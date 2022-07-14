@@ -1,0 +1,60 @@
+.container {
+  padding: 39px 28px;
+}
+
+.collapse {
+  // 標題 (ex 基本資料建立)
+  [class="ant-collapse-header"] {
+    position: relative;
+    width: fit-content;
+    padding: 0 !important;
+  }
+  // 標題的文字
+  [class="ant-collapse-header-text"] {
+    font-weight: 400;
+    font-size: 18px;
+    color: #14256a;
+  }
+  // 標題的箭頭
+  [class="ant-collapse-expand-icon"] {
+    position: absolute;
+    left: calc(100% + 7px);
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    > * {
+      margin: auto;
+    }
+  }
+
+  [class="ant-collapse-content-box"] {
+    padding: 0 0 9px 0 !important;
+    > ul {
+      padding: 0px 9px;
+      margin: 0;
+      margin-top: 28px;
+      > li {
+        padding-left: 9px;
+        font-weight: 600;
+        font-size: 18px;
+        margin-top: 16px;
+        border-left: solid 1px transparent;
+        &.active {
+          border-left: solid 1px #ea1833;
+          > a {
+            color: #ea1833;
+            font-weight: 600;
+          }
+        }
+        > a {
+          font-weight: 400;
+          font-size: 18px;
+          color: #404040;
+        }
+        &:nth-of-type(1) {
+          margin-top: 0px;
+        }
+      }
+    }
+  }
+}
