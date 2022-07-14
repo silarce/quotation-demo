@@ -1,0 +1,58 @@
+.container {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-gap: 19px;
+  margin: auto;
+  margin-right: 23px;
+  height: fit-content;
+  > * {
+    margin: auto;
+  }
+}
+
+.avatar {
+  display: block;
+  width: 64px;
+  height: 64px;
+}
+
+.name {
+  > p {
+    margin: auto;
+    &:nth-of-type(1) {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 19px;
+      letter-spacing: 0em;
+      text-align: left;
+      color: #14256a;
+    }
+    &:nth-of-type(2) {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 19px;
+      letter-spacing: 0em;
+      text-align: left;
+      color: #14256a;
+    }
+  }
+}
+
+.line {
+  width: 2px;
+  height: 44px;
+  margin-left: 4px;
+  background-color: #EA1833;
+}
+
+.logout {
+  cursor:pointer;
+  > span {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+    color: #14256a;
+    margin-left: 5px;
+  }
+}
