@@ -24,7 +24,10 @@ import icon_project from "public/image/icon/project.svg"
 
 
 export default function Nav() {
-  const pathname = useRouter().pathname
+  // const pathname = useRouter().pathname
+  const router = useRouter()
+  const pathname = router.pathname
+
 
 
   return (

@@ -8,19 +8,24 @@ const { Panel } = Collapse;
 // css
 import style from "./side.module.scss"
 
+// meta
+import pathList from './pathList';
 
 export default function Side() {
-  const pathname = useRouter().pathname
+  const pathname: string = useRouter().pathname
 
-  console.log(pathname)
+  let linkList = pathList[pathname]
+  if (!linkList) linkList = pathList["/"]
 
   return (
     <div className={style.container}>
-      {settingList.list.map((item, index) => {
+      {linkList.list.map((item, index) => {
         const { label, path, list } = item
         if (path) {
           return (
-            <p key={index}>{label}</p>
+            <Link href={path} key={index}>
+              <a className={style.option} key={index}>{label}</a>
+            </Link>
           )
         }
         if (list) {
@@ -90,14 +95,4 @@ const settingList = {
     },
   ]
 }
-
-
-
-
-// const foo = {
-//   "/set": "set"
-// }
-
-// console.log(foo["/set"])
-
 
