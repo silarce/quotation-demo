@@ -12,14 +12,16 @@ import style from "./side.module.scss"
 import pathList from './pathList';
 
 export default function Side() {
-  const pathname: string = useRouter().pathname
+  // const pathname: string = useRouter().pathname
+  const router = useRouter()
+  const pathname = router.pathname
+  const parentPath = "/" + pathname.split("/")[1]
 
-  let linkList = pathList[pathname]
-  if (!linkList) linkList = pathList["/"]
+  let linkList = pathList[parentPath]
 
   return (
     <div className={style.container}>
-      {linkList.list.map((item, index) => {
+      {linkList?.list.map((item, index) => {
         const { label, path, list } = item
         if (path) {
           return (
@@ -31,7 +33,7 @@ export default function Side() {
         if (list) {
           return (
             <Collapse key={index} className={style.collapse}
-              defaultActiveKey={[settingList.defaultCollapse]} ghost
+              defaultActiveKey={[linkList.defaultCollapse]} ghost
               // defaultActiveKey={['0']} ghost
               onChange={() => { }}>
               <Panel header={label} key={`${index}`}>
@@ -55,44 +57,5 @@ export default function Side() {
       })}
     </div>
   )
-}
-
-
-// ==============================================
-
-
-const settingList = {
-  defaultCollapse: "0",
-  list: [
-    {
-      label: "基本資料建立",
-      list: [
-        {
-          label: "公司資料",
-          path: "/setting/theCompanyInfo",
-        },
-        {
-          label: "公司職等職稱",
-          path: "/setting/grade",
-        },
-        {
-          label: "人員資料",
-          path: "/setting/staffProfile",
-        },
-        {
-          label: "人事權限管理",
-          path: "/setting/hrManage",
-        },
-      ]
-    },
-    {
-      label: "客戶列表",
-      path: "/setting/clientList",
-    },
-    {
-      label: "產品列表",
-      path: "/setting/productList"
-    },
-  ]
 }
 

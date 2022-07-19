@@ -1,7 +1,10 @@
+@use "styles/theme01" as *;
+
 /* 字體 Inter */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 /* 字體 Noto sans */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap");
+
 
 @tailwind base;
 @tailwind components;
@@ -31,6 +34,7 @@ a,
 textarea,
 input {
   font-family: inter, noto sans tc;
+  color: $colorMain;
 }
 
 a {
@@ -45,7 +49,7 @@ a {
 // 出現404頁面的時候，把css蓋掉
 // 不然被bod的bgc會被設定成#000
 @media (prefers-color-scheme: dark) {
-  html >body {
+  html > body {
     background-color: #fff;
   }
 }

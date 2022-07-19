@@ -11,13 +11,12 @@ import '../styles/globals.scss'
 import 'antd/dist/antd.css';
 
 
-
 function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
       <Head>
-        <title>三久ERP</title>
+        <title >三久ERP</title>
       </Head>
       <Layer>
         <Component {...pageProps} />

@@ -1,3 +1,5 @@
+@use "styles/theme01" as *;
+
 .container {
   display: grid;
   grid-template-columns: auto auto auto auto;
@@ -25,7 +27,7 @@
       line-height: 19px;
       letter-spacing: 0em;
       text-align: left;
-      color: #14256a;
+      color: $colorMain;
     }
     &:nth-of-type(2) {
       font-size: 16px;
@@ -33,7 +35,7 @@
       line-height: 19px;
       letter-spacing: 0em;
       text-align: left;
-      color: #14256a;
+      color: $colorMain;
     }
   }
 }
@@ -42,17 +44,17 @@
   width: 2px;
   height: 44px;
   margin-left: 4px;
-  background-color: #EA1833;
+  background-color: $colorActive01;
 }
 
 .logout {
-  cursor:pointer;
+  cursor: pointer;
   > span {
     font-style: normal;
     font-weight: 600;
     font-size: 16px;
     line-height: 19px;
-    color: #14256a;
+    color: $colorMain;
     margin-left: 5px;
   }
 }
