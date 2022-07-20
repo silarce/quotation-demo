@@ -6,28 +6,6 @@
   height: 100%;
 }
 
-.headerBar {
-  display: flex;
-  height: 100%;
-  > * {
-    margin: auto;
-    margin-left: 17px;
-  }
-  > button {
-    margin-top: 18px;
-    padding: 10px 44px;
-    border: solid 1px $colorBorder01;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 19px;
-    color: $colorMain;
-    &.uploadBtn {
-      color: $colorActive01;
-      border-color: $colorActive01;
-    }
-  }
-}
-
 .mainContainer {
   display: grid;
   grid-template-columns: fit-content(100%) auto;
@@ -41,7 +19,6 @@
   display: grid;
   width: 440px;
   height: 360px;
-  padding-top: 50px;
   border: solid 1px $colorBorder01;
   > * {
     margin: auto;
@@ -59,10 +36,36 @@
   }
 }
 
-.loadPhotoButton {
+// 上傳圖片按鈕
+
+.loadButtonBox {
   position: absolute;
-  top: 9px;
-  left: 9px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 9px;
+  background-color: #fff8;
+  > span {
+    margin-left: 9px;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    color: $colorSub;
+  }
+  > img {
+    position: absolute;
+    top: 50%;
+    right: 17px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.loadPhotoButton {
+  // position: absolute;
+  // top: 9px;
+  // left: 9px;
   padding: 7px 25px;
   border: solid 1px $colorBorder01;
   background-color: #fff;
@@ -75,19 +78,19 @@
     color: $colorMain;
   }
   // 上限10MB
-  > span:nth-of-type(2) {
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 9px);
-    transform: translateY(-50%);
-    width: fit-content;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 15px;
-    color: $colorSub;
-    cursor: auto;
-    // background-color: #fff8;
-  }
+  // > span:nth-of-type(2) {
+  //   position: absolute;
+  //   top: 50%;
+  //   left: calc(100% + 9px);
+  //   transform: translateY(-50%);
+  //   width: fit-content;
+  //   font-weight: 500;
+  //   font-size: 12px;
+  //   line-height: 15px;
+  //   color: $colorSub;
+  //   cursor: auto;
+  //   // background-color: #fff8;
+  // }
   > input {
     display: none;
   }

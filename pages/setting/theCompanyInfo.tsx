@@ -2,14 +2,16 @@
 // 公司資料
 
 import {
-  useState, useEffect,
-  Dispatch, SetStateAction, SyntheticEvent,
-  ChangeEventHandler
-
+  useState,
+  // Dispatch, SetStateAction, SyntheticEvent,
+  // ChangeEventHandler
 } from "react"
-import Image from "next/image"
 
+// components
 import PageHeader from "components/PageTitle/pageHeader"
+
+// icon
+import iconDelete from "public/image/icon/delete01.svg"
 
 // css
 import style from "./theCompanyInfo.module.scss"
@@ -40,43 +42,12 @@ export default function TheCompanyInfo() {
     }
   }
 
-  // interface event01 {
-  //   target: {
-  //     files: any[]
-  //   }
-  // }
-  // const preloadImg = (e: event01) => {
-  //   if (!e.target?.files?.[0]) return
-  //   const file = e.target.files[0]
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(file)
-  //   reader.onload = (e: ProgressEvent<FileReader>) => {
-  //     if (!e.target?.result) return
-  //     setImgSrc((e.target?.result) as string)
-  //   }
-  // }
-
-  // const preloadImg = (e: Event) => {
-  // const preloadImg = (e: event01) => {
-  //   // const preloadImg = (e: ProgressEvent<{files:Blob[]}>) => {
-  //   if (!e.target?.files?.[0]) return
-  //   const file = e.target.files[0]
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(file)
-  //   reader.onload = (e: ProgressEvent<FileReader>) => {
-  //     if (!e.target?.result) return
-  //     setImgSrc((e.target?.result) as string)
-  //   }
-  // }
-
-
   // ===================================================
-  // console.log(imgSrc)
 
-  const stopBubble = (e: { preventDefault: () => void }) => {
-    // e.stopPropagation()
-    e.preventDefault()
-  }
+
+  // const stopBubble = (e: { preventDefault: () => void }) => {
+  //   e.preventDefault()
+  // }
 
   return (
     <div className={style.container}>
@@ -98,13 +69,17 @@ export default function TheCompanyInfo() {
             : <span>LOGO</span>}
           {disable
             ? ""
-            : <label className={style.loadPhotoButton} htmlFor="uploadLogo">
-              <span>上傳公司Logo</span>
-              <span onClick={stopBubble}>{"(上限10MB)"}</span>
-              <input id="uploadLogo" type="file"
-                onChange={preloadImg}
-              />
-            </label>
+            : <div className={style.loadButtonBox}>
+              <label className={style.loadPhotoButton} htmlFor="uploadLogo">
+                <span>上傳公司Logo</span>
+                <input id="uploadLogo" type="file"
+                  onChange={preloadImg}
+                />
+              </label>
+              <span>{"(上限10MB)"}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={iconDelete.src} alt="delete" />
+            </div>
           }
         </div>
         <div className={style.formContainer}>
