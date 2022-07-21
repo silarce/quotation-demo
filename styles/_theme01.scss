@@ -1,0 +1,29 @@
+$colorMain: #14256a;
+$colorSub: #404040;
+$colorText: #404040;
+
+$colorActive01: #ea1833;
+
+$colorBorder01: #c1c1c1;
+
+.headerBar {
+  display: flex;
+  height: 100%;
+  > * {
+    margin: auto;
+    margin-left: 17px;
+  }
+  > button {
+    margin-top: 18px;
+    padding: 10px 44px;
+    border: solid 1px $colorBorder01;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+    color: $colorMain;
+    &.uploadBtn {
+      color: $colorActive01;
+      border-color: $colorActive01;
+    }
+  }
+}

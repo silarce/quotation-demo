@@ -1,3 +1,5 @@
+@use "styles/theme01" as *;
+
 /* 字體 Inter */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 /* 字體 Noto sans */
@@ -14,7 +16,8 @@ body {
   font-family: inter, noto sans tc;
   height: 100%;
 }
-body > div {
+
+#__next {
   height: 100%;
 }
 
@@ -31,6 +34,7 @@ a,
 textarea,
 input {
   font-family: inter, noto sans tc;
+  color: $colorMain;
 }
 
 a {
@@ -42,4 +46,10 @@ a {
   box-sizing: border-box;
 }
 
-
+// 出現404頁面的時候，把css蓋掉
+// 不然被bod的bgc會被設定成#000
+@media (prefers-color-scheme: dark) {
+  html > body {
+    background-color: #fff;
+  }
+}

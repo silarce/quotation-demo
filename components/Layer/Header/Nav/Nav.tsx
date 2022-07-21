@@ -24,7 +24,10 @@ import icon_project from "public/image/icon/project.svg"
 
 
 export default function Nav() {
-  const pathname = useRouter().pathname
+  // const pathname = useRouter().pathname
+  const router = useRouter()
+  const pathname = router.pathname
+
 
 
   return (
@@ -52,7 +55,7 @@ export default function Nav() {
 
 const linkList = [
   { icon: icon_home, href: "/", label: "首頁" },
-  { icon: icon_setting, href: "/setting", label: "公司設定" },
+  { icon: icon_setting, href: "/setting/theCompanyInfo", label: "公司設定" },
   { icon: icon_domestic, href: "/domestic", label: "營業部", subLabel: "-國內工程" },
   { icon: icon_foreign, href: "/foreign", label: "營業部", subLabel: "-國外工程", },
   { icon: icon_project, href: "/project", label: "工務部" },
