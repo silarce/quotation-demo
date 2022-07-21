@@ -3,7 +3,7 @@ import React from "react";
 import style from "./logo.module.scss"
 
 // logo
-import logo from "public/Image/logo/logo01.svg"
+import logo from "public/image/logo/logo01.svg"
 
 export default function Logo() {
 

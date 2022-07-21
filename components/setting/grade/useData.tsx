@@ -9,7 +9,7 @@ interface Tdata {
   label: string
   id?: string | number
   editLabel?: (e: ChangeEvent<HTMLInputElement>) => void
-  list: { label: string, editLabel?: (e: ChangeEvent<HTMLInputElement>) => void }[]
+  list: { label: string | null, editLabel?: (e: ChangeEvent<HTMLInputElement>) => void }[]
 }
 
 export default function useData() {
@@ -18,7 +18,7 @@ export default function useData() {
 
   const resetData = () => {
     setData([])
-    const list = metaList.map((item, index) => {
+    metaList.forEach((item, index) => {
       const { id, label, list } = item
       new Department({ id, label, index, list, setData })
     })
@@ -40,9 +40,8 @@ class Manager {
   setData
   constructor(
     { parentIndex, index, label, setData }: {
-      parentIndex: number, index: number, label: string,
-      // setData: Dispatch<SetStateAction<object[]>>
-      setData: any
+      parentIndex: number, index: number, label: string | null,
+      setData: Dispatch<SetStateAction<Tdata[]>>
     }
   ) {
     this.parentIndex = parentIndex
@@ -50,9 +49,9 @@ class Manager {
     this.label = label
     this.setData = setData
   }
-  editLabel = (e: any) => {
+  editLabel = (e: ChangeEvent<HTMLInputElement>) => {
     this.label = e.target.value
-    this.setData((state: any[]) => {
+    this.setData((state: Tdata[]) => {
       state[this.parentIndex].list[this.index] = this
       return [...state]
     })
@@ -71,9 +70,9 @@ class Department {
   setData
   constructor(
     { index, id, label, list, setData }: {
-      index: number, id: string, label: string, list: any[]
-      // setData: Dispatch<SetStateAction<object[]>>
-      setData: any
+      index: number, id: string, label: string, list: type_Unit
+      // setData: any
+      setData: Dispatch<SetStateAction<Tdata[]>>
     }
   ) {
     this.index = index
@@ -86,14 +85,14 @@ class Department {
       return new Manager({ label, parentIndex, index: childIndex, setData })
     })
 
-    setData((state: this[]) => {
+    setData((state: Tdata[]) => {
       state[index] = this
       return [...state]
     })
   }
-  editLabel = (e: any) => {
+  editLabel = (e: ChangeEvent<HTMLInputElement>) => {
     this.label = e.target.value
-    this.setData((state: this[]) => {
+    this.setData((state: Tdata[]) => {
       state[this.index] = this
       return [...state]
     })
@@ -111,11 +110,15 @@ class Department {
 
 
 
+interface type_metaList {
+  id: string
+  label: string
+
+}[]
 
 
-
-
-
+// type type_Unit = typeof metaList[0]["list"]
+type type_Unit = typeof metaList[0]["list"]
 
 
 

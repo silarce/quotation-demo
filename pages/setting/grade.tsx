@@ -14,11 +14,12 @@ import AddUnit from "components/setting/grade/modal/AddUnit"
 // hook
 import useData from "../../components/setting/grade/useData"
 
-// css
-import style from "./grade.module.scss"
 
 // icon
 import iconAdd from "public/image/icon/add.svg"
+
+// css
+import style from "./grade.module.scss"
 
 interface Tdata {
   label: string

@@ -3,8 +3,7 @@
 
 import {
   useState,
-  // Dispatch, SetStateAction, SyntheticEvent,
-  // ChangeEventHandler
+  ChangeEvent,
 } from "react"
 
 // components
@@ -32,22 +31,16 @@ export default function TheCompanyInfo() {
   const [upload, setUpload] = useState(false)
   const [imgSrc, setImgSrc] = useState("")
 
-  const preloadImg = (e: any) => {
-    if (!e.target.files[0]) return
+  const preloadImg = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
     const file = e.target.files[0]
     const reader = new FileReader();
     reader.readAsDataURL(file)
-    reader.onload = (e: any) => {
-      setImgSrc(e.target.result)
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      if (!e.target) return
+      setImgSrc(e.target.result as string)
     }
   }
-
-  // ===================================================
-
-
-  // const stopBubble = (e: { preventDefault: () => void }) => {
-  //   e.preventDefault()
-  // }
 
   return (
     <div className={style.container}>
