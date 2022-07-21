@@ -1,16 +1,4 @@
 
-
-// interface indexType {
-//   [path: string]: {
-//     label: string
-//     [key: string]: {}
-//   }
-// }
-
-// interface indexType {
-//   label: string
-//   [key: string]: string | object
-// }
 interface indexType {
   label: string
   [key: string]: string | object
