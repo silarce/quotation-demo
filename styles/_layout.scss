@@ -24,16 +24,27 @@
   }
   // 這個是div裡包input與img
   > .searchInput {
+    position: relative;
     display: flex;
     width: 188px;
-    padding: 10px 0px 9px 8px;
+    padding: 10px 0px 10px 8px;
     margin-right: 25px;
-    border-bottom: solid 1px $colorBorder01;
     > input {
       width: 100%;
+      &:focus ~ .borderBottom {
+        background-color: $colorActive01;
+      }
     }
     > img {
       cursor: pointer;
+    }
+    > .borderBottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: $colorBorder01;
     }
   }
 }
