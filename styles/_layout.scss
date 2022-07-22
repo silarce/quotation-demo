@@ -1,6 +1,5 @@
 @use "styles/theme01" as *;
 
-
 .headerBar {
   display: flex;
   height: 100%;
@@ -39,13 +38,20 @@
   }
 }
 // ======================================================
+.container {
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
+  height: 100%;
+}
 .scrollContainer {
   display: grid;
   height: 100%;
   grid-template-rows: fit-content(100%) auto;
-  // grid-template-rows: fit-content(100%) fit-content(100%);
-  // overflow: hidden;
   > div:nth-of-type(2) {
     overflow: auto;
   }
+}
+
+.mainContainer {
+  border: solid 1px $colorBorder01;
 }
