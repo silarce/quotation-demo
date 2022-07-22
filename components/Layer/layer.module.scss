@@ -9,16 +9,15 @@
 .wrapper {
   display: grid;
   grid-template-columns: 221px auto;
-  // overflow: hidden;
-  height:100%;
+  overflow: hidden;
+  height: 100%;
 }
 .main {
   height: 100%;
-  padding:0 15px 15px 0;
+  padding: 0 15px 15px 0;
+  overflow: hidden;
   // overflow: auto;
-  height:100%;
 }
-
 .logo {
   width: 70px;
 }
