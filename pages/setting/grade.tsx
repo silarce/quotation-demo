@@ -50,7 +50,7 @@ export default function Grade() {
   // ===============================
 
   return (
-    <>
+    <div className={style.container}>
       <PageHeader>
         {editable
           ? <ButtonBar02 setEditable={setEditable} setVisibleAddUnit={setVisibleAddUnit} resetData={resetData} />
@@ -76,7 +76,7 @@ export default function Grade() {
       />
       <AddUnit visible={visibleAddUnit} setVisible={setVisibleAddUnit}
       />
-    </>
+    </div>
   )
 }
 

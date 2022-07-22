@@ -43,6 +43,7 @@ export default function TheCompanyInfo() {
   }
 
   return (
+    // <div className="container">
     <div className={style.container}>
       <PageHeader>
         <div>
