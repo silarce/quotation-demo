@@ -23,6 +23,10 @@
   grid-template-columns: 100px auto;
   gap: 40px;
   padding: 17px $leftPadding_option 14px $leftPadding_option;
+  > * {
+    margin: auto;
+    margin-left: 0;
+  }
   > span {
     font-weight: 500;
     font-size: 20px;
@@ -50,51 +54,105 @@
 }
 
 .select {
-  position: relative;
-  cursor: pointer;
   width: fit-content;
-  > * {
-    display: inline-block;
-    vertical-align: middle;
+  input {
+    background-color: #fff;
+    box-shadow: none;
   }
-  > span {
+  [class$="control"] {
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+  [class$="ValueContainer"] {
+    padding: 0;
+  }
+  [class$="indicatorSeparator"] {
+    display: none;
+  }
+
+  [class$="placeholder"] {
     width: 90px;
     font-weight: 400;
     font-size: 18px;
     line-height: 22px;
     color: $colorBorder01;
-    margin-right: 23px;
-    &.hasValue {
-      color: $colorText;
+  }
+  [class$="singleValue"] {
+    width: 90px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorText;
+  }
+
+  [class$="option"] {
+    display: block;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorText;
+    cursor: pointer;
+    background-color: transparent;
+    &:hover {
+      color: $colorActive01;
+      background-color: transparent;
     }
   }
+
+  // [class$=]{
+  // }
 }
+// .select {
+//   position: relative;
+//   cursor: pointer;
+//   width: fit-content;
+//   > * {
+//     display: inline-block;
+//     vertical-align: middle;
+//   }
+//   > span {
+//     width: 90px;
+//     font-weight: 400;
+//     font-size: 18px;
+//     line-height: 22px;
+//     color: $colorBorder01;
+//     margin-right: 23px;
+//     &.hasValue {
+//       color: $colorText;
+//     }
+//   }
+// }
 
 .selList {
-  :global(.ant-dropdown-menu-title-content) {
-    &:hover {
-      > span {
-        color: $colorActive01;
-      }
-    }
-    > span {
-      display: block;
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 22px;
-      color: $colorText;
-      padding:10px 5px;
-    }
-  }
-  :global(.ant-dropdown-menu){
-    padding:0;
-  }
-  :global(.ant-dropdown-menu-item) {
-    padding: 0;
-    // background-color: pink;
-    // padding-top:0;
-    // padding-bottom:0;
-  }
   // :global(.){
   // }
 }
+// .selList {
+//   :global(.ant-dropdown-menu-title-content) {
+//     &:hover {
+//       > span {
+//         color: $colorActive01;
+//       }
+//     }
+//     > span {
+//       display: block;
+//       font-weight: 400;
+//       font-size: 18px;
+//       line-height: 22px;
+//       color: $colorText;
+//       padding:10px 5px;
+//     }
+//   }
+//   :global(.ant-dropdown-menu){
+//     padding:0;
+//   }
+//   :global(.ant-dropdown-menu-item) {
+//     padding: 0;
+//     // background-color: pink;
+//     // padding-top:0;
+//     // padding-bottom:0;
+//   }
+//   // :global(.){
+//   // }
+// }

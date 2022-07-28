@@ -28,7 +28,7 @@ export default function EditStaff({ selStaffInfo, setSelStaffInfo }:
       </div>
 
       <EditStaffProfile01 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
-      {/* <EditStaffProfile02 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} /> */}
+      <EditStaffProfile02 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
 
 
     </div>

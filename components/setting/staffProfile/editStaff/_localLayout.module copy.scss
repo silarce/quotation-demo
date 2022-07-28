@@ -1,0 +1,100 @@
+@use "styles/theme01" as *;
+@use "../local.module" as *;
+
+.container {
+  margin-top: 27px;
+  > p {
+    padding: 11px $leftPadding_title;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    background-color: $bgc01;
+  }
+}
+
+.main {
+  padding: 29px $leftPadding_div;
+  border: solid 1px $colorBorder01;
+}
+
+.label {
+  position: relative;
+  display: grid;
+  grid-template-columns: 100px auto;
+  gap: 40px;
+  padding: 17px $leftPadding_option 14px $leftPadding_option;
+  > span {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    color: $colorText;
+  }
+  > input {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    &::placeholder {
+      color: $colorBorder01;
+    }
+    &:focus ~ hr {
+      border-color: $colorActive01;
+    }
+  }
+  > hr {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 100%;
+    border-color: #14256a;
+  }
+}
+
+.select {
+  position: relative;
+  cursor: pointer;
+  width: fit-content;
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > span {
+    width: 90px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorBorder01;
+    margin-right: 23px;
+    &.hasValue {
+      color: $colorText;
+    }
+  }
+}
+
+.selList {
+  :global(.ant-dropdown-menu-title-content) {
+    &:hover {
+      > span {
+        color: $colorActive01;
+      }
+    }
+    > span {
+      display: block;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 22px;
+      color: $colorText;
+      padding:10px 5px;
+    }
+  }
+  :global(.ant-dropdown-menu){
+    padding:0;
+  }
+  :global(.ant-dropdown-menu-item) {
+    padding: 0;
+    // background-color: pink;
+    // padding-top:0;
+    // padding-bottom:0;
+  }
+  // :global(.){
+  // }
+}

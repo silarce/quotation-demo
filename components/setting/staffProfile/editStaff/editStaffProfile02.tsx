@@ -3,15 +3,15 @@ import { useState, Dispatch, SetStateAction } from "react"
 
 // gear
 import {
-  Tdata, TdepartmentData, Toptions,
-  Input,
-  menuCreator, Select, SelectGroup
+  Tdata, TdepartmentData,
+  Input, Select
 } from "./gear"
 
 
 // css
 import style from "./editStaffProfile02.module.scss"
 
+// icon
 import iconAdd from "public/image/icon/addCircle.svg"
 import iconRemove from "public/image/icon/removeCircle.svg"
 
@@ -43,16 +43,16 @@ export default function EditStaffProfile02(
         {/* select */}
         <div>
           <div className={style.selBox}>
-            <SelectGroup {...{
-              data: department01,
-              stateData: selStaffInfo.department01,
-              setSelStaffInfo
-            }} />
-            {/* {department01.map((item, index) => {
+            {departmentGroup.map((item, index) => {
+              const { key } = item
               return (
-                <Select key={index} data={item} />
+                <Select key={index} data={item}
+                  {...{
+                    stateData: selStaffInfo["department01"][key],
+                    setSelStaffInfo, parentKey: "department01"
+                  }} />
               )
-            })} */}
+            })}
             {/*  eslint-disable-next-line @next/next/no-img-element */}
             <img src={isDepart02 ? iconRemove.src : iconAdd.src} alt="增加/移除部門"
               onClick={switchNewDepart}
@@ -60,20 +60,16 @@ export default function EditStaffProfile02(
           </div>
           {isDepart02 &&
             <div className={style.selBox}>
-
-
-              {/* <SelectGroup {...{
-                data: department02,
-                stateData: selStaffInfo.department02,
-                setSelStaffInfo
-              }} /> */}
-
-
-              {/* {department02.map((item, index) => {
+              {departmentGroup.map((item, index) => {
+                const { key } = item
                 return (
-                  <Select key={index} data={item} />
+                  <Select key={index} data={item}
+                    {...{
+                      stateData: selStaffInfo["department02"][key],
+                      setSelStaffInfo, parentKey: "department02"
+                    }} />
                 )
-              })} */}
+              })}
             </div>
           }
         </div>
@@ -111,40 +107,55 @@ export default function EditStaffProfile02(
 
 // 部門
 const selOptionsDepartment = [
-  { label: "管理部" },
-  { label: "營業部" },
-  { label: "研發部" },
-  { label: "工程部" },
-  { label: "廠務部" },
-  { label: "會計部" },
+  { value: "管理部", label: "管理部" },
+  { value: "營業部", label: "營業部" },
+  { value: "研發部", label: "研發部" },
+  { value: "工程部", label: "工程部" },
+  { value: "廠務部", label: "廠務部" },
+  { value: "會計部", label: "會計部" },
 ]
 // 職稱
 const selOptionsJobTitle = [
-  { label: "總經理" },
-  { label: "副總經理" },
-  { label: "協理" },
-  { label: "資深經理" },
-  { label: "經理" },
-  { label: "副理" },
-  { label: "課長" },
-  { label: "副課長" },
-  { label: "專員" },
-  { label: "助理" },
+  { value: "總經", label: "總經理" },
+  { value: "副總經理", label: "副總經理" },
+  { value: "協理", label: "協理" },
+  { value: "資深經理", label: "資深經理" },
+  { value: "經理", label: "經理" },
+  { value: "副理", label: "副理" },
+  { value: "課長", label: "課長" },
+  { value: "副課長", label: "副課長" },
+  { value: "專員", label: "專員" },
+  { value: "助理", label: "助理" },
 ]
 // 職等
 const selOptionsLevel = [
-  { label: "Level 10" },
-  { label: "Level 9" },
-  { label: "Level 8" },
-  { label: "Level 7" },
-  { label: "Level 6" },
-  { label: "Level 5" },
-  { label: "Level 4" },
-  { label: "Level 3" },
-  { label: "Level 2" },
-  { label: "Level 1" },
+  { value: "Level 10", label: "Level 10" },
+  { value: "Level 9", label: "Level 9" },
+  { value: "Level 8", label: "Level 8" },
+  { value: "Level 7", label: "Level 7" },
+  { value: "Level 6", label: "Level 6" },
+  { value: "Level 5", label: "Level 5" },
+  { value: "Level 4", label: "Level 4" },
+  { value: "Level 3", label: "Level 3" },
+  { value: "Level 2", label: "Level 2" },
+  { value: "Level 1", label: "Level 1" },
 ]
 
+
+const departmentGroup: TdepartmentData[] = [
+  {
+    key: "department", label: "部門", placeholder: "請選擇部門",
+    options: selOptionsDepartment
+  },
+  {
+    key: "jobTitle", label: "職稱", placeholder: "請選擇職稱",
+    options: selOptionsJobTitle
+  },
+  {
+    key: "level", label: "職等", placeholder: "請選擇職等",
+    options: selOptionsLevel
+  },
+]
 
 const department01: { key: string, list: TdepartmentData[] } = {
   key: "department01",

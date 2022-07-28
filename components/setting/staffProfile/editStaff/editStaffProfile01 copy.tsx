@@ -46,10 +46,11 @@ export default function EditStaffProfile01(
           <div>
             <Input data={list02.birthday}
               {...{ stateData: selStaffInfo.birthday, setSelStaffInfo }} />
+            {/* <Select /> */}
             <Select data={list02.sex}
               {...{ stateData: selStaffInfo.sex, setSelStaffInfo }} />
-            <Select data={list02.marital}
-              {...{ stateData: selStaffInfo.marital, setSelStaffInfo }} />
+            {/* <Select data={list02.marital}
+              {...{ stateData: selStaffInfo.marital, setSelStaffInfo }} /> */}
             <Input data={list02.education}
               {...{ stateData: selStaffInfo.education, setSelStaffInfo }} />
             <Input data={list02.expertise}
@@ -103,12 +104,12 @@ const list03: Tdata[] = [
 
 
 const selOptionsSex = [
-  { value: "男", label: "男" },
-  { value: "女", label: "女" },
+  { label: "男" },
+  { label: "女" },
 ]
 const selOptionsMarital = [
-  { value: "已婚", label: "未婚" },
-  { value: "未婚", label: "已婚" },
+  { label: "未婚" },
+  { label: "已婚" },
 ]
 
 const list02: { [key: string]: Tdata } = {
@@ -116,10 +117,12 @@ const list02: { [key: string]: Tdata } = {
   sex: {
     key: "sex", label: "性別", placeholder: "請選擇性別",
     options: selOptionsSex
+    // menu: menuCreator(selOptionsSex)
   },
   marital: {
     key: "marital", label: "婚姻", placeholder: "請選擇狀態",
     options: selOptionsMarital
+    // menu: menuCreator(selOptionsMarital)
   },
   education: { key: "education", label: "學歷", placeholder: "請輸入學歷" },
   expertise: { key: "expertise", label: "專長", placeholder: "請輸入專長" },
