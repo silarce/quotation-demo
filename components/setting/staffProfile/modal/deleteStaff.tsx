@@ -9,7 +9,7 @@ import { Modal } from 'antd';
 import style from "./deleteStaff.module.scss"
 
 // type
-import { TstaffInfo } from "../staffList";
+import { TstaffInfo } from "components/setting/staffProfile/fakeData";
 
 export default function DeleteStaff({ visible, setVisible, staffInfo }:
   {
@@ -19,7 +19,7 @@ export default function DeleteStaff({ visible, setVisible, staffInfo }:
   }) {
 
 
-  const { name } = staffInfo
+  const { chName } = staffInfo
 
 
   return (
@@ -33,7 +33,7 @@ export default function DeleteStaff({ visible, setVisible, staffInfo }:
       cancelText="取消"
       onCancel={() => setVisible(false)}
     >
-      <p>請確定是否刪除「{name}」</p>
+      <p>請確定是否刪除「{chName}」</p>
     </Modal>
   )
 }

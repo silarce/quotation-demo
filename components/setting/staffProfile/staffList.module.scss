@@ -1,6 +1,7 @@
 @use "styles/theme01" as *;
 
 .antdTable {
+  padding: 0 4px;
   :global(.ant-table) {
     th {
       padding: 12px 10px;
@@ -23,9 +24,6 @@
   :global(.ant-table-cell) {
     border: none;
     border-bottom: solid 1px #c1c1c1;
-
-    // border:solid 1px black;
-
     &::before {
       display: none;
     }
@@ -33,10 +31,6 @@
       padding-left: 46px;
     }
   }
-
-  :global(.ant-table-thead) {
-  }
-
   // :global(.){
   // }
 }

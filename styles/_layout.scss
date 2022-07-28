@@ -20,6 +20,9 @@
     &.uploadBtn {
       color: $colorActive01;
       border-color: $colorActive01;
+      > span {
+        color: $colorActive01;
+      }
     }
   }
   // 這個是div裡包input與img

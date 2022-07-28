@@ -1,0 +1,20 @@
+@use "styles/theme01" as *;
+@use "../local.module" as *;
+@use "./localLayout.module" as *;
+
+.form01 {
+  display: grid;
+  grid-template-columns: 1fr 65px 1fr;
+  gap: 24px 0;
+  > div:nth-last-of-type(1) {
+    grid-column: span 3;
+  }
+}
+
+// 垂直分隔線
+.vr {
+  width: 1px;
+  height: 100%;
+  margin: auto;
+  background-color: $colorBorder01;
+}

@@ -1,0 +1,31 @@
+@use "styles/theme01" as *;
+@use "./local.module" as *;
+
+
+.container {
+  height: 100%;
+  padding: 38px 45px 41px 45px;
+  overflow: auto;
+}
+
+// 使用者代號
+.staffId {
+  min-width: 300px;
+  width: fit-content;
+  padding: 20px $leftPadding_title;
+  border: solid 1px $colorBorder01;
+  > span {
+    &:nth-of-type(1) {
+      margin-right: 40px;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 24px;
+      color:$colorText;
+    }
+    &:nth-of-type(2) {
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 22px;
+    }
+  }
+}

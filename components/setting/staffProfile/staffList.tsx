@@ -12,14 +12,21 @@ import iconDelete from "public/image/icon/delete01.svg"
 // css
 import style from "./staffList.module.scss"
 
+// fakeData
+import { TstaffInfo } from "./fakeData"
+
 
 
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 type TsetDelVisible = Dispatch<SetStateAction<boolean>>
 
 export default function StaffList(
-  { setSelStaffInfo, setDelVisible }:
-    { setSelStaffInfo: TsetSelStaffInfo, setDelVisible: TsetDelVisible }) {
+  { setSelStaffInfo, setDelVisible, data }:
+    {
+      setSelStaffInfo: TsetSelStaffInfo,
+      setDelVisible: TsetDelVisible
+      data: TstaffInfo[]
+    }) {
 
 
   const columns = useMemo(() => columnsCreator(setSelStaffInfo, setDelVisible)
@@ -52,48 +59,49 @@ const columnsCreator = (
       },
       {
         title: '姓名',
-        dataIndex: 'name',
+        dataIndex: 'chName',
         width: 150,
       },
       {
         title: '電話',
-        dataIndex: 'phone',
+        dataIndex: 'phone01',
         width: 170,
       },
       {
         title: '部門編號/部門名稱/職稱/職等',
         dataIndex: 'info01',
         width: 300,
-        render: (_, { info01 }) => (
-          <>
-            {info01.map((item, index) => {
-              return (
-                <span className={style.infoSpan}
-                  key={index}
-                >
-                  {item}
-                </span>
-              )
-            })}
-          </>
-        )
+        render: (_, { department01 }) => {
+          const { departmentId, department,
+            jobTitle, level, } = department01
+          return (
+            <>
+              <span className={style.infoSpan}>{departmentId}</span>
+              <span className={style.infoSpan}>{department}</span>
+              <span className={style.infoSpan}>{jobTitle}</span>
+              <span className={style.infoSpan}>{level}</span>
+            </>
+          )
+        }
       },
       {
         title: '',
         dataIndex: 'info02',
-        render: (_, { info02 }) => (
-          <>
-            {info02.map((item, index) => {
-              return (
-                <span className={style.infoSpan}
-                  key={index}
-                >
-                  {item}
-                </span>
-              )
-            })}
-          </>
-        )
+        render: (_, { department02 }) => {
+          if (!department02) return null
+          const { departmentId, department,
+            jobTitle, level } = department02
+
+          if (!departmentId) return null
+          return (
+            <>
+              <span className={style.infoSpan}>{departmentId}</span>
+              <span className={style.infoSpan}>{department}</span>
+              <span className={style.infoSpan}>{jobTitle}</span>
+              <span className={style.infoSpan}>{level}</span>
+            </>
+          )
+        }
       },
       {
         title: '',
@@ -117,62 +125,4 @@ const columnsCreator = (
     ] as ColumnsType<TstaffInfo>
   )
 }
-
-
-
-
-// ==============================================
-export interface TstaffInfo {
-  key?: string | number;
-  staffId?: string;
-  name: string;
-  phone: number | string;
-  info01: string[]; //等到接api看看資料長什麼樣子再改吧
-  info02: string[]; //等到接api看看資料長什麼樣子再改吧
-}
-
-
-
-let data: TstaffInfo[] = [
-  {
-    name: '王小明',
-    phone: "0987654321",
-    info01: ["A", "管理部", "資深經理", "Level 7"],
-    info02: []
-  },
-  {
-
-    name: '王中明',
-    phone: "0987654321",
-    info01: ["A", "管理部", "資淺經理", "Level 5"],
-    info02: ["B", "營業部", "資深業務經理", "Level 7"]
-  },
-  {
-
-    name: '王大明',
-    phone: "0412345678",
-    info01: ["A", "管理部", "資深經理", "Level 7"],
-    info02: []
-  },
-  {
-    name: '王小明明明',
-    phone: "0987654321",
-    info01: ["A", "管理部", "資深經理", "Level 7"],
-    info02: ["B", "營業部", "資淺業務經理", "Level 5"]
-  },
-];
-
-
-data = data.concat(JSON.parse(JSON.stringify(data)))
-data = data.concat(JSON.parse(JSON.stringify(data)))
-data = data.concat(JSON.parse(JSON.stringify(data)))
-
-
-
-data.forEach((item, index) => {
-  item.key = index
-  item.staffId = "A" + (`${index}`.padStart(3, "0"))
-})
-
-
 
