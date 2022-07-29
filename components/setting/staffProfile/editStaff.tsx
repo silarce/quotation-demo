@@ -6,7 +6,7 @@ import EditStaffProfile01 from "./editStaff/editStaffProfile01"
 import EditStaffProfile02 from "./editStaff/editStaffProfile02"
 
 // type
-import { TstaffInfo } from "components/setting/staffProfile/fakeData";
+import { TstaffInfo } from "meta/fakeData/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 
@@ -27,14 +27,13 @@ export default function EditStaff({ selStaffInfo, setSelStaffInfo }:
         <span>{staffId}</span>
       </div>
 
+      {/* 這兩個元件裡面很亂，等要接api時再一併整理 */}
       <EditStaffProfile01 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
       <EditStaffProfile02 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
-
 
     </div>
   )
 }
-
 // ==========================================================
 
 

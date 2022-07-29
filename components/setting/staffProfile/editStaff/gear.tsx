@@ -10,7 +10,7 @@ import iconArrow from "public/image/icon/arrow_down_red.svg"
 import style from "./_localLayout.module.scss"
 
 // type
-import { TstaffInfo } from "components/setting/staffProfile/fakeData";
+import { TstaffInfo } from "meta/fakeData/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 

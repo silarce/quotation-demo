@@ -1,6 +1,6 @@
 import {
-  useMemo,
-  Dispatch, SetStateAction, MutableRefObject, HTMLAttributes
+  useMemo, useRef,
+  Dispatch, SetStateAction
 } from 'react';
 
 import { Table } from 'antd';
@@ -21,45 +21,30 @@ type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 type TsetDelVisible = Dispatch<SetStateAction<boolean>>
 type TsetIsEditStaff = Dispatch<SetStateAction<boolean>>
 
-export default function StaffList({
-  setSelStaffInfo, setDelVisible,
-  data, setIsEditStaff, staffListRef }:
+export default function StaffList({ setSelStaffInfo, setDelVisible,
+  data, setIsEditStaff }:
   {
     setSelStaffInfo: TsetSelStaffInfo,
     setDelVisible: TsetDelVisible
     data: TstaffInfo[]
     setIsEditStaff: TsetIsEditStaff
-    staffListRef: MutableRefObject<HTMLElement[]>
   }) {
 
-  // ========================================
+
   const columns = useMemo(() =>
     columnsCreator(
       setSelStaffInfo,
       setDelVisible,
-      setIsEditStaff,
+      setIsEditStaff
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
     , [])
-
 
 
   return (
     <Table className={style.antdTable}
       columns={columns} dataSource={data}
       pagination={false}
-      onRow={(record, index) => {
-        // record裝的帶進每一個row的資料
-        if (index === undefined) return {}
-        return {
-          // 把ref放進tr裡面，搜尋時就可以scroll到指定的tr
-          ref: (ele: HTMLElement) => {
-            staffListRef.current[index] = ele
-          },
-          // 把data-staffid放進tr，做為搜尋的依據
-          "data-staffid": record.staffId
-        } as HTMLAttributes<HTMLElement>
-      }}
     />
   )
 }
@@ -67,11 +52,11 @@ export default function StaffList({
 
 // ================================================
 
-// 每一行cell的設定
+
 const columnsCreator = (
   setSelStaffInfo: TsetSelStaffInfo,
   setDelVisible: TsetDelVisible,
-  setIsEditStaff: TsetIsEditStaff,
+  setIsEditStaff: TsetIsEditStaff
 ) => {
 
   return (

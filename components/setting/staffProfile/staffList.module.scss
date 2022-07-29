@@ -34,19 +34,30 @@
   // :global(.){
   // }
 }
+.staffId {
+  display: block;
+  height: 100%;
+}
 
-.infoSpan {
-  &::after {
-    content: "/";
-    margin: 0 3px;
+.departmentInfo {
+  width: fit-content;
+  cursor: pointer;
+  &:hover {
+    background-color: $bgc01;
   }
-  &:nth-last-of-type(1)::after{
-    display: none;
+  > span {
+    &::after {
+      content: "/";
+      margin: 0 3px;
+    }
+    &:nth-last-of-type(1)::after {
+      display: none;
+    }
   }
 }
 
 .iconDelete {
   display: block;
-  margin:auto;
+  margin: auto;
   cursor: pointer;
 }

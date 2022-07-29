@@ -63,6 +63,7 @@
   grid-template-rows: fit-content(100%) auto;
   > div:nth-of-type(2) {
     overflow: auto;
+    scroll-behavior: smooth;
   }
 }
 

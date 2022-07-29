@@ -16,7 +16,7 @@ import iconAdd from "public/image/icon/addCircle.svg"
 import iconRemove from "public/image/icon/removeCircle.svg"
 
 // type
-import { TstaffInfo } from "components/setting/staffProfile/fakeData";
+import { TstaffInfo } from "meta/fakeData/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 

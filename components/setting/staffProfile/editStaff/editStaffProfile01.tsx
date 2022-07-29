@@ -5,14 +5,12 @@ import style from "./editStaffProfile01.module.scss"
 
 // gear
 import {
-  Tdata, Toptions,
-  Input,
-  menuCreator, WrongSelect,
-  Select
+  Tdata,
+  Input, Select
 } from "./gear"
 
 // type
-import { TstaffInfo } from "components/setting/staffProfile/fakeData";
+import { TstaffInfo } from "meta/fakeData/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 
@@ -75,16 +73,6 @@ export default function EditStaffProfile01(
 
 
 // ==========================================================
-
-
-// const formList: { [key: string]: Tdata } = {
-//   chName: { key: "chName", label: "中文姓名", placeholder: "請輸入中文姓名" },
-//   enName: { key: "enName", label: "英文姓名", placeholder: "請輸入英文姓名" },
-//   idNumber: { key: "idNumber", label: "身分證字號", placeholder: "請輸入身分證字號" },
-//   phone01: { key: "phone01", label: "連絡電話 1", placeholder: "請輸入連絡電話 1" },
-//   phone02: { key: "phone02", label: "連絡電話 2", placeholder: "請輸入連絡電話 2" },
-// }
-
 
 const list01: Tdata[] = [
   { key: "chName", label: "中文姓名", placeholder: "請輸入中文姓名" },

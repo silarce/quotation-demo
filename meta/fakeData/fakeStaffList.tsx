@@ -172,21 +172,6 @@ let fakeData: TstaffInfo[] = [
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 fakeData = fakeData.concat(JSON.parse(JSON.stringify(fakeData)))
 fakeData = fakeData.concat(JSON.parse(JSON.stringify(fakeData)))
 fakeData = fakeData.concat(JSON.parse(JSON.stringify(fakeData)))
@@ -200,25 +185,6 @@ fakeData.forEach((item, index) => {
 
 export type { TstaffInfo, TstaffInfo as TstaffProfile }
 export { fakeData }
-
-
-
-interface Tarr {
-  a: string
-  b: number
-  c?: {
-    x: "xx",
-    y: "yy"
-  }
-}
-
-const bar01: Tarr = { a: "AA", b: 123 }
-const bar02: Tarr = { a: "AA", b: 123 }
-
-const foo = (key: keyof Tarr) => {
-  console.log(bar01[key])
-  console.log(bar02[key])
-}
 
 
 

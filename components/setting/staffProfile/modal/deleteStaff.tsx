@@ -9,7 +9,7 @@ import { Modal } from 'antd';
 import style from "./deleteStaff.module.scss"
 
 // type
-import { TstaffInfo } from "components/setting/staffProfile/fakeData";
+import { TstaffInfo } from "meta/fakeData/fakeStaffList";
 
 export default function DeleteStaff({ visible, setVisible, staffInfo }:
   {
