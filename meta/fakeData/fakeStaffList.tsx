@@ -184,7 +184,7 @@ fakeData.forEach((item, index) => {
 
 
 export type { TstaffInfo, TstaffInfo as TstaffProfile }
-export { fakeData }
+export { fakeData as fakeStaffList }
 
 
 

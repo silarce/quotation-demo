@@ -3,4 +3,60 @@
 
 .mainContainer {
   padding: 38px 45px;
+  display: grid;
+  gap: 21px;
+}
+
+.departHeader {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  padding: 11px 41px;
+  background-color: $bgc01;
+  > * {
+    display: inline-block;
+    margin: auto;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorMain;
+  }
+}
+
+.cardContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 420px);
+  justify-content: left;
+  gap: 40px 80px;
+  padding: 34px 35px;
+  border: solid 1px $colorBorder01;
+  > span {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+  }
+}
+
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 120px 72px 118px;
+  gap: 20px;
+  // width: 405px;
+  width: fit-content;
+  padding: 22px 33px;
+  border: solid 1px $colorBorder01;
+  border-left: solid 2px $colorActive01;
+  span {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+  }
+  > img {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 12px);
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
 }

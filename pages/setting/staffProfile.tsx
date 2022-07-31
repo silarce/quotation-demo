@@ -10,7 +10,7 @@ import {
 import PageHeader from "components/PageTitle/pageHeader"
 import StaffList from "components/setting/staffProfile/staffList";
 import EditStaff from "components/setting/staffProfile/editStaff";
-import { TstaffInfo, fakeData } from "meta/fakeData/fakeStaffList";
+import { TstaffInfo, fakeStaffList } from "meta/fakeData/fakeStaffList";
 
 
 // modal
@@ -28,7 +28,7 @@ import style from "./staffProfile.module.scss"
 export default function StaffProfile() {
   // ====================================================
   // 資料，員工列表
-  const [staffList, setStaffList] = useState<TstaffInfo[]>(fakeData)
+  const [staffList, setStaffList] = useState<TstaffInfo[]>(fakeStaffList)
   // ====================================================
   // 空資料，新增員工資料用
   const newStaffProfile = useMemo(() => {
