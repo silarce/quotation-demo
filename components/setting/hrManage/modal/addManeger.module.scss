@@ -24,6 +24,7 @@
       height: auto;
       padding: 10px 44px;
       margin: 0 !important;
+      background-color: $bgc01;
       &:nth-of-type(1) {
         font-weight: 500;
         font-size: 16px;
@@ -34,7 +35,6 @@
         font-weight: 500;
         font-size: 16px;
         line-height: 19px;
-        background-color: transparent;
         border-color: $colorActive01;
         > span {
           color: $colorActive01;
@@ -77,6 +77,13 @@
   padding: 0 46px;
   gap: 60px;
   border-bottom: solid 1px $colorBorder01;
+  cursor: pointer;
+  &:hover {
+    background-color: $bgc01;
+  }
+  &.selected {
+    background-color: #ecf1ff;
+  }
   &:nth-last-of-type(1) {
     border: none;
   }
@@ -86,6 +93,6 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
-    color:$colorText
+    color: $colorText;
   }
 }

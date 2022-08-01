@@ -26,22 +26,27 @@ import {
 } from "meta/fakeData/fakeManagerist"
 
 export default function HrManage() {
+  const [managerList, setManagerList] = useState<TfakeManagerList>(fakeManagerList)
+
 
   const [showAddManager, setShowAddManager] = useState(false)
+  const [selIndex, setSelIndex] = useState<number>(999)
 
-  const showAdd = () => {
+
+  const showAdd = (selIndex: number) => {
     setShowAddManager(true)
+    setSelIndex(selIndex)
   }
-
 
   return (
     <div className={style.scrollContainer}>
       <PageHeader>
       </PageHeader>
       <div className={style.mainContainer}>
-        {fakeManagerList.map((item, index) => {
+        {managerList.map((item, index) => {
           return (
-            <DepartmentManagers key={index} data={item} showAdd={showAdd} />
+            <DepartmentManagers key={index} index={index}
+              data={item} showAdd={showAdd} setData={setManagerList} />
           )
         })}
       </div>
@@ -49,7 +54,8 @@ export default function HrManage() {
       <AddManager
         {...{
           visible: showAddManager, setVisible: setShowAddManager,
-          staffList: fakeStaffList
+          staffList: fakeStaffList, setManagerList,
+          selIndex
         }}
       />
 
@@ -58,24 +64,33 @@ export default function HrManage() {
 }
 // ====================================================================
 
-
-
-const DepartmentManagers = ({ data, showAdd }:
+const DepartmentManagers = ({ index, data, showAdd, setData }:
   {
+    index: number
     data: TdepartmentManageList,
-    showAdd: () => void
+    showAdd: (selIndex: number) => void,
+    setData: Dispatch<SetStateAction<TfakeManagerList>>
   }) => {
   const { departmentId, label, list } = data
 
+  const removeManager = (managerIndex: number) => {
+    // setState在嚴格模式下輝執行兩次，所以會發生bug
+    // 但是在生產環境不會開啟嚴格模式，在生產環境就沒問題了
+    setData(state => {
+      state[index].list.splice(managerIndex, 1)
+      return [...state]
+    })
+  }
 
   return (
     <div >
       <div className={style.departHeader}>
         <span>{label}</span>
-        <button className={style.btn01}>
+        <button className={style.btn01}
+          onClick={() => showAdd(index)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconAdd.src} alt="add" />
-          <span onClick={showAdd}>新增管理人員</span>
+          <span>新增管理人員</span>
         </button>
       </div>
       {/*  */}
@@ -97,7 +112,9 @@ const DepartmentManagers = ({ data, showAdd }:
                 <span>{jobTitle}</span>
                 <span>{phone01}</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconRemove.src} alt="remove" />
+                <img src={iconRemove.src} alt="remove"
+                  onClick={() => { removeManager(index) }}
+                />
               </div>
             )
           })
