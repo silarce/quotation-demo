@@ -22,6 +22,7 @@ interface TclientProfile {
 
 type TclientProfileList = TclientProfile[]
 
+// ===============================================================================
 
 const client01: TclientProfile = {
   id: "S00001",
@@ -130,6 +131,29 @@ fakeClientList.forEach((item, index) => {
   item.id = "S" + `${index}`.padStart(4, "0")
 })
 
+// ===============================================================================
+const clientEmpty: TclientProfile = {
+  id: "",
+  type: "",
+  name: "",
+  shortName: "",
+  phone: "",
+  fax: "",
+  head: "",
+  address: "",
+  billAddress: "",
+  taxtNumber: "",
+  taxtType: "",
+  contact: [
+    {
+      name: "",
+      phone: "",
+    },
+  ]
+}
+// ===============================================================================
+
+
 
 
 
@@ -138,7 +162,7 @@ fakeClientList.forEach((item, index) => {
 
 export type { TclientProfile, TclientProfileList }
 
-export { fakeClientList }
+export { fakeClientList, clientEmpty }
 
 
 

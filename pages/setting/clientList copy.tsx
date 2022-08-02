@@ -7,8 +7,11 @@ import {
 
 // components
 import PageHeader from "components/PageTitle/pageHeader"
-import List from "components/setting/clientList/list"
-import EditClient from "components/setting/clientList/editClient"
+import PanelHeader from "components/setting/clientList/panel/panelHeader"
+import PanelBody from "components/setting/clientList/panel/panelBody"
+
+// antd
+import { Collapse } from 'antd';
 
 // icon
 import iconAdd from "public/image/icon/add.svg"
@@ -24,6 +27,7 @@ import {
 } from "meta/fakeData/fakeClientList";
 
 
+const { Panel } = Collapse
 
 export default function ClientList() {
 
@@ -41,6 +45,13 @@ export default function ClientList() {
 
   // 被編輯的員工資料，預設為空資料
   const [selClientProfile, setSelClientProfile] = useState<TclientProfile>(newClientProfile)
+  // ======================================================
+  // 點擊變粉紅色用
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const changeActive = (panelIndex: string | string[]) => {
+    const activeIndex = parseInt(panelIndex as string)
+    setActiveIndex(activeIndex)
+  }
 
   // ====================================================
   // 編輯頁面開關
@@ -72,12 +83,29 @@ export default function ClientList() {
             clientListRef={clientListRef} addClient={addClient} />}
       </PageHeader>
 
-      <div className={style.mainContainer}>
-        {isEdit
-          ? <EditClient />
-          : <List {...{ clientList, clientListRef }} />}
+      <div >
+        <Collapse
+          expandIcon={() => <></>}
+          accordion={true}
+          onChange={changeActive}
+        >
+          {clientList.map((item, index) => {
+            const isActive = activeIndex === index ? true : false
+            return (
+              <Panel className={style.panel} key={index}
+                header={
+                  <PanelHeader clientData={item} isActive={isActive}
+                    clientListRef={clientListRef} index={index}
+                  />}
+              >
+                <PanelBody clientData={item} />
+              </Panel>
+            )
+          })}
+        </Collapse>
 
 
+        
       </div>
 
 

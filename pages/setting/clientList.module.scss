@@ -2,20 +2,9 @@
 @use "styles/layout" as *;
 
 .mainContainer {
-  padding-left: 4px;
-}
 
-.panel {
-  :global(.ant-collapse-header) {
-    display: block !important;
-    padding: 0 !important;
-    background-color: #fff ;
+
+  :global(.ant-collapse) {
+    border: none;
   }
-
-  :global(.ant-collapse-content-box) {
-    padding: 0;
-  }
-
-  // :global(.){
-  // }
 }

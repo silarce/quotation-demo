@@ -1,6 +1,7 @@
 @use "styles/theme01" as *;
 
 .container {
+  position: relative;
   display: grid;
   grid-template-columns: auto 300px 230px 130px;
   padding: 5px 0px;
@@ -78,5 +79,19 @@
     > img {
       cursor: pointer;
     }
+  }
+}
+
+.redBar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  width: 3px;
+  height: 76px;
+  &.active {
+    background-color: $colorActive01;
   }
 }

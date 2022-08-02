@@ -32,7 +32,6 @@ export default function PanelHeader({ clientData, isActive, clientListRef, index
         (ele: HTMLDivElement) => { clientListRef.current[index] = ele }
       }
     >
-
       <div className={style.cell01}>
         <div>
           <h6>客戶編號</h6>
@@ -77,7 +76,8 @@ export default function PanelHeader({ clientData, isActive, clientListRef, index
           <img src={iconDelete.src} alt="移除" />
         </div>
       </div>
-
+      {/* active時最左邊的紅色直條 */}
+      <span className={`${style.redBar} ${active}`} />
     </div>
   )
 }
