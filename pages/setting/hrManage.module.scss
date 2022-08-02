@@ -24,10 +24,6 @@
 }
 
 .cardContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 420px);
-  justify-content: left;
-  gap: 40px 80px;
   padding: 34px 35px;
   border: solid 1px $colorBorder01;
   > span {
@@ -39,14 +35,17 @@
 
 .card {
   position: relative;
-  display: grid;
-  grid-template-columns: 120px 72px 118px;
+  display: inline-grid;
+  grid-template-columns: 120px fit-content(100%) 118px;
   gap: 20px;
-  // width: 405px;
   width: fit-content;
   padding: 22px 33px;
+  margin-right: 80px;
   border: solid 1px $colorBorder01;
   border-left: solid 2px $colorActive01;
+  &:nth-of-type(n + 4) {
+    margin-top: 40px;
+  }
   span {
     font-weight: 400;
     font-size: 18px;

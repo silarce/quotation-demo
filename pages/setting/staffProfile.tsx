@@ -94,9 +94,9 @@ const ButtonBar01 = ({ setIsEditStaff, staffListRef }:
     staffListRef: MutableRefObject<HTMLElement[]>
   }) => {
   // ===========================================
+  // 搜尋
   const [inputValue, setInputVaue] = useState("")
 
-  // ===========================================
   const searchHandler = () => {
     const ref = staffListRef.current.find(item => {
       const thisStaffId

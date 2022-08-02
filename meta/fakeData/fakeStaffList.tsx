@@ -60,7 +60,8 @@ let fakeData: TstaffInfo[] = [
     department01: {
       departmentId: "A",
       department: "管理部",
-      jobTitle: "資深經理",
+      jobTitle: "資深專業經理",
+      // jobTitle: "資深經理",
       level: "Level 7",
     },
     department02: {
