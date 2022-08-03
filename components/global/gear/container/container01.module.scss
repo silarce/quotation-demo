@@ -1,0 +1,18 @@
+@use "styles/theme01" as *;
+
+.container {
+  margin-top: 27px;
+  > p {
+    padding: 11px 40px;
+    margin: 0;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    background-color: $bgc01;
+  }
+}
+
+.main {
+  padding: 30px 36px;
+  border: solid 1px $colorBorder01;
+}
