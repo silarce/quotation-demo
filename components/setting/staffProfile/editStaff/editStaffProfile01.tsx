@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, ChangeEvent } from "react"
 
 // css
 import style from "./editStaffProfile01.module.scss"
@@ -8,6 +8,8 @@ import {
   Tdata,
   Input, Select
 } from "./gear"
+
+import { Input01 } from "components/global/gear/input/input";
 
 // type
 import { TstaffInfo } from "meta/fakeData/fakeStaffList";
@@ -22,6 +24,18 @@ export default function EditStaffProfile01(
     }
 ) {
 
+  const onChangeCreator = (key: keyof TstaffInfo) => {
+    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value
+      if (key === "department01" || key === "department02") return;
+      setSelStaffInfo(state => {
+        state[key] = value
+        return { ...state }
+      })
+    }
+    return onChange
+  }
+
 
   return (
     <div className={style.container}>
@@ -32,6 +46,11 @@ export default function EditStaffProfile01(
             {list01.map((item, index) => {
               const stateData = selStaffInfo[item.key]
               if (typeof stateData === "object" || stateData === undefined) return null
+
+              const { key, label, placeholder } = item
+              const onChange = onChangeCreator(key)
+              const stateValue = stateData
+              const id = key
               return (
                 <Input key={index} data={item}
                   {...{ stateData, setSelStaffInfo }}
@@ -43,15 +62,30 @@ export default function EditStaffProfile01(
           <div className={style.vr} />
           <div>
             <Input data={list02.birthday}
-              {...{ stateData: selStaffInfo.birthday, setSelStaffInfo }} />
+              {...{
+                stateData: selStaffInfo.birthday, setSelStaffInfo,
+                width: "237px", labelWidth: "40px"
+              }} />
             <Select data={list02.sex}
-              {...{ stateData: selStaffInfo.sex, setSelStaffInfo }} />
+              {...{
+                stateData: selStaffInfo.sex, setSelStaffInfo,
+                width: "237px", labelWidth: "40px"
+              }} />
             <Select data={list02.marital}
-              {...{ stateData: selStaffInfo.marital, setSelStaffInfo }} />
+              {...{
+                stateData: selStaffInfo.marital, setSelStaffInfo,
+                width: "237px", labelWidth: "40px"
+              }} />
             <Input data={list02.education}
-              {...{ stateData: selStaffInfo.education, setSelStaffInfo }} />
+              {...{
+                stateData: selStaffInfo.education, setSelStaffInfo,
+                width: "478px", labelWidth: "40px"
+              }} />
             <Input data={list02.expertise}
-              {...{ stateData: selStaffInfo.expertise, setSelStaffInfo }} />
+              {...{
+                stateData: selStaffInfo.expertise, setSelStaffInfo,
+                width: "478px", labelWidth: "40px"
+              }} />
           </div>
           {/* 地址 grid-column設為 span 3*/}
           <div >
@@ -71,8 +105,12 @@ export default function EditStaffProfile01(
   )
 }
 
+// ==========================================================
+
+
 
 // ==========================================================
+
 
 const list01: Tdata[] = [
   { key: "chName", label: "中文姓名", placeholder: "請輸入中文姓名" },

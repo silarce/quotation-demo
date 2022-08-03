@@ -3,11 +3,12 @@
 
 
 .container {
-  padding: 38px 45px ;
+  padding: 38px 45px;
+  background-color: #ddd;
 }
 
-// 使用者代號
-.staffId {
+// 客戶代號
+.id {
   min-width: 300px;
   width: fit-content;
   padding: 20px $leftPadding_title;
@@ -18,7 +19,7 @@
       font-weight: 500;
       font-size: 20px;
       line-height: 24px;
-      color:$colorText;
+      color: $colorText;
     }
     &:nth-of-type(2) {
       font-weight: 400;

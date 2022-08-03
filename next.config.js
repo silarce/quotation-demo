@@ -13,5 +13,5 @@ module.exports = {
   webpack: (config) => {
     config.plugins.push(new CaseSensitivePathsPlugin())
     return config
-  }
+  },
 }

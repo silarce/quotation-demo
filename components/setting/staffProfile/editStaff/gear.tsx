@@ -1,13 +1,17 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, ChangeEvent } from 'react';
 
 // UI套件
-import reactSel, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+
+// global gear
+import { Input01 } from "components/global/gear/input/input";
+import { Select01 } from 'components/global/gear/select/select';
 
 // icon
 import iconArrow from "public/image/icon/arrow_down_red.svg"
 
 // css
-import style from "./_localLayout.module.scss"
+// import style from "./_localLayout.module.scss"
 
 // type
 import { TstaffInfo } from "meta/fakeData/fakeStaffList";
@@ -31,15 +35,20 @@ interface TdepartmentData {
 
 // ========================================================
 
-const Input = ({ data, stateData, setSelStaffInfo }:
+
+const Input = ({ data, stateData, setSelStaffInfo,
+  width, labelWidth }:
   {
     data: Tdata,
     stateData: string | number,
-    setSelStaffInfo: TsetSelStaffInfo
+    setSelStaffInfo: TsetSelStaffInfo,
+    width?: string,
+    labelWidth?: string,
   }) => {
   const { key, label, placeholder } = data
 
-  const onChange = (value: string) => {
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
     if (key === "department01" || key === "department02") return;
     setSelStaffInfo(state => {
       state[key] = value
@@ -47,41 +56,43 @@ const Input = ({ data, stateData, setSelStaffInfo }:
     })
   }
 
+  const stateValue = stateData
+  const id = key
+
   return (
-    <label className={style.label} htmlFor={key}>
-      <span>{label}</span>
-      <input id={key} type="text" placeholder={placeholder}
-        value={stateData}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      <hr />
-    </label>
+    <Input01
+      {...{
+        label, stateValue,
+        placeholder, onChange, id,
+        width, labelWidth
+      }} />
   )
 }
 // ========================================================
 
-const Select = ({ data, stateData, setSelStaffInfo, parentKey }:
+const Select = ({ data, stateData, setSelStaffInfo, parentKey,
+  width, labelWidth }:
   {
     data: Tdata | TdepartmentData,
     stateData: string,
     setSelStaffInfo: TsetSelStaffInfo
     parentKey?: "department01" | "department02"
+    width?: string
+    labelWidth?: string
   }) => {
-  const Select = reactSel //  只是為了讓字少一點
 
   const { label, options, placeholder } = data
   let { key } = data
   if (parentKey) key = key as TdepartmentData["key"]
   else key = key as Tdata["key"]
 
-  const selValue = stateData
-    ? {
-      value: stateData,
-      label: stateData
-    }
-    : null
+  const selValue = {
+    value: stateData,
+    label: stateData
+  }
 
-  const handleChange = (option: SingleValue<{
+
+  const onChange = (option: SingleValue<{
     value: string;
     label: string;
   }>) => {
@@ -104,23 +115,14 @@ const Select = ({ data, stateData, setSelStaffInfo, parentKey }:
       return { ...state }
     })
   }; //handleChange
-
-  // eslint-disable-next-line @next/next/no-img-element
-  const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
+  if (!options) return null
   return (
-    <div className={style.label} >
-      <span>{label}</span>
-      <Select className={style.select}
-        placeholder={placeholder}
-        defaultValue={selValue}
-        value={selValue}
-        options={options}
-        onChange={handleChange}
-        components={{ DropdownIndicator }}
-        isSearchable={false}
-      />
-      <hr />
-    </div>
+    <Select01
+      {...{
+        label, stateValue: selValue, placeholder,
+        options, onChange, width, labelWidth
+      }}
+    />
   )
 }
 
@@ -131,5 +133,4 @@ export type {
 }
 export {
   Input, Select
-
 }

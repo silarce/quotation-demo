@@ -4,7 +4,7 @@
 
 .form01 {
   display: grid;
-  grid-template-columns: 1fr 65px 1fr;
+  grid-template-columns: 400px 65px 1fr;
   gap: 24px 0;
   > div:nth-last-of-type(1) {
     grid-column: span 3;

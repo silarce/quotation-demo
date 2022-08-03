@@ -1,0 +1,91 @@
+@use "styles/theme01" as *;
+
+.label {
+  position: relative;
+  display: grid;
+  // grid-template-columns: fit-content(100%) auto;
+  grid-template-columns: 100px auto;
+  gap: 40px;
+  width: 100%;
+  padding: 17px 4px 14px 4px;
+  > * {
+    margin: auto;
+    margin-left: 0;
+  }
+  > span {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    color: $colorText;
+  }
+  > input {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    width: 100%;
+    &::placeholder {
+      color: $colorBorder01;
+    }
+    &:focus ~ hr {
+      border-color: $colorActive01;
+    }
+  }
+  > hr {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 100%;
+    border-color: #14256a;
+  }
+}
+
+.select {
+  width: 100%;
+  padding-right:10px;
+  input {
+    background-color: #fff;
+    box-shadow: none;
+  }
+  [class$="control"] {
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    min-height: auto;
+  }
+  [class$="ValueContainer"] {
+    padding: 0;
+  }
+  [class$="indicatorSeparator"] {
+    display: none;
+  }
+
+  [class$="placeholder"] {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorBorder01;
+  }
+  [class$="singleValue"] {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorText;
+  }
+
+  [class$="option"] {
+    display: block;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: $colorText;
+    cursor: pointer;
+    background-color: transparent;
+    &:hover {
+      color: $colorActive01;
+      background-color: transparent;
+    }
+  }
+
+  // [class$=]{
+  // }
+}

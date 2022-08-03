@@ -1,5 +1,6 @@
 
-
+// css
+import style from "./editClient.module.scss"
 
 
 
@@ -9,12 +10,23 @@ export default function EditClient() {
 
 
   return (
-    <div>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
+    <div className={style.container}>
+      <div className={style.id}>
+        <span>使用者代號</span>
+        <span>{"S0001"}</span>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
     </div>
   )
 }
