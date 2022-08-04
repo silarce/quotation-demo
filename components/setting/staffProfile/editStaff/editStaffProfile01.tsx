@@ -47,10 +47,6 @@ export default function EditStaffProfile01(
               const stateData = selStaffInfo[item.key]
               if (typeof stateData === "object" || stateData === undefined) return null
 
-              const { key, label, placeholder } = item
-              const onChange = onChangeCreator(key)
-              const stateValue = stateData
-              const id = key
               return (
                 <Input key={index} data={item}
                   {...{ stateData, setSelStaffInfo }}

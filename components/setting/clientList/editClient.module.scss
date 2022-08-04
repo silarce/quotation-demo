@@ -1,10 +1,9 @@
 @use "styles/theme01" as *;
 @use "./local.module" as *;
 
-
 .container {
+  position: relative;
   padding: 38px 45px;
-  background-color: #ddd;
 }
 
 // 客戶代號
@@ -27,4 +26,54 @@
       line-height: 22px;
     }
   }
+}
+
+.form01 {
+  display: grid;
+  grid-template-columns: 318px auto 318px;
+  justify-content: space-between;
+  width: 702px;
+  > label {
+    &:nth-of-type(1),
+    &:nth-of-type(2) {
+      grid-column: span 3;
+    }
+  }
+}
+
+.form02 {
+  position: absolute;
+  top: 30px;
+  right: 37px;
+  width: 238px;
+  height: fit-content;
+}
+
+.form03 {
+  margin-top: 36px;
+}
+
+.form04 {
+  position: relative;
+  display: inline-block;
+  width: 340px;
+  padding: 7px 16px 21px 16px;
+  margin-right: 76px;
+  margin-top:40px;
+  border: solid 1px $colorBorder01;
+  > img {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 12px);
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+}
+
+.vr {
+  position: relative;
+  top: 23px;
+  background-color: #000;
+  width: 1px;
+  height: 151px;
 }

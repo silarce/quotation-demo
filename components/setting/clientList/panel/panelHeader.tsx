@@ -14,13 +14,15 @@ import { TclientProfile } from "meta/fakeData/fakeClientList";
 
 
 
-export default function PanelHeader({ clientData, isActive, clientListRef, index }:
-  {
-    clientData: TclientProfile
-    isActive: boolean
-    clientListRef: MutableRefObject<HTMLElement[]>
-    index: number
-  }) {
+export default function PanelHeader(
+  { clientData, isActive, clientListRef, index, editClient }:
+    {
+      clientData: TclientProfile
+      isActive: boolean
+      clientListRef: MutableRefObject<HTMLElement[]>
+      index: number
+      editClient: () => void
+    }) {
   const { id, type, name, phone, fax, contact } = clientData
   const contact01 = contact[0]
 
@@ -71,6 +73,7 @@ export default function PanelHeader({ clientData, isActive, clientListRef, index
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconEdit.src} alt="編輯"
+            onClick={editClient}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconDelete.src} alt="移除" />

@@ -20,6 +20,15 @@ interface TclientProfile {
   }[]
 }
 
+const foo = (
+  data: TclientProfile,
+  key: keyof TclientProfile
+) => {
+  const bar = data[key]
+  return bar
+}
+
+
 type TclientProfileList = TclientProfile[]
 
 // ===============================================================================

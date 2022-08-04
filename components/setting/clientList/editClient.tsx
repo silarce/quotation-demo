@@ -1,38 +1,240 @@
+import {
+  useMemo,
+  Dispatch, SetStateAction, ChangeEvent
+} from "react"
+
+import { TclientProfile } from "meta/fakeData/fakeClientList";
+// gear
+import { Container01 } from "components/global/gear/container/container01"
+//global gear
+import { Input01 } from "components/global/gear/input/input";
+import { Select02, Toption } from "components/global/gear/select/select";
+
+// icon
+import iconAdd from "public/image/icon/addCircle.svg"
 
 // css
 import style from "./editClient.module.scss"
 
 
+export default function EditClient({ selData, setSelData }:
+  {
+    selData: TclientProfile
+    setSelData: Dispatch<SetStateAction<TclientProfile>>
+  }) {
 
-export default function EditClient() {
+  const formObj = useMemo(() =>
+    formObjCreator(selData, setSelData)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    , [selData])
+  // ====================================================
+  const { id } = selData
+  const { name, shortName, phone,
+    fax, head, address, billAddress, taxtNumber,
+    taxtType, type, contact
+  } = formObj
+  const styleWidth = {
+    labelWidth: "80px"
+  }
+  // ====================================================
+  const addContact = () => {
+    // 把contact寫在setState外面是因為，在嚴格模式下
+    // setState會執行兩次，也就是說push會執行兩次
+    // 導致BUG
+    const contact = selData.contact
+    contact.push({
+      name: "",
+      phone: ""
+    })
+    setSelData(state => {
+      return { ...state, contact }
+    })
+  }
 
-
-
-
+  // ====================================================
   return (
     <div className={style.container}>
       <div className={style.id}>
         <span>使用者代號</span>
-        <span>{"S0001"}</span>
+        <span>{id}</span>
       </div>
+      <Container01 label={"客戶資料"} >
+        <div className={style.form01}>
+          <Input01 {...{ ...name, ...styleWidth, }} />
+          <Input01 {...{ ...shortName, ...styleWidth, }} />
+          {/*  */}
+          <div>
+            <Input01 {...{ ...head, ...styleWidth, }} />
+            <Select02 {...{ ...taxtType }} />
+            <Input01 {...{ ...taxtNumber, ...styleWidth, }} />
+          </div>
+          <div className={style.vr} />
+          <div>
+            <Input01 {...{ ...phone, ...styleWidth, }} />
+            <Input01 {...{ ...fax, ...styleWidth, }} />
+          </div>
+        </div>
+        <div className={style.form02}>
+          <Select02 {...{ ...type, labelWidth: "40px" }} />
+        </div>
+        <div className={style.form03}>
+          <Input01 {...{ ...address, ...styleWidth, width: "941px" }} />
+          <Input01 {...{ ...billAddress, ...styleWidth, width: "941px" }} />
+        </div>
+      </Container01>
 
-
-
-
-
-
-
-
-
-
-
-
+      <Container01 label={"聯絡人資訊"}>
+        {contact.map((item, index) => {
+          const { name, phone } = item
+          return (
+            <div className={style.form04} key={index}>
+              <Input01 {...{ ...name, }} />
+              <Input01 {...{ ...phone, }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={iconAdd.src} alt="add"
+                onClick={addContact}
+              />
+            </div>
+          )
+        })}
+      </Container01>
     </div>
   )
 }
 
+// ======================================================================
 
+const formObjCreator = (
+  state: TclientProfile,
+  setState: Dispatch<SetStateAction<TclientProfile>>
+) => {
+  // ==============================
+  // InputDataCreator
+  const idc = (
+    label: string,
+    key: Exclude<keyof TclientProfile, "contact">,
+    placeholder?: string,
+  ) => {
+    if (!placeholder) placeholder = `請輸入${label}`
+    const stateValue = state[key]
+    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value
+      setState(state => {
+        state[key] = value
+        return { ...state }
+      })
+    }
+    const id = key
+    return { label, placeholder, id, stateValue, onChange }
+  }
+  // =============================================
+  // selectDataCreator
+  const sdc = (optionObj: ToptionBox) => {
+    let { key, label, placeholder, options } = optionObj
+    const stateValue = state[key]
+    const onChange = (option: Toption | null) => {
+      if (!option) return
+      const { value } = option
+      setState(state => {
+        state[key] = value
+        return { ...state }
+      })
+    }
+    return {
+      label, stateValue, placeholder, options, onChange
+    }
+  }
+  // =============================================
+  // InputContactDataCreatorCore
+  const icdc = () => {
+    const contact = state.contact
+    const list = contact.map((item, index) => {
+      const creator = (
+        key: keyof typeof item,
+      ) => {
+        // -------------------
+        const stateValue = item[key]
+        // -------------------
+        const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+          const value = e.target.value
+          setState(state => {
+            state.contact[index][key] = value
+            return { ...state }
+          })
+        }
+        // -------------------
+        const label = key === "phone" ? "電話" : `聯絡人 ${index + 1}`
+        const placeholder = key === "phone" ? "請輸入電話" : `請輸入聯絡人`
+        // -------------------
+        return {
+          label,
+          placeholder,
+          id: `contactName${index + 1}`,
+          stateValue,
+          onChange
+        }
+      }
+      return {
+        name: creator("name"),
+        phone: creator("phone")
+      }
+    }) //list
+    return list
+  } //icdc
+  // =============================================
 
+  const data = {
+    name: idc("客戶全稱", "name",),
+    shortName: idc("客戶簡稱", "shortName",),
+    phone: idc("公司電話", "phone",),
+    fax: idc("公司傳真", "fax",),
+    head: idc("負責人", "head",),
+    address: idc("公司地址", "address",),
+    billAddress: idc("發票地址", "billAddress",),
+    taxtNumber: idc("統一編號", "taxtNumber",),
+    taxtType: sdc(optionList.taxtType as ToptionBox),
+    type: sdc(optionList.type as ToptionBox),
+    contact: icdc()
+  }
+  return data
+}
+
+interface ToptionBox {
+  key: Exclude<keyof TclientProfile, "contact">
+  label: string
+  placeholder?: string
+  options: {
+    value: string,
+    label: string
+  }[]
+}
+
+type ToptionList = {
+  [key in keyof TclientProfile]?: ToptionBox
+}
+
+const optionList: ToptionList = {
+  taxtType: {
+    key: "taxtType",
+    label: "扣稅類別",
+    placeholder: "請選擇類別",
+    options: [
+      { value: "應稅", label: "應稅" },
+      { value: "應稅外加", label: "應稅外加" },
+      { value: "免稅", label: "免稅" },
+    ]
+  },
+  type: {
+    key: "type",
+    label: "類別",
+    placeholder: "請選擇類別",
+    options: [
+      { value: "客戶", label: "客戶" },
+      { value: "廠商", label: "廠商" },
+      { value: "客戶廠商", label: "客戶廠商" },
+    ]
+  },
+}
 
 
 

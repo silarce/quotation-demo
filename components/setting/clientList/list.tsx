@@ -23,10 +23,11 @@ import {
 
 const { Panel } = AntdCollapse
 
-export default function List({ clientList, clientListRef }:
+export default function List({ clientList, clientListRef, editClient }:
   {
     clientList: TclientProfileList
     clientListRef: MutableRefObject<HTMLElement[]>
+    editClient: (profile: TclientProfile) => void
   }) {
 
   // 點擊變粉紅色用
@@ -44,11 +45,15 @@ export default function List({ clientList, clientListRef }:
       >
         {clientList.map((item, index) => {
           const isActive = activeIndex === index ? true : false
+          const newEditClient = () => editClient(item)
+
+
           return (
             <Panel className={style.panel} key={index}
               header={
                 <PanelHeader clientData={item} isActive={isActive}
                   clientListRef={clientListRef} index={index}
+                  editClient={newEditClient}
                 />}
             >
               <PanelBody clientData={item} />

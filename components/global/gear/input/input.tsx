@@ -31,8 +31,6 @@ const Input01 = ({ label, stateValue, placeholder, onChange,
   }
   // ========================================================
 
-
-
   return (
     <label className={`${style.label} ${className}`} htmlFor={id}
       style={lableStyle}

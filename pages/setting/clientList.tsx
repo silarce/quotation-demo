@@ -2,7 +2,7 @@
 // 客戶列表
 import {
   useState, useMemo, useRef,
-  Dispatch, SetStateAction, MutableRefObject
+  Dispatch, SetStateAction, MutableRefObject, RefObject
 } from "react"
 
 // components
@@ -43,21 +43,33 @@ export default function ClientList() {
   const [selClientProfile, setSelClientProfile] = useState<TclientProfile>(newClientProfile)
 
   // ====================================================
+  const mainContainerRef = useRef<HTMLDivElement>(null)
+  // ====================================================
   // 編輯頁面開關
   const [isEdit, setIsEdit] = useState(false)
 
   const resetEditPanel = () => {
     setIsEdit(false)
     setSelClientProfile(newClientProfile)
+    if (mainContainerRef.current) {
+      mainContainerRef.current.scrollTop = 0
+    }
   }
   const editClient = (clientProfile: TclientProfile) => {
     setIsEdit(true)
     setSelClientProfile(clientProfile)
+    if (mainContainerRef.current) {
+      mainContainerRef.current.scrollTop = 0
+    }
   }
   const addClient = () => {
     setIsEdit(true)
     setSelClientProfile(newClientProfile)
+    if (mainContainerRef.current) {
+      mainContainerRef.current.scrollTop = 0
+    }
   }
+
   // ====================================================
   // 用於搜尋功能
   const clientListRef = useRef<HTMLElement[]>([])
@@ -72,12 +84,10 @@ export default function ClientList() {
             clientListRef={clientListRef} addClient={addClient} />}
       </PageHeader>
 
-      <div className={style.mainContainer}>
+      <div className={style.mainContainer} ref={mainContainerRef}>
         {isEdit
-          ? <EditClient />
-          : <List {...{ clientList, clientListRef }} />}
-
-
+          ? <EditClient selData={selClientProfile} setSelData={setSelClientProfile} />
+          : <List {...{ clientList, clientListRef, editClient }} />}
       </div>
 
 

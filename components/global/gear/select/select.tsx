@@ -41,7 +41,6 @@ const Select01 = ({
   // ========================================================
   stateValue = stateValue?.value === "" ? null : stateValue
   // ========================================================
-  console.log(stateValue)
 
   // eslint-disable-next-line @next/next/no-img-element
   const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
@@ -66,7 +65,63 @@ const Select01 = ({
 
 
 
-export { Select01 }
+const Select02 = ({
+  label, stateValue, placeholder, options, onChange,
+  className, width, labelWidth }:
+  {
+    label: string
+    // stateValue: string
+    stateValue: Toption | string | null
+    placeholder?: string
+    options: Toption[]
+    onChange: (option: Toption | null) => void
+    className?: string
+    width?: string
+    labelWidth?: string
+  }) => {
+
+  let option = typeof stateValue === "string"
+    ? {
+      value: stateValue,
+      label: stateValue
+    }
+    : stateValue;
+  if (option?.value === "") option = null
+
+
+  // ========================================================
+  className = className ? className : ""
+  if (!placeholder) placeholder = `請選擇${label}`
+  // ========================================================
+  const lableStyle = {
+    width: width ? width : "",
+    gridTemplateColumns: labelWidth ? `${labelWidth} auto` : ""
+  }
+  // ========================================================
+
+  // eslint-disable-next-line @next/next/no-img-element
+  const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
+  return (
+    <div className={`${style.label} ${className}`}
+      style={lableStyle}
+    >
+      <span>{label}</span>
+      <Select className={style.select}
+        placeholder={placeholder}
+        value={option}
+        options={options}
+        onChange={onChange}
+        components={{ DropdownIndicator }}
+        isSearchable={false}
+      />
+      <hr />
+    </div>
+  )
+}
+
+
+export type { Toption }
+export { Select01, Select02 }
 
 
 

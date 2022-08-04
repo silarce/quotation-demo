@@ -3,6 +3,7 @@
 
 .mainContainer {
 
+  scroll-behavior: auto !important;
 
   :global(.ant-collapse) {
     border: none;

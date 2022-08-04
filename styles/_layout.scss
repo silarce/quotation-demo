@@ -89,7 +89,7 @@
   display: grid;
   height: 100%;
   grid-template-rows: fit-content(100%) auto;
-  > div:nth-of-type(2) {
+  > div:nth-of-type(2) { //通常是mainContainer
     overflow: auto;
     scroll-behavior: smooth;
   }
