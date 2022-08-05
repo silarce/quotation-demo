@@ -1,11 +1,15 @@
 @use "styles/theme01" as *;
 
-.inputSearch {
+div.inputSearch {
   position: relative;
   display: flex;
   width: 188px;
   padding: 10px 0px 10px 8px;
   margin-right: 25px;
+  color: $colorMain;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
   > input {
     width: 100%;
     &:focus ~ .borderBottom {
@@ -24,4 +28,3 @@
     background-color: $colorBorder01;
   }
 }
-
