@@ -1,6 +1,6 @@
 import {
   useState,
-  MutableRefObject
+  MutableRefObject, MouseEvent
 } from 'react';
 
 
@@ -23,12 +23,14 @@ import {
 
 const { Panel } = AntdCollapse
 
-export default function List({ clientList, clientListRef, editClient }:
-  {
-    clientList: TclientProfileList
-    clientListRef: MutableRefObject<HTMLElement[]>
-    editClient: (profile: TclientProfile) => void
-  }) {
+export default function List(
+  { clientList, clientListRef, editClient, openDeletePanel }:
+    {
+      clientList: TclientProfileList
+      clientListRef: MutableRefObject<HTMLElement[]>
+      editClient: (profile: TclientProfile) => void
+      openDeletePanel: (profile: TclientProfile) => void
+    }) {
 
   // 點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -36,6 +38,9 @@ export default function List({ clientList, clientListRef, editClient }:
     const activeIndex = parseInt(panelIndex as string)
     setActiveIndex(activeIndex)
   }
+
+
+
   return (
     <div className={style.container}>
       <AntdCollapse
@@ -46,6 +51,10 @@ export default function List({ clientList, clientListRef, editClient }:
         {clientList.map((item, index) => {
           const isActive = activeIndex === index ? true : false
           const newEditClient = () => editClient(item)
+          const newOpenDeletePanel = (e: MouseEvent) => {
+            e.stopPropagation()
+            openDeletePanel(item)
+          }
 
 
           return (
@@ -53,7 +62,7 @@ export default function List({ clientList, clientListRef, editClient }:
               header={
                 <PanelHeader clientData={item} isActive={isActive}
                   clientListRef={clientListRef} index={index}
-                  editClient={newEditClient}
+                  editClient={newEditClient} openDeletePanel={newOpenDeletePanel}
                 />}
             >
               <PanelBody clientData={item} />

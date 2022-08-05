@@ -10,9 +10,14 @@ import PageHeader from "components/PageTitle/pageHeader"
 import List from "components/setting/clientList/list"
 import EditClient from "components/setting/clientList/editClient"
 
+// global gear
+import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
+
+
 // icon
 import iconAdd from "public/image/icon/add.svg"
 import iconSearch from "public/image/icon/search.svg"
+import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./clientList.module.scss"
@@ -71,6 +76,22 @@ export default function ClientList() {
   }
 
   // ====================================================
+  const [showDeletePanel, setShowDeletePanel] = useState(false)
+  const openDeletePanel = (clientProfile: TclientProfile) => {
+    setShowDeletePanel(true)
+    setSelClientProfile(clientProfile)
+  }
+
+  const deleteSelProfile = () => {
+    const id = selClientProfile.id
+    const delIndex = clientList.findIndex((item) => item.id === id)
+    setClientList(state => {
+      state.splice(delIndex, 1)
+      return [...state]
+    })
+    setShowDeletePanel(false)
+  }
+  // ====================================================
   // 用於搜尋功能
   const clientListRef = useRef<HTMLElement[]>([])
 
@@ -87,9 +108,15 @@ export default function ClientList() {
       <div className={style.mainContainer} ref={mainContainerRef}>
         {isEdit
           ? <EditClient selData={selClientProfile} setSelData={setSelClientProfile} />
-          : <List {...{ clientList, clientListRef, editClient }} />}
+          : <List {...{ clientList, clientListRef, editClient, openDeletePanel }} />}
       </div>
-
+      <TwoButtonModal
+        {...{
+          visible: showDeletePanel,
+          setVisible: setShowDeletePanel,
+          text: `請確定要刪除「${selClientProfile.id}」「${selClientProfile.name}」?`,
+          onOk: deleteSelProfile,
+        }} />
 
     </div>
   )
@@ -130,9 +157,8 @@ const ButtonBar01 = ({
           onChange={e => { setInputVaue(e.target.value) }}
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={iconSearch.src} alt="搜尋icon"
-          onClick={searchHandler}
-        />
+        <IconSearch onClick={searchHandler}/>
+        {/* <IconSearch onClick={searchHandler} /> */}
         <div className={style.borderBottom} />
       </div>
       {/*  */}

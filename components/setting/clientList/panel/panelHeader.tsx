@@ -1,8 +1,16 @@
-import { MutableRefObject, LegacyRef } from "react"
+import { MutableRefObject, LegacyRef, MouseEvent } from "react"
 
 // icon
 import iconDelete from "public/image/icon/delete01.svg"
 import iconEdit from "public/image/icon/edit.svg"
+import iconDelete_hover from "public/image/icon/delete01_hover.svg"
+import iconEdit_hover from "public/image/icon/edit_hover.svg"
+
+import {
+  Icondelete01 as IconDelete,
+  IconEdit
+} from "public/image/icon/svgComponent/svgIcons"
+
 
 // css
 import style from "./panelHeader.module.scss"
@@ -15,13 +23,14 @@ import { TclientProfile } from "meta/fakeData/fakeClientList";
 
 
 export default function PanelHeader(
-  { clientData, isActive, clientListRef, index, editClient }:
+  { clientData, isActive, clientListRef, index, editClient, openDeletePanel }:
     {
       clientData: TclientProfile
       isActive: boolean
       clientListRef: MutableRefObject<HTMLElement[]>
       index: number
       editClient: () => void
+      openDeletePanel: (e: MouseEvent) => void
     }) {
   const { id, type, name, phone, fax, contact } = clientData
   const contact01 = contact[0]
@@ -71,12 +80,9 @@ export default function PanelHeader(
       {/* ============================ */}
       <div className={style.cell04}>
         <div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={iconEdit.src} alt="編輯"
-            onClick={editClient}
+          <IconEdit onClick={editClient} />
+          <IconDelete onClick={openDeletePanel}
           />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={iconDelete.src} alt="移除" />
         </div>
       </div>
       {/* active時最左邊的紅色直條 */}
