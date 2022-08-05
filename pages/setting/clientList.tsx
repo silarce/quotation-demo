@@ -8,12 +8,11 @@ import {
 import PageHeader from "components/PageTitle/pageHeader"
 import List from "components/setting/clientList/list"
 import EditClient from "components/setting/clientList/editClient"
-import InputSearch from "components/global/gear/input/inputSearch"
-import AddButton from "components/global/gear/button/addButton"
 
 // global gear
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-
+import InputSearch from "components/global/gear/input/inputSearch"
+import AddButton from "components/global/gear/button/addButton"
 
 // css
 import style from "./clientList.module.scss"
@@ -38,7 +37,7 @@ export default function ClientList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientList.length])
 
-  // 被編輯的員工資料，預設為空資料
+  // 被編輯的資料，預設為空資料
   const [selClientProfile, setSelClientProfile] = useState<TclientProfile>(newClientProfile)
 
   // ====================================================
@@ -144,8 +143,8 @@ const ButtonBar01 = ({
 
   return (
     <div className={style.headerBar}>
-      <InputSearch placeholder="編號/類別/全稱字段" onClick={searchClient} />
-      <AddButton text="新增客戶資料" onClick={addClient} />
+      <InputSearch placeholder="編號/類別/模糊全稱" onClick={searchClient} />
+      <AddButton label="新增客戶資料" onClick={addClient} />
     </div>
   )
 }

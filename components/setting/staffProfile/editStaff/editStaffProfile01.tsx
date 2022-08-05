@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, ChangeEvent } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 // css
 import style from "./editStaffProfile01.module.scss"
@@ -8,8 +8,6 @@ import {
   Tdata,
   Input, Select
 } from "./gear"
-
-import { Input01 } from "components/global/gear/input/input";
 
 // type
 import { TstaffInfo } from "meta/fakeData/fakeStaffList";
@@ -23,18 +21,6 @@ export default function EditStaffProfile01(
       setSelStaffInfo: TsetSelStaffInfo
     }
 ) {
-
-  const onChangeCreator = (key: keyof TstaffInfo) => {
-    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      if (key === "department01" || key === "department02") return;
-      setSelStaffInfo(state => {
-        state[key] = value
-        return { ...state }
-      })
-    }
-    return onChange
-  }
 
 
   return (
@@ -100,10 +86,6 @@ export default function EditStaffProfile01(
     </div>
   )
 }
-
-// ==========================================================
-
-
 
 // ==========================================================
 

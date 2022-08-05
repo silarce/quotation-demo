@@ -7,12 +7,6 @@ import { SingleValue } from 'react-select';
 import { Input01 } from "components/global/gear/input/input";
 import { Select01 } from 'components/global/gear/select/select';
 
-// icon
-import iconArrow from "public/image/icon/arrow_down_red.svg"
-
-// css
-// import style from "./_localLayout.module.scss"
-
 // type
 import { TstaffInfo } from "meta/fakeData/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>

@@ -7,9 +7,9 @@ import style from "./addButton.module.scss"
 
 
 
-export default function AddButton({ text, onClick, className }:
+export default function AddButton({ label, onClick, className }:
   {
-    text: string
+    label: string
     onClick: () => void
     className?: string
   }) {
@@ -21,7 +21,7 @@ export default function AddButton({ text, onClick, className }:
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={iconAdd.src} alt="add" />
-      <span >{text}</span>
+      <span >{label}</span>
     </button>
   )
 

@@ -1,13 +1,10 @@
-import {
-  useMemo,
-  Dispatch, SetStateAction, MutableRefObject, HTMLAttributes
-} from 'react';
+import { useMemo, } from 'react';
 
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 // icon
-import iconDelete from "public/image/icon/delete01.svg"
+import { Icondelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import style from "./staffList.module.scss"
@@ -15,63 +12,39 @@ import style from "./staffList.module.scss"
 // fakeData
 import { TstaffInfo } from "../../../meta/fakeData/fakeStaffList"
 
-
-
-type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
-type TsetDelVisible = Dispatch<SetStateAction<boolean>>
-type TsetIsEditStaff = Dispatch<SetStateAction<boolean>>
-
 export default function StaffList({
-  setSelStaffInfo, setDelVisible,
-  data, setIsEditStaff, staffListRef }:
+  data,
+  editStaff, openDeletePanel }:
   {
-    setSelStaffInfo: TsetSelStaffInfo,
-    setDelVisible: TsetDelVisible
     data: TstaffInfo[]
-    setIsEditStaff: TsetIsEditStaff
-    staffListRef: MutableRefObject<HTMLElement[]>
+    editStaff: (staffProfile: TstaffInfo) => void
+    openDeletePanel: (staffProfile: TstaffInfo) => void
   }) {
 
   // ========================================
   const columns = useMemo(() =>
     columnsCreator(
-      setSelStaffInfo,
-      setDelVisible,
-      setIsEditStaff,
+      editStaff,
+      openDeletePanel
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
     , [])
-
 
 
   return (
     <Table className={style.antdTable}
       columns={columns} dataSource={data}
       pagination={false}
-      onRow={(record, index) => {
-        // record裝的帶進每一個row的資料
-        if (index === undefined) return {}
-        return {
-          // 把ref放進tr裡面，搜尋時就可以scroll到指定的tr
-          ref: (ele: HTMLElement) => {
-            staffListRef.current[index] = ele
-          },
-          // 把data-staffid放進tr，做為搜尋的依據
-          "data-staffid": record.staffId
-        } as HTMLAttributes<HTMLElement>
-      }}
     />
   )
 }
-
 
 // ================================================
 
 // 每一行cell的設定
 const columnsCreator = (
-  setSelStaffInfo: TsetSelStaffInfo,
-  setDelVisible: TsetDelVisible,
-  setIsEditStaff: TsetIsEditStaff,
+  editStaff: (staffProfile: TstaffInfo) => void,
+  openDeletePanel: (staffProfile: TstaffInfo) => void,
 ) => {
 
   return (
@@ -100,14 +73,9 @@ const columnsCreator = (
           const { departmentId, department,
             jobTitle, level, } = department01
 
-          const showEditPanel = () => {
-            setSelStaffInfo(staffProfile)
-            setIsEditStaff(true)
-          }
-
           return (
             <div className={style.departmentInfo}
-              onClick={showEditPanel}>
+              onClick={() => editStaff(staffProfile)}>
               <span>{departmentId}</span>
               <span>{department}</span>
               <span>{jobTitle}</span>
@@ -125,13 +93,9 @@ const columnsCreator = (
           const { departmentId, department,
             jobTitle, level } = department02
           if (!departmentId) return null
-          const showEditPanel = () => {
-            setSelStaffInfo(staffProfile)
-            setIsEditStaff(true)
-          }
           return (
             <div className={style.departmentInfo}
-              onClick={showEditPanel}>
+              onClick={() => editStaff(staffProfile)}>
               <span>{departmentId}</span>
               <span>{department}</span>
               <span>{jobTitle}</span>
@@ -146,16 +110,11 @@ const columnsCreator = (
         width: 55,
         render: (_, info) => {
           const onClick = () => {
-            setSelStaffInfo(info)
-            setDelVisible(true)
+            openDeletePanel(info)
           }
 
           return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className={style.iconDelete}
-              src={iconDelete.src} alt=""
-              onClick={onClick}
-            />
+            <Icondelete01 className={style.iconDelete} onClick={onClick} />
           )
         },
       },
