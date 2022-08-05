@@ -43,12 +43,14 @@ export default function HrManage() {
       <PageHeader>
       </PageHeader>
       <div className={style.mainContainer}>
-        {managerList.map((item, index) => {
-          return (
-            <DepartmentManagers key={index} index={index}
-              data={item} showAdd={showAdd} setData={setManagerList} />
-          )
-        })}
+        <div style={{ width: "100%" }}>
+          {managerList.map((item, index) => {
+            return (
+              <DepartmentManagers key={index} index={index}
+                data={item} showAdd={showAdd} setData={setManagerList} />
+            )
+          })}
+        </div>
       </div>
 
       <AddManager

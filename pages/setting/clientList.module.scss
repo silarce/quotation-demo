@@ -2,9 +2,6 @@
 @use "styles/layout" as *;
 
 .mainContainer {
-
-  scroll-behavior: auto !important;
-
   :global(.ant-collapse) {
     border: none;
   }

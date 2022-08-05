@@ -85,16 +85,27 @@
   grid-template-rows: fit-content(100%) auto;
   height: 100%;
 }
+
+// 基本上廢棄不用了
 .scrollContainer {
   display: grid;
-  height: 100%;
   grid-template-rows: fit-content(100%) auto;
-  > div:nth-of-type(2) { //通常是mainContainer
-    overflow: auto;
-    scroll-behavior: smooth;
+  height: 100%;
+  > div:nth-of-type(2) {
+    //通常是mainContainer
+    // overflow: auto;
+    // scroll-behavior: smooth;
   }
 }
 
 .mainContainer {
   border: solid 1px $colorBorder01;
+  display: grid;
+  grid-template-rows: auto;
+  height: 100%;
+  overflow: hidden;
+  > div {
+    overflow: auto;
+    scroll-behavior: smooth;
+  }
 }

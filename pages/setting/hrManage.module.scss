@@ -2,9 +2,11 @@
 @use "styles/layout" as *;
 
 .mainContainer {
-  padding: 38px 45px;
-  display: grid;
-  gap: 21px;
+  > div {
+    padding: 38px 45px;
+    display: grid;
+    gap: 21px;
+  }
 }
 
 .departHeader {
