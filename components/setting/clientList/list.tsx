@@ -1,6 +1,6 @@
 import {
   useState,
-  MutableRefObject, MouseEvent
+  MouseEvent
 } from 'react';
 
 
@@ -24,10 +24,9 @@ import {
 const { Panel } = AntdCollapse
 
 export default function List(
-  { clientList, clientListRef, editClient, openDeletePanel }:
+  { clientList, editClient, openDeletePanel }:
     {
       clientList: TclientProfileList
-      clientListRef: MutableRefObject<HTMLElement[]>
       editClient: (profile: TclientProfile) => void
       openDeletePanel: (profile: TclientProfile) => void
     }) {
@@ -38,8 +37,6 @@ export default function List(
     const activeIndex = parseInt(panelIndex as string)
     setActiveIndex(activeIndex)
   }
-
-
 
   return (
     <div className={style.container}>
@@ -56,12 +53,10 @@ export default function List(
             openDeletePanel(item)
           }
 
-
           return (
             <Panel className={style.panel} key={index}
               header={
                 <PanelHeader clientData={item} isActive={isActive}
-                  clientListRef={clientListRef} index={index}
                   editClient={newEditClient} openDeletePanel={newOpenDeletePanel}
                 />}
             >

@@ -1,8 +1,7 @@
 // 客戶列表
 // 客戶列表
 import {
-  useState, useMemo, useRef,
-  Dispatch, SetStateAction, MutableRefObject
+  useState, useMemo,
 } from "react"
 
 // components
@@ -16,10 +15,6 @@ import AddButton from "components/global/gear/button/addButton"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 
 
-// icon
-import iconAdd from "public/image/icon/add.svg"
-import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
-
 // css
 import style from "./clientList.module.scss"
 
@@ -28,8 +23,6 @@ import {
   TclientProfile, TclientProfileList,
   fakeClientList, clientEmpty
 } from "meta/fakeData/fakeClientList";
-
-
 
 export default function ClientList() {
 
@@ -49,34 +42,25 @@ export default function ClientList() {
   const [selClientProfile, setSelClientProfile] = useState<TclientProfile>(newClientProfile)
 
   // ====================================================
-  const mainContainerRef = useRef<HTMLDivElement>(null)
-  // ====================================================
-  // 編輯頁面開關
+  // 編輯/新增
   const [isEdit, setIsEdit] = useState(false)
 
   const resetEditPanel = () => {
     setIsEdit(false)
     setSelClientProfile(newClientProfile)
-    if (mainContainerRef.current) {
-      mainContainerRef.current.scrollTop = 0
-    }
   }
   const editClient = (clientProfile: TclientProfile) => {
     setIsEdit(true)
     setSelClientProfile(clientProfile)
-    if (mainContainerRef.current) {
-      mainContainerRef.current.scrollTop = 0
-    }
   }
   const addClient = () => {
     setIsEdit(true)
     setSelClientProfile(newClientProfile)
-    if (mainContainerRef.current) {
-      mainContainerRef.current.scrollTop = 0
-    }
   }
 
   // ====================================================
+  // 刪除功能
+
   const [showDeletePanel, setShowDeletePanel] = useState(false)
   const openDeletePanel = (clientProfile: TclientProfile) => {
     setShowDeletePanel(true)
@@ -94,23 +78,47 @@ export default function ClientList() {
   }
   // ====================================================
   // 用於搜尋功能
-  const clientListRef = useRef<HTMLElement[]>([])
+  const [filteredList, setFilteredList] = useState<typeof fakeClientList>([])
 
+  const searchClient = (searchValue: string) => {
+
+    // 搜尋編號
+    let filteredList =
+      clientList.filter((item) => searchValue === item.id)
+    // 搜尋類別
+    if (!filteredList[0]) {
+      filteredList =
+        clientList.filter((item) => searchValue === item.type)
+    }
+    // 搜尋全稱
+    const regName = new RegExp(searchValue)
+    if (!filteredList[0]) {
+      filteredList =
+        clientList.filter((item) => regName.test(item.name))
+    }
+    setFilteredList(filteredList)
+  }
 
   return (
-    <div className={style.scrollContainer}>
+    <div className={style.container}>
       <PageHeader>
         {isEdit
           ? <ButtonBar02 selClientProfile={selClientProfile} resetEditPanel={resetEditPanel} />
           : <ButtonBar01
-            clientListRef={clientListRef} addClient={addClient} />}
+            addClient={addClient}
+            searchClient={searchClient}
+          />}
       </PageHeader>
 
-      <div className={style.mainContainer} ref={mainContainerRef}>
+      <div className={style.mainContainer} >
         {isEdit
           ? <EditClient selData={selClientProfile} setSelData={setSelClientProfile} />
-          : <List {...{ clientList, clientListRef, editClient, openDeletePanel }} />}
+          : <List {...{
+            clientList: (filteredList[0] ? filteredList : clientList),
+            editClient, openDeletePanel
+          }} />}
       </div>
+
       <TwoButtonModal
         {...{
           visible: showDeletePanel,
@@ -126,35 +134,21 @@ export default function ClientList() {
 // ================================================================
 
 const ButtonBar01 = ({
-  addClient, clientListRef
+  addClient, searchClient
 }:
   {
     addClient: () => void
-    clientListRef: MutableRefObject<HTMLElement[]>
+    searchClient: (searchValue: string) => void
   }) => {
   // ===========================================
-  // 搜尋
-  const searchHandler = (searchValue: string) => {
-    const ref = clientListRef.current.find(item => {
-      const thisClientId
-        = ((item.querySelector("#clientId") as HTMLElement).innerText)
-      return thisClientId === searchValue
-    })
-    if (ref) ref.scrollIntoView()
-    else alert(`${searchValue}不存在`)
-  }
 
   return (
     <div className={style.headerBar}>
-      {/*  */}
-      <InputSearch placeholder="輸入客戶編號" onClick={searchHandler} />
-      {/*  */}
+      <InputSearch placeholder="編號/類別/全稱字段" onClick={searchClient} />
       <AddButton text="新增客戶資料" onClick={addClient} />
     </div>
   )
 }
-
-
 
 const ButtonBar02 = (
   { selClientProfile, resetEditPanel }:

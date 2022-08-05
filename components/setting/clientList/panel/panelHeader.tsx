@@ -1,4 +1,4 @@
-import { MutableRefObject,  MouseEvent } from "react"
+import { MouseEvent } from "react"
 
 // icon
 
@@ -19,12 +19,10 @@ import { TclientProfile } from "meta/fakeData/fakeClientList";
 
 
 export default function PanelHeader(
-  { clientData, isActive, clientListRef, index, editClient, openDeletePanel }:
+  { clientData, isActive, editClient, openDeletePanel }:
     {
       clientData: TclientProfile
       isActive: boolean
-      clientListRef: MutableRefObject<HTMLElement[]>
-      index: number
       editClient: () => void
       openDeletePanel: (e: MouseEvent) => void
     }) {
@@ -35,9 +33,6 @@ export default function PanelHeader(
 
   return (
     <div className={`${style.container} ${active}`}
-      ref={
-        (ele: HTMLDivElement) => { clientListRef.current[index] = ele }
-      }
     >
       <div className={style.cell01}>
         <div>
