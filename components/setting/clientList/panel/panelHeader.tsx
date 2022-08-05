@@ -1,10 +1,6 @@
-import { MutableRefObject, LegacyRef, MouseEvent } from "react"
+import { MutableRefObject,  MouseEvent } from "react"
 
 // icon
-import iconDelete from "public/image/icon/delete01.svg"
-import iconEdit from "public/image/icon/edit.svg"
-import iconDelete_hover from "public/image/icon/delete01_hover.svg"
-import iconEdit_hover from "public/image/icon/edit_hover.svg"
 
 import {
   Icondelete01 as IconDelete,

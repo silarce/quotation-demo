@@ -2,13 +2,15 @@
 // 客戶列表
 import {
   useState, useMemo, useRef,
-  Dispatch, SetStateAction, MutableRefObject, RefObject
+  Dispatch, SetStateAction, MutableRefObject
 } from "react"
 
 // components
 import PageHeader from "components/PageTitle/pageHeader"
 import List from "components/setting/clientList/list"
 import EditClient from "components/setting/clientList/editClient"
+import InputSearch from "components/global/gear/input/inputSearch"
+import AddButton from "components/global/gear/button/addButton"
 
 // global gear
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
@@ -16,7 +18,6 @@ import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonMo
 
 // icon
 import iconAdd from "public/image/icon/add.svg"
-import iconSearch from "public/image/icon/search.svg"
 import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 
 // css
@@ -124,8 +125,6 @@ export default function ClientList() {
 
 // ================================================================
 
-type TsetIsEdit = Dispatch<SetStateAction<boolean>>
-
 const ButtonBar01 = ({
   addClient, clientListRef
 }:
@@ -135,40 +134,22 @@ const ButtonBar01 = ({
   }) => {
   // ===========================================
   // 搜尋
-  const [inputValue, setInputVaue] = useState("")
-  const searchHandler = () => {
+  const searchHandler = (searchValue: string) => {
     const ref = clientListRef.current.find(item => {
       const thisClientId
         = ((item.querySelector("#clientId") as HTMLElement).innerText)
-      return thisClientId === inputValue
+      return thisClientId === searchValue
     })
-
     if (ref) ref.scrollIntoView()
-    else alert(`${inputValue}不存在`)
-
+    else alert(`${searchValue}不存在`)
   }
 
   return (
     <div className={style.headerBar}>
       {/*  */}
-      <div className={style.searchInput}>
-        <input type="text" placeholder="輸入客戶編號"
-          value={inputValue}
-          onChange={e => { setInputVaue(e.target.value) }}
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <IconSearch onClick={searchHandler}/>
-        {/* <IconSearch onClick={searchHandler} /> */}
-        <div className={style.borderBottom} />
-      </div>
+      <InputSearch placeholder="輸入客戶編號" onClick={searchHandler} />
       {/*  */}
-      <button className={style.addButton}
-        onClick={addClient}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={iconAdd.src} alt="add" />
-        <span >新增客戶資料</span>
-      </button>
+      <AddButton text="新增客戶資料" onClick={addClient} />
     </div>
   )
 }
