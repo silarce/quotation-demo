@@ -14,6 +14,8 @@ import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import InputSearch from "components/global/gear/input/inputSearch"
 import AddButton from "components/global/gear/button/addButton"
+import MyButton from "components/global/gear/button/myButton"
+import RedButton from "components/global/gear/button/redButton"
 
 // css
 import style from "./clientList.module.scss"
@@ -127,7 +129,7 @@ export default function ClientList() {
           visible: showDeletePanel,
           setVisible: setShowDeletePanel,
           text: `請確定要刪除「${selClientProfile.id}」「${selClientProfile.name}」?`,
-          onOk: deleteSelProfile,
+          onConfirm: deleteSelProfile
         }} />
 
     </div>
@@ -163,17 +165,8 @@ const ButtonBar02 = (
 
   return (
     <div className={style.headerBar}>
-      <button className={style.uploadBtn}
-        onClick={() => { alert(`上傳${selClientProfile.id}的資料`) }}
-      >
-        上傳
-      </button>
-
-      <button className={style.addButton}
-        onClick={resetEditPanel}
-      >
-        取消
-      </button>
+      <RedButton label="上傳" onClick={() => alert(`上傳${selClientProfile.id}的資料`)} />
+      <MyButton label="取消" onClick={resetEditPanel} />
     </div>
   )
 }

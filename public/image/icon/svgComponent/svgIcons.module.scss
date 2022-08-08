@@ -11,3 +11,10 @@
 .cursorAuto {
   cursor: auto;
 }
+
+.addCircle {
+  stroke: #ea1833;
+  &:hover {
+    fill: #FFEEEE;
+  }
+}

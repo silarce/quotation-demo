@@ -59,14 +59,15 @@
   width: 340px;
   padding: 7px 16px 21px 16px;
   margin-right: 76px;
-  margin-top:40px;
+  margin-top: 40px;
   border: solid 1px $colorBorder01;
-  > img {
+  > div {
+    display: grid;
+    gap: 20px;
     position: absolute;
     top: 50%;
     left: calc(100% + 12px);
     transform: translateY(-50%);
-    cursor: pointer;
   }
 }
 

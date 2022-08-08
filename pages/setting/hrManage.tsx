@@ -13,8 +13,7 @@ import AddManager from "components/setting/hrManage/modal/AddManeger"
 import AddButton from "components/global/gear/button/addButton"
 
 // icon
-import iconAdd from "public/image/icon/add.svg"
-import iconRemove from "public/image/icon/removeCircle.svg"
+import { IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./hrManage.module.scss"
@@ -109,15 +108,11 @@ const DepartmentManagers = ({ index, data, showAdd, setData }:
                 </div>
                 <span>{jobTitle}</span>
                 <span>{phone01}</span>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconRemove.src} alt="remove"
-                  onClick={() => { removeManager(index) }}
-                />
+                <IconRemoveCircle onClick={() => { removeManager(index) }} />
               </div>
             )
           })
         }
-
       </div>
     </div>
   )

@@ -11,7 +11,7 @@ import { Input01 } from "components/global/gear/input/input";
 import { Select02, Toption } from "components/global/gear/select/select";
 
 // icon
-import iconAdd from "public/image/icon/addCircle.svg"
+import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
 // css
 import style from "./editClient.module.scss"
@@ -46,6 +46,15 @@ export default function EditClient({ selData, setSelData }:
       name: "",
       phone: ""
     })
+    setSelData(state => {
+      return { ...state, contact }
+    })
+  }
+  const removeContact = () => {
+    // 附註同addContent
+    const contact = selData.contact
+    if (contact.length <= 1) return;
+    contact.pop()
     setSelData(state => {
       return { ...state, contact }
     })
@@ -90,10 +99,11 @@ export default function EditClient({ selData, setSelData }:
             <div className={style.form04} key={index}>
               <Input01 {...{ ...name, }} />
               <Input01 {...{ ...phone, }} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={iconAdd.src} alt="add"
-                onClick={addContact}
-              />
+              <div>
+                <IconAddCircle onClick={addContact} />
+                {index > 0 && <IconRemoveCircle onClick={removeContact} />}
+
+              </div>
             </div>
           )
         })}

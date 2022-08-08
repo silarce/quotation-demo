@@ -12,33 +12,27 @@ import style from "./twoButtonModal.module.scss"
 
 
 export default function TwoButtonModal(
-  { visible, setVisible, text, onConfirm, onCancel, confirmText, cancelText }:
+  { visible, setVisible, text, onOk, confirmText, cancelText }:
     {
       visible: boolean,
       setVisible: Dispatch<SetStateAction<boolean>>,
       text: string
-      onConfirm: () => void
-      onCancel?: () => void
+      onOk: () => void
       confirmText?: string
       cancelText?: string
     }) {
-
-  if (!onCancel) onCancel = () => {
-    setVisible(false)
-  }
 
   return (
     <Modal
       className={style.container}
       visible={visible}
-      maskClosable={true}
       closable={false}
       centered={true}
       width={400}
-      onCancel={onCancel}
       footer={<TwoBtnFooter
         {...{
-          onConfirm, onCancel,
+          onConfirm: onOk,
+          onCancel: () => setVisible(false),
           confirmText, cancelText
         }}
       />}

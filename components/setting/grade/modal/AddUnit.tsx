@@ -2,8 +2,13 @@ import {
   Dispatch, SetStateAction
 } from "react"
 
+
+
 // antd
 import { Modal } from 'antd';
+
+//global gear
+import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
 
 // css
 import style from "./addUnit.module.scss"
@@ -15,6 +20,8 @@ export default function AddUnit({ visible, setVisible }:
     setVisible: Dispatch<SetStateAction<boolean>>,
   }) {
 
+  const onConfirm = () => alert("送出資料")
+  const onCancel = () => setVisible(false)
 
   return (
     <Modal
@@ -22,10 +29,9 @@ export default function AddUnit({ visible, setVisible }:
       visible={visible}
       closable={false}
       centered={true}
-      width={400}
-      okText="確定"
-      cancelText="取消"
-      onCancel={() => setVisible(false)}
+      width={405}
+      onCancel={onCancel}
+      footer={<TwoBtnFooter {...{ onConfirm, onCancel }} />}
     >
       <p>請輸入新增部門</p>
       <div>

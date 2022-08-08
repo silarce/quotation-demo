@@ -9,8 +9,10 @@ import style from "./svgIcons.module.scss"
 const getClassName = (props: SVGProps<SVGSVGElement>) => {
   let { className, cursor } = props
   if (!className) className = ""
+  // 如果有送auto特性進來，就設cursorAuto className
   cursor = cursor === "auto" ? style.cursorAuto : ""
-  return className = `${style.svg} ${className} ${cursor}`
+
+  return className = `${style.svg} ${cursor} ${className}`
 }
 
 
@@ -44,11 +46,69 @@ export function IconSearch(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M8.13636 14.2727C11.5254 14.2727 14.2727 11.5254 14.2727 8.13636C14.2727 4.74734 11.5254 2 8.13636 2C4.74734 2 2 4.74734 2 8.13636C2 11.5254 4.74734 14.2727 8.13636 14.2727Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-      {/* <path d="M8.13636 14.2727C11.5254 14.2727 14.2727 11.5254 14.2727 8.13636C14.2727 4.74734 11.5254 2 8.13636 2C4.74734 2 2 4.74734 2 8.13636C2 11.5254 4.74734 14.2727 8.13636 14.2727Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" /> */}
       <path d="M12.6364 12.6365L18.3636 18.3637" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-      {/* <path d="M12.6364 12.6365L18.3636 18.3637" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" /> */}
     </svg>
-
-
   )
 }
+
+export function IconCopy(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props)
+  return (
+    <svg {...{ ...props, className }} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3.5" y="2.5" width="10" height="13" stroke="currentColor" />
+      <path d="M13.5 8H17V19H9V15.6" stroke="currentColor" />
+    </svg>
+  )
+}
+
+export function IconDetail(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props)
+  return (
+    <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6.5" y="4.5" width="7" height="4" stroke="currentColor" />
+      <line x1="6" y1="14.5" x2="11" y2="14.5" stroke="currentColor" />
+      <line x1="6" y1="11.5" x2="11" y2="11.5" stroke="currentColor" />
+      <rect x="3.5" y="1.5" width="13" height="17" stroke="currentColor" />
+    </svg>
+  )
+}
+
+export function IconAddCircle(props: SVGProps<SVGSVGElement>) {
+  let className = getClassName(props)
+  className = `${className} ${style.addCircle}`
+  return (
+    <svg {...{ ...props, className }} width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M35 18C35 8.61116 27.3888 1 18 1C8.61116 1 1 8.61116 1 18C1 27.3888 8.61116 35 18 35C27.3888 35 35 27.3888 35 18Z" strokeMiterlimit="10" />
+      <path d="M7.99023 17.7872H27.9625M17.9764 8V28" strokeWidth="2" />
+    </svg>
+  )
+}
+
+export function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
+  let className = getClassName(props)
+  className = `${className} ${style.addCircle}`
+  return (
+    <svg {...{ ...props, className }} width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M35 18C35 8.61116 27.3888 1 18 1C8.61116 1 1 8.61116 1 18C1 27.3888 8.61116 35 18 35C27.3888 35 35 27.3888 35 18Z" strokeMiterlimit="10" />
+      <line x1="7.99023" y1="18" x2="27.9625" y2="18" strokeWidth="2" />
+    </svg>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

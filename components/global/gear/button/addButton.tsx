@@ -3,7 +3,7 @@
 // icon
 import iconAdd from "public/image/icon/add.svg"
 
-import style from "./addButton.module.scss"
+import style from "./_button.module.scss"
 
 
 
@@ -24,8 +24,6 @@ export default function AddButton({ label, onClick, className }:
       <span >{label}</span>
     </button>
   )
-
-
 }
 
 

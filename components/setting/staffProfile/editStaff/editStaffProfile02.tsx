@@ -14,6 +14,7 @@ import style from "./editStaffProfile02.module.scss"
 // icon
 import iconAdd from "public/image/icon/addCircle.svg"
 import iconRemove from "public/image/icon/removeCircle.svg"
+import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
 // type
 import { TstaffInfo } from "meta/fakeData/fakeStaffList";
@@ -54,9 +55,10 @@ export default function EditStaffProfile02(
               )
             })}
             {/*  eslint-disable-next-line @next/next/no-img-element */}
-            <img src={isDepart02 ? iconRemove.src : iconAdd.src} alt="增加/移除部門"
-              onClick={switchNewDepart}
-            />
+            {isDepart02
+              ? <IconRemoveCircle onClick={switchNewDepart} />
+              : <IconAddCircle onClick={switchNewDepart} />
+            }
           </div>
           {isDepart02 &&
             <div className={style.selBox}>

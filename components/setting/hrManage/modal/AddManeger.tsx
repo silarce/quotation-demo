@@ -6,6 +6,9 @@ import {
 // antd
 import { Modal } from 'antd';
 
+// global gear
+import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
+
 // css
 import style from "./addManeger.module.scss"
 
@@ -31,11 +34,9 @@ export default function AddManager(
   const [selStaff, setSelStaff] = useState<TselStaffList>({})
   const selectStaff = (staffInfo: TstaffInfo) => {
     const { staffId } = staffInfo
-    setSelStaff(state => {
-      if (state[staffId]) delete state[staffId]
-      else state[staffId] = staffInfo
-      return { ...state }
-    })
+    if (selStaff[staffId]) delete selStaff[staffId]
+    else selStaff[staffId] = staffInfo
+    setSelStaff({ ...selStaff })
   }
 
   // ===============================================
@@ -53,6 +54,8 @@ export default function AddManager(
     setSelStaff({})
     setVisible(false)
   }
+  const onConfirm = addManager
+  const onCancel = cleanAndClose
 
   return (
     <Modal
@@ -62,10 +65,8 @@ export default function AddManager(
       centered={true}
       width={400}
       destroyOnClose={true}
-      okText="確定"
-      cancelText="取消"
-      onCancel={cleanAndClose}
-      onOk={addManager}
+      onCancel={onCancel}
+      footer={<TwoBtnFooter {...{ onConfirm, onCancel }} />}
     >
       <div className={style.title}>
         <span>請選擇管理人員</span>

@@ -7,6 +7,11 @@ import { useState, ChangeEvent, Dispatch, SetStateAction } from "react"
 import PageHeader from "components/PageHeader/pageHeader"
 import ColumnList from "../../components/setting/grade/columnList"
 import ColumnTitle from "../../components/setting/grade/columnTitle"
+
+// glogal gear
+import MyButton from "components/global/gear/button/myButton"
+import RedButton from "components/global/gear/button/redButton"
+import AddButton from "components/global/gear/button/addButton"
 // modal
 import DeleteUnit from "components/setting/grade/modal/DeleteUnit"
 import AddUnit from "components/setting/grade/modal/AddUnit"
@@ -86,9 +91,7 @@ export default function Grade() {
 const ButtonBar01 = ({ setEditable }:
   { setEditable: (b: boolean) => void }) => {
   return (
-    <div className={style.headerBar}>
-      <button onClick={() => setEditable(true)}>編輯</button>
-    </div>
+    <MyButton label="編輯" onClick={() => setEditable(true)} />
   )
 }
 const ButtonBar02 = ({ setEditable, setVisibleAddUnit, resetData }:
@@ -103,16 +106,9 @@ const ButtonBar02 = ({ setEditable, setVisibleAddUnit, resetData }:
   }
   return (
     <div className={style.headerBar}>
-      <button className={style.addButton}
-        onClick={() => { setVisibleAddUnit(true) }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={iconAdd.src} alt="add" />
-        <span>新增部門</span>
-      </button>
-      <button className={style.uploadBtn}
-        onClick={() => { alert("上傳按鈕測試") }}>上傳</button>
-      <button onClick={cancer}>取消</button>
+      <AddButton label="新增部門" onClick={() => { setVisibleAddUnit(true) }} />
+      <RedButton label="上傳" onClick={() => { alert("上傳按鈕測試") }} />
+      <MyButton label="取消" onClick={cancer} />
     </div>
   )
 }

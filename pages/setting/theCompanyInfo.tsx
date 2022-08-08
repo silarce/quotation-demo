@@ -8,9 +8,13 @@ import {
 
 // components
 import PageHeader from "components/PageHeader/pageHeader"
-
+// global gear
+import MyButton from "components/global/gear/button/myButton"
+import RedButton from "components/global/gear/button/redButton"
 // icon
 import iconDelete from "public/image/icon/delete01.svg"
+import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
+
 
 // css
 import style from "./theCompanyInfo.module.scss"
@@ -71,8 +75,7 @@ export default function TheCompanyInfo() {
                 />
               </label>
               <span>{"(上限10MB)"}</span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={iconDelete.src} alt="delete" />
+              <Icondelete01 />
             </div>
           }
         </div>
@@ -103,9 +106,7 @@ export default function TheCompanyInfo() {
 
 const ButtonBar01 = ({ setDisable }: { setDisable: (b: boolean) => void }) => {
   return (
-    <div className={style.headerBar}>
-      <button onClick={() => setDisable(false)}>編輯</button>
-    </div>
+    <MyButton label="編輯" onClick={() => setDisable(false)} />
   )
 }
 const ButtonBar02 = ({ setDisable, upload, setUpload }
@@ -122,9 +123,8 @@ const ButtonBar02 = ({ setDisable, upload, setUpload }
 
   return (
     <div className={style.headerBar}>
-      <button className={style.uploadBtn}
-        onClick={() => { setUpload(true) }}>上傳</button>
-      <button onClick={cancer}>取消</button>
+      <RedButton label="上傳" onClick={() => { setUpload(true) }} />
+      <MyButton label="取消" onClick={cancer} />
     </div>
   )
 }
