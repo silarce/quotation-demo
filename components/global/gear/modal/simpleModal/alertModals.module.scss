@@ -1,0 +1,9 @@
+@use "styles/theme01" as *;
+
+.container {
+  :global(.ant-btn) {
+    > span {
+      color: white;
+    }
+  }
+}

@@ -32,6 +32,7 @@ export default function TwoButtonModal(
       cancelText="取消"
       onOk={onOk}
       onCancel={() => setVisible(false)}
+
     >
       <p>{text}</p>
     </Modal>

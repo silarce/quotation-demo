@@ -8,6 +8,7 @@ import {
 import PageHeader from "components/PageTitle/pageHeader"
 import List from "components/setting/clientList/list"
 import EditClient from "components/setting/clientList/editClient"
+import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals"
 
 // global gear
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
@@ -95,6 +96,9 @@ export default function ClientList() {
       filteredList =
         clientList.filter((item) => regName.test(item.name))
     }
+
+    if (searchValue !== "" && !filteredList[0])
+      return ModalInfo("沒有符合的資料")
     setFilteredList(filteredList)
   }
 

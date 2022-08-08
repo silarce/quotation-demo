@@ -9,11 +9,13 @@ import {
 import PageHeader from "components/PageTitle/pageHeader"
 import StaffList from "components/setting/staffProfile/staffList";
 import EditStaff from "components/setting/staffProfile/editStaff";
+import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals";
 
 // global gear
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import InputSearch from "components/global/gear/input/inputSearch"
 import AddButton from "components/global/gear/button/addButton"
+
 
 
 // css
@@ -89,6 +91,9 @@ export default function StaffProfile() {
       filteredList =
         staffList.filter((item) => regName.test(item.chName))
     }
+
+    if (searchValue !== "" && !filteredList[0])
+      return ModalInfo("沒有符合的資料")
     setFilteredList(filteredList)
   }
 

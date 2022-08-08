@@ -1,0 +1,32 @@
+
+
+
+
+// css
+import style from "./alertModals.module.scss"
+
+
+
+
+import { Modal } from 'antd';
+
+
+export const ModalInfo = (
+  title?: string | number,
+  content?: string | number,
+) => {
+  Modal.info({
+    className: style.container,
+    title,
+    content,
+    okText:"確認",
+    maskClosable: true
+  })
+}
+
+
+
+
+
+
+

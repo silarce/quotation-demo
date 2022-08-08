@@ -1,0 +1,19 @@
+@use "styles/theme01" as *;
+
+$padding01: 24px;
+$footerGap01: 24px;
+
+.container {
+  :global(.ant-modal-content) {
+    padding: $padding01;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+  :global(.ant-modal-footer) {
+    display: flex;
+    justify-content: center;
+    gap: $footerGap01;
+    border: none;
+  }
+}
