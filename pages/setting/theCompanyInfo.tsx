@@ -7,7 +7,7 @@ import {
 } from "react"
 
 // components
-import PageHeader from "components/PageTitle/pageHeader"
+import PageHeader from "components/PageHeader/pageHeader"
 
 // icon
 import iconDelete from "public/image/icon/delete01.svg"
@@ -83,6 +83,7 @@ export default function TheCompanyInfo() {
               <label key={index} htmlFor={id}>
                 <span>{label}</span>
                 <input type="text" placeholder={`請輸入${label}`}
+                  autoComplete="off"
                   id={id}
                   disabled={disable}
                   value={inputValues[id] || ""}

@@ -8,8 +8,9 @@ import {
 } from "react"
 
 // components
-import PageHeader from "components/PageTitle/pageHeader"
+import PageHeader from "components/PageHeader/pageHeader"
 import AddManager from "components/setting/hrManage/modal/AddManeger"
+import AddButton from "components/global/gear/button/addButton"
 
 // icon
 import iconAdd from "public/image/icon/add.svg"
@@ -88,17 +89,12 @@ const DepartmentManagers = ({ index, data, showAdd, setData }:
     <div >
       <div className={style.departHeader}>
         <span>{label}</span>
-        <button className={style.btn01}
-          onClick={() => showAdd(index)}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={iconAdd.src} alt="add" />
-          <span>新增管理人員</span>
-        </button>
+        <AddButton className={style.addBtn}
+          label="新增管理人員" onClick={() => showAdd(index)} />
       </div>
       {/*  */}
 
       <div className={style.cardContainer}>
-
         {list.length === 0
           ? <span>目前尚未新增管理人員</span>
           : list.map((item, index) => {

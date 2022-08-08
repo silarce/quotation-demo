@@ -5,7 +5,7 @@ import {
 } from "react"
 
 // components
-import PageHeader from "components/PageTitle/pageHeader"
+import PageHeader from "components/PageHeader/pageHeader"
 import List from "components/setting/clientList/list"
 import EditClient from "components/setting/clientList/editClient"
 import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals"

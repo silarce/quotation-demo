@@ -4,7 +4,7 @@ import { useState, ChangeEvent, Dispatch, SetStateAction } from "react"
 
 
 // components
-import PageHeader from "components/PageTitle/pageHeader"
+import PageHeader from "components/PageHeader/pageHeader"
 import ColumnList from "../../components/setting/grade/columnList"
 import ColumnTitle from "../../components/setting/grade/columnTitle"
 // modal

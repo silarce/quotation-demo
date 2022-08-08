@@ -7,7 +7,9 @@
 .title {
   width: $cellWidth;
   height: $hederHeight;
+  padding: 14px 0 8px 0;
   margin: auto;
+  background-color: $bgc01;
   > div {
     position: relative;
     padding: 0 23px;

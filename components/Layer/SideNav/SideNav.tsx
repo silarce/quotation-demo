@@ -11,7 +11,7 @@ import style from "./side.module.scss"
 // meta
 import pathList from './pathList';
 
-export default function Side() {
+export default function SideNav() {
   // const pathname: string = useRouter().pathname
   const router = useRouter()
   const pathname = router.pathname

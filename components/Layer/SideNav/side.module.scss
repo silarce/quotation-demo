@@ -1,8 +1,11 @@
+@use "styles/theme01" as *;
+
 .container {
   padding: 39px 28px;
   display: grid;
   grid-gap: 30px;
   height: fit-content;
+  background-color: $bgc01;
 }
 
 .collapse {

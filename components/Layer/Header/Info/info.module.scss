@@ -4,9 +4,10 @@
   display: grid;
   grid-template-columns: auto auto auto auto;
   grid-gap: 19px;
+  height: 100%;
+  padding: 0 23px 0 33px;
   margin: auto;
-  margin-right: 23px;
-  height: fit-content;
+  background-color: $bgc01;
   > * {
     margin: auto;
   }

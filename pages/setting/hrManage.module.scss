@@ -26,7 +26,8 @@
 }
 
 .cardContainer {
-  padding: 34px 35px;
+  padding: 14px 35px;
+  padding-bottom: 24px;
   border: solid 1px $colorBorder01;
   > span {
     font-weight: 400;
@@ -42,7 +43,7 @@
   gap: 20px;
   width: fit-content;
   padding: 22px 33px;
-  margin-right: 80px;
+  margin: 14px 80px 0px 0px;
   border: solid 1px $colorBorder01;
   border-left: solid 2px $colorActive01;
   &:nth-of-type(n + 4) {
@@ -60,4 +61,8 @@
     transform: translateY(-50%);
     cursor: pointer;
   }
+}
+
+.addBtn {
+  border: none;
 }

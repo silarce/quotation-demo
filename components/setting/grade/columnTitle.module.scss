@@ -5,12 +5,16 @@
 }
 
 .title {
+  display: grid;
   width: $cellWidth;
   height: $hederHeight;
+  // padding: 14px 0 8px 0;
   margin: auto;
   > div {
     padding-bottom: 3px;
     border-bottom: solid 1px transparent;
+    width: 100%;
+    margin: auto;
     > span {
       display: block;
       width: calc(100% - 30px);
