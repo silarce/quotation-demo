@@ -1,0 +1,20 @@
+@use "styles/theme01" as *;
+
+.svg {
+  color: $colorMain;
+  cursor: pointer;
+  &:hover {
+    color: $colorActive01;
+  }
+}
+
+.cursorAuto {
+  cursor: auto;
+}
+
+.addCircle {
+  stroke: #ea1833;
+  &:hover {
+    fill: #FFEEEE;
+  }
+}

@@ -1,0 +1,70 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: auto 362px 230px 130px;
+  padding: 5px 0px;
+  width: 100%;
+  background-color: $bgc01;
+  // cell層
+  > div {
+    padding-top: 13px;
+    padding-bottom: 13px;
+    border-left: solid 1px $colorBorder01;
+    &:nth-of-type(1) {
+      border-left: solid 3px transparent;
+    }
+    //cell下層
+    > div {
+      &:nth-of-type(1) {
+        margin-bottom: 20px;
+      }
+      h6 {
+        margin-bottom: 8px;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #979797;
+      }
+      span {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 19px;
+        color: $colorText;
+      }
+    }
+  }
+}
+
+.cell01 {
+  padding-left: 46px;
+  > div {
+    &:nth-of-type(1) {
+      > span {
+        color: $colorMain;
+      }
+    }
+  }
+}
+
+.cell02 {
+  display: grid;
+  grid-template-columns: 80px 76px calc(64px + 16px);
+  width: 100%;
+  padding-left: 23px;
+  column-gap: 22px;
+  > div {
+    &:nth-of-type(3) {
+      padding-left: 16px;
+    }
+    &:nth-last-of-type(1) {
+      grid-column: span 3;
+    }
+  }
+}
+
+.cell03 {
+  > div {
+    padding-left: 23px;
+  }
+}

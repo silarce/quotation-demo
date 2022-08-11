@@ -1,5 +1,4 @@
 @use "styles/theme01" as *;
-
 .container {
   display: grid;
   grid-template-columns: fit-content(100%) auto fit-content(100%);

@@ -1,0 +1,29 @@
+@use "styles/theme01" as *;
+
+.container {
+  position: relative;
+  height: 58px;
+  padding-bottom:15px;
+}
+
+.pageTitle {
+  // position: relative;
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  padding: 15px 48px;
+  font-weight: 400;
+  font-size: 18px;
+  border-bottom: solid 2px $colorActive01;
+  background-color: $bgc01;
+}
+
+.panel {
+  width: fit-content;
+  height: 100%;
+  margin: auto;
+  margin-right: 0;
+  button {
+    
+  }
+}

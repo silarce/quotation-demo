@@ -1,0 +1,17 @@
+@use "styles/theme01" as *;
+@use "./list.module" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: 123px 88px auto;
+  gap: 16px 25px;
+  padding: 23px 30px;
+  background-color: $bgc01;
+  max-height: 175px;
+  overflow: auto;
+  > span {
+    font-weight: 400;
+    font-size: 16px;
+    overflow-wrap: break-word;
+  }
+}

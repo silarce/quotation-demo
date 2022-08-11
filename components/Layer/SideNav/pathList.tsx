@@ -96,33 +96,70 @@ const pathList: pathList = {
     defaultCollapse: "0",
     list: [
       {
-        label: "國內工程",
+        label: "報價",
         list: [
           {
-            label: "施工中",
-            path: "/",
+            label: "預算",
+            path: "/domestic/budget",
           },
           {
-            label: "施工中",
-            path: "/",
+            label: "投標",
+            path: "/domestic/tender",
           },
           {
-            label: "施工中",
-            path: "/",
+            label: "發包",
+            path: "/domestic/outsourcing",
           },
           {
-            label: "施工中",
-            path: "/",
+            label: "合約",
+            path: "/domestic/contract",
+          },
+          {
+            label: "查詢報價單",
+            path: "/domestic/inquireQuotation",
+          },
+          {
+            label: "歷史紀錄",
+            path: "/domestic/history",
+          },
+          {
+            label: "報表",
+            path: "/domestic/report",
           },
         ]
       },
       {
-        label: "施工中",
-        path: "/",
+        label: "查詢派工作表",
+        path: "/domestic/",
       },
       {
-        label: "施工中",
-        path: "/"
+        label: "查詢應收帳款明細",
+        path: "/domestic/",
+      },
+      {
+        label: "查詢派工單明細",
+        path: "/domestic/",
+      },
+      {
+        label: "統計表",
+        list: [
+          {
+            label: "業績統計表",
+            path: "/domestic/",
+          },
+          {
+            label: "個人業績統計表",
+            path: "/domestic/",
+          },
+          {
+            label: "追加工程統計表",
+            path: "/domestic/",
+          },
+          {
+            label: "報價統計表",
+            path: "/domestic/",
+          },
+        ]
       },
     ]
   },

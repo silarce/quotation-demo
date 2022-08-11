@@ -1,0 +1,44 @@
+@use "styles/theme01" as *;
+
+@mixin button {
+  padding: 10px 44px;
+  color: $colorMain;
+  border: solid 1px $colorBorder01;
+  background-color: $bgc01;
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > span {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+  }
+  > img {
+    margin-right: 5px;
+  }
+  &:hover {
+    background-color: $hoverBgc01;
+  }
+}
+
+.button {
+  @include button;
+}
+
+.addButton {
+  @include button;
+  padding-left: 22px;
+  padding-right: 27px;
+}
+
+.redButton {
+  @include button;
+  border-color: #ea1833;
+  > span {
+    color: #ea1833;
+  }
+  &:hover {
+    background-color: $chosenBgc01;
+  }
+}

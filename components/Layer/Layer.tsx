@@ -4,7 +4,7 @@ import style from "./layer.module.scss"
 
 // components
 import Header from "./Header/Header"
-import Side from "./SideNav/Side";
+import SideNav from "./SideNav/SideNav";
 
 export default function Layer({ children }: { children: React.ReactNode }) {
 
@@ -17,7 +17,7 @@ export default function Layer({ children }: { children: React.ReactNode }) {
     <div className={style.container}>
       <Header />
       <div className={style.wrapper}>
-        <Side />
+        <SideNav />
         {/* main */}
         <div className={style.main}>{children}</div>
       </div>

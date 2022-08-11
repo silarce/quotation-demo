@@ -1,0 +1,66 @@
+@use "styles/theme01" as *;
+
+.headerBar {
+  display: flex;
+  height: 100%;
+  > * {
+    display: inline-block;
+    margin: auto;
+    margin-left: 17px;
+    // margin-top: 18px;
+    color: $colorMain;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+  }
+}
+
+.btn01 {
+  padding: 10px 44px;
+  border: solid 1px $colorBorder01;
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > img {
+    margin-right: 5px;
+  }
+  &.uploadBtn {
+    color: $colorActive01;
+    border-color: $colorActive01;
+    > span {
+      color: $colorActive01;
+    }
+  }
+}
+
+// ======================================================
+.container {
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
+  height: 100%;
+}
+
+// 基本上廢棄不用了
+.scrollContainer {
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
+  height: 100%;
+  > div:nth-of-type(2) {
+    //通常是mainContainer
+    // overflow: auto;
+    // scroll-behavior: smooth;
+  }
+}
+
+.mainContainer {
+  border: solid 1px $colorBorder01;
+  display: grid;
+  grid-template-rows: auto;
+  height: 100%;
+  overflow: hidden;
+  > div {
+    overflow: auto;
+    scroll-behavior: smooth;
+  }
+}

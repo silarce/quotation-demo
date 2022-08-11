@@ -1,0 +1,20 @@
+@use "styles/theme01" as *;
+
+.container {
+  padding: 4px;
+}
+
+.panel {
+  :global(.ant-collapse-header) {
+    display: block !important;
+    padding: 0 !important;
+    background-color: #fff;
+  }
+
+  :global(.ant-collapse-content-box) {
+    padding: 0;
+  }
+
+  // :global(.){
+  // }
+}
