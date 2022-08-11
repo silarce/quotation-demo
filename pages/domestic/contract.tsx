@@ -38,7 +38,7 @@ export default function Budget() {
   return (
     <div className={style.container}>
       {/* header panel */}
-      <PageHeader02 tag="預算" panelList={panelList} />
+      <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
         <ContractList contractList={fakeContractList} />
