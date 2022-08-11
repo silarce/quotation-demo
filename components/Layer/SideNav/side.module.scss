@@ -4,8 +4,10 @@
   padding: 39px 28px;
   display: grid;
   grid-gap: 30px;
-  height: fit-content;
+  align-content: start;
+  height: 100%;
   background-color: $bgc01;
+  overflow: auto;
 }
 
 .collapse {

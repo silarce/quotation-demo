@@ -10,7 +10,7 @@ import { Icondelete01 } from 'public/image/icon/svgComponent/svgIcons';
 import style from "./staffList.module.scss"
 
 // fakeData
-import { TstaffInfo } from "../../../meta/fakeData/fakeStaffList"
+import { TstaffInfo } from "../../../../meta/fakeData/fakeStaffList"
 
 export default function StaffList({
   data,

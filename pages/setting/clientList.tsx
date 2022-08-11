@@ -6,8 +6,8 @@ import {
 
 // components
 import PageHeader from "components/PageHeader/pageHeader"
-import List from "components/setting/clientList/list"
-import EditClient from "components/setting/clientList/editClient"
+import List from "components/page/setting/clientList/list"
+import EditClient from "components/page/setting/clientList/editClient"
 import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals"
 
 // global gear

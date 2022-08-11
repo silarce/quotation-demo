@@ -76,7 +76,7 @@ const client02: TclientProfile = {
   contact: [
     {
       name: "王小華",
-      phone: "0987654321",
+      phone: "0987556677",
     },
   ]
 }
@@ -118,7 +118,7 @@ const client04: TclientProfile = {
   contact: [
     {
       name: "林有間",
-      phone: "0987654321",
+      phone: "0955132978",
     },
   ]
 }

@@ -1,0 +1,19 @@
+@use "styles/theme01" as *;
+@use "./list.module" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: $columnsWidth01;
+  gap: $gap01;
+  height: 40px;
+  background-color: $bgc01;
+  padding-left: $gridPaddingLeft01;
+  border-bottom: solid 1px $colorBorder01;
+  > * {
+    margin: auto;
+    margin-left: 0;
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}

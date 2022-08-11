@@ -14,7 +14,8 @@ import pathList from './pathList';
 export default function SideNav() {
   // const pathname: string = useRouter().pathname
   const router = useRouter()
-  const pathname = router.pathname
+  // const pathname = router.pathname
+  const pathname = router.asPath
   const parentPath = "/" + pathname.split("/")[1]
 
   let linkList = pathList[parentPath]

@@ -5,19 +5,19 @@ import { useState, ChangeEvent, Dispatch, SetStateAction } from "react"
 
 // components
 import PageHeader from "components/PageHeader/pageHeader"
-import ColumnList from "../../components/setting/grade/columnList"
-import ColumnTitle from "../../components/setting/grade/columnTitle"
+import ColumnList from "../../components/page/setting/grade/columnList"
+import ColumnTitle from "../../components/page/setting/grade/columnTitle"
 
 // glogal gear
 import MyButton from "components/global/gear/button/myButton"
 import RedButton from "components/global/gear/button/redButton"
 import AddButton from "components/global/gear/button/addButton"
 // modal
-import DeleteUnit from "components/setting/grade/modal/DeleteUnit"
-import AddUnit from "components/setting/grade/modal/AddUnit"
+import DeleteUnit from "components/page/setting/grade/modal/DeleteUnit"
+import AddUnit from "components/page/setting/grade/modal/AddUnit"
 
 // hook
-import useData from "../../components/setting/grade/useData"
+import useData from "../../components/page/setting/grade/useData"
 
 
 // icon

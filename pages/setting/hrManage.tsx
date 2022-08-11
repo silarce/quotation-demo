@@ -9,7 +9,7 @@ import {
 
 // components
 import PageHeader from "components/PageHeader/pageHeader"
-import AddManager from "components/setting/hrManage/modal/AddManeger"
+import AddManager from "components/page/setting/hrManage/modal/AddManeger"
 import AddButton from "components/global/gear/button/addButton"
 
 // icon

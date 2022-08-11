@@ -7,8 +7,8 @@ import {
 
 // components
 import PageHeader from "components/PageHeader/pageHeader"
-import StaffList from "components/setting/staffProfile/staffList";
-import EditStaff from "components/setting/staffProfile/editStaff";
+import StaffList from "components/page/setting/staffProfile/staffList";
+import EditStaff from "components/page/setting/staffProfile/editStaff";
 import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals";
 
 // global gear

@@ -1,0 +1,56 @@
+@use "styles/theme01" as *;
+@use "./list.module" as *;
+
+.container {
+  position: relative;
+  display: grid;
+  grid-template-columns: $columnsWidth01;
+  gap: $gap01;
+  padding: 18px 0 18px $gridPaddingLeft01;
+  border-bottom: solid 1px $colorBorder01;
+  &:nth-last-of-type(1) {
+    border-bottom: none;
+  }
+  &:hover {
+    background-color: $hoverBgc01;
+    .leftBar {
+      background-color: $colorMain;
+    }
+  }
+  &.active {
+    background-color: $chosenBgc01;
+    .leftBar {
+      background-color: $colorActive01;
+    }
+  }
+  span {
+    color: $colorText;
+    font-weight: 400;
+    font-size: 16px;
+    overflow-wrap: break-word;
+  }
+  .leftBar {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: calc(100% - 4px);
+    background-color: transparent;
+  }
+}
+
+.name {
+  > span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    &:nth-of-type(1) {
+      color: $colorMain;
+    }
+    &:nth-of-type(2) {
+      margin-top: 16px;
+    }
+  }
+}
