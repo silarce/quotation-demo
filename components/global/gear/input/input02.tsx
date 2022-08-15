@@ -4,20 +4,25 @@ import { ChangeEvent } from "react"
 import { nanoid } from 'nanoid'
 
 // css
-import style from "./input.module.scss"
+import style from "./input02.module.scss"
 
-const Input01 = ({ label, stateValue, placeholder, onChange,
-  id, className, width, labelWidth }:
-  {
-    label: string,
-    stateValue: string | number,
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void,
-    placeholder?: string | false,
-    id?: string | number
-    className?: string
-    width?: string
-    labelWidth?: string
-  }) => {
+const Input02 = (
+  { label, stateValue, placeholder, onChange,
+    id, className, width, labelWidth, gap,
+    disabled
+  }:
+    {
+      label: string,
+      stateValue: string | number,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => void,
+      placeholder?: string | false,
+      id?: string | number
+      className?: string
+      width?: string
+      labelWidth?: string
+      gap?: string
+      disabled?: boolean | undefined
+    }) => {
   // ========================================================
   className = className ? className : ""
   // ========================================================
@@ -32,13 +37,17 @@ const Input01 = ({ label, stateValue, placeholder, onChange,
   // ========================================================
 
   const lableStyle = {
-    width: width ? width : "",
-    gridTemplateColumns: labelWidth ? `${labelWidth} auto` : ""
+    width: width ? width : "D",
+    gridTemplateColumns: labelWidth ? `${labelWidth} auto` : "",
+    gap: gap ? gap : "",
   }
+
+  const styleDisabled = disabled ? style.disabled : ""
+
   // ========================================================
 
   return (
-    <label className={`${style.label} ${className}`} htmlFor={id}
+    <label className={`${style.label} ${className} ${styleDisabled}`} htmlFor={id}
       style={lableStyle}
     >
       <span>{label}</span>
@@ -46,6 +55,7 @@ const Input01 = ({ label, stateValue, placeholder, onChange,
         autoComplete="off"
         value={stateValue}
         onChange={onChange}
+        disabled={disabled}
       />
       <hr />
     </label>
@@ -53,6 +63,6 @@ const Input01 = ({ label, stateValue, placeholder, onChange,
 }
 
 
-export { Input01 }
+export default Input02
 
 

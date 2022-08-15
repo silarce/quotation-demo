@@ -1,0 +1,10 @@
+@use "styles/theme01" as *;
+@use "./input.module.scss" as *;
+
+.label {
+  &.disabled {
+    > hr {
+      border-color: transparent;
+    }
+  }
+}
