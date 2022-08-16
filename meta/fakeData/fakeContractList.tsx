@@ -1,7 +1,7 @@
 
 
 interface Tcontract {
-  contractId: string
+  quotationId: string //報價單Id
   clientName: string
   projectName: string
   schedule: string //進度
@@ -23,7 +23,7 @@ type TcontractList = Tcontract[]
 
 let fakeContractList: TcontractList = [
   {
-    contractId: "S-110211-01",
+    quotationId: "S-110211-01",
     clientName: "新加坡商犀牛頓科技股份有限公司",
     projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
     schedule: "100.00",
@@ -40,7 +40,7 @@ let fakeContractList: TcontractList = [
     ]
   },
   {
-    contractId: "S-110211-02",
+    quotationId: "S-110211-02",
     clientName: "尚比亞商大象皮成衣股份有限公司",
     projectName: "台灣東西南北雜衣(股)公司~東拼西湊大拍賣企劃",
     schedule: "56.08",
@@ -67,7 +67,7 @@ let fakeContractList: TcontractList = [
     ]
   },
   {
-    contractId: "S-110211-03",
+    quotationId: "S-110211-03",
     clientName: "有間有限公司",
     projectName: "有間客棧大飯店五百周年慶暨北海分館開幕儀式企劃",
     schedule: "23.55",
@@ -95,7 +95,9 @@ let fakeContractList: TcontractList = [
 fakeContractList = fakeContractList.concat(JSON.parse(JSON.stringify(fakeContractList)))
 fakeContractList = fakeContractList.concat(JSON.parse(JSON.stringify(fakeContractList)))
 
-
+fakeContractList.forEach((item, index) => {
+  item.quotationId = `S-110211-${`${index + 1}`.padStart(2, "0")}`
+})
 
 
 

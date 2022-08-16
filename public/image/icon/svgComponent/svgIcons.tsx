@@ -75,7 +75,7 @@ export function IconDetail(props: SVGProps<SVGSVGElement>) {
 
 export function IconAddCircle(props: SVGProps<SVGSVGElement>) {
   let className = getClassName(props)
-  className = `${className} ${style.addCircle}`
+  className = `${className} ${style.circle}`
   return (
     <svg {...{ ...props, className }} width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M35 18C35 8.61116 27.3888 1 18 1C8.61116 1 1 8.61116 1 18C1 27.3888 8.61116 35 18 35C27.3888 35 35 27.3888 35 18Z" strokeMiterlimit="10" />
@@ -86,7 +86,7 @@ export function IconAddCircle(props: SVGProps<SVGSVGElement>) {
 
 export function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
   let className = getClassName(props)
-  className = `${className} ${style.addCircle}`
+  className = `${className} ${style.circle}`
   return (
     <svg {...{ ...props, className }} width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M35 18C35 8.61116 27.3888 1 18 1C8.61116 1 1 8.61116 1 18C1 27.3888 8.61116 35 18 35C27.3888 35 35 27.3888 35 18Z" strokeMiterlimit="10" />
@@ -95,6 +95,17 @@ export function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+
+export function IconRemove02(props: SVGProps<SVGSVGElement>) {
+  let className = getClassName(props)
+  className = `${className} ${style.circle}`
+  return (
+    <svg  {...{ ...props, className }} width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9Z"  strokeMiterlimit="10" />
+      <path d="M5.59514 12.2521L12.241 5.60625M5.66132 5.67243L12.3164 12.3276"  strokeWidth="2" />
+    </svg>
+  )
+}
 
 
 

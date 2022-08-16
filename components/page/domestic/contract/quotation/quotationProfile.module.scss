@@ -1,0 +1,71 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: 789px 295px;
+  gap: 33px;
+  justify-content: space-between;
+  padding: 0 22px 0 50px;
+}
+
+.profile {
+  // background-color: #ddd;
+}
+
+.clientState {
+  padding: 4px 10px;
+  color: #fff;
+  font-weight: 400;
+  font-size: 16px;
+  background-color: $colorBorder01;
+}
+
+.form02 {
+  display: grid;
+  grid-template-columns: auto 394px;
+  justify-content: space-between;
+}
+
+.clientName {
+  position: relative;
+  input {
+    padding-left: 25px;
+  }
+  > button {
+    position: absolute;
+    top: 50%;
+    left: 104px;
+    transform: translateY(-50%);
+    padding: 5px 17px;
+    color: $colorMain;
+    font-weight: 400;
+    font-size: 16px;
+    background-color: $bgc01;
+    border: solid 1px $colorBorder01;
+  }
+  > svg {
+    position: absolute;
+    top: 50%;
+    left: 104px;
+    transform: translateY(-50%);
+  }
+}
+
+.time {
+  display: grid;
+  grid-template-columns: 72px auto;
+  gap: 16px 24px;
+  height: fit-content;
+  padding: 18px 24px;
+  background-color: $bgc01;
+  > span {
+    font-weight: 400;
+    font-size: 18px;
+    &:nth-of-type(odd) {
+      color: $colorMain;
+    }
+    &:nth-of-type(even) {
+      color: $colorText;
+    }
+  }
+}

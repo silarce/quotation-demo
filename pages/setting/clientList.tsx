@@ -33,9 +33,9 @@ export default function ClientList() {
   // ====================================================
   // 空資料，新增員工資料用
   const newClientProfile = useMemo(() => {
-    const lastNum = parseInt(clientList[clientList.length - 1].id.substring(1))
+    const lastNum = parseInt(clientList[clientList.length - 1].clientId.substring(1))
     const newStaffId = "S" + (`${lastNum + 1}`.padStart(4, "0"))
-    clientEmpty.id = newStaffId
+    clientEmpty.clientId = newStaffId
     return clientEmpty
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientList.length])
@@ -70,8 +70,8 @@ export default function ClientList() {
   }
 
   const deleteSelProfile = () => {
-    const id = selClientProfile.id
-    const delIndex = clientList.findIndex((item) => item.id === id)
+    const id = selClientProfile.clientId
+    const delIndex = clientList.findIndex((item) => item.clientId === id)
     setClientList(state => {
       state.splice(delIndex, 1)
       return [...state]
@@ -86,7 +86,7 @@ export default function ClientList() {
 
     // 搜尋編號
     let filteredList =
-      clientList.filter((item) => searchValue === item.id)
+      clientList.filter((item) => searchValue === item.clientId)
     // 搜尋類別
     if (!filteredList[0]) {
       filteredList =
@@ -128,7 +128,7 @@ export default function ClientList() {
         {...{
           visible: showDeletePanel,
           setVisible: setShowDeletePanel,
-          text: `請確定要刪除「${selClientProfile.id}」「${selClientProfile.name}」?`,
+          text: `請確定要刪除「${selClientProfile.clientId}」「${selClientProfile.name}」?`,
           onConfirm: deleteSelProfile
         }} />
 
@@ -165,7 +165,7 @@ const ButtonBar02 = (
 
   return (
     <div className={style.headerBar}>
-      <RedButton label="上傳" onClick={() => alert(`上傳${selClientProfile.id}的資料`)} />
+      <RedButton label="上傳" onClick={() => alert(`上傳${selClientProfile.clientId}的資料`)} />
       <MyButton label="取消" onClick={resetEditPanel} />
     </div>
   )

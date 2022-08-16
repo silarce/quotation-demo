@@ -20,7 +20,7 @@ export default function ListHeader01(
     }) {
 
   const {
-    contractId, clientName, projectName,
+    quotationId: contractId, clientName, projectName,
     schedule, money, contactName,
     contactPhone, undertaker,
   } = contract

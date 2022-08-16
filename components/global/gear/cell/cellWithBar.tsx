@@ -4,13 +4,14 @@ import { ReactNode } from "react"
 // css
 import style from "./cellWithBar.module.scss"
 
-export default function CellWithBar({ children, isActive, className, element }:
-  {
-    children: ReactNode
-    isActive?: boolean
-    className?: string
-    element?: string
-  }) {
+export default function CellWithBar(
+  { children, isActive, className, element }:
+    {
+      children: ReactNode
+      isActive?: boolean
+      className?: string
+      element?: string
+    }) {
 
   const active = isActive ? style.active : ""
 
