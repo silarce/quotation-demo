@@ -1,0 +1,27 @@
+@use "styles/theme01" as *;
+
+.container {
+  width: calc(100% - (17px * 2));
+  padding: 0 4px;
+  margin: auto;
+  margin-top: 17px;
+  border: solid 1px $colorBorder01;
+}
+
+.header {
+  padding: 18px 28px;
+  > span {
+    margin-right: 26px;
+    font-weight: 400;
+    font-size: 18px;
+    color: $colorMain;
+  }
+  > button {
+    padding: 5px 17px;
+    font-weight: 400;
+    font-size: 16px;
+    color: $colorMain;
+    border: solid 1px $colorBorder01;
+    background-color: $bgc01;
+  }
+}

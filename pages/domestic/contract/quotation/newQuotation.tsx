@@ -4,7 +4,7 @@ import { useRouter } from "next/router"
 
 // components
 import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
-import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduction"
+import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
@@ -46,21 +46,17 @@ export default function Quotation() {
   // =========================================================
   if (!newQuotatinId) return null
   return (
-    <div>
+    <div className={style.container}>
 
       <PageHeader02 tagList={tagList} panelList={panelList} />
 
       <div className={style.mainContainer}>
-
-
         <div className={style.quotation}> {/* scroll wrapper */}
           <QuotationProfile stateQuotation={stateQuotation} />
 
           <h5 className={style.titleHr}>合約項目</h5>
 
           <QuotationProduction />
-
-
 
           {/* <div>
           <div></div>
