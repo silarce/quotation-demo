@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid'
 import style from "./input03.module.scss"
 
 const Input03 = (
-  {  stateValue, placeholder, onChange,
+  { stateValue, placeholder, onChange,
     id, className, width, labelWidth, gap,
     disabled
   }:
@@ -27,8 +27,6 @@ const Input03 = (
   // ========================================================
   if (id === undefined) id = nanoid()
   id = `${id}`
-
-
 
   if (placeholder === undefined) placeholder = `請輸入`
   if (placeholder === false) placeholder = ""
@@ -60,7 +58,8 @@ const Input03 = (
   )
 }
 
-
+type Tinput03 = typeof Input03
+export type { Tinput03 }
 export default Input03
 
 

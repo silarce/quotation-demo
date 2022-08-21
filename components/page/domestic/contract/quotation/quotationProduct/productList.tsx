@@ -1,6 +1,7 @@
 
 
-
+// global gear
+import Input03 from "components/global/gear/input/input03"
 
 
 // css
@@ -12,28 +13,52 @@ import { TuseProduct } from "./useProduct"
 export default function ProductList({ productStates }:
   { productStates: TuseProduct }) {
 
-  const { dndProductList, theadList } = productStates
+  const { dndProductList, theadList, dndBody } = productStates
+  console.log(dndBody)
 
   return (
     <div className={style.container}>
 
-      {dndProductList.map((row, index) => {
+      {dndBody.map((item, pIndex) => {
         return (
-          <div className={style.row} key={index}>
-            {row.map((column, index) => {
-              const width = theadList[index].width
+          <div className={style.row} key={pIndex}>
+            {item.map((item, cIndex) => {
+              const width = theadList[cIndex].width
               const theStyle = { width }
               return (
-                <div className={style.column} style={theStyle} key={index}>
-                  <span>{column}</span>
+                <div className={style.column} key={`${pIndex}${cIndex}`} style={theStyle} >
+                  {item}
                 </div>
               )
-            })} {/* column */}
+            })}
           </div>
         )
-      })}{/* row */}
-
+      })}
 
     </div>
   )
 }
+
+
+
+// ================================================
+
+// 最早的寫法，參考
+// {
+//   dndProductList.map((row, index) => {
+//     return (
+//       <div className={style.row} key={index}>
+//         {row.map((column, index) => {
+//           const width = theadList[index].width
+//           const theStyle = { width }
+//           return (
+//             <div className={style.column} style={theStyle} key={index}>
+//               <span>{column}</span>
+//             </div>
+//           )
+//         })} {/* column */}
+//       </div>
+//     )
+//   })
+// } {/* row */ }
+

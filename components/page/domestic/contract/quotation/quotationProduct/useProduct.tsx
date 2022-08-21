@@ -1,17 +1,23 @@
 import {
-  Dispatch, SetStateAction,
+  Dispatch, SetStateAction, ChangeEvent,
   useState, useMemo
 } from "react"
 
 
+// global gear
+import Input03, { Tinput03 } from "components/global/gear/input/input03"
+// import Input03 from "components/global/gear/input/input03"
 
-
+// ======================================================
 interface TuseProduct {
   theadList: TtheadItem[]
   setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
   dndProductList: string[][]
   setDndProductList: Dispatch<SetStateAction<string[][]>>
+  dndBody: JSX.Element[][]
 }
+
+
 
 export default function UseProduct(): TuseProduct {
   // dnd用的狀態
@@ -26,11 +32,24 @@ export default function UseProduct(): TuseProduct {
     = useState(dndListCreator(productList))
 
 
+  const dndBodyCell = useMemo(() => {
+    return dndProductList.map((row, pIndex) => {
+      return row.map((column, cIndex) => {
+        return inputCellCreator({ pIndex, cIndex, dndProductList, setDndProductList })
+      })
+    })
+  }, [dndProductList])
+
+
+  // console.log(dndProductList)
+  // console.log(dndBodyCell)
+
 
 
   return {
     theadList, setTheadList,
-    dndProductList, setDndProductList
+    dndProductList, setDndProductList,
+    dndBody: dndBodyCell
   }
 }
 
@@ -111,15 +130,15 @@ const fakeProductList: TfakeProduct[] = [
     memo: "防颱防颱"
   },
   {
-    discount: "100.00",
-    project: "SD1",
-    quoteType: "捲門捲門捲",
-    L: "516",
-    W: "230",
-    H: "230",
-    B: "45",
-    area: "14.19",
-    cai: "154.52",
+    discount: "86.43",
+    project: "SD2",
+    quoteType: "捲門",
+    L: "416",
+    W: "100",
+    H: "330",
+    B: "20",
+    area: "22.66",
+    cai: "200.87",
     doorType: "SJ-302",
     material: "不鏽鋼304#",
     surface: "BA",
@@ -145,6 +164,62 @@ const dndListCreator = (list: TfakeProduct[]) => {
       subTotal, memo]
   })
 }
+// 傳化後的dndProductList長得像這樣,是雙層陣列
+// [
+//   ["100.00", "SD1", "捲門捲門捲", "516", "230",
+//     "230", "45", "14.19", "154.52", "SJ-302",
+//     "不鏽鋼304#", "BA", "1/3HP", "1", "158610",
+//     "158610", "防颱防颱"],
+//   ["100.00", "SD1", "捲門捲門捲", "516", "230",
+//     "230", "45", "14.19", "154.52", "SJ-302",
+//     "不鏽鋼304#", "BA", "1/3HP", "1", "158610",
+//     "158610", "防颱防颱"]
+// ]
+
+
+// pIndex上層的index，cIndex下層的index
+
+
+const inputCellCreator = ({ pIndex, cIndex, dndProductList, setDndProductList }:
+  {
+    pIndex: number
+    cIndex: number
+    dndProductList: string[][]
+    setDndProductList: Dispatch<SetStateAction<string[][]>>
+  }) => {
+
+  const stateValue = dndProductList[pIndex][cIndex]
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDndProductList(list => {
+      list[pIndex][cIndex] = e.target.value
+      return [...list]
+    })
+  }
+  return (
+    <Input03 key={`${pIndex}${cIndex}`} {...{ stateValue, onChange }} />
+  )
+
+}
+
+// class class_inputCell {
+// constructor({ pIndex, cIndex, dndProductList, setDndProductList }:
+//   {
+//     pIndex: number
+//       cIndex: number
+//       dndProductList: string[][]
+//       setDndProductList: Dispatch<SetStateAction<string[][]>>
+//   }) {
+//   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+//     setDndProductList(list => {
+//       list[pIndex][cIndex] = e.target.value
+//       return [...list]
+//     })
+//   }
+// }
+// }
+
+
+
 
 
 
