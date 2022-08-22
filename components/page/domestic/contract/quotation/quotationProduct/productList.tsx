@@ -15,7 +15,7 @@ import { TuseProduct } from "./useProduct"
 export default function ProductList({ productStates }:
   { productStates: TuseProduct }) {
 
-  const { theadList, dndBody } = productStates
+  const { theadList, dndBody, deleteProduct, copyProduct } = productStates
 
   // =======================================
   const [isActive, setIsActive] = useState(-1)
@@ -31,8 +31,8 @@ export default function ProductList({ productStates }:
               onBlur={() => setIsActive(-1)}
             >
               <div className={style.buttonBox}>
-                <Icondelete01 />
-                <IconCopy />
+                <Icondelete01 onClick={() => deleteProduct(pIndex)} />
+                <IconCopy onClick={() => copyProduct(pIndex)} />
                 <span>1</span>
               </div>
               {item.map((item, cIndex) => {

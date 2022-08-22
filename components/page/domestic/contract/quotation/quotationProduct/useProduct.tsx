@@ -12,6 +12,9 @@ interface TuseProduct {
   theadList: TtheadItem[]
   setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
   productList: TfakeProduct[]
+  addProduct: () => void
+  deleteProduct: (index: number) => void
+  copyProduct: (index: number) => void
   dndBody: JSX.Element[][]
 }
 
@@ -38,10 +41,23 @@ export default function UseProduct(): TuseProduct {
     })
   }, [productList, theadList])
 
+  const addProduct = () => {
+    productList.push({ ...emptyProduct })
+    setProductList([...productList])
+  }
+  const deleteProduct = (index: number) => {
+    productList.splice(index, 1)
+    setProductList([...productList])
+  }
+  const copyProduct = (index: number) => {
+    productList.splice(index, 0, { ...productList[index] })
+    setProductList([...productList])
+  }
+
 
   return {
     theadList, setTheadList,
-    productList,
+    productList, addProduct, deleteProduct, copyProduct,
     dndBody
   }
 }
@@ -183,9 +199,25 @@ const fakeProductList: TfakeProduct[] = [
   },
 ]
 
-const emptyProduct = [
-
-]
+const emptyProduct = {
+  discount: "",
+  project: "",
+  quoteType: "",
+  L: "",
+  W: "",
+  H: "",
+  B: "",
+  area: "",
+  cai: "",
+  doorType: "",
+  material: "",
+  surface: "",
+  horsepower: "",
+  qty: "",
+  unitPrice: "",
+  subTotal: "",
+  memo: "",
+}
 
 
 // ================================

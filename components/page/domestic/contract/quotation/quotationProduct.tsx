@@ -25,8 +25,7 @@ export default function QuotationProduction() {
   const [allowMove, setAllowMove] = useState(false)
 
 
-  // console.log(dndProductList)
-console.log(productStates.productList)
+  const { addProduct } = productStates
 
   return (
     <div className={style.container}>
@@ -39,9 +38,8 @@ console.log(productStates.productList)
       <DndThead productStates={productStates} allowMove={allowMove} />
       <ProductList productStates={productStates} />
 
-
       <AddButton className={style.addBtn}
-        label="新增產品" onClick={() => { }} />
+        label="新增產品" onClick={addProduct} />
 
     </div>
   )
