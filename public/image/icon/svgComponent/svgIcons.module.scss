@@ -1,5 +1,8 @@
 @use "styles/theme01" as *;
 
+$colorRed: #ea1833;
+$colorLightPink: #ffeeee;
+
 .svg {
   color: $colorMain;
   cursor: pointer;
@@ -12,9 +15,10 @@
   cursor: auto;
 }
 
-.addCircle {
-  stroke: #ea1833;
+
+.circle {
+  stroke: $colorRed;
   &:hover {
-    fill: #FFEEEE;
+    fill: $colorLightPink;
   }
 }

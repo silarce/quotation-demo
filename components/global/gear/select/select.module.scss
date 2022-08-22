@@ -43,7 +43,7 @@
   width: 100%;
   padding-right:10px;
   input {
-    background-color: #fff;
+    background-color: transparent;
     box-shadow: none;
   }
   [class$="control"] {
@@ -51,6 +51,7 @@
     box-shadow: none;
     cursor: pointer;
     min-height: auto;
+    background-color: transparent;
   }
   [class$="ValueContainer"] {
     padding: 0;

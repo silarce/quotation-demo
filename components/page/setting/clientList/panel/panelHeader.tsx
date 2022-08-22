@@ -26,7 +26,7 @@ export default function PanelHeader(
       editClient: () => void
       openDeletePanel: (e: MouseEvent) => void
     }) {
-  const { id, type, name, phone, fax, contact } = clientData
+  const { clientId: id, type, name, phone, fax, contact } = clientData
   const contact01 = contact[0]
 
   const active = isActive ? style.active : ""

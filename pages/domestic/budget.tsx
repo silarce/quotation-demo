@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRouter } from "next/router";
 
 
 // global gear
@@ -16,22 +16,30 @@ import fakeContractList, { TcontractList } from "meta/fakeData/fakeContractList"
 
 
 // ===========================================
-const panelList: TpanelList = [{
-  type: "addButton",
-  label: "新增報價單",
-  onClick: () => alert("test")
-}]
 
 
 // ===========================================
 
 export default function Budget() {
 
-  // data
-
-
-
+  const router = useRouter()
   // ===================================================
+
+  const panelList: TpanelList = [{
+    type: "addButton",
+    label: "新增報價單",
+    onClick: () => {
+      let newQuotatinId = `${fakeContractList.length + 1}`.padStart(2, "0")
+      newQuotatinId = "S-110211-" + newQuotatinId
+
+      router.push({
+        pathname: `/domestic/contract/quotation/newQuotation`,
+        query: { newQuotatinId }
+      })
+    }
+  }]
+
+
 
   // ===================================================
 

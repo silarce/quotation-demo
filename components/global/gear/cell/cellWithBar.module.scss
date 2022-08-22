@@ -1,0 +1,28 @@
+@use "styles/theme01" as *;
+
+.container {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  &:hover {
+    background-color: $hoverBgc01;
+    > .bar {
+      background-color: $colorMain;
+    }
+  }
+  &.active {
+    background-color: $chosenBgc01;
+    > .bar {
+      background-color: $colorActive01;
+    }
+  }
+}
+
+.bar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: calc(100% - 4px);
+}

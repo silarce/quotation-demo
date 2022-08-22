@@ -31,6 +31,7 @@ interface Tpanel02 {
 }
 
 type TpanelList = (Tpanel01 | Tpanel02)[]
+type TtagList = Ttag[]
 
 
 
@@ -94,4 +95,4 @@ export default function PageHeader02(
 }
 
 
-export type { TpanelList }
+export type { TpanelList, TtagList }

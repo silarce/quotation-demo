@@ -3,7 +3,7 @@
 
 
 interface TclientProfile {
-  id: string
+  clientId: string
   type: string
   name: string
   shortName: string
@@ -34,7 +34,7 @@ type TclientProfileList = TclientProfile[]
 // ===============================================================================
 
 const client01: TclientProfile = {
-  id: "S00001",
+  clientId: "S00001",
   type: "客戶",
   name: "新加坡商犀牛頓科技股份有限公司",
   shortName: "犀牛盾/愛進化",
@@ -62,7 +62,7 @@ const client01: TclientProfile = {
 }
 
 const client02: TclientProfile = {
-  id: "S00002",
+  clientId: "S00002",
   type: "客戶/廠商",
   name: "尚比亞商大象皮成衣股份有限公司",
   shortName: "大象皮成衣",
@@ -81,7 +81,7 @@ const client02: TclientProfile = {
   ]
 }
 const client03: TclientProfile = {
-  id: "S00003",
+  clientId: "S00003",
   type: "廠商",
   name: "英屬維京群島商加勒比貿易股份有限公司台灣分公司",
   shortName: "加勒比貿易",
@@ -104,7 +104,7 @@ const client03: TclientProfile = {
   ]
 }
 const client04: TclientProfile = {
-  id: "S00004",
+  clientId: "S00004",
   type: "客戶/廠商",
   name: "有間有限公司",
   shortName: "有間公司",
@@ -137,12 +137,12 @@ fakeClientList = fakeClientList.concat(JSON.parse(JSON.stringify(fakeClientList)
 fakeClientList = fakeClientList.concat(JSON.parse(JSON.stringify(fakeClientList)))
 
 fakeClientList.forEach((item, index) => {
-  item.id = "S" + `${index}`.padStart(4, "0")
+  item.clientId = "S" + `${index}`.padStart(4, "0")
 })
 
 // ===============================================================================
 const clientEmpty: TclientProfile = {
-  id: "",
+  clientId: "",
   type: "",
   name: "",
   shortName: "",

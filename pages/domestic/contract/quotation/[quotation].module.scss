@@ -1,0 +1,18 @@
+@use "styles/theme01" as *;
+@use "styles/layout" as *;
+
+.quotation {
+  padding-top: 36px;
+}
+
+.titleHr {
+  width: calc(100% - 6px);
+  padding: 16px 0 14px 0;
+  margin: auto;
+  margin-top: 35px;
+  font-weight: 400;
+  font-size: 18px;
+  color: $colorMain;
+  text-align: center;
+  background-color: $bgc01;
+}

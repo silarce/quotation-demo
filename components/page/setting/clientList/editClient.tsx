@@ -28,7 +28,7 @@ export default function EditClient({ selData, setSelData }:
     // eslint-disable-next-line react-hooks/exhaustive-deps
     , [selData])
   // ====================================================
-  const { id } = selData
+  const { clientId: id } = selData
   const { name, shortName, phone,
     fax, head, address, billAddress, taxtNumber,
     taxtType, type, contact

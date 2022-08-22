@@ -1,0 +1,32 @@
+@use "styles/theme01" as *;
+
+.container {
+  // background-color: #ddd;
+}
+
+.row {
+  padding: 11px 0 11px 0;
+}
+.buttonBox {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 20px);
+  gap: 16px;
+  width: 124px;
+  padding-left: 22px;
+}
+
+.column {
+  display: inline-block;
+  margin-left: 16px;
+  &:nth-of-type(1) {
+    // margin-left: 124px;
+  }
+  > div,
+  > label {
+    padding: 0;
+  }
+
+  input {
+    font-size: 16px !important;
+  }
+}
