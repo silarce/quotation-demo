@@ -6,7 +6,7 @@ import {
 
 // global gear
 import Input03 from "components/global/gear/input/input03"
-import Select03, { Toption } from "components/global/gear/select/select03"
+import Select03 from "components/global/gear/select/select03"
 // ======================================================
 interface TuseProduct {
   theadList: TtheadItem[]
@@ -20,7 +20,8 @@ interface TuseProduct {
 
 export default function UseProduct(): TuseProduct {
   // dnd head的狀態，也是資料分類目錄
-  const [theadList, setTheadList] = useState<TtheadItem[]>(theadListOri)
+  const [theadList, setTheadList] = useState(theadListOri)
+
 
   // 原始資料，接上api前還用不到
   const [productList, setProductList] = useState(fakeProductList)
@@ -33,24 +34,10 @@ export default function UseProduct(): TuseProduct {
   const dndBodyCell = useMemo(() => {
     return dndProductList.map((row, pIndex) => {
       return row.map((column, cIndex) => {
-        const { options } = theadList[cIndex]
-        return (
-          options
-            ? selectCellCreator({ pIndex, cIndex, dndProductList, setDndProductList, options })
-            : inputCellCreator({ pIndex, cIndex, dndProductList, setDndProductList })
-        )
+        return inputCellCreator({ pIndex, cIndex, dndProductList, setDndProductList })
       })
     })
   }, [dndProductList])
-
-
-  // const dndBodyCell = useMemo(() => {
-  //   return dndProductList.map((row, pIndex) => {
-  //     return row.map((column, cIndex) => {
-  //       return inputCellCreator({ pIndex, cIndex, dndProductList, setDndProductList })
-  //     })
-  //   })
-  // }, [dndProductList])
 
 
   // console.log(dndProductList)
@@ -69,75 +56,32 @@ export default function UseProduct(): TuseProduct {
 // =============================================================
 // =============================================================
 interface TtheadItem {
-  id: number | string
+  id: number
   label: string
   width: string
-  options?: Toption[]
 }
-
-const quoteTypeOptions: Toption[] = [
-  { value: "捲門", label: "捲門" },
-  { value: "特大號捲門", label: "特大號捲門" },
-  { value: "大捲門", label: "大捲門" },
-]
-const materialOptions: Toption[] = [
-  { value: "不鏽鋼304#", label: "不鏽鋼304#" },
-  { value: "烤漆鐵", label: "烤漆鐵" },
-  { value: "鍍鋅鋼", label: "鍍鋅鋼" },
-  { value: "合金鋼", label: "合金鋼" },
-  { value: "耐候鋼", label: "耐候鋼" },
-  { value: "鋁合金", label: "鋁合金" },
-  { value: "陽極鋁合金", label: "陽極鋁合金" },
-]
-const surfaceOptions: Toption[] = [
-  { value: "AA", label: "AA" },
-  { value: "BA", label: "BA" },
-  { value: "CC", label: "CC" },
-  { value: "DS", label: "DS" },
-]
-const memoOptions: Toption[] = [
-  { value: "防颱", label: "防颱" },
-  { value: "耐候", label: "耐候" },
-  { value: "耐酸腐蝕", label: "耐酸腐蝕" },
-]
-
-
-
+// 因為要操作陣列，所以id限定為數字或是數值
+// 不過用數值會比較方便
+// id不可以是0，不然第一個dndItem會不能拖動
 const theadListOri: TtheadItem[] = [
-  { id: "discount", label: "折數", width: "75px" },
-  { id: "project", label: "項目", width: "60px" },
-  {
-    id: "quoteType", label: "報價別", width: "97px",
-    options: quoteTypeOptions
-  },
-  { id: "L", label: "L", width: "60px" },
-  { id: "W", label: "W", width: "60px" },
-  { id: "H", label: "H", width: "60px" },
-  { id: "B", label: "B", width: "60px" },
-  { id: "area", label: "面積", width: "60px" },
-  { id: "cai", label: "才數", width: "60px" },
-  { id: "doorType", label: "門型", width: "60px" },
-  {
-    id: "material", label: "材料", width: "120px",
-    options: materialOptions
-  },
-  {
-    id: "surface", label: "表面", width: "45px",
-    options: surfaceOptions
-  },
-  { id: "horsepower", label: "馬力", width: "60px" },
-  { id: "qty", label: "數量", width: "43px" },
-  { id: "unitPrice", label: "單價", width: "84px" },
-  { id: "subTotal", label: "複價", width: "84px" },
-  {
-    id: "memo", label: "備註", width: "90px",
-    options: memoOptions
-  },
+  { id: 1, label: "折數", width: "75px" },
+  { id: 2, label: "項目", width: "60px" },
+  { id: 3, label: "報價別", width: "97px" },
+  { id: 4, label: "L", width: "60px" },
+  { id: 5, label: "W", width: "60px" },
+  { id: 6, label: "H", width: "60px" },
+  { id: 7, label: "B", width: "60px" },
+  { id: 8, label: "面積", width: "60px" },
+  { id: 9, label: "才數", width: "60px" },
+  { id: 10, label: "門型", width: "60px" },
+  { id: 11, label: "材料", width: "120px" },
+  { id: 12, label: "表面", width: "45px" },
+  { id: 13, label: "馬力", width: "60px" },
+  { id: 14, label: "數量", width: "43px" },
+  { id: 15, label: "單價", width: "84px" },
+  { id: 16, label: "複價", width: "84px" },
+  { id: 17, label: "備註", width: "90px" },
 ]
-
-
-
-
 
 
 // ====================================================
@@ -256,28 +200,21 @@ const inputCellCreator = ({ pIndex, cIndex, dndProductList, setDndProductList }:
 
 // ==========
 // pIndex為上層的index，cIndex為下層的index
-const selectCellCreator = (
-  { pIndex, cIndex, dndProductList, setDndProductList, options }:
-    {
-      pIndex: number
-      cIndex: number
-      dndProductList: string[][]
-      setDndProductList: Dispatch<SetStateAction<string[][]>>
-      options: Toption[]
-    }) => {
+const selectCellCreator = ({ pIndex, cIndex, dndProductList, setDndProductList }:
+  {
+    pIndex: number
+    cIndex: number
+    dndProductList: string[][]
+    setDndProductList: Dispatch<SetStateAction<string[][]>>
+  }) => {
 
   const stateValue = dndProductList[pIndex][cIndex]
-  const onChange = (option: Toption | null) => {
-    if (!option) return
-    const { value } = option
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDndProductList(list => {
-      list[pIndex][cIndex] = value
+      list[pIndex][cIndex] = e.target.value
       return [...list]
     })
   }
-  return <Select03 {...{
-    stateValue, options, onChange,
-  }} />
 
 } //  selectCellCreator
 

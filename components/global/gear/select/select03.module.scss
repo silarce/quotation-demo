@@ -1,0 +1,54 @@
+@use "styles/theme01" as *;
+@use "./select.module.scss" as *;
+
+.label {
+  display: block;
+  grid-template-columns: auto;
+  gap: 0px;
+}
+
+.select {
+  padding-right: 0px;
+
+  [class$="placeholder"] {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: $colorBorder01;
+  }
+  [class$="singleValue"] {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: $colorText;
+  }
+
+  [class$="menu"] {
+    padding: 0 12px;
+  }
+
+  [class$="option"] {
+    display: block;
+    // padding-top: 10px;
+    // padding-bottom: 10px;
+    padding-left: 0;
+    padding-right: 0;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: $colorText;
+    cursor: pointer;
+    background-color: transparent;
+    border-bottom: solid 1px $colorBorder01;
+    &:hover {
+      color: $colorActive01;
+      background-color: transparent;
+    }
+    &:nth-last-of-type(1) {
+      border-bottom: none;
+    }
+  }
+
+  // [class$=]{
+  // }
+}

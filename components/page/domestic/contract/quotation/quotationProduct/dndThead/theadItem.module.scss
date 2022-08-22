@@ -4,9 +4,17 @@
   display: inline-block;
   padding: 2px 3px;
   margin-left: 16px;
-  border: solid 1px $colorMain;
+  border: solid 1px transparent;
+  cursor: default;
   &:nth-of-type(1) {
-    margin-left: 124px;
+    // margin-left: 124px;
+  }
+  &.allowMove {
+    border: solid 1px $colorMain;
+    cursor: grab;
+  }
+  &.isMoving {
+    background-color: $chosenBgc01;
   }
   > span {
     color: $colorMain;

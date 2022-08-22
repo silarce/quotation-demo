@@ -1,0 +1,15 @@
+
+input.tsx
+第一個製作的input元件
+
+input02.tsx
+input.tsx加強版，可以設定更多參數
+
+input03.tsx
+幾乎同input02，只是沒有label
+
+
+
+
+
+

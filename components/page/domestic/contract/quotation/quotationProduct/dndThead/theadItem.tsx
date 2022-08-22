@@ -5,15 +5,19 @@ import { CSS } from "@dnd-kit/utilities"
 import style from "./theadItem.module.scss"
 
 interface TtheadItem {
-  id: number
+  id: number | string
   label: string
   width: string
 }
 
 
 
-export default function TheadItem({ theadInfo, }:
-  { theadInfo: TtheadItem }) {
+export default function TheadItem({ theadInfo, allowMove, isMoving }:
+  {
+    theadInfo: TtheadItem
+    allowMove?: boolean
+    isMoving?: boolean
+  }) {
 
   const { id, label, width } = theadInfo
 
@@ -21,22 +25,25 @@ export default function TheadItem({ theadInfo, }:
     attributes, listeners, setNodeRef, transform, transition
   } = useSortable({
     id,
-    transition: {
-      duration: 200,
-      easing: "ease"
-    }
+    disabled: allowMove ? false : true
+    // transition: {
+    //   duration: 200,
+    //   easing: "ease"
+    // }
   })
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
-    // transition: "transform 200ms ease 0s",
     transition,
     width
   }
 
+  const styleAllowMove = allowMove ? style.allowMove : ""
+  const styleIsMoving = isMoving ? style.isMoving : ""
+
   return (
-    <div className={style.container}
-      ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}>
+    <div className={`${style.container} ${styleAllowMove} ${styleIsMoving}`}
+      ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}      >
       <span>{label}</span>
     </div>
   )

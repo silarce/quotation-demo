@@ -20,7 +20,7 @@ const getClassName = (props: SVGProps<SVGSVGElement>) => {
 
 
 
-function Icondelete01(props: SVGProps<SVGSVGElement>) {
+export function Icondelete01(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -33,7 +33,7 @@ function Icondelete01(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function IconEdit(props: SVGProps<SVGSVGElement>) {
+export function IconEdit(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -44,7 +44,7 @@ function IconEdit(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function IconSearch(props: SVGProps<SVGSVGElement>) {
+export function IconSearch(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,7 +54,7 @@ function IconSearch(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function IconCopy(props: SVGProps<SVGSVGElement>) {
+export function IconCopy(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +64,7 @@ function IconCopy(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function IconDetail(props: SVGProps<SVGSVGElement>) {
+export function IconDetail(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -76,7 +76,7 @@ function IconDetail(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function IconAddCircle(props: SVGProps<SVGSVGElement>) {
+export function IconAddCircle(props: SVGProps<SVGSVGElement>) {
   let className = getClassName(props)
   className = `${className} ${style.circle}`
   return (
@@ -87,7 +87,7 @@ function IconAddCircle(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
+export function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
   let className = getClassName(props)
   className = `${className} ${style.circle}`
   return (
@@ -99,28 +99,18 @@ function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
 }
 
 
-function IconRemove02(props: SVGProps<SVGSVGElement>) {
+export function IconRemove02(props: SVGProps<SVGSVGElement>) {
   let className = getClassName(props)
   className = `${className} ${style.circle}`
   return (
     <svg  {...{ ...props, className }} width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9Z" strokeMiterlimit="10" />
-      <path d="M5.59514 12.2521L12.241 5.60625M5.66132 5.67243L12.3164 12.3276" strokeWidth="2" />
+      <path d="M17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9Z"  strokeMiterlimit="10" />
+      <path d="M5.59514 12.2521L12.241 5.60625M5.66132 5.67243L12.3164 12.3276"  strokeWidth="2" />
     </svg>
   )
 }
 
 
-export {
-  Icondelete01, //垃圾桶icon
-  IconEdit,
-  IconSearch,
-  IconCopy,
-  IconDetail,
-  IconAddCircle,
-  IconRemoveCircle,
-  IconRemove02,
-}
 
 
 
