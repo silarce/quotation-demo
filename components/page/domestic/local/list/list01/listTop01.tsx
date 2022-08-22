@@ -13,7 +13,7 @@ export default function ListTop01() {
     <div className={style.container}>
       <span>報價編號</span>
       <span>客戶名稱/工程名稱</span>
-      <span>{/* 進度 留白 */}</span>
+      <span>總折數</span>
       <span>合約金額</span>
       <span>聯絡人</span>
       <span>連絡電話</span>
