@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities"
 import style from "./theadItem.module.scss"
 
 interface TtheadItem {
-  id: number | string
+  id: string
   label: string
   width: string
 }
@@ -38,11 +38,18 @@ export default function TheadItem({ theadInfo, allowMove, isMoving }:
     width
   }
 
+  // ===========================================================
+  const lwhbReg = /L|W|H|B/
+
   const styleAllowMove = allowMove ? style.allowMove : ""
   const styleIsMoving = isMoving ? style.isMoving : ""
+  const styleIsCentewr = lwhbReg.test(id) ? style.textCenter : ""
 
   return (
-    <div className={`${style.container} ${styleAllowMove} ${styleIsMoving}`}
+    <div className={`
+    ${style.container} ${styleAllowMove} 
+    ${styleIsMoving} ${styleIsCentewr}
+    `}
       ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}      >
       <span>{label}</span>
     </div>

@@ -6,8 +6,8 @@
   margin-left: 16px;
   border: solid 1px transparent;
   cursor: default;
-  &:nth-of-type(1) {
-    // margin-left: 124px;
+  > span {
+    color: $colorMain;
   }
   &.allowMove {
     border: solid 1px $colorMain;
@@ -16,7 +16,7 @@
   &.isMoving {
     background-color: $chosenBgc01;
   }
-  > span {
-    color: $colorMain;
+  &.textCenter {
+    text-align: center;
   }
 }

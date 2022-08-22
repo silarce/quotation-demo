@@ -19,6 +19,7 @@ export default function ProductList({ productStates }:
 
   // =======================================
   const [isActive, setIsActive] = useState(-1)
+  const lwhbReg = /L|W|H|B/
   // =======================================
   return (
     <div className={style.container} >
@@ -36,10 +37,11 @@ export default function ProductList({ productStates }:
                 <span>1</span>
               </div>
               {item.map((item, cIndex) => {
-                const width = theadList[cIndex].width
+                const { width, id } = theadList[cIndex]
+                const textCenter = lwhbReg.test(id) ? style.textCenter : ""
                 const theStyle = { width }
                 return (
-                  <div className={style.column} key={`${pIndex}${cIndex}`} style={theStyle} >
+                  <div className={`${style.column} ${textCenter}`} key={`${pIndex}${cIndex}`} style={theStyle} >
                     {item}
                   </div>
                 )
