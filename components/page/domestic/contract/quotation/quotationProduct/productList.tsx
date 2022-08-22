@@ -15,7 +15,7 @@ import { TuseProduct } from "./useProduct"
 export default function ProductList({ productStates }:
   { productStates: TuseProduct }) {
 
-  const { dndProductList, theadList, dndBody } = productStates
+  const { theadList, dndBody } = productStates
 
   // =======================================
   const [isActive, setIsActive] = useState(-1)
@@ -52,26 +52,4 @@ export default function ProductList({ productStates }:
   )
 }
 
-
-
 // ================================================
-
-// 最早的寫法，參考
-// {
-//   dndProductList.map((row, index) => {
-//     return (
-//       <div className={style.row} key={index}>
-//         {row.map((column, index) => {
-//           const width = theadList[index].width
-//           const theStyle = { width }
-//           return (
-//             <div className={style.column} style={theStyle} key={index}>
-//               <span>{column}</span>
-//             </div>
-//           )
-//         })} {/* column */}
-//       </div>
-//     )
-//   })
-// } {/* row */ }
-

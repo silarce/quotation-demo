@@ -24,8 +24,8 @@ import TheadItem from "./dndThead/theadItem"
 import style from "./dndThead.module.scss"
 
 // data/hook
-import { TuseProduct } from "./useProduct"
-import { Divider } from "antd"
+import { TuseProduct, TfakeProduct } from "./useProduct"
+
 
 
 
@@ -35,7 +35,7 @@ export default function DndThead({ productStates, allowMove }:
     allowMove: boolean
   }) {
 
-  const { theadList, setTheadList, setDndProductList } = productStates
+  const { theadList, setTheadList } = productStates
 
   const items = useMemo(() => {
     return theadList.map((item) => item.id)
@@ -77,7 +77,8 @@ export default function DndThead({ productStates, allowMove }:
         <DragOverlay dropAnimation={null}
           // 為了讓滑鼠再拖移時保持cursor:"grabbing"而設這個style
           style={{
-            width: "100px", height: "20px", cursor: "grabbing",
+            width: "120px", height: "40px",
+            cursor: "grabbing", transition: "0s",
           }}
         />
       </DndContext>
@@ -87,21 +88,11 @@ export default function DndThead({ productStates, allowMove }:
   function handleDragEnd(e: DragEndEvent) {
     const { active, over } = e
     setIsMoving("")
-
     if (active.id !== over?.id) {
-
-      let oldIndex: number = items.indexOf(active.id);
-      let newIndex: number = items.indexOf(over?.id as number | string);
-
+      let oldIndex: number = items.indexOf(active.id as keyof TfakeProduct);
+      let newIndex: number = items.indexOf(over?.id as keyof TfakeProduct);
       setTheadList((item) => {
         return arrayMove(item, oldIndex, newIndex)
-      })
-
-      setDndProductList(list => {
-        const newList = list.map((item) => {
-          return arrayMove(item, oldIndex, newIndex)
-        })
-        return newList
       })
     }
   }
@@ -109,20 +100,10 @@ export default function DndThead({ productStates, allowMove }:
   function handleDragStart(e: DragStartEvent) {
     const { id } = e.active
     setIsMoving(id as string)
-    // document.getElementById("__next")?.addEventListener("mouseUp", () => alert("trest"))
-    // document.body.addEventListener("click",()=>{alert("test")})
-    // window.addEventListener("onMouseUp",()=>{alert("test")})
   }
 
 } // DndThead  
 
 
-
-
 // ===========================================================
 // ===========================================================
-
-
-// document.body.addEventListener("click",()=>{alert("test")})
-
-// document.getElementById("__next")?.addEventListener("mouseUp",()=>alert("trest"))

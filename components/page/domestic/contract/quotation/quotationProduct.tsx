@@ -5,6 +5,9 @@ import { useState } from "react"
 import DndThead from "./quotationProduct/dndThead"
 import ProductList from "./quotationProduct/productList"
 
+// global gear
+import AddButton from "components/global/gear/button/addButton"
+
 // css
 import style from "./quotationProduct.module.scss"
 
@@ -23,7 +26,7 @@ export default function QuotationProduction() {
 
 
   // console.log(dndProductList)
-  
+console.log(productStates.productList)
 
   return (
     <div className={style.container}>
@@ -33,10 +36,12 @@ export default function QuotationProduction() {
           設定排序
         </button>
       </div>
-      <DndThead productStates={productStates} allowMove={allowMove}/>
+      <DndThead productStates={productStates} allowMove={allowMove} />
       <ProductList productStates={productStates} />
-      {/* <DndThead theadList={theadList} setDndProductList={setDndProductList} />
-      <ProductList dndProductList={dndProductList} /> */}
+
+
+      <AddButton className={style.addBtn}
+        label="新增產品" onClick={() => { }} />
 
     </div>
   )

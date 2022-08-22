@@ -11,8 +11,7 @@ import Select03, { Toption } from "components/global/gear/select/select03"
 interface TuseProduct {
   theadList: TtheadItem[]
   setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
-  dndProductList: string[][]
-  setDndProductList: Dispatch<SetStateAction<string[][]>>
+  productList: TfakeProduct[]
   dndBody: JSX.Element[][]
 }
 
@@ -25,43 +24,25 @@ export default function UseProduct(): TuseProduct {
   // 原始資料，接上api前還用不到
   const [productList, setProductList] = useState(fakeProductList)
 
-  // 修改格式後的資料，用於dnd
-  const [dndProductList, setDndProductList]
-    = useState(dndListCreator(productList))
 
-
-  const dndBodyCell = useMemo(() => {
-    return dndProductList.map((row, pIndex) => {
-      return row.map((column, cIndex) => {
-        const { options } = theadList[cIndex]
+  const dndBody = useMemo(() => {
+    return productList.map((row, pIndex) => {
+      return theadList.map((column) => {
+        const { id, options } = column
         return (
           options
-            ? selectCellCreator({ pIndex, cIndex, dndProductList, setDndProductList, options })
-            : inputCellCreator({ pIndex, cIndex, dndProductList, setDndProductList })
+            ? selectCellCreator({ pIndex, id, productList, setProductList, options })
+            : inputCellCreator({ pIndex, id, productList, setProductList })
         )
       })
     })
-  }, [dndProductList])
-
-
-  // const dndBodyCell = useMemo(() => {
-  //   return dndProductList.map((row, pIndex) => {
-  //     return row.map((column, cIndex) => {
-  //       return inputCellCreator({ pIndex, cIndex, dndProductList, setDndProductList })
-  //     })
-  //   })
-  // }, [dndProductList])
-
-
-  // console.log(dndProductList)
-  // console.log(dndBodyCell)
-
+  }, [productList, theadList])
 
 
   return {
     theadList, setTheadList,
-    dndProductList, setDndProductList,
-    dndBody: dndBodyCell
+    productList,
+    dndBody
   }
 }
 
@@ -69,7 +50,7 @@ export default function UseProduct(): TuseProduct {
 // =============================================================
 // =============================================================
 interface TtheadItem {
-  id: number | string
+  id: keyof TfakeProduct
   label: string
   width: string
   options?: Toption[]
@@ -134,9 +115,6 @@ const theadListOri: TtheadItem[] = [
     options: memoOptions
   },
 ]
-
-
-
 
 
 
@@ -205,90 +183,62 @@ const fakeProductList: TfakeProduct[] = [
   },
 ]
 
-const dndListCreator = (list: TfakeProduct[]) => {
-  return list.map((item) => {
-    const {
-      discount, project, quoteType, L, W,
-      H, B, area, cai, doorType,
-      material, surface, horsepower, qty, unitPrice,
-      subTotal, memo
-    } = item
-    return [discount, project, quoteType, L, W,
-      H, B, area, cai, doorType,
-      material, surface, horsepower, qty, unitPrice,
-      subTotal, memo]
-  })
-}
-// 傳化後的dndProductList長得像這樣,是雙層陣列
-// [
-//   ["100.00", "SD1", "捲門捲門捲", "516", "230",
-//     "230", "45", "14.19", "154.52", "SJ-302",
-//     "不鏽鋼304#", "BA", "1/3HP", "1", "158610",
-//     "158610", "防颱防颱"],
-//   ["100.00", "SD1", "捲門捲門捲", "516", "230",
-//     "230", "45", "14.19", "154.52", "SJ-302",
-//     "不鏽鋼304#", "BA", "1/3HP", "1", "158610",
-//     "158610", "防颱防颱"]
-// ]
+const emptyProduct = [
+
+]
 
 
+// ================================
 
 // pIndex為上層的index，cIndex為下層的index
-const inputCellCreator = ({ pIndex, cIndex, dndProductList, setDndProductList }:
+const inputCellCreator = ({ pIndex, id, productList, setProductList }:
   {
     pIndex: number
-    cIndex: number
-    dndProductList: string[][]
-    setDndProductList: Dispatch<SetStateAction<string[][]>>
+    id: keyof TfakeProduct
+    productList: TfakeProduct[]
+    setProductList: Dispatch<SetStateAction<TfakeProduct[]>>
   }) => {
 
-  const stateValue = dndProductList[pIndex][cIndex]
+  const stateValue = productList[pIndex][id]
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDndProductList(list => {
-      list[pIndex][cIndex] = e.target.value
+    setProductList(list => {
+      list[pIndex][id] = e.target.value
       return [...list]
     })
   }
+
   return (
-    <Input03 key={`${pIndex}${cIndex}`} {...{ stateValue, onChange }} />
+    <Input03 key={`${pIndex}${id}`} {...{ stateValue, onChange }} />
   )
 } //  inputCellCreator
 
-// ==========
+
+// =============
 // pIndex為上層的index，cIndex為下層的index
 const selectCellCreator = (
-  { pIndex, cIndex, dndProductList, setDndProductList, options }:
+  { pIndex, id, productList, setProductList, options }:
     {
       pIndex: number
-      cIndex: number
-      dndProductList: string[][]
-      setDndProductList: Dispatch<SetStateAction<string[][]>>
+      id: keyof TfakeProduct
+      productList: TfakeProduct[]
+      setProductList: Dispatch<SetStateAction<TfakeProduct[]>>
       options: Toption[]
     }) => {
 
-  const stateValue = dndProductList[pIndex][cIndex]
+  const stateValue = productList[pIndex][id]
   const onChange = (option: Toption | null) => {
     if (!option) return
     const { value } = option
-    setDndProductList(list => {
-      list[pIndex][cIndex] = value
+    setProductList(list => {
+      list[pIndex][id] = value
       return [...list]
     })
   }
   return <Select03 {...{
     stateValue, options, onChange,
   }} />
-
 } //  selectCellCreator
 
 
 
-
-
-
-
-
-
-
 export type { TuseProduct, TtheadItem, TfakeProduct }
-// export { theadListOri as theadList }
