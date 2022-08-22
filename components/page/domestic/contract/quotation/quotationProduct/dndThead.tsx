@@ -86,6 +86,8 @@ export default function DndThead({ productStates, allowMove }:
   // ============================================
   function handleDragEnd(e: DragEndEvent) {
     const { active, over } = e
+    setIsMoving("")
+
     if (active.id !== over?.id) {
 
       let oldIndex: number = items.indexOf(active.id);
@@ -101,7 +103,6 @@ export default function DndThead({ productStates, allowMove }:
         })
         return newList
       })
-      setIsMoving("")
     }
   }
 
