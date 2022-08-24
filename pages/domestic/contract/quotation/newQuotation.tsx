@@ -11,12 +11,13 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHe
 
 // hook
 import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
-
+import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
 
 // css
 import style from "./[quotation].module.scss"
 
-
+// fakeData
+import fakeQuotationData from "meta/fakeData/fakeQuotation"
 
 
 
@@ -28,11 +29,13 @@ export default function Quotation() {
   const { newQuotatinId } = router.query
 
   // =========================================================
-  const stateQuotation = useProfile()
+  // profile
+  const stateQuotation = useProfile(fakeQuotationData.profile)
   if (stateQuotation.quotation.quotationId === "" && typeof newQuotatinId === "string") {
     stateQuotation.setQuotation.setQuotationId(newQuotatinId)
   }
-
+  // product
+  const productStates = useProduct(fakeQuotationData.productList)
 
   // =========================================================
   const tagList: TtagList = [
@@ -57,7 +60,7 @@ export default function Quotation() {
           {/*  */}
           <h5 className={style.titleHr}>合約項目</h5>
           {/* 主產品設定 */}
-          <QuotationProduction />
+          <QuotationProduction productStates={productStates} />
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}

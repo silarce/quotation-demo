@@ -1,6 +1,44 @@
 // 報價單假資料
 
 
+
+// ========================================================
+// profile
+interface Tquotataion {
+  quotationId: string
+  clientId: string
+  clientName: string
+  contactPerson: string
+  contactPhone: string
+  fax: string
+  clientState: string
+  ageing: string //時效
+  builtDate: string//報價日期
+  projectName: string
+  trackState: string//追蹤狀態
+  schedule: string//工地進度
+  projectAddress: string
+}
+
+const fakeProfile = {
+  quotationId: "S-110211-06",
+  clientId: "S0000",
+  clientName: "新加坡商犀牛頓科技股份有限公司",
+  contactPerson: "陳小明小華",
+  contactPhone: "0987654321",
+  fax: "04-12345656",
+  clientState: "一般客戶",
+  ageing: "10",
+  builtDate: "2020-02-02",
+  projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+  trackState: "",
+  schedule: "",
+  projectAddress: "未定",
+}
+
+
+// ========================================================
+// product
 interface TfakeProduct {
   discount: string  // 折數
   project: string  // 項目
@@ -62,18 +100,18 @@ const fakeProductList: TfakeProduct[] = [
     memo: "防颱防颱"
   },
 ]
+// ========================================================
 
 
 
 
-
-const fakeQuotation = {
-  profile: {},
+const fakeQuotationData = {
+  profile: fakeProfile,
   productList: fakeProductList
 }
 
 
 
 
-export default fakeQuotation
+export default fakeQuotationData
 

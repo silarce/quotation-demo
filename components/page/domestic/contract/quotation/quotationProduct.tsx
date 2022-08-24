@@ -12,15 +12,16 @@ import AddButton from "components/global/gear/button/addButton"
 import style from "./quotationProduct.module.scss"
 import styleL from "./local.module.scss"
 
-// data/hook
-import useProduct from "./hook/useProduct"
+// type
+import type { TuseProduct } from "./hook/useProduct"
 
 
 
 
-export default function QuotationProduction() {
+export default function QuotationProduction({ productStates }:
+  { productStates: TuseProduct }) {
   // dnd與資料相關的東西都在這裡面
-  const productStates = useProduct()
+  // const productStates = useProduct()
 
   const [allowMove, setAllowMove] = useState(false)
 

@@ -40,6 +40,7 @@ export default function QuotationProfile(
     quotationId, ageing, projectName,
     trackState, schedule, projectAddress,
     clientName, contactPerson, contactPhone, fax,
+    clientState
 
   } = quotation
   const {
@@ -81,7 +82,8 @@ export default function QuotationProfile(
   return (
     <div className={style.container}>
       <div className={style.profile}>
-        <span className={style.clientState}>狀態 : {"尚未選擇客戶"}</span>
+        <span className={style.clientState}>狀態 : {clientState || "尚未選擇客戶"}</span>
+        {/* <span className={style.clientState}>狀態 : {"尚未選擇客戶"}</span> */}
         <Input02
           {...{
             label: "工程名稱", stateValue: projectName,
