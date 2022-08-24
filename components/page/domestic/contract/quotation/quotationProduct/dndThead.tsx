@@ -26,7 +26,7 @@ import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
 // data/hook
-import { TuseProduct, TfakeProduct } from "../hook/useProduct"
+import { TuseProduct, Tproduct } from "../hook/useProduct"
 
 
 
@@ -57,7 +57,7 @@ export default function DndThead({ productStates, allowMove }:
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        // modifiers={[restrictToHorizontalAxis]}
+        modifiers={[restrictToHorizontalAxis]}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
@@ -91,8 +91,8 @@ export default function DndThead({ productStates, allowMove }:
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
-      let oldIndex: number = items.indexOf(active.id as keyof TfakeProduct);
-      let newIndex: number = items.indexOf(over?.id as keyof TfakeProduct);
+      let oldIndex: number = items.indexOf(active.id as Exclude<keyof Tproduct, "component">);
+      let newIndex: number = items.indexOf(over?.id as Exclude<keyof Tproduct, "component">);
       setTheadList((item) => {
         return arrayMove(item, oldIndex, newIndex)
       })

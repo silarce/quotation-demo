@@ -8,45 +8,28 @@ import {
 import Input03 from "components/global/gear/input/input03"
 import Select03, { Toption } from "components/global/gear/select/select03"
 
-// type
-import type { Tcomponent, Tproduct } from "meta/fakeData/fakeQuotation"
-
-
 // ======================================================
-// type
 interface TuseProduct {
   theadList: TtheadItem[]
   setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
-  productList: Tproduct[]
-  setProductList:Dispatch<SetStateAction<Tproduct[]>>
+  productList: TfakeProduct[]
   addProduct: () => void
   deleteProduct: (index: number) => void
   copyProduct: (index: number) => void
   dndBody: JSX.Element[][]
-  activeRow: number
-  setActiveRow: Dispatch<SetStateAction<number>>
-}
-
-interface TtheadItem {
-  id: Exclude<(keyof Tproduct), "component">
-  label: string
-  width: string
-  options?: Toption[]
 }
 
 
-export default function UseProduct(productListOri?: Tproduct[]): TuseProduct {
+
+export default function UseProduct(productListOri?: TfakeProduct[]): TuseProduct {
   // dnd head的狀態，也是資料分類目錄
   const [theadList, setTheadList] = useState<TtheadItem[]>(theadListOri)
 
-  // 將資料轉為狀態
-  const [productList, setProductList] = useState<Tproduct[]>(productListOri || [])
+  // 原始資料
+  const [productList, setProductList] = useState<TfakeProduct[]>(productListOri || [])
+  // const [productList, setProductList] = useState(fakeProductList)
 
-  // 被選中的row
-  const [activeRow, setActiveRow] = useState(-1)
 
-  // 這個部分好像可以分出去，直接在productList執行
-  // 要接API時再說吧
   const dndBody = useMemo(() => {
     return productList.map((row, pIndex) => {
       return theadList.map((column) => {
@@ -72,23 +55,12 @@ export default function UseProduct(productListOri?: Tproduct[]): TuseProduct {
     productList.splice(index, 0, { ...productList[index] })
     setProductList([...productList])
   }
-  // ===============================================================
-
-
-
-
-
-  // console.log(activeRow)
-  // console.log("productListOri", productListOri)
-  // console.log("productList", productListOri)
-
 
 
   return {
     theadList, setTheadList,
-    productList, setProductList, addProduct, deleteProduct, copyProduct,
-    dndBody, activeRow, setActiveRow
-
+    productList, addProduct, deleteProduct, copyProduct,
+    dndBody
   }
 }
 
@@ -97,6 +69,12 @@ export default function UseProduct(productListOri?: Tproduct[]): TuseProduct {
 // =============================================================
 // 要帶進thead或body的東西
 
+interface TtheadItem {
+  id: keyof TfakeProduct
+  label: string
+  width: string
+  options?: Toption[]
+}
 
 const quoteTypeOptions: Toption[] = [
   { value: "捲門", label: "捲門" },
@@ -144,7 +122,7 @@ const theadListOri: TtheadItem[] = [
     options: materialOptions
   },
   {
-    id: "surface", label: "表面", width: "50px",
+    id: "surface", label: "表面", width: "45px",
     options: surfaceOptions
   },
   { id: "horsepower", label: "馬力", width: "60px" },
@@ -160,8 +138,29 @@ const theadListOri: TtheadItem[] = [
 
 
 // ====================================================
+// fake data
 
-const emptyProduct: Tproduct = {
+interface TfakeProduct {
+  discount: string  // 折數
+  project: string  // 項目
+  quoteType: string  // 報價別
+  L: string  // L
+  W: string  // W
+  H: string  // H
+  B: string  // B
+  area: string  // 面積
+  cai: string  // 才數 // 只有台灣在用的單位，沒有英文譯名
+  doorType: string  // 門型
+  material: string  // 材料
+  surface: string  // 表面
+  horsepower: string  // 馬力
+  qty: string  // 數量
+  unitPrice: string  // 單價
+  subTotal: string  // 複價
+  memo: string  // 備註
+}
+
+const emptyProduct = {
   discount: "",
   project: "",
   quoteType: "",
@@ -179,20 +178,18 @@ const emptyProduct: Tproduct = {
   unitPrice: "",
   subTotal: "",
   memo: "",
-  component: []
 }
 
 
 // ================================
 
-// pIndex為上層的index
+// pIndex為上層的index，cIndex為下層的index
 const inputCellCreator = ({ pIndex, id, productList, setProductList }:
   {
     pIndex: number
-    id: Exclude<(keyof Tproduct), "component">
-    // id: keyof Tproduct
-    productList: Tproduct[]
-    setProductList: Dispatch<SetStateAction<Tproduct[]>>
+    id: keyof TfakeProduct
+    productList: TfakeProduct[]
+    setProductList: Dispatch<SetStateAction<TfakeProduct[]>>
   }) => {
 
   const stateValue = productList[pIndex][id]
@@ -211,14 +208,14 @@ const inputCellCreator = ({ pIndex, id, productList, setProductList }:
 
 
 // =============
-// pIndex為上層的index
+// pIndex為上層的index，cIndex為下層的index
 const selectCellCreator = (
   { pIndex, id, productList, setProductList, options }:
     {
       pIndex: number
-      id: Exclude<(keyof Tproduct), "component">
-      productList: Tproduct[]
-      setProductList: Dispatch<SetStateAction<Tproduct[]>>
+      id: keyof TfakeProduct
+      productList: TfakeProduct[]
+      setProductList: Dispatch<SetStateAction<TfakeProduct[]>>
       options: Toption[]
     }) => {
 
@@ -241,16 +238,4 @@ const selectCellCreator = (
 
 
 
-
-
-
-
-
-
-export type { TuseProduct, TtheadItem, Tproduct }
-
-
-
-
-
-
+export type { TuseProduct, TtheadItem, TfakeProduct }

@@ -37,6 +37,7 @@
   cursor: default;
   > span {
     color: $colorMain;
+    font-size: 16px;
   }
   &.allowMove {
     border: solid 1px $colorMain;
@@ -47,5 +48,30 @@
   }
   &.textCenter {
     text-align: center;
+  }
+}
+
+.row {
+  padding: 11px 0 11px 0;
+}
+
+.column {
+  display: inline-block;
+  margin-left: 16px;
+  vertical-align: bottom;
+  > div,
+  > label {
+    padding: 0;
+    > span {
+      font-size: 16px;
+    }
+  }
+  input {
+    font-size: 16px !important;
+  }
+  &.textCenter {
+    input {
+      text-align: center;
+    }
   }
 }

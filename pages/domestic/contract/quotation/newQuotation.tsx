@@ -1,11 +1,10 @@
-import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 
 // components
 import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
-import QuotationMaterial from "components/page/domestic/contract/quotation/quotationMaterial"
+import QuotationMaterial from "components/page/domestic/contract/quotation/quotationComponent"
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
@@ -18,6 +17,7 @@ import style from "./[quotation].module.scss"
 
 // fakeData
 import fakeQuotationData from "meta/fakeData/fakeQuotation"
+import { arraySwap } from "@dnd-kit/sortable"
 
 
 
@@ -34,8 +34,16 @@ export default function Quotation() {
   if (stateQuotation.quotation.quotationId === "" && typeof newQuotatinId === "string") {
     stateQuotation.setQuotation.setQuotationId(newQuotatinId)
   }
+
   // product
+
   const productStates = useProduct(fakeQuotationData.productList)
+
+  // console.log(productStates)
+
+
+
+
 
   // =========================================================
   const tagList: TtagList = [
@@ -64,9 +72,10 @@ export default function Quotation() {
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <QuotationMaterial />
+            <QuotationMaterial productStates={productStates}/>
             <hr />
             <div>
+              <h1>test</h1><h1>test</h1><h1>test</h1>
               <h1>test</h1><h1>test</h1><h1>test</h1>
             </div>
           </div>
