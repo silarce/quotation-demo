@@ -10,7 +10,7 @@ import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons 
 import style from "./productList.module.scss"
 
 // data type
-import { TuseProduct } from "./useProduct"
+import { TuseProduct } from "../hook/useProduct"
 
 export default function ProductList({ productStates }:
   { productStates: TuseProduct }) {

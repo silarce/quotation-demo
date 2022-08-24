@@ -238,9 +238,11 @@ const inputCellCreator = ({ pIndex, id, productList, setProductList }:
       return [...list]
     })
   }
+  // const placeholder = ""
 
   return (
-    <Input03 key={`${pIndex}${id}`} {...{ stateValue, onChange }} />
+    <Input03 key={`${pIndex}${id}`}
+      {...{ stateValue, onChange }} />
   )
 } //  inputCellCreator
 

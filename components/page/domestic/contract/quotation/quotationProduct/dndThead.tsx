@@ -21,10 +21,12 @@ import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
 // components
 import TheadItem from "./dndThead/theadItem"
 
+// css
 import style from "./dndThead.module.scss"
+import styleL from "../local.module.scss"
 
 // data/hook
-import { TuseProduct, TfakeProduct } from "./useProduct"
+import { TuseProduct, TfakeProduct } from "../hook/useProduct"
 
 
 
@@ -50,7 +52,7 @@ export default function DndThead({ productStates, allowMove }:
   const [isMoving, setIsMoving] = useState("")
   // =======================================================
   return (
-    <div >
+    <div className={styleL.thead}>
       <div className={style.emptyBlock} />
       <DndContext
         sensors={sensors}

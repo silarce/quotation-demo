@@ -14,7 +14,7 @@ const Input03 = (
     {
       stateValue: string | number,
       onChange: (e: ChangeEvent<HTMLInputElement>) => void,
-      placeholder?: string | false,
+      placeholder?: string
       id?: string | number
       className?: string
       width?: string
@@ -28,8 +28,10 @@ const Input03 = (
   if (id === undefined) id = nanoid()
   id = `${id}`
 
-  if (placeholder === undefined) placeholder = `請輸入`
-  if (placeholder === false) placeholder = ""
+
+  // if (!placeholder) placeholder = ""
+  // if (placeholder === undefined) placeholder = `請輸入`
+  // if (placeholder === false) placeholder = ""
 
   // ========================================================
 

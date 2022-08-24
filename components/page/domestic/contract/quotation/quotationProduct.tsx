@@ -10,10 +10,10 @@ import AddButton from "components/global/gear/button/addButton"
 
 // css
 import style from "./quotationProduct.module.scss"
-
+import styleL from "./local.module.scss"
 
 // data/hook
-import useProduct, { TuseProduct } from "./quotationProduct/useProduct"
+import useProduct from "./hook/useProduct"
 
 
 
@@ -24,15 +24,15 @@ export default function QuotationProduction() {
 
   const [allowMove, setAllowMove] = useState(false)
 
-
   const { addProduct } = productStates
 
   return (
     <div className={style.container}>
-      <div className={style.header}>
-        <span>主產品設定</span>
-        <button onClick={() => setAllowMove(state => !state)}>
-          設定排序
+      <div className={styleL.header}>
+        <h2>主產品設定</h2>
+        <button className={((allowMove && styleL.active) || "")}
+          onClick={() => setAllowMove(state => !state)}>
+          {allowMove ? "確定排序" : "設定排序"}
         </button>
       </div>
       <DndThead productStates={productStates} allowMove={allowMove} />
@@ -40,7 +40,6 @@ export default function QuotationProduction() {
 
       <AddButton className={style.addBtn}
         label="新增產品" onClick={addProduct} />
-
     </div>
   )
 }

@@ -13,7 +13,7 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
 import style from "./quotationProfile.module.scss"
 
 // fakeData/type
-import { TuseQuotation, Tquotataion } from "./hook/useQuotation"
+import { TuseQuotation, Tquotataion } from "./hook/useProfile"
 
 
 

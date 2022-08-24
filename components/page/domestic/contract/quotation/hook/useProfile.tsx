@@ -67,7 +67,7 @@ const emptyQuotation: Tquotataion = {
 
 
 
-export default function useQuotation(quotationData?: Tquotataion) {
+export default function useProfile(quotationData?: Tquotataion) {
 
 
   if (!quotationData) quotationData = emptyQuotation

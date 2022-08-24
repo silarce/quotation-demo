@@ -18,6 +18,7 @@
 .column {
   display: inline-block;
   margin-left: 16px;
+  vertical-align: bottom;
   > div,
   > label {
     padding: 0;

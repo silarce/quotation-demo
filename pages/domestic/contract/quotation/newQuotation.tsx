@@ -5,12 +5,12 @@ import { useRouter } from "next/router"
 // components
 import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
-
+import QuotationMaterial from "components/page/domestic/contract/quotation/quotationMaterial"
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
 // hook
-import useQuotation from "components/page/domestic/contract/quotation/hook/useQuotation"
+import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
 
 
 // css
@@ -28,7 +28,7 @@ export default function Quotation() {
   const { newQuotatinId } = router.query
 
   // =========================================================
-  const stateQuotation = useQuotation()
+  const stateQuotation = useProfile()
   if (stateQuotation.quotation.quotationId === "" && typeof newQuotatinId === "string") {
     stateQuotation.setQuotation.setQuotationId(newQuotatinId)
   }
@@ -52,16 +52,24 @@ export default function Quotation() {
 
       <div className={style.mainContainer}>
         <div className={style.quotation}> {/* scroll wrapper */}
+          {/* 工程名稱 */}
           <QuotationProfile stateQuotation={stateQuotation} />
-
+          {/*  */}
           <h5 className={style.titleHr}>合約項目</h5>
-
+          {/* 主產品設定 */}
           <QuotationProduction />
 
-          {/* <div>
-          <div></div>
-          <div></div>
-        </div> */}
+          <div className={style.redWrapper}>
+            {/* 材料配件設定 */}
+            <QuotationMaterial />
+            <hr />
+            <div>
+              <h1>test</h1><h1>test</h1><h1>test</h1>
+            </div>
+          </div>
+
+
+
           {/* <div></div> */}
           {/* <div>
           <div></div>

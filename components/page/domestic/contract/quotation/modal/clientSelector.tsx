@@ -15,7 +15,7 @@ import style from "./clientSelector.module.scss"
 // fakeData
 import { fakeClientList, TclientProfile } from 'meta/fakeData/fakeClientList'
 // fakeData/type
-import { TsetQuotation } from "../hook/useQuotation"
+import { TsetQuotation } from "../hook/useProfile"
 
 
 export default function ClientSelector(

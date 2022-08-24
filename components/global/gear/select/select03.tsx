@@ -41,7 +41,9 @@ const Select03 = ({
 
   // ========================================================
   className = className ? className : ""
-  if (!placeholder) placeholder = `請選擇`
+
+  if (!placeholder) placeholder = ""
+  // if (!placeholder) placeholder = `請選擇`
   // ========================================================
   const lableStyle = {
     width: width ? width : "",

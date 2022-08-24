@@ -1,22 +1,22 @@
 @use "styles/theme01" as *;
 
-.container {
-  display: inline-block;
-  padding: 2px 3px;
-  margin-left: 16px;
-  border: solid 1px transparent;
-  cursor: default;
-  > span {
-    color: $colorMain;
-  }
-  &.allowMove {
-    border: solid 1px $colorMain;
-    cursor: grab;
-  }
-  &.isMoving {
-    background-color: $chosenBgc01;
-  }
-  &.textCenter {
-    text-align: center;
-  }
-}
+// .container {
+//   display: inline-block;
+//   padding: 2px 3px;
+//   margin-left: 16px;
+//   border: solid 1px transparent;
+//   cursor: default;
+//   > span {
+//     color: $colorMain;
+//   }
+//   &.allowMove {
+//     border: solid 1px $colorMain;
+//     cursor: grab;
+//   }
+//   &.isMoving {
+//     background-color: $chosenBgc01;
+//   }
+//   &.textCenter {
+//     text-align: center;
+//   }
+// }
