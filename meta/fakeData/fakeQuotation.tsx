@@ -211,134 +211,12 @@ const fakeComponent: Tcomponent[] = [
     basicWeight: null,
     unit: "組",
     qty: "1",
-    listPrice: "975.00",
+    listPrice: "48975.00",
     totalListPrice: "4485",
     price: "453",
     totalPrice: "2084",
   },
 ]
-
-
-
-
-
-
-
-// const fakeComponent: Tcomponent[] = [
-//   {
-//     id01: "SJ0A",
-//     typeName: "門片",
-//     id02: "SJ3020A0088",
-//     material: "不鏽鋼304#",
-//     surface: "BA",
-//     basicWeight: "22.00",
-//     unit: "m2",
-//     qty: "14.19",
-//     listPrice: "6171",
-//     totalListPrice: "87556.49",
-//     price: "6171",
-//     totalPrice: "87566",
-//   },
-//   {
-//     id01: "SJ0A",
-//     typeName: "門軌",
-//     id02: "SJ3020A0088",
-//     material: "不鏽鋼316#",
-//     surface: null,
-//     basicWeight: null,
-//     unit: null,
-//     qty: "1",
-//     listPrice: "11286",
-//     totalListPrice: "11286",
-//     price: "11286",
-//     totalPrice: "11286",
-//   },
-//   {
-//     id01: "SJ0A",
-//     typeName: "捲箱",
-//     id02: "SJ3020A0088",
-//     material: "不鏽鋼316#",
-//     surface: null,
-//     basicWeight: null,
-//     unit: null,
-//     qty: "1",
-//     listPrice: "2895",
-//     totalListPrice: "2895",
-//     price: "2895",
-//     totalPrice: "2895",
-//   },
-//   {
-//     id01: "SJ0A",
-//     typeName: "底座",
-//     id02: "SJ3020A0088",
-//     material: "不鏽鋼316#",
-//     surface: null,
-//     basicWeight: null,
-//     unit: null,
-//     qty: "1",
-//     listPrice: "1848",
-//     totalListPrice: "1848",
-//     price: "1848",
-//     totalPrice: "1848",
-//   },
-//   {
-//     id01: "SJ0E",
-//     typeName: "捲軸",
-//     id02: "SJIN0E0002",
-//     material: "捲軸 Ø5”",
-//     surface: null,
-//     basicWeight: null,
-//     unit: "M",
-//     qty: "1",
-//     listPrice: "975.00",
-//     totalListPrice: "4485",
-//     price: "453",
-//     totalPrice: "2084",
-//   },
-//   {
-//     id01: "SJ0E",
-//     typeName: "馬達機",
-//     id02: "SJ3020A0088",
-//     material: "220V 1HP",
-//     surface: null,
-//     basicWeight: null,
-//     unit: "組",
-//     qty: "1",
-//     listPrice: "975.00",
-//     totalListPrice: "4485",
-//     price: "453",
-//     totalPrice: "2084",
-//   },
-//   {
-//     id01: "SJ0E",
-//     typeName: "配電箱及按鈕開關",
-//     id02: null,
-//     material: null,
-//     surface: null,
-//     basicWeight: null,
-//     unit: "組",
-//     qty: "1",
-//     listPrice: "975.00",
-//     totalListPrice: "4485",
-//     price: "453",
-//     totalPrice: "2084",
-//   },
-//   {
-//     id01: "SJ0E",
-//     typeName: "安裝費",
-//     id02: null,
-//     material: null,
-//     surface: null,
-//     basicWeight: null,
-//     unit: "組",
-//     qty: "1",
-//     listPrice: "975.00",
-//     totalListPrice: "4485",
-//     price: "453",
-//     totalPrice: "2084",
-//   },
-// ]
-
 
 
 
@@ -361,7 +239,7 @@ const fakeProductList: Tproduct[] = [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
-    component: fakeComponent
+    component: JSON.parse(JSON.stringify(fakeComponent))
   },
   {
     discount: "86.43",
@@ -381,11 +259,10 @@ const fakeProductList: Tproduct[] = [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
-    component: fakeComponent
+    component: JSON.parse(JSON.stringify(fakeComponent))
   },
 ]
 // ========================================================
-
 
 
 
@@ -393,11 +270,6 @@ const fakeQuotationData = {
   profile: fakeProfile,
   productList: fakeProductList
 }
-
-
-
-
-
 
 
 export default fakeQuotationData

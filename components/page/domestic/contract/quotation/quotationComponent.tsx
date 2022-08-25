@@ -13,10 +13,6 @@ import styleL from "./local.module.scss"
 // type
 import { TuseProduct, Tproduct } from "./hook/useProduct"
 import type { Tcomponent } from "meta/fakeData/fakeQuotation"
-import { spawn } from "child_process"
-
-
-
 
 
 
@@ -25,14 +21,15 @@ export default function QuotationMaterial({ productStates }:
 
   const { productList, setProductList, activeRow } = productStates
 
-  // console.log("productList", productList)
 
   const productComponent = useMemo(() => {
     if (activeRow < 0) return []
     return productList[activeRow].component
   }, [activeRow, productList])
 
+
   // console.log(productComponent)
+
 
   return (
     <>
@@ -41,6 +38,9 @@ export default function QuotationMaterial({ productStates }:
       </div>
       {/* thead */}
       <div className={styleL.thead}>
+        <div className={styleL.rowIndex}>
+          <span></span>
+        </div>
         {theadIndex.map((item, index) => {
           const { label, width } = theadInfo[item]
           const theStyle = { width }
@@ -52,26 +52,60 @@ export default function QuotationMaterial({ productStates }:
         })}
       </div>
       {/* tbody */}
+
       <div>
+        {/*  */}
+        {!productComponent[0] &&
+          <>
+            <div className={styleL.rowIndex}></div>
+            <span className={styleL.noListTip}>尚未選擇產品</span>
+          </>}
+        {/*  */}
+
+
         {productComponent.map((row, pIndex) => {
           return (
             <div className={styleL.row} key={pIndex}>
+              <div className={styleL.rowIndex}>
+                <span>{pIndex + 1}</span>
+              </div>
+
               {theadIndex.map((key, cIndex) => {
                 const { width } = theadInfo[key]
                 const theStyle = { width }
-
                 let item = row[key]
-
+                // 
                 if (item === null) return (
                   <div className={styleL.column} key={cIndex} style={theStyle}>
                     <div><span></span></div>
                   </div>
                 )
-                if (typeof item === "string") return (
-                  <div className={styleL.column} key={cIndex} style={theStyle}>
-                    <div><span>{item}</span></div>
-                  </div>
-                )
+                // 
+                if (typeof item === "string") {
+                  // 如果是數值，就加千分位符號
+                  const intReg = /^[0-9]*$/
+                  const floatReg = /^[+-]?\d+(\.\d+)?$/
+                  if (intReg.test(item) || floatReg.test(item))
+                    item = item.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                  // 改變平方單位的格式
+                  const unitReg = /cm2|m2|km2|mm2 /
+                  let theTwo;
+                  if (unitReg.test(item)) {
+                    item = item.replace(/[0-9]/g, '')
+                    theTwo = 2
+                  }
+
+                  return (
+                    <div className={styleL.column} key={cIndex} style={theStyle}>
+                      <div>
+                        <span>{item}</span>
+                        {theTwo && <sup>{theTwo}</sup>}
+                      </div>
+                    </div>
+                  )
+                }
+                // 
                 const { value, options } = item
                 if (options) {
                   return (
@@ -86,53 +120,11 @@ export default function QuotationMaterial({ productStates }:
                     </div>
                   )
                 }
-
-                // const value = row[key]
-                // const { width, options } = theadInfo[key]
-                // const theStyle = { width }
-
-
-
-
-
-
-                return (
-                  <div className={styleL.column} key={cIndex} style={theStyle}>
-                    {value === null ? <div><span></span></div>
-                      : (!options) ? <div><span>{value}</span></div>
-                        : selectCellCreator({
-                          componentIndex: pIndex,
-                          id: key,
-                          productList,
-                          setProductList,
-                          options
-                        })
-                    }
-                  </div>
-                )
-
-
-                // return (
-                //   <div className={styleL.column} key={cIndex} style={theStyle}>
-                //     {(options && value !== null)
-                //       ?
-                //       selectCellCreator({
-                //         componentIndex: pIndex,
-                //         id: key,
-                //         productList,
-                //         setProductList,
-                //         options
-                //       })
-                //       : <div><span>{value}</span></div>}
-                //   </div>
-                // )
               })}
             </div>
           )
         })}
-
       </div>
-
     </>
   )
 
@@ -156,7 +148,6 @@ export default function QuotationMaterial({ productStates }:
       if (!option) return
       const { value } = option
       setProductList(list => {
-        // list[activeRow].component[componentIndex][id].value = value
         const component = list[activeRow].component[componentIndex][id] as { value: string, options: Toption[] }
         component.value = value
         return [...list]
@@ -169,9 +160,6 @@ export default function QuotationMaterial({ productStates }:
     }} />
   } //  selectCellCreator
 
-
-
-
 }
 
 
@@ -181,7 +169,6 @@ export default function QuotationMaterial({ productStates }:
 interface TheadInfoItem {
   label: string
   width: string
-  options?: Toption[]
 }
 
 interface TtheadInfo {
@@ -199,20 +186,6 @@ interface TtheadInfo {
   totalPrice: TheadInfoItem // 複價
 }
 
-// interface Tcomponent {
-//   id01: string
-//   typeName: string
-//   id02?: string
-//   material?: string
-//   surface?: string
-//   basicWeight?: string
-//   unit?: string
-//   qty: string
-//   listPrice: string
-//   totalListPrice: string
-//   price: string
-//   totalPrice: string
-// }
 
 const theadIndex: (keyof TtheadInfo)[] = [
   "id01", "typeName", "id02", "material",
@@ -221,30 +194,12 @@ const theadIndex: (keyof TtheadInfo)[] = [
 ]
 
 
-const materialOptions: Toption[] = [
-  { value: "不鏽鋼304#", label: "不鏽鋼304#" },
-  { value: "不鏽鋼316#", label: "不鏽鋼316#" },
-  { value: "烤漆鐵", label: "烤漆鐵" },
-  { value: "鍍鋅鋼", label: "鍍鋅鋼" },
-  { value: "合金鋼", label: "合金鋼" },
-  { value: "耐候鋼", label: "耐候鋼" },
-  { value: "鋁合金", label: "鋁合金" },
-  { value: "陽極鋁合金", label: "陽極鋁合金" },
-]
-const surfaceOptions: Toption[] = [
-  { value: "AA", label: "AA" },
-  { value: "BA", label: "BA" },
-  { value: "CC", label: "CC" },
-  { value: "DS", label: "DS" },
-]
-
-
 const theadInfo: TtheadInfo = {
   id01: { label: "代號", width: "45px" },
   typeName: { label: "種類名稱", width: "136px" },
   id02: { label: "代號", width: "116px" },
-  material: { label: "材料", width: "120px", options: materialOptions },
-  surface: { label: "表面", width: "50px", options: surfaceOptions },
+  material: { label: "材料", width: "120px" },
+  surface: { label: "表面", width: "50px" },
   basicWeight: { label: "重量基重", width: "75px" },
   unit: { label: "單位", width: "40px" },
   qty: { label: "數量", width: "60px" },

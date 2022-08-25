@@ -4,7 +4,7 @@ import { useRouter } from "next/router"
 // components
 import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
-import QuotationMaterial from "components/page/domestic/contract/quotation/quotationComponent"
+import QuotationComponent from "components/page/domestic/contract/quotation/quotationComponent"
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
@@ -17,7 +17,6 @@ import style from "./[quotation].module.scss"
 
 // fakeData
 import fakeQuotationData from "meta/fakeData/fakeQuotation"
-import { arraySwap } from "@dnd-kit/sortable"
 
 
 
@@ -38,10 +37,6 @@ export default function Quotation() {
   // product
 
   const productStates = useProduct(fakeQuotationData.productList)
-
-  // console.log(productStates)
-
-
 
 
 
@@ -72,7 +67,7 @@ export default function Quotation() {
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <QuotationMaterial productStates={productStates}/>
+            <QuotationComponent productStates={productStates} />
             <hr />
             <div>
               <h1>test</h1><h1>test</h1><h1>test</h1>
@@ -97,3 +92,7 @@ export default function Quotation() {
     </div>
   )
 }
+
+
+
+
