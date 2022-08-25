@@ -10,12 +10,10 @@ import iconArrow from "public/image/icon/arrow_down.svg"
 // css
 import style from "./select03.module.scss"
 
-
 type Toption = {
   value: string
   label: string
 }
-
 
 const Select03 = ({
   stateValue, options, onChange, placeholder,
@@ -41,7 +39,9 @@ const Select03 = ({
 
   // ========================================================
   className = className ? className : ""
-  if (!placeholder) placeholder = `請選擇`
+
+  if (!placeholder) placeholder = ""
+  // if (!placeholder) placeholder = `請選擇`
   // ========================================================
   const lableStyle = {
     width: width ? width : "",

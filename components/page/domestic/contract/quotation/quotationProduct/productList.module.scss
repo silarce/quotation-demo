@@ -18,15 +18,17 @@
 .column {
   display: inline-block;
   margin-left: 16px;
-  &:nth-of-type(1) {
-    // margin-left: 124px;
-  }
+  vertical-align: bottom;
   > div,
   > label {
     padding: 0;
   }
-
   input {
     font-size: 16px !important;
+  }
+  &.textCenter {
+    input {
+      text-align: center;
+    }
   }
 }

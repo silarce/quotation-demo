@@ -67,40 +67,39 @@ const emptyQuotation: Tquotataion = {
 
 
 
-export default function useQuotation(quotationData?: Tquotataion) {
+export default function useProfile(quotationData?: Tquotataion) {
 
 
   if (!quotationData) quotationData = emptyQuotation
 
-
   const [quotationId, setQuotationId]
-    = useState(emptyQuotation.quotationId)
+    = useState(quotationData.quotationId)
   const [clientId, setClientId]
-    = useState(emptyQuotation.clientId)
+    = useState(quotationData.clientId)
 
   const [clientName, setClientName]
-    = useState(emptyQuotation.clientName)
+    = useState(quotationData.clientName)
   const [contactPerson, setContactPerson]
-    = useState(emptyQuotation.contactPerson)
+    = useState(quotationData.contactPerson)
   const [contactPhone, setContactPhone]
-    = useState(emptyQuotation.contactPhone)
+    = useState(quotationData.contactPhone)
   const [fax, setFax]
 
-    = useState(emptyQuotation.fax)
+    = useState(quotationData.fax)
   const [clientState, setClientState]
-    = useState(emptyQuotation.clientState)
+    = useState(quotationData.clientState)
   const [ageing, setAgeing]
-    = useState(emptyQuotation.ageing) //時效
+    = useState(quotationData.ageing) //時效
   const [builtDate, setBuiltDate]
-    = useState(emptyQuotation.builtDate) //報價日期
+    = useState(quotationData.builtDate) //報價日期
   const [projectName, setProjectName]
-    = useState(emptyQuotation.projectName)
+    = useState(quotationData.projectName)
   const [trackState, setTrackState]
-    = useState(emptyQuotation.trackState) //追蹤狀態
+    = useState(quotationData.trackState) //追蹤狀態
   const [schedule, setSchedule]
-    = useState(emptyQuotation.schedule) //工地進度
+    = useState(quotationData.schedule) //工地進度
   const [projectAddress, setProjectAddress]
-    = useState(emptyQuotation.projectAddress) //工地進度
+    = useState(quotationData.projectAddress) //工地進度
 
 
   const quotation = {

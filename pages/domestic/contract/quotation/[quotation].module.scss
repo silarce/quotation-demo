@@ -16,3 +16,16 @@
   text-align: center;
   background-color: $bgc01;
 }
+
+.redWrapper {
+  width: calc(100% - 34px);
+  padding: 0 3px;
+  margin: auto;
+  margin-top: 11px;
+  border: solid 1px #ea1833;
+  > hr {
+    width: 100%;
+    margin: auto;
+    border-color: red;
+  }
+}

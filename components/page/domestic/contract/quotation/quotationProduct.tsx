@@ -5,39 +5,42 @@ import { useState } from "react"
 import DndThead from "./quotationProduct/dndThead"
 import ProductList from "./quotationProduct/productList"
 
+// global gear
+import AddButton from "components/global/gear/button/addButton"
+
 // css
 import style from "./quotationProduct.module.scss"
+import styleL from "./local.module.scss"
+
+// type
+import type { TuseProduct } from "./hook/useProduct"
 
 
-// data/hook
-import useProduct, { TuseProduct } from "./quotationProduct/useProduct"
 
 
-
-
-export default function QuotationProduction() {
+export default function QuotationProduction({ productStates }:
+  { productStates: TuseProduct }) {
   // dnd與資料相關的東西都在這裡面
-  const productStates = useProduct()
+  // const productStates = useProduct()
 
   const [allowMove, setAllowMove] = useState(false)
 
-
-  // console.log(dndProductList)
-  
+  const { addProduct } = productStates
 
   return (
     <div className={style.container}>
-      <div className={style.header}>
-        <span>主產品設定</span>
-        <button onClick={() => setAllowMove(state => !state)}>
-          設定排序
+      <div className={styleL.header}>
+        <h2>主產品設定</h2>
+        <button className={((allowMove && styleL.active) || "")}
+          onClick={() => setAllowMove(state => !state)}>
+          {allowMove ? "確定排序" : "設定排序"}
         </button>
       </div>
-      <DndThead productStates={productStates} allowMove={allowMove}/>
+      <DndThead productStates={productStates} allowMove={allowMove} />
       <ProductList productStates={productStates} />
-      {/* <DndThead theadList={theadList} setDndProductList={setDndProductList} />
-      <ProductList dndProductList={dndProductList} /> */}
 
+      <AddButton className={style.addBtn}
+        label="新增產品" onClick={addProduct} />
     </div>
   )
 }

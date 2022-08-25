@@ -8,38 +8,44 @@ import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons 
 
 // css
 import style from "./productList.module.scss"
+import styleL from "../local.module.scss"
 
 // data type
-import { TuseProduct } from "./useProduct"
+import { TuseProduct } from "../hook/useProduct"
 
 export default function ProductList({ productStates }:
   { productStates: TuseProduct }) {
 
-  const { dndProductList, theadList, dndBody } = productStates
+  const { theadList, dndBody,
+    deleteProduct, copyProduct,
+    activeRow, setActiveRow,
+  } = productStates
 
   // =======================================
-  const [isActive, setIsActive] = useState(-1)
+  const lwhbReg = /L|W|H|B/
   // =======================================
+
   return (
     <div className={style.container} >
       {dndBody.map((item, pIndex) => {
         return (
 
-          <CellWithBar key={pIndex} isActive={isActive === pIndex}>
+          <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
-              onFocus={() => setIsActive(pIndex)}
-              onBlur={() => setIsActive(-1)}
+              onFocus={() => setActiveRow(pIndex)}
+            // onBlur={() => setActiveRow(-1)} //點在其他row上面也會觸發onBlur，先註解掉以後再來想解方
             >
               <div className={style.buttonBox}>
-                <Icondelete01 />
-                <IconCopy />
+                <Icondelete01 onClick={() => deleteProduct(pIndex)} />
+                <IconCopy onClick={() => copyProduct(pIndex)} />
                 <span>1</span>
               </div>
               {item.map((item, cIndex) => {
-                const width = theadList[cIndex].width
+                const { width, id } = theadList[cIndex]
+                const textCenter = lwhbReg.test(id) ? style.textCenter : ""
                 const theStyle = { width }
                 return (
-                  <div className={style.column} key={`${pIndex}${cIndex}`} style={theStyle} >
+                  <div className={`${styleL.column} ${textCenter}`} key={`${pIndex}${cIndex}`} style={theStyle} >
                     {item}
                   </div>
                 )
@@ -52,26 +58,4 @@ export default function ProductList({ productStates }:
   )
 }
 
-
-
 // ================================================
-
-// 最早的寫法，參考
-// {
-//   dndProductList.map((row, index) => {
-//     return (
-//       <div className={style.row} key={index}>
-//         {row.map((column, index) => {
-//           const width = theadList[index].width
-//           const theStyle = { width }
-//           return (
-//             <div className={style.column} style={theStyle} key={index}>
-//               <span>{column}</span>
-//             </div>
-//           )
-//         })} {/* column */}
-//       </div>
-//     )
-//   })
-// } {/* row */ }
-
