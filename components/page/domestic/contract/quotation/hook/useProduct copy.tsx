@@ -8,8 +8,7 @@ import {
 import Input03 from "components/global/gear/input/input03"
 import Select03, { Toption } from "components/global/gear/select/select03"
 
-// data type
-import { fakeComponent, fakeAccessory } from "meta/fakeData/fakeQuotation"
+// type
 import type { Tcomponent, Tproduct } from "meta/fakeData/fakeQuotation"
 
 
@@ -29,7 +28,7 @@ interface TuseProduct {
 }
 
 interface TtheadItem {
-  id: Exclude<(keyof Tproduct), "component" | "accessory">
+  id: Exclude<(keyof Tproduct), "component">
   label: string
   width: string
   options?: Toption[]
@@ -62,8 +61,7 @@ export default function UseProduct(productListOri?: Tproduct[]): TuseProduct {
   }, [productList, theadList])
 
   const addProduct = () => {
-    productList.push(JSON.parse(JSON.stringify(emptyProduct)))
-    // productList.push({ ...emptyProduct })
+    productList.push({ ...emptyProduct })
     setProductList([...productList])
   }
   const deleteProduct = (index: number) => {
@@ -75,6 +73,15 @@ export default function UseProduct(productListOri?: Tproduct[]): TuseProduct {
     setProductList([...productList])
   }
   // ===============================================================
+
+
+
+
+
+  // console.log(activeRow)
+  // console.log("productListOri", productListOri)
+  // console.log("productList", productListOri)
+
 
 
   return {
@@ -122,7 +129,7 @@ const theadListOri: TtheadItem[] = [
   { id: "discount", label: "折數", width: "75px" },
   { id: "project", label: "項目", width: "60px" },
   {
-    id: "quoteType", label: "報價別", width: "105px",
+    id: "quoteType", label: "報價別", width: "97px",
     options: quoteTypeOptions
   },
   { id: "L", label: "L", width: "60px" },
@@ -137,7 +144,7 @@ const theadListOri: TtheadItem[] = [
     options: materialOptions
   },
   {
-    id: "surface", label: "表面", width: "55px",
+    id: "surface", label: "表面", width: "50px",
     options: surfaceOptions
   },
   { id: "horsepower", label: "馬力", width: "60px" },
@@ -172,8 +179,8 @@ const emptyProduct: Tproduct = {
   unitPrice: "",
   subTotal: "",
   memo: "",
-  component: JSON.parse(JSON.stringify(fakeComponent)),
-  accessory: JSON.parse(JSON.stringify(fakeAccessory))
+  component: [],
+  accessory: []
 }
 
 
@@ -183,7 +190,7 @@ const emptyProduct: Tproduct = {
 const inputCellCreator = ({ pIndex, id, productList, setProductList }:
   {
     pIndex: number
-    id: Exclude<(keyof Tproduct), "component" | "accessory">
+    id: Exclude<(keyof Tproduct), "component">
     // id: keyof Tproduct
     productList: Tproduct[]
     setProductList: Dispatch<SetStateAction<Tproduct[]>>
@@ -210,7 +217,7 @@ const selectCellCreator = (
   { pIndex, id, productList, setProductList, options }:
     {
       pIndex: number
-      id: Exclude<(keyof Tproduct), "component" | "accessory">
+      id: Exclude<(keyof Tproduct), "component">
       productList: Tproduct[]
       setProductList: Dispatch<SetStateAction<Tproduct[]>>
       options: Toption[]
@@ -229,6 +236,14 @@ const selectCellCreator = (
     stateValue, options, onChange,
   }} />
 } //  selectCellCreator
+
+
+
+
+
+
+
+
 
 
 

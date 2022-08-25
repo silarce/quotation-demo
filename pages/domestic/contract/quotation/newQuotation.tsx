@@ -5,6 +5,7 @@ import { useRouter } from "next/router"
 import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
 import QuotationComponent from "components/page/domestic/contract/quotation/quotationComponent"
+import QuotationAccessory from "components/page/domestic/contract/quotation/quotationAccessory"
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
@@ -69,10 +70,7 @@ export default function Quotation() {
             {/* 材料配件設定 */}
             <QuotationComponent productStates={productStates} />
             <hr />
-            <div>
-              <h1>test</h1><h1>test</h1><h1>test</h1>
-              <h1>test</h1><h1>test</h1><h1>test</h1>
-            </div>
+            <QuotationAccessory productStates={productStates} />
           </div>
 
 

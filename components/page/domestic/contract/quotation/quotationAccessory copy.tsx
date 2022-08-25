@@ -12,23 +12,21 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseProduct, Tproduct } from "./hook/useProduct"
-import type { Tcomponent } from "meta/fakeData/fakeQuotation"
+import type { Taccessory } from "meta/fakeData/fakeQuotation"
 
 
 
-export default function QuotationComponent({ productStates }:
+export default function QuotationAccessory({ productStates }:
   { productStates: TuseProduct }) {
 
   const { productList, setProductList, activeRow } = productStates
 
 
-  const productComponent = useMemo(() => {
+  const productAccessory = useMemo(() => {
     if (activeRow < 0) return []
-    return productList[activeRow].component
+    return productList[activeRow].accessory
   }, [activeRow, productList])
 
-
-  // console.log(productComponent)
 
 
   return (
@@ -55,7 +53,7 @@ export default function QuotationComponent({ productStates }:
 
       <div>
         {/*  */}
-        {!productComponent[0] &&
+        {!productAccessory[0] &&
           <>
             <div className={styleL.rowIndex}></div>
             <span className={styleL.noListTip}>尚未選擇產品</span>
@@ -63,7 +61,7 @@ export default function QuotationComponent({ productStates }:
         {/*  */}
 
 
-        {productComponent.map((row, pIndex) => {
+        {productAccessory.map((row, pIndex) => {
           return (
             <div className={styleL.row} key={pIndex}>
               <div className={styleL.rowIndex}>
@@ -135,7 +133,7 @@ export default function QuotationComponent({ productStates }:
     { componentIndex, id, productList, setProductList, options }:
       {
         componentIndex: number
-        id: keyof Tcomponent
+        id: keyof Taccessory
         productList: Tproduct[]
         setProductList: Dispatch<SetStateAction<Tproduct[]>>
         options: Toption[]
@@ -172,41 +170,32 @@ interface TheadInfoItem {
 }
 
 interface TtheadInfo {
-  id01: TheadInfoItem// 代號
-  typeName: TheadInfoItem// 種類名稱
-  id02: TheadInfoItem // 代號
-  material: TheadInfoItem // 材料
-  surface: TheadInfoItem // 表面
-  basicWeight: TheadInfoItem // 重量基重
-  unit: TheadInfoItem // 單位
-  qty: TheadInfoItem // 數量
-  listPrice: TheadInfoItem // 牌價
-  totalListPrice: TheadInfoItem // 牌價複價
-  price: TheadInfoItem // 單價
-  totalPrice: TheadInfoItem // 複價
+  id: TheadInfoItem
+  name: TheadInfoItem
+  unit: TheadInfoItem
+  qty: TheadInfoItem
+  listPrice: TheadInfoItem //牌價
+  totalListPrice: TheadInfoItem //牌價複價
+  price: TheadInfoItem //單價
+  totalPrice: TheadInfoItem //複價
 }
 
 
 const theadIndex: (keyof TtheadInfo)[] = [
-  "id01", "typeName", "id02", "material",
-  "surface", "basicWeight", "unit", "qty",
+  "id", "name", "unit", "qty",
   "listPrice", "totalListPrice", "price", "totalPrice",
 ]
 
 
 const theadInfo: TtheadInfo = {
-  id01: { label: "代號", width: "45px" },
-  typeName: { label: "種類名稱", width: "136px" },
-  id02: { label: "代號", width: "116px" },
-  material: { label: "材料", width: "120px" },
-  surface: { label: "表面", width: "55px" },
-  basicWeight: { label: "重量基重", width: "75px" },
-  unit: { label: "單位", width: "40px" },
+  id: { label: "代號", width: "68px" },
+  name: { label: "名稱", width: "160px" },
+  unit: { label: "單位", width: "38px" },
   qty: { label: "數量", width: "60px" },
-  listPrice: { label: "牌價", width: "84px" },
+  listPrice: { label: "牌價", width: "82px" },
   totalListPrice: { label: "牌價複價", width: "84px" },
-  price: { label: "單價", width: "84px" },
-  totalPrice: { label: "複價", width: "84px" },
+  price: { label: "單價", width: "82px" },
+  totalPrice: { label: "單價複價", width: "84px" },
 }
 
 

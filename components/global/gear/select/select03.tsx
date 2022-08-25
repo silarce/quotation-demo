@@ -10,12 +10,10 @@ import iconArrow from "public/image/icon/arrow_down.svg"
 // css
 import style from "./select03.module.scss"
 
-
 type Toption = {
   value: string
   label: string
 }
-
 
 const Select03 = ({
   stateValue, options, onChange, placeholder,

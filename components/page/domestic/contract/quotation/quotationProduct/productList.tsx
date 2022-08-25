@@ -8,6 +8,7 @@ import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons 
 
 // css
 import style from "./productList.module.scss"
+import styleL from "../local.module.scss"
 
 // data type
 import { TuseProduct } from "../hook/useProduct"
@@ -23,7 +24,7 @@ export default function ProductList({ productStates }:
   // =======================================
   const lwhbReg = /L|W|H|B/
   // =======================================
-  
+
   return (
     <div className={style.container} >
       {dndBody.map((item, pIndex) => {
@@ -32,7 +33,7 @@ export default function ProductList({ productStates }:
           <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
               onFocus={() => setActiveRow(pIndex)}
-              // onBlur={() => setActiveRow(-1)} //點在其他row上面也會觸發onBlur，先註解掉以後再來想解方
+            // onBlur={() => setActiveRow(-1)} //點在其他row上面也會觸發onBlur，先註解掉以後再來想解方
             >
               <div className={style.buttonBox}>
                 <Icondelete01 onClick={() => deleteProduct(pIndex)} />
@@ -44,7 +45,7 @@ export default function ProductList({ productStates }:
                 const textCenter = lwhbReg.test(id) ? style.textCenter : ""
                 const theStyle = { width }
                 return (
-                  <div className={`${style.column} ${textCenter}`} key={`${pIndex}${cIndex}`} style={theStyle} >
+                  <div className={`${styleL.column} ${textCenter}`} key={`${pIndex}${cIndex}`} style={theStyle} >
                     {item}
                   </div>
                 )

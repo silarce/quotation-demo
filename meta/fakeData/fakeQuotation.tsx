@@ -26,15 +26,24 @@ interface Tcomponent {
   id02: string | null
   material: { value: string, options: Toption[] } | string | null
   surface: { value: string, options: Toption[] } | string | null
-  // material: string | null
-  // surface: string | null
   basicWeight: string | null
   unit: string | null
   qty: string
-  listPrice: string
-  totalListPrice: string
-  price: string
-  totalPrice: string
+  listPrice: string //牌價
+  totalListPrice: string //牌價複價
+  price: string //單價
+  totalPrice: string //複價
+}
+
+interface Taccessory {
+  id: string
+  name: string
+  unit: string
+  qty: string
+  listPrice: string //牌價
+  totalListPrice: string //牌價複價
+  price: string //單價
+  totalPrice: string //複價
 }
 
 interface Tproduct {
@@ -56,9 +65,12 @@ interface Tproduct {
   subTotal: string  // 複價
   memo: string  // 備註
   component: Tcomponent[]
+  accessory: Taccessory[]
 }
 
 
+// ========================================================
+// ========================================================
 // ========================================================
 // profile
 
@@ -80,6 +92,8 @@ const fakeProfile: Tprofile = {
 
 
 // ========================================================
+// ========================================================
+// ========================================================
 // product
 
 const materialOptions: Toption[] = [
@@ -99,7 +113,8 @@ const surfaceOptions: Toption[] = [
   { value: "DS", label: "DS" },
 ]
 
-
+// ------------------------------------
+// component
 
 const fakeComponent: Tcomponent[] = [
   {
@@ -108,8 +123,6 @@ const fakeComponent: Tcomponent[] = [
     id02: "SJ3020A0088",
     material: { value: "不鏽鋼304#", options: materialOptions },
     surface: { value: "BA", options: surfaceOptions },
-    // material: "不鏽鋼304#",
-    // surface: "BA",
     basicWeight: "22.00",
     unit: "m2",
     qty: "14.19",
@@ -217,7 +230,56 @@ const fakeComponent: Tcomponent[] = [
     totalPrice: "2084",
   },
 ]
+// ----------------------------------------------------------
+// ----------------------------------------------------------
+// accessory
+const fakeAccessory: Taccessory[] = [
+  {
+    id: "SJ0A09",
+    name: "鋁合金障礙感知器",
+    unit: "M",
+    qty: "1",
+    listPrice: "5000",
+    totalListPrice: "5000",
+    price: "5000",
+    totalPrice: "5000",
+  },
+  {
+    id: "SJ0A77",
+    name: "紅外線",
+    unit: "組",
+    qty: "1",
+    listPrice: "15000",
+    totalListPrice: "15000",
+    price: "15000",
+    totalPrice: "15000",
+  },
+  {
+    id: "SJ0A07",
+    name: "遙控器",
+    unit: "組",
+    qty: "1",
+    listPrice: "5000",
+    totalListPrice: "5000",
+    price: "5000",
+    totalPrice: "5000",
+  },
+  {
+    id: "SJ0A01",
+    name: "防颱底座鎖固",
+    unit: "組",
+    qty: "1",
+    listPrice: "5000",
+    totalListPrice: "5000",
+    price: "5000",
+    totalPrice: "5000",
+  },
+]
 
+
+
+// ----------------------------------------------------------
+// ----------------------------------------------------------
 
 
 const fakeProductList: Tproduct[] = [
@@ -239,7 +301,8 @@ const fakeProductList: Tproduct[] = [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
-    component: JSON.parse(JSON.stringify(fakeComponent))
+    component: JSON.parse(JSON.stringify(fakeComponent)),
+    accessory: JSON.parse(JSON.stringify(fakeAccessory))
   },
   {
     discount: "86.43",
@@ -259,10 +322,15 @@ const fakeProductList: Tproduct[] = [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
-    component: JSON.parse(JSON.stringify(fakeComponent))
+    component: JSON.parse(JSON.stringify(fakeComponent)),
+    accessory: JSON.parse(JSON.stringify(fakeAccessory))
   },
 ]
 // ========================================================
+// ========================================================
+// ========================================================
+
+
 
 
 
@@ -273,5 +341,6 @@ const fakeQuotationData = {
 
 
 export default fakeQuotationData
-export type { Tprofile, Tcomponent, Tproduct }
+export { fakeComponent, fakeAccessory }
+export type { Tprofile, Tcomponent, Taccessory, Tproduct }
 
