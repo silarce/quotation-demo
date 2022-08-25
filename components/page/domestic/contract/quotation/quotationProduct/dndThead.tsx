@@ -91,8 +91,8 @@ export default function DndThead({ productStates, allowMove }:
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
-      let oldIndex: number = items.indexOf(active.id as Exclude<keyof Tproduct, "component">);
-      let newIndex: number = items.indexOf(over?.id as Exclude<keyof Tproduct, "component">);
+      let oldIndex: number = items.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory">);
+      let newIndex: number = items.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory">);
       setTheadList((item) => {
         return arrayMove(item, oldIndex, newIndex)
       })
