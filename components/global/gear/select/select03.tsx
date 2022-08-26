@@ -3,6 +3,7 @@
 
 // UI套件
 import Select from 'react-select';
+import type { StylesConfig, GroupBase } from 'react-select';
 
 // icon
 import iconArrow from "public/image/icon/arrow_down.svg"
@@ -14,6 +15,9 @@ type Toption = {
   value: string
   label: string
 }
+
+
+
 
 const Select03 = ({
   stateValue, options, onChange, placeholder,
@@ -62,6 +66,7 @@ const Select03 = ({
         onChange={onChange}
         components={{ DropdownIndicator }}
         isSearchable={false}
+        styles={myStyle}
       />
       <hr />
     </div>
@@ -74,8 +79,24 @@ export default Select03
 
 
 
-
-
+const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
+  valueContainer: (provided) => {
+    const padding = 0;
+    return { ...provided, padding }
+  },
+  menuList: (provided) => {
+    const padding = `0 12px`;
+    const width = `calc(100% + 18px)`;
+    const backgroundColor = "#fff";
+    return {
+      ...provided, padding, width, backgroundColor,
+    }
+  },
+  // menuList: (provided) => {
+  //   const padding = 0;
+  //   return { ...provided, padding }
+  // },
+}
 
 
 

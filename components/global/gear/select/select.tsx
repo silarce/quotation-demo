@@ -4,6 +4,7 @@
 
 // UI套件
 import Select from 'react-select';
+import type { StylesConfig, GroupBase } from 'react-select';
 
 // icon
 import iconArrow from "public/image/icon/arrow_down_red.svg"
@@ -11,6 +12,14 @@ import iconArrow from "public/image/icon/arrow_down_red.svg"
 // css
 import style from "./select.module.scss"
 
+
+
+const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
+  valueContainer: (provided) => {
+    const padding = 0;
+    return { ...provided, padding }
+  }
+}
 
 
 type Toption = {
@@ -59,6 +68,7 @@ const Select01 = ({
         onChange={onChange}
         components={{ DropdownIndicator }}
         isSearchable={false}
+        styles={myStyle}
       />
       <hr />
     </div>
@@ -115,6 +125,7 @@ const Select02 = ({
         onChange={onChange}
         components={{ DropdownIndicator }}
         isSearchable={false}
+        styles={myStyle}
       />
       <hr />
     </div>

@@ -13,7 +13,8 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: inter, noto sans tc;
+  font-family: noto sans tc;
+  // font-family: inter, noto sans tc;
   height: 100%;
 }
 
@@ -33,7 +34,8 @@ div,
 a,
 textarea,
 input {
-  font-family: inter, noto sans tc;
+  font-family: noto sans tc;
+  // font-family: inter, noto sans tc;
   color: $colorText;
   outline: none;
 }

@@ -27,11 +27,11 @@
     box-shadow: none;
     filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
   }
-  [class$="MenuList"] {
-    padding: 0 12px;
-    width: calc(100% + 18px);
-    background-color: #fff;
-  }
+  // [class$="MenuList"] {
+  //   padding: 0 12px;
+  //   width: calc(100% + 18px);
+  //   background-color: #fff;
+  // }
 
   [class$="option"] {
     display: block;

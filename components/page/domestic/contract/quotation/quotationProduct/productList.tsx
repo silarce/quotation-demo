@@ -4,7 +4,7 @@ import { useState } from "react"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 
 // icon
-import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons copy"
+import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./productList.module.scss"

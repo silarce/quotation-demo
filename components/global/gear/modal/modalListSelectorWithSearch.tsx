@@ -11,6 +11,7 @@ import InputSearch from 'components/global/gear/input/inputSearch';
 // css
 import style from "./modalListSelectorWithSearch.module.scss"
 
+
 export default function ModalListSelectorWithSearch(
   { children, label, visible,
     onConfirm, onCancel, onSearch,
@@ -19,6 +20,7 @@ export default function ModalListSelectorWithSearch(
       children: ReactNode
       label: string
       visible: boolean
+      // onClick會寫在children裡面
       onConfirm: () => void
       onCancel: () => void
       onSearch: (value: string) => void
