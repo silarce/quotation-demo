@@ -6,13 +6,14 @@ import QuotationProfile from "components/page/domestic/contract/quotation/quotat
 import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
 import QuotationComponent from "components/page/domestic/contract/quotation/quotationComponent"
 import QuotationAccessory from "components/page/domestic/contract/quotation/quotationAccessory"
+import QuotationTotal from "components/page/domestic/contract/quotation/quotationTotal"
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
 // hook
 import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
 import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
-
+import useMemoList from "components/page/domestic/contract/quotation/hook/useMemoList"
 // css
 import style from "./[quotation].module.scss"
 
@@ -36,10 +37,10 @@ export default function Quotation() {
   }
 
   // product
-
   const productStates = useProduct(fakeQuotationData.productList)
 
-
+  // memo
+  const memoListState = useMemoList(fakeQuotationData)
 
   // =========================================================
   const tagList: TtagList = [
@@ -72,7 +73,7 @@ export default function Quotation() {
             <hr />
             <QuotationAccessory productStates={productStates} />
           </div>
-
+          <QuotationTotal memoListState={memoListState} />
 
 
 

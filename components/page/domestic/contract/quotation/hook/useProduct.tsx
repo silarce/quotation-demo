@@ -36,7 +36,7 @@ interface TtheadItem {
 }
 
 
-export default function UseProduct(productListOri?: Tproduct[]): TuseProduct {
+export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
   // dnd head的狀態，也是資料分類目錄
   const [theadList, setTheadList] = useState<TtheadItem[]>(theadListOri)
 
