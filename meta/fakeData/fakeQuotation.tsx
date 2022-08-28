@@ -12,6 +12,7 @@ interface Tquotation {
   productList: Tproduct[]
   memoList: TmemoList
   rangeList: TrangeList
+  payInfo: TpayInfo
 }
 // -------------------------
 interface Tprofile {
@@ -89,9 +90,6 @@ interface TmemoList {
   list: Tmemo[]
   options: Tmemo[]
 }
-
-
-
 // -----------------------------
 // range
 interface Trange {
@@ -101,8 +99,19 @@ interface TrangeList {
   list: Trange[]
   options: Trange[]
 }
-
 // -----------------------------
+// other
+interface TpayInfo {
+  tradingLocation: string // 交貨地點
+  tradingDate: string // 交貨日期
+  payMethod: {
+    deposit: string // 訂製同時付總金額
+    finalPayment: string // 交貨同時付總金額
+    installedPayment: string // 按裝完成付總金額
+    eleConnectPayment: string // 接電使用付總金額
+  }
+}
+
 
 
 // ========================================================
@@ -411,18 +420,30 @@ const fakeRange: TrangeList = {
   ]
 }
 // ========================================================
+// other
+const fakePayInfo = {
+  tradingLocation: "", // 交貨地點
+  tradingDate: "", // 交貨日期 //格式 yyy-mm-dd， yyy為民國年
+  payMethod: {
+    deposit: "", // 訂製同時付總金額
+    finalPayment: "", // 交貨同時付總金額
+    installedPayment: "", // 按裝完成付總金額
+    eleConnectPayment: "", // 接電使用付總金額
+  }
+}
 // ========================================================
 // ========================================================
 
 
 
 
-
+// 資料總結
 const fakeQuotationData: Tquotation = {
   profile: fakeProfile,
   productList: fakeProductList,
   memoList: fakeMemo,
-  rangeList: fakeRange
+  rangeList: fakeRange,
+  payInfo: fakePayInfo
 }
 
 
@@ -431,8 +452,9 @@ export { fakeComponent, fakeAccessory }
 export type {
   Tquotation,
   Tprofile,
-  Tcomponent, Taccessory, Tproduct,
+  Tproduct, Tcomponent, Taccessory,
   TmemoList, Tmemo,
   TrangeList, Trange,
+  TpayInfo
 }
 

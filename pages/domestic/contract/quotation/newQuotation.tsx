@@ -15,6 +15,7 @@ import useProfile from "components/page/domestic/contract/quotation/hook/useProf
 import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
 import useMemoList from "components/page/domestic/contract/quotation/hook/useMemoList"
 import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
+import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
 // css
 import style from "./[quotation].module.scss"
 
@@ -42,6 +43,8 @@ export default function Quotation() {
   const memoListState = useMemoList(fakeQuotationData)
   // range
   const rangeListState = useRangeList(fakeQuotationData)
+  // payInfo
+  const payInfoState = usePayInfo(fakeQuotationData)
 
 
   // =========================================================
