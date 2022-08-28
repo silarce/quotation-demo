@@ -13,27 +13,27 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import styleL from "./local.module.scss"
 
 // type
-import { TuseMemoList } from "../hook/useMemoList"
-import { Tmemo } from "meta/fakeData/fakeQuotation"
+import { TuseRangeList } from "../hook/useRangeList"
+import { Trange } from "meta/fakeData/fakeQuotation"
 
 
-export default function MemoList({ memoListState }:
-  { memoListState: TuseMemoList }) {
+export default function RangeList({ rangeListState }:
+  { rangeListState: TuseRangeList }) {
 
-  const { memoList, setMemoList, deleteMemo, } = memoListState
-  const { list, options } = memoList
+  const { rangeList, setRangeList, deleteRange, } = rangeListState
+  const { list, options } = rangeList
 
   // ====================================================
-  const [selMemo, setSelMemo] = useState<Tmemo[]>([])
-  const toSelMemo = (memo: Tmemo) => {
-    const theIndex = selMemo.indexOf(memo)
+  const [selRange, setSelRange] = useState<Trange[]>([])
+  const toSelRange = (range: Trange) => {
+    const theIndex = selRange.indexOf(range)
     if (theIndex === -1) {
-      selMemo.push(memo)
-      setSelMemo([...selMemo])
+      selRange.push(range)
+      setSelRange([...selRange])
     }
     if (theIndex > -1) {
-      selMemo.splice(theIndex, 1)
-      setSelMemo([...selMemo])
+      selRange.splice(theIndex, 1)
+      setSelRange([...selRange])
     }
   }
   // ====================================================
@@ -44,13 +44,13 @@ export default function MemoList({ memoListState }:
   const toShowAdd = () => setShowAdd(true)
   const onCancel = () => {
     setShowAdd(false)
-    setSelMemo([])
+    setSelRange([])
     setSearchValue("")
   }
   const onConfirm = () => {
-    if (!selMemo[0]) return ModalInfo02({ title: "請選擇備註" })
-    memoList.list = memoList.list.concat([...selMemo])
-    setMemoList({ ...memoList })
+    if (!selRange[0]) return ModalInfo02({ title: "請選擇備註" })
+    rangeList.list = rangeList.list.concat([...selRange])
+    setRangeList({ ...rangeList })
   }
   const onSearch = (value: string) => {
     setSearchValue(value)
@@ -58,12 +58,12 @@ export default function MemoList({ memoListState }:
 
   return (
     <div className={styleL.listContainer}>
-      <p>備註</p>
+      <p>報價範圍</p>
       {list.map((item, index) => {
         const { content } = item
         return (
           <div key={index}>
-            <IconRemoveCircle onClick={() => deleteMemo(index)} />
+            <IconRemoveCircle onClick={() => deleteRange(index)} />
             <span>{index + 1}</span>
             <span>{content}</span>
           </div>
@@ -81,14 +81,14 @@ export default function MemoList({ memoListState }:
         <div className={styleL.addModalBody}>
           {options.map((item, index) => {
             const { content } = item
-            const isActive = (selMemo.includes(item))
+            const isActive = (selRange.includes(item))
             if (!content.includes(searchValue)) return null
             return (
               <CellWithBar className={styleL.cellWithBar} key={index}
                 isActive={isActive}
               >
                 <div className={styleL.row}
-                  onClick={() => toSelMemo(item)}
+                  onClick={() => toSelRange(item)}
                 >
                   <span>{content}</span>
                 </div>

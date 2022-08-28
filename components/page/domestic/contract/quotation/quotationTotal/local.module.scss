@@ -1,6 +1,15 @@
 @use "styles/theme01" as *;
 
-.textRow {
+.listContainer {
+  > p {
+    font-weight: 400;
+    font-size: 18px;
+    color: $colorMain;
+    margin: 0;
+    margin-bottom: 15px;
+    margin-top: 28px;
+  }
+
   // 裡面裝了兩個span 一個svg
   > div {
     > svg {

@@ -14,6 +14,7 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHe
 import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
 import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
 import useMemoList from "components/page/domestic/contract/quotation/hook/useMemoList"
+import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
 // css
 import style from "./[quotation].module.scss"
 
@@ -35,12 +36,13 @@ export default function Quotation() {
   if (stateQuotation.quotation.quotationId === "" && typeof newQuotatinId === "string") {
     stateQuotation.setQuotation.setQuotationId(newQuotatinId)
   }
-
   // product
   const productStates = useProduct(fakeQuotationData.productList)
-
   // memo
   const memoListState = useMemoList(fakeQuotationData)
+  // range
+  const rangeListState = useRangeList(fakeQuotationData)
+
 
   // =========================================================
   const tagList: TtagList = [
@@ -73,7 +75,7 @@ export default function Quotation() {
             <hr />
             <QuotationAccessory productStates={productStates} />
           </div>
-          <QuotationTotal memoListState={memoListState} />
+          <QuotationTotal memoListState={memoListState} rangeListState={rangeListState} />
 
 
 
