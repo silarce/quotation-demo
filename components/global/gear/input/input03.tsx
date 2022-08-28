@@ -36,7 +36,7 @@ const Input03 = (
   // ========================================================
 
   const lableStyle = {
-    width: width ? width : "D",
+    width: width ? width : "",
     gridTemplateColumns: labelWidth ? `${labelWidth} auto` : "",
     gap: gap ? gap : "",
   }

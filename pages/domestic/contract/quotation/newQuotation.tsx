@@ -76,10 +76,15 @@ export default function Quotation() {
             {/* 材料配件設定 */}
             <QuotationComponent productStates={productStates} />
             <hr />
+            {/* 選配設定 */}
             <QuotationAccessory productStates={productStates} />
           </div>
-          <QuotationTotal memoListState={memoListState} rangeListState={rangeListState} />
-
+          {/* 備註/報價範圍/付款資訊 */}
+          <QuotationTotal
+            {...{
+              memoListState, rangeListState,
+              payInfoState, productStates
+            }} />
 
 
           {/* <div></div> */}
