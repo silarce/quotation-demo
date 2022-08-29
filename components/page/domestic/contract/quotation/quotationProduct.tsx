@@ -36,8 +36,10 @@ export default function QuotationProduction({ productStates }:
           {allowMove ? "確定排序" : "設定排序"}
         </button>
       </div>
-      <DndThead productStates={productStates} allowMove={allowMove} />
-      <ProductList productStates={productStates} />
+      <div className={style.listContainer}>
+        <DndThead productStates={productStates} allowMove={allowMove} />
+        <ProductList productStates={productStates} />
+      </div>
 
       <AddButton className={style.addBtn}
         label="新增產品" onClick={addProduct} />
