@@ -14,6 +14,8 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHe
 import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
 import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
 import useMemoList from "components/page/domestic/contract/quotation/hook/useMemoList"
+import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
+import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
 // css
 import style from "./[quotation].module.scss"
 
@@ -35,12 +37,15 @@ export default function Quotation() {
   if (stateQuotation.quotation.quotationId === "" && typeof newQuotatinId === "string") {
     stateQuotation.setQuotation.setQuotationId(newQuotatinId)
   }
-
   // product
   const productStates = useProduct(fakeQuotationData.productList)
-
   // memo
   const memoListState = useMemoList(fakeQuotationData)
+  // range
+  const rangeListState = useRangeList(fakeQuotationData)
+  // payInfo
+  const payInfoState = usePayInfo(fakeQuotationData)
+
 
   // =========================================================
   const tagList: TtagList = [
@@ -71,10 +76,15 @@ export default function Quotation() {
             {/* 材料配件設定 */}
             <QuotationComponent productStates={productStates} />
             <hr />
+            {/* 選配設定 */}
             <QuotationAccessory productStates={productStates} />
           </div>
-          <QuotationTotal memoListState={memoListState} />
-
+          {/* 備註/報價範圍/付款資訊 */}
+          <QuotationTotal
+            {...{
+              memoListState, rangeListState,
+              payInfoState, productStates
+            }} />
 
 
           {/* <div></div> */}

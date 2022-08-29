@@ -1,117 +1,54 @@
 import { useState } from "react"
 
-// global gear
-import ModalListSelectorWithSearch from "components/global/gear/modal/modalListSelectorWithSearch"
-import CellWithBar from "components/global/gear/cell/cellWithBar"
-import { ModalInfo02 } from "components/global/gear/modal/simpleModal/alertModals"
-// icon
-import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
+// component
+import MemoList from "./quotationTotal/memoList"
+import RangeList from "./quotationTotal/rangeList"
+import PayInfo from "./quotationTotal/payInfo"
+
 
 
 // css
 import style from "./quotationTotal.module.scss"
-
+import styleL from "./quotationTotal/local.module.scss"
 // type
 import { TuseMemoList } from "./hook/useMemoList"
-import { Tmemo } from "meta/fakeData/fakeQuotation"
+import { TuseRangeList } from "./hook/useRangeList"
+import { TusePayInfo } from "./hook/usePayInfo"
+import { TuseProduct } from "./hook/useProduct"
 
 
 
-export default function QuotationTotal({ memoListState }:
-  { memoListState: TuseMemoList }) {
 
-  const { memoList, setMemoList, deleteMemo, } = memoListState
-  const { list, options } = memoList
+export default function QuotationTotal(
+  { memoListState, rangeListState, payInfoState, productStates }:
+    {
+      memoListState: TuseMemoList
+      rangeListState: TuseRangeList
+      payInfoState: TusePayInfo
+      productStates: TuseProduct
+    }) {
 
 
-  // ====================================================
-  const [selMemo, setSelMemo] = useState<Tmemo[]>([])
-  const toSelMemo = (memo: Tmemo) => {
-    const theIndex = selMemo.indexOf(memo)
-    if (theIndex === -1) {
-      selMemo.push(memo)
-      setSelMemo([...selMemo])
-    }
-    if (theIndex > -1) {
-      selMemo.splice(theIndex, 1)
-      setSelMemo([...selMemo])
-    }
-  }
-  // ====================================================
-  // ModalListSelectorWithSearch
-  const [showAdd, setShowAdd] = useState(false)
-  const [searchValue, setSearchValue] = useState("")
 
-  const toShowAdd = () => setShowAdd(true)
-  const onCancel = () => {
-    setShowAdd(false)
-    setSelMemo([])
-    setSearchValue("")
-  }
-  const onConfirm = () => {
-    if (!selMemo[0]) return ModalInfo02({ title: "請選擇備註" })
-    memoList.list = memoList.list.concat([...selMemo])
-    setMemoList({ ...memoList })
-  }
-  const onSearch = (value: string) => {
-    setSearchValue(value)
-  }
+
   // ====================================================
   return (
     <div className={style.container}>
       {/* ========================================== */}
-      <div className={style.memo}>
-        {list.map((item, index) => {
-          const { content } = item
-          return (
-            <div key={index}>
-              <IconRemoveCircle onClick={() => deleteMemo(index)} />
-              <span>{index + 1}</span>
-              <span>{content}</span>
-            </div>
-          )
-        })}
-        <div>
-          <IconAddCircle onClick={toShowAdd} />
-        </div>
-      </div> {/* memo */}
+      <MemoList memoListState={memoListState} />
       {/* ========================================== */}
 
       <div className={style.layer01}>
-        <div className={style.range}>
-          range
+        <RangeList rangeListState={rangeListState} />
+        {/* -------------------------*/}
+        <PayInfo payInfoState={payInfoState} productStates={productStates} />
+        {/* <div className={style.total}>
         </div>
-
-        <div className={style.total}>
-        </div>
+         */}
       </div>
 
       {/* ============================================= */}
-      <ModalListSelectorWithSearch {...{
-        label: "請選擇備註",
-        visible: showAdd,
-        onCancel, onConfirm, onSearch,
-      }}>
-        <div className={style.addModalBody}>
-          {options.map((item, index) => {
-            const { content } = item
-            const isActive = (selMemo.includes(item))
-            if (!content.includes(searchValue)) return null
-            return (
-              <CellWithBar className={style.cellWithBar} key={index}
-                isActive={isActive}
-              >
-                <div className={style.row}
-                  onClick={() => toSelMemo(item)}
-                >
-                  <span>{content}</span>
-                </div>
-              </CellWithBar>
-            )
-          })}
 
-        </div>
-      </ModalListSelectorWithSearch >
     </div >
   )
 }
