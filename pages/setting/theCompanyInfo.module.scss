@@ -45,6 +45,9 @@
   width: 100%;
   padding: 9px;
   background-color: #fff8;
+  > * {
+    vertical-align: middle;
+  }
   > span {
     margin-left: 9px;
     font-weight: 500;
@@ -63,15 +66,16 @@
 }
 
 .loadPhotoButton {
+  display: inline-block;
   padding: 7px 25px;
   border: solid 1px $colorBorder01;
-  background-color:  $bgc01;
+  background-color: $bgc01;
   cursor: pointer;
   // 上傳公司Logo
   > span:nth-of-type(1) {
     font-weight: 500;
     font-size: 14px;
-    line-height: 17px;
+    // line-height: 17px;
     color: $colorMain;
   }
   > input {
