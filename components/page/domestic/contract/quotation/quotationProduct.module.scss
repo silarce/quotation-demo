@@ -8,6 +8,10 @@
   border: solid 1px $colorBorder01;
 }
 
+.listContainer {
+  width: 100%;
+  overflow: auto;
+}
 
 .addBtn {
   width: 100%;

@@ -130,8 +130,8 @@ const theadListOri: TtheadItem[] = [
   { id: "H", label: "H", width: "60px" },
   { id: "B", label: "B", width: "60px" },
   { id: "area", label: "面積", width: "60px" },
-  { id: "cai", label: "才數", width: "60px" },
-  { id: "doorType", label: "門型", width: "60px" },
+  { id: "cai", label: "才數", width: "75px" },
+  { id: "doorType", label: "門型", width: "75px" },
   {
     id: "material", label: "材料", width: "120px",
     options: materialOptions

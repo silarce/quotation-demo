@@ -93,7 +93,6 @@ export default function QuotationProfile(
         {/*  */}
         <div className={style.form02}>
           <div>
-
             <div className={style.clientName}>
               <Input02
                 {...{
@@ -105,7 +104,6 @@ export default function QuotationProfile(
               {!clientName && <button onClick={openModal}>請選擇客戶</button>}
               {clientName && <IconRemove02 onClick={clearClient} />}
             </div>
-
 
             {clientData.map((item, index) => {
               const { label, value, placeholder } = item
