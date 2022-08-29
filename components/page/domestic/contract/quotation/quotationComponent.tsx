@@ -36,94 +36,94 @@ export default function QuotationComponent({ productStates }:
       <div className={styleL.header}>
         <h2>材料/配件設定</h2>
       </div>
-      {/* thead */}
-      <div className={styleL.thead}>
-        <div className={styleL.rowIndex}>
-          <span></span>
-        </div>
-        {theadIndex.map((item, index) => {
-          const { label, width } = theadInfo[item]
-          const theStyle = { width }
-          return (
-            <div className={styleL.theadCell} key={index} style={theStyle}>
-              <span>{label}</span>
-            </div>
-          )
-        })}
-      </div>
-      {/* tbody */}
-
-      <div>
-        {/*  */}
-        {!productComponent[0] &&
-          <>
-            <div className={styleL.rowIndex}></div>
-            <span className={styleL.noListTip}>尚未選擇產品</span>
-          </>}
-        {/*  */}
-
-
-        {productComponent.map((row, pIndex) => {
-          return (
-            <div className={styleL.row} key={pIndex}>
-              <div className={styleL.rowIndex}>
-                <span>{pIndex + 1}</span>
+      <div className={styleL.scrollDiv}>
+        {/* thead */}
+        <div className={styleL.thead}>
+          <div className={styleL.rowIndex}>
+            <span></span>
+          </div>
+          {theadIndex.map((item, index) => {
+            const { label, width } = theadInfo[item]
+            const theStyle = { width }
+            return (
+              <div className={styleL.theadCell} key={index} style={theStyle}>
+                <span>{label}</span>
               </div>
+            )
+          })}
+        </div>
+        {/* tbody */}
 
-              {theadIndex.map((key, cIndex) => {
-                const { width } = theadInfo[key]
-                const theStyle = { width }
-                let item = row[key]
-                // 
-                if (item === null) return (
-                  <div className={styleL.column} key={cIndex} style={theStyle}>
-                    <div><span></span></div>
-                  </div>
-                )
-                // 
-                if (typeof item === "string") {
-                  // 如果是數值，就加千分位符號
-                  const intReg = /^[0-9]*$/
-                  const floatReg = /^[+-]?\d+(\.\d+)?$/
-                  if (intReg.test(item) || floatReg.test(item))
-                    item = item.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        <div>
+          {/*  */}
+          {!productComponent[0] &&
+            <>
+              <div className={styleL.rowIndex}></div>
+              <span className={styleL.noListTip}>尚未選擇產品</span>
+            </>}
+          {/*  */}
+          {productComponent.map((row, pIndex) => {
+            return (
+              <div className={styleL.row} key={pIndex}>
+                <div className={styleL.rowIndex}>
+                  <span>{pIndex + 1}</span>
+                </div>
 
-                  // 改變平方單位的格式
-                  const unitReg = /cm2|m2|km2|mm2 /
-                  let theTwo;
-                  if (unitReg.test(item)) {
-                    item = item.replace(/[0-9]/g, '')
-                    theTwo = 2
-                  }
-
-                  return (
+                {theadIndex.map((key, cIndex) => {
+                  const { width } = theadInfo[key]
+                  const theStyle = { width }
+                  let item = row[key]
+                  // 
+                  if (item === null) return (
                     <div className={styleL.column} key={cIndex} style={theStyle}>
-                      <div>
-                        <span>{item}</span>
-                        {theTwo && <sup>{theTwo}</sup>}
+                      <div><span></span></div>
+                    </div>
+                  )
+                  // 
+                  if (typeof item === "string") {
+                    // 如果是數值，就加千分位符號
+                    const intReg = /^[0-9]*$/
+                    const floatReg = /^[+-]?\d+(\.\d+)?$/
+                    if (intReg.test(item) || floatReg.test(item))
+                      item = item.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    // 改變平方單位的格式
+                    const unitReg = /cm2|m2|km2|mm2 /
+                    let theTwo;
+                    if (unitReg.test(item)) {
+                      item = item.replace(/[0-9]/g, '')
+                      theTwo = 2
+                    }
+
+                    return (
+                      <div className={styleL.column} key={cIndex} style={theStyle}>
+                        <div>
+                          <span>{item}</span>
+                          {theTwo && <sup>{theTwo}</sup>}
+                        </div>
                       </div>
-                    </div>
-                  )
-                }
-                // 
-                const { value, options } = item
-                if (options) {
-                  return (
-                    <div className={styleL.column} key={cIndex} style={theStyle}>
-                      {selectCellCreator({
-                        componentIndex: pIndex,
-                        id: key,
-                        productList,
-                        setProductList,
-                        options
-                      })}
-                    </div>
-                  )
-                }
-              })}
-            </div>
-          )
-        })}
+                    )
+                  }
+                  // 
+                  const { value, options } = item
+                  if (options) {
+                    return (
+                      <div className={styleL.column} key={cIndex} style={theStyle}>
+                        {selectCellCreator({
+                          componentIndex: pIndex,
+                          id: key,
+                          productList,
+                          setProductList,
+                          options
+                        })}
+                      </div>
+                    )
+                  }
+                })}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </>
   )

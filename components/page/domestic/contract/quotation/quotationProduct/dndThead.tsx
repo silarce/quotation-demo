@@ -57,7 +57,7 @@ export default function DndThead({ productStates, allowMove }:
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        modifiers={[restrictToHorizontalAxis]}
+        // modifiers={[restrictToHorizontalAxis]}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >

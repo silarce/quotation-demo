@@ -39,10 +39,9 @@ export default function QuotationProduction({ productStates }:
       <div className={style.listContainer}>
         <DndThead productStates={productStates} allowMove={allowMove} />
         <ProductList productStates={productStates} />
+        <AddButton className={style.addBtn}
+          label="新增產品" onClick={addProduct} />
       </div>
-
-      <AddButton className={style.addBtn}
-        label="新增產品" onClick={addProduct} />
     </div>
   )
 }

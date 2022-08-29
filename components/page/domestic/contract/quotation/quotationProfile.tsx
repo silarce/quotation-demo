@@ -92,18 +92,18 @@ export default function QuotationProfile(
           }} />
         {/*  */}
         <div className={style.form02}>
+          <div className={style.clientName}>
+            <Input02
+              {...{
+                label: "客戶名稱", stateValue: clientName,
+                onChange: (e) => {/**/ }, placeholder: "",
+                disabled: true, ...inputStyle,
+                className: style.clientName
+              }} />
+            {!clientName && <button onClick={openModal}>請選擇客戶</button>}
+            {clientName && <IconRemove02 onClick={clearClient} />}
+          </div>
           <div>
-            <div className={style.clientName}>
-              <Input02
-                {...{
-                  label: "客戶名稱", stateValue: clientName,
-                  onChange: (e) => {/**/ }, placeholder: "",
-                  disabled: true, ...inputStyle,
-                  className: style.clientName
-                }} />
-              {!clientName && <button onClick={openModal}>請選擇客戶</button>}
-              {clientName && <IconRemove02 onClick={clearClient} />}
-            </div>
 
             {clientData.map((item, index) => {
               const { label, value, placeholder } = item

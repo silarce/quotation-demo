@@ -2,7 +2,8 @@
 
 .container {
   display: grid;
-  grid-template-columns: 1000px 295px;
+  // grid-template-columns: 1000px 295px;
+  grid-template-columns: 789px 295px;
   gap: 33px;
   justify-content: space-between;
   padding: 0 22px 0 50px;
@@ -23,11 +24,12 @@
 .form02 {
   display: grid;
   grid-template-columns: auto 394px;
-  grid-template-columns: 550px 394px;
+  // grid-template-columns: 550px 394px;
   justify-content: space-between;
 }
 
 .clientName {
+  grid-column: span 2;
   position: relative;
   input {
     padding-left: 25px;
