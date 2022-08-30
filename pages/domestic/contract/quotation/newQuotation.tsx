@@ -7,6 +7,8 @@ import QuotationProduction from "components/page/domestic/contract/quotation/quo
 import QuotationComponent from "components/page/domestic/contract/quotation/quotationComponent"
 import QuotationAccessory from "components/page/domestic/contract/quotation/quotationAccessory"
 import QuotationTotal from "components/page/domestic/contract/quotation/quotationTotal"
+import QuotationSinature from "components/page/domestic/contract/quotation/quotationSinature"
+
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
@@ -16,6 +18,7 @@ import useProduct from "components/page/domestic/contract/quotation/hook/useProd
 import useMemoList from "components/page/domestic/contract/quotation/hook/useMemoList"
 import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
 import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
+import useSinature from "components/page/domestic/contract/quotation/hook/useSinature"
 // css
 import style from "./[quotation].module.scss"
 
@@ -45,6 +48,10 @@ export default function Quotation() {
   const rangeListState = useRangeList(fakeQuotationData)
   // payInfo
   const payInfoState = usePayInfo(fakeQuotationData)
+  // sinature
+  const sinatureState = useSinature(fakeQuotationData)
+  // ---------------------
+  
 
 
   // =========================================================
@@ -85,20 +92,10 @@ export default function Quotation() {
               memoListState, rangeListState,
               payInfoState, productStates
             }} />
-
-
-          {/* <div></div> */}
-          {/* <div>
-          <div></div>
-          <div></div>
-        </div> */}
-          {/* <div></div> */}
+          {/* 簽名 */}
+          <QuotationSinature sinatureState={sinatureState} />
         </div>
-
       </div>
-
-
-
     </div>
   )
 }

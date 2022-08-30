@@ -4,7 +4,7 @@ import { useState } from "react"
 import MemoList from "./quotationTotal/memoList"
 import RangeList from "./quotationTotal/rangeList"
 import PayInfo from "./quotationTotal/payInfo"
-
+import QuotationSinature from "./quotationSinature"
 
 
 // css
@@ -28,27 +28,14 @@ export default function QuotationTotal(
       productStates: TuseProduct
     }) {
 
-
-
-
   // ====================================================
   return (
     <div className={style.container}>
-      {/* ========================================== */}
       <MemoList memoListState={memoListState} />
-      {/* ========================================== */}
-
       <div className={style.layer01}>
         <RangeList rangeListState={rangeListState} />
-        {/* -------------------------*/}
         <PayInfo payInfoState={payInfoState} productStates={productStates} />
-        {/* <div className={style.total}>
-        </div>
-         */}
       </div>
-
-      {/* ============================================= */}
-
     </div >
   )
 }

@@ -13,6 +13,7 @@ interface Tquotation {
   memoList: TmemoList
   rangeList: TrangeList
   payInfo: TpayInfo
+  sinature: Tsinature
 }
 // -------------------------
 interface Tprofile {
@@ -100,7 +101,7 @@ interface TrangeList {
   options: Trange[]
 }
 // -----------------------------
-// other
+// payInfo
 interface TpayInfo {
   tradingLocation: string // 交貨地點
   tradingDate: string // 交貨日期
@@ -110,6 +111,13 @@ interface TpayInfo {
     installedPayment: string // 按裝完成付總金額
     eleConnectPayment: string // 接電使用付總金額
   }
+}
+// -----------------------------
+// sinature
+interface Tsinature {
+  manager: { value: string, label: string }  // 經理
+  director: { value: string, label: string } // 主管
+  attn: { value: string, label: string } // 經辦
 }
 
 
@@ -420,7 +428,7 @@ const fakeRange: TrangeList = {
   ]
 }
 // ========================================================
-// other
+// payInfo
 const fakePayInfo = {
   tradingLocation: "", // 交貨地點
   tradingDate: "", // 交貨日期 //格式 yyy-mm-dd， yyy為民國年
@@ -431,6 +439,15 @@ const fakePayInfo = {
     eleConnectPayment: "", // 接電使用付總金額
   }
 }
+// ========================================================
+// sinature
+const fakeSinature: Tsinature = {
+  manager: { value: "王小明", label: "經理" }, // 經理
+  director: { value: "李小華", label: "主管" }, // 主管
+  attn: { value: "林小善", label: "經辦" }, // 經辦
+}
+
+// ========================================================
 // ========================================================
 // ========================================================
 
@@ -443,7 +460,8 @@ const fakeQuotationData: Tquotation = {
   productList: fakeProductList,
   memoList: fakeMemo,
   rangeList: fakeRange,
-  payInfo: fakePayInfo
+  payInfo: fakePayInfo,
+  sinature: fakeSinature
 }
 
 
