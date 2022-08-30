@@ -13,8 +13,7 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
 import style from "./quotationProfile.module.scss"
 
 // fakeData/type
-import { TuseQuotation, Tquotataion } from "./hook/useProfile"
-
+import type { TuseProfile } from "./hook/useProfile"
 
 
 
@@ -26,31 +25,33 @@ const inputStyle = {
 
 // ====================================================
 export default function QuotationProfile(
-  { stateQuotation, disabled }:
+  { profileState, disabled }:
     {
-      stateQuotation: TuseQuotation
+      profileState: TuseProfile
       disabled?: boolean
     }) {
 
   // ==============================================
   // 報價單資料
-  const { quotation, setQuotation } = stateQuotation
+  const { profile } = profileState
 
   const {
     quotationId, ageing, projectName,
     trackState, schedule, projectAddress,
     clientName, contactPerson, contactPhone, fax,
     clientState
+  } = profile
 
-  } = quotation
   const {
-    setProjectName, setTrackState, setSchedule,
-    setProjectAddress, setClientName, setContactPerson,
+    onChangeProjectName, onChangeTrackState,
+    onChangeSchedule, onChangeProjectAddress,
+    setClientName, setContactPerson,
     setContactPhone, setFax,
-  } = setQuotation
+    setClientId
+  } = profileState
 
   // ----------------------------------
-  const builtDate = format(new Date(quotation.builtDate), "yyyy年MM月dd日")
+  const builtDate = format(new Date(profile.builtDate), "yyy年MM月dd日")
   // ----------------------------------
   // ==============================================
 
@@ -64,6 +65,7 @@ export default function QuotationProfile(
 
   // ==============================================
   const clearClient = () => {
+    setClientId("")
     setClientName("")
     setContactPerson("")
     setContactPhone("")
@@ -75,10 +77,6 @@ export default function QuotationProfile(
   const openModal = () => setShowModal(true)
   // ==============================================
 
-  // console.log(quotationId)
-
-
-
   return (
     <div className={style.container}>
       <div className={style.profile}>
@@ -87,7 +85,7 @@ export default function QuotationProfile(
         <Input02
           {...{
             label: "工程名稱", stateValue: projectName,
-            onChange: (e) => { setProjectName(e.target.value) },
+            onChange: onChangeProjectName,
             disabled, ...inputStyle
           }} />
         {/*  */}
@@ -122,13 +120,13 @@ export default function QuotationProfile(
             <Input02
               {...{
                 label: "追蹤狀態", stateValue: trackState,
-                onChange: (e) => { setTrackState(e.target.value) },
+                onChange: onChangeTrackState,
                 disabled, ...inputStyle
               }} />
             <Input02
               {...{
                 label: "工地進度", stateValue: schedule,
-                onChange: (e) => { setSchedule(e.target.value) },
+                onChange: onChangeSchedule,
                 disabled, ...inputStyle
               }} />
           </div>
@@ -136,7 +134,7 @@ export default function QuotationProfile(
         <Input02
           {...{
             label: "工地地點", stateValue: projectAddress,
-            onChange: (e) => { setProjectAddress(e.target.value) },
+            onChange: onChangeProjectAddress,
             disabled, ...inputStyle
           }} />
       </div>
@@ -151,8 +149,12 @@ export default function QuotationProfile(
       </div>
 
       {/* modal */}
-      <ClientSelector {...{ showModal, setShowModal, setQuotation }} />
+      <ClientSelector {...{ showModal, setShowModal, profileState }} />
 
     </div>
   )
 }
+
+
+// ===================================================
+

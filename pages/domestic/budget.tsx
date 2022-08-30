@@ -29,12 +29,12 @@ export default function Budget() {
     type: "addButton",
     label: "新增報價單",
     onClick: () => {
-      let newQuotatinId = `${fakeContractList.length + 1}`.padStart(2, "0")
-      newQuotatinId = "S-110211-" + newQuotatinId
+      let newQuotationId = `${fakeContractList.length + 1}`.padStart(2, "0")
+      newQuotationId = "S-110211-" + newQuotationId
 
       router.push({
         pathname: `/domestic/contract/quotation/newQuotation`,
-        query: { newQuotatinId }
+        query: { newQuotationId }
       })
     }
   }]

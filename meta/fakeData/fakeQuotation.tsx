@@ -17,19 +17,20 @@ interface Tquotation {
 }
 // -------------------------
 interface Tprofile {
-  quotationId: string
+  clientState: string //客戶狀態(如新客戶、舊客戶....)
+  quotationId: string // 報價單編號
+  projectName: string //工程名稱
   clientId: string
   clientName: string
   contactPerson: string
   contactPhone: string
   fax: string
-  clientState: string
+
   ageing: string //時效
   builtDate: string//報價日期
-  projectName: string
   trackState: string//追蹤狀態
   schedule: string//工地進度
-  projectAddress: string
+  projectAddress: string //工程地點
 }
 
 // -------------------------------
@@ -136,7 +137,7 @@ const fakeProfile: Tprofile = {
   fax: "04-12345656",
   clientState: "一般客戶",
   ageing: "10",
-  builtDate: "2020-02-02",
+  builtDate: "111-02-02",
   projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
   trackState: "",
   schedule: "",

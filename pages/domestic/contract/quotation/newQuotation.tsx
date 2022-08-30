@@ -26,20 +26,19 @@ import style from "./[quotation].module.scss"
 import fakeQuotationData from "meta/fakeData/fakeQuotation"
 
 
-
-
-
 export default function Quotation() {
 
   const router = useRouter()
-  const { newQuotatinId } = router.query
-
+  let { newQuotationId } = router.query
+  if (typeof newQuotationId !== "string") newQuotationId = ""
   // =========================================================
   // profile
-  const stateQuotation = useProfile(fakeQuotationData.profile)
-  if (stateQuotation.quotation.quotationId === "" && typeof newQuotatinId === "string") {
-    stateQuotation.setQuotation.setQuotationId(newQuotatinId)
-  }
+  const profileState = useProfile({
+    quotationData: fakeQuotationData,
+    newQuotationId
+  })
+
+  // -------------------
   // product
   const productStates = useProduct(fakeQuotationData.productList)
   // memo
@@ -51,12 +50,11 @@ export default function Quotation() {
   // sinature
   const sinatureState = useSinature(fakeQuotationData)
   // ---------------------
-  
 
 
   // =========================================================
   const tagList: TtagList = [
-    { label: `報價編號 ${newQuotatinId}`, onClick: () => alert(newQuotatinId) },
+    { label: `報價編號 ${newQuotationId}`, onClick: () => alert(newQuotationId) },
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
   const panelList: TpanelList = [
@@ -64,7 +62,7 @@ export default function Quotation() {
     { type: "myButton", label: "取消", onClick: () => router.back() },
   ]
   // =========================================================
-  if (!newQuotatinId) return null
+  if (newQuotationId === undefined) return null
   return (
     <div className={style.container}>
 
@@ -73,7 +71,7 @@ export default function Quotation() {
       <div className={style.mainContainer}>
         <div className={style.quotation}> {/* scroll wrapper */}
           {/* 工程名稱 */}
-          <QuotationProfile stateQuotation={stateQuotation} />
+          <QuotationProfile profileState={profileState} />
           {/*  */}
           <h5 className={style.titleHr}>合約項目</h5>
           {/* 主產品設定 */}
