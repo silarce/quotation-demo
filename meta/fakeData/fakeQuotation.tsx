@@ -337,8 +337,8 @@ const fakeProductList: Tproduct[] = [
     H: "230",
     B: "45",
     area: "14.19",
-    cai: "154.52",
-    doorType: "SJ-302",
+    cai: "15400.52", //才數
+    doorType: "SJ-30287", //門型
     material: "不鏽鋼304#",
     surface: "BA",
     horsepower: "1/3HP",
