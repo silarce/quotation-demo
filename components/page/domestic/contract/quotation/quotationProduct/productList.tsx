@@ -29,11 +29,9 @@ export default function ProductList({ productStates }:
     <div className={style.container} >
       {dndBody.map((item, pIndex) => {
         return (
-
           <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
               onFocus={() => setActiveRow(pIndex)}
-            // onBlur={() => setActiveRow(-1)} //點在其他row上面也會觸發onBlur，先註解掉以後再來想解方
             >
               <div className={style.buttonBox}>
                 <Icondelete01 onClick={() => deleteProduct(pIndex)} />
@@ -42,7 +40,7 @@ export default function ProductList({ productStates }:
               </div>
               {item.map((item, cIndex) => {
                 const { width, id } = theadList[cIndex]
-                const textCenter = lwhbReg.test(id) ? style.textCenter : ""
+                const textCenter = lwhbReg.test(id) ? styleL.textCenter : ""
                 const theStyle = { width }
                 return (
                   <div className={`${styleL.column} ${textCenter}`} key={`${pIndex}${cIndex}`} style={theStyle} >

@@ -11,6 +11,14 @@ import style from "./payInfo.module.scss"
 // type
 type TpayMethod = TusePayInfo["payInfo"]["payMethod"]
 
+interface TtotalObj {
+  discount: number | string //折數
+  subTotal: number | string //小計
+  businessTax: number | string// 營業稅
+  total: number | string // 總計
+}
+
+
 
 export default function PayInfo({ payInfoState, productStates }:
   {
@@ -31,7 +39,7 @@ export default function PayInfo({ payInfoState, productStates }:
 
   // ---------------------------------
   const totalList = useMemo(() => {
-    const totalObj = {
+    const totalObj: TtotalObj = {
       discount: "0", //折數
       subTotal: "0", //小計
       businessTax: "0",// 營業稅
@@ -52,11 +60,15 @@ export default function PayInfo({ payInfoState, productStates }:
       const { discount, subTotal } = totalObj
       totalObj.businessTax = Decimal.mul(subTotal, 0.05).toString()
       totalObj.total = Decimal.sub(subTotal, totalObj.businessTax).toString()
-      totalObj.discount =
-        Decimal.div(discount, productList.length).toFixed(3)
+      if (productList.length === 0) totalObj.discount = 0;
+      else {
+        totalObj.discount =
+          Decimal.div(discount, productList.length).toFixed(3)
+      }
     }
     // -------
     const { discount, subTotal, businessTax, total } = totalObj
+
     const totalList = [
       { label: "總折數", value: `${discount}%` },
       { label: "小計", value: subTotal },

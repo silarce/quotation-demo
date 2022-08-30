@@ -68,6 +68,7 @@ export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
   }
   const deleteProduct = (index: number) => {
     productList.splice(index, 1)
+    setActiveRow(-1)
     setProductList([...productList])
   }
   const copyProduct = (index: number) => {

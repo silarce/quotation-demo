@@ -2,13 +2,17 @@ import { ChangeEvent, useState } from "react";
 
 // type
 import type { Tquotation } from "meta/fakeData/fakeQuotation";
+// data
+import { fakeEmptySinature } from "meta/fakeData/fakeQuotation";
 
 
 
-export default function useSinature(quotationData: Tquotation) {
-  const { sinature: sinatureOri } = quotationData
+export default function useSinature(quotationData?: Tquotation) {
+  let sinatureOri;
+  if (quotationData) sinatureOri = quotationData.sinature
+  else sinatureOri = fakeEmptySinature
+
   type Tsinature = typeof sinatureOri
-
   const [sinature, setSinature] = useState(sinatureOri)
 
   const onChangeCreator = (key: keyof Tsinature) => {

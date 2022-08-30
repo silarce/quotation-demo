@@ -106,6 +106,7 @@ export default function QuotationProfile(
           </div>
 
           <div>
+            {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
             {clientData.map((item, index) => {
               const { label, value, placeholder } = item
               return (
@@ -118,7 +119,6 @@ export default function QuotationProfile(
                   }} />
               )
             })}
-
           </div>
           <div>
             <Input02

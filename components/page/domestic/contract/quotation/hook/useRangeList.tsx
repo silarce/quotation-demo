@@ -5,7 +5,8 @@ import {
 
 // type
 import type { Tquotation, TrangeList, Trange } from "meta/fakeData/fakeQuotation";
-// TrangeList, Trange,
+// data
+import { fakeEmptyRange } from "meta/fakeData/fakeQuotation";
 
 interface TuseRangeList {
   rangeList: TrangeList
@@ -16,8 +17,11 @@ interface TuseRangeList {
 
 
 export default function
-  useRangeList(quotationData: Tquotation): TuseRangeList {
-  const { rangeList: rangeListOri } = quotationData
+  useRangeList(quotationData?: Tquotation): TuseRangeList {
+  let rangeListOri;
+  if (quotationData) rangeListOri = quotationData.rangeList
+  else rangeListOri = fakeEmptyRange
+
   const [rangeList, setRangeList] = useState({ ...rangeListOri })
 
   // 沒有用到

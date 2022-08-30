@@ -2,10 +2,16 @@ import { ChangeEvent, useState } from "react";
 
 // type
 import type { Tquotation } from "meta/fakeData/fakeQuotation";
+// data
+import { fakeEmptyPayInfo } from "meta/fakeData/fakeQuotation";
 
 
-export default function usePayInfo(quotationData: Tquotation) {
-  const { payInfo: payInfoOri } = quotationData
+
+export default function usePayInfo(quotationData?: Tquotation) {
+  let payInfoOri;
+  if (quotationData) payInfoOri = quotationData.payInfo
+  else payInfoOri = fakeEmptyPayInfo
+
   type TpayInfo = typeof payInfoOri
   const [payInfo, setPayInfo] = useState<TpayInfo>(JSON.parse(JSON.stringify(payInfoOri)))
 

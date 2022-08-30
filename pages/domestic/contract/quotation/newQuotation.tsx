@@ -23,7 +23,8 @@ import useSinature from "components/page/domestic/contract/quotation/hook/useSin
 import style from "./[quotation].module.scss"
 
 // fakeData
-import fakeQuotationData from "meta/fakeData/fakeQuotation"
+import fakeQuotationData,
+{ fakeEmptyMemo, fakeEmptyRange } from "meta/fakeData/fakeQuotation"
 
 
 export default function Quotation() {
@@ -34,23 +35,25 @@ export default function Quotation() {
   // =========================================================
   // profile
   const profileState = useProfile({
-    quotationData: fakeQuotationData,
+    // quotationData: fakeQuotationData,
     newQuotationId
   })
-
   // -------------------
   // product
+  // const productStates = useProduct()
   const productStates = useProduct(fakeQuotationData.productList)
   // memo
-  const memoListState = useMemoList(fakeQuotationData)
+  const memoListState = useMemoList()
+  // const memoListState = useMemoList(fakeQuotationData)
   // range
-  const rangeListState = useRangeList(fakeQuotationData)
+  const rangeListState = useRangeList()
+  // const rangeListState = useRangeList(fakeQuotationData)
   // payInfo
-  const payInfoState = usePayInfo(fakeQuotationData)
+  const payInfoState = usePayInfo()
+  // const payInfoState = usePayInfo(fakeQuotationData)
   // sinature
-  const sinatureState = useSinature(fakeQuotationData)
-  // ---------------------
-
+  const sinatureState = useSinature()
+  // const sinatureState = useSinature(fakeQuotationData)
 
   // =========================================================
   const tagList: TtagList = [
