@@ -84,6 +84,7 @@ export default function QuotationProfile(
         {/* <span className={style.clientState}>狀態 : {"尚未選擇客戶"}</span> */}
         <Input02
           {...{
+            className: style.input02,
             label: "工程名稱", stateValue: projectName,
             onChange: onChangeProjectName,
             disabled, ...inputStyle
@@ -91,23 +92,26 @@ export default function QuotationProfile(
         {/*  */}
         <div className={style.form02}>
           <div className={style.clientName}>
-            <Input02
-              {...{
-                label: "客戶名稱", stateValue: clientName,
-                onChange: (e) => {/**/ }, placeholder: "",
-                disabled: true, ...inputStyle,
-                className: style.clientName
-              }} />
-            {!clientName && <button onClick={openModal}>請選擇客戶</button>}
-            {clientName && <IconRemove02 onClick={clearClient} />}
+            <div>
+              <Input02
+                {...{
+                  className: `${style.clientName} ${style.input02}`,
+                  label: "客戶名稱", stateValue: clientName,
+                  onChange: (e) => {/**/ }, placeholder: "",
+                  disabled: true, ...inputStyle,
+                }} />
+              {!clientName && <button onClick={openModal}>請選擇客戶</button>}
+              {clientName && <IconRemove02 onClick={clearClient} />}
+            </div>
           </div>
-          <div>
 
+          <div>
             {clientData.map((item, index) => {
               const { label, value, placeholder } = item
               return (
                 <Input02 key={index}
                   {...{
+                    className: style.input02,
                     label, stateValue: value, placeholder,
                     onChange: (e) => { },
                     disabled: true, ...inputStyle
@@ -119,12 +123,14 @@ export default function QuotationProfile(
           <div>
             <Input02
               {...{
+                className: style.input02,
                 label: "追蹤狀態", stateValue: trackState,
                 onChange: onChangeTrackState,
                 disabled, ...inputStyle
               }} />
             <Input02
               {...{
+                className: style.input02,
                 label: "工地進度", stateValue: schedule,
                 onChange: onChangeSchedule,
                 disabled, ...inputStyle
@@ -133,6 +139,7 @@ export default function QuotationProfile(
         </div> {/* form02 */}
         <Input02
           {...{
+            className: style.input02,
             label: "工地地點", stateValue: projectAddress,
             onChange: onChangeProjectAddress,
             disabled, ...inputStyle
