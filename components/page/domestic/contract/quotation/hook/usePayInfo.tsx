@@ -1,23 +1,13 @@
 import { ChangeEvent, useState } from "react";
 
-
-
-
 // type
 import type { Tquotation } from "meta/fakeData/fakeQuotation";
 
 
-
-
-
-
-
-
 export default function usePayInfo(quotationData: Tquotation) {
   const { payInfo: payInfoOri } = quotationData
-  // const [payInfo, setPayInfo] = useState(JSON.parse(JSON.stringify(payInfoOri)))
-  const [payInfo, setPayInfo] = useState(payInfoOri)
-
+  type TpayInfo = typeof payInfoOri
+  const [payInfo, setPayInfo] = useState<TpayInfo>(JSON.parse(JSON.stringify(payInfoOri)))
 
   const onChangeCreator01 = (
     key: Exclude<keyof Tquotation["payInfo"], "payMethod">
