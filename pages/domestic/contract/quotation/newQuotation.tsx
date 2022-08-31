@@ -31,7 +31,7 @@ export default function Quotation() {
 
   const router = useRouter()
   let { newQuotationId } = router.query
-  if (typeof newQuotationId !== "string") newQuotationId = ""
+  // if (typeof newQuotationId !== "string") newQuotationId = ""
   // =========================================================
   // profile
   const profileState = useProfile({
