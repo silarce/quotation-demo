@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-
+import { NextRouter } from "next/router"
 
 // components
 import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
@@ -24,36 +24,77 @@ import style from "./[quotation].module.scss"
 
 // fakeData
 import fakeQuotationData,
-{ fakeEmptyMemo, fakeEmptyRange } from "meta/fakeData/fakeQuotation"
+{ fakeEmptyMemo, fakeEmptyRange, fakeProfileList } from "meta/fakeData/fakeQuotation"
+
+type TquotationData = typeof fakeQuotationData
 
 
+// 應該會是點進來後才跟後端要資料
+// 現在先做一個假的報價單資料表import進來，然後跟去收到的報價單id檢索對應的資料
+// 報價單資料複雜由龐大，沿用fakeQuotaion然後把profile替換掉好了
+// 所以，做fakeProfileList吧,寫在fakeQuotation.tsx裡面
+
+
+
+// 如果使用者貼上動態url進來，一開始router.query會是空的
+// 要運行第二次後router.query才會有東西，所以包這一層判斷是否已經ready
 export default function Quotation() {
-
   const router = useRouter()
-  let { newQuotationId } = router.query
+  const isReady = router.isReady
+
+  if (!isReady) return null
+
+  return <TheQuotation router={router} />
+}
+
+function TheQuotation({ router }: { router: NextRouter }) {
+
+  let { quotation, newQuotationId } = router.query
+  // quotation為報價單的id，也可能是"newQuotation"字串
+  // 如果quotation為報價單id，那newQuotationId應該會是undefined
+
+
+  // 接上api前先這樣處理
+  let quotationData: TquotationData | undefined;
+  if (typeof quotation === "string" && quotation !== "newQuotation") {
+    quotationData = fakeQuotationData
+    quotationData.profile = fakeProfileList[quotation]
+    if (!quotationData.profile) quotationData = undefined
+  }
+
   if (typeof newQuotationId !== "string") newQuotationId = ""
+
+// 接著要做沒有這個報價單編號時的處理
+// 接著要做沒有這個報價單編號時的處理
+// 接著要做沒有這個報價單編號時的處理
+// 接著要做沒有這個報價單編號時的處理
+// 接著要做沒有這個報價單編號時的處理
+// 接著要做沒有這個報價單編號時的處理
+// 接著要做沒有這個報價單編號時的處理
+
+
   // =========================================================
   // profile
   const profileState = useProfile({
-    // quotationData: fakeQuotationData,
-    newQuotationId
+    quotationData,
+    newQuotationId,
   })
   // -------------------
   // product
   // const productStates = useProduct()
-  const productStates = useProduct(fakeQuotationData.productList)
+  const productStates = useProduct(quotationData?.productList)
   // memo
-  const memoListState = useMemoList()
-  // const memoListState = useMemoList(fakeQuotationData)
+  // const memoListState = useMemoList()
+  const memoListState = useMemoList(quotationData)
   // range
-  const rangeListState = useRangeList()
-  // const rangeListState = useRangeList(fakeQuotationData)
+  // const rangeListState = useRangeList()
+  const rangeListState = useRangeList(quotationData)
   // payInfo
-  const payInfoState = usePayInfo()
-  // const payInfoState = usePayInfo(fakeQuotationData)
+  // const payInfoState = usePayInfo()
+  const payInfoState = usePayInfo(quotationData)
   // sinature
-  const sinatureState = useSinature()
-  // const sinatureState = useSinature(fakeQuotationData)
+  // const sinatureState = useSinature()
+  const sinatureState = useSinature(quotationData)
 
   // =========================================================
   const tagList: TtagList = [
@@ -65,7 +106,6 @@ export default function Quotation() {
     { type: "myButton", label: "取消", onClick: () => router.back() },
   ]
   // =========================================================
-  if (newQuotationId === undefined) return null
   return (
     <div className={style.container}>
 

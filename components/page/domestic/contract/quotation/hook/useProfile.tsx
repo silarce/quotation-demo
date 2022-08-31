@@ -16,7 +16,7 @@ import type { Tquotation, Tprofile } from "meta/fakeData/fakeQuotation";
 export default function useProfile({ quotationData, newQuotationId }:
   {
     quotationData?: Tquotation
-    newQuotationId?: string | string[] | undefined
+    newQuotationId?: string
   }) {
 
   let profileOri: Tprofile;
@@ -62,7 +62,7 @@ export default function useProfile({ quotationData, newQuotationId }:
   // 來自父層useRouter的newQuotationId一開始是undefined
   // 所以要這樣處裡
   useEffect(() => {
-    if (!quotationData && typeof newQuotationId === "string")
+    if (!quotationData)
       setQuotationId(newQuotationId || "")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newQuotationId])

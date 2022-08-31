@@ -500,3 +500,236 @@ export type {
   TpayInfo
 }
 
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+
+interface TprofileList {
+  [key: string]: Tprofile
+}
+
+const fakeProfileList: TprofileList = {
+  "S-110211-01": {
+    quotationId: "S-110211-01",
+    clientId: "S0000",
+    clientName: "新加坡商犀牛頓科技股份有限公司",
+    contactPerson: "陳小明小華",
+    contactPhone: "0987654321",
+    fax: "04-12345656",
+    clientState: "重要客戶",
+    ageing: "10",
+    builtDate: "111-02-02",
+    projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-02": {
+    quotationId: "S-110211-02",
+    clientId: "S0001",
+    clientName: "尚比亞商大象皮成衣股份有限公司",
+    contactPerson: "王小華",
+    contactPhone: "0987556677",
+    fax: "04-11111111",
+    clientState: "新客戶",
+    ageing: "10",
+    builtDate: "111-04-23",
+    projectName: "台灣東西南北雜衣(股)公司~東拼西湊大拍賣企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-03": {
+    quotationId: "S-110211-03",
+    clientId: "S0003",
+    clientName: "有間有限公司",
+    contactPerson: "林有間",
+    contactPhone: "0955132978",
+    fax: "04-33333333",
+    clientState: "一般客戶",
+    ageing: "10",
+    builtDate: "111-05-14",
+    projectName: "有間客棧大飯店五百周年慶暨北海分館開幕儀式企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "新北市石門區",
+  },
+  "S-110211-04": {
+    quotationId: "S-110211-04",
+    clientId: "S0000",
+    clientName: "新加坡商犀牛頓科技股份有限公司",
+    contactPerson: "陳小明小華",
+    contactPhone: "0987654321",
+    fax: "04-12345656",
+    clientState: "重要客戶",
+    ageing: "10",
+    builtDate: "111-02-02",
+    projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-05": {
+    quotationId: "S-110211-05",
+    clientId: "S0001",
+    clientName: "尚比亞商大象皮成衣股份有限公司",
+    contactPerson: "王小華",
+    contactPhone: "0987556677",
+    fax: "04-11111111",
+    clientState: "新客戶",
+    ageing: "10",
+    builtDate: "111-04-23",
+    projectName: "台灣東西南北雜衣(股)公司~東拼西湊大拍賣企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-06": {
+    quotationId: "S-110211-06",
+    clientId: "S0003",
+    clientName: "有間有限公司",
+    contactPerson: "林有間",
+    contactPhone: "0955132978",
+    fax: "04-33333333",
+    clientState: "一般客戶",
+    ageing: "10",
+    builtDate: "111-05-14",
+    projectName: "有間客棧大飯店五百周年慶暨北海分館開幕儀式企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "新北市石門區",
+  },
+  "S-110211-07": {
+    quotationId: "S-110211-07",
+    clientId: "S0000",
+    clientName: "新加坡商犀牛頓科技股份有限公司",
+    contactPerson: "陳小明小華",
+    contactPhone: "0987654321",
+    fax: "04-12345656",
+    clientState: "重要客戶",
+    ageing: "10",
+    builtDate: "111-02-02",
+    projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-08": {
+    quotationId: "S-110211-08",
+    clientId: "S0001",
+    clientName: "尚比亞商大象皮成衣股份有限公司",
+    contactPerson: "王小華",
+    contactPhone: "0987556677",
+    fax: "04-11111111",
+    clientState: "新客戶",
+    ageing: "10",
+    builtDate: "111-04-23",
+    projectName: "台灣東西南北雜衣(股)公司~東拼西湊大拍賣企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-09": {
+    quotationId: "S-110211-09",
+    clientId: "S0003",
+    clientName: "有間有限公司",
+    contactPerson: "林有間",
+    contactPhone: "0955132978",
+    fax: "04-33333333",
+    clientState: "一般客戶",
+    ageing: "10",
+    builtDate: "111-05-14",
+    projectName: "有間客棧大飯店五百周年慶暨北海分館開幕儀式企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "新北市石門區",
+  },
+  "S-110211-10": {
+    quotationId: "S-110211-10",
+    clientId: "S0000",
+    clientName: "新加坡商犀牛頓科技股份有限公司",
+    contactPerson: "陳小明小華",
+    contactPhone: "0987654321",
+    fax: "04-12345656",
+    clientState: "重要客戶",
+    ageing: "10",
+    builtDate: "111-02-02",
+    projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-11": {
+    quotationId: "S-110211-1",
+    clientId: "S0001",
+    clientName: "尚比亞商大象皮成衣股份有限公司",
+    contactPerson: "王小華",
+    contactPhone: "0987556677",
+    fax: "04-11111111",
+    clientState: "新客戶",
+    ageing: "10",
+    builtDate: "111-04-23",
+    projectName: "台灣東西南北雜衣(股)公司~東拼西湊大拍賣企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "未定",
+  },
+  "S-110211-12": {
+    quotationId: "S-110211-12",
+    clientId: "S0003",
+    clientName: "有間有限公司",
+    contactPerson: "林有間",
+    contactPhone: "0955132978",
+    fax: "04-33333333",
+    clientState: "一般客戶",
+    ageing: "10",
+    builtDate: "111-05-14",
+    projectName: "有間客棧大飯店五百周年慶暨北海分館開幕儀式企劃",
+    trackState: "",
+    schedule: "",
+    projectAddress: "新北市石門區",
+  },
+}
+
+
+
+export { fakeProfileList }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

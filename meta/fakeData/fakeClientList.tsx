@@ -46,7 +46,7 @@ const client01: TclientProfile = {
   billAddress: "台北市大安區和平東路一段100號",
   taxtNumber: "83207153",
   taxtType: "應稅外加",
-  clientState: "新客戶",
+  clientState: "重要客戶",
   contact: [
     {
       name: "陳小明小華",
@@ -95,7 +95,7 @@ const client03: TclientProfile = {
   billAddress: "新竹縣關西鎮豐德街20號",
   taxtNumber: "22222222",
   taxtType: "應稅外加",
-  clientState: "舊客戶",
+  clientState: "一般客戶",
   contact: [
     {
       name: "林中華",
@@ -119,7 +119,7 @@ const client04: TclientProfile = {
   billAddress: "高雄市大寮區青山街二段150巷68弄20號B棟10樓之9",
   taxtNumber: "33333333",
   taxtType: "應稅",
-  clientState: "舊客戶",
+  clientState: "一般客戶",
   contact: [
     {
       name: "林有間",
