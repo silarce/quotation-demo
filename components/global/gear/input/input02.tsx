@@ -29,15 +29,13 @@ const Input02 = (
   if (id === undefined) id = nanoid()
   id = `${id}`
 
-
-
   if (placeholder === undefined) placeholder = `請輸入${label}`
   if (placeholder === false) placeholder = ""
 
   // ========================================================
 
   const lableStyle = {
-    width: width ? width : "D",
+    width: width ? width : "",
     gridTemplateColumns: labelWidth ? `${labelWidth} auto` : "",
     gap: gap ? gap : "",
   }

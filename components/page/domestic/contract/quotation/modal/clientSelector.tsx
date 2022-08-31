@@ -15,15 +15,15 @@ import style from "./clientSelector.module.scss"
 // fakeData
 import { fakeClientList, TclientProfile } from 'meta/fakeData/fakeClientList'
 // fakeData/type
-import { TsetQuotation } from "../hook/useProfile"
+import { TuseProfile } from "../hook/useProfile"
 
 
 export default function ClientSelector(
-  { showModal, setShowModal, setQuotation }:
+  { showModal, setShowModal, profileState }:
     {
       showModal: boolean
       setShowModal: Dispatch<SetStateAction<boolean>>
-      setQuotation: TsetQuotation
+      profileState: TuseProfile
     }
 ) {
 
@@ -37,20 +37,18 @@ export default function ClientSelector(
   const [selClient, setSelClient] = useState<TclientProfile>()
   // 搜尋過濾
   const [searchValue, setSearchValue] = useState("")
-
-  // ==================================================
-
   // ==================================================
   const onClick = (item: TclientProfile) => {
     setSelClient(item)
   }
   const onConfirm = () => {
     if (!selClient) return ModalInfo("請選擇公司")
-    const { setClientName, setContactPerson,
-      setContactPhone, setFax, } = setQuotation
-    const { shortName, contact, fax } = selClient
+    const { setClientId, setClientName, setContactPerson,
+      setContactPhone, setFax, } = profileState
+    const { clientId, shortName, contact, fax } = selClient
     const { name: contactPerson, phone: contactPhone } = contact[0]
 
+    setClientId(clientId)
     setClientName(shortName)
     setContactPerson(contactPerson)
     setContactPhone(contactPhone)
@@ -65,8 +63,6 @@ export default function ClientSelector(
   const onSearch = (value: string) => { setSearchValue(value) }
   // ==================================================
 
-
-
   return (
     <ModalListSelectorWithSearch {...{
       label: "請選擇公司", visible: showModal,
@@ -75,7 +71,6 @@ export default function ClientSelector(
     }} >
       <ul className={style.container}>
         {clientList.map((item, index) => {
-
           const { clientId } = item;
           const isActive = clientId === selClient?.clientId ? true : false
           const { name } = item
@@ -96,8 +91,6 @@ export default function ClientSelector(
           )
         })}
       </ul>
-
-
     </ModalListSelectorWithSearch >
   )
 }

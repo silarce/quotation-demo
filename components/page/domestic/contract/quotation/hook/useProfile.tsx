@@ -1,54 +1,94 @@
 import {
-  useState,
-  Dispatch, SetStateAction
+  useState, useEffect,
+  ChangeEvent
 } from "react";
 
 import { format } from 'date-fns'
 
+// type
+import type { Tquotation, Tprofile } from "meta/fakeData/fakeQuotation";
 
 
 
-interface Tquotataion {
-  quotationId: string
 
-  clientId: string
 
-  clientName: string
-  contactPerson: string
-  contactPhone: string
-  fax: string
+// export default function useProfile(quotationData?: Tquotation) {
+export default function useProfile({ quotationData, newQuotationId }:
+  {
+    quotationData?: Tquotation
+    newQuotationId?: string | string[] | undefined
+  }) {
 
-  clientState: string
-  ageing: string //時效
-  builtDate: string//報價日期
-  projectName: string
-  trackState: string//追蹤狀態
-  schedule: string//工地進度
-  projectAddress: string
+  let profileOri: Tprofile;
+
+  if (quotationData) profileOri = quotationData.profile
+  else profileOri = emptyProfile
+
+  // const profileOri = quotationData ? quotationData.profile : emptyProfile
+  const [profile, setProfile] = useState<Tprofile>(JSON.parse(JSON.stringify(profileOri)))
+
+  const onChangeCreator = (key: keyof Tprofile) => {
+    return (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value
+      setProfile(profile => {
+        profile[key] = value
+        return { ...profile }
+      })
+    }
+  }
+  const setCreator = (key: keyof Tprofile) => {
+    return (value: string) => {
+      setProfile(profile => {
+        profile[key] = value
+        return { ...profile }
+      })
+    }
+  }
+
+  const onChangeProjectName = onChangeCreator("projectName")
+  const onChangeTrackState = onChangeCreator("trackState")
+  const onChangeSchedule = onChangeCreator("schedule")
+  const onChangeProjectAddress = onChangeCreator("projectAddress")
+
+  const setClientState = setCreator("clientState")
+  const setQuotationId = setCreator("quotationId")
+  const setClientId = setCreator("clientId")
+  const setClientName = setCreator("clientName")
+  const setContactPerson = setCreator("contactPerson")
+  const setContactPhone = setCreator("contactPhone")
+  const setFax = setCreator("fax")
+
+
+  // 來自父層useRouter的newQuotationId一開始是undefined
+  // 所以要這樣處裡
+  useEffect(() => {
+    if (!quotationData && typeof newQuotationId === "string")
+      setQuotationId(newQuotationId || "")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newQuotationId])
+
+
+  return {
+    profile, setProfile,
+    onChangeProjectName, onChangeTrackState,
+    onChangeSchedule, onChangeProjectAddress,
+    setClientState, setQuotationId,
+    setClientId, setClientName,
+    setContactPerson, setContactPhone,
+    setFax,
+  }
 }
 
-interface TsetQuotation {
-  setQuotationId: Dispatch<SetStateAction<string>>
-  setClientId: Dispatch<SetStateAction<string>>
+type TuseProfile = ReturnType<typeof useProfile>
 
-  setClientName: Dispatch<SetStateAction<string>>
-  setContactPerson: Dispatch<SetStateAction<string>>
-  setContactPhone: Dispatch<SetStateAction<string>>
-  setFax: Dispatch<SetStateAction<string>>
-
-
-  setClientState: Dispatch<SetStateAction<string>>
-  setAgeing: Dispatch<SetStateAction<string>>
-  setBuiltDate: Dispatch<SetStateAction<string>>
-  setProjectName: Dispatch<SetStateAction<string>>
-  setTrackState: Dispatch<SetStateAction<string>>
-  setSchedule: Dispatch<SetStateAction<string>>
-  setProjectAddress: Dispatch<SetStateAction<string>>
+// ===============================================
+const buildToday = () => {
+  const today = new Date()
+  today.setFullYear(today.getFullYear() - 1911)
+  return format(today, "yyy-MM-dd")
 }
 
-
-
-const emptyQuotation: Tquotataion = {
+const emptyProfile: Tprofile = {
   quotationId: "",
   clientId: "",
   clientName: "",
@@ -57,96 +97,14 @@ const emptyQuotation: Tquotataion = {
   fax: "",
   clientState: "",
   ageing: "10",
-  builtDate: format(new Date(), "yyyy-MM-dd"),
+  builtDate: buildToday(),
   projectName: "",
   trackState: "",
   schedule: "",
   projectAddress: "",
 }
 
-
-
-
-export default function useProfile(quotationData?: Tquotataion) {
-
-
-  if (!quotationData) quotationData = emptyQuotation
-
-  const [quotationId, setQuotationId]
-    = useState(quotationData.quotationId)
-  const [clientId, setClientId]
-    = useState(quotationData.clientId)
-
-  const [clientName, setClientName]
-    = useState(quotationData.clientName)
-  const [contactPerson, setContactPerson]
-    = useState(quotationData.contactPerson)
-  const [contactPhone, setContactPhone]
-    = useState(quotationData.contactPhone)
-  const [fax, setFax]
-
-    = useState(quotationData.fax)
-  const [clientState, setClientState]
-    = useState(quotationData.clientState)
-  const [ageing, setAgeing]
-    = useState(quotationData.ageing) //時效
-  const [builtDate, setBuiltDate]
-    = useState(quotationData.builtDate) //報價日期
-  const [projectName, setProjectName]
-    = useState(quotationData.projectName)
-  const [trackState, setTrackState]
-    = useState(quotationData.trackState) //追蹤狀態
-  const [schedule, setSchedule]
-    = useState(quotationData.schedule) //工地進度
-  const [projectAddress, setProjectAddress]
-    = useState(quotationData.projectAddress) //工地進度
-
-
-  const quotation = {
-    quotationId,
-    clientId,
-    clientName,
-    contactPerson,
-    contactPhone,
-    fax,
-    clientState,
-    ageing,
-    builtDate,
-    projectName,
-    trackState,
-    schedule,
-    projectAddress,
-  }
-
-  const setQuotation = {
-    setQuotationId,
-    setClientId,
-    setClientName,
-    setContactPerson,
-    setContactPhone,
-    setFax,
-    setClientState,
-    setAgeing,
-    setBuiltDate,
-    setProjectName,
-    setTrackState,
-    setSchedule,
-    setProjectAddress,
-  }
-
-
-  return {
-    quotation,
-    setQuotation
-  }
-}
-
-type TuseQuotation = {
-  quotation: Tquotataion
-  setQuotation: TsetQuotation
-}
-
-export type { TuseQuotation, Tquotataion, TsetQuotation }
+export type { TuseProfile }
 
 
 

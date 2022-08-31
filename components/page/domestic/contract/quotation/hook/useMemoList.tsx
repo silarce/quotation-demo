@@ -5,7 +5,8 @@ import {
 
 // type
 import type { Tquotation, TmemoList, Tmemo } from "meta/fakeData/fakeQuotation";
-
+// data
+import { fakeEmptyMemo } from "meta/fakeData/fakeQuotation";
 
 interface TuseMemoList {
   memoList: TmemoList
@@ -16,8 +17,15 @@ interface TuseMemoList {
 
 
 export default function
-  useMemoList(quotationData: Tquotation): TuseMemoList {
-  const { memoList: memoListOri } = quotationData
+  useMemoList(quotationData?: Tquotation): TuseMemoList {
+  let memoListOri;
+  if (quotationData) memoListOri = quotationData.memoList
+  else memoListOri = fakeEmptyMemo;
+
+
+
+  // const { memoList: memoListOri } = quotationData
+
   const [memoList, setMemoList] = useState({ ...memoListOri })
 
   // 沒有用到

@@ -3,9 +3,28 @@
 .container {
   width: 341px;
   min-height: 496px;
-  // padding: 23px 25px 20px;
-  padding: 0px 25px;
+  padding: 20px 25px;
   border: solid 1px $colorBorder01;
+}
+
+.payBox {
+  margin-bottom: 20px;
+  > div {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    margin-top: 14px;
+    &:nth-of-type(1) {
+      margin-top: 0;
+    }
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      &:nth-of-type(1) {
+        color: $colorMain;
+      }
+    }
+  }
 }
 
 .grayHr {

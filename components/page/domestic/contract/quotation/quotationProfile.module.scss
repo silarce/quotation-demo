@@ -30,27 +30,35 @@
 
 .clientName {
   grid-column: span 2;
-  position: relative;
-  input {
-    padding-left: 25px;
-  }
-  > button {
-    position: absolute;
-    top: 50%;
-    left: 104px;
-    transform: translateY(-50%);
-    padding: 5px 17px;
-    color: $colorMain;
-    font-weight: 400;
-    font-size: 16px;
-    background-color: $bgc01;
-    border: solid 1px $colorBorder01;
-  }
-  > svg {
-    position: absolute;
-    top: 50%;
-    left: 104px;
-    transform: translateY(-50%);
+  padding-top: 17px;
+  padding-bottom: 4px;
+  > div {
+    position: relative;
+    label {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    input {
+      padding-left: 25px;
+    }
+    > button {
+      position: absolute;
+      top: 50%;
+      left: 104px;
+      transform: translateY(-50%);
+      padding: 5px 17px;
+      color: $colorMain;
+      font-weight: 400;
+      font-size: 16px;
+      background-color: $bgc01;
+      border: solid 1px $colorBorder01;
+    }
+    > svg {
+      position: absolute;
+      top: 50%;
+      left: 104px;
+      transform: translateY(-50%);
+    }
   }
 }
 
@@ -71,4 +79,8 @@
       color: $colorText;
     }
   }
+}
+
+.input02 {
+  padding-bottom: 4px;
 }
