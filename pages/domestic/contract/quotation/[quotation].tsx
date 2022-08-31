@@ -29,11 +29,10 @@ import fakeQuotationData,
 type TquotationData = typeof fakeQuotationData
 
 
-// 應該會是點進來後才跟後端要資料
-// 現在先做一個假的報價單資料表import進來，然後跟去收到的報價單id檢索對應的資料
+// 產品應該會是點進來後才跟後端要資料
+// 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料
 // 報價單資料複雜由龐大，沿用fakeQuotaion然後把profile替換掉好了
 // 所以，做fakeProfileList吧,寫在fakeQuotation.tsx裡面
-
 
 
 // 如果使用者貼上動態url進來，一開始router.query會是空的
@@ -49,12 +48,13 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
 
-  let { quotation, newQuotationId } = router.query
   // quotation為報價單的id，也可能是"newQuotation"字串
   // 如果quotation為報價單id，那newQuotationId應該會是undefined
+  let { quotation, newQuotationId } = router.query
+  if (typeof newQuotationId !== "string") newQuotationId = ""
 
 
-  // 接上api前先這樣處理
+  // 正式接上api前先這樣處理
   let quotationData: TquotationData | undefined;
   if (typeof quotation === "string" && quotation !== "newQuotation") {
     quotationData = fakeQuotationData
@@ -62,54 +62,48 @@ function TheQuotation({ router }: { router: NextRouter }) {
     if (!quotationData.profile) quotationData = undefined
   }
 
-  if (typeof newQuotationId !== "string") newQuotationId = ""
-
-// 接著要做沒有這個報價單編號時的處理
-// 接著要做沒有這個報價單編號時的處理
-// 接著要做沒有這個報價單編號時的處理
-// 接著要做沒有這個報價單編號時的處理
-// 接著要做沒有這個報價單編號時的處理
-// 接著要做沒有這個報價單編號時的處理
-// 接著要做沒有這個報價單編號時的處理
-
-
   // =========================================================
-  // profile
+  // profile //報價單基本資料
   const profileState = useProfile({
     quotationData,
     newQuotationId,
   })
   // -------------------
-  // product
-  // const productStates = useProduct()
+  // product // 產品設定
   const productStates = useProduct(quotationData?.productList)
-  // memo
-  // const memoListState = useMemoList()
+  // memo // 備註
   const memoListState = useMemoList(quotationData)
-  // range
-  // const rangeListState = useRangeList()
+  // range // 報價範圍
   const rangeListState = useRangeList(quotationData)
-  // payInfo
-  // const payInfoState = usePayInfo()
+  // payInfo // 支付資訊
   const payInfoState = usePayInfo(quotationData)
-  // sinature
-  // const sinatureState = useSinature()
+  // sinature //簽名
   const sinatureState = useSinature(quotationData)
-
   // =========================================================
   const tagList: TtagList = [
     { label: `報價編號 ${newQuotationId}`, onClick: () => alert(newQuotationId) },
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
-  const panelList: TpanelList = [
+  const panel_newQuotation: TpanelList = [
     { type: "redButton", label: "上傳", onClick: () => alert("上傳") },
     { type: "myButton", label: "取消", onClick: () => router.back() },
   ]
+  const panel_quotation: TpanelList = [
+    { type: "myButton", label: "匯出報價單", onClick: () => alert("匯出報價單") },
+    { type: "myButton", label: "送審", onClick: () => alert("送審") },
+    { type: "myButton", label: "編輯", onClick: () => alert("編輯") },
+    { type: "myButton", label: "返回", onClick: () => router.back() },
+  ]
+  // =========================================================
+
+  if (quotation !== "newQuotation" && !quotationData)
+    return <NoQuotation quotationId={quotation as string} />
   // =========================================================
   return (
     <div className={style.container}>
-
-      <PageHeader02 tagList={tagList} panelList={panelList} />
+      <PageHeader02 tagList={tagList}
+        panelList={newQuotationId ? panel_newQuotation : panel_quotation}
+      />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}> {/* scroll wrapper */}
@@ -139,6 +133,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
       </div>
     </div>
   )
+}
+
+
+// ===============================================================
+
+const NoQuotation = ({ quotationId }: { quotationId: string }) => {
+  const router = useRouter()
+  const toBack = () => {
+    router.back()
+  }
+  return (
+    <div className={style.noQuotation}>
+      <span>沒有這個報價單ID</span>
+      <span>{quotationId}</span>
+      <button onClick={toBack}>回上一頁</button>
+    </div>
+  )
+
 }
 
 
