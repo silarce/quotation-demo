@@ -17,8 +17,6 @@ type Toption = {
 }
 
 
-
-
 const Select03 = ({
   stateValue, options, onChange, placeholder,
   className, width, labelWidth }:
@@ -55,6 +53,10 @@ const Select03 = ({
 
   // eslint-disable-next-line @next/next/no-img-element
   const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
+
+
+
+
   return (
     <div className={`${style.label} ${className} selec03`}
       style={lableStyle}
@@ -67,6 +69,7 @@ const Select03 = ({
         components={{ DropdownIndicator }}
         isSearchable={false}
         styles={myStyle}
+        menuPortalTarget={document.body}
       />
       <hr />
     </div>
@@ -76,8 +79,6 @@ const Select03 = ({
 
 export type { Toption }
 export default Select03
-
-
 
 const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
   valueContainer: (provided) => {
@@ -92,11 +93,51 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
       ...provided, padding, width, backgroundColor,
     }
   },
-  // menuList: (provided) => {
-  //   const padding = 0;
-  //   return { ...provided, padding }
+  menu: (provided) => {
+    const boxShadow = "none";
+    const filter = "drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15))"
+    return {
+      ...provided,
+      boxShadow, filter
+    }
+  },
+  option: (provided) => {
+    const optionStyle = {
+      display: "block",
+      paddingLeft: "0",
+      paddingRight: "0",
+      fontWeight: "400",
+      fontSize: "16px",
+      lineHeight: "22px",
+      color: "$colorText",
+      cursor: "pointer",
+      backgroundColor: "transparent",
+      borderBottom: `solid 1px ${style.colorBorder01}`,
+      "&:hover": {
+        color: "red"
+      }
+    }
+
+    return {
+      ...provided, ...optionStyle
+    }
+  },
+
+
+
+
+  //   (provided) => {
+  //   return {
+  //     ...provided
+  //   }
   // },
+
+
 }
+
+
+
+
 
 
 

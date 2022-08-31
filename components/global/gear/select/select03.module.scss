@@ -22,37 +22,6 @@
     line-height: 22px;
     color: $colorText;
   }
-
-  [class$="menu"] {
-    box-shadow: none;
-    filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
-  }
-  // [class$="MenuList"] {
-  //   padding: 0 12px;
-  //   width: calc(100% + 18px);
-  //   background-color: #fff;
-  // }
-
-  [class$="option"] {
-    display: block;
-    padding-left: 0;
-    padding-right: 0;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 22px;
-    color: $colorText;
-    cursor: pointer;
-    background-color: transparent;
-    border-bottom: solid 1px $colorBorder01;
-    &:hover {
-      color: $colorActive01;
-      background-color: transparent;
-    }
-    &:nth-last-of-type(1) {
-      border-bottom: none;
-    }
-  }
-
   // [class$=]{
   // }
 }
