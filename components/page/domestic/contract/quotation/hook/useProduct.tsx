@@ -91,7 +91,8 @@ export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
 // =============================================================
 // 要帶進thead或body的東西
 
-
+// 關於options
+// 未來有需要時再改成 memoList的作法
 const quoteTypeOptions: Toption[] = [
   { value: "捲門", label: "捲門" },
   { value: "特大號捲門", label: "特大號捲門" },
