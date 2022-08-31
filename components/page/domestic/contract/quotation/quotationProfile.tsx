@@ -47,7 +47,7 @@ export default function QuotationProfile(
     onChangeSchedule, onChangeProjectAddress,
     setClientName, setContactPerson,
     setContactPhone, setFax,
-    setClientId
+    setClientId, setClientState
   } = profileState
 
   // ----------------------------------
@@ -70,7 +70,10 @@ export default function QuotationProfile(
     setContactPerson("")
     setContactPhone("")
     setFax("")
+    setClientState("")
   }
+  // ==============================================
+  const styleHaveState = clientState ? style.haveState : ""
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
@@ -80,8 +83,7 @@ export default function QuotationProfile(
   return (
     <div className={style.container}>
       <div className={style.profile}>
-        <span className={style.clientState}>狀態 : {clientState || "尚未選擇客戶"}</span>
-        {/* <span className={style.clientState}>狀態 : {"尚未選擇客戶"}</span> */}
+        <span className={`${style.clientState}  ${styleHaveState}`}>狀態 : {clientState || "尚未選擇客戶"}</span>
         <Input02
           {...{
             className: style.input02,
