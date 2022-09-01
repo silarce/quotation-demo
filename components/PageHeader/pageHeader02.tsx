@@ -23,6 +23,7 @@ interface Tpanel01 {
   onClick: () => void
   placeholder?: undefined
   className?: string
+  img?: string
 }
 interface Tpanel02 {
   type: "inputSearch"
@@ -30,6 +31,7 @@ interface Tpanel02 {
   onClick: (value: string) => void
   label?: undefined
   className?: string
+  img?: string
 }
 
 type TpanelList = (Tpanel01 | Tpanel02)[]
@@ -77,15 +79,17 @@ export default function PageHeader02(
       {/* buttonBox */}
       <div className={style.buttonBox}>
         {panelList.map((item, index) => {
-          const { label, type, onClick,
-            placeholder, className } = item
+          const {
+            label, type, onClick,
+            placeholder, className, img
+          } = item
 
           return (
             <Fragment key={index}>
               {
-                type === "myButton" ? <MyButton {...{ label, onClick, className }} />
-                  : type === "redButton" ? <RedButton {...{ label, onClick, className }} />
-                    : type === "addButton" ? <AddButton {...{ label, onClick, className }} />
+                type === "myButton" ? <MyButton {...{ label, onClick, className, img }} />
+                  : type === "redButton" ? <RedButton {...{ label, onClick, className, img }} />
+                    : type === "addButton" ? <AddButton {...{ label, onClick, className, img }} />
                       : type === "inputSearch" ? <InputSearch {...{ placeholder, onClick, className }} />
                         : <></>
               }

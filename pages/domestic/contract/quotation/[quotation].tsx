@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
@@ -21,13 +21,16 @@ import useMemoList from "components/page/domestic/contract/quotation/hook/useMem
 import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
 import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
 import useSinature from "components/page/domestic/contract/quotation/hook/useSinature"
+
+// icon
+import iconUpload from "public/image/icon/upload.svg"
+
 // css
 import style from "./[quotation].module.scss"
 
 // fakeData
 import fakeQuotationData,
-{ fakeEmptyMemo, fakeEmptyRange, fakeProfileList } from "meta/fakeData/fakeQuotation"
-import ru from "date-fns/esm/locale/ru/index.js"
+{ fakeProfileList } from "meta/fakeData/fakeQuotation"
 
 type TquotationData = typeof fakeQuotationData
 
@@ -66,7 +69,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
   // 是否可編輯
-  const [allowEdit, setAllowEdit] = useState(false)
+  const [allowEdit, setAllowEdit] =
+    useState(quotation === "newQuotation" ? true : false)
+
+
   // =========================================================
   // profile //報價單基本資料
   const profileState = useProfile({
@@ -96,7 +102,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: "myButton", label: "取消", onClick: () => router.back() },
   ]
   const panel_quotation: TpanelList = [
-    { type: "myButton", label: "匯出報價單", onClick: () => alert("匯出報價單") },
+    {
+      type: "myButton", label: "匯出報價單", img: iconUpload.src,
+      onClick: () => alert("匯出報價單")
+    },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
     {
       type: allowEdit ? "redButton" : "myButton",

@@ -14,7 +14,6 @@ export default function MyButton(
       img?: string
     }) {
 
-
   return (
     <button className={`${style.button} ${className || ""}`}
       onClick={onClick}
