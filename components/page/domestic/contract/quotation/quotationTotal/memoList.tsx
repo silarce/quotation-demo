@@ -17,8 +17,11 @@ import { TuseMemoList } from "../hook/useMemoList"
 import { Tmemo } from "meta/fakeData/fakeQuotation"
 
 
-export default function MemoList({ memoListState }:
-  { memoListState: TuseMemoList }) {
+export default function MemoList({ memoListState, disabled }:
+  {
+    memoListState: TuseMemoList
+    disabled: boolean
+  }) {
 
   const { memoList, setMemoList, deleteMemo, } = memoListState
   const { list, options } = memoList
@@ -63,14 +66,18 @@ export default function MemoList({ memoListState }:
         const { content } = item
         return (
           <div key={index}>
-            <IconRemoveCircle onClick={() => deleteMemo(index)} />
+            {disabled ?
+              <span></span> :
+              <IconRemoveCircle onClick={() => deleteMemo(index)} />}
             <span>{index + 1}</span>
             <span>{content}</span>
           </div>
         )
       })}
       <div>
-        <IconAddCircle onClick={toShowAdd} />
+        {disabled ?
+          <span></span> :
+          <IconAddCircle onClick={toShowAdd} />}
       </div>
       {/*  */}
       <ModalListSelectorWithSearch {...{

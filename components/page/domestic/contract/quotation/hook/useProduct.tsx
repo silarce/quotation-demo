@@ -36,7 +36,12 @@ interface TtheadItem {
 }
 
 
-export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
+export default function useProduct(
+  productListOri?: Tproduct[],
+  disabled: boolean = false
+): TuseProduct {
+
+
   // dnd head的狀態，也是資料分類目錄
   const [theadList, setTheadList] = useState<TtheadItem[]>(theadListOri)
 
@@ -54,12 +59,16 @@ export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
         const { id, options } = column
         return (
           options
-            ? selectCellCreator({ pIndex, id, productList, setProductList, options })
-            : inputCellCreator({ pIndex, id, productList, setProductList })
+            ? selectCellCreator({
+              pIndex, id, productList, setProductList, options, disabled
+            })
+            : inputCellCreator({
+              pIndex, id, productList, setProductList, disabled
+            })
         )
       })
     })
-  }, [productList, theadList])
+  }, [productList, theadList, disabled])
 
   const addProduct = () => {
     productList.push(JSON.parse(JSON.stringify(emptyProduct)))
@@ -182,14 +191,16 @@ const emptyProduct: Tproduct = {
 // ================================
 
 // pIndex為上層的index
-const inputCellCreator = ({ pIndex, id, productList, setProductList }:
-  {
-    pIndex: number
-    id: Exclude<(keyof Tproduct), "component" | "accessory">
-    // id: keyof Tproduct
-    productList: Tproduct[]
-    setProductList: Dispatch<SetStateAction<Tproduct[]>>
-  }) => {
+const inputCellCreator = (
+  { pIndex, id, productList, setProductList, disabled }:
+    {
+      pIndex: number
+      id: Exclude<(keyof Tproduct), "component" | "accessory">
+      // id: keyof Tproduct
+      productList: Tproduct[]
+      setProductList: Dispatch<SetStateAction<Tproduct[]>>
+      disabled: boolean
+    }) => {
 
   const stateValue = productList[pIndex][id]
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -201,7 +212,7 @@ const inputCellCreator = ({ pIndex, id, productList, setProductList }:
 
   return (
     <Input03 key={`${pIndex}${id}`}
-      {...{ stateValue, onChange }} />
+      {...{ stateValue, onChange, disabled }} />
   )
 } //  inputCellCreator
 
@@ -209,13 +220,14 @@ const inputCellCreator = ({ pIndex, id, productList, setProductList }:
 // =============
 // pIndex為上層的index
 const selectCellCreator = (
-  { pIndex, id, productList, setProductList, options }:
+  { pIndex, id, productList, setProductList, options, disabled }:
     {
       pIndex: number
       id: Exclude<(keyof Tproduct), "component" | "accessory">
       productList: Tproduct[]
       setProductList: Dispatch<SetStateAction<Tproduct[]>>
       options: Toption[]
+      disabled: boolean
     }) => {
 
   const stateValue = productList[pIndex][id]
@@ -228,7 +240,7 @@ const selectCellCreator = (
     })
   }
   return <Select03 {...{
-    stateValue, options, onChange,
+    stateValue, options, onChange, disabled
   }} />
 } //  selectCellCreator
 

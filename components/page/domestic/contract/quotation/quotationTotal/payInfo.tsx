@@ -20,10 +20,11 @@ interface TtotalObj {
 
 
 
-export default function PayInfo({ payInfoState, productStates }:
+export default function PayInfo({ payInfoState, productStates, disabled }:
   {
     payInfoState: TusePayInfo
     productStates: TuseProduct
+    disabled: boolean
   }) {
   const {
     payInfo, setPayInfo,
@@ -107,6 +108,7 @@ export default function PayInfo({ payInfoState, productStates }:
             placeholder: "請輸入交貨地址",
             stateValue: tradingLocation,
             onChange: onChangeTradingLocation,
+            disabled
           }} />
         </div>
         <div className={style.inputBox01}>
@@ -115,6 +117,7 @@ export default function PayInfo({ payInfoState, productStates }:
             placeholder: `例 : 100-01-01`,
             stateValue: tradingDate,
             onChange: onChangeTradingDate,
+            disabled
           }} />
         </div>
 
@@ -131,6 +134,7 @@ export default function PayInfo({ payInfoState, productStates }:
                   stateValue: payMethod[key],
                   onChange: onChange,
                   placeholder: "請輸入%數",
+                  disabled
                 }} />
                 <span>%</span>
               </div>

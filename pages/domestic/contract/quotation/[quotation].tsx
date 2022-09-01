@@ -1,3 +1,5 @@
+
+import { useState } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
@@ -25,6 +27,7 @@ import style from "./[quotation].module.scss"
 // fakeData
 import fakeQuotationData,
 { fakeEmptyMemo, fakeEmptyRange, fakeProfileList } from "meta/fakeData/fakeQuotation"
+import ru from "date-fns/esm/locale/ru/index.js"
 
 type TquotationData = typeof fakeQuotationData
 
@@ -53,7 +56,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let { quotation, newQuotationId } = router.query
   if (typeof newQuotationId !== "string") newQuotationId = ""
 
-
   // 正式接上api前先這樣處理
   let quotationData: TquotationData | undefined;
   if (typeof quotation === "string" && quotation !== "newQuotation") {
@@ -63,14 +65,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // =========================================================
+  // 是否可編輯
+  const [allowEdit, setAllowEdit] = useState(false)
+  // =========================================================
   // profile //報價單基本資料
   const profileState = useProfile({
     quotationData,
     newQuotationId,
   })
-  // -------------------
   // product // 產品設定
-  const productStates = useProduct(quotationData?.productList)
+  const productStates = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const memoListState = useMemoList(quotationData)
   // range // 報價範圍
@@ -81,7 +85,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const sinatureState = useSinature(quotationData)
   // =========================================================
   const tagList: TtagList = [
-    { label: `報價編號 ${newQuotationId}`, onClick: () => alert(newQuotationId) },
+    {
+      label: `報價編號 ${newQuotationId || quotation}`,
+      onClick: () => alert(newQuotationId || quotation)
+    },
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
   const panel_newQuotation: TpanelList = [
@@ -91,11 +98,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const panel_quotation: TpanelList = [
     { type: "myButton", label: "匯出報價單", onClick: () => alert("匯出報價單") },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
-    { type: "myButton", label: "編輯", onClick: () => alert("編輯") },
+    {
+      type: allowEdit ? "redButton" : "myButton",
+      label: allowEdit ? "結束編輯" : `編輯`,
+      onClick: () => setAllowEdit(state => !state),
+      className: style.editButton
+    },
     { type: "myButton", label: "返回", onClick: () => router.back() },
   ]
   // =========================================================
-
+  // =========================================================
+  // =========================================================
+  // =========================================================
+  // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
   if (quotation !== "newQuotation" && !quotationData)
     return <NoQuotation quotationId={quotation as string} />
   // =========================================================
@@ -108,7 +123,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}> {/* scroll wrapper */}
           {/* 工程名稱 */}
-          <QuotationProfile profileState={profileState} />
+          <QuotationProfile profileState={profileState} disabled={!allowEdit} />
           {/*  */}
           <h5 className={style.titleHr}>合約項目</h5>
           {/* 主產品設定 */}
@@ -116,7 +131,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <QuotationComponent productStates={productStates} />
+            <QuotationComponent productStates={productStates} disabled={!allowEdit} />
             <hr />
             {/* 選配設定 */}
             <QuotationAccessory productStates={productStates} />
@@ -125,10 +140,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationTotal
             {...{
               memoListState, rangeListState,
-              payInfoState, productStates
+              payInfoState, productStates,
+              disabled: !allowEdit
             }} />
           {/* 簽名 */}
-          <QuotationSinature sinatureState={sinatureState} />
+          <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
         </div>
       </div>
     </div>

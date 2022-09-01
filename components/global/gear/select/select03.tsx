@@ -19,7 +19,7 @@ type Toption = {
 
 const Select03 = ({
   stateValue, options, onChange, placeholder,
-  className, width, labelWidth }:
+  className, width, labelWidth, disabled }:
   {
     stateValue: Toption | string | null
     options: Toption[]
@@ -28,6 +28,7 @@ const Select03 = ({
     className?: string
     width?: string
     labelWidth?: string
+    disabled?: boolean
   }) => {
 
   let option = typeof stateValue === "string"
@@ -50,12 +51,12 @@ const Select03 = ({
     gridTemplateColumns: labelWidth ? `${labelWidth} auto` : ""
   }
   // ========================================================
-
   // eslint-disable-next-line @next/next/no-img-element
-  const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
-
-
-
+  const DropdownIndicator = () => {
+    if (disabled) return <></>
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={iconArrow.src} alt="下拉箭頭" />
+  }
 
   return (
     <div className={`${style.label} ${className} selec03`}
@@ -70,8 +71,9 @@ const Select03 = ({
         isSearchable={false}
         styles={myStyle}
         menuPortalTarget={document.body}
+        isDisabled={disabled}
       />
-      <hr />
+      {!disabled && <hr />}
     </div>
   )
 }
@@ -117,22 +119,15 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
         color: "red"
       }
     }
-
     return {
       ...provided, ...optionStyle
     }
   },
-
-
-
-
-  //   (provided) => {
+  //   (provided,state) => {
   //   return {
   //     ...provided
   //   }
   // },
-
-
 }
 
 

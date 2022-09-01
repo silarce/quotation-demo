@@ -9,7 +9,7 @@ import style from "./input03.module.scss"
 const Input03 = (
   { stateValue, placeholder, onChange,
     id, className, width, labelWidth, gap,
-    disabled
+    disabled, alwaysBaseline
   }:
     {
       stateValue: string | number,
@@ -21,6 +21,7 @@ const Input03 = (
       labelWidth?: string
       gap?: string
       disabled?: boolean | undefined
+      alwaysBaseline?: boolean
     }) => {
   // ========================================================
   className = className ? className : ""
@@ -42,6 +43,7 @@ const Input03 = (
   }
 
   const styleDisabled = disabled ? style.disabled : ""
+  const styleAlwaysBaseline = alwaysBaseline ? style.alwaysBaseline : ""
 
   // ========================================================
 
@@ -55,7 +57,7 @@ const Input03 = (
         onChange={onChange}
         disabled={disabled}
       />
-      <hr />
+      <hr className={`${styleAlwaysBaseline}`} />
     </label>
   )
 }

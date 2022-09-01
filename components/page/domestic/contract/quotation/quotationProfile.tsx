@@ -14,6 +14,7 @@ import style from "./quotationProfile.module.scss"
 
 // fakeData/type
 import type { TuseProfile } from "./hook/useProfile"
+import id from 'date-fns/esm/locale/id/index.js'
 
 
 
@@ -25,10 +26,10 @@ const inputStyle = {
 
 // ====================================================
 export default function QuotationProfile(
-  { profileState, disabled }:
+  { profileState, disabled = false }:
     {
       profileState: TuseProfile
-      disabled?: boolean
+      disabled: boolean
     }) {
 
   // ==============================================
@@ -65,6 +66,7 @@ export default function QuotationProfile(
 
   // ==============================================
   const clearClient = () => {
+    if (disabled) return
     setClientId("")
     setClientName("")
     setContactPerson("")
@@ -77,7 +79,7 @@ export default function QuotationProfile(
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
-  const openModal = () => setShowModal(true)
+  const openModal = () => disabled ? "" : setShowModal(true)
   // ==============================================
 
   return (

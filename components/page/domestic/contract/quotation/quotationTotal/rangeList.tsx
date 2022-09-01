@@ -17,8 +17,11 @@ import { TuseRangeList } from "../hook/useRangeList"
 import { Trange } from "meta/fakeData/fakeQuotation"
 
 
-export default function RangeList({ rangeListState }:
-  { rangeListState: TuseRangeList }) {
+export default function RangeList({ rangeListState, disabled }:
+  {
+    rangeListState: TuseRangeList
+    disabled: boolean
+  }) {
 
   const { rangeList, setRangeList, deleteRange, } = rangeListState
   const { list, options } = rangeList
@@ -63,14 +66,18 @@ export default function RangeList({ rangeListState }:
         const { content } = item
         return (
           <div key={index}>
-            <IconRemoveCircle onClick={() => deleteRange(index)} />
+            {disabled ?
+              <span></span> :
+              <IconRemoveCircle onClick={() => deleteRange(index)} />}
             <span>{index + 1}</span>
             <span>{content}</span>
           </div>
         )
       })}
       <div>
-        <IconAddCircle onClick={toShowAdd} />
+        {disabled ?
+          <span></span> :
+          <IconAddCircle onClick={toShowAdd} />}
       </div>
       {/*  */}
       <ModalListSelectorWithSearch {...{

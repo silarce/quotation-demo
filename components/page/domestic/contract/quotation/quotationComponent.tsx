@@ -16,8 +16,12 @@ import type { Tcomponent } from "meta/fakeData/fakeQuotation"
 
 
 
-export default function QuotationComponent({ productStates }:
-  { productStates: TuseProduct }) {
+export default function QuotationComponent(
+  { productStates, disabled = false }:
+    {
+      productStates: TuseProduct,
+      disabled: boolean
+    }) {
 
   const { productList, setProductList, activeRow } = productStates
 
@@ -114,7 +118,8 @@ export default function QuotationComponent({ productStates }:
                           id: key,
                           productList,
                           setProductList,
-                          options
+                          options,
+                          disabled
                         })}
                       </div>
                     )
@@ -132,13 +137,14 @@ export default function QuotationComponent({ productStates }:
   // =============
   // pIndex為上層的index
   function selectCellCreator(
-    { componentIndex, id, productList, setProductList, options }:
+    { componentIndex, id, productList, setProductList, options, disabled }:
       {
         componentIndex: number
         id: keyof Tcomponent
         productList: Tproduct[]
         setProductList: Dispatch<SetStateAction<Tproduct[]>>
         options: Toption[]
+        disabled: boolean
       }) {
 
     const component = productList[activeRow].component[componentIndex][id] as { value: string, options: Toption[] }
@@ -156,7 +162,7 @@ export default function QuotationComponent({ productStates }:
 
     if (stateValue === undefined) return (<span />)
     return <Select03 {...{
-      stateValue, options, onChange,
+      stateValue, options, onChange, disabled
     }} />
   } //  selectCellCreator
 
