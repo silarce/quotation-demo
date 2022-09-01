@@ -14,7 +14,8 @@
   > div {
     display: grid;
     grid-template-columns: 16px fit-content(100%) auto;
-    height: 24px;
+    height: 25px;
+    // height: 24px;
     margin-bottom: 8px;
     &:nth-last-of-type(1) {
       margin-bottom: 0;
@@ -32,12 +33,19 @@
       font-weight: 400;
       font-size: 16px;
       margin-left: 0;
-      &:nth-last-of-type(2) {
+      &:nth-last-of-type(1) {
         // 這是裝了數字的元素
         width: 20px;
         margin-left: 7px;
         margin-right: 6px;
         text-align: center;
+      }
+    }
+    > label {
+      padding: 0;
+      > input {
+        font-weight: 400;
+        font-size: 16px;
       }
     }
   }

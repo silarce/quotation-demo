@@ -39,7 +39,7 @@ export default function QuotationSinature({ sinatureState, disabled = false }:
               stateValue: value,
               onChange: onChange,
               disabled,
-              alwaysBaseline: true
+              showBaseline: "always"
             }} />
           </div>
         )

@@ -3,7 +3,7 @@ import { useState } from "react"
 // global gear
 import ModalListSelectorWithSearch from "components/global/gear/modal/modalListSelectorWithSearch"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-import { ModalInfo02 } from "components/global/gear/modal/simpleModal/alertModals"
+import Input03 from "components/global/gear/input/input03"
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
@@ -23,7 +23,8 @@ export default function RangeList({ rangeListState, disabled }:
     disabled: boolean
   }) {
 
-  const { rangeList, setRangeList, deleteRange, } = rangeListState
+  const { rangeList, setRangeList,
+    addRanges, onChangeRangeCreator, deleteRange, } = rangeListState
   const { list, options } = rangeList
 
   // ====================================================
@@ -50,11 +51,7 @@ export default function RangeList({ rangeListState, disabled }:
     setSelRange([])
     setSearchValue("")
   }
-  const onConfirm = () => {
-    if (!selRange[0]) return ModalInfo02({ title: "請選擇備註" })
-    rangeList.list = rangeList.list.concat([...selRange])
-    setRangeList({ ...rangeList })
-  }
+  const onConfirm = () => addRanges(selRange)
   const onSearch = (value: string) => {
     setSearchValue(value)
   }
@@ -64,13 +61,20 @@ export default function RangeList({ rangeListState, disabled }:
       <p>報價範圍</p>
       {list.map((item, index) => {
         const { content } = item
+        const onChange = onChangeRangeCreator(index)
         return (
           <div key={index}>
             {disabled ?
               <span></span> :
               <IconRemoveCircle onClick={() => deleteRange(index)} />}
             <span>{index + 1}</span>
-            <span>{content}</span>
+            <Input03 {...{
+              stateValue: content,
+              onChange,
+              placeholder: "請輸入備註",
+              showBaseline: "never",
+              disabled
+            }} />
           </div>
         )
       })}

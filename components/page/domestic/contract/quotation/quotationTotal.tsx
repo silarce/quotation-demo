@@ -7,7 +7,6 @@ import PayInfo from "./quotationTotal/payInfo"
 
 // css
 import style from "./quotationTotal.module.scss"
-import styleL from "./quotationTotal/local.module.scss"
 // type
 import { TuseMemoList } from "./hook/useMemoList"
 import { TuseRangeList } from "./hook/useRangeList"

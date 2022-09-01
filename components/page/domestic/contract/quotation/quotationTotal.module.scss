@@ -7,7 +7,7 @@
 
 .layer01 {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr auto;
   justify-content: space-between;
+  gap: 50px;
 }
-
