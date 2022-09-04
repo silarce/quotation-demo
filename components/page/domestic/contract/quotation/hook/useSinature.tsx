@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from "react";
 
 // type
-import type { Tquotation } from "meta/fakeData/fakeQuotation";
+import type { Tquotation } from "meta/fakeData/fakeQuotation/fakeQuotation";
 // data
-import { fakeEmptySinature } from "meta/fakeData/fakeQuotation";
+import { fakeEmptySinature } from "meta/fakeData/fakeQuotation/fakeQuotation";
 
 
 

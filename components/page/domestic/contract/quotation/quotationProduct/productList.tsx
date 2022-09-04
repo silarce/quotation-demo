@@ -34,7 +34,7 @@ export default function ProductList({ productStates }:
               onClick={() => setActiveRow(pIndex)}
             >
               <div className={style.buttonBox}>
-                <Icondelete01 onClick={() => deleteProduct(pIndex)} />
+                <Icondelete01 onClick={(e) => deleteProduct(e, pIndex)} />
                 <IconCopy onClick={() => copyProduct(pIndex)} />
                 <span>1</span>
               </div>

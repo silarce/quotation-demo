@@ -7,9 +7,9 @@ import {
 import { ModalInfo02 } from "components/global/gear/modal/simpleModal/alertModals"
 
 // type
-import type { Tquotation, TmemoList, Tmemo } from "meta/fakeData/fakeQuotation";
+import type { Tquotation, TmemoList, Tmemo } from "meta/fakeData/fakeQuotation/fakeQuotation";
 // data
-import { fakeEmptyMemo } from "meta/fakeData/fakeQuotation";
+import { fakeEmptyMemo } from "meta/fakeData/fakeQuotation/fakeQuotation";
 
 
 export default function

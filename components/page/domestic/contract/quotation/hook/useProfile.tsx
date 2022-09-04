@@ -6,7 +6,7 @@ import {
 import { format } from 'date-fns'
 
 // type
-import type { Tquotation, Tprofile } from "meta/fakeData/fakeQuotation";
+import type { Tquotation, Tprofile } from "meta/fakeData/fakeQuotation/fakeQuotation";
 
 
 

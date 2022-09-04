@@ -34,7 +34,7 @@ interface Tpanel02 {
   img?: string
 }
 
-type TpanelList = (Tpanel01 | Tpanel02)[]
+type TpanelList = (Tpanel01 | Tpanel02 | null)[]
 type TtagList = Ttag[]
 
 
@@ -79,6 +79,7 @@ export default function PageHeader02(
       {/* buttonBox */}
       <div className={style.buttonBox}>
         {panelList.map((item, index) => {
+          if (!item) return null
           const {
             label, type, onClick,
             placeholder, className, img

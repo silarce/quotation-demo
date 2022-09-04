@@ -14,7 +14,7 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseRangeList } from "../hook/useRangeList"
-import { Trange } from "meta/fakeData/fakeQuotation"
+import { Trange } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
 
 export default function RangeList({ rangeListState, disabled }:

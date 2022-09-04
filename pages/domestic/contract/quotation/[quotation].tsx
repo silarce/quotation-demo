@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
@@ -10,6 +10,7 @@ import QuotationComponent from "components/page/domestic/contract/quotation/quot
 import QuotationAccessory from "components/page/domestic/contract/quotation/quotationAccessory"
 import QuotationTotal from "components/page/domestic/contract/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/contract/quotation/quotationSinature"
+import QuotationProdChangingRecord from "components/page/domestic/contract/quotation/quotationProdChangingRecord"
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
@@ -30,7 +31,8 @@ import style from "./[quotation].module.scss"
 
 // fakeData
 import fakeQuotationData,
-{ fakeProfileList } from "meta/fakeData/fakeQuotation"
+{ fakeProfileList } from "meta/fakeData/fakeQuotation/fakeQuotation"
+import { fakeProdChangingRecordList } from "meta/fakeData/fakeQuotation/fakeChangeProductRecord"
 
 type TquotationData = typeof fakeQuotationData
 
@@ -39,6 +41,7 @@ type TquotationData = typeof fakeQuotationData
 // 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料
 // 報價單資料複雜由龐大，沿用fakeQuotaion然後把profile替換掉好了
 // 所以，做fakeProfileList吧,寫在fakeQuotation.tsx裡面
+
 
 
 // 如果使用者貼上動態url進來，一開始router.query會是空的
@@ -52,12 +55,24 @@ export default function Quotation() {
   return <TheQuotation router={router} />
 }
 
+// =====================================
+// =====================================
+// =====================================
 function TheQuotation({ router }: { router: NextRouter }) {
-
+  // query
   // quotation為報價單的id，也可能是"newQuotation"字串
   // 如果quotation為報價單id，那newQuotationId應該會是undefined
-  let { quotation, newQuotationId } = router.query
+  let {
+    quotation, //報價單id //若為新增報價單則為newQuotation
+    newQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
+    isContract: isContractOri// 是否為從合約點進來的
+  } = router.query
+
   if (typeof newQuotationId !== "string") newQuotationId = ""
+  // 是否為從合約報表點進來的
+  const isContract = isContractOri === "true" ? true : false
+
+  // ======================================================
 
   // 正式接上api前先這樣處理
   let quotationData: TquotationData | undefined;
@@ -72,6 +87,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [allowEdit, setAllowEdit] =
     useState(quotation === "newQuotation" ? true : false)
 
+  // 合約項目 追加/追減項目的開關
+  const [switch01, setSwitch01] = useState(false)
 
   // =========================================================
   // profile //報價單基本資料
@@ -90,6 +107,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // sinature //簽名
   const sinatureState = useSinature(quotationData)
   // =========================================================
+  // 追加追減項目
+  const prodChangingRecord = useMemo(() => {
+    if (typeof quotation === "string")
+      return fakeProdChangingRecordList[quotation]
+  }, [quotation])
+  // =========================================================
   const tagList: TtagList = [
     {
       label: `報價編號 ${newQuotationId || quotation}`,
@@ -102,6 +125,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: "myButton", label: "取消", onClick: () => router.back() },
   ]
   const panel_quotation: TpanelList = [
+    (isContract && {
+      type: "myButton",
+      label: "追加追減報價單",
+      onClick: () => alert("追加追減報價單")
+    }) || null,
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
       onClick: () => alert("匯出報價單")
@@ -128,23 +156,49 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <PageHeader02 tagList={tagList}
         panelList={newQuotationId ? panel_newQuotation : panel_quotation}
       />
-
+      {/*  */}
       <div className={style.mainContainer}>
         <div className={style.quotation}> {/* scroll wrapper */}
           {/* 工程名稱 */}
           <QuotationProfile profileState={profileState} disabled={!allowEdit} />
           {/*  */}
-          <h5 className={style.titleHr}>合約項目</h5>
-          {/* 主產品設定 */}
-          <QuotationProduction productStates={productStates} />
 
-          <div className={style.redWrapper}>
-            {/* 材料配件設定 */}
-            <QuotationComponent productStates={productStates} disabled={!allowEdit} />
-            <hr />
-            {/* 選配設定 */}
-            <QuotationAccessory productStates={productStates} />
+          <div className={style.switchBar}>
+            <div className={(switch01 && style.active) || "" as string}
+              onClick={() => setSwitch01(true)}>
+              合約項目
+            </div>
+            {isContract &&
+              <div className={(!switch01 && style.active) || "" as string}
+                onClick={() => setSwitch01(false)}>
+                追加 / 追減項目
+              </div>}
           </div>
+
+
+
+          {/*  */}
+          {switch01
+            ?
+            <>
+              {/* 主產品設定 */}
+              <QuotationProduction productStates={productStates} />
+              <div className={style.redWrapper}>
+                {/* 材料配件設定 */}
+                <QuotationComponent productStates={productStates} disabled={!allowEdit} />
+                <hr />
+                {/* 選配設定 */}
+                <QuotationAccessory productStates={productStates} />
+              </div>
+            </>
+            :
+            <>
+              <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
+            </>
+          }
+
+
+
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
             {...{

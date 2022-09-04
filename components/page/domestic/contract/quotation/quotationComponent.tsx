@@ -12,7 +12,7 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseProduct, Tproduct } from "./hook/useProduct"
-import type { Tcomponent } from "meta/fakeData/fakeQuotation"
+import type { Tcomponent } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
 
 
@@ -28,11 +28,11 @@ export default function QuotationComponent(
 
   const productComponent = useMemo(() => {
     if (activeRow < 0) return []
+
+    console.log(activeRow)
     return productList[activeRow].component
   }, [activeRow, productList])
 
-
-  // console.log(productComponent)
 
 
   return (

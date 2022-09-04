@@ -14,7 +14,7 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseMemoList } from "../hook/useMemoList"
-import { Tmemo } from "meta/fakeData/fakeQuotation"
+import { Tmemo } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
 
 export default function MemoList({ memoListState, disabled }:

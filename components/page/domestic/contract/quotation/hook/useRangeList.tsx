@@ -8,9 +8,9 @@ import { ModalInfo02 } from "components/global/gear/modal/simpleModal/alertModal
 
 
 // type
-import type { Tquotation, TrangeList, Trange } from "meta/fakeData/fakeQuotation";
+import type { Tquotation, TrangeList, Trange } from "meta/fakeData/fakeQuotation/fakeQuotation";
 // data
-import { fakeEmptyRange } from "meta/fakeData/fakeQuotation";
+import { fakeEmptyRange } from "meta/fakeData/fakeQuotation/fakeQuotation";
 
 
 
