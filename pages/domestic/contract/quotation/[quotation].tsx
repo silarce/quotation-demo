@@ -88,7 +88,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     useState(quotation === "newQuotation" ? true : false)
 
   // 合約項目 追加/追減項目的開關
-  const [switch01, setSwitch01] = useState(false)
+  const [switch01, setSwitch01] = useState(true)
 
   // =========================================================
   // profile //報價單基本資料
