@@ -44,8 +44,8 @@ export default function ClientSelector(
   const onConfirm = () => {
     if (!selClient) return ModalInfo("請選擇公司")
     const { setClientId, setClientName, setContactPerson,
-      setContactPhone, setFax, } = profileState
-    const { clientId, shortName, contact, fax } = selClient
+      setContactPhone, setFax, setClientState } = profileState
+    const { clientId, shortName, contact, fax, clientState } = selClient
     const { name: contactPerson, phone: contactPhone } = contact[0]
 
     setClientId(clientId)
@@ -53,6 +53,7 @@ export default function ClientSelector(
     setContactPerson(contactPerson)
     setContactPhone(contactPhone)
     setFax(fax)
+    setClientState(clientState)
     onCancel()
   }
   const onCancel = () => {

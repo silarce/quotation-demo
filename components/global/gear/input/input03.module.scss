@@ -11,4 +11,11 @@
       border-color: transparent;
     }
   }
+
+  > hr.alwaysBaseline {
+    border-color: $colorMain;
+  }
+  > hr.neverBaseline {
+    border-color: transparent;
+  }
 }

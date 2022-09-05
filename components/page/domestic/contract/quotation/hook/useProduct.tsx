@@ -1,5 +1,5 @@
 import {
-  Dispatch, SetStateAction, ChangeEvent,
+  Dispatch, SetStateAction, ChangeEvent, MouseEvent,
   useState, useMemo
 } from "react"
 
@@ -9,24 +9,24 @@ import Input03 from "components/global/gear/input/input03"
 import Select03, { Toption } from "components/global/gear/select/select03"
 
 // data type
-import { fakeComponent, fakeAccessory } from "meta/fakeData/fakeQuotation"
-import type { Tcomponent, Tproduct } from "meta/fakeData/fakeQuotation"
+import { fakeComponent, fakeAccessory } from "meta/fakeData/fakeQuotation/fakeQuotation"
+import type { Tcomponent, Tproduct } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
 
 // ======================================================
 // type
-interface TuseProduct {
-  theadList: TtheadItem[]
-  setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
-  productList: Tproduct[]
-  setProductList: Dispatch<SetStateAction<Tproduct[]>>
-  addProduct: () => void
-  deleteProduct: (index: number) => void
-  copyProduct: (index: number) => void
-  dndBody: JSX.Element[][]
-  activeRow: number
-  setActiveRow: Dispatch<SetStateAction<number>>
-}
+// interface TuseProduct {
+//   theadList: TtheadItem[]
+//   setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
+//   productList: Tproduct[]
+//   setProductList: Dispatch<SetStateAction<Tproduct[]>>
+//   addProduct: () => void
+//   deleteProduct: (index: number) => void
+//   copyProduct: (index: number) => void
+//   dndBody: JSX.Element[][]
+//   activeRow: number
+//   setActiveRow: Dispatch<SetStateAction<number>>
+// }
 
 interface TtheadItem {
   id: Exclude<(keyof Tproduct), "component" | "accessory">
@@ -35,8 +35,12 @@ interface TtheadItem {
   options?: Toption[]
 }
 
+// ==========================================
+export default function useProduct(
+  productListOri?: Tproduct[],
+  disabled: boolean = false
+) {
 
-export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
   // dnd head的狀態，也是資料分類目錄
   const [theadList, setTheadList] = useState<TtheadItem[]>(theadListOri)
 
@@ -54,23 +58,28 @@ export default function useProduct(productListOri?: Tproduct[]): TuseProduct {
         const { id, options } = column
         return (
           options
-            ? selectCellCreator({ pIndex, id, productList, setProductList, options })
-            : inputCellCreator({ pIndex, id, productList, setProductList })
+            ? selectCellCreator({
+              pIndex, id, productList, setProductList, options, disabled
+            })
+            : inputCellCreator({
+              pIndex, id, productList, setProductList, disabled
+            })
         )
       })
     })
-  }, [productList, theadList])
+  }, [productList, theadList, disabled])
 
   const addProduct = () => {
     productList.push(JSON.parse(JSON.stringify(emptyProduct)))
-    // productList.push({ ...emptyProduct })
     setProductList([...productList])
   }
-  const deleteProduct = (index: number) => {
+  const deleteProduct = (e: MouseEvent, index: number) => {
+    e.stopPropagation()
     productList.splice(index, 1)
     setActiveRow(-1)
     setProductList([...productList])
   }
+
   const copyProduct = (index: number) => {
     productList.splice(index, 0, { ...productList[index] })
     setProductList([...productList])
@@ -182,14 +191,16 @@ const emptyProduct: Tproduct = {
 // ================================
 
 // pIndex為上層的index
-const inputCellCreator = ({ pIndex, id, productList, setProductList }:
-  {
-    pIndex: number
-    id: Exclude<(keyof Tproduct), "component" | "accessory">
-    // id: keyof Tproduct
-    productList: Tproduct[]
-    setProductList: Dispatch<SetStateAction<Tproduct[]>>
-  }) => {
+const inputCellCreator = (
+  { pIndex, id, productList, setProductList, disabled }:
+    {
+      pIndex: number
+      id: Exclude<(keyof Tproduct), "component" | "accessory">
+      // id: keyof Tproduct
+      productList: Tproduct[]
+      setProductList: Dispatch<SetStateAction<Tproduct[]>>
+      disabled: boolean
+    }) => {
 
   const stateValue = productList[pIndex][id]
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -201,7 +212,7 @@ const inputCellCreator = ({ pIndex, id, productList, setProductList }:
 
   return (
     <Input03 key={`${pIndex}${id}`}
-      {...{ stateValue, onChange }} />
+      {...{ stateValue, onChange, disabled }} />
   )
 } //  inputCellCreator
 
@@ -209,13 +220,14 @@ const inputCellCreator = ({ pIndex, id, productList, setProductList }:
 // =============
 // pIndex為上層的index
 const selectCellCreator = (
-  { pIndex, id, productList, setProductList, options }:
+  { pIndex, id, productList, setProductList, options, disabled }:
     {
       pIndex: number
       id: Exclude<(keyof Tproduct), "component" | "accessory">
       productList: Tproduct[]
       setProductList: Dispatch<SetStateAction<Tproduct[]>>
       options: Toption[]
+      disabled: boolean
     }) => {
 
   const stateValue = productList[pIndex][id]
@@ -228,12 +240,13 @@ const selectCellCreator = (
     })
   }
   return <Select03 {...{
-    stateValue, options, onChange,
+    stateValue, options, onChange, disabled
   }} />
 } //  selectCellCreator
 
 
 
+type TuseProduct = ReturnType<typeof useProduct>
 
 export type { TuseProduct, TtheadItem, Tproduct }
 

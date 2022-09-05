@@ -14,6 +14,7 @@ import style from "./quotationProfile.module.scss"
 
 // fakeData/type
 import type { TuseProfile } from "./hook/useProfile"
+import id from 'date-fns/esm/locale/id/index.js'
 
 
 
@@ -25,10 +26,10 @@ const inputStyle = {
 
 // ====================================================
 export default function QuotationProfile(
-  { profileState, disabled }:
+  { profileState, disabled = false }:
     {
       profileState: TuseProfile
-      disabled?: boolean
+      disabled: boolean
     }) {
 
   // ==============================================
@@ -47,7 +48,7 @@ export default function QuotationProfile(
     onChangeSchedule, onChangeProjectAddress,
     setClientName, setContactPerson,
     setContactPhone, setFax,
-    setClientId
+    setClientId, setClientState
   } = profileState
 
   // ----------------------------------
@@ -65,23 +66,26 @@ export default function QuotationProfile(
 
   // ==============================================
   const clearClient = () => {
+    if (disabled) return
     setClientId("")
     setClientName("")
     setContactPerson("")
     setContactPhone("")
     setFax("")
+    setClientState("")
   }
+  // ==============================================
+  const styleHaveState = clientState ? style.haveState : ""
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
-  const openModal = () => setShowModal(true)
+  const openModal = () => disabled ? "" : setShowModal(true)
   // ==============================================
 
   return (
     <div className={style.container}>
       <div className={style.profile}>
-        <span className={style.clientState}>狀態 : {clientState || "尚未選擇客戶"}</span>
-        {/* <span className={style.clientState}>狀態 : {"尚未選擇客戶"}</span> */}
+        <span className={`${style.clientState}  ${styleHaveState}`}>狀態 : {clientState || "尚未選擇客戶"}</span>
         <Input02
           {...{
             className: style.input02,

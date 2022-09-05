@@ -6,16 +6,30 @@
   padding-bottom: 32px;
 }
 
-.titleHr {
+.switchBar {
+  display: flex;
+
   width: calc(100% - 6px);
-  padding: 16px 0 14px 0;
   margin: auto;
   margin-top: 35px;
+  text-align: center;
+  background-color: $bgc01;
+
   font-weight: 400;
   font-size: 18px;
   color: $colorMain;
-  text-align: center;
-  background-color: $bgc01;
+  > div {
+    flex: 1 1;
+    height: 52px;
+    line-height: 52px;
+    text-align: center;
+    border-bottom: solid 2px transparent;
+    cursor:pointer;
+    &.active {
+      background-color: $chosenBgc01;
+      border-color: $colorActive01;
+    }
+  }
 }
 
 .redWrapper {
@@ -28,5 +42,33 @@
     width: 100%;
     margin: auto;
     border-color: red;
+  }
+}
+// ===============================================
+
+.noQuotation {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  width: 100%;
+  height: 100%;
+  > * {
+    margin: auto;
+  }
+  > span {
+    font-size: 50px;
+  }
+  > button {
+    background-color: #ddd;
+    padding: 10px;
+    margin-top: 30px;
+    font-size: 30px;
+  }
+}
+// ===============================================
+
+.editButton {
+  > span {
+    width: 64px;
   }
 }

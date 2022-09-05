@@ -8,8 +8,11 @@ import style from "./quotationSinature.module.scss"
 // type
 import { TuseSinature } from "./hook/useSinature"
 
-export default function QuotationSinature({ sinatureState }:
-  { sinatureState: TuseSinature }) {
+export default function QuotationSinature({ sinatureState, disabled = false }:
+  {
+    sinatureState: TuseSinature
+    disabled: boolean
+  }) {
   const {
     sinature, setSinature,
     onChangeManager, onChangeDirector, onChangeAttn
@@ -23,8 +26,6 @@ export default function QuotationSinature({ sinatureState }:
     { sinature: attn, onChange: onChangeAttn },
   ]
 
-
-
   return (
     <div className={style.container}>
       {sinatureList.map((item, index) => {
@@ -37,6 +38,8 @@ export default function QuotationSinature({ sinatureState }:
             <Input03 {...{
               stateValue: value,
               onChange: onChange,
+              disabled,
+              showBaseline: "always"
             }} />
           </div>
         )

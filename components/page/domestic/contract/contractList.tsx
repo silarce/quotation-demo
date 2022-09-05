@@ -3,6 +3,7 @@ import {
   useState,
   MouseEvent
 } from 'react';
+import { useRouter } from 'next/router';
 
 // components
 import ListTop01 from '../local/list/list01/listTop01';
@@ -28,16 +29,13 @@ const { Panel } = Collapse
 export default function ContractList({ contractList }:
   { contractList: TcontractList }) {
 
+  const router = useRouter()
+
   // 點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1)
   const changeActive = (panelIndex: string | string[]) => {
     const activeIndex = parseInt(panelIndex as string)
     setActiveIndex(activeIndex)
-  }
-  // =============================================
-  const onClick = (e: MouseEvent) => {
-    e.stopPropagation()
-    alert("test")
   }
   // =============================================
 
@@ -52,8 +50,17 @@ export default function ContractList({ contractList }:
         onChange={changeActive}
       >
         {contractList.map((item, index) => {
-          const { memoList } = item
+          const { memoList, quotationId } = item
           const isActive = activeIndex === index
+
+          const onClick = (e: MouseEvent) => {
+            e.stopPropagation()
+            const isContract = true
+            router.push({
+              pathname: `/domestic/contract/quotation/${quotationId}`,
+              query: { isContract }
+            })
+          }
 
           return (
             <Panel key={index} className={style.panel}

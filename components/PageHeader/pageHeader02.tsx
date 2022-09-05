@@ -20,17 +20,21 @@ interface Ttag {
 interface Tpanel01 {
   type: "myButton" | "redButton" | "addButton"
   label: string
-  placeholder?: undefined
   onClick: () => void
+  placeholder?: undefined
+  className?: string
+  img?: string
 }
 interface Tpanel02 {
   type: "inputSearch"
   placeholder: string
-  label?: undefined
   onClick: (value: string) => void
+  label?: undefined
+  className?: string
+  img?: string
 }
 
-type TpanelList = (Tpanel01 | Tpanel02)[]
+type TpanelList = (Tpanel01 | Tpanel02 | null)[]
 type TtagList = Ttag[]
 
 
@@ -75,15 +79,19 @@ export default function PageHeader02(
       {/* buttonBox */}
       <div className={style.buttonBox}>
         {panelList.map((item, index) => {
-          const { label, type, onClick, placeholder } = item
+          if (!item) return null
+          const {
+            label, type, onClick,
+            placeholder, className, img
+          } = item
 
           return (
             <Fragment key={index}>
               {
-                type === "myButton" ? <MyButton {...{ label, onClick }} />
-                  : type === "redButton" ? <RedButton {...{ label, onClick }} />
-                    : type === "addButton" ? <AddButton {...{ label, onClick }} />
-                      : type === "inputSearch" ? <InputSearch {...{ placeholder, onClick }} />
+                type === "myButton" ? <MyButton {...{ label, onClick, className, img }} />
+                  : type === "redButton" ? <RedButton {...{ label, onClick, className, img }} />
+                    : type === "addButton" ? <AddButton {...{ label, onClick, className, img }} />
+                      : type === "inputSearch" ? <InputSearch {...{ placeholder, onClick, className }} />
                         : <></>
               }
             </Fragment>

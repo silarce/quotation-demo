@@ -31,10 +31,10 @@ export default function ProductList({ productStates }:
         return (
           <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
-              onFocus={() => setActiveRow(pIndex)}
+              onClick={() => setActiveRow(pIndex)}
             >
               <div className={style.buttonBox}>
-                <Icondelete01 onClick={() => deleteProduct(pIndex)} />
+                <Icondelete01 onClick={(e) => deleteProduct(e, pIndex)} />
                 <IconCopy onClick={() => copyProduct(pIndex)} />
                 <span>1</span>
               </div>

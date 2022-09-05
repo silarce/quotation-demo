@@ -18,7 +18,7 @@ import fakeContractList, { TcontractList } from "meta/fakeData/fakeContractList"
 // ===========================================
 const panelList: TpanelList = [{
   type: "addButton",
-  label: "新增報價單",
+  label: "待變更介面",
   onClick: () => alert("test")
 }]
 

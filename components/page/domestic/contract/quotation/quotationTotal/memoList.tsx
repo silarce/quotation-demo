@@ -3,7 +3,7 @@ import { useState } from "react"
 // global gear
 import ModalListSelectorWithSearch from "components/global/gear/modal/modalListSelectorWithSearch"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-import { ModalInfo02 } from "components/global/gear/modal/simpleModal/alertModals"
+import Input03 from "components/global/gear/input/input03"
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
@@ -14,13 +14,17 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseMemoList } from "../hook/useMemoList"
-import { Tmemo } from "meta/fakeData/fakeQuotation"
+import { Tmemo } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
 
-export default function MemoList({ memoListState }:
-  { memoListState: TuseMemoList }) {
+export default function MemoList({ memoListState, disabled }:
+  {
+    memoListState: TuseMemoList
+    disabled: boolean
+  }) {
 
-  const { memoList, setMemoList, deleteMemo, } = memoListState
+  const { memoList, setMemoList,
+    onChangeMemoCreator, deleteMemo, addMemos } = memoListState
   const { list, options } = memoList
 
   // ====================================================
@@ -47,11 +51,7 @@ export default function MemoList({ memoListState }:
     setSelMemo([])
     setSearchValue("")
   }
-  const onConfirm = () => {
-    if (!selMemo[0]) return ModalInfo02({ title: "請選擇備註" })
-    memoList.list = memoList.list.concat([...selMemo])
-    setMemoList({ ...memoList })
-  }
+  const onConfirm = () => addMemos(selMemo);
   const onSearch = (value: string) => {
     setSearchValue(value)
   }
@@ -61,16 +61,27 @@ export default function MemoList({ memoListState }:
       <p>備註</p>
       {list.map((item, index) => {
         const { content } = item
+        const onChange = onChangeMemoCreator(index)
         return (
           <div key={index}>
-            <IconRemoveCircle onClick={() => deleteMemo(index)} />
+            {disabled ?
+              <span></span> :
+              <IconRemoveCircle onClick={() => deleteMemo(index)} />}
             <span>{index + 1}</span>
-            <span>{content}</span>
+            <Input03 {...{
+              stateValue: content,
+              onChange,
+              placeholder: "請輸入備註",
+              showBaseline: "never",
+              disabled
+            }} />
           </div>
         )
       })}
       <div>
-        <IconAddCircle onClick={toShowAdd} />
+        {disabled ?
+          <span></span> :
+          <IconAddCircle onClick={toShowAdd} />}
       </div>
       {/*  */}
       <ModalListSelectorWithSearch {...{

@@ -12,7 +12,7 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseProduct, Tproduct } from "./hook/useProduct"
-import type { Taccessory } from "meta/fakeData/fakeQuotation"
+import type { Taccessory } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
 
 
