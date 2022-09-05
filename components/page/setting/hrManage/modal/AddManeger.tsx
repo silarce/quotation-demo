@@ -14,9 +14,8 @@ import style from "./addManeger.module.scss"
 
 // fakeData
 import {
-  TstaffInfo, TdepartmentManageList, TfakeManagerList,
-  fakeManagerList
-} from "meta/fakeData/fakeManagerist"
+  TdepartmentManageList, TstaffInfo,
+} from "fakeDatabase/staff/fakeManagerList"
 
 export default function AddManager(
   { visible, setVisible, staffList, setManagerList, selIndex }:
@@ -24,7 +23,7 @@ export default function AddManager(
       visible: boolean,
       setVisible: Dispatch<SetStateAction<boolean>>,
       staffList: TstaffInfo[]
-      setManagerList: Dispatch<SetStateAction<TfakeManagerList>>
+      setManagerList: Dispatch<SetStateAction<TdepartmentManageList>>
       selIndex: number
     }) {
   // ==================================================

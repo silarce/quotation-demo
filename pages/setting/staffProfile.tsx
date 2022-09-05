@@ -22,8 +22,7 @@ import RedButton from "components/global/gear/button/redButton";
 import style from "./staffProfile.module.scss"
 
 // fakeData
-import { TstaffInfo, fakeStaffList } from "meta/fakeData/fakeStaffList";
-
+import { TstaffInfo, fakeStaffList } from "fakeDatabase/staff/fakeStaffList";
 
 export default function StaffProfile() {
   // ====================================================
@@ -159,7 +158,7 @@ const ButtonBar02 = ({ selStaffInfo, resetEditPanel }:
   return (
     <div className={style.headerBar}>
       <RedButton label="上傳" onClick={() => { alert(`上傳${selStaffInfo.staffId}的資料`) }} />
-      <MyButton label="取消" onClick={resetEditPanel}/>
+      <MyButton label="取消" onClick={resetEditPanel} />
     </div>
   )
 }
@@ -168,8 +167,7 @@ const ButtonBar02 = ({ selStaffInfo, resetEditPanel }:
 // =============================================================
 // 空資料，新增人員資料使用
 
-const emptyStaffProfileCreator = (newStaffId: string) => {
-
+const emptyStaffProfileCreator = (newStaffId: string): TstaffInfo => {
   return {
     staffId: newStaffId,
     chName: '',

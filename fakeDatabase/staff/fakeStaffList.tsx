@@ -1,3 +1,6 @@
+const _ = require('lodash');
+
+
 
 interface TstaffInfo {
   key?: string | number; // key 是antd table用的參數 ,會在最後加進去
@@ -36,10 +39,18 @@ interface TstaffInfo {
 }
 
 
+interface TstaffInfoObjList {
+  [key: string]: TstaffInfo
+}
+type TstaffInfoList = TstaffInfo[]
 
-let fakeData: TstaffInfo[] = [
-  {
-    staffId: "",
+// ======================================================
+// ======================================================
+// ======================================================
+
+const fakeStaffObjList: TstaffInfoObjList = {
+  "A000": {
+    staffId: "A000",
     chName: '王小明',
     enName: "",
     idNumber: "A123456789",
@@ -61,7 +72,6 @@ let fakeData: TstaffInfo[] = [
       departmentId: "A",
       department: "管理部",
       jobTitle: "資深專業經理",
-      // jobTitle: "資深經理",
       level: "Level 7",
     },
     department02: {
@@ -71,8 +81,8 @@ let fakeData: TstaffInfo[] = [
       level: "Level 5",
     }
   },
-  {
-    staffId: "",
+  "A001": {
+    staffId: "A001",
     chName: '王大明',
     enName: "Big-Ming",
     idNumber: "B123456789",
@@ -103,8 +113,8 @@ let fakeData: TstaffInfo[] = [
       level: "",
     },
   },
-  {
-    staffId: "",
+  "A002": {
+    staffId: "A002",
     chName: '王中明',
     enName: "",
     idNumber: "C987654321",
@@ -135,8 +145,8 @@ let fakeData: TstaffInfo[] = [
       level: "Level 8",
     }
   },
-  {
-    staffId: "",
+  "A003": {
+    staffId: "A003",
     chName: '王聰明',
     enName: "Smart-Ming",
     idNumber: "D123456789",
@@ -167,29 +177,26 @@ let fakeData: TstaffInfo[] = [
       level: "",
     },
   },
-];
+}
 
+// 批次複製
+const lengthOri = Object.keys(fakeStaffObjList).length
+let i = lengthOri 
+for (i; i <= 30; i++) {
+  const key = "A" + (`${i}`.padStart(3, "0"))
+  const keyToClone = "A" + (`${i - lengthOri}`.padStart(3, "0"))
 
+  fakeStaffObjList[key] = _.cloneDeep(fakeStaffObjList[keyToClone])
+  fakeStaffObjList[key].staffId = key
+}
 
+// 建立陣列版的 fakeStaffObjList
+const fakeStaffList: TstaffInfoList = Object.values(fakeStaffObjList)
 
-
-fakeData = fakeData.concat(JSON.parse(JSON.stringify(fakeData)))
-fakeData = fakeData.concat(JSON.parse(JSON.stringify(fakeData)))
-fakeData = fakeData.concat(JSON.parse(JSON.stringify(fakeData)))
-
-fakeData.forEach((item, index) => {
-  item.key = index
-  item.staffId = "A" + (`${index}`.padStart(3, "0"))
-})
-
-
-
-export type { TstaffInfo, TstaffInfo as TstaffProfile }
-export { fakeData as fakeStaffList }
-
-
-
-
-
+// ==========================================================
+// ==========================================================
+// ==========================================================
+export type { TstaffInfo, TstaffInfoObjList, TstaffInfoList }
+export { fakeStaffObjList, fakeStaffList }
 
 

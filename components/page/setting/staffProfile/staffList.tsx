@@ -9,14 +9,14 @@ import { Icondelete01 } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import style from "./staffList.module.scss"
 
-// fakeData
-import { TstaffInfo } from "../../../../meta/fakeData/fakeStaffList"
+// type
+import { TstaffInfo, TstaffInfoList } from "fakeDatabase/staff/fakeStaffList"
 
 export default function StaffList({
   data,
   editStaff, openDeletePanel }:
   {
-    data: TstaffInfo[]
+    data: TstaffInfoList
     editStaff: (staffProfile: TstaffInfo) => void
     openDeletePanel: (staffProfile: TstaffInfo) => void
   }) {
@@ -30,11 +30,11 @@ export default function StaffList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     , [])
 
-
   return (
     <Table className={style.antdTable}
       columns={columns} dataSource={data}
       pagination={false}
+      rowKey={(data) => data.staffId}
     />
   )
 }
@@ -112,7 +112,6 @@ const columnsCreator = (
           const onClick = () => {
             openDeletePanel(info)
           }
-
           return (
             <Icondelete01 className={style.iconDelete} onClick={onClick} />
           )
