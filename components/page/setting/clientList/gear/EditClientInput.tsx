@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, ChangeEvent } from 'react';
 
-import { TclientProfile } from 'meta/fakeData/fakeClientList';
+import { TclientProfile } from "fakeDatabase/client/fakeClientList";
 
 import { Input01 } from "components/global/gear/input/input";
 

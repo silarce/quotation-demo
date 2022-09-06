@@ -18,7 +18,7 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHe
 // hook
 import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
 import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
-import useMemoList from "components/page/domestic/contract/quotation/hook/useMemoList"
+import useRemarkList from "components/page/domestic/contract/quotation/hook/useRemarkList"
 import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
 import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
 import useSinature from "components/page/domestic/contract/quotation/hook/useSinature"
@@ -29,20 +29,13 @@ import iconUpload from "public/image/icon/upload.svg"
 // css
 import style from "./[quotation].module.scss"
 
-// fakeData
-import fakeQuotationData,
-{ fakeProfileList } from "meta/fakeData/fakeQuotation/fakeQuotation"
-import { fakeProdChangingRecordList } from "meta/fakeData/fakeQuotation/fakeChangeProductRecord"
-
-type TquotationData = typeof fakeQuotationData
+// fakeData type
+import { Tquotation, fakeQuotationObjList } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 
 
 // 產品應該會是點進來後才跟後端要資料
 // 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料
-// 報價單資料複雜由龐大，沿用fakeQuotaion然後把profile替換掉好了
-// 所以，做fakeProfileList吧,寫在fakeQuotation.tsx裡面
-
-
 
 // 如果使用者貼上動態url進來，一開始router.query會是空的
 // 要運行第二次後router.query才會有東西，所以包這一層判斷是否已經ready
@@ -75,11 +68,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ======================================================
 
   // 正式接上api前先這樣處理
-  let quotationData: TquotationData | undefined;
+  let quotationData: Tquotation | undefined;
   if (typeof quotation === "string" && quotation !== "newQuotation") {
-    quotationData = fakeQuotationData
-    quotationData.profile = fakeProfileList[quotation]
-    if (!quotationData.profile) quotationData = undefined
+    quotationData = fakeQuotationObjList[quotation]
+    if (!quotationData) quotationData = undefined
   }
 
   // =========================================================
@@ -99,7 +91,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // product // 產品設定
   const productStates = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
-  const memoListState = useMemoList(quotationData)
+  const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
   const rangeListState = useRangeList(quotationData)
   // payInfo // 支付資訊
@@ -202,7 +194,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
             {...{
-              memoListState, rangeListState,
+              remarkListState, rangeListState,
               payInfoState, productStates,
               disabled: !allowEdit
             }} />

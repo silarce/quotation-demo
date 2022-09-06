@@ -17,17 +17,15 @@ import { Collapse } from 'antd';
 // css
 import style from "./contractList.module.scss"
 
-// fakeData
-import { TcontractList } from "meta/fakeData/fakeContractList";
-
-
+// type
+import { TfakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
 
 
 const { Panel } = Collapse
 
 
 export default function ContractList({ contractList }:
-  { contractList: TcontractList }) {
+  { contractList: TfakeContractListSimple }) {
 
   const router = useRouter()
 
@@ -68,7 +66,10 @@ export default function ContractList({ contractList }:
                 <ListHeader01 contract={item} onClick={onClick} isActive={isActive} />
               }
             >
-              <ListBody01 memoList={memoList} />
+              {memoList.length > 0
+                ? <ListBody01 memoList={memoList} />
+                : <span>無備註</span>
+              }
             </Panel>
           )
         })}

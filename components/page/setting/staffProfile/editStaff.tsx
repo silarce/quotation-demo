@@ -6,7 +6,7 @@ import EditStaffProfile01 from "./editStaff/editStaffProfile01"
 import EditStaffProfile02 from "./editStaff/editStaffProfile02"
 
 // type
-import { TstaffInfo } from "meta/fakeData/fakeStaffList";
+import { TstaffInfo } from "fakeDatabase/staff/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 

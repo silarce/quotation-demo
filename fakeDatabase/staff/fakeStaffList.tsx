@@ -49,8 +49,8 @@ type TstaffInfoList = TstaffInfo[]
 // ======================================================
 
 const fakeStaffObjList: TstaffInfoObjList = {
-  "A000": {
-    staffId: "A000",
+  "A001": {
+    staffId: "A001",
     chName: '王小明',
     enName: "",
     idNumber: "A123456789",
@@ -81,8 +81,8 @@ const fakeStaffObjList: TstaffInfoObjList = {
       level: "Level 5",
     }
   },
-  "A001": {
-    staffId: "A001",
+  "A002": {
+    staffId: "A002",
     chName: '王大明',
     enName: "Big-Ming",
     idNumber: "B123456789",
@@ -113,8 +113,8 @@ const fakeStaffObjList: TstaffInfoObjList = {
       level: "",
     },
   },
-  "A002": {
-    staffId: "A002",
+  "A003": {
+    staffId: "A003",
     chName: '王中明',
     enName: "",
     idNumber: "C987654321",
@@ -145,8 +145,8 @@ const fakeStaffObjList: TstaffInfoObjList = {
       level: "Level 8",
     }
   },
-  "A003": {
-    staffId: "A003",
+  "A004": {
+    staffId: "A004",
     chName: '王聰明',
     enName: "Smart-Ming",
     idNumber: "D123456789",
@@ -180,11 +180,11 @@ const fakeStaffObjList: TstaffInfoObjList = {
 }
 
 // 批次複製
-const lengthOri = Object.keys(fakeStaffObjList).length
-let i = lengthOri 
+const listLength = Object.keys(fakeStaffObjList).length
+let i = listLength + 1
 for (i; i <= 30; i++) {
   const key = "A" + (`${i}`.padStart(3, "0"))
-  const keyToClone = "A" + (`${i - lengthOri}`.padStart(3, "0"))
+  const keyToClone = "A" + (`${i - listLength}`.padStart(3, "0"))
 
   fakeStaffObjList[key] = _.cloneDeep(fakeStaffObjList[keyToClone])
   fakeStaffObjList[key].staffId = key

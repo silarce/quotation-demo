@@ -6,13 +6,10 @@ import {
 // global gear
 import { ModalInfo02 } from "components/global/gear/modal/simpleModal/alertModals"
 
-
 // type
-import type { Tquotation, TrangeList, Trange } from "meta/fakeData/fakeQuotation/fakeQuotation";
-// data
-import { fakeEmptyRange } from "meta/fakeData/fakeQuotation/fakeQuotation";
+import { Tquotation, Trange } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
-
+const _ = require("lodash")
 
 export default function
   useRangeList(quotationData?: Tquotation) {
@@ -20,28 +17,28 @@ export default function
   if (quotationData) rangeListOri = quotationData.rangeList
   else rangeListOri = fakeEmptyRange
 
-  const [rangeList, setRangeList] = useState({ ...rangeListOri })
+  const [rangeList, setRangeList] = useState<Trange[]>(_.cloneDeep(rangeListOri))
 
   const onChangeRangeCreator = (index: number) => {
     return (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      setRangeList(memoList => {
-        memoList.list[index].content = value
-        return { ...memoList }
+      setRangeList(rangeList => {
+        rangeList[index].content = value
+        return [...rangeList]
       })
     }
   }
 
   const addRanges = ((selRange: Trange[]) => {
     if (!selRange[0]) return ModalInfo02({ title: "請選擇報價範圍" })
-    rangeList.list = rangeList.list.concat([...structuredClone(selRange)])
-    setRangeList({ ...rangeList })
+    const newRangeList = rangeList.concat([..._.cloneDeep(selRange)])
+    setRangeList([...newRangeList])
   });
 
 
   const deleteRange = (index: number) => {
-    rangeList.list.splice(index, 1)
-    setRangeList({ ...rangeList })
+    rangeList.splice(index, 1)
+    setRangeList([...rangeList])
   }
 
   return {
@@ -54,7 +51,8 @@ type TuseRangeList = ReturnType<typeof useRangeList>
 
 export type { TuseRangeList }
 
-
+// ===============================================
+const fakeEmptyRange: Trange[] = []
 
 
 

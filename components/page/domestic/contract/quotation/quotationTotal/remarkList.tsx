@@ -13,31 +13,33 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import styleL from "./local.module.scss"
 
 // type
-import { TuseMemoList } from "../hook/useMemoList"
-import { Tmemo } from "meta/fakeData/fakeQuotation/fakeQuotation"
+import { TuseRemarkList } from "../hook/useRemarkList"
+import { Tremark } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+
+// data
+import { remarkOptions } from "fakeDatabase/domestic/quotation/fakeQuotRemarkList"
 
 
-export default function MemoList({ memoListState, disabled }:
+export default function RemarkList({ remarkListState, disabled }:
   {
-    memoListState: TuseMemoList
+    remarkListState: TuseRemarkList
     disabled: boolean
   }) {
 
-  const { memoList, setMemoList,
-    onChangeMemoCreator, deleteMemo, addMemos } = memoListState
-  const { list, options } = memoList
+  const { remarkList, setRemarkList,
+    onChangeRemarkCreator, deleteRemark, addRemarks } = remarkListState
 
   // ====================================================
-  const [selMemo, setSelMemo] = useState<Tmemo[]>([])
-  const toSelMemo = (memo: Tmemo) => {
-    const theIndex = selMemo.indexOf(memo)
+  const [selRemark, setSelRemark] = useState<Tremark[]>([])
+  const toSelRemark = (remark: Tremark) => {
+    const theIndex = selRemark.indexOf(remark)
     if (theIndex === -1) {
-      selMemo.push(memo)
-      setSelMemo([...selMemo])
+      selRemark.push(remark)
+      setSelRemark([...selRemark])
     }
     if (theIndex > -1) {
-      selMemo.splice(theIndex, 1)
-      setSelMemo([...selMemo])
+      selRemark.splice(theIndex, 1)
+      setSelRemark([...selRemark])
     }
   }
   // ====================================================
@@ -48,10 +50,10 @@ export default function MemoList({ memoListState, disabled }:
   const toShowAdd = () => setShowAdd(true)
   const onCancel = () => {
     setShowAdd(false)
-    setSelMemo([])
+    setSelRemark([])
     setSearchValue("")
   }
-  const onConfirm = () => addMemos(selMemo);
+  const onConfirm = () => addRemarks(selRemark);
   const onSearch = (value: string) => {
     setSearchValue(value)
   }
@@ -59,14 +61,14 @@ export default function MemoList({ memoListState, disabled }:
   return (
     <div className={styleL.listContainer}>
       <p>備註</p>
-      {list.map((item, index) => {
+      {remarkList.map((item, index) => {
         const { content } = item
-        const onChange = onChangeMemoCreator(index)
+        const onChange = onChangeRemarkCreator(index)
         return (
           <div key={index}>
             {disabled ?
               <span></span> :
-              <IconRemoveCircle onClick={() => deleteMemo(index)} />}
+              <IconRemoveCircle onClick={() => deleteRemark(index)} />}
             <span>{index + 1}</span>
             <Input03 {...{
               stateValue: content,
@@ -90,16 +92,16 @@ export default function MemoList({ memoListState, disabled }:
         onCancel, onConfirm, onSearch,
       }}>
         <div className={styleL.addModalBody}>
-          {options.map((item, index) => {
+          {remarkOptions.map((item, index) => {
             const { content } = item
-            const isActive = (selMemo.includes(item))
+            const isActive = (selRemark.includes(item))
             if (!content.includes(searchValue)) return null
             return (
               <CellWithBar className={styleL.cellWithBar} key={index}
                 isActive={isActive}
               >
                 <div className={styleL.row}
-                  onClick={() => toSelMemo(item)}
+                  onClick={() => toSelRemark(item)}
                 >
                   <span>{content}</span>
                 </div>

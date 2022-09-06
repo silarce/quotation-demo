@@ -5,12 +5,12 @@ import style from "./listBody01.module.scss";
 
 
 // fakeData
-import { Tcontract } from "meta/fakeData/fakeContractList";
-
+// type
+import { TfakeContractSimple } from "fakeDatabase/domestic/contractCombinder";
 
 
 export default function ListBody01({ memoList }:
-  { memoList: Tcontract["memoList"] }) {
+  { memoList: TfakeContractSimple["memoList"] }) {
 
 
 

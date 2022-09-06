@@ -1,56 +1,37 @@
+import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
-
-interface Tproduct {
+interface TrecordProduct
+  extends Omit<Tproduct, "component" | "accessory"> {
   action: string
-  discount: string  // 折數
-  project: string  // 項目
-  quoteType: string  // 報價別
-  L: string  // L
-  W: string  // W
-  H: string  // H
-  B: string  // B
-  area: string  // 面積
-  cai: string  // 才數 // 只有台灣在用的單位，沒有英文譯名
-  doorType: string  // 門型
-  material: string  // 材料
-  surface: string  // 表面
-  horsepower: string  // 馬力
-  qty: string  // 數量
-  unitPrice: string  // 單價
-  subTotal: string  // 複價
-  memo: string  // 備註
 }
 
-
-
-
-interface TchangeList {
-  [key: string]: TchangeListItem
-}
 
 interface TchangeListItem {
   id: string // 編號
   date: string // 日期
   priceChange: number // 追加追減項目
   remark: string // 備註
-  product: Tproduct[]
+  product: TrecordProduct[]
 }
+
+
+interface TchangeList {
+  [key: string]: TchangeListItem
+}
+
 
 interface TchangeRecord {
   quotationId: string
   list: TchangeList
 }
 
+
 interface TprodChangingRecordList {
   [key: string]: TchangeRecord
 }
 
 
-
-
-
-
-const fakeProduct01: Tproduct = {
+const fakeProduct01: TrecordProduct = {
   action: "add",
   discount: "100.00",
   project: "SD1",
@@ -70,7 +51,7 @@ const fakeProduct01: Tproduct = {
   subTotal: "158610",
   memo: "防颱防颱",
 }
-const fakeProduct02: Tproduct = {
+const fakeProduct02: TrecordProduct = {
   action: "remove",
   discount: "100.00",
   project: "SD1",
@@ -90,6 +71,7 @@ const fakeProduct02: Tproduct = {
   subTotal: "158610",
   memo: "防颱防颱",
 }
+
 
 const fakeChangeList: TchangeList = {
   "M-1110101-01": {
@@ -138,8 +120,6 @@ const fakeChangeList: TchangeList = {
     ]
   },
 }
-
-
 
 
 

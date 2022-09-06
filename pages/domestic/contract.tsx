@@ -12,8 +12,7 @@ import ContractList from "components/page/domestic/contract/contractList";
 import style from "./budget.module.scss"
 
 // fakeData
-import fakeContractList, { TcontractList } from "meta/fakeData/fakeContractList";
-
+import { fakeContractListSimple } from "fakeDatabase/domestic/contractCombinder"; 
 
 // ===========================================
 const panelList: TpanelList = [{
@@ -25,11 +24,7 @@ const panelList: TpanelList = [{
 
 // ===========================================
 
-export default function Budget() {
-
-  // data
-
-
+export default function Contract() {
 
   // ===================================================
 
@@ -41,12 +36,8 @@ export default function Budget() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <ContractList contractList={fakeContractList} />
+        <ContractList contractList={fakeContractListSimple} />
       </div>
     </div>
   )
-
-
-
-
 }

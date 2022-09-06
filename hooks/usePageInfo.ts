@@ -3,7 +3,7 @@
 
 import { useRouter } from "next/router"
 // meta
-import routerIndex from "meta/routerIndex"
+import routerIndex from "config/routerIndex"
 
 
 export default function usePageInfo() {

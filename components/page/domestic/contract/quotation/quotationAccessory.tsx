@@ -11,10 +11,7 @@ import style from "./quotationComponent.module.scss"
 import styleL from "./local.module.scss"
 
 // type
-import { TuseProduct, Tproduct } from "./hook/useProduct"
-import type { Taccessory } from "meta/fakeData/fakeQuotation/fakeQuotation"
-
-
+import { TuseProduct } from "./hook/useProduct"
 
 export default function QuotationAccessory({ productStates }:
   { productStates: TuseProduct }) {

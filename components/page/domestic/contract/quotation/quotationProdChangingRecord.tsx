@@ -10,7 +10,7 @@ import CellWithBar from "components/global/gear/cell/cellWithBar";
 import style from "components/page/domestic/contract/quotation/quotationProdChangingRecord.module.scss"
 
 // type
-import type { TchangeRecord, TchangeListItem } from "meta/fakeData/fakeQuotation/fakeChangeProductRecord"
+import type { TchangeRecord, TchangeListItem } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 
 
 const { Panel } = Collapse

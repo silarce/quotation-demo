@@ -12,7 +12,7 @@ import {
 import style from "./panelHeader.module.scss"
 
 // fakeData
-import { TclientProfile } from "meta/fakeData/fakeClientList";
+import { TclientProfile } from"fakeDatabase/client/fakeClientList";
 
 // ====================================================
 

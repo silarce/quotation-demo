@@ -8,7 +8,7 @@ import { Input01 } from "components/global/gear/input/input";
 import { Select01 } from 'components/global/gear/select/select';
 
 // type
-import { TstaffInfo } from "meta/fakeData/fakeStaffList";
+import { TstaffInfo } from  "fakeDatabase/staff/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 

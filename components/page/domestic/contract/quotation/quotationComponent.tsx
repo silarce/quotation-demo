@@ -12,8 +12,8 @@ import styleL from "./local.module.scss"
 
 // type
 import { TuseProduct, Tproduct } from "./hook/useProduct"
-import type { Tcomponent } from "meta/fakeData/fakeQuotation/fakeQuotation"
-
+// import type { Tcomponent } from "meta/fakeData/fakeQuotation/fakeQuotation"
+import type { Tcomponent } from "fakeDatabase/domestic/quotation/fakeQuotComponentList"
 
 
 export default function QuotationComponent(
