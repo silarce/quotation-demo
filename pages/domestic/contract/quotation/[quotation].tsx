@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
@@ -11,7 +11,7 @@ import QuotationAccessory from "components/page/domestic/contract/quotation/quot
 import QuotationTotal from "components/page/domestic/contract/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/contract/quotation/quotationSinature"
 import QuotationProdChangingRecord from "components/page/domestic/contract/quotation/quotationProdChangingRecord"
-
+import QuotationRecord from "components/page/domestic/contract/quotation/quotationRecord"
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 
@@ -82,6 +82,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 合約項目 追加/追減項目的開關
   const [switch01, setSwitch01] = useState(true)
 
+  // 展開版本追加追減紀錄的開關
+  const [switch02, setSwitch02] = useState(false)
+
   // =========================================================
   // profile //報價單基本資料
   const profileState = useProfile({
@@ -120,7 +123,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     (isContract && {
       type: "myButton",
       label: "追加追減報價單",
-      onClick: () => alert("追加追減報價單")
+      onClick: () => setSwitch02(state => !state)
     }) || null,
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
@@ -166,9 +169,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 追加 / 追減項目
               </div>}
           </div>
-
-
-
           {/*  */}
           {switch01
             ?
@@ -183,14 +183,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 <QuotationAccessory productStates={productStates} />
               </div>
             </>
-            :
-            <>
-              <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
-            </>
+            : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
           }
-
-
-
+          {/* 展開版本的追加追減紀錄 */}
+          {prodChangingRecord && switch02 &&
+            <QuotationRecord prodChangingRecord={prodChangingRecord} />}
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
             {...{

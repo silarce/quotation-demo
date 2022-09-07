@@ -79,8 +79,49 @@ const fakeQuotProductList: Tproduct[] = [
 ]
 
 
+// =========================================================
+type TprodCellConfig = {
+  keyList: (keyof (Omit<Tproduct, "component" | "accessory">))[]
+  cellConfig: {
+    [key in (keyof (Omit<Tproduct, "component" | "accessory">))]: {
+      id: string
+      label: string;
+      width: string
+    }
+  }
+}
+
+const prodCellConfig: TprodCellConfig = {
+  keyList: [
+    "discount", "project", "quoteType", "L", "W",
+    "H", "B", "area", "cai", "doorType",
+    "material", "surface", "horsepower", "qty", "unitPrice",
+    "subTotal", "memo"],
+  cellConfig: {
+    discount: { id: "discount", label: "折數", width: "75px" },
+    project: { id: "project", label: "項目", width: "60px" },
+    quoteType: { id: "quoteType", label: "報價別", width: "105px" },
+    L: { id: "L", label: "L", width: "60px" },
+    W: { id: "W", label: "W", width: "60px" },
+    H: { id: "H", label: "H", width: "60px" },
+    B: { id: "B", label: "B", width: "60px" },
+    area: { id: "area", label: "面積", width: "60px" },
+    cai: { id: "cai", label: "才數", width: "75px" },
+    doorType: { id: "doorType", label: "門型", width: "75px" },
+    material: { id: "material", label: "材料", width: "120px" },
+    surface: { id: "surface", label: "表面", width: "55px" },
+    horsepower: { id: "horsepower", label: "馬力", width: "60px" },
+    qty: { id: "qty", label: "數量", width: "43px" },
+    unitPrice: { id: "unitPrice", label: "單價", width: "84px" },
+    subTotal: { id: "subTotal", label: "複價", width: "84px" },
+    memo: { id: "memo", label: "備註", width: "90px" },
+  }
+}
 
 
 
 export type { Tproduct }
-export { fakeQuotProductList  }
+export { fakeQuotProductList }
+
+export type { TprodCellConfig }
+export { prodCellConfig }

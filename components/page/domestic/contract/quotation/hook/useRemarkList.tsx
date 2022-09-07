@@ -40,7 +40,6 @@ export default function
     setRemarkList([...remarkList])
   }
 
-  console.log(remarkList)
   return {
     remarkList, setRemarkList,
     addRemarks, onChangeRemarkCreator, deleteRemark,
