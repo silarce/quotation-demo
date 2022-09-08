@@ -6,7 +6,7 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 
 // components
 import BudgeList from "components/page/domestic/budget/budgeList"
-
+import HeaderPanel from "components/page/domestic/budget/headerPanel";
 
 // css
 import style from "./budget.module.scss"
@@ -25,21 +25,21 @@ export default function Budget() {
   const router = useRouter()
   // ===================================================
 
-  const panelList: TpanelList = [{
-    type: "addButton",
-    label: "新增報價單",
-    onClick: () => {
-      let newQuotationId = `${fakeContractListSimple.length + 1}`.padStart(2, "0")
-      newQuotationId = "S-110211-" + newQuotationId
-
-      router.push({
-        pathname: `/domestic/contract/quotation/newQuotation`,
-        query: { newQuotationId }
-      })
-    }
-  }]
-
-
+  const panelList: TpanelList = [
+    { custom: <HeaderPanel /> },
+    {
+      type: "addButton",
+      label: "新增報價單",
+      onClick: () => {
+        let newQuotationId = `${fakeContractListSimple.length + 1}`.padStart(2, "0")
+        newQuotationId = "S-110211-" + newQuotationId
+        router.push({
+          pathname: `/domestic/contract/quotation/newQuotation`,
+          query: { newQuotationId }
+        })
+      }
+    },
+  ]
 
   // ===================================================
 
@@ -53,8 +53,6 @@ export default function Budget() {
       </div>
     </div>
   )
-
-
-
-
 }
+
+// ==========================================================

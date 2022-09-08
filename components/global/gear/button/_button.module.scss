@@ -21,6 +21,12 @@
   &:hover {
     background-color: $hoverBgc01;
   }
+  @media (max-width: 1440px) {
+    padding: 10px 20px;
+  }
+  @media (max-width: 1240px) {
+    padding: 10px 10px;
+  }
 }
 
 .button {

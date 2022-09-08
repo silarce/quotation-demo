@@ -1,8 +1,8 @@
-
+import { useState, useMemo } from "react"
 
 
 // UI套件
-import Select from 'react-select';
+import Select, { SingleValue } from 'react-select';
 import type { StylesConfig, GroupBase } from 'react-select';
 
 // icon
@@ -31,6 +31,7 @@ const Select03 = ({
     disabled?: boolean
   }) => {
 
+
   let option = typeof stateValue === "string"
     ? {
       value: stateValue,
@@ -57,6 +58,10 @@ const Select03 = ({
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={iconArrow.src} alt="下拉箭頭" />
   }
+
+
+
+
 
   return (
     <div className={`${style.label} ${className} selec03`}
@@ -129,10 +134,4 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
   //   }
   // },
 }
-
-
-
-
-
-
 
