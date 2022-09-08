@@ -15,12 +15,11 @@ import ListHeader01 from '../local/list/list01/listHeader01';
 import style from "./budgetList.module.scss"
 
 
-// fakeData
-import { TcontractList } from "meta/fakeData/fakeContractList";
-
+// type
+import { TfakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
 
 export default function BudgetList({ contractList }:
-  { contractList: TcontractList }) {
+  { contractList: TfakeContractListSimple }) {
 
   const router = useRouter()
 

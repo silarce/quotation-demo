@@ -22,14 +22,15 @@ import style from "./clientList.module.scss"
 
 // fakeData
 import {
-  TclientProfile, TclientProfileList,
-  fakeClientList, clientEmpty
-} from "meta/fakeData/fakeClientList";
+  TclientProfile,
+  fakeClientProfileList,
+} from "fakeDatabase/client/fakeClientList"
+
 
 export default function ClientList() {
 
   // data
-  const [clientList, setClientList] = useState(fakeClientList)
+  const [clientList, setClientList] = useState(fakeClientProfileList)
   // ====================================================
   // 空資料，新增員工資料用
   const newClientProfile = useMemo(() => {
@@ -80,7 +81,7 @@ export default function ClientList() {
   }
   // ====================================================
   // 用於搜尋功能
-  const [filteredList, setFilteredList] = useState<typeof fakeClientList>([])
+  const [filteredList, setFilteredList] = useState<typeof fakeClientProfileList>([])
 
   const searchClient = (searchValue: string) => {
 
@@ -171,3 +172,24 @@ const ButtonBar02 = (
   )
 }
 
+// ===================================================================================================
+const clientEmpty: TclientProfile = {
+  clientId: "",
+  type: "",
+  name: "",
+  shortName: "",
+  phone: "",
+  fax: "",
+  head: "",
+  address: "",
+  billAddress: "",
+  taxtNumber: "",
+  taxtType: "",
+  clientState: "",
+  contact: [
+    {
+      name: "",
+      phone: "",
+    },
+  ]
+}

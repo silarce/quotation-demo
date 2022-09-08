@@ -10,7 +10,7 @@ import {
 } from "./gear"
 
 // type
-import { TstaffInfo } from "meta/fakeData/fakeStaffList";
+import { TstaffInfo } from "fakeDatabase/staff/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 

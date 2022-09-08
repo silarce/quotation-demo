@@ -5,8 +5,9 @@ import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
 
 import style from "./listHeader01.module.scss"
 
-// fakeData
-import { Tcontract } from "meta/fakeData/fakeContractList";
+
+// type
+import { TfakeContractSimple } from "fakeDatabase/domestic/contractCombinder";
 
 
 
@@ -14,7 +15,7 @@ export default function ListHeader01(
   { className = "", contract, onClick, isActive }:
     {
       className?: string
-      contract: Tcontract
+      contract: TfakeContractSimple
       onClick: ((e: MouseEvent) => void) | (() => void)
       isActive?: boolean
     }) {

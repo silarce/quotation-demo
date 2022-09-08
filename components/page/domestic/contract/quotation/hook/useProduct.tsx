@@ -9,25 +9,13 @@ import Input03 from "components/global/gear/input/input03"
 import Select03, { Toption } from "components/global/gear/select/select03"
 
 // data type
-import { fakeComponent, fakeAccessory } from "meta/fakeData/fakeQuotation/fakeQuotation"
-import type { Tcomponent, Tproduct } from "meta/fakeData/fakeQuotation/fakeQuotation"
+import type { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+import { fakeComponentList } from "fakeDatabase/domestic/quotation/fakeQuotComponentList"
+import { fakeAccessoryList } from "fakeDatabase/domestic/quotation/fakeQuotAccessoryList"
 
+const _ = require("lodash")
 
 // ======================================================
-// type
-// interface TuseProduct {
-//   theadList: TtheadItem[]
-//   setTheadList: Dispatch<SetStateAction<TtheadItem[]>>
-//   productList: Tproduct[]
-//   setProductList: Dispatch<SetStateAction<Tproduct[]>>
-//   addProduct: () => void
-//   deleteProduct: (index: number) => void
-//   copyProduct: (index: number) => void
-//   dndBody: JSX.Element[][]
-//   activeRow: number
-//   setActiveRow: Dispatch<SetStateAction<number>>
-// }
-
 interface TtheadItem {
   id: Exclude<(keyof Tproduct), "component" | "accessory">
   label: string
@@ -183,8 +171,8 @@ const emptyProduct: Tproduct = {
   unitPrice: "",
   subTotal: "",
   memo: "",
-  component: JSON.parse(JSON.stringify(fakeComponent)),
-  accessory: JSON.parse(JSON.stringify(fakeAccessory))
+  component: _.cloneDeep(fakeComponentList),
+  accessory: _.cloneDeep(fakeAccessoryList)
 }
 
 
@@ -196,7 +184,6 @@ const inputCellCreator = (
     {
       pIndex: number
       id: Exclude<(keyof Tproduct), "component" | "accessory">
-      // id: keyof Tproduct
       productList: Tproduct[]
       setProductList: Dispatch<SetStateAction<Tproduct[]>>
       disabled: boolean

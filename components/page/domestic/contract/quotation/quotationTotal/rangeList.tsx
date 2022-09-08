@@ -13,9 +13,11 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import styleL from "./local.module.scss"
 
 // type
+import { Trange } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { TuseRangeList } from "../hook/useRangeList"
-import { Trange } from "meta/fakeData/fakeQuotation/fakeQuotation"
 
+// data
+import { rangeOptions } from "fakeDatabase/domestic/quotation/fakeQuotRangeList"
 
 export default function RangeList({ rangeListState, disabled }:
   {
@@ -25,7 +27,6 @@ export default function RangeList({ rangeListState, disabled }:
 
   const { rangeList, setRangeList,
     addRanges, onChangeRangeCreator, deleteRange, } = rangeListState
-  const { list, options } = rangeList
 
   // ====================================================
   const [selRange, setSelRange] = useState<Trange[]>([])
@@ -59,7 +60,7 @@ export default function RangeList({ rangeListState, disabled }:
   return (
     <div className={styleL.listContainer}>
       <p>報價範圍</p>
-      {list.map((item, index) => {
+      {rangeList.map((item, index) => {
         const { content } = item
         const onChange = onChangeRangeCreator(index)
         return (
@@ -90,7 +91,7 @@ export default function RangeList({ rangeListState, disabled }:
         onCancel, onConfirm, onSearch,
       }}>
         <div className={styleL.addModalBody}>
-          {options.map((item, index) => {
+          {rangeOptions.map((item, index) => {
             const { content } = item
             const isActive = (selRange.includes(item))
             if (!content.includes(searchValue)) return null

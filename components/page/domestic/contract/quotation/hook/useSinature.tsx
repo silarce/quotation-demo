@@ -1,10 +1,7 @@
 import { ChangeEvent, useState } from "react";
 
 // type
-import type { Tquotation } from "meta/fakeData/fakeQuotation/fakeQuotation";
-// data
-import { fakeEmptySinature } from "meta/fakeData/fakeQuotation/fakeQuotation";
-
+import { Tquotation, Tsinature } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 
 export default function useSinature(quotationData?: Tquotation) {
@@ -40,6 +37,12 @@ type TuseSinature = ReturnType<typeof useSinature>
 export type { TuseSinature }
 
 
+// =====================================================
+const fakeEmptySinature: Tsinature = {
+  manager: { value: "", label: "經理" }, // 經理
+  director: { value: "", label: "主管" }, // 主管
+  attn: { value: "", label: "經辦" }, // 經辦
+}
 
 
 

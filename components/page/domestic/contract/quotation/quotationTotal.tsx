@@ -1,14 +1,14 @@
 import { useState } from "react"
 
 // component
-import MemoList from "./quotationTotal/memoList"
+import MemoList from "./quotationTotal/remarkList"
 import RangeList from "./quotationTotal/rangeList"
 import PayInfo from "./quotationTotal/payInfo"
 
 // css
 import style from "./quotationTotal.module.scss"
 // type
-import { TuseMemoList } from "./hook/useMemoList"
+import { TuseRemarkList } from "./hook/useRemarkList"
 import { TuseRangeList } from "./hook/useRangeList"
 import { TusePayInfo } from "./hook/usePayInfo"
 import { TuseProduct } from "./hook/useProduct"
@@ -17,10 +17,10 @@ import { TuseProduct } from "./hook/useProduct"
 
 
 export default function QuotationTotal(
-  { memoListState, rangeListState,
+  { remarkListState, rangeListState,
     payInfoState, productStates, disabled = false }:
     {
-      memoListState: TuseMemoList
+      remarkListState: TuseRemarkList
       rangeListState: TuseRangeList
       payInfoState: TusePayInfo
       productStates: TuseProduct
@@ -30,7 +30,7 @@ export default function QuotationTotal(
   // ====================================================
   return (
     <div className={style.container}>
-      <MemoList memoListState={memoListState} disabled={disabled} />
+      <MemoList remarkListState={remarkListState} disabled={disabled} />
       <div className={style.layer01}>
         <RangeList rangeListState={rangeListState} disabled={disabled} />
         <PayInfo payInfoState={payInfoState} productStates={productStates}

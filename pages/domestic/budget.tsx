@@ -12,7 +12,7 @@ import BudgeList from "components/page/domestic/budget/budgeList"
 import style from "./budget.module.scss"
 
 // fakeData
-import fakeContractList, { TcontractList } from "meta/fakeData/fakeContractList";
+import { fakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
 
 
 // ===========================================
@@ -29,7 +29,7 @@ export default function Budget() {
     type: "addButton",
     label: "新增報價單",
     onClick: () => {
-      let newQuotationId = `${fakeContractList.length + 1}`.padStart(2, "0")
+      let newQuotationId = `${fakeContractListSimple.length + 1}`.padStart(2, "0")
       newQuotationId = "S-110211-" + newQuotationId
 
       router.push({
@@ -49,7 +49,7 @@ export default function Budget() {
       <PageHeader02 tag="預算" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <BudgeList contractList={fakeContractList} />
+        <BudgeList contractList={fakeContractListSimple} />
       </div>
     </div>
   )

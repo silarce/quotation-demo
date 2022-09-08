@@ -3,7 +3,7 @@ import {
   Dispatch, SetStateAction, ChangeEvent
 } from "react"
 
-import { TclientProfile } from "meta/fakeData/fakeClientList";
+import { TclientProfile } from "fakeDatabase/client/fakeClientList";
 // gear
 import { Container01 } from "components/global/gear/container/container01"
 //global gear

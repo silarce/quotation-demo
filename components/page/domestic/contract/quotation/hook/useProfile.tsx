@@ -6,8 +6,8 @@ import {
 import { format } from 'date-fns'
 
 // type
-import type { Tquotation, Tprofile } from "meta/fakeData/fakeQuotation/fakeQuotation";
 
+import { Tquotation, TquotProfile } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 
 
@@ -19,15 +19,15 @@ export default function useProfile({ quotationData, newQuotationId }:
     newQuotationId?: string
   }) {
 
-  let profileOri: Tprofile;
+  let profileOri: TquotProfile;
 
   if (quotationData) profileOri = quotationData.profile
   else profileOri = emptyProfile
 
   // const profileOri = quotationData ? quotationData.profile : emptyProfile
-  const [profile, setProfile] = useState<Tprofile>(JSON.parse(JSON.stringify(profileOri)))
+  const [profile, setProfile] = useState<TquotProfile>(JSON.parse(JSON.stringify(profileOri)))
 
-  const onChangeCreator = (key: keyof Tprofile) => {
+  const onChangeCreator = (key: keyof TquotProfile) => {
     return (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
       setProfile(profile => {
@@ -36,7 +36,7 @@ export default function useProfile({ quotationData, newQuotationId }:
       })
     }
   }
-  const setCreator = (key: keyof Tprofile) => {
+  const setCreator = (key: keyof TquotProfile) => {
     return (value: string) => {
       setProfile(profile => {
         profile[key] = value
@@ -88,7 +88,7 @@ const buildToday = () => {
   return format(today, "yyy-MM-dd")
 }
 
-const emptyProfile: Tprofile = {
+const emptyProfile: TquotProfile = {
   quotationId: "",
   clientId: "",
   clientName: "",

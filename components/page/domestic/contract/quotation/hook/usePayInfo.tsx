@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from "react";
 
 // type
-import type { Tquotation } from "meta/fakeData/fakeQuotation/fakeQuotation";
-// data
-import { fakeEmptyPayInfo } from "meta/fakeData/fakeQuotation/fakeQuotation";
+import { Tquotation, TpayInfo } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+
+
 
 
 
@@ -63,6 +63,16 @@ export type { TusePayInfo }
 
 
 
-
+// ========================================================
+const fakeEmptyPayInfo: TpayInfo = {
+  tradingLocation: "", // 交貨地點
+  tradingDate: "", // 交貨日期 //格式 yyy-mm-dd， yyy為民國年
+  payMethod: {
+    deposit: "", // 訂製同時付總金額
+    finalPayment: "", // 交貨同時付總金額
+    installedPayment: "", // 按裝完成付總金額
+    eleConnectPayment: "", // 接電使用付總金額
+  }
+}
 
 

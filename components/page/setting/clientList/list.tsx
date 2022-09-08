@@ -15,10 +15,8 @@ import { Collapse as AntdCollapse } from 'antd';
 import style from "./list.module.scss"
 
 // fakeData
-import {
-  TclientProfile, TclientProfileList,
-} from "meta/fakeData/fakeClientList";
 
+import { TclientProfile, TclientProfileList, } from "fakeDatabase/client/fakeClientList";
 
 
 const { Panel } = AntdCollapse

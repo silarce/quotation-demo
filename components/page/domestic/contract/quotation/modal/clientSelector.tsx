@@ -13,7 +13,10 @@ import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals'
 import style from "./clientSelector.module.scss"
 
 // fakeData
-import { fakeClientList, TclientProfile } from 'meta/fakeData/fakeClientList'
+import {
+  TclientProfile,
+  fakeClientProfileList,
+} from "fakeDatabase/client/fakeClientList"
 // fakeData/type
 import { TuseProfile } from "../hook/useProfile"
 
@@ -29,7 +32,7 @@ export default function ClientSelector(
 
   const clientList = useMemo(() => {
     // 現在使用假資料，到時候要接api取資料
-    return fakeClientList
+    return fakeClientProfileList
   }, [])
 
   // ==================================================

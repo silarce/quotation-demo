@@ -12,12 +12,10 @@ import {
 import style from "./editStaffProfile02.module.scss"
 
 // icon
-import iconAdd from "public/image/icon/addCircle.svg"
-import iconRemove from "public/image/icon/removeCircle.svg"
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
 // type
-import { TstaffInfo } from "meta/fakeData/fakeStaffList";
+import { TstaffInfo } from  "fakeDatabase/staff/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 
