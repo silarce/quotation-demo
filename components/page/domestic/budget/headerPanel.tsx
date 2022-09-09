@@ -1,4 +1,7 @@
-import { useState } from "react"
+import {
+  Dispatch, SetStateAction,
+  useState
+} from "react"
 import dynamic from "next/dynamic"
 
 // icon
@@ -19,9 +22,21 @@ const Select03 = dynamic(
 )
 
 
-export default function HeaderPanel() {
+interface TsearchObj {
+  doorType: string
+  country: string
+  clientName: string
+  projectName: string
+}
+
+
+export default function HeaderPanel({ setSearchObj }:
+  { setSearchObj: Dispatch<SetStateAction<TsearchObj>> }) {
   const [doorType, setDoorType] = useState(doorTypeOptions[0])
   const [country, setCountry] = useState(countryOptions[0])
+  const [clientName, setClientName] = useState("")
+  const [projectName, setProjectName] = useState("")
+
 
   const onChangeDoor = (option: Toption | null) => {
     if (!option) return
@@ -35,9 +50,15 @@ export default function HeaderPanel() {
   const onSearch = () => {
     const doorValue = doorType.value
     const countryValue = country.value
+    setSearchObj(obj => {
+      obj.doorType = doorValue
+      obj.country = countryValue
+      obj.clientName = clientName
+      obj.projectName = projectName
+      return { ...obj }
+    })
 
 
-    alert("onsearch")
   }
 
   return (
@@ -65,6 +86,8 @@ export default function HeaderPanel() {
         <input type="text"
           placeholder="請輸入客戶名稱"
           autoComplete="off"
+          value={clientName}
+          onChange={e => setClientName(e.target.value)}
         />
       </label>
       <div className={style.pilar} />
@@ -72,6 +95,8 @@ export default function HeaderPanel() {
         <input type="text"
           placeholder="請輸入工程名稱"
           autoComplete="off"
+          value={projectName}
+          onChange={e => setProjectName(e.target.value)}
         />
       </label>
       <IconSearch className={style.iconSearch} onClick={onSearch} />

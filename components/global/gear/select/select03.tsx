@@ -122,7 +122,10 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
       borderBottom: `solid 1px ${style.colorBorder01}`,
       "&:hover": {
         color: "red"
-      }
+      },
+      ":nth-last-of-type(1)": {
+        borderColor: "transparent"
+      },
     }
     return {
       ...provided, ...optionStyle

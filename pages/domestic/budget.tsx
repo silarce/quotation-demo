@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useRouter } from "next/router";
 
 
@@ -5,33 +6,47 @@ import { useRouter } from "next/router";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 
 // components
-import BudgeList from "components/page/domestic/budget/budgeList"
+import BudgeList from "components/page/domestic/budget/budgetList"
 import HeaderPanel from "components/page/domestic/budget/headerPanel";
 
 // css
 import style from "./budget.module.scss"
 
 // fakeData
-import { fakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
+import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 
 
 // ===========================================
-
-
+// type
+interface TsearchOnj {
+  doorType: string
+  country: string
+  clientName: string
+  projectName: string
+}
 // ===========================================
 
 export default function Budget() {
-
   const router = useRouter()
+  const { fakeBudgetList } = fakeBudgetListGroup
   // ===================================================
 
+  const [searchObj, setSearchObj] = useState({
+    doorType: "",
+    country: "",
+    clientName: "",
+    projectName: "",
+  })
+
+
+
   const panelList: TpanelList = [
-    { custom: <HeaderPanel /> },
+    { custom: <HeaderPanel setSearchObj={setSearchObj} /> },
     {
       type: "addButton",
       label: "新增報價單",
       onClick: () => {
-        let newQuotationId = `${fakeContractListSimple.length + 1}`.padStart(2, "0")
+        let newQuotationId = `${fakeBudgetList.length + 1}`.padStart(2, "0")
         newQuotationId = "S-110211-" + newQuotationId
         router.push({
           pathname: `/domestic/contract/quotation/newQuotation`,
@@ -49,7 +64,7 @@ export default function Budget() {
       <PageHeader02 tag="預算" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <BudgeList contractList={fakeContractListSimple} />
+        <BudgeList budgetList={fakeBudgetList} searchObj={searchObj} />
       </div>
     </div>
   )
