@@ -5,7 +5,7 @@ import { useState } from "react";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 
 // components
-import BudgeList from "components/page/domestic/budget/budgeList"
+import BudgeList from "components/page/domestic/budget/budgetList"
 import ContractList from "components/page/domestic/contract/contractList";
 
 // css

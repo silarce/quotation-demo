@@ -1,6 +1,8 @@
 @use "styles/theme01" as *;
 @use "./list.module" as *;
 
+
+
 .container {
   display: grid;
   grid-template-columns: $columnsWidth01;

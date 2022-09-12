@@ -1,4 +1,7 @@
-import { useState, Fragment } from "react"
+import {
+  ReactNode,
+  useState, Fragment
+} from "react"
 
 // components
 import MyButton from "components/global/gear/button/myButton"
@@ -24,6 +27,7 @@ interface Tpanel01 {
   placeholder?: undefined
   className?: string
   img?: string
+  custom?: undefined
 }
 interface Tpanel02 {
   type: "inputSearch"
@@ -32,9 +36,25 @@ interface Tpanel02 {
   label?: undefined
   className?: string
   img?: string
+  custom?: undefined
+}
+interface Tpanel03 {
+  custom: JSX.Element
+  type?: undefined
+  label?: undefined
+  onClick?: undefined
+  placeholder?: undefined
+  className?: undefined
+  img?: undefined
+
 }
 
-type TpanelList = (Tpanel01 | Tpanel02 | null)[]
+
+
+
+
+
+type TpanelList = (Tpanel01 | Tpanel02 | Tpanel03 | null)[]
 type TtagList = Ttag[]
 
 
@@ -46,9 +66,9 @@ export default function PageHeader02(
     panelList = []
   }:
     {
-      tag?: string
-      tagList?: Ttag[]
-      panelList?: TpanelList
+      tag?: string // 最左邊的標籤(標題)
+      tagList?: Ttag[] // 左邊的多個標籤，帶click事件
+      panelList?: TpanelList //右邊的一排按鈕
     }) {
 
   const [active, setActive] = useState(0)
@@ -80,6 +100,13 @@ export default function PageHeader02(
       <div className={style.buttonBox}>
         {panelList.map((item, index) => {
           if (!item) return null
+
+          if (item.custom) return (
+            <Fragment key={index}>
+              {item.custom}
+            </Fragment>
+          )
+
           const {
             label, type, onClick,
             placeholder, className, img
