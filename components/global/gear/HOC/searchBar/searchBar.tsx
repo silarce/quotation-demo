@@ -20,7 +20,7 @@ interface TsearchObj {
 }
 
 interface TsearchTargetSel {
-  stateValue: Toption
+  stateValue: Toption | null
   options: Toption[]
   placeholder: string
   onChange: (option: Toption | null) => void
