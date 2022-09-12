@@ -137,6 +137,14 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
       ...provided, ...optionStyle
     }
   },
+  indicatorsContainer: (provided) => {
+    const position = "relative"
+    return { ...provided, position }
+  },
+
+
+
+
   //   (provided,state) => {
   //   return {
   //     ...provided
