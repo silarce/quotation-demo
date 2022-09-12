@@ -8,6 +8,7 @@
   background-color: $bgc01;
   // cell層
   > div {
+    height: 140px;
     padding-top: 13px;
     padding-bottom: 13px;
     border-left: solid 1px $colorBorder01;
@@ -16,8 +17,9 @@
     }
     //cell下層
     > div {
-      &:nth-of-type(1) {
-        margin-bottom: 20px;
+      margin-bottom: 20px;
+      &:nth-last-of-type(1) {
+        margin-bottom: 0px;
       }
       h6 {
         margin-bottom: 8px;
@@ -64,6 +66,8 @@
 }
 
 .cell03 {
+  // height: 140px;
+  overflow: auto;
   > div {
     padding-left: 23px;
   }

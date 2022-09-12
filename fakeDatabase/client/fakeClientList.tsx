@@ -97,6 +97,22 @@ const fakeClientProfileObjList: TclientProfileObjList = {
         name: "林東華",
         phone: "0987654321",
       },
+      {
+        name: "林中華",
+        phone: "0987654321",
+      },
+      {
+        name: "林東華",
+        phone: "0987654321",
+      },
+      {
+        name: "林中華",
+        phone: "0987654321",
+      },
+      {
+        name: "林東華",
+        phone: "0987654321",
+      },
     ]
   },
   "S00004": {
