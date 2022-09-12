@@ -1,11 +1,9 @@
-
 import {
   useState,
   MouseEvent
 } from 'react';
 
 import { useRouter } from 'next/router';
-
 
 // components
 import Thead from './budgetList/thead';
@@ -15,34 +13,25 @@ import PanelBody from './budgetList/panelBody';
 // antd
 import { Collapse } from 'antd';
 
-
 // css
 import style from "./budgetList.module.scss"
 
-
 // data type
 import {
-  TbudgetList,
-  fakeBudgetListGroup
+  TbudgetList,  
 } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+import  { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
 const { Panel } = Collapse
 // ========================
-
-interface TsearchOnj {
-  doorType: string
-  country: string
-  clientName: string
-  projectName: string
-}
 
 
 
 export default function BudgetList({ budgetList, searchObj }:
   {
     budgetList: TbudgetList
-    searchObj: TsearchOnj
+    searchObj: TsearchObj
   }) {
   const router = useRouter()
 
