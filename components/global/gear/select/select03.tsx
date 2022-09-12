@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useEffect } from "react"
 
 
 // UI套件
@@ -31,6 +31,15 @@ const Select03 = ({
     disabled?: boolean
   }) => {
 
+  // ====================================================
+  // 避免發生window is undefined
+  const [windowReady, setWindowReady] = useState(false)
+  useEffect(() => {
+    setWindowReady(true)
+  }, [])
+  if (!windowReady) return null
+  // ====================================================
+
 
   let option = typeof stateValue === "string"
     ? {
@@ -58,9 +67,6 @@ const Select03 = ({
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={iconArrow.src} alt="下拉箭頭" />
   }
-
-
-
 
 
   return (
