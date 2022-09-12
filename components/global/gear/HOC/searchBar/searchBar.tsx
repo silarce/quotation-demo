@@ -25,6 +25,7 @@ interface TsearchTargetSel {
   placeholder: string
   onChange: (option: Toption | null) => void
   className?: string
+  width?: string
 }
 
 interface TsearchTargetInput {
@@ -32,8 +33,16 @@ interface TsearchTargetInput {
   placeholder?: string
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
   className?: string
+  width?: string
   options?: undefined
 }
+
+interface TsearchGroup {
+  searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
+  doSearch: () => void
+}
+
+
 
 
 export default function SearchBar({ searchTargetList, doSearch, className = "" }:
@@ -46,11 +55,11 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
   return (
     <div className={`${style.container} ${className}`}>
       {searchTargetList.map((target, index) => {
-        const { stateValue, options, placeholder, onChange } = target
+        const { stateValue, options, placeholder, onChange, width } = target
         const className = target.className || ""
-
+        const theStyle = { width }
         if (options) return (
-          <div className={style.selectBox} key={index}>
+          <div className={style.selectBox} key={index} style={theStyle}>
             <Select03
               className={`${style.select} ${className}`}
               stateValue={stateValue}
@@ -64,6 +73,7 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
             <div className={style.pilar} />
             <label className={`${style.label} ${className}`}>
               <input type="text" autoComplete="off"
+                style={theStyle}
                 placeholder={placeholder}
                 value={stateValue}
                 onChange={onChange}
@@ -78,6 +88,11 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
 }
 
 
-export type { TsearchObj }
+export type { TsearchObj, TsearchGroup }
+
+
+
+
+
 
 
