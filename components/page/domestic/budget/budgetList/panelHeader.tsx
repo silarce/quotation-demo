@@ -32,7 +32,7 @@ export default function PanelHeader({ budget, isActive, openQuotation }:
     <CellWithBar className={style.panelHeader} isActive={isActive}>
       <div className={style.row01}>
         <span>{quotationId}</span>
-        <span>{clientName}</span>
+        <span className={style.clientName}>{clientName}</span>
         <span>{contactName}</span>
         <span>{contactPhone}</span>
         <span>{undertaker}</span>
@@ -46,7 +46,7 @@ export default function PanelHeader({ budget, isActive, openQuotation }:
         <div className={style.place}>
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconPlace.src} alt="place" />
-          <span>{country}</span>
+          <span className={style.country}>{country}</span>
         </div>
         <span>{projectName}</span>
         <div></div>

@@ -95,7 +95,7 @@ export default function PageHeader02(
       {/* tagBox */} {/* 左邊的部分 */}
       <div className={style.tagBox}>
         {/* simple tag */}
-        {tag && <span>{tag}</span>}
+        {tag && <div><span>{tag}</span></div>}
         {/* tags */}
         {tagList.map((item, index) => {
           const { label, onClick } = item
@@ -107,7 +107,8 @@ export default function PageHeader02(
           return (
             <button key={index} className={isActive}
               onClick={theOnClick}
-            >{label}
+            >
+              <span>{label}</span>
             </button>
           )
         })}
@@ -125,7 +126,7 @@ export default function PageHeader02(
               {item.custom}
             </Fragment>
           )
-
+          // 搜尋bar
           if (item.searchGroup) {
             const { searchTargetList, doSearch } = item.searchGroup
             return <SearchBar
@@ -153,7 +154,7 @@ export default function PageHeader02(
           )
         })}
       </div>
-    </div>
+    </div >
   )
 }
 

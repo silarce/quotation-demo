@@ -5,26 +5,29 @@
   grid-template-columns: repeat(2, auto);
   justify-content: space-between;
   height: 58px;
-  padding-bottom: 15px;
+  // padding-bottom: 15px;
 }
 
 .tagBox {
+  z-index: 1;
   > button,
-  > span {
-    padding: 15px 35px;
-    padding-bottom: 14px;
-    font-weight: 400;
-    font-size: 18px;
+  > div {
+    display: inline-grid;
+    height: calc(100% + 1px);
+    padding: 0px 35px;
     background-color: $bgc01;
     &.active {
       background-color: $chosenBgc01;
       border-bottom: solid 2px $colorActive01;
     }
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      margin: auto;
+    }
   }
-  > span {
-    padding: 15px 48px;
-    padding-bottom: 14px;
-    display: inline-block;
+  > div {
+    padding: 0px 48px;
     cursor: auto;
     border-bottom: solid 2px $colorActive01;
   }

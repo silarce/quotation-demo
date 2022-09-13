@@ -46,7 +46,7 @@ export default function Budget() {
       stateValue: doorType,
       options: doorTypeOptions,
       placeholder: "選擇門型",
-      width: "110px",
+      width: "90px",
       onChange: (option: Toption | null) => {
         if (!option) return
         setDoorType(option)
@@ -55,8 +55,8 @@ export default function Budget() {
     {
       stateValue: country,
       options: countryOptions,
-      placeholder: "選擇城市",
-      width: "110px",
+      placeholder: "選擇地區",
+      width: "80px",
       onChange: (option: Toption | null) => {
         if (!option) return
         setCountry(option)

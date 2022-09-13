@@ -21,6 +21,12 @@ div.container {
     hr {
       display: none;
     }
+    [class$="placeholder"] {
+      font-weight: 500;
+    }
+    [class$="singleValue"] {
+      font-weight: 500;
+    }
   }
 }
 
@@ -33,6 +39,11 @@ div.container {
 .label {
   input {
     width: 200px; //預設200px
+    font-weight: 500;
+    font-size: 16px;
+    &::placeholder {
+      color: $colorBorder01;
+    }
   }
 }
 

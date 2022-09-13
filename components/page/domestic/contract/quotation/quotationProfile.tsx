@@ -146,7 +146,7 @@ export default function QuotationProfile(
           }} />
         {/*  */}
         <div className={style.form02}>
-          <div className={style.clientName}>
+          <div className={`${style.clientName} ${disabled ? style.disabled : ""}`}>
             <div>
               <Input02
                 {...{
@@ -156,7 +156,7 @@ export default function QuotationProfile(
                   disabled: true, ...inputStyle,
                 }} />
               {!clientName && <button onClick={openModal}>請選擇客戶</button>}
-              {clientName && <IconRemove02 onClick={clearClient} />}
+              {clientName && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
 
@@ -192,15 +192,6 @@ export default function QuotationProfile(
               }} />
           </div>
         </div> {/* form02 */}
-
-
-        {/* <Input02
-          {...{
-            className: style.input02,
-            label: "工地地點", stateValue: projectAddress,
-            onChange: onChangeProjectAddress,
-            disabled, ...inputStyle
-          }} /> */}
 
         <SearchInput label="工程地點" searchInputPropsList={selectInputList} />
 

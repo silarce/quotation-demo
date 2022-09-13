@@ -541,7 +541,7 @@ export const districtOptionsSelector = (country: string) => {
     case "金門縣": return optionsCreator_districtW()
     case "連江縣": return optionsCreator_districtZ()
     default:
-      return [{ value: "---", label: "---" }];
+      return [{ value: "", label: "" }];
   }
 }
 
