@@ -82,7 +82,7 @@ export default function QuotationProfile(
   const styleHaveState = clientState ? style.haveState : ""
   // ==============================================
   // 工程地點
-  
+
   // 城市
   const countryOptions = optionsCreator_country()
   const [country, setCountry] = useState<Toption | null>(null)
@@ -126,19 +126,11 @@ export default function QuotationProfile(
     },
   ]
 
-
-
-
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
   const openModal = () => disabled ? "" : setShowModal(true)
   // ==============================================
-
-
-
-
-
 
 
   return (

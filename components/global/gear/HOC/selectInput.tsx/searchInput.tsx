@@ -36,19 +36,22 @@ interface TinputProps {
 
 
 
-export default function SearchInput({ label, searchInputPropsList }:
-  {
-    label: string
-    searchInputPropsList: (TselectProps | TinputProps)[]
-  }) {
+export default function SearchInput(
+  { label, searchInputPropsList, labelWidth = "", className }:
+    {
+      label: string
+      searchInputPropsList: (TselectProps | TinputProps)[]
+      labelWidth?: string
+      className?: string
+    }) {
 
-
+  const labelStyle = { width: labelWidth }
 
 
   return (
-    <div className={style.container}>
+    <div className={`${style.container} ${className}`}>
 
-      <span>{label}</span>
+      <span style={labelStyle}>{label}</span>
 
       {searchInputPropsList.map((target, index) => {
         const { stateValue, options, placeholder, onChange, width } = target
