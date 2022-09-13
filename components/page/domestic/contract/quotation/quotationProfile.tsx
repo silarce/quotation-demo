@@ -1,10 +1,14 @@
-import { useState, useMemo } from 'react'
+import {
+  ChangeEvent,
+  useState, useMemo
+} from 'react'
 import { format } from 'date-fns'
 
 // components
 import ClientSelector from './modal/clientSelector'
 // glogal gear
 import Input02 from "components/global/gear/input/input02"
+import SearchInput from 'components/global/gear/HOC/selectInput.tsx/searchInput'
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
@@ -14,7 +18,7 @@ import style from "./quotationProfile.module.scss"
 
 // fakeData/type
 import type { TuseProfile } from "./hook/useProfile"
-import id from 'date-fns/esm/locale/id/index.js'
+import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
 
 
@@ -77,10 +81,65 @@ export default function QuotationProfile(
   // ==============================================
   const styleHaveState = clientState ? style.haveState : ""
   // ==============================================
+  // 工程地點
+  
+  // 城市
+  const countryOptions = optionsCreator_country()
+  const [country, setCountry] = useState<Toption | null>(null)
+
+  // 地區
+  const [district, setDistrict] = useState<Toption | null>(null)
+  const districtOptions = useMemo(() => {
+    setDistrict(null)
+    return districtOptionsSelector(country?.value || "")
+  }, [country])
+
+  // 剩餘地址
+  const [address, setAddress] = useState("")
+
+
+  const selectInputList = [
+    {
+      stateValue: country,
+      options: countryOptions,
+      placeholder: "選擇縣市",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setCountry(option)
+      }
+    },
+    {
+      stateValue: district,
+      options: districtOptions,
+      placeholder: "選擇地區",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setDistrict(option)
+      }
+    },
+    {
+      stateValue: address,
+      placeholder: "請輸入剩餘地址",
+      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+    },
+  ]
+
+
+
+
+  // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
   const openModal = () => disabled ? "" : setShowModal(true)
   // ==============================================
+
+
+
+
+
+
 
   return (
     <div className={style.container}>
@@ -141,13 +200,18 @@ export default function QuotationProfile(
               }} />
           </div>
         </div> {/* form02 */}
-        <Input02
+
+
+        {/* <Input02
           {...{
             className: style.input02,
             label: "工地地點", stateValue: projectAddress,
             onChange: onChangeProjectAddress,
             disabled, ...inputStyle
-          }} />
+          }} /> */}
+
+        <SearchInput label="工程地點" searchInputPropsList={selectInputList} />
+
       </div>
 
       <div className={style.time}>
@@ -168,4 +232,24 @@ export default function QuotationProfile(
 
 
 // ===================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
