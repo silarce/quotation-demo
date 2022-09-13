@@ -7,7 +7,7 @@ import MyButton from "components/global/gear/button/myButton"
 import RedButton from "components/global/gear/button/redButton"
 import AddButton from "components/global/gear/button/addButton"
 import InputSearch from "components/global/gear/input/inputSearch"
-import SearchBar from "components/global/gear/HOC/searchBar/searchBar"
+import SearchBar, { TsearchObj } from "components/global/gear/HOC/searchBar/searchBar"
 
 
 // css
@@ -159,4 +159,4 @@ export default function PageHeader02(
 }
 
 
-export type { TpanelList, TtagList }
+export type { TpanelList, TtagList, TsearchObj }

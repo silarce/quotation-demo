@@ -4,6 +4,13 @@
   padding-left: 4px;
 }
 
+.noDataTip {
+  font-size: 50px;
+  text-align: center;
+  margin-top: 50px;
+  color:$colorMain;
+}
+
 .panel {
   :global(.ant-collapse-header) {
     display: block !important;

@@ -14,6 +14,13 @@ export const optionsCreator_doorType: () => Toption[] =
     { value: "門型三", label: "門型三" },
   ]
 
+export const optionsCreator_clientSearch: () => Toption[] =
+  () => [
+    { value: "clientId", label: "客戶編號" },
+    { value: "name", label: "客戶名稱" },
+    { value: "contactPerson", label: "聯絡人" },
+    { value: "phone", label: "電話" },
+  ]
 
 
 
