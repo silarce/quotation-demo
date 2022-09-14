@@ -2,6 +2,9 @@
 
 .container {
   padding: 4px;
+  :global(.ant-collapse) {
+    border: none;
+  }
 }
 
 .panel {
@@ -44,6 +47,7 @@
 
 div.panelHeader {
   padding: 17px 30px;
+  border: none;
   .row01,
   .row02 {
     span {

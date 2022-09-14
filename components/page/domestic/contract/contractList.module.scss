@@ -2,6 +2,9 @@
 
 .container {
   padding: 4px;
+  :global(.ant-collapse) {
+    border: none;
+  }
 }
 
 .panel {

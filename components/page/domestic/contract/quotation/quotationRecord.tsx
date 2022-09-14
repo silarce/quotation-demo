@@ -6,7 +6,7 @@ import { TchangeRecord } from "fakeDatabase/domestic/quotation/fakeChangeProduct
 import style from "./quotationRecord.module.scss"
 
 // config
-import { prodCellConfig } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 
 
 export default function QuotationRecord({ prodChangingRecord }:
@@ -18,7 +18,7 @@ export default function QuotationRecord({ prodChangingRecord }:
   const {
     keyList: prodKeyList,
     cellConfig,
-  } = prodCellConfig
+  } = prodCellConfigOri()
 
   return (
     <div className={style.container}>

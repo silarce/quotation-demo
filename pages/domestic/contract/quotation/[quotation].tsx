@@ -30,9 +30,11 @@ import iconUpload from "public/image/icon/upload.svg"
 import style from "./[quotation].module.scss"
 
 // fakeData type
-import { Tquotation, fakeQuotationObjList } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 
+// 生成假資料
+const fakeQuotationObjList = fakeQuotationObjListOri()
 
 // 產品應該會是點進來後才跟後端要資料
 // 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料

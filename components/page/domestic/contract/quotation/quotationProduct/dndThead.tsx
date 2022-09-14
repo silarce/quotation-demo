@@ -10,12 +10,14 @@ import {
   DragStartEvent,
   DragEndEvent,
 } from "@dnd-kit/core"
+
 import {
   arrayMove,
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
+
+// import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
 // --------------------
 
 // components
@@ -25,28 +27,28 @@ import TheadItem from "./dndThead/theadItem"
 import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
-// data/hook
+// data hook type config
 import { TuseProduct, Tproduct } from "../hook/useProduct"
 
+// 格子的設定
+import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+const { cellConfig } = prodCellConfigOri()
 
 
-
+// =========================================================
+// =========================================================
 export default function DndThead({ productStates, allowMove }:
   {
     productStates: TuseProduct
     allowMove: boolean
   }) {
 
-  const { theadList, setTheadList } = productStates
-
-  const items = useMemo(() => {
-    return theadList.map((item) => item.id)
-  }, [theadList])
+  // thead的目錄、排序
+  const { theadIndex, setTheadIndex } = productStates
 
   const sensors = useSensors(
     useSensor(PointerSensor),
   )
-
 
   // =======================================================
   const [isMoving, setIsMoving] = useState("")
@@ -61,17 +63,16 @@ export default function DndThead({ productStates, allowMove }:
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={items}
+        <SortableContext items={theadIndex}
           strategy={horizontalListSortingStrategy}
         >
-          {items.map((item, index) => {
-            const theadInfo = theadList[index]
-            const { id } = theadInfo
+          {theadIndex.map((key, index) => {
+            const theadInfo = cellConfig[key]
             return (
               // key必須是items裡的值
-              <TheadItem key={item} theadInfo={theadInfo}
+              <TheadItem key={key} theadInfo={theadInfo}
                 allowMove={allowMove}
-                isMoving={isMoving === id}
+                isMoving={isMoving === key}
               />
             )
           })}
@@ -91,9 +92,9 @@ export default function DndThead({ productStates, allowMove }:
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
-      let oldIndex: number = items.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory">);
-      let newIndex: number = items.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory">);
-      setTheadList((item) => {
+      let oldIndex: number = theadIndex.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory">);
+      let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory">);
+      setTheadIndex((item) => {
         return arrayMove(item, oldIndex, newIndex)
       })
     }
