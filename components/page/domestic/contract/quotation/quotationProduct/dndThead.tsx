@@ -45,7 +45,6 @@ export default function DndThead({ productStates, allowMove }:
 
   // thead的目錄、排序
   const { theadIndex, setTheadIndex } = productStates
-
   const sensors = useSensors(
     useSensor(PointerSensor),
   )

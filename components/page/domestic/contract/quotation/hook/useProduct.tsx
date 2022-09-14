@@ -1,17 +1,15 @@
 import {
-  Dispatch, SetStateAction, ChangeEvent, MouseEvent,
-  useState, useMemo
+  ChangeEvent, MouseEvent,
+  useState,
 } from "react"
 
 
 // global gear
-import Input03 from "components/global/gear/input/input03"
-import Select03, { Toption } from "components/global/gear/select/select03"
+
+import { Toption } from "components/global/gear/select/select03"
 
 // data type
 import type { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
-// import { fakeComponentList } from "fakeDatabase/domestic/quotation/fakeQuotComponentList"
-// import { fakeAccessoryList } from "fakeDatabase/domestic/quotation/fakeQuotAccessoryList"
 import {
   TprodCellKey,
   emptyProduct, prodCellConfigOri
@@ -94,6 +92,7 @@ export default function useProduct(
     pIndex: number,
     key: TprodCellKey
   ) => {
+    if (key === "ejectionDoor") return
     setProductList(list => {
       list[pIndex][key] = e.target.value
       return [...list]
@@ -107,10 +106,20 @@ export default function useProduct(
   ) => {
     if (!option) return
     const { value } = option
+    if (key === "ejectionDoor") return
     setProductList(list => {
       list[pIndex][key] = value
       return [...list]
     })
+  }
+
+  const onCheckboxClick = (
+    pIndex: number,
+    key: TprodCellKey
+  ) => {
+    if (key !== "ejectionDoor") return
+    productList[pIndex][key] = !(productList[pIndex][key])
+    setProductList([...productList])
   }
 
 
@@ -119,7 +128,7 @@ export default function useProduct(
     productList, setProductList,
     activeRow, setActiveRow,
     addProduct, deleteProduct, copyProduct,
-    onInputChange, onSelChange, disabled
+    onInputChange, onSelChange, onCheckboxClick, disabled
   }
 }
 
@@ -127,35 +136,6 @@ export default function useProduct(
 type TuseProduct = ReturnType<typeof useProduct>
 
 export type { TuseProduct, TtheadItem, Tproduct, TprodCellKey }
-
-
-// =============================================================
-// =============================================================
-
-// const emptyProduct: Tproduct = {
-//   discount: "",
-//   project: "",
-//   quoteType: "",
-//   L: "",
-//   W: "",
-//   H: "",
-//   B: "",
-//   area: "",
-//   cai: "",
-//   doorType: "",
-//   material: "",
-//   surface: "",
-//   horsepower: "",
-//   qty: "",
-//   unitPrice: "",
-//   subTotal: "",
-//   memo: "",
-//   component: _.cloneDeep(fakeComponentList),
-//   accessory: _.cloneDeep(fakeAccessoryList)
-// }
-
-
-// ================================
 
 
 

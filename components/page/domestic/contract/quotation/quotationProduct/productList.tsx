@@ -4,7 +4,7 @@ import { ChangeEvent } from "react"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import Input03 from "components/global/gear/input/input03"
 import Select03 from "components/global/gear/select/select03"
-
+import Checkbox01 from "components/global/gear/checkbox/checkbox01"
 // icon
 import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
@@ -52,7 +52,7 @@ export default function ProductList({ productStates }:
   const { theadIndex, productList,
     deleteProduct, copyProduct,
     activeRow, setActiveRow,
-    onInputChange, onSelChange, disabled
+    onInputChange, onSelChange, onCheckboxClick, disabled
   } = productStates
 
   // =======================================
@@ -104,12 +104,13 @@ export default function ProductList({ productStates }:
       pIndex: number
       type: string
       disabled: boolean
-      stateValue: string
+      stateValue: string | boolean
     }
   ) {
 
     switch (type) {
       case "input": {
+        if (typeof stateValue !== "string") return null
         const onChange
           = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, pIndex, key)
         return (
@@ -118,6 +119,7 @@ export default function ProductList({ productStates }:
         )
       }
       case "select": {
+        if (typeof stateValue !== "string") return null
         const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => onSelChange(option, pIndex, key)
@@ -125,6 +127,16 @@ export default function ProductList({ productStates }:
           <Select03 {...{
             stateValue, options, onChange, disabled
           }} />
+        )
+      }
+
+      case "checkbox": {
+        if (typeof stateValue !== "boolean") return null
+        const onClick = () => onCheckboxClick(pIndex, key)
+        return (
+          <div className={styleL.checkbox}>
+            <Checkbox01 stateValue={stateValue} onClick={onClick} />
+          </div>
         )
       }
       default:

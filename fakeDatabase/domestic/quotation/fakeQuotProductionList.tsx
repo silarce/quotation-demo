@@ -29,6 +29,7 @@ interface Tproduct {
   unitPrice: string  // 單價
   subTotal: string  // 複價
   memo: string  // 備註
+  ejectionDoor: boolean
   component: Tcomponent[]
   accessory: Taccessory[]
 }
@@ -54,6 +55,7 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
+    ejectionDoor: false,
     component: JSON.parse(JSON.stringify(fakeComponentList)),
     accessory: JSON.parse(JSON.stringify(fakeAccessoryList))
   },
@@ -75,6 +77,7 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
+    ejectionDoor: true,
     component: JSON.parse(JSON.stringify(fakeComponentList)),
     accessory: JSON.parse(JSON.stringify(fakeAccessoryList))
   },
@@ -104,7 +107,7 @@ const prodCellConfigOri: () => TprodCellConfig = () => ({
     "discount", "project", "quoteType", "L", "W",
     "H", "B", "area", "cai", "doorType",
     "material", "surface", "horsepower", "qty", "unitPrice",
-    "subTotal", "memo"],
+    "subTotal", "memo", "ejectionDoor"],
   cellConfig: {
     discount: { id: "discount", label: "折數", width: "75px", type: "input" },
     project: { id: "project", label: "項目", width: "60px", type: "input" },
@@ -123,6 +126,7 @@ const prodCellConfigOri: () => TprodCellConfig = () => ({
     unitPrice: { id: "unitPrice", label: "單價", width: "84px", type: "input" },
     subTotal: { id: "subTotal", label: "複價", width: "84px", type: "input" },
     memo: { id: "memo", label: "備註", width: "90px", type: "select" },
+    ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "80px", type: "checkbox" },
   }
 })
 
@@ -145,6 +149,7 @@ const emptyProduct: Tproduct = {
   unitPrice: "",
   subTotal: "",
   memo: "",
+  ejectionDoor: false,
   component: _.cloneDeep(fakeComponentList),
   accessory: _.cloneDeep(fakeAccessoryList)
 }
