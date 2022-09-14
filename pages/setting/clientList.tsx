@@ -82,7 +82,7 @@ export default function ClientList() {
   // 用於搜尋功能，過濾資料
 
   const [searchObj, setSearchObj] = useState<TsearchObj>({
-    searchType: "",
+    searchType: "clientId",
     searchContent: "",
   })
 
