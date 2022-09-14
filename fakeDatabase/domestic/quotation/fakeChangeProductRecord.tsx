@@ -50,6 +50,7 @@ const fakeProduct01: TrecordProduct = {
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
+  ejectionDoor: false
 }
 const fakeProduct02: TrecordProduct = {
   action: "remove",
@@ -70,6 +71,7 @@ const fakeProduct02: TrecordProduct = {
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
+  ejectionDoor: true
 }
 
 
