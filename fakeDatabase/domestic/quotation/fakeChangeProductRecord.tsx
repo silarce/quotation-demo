@@ -35,7 +35,7 @@ const fakeProduct01: TrecordProduct = {
   action: "add",
   discount: "100.00",
   project: "SD1",
-  quoteType: "捲門捲門捲",
+  quoteType: "不是捲門",
   L: "516",
   W: "230",
   H: "230",
@@ -50,13 +50,14 @@ const fakeProduct01: TrecordProduct = {
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
-  ejectionDoor: false
+  ejectionDoor: false,
+  quoteTypeType: "normal"
 }
 const fakeProduct02: TrecordProduct = {
   action: "remove",
   discount: "100.00",
   project: "SD1",
-  quoteType: "捲門捲門捲",
+  quoteType: "捲門",
   L: "516",
   W: "230",
   H: "230",
@@ -71,7 +72,8 @@ const fakeProduct02: TrecordProduct = {
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
-  ejectionDoor: true
+  ejectionDoor: true,
+  quoteTypeType: "rollerDoor"
 }
 
 

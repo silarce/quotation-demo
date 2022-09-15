@@ -11,10 +11,14 @@ import iconArrow from "public/image/icon/arrow_down.svg"
 // css
 import style from "./select03.module.scss"
 
-type Toption = {
-  value: string
-  label: string
-}
+// type
+import { Toption } from "fakeDatabase/options/options"
+
+
+// type Toption = {
+//   value: string
+//   label: string
+// }
 
 
 const Select03 = ({

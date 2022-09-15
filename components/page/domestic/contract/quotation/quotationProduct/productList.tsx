@@ -56,12 +56,13 @@ export default function ProductList({ productStates }:
   } = productStates
 
   // =======================================
-  const lwhbReg = /L|W|H|B/
+  const centerReg = /L|W|H|B|ejectionDoor/
   // =======================================
 
   return (
     <div className={style.container} >
       {productList.map((dataItem, pIndex) => {
+        const { quoteTypeType } = dataItem
         return (
           <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
@@ -73,13 +74,16 @@ export default function ProductList({ productStates }:
                 <span>1</span>
               </div>
               {theadIndex.map((key) => {
+
                 const { width, id, type } = cellConfig[key]
-                const textCenter = lwhbReg.test(id) ? styleL.textCenter : ""
+                const textCenter = centerReg.test(id) ? styleL.textCenter : ""
                 const theStyle = { width }
                 const stateValue = dataItem[key]
-
                 const TheCell =
                   cellSwitcher({ key, pIndex, type, disabled, stateValue })
+
+                if (key === "ejectionDoor" && quoteTypeType !== "rollerDoor")
+                  return <div className={`${styleL.column}`} key={key} style={theStyle} />
 
                 return (
                   <div className={`${styleL.column} ${textCenter}`}

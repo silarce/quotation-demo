@@ -32,6 +32,8 @@ interface Tproduct {
   ejectionDoor: boolean
   component: Tcomponent[]
   accessory: Taccessory[]
+  // ----
+  quoteTypeType: string
 }
 
 
@@ -40,7 +42,7 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
   {
     discount: "100.00",
     project: "SD1",
-    quoteType: "捲門捲門捲",
+    quoteType: "不是捲門",
     L: "516",
     W: "230",
     H: "230",
@@ -57,7 +59,8 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
     memo: "防颱防颱",
     ejectionDoor: false,
     component: JSON.parse(JSON.stringify(fakeComponentList)),
-    accessory: JSON.parse(JSON.stringify(fakeAccessoryList))
+    accessory: JSON.parse(JSON.stringify(fakeAccessoryList)),
+    quoteTypeType: "normal"
   },
   {
     discount: "86.43",
@@ -79,13 +82,14 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
     memo: "防颱防颱",
     ejectionDoor: true,
     component: JSON.parse(JSON.stringify(fakeComponentList)),
-    accessory: JSON.parse(JSON.stringify(fakeAccessoryList))
+    accessory: JSON.parse(JSON.stringify(fakeAccessoryList)),
+    quoteTypeType: "rollerDoor"
   },
 ]
 
 
 // =========================================================
-type TprodCellKey = keyof (Omit<Tproduct, "component" | "accessory">)
+type TprodCellKey = keyof (Omit<Tproduct, "component" | "accessory" | "quoteTypeType">)
 
 type TprodCellConfig = {
   keyList: TprodCellKey[]
@@ -126,7 +130,7 @@ const prodCellConfigOri: () => TprodCellConfig = () => ({
     unitPrice: { id: "unitPrice", label: "單價", width: "84px", type: "input" },
     subTotal: { id: "subTotal", label: "複價", width: "84px", type: "input" },
     memo: { id: "memo", label: "備註", width: "90px", type: "select" },
-    ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "80px", type: "checkbox" },
+    ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
   }
 })
 
@@ -151,7 +155,8 @@ const emptyProduct: Tproduct = {
   memo: "",
   ejectionDoor: false,
   component: _.cloneDeep(fakeComponentList),
-  accessory: _.cloneDeep(fakeAccessoryList)
+  accessory: _.cloneDeep(fakeAccessoryList),
+  quoteTypeType: "normal"
 }
 
 

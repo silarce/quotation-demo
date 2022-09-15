@@ -104,9 +104,18 @@ export default function useProduct(
     pIndex: number,
     key: TprodCellKey
   ) => {
-    if (!option) return
+    if (!option) return 
     const { value } = option
     if (key === "ejectionDoor") return
+    const { quoteTypeType } = option
+    if (quoteTypeType) {
+      setProductList(list => {
+        list[pIndex]["quoteTypeType"] = quoteTypeType
+        if (quoteTypeType !== "rollerDoor") list[pIndex]["ejectionDoor"] = false
+        return [...list]
+      })
+    }
+
     setProductList(list => {
       list[pIndex][key] = value
       return [...list]
