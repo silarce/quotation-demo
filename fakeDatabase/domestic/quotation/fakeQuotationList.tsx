@@ -6,7 +6,7 @@ import {
 } from "./fakeQuotProfileList"
 
 import {
-  Tproduct, fakeQuotProductList,
+  Tproduct, fakeQuotProductListOri,
 } from "./fakeQuotProductionList"
 
 import {
@@ -38,22 +38,29 @@ interface TquotationObjList {
 
 type TquotationList = Tquotation[]
 
-let fakeQuotationObjList: TquotationObjList = {}
+const fakeQuotationObjListOri = () => {
+  let fakeQuotationObjList: TquotationObjList = {}
+  fakeQuotationIndex.forEach((key) => {
+    fakeQuotationObjList[key] = {
+      profile: fakeQuotProfileObjList[key],
+      productList: fakeQuotProductListOri(),
+      remarkList: fakeQuotRemarkList,
+      rangeList: fakeQuotRangeList,
+      payInfo: fakeQuotPayInfo,
+      sinature: fakeSinature,
+    }
+  })
+  return fakeQuotationObjList
+}
 
-fakeQuotationIndex.forEach((key) => {
-  fakeQuotationObjList[key] = {
-    profile: fakeQuotProfileObjList[key],
-    productList: fakeQuotProductList,
-    remarkList: fakeQuotRemarkList,
-    rangeList: fakeQuotRangeList,
-    payInfo: fakeQuotPayInfo,
-    sinature: fakeSinature,
-  }
-})
 
 
 
-const fakeQuotationList = Object.values(fakeQuotationObjList)
+const fakeQuotationListOri = () => Object.values(fakeQuotationObjListOri())
+
+
+
+
 
 export type {
   Tquotation,
@@ -66,6 +73,9 @@ export type {
   TpayInfo,
   Tsinature,
 }
+
+
+
 export {
-  fakeQuotationObjList, fakeQuotationList,
+  fakeQuotationObjListOri, fakeQuotationListOri
 }

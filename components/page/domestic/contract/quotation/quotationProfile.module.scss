@@ -63,6 +63,13 @@
       transform: translateY(-50%);
     }
   }
+  &.disabled {
+    > div {
+      input {
+        padding-left: 0px;
+      }
+    }
+  }
 }
 
 .time {

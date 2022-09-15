@@ -7,7 +7,7 @@
 .row {
   padding: 11px 0 11px 0;
   white-space: nowrap;
-  width:fit-content;
+  width: fit-content;
 }
 .buttonBox {
   display: inline-grid;
@@ -25,8 +25,9 @@
   > label {
     padding: 0;
   }
-  input {
-    font-size: 16px !important;
+  label input,
+  div input {
+    font-size: 16px;
   }
   &.textCenter {
     input {
@@ -34,3 +35,4 @@
     }
   }
 }
+

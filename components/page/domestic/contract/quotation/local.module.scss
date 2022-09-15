@@ -27,7 +27,7 @@
 .thead {
   padding: 11px 0;
   background-color: $bgc01;
-  min-width:100%;
+  min-width: 100%;
   width: fit-content;
   white-space: nowrap;
 }
@@ -91,8 +91,13 @@
       font-size: 16px;
     }
   }
-  input {
-    font-size: 16px !important;
+  label input,
+  div input {
+    font-size: 16px;
+  }
+  .checkbox {
+    display: flex;
+    padding-bottom: 1px;
   }
   &.textCenter {
     input {
@@ -105,5 +110,3 @@
   width: 100%;
   overflow: auto;
 }
-
-

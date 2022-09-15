@@ -8,6 +8,8 @@ import {
   fakeAccessoryList
 } from "./fakeQuotAccessoryList"
 
+const _ = require("lodash")
+
 
 interface Tproduct {
   discount: string  // 折數
@@ -27,13 +29,14 @@ interface Tproduct {
   unitPrice: string  // 單價
   subTotal: string  // 複價
   memo: string  // 備註
+  ejectionDoor: boolean
   component: Tcomponent[]
   accessory: Taccessory[]
 }
 
 
 
-const fakeQuotProductList: Tproduct[] = [
+const fakeQuotProductListOri: () => Tproduct[] = () => [
   {
     discount: "100.00",
     project: "SD1",
@@ -52,6 +55,7 @@ const fakeQuotProductList: Tproduct[] = [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
+    ejectionDoor: false,
     component: JSON.parse(JSON.stringify(fakeComponentList)),
     accessory: JSON.parse(JSON.stringify(fakeAccessoryList))
   },
@@ -73,6 +77,7 @@ const fakeQuotProductList: Tproduct[] = [
     unitPrice: "158610",
     subTotal: "158610",
     memo: "防颱防颱",
+    ejectionDoor: true,
     component: JSON.parse(JSON.stringify(fakeComponentList)),
     accessory: JSON.parse(JSON.stringify(fakeAccessoryList))
   },
@@ -80,48 +85,79 @@ const fakeQuotProductList: Tproduct[] = [
 
 
 // =========================================================
+type TprodCellKey = keyof (Omit<Tproduct, "component" | "accessory">)
+
 type TprodCellConfig = {
-  keyList: (keyof (Omit<Tproduct, "component" | "accessory">))[]
+  keyList: TprodCellKey[]
   cellConfig: {
-    [key in (keyof (Omit<Tproduct, "component" | "accessory">))]: {
-      id: string
-      label: string;
-      width: string
-    }
+    [key in TprodCellKey]: TcellConfig
   }
 }
 
-const prodCellConfig: TprodCellConfig = {
+interface TcellConfig {
+  id: string
+  label: string
+  width: string
+  type: string
+}
+
+
+const prodCellConfigOri: () => TprodCellConfig = () => ({
   keyList: [
     "discount", "project", "quoteType", "L", "W",
     "H", "B", "area", "cai", "doorType",
     "material", "surface", "horsepower", "qty", "unitPrice",
-    "subTotal", "memo"],
+    "subTotal", "memo", "ejectionDoor"],
   cellConfig: {
-    discount: { id: "discount", label: "折數", width: "75px" },
-    project: { id: "project", label: "項目", width: "60px" },
-    quoteType: { id: "quoteType", label: "報價別", width: "105px" },
-    L: { id: "L", label: "L", width: "60px" },
-    W: { id: "W", label: "W", width: "60px" },
-    H: { id: "H", label: "H", width: "60px" },
-    B: { id: "B", label: "B", width: "60px" },
-    area: { id: "area", label: "面積", width: "60px" },
-    cai: { id: "cai", label: "才數", width: "75px" },
-    doorType: { id: "doorType", label: "門型", width: "75px" },
-    material: { id: "material", label: "材料", width: "120px" },
-    surface: { id: "surface", label: "表面", width: "55px" },
-    horsepower: { id: "horsepower", label: "馬力", width: "60px" },
-    qty: { id: "qty", label: "數量", width: "43px" },
-    unitPrice: { id: "unitPrice", label: "單價", width: "84px" },
-    subTotal: { id: "subTotal", label: "複價", width: "84px" },
-    memo: { id: "memo", label: "備註", width: "90px" },
+    discount: { id: "discount", label: "折數", width: "75px", type: "input" },
+    project: { id: "project", label: "項目", width: "60px", type: "input" },
+    quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "select" },
+    L: { id: "L", label: "L", width: "60px", type: "input" },
+    W: { id: "W", label: "W", width: "60px", type: "input" },
+    H: { id: "H", label: "H", width: "60px", type: "input" },
+    B: { id: "B", label: "B", width: "60px", type: "input" },
+    area: { id: "area", label: "面積", width: "60px", type: "input" },
+    cai: { id: "cai", label: "才數", width: "75px", type: "input" },
+    doorType: { id: "doorType", label: "門型", width: "75px", type: "input" },
+    material: { id: "material", label: "材料", width: "120px", type: "select" },
+    surface: { id: "surface", label: "表面", width: "55px", type: "select" },
+    horsepower: { id: "horsepower", label: "馬力", width: "60px", type: "input" },
+    qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+    unitPrice: { id: "unitPrice", label: "單價", width: "84px", type: "input" },
+    subTotal: { id: "subTotal", label: "複價", width: "84px", type: "input" },
+    memo: { id: "memo", label: "備註", width: "90px", type: "select" },
+    ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "80px", type: "checkbox" },
   }
+})
+
+
+const emptyProduct: Tproduct = {
+  discount: "",
+  project: "",
+  quoteType: "",
+  L: "",
+  W: "",
+  H: "",
+  B: "",
+  area: "",
+  cai: "",
+  doorType: "",
+  material: "",
+  surface: "",
+  horsepower: "",
+  qty: "",
+  unitPrice: "",
+  subTotal: "",
+  memo: "",
+  ejectionDoor: false,
+  component: _.cloneDeep(fakeComponentList),
+  accessory: _.cloneDeep(fakeAccessoryList)
 }
 
 
 
 export type { Tproduct }
-export { fakeQuotProductList }
+export { fakeQuotProductListOri, emptyProduct }
 
-export type { TprodCellConfig }
-export { prodCellConfig }
+export type { TprodCellConfig, TcellConfig, TprodCellKey }
+export { prodCellConfigOri }

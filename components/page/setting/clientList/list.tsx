@@ -36,6 +36,17 @@ export default function List(
     setActiveIndex(activeIndex)
   }
 
+  if (!clientList[0]) return (
+    <div className={style.container}>
+      <p className={style.noDataTip}>
+        沒有符合條件的資料
+        <br />
+        請重新輸入關鍵字或清空搜尋
+      </p>
+    </div>
+  )
+
+
   return (
     <div className={style.container}>
       <AntdCollapse

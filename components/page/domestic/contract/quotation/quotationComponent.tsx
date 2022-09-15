@@ -28,8 +28,6 @@ export default function QuotationComponent(
 
   const productComponent = useMemo(() => {
     if (activeRow < 0) return []
-
-    console.log(activeRow)
     return productList[activeRow].component
   }, [activeRow, productList])
 
