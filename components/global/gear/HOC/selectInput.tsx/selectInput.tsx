@@ -1,6 +1,6 @@
 import {
   ChangeEvent,
-  Fragment
+  useState
 } from "react"
 
 
@@ -36,20 +36,26 @@ interface TinputProps {
 
 
 
-export default function SearchInput(
-  { label, searchInputPropsList, labelWidth = "", className }:
+export default function SelectInput(
+  { label, searchInputPropsList, disabled, labelWidth = "", className }:
     {
       label: string
       searchInputPropsList: (TselectProps | TinputProps)[]
+      disabled?: boolean
       labelWidth?: string
       className?: string
     }) {
 
   const labelStyle = { width: labelWidth }
 
+  const [isFocus, setIsFocus] = useState(false)
+  const styleIsFocus = isFocus ? style.isFocus : ""
+
+  const onFocus = () => { setIsFocus(true) }
+  const onBlur = () => { setIsFocus(false) }
 
   return (
-    <div className={`${style.container} ${className}`}>
+    <div className={`${style.container} ${styleIsFocus} ${className}`}>
 
       <span style={labelStyle}>{label}</span>
 
@@ -64,7 +70,11 @@ export default function SearchInput(
               stateValue={stateValue}
               options={options}
               placeholder={placeholder}
-              onChange={onChange} />
+              onChange={onChange}
+              disabled={disabled}
+              onFocus={onFocus}
+              onBlur={onBlur}
+            />
           </div>
         )
         else return (
@@ -74,6 +84,9 @@ export default function SearchInput(
             placeholder={placeholder}
             value={stateValue}
             onChange={onChange}
+            disabled={disabled}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
         )
       })}

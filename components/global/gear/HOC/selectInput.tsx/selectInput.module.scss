@@ -4,10 +4,14 @@
   display: flex;
   border-bottom: solid 1px $colorText;
   padding: 17px 4px 4px 4px;
+  &.isFocus {
+    border-color: $colorActive01;
+  }
   > span {
     font-weight: 500;
     font-size: 20px;
     color: $colorMain;
+    margin-right: 27px;
   }
   .select {
     padding: 0;
@@ -20,6 +24,9 @@
 .selectBox {
   margin-left: 27px;
   width: 120px; //預設120px
+  &:nth-of-type(1) {
+    margin-left: 0px;
+  }
   .select {
     padding: 0;
     hr {
@@ -54,6 +61,7 @@
   margin-left: 25px;
   font-weight: 400;
   font-size: 18px;
+  background-color: transparent;
   &::placeholder {
     font-weight: 400;
     font-size: 18px;
