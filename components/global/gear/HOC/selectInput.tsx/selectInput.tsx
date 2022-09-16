@@ -5,7 +5,7 @@ import {
 
 
 // css
-import style from "./searchInput.module.scss"
+import style from "./selectInput.module.scss"
 
 
 

@@ -122,3 +122,11 @@
     }
   }
 }
+
+.selectInput {
+  border-color: $colorBorder01;
+  > span {
+    margin-right: 44px;
+    color: $colorText;
+  }
+}

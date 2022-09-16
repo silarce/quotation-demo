@@ -2,7 +2,7 @@
 // 公司資料
 
 import {
-  useState,
+  useState, useMemo,
   ChangeEvent,
 } from "react"
 
@@ -11,6 +11,9 @@ import PageHeader from "components/PageHeader/pageHeader"
 // global gear
 import MyButton from "components/global/gear/button/myButton"
 import RedButton from "components/global/gear/button/redButton"
+import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
+
+
 // icon
 import iconDelete from "public/image/icon/delete01.svg"
 import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
@@ -18,6 +21,10 @@ import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./theCompanyInfo.module.scss"
+
+
+// fakeData type
+import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
 export default function TheCompanyInfo() {
   // ===================================================
@@ -30,6 +37,57 @@ export default function TheCompanyInfo() {
       return { ...state }
     })
   }
+  // ===================================================
+  // 地址
+  // 城市
+  const countryOptions = optionsCreator_country()
+  const [country, setCountry] = useState<Toption | null>(null)
+
+  // 地區
+  const [district, setDistrict] = useState<Toption | null>(null)
+  const districtOptions = useMemo(() => {
+    setDistrict(null)
+    return districtOptionsSelector(country?.value || "")
+  }, [country])
+
+  // 剩餘地址
+  const [address, setAddress] = useState("")
+
+
+  const selectInputList = [
+    {
+      stateValue: country,
+      options: countryOptions,
+      placeholder: "選擇縣市",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setCountry(option)
+      }
+    },
+    {
+      stateValue: district,
+      options: districtOptions,
+      placeholder: "選擇地區",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setDistrict(option)
+      }
+    },
+    {
+      stateValue: address,
+      placeholder: "請輸入剩餘地址",
+      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+    },
+  ]
+
+
+
+
+
+
+
   // ===================================================
   // 上傳照片
   const [upload, setUpload] = useState(false)
@@ -79,6 +137,7 @@ export default function TheCompanyInfo() {
             </div>
           }
         </div>
+
         <div className={style.formContainer}>
           {inputList.map((item, index) => {
             const { id, label } = item
@@ -96,6 +155,10 @@ export default function TheCompanyInfo() {
               </label>
             )
           })}
+
+          <SelectInput className={style.selectInput}
+            label="公司地址" searchInputPropsList={selectInputList}
+            disabled={disable} />
         </div>
       </div>
     </div>
@@ -154,10 +217,10 @@ const inputList = [
     id: "companyTaxId",
     label: "公司統編",
   },
-  {
-    id: "companyAddress",
-    label: "公司地址",
-  },
+  // {
+  //   id: "companyAddress",
+  //   label: "公司地址",
+  // },
 ]
 
 

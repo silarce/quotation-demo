@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction } from "react"
+import {
+  Dispatch, SetStateAction, ChangeEvent,
+  useState, useMemo
+} from "react"
+
+// globale gear
+import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
 
 // css
 import style from "./editStaffProfile01.module.scss"
@@ -9,7 +15,8 @@ import {
   Input, Select
 } from "./gear"
 
-// type
+// data type
+import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 import { TstaffInfo } from "fakeDatabase/staff/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
@@ -21,6 +28,98 @@ export default function EditStaffProfile01(
       setSelStaffInfo: TsetSelStaffInfo
     }
 ) {
+
+
+  // ===========================================================
+  // 戶籍地址
+  // 城市
+  const countryOptions = optionsCreator_country()
+  const [country, setCountry] = useState<Toption | null>(null)
+
+  // 地區
+  const [district, setDistrict] = useState<Toption | null>(null)
+  const districtOptions = useMemo(() => {
+    setDistrict(null)
+    return districtOptionsSelector(country?.value || "")
+  }, [country])
+
+  // 剩餘地址
+  const [address, setAddress] = useState("")
+
+
+  const selectInputList = [
+    {
+      stateValue: country,
+      options: countryOptions,
+      placeholder: "選擇縣市",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setCountry(option)
+      }
+    },
+    {
+      stateValue: district,
+      options: districtOptions,
+      placeholder: "選擇地區",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setDistrict(option)
+      }
+    },
+    {
+      stateValue: address,
+      placeholder: "請輸入剩餘地址",
+      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+    },
+  ]
+  // --------------------------------
+  // 聯絡地址
+  // 城市
+  const contactCountryOptions = optionsCreator_country()
+  const [contactCountry, setContactCountry] = useState<Toption | null>(null)
+
+  // 地區
+  const [contactDistrict, setContactDistrict] = useState<Toption | null>(null)
+  const contactDistrictOptions = useMemo(() => {
+    setContactDistrict(null)
+    return districtOptionsSelector(contactCountry?.value || "")
+  }, [contactCountry])
+
+  // 剩餘地址
+  const [contactAddress, setContactAddress] = useState("")
+
+  const contactSelectInputList = [
+    {
+      stateValue: contactCountry,
+      options: contactCountryOptions,
+      placeholder: "選擇縣市",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setContactCountry(option)
+      }
+    },
+    {
+      stateValue: contactDistrict,
+      options: contactDistrictOptions,
+      placeholder: "選擇地區",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setContactDistrict(option)
+      }
+    },
+    {
+      stateValue: contactAddress,
+      placeholder: "請輸入剩餘地址",
+      onChange: (e: ChangeEvent<HTMLInputElement>) => setContactAddress(e.target.value)
+    },
+  ]
+
+
+  // ===========================================================
 
 
   return (
@@ -71,16 +170,16 @@ export default function EditStaffProfile01(
           </div>
           {/* 地址 grid-column設為 span 3*/}
           <div >
-            {list03.map((item, index) => {
-              const stateData = selStaffInfo[item.key]
-              if (typeof stateData === "object" || stateData === undefined) return null
-              return (
-                <Input key={index} data={item}
-                  {...{ stateData, setSelStaffInfo }}
-                />
-              )
-            })}
+            <SelectInput className={style.selectInput}
+              label="戶籍地址" searchInputPropsList={selectInputList}
+              labelWidth="110px" />
+            <SelectInput className={style.selectInput}
+              label="聯絡地址" searchInputPropsList={contactSelectInputList}
+              labelWidth="110px" />
           </div>
+
+
+
         </div>
       </div>
     </div>
