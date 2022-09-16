@@ -24,10 +24,12 @@ export default function SideNav() {
     <div className={style.container}>
       {linkList?.list.map((item, index) => {
         const { label, path, list } = item
+        const reg = new RegExp(`^${path}`)
+        let active = reg.test(pathname) ? style.active : ""
         if (path) {
           return (
             <Link href={path} key={index}>
-              <a className={style.option} key={index}>{label}</a>
+              <a className={`${style.option} ${active}`} key={index}>{label}</a>
             </Link>
           )
         }
