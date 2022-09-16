@@ -71,10 +71,11 @@
   display: block;
   // margin: auto;
   // margin-top: 30px;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 18px;
   color: #14256a;
   &.active {
+    font-weight: 600;
     color: $colorActive01;
     position: relative;
     &::before {
