@@ -1,15 +1,16 @@
 
 import {
-  Tcomponent, TcomponentList,
-  fakeComponentList
+  Tcomponent,
+  fakeComponentListOri
 } from "./fakeQuotComponentList"
 import {
-  Taccessory, TaccessoryList,
-  fakeAccessoryList
+  Taccessory,
+  fakeAccessoryListOri
 } from "./fakeQuotAccessoryList"
 
-const _ = require("lodash")
 
+const fakeComponentList = fakeComponentListOri()
+const fakeAccessoryList = fakeAccessoryListOri()
 
 interface Tproduct {
   discount: string  // 折數
@@ -58,8 +59,8 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
     subTotal: "158610",
     memo: "防颱防颱",
     ejectionDoor: false,
-    component: JSON.parse(JSON.stringify(fakeComponentList)),
-    accessory: JSON.parse(JSON.stringify(fakeAccessoryList)),
+    component: fakeComponentList,
+    accessory: fakeAccessoryList,
     quoteTypeType: "normal"
   },
   {
@@ -81,8 +82,8 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
     subTotal: "158610",
     memo: "防颱防颱",
     ejectionDoor: true,
-    component: JSON.parse(JSON.stringify(fakeComponentList)),
-    accessory: JSON.parse(JSON.stringify(fakeAccessoryList)),
+    component: fakeComponentList,
+    accessory: fakeAccessoryList,
     quoteTypeType: "rollerDoor"
   },
 ]
@@ -154,8 +155,8 @@ const emptyProduct: Tproduct = {
   subTotal: "",
   memo: "",
   ejectionDoor: false,
-  component: _.cloneDeep(fakeComponentList),
-  accessory: _.cloneDeep(fakeAccessoryList),
+  component: fakeComponentList,
+  accessory: fakeAccessoryList,
   quoteTypeType: "normal"
 }
 

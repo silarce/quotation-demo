@@ -1,10 +1,9 @@
-import { useState } from "react"
 
 // component
 import MemoList from "./quotationTotal/remarkList"
 import RangeList from "./quotationTotal/rangeList"
 import PayInfo from "./quotationTotal/payInfo"
-
+import Appendix from "./quotationTotal/appendix"
 // css
 import style from "./quotationTotal.module.scss"
 // type
@@ -32,7 +31,10 @@ export default function QuotationTotal(
     <div className={style.container}>
       <MemoList remarkListState={remarkListState} disabled={disabled} />
       <div className={style.layer01}>
-        <RangeList rangeListState={rangeListState} disabled={disabled} />
+        <div>
+          <RangeList rangeListState={rangeListState} disabled={disabled} />
+          <Appendix disabled={disabled} />
+        </div>
         <PayInfo payInfoState={payInfoState} productStates={productStates}
           disabled={disabled} />
       </div>

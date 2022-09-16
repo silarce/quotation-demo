@@ -1,0 +1,17 @@
+.modal {
+  padding: 0;
+  :global(.ant-modal-content) {
+    width: fit-content;
+    max-width: 90vw;
+    margin: auto;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+}
+
+.document {
+  canvas {
+    margin: auto;
+  }
+}

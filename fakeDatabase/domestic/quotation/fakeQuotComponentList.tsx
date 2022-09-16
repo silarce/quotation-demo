@@ -1,5 +1,8 @@
 
-import { Toption } from "./localType"
+import {
+  Toption,
+  optionsCreator_material, optionsCreator_surface
+} from "fakeDatabase/options/options"
 
 
 
@@ -21,26 +24,12 @@ interface Tcomponent {
 type TcomponentList = Tcomponent[]
 
 
-const materialOptions: Toption[] = [
-  { value: "不鏽鋼304#", label: "不鏽鋼304#" },
-  { value: "不鏽鋼316#", label: "不鏽鋼316#" },
-  { value: "烤漆鐵", label: "烤漆鐵" },
-  { value: "鍍鋅鋼", label: "鍍鋅鋼" },
-  { value: "合金鋼", label: "合金鋼" },
-  { value: "耐候鋼", label: "耐候鋼" },
-  { value: "鋁合金", label: "鋁合金" },
-  { value: "陽極鋁合金", label: "陽極鋁合金" },
-]
-const surfaceOptions: Toption[] = [
-  { value: "AA", label: "AA" },
-  { value: "BA", label: "BA" },
-  { value: "CC", label: "CC" },
-  { value: "DS", label: "DS" },
-]
+const materialOptions = optionsCreator_material()
+const surfaceOptions = optionsCreator_surface()
 
 
 
-const fakeComponentList: TcomponentList = [
+const fakeComponentListOri = (): TcomponentList => [
   {
     id01: "SJ0A",
     typeName: "門片",
@@ -56,8 +45,22 @@ const fakeComponentList: TcomponentList = [
     totalPrice: "87566",
   },
   {
+    id01: "SJ0E",
+    typeName: "捲軸",
+    id02: "SJIN0E0002",
+    material: "捲軸 Ø5”",
+    surface: null,
+    basicWeight: null,
+    unit: "M",
+    qty: "1",
+    listPrice: "975.00",
+    totalListPrice: "4485",
+    price: "453",
+    totalPrice: "2084",
+  },
+  {
     id01: "SJ0A",
-    typeName: "門軌",
+    typeName: "門箱",
     id02: "SJ3020A0088",
     material: { value: "不鏽鋼316#", options: materialOptions },
     surface: null,
@@ -71,17 +74,17 @@ const fakeComponentList: TcomponentList = [
   },
   {
     id01: "SJ0A",
-    typeName: "捲箱",
+    typeName: "支板",
     id02: "SJ3020A0088",
     material: { value: "不鏽鋼316#", options: materialOptions },
     surface: null,
     basicWeight: null,
     unit: null,
     qty: "1",
-    listPrice: "2895",
-    totalListPrice: "2895",
-    price: "2895",
-    totalPrice: "2895",
+    listPrice: "11286",
+    totalListPrice: "11286",
+    price: "11286",
+    totalPrice: "11286",
   },
   {
     id01: "SJ0A",
@@ -98,18 +101,18 @@ const fakeComponentList: TcomponentList = [
     totalPrice: "1848",
   },
   {
-    id01: "SJ0E",
-    typeName: "捲軸",
-    id02: "SJIN0E0002",
-    material: "捲軸 Ø5”",
+    id01: "SJ0A",
+    typeName: "門軌",
+    id02: "SJ3020A0088",
+    material: { value: "不鏽鋼316#", options: materialOptions },
     surface: null,
     basicWeight: null,
-    unit: "M",
+    unit: null,
     qty: "1",
-    listPrice: "975.00",
-    totalListPrice: "4485",
-    price: "453",
-    totalPrice: "2084",
+    listPrice: "11286",
+    totalListPrice: "11286",
+    price: "11286",
+    totalPrice: "11286",
   },
   {
     id01: "SJ0E",
@@ -139,25 +142,7 @@ const fakeComponentList: TcomponentList = [
     price: "453",
     totalPrice: "2084",
   },
-  {
-    id01: "SJ0E",
-    typeName: "安裝費",
-    id02: null,
-    material: null,
-    surface: null,
-    basicWeight: null,
-    unit: "組",
-    qty: "1",
-    listPrice: "48975.00",
-    totalListPrice: "4485",
-    price: "453",
-    totalPrice: "2084",
-  },
 ]
-
-
-
-
 
 
 export type {
@@ -166,5 +151,5 @@ export type {
 }
 
 export {
-  fakeComponentList
+  fakeComponentListOri,
 }

@@ -69,7 +69,7 @@ export default function RemarkList({ remarkListState, disabled }:
             {disabled ?
               <span></span> :
               <IconRemoveCircle onClick={() => deleteRemark(index)} />}
-            <span>{index + 1}</span>
+            <span className={styleL.serialNumber}>{index + 1}</span>
             <Input03 {...{
               stateValue: content,
               onChange,
