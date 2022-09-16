@@ -1,0 +1,39 @@
+.pdfViewer01 {
+  background-color: #fff;
+  flex-direction: column;
+  overflow: hidden;
+  left: 0;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 9999;
+
+  .panelBar {
+    align-items: center;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    padding: 0.5rem;
+    > div {
+      margin-right: auto;
+      color: #fff;
+    }
+    > button {
+      background-color: #357edd;
+      border: none;
+      border-radius: 4px;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 8px;
+    }
+  }
+  .viewerWrapper {
+    height: 100%;
+    flex-grow: 1;
+    overflow: auto;
+    :global(.rpv-core__tooltip-body-content) {
+      color: white !important;
+    }
+  }
+} // pdfViewer01

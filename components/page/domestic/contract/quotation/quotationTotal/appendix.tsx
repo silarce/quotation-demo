@@ -7,10 +7,8 @@ import dynamic from "next/dynamic";
 
 // antd
 import { Image } from 'antd';
-// global gear
-const PdfModal = dynamic(() => import("components/global/gear/modal/pdfModal/pdfModal"), {
-  ssr: false
-});
+
+const PdfViewer01 = dynamic(() => import("components/global/gear/pdf/pdfViewer01"))
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
@@ -18,12 +16,11 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 // css
 import styleL from "./local.module.scss"
 
-
 // type
 type TimgList = {
   fileType: string
   fileName: string
-  fileSrc: string | File
+  fileSrc: string
 }[]
 
 
@@ -50,14 +47,13 @@ export default function Appendix({ disabled }:
     reader.readAsDataURL(file)
     reader.onload = (e: ProgressEvent<FileReader>) => {
       if (!e.target) return
+      console.log(e)
       if (typeof e.target.result !== "string") return
       const { name: fileName, type } = file
       const fileType =
         imageReg.test(type) ? "image"
           : pdfReg.test(type) ? "pdf" : "other"
-      const fileSrc =
-        fileType === "image" ? e.target.result
-          : fileType === "pdf" ? file : ""
+      const fileSrc = e.target.result || ""
       fileList.push({
         fileType,
         fileName,
@@ -70,6 +66,9 @@ export default function Appendix({ disabled }:
   // =========================================================
   // modal switch
   const [showModal, setShowModal] = useState(-1)
+  const closeModal = () => {
+    setShowModal(-1)
+  }
 
   return (
     <div className={`${styleL.listContainer}`}>
@@ -85,12 +84,9 @@ export default function Appendix({ disabled }:
             <span className={styleL.serialNumber}>{index + 1}</span>
             <span className={styleL.fileName}
               onClick={() => setShowModal(index)}>{fileName}</span>
-            {fileType === "pdf" &&
-              <PdfModal
-                visible={showModal === index}
-                onCancel={() => setShowModal(-1)}
-                pdfSrc={fileSrc}
-              />
+            {fileType === "pdf" && showModal === index &&
+              <PdfViewer01 pdfSrc={fileSrc} fileName={fileName}
+                closeModal={closeModal} />
             }
             {fileType === "image" &&
               // eslint-disable-next-line jsx-a11y/alt-text
