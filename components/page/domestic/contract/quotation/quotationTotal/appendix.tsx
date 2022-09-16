@@ -12,7 +12,7 @@ const PdfViewer01 = dynamic(() => import("components/global/gear/pdf/pdfViewer01
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
-
+import iconAttacth from "public/image/icon/attach.svg"
 // css
 import styleL from "./local.module.scss"
 
@@ -47,7 +47,6 @@ export default function Appendix({ disabled }:
     reader.readAsDataURL(file)
     reader.onload = (e: ProgressEvent<FileReader>) => {
       if (!e.target) return
-      console.log(e)
       if (typeof e.target.result !== "string") return
       const { name: fileName, type } = file
       const fileType =
@@ -71,7 +70,7 @@ export default function Appendix({ disabled }:
   }
 
   return (
-    <div className={`${styleL.listContainer}`}>
+    <div className={`${styleL.appendix} ${styleL.listContainer} `}>
       <p>附件</p>
       {fileList.map((item, index) => {
         const { fileType, fileName, fileSrc, } = item
@@ -81,7 +80,11 @@ export default function Appendix({ disabled }:
             {disabled ?
               <span></span> :
               <IconRemoveCircle onClick={() => removeFile(index)} />}
-            <span className={styleL.serialNumber}>{index + 1}</span>
+            <span className={styleL.serialNumber}>
+              {/*  eslint-disable-next-line @next/next/no-img-element */}
+              <img src={iconAttacth.src} alt="" />
+            </span>
+            {/* <span className={styleL.serialNumber}>{index + 1}</span> */}
             <span className={styleL.fileName}
               onClick={() => setShowModal(index)}>{fileName}</span>
             {fileType === "pdf" && showModal === index &&

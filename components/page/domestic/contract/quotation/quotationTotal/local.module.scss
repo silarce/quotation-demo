@@ -40,10 +40,8 @@
         margin-right: 6px;
         text-align: center;
       }
-      &.fileName {
-        cursor: pointer;
-      }
     }
+
     > label {
       padding: 0;
       > input {
@@ -80,6 +78,21 @@
   }
 }
 
+.appendix {
+  .fileName {
+    cursor: pointer;
+    border-bottom: solid 1px black;
+    line-height: 24px;
+  }
+  .serialNumber {
+    > img {
+      display: inline;
+    }
+  }
+}
+
+// 這不能放在appendix下
+// 因為antd的Image會portal到最外層
 .antdImage {
   img {
     display: inline;
