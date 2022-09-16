@@ -8,7 +8,9 @@ import dynamic from "next/dynamic";
 // antd
 import { Image } from 'antd';
 
+// global gear
 const PdfViewer01 = dynamic(() => import("components/global/gear/pdf/pdfViewer01"))
+import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals";
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
@@ -53,6 +55,12 @@ export default function Appendix({ disabled }:
         imageReg.test(type) ? "image"
           : pdfReg.test(type) ? "pdf" : "other"
       const fileSrc = e.target.result || ""
+
+      if (fileType === "other") {
+        console.log(fileType)
+        return ModalInfo("只能上傳圖片或pdf")
+      }
+      
       fileList.push({
         fileType,
         fileName,
