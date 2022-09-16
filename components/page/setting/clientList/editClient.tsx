@@ -1,6 +1,6 @@
 import {
-  useMemo,
-  Dispatch, SetStateAction, ChangeEvent
+  Dispatch, SetStateAction, ChangeEvent,
+  useMemo, useState,
 } from "react"
 
 import { TclientProfile } from "fakeDatabase/client/fakeClientList";
@@ -8,13 +8,17 @@ import { TclientProfile } from "fakeDatabase/client/fakeClientList";
 import { Container01 } from "components/global/gear/container/container01"
 //global gear
 import { Input01 } from "components/global/gear/input/input";
-import { Select02, Toption } from "components/global/gear/select/select";
-
+import { Select02 } from "components/global/gear/select/select";
+import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput";
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
 // css
 import style from "./editClient.module.scss"
+
+// data type
+import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
+
 
 
 export default function EditClient({ selData, setSelData }:
@@ -30,7 +34,9 @@ export default function EditClient({ selData, setSelData }:
   // ====================================================
   const { clientId: id } = selData
   const { name, shortName, phone,
-    fax, head, address, billAddress, taxtNumber,
+    fax, head,
+    //  address, billAddress, 
+    taxtNumber,
     taxtType, type, contact
   } = formObj
   const styleWidth = {
@@ -61,6 +67,94 @@ export default function EditClient({ selData, setSelData }:
   }
 
   // ====================================================
+  // 公司地址
+  // 城市
+  const countryOptions = optionsCreator_country()
+  const [country, setCountry] = useState<Toption | null>(null)
+
+  // 地區
+  const [district, setDistrict] = useState<Toption | null>(null)
+  const districtOptions = useMemo(() => {
+    setDistrict(null)
+    return districtOptionsSelector(country?.value || "")
+  }, [country])
+
+  // 剩餘地址
+  const [address, setAddress] = useState("")
+
+
+  const selectInputList = [
+    {
+      stateValue: country,
+      options: countryOptions,
+      placeholder: "選擇縣市",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setCountry(option)
+      }
+    },
+    {
+      stateValue: district,
+      options: districtOptions,
+      placeholder: "選擇地區",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setDistrict(option)
+      }
+    },
+    {
+      stateValue: address,
+      placeholder: "請輸入剩餘地址",
+      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+    },
+  ]
+  // --------------------------------
+  // 發票地址
+  // 城市
+  const billCountryOptions = optionsCreator_country()
+  const [billCountry, setBillCountry] = useState<Toption | null>(null)
+
+  // 地區
+  const [billDistrict, setBillDistrict] = useState<Toption | null>(null)
+  const billDistrictOptions = useMemo(() => {
+    setBillDistrict(null)
+    return districtOptionsSelector(billCountry?.value || "")
+  }, [billCountry])
+
+  // 剩餘地址
+  const [billAddress, setBillAddress] = useState("")
+
+  const billSelectInputList = [
+    {
+      stateValue: billCountry,
+      options: billCountryOptions,
+      placeholder: "選擇縣市",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setBillCountry(option)
+      }
+    },
+    {
+      stateValue: billDistrict,
+      options: billDistrictOptions,
+      placeholder: "選擇地區",
+      width: "90px",
+      onChange: (option: Toption | null) => {
+        if (!option) return
+        setBillDistrict(option)
+      }
+    },
+    {
+      stateValue: billAddress,
+      placeholder: "請輸入剩餘地址",
+      onChange: (e: ChangeEvent<HTMLInputElement>) => setBillAddress(e.target.value)
+    },
+  ]
+
+  // ====================================================
   return (
     <div className={style.container}>
       <div className={style.id}>
@@ -74,7 +168,7 @@ export default function EditClient({ selData, setSelData }:
           {/*  */}
           <div>
             <Input01 {...{ ...head, ...styleWidth, }} />
-            <Select02 {...{ ...taxtType }} />
+            <Select02 labelWidth={"80px"} {...{ ...taxtType }} /> {/* 扣稅列別 */}
             <Input01 {...{ ...taxtNumber, ...styleWidth, }} />
           </div>
           <div className={style.vr} />
@@ -87,8 +181,12 @@ export default function EditClient({ selData, setSelData }:
           <Select02 {...{ ...type, labelWidth: "40px" }} />
         </div>
         <div className={style.form03}>
-          <Input01 {...{ ...address, ...styleWidth, width: "941px" }} />
-          <Input01 {...{ ...billAddress, ...styleWidth, width: "941px" }} />
+          <SelectInput className={style.selectInput}
+            label="戶籍地址" searchInputPropsList={selectInputList}
+            labelWidth="90px" />
+          <SelectInput className={style.selectInput}
+            label="聯絡地址" searchInputPropsList={billSelectInputList}
+            labelWidth="90px" />
         </div>
       </Container01>
 

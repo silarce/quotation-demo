@@ -91,8 +91,8 @@ export default function DndThead({ productStates, allowMove }:
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
-      let oldIndex: number = theadIndex.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory">);
-      let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory">);
+      let oldIndex: number = theadIndex.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType">);
+      let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType">);
       setTheadIndex((item) => {
         return arrayMove(item, oldIndex, newIndex)
       })

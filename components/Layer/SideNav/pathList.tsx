@@ -130,34 +130,34 @@ const pathList: pathList = {
       },
       {
         label: "查詢派工作表",
-        path: "/domestic/",
+        path: "/domestic/unSet",
       },
       {
         label: "查詢應收帳款明細",
-        path: "/domestic/",
+        path: "/domestic/unSet",
       },
       {
         label: "查詢派工單明細",
-        path: "/domestic/",
+        path: "/domestic/unSet",
       },
       {
         label: "統計表",
         list: [
           {
             label: "業績統計表",
-            path: "/domestic/",
+            path: "/domestic/unSet",
           },
           {
             label: "個人業績統計表",
-            path: "/domestic/",
+            path: "/domestic/unSet",
           },
           {
             label: "追加工程統計表",
-            path: "/domestic/",
+            path: "/domestic/unSet",
           },
           {
             label: "報價統計表",
-            path: "/domestic/",
+            path: "/domestic/unSet",
           },
         ]
       },

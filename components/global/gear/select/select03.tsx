@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react"
+import {
+  FocusEvent,
+  useState, useEffect
+} from "react"
 
 
 // UI套件
@@ -11,15 +14,15 @@ import iconArrow from "public/image/icon/arrow_down.svg"
 // css
 import style from "./select03.module.scss"
 
-type Toption = {
-  value: string
-  label: string
-}
+// type
+import { Toption } from "fakeDatabase/options/options"
 
 
 const Select03 = ({
   stateValue, options, onChange, placeholder,
-  className, width, labelWidth, disabled }:
+  className, width, labelWidth, disabled,
+  onFocus, onBlur
+}:
   {
     stateValue: Toption | string | null
     options: Toption[]
@@ -29,6 +32,8 @@ const Select03 = ({
     width?: string
     labelWidth?: string
     disabled?: boolean
+    onFocus?: (e?: FocusEvent<HTMLInputElement>) => void
+    onBlur?: (e?: FocusEvent<HTMLInputElement>) => void
   }) => {
 
   // ====================================================
@@ -54,7 +59,7 @@ const Select03 = ({
   className = className ? className : ""
 
   if (!placeholder) placeholder = ""
-  // if (!placeholder) placeholder = `請選擇`
+
   // ========================================================
   const lableStyle = {
     width: width ? width : "",
@@ -67,7 +72,6 @@ const Select03 = ({
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={iconArrow.src} alt="下拉箭頭" />
   }
-
 
   return (
     <div className={`${style.label} ${className} selec03`}
@@ -83,6 +87,8 @@ const Select03 = ({
         styles={myStyle}
         menuPortalTarget={document.body}
         isDisabled={disabled}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
       {!disabled && <hr />}
     </div>

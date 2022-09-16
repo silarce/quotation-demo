@@ -23,7 +23,9 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    // "js/pdf-worker.js"
+    // "/pdf-worker.js"
   ],
   "exclude": [
     "node_modules"

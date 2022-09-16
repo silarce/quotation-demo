@@ -18,3 +18,9 @@
   margin: auto;
   background-color: $colorBorder01;
 }
+
+.selectInput {
+  > span {
+    color: $colorText;
+  }
+}

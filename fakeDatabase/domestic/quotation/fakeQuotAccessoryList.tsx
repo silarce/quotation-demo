@@ -18,7 +18,7 @@ interface TaccessoryObjList {
 type TaccessoryList = Taccessory[]
 
 
-const fakeAccessoryObjList = {
+const fakeAccessoryObjListOri = (): TaccessoryObjList => ({
   "SJ0A09": {
     id: "SJ0A09",
     name: "鋁合金障礙感知器",
@@ -59,14 +59,12 @@ const fakeAccessoryObjList = {
     price: "5000",
     totalPrice: "5000",
   },
-}
+})
 
 
+const fakeAccessoryListOri = 
+(): Taccessory[] => Object.values(fakeAccessoryObjListOri())
 
-
-
-const fakeAccessoryList: Taccessory[] =
-  Object.values(fakeAccessoryObjList)
 
 
 export type {
@@ -75,4 +73,4 @@ export type {
   TaccessoryList,
 }
 
-export { fakeAccessoryObjList, fakeAccessoryList }
+export {  fakeAccessoryObjListOri, fakeAccessoryListOri }

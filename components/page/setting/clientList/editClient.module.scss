@@ -78,3 +78,9 @@
   width: 1px;
   height: 151px;
 }
+
+.selectInput {
+  > span {
+    color: $colorText;
+  }
+}

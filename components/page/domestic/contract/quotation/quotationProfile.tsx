@@ -8,7 +8,7 @@ import { format } from 'date-fns'
 import ClientSelector from './modal/clientSelector'
 // glogal gear
 import Input02 from "components/global/gear/input/input02"
-import SearchInput from 'components/global/gear/HOC/selectInput.tsx/searchInput'
+import SelectInput from 'components/global/gear/HOC/selectInput.tsx/selectInput'
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
@@ -193,7 +193,9 @@ export default function QuotationProfile(
           </div>
         </div> {/* form02 */}
 
-        <SearchInput label="工程地點" searchInputPropsList={selectInputList} />
+        <SelectInput label="工程地點" searchInputPropsList={selectInputList}
+          disabled={disabled}
+        />
 
       </div>
 

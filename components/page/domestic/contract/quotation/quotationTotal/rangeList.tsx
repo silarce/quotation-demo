@@ -68,7 +68,7 @@ export default function RangeList({ rangeListState, disabled }:
             {disabled ?
               <span></span> :
               <IconRemoveCircle onClick={() => deleteRange(index)} />}
-            <span>{index + 1}</span>
+            <span className={styleL.serialNumber}>{index + 1}</span>
             <Input03 {...{
               stateValue: content,
               onChange,
