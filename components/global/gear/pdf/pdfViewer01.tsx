@@ -27,7 +27,7 @@ export default function PdfViewer01({ pdfSrc, fileName, closeModal, className = 
 // https://react-pdf-viewer.dev/docs/basic-usage/
 
   return (
-    <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.15.349/build/pdf.worker.js">
+    <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.8.335/legacy/build/pdf.worker.js">
       <div className={`${style.pdfViewer01} ${className}`}>
 
         <div className={style.panelBar}>

@@ -4,7 +4,7 @@ CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 
 // =====================================================
-
+const path = require('path');
 // =====================================================
 /** @type {import('next').NextConfig} */
 const nextConfig = {
