@@ -116,7 +116,7 @@ const pathList: pathList = {
           },
           {
             label: "查詢報價單",
-            path: "/domestic/inquireQuotation",
+            path: "/domestic/queryQuotation",
           },
           {
             label: "歷史紀錄",

@@ -36,6 +36,9 @@ div.container {
   width: 1px;
   margin: 0 15px;
   background-color: $colorBorder01;
+  &:nth-child(1){
+    display: none;
+  }
 }
 
 .label {

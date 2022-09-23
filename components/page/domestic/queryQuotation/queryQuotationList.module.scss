@@ -1,0 +1,83 @@
+@use "styles/theme01" as *;
+
+.container {
+  padding: 4px;
+  :global(.ant-collapse) {
+    border: none;
+  }
+}
+
+.panel {
+  :global(.ant-collapse-header) {
+    display: block !important;
+    padding: 0 !important;
+    background-color: #fff;
+  }
+
+  :global(.ant-collapse-content-box) {
+    padding: 0;
+  }
+
+  // :global(.){
+  // }
+}
+
+// ===============================================================
+
+.thead {
+  display: grid;
+  grid-template-columns: 112px 34px 80px auto 80px 100px 14px;
+  gap: 22px;
+  height: 40px;
+  padding: 0 30px;
+  background-color: $bgc01;
+  > * {
+    margin: auto;
+    margin-left: 0;
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+  > span {
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}
+
+div.panelHeader {
+  padding: 17px 30px;
+  border: none;
+  display: grid;
+  grid-template-columns: 112px 34px 80px auto 80px 100px 20px;
+  gap: 22px;
+  > span {
+    font-weight: 400;
+    font-size: 16px;
+    &.step {
+      color: #ea1833;
+    }
+    &.clientName {
+      color: $colorMain;
+    }
+  }
+}
+
+div.panelBody {
+  .row {
+    display: grid;
+    grid-template-columns: 112px 34px 80px auto 80px 100px 20px;
+    gap: 22px;
+    padding: 8px 30px;
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      &.step {
+        color: #ea1833;
+      }
+      &.clientName {
+        color: $colorMain;
+      }
+    }
+  }
+}
