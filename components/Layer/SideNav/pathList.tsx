@@ -192,44 +192,82 @@ const pathList: pathList = {
         label: "施工中",
         path: "/",
       },
-      {
-        label: "施工中",
-        path: "/"
-      },
     ]
   },
   // -----------------------------
-  "/project": {
+  "/worksDepartment": {
     defaultCollapse: "0",
     list: [
       {
-        label: "工程部",
+        label: "合約",
+        path: "/contract",
+      },
+      {
+        label: "新增派工單",
+        path: "/addDispatch",
+      },
+      {
+        label: "派工進度表",
+        path: "/schedule",
+      },
+      {
+        label: "報表",
         list: [
           {
-            label: "施工中",
-            path: "/",
+            label: "出貨統計表",
+            path: "/shippingStatistics",
           },
           {
-            label: "施工中",
-            path: "/",
+            label: "營業狀況表",
+            path: "/StatementOfBusinessConditions",
           },
           {
-            label: "施工中",
-            path: "/",
+            label: "應收帳款表",
+            path: "/accountsReceivableStatement",
           },
           {
-            label: "施工中",
-            path: "/",
+            label: "代辦事項總覽",
+            path: "/toDoOverview",
           },
         ]
       },
       {
-        label: "施工中",
-        path: "/",
+        label: "外包計價",
+        path: "/outsourcingPricing",
       },
       {
-        label: "施工中",
-        path: "/"
+        label: "矯正預防措施處理單",
+        path: "/correctiveAndPreventiveActionSheet"
+      },
+      {
+        label: "機具公物管理",
+        list: [
+          {
+            label: "採購維修申請",
+            path: "/purchaseRepairRequest",
+          },
+          {
+            label: "公物紀錄表",
+            path: "/publicPropertyRecord",
+          },
+        ]
+      },
+      {
+        label: "保養合約",
+        list: [
+          {
+            label: "合約",
+            path: "/contract",
+          },
+          {
+            label: "派工進度表",
+            path: "/dispatchSchedule",
+          },
+          {
+            label: "應收帳款明細",
+            path: "/accountsReceivableDetails",
+          },
+        ]
       },
     ]
   },

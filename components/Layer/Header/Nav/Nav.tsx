@@ -58,6 +58,6 @@ const linkList = [
   { icon: icon_setting, href: "/setting/theCompanyInfo", label: "公司設定" },
   { icon: icon_domestic, href: "/domestic/budget", label: "營業部", subLabel: "-國內工程" },
   { icon: icon_foreign, href: "/foreign", label: "營業部", subLabel: "-國外工程", },
-  { icon: icon_project, href: "/project", label: "工務部" },
+  { icon: icon_project, href: "/worksDepartment/contract", label: "工務部" },
 ]
 
