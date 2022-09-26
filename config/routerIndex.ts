@@ -6,6 +6,9 @@ interface indexType {
 
 
 
+// 或許應該早點把相關元件換掉
+// 然後把這個檔案刪掉比較好
+
 const routerIndex: indexType = {
   label: "第一層",
   "/": {

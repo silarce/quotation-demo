@@ -37,7 +37,7 @@ interface TinputProps {
 
 
 export default function SelectInput(
-  { label, searchInputPropsList, disabled, labelWidth = "", className }:
+  { label, searchInputPropsList, disabled, labelWidth, className }:
     {
       label: string
       searchInputPropsList: (TselectProps | TinputProps)[]
@@ -57,6 +57,7 @@ export default function SelectInput(
   return (
     <div className={`${style.container} ${styleIsFocus} ${className}`}>
 
+      {/* <span style={labelStyle}>{label}</span> */}
       <span style={labelStyle}>{label}</span>
 
       {searchInputPropsList.map((target, index) => {

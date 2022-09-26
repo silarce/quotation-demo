@@ -1,20 +1,25 @@
+import { useEffect } from 'react'
+
 
 import type { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import styles from '../styles/index.module.scss'
 
+// import Home from './home'
 
 
 const Home: NextPage = () => {
+  const router = useRouter()
 
 
+  useEffect(() => {
+    router.push("/home")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
-    <div className={styles.container}>
-      <div className={styles.foo}>
-        <h1>首頁</h1>
-  
-      </div>
-    </div>
+    <>
+    </>
   )
 }
 

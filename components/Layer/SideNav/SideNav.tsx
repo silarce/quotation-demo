@@ -8,24 +8,24 @@ const { Panel } = Collapse;
 // css
 import style from "./side.module.scss"
 
-// meta
-import pathList from './pathList';
+// 路由表
+import sidePathList from './pathList';
 
 export default function SideNav() {
-  // const pathname: string = useRouter().pathname
   const router = useRouter()
-  // const pathname = router.pathname
-  const pathname = router.asPath
-  const parentPath = "/" + pathname.split("/")[1]
+  // pathname與route在404的時候值是"_error"
+  // 會導致無法取到路由表的值
+  const asPath = router.asPath
+  const parentPath = "/" + asPath.split("/")[1]
 
-  let linkList = pathList[parentPath]
+  let linkList = sidePathList[parentPath]
 
   return (
     <div className={style.container}>
       {linkList?.list.map((item, index) => {
         const { label, path, list } = item
         const reg = new RegExp(`^${path}`)
-        let active = reg.test(pathname) ? style.active : ""
+        let active = reg.test(asPath) ? style.active : ""
         if (path) {
           return (
             <Link href={path} key={index}>
@@ -36,8 +36,8 @@ export default function SideNav() {
         if (list) {
           return (
             <Collapse key={index} className={style.collapse}
-              defaultActiveKey={[linkList.defaultCollapse]} ghost
-              // defaultActiveKey={['0']} ghost
+              defaultActiveKey={[linkList.defaultCollapse || "0"]} ghost
+              // defaultActiveKey={['0']}  ghost
               onChange={() => { }}>
               <Panel header={label} key={`${index}`}>
                 {/* <Panel header={label} key="1"> */}
@@ -45,7 +45,7 @@ export default function SideNav() {
                   {list.map((item, index) => {
                     const { label, path } = item
                     const reg = new RegExp(`^${path}`)
-                    let active = reg.test(pathname) ? style.active : ""
+                    let active = reg.test(asPath) ? style.active : ""
                     return (
                       <li className={active} key={index}>
                         <Link href={path}>{label}</Link>
