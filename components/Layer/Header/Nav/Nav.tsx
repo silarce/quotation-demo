@@ -6,14 +6,8 @@ import { useRouter } from "next/router"
 // css
 import styled from "./nav.module.scss"
 
-// icon
-import icon_home from "public/image/icon/home.svg"
-import icon_setting from "public/image/icon/setting.svg"
-import icon_domestic from "public/image/icon/domestic.svg"
-import icon_foreign from "public/image/icon/foreign.svg"
-import icon_project from "public/image/icon/project.svg"
-
-
+// 路由表
+import { topPathList } from "components/Layer/SideNav/pathList"
 
 
 
@@ -24,7 +18,6 @@ import icon_project from "public/image/icon/project.svg"
 
 
 export default function Nav() {
-  // const pathname = useRouter().pathname
   const router = useRouter()
   const pathname = router.pathname
 
@@ -32,11 +25,11 @@ export default function Nav() {
 
   return (
     <div className={styled.container}>
-      {linkList.map((item, index) => {
-        const { icon, href, label, subLabel: subLabel } = item
-        const reg = new RegExp(`^${href}`)
+      {topPathList.map((item, index) => {
+        const { icon, path01, href, label, subLabel: subLabel } = item
+        const reg = new RegExp(`^${path01}`)
         let active = reg.test(pathname) ? styled.active : ""
-        if (href === "/") active = pathname === href ? styled.active : ""
+        if (path01 === "/") active = pathname === path01 ? styled.active : ""
         return (
           <Link href={href} key={index}>
             <a className={`${styled.link} ${active}`}>
@@ -52,12 +45,3 @@ export default function Nav() {
 }
 
 // ========================================
-
-const linkList = [
-  { icon: icon_home, href: "/", label: "首頁" },
-  { icon: icon_setting, href: "/setting/theCompanyInfo", label: "公司設定" },
-  { icon: icon_domestic, href: "/domestic/budget", label: "營業部", subLabel: "-國內工程" },
-  { icon: icon_foreign, href: "/foreign", label: "營業部", subLabel: "-國外工程", },
-  { icon: icon_project, href: "/worksDepartment/contract", label: "工務部" },
-]
-
