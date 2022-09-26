@@ -13,18 +13,19 @@ import sidePathList from './pathList';
 
 export default function SideNav() {
   const router = useRouter()
-  const pathname = router.pathname
-  const parentPath = "/" + pathname.split("/")[1]
+  // pathname與route在404的時候值是"_error"
+  // 會導致無法取到路由表的值
+  const asPath = router.asPath
+  const parentPath = "/" + asPath.split("/")[1]
 
   let linkList = sidePathList[parentPath]
-
 
   return (
     <div className={style.container}>
       {linkList?.list.map((item, index) => {
         const { label, path, list } = item
         const reg = new RegExp(`^${path}`)
-        let active = reg.test(pathname) ? style.active : ""
+        let active = reg.test(asPath) ? style.active : ""
         if (path) {
           return (
             <Link href={path} key={index}>
@@ -44,7 +45,7 @@ export default function SideNav() {
                   {list.map((item, index) => {
                     const { label, path } = item
                     const reg = new RegExp(`^${path}`)
-                    let active = reg.test(pathname) ? style.active : ""
+                    let active = reg.test(asPath) ? style.active : ""
                     return (
                       <li className={active} key={index}>
                         <Link href={path}>{label}</Link>
