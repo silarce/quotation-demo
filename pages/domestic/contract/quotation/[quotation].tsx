@@ -161,17 +161,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/*  */}
 
           <div className={style.switchBar}>
-            <div className={(switch01 && style.active) || "" as string}
-              onClick={() => setSwitch01(true)}>
-              合約項目
-            </div>
+            {!switch02 &&
+              <div className={(switch01 && style.active) || ""}
+                onClick={() => setSwitch01(true)}>
+                合約項目
+              </div>
+            }
             {isContract &&
-              <div className={(!switch01 && style.active) || "" as string}
+              <div
+                className={switch02 ? style.active
+                  : !switch01 ? style.active
+                    : ""}
                 onClick={() => setSwitch01(false)}>
                 追加 / 追減項目
               </div>}
           </div>
-
           {/* 合約項目 追加/追減項目 */}
           {switch01
             ?
