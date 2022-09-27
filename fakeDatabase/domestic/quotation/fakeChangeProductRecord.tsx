@@ -182,7 +182,12 @@ const fakeProdChangingRecordList: TprodChangingRecordList = {
 
 
 
-export type { TprodChangingRecordList, TchangeRecord, TchangeListItem }
+export type {
+  TprodChangingRecordList,
+  TchangeRecord,
+  TchangeListItem,
+  TrecordProduct
+}
 export { fakeProdChangingRecordList }
 
 

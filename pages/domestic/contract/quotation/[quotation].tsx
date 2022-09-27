@@ -171,10 +171,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 追加 / 追減項目
               </div>}
           </div>
-          {/*  */}
+
+          {/* 合約項目 追加/追減項目 */}
           {switch01
             ?
             <>
+              {/* 合約項目 */}
               {/* 主產品設定 */}
               <QuotationProduction productStates={productStates} />
               <div className={style.redWrapper}>
@@ -185,11 +187,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 <QuotationAccessory productStates={productStates} />
               </div>
             </>
+            // 追加/追減項目
             : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
           }
+
           {/* 展開版本的追加追減紀錄 */}
           {prodChangingRecord && switch02 &&
             <QuotationRecord prodChangingRecord={prodChangingRecord} />}
+
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
             {...{
