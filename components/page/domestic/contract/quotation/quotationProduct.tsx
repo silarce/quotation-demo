@@ -18,8 +18,12 @@ import type { TuseProduct } from "./hook/useProduct"
 
 
 
-export default function QuotationProduction({ productStates }:
-  { productStates: TuseProduct }) {
+export default function QuotationProduction({ productStates, switch02, className = "" }:
+  {
+    productStates: TuseProduct
+    switch02?: boolean
+    className?: string
+  }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
 
@@ -27,9 +31,10 @@ export default function QuotationProduction({ productStates }:
 
   const { addProduct } = productStates
 
+  const borderRed = switch02 ? style.borderRed : ""
 
   return (
-    <div className={style.container}>
+    <div className={`${style.container} ${borderRed} ${className}`}>
       <div className={styleL.header}>
         <h2>主產品設定</h2>
         <button className={((allowMove && styleL.active) || "")}

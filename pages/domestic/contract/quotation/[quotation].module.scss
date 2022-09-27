@@ -8,7 +8,6 @@
 
 .switchBar {
   display: flex;
-
   width: calc(100% - 6px);
   margin: auto;
   margin-top: 35px;
@@ -24,7 +23,7 @@
     line-height: 52px;
     text-align: center;
     border-bottom: solid 2px transparent;
-    cursor:pointer;
+    cursor: pointer;
     &.active {
       background-color: $chosenBgc01;
       border-color: $colorActive01;
@@ -65,6 +64,68 @@
     font-size: 30px;
   }
 }
+// ===============================================
+// OldQuotationProduction
+
+.oldQuotationProduction {
+  width: calc(100% - 34px);
+  border: solid 1px $colorMain;
+  margin: auto;
+  margin-top: 16px;
+  :global(.ant-collapse-item) :global(.ant-collapse-header) {
+    padding: unset;
+    display: block;
+    background-color: #fff;
+    cursor: auto;
+  }
+  :global(.ant-collapse-content-box) {
+    padding: unset;
+    overflow: auto;
+  }
+  :global(.ant-collapse-item) {
+    border: none;
+  }
+
+  .OqpHeader {
+    position: relative;
+    background-color: #ffeeee;
+    text-align: center;
+    padding: 11px 0;
+    border-bottom: solid 1px $colorMain;
+    transition: 0.3s;
+    &.active {
+      border-color: #ffeeee;
+    }
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+    }
+    > .panelButton {
+      padding: 5px 20px 5px 28px;
+      margin: auto;
+      background-color: $bgc01;
+      border: solid 1px $colorBorder01;
+      position: absolute;
+      top: 50%;
+      right: 5px;
+      transform: translateY(-50%);
+      > * {
+        vertical-align: middle;
+        &:nth-child(1) {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+
+  .quotationProduction {
+    width: 100%;
+    margin: 0;
+    border: none;
+  }
+} // oldQuotationProduction
+
 // ===============================================
 
 .editButton {

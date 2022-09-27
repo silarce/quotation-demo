@@ -12,12 +12,18 @@ import QuotationTotal from "components/page/domestic/contract/quotation/quotatio
 import QuotationSinature from "components/page/domestic/contract/quotation/quotationSinature"
 import QuotationProdChangingRecord from "components/page/domestic/contract/quotation/quotationProdChangingRecord"
 import QuotationRecord from "components/page/domestic/contract/quotation/quotationRecord"
+
+// antd
+import { Collapse } from 'antd';
+const { Panel } = Collapse
+
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
+import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // hook
 import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
-import useProduct from "components/page/domestic/contract/quotation/hook/useProduct"
+import useProduct, { TuseProduct } from "components/page/domestic/contract/quotation/hook/useProduct"
 import useRemarkList from "components/page/domestic/contract/quotation/hook/useRemarkList"
 import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
 import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
@@ -94,7 +100,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     newQuotationId,
   })
   // product // 產品設定
-  const productStates = useProduct(quotationData?.productList, !allowEdit)
+  const productStates: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
+  const productStates02: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
@@ -177,12 +184,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
               </div>}
           </div>
           {/* 合約項目 追加/追減項目 */}
-          {switch01
+          {(switch01 || switch02)
             ?
             <>
               {/* 合約項目 */}
               {/* 主產品設定 */}
-              <QuotationProduction productStates={productStates} />
+              <QuotationProduction productStates={productStates} switch02={switch02} />
+              {/* 原報價項目 */}
+              {switch02 &&
+                <OldQuotationProduction productStates={productStates02} />
+              }
               <div className={style.redWrapper}>
                 {/* 材料配件設定 */}
                 <QuotationComponent productStates={productStates} disabled={!allowEdit} />
@@ -194,6 +205,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             // 追加/追減項目
             : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
           }
+
+
+
 
           {/* 展開版本的追加追減紀錄 */}
           {prodChangingRecord && switch02 &&
@@ -232,6 +246,52 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 
 }
 
+// =========================================================
+
+const OldQuotationProduction = ({ productStates }:
+  { productStates: TuseProduct }) => {
+
+  const [isActive, setIsActive] = useState(true)
+  const panelSwitch = () => setIsActive(!isActive)
 
 
+  return (
+    <Collapse
+      className={`${style.oldQuotationProduction}`}
+      expandIcon={() => <></>}
+      accordion={false}
+      activeKey={+isActive}
+    >
+      <Panel key={0}
+        header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}
+      >
+        <QuotationProduction
+          className={style.quotationProduction}
+          productStates={productStates} />
+      </Panel>
+    </Collapse>
+  )
+}
+
+const OqpHeader = ({ isActive, panelSwitch }: {
+  isActive: boolean
+  panelSwitch: () => void
+}) => {
+
+  const active = isActive ? style.active : ""
+
+  return (
+    <div className={`${style.OqpHeader} ${active}`}>
+      <span>原報價項目</span>
+      <button className={style.panelButton} onClick={panelSwitch}>
+        <span>展開</span>
+        <RotatingArrow01 deg={0} defaultDeg={-180} isActive={!isActive} />
+      </button>
+    </div>
+  )
+}
+
+
+
+// =========================================================
 
