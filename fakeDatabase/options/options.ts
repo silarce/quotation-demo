@@ -1,8 +1,18 @@
 
+
+// icon
+import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
+
+
+
+
+
+
 interface Toption {
   value: string
   label: string
   quoteTypeType?: string
+  icon?: string
 }
 
 
@@ -26,6 +36,7 @@ export const optionsCreator_clientSearch =
     { value: "phone", label: "電話" },
   ]
 
+// 報價別
 export const optionsCreator_quoteType =
   (): Toption[] => [
     { value: "捲門", label: "捲門", quoteTypeType: "rollerDoor" },
@@ -35,6 +46,7 @@ export const optionsCreator_quoteType =
     { value: "也不是捲門", label: "也不是捲門", quoteTypeType: "normal" },
   ]
 
+// 材料
 export const optionsCreator_material =
   (): Toption[] => [
     { value: "不鏽鋼304#", label: "不鏽鋼304#" },
@@ -45,6 +57,8 @@ export const optionsCreator_material =
     { value: "鋁合金", label: "鋁合金" },
     { value: "陽極鋁合金", label: "陽極鋁合金" },
   ]
+
+// 表面
 export const optionsCreator_surface =
   (): Toption[] => [
     { value: "AA", label: "AA" },
@@ -52,11 +66,31 @@ export const optionsCreator_surface =
     { value: "CC", label: "CC" },
     { value: "DS", label: "DS" },
   ]
+
+// 備註
 export const optionsCreator_memo =
   (): Toption[] => [
     { value: "防颱", label: "防颱" },
     { value: "耐候", label: "耐候" },
     { value: "耐酸腐蝕", label: "耐酸腐蝕" },
+  ]
+
+
+
+
+// 門軌
+
+
+
+
+
+export const optionsCreator_doorRail =
+  (): Toption[] => [
+    { value: "75", label: "75", icon: iconDoorRail75.src },
+    { value: "60", label: "60", icon: iconDoorRail75.src },
+    { value: "98", label: "98", icon: iconDoorRail75.src },
+    { value: "17", label: "17", icon: iconDoorRail75.src },
+
   ]
 
 

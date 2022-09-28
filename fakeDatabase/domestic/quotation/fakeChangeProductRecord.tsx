@@ -1,9 +1,20 @@
 import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 interface TrecordProduct
-  extends Omit<Tproduct, "component" | "accessory"> {
+  extends Omit<Tproduct,
+    "component" | "accessory" |
+    "quoteType" | "material" | "surface" | "doorRail" | "memo"
+  > {
   action: string
+  quoteType: string
+  material: string
+  surface: string
+  doorRail: string
+  memo: string
 }
+
+
+
 
 
 interface TchangeListItem {
@@ -45,14 +56,15 @@ const fakeProduct01: TrecordProduct = {
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
+  doorRail: "75",
   horsepower: "1/3HP",
   qty: "1",
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
   ejectionDoor: false,
-  quoteTypeType: "normal"
 }
+
 const fakeProduct02: TrecordProduct = {
   action: "remove",
   discount: "100.00",
@@ -67,13 +79,13 @@ const fakeProduct02: TrecordProduct = {
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
+  doorRail: "75",
   horsepower: "1/3HP",
   qty: "1",
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
   ejectionDoor: true,
-  quoteTypeType: "rollerDoor"
 }
 
 

@@ -1,10 +1,15 @@
 import { ChangeEvent } from "react"
 
+import { components } from "react-select";
+const { Option } = components
+
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import Input03 from "components/global/gear/input/input03"
 import Select03 from "components/global/gear/select/select03"
 import Checkbox01 from "components/global/gear/checkbox/checkbox01"
+import { OptionWithIcon01 } from "components/global/gear/select/optionWithIcon";
+import { SingleValueWithIcon01 } from "components/global/gear/select/singleValueWithIcon";
 // icon
 import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
@@ -14,7 +19,12 @@ import styleL from "../local.module.scss"
 
 // data type
 import { TprodCellKey, TuseProduct } from "../hook/useProduct"
-
+import {
+  emptyProduct,
+  TproductString,
+  TproductBoolean,
+  TproductObject,
+} from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 // options
 import {
   Toption,
@@ -22,6 +32,7 @@ import {
   optionsCreator_material,
   optionsCreator_surface,
   optionsCreator_memo,
+  optionsCreator_doorRail,
 } from "fakeDatabase/options/options"
 
 // ==========================================================
@@ -33,7 +44,7 @@ type TcellConfigKey = keyof typeof cellConfig
 type ToptionsObjKey =
   Extract<
     TcellConfigKey,
-    "quoteType" | "material" | "surface" | "memo"
+    "quoteType" | "material" | "surface" | "memo" | "doorRail"
   >
 type ToptionsObjList = {
   [key in ToptionsObjKey]: Toption[]
@@ -43,6 +54,7 @@ const optionsObjList: ToptionsObjList = {
   material: optionsCreator_material(),
   surface: optionsCreator_surface(),
   memo: optionsCreator_memo(),
+  doorRail: optionsCreator_doorRail()
 }
 // ==========================================================
 // ==========================================================
@@ -58,11 +70,10 @@ export default function ProductList({ productStates }:
   // =======================================
   const centerReg = /L|W|H|B|ejectionDoor/
   // =======================================
-
   return (
     <div className={style.container} >
       {productList.map((dataItem, pIndex) => {
-        const { quoteTypeType } = dataItem
+        const { quoteType } = dataItem
         return (
           <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
@@ -82,7 +93,7 @@ export default function ProductList({ productStates }:
                 const TheCell =
                   cellSwitcher({ key, pIndex, type, disabled, stateValue })
 
-                if (key === "ejectionDoor" && quoteTypeType !== "rollerDoor")
+                if (key === "ejectionDoor" && quoteType.quoteTypeType !== "rollerDoor")
                   return <div className={`${styleL.column}`} key={key} style={theStyle} />
 
                 return (
@@ -105,34 +116,56 @@ export default function ProductList({ productStates }:
   function cellSwitcher({ key, pIndex, type, disabled, stateValue }:
     {
       key: TprodCellKey
+      // key: TproductString | TproductBoolean | TproductObject
       pIndex: number
       type: string
       disabled: boolean
-      stateValue: string | boolean
+      stateValue: string | boolean | Toption
     }
   ) {
 
     switch (type) {
+
       case "input": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, pIndex, key)
+          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, pIndex, key as keyof TproductString)
         return (
           <Input03 key={`${pIndex}${key}`}
             {...{ stateValue, onChange, disabled }} />
         )
       }
+
       case "select": {
-        if (typeof stateValue !== "string") return null
         const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
-          (option: Toption | null) => onSelChange(option, pIndex, key)
+          (option: Toption | null) => onSelChange(option, pIndex, key as keyof TproductObject)
         return (
           <Select03 {...{
-            stateValue, options, onChange, disabled
+            stateValue: stateValue as Toption, options, onChange, disabled
           }} />
         )
       }
+
+      case "selectWithIcon": {
+        const options = optionsObjList[key as ToptionsObjKey]
+        const onChange =
+          (option: Toption | null) => onSelChange(option, pIndex, key as keyof TproductObject)
+
+        const customComponents = {
+          Option: OptionWithIcon01,
+          SingleValue: SingleValueWithIcon01,
+        }
+
+        return (
+          <Select03 {...{
+            stateValue: stateValue as Toption, options, onChange, disabled,
+            customComponents
+          }} />
+        )
+      }
+
+
 
       case "checkbox": {
         if (typeof stateValue !== "boolean") return null
@@ -151,9 +184,6 @@ export default function ProductList({ productStates }:
 } //ProductList
 
 // ================================================
-
-
-
 
 
 
