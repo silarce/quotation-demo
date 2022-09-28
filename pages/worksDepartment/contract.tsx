@@ -14,7 +14,7 @@ import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 import BudgeList from "components/page/domestic/budget/budgetList"
 
 // css
-import style from "./budget.module.scss"
+import style from "./contract.module.scss"
 
 // fakeData
 import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
