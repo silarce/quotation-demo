@@ -5,8 +5,10 @@ import {
 
 
 // UI套件
-import Select, { SingleValue } from 'react-select';
-import type { StylesConfig, GroupBase } from 'react-select';
+import Select, { SingleValue, } from 'react-select';
+import type {
+  StylesConfig, GroupBase,
+} from 'react-select';
 
 // icon
 import iconArrow from "public/image/icon/arrow_down.svg"
@@ -17,11 +19,17 @@ import style from "./select03.module.scss"
 // type
 import { Toption } from "fakeDatabase/options/options"
 
+type TcustomComponents = {
+  Option: (props?: any) => JSX.Element
+}
+
+
 
 const Select03 = ({
   stateValue, options, onChange, placeholder,
   className, width, labelWidth, disabled,
-  onFocus, onBlur
+  onFocus, onBlur,
+  customComponents
 }:
   {
     stateValue: Toption | string | null
@@ -34,6 +42,7 @@ const Select03 = ({
     disabled?: boolean
     onFocus?: (e?: FocusEvent<HTMLInputElement>) => void
     onBlur?: (e?: FocusEvent<HTMLInputElement>) => void
+    customComponents?: TcustomComponents
   }) => {
 
   // ====================================================
@@ -45,11 +54,10 @@ const Select03 = ({
   if (!windowReady) return null
   // ====================================================
 
-
   let option = typeof stateValue === "string"
     ? {
       value: stateValue,
-      label: stateValue
+      label: stateValue,
     }
     : stateValue;
   if (option?.value === "") option = null
@@ -66,12 +74,6 @@ const Select03 = ({
     gridTemplateColumns: labelWidth ? `${labelWidth} auto` : ""
   }
   // ========================================================
-  // eslint-disable-next-line @next/next/no-img-element
-  const DropdownIndicator = () => {
-    if (disabled) return <></>
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={iconArrow.src} alt="下拉箭頭" />
-  }
 
   return (
     <div className={`${style.label} ${className} selec03`}
@@ -82,22 +84,39 @@ const Select03 = ({
         value={option}
         options={options}
         onChange={onChange}
-        components={{ DropdownIndicator }}
         isSearchable={false}
         styles={myStyle}
         menuPortalTarget={document.body}
         isDisabled={disabled}
         onFocus={onFocus}
         onBlur={onBlur}
+        components={{
+          DropdownIndicator,
+          ...customComponents
+        }}
       />
       {!disabled && <hr />}
     </div>
   )
-}
+  // ====================================================
+  // 客製化元件
 
+  // eslint-disable-next-line @next/next/no-img-element
+  function DropdownIndicator() {
+    if (disabled) return <></>
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={iconArrow.src} alt="下拉箭頭" />
+  }
+
+  // ===================================================
+} // Select03
+// ===================================================
 
 export type { Toption }
 export default Select03
+
+
+
 
 const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
   valueContainer: (provided) => {
@@ -127,7 +146,7 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
       paddingRight: "0",
       fontWeight: "400",
       fontSize: "16px",
-      lineHeight: "22px",
+      // lineHeight: "22px",
       color: "$colorText",
       cursor: "pointer",
       backgroundColor: "transparent",
@@ -148,7 +167,7 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
     return { ...provided, position }
   },
 
-
+  // ========================================
 
 
   //   (provided,state) => {
