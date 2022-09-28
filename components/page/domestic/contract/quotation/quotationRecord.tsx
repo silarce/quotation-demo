@@ -67,9 +67,6 @@ export default function QuotationRecord({ prodChangingRecord }:
           expandIcon={() => <></>}
           accordion={false}
           activeKey={activePanel}
-        // collapsible="disabled"
-        // destroyInactivePanel={true}
-        // onChange={changeActive}
         >
           {recordKeyList.map((key, index) => {
             const changeInfo = list[key]
@@ -96,6 +93,12 @@ export default function QuotationRecord({ prodChangingRecord }:
                   changeInfo={changeInfo} panelSwitch={panelSwitch}
                   isActive={isActive}
                 />}
+                extra={
+                  <button className={style.panelButton} onClick={panelSwitch}>
+                    <span>展開</span>
+                    <RotatingArrow01 deg={0} defaultDeg={-180} isActive={isActive} />
+                  </button>
+                }
               >
                 <div className={style.prodContainer}>
                   <Thead />
@@ -126,8 +129,6 @@ export default function QuotationRecord({ prodChangingRecord }:
       priceChange > 0 ? `+$${priceChange}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         : `-$${-priceChange}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
-
-
     return (
       <div className={style.recordInfo} >
         <span>{id}</span>
@@ -135,10 +136,6 @@ export default function QuotationRecord({ prodChangingRecord }:
         <span>{date}</span>
         <span>{formatedPriceChange}</span>
         <span>{remark}</span>
-        <button className={style.panelButton} onClick={panelSwitch}>
-          <span>展開</span>
-          <RotatingArrow01 deg={0} defaultDeg={-180} isActive={isActive} />
-        </button>
       </div>
     )
   } // RecordInfo
@@ -191,8 +188,6 @@ export default function QuotationRecord({ prodChangingRecord }:
       </>
     )
   } // Tbody
-
-
 }  // QuotationRecord
 
 // ================================================================
