@@ -2,6 +2,8 @@
 
 // icon
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
+import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
+import iconDoorRail98 from "public/image/icon/doorRail/doorRail98.svg"
 
 
 
@@ -87,10 +89,8 @@ export const optionsCreator_memo =
 export const optionsCreator_doorRail =
   (): Toption[] => [
     { value: "75", label: "75", icon: iconDoorRail75.src },
-    { value: "60", label: "60", icon: iconDoorRail75.src },
-    { value: "98", label: "98", icon: iconDoorRail75.src },
-    { value: "17", label: "17", icon: iconDoorRail75.src },
-
+    { value: "60", label: "60", icon: iconDoorRail60.src },
+    { value: "98", label: "98", icon: iconDoorRail98.src },
   ]
 
 

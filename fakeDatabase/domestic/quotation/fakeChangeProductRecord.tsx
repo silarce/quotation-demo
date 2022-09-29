@@ -2,6 +2,7 @@ import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
+import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
 
 interface TrecordProduct
   extends Omit<Tproduct,
@@ -64,7 +65,7 @@ const fakeProduct01: TrecordProduct = {
   surface: "BA",
   doorRail: {
     label: "60",
-    icon: iconDoorRail75.src
+    icon: iconDoorRail60.src
   },
   horsepower: "1/3HP",
   qty: "1",

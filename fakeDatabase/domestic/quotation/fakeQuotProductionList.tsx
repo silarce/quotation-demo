@@ -1,5 +1,6 @@
 
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
+import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
 
 import { Toption } from "components/global/gear/select/select03"
 
@@ -106,9 +107,9 @@ const fakeQuotProductListOri: () => Tproduct[] = () => [
       label: "BA",
     },
     doorRail: {
-      value: "75",
-      label: "75",
-      icon: iconDoorRail75.src
+      value: "60",
+      label: "60",
+      icon: iconDoorRail60.src
     },
     horsepower: "1/3HP",
     qty: "1",
