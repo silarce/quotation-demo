@@ -1,5 +1,8 @@
 import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
+
+import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
+
 interface TrecordProduct
   extends Omit<Tproduct,
     "component" | "accessory" |
@@ -9,7 +12,10 @@ interface TrecordProduct
   quoteType: string
   material: string
   surface: string
-  doorRail: string
+  doorRail: {
+    label: string
+    icon: string
+  }
   memo: string
 }
 
@@ -56,7 +62,10 @@ const fakeProduct01: TrecordProduct = {
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
-  doorRail: "75",
+  doorRail: {
+    label: "60",
+    icon: iconDoorRail75.src
+  },
   horsepower: "1/3HP",
   qty: "1",
   unitPrice: "158610",
@@ -79,7 +88,10 @@ const fakeProduct02: TrecordProduct = {
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
-  doorRail: "75",
+  doorRail: {
+    label: "75",
+    icon: iconDoorRail75.src
+  },
   horsepower: "1/3HP",
   qty: "1",
   unitPrice: "158610",

@@ -149,10 +149,17 @@
     }
   }
   .column {
+    > * {
+      display: inline-block;
+      vertical-align: middle;
+    }
     > span {
       font-weight: 400;
       font-size: 16px;
       color: $colorText;
+    }
+    > img {
+      margin-right: 6px;
     }
   }
 }

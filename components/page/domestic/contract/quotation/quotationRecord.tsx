@@ -6,7 +6,7 @@ const { Panel } = Collapse
 
 // global gear
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
-
+import Checkbox01 from "components/global/gear/checkbox/checkbox01"
 // type
 import { TchangeListItem, TchangeRecord, TrecordProduct } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 
@@ -146,10 +146,12 @@ export default function QuotationRecord({ prodChangingRecord }:
         <span></span>
         <span></span>
         {prodKeyList.map((key, index) => {
-          const { id, label, width } = cellConfig[key]
+          const { id, label, width, type } = cellConfig[key]
           const theStyle = { width }
+          const styleCenter = type === "checkbox" ? "text-center" : ""
+          const className = `${style.column} ${styleCenter}`
           return (
-            <div className={style.column} key={index} style={theStyle}>
+            <div className={className} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           )
@@ -171,20 +173,47 @@ export default function QuotationRecord({ prodChangingRecord }:
               <span className={`${style.action} ${classAction}`}></span>
               <span>{index + 1}</span>
               {prodKeyList.map((key, index) => {
-                const { width } = cellConfig[key]
+                const { width, type } = cellConfig[key]
                 const value = item[key]
                 const theStyle = { width }
+
+                if (type === "selectWithIcon") {
+                  const { label, icon } =
+                    value as {
+                      label: string
+                      icon: string
+                    }
+                  return (
+                    <div className={style.column} key={index} style={theStyle}>
+                      {/*  eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={icon} alt="" />
+                      <span>
+                        {label}
+                      </span>
+                    </div>
+                  )
+                }
+
+                if (type === "checkbox") return (
+                  <div className={`${style.column} text-center`} key={index} style={theStyle}>
+                    <Checkbox01
+                      stateValue={value as boolean}
+                      cursor="auto"
+                    />
+                  </div>
+                )
                 return (
                   <div className={style.column} key={index} style={theStyle}>
                     <span>
-                      {value}
+                      {value as string}
                     </span>
                   </div>
                 )
-              })}
+
+              })/* prodKeyList */} 
             </div>
           )
-        })}
+        }) /* product */}
       </>
     )
   } // Tbody
