@@ -5,7 +5,7 @@ import { Collapse } from 'antd';
 
 // glogal gear
 import CellWithBar from "components/global/gear/cell/cellWithBar";
-
+import Checkbox01 from "components/global/gear/checkbox/checkbox01"
 // css
 import style from "components/page/domestic/contract/quotation/quotationProdChangingRecord.module.scss"
 
@@ -105,7 +105,6 @@ const CollapseBody = ({ record }:
   const { product } = record
   return (
     <div>
-
       <div className={style.panelBodyHeader}>
         <span></span>
         <span></span>
@@ -124,18 +123,51 @@ const CollapseBody = ({ record }:
         const { action } = item
         const classAction = action === "add" ? style.add
           : action === "remove" ? style.remove : ""
+
+        // console.log(item)
+
+
+
         return (
           <div key={index} className={style.panelBodyBody}>
             <span className={`${style.action} ${classAction}`}></span>
             <span>{index + 1}</span>
             {collapseBodyIndex.map((key, index) => {
-              const { width } = detailTheadConfigList[key]
+              const { width, type } = detailTheadConfigList[key]
               const value = item[key]
               const theStyle = { width }
+
+              if (type === "checkbox")
+                return (
+                  <div className={`${style.column} text-center`} key={index} style={theStyle}>
+                    <Checkbox01
+                      stateValue={value as boolean}
+                      cursor="auto"
+                    />
+                  </div>
+                )
+
+              if (type === "selectWithIcon") {
+                const { label, icon } =
+                  value as {
+                    label: string
+                    icon: string
+                  }
+                return (
+                  <div className={style.column} key={index} style={theStyle}>
+                    {/*  eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={icon} alt="" />
+                    <span>
+                      {label}
+                    </span>
+                  </div>
+                )
+              }
+
               return (
                 <div className={style.column} key={index} style={theStyle}>
                   <span>
-                    {value}
+                    {value as string}
                   </span>
                 </div>
               )
@@ -195,6 +227,7 @@ const theadConfigList: TtheadConfigList = {
 interface TdetailTheadConfig {
   label: string
   width: string
+  type?: string
 }
 
 interface TdetailTheadConfigList {
@@ -215,6 +248,8 @@ interface TdetailTheadConfigList {
   "unitPrice": TdetailTheadConfig
   "subTotal": TdetailTheadConfig
   "memo": TdetailTheadConfig
+  "doorRail": TdetailTheadConfig
+  "ejectionDoor": TdetailTheadConfig
 }
 
 type TdetailTheadIndex = (keyof TdetailTheadConfigList)[]
@@ -232,11 +267,13 @@ const collapseBodyIndex: TdetailTheadIndex = [
   "doorType",
   "material",
   "surface",
+  "doorRail",
   "horsepower",
   "qty",
   "unitPrice",
   "subTotal",
   "memo",
+  "ejectionDoor",
 ]
 
 const detailTheadConfigList: TdetailTheadConfigList = {
@@ -257,6 +294,8 @@ const detailTheadConfigList: TdetailTheadConfigList = {
   "unitPrice": { label: "單價", width: "84px" },
   "subTotal": { label: "複價", width: "84px" },
   "memo": { label: "備註", width: "90px" },
+  "doorRail": { label: "門軌", width: "70px", type: "selectWithIcon" },
+  "ejectionDoor": { label: "彈射門", width: "60px", type: "checkbox" },
 }
 
 
