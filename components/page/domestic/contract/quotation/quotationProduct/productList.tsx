@@ -173,7 +173,10 @@ export default function ProductList({ productStates }:
         }
         return (
           <div className={styleL.checkbox}>
-            <Checkbox01 stateValue={stateValue} onClick={onClick} />
+            <Checkbox01
+              stateValue={stateValue}
+              disabled={disabled}
+              onClick={onClick} />
           </div>
         )
       }
