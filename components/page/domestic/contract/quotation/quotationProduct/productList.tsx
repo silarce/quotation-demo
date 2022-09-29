@@ -165,11 +165,12 @@ export default function ProductList({ productStates }:
         )
       }
 
-
-
       case "checkbox": {
         if (typeof stateValue !== "boolean") return null
-        const onClick = () => onCheckboxClick(pIndex, key)
+        const onClick = () => {
+          if (disabled) return
+          onCheckboxClick(pIndex, key)
+        }
         return (
           <div className={styleL.checkbox}>
             <Checkbox01 stateValue={stateValue} onClick={onClick} />
