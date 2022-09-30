@@ -10,7 +10,8 @@
 .tagBox {
   z-index: 1;
   > button,
-  > div {
+  > div,
+  > a {
     position: relative;
     display: inline-grid;
     height: 100%;
