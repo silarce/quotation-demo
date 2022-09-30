@@ -1,0 +1,26 @@
+@use "styles/theme01" as *;
+
+.title {
+  height: 58px;
+  display: inline-flex;
+  background-color: $bgc01;
+  padding: 0px 35px;
+  > span {
+    margin: auto;
+    font-weight: 400;
+    font-size: 18px;
+    &:nth-of-type(1) {
+      margin-right: 10px;
+      color: $colorMain;
+    }
+  }
+}
+.headerWrapper {
+  width: fit-content;
+  border: solid 1px $colorBorder01;
+  border-bottom: none;
+}
+
+.childrenWrapper {
+  border: solid 1px $colorBorder01;
+}

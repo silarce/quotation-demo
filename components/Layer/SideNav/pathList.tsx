@@ -223,7 +223,7 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "合約",
-          path: path01 + "/contract",
+          path: path01 + "/contractList",
         },
         {
           label: "新增派工單",
@@ -327,7 +327,7 @@ const topPathList = [
     icon: icon_project,
     label: "工務部",
     path01: sidePathList["/worksDepartment"].path01,
-    href: sidePathList["/worksDepartment"].path01 + "/contract",
+    href: sidePathList["/worksDepartment"].path01 + "/contractList",
   },
 ]
 
