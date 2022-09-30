@@ -1,13 +1,12 @@
-
-
-
-
-
-import ContractNavLayout from "components/page/worksDepartment/contracList/contract/contractNavLayout"
 import React from "react"
+import ContractNavLayout from "components/page/worksDepartment/contracList/contract/contractNavLayout"
+
+// component
+import Profile from "components/page/worksDepartment/contracList/contract/workContactDoc/profile"
 
 
-
+// css
+import style from "./contract.module.scss"
 
 
 
@@ -15,16 +14,14 @@ import React from "react"
 export default function WorkContactDoc() {
 
   return (
-    <div>
-      <h1>workContactDoc</h1>
-      <h1>workContactDoc</h1>
-      <h1>workContactDoc</h1>
-      <h1>workContactDoc</h1>
-      <h1>workContactDoc</h1>
+    <div className={style.workContactDoc}>
+      <Profile />
     </div>
   )
 }
-
+// ===========================================================
+// ===========================================================
+// ===========================================================
 
 WorkContactDoc.getLayout = (page: React.ReactNode) => {
   return (

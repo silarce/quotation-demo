@@ -5,7 +5,7 @@ import { NextRouter } from "next/router"
 
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02 from "components/PageHeader/pageHeader02"
 
 // css
 import style from "./contractNavLayout.module.scss"

@@ -14,7 +14,7 @@ const Input02 = (
     {
       label: string,
       stateValue: string | number,
-      onChange: (e: ChangeEvent<HTMLInputElement>) => void,
+      onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
       placeholder?: string | false,
       id?: string | number
       className?: string

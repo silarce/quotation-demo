@@ -2,9 +2,10 @@
 @use "./input.module.scss" as *;
 
 .label {
-  input{
+  > span {
+  }
+  input {
     background-color: transparent;
-    
   }
   &.disabled {
     > hr {

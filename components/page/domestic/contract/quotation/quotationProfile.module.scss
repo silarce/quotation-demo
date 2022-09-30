@@ -93,4 +93,9 @@
 
 .input02 {
   padding-bottom: 4px;
+  > span {
+    color: $colorMain;
+    font-weight: 400;
+    font-size: 18px;
+  }
 }

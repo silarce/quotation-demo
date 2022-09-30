@@ -1,3 +1,6 @@
+// input03是沒有前文字的input
+
+
 
 import { ChangeEvent } from "react"
 // 產生隨機字串(作為id)
