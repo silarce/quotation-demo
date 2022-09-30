@@ -11,10 +11,10 @@ import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
 // components
-import BudgeList from "components/page/domestic/budget/budgetList"
+import ContractList from 'components/page/worksDepartment/contracList/contractList';
 
 // css
-import style from "./contract.module.scss"
+import style from "./contractList.module.scss"
 
 // fakeData
 import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
@@ -23,7 +23,7 @@ import { Toption } from "components/global/gear/select/select03"
 
 // ===========================================
 
-export default function WdContract() {
+export default function WdContractList() {
   const router = useRouter()
   const { fakeBudgetList } = fakeBudgetListGroup
 
@@ -110,10 +110,10 @@ export default function WdContract() {
   return (
     <div className={style.container}>
       {/* header panel */}
-      <PageHeader02 tag="預算" panelList={panelList} />
+      <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <BudgeList budgetList={fakeBudgetList} searchObj={searchObj} />
+        <ContractList contractList={fakeBudgetList} searchObj={searchObj} />
       </div>
     </div>
   )
