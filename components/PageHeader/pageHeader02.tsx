@@ -95,7 +95,12 @@ export default function PageHeader02(
       {/* tagBox */} {/* 左邊的部分 */}
       <div className={style.tagBox}>
         {/* simple tag */}
-        {tag && <div><span>{tag}</span></div>}
+        {tag &&
+          <div>
+            <span>{tag}</span>
+            <hr className={style.bottomBar} />
+          </div>
+        }
         {/* tags */}
         {tagList.map((item, index) => {
           const { label, onClick } = item
@@ -109,6 +114,7 @@ export default function PageHeader02(
               onClick={theOnClick}
             >
               <span>{label}</span>
+              <hr className={style.bottomBar} />
             </button>
           )
         })}
