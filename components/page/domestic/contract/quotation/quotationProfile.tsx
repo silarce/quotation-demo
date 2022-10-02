@@ -122,7 +122,7 @@ export default function QuotationProfile(
     {
       stateValue: address,
       placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)
     },
   ]
 

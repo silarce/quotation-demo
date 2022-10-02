@@ -56,12 +56,13 @@
   }
 }
 
-.input {
+.textarea {
   flex: auto;
   margin-left: 25px;
   font-weight: 400;
   font-size: 18px;
   background-color: transparent;
+  resize: none;
   &::placeholder {
     font-weight: 400;
     font-size: 18px;
