@@ -1,7 +1,17 @@
 
+
+
+
 import { ChangeEvent } from "react"
 // 產生隨機字串(作為id)
 import { nanoid } from 'nanoid'
+
+// ui
+import TextareaAutosize from 'react-textarea-autosize';
+
+// antd
+import { Input } from 'antd';
+const { TextArea } = Input;
 
 // css
 import style from "./input02.module.scss"
@@ -14,7 +24,8 @@ const Input02 = (
     {
       label: string,
       stateValue: string | number,
-      onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
+      // onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
+      onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
       placeholder?: string | false,
       id?: string | number
       className?: string
@@ -49,12 +60,23 @@ const Input02 = (
       style={lableStyle}
     >
       <span>{label}</span>
-      <input id={id} type="text" placeholder={placeholder}
+
+      <TextareaAutosize className={style.textArea}
+        id={id} placeholder={placeholder}
         autoComplete="off"
         value={stateValue}
         onChange={onChange}
         disabled={disabled}
       />
+
+      {/* <input id={id} type="text" placeholder={placeholder}
+        autoComplete="off"
+        value={stateValue}
+        onChange={onChange}
+        disabled={disabled}
+      /> */}
+
+
       <hr />
     </label>
   )
