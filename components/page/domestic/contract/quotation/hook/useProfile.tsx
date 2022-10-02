@@ -28,8 +28,11 @@ export default function useProfile({ quotationData, newQuotationId }:
   const [profile, setProfile] = useState<TquotProfile>(JSON.parse(JSON.stringify(profileOri)))
 
   const onChangeCreator = (key: keyof TquotProfile) => {
-    return (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
+    // return (e: ChangeEvent<HTMLInputElement>) => {
+    return (e: ChangeEvent<HTMLTextAreaElement>) => {
+      let value = e.target.value
+      // 避免使用者斷行
+      value = value.replace(/[\n\r\t]/g, "")
       setProfile(profile => {
         profile[key] = value
         return { ...profile }

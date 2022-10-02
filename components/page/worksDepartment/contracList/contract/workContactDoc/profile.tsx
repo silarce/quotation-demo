@@ -12,7 +12,13 @@ import style from "./workContactDoc.module.scss"
 // ==================================================
 export default function Profile() {
 
-
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
+  // input02需要新增textarea的可能，不然太長的地址會被遮掩
 
   return (
     <div className={style.profile}>
@@ -74,31 +80,31 @@ export default function Profile() {
         <Input02
           {...{
             className: style.input02,
-            label: "工程傳真", stateValue: "04-1234567",
+            label: "工程編號", stateValue: "M-1101201",
             disabled: true, ...inputStyle01
           }} />
         <Input02
           {...{
             className: style.input02,
-            label: "工程傳真", stateValue: "04-1234567",
+            label: "承包商", stateValue: "創典科技A有限公司",
             disabled: true, ...inputStyle01
           }} />
         <Input02
           {...{
             className: style.input02,
-            label: "工程傳真", stateValue: "04-1234567",
+            label: "負責人", stateValue: "李先生",
             disabled: true, ...inputStyle01
           }} />
         <Input02
           {...{
             className: style.input02,
-            label: "工程傳真", stateValue: "04-1234567",
+            label: "公司電話", stateValue: "04-1234567",
             disabled: true, ...inputStyle01
           }} />
         <Input02
           {...{
             className: style.input02,
-            label: "工程傳真", stateValue: "04-1234567",
+            label: "公司傳真", stateValue: "04-1234567",
             disabled: true, ...inputStyle01
           }} />
       </div>
