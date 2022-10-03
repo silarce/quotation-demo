@@ -91,18 +91,6 @@ export default function WdContractList() {
 
   const panelList: TpanelList = [
     { searchGroup },
-    {
-      type: "addButton",
-      label: "新增報價單",
-      onClick: () => {
-        let newQuotationId = `${fakeBudgetList.length + 1}`.padStart(2, "0")
-        newQuotationId = "S-110211-" + newQuotationId
-        router.push({
-          pathname: `/domestic/contract/quotation/newQuotation`,
-          query: { newQuotationId }
-        })
-      }
-    },
   ]
 
   // ===================================================
