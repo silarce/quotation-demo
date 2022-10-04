@@ -1,0 +1,116 @@
+@use "styles/theme01" as *;
+
+.table01 {
+  .header {
+    padding: 18px 28px;
+    > h2 {
+      display: inline-block;
+      margin: 0;
+      margin-right: 26px;
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+    }
+    > button {
+      //設定排序按鈕
+      padding: 5px 17px;
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+      border: solid 1px $colorBorder01;
+      background-color: $bgc01;
+      &.active {
+        color: $colorActive01;
+        border: solid 1px $colorActive01;
+      }
+    }
+  }
+}
+
+.tableList {
+  .row {
+    padding: 11px 0 11px 0;
+    width: fit-content;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .column {
+    padding: 2px 3px;
+    margin-left: 16px;
+    display: inline-flex;
+    align-items: center;
+
+    &.textCenter {
+      text-align: center;
+    }
+    > img {
+      display: inline-block;
+      margin-right: 6px;
+    }
+    > span {
+      display: inline-block;
+      font-size: 16px;
+    }
+  }
+
+  .rowIndex {
+    display: inline-block;
+    width: 20px;
+    margin-left: 12px;
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+  }
+}
+
+.dndThead {
+  padding: 11px 0;
+  background-color: $bgc01;
+  min-width: 100%;
+  width: fit-content;
+  white-space: nowrap;
+  .emptyBlock {
+    display: inline-block;
+    width: 20px;
+    margin-left: 12px;
+  }
+}
+
+.theadItem {
+  display: inline-block;
+  padding: 2px 3px;
+  margin-left: 16px;
+  border: solid 1px transparent;
+  width: 100%;
+  cursor: default;
+  > span {
+    color: $colorMain;
+    font-size: 16px;
+  }
+  &.allowMove {
+    border: solid 1px $colorMain;
+    cursor: grab;
+  }
+  &.isMoving {
+    background-color: $chosenBgc01;
+  }
+  &.textCenter {
+    text-align: center;
+  }
+}
+
+// .noListTip {
+//   display: inline-block;
+//   margin: 16px;
+//   font-weight: 400;
+//   font-size: 16px;
+//   color: #c1c1c1;
+// }
+
+// .scrollDiv {
+//   width: 100%;
+//   overflow: auto;
+// }
