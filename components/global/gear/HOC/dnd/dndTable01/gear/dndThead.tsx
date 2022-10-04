@@ -27,11 +27,11 @@ import {
 import TheadItem from "./dndThead/theadItem"
 
 // css
-import style from "../table01.module.scss"
+import style from "../dndTable01.module.scss"
 
 
 // type
-import { Ttable01Config } from "../table01"
+import { Ttable01Config } from "../dndTable01"
 import { TdndCellConfigkeys } from "config/dndCellConfig"
 
 // config

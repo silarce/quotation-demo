@@ -6,29 +6,27 @@ import DndThead from "./gear/dndThead"
 import TableList from "./gear/tableList"
 
 // css
-import style from "./table01.module.scss"
+import style from "./dndTable01.module.scss"
 
 // type
 import { TdndCellConfigkeys } from "config/dndCellConfig"
 
 
 export default function Table01
-  // <N extends string, I extends string>
   <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
-  ({ tableData, keyIndex }:
+  ({ tableData, keyIndex, className = "" }:
     {
       tableData: Ttable01<N, I>
       keyIndex: (N | I)[]
+      className?: string
     }) {
 
-
-  // const [theadIndex, setTheadIndex] = useState<(N | I)[]>(keyIndex)
   const [theadIndex, setTheadIndex] = useState<(N | I)[]>(keyIndex)
 
   const [allowMove, setAllowMove] = useState(false)
 
   return (
-    <div className={style.table01}>
+    <div className={`${style.table01} ${className}`}>
       <div className={style.header}>
         <h2>主產品設定</h2>
         <button className={((allowMove && style.active) || "")}

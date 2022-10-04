@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
 // css
-import style from "../../table01.module.scss"
+import style from "../../dndTable01.module.scss"
 
 import { Tconfig } from "config/dndCellConfig"
 

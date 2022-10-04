@@ -5,11 +5,11 @@ import { Dispatch, SetStateAction } from "react"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 
 // css
-import style from "../table01.module.scss"
+import style from "../dndTable01.module.scss"
 
 
 // type
-import { Ttable01, Ttable01Config } from "../table01"
+import { Ttable01, Ttable01Config } from "../dndTable01"
 import { TdndCellConfigkeys, dndCellConfigOri } from "config/dndCellConfig"
 const dndCellConfig = dndCellConfigOri()
 
