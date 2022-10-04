@@ -6,6 +6,7 @@ import { NextRouter } from "next/router"
 
 // global gear
 import PageHeader02 from "components/PageHeader/pageHeader02"
+import PageHeaderFlex01 from "components/PageHeader/pageHeaderFlex01"
 
 // css
 import style from "./contractNavLayout.module.scss"
@@ -83,14 +84,14 @@ function TheContractLayout({ router, children }:
 
   return (
     <div className={style.container}>
-      
+
       <div>
         <div className={style.title}>
           <span>合作編號</span>
           <span>{contractId}</span>
         </div>
         <div className={style.headerWrapper}>
-          <PageHeader02 linkList={linkList} />
+          <PageHeaderFlex01 linkList={linkList} />
         </div>
       </div>
 
