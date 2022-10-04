@@ -15,10 +15,9 @@ import { TdndCellConfigkeys } from "config/dndCellConfig"
 export default function Table01
   // <N extends string, I extends string>
   <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
-  ({ tableData, config, keyIndex }:
+  ({ tableData, keyIndex }:
     {
       tableData: Ttable01<N, I>
-      config: Ttable01Config<N, I>
       keyIndex: (N | I)[]
     }) {
 
@@ -38,7 +37,7 @@ export default function Table01
         </button>
       </div>
       <DndThead<N, I>
-        config={config} allowMove={allowMove}
+        allowMove={allowMove}
         theadIndex={theadIndex} setTheadIndex={setTheadIndex}
       />
       <TableList<N, I>

@@ -33,7 +33,7 @@ export default function TableList
         return (
           <CellWithBar key={rowIndex} >
             <div className={style.row}>
-              <div className={style.rowIndex}><span>{rowIndex + 1}</span></div>
+              <div className={`${style.column} ${style.rowIndex}`}><span>{rowIndex + 1}</span></div>
               {theadIndex.map((key, columnIndex) => {
                 const { width, id, position } = dndCellConfig[key]
                 const { value, icon } = item[key]

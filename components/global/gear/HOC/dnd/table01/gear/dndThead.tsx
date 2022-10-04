@@ -44,15 +44,11 @@ const dndCellConfig = dndCellConfigOri()
 export default function DndThead
   <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
   ({
-    // productData, 
-    config,
     allowMove,
     theadIndex,
     setTheadIndex
   }:
     {
-      // productData: TfakeTable01<N, I>
-      config: Ttable01Config<N, I>
       allowMove: boolean
       theadIndex: (N | I)[]
       setTheadIndex: Dispatch<SetStateAction<(N | I)[]>>
@@ -91,13 +87,7 @@ export default function DndThead
             )
           })}
         </SortableContext>
-        <DragOverlay dropAnimation={null}
-        // 為了讓滑鼠再拖移時保持cursor:"grabbing"而設這個style
-        // style={{
-        //   width: "120px", height: "40px",
-        //   cursor: "grabbing", transition: "0s",
-        // }}
-        />
+        <DragOverlay dropAnimation={null} />
       </DndContext>
     </div>
   )
