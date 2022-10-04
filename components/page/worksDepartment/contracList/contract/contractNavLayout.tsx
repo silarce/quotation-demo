@@ -82,20 +82,24 @@ function TheContractLayout({ router, children }:
   ]
 
   return (
-    <div>
-      <div className={style.title}>
-        <span>合作編號</span>
-        <span>{contractId}</span>
+    <div className={style.container}>
+      
+      <div>
+        <div className={style.title}>
+          <span>合作編號</span>
+          <span>{contractId}</span>
+        </div>
+        <div className={style.headerWrapper}>
+          <PageHeader02 linkList={linkList} />
+        </div>
       </div>
 
-      <div className={style.headerWrapper}>
-        <PageHeader02 linkList={linkList} />
-      </div>
-
-      <div className={style.childrenWrapper}>
+      <div className={`${style.mainContainer} ${style.childrenWrapper}`}>
         {children}
       </div>
+
     </div>
+
   )
 }
 
