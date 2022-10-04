@@ -10,25 +10,22 @@ import style from "../table01.module.scss"
 
 // type
 import { Ttable01, Ttable01Config } from "../table01"
-
+import { TdndCellConfigkeys, dndCellConfigOri } from "config/dndCellConfig"
+const dndCellConfig = dndCellConfigOri()
 
 export default function TableList
-  <N extends string, I extends string>
+  <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
   ({
     tableData,
-    config: theConfig,
     theadIndex,
   }:
     {
       tableData: Ttable01<N, I>
-      config: Ttable01Config<N, I>
       theadIndex: (N | I)[]
     }) {
 
   const { list } = tableData
-  const { keyIndex, config } = theConfig
 
-  const centerReg = /L|H|B/
 
   return (
     <div className={style.tableList} >
@@ -38,10 +35,10 @@ export default function TableList
             <div className={style.row}>
               <div className={style.rowIndex}><span>{rowIndex + 1}</span></div>
               {theadIndex.map((key, columnIndex) => {
-                const { width, id } = config[key]
+                const { width, id, position } = dndCellConfig[key]
                 const { value, icon } = item[key]
                 const theStyle = { width }
-                const textCenter = centerReg.test(id) ? style.textCenter : ""
+                const textCenter = position === "center" ? style.textCenter : ""
                 return (
                   <div className={`${style.column} ${textCenter}`}
                     key={key} style={theStyle} >

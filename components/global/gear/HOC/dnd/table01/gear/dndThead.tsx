@@ -32,18 +32,24 @@ import style from "../table01.module.scss"
 
 // type
 import { Ttable01Config } from "../table01"
+import { TdndCellConfigkeys } from "config/dndCellConfig"
+
+// config
+import { dndCellConfigOri } from "config/dndCellConfig"
+const dndCellConfig = dndCellConfigOri()
 
 
 // =========================================================
 // =========================================================
 export default function DndThead
-  <N extends string, I extends string>
+  <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
   ({
     // productData, 
     config,
     allowMove,
     theadIndex,
-    setTheadIndex }:
+    setTheadIndex
+  }:
     {
       // productData: TfakeTable01<N, I>
       config: Ttable01Config<N, I>
@@ -75,8 +81,7 @@ export default function DndThead
           strategy={horizontalListSortingStrategy}
         >
           {theadIndex.map((key, index) => {
-            // const theadInfo = cellConfig[key]
-            const theadInfo = config.config[key]
+            const theadInfo = dndCellConfig[key]
             return (
               // key必須是items裡的值
               <TheadItem key={key} theadInfo={theadInfo}

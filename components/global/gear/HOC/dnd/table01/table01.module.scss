@@ -1,5 +1,7 @@
 @use "styles/theme01" as *;
 
+$cellgap: 16px;
+
 .table01 {
   .header {
     padding: 18px 28px;
@@ -27,45 +29,6 @@
   }
 }
 
-.tableList {
-  .row {
-    padding: 11px 0 11px 0;
-    width: fit-content;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .column {
-    padding: 2px 3px;
-    margin-left: 16px;
-    display: inline-flex;
-    align-items: center;
-
-    &.textCenter {
-      text-align: center;
-    }
-    > img {
-      display: inline-block;
-      margin-right: 6px;
-    }
-    > span {
-      display: inline-block;
-      font-size: 16px;
-    }
-  }
-
-  .rowIndex {
-    display: inline-block;
-    width: 20px;
-    margin-left: 12px;
-    > span {
-      font-weight: 400;
-      font-size: 16px;
-    }
-  }
-}
-
 .dndThead {
   padding: 11px 0;
   background-color: $bgc01;
@@ -80,9 +43,9 @@
 }
 
 .theadItem {
-  display: inline-block;
+  display: inline-flex;
   padding: 2px 3px;
-  margin-left: 16px;
+  margin-left: $cellgap;
   border: solid 1px transparent;
   width: 100%;
   cursor: default;
@@ -98,7 +61,47 @@
     background-color: $chosenBgc01;
   }
   &.textCenter {
-    text-align: center;
+    > * {
+      margin: auto;
+    }
+  }
+}
+
+.tableList {
+  .row {
+    padding: 11px 0 11px 0;
+    width: fit-content;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+  }
+  .column {
+    padding: 2px 3px;
+    margin-left: $cellgap;
+    display: inline-flex;
+    align-items: center;
+    &.textCenter {
+      > span {
+        margin: auto;
+      }
+    }
+    > img {
+      display: inline-block;
+      margin-right: 6px;
+    }
+    > span {
+      display: inline-block;
+      font-size: 16px;
+    }
+  }
+  .rowIndex {
+    display: inline-block;
+    width: 20px;
+    margin-left: 12px;
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+    }
   }
 }
 

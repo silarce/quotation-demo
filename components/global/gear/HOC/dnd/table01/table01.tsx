@@ -8,17 +8,23 @@ import TableList from "./gear/tableList"
 // css
 import style from "./table01.module.scss"
 
+// type
+import { TdndCellConfigkeys } from "config/dndCellConfig"
+
 
 export default function Table01
-  <N extends string, I extends string>
-  ({ tableData, config }:
+  // <N extends string, I extends string>
+  <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
+  ({ tableData, config, keyIndex }:
     {
       tableData: Ttable01<N, I>
       config: Ttable01Config<N, I>
+      keyIndex: (N | I)[]
     }) {
 
 
-  const [theadIndex, setTheadIndex] = useState<(N | I)[]>(config.keyIndex)
+  // const [theadIndex, setTheadIndex] = useState<(N | I)[]>(keyIndex)
+  const [theadIndex, setTheadIndex] = useState<(N | I)[]>(keyIndex)
 
   const [allowMove, setAllowMove] = useState(false)
 
@@ -38,7 +44,6 @@ export default function Table01
       <TableList<N, I>
         theadIndex={theadIndex}
         tableData={tableData}
-        config={config}
       />
     </div>
   )
@@ -47,7 +52,7 @@ export default function Table01
 // =========================================================
 // =========================================================
 // =========================================================
-type Ttable01<N extends string, I extends string> = {
+type Ttable01<N extends TdndCellConfigkeys, I extends TdndCellConfigkeys> = {
   list: (
     {
       [key in N]: {
@@ -66,7 +71,7 @@ type Ttable01<N extends string, I extends string> = {
 
 // type Ttable01Config<keys extends string> = {
 //   keyIndex: keys[]
-type Ttable01Config<N extends string, I extends string> = {
+type Ttable01Config<N extends TdndCellConfigkeys, I extends TdndCellConfigkeys> = {
   keyIndex: (N | I)[]
   config: {
     [key in (N | I)]: {

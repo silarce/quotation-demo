@@ -5,22 +5,17 @@ import { CSS } from "@dnd-kit/utilities"
 // css
 import style from "../../table01.module.scss"
 
-interface TtheadItem {
-  id: string
-  label: string
-  width: string
-}
-
+import { Tconfig } from "config/dndCellConfig"
 
 
 export default function TheadItem({ theadInfo, allowMove, isMoving }:
   {
-    theadInfo: TtheadItem
+    theadInfo: Tconfig
     allowMove?: boolean
     isMoving?: boolean
   }) {
 
-  const { id, label, width } = theadInfo
+  const { id, label, width, position } = theadInfo
 
   const {
     attributes, listeners, setNodeRef, transform, transition
@@ -40,11 +35,10 @@ export default function TheadItem({ theadInfo, allowMove, isMoving }:
   }
 
   // ===========================================================
-  const lwhbReg = /L|W|H|B/
-
   const styleAllowMove = allowMove ? style.allowMove : ""
   const styleIsMoving = isMoving ? style.isMoving : ""
-  const styleIsCentewr = lwhbReg.test(id) ? style.textCenter : ""
+
+  const styleIsCentewr = position === "center" ? style.textCenter : ""
 
   return (
     <div className={`${style.theadItem} ${styleAllowMove} ${styleIsMoving} ${styleIsCentewr}`}
