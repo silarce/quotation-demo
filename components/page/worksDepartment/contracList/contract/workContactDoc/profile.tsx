@@ -12,13 +12,6 @@ import style from "./workContactDoc.module.scss"
 // ==================================================
 export default function Profile() {
 
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
-  // input02需要新增textarea的可能，不然太長的地址會被遮掩
 
   return (
     <div className={style.profile}>
