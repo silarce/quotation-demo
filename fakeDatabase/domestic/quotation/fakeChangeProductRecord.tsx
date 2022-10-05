@@ -1,9 +1,27 @@
 import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
+
+import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
+import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
+
 interface TrecordProduct
-  extends Omit<Tproduct, "component" | "accessory"> {
+  extends Omit<Tproduct,
+    "component" | "accessory" |
+    "quoteType" | "material" | "surface" | "doorRail" | "memo"
+  > {
   action: string
+  quoteType: string
+  material: string
+  surface: string
+  doorRail: {
+    label: string
+    icon: string
+  }
+  memo: string
 }
+
+
+
 
 
 interface TchangeListItem {
@@ -45,14 +63,18 @@ const fakeProduct01: TrecordProduct = {
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
+  doorRail: {
+    label: "60",
+    icon: iconDoorRail60.src
+  },
   horsepower: "1/3HP",
   qty: "1",
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
   ejectionDoor: false,
-  quoteTypeType: "normal"
 }
+
 const fakeProduct02: TrecordProduct = {
   action: "remove",
   discount: "100.00",
@@ -67,13 +89,16 @@ const fakeProduct02: TrecordProduct = {
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
+  doorRail: {
+    label: "75",
+    icon: iconDoorRail75.src
+  },
   horsepower: "1/3HP",
   qty: "1",
   unitPrice: "158610",
   subTotal: "158610",
   memo: "防颱防颱",
   ejectionDoor: true,
-  quoteTypeType: "rollerDoor"
 }
 
 
@@ -182,7 +207,12 @@ const fakeProdChangingRecordList: TprodChangingRecordList = {
 
 
 
-export type { TprodChangingRecordList, TchangeRecord, TchangeListItem }
+export type {
+  TprodChangingRecordList,
+  TchangeRecord,
+  TchangeListItem,
+  TrecordProduct
+}
 export { fakeProdChangingRecordList }
 
 

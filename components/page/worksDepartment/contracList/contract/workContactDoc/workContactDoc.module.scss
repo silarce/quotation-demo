@@ -1,0 +1,94 @@
+@use "styles/theme01" as *;
+
+.profile {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  padding: 40px 50px;
+
+  .leftBlock {
+    width: 650px;
+    .leftUpBlock {
+      margin-top: 24px;
+      display: grid;
+      gap: 21px;
+    }
+    > hr {
+      margin: 21px 0;
+    }
+    .leftDownBlock {
+      display: grid;
+      grid-template-columns: auto 220px;
+      justify-content: space-between;
+      gap: 21px;
+      > .input02:nth-last-of-type(1) {
+        grid-column: span 2;
+      }
+    }
+  }
+  .rightBlock {
+    display: grid;
+    gap: 16px;
+    width: 400px;
+    height: fit-content;
+    padding: 20px 24px;
+    background-color: $bgc01;
+  }
+
+  .input02 {
+    padding: 0;
+    > span {
+      color: $colorMain;
+      font-weight: 400;
+      font-size: 18px;
+    }
+  }
+}
+// ==========================================================
+.workProject {
+  > .title {
+    margin: 0 3px;
+    height: 52px;
+    line-height: 52px;
+    background-color: $bgc01;
+    text-align: center;
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+    }
+  }
+}
+
+// ==========================================================
+.remark {
+  margin: 55px 80px 95px 17px;
+  margin-top: 55px;
+  .title {
+    font-weight: 400;
+    font-size: 18px;
+    color: $colorMain;
+    margin: 0;
+    margin-bottom: 15px;
+  }
+  .ul {
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+    > li {
+      display: grid;
+      grid-template-columns: 20px auto;
+      gap: 6px;
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+        &:nth-of-type(1) {
+          margin: auto;
+          margin-top: 0;
+        }
+      }
+    }
+  }
+}
+// ==========================================================

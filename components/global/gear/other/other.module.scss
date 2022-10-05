@@ -1,0 +1,9 @@
+@use "styles/theme01" as *;
+
+.status {
+  padding: 4px 10px;
+  font-weight: 400;
+  font-size: 16px;
+  color: white;
+  background-color: $colorMain;
+}

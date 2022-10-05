@@ -5,31 +5,44 @@
   grid-template-columns: repeat(2, auto);
   justify-content: space-between;
   height: 58px;
-  // padding-bottom: 15px;
 }
 
 .tagBox {
   z-index: 1;
   > button,
-  > div {
+  > div,
+  > a {
+    position: relative;
     display: inline-grid;
-    height: calc(100% + 1px);
+    height: 100%;
     padding: 0px 35px;
     background-color: $bgc01;
-    &.active {
-      background-color: $chosenBgc01;
-      border-bottom: solid 2px $colorActive01;
-    }
     > span {
       font-weight: 400;
       font-size: 18px;
       margin: auto;
     }
+    > .bottomBar {
+      position: absolute;
+      bottom: -1px;
+      width: 100%;
+      border-width: 0 0 2px 0;
+      border-color: transparent;
+    }
+
+    &.active {
+      background-color: $chosenBgc01;
+      > .bottomBar {
+        border-color: $colorActive01;
+      }
+    }
   }
   > div {
     padding: 0px 48px;
     cursor: auto;
-    border-bottom: solid 2px $colorActive01;
+    > .bottomBar {
+      border-color: $colorActive01;
+    }
   }
 }
 

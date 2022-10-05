@@ -1,0 +1,41 @@
+@use "styles/theme01" as *;
+
+.pageHeaderFlex01 {
+  display: flex;
+  width: 100%;
+  height: 58px;
+  > button,
+  > div,
+  > a {
+    flex: auto;
+    position: relative;
+    display: inline-flex;
+    background-color: $bgc01;
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      margin: auto;
+    }
+    > .bottomBar {
+      position: absolute;
+      bottom: -1px;
+      width: 100%;
+      border-width: 0 0 2px 0;
+      border-color: transparent;
+    }
+
+    &.active {
+      background-color: $chosenBgc01;
+      > .bottomBar {
+        border-color: $colorActive01;
+      }
+    }
+  }
+  > div {
+    padding: 0px 48px;
+    cursor: auto;
+    > .bottomBar {
+      border-color: $colorActive01;
+    }
+  }
+}

@@ -41,7 +41,7 @@
       padding-top: 0;
       padding-bottom: 0;
     }
-    input {
+    textarea {
       padding-left: 25px;
     }
     > button {
@@ -65,7 +65,7 @@
   }
   &.disabled {
     > div {
-      input {
+      textarea {
         padding-left: 0px;
       }
     }
@@ -93,4 +93,9 @@
 
 .input02 {
   padding-bottom: 4px;
+  > span {
+    color: $colorMain;
+    font-weight: 400;
+    font-size: 18px;
+  }
 }

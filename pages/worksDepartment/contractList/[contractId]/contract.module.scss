@@ -1,0 +1,27 @@
+@use "styles/layout" as *;
+@use "styles/theme01" as *;
+
+.workContactDoc {
+}
+// ==================================================
+.outboundOrder {
+  padding: 17px;
+  padding-top: 48px;
+  .title {
+    margin-left: 31px;
+    margin-bottom: 35px;
+    > div {
+      display: grid;
+      grid-template-columns: 75px auto;
+      gap: 20px;
+      > span {
+        font-weight: 400;
+        font-size: 18px;
+        &:nth-of-type(1) {
+          color: $colorMain;
+        }
+      }
+    }
+  }
+}
+// ==================================================

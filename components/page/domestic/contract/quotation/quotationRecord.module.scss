@@ -7,6 +7,8 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
   > * {
     display: inline-block;
   }
@@ -44,26 +46,23 @@
         }
       }
     }
+    &:nth-of-type(3) {
+      margin: auto;
+      margin-right: 0;
+    }
   }
 }
 
 .recordList {
-  height: 650px;
+  // height: 650px;
   overflow: auto;
   // padding: 3px;
   // border: solid 1px $colorBorder01;
 }
 
-.recordContainer {
-  margin-top: 11px;
-  border: solid 1px $colorMain;
-  padding: 0 3px;
-  &:nth-of-type(1) {
-    margin-top: 21px;
-  }
-}
 .recordInfo {
-  padding: 0px 30px;
+  padding: 2px 30px;
+  padding-right: 15px;
   display: grid;
   grid-template-columns: repeat(4, fit-content(100%)) auto;
   > span {
@@ -75,9 +74,10 @@
       font-weight: 700;
       color: $colorMain;
     }
+    // 直線
     &:nth-of-type(2) {
       width: 1px;
-      height: 45.14px;
+      // height: 45.14px;
       padding: 0;
       margin: 0 25px;
       background-color: $colorBorder01;
@@ -149,10 +149,64 @@
     }
   }
   .column {
+    > * {
+      display: inline-block;
+      vertical-align: middle;
+    }
     > span {
       font-weight: 400;
       font-size: 16px;
       color: $colorText;
+    }
+    > img {
+      margin-right: 6px;
+    }
+  }
+}
+
+.collapse {
+  border: none;
+  :global(.ant-collapse-item) :global(.ant-collapse-header) {
+    padding: unset;
+    // display: block;
+    background-color: #fff;
+  }
+  :global(.ant-collapse-content-box) {
+    padding: unset;
+    overflow: auto;
+  }
+  :global(.ant-collapse-item) {
+    border: solid 1px $colorMain;
+    border-bottom: 0;
+    &:nth-last-of-type(1) {
+      border-bottom: solid 1px $colorMain;
+    }
+  }
+  :global(.ant-collapse-extra) {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 7px;
+  }
+}
+.recordContainer {
+  margin-top: 11px;
+  padding: 0 3px;
+  &:nth-of-type(1) {
+    margin-top: 21px;
+  }
+}
+
+.panelButton {
+  width: fit-content;
+  padding: 5px 20px 5px 28px;
+  margin: auto;
+  background-color: $bgc01;
+  border: solid 1px $colorBorder01;
+  white-space: nowrap;
+  > * {
+    vertical-align: middle;
+    &:nth-child(1) {
+      margin-right: 10px;
     }
   }
 }

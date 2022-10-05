@@ -71,7 +71,7 @@ export default function EditStaffProfile01(
     {
       stateValue: address,
       placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)
     },
   ]
   // --------------------------------
@@ -114,7 +114,7 @@ export default function EditStaffProfile01(
     {
       stateValue: contactAddress,
       placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setContactAddress(e.target.value)
+      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setContactAddress(e.target.value)
     },
   ]
 

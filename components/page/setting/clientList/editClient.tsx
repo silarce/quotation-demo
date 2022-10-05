@@ -107,7 +107,7 @@ export default function EditClient({ selData, setSelData }:
     {
       stateValue: address,
       placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)
+      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)
     },
   ]
   // --------------------------------
@@ -150,7 +150,7 @@ export default function EditClient({ selData, setSelData }:
     {
       stateValue: billAddress,
       placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setBillAddress(e.target.value)
+      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setBillAddress(e.target.value)
     },
   ]
 

@@ -3,6 +3,9 @@ import {
   useState
 } from "react"
 
+// ui
+import TextareaAutosize from 'react-textarea-autosize';
+
 
 // css
 import style from "./selectInput.module.scss"
@@ -28,7 +31,7 @@ interface TselectProps {
 interface TinputProps {
   stateValue: string
   placeholder?: string
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
   className?: string
   width?: string
   options?: undefined
@@ -79,8 +82,8 @@ export default function SelectInput(
           </div>
         )
         else return (
-          <input className={style.input} key={index}
-            type="text" autoComplete="off"
+          <TextareaAutosize className={style.textarea} key={index}
+            autoComplete="off"
             style={theStyle}
             placeholder={placeholder}
             value={stateValue}
@@ -89,6 +92,16 @@ export default function SelectInput(
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          // <input className={style.input} key={index}
+          //   type="text" autoComplete="off"
+          //   style={theStyle}
+          //   placeholder={placeholder}
+          //   value={stateValue}
+          //   onChange={onChange}
+          //   disabled={disabled}
+          //   onFocus={onFocus}
+          //   onBlur={onBlur}
+          // />
         )
       })}
     </div>

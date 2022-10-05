@@ -1,0 +1,137 @@
+@use "styles/theme01" as *;
+
+$cellgap: 16px;
+
+.table01 {
+  padding: 0 4px;
+  margin: 17px;
+  margin-bottom: 0;
+  border: solid 1px $colorBorder01;
+  .header {
+    padding: 18px 28px;
+    > h2 {
+      display: inline-block;
+      margin: 0;
+      margin-right: 26px;
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+    }
+    > button {
+      //設定排序按鈕
+      padding: 5px 17px;
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+      border: solid 1px $colorBorder01;
+      background-color: $bgc01;
+      &.active {
+        color: $colorActive01;
+        border: solid 1px $colorActive01;
+      }
+    }
+  }
+}
+
+.dndThead {
+  display: inline-flex;
+  // gap: $cellgap;
+  padding: 11px 0;
+  min-width: 100%;
+  width: fit-content;
+  background-color: $bgc01;
+  white-space: nowrap;
+  .emptyBlock {
+    display: inline-block;
+    width: 20px;
+    margin-left: 22px;
+    margin-right: 10px;
+  }
+}
+
+.theadItem {
+  display: inline-flex;
+  width: 100%;
+  padding: 2px 3px;
+  margin-left: $cellgap;
+  border: solid 1px transparent;
+  cursor: default;
+  &:nth-of-type(2) {
+    margin-left: 0px;
+  }
+
+  &.allowMove {
+    border: solid 1px $colorMain;
+    cursor: grab;
+  }
+  &.isMoving {
+    background-color: $chosenBgc01;
+  }
+  &.textCenter {
+    > * {
+      margin: auto;
+    }
+  }
+  > span {
+    color: $colorMain;
+    font-size: 16px;
+  }
+}
+
+.tableList {
+  max-height: 410px;
+  overflow: auto;
+  .row {
+    display: inline-flex;
+    // gap: $cellgap;
+    padding: 11px 0 11px 0;
+    width: fit-content;
+    white-space: nowrap;
+    align-items: center;
+  }
+  .column {
+    padding: 2px 3px;
+    margin-left: $cellgap;
+    display: inline-flex;
+    align-items: center;
+    &:nth-of-type(2) {
+      margin-left: 0px;
+    }
+    &.rowIndex {
+      display: inline-block;
+      width: 20px;
+      margin-left: 22px;
+      margin-right: 10px;
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+    }
+    &.textCenter {
+      > span {
+        margin: auto;
+      }
+    }
+    > img {
+      display: inline-block;
+      margin-right: 6px;
+    }
+    > span {
+      display: inline-block;
+      font-size: 16px;
+    }
+  }
+}
+
+// .noListTip {
+//   display: inline-block;
+//   margin: 16px;
+//   font-weight: 400;
+//   font-size: 16px;
+//   color: #c1c1c1;
+// }
+
+// .scrollDiv {
+//   width: 100%;
+//   overflow: auto;
+// }

@@ -9,10 +9,15 @@ import {
 import { Toption } from "components/global/gear/select/select03"
 
 // data type
-import type { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+import type {
+  Tproduct,
+} from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import {
   TprodCellKey,
-  emptyProduct, prodCellConfigOri
+  emptyProduct, prodCellConfigOri,
+  TproductString,
+  TproductBoolean,
+  TproductObject,
 } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 
 // options
@@ -90,9 +95,8 @@ export default function useProduct(
   const onInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     pIndex: number,
-    key: TprodCellKey
+    key: keyof TproductString
   ) => {
-    if (key === "ejectionDoor") return
     setProductList(list => {
       list[pIndex][key] = e.target.value
       return [...list]
@@ -102,22 +106,12 @@ export default function useProduct(
   const onSelChange = (
     option: Toption | null,
     pIndex: number,
-    key: TprodCellKey
+    key: keyof TproductObject
   ) => {
-    if (!option) return 
-    const { value } = option
-    if (key === "ejectionDoor") return
-    const { quoteTypeType } = option
-    if (quoteTypeType) {
-      setProductList(list => {
-        list[pIndex]["quoteTypeType"] = quoteTypeType
-        if (quoteTypeType !== "rollerDoor") list[pIndex]["ejectionDoor"] = false
-        return [...list]
-      })
-    }
+    if (!option) return
 
     setProductList(list => {
-      list[pIndex][key] = value
+      list[pIndex][key] = option
       return [...list]
     })
   }

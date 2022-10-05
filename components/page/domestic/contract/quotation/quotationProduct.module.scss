@@ -6,6 +6,9 @@
   margin: auto;
   margin-top: 17px;
   border: solid 1px $colorBorder01;
+  &.borderRed {
+    border: solid 1px #ea1833;
+  }
 }
 
 .listContainer {
