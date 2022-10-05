@@ -1,0 +1,8 @@
+@use "styles/theme01" as *;
+
+.orderList {
+  .grid {
+    display: grid;
+    grid-template-columns: auto;
+  }
+}
