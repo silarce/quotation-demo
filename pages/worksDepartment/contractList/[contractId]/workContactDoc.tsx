@@ -1,11 +1,10 @@
 // 工程聯絡單
 // 工程聯絡單
 // 工程聯絡單
-
 import React from "react"
-import ContractNavLayout from "components/page/worksDepartment/contracList/contract/contractNavLayout"
 
 // component
+import PageHeader from "components/page/worksDepartment/contracList/contract/gear/PageHeader"
 import Profile from "components/page/worksDepartment/contracList/contract/workContactDoc/profile"
 import WorkProject from "components/page/worksDepartment/contracList/contract/workContactDoc/workProject"
 import Remark from "components/page/worksDepartment/contracList/contract/workContactDoc/remark"
@@ -15,13 +14,27 @@ import style from "./contract.module.scss"
 
 
 
+
+
+
+
 export default function WorkContactDoc() {
 
+
   return (
-    <div className={style.workContactDoc}>
-      <Profile />
-      <WorkProject />
-      <Remark />
+    <div className={style.container}>
+
+
+      <PageHeader />
+
+      <div className={style.mainContainer}>
+        <div className={style.workContactDoc}>
+          <Profile />
+          <WorkProject />
+          <Remark />
+        </div>
+      </div>
+
     </div>
   )
 }
@@ -29,10 +42,3 @@ export default function WorkContactDoc() {
 // ===========================================================
 // ===========================================================
 
-WorkContactDoc.getLayout = (page: React.ReactNode) => {
-  return (
-    <ContractNavLayout>
-      {page}
-    </ContractNavLayout>
-  )
-}

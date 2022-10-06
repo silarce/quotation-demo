@@ -31,7 +31,7 @@ interface Tlink {
   href: string
 }
 
-
+// 三種按鈕
 interface Tpanel01 {
   type: "myButton" | "redButton" | "addButton"
   label: string
@@ -42,6 +42,8 @@ interface Tpanel01 {
   custom?: undefined
   searchGroup?: undefined
 }
+
+// 搜尋input
 interface Tpanel02 {
   type: "inputSearch"
   placeholder: string
@@ -52,6 +54,8 @@ interface Tpanel02 {
   custom?: undefined
   searchGroup?: undefined
 }
+
+// 客製化元件
 interface Tpanel03 {
   custom: JSX.Element
   type?: undefined
