@@ -10,11 +10,11 @@ import style from "../dndTable01.module.scss"
 
 // type
 import { Ttable01, Ttable01Config } from "../dndTable01"
-import { TdndCellConfigkeys, dndCellConfigOri } from "config/dndCellConfig"
+import { TdndCellConfigKeys, dndCellConfigOri } from "config/dndCellConfig"
 const dndCellConfig = dndCellConfigOri()
 
 export default function TableList
-  <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
+  <N extends TdndCellConfigKeys, I extends TdndCellConfigKeys>
   ({
     tableData,
     theadIndex,
