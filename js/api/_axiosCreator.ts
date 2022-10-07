@@ -29,7 +29,7 @@ axi.interceptors.response.use(
       switch (err.response.status) {
         case 401:
           // alert("401，沒有權限")
-          console.log("401錯誤")
+          console.log("401，沒有權限")
           break
         case 404:
           console.log("404錯誤")

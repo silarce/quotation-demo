@@ -4,16 +4,19 @@ import { useState, useEffect } from "react";
 import { axi } from "./_axiosCreator";
 
 
-type TapiCompanyInfo = {
-  "id": string,
-  "createdAt": string,
-  "updatedAt": string,
-  "name": string,
-  "phone": string,
-  "email": string,
-  "address": string,
-  "logoLink": string
-}
+// =============================================
+type TapiCompanyInfoKeys =
+  "id" | "createdAt" | "updatedAt" | "name" |
+  "phone" | "email" | "logoLink" | "fax" |
+  "taxId" | "county" | "district" | "address"
+export type TapiCompanyInfo = {
+  [key in TapiCompanyInfoKeys]: string | null
+} |
+  {
+    [key in TapiCompanyInfoKeys]?: undefined
+  }
+
+
 
 const apiCompanyInfo = () => {
   const api = "/company-info"
@@ -23,16 +26,16 @@ const apiCompanyInfo = () => {
 }
 
 export const useCompanyInfo = () => {
-
-  const [data, setData] = useState<TapiCompanyInfo>()
+  const [data, setData] = useState<TapiCompanyInfo>({})
   const update = async () => {
     const res = await apiCompanyInfo()
     if (res) setData(res)
   }
   useEffect(() => {
     update()
-    console.log(document.cookie)
   }, [])
 
-  return [data, update]
+  return [data, setData, update] as const
 }
+
+// =============================================

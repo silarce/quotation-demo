@@ -6,86 +6,85 @@ import {
   ChangeEvent,
 } from "react"
 
-// components
-import PageHeader from "components/PageHeader/pageHeader"
-// global gear
-import MyButton from "components/global/gear/button/myButton"
-import RedButton from "components/global/gear/button/redButton"
-import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
 
+// global gear
+import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import Input02 from "components/global/gear/input/input02"
+import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
+import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address"
+
+// api
+import { useCompanyInfo, TapiCompanyInfo } from "js/api/company-info"
 
 // icon
-import iconDelete from "public/image/icon/delete01.svg"
 import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
-
 
 // css
 import style from "./theCompanyInfo.module.scss"
 
-
 // fakeData type
-import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 
 export default function TheCompanyInfo() {
   // ===================================================
-  // input list
-  const [inputValues, setInputValues] = useState<{ [key: string]: string }>({})
-  const [disable, setDisable] = useState(true)
-  const onChange = (key: string, value: string) => {
-    setInputValues(state => {
-      state[key] = value
-      return { ...state }
-    })
-  }
+  const [companyInfo, setCompanyInfo, updateCompanyInfo]
+    = useCompanyInfo()
   // ===================================================
-  // 地址
-  // 城市
-  const countryOptions = optionsCreator_country()
-  const [country, setCountry] = useState<Toption | null>(null)
-
-  // 地區
-  const [district, setDistrict] = useState<Toption | null>(null)
-  const districtOptions = useMemo(() => {
-    setDistrict(null)
-    return districtOptionsSelector(country?.value || "")
-  }, [country])
-
-  // 剩餘地址
-  const [address, setAddress] = useState("")
-
-
-  const selectInputList = [
+  const [editable, setEditable] = useState(false)
+  // ===================================================
+  // pageHeader
+  const panalList01: TpanelList = [
     {
-      stateValue: country,
-      options: countryOptions,
-      placeholder: "選擇縣市",
-      width: "90px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setCountry(option)
-      }
+      type: "myButton",
+      label: "編輯",
+      onClick: () => { setEditable(true) }
+    }
+  ]
+  const panalList02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => { }
     },
     {
-      stateValue: district,
-      options: districtOptions,
-      placeholder: "選擇地區",
-      width: "90px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setDistrict(option)
-      }
-    },
-    {
-      stateValue: address,
-      placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)
+      type: "myButton",
+      label: "取消",
+      onClick: () => { setEditable(false) }
     },
   ]
 
+  // ===================================================
+  // 地址
+  const { county, district, address } = companyInfo
 
+  const clearDistrict = () => {
+    companyInfo.district = null
+    setCompanyInfo({ ...companyInfo })
+  }
 
-
-
+  const searchInputProps = {
+    county,
+    onChangeCountry: (option: Toption | null) => {
+      if (!option) return
+      if (companyInfo.county === option.value) return
+      companyInfo.county = option.value
+      clearDistrict()
+      setCompanyInfo({ ...companyInfo })
+    },
+    district,
+    onChangeDistrict: (option: Toption | null) => {
+      if (!option) return
+      if (companyInfo.district === option.value) return
+      companyInfo.district = option.value
+      setCompanyInfo({ ...companyInfo })
+    },
+    address,
+    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value
+      companyInfo.address = value
+      setCompanyInfo({ ...companyInfo })
+    },
+  }
 
 
   // ===================================================
@@ -104,26 +103,22 @@ export default function TheCompanyInfo() {
     }
   }
 
+  // ===================================================
   return (
-    // <div className="container">
     <div className={style.container}>
-      <PageHeader>
-        <div>
-          {disable
-            ? <ButtonBar01 setDisable={setDisable} />
-            : <ButtonBar02 setDisable={setDisable}
-              upload={upload}
-              setUpload={setUpload}
-            />}
-        </div>
-      </PageHeader>
+
+      <PageHeader02 tag="公司資料"
+        panelList={editable ? panalList02 : panalList01}
+      />
+
       <div className={style.mainContainer}>
+
         <div className={style.logoBox}>
           {imgSrc
             // eslint-disable-next-line @next/next/no-img-element
             ? <img src={imgSrc} alt="logo" />
             : <span>LOGO</span>}
-          {disable
+          {editable
             ? ""
             : <div className={style.loadButtonBox}>
               <label className={style.loadPhotoButton} htmlFor="uploadLogo">
@@ -139,26 +134,30 @@ export default function TheCompanyInfo() {
         </div>
 
         <div className={style.formContainer}>
-          {inputList.map((item, index) => {
-            const { id, label } = item
+          {dataIndex.map((key, index) => {
+            const { label } = config[key]
+            const stateValue = companyInfo[key] || ""
+            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+              const value = e.target.value
+              companyInfo[key] = value
+              setCompanyInfo({ ...companyInfo })
+            }
             return (
-              <label key={index} htmlFor={id}>
-                <span>{label}</span>
-                <input type="text" placeholder={`請輸入${label}`}
-                  autoComplete="off"
-                  id={id}
-                  disabled={disable}
-                  value={inputValues[id] || ""}
-                  onChange={(e) => { onChange(id, e.target.value) }}
-                />
-                <div />
-              </label>
+              <Input02 key={index}
+                className={style.input02}
+                label={label}
+                stateValue={stateValue}
+                onChange={onChange}
+                disabled={!editable}
+              />
             )
           })}
 
-          <SelectInput className={style.selectInput}
-            label="公司地址" searchInputPropsList={selectInputList}
-            disabled={disable} />
+          <SelectInput_address
+            searchInputProps={searchInputProps}
+            disabled={!editable}
+            className={style.selectInput}
+          />
         </div>
       </div>
     </div>
@@ -167,64 +166,45 @@ export default function TheCompanyInfo() {
 // ========================================================
 
 
-const ButtonBar01 = ({ setDisable }: { setDisable: (b: boolean) => void }) => {
-  return (
-    <MyButton label="編輯" onClick={() => setDisable(false)} />
-  )
-}
-const ButtonBar02 = ({ setDisable, upload, setUpload }
-  : {
-    setDisable: (b: boolean) => void,
-    upload: boolean,
-    setUpload: (b: boolean) => void
-  }) => {
+type TapiCompanyInfoKey = keyof TapiCompanyInfo
+type TconfigKeys = Extract<TapiCompanyInfoKey,
+  "name" | "phone" | "fax" | "email" | "taxId"
+>
 
-  const cancer = () => {
-    setDisable(true)
-    setUpload(false)
+type Tconfig = {
+  [key in TconfigKeys]: {
+    key: string
+    label: string
   }
-
-  return (
-    <div className={style.headerBar}>
-      <RedButton label="上傳" onClick={() => { setUpload(true) }} />
-      <MyButton label="取消" onClick={cancer} />
-    </div>
-  )
 }
 
+const config: Tconfig = {
+  "name": {
+    key: "name",
+    label: "公司名稱"
+  },
+  "phone": {
+    key: "phone",
+    label: "公司電話"
+  },
+  "fax": {
+    key: "fax",
+    label: "公司傳真"
+  },
+  "email": {
+    key: "email",
+    label: "公司信箱"
+  },
+  "taxId": {
+    key: "taxId",
+    label: "公司統編"
+  },
+}
 
-
-// ========================================================
-
-const inputList = [
-  {
-    id: "companyName",
-    label: "公司名稱",
-  },
-  {
-    id: "companyTel",
-    label: "公司電話",
-  },
-  {
-    id: "companyFax",
-    label: "公司傳真",
-  },
-  {
-    id: "companyMail",
-    label: "公司信箱",
-  },
-  {
-    id: "companyTaxId",
-    label: "公司統編",
-  },
-  // {
-  //   id: "companyAddress",
-  //   label: "公司地址",
-  // },
+const dataIndex: (keyof Tconfig)[] = [
+  "name",
+  "phone",
+  "fax",
+  "email",
+  "taxId",
 ]
-
-
-
-
-
-

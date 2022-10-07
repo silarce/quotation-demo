@@ -20,7 +20,7 @@ import Select03, { Toption } from "components/global/gear/select/select03"
 
 
 interface TselectProps {
-  stateValue: Toption | null
+  stateValue: Toption | string | null
   options: Toption[]
   placeholder: string
   onChange: (option: Toption | null) => void
@@ -56,6 +56,8 @@ export default function SelectInput(
 
   const onFocus = () => { setIsFocus(true) }
   const onBlur = () => { setIsFocus(false) }
+
+console.log(disabled)
 
   return (
     <div className={`${style.container} ${styleIsFocus} ${className}`}>
