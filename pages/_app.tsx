@@ -1,10 +1,12 @@
-import Head from 'next/head'
-
-
-import type { AppProps } from 'next/app'
-
+import { useEffect } from 'react'
 import type { ReactElement, ReactNode } from 'react'
+
+import Head from 'next/head'
+import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
+
+// api
+import { apiLogin, apiLogout } from 'js/api/auth'
 
 
 // conponents
@@ -27,8 +29,19 @@ type AppPropsWithLayout = AppProps & {
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
-
+  // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
+
+  useEffect(() => {
+    // 登入
+    apiLogin({
+      // account: "",
+      // password: ""
+      account: "admin",
+      password: "1qaz#EDC5tgb"
+    })
+  }, [])
+
 
 
   return (
