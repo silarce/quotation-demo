@@ -2,14 +2,15 @@ import axios from "axios"
 
 const axi = axios.create({
   baseURL: "https://sanjeou-erp-be.caprover.credot-web.com/",
+  withCredentials:true,
 })
 
 
 
 axi.interceptors.request.use(
-  (req) => {
+  (config) => {
     // req攔截器
-    return req
+    return config
   },
   (err) => {
     // req錯誤攔截器
@@ -27,7 +28,7 @@ axi.interceptors.response.use(
     if (err.response) {
       switch (err.response.status) {
         case 401:
-          alert("401，沒有權限")
+          // alert("401，沒有權限")
           console.log("401錯誤")
           break
         case 404:

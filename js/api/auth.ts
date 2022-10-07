@@ -11,9 +11,7 @@ export const apiLogin =
       "password": string
     }
   ) => {
-
     const api = "/auth/login"
-
     return axi.post(api, body)
       .then(({ data }) => {
         return data
@@ -28,5 +26,14 @@ export const apiLogout = () => {
     .then(({ data }) => data)
     .catch(err => err)
 }
+
+// 取得使用者資料
+export const apiAuthMe = () => {
+  const api = "/auth/me"
+  return axi.get(api)
+    .then(({ data }) => data)
+    .catch(err => err)
+}
+
 
 
