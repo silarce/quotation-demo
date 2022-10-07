@@ -3,6 +3,9 @@ import Image from "next/image"
 // css
 import style from "./info.module.scss"
 
+// api
+import { apiLogout } from 'js/api/auth'
+
 // img
 import avatar from "public/image/avatar.png"
 // icon
@@ -29,7 +32,7 @@ export default function Info() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={logout.src} alt="登出"
         />
-        <span>登出</span>
+        <span onClick={apiLogout}>登出</span>
       </div>
     </div>
   )

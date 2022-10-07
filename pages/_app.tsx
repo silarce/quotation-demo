@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 
 import Head from 'next/head'
@@ -6,7 +6,7 @@ import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 
 // api
-import { apiLogin, apiLogout } from 'js/api/auth'
+import { apiLogin, apiLogout, apiAuthMe } from 'js/api/auth'
 
 
 // conponents
@@ -28,22 +28,34 @@ type AppPropsWithLayout = AppProps & {
 
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const [ready, setReady] = useState(false)
+
 
   // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
 
+
   useEffect(() => {
-    // 登入
-    apiLogin({
-      // account: "",
-      // password: ""
-      account: "admin",
-      password: "1qaz#EDC5tgb"
-    })
+    (async () => {
+      // 檢查是否已登入
+      const authInfo = await apiAuthMe()
+      // 如果為false，就進行登入
+      if (!authInfo?.id) {
+        await apiLogin({
+          // account: "",
+          // password: ""
+          account: "admin",
+          password: "1qaz#EDC5tgb"
+        })
+      }
+      // 登入程序完畢，ready設為true
+      setReady(true)
+    })()
   }, [])
 
-
-
+  // ----
+  if (!ready) return null
+  // ----
   return (
 
     <>
