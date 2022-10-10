@@ -57,8 +57,6 @@ export default function SelectInput(
   const onFocus = () => { setIsFocus(true) }
   const onBlur = () => { setIsFocus(false) }
 
-console.log(disabled)
-
   return (
     <div className={`${style.container} ${styleIsFocus} ${className}`}>
 

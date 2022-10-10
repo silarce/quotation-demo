@@ -2,19 +2,24 @@
 // 公司資料
 
 import {
-  useState, useMemo,
   ChangeEvent,
+  useState, useEffect,
 } from "react"
 
+const _ = require("lodash")
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import Input02 from "components/global/gear/input/input02"
-import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
 import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address"
+import LoadingCover from "components/global/gear/loadingCover"
 
 // api
-import { useCompanyInfo, TapiCompanyInfo } from "js/api/company-info"
+import {
+  useCompanyInfo, TapiCompanyInfo,
+  apiPatchCompanyInfo,
+  apiUploadCompanyLogo
+} from "js/api/api_company-info"
 
 // icon
 import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
@@ -25,12 +30,37 @@ import style from "./theCompanyInfo.module.scss"
 // fakeData type
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 
+
 export default function TheCompanyInfo() {
   // ===================================================
+  // 公司資料
   const [companyInfo, setCompanyInfo, updateCompanyInfo]
     = useCompanyInfo()
+  const [infoBackup, setInfoBackup] = useState<TapiCompanyInfo>()
+  // 更新資料
+  const update = async () => {
+    const res = await updateCompanyInfo() as TapiCompanyInfo
+    if (res) setInfoBackup(_.cloneDeep(res))
+  }
+
+  useEffect(() => {
+    update()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ===================================================
+  // 圖片檔案
+  const [imageFile, setImageFile] = useState<File>()
+  // 預覽圖片
+  const [imgSrc, setImgSrc] = useState<string | null | undefined>("")
+
+  useEffect(() => {
+    setImgSrc(companyInfo.logoLink)
+  }, [companyInfo.logoLink])
   // ===================================================
   const [editable, setEditable] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  // ===================================================
   // ===================================================
   // pageHeader
   const panalList01: TpanelList = [
@@ -44,19 +74,44 @@ export default function TheCompanyInfo() {
     {
       type: "redButton",
       label: "上傳",
-      onClick: () => { }
+      onClick: async () => {
+        setIsLoading(true)
+        const body = {
+          name: companyInfo.name || "",
+          phone: companyInfo.phone || "",
+          email: companyInfo.email || "",
+          county: companyInfo.county || "",
+          district: companyInfo.district || "",
+          address: companyInfo.address || "",
+          fax: companyInfo.fax || "",
+          taxId: companyInfo.taxId || "",
+        }
+        await apiPatchCompanyInfo(body)
+        if (imageFile) {
+          const formData = new FormData
+          formData.append("image", imageFile)
+          await apiUploadCompanyLogo(formData)
+        }
+        await update()
+        setIsLoading(false)
+        setEditable(false)
+      }
     },
     {
       type: "myButton",
       label: "取消",
-      onClick: () => { setEditable(false) }
+      onClick: () => {
+        setEditable(false)
+        setCompanyInfo(_.cloneDeep(infoBackup))
+        clearLogo()
+      }
     },
   ]
-
   // ===================================================
   // 地址
-  const { county, district, address } = companyInfo
+  const { county, district, address, logoLink } = companyInfo
 
+  // 選擇城市後清除地區
   const clearDistrict = () => {
     companyInfo.district = null
     setCompanyInfo({ ...companyInfo })
@@ -86,15 +141,15 @@ export default function TheCompanyInfo() {
     },
   }
 
-
   // ===================================================
   // 上傳照片
-  const [upload, setUpload] = useState(false)
-  const [imgSrc, setImgSrc] = useState("")
 
-  const preloadImg = (e: ChangeEvent<HTMLInputElement>) => {
+  // 選擇圖片
+  const selectImg = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
     const file = e.target.files[0]
+    setImageFile(file)
+    // 預覽圖片
     const reader = new FileReader();
     reader.readAsDataURL(file)
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -102,37 +157,43 @@ export default function TheCompanyInfo() {
       setImgSrc(e.target.result as string)
     }
   }
+  // 清除
+  const clearLogo = () => {
+    setImgSrc(companyInfo.logoLink)
+    setImageFile(undefined)
+  }
 
   // ===================================================
   return (
     <div className={style.container}>
-
       <PageHeader02 tag="公司資料"
         panelList={editable ? panalList02 : panalList01}
       />
-
       <div className={style.mainContainer}>
 
+        {/* 左邊的圖片 */}
         <div className={style.logoBox}>
-          {imgSrc
+          {logoLink
             // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={imgSrc} alt="logo" />
+            ? <img src={imgSrc || ""} alt="logo" />
             : <span>LOGO</span>}
-          {editable
+          {!editable
             ? ""
             : <div className={style.loadButtonBox}>
-              <label className={style.loadPhotoButton} htmlFor="uploadLogo">
+              <label className={style.loadPhotoButton}
+                htmlFor="uploadLogo">
                 <span>上傳公司Logo</span>
                 <input id="uploadLogo" type="file"
-                  onChange={preloadImg}
+                  onChange={selectImg}
                 />
               </label>
               <span>{"(上限10MB)"}</span>
-              <Icondelete01 />
+              <Icondelete01 onClick={clearLogo} />
             </div>
           }
         </div>
 
+        {/* 右邊的表單 */}
         <div className={style.formContainer}>
           {dataIndex.map((key, index) => {
             const { label } = config[key]
@@ -152,14 +213,15 @@ export default function TheCompanyInfo() {
               />
             )
           })}
-
           <SelectInput_address
             searchInputProps={searchInputProps}
             disabled={!editable}
             className={style.selectInput}
           />
         </div>
+
       </div>
+      <LoadingCover open={isLoading} />
     </div>
   )
 }

@@ -4,7 +4,7 @@ import Image from "next/image"
 import style from "./info.module.scss"
 
 // api
-import { apiLogout } from 'js/api/auth'
+import { apiLogout } from 'js/api/api_auth'
 
 // img
 import avatar from "public/image/avatar.png"

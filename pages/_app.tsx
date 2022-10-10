@@ -6,7 +6,7 @@ import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 
 // api
-import { apiLogin, apiLogout, apiAuthMe } from 'js/api/auth'
+import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
 
 
 // conponents
