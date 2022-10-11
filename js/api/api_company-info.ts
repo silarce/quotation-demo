@@ -32,7 +32,7 @@ export const useCompanyInfo = () => {
       return res
     }
   }
-  return [data, setData, update] as const
+  return {data, setData, update} as const
 }
 
 // =============================================

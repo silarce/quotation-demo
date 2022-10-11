@@ -34,8 +34,11 @@ import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 export default function TheCompanyInfo() {
   // ===================================================
   // 公司資料
-  const [companyInfo, setCompanyInfo, updateCompanyInfo]
-    = useCompanyInfo()
+  const {
+    data: companyInfo,
+    setData: setCompanyInfo,
+    update: updateCompanyInfo,
+  } = useCompanyInfo()
   const [infoBackup, setInfoBackup] = useState<TapiCompanyInfo>()
   // 更新資料
   const update = async () => {
