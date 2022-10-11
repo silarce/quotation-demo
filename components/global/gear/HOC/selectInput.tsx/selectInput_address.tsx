@@ -10,7 +10,7 @@ import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
 // fakeData type
 import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
-type TsearchInputProps = {
+export type TsearchInputProps = {
   county: string | null | undefined
   onChangeCountry: (option: Toption | null) => void
   district: string | null | undefined

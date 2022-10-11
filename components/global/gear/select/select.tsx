@@ -82,7 +82,6 @@ const Select02 = ({
   className, width, labelWidth }:
   {
     label: string
-    // stateValue: string
     stateValue: Toption | string | null
     placeholder?: string
     options: Toption[]

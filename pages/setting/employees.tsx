@@ -2,13 +2,12 @@
 // 人員資料
 
 import {
-  useState, useMemo,
+  useState, useMemo, useEffect
 } from "react"
 
 // components
-import PageHeader from "components/PageHeader/pageHeader"
-import StaffList from "components/page/setting/staffProfile/staffList";
-import EditStaff from "components/page/setting/staffProfile/editStaff";
+import StaffList from "components/page/setting/employees/staffList";
+import EditStaff from "components/page/setting/employees/editStaff";
 import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals";
 
 // global gear
@@ -17,14 +16,37 @@ import InputSearch from "components/global/gear/input/inputSearch"
 import AddButton from "components/global/gear/button/addButton"
 import MyButton from "components/global/gear/button/myButton";
 import RedButton from "components/global/gear/button/redButton";
+import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
+
+
+// api
+import { useEmployee, TapiGetEmployee } from "js/api/api_employee";
 
 // css
-import style from "./staffProfile.module.scss"
+import style from "./employees.module.scss"
 
 // fakeData
 import { TstaffInfo, fakeStaffList } from "fakeDatabase/staff/fakeStaffList";
 
-export default function StaffProfile() {
+export default function Employees() {
+  // ====================================================
+  let { data, setData, update } = useEmployee()
+  const [params, setParams] = useState<TapiGetEmployee>({
+    order: "ASC",
+    page: 1,
+    pageSize: 10,
+  })
+  const setPage = (page: number) => {
+    setParams(params => {
+      params.page = page
+      return { ...params }
+    })
+  }
+  useEffect(() => {
+    update(params)
+  }, [])
+
+
   // ====================================================
   // 資料，員工列表
   const [staffList, setStaffList] = useState<TstaffInfo[]>(fakeStaffList)
@@ -98,22 +120,34 @@ export default function StaffProfile() {
 
 
   // ====================================================
+  const panelList: TpanelList = [
+    {
+      type: "inputSearch",
+      placeholder: "編號/模糊姓名",
+      onClick: searchStaff
+    },
+    {
+      type: "myButton",
+      label: "新增員工資料",
+      onClick: addStaff
+    }
+  ]
+  // ====================================================
 
 
   return (
     <div className={style.scrollContainer}>
-      <PageHeader>
-        {isEditStaff
-          ? <ButtonBar02
-            {...{ resetEditPanel, selStaffInfo }} />
-          : <ButtonBar01
-            addStaff={addStaff} searchStaff={searchStaff} />}
-      </PageHeader>
+
+      <PageHeader02 tag="人員資料"
+        panelList={panelList}
+      />
+
 
       <div className={style.mainContainer}>
         {isEditStaff
           ? <EditStaff selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
-          : <StaffList {...{
+          : 
+          <StaffList {...{
             data: filteredList[0] ? filteredList : staffList,
             editStaff, openDeletePanel
           }} />

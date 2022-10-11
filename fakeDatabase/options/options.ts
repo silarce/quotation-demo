@@ -17,6 +17,19 @@ interface Toption {
   icon?: string
 }
 
+// 性別
+export const optionsCreator_gender =
+  (): Toption[] => [
+    { value: "男", label: "男" },
+    { value: "女", label: "女" },
+  ]
+
+// 婚姻狀況
+export const optionsCreator_marital =
+  (): Toption[] => [
+    { value: "已婚", label: "未婚" },
+    { value: "未婚", label: "已婚" },
+  ]
 
 
 // 門型編號
@@ -81,9 +94,6 @@ export const optionsCreator_memo =
 
 
 // 門軌
-
-
-
 
 
 export const optionsCreator_doorRail =
