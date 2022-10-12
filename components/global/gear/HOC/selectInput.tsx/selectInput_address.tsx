@@ -22,11 +22,13 @@ export type TsearchInputProps = {
 export default function SelectInput_address(
   {
     searchInputProps,
+    label,
     className,
     disabled
   }:
     {
       searchInputProps: TsearchInputProps
+      label?: string
       className?: string
       disabled?: boolean
     }) {
@@ -75,7 +77,7 @@ export default function SelectInput_address(
 
   return (
     <SelectInput className={className}
-      label="公司地址" searchInputPropsList={selectInputList}
+      label={label||"地址"} searchInputPropsList={selectInputList}
       disabled={disabled} />
   )
 }
