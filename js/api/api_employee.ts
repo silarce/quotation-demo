@@ -7,11 +7,11 @@ import { axi } from "./_axiosCreator";
 // 員工資料
 type Temployee = {
   "id": string,
-  "createdAt": string,//"2022-10-11T07:16:58.689Z"
-  "updatedAt": string,//"2022-10-11T07:16:58.689Z"
-  "id_number": string,
-  "ch_name": string,
-  "en_name": string,
+  "createdAt": string, // 2022-10-12T08:47:24.753Z"
+  "updatedAt": string, // 2022-10-12T08:47:24.753Z"
+  "idNumber": string,
+  "chName": string,
+  "enName": string,
   "identity": string,
   "birthday": string,
   "gender": string,
@@ -21,15 +21,19 @@ type Temployee = {
   "phone1": string,
   "phone2": string,
   "email": string,
-  "residence_address": string,
-  "mailing_address": string,
-  "process_permission": boolean,
+  "residenceCounty": string,
+  "residenceDistrict": string,
+  "residenceAddress": string,
+  "mailingCounty": string,
+  "mailingDistrict": string,
+  "mailingAddress": string,
+  "processPermission": true,
   "seniority": string,
-  "start_date": string,
-  "leave_date": string,
-  "retire_date": string,
-  "severance_date": string,
-  "departments": string[]
+  "startDate": string,
+  "leaveDate": string,
+  "retireDate": string,
+  "severanceDate": string,
+  "jobs": string[]
 }
 
 // 員工資料列表
@@ -47,9 +51,9 @@ type TgetEmployee = {
 
 // 新增、更新員工資料的body
 export type TpostEmployee = {
-  "id_number": string,
-  "ch_name": string,
-  "en_name": string,
+  "idNumber": string,
+  "chName": string,
+  "enName": string,
   "identity": string,
   "birthday": string,
   "gender": string,
@@ -59,16 +63,21 @@ export type TpostEmployee = {
   "phone1": string,
   "phone2": string,
   "email": string,
-  "residence_address": string,
-  "mailing_address": string,
-  "process_permission": boolean,
+  "residenceCounty": string,
+  "residenceDistrict": string,
+  "residenceAddress": string,
+  "mailingCounty": string,
+  "mailingDistrict": string,
+  "mailingAddress": string,
+  "processPermission": true,
   "seniority": string,
-  "start_date": string,
-  "leave_date": string,
-  "retire_date": string,
-  "severance_date": string,
-  "departmentId"?: string[]
+  "startDate": string,
+  "leaveDate": string,
+  "retireDate": string,
+  "severanceDate": string,
+  "jobId"?: string[]
 }
+
 
 
 export type TapiGetEmployee = {

@@ -70,6 +70,10 @@ const Input02 = (
         autoComplete="off"
         value={stateValue}
         onChange={onChange}
+        onKeyDown={(e) => {
+          if (e.code === "Enter") e.preventDefault()
+          if (e.code === "NumpadEnter") e.preventDefault()
+        }}
         disabled={disabled}
       />
 

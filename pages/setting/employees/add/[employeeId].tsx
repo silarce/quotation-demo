@@ -1,13 +1,13 @@
 import { useState } from "react";
-
+import { useRouter } from "next/router";
 
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
 
 
-
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
+import LoadingCover from "components/global/gear/loadingCover";
 
 // css
 import style from "../../employees.module.scss"
@@ -17,20 +17,26 @@ import { apiPostEmployee, TpostEmployee } from "js/api/api_employee";
 
 export default function AddEmployee() {
 
-  const [data, setData] = useState(emptyData)
+  const router = useRouter()
 
+  const [data, setData] = useState(emptyDataOri())
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const panelList: TpanelList = [
     {
       type: "redButton",
       label: "取消",
-      onClick: () => { }
+      onClick: () => { router.back() }
     },
     {
       type: "myButton",
       label: "上傳",
-      onClick: () => { }
+      onClick: async () => {
+        setIsLoading(true)
+        await apiPostEmployee(data)
+        setIsLoading(false)
+      }
     }
   ]
 
@@ -41,15 +47,10 @@ export default function AddEmployee() {
       <PageHeader02 tag="人員資料"
         panelList={panelList}
       />
-
       <div className={style.mainContainer}>
-
-        <EditEmployee data={data} setData={setData}/>
-
+        <EditEmployee data={data} setData={setData} />
       </div>
-
-
-
+      <LoadingCover open={isLoading} />
     </div>
   )
 }
@@ -58,10 +59,10 @@ export default function AddEmployee() {
 
 
 
-const emptyData: TpostEmployee = {
-  "id_number": "test",
-  "ch_name": "",
-  "en_name": "",
+const emptyDataOri = (): TpostEmployee => ({
+  "idNumber": "",
+  "chName": "",
+  "enName": "",
   "identity": "",
   "birthday": "",
   "gender": "",
@@ -71,16 +72,48 @@ const emptyData: TpostEmployee = {
   "phone1": "",
   "phone2": "",
   "email": "",
-  "residence_address": "",
-  "mailing_address": "",
-  "process_permission": true,
+  "residenceCounty": "",
+  "residenceDistrict": "",
+  "residenceAddress": "",
+  "mailingCounty": "",
+  "mailingDistrict": "",
+  "mailingAddress": "",
+  "processPermission": true,
   "seniority": "",
-  "start_date": "",
-  "leave_date": "",
-  "retire_date": "",
-  "severance_date": "",
-  "departmentId": []
-}
+  "startDate": "",
+  "leaveDate": "",
+  "retireDate": "",
+  "severanceDate": "",
+  "jobId": [""]
+})
+
+// const emptyData: TpostEmployee = {
+  //   "idNumber": "",
+//   "chName": "",
+//   "enName": "",
+//   "identity": "",
+//   "birthday": "",
+//   "gender": "",
+//   "marital": "",
+//   "education": "",
+//   "expertise": "",
+//   "phone1": "",
+//   "phone2": "",
+//   "email": "",
+//   "residenceCounty": "",
+//   "residenceDistrict": "",
+//   "residenceAddress": "",
+//   "mailingCounty": "",
+//   "mailingDistrict": "",
+//   "mailingAddress": "",
+//   "processPermission": true,
+//   "seniority": "",
+//   "startDate": "",
+//   "leaveDate": "",
+//   "retireDate": "",
+//   "severanceDate": "",
+//   "jobId": [""]
+// }
 
 
 

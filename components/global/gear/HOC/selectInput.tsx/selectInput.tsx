@@ -87,10 +87,14 @@ export default function SelectInput(
             style={theStyle}
             placeholder={placeholder}
             value={stateValue}
-            onChange={onChange}
             disabled={disabled}
             onFocus={onFocus}
             onBlur={onBlur}
+            onChange={onChange}
+            onKeyDown={(e) => {
+              if (e.code === "Enter") e.preventDefault()
+              if (e.code === "NumpadEnter") e.preventDefault()
+            }}
           />
           // <input className={style.input} key={index}
           //   type="text" autoComplete="off"

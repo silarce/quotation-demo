@@ -5,6 +5,9 @@ import {
   useState, useMemo, useEffect
 } from "react"
 
+import { useRouter } from "next/router";
+
+
 // components
 import StaffList from "components/page/setting/employees/staffList";
 import EditStaff from "components/page/setting/employees/editStaff";
@@ -12,12 +15,8 @@ import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals"
 
 // global gear
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-import InputSearch from "components/global/gear/input/inputSearch"
-import AddButton from "components/global/gear/button/addButton"
-import MyButton from "components/global/gear/button/myButton";
-import RedButton from "components/global/gear/button/redButton";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
-
+import LoadingCover from "components/global/gear/loadingCover";
 
 // api
 import { useEmployee, TapiGetEmployee } from "js/api/api_employee";
@@ -29,8 +28,14 @@ import style from "./employees.module.scss"
 import { TstaffInfo, fakeStaffList } from "fakeDatabase/staff/fakeStaffList";
 
 export default function Employees() {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   // ====================================================
   let { data, setData, update } = useEmployee()
+
+  console.log(data)
+
+
   const [params, setParams] = useState<TapiGetEmployee>({
     order: "ASC",
     page: 1,
@@ -43,7 +48,12 @@ export default function Employees() {
     })
   }
   useEffect(() => {
-    update(params)
+    (async () => {
+      setIsLoading(true)
+      await update(params)
+      setIsLoading(false)
+    })()
+
   }, [])
 
 
@@ -129,7 +139,12 @@ export default function Employees() {
     {
       type: "myButton",
       label: "新增員工資料",
-      onClick: addStaff
+      onClick: () => {
+        const lastId =
+          (`${data.meta.itemCount + 1}`.padStart(5, "0"))
+        router.push(`/setting/employees/add/${lastId}`)
+      }
+      // onClick: () => { router.push("/setting/employees/add/5465") }
     }
   ]
   // ====================================================
@@ -142,11 +157,10 @@ export default function Employees() {
         panelList={panelList}
       />
 
-
       <div className={style.mainContainer}>
         {isEditStaff
           ? <EditStaff selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
-          : 
+          :
           <StaffList {...{
             data: filteredList[0] ? filteredList : staffList,
             editStaff, openDeletePanel
@@ -161,41 +175,42 @@ export default function Employees() {
           text: `請確定要刪除「${selStaffInfo.staffId}」「${selStaffInfo.chName}」?`,
           onConfirm: deleteSelProfile,
         }} />
+      <LoadingCover open={isLoading}/>
     </div>
   )
 }
 // ===========================================================
 // 搜尋 新增員工資料
 
-const ButtonBar01 = ({ addStaff, searchStaff }:
-  {
-    addStaff: () => void
-    searchStaff: (value: string) => void
-  }) => {
-  // ===========================================
+// const ButtonBar01 = ({ addStaff, searchStaff }:
+//   {
+//     addStaff: () => void
+//     searchStaff: (value: string) => void
+//   }) => {
+//   // ===========================================
 
-  return (
-    <div className={style.headerBar}>
-      {/*  */}
-      <InputSearch placeholder="編號/模糊姓名" onClick={searchStaff} />
-      {/*  */}
-      <AddButton label="新增員工資料" onClick={addStaff} />
-    </div>
-  )
-}
-const ButtonBar02 = ({ selStaffInfo, resetEditPanel }:
-  {
-    selStaffInfo: TstaffInfo
-    resetEditPanel: () => void
-  }) => {
+//   return (
+//     <div className={style.headerBar}>
+//       {/*  */}
+//       <InputSearch placeholder="編號/模糊姓名" onClick={searchStaff} />
+//       {/*  */}
+//       <AddButton label="新增員工資料" onClick={addStaff} />
+//     </div>
+//   )
+// }
+// const ButtonBar02 = ({ selStaffInfo, resetEditPanel }:
+//   {
+//     selStaffInfo: TstaffInfo
+//     resetEditPanel: () => void
+//   }) => {
 
-  return (
-    <div className={style.headerBar}>
-      <RedButton label="上傳" onClick={() => { alert(`上傳${selStaffInfo.staffId}的資料`) }} />
-      <MyButton label="取消" onClick={resetEditPanel} />
-    </div>
-  )
-}
+//   return (
+//     <div className={style.headerBar}>
+//       <RedButton label="上傳" onClick={() => { alert(`上傳${selStaffInfo.staffId}的資料`) }} />
+//       <MyButton label="取消" onClick={resetEditPanel} />
+//     </div>
+//   )
+// }
 
 
 // =============================================================

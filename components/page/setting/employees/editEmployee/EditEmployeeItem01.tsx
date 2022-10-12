@@ -26,112 +26,155 @@ export default function EditEmployeeItem01({ data, setData }: {
   setData: Dispatch<SetStateAction<TpostEmployee>>
 }) {
 
-
+  const {
+    residenceCounty, residenceDistrict, residenceAddress,
+    mailingCounty, mailingDistrict, mailingAddress
+  } = data
 
 
 
   const searchInputPropsResidence = {
-    county: "",
-    onChangeCountry: "",
-    district: "",
-    onChangeDistrict: "",
-    address: "",
-    onChangeAddress: "",
+    county: residenceCounty,
+    onChangeCountry: (option: Toption | null) => {
+      if (!option) return
+      const value = option.value
+      setData(data => {
+        data.residenceCounty = value
+        return { ...data }
+      })
+    },
+    district: residenceDistrict,
+    onChangeDistrict: (option: Toption | null) => {
+      if (!option) return
+      const value = option.value
+      setData(data => {
+        data.residenceDistrict = value
+        return { ...data }
+      })
+    },
+    address: residenceAddress,
+    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value
+      setData(data => {
+        data.residenceAddress = value
+        return { ...data }
+      })
+    },
   }
-
+  const searchInputPropsMailing = {
+    county: mailingCounty,
+    onChangeCountry: (option: Toption | null) => {
+      if (!option) return
+      const value = option.value
+      setData(data => {
+        data.mailingCounty = value
+        return { ...data }
+      })
+    },
+    district: mailingDistrict,
+    onChangeDistrict: (option: Toption | null) => {
+      if (!option) return
+      const value = option.value
+      setData(data => {
+        data.mailingDistrict = value
+        return { ...data }
+      })
+    },
+    address: mailingAddress,
+    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value
+      setData(data => {
+        data.mailingAddress = value
+        return { ...data }
+      })
+    },
+  }
 
 
   return (
     <div className={style.editEmployeeItem01}>
-      <p>員工個人資料</p>
-      <div className={style.main}>
-        <div className={style.form01}>
-          {/* 左邊 */}
-          <div>
-            {keyIndex01.map((key, index) => {
-              const { label } = config01[key]
-              const stateValue = data[key]
-              const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-                const value = e.target.value
-                setData(data => {
-                  data[key] = value
-                  return { ...data }
-                })
-              }
-              return (
-                <Input02 key={index}
+      <p className={style.subTitle}>員工個人資料</p>
+      <div className={style.form01}>
+        {/* 左邊 */}
+        <div>
+          {keyIndex01.map((key, index) => {
+            const { label } = config01[key]
+            const stateValue = data[key]
+            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+              const value = e.target.value
+              setData(data => {
+                data[key] = value
+                return { ...data }
+              })
+            }
+            return (
+              <Input02 key={index}
                 className={style.input02}
-                  stateValue={stateValue}
-                  label={label}
-                  onChange={onChange}
-                />
-              )
-            })}
-          </div>
-          {/* 垂直分隔線 */}
-          <div className={style.vr} />
-          {/* 右邊 */}
-          <div>
-            {keyIndex02.map((key, index) => {
-
-
-              const { label, options, width, labelWidth } = config02[key]
-              const stateValue = data[key]
-
-              if (options) {
-                const onChange = (option: Toption | null) => {
-                  if (!option) return
-                  const { value } = option
-                  setData(data => {
-                    data[key] = value
-                    return ({ ...data })
-                  })
-                }
-                return (
-                  <Select02 key={index}
-                    className={style.select02}
-                    stateValue={stateValue}
-                    label={label}
-                    options={options}
-                    onChange={onChange}
-                    width={width}
-                    labelWidth={labelWidth}
-                  />
-                )
-              }
-              const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-                const value = e.target.value
+                stateValue={stateValue}
+                label={label}
+                onChange={onChange}
+              />
+            )
+          })}
+        </div>
+        {/* 垂直分隔線 */}
+        <div className={style.vr} />
+        {/* 右邊 */}
+        <div>
+          {keyIndex02.map((key, index) => {
+            const { label, options, width, labelWidth } = config02[key]
+            const stateValue = data[key]
+            if (options) {
+              const onChange = (option: Toption | null) => {
+                if (!option) return
+                const { value } = option
                 setData(data => {
                   data[key] = value
-                  return { ...data }
+                  return ({ ...data })
                 })
               }
               return (
-                <Input02 key={index}
-                  className={style.input02}
+                <Select02 key={index}
+                  className={style.select02}
                   stateValue={stateValue}
                   label={label}
+                  options={options}
                   onChange={onChange}
                   width={width}
                   labelWidth={labelWidth}
                 />
               )
-            })}
-          </div>
-          {/* 下面 */}
-          <div >
-            {/* <SelectInput_address searchInputProps={searchInputPropsResidence} /> */}
-            test
-            {/* <SelectInput className={style.selectInput}
-              label="戶籍地址" searchInputPropsList={selectInputList}
-              labelWidth="110px" />
-            <SelectInput className={style.selectInput}
-              label="聯絡地址" searchInputPropsList={contactSelectInputList}
-              labelWidth="110px" /> */}
-          </div>
+            }
+            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+              const value = e.target.value
+              setData(data => {
+                data[key] = value
+                return { ...data }
+              })
+            }
+            return (
+              <Input02 key={index}
+                className={style.input02}
+                stateValue={stateValue}
+                label={label}
+                onChange={onChange}
+                width={width}
+                labelWidth={labelWidth}
+              />
+            )
+          })}
         </div>
-
-
+        {/* 下面 */}
+        <div >
+          <SelectInput_address
+            className={style.selectInput}
+            label="戶籍地址"
+            searchInputProps={searchInputPropsResidence} />
+          <SelectInput_address
+            className={style.selectInput}
+            label="通訊地址"
+            searchInputProps={searchInputPropsMailing} />
+        </div>
       </div>
     </div>
   )
@@ -140,20 +183,20 @@ export default function EditEmployeeItem01({ data, setData }: {
 
 // ============================================================
 type TkeyIndex01Key = (keyof Pick<TpostEmployee,
-  "ch_name" | "en_name" | "identity" | "phone1" | "phone2">)
+  "chName" | "enName" | "identity" | "phone1" | "phone2">)
 
 const keyIndex01: TkeyIndex01Key[]
-  = ["ch_name", "en_name", "identity", "phone1", "phone2"]
+  = ["chName", "enName", "identity", "phone1", "phone2"]
 
 const config01: {
   [key in TkeyIndex01Key]: {
     label: string
   }
 } = {
-  ch_name: {
+  chName: {
     label: "中文姓名"
   },
-  en_name: {
+  enName: {
     label: "英文姓名"
   },
   identity: {

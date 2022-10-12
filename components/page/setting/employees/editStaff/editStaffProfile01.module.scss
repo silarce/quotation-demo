@@ -1,6 +1,6 @@
 @use "styles/theme01" as *;
-// @use "../local.module" as *;
-// @use "./localLayout.module" as *;
+@use "../local.module" as *;
+@use "./localLayout.module" as *;
 
 .form01 {
   display: grid;

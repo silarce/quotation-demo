@@ -28,7 +28,6 @@ export default function EditStaff({ selStaffInfo, setSelStaffInfo }:
       {/* 這兩個元件裡面很亂，等要接api時再一併整理 */}
       <EditStaffProfile01 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
       <EditStaffProfile02 selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
-
     </div>
   )
 }
