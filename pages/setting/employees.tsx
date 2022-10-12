@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import StaffList from "components/page/setting/employees/staffList";
 import EditStaff from "components/page/setting/employees/editStaff";
 import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals";
+import EmployeeList from "components/page/setting/employees/employeeList";
 
 // global gear
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
@@ -19,7 +20,7 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
 
 // api
-import { useEmployee, TapiGetEmployee } from "js/api/api_employee";
+import { useEmployee, TapiGetEmployee, TgetEmployee } from "js/api/api_employee";
 
 // css
 import style from "./employees.module.scss"
@@ -32,8 +33,15 @@ export default function Employees() {
   const [isLoading, setIsLoading] = useState(false)
   // ====================================================
   let { data, setData, update } = useEmployee()
+  const employeeList = data?.data || []
+  const meta = data?.meta
+
+
+
 
   console.log(data)
+
+
 
 
   const [params, setParams] = useState<TapiGetEmployee>({
@@ -54,6 +62,7 @@ export default function Employees() {
       setIsLoading(false)
     })()
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
@@ -76,20 +85,20 @@ export default function Employees() {
   // 編輯/新增
   const [isEditStaff, setIsEditStaff] = useState(false)
 
-  const resetEditPanel = () => {
-    setIsEditStaff(false)
-    setSelStaffInfo(newStaffProfile)
-  }
+  // const resetEditPanel = () => {
+  //   setIsEditStaff(false)
+  //   setSelStaffInfo(newStaffProfile)
+  // }
 
   const editStaff = (staffProfile: TstaffInfo) => {
     setIsEditStaff(true)
     setSelStaffInfo(staffProfile)
   }
 
-  const addStaff = () => {
-    setIsEditStaff(true)
-    setSelStaffInfo(newStaffProfile)
-  }
+  // const addStaff = () => {
+  //   setIsEditStaff(true)
+  //   setSelStaffInfo(newStaffProfile)
+  // }
 
   // ====================================================
   // 刪除功能
@@ -110,22 +119,24 @@ export default function Employees() {
   }
   // ====================================================
   // 用於搜尋功能
-  const [filteredList, setFilteredList] = useState<typeof fakeStaffList>([])
+  // const [filteredList, setFilteredList] = useState<typeof fakeStaffList>([])
 
   const searchStaff = (searchValue: string) => {
-    // 搜尋編號
-    let filteredList =
-      staffList.filter((item) => searchValue === item.staffId)
-    // 搜尋名稱
-    const regName = new RegExp(searchValue)
-    if (!filteredList[0]) {
-      filteredList =
-        staffList.filter((item) => regName.test(item.chName))
-    }
 
-    if (searchValue !== "" && !filteredList[0])
-      return ModalInfo("沒有符合的資料")
-    setFilteredList(filteredList)
+    alert("重作中")
+    // // 搜尋編號
+    // let filteredList =
+    //   staffList.filter((item) => searchValue === item.staffId)
+    // // 搜尋名稱
+    // const regName = new RegExp(searchValue)
+    // if (!filteredList[0]) {
+    //   filteredList =
+    //     staffList.filter((item) => regName.test(item.chName))
+    // }
+
+    // if (searchValue !== "" && !filteredList[0])
+    //   return ModalInfo("沒有符合的資料")
+    // setFilteredList(filteredList)
   }
 
 
@@ -140,11 +151,11 @@ export default function Employees() {
       type: "myButton",
       label: "新增員工資料",
       onClick: () => {
+        if (!meta) return
         const lastId =
-          (`${data.meta.itemCount + 1}`.padStart(5, "0"))
+          "A" + (`${meta.itemCount + 1}`.padStart(5, "0"))
         router.push(`/setting/employees/add/${lastId}`)
       }
-      // onClick: () => { router.push("/setting/employees/add/5465") }
     }
   ]
   // ====================================================
@@ -158,14 +169,22 @@ export default function Employees() {
       />
 
       <div className={style.mainContainer}>
-        {isEditStaff
+        <EmployeeList employeeList={employeeList} />
+
+        {/* <StaffList {...{
+          data: filteredList[0] ? filteredList : staffList,
+          editStaff, openDeletePanel
+        }} /> */}
+
+
+        {/* {isEditStaff
           ? <EditStaff selStaffInfo={selStaffInfo} setSelStaffInfo={setSelStaffInfo} />
           :
           <StaffList {...{
             data: filteredList[0] ? filteredList : staffList,
             editStaff, openDeletePanel
           }} />
-        }
+        } */}
       </div>
 
       <TwoButtonModal
@@ -175,7 +194,8 @@ export default function Employees() {
           text: `請確定要刪除「${selStaffInfo.staffId}」「${selStaffInfo.chName}」?`,
           onConfirm: deleteSelProfile,
         }} />
-      <LoadingCover open={isLoading}/>
+        
+      <LoadingCover open={isLoading} />
     </div>
   )
 }

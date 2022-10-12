@@ -1,0 +1,40 @@
+@use "styles/theme01" as *;
+
+.employeeList {
+  padding: 4px;
+
+  .thead {
+    background-color: $bgc01;
+    display: flex;
+    gap: 63px;
+    height: 40px;
+    padding-left: 45px;
+    padding-right: 20px;
+  }
+  .tbody {
+    .row {
+      display: flex;
+      gap: 63px;
+      height: 54px;
+      padding-left: 45px;
+      padding-right: 20px;
+      border-top: solid 1px $colorBorder01;
+      .column {
+        > span {
+          font-size: 16px;
+          color: $colorText;
+        }
+      }
+    }
+  }
+  .column {
+    margin: auto;
+    margin-left: 0;
+    margin-right: 0;
+    > span {
+      font-weight: 400;
+      font-size: 14px;
+      color: #979797;
+    }
+  }
+}

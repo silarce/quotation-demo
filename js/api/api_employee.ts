@@ -5,7 +5,7 @@ import { axi } from "./_axiosCreator";
 
 // =============================================
 // 員工資料
-type Temployee = {
+export type Temployee = {
   "id": string,
   "createdAt": string, // 2022-10-12T08:47:24.753Z"
   "updatedAt": string, // 2022-10-12T08:47:24.753Z"
@@ -27,19 +27,19 @@ type Temployee = {
   "mailingCounty": string,
   "mailingDistrict": string,
   "mailingAddress": string,
-  "processPermission": true,
   "seniority": string,
   "startDate": string,
   "leaveDate": string,
   "retireDate": string,
   "severanceDate": string,
+  "processPermission": true,
   "jobs": string[]
 }
 
 // 員工資料列表
-type TgetEmployee = {
-  "data": Temployee[],
-  "meta": {
+export type TgetEmployee = {
+  "data"?: Temployee[],
+  "meta"?: {
     "page": number,
     "pageSize": number,
     "itemCount": number,
@@ -69,12 +69,12 @@ export type TpostEmployee = {
   "mailingCounty": string,
   "mailingDistrict": string,
   "mailingAddress": string,
-  "processPermission": true,
   "seniority": string,
   "startDate": string,
   "leaveDate": string,
   "retireDate": string,
   "severanceDate": string,
+  "processPermission": true,
   "jobId"?: string[]
 }
 
@@ -94,7 +94,7 @@ const apiGetEmployee = (params: TapiGetEmployee) => {
 }
 
 export const useEmployee = () => {
-  const [data, setData] = useState<TgetEmployee>({} as TgetEmployee)
+  const [data, setData] = useState<TgetEmployee>({})
   const update = async (params: TapiGetEmployee) => {
     const data = await apiGetEmployee(params)
     if (data) setData(data)
