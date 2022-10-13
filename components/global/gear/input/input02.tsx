@@ -13,10 +13,6 @@ import { nanoid } from 'nanoid'
 // ui
 import TextareaAutosize from 'react-textarea-autosize';
 
-// antd
-import { Input } from 'antd';
-const { TextArea } = Input;
-
 // css
 import style from "./input02.module.scss"
 

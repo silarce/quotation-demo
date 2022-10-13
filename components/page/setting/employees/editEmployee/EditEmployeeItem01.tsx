@@ -2,11 +2,12 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 
+
 // global gear
 import Input02 from "components/global/gear/input/input02"
 import { Select02 } from "components/global/gear/select/select"
 import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address";
-
+import TimePicker01 from "components/global/gear/input/timePicker01";
 // option
 import {
   Toption,
@@ -22,12 +23,8 @@ import { TpostEmployee, Temployee } from "js/api/api_employee";
 import style from "../editEmployee.module.scss"
 
 export default function EditEmployeeItem01({ data, setData }: {
-  // data: TpostEmployee | Partial<Temployee>
-  data:  Partial<Temployee>
-  // setData: Dispatch<SetStateAction<TpostEmployee | Partial<Temployee>>>
+  data: Partial<Temployee>
   setData:
-  // Dispatch<SetStateAction<TpostEmployee>>
-  //  |
   Dispatch<SetStateAction<Partial<Temployee>>>
 }) {
   const {
@@ -95,6 +92,8 @@ export default function EditEmployeeItem01({ data, setData }: {
   }
 
 
+
+  // ======================================================
   return (
     <div className={style.editEmployeeItem01}>
       <p className={style.subTitle}>員工個人資料</p>
@@ -125,6 +124,21 @@ export default function EditEmployeeItem01({ data, setData }: {
         <div className={style.vr} />
         {/* 右邊 */}
         <div>
+          {/*  */}
+          <TimePicker01
+            className={style.input02}
+            stateValue={data.birthday}
+            label={"生日"}
+            onChange={(dateString: string) => {
+              setData(data => {
+                data.birthday = dateString
+                return { ...data }
+              })
+            }}
+            width={"240px"}
+            labelWidth={"40px"}
+          />
+          {/*  */}
           {keyIndex02.map((key, index) => {
             const { label, options, width, labelWidth } = config02[key]
             const stateValue = data[key]
@@ -215,10 +229,10 @@ const config01: {
 }
 // -------------------------
 type TkeyIndex02Key = (keyof Pick<TpostEmployee,
-  "birthday" | "gender" | "marital" | "education" | "expertise">)
+  "gender" | "marital" | "education" | "expertise">)
 
 const keyIndex02: TkeyIndex02Key[]
-  = ["birthday", "gender", "marital", "education", "expertise"]
+  = ["gender", "marital", "education", "expertise"]
 
 const config02: {
   [key in TkeyIndex02Key]: {
@@ -228,11 +242,6 @@ const config02: {
     options?: Toption[]
   }
 } = {
-  birthday: {
-    label: "生日",
-    width: "240px",
-    labelWidth: "40px"
-  },
   gender: {
     label: "性別",
     width: "240px",
