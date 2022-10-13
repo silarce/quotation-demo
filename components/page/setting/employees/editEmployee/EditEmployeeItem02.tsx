@@ -25,14 +25,14 @@ const optionsJobTitle = optionsCreator_jobTitle();
 const optionsLevel = optionsCreator_level();
 
 // type
-import { TpostEmployee } from "js/api/api_employee";
+import { TpostEmployee, Temployee } from "js/api/api_employee";
 
 // css
 import style from "../editEmployee.module.scss"
 
 export default function EditEmployeeItem02({ data, setData }: {
-  data: TpostEmployee
-  setData: Dispatch<SetStateAction<TpostEmployee>>
+  data: TpostEmployee | Partial<Temployee>
+  setData: Dispatch<SetStateAction<TpostEmployee | Partial<Temployee>>>
 }) {
 
 

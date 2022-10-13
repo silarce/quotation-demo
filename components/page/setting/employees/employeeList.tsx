@@ -1,12 +1,18 @@
-
+import {
+  MouseEvent,
+  useState, useContext
+} from "react"
 import Link from "next/link";
 
-// global
+
+
+
+// global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-
-
-
-
+import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
+import { ModalSuccess01 } from "components/global/gear/modal/simpleModal/alertModals";
+// api
+import { apiDeleteEmployee } from "js/api/api_employee";
 
 // icon
 import { Icondelete01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -15,10 +21,42 @@ import style from "./employeeList.module.scss"
 // type
 import { Temployee } from "js/api/api_employee"
 
+// constext
+import { employeeContext } from "pages/setting/employees";
 
-export default function EmployeeList({ employeeList }: {
+export default function EmployeeList({ employeeList, toUpdate }: {
   employeeList: Temployee[]
+  toUpdate: () => void
 }) {
+  const { setIsLoading } = useContext(employeeContext)
+
+  const [selInfo, setSelInfo] = useState({
+    id: "",
+    idNumber: "",
+    chName: ""
+  })
+  const closeDelPanel = () => {
+    setSelInfo({
+      id: "",
+      idNumber: "",
+      chName: ""
+    })
+  }
+
+  const openDelPanel = (e: MouseEvent, data: Temployee) => {
+    e.stopPropagation()
+    const { id, idNumber, chName } = data
+    setSelInfo({ id, idNumber, chName })
+  }
+
+  const deleteEmployee = async () => {
+    if (!selInfo.id) return
+    setIsLoading(true)
+    const res = await apiDeleteEmployee(selInfo.id)
+    if (res.deletedAt) await toUpdate()
+    closeDelPanel()
+    ModalSuccess01({ title: "刪除完成" })
+  }
 
   return (
     <div className={style.employeeList}>
@@ -68,13 +106,13 @@ export default function EmployeeList({ employeeList }: {
                         <div className={style.column} key={index}
                           style={theStyle}
                         >
-                          <span>{"無資料"}</span>
+                          <span>{"還無法取得資料"}</span>
                         </div>
                       )
                   })}
 
                   <div className={`${style.column} ${style.btnCell}`}>
-                    <Icondelete01 />
+                    <Icondelete01 onClick={(e) => { openDelPanel(e, row) }} />
                   </div>
                 </div>
               </Link>
@@ -82,6 +120,13 @@ export default function EmployeeList({ employeeList }: {
           )
         })}
       </div>
+      <TwoButtonModal
+        {...{
+          visible: !!selInfo.id,
+          text: `請確定要刪除「${selInfo.idNumber}」「${selInfo.chName}」?`,
+          onConfirm: deleteEmployee,
+          onCancel: closeDelPanel,
+        }} />
     </div>
   )
 }

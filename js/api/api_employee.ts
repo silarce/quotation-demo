@@ -33,13 +33,13 @@ export type Temployee = {
   "retireDate": string,
   "severanceDate": string,
   "processPermission": true,
-  "jobs": string[]
+  "jobs"?: string[]
 }
 
 // 員工資料列表
 export type TgetEmployee = {
-  "data"?: Temployee[],
-  "meta"?: {
+  "data": Temployee[],
+  "meta": {
     "page": number,
     "pageSize": number,
     "itemCount": number,
@@ -80,13 +80,15 @@ export type TpostEmployee = {
 
 
 
-export type TapiGetEmployee = {
+
+// =======================================================
+// 取得員工資料列表
+export type TapiGetEmployeeParams = {
   order: "ASC" | "DESC",
   page: number,
   pageSize: number,
 }
-
-const apiGetEmployee = (params: TapiGetEmployee) => {
+const apiGetEmployee = (params: TapiGetEmployeeParams) => {
   const api = "/employees"
   return axi.get(api, { params })
     .then(({ data }) => data)
@@ -94,13 +96,37 @@ const apiGetEmployee = (params: TapiGetEmployee) => {
 }
 
 export const useEmployee = () => {
-  const [data, setData] = useState<TgetEmployee>({})
-  const update = async (params: TapiGetEmployee) => {
+  let [data, setData] = useState<Partial<TgetEmployee>>({})
+  const update = async (params: TapiGetEmployeeParams) => {
     const data = await apiGetEmployee(params)
     if (data) setData(data)
     return data
   }
-  return { data, setData, update } as const
+
+  return { data, setData, update }
+}
+
+// =======================================================
+// 取得個別員工資料
+
+const apiGetEmployee_id = (id: string) => {
+  const api = `/employees/${id}`
+  return axi.get(api)
+    .then(({ data }) => {
+      return data
+    })
+    .catch((err) => false)
+}
+
+export const useEmployeeById = (id: string) => {
+  const [data, setData] = useState<Partial<Temployee>>({})
+  const update = async () => {
+    const res = await apiGetEmployee_id(id)
+    if (res) setData(res)
+    return res
+  }
+
+  return { data, setData, update }
 }
 
 // =======================================================
@@ -112,12 +138,24 @@ export const apiPostEmployee = (body: TpostEmployee) => {
     .then(({ data }) => data)
     .catch(err => err)
 }
+// =======================================================
+// 修改員工資料
+export const apiPatchEmployee = (body: Temployee, id: string) => {
+  const api = `/employees/${id}`
+  return axi.patch(api, body)
+    .then(({ data }) => data)
+    .catch(err => err)
+}
 
+// =======================================================
+// 刪除員工資料
 
-
-
-
-
+export const apiDeleteEmployee = (id: string) => {
+  const api = `/employees/${id}`
+  return axi.delete(api)
+    .then(({ data }) => data)
+    .catch(err => err)
+}
 
 
 

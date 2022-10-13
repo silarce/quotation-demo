@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
 
-
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
@@ -13,25 +12,24 @@ import LoadingCover from "components/global/gear/loadingCover";
 import style from "../../employees.module.scss"
 
 // api
-import { apiPostEmployee, TpostEmployee, Temployee } from "js/api/api_employee";
-import { id } from "date-fns/locale";
+import {
+  Temployee, TpostEmployee,
+  useEmployeeById, apiPatchEmployee
+} from "js/api/api_employee";
 
 
 export default function AddEmployee() {
 
   const router = useRouter()
 
-  const [data, setData] = useState<Partial<Temployee>>(emptyDataOri())
-  const [isLoading, setIsLoading] = useState(false)
+  let { data, setData, update } = useEmployeeById(router.query.id as string || "")
 
   useEffect(() => {
-    // 在設定使用者代號的方案出來前，先這樣處理
-    if (!data.idNumber) {
-      data.idNumber = router.query.employeeId as string || ""
-      setData({ ...data })
-    }
+    update()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const panelList: TpanelList = [
@@ -45,7 +43,7 @@ export default function AddEmployee() {
       label: "上傳",
       onClick: async () => {
         setIsLoading(true)
-        await apiPostEmployee(data as Temployee)
+        await apiPatchEmployee(data as Temployee, data.id || "")
         setIsLoading(false)
       }
     }
