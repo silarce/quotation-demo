@@ -39,6 +39,20 @@ export const ModalInfo02 = (
   })
 }
 
+export const ModalSuccess01 = (
+  { title, content }: {
+    title?: string | number
+    content?: string | number
+  }
+) => {
+  Modal.success({
+    className: style.container,
+    title,
+    content,
+    okText: "確認",
+    maskClosable: true
+  })
+}
 
 
 

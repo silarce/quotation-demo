@@ -15,16 +15,25 @@ export default function TwoButtonModal(
   { visible, setVisible, text, onConfirm, onCancel, confirmText, cancelText }:
     {
       visible: boolean,
+      setVisible?: Dispatch<SetStateAction<boolean>>,
+      text: string
+      onConfirm: () => void
+      onCancel: () => void
+      confirmText?: string
+      cancelText?: string
+    } | {
+      visible: boolean,
       setVisible: Dispatch<SetStateAction<boolean>>,
       text: string
       onConfirm: () => void
       onCancel?: () => void
       confirmText?: string
       cancelText?: string
-    }) {
+    }
+) {
 
   if (!onCancel) onCancel = () => {
-    setVisible(false)
+    if (setVisible) setVisible(false)
   }
 
   return (

@@ -87,7 +87,7 @@ const sidePathList: TsidePathList = {
             },
             {
               label: "人員資料",
-              path: path01 + "/staffProfile",
+              path: path01 + "/employees",
             },
             {
               label: "人事權限管理",

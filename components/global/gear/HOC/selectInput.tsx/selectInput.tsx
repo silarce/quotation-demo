@@ -20,7 +20,7 @@ import Select03, { Toption } from "components/global/gear/select/select03"
 
 
 interface TselectProps {
-  stateValue: Toption | null
+  stateValue: Toption | string | null
   options: Toption[]
   placeholder: string
   onChange: (option: Toption | null) => void
@@ -87,10 +87,14 @@ export default function SelectInput(
             style={theStyle}
             placeholder={placeholder}
             value={stateValue}
-            onChange={onChange}
             disabled={disabled}
             onFocus={onFocus}
             onBlur={onBlur}
+            onChange={onChange}
+            onKeyDown={(e) => {
+              if (e.code === "Enter") e.preventDefault()
+              if (e.code === "NumpadEnter") e.preventDefault()
+            }}
           />
           // <input className={style.input} key={index}
           //   type="text" autoComplete="off"

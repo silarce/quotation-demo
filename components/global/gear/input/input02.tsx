@@ -1,4 +1,8 @@
-
+// input02是有標題的input
+// input02是有標題的input
+// input02是有標題的input
+// input02是有標題的input
+// input02是有標題的input
 
 
 
@@ -23,7 +27,7 @@ const Input02 = (
   }:
     {
       label: string,
-      stateValue: string | number,
+      stateValue: string | number | undefined | null,
       // onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
       onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
       placeholder?: string | false,
@@ -64,8 +68,12 @@ const Input02 = (
       <TextareaAutosize className={style.textArea}
         id={id} placeholder={placeholder}
         autoComplete="off"
-        value={stateValue}
+        value={stateValue ?? ""}
         onChange={onChange}
+        onKeyDown={(e) => {
+          if (e.code === "Enter") e.preventDefault()
+          if (e.code === "NumpadEnter") e.preventDefault()
+        }}
         disabled={disabled}
       />
 

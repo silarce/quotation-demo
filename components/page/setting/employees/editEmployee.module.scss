@@ -1,0 +1,112 @@
+@use "styles/theme01" as *;
+
+$leftPadding_title: 41px;
+$leftPadding_option: 4px;
+
+$leftPadding_div: $leftPadding_title - $leftPadding_option;
+
+.editEmployee {
+  padding: 38px 45px;
+  // 使用者代號
+  .employeeId {
+    min-width: 300px;
+    width: fit-content;
+    padding: 20px $leftPadding_title;
+    border: solid 1px $colorBorder01;
+    > span {
+      &:nth-of-type(1) {
+        margin-right: 40px;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 24px;
+        color: $colorText;
+      }
+      &:nth-of-type(2) {
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+      }
+    }
+  }
+
+  .editEmployeeItem01 {
+    margin-top: 27px;
+    .form01 {
+      display: grid;
+      grid-template-columns: 400px 65px 480px;
+      gap: 24px 0;
+      padding: 29px $leftPadding_div;
+      border: solid 1px $colorBorder01;
+      > div:nth-last-of-type(1) {
+        grid-column: span 3;
+      }
+    }
+  }
+
+  .editEmployeeItem02 {
+    margin-top: 27px;
+    .form02 {
+      padding: 29px $leftPadding_div;
+      border: solid 1px $colorBorder01;
+      .selBox {
+        display: inline-block;
+        position: relative;
+        width: 378px;
+        padding: 24px 18px 21px 18px;
+        margin-left: 75px;
+        border: solid 1px $colorBorder01;
+        &:nth-of-type(1) {
+          margin-left: 0;
+        }
+        > svg {
+          position: absolute;
+          left: calc(100% + 12px);
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+        }
+      }
+      .bottomContainer {
+        margin-top: 28px;
+        > div {
+          display: inline-block;
+          &:nth-of-type(1) {
+            width: 407px;
+            margin-right:47px;
+          }
+          &:nth-of-type(2) {
+            display: inline-grid;
+            grid-template-columns: 256px 256px;
+            gap: 0 22px;
+            width: fit-content;
+            input {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // -------------------------------
+  // 垂直分隔線
+  .vr {
+    width: 1px;
+    height: 100%;
+    margin: auto;
+    background-color: $colorBorder01;
+  }
+  .selectInput {
+    > span {
+      color: $colorText;
+    }
+  }
+  .subTitle {
+    padding: 11px $leftPadding_title;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    background-color: $bgc01;
+    margin: auto;
+  }
+}

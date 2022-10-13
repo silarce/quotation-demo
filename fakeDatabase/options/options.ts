@@ -17,6 +17,73 @@ interface Toption {
   icon?: string
 }
 
+// 性別
+export const optionsCreator_gender =
+  (): Toption[] => [
+    { value: "男", label: "男" },
+    { value: "女", label: "女" },
+  ]
+
+// 婚姻狀況
+export const optionsCreator_marital =
+  (): Toption[] => [
+    { value: "已婚", label: "未婚" },
+    { value: "未婚", label: "已婚" },
+  ]
+
+
+
+export const optionsCreator_department =
+  (): Toption[] => [
+    { value: "管理部", label: "管理部" },
+    { value: "營業部", label: "營業部" },
+    { value: "研發部", label: "研發部" },
+    { value: "工程部", label: "工程部" },
+    { value: "廠務部", label: "廠務部" },
+    { value: "會計部", label: "會計部" },
+  ]
+
+
+
+export const optionsCreator_jobTitle =
+  (): Toption[] => [
+    { value: "總經", label: "總經理" },
+    { value: "副總經理", label: "副總經理" },
+    { value: "協理", label: "協理" },
+    { value: "資深經理", label: "資深經理" },
+    { value: "經理", label: "經理" },
+    { value: "副理", label: "副理" },
+    { value: "課長", label: "課長" },
+    { value: "副課長", label: "副課長" },
+    { value: "專員", label: "專員" },
+    { value: "助理", label: "助理" },
+  ]
+
+export const optionsCreator_level =
+  (): Toption[] => [
+    { value: "Level 10", label: "Level 10" },
+    { value: "Level 9", label: "Level 9" },
+    { value: "Level 8", label: "Level 8" },
+    { value: "Level 7", label: "Level 7" },
+    { value: "Level 6", label: "Level 6" },
+    { value: "Level 5", label: "Level 5" },
+    { value: "Level 4", label: "Level 4" },
+    { value: "Level 3", label: "Level 3" },
+    { value: "Level 2", label: "Level 2" },
+    { value: "Level 1", label: "Level 1" },
+  ]
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // 門型編號
@@ -81,9 +148,6 @@ export const optionsCreator_memo =
 
 
 // 門軌
-
-
-
 
 
 export const optionsCreator_doorRail =

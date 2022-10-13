@@ -10,8 +10,6 @@ import { TstaffInfo } from "fakeDatabase/staff/fakeStaffList";
 type TsetSelStaffInfo = Dispatch<SetStateAction<TstaffInfo>>
 
 
-
-
 export default function EditStaff({ selStaffInfo, setSelStaffInfo }:
   {
     selStaffInfo: TstaffInfo,
