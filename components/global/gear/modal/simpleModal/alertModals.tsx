@@ -10,6 +10,7 @@ import style from "./alertModals.module.scss"
 
 import { Modal } from 'antd';
 
+// ==================================================
 
 export const ModalInfo = (
   title?: string | number,
@@ -39,6 +40,7 @@ export const ModalInfo02 = (
   })
 }
 
+// ==================================================
 export const ModalSuccess01 = (
   { title, content }: {
     title?: string | number
@@ -53,7 +55,21 @@ export const ModalSuccess01 = (
     maskClosable: true
   })
 }
-
+// ==================================================
+export const ModalErr01 = (
+  { title, content }: {
+    title?: string | number
+    content?: string | number
+  }
+) => {
+  Modal.error({
+    className: style.container,
+    title,
+    content,
+    okText: "確認",
+    maskClosable: true
+  })
+}
 
 
 

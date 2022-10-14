@@ -8,7 +8,7 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
-
+import { ModalSuccess01, ModalErr01 } from "components/global/gear/modal/simpleModal/alertModals";
 // css
 import style from "../../employees.module.scss"
 
@@ -38,20 +38,28 @@ export default function AddEmployee() {
     {
       type: "redButton",
       label: "取消",
-      onClick: () => { router.back() }
+      onClick: () => { router.push("/setting/employees") }
     },
     {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
-        setIsLoading(true)
-        await apiPostEmployee(data as Temployee)
-        setIsLoading(false)
+        try {
+          setIsLoading(true)
+          const res = await apiPostEmployee(data as TpostEmployee) as Temployee
+          router.push(`/setting/employees/edit/${res.id}`)
+        }
+        catch {
+          ModalErr01({ title: "新增人員失敗" })
+        }
+        finally {
+          setIsLoading(false)
+          ModalSuccess01({ title: "新增人員完成" })
+        }
       }
     }
   ]
-
-
+  
   return (
     <div className={style.container}>
 

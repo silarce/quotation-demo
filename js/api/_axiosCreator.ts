@@ -2,7 +2,7 @@ import axios from "axios"
 
 const axi = axios.create({
   baseURL: "https://sanjeou-erp-be.caprover.credot-web.com/",
-  withCredentials:true,
+  withCredentials: true,
 })
 
 
@@ -43,7 +43,7 @@ axi.interceptors.response.use(
     }
     if (!window.navigator.onLine) {
       alert("網路出了問題，請檢查網路後重新整理網頁");
-      return;
+      Promise.reject(err);
     }
     return Promise.reject(err)
   }
