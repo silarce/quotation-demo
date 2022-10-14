@@ -7,7 +7,7 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
-import { ModalSuccess01, ModalErr01 } from "components/global/gear/modal/simpleModal/alertModals";
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 // css
 import style from "../../employees.module.scss"
 
@@ -45,10 +45,10 @@ export default function AddEmployee() {
         try {
           setIsLoading(true)
           await apiPatchEmployee(data as TpostEmployee, data.id!)
-          ModalSuccess01({ title: "變更人員資料完成" })
+          myAlert.success({ title: "變更人員資料完成" })
         }
         catch {
-          ModalErr01({ title: "變更人員資料失敗" })
+          myAlert.err({ title: "變更人員資料失敗" })
         }
         finally {
           setIsLoading(false)

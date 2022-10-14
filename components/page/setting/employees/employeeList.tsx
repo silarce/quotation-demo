@@ -10,7 +10,7 @@ import Link from "next/link";
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-import { ModalSuccess01, ModalErr01 } from "components/global/gear/modal/simpleModal/alertModals";
+import { ModalSuccess, ModalErr } from "components/global/gear/modal/simpleModal/alertModals";
 // api
 import { apiDeleteEmployee } from "js/api/api_employee";
 
@@ -55,11 +55,11 @@ export default function EmployeeList({ employeeList, toUpdate }: {
       setIsLoading(true)
       await apiDeleteEmployee(selInfo.id)
       await toUpdate()
-      ModalSuccess01({ title: "刪除完成" })
+      ModalSuccess({ title: "刪除完成" })
     }
     catch {
       await toUpdate()
-      ModalErr01({ title: "刪除失敗" })
+      ModalErr({ title: "刪除失敗" })
     }
     finally {
       setIsLoading(false)

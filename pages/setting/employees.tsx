@@ -28,6 +28,8 @@ import style from "./employees.module.scss"
 
 // ==================================================
 
+
+
 export const employeeContext = createContext<{
   setIsLoading: Dispatch<SetStateAction<boolean>>
 }>(null!)
@@ -57,13 +59,11 @@ export default function Employees() {
   }
 
   useEffect(() => {
-
     (async () => {
       setIsLoading(true)
       await toUpdate()
       setIsLoading(false)
     })()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -122,7 +122,6 @@ export default function Employees() {
 // ============================================================
 /*
 計畫事項
-地址輸入欄有BUG，改變城市後區域不會歸null，要修
 要製作上傳成功失敗的提示(Modal系列要改風格)
 讀取中要改善
 */
