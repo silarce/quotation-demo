@@ -12,7 +12,7 @@ const _ = require("lodash")
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import Input02 from "components/global/gear/input/input02"
 import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address"
-import LoadingCover from "components/global/gear/loadingCover"
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // api
 import {
@@ -62,7 +62,7 @@ export default function TheCompanyInfo() {
   }, [companyInfo.logoLink])
   // ===================================================
   const [editable, setEditable] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  
   // ===================================================
   // ===================================================
   // pageHeader
@@ -78,7 +78,7 @@ export default function TheCompanyInfo() {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-        setIsLoading(true)
+        setRootLoading(true)
         const body = {
           name: companyInfo.name || "",
           phone: companyInfo.phone || "",
@@ -96,7 +96,7 @@ export default function TheCompanyInfo() {
           await apiUploadCompanyLogo(formData)
         }
         await update()
-        setIsLoading(false)
+        setRootLoading(false)
         setEditable(false)
       }
     },
@@ -225,7 +225,6 @@ export default function TheCompanyInfo() {
         </div>
 
       </div>
-      <LoadingCover open={isLoading} />
     </div>
   )
 }

@@ -11,7 +11,7 @@ import Link from "next/link";
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import { ModalSuccess, ModalErr } from "components/global/gear/modal/simpleModal/alertModals";
-import { setRootLoading } from "components/global/gear/important/rootLoadingCover";
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // api
 import { apiDeleteEmployee } from "js/api/api_employee";
 

@@ -9,7 +9,7 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
-import { setRootLoading } from "components/global/gear/important/rootLoadingCover";
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // css
 import style from "../../employees.module.scss"
 

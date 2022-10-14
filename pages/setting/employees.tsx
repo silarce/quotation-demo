@@ -3,9 +3,6 @@
 
 import {
   useState, useEffect,
-  createContext,
-  Dispatch,
-  SetStateAction
 } from "react"
 
 
@@ -16,9 +13,11 @@ import { useRouter } from "next/router";
 // components
 import EmployeeList from "components/page/setting/employees/employeeList";
 
+
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
-import LoadingCover from "components/global/gear/loadingCover";
+// import Spin01 from "components/global/gear/other/spin01";
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 // api
 import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
 
@@ -26,13 +25,6 @@ import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
 import style from "./employees.module.scss"
 
 // ==================================================
-
-
-
-export const employeeContext = createContext<{
-  setIsLoading: Dispatch<SetStateAction<boolean>>
-}>(null!)
-
 
 export default function Employees() {
   const router = useRouter()
@@ -104,18 +96,14 @@ export default function Employees() {
       <PageHeader02 tag="人員資料"
         panelList={panelList}
       />
-      <employeeContext.Provider value={{ setIsLoading }}>
-        <div className={style.mainContainer}>
-          <EmployeeList
-            employeeList={employeeList} toUpdate={toUpdate} />
-        </div>
-      </employeeContext.Provider>
-      <LoadingCover open={isLoading} />
+      <div className={style.mainContainer}>
+        <EmployeeList
+          employeeList={employeeList} toUpdate={toUpdate} />
+        <LoadingCover01 isLoading={isLoading} />
+      </div>
     </div>
   )
 }
-
-
 
 
 // ============================================================
@@ -123,7 +111,10 @@ export default function Employees() {
 // ============================================================
 /*
 計畫事項
-讀取中要改善
+接著要做區域性loading cover
+
+
+
 */
 
 /*

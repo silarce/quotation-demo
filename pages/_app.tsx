@@ -5,18 +5,11 @@ import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 
-
 // conponents
 import Layer from "components/Layer/Layer"
 
-// antd
-// import { Spin } from 'antd'
-
-// mui
-// import CircularProgress from '@mui/material/CircularProgress';
-
 // global gear
-import RootLoadingCover from 'components/global/gear/important/rootLoadingCover'
+import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover'
 
 // api
 import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
@@ -55,8 +48,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       // 登入程序完畢，ready設為true
       setReady(true)
     })()
-    // Spin.setDefaultIndicator(<CircularProgress size={100}/>)
-    // Spin.setDefaultIndicator(<CircularProgress />)
   }, [])
 
   // ----
