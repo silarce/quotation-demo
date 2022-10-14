@@ -2,7 +2,7 @@
 // 人員資料
 
 import {
-  useState, useMemo, useEffect,
+  useState, useEffect,
   createContext,
   Dispatch,
   SetStateAction
@@ -19,7 +19,6 @@ import EmployeeList from "components/page/setting/employees/employeeList";
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
-
 // api
 import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
 
@@ -95,6 +94,8 @@ export default function Employees() {
       }
     }
   ]
+
+
   // ====================================================
 
 
@@ -122,7 +123,6 @@ export default function Employees() {
 // ============================================================
 /*
 計畫事項
-要製作上傳成功失敗的提示(Modal系列要改風格)
 讀取中要改善
 */
 

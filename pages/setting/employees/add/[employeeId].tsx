@@ -44,8 +44,9 @@ export default function AddEmployee() {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
+        let loading = myAlert.loading()
+        // setIsLoading(true)
         try {
-          setIsLoading(true)
           const res = await apiPostEmployee(data as TpostEmployee) as Temployee
           router.push(`/setting/employees/edit/${res.id}`)
           myAlert.success({ title: "新增人員完成" })
@@ -54,7 +55,11 @@ export default function AddEmployee() {
           myAlert.err({ title: "新增人員失敗" })
         }
         finally {
-          setIsLoading(false)
+
+          loading.destroy()
+
+
+          // setIsLoading(false)
         }
       }
     }

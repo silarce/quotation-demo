@@ -182,10 +182,10 @@ export default function EditClient({ selData, setSelData }:
         </div>
         <div className={style.form03}>
           <SelectInput className={style.selectInput}
-            label="戶籍地址" searchInputPropsList={selectInputList}
+            label="戶籍地址" selectInputPropsList={selectInputList}
             labelWidth="90px" />
           <SelectInput className={style.selectInput}
-            label="聯絡地址" searchInputPropsList={billSelectInputList}
+            label="聯絡地址" selectInputPropsList={billSelectInputList}
             labelWidth="90px" />
         </div>
       </Container01>

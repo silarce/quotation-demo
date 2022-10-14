@@ -1,6 +1,9 @@
 
-
-
+// antd
+import { Modal, ModalFuncProps } from 'antd';
+import {
+  LoadingOutlined,
+} from '@ant-design/icons';
 
 // css
 import style from "./alertModals.module.scss"
@@ -8,12 +11,11 @@ import style from "./alertModals.module.scss"
 
 
 
-import { Modal, ModalFuncProps } from 'antd';
 
 // ==================================================
 
 const modalProps = {
-  className: style.container,
+  className: style.alert,
   okText: "確認",
   maskClosable: true,
   centered: true,
@@ -25,7 +27,7 @@ export const ModalInfo = (
   content?: string | number,
   props?: ModalFuncProps
 ) => {
-  Modal.info({
+  return Modal.info({
     title,
     content,
     ...modalProps,
@@ -40,7 +42,7 @@ export const ModalInfo02 = (
     props?: ModalFuncProps
   }
 ) => {
-  Modal.info({
+  return Modal.info({
     title,
     content,
     ...modalProps,
@@ -56,7 +58,7 @@ export const ModalSuccess = (
     props?: ModalFuncProps
   }
 ) => {
-  Modal.success({
+  return Modal.success({
     title,
     content,
     ...modalProps,
@@ -71,13 +73,36 @@ export const ModalErr = (
     props?: ModalFuncProps
   }
 ) => {
-  Modal.error({
+  return Modal.error({
     title,
     content,
     ...modalProps,
     ...props
   })
 }
+
+// ====================================================
+export const ModalLoading = (theProps: {
+  title?: string | number
+  content?: string | number
+  showBtn?: boolean
+  props?: ModalFuncProps
+} = {}) => {
+  const { title, content, showBtn, props } = theProps!
+  const styleShowBtn = showBtn ? style.showBtn : ""
+  const className = `${style.loading} ${styleShowBtn}`
+  return Modal.info({
+    className: className,
+    title,
+    content,
+    icon: <LoadingOutlined />,
+    centered: true,
+    keyboard: false,
+    zIndex: 9999,
+    ...props
+  })
+}
+
 
 
 
@@ -86,7 +111,9 @@ export const ModalErr = (
 const myAlert = {
   info: ModalInfo02,
   success: ModalSuccess,
-  err: ModalErr
+  err: ModalErr,
+  loading: ModalLoading,
+  destroyAll: Modal.destroyAll
 }
 
 export default myAlert
