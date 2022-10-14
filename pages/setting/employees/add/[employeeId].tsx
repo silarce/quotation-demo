@@ -14,7 +14,7 @@ import style from "../../employees.module.scss"
 
 // api
 import { apiPostEmployee, TpostEmployee, Temployee } from "js/api/api_employee";
-import { id } from "date-fns/locale";
+
 
 
 export default function AddEmployee() {
@@ -97,35 +97,6 @@ const emptyDataOri = (): TpostEmployee => ({
   "severanceDate": "",
   // "jobId": [""]
 })
-
-// const emptyData: TpostEmployee = {
-  //   "idNumber": "",
-//   "chName": "",
-//   "enName": "",
-//   "identity": "",
-//   "birthday": "",
-//   "gender": "",
-//   "marital": "",
-//   "education": "",
-//   "expertise": "",
-//   "phone1": "",
-//   "phone2": "",
-//   "email": "",
-//   "residenceCounty": "",
-//   "residenceDistrict": "",
-//   "residenceAddress": "",
-//   "mailingCounty": "",
-//   "mailingDistrict": "",
-//   "mailingAddress": "",
-//   "processPermission": true,
-//   "seniority": "",
-//   "startDate": "",
-//   "leaveDate": "",
-//   "retireDate": "",
-//   "severanceDate": "",
-//   "jobId": [""]
-// }
-
 
 
 

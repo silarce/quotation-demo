@@ -7,8 +7,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react";
 // global gear
 import Input02 from "components/global/gear/input/input02"
 import { Select02 } from "components/global/gear/select/select"
-import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address";
-
+import TimePicker01 from "components/global/gear/input/timePicker01";
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
@@ -36,25 +35,11 @@ export default function EditEmployeeItem02({ data, setData }: {
 }) {
 
 
-
-
-
   const [isDepart02, setIsDepart02] = useState(false)
 
   const switchNewDepart = () => {
     setIsDepart02(state => !state)
   }
-
-
-  const searchInputPropsResidence = {
-    county: "",
-    onChangeCountry: () => { },
-    district: "",
-    onChangeDistrict: () => { },
-    address: "",
-    onChangeAddress: () => { },
-  }
-
 
 
   return (
@@ -121,20 +106,20 @@ export default function EditEmployeeItem02({ data, setData }: {
             {keyIndex02.map((key, index) => {
               const stateValue = data[key]
               const { label } = config02[key]
-              const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-                const value = e.target.value
+
+              const onChange = (dateString: string) => {
+                const value = dateString
                 setData(data => {
                   data[key] = value
                   return { ...data }
                 })
               }
               return (
-                <Input02
+                <TimePicker01
                   key={index}
                   stateValue={stateValue}
                   label={label}
                   labelWidth="60px"
-                  placeholder="例 : 100-01-01"
                   onChange={onChange}
                 />
               )

@@ -109,7 +109,6 @@ export default function Employees() {
         <div className={style.mainContainer}>
           <EmployeeList
             employeeList={employeeList} toUpdate={toUpdate} />
-
         </div>
       </employeeContext.Provider>
       <LoadingCover open={isLoading} />
@@ -126,10 +125,9 @@ export default function Employees() {
 /*
 計畫事項
 地址輸入欄有BUG，改變城市後區域不會歸null，要修
-生日欄位的格式要修正
-輸入日期的欄位要改成日期選擇器
 要製作上傳成功失敗的提示(Modal系列要改風格)
 讀取中要改善
+到職日 離職日 退休日 資遣日也要用日期選擇器
 */
 
 
