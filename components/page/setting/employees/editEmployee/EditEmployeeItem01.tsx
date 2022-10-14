@@ -189,11 +189,11 @@ export default function EditEmployeeItem01({ data, setData }: {
           <SelectInput_address
             className={style.selectInput}
             label="戶籍地址"
-            searchInputProps={selectInputPropsResidence} />
+            selectInputProps={selectInputPropsResidence} />
           <SelectInput_address
             className={style.selectInput}
             label="通訊地址"
-            searchInputProps={selectInputPropsMailing} />
+            selectInputProps={selectInputPropsMailing} />
         </div>
       </div>
     </div>

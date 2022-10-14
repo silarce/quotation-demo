@@ -10,7 +10,7 @@ import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
 // fakeData type
 import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
-export type TsearchInputProps = {
+export type TselectInputProps = {
   county: string | null | undefined
   onChangeCountry: (option: Toption | null) => void
   district: string | null | undefined
@@ -21,13 +21,13 @@ export type TsearchInputProps = {
 
 export default function SelectInput_address(
   {
-    searchInputProps,
+    selectInputProps,
     label,
     className,
     disabled
   }:
     {
-      searchInputProps: TsearchInputProps
+      selectInputProps: TselectInputProps
       label?: string
       className?: string
       disabled?: boolean
@@ -40,7 +40,7 @@ export default function SelectInput_address(
     onChangeDistrict,
     address,
     onChangeAddress,
-  } = searchInputProps
+  } = selectInputProps
 
 
 
@@ -77,7 +77,7 @@ export default function SelectInput_address(
 
   return (
     <SelectInput className={className}
-      label={label||"地址"} searchInputPropsList={selectInputList}
+      label={label||"地址"} selectInputPropsList={selectInputList}
       disabled={disabled} />
   )
 }
@@ -91,7 +91,7 @@ export default function SelectInput_address(
 //   companyInfo.district = null
 //   setCompanyInfo({ ...companyInfo })
 // }
-// const searchInputProps = {
+// const selectInputProps = {
 //   county,
 //   onChangeCountry: (option: Toption | null) => {
 //     if (!option) return

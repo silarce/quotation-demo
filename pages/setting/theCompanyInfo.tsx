@@ -217,7 +217,7 @@ export default function TheCompanyInfo() {
             )
           })}
           <SelectInput_address
-            searchInputProps={searchInputProps}
+            selectInputProps={searchInputProps}
             label="公司地址"
             disabled={!editable}
             className={style.selectInput}

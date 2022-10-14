@@ -125,7 +125,6 @@ export default function Employees() {
 地址輸入欄有BUG，改變城市後區域不會歸null，要修
 要製作上傳成功失敗的提示(Modal系列要改風格)
 讀取中要改善
-到職日 離職日 退休日 資遣日也要用日期選擇器
 */
 
 /*

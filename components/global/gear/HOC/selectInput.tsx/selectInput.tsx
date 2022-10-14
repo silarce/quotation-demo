@@ -40,10 +40,10 @@ interface TinputProps {
 
 
 export default function SelectInput(
-  { label, searchInputPropsList, disabled, labelWidth, className }:
+  { label, selectInputPropsList, disabled, labelWidth, className }:
     {
       label: string
-      searchInputPropsList: (TselectProps | TinputProps)[]
+      selectInputPropsList: (TselectProps | TinputProps)[]
       disabled?: boolean
       labelWidth?: string
       className?: string
@@ -63,7 +63,7 @@ export default function SelectInput(
       {/* <span style={labelStyle}>{label}</span> */}
       <span style={labelStyle}>{label}</span>
 
-      {searchInputPropsList.map((target, index) => {
+      {selectInputPropsList.map((target, index) => {
         const { stateValue, options, placeholder, onChange, width } = target
         const className = target.className || ""
         const theStyle = { width }
