@@ -34,13 +34,14 @@ export default function EditEmployeeItem01({ data, setData }: {
 
 
 
-  const searchInputPropsResidence = {
+  const selectInputPropsResidence = {
     county: residenceCounty,
     onChangeCountry: (option: Toption | null) => {
       if (!option) return
       const value = option.value
       setData(data => {
         data.residenceCounty = value
+        data.residenceDistrict = ""
         return { ...data }
       })
     },
@@ -62,13 +63,14 @@ export default function EditEmployeeItem01({ data, setData }: {
       })
     },
   }
-  const searchInputPropsMailing = {
+  const selectInputPropsMailing = {
     county: mailingCounty,
     onChangeCountry: (option: Toption | null) => {
       if (!option) return
       const value = option.value
       setData(data => {
         data.mailingCounty = value
+        data.mailingDistrict = ""
         return { ...data }
       })
     },
@@ -187,11 +189,11 @@ export default function EditEmployeeItem01({ data, setData }: {
           <SelectInput_address
             className={style.selectInput}
             label="戶籍地址"
-            searchInputProps={searchInputPropsResidence} />
+            searchInputProps={selectInputPropsResidence} />
           <SelectInput_address
             className={style.selectInput}
             label="通訊地址"
-            searchInputProps={searchInputPropsMailing} />
+            searchInputProps={selectInputPropsMailing} />
         </div>
       </div>
     </div>
