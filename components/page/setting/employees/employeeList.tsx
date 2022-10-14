@@ -11,6 +11,7 @@ import Link from "next/link";
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import { ModalSuccess, ModalErr } from "components/global/gear/modal/simpleModal/alertModals";
+import { setRootLoading } from "components/global/gear/important/rootLoadingCover";
 // api
 import { apiDeleteEmployee } from "js/api/api_employee";
 
@@ -21,14 +22,13 @@ import style from "./employeeList.module.scss"
 // type
 import { Temployee } from "js/api/api_employee"
 
-// constext
-import { employeeContext } from "pages/setting/employees";
+
 
 export default function EmployeeList({ employeeList, toUpdate }: {
   employeeList: Temployee[]
   toUpdate: () => void
 }) {
-  const { setIsLoading } = useContext(employeeContext)
+
 
   const [selInfo, setSelInfo] = useState({
     id: "",
@@ -52,7 +52,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
   const deleteEmployee = async () => {
     if (!selInfo.id) return
     try {
-      setIsLoading(true)
+      setRootLoading(true)
       await apiDeleteEmployee(selInfo.id)
       await toUpdate()
       ModalSuccess({ title: "刪除完成" })
@@ -62,7 +62,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
       ModalErr({ title: "刪除失敗" })
     }
     finally {
-      setIsLoading(false)
+      setRootLoading(false)
       closeDelPanel()
     }
   }

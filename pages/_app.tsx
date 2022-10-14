@@ -5,12 +5,21 @@ import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 
-// api
-import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
-
 
 // conponents
 import Layer from "components/Layer/Layer"
+
+// antd
+// import { Spin } from 'antd'
+
+// mui
+// import CircularProgress from '@mui/material/CircularProgress';
+
+// global gear
+import RootLoadingCover from 'components/global/gear/important/rootLoadingCover'
+
+// api
+import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
 
 // css
 import '../styles/globals.scss'
@@ -25,15 +34,10 @@ type AppPropsWithLayout = AppProps & {
 }
 
 
-
-
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false)
-
-
   // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
-
 
   useEffect(() => {
     (async () => {
@@ -51,6 +55,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       // 登入程序完畢，ready設為true
       setReady(true)
     })()
+    // Spin.setDefaultIndicator(<CircularProgress size={100}/>)
+    // Spin.setDefaultIndicator(<CircularProgress />)
   }, [])
 
   // ----
@@ -67,11 +73,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           <Component {...pageProps} />
         )}
       </Layer>
+      {/* 全域loading cover */}
+      {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
+      <RootLoadingCover />
     </>
   )
 }
 
 export default MyApp
-
 
 

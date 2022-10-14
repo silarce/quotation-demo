@@ -9,6 +9,7 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import { setRootLoading } from "components/global/gear/important/rootLoadingCover";
 // css
 import style from "../../employees.module.scss"
 
@@ -18,7 +19,6 @@ import { apiPostEmployee, TpostEmployee, Temployee } from "js/api/api_employee";
 
 
 export default function AddEmployee() {
-
   const router = useRouter()
 
   const [data, setData] = useState<Partial<Temployee>>(emptyDataOri())
@@ -44,8 +44,7 @@ export default function AddEmployee() {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
-        let loading = myAlert.loading()
-        // setIsLoading(true)
+        setRootLoading(true)
         try {
           const res = await apiPostEmployee(data as TpostEmployee) as Temployee
           router.push(`/setting/employees/edit/${res.id}`)
@@ -55,11 +54,7 @@ export default function AddEmployee() {
           myAlert.err({ title: "新增人員失敗" })
         }
         finally {
-
-          loading.destroy()
-
-
-          // setIsLoading(false)
+          setRootLoading(false)
         }
       }
     }

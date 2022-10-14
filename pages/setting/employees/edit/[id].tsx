@@ -8,6 +8,7 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import { setRootLoading } from "components/global/gear/important/rootLoadingCover";
 // css
 import style from "../../employees.module.scss"
 
@@ -29,7 +30,7 @@ export default function AddEmployee() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [isLoading, setIsLoading] = useState(false)
+
 
 
   const panelList: TpanelList = [
@@ -43,7 +44,7 @@ export default function AddEmployee() {
       label: "上傳",
       onClick: async () => {
         try {
-          setIsLoading(true)
+          setRootLoading(true)
           await apiPatchEmployee(data as TpostEmployee, data.id!)
           myAlert.success({ title: "變更人員資料完成" })
         }
@@ -51,7 +52,7 @@ export default function AddEmployee() {
           myAlert.err({ title: "變更人員資料失敗" })
         }
         finally {
-          setIsLoading(false)
+          setRootLoading(false)
         }
       }
     }
@@ -67,7 +68,6 @@ export default function AddEmployee() {
       <div className={style.mainContainer}>
         <EditEmployee data={data} setData={setData} />
       </div>
-      <LoadingCover open={isLoading} />
     </div>
   )
 }
