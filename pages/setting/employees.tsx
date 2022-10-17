@@ -35,9 +35,9 @@ export default function Employees() {
   const meta = data?.meta
 
   const [params, setParams] = useState<TapiGetEmployeeParams>({
-    order: "ASC",
+    order: "DESC",
     page: 1,
-    pageSize: 10,
+    pageSize: 9999,
   })
   const setPage = (page: number) => {
     setParams(params => {
@@ -119,6 +119,9 @@ export default function Employees() {
 
 /*
 討論事項
+關於公司設定-人員資料
+
+10/14
 使用者代號的問題
 使用者代號目前是依據總使用者的數量產生流水號
 如果有使用者被刪除，這個流水號就會發生重複
@@ -135,5 +138,15 @@ export default function Employees() {
 後端的filter參數似乎還無法使用，因此無法過濾資料(搜尋功能)
 
 後端有提供page參數，但設計圖沒有設計分頁器(包括其他所有的列表都沒有)
+
+10/17
+get /employees 的order參數沒有作用，ASC或DESC取得的資料排序一樣
+
+後端的filter參數今天更新了，今天應該就能把搜尋功能補上
+
+後端新增查詢jobId功能，似乎有點問題，我再跟後端討論
+根據與jobs相關的api，似乎不能直接編輯人員的部門、職稱、職等這三個參數
+只能送jobId到後端去，設定對應的、固定的的部門、職稱、職等
+
 */
 
