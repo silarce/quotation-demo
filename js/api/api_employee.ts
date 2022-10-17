@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 
 import { axi } from "./_axiosCreator";
 
+
 // =============================================
 // 員工資料
 export type Temployee = {
@@ -78,6 +79,8 @@ export type TpostEmployee = {
   "jobId"?: string[]
 }
 
+type Tpopulate =
+  "jobs"[]
 
 
 
@@ -87,6 +90,10 @@ export type TapiGetEmployeeParams = {
   order: "ASC" | "DESC",
   page: number,
   pageSize: number,
+  filter?: {
+    [key: string]: any
+  }
+  populate?: Tpopulate
 }
 const apiGetEmployee = (params: TapiGetEmployeeParams) => {
   const api = "/employees"
@@ -95,9 +102,9 @@ const apiGetEmployee = (params: TapiGetEmployeeParams) => {
     .catch(err => err)
 }
 
-export const useEmployee = () => {
+export const useEmployee = (params: TapiGetEmployeeParams) => {
   let [data, setData] = useState<Partial<TgetEmployee>>({})
-  const update = async (params: TapiGetEmployeeParams) => {
+  const update = async () => {
     const data = await apiGetEmployee(params)
     if (data) setData(data)
     return data
@@ -108,20 +115,25 @@ export const useEmployee = () => {
 
 // =======================================================
 // 取得個別員工資料
+export type TapiGetEmployee_idParams = {
+  populate: Tpopulate
+}
 
-const apiGetEmployee_id = (id: string) => {
+const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
   const api = `/employees/${id}`
-  return axi.get(api)
+
+  return axi.get(api, { params })
     .then(({ data }) => {
       return data
     })
     .catch((err) => false)
 }
 
-export const useEmployeeById = (id: string) => {
+export const useEmployeeById = (id: string, params?: TapiGetEmployee_idParams) => {
   const [data, setData] = useState<Partial<Temployee>>({})
+
   const update = async () => {
-    const res = await apiGetEmployee_id(id)
+    const res = await apiGetEmployee_id(id, params)
     if (res) setData(res)
     return res
   }
@@ -133,6 +145,9 @@ export const useEmployeeById = (id: string) => {
 
 export const apiPostEmployee = (body: TpostEmployee) => {
   const api = "/employees"
+
+  body.jobId = ["670e0785-e3b3-443a-8a90-e70c5058e547"]
+
   return axi.post(api, body)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))

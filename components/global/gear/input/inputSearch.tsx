@@ -1,8 +1,8 @@
 
 
 import {
+  Dispatch, SetStateAction, FormEvent, useEffect,
   useState,
-  FormEvent
 } from "react"
 
 // icon
@@ -12,14 +12,26 @@ import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 import style from "./inputSearch.module.scss"
 
 
-export default function InputSearch({ placeholder, onClick, className }:
-  {
-    placeholder: string
-    onClick: (value: string) => void
-    className?: string
-  }) {
+export default function InputSearch(
+  { placeholder, onClick, className,
+    stateValue, setStateValue,
+    defaultValue = ""
+  }:
+    {
+      placeholder: string
+      onClick: (value: string) => void
+      className?: string
+      stateValue?: string
+      setStateValue?: Dispatch<SetStateAction<string>>
+      defaultValue?: string
+    }) {
 
-  const [value, setValue] = useState("")
+  let [value, setValue] = useState(defaultValue)
+  if (stateValue && setStateValue) {
+    value = stateValue
+    setValue = setStateValue
+  }
+
   const newOnClick = () => { onClick(value) }
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()

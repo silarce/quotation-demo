@@ -2,21 +2,15 @@
 // 人員資料
 
 import {
-  useState, useEffect,
+  useState, useEffect, useMemo
 } from "react"
-
-
-
 import { useRouter } from "next/router";
-
 
 // components
 import EmployeeList from "components/page/setting/employees/employeeList";
 
-
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
-// import Spin01 from "components/global/gear/other/spin01";
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 // api
 import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
@@ -30,50 +24,81 @@ export default function Employees() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   // ====================================================
-  let { data, setData, update } = useEmployee()
-  const employeeList = data?.data || []
-  const meta = data?.meta
-
   const [params, setParams] = useState<TapiGetEmployeeParams>({
     order: "DESC",
     page: 1,
     pageSize: 9999,
+    filter: {
+      $or: {
+        idNumber: {
+          $contains: router.query.searchValue,
+        },
+        chName: {
+          $contains: router.query.searchValue,
+        },
+        // enName: {
+        //   $contains: searchValue,
+        // }
+      }
+    },
+    populate: ["jobs"]
   })
+
+  let { data, update } = useEmployee(params)
+  const employeeList = data?.data || []
+  const meta = data?.meta
+
   const setPage = (page: number) => {
     setParams(params => {
       params.page = page
       return { ...params }
     })
   }
-  const toUpdate = async () => {
-    return await update(params)
+
+  // 搜尋功能
+  const searchStaff = (searchValue: string) => {
+    router.push(
+      {
+        pathname: "/setting/employees",
+        query: {
+          searchValue
+        }
+      }
+    )
+    setParams(params => ({
+      ...params,
+      filter: {
+        $or: {
+          idNumber: {
+            $contains: searchValue,
+          },
+          chName: {
+            $contains: searchValue,
+          },
+          // enName: {
+          //   $contains: searchValue,
+          // }
+        }
+      }
+    }))
   }
 
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      await toUpdate()
+      await update()
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-
-  // ====================================================
-  // 用於搜尋功能
-  // const [filteredList, setFilteredList] = useState<typeof fakeStaffList>([])
-
-  const searchStaff = (searchValue: string) => {
-    alert("重作中")
-  }
-
+  }, [params])
 
   // ====================================================
   const panelList: TpanelList = [
     {
       type: "inputSearch",
       placeholder: "編號/模糊姓名",
-      onClick: searchStaff
+      onClick: searchStaff,
+      defaultValue: router.query.searchValue as string
     },
     {
       type: "myButton",
@@ -89,16 +114,24 @@ export default function Employees() {
 
 
   // ====================================================
-
-
-  return (
-    <div className={style.scrollContainer}>
+  const MemoPageHeader = useMemo(() => {
+    return (
       <PageHeader02 tag="人員資料"
         panelList={panelList}
       />
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!meta, router.query.searchValue])
+  // ====================================================
+
+  return (
+    <div className={style.scrollContainer}>
+
+      {MemoPageHeader}
+
       <div className={style.mainContainer}>
         <EmployeeList
-          employeeList={employeeList} toUpdate={toUpdate} />
+          employeeList={employeeList} toUpdate={update} />
         <LoadingCover01 isLoading={isLoading} />
       </div>
     </div>
@@ -111,7 +144,6 @@ export default function Employees() {
 // ============================================================
 /*
 計畫事項
-接著要做區域性loading cover
 
 
 

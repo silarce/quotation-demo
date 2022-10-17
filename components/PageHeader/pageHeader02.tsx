@@ -1,4 +1,5 @@
 import {
+  Dispatch, SetStateAction,
   useState, Fragment
 } from "react"
 
@@ -51,6 +52,9 @@ interface Tpanel02 {
   img?: string
   custom?: undefined
   searchGroup?: undefined
+  stateValue?: string
+  setStateValue?: Dispatch<SetStateAction<string>>
+  defaultValue?: string
 }
 interface Tpanel03 {
   custom: JSX.Element
@@ -203,7 +207,7 @@ export default function PageHeader02(
                 type === "myButton" ? <MyButton {...{ label, onClick, className, img }} />
                   : type === "redButton" ? <RedButton {...{ label, onClick, className, img }} />
                     : type === "addButton" ? <AddButton {...{ label, onClick, className, img }} />
-                      : type === "inputSearch" ? <InputSearch {...{ placeholder, onClick, className }} />
+                      : type === "inputSearch" ? <InputSearch {...item} />
                         : <></>
               }
             </Fragment>

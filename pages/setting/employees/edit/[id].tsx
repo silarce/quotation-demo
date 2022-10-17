@@ -14,16 +14,22 @@ import style from "../../employees.module.scss"
 
 // api
 import {
-  TpostEmployee,
+  TpostEmployee, TapiGetEmployee_idParams,
   useEmployeeById, apiPatchEmployee
 } from "js/api/api_employee";
 
+const useEmployeeByIdParams: TapiGetEmployee_idParams = {
+  populate: ["jobs"]
+}
 
 export default function AddEmployee() {
 
   const router = useRouter()
 
-  let { data, setData, update } = useEmployeeById(router.query.id as string || "")
+  let { data, setData, update } =
+    useEmployeeById(
+      router.query.id as string || "",
+      useEmployeeByIdParams)
 
   useEffect(() => {
     update()
