@@ -1,7 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 
 // global gear
@@ -12,27 +12,49 @@ import TimePicker01 from "components/global/gear/input/timePicker01";
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
 
-// option
 import {
-  Toption,
-  optionsCreator_department, optionsCreator_jobTitle,
-  optionsCreator_level,
-} from "fakeDatabase/options/options";
+  useJobsOptions
+} from "js/api/api_department";
 
-const optionsDepartment = optionsCreator_department();
-const optionsJobTitle = optionsCreator_jobTitle();
-const optionsLevel = optionsCreator_level();
 
 // type
 import { TpostEmployee, Temployee } from "js/api/api_employee";
-
+import { Toption } from "fakeDatabase/options/options";
 // css
 import style from "../editEmployee.module.scss"
 
+
+// ============================================================
 export default function EditEmployeeItem02({ data, setData }: {
   data: TpostEmployee | Partial<Temployee>
   setData: Dispatch<SetStateAction<TpostEmployee | Partial<Temployee>>>
 }) {
+
+  // ======================================================
+  // 部門選擇所需的狀態與options
+  const {
+    department, jobName, jobId,
+    optionsDepartments, onChangeDepartments,
+    optionsJobs, onChangeJobs,
+    updateDepartmentsData,
+  } = useJobsOptions()
+
+  useEffect(() => {
+    updateDepartmentsData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    setData(data => ({
+      ...data,
+      jobId: [jobId]
+    }))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId])
+
+  const [config01, keyindex01] = jobConfig()
+
+  // ======================================================
 
 
   const [isDepart02, setIsDepart02] = useState(false)
@@ -42,19 +64,20 @@ export default function EditEmployeeItem02({ data, setData }: {
   }
 
 
+
+
   return (
     <div className={style.editEmployeeItem02}>
       <p className={style.subTitle}>公司資訊</p>
       <div className={style.form02}>
-
         <>
           <div className={style.selBox}>
             {keyindex01.map((key, index) => {
-              const { label, options } = config01[key]
-              const onChange = () => { }
+              const { stateValue, label, options, onChange }
+                = config01[key]
               return (
                 <Select02 key={index}
-                  stateValue={null}
+                  stateValue={stateValue}
                   label={label}
                   options={options}
                   onChange={onChange}
@@ -66,7 +89,7 @@ export default function EditEmployeeItem02({ data, setData }: {
               : <IconAddCircle onClick={switchNewDepart} />
             }
           </div>
-          {isDepart02 &&
+          {/* {isDepart02 &&
             <div className={style.selBox}>
               {keyindex01.map((key, index) => {
                 const { label, options } = config01[key]
@@ -84,7 +107,7 @@ export default function EditEmployeeItem02({ data, setData }: {
                 ? <IconRemoveCircle onClick={switchNewDepart} />
                 : <IconAddCircle onClick={switchNewDepart} />
               }
-            </div>}
+            </div>} */}
         </>
 
         <div className={style.bottomContainer}>
@@ -125,51 +148,65 @@ export default function EditEmployeeItem02({ data, setData }: {
               )
             })}
           </div>
-
         </div>
       </div>
     </div>
   )
-}
+  // --------------------------------------------------------
+
+  function jobConfig() {
+
+    type TkeyIndex01Keys = "department" | "jobName" | "grade";
+
+    const keyindex01: TkeyIndex01Keys[] = [
+      "department",
+      "jobName",
+      "grade",
+    ];
+
+    const config01: {
+      [key in TkeyIndex01Keys]: {
+        stateValue: Toption | null | string
+        label: string;
+        options: Toption[];
+        onChange: (option: Toption | null) => void
+      };
+    } = {
+      "department": {
+        stateValue: department,
+        label: "部門",
+        options: optionsDepartments,
+        onChange: onChangeDepartments
+      },
+      "jobName": {
+        stateValue: jobName,
+        label: "職稱",
+        options: optionsJobs,
+        onChange: onChangeJobs
+      },
+      "grade": {
+        stateValue: jobName?.grade ?? null,
+        label: "職等",
+        options: [{ value: "", label: "職等不能選擇" }],
+        onChange: () => { }
+      },
+    };
+    return [config01, keyindex01] as const
+  }
+} // EditEmployeeItem02
 
 
 // ============================================================
-type TkeyIndex01Keys = "department" | "jobTitle" | "level"
 
-const keyindex01: TkeyIndex01Keys[] = [
-  "department", "jobTitle", "level",
-]
-
-const config01: {
-  [key in TkeyIndex01Keys]: {
-    label: string
-    options: Toption[]
-  }
-} = {
-  "department": {
-    label: "部門",
-    options: optionsDepartment
-  },
-  "jobTitle": {
-    label: "職稱",
-    options: optionsJobTitle
-  },
-  "level": {
-    label: "職等",
-    options: optionsLevel
-  },
-}
-
-// ---------------
-type TkeyIndexKeys =
+type TkeyIndex02Keys =
   "startDate" | "leaveDate" | "retireDate" | "severanceDate"
 
-const keyIndex02: TkeyIndexKeys[] = [
+const keyIndex02: TkeyIndex02Keys[] = [
   "startDate", "leaveDate", "retireDate", "severanceDate"
 ]
 
 const config02: {
-  [key in TkeyIndexKeys]: {
+  [key in TkeyIndex02Keys]: {
     label: string
   }
 } = {

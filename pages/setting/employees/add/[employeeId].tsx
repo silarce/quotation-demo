@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 
 // component
@@ -18,11 +18,15 @@ import { apiPostEmployee, TpostEmployee, Temployee } from "js/api/api_employee";
 
 
 
+
+
+
+// =====================================================
 export default function AddEmployee() {
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const [data, setData] = useState<Partial<Temployee>>(emptyDataOri())
-  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     // 在設定使用者代號的方案出來前，先這樣處理
@@ -33,7 +37,7 @@ export default function AddEmployee() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-
+  // =======================================================
   const panelList: TpanelList = [
     {
       type: "redButton",
@@ -60,6 +64,7 @@ export default function AddEmployee() {
     }
   ]
 
+  // =====================================================
   return (
     <div className={style.container}>
 
@@ -72,8 +77,11 @@ export default function AddEmployee() {
       <LoadingCover open={isLoading} />
     </div>
   )
-}
+} // AddEmployee
 
+// ===========================================================
+// ===========================================================
+// ===========================================================
 // ===========================================================
 
 
@@ -108,6 +116,8 @@ const emptyDataOri = (): TpostEmployee => ({
 
 
 
+
+// ========================================================
 
 
 

@@ -12,6 +12,7 @@ import iconArrow from "public/image/icon/arrow_down_red.svg"
 // css
 import style from "./select.module.scss"
 
+import type {Toption} from "fakeDatabase/options/options"
 
 
 const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
@@ -22,10 +23,8 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
 }
 
 
-type Toption = {
-  value: string
-  label: string
-}
+
+
 
 const Select01 = ({
   label, stateValue, placeholder, options, onChange,
