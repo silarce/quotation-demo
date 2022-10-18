@@ -32,7 +32,7 @@ export const useCompanyInfo = () => {
       return res
     }
   }
-  return {data, setData, update} as const
+  return { data, setData, update } as const
 }
 
 // =============================================
@@ -53,7 +53,7 @@ export const apiPatchCompanyInfo = (body: TpatchCompanyInfo) => {
   const api = "/company-info"
   return axi.patch(api, body)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject("公司資料更新失敗"))
 }
 
 
@@ -64,7 +64,7 @@ export const apiUploadCompanyLogo = (formData: FormData) => {
   const body = formData
   return axi.patch(api, body)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject("公司LOGO更新失敗"))
 }
 
 

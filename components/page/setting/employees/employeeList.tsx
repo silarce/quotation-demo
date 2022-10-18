@@ -10,7 +10,8 @@ import Link from "next/link";
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-import { ModalSuccess01 } from "components/global/gear/modal/simpleModal/alertModals";
+import { ModalSuccess, ModalErr } from "components/global/gear/modal/simpleModal/alertModals";
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // api
 import { apiDeleteEmployee } from "js/api/api_employee";
 
@@ -21,14 +22,13 @@ import style from "./employeeList.module.scss"
 // type
 import { Temployee } from "js/api/api_employee"
 
-// constext
-import { employeeContext } from "pages/setting/employees";
+
 
 export default function EmployeeList({ employeeList, toUpdate }: {
   employeeList: Temployee[]
   toUpdate: () => void
 }) {
-  const { setIsLoading } = useContext(employeeContext)
+
 
   const [selInfo, setSelInfo] = useState({
     id: "",
@@ -51,11 +51,20 @@ export default function EmployeeList({ employeeList, toUpdate }: {
 
   const deleteEmployee = async () => {
     if (!selInfo.id) return
-    setIsLoading(true)
-    const res = await apiDeleteEmployee(selInfo.id)
-    if (res.deletedAt) await toUpdate()
-    closeDelPanel()
-    ModalSuccess01({ title: "刪除完成" })
+    try {
+      setRootLoading(true)
+      await apiDeleteEmployee(selInfo.id)
+      await toUpdate()
+      ModalSuccess({ title: "刪除完成" })
+    }
+    catch {
+      await toUpdate()
+      ModalErr({ title: "刪除失敗" })
+    }
+    finally {
+      setRootLoading(false)
+      closeDelPanel()
+    }
   }
 
   return (

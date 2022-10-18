@@ -1,6 +1,9 @@
 
-
-
+// antd
+import { Modal, ModalFuncProps } from 'antd';
+import {
+  LoadingOutlined,
+} from '@ant-design/icons';
 
 // css
 import style from "./alertModals.module.scss"
@@ -8,54 +11,115 @@ import style from "./alertModals.module.scss"
 
 
 
-import { Modal } from 'antd';
+
+// ==================================================
+
+const modalProps = {
+  className: style.alert,
+  okText: "確認",
+  maskClosable: true,
+  centered: true,
+}
 
 
 export const ModalInfo = (
   title?: string | number,
   content?: string | number,
+  props?: ModalFuncProps
 ) => {
-  Modal.info({
-    className: style.container,
+  return Modal.info({
     title,
     content,
-    okText: "確認",
-    maskClosable: true
+    ...modalProps,
+    ...props
   })
 }
 
 export const ModalInfo02 = (
-  { title, content }: {
+  { title, content, props }: {
     title?: string | number
     content?: string | number
+    props?: ModalFuncProps
   }
 ) => {
-  Modal.info({
-    className: style.container,
+  return Modal.info({
     title,
     content,
-    okText: "確認",
-    maskClosable: true
+    ...modalProps,
+    ...props
   })
 }
 
-export const ModalSuccess01 = (
-  { title, content }: {
+// ==================================================
+export const ModalSuccess = (
+  { title, content, props }: {
     title?: string | number
     content?: string | number
+    props?: ModalFuncProps
   }
 ) => {
-  Modal.success({
-    className: style.container,
+  return Modal.success({
     title,
     content,
-    okText: "確認",
-    maskClosable: true
+    ...modalProps,
+    ...props
+  })
+}
+// ==================================================
+export const ModalErr = (
+  { title, content, props }: {
+    title?: string | number
+    content?: string | number
+    props?: ModalFuncProps
+  }
+) => {
+  return Modal.error({
+    title,
+    content,
+    ...modalProps,
+    ...props
+  })
+}
+
+// ====================================================
+export const ModalLoading = (theProps: {
+  title?: string | number
+  content?: string | number
+  showBtn?: boolean
+  props?: ModalFuncProps
+} = {}) => {
+  const { title, content, showBtn, props } = theProps!
+  const styleShowBtn = showBtn ? style.showBtn : ""
+  const className = `${style.loading} ${styleShowBtn}`
+  return Modal.info({
+    className: className,
+    title,
+    content,
+    icon: <LoadingOutlined />,
+    centered: true,
+    keyboard: false,
+    zIndex: 9999,
+    ...props
   })
 }
 
 
 
+
+// ====================================================
+
+const myAlert = {
+  info: ModalInfo02,
+  success: ModalSuccess,
+  err: ModalErr,
+  loading: ModalLoading,
+  destroyAll: Modal.destroyAll
+}
+
+export default myAlert
+
+// ====================================================
+// ====================================================
 
 
 

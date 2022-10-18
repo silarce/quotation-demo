@@ -54,6 +54,7 @@
 }
 
 .mainContainer {
+  position: relative;
   border: solid 1px $colorBorder01;
   display: grid;
   grid-template-rows: auto;

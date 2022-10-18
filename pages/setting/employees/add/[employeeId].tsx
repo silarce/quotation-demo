@@ -8,17 +8,17 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
-
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // css
 import style from "../../employees.module.scss"
 
 // api
 import { apiPostEmployee, TpostEmployee, Temployee } from "js/api/api_employee";
-import { id } from "date-fns/locale";
+
 
 
 export default function AddEmployee() {
-
   const router = useRouter()
 
   const [data, setData] = useState<Partial<Temployee>>(emptyDataOri())
@@ -38,19 +38,27 @@ export default function AddEmployee() {
     {
       type: "redButton",
       label: "取消",
-      onClick: () => { router.back() }
+      onClick: () => { router.push("/setting/employees") }
     },
     {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
-        setIsLoading(true)
-        await apiPostEmployee(data as Temployee)
-        setIsLoading(false)
+        setRootLoading(true)
+        try {
+          const res = await apiPostEmployee(data as TpostEmployee) as Temployee
+          router.push(`/setting/employees/edit/${res.id}`)
+          myAlert.success({ title: "新增人員完成" })
+        }
+        catch {
+          myAlert.err({ title: "新增人員失敗" })
+        }
+        finally {
+          setRootLoading(false)
+        }
       }
     }
   ]
-
 
   return (
     <div className={style.container}>
@@ -97,35 +105,6 @@ const emptyDataOri = (): TpostEmployee => ({
   "severanceDate": "",
   // "jobId": [""]
 })
-
-// const emptyData: TpostEmployee = {
-  //   "idNumber": "",
-//   "chName": "",
-//   "enName": "",
-//   "identity": "",
-//   "birthday": "",
-//   "gender": "",
-//   "marital": "",
-//   "education": "",
-//   "expertise": "",
-//   "phone1": "",
-//   "phone2": "",
-//   "email": "",
-//   "residenceCounty": "",
-//   "residenceDistrict": "",
-//   "residenceAddress": "",
-//   "mailingCounty": "",
-//   "mailingDistrict": "",
-//   "mailingAddress": "",
-//   "processPermission": true,
-//   "seniority": "",
-//   "startDate": "",
-//   "leaveDate": "",
-//   "retireDate": "",
-//   "severanceDate": "",
-//   "jobId": [""]
-// }
-
 
 
 

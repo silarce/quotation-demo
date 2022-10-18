@@ -12,7 +12,8 @@ const _ = require("lodash")
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import Input02 from "components/global/gear/input/input02"
 import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address"
-import LoadingCover from "components/global/gear/loadingCover"
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // api
 import {
@@ -62,7 +63,7 @@ export default function TheCompanyInfo() {
   }, [companyInfo.logoLink])
   // ===================================================
   const [editable, setEditable] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+
   // ===================================================
   // ===================================================
   // pageHeader
@@ -78,7 +79,6 @@ export default function TheCompanyInfo() {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-        setIsLoading(true)
         const body = {
           name: companyInfo.name || "",
           phone: companyInfo.phone || "",
@@ -89,15 +89,25 @@ export default function TheCompanyInfo() {
           fax: companyInfo.fax || "",
           taxId: companyInfo.taxId || "",
         }
-        await apiPatchCompanyInfo(body)
-        if (imageFile) {
-          const formData = new FormData
-          formData.append("image", imageFile)
-          await apiUploadCompanyLogo(formData)
+        setRootLoading(true)
+        try {
+          await apiPatchCompanyInfo(body)
+          if (imageFile) {
+            const formData = new FormData
+            formData.append("image", imageFile)
+            await apiUploadCompanyLogo(formData)
+          }
+          await update()
+          myAlert.success({ title: "上傳成功" })
         }
-        await update()
-        setIsLoading(false)
-        setEditable(false)
+        catch (err) {
+          await update()
+          myAlert.err({ title: err as string })
+        }
+        finally {
+          setRootLoading(false)
+          setEditable(false)
+        }
       }
     },
     {
@@ -217,7 +227,7 @@ export default function TheCompanyInfo() {
             )
           })}
           <SelectInput_address
-            searchInputProps={searchInputProps}
+            selectInputProps={searchInputProps}
             label="公司地址"
             disabled={!editable}
             className={style.selectInput}
@@ -225,7 +235,6 @@ export default function TheCompanyInfo() {
         </div>
 
       </div>
-      <LoadingCover open={isLoading} />
     </div>
   )
 }

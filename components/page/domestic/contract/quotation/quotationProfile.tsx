@@ -193,7 +193,7 @@ export default function QuotationProfile(
           </div>
         </div> {/* form02 */}
 
-        <SelectInput label="工程地點" searchInputPropsList={selectInputList}
+        <SelectInput label="工程地點" selectInputPropsList={selectInputList}
           disabled={disabled}
         />
 

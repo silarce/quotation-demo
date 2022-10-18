@@ -125,7 +125,6 @@ export const useEmployeeById = (id: string) => {
     if (res) setData(res)
     return res
   }
-
   return { data, setData, update }
 }
 
@@ -136,15 +135,15 @@ export const apiPostEmployee = (body: TpostEmployee) => {
   const api = "/employees"
   return axi.post(api, body)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err))
 }
 // =======================================================
 // 修改員工資料
-export const apiPatchEmployee = (body: Temployee, id: string) => {
+export const apiPatchEmployee = (body: TpostEmployee, id: string) => {
   const api = `/employees/${id}`
   return axi.patch(api, body)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err))
 }
 
 // =======================================================
@@ -154,7 +153,7 @@ export const apiDeleteEmployee = (id: string) => {
   const api = `/employees/${id}`
   return axi.delete(api)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err))
 }
 
 

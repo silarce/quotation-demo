@@ -7,13 +7,14 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import LoadingCover from "components/global/gear/loadingCover";
-
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // css
 import style from "../../employees.module.scss"
 
 // api
 import {
-  Temployee, TpostEmployee,
+  TpostEmployee,
   useEmployeeById, apiPatchEmployee
 } from "js/api/api_employee";
 
@@ -29,22 +30,30 @@ export default function AddEmployee() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [isLoading, setIsLoading] = useState(false)
+
 
 
   const panelList: TpanelList = [
     {
       type: "redButton",
       label: "取消",
-      onClick: () => { router.back() }
+      onClick: () => { router.push("/setting/employees") }
     },
     {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
-        setIsLoading(true)
-        await apiPatchEmployee(data as Temployee, data.id || "")
-        setIsLoading(false)
+        try {
+          setRootLoading(true)
+          await apiPatchEmployee(data as TpostEmployee, data.id!)
+          myAlert.success({ title: "變更人員資料完成" })
+        }
+        catch {
+          myAlert.err({ title: "變更人員資料失敗" })
+        }
+        finally {
+          setRootLoading(false)
+        }
       }
     }
   ]
@@ -59,7 +68,6 @@ export default function AddEmployee() {
       <div className={style.mainContainer}>
         <EditEmployee data={data} setData={setData} />
       </div>
-      <LoadingCover open={isLoading} />
     </div>
   )
 }

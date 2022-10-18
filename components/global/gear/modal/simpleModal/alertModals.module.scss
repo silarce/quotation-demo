@@ -1,9 +1,94 @@
 @use "styles/theme01" as *;
 
-.container {
-  :global(.ant-btn) {
-    > span {
-      color: white;
+.alert {
+  :global(.ant-modal-confirm-body) {
+    :global(.anticon) {
+      display: block;
+      margin: auto;
+      font-size: 60px;
+      float: unset;
+    }
+    :global(.ant-modal-confirm-title) {
+      margin: auto;
+      text-align: center;
+      margin-top: 10px;
+      font-weight: 400;
+      font-size: 30px;
+      color: $colorMain;
+    }
+    // 為了把優先級壓過去，所以使用跟antd一樣的選擇器
+    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
+      margin: auto;
+      text-align: center;
+      font-weight: 400;
+      font-size: 18px;
+    }
+  }
+
+  :global(.ant-modal-confirm-btns) {
+    text-align: center;
+    > button {
+      padding: 10px 44px;
+      background-color: $bgc01;
+      border-color: $colorBorder01;
+      height: auto;
+      > span {
+        color: $colorMain;
+      }
     }
   }
 }
+
+.loading {
+  :global(.ant-modal-content) {
+    background-color: unset;
+    box-shadow: unset;
+  }
+  :global(.ant-modal-confirm-body) {
+    :global(.anticon) {
+      display: block;
+      margin: auto;
+      font-size: 100px;
+      float: unset;
+      color: white;
+    }
+    :global(.ant-modal-confirm-title) {
+      margin: auto;
+      text-align: center;
+      margin-top: 10px;
+      font-weight: 400;
+      font-size: 30px;
+      color: $colorMain;
+    }
+    // 為了把優先級壓過去，所以使用跟antd一樣的選擇器
+    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
+      margin: auto;
+      text-align: center;
+      font-weight: 400;
+      font-size: 18px;
+    }
+  }
+
+  :global(.ant-modal-confirm-btns) {
+    display: none;
+  }
+  &.showBtn {
+    :global(.ant-modal-confirm-btns) {
+      display: block;
+      text-align: center;
+      > button {
+        padding: 10px 44px;
+        background-color: $bgc01;
+        border-color: $colorBorder01;
+        height: auto;
+        > span {
+          color: $colorMain;
+        }
+      }
+    }
+  }
+}
+
+// :global(){
+
+// }

@@ -1,21 +1,16 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/router";
 
 // component
 import EditEmployeeItem01 from "./editEmployee/EditEmployeeItem01";
 import EditEmployeeItem02 from "./editEmployee/EditEmployeeItem02";
 
-// global gear
-import Input02 from "components/global/gear/input/input02"
-import { Select02 } from "components/global/gear/select/select"
 
 // type
 import { TpostEmployee, Temployee } from "js/api/api_employee";
 
 // css
 import style from "./editEmployee.module.scss"
-
-
 
 
 export default function EditEmployee({ data, setData }: {
