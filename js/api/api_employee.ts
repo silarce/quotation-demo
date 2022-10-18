@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 
 import { axi } from "./_axiosCreator";
 
+// type
+import { TjobsData } from "./api_department"
+
 
 // =============================================
 // 員工資料
@@ -34,7 +37,7 @@ export type Temployee = {
   "retireDate": string,
   "severanceDate": string,
   "processPermission": true,
-  "jobs"?: string[]
+  "jobs"?: TjobsData[]
 }
 
 // 員工資料列表
@@ -76,7 +79,7 @@ export type TpostEmployee = {
   "retireDate": string,
   "severanceDate": string,
   "processPermission": true,
-  "jobId"?: string[]
+  "jobId": string[]
 }
 
 type Tpopulate =
@@ -145,9 +148,6 @@ export const useEmployeeById = (id: string, params?: TapiGetEmployee_idParams) =
 
 export const apiPostEmployee = (body: TpostEmployee) => {
   const api = "/employees"
-
-  body.jobId = ["670e0785-e3b3-443a-8a90-e70c5058e547"]
-
   return axi.post(api, body)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))

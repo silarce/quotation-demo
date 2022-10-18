@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 
-export interface Toption {
-  value: string
-  label: string
-}
+import { Toption } from "./options"
+
+export type { Toption }
 
 
 

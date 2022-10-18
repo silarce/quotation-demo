@@ -71,7 +71,7 @@ export const useDepartments = (params: Tparams) => {
 // jobs type
 
 
-type TjobsData =
+export type TjobsData =
   {
     "id": string,
     "createdAt": string, // "2022-10-17T13:39:50.061Z"
@@ -83,7 +83,7 @@ type TjobsData =
       "createdAt": string, // "2022-10-17T13:39:50.061Z"
       "updatedAt": string, // "2022-10-17T13:39:50.061Z"
       "name": string,
-      "jobs": string[]
+      // "jobs"?: string[]
     },
   }
 
@@ -123,22 +123,14 @@ export const useJobs = (params: Tparams) => {
 // =====================================================
 // hook
 
-export const useJobsOptions = () => {
+export const useJobsOptions = (
+  departmentsData: Partial<TgetDepartments>,
+  defaultJobs?: TjobsData
+) => {
 
-  const defaultParams = (): Tparams => ({
-    order: "ASC",
-    page: 1,
-    pageSize: 999,
-    populate: ["jobs"]
-  })
-
-  // !!!!!!!!!!!! 搞這麼多東西就是為了這個
-  const [jobId, setJobId] = useState("")
-  // !!!!!!!!!!!!
-
-  // 取得部門資料，然後再取得裡面的職稱資料
-  const { data: departmentsData, update: updateDepartmentsData }
-    = useDepartments(defaultParams())
+  // 這裡先設定jobsData，要post前再把jobId取出然後post
+  const [jobs, setJobs]
+    = useState<TjobsData | undefined>(defaultJobs)
 
   const [department, setDepartment] =
     useState<Toption | null>(null) //部門
@@ -146,7 +138,7 @@ export const useJobsOptions = () => {
     useState<Toption | null>(null) //職稱 
 
 
-  // =============================================================
+  // --------------------------------------------------------------
   // 部門options
   const {
     optionsDepartmentsObj,
@@ -159,13 +151,15 @@ export const useJobsOptions = () => {
   const onChangeDepartments = (option: Toption | null) => {
     if (!option) return null
     setDepartment(option)
+    setJobName(null)
+    setJobs(undefined)
   }
 
-  // =============================================================
+  // --------------------------------------------------------------
   // 職稱options
 
   const {
-    // optionsJobsObj,
+    optionsJobsObj,
     optionsJobs
   } = useMemo(() => {
     return optionsJobsOri()
@@ -175,14 +169,34 @@ export const useJobsOptions = () => {
   const onChangeJobs = (option: Toption | null) => {
     if (!option) return null
     setJobName(option)
-    setJobId(option.value as string)
+    setJobs(optionsJobsObj[option.value])
+  }
+  // --------------------------------------------------------------
+  const clear = () => {
+    setDepartment(null)
+    setJobName(null)
+    setJobs(undefined)
   }
 
+  useEffect(() => {
+
+    if (!jobs) return
+    setDepartment({
+      value: jobs.department.id,
+      label: jobs.department.name
+    })
+    setJobName({
+      value: jobs.id,
+      label: jobs.name,
+      grade: `${jobs.grade}`
+    })
+  }, [])
+
   return {
-    department, jobName, jobId,
+    department, jobName, jobs,
     optionsDepartments, onChangeDepartments,
     optionsJobs, onChangeJobs,
-    updateDepartmentsData,
+    clear
   }
 
   // --------------------------------
@@ -212,7 +226,7 @@ export const useJobsOptions = () => {
     const optionsJobs =
       [] as Toption[]
     if (department) {
-      optionsDepartmentsObj[department.value].jobs.forEach((item) => {
+      optionsDepartmentsObj[department.value]?.jobs?.forEach((item) => {
         const { id, name, grade } = item;
         optionsJobsObj[id] = item
         optionsJobs.push({
@@ -229,6 +243,7 @@ export const useJobsOptions = () => {
   }
 }
 
+export type TuseJobsOptions = ReturnType<typeof useJobsOptions>
 
 
 

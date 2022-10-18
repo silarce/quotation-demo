@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import {
+  Dispatch, SetStateAction,
+  useState, useEffect
+} from "react";
 import { useRouter } from "next/router";
+const _ = require("lodash")
 
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
-import LoadingCover from "components/global/gear/loadingCover";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // css
@@ -17,27 +20,31 @@ import {
   TpostEmployee, TapiGetEmployee_idParams,
   useEmployeeById, apiPatchEmployee
 } from "js/api/api_employee";
+import type { TjobsData } from "js/api/api_department";
+import type { TprePostEmployee } from "components/page/setting/employees/editEmployee";
 
-const useEmployeeByIdParams: TapiGetEmployee_idParams = {
+
+const theUseEmployeeByIdParams: TapiGetEmployee_idParams = {
   populate: ["jobs"]
 }
 
 export default function AddEmployee() {
-
   const router = useRouter()
+  const [isReady, setIsReady] = useState(false)
+  // ================================================
 
   let { data, setData, update } =
     useEmployeeById(
       router.query.id as string || "",
-      useEmployeeByIdParams)
+      theUseEmployeeByIdParams)
 
   useEffect(() => {
-    update()
+    (async () => {
+      await update()
+      setIsReady(true)
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-
-
 
   const panelList: TpanelList = [
     {
@@ -51,7 +58,12 @@ export default function AddEmployee() {
       onClick: async () => {
         try {
           setRootLoading(true)
-          await apiPatchEmployee(data as TpostEmployee, data.id!)
+          let postData = _.cloneDeep(data)
+          postData.jobId = postData.jobs.map((jobs: TjobsData) => jobs.id)
+
+          postData = postData as TpostEmployee
+
+          await apiPatchEmployee(postData, postData.id)
           myAlert.success({ title: "變更人員資料完成" })
         }
         catch {
@@ -72,75 +84,15 @@ export default function AddEmployee() {
         panelList={panelList}
       />
       <div className={style.mainContainer}>
-        <EditEmployee data={data} setData={setData} />
+        {isReady &&
+          <EditEmployee
+            data={data as TprePostEmployee}
+            setData={setData as Dispatch<SetStateAction<TprePostEmployee>>} />
+        }
       </div>
     </div>
   )
 }
 
 // ===========================================================
-
-
-
-const emptyDataOri = (): TpostEmployee => ({
-  "idNumber": "",
-  "chName": "",
-  "enName": "",
-  "identity": "",
-  "birthday": "",
-  "gender": "",
-  "marital": "",
-  "education": "",
-  "expertise": "",
-  "phone1": "",
-  "phone2": "",
-  "email": "",
-  "residenceCounty": "",
-  "residenceDistrict": "",
-  "residenceAddress": "",
-  "mailingCounty": "",
-  "mailingDistrict": "",
-  "mailingAddress": "",
-  "processPermission": true,
-  "seniority": "",
-  "startDate": "",
-  "leaveDate": "",
-  "retireDate": "",
-  "severanceDate": "",
-  // "jobId": [""]
-})
-
-// const emptyData: TpostEmployee = {
-  //   "idNumber": "",
-//   "chName": "",
-//   "enName": "",
-//   "identity": "",
-//   "birthday": "",
-//   "gender": "",
-//   "marital": "",
-//   "education": "",
-//   "expertise": "",
-//   "phone1": "",
-//   "phone2": "",
-//   "email": "",
-//   "residenceCounty": "",
-//   "residenceDistrict": "",
-//   "residenceAddress": "",
-//   "mailingCounty": "",
-//   "mailingDistrict": "",
-//   "mailingAddress": "",
-//   "processPermission": true,
-//   "seniority": "",
-//   "startDate": "",
-//   "leaveDate": "",
-//   "retireDate": "",
-//   "severanceDate": "",
-//   "jobId": [""]
-// }
-
-
-
-
-
-
 

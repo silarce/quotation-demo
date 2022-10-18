@@ -23,6 +23,7 @@ import style from "./employees.module.scss"
 export default function Employees() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [isReady, setIsReady] = useState(false)
   // ====================================================
   const [params, setParams] = useState<TapiGetEmployeeParams>({
     order: "DESC",
@@ -87,6 +88,7 @@ export default function Employees() {
     (async () => {
       setIsLoading(true)
       await update()
+      setIsReady(true)
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,15 +125,14 @@ export default function Employees() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [!!meta, router.query.searchValue])
   // ====================================================
-
   return (
     <div className={style.scrollContainer}>
-
       {MemoPageHeader}
-
       <div className={style.mainContainer}>
-        <EmployeeList
-          employeeList={employeeList} toUpdate={update} />
+        {isReady &&
+          <EmployeeList
+            employeeList={employeeList} toUpdate={update} />
+        }
         <LoadingCover01 isLoading={isLoading} />
       </div>
     </div>

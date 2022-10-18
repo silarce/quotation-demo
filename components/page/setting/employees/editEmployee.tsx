@@ -8,15 +8,15 @@ import EditEmployeeItem02 from "./editEmployee/EditEmployeeItem02";
 
 // type
 import { TpostEmployee, Temployee } from "js/api/api_employee";
-
+import type { TjobsData } from "js/api/api_department";
 // css
 import style from "./editEmployee.module.scss"
 
 
 export default function EditEmployee({ data, setData }: {
-  data: Partial<Temployee>
+  data: TprePostEmployee
   setData:
-  Dispatch<SetStateAction<Partial<Temployee>>>
+  Dispatch<SetStateAction<TprePostEmployee>>
 }) {
   const router = useRouter()
 
@@ -45,9 +45,13 @@ export default function EditEmployee({ data, setData }: {
     </div>
   )
 }
+// ===========================================================
 
 
-const emptyDataOri = (): TpostEmployee => ({
+export type TprePostEmployee
+  = Omit<TpostEmployee, "jobId"> & { jobs: TjobsData[] }
+
+const emptyDataOri = (): TprePostEmployee => ({
   "idNumber": "",
   "chName": "",
   "enName": "",
@@ -72,5 +76,13 @@ const emptyDataOri = (): TpostEmployee => ({
   "leaveDate": "",
   "retireDate": "",
   "severanceDate": "",
-  // "jobId": [""]
+  "jobs": [],
 })
+
+
+
+
+
+
+
+
