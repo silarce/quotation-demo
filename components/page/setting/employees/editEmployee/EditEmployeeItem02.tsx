@@ -98,6 +98,14 @@ export default function EditEmployeeItem02({ data, setData }: {
                 />
               )
             })}
+
+            <Input02
+              className={style.input02}
+              stateValue={data.jobs[0]?.grade ?? ""}
+              label="職等"
+              labelWidth="100px"
+              disabled={true}
+            />
             {isDepart02
               ? <IconRemoveCircle onClick={switchNewDepart} />
               : <IconAddCircle onClick={switchNewDepart} />
@@ -118,6 +126,13 @@ export default function EditEmployeeItem02({ data, setData }: {
                   />
                 )
               })}
+              <Input02
+                className={style.input02}
+                stateValue={data.jobs[1]?.grade ?? ""}
+                label="職等"
+                labelWidth="100px"
+                disabled={true}
+              />
               {isDepart02
                 ? <IconRemoveCircle onClick={switchNewDepart} />
                 : <IconAddCircle onClick={switchNewDepart} />
@@ -178,12 +193,13 @@ function jobConfig(jobsOptions: TuseJobsOptions) {
     optionsJobs, onChangeJobs,
   } = jobsOptions
 
-  type TkeyIndex01Keys = "department" | "jobName" | "grade";
+  type TkeyIndex01Keys = "department" | "jobName";
+  //  | "grade";
 
   const keyindex01: TkeyIndex01Keys[] = [
     "department",
     "jobName",
-    "grade",
+    // "grade",
   ];
 
   const config01: {
@@ -206,12 +222,12 @@ function jobConfig(jobsOptions: TuseJobsOptions) {
       options: optionsJobs,
       onChange: onChangeJobs
     },
-    "grade": {
-      stateValue: jobName?.grade ?? null,
-      label: "職等",
-      options: [{ value: "", label: "職等不能選擇" }],
-      onChange: () => { }
-    },
+    // "grade": {
+    //   stateValue: jobName?.grade ?? null,
+    //   label: "職等",
+    //   options: [{ value: "", label: "職等不能選擇" }],
+    //   onChange: () => { }
+    // },
   };
   return [config01, keyindex01] as const
 }

@@ -188,7 +188,7 @@ export const useJobsOptions = (
     setJobName({
       value: jobs.id,
       label: jobs.name,
-      grade: `${jobs.grade}`
+      // grade: `${jobs.grade}`
     })
   }, [])
 

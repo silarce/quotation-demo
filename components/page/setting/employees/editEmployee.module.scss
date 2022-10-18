@@ -65,6 +65,11 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
           transform: translateY(-50%);
           cursor: pointer;
         }
+        .input02 {
+          hr {
+            border-color: $colorMain;
+          }
+        }
       }
       .bottomContainer {
         margin-top: 28px;
