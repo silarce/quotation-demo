@@ -3,8 +3,6 @@ import { useState } from "react";
 
 import { axi } from "./_axiosCreator";
 
-// type
-import { TjobsData } from "./api_department"
 // ===============================================================
 
 
@@ -24,7 +22,7 @@ export type TapiGetCustomersParams = {
   filter?: {
     [key: string]: any
   }
-  populate?: "contact"[]
+  populate?: "contacts"[]
   sort?: string[]
 }
 
@@ -60,12 +58,12 @@ export type TcustomersData = {
   "invoiceCounty": string, //發票地址縣市
   "invoiceDistrict": string, //發票地址區域
   "invoiceAddress": string, //發票地址剩餘地址
-  "contacts": TcontactData[] //聯絡人
+  "contacts"?: TcontactData[] //聯絡人
 }
 
 
 export type TgetCustomers = {
-  data: TcustomersData
+  data: TcustomersData[]
   meta: Tmeta
 }
 

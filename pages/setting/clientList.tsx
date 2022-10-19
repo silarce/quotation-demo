@@ -13,8 +13,7 @@ import EditClient from "components/page/setting/clientList/editClient"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import PageHeader02, { TpanelList, TsearchObj } from "components/PageHeader/pageHeader02"
 
-// api
-import { useCustomers } from "js/api/api_customer"
+
 
 // css
 import style from "./clientList.module.scss"
@@ -29,8 +28,6 @@ import { optionsCreator_clientSearch, Toption } from "fakeDatabase/options/optio
 
 export default function ClientList() {
 
-
-  // =============================================================
   // data
   const [clientList, setClientList] = useState(fakeClientProfileList)
   // ====================================================
@@ -192,7 +189,7 @@ const ButtonBar01 = ({
       searchContent
     })
   }
-
+  
   const searchGroup = {
     searchTargetList,
     doSearch

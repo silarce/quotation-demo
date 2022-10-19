@@ -1,0 +1,8 @@
+@use "styles/theme01" as *;
+@use "styles/layout" as *;
+
+.mainContainer {
+  :global(.ant-collapse) {
+    border: none;
+  }
+}
