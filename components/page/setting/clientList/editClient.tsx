@@ -158,7 +158,7 @@ export default function EditClient({ selData, setSelData }:
   return (
     <div className={style.container}>
       <div className={style.id}>
-        <span>使用者代號</span>
+        <span>客戶編號</span>
         <span>{id}</span>
       </div>
       <Container01 label={"客戶資料"} >
