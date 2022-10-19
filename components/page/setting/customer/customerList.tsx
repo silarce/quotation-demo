@@ -7,7 +7,7 @@ import {
 
 // component
 import PanelHeader from './customerList/panelHeader';
-
+import PanelBody from './customerList/panelBody';
 // antd
 import { Collapse } from 'antd';
 
@@ -51,7 +51,7 @@ export default function CustomerList(
                 isActive={isActive}
               />}
             >
-              panel body
+              <PanelBody customersData={data} />
             </Panel>
           )
         })}
