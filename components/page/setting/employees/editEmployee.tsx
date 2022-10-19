@@ -55,8 +55,8 @@ export default function EditEmployee({ data, setData, check }: {
         />
         {check &&
           <span className={style.checkTip}>
-            {check === "ok" ? <IconCheck01 className={style.check} />
-              : check === "notOk" ? <IconCross01 className={style.cross} />
+            {check === "ok" ? <IconCheck01 className={style.check} cursor="auto" />
+              : check === "notOk" ? <IconCross01 className={style.cross} cursor="auto" />
                 : <CircularProgress size={30} />
             }
             {check === "notOk" &&
