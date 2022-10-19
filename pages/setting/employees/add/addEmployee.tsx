@@ -21,47 +21,62 @@ import {
   apiPostEmployee,
 } from "js/api/api_employee";
 import type { TjobsData } from "js/api/api_department";
+import { useCheckEmployee } from "js/api/api_employee";
 
 // type
 import type { TprePostEmployee } from "components/page/setting/employees/editEmployee";
+// =====================================================
 
-
+// 防抖
+let timeoutId: NodeJS.Timeout;
 // =====================================================
 export default function AddEmployee() {
   const router = useRouter()
 
   const [data, setData] = useState<TprePostEmployee>(emptyDataOri())
 
-  useEffect(() => {
-    // 在設定使用者代號的方案出來前，先這樣處理
-    if (!data.idNumber) {
-      data.idNumber = router.query.employeeId as string || ""
-      setData({ ...data })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // =======================================================
+  // 檢查idNumber是否不重複
+  const {
+    check,
+    setCheck,
+    reCheck
+  } = useCheckEmployee(data.idNumber)
 
+  useEffect(() => {
+    setCheck("loading")
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => {
+      if (!data.idNumber) return setCheck("notOk")
+      reCheck()
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.idNumber])
   // =======================================================
   const panelList: TpanelList = [
     {
       type: "redButton",
       label: "取消",
-      onClick: () => { router.push("/setting/employees") }
+      onClick: () => { router.back() }
     },
     {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
+        if (check === "notOk") return myAlert.err({ title: "使用者代號錯誤" })
+        if (check === "loading") return myAlert.info({ title: "正在檢查使用者代號" })
         try {
           setRootLoading(true)
-
           let postData = _.cloneDeep(data)
           postData.jobId = postData.jobs.map((jobs: TjobsData) => jobs.id)
-
           postData = postData as TpostEmployee
-
           const res = await apiPostEmployee(postData) as Temployee
-          router.push(`/setting/employees/edit/${res.id}`)
+          router.push({
+            pathname: `/setting/employees/edit/${res.id}`,
+            query: {
+              isNew: true
+            }
+          })
           myAlert.success({ title: "新增人員完成" })
         }
         catch {
@@ -82,7 +97,7 @@ export default function AddEmployee() {
         panelList={panelList}
       />
       <div className={style.mainContainer}>
-        <EditEmployee data={data} setData={setData} />
+        <EditEmployee data={data} setData={setData} check={check} />
       </div>
     </div>
   )

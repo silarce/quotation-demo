@@ -13,18 +13,40 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     width: fit-content;
     padding: 20px $leftPadding_title;
     border: solid 1px $colorBorder01;
-    > span {
-      &:nth-of-type(1) {
-        margin-right: 40px;
-        font-weight: 500;
-        font-size: 20px;
-        line-height: 24px;
-        color: $colorText;
+
+    display: flex;
+    > * {
+      margin: auto;
+    }
+
+    .input02 {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .checkTip {
+      margin-left: 10px;
+      width: fit-content;
+      white-space: nowrap;
+      display: flex;
+      > * {
+        margin: auto;
       }
-      &:nth-of-type(2) {
-        font-weight: 400;
-        font-size: 18px;
-        line-height: 22px;
+      > svg {
+        height: 20px;
+        width: auto;
+        margin-right: 5px;
+        &.check {
+          color: #42ba96;
+        }
+        &.cross {
+          color: red;
+        }
+      }
+      .muiCircular {
+        font-size: 10px;
+      }
+      .alertTip {
+        color: red;
       }
     }
   }

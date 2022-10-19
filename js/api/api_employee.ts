@@ -1,5 +1,7 @@
 
-import { useState, useEffect } from "react";
+import {
+  useState, useEffect
+} from "react";
 
 import { axi } from "./_axiosCreator";
 
@@ -102,7 +104,7 @@ const apiGetEmployee = (params: TapiGetEmployeeParams) => {
   const api = "/employees"
   return axi.get(api, { params })
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.message))
 }
 
 export const useEmployee = (params: TapiGetEmployeeParams) => {
@@ -115,6 +117,43 @@ export const useEmployee = (params: TapiGetEmployeeParams) => {
 
   return { data, setData, update }
 }
+
+export const useCheckEmployee = (
+  idNumber: string,
+) => {
+  type Tcheck = "ok" | "notOk" | "loading"
+
+  const params: TapiGetEmployeeParams = {
+    order: "ASC",
+    page: 1,
+    pageSize: 999,
+    filter: {
+      idNumber: {
+        $eq: idNumber
+      }
+    }
+  }
+  const [check, setCheck] = useState<Tcheck>("loading")
+
+  const update = async () => {
+    try {
+      setCheck("loading")
+      const res = await apiGetEmployee(params)
+      if (res.data.length === 0) setCheck("ok")
+      else setCheck("notOk")
+    }
+    catch {
+      setCheck("notOk")
+    }
+  }
+
+  return {
+    check,
+    setCheck,
+    reCheck: update
+  }
+}
+
 
 // =======================================================
 // 取得個別員工資料

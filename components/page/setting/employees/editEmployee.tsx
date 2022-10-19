@@ -1,37 +1,72 @@
-import { Dispatch, SetStateAction } from "react";
+import {
+  Dispatch, SetStateAction,
+  useEffect
+} from "react";
 import { useRouter } from "next/router";
 
 // component
 import EditEmployeeItem01 from "./editEmployee/EditEmployeeItem01";
 import EditEmployeeItem02 from "./editEmployee/EditEmployeeItem02";
 
+import Input02 from "components/global/gear/input/input02";
 
+// icon
+import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
+import CircularProgress from '@mui/material/CircularProgress';
 // type
-import { TpostEmployee, Temployee } from "js/api/api_employee";
+import { TpostEmployee, } from "js/api/api_employee";
 import type { TjobsData } from "js/api/api_department";
+
 // css
 import style from "./editEmployee.module.scss"
+// =====================================================
 
 
-export default function EditEmployee({ data, setData }: {
+// =====================================================
+export default function EditEmployee({ data, setData, check }: {
   data: TprePostEmployee
-  setData:
-  Dispatch<SetStateAction<TprePostEmployee>>
+  setData: Dispatch<SetStateAction<TprePostEmployee>>
+  check?: "ok" | "notOk" | "loading"
 }) {
   const router = useRouter()
-
-  if (!router.isReady) return null
-
+  // ===================================================
   if (!data) data = emptyDataOri()
-  if (!data.idNumber) data.idNumber =
-    router.query.employeeId as string
+  // ==================================================
 
+  // ==================================================
+  const idNumberIsDisabled
+    = router.pathname === "/setting/employees/edit/[id]"
+  // ==================================================
+  if (!router.isReady) return null
+  // ==================================================
   return (
     <div className={style.editEmployee}>
 
       <div className={style.employeeId}>
-        <span>使用者代號</span>
-        <span>{data.idNumber}</span>
+        <Input02
+          className={style.input02}
+          stateValue={data.idNumber}
+          label="使用者代號"
+          onChange={(e) => {
+            const value = e.target.value
+            setData(data => ({ ...data, idNumber: value }))
+          }}
+          disabled={idNumberIsDisabled}
+        />
+        {check &&
+          <span className={style.checkTip}>
+            {check === "ok" ? <IconCheck01 className={style.check} />
+              : check === "notOk" ? <IconCross01 className={style.cross} />
+                : <CircularProgress size={30} />
+            }
+            {check === "notOk" &&
+              <span className={style.alertTip}>
+                {data.idNumber ? "此代號已有人使用" : "請輸入使用者代號"}
+              </span>
+            }
+
+          </span>
+        }
       </div>
 
       <EditEmployeeItem01

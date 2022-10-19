@@ -101,7 +101,7 @@ function IconRemoveCircle(props: SVGProps<SVGSVGElement>) {
 
 function IconRemove02(props: SVGProps<SVGSVGElement>) {
   let className = getClassName(props)
-  className = `${className} ${style.circle}`
+
   return (
     <svg  {...{ ...props, className }} width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9Z" strokeMiterlimit="10" />
@@ -109,6 +109,31 @@ function IconRemove02(props: SVGProps<SVGSVGElement>) {
     </svg>
   )
 }
+
+export const IconCheck01 = (props: SVGProps<SVGSVGElement>) => {
+  let className = getClassName(props)
+  return (
+    <svg {...{ ...props, className }}
+      width="12" height="9" viewBox="0 0 12 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.26573 3.49228L4.99141 7.74896L10.9771 0.630567" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
+  let className = getClassName(props)
+  return (
+    <svg {...{ ...props, className }}
+      width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line y1="-0.5" x2="11.443" y2="-0.5" transform="matrix(-0.699118 0.715007 -0.699118 -0.715007 8 0)" stroke="currentColor" />
+      <line y1="-0.5" x2="11.443" y2="-0.5" transform="matrix(0.699118 0.715007 -0.699118 0.715007 0 0.818184)" stroke="currentColor" />
+    </svg>
+  )
+}
+
+
+
+
 
 
 export {

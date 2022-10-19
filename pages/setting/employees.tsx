@@ -106,10 +106,7 @@ export default function Employees() {
       type: "myButton",
       label: "新增員工資料",
       onClick: () => {
-        if (!meta) return
-        const lastId =
-          "A" + (`${meta.itemCount + 1}`.padStart(5, "0"))
-        router.push(`/setting/employees/add/${lastId}`)
+        router.push(`/setting/employees/add/addEmployee`)
       }
     }
   ]

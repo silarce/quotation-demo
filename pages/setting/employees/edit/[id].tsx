@@ -50,7 +50,13 @@ export default function AddEmployee() {
     {
       type: "redButton",
       label: "取消",
-      onClick: () => { router.push("/setting/employees") }
+      onClick: () => {
+        if (router.query.isNew) {
+          router.push("/setting/employees")
+          return
+        }
+        router.back()
+      }
     },
     {
       type: "myButton",
