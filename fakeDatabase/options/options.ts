@@ -74,8 +74,19 @@ export const optionsCreator_marital =
 //     { value: "Level 1", label: "Level 1" },
 //   ]
 
-
-
+// 扣稅類別
+export const optionsCreator_taxDeductionCategory =
+  (): Toption[] => [
+    { value: "應稅", label: "應稅" },
+    { value: "應稅外加", label: "應稅外加" },
+    { value: "免稅", label: "免稅" },
+  ]
+export const optionsCreator_customerCategory =
+  (): Toption[] => [
+    { value: "客戶", label: "客戶" },
+    { value: "廠商", label: "廠商" },
+    { value: "客戶廠商", label: "客戶廠商" },
+  ]
 
 
 

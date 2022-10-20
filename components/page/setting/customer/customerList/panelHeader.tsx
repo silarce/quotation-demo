@@ -1,5 +1,5 @@
 
-
+import { useRouter } from "next/router";
 
 
 import { MouseEvent } from "react"
@@ -36,10 +36,20 @@ export default function PanelHeader(
       customersData: TcustomersData
       isActive: boolean
     }) {
+  // ====================================================
+  const router = useRouter()
 
+  // ====================================================
   const contact01
     = customersData.contacts?.[0] ?? {} as Partial<TcontactData>
+  // ====================================================
 
+  const toEdit = (e: MouseEvent) => {
+    e.stopPropagation()
+    router.push(`/setting/customer/edit/${customersData.id}`)
+  }
+
+  // ====================================================
   return (
     <CellWithBar isActive={isActive}>
       <div className={`${style.panelHeader}`}
@@ -81,7 +91,7 @@ export default function PanelHeader(
         {/* ============================ */}
         <div className={style.cell04}>
           <div>
-            <IconEdit onClick={() => alert("test")} />
+            <IconEdit onClick={toEdit} />
             <IconDelete onClick={() => alert("test")} />
           </div>
         </div>

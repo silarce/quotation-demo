@@ -165,3 +165,146 @@
     }
   }
 }
+
+// ========================================================
+
+$leftPadding_title: 41px;
+$leftPadding_option: 4px;
+
+$leftPadding_div: $leftPadding_title - $leftPadding_option;
+
+.editCustomer {
+  padding: 38px 45px;
+  // 使用者代號
+  .theId {
+    min-width: 300px;
+    width: fit-content;
+    padding: 20px $leftPadding_title;
+    border: solid 1px $colorBorder01;
+
+    display: flex;
+    > * {
+      margin: auto;
+    }
+
+    .input02 {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .checkTip {
+      margin-left: 10px;
+      width: fit-content;
+      white-space: nowrap;
+      display: flex;
+      > * {
+        margin: auto;
+      }
+      > svg {
+        height: 20px;
+        width: auto;
+        margin-right: 5px;
+        &.check {
+          color: #42ba96;
+        }
+        &.cross {
+          color: red;
+        }
+      }
+      .muiCircular {
+        font-size: 10px;
+      }
+      .alertTip {
+        color: red;
+      }
+    }
+  } // theId
+  // --------------------------------------------------
+  .editCustomerItem01 {
+    margin-top: 27px;
+    .form01 {
+      position: relative;
+      display: grid;
+      grid-template-columns: 400px 65px 400px;
+      @media (max-width: 1536px) {
+        grid-template-columns: 350px 65px 350px;
+      }
+      gap: 24px 0;
+      padding: 29px $leftPadding_div;
+      border: solid 1px $colorBorder01;
+      > div:nth-of-type(1) {
+        grid-column: span 3;
+      }
+      > div:nth-last-of-type(2) {
+        grid-column: span 3;
+      }
+      .rightSide {
+        position: absolute;
+        top: 30px;
+        right: 37px;
+        width: 238px;
+      }
+      // 垂直分隔線
+      .vr {
+        width: 1px;
+        height: 100%;
+        margin: auto;
+        background-color: $colorBorder01;
+      }
+      .selectInput {
+        > span {
+          color: $colorText;
+        }
+      }
+    }
+    .subTitle {
+      padding: 11px $leftPadding_title;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 22px;
+      background-color: $bgc01;
+      margin: auto;
+    }
+  } // editCustomerItem01
+  // --------------------------------------------------
+  .editCustomerItem02 {
+    margin-top: 27px;
+    .form {
+      padding: 29px $leftPadding_div;
+      border: solid 1px $colorBorder01;
+      display: grid;
+      grid-template-columns: repeat(3, fit-content(100%));
+      @media (max-width: 1536px) {
+        grid-template-columns: repeat(2, fit-content(100%));
+      }
+      gap: 20px 75px;
+      .inputBox {
+        display: inline-block;
+        position: relative;
+        width: 378px;
+        padding: 24px 18px 21px 18px;
+        border: solid 1px $colorBorder01;
+        .input02 {
+          &:nth-of-type(1) {
+            padding-top: 0;
+          }
+          hr {
+            border-color: $colorMain;
+          }
+        }
+        .buttonBox {
+          position: absolute;
+          left: calc(100% + 12px);
+          top: 50%;
+          transform: translateY(-50%);
+          display: grid;
+          gap: 20px;
+          .noShow {
+            opacity: 0;
+            cursor: "auto";
+          }
+        }
+      } // inputBox
+    } // form
+  } //editCustomerItem02
+}
+// =====================================================
