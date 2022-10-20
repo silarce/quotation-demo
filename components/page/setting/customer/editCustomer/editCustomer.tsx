@@ -42,7 +42,7 @@ export default function EditCustomer({ data, setData, check }: {
           label="客戶編號"
           onChange={(e) => {
             const value = e.target.value
-            setData(data => ({ ...data, idNumber: value }))
+            setData(data => ({ ...data, customerNumber: value }))
           }}
           disabled={idNumberIsDisabled}
         />

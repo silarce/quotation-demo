@@ -13,9 +13,6 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 
-// icon
-import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
-import CircularProgress from '@mui/material/CircularProgress';
 
 // api
 import {
@@ -25,7 +22,6 @@ import {
 
 // css
 import style from "../../customer.module.scss"
-import { id } from "date-fns/locale";
 
 const params: TapiGetCustomersParams = {
   populate: ["contacts"]

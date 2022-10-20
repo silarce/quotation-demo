@@ -121,6 +121,46 @@ export const useCustomers = (params?: TapiGetCustomersParams) => {
 }
 
 // ============================================================
+// 檢查客戶編號是否存在
+export const useCheckCustomers = (
+  customerNumber: string,
+) => {
+  type Tcheck = "ok" | "notOk" | "loading"
+
+  const params: TapiGetCustomersParams = {
+    order: "ASC",
+    page: 1,
+    pageSize: 999,
+    filter: {
+      customerNumber: {
+        $eq: customerNumber
+      }
+    }
+  }
+
+  const [check, setCheck] = useState<Tcheck>("loading")
+
+  const update = async () => {
+    try {
+      setCheck("loading")
+      const res = await apiGetCustomers(params)
+      if (res.data.length === 0) setCheck("ok")
+      else setCheck("notOk")
+    }
+    catch {
+      setCheck("notOk")
+    }
+  }
+
+  return {
+    check,
+    setCheck,
+    reCheck: update
+  }
+}
+
+
+// ============================================================
 // 取得個別客戶資料
 
 const apiGetCustomers_id
@@ -141,6 +181,15 @@ export const useCustomersById
     }
     return { data, setData, update }
   }
+
+// ==============================================================
+// 新增客戶資料
+export const apiPostCustomers = (body: TpostCustomer) => {
+  const api = `/customers`
+  return axi.post(api, body)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err.message))
+}
 
 // ==============================================================
 // 編輯客戶資料

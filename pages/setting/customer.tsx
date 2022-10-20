@@ -5,6 +5,7 @@ import {
   ChangeEvent, Dispatch, SetStateAction,
   useState, useMemo, useEffect
 } from "react"
+import { useRouter } from "next/router"
 
 // component
 import CustomerList from "components/page/setting/customer/customerList"
@@ -35,6 +36,7 @@ import { optionsCreator_clientSearch, Toption } from "fakeDatabase/options/optio
 
 
 export default function Customer() {
+  const router = useRouter()
   const [isReady, setIsReady] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   // =====================================================
@@ -87,7 +89,7 @@ export default function Customer() {
     {
       type: "addButton",
       label: "新增客戶資料",
-      onClick: () => { alert("製作中") }
+      onClick: () => router.push("/setting/customer/add")
     }
   ]
 

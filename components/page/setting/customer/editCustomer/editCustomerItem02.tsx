@@ -23,8 +23,8 @@ export default function EditCustomerItem02({ data, setData }: {
   Dispatch<SetStateAction<TcustomersData>>
 }) {
 
-  const contacts = data.contacts
-  console.log(contacts)
+  const contacts = data.contacts ?? []
+  if (!contacts[0]) contacts.push({})
 
   return (
     <div className={style.editCustomerItem02}>
