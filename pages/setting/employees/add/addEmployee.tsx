@@ -56,11 +56,6 @@ export default function AddEmployee() {
   const panelList: TpanelList = [
     {
       type: "redButton",
-      label: "取消",
-      onClick: () => { router.back() }
-    },
-    {
-      type: "myButton",
       label: "上傳",
       onClick: async () => {
         if (check === "notOk") return myAlert.err({ title: "使用者代號錯誤" })
@@ -86,6 +81,12 @@ export default function AddEmployee() {
           setRootLoading(false)
         }
       }
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => { window.history.go(-2) }
+      // onClick: () => { router.back() }
     }
   ]
 

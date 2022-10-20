@@ -49,17 +49,6 @@ export default function AddEmployee() {
   const panelList: TpanelList = [
     {
       type: "redButton",
-      label: "取消",
-      onClick: () => {
-        if (router.query.isNew) {
-          router.push("/setting/employees")
-          return
-        }
-        router.back()
-      }
-    },
-    {
-      type: "myButton",
       label: "上傳",
       onClick: async () => {
         try {
@@ -78,6 +67,17 @@ export default function AddEmployee() {
         finally {
           setRootLoading(false)
         }
+      }
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => {
+        if (router.query.isNew) {
+          window.history.go(-2)
+          return
+        }
+        router.back()
       }
     }
   ]
