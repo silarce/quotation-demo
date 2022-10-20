@@ -85,8 +85,7 @@ export default function AddEmployee() {
     {
       type: "myButton",
       label: "取消",
-      onClick: () => { window.history.go(-2) }
-      // onClick: () => { router.back() }
+      onClick: () => { router.back() }
     }
   ]
 
