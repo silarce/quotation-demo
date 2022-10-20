@@ -39,9 +39,23 @@ export default function Edit() {
   // ------------------------------------------------------
   useEffect(() => {
     (async () => {
-      await update()
-      setIsReady(true)
+      try {
+        const res = await update()
+        if (res.contacts.length === 0) {
+          setData({
+            ...res,
+            contacts: [{ name: "", phone: "" }]
+          })
+        }
+        setIsReady(true)
+      }
+      catch {
+        myAlert.err({
+          title: "取得客戶資料失敗"
+        })
+      }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   // ------------------------------------------------------
 
@@ -93,9 +107,6 @@ export default function Edit() {
             setData={setData as Dispatch<SetStateAction<TcustomersData>>} />
         }
       </div>
-
-
-
     </div>
   )
 

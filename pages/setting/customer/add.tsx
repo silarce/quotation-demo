@@ -119,5 +119,8 @@ const emptyCustomerOri = (): TpostCustomer => ({
   "invoiceCounty": "", //發票地址縣市
   "invoiceDistrict": "", //發票地址區域
   "invoiceAddress": "", //發票地址剩餘地址
-  "contacts": []
+  "contacts": [{
+    name: "",
+    phone: ""
+  }]
 })
