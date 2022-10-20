@@ -1,13 +1,14 @@
-// 人員資料
-// 人員資料
 
 import {
-  useState, useEffect, useMemo
+  useState, useEffect
 } from "react"
 import { useRouter } from "next/router";
 
 // components
 import EmployeeList from "components/page/setting/employees/employeeList";
+
+// antd
+import { Pagination } from 'antd';
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
@@ -26,9 +27,9 @@ export default function Employees() {
   const [isReady, setIsReady] = useState(false)
   // ====================================================
   const [params, setParams] = useState<TapiGetEmployeeParams>({
-    order: "DESC",
+    order: "ASC",
     page: 1,
-    pageSize: 9999,
+    pageSize: 20,
     filter: {
       $or: {
         idNumber: {
@@ -37,9 +38,6 @@ export default function Employees() {
         chName: {
           $contains: router.query.searchValue,
         },
-        // enName: {
-        //   $contains: searchValue,
-        // }
       }
     },
     populate: ["jobs"]
@@ -48,13 +46,6 @@ export default function Employees() {
   let { data, update } = useEmployee(params)
   const employeeList = data?.data || []
   const meta = data?.meta
-
-  const setPage = (page: number) => {
-    setParams(params => {
-      params.page = page
-      return { ...params }
-    })
-  }
 
   // 搜尋功能
   const searchStaff = (searchValue: string) => {
@@ -76,14 +67,19 @@ export default function Employees() {
           chName: {
             $contains: searchValue,
           },
-          // enName: {
-          //   $contains: searchValue,
-          // }
         }
       }
     }))
   }
+  // ====================================================
+  const setPage = (page: number) => {
+    setParams(params => {
+      params.page = page
+      return { ...params }
+    })
+  }
 
+  // =========================================================
   useEffect(() => {
     (async () => {
       setIsLoading(true)
@@ -112,22 +108,22 @@ export default function Employees() {
   ]
 
   // ====================================================
-  const MemoPageHeader = useMemo(() => {
-    return (
-      <PageHeader02 tag="人員資料"
-        panelList={panelList}
-      />
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [!!meta, router.query.searchValue])
-  // ====================================================
   return (
     <div className={style.container}>
-      {MemoPageHeader}
+      <PageHeader02 tag="人員資料" panelList={panelList} />
       <div className={style.mainContainer}>
         {isReady &&
-          <EmployeeList
-            employeeList={employeeList} toUpdate={update} />
+          <>
+            <EmployeeList
+              employeeList={employeeList} toUpdate={update} />
+            <div className={style.paginationBox}>
+              <Pagination
+                current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
+                pageSize={meta?.pageSize ?? 0}
+                onChange={setPage}
+              />
+            </div>
+          </>
         }
         <LoadingCover01 isLoading={isLoading} />
       </div>
