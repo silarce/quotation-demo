@@ -122,7 +122,7 @@ export default function Employees() {
   }, [!!meta, router.query.searchValue])
   // ====================================================
   return (
-    <div className={style.scrollContainer}>
+    <div className={style.container}>
       {MemoPageHeader}
       <div className={style.mainContainer}>
         {isReady &&

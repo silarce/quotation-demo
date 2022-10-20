@@ -111,9 +111,9 @@ export const optionsCreator_doorType =
 // 客戶列表搜尋用
 export const optionsCreator_clientSearch =
   (): Toption[] => [
-    { value: "clientId", label: "客戶編號" },
+    { value: "customerNumber", label: "客戶編號" },
     { value: "name", label: "客戶名稱" },
-    { value: "contactPerson", label: "聯絡人" },
+    // { value: "contactPerson", label: "聯絡人" },
     { value: "phone", label: "電話" },
   ]
 

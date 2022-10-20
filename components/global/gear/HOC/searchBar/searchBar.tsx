@@ -26,6 +26,7 @@ interface TsearchTargetSel {
   // onChange: (option: Toption | null) => void
   className?: string
   width?: string
+  defaultValue?: string | Toption
 }
 
 interface TsearchTargetInput {
@@ -35,6 +36,7 @@ interface TsearchTargetInput {
   className?: string
   width?: string
   options?: undefined
+  defaultValue?: string
 }
 
 export type TdoSearch
@@ -55,21 +57,32 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
     className?: string
   }) {
 
-
   const [valueArr, setValueArr]
-    = useState<(Toption | null | string)[]>([])
+    = useState<(Toption | null | string)[]>(
+      searchTargetList.map((item, key) => {
+        const { defaultValue } = item
+        return defaultValue ?? null
+      })
+    )
 
 
   return (
     <div className={`${style.container} ${className}`}>
 
       {searchTargetList.map((item, index) => {
-        const { options, placeholder, width }
+        const { options, placeholder, width, defaultValue }
           = item
         const className = item.className || ""
         const theStyle = { width }
+        if (valueArr[index] === undefined) {
+          setValueArr(arr => {
+            arr[index] = options?.[0] ?? null
+            return [...arr]
+          })
+        }
         if (options) return (
-          <div className={style.selectBox} key={index} style={theStyle}>
+          <div className={style.selectBox} key={index}
+            style={theStyle}>
             <Select03
               className={`${style.select} ${className}`}
               stateValue={valueArr[index] ?? options[0]}
@@ -91,7 +104,7 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
               <input type="text" autoComplete="off"
                 style={theStyle}
                 placeholder={placeholder}
-                value={valueArr[index] as string ?? ""}
+                value={typeof valueArr[index] === "string" ? valueArr[index] as string : ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const value = e.target.value
                   setValueArr(arr => {

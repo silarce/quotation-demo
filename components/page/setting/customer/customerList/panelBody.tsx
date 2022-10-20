@@ -1,21 +1,11 @@
 
-
 // css
 import style from "../customer.module.scss"
 
-
 // type
-import { TcustomersData, TcontactData } from "js/api/api_customer";
-
-
-
-// fakeData
-import { TclientProfile } from "fakeDatabase/client/fakeClientList";
+import { TcustomersData } from "js/api/api_customer";
 
 // ====================================================
-
-
-
 export default function PanelBody(
   { customersData }: { customersData: TcustomersData }) {
 
@@ -26,11 +16,10 @@ export default function PanelBody(
     contacts
   }
     = customersData
+  // ==================================================
 
 
-
-
-
+  // ==================================================
   return (
     <div className={style.panelBody}>
       <div className={style.cell01}>

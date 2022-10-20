@@ -31,10 +31,11 @@ import { TcustomersData, TcontactData } from "js/api/api_customer";
 
 
 export default function PanelHeader(
-  { customersData, isActive }:
+  { customersData, isActive, openDelPanel }:
     {
       customersData: TcustomersData
       isActive: boolean
+      openDelPanel: (e: MouseEvent, data: TcustomersData) => void
     }) {
   // ====================================================
   const router = useRouter()
@@ -92,7 +93,7 @@ export default function PanelHeader(
         <div className={style.cell04}>
           <div>
             <IconEdit onClick={toEdit} />
-            <IconDelete onClick={() => alert("test")} />
+            <IconDelete onClick={(e) => openDelPanel(e, customersData)} />
           </div>
         </div>
       </div>

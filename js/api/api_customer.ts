@@ -202,6 +202,16 @@ export const apiPatchCustomers_id
       .catch(err => Promise.reject(err.message))
   }
 
+// ==============================================================
+// 刪除客戶資料
+export const apiDeleteCustomers_id
+  = (id: string,) => {
+    const api = `/customers/${id}`
+    return axi.delete(api)
+      .then(({ data }) => data)
+      .catch(err => Promise.reject(err.message))
+  }
+
 
 
 
