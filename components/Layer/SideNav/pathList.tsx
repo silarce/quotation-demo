@@ -97,7 +97,7 @@ const sidePathList: TsidePathList = {
         },
         {
           label: "客戶列表",
-          path: path01 + "/clientList",
+          path: path01 + "/customer",
         },
         {
           label: "產品列表",
