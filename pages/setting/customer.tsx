@@ -50,12 +50,14 @@ function TheCustomer({ router }: { router: NextRouter }) {
   const filter: TapiGetCustomersParams["filter"] = {}
   const searchProperty = router.query.searchProperty as string
   const searchValue = router.query.searchValue as string
-  filter[searchProperty] = {}
-  filter[searchProperty].$contains = searchValue
+  if (searchProperty && searchProperty) {
+    filter[searchProperty] = {}
+    filter[searchProperty].$contains = searchValue
+  }
 
   let [params, setParams] = useState<TapiGetCustomersParams>({
     page: 1,
-    pageSize: 15,
+    pageSize: 8,
     populate: ["contacts"],
     filter,
     // sort: []
@@ -95,11 +97,12 @@ function TheCustomer({ router }: { router: NextRouter }) {
     {
       options: clientSearchOptions,
       width: "90px",
-      defaultValue: clientSearchOptionsObj[searchProperty]
+      defaultValue:
+        clientSearchOptionsObj[searchProperty] ?? clientSearchOptions[0]
     },
     {
       placeholder: "請輸入搜尋內容",
-      defaultValue: searchValue
+      defaultValue: searchValue ?? ""
     },
   ]
 
@@ -108,7 +111,6 @@ function TheCustomer({ router }: { router: NextRouter }) {
     doSearch: (valueArr: (Toption | null | string)[]) => {
       // if (typeof valueArr[0] === "string") return console.log("搜尋功能有錯誤")
       // if (!valueArr?.[0]?.value) return console.log("搜尋功能有錯誤")
-      console.log(valueArr)
       const searchProperty = (valueArr[0] as Toption).value
       const searchValue = valueArr[1] as string
 

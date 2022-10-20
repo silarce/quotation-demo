@@ -48,8 +48,6 @@ interface TsearchGroup {
 }
 
 
-
-
 export default function SearchBar({ searchTargetList, doSearch, className = "" }:
   {
     searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
@@ -59,12 +57,13 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
 
   const [valueArr, setValueArr]
     = useState<(Toption | null | string)[]>(
-      searchTargetList.map((item, key) => {
-        const { defaultValue } = item
-        return defaultValue ?? null
+      searchTargetList.map((item) => {
+        const { defaultValue, options } = item
+        if (defaultValue) return defaultValue
+        if (options) return options[0]
+        return ""
       })
     )
-
 
   return (
     <div className={`${style.container} ${className}`}>

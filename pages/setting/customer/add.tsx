@@ -55,11 +55,17 @@ export default function Add() {
       type: "myButton",
       label: "上傳",
       onClick: async () => {
+        if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
+        if (check === "loading") return myAlert.info({ title: "正在檢查客戶編號" })
         try {
-          if (!data.customerNumber) return
           setRootLoading(true)
-          // 
-          await apiPostCustomers(data)
+          const res = await apiPostCustomers(data)
+          router.push({
+            pathname: `/setting/customer/edit/${res.id}`,
+            query: {
+              isNew: true
+            }
+          })
           myAlert.success({ title: "新增客戶資料完成" })
         }
         catch {
