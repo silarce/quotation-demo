@@ -18,14 +18,14 @@ const [optionsGender, optionMarital]
 
 // type
 import { TpostEmployee, Temployee } from "js/api/api_employee";
-
+import type { TprePostEmployee } from "../editEmployee";
 // css
 import style from "../editEmployee.module.scss"
 
 export default function EditEmployeeItem01({ data, setData }: {
-  data: Partial<Temployee>
+  data: TprePostEmployee
   setData:
-  Dispatch<SetStateAction<Partial<Temployee>>>
+  Dispatch<SetStateAction<TprePostEmployee>>
 }) {
   const {
     residenceCounty, residenceDistrict, residenceAddress,

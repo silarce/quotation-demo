@@ -1,7 +1,13 @@
 
-import { useState, useEffect } from "react";
+import {
+  useState, useEffect
+} from "react";
 
 import { axi } from "./_axiosCreator";
+
+// type
+import { TjobsData } from "./api_department"
+
 
 // =============================================
 // 員工資料
@@ -33,7 +39,7 @@ export type Temployee = {
   "retireDate": string,
   "severanceDate": string,
   "processPermission": true,
-  "jobs"?: string[]
+  "jobs"?: TjobsData[]
 }
 
 // 員工資料列表
@@ -75,9 +81,11 @@ export type TpostEmployee = {
   "retireDate": string,
   "severanceDate": string,
   "processPermission": true,
-  "jobId"?: string[]
+  "jobId": string[]
 }
 
+type Tpopulate =
+  "jobs"[]
 
 
 
@@ -87,17 +95,21 @@ export type TapiGetEmployeeParams = {
   order: "ASC" | "DESC",
   page: number,
   pageSize: number,
+  filter?: {
+    [key: string]: any
+  }
+  populate?: Tpopulate
 }
 const apiGetEmployee = (params: TapiGetEmployeeParams) => {
   const api = "/employees"
   return axi.get(api, { params })
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.message))
 }
 
-export const useEmployee = () => {
+export const useEmployee = (params: TapiGetEmployeeParams) => {
   let [data, setData] = useState<Partial<TgetEmployee>>({})
-  const update = async (params: TapiGetEmployeeParams) => {
+  const update = async () => {
     const data = await apiGetEmployee(params)
     if (data) setData(data)
     return data
@@ -106,22 +118,64 @@ export const useEmployee = () => {
   return { data, setData, update }
 }
 
+export const useCheckEmployee = (
+  idNumber: string,
+) => {
+  type Tcheck = "ok" | "notOk" | "loading"
+
+  const params: TapiGetEmployeeParams = {
+    order: "ASC",
+    page: 1,
+    pageSize: 999,
+    filter: {
+      idNumber: {
+        $eq: idNumber
+      }
+    }
+  }
+  const [check, setCheck] = useState<Tcheck>("loading")
+
+  const update = async () => {
+    try {
+      setCheck("loading")
+      const res = await apiGetEmployee(params)
+      if (res.data.length === 0) setCheck("ok")
+      else setCheck("notOk")
+    }
+    catch {
+      setCheck("notOk")
+    }
+  }
+
+  return {
+    check,
+    setCheck,
+    reCheck: update
+  }
+}
+
+
 // =======================================================
 // 取得個別員工資料
+export type TapiGetEmployee_idParams = {
+  populate: Tpopulate
+}
 
-const apiGetEmployee_id = (id: string) => {
+const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
   const api = `/employees/${id}`
-  return axi.get(api)
+
+  return axi.get(api, { params })
     .then(({ data }) => {
       return data
     })
     .catch((err) => false)
 }
 
-export const useEmployeeById = (id: string) => {
+export const useEmployeeById = (id: string, params?: TapiGetEmployee_idParams) => {
   const [data, setData] = useState<Partial<Temployee>>({})
+
   const update = async () => {
-    const res = await apiGetEmployee_id(id)
+    const res = await apiGetEmployee_id(id, params)
     if (res) setData(res)
     return res
   }

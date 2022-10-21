@@ -1,0 +1,41 @@
+GET {{host}}/users?filter[username]=admin
+搜尋 username = "admin"
+
+###
+GET {{host}}/users?filter[username][$contains]=st120
+搜尋 username 含有 "st120"
+
+###
+GET {{host}}/users?
+  filter[createdAt][$gte]=2022-08-05 08:52:52&
+  filter[createdAt][$lt]=2022-08-05 08:52:53
+搜尋 createdAt >= 2022-08-05 08:52:52 並且 createdAt < 2022-08-05 08:52:53
+
+###
+GET {{host}}/users?
+  populate[]=roles&
+  populate[]=groups&
+  filter[username][$in][]=dust120125&
+  filter[$and][account][$notNull]&
+  filter[$or][username][$eq]=admin&
+  filter[$or][account][$ne]=admin&
+  filter[isActive]=false
+
+
+
+
+filter
+  $and
+  $or
+  $eq: '等於',
+  $ne: '不等於',
+  $lt: '小於',
+  $lte: '小於等於',
+  $gt: '大於',
+  $gte: '大於等於',
+  $in: '包含 (須提供陣列)',
+  $notIn: '不包含 (須提供陣列)',
+  $contains: '含有 (部分比對字串)',
+  $notContains: '不含有 (部分比對字串)',
+  $null: '等於 Null',
+  $notNull: '不等於 Null',

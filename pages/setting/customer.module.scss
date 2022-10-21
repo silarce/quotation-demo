@@ -3,6 +3,9 @@
 
 .mainContainer {
   align-content: space-between;
+  :global(.ant-collapse) {
+    border: none;
+  }
   >.paginationBox {
     display: flex;
     justify-content: flex-end;
