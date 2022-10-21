@@ -17,12 +17,7 @@ import Profile from "components/page/worksDepartment/contracList/contract/dispat
 import List from "components/page/worksDepartment/contracList/contract/dispatchList/list"
 
 // css
-import style from "./contract.module.scss"
-
-
-
-
-
+import style from "./dispatchList.module.scss"
 
 
 export default function DispatchList() {
@@ -47,8 +42,6 @@ export default function DispatchList() {
       onClick: () => router.push(`${router.asPath}/add`)
     }
   ]
-
-
 
   return (
     <div className={style.container}>
