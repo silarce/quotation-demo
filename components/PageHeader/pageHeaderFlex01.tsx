@@ -74,7 +74,8 @@ export default function PageHeaderFlex01(
       <>
         {linkList.map((config, index) => {
           const { label, href } = config;
-          const isActive = href === asPath ? style.active : ""
+          const reg = new RegExp(`^${href}`)
+          const isActive = reg.test(asPath) ? style.active : ""
           return (
             <Link href={href} key={index}>
               <a className={isActive}>
