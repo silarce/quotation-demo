@@ -19,7 +19,7 @@ import style from "./input02.module.scss"
 const Input02 = (
   { label, stateValue, placeholder, onChange,
     id, className, width, labelWidth, gap,
-    disabled
+    disabled, labelColor, noUnderline
   }:
     {
       label: string,
@@ -32,7 +32,9 @@ const Input02 = (
       width?: string
       labelWidth?: string
       gap?: string
-      disabled?: boolean | undefined
+      disabled?: boolean | undefined,
+      labelColor?: string
+      noUnderline?: boolean
     }) => {
   // ========================================================
   className = className ? className : ""
@@ -50,16 +52,26 @@ const Input02 = (
     gridTemplateColumns: labelWidth ? `${labelWidth} auto` : "",
     gap: gap ? gap : "",
   }
-
+  // --------------------------
   const styleDisabled = disabled ? style.disabled : ""
+  const styleLabelColor = (() => {
+    switch (labelColor) {
+      case "main": return style.colorMain;
+      default: return "";
+    }
+  })()
+  const styleNoUnderline = noUnderline ? style.noUnderline : ""
 
   // ========================================================
 
   return (
-    <label className={`${style.label} ${className} ${styleDisabled}`} htmlFor={id}
+    <label
+      className
+      ={[className, style.label, styleDisabled].join(" ")}
+      htmlFor={id}
       style={lableStyle}
     >
-      <span>{label}</span>
+      <span className={styleLabelColor}>{label}</span>
 
       <TextareaAutosize className={style.textArea}
         id={id} placeholder={placeholder}
@@ -72,16 +84,7 @@ const Input02 = (
         }}
         disabled={disabled}
       />
-
-      {/* <input id={id} type="text" placeholder={placeholder}
-        autoComplete="off"
-        value={stateValue}
-        onChange={onChange}
-        disabled={disabled}
-      /> */}
-
-
-      <hr />
+      <hr className={styleNoUnderline} />
     </label>
   )
 }

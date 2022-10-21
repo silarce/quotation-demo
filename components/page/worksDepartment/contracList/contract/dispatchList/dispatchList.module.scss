@@ -1,0 +1,24 @@
+@use "styles/theme01" as *;
+
+.profile {
+  display: flex;
+  justify-content: space-between;
+  height: fit-content;
+  margin: 0 50px;
+  background-color: #ddd;
+  .left,
+  .right {
+    height: fit-content;
+    display: grid;
+    gap: 20px;
+    .input02 {
+      padding: 0;
+    }
+  }
+  .left {
+    width: 650px;
+  }
+  .right {
+    width: 300px;
+  }
+}

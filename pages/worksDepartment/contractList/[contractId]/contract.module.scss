@@ -1,9 +1,12 @@
 @use "styles/layout" as *;
 @use "styles/theme01" as *;
 
+// 工程聯絡單
 .workContactDoc {
 }
+
 // ==================================================
+// 出庫單
 .outboundOrder {
   padding: 17px;
   padding-top: 48px;
@@ -45,3 +48,7 @@
   }
 }
 // ==================================================
+// 派工單列表
+.dispatchList {
+  padding: 40px 0 20px 0;
+}

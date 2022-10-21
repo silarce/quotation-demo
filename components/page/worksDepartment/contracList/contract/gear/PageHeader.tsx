@@ -6,7 +6,7 @@ import { NextRouter } from "next/router"
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import PageHeaderFlex01 from "components/PageHeader/pageHeaderFlex01"
 
-
+export type { TpanelList }
 
 
 
@@ -57,7 +57,7 @@ export default function PageHeader({ panelList }:
   return (
     <div>
       <PageHeader02
-        tag={`合作編號${contractId}`}
+        tag={`合約編號${contractId}`}
         panelList={panelList} />
       <PageHeaderFlex01 linkList={linkList} />
     </div>

@@ -49,4 +49,12 @@
       border-color: transparent;
     }
   }
+  > hr {
+    &.noUnderline {
+      border-color: transparent;
+    }
+  }
+  .colorMain {
+    color: $colorMain;
+  }
 }
