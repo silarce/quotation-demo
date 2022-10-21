@@ -10,17 +10,16 @@ import style from "./dispatchList.module.scss"
 
 
 // fake
-import { TfakeProfile, TfakeData } from "pages/worksDepartment/contractList/[contractId]/dispatchList"
+import type { TfakeProfile } from "pages/worksDepartment/contractList/[contractId]/dispatchList"
 
 
 export default function Profile(
-  { data, setData }:
+  { profile, setProfile }:
     {
-      data: TfakeData
-      setData: Dispatch<SetStateAction<TfakeData>>
+      profile: TfakeProfile
+      setProfile: Dispatch<SetStateAction<TfakeProfile>>
     }) {
 
-  const profile = data.profile
 
 
   return (
@@ -32,13 +31,12 @@ export default function Profile(
           const { label, labelWidth } = config01[key]
           const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value
-            setData(data => {
-              data.profile[key] = value
+            setProfile(data => {
+              data[key] = value
               return { ...data }
             })
           }
           return (
-            // <Input02 className={style.input02} key={index}
             <Input02 className={`${style.input02} p-0`} key={index}
               stateValue={value}
               label={label}
@@ -58,8 +56,8 @@ export default function Profile(
           const { label, labelWidth } = config02[key]
           const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value
-            setData(data => {
-              data.profile[key] = value
+            setProfile(data => {
+              data[key] = value
               return { ...data }
             })
           }

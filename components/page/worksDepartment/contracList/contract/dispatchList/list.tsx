@@ -13,18 +13,17 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react"
 import style from "./dispatchList.module.scss"
 
 // fake
-import { TfakeDispatch, TfakeData } from "pages/worksDepartment/contractList/[contractId]/dispatchList"
+import { TfakeDispatch } from "pages/worksDepartment/contractList/[contractId]/dispatchList"
 
 
 export default function List(
-  { data, setData }:
+  { list, setList }:
     {
-      data: TfakeData
-      setData: Dispatch<SetStateAction<TfakeData>>
+      list: TfakeDispatch[]
+      setList: Dispatch<SetStateAction<TfakeDispatch[]>>
     }) {
 
-  const list = data.list
-
+  
 
   return (
     <div className={style.list}>

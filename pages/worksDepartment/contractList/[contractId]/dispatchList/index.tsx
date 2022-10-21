@@ -24,11 +24,14 @@ export default function DispatchList() {
   const [isReady, setIsReady] = useState(false)
   const router = useRouter()
   // ----------------------------------------------------
-  const [data, setData] = useState<TfakeData>()
+  // const [data, setData] = useState<TfakeData>()
+  const [profile, setProfile] = useState<TfakeProfile>()
+  const [list, setList] = useState<TfakeDispatch[]>()
 
 
   useEffect(() => {
-    setData(fakeDataOri(router.query.contractId as string ?? ""))
+    setProfile(fakeProfileOri(router.query.contractId as string ?? ""))
+    setList(fakeListOri())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -50,10 +53,10 @@ export default function DispatchList() {
 
       <div className={style.mainContainer}>
 
-        {data &&
+        {profile && list &&
           <div className={style.dispatchList}>
-            <Profile data={data} setData={setData as Dispatch<SetStateAction<TfakeData>>} />
-            <List data={data} setData={setData as Dispatch<SetStateAction<TfakeData>>} />
+            <Profile profile={profile!} setProfile={setProfile as Dispatch<SetStateAction<TfakeProfile>>} />
+            <List list={list} setList={setList as Dispatch<SetStateAction<TfakeDispatch[]>>} />
           </div>
         }
       </div>
@@ -87,9 +90,6 @@ const fakeProfileOri = (工程編號: string): TfakeProfile => ({
 })
 
 
-export type TfakeData = ReturnType<typeof fakeDataOri>
-
-
 export type TfakeDispatch = {
   日期: string,
   工務人員: string,
@@ -97,7 +97,7 @@ export type TfakeDispatch = {
 }
 
 
-const fakeList = (): TfakeDispatch[] => [
+const fakeListOri = (): TfakeDispatch[] => [
   {
     日期: "100-01-01",
     工務人員: "王先生小文",
@@ -122,7 +122,7 @@ const fakeList = (): TfakeDispatch[] => [
     日期: "100-05-01",
     工務人員: "小文",
     辦理事項: `辦理事項辦理事項辦理事項辦理事項辦理事
-項辦理事項辦理事項`,
+    項辦理事項辦理事項`,
   },
   {
     日期: "105-01-26",
@@ -137,11 +137,14 @@ const fakeList = (): TfakeDispatch[] => [
 ]
 
 
-const fakeDataOri = (工程編號: string) => ({
-  profile: fakeProfileOri(工程編號),
-  list: fakeList()
-})
 
+
+// const fakeDataOri = (工程編號: string) => ({
+//   profile: fakeProfileOri(工程編號),
+//   list: fakeList()
+// })
+
+// export type TfakeData = ReturnType<typeof fakeDataOri>
 
 
 
