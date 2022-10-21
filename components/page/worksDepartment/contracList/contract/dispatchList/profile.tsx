@@ -45,13 +45,12 @@ export default function Profile(
               labelWidth={labelWidth}
               onChange={onChange}
               labelColor="main"
-              disabled={true}
               gap={"24px"}
+              disabled={true}
             />
           )
         })}
       </div>
-
 
       <div className={style.right}>
         {indexKeys02.map((key, index) => {
@@ -72,6 +71,7 @@ export default function Profile(
               onChange={onChange}
               labelColor="main"
               gap={"24px"}
+              disabled={true}
             />
           )
         })}

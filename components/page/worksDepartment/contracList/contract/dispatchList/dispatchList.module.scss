@@ -5,7 +5,6 @@
   justify-content: space-between;
   height: fit-content;
   margin: 0 50px;
-  background-color: #ddd;
   .left,
   .right {
     height: fit-content;
@@ -20,5 +19,46 @@
   }
   .right {
     width: 300px;
+    .input02 {
+      hr {
+        border-color: $colorMain;
+      }
+    }
+  }
+}
+
+.list {
+  padding: 4px 4px 0 4px;
+  border: solid 1px $colorBorder01;
+  margin: 35px 17px 0;
+  .thead,
+  .row {
+    display: grid;
+    grid-template-columns: 100px 100px auto;
+    gap: 22px;
+    align-content: center;
+    > div {
+      span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .thead {
+    padding: 11px 28px;
+    background-color: $bgc01;
+    > div {
+      span {
+        color: $colorMain;
+      }
+    }
+  }
+  .row {
+    padding: 18px 28px;
+    border-bottom: solid 1px $colorBorder01;
+    &:nth-last-of-type(1) {
+      border-color: transparent;
+    }
   }
 }
