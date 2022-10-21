@@ -52,7 +52,7 @@ export default function Add() {
 
   const panelList: TpanelList = [
     {
-      type: "myButton",
+      type: "redButton",
       label: "上傳",
       onClick: async () => {
         if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
@@ -77,7 +77,7 @@ export default function Add() {
       }
     },
     {
-      type: "redButton",
+      type: "myButton",
       label: "取消",
       onClick: () => {
         router.back()

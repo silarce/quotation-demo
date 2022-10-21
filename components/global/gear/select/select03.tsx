@@ -86,7 +86,8 @@ const Select03 = ({
         onChange={onChange}
         isSearchable={false}
         styles={myStyle}
-        menuPortalTarget={document.body}
+        menuPortalTarget={document.getElementById("__next")}
+        // menuPortalTarget={document.body}
         isDisabled={disabled}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -94,6 +95,7 @@ const Select03 = ({
           DropdownIndicator,
           ...customComponents
         }}
+        menuPosition={"fixed"}
       />
       {!disabled && <hr />}
     </div>
