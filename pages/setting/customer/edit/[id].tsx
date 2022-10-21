@@ -62,17 +62,6 @@ export default function Edit() {
   const panelList: TpanelList = [
     {
       type: "redButton",
-      label: "取消",
-      onClick: () => {
-        if (router.query.isNew) {
-          window.history.go(-2)
-          return
-        }
-        router.back()
-      }
-    },
-    {
-      type: "myButton",
       label: "上傳",
       onClick: async () => {
         try {
@@ -89,7 +78,18 @@ export default function Edit() {
           setRootLoading(false)
         }
       }
-    }
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => {
+        if (router.query.isNew) {
+          window.history.go(-2)
+          return
+        }
+        router.back()
+      }
+    },
   ]
 
   // =======================================================
