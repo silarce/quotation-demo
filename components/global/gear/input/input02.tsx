@@ -1,4 +1,8 @@
-
+// input02是有標題的input
+// input02是有標題的input
+// input02是有標題的input
+// input02是有標題的input
+// input02是有標題的input
 
 
 
@@ -8,10 +12,6 @@ import { nanoid } from 'nanoid'
 
 // ui
 import TextareaAutosize from 'react-textarea-autosize';
-
-// antd
-import { Input } from 'antd';
-const { TextArea } = Input;
 
 // css
 import style from "./input02.module.scss"
@@ -23,7 +23,7 @@ const Input02 = (
   }:
     {
       label: string,
-      stateValue: string | number,
+      stateValue: string | number | undefined | null,
       // onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
       onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
       placeholder?: string | false,
@@ -64,8 +64,12 @@ const Input02 = (
       <TextareaAutosize className={style.textArea}
         id={id} placeholder={placeholder}
         autoComplete="off"
-        value={stateValue}
+        value={stateValue ?? ""}
         onChange={onChange}
+        onKeyDown={(e) => {
+          if (e.code === "Enter") e.preventDefault()
+          if (e.code === "NumpadEnter") e.preventDefault()
+        }}
         disabled={disabled}
       />
 

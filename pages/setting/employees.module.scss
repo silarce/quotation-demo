@@ -1,0 +1,14 @@
+@use "styles/theme01" as *;
+@use "styles/layout" as *;
+
+.mainContainer {
+  align-content: space-between;
+  >.paginationBox {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 40px;
+    padding-right: 30px;
+    background-color: $bgc01;
+  }
+}

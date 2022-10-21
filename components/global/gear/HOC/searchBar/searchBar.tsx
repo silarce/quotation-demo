@@ -1,6 +1,6 @@
 import {
   ChangeEvent,
-  Fragment
+  Fragment, useState
 } from "react"
 
 // globalGear
@@ -20,52 +20,80 @@ interface TsearchObj {
 }
 
 interface TsearchTargetSel {
-  stateValue: Toption | null
+  // stateValue: Toption | null
   options: Toption[]
   placeholder?: string
-  onChange: (option: Toption | null) => void
+  // onChange: (option: Toption | null) => void
   className?: string
   width?: string
+  defaultValue?: string | Toption
 }
 
 interface TsearchTargetInput {
-  stateValue: string
+  // stateValue: string
   placeholder?: string
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void
+  // onChange: (e: ChangeEvent<HTMLInputElement>) => void
   className?: string
   width?: string
   options?: undefined
+  defaultValue?: string
 }
+
+export type TdoSearch
+  = (valueArr: (Toption | null | string)[]) => void
 
 interface TsearchGroup {
   searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
-  doSearch: () => void
+  doSearch: TdoSearch
 }
-
-
 
 
 export default function SearchBar({ searchTargetList, doSearch, className = "" }:
   {
     searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
-    doSearch: () => void
+    doSearch: TdoSearch
     className?: string
   }) {
 
+  const [valueArr, setValueArr]
+    = useState<(Toption | null | string)[]>(
+      searchTargetList.map((item) => {
+        const { defaultValue, options } = item
+        if (defaultValue) return defaultValue
+        if (options) return options[0]
+        return ""
+      })
+    )
+
   return (
     <div className={`${style.container} ${className}`}>
-      {searchTargetList.map((target, index) => {
-        const { stateValue, options, placeholder, onChange, width } = target
-        const className = target.className || ""
+
+      {searchTargetList.map((item, index) => {
+        const { options, placeholder, width, defaultValue }
+          = item
+        const className = item.className || ""
         const theStyle = { width }
+        if (valueArr[index] === undefined) {
+          setValueArr(arr => {
+            arr[index] = options?.[0] ?? null
+            return [...arr]
+          })
+        }
         if (options) return (
-          <div className={style.selectBox} key={index} style={theStyle}>
+          <div className={style.selectBox} key={index}
+            style={theStyle}>
             <Select03
               className={`${style.select} ${className}`}
-              stateValue={stateValue}
+              stateValue={valueArr[index] ?? options[0]}
               options={options}
               placeholder={placeholder}
-              onChange={onChange} />
+              onChange={(option: Toption | null) => {
+                if (!option) return
+                setValueArr(arr => {
+                  arr[index] = option
+                  return [...arr]
+                })
+              }} />
           </div>
         )
         else return (
@@ -75,14 +103,23 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
               <input type="text" autoComplete="off"
                 style={theStyle}
                 placeholder={placeholder}
-                value={stateValue}
-                onChange={onChange}
+                value={typeof valueArr[index] === "string" ? valueArr[index] as string : ""}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value
+                  setValueArr(arr => {
+                    arr[index] = value
+                    return [...arr]
+                  })
+                }}
               />
             </label>
           </Fragment>
         )
       })}
-      <IconSearch className={style.iconSearch} onClick={doSearch} />
+
+      <IconSearch className={style.iconSearch}
+        onClick={() => { doSearch(valueArr) }}
+      />
     </div>
   )
 }

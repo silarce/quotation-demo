@@ -1,0 +1,310 @@
+@use "styles/theme01" as *;
+
+.customerList {
+  padding-left: 4px;
+  .panel {
+    :global(.ant-collapse-header) {
+      display: block !important;
+      padding: 0 !important;
+      background-color: #fff;
+    }
+
+    :global(.ant-collapse-content-box) {
+      padding: 0;
+    }
+
+    // :global(.){
+    // }
+  }
+}
+// =====================================================
+.panelHeader {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 300px 230px 130px;
+  padding: 5px 0px;
+  width: 100%;
+  > div {
+    padding-top: 13px;
+    padding-bottom: 13px;
+    border-left: solid 1px $colorBorder01;
+    &:nth-of-type(1) {
+      border-left: solid 3px transparent;
+    }
+    //cell下層
+    > div {
+      > h6 {
+        margin-bottom: 9px;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #979797;
+      }
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 19px;
+        color: $colorText;
+      }
+    }
+  }
+
+  .cell01 {
+    display: grid;
+    grid-template-columns: 58px 75px auto;
+    gap: 30px;
+    padding-left: 46px;
+    > div:nth-of-type(3) {
+      > span {
+        color: $colorMain;
+      }
+    }
+  }
+
+  .cell02 {
+    display: grid;
+    grid-template-columns: repeat(2, 120px);
+    justify-content: center;
+    gap: 20px;
+    padding-left: 23px;
+  }
+
+  .cell03 {
+    > div {
+      padding-left: 23px;
+    }
+  }
+
+  .cell04 {
+    > div {
+      display: grid;
+      grid-template-columns: auto auto;
+      justify-content: center;
+      gap: 30px;
+      width: 100%;
+      height: 100%;
+      > * {
+        margin: auto;
+      }
+      > img {
+        cursor: pointer;
+      }
+    }
+  }
+}
+// =====================================================
+.panelBody {
+  display: grid;
+  grid-template-columns: auto 362px 230px 130px;
+  padding: 5px 0px;
+  width: 100%;
+  background-color: $bgc01;
+  // cell層
+  > div {
+    height: 140px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    border-left: solid 1px $colorBorder01;
+    &:nth-of-type(1) {
+      border-left: solid 3px transparent;
+    }
+    //cell下層
+    > div {
+      margin-bottom: 20px;
+      &:nth-last-of-type(1) {
+        margin-bottom: 0px;
+      }
+      h6 {
+        margin-bottom: 8px;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #979797;
+      }
+      span {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 19px;
+        color: $colorText;
+      }
+    }
+  }
+
+  .cell01 {
+    padding-left: 46px;
+    > div {
+      &:nth-of-type(1) {
+        > span {
+          color: $colorMain;
+        }
+      }
+    }
+  }
+
+  .cell02 {
+    display: grid;
+    grid-template-columns: 80px 76px calc(64px + 16px);
+    width: 100%;
+    padding-left: 23px;
+    column-gap: 22px;
+    > div {
+      &:nth-of-type(3) {
+        padding-left: 16px;
+      }
+      &:nth-last-of-type(1) {
+        grid-column: span 3;
+      }
+    }
+  }
+
+  .cell03 {
+    // height: 140px;
+    overflow: auto;
+    > div {
+      padding-left: 23px;
+    }
+  }
+}
+
+// ========================================================
+
+$leftPadding_title: 41px;
+$leftPadding_option: 4px;
+
+$leftPadding_div: $leftPadding_title - $leftPadding_option;
+
+.editCustomer {
+  padding: 38px 45px;
+  // 使用者代號
+  .theId {
+    min-width: 300px;
+    width: fit-content;
+    padding: 20px $leftPadding_title;
+    border: solid 1px $colorBorder01;
+
+    display: flex;
+    > * {
+      margin: auto;
+    }
+
+    .input02 {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .checkTip {
+      margin-left: 10px;
+      width: fit-content;
+      white-space: nowrap;
+      display: flex;
+      > * {
+        margin: auto;
+      }
+      > svg {
+        height: 20px;
+        width: auto;
+        margin-right: 5px;
+        &.check {
+          color: #42ba96;
+        }
+        &.cross {
+          color: red;
+        }
+      }
+      .muiCircular {
+        font-size: 10px;
+      }
+      .alertTip {
+        color: red;
+      }
+    }
+  } // theId
+  // --------------------------------------------------
+  .editCustomerItem01 {
+    margin-top: 27px;
+    .form01 {
+      position: relative;
+      display: grid;
+      grid-template-columns: 400px 65px 400px;
+      @media (max-width: 1536px) {
+        grid-template-columns: 350px 65px 350px;
+      }
+      gap: 24px 0;
+      padding: 29px $leftPadding_div;
+      border: solid 1px $colorBorder01;
+      > div:nth-of-type(1) {
+        grid-column: span 3;
+      }
+      > div:nth-last-of-type(2) {
+        grid-column: span 3;
+      }
+      .rightSide {
+        position: absolute;
+        top: 30px;
+        right: 37px;
+        width: 238px;
+      }
+      // 垂直分隔線
+      .vr {
+        width: 1px;
+        height: 100%;
+        margin: auto;
+        background-color: $colorBorder01;
+      }
+      .selectInput {
+        > span {
+          color: $colorText;
+        }
+      }
+    }
+    .subTitle {
+      padding: 11px $leftPadding_title;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 22px;
+      background-color: $bgc01;
+      margin: auto;
+    }
+  } // editCustomerItem01
+  // --------------------------------------------------
+  .editCustomerItem02 {
+    margin-top: 27px;
+    .form {
+      padding: 29px $leftPadding_div;
+      border: solid 1px $colorBorder01;
+      display: grid;
+      grid-template-columns: repeat(3, fit-content(100%));
+      @media (max-width: 1536px) {
+        grid-template-columns: repeat(2, fit-content(100%));
+      }
+      gap: 20px 75px;
+      .inputBox {
+        display: inline-block;
+        position: relative;
+        width: 378px;
+        padding: 24px 18px 21px 18px;
+        border: solid 1px $colorBorder01;
+        .input02 {
+          &:nth-of-type(1) {
+            padding-top: 0;
+          }
+          hr {
+            border-color: $colorMain;
+          }
+        }
+        .buttonBox {
+          position: absolute;
+          left: calc(100% + 12px);
+          top: 50%;
+          transform: translateY(-50%);
+          display: grid;
+          gap: 20px;
+          .noShow {
+            opacity: 0;
+            cursor: "auto";
+          }
+        }
+      } // inputBox
+    } // form
+  } //editCustomerItem02
+}
+// =====================================================

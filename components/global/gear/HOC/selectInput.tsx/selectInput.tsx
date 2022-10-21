@@ -20,7 +20,7 @@ import Select03, { Toption } from "components/global/gear/select/select03"
 
 
 interface TselectProps {
-  stateValue: Toption | null
+  stateValue: Toption | string | null
   options: Toption[]
   placeholder: string
   onChange: (option: Toption | null) => void
@@ -40,10 +40,10 @@ interface TinputProps {
 
 
 export default function SelectInput(
-  { label, searchInputPropsList, disabled, labelWidth, className }:
+  { label, selectInputPropsList, disabled, labelWidth, className }:
     {
       label: string
-      searchInputPropsList: (TselectProps | TinputProps)[]
+      selectInputPropsList: (TselectProps | TinputProps)[]
       disabled?: boolean
       labelWidth?: string
       className?: string
@@ -63,7 +63,7 @@ export default function SelectInput(
       {/* <span style={labelStyle}>{label}</span> */}
       <span style={labelStyle}>{label}</span>
 
-      {searchInputPropsList.map((target, index) => {
+      {selectInputPropsList.map((target, index) => {
         const { stateValue, options, placeholder, onChange, width } = target
         const className = target.className || ""
         const theStyle = { width }
@@ -87,10 +87,14 @@ export default function SelectInput(
             style={theStyle}
             placeholder={placeholder}
             value={stateValue}
-            onChange={onChange}
             disabled={disabled}
             onFocus={onFocus}
             onBlur={onBlur}
+            onChange={onChange}
+            onKeyDown={(e) => {
+              if (e.code === "Enter") e.preventDefault()
+              if (e.code === "NumpadEnter") e.preventDefault()
+            }}
           />
           // <input className={style.input} key={index}
           //   type="text" autoComplete="off"

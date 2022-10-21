@@ -12,6 +12,7 @@ import iconArrow from "public/image/icon/arrow_down_red.svg"
 // css
 import style from "./select.module.scss"
 
+import type {Toption} from "fakeDatabase/options/options"
 
 
 const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
@@ -22,10 +23,8 @@ const myStyle: StylesConfig<Toption, false, GroupBase<Toption>> = {
 }
 
 
-type Toption = {
-  value: string
-  label: string
-}
+
+
 
 const Select01 = ({
   label, stateValue, placeholder, options, onChange,
@@ -82,8 +81,7 @@ const Select02 = ({
   className, width, labelWidth }:
   {
     label: string
-    // stateValue: string
-    stateValue: Toption | string | null
+    stateValue: Toption | string | null | undefined
     placeholder?: string
     options: Toption[]
     onChange: (option: Toption | null) => void
@@ -98,7 +96,10 @@ const Select02 = ({
       label: stateValue
     }
     : stateValue;
+  if (!option) option = null
+  // 為了讓placeholder在空字串的情況下能顯示
   if (option?.value === "") option = null
+
 
 
   // ========================================================

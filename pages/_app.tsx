@@ -1,14 +1,18 @@
-import Head from 'next/head'
-
-
-import type { AppProps } from 'next/app'
-
+import { useState, useEffect } from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import type { NextPage } from 'next'
 
+import Head from 'next/head'
+import type { AppProps } from 'next/app'
+import type { NextPage } from 'next'
 
 // conponents
 import Layer from "components/Layer/Layer"
+
+// global gear
+import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover'
+
+// api
+import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
 
 // css
 import '../styles/globals.scss'
@@ -23,14 +27,32 @@ type AppPropsWithLayout = AppProps & {
 }
 
 
-
-
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-
-
+  const [ready, setReady] = useState(false)
+  // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
 
+  useEffect(() => {
+    (async () => {
+      // 檢查是否已登入
+      const authInfo = await apiAuthMe()
+      // 如果為false，就進行登入
+      if (!authInfo?.id) {
+        await apiLogin({
+          // account: "",
+          // password: ""
+          account: "admin",
+          password: "1qaz#EDC5tgb"
+        })
+      }
+      // 登入程序完畢，ready設為true
+      setReady(true)
+    })()
+  }, [])
 
+  // ----
+  if (!ready) return null
+  // ----
   return (
 
     <>
@@ -42,11 +64,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           <Component {...pageProps} />
         )}
       </Layer>
+      {/* 全域loading cover */}
+      {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
+      <RootLoadingCover />
     </>
   )
 }
 
 export default MyApp
-
 
 
