@@ -51,4 +51,8 @@
 // 派工單列表
 .dispatchList {
   padding: 40px 0 20px 0;
+  background-color: #000;
+  > hr {
+    border-color: red;
+  }
 }

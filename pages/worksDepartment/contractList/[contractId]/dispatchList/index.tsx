@@ -25,17 +25,16 @@ export default function DispatchList() {
   const router = useRouter()
   // ----------------------------------------------------
   // const [data, setData] = useState<TfakeData>()
-  const [profile, setProfile] = useState<TfakeProfile>()
-  const [list, setList] = useState<TfakeDispatch[]>()
+  const [profile, setProfile] = useState<Partial<TfakeProfile>>({})
+  const [list, setList] = useState<TfakeDispatch[]>([])
 
 
   useEffect(() => {
     setProfile(fakeProfileOri(router.query.contractId as string ?? ""))
     setList(fakeListOri())
+    setIsReady(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-
 
   // ----------------------------------------------------
   const panelList: TpanelList = [
@@ -46,6 +45,7 @@ export default function DispatchList() {
     }
   ]
 
+  if (!isReady) return null
   return (
     <div className={style.container}>
 
@@ -55,7 +55,7 @@ export default function DispatchList() {
 
         {profile && list &&
           <div className={style.dispatchList}>
-            <Profile profile={profile!} setProfile={setProfile as Dispatch<SetStateAction<TfakeProfile>>} />
+            <Profile profile={profile!} setProfile={setProfile} />
             <List list={list} setList={setList as Dispatch<SetStateAction<TfakeDispatch[]>>} />
           </div>
         }

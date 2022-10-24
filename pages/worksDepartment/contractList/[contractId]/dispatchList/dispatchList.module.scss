@@ -3,21 +3,14 @@
 
 // 派工單列表
 
-
-
-
-
-.dispatchList {
+.dispatchList,
+.add {
   padding: 40px 0 20px 0;
 }
 
-
-
-
-
-
-
-
-
-
-
+.add {
+  > hr {
+    border-color: $colorBorder01;
+    margin: 36px 4px;
+  }
+}
