@@ -47,11 +47,11 @@
   textArea {
     background-color: transparent;
   }
-  &.disabled {
-    > hr {
-      border-color: transparent;
-    }
+
+  &.disabled > .textArea ~ hr {
+    border-color: transparent ;
   }
+
   > hr {
     &.noUnderline {
       border-color: transparent;
