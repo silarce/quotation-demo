@@ -1,0 +1,18 @@
+@use "styles/theme01" as *;
+
+.profile {
+  display: grid;
+  height: fit-content;
+  margin: 40px 50px 0;
+  grid-template-columns: repeat(2, fit-content(100%));
+  gap: 18px 105px;
+  .input02 {
+    padding: 0;
+    > span {
+      color: $colorMain;
+    }
+    > hr {
+      border-color: $colorBorder01;
+    }
+  }
+}

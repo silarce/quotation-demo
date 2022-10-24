@@ -9,6 +9,7 @@ import { useRouter } from "next/router"
 import MyButton from "components/global/gear/button/myButton"
 import RedButton from "components/global/gear/button/redButton"
 import AddButton from "components/global/gear/button/addButton"
+import ExportButton from "components/global/gear/button/exportButton"
 import InputSearch from "components/global/gear/input/inputSearch"
 import SearchBar, { TsearchObj } from "components/global/gear/HOC/searchBar/searchBar"
 
@@ -32,9 +33,9 @@ interface Tlink {
   href: string
 }
 
-// 三種按鈕
+// 各種按鈕，可以變更或加上icon
 interface Tpanel01 {
-  type: "myButton" | "redButton" | "addButton"
+  type: "myButton" | "redButton" | "addButton" | "exportButton"
   label: string
   onClick: () => void
   placeholder?: undefined
@@ -242,8 +243,9 @@ function PanelList({ panelList }:
               type === "myButton" ? <MyButton {...{ label, onClick, className, img }} />
                 : type === "redButton" ? <RedButton {...{ label, onClick, className, img }} />
                   : type === "addButton" ? <AddButton {...{ label, onClick, className, img }} />
-                    : type === "inputSearch" ? <InputSearch {...item} />
-                      : <></>
+                    : type === "exportButton" ? <ExportButton {...{ label, onClick, className, img }} />
+                      : type === "inputSearch" ? <InputSearch {...item} />
+                        : <></>
             }
           </Fragment>
         )
