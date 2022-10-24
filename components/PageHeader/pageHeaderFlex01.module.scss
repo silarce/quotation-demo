@@ -4,13 +4,15 @@
   display: flex;
   width: 100%;
   height: 58px;
+  border: solid 1px $colorBorder01;
+  background-color: $bgc01;
+  border-bottom-color: transparent;
   > button,
   > div,
   > a {
     flex: auto;
     position: relative;
     display: inline-flex;
-    background-color: $bgc01;
     > span {
       font-weight: 400;
       font-size: 18px;
@@ -18,10 +20,11 @@
     }
     > .bottomBar {
       position: absolute;
-      bottom: -1px;
+      bottom: -2px;
       width: 100%;
       border-width: 0 0 2px 0;
       border-color: transparent;
+      z-index: 1;
     }
 
     &.active {
