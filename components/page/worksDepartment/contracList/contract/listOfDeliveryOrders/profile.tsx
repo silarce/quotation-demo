@@ -14,10 +14,11 @@ import type { Tprofile } from "pages/worksDepartment/contractList/[contractId]/l
 
 
 export default function Profile(
-  { data, setData }:
+  { data, setData, editable }:
     {
       data: Partial<Tprofile>
       setData: Dispatch<SetStateAction<Partial<Tprofile>>>
+      editable: boolean
     }
 ) {
 
@@ -41,7 +42,9 @@ export default function Profile(
             onChange={onChange}
             labelWidth="80px"
             width={key === "projectName" ? "700px" : "255px"}
-            disabled={key === "projectName" ? true : false}
+            disabled={
+              !editable || key === "projectName" ? true : false
+            }
           />
         )
       })}

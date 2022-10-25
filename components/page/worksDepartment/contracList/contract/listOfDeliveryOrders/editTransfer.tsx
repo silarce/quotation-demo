@@ -30,12 +30,14 @@ import { Ttransfer } from "pages/worksDepartment/contractList/[contractId]/listO
 export default function EditTransfer(
   { transferList, setTransferList,
     addTransfer, delTransfer,
+    editable
   }:
     {
       transferList: Ttransfer[]
       setTransferList: Dispatch<SetStateAction<Ttransfer[]>>
       addTransfer: () => void
       delTransfer: (index: number) => void
+      editable: boolean
     }
 ) {
 
@@ -103,6 +105,7 @@ export default function EditTransfer(
                           stateValue={stateValue}
                           onChange={onChangeInput}
                           placeholder=""
+                          disabled={!editable}
                         />
                       }
                       {type === "select" &&
@@ -111,6 +114,7 @@ export default function EditTransfer(
                           onChange={onChangeSel}
                           options={options!}
                           placeholder=""
+                          disabled={!editable}
                         />
                       }
                     </div>

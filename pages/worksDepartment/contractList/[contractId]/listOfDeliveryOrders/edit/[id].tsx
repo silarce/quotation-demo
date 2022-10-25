@@ -11,6 +11,7 @@ import PageHeader, { TpanelList } from "components/page/worksDepartment/contracL
 import Profile from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/profile"
 import EditTransfer from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/editTransfer"
 import IconEdit from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/iconEdit"
+import Signature from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/signature"
 
 // css
 import style from "../listOfDeliveryOrders.module.scss"
@@ -20,9 +21,11 @@ import style from "../listOfDeliveryOrders.module.scss"
 export default function Edit() {
   const [isReady, setIsReady] = useState(false)
   const router = useRouter()
+  const [editable, setEditable] = useState(false)
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Partial<Tprofile>>({})
   const [transferList, setTransferList] = useState<Ttransfer[]>([])
+  const [signature, setSignature] = useState<Partial<Tsignature>>({})
 
   const addTransfer = () => {
     transferList.push(fakeTransferOri())
@@ -33,11 +36,14 @@ export default function Edit() {
     setTransferList([...transferList])
   }
 
-
-
-  useEffect(() => {
+  const init = () => {
     setProfile(fakeProfileOri())
     setTransferList(fakeTransferListOri())
+    setSignature(fakeSignatureOri())
+  }
+
+  useEffect(() => {
+    init()
     setIsReady(true)
   }, [])
 
@@ -46,9 +52,11 @@ export default function Edit() {
   // ----------------------------------------------------
   const panelList: TpanelList = [
     {
-      type: "myButton",
-      label: "編輯",
-      onClick: () => alert("test")
+      type: editable ? "redButton" : "myButton",
+      label: editable ? "取消" : "編輯",
+      onClick: () => {
+        editable ? init() : setEditable(state => !state)
+      }
     },
     {
       type: "exportButton",
@@ -57,7 +65,7 @@ export default function Edit() {
     },
     {
       type: "myButton",
-      label: "取消",
+      label: "返回",
       onClick: () => router.back()
     },
   ]
@@ -70,15 +78,24 @@ export default function Edit() {
 
       <PageHeader panelList={panelList} />
 
-      <div className={`${style.mainContainer} ${style.powerTransmissionSpareList}`}>
-        <Profile data={profile} setData={setProfile} />
-        <EditTransfer
-          transferList={transferList}
-          setTransferList={setTransferList}
-          addTransfer={addTransfer}
-          delTransfer={delTransfer}
-        />
-        <IconEdit />
+      <div className={`${style.mainContainer}`}>
+        <div>
+          <Profile data={profile} setData={setProfile}
+            editable={editable} />
+          <EditTransfer
+            transferList={transferList}
+            setTransferList={setTransferList}
+            addTransfer={addTransfer}
+            delTransfer={delTransfer}
+            editable={editable}
+          />
+          <IconEdit />
+          <Signature
+            signature={signature}
+            setSignature={setSignature}
+            editable={editable}
+          />
+        </div>
       </div>
 
     </div>
@@ -134,4 +151,23 @@ const fakeTransferOri = (): Ttransfer => ({
   qty: "",
   reason: "",
 })
+
+// ===========================================================
+
+export type Tsignature = {
+  會計: string
+  倉庫: string
+  廠務主管: string
+  單位主管: string
+  填表: string
+}
+
+const fakeSignatureOri = (): Tsignature => ({
+  會計: "",
+  倉庫: "",
+  廠務主管: "林曉雯",
+  單位主管: "林曉雯",
+  填表: "林曉雯",
+})
+
 
