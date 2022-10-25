@@ -22,7 +22,7 @@ const Input02 = (
     disabled, labelColor, noUnderline
   }:
     {
-      label: string,
+      label?: string,
       stateValue: string | number | undefined | null,
       // onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
       onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
@@ -48,9 +48,12 @@ const Input02 = (
   // ========================================================
 
   const lableStyle = {
-    width: width ? width : "",
-    gridTemplateColumns: labelWidth ? `${labelWidth} auto` : "",
-    gap: gap ? gap : "",
+    width: width ? width : undefined,
+    gridTemplateColumns:
+      !label ? `auto`
+        : labelWidth ? `${labelWidth} auto`
+          : undefined,
+    gap: gap ? gap : undefined,
   }
   // --------------------------
   const styleDisabled = disabled ? style.disabled : ""
@@ -71,7 +74,9 @@ const Input02 = (
       htmlFor={id}
       style={lableStyle}
     >
-      <span className={styleLabelColor}>{label}</span>
+      {label &&
+        <span className={styleLabelColor}>{label}</span>
+      }
 
       <TextareaAutosize className={style.textArea}
         id={id} placeholder={placeholder}
