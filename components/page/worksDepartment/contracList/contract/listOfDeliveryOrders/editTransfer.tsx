@@ -36,7 +36,6 @@ export default function EditTransfer(
       setTransferList: Dispatch<SetStateAction<Ttransfer[]>>
       addTransfer: () => void
       delTransfer: (index: number) => void
-
     }
 ) {
 
