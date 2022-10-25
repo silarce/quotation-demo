@@ -20,7 +20,7 @@ const getClassName = (props: SVGProps<SVGSVGElement>) => {
 
 
 
-function Icondelete01(props: SVGProps<SVGSVGElement>) {
+function IconDelete01(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -137,7 +137,7 @@ export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
 
 
 export {
-  Icondelete01, //垃圾桶icon
+  IconDelete01 as IconDelete01, //垃圾桶icon
   IconEdit,
   IconSearch,
   IconCopy,

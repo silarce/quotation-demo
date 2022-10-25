@@ -10,7 +10,7 @@ import CellWithBar from "components/global/gear/cell/cellWithBar";
 
 // icon
 import {
-  Icondelete01 as IconDelete,
+  IconDelete01 as IconDelete,
   IconEdit
 } from "public/image/icon/svgComponent/svgIcons"
 
