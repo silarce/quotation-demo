@@ -10,6 +10,7 @@ import { useRouter } from "next/router"
 import PageHeader, { TpanelList } from "components/page/worksDepartment/contracList/contract/gear/PageHeader"
 import Profile from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/profile"
 import EditTransfer from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/editTransfer"
+import IconEdit from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/iconEdit"
 
 // css
 import style from "../listOfDeliveryOrders.module.scss"
@@ -77,6 +78,7 @@ export default function Edit() {
           addTransfer={addTransfer}
           delTransfer={delTransfer}
         />
+        <IconEdit />
       </div>
 
     </div>

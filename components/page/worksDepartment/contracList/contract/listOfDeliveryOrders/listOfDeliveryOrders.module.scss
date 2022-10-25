@@ -98,7 +98,7 @@
       .sel {
         // 為了對齊
         margin-bottom: 0.14px;
-        min-height: 25.14px;;
+        min-height: 25.14px;
       }
     }
   }
@@ -112,7 +112,6 @@
   padding: 3px;
   > .head {
     background-color: $bgc01;
-    padding-top: 11px;
-    padding-bottom: 11px;
+    padding: 11px 30px;
   }
 }
