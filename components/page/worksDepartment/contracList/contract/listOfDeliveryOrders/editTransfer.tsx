@@ -102,6 +102,7 @@ export default function EditTransfer(
                         <Input02 className={style.input}
                           stateValue={stateValue}
                           onChange={onChangeInput}
+                          placeholder=""
                         />
                       }
                       {type === "select" &&
@@ -109,6 +110,7 @@ export default function EditTransfer(
                           stateValue={stateValue}
                           onChange={onChangeSel}
                           options={options!}
+                          placeholder=""
                         />
                       }
                     </div>
