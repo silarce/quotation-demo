@@ -16,3 +16,60 @@
     }
   }
 }
+
+.editTransfer {
+  border: solid 1px $colorBorder01;
+  margin: 0 16px;
+  padding: 3px;
+  .thead,
+  .row {
+    display: flex;
+    > div {
+      margin: auto;
+      &:nth-of-type(1) {
+        width: 20px;
+        margin: auto 16px auto 22px;
+        text-align: center;
+      }
+      &:nth-of-type(2) {
+        width: 20px;
+        margin-right: 10px;
+        text-align: center;
+      }
+    }
+  }
+  .thead {
+    background-color: $bgc01;
+    height: 40px;
+    > div {
+      &.center {
+        text-align: center;
+      }
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+        color: $colorMain;
+      }
+    }
+  }
+  .row {
+    > div {
+      height: fit-content;
+      padding: 10px 0;
+      &.center {
+        input {
+          text-align: center;
+        }
+      }
+      .input,
+      .sel {
+        padding: 0;
+        span,
+        input {
+          font-weight: 400;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}

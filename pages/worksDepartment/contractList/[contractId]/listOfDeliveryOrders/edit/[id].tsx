@@ -9,7 +9,7 @@ import { useRouter } from "next/router"
 // component
 import PageHeader, { TpanelList } from "components/page/worksDepartment/contracList/contract/gear/PageHeader"
 import Profile from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/profile"
-
+import EditTransfer from "components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/editTransfer"
 
 // css
 import style from "../listOfDeliveryOrders.module.scss"
@@ -21,9 +21,11 @@ export default function Edit() {
   const router = useRouter()
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Partial<Tprofile>>({})
+  const [transferList, setTransferList] = useState<Ttransfer[]>([])
 
   useEffect(() => {
     setProfile(fakeProfileOri())
+    setTransferList(fakeTransferListOri())
     setIsReady(true)
   }, [])
 
@@ -58,6 +60,10 @@ export default function Edit() {
 
       <div className={`${style.mainContainer} ${style.powerTransmissionSpareList}`}>
         <Profile data={profile} setData={setProfile} />
+        <EditTransfer
+          transferList={transferList}
+          setTransferList={setTransferList}
+        />
       </div>
 
     </div>
@@ -86,11 +92,23 @@ const fakeProfileOri = (): Tprofile => ({
 })
 
 
+// ===========================================================
 
+export type Ttransfer = {
+  itemName: string
+  material: string
+  qty: string
+  reason: string
+}
 
-
-
-
-
-
-
+const fakeTransferListOri = (): Ttransfer[] => {
+  const transferOri = () => ({
+    itemName: "SD1",
+    material: "304",
+    qty: "1",
+    reason: "frestgertgdgg",
+  })
+  return Array(4)
+    .fill(undefined)
+    .map(() => transferOri())
+}
