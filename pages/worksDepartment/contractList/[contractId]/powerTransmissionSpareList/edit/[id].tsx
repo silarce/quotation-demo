@@ -9,7 +9,7 @@ import { useRouter } from "next/router"
 // component
 import PageHeader, { TpanelList } from "components/page/worksDepartment/contracList/contract/gear/PageHeader"
 import Profile from "components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/profile"
-
+import Sheet from "components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/sheet"
 
 // css
 import style from "../powerTransmissionSpareList.module.scss"
@@ -70,6 +70,7 @@ export default function Edit() {
 
       <div className={`${style.mainContainer} ${style.powerTransmissionSpareList}`}>
         <Profile data={profile} setData={setProfile} />
+        <Sheet />
       </div>
 
     </div>

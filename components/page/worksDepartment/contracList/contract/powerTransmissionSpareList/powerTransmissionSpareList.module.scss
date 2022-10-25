@@ -16,3 +16,21 @@
     }
   }
 }
+
+.sheet {
+  div {
+    border: solid 1px black;
+  }
+  .c1 {
+    display: grid;
+    grid-template-columns: 2fr 10fr;
+    .c2 {
+      display: grid;
+      grid-template-columns: 2fr 10fr;
+      .c3 {
+        display: grid;
+        grid-template-columns: 2fr 10fr;
+      }
+    }
+  }
+}
