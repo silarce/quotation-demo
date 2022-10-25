@@ -10,14 +10,24 @@ export type { TpanelList }
 
 
 
-export default function PageHeader({ panelList }:
-  { panelList?: TpanelList }) {
+export default function PageHeader({ tagCallback, panelList }:
+  {
+    tagCallback?: (contractId: string) => string
+    panelList?: TpanelList
+  }) {
 
   const router = useRouter()
   const isReady = router.isReady
   if (!isReady) return null
 
+
   const { contractId } = router.query
+
+  const tag
+    = tagCallback
+    && tagCallback(contractId as string)
+    || `合約編號${contractId}`
+
   const pathHead = `/worksDepartment/contractList/${contractId}`
   const linkList = [
     {
@@ -57,7 +67,7 @@ export default function PageHeader({ panelList }:
   return (
     <div>
       <PageHeader02
-        tag={`合約編號${contractId}`}
+        tag={tag}
         panelList={panelList} />
       <PageHeaderFlex01 linkList={linkList} />
     </div>
