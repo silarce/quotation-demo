@@ -23,6 +23,17 @@ export default function Edit() {
   const [profile, setProfile] = useState<Partial<Tprofile>>({})
   const [transferList, setTransferList] = useState<Ttransfer[]>([])
 
+  const addTransfer = () => {
+    transferList.push(fakeTransferOri())
+    setTransferList([...transferList])
+  }
+  const delTransfer = (index: number) => {
+    transferList.splice(index, 1)
+    setTransferList([...transferList])
+  }
+
+
+
   useEffect(() => {
     setProfile(fakeProfileOri())
     setTransferList(fakeTransferListOri())
@@ -63,6 +74,8 @@ export default function Edit() {
         <EditTransfer
           transferList={transferList}
           setTransferList={setTransferList}
+          addTransfer={addTransfer}
+          delTransfer={delTransfer}
         />
       </div>
 
@@ -104,11 +117,19 @@ export type Ttransfer = {
 const fakeTransferListOri = (): Ttransfer[] => {
   const transferOri = () => ({
     itemName: "SD1",
-    material: "304",
+    material: "不鏽鋼304#",
     qty: "1",
-    reason: "frestgertgdgg",
+    reason: "退貨理由退貨理由退貨理由退貨理由退貨理由退貨理由退貨理由",
   })
   return Array(4)
     .fill(undefined)
     .map(() => transferOri())
 }
+
+const fakeTransferOri = (): Ttransfer => ({
+  itemName: "",
+  material: "",
+  qty: "",
+  reason: "",
+})
+
