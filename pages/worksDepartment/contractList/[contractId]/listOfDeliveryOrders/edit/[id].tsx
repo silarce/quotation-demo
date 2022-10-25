@@ -50,6 +50,11 @@ export default function Edit() {
 
 
   // ----------------------------------------------------
+  const tagCallback = (contractId: string) => {
+    return `調(退)貨單 ${contractId}`
+  }
+
+
   const panelList: TpanelList = [
     {
       type: editable ? "redButton" : "myButton",
@@ -76,7 +81,7 @@ export default function Edit() {
 
     <div className={style.container}>
 
-      <PageHeader panelList={panelList} />
+      <PageHeader panelList={panelList} tagCallback={tagCallback} />
 
       <div className={`${style.mainContainer}`}>
         <div>
