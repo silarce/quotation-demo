@@ -113,7 +113,7 @@ export const optionsCreator_clientSearch =
   (): Toption[] => [
     { value: "customerNumber", label: "客戶編號" },
     { value: "name", label: "客戶名稱" },
-    // { value: "contactPerson", label: "聯絡人" },
+    { value: "contacts.name", label: "聯絡人" },
     { value: "phone", label: "電話" },
   ]
 
