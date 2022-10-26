@@ -13,5 +13,8 @@ $hoverBgc01: #ecf1ff;
 $chosenBgc01: #ffeeee;
 
 :export {
+  colorMain: $colorMain;
+  colorText: $colorText;
   colorBorder01: $colorBorder01;
+  bgc01: $bgc01;
 }

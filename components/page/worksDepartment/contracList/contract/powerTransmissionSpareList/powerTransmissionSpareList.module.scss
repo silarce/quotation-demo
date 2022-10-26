@@ -18,18 +18,53 @@
 }
 
 .sheet {
-  div {
-    border: solid 1px black;
-  }
-  .c1 {
+  margin: 40px 16px 130px;
+  padding: 3px;
+  border: solid 1px $colorBorder01;
+  .thead,
+  .tbody {
     display: grid;
-    grid-template-columns: 2fr 10fr;
-    .c2 {
-      display: grid;
-      grid-template-columns: 2fr 10fr;
-      .c3 {
-        display: grid;
-        grid-template-columns: 2fr 10fr;
+    grid-template-columns: 2fr 2fr 7fr 1fr;
+    > div {
+      text-align: center;
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+      &:nth-of-type(3) {
+        text-align: left;
+        > span {
+          margin-left: 20px;
+        }
+      }
+    }
+  }
+
+  .thead {
+    background-color: $bgc01;
+    border-bottom: solid 1px $colorBorder01;
+    margin-bottom: 3px;
+    > div {
+      // border: solid 1px black;
+      > span {
+        color: $colorMain;
+      }
+    }
+  }
+
+  .tbody {
+    // border: solid 1px $colorBorder01;
+    // border-width: 1px 0px 0px 1px;
+    > div {
+      > div {
+        &:nth-last-of-type(1) {
+          border-bottom: 0;
+        }
+      }
+    }
+    > div:nth-last-of-type(1) {
+      > div {
+        border-right: 0;
       }
     }
   }

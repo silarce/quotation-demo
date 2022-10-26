@@ -68,9 +68,12 @@ export default function Edit() {
 
       <PageHeader panelList={panelList} />
 
-      <div className={`${style.mainContainer} ${style.powerTransmissionSpareList}`}>
+      <div className={`${style.mainContainer}`}>
+        <div className={style.powerTransmissionSpareList}>
+
         <Profile data={profile} setData={setProfile} />
         <Sheet />
+        </div>
       </div>
 
     </div>
