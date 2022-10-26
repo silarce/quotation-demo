@@ -60,7 +60,8 @@ export default function Edit() {
       type: editable ? "redButton" : "myButton",
       label: editable ? "取消" : "編輯",
       onClick: () => {
-        editable ? init() : setEditable(state => !state)
+        if (editable) { init(); setEditable(false) }
+        else setEditable(true)
       }
     },
     {
