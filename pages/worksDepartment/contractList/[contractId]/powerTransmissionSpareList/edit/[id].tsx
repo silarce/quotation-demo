@@ -10,6 +10,7 @@ import { useRouter } from "next/router"
 import PageHeader, { TpanelList } from "components/page/worksDepartment/contracList/contract/gear/PageHeader"
 import Profile from "components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/profile"
 import Sheet from "components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/sheet"
+import Signature from "components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/signature"
 
 // css
 import style from "../powerTransmissionSpareList.module.scss"
@@ -17,25 +18,22 @@ import style from "../powerTransmissionSpareList.module.scss"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+// ======================================================
 export default function Edit() {
   const [isReady, setIsReady] = useState(false)
   const router = useRouter()
+  const [editable, setEditable] = useState(false)
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Partial<Tprofile>>({})
+  const [signature, setSignature] = useState<Partial<Tsignature>>({})
+
+  const init = () => {
+    setProfile(fakeProfileOri())
+    setSignature(fakeSignatureOri())
+  }
 
   useEffect(() => {
-    setProfile(fakeProfileOri())
+    init()
     setIsReady(true)
   }, [])
 
@@ -44,9 +42,12 @@ export default function Edit() {
   // ----------------------------------------------------
   const panelList: TpanelList = [
     {
-      type: "myButton",
-      label: "編輯",
-      onClick: () => alert("test")
+      type: editable ? "redButton" : "myButton",
+      label: editable ? "取消" : "編輯",
+      onClick: () => {
+        if (editable) { init(); setEditable(false) }
+        else setEditable(true)
+      }
     },
     {
       type: "exportButton",
@@ -70,9 +71,13 @@ export default function Edit() {
 
       <div className={`${style.mainContainer}`}>
         <div className={style.powerTransmissionSpareList}>
-
-        <Profile data={profile} setData={setProfile} />
-        <Sheet />
+          <Profile data={profile} setData={setProfile}
+            editable={editable} />
+          <Sheet editable={editable}/>
+          <Signature
+            signature={signature} setSignature={setSignature}
+            editable={editable}
+          />
         </div>
       </div>
 
@@ -99,6 +104,20 @@ const fakeProfileOri = (): Tprofile => ({
   projectName: "台中港加工處理區-宇隆科技廠房增建工程A",
   neededDate: "111-02-02",
   applyDate: "111-02-02",
+})
+
+
+// ===================================================
+export type Tsignature = {
+  領料人員: string
+  配料人員: string
+  填表人員: string
+}
+
+const fakeSignatureOri = (): Tsignature => ({
+  領料人員: "林曉雯",
+  配料人員: "林曉雯",
+  填表人員: "林曉雯",
 })
 
 

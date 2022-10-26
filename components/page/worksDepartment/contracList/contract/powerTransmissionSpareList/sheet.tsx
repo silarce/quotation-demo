@@ -14,7 +14,11 @@ import style from "./powerTransmissionSpareList.module.scss"
 
 
 
-export default function Sheet() {
+export default function Sheet(
+  { editable }:
+    { editable: boolean }
+
+) {
 
   return (
     <div className={style.sheet}>
@@ -50,7 +54,7 @@ export default function Sheet() {
                     return (
                       <Fragment key={c3Index}>
                         <Cother {...{ rSpan, cSpan }}>
-                          <textarea placeholder="其他..." />
+                          <textarea placeholder="其他..." disabled={!editable}/>
                         </Cother>
                       </Fragment>
                     )
@@ -76,7 +80,12 @@ export default function Sheet() {
                         </SubCell>
                         {subKeys!.map((key, subIndex) => {
                           return (
-                            <C4 key={subIndex}><input type="text" /></C4>
+                            <C4 key={subIndex}
+                              editable={editable}
+                            >
+                              <input type="text" defaultValue={defaultValue}
+                                disabled={!editable} />
+                            </C4>
                           )
                         })}
                       </Fragment>
@@ -86,7 +95,11 @@ export default function Sheet() {
                   return (
                     <Fragment key={c3Index}>
                       <C3><span>{label}</span></C3>
-                      <C4><input type="text" defaultValue={defaultValue} /></C4>
+                      <C4 editable={editable}>
+                        <input type="text" defaultValue={defaultValue}
+                          disabled={!editable}
+                        />
+                      </C4>
                     </Fragment>
                   )
                 })}
@@ -105,8 +118,9 @@ export default function Sheet() {
 
 
 // =======================================
-
-
+// =======================================
+// =======================================
+// =======================================
 
 const Tbody = styled.div`
 display: grid;
@@ -146,14 +160,15 @@ const C3 = styled(CellInit)`
   margin-left:20px;
 }
 `
-const C4 = styled(CellInit)`
+const C4 = styled(CellInit) <{ editable: boolean }>`
 display: grid;
 border-right: none;
 >input{
   width:50px;
   margin:auto;
-  border-bottom:solid 1px black;
+  border-bottom:solid 1px ${({ editable }) => editable ? "black" : "transparent"} ;
   text-align: center;
+  background-color: transparent;
 }
 `
 
@@ -179,6 +194,8 @@ border:none;
 `
 
 
+// ===========================================
+// ===========================================
 // ===========================================
 
 type Tc2IndexKeys =

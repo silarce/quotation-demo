@@ -18,7 +18,7 @@
 }
 
 .sheet {
-  margin: 40px 16px 130px;
+  margin: 40px 16px 0px;
   padding: 3px;
   border: solid 1px $colorBorder01;
   .thead {
@@ -49,6 +49,23 @@
       > span {
         color: $colorMain;
       }
+    }
+  }
+}
+
+.signature {
+  margin: 130px 50px 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 45px;
+  .cell {
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+    }
+    > .input02 {
+      padding: 24px 0 14px;
     }
   }
 }
