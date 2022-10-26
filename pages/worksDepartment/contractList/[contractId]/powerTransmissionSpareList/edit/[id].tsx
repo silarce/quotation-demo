@@ -56,7 +56,7 @@ export default function Edit() {
     },
     {
       type: "myButton",
-      label: "取消",
+      label: "返回",
       onClick: () => router.back()
     },
   ]
