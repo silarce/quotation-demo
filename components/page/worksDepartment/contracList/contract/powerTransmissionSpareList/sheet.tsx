@@ -25,7 +25,7 @@ export default function Sheet() {
         <div><span>種類</span></div>
         <div><span>數量</span></div>
       </div>
-      
+
       <Tbody>
         <C1><span>門型</span></C1>
         {c2IndexKeys.map((c2Key, index) => {
@@ -43,7 +43,7 @@ export default function Sheet() {
               {c3Config[c2Key]
                 .indexKeys.map((c3Key, c3Index) => {
 
-                  const { label, rSpan, cSpan, type, }
+                  const { label, rSpan, cSpan, type, defaultValue }
                     = c3Config[c2Key].config[c3Key]
 
                   if (c2Key === "其他") {
@@ -86,7 +86,7 @@ export default function Sheet() {
                   return (
                     <Fragment key={c3Index}>
                       <C3><span>{label}</span></C3>
-                      <C4><input type="text" /></C4>
+                      <C4><input type="text" defaultValue={defaultValue} /></C4>
                     </Fragment>
                   )
                 })}
@@ -153,6 +153,7 @@ border-right: none;
   width:50px;
   margin:auto;
   border-bottom:solid 1px black;
+  text-align: center;
 }
 `
 
@@ -209,6 +210,7 @@ const c3Config: {
             label: string
           }
         }
+        defaultValue?: string
       }
     }
   }
@@ -216,19 +218,19 @@ const c3Config: {
   鎖盒: {
     indexKeys: ["a", "b", "c", "d", "e", "f",],
     config: {
-      a: { label: "智慧型" },
-      b: { label: "面板式" },
-      c: { label: "埋入式" },
-      d: { label: "外露式" },
-      e: { label: "電子式" },
-      f: { label: "防爆式" },
+      a: { label: "智慧型", defaultValue: "1" },
+      b: { label: "面板式", defaultValue: "3" },
+      c: { label: "埋入式", defaultValue: "" },
+      d: { label: "外露式", defaultValue: "2" },
+      e: { label: "電子式", defaultValue: "1" },
+      f: { label: "防爆式", defaultValue: "1" },
     }
   },
   鎖匙: {
     indexKeys: ["a", "b"],
     config: {
-      a: { label: "鎖號" },
-      b: { label: "特殊鎖號" },
+      a: { label: "鎖號", defaultValue: "1" },
+      b: { label: "特殊鎖號", defaultValue: "2" },
     }
   },
   押扣: {
@@ -266,9 +268,9 @@ const c3Config: {
   板門配件: {
     indexKeys: ["a", "b", "c"],
     config: {
-      a: { label: "門弓器" },
+      a: { label: "門弓器", defaultValue: "3" },
       b: { label: "平推鎖" },
-      c: { label: "電磁扣" },
+      c: { label: "電磁扣", defaultValue: "5" },
     }
   },
   主機: {
@@ -290,12 +292,11 @@ const c3Config: {
   防颱配件: {
     indexKeys: ["a", "b"],
     config: {
-      a: { label: "防颱鎖固" },
+      a: { label: "防颱鎖固", defaultValue: "8" },
       b: { label: "防颱中柱" },
     }
   },
   其他: {
-
     indexKeys: ["a"],
     config: {
       a: {
@@ -303,7 +304,6 @@ const c3Config: {
         cSpan: 2,
         type: "textarea"
       },
-
     }
   },
 }
