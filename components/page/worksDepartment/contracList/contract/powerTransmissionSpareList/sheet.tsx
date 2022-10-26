@@ -19,24 +19,26 @@ export default function Sheet() {
   return (
     <div className={style.sheet}>
 
-      {/* <div className={style.thead}>
+      <div className={style.thead}>
         <div><span>門型/數量</span></div>
         <div><span>品名</span></div>
         <div><span>種類</span></div>
         <div><span>數量</span></div>
-      </div> */}
-
-      {/* <div className={style.tbody}>
-      </div> */}
-
+      </div>
+      
       <Tbody>
         <C1><span>門型</span></C1>
         {c2IndexKeys.map((c2Key, index) => {
           const { label, rSpan } = c2Config[c2Key]
+
+          const noBottomBorder = c2Key === "其他" ? true : false
           return (
             <Fragment key={index}>
 
-              <C2 rSpan={rSpan}><span>{label}</span></C2>
+              <C2
+                rSpan={rSpan}
+                noBottomBorder={noBottomBorder}
+              ><span>{label}</span></C2>
 
               {c3Config[c2Key]
                 .indexKeys.map((c3Key, c3Index) => {
@@ -67,7 +69,7 @@ export default function Sheet() {
                             {subKeys!.map((key, subIndex) => {
                               const { label } = subConfig![key]
                               return (
-                                <C2 key={subIndex}><span>{label}</span></C2>
+                                <C3 key={subIndex}><span>{label}</span></C3>
                               )
                             })}
                           </div>
@@ -83,7 +85,7 @@ export default function Sheet() {
 
                   return (
                     <Fragment key={c3Index}>
-                      <C3 ><span>{label}</span></C3>
+                      <C3><span>{label}</span></C3>
                       <C4><input type="text" /></C4>
                     </Fragment>
                   )
@@ -107,35 +109,46 @@ export default function Sheet() {
 
 
 const Tbody = styled.div`
->div{
-  /* border: solid 1px black;
-  border-width: 0 1px 1px 0; */
-  /* min-height: 50px; */
-}
 display: grid;
-grid-template-columns: auto auto auto auto;
+grid-template-columns: 2fr 2fr 7fr 1fr;
 `
 
 const CellInit = styled.div<{
   rSpan?: number
   cSpan?: number
+  noBottomBorder?: boolean
 }>`
 grid-row: span ${({ rSpan }) => rSpan || 1};
 grid-column: span ${({ cSpan }) => cSpan || 1};
 min-height:${({ rSpan }) => (rSpan || 1) * 50}px;
-border: solid 1px black;
+border: solid 1px ${style.colorBorder01};
 border-width: 0 1px 1px 0;
+display: grid;
+border-bottom: ${({ noBottomBorder }) => noBottomBorder ? "0" : ""};
+>*{
+  margin:auto;
+  font-weight: 400;
+  font-size: 16px;
+}
 `
 
 const C1 = styled(CellInit)`
 grid-row: span 100;
+border-bottom: none;
+>*{
+  margin-top:20px;
+}
 `
 const C2 = styled(CellInit)`
 `
 const C3 = styled(CellInit)`
+>*{
+  margin-left:20px;
+}
 `
 const C4 = styled(CellInit)`
 display: grid;
+border-right: none;
 >input{
   width:50px;
   margin:auto;
@@ -144,6 +157,8 @@ display: grid;
 `
 
 const Cother = styled(CellInit)`
+border-right: none;
+border-bottom: none;
 >textarea{
   width:100%;
   height:100%;
@@ -156,45 +171,12 @@ const SubCell = styled(CellInit)`
 display: grid;
 grid-template-columns: 25% 75%;
 border:none;
+>*{
+  width:100%;
+  height:100%;
+}
 `
 
-
-// const CellInit = styled.div`
-// display: grid;
-// border:solid 1px ${style.colorBorder01};
-// border-width:0 1px 1px 0;
-// height:100%;
-// >span{margin:auto;};
-// `
-
-// const cellHeight = 50;
-
-// const Cell = styled(CellInit) <{ size?: number }>`
-// height:${({ size }) => (size || 1) * cellHeight}px;
-// `
-// const C3 = styled(Cell)`
-// >span{
-//   margin-left:20px;
-// }
-// `
-// const C4 = styled(Cell)`
-// >input{
-//   text-align: center;
-//   border-bottom:solid 1px black;
-//   padding:0 10px;
-//   width:60px;
-//   margin:auto;
-// }
-// `
-
-// const Cother = styled(Cell)`
-
-// >textarea{
-//   width:100%;
-//   height:100%;
-//   padding:10px
-// }
-// `
 
 // ===========================================
 
@@ -274,17 +256,6 @@ const c3Config: {
       },
     }
   },
-  // 控制箱盤: {
-  //   indexKeys: ["a", "b", "c", "d", "e", "f",],
-  //   config: {
-  //     a: { label: "3HP 馬達控制箱（380V）" },
-  //     b: { label: "3HP 馬達控制箱（380V）" },
-  //     c: { label: "2HP 馬達控制箱（220V）" },
-  //     d: { label: "2HP 馬達控制箱（220V）" },
-  //     e: { label: "彈射門控制箱" },
-  //     f: { label: "紅外線控制盤（含面板）" },
-  //   }
-  // },
   消防備品: {
     indexKeys: ["a", "b"],
     config: {

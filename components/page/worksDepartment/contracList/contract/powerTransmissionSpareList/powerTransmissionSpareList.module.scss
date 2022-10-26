@@ -21,10 +21,10 @@
   margin: 40px 16px 130px;
   padding: 3px;
   border: solid 1px $colorBorder01;
-  .thead,
-  .tbody {
+  .thead {
     display: grid;
     grid-template-columns: 2fr 2fr 7fr 1fr;
+    padding: 11px 0;
     > div {
       text-align: center;
       > span {
@@ -48,23 +48,6 @@
       // border: solid 1px black;
       > span {
         color: $colorMain;
-      }
-    }
-  }
-
-  .tbody {
-    // border: solid 1px $colorBorder01;
-    // border-width: 1px 0px 0px 1px;
-    > div {
-      > div {
-        &:nth-last-of-type(1) {
-          border-bottom: 0;
-        }
-      }
-    }
-    > div:nth-last-of-type(1) {
-      > div {
-        border-right: 0;
       }
     }
   }
