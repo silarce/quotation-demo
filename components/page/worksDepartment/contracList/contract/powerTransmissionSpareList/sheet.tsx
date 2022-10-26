@@ -1,13 +1,6 @@
-// @ t s-nocheck
 import styled from "@emotion/styled"
-import id from "date-fns/esm/locale/id/index.js"
 import React, { Fragment } from "react"
-
-
-
-
-
-
+import { useRouter } from "next/router"
 
 // css
 import style from "./powerTransmissionSpareList.module.scss"
@@ -19,6 +12,11 @@ export default function Sheet(
     { editable: boolean }
 
 ) {
+
+  const router = useRouter()
+  const isAdd = router.route.split("/").pop() === "add"
+
+
 
   return (
     <div className={style.sheet}>
@@ -54,7 +52,7 @@ export default function Sheet(
                     return (
                       <Fragment key={c3Index}>
                         <Cother {...{ rSpan, cSpan }}>
-                          <textarea placeholder="其他..." disabled={!editable}/>
+                          <textarea placeholder="其他..." disabled={!editable} />
                         </Cother>
                       </Fragment>
                     )
@@ -83,7 +81,7 @@ export default function Sheet(
                             <C4 key={subIndex}
                               editable={editable}
                             >
-                              <input type="text" defaultValue={defaultValue}
+                              <input type="text" defaultValue={isAdd ? "" : defaultValue}
                                 disabled={!editable} />
                             </C4>
                           )
@@ -96,7 +94,7 @@ export default function Sheet(
                     <Fragment key={c3Index}>
                       <C3><span>{label}</span></C3>
                       <C4 editable={editable}>
-                        <input type="text" defaultValue={defaultValue}
+                        <input type="text" defaultValue={isAdd ? "" : defaultValue}
                           disabled={!editable}
                         />
                       </C4>
