@@ -2,7 +2,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react"
 
 // global gear
 import Input02 from "components/global/gear/input/input02"
-
+import TimePicker01 from "components/global/gear/input/timePicker01"
 
 // css
 import style from "./powerTransmissionSpareList.module.scss"
@@ -26,8 +26,31 @@ export default function Profile(
   return (
     <div className={style.profile}>
       {indexKeys.map((key, index) => {
-        const { label } = config[key]
+        const { label, type } = config[key]
         const stateValue = data[key]
+        // -----
+        if (type === "date") {
+          const onChange = (dateString: string) => {
+            const value = dateString
+            setData(data => {
+              data[key] = value
+              return { ...data }
+            })
+          }
+          return (
+            <TimePicker01
+              className={style.input02}
+              label={label}
+              labelWidth="80px"
+              stateValue={stateValue}
+              onChange={onChange}
+              disabled={
+                !editable || key === "projectName" ? true : false
+              }
+            />
+          )
+        }
+        // -----
         const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
           const value = e.target.value
           setData(data => {
@@ -49,29 +72,7 @@ export default function Profile(
         )
       })}
     </div>
-    // <div className={style.profile}>
-    //   {indexKeys.map((key, index) => {
-    //     const { label } = config[key]
-    //     const stateValue = data[key]
-    //     const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    //       const value = e.target.value
-    //       setData(data => {
-    //         data[key] = value
-    //         return { ...data }
-    //       })
-    //     }
-    //     return (
-    //       <Input02 className={style.input02} key={index}
-    //         label={label}
-    //         stateValue={stateValue}
-    //         onChange={onChange}
-    //         labelWidth="80px"
-    //         width={key === "projectName" ? "700px" : "255px"}
-    //         disabled={key === "projectName" ? true : false}
-    //       />
-    //     )
-    //   })}
-    // </div>
+
   )
 }
 
@@ -90,6 +91,7 @@ const indexKeys: TindexKeys[]
 const config: {
   [key in TindexKeys]: {
     label: string
+    type?: "date"
   }
 } = {
   projectId: {
@@ -99,11 +101,26 @@ const config: {
     label: "工程名稱"
   },
   neededDate: {
-    label: "需要日期"
+    label: "需要日期",
+    type: "date"
   },
   applyDate: {
-    label: "填表日期"
+    label: "填表日期",
+    type: "date"
   },
 }
 
 
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
+// 把profile的時間input改為時間選擇器
