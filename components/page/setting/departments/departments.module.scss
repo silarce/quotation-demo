@@ -1,9 +1,20 @@
 @use "styles/theme01" as *;
 
-.titles {
-  .cell {
+.list {
+  .thead {
+    display: flex;
+    height: 64px;
+    background-color: $bgc01;
+    > div {
+      width: fit-content;
+      border: solid 1px black;
+    }
+  }
 
+  .tbody {
+    display: grid;
+    gap: 4px;
 
-    
+    background-color: pink;
   }
 }

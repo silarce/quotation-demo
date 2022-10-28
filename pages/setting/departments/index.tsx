@@ -49,13 +49,6 @@ export default function Department() {
 
   console.log(myDepartment)
 
-// 資料處理好了，接下來做介面
-// 資料處理好了，接下來做介面
-// 資料處理好了，接下來做介面
-// 資料處理好了，接下來做介面
-// 資料處理好了，接下來做介面
-
-
   useEffect(() => {
     (async () => {
       await update()
@@ -106,11 +99,9 @@ export default function Department() {
       <div className={style.mainContainer}>
         {data.data &&
           <div className={style.department}>
-            <List data={data} setData={setData} />
-
-
-
-
+            <List
+              myDepartment={myDepartment}
+              setMyDepartment={setMyDepartment} />
           </div>
         }
         <LoadingCover01 isLoading={isLoading} />
@@ -136,9 +127,20 @@ export default function Department() {
 5 patch前需要把多餘的屬性去掉 只留下name grade 
 */
 
+
+type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
+  jobs: TmyJobs[]
+  dOnChange?: (e: ChangeEvent<HTMLInputElement>) => void
+  // markDelete?: () => void
+  new?: boolean
+  patch?: boolean
+  delete?: boolean
+  // method?: "post" | "patch" | "delete"
+}
+
 type TmyJobs = Partial<Omit<TjobsData, "department">> & {
   grade: number
-  // onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   id?: string
   name?: string
   departmentId?: string
@@ -148,15 +150,6 @@ type TmyJobs = Partial<Omit<TjobsData, "department">> & {
   // method?: "post" | "patch"
 }
 
-type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
-  jobs: TmyJobs[]
-  // onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
-  // markDelete?: () => void
-  new?: boolean
-  patch?: boolean
-  delete?: boolean
-  // method?: "post" | "patch" | "delete"
-}
 // ----
 const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
 
@@ -201,13 +194,13 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
       item.jobs = myJobs
       // --------------------
       // 改變部門名稱與新增刪除部門的標記
-      // item.onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-      //   const value = e.target.value
-      //   myDepartment[dIndex].name = value
-      //   myDepartment[dIndex].patch = true
+      item.dOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value
+        myDepartment[dIndex].name = value
+        myDepartment[dIndex].patch = true
+        setMyDepartment([...myDepartment])
+      }
 
-      //   setMyDepartment([...myDepartment])
-      // }
       // item.markDelete = () => {
       //   myDepartment[dIndex].delete = true
       //   setMyDepartment([...myDepartment])
@@ -230,6 +223,7 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
   return { myDepartment, setMyDepartment }
 }
 
+export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
 
 
 
