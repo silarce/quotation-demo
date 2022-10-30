@@ -1,7 +1,7 @@
 // 公司職等職稱
 // 公司職等職稱
 import {
-  ChangeEvent, Dispatch, SetStateAction,
+  ChangeEvent, Dispatch, SetStateAction, MouseEvent,
   useState, useEffect, useMemo
 } from "react"
 
@@ -45,9 +45,9 @@ export default function Department() {
   // ---------------------------------------------------------
   // 取得部門列表
   const { data, setData, update } = useDepartments(params)
-  const { myDepartment, setMyDepartment } = useDeparmentGrid(data)
+  const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data)
 
-  console.log(myDepartment)
+
 
   useEffect(() => {
     (async () => {
@@ -62,24 +62,24 @@ export default function Department() {
     {
       type: "myButton",
       label: "編輯",
-      onClick: () => { alert("test") }
+      onClick: () => { setEditable(true) }
     }
   ]
   const panelList02: TpanelList = [
     {
       type: "addButton",
       label: "新增部門",
-      onClick: () => { alert("test") }
+      onClick: () => { }
     },
     {
       type: "redButton",
       label: "上傳",
-      onClick: () => { alert("test") }
+      onClick: () => { uploads(myDepartment) }
     },
     {
       type: "myButton",
       label: "取消",
-      onClick: () => { alert("test") }
+      onClick: () => { setEditable(false) }
     },
   ]
   // ---------------------------------------------------------
@@ -93,7 +93,7 @@ export default function Department() {
     <div className={style.container}>
       <PageHeader02
         tag="公司職等職稱"
-        panelList={panelList01}
+        panelList={editable ? panelList02 : panelList01}
       />
 
       <div className={style.mainContainer}>
@@ -130,24 +130,22 @@ export default function Department() {
 
 type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
   jobs: TmyJobs[]
-  dOnChange?: (e: ChangeEvent<HTMLInputElement>) => void
-  // markDelete?: () => void
+  dMethod?: "post" | "patch" | "delete"
   new?: boolean
-  patch?: boolean
-  delete?: boolean
-  // method?: "post" | "patch" | "delete"
+  dOnChange: (e: ChangeEvent<HTMLInputElement>) => void
+  dMarkDel: (e: MouseEvent) => void
 }
 
 type TmyJobs = Partial<Omit<TjobsData, "department">> & {
-  grade: number
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void
+  grade?: number
   id?: string
   name?: string
-  departmentId?: string
+  departmentId?: string | null
+  jMethod?: "post" | "patch" | "delete" | "empty"
   new?: boolean
-  patch?: boolean
-  delete?: boolean
-  // method?: "post" | "patch"
+  jOnChange: (e: ChangeEvent<HTMLInputElement>) => void
+  jMarkDel: (e: MouseEvent) => void
+  addJobs?: () => void
 }
 
 // ----
@@ -159,17 +157,31 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
     const myDepartment = _.cloneDeep(departments.data) as TmyDepartmentData[]
 
     // 對每一個department資料進行處理
-    myDepartment.forEach((item, dIndex, arr) => {
-      delete item.createdAt
-      delete item.updatedAt
-      const { id, jobs } = item
+    myDepartment.forEach((dItem, dIndex, arr) => {
+      delete dItem.createdAt
+      delete dItem.updatedAt
+      const { id, jobs } = dItem
       // --------
+      // 改變部門名稱與新增刪除部門的標記
+      dItem.dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        dItem.name = value
+        dItem.dMethod = "patch"
+        setMyDepartment([...myDepartment])
+      }
+      dItem.dMarkDel = (e: MouseEvent) => {
+        e.stopPropagation()
+        dItem.dMethod = "delete"
+        setMyDepartment([...myDepartment])
+      }
+
+      // ----------------------------------------------------------
       // 把jobs陣列裡的東西放進tempJobsObj裡，並以grade作為key
       const tempJobsObj: { [key: number]: TmyJobs } = {}
       jobs?.forEach((item) => {
         delete item.createdAt
         delete item.updatedAt
-        tempJobsObj[item.grade] = item
+        tempJobsObj[item.grade!] = item
       })
       // --------
       // 建立myJobs，job資料要有10筆
@@ -177,53 +189,101 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
       // 否則建立空的資料放進去
       const myJobs: TmyJobs[] =
         Array(10).fill(undefined)
-          .map((item, jIndex) => {
-            if (tempJobsObj[jIndex + 1]) return tempJobsObj[jIndex + 1]
+          .map((jItem, jIndex) => {
+
+            if (tempJobsObj[jIndex + 1]) {
+
+              tempJobsObj[jIndex + 1].jOnChange
+                = (e: ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value
+                  dItem.jobs[jIndex].name = value
+                  dItem.jobs[jIndex].jMethod = "patch"
+                  setMyDepartment([...myDepartment])
+                }
+              tempJobsObj[jIndex + 1].jMarkDel
+                = () => {
+                  dItem.jobs[jIndex].jMethod = "delete"
+                  setMyDepartment([...myDepartment])
+                }
+              return tempJobsObj[jIndex + 1]
+            }
+
             return {
               grade: jIndex + 1,
               departmentId: id,
+              jMethod: "empty",
               new: true,
-              onChange: (e: ChangeEvent<HTMLTextAreaElement>) => {
+              jOnChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value
-                myDepartment[dIndex].jobs[jIndex].name = value
+                dItem.jobs[jIndex].name = value
+                setMyDepartment([...myDepartment])
+              },
+              addJobs: () => {
+                dItem.jobs[jIndex].jMethod = "post"
+                setMyDepartment([...myDepartment])
+              },
+              jMarkDel: (e: MouseEvent) => {
+                e.stopPropagation()
+                dItem.jobs[jIndex].jMethod = "delete"
                 setMyDepartment([...myDepartment])
               }
             }
           })
       // myJobs資料處理好了，替換item.jobs
-      item.jobs = myJobs
-      // --------------------
-      // 改變部門名稱與新增刪除部門的標記
-      item.dOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        const value = e.target.value
-        myDepartment[dIndex].name = value
-        myDepartment[dIndex].patch = true
-        setMyDepartment([...myDepartment])
-      }
-
-      // item.markDelete = () => {
-      //   myDepartment[dIndex].delete = true
-      //   setMyDepartment([...myDepartment])
-      // }
-
+      dItem.jobs = myJobs
     })
-
     setMyDepartment(myDepartment)
   }, [departments])
 
-  // const addDepartment = (name: string) => {
-  //   myDepartment.push({
-  //     name,
-  //     method: "post",
-  //     jobs: []
-  //   })
-  // }
+  const addDepartment = (name: string) => {
+    myDepartment.push({
+      name,
+      dMethod: "post",
+      jobs: []
+    })
+    setMyDepartment([...myDepartment])
+  }
 
 
-  return { myDepartment, setMyDepartment }
+  return { myDepartment, setMyDepartment, addDepartment }
 }
 
 export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
+
+
+
+
+// =================================================================
+
+
+// 批次上傳
+const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
+
+  for (let department of myDepartment) {
+    const {
+      id: departmentId,
+      name: dName,
+      dMethod,
+      jobs,
+    } = department
+
+    if (dMethod === "patch") await apiPatchDepartments(departmentId!, { name: dName! })
+    if (dMethod === "delete") {
+      await apiDeleteDepartments(departmentId!)
+      continue
+    }
+
+
+    for (let job of jobs!) {
+      const { grade, id, name, jMethod: method } = job
+      if (!departmentId || !grade || !name) continue
+      if (method === "patch") await apiPatchJobs(id!, { grade, name, departmentId })
+      if (method === "post") await apiPostJobs({ grade, name, departmentId })
+      if (method === "delete") await apiDeleteJobs(id!)
+    }
+  }
+}
+
 
 
 

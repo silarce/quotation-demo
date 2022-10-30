@@ -54,7 +54,7 @@ const apiGetDepartments = (params: Tparams) => {
 }
 
 export const useDepartments = (params: Tparams = {}) => {
-  let [data, setData] = useState<Partial<TgetDepartments>>({ })
+  let [data, setData] = useState<Partial<TgetDepartments>>({})
   const update = async () => {
     const data = await apiGetDepartments(params)
     if (data) setData(data)
@@ -70,6 +70,21 @@ export const apiPostDepartments = (body: { name: string }) => {
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
+/*
+apiPostDepartments res長這樣
+{
+  "name": "測試01",
+  "createdBy": "60042df0-0499-4362-9293-f64ac4878332",
+  "updatedBy": "60042df0-0499-4362-9293-f64ac4878332",
+  "deletedBy": null,
+  "deletedAt": null,
+  "id": "a3bc8a39-da2b-494d-89dc-50208abeb222",
+  "createdAt": "2022-10-30T06:41:37.216Z",
+  "updatedAt": "2022-10-30T06:41:37.216Z"
+}
+ */
+
+
 // 更新部門，目前只能變更name
 export const apiPatchDepartments = (id: string, body: { name: string }) => {
   const api = `/departments/${id}`
@@ -146,11 +161,38 @@ export const apiPostJobs = (body: {
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
+/*
+ apiPostJobs res長這樣
+{
+  "name": "J測試01",
+  "grade": 1,
+  "department": {
+    "id": "a3bc8a39-da2b-494d-89dc-50208abeb222",
+    "createdAt": "2022-10-30T06:41:37.216Z",
+    "updatedAt": "2022-10-30T06:41:37.216Z",
+    "createdBy": "60042df0-0499-4362-9293-f64ac4878332",
+    "updatedBy": "60042df0-0499-4362-9293-f64ac4878332",
+    "deletedBy": null,
+    "name": "測試01",
+    "deletedAt": null
+  },
+  "createdBy": "60042df0-0499-4362-9293-f64ac4878332",
+  "updatedBy": "60042df0-0499-4362-9293-f64ac4878332",
+  "deletedBy": null,
+  "deletedAt": null,
+  "id": "f7709e5c-d6fa-425c-ace5-aecb3ffc8adc",
+  "createdAt": "2022-10-30T06:52:17.062Z",
+  "updatedAt": "2022-10-30T06:52:17.062Z"
+}
+*/
+
+
+
 // 更新職等
 export const apiPatchJobs = (id: string, body: {
-  "name": string
-  "grade": number
-  "departmentId": string
+  "name"?: string
+  "grade"?: number
+  "departmentId"?: string
 }) => {
   const api = `/jobs/${id}`
   return axi.patch(api, body)

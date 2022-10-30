@@ -1,20 +1,78 @@
 @use "styles/theme01" as *;
 
 .list {
-  .thead {
-    display: flex;
-    height: 64px;
+  padding-top: 3px;
+  .cell {
+    min-height: 53.14px;
+    padding: 14px 7px;
+    padding-bottom: 11px;
+    border: solid 1px #e4e4e4;
     background-color: $bgc01;
-    > div {
-      width: fit-content;
-      border: solid 1px black;
+    > .inputBox {
+      position: relative;
+      display: block;
+      border-bottom: solid 1px $colorBorder01;
+      text-align: center;
+      input {
+        min-width: 110px;
+        width: 100%;
+        margin: auto;
+        padding: 0 10px;
+        font-weight: 400;
+        font-size: 16px;
+        text-align: center;
+        background-color: transparent;
+      }
+      > svg {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+    // ----
+    &.empty {
+      display: grid;
+      cursor: pointer;
+      &:hover {
+        background-color: #e1e1e1;
+      }
+      > img {
+        margin: auto;
+      }
+    }
+    &.delete {
+      background-color: #ff5555;
     }
   }
 
-  .tbody {
-    display: grid;
+  .coulmns {
+    display: flex;
     gap: 4px;
+    margin-top: 5px;
+    background-color: black;
+    > div {
+      display: grid;
+      gap: 4px;
+      > .cell {
+      }
+    }
+  }
+}
 
-    background-color: pink;
+.thead {
+  display: flex;
+  gap: 4px;
+  background-color: black;
+  > .cell {
+    padding-bottom: 8px;
+    > p {
+      margin: auto;
+      margin-top: 3px;
+      text-align: center;
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+    }
   }
 }

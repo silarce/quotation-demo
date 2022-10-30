@@ -4,12 +4,14 @@ import {
   useState, useRef
 } from 'react';
 
-import { createPortal } from 'react-dom';
 
 
 // component
 import AutosizeInput from 'react-input-autosize';
 
+// icon
+import { IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
+import iconAdd from "public/image/icon/add.svg"
 
 // css
 import style from "./departments.module.scss"
@@ -32,42 +34,75 @@ export default function List(
 
 
 
-  const theadRef = useRef(null!)
 
-
-  console.log(myDepartment)
+  // console.log(myDepartment)
 
 
   return (
     <div className={style.list}>
-      <div className={style.thead} ref={theadRef}>
-
-      </div>
+      {/* <div className={style.thead} ref={theadRef}>
+      </div> */}
 
 
       {/* tbody */}
-      <div className={style.tbody}>
+      <div className={style.coulmns}>
 
         {myDepartment.map((dItem, dIndex) => {
-          if (!theadRef?.current) return null
 
-          const { name, dOnChange, jobs } = dItem
 
+          const { name, jobs, dMethod,
+            dOnChange, dMarkDel } = dItem
+
+          let styleDCell: string = style.cell
+          if (dMethod === "delete") styleDCell = `${style.cell} ${style.delete}`
 
           return (
-            <div className={style.jobsColumn} key={dIndex}>
+            <div className={`${style.thead}`} key={dIndex}>
               {/* 建立在thead裡面*/}
-              {createPortal(
-                <div>
-                  <input type="text"
+
+              <div className={styleDCell}>
+                <label className={style.inputBox}>
+                  <AutosizeInput type="text"
                     value={name}
                     onChange={dOnChange}
                   />
-                </div>,
-                theadRef.current)}
+                  <IconCross01 onClick={dMarkDel}/>
+                </label>
+                <p>A</p>
+              </div>,
+
               {/* ============================ */}
 
+              {jobs?.reverse().map((item, index) => {
+                const { grade, id, name, jMethod,
+                  jOnChange, addJobs, jMarkDel,
+                } = item
 
+                if (jMethod === "empty") return (
+                  <div className={`${style.cell} ${style.empty}`} key={index}
+                    onClick={addJobs}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={iconAdd.src} alt=""
+                    />
+                  </div>
+                )
+
+                let className: string = style.cell
+                if (jMethod === "delete") className = `${style.cell} ${style.delete}`
+
+                return (
+                  <div className={className} key={index}>
+                    <label className={style.inputBox}>
+                      <AutosizeInput type="text"
+                        value={name ?? ""}
+                        onChange={jOnChange}
+                      />
+                      <IconCross01 onClick={jMarkDel} />
+                    </label>
+                  </div>
+                )
+              })}
 
 
 
