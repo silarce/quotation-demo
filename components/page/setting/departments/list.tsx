@@ -69,7 +69,7 @@ export default function List(
                   <IconCross01 onClick={dMarkDel}/>
                 </label>
                 <p>A</p>
-              </div>,
+              </div>
 
               {/* ============================ */}
 

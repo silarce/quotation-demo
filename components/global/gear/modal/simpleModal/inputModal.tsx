@@ -1,0 +1,76 @@
+import {
+  Dispatch, SetStateAction,
+  useState
+} from "react"
+
+
+
+// antd
+import { Modal } from 'antd';
+
+//global gear
+import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
+
+// css
+import style from "./simpleModal.module.scss"
+
+
+export default function InputModal(
+  {
+    visible, setVisible, title, placeholder, className,
+    onConfirm, onCancel
+
+  }:
+    {
+      visible: boolean,
+      setVisible: Dispatch<SetStateAction<boolean>>,
+      title: string
+      placeholder: string
+      className?: string
+      onConfirm: (value: string) => void
+      onCancel?: () => void
+    }) {
+
+  const [value, setValue] = useState("")
+
+
+  const thisOnConfirm = async () => {
+    await onConfirm(value)
+    setVisible(false)
+    setValue("")
+  }
+  const thisOnCancel = () => {
+    onCancel && onCancel()
+    setVisible(false)
+    setValue("")
+  }
+
+  return (
+    <Modal
+      className={`${style.inputModal} ${className}`}
+      visible={visible}
+      closable={false}
+      centered={true}
+      width={405}
+      onCancel={onCancel}
+      footer={<TwoBtnFooter
+        onConfirm={thisOnConfirm}
+        onCancel={thisOnCancel}
+      />}
+    >
+      <p>{title}</p>
+      <div>
+        <input type="text" placeholder={placeholder}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </div>
+    </Modal>
+  )
+}
+
+// ============================================
+
+
+
+
