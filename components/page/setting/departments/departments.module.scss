@@ -1,7 +1,8 @@
 @use "styles/theme01" as *;
 
 .list {
-  padding-top: 3px;
+  display: inline-block;
+  vertical-align: top;
   .cell {
     min-height: 53.14px;
     padding: 14px 7px;
@@ -46,33 +47,65 @@
     }
   }
 
-  .coulmns {
+  .row {
     display: flex;
     gap: 4px;
-    margin-top: 5px;
-    background-color: black;
-    > div {
+    .columns {
       display: grid;
       gap: 4px;
-      > .cell {
+      > .cell.head {
+        position: relative;
+        padding-bottom: 8px;
+        border-color: transparent;
+        margin-bottom: 2px;
+        > p {
+          margin: auto;
+          margin-top: 3px;
+          text-align: center;
+          font-weight: 400;
+          font-size: 16px;
+          color: $colorMain;
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          left: calc(100% + 1px);
+          top: -1px;
+          height: calc(100% + 2px);
+          width: 4px;
+          background-color: $bgc01;
+        }
+      }
+      &:nth-last-of-type(1) {
+        > .cell.head {
+          &::after {
+            display: none;
+          }
+        }
       }
     }
   }
 }
 
-.thead {
-  display: flex;
+.caption {
+  display: inline-block;
+  vertical-align: top;
+  display: inline-grid;
   gap: 4px;
-  background-color: black;
-  > .cell {
-    padding-bottom: 8px;
-    > p {
+  width: 106px;
+
+  .cell {
+    min-height: 53.14px;
+    padding: 14px 7px;
+    padding-bottom: 11px;
+    border: solid 1px transparent;
+    display: grid;
+    > * {
       margin: auto;
-      margin-top: 3px;
-      text-align: center;
-      font-weight: 400;
-      font-size: 16px;
-      color: $colorMain;
+    }
+    &.head {
+      height: 78.28px;
+      margin-bottom: 2px;
     }
   }
 }

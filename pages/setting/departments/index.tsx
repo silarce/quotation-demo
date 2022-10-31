@@ -9,6 +9,8 @@ const _ = require("lodash")
 
 // component
 import List from "components/page/setting/departments/list"
+import Caption from "components/page/setting/departments/caption"
+
 
 // glogal gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
@@ -87,19 +89,6 @@ export default function Department() {
     },
   ]
   // ---------------------------------------------------------
-  console.log(myDepartment)
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-  // 接著製作新增部門
-
-  // ---------------------------------------------------------
   if (!isReady) return null
   // ---------------------------------------------------------
   return (
@@ -108,10 +97,13 @@ export default function Department() {
         tag="公司職等職稱"
         panelList={editable ? panelList02 : panelList01}
       />
-
       <div className={style.mainContainer}>
+
+
+
         {data.data &&
           <div className={style.department}>
+            <Caption />
             <List
               myDepartment={myDepartment}
               setMyDepartment={setMyDepartment} />
@@ -134,17 +126,6 @@ export default function Department() {
 // ========================================================
 // ========================================================
 // ========================================================
-
-/*
-1 將departmant裡的jobs填滿為數量為10的陣列
-  其中必須要name grade departmentId三個property
-  必須依grade排序，大的在前，也就是10 9 8 7 ......0
-2 舊有的jobs沒有departmentId這個property，要加進去
-3 被更動過的jobs物件，要加入method:"patch"屬性
-  以此辨識是否有被編輯過而需要發patch請求
-4 post前需要把多餘的屬性去掉 只留下name grade departmentId
-5 patch前需要把多餘的屬性去掉 只留下name grade 
-*/
 
 
 type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
@@ -171,38 +152,6 @@ type TmyJobs = Partial<Omit<TjobsData, "department">> & {
 const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
 
   const [myDepartment, setMyDepartment] = useState<Partial<TmyDepartmentData>[]>([])
-
-
-
-  // ---------------------------------------------------------------------------
-
-  const createJob = (
-    { dItem, jIndex, id }:
-      {
-        dItem: TmyDepartmentData
-        jIndex: number
-        id: string | undefined
-      }
-  ): TmyJobs => ({
-    grade: jIndex + 1,
-    departmentId: id,
-    jMethod: "empty",
-    new: true,
-    jOnChange: (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      dItem.jobs[jIndex].name = value
-      setMyDepartment([...myDepartment])
-    },
-    addJobs: () => {
-      dItem.jobs[jIndex].jMethod = "post"
-      setMyDepartment([...myDepartment])
-    },
-    jMarkDel: (e: MouseEvent) => {
-      e.stopPropagation()
-      dItem.jobs[jIndex].jMethod = "delete"
-      setMyDepartment([...myDepartment])
-    }
-  })
 
   // ---------------------------------------------------------------------------
 
@@ -262,51 +211,43 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
               return tempJobsObj[jIndex + 1]
             }
 
-            return createJob({ dItem, jIndex, id })
-
-            // return {
-            //   grade: jIndex + 1,
-            //   departmentId: id,
-            //   jMethod: "empty",
-            //   new: true,
-            //   jOnChange: (e: ChangeEvent<HTMLInputElement>) => {
-            //     const value = e.target.value
-            //     dItem.jobs[jIndex].name = value
-            //     setMyDepartment([...myDepartment])
-            //   },
-            //   addJobs: () => {
-            //     dItem.jobs[jIndex].jMethod = "post"
-            //     setMyDepartment([...myDepartment])
-            //   },
-            //   jMarkDel: (e: MouseEvent) => {
-            //     e.stopPropagation()
-            //     dItem.jobs[jIndex].jMethod = "delete"
-            //     setMyDepartment([...myDepartment])
-            //   }
-            // }
-
+            return {
+              grade: jIndex + 1,
+              departmentId: id,
+              jMethod: "empty",
+              new: true,
+              jOnChange: (e: ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value
+                dItem.jobs[jIndex].name = value
+                setMyDepartment([...myDepartment])
+              },
+              addJobs: () => {
+                dItem.jobs[jIndex].jMethod = "post"
+                setMyDepartment([...myDepartment])
+              },
+              jMarkDel: (e: MouseEvent) => {
+                e.stopPropagation()
+                dItem.jobs[jIndex].jMethod = "delete"
+                setMyDepartment([...myDepartment])
+              }
+            }
           })
       // myJobs資料處理好了，替換item.jobs
       dItem.jobs = myJobs
-      console.log(myJobs)
     })
     setMyDepartment(myDepartment)
   }, [departments])
 
   // ==========================================
+
   const addDepartment = (name: string) => {
-
-
-    myDepartment.push({
-      name,
-      dMethod: "post",
-      jobs: []
-    })
-
-
-    setMyDepartment([...myDepartment])
+    // myDepartment.push({
+    //   name,
+    //   dMethod: "post",
+    //   jobs: []
+    // })
+    // setMyDepartment([...myDepartment])
   }
-
 
   // ==========================================
   return { myDepartment, setMyDepartment, addDepartment }

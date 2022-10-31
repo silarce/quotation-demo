@@ -1,7 +1,7 @@
 
 import {
   Dispatch, SetStateAction,
-  useState, useRef
+  useState, useRef, Fragment
 } from 'react';
 
 
@@ -33,40 +33,29 @@ export default function List(
 ) {
 
 
-
-
-  // console.log(myDepartment)
-
-
   return (
     <div className={style.list}>
-      {/* <div className={style.thead} ref={theadRef}>
-      </div> */}
 
 
-      {/* tbody */}
-      <div className={style.coulmns}>
-
+      <div className={style.row}>
         {myDepartment.map((dItem, dIndex) => {
-
-
           const { name, jobs, dMethod,
             dOnChange, dMarkDel } = dItem
 
-          let styleDCell: string = style.cell
-          if (dMethod === "delete") styleDCell = `${style.cell} ${style.delete}`
+          let styleHead: string = `${style.cell} ${style.head}`
+          if (dMethod === "delete") styleHead
+            = `${styleHead} ${style.delete}`
 
           return (
-            <div className={`${style.thead}`} key={dIndex}>
+            <div className={`${style.columns}`} key={dIndex}>
               {/* 建立在thead裡面*/}
-
-              <div className={styleDCell}>
+              <div className={styleHead}>
                 <label className={style.inputBox}>
                   <AutosizeInput type="text"
                     value={name}
                     onChange={dOnChange}
                   />
-                  <IconCross01 onClick={dMarkDel}/>
+                  <IconCross01 onClick={dMarkDel} />
                 </label>
                 <p>A</p>
               </div>
@@ -103,25 +92,12 @@ export default function List(
                   </div>
                 )
               })}
-
-
-
-            </div>
+            </div> // thead
           )
-
         })}
-
-
-
-
-      </div>
-
-
-
-
+      </div>{/* coulmns */}
     </div>
   )
-
 }
 
 
@@ -129,12 +105,3 @@ export default function List(
 
 
 
-
-
-{/* <AutosizeInput
-value={foo}
-onChange={function (event) {
-  setFoo(event.target.value)
-}}
-placeholder="test"
-/> */}
