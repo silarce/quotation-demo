@@ -35,8 +35,6 @@ export default function List(
 
   return (
     <div className={style.list}>
-
-
       <div className={style.row}>
         {myDepartment.map((dItem, dIndex) => {
           const { name, jobs, dMethod,
@@ -95,7 +93,9 @@ export default function List(
             </div> // thead
           )
         })}
+
       </div>{/* coulmns */}
+        <div className={style.rowBg} />
     </div>
   )
 }
