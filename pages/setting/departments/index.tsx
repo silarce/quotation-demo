@@ -4,6 +4,7 @@ import {
   ChangeEvent, Dispatch, SetStateAction, MouseEvent,
   useState, useEffect, useMemo
 } from "react"
+import { AxiosError } from "axios"
 
 const _ = require("lodash")
 
@@ -124,6 +125,15 @@ export default function Department() {
 // ========================================================
 // ========================================================
 // ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
 
 
 type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
@@ -143,95 +153,48 @@ type TmyJobs = Partial<Omit<TjobsData, "department">> & {
   isNew?: boolean
   isMarkedDel?: boolean
   isFocus: boolean
-
-
-
   jOnChange: (e: ChangeEvent<HTMLInputElement>) => void
   jMarkDel: (e: MouseEvent) => void
   addJobs?: () => void
   changeFocus: (isFocus: boolean) => void
 }
 
-// ----
-const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
-
-  const [myDepartment, setMyDepartment] = useState<Partial<TmyDepartmentData>[]>([])
-
-  console.log(myDepartment)
-
-  // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (!Array.isArray(departments.data)) return
-    const myDepartment = _.cloneDeep(departments.data) as TmyDepartmentData[]
-
-    // 對每一個department資料進行處理
-    myDepartment.forEach((dItem, dIndex, arr) => {
-      delete dItem.createdAt
-      delete dItem.updatedAt
-
-      dItem = new DepartmentClass({
-        dItem, setMyDepartment
-      })
-      arr[dIndex] = dItem
-    })
-    setMyDepartment(myDepartment)
-  }, [departments])
-
-  // ==========================================
-
-  const addDepartment = (name: string) => {
-
-    // const newDepartment = new DepartmentClass(
-    //   {
-    //     dItem: {
-    //       id: undefined,
-    //       name: "",
-    //       jobs: [] 
-    //     },
-    //     setMyDepartment
-    //   }
-    // )
-
-    // myDepartment.push({
-    //   name,
-    //   dMethod: "post",
-    //   jobs: []
-    // })
-    // setMyDepartment([...myDepartment])
-  }
-
-  // ==========================================
-  return { myDepartment, setMyDepartment, addDepartment }
-}
-
-export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
-
-
-
 
 // =================================================================
+
 class DepartmentClass implements TmyDepartmentData {
   id: TmyDepartmentData["id"]
   name: TmyDepartmentData["name"]
   jobs: TmyDepartmentData["jobs"]
   dMethod: TmyDepartmentData["dMethod"]
-  isNew: TmyDepartmentData["isNew"]
   #setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+
+  isNew: TmyDepartmentData["isNew"]
+  index: number | undefined
   constructor(
-    { dItem, setMyDepartment }:
+    { dItem, setMyDepartment, isNew, index }:
       {
-        dItem: TmyDepartmentData
+        // dItem: TmyDepartmentData
+        dItem: Pick<TmyDepartmentData, "id" | "name" | "jobs">
         setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
-      }) {
-    const { id, name, jobs, } = dItem
+        isNew?: never
+        index?: never
+      } |
+      {
+        dItem: Pick<TmyDepartmentData, "id" | "name" | "jobs">
+        setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+        isNew: boolean
+        index: number
+      }
+  ) {
+    const { id, name, jobs } = dItem
     this.id = id
     this.name = name
     this.#setMyDepartment = setMyDepartment
-
+    this.isNew = isNew ?? false
+    this.index = index
+    this.dMethod = isNew ? "post" : undefined
     // ----------------------------------------
-    this.jobs = jobs
-
     // 把jobs陣列裡的東西放進tempJobsObj裡，並以grade作為key
     const tempJobsObj: { [key: number]: TmyJobs } = {}
     jobs?.forEach((item) => {
@@ -246,7 +209,6 @@ class DepartmentClass implements TmyDepartmentData {
     const myJobs: TmyJobs[] =
       Array(10).fill(undefined)
         .map((jItem, jIndex) => {
-          // const jobData = tempJobsObj[jIndex + 1]
           if (tempJobsObj[jIndex + 1]) {
             return new JobClass({
               jobData: tempJobsObj[jIndex + 1],
@@ -254,33 +216,34 @@ class DepartmentClass implements TmyDepartmentData {
               setMyDepartment
             })
           }
-
           return new EmptyJobClass({
             jIndex, departmnetId: this.id, setMyDepartment,
-            // myDepartment,dItem
           })
         })
-
     this.jobs = myJobs
-
-
-
   }
 
   dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!this.isNew) this.dMethod = "patch"
     const value = e.target.value
     this.name = value
-    this.dMethod = "patch"
     this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 
   dMarkDel = (e: MouseEvent) => {
     e.stopPropagation()
+    if (this.isNew && this.index) {
+      this.#setMyDepartment((myDepartment) => {
+        myDepartment.splice(this.index!, 1)
+        return [...myDepartment]
+      })
+      return
+    }
     this.dMethod = "delete"
     this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 }
-
+// ================
 class JobClass implements TmyJobs {
   departmentId: TmyJobs["departmentId"]
   id: TmyJobs["id"]
@@ -339,8 +302,7 @@ class JobClass implements TmyJobs {
   }
 }
 
-
-
+// ================
 class EmptyJobClass implements TmyJobs {
   // department: TmyDepartmentData
   departmentId: TmyJobs["departmentId"]
@@ -397,44 +359,100 @@ class EmptyJobClass implements TmyJobs {
     this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 }
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
 
+  const [myDepartment, setMyDepartment] = useState<Partial<TmyDepartmentData>[]>([])
 
+  useEffect(() => {
+    if (!Array.isArray(departments.data)) return
+    const myDepartment = _.cloneDeep(departments.data) as TmyDepartmentData[]
+
+    // 對每一個department資料進行處理
+    myDepartment.forEach((dItem, dIndex, arr) => {
+      delete dItem.createdAt
+      delete dItem.updatedAt
+
+      dItem = new DepartmentClass({
+        dItem, setMyDepartment
+      })
+      arr[dIndex] = dItem
+    })
+    setMyDepartment(myDepartment)
+  }, [departments])
+
+  // -------------------------------------------------------------
+  const addDepartment = (name: string) => {
+    const dItem: Pick<TmyDepartmentData, "id" | "name" | "jobs"> = {
+      id: undefined,
+      name: name ?? "",
+      jobs: []
+    }
+    const newDepartment = new DepartmentClass(
+      {
+        dItem, setMyDepartment,
+        isNew: true,
+        index: myDepartment.length
+      }
+    )
+    myDepartment.push(newDepartment)
+    setMyDepartment([...myDepartment])
+  }
+
+  // ------------------------------------------------------------
+  return { myDepartment, setMyDepartment, addDepartment }
+}
+
+export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
 
 // =================================================================
 
 // 批次上傳
 const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
 
-  for (let department of myDepartment) {
-    const {
-      id: departmentId,
-      name: dName,
-      dMethod,
-      jobs,
-    } = department
+  try {
+    for (let department of myDepartment) {
+      const {
+        name: dName,
+        dMethod,
+        jobs,
+      } = department
 
-    if (dMethod === "patch") await apiPatchDepartments(departmentId!, { name: dName! })
-    if (dMethod === "delete") {
-      await apiDeleteDepartments(departmentId!)
-      continue
+      let departmentId = department.id
+
+      if (dMethod === "patch") await apiPatchDepartments(departmentId!, { name: dName! })
+      if (dMethod === "delete") {
+        await apiDeleteDepartments(departmentId!)
+        continue
+      }
+      let newDepartment;
+      if (dMethod === "post") newDepartment = await apiPostDepartments({ name: dName ?? "" })
+      departmentId = newDepartment?.id
+      if (!departmentId) continue
+
+      for (let job of jobs!) {
+        const { grade, id, jMethod: method, isMarkedDel } = job
+        let { name } = job
+        if (!grade) continue
+        if (name === undefined) name = ""
+        if (isMarkedDel) await apiDeleteJobs(id!)
+        if (method === "patch") await apiPatchJobs(id!, { grade, name, departmentId })
+        if (method === "post") await apiPostJobs({ grade, name, departmentId })
+      }
     }
-
-
-    for (let job of jobs!) {
-      const { grade, id, jMethod: method, isMarkedDel } = job
-      let { name } = job
-      if (!departmentId || !grade) continue
-      if (name === undefined) name = ""
-      if (isMarkedDel) await apiDeleteJobs(id!)
-      if (method === "patch") await apiPatchJobs(id!, { grade, name, departmentId })
-      if (method === "post") await apiPostJobs({ grade, name, departmentId })
-    }
+  } // try
+  catch (err) {
+    myAlert.err({
+      title: "批次上傳發生錯誤",
+    })
+  }
+  finally{
+    
   }
 }
-
-// 要記得做focus提示
-// 要記得做focus提示
-// 要記得做focus提示
-// 要記得做focus提示
-// 要記得做focus提示
-// 要記得做focus提示
