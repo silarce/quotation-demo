@@ -138,10 +138,13 @@ export default function Department() {
 
 type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
   jobs: TmyJobs[]
-  dMethod?: "post" | "patch" | "delete"
+  dMethod?: "post" | "patch"
   isNew?: boolean
+  isMarkedDel?: boolean
+  isFocus: boolean
   dOnChange: (e: ChangeEvent<HTMLInputElement>) => void
   dMarkDel: (e: MouseEvent) => void
+  changeFocus: (isFocus: boolean) => void
 }
 
 type TmyJobs = Partial<Omit<TjobsData, "department">> & {
@@ -166,6 +169,8 @@ class DepartmentClass implements TmyDepartmentData {
   id: TmyDepartmentData["id"]
   name: TmyDepartmentData["name"]
   jobs: TmyDepartmentData["jobs"]
+  isFocus: TmyDepartmentData["isFocus"] = false
+  isMarkedDel: TmyDepartmentData["isMarkedDel"] = false
   dMethod: TmyDepartmentData["dMethod"]
   #setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
 
@@ -221,15 +226,14 @@ class DepartmentClass implements TmyDepartmentData {
           })
         })
     this.jobs = myJobs
-  }
-
+  } // constructor
+  // --------------------------------
   dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!this.isNew) this.dMethod = "patch"
     const value = e.target.value
     this.name = value
     this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
-
   dMarkDel = (e: MouseEvent) => {
     e.stopPropagation()
     if (this.isNew && this.index) {
@@ -239,9 +243,14 @@ class DepartmentClass implements TmyDepartmentData {
       })
       return
     }
-    this.dMethod = "delete"
+    this.isMarkedDel = !this.isMarkedDel
     this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
+  changeFocus = (isFocus: boolean) => {
+    this.isFocus = isFocus
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
+  }
+
 }
 // ================
 class JobClass implements TmyJobs {
@@ -421,13 +430,13 @@ const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
       const {
         name: dName,
         dMethod,
-        jobs,
+        jobs, isMarkedDel
       } = department
 
       let departmentId = department.id
 
       if (dMethod === "patch") await apiPatchDepartments(departmentId!, { name: dName! })
-      if (dMethod === "delete") {
+      if (isMarkedDel) {
         await apiDeleteDepartments(departmentId!)
         continue
       }
@@ -452,7 +461,7 @@ const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
       title: "批次上傳發生錯誤",
     })
   }
-  finally{
-    
+  finally {
+
   }
 }

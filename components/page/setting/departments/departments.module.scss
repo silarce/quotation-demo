@@ -92,30 +92,19 @@
         border-color: transparent;
         margin-bottom: 2px;
         > p {
+          position: relative;
           margin: auto;
           margin-top: 3px;
           text-align: center;
           font-weight: 400;
           font-size: 16px;
           color: $colorMain;
+          z-index: 2;
         }
-        // &::after {
-        //   content: "";
-        //   position: absolute;
-        //   left: calc(100% + 1px);
-        //   top: -1px;
-        //   height: calc(100% + 2px);
-        //   width: 4px;
-        //   background-color: $bgc01;
-        // }
+        &.isFocus {
+          border: solid 1px $colorActive01;
+        }
       }
-      // &:nth-last-of-type(1) {
-      //   > .cell.head {
-      //     &::after {
-      //       display: none;
-      //     }
-      //   }
-      // }
     }
   }
 

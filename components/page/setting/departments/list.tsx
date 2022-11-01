@@ -40,12 +40,19 @@ export default function List(
     <div className={style.list}>
       <div className={style.row}>
         {myDepartment.map((dItem, dIndex) => {
-          const { name, jobs, dMethod,
-            dOnChange, dMarkDel } = dItem
+          const { name, jobs, dMethod, isMarkedDel, isFocus,
+            dOnChange, dMarkDel, changeFocus
+          } = dItem
 
           let styleHead: string = `${style.cell} ${style.head}`
-          if (dMethod === "delete") styleHead
+          
+          if (isMarkedDel) styleHead
             = `${styleHead} ${style.delete}`
+
+          if (isFocus) styleHead = `${styleHead} ${style.isFocus}`
+
+          const TheIcon = isMarkedDel ? RedoOutlined : IconCross01
+
 
           return (
             <div className={`${style.columns}`} key={dIndex}>
@@ -55,12 +62,15 @@ export default function List(
                   <AutosizeInput type="text"
                     value={name}
                     onChange={dOnChange}
-                    disabled={!editable}
+                    disabled={!editable || isMarkedDel}
+                    onFocus={() => changeFocus?.(true)}
+                    onBlur={() => changeFocus?.(false)}
                   />
-                  <IconCross01 className={style.iconCross01}
+                  <TheIcon className={style.iconCross01}
                     onClick={editable ? dMarkDel : undefined} />
                 </label>
                 <p>A</p>
+                <div className={style.focusBg} />
               </div>
 
               {/* ============================ */}
