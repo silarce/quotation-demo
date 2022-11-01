@@ -5,7 +5,13 @@
   padding-top: 3px;
   display: grid;
   grid-template-columns: fit-content(100%) auto;
-  >*{
+  > * {
     height: fit-content;
+  }
+}
+
+.modalConfirm {
+  :global(.ant-modal-confirm-content) {
+    padding-top: 20px;
   }
 }

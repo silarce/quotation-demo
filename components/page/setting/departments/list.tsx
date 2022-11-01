@@ -12,6 +12,8 @@ import AutosizeInput from 'react-input-autosize';
 // icon
 import { IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
 import iconAdd from "public/image/icon/add.svg"
+import { RedoOutlined } from '@ant-design/icons';
+
 
 // css
 import style from "./departments.module.scss"
@@ -25,14 +27,15 @@ import { TuseDeparmentGrid } from 'pages/setting/departments';
 
 // =============================================
 export default function List(
-  { myDepartment, setMyDepartment }:
+  { myDepartment, setMyDepartment, editable }:
     {
       myDepartment: TuseDeparmentGrid["myDepartment"]
       setMyDepartment: TuseDeparmentGrid["setMyDepartment"]
+      editable: boolean
     }
 ) {
 
-
+  // 這個return裡面根據不同的情況有三種return
   return (
     <div className={style.list}>
       <div className={style.row}>
@@ -52,8 +55,10 @@ export default function List(
                   <AutosizeInput type="text"
                     value={name}
                     onChange={dOnChange}
+                    disabled={!editable}
                   />
-                  <IconCross01 onClick={dMarkDel} />
+                  <IconCross01 className={style.iconCross01}
+                    onClick={editable ? dMarkDel : undefined} />
                 </label>
                 <p>A</p>
               </div>
@@ -62,21 +67,25 @@ export default function List(
 
               {jobs?.reverse().map((item, index) => {
                 const { grade, id, name, jMethod,
-                  jOnChange, addJobs, jMarkDel,
+                  isMarkedDel, isNew, isFocus,
+                  jOnChange, addJobs, jMarkDel, changeFocus
                 } = item
 
-                if (jMethod === "empty") return (
-                  <div className={`${style.cell} ${style.empty}`} key={index}
-                    onClick={addJobs}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={iconAdd.src} alt=""
-                    />
-                  </div>
-                )
+                if (isNew && jMethod === "nothing")
+                  return (
+                    <div className={`${style.cell} ${style.empty}`} key={index}
+                      onClick={editable ? addJobs : undefined}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={iconAdd.src} alt=""
+                      />
+                    </div>
+                  )
 
                 let className: string = style.cell
-                if (jMethod === "delete") className = `${style.cell} ${style.delete}`
+                if (isMarkedDel) className = `${style.cell} ${style.delete}`
+                if (isFocus) className = `${style.cell} ${style.isFocus}`
+                const TheIcon = isMarkedDel ? RedoOutlined : IconCross01
 
                 return (
                   <div className={className} key={index}>
@@ -84,9 +93,14 @@ export default function List(
                       <AutosizeInput type="text"
                         value={name ?? ""}
                         onChange={jOnChange}
+                        disabled={!editable || isMarkedDel}
+                        onFocus={() => { changeFocus(true) }}
+                        onBlur={() => { changeFocus(false) }}
                       />
-                      <IconCross01 onClick={jMarkDel} />
+                      <TheIcon className={style.iconCross01}
+                        onClick={editable ? jMarkDel : undefined} />
                     </label>
+                    <div className={style.focusBg} />
                   </div>
                 )
               })}
@@ -95,13 +109,10 @@ export default function List(
         })}
 
       </div>{/* coulmns */}
-        <div className={style.rowBg} />
+      <div className={style.rowBg} />
     </div>
   )
 }
 
 
 // =====================================================
-
-
-

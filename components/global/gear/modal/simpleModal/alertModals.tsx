@@ -102,7 +102,8 @@ export const ModalConfirm = (
     ...modalProps,
     ...props,
     className: theClassName,
-    cancelText: "取消"
+    cancelText: "取消",
+    icon:<></>
   })
 }
 
@@ -133,6 +134,7 @@ const myAlert = {
   info: ModalInfo02,
   success: ModalSuccess,
   err: ModalErr,
+  confirm: ModalConfirm,
   loading: ModalLoading,
   destroyAll: Modal.destroyAll
 }

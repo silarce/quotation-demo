@@ -16,6 +16,7 @@ import Caption from "components/page/setting/departments/caption"
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // api
 import {
@@ -48,8 +49,6 @@ export default function Department() {
   // 取得部門列表
   const { data, setData, update } = useDepartments(params)
   const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data)
-
-  // console.log(myDepartment)
 
   useEffect(() => {
     (async () => {
@@ -130,27 +129,35 @@ export default function Department() {
 type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
   jobs: TmyJobs[]
   dMethod?: "post" | "patch" | "delete"
-  new?: boolean
+  isNew?: boolean
   dOnChange: (e: ChangeEvent<HTMLInputElement>) => void
   dMarkDel: (e: MouseEvent) => void
 }
 
 type TmyJobs = Partial<Omit<TjobsData, "department">> & {
-  grade?: number
-  id?: string
-  name?: string
   departmentId?: string | null
-  jMethod?: "post" | "patch" | "delete" | "empty"
-  new?: boolean
+  id?: string
+  grade?: number
+  name?: string
+  jMethod?: "post" | "patch" | "nothing"
+  isNew?: boolean
+  isMarkedDel?: boolean
+  isFocus: boolean
+
+
+
   jOnChange: (e: ChangeEvent<HTMLInputElement>) => void
   jMarkDel: (e: MouseEvent) => void
   addJobs?: () => void
+  changeFocus: (isFocus: boolean) => void
 }
 
 // ----
 const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
 
   const [myDepartment, setMyDepartment] = useState<Partial<TmyDepartmentData>[]>([])
+
+  console.log(myDepartment)
 
   // ---------------------------------------------------------------------------
 
@@ -231,8 +238,8 @@ class DepartmentClass implements TmyDepartmentData {
   name: TmyDepartmentData["name"]
   jobs: TmyDepartmentData["jobs"]
   dMethod: TmyDepartmentData["dMethod"]
-  new: TmyDepartmentData["new"]
-  setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+  isNew: TmyDepartmentData["isNew"]
+  #setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
   constructor(
     { dItem, setMyDepartment }:
       {
@@ -243,23 +250,27 @@ class DepartmentClass implements TmyDepartmentData {
     this.id = id
     this.name = name
     this.jobs = jobs
-    this.setMyDepartment = setMyDepartment
+    this.#setMyDepartment = setMyDepartment
   }
 
   dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     this.name = value
     this.dMethod = "patch"
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 
   dMarkDel = (e: MouseEvent) => {
     e.stopPropagation()
     this.dMethod = "delete"
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 }
 
+
+class JobClassInit {
+
+}
 
 
 class JobClass implements TmyJobs {
@@ -267,8 +278,10 @@ class JobClass implements TmyJobs {
   id: TmyJobs["id"]
   grade: TmyJobs["grade"]
   name: TmyJobs["name"]
-  jMethod: TmyJobs["jMethod"]
-  setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+  jMethod: TmyJobs["jMethod"] = "nothing"
+  isMarkedDel: TmyJobs["isMarkedDel"] = false
+  isFocus: TmyJobs["isFocus"] = false
+  #setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
 
   constructor(
     { jobData, departmentId, setMyDepartment }:
@@ -283,17 +296,38 @@ class JobClass implements TmyJobs {
     this.id = id
     this.grade = grade
     this.name = name
-    this.setMyDepartment = setMyDepartment
+    this.#setMyDepartment = setMyDepartment
   }
   jOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (this.isMarkedDel) return
     const value = e.target.value
     this.name = value
     this.jMethod = "patch"
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
-  jMarkDel = () => {
-    this.jMethod = "delete"
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+  jMarkDel: TmyJobs["jMarkDel"] = (e: MouseEvent) => {
+    e.stopPropagation()
+    if (this.isMarkedDel) {
+      this.jMethod = "patch"
+      this.isMarkedDel = false
+      this.#setMyDepartment((myDepartment) => [...myDepartment])
+      return
+    }
+    myAlert.confirm({
+      title: `請確認是否刪除？`,
+      content: `職等「${this.grade}」 「${this.name}」`,
+      className: style.modalConfirm,
+      props: {
+        onOk: () => {
+          this.isMarkedDel = true
+          this.#setMyDepartment((myDepartment) => [...myDepartment])
+        }
+      }
+    })
+  }
+  changeFocus = (isFocus: boolean) => {
+    this.isFocus = isFocus
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 }
 
@@ -301,14 +335,15 @@ class JobClass implements TmyJobs {
 
 class EmptyJobClass implements TmyJobs {
   // department: TmyDepartmentData
-  grade: TmyJobs["grade"]
   departmentId: TmyJobs["departmentId"]
-  jMethod: TmyJobs["jMethod"]
-  new: TmyJobs["new"]
+  grade: TmyJobs["grade"]
   name: TmyJobs["name"]
-
+  jMethod: TmyJobs["jMethod"]
+  isNew: TmyJobs["isNew"]
+  isMarkedDel: TmyJobs["isMarkedDel"] = false
+  isFocus: TmyJobs["isFocus"] = false
+  #setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
   // myDepartment: Partial<TmyDepartmentData>[]
-  setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
   // -------
   constructor(
     { jIndex, departmnetId, setMyDepartment,
@@ -325,30 +360,35 @@ class EmptyJobClass implements TmyJobs {
     // this.department = dItem
     this.grade = jIndex + 1
     this.departmentId = departmnetId
-    this.jMethod = "empty"
-    this.new = true
+    this.jMethod = "nothing"
+    this.isNew = true
     // this.myDepartment = myDepartment
-    this.setMyDepartment = setMyDepartment
+    this.#setMyDepartment = setMyDepartment
   }
   // -------
   jOnChange: TmyJobs["jOnChange"] = (e: ChangeEvent<HTMLInputElement>) => {
+    if (this.isMarkedDel) return
     const value = e.target.value
     this.name = value
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
   addJobs: TmyJobs["addJobs"] = () => {
     this.jMethod = "post"
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
   jMarkDel: TmyJobs["jMarkDel"] = (e: MouseEvent) => {
     e.stopPropagation()
-    this.jMethod = "delete"
-    this.setMyDepartment((myDepartment) => [...myDepartment])
+    // 因為本來就不存在於資料庫，
+    // 所以只要把jMethod改回"nothing"，避免post就好了
+    this.jMethod = "nothing"
+    this.name = ""
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
+  }
+  changeFocus = (isFocus: boolean) => {
+    this.isFocus = isFocus
+    this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 }
-
-
-
 
 
 
@@ -373,13 +413,20 @@ const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
 
 
     for (let job of jobs!) {
-      const { grade, id, name, jMethod: method } = job
-      if (!departmentId || !grade || !name) continue
+      const { grade, id, jMethod: method, isMarkedDel } = job
+      let { name } = job
+      if (!departmentId || !grade) continue
+      if (name === undefined) name = ""
+      if (isMarkedDel) await apiDeleteJobs(id!)
       if (method === "patch") await apiPatchJobs(id!, { grade, name, departmentId })
       if (method === "post") await apiPostJobs({ grade, name, departmentId })
-      if (method === "delete") await apiDeleteJobs(id!)
     }
   }
 }
 
-
+// 要記得做focus提示
+// 要記得做focus提示
+// 要記得做focus提示
+// 要記得做focus提示
+// 要記得做focus提示
+// 要記得做focus提示

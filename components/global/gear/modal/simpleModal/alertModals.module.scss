@@ -27,7 +27,8 @@
       color: $colorMain;
     }
     // 為了把優先級壓過去，所以使用跟antd一樣的選擇器
-    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
+    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content),
+    :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
       margin: auto;
       text-align: center;
       font-weight: 400;
@@ -128,7 +129,8 @@
       color: $colorMain;
     }
     // 為了把優先級壓過去，所以使用跟antd一樣的選擇器
-    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
+    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content),
+    :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
       margin: auto;
       text-align: center;
       font-weight: 400;
