@@ -40,19 +40,16 @@ export default function List(
     <div className={style.list}>
       <div className={style.row}>
         {myDepartment.map((dItem, dIndex) => {
-          const { name, jobs, dMethod, isMarkedDel, isFocus,
+          const { name, jobs, dMethod, isMarkedDel: dIsMarkedDel, isFocus,
             dOnChange, dMarkDel, changeFocus
           } = dItem
 
+
           let styleHead: string = `${style.cell} ${style.head}`
-          
-          if (isMarkedDel) styleHead
+          if (dIsMarkedDel) styleHead
             = `${styleHead} ${style.delete}`
-
           if (isFocus) styleHead = `${styleHead} ${style.isFocus}`
-
-          const TheIcon = isMarkedDel ? RedoOutlined : IconCross01
-
+          const TheIcon = dIsMarkedDel ? RedoOutlined : IconCross01
 
           return (
             <div className={`${style.columns}`} key={dIndex}>
@@ -62,7 +59,7 @@ export default function List(
                   <AutosizeInput type="text"
                     value={name}
                     onChange={dOnChange}
-                    disabled={!editable || isMarkedDel}
+                    disabled={!editable || dIsMarkedDel}
                     onFocus={() => changeFocus?.(true)}
                     onBlur={() => changeFocus?.(false)}
                   />
@@ -81,19 +78,22 @@ export default function List(
                   jOnChange, addJobs, jMarkDel, changeFocus
                 } = item
 
-                if (isNew && jMethod === "nothing")
+                if (isNew && jMethod === "nothing") {
+                  let className = `${style.cell} ${style.empty}`
+                  if (dIsMarkedDel) className = `${className} ${style.delete}`
                   return (
-                    <div className={`${style.cell} ${style.empty}`} key={index}
-                      onClick={editable ? addJobs : undefined}
+                    <div className={className} key={index}
+                      onClick={editable && !dIsMarkedDel ? addJobs : undefined}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={iconAdd.src} alt=""
                       />
                     </div>
                   )
+                }
 
                 let className: string = style.cell
-                if (isMarkedDel) className = `${style.cell} ${style.delete}`
+                if (isMarkedDel || dIsMarkedDel) className = `${style.cell} ${style.delete}`
                 if (isFocus) className = `${style.cell} ${style.isFocus}`
                 const TheIcon = isMarkedDel ? RedoOutlined : IconCross01
 
@@ -103,12 +103,12 @@ export default function List(
                       <AutosizeInput type="text"
                         value={name ?? ""}
                         onChange={jOnChange}
-                        disabled={!editable || isMarkedDel}
+                        disabled={!editable || isMarkedDel || dIsMarkedDel}
                         onFocus={() => { changeFocus(true) }}
                         onBlur={() => { changeFocus(false) }}
                       />
                       <TheIcon className={style.iconCross01}
-                        onClick={editable ? jMarkDel : undefined} />
+                        onClick={editable && !dIsMarkedDel ? jMarkDel : undefined} />
                     </label>
                     <div className={style.focusBg} />
                   </div>
