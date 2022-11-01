@@ -15,9 +15,10 @@ import Caption from "components/page/setting/departments/caption"
 
 // glogal gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
-import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // api
 import {
@@ -51,9 +52,19 @@ export default function Department() {
   const { data, setData, update } = useDepartments(params)
   const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data)
 
+
+  const toUpdate = async () => {
+    try {
+      setIsLoading(true)
+      return await update()
+    }
+    catch { }
+    finally { setIsLoading(false) }
+  }
+
   useEffect(() => {
     (async () => {
-      await update()
+      await toUpdate()
       setIsReady(true)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,7 +91,7 @@ export default function Department() {
     {
       type: "redButton",
       label: "上傳",
-      onClick: () => { uploads(myDepartment) }
+      onClick: () => { uploads(myDepartment, toUpdate) }
     },
     {
       type: "myButton",
@@ -322,26 +333,19 @@ class EmptyJobClass implements TmyJobs {
   isMarkedDel: TmyJobs["isMarkedDel"] = false
   isFocus: TmyJobs["isFocus"] = false
   #setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
-  // myDepartment: Partial<TmyDepartmentData>[]
   // -------
   constructor(
-    { jIndex, departmnetId, setMyDepartment,
-      //  myDepartment ,dItem
-    }:
+    { jIndex, departmnetId, setMyDepartment, }:
       {
-        // dItem: TmyDepartmentData
         jIndex: number
         departmnetId: string | undefined
-        // myDepartment: Partial<TmyDepartmentData>[]
         setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
       }
   ) {
-    // this.department = dItem
     this.grade = jIndex + 1
     this.departmentId = departmnetId
     this.jMethod = "nothing"
     this.isNew = true
-    // this.myDepartment = myDepartment
     this.#setMyDepartment = setMyDepartment
   }
   // -------
@@ -423,9 +427,13 @@ export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
 // =================================================================
 
 // 批次上傳
-const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
+const uploads = async (
+  myDepartment: TuseDeparmentGrid["myDepartment"],
+  toUpdate: () => void
+) => {
 
   try {
+    setRootLoading(true)
     for (let department of myDepartment) {
       const {
         name: dName,
@@ -462,6 +470,7 @@ const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
     })
   }
   finally {
-
+    setRootLoading(false)
+    toUpdate()
   }
 }
