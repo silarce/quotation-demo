@@ -171,43 +171,9 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
       delete dItem.updatedAt
 
       dItem = new DepartmentClass({
-        dItem,
-        setMyDepartment
+        dItem, setMyDepartment
       })
       arr[dIndex] = dItem
-
-      const { id: departmentId, jobs } = dItem
-      // ----------------------------------------------------------
-      // 把jobs陣列裡的東西放進tempJobsObj裡，並以grade作為key
-      const tempJobsObj: { [key: number]: TmyJobs } = {}
-      jobs?.forEach((item) => {
-        delete item.createdAt
-        delete item.updatedAt
-        tempJobsObj[item.grade!] = item
-      })
-      // --------
-      // 建立myJobs，job資料要有10筆
-      // 如果tempJobsObj有對應的資料，就把對應的資料放進去
-      // 否則建立空的資料放進去
-      const myJobs: TmyJobs[] =
-        Array(10).fill(undefined)
-          .map((jItem, jIndex) => {
-            // const jobData = tempJobsObj[jIndex + 1]
-            if (tempJobsObj[jIndex + 1]) {
-              return new JobClass({
-                jobData: tempJobsObj[jIndex + 1],
-                departmentId,
-                setMyDepartment
-              })
-            }
-
-            return new EmptyJobClass({
-              jIndex, departmnetId: departmentId, setMyDepartment,
-              // myDepartment,dItem
-            })
-          })
-      // myJobs資料處理好了，替換item.jobs
-      dItem.jobs = myJobs
     })
     setMyDepartment(myDepartment)
   }, [departments])
@@ -215,6 +181,18 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
   // ==========================================
 
   const addDepartment = (name: string) => {
+
+    // const newDepartment = new DepartmentClass(
+    //   {
+    //     dItem: {
+    //       id: undefined,
+    //       name: "",
+    //       jobs: [] 
+    //     },
+    //     setMyDepartment
+    //   }
+    // )
+
     // myDepartment.push({
     //   name,
     //   dMethod: "post",
@@ -249,8 +227,44 @@ class DepartmentClass implements TmyDepartmentData {
     const { id, name, jobs, } = dItem
     this.id = id
     this.name = name
-    this.jobs = jobs
     this.#setMyDepartment = setMyDepartment
+
+    // ----------------------------------------
+    this.jobs = jobs
+
+    // 把jobs陣列裡的東西放進tempJobsObj裡，並以grade作為key
+    const tempJobsObj: { [key: number]: TmyJobs } = {}
+    jobs?.forEach((item) => {
+      delete item.createdAt
+      delete item.updatedAt
+      tempJobsObj[item.grade!] = item
+    })
+
+    // 建立myJobs，job資料要有10筆
+    // 如果tempJobsObj有對應的資料，就把對應的資料放進去
+    // 否則建立空的資料放進去
+    const myJobs: TmyJobs[] =
+      Array(10).fill(undefined)
+        .map((jItem, jIndex) => {
+          // const jobData = tempJobsObj[jIndex + 1]
+          if (tempJobsObj[jIndex + 1]) {
+            return new JobClass({
+              jobData: tempJobsObj[jIndex + 1],
+              departmentId: this.id,
+              setMyDepartment
+            })
+          }
+
+          return new EmptyJobClass({
+            jIndex, departmnetId: this.id, setMyDepartment,
+            // myDepartment,dItem
+          })
+        })
+
+    this.jobs = myJobs
+
+
+
   }
 
   dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -266,12 +280,6 @@ class DepartmentClass implements TmyDepartmentData {
     this.#setMyDepartment((myDepartment) => [...myDepartment])
   }
 }
-
-
-class JobClassInit {
-
-}
-
 
 class JobClass implements TmyJobs {
   departmentId: TmyJobs["departmentId"]
