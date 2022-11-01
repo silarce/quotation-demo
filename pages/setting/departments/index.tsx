@@ -49,7 +49,7 @@ export default function Department() {
   const { data, setData, update } = useDepartments(params)
   const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data)
 
-
+  // console.log(myDepartment)
 
   useEffect(() => {
     (async () => {
@@ -98,15 +98,14 @@ export default function Department() {
         panelList={editable ? panelList02 : panelList01}
       />
       <div className={style.mainContainer}>
-
-
-
         {data.data &&
           <div className={style.department}>
             <Caption />
             <List
               myDepartment={myDepartment}
-              setMyDepartment={setMyDepartment} />
+              setMyDepartment={setMyDepartment}
+              editable={editable}
+            />
           </div>
         }
         <LoadingCover01 isLoading={isLoading} />
@@ -163,21 +162,14 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
     myDepartment.forEach((dItem, dIndex, arr) => {
       delete dItem.createdAt
       delete dItem.updatedAt
-      const { id, jobs } = dItem
-      // --------
-      // 改變部門名稱與新增刪除部門的標記
-      dItem.dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        dItem.name = value
-        dItem.dMethod = "patch"
-        setMyDepartment([...myDepartment])
-      }
-      dItem.dMarkDel = (e: MouseEvent) => {
-        e.stopPropagation()
-        dItem.dMethod = "delete"
-        setMyDepartment([...myDepartment])
-      }
 
+      dItem = new DepartmentClass({
+        dItem,
+        setMyDepartment
+      })
+      arr[dIndex] = dItem
+
+      const { id: departmentId, jobs } = dItem
       // ----------------------------------------------------------
       // 把jobs陣列裡的東西放進tempJobsObj裡，並以grade作為key
       const tempJobsObj: { [key: number]: TmyJobs } = {}
@@ -193,44 +185,19 @@ const useDeparmentGrid = (departments: Partial<TgetDepartments>) => {
       const myJobs: TmyJobs[] =
         Array(10).fill(undefined)
           .map((jItem, jIndex) => {
-
+            // const jobData = tempJobsObj[jIndex + 1]
             if (tempJobsObj[jIndex + 1]) {
-
-              tempJobsObj[jIndex + 1].jOnChange
-                = (e: ChangeEvent<HTMLInputElement>) => {
-                  const value = e.target.value
-                  dItem.jobs[jIndex].name = value
-                  dItem.jobs[jIndex].jMethod = "patch"
-                  setMyDepartment([...myDepartment])
-                }
-              tempJobsObj[jIndex + 1].jMarkDel
-                = () => {
-                  dItem.jobs[jIndex].jMethod = "delete"
-                  setMyDepartment([...myDepartment])
-                }
-              return tempJobsObj[jIndex + 1]
+              return new JobClass({
+                jobData: tempJobsObj[jIndex + 1],
+                departmentId,
+                setMyDepartment
+              })
             }
 
-            return {
-              grade: jIndex + 1,
-              departmentId: id,
-              jMethod: "empty",
-              new: true,
-              jOnChange: (e: ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value
-                dItem.jobs[jIndex].name = value
-                setMyDepartment([...myDepartment])
-              },
-              addJobs: () => {
-                dItem.jobs[jIndex].jMethod = "post"
-                setMyDepartment([...myDepartment])
-              },
-              jMarkDel: (e: MouseEvent) => {
-                e.stopPropagation()
-                dItem.jobs[jIndex].jMethod = "delete"
-                setMyDepartment([...myDepartment])
-              }
-            }
+            return new EmptyJobClass({
+              jIndex, departmnetId: departmentId, setMyDepartment,
+              // myDepartment,dItem
+            })
           })
       // myJobs資料處理好了，替換item.jobs
       dItem.jobs = myJobs
@@ -259,7 +226,133 @@ export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
 
 
 // =================================================================
+class DepartmentClass implements TmyDepartmentData {
+  id: TmyDepartmentData["id"]
+  name: TmyDepartmentData["name"]
+  jobs: TmyDepartmentData["jobs"]
+  dMethod: TmyDepartmentData["dMethod"]
+  new: TmyDepartmentData["new"]
+  setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+  constructor(
+    { dItem, setMyDepartment }:
+      {
+        dItem: TmyDepartmentData
+        setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+      }) {
+    const { id, name, jobs, } = dItem
+    this.id = id
+    this.name = name
+    this.jobs = jobs
+    this.setMyDepartment = setMyDepartment
+  }
 
+  dOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    this.name = value
+    this.dMethod = "patch"
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+
+  dMarkDel = (e: MouseEvent) => {
+    e.stopPropagation()
+    this.dMethod = "delete"
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+}
+
+
+
+class JobClass implements TmyJobs {
+  departmentId: TmyJobs["departmentId"]
+  id: TmyJobs["id"]
+  grade: TmyJobs["grade"]
+  name: TmyJobs["name"]
+  jMethod: TmyJobs["jMethod"]
+  setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+
+  constructor(
+    { jobData, departmentId, setMyDepartment }:
+      {
+        jobData: TmyJobs
+        departmentId: string | undefined
+        setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+      }
+  ) {
+    const { grade, name, id } = jobData
+    this.departmentId = departmentId
+    this.id = id
+    this.grade = grade
+    this.name = name
+    this.setMyDepartment = setMyDepartment
+  }
+  jOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    this.name = value
+    this.jMethod = "patch"
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+  jMarkDel = () => {
+    this.jMethod = "delete"
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+}
+
+
+
+class EmptyJobClass implements TmyJobs {
+  // department: TmyDepartmentData
+  grade: TmyJobs["grade"]
+  departmentId: TmyJobs["departmentId"]
+  jMethod: TmyJobs["jMethod"]
+  new: TmyJobs["new"]
+  name: TmyJobs["name"]
+
+  // myDepartment: Partial<TmyDepartmentData>[]
+  setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+  // -------
+  constructor(
+    { jIndex, departmnetId, setMyDepartment,
+      //  myDepartment ,dItem
+    }:
+      {
+        // dItem: TmyDepartmentData
+        jIndex: number
+        departmnetId: string | undefined
+        // myDepartment: Partial<TmyDepartmentData>[]
+        setMyDepartment: Dispatch<SetStateAction<Partial<TmyDepartmentData>[]>>
+      }
+  ) {
+    // this.department = dItem
+    this.grade = jIndex + 1
+    this.departmentId = departmnetId
+    this.jMethod = "empty"
+    this.new = true
+    // this.myDepartment = myDepartment
+    this.setMyDepartment = setMyDepartment
+  }
+  // -------
+  jOnChange: TmyJobs["jOnChange"] = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    this.name = value
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+  addJobs: TmyJobs["addJobs"] = () => {
+    this.jMethod = "post"
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+  jMarkDel: TmyJobs["jMarkDel"] = (e: MouseEvent) => {
+    e.stopPropagation()
+    this.jMethod = "delete"
+    this.setMyDepartment((myDepartment) => [...myDepartment])
+  }
+}
+
+
+
+
+
+
+// =================================================================
 
 // 批次上傳
 const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
@@ -288,6 +381,5 @@ const uploads = async (myDepartment: TuseDeparmentGrid["myDepartment"]) => {
     }
   }
 }
-
 
 
