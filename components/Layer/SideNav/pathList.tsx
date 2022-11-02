@@ -79,7 +79,7 @@ const sidePathList: TsidePathList = {
           list: [
             {
               label: "公司資料",
-              path: path01 + "/theCompanyInfo",
+              path: path01 + "/company-info",
             },
             {
               label: "公司職等職稱",

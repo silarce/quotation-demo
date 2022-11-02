@@ -26,13 +26,13 @@ import {
 import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
-import style from "./theCompanyInfo.module.scss"
+import style from "./company-info.module.scss"
 
 // fakeData type
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 
 
-export default function TheCompanyInfo() {
+export default function CompanyInfo() {
   // ===================================================
   // 公司資料
   const {
