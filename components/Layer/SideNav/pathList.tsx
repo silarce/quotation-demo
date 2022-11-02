@@ -309,7 +309,7 @@ const topPathList = [
     icon: icon_setting,
     label: "公司設定",
     path01: sidePathList["/setting"].path01,
-    href: sidePathList["/setting"].path01 + "/theCompanyInfo",
+    href: sidePathList["/setting"].path01 + "/company-info",
   },
   {
     icon: icon_domestic,
