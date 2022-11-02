@@ -254,8 +254,17 @@ class DepartmentClass implements TmyDepartmentData {
       })
       return
     }
-    this.isMarkedDel = !this.isMarkedDel
-    this.#setMyDepartment((myDepartment) => [...myDepartment])
+    myAlert.confirm({
+      title: `請確認是否刪除？`,
+      content: `部門「${this.name}」`,
+      className: style.modalConfirm,
+      props: {
+        onOk: () => {
+          this.isMarkedDel = !this.isMarkedDel
+          this.#setMyDepartment((myDepartment) => [...myDepartment])
+        }
+      }
+    })
   }
   changeFocus = (isFocus: boolean) => {
     this.isFocus = isFocus
