@@ -120,6 +120,7 @@ export const IconCheck01 = (props: SVGProps<SVGSVGElement>) => {
   )
 }
 
+// 叉叉 X
 export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
   let className = getClassName(props)
   return (

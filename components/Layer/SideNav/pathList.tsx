@@ -83,7 +83,7 @@ const sidePathList: TsidePathList = {
             },
             {
               label: "公司職等職稱",
-              path: path01 + "/grade",
+              path: path01 + "/departments",
             },
             {
               label: "人員資料",

@@ -128,6 +128,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
         filter[searchProperty]["$contains"] = searchValue
         return ({
           ...params,
+          page: 1,
           filter
         })
       })

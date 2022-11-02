@@ -1,5 +1,15 @@
 @use "styles/theme01" as *;
 
+.btn {
+  padding: 10px 44px;
+  background-color: $bgc01;
+  border-color: $colorBorder01;
+  height: auto;
+  > span {
+    color: $colorMain;
+  }
+}
+// =======================================================================
 .alert {
   :global(.ant-modal-confirm-body) {
     :global(.anticon) {
@@ -17,7 +27,8 @@
       color: $colorMain;
     }
     // 為了把優先級壓過去，所以使用跟antd一樣的選擇器
-    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
+    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content),
+    :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
       margin: auto;
       text-align: center;
       font-weight: 400;
@@ -25,19 +36,76 @@
     }
   }
 
-  :global(.ant-modal-confirm-btns) {
+  :global(.ant-modal-confirm-body) + :global(.ant-modal-confirm-btns) {
     text-align: center;
     > button {
-      padding: 10px 44px;
-      background-color: $bgc01;
-      border-color: $colorBorder01;
-      height: auto;
+      @extend .btn;
+    }
+  }
+}
+// =======================================================================
+.confirm {
+  :global(.ant-modal-confirm-body) + :global(.ant-modal-confirm-btns) {
+    display: flex;
+    justify-content: center;
+    flex-direction: row-reverse;
+    gap: 8px;
+    > button:global(.ant-btn) {
+      margin-left: 0;
+    }
+    > :global(.ant-btn-primary) {
+      border-color: $colorActive01;
       > span {
-        color: $colorMain;
+        color: $colorActive01;
       }
     }
   }
 }
+
+// =======================================================================
+// .inputConfirm {
+//   :global(.ant-modal-confirm-body-wrapper) {
+//     width: fit-content;
+//     margin: auto;
+//     :global(.ant-modal-confirm-body) {
+//       :global(.anticon) {
+//         display: none;
+//       }
+//       :global(.ant-modal-confirm-title) {
+//         font-weight: 400;
+//         font-size: 18px;
+//         margin: auto;
+//       }
+//     }
+//     :global(.ant-modal-confirm-body) + :global(.ant-modal-confirm-btns) {
+//       display: flex;
+//       gap: 8px;
+//       flex-direction: row-reverse;
+//       > button {
+//         @extend .btn;
+//         margin-left: 0;
+//         &:global(.ant-btn-primary) {
+//           border-color: $colorActive01;
+//           > span {
+//             color: $colorActive01;
+//           }
+//         }
+//       }
+//     }
+//   }
+//   .content {
+//     margin-top: 68px;
+//     margin-bottom: 60px;
+//     > input {
+//       width: 100%;
+//       font-weight: 400;
+//       font-size: 18px;
+//       text-align: center;
+//       border-bottom: solid 1px $colorBorder01;
+//     }
+//   }
+// }
+// =======================================================================
 
 .loading {
   :global(.ant-modal-content) {
@@ -61,7 +129,8 @@
       color: $colorMain;
     }
     // 為了把優先級壓過去，所以使用跟antd一樣的選擇器
-    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
+    :global(.anticon) + :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content),
+    :global(.ant-modal-confirm-title) + :global(.ant-modal-confirm-content) {
       margin: auto;
       text-align: center;
       font-weight: 400;
