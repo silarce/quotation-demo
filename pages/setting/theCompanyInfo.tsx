@@ -216,9 +216,12 @@ export default function TheCompanyInfo() {
               companyInfo[key] = value
               setCompanyInfo({ ...companyInfo })
             }
+            // editable
+            let styleInput02 = `${style.input02}`
+            if (editable) styleInput02 = `${styleInput02} ${style.editable}`
             return (
               <Input02 key={index}
-                className={style.input02}
+                className={styleInput02}
                 label={label}
                 stateValue={stateValue}
                 onChange={onChange}
@@ -227,10 +230,10 @@ export default function TheCompanyInfo() {
             )
           })}
           <SelectInput_address
+            className={`${style.selectInput} ${(editable && style.editable) ?? undefined}`}
             selectInputProps={searchInputProps}
             label="公司地址"
             disabled={!editable}
-            className={style.selectInput}
           />
         </div>
 
