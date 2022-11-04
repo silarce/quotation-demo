@@ -18,6 +18,12 @@ interface Toption {
   [key: string]: string | undefined
 }
 
+interface ToptionPlus {
+  obj: { [key: string]: Toption },
+  options: Toption[]
+}
+
+
 // 性別
 export const optionsCreator_gender =
   (): Toption[] => [
@@ -33,47 +39,6 @@ export const optionsCreator_marital =
   ]
 
 
-
-// export const optionsCreator_department =
-//   (): Toption[] => [
-//     { value: "管理部", label: "管理部" },
-//     { value: "營業部", label: "營業部" },
-//     { value: "研發部", label: "研發部" },
-//     { value: "工程部", label: "工程部" },
-//     { value: "廠務部", label: "廠務部" },
-//     { value: "會計部", label: "會計部" },
-//   ]
-
-
-
-// export const optionsCreator_jobTitle =
-//   (): Toption[] => [
-//     { value: "總經", label: "總經理" },
-//     { value: "副總經理", label: "副總經理" },
-//     { value: "協理", label: "協理" },
-//     { value: "資深經理", label: "資深經理" },
-//     { value: "經理", label: "經理" },
-//     { value: "副理", label: "副理" },
-//     { value: "課長", label: "課長" },
-//     { value: "副課長", label: "副課長" },
-//     { value: "專員", label: "專員" },
-//     { value: "助理", label: "助理" },
-//   ]
-
-// export const optionsCreator_level =
-//   (): Toption[] => [
-//     { value: "Level 10", label: "Level 10" },
-//     { value: "Level 9", label: "Level 9" },
-//     { value: "Level 8", label: "Level 8" },
-//     { value: "Level 7", label: "Level 7" },
-//     { value: "Level 6", label: "Level 6" },
-//     { value: "Level 5", label: "Level 5" },
-//     { value: "Level 4", label: "Level 4" },
-//     { value: "Level 3", label: "Level 3" },
-//     { value: "Level 2", label: "Level 2" },
-//     { value: "Level 1", label: "Level 1" },
-//   ]
-
 // 扣稅類別
 export const optionsCreator_taxDeductionCategory =
   (): Toption[] => [
@@ -87,14 +52,6 @@ export const optionsCreator_customerCategory =
     { value: "廠商", label: "廠商" },
     { value: "客戶廠商", label: "客戶廠商" },
   ]
-
-
-
-
-
-
-
-
 
 
 
@@ -160,14 +117,120 @@ export const optionsCreator_memo =
 
 
 // 門軌
-
-
 export const optionsCreator_doorRail =
   (): Toption[] => [
     { value: "75", label: "75", icon: iconDoorRail75.src },
     { value: "60", label: "60", icon: iconDoorRail60.src },
     { value: "98", label: "98", icon: iconDoorRail98.src },
   ]
+
+
+
+
+// 報價別
+export const optionsCreator_quoteType_new =
+  (): ToptionPlus => {
+    const obj = {
+      捲門: {
+        value: "捲門", label: "捲門", quoteTypeType: "rollerDoor"
+      },
+      大捲門: {
+        value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor"
+      },
+      特大號捲門: {
+        value: "特大號捲門", label: "特大號捲門", quoteTypeType: "rollerDoor"
+      },
+      不是捲門: {
+        value: "不是捲門", label: "不是捲門", quoteTypeType: "normal"
+      },
+      也不是捲門: {
+        value: "也不是捲門", label: "也不是捲門", quoteTypeType: "normal"
+      },
+    }
+    return {
+      obj,
+      options: Object.values(obj)
+    }
+  }
+
+
+// 接上api前暫時先這樣
+// 材料
+export const optionsCreator_material_new =
+  (): ToptionPlus => {
+    const obj = {
+      "不鏽鋼304#": { value: "不鏽鋼304#", label: "不鏽鋼304#" },
+      "烤漆鐵": { value: "烤漆鐵", label: "烤漆鐵" },
+      "鍍鋅鋼": { value: "鍍鋅鋼", label: "鍍鋅鋼" },
+      "合金鋼": { value: "合金鋼", label: "合金鋼" },
+      "耐候鋼": { value: "耐候鋼", label: "耐候鋼" },
+      "鋁合金": { value: "鋁合金", label: "鋁合金" },
+      "陽極鋁合金": { value: "陽極鋁合金", label: "陽極鋁合金" },
+    }
+    return {
+      obj,
+      options: Object.values(obj)
+    }
+  }
+
+// 表面
+export const optionsCreator_surface_new =
+  (): ToptionPlus => {
+    const obj = {
+      AA: { value: "AA", label: "AA" },
+      BA: { value: "BA", label: "BA" },
+      CC: { value: "CC", label: "CC" },
+      DS: { value: "DS", label: "DS" },
+    }
+    return {
+      obj,
+      options: Object.values(obj)
+    }
+  }
+
+// 備註
+// export const optionsCreator_memo_new =
+//   (): ToptionPlus => {
+//     const obj = {
+//       防颱: { value: "防颱", label: "防颱" },
+//       耐候: { value: "耐候", label: "耐候" },
+//       耐酸腐蝕: { value: "耐酸腐蝕", label: "耐酸腐蝕" },
+//       防颱防颱: { value: "防颱防颱", label: "防颱防颱" },
+//     }
+//     return {
+//       obj,
+//       options: Object.values(obj)
+//     }
+//   }
+
+// 門軌
+export const optionsCreator_doorRail_new =
+  (): ToptionPlus => {
+    const obj = {
+      "75": { value: "75", label: "75", icon: iconDoorRail75.src },
+      "60": { value: "60", label: "60", icon: iconDoorRail60.src },
+      "98": { value: "98", label: "98", icon: iconDoorRail98.src },
+    }
+    return {
+      obj,
+      options: Object.values(obj)
+    }
+  }
+
+// B 報價單的B
+export const optionsCreator_B_new =
+  (): ToptionPlus => {
+    const obj = {
+      "77": { value: "77", label: "77"},
+      "45": { value: "45", label: "45"},
+      "20": { value: "20", label: "20"},
+    }
+    return {
+      obj,
+      options: Object.values(obj)
+    }
+  }
+
 
 
 // export const optionsCreator_ =
@@ -183,4 +246,4 @@ export const optionsCreator_doorRail =
 
 
 
-export type { Toption }
+export type { Toption, ToptionPlus }

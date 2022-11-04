@@ -14,13 +14,13 @@ import styleL from "./local.module.scss"
 
 // type
 import type { TuseProduct } from "./hook/useProduct"
-
+import type { TuseProduct_new } from "./hook/useProduct_new"
 
 
 
 export default function QuotationProduction({ productStates, switch02, className = "" }:
   {
-    productStates: TuseProduct
+    productStates: TuseProduct_new
     switch02?: boolean
     className?: string
   }) {
@@ -29,7 +29,7 @@ export default function QuotationProduction({ productStates, switch02, className
 
   const [allowMove, setAllowMove] = useState(false)
 
-  const { addProduct } = productStates
+  // const { addProduct } = productStates
 
   const borderRed = switch02 ? style.borderRed : ""
 
@@ -46,7 +46,10 @@ export default function QuotationProduction({ productStates, switch02, className
         <DndThead productStates={productStates} allowMove={allowMove} />
         <ProductList productStates={productStates} />
         <AddButton className={style.addBtn}
-          label="新增產品" onClick={addProduct} />
+          label="新增產品"
+          onClick={() => alert("test")}
+        //  onClick={addProduct} 
+        />
       </div>
     </div>
   )

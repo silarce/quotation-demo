@@ -18,57 +18,54 @@ import style from "./productList.module.scss"
 import styleL from "../local.module.scss"
 
 // data type
-import { TprodCellKey, TuseProduct } from "../hook/useProduct"
+// import { TprodCellKey, TuseProduct } from "../hook/useProduct"
+import type { TuseProduct_new, TprodCellKey, ProdClass } from "../hook/useProduct_new"
 import {
   emptyProduct,
   TproductString,
   TproductBoolean,
   TproductObject,
-} from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+} from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
 // options
 import {
-  Toption,
-  optionsCreator_quoteType,
-  optionsCreator_material,
-  optionsCreator_surface,
-  optionsCreator_memo,
-  optionsCreator_doorRail,
+  Toption, ToptionPlus,
+  optionsCreator_quoteType_new,
+  optionsCreator_material_new,
+  optionsCreator_surface_new,
+  optionsCreator_doorRail_new,
+  optionsCreator_B_new,
 } from "fakeDatabase/options/options"
 
 // ==========================================================
 // 格子的設定
-import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
 const { cellConfig } = prodCellConfigOri()
 
-type TcellConfigKey = keyof typeof cellConfig
-type ToptionsObjKey =
-  Extract<
-    TcellConfigKey,
-    "quoteType" | "material" | "surface" | "memo" | "doorRail"
-  >
+type ToptionsObjKey = keyof TproductObject
 type ToptionsObjList = {
-  [key in ToptionsObjKey]: Toption[]
+  [key in ToptionsObjKey]: ToptionPlus
 }
 const optionsObjList: ToptionsObjList = {
-  quoteType: optionsCreator_quoteType(),
-  material: optionsCreator_material(),
-  surface: optionsCreator_surface(),
-  memo: optionsCreator_memo(),
-  doorRail: optionsCreator_doorRail()
+  quoteType: optionsCreator_quoteType_new(),
+  material: optionsCreator_material_new(),
+  surface: optionsCreator_surface_new(),
+  doorRail: optionsCreator_doorRail_new(),
+  B: optionsCreator_B_new(),
 }
 // ==========================================================
 // ==========================================================
 export default function ProductList({ productStates }:
-  { productStates: TuseProduct }) {
+  { productStates: TuseProduct_new }) {
 
   const { theadIndex, productList,
-    deleteProduct, copyProduct,
+    // deleteProduct, copyProduct,
     activeRow, setActiveRow,
-    onInputChange, onSelChange, onCheckboxClick, disabled
+    // onInputChange, onSelChange, onCheckboxClick, 
+    disabled
   } = productStates
 
   // =======================================
-  const centerReg = /L|W|H|B|ejectionDoor/
+  const centerReg = /L|W|H|B|typhoonProof|ejectionDoor/
   // =======================================
   return (
     <div className={style.container} >
@@ -80,19 +77,22 @@ export default function ProductList({ productStates }:
               onClick={() => setActiveRow(pIndex)}
             >
               <div className={style.buttonBox}>
-                <Icondelete01 onClick={(e) => deleteProduct(e, pIndex)} />
-                <IconCopy onClick={() => copyProduct(pIndex)} />
+
+                <Icondelete01
+                //  onClick={(e) => deleteProduct(e, pIndex)} 
+                />
+                <IconCopy
+                //  onClick={() => copyProduct(pIndex)} 
+                />
                 <span>1</span>
               </div>
               {theadIndex.map((key) => {
-
                 const { width, id, type } = cellConfig[key]
                 const textCenter = centerReg.test(id) ? styleL.textCenter : ""
                 const theStyle = { width }
                 const stateValue = dataItem[key]
                 const TheCell =
-                  cellSwitcher({ key, pIndex, type, disabled, stateValue })
-
+                  cellSwitcher({ dataItem, key, type, disabled, stateValue })
                 if (key === "ejectionDoor" && quoteType.quoteTypeType !== "rollerDoor")
                   return <div className={`${styleL.column}`} key={key} style={theStyle} />
 
@@ -113,33 +113,48 @@ export default function ProductList({ productStates }:
   // ===========================================================
   // ===========================================================
   // ===========================================================
-  function cellSwitcher({ key, pIndex, type, disabled, stateValue }:
+  function cellSwitcher({ dataItem, key, type, disabled, stateValue }:
     {
+      dataItem: ProdClass
       key: TprodCellKey
       // key: TproductString | TproductBoolean | TproductObject
-      pIndex: number
       type: string
       disabled: boolean
       stateValue: string | boolean | Toption
     }
   ) {
 
+    const {
+      onInputChange, onSelChange, onChcekBoxClick,
+    } = dataItem
+
+
     switch (type) {
 
       case "input": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, pIndex, key as keyof TproductString)
+          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, key as keyof TproductString)
         return (
-          <Input03 key={`${pIndex}${key}`}
+          <Input03
             {...{ stateValue, onChange, disabled }} />
         )
       }
 
+      case "readOnly": {
+        if (typeof stateValue !== "string") return null
+        const onChange
+          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, key as keyof TproductString)
+        return (
+          <Input03
+            {...{ stateValue, onChange, disabled: true }} />
+        )
+      }
+
       case "select": {
-        const options = optionsObjList[key as ToptionsObjKey]
+        const options = optionsObjList[key as ToptionsObjKey].options
         const onChange =
-          (option: Toption | null) => onSelChange(option, pIndex, key as keyof TproductObject)
+          (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
         return (
           <Select03 {...{
             stateValue: stateValue as Toption, options, onChange, disabled
@@ -148,9 +163,9 @@ export default function ProductList({ productStates }:
       }
 
       case "selectWithIcon": {
-        const options = optionsObjList[key as ToptionsObjKey]
+        const options = optionsObjList[key as ToptionsObjKey].options
         const onChange =
-          (option: Toption | null) => onSelChange(option, pIndex, key as keyof TproductObject)
+          (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
 
         const customComponents = {
           Option: OptionWithIcon01,
@@ -169,7 +184,7 @@ export default function ProductList({ productStates }:
         if (typeof stateValue !== "boolean") return null
         const onClick = () => {
           if (disabled) return
-          onCheckboxClick(pIndex, key)
+          onChcekBoxClick(key as "ejectionDoor")
         }
         return (
           <div className={styleL.checkbox}>
@@ -188,10 +203,4 @@ export default function ProductList({ productStates }:
 } //ProductList
 
 // ================================================
-
-
-
-
-
-
 

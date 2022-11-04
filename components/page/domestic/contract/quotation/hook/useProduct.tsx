@@ -49,12 +49,12 @@ interface TtheadItemObjList {
 const pordCellConfig = prodCellConfigOri()
 let { keyList: prodKeyList, cellConfig } = pordCellConfig
 
-const theadCellConfigObjList = cellConfig as TtheadItemObjList
+// const theadCellConfigObjList = cellConfig as TtheadItemObjList
 
-theadCellConfigObjList.quoteType.options = optionsCreator_quoteType()
-theadCellConfigObjList.material.options = optionsCreator_material()
-theadCellConfigObjList.surface.options = optionsCreator_surface()
-theadCellConfigObjList.memo.options = optionsCreator_memo()
+// theadCellConfigObjList.quoteType.options = optionsCreator_quoteType()
+// theadCellConfigObjList.material.options = optionsCreator_material()
+// theadCellConfigObjList.surface.options = optionsCreator_surface()
+// theadCellConfigObjList.memo.options = optionsCreator_memo()
 
 // ============================================================
 // ============================================================
