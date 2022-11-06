@@ -29,7 +29,7 @@ export default function QuotationProduction({ productStates, switch02, className
 
   const [allowMove, setAllowMove] = useState(false)
 
-  // const { addProduct } = productStates
+  const { addProduct } = productStates
 
   const borderRed = switch02 ? style.borderRed : ""
 
@@ -47,8 +47,7 @@ export default function QuotationProduction({ productStates, switch02, className
         <ProductList productStates={productStates} />
         <AddButton className={style.addBtn}
           label="新增產品"
-          onClick={() => alert("test")}
-        //  onClick={addProduct} 
+          onClick={addProduct}
         />
       </div>
     </div>

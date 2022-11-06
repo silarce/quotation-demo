@@ -160,12 +160,8 @@ export const optionsCreator_material_new =
   (): ToptionPlus => {
     const obj = {
       "不鏽鋼304#": { value: "不鏽鋼304#", label: "不鏽鋼304#" },
+      "不鏽鋼316#": { value: "不鏽鋼316#", label: "不鏽鋼316#" },
       "烤漆鐵": { value: "烤漆鐵", label: "烤漆鐵" },
-      "鍍鋅鋼": { value: "鍍鋅鋼", label: "鍍鋅鋼" },
-      "合金鋼": { value: "合金鋼", label: "合金鋼" },
-      "耐候鋼": { value: "耐候鋼", label: "耐候鋼" },
-      "鋁合金": { value: "鋁合金", label: "鋁合金" },
-      "陽極鋁合金": { value: "陽極鋁合金", label: "陽極鋁合金" },
     }
     return {
       obj,

@@ -115,8 +115,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const prodNew = useProduct_new(fakeQuotProductListNew)
 
 
-
-
+  
 
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
@@ -202,6 +201,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 合約項目 追加/追減項目 */}
 
           <QuotationProduction productStates={prodNew} switch02={switch02} />
+          <div className={style.redWrapper}>
+            {/* 材料配件設定 */}
+            {/* <QuotationComponent productStates={productStates} disabled={!allowEdit} /> */}
+
+            <QuotationComponent
+              partList={prodNew.productList[prodNew.activeRow]?.part}
+              disabled={!allowEdit} />
+
+            <hr />
+            {/* 選配設定 */}
+            {/* <QuotationAccessory productStates={productStates} /> */}
+          </div>
 
 
           {

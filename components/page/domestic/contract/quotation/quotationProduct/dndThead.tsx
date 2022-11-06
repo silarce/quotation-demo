@@ -31,7 +31,8 @@ import styleL from "../local.module.scss"
 import { TuseProduct, Tproduct } from "../hook/useProduct"
 import type { TuseProduct_new } from "../hook/useProduct_new"
 // 格子的設定
-import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
+// import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
+import { prodCellConfigOri } from "../hook/useProduct_new"
 const { cellConfig } = prodCellConfigOri()
 
 

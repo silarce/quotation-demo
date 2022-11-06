@@ -18,12 +18,12 @@ import style from "./productList.module.scss"
 import styleL from "../local.module.scss"
 
 // data type
-// import { TprodCellKey, TuseProduct } from "../hook/useProduct"
-import type { TuseProduct_new, TprodCellKey, ProdClass } from "../hook/useProduct_new"
 import {
-  emptyProduct,
+  TuseProduct_new, ProdClass, TprodKeys,
+  prodCellConfigOri
+} from "../hook/useProduct_new"
+import {
   TproductString,
-  TproductBoolean,
   TproductObject,
 } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
 // options
@@ -36,9 +36,10 @@ import {
   optionsCreator_B_new,
 } from "fakeDatabase/options/options"
 
+
+
 // ==========================================================
 // 格子的設定
-import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
 const { cellConfig } = prodCellConfigOri()
 
 type ToptionsObjKey = keyof TproductObject
@@ -58,9 +59,8 @@ export default function ProductList({ productStates }:
   { productStates: TuseProduct_new }) {
 
   const { theadIndex, productList,
-    // deleteProduct, copyProduct,
+    deleteProduct, copyProduct,
     activeRow, setActiveRow,
-    // onInputChange, onSelChange, onCheckboxClick, 
     disabled
   } = productStates
 
@@ -79,10 +79,10 @@ export default function ProductList({ productStates }:
               <div className={style.buttonBox}>
 
                 <Icondelete01
-                //  onClick={(e) => deleteProduct(e, pIndex)} 
+                  onClick={(e) => deleteProduct(e, pIndex)}
                 />
                 <IconCopy
-                //  onClick={() => copyProduct(pIndex)} 
+                  onClick={() => copyProduct(pIndex)}
                 />
                 <span>1</span>
               </div>
@@ -116,7 +116,7 @@ export default function ProductList({ productStates }:
   function cellSwitcher({ dataItem, key, type, disabled, stateValue }:
     {
       dataItem: ProdClass
-      key: TprodCellKey
+      key: TprodKeys
       // key: TproductString | TproductBoolean | TproductObject
       type: string
       disabled: boolean
@@ -204,3 +204,9 @@ export default function ProductList({ productStates }:
 
 // ================================================
 
+// 接著處理價格的千分位
+// 接著處理價格的千分位
+// 接著處理價格的千分位
+// 接著處理價格的千分位
+// 接著處理價格的千分位
+// 接著處理價格的千分位

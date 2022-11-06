@@ -2,19 +2,23 @@ import {
   ChangeEvent, Dispatch, MouseEvent, SetStateAction,
   useState, useEffect
 } from "react"
-// 
+import Decimal from "decimal.js"
 const _ = require("lodash")
 
 
 // fake
 import {
   Tproduct,
-  TprodCellKey,
-  emptyProduct, prodCellConfigOri,
   TproductString,
   TproductBoolean,
   TproductObject,
 } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
+
+import {
+  Tpart, TpartList, TquoteTypeKeys,
+  fakePartGroupOri
+} from "fakeDatabase/domestic/quotation/fakeQuotPart"
+const fakePartGroup = fakePartGroupOri()
 
 // options
 import {
@@ -39,7 +43,7 @@ const optionsGroup = {
 // ======================================================
 // type
 interface TtheadItem {
-  id: TprodCellKey
+  id: TprodKeys
   label: string
   width: string
   options?: Toption[]
@@ -50,7 +54,7 @@ interface TtheadItemObjList {
 
 
 // ======================================================
-// data
+
 const pordCellConfig = prodCellConfigOri()
 let { keyList: prodKeyList,
   // cellConfig 
@@ -89,21 +93,25 @@ export default function useProduct_new(
   }, [productListOri])
 
 
-  // const addProduct = () => {
-  //   productList.push(JSON.parse(JSON.stringify(emptyProduct)))
-  //   setProductList([...productList])
-  // }
-  // const deleteProduct = (e: MouseEvent, index: number) => {
-  //   e.stopPropagation()
-  //   productList.splice(index, 1)
-  //   setActiveRow(-1)
-  //   setProductList([...productList])
-  // }
+  const addProduct = () => {
+    const newProd = new ProdClass({
+      product: emptyProduct(),
+      setProductList
+    })
+    productList.push(newProd)
+    setProductList([...productList])
+  }
+  const deleteProduct = (e: MouseEvent, index: number) => {
+    e.stopPropagation()
+    productList.splice(index, 1)
+    setActiveRow(-1)
+    setProductList([...productList])
+  }
 
-  // const copyProduct = (index: number) => {
-  //   productList.splice(index, 0, { ...productList[index] })
-  //   setProductList([...productList])
-  // }
+  const copyProduct = (index: number) => {
+    productList.splice(index, 0, _.cloneDeep(productList[index]) as ProdClass)
+    setProductList([...productList])
+  }
 
 
 
@@ -111,8 +119,7 @@ export default function useProduct_new(
     theadIndex, setTheadIndex,
     productList, setProductList,
     activeRow, setActiveRow,
-    // addProduct, deleteProduct, copyProduct,
-    // onInputChange, onSelChange, onCheckboxClick,
+    addProduct, deleteProduct, copyProduct,
     disabled
   }
 }
@@ -122,7 +129,7 @@ export default function useProduct_new(
 // =============================================================
 type TuseProduct_new = ReturnType<typeof useProduct_new>
 
-export type { TuseProduct_new, TtheadItem, Tproduct, TprodCellKey, ProdClass }
+export type { TuseProduct_new, TtheadItem, Tproduct, TprodKeys, ProdClass }
 
 
 
@@ -134,19 +141,27 @@ export type { TuseProduct_new, TtheadItem, Tproduct, TprodCellKey, ProdClass }
 // ============================================================================
 // ============================================================================
 // ============================================================================
+
+
+
+// porduction要新增牌價與牌價複價欄位
+// porduction要新增牌價與牌價複價欄位
+// porduction要新增牌價與牌價複價欄位
+// porduction要新增牌價與牌價複價欄位
+// porduction要新增牌價與牌價複價欄位
+// porduction要新增牌價與牌價複價欄位
 
 class ProdClass {
   discount: Tproduct["discount"]  // 折數
   project: Tproduct["project"]  // 項目
-  L: Tproduct["L"]  // L
-  W: Tproduct["W"]  // W
-  H: Tproduct["H"]  // H
-  // area: Tproduct["area"]  // 面積
-  cai: Tproduct["cai"]  // 才數 // 只有台灣在用的單位，沒有英文譯名
+  _L: Tproduct["L"]  // L
+  _W: Tproduct["W"]  // W
+  _H: Tproduct["H"]  // H
+  // _cai: Tproduct["cai"]  // 才數 // 只有台灣在用的單位，沒有英文譯名
   doorType: Tproduct["doorType"]  // 門型
   horsepower: Tproduct["horsepower"]  // 馬力
   qty: Tproduct["qty"]  // 數量
-  unitPrice: Tproduct["unitPrice"]  // 單價
+  // unitPrice: Tproduct["unitPrice"]  // 單價
   // subTotal: Tproduct["subTotal"]  // 複價
   memo: Tproduct["memo"] // 備註
 
@@ -159,6 +174,7 @@ class ProdClass {
   ejectionDoor: Tproduct["ejectionDoor"]
   typhoonProof: Tproduct["typhoonProof"]
 
+  part: PartClass[]
 
   setProductList: Dispatch<SetStateAction<ProdClass[]>>
 
@@ -171,8 +187,8 @@ class ProdClass {
   ) {
     const {
       discount, project, L, W,
-      H, B, area, cai,
-      doorType, horsepower, qty, unitPrice, subTotal,
+      H, B,
+      doorType, horsepower, qty,
       quoteType, material, surface, doorRail, memo,
       ejectionDoor, typhoonProof
     } = product
@@ -180,19 +196,14 @@ class ProdClass {
 
     this.discount = discount
     this.project = project
-    this.L = L
-    this.W = W
-    this.H = H
-
-    // this._area = area
-    this.cai = cai
+    this._L = L
+    this._W = W
+    this._H = H
+    this.memo = memo
 
     this.doorType = doorType
     this.horsepower = horsepower
     this.qty = qty
-    this.unitPrice = unitPrice
-    // this.subTotal = subTotal
-    this.memo = memo
 
     this.ejectionDoor = ejectionDoor
     this.typhoonProof = typhoonProof
@@ -202,31 +213,69 @@ class ProdClass {
     this.surface = optionsGroup["surface"].obj[surface]
     this.doorRail = optionsGroup["doorRail"].obj[doorRail]
     this.B = optionsGroup["B"].obj[B]
+
+    this.part = fakePartGroup[quoteType as TquoteTypeKeys]
+      .map((partData) => new PartClass({
+        partData,
+        setProductList,
+        parent: this
+      }))
   }
 
-  get area() {
-    const L = parseInt(this.L)
-    const H = parseInt(this.H)
-    const B = parseInt(this.B.value)
-    return `${L * (H + B) / 100}`
+  get L() {
+    return this._L
   }
+  set L(v) {
+    this._L = new Decimal(parseFloat(v) || 0).abs().toString()
+  }
+  get W() {
+    return this._W
+  }
+  set W(v) {
+    this._W = new Decimal(parseFloat(v) || 0).abs().toString()
+  }
+  get H() {
+    return this._H
+  }
+  set H(v) {
+    this._H = new Decimal(parseFloat(v) || 0).abs().toString()
+  }
+
+
+  get area() {
+    return new Decimal(this._L)
+      .mul(Decimal.add(this._H, this.B.value))
+      .div(100 * 100) // 把單位從平方公分轉為平方公尺
+      .toFixed(2).toString()
+  }
+  get cai() {
+    // return new Decimal(this._cai).toFixed(1).toString()
+    return new Decimal(999).toFixed(1).toString()
+  }
+  // 單價
+  get unitPrice() {
+    let listPrice = new Decimal(0)
+    this.part.forEach((part) => {
+      listPrice = listPrice.plus(part.totalPrice)
+    })
+    return listPrice.toString()
+  }
+  // 複價
   get subTotal() {
     const qty = parseInt(this.qty) || 0
     const unitPrice = parseInt(this.unitPrice)
     return `${qty * unitPrice}`
-
   }
-
-  // get cai() {
-  //   return this._cai
-  // }
-
   // --------------
   onInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     key: keyof TproductString
   ) => {
-    if (key === "area" || key === "subTotal") return
+    const regex = /^area$|^unitPrice$|^subTotal$|^cai$/
+    if (regex.test(key)) return
+    key = key as Exclude<keyof TproductString,
+      "area" | "unitPrice" | "subTotal" | "cai"
+    >
     this[key] = e.target.value
     this.setProductList(state => [...state])
   }
@@ -237,6 +286,16 @@ class ProdClass {
   ) => {
     if (!option) return
     this[`${key}`] = option
+
+    if (key === "quoteType") {
+      this.part = fakePartGroup[this.quoteType.value as TquoteTypeKeys]
+        .map((partData) => new PartClass(
+          {
+            partData,
+            setProductList: this.setProductList,
+            parent: this
+          }))
+    }
     this.setProductList(state => [...state])
   }
 
@@ -257,12 +316,156 @@ class ProdClass {
 // ============================================================================
 // ============================================================================
 
-class ComponentClass {
-subType:string = ""
+export class PartClass {
+  subType: string
+  subTypeName: string
+  id: string | null
+  material: Toption | string
+  surface: Toption | string
+  basicWeight: string | null // 重量基重
+  unit: string | null
+  _qty: string | null
+  listPrice: string //牌價
+  price: string //單價
+  setProductList: Dispatch<SetStateAction<ProdClass[]>>
 
+  parent: ProdClass
 
+  constructor(
+    { partData, setProductList, parent }:
+      {
+        partData: Tpart
+        setProductList: Dispatch<SetStateAction<ProdClass[]>>
+        parent: ProdClass
+      }) {
+
+    const {
+      subType, subTypeName, id, material, surface,
+      basicWeight, unit, qty, listPrice,
+      price,
+    } = partData
+    this.setProductList = setProductList
+
+    this.subType = subType
+    this.subTypeName = subTypeName
+    this.id = id
+    this.basicWeight = basicWeight
+    this.unit = unit
+
+    this._qty = qty ?? null
+
+    this.listPrice = listPrice
+    this.price = price
+
+    this.material = optionsGroup["material"].obj[material] ?? material
+    this.surface = optionsGroup["surface"].obj[surface] ?? surface
+
+    this.parent = parent
+  }
+
+  get qty() {
+    if (this._qty) return this._qty
+    if (this.unit === "M") return this.parent.L
+    return this.parent.area
+  }
+  //牌價複價
+  get totalListPrice() {
+    return Decimal.mul(this.qty, this.listPrice).toString()
+  }
+  //複價 (有計算折數的複價)
+  get totalPrice() {
+    return Decimal.mul(this.totalListPrice, this.parent.discount)
+      .div(100)
+      .toString()
+  }
+
+  onSelChange = (
+    option: Toption | null,
+    key: "material" | "surface"
+  ) => {
+    if (!option) return
+    this[`${key}`] = option
+    this.setProductList(state => [...state])
+  }
 }
 
+
+
+// ================================================================
+
+type TprodKeys = keyof Pick<ProdClass,
+  "discount" | "project" | "quoteType" | "L" | "W" |
+  "H" | "B" | "area" | "cai" | "doorType" |
+  "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
+  "subTotal" | "memo" | "typhoonProof" | "ejectionDoor"
+>
+
+type TprodCellConfig = {
+  keyList: TprodKeys[]
+  cellConfig: {
+    [key in TprodKeys]: {
+      id: key
+      label: string
+      width: string
+      type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
+    }
+  }
+}
+
+export function prodCellConfigOri(): TprodCellConfig {
+  return {
+    keyList: [
+      "discount", "project", "quoteType", "L", "W",
+      "H", "B", "area", "cai", "doorType",
+      "material", "surface", "doorRail", "horsepower", "qty", "unitPrice",
+      "subTotal", "memo", "typhoonProof", "ejectionDoor",
+    ],
+    cellConfig: {
+      discount: { id: "discount", label: "折數", width: "75px", type: "input" },
+      project: { id: "project", label: "項目", width: "60px", type: "input" },
+      quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "select" },
+      L: { id: "L", label: "L", width: "60px", type: "input" },
+      W: { id: "W", label: "W", width: "60px", type: "input" },
+      H: { id: "H", label: "H", width: "60px", type: "input" },
+      B: { id: "B", label: "B", width: "60px", type: "select" },
+      area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
+      cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
+      doorType: { id: "doorType", label: "門型", width: "75px", type: "input" },
+      material: { id: "material", label: "材料", width: "120px", type: "select" },
+      surface: { id: "surface", label: "表面", width: "55px", type: "select" },
+      doorRail: { id: "doorRail", label: "門軌", width: "70px", type: "selectWithIcon" },
+      horsepower: { id: "horsepower", label: "馬力", width: "60px", type: "input" },
+      qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+
+      unitPrice: { id: "unitPrice", label: "單價", width: "100px", type: "readOnly" },
+      subTotal: { id: "subTotal", label: "複價", width: "100px", type: "readOnly" },
+
+      memo: { id: "memo", label: "備註", width: "90px", type: "input" },
+      ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
+      typhoonProof: { id: "typhoonProof", label: "防颱", width: "60px", type: "checkbox" },
+    }
+  }
+}
+
+// ============================================================================
+const emptyProduct = (): Tproduct => ({
+  discount: "100.00",
+  project: "",
+  quoteType: "不是捲門",
+  L: "0",
+  W: "0",
+  H: "0",
+  B: "20",
+  doorType: "",
+  material: "不鏽鋼304#",
+  surface: "BA",
+  doorRail: "60",
+  horsepower: "",
+  qty: "",
+  memo: "",
+  ejectionDoor: false,
+  typhoonProof: false,
+})
 
 
 
@@ -311,6 +514,15 @@ subType:string = ""
 //     })
 //   }
 // }
+
+
+
+
+
+
+
+
+
 
 
 
