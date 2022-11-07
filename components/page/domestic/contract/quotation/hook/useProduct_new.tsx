@@ -1,6 +1,6 @@
 import {
   ChangeEvent, Dispatch, MouseEvent, SetStateAction,
-  useState, useEffect
+  useState, useEffect, useMemo
 } from "react"
 import Decimal from "decimal.js"
 const _ = require("lodash")
@@ -23,18 +23,22 @@ const fakePartGroup = fakePartGroupOri()
 // options
 import {
   Toption, ToptionPlus,
-  optionsCreator_quoteType_new,
-  optionsCreator_material_new,
-  optionsCreator_surface_new,
-  optionsCreator_doorRail_new,
-  optionsCreator_B_new,
+  optionsCreator_quoteType,
+  optionsCreator_material,
+  optionsCreator_surface,
+  optionsCreator_doorRail,
+  optionsCreator_B,
+  optionsCreator_horsepower,
+  optionsCreator_doorType,
 } from "fakeDatabase/options/options"
 const optionsGroup = {
-  quoteType: optionsCreator_quoteType_new(),
-  material: optionsCreator_material_new(),
-  surface: optionsCreator_surface_new(),
-  doorRail: optionsCreator_doorRail_new(),
-  B: optionsCreator_B_new(),
+  quoteType: optionsCreator_quoteType(),
+  material: optionsCreator_material(),
+  surface: optionsCreator_surface(),
+  doorRail: optionsCreator_doorRail(),
+  B: optionsCreator_B(),
+  horsepower: optionsCreator_horsepower(),
+  doorType: optionsCreator_doorType(),
 }
 
 
@@ -67,29 +71,23 @@ let { keyList: prodKeyList,
 
 
 export default function useProduct_new(
-  productListOri?: Tproduct[],
-  disabled: boolean = false
+  productListOri: Tproduct[],
+  disabled: boolean
 ) {
 
   // // dnd head的狀態，也是資料分類目錄
   const [theadIndex, setTheadIndex] = useState(prodKeyList)
-
   // // 被選中的row
   const [activeRow, setActiveRow] = useState(-1)
-
   // 資料
   const [productList, setProductList] = useState<ProdClass[]>([])
 
   useEffect(() => {
     if (!productListOri) return
-
     const newList = productListOri.map((item, index) => {
       return new ProdClass({ product: item, setProductList })
     })
-
     setProductList(newList)
-
-
   }, [productListOri])
 
 
@@ -113,14 +111,49 @@ export default function useProduct_new(
     setProductList([...productList])
   }
 
+  // 變更所有prod的折數，在右下方的總折數使用
+  const changeAllDiscount = (e: ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value
+    if (!/^\d*\.?\d*$/.test(value)) return
+    productList.forEach((prod) => {
+      prod.discount = value
+    })
+    setProductList([...productList])
+  }
 
+  // 總折數
+  const avgDiscount = (() => {
+    let avg = new Decimal(0)
+    productList.forEach((prod) => {
+      avg = avg.plus(prod.discount)
+    })
+    return avg.div(productList.length || 1).toNumber()
+  })()
+
+  // 小計
+  const subTotal = (() => {
+    let total = new Decimal(0)
+    productList.forEach((prod) => {
+      const priceTotal = prod.priceTotal.replaceAll(",", "")
+      total = total.plus(priceTotal)
+    })
+    return total.toNumber()
+  })()
+
+  // 營業稅
+  const businessTax = new Decimal(subTotal).mul(0.05).toNumber()
+
+  // 總計
+  const total = new Decimal(subTotal).sub(businessTax).toNumber()
 
   return {
     theadIndex, setTheadIndex,
     productList, setProductList,
     activeRow, setActiveRow,
     addProduct, deleteProduct, copyProduct,
-    disabled
+    changeAllDiscount,
+    disabled,
+    avgDiscount, subTotal, businessTax, total
   }
 }
 
@@ -142,15 +175,6 @@ export type { TuseProduct_new, TtheadItem, Tproduct, TprodKeys, ProdClass }
 // ============================================================================
 // ============================================================================
 
-
-
-// porduction要新增牌價與牌價複價欄位
-// porduction要新增牌價與牌價複價欄位
-// porduction要新增牌價與牌價複價欄位
-// porduction要新增牌價與牌價複價欄位
-// porduction要新增牌價與牌價複價欄位
-// porduction要新增牌價與牌價複價欄位
-
 class ProdClass {
   discount: Tproduct["discount"] = ""
   _discount: Tproduct["discount"]  // 折數
@@ -161,27 +185,21 @@ class ProdClass {
   _L: Tproduct["L"]  // L
   _W: Tproduct["W"]  // W
   _H: Tproduct["H"]  // H
-  // _cai: Tproduct["cai"]  // 才數 // 只有台灣在用的單位，沒有英文譯名
-  doorType: Tproduct["doorType"]  // 門型
-  horsepower: Tproduct["horsepower"]  // 馬力
   _qty: Tproduct["qty"]  // 數量
-  // unitPrice: Tproduct["unitPrice"]  // 單價
-  // subTotal: Tproduct["subTotal"]  // 複價
   memo: Tproduct["memo"] // 備註
 
-  quoteType: Toption //報價別
-  material: Toption // 材料
-  surface: Toption // 表面
-  doorRail: Toption // 門軌
-  B: Toption // B
+  doorType: Toption  // 門型
+  horsepower: Toption  // 馬力
+  quoteType: Toption  //報價別
+  material: Toption  // 材料
+  surface: Toption  // 表面
+  doorRail: Toption  // 門軌
+  B: Toption  // B
 
   ejectionDoor: Tproduct["ejectionDoor"]
   typhoonProof: Tproduct["typhoonProof"]
 
   part: PartClass[]
-
-
-
 
   setProductList: Dispatch<SetStateAction<ProdClass[]>>
 
@@ -208,18 +226,28 @@ class ProdClass {
     this._H = H
     this.memo = memo
 
-    this.doorType = doorType
-    this.horsepower = horsepower
     this._qty = qty
 
     this.ejectionDoor = ejectionDoor
     this.typhoonProof = typhoonProof
 
-    this.quoteType = optionsGroup["quoteType"].obj[quoteType]
-    this.material = optionsGroup["material"].obj[material]
-    this.surface = optionsGroup["surface"].obj[surface]
-    this.doorRail = optionsGroup["doorRail"].obj[doorRail]
-    this.B = optionsGroup["B"].obj[B]
+
+
+    this.doorType = optionsGroup["doorType"].find((item) => item.value === doorType)
+      ?? unexpectedOption(doorType)
+    this.horsepower = optionsGroup["horsepower"].find((item) => item.value === horsepower)
+      ?? unexpectedOption(horsepower)
+    this.quoteType = optionsGroup["quoteType"].find((item) => item.value === quoteType)
+      ?? unexpectedOption(quoteType)
+    this.material = optionsGroup["material"].find((item) => item.value === material)
+      ?? unexpectedOption(material)
+    this.surface = optionsGroup["surface"].find((item) => item.value === surface)
+      ?? unexpectedOption(surface)
+    this.doorRail = optionsGroup["doorRail"].find((item) => item.value === doorRail)
+      ?? unexpectedOption(doorRail)
+    this.B = optionsGroup["B"].find((item) => item.value === B)
+      ?? unexpectedOption(B)
+
 
 
     let keys = ["discount", "L", "W", "H",]
@@ -229,6 +257,7 @@ class ProdClass {
           return this[`_${key}`]
         },
         set(v) {
+          if (!/^\d*\.?\d*$/.test(v)) return
           this[`_${key}`] = new Decimal(parseFloat(v) || 0).abs().toString()
         },
       })
@@ -251,7 +280,6 @@ class ProdClass {
       .toFixed(2).toString()
   }
   get cai() {
-    // return new Decimal(this._cai).toFixed(1).toString()
     return new Decimal(999).toFixed(1).toString()
   }
 
@@ -259,6 +287,7 @@ class ProdClass {
     return this._qty
   }
   set qty(v) {
+    if (!/^\d*\.?\d*$/.test(v)) return
     this._qty = new Decimal(parseInt(v) || 0).abs().toString()
   }
 
@@ -271,7 +300,7 @@ class ProdClass {
     return listPrice.toNumber().toLocaleString()
   }
   // 複價
-  get subTotal() {
+  get priceTotal() {
     return new Decimal(this.qty || 0)
       .mul(this.unitPrice.replaceAll(",", ""))
       .toNumber().toLocaleString()
@@ -367,8 +396,10 @@ export class PartClass {
     this.listPrice = listPrice
     this.price = price
 
-    this.material = optionsGroup["material"].obj[material] ?? material
-    this.surface = optionsGroup["surface"].obj[surface] ?? surface
+    this.material = optionsGroup["material"].find((item) => item.value === material)
+      ?? material
+    this.surface = optionsGroup["surface"].find((item) => item.value === surface)
+      ?? surface
 
     this.parent = parent
   }
@@ -407,7 +438,7 @@ type TprodKeys = keyof Pick<ProdClass,
   "discount" | "project" | "quoteType" | "L" | "W" |
   "H" | "B" | "area" | "cai" | "doorType" |
   "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
-  "subTotal" | "memo" | "typhoonProof" | "ejectionDoor"
+  "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor"
 >
 
 type TprodCellConfig = {
@@ -428,7 +459,7 @@ export function prodCellConfigOri(): TprodCellConfig {
       "discount", "project", "quoteType", "L", "W",
       "H", "B", "area", "cai", "doorType",
       "material", "surface", "doorRail", "horsepower", "qty", "unitPrice",
-      "subTotal", "memo", "typhoonProof", "ejectionDoor",
+      "priceTotal", "memo", "typhoonProof", "ejectionDoor",
     ],
     cellConfig: {
       discount: { id: "discount", label: "折數", width: "75px", type: "input" },
@@ -440,16 +471,14 @@ export function prodCellConfigOri(): TprodCellConfig {
       B: { id: "B", label: "B", width: "60px", type: "select" },
       area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
       cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
-      doorType: { id: "doorType", label: "門型", width: "75px", type: "input" },
+      doorType: { id: "doorType", label: "門型", width: "100px", type: "select" },
       material: { id: "material", label: "材料", width: "120px", type: "select" },
       surface: { id: "surface", label: "表面", width: "55px", type: "select" },
       doorRail: { id: "doorRail", label: "門軌", width: "75px", type: "selectWithIcon" },
-      horsepower: { id: "horsepower", label: "馬力", width: "60px", type: "input" },
+      horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "select" },
       qty: { id: "qty", label: "數量", width: "43px", type: "input" },
-
       unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "readOnly" },
-      subTotal: { id: "subTotal", label: "複價", width: "140px", type: "readOnly" },
-
+      priceTotal: { id: "priceTotal", label: "複價", width: "140px", type: "readOnly" },
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
       ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
       typhoonProof: { id: "typhoonProof", label: "防颱", width: "60px", type: "checkbox" },
@@ -477,7 +506,10 @@ const emptyProduct = (): Tproduct => ({
   typhoonProof: false,
 })
 
-
+const unexpectedOption = (v: string) => ({
+  value: v,
+  label: v
+})
 
 
 

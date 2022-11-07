@@ -112,10 +112,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const productStates02: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
 
 
-  const prodNew = useProduct_new(fakeQuotProductListNew)
+  const prodNew = useProduct_new(fakeQuotProductListNew, !allowEdit)
 
-
-  
 
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
@@ -170,6 +168,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (quotation !== "newQuotation" && !quotationData)
     return <NoQuotation quotationId={quotation as string} />
   // =========================================================
+  // =========================================================
   return (
     <div className={style.container}>
       <PageHeader02 tagList={tagList}
@@ -208,7 +207,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <QuotationComponent
               partList={prodNew.productList[prodNew.activeRow]?.part}
               disabled={!allowEdit} />
-
             <hr />
             {/* 選配設定 */}
             {/* <QuotationAccessory productStates={productStates} /> */}
@@ -252,8 +250,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             {...{
               remarkListState, rangeListState,
               payInfoState, productStates,
-              disabled: !allowEdit
-            }} />
+              disabled: !allowEdit,
+              prodState: prodNew
+            }}
+          />
           {/* 簽名 */}
           <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
         </div>

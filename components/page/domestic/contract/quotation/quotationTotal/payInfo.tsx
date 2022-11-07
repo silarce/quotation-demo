@@ -1,102 +1,80 @@
 import { useMemo } from "react"
 import Decimal from "decimal.js"
 
+// global gear
+import Input03 from "components/global/gear/input/input03"
 
 // css
-import Input03 from "components/global/gear/input/input03"
-import { TusePayInfo } from "../hook/usePayInfo"
-import { TuseProduct } from "../hook/useProduct"
 import style from "./payInfo.module.scss"
+
+
 
 // type
 type TpayMethod = TusePayInfo["payInfo"]["payMethod"]
-
-interface TtotalObj {
-  discount: number | string //折數
-  subTotal: number | string //小計
-  businessTax: number | string// 營業稅
-  total: number | string // 總計
-}
+import { TusePayInfo } from "../hook/usePayInfo"
+import { TuseProduct } from "../hook/useProduct"
+import { TuseProduct_new } from "../hook/useProduct_new"
 
 
-
-export default function PayInfo({ payInfoState, productStates, disabled }:
-  {
-    payInfoState: TusePayInfo
-    productStates: TuseProduct
-    disabled: boolean
-  }) {
+export default function PayInfo(
+  { payInfoState, disabled, prodCount, changeAllDiscount }:
+    {
+      payInfoState: TusePayInfo
+      disabled: boolean
+      prodCount: {
+        avgDiscount: number,
+        subTotal: number,
+        businessTax: number,
+        total: number,
+      }
+      changeAllDiscount: TuseProduct_new["changeAllDiscount"]
+    }) {
+  // -----------------------------------------------------------------------
+  const { avgDiscount, subTotal, businessTax, total } = prodCount
+  const countList = [
+    { label: "小計", value: subTotal },
+    { label: "營業稅(5%)", value: businessTax },
+    { label: "總計", value: total },
+  ]
+  // -----------------------------------------------------------------------
   const {
     payInfo, setPayInfo,
     onChangeTradingLocation, onChangeTradingDate,
   } = payInfoState
   const { tradingLocation, tradingDate, payMethod, } = payInfo
-  // ====================================================
+  // -----------------------------------------------------------------------
   // 付款辦法
   const payMethodItems = payMethodItemsCreator(payInfoState)
-  // ====================================================
-  // 總計
-  const { productList } = productStates
-
-  // ---------------------------------
-  const totalList = useMemo(() => {
-    const totalObj: TtotalObj = {
-      discount: "0", //折數
-      subTotal: "0", //小計
-      businessTax: "0",// 營業稅
-      total: "0" // 總計
-    }
-    // -------
-    // 計算
-    {
-      productList.forEach(item => {
-        let { discount, subTotal } = item
-        discount = discount || "0"
-        subTotal = subTotal || "0"
-        totalObj.discount =
-          Decimal.add(totalObj.discount, discount).toString()
-        totalObj.subTotal =
-          Decimal.add(totalObj.subTotal, subTotal).toString()
-      })
-      const { discount, subTotal } = totalObj
-      totalObj.businessTax = Decimal.mul(subTotal, 0.05).toString()
-      totalObj.total = Decimal.sub(subTotal, totalObj.businessTax).toString()
-      if (productList.length === 0) totalObj.discount = 0;
-      else {
-        totalObj.discount =
-          Decimal.div(discount, productList.length).toFixed(3)
-      }
-    }
-    // -------
-    const { discount, subTotal, businessTax, total } = totalObj
-
-    const totalList = [
-      { label: "總折數", value: `${discount}%` },
-      { label: "小計", value: subTotal },
-      { label: "營業稅(5%)", value: businessTax },
-      { label: "總計", value: total },
-    ]
-    return totalList
-  }, [productList])
-
+  // -----------------------------------------------------------------------
 
   return (
 
     <div className={style.container}>
 
       <div className={style.payBox}>
-        {totalList.map((item, index) => {
+        <div className={style.avgDiscount}>
+          <span>{"總折數"}</span>
+          <div>
+            <input type="text"
+              value={avgDiscount}
+              onChange={changeAllDiscount}
+            />
+            <span>%</span>
+          </div>
+        </div>
+
+        {countList.map((item, index) => {
           let { label, value } = item
           // 加千分位
-          value =
-            value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          const theValue = value.toFixed(2).toLocaleString();
           return (
             <div key={index}>
               <span>{label}</span>
-              <span>{value}</span>
+              <span>{theValue}</span>
             </div>
           )
         })}
+
       </div>
 
       <hr className={style.grayHr} />

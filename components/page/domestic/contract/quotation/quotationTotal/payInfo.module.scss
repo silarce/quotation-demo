@@ -25,6 +25,22 @@
       }
     }
   }
+  > .avgDiscount {
+    > div {
+      > input {
+        color: $colorMain;
+        font-weight: 400;
+        font-size: 16px;
+        text-align: right;
+        border-bottom: solid 1px $colorMain;
+      }
+      > span {
+        color: $colorMain;
+        font-weight: 400;
+        font-size: 16px;
+      }
+    }
+  }
 }
 
 .grayHr {

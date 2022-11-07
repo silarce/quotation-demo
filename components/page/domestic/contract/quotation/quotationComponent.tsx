@@ -12,43 +12,29 @@ import styleL from "./local.module.scss"
 
 // options
 import {
-  Toption, ToptionPlus,
-  optionsCreator_material_new,
-  optionsCreator_surface_new,
+  Toption, 
+  optionsCreator_material,
+  optionsCreator_surface,
 
 } from "fakeDatabase/options/options"
 
 const optionsObj: {
-  [key: string]: ToptionPlus
+  [key: string]: Toption[]
 } = {
-  material: optionsCreator_material_new(),
-  surface: optionsCreator_surface_new()
+  material: optionsCreator_material(),
+  surface: optionsCreator_surface()
 }
 
 // type
-import { TuseProduct, Tproduct } from "./hook/useProduct"
 import { PartClass } from "./hook/useProduct_new"
-// import type { Tcomponent } from "meta/fakeData/fakeQuotation/fakeQuotation"
-import type { Tcomponent } from "fakeDatabase/domestic/quotation/fakeQuotComponentList"
 
-
-
-
+// =========================================================
 export default function QuotationComponent(
   { partList, disabled = false }:
     {
       partList: PartClass[] | undefined,
       disabled: boolean
     }) {
-
-  // const { productList, setProductList, activeRow } = productStates
-
-
-  // const productComponent = useMemo(() => {
-  //   if (activeRow < 0) return []
-  //   return productList[activeRow].component
-  // }, [activeRow, productList])
-
 
 
   return (
@@ -95,13 +81,13 @@ export default function QuotationComponent(
                 const { width } = config[key]
                 const theStyle = { width }
                 let item = row[key]
-                // 
+                // _______
                 if (item === null) return (
                   <div className={styleL.column} key={cIndex} style={theStyle}>
                     <div><span></span></div>
                   </div>
                 )
-                // 
+                // _______
                 if (typeof item === "string") {
                   // 如果是數值，就加千分位符號
                   const intReg = /^[0-9]*$/
@@ -116,7 +102,6 @@ export default function QuotationComponent(
                     item = item.replace(/[0-9]/g, '')
                     theTwo = 2
                   }
-
                   return (
                     <div className={styleL.column} key={cIndex} style={theStyle}>
                       <div>
@@ -126,9 +111,8 @@ export default function QuotationComponent(
                     </div>
                   )
                 }
-
+                // _______
                 if (optionsObj[key]) {
-
                   const onChange = (option: Toption | null) => {
                     if (key === "material" || key === "surface")
                       onSelChange(option, key)
@@ -137,7 +121,7 @@ export default function QuotationComponent(
                     <div className={styleL.column} key={cIndex} style={theStyle}>
                       <Select03
                         stateValue={item}
-                        options={optionsObj[key].options}
+                        options={optionsObj[key]}
                         onChange={onChange}
                         disabled={disabled}
                       />

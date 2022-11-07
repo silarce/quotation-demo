@@ -29,11 +29,13 @@ import {
 // options
 import {
   Toption, ToptionPlus,
-  optionsCreator_quoteType_new,
-  optionsCreator_material_new,
-  optionsCreator_surface_new,
-  optionsCreator_doorRail_new,
-  optionsCreator_B_new,
+  optionsCreator_quoteType,
+  optionsCreator_material,
+  optionsCreator_surface,
+  optionsCreator_doorRail,
+  optionsCreator_B,
+  optionsCreator_horsepower,
+  optionsCreator_doorType,
 } from "fakeDatabase/options/options"
 
 
@@ -44,14 +46,16 @@ const { cellConfig } = prodCellConfigOri()
 
 type ToptionsObjKey = keyof TproductObject
 type ToptionsObjList = {
-  [key in ToptionsObjKey]: ToptionPlus
+  [key in ToptionsObjKey]: Toption[]
 }
 const optionsObjList: ToptionsObjList = {
-  quoteType: optionsCreator_quoteType_new(),
-  material: optionsCreator_material_new(),
-  surface: optionsCreator_surface_new(),
-  doorRail: optionsCreator_doorRail_new(),
-  B: optionsCreator_B_new(),
+  quoteType: optionsCreator_quoteType(),
+  material: optionsCreator_material(),
+  surface: optionsCreator_surface(),
+  doorRail: optionsCreator_doorRail(),
+  B: optionsCreator_B(),
+  horsepower: optionsCreator_horsepower(),
+  doorType: optionsCreator_doorType(),
 }
 // ==========================================================
 // ==========================================================
@@ -70,7 +74,7 @@ export default function ProductList({ productStates }:
   return (
     <div className={style.container} >
       {productList.map((dataItem, pIndex) => {
-        const { quoteType } = dataItem
+        const { quoteType, doorType } = dataItem
         return (
           <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
             <div className={style.row}
@@ -93,8 +97,11 @@ export default function ProductList({ productStates }:
                 const stateValue = dataItem[key]
                 const TheCell =
                   cellSwitcher({ dataItem, key, type, disabled, stateValue })
-                if (key === "ejectionDoor" && quoteType.quoteTypeType !== "rollerDoor")
-                  return <div className={`${styleL.column}`} key={key} style={theStyle} />
+
+                if (
+                  (key === "ejectionDoor" && quoteType.quoteTypeType !== "rollerDoor")
+                  || (key === "typhoonProof" && doorType.value !== "SJ-302")
+                ) return <div className={`${styleL.column}`} key={key} style={theStyle} />
 
                 return (
                   <div className={`${styleL.column} ${textCenter}`}
@@ -152,7 +159,7 @@ export default function ProductList({ productStates }:
       }
 
       case "select": {
-        const options = optionsObjList[key as ToptionsObjKey].options
+        const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
         return (
@@ -163,7 +170,7 @@ export default function ProductList({ productStates }:
       }
 
       case "selectWithIcon": {
-        const options = optionsObjList[key as ToptionsObjKey].options
+        const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
 

@@ -30,8 +30,6 @@ interface TproductString {
   L: string  // L
   W: string  // W
   H: string  // H
-  doorType: string  // 門型
-  horsepower: string  // 馬力
   qty: string  // 數量
   memo: string //備註
   // cai: string  // 才數 // 只有台灣在用的單位，沒有英文譯名
@@ -41,6 +39,8 @@ interface TproductString {
 }
 
 interface TproductObject {
+  doorType: string  // 門型
+  horsepower: string  // 馬力
   quoteType: string
   material: string
   surface: string
