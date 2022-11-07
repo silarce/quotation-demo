@@ -152,15 +152,19 @@ export type { TuseProduct_new, TtheadItem, Tproduct, TprodKeys, ProdClass }
 // porduction要新增牌價與牌價複價欄位
 
 class ProdClass {
-  discount: Tproduct["discount"]  // 折數
+  discount: Tproduct["discount"] = ""
+  _discount: Tproduct["discount"]  // 折數
   project: Tproduct["project"]  // 項目
+  L: Tproduct["L"] = ""  // L
+  W: Tproduct["W"] = ""  // W
+  H: Tproduct["H"] = ""  // H
   _L: Tproduct["L"]  // L
   _W: Tproduct["W"]  // W
   _H: Tproduct["H"]  // H
   // _cai: Tproduct["cai"]  // 才數 // 只有台灣在用的單位，沒有英文譯名
   doorType: Tproduct["doorType"]  // 門型
   horsepower: Tproduct["horsepower"]  // 馬力
-  qty: Tproduct["qty"]  // 數量
+  _qty: Tproduct["qty"]  // 數量
   // unitPrice: Tproduct["unitPrice"]  // 單價
   // subTotal: Tproduct["subTotal"]  // 複價
   memo: Tproduct["memo"] // 備註
@@ -175,6 +179,9 @@ class ProdClass {
   typhoonProof: Tproduct["typhoonProof"]
 
   part: PartClass[]
+
+
+
 
   setProductList: Dispatch<SetStateAction<ProdClass[]>>
 
@@ -194,7 +201,7 @@ class ProdClass {
     } = product
     this.setProductList = setProductList
 
-    this.discount = discount
+    this._discount = discount
     this.project = project
     this._L = L
     this._W = W
@@ -203,7 +210,7 @@ class ProdClass {
 
     this.doorType = doorType
     this.horsepower = horsepower
-    this.qty = qty
+    this._qty = qty
 
     this.ejectionDoor = ejectionDoor
     this.typhoonProof = typhoonProof
@@ -214,31 +221,26 @@ class ProdClass {
     this.doorRail = optionsGroup["doorRail"].obj[doorRail]
     this.B = optionsGroup["B"].obj[B]
 
+
+    let keys = ["discount", "L", "W", "H",]
+    keys.forEach((key) => {
+      Object.defineProperty(this, key, {
+        get() {
+          return this[`_${key}`]
+        },
+        set(v) {
+          this[`_${key}`] = new Decimal(parseFloat(v) || 0).abs().toString()
+        },
+      })
+    })
+
+    // 建立part
     this.part = fakePartGroup[quoteType as TquoteTypeKeys]
       .map((partData) => new PartClass({
         partData,
         setProductList,
         parent: this
       }))
-  }
-
-  get L() {
-    return this._L
-  }
-  set L(v) {
-    this._L = new Decimal(parseFloat(v) || 0).abs().toString()
-  }
-  get W() {
-    return this._W
-  }
-  set W(v) {
-    this._W = new Decimal(parseFloat(v) || 0).abs().toString()
-  }
-  get H() {
-    return this._H
-  }
-  set H(v) {
-    this._H = new Decimal(parseFloat(v) || 0).abs().toString()
   }
 
 
@@ -252,19 +254,27 @@ class ProdClass {
     // return new Decimal(this._cai).toFixed(1).toString()
     return new Decimal(999).toFixed(1).toString()
   }
+
+  get qty() {
+    return this._qty
+  }
+  set qty(v) {
+    this._qty = new Decimal(parseInt(v) || 0).abs().toString()
+  }
+
   // 單價
   get unitPrice() {
     let listPrice = new Decimal(0)
     this.part.forEach((part) => {
       listPrice = listPrice.plus(part.totalPrice)
     })
-    return listPrice.toString()
+    return listPrice.toNumber().toLocaleString()
   }
   // 複價
   get subTotal() {
-    const qty = parseInt(this.qty) || 0
-    const unitPrice = parseInt(this.unitPrice)
-    return `${qty * unitPrice}`
+    return new Decimal(this.qty || 0)
+      .mul(this.unitPrice.replaceAll(",", ""))
+      .toNumber().toLocaleString()
   }
   // --------------
   onInputChange = (
@@ -433,12 +443,12 @@ export function prodCellConfigOri(): TprodCellConfig {
       doorType: { id: "doorType", label: "門型", width: "75px", type: "input" },
       material: { id: "material", label: "材料", width: "120px", type: "select" },
       surface: { id: "surface", label: "表面", width: "55px", type: "select" },
-      doorRail: { id: "doorRail", label: "門軌", width: "70px", type: "selectWithIcon" },
+      doorRail: { id: "doorRail", label: "門軌", width: "75px", type: "selectWithIcon" },
       horsepower: { id: "horsepower", label: "馬力", width: "60px", type: "input" },
       qty: { id: "qty", label: "數量", width: "43px", type: "input" },
 
-      unitPrice: { id: "unitPrice", label: "單價", width: "100px", type: "readOnly" },
-      subTotal: { id: "subTotal", label: "複價", width: "100px", type: "readOnly" },
+      unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "readOnly" },
+      subTotal: { id: "subTotal", label: "複價", width: "140px", type: "readOnly" },
 
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
       ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
