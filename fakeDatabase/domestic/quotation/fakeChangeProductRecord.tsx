@@ -3,6 +3,7 @@ import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
 import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
+import iconDoorRail98 from "public/image/icon/doorRail/doorRail98.svg"
 
 interface TrecordProduct
   extends Omit<Tproduct,
@@ -18,12 +19,13 @@ interface TrecordProduct
     icon: string
   }
   memo: string
+
+  area: string
+  cai: string
+  unitPrice: string
+  subTotal: string
+  priceTotal: string
 }
-
-
-
-
-
 interface TchangeListItem {
   id: string // 編號
   date: string // 日期
@@ -36,14 +38,10 @@ interface TchangeListItem {
 interface TchangeList {
   [key: string]: TchangeListItem
 }
-
-
 interface TchangeRecord {
   quotationId: string
   list: TchangeList
 }
-
-
 interface TprodChangingRecordList {
   [key: string]: TchangeRecord
 }
@@ -71,8 +69,11 @@ const fakeProduct01: TrecordProduct = {
   qty: "1",
   unitPrice: "158610",
   subTotal: "158610",
-  memo: "防颱防颱",
+  memo: "這是備註",
   ejectionDoor: false,
+
+  typhoonProof: true,
+  priceTotal: "11111",
 }
 
 const fakeProduct02: TrecordProduct = {
@@ -97,8 +98,11 @@ const fakeProduct02: TrecordProduct = {
   qty: "1",
   unitPrice: "158610",
   subTotal: "158610",
-  memo: "防颱防颱",
+  memo: "備註",
   ejectionDoor: true,
+
+  typhoonProof: false,
+  priceTotal: "11111",
 }
 
 
