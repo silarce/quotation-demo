@@ -19,13 +19,13 @@ import styleL from "../local.module.scss"
 
 // data type
 import {
-  TuseProduct_new, ProdClass, TprodKeys,
+  TuseProduct, ProdClass, TprodKeys,
   prodCellConfigOri
-} from "../hook/useProduct_new"
+} from "../hook/useProduct"
 import {
   TproductString,
   TproductObject,
-} from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
+} from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 // options
 import {
   Toption, ToptionPlus,
@@ -60,7 +60,7 @@ const optionsObjList: ToptionsObjList = {
 // ==========================================================
 // ==========================================================
 export default function ProductList({ productStates }:
-  { productStates: TuseProduct_new }) {
+  { productStates: TuseProduct }) {
 
   const { theadIndex, productList,
     deleteProduct, copyProduct,

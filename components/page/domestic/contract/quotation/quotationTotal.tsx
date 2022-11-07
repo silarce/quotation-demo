@@ -14,23 +14,19 @@ import { TuseRangeList } from "./hook/useRangeList"
 import { TusePayInfo } from "./hook/usePayInfo"
 import { TuseProduct } from "./hook/useProduct"
 
-// type
-import { TuseProduct_new } from "./hook/useProduct_new"
-
 
 export default function QuotationTotal(
   { remarkListState, rangeListState,
-    payInfoState, productStates, disabled = false,
+    payInfoState,  disabled = false,
     prodState
   }:
     {
       remarkListState: TuseRemarkList
       rangeListState: TuseRangeList
       payInfoState: TusePayInfo
-      productStates: TuseProduct
       disabled: boolean
 
-      prodState: TuseProduct_new
+      prodState: TuseProduct
     }) {
 
 

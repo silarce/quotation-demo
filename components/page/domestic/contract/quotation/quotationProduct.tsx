@@ -14,13 +14,12 @@ import styleL from "./local.module.scss"
 
 // type
 import type { TuseProduct } from "./hook/useProduct"
-import type { TuseProduct_new } from "./hook/useProduct_new"
 
 
 
 export default function QuotationProduction({ productStates, switch02, className = "" }:
   {
-    productStates: TuseProduct_new
+    productStates: TuseProduct
     switch02?: boolean
     className?: string
   }) {

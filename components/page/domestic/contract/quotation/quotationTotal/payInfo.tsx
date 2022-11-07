@@ -13,7 +13,6 @@ import style from "./payInfo.module.scss"
 type TpayMethod = TusePayInfo["payInfo"]["payMethod"]
 import { TusePayInfo } from "../hook/usePayInfo"
 import { TuseProduct } from "../hook/useProduct"
-import { TuseProduct_new } from "../hook/useProduct_new"
 
 
 export default function PayInfo(
@@ -27,7 +26,7 @@ export default function PayInfo(
         businessTax: number,
         total: number,
       }
-      changeAllDiscount: TuseProduct_new["changeAllDiscount"]
+      changeAllDiscount: TuseProduct["changeAllDiscount"]
     }) {
   // -----------------------------------------------------------------------
   const { avgDiscount, subTotal, businessTax, total } = prodCount

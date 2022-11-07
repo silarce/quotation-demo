@@ -13,16 +13,24 @@ import styleL from "./local.module.scss"
 // type
 import { TuseProduct } from "./hook/useProduct"
 
-export default function QuotationAccessory({ productStates }:
-  { productStates: TuseProduct }) {
 
-  const { productList, setProductList, activeRow } = productStates
+// fake
+import { fakeAccessoryListOri } from "fakeDatabase/domestic/quotation/fakeQuotAccessoryList"
+
+export default function QuotationAccessory(
+  { activeRow }:
+    { activeRow: number }
+
+) {
 
 
-  const productAccessory = useMemo(() => {
-    if (activeRow < 0) return []
-    return productList[activeRow].accessory
-  }, [activeRow, productList])
+
+  const productAccessory = fakeAccessoryListOri()
+
+  // const productAccessory = useMemo(() => {
+  //   if (activeRow < 0) return []
+  //   return productList[activeRow].accessory
+  // }, [activeRow, productList])
 
 
 
@@ -49,8 +57,7 @@ export default function QuotationAccessory({ productStates }:
       {/* tbody */}
 
       <div>
-        {/*  */}
-        {!productAccessory[0] &&
+        {activeRow === -1 &&
           <>
             <div className={styleL.rowIndex}></div>
             <span className={styleL.noListTip}>尚未選擇產品</span>
@@ -58,7 +65,7 @@ export default function QuotationAccessory({ productStates }:
         {/*  */}
 
 
-        {productAccessory.map((row, pIndex) => {
+        {activeRow > -1 && productAccessory.map((row, pIndex) => {
           return (
             <div className={styleL.row} key={pIndex}>
               <div className={styleL.rowIndex}>
@@ -100,21 +107,7 @@ export default function QuotationAccessory({ productStates }:
                     </div>
                   )
                 }
-                // 
-                // const { value, options } = item
-                // if (options) {
-                //   return (
-                //     <div className={styleL.column} key={cIndex} style={theStyle}>
-                //       {selectCellCreator({
-                //         accessoryIndex: pIndex,
-                //         id: key,
-                //         productList,
-                //         setProductList,
-                //         options
-                //       })}
-                //     </div>
-                //   )
-                // }
+
               })}
             </div>
           )
@@ -122,43 +115,7 @@ export default function QuotationAccessory({ productStates }:
       </div>
     </>
   )
-
-
-  // =============
-  // pIndex為上層的index
-  // function selectCellCreator(
-  //   { accessoryIndex, id, productList, setProductList, options }:
-  //     {
-  //       accessoryIndex: number
-  //       id: keyof Taccessory
-  //       productList: Tproduct[]
-  //       setProductList: Dispatch<SetStateAction<Tproduct[]>>
-  //       options: Toption[]
-  //     }) {
-
-  //   const accessory = productList[activeRow].accessory[accessoryIndex][id] as { value: string, options: Toption[] }
-  //   const stateValue = accessory.value
-
-  //   const onChange = (option: Toption | null) => {
-  //     if (!option) return
-  //     const { value } = option
-  //     setProductList(list => {
-  //       const accessory = list[activeRow].accessory[accessoryIndex][id] as { value: string, options: Toption[] }
-  //       accessory.value = value
-  //       return [...list]
-  //     })
-  //   }
-
-  //   if (stateValue === undefined) return (<span />)
-  //   return <Select03 {...{
-  //     stateValue, options, onChange,
-  //   }} />
-  // } //  selectCellCreator
-
 } //QuotationAccessory
-
-
-// ================================================
 
 // ================================================
 interface TheadInfoItem {
@@ -182,7 +139,6 @@ const theadIndex: (keyof TtheadInfo)[] = [
   "id", "name", "unit", "qty",
   "listPrice", "totalListPrice", "price", "totalPrice",
 ]
-
 
 const theadInfo: TtheadInfo = {
   id: { label: "代號", width: "68px" },

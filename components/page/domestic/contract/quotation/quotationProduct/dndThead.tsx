@@ -28,11 +28,10 @@ import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
 // data hook type config
-import { TuseProduct, Tproduct } from "../hook/useProduct"
-import type { TuseProduct_new } from "../hook/useProduct_new"
+import type { TuseProduct, Tproduct } from "../hook/useProduct"
 // 格子的設定
 // import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
-import { prodCellConfigOri } from "../hook/useProduct_new"
+import { prodCellConfigOri } from "../hook/useProduct"
 const { cellConfig } = prodCellConfigOri()
 
 
@@ -40,7 +39,7 @@ const { cellConfig } = prodCellConfigOri()
 // =========================================================
 export default function DndThead({ productStates, allowMove }:
   {
-    productStates: TuseProduct_new
+    productStates: TuseProduct
     allowMove: boolean
   }) {
 

@@ -38,17 +38,13 @@ import style from "./[quotation].module.scss"
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
-
-
-// lab
-import useProduct_new, { TuseProduct_new } from "components/page/domestic/contract/quotation/hook/useProduct_new"
-import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
-const fakeQuotProductListNew = fakeQuotProductListOri()
+import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 
 
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
+const fakeQuotProductList = fakeQuotProductListOri()
 
 // 產品應該會是點進來後才跟後端要資料
 // 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料
@@ -107,14 +103,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationData,
     newQuotationId,
   })
-  // product // 產品設定
-  const productStates: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
-  const productStates02: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
-
-
-  const prodNew = useProduct_new(fakeQuotProductListNew, !allowEdit)
-
-
+  // 主產品資料
+  const prodStates = useProduct(quotationData?.productList, !allowEdit)
+  const prodStates02 = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
@@ -199,47 +190,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
           {/* 合約項目 追加/追減項目 */}
 
-          <QuotationProduction productStates={prodNew} switch02={switch02} />
-          <div className={style.redWrapper}>
-            {/* 材料配件設定 */}
-            {/* <QuotationComponent productStates={productStates} disabled={!allowEdit} /> */}
-
-            <QuotationComponent
-              partList={prodNew.productList[prodNew.activeRow]?.part}
-              disabled={!allowEdit} />
-            <hr />
-            {/* 選配設定 */}
-            {/* <QuotationAccessory productStates={productStates} /> */}
-          </div>
-
 
           {
-            // (switch01 || switch02)
-            //   ?
-            //   <>
-            //     {/* 合約項目 */}
-            //     {/* 主產品設定 */}
-            //     <QuotationProduction productStates={productStates} switch02={switch02} />
-            //     {/* 原報價項目 */}
-            //     {switch02 &&
-            //       <OldQuotationProduction productStates={productStates02} />
-            //     }
+            (switch01 || switch02)
+              ?
+              <>
+                {/* 合約項目 */}
+                {/* 主產品設定 */}
+                <QuotationProduction productStates={prodStates} switch02={switch02} />
+                {/* 原報價項目 */}
+                {switch02 &&
+                  <OldQuotationProduction productStates={prodStates02} />
+                }
 
-            //     <div className={style.redWrapper}>
-            //       {/* 材料配件設定 */}
-            //       <QuotationComponent productStates={productStates} disabled={!allowEdit} />
-            //       <hr />
-            //       {/* 選配設定 */}
-            //       <QuotationAccessory productStates={productStates} />
-            //     </div>
+                <div className={style.redWrapper}>
+                  {/* 材料配件設定 */}
+                  <QuotationComponent
+                    partList={prodStates.productList[prodStates.activeRow]?.part}
+                    disabled={!allowEdit} />
+                  <hr />
+                  {/* 選配設定 */}
+                  <QuotationAccessory activeRow={prodStates.activeRow} />
+                </div>
 
-            //   </>
-            //   // 追加/追減項目
-            //   : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
+              </>
+              // 追加/追減項目
+              : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
           }
-
-
-
 
           {/* 展開版本的追加追減紀錄 */}
           {prodChangingRecord && switch02 &&
@@ -249,9 +226,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationTotal
             {...{
               remarkListState, rangeListState,
-              payInfoState, productStates,
+              payInfoState,
               disabled: !allowEdit,
-              prodState: prodNew
+              prodState: prodStates
             }}
           />
           {/* 簽名 */}
@@ -283,30 +260,30 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 // =========================================================
 
 // 暫時先註解掉
-// const OldQuotationProduction = ({ productStates }:
-//   { productStates: TuseProduct }) => {
+const OldQuotationProduction = ({ productStates }:
+  { productStates: TuseProduct }) => {
 
-//   const [isActive, setIsActive] = useState(true)
-//   const panelSwitch = () => setIsActive(!isActive)
+  const [isActive, setIsActive] = useState(true)
+  const panelSwitch = () => setIsActive(!isActive)
 
 
-//   return (
-//     <Collapse
-//       className={`${style.oldQuotationProduction}`}
-//       expandIcon={() => <></>}
-//       accordion={false}
-//       activeKey={+isActive}
-//     >
-//       <Panel key={0}
-//         header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}
-//       >
-//         <QuotationProduction
-//           className={style.quotationProduction}
-//           productStates={productStates} />
-//       </Panel>
-//     </Collapse>
-//   )
-// }
+  return (
+    <Collapse
+      className={`${style.oldQuotationProduction}`}
+      expandIcon={() => <></>}
+      accordion={false}
+      activeKey={+isActive}
+    >
+      <Panel key={0}
+        header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}
+      >
+        <QuotationProduction
+          className={style.quotationProduction}
+          productStates={productStates} />
+      </Panel>
+    </Collapse>
+  )
+}
 
 const OqpHeader = ({ isActive, panelSwitch }: {
   isActive: boolean

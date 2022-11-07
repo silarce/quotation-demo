@@ -26,7 +26,7 @@ const optionsObj: {
 }
 
 // type
-import { PartClass } from "./hook/useProduct_new"
+import { PartClass } from "./hook/useProduct"
 
 // =========================================================
 export default function QuotationComponent(
