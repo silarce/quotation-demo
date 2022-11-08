@@ -79,7 +79,7 @@ const sidePathList: TsidePathList = {
           list: [
             {
               label: "公司資料",
-              path: path01 + "/theCompanyInfo",
+              path: path01 + "/company-info",
             },
             {
               label: "公司職等職稱",
@@ -309,7 +309,7 @@ const topPathList = [
     icon: icon_setting,
     label: "公司設定",
     path01: sidePathList["/setting"].path01,
-    href: sidePathList["/setting"].path01 + "/theCompanyInfo",
+    href: sidePathList["/setting"].path01 + "/company-info",
   },
   {
     icon: icon_domestic,

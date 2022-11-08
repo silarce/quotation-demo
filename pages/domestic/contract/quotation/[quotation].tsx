@@ -38,9 +38,13 @@ import style from "./[quotation].module.scss"
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
+import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+
+
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
+const fakeQuotProductList = fakeQuotProductListOri()
 
 // 產品應該會是點進來後才跟後端要資料
 // 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料
@@ -99,9 +103,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationData,
     newQuotationId,
   })
-  // product // 產品設定
-  const productStates: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
-  const productStates02: TuseProduct = useProduct(quotationData?.productList, !allowEdit)
+  // 主產品資料
+  const prodStates = useProduct(quotationData?.productList, !allowEdit)
+  const prodStates02 = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
@@ -155,6 +159,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (quotation !== "newQuotation" && !quotationData)
     return <NoQuotation quotationId={quotation as string} />
   // =========================================================
+  // =========================================================
   return (
     <div className={style.container}>
       <PageHeader02 tagList={tagList}
@@ -184,30 +189,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
               </div>}
           </div>
           {/* 合約項目 追加/追減項目 */}
-          {(switch01 || switch02)
-            ?
-            <>
-              {/* 合約項目 */}
-              {/* 主產品設定 */}
-              <QuotationProduction productStates={productStates} switch02={switch02} />
-              {/* 原報價項目 */}
-              {switch02 &&
-                <OldQuotationProduction productStates={productStates02} />
-              }
-              <div className={style.redWrapper}>
-                {/* 材料配件設定 */}
-                <QuotationComponent productStates={productStates} disabled={!allowEdit} />
-                <hr />
-                {/* 選配設定 */}
-                <QuotationAccessory productStates={productStates} />
-              </div>
-            </>
-            // 追加/追減項目
-            : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
+
+
+          {
+            (switch01 || switch02)
+              ?
+              <>
+                {/* 合約項目 */}
+                {/* 主產品設定 */}
+                <QuotationProduction productStates={prodStates} switch02={switch02} />
+                {/* 原報價項目 */}
+                {switch02 &&
+                  <OldQuotationProduction productStates={prodStates02} />
+                }
+
+                <div className={style.redWrapper}>
+                  {/* 材料配件設定 */}
+                  <QuotationComponent
+                    partList={prodStates.productList[prodStates.activeRow]?.part}
+                    disabled={!allowEdit} />
+                  <hr />
+                  {/* 選配設定 */}
+                  <QuotationAccessory activeRow={prodStates.activeRow} />
+                </div>
+
+              </>
+              // 追加/追減項目
+              : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
           }
-
-
-
 
           {/* 展開版本的追加追減紀錄 */}
           {prodChangingRecord && switch02 &&
@@ -217,14 +226,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationTotal
             {...{
               remarkListState, rangeListState,
-              payInfoState, productStates,
-              disabled: !allowEdit
-            }} />
+              payInfoState,
+              disabled: !allowEdit,
+              prodState: prodStates
+            }}
+          />
           {/* 簽名 */}
           <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
@@ -248,6 +259,7 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 
 // =========================================================
 
+// 暫時先註解掉
 const OldQuotationProduction = ({ productStates }:
   { productStates: TuseProduct }) => {
 

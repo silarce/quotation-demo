@@ -17,7 +17,6 @@ import type { TuseProduct } from "./hook/useProduct"
 
 
 
-
 export default function QuotationProduction({ productStates, switch02, className = "" }:
   {
     productStates: TuseProduct
@@ -46,7 +45,9 @@ export default function QuotationProduction({ productStates, switch02, className
         <DndThead productStates={productStates} allowMove={allowMove} />
         <ProductList productStates={productStates} />
         <AddButton className={style.addBtn}
-          label="新增產品" onClick={addProduct} />
+          label="新增產品"
+          onClick={addProduct}
+        />
       </div>
     </div>
   )

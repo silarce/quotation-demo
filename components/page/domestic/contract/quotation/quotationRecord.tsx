@@ -14,8 +14,7 @@ import { TchangeListItem, TchangeRecord, TrecordProduct } from "fakeDatabase/dom
 import style from "./quotationRecord.module.scss"
 
 // config
-import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
-
+import { prodCellConfigOri } from './hook/useProduct';
 
 export default function QuotationRecord({ prodChangingRecord }:
   { prodChangingRecord: TchangeRecord }) {

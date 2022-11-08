@@ -123,16 +123,45 @@
   }
 
   .input02 {
-    hr{
-      border-color:$colorBorder01;
+    textarea {
+      color: $colorMain;
+    }
+    hr {
+      border-color: $colorBorder01;
+    }
+    &.editable {
+      textarea {
+        &:focus ~ hr {
+          border-color: $colorActive01;
+        }
+      }
+      hr {
+        border-color: $colorMain;
+      }
     }
   }
 }
 
 .selectInput {
   border-color: $colorBorder01;
+
+  textarea {
+    color: $colorMain;
+  }
   > span {
     margin-right: 44px;
     color: $colorText;
+  }
+
+  div:global([class*="ValueContainer"]) {
+    div:global([class*="singleValue"]) {
+      color: $colorMain;
+    }
+  }
+  &.editable {
+    border-color: $colorMain;
+  }
+  &[class*="isFocus"] {
+    border-color: $colorActive01;
   }
 }

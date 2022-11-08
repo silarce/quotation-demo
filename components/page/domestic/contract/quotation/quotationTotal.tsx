@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 
 // component
 import MemoList from "./quotationTotal/remarkList"
@@ -13,18 +15,32 @@ import { TusePayInfo } from "./hook/usePayInfo"
 import { TuseProduct } from "./hook/useProduct"
 
 
-
-
 export default function QuotationTotal(
   { remarkListState, rangeListState,
-    payInfoState, productStates, disabled = false }:
+    payInfoState,  disabled = false,
+    prodState
+  }:
     {
       remarkListState: TuseRemarkList
       rangeListState: TuseRangeList
       payInfoState: TusePayInfo
-      productStates: TuseProduct
       disabled: boolean
+
+      prodState: TuseProduct
     }) {
+
+
+
+
+
+  const prodCount = {
+    avgDiscount: prodState.avgDiscount,
+    subTotal: prodState.subTotal,
+    businessTax: prodState.businessTax,
+    total: prodState.total,
+  }
+
+  const changeAllDiscount = prodState.changeAllDiscount
 
   // ====================================================
   return (
@@ -35,8 +51,10 @@ export default function QuotationTotal(
           <RangeList rangeListState={rangeListState} disabled={disabled} />
           <Appendix disabled={disabled} />
         </div>
-        <PayInfo payInfoState={payInfoState} productStates={productStates}
-          disabled={disabled} />
+        <PayInfo payInfoState={payInfoState}
+          disabled={disabled} prodCount={prodCount}
+          changeAllDiscount={changeAllDiscount}
+        />
       </div>
     </div >
   )
