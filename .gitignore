@@ -34,6 +34,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+.vscode
+
 /廢案
 /z_筆記
 /z_備份
