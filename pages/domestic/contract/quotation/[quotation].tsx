@@ -38,7 +38,7 @@ import style from "./[quotation].module.scss"
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
-import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+// import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 
 // ========================================================
 // lab

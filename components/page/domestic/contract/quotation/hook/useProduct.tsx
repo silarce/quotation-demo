@@ -169,11 +169,11 @@ class ProdClass {
   discount: Tproduct["discount"] = ""
   _discount: Tproduct["discount"]  // 折數
   project: Tproduct["project"]  // 項目
-  L: Tproduct["L"] = ""  // L
-  W: Tproduct["W"] = ""  // W
+  // L: Tproduct["L"] = ""  // L
+  // W: Tproduct["W"] = ""  // W
   H: Tproduct["H"] = ""  // H
-  _L: Tproduct["L"]  // L
-  _W: Tproduct["W"]  // W
+  _L: number  // L
+  _W: number  // W
   _H: Tproduct["H"]  // H
   _qty: Tproduct["qty"]  // 數量
   memo: Tproduct["memo"] // 備註
@@ -211,8 +211,8 @@ class ProdClass {
 
     this._discount = discount
     this.project = project
-    this._L = L
-    this._W = W
+    this._L = parseFloat(L)
+    this._W = parseFloat(W)
     this._H = H
     this.memo = memo
 
@@ -239,8 +239,7 @@ class ProdClass {
       ?? unexpectedOption(B)
 
 
-
-    let keys = ["discount", "L", "W", "H",]
+    let keys = ["discount", "H",]
     keys.forEach((key) => {
       Object.defineProperty(this, key, {
         get() {
@@ -262,15 +261,29 @@ class ProdClass {
       }))
   }
 
+  get L() {
+    return `${this._L}`
+  }
+  set L(v) {
+    this._W = 0
+    this._L = new Decimal(parseFloat(v) || 0).abs().toNumber()
+  }
+  get W() {
+    return `${this._W}`
+  }
+  set W(v) {
+    this._L = 0
+    this._W = new Decimal(parseFloat(v) || 0).abs().toNumber()
+  }
 
   get area() {
-    return new Decimal(this._L)
+    return new Decimal(this._L || this._W)
       .mul(Decimal.add(this._H, this.B.value))
       .div(100 * 100) // 把單位從平方公分轉為平方公尺
       .toFixed(2).toString()
   }
   get cai() {
-    return new Decimal(999).toFixed(1).toString()
+    return new Decimal(this.area).mul(10.89).toFixed(0).toString()
   }
 
   get qty() {
@@ -355,7 +368,7 @@ export class PartClass {
   unit: string | null
   _qty: string | null
   listPrice: string //牌價
-  price: string //單價
+  // price: string //單價
   setProductList: Dispatch<SetStateAction<ProdClass[]>>
 
   parent: ProdClass
@@ -371,7 +384,7 @@ export class PartClass {
     const {
       subType, subTypeName, id, material, surface,
       basicWeight, unit, qty, listPrice,
-      price,
+      // price,
     } = partData
     this.setProductList = setProductList
 
@@ -384,7 +397,7 @@ export class PartClass {
     this._qty = qty ?? null
 
     this.listPrice = listPrice
-    this.price = price
+    // this.price = price
 
     this.material = optionsGroup["material"].find((item) => item.value === material)
       ?? material
@@ -395,18 +408,31 @@ export class PartClass {
   }
 
   get qty() {
-    if (this._qty) return this._qty
-    if (this.unit === "M") return this.parent.L
+    if (this._qty) return parseFloat(this._qty).toFixed(2)
+    if (this.subTypeName === "門軌") {
+      const length = this.parent._H
+      return new Decimal(length).div(100).toFixed(2).toString()
+    }
+    if (this.unit === "M") {
+      const length = this.parent._L || this.parent.W
+      return new Decimal(length).div(100).toFixed(2).toString()
+    }
     return this.parent.area
   }
   //牌價複價
   get totalListPrice() {
-    return Decimal.mul(this.qty, this.listPrice).toString()
+    return Decimal.mul(this.qty, this.listPrice).toFixed(2).toString()
+  }
+  // 單價 (有計算折數的單價)
+  get price() {
+    return Decimal.mul(this.listPrice, this.parent.discount)
+      .div(100).toFixed(2)
+      .toString()
   }
   //複價 (有計算折數的複價)
   get totalPrice() {
     return Decimal.mul(this.totalListPrice, this.parent.discount)
-      .div(100)
+      .div(100).toFixed(2)
       .toString()
   }
 
@@ -455,10 +481,10 @@ export function prodCellConfigOri(): TprodCellConfig {
       discount: { id: "discount", label: "折數", width: "75px", type: "input" },
       project: { id: "project", label: "項目", width: "60px", type: "input" },
       quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "select" },
-      L: { id: "L", label: "L", width: "60px", type: "input" },
-      W: { id: "W", label: "W", width: "60px", type: "input" },
-      H: { id: "H", label: "H", width: "60px", type: "input" },
-      B: { id: "B", label: "B", width: "60px", type: "select" },
+      L: { id: "L", label: "L(m)", width: "60px", type: "input" },
+      W: { id: "W", label: "W(m)", width: "60px", type: "input" },
+      H: { id: "H", label: "H(m)", width: "60px", type: "input" },
+      B: { id: "B", label: "B(m)", width: "60px", type: "select" },
       area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
       cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
       doorType: { id: "doorType", label: "門型", width: "100px", type: "select" },
