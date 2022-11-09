@@ -118,6 +118,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return fakeProdChangingRecordList[quotation]
   }, [quotation])
   // =========================================================
+  const [showPdf, setShowPdf] = useState(false)
+
   const tagList: TtagList = [
     {
       label: `報價編號 ${newQuotationId || quotation}`,
@@ -137,7 +139,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }) || null,
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
-      onClick: () => alert("匯出報價單")
+      onClick: () => setShowPdf(true)
     },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
     {
@@ -232,7 +234,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
         </div>
       </div>
-      <QuotationPdf isVisable={true} onCancel={() => { }} />
+      <QuotationPdf isVisable={showPdf} onCancel={() => { setShowPdf(false) }}
+
+      />
     </div >
   )
 }
