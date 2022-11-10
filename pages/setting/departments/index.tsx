@@ -2,9 +2,9 @@
 // 公司職等職稱
 import {
   ChangeEvent, Dispatch, SetStateAction, MouseEvent,
-  useState, useEffect, useMemo
+  useState, useEffect, 
 } from "react"
-import { AxiosError } from "axios"
+
 
 const _ = require("lodash")
 

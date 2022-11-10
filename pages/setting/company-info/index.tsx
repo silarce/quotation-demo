@@ -23,7 +23,7 @@ import {
 } from "js/api/api_company-info"
 
 // icon
-import { Icondelete01 } from "public/image/icon/svgComponent/svgIcons"
+import { IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./company-info.module.scss"
@@ -201,7 +201,7 @@ export default function CompanyInfo() {
                 />
               </label>
               <span>{"(上限10MB)"}</span>
-              <Icondelete01 onClick={clearLogo} />
+              <IconDelete01 onClick={clearLogo} />
             </div>
           }
         </div>
