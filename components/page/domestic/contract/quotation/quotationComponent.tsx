@@ -12,7 +12,7 @@ import styleL from "./local.module.scss"
 
 // options
 import {
-  Toption, 
+  Toption,
   optionsCreator_material,
   optionsCreator_surface,
 
@@ -43,9 +43,9 @@ export default function QuotationComponent(
         <h2>材料/配件設定</h2>
       </div>
 
-      <div className={styleL.scrollDiv}>
+      <div className={styleL.scrollDiv + " " + style.scrollDiv}>
         {/* thead */}
-        <div className={styleL.thead}>
+        <div className={styleL.thead + " " + style.thead}>
           <div className={styleL.rowIndex}>
             <span></span>
           </div>
@@ -106,7 +106,7 @@ export default function QuotationComponent(
                     <div className={styleL.column} key={cIndex} style={theStyle}>
                       <div>
                         <span>{item}</span>
-                        {theTwo && <sup>{theTwo}</sup>}
+                        <sup>{theTwo}</sup>
                       </div>
                     </div>
                   )
@@ -162,8 +162,8 @@ type Tconfig = {
 }
 
 const config: Tconfig = {
-  "subType": { label: "代號", width: "45px" },
-  "subTypeName": { label: "種類名稱", width: "136px" },
+  "subType": { label: "中類", width: "45px" },
+  "subTypeName": { label: "種類名稱", width: "160px" },
   "id": { label: "代號", width: "116px" },
   "material": { label: "材料", width: "120px" },
   "surface": { label: "表面", width: "55px" },

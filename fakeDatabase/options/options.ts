@@ -80,9 +80,7 @@ export const optionsCreator_quoteType =
   (): Toption[] => [
     { value: "捲門", label: "捲門", quoteTypeType: "rollerDoor" },
     { value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor" },
-    { value: "特大號捲門", label: "特大號捲門", quoteTypeType: "rollerDoor" },
     { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
-    { value: "也不是捲門", label: "也不是捲門", quoteTypeType: "normal" },
   ]
 
 // 材料

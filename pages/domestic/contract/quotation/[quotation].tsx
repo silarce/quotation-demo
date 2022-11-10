@@ -38,19 +38,19 @@ import style from "./[quotation].module.scss"
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
-import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
+// import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 
-
+// ========================================================
+// lab
+import QuotationPdf from "components/page/domestic/paf/quotationPdf/quotationPdf"
+// ========================================================
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
-const fakeQuotProductList = fakeQuotProductListOri()
 
-// 產品應該會是點進來後才跟後端要資料
-// 現在先做一個假的報價單資料表import進來，然後跟收到的報價單id(quotation)檢索對應的資料
-
-// 如果使用者貼上動態url進來，一開始router.query會是空的
-// 要運行第二次後router.query才會有東西，所以包這一層判斷是否已經ready
+// =============================================================
+// =============================================================
+// =============================================================
 export default function Quotation() {
   const router = useRouter()
   const isReady = router.isReady
@@ -59,10 +59,7 @@ export default function Quotation() {
 
   return <TheQuotation router={router} />
 }
-
-// =====================================
-// =====================================
-// =====================================
+// ===========================================================
 function TheQuotation({ router }: { router: NextRouter }) {
   // query
   // quotation為報價單的id，也可能是"newQuotation"字串
@@ -121,6 +118,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return fakeProdChangingRecordList[quotation]
   }, [quotation])
   // =========================================================
+  const [showPdf, setShowPdf] = useState(false)
+
   const tagList: TtagList = [
     {
       label: `報價編號 ${newQuotationId || quotation}`,
@@ -140,7 +139,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }) || null,
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
-      onClick: () => alert("匯出報價單")
+      onClick: () => setShowPdf(true)
     },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
     {
@@ -235,6 +234,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
         </div>
       </div>
+      <QuotationPdf isVisable={showPdf} onCancel={() => { setShowPdf(false) }}
+
+      />
     </div >
   )
 }

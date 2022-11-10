@@ -1,7 +1,9 @@
 @use "styles/theme01" as *;
 
-
-
-
-
-
+.scrollDiv {
+  height: 463px;
+  .thead {
+    position: sticky;
+    top: 0;
+  }
+}

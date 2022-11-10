@@ -9,6 +9,14 @@
 @tailwind components;
 @tailwind utilities;
 
+// tailwind的css設定會使 html2canvas 跑版
+// 為了使html2canvas產生的canvas不跑版，所以這樣設定
+@layer base {
+  img {
+    @apply inline-block;
+  }
+}
+
 html,
 body {
   padding: 0;
