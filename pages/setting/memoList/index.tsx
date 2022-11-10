@@ -20,56 +20,64 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 import Input02 from "components/global/gear/input/input02"
 
 // icon
-import { IconEdit, IconCopy, IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
+import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./memoList.module.scss"
-import TheadItem from "components/page/domestic/contract/quotation/quotationProduct/dndThead/theadItem"
 
+type TmemoState = {
+  list: MemoClass[]
+}
 
-
-
-
-
+// ==========================================================================
 export default function MemoList() {
   const [isReady, setIsReady] = useState(false)
   const [editable, setEditable] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
   // ------------------------------------------------------------------------
-  const [memoList, setMemoList] = useState<MemoClass[]>([])
+  const [memoState, setMemoState] = useState<TmemoState>({ list: [] })
 
   useEffect(() => {
-    const theMemoList =
-      fakeMomoListOri().map((memo, index) =>
-        new MemoClass({
-          memo,
-          memoList,
-          setMemoList,
-          index
-        })
-      )
-    setMemoList(theMemoList)
+    if (memoState.list.length !== 0) return
+    fakeMomoListOri().forEach((memo, index) => {
+      const newMemo = new MemoClass({
+        memo,
+        memoList: memoState.list,
+        setMemoState: setMemoState,
+      })
+      memoState.list.push(newMemo)
+    })
+    setMemoState({ ...memoState })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
-
-
+  // ------------------------------------------------------------------------
+  const [searchValue, setSearchValue] = useState("")
+  const toSearch = (v: string) => setSearchValue(v)
   // ------------------------------------------------------------------------
   const panelList: TpanelList = [
     {
       type: "inputSearch",
       placeholder: "請輸入搜尋內容",
-      onClick: () => { }
+      onClick: toSearch
     },
     {
       type: "addButton",
       label: "新增備註",
-      onClick: () => { }
+      onClick: () => {
+        const newMemo = new MemoClass({
+          memo: "",
+          memoList: memoState.list,
+          setMemoState: setMemoState,
+        })
+        memoState.list.unshift(newMemo)
+        setSearchValue("")
+        setMemoState({ ...memoState })
+      }
     }
   ]
-
   // ------------------------------------------------------------------------
   return (
     <div className={style.container}>
@@ -82,17 +90,44 @@ export default function MemoList() {
       <div className={style.mainContainer}>
         <div className={style.memoList}>
 
-          {memoList.map((item, index) => {
+          {memoState.list.map((item, index) => {
+            const {
+              memo, editable,
+              copy, changeEditable, deleteThis, onChange
+            } = item
+
+            // 與搜尋功能
+            const regex = new RegExp(searchValue)
+            if (!regex.test(memo)) return null
 
             return (
-              <CellWithBar key={index}>
-                <div><IconEdit /></div>
-                <div><IconCopy /></div>
-                <div><IconDelete01 /></div>
-                <div>1</div>
+              <CellWithBar className={style.row} key={index}
+                isActive={editable}
+              >
 
+                <div className={style.icon}>
+                  {editable
+                    ? <IconCheck02 onClick={() => changeEditable()} />
+                    : <IconEdit onClick={() => changeEditable()} />}
+                </div>
+                <div className={style.icon}>
+                  <IconCopy onClick={() => copy()} />
+                </div>
+                <div className={style.icon}>
+                  <IconDelete01 onClick={() => deleteThis()} />
+                </div>
+                <div className={style.index}><span>1</span></div>
 
-
+                <div className={style.input}>
+                  <Input02 className={style.input03}
+                    stateValue={memo}
+                    onChange={onChange}
+                    label=""
+                    labelWidth="0"
+                    gap="0"
+                    disabled={!editable}
+                  />
+                </div>
               </CellWithBar>
             )
 
@@ -114,48 +149,55 @@ export default function MemoList() {
 
 class MemoClass {
   memo: string
+  setMemoState: Dispatch<SetStateAction<TmemoState>>
   rerender: () => void
-  memoList: MemoClass[]
-  index: number
+  memoList: MemoClass[] = []
   editable = false
 
   constructor(
     { memo,
       memoList,
-      setMemoList,
-      index
+      setMemoState,
     }:
       {
         memo: string
         memoList: MemoClass[]
-        setMemoList: Dispatch<SetStateAction<MemoClass[]>>
-        index: number
+        setMemoState: Dispatch<SetStateAction<TmemoState>>
       }
   ) {
     this.memo = memo
     this.memoList = memoList
-    this.index = index
+    this.setMemoState = setMemoState
     this.rerender = () => {
-      setMemoList(memoList => [...memoList])
+      setMemoState(state => ({ ...state }))
     }
   }
 
   copy = () => {
-    const copy = _.cloneDeep(this)
+    const copy = new MemoClass({
+      memo: this.memo,
+      memoList: this.memoList,
+      setMemoState: this.setMemoState,
+    })
     this.memoList.unshift(copy)
     this.rerender()
   }
 
-  changeEditable = (v: boolean) => {
+  changeEditable = (v?: boolean) => {
+    this.memoList.forEach((other, index, arr) => {
+      if (other === this) return
+      other.editable = false
+    })
     if (v === undefined)
       this.editable = !this.editable
     else this.editable = v
     this.rerender()
   }
 
-  delete = () => {
+  deleteThis = () => {
     const deleteThis = () => {
-      this.memoList.splice(this.index, 1)
+      const index = this.memoList.findIndex((item) => item === this)
+      this.memoList.splice(index, 1)
       this.rerender()
     }
     myAlert.confirm({
@@ -178,14 +220,22 @@ class MemoClass {
 
 // ==========================================================================
 const fakeMomoListOri = () => [
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
-  "字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串字串",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "抗風壓結構計算技師簽證費用、材料檢驗費用、防颱中柱、高空作業自動防火連動操作裝置、前遮板、矽利康、懸吊系統、門框補強立柱、收邊料,單價另計。",
+  "很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
+  "防颱型捲門含防颱底座鎖固*1個、檔輪、鋁合金障感器及遙控器(1:2),捲箱2面0.8t。",
 ]
 
 

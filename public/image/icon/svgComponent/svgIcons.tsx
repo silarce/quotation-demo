@@ -56,7 +56,7 @@ function IconSearch(props: SVGProps<SVGSVGElement>) {
 function IconCopy(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
-    <svg {...{ ...props, className }} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="3.5" y="2.5" width="10" height="13" stroke="currentColor" />
       <path d="M13.5 8H17V19H9V15.6" stroke="currentColor" />
     </svg>
@@ -118,6 +118,18 @@ export const IconCheck01 = (props: SVGProps<SVGSVGElement>) => {
     </svg>
   )
 }
+
+export const IconCheck02 = (props: SVGProps<SVGSVGElement>) => {
+  let className = getClassName(props)
+  return (
+    <svg {...{ ...props, className }}
+      width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 10.1579L8.04 17L17 4" stroke="#EA1833" strokeWidth="1.5" />
+    </svg>
+
+  )
+}
+
 
 // 叉叉 X
 export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
