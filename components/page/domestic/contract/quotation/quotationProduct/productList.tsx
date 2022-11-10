@@ -11,7 +11,7 @@ import Checkbox01 from "components/global/gear/checkbox/checkbox01"
 import { OptionWithIcon01 } from "components/global/gear/select/optionWithIcon";
 import { SingleValueWithIcon01 } from "components/global/gear/select/singleValueWithIcon";
 // icon
-import { Icondelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
+import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./productList.module.scss"
@@ -82,7 +82,7 @@ export default function ProductList({ productStates }:
             >
               <div className={style.buttonBox}>
 
-                <Icondelete01
+                <IconDelete01
                   onClick={(e) => deleteProduct(e, pIndex)}
                 />
                 <IconCopy

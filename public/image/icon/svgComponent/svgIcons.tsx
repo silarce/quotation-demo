@@ -20,7 +20,7 @@ const getClassName = (props: SVGProps<SVGSVGElement>) => {
 
 
 
-function Icondelete01(props: SVGProps<SVGSVGElement>) {
+function IconDelete01(props: SVGProps<SVGSVGElement>) {
   const className = getClassName(props)
   return (
     <svg {...{ ...props, className }} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -40,7 +40,6 @@ function IconEdit(props: SVGProps<SVGSVGElement>) {
       <path d="M3.125 12.0955V14.7518H5.78125L13.6154 6.9176L10.9592 4.26135L3.125 12.0955ZM15.6696 4.86344C15.9458 4.58719 15.9458 4.14094 15.6696 3.86469L14.0121 2.20719C13.7358 1.93094 13.2896 1.93094 13.0133 2.20719L11.7171 3.50344L14.3733 6.15969L15.6696 4.86344Z" fill="currentColor" />
       <path d="M3 17.377H17" stroke="currentColor" />
     </svg>
-
   )
 }
 
@@ -136,9 +135,8 @@ export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
 
 
 
-
 export {
-  Icondelete01, //垃圾桶icon
+  IconDelete01, //垃圾桶icon
   IconEdit,
   IconSearch,
   IconCopy,
