@@ -294,13 +294,28 @@ class ProdClass {
     this._qty = new Decimal(parseInt(v) || 0).abs().toString()
   }
 
-  // 單價
-  get unitPrice() {
+  // 牌價
+  get listPrice() {
     let listPrice = new Decimal(0)
     this.part.forEach((part) => {
-      listPrice = listPrice.plus(part.totalPrice)
+      listPrice = listPrice.plus(part.totalListPrice)
     })
     return listPrice.toNumber().toLocaleString()
+  }
+  // 牌價複價
+  get listPriceTotal() {
+    return new Decimal(this.qty || 0)
+      .mul(this.listPrice.replaceAll(",", ""))
+      .toNumber().toLocaleString()
+  }
+
+  // 單價
+  get unitPrice() {
+    let unitPrice = new Decimal(0)
+    this.part.forEach((part) => {
+      unitPrice = unitPrice.plus(part.totalPrice)
+    })
+    return unitPrice.toNumber().toLocaleString()
   }
   // 複價
   get priceTotal() {
@@ -454,7 +469,8 @@ type TprodKeys = keyof Pick<ProdClass,
   "discount" | "project" | "quoteType" | "L" | "W" |
   "H" | "B" | "area" | "cai" | "doorType" |
   "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
-  "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor"
+  "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor" |
+  "listPrice" | "listPriceTotal"
 >
 
 type TprodCellConfig = {
@@ -474,8 +490,9 @@ export function prodCellConfigOri(): TprodCellConfig {
     keyList: [
       "discount", "project", "quoteType", "L", "W",
       "H", "B", "area", "cai", "doorType",
-      "material", "surface", "doorRail", "horsepower", "qty", "unitPrice",
-      "priceTotal", "memo", "typhoonProof", "ejectionDoor",
+      "material", "surface", "doorRail", "horsepower", "qty",
+      "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
+      "memo", "typhoonProof", "ejectionDoor",
     ],
     cellConfig: {
       discount: { id: "discount", label: "折數", width: "75px", type: "input" },
@@ -493,6 +510,8 @@ export function prodCellConfigOri(): TprodCellConfig {
       doorRail: { id: "doorRail", label: "門軌", width: "75px", type: "selectWithIcon" },
       horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "select" },
       qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+      listPrice: { id: "listPrice", label: "牌價", width: "120px", type: "readOnly" },
+      listPriceTotal: { id: "listPriceTotal", label: "牌價複價", width: "140px", type: "readOnly" },
       unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "readOnly" },
       priceTotal: { id: "priceTotal", label: "複價", width: "140px", type: "readOnly" },
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },

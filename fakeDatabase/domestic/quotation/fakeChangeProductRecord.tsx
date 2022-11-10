@@ -22,6 +22,8 @@ interface TrecordProduct
 
   area: string
   cai: string
+  listPrice: string
+  listPriceTotal: string
   unitPrice: string
   subTotal: string
   priceTotal: string
@@ -67,6 +69,8 @@ const fakeProduct01: TrecordProduct = {
   },
   horsepower: "1/3HP",
   qty: "1",
+  listPrice: "11111",
+  listPriceTotal: "11111",
   unitPrice: "158610",
   subTotal: "158610",
   memo: "這是備註",
@@ -96,6 +100,8 @@ const fakeProduct02: TrecordProduct = {
   },
   horsepower: "1/3HP",
   qty: "1",
+  listPrice: "11111",
+  listPriceTotal: "11111",
   unitPrice: "158610",
   subTotal: "158610",
   memo: "備註",
