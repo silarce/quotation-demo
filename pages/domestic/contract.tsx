@@ -9,7 +9,7 @@ import BudgeList from "components/page/domestic/budget/budgetList"
 import ContractList from "components/page/domestic/contract/contractList";
 
 // css
-import style from "./budget.module.scss"
+import style from "./contract.module.scss"
 
 // fakeData
 import { fakeContractListSimple } from "fakeDatabase/domestic/contractCombinder"; 
