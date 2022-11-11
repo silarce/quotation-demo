@@ -105,17 +105,6 @@ export default function QuoteRangeList() {
                 isActive={editable}
               >
 
-                <div className={style.icon}>
-                  {editable
-                    ? <IconCheck02 onClick={() => changeEditable()} />
-                    : <IconEdit onClick={() => changeEditable()} />}
-                </div>
-                <div className={style.icon}>
-                  <IconCopy onClick={() => copy()} />
-                </div>
-                <div className={style.icon}>
-                  <IconDelete01 onClick={() => deleteThis()} />
-                </div>
                 <div className={style.index}><span>1</span></div>
 
                 <div className={style.input}>
@@ -128,6 +117,19 @@ export default function QuoteRangeList() {
                     disabled={!editable}
                   />
                 </div>
+
+                <div className={style.icon}>
+                  {editable
+                    ? <IconCheck02 onClick={() => changeEditable()} />
+                    : <IconEdit onClick={() => changeEditable()} />}
+                </div>
+                <div className={style.icon}>
+                  <IconCopy onClick={() => copy()} />
+                </div>
+                <div className={style.icon}>
+                  <IconDelete01 onClick={() => deleteThis()} />
+                </div>
+
               </CellWithBar>
             )
 

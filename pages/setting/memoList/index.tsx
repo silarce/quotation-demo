@@ -104,6 +104,17 @@ export default function MemoList() {
               <CellWithBar className={style.row} key={index}
                 isActive={editable}
               >
+                <div className={style.index}><span>{index + 1}</span></div>
+                <div className={style.input}>
+                  <Input02 className={style.input03}
+                    stateValue={memo}
+                    onChange={onChange}
+                    label=""
+                    labelWidth="0"
+                    gap="0"
+                    disabled={!editable}
+                  />
+                </div>
 
                 <div className={style.icon}>
                   {editable
@@ -116,30 +127,11 @@ export default function MemoList() {
                 <div className={style.icon}>
                   <IconDelete01 onClick={() => deleteThis()} />
                 </div>
-                <div className={style.index}><span>1</span></div>
-
-                <div className={style.input}>
-                  <Input02 className={style.input03}
-                    stateValue={memo}
-                    onChange={onChange}
-                    label=""
-                    labelWidth="0"
-                    gap="0"
-                    disabled={!editable}
-                  />
-                </div>
               </CellWithBar>
             )
-
           })}
-
-
-
         </div>
-
-
       </div>
-
     </div>
   )
 }
