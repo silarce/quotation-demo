@@ -25,6 +25,7 @@ interface TrecordProduct
   listPrice: string
   listPriceTotal: string
   unitPrice: string
+  subTotal: string
   priceTotal: string
 }
 interface TchangeListItem {
@@ -56,11 +57,11 @@ const fakeProduct01: TrecordProduct = {
   project: "SD1",
   quoteType: "不是捲門",
   L: "516",
-  W: "0",
+  W: "230",
   H: "230",
   B: "45",
-  area: (516 * (230 + 45) / 10000).toFixed(2),
-  cai: (516 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
+  area: "14.19",
+  cai: "15400.52", //才數
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
@@ -69,27 +70,29 @@ const fakeProduct01: TrecordProduct = {
     icon: iconDoorRail60.src
   },
   horsepower: "1/3HP",
-  qty: "2",
-  listPrice: "10000",
-  listPriceTotal: "20000",
-  unitPrice: "20000",
-  priceTotal: "20000",
+  qty: "1",
+  listPrice: "11111",
+  listPriceTotal: "11111",
+  unitPrice: "158610",
+  subTotal: "158610",
   memo: "這是備註",
-  typhoonProof: true,
   ejectionDoor: false,
+
+  typhoonProof: true,
+  priceTotal: "11111",
 }
 
 const fakeProduct02: TrecordProduct = {
   action: "remove",
-  discount: "50.00",
-  project: "SD2",
+  discount: "100.00",
+  project: "SD1",
   quoteType: "捲門",
-  L: "0",
+  L: "516",
   W: "230",
   H: "230",
   B: "45",
-  area: (230 * (230 + 45) / 10000).toFixed(2),
-  cai: (230 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
+  area: "14.19",
+  cai: "15400.52", //才數
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
@@ -97,15 +100,17 @@ const fakeProduct02: TrecordProduct = {
     label: "75",
     icon: iconDoorRail75.src
   },
-  horsepower: "1 1/2HP",
+  horsepower: "1/3HP",
   qty: "1",
-  listPrice: "10000",
-  listPriceTotal: "10000",
-  unitPrice: "9000",
-  priceTotal: "9000",
+  listPrice: "11111",
+  listPriceTotal: "11111",
+  unitPrice: "158610",
+  subTotal: "158610",
   memo: "備註",
-  typhoonProof: false,
   ejectionDoor: true,
+
+  typhoonProof: false,
+  priceTotal: "11111",
 }
 
 

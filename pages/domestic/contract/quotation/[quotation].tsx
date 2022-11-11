@@ -215,7 +215,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
           }
 
-          {/* 展開版本的追加追減紀錄 */}
+          {/* 展開版本的追加追減紀錄 (在很下面)*/}
           {prodChangingRecord && switch02 &&
             <QuotationRecord prodChangingRecord={prodChangingRecord} />}
 

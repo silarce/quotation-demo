@@ -42,16 +42,10 @@ const optionsGroup = {
 }
 
 
-
-
-// ======================================================
-// type
-
 // ======================================================
 
 const pordCellConfig = prodCellConfigOri()
 let { keyList: prodKeyList,
-  // cellConfig 
 } = pordCellConfig
 
 
@@ -60,7 +54,7 @@ let { keyList: prodKeyList,
 // ============================================================
 
 
-export default function useProduct(
+function useProduct(
   productListOri: Tproduct[] | undefined,
   disabled: boolean
 ) {
@@ -145,14 +139,7 @@ export default function useProduct(
     disabled,
     avgDiscount, subTotal, businessTax, total
   }
-}
-
-
-
-// =============================================================
-type TuseProduct = ReturnType<typeof useProduct>
-
-export type { TuseProduct, Tproduct, TprodKeys, ProdClass }
+} // useProduct
 
 
 
@@ -276,12 +263,14 @@ class ProdClass {
     this._W = new Decimal(parseFloat(v) || 0).abs().toNumber()
   }
 
+  // L*(H+B)/10000 = area
   get area() {
     return new Decimal(this._L || this._W)
       .mul(Decimal.add(this._H, this.B.value))
       .div(100 * 100) // 把單位從平方公分轉為平方公尺
       .toFixed(2).toString()
   }
+  // area *10.89 = cai 取整數
   get cai() {
     return new Decimal(this.area).mul(10.89).toFixed(0).toString()
   }
@@ -294,13 +283,28 @@ class ProdClass {
     this._qty = new Decimal(parseInt(v) || 0).abs().toString()
   }
 
-  // 單價
-  get unitPrice() {
+  // 牌價
+  get listPrice() {
     let listPrice = new Decimal(0)
     this.part.forEach((part) => {
-      listPrice = listPrice.plus(part.totalPrice)
+      listPrice = listPrice.plus(part.totalListPrice)
     })
     return listPrice.toNumber().toLocaleString()
+  }
+  // 牌價複價
+  get listPriceTotal() {
+    return new Decimal(this.qty || 0)
+      .mul(this.listPrice.replaceAll(",", ""))
+      .toNumber().toLocaleString()
+  }
+
+  // 單價
+  get unitPrice() {
+    let unitPrice = new Decimal(0)
+    this.part.forEach((part) => {
+      unitPrice = unitPrice.plus(part.totalPrice)
+    })
+    return unitPrice.toNumber().toLocaleString()
   }
   // 複價
   get priceTotal() {
@@ -358,7 +362,7 @@ class ProdClass {
 // ============================================================================
 // ============================================================================
 
-export class PartClass {
+class PartClass {
   subType: string
   subTypeName: string
   id: string | null
@@ -454,7 +458,8 @@ type TprodKeys = keyof Pick<ProdClass,
   "discount" | "project" | "quoteType" | "L" | "W" |
   "H" | "B" | "area" | "cai" | "doorType" |
   "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
-  "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor"
+  "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor" |
+  "listPrice" | "listPriceTotal"
 >
 
 type TprodCellConfig = {
@@ -469,13 +474,14 @@ type TprodCellConfig = {
   }
 }
 
-export function prodCellConfigOri(): TprodCellConfig {
+function prodCellConfigOri(): TprodCellConfig {
   return {
     keyList: [
       "discount", "project", "quoteType", "L", "W",
       "H", "B", "area", "cai", "doorType",
-      "material", "surface", "doorRail", "horsepower", "qty", "unitPrice",
-      "priceTotal", "memo", "typhoonProof", "ejectionDoor",
+      "material", "surface", "doorRail", "horsepower", "qty",
+      "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
+      "memo", "typhoonProof", "ejectionDoor",
     ],
     cellConfig: {
       discount: { id: "discount", label: "折數", width: "75px", type: "input" },
@@ -493,6 +499,8 @@ export function prodCellConfigOri(): TprodCellConfig {
       doorRail: { id: "doorRail", label: "門軌", width: "75px", type: "selectWithIcon" },
       horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "select" },
       qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+      listPrice: { id: "listPrice", label: "牌價", width: "120px", type: "readOnly" },
+      listPriceTotal: { id: "listPriceTotal", label: "牌價複價", width: "140px", type: "readOnly" },
       unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "readOnly" },
       priceTotal: { id: "priceTotal", label: "複價", width: "140px", type: "readOnly" },
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
@@ -530,6 +538,13 @@ const unexpectedOption = (v: string) => ({
 
 
 
+
+// =============================================================
+type TuseProduct = ReturnType<typeof useProduct>
+
+export default useProduct
+export { prodCellConfigOri }
+export type { TuseProduct, Tproduct, TprodKeys, ProdClass, PartClass }
 
 
 
