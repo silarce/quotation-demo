@@ -29,34 +29,43 @@ export default function QuotationPdf(
     }
 ) {
 
+  const refPdf = useRef<(HTMLDivElement | null)[]>([])
 
-  const refPdf = useRef(null!)
-  const refFoo = useRef(null!)
-
-  // const [bar, setBar] = useState()
   useEffect(() => {
-    if (!isVisable) return;
-    html2canvas(refPdf.current)
-      .then((canvas) => {
-        const doc = new jsPDF("p", "px", "a4")
-        const image = canvas.toDataURL("image/JPEG")
+    if (!isVisable || !refPdf.current[0]) return;
 
-        var width = doc.internal.pageSize.getWidth();
-        var height = doc.internal.pageSize.getHeight();
-        // refFoo.current.appendChild(canvas)
-        // window.open(image)
-        // setBar(image)
-        // doc.addImage(avatar.src, "JPEG", 0, 0, 100, 100);
-        // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-        // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+    const doc = new jsPDF("p", "px", "a4")
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var pageHeight = doc.internal.pageSize.getHeight();
 
-        doc.addImage(image, "JPEG", 0, 0, width, height);
-        doc.save('foo.pdf')
-      })
+    (async () => {
+      let isFirst = true
+      let item
+      for (item of refPdf.current) {
+        if (!item) return
+        const image = await html2canvas(item)
+          .then((canvas) => {
+            const image = canvas.toDataURL("image/JPEG")
+            return image
+
+            // doc.addImage(avatar.src, "JPEG", 0, 0, 100, 100);
+            // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+            // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+
+          })
+
+        if (!isFirst) doc.addPage()
+        isFirst = false
+        doc.addImage(image, "JPEG", 0, 0, pageWidth, pageHeight,);
+      }
+      doc.save('foo.pdf')
+    })()
+
+
   }, [isVisable])
 
 
-
+  console.log(refPdf)
 
   return (
     <Modal className={style.quotationPdf}
@@ -69,7 +78,7 @@ export default function QuotationPdf(
       width={"fit-content"}
     >
       <div className={style.pdf}
-        ref={refPdf}>
+        ref={ele => refPdf.current[0] = ele}>
         <Header />
         <Profile />
         <Table />
@@ -77,9 +86,15 @@ export default function QuotationPdf(
         <Other />
       </div>
 
-      {/* <div ref={refFoo}>
-        <img src={bar} alt="" />
-      </div> */}
+      <div className={style.pdf}
+        ref={ele => refPdf.current[1] = ele}>
+        <Header />
+        <Profile />
+        <Table />
+        <Total />
+        <Other />
+      </div>
+
 
     </Modal>
   )
