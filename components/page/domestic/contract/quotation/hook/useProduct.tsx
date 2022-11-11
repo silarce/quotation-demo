@@ -42,16 +42,10 @@ const optionsGroup = {
 }
 
 
-
-
-// ======================================================
-// type
-
 // ======================================================
 
 const pordCellConfig = prodCellConfigOri()
 let { keyList: prodKeyList,
-  // cellConfig 
 } = pordCellConfig
 
 
@@ -60,7 +54,7 @@ let { keyList: prodKeyList,
 // ============================================================
 
 
-export default function useProduct(
+function useProduct(
   productListOri: Tproduct[] | undefined,
   disabled: boolean
 ) {
@@ -145,14 +139,7 @@ export default function useProduct(
     disabled,
     avgDiscount, subTotal, businessTax, total
   }
-}
-
-
-
-// =============================================================
-type TuseProduct = ReturnType<typeof useProduct>
-
-export type { TuseProduct, Tproduct, TprodKeys, ProdClass }
+} // useProduct
 
 
 
@@ -276,12 +263,14 @@ class ProdClass {
     this._W = new Decimal(parseFloat(v) || 0).abs().toNumber()
   }
 
+  // L*(H+B)/10000 = area
   get area() {
     return new Decimal(this._L || this._W)
       .mul(Decimal.add(this._H, this.B.value))
       .div(100 * 100) // 把單位從平方公分轉為平方公尺
       .toFixed(2).toString()
   }
+  // area *10.89 = cai 取整數
   get cai() {
     return new Decimal(this.area).mul(10.89).toFixed(0).toString()
   }
@@ -373,7 +362,7 @@ class ProdClass {
 // ============================================================================
 // ============================================================================
 
-export class PartClass {
+class PartClass {
   subType: string
   subTypeName: string
   id: string | null
@@ -485,7 +474,7 @@ type TprodCellConfig = {
   }
 }
 
-export function prodCellConfigOri(): TprodCellConfig {
+function prodCellConfigOri(): TprodCellConfig {
   return {
     keyList: [
       "discount", "project", "quoteType", "L", "W",
@@ -549,6 +538,13 @@ const unexpectedOption = (v: string) => ({
 
 
 
+
+// =============================================================
+type TuseProduct = ReturnType<typeof useProduct>
+
+export default useProduct
+export { prodCellConfigOri }
+export type { TuseProduct, Tproduct, TprodKeys, ProdClass, PartClass }
 
 
 
