@@ -188,8 +188,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
               </div>}
           </div>
           {/* 合約項目 追加/追減項目 */}
-
-
           {
             (switch01 || switch02)
               ?
@@ -304,6 +302,8 @@ const OqpHeader = ({ isActive, panelSwitch }: {
     </div>
   )
 }
+
+
 
 
 
