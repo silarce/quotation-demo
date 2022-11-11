@@ -103,6 +103,14 @@ const sidePathList: TsidePathList = {
           label: "產品列表",
           path: path01 + "/productList"
         },
+        {
+          label: "備註列表",
+          path: path01 + "/memoList"
+        },
+        {
+          label: "報價範圍列表",
+          path: path01 + "/quoteRangeList"
+        },
       ]
     }
   })(),

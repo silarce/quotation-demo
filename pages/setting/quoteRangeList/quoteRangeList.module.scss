@@ -1,0 +1,40 @@
+@use "styles/theme01" as *;
+@use "styles/layout" as *;
+
+.quoteRangeList {
+  padding: 4px;
+  .row {
+    display: flex;
+    padding: 10px 25px;
+    > div {
+      display: flex;
+      margin-top: 0;
+      > * {
+        margin: auto;
+      }
+    }
+
+    .icon {
+      margin-right: 20px;
+      margin-top: 4px;
+      height: fit-content;
+    }
+    .index {
+      margin: 1px 7px auto 7px;
+      width: 20px;
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+        color: $colorMain;
+      }
+    }
+    .input {
+      flex: auto;
+      > .input03 {
+        padding: 0;
+        position: relative;
+        top: -2px;
+      }
+    }
+  }
+}

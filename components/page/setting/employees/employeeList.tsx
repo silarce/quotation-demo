@@ -16,7 +16,7 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 import { apiDeleteEmployee } from "js/api/api_employee";
 
 // icon
-import { Icondelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import style from "./employeeList.module.scss"
 // type
@@ -121,7 +121,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
                   })}
 
                   <div className={`${style.column} ${style.btnCell}`}>
-                    <Icondelete01 onClick={(e) => { openDelPanel(e, row) }} />
+                    <IconDelete01 onClick={(e) => { openDelPanel(e, row) }} />
                   </div>
                 </div>
               </Link>
