@@ -3,7 +3,15 @@ import { useState, useMemo } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
-
+// components
+import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
+import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
+import QuotationComponent from "components/page/domestic/quotation/quotationComponent"
+import QuotationAccessory from "components/page/domestic/quotation/quotationAccessory"
+import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
+import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
+import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
+import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
 
 
 // global gear
@@ -55,6 +63,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     newQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
   } = router.query
   if (typeof newQuotationId !== "string") newQuotationId = ""
+
 
   // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
   let quotationData: Tquotation | undefined;
@@ -114,20 +123,55 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ]
   // --------------------------------------------------------------------------
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  // if (quotation !== "newQuotation" && !quotationData)
-  //   return <NoQuotation quotationId={quotation as string} />
+  if (quotationId !== "newQuotation" && !quotationData)
+    return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   return (
     <div className={style.container}>
-      {/* <PageHeader02 tagList={tagList}
-        panelList={newQuotationId ? panel_newQuotation : panel_quotation}
-      /> */}
+      <PageHeader02 tagList={tagList}
+        panelList={allowEdit ? panel_editable : panel_noEditable}
+      />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
+          <QuotationProfile profileState={profileState} disabled={!allowEdit} />
 
+          {/* 基本資料 */}
+          <div className={style.switchBar}>
+            {!switch02 &&
+              <div className={(switch01 && style.active) || ""}
+                onClick={() => setSwitch01(true)}>
+                合約項目
+              </div>
+            }
+          </div>
+
+          {/* 主產品設定 */}
+          <QuotationProduction productStates={prodStates} switch02={switch02} />
+
+          <div className={style.redWrapper}>
+            {/* 材料配件設定 */}
+            <QuotationComponent
+              partList={prodStates.productList[prodStates.activeRow]?.part}
+              disabled={!allowEdit} />
+            <hr />
+            {/* 選配設定 */}
+            <QuotationAccessory activeRow={prodStates.activeRow} />
+          </div>
+
+          {/* 備註/報價範圍/付款資訊 */}
+          <QuotationTotal
+            {...{
+              remarkListState, rangeListState,
+              payInfoState,
+              disabled: !allowEdit,
+              prodState: prodStates
+            }}
+          />
+          {/* 簽名 */}
+          <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
 
 
         </div>
@@ -139,6 +183,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
 }
 
 
-
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+const NoQuotation = ({ quotationId }: { quotationId: string }) => {
+  const router = useRouter()
+  const toBack = () => {
+    router.back()
+  }
+  return (
+    <div className={style.noQuotation}>
+      <span>沒有這個報價單ID</span>
+      <span>{quotationId}</span>
+      <button onClick={toBack}>回上一頁</button>
+    </div>
+  )
+}
 
 
