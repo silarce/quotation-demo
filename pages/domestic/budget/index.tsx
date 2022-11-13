@@ -37,65 +37,57 @@ export default function Budget() {
   const { fakeBudgetList } = fakeBudgetListGroup
 
   // ===================================================
+  // panelList
+
   // 搜尋用的
   const [searchObj, setSearchObj] = useState<TsearchObj>({
     doorType: "",
-    country: "",
+    county: "",
     clientName: "",
     projectName: "",
   })
 
-  const [doorType, setDoorType] = useState(optionsDoorType[0])
-  const [country, setCountry] = useState(optionsCounty[0])
-  const [clientName, setClientName] = useState("")
-  const [projectName, setProjectName] = useState("")
-
   const searchTargetList = [
     {
-      stateValue: doorType,
+      stateValue: optionsDoorType[0],
       options: optionsDoorType,
       placeholder: "選擇門型",
       width: "100px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setDoorType(option)
-      }
     },
     {
-      stateValue: country,
+      stateValue: optionsCounty[0],
       options: optionsCounty,
       placeholder: "選擇地區",
       width: "80px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setCountry(option)
-      }
     },
     {
-      stateValue: clientName,
+      stateValue: "",
       placeholder: "請輸入客戶名稱",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)
     },
     {
-      stateValue: projectName,
+      stateValue: "",
       placeholder: "請輸入專案名稱",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)
     },
   ]
 
-  const doSearch = () => {
+  const doSearch = (valueArr: (string | Toption | null)[]) => {
+    let [doorTypeOption, countyOption, clientName, projectName] = valueArr
+    const doorType = (doorTypeOption as Toption).value
+    const county = (countyOption as Toption).value
+    clientName = clientName as string
+    projectName = projectName as string
     setSearchObj({
-      doorType: doorType.value,
-      country: country.value,
-      clientName: clientName,
-      projectName: projectName,
+      doorType,
+      county,
+      clientName,
+      projectName,
     })
   }
-
   const searchGroup = {
     searchTargetList,
     doSearch
   }
+
   // -----------------------
 
   const panelList: TpanelList = [
