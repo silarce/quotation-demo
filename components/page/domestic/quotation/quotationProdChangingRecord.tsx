@@ -7,7 +7,7 @@ import { Collapse } from 'antd';
 import CellWithBar from "components/global/gear/cell/cellWithBar";
 import Checkbox01 from "components/global/gear/checkbox/checkbox01"
 // css
-import style from "components/page/domestic/contract/quotation/quotationProdChangingRecord.module.scss"
+import style from "components/page/domestic/quotation/quotationProdChangingRecord.module.scss"
 
 // type
 import type { TchangeRecord, TchangeListItem } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"

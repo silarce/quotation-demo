@@ -4,14 +4,14 @@ import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
 // components
-import QuotationProfile from "components/page/domestic/contract/quotation/quotationProfile"
-import QuotationProduction from "components/page/domestic/contract/quotation/quotationProduct"
-import QuotationComponent from "components/page/domestic/contract/quotation/quotationComponent"
-import QuotationAccessory from "components/page/domestic/contract/quotation/quotationAccessory"
-import QuotationTotal from "components/page/domestic/contract/quotation/quotationTotal"
-import QuotationSinature from "components/page/domestic/contract/quotation/quotationSinature"
-import QuotationProdChangingRecord from "components/page/domestic/contract/quotation/quotationProdChangingRecord"
-import QuotationRecord from "components/page/domestic/contract/quotation/quotationRecord"
+import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
+import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
+import QuotationComponent from "components/page/domestic/quotation/quotationComponent"
+import QuotationAccessory from "components/page/domestic/quotation/quotationAccessory"
+import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
+import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
+import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
+import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
 
 // antd
 import { Collapse } from 'antd';
@@ -22,12 +22,12 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHe
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // hook
-import useProfile from "components/page/domestic/contract/quotation/hook/useProfile"
-import useProduct, { TuseProduct } from "components/page/domestic/contract/quotation/hook/useProduct"
-import useRemarkList from "components/page/domestic/contract/quotation/hook/useRemarkList"
-import useRangeList from "components/page/domestic/contract/quotation/hook/useRangeList"
-import usePayInfo from "components/page/domestic/contract/quotation/hook/usePayInfo"
-import useSinature from "components/page/domestic/contract/quotation/hook/useSinature"
+import useProfile from "components/page/domestic/quotation/hook/useProfile"
+import useProduct, { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
+import useRemarkList from "components/page/domestic/quotation/hook/useRemarkList"
+import useRangeList from "components/page/domestic/quotation/hook/useRangeList"
+import usePayInfo from "components/page/domestic/quotation/hook/usePayInfo"
+import useSinature from "components/page/domestic/quotation/hook/useSinature"
 
 // icon
 import iconUpload from "public/image/icon/upload.svg"
