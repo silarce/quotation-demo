@@ -8,7 +8,7 @@ import {
 import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
 
 // fakeData type
-import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
 export type TselectInputProps = {
   county: string | null | undefined
@@ -46,7 +46,7 @@ export default function SelectInput_address(
 
   // 地址
   // 城市
-  const countryOptions = optionsCreator_country()
+  const countryOptions = optionsCreator_county()
   // 地區
   const districtOptions = useMemo(() => {
     return districtOptionsSelector(county || "")

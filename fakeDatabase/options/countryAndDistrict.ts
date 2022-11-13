@@ -7,7 +7,7 @@ export type { Toption }
 
 
 
-export const optionsCreator_country: () => Toption[] =
+export const optionsCreator_county: () => Toption[] =
   () => [
     { value: "基隆市", label: "基隆市" },
     { value: "新北市", label: "新北市" },
