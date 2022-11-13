@@ -38,7 +38,6 @@ import style from "./[quotation].module.scss"
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
-// import { Tproduct, fakeQuotProductListOri, } from "fakeDatabase/domestic/quotation/fakeQuotProductionList"
 
 // ========================================================
 // lab
@@ -61,45 +60,33 @@ export default function Quotation() {
 }
 // ===========================================================
 function TheQuotation({ router }: { router: NextRouter }) {
-  // query
-  // quotation為報價單的id，也可能是"newQuotation"字串
-  // 如果quotation為報價單id，那newQuotationId應該會是undefined
   let {
-    quotation, //報價單id //若為新增報價單則為newQuotation
-    newQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
-    isContract: isContractOri// 是否為從合約點進來的
+    quotationId, //報價單id 
   } = router.query
 
-  if (typeof newQuotationId !== "string") newQuotationId = ""
-  // 是否為從合約報表點進來的
-  const isContract = isContractOri === "true" ? true : false
 
   // ======================================================
 
   // 正式接上api前先這樣處理
   let quotationData: Tquotation | undefined;
-  if (typeof quotation === "string" && quotation !== "newQuotation") {
-    quotationData = fakeQuotationObjList[quotation]
-    if (!quotationData) quotationData = undefined
-  }
+  quotationData = fakeQuotationObjList[quotationId as string]
 
   // =========================================================
   // 是否可編輯
   const [allowEdit, setAllowEdit] =
-    useState(quotation === "newQuotation" ? true : false)
+    useState(quotationId === "newQuotation" ? true : false)
 
   // 合約項目 追加/追減項目的開關
+  // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
   const [switch01, setSwitch01] = useState(true)
 
   // 展開版本追加追減紀錄的開關
+  // 按鈕是panelList的"追加追減報價單"
   const [switch02, setSwitch02] = useState(false)
 
   // =========================================================
   // profile //報價單基本資料
-  const profileState = useProfile({
-    quotationData,
-    newQuotationId,
-  })
+  const profileState = useProfile({ quotationData })
   // 主產品資料
   const prodStates = useProduct(quotationData?.productList, !allowEdit)
   const prodStates02 = useProduct(quotationData?.productList, !allowEdit)
@@ -114,29 +101,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // 追加追減項目
   const prodChangingRecord = useMemo(() => {
-    if (typeof quotation === "string")
-      return fakeProdChangingRecordList[quotation]
-  }, [quotation])
+    if (typeof quotationId === "string")
+      return fakeProdChangingRecordList[quotationId]
+  }, [quotationId])
   // =========================================================
   const [showPdf, setShowPdf] = useState(false)
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${newQuotationId || quotation}`,
-      onClick: () => alert(newQuotationId || quotation)
+      label: `報價編號 ${quotationId}`,
+      onClick: () => alert(quotationId)
     },
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
-  const panel_newQuotation: TpanelList = [
-    { type: "redButton", label: "上傳", onClick: () => alert("上傳") },
-    { type: "myButton", label: "取消", onClick: () => router.back() },
-  ]
+
   const panel_quotation: TpanelList = [
-    (isContract && {
+    {
       type: "myButton",
       label: "追加追減報價單",
       onClick: () => setSwitch02(state => !state)
-    }) || null,
+    },
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
       onClick: () => setShowPdf(true)
@@ -155,22 +139,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  if (quotation !== "newQuotation" && !quotationData)
-    return <NoQuotation quotationId={quotation as string} />
+  if (quotationId !== "newQuotation" && !quotationData)
+    return <NoQuotation quotationId={quotationId as string} />
   // =========================================================
   // =========================================================
   return (
     <div className={style.container}>
-      <PageHeader02 tagList={tagList}
-        panelList={newQuotationId ? panel_newQuotation : panel_quotation}
-      />
+      <PageHeader02 tagList={tagList} panelList={panel_quotation} />
       {/*  */}
       <div className={style.mainContainer}>
-        <div className={style.quotation}> {/* scroll wrapper */}
-          {/* 工程名稱 */}
+        <div className={style.quotation}>
+          {/* 報價單基本資料 */}
           <QuotationProfile profileState={profileState} disabled={!allowEdit} />
-          {/*  */}
 
+          {/* switch01 */}
           <div className={style.switchBar}>
             {!switch02 &&
               <div className={(switch01 && style.active) || ""}
@@ -178,33 +160,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 合約項目
               </div>
             }
-            {/* !!!合約才有!!! */}
-            {isContract &&
-              <div
-                className={switch02 ? style.active
-                  : !switch01 ? style.active
-                    : ""}
-                onClick={() => setSwitch01(false)}>
-                追加 / 追減項目
-              </div>}
-            {/* !!!合約才有!!! */}
+            <div
+              className={(switch02 || !switch01) ? style.active : ""}
+              onClick={() => setSwitch01(false)}>
+              追加 / 追減項目
+            </div>
           </div>
 
-
-          
           {/* 合約項目 追加/追減項目 */}
           {
             (switch01 || switch02)
               ?
               <>
-                {/* 合約項目 */}
                 {/* 主產品設定 */}
                 <QuotationProduction productStates={prodStates} switch02={switch02} />
                 {/* 原報價項目 */}
                 {switch02 &&
                   <OldQuotationProduction productStates={prodStates02} />
                 }
-
                 <div className={style.redWrapper}>
                   {/* 材料配件設定 */}
                   <QuotationComponent
@@ -214,7 +187,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   {/* 選配設定 */}
                   <QuotationAccessory activeRow={prodStates.activeRow} />
                 </div>
-
               </>
               // 追加/追減項目
               : <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
@@ -222,8 +194,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {prodChangingRecord && switch02 &&
-            <QuotationRecord prodChangingRecord={prodChangingRecord} />}
+          {switch02 &&
+            <QuotationRecord prodChangingRecord={prodChangingRecord} />
+          }
 
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
@@ -239,7 +212,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         </div>
       </div>
       <QuotationPdf isVisable={showPdf} onCancel={() => { setShowPdf(false) }}
-
       />
     </div >
   )
@@ -260,18 +232,15 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
       <button onClick={toBack}>回上一頁</button>
     </div>
   )
-
 }
 
 // =========================================================
 
-// 暫時先註解掉
 const OldQuotationProduction = ({ productStates }:
   { productStates: TuseProduct }) => {
 
   const [isActive, setIsActive] = useState(true)
   const panelSwitch = () => setIsActive(!isActive)
-
 
   return (
     <Collapse
@@ -290,7 +259,7 @@ const OldQuotationProduction = ({ productStates }:
     </Collapse>
   )
 }
-
+// oqp就是OldQuotationProduction
 const OqpHeader = ({ isActive, panelSwitch }: {
   isActive: boolean
   panelSwitch: () => void

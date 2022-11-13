@@ -17,9 +17,9 @@ import style from "./quotationRecord.module.scss"
 import { prodCellConfigOri } from './hook/useProduct';
 
 export default function QuotationRecord({ prodChangingRecord }:
-  { prodChangingRecord: TchangeRecord }) {
+  { prodChangingRecord: TchangeRecord | undefined }) {
 
-  const { list } = prodChangingRecord
+  const { list } = prodChangingRecord ?? { list: {} }
   const recordKeyList = Object.keys(list)
 
   const {
@@ -108,6 +108,16 @@ export default function QuotationRecord({ prodChangingRecord }:
           })}
         </Collapse>
       </div>
+
+      {!prodChangingRecord &&
+        <div className={style.noRecord}>
+          <span>
+            無追加/追減項目紀錄
+          </span>
+        </div>
+      }
+
+
     </div>
   ) // return
 
@@ -209,7 +219,7 @@ export default function QuotationRecord({ prodChangingRecord }:
                   </div>
                 )
 
-              })/* prodKeyList */} 
+              })/* prodKeyList */}
             </div>
           )
         }) /* product */}
