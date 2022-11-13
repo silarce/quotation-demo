@@ -33,7 +33,7 @@ import useSinature from "components/page/domestic/quotation/hook/useSinature"
 import iconUpload from "public/image/icon/upload.svg"
 
 // css
-import style from "./[quotation].module.scss"
+import style from "./quotation.module.scss"
 
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
