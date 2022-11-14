@@ -1,9 +1,11 @@
 import React, {
   Dispatch, SetStateAction,
-  useState, useEffect, useRef,
+  useState, useEffect, useRef, Fragment
 } from "react"
 import html2canvas from 'html2canvas'
 import jsPDF from "jspdf"
+
+const _ = require("lodash")
 
 // component
 import Header from "./header"
@@ -20,7 +22,7 @@ import style from "./quotationPdf.module.scss"
 
 // type
 import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
-import { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
+import { TuseProduct, ProdClass } from "components/page/domestic/quotation/hook/useProduct"
 import { TuseRemarkList } from "components/page/domestic/quotation/hook/useRemarkList"
 import { TuseRangeList } from "components/page/domestic/quotation/hook/useRangeList"
 import { TusePayInfo } from "components/page/domestic/quotation/hook/usePayInfo"
@@ -89,7 +91,17 @@ export default function QuotationPdf(
       centered={true}
       width={"fit-content"}
     >
-      <PdfTypeA refPdf={refPdf}
+
+      {/* <PdfTypeA refPdf={refPdf}
+        profileState={profileState}
+        prodState={prodState}
+        remarkListState={remarkListState}
+        rangeListState={rangeListState}
+        payInfoState={payInfoState}
+        sinatureState={sinatureState}
+      /> */}
+
+      <PdfTypeB refPdf={refPdf}
         profileState={profileState}
         prodState={prodState}
         remarkListState={remarkListState}
@@ -97,10 +109,12 @@ export default function QuotationPdf(
         payInfoState={payInfoState}
         sinatureState={sinatureState}
       />
+
     </Modal>
   )
 }
 // ========================================================================
+// typeA 用在只有一頁的情況
 const PdfTypeA = (
   { refPdf,
     profileState,
@@ -128,7 +142,7 @@ const PdfTypeA = (
         ref={ele => refPdf.current[0] = ele}>
         <Header />
         <Profile profileState={profileState} />
-        <Table prodState={prodState}/>
+        <Table productList={prodState.productList} />
         <Total remarkListState={remarkListState} prodState={prodState} />
         <Other
           rangeListState={rangeListState}
@@ -136,15 +150,61 @@ const PdfTypeA = (
           sinatureState={sinatureState}
         />
       </div>
-      {/* <hr className={style.hr} />
+    </>
+  )
+}
+
+// typeB 用在多頁的情況
+const PdfTypeB = (
+  { refPdf,
+    profileState,
+    prodState,
+    remarkListState,
+    rangeListState,
+    payInfoState,
+    sinatureState
+  }:
+    {
+      refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
+      profileState: TuseProfile
+      prodState: TuseProduct
+      remarkListState: TuseRemarkList
+      rangeListState: TuseRangeList
+      payInfoState: TusePayInfo
+      sinatureState: TuseSinature
+    }
+) => {
+
+  const { productList } = prodState
+  const chunkedList = _.chunk(productList, 40) as ProdClass[][]
+
+  return (
+    <>
       <div className={style.pdf}
-        ref={ele => refPdf.current[1] = ele}>
+        ref={ele => refPdf.current[0] = ele}>
         <Header />
-        <Profile />
-        <Table />
-        <Total />
-        <Other />
-      </div> */}
+        <Profile profileState={profileState} />
+        <Total remarkListState={remarkListState} prodState={prodState} />
+        <Other
+          rangeListState={rangeListState}
+          payInfoState={payInfoState}
+          sinatureState={sinatureState}
+        />
+      </div>
+
+      {chunkedList.map((chunk, index) => {
+        return (
+          <Fragment key={index}>
+            <hr className={style.hr} />
+            <div className={style.pdf}
+              ref={ele => refPdf.current[index + 1] = ele}>
+              <Header />
+              <Profile profileState={profileState} />
+              <Table productList={chunk} />
+            </div>
+          </Fragment>
+        )
+      })}
     </>
   )
 }
@@ -168,8 +228,6 @@ const PdfTypeA = (
 // 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
 // ========================================================================
 // 或許可以用瀏覽器的列印功能產生pdf?
-
-
 
 
 

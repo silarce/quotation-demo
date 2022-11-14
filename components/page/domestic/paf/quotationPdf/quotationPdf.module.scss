@@ -135,7 +135,7 @@ $semiMaring: 0 8px;
   .remark {
     display: grid;
     grid-template-columns: 80px auto;
-    height: 350px;
+    min-height: 350px;
     padding: 0 20px;
     margin-bottom: 50px;
     .semi {

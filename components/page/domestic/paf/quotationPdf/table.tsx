@@ -1,6 +1,4 @@
 
-
-
 // css
 import style from "./quotationPdf.module.scss"
 
@@ -9,16 +7,12 @@ import { optionsCreator_doorRail } from "fakeDatabase/options/options"
 const optionsDoorRail = optionsCreator_doorRail()
 
 // type
-import { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
+import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
 
 export default function Table(
-  { prodState }:
-    { prodState: TuseProduct }
+  { productList }:
+    { productList: ProdClass[] }
 ) {
-
-  console.log(prodState)
-
-  const { productList } = prodState
 
   return (
     <div className={style.table}>
@@ -44,20 +38,12 @@ export default function Table(
       })}
 
       {productList.map((row, rIndex) => {
-
         const data = row.allData
-        
-        
-
-
         return indexKeys.map((key, cIndex) => {
           let value = data[key]
-          
           const { width, align } = config[key]
           const theStyle = { width }
           const subClass = " " + style[align ?? ""]
-
-
 
           if (key === "doorRail") {
             const imgSrc =
