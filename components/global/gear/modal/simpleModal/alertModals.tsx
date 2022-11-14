@@ -82,6 +82,22 @@ export const ModalErr = (
     ...props
   })
 }
+// ====================================================
+
+export const ModalWarning = (
+  { title, content, props }: {
+    title?: string | number
+    content?: string | number
+    props?: ModalFuncProps
+  }
+) => {
+  return Modal.warning({
+    title,
+    content,
+    ...modalProps,
+    ...props
+  })
+}
 
 // ====================================================
 
@@ -103,7 +119,7 @@ export const ModalConfirm = (
     ...props,
     className: theClassName,
     cancelText: "取消",
-    icon:<></>
+    icon: <></>
   })
 }
 
@@ -134,6 +150,7 @@ const myAlert = {
   info: ModalInfo02,
   success: ModalSuccess,
   err: ModalErr,
+  warning: ModalWarning,
   confirm: ModalConfirm,
   loading: ModalLoading,
   destroyAll: Modal.destroyAll
