@@ -53,6 +53,11 @@ import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quota
 import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 // =============================================================
 
+// lab
+import QuotationPdf from "components/page/domestic/paf/quotationPdf/quotationPdf"
+// ========================================================
+
+
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
 
@@ -89,10 +94,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 是否可編輯
   const [allowEdit, setAllowEdit] =
     useState(quotationId === "newQuotation" ? true : false)
-  // 合約項目 追加/追減項目的開關
-  const [switch01, setSwitch01] = useState(true)
-  // 展開版本追加追減紀錄的開關
-  const [switch02, setSwitch02] = useState(false)
   // --------------------------------------------------------------------------
   // profile //報價單基本資料
   const profileState = useProfile({
@@ -101,7 +102,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   })
   // 主產品資料
   const prodStates = useProduct(quotationData?.productList, !allowEdit)
-  const prodStates02 = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
@@ -120,7 +120,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [showMemoModal, setShowMemoModal] = useState(false)
   const inputModalOnConfirm = (v: string) => {
-    if (!v) return myAlert.warning({title:"請輸入註解"})
+    if (!v) return myAlert.warning({ title: "請輸入註解" })
     alert("上傳")
     setShowMemoModal(false)
   }
@@ -143,8 +143,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         options={optionQuotationState}
       />
     },
-    { type: "myButton", label: "狀態", onClick: () => alert("施工中") },
-    { type: "myButton", label: "歷史狀態", onClick: () => alert("歷史狀態") },
+    // { type: "myButton", label: "狀態", onClick: () => alert("施工中") },
+    // { type: "myButton", label: "歷史狀態", onClick: () => alert("歷史狀態") },
     { type: "redButton", label: "上傳", onClick: () => setShowMemoModal(true) },
     { type: "myButton", label: "取消", onClick: () => setAllowEdit(false) },
   ]
@@ -177,16 +177,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           {/* 基本資料 */}
           <div className={style.switchBar}>
-            {!switch02 &&
-              <div className={(switch01 && style.active) || ""}
-                onClick={() => setSwitch01(true)}>
-                合約項目
-              </div>
-            }
+            <div className={style.active}>
+              合約項目
+            </div>
           </div>
 
           {/* 主產品設定 */}
-          <QuotationProduction productStates={prodStates} switch02={switch02} />
+          <QuotationProduction productStates={prodStates} />
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
@@ -221,6 +218,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
+      <QuotationPdf isVisable={showPdf} onCancel={() => { setShowPdf(false) }} />
     </div>
   )
 
