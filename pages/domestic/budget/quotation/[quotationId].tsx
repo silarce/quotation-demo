@@ -21,6 +21,8 @@ import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import Select03, { TcusStyleObj } from "components/global/gear/select/select03"
+import InputModal from "components/global/gear/modal/simpleModal/inputModal"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // hook
 import useProfile from "components/page/domestic/quotation/hook/useProfile"
@@ -109,10 +111,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // sinature //簽名
   const sinatureState = useSinature(quotationData)
   // --------------------------------------------------------------------------
+
   const [showPdf, setShowPdf] = useState(false)
+
   // --------------------------------------------------------------------------
 
   const [quotationState, setQuotationState] = useState<Toption>({ value: "預算", label: "預算" })
+
+  const [showMemoModal, setShowMemoModal] = useState(false)
+  const inputModalOnConfirm = (v: string) => {
+    if (!v) return myAlert.warning({title:"請輸入註解"})
+    alert("上傳")
+    setShowMemoModal(false)
+  }
 
   const tagList: TtagList = [
     {
@@ -134,7 +145,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: "myButton", label: "狀態", onClick: () => alert("施工中") },
     { type: "myButton", label: "歷史狀態", onClick: () => alert("歷史狀態") },
-    { type: "redButton", label: "上傳", onClick: () => alert("上傳") },
+    { type: "redButton", label: "上傳", onClick: () => setShowMemoModal(true) },
     { type: "myButton", label: "取消", onClick: () => setAllowEdit(false) },
   ]
   const panel_noEditable: TpanelList = [
@@ -146,6 +157,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
     { type: "myButton", label: "返回", onClick: () => router.back() },
   ]
+
   // --------------------------------------------------------------------------
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
   if (quotationId !== "newQuotation" && !quotationData)
@@ -201,7 +213,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         </div>
       </div>
-
+      <InputModal
+        visible={showMemoModal}
+        setVisible={setShowMemoModal}
+        title={"請輸入註解"}
+        placeholder={"註解"}
+        onConfirm={inputModalOnConfirm}
+        autoCloseOnConfirm={false}
+      />
     </div>
   )
 
