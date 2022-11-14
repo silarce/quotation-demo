@@ -43,14 +43,9 @@ const optionQuotationState = optionsCreator_quotationState()
 // css
 import style from "./quotation.module.scss"
 
-// type
-import type {
-  StylesConfig, GroupBase,
-} from 'react-select';
-
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
-import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
+// import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 // =============================================================
 
 // lab
@@ -101,7 +96,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     newQuotationId,
   })
   // 主產品資料
-  const prodStates = useProduct(quotationData?.productList, !allowEdit)
+  const prodState = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
@@ -110,6 +105,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const payInfoState = usePayInfo(quotationData)
   // sinature //簽名
   const sinatureState = useSinature(quotationData)
+
+
   // --------------------------------------------------------------------------
 
   const [showPdf, setShowPdf] = useState(false)
@@ -183,16 +180,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/* 主產品設定 */}
-          <QuotationProduction productStates={prodStates} />
+          <QuotationProduction productStates={prodState} />
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
             <QuotationComponent
-              partList={prodStates.productList[prodStates.activeRow]?.part}
+              partList={prodState.productList[prodState.activeRow]?.part}
               disabled={!allowEdit} />
             <hr />
             {/* 選配設定 */}
-            <QuotationAccessory activeRow={prodStates.activeRow} />
+            <QuotationAccessory activeRow={prodState.activeRow} />
           </div>
 
           {/* 備註/報價範圍/付款資訊 */}
@@ -201,7 +198,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               remarkListState, rangeListState,
               payInfoState,
               disabled: !allowEdit,
-              prodState: prodStates
+              prodState: prodState
             }}
           />
           {/* 簽名 */}
@@ -218,7 +215,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
-      <QuotationPdf isVisable={showPdf} onCancel={() => { setShowPdf(false) }} />
+      <QuotationPdf
+        isVisable={showPdf}
+        onCancel={() => { setShowPdf(false) }}
+        profileState={profileState}
+        prodState={prodState}
+        remarkListState={remarkListState}
+        rangeListState={rangeListState}
+        payInfoState={payInfoState}
+        sinatureState={sinatureState}
+      />
     </div>
   )
 

@@ -41,7 +41,7 @@ export default function usePayInfo(quotationData?: Tquotation) {
   const onChangeTradingLocation = onChangeCreator01("tradingLocation")
   const onChangeTradingDate = onChangeCreator01("tradingDate")
   const onChangeDeposit = onChangeCreator02("deposit")
-  const onChangeFinalPayment = onChangeCreator02("finalPayment")
+  const onChangeFinalPayment = onChangeCreator02("deliveryPayment")
   const onChangeInstalledPayment = onChangeCreator02("installedPayment")
   const onChangeEleConnectPayment = onChangeCreator02("eleConnectPayment")
 
@@ -69,7 +69,7 @@ const fakeEmptyPayInfo: TpayInfo = {
   tradingDate: "", // 交貨日期 //格式 yyy-mm-dd， yyy為民國年
   payMethod: {
     deposit: "", // 訂製同時付總金額
-    finalPayment: "", // 交貨同時付總金額
+    deliveryPayment: "", // 交貨同時付總金額
     installedPayment: "", // 按裝完成付總金額
     eleConnectPayment: "", // 接電使用付總金額
   }

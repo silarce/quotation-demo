@@ -180,6 +180,13 @@ class ProdClass {
 
   setProductList: Dispatch<SetStateAction<ProdClass[]>>
 
+  // 這兩個資料出現在PDF中，但是沒出現在主產品設定中
+  // 目前還沒接api，先用寫死的假資料
+  thickness = "1.50t" //厚度
+  openType = "電動"
+
+
+
   constructor(
     { product, setProductList }:
       {
@@ -351,6 +358,42 @@ class ProdClass {
     this[key] = !this[key]
     this.setProductList(state => [...state])
   }
+
+  get allData() {
+    return {
+      discount: this.discount,
+      project: this.project,
+      L: this.L,
+      W: this.W,
+      H: this.H,
+      qty: this.qty,
+      area: this.area,
+      cai: this.cai,
+      memo: this.memo,
+
+      doorType: this.doorType.value,
+      horsepower: this.horsepower.value,
+      quoteType: this.quoteType.value,
+      material: this.material.value,
+      surface: this.surface.value,
+      doorRail: this.doorRail.value,
+      B: this.B.value,
+
+      ejectionDoor: this.ejectionDoor,
+      typhoonProof: this.typhoonProof,
+
+      listPrice: this.listPrice,
+      listPriceTotal: this.listPriceTotal,
+      unitPrice: this.unitPrice,
+      priceTotal: this.priceTotal,
+
+      // pdf要的資料
+      size: `${this._W || this._L} X ${this.H} + ${this.B.value}`,
+      thickness: this.thickness,
+      openType: this.openType,
+    }
+  }
+
 }
 
 
