@@ -210,3 +210,11 @@
     }
   }
 }
+
+.noRecord {
+  border: solid 1px $colorMain;
+  padding: 11px;
+  > span {
+    font-size: 18px;
+  }
+}

@@ -132,7 +132,13 @@ export const optionsCreator_horsepower =
   ]
 
 
-
+// 報價單狀態
+export const optionsCreator_quotationState =
+  (): Toption[] => [
+    { value: "預算", label: "預算" },
+    { value: "投標", label: "投標" },
+    { value: "發包", label: "發包" },
+  ]
 
 
 

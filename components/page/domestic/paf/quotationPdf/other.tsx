@@ -3,12 +3,39 @@
 import style from "./quotationPdf.module.scss"
 
 
+// type
+
+import { TuseRangeList } from "components/page/domestic/quotation/hook/useRangeList"
+import { TusePayInfo } from "components/page/domestic/quotation/hook/usePayInfo"
+import { TuseSinature } from "components/page/domestic/quotation/hook/useSinature"
 
 
 
+export default function Other(
+  {
+    rangeListState,
+    payInfoState,
+    sinatureState
+  }:
+    {
+      rangeListState: TuseRangeList
+      payInfoState: TusePayInfo
+      sinatureState: TuseSinature
+    }
+) {
 
-export default function Other() {
+  const { rangeList } = rangeListState
 
+  const { payMethod, tradingDate, tradingLocation } = payInfoState.payInfo
+  const {
+    deposit, //訂製
+    deliveryPayment, // 交貨
+    installedPayment, // 按裝
+    eleConnectPayment, // 接電
+  } = payMethod
+  const [year, month, day] = tradingDate.split("-")
+
+  const attn = sinatureState.sinature.attn.value
 
 
   return (
@@ -17,27 +44,26 @@ export default function Other() {
       <div className={style.range}>
         <h2>一、報價範圍</h2>
         <ol>
-          {fakeRange.map((data, index) => {
+          {rangeList.map((data, index) => {
+            const { content } = data
             return (
-              <li key={index}>{data}</li>
+              <li key={index}>{content}</li>
             )
           })}
         </ol>
       </div>
 
-
-
       <div>
         <div className={style.address}>
           <h2>二、交貨地點 : </h2>
           <div>
-            <span>{"台中市新社區大樹路花花巷草草弄1050-60號5樓很長的地址很長的地址很長的地址很長的地址"}</span>
+            <span>{tradingLocation || "未定"}</span>
           </div>
         </div>
         <div className={style.date}>
           <h2>三、交貨日期 : </h2>
           <div>
-            <span>{"民國102年05月05日"}</span>
+            <span>{(tradingDate && `民國${year}年${month}月${day}日`) || "未定"}</span>
           </div>
         </div>
 
@@ -46,54 +72,39 @@ export default function Other() {
           <ol>
             <li>
               <h2>訂製同時付總金額</h2>
-              <h2>{"25"}</h2>
+              <h2>{deposit}</h2>
               <h2>%</h2>
             </li>
             <li>
               <h2>交貨同時付總金額</h2>
-              <h2>{"25"}</h2>
+              <h2>{deliveryPayment}</h2>
               <h2>%</h2>
             </li>
             <li>
               <h2>按裝完成付總金額</h2>
-              <h2>{"25"}</h2>
+              <h2>{installedPayment}</h2>
               <h2>%</h2>
             </li>
             <li>
               <h2>接電使用付總金額</h2>
-              <h2>{"25"}</h2>
+              <h2>{eleConnectPayment}</h2>
               <h2>%</h2>
             </li>
           </ol>
         </div>
 
         <div className={style.handle}>
-          <h2>經辦人 : {"陳小明 #111"}</h2>
+          <h2>經辦人 : {attn}</h2>
         </div>
 
 
 
       </div>
-
-
     </div>
   )
 }
 
 // ==============================================================================
-const fakeRange = [
-  "報價範圍報價範圍報價範圍報價範圍報價範圍報價範圍報價範圍",
-  "報價範圍報價範圍報價範圍報價範圍報價範圍報價範圍圍報價範圍",
-  "報價範圍報價範圍報價範圍報價範圍報價範圍報圍報價範圍報價範圍",
-  "報價範圍報價範圍報價範圍報價範圍報價範圍報價範圍報價範範圍",
-  "報價範圍報價範圍報價範圍報價範圍報圍報價範圍報價範圍報價範圍",
-  "報價範圍報價範圍報價範圍報圍報圍",
-  "報價範圍報價範圍報價範圍報價範圍報圍報價範圍報價圍報價範圍",
-  "報價範圍報價範圍報價範圍報價範圍報價範圍報價範圍報價範圍報價範",
-  "報價範圍報價範圍報報價範圍報價範圍報價範圍",
-  "報價範圍報價範圍報價範圍報價範圍報價範圍範圍",
-  "報價範圍報價範圍報價範圍報價範圍範圍報價範圍報價範範圍報價範圍",
-]
 
 
 

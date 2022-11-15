@@ -128,7 +128,7 @@ export default function PayInfo(
 
 // =====================================================
 const payMethodIndex: (keyof TpayMethod)[] = [
-  "deposit", "finalPayment",
+  "deposit", "deliveryPayment",
   "installedPayment", "eleConnectPayment",
 ]
 const payMethodItemsCreator = (payInfoState: TusePayInfo) => {
@@ -141,7 +141,7 @@ const payMethodItemsCreator = (payInfoState: TusePayInfo) => {
       label: "訂製同時付總金額",
       onChange: onChangeDeposit
     },
-    finalPayment: {
+    deliveryPayment: {
       label: "交貨同時付總金額",
       onChange: onChangeFinalPayment
     },

@@ -16,6 +16,15 @@ import BudgeList from "components/page/domestic/budget/budgetList"
 // css
 import style from "./budget.module.scss"
 
+// option
+import { optionsCreator_doorType } from 'fakeDatabase/options/options';
+import { optionsCreator_county } from 'fakeDatabase/options/countryAndDistrict';
+const optionsDoorType = optionsCreator_doorType()
+const optionsCounty = optionsCreator_county()
+optionsDoorType.unshift({ value: "", label: "不拘" })
+optionsCounty.unshift({ value: "", label: "不拘" })
+
+
 // fakeData
 import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 // type
@@ -28,65 +37,57 @@ export default function Budget() {
   const { fakeBudgetList } = fakeBudgetListGroup
 
   // ===================================================
+  // panelList
+
   // 搜尋用的
   const [searchObj, setSearchObj] = useState<TsearchObj>({
     doorType: "",
-    country: "",
+    county: "",
     clientName: "",
     projectName: "",
   })
 
-  const [doorType, setDoorType] = useState(doorTypeOptions[0])
-  const [country, setCountry] = useState(countryOptions[0])
-  const [clientName, setClientName] = useState("")
-  const [projectName, setProjectName] = useState("")
-
   const searchTargetList = [
     {
-      stateValue: doorType,
-      options: doorTypeOptions,
+      stateValue: optionsDoorType[0],
+      options: optionsDoorType,
       placeholder: "選擇門型",
-      width: "90px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setDoorType(option)
-      }
+      width: "100px",
     },
     {
-      stateValue: country,
-      options: countryOptions,
+      stateValue: optionsCounty[0],
+      options: optionsCounty,
       placeholder: "選擇地區",
       width: "80px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setCountry(option)
-      }
     },
     {
-      stateValue: clientName,
+      stateValue: "",
       placeholder: "請輸入客戶名稱",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)
     },
     {
-      stateValue: projectName,
+      stateValue: "",
       placeholder: "請輸入專案名稱",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)
     },
   ]
 
-  const doSearch = () => {
+  const doSearch = (valueArr: (string | Toption | null)[]) => {
+    let [doorTypeOption, countyOption, clientName, projectName] = valueArr
+    const doorType = (doorTypeOption as Toption).value
+    const county = (countyOption as Toption).value
+    clientName = clientName as string
+    projectName = projectName as string
     setSearchObj({
-      doorType: doorType.value,
-      country: country.value,
-      clientName: clientName,
-      projectName: projectName,
+      doorType,
+      county,
+      clientName,
+      projectName,
     })
   }
-
   const searchGroup = {
     searchTargetList,
     doSearch
   }
+
   // -----------------------
 
   const panelList: TpanelList = [
@@ -98,7 +99,7 @@ export default function Budget() {
         let newQuotationId = `${fakeBudgetList.length + 1}`.padStart(2, "0")
         newQuotationId = "S-110211-" + newQuotationId
         router.push({
-          pathname: `/domestic/contract/quotation/newQuotation`,
+          pathname: `/domestic/budget/quotation/newQuotation`,
           query: { newQuotationId }
         })
       }
@@ -122,25 +123,6 @@ export default function Budget() {
 // ==========================================================
 // ==========================================================
 // ==========================================================
-const doorTypeOptions: Toption[] = [
-  { value: "", label: "不拘" },
-  { value: "SJ-30287", label: "SJ-30287" },
-  { value: "SJ-302", label: "SJ-302" },
-  { value: "門型一", label: "門型一" },
-  { value: "門型二", label: "門型二" },
-  { value: "門型三", label: "門型三" },
-]
-const countryOptions: Toption[] = [
-  { value: "", label: "不拘" },
-  { value: "台北市", label: "台北市" },
-  { value: "新北市", label: "新北市" },
-  { value: "基隆縣", label: "基隆縣" },
-  { value: "桃園市", label: "桃園市" },
-  { value: "新竹縣", label: "新竹縣" },
-  { value: "新竹市", label: "新竹市" },
-  { value: "苗栗縣", label: "苗栗縣" },
-  { value: "台中市", label: "台中市" },
-]
 
 
 // ==========================================================

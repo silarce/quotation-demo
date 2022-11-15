@@ -19,13 +19,16 @@ import style from "./contractList.module.scss"
 
 // type
 import { TfakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
-
+import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 const { Panel } = Collapse
 
 
-export default function ContractList({ contractList }:
-  { contractList: TfakeContractListSimple }) {
+export default function ContractList({ contractList, searchObj }:
+  {
+    contractList: TfakeContractListSimple
+    searchObj: TsearchObj
+  }) {
 
   const router = useRouter()
 
@@ -48,7 +51,10 @@ export default function ContractList({ contractList }:
         onChange={changeActive}
       >
         {contractList.map((item, index) => {
-          const { memoList, quotationId } = item
+          const {
+            memoList, quotationId,
+            doorType, county,
+            clientName, projectName, } = item
           const isActive = activeIndex === index
 
           const onClick = (e: MouseEvent) => {
@@ -59,6 +65,20 @@ export default function ContractList({ contractList }:
               query: { isContract }
             })
           }
+          // ===========================
+          // 搜尋過濾
+          const regDoorType = new RegExp(searchObj.doorType)
+          const regCountry = new RegExp(searchObj.country)
+          const regClientName = new RegExp(searchObj.clientName)
+          const regProjectName = new RegExp(searchObj.projectName)
+          if (
+            !regDoorType.test(doorType) ||
+            !regCountry.test(county) ||
+            !regClientName.test(clientName) ||
+            !regProjectName.test(projectName)
+          ) return null
+          // ===========================
+
 
           return (
             <Panel key={index} className={style.panel}

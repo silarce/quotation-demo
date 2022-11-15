@@ -7,12 +7,16 @@ import { optionsCreator_doorRail } from "fakeDatabase/options/options"
 const optionsDoorRail = optionsCreator_doorRail()
 
 // type
-import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
+import { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
 
 export default function Table(
-  { productList }:
-    { productList: ProdClass[] }
+  { prodState }:
+    { prodState: TuseProduct }
 ) {
+
+  console.log(prodState)
+
+  const { productList } = prodState
 
   return (
     <div className={style.table}>
@@ -37,10 +41,9 @@ export default function Table(
         )
       })}
 
-      {productList.map((row, rIndex) => {
-        const data = row.allData
+      {fakeDataArr.map((row, rIndex) => {
         return indexKeys.map((key, cIndex) => {
-          let value = data[key]
+          const value = row[key]
           const { width, align } = config[key]
           const theStyle = { width }
           const subClass = " " + style[align ?? ""]
@@ -91,7 +94,7 @@ export default function Table(
 type TindexKeys =
   "project" | "size" | "doorType" | "material" | "thickness" |
   "surface" | "doorRail" | "horsepower" | "openType" | "qty" |
-  "unitPrice" | "priceTotal" | "memo"
+  "unitPrice" | "subTotal" | "memo"
 
 type Tconfig = {
   [key in TindexKeys]: {
@@ -104,7 +107,7 @@ type Tconfig = {
 const indexKeys: TindexKeys[] = [
   "project", "size", "doorType", "material", "thickness",
   "surface", "doorRail", "horsepower", "openType", "qty",
-  "unitPrice", "priceTotal", "memo"
+  "unitPrice", "subTotal", "memo"
 ]
 
 const config: Tconfig = {
@@ -122,7 +125,7 @@ const config: Tconfig = {
   },
   material: {
     label: "材料",
-    width: "140px",
+    width: "90px",
     align: "center",
   },
   thickness: {
@@ -137,7 +140,7 @@ const config: Tconfig = {
   },
   doorRail: {
     label: "門軌",
-    width: "70px",
+    width: "80px",
     align: "center",
   },
   horsepower: {
@@ -152,7 +155,7 @@ const config: Tconfig = {
   },
   qty: {
     label: "數量",
-    width: "70px",
+    width: "80px",
     align: "right",
   },
   unitPrice: {
@@ -160,7 +163,7 @@ const config: Tconfig = {
     width: "100%",
     align: "right",
   },
-  priceTotal: {
+  subTotal: {
     label: "複價",
     width: "100%",
     align: "right",
@@ -190,7 +193,7 @@ const fakeDataArr = [
     openType: "電動",
     qty: "2樘",
     unitPrice: "635,242",
-    priceTotal: "1,270,484",
+    subTotal: "1,270,484",
     memo: "一般",
   },
   {
@@ -205,7 +208,7 @@ const fakeDataArr = [
     openType: "電動",
     qty: "2樘",
     unitPrice: "635,242",
-    priceTotal: "1,270,484",
+    subTotal: "1,270,484",
     memo: "一般",
   },
   {
@@ -220,7 +223,7 @@ const fakeDataArr = [
     openType: "電動",
     qty: "2樘",
     unitPrice: "635,242",
-    priceTotal: "1,270,484",
+    subTotal: "1,270,484",
     memo: "一般",
   },
   {
@@ -235,7 +238,7 @@ const fakeDataArr = [
     openType: "電動",
     qty: "2樘",
     unitPrice: "635,242",
-    priceTotal: "1,270,484",
+    subTotal: "1,270,484",
     memo: "一般",
   },
 ]

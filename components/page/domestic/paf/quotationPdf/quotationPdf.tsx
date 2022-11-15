@@ -1,9 +1,11 @@
 import React, {
   Dispatch, SetStateAction,
-  useState, useEffect, useRef,
+  useState, useEffect, useRef, Fragment
 } from "react"
 import html2canvas from 'html2canvas'
 import jsPDF from "jspdf"
+
+const _ = require("lodash")
 
 // component
 import Header from "./header"
@@ -18,44 +20,72 @@ import Modal from "antd/lib/modal/Modal"
 // css
 import style from "./quotationPdf.module.scss"
 
-// import avatar from "public/image/avatar.png"
-
+// type
+import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
+import { TuseProduct, ProdClass } from "components/page/domestic/quotation/hook/useProduct"
+import { TuseRemarkList } from "components/page/domestic/quotation/hook/useRemarkList"
+import { TuseRangeList } from "components/page/domestic/quotation/hook/useRangeList"
+import { TusePayInfo } from "components/page/domestic/quotation/hook/usePayInfo"
+import { TuseSinature } from "components/page/domestic/quotation/hook/useSinature"
 
 export default function QuotationPdf(
-  { isVisable, onCancel }:
+  { isVisable, onCancel,
+    profileState,
+    prodState,
+    remarkListState,
+    rangeListState,
+    payInfoState,
+    sinatureState,
+  }:
     {
       isVisable: boolean
       onCancel: () => void
+      profileState: TuseProfile
+      prodState: TuseProduct
+      remarkListState: TuseRemarkList
+      rangeListState: TuseRangeList
+      payInfoState: TusePayInfo
+      sinatureState: TuseSinature
     }
 ) {
 
-
-  const refPdf = useRef(null!)
-  const refFoo = useRef(null!)
-
-  // const [bar, setBar] = useState()
-  useEffect(() => {
-    if (!isVisable) return;
-    html2canvas(refPdf.current)
-      .then((canvas) => {
-        const doc = new jsPDF("p", "px", "a4")
-        const image = canvas.toDataURL("image/JPEG")
-
-        var width = doc.internal.pageSize.getWidth();
-        var height = doc.internal.pageSize.getHeight();
-        // refFoo.current.appendChild(canvas)
-        // window.open(image)
-        // setBar(image)
-        // doc.addImage(avatar.src, "JPEG", 0, 0, 100, 100);
-        // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-        // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-
-        doc.addImage(image, "JPEG", 0, 0, width, height);
-        doc.save('foo.pdf')
-      })
-  }, [isVisable])
+  const [pdfType, setPdfType] = useState("typeA")
 
 
+  // ------------------------------------------------------------------
+
+  const quotationId = profileState.profile.quotationId
+
+  // ------------------------------------------------------------------
+  const refPdf = useRef<(HTMLDivElement | null)[]>([])
+
+  console.log(refPdf)
+
+  const dlPdf = async () => {
+    if (!isVisable || !refPdf.current[0]) return;
+
+    const doc = new jsPDF("p", "px", "a4")
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var pageHeight = doc.internal.pageSize.getHeight();
+
+    let isFirst = true
+    let item
+    for (item of refPdf.current) {
+      if (!item) continue
+      const image = await html2canvas(item)
+        .then((canvas) => {
+          const image = canvas.toDataURL("image/JPEG")
+          return image
+        })
+      if (!isFirst) doc.addPage()
+      isFirst = false
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, "JPEG", 0, 0, pageWidth, pageHeight,);
+    }
+    doc.save(`${quotationId}.pdf`)
+  }
 
 
   return (
@@ -68,27 +98,179 @@ export default function QuotationPdf(
       centered={true}
       width={"fit-content"}
     >
-      <div className={style.pdf}
-        ref={refPdf}>
-        <Header />
-        <Profile />
-        <Table />
-        <Total />
-        <Other />
+
+      <div className={style.panel}>
+        <div className={style.left}>
+          <button className={pdfType === "typeA" ? style.active : ""}
+            onClick={() => { setPdfType("typeA") }}>
+            <span>typeA</span>
+          </button>
+          <button className={pdfType === "typeB" ? style.active : ""}
+            onClick={() => { setPdfType("typeB") }}>
+            <span>typeB</span>
+          </button>
+        </div>
+        <div>
+          <button onClick={dlPdf}><span>下載PDF</span></button>
+        </div>
       </div>
 
-      {/* <div ref={refFoo}>
-        <img src={bar} alt="" />
-      </div> */}
+
+      {pdfType === "typeA" &&
+        <PdfTypeA refPdf={refPdf}
+          profileState={profileState}
+          prodState={prodState}
+          remarkListState={remarkListState}
+          rangeListState={rangeListState}
+          payInfoState={payInfoState}
+          sinatureState={sinatureState}
+        />
+      }
+      {pdfType === "typeB" &&
+        <PdfTypeB refPdf={refPdf}
+          profileState={profileState}
+          prodState={prodState}
+          remarkListState={remarkListState}
+          rangeListState={rangeListState}
+          payInfoState={payInfoState}
+          sinatureState={sinatureState}
+        />
+      }
+
+
+
+
+
 
     </Modal>
   )
 }
+// ========================================================================
+// typeA 用在只有一頁的情況
+const PdfTypeA = (
+  { refPdf,
+    profileState,
+    prodState,
+    remarkListState,
+    rangeListState,
+    payInfoState,
+    sinatureState
+  }:
+    {
+      refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
+      profileState: TuseProfile
+      prodState: TuseProduct
+      remarkListState: TuseRemarkList
+      rangeListState: TuseRangeList
+      payInfoState: TusePayInfo
+      sinatureState: TuseSinature
+    }
+) => {
+
+  const { productList } = prodState
+  const chunkedList = _.chunk(productList, 12) as ProdClass[][]
+  const pageCount = chunkedList.length
+
+  return (
+    <>
+      {chunkedList.map((chunk, index) => {
+        return (
+          <Fragment key={index}>
+            {index !== 0 && <hr className={style.hr} />}
+            <div className={style.pdf}
+              ref={ele => refPdf.current[0] = ele}>
+              <Header />
+              <Profile profileState={profileState} index={index + 1} pageCount={pageCount} />
+              <Table productList={chunk} />
+              <Total remarkListState={remarkListState} prodState={prodState} />
+              <Other
+                rangeListState={rangeListState}
+                payInfoState={payInfoState}
+                sinatureState={sinatureState}
+              />
+            </div>
+          </Fragment>
+        )
+      })}
+    </>
+  )
+}
+
+// typeB 用在多頁的情況
+const PdfTypeB = (
+  { refPdf,
+    profileState,
+    prodState,
+    remarkListState,
+    rangeListState,
+    payInfoState,
+    sinatureState
+  }:
+    {
+      refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
+      profileState: TuseProfile
+      prodState: TuseProduct
+      remarkListState: TuseRemarkList
+      rangeListState: TuseRangeList
+      payInfoState: TusePayInfo
+      sinatureState: TuseSinature
+    }
+) => {
+
+  const { productList } = prodState
+  const chunkedList = _.chunk(productList, 40) as ProdClass[][]
+  const pageCount = chunkedList.length
+
+  return (
+    <>
+      <div className={style.pdf}
+        ref={ele => refPdf.current[0] = ele}>
+        <Header />
+        <Profile profileState={profileState} index={1} pageCount={pageCount} />
+        <Total remarkListState={remarkListState} prodState={prodState} />
+        <Other
+          rangeListState={rangeListState}
+          payInfoState={payInfoState}
+          sinatureState={sinatureState}
+        />
+      </div>
+
+      {chunkedList.map((chunk, index) => {
+        return (
+          <Fragment key={index}>
+            <hr className={style.hr} />
+            <div className={style.pdf}
+              ref={ele => refPdf.current[index + 1] = ele}>
+              <Header />
+              <Profile profileState={profileState} index={index + 2} pageCount={pageCount} />
+              <Table productList={chunk} />
+            </div>
+          </Fragment>
+        )
+      })}
+    </>
+  )
+}
 
 // ========================================================================
+
+
+
+
+
+// ========================================================================
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
+// ========================================================================
 // 或許可以用瀏覽器的列印功能產生pdf?
-
-
 
 
 

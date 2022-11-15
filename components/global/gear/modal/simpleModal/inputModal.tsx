@@ -1,6 +1,6 @@
 import {
   Dispatch, SetStateAction,
-  useState
+  useEffect, useState
 } from "react"
 
 
@@ -18,6 +18,7 @@ import style from "./simpleModal.module.scss"
 export default function InputModal(
   {
     visible, setVisible, title, placeholder, className,
+    autoCloseOnConfirm = true,
     onConfirm, onCancel
 
   }:
@@ -26,18 +27,25 @@ export default function InputModal(
       setVisible: Dispatch<SetStateAction<boolean>>,
       title: string
       placeholder: string
-      className?: string
       onConfirm: (value: string) => void
+      className?: string
+      autoCloseOnConfirm?: boolean
       onCancel?: () => void
     }) {
 
   const [value, setValue] = useState("")
 
+  useEffect(() => {
+    if (visible === false) setValue("")
+  }, [visible])
+
 
   const thisOnConfirm = async () => {
     await onConfirm(value)
-    setVisible(false)
-    setValue("")
+    if (autoCloseOnConfirm) {
+      setVisible(false)
+      setValue("")
+    }
   }
   const thisOnCancel = () => {
     onCancel && onCancel()

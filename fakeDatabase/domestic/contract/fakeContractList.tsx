@@ -10,6 +10,8 @@ interface Tcontract {
   contactName: string
   contactPhone: string
   undertaker: string //承辦人
+  doorType: string
+  county: string
 }
 
 interface TcontractObjList {
@@ -26,6 +28,8 @@ let fakeContractObjList: TcontractObjList = {
     contactName: "陳小明小華",
     contactPhone: "0987654321",
     undertaker: "陳小明小華",
+    doorType: "SJ-302",
+    county: "新北"
   },
   "S-110211-02": {
     quotationId: "S-110211-02",
@@ -36,6 +40,8 @@ let fakeContractObjList: TcontractObjList = {
     contactName: "王小華",
     contactPhone: "0987556677",
     undertaker: "王小華",
+    doorType: "SJ-312",
+    county: "臺中"
   },
   "S-110211-03": {
     quotationId: "S-110211-03",
@@ -46,6 +52,8 @@ let fakeContractObjList: TcontractObjList = {
     contactName: "林有間",
     contactPhone: "0987654321",
     undertaker: "林有間",
+    doorType: "SJ-120A",
+    county: "高雄"
   },
 }
 

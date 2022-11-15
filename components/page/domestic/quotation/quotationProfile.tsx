@@ -18,7 +18,7 @@ import style from "./quotationProfile.module.scss"
 
 // fakeData/type
 import type { TuseProfile } from "./hook/useProfile"
-import { Toption, optionsCreator_country, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
 
 
@@ -84,7 +84,7 @@ export default function QuotationProfile(
   // 工程地點
 
   // 城市
-  const countryOptions = optionsCreator_country()
+  const countryOptions = optionsCreator_county()
   const [country, setCountry] = useState<Toption | null>(null)
 
   // 地區

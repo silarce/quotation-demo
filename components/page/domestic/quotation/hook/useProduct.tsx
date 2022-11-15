@@ -42,16 +42,10 @@ const optionsGroup = {
 }
 
 
-
-
-// ======================================================
-// type
-
 // ======================================================
 
 const pordCellConfig = prodCellConfigOri()
 let { keyList: prodKeyList,
-  // cellConfig 
 } = pordCellConfig
 
 
@@ -60,7 +54,7 @@ let { keyList: prodKeyList,
 // ============================================================
 
 
-export default function useProduct(
+function useProduct(
   productListOri: Tproduct[] | undefined,
   disabled: boolean
 ) {
@@ -145,14 +139,7 @@ export default function useProduct(
     disabled,
     avgDiscount, subTotal, businessTax, total
   }
-}
-
-
-
-// =============================================================
-type TuseProduct = ReturnType<typeof useProduct>
-
-export type { TuseProduct, Tproduct, TprodKeys, ProdClass }
+} // useProduct
 
 
 
@@ -192,6 +179,13 @@ class ProdClass {
   part: PartClass[]
 
   setProductList: Dispatch<SetStateAction<ProdClass[]>>
+
+  // 這兩個資料出現在PDF中，但是沒出現在主產品設定中
+  // 目前還沒接api，先用寫死的假資料
+  thickness = "1.50t" //厚度
+  openType = "電動"
+
+
 
   constructor(
     { product, setProductList }:
@@ -276,12 +270,14 @@ class ProdClass {
     this._W = new Decimal(parseFloat(v) || 0).abs().toNumber()
   }
 
+  // L*(H+B)/10000 = area
   get area() {
     return new Decimal(this._L || this._W)
       .mul(Decimal.add(this._H, this.B.value))
       .div(100 * 100) // 把單位從平方公分轉為平方公尺
       .toFixed(2).toString()
   }
+  // area *10.89 = cai 取整數
   get cai() {
     return new Decimal(this.area).mul(10.89).toFixed(0).toString()
   }
@@ -362,6 +358,42 @@ class ProdClass {
     this[key] = !this[key]
     this.setProductList(state => [...state])
   }
+
+  get allData() {
+    return {
+      discount: this.discount,
+      project: this.project,
+      L: this.L,
+      W: this.W,
+      H: this.H,
+      qty: this.qty,
+      area: this.area,
+      cai: this.cai,
+      memo: this.memo,
+
+      doorType: this.doorType.value,
+      horsepower: this.horsepower.value,
+      quoteType: this.quoteType.value,
+      material: this.material.value,
+      surface: this.surface.value,
+      doorRail: this.doorRail.value,
+      B: this.B.value,
+
+      ejectionDoor: this.ejectionDoor,
+      typhoonProof: this.typhoonProof,
+
+      listPrice: this.listPrice,
+      listPriceTotal: this.listPriceTotal,
+      unitPrice: this.unitPrice,
+      priceTotal: this.priceTotal,
+
+      // pdf要的資料
+      size: `${this._W || this._L} X ${this.H} + ${this.B.value}`,
+      thickness: this.thickness,
+      openType: this.openType,
+    }
+  }
+
 }
 
 
@@ -373,7 +405,7 @@ class ProdClass {
 // ============================================================================
 // ============================================================================
 
-export class PartClass {
+class PartClass {
   subType: string
   subTypeName: string
   id: string | null
@@ -485,7 +517,7 @@ type TprodCellConfig = {
   }
 }
 
-export function prodCellConfigOri(): TprodCellConfig {
+function prodCellConfigOri(): TprodCellConfig {
   return {
     keyList: [
       "discount", "project", "quoteType", "L", "W",
@@ -549,6 +581,13 @@ const unexpectedOption = (v: string) => ({
 
 
 
+
+// =============================================================
+type TuseProduct = ReturnType<typeof useProduct>
+
+export default useProduct
+export { prodCellConfigOri }
+export type { TuseProduct, Tproduct, TprodKeys, ProdClass, PartClass }
 
 
 
