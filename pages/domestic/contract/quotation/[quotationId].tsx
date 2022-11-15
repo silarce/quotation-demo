@@ -88,8 +88,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // profile //報價單基本資料
   const profileState = useProfile({ quotationData })
   // 主產品資料
-  const prodStates = useProduct(quotationData?.productList, !allowEdit)
-  const prodStates02 = useProduct(quotationData?.productList, !allowEdit)
+  const prodState = useProduct(quotationData?.productList, !allowEdit)
+  const prodState02 = useProduct(quotationData?.productList, !allowEdit)
   // memo // 備註
   const remarkListState = useRemarkList(quotationData)
   // range // 報價範圍
@@ -173,19 +173,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
               ?
               <>
                 {/* 主產品設定 */}
-                <QuotationProduction productStates={prodStates} switch02={switch02} />
+                <QuotationProduction productStates={prodState} switch02={switch02} />
                 {/* 原報價項目 */}
                 {switch02 &&
-                  <OldQuotationProduction productStates={prodStates02} />
+                  <OldQuotationProduction productStates={prodState02} />
                 }
                 <div className={style.redWrapper}>
                   {/* 材料配件設定 */}
                   <QuotationComponent
-                    partList={prodStates.productList[prodStates.activeRow]?.part}
+                    partList={prodState.productList[prodState.activeRow]?.part}
                     disabled={!allowEdit} />
                   <hr />
                   {/* 選配設定 */}
-                  <QuotationAccessory activeRow={prodStates.activeRow} />
+                  <QuotationAccessory activeRow={prodState.activeRow} />
                 </div>
               </>
               // 追加/追減項目
@@ -204,14 +204,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
               remarkListState, rangeListState,
               payInfoState,
               disabled: !allowEdit,
-              prodState: prodStates
+              prodState: prodState
             }}
           />
           {/* 簽名 */}
           <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
         </div>
       </div>
-      <QuotationPdf isVisable={showPdf} onCancel={() => { setShowPdf(false) }}
+      <QuotationPdf
+        isVisable={showPdf}
+        onCancel={() => { setShowPdf(false) }}
+        profileState={profileState}
+        prodState={prodState}
+        remarkListState={remarkListState}
+        rangeListState={rangeListState}
+        payInfoState={payInfoState}
+        sinatureState={sinatureState}
       />
     </div >
   )
