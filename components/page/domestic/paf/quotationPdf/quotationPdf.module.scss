@@ -1,4 +1,4 @@
-// @use "styles/theme01" as *;
+@use "styles/theme01" as *;
 
 $fontTitle: 40px;
 $fontInfo: 25px;
@@ -250,9 +250,32 @@ $semiMaring: 0 8px;
     margin-top: 20px;
   }
 }
+// ======================================================================
 
-.test {
-  h1 {
-    font-size: 50px;
+.panel {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: repeat(2, fit-content(100%));
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 20px;
+  background-color: $bgc01;
+  button {
+    padding: 5px;
+    background-color: $colorBorder01;
+    cursor: pointer;
+    > span {
+      font-size: 18px;
+    }
+    &.active {
+      > span {
+        color: white;
+      }
+    }
+  }
+  .left {
+    display: flex;
+    gap: 15px;
   }
 }

@@ -53,32 +53,39 @@ export default function QuotationPdf(
 
 
   // ------------------------------------------------------------------
+
+  const quotationId = profileState.profile.quotationId
+
+  // ------------------------------------------------------------------
   const refPdf = useRef<(HTMLDivElement | null)[]>([])
-  // useEffect(() => {
-  //   if (!isVisable || !refPdf.current[0]) return;
-  //   const doc = new jsPDF("p", "px", "a4")
-  //   var pageWidth = doc.internal.pageSize.getWidth();
-  //   var pageHeight = doc.internal.pageSize.getHeight();
-  //   (async () => {
-  //     let isFirst = true
-  //     let item
-  //     for (item of refPdf.current) {
-  //       if (!item) return
-  //       const image = await html2canvas(item)
-  //         .then((canvas) => {
-  //           const image = canvas.toDataURL("image/JPEG")
-  //           return image
-  //           // doc.addImage(avatar.src, "JPEG", 0, 0, 100, 100);
-  //           // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-  //           // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-  //         })
-  //       if (!isFirst) doc.addPage()
-  //       isFirst = false
-  //       doc.addImage(image, "JPEG", 0, 0, pageWidth, pageHeight,);
-  //     }
-  //     doc.save('foo.pdf')
-  //   })()
-  // }, [isVisable])
+
+  console.log(refPdf)
+
+  const dlPdf = async () => {
+    if (!isVisable || !refPdf.current[0]) return;
+
+    const doc = new jsPDF("p", "px", "a4")
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var pageHeight = doc.internal.pageSize.getHeight();
+
+    let isFirst = true
+    let item
+    for (item of refPdf.current) {
+      if (!item) continue
+      const image = await html2canvas(item)
+        .then((canvas) => {
+          const image = canvas.toDataURL("image/JPEG")
+          return image
+        })
+      if (!isFirst) doc.addPage()
+      isFirst = false
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, "JPEG", 0, 0, pageWidth, pageHeight,);
+    }
+    doc.save(`${quotationId}.pdf`)
+  }
 
 
   return (
@@ -92,23 +99,48 @@ export default function QuotationPdf(
       width={"fit-content"}
     >
 
-      <PdfTypeA refPdf={refPdf}
-        profileState={profileState}
-        prodState={prodState}
-        remarkListState={remarkListState}
-        rangeListState={rangeListState}
-        payInfoState={payInfoState}
-        sinatureState={sinatureState}
-      />
+      <div className={style.panel}>
+        <div className={style.left}>
+          <button className={pdfType === "typeA" ? style.active : ""}
+            onClick={() => { setPdfType("typeA") }}>
+            <span>typeA</span>
+          </button>
+          <button className={pdfType === "typeB" ? style.active : ""}
+            onClick={() => { setPdfType("typeB") }}>
+            <span>typeB</span>
+          </button>
+        </div>
+        <div>
+          <button onClick={dlPdf}><span>下載PDF</span></button>
+        </div>
+      </div>
 
-      {/* <PdfTypeB refPdf={refPdf}
-        profileState={profileState}
-        prodState={prodState}
-        remarkListState={remarkListState}
-        rangeListState={rangeListState}
-        payInfoState={payInfoState}
-        sinatureState={sinatureState}
-      /> */}
+
+      {pdfType === "typeA" &&
+        <PdfTypeA refPdf={refPdf}
+          profileState={profileState}
+          prodState={prodState}
+          remarkListState={remarkListState}
+          rangeListState={rangeListState}
+          payInfoState={payInfoState}
+          sinatureState={sinatureState}
+        />
+      }
+      {pdfType === "typeB" &&
+        <PdfTypeB refPdf={refPdf}
+          profileState={profileState}
+          prodState={prodState}
+          remarkListState={remarkListState}
+          rangeListState={rangeListState}
+          payInfoState={payInfoState}
+          sinatureState={sinatureState}
+        />
+      }
+
+
+
+
+
 
     </Modal>
   )
