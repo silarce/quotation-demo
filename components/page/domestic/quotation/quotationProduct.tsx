@@ -42,8 +42,12 @@ export default function QuotationProduction({ productStates, switch02, className
         </button>
       </div>
       <div className={style.listContainer}>
-        <DndThead productStates={productStates} allowMove={allowMove} />
+        <div className={style.thead}>
+          <DndThead productStates={productStates} allowMove={allowMove} />
+        </div>
+
         <ProductList productStates={productStates} />
+
         <AddButton className={style.addBtn}
           label="新增產品"
           onClick={addProduct}

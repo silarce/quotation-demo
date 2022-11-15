@@ -14,6 +14,12 @@
 .listContainer {
   width: 100%;
   overflow: auto;
+  max-height: 500px;
+  .thead{
+    position: sticky;
+    top:0;
+    z-index: 1;
+  }
 }
 
 .addBtn {
