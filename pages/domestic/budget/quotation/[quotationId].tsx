@@ -1,10 +1,16 @@
 // 報價單
-import {
-  Dispatch, SetStateAction,
-  useState, useMemo,
+import React, {
+  Dispatch, SetStateAction, FocusEvent,
+  useState, useMemo, useRef
 } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
+
+import Select from 'react-select';
+import type { GroupBase, } from 'react-select';
+
+
+
 
 // components
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
@@ -16,6 +22,9 @@ import QuotationSinature from "components/page/domestic/quotation/quotationSinat
 import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
 
+// antd
+import type { MenuProps } from 'antd';
+import { Button, Dropdown, Space } from 'antd';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
@@ -256,41 +265,120 @@ const QuotationStateSel = (
       options: Toption[]
     }
 ) => {
+  // -------------------------------------------------------------------------
+  // 報價狀態
+  const [isFocus, setIsFocus] = useState("")
+  const [selIsOpen, setSelIsOpen] = useState<boolean | undefined>(undefined)
 
   const customStyleObj: TcusStyleObj = {
-    menuList: {
-      width: `180.375px`,
+    menu: {
+      width: `172.38px`,
       position: "relative",
-      right: "60.38px",
+      right: "92px",
+      top: "3px",
+    },
+    menuList: {
+      width: "100%",
     },
     option: {
       textAlign: "center"
-    }
+    },
   }
 
   const onChange = (option: Toption | null) => {
     setQuotationState(option!)
+    setIsFocus("")
+    setSelIsOpen(undefined)
   }
+  const onFocus = (e?: FocusEvent<HTMLInputElement>) => {
+    setIsFocus(style.isFocus)
+  }
+  const onBlur = () => {
+    setIsFocus("")
+    setSelIsOpen(undefined)
+  }
+  // --------------------------------------------------------------
+  // 歷史狀態
+  const [showHistory, setShowHistory] = useState("")
+  const historyRef = useRef<HTMLDivElement>(null!)
+  const historyListRef = useRef<HTMLDivElement>(null!)
+  const selRef = useRef<HTMLDivElement>(null!)
 
+  const closeHistoryList = (e: MouseEvent) => {
 
+    if (historyRef.current.contains(e.target as Node)) return
+    if (historyListRef.current.contains(e.target as Node)) return
+
+    setShowHistory("")
+    document.removeEventListener('mousedown', closeHistoryList)
+  }
+  const openHistoryList = () => {
+    setShowHistory(style.isShow)
+    document.addEventListener('mousedown', closeHistoryList)
+  }
+  // --------------------------------------------------------------
   return (
     <div className={style.quotationState}>
-      <div className={style.sel}>
-        <span>狀態 : </span>
+      <div className={`${style.sel} ${isFocus}`}
+        onClick={() => selRef.current.focus()}
+      >
+        <span>報價狀態 : </span>
         <Select03 className={style.select03}
           stateValue={quotationState}
           options={options}
           onChange={onChange}
           customStyleObj={customStyleObj}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          selRef={selRef}
+          openMenuOnFocus={true}
         />
       </div>
-      {/* <div>
+
+      <div className={style.history} ref={historyRef}
+        onClick={openHistoryList}>
         <span>
           歷史狀態
         </span>
-      </div> */}
-    </div>
-  )
+      </div>
 
+      <div className={`${style.historyList} ${showHistory}`} ref={historyListRef}
+      >
+        <div className={style.item}>
+          <div><span>{"預算 > 投標"}</span></div>
+          <div>
+            <span>2022-02-03</span>
+            <span>10:23:30</span>
+          </div>
+        </div>
+        <hr />
+        <div className={style.item}>
+          <div><span>{"預算 > 發包"}</span></div>
+          <div>
+            <span>2022-02-03</span>
+            <span>10:23:30</span>
+          </div>
+        </div>
+        <hr />
+        <div className={style.item}>
+          <div><span>{"預算 > 發包"}</span></div>
+          <div>
+            <span>2022-02-03</span>
+            <span>10:23:30</span>
+          </div>
+        </div>
+        <hr />
+        <div className={style.item}>
+          <div><span>{"預算 > 投標"}</span></div>
+          <div>
+            <span>2022-02-03</span>
+            <span>10:23:30</span>
+          </div>
+        </div>
+        <hr />
+      </div>
+
+    </div >
+  )
 }
 
