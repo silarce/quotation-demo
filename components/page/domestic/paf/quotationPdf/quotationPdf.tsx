@@ -14,6 +14,9 @@ import Table from "./table"
 import Total from "./total"
 import Other from "./other"
 
+// global gear
+import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+
 // antd
 import Modal from "antd/lib/modal/Modal"
 
@@ -51,6 +54,9 @@ export default function QuotationPdf(
 
   const [pdfType, setPdfType] = useState("typeA")
 
+  // useEffect(() => {
+  //   showRootLoading(true, "正在處理PDF")
+  // }, [])
 
   // ------------------------------------------------------------------
 
@@ -59,10 +65,10 @@ export default function QuotationPdf(
   // ------------------------------------------------------------------
   const refPdf = useRef<(HTMLDivElement | null)[]>([])
 
-  console.log(refPdf)
-
   const dlPdf = async () => {
     if (!isVisable || !refPdf.current[0]) return;
+
+    showRootLoading(true, "正在處理PDF")
 
     const doc = new jsPDF("p", "px", "a4")
     var pageWidth = doc.internal.pageSize.getWidth();
@@ -85,6 +91,7 @@ export default function QuotationPdf(
       doc.addImage(image, "JPEG", 0, 0, pageWidth, pageHeight,);
     }
     doc.save(`${quotationId}.pdf`)
+    showRootLoading(false)
   }
 
 
@@ -115,7 +122,6 @@ export default function QuotationPdf(
         </div>
       </div>
 
-
       {pdfType === "typeA" &&
         <PdfTypeA refPdf={refPdf}
           profileState={profileState}
@@ -136,12 +142,6 @@ export default function QuotationPdf(
           sinatureState={sinatureState}
         />
       }
-
-
-
-
-
-
     </Modal>
   )
 }
@@ -219,20 +219,24 @@ const PdfTypeB = (
 
   const { productList } = prodState
   const chunkedList = _.chunk(productList, 40) as ProdClass[][]
-  const pageCount = chunkedList.length
+  const pageCount = chunkedList.length + 1
 
   return (
     <>
-      <div className={style.pdf}
+      <div className={`${style.pdf} ${style.typeB}`}
         ref={ele => refPdf.current[0] = ele}>
-        <Header />
-        <Profile profileState={profileState} index={1} pageCount={pageCount} />
-        <Total remarkListState={remarkListState} prodState={prodState} />
-        <Other
-          rangeListState={rangeListState}
-          payInfoState={payInfoState}
-          sinatureState={sinatureState}
-        />
+        <div>
+          <Header />
+          <Profile profileState={profileState} index={1} pageCount={pageCount} />
+        </div>
+        <div>
+          <Total remarkListState={remarkListState} prodState={prodState} />
+          <Other
+            rangeListState={rangeListState}
+            payInfoState={payInfoState}
+            sinatureState={sinatureState}
+          />
+        </div>
       </div>
 
       {chunkedList.map((chunk, index) => {
@@ -253,32 +257,6 @@ const PdfTypeB = (
 }
 
 // ========================================================================
-
-
-
-
-
-// ========================================================================
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// 接著，製作另一個版本的排版，還有選擇兩種排版的切換按鈕，然後把資料引入PDF
-// ========================================================================
-// 或許可以用瀏覽器的列印功能產生pdf?
-
-
-
-
-
-
-
-
 
 
 

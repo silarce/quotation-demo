@@ -33,6 +33,10 @@ $semiMaring: 0 8px;
   height: calc(842px * 2.7);
   padding: 60px 40px;
   // line-height:0.5
+  &.typeB {
+    display: grid;
+    align-content: space-between;
+  }
 }
 .header {
   border-bottom: solid 2px black;
