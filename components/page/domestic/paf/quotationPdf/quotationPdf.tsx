@@ -92,16 +92,7 @@ export default function QuotationPdf(
       width={"fit-content"}
     >
 
-      {/* <PdfTypeA refPdf={refPdf}
-        profileState={profileState}
-        prodState={prodState}
-        remarkListState={remarkListState}
-        rangeListState={rangeListState}
-        payInfoState={payInfoState}
-        sinatureState={sinatureState}
-      /> */}
-
-      <PdfTypeB refPdf={refPdf}
+      <PdfTypeA refPdf={refPdf}
         profileState={profileState}
         prodState={prodState}
         remarkListState={remarkListState}
@@ -109,6 +100,15 @@ export default function QuotationPdf(
         payInfoState={payInfoState}
         sinatureState={sinatureState}
       />
+
+      {/* <PdfTypeB refPdf={refPdf}
+        profileState={profileState}
+        prodState={prodState}
+        remarkListState={remarkListState}
+        rangeListState={rangeListState}
+        payInfoState={payInfoState}
+        sinatureState={sinatureState}
+      /> */}
 
     </Modal>
   )
@@ -135,21 +135,31 @@ const PdfTypeA = (
     }
 ) => {
 
+  const { productList } = prodState
+  const chunkedList = _.chunk(productList, 12) as ProdClass[][]
+  const pageCount = chunkedList.length
 
   return (
     <>
-      <div className={style.pdf}
-        ref={ele => refPdf.current[0] = ele}>
-        <Header />
-        <Profile profileState={profileState} />
-        <Table productList={prodState.productList} />
-        <Total remarkListState={remarkListState} prodState={prodState} />
-        <Other
-          rangeListState={rangeListState}
-          payInfoState={payInfoState}
-          sinatureState={sinatureState}
-        />
-      </div>
+      {chunkedList.map((chunk, index) => {
+        return (
+          <Fragment key={index}>
+            {index !== 0 && <hr className={style.hr} />}
+            <div className={style.pdf}
+              ref={ele => refPdf.current[0] = ele}>
+              <Header />
+              <Profile profileState={profileState} index={index + 1} pageCount={pageCount} />
+              <Table productList={chunk} />
+              <Total remarkListState={remarkListState} prodState={prodState} />
+              <Other
+                rangeListState={rangeListState}
+                payInfoState={payInfoState}
+                sinatureState={sinatureState}
+              />
+            </div>
+          </Fragment>
+        )
+      })}
     </>
   )
 }
@@ -177,13 +187,14 @@ const PdfTypeB = (
 
   const { productList } = prodState
   const chunkedList = _.chunk(productList, 40) as ProdClass[][]
+  const pageCount = chunkedList.length
 
   return (
     <>
       <div className={style.pdf}
         ref={ele => refPdf.current[0] = ele}>
         <Header />
-        <Profile profileState={profileState} />
+        <Profile profileState={profileState} index={1} pageCount={pageCount} />
         <Total remarkListState={remarkListState} prodState={prodState} />
         <Other
           rangeListState={rangeListState}
@@ -199,7 +210,7 @@ const PdfTypeB = (
             <div className={style.pdf}
               ref={ele => refPdf.current[index + 1] = ele}>
               <Header />
-              <Profile profileState={profileState} />
+              <Profile profileState={profileState} index={index + 2} pageCount={pageCount} />
               <Table productList={chunk} />
             </div>
           </Fragment>

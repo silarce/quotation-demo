@@ -6,8 +6,12 @@ import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
 
 
 export default function Profile(
-  { profileState }:
-    { profileState: TuseProfile }
+  { profileState, index ,pageCount}:
+    {
+      profileState: TuseProfile
+      index: number
+      pageCount: number
+    }
 ) {
 
 
@@ -15,7 +19,7 @@ export default function Profile(
   const {
     quotationId, clientId, clientName, contactPerson, contactPhone,
     fax, clientState, ageing, builtDate, projectName,
-    trackState, schedule,projectAddress
+    trackState, schedule, projectAddress
   } = profileState.profile
 
   const [year, month, day] = builtDate.split("-")
@@ -76,7 +80,7 @@ export default function Profile(
           <div>
             <span>頁次</span>
             <span className={style.semi}>:</span>
-            <span>{"1/1"}</span>
+            <span>{`${index}/${pageCount}`}</span>
           </div>
         </div>
       </div>
