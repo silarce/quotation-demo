@@ -129,24 +129,80 @@
 // ===============================================
 
 .quotationState {
-  background-color: #f5f5f5;
-  padding: 10px 0px;
+  position: relative;
+  background-color: $bgc01;
+  border: solid 1px $colorBorder01;
+  > * {
+    padding: 10px 20px;
+    display: inline-block;
+  }
   .sel {
-    padding: 0 20px;
     width: fit-content;
+    cursor: pointer;
     > * {
       display: inline-block;
       padding: 0;
     }
     .select03 {
-      width: 100px;
+      width: 60px;
       hr {
         display: none;
       }
-
-      [class$=MenuList] {
+      [class$="MenuList"] {
         background-color: pink !important;
       }
+    }
+    &.isFocus {
+      > span {
+        color: red;
+      }
+      .select03 div {
+        color: red;
+      }
+    }
+  }
+  .history {
+    width: fit-content;
+    border-left: solid 1px $colorBorder01;
+    cursor: pointer;
+  }
+  .historyList {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    width: calc(100% + 2px);
+    padding: 0 20px;
+    z-index: 1;
+    background-color: white;
+    border: solid 1px $colorBorder01;
+    > .item {
+      display: grid;
+      grid-template-columns: 85px 100px;
+      justify-content: space-between;
+      padding: 10px 0;
+      span {
+        font-weight: 500;
+        font-size: 16px;
+      }
+      > div:nth-of-type(1) {
+        span {
+          color: $colorMain;
+        }
+      }
+      > div:nth-of-type(2) {
+        display: grid;
+        gap: 7px;
+        > span:nth-of-type(1) {
+          color: $colorMain;
+        }
+      }
+    }
+    hr:nth-last-of-type(1) {
+      display: none;
+    }
+    &.isShow {
+      display: block;
     }
   }
 }

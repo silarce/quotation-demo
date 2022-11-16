@@ -128,7 +128,7 @@ function useProduct(
   const businessTax = new Decimal(subTotal).mul(0.05).toNumber()
 
   // 總計
-  const total = new Decimal(subTotal).sub(businessTax).toNumber()
+  const total = new Decimal(subTotal).add(businessTax).toNumber()
 
   return {
     theadIndex, setTheadIndex,

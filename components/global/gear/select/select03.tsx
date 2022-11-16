@@ -5,9 +5,9 @@ import {
 
 
 // UI套件
-import Select, { CSSObjectWithLabel, SingleValue, } from 'react-select';
+import Select, { CSSObjectWithLabel, SingleValue } from 'react-select';
 import type {
-  StylesConfig, GroupBase,
+  StylesConfig, GroupBase
 } from 'react-select';
 
 // icon
@@ -29,7 +29,8 @@ const Select03 = ({
   stateValue, options, onChange, placeholder,
   className, width, labelWidth, disabled,
   onFocus, onBlur,
-  customComponents, customStyleObj
+  customComponents, customStyleObj,
+  selRef, openMenuOnFocus
 }:
   {
     stateValue: Toption | string | null
@@ -44,6 +45,8 @@ const Select03 = ({
     onBlur?: (e?: FocusEvent<HTMLInputElement>) => void
     customComponents?: TcustomComponents
     customStyleObj?: TcusStyleObj
+    selRef?: React.LegacyRef<HTMLDivElement>
+    openMenuOnFocus?: boolean
   }) => {
 
   // ====================================================
@@ -99,6 +102,9 @@ const Select03 = ({
           ...customComponents
         }}
         menuPosition={"fixed"}
+        // ref={selRef as Ref<Select<Toption, false, GroupBase<Toption>>>}
+        ref={selRef as any} // 實在是不知道也找不到select的ref的型別怎麼設定
+        openMenuOnFocus={openMenuOnFocus}
       />
       {!disabled && <hr />}
     </div>
@@ -167,15 +173,6 @@ const styleObjOri = (cusStyleObj: TcusStyleObj | undefined): StylesConfig<Toptio
         ...cusStyleObj?.valueContainer
       }
     },
-    menuList: (provided) => {
-      const padding = `0 12px`;
-      const width = `calc(100% + 18px)`;
-      const backgroundColor = "#fff";
-      return {
-        ...provided, padding, width, backgroundColor,
-        ...cusStyleObj?.menuList
-      }
-    },
     menu: (provided) => {
       const boxShadow = "none";
       const filter = "drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15))"
@@ -183,6 +180,15 @@ const styleObjOri = (cusStyleObj: TcusStyleObj | undefined): StylesConfig<Toptio
         ...provided,
         boxShadow, filter,
         ...cusStyleObj?.menu
+      }
+    },
+    menuList: (provided) => {
+      const padding = `0 12px`;
+      const width = `calc(100% + 18px)`;
+      const backgroundColor = "#fff";
+      return {
+        ...provided, padding, width, backgroundColor,
+        ...cusStyleObj?.menuList
       }
     },
     option: (provided) => {
@@ -215,7 +221,13 @@ const styleObjOri = (cusStyleObj: TcusStyleObj | undefined): StylesConfig<Toptio
       return {
         ...provided,
         position,
-        ...cusStyleObj?.option,
+        ...cusStyleObj?.indicatorsContainer,
+      }
+    },
+    singleValue: (provided) => {
+      return {
+        ...provided,
+        ...cusStyleObj?.singleValue,
       }
     },
     // ========================================
