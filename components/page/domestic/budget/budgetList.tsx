@@ -18,9 +18,9 @@ import style from "./budgetList.module.scss"
 
 // data type
 import {
-  TbudgetList,  
+  TbudgetList,
 } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
-import  { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
+import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
 const { Panel } = Collapse
@@ -65,30 +65,30 @@ export default function BudgetList({ budgetList, searchObj }:
 
           const openQuotation = (e: MouseEvent) => {
             e.stopPropagation()
-            router.push(`/domestic/contract/quotation/${quotationId}`)
+            router.push(`/domestic/budget/quotation/${quotationId}`)
           }
-          const { detail } = item
-          // ===========================
-          // 搜尋過濾
-          const regDoorType = new RegExp(searchObj.doorType)
-          const regCountry = new RegExp(searchObj.country)
-          const regClientName = new RegExp(searchObj.clientName)
-          const regProjectName = new RegExp(searchObj.projectName)
-          if (
-            !regDoorType.test(doorType) ||
-            !regCountry.test(country) ||
-            !regClientName.test(clientName) ||
-            !regProjectName.test(projectName)
-          ) return null
-          // ===========================
+        const {detail} = item
+        // ===========================
+        // 搜尋過濾
+        const regDoorType = new RegExp(searchObj.doorType)
+        const regCountry = new RegExp(searchObj.country)
+        const regClientName = new RegExp(searchObj.clientName)
+        const regProjectName = new RegExp(searchObj.projectName)
+        if (
+        !regDoorType.test(doorType) ||
+        !regCountry.test(country) ||
+        !regClientName.test(clientName) ||
+        !regProjectName.test(projectName)
+        ) return null
+        // ===========================
 
-          return (
-            <Panel key={index} className={style.panel}
-              header={<PanelHeader budget={item} isActive={isActive} openQuotation={openQuotation} />}
-            >
-              <PanelBody budgetDetail={detail} />
-            </Panel>
-          )
+        return (
+        <Panel key={index} className={style.panel}
+          header={<PanelHeader budget={item} isActive={isActive} openQuotation={openQuotation} />}
+        >
+          <PanelBody budgetDetail={detail} />
+        </Panel>
+        )
         })}
       </Collapse>
     </div >

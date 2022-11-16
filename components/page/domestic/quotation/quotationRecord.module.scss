@@ -1,0 +1,220 @@
+@use "styles/theme01" as *;
+
+.container {
+  width: calc(100% - (17px * 2));
+  margin: auto;
+  margin-top: 45px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  > * {
+    display: inline-block;
+  }
+  > span {
+    margin-left: 32px;
+    font-weight: 400;
+    font-size: 18px;
+    color: $colorMain;
+  }
+  > div {
+    > span {
+      display: inline-block;
+    }
+    &:nth-of-type(1) {
+      margin-left: 24px;
+      > span {
+        &:nth-of-type(1) {
+          width: 8px;
+          height: 8px;
+          margin-right: 5px;
+          background-color: #08f366;
+          border-radius: 50%;
+        }
+      }
+    }
+    &:nth-of-type(2) {
+      margin-left: 15px;
+      > span {
+        &:nth-of-type(1) {
+          width: 8px;
+          height: 8px;
+          margin-right: 5px;
+          border-radius: 50%;
+          background-color: #ea1833;
+        }
+      }
+    }
+    &:nth-of-type(3) {
+      margin: auto;
+      margin-right: 0;
+    }
+  }
+}
+
+.recordList {
+  // height: 650px;
+  overflow: auto;
+  // padding: 3px;
+  // border: solid 1px $colorBorder01;
+}
+
+.recordInfo {
+  padding: 2px 30px;
+  padding-right: 15px;
+  display: grid;
+  grid-template-columns: repeat(4, fit-content(100%)) auto;
+  > span {
+    display: inline-block;
+    font-size: 16px;
+    padding: 10px 0;
+    &:nth-of-type(1) {
+      width: 115px;
+      font-weight: 700;
+      color: $colorMain;
+    }
+    // 直線
+    &:nth-of-type(2) {
+      width: 1px;
+      // height: 45.14px;
+      padding: 0;
+      margin: 0 25px;
+      background-color: $colorBorder01;
+    }
+    &:nth-of-type(3) {
+      width: 80px;
+      font-weight: 700;
+      color: $colorMain;
+    }
+    &:nth-of-type(4) {
+      width: 80px;
+      margin-left: 15px;
+      font-weight: 400;
+      color: $colorMain;
+    }
+    &:nth-of-type(5) {
+      margin-left: 15px;
+      font-weight: 400;
+    }
+  }
+}
+
+.prodContainer {
+  overflow: auto;
+}
+
+.thead {
+  width: fit-content;
+  padding: 11px 0;
+  white-space: nowrap;
+  background-color: $bgc01;
+  > span {
+    display: inline-block;
+    &:nth-of-type(1) {
+      width: 8px;
+      margin-left: 19px;
+    }
+    &:nth-of-type(2) {
+      width: 20px;
+      margin-left: 12px;
+      margin-right: 10px;
+    }
+  }
+  .column {
+    display: inline-block;
+    margin-left: 22px;
+    &:nth-of-type(1) {
+      margin-left: 0;
+    }
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+    }
+  }
+}
+
+.tbody {
+  @extend .thead;
+  background-color: #fff;
+  .action {
+    height: 8px;
+    border-radius: 50%;
+    &.add {
+      background-color: #08f366;
+    }
+    &.remove {
+      background-color: #ea1833;
+    }
+  }
+  .column {
+    > * {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorText;
+    }
+    > img {
+      margin-right: 6px;
+    }
+  }
+}
+
+.collapse {
+  border: none;
+  :global(.ant-collapse-item) :global(.ant-collapse-header) {
+    padding: unset;
+    // display: block;
+    background-color: #fff;
+  }
+  :global(.ant-collapse-content-box) {
+    padding: unset;
+    overflow: auto;
+  }
+  :global(.ant-collapse-item) {
+    border: solid 1px $colorMain;
+    border-bottom: 0;
+    &:nth-last-of-type(1) {
+      border-bottom: solid 1px $colorMain;
+    }
+  }
+  :global(.ant-collapse-extra) {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 7px;
+  }
+}
+.recordContainer {
+  margin-top: 11px;
+  padding: 0 3px;
+  &:nth-of-type(1) {
+    margin-top: 21px;
+  }
+}
+
+.panelButton {
+  width: fit-content;
+  padding: 5px 20px 5px 28px;
+  margin: auto;
+  background-color: $bgc01;
+  border: solid 1px $colorBorder01;
+  white-space: nowrap;
+  > * {
+    vertical-align: middle;
+    &:nth-child(1) {
+      margin-right: 10px;
+    }
+  }
+}
+
+.noRecord {
+  border: solid 1px $colorMain;
+  padding: 11px;
+  > span {
+    font-size: 18px;
+  }
+}

@@ -54,12 +54,7 @@ const fakeQuotationObjListOri = () => {
 }
 
 
-
-
 const fakeQuotationListOri = () => Object.values(fakeQuotationObjListOri())
-
-
-
 
 
 export type {

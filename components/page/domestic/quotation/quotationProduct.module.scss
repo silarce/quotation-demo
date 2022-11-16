@@ -1,0 +1,30 @@
+@use "styles/theme01" as *;
+
+.container {
+  width: calc(100% - (17px * 2));
+  padding: 0 4px;
+  margin: auto;
+  margin-top: 17px;
+  border: solid 1px $colorBorder01;
+  &.borderRed {
+    border: solid 1px #ea1833;
+  }
+}
+
+.listContainer {
+  width: 100%;
+  overflow: auto;
+  max-height: 500px;
+  .thead{
+    position: sticky;
+    top:0;
+    z-index: 1;
+  }
+}
+
+.addBtn {
+  width: fit-content;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+}

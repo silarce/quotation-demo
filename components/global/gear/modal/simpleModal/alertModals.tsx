@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 
 // antd
 import { Modal, ModalFuncProps } from 'antd';
@@ -80,6 +82,46 @@ export const ModalErr = (
     ...props
   })
 }
+// ====================================================
+
+export const ModalWarning = (
+  { title, content, props }: {
+    title?: string | number
+    content?: string | number
+    props?: ModalFuncProps
+  }
+) => {
+  return Modal.warning({
+    title,
+    content,
+    ...modalProps,
+    ...props
+  })
+}
+
+// ====================================================
+
+export const ModalConfirm = (
+  { title, content, props, className }: {
+    title?: string | number
+    content?: string | number
+    props?: ModalFuncProps
+    className?: string
+  }
+) => {
+  let { className: className01 } = modalProps
+
+  const theClassName = `${className01} ${style.confirm} ${className}`
+  return Modal.confirm({
+    title,
+    content,
+    ...modalProps,
+    ...props,
+    className: theClassName,
+    cancelText: "取消",
+    icon: <></>
+  })
+}
 
 // ====================================================
 export const ModalLoading = (theProps: {
@@ -102,16 +144,14 @@ export const ModalLoading = (theProps: {
     ...props
   })
 }
-
-
-
-
 // ====================================================
 
 const myAlert = {
   info: ModalInfo02,
   success: ModalSuccess,
   err: ModalErr,
+  warning: ModalWarning,
+  confirm: ModalConfirm,
   loading: ModalLoading,
   destroyAll: Modal.destroyAll
 }

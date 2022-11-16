@@ -3,6 +3,7 @@ import { Tproduct } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
 import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
+import iconDoorRail98 from "public/image/icon/doorRail/doorRail98.svg"
 
 interface TrecordProduct
   extends Omit<Tproduct,
@@ -18,12 +19,14 @@ interface TrecordProduct
     icon: string
   }
   memo: string
+
+  area: string
+  cai: string
+  listPrice: string
+  listPriceTotal: string
+  unitPrice: string
+  priceTotal: string
 }
-
-
-
-
-
 interface TchangeListItem {
   id: string // 編號
   date: string // 日期
@@ -36,17 +39,15 @@ interface TchangeListItem {
 interface TchangeList {
   [key: string]: TchangeListItem
 }
-
-
 interface TchangeRecord {
   quotationId: string
   list: TchangeList
 }
-
-
 interface TprodChangingRecordList {
   [key: string]: TchangeRecord
 }
+
+
 
 
 const fakeProduct01: TrecordProduct = {
@@ -55,11 +56,11 @@ const fakeProduct01: TrecordProduct = {
   project: "SD1",
   quoteType: "不是捲門",
   L: "516",
-  W: "230",
+  W: "0",
   H: "230",
   B: "45",
-  area: "14.19",
-  cai: "15400.52", //才數
+  area: (516 * (230 + 45) / 10000).toFixed(2),
+  cai: (516 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
@@ -68,24 +69,27 @@ const fakeProduct01: TrecordProduct = {
     icon: iconDoorRail60.src
   },
   horsepower: "1/3HP",
-  qty: "1",
-  unitPrice: "158610",
-  subTotal: "158610",
-  memo: "防颱防颱",
+  qty: "2",
+  listPrice: "10000",
+  listPriceTotal: "20000",
+  unitPrice: "20000",
+  priceTotal: "20000",
+  memo: "這是備註",
+  typhoonProof: true,
   ejectionDoor: false,
 }
 
 const fakeProduct02: TrecordProduct = {
   action: "remove",
-  discount: "100.00",
-  project: "SD1",
+  discount: "50.00",
+  project: "SD2",
   quoteType: "捲門",
-  L: "516",
+  L: "0",
   W: "230",
   H: "230",
   B: "45",
-  area: "14.19",
-  cai: "15400.52", //才數
+  area: (230 * (230 + 45) / 10000).toFixed(2),
+  cai: (230 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
   doorType: "SJ-30287", //門型
   material: "不鏽鋼304#",
   surface: "BA",
@@ -93,11 +97,14 @@ const fakeProduct02: TrecordProduct = {
     label: "75",
     icon: iconDoorRail75.src
   },
-  horsepower: "1/3HP",
+  horsepower: "1 1/2HP",
   qty: "1",
-  unitPrice: "158610",
-  subTotal: "158610",
-  memo: "防颱防颱",
+  listPrice: "10000",
+  listPriceTotal: "10000",
+  unitPrice: "9000",
+  priceTotal: "9000",
+  memo: "備註",
+  typhoonProof: false,
   ejectionDoor: true,
 }
 

@@ -79,11 +79,11 @@ const sidePathList: TsidePathList = {
           list: [
             {
               label: "公司資料",
-              path: path01 + "/theCompanyInfo",
+              path: path01 + "/company-info",
             },
             {
               label: "公司職等職稱",
-              path: path01 + "/grade",
+              path: path01 + "/departments",
             },
             {
               label: "人員資料",
@@ -102,6 +102,14 @@ const sidePathList: TsidePathList = {
         {
           label: "產品列表",
           path: path01 + "/productList"
+        },
+        {
+          label: "備註列表",
+          path: path01 + "/memoList"
+        },
+        {
+          label: "報價範圍列表",
+          path: path01 + "/quoteRangeList"
         },
       ]
     }
@@ -309,7 +317,7 @@ const topPathList = [
     icon: icon_setting,
     label: "公司設定",
     path01: sidePathList["/setting"].path01,
-    href: sidePathList["/setting"].path01 + "/theCompanyInfo",
+    href: sidePathList["/setting"].path01 + "/company-info",
   },
   {
     icon: icon_domestic,
