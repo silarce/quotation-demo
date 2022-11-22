@@ -31,12 +31,11 @@ export default function Nav() {
         let active = reg.test(pathname) ? styled.active : ""
         if (path01 === "/") active = pathname === path01 ? styled.active : ""
         return (
-          <Link href={href} key={index}>
-            <a className={`${styled.link} ${active}`}>
-              <Image src={icon} alt={label + subLabel} />
-              <span>{label}</span>
-              {subLabel && <span>{subLabel}</span>}
-            </a>
+          <Link className={`${styled.link} ${active}`}
+            href={href} key={index}>
+            <Image src={icon} alt={label + subLabel} />
+            <span>{label}</span>
+            {subLabel && <span>{subLabel}</span>}
           </Link>
         )
       })}

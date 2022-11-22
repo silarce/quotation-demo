@@ -49,7 +49,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   useEffect(() => {
     if (isLoged) router.push("/home")
-    if (!isLoged) router.push("/login")
+    if (!isLoged &&　ready) router.push("/login")
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoged])
 
