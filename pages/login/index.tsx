@@ -6,7 +6,7 @@ import {
 import Image from "next/image"
 
 // component
-import Input02,{TeTextarea} from "components/global/gear/input/input02"
+import Input02, { TeTextarea } from "components/global/gear/input/input02"
 
 // antd
 import { Button } from 'antd';
@@ -58,13 +58,17 @@ export default function Login(
   return (
     <div className={scss.login}>
       <div className={scss.top}>
-        <Image src={logo} alt="logo" />
-        <Image src={erpLogo} alt="erpLogo" />
-        <Image src={imgArc} alt="" />
+        <div><Image src={logo} alt="logo" /></div>
+        <div><Image src={erpLogo} alt="erpLogo" /></div>
+        <div><Image src={imgArc} alt="" /></div>
       </div>
 
-      <Image className={scss.banner}
-        src={Imgbanner} alt="banner" />
+      <div>
+        <Image className={scss.banner}
+          src={Imgbanner} alt="banner"
+          priority
+        />
+      </div>
 
       <form className={scss.loginPanel}
         onSubmit={() => { alert("test") }}>
@@ -76,7 +80,7 @@ export default function Login(
           labelWidth="40px"
           gap="50px"
           placeholder="請輸入帳號"
-          onChange={(e:TeTextarea) => setAccont(e.target.value)}
+          onChange={(e: TeTextarea) => setAccont(e.target.value)}
           isInput={true}
         />
         <Input02 className={scss.input02}
@@ -85,7 +89,7 @@ export default function Login(
           labelWidth="40px"
           gap="50px"
           placeholder="請輸入密碼"
-          onChange={(e:TeTextarea) => setPassword(e.target.value)}
+          onChange={(e: TeTextarea) => setPassword(e.target.value)}
           isInput={true}
           inputType="password"
         />
