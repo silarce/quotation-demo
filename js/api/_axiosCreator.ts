@@ -27,9 +27,9 @@ axi.interceptors.response.use(
     return res
   },
   (err) => {
-    
+
     const url = err.config.url
-    const ignore401 = ["/auth/login"]
+    const ignore401 = ["/auth/login", "/auth/me"]
 
     if (err.response) {
       switch (err.response.status) {

@@ -43,14 +43,19 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         await apiAuthMe()
         setIsLoged(true)
       }
-      finally { setReady(true) }
+      catch { }
+      finally {
+        setTimeout(() => {
+          setReady(true)
+        }, 10);
+      }
     })()
   }, [])
 
   useEffect(() => {
-    if (isLoged) router.push("/home")
-    if (!isLoged &&　ready) router.push("/login")
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (isLoged && firstPathname === "login") router.push("/home")
+    if (!isLoged && ready) router.push("/login")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoged])
 
 
