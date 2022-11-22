@@ -7,12 +7,13 @@ import type { NextPage } from 'next'
 
 // conponents
 import Layer from "components/Layer/Layer"
+import Login from '../components/page/login'
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover'
 
 // api
-import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
+import { apiLogout, apiAuthMe } from 'js/api/api_auth'
 
 // css
 import '../styles/globals.scss'
@@ -32,7 +33,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false)
   const [isLoged, setIsLoged] = useState(false)
   const router = appProps.router
-  const firstPathname = router.pathname.split("/")[1]
+  // const firstPathname = router.pathname.split("/")[1]
 
   // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
@@ -53,11 +54,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     })()
   }, [])
 
-  useEffect(() => {
-    if (isLoged && firstPathname === "login") router.push("/home")
-    if (!isLoged && ready) router.push("/login")
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoged])
+  // useEffect(() => {
+  //   if (isLoged && firstPathname === "login") router.push("/home")
+  //   if (!isLoged && ready) router.push("/login")
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isLoged, router.pathname])
 
 
 
@@ -67,28 +68,36 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       await apiLogout()
       setIsLoged(false)
     }
-    catch { myAlert.err({title:"登出失敗"}) }
+    catch { myAlert.err({ title: "登出失敗" }) }
   }
   // -----------------------------------------------------------------------
   if (!ready) return null
   // -----------------------------------------------------------------------
-  const noLayoutList = ["login"]
-  if (noLayoutList.includes(firstPathname)) {
+  // const noLayoutList = ["login"]
+  // if (noLayoutList.includes(firstPathname)) {
+  //   return (
+  //     <>
+  //       <Head>
+  //         <title >三久ERP</title>
+  //       </Head>
+  //       {getLayout(
+  //         <Component {...pageProps} setIsLoged={setIsLoged} />
+  //       )}
+  //     </>
+  //   )
+  // }
+  // ------------------------------------------------------------------
+  if (!isLoged)
     return (
       <>
         <Head>
           <title >三久ERP</title>
         </Head>
-        {getLayout(
-          <Component {...pageProps} setIsLoged={setIsLoged} />
-        )}
+        <Login setIsLoged={setIsLoged} />
       </>
     )
-  }
-
-  // ----
+  // ------------------------------------------------------------------
   return (
-
     <>
       <Head>
         <title>三久ERP</title>
