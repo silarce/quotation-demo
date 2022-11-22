@@ -29,7 +29,9 @@ type AppPropsWithLayout = AppProps & {
 
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false)
-  const firstPathname = appProps.router.pathname.split("/")[1]
+  const [isLoged, setIsLoged] = useState(false)
+  const router = appProps.router
+  const firstPathname = router.pathname.split("/")[1]
 
   // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
@@ -37,20 +39,20 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   useEffect(() => {
     (async () => {
       // 檢查是否已登入
-      const authInfo = await apiAuthMe()
-      // 如果為false，就進行登入
-      if (!authInfo?.id) {
-        await apiLogin({
-          // account: "",
-          // password: ""
-          account: "admin",
-          password: "1qaz#EDC5tgb"
-        })
+      try {
+        await apiAuthMe()
+        setIsLoged(true)
       }
-      // 登入程序完畢，ready設為true
-      setReady(true)
+      finally { setReady(true) }
     })()
   }, [])
+
+  useEffect(() => {
+    if (isLoged) router.push("/home")
+    if (!isLoged) router.push("/login")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoged])
+
 
   // ----
   if (!ready) return null
@@ -63,7 +65,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
           <title >三久ERP</title>
         </Head>
         {getLayout(
-          <Component {...pageProps} />
+          <Component {...pageProps} setIsLoged={setIsLoged} />
         )}
       </>
     )
