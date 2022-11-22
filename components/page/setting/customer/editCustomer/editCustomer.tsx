@@ -8,7 +8,7 @@ import EditCustomerItem01 from "./editCustomerItem01";
 import EditCustomerItem02 from "./editCustomerItem02";
 
 // global gear
-import Input02 from "components/global/gear/input/input02";
+import Input02, { TeTextarea } from "components/global/gear/input/input02";
 
 // icon
 import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
@@ -40,7 +40,7 @@ export default function EditCustomer({ data, setData, check }: {
           className={style.input02}
           stateValue={data.customerNumber}
           label="客戶編號"
-          onChange={(e) => {
+          onChange={(e:TeTextarea) => {
             const value = e.target.value
             setData(data => ({ ...data, customerNumber: value }))
           }}

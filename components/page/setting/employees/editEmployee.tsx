@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import EditEmployeeItem01 from "./editEmployee/EditEmployeeItem01";
 import EditEmployeeItem02 from "./editEmployee/EditEmployeeItem02";
 
-import Input02 from "components/global/gear/input/input02";
+import Input02,{TeTextarea} from "components/global/gear/input/input02";
 
 // icon
 import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
@@ -47,7 +47,7 @@ export default function EditEmployee({ data, setData, check }: {
           className={style.input02}
           stateValue={data.idNumber}
           label="使用者代號"
-          onChange={(e) => {
+          onChange={(e:TeTextarea) => {
             const value = e.target.value
             setData(data => ({ ...data, idNumber: value }))
           }}

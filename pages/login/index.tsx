@@ -6,7 +6,7 @@ import {
 import Image from "next/image"
 
 // component
-import Input02 from "components/global/gear/input/input02"
+import Input02,{TeTextarea} from "components/global/gear/input/input02"
 
 // antd
 import { Button } from 'antd';
@@ -76,7 +76,7 @@ export default function Login(
           labelWidth="40px"
           gap="50px"
           placeholder="請輸入帳號"
-          onChange={(e) => setAccont(e.target.value)}
+          onChange={(e:TeTextarea) => setAccont(e.target.value)}
           isInput={true}
         />
         <Input02 className={scss.input02}
@@ -85,7 +85,7 @@ export default function Login(
           labelWidth="40px"
           gap="50px"
           placeholder="請輸入密碼"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e:TeTextarea) => setPassword(e.target.value)}
           isInput={true}
           inputType="password"
         />
