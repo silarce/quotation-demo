@@ -27,8 +27,10 @@ type AppPropsWithLayout = AppProps & {
 }
 
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false)
+  const firstPathname = appProps.router.pathname.split("/")[1]
+
   // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -52,12 +54,27 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   // ----
   if (!ready) return null
+  // -----------------------------------------------------------------------
+  const noLayoutList = ["login"]
+  if (noLayoutList.includes(firstPathname)) {
+    return (
+      <>
+        <Head>
+          <title >三久ERP</title>
+        </Head>
+        {getLayout(
+          <Component {...pageProps} />
+        )}
+      </>
+    )
+  }
+
   // ----
   return (
 
     <>
       <Head>
-        <title >三久ERP</title>
+        <title>三久ERP</title>
       </Head>
       <Layer>
         {getLayout(
@@ -72,5 +89,4 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 }
 
 export default MyApp
-
 
