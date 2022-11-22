@@ -49,6 +49,7 @@ export default function Login() {
           gap="50px"
           placeholder="請輸入帳號"
           onChange={(e) => setAcc(e.target.value)}
+          isInput={true}
         />
         <Input02 className={scss.input02}
           stateValue={pw}
@@ -57,6 +58,8 @@ export default function Login() {
           gap="50px"
           placeholder="請輸入密碼"
           onChange={(e) => setPw(e.target.value)}
+          isInput={true}
+          inputType="password"
         />
         <button className={scss.btn}><span>登入</span></button>
       </form>
@@ -70,7 +73,7 @@ export default function Login() {
       </div>
 
       {/* 右下角背景的一條線 */}
-      <div className={scss.bgLine}/>
+      <div className={scss.bgLine} />
 
     </div>
   )

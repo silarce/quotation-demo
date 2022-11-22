@@ -6,7 +6,7 @@
 
 
 
-import { ChangeEvent } from "react"
+import { ChangeEvent, HTMLInputTypeAttribute } from "react"
 // 產生隨機字串(作為id)
 import { nanoid } from 'nanoid'
 
@@ -19,13 +19,13 @@ import style from "./input02.module.scss"
 const Input02 = (
   { label, stateValue, placeholder, onChange,
     id, className, width, labelWidth, gap,
-    disabled
+    disabled, isInput, inputType
   }:
     {
       label: string,
       stateValue: string | number | undefined | null,
-      // onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
-      onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
+      // onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
+      onChange?: (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void,
       placeholder?: string | false,
       id?: string | number
       className?: string
@@ -33,6 +33,9 @@ const Input02 = (
       labelWidth?: string
       gap?: string
       disabled?: boolean | undefined
+      isInput?: true
+      inputType?: "text" | "password"
+
     }) => {
   // ========================================================
   className = className ? className : ""
@@ -60,18 +63,33 @@ const Input02 = (
       style={lableStyle}
     >
       <span>{label}</span>
+      {!isInput &&
+        <TextareaAutosize className={style.textArea}
+          id={id} placeholder={placeholder}
+          autoComplete="off"
+          value={stateValue ?? ""}
+          onChange={onChange}
+          onKeyDown={(e) => {
+            if (e.code === "Enter") e.preventDefault()
+            if (e.code === "NumpadEnter") e.preventDefault()
+          }}
+          disabled={disabled}
+        />
+      }
 
-      <TextareaAutosize className={style.textArea}
-        id={id} placeholder={placeholder}
-        autoComplete="off"
-        value={stateValue ?? ""}
-        onChange={onChange}
-        onKeyDown={(e) => {
-          if (e.code === "Enter") e.preventDefault()
-          if (e.code === "NumpadEnter") e.preventDefault()
-        }}
-        disabled={disabled}
-      />
+      {isInput &&
+        <input className={style.textArea}
+          id={id} placeholder={placeholder}
+          autoComplete="off"
+          value={stateValue ?? ""}
+          onChange={onChange}
+          onKeyDown={(e) => {
+            if (e.code === "Enter") e.preventDefault()
+            if (e.code === "NumpadEnter") e.preventDefault()
+          }}
+          disabled={disabled}
+          type={inputType ?? "text"}
+        />}
 
       {/* <input id={id} type="text" placeholder={placeholder}
         autoComplete="off"
