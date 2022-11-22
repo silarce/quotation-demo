@@ -28,8 +28,8 @@ export default function SideNav() {
         let active = reg.test(asPath) ? style.active : ""
         if (path) {
           return (
-            <Link href={path} key={index}>
-              <a className={`${style.option} ${active}`} key={index}>{label}</a>
+            <Link className={`${style.option} ${active}`} href={path} key={index}>
+              {label}
             </Link>
           )
         }
@@ -37,10 +37,8 @@ export default function SideNav() {
           return (
             <Collapse key={index} className={style.collapse}
               defaultActiveKey={[linkList.defaultCollapse || "0"]} ghost
-              // defaultActiveKey={['0']}  ghost
               onChange={() => { }}>
               <Panel header={label} key={`${index}`}>
-                {/* <Panel header={label} key="1"> */}
                 <ul>
                   {list.map((item, index) => {
                     const { label, path } = item

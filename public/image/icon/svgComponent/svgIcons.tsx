@@ -148,11 +148,7 @@ export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
 
 
 export {
-<<<<<<< HEAD
-  IconDelete01 as IconDelete01, //垃圾桶icon
-=======
   IconDelete01, //垃圾桶icon
->>>>>>> main
   IconEdit,
   IconSearch,
   IconCopy,
