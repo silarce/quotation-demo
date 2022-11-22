@@ -37,7 +37,7 @@ axi.interceptors.response.use(
           if (ignore401.includes(url)) break
           myAlert.err({
             title: "401錯誤、沒有權限",
-            content: "請重新登入"
+            content: "請重新登入或請求授權"
           })
           console.log("401，沒有權限")
           break

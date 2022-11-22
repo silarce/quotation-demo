@@ -17,6 +17,7 @@ import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
 // css
 import '../styles/globals.scss'
 import 'antd/dist/antd.css';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -59,7 +60,16 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   }, [isLoged])
 
 
-  // ----
+
+  // -----------------------------------------------------------------------
+  const reqLogout = async () => {
+    try {
+      await apiLogout()
+      setIsLoged(false)
+    }
+    catch { myAlert.err({title:"登出失敗"}) }
+  }
+  // -----------------------------------------------------------------------
   if (!ready) return null
   // -----------------------------------------------------------------------
   const noLayoutList = ["login"]
@@ -83,7 +93,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       <Head>
         <title>三久ERP</title>
       </Head>
-      <Layer>
+      <Layer reqLogout={reqLogout}>
         {getLayout(
           <Component {...pageProps} />
         )}
