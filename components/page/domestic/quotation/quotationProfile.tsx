@@ -143,18 +143,38 @@ export default function QuotationProfile(
             label: "工程名稱", stateValue: projectName,
             onChange: onChangeProjectName,
             disabled, ...inputStyle
-          }} />
+          }}
+        />
+        {/* <Input02
+          {...{
+            className: style.input02,
+            label: "工程名稱", stateValue: projectName,
+            onChange: onChangeProjectName,
+            disabled, ...inputStyle
+          }} /> */}
         {/*  */}
         <div className={style.form02}>
           <div className={`${style.clientName} ${disabled ? style.disabled : ""}`}>
             <div>
+
+
               <Input02
-                {...{
-                  className: `${style.clientName} ${style.input02}`,
-                  label: "客戶名稱", stateValue: clientName,
-                  onChange: (e) => {/**/ }, placeholder: "",
-                  disabled: true, ...inputStyle,
-                }} />
+                className={`${style.clientName} ${style.input02}`}
+                label={"客戶名稱"}
+                stateValue={clientName}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => { }}
+                placeholder={""}
+                disabled={true}
+                {...{ inputStyle }}
+              // {...{
+              //   className: `${style.clientName} ${style.input02}`,
+              //   label: "客戶名稱", stateValue: clientName,
+              //   onChange: (e:ChangeEvent<HTMLTextAreaElement>) => {/**/ }, placeholder: "",
+              //   disabled: true, ...inputStyle,
+              // }} 
+              />
+
+
               {!clientName && <button onClick={openModal}>請選擇客戶</button>}
               {clientName && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
@@ -169,7 +189,7 @@ export default function QuotationProfile(
                   {...{
                     className: style.input02,
                     label, stateValue: value, placeholder,
-                    onChange: (e) => { },
+                    onChange: (e: ChangeEvent<HTMLTextAreaElement>) => { },
                     disabled: true, ...inputStyle
                   }} />
               )

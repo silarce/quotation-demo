@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from "react";
 
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
+import Input02,{TeTextarea} from "components/global/gear/input/input02"
 import { Select02 } from "components/global/gear/select/select"
 import TimePicker01 from "components/global/gear/input/timePicker01";
 // icon
@@ -146,7 +146,7 @@ export default function EditEmployeeItem02({ data, setData }: {
               stateValue={data.seniority}
               label="年資"
               labelWidth="60px"
-              onChange={(e) => {
+              onChange={(e:TeTextarea) => {
                 const value = e.target.value
                 setData(data => {
                   data.seniority = value

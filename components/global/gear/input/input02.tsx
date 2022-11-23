@@ -16,6 +16,13 @@ import TextareaAutosize from 'react-textarea-autosize';
 // css
 import style from "./input02.module.scss"
 
+
+type TonChangeTextarea = (e: ChangeEvent<HTMLTextAreaElement>) => void
+type TonChangeInput = (e: ChangeEvent<HTMLInputElement>) => void
+
+type TeTextarea = ChangeEvent<HTMLTextAreaElement>
+type TeInput = ChangeEvent<HTMLInputElement>
+
 const Input02 = (
   { label, stateValue, placeholder, onChange,
     id, className, width, labelWidth, gap,
@@ -25,8 +32,7 @@ const Input02 = (
     {
       label?: string,
       stateValue: string | number | undefined | null,
-      // onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
-      onChange?: (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void,
+      onChange?: TonChangeTextarea | TonChangeInput
       placeholder?: string | false,
       id?: string | number
       className?: string
@@ -86,7 +92,7 @@ const Input02 = (
           id={id} placeholder={placeholder}
           autoComplete="off"
           value={stateValue ?? ""}
-          onChange={onChange}
+          onChange={onChange as TonChangeTextarea}
           onKeyDown={(e) => {
             if (e.code === "Enter") e.preventDefault()
             if (e.code === "NumpadEnter") e.preventDefault()
@@ -100,7 +106,7 @@ const Input02 = (
           id={id} placeholder={placeholder}
           autoComplete="off"
           value={stateValue ?? ""}
-          onChange={onChange}
+          onChange={onChange as TonChangeInput}
           onKeyDown={(e) => {
             if (e.code === "Enter") e.preventDefault()
             if (e.code === "NumpadEnter") e.preventDefault()
@@ -125,4 +131,6 @@ const Input02 = (
 
 export default Input02
 
-
+export type {
+  TonChangeTextarea, TonChangeInput, TeTextarea, TeInput
+}

@@ -27,9 +27,9 @@ axi.interceptors.response.use(
     return res
   },
   (err) => {
-    
+
     const url = err.config.url
-    const ignore401 = ["/auth/login"]
+    const ignore401 = ["/auth/login", "/auth/me"]
 
     if (err.response) {
       switch (err.response.status) {
@@ -37,7 +37,7 @@ axi.interceptors.response.use(
           if (ignore401.includes(url)) break
           myAlert.err({
             title: "401錯誤、沒有權限",
-            content: "請重新登入"
+            content: "請重新登入或請求授權"
           })
           console.log("401，沒有權限")
           break
