@@ -81,10 +81,6 @@ export default function ProductList({ productStates }:
               onClick={() => setActiveRow(pIndex)}
             >
               <div className={style.buttonBox}>
-<<<<<<< HEAD:components/page/domestic/contract/quotation/quotationProduct/productList.tsx
-                <IconDelete01 onClick={(e) => deleteProduct(e, pIndex)} />
-                <IconCopy onClick={() => copyProduct(pIndex)} />
-=======
 
                 <IconDelete01
                   onClick={(e) => deleteProduct(e, pIndex)}
@@ -92,7 +88,6 @@ export default function ProductList({ productStates }:
                 <IconCopy
                   onClick={() => copyProduct(pIndex)}
                 />
->>>>>>> main:components/page/domestic/quotation/quotationProduct/productList.tsx
                 <span>1</span>
               </div>
               {theadIndex.map((key) => {

@@ -39,8 +39,7 @@ export default function Profile(
             })
           }
           return (
-            <TimePicker01
-              className={style.input02}
+            <TimePicker01 className={style.input02} key={index}
               label={label}
               labelWidth="80px"
               stateValue={stateValue}
