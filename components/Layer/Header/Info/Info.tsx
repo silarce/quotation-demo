@@ -1,18 +1,20 @@
-import Image from "next/image"
+import { useContext } from "react"
 
 // css
 import style from "./info.module.scss"
-
-// api
-import { apiLogout } from 'js/api/api_auth'
 
 // img
 import avatar from "public/image/avatar.png"
 // icon
 import logout from "public/image/icon/logout.svg"
 
+// ctx
+import { LayerCtx } from "components/Layer/Layer"
+
 
 export default function Info() {
+  const { reqLogout } = useContext(LayerCtx)
+
 
 
   return (
@@ -32,7 +34,7 @@ export default function Info() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={logout.src} alt="登出"
         />
-        <span onClick={apiLogout}>登出</span>
+        <span onClick={reqLogout}>登出</span>
       </div>
     </div>
   )

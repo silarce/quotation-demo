@@ -16,7 +16,7 @@ export const apiLogin =
       .then(({ data }) => {
         return data
       })
-      .catch((err) => err)
+      .catch(err => Promise.reject(err))
   }
 
 // 登出
@@ -24,7 +24,7 @@ export const apiLogout = () => {
   const api = "/auth/logout"
   return axi.get(api)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err))
 }
 
 // 取得使用者資料
@@ -32,7 +32,7 @@ export const apiAuthMe = () => {
   const api = "/auth/me"
   return axi.get(api)
     .then(({ data }) => data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err))
 }
 
 

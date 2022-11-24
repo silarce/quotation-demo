@@ -21,6 +21,8 @@ import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
+import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
+import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/quotationPdf_part"
 
 // antd
 import type { MenuProps } from 'antd';
@@ -57,14 +59,9 @@ import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quota
 // import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 // =============================================================
 
-// lab
-import QuotationPdf from "components/page/domestic/paf/quotationPdf/quotationPdf"
-// ========================================================
-
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
-
 
 // =============================================================
 // =============================================================
@@ -80,13 +77,17 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
 
-
   let {
     quotationId, //報價單id //若為新增報價單則為newQuotation
     newQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
   } = router.query
   if (typeof newQuotationId !== "string") newQuotationId = ""
+  // --------------------------------------------------------------------------
 
+  const [showPdf, setShowPdf] = useState(false)
+  const [showPdf_part, setShowPdf_part] = useState(false)
+
+  // --------------------------------------------------------------------------
 
   // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
   let quotationData: Tquotation | undefined;
@@ -114,11 +115,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const payInfoState = usePayInfo(quotationData)
   // sinature //簽名
   const sinatureState = useSinature(quotationData)
-
-
-  // --------------------------------------------------------------------------
-
-  const [showPdf, setShowPdf] = useState(false)
 
   // --------------------------------------------------------------------------
 
@@ -158,6 +154,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
       onClick: () => setShowPdf(true)
+    },
+    {
+      type: "myButton", label: "匯出材料/配件", img: iconUpload.src,
+      onClick: () => setShowPdf_part(true)
     },
     { type: "myButton", label: "編輯", onClick: () => setAllowEdit(true) },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
@@ -234,9 +234,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
         payInfoState={payInfoState}
         sinatureState={sinatureState}
       />
+
+      {/*  */}
+      <QuotationPdf_part
+        isVisable={showPdf_part}
+        onCancel={() => { setShowPdf_part(false) }}
+        profileState={profileState}
+        prodState={prodState}
+      />
+      {/*  */}
     </div>
   )
-
 }
 
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createContext } from "react";
 
 import style from "./layer.module.scss"
 
@@ -6,7 +6,18 @@ import style from "./layer.module.scss"
 import Header from "./Header/Header"
 import SideNav from "./SideNav/SideNav";
 
-export default function Layer({ children }: { children: React.ReactNode }) {
+
+
+
+export const LayerCtx = createContext<{ reqLogout: () => void }>(null!)
+
+// ======================================================================
+export default function Layer(
+  { children, reqLogout }:
+    {
+      children: React.ReactNode
+      reqLogout: () => void
+    }) {
 
 
 
@@ -15,7 +26,9 @@ export default function Layer({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={style.container}>
-      <Header />
+      <LayerCtx.Provider value={{ reqLogout }}>
+        <Header />
+      </LayerCtx.Provider>
       <div className={style.wrapper}>
         <SideNav />
         {/* main */}
