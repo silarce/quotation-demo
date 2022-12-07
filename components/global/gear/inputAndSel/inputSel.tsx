@@ -16,8 +16,6 @@ import scss from "./inputSel.module.scss"
 
 
 
-
-
 // =============================================================================
 
 export default function InputSel(

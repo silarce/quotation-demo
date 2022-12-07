@@ -1,22 +1,11 @@
 import {
   ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent,
   Dispatch, SetStateAction,
-  useState
 } from "react"
-
-
-
-
-
-
-
 
 
 // css
 import scss from "../inputSel.module.scss"
-
-
-
 
 
 export type TinputProps = {
@@ -25,8 +14,6 @@ export type TinputProps = {
   className?: string
   attributes?: InputHTMLAttributes<HTMLInputElement>
 }
-
-
 
 // ==============================================================================
 export default function Input(
@@ -43,27 +30,33 @@ export default function Input(
     }
 ) {
 
+  const {
+    value,
+    onChange,
+    className,
+    attributes,
+  } = inputProps
+
+
   const inputClasses = (() => {
-    return `${scss.inputBox} ${inputProps?.className ?? ""}`
+    return `${scss.inputBox} ${className ?? ""}`
   })()
-
-
-
+// -------------------------------------------------------------------------
   return (
     <div className={inputClasses}>
       <input
         type="text"
         placeholder={placeholder}
         autoComplete="off"
-        value={inputProps.value}
+        value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(e) => inputProps.onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         /*如果inputProps.attributes裡存在對應prop的話
         inputProps.attributes裡的prop會把上面對應的props蓋過去
         計畫只會把type或autoComplete蓋過去*/
-        {...inputProps.attributes}
+        {...attributes}
       />
     </div>
   )

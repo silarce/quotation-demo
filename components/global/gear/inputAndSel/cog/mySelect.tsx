@@ -1,12 +1,7 @@
 
 import {
-  ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent,
-
-  useState
+  CSSProperties, FocusEvent,
 } from "react"
-
-
-
 
 
 import Select, { Options, SingleValue, ActionMeta } from 'react-select';
@@ -26,6 +21,7 @@ import type { Toption } from "fakeDatabase/options/options"
 export type TselectProps = {
   value: Toption | string | number | null | undefined
   options: Toption[]
+  className?: string
   // onChange: (option: Toption | null, meta?: ActionMeta<Toption>) => void
   onChange: (option: SingleValue<Toption>, meta?: ActionMeta<Toption>) => void
   onFocus?: (e?: FocusEvent<HTMLInputElement>) => void
@@ -39,8 +35,6 @@ export type TselectProps = {
   customComponents?: TselCustomComponents
 }
 
-
-
 // ==============================================================================
 export default function MySelect(
   {
@@ -53,8 +47,6 @@ export default function MySelect(
       placeholder?: string | undefined
       disabled: boolean | undefined
     }
-
-
 ) {
 
   // 如果selectProps.value == false就轉為null
@@ -68,32 +60,47 @@ export default function MySelect(
     }
   }
 
+
+  const {
+    value,
+    options,
+    className,
+    onChange,
+    onFocus,
+    onBlur,
+    classNames,
+    selectRef,
+    openMenuOnFocus,
+    customComponents,
+  } = selectProps
+
+
   // 客製化元件
   // eslint-disable-next-line @next/next/no-img-element
   const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
 
-
+// -------------------------------------------------------------------------
   return (
-    <div className={scss.selectBox}>
+    <div className={`${scss.selectBox} ${className}`}>
       <Select
-        className={scss.select}
         isDisabled={disabled}
-        value={selectProps.value as Toption}
+        value={value as Toption}
         placeholder={placeholder}
-        options={selectProps.options}
-        onChange={selectProps.onChange}
-        components={{ DropdownIndicator, ...selectProps.customComponents }}
+        options={options}
+        onChange={onChange}
+        components={{ DropdownIndicator, ...customComponents }}
         unstyled={true}
         menuPortalTarget={document.getElementById("__next")}
         // menuPosition={"fixed"}
         // menuIsOpen={true}
         classNames={{
-          menu: (state) => `${scss.selMenu} ${selectProps.classNames?.menu ?? ""}`,
-          placeholder: (state) => `${scss.selPlaceholder} ${selectProps.classNames?.placeholder ?? ""}`,
-          singleValue: (state) => `${scss.selSingleValue} ${selectProps.classNames?.singleValue ?? ""}`,
-          option: (state) => `${scss.selOption} ${selectProps.classNames?.option ?? ""}`,
-          control: (state) => `${scss.selControl} ${selectProps.classNames?.control ?? ""}`,
-          menuList: (state) => `${scss.selMenuList} ${selectProps.classNames?.menuList ?? ""}`,
+          container: (state) => `${scss.selContainer} ${classNames?.container ?? ""}`,
+          menu: (state) => `${scss.selMenu} ${classNames?.menu ?? ""}`,
+          placeholder: (state) => `${scss.selPlaceholder} ${classNames?.placeholder ?? ""}`,
+          singleValue: (state) => `${scss.selSingleValue} ${classNames?.singleValue ?? ""}`,
+          option: (state) => `${scss.selOption} ${classNames?.option ?? ""}`,
+          control: (state) => `${scss.selControl} ${classNames?.control ?? ""}`,
+          menuList: (state) => `${scss.selMenuList} ${classNames?.menuList ?? ""}`,
         }}
       />
     </div>
