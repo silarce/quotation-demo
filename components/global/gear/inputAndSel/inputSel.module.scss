@@ -1,0 +1,96 @@
+@use "styles/theme01" as *;
+
+.label {
+  position: relative;
+  display: grid;
+  grid-template-columns: fit-content(100%) auto;
+  align-items: center;
+
+  gap: 20px;
+  width: 100%;
+
+  > * {
+    margin-left: 0;
+  }
+  .caption {
+    font-weight: 500;
+    font-size: 20px;
+    color: $colorText;
+  }
+  .inputBox {
+    height: fit-content;
+    font-weight: 400;
+    font-size: 18px;
+    width: 100%;
+    > input {
+      width: 100%;
+      background: transparent;
+      &::placeholder {
+        color: $colorBorder01;
+      }
+    }
+  }
+
+  .hr {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 100%;
+    border-color: $colorMain;
+    &:global(.isFocus) {
+      border-color: $colorActive01;
+    }
+    &:global(.invisible) {
+      visibility: hidden;
+    }
+  }
+
+  // =================================================================
+  // Select
+} //label
+
+.selectBox {
+  height: fit-content;
+  font-weight: 400;
+  font-size: 18px;
+  width: 100%;
+  // color: $colorText;
+  color: pink;
+}
+.select {
+  // cursor: pointer;
+}
+div.selControl {
+  cursor: pointer;
+}
+
+.selPlaceholder {
+  color: $colorBorder01;
+}
+.selSingleValue {
+  color: $colorText;
+}
+.selMenu {
+  background-color: #fff;
+  box-sizing: border-box;
+  filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
+}
+
+.selMenuList {
+  padding: 0 12px;
+}
+
+div.selOption {
+  padding: 10px 0;
+  color: $colorText;
+  font-weight: 400;
+  font-size: 18px;
+  border-bottom: solid 1px $colorBorder01;
+  cursor: pointer;
+  &:nth-last-of-type(1) {
+    border-bottom: none;
+  }
+  &:hover {
+    color: $colorActive01;
+  }
+}
