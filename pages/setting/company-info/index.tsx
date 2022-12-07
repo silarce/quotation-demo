@@ -10,10 +10,10 @@ const _ = require("lodash")
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
-import Input02 from "components/global/gear/input/input02"
 import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address"
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // api
 import {
@@ -26,7 +26,7 @@ import {
 import { IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
-import style from "./company-info.module.scss"
+import scss from "./company-info.module.scss"
 
 // fakeData type
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
@@ -175,25 +175,24 @@ export default function CompanyInfo() {
     setImgSrc(companyInfo.logoLink)
     setImageFile(undefined)
   }
-
   // ===================================================
   return (
-    <div className={style.container}>
+    <div className={scss.container}>
       <PageHeader02 tag="公司資料"
         panelList={editable ? panalList02 : panalList01}
       />
-      <div className={style.mainContainer}>
+      <div className={scss.mainContainer}>
 
         {/* 左邊的圖片 */}
-        <div className={style.logoBox}>
+        <div className={scss.logoBox}>
           {logoLink
             // eslint-disable-next-line @next/next/no-img-element
             ? <img src={imgSrc || ""} alt="logo" />
             : <span>LOGO</span>}
           {!editable
             ? ""
-            : <div className={style.loadButtonBox}>
-              <label className={style.loadPhotoButton}
+            : <div className={scss.loadButtonBox}>
+              <label className={scss.loadPhotoButton}
                 htmlFor="uploadLogo">
                 <span>上傳公司Logo</span>
                 <input id="uploadLogo" type="file"
@@ -207,30 +206,35 @@ export default function CompanyInfo() {
         </div>
 
         {/* 右邊的表單 */}
-        <div className={style.formContainer}>
+        <div className={scss.formContainer}>
           {dataIndex.map((key, index) => {
             const { label } = config[key]
             const stateValue = companyInfo[key] || ""
-            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-              const value = e.target.value
+            const onChange = (value: string) => {
               companyInfo[key] = value
               setCompanyInfo({ ...companyInfo })
             }
             // editable
-            let styleInput02 = `${style.input02}`
-            if (editable) styleInput02 = `${styleInput02} ${style.editable}`
+            let styleInput02 = `${scss.input02}`
+            if (editable) styleInput02 = `${styleInput02} ${scss.editable}`
             return (
-              <Input02 key={index}
-                className={styleInput02}
+              <InputSel key={index}
                 label={label}
-                stateValue={stateValue}
-                onChange={onChange}
+                captionWidth="80px"
+                gap="50px"
+                padding="20px 0 14px 0"
+                hrColor={(!editable && scss.colorBorder01) || undefined}
                 disabled={!editable}
+                inputProps={{
+                  value: stateValue,
+                  onChange: onChange
+                }}
               />
             )
           })}
+
           <SelectInput_address
-            className={`${style.selectInput} ${(editable && style.editable) ?? undefined}`}
+            className={`${scss.selectInput} ${(editable && scss.editable) ?? undefined}`}
             selectInputProps={searchInputProps}
             label="公司地址"
             disabled={!editable}

@@ -84,62 +84,8 @@
 }
 
 .formContainer {
-  margin: 11px auto auto 0;
+  margin-top: 8px;
   width: 100%;
-  > label {
-    display: grid;
-    grid-template-columns: fit-content(100%) auto;
-    gap: 0 50px;
-    width: 100%;
-    padding-top: 17px;
-    > * {
-      margin: auto;
-    }
-    > span {
-      font-weight: 500;
-      font-size: 20px;
-      line-height: 24px;
-      color: $colorText;
-    }
-    > input {
-      width: 100%;
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 22px;
-      color: $colorMain;
-      background-color: transparent;
-      outline: none;
-      &:focus ~ div {
-        background-color: $colorActive01;
-      }
-    }
-    > div {
-      grid-column: span 2;
-      width: 100%;
-      margin-top: 14px;
-      height: 1px;
-      background-color: $colorBorder01;
-    }
-  }
-
-  .input02 {
-    textarea {
-      color: $colorMain;
-    }
-    hr {
-      border-color: $colorBorder01;
-    }
-    &.editable {
-      textarea {
-        &:focus ~ hr {
-          border-color: $colorActive01;
-        }
-      }
-      hr {
-        border-color: $colorMain;
-      }
-    }
-  }
 }
 
 .selectInput {
