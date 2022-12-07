@@ -16,6 +16,7 @@
     font-weight: 500;
     font-size: 20px;
     color: $colorText;
+    align-self: flex-start;
   }
   .inputBox {
     height: fit-content;
@@ -25,6 +26,23 @@
     > input {
       width: 100%;
       background: transparent;
+      &::placeholder {
+        color: $colorBorder01;
+      }
+    }
+  }
+
+  .textareaBox {
+    height: fit-content;
+    width: 100%;
+    font-size: 0px;
+    > textarea {
+      display: block;
+      width: 100%;
+      font-weight: 400;
+      font-size: 18px;
+      resize: none;
+      background-color: transparent;
       &::placeholder {
         color: $colorBorder01;
       }

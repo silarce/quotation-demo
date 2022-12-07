@@ -8,7 +8,7 @@ import {
 // component
 import Input, { TinputProps } from "./cog/input";
 import MySelect, { TselectProps } from "./cog/mySelect";
-
+import Textarea, { TtextareaProps } from "./cog/textarea";
 
 
 // css
@@ -37,7 +37,8 @@ export default function InputSel(
     hrClassName,
 
     inputProps,
-    selectProps
+    selectProps,
+    textareaProps,
   }:
     {
       label?: string
@@ -60,6 +61,7 @@ export default function InputSel(
 
       inputProps?: TinputProps
       selectProps?: TselectProps
+      textareaProps?: TtextareaProps
     }
 
 ) {
@@ -69,7 +71,7 @@ export default function InputSel(
 
   // -----------------------------------------------------------------------
   // 由外部控制的css，會寫在inline
-  
+
   const lableStyle: CSSProperties = {
     width: width,
     gap: gap,
@@ -121,6 +123,20 @@ export default function InputSel(
           disabled={disabled}
         />
       }
+
+      {textareaProps &&
+        <Textarea
+          textareaProps={textareaProps}
+          placeholder={placeholder}
+          setIsFocus={setIsFocus}
+          disabled={disabled}
+        />
+      }
+
+
+
+
+
 
       {selectProps &&
         <MySelect
