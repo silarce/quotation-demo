@@ -26,11 +26,13 @@ export default function InputSel(
     captionWidth,
     width,
     gap,
+    padding,
+    hrColor,
 
-    showBaseline = true,
+    showBaseline = "always",
     disabled,
 
-    labelClassName,
+    className,
     captionClassName,
     hrClassName,
 
@@ -44,11 +46,15 @@ export default function InputSel(
       width?: CSSProperties["width"]
       gap?: CSSProperties["gap"]
       captionWidth?: CSSProperties["width"]
+      padding?: CSSProperties["padding"]
+      hrColor?: CSSProperties["borderColor"]
 
-      showBaseline?: boolean
+
+      /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
+      showBaseline?: "invisible" | "always" | "auto"
       disabled?: boolean
 
-      labelClassName?: string
+      className?: string
       captionClassName?: string
       hrClassName?: string
 
@@ -65,23 +71,31 @@ export default function InputSel(
   const lableStyle: CSSProperties = {
     width: width,
     gap: gap,
-    gridTemplateColumns: !label ? "auto" : undefined
+    gridTemplateColumns: !label ? "auto" : undefined,
+    padding: padding
   }
   const captionStyle: CSSProperties = {
     width: captionWidth,
   }
+  const hrStyle: CSSProperties = {
+    borderColor: hrColor
+  }
 
 
   const labelClasses = (() => {
-    return `${scss.label} ${labelClassName ?? ""}`
+    return `${scss.label} ${className ?? ""}`
   })()
   const captionClasses = (() => {
     return `${scss.caption} ${captionClassName ?? ""}`
   })()
 
+
   const hrClasses = (() => {
     const classIsFocus = (isFocus || "") && "isFocus"
-    const classInvisible = (disabled || "") && "invisible"
+    const classInvisible = (() => {
+      if (showBaseline === "always") return ""
+      if (disabled) return "invisible"
+    })()
     return `${scss.hr} ${classIsFocus} ${classInvisible} ${hrClassName ?? ""}`
   })()
 
@@ -114,8 +128,10 @@ export default function InputSel(
         />
       }
 
-      {showBaseline &&
-        <hr className={hrClasses} />
+      {showBaseline !== "invisible" &&
+        <hr className={hrClasses}
+          style={hrStyle}
+        />
       }
 
     </label>
