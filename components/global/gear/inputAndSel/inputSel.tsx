@@ -67,7 +67,9 @@ export default function InputSel(
   const [isFocus, setIsFocus] = useState(false)
 
 
-
+  // -----------------------------------------------------------------------
+  // 由外部控制的css，會寫在inline
+  
   const lableStyle: CSSProperties = {
     width: width,
     gap: gap,
@@ -80,7 +82,8 @@ export default function InputSel(
   const hrStyle: CSSProperties = {
     borderColor: hrColor
   }
-
+  // -----------------------------------------------------------------------
+  // 根據不同的狀況設定className
 
   const labelClasses = (() => {
     return `${scss.label} ${className ?? ""}`
@@ -88,8 +91,6 @@ export default function InputSel(
   const captionClasses = (() => {
     return `${scss.caption} ${captionClassName ?? ""}`
   })()
-
-
   const hrClasses = (() => {
     const classIsFocus = (isFocus || "") && "isFocus"
     const classInvisible = (() => {
@@ -99,6 +100,7 @@ export default function InputSel(
     return `${scss.hr} ${classIsFocus} ${classInvisible} ${hrClassName ?? ""}`
   })()
 
+  // -----------------------------------------------------------------------
   // ------------------------------------------------------------------------
 
 
