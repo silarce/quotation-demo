@@ -7,8 +7,8 @@ import {
 import Select, { Options, SingleValue, ActionMeta } from 'react-select';
 
 // icon
-import iconArrow from "public/image/icon/arrow_down_red.svg"
-
+import iconArrowRed from "public/image/icon/arrow_down_red.svg"
+import iconArrowBlack from "public/image/icon/arrow_down.svg"
 // css
 import scss from "../inputSel.module.scss"
 
@@ -33,6 +33,8 @@ export type TselectProps = {
   selectRef?: React.LegacyRef<HTMLDivElement>
   openMenuOnFocus?: boolean
   customComponents?: TselCustomComponents
+
+  arrowType?: "red" | "black"
 }
 
 // ==============================================================================
@@ -41,11 +43,13 @@ export default function MySelect(
     selectProps,
     placeholder,
     disabled,
+    style
   }:
     {
       selectProps: TselectProps
       placeholder?: string | undefined
       disabled: boolean | undefined
+      style?: CSSProperties
     }
 ) {
 
@@ -72,16 +76,24 @@ export default function MySelect(
     selectRef,
     openMenuOnFocus,
     customComponents,
+    arrowType,
   } = selectProps
 
 
   // 客製化元件
-  // eslint-disable-next-line @next/next/no-img-element
-  const DropdownIndicator = () => (<img src={iconArrow.src} alt="下拉箭頭" />)
+  // 箭頭
+  const DropdownIndicator = () => {
+    if (disabled) return null
+    const arrowImg = arrowType === "red" ? iconArrowRed.src
+      : arrowType === "black" ? iconArrowBlack.src
+        : iconArrowRed.src
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={arrowImg} alt="下拉箭頭" />
+  }
 
-// -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
   return (
-    <div className={`${scss.selectBox} ${className}`}>
+    <div className={`${scss.selectBox} ${className}`} style={style}>
       <Select
         isDisabled={disabled}
         value={value as Toption}
@@ -91,8 +103,10 @@ export default function MySelect(
         components={{ DropdownIndicator, ...customComponents }}
         unstyled={true}
         menuPortalTarget={document.getElementById("__next")}
+        onFocus={onFocus}
+        onBlur={onBlur}
         // menuPosition={"fixed"}
-        // menuIsOpen={true}
+        // menuIsOpen={true} // 需要調整選單的CSS時就使用
         classNames={{
           container: (state) => `${scss.selContainer} ${classNames?.container ?? ""}`,
           menu: (state) => `${scss.selMenu} ${classNames?.menu ?? ""}`,

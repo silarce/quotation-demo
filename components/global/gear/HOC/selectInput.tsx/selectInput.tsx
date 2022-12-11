@@ -96,16 +96,6 @@ export default function SelectInput(
               if (e.code === "NumpadEnter") e.preventDefault()
             }}
           />
-          // <input className={style.input} key={index}
-          //   type="text" autoComplete="off"
-          //   style={theStyle}
-          //   placeholder={placeholder}
-          //   value={stateValue}
-          //   onChange={onChange}
-          //   disabled={disabled}
-          //   onFocus={onFocus}
-          //   onBlur={onBlur}
-          // />
         )
       })}
     </div>

@@ -22,7 +22,7 @@ interface TextareaAutosizeProps extends Omit<TextareaProps, 'style'> {
 
 export type TtextareaProps = {
   value: string
-  onChange: (value: string) => void
+  onChange?: (value: string) => void
   className?: string
   props?: TextareaAutosizeProps
 }
@@ -63,7 +63,8 @@ export default function Textarea(
         autoComplete="off"
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(e) => onChange(e.target.value)}
+        // onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange?.(e.target.value)}
         disabled={disabled}
         onKeyDown={(e) => {
           if (e.code === "Enter") e.preventDefault()
@@ -72,6 +73,7 @@ export default function Textarea(
         /*如果props裡存在對應prop的話
         props裡的prop會把上面對應的prop蓋過去*/
         {...props}
+
       />
     </div>
   )

@@ -14,6 +14,8 @@ import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/sele
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
+import SelInputBar_address from "components/global/gear/HOC/selectInput.tsx/selInputBar_address"
+
 
 // api
 import {
@@ -132,7 +134,7 @@ export default function CompanyInfo() {
 
   const searchInputProps = {
     county,
-    onChangeCountry: (option: Toption | null) => {
+    onChangeCounty: (option: Toption | null) => {
       if (!option) return
       if (companyInfo.county === option.value) return
       companyInfo.county = option.value
@@ -147,8 +149,7 @@ export default function CompanyInfo() {
       setCompanyInfo({ ...companyInfo })
     },
     address,
-    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value
+    onChangeAddress: (value: string) => {
       companyInfo.address = value
       setCompanyInfo({ ...companyInfo })
     },
@@ -233,11 +234,15 @@ export default function CompanyInfo() {
             )
           })}
 
-          <SelectInput_address
+          <SelInputBar_address
             className={`${scss.selectInput} ${(editable && scss.editable) ?? undefined}`}
-            selectInputProps={searchInputProps}
+            addressProps={searchInputProps}
             label="公司地址"
+            captionWidth="80px"
+            gap="50px"
+            padding="20px 0 14px 0"
             disabled={!editable}
+            hrColor={(!editable && scss.colorBorder01) || undefined}
           />
         </div>
 

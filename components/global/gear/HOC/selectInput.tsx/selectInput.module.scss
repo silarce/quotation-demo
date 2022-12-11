@@ -3,7 +3,7 @@
 .container {
   display: flex;
   border-bottom: solid 1px $colorText;
-  padding: 17px 4px 4px 4px;
+  // padding: 17px 4px 4px 4px;
   &.isFocus {
     border-color: $colorActive01;
   }
@@ -11,13 +11,13 @@
     font-weight: 500;
     font-size: 20px;
     color: $colorMain;
-    margin-right: 27px;
+    // margin-right: 27px;
   }
   .select {
-    padding: 0;
-    hr {
-      display: none;
-    }
+    // padding: 0;
+    // hr {
+    //   display: none;
+    // }
   }
 }
 
@@ -27,45 +27,45 @@
   &:nth-of-type(1) {
     margin-left: 0px;
   }
-  .select {
-    padding: 0;
-    hr {
-      display: none;
-    }
-    [class$="placeholder"] {
-      font-weight: 400;
-      font-size: 18px;
-      line-height: unset;
-      color: $colorBorder01;
-    }
-    [class$="singleValue"] {
-      font-weight: 400;
-      font-size: 18px;
-      line-height: unset;
-      color: $colorText;
-    }
-    img {
-      display: block;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: auto;
-      max-width: unset;
-      transform: translate(-50%, -50%);
-    }
-  }
+  // .select {
+  //   padding: 0;
+  //   hr {
+  //     display: none;
+  //   }
+  //   [class$="placeholder"] {
+  //     font-weight: 400;
+  //     font-size: 18px;
+  //     line-height: unset;
+  //     color: $colorBorder01;
+  //   }
+  //   [class$="singleValue"] {
+  //     font-weight: 400;
+  //     font-size: 18px;
+  //     line-height: unset;
+  //     color: $colorText;
+  //   }
+  //   img {
+  //     display: block;
+  //     position: absolute;
+  //     top: 50%;
+  //     left: 50%;
+  //     width: auto;
+  //     max-width: unset;
+  //     transform: translate(-50%, -50%);
+  //   }
+  // }
 }
 
-.textarea {
-  flex: auto;
-  margin-left: 25px;
-  font-weight: 400;
-  font-size: 18px;
-  background-color: transparent;
-  resize: none;
-  &::placeholder {
-    font-weight: 400;
-    font-size: 18px;
-    color: $colorBorder01;
-  }
-}
+// .textarea {
+//   flex: auto;
+//   margin-left: 25px;
+//   font-weight: 400;
+//   font-size: 18px;
+//   background-color: transparent;
+//   resize: none;
+//   &::placeholder {
+//     font-weight: 400;
+//     font-size: 18px;
+//     color: $colorBorder01;
+//   }
+// }

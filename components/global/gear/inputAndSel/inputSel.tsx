@@ -133,11 +133,6 @@ export default function InputSel(
         />
       }
 
-
-
-
-
-
       {selectProps &&
         <MySelect
           selectProps={selectProps}
