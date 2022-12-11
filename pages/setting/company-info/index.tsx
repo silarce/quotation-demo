@@ -10,7 +10,6 @@ const _ = require("lodash")
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
-import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address"
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
@@ -245,7 +244,6 @@ export default function CompanyInfo() {
             hrColor={(!editable && scss.colorBorder01) || undefined}
           />
         </div>
-
       </div>
     </div>
   )
