@@ -1,10 +1,8 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
-import { Select02 } from "components/global/gear/select/select"
-import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address";
-
+import InputSel from "components/global/gear/inputAndSel/inputSel";
+import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
 
 // option
 import {
@@ -41,7 +39,7 @@ export default function EditCustomerItem01({ data, setData }: {
   // ======================================================
   const selectInputPropsAddress = {
     county: county,
-    onChangeCountry: (option: Toption | null) => {
+    onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
       setData(data => {
@@ -60,8 +58,7 @@ export default function EditCustomerItem01({ data, setData }: {
       })
     },
     address: address,
-    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value
+    onChangeAddress: (value: string) => {
       setData(data => {
         data.address = value
         return { ...data }
@@ -70,7 +67,7 @@ export default function EditCustomerItem01({ data, setData }: {
   }
   const selectInputPropsInvoice = {
     county: invoiceCounty,
-    onChangeCountry: (option: Toption | null) => {
+    onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
       setData(data => {
@@ -89,8 +86,7 @@ export default function EditCustomerItem01({ data, setData }: {
       })
     },
     address: invoiceAddress,
-    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value
+    onChangeAddress: (value: string) => {
       setData(data => {
         data.invoiceAddress = value
         return { ...data }
@@ -100,8 +96,7 @@ export default function EditCustomerItem01({ data, setData }: {
   // ======================================================
   const createOnChange
     = (key: keyof Omit<TcustomersData, "contacts">) => {
-      return (e: ChangeEvent<HTMLTextAreaElement>) => {
-        const value = e.target.value
+      return (value: string) => {
         setData(data => {
           data[key] = value
           return { ...data }
@@ -118,46 +113,66 @@ export default function EditCustomerItem01({ data, setData }: {
       <div className={style.form01}>
         {/* 上邊 */}
         <div>
-          <Input02
+          <InputSel
             className={style.input02}
-            stateValue={data["name"]}
             label={"客戶全稱"}
-            onChange={createOnChange("name")}
+            presetStyle="s01"
+            captionWidth="100px"
+            inputProps={{
+              value: data["name"],
+              onChange: createOnChange("name"),
+            }}
           />
-          <Input02
+          <InputSel
             className={style.input02}
-            stateValue={data["nickname"]}
             label={"客戶簡稱"}
-            onChange={createOnChange("nickname")}
+            presetStyle="s01"
+            captionWidth="100px"
+            inputProps={{
+              value: data["nickname"],
+              onChange: createOnChange("nickname"),
+            }}
           />
         </div>
         {/* 左邊 */}
         <div>
-          <Input02
+          <InputSel
             className={style.input02}
-            stateValue={data["principal"]}
             label={"負責人"}
-            onChange={createOnChange("principal")}
-          />
-          <Select02
-            className={style.select02}
-            stateValue={data["taxDeductionCategory"]}
-            label={"扣稅類別"}
-            options={optionsTaxDeductionCategory}
-            onChange={(option: Toption | null) => {
-              if (!option) return
-              const { value } = option
-              setData(data => {
-                data["taxDeductionCategory"] = value
-                return ({ ...data })
-              })
+            presetStyle="s01"
+            captionWidth="100px"
+            inputProps={{
+              value: data["principal"],
+              onChange: createOnChange("principal"),
             }}
           />
-          <Input02
+          <InputSel
+            className={style.select02}
+            label={"扣稅類別"}
+            presetStyle="s01"
+            captionWidth="100px"
+            selectProps={{
+              value: data["taxDeductionCategory"],
+              options: optionsTaxDeductionCategory,
+              onChange: (option: Toption | null) => {
+                if (!option) return
+                const { value } = option
+                setData(data => {
+                  data["taxDeductionCategory"] = value
+                  return ({ ...data })
+                })
+              },
+            }}
+          />
+          <InputSel
             className={style.input02}
-            stateValue={data["taxId"]}
             label={"統一編號"}
-            onChange={createOnChange("taxId")}
+            presetStyle="s01"
+            captionWidth="100px"
+            inputProps={{
+              value: data["taxId"],
+              onChange: createOnChange("taxId"),
+            }}
           />
         </div>
         {/* 垂直分隔線 */}
@@ -167,49 +182,59 @@ export default function EditCustomerItem01({ data, setData }: {
           {keyIndex01.map((key, index) => {
             const { label } = config01[key]
             const stateValue = data[key]
-            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-              const value = e.target.value
+            const onChange = (value: string) => {
               setData(data => {
                 data[key] = value
                 return { ...data }
               })
             }
             return (
-              <Input02 key={index}
+              <InputSel key={index}
                 className={style.input02}
-                stateValue={stateValue}
                 label={label}
-                onChange={onChange}
+                presetStyle="s01"
+                captionWidth="100px"
+                inputProps={{
+                  value: stateValue,
+                  onChange: onChange,
+                }}
               />
             )
           })}
         </div>
         {/* 下面 */}
         <div>
-          <SelectInput_address
+          <InputSelBar_address
             className={style.selectInput}
             label="公司地址"
-            selectInputProps={selectInputPropsAddress} />
-          <SelectInput_address
+            presetStyle="s01"
+            captionWidth="100px"
+            addressProps={selectInputPropsAddress} />
+          <InputSelBar_address
             className={style.selectInput}
             label="發票地址"
-            selectInputProps={selectInputPropsInvoice} />
+            presetStyle="s01"
+            captionWidth="100px"
+            addressProps={selectInputPropsInvoice} />
         </div>
 
         <div className={style.rightSide}>
-          <Select02
+          <InputSel
             className={style.select02}
-            stateValue={data["category"]}
             label={"類別"}
-            options={optionsCustomerCategory}
-            labelWidth="50px"
-            onChange={(option: Toption | null) => {
-              if (!option) return
-              const { value } = option
-              setData(data => {
-                data["category"] = value
-                return ({ ...data })
-              })
+            presetStyle="s01"
+            captionWidth="50px"
+            selectProps={{
+              value: data["category"],
+              options: optionsCustomerCategory,
+              onChange: (option: Toption | null) => {
+                if (!option) return
+                const { value } = option
+                setData(data => {
+                  data["category"] = value
+                  return ({ ...data })
+                })
+              },
             }}
           />
         </div>

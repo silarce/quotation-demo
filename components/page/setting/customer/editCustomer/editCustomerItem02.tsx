@@ -1,11 +1,9 @@
 import {
-  ChangeEvent, Dispatch, SetStateAction
+  Dispatch, SetStateAction
 } from "react";
 
-
 // global gear
-import Input02 from "components/global/gear/input/input02"
-
+import InputSel from "components/global/gear/inputAndSel/inputSel";
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
@@ -14,9 +12,7 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import style from "../customer.module.scss"
 
 // type
-import { TcustomersData, TcontactData } from "js/api/api_customer";
-
-
+import { TcustomersData } from "js/api/api_customer";
 
 // ======================================================
 export default function EditCustomerItem02({ data, setData }: {
@@ -36,15 +32,13 @@ export default function EditCustomerItem02({ data, setData }: {
 
         {contacts?.map((item, index) => {
           const { name, phone } = item
-          const onChange01 = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value
+          const onChange01 = (value: string) => {
             setData(data => {
               data.contacts![index].name = value
               return { ...data }
             })
           }
-          const onChange02 = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value
+          const onChange02 = (value: string) => {
             setData(data => {
               data.contacts![index].phone = value
               return { ...data }
@@ -66,17 +60,25 @@ export default function EditCustomerItem02({ data, setData }: {
 
           return (
             <div className={style.inputBox} key={index}>
-              <Input02
+              <InputSel
                 className={style.input02}
-                stateValue={name}
                 label={`聯絡人 ${index + 1}`}
-                onChange={onChange01}
+                presetStyle="s01"
+                captionWidth="100px"
+                inputProps={{
+                  value: name ?? "",
+                  onChange: onChange01,
+                }}
               />
-              <Input02
+              <InputSel
                 className={style.input02}
-                stateValue={phone}
                 label={"電話"}
-                onChange={onChange02}
+                presetStyle="s01"
+                captionWidth="100px"
+                inputProps={{
+                  value: phone ?? "",
+                  onChange: onChange02,
+                }}
               />
               <div className={style.buttonBox}>
                 <IconAddCircle onClick={addContact} />

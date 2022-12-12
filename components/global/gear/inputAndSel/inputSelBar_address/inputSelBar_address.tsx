@@ -36,7 +36,8 @@ export default function InputSelBar_address(
     className,
     valueContanierClassName,
     disabled,
-    hrColor
+    hrColor,
+    presetStyle,
   }:
     {
       label?: string
@@ -48,6 +49,7 @@ export default function InputSelBar_address(
       valueContanierClassName?: string
       disabled?: boolean
       hrColor?: CSSProperties["borderColor"]
+      presetStyle?: "s01"
     }) {
 
   const {
@@ -58,6 +60,18 @@ export default function InputSelBar_address(
     address,
     onChangeAddress,
   } = addressProps
+
+
+  if (presetStyle) {
+    switch (presetStyle) {
+      case "s01":
+        padding = "17px 4px 14px 4px"
+        gap = "40px"
+        break;
+      default:
+        break;
+    }
+  }
 
 
 
