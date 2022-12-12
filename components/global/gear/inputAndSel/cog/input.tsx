@@ -9,7 +9,7 @@ import scss from "../inputSel.module.scss"
 
 
 export type TinputProps = {
-  value: string
+  value: string | number
   onChange: (value: string) => void
   className?: string
   attributes?: InputHTMLAttributes<HTMLInputElement>
@@ -41,7 +41,7 @@ export default function Input(
   const inputClasses = (() => {
     return `${scss.inputBox} ${className ?? ""}`
   })()
-// -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
   return (
     <div className={inputClasses}>
       <input

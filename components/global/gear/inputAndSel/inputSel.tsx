@@ -29,8 +29,10 @@ export default function InputSel(
     padding,
     hrColor,
 
+
     showBaseline = "always",
     disabled,
+    presetStyle,
 
     className,
     captionClassName,
@@ -55,6 +57,7 @@ export default function InputSel(
       /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
       showBaseline?: "invisible" | "always" | "auto"
       disabled?: boolean
+      presetStyle?: "s01"
 
       className?: string
       captionClassName?: string
@@ -71,6 +74,19 @@ export default function InputSel(
   const [isFocus, setIsFocus] = useState(false)
 
 
+
+  // -----------------------------------------------------------------------
+
+  if (presetStyle) {
+    switch (presetStyle) {
+      case "s01":
+        padding = "17px 4px 14px 4px"
+        gap = "40px"
+        break;
+      default:
+        break;
+    }
+  }
 
   // -----------------------------------------------------------------------
   // 由外部控制的css，會寫在inline
@@ -105,7 +121,8 @@ export default function InputSel(
     return `${scss.hr} ${classIsFocus} ${classInvisible} ${hrClassName ?? ""}`
   })()
 
-  // -----------------------------------------------------------------------
+
+
   // ------------------------------------------------------------------------
 
 
