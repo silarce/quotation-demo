@@ -4,18 +4,18 @@ import {
 } from "react"
 
 // gear
-import InputSel from "../../inputAndSel/inputSel"
+import InputSel from "../inputSel"
 
 
 // css
-import scss from "./selInpuBar.module.scss"
+import scss from "./inputSelBar.module.scss"
 
 // type
 import type { Toption } from "fakeDatabase/options/options"
 // component
-import Input, { TinputProps } from "../../inputAndSel/cog/input";
-import MySelect, { TselectProps } from "../../inputAndSel/cog/mySelect";
-import Textarea, { TtextareaProps } from "../../inputAndSel/cog/textarea";
+import Input, { TinputProps } from "../cog/input";
+import MySelect, { TselectProps } from "../cog/mySelect";
+import Textarea, { TtextareaProps } from "../cog/textarea";
 
 
 
@@ -43,7 +43,7 @@ export type TselInputPropsArr
   = (TinputPropsWrapper | TselectPropsWrapper | TtextareaPropsWrapper)[]
 
 // =========================================================================
-export default function SelInputBar(
+export default function InputSelBar(
   {
     label, propsArr,
     captionWidth, width, gap, padding, hrColor,

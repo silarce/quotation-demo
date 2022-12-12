@@ -13,7 +13,7 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
-import SelInputBar_address from "components/global/gear/HOC/selectInput.tsx/selInputBar_address"
+import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address"
 
 
 // api
@@ -233,7 +233,7 @@ export default function CompanyInfo() {
             )
           })}
 
-          <SelInputBar_address
+          <InputSelBar_address
             className={`${scss.selectInput} ${(editable && scss.editable) ?? undefined}`}
             addressProps={searchInputProps}
             label="公司地址"

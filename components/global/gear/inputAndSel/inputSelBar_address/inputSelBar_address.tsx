@@ -6,10 +6,10 @@ import {
 } from "react"
 
 // global gear
-import SelInputBar, { TselInputPropsArr } from "./selInpuBar"
+import InputSelBar, { TselInputPropsArr } from "../inputSelBar/inputSelBar"
 
 // css
-import scss from "./selInputBar_address.module.scss"
+import scss from "./inputSelBar_address.module.scss"
 
 // fakeData type
 import {
@@ -26,7 +26,7 @@ export type TaddressProps = {
   onChangeAddress: (e: string) => void
 }
 
-export default function SelInputBar_address(
+export default function InputSelBar_address(
   {
     label,
     addressProps,
@@ -109,7 +109,7 @@ export default function SelInputBar_address(
 
   // ------------------------------------------------------------------
   return (
-    <SelInputBar
+    <InputSelBar
       label={label}
       propsArr={selectInputList}
       className={className}

@@ -3,7 +3,7 @@ import {  Dispatch, SetStateAction } from "react";
 
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
-import SelInputBar_address from "components/global/gear/HOC/selectInput.tsx/selInputBar_address";
+import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
 
 // option
 import {
@@ -194,14 +194,14 @@ export default function EditEmployeeItem01({ data, setData }: {
         {/* 下面 */}
         <div >
 
-          <SelInputBar_address
+          <InputSelBar_address
             className={style.selectInput}
             label="戶籍地址"
             captionWidth="100px"
             padding="17px 4px 14px 4px"
             gap="40px"
             addressProps={selectInputPropsResidence} />
-          <SelInputBar_address
+          <InputSelBar_address
             className={style.selectInput}
             label="通訊地址"
             captionWidth="100px"
