@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import EditEmployeeItem01 from "./editEmployee/EditEmployeeItem01";
 import EditEmployeeItem02 from "./editEmployee/EditEmployeeItem02";
 
-import Input02,{TeTextarea} from "components/global/gear/input/input02";
+import InputSel from "components/global/gear/inputAndSel/inputSel";
 
 // icon
 import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
@@ -43,15 +43,17 @@ export default function EditEmployee({ data, setData, check }: {
     <div className={style.editEmployee}>
 
       <div className={style.employeeId}>
-        <Input02
-          className={style.input02}
-          stateValue={data.idNumber}
+        <InputSel
           label="使用者代號"
-          onChange={(e:TeTextarea) => {
-            const value = e.target.value
-            setData(data => ({ ...data, idNumber: value }))
-          }}
+          placeholder="請輸入使用者代號"
+          className={style.input02}
           disabled={idNumberIsDisabled}
+          inputProps={{
+            value: data.idNumber,
+            onChange: (value: string) => {
+              setData(data => ({ ...data, idNumber: value }))
+            },
+          }}
         />
         {check &&
           <span className={style.checkTip}>

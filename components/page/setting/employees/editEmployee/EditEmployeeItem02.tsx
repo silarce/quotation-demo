@@ -1,13 +1,10 @@
 
 import { useState, useEffect } from "react";
-
 import { Dispatch, SetStateAction } from "react";
 
-
 // global gear
-import Input02,{TeTextarea} from "components/global/gear/input/input02"
-import { Select02 } from "components/global/gear/select/select"
-import TimePicker01 from "components/global/gear/input/timePicker01";
+import InputSel from "components/global/gear/inputAndSel/inputSel";
+
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
@@ -19,7 +16,6 @@ import {
 
 
 // type
-import { TpostEmployee, Temployee } from "js/api/api_employee";
 import { Toption } from "fakeDatabase/options/options";
 import type { TprePostEmployee } from "../editEmployee";
 // css
@@ -90,22 +86,28 @@ export default function EditEmployeeItem02({ data, setData }: {
               const { stateValue, label, options, onChange }
                 = jobsConfig01[key]
               return (
-                <Select02 key={index}
-                  stateValue={stateValue}
+                <InputSel key={index}
                   label={label}
-                  options={options}
-                  onChange={onChange}
+                  presetStyle="s01"
+                  selectProps={{
+                    value: stateValue,
+                    options: options,
+                    onChange: onChange,
+                  }}
                 />
               )
             })}
-
-            <Input02
+            <InputSel
               className={style.input02}
-              stateValue={data.jobs[0]?.grade ?? ""}
               label="職等"
-              labelWidth="100px"
+              presetStyle="s01"
               disabled={true}
+              inputProps={{
+                value: data.jobs[0]?.grade ?? "",
+                onChange: () => { },
+              }}
             />
+
             {isDepart02
               ? <IconRemoveCircle onClick={switchNewDepart} />
               : <IconAddCircle onClick={switchNewDepart} />
@@ -118,20 +120,26 @@ export default function EditEmployeeItem02({ data, setData }: {
                   = jobsConfig02[key]
 
                 return (
-                  <Select02 key={index}
-                    stateValue={stateValue}
+                  <InputSel key={index}
                     label={label}
-                    options={options}
-                    onChange={onChange}
+                    presetStyle="s01"
+                    selectProps={{
+                      value: stateValue,
+                      options: options,
+                      onChange: onChange,
+                    }}
                   />
                 )
               })}
-              <Input02
+              <InputSel
                 className={style.input02}
-                stateValue={data.jobs[1]?.grade ?? ""}
                 label="職等"
-                labelWidth="100px"
+                presetStyle="s01"
                 disabled={true}
+                inputProps={{
+                  value: data.jobs[1]?.grade ?? "",
+                  onChange: () => { },
+                }}
               />
               {isDepart02
                 ? <IconRemoveCircle onClick={switchNewDepart} />
@@ -142,16 +150,18 @@ export default function EditEmployeeItem02({ data, setData }: {
 
         <div className={style.bottomContainer}>
           <div>
-            <Input02
-              stateValue={data.seniority}
+            <InputSel
               label="年資"
-              labelWidth="60px"
-              onChange={(e:TeTextarea) => {
-                const value = e.target.value
-                setData(data => {
-                  data.seniority = value
-                  return { ...data }
-                })
+              captionWidth="60px"
+              presetStyle="s01"
+              inputProps={{
+                value: data.seniority,
+                onChange: (value: string) => {
+                  setData(data => {
+                    data.seniority = value
+                    return { ...data }
+                  })
+                },
               }}
             />
           </div>
@@ -159,7 +169,6 @@ export default function EditEmployeeItem02({ data, setData }: {
             {keyIndex02.map((key, index) => {
               const stateValue = data[key]
               const { label } = config02[key]
-
               const onChange = (dateString: string) => {
                 const value = dateString
                 setData(data => {
@@ -168,12 +177,15 @@ export default function EditEmployeeItem02({ data, setData }: {
                 })
               }
               return (
-                <TimePicker01
+                <InputSel
                   key={index}
-                  stateValue={stateValue}
                   label={label}
-                  labelWidth="60px"
-                  onChange={onChange}
+                  captionWidth="60px"
+                  presetStyle="s01"
+                  datePickerProps={{
+                    value: stateValue,
+                    onChange: onChange,
+                  }}
                 />
               )
             })}
