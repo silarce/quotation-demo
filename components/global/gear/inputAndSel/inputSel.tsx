@@ -9,7 +9,7 @@ import {
 import Input, { TinputProps } from "./cog/input";
 import MySelect, { TselectProps } from "./cog/mySelect";
 import Textarea, { TtextareaProps } from "./cog/textarea";
-
+import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
 
 // css
 import scss from "./inputSel.module.scss"
@@ -39,6 +39,7 @@ export default function InputSel(
     inputProps,
     selectProps,
     textareaProps,
+    datePickerProps,
   }:
     {
       label?: string
@@ -62,11 +63,13 @@ export default function InputSel(
       inputProps?: TinputProps
       selectProps?: TselectProps
       textareaProps?: TtextareaProps
+      datePickerProps?: TdatePickerProps
     }
 
 ) {
 
   const [isFocus, setIsFocus] = useState(false)
+
 
 
   // -----------------------------------------------------------------------
@@ -118,7 +121,7 @@ export default function InputSel(
       {inputProps &&
         <Input
           inputProps={inputProps}
-          placeholder={placeholder}
+          placeholder={placeholder ?? `請輸入${label}`}
           setIsFocus={setIsFocus}
           disabled={disabled}
         />
@@ -127,7 +130,7 @@ export default function InputSel(
       {textareaProps &&
         <Textarea
           textareaProps={textareaProps}
-          placeholder={placeholder}
+          placeholder={placeholder ?? `請輸入${label}`}
           setIsFocus={setIsFocus}
           disabled={disabled}
         />
@@ -136,10 +139,20 @@ export default function InputSel(
       {selectProps &&
         <MySelect
           selectProps={selectProps}
+          placeholder={placeholder ?? `請選擇${label}`}
+          disabled={disabled}
+        />
+      }
+
+      {datePickerProps &&
+        <MyDatePicker
+          datePickerProps={datePickerProps}
+          setIsFocus={setIsFocus}
           placeholder={placeholder}
           disabled={disabled}
         />
       }
+
 
       {showBaseline !== "invisible" &&
         <hr className={hrClasses}

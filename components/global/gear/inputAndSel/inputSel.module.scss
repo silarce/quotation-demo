@@ -46,7 +46,7 @@
       color: $colorBorder01;
     }
   }
-}
+} // inputBox
 
 .textareaBox {
   height: fit-content;
@@ -63,10 +63,27 @@
       color: $colorBorder01;
     }
   }
-}
+} // textareaBox
+
+.datePickerBox {
+  .timePicker {
+    padding: 0;
+    input {
+      font-weight: 400;
+      font-size: 18px;
+      width: 100%;
+      resize: none;
+      &::placeholder {
+        color: $colorBorder01;
+      }
+    }
+  }
+} // datePickerBox
 
 // =================================================================
 // Select
+// select的選單元件會portal到#__next
+// 所以不能用巢狀文法
 .selectBox {
   height: fit-content;
   font-weight: 400;
@@ -76,7 +93,6 @@
   color: pink;
 }
 .selContainer {
-
 }
 div.selControl {
   min-height: auto;
