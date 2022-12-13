@@ -34,21 +34,29 @@ export default function InputSelBar_address(
     gap,
     padding,
     className,
+    captionClassName,
     valueContanierClassName,
     disabled,
     hrColor,
     presetStyle,
+    showBaseline,
   }:
     {
       label?: string
       addressProps: TaddressProps
+
       captionWidth?: CSSProperties["width"]
       gap?: CSSProperties["gap"]
       padding?: CSSProperties["padding"]
+      hrColor?: CSSProperties["borderColor"]
+
+      disabled?: boolean
+      showBaseline?: "invisible" | "always" | "auto"
+
       className?: string
       valueContanierClassName?: string
-      disabled?: boolean
-      hrColor?: CSSProperties["borderColor"]
+      captionClassName?: string
+
       presetStyle?: "s01"
     }) {
 
@@ -127,12 +135,14 @@ export default function InputSelBar_address(
       label={label}
       propsArr={selectInputList}
       className={className}
+      captionClassName={captionClassName}
       valueContanierClassName={valueContanierClassName}
       captionWidth={captionWidth}
       gap={gap}
       padding={padding}
       disabled={disabled}
       hrColor={hrColor}
+      showBaseline={showBaseline}
     />
   )
 }
