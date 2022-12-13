@@ -17,9 +17,7 @@ export default function Lab() {
 
       <div className={scss.foo}>
 
-        <img src="/_next/static/media/doorRail75.46dfc626.svg" alt="" />
-        <img src="/_next/static/media/doorRail75.46dfc626.svg" alt="" />
-        <img src="/_next/static/media/doorRail75.46dfc626.svg" alt="" />
+       
         
       </div>
 
