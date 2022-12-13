@@ -1,8 +1,12 @@
 @use "styles/theme01" as *;
 @use "styles/layout" as *;
 
-.memoList {
+.mainContainer {
   padding: 4px;
+}
+
+.memoList {
+  margin-top:3px;
   .row {
     display: flex;
     padding: 10px 25px;

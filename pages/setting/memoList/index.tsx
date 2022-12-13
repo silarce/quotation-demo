@@ -7,8 +7,6 @@ import {
 
 const _ = require("lodash")
 
-
-
 // glogal gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 // import InputModal from "components/global/gear/modal/simpleModal/inputModal"
@@ -18,12 +16,20 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import Input02 from "components/global/gear/input/input02"
+import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar"
+
 
 // icon
 import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./memoList.module.scss"
+
+
+// fake
+import { optionsCreator_prodClass, optionsCreator_doorType, Toption } from "fakeDatabase/options/options"
+const optionsProdClass = optionsCreator_prodClass()
+const optionsDoorType = optionsCreator_doorType()
 
 type TmemoState = {
   list: MemoClass[]
@@ -79,6 +85,27 @@ export default function MemoList() {
     }
   ]
   // ------------------------------------------------------------------------
+  const [prodClass, setProdClass] = useState<TselectProps["value"]>(null)
+  const [doorType, setDoorType] = useState<TselectProps["value"]>(null)
+
+  const selectPropsArr: TselectProps[] = [
+    {
+      value: prodClass,
+      options: optionsProdClass,
+      onChange: (option: Toption | null) => { setProdClass(option?.value) },
+      placeholder: "選擇類別",
+      boxStyle: { width: "200px" }
+    },
+    {
+      value: doorType,
+      options: optionsDoorType,
+      onChange: (option: Toption | null) => { setDoorType(option?.value) },
+      placeholder: "選擇門型",
+      boxStyle: { width: "145px" }
+    },
+  ]
+
+  // ------------------------------------------------------------------------
   return (
     <div className={style.container}>
       <PageHeader02
@@ -86,10 +113,11 @@ export default function MemoList() {
         panelList={panelList}
       />
 
-
       <div className={style.mainContainer}>
+        <div>
+          <SelectBar selectPropsArr={selectPropsArr} />
+        </div>
         <div className={style.memoList}>
-
           {memoState.list.map((item, index) => {
             const {
               memo, editable,
