@@ -7,14 +7,14 @@ import { format } from 'date-fns'
 // components
 import ClientSelector from './modal/clientSelector'
 // glogal gear
-import Input02 from "components/global/gear/input/input02"
-import SelectInput from 'components/global/gear/HOC/selectInput.tsx/selectInput'
+import InputSel from 'components/global/gear/inputAndSel/inputSel'
+import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address'
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
 
 // css
-import style from "./quotationProfile.module.scss"
+import scss from "./quotationProfile.module.scss"
 
 // fakeData/type
 import type { TuseProfile } from "./hook/useProfile"
@@ -24,9 +24,13 @@ import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDat
 
 // ====================================================
 const inputStyle = {
+  captionWidth: "80px",
+  gap: "24px",
+  padding: "21px 0px 4px 0px",
   labelWidth: "80px",
-  gap: "24px"
 }
+
+
 
 // ====================================================
 export default function QuotationProfile(
@@ -79,7 +83,7 @@ export default function QuotationProfile(
     setClientState("")
   }
   // ==============================================
-  const styleHaveState = clientState ? style.haveState : ""
+  const styleHaveState = clientState ? scss.haveState : ""
   // ==============================================
   // 工程地點
 
@@ -98,34 +102,20 @@ export default function QuotationProfile(
   const [address, setAddress] = useState("")
 
 
-  const selectInputList = [
-    {
-      stateValue: country,
-      options: countryOptions,
-      placeholder: "選擇縣市",
-      width: "90px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setCountry(option)
-      }
+  const selectInputList = {
+    county: country?.value,
+    onChangeCounty: (option: Toption | null) => {
+      if (!option) return
+      setCountry(option)
     },
-    {
-      stateValue: district,
-      options: districtOptions,
-      placeholder: "選擇地區",
-      width: "90px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setDistrict(option)
-      }
+    district: district?.value,
+    onChangeDistrict: (option: Toption | null) => {
+      if (!option) return
+      setDistrict(option)
     },
-    {
-      stateValue: address,
-      placeholder: "請輸入剩餘地址",
-      onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)
-    },
-  ]
-
+    address: address,
+    onChangeAddress: (value: string) => setAddress(value),
+  }
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
@@ -134,47 +124,35 @@ export default function QuotationProfile(
 
 
   return (
-    <div className={style.container}>
-      <div className={style.profile}>
-        <span className={`${style.clientState}  ${styleHaveState}`}>狀態 : {clientState || "尚未選擇客戶"}</span>
-        <Input02
-          {...{
-            className: style.input02,
-            label: "工程名稱", stateValue: projectName,
+    <div className={scss.container}>
+      <div className={scss.profile}>
+        <span className={`${scss.clientState}  ${styleHaveState}`}>狀態 : {clientState || "尚未選擇客戶"}</span>
+        <InputSel
+          label="工程名稱"
+          disabled={disabled}
+          {...{ ...inputStyle }}
+          inputProps={{
+            value: projectName,
             onChange: onChangeProjectName,
-            disabled, ...inputStyle
           }}
         />
-        {/* <Input02
-          {...{
-            className: style.input02,
-            label: "工程名稱", stateValue: projectName,
-            onChange: onChangeProjectName,
-            disabled, ...inputStyle
-          }} /> */}
         {/*  */}
-        <div className={style.form02}>
-          <div className={`${style.clientName} ${disabled ? style.disabled : ""}`}>
+        <div className={scss.form02}>
+          <div className={`${scss.clientName} ${disabled ? scss.disabled : ""}`}>
             <div>
-
-
-              <Input02
-                className={`${style.clientName} ${style.input02}`}
+              <InputSel
                 label={"客戶名稱"}
-                stateValue={clientName}
-                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => { }}
                 placeholder={""}
                 disabled={true}
-                {...{ inputStyle }}
-              // {...{
-              //   className: `${style.clientName} ${style.input02}`,
-              //   label: "客戶名稱", stateValue: clientName,
-              //   onChange: (e:ChangeEvent<HTMLTextAreaElement>) => {/**/ }, placeholder: "",
-              //   disabled: true, ...inputStyle,
-              // }} 
+                showBaseline="invisible"
+                captionClassName={scss.input02}
+                captionWidth={inputStyle.captionWidth}
+                gap={inputStyle.gap}
+                textareaProps={{
+                  value: clientName,
+                  onChange: () => { },
+                }}
               />
-
-
               {!clientName && <button onClick={openModal}>請選擇客戶</button>}
               {clientName && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
@@ -185,41 +163,60 @@ export default function QuotationProfile(
             {clientData.map((item, index) => {
               const { label, value, placeholder } = item
               return (
-                <Input02 key={index}
-                  {...{
-                    className: style.input02,
-                    label, stateValue: value, placeholder,
-                    onChange: (e: ChangeEvent<HTMLTextAreaElement>) => { },
-                    disabled: true, ...inputStyle
-                  }} />
+                <InputSel key={index}
+                  label={label}
+                  placeholder={placeholder}
+                  captionClassName={scss.input02}
+                  disabled={true}
+                  showBaseline="invisible"
+                  {...{ ...inputStyle }}
+                  inputProps={{
+                    value: value,
+                    onChange: () => { },
+                  }}
+                />
               )
             })}
           </div>
           <div>
-            <Input02
-              {...{
-                className: style.input02,
-                label: "追蹤狀態", stateValue: trackState,
+
+            <InputSel
+              label="追蹤狀態"
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...{ ...inputStyle }}
+              inputProps={{
+                value: trackState,
                 onChange: onChangeTrackState,
-                disabled, ...inputStyle
-              }} />
-            <Input02
-              {...{
-                className: style.input02,
-                label: "工地進度", stateValue: schedule,
+              }}
+            />
+
+            <InputSel
+              label="工地進度"
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...{ ...inputStyle }}
+              inputProps={{
+                value: schedule,
                 onChange: onChangeSchedule,
-                disabled, ...inputStyle
-              }} />
+              }}
+            />
           </div>
         </div> {/* form02 */}
 
-        <SelectInput label="工程地點" selectInputPropsList={selectInputList}
+        <InputSelBar_address
+          label="工程地點"
+          captionClassName={scss.input02}
+          showBaseline="auto"
+          {...{ ...inputStyle }}
+          addressProps={selectInputList}
           disabled={disabled}
         />
-
       </div>
 
-      <div className={style.time}>
+      <div className={scss.time}>
         <span>報價編號</span>
         <span>{quotationId}</span>
         <span>報價時效</span>
