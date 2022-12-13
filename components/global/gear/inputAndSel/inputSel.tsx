@@ -27,6 +27,7 @@ export default function InputSel(
     width,
     gap,
     padding,
+    margin,
     hrColor,
 
 
@@ -51,6 +52,7 @@ export default function InputSel(
       gap?: CSSProperties["gap"]
       captionWidth?: CSSProperties["width"]
       padding?: CSSProperties["padding"]
+      margin?: CSSProperties["margin"]
       hrColor?: CSSProperties["borderColor"]
 
 
@@ -95,7 +97,8 @@ export default function InputSel(
     width: width,
     gap: gap,
     gridTemplateColumns: !label ? "auto" : undefined,
-    padding: padding
+    padding: padding,
+    margin: margin
   }
   const captionStyle: CSSProperties = {
     width: captionWidth,
