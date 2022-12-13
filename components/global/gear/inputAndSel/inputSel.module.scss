@@ -17,6 +17,9 @@
     font-size: 20px;
     color: $colorText;
     align-self: flex-start;
+    >span{
+      display: block;
+    }
   }
 
   .hr {
@@ -40,6 +43,7 @@
   font-size: 18px;
   width: 100%;
   > input {
+    display: block;
     width: 100%;
     background: transparent;
     &::placeholder {
