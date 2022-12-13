@@ -1,8 +1,12 @@
 @use "styles/theme01" as *;
 @use "styles/layout" as *;
 
-.quoteRangeList {
+.mainContainer {
   padding: 4px;
+}
+
+.quoteRangeList {
+  margin-top: 3px;
   .row {
     display: flex;
     padding: 10px 25px;
