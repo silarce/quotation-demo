@@ -17,7 +17,7 @@
     font-size: 20px;
     color: $colorText;
     align-self: flex-start;
-    >span{
+    > span {
       display: block;
     }
   }
@@ -110,7 +110,7 @@ div.selControl {
   color: $colorText;
 }
 .selMenu {
-  min-width:fit-content;
+  min-width: fit-content;
   background-color: #fff;
   box-sizing: border-box;
   filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
@@ -130,6 +130,7 @@ div.selOption {
   border-bottom: solid 1px $colorBorder01;
   white-space: nowrap;
   cursor: pointer;
+
   &:nth-last-of-type(1) {
     border-bottom: none;
   }

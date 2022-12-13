@@ -1,6 +1,7 @@
 @use "styles/theme01" as *;
 
 .option {
+  width:60px;
   > * {
     display: inline-block;
     vertical-align: middle;

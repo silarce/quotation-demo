@@ -321,7 +321,7 @@ class ProdClass {
   }
   // --------------
   onInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
+    value:string,
     key: keyof TproductString
   ) => {
     const regex = /^area$|^unitPrice$|^subTotal$|^cai$/
@@ -329,7 +329,7 @@ class ProdClass {
     key = key as Exclude<keyof TproductString,
       "area" | "unitPrice" | "subTotal" | "cai"
     >
-    this[key] = e.target.value
+    this[key] = value
     this.setProductList(state => [...state])
   }
 

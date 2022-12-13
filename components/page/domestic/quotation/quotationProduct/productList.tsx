@@ -5,11 +5,13 @@ const { Option } = components
 
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-import Input03 from "components/global/gear/input/input03"
-import Select03 from "components/global/gear/select/select03"
 import Checkbox01 from "components/global/gear/checkbox/checkbox01"
+import InputSel from "components/global/gear/inputAndSel/inputSel";
 import { OptionWithIcon01 } from "components/global/gear/select/optionWithIcon";
 import { SingleValueWithIcon01 } from "components/global/gear/select/singleValueWithIcon";
+
+
+
 // icon
 import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
@@ -37,6 +39,7 @@ import {
   optionsCreator_horsepower,
   optionsCreator_doorType,
 } from "fakeDatabase/options/options"
+import Placeholder from "react-select/dist/declarations/src/components/Placeholder";
 
 
 
@@ -141,35 +144,59 @@ export default function ProductList({ productStates }:
       case "input": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, key as keyof TproductString)
+          = (value: string) => onInputChange(value, key as keyof TproductString)
         return (
-          <Input03
-            {...{ stateValue, onChange, disabled }} />
+          <InputSel
+            disabled={disabled}
+            inputProps={{
+              value: stateValue,
+              onChange: onChange
+            }}
+          />
         )
       }
 
       case "readOnly": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (e: ChangeEvent<HTMLInputElement>) => onInputChange(e, key as keyof TproductString)
+          = (value: string) => onInputChange(value, key as keyof TproductString)
         return (
-          <Input03
-            {...{ stateValue, onChange, disabled: true }} />
+          <InputSel
+            disabled={true}
+            showBaseline="invisible"
+            inputProps={{
+              value: stateValue,
+              onChange: onChange
+            }}
+          />
         )
       }
 
       case "select": {
+        if (typeof stateValue === "boolean") return null
         const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
         return (
-          <Select03 {...{
-            stateValue: stateValue as Toption, options, onChange, disabled
-          }} />
+          <InputSel
+            disabled={disabled}
+            selectProps={{
+              value: stateValue,
+              options: options,
+              onChange: onChange,
+              arrowType: "black",
+              classNames: {
+                singleValue: style.inputSelSingleValue,
+                placeholder: style.inputSelPlaceholder,
+                input: style.inputSelInput
+              }
+            }}
+          />
         )
       }
 
       case "selectWithIcon": {
+        if (typeof stateValue === "boolean") return null
         const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
@@ -180,10 +207,21 @@ export default function ProductList({ productStates }:
         }
 
         return (
-          <Select03 {...{
-            stateValue: stateValue as Toption, options, onChange, disabled,
-            customComponents
-          }} />
+          <InputSel
+            disabled={disabled}
+            selectProps={{
+              value: stateValue,
+              options: options,
+              onChange: onChange,
+              arrowType: "black",
+              customComponents: customComponents,
+              classNames: {
+                singleValue: style.inputSelSingleValue,
+                placeholder: style.inputSelPlaceholder,
+                input: style.inputSelInput,
+              }
+            }}
+          />
         )
       }
 
@@ -210,10 +248,3 @@ export default function ProductList({ productStates }:
 } //ProductList
 
 // ================================================
-
-// 接著處理價格的千分位
-// 接著處理價格的千分位
-// 接著處理價格的千分位
-// 接著處理價格的千分位
-// 接著處理價格的千分位
-// 接著處理價格的千分位

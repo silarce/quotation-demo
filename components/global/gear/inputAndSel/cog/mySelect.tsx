@@ -115,6 +115,7 @@ export default function MySelect(
           option: (state) => `${scss.selOption} ${classNames?.option ?? ""}`,
           control: (state) => `${scss.selControl} ${classNames?.control ?? ""}`,
           menuList: (state) => `${scss.selMenuList} ${classNames?.menuList ?? ""}`,
+          input: (state) => `${scss.input ?? ""} ${classNames?.input ?? ""}`,
         }}
       />
     </div>

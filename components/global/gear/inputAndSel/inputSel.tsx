@@ -30,7 +30,6 @@ export default function InputSel(
     margin,
     hrColor,
 
-
     showBaseline = "always",
     disabled,
     presetStyle,
