@@ -63,11 +63,10 @@ export default function Login(
         <div><Image src={imgArc} alt="" /></div>
       </div>
 
-      <div>
-        <Image className={scss.banner}
-          src={Imgbanner} alt="banner"
-          priority
-        />
+      <div className={scss.banner} style={{ backgroundImage: `url(${Imgbanner.src})` }}>
+        <div>
+          <span>登入系統</span>
+        </div>
       </div>
 
       <form className={scss.loginPanel}

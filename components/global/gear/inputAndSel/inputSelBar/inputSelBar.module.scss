@@ -1,0 +1,45 @@
+@use "styles/theme01" as *;
+
+.label {
+  position: relative;
+  display: grid;
+  grid-template-columns: fit-content(100%) auto;
+  align-items: center;
+
+  gap: 20px;
+  width: 100%;
+
+  > * {
+    margin-left: 0;
+  }
+  .caption {
+    font-weight: 500;
+    font-size: 20px;
+    color: $colorText;
+    align-self: flex-start;
+  }
+
+  .valueContanier {
+    width: 100%;
+    display: flex;
+    
+    gap: 20px;
+    > * {
+      flex: 0 0 auto;
+    }
+  }
+
+  .hr {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 100%;
+    border-color: $colorMain;
+    &:global(.isFocus) {
+      border-color: $colorActive01;
+    }
+    &:global(.invisible) {
+      visibility: hidden;
+    }
+  }
+} //label

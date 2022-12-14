@@ -1,7 +1,6 @@
 import axios from "axios"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
-
 const axi = axios.create({
   baseURL: "https://sanjeou-erp-be.caprover.credot-web.com/",
   withCredentials: true,
@@ -35,10 +34,11 @@ axi.interceptors.response.use(
       switch (err.response.status) {
         case 401:
           if (ignore401.includes(url)) break
-          myAlert.err({
-            title: "401錯誤、沒有權限",
-            content: "請重新登入或請求授權"
-          })
+          window.location.reload()
+          // myAlert.err({
+          //   title: "401錯誤、沒有權限",
+          //   content: "請重新登入或請求授權"
+          // })
           console.log("401，沒有權限")
           break
         case 404:

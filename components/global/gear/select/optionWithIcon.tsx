@@ -14,10 +14,12 @@ export function OptionWithIcon01(props: any) {
   const { label, icon } = data
 
   return (
-    <Option {...props} className={style.option}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={icon} alt="" />
-      <span>{label}</span>
+    <Option {...props}>
+      <div className={style.option}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={icon} alt="" />
+        <span>{label}</span>
+      </div>
     </Option>
   )
 }

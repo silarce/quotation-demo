@@ -1,0 +1,6 @@
+@use "styles/theme01" as *;
+
+// .addressPlus是為了加強CSS權重
+.address.addressPlus {
+  flex: 1 1 auto;
+}

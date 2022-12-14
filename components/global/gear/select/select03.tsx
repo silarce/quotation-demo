@@ -97,6 +97,7 @@ const Select03 = ({
         isDisabled={disabled}
         onFocus={onFocus}
         onBlur={onBlur}
+        // menuIsOpen={true}
         components={{
           DropdownIndicator,
           ...customComponents

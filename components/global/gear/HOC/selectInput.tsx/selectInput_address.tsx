@@ -2,6 +2,7 @@
 import {
   useMemo,
   ChangeEvent,
+  CSSProperties,
 } from "react"
 
 // global gear
@@ -23,12 +24,14 @@ export default function SelectInput_address(
   {
     selectInputProps,
     label,
+    labelWidth,
     className,
     disabled
   }:
     {
       selectInputProps: TselectInputProps
       label?: string
+      labelWidth?: CSSProperties["width"]
       className?: string
       disabled?: boolean
     }) {
@@ -77,7 +80,9 @@ export default function SelectInput_address(
 
   return (
     <SelectInput className={className}
-      label={label||"地址"} selectInputPropsList={selectInputList}
+      label={label || "地址"} selectInputPropsList={selectInputList}
+      // labelWidth="120px"
+      // labelMarginRight="400px"
       disabled={disabled} />
   )
 }

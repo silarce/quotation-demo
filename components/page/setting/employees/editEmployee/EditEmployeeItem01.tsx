@@ -1,13 +1,10 @@
 
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
-
-
+import {  Dispatch, SetStateAction } from "react";
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
-import { Select02 } from "components/global/gear/select/select"
-import SelectInput_address from "components/global/gear/HOC/selectInput.tsx/selectInput_address";
-import TimePicker01 from "components/global/gear/input/timePicker01";
+import InputSel from "components/global/gear/inputAndSel/inputSel";
+import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
+
 // option
 import {
   Toption,
@@ -17,7 +14,7 @@ const [optionsGender, optionMarital]
   = [optionsCreator_gender(), optionsCreator_marital()]
 
 // type
-import { TpostEmployee, Temployee } from "js/api/api_employee";
+import { TpostEmployee } from "js/api/api_employee";
 import type { TprePostEmployee } from "../editEmployee";
 // css
 import style from "../editEmployee.module.scss"
@@ -36,7 +33,7 @@ export default function EditEmployeeItem01({ data, setData }: {
 
   const selectInputPropsResidence = {
     county: residenceCounty,
-    onChangeCountry: (option: Toption | null) => {
+    onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
       setData(data => {
@@ -55,8 +52,7 @@ export default function EditEmployeeItem01({ data, setData }: {
       })
     },
     address: residenceAddress,
-    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value
+    onChangeAddress: (value: string) => {
       setData(data => {
         data.residenceAddress = value
         return { ...data }
@@ -65,7 +61,7 @@ export default function EditEmployeeItem01({ data, setData }: {
   }
   const selectInputPropsMailing = {
     county: mailingCounty,
-    onChangeCountry: (option: Toption | null) => {
+    onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
       setData(data => {
@@ -84,8 +80,7 @@ export default function EditEmployeeItem01({ data, setData }: {
       })
     },
     address: mailingAddress,
-    onChangeAddress: (e: ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value
+    onChangeAddress: (value: string) => {
       setData(data => {
         data.mailingAddress = value
         return { ...data }
@@ -105,19 +100,22 @@ export default function EditEmployeeItem01({ data, setData }: {
           {keyIndex01.map((key, index) => {
             const { label } = config01[key]
             const stateValue = data[key]
-            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-              const value = e.target.value
+            const onChange = (value: string) => {
               setData(data => {
                 data[key] = value
                 return { ...data }
               })
             }
             return (
-              <Input02 key={index}
+              <InputSel key={index}
                 className={style.input02}
-                stateValue={stateValue}
                 label={label}
-                onChange={onChange}
+                captionWidth="100px"
+                presetStyle="s01"
+                inputProps={{
+                  value: stateValue,
+                  onChange: onChange
+                }}
               />
             )
           })}
@@ -127,19 +125,24 @@ export default function EditEmployeeItem01({ data, setData }: {
         {/* 右邊 */}
         <div>
           {/*  */}
-          <TimePicker01
+
+          <InputSel
             className={style.input02}
-            stateValue={data.birthday}
             label={"生日"}
-            onChange={(dateString: string) => {
-              setData(data => {
-                data.birthday = dateString
-                return { ...data }
-              })
-            }}
             width={"240px"}
-            labelWidth={"40px"}
+            presetStyle="s01"
+            captionWidth={"40px"}
+            datePickerProps={{
+              value: data.birthday,
+              onChange: (dateString: string) => {
+                setData(data => {
+                  data.birthday = dateString
+                  return { ...data }
+                })
+              },
+            }}
           />
+
           {/*  */}
           {keyIndex02.map((key, index) => {
             const { label, options, width, labelWidth } = config02[key]
@@ -154,46 +157,57 @@ export default function EditEmployeeItem01({ data, setData }: {
                 })
               }
               return (
-                <Select02 key={index}
+                <InputSel key={index}
                   className={style.select02}
-                  stateValue={stateValue}
                   label={label}
-                  options={options}
-                  onChange={onChange}
+                  presetStyle="s01"
                   width={width}
-                  labelWidth={labelWidth}
+                  captionWidth={labelWidth}
+                  selectProps={{
+                    value: stateValue,
+                    options: options,
+                    onChange: onChange,
+                  }}
                 />
               )
             }
-            const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-              const value = e.target.value
+            const onChange = (value: string) => {
               setData(data => {
                 data[key] = value
                 return { ...data }
               })
             }
             return (
-              <Input02 key={index}
+              <InputSel key={index}
                 className={style.input02}
-                stateValue={stateValue}
                 label={label}
-                onChange={onChange}
-                width={width}
-                labelWidth={labelWidth}
+                captionWidth={labelWidth}
+                presetStyle="s01"
+                inputProps={{
+                  value: stateValue,
+                  onChange: onChange
+                }}
               />
             )
           })}
         </div>
         {/* 下面 */}
         <div >
-          <SelectInput_address
+
+          <InputSelBar_address
             className={style.selectInput}
             label="戶籍地址"
-            selectInputProps={selectInputPropsResidence} />
-          <SelectInput_address
+            captionWidth="100px"
+            padding="17px 4px 14px 4px"
+            gap="40px"
+            addressProps={selectInputPropsResidence} />
+          <InputSelBar_address
             className={style.selectInput}
             label="通訊地址"
-            selectInputProps={selectInputPropsMailing} />
+            captionWidth="100px"
+            padding="17px 4px 14px 4px"
+            gap="40px"
+            addressProps={selectInputPropsMailing} />
         </div>
       </div>
     </div>

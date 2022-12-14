@@ -18,6 +18,7 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import Input02 from "components/global/gear/input/input02"
+import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar"
 
 // icon
 import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
@@ -25,6 +26,10 @@ import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon
 // css
 import style from "./quoteRangeList.module.scss"
 
+// fake
+import { optionsCreator_prodClass, optionsCreator_doorType, Toption } from "fakeDatabase/options/options"
+const optionsProdClass = optionsCreator_prodClass()
+const optionsDoorType = optionsCreator_doorType()
 
 type TquoteRangeState = {
   list: QuoteRangeClass[]
@@ -79,6 +84,27 @@ export default function QuoteRangeList() {
     }
   ]
   // ------------------------------------------------------------------------
+  const [prodClass, setProdClass] = useState<TselectProps["value"]>(null)
+  const [doorType, setDoorType] = useState<TselectProps["value"]>(null)
+
+  const selectPropsArr: TselectProps[] = [
+    {
+      value: prodClass,
+      options: optionsProdClass,
+      onChange: (option: Toption | null) => { setProdClass(option?.value) },
+      placeholder: "選擇類別",
+      boxStyle: { width: "200px" }
+    },
+    {
+      value: doorType,
+      options: optionsDoorType,
+      onChange: (option: Toption | null) => { setDoorType(option?.value) },
+      placeholder: "選擇門型",
+      boxStyle: { width: "145px" }
+    },
+  ]
+
+  // ------------------------------------------------------------------------
   return (
     <div className={style.container}>
       <PageHeader02
@@ -88,8 +114,10 @@ export default function QuoteRangeList() {
 
 
       <div className={style.mainContainer}>
+        <div>
+          <SelectBar selectPropsArr={selectPropsArr} />
+        </div>
         <div className={style.quoteRangeList}>
-
           {quoteRangeState.list.map((item, index) => {
             const {
               quoteRange, editable,

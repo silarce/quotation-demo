@@ -103,8 +103,10 @@ function IconRemove02(props: SVGProps<SVGSVGElement>) {
 
   return (
     <svg  {...{ ...props, className }} width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9Z" strokeMiterlimit="10" />
-      <path d="M5.59514 12.2521L12.241 5.60625M5.66132 5.67243L12.3164 12.3276" strokeWidth="2" />
+      <style type="text/css"></style>
+      <path d="M17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9Z" strokeMiterlimit="10" stroke="#EA1833"
+      />
+      <path d="M5.59514 12.2521L12.241 5.60625M5.66132 5.67243L12.3164 12.3276" strokeWidth="2" stroke="#EA1833"/>
     </svg>
   )
 }
