@@ -19,7 +19,7 @@
       padding-left: 45px;
       padding-right: 20px;
       border-top: solid 1px $colorBorder01;
-      cursor:pointer;
+      cursor: pointer;
       .column {
         > span {
           font-size: 16px;
@@ -36,6 +36,13 @@
       font-weight: 400;
       font-size: 14px;
       color: #979797;
+    }
+
+    &.departmentInfo {
+      display: grid;
+      grid-template-columns: auto auto;
+      justify-content: flex-start;
+      gap: 35px;
     }
   }
 }
