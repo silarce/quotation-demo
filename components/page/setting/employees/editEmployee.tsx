@@ -48,6 +48,7 @@ export default function EditEmployee({ data, setData, check }: {
           placeholder="請輸入使用者代號"
           className={style.input02}
           disabled={idNumberIsDisabled}
+          showBaseline="auto"
           inputProps={{
             value: data.idNumber,
             onChange: (value: string) => {
