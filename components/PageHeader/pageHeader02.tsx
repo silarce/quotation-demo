@@ -189,11 +189,9 @@ function LinkList({ linkList, asPath }:
         const { label, href } = config;
         const isActive = href === asPath ? style.active : ""
         return (
-          <Link href={href} key={index}>
-            <a className={isActive}>
+          <Link className={isActive} href={href} key={index}>
               <span>{label}</span>
               <hr className={style.bottomBar} />
-            </a>
           </Link>
         )
       })}
