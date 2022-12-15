@@ -16,17 +16,17 @@ import scss from "./card.module.scss"
 
 
 
-export default function Card(
+export default function Card<T>(
   {
     label, addLabel, noDataTip, dataArr, showAdd, removeData, CustomItem }:
     {
       label: string
       addLabel: string
       noDataTip: string
-      dataArr: (string | any)[]
+      dataArr: (string | T)[]
       showAdd: () => void
       removeData: (index: number) => void
-      CustomItem: React.ComponentType<any>
+      CustomItem: React.ComponentType<{ data: T }>
     }
 ) {
 
