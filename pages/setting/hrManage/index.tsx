@@ -7,9 +7,10 @@ import {
 } from "react"
 
 // components
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
-import PageHeader from "components/PageHeader/pageHeader"
+import Header from "components/page/setting/hrManage/header/header";
 import AddManager from "components/page/setting/hrManage/modal/AddManeger"
+
+// gear
 import AddButton from "components/global/gear/button/addButton"
 
 // icon
@@ -38,10 +39,33 @@ export default function HrManage() {
     setSelIndex(selIndex)
   }
 
+  // --------------------------------------------------------------------------
+
+
+
+  const linkArr = [
+    {
+      label: "人事權限管理",
+      href: "/setting/hrManage",
+    },
+    {
+      label: "ERP功能權限",
+      href: "/setting/hrManage/erpFuncPermissions",
+    },
+    {
+      label: "ERP操作權限",
+      href: "/setting/hrManage/erpCtrlPermissions",
+    },
+  ]
+
+
+
+  // --------------------------------------------------------------------------
   return (
     <div className={style.scrollContainer}>
-      <PageHeader>
-      </PageHeader>
+
+      <Header />
+
       <div className={style.mainContainer}>
         <div style={{ width: "100%" }}>
           {managerList.map((item, index) => {
