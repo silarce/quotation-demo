@@ -26,7 +26,7 @@ export default function Card<T>(
       dataArr: (string | T)[]
       showAdd: () => void
       removeData: (index: number) => void
-      CustomItem: React.ComponentType<{ data: T }>
+      CustomItem?: React.ComponentType<{ data: T }>
     }
 ) {
 
@@ -47,7 +47,9 @@ export default function Card<T>(
           return (
             <div className={scss.tag} key={index}>
               <div className={scss.content}>
-                {typeof item === "string" ? item : <CustomItem data={item} />}
+                {typeof item === "string" ? item
+                  : (CustomItem && <CustomItem data={item} />)
+                  ?? null}
               </div>
               <IconRemoveCircle onClick={() => { removeData(index) }} />
             </div>
