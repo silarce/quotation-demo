@@ -17,7 +17,7 @@ const [optionsGender, optionMarital]
 import { TpostEmployee } from "js/api/api_employee";
 import type { TprePostEmployee } from "../editEmployee";
 // css
-import style from "../editEmployee.module.scss"
+import scss from "../editEmployee.module.scss"
 
 export default function EditEmployeeItem01({ data, setData }: {
   data: TprePostEmployee
@@ -92,9 +92,9 @@ export default function EditEmployeeItem01({ data, setData }: {
 
   // ======================================================
   return (
-    <div className={style.editEmployeeItem01}>
-      <p className={style.subTitle}>員工個人資料</p>
-      <div className={style.form01}>
+    <div className={scss.editEmployeeItem01}>
+      <p className={scss.subTitle}>員工個人資料</p>
+      <div className={scss.form01}>
         {/* 左邊 */}
         <div>
           {keyIndex01.map((key, index) => {
@@ -108,7 +108,7 @@ export default function EditEmployeeItem01({ data, setData }: {
             }
             return (
               <InputSel key={index}
-                className={style.input02}
+                className={scss.inputSel}
                 label={label}
                 captionWidth="100px"
                 presetStyle="s01"
@@ -121,13 +121,13 @@ export default function EditEmployeeItem01({ data, setData }: {
           })}
         </div>
         {/* 垂直分隔線 */}
-        <div className={style.vr} />
+        <div className={scss.vr} />
         {/* 右邊 */}
         <div>
           {/*  */}
 
           <InputSel
-            className={style.input02}
+            className={scss.inputSel}
             label={"生日"}
             width={"240px"}
             presetStyle="s01"
@@ -158,7 +158,7 @@ export default function EditEmployeeItem01({ data, setData }: {
               }
               return (
                 <InputSel key={index}
-                  className={style.select02}
+                  className={scss.inputSel}
                   label={label}
                   presetStyle="s01"
                   width={width}
@@ -179,7 +179,7 @@ export default function EditEmployeeItem01({ data, setData }: {
             }
             return (
               <InputSel key={index}
-                className={style.input02}
+                className={scss.inputSel}
                 label={label}
                 captionWidth={labelWidth}
                 presetStyle="s01"
@@ -195,14 +195,14 @@ export default function EditEmployeeItem01({ data, setData }: {
         <div >
 
           <InputSelBar_address
-            className={style.selectInput}
+            className={scss.inputSel}
             label="戶籍地址"
             captionWidth="100px"
             padding="17px 4px 14px 4px"
             gap="40px"
             addressProps={selectInputPropsResidence} />
           <InputSelBar_address
-            className={style.selectInput}
+            className={scss.inputSel}
             label="通訊地址"
             captionWidth="100px"
             padding="17px 4px 14px 4px"

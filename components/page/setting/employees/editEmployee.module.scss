@@ -13,7 +13,6 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     width: fit-content;
     padding: 20px $leftPadding_title;
     border: solid 1px $colorBorder01;
-
     display: flex;
     > * {
       margin: auto;
@@ -22,6 +21,9 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     .input02 {
       padding-top: 0;
       padding-bottom: 0;
+      input {
+        color: $colorMain;
+      }
     }
     .checkTip {
       margin-left: 10px;
@@ -115,6 +117,16 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     }
   }
 
+  .inputSel {
+    input,
+    div:not([class*="placeholder"]) {
+      color: $colorMain;
+      hr {
+        border-color: $colorMain;
+      }
+    }
+  }
+
   // -------------------------------
   // 垂直分隔線
   .vr {
@@ -123,11 +135,7 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     margin: auto;
     background-color: $colorBorder01;
   }
-  .selectInput {
-    > span {
-      color: $colorText;
-    }
-  }
+
   .subTitle {
     padding: 11px $leftPadding_title;
     font-weight: 400;
