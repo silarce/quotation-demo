@@ -95,15 +95,19 @@ export default function EmployeeList({ employeeList, toUpdate }: {
                     const theStyle = { width, flex }
 
                     if (key === "jobs" && Array.isArray(data)) {
+
+
                       return (
                         <div className={`${scss.column} ${scss.departmentInfo}`} key={index}
                           style={theStyle}
                         >
                           {data.map((item, index) => {
                             const { grade, name } = item
+                            const department = item.department
+                            const { name: departmentName } = department
                             return (
                               <div key={index}>
-                                {`字母 / XX部 / ${name} / Level${grade}`}
+                                {`字母 / ${departmentName} / ${name} / Level${grade}`}
                               </div>
                             )
                           })}

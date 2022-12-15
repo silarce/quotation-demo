@@ -85,7 +85,7 @@ export type TpostEmployee = {
 }
 
 type Tpopulate =
-  "jobs"[]
+  "jobs.department"[]
 
 
 

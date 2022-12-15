@@ -40,7 +40,7 @@ export default function Employees() {
         },
       }
     },
-    populate: ["jobs"]
+    populate: ["jobs.department"]
   })
 
   let { data, update } = useEmployee(params)
