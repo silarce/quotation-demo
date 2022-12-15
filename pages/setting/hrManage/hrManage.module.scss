@@ -36,6 +36,18 @@
   }
 }
 
+.customCard {
+  display: grid;
+  grid-template-columns: 120px fit-content(100%) 118px;
+  gap: 20px;
+  width: fit-content;
+  span {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+  }
+}
+
 .card {
   position: relative;
   display: inline-grid;
