@@ -78,12 +78,8 @@
   gap: 60px;
   border-bottom: solid 1px $colorBorder01;
   cursor: pointer;
-  &:hover {
-    background-color: $hoverBgc01;
-  }
-  &.selected {
-    background-color:$chosenBgc01;
-  }
+
+
   &:nth-last-of-type(1) {
     border: none;
   }

@@ -8,6 +8,7 @@ import { Modal } from 'antd';
 
 // global gear
 import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
+import CellWithBar from "components/global/gear/cell/cellWithBar";
 
 // css
 import style from "./addManeger.module.scss"
@@ -76,18 +77,17 @@ export default function AddManager(
         {staffList.map((item, index) => {
           const { staffId, chName, department01 } = item
           const { jobTitle, level } = department01
-
-          const active = selStaff[staffId] ? style.selected : ""
-
           return (
-            <div key={index} className={`${style.listItem} ${active}`}
-              onClick={() => selectStaff(item)}
-            >
-              <span>{staffId}</span>
-              <span>{chName}</span>
-              <span>{jobTitle}</span>
-              <span>{level}</span>
-            </div>
+            <CellWithBar key={index} isActive={!!selStaff[staffId]}>
+              <div className={`${style.listItem}`}
+                onClick={() => selectStaff(item)}
+              >
+                <span>{staffId}</span>
+                <span>{chName}</span>
+                <span>{jobTitle}</span>
+                <span>{level}</span>
+              </div>
+            </CellWithBar>
           )
         })}
       </div>
