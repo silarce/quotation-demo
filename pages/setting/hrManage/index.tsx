@@ -7,6 +7,7 @@ import {
 } from "react"
 
 // components
+import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import PageHeader from "components/PageHeader/pageHeader"
 import AddManager from "components/page/setting/hrManage/modal/AddManeger"
 import AddButton from "components/global/gear/button/addButton"
