@@ -47,7 +47,7 @@ export default function Card<T>(
           return (
             <div className={scss.tag} key={index}>
               <div className={scss.content}>
-                {typeof item === "string" ? item
+                {typeof item === "string" ? <span className={scss.contentSpan}>{item}</span>
                   : (CustomItem && <CustomItem data={item} />)
                   ?? null}
               </div>

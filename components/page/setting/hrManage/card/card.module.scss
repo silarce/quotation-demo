@@ -43,6 +43,10 @@
       padding: 22px 33px;
       border: solid 1px $colorBorder01;
       border-left: solid 2px $colorActive01;
+      >.contentSpan {
+        font-weight: 400;
+        font-size: 18px;
+      }
     }
 
     > svg {
