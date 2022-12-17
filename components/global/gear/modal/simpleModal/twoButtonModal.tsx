@@ -16,7 +16,7 @@ export default function TwoButtonModal(
     {
       visible: boolean,
       setVisible?: Dispatch<SetStateAction<boolean>>,
-      text: string
+      text: string | undefined
       onConfirm: () => void
       onCancel: () => void
       confirmText?: string
