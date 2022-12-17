@@ -38,14 +38,7 @@ export default function ErpFuncPermissions() {
 
   // --------------------------------------------------------------------------
 
-
-  // 製作removeData功能
-  // 製作removeData功能
-  // 製作removeData功能
-  // 製作removeData功能
-  // 製作removeData功能
   const [preDelData, setPreDelData] = useState<TdepartmentInfo>()
-
   const [showDelete, setShowDelete] = useState(false)
 
   const openDelete = (department: TdepartmentInfo) => {
@@ -59,8 +52,6 @@ export default function ErpFuncPermissions() {
     const { label } = preDelData
     alert(`移除${label}`)
   }
-
-
 
   // --------------------------------------------------------------------------
   return (
