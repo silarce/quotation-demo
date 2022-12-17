@@ -10,8 +10,16 @@
     right: 0;
     bottom: 0;
     .numerator {
-      margin-left:5px;
+      margin-left: 5px;
       color: #ea1833;
     }
   }
+}
+
+.mainContainer {
+  border: solid 1px $colorBorder01;
+}
+
+.main {
+  padding: 3px;
 }
