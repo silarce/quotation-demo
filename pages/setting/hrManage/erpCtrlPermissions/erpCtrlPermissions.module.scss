@@ -1,2 +1,17 @@
 @use "styles/theme01" as *;
 @use "styles/layout" as *;
+
+.header {
+  position: relative;
+  font-weight: 400;
+  font-size: 13px;
+  .countBox {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    .numerator {
+      margin-left:5px;
+      color: #ea1833;
+    }
+  }
+}
