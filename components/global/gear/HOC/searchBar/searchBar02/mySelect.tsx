@@ -79,6 +79,18 @@ export default function MySelect(
   } = selectProps
 
 
+  // 如果selectProps.value == false就轉為null
+  // 如果是字串，就轉為Toption的型態
+  if (selectProps) {
+    const selValue = value
+    if (!selValue) value = null
+    else if (/string|number/.test(typeof selValue)) {
+      value = selectProps.options.find((item) => item.value === selValue)
+        ?? { label: selValue as string, value: selValue as string }
+    }
+  }
+
+
   // ------------------------------------------------------------------------
   return (
     <Select

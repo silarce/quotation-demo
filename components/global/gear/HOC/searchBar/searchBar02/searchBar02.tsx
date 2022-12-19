@@ -5,6 +5,8 @@ import {
 
 import MySelect, { TselectProps } from "./mySelect"
 
+const _ = require("lodash")
+
 // icon
 import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 
@@ -29,14 +31,22 @@ export type TinputProps = {
 
 export type { TselectProps }
 
+type TinputConfig = {
+  props: TinputProps
+  boxStyle?: CSSProperties,
+}
+type TselectConfig = {
+  props: TselectProps
+  boxStyle?: CSSProperties,
+}
 
 
 
 // ============================================================================
 export default function SearchBar02(
   {
-    inputPropsArr,
-    selectPropsArr,
+    inputConfigArr,
+    selectConfigArr,
     doSearch,
     disabled,
     containerStyle,
@@ -44,8 +54,8 @@ export default function SearchBar02(
     {
 
 
-      inputPropsArr?: TinputProps[]
-      selectPropsArr?: TselectProps[]
+      inputConfigArr?: TinputConfig[]
+      selectConfigArr?: TselectConfig[]
 
       doSearch: (valueArr: (string | number | null | undefined)[]) => void
       disabled?: boolean
@@ -58,29 +68,32 @@ export default function SearchBar02(
 
   const valueArr = inpValueArr.concat(selValueArr)
 
+
   return (
     <div className={scss.searchBar} style={containerStyle}>
 
-      {selectPropsArr?.map((props, index) => {
+      {selectConfigArr?.map((config, index) => {
+
+        const { props, boxStyle } = config
+        const { onChange } = props
 
         const theOnChange = (option: Toption | null) => {
           const value = option?.value || null
 
-          const { onChange } = props
           onChange?.(option) // 基本上不會用到
 
           selValueArr[index] = value
           setSelValueArr(state => [...state]) // 基本上會用到
         }
 
-        props.onChange = theOnChange
-
+        const propsCopy = _.cloneDeep(props)
+        propsCopy.onChange = theOnChange
 
         return (
-          <div key={index} className={scss.selectWrapper}>
+          <div key={index} className={scss.selectWrapper} style={boxStyle}>
             <MySelect
               value={selValueArr[index]}
-              selectProps={props}
+              selectProps={propsCopy}
               disabled={disabled}
             />
           </div>
@@ -92,7 +105,9 @@ export default function SearchBar02(
 
 
       {/*  */}
-      {inputPropsArr?.map((props, index) => {
+      {inputConfigArr?.map((config, index) => {
+
+        const { props, boxStyle } = config
 
         const { placeholder, onChange, className, attributes, } = props
 
@@ -109,7 +124,7 @@ export default function SearchBar02(
         }
 
         return (
-          <div key={index} className={scss.inputWrapper}>
+          <div key={index} className={scss.inputWrapper} style={boxStyle}>
             <input className={`${scss.input} ${className ?? ""}`}
               type="text"
               value={inpValueArr[index] ?? ""}
