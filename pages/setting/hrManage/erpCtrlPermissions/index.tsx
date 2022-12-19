@@ -22,9 +22,6 @@ import { useDepartments } from "js/api/api_department";
 import scss from "./erpCtrlPermissions.module.scss"
 
 
-
-
-
 // ==========================================================================
 export default function ErpCtrlPermissions() {
 
@@ -54,12 +51,13 @@ export default function ErpCtrlPermissions() {
   const employeeList = data?.data || []
   const meta = data?.meta
 
-  const { data: departmentsData, update: updateDepartments } = useDepartments()
-  const departmentList = departmentsData?.data || []
 
+  // 部門列表
+  const { data: departmentsData, update: updateDepartments } = useDepartments()
+  // 用在搜尋bar的option
   const options_departments = useMemo(() => {
     if (!departmentsData.data) return []
-    
+
     return departmentsData.data.map((item) => {
       const { id, name } = item
       return {
@@ -67,7 +65,6 @@ export default function ErpCtrlPermissions() {
         label: name
       }
     })
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departmentsData])
 
@@ -100,15 +97,15 @@ export default function ErpCtrlPermissions() {
 
       <div className={scss.mainContainer} >
         <div className={scss.main}>
-          <Table
-            employeeList={employeeList} toUpdate={update}
-            searchOption={options_departments}
-          />
-
+          {isReady &&
+            <Table
+              employeeList={employeeList} toUpdate={update}
+              searchOption={options_departments}
+            />
+          }
         </div>
+        <LoadingCover01 isLoading={isLoading} />
       </div>
-
-
     </div>
   )
 }
