@@ -100,14 +100,14 @@ export type TapiGetEmployeeParams = {
   }
   populate?: Tpopulate
 }
-const apiGetEmployee = (params: TapiGetEmployeeParams) => {
+const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
   const api = "/employees"
   return axi.get(api, { params })
     .then(({ data }) => data)
     .catch(err => Promise.reject(err.message))
 }
 
-export const useEmployee = (params: TapiGetEmployeeParams) => {
+export const useEmployee = (params?: TapiGetEmployeeParams) => {
   let [data, setData] = useState<Partial<TgetEmployee>>({})
   const update = async () => {
     const data = await apiGetEmployee(params)
