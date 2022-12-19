@@ -3,7 +3,7 @@
 // ERP操作權限
 
 import {
-  useState, useEffect
+  useState, useEffect, useMemo
 } from "react"
 import { useRouter } from "next/router";
 
@@ -17,7 +17,7 @@ import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 
 // api
 import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
-
+import { useDepartments } from "js/api/api_department";
 
 import scss from "./erpCtrlPermissions.module.scss"
 
@@ -32,6 +32,7 @@ export default function ErpCtrlPermissions() {
   const [isLoading, setIsLoading] = useState(false)
   const [isReady, setIsReady] = useState(false)
   // ------------------------------------------------------------------------
+
   const [params, setParams] = useState<TapiGetEmployeeParams>({
     order: "ASC",
     page: 1,
@@ -53,11 +54,31 @@ export default function ErpCtrlPermissions() {
   const employeeList = data?.data || []
   const meta = data?.meta
 
+  const { data: departmentsData, update: updateDepartments } = useDepartments()
+  const departmentList = departmentsData?.data || []
+
+  const options_departments = useMemo(() => {
+    if (!departmentsData.data) return []
+    
+    return departmentsData.data.map((item) => {
+      const { id, name } = item
+      return {
+        value: id,
+        label: name
+      }
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [departmentsData])
+
+
   // ------------------------------------------------------------------------
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      await update()
+      await Promise.all([update(), updateDepartments()])
+        .then((valueArr) => valueArr)
+        .catch(err => Promise.reject(err))
       setIsReady(true)
       setIsLoading(false)
     })()
@@ -81,6 +102,7 @@ export default function ErpCtrlPermissions() {
         <div className={scss.main}>
           <Table
             employeeList={employeeList} toUpdate={update}
+            searchOption={options_departments}
           />
 
         </div>
@@ -90,10 +112,3 @@ export default function ErpCtrlPermissions() {
     </div>
   )
 }
-
-
-
-
-
-
-

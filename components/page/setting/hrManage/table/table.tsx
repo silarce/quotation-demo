@@ -15,11 +15,9 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 import SearchBar02 from "components/global/gear/HOC/searchBar/searchBar02/searchBar02";
 import AddButton from "components/global/gear/button/addButton";
-// api
-import { apiDeleteEmployee } from "js/api/api_employee";
 
 // icon
-import { IconDelete01, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from "./table.module.scss"
 // type
@@ -27,9 +25,10 @@ import { Temployee } from "js/api/api_employee"
 import { Toption } from "fakeDatabase/options/options";
 
 
-export default function Table({ employeeList, toUpdate }: {
+export default function Table({ employeeList, toUpdate, searchOption }: {
   employeeList: Temployee[]
   toUpdate: () => void
+  searchOption: Toption[]
 }) {
 
 
@@ -77,22 +76,20 @@ export default function Table({ employeeList, toUpdate }: {
 
   const selectPropsArr = [
     {
-      placeholder: "請選擇部門",
-      options: [],
+      boxStyle: { width: "180px" },
+      props: {
+        placeholder: "請選擇部門",
+        options: searchOption,
+      }
     },
   ]
   const inputPropsArr = [
     {
-      placeholder: "請輸入搜尋內容",
+      props: {
+        placeholder: "請輸入搜尋內容",
+      }
     },
   ]
-
-  // 接著取得部門列表並做成options
-  // 接著取得部門列表並做成options
-  // 接著取得部門列表並做成options
-  // 接著取得部門列表並做成options
-  // 接著取得部門列表並做成options
-
   // ---------------------------------------------------------------------------
   return (
     <div className={scss.employeeList}>
@@ -114,8 +111,8 @@ export default function Table({ employeeList, toUpdate }: {
             <SearchBar02
               doSearch={(valueArr: (string | number | null | undefined)[]) => {
               }}
-              inputPropsArr={inputPropsArr}
-              selectPropsArr={selectPropsArr}
+              inputConfigArr={inputPropsArr}
+              selectConfigArr={selectPropsArr}
             />
           </div>
           {/*  */}
@@ -172,7 +169,6 @@ export default function Table({ employeeList, toUpdate }: {
                   onClick={(e) => { openDelPanel(e, row) }} />
               </div>
             </div>
-
 
           )
         })}
