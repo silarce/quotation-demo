@@ -9,8 +9,29 @@
     gap: 63px;
     height: 40px;
     padding-left: 45px;
-    padding-right: 20px;
+    // padding-right: 20px;
+    .ctrlBar {
+      display: flex;
+      .searchlBar {
+        border: solid 1px #fff;
+        border-width: 0 3px;
+      }
+      .addBtnBox {
+        width: fit-content;
+        flex: 0 0 auto;
+        .addBtn {
+          height: 40px;
+          display: flex;
+          align-items: center;
+          > span {
+            font-weight: 500;
+            font-size: 14px;
+          }
+        }
+      }
+    }
   }
+
   .tbody {
     .row {
       display: flex;
@@ -18,13 +39,15 @@
       height: 53px;
       padding-left: 45px;
       padding-right: 20px;
-      border-top: solid 1px $colorBorder01;
-      cursor: pointer;
+      border-bottom: solid 1px $colorBorder01;
       .column {
         > span {
           font-size: 16px;
           color: $colorText;
         }
+      }
+      &:nth-last-of-type(1) {
+        border-bottom: none;
       }
     }
   }
@@ -43,6 +66,13 @@
       grid-template-columns: auto auto;
       justify-content: flex-start;
       gap: 35px;
+    }
+    .btnRemove {
+      width: 18px;
+      stroke: $colorMain;
+      &:hover {
+        fill: #14256a20;
+      }
     }
   }
 }

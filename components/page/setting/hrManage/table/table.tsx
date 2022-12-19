@@ -12,16 +12,19 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import { ModalSuccess, ModalErr } from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
+import InputSel from "components/global/gear/inputAndSel/inputSel";
+import SearchBar02 from "components/global/gear/HOC/searchBar/searchBar02/searchBar02";
+import AddButton from "components/global/gear/button/addButton";
 // api
 import { apiDeleteEmployee } from "js/api/api_employee";
 
 // icon
-import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDelete01, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from "./table.module.scss"
 // type
 import { Temployee } from "js/api/api_employee"
-
+import { Toption } from "fakeDatabase/options/options";
 
 
 export default function Table({ employeeList, toUpdate }: {
@@ -29,6 +32,9 @@ export default function Table({ employeeList, toUpdate }: {
   toUpdate: () => void
 }) {
 
+
+
+  // ---------------------------------------------------------------------------
 
   const [selInfo, setSelInfo] = useState({
     id: "",
@@ -50,23 +56,44 @@ export default function Table({ employeeList, toUpdate }: {
   }
 
   const deleteEmployee = async () => {
-    if (!selInfo.id) return
-    try {
-      setRootLoading(true)
-      await apiDeleteEmployee(selInfo.id)
-      await toUpdate()
-      ModalSuccess({ title: "刪除完成" })
-    }
-    catch {
-      await toUpdate()
-      ModalErr({ title: "刪除失敗" })
-    }
-    finally {
-      setRootLoading(false)
-      closeDelPanel()
-    }
+    // if (!selInfo.id) return
+    // try {
+    //   setRootLoading(true)
+    //   await apiDeleteEmployee(selInfo.id)
+    //   await toUpdate()
+    //   ModalSuccess({ title: "刪除完成" })
+    // }
+    // catch {
+    //   await toUpdate()
+    //   ModalErr({ title: "刪除失敗" })
+    // }
+    // finally {
+    //   setRootLoading(false)
+    //   closeDelPanel()
+    // }
   }
 
+  // ---------------------------------------------------------------------------
+
+  const selectPropsArr = [
+    {
+      placeholder: "請選擇部門",
+      options: [],
+    },
+  ]
+  const inputPropsArr = [
+    {
+      placeholder: "請輸入搜尋內容",
+    },
+  ]
+
+  // 接著取得部門列表並做成options
+  // 接著取得部門列表並做成options
+  // 接著取得部門列表並做成options
+  // 接著取得部門列表並做成options
+  // 接著取得部門列表並做成options
+
+  // ---------------------------------------------------------------------------
   return (
     <div className={scss.employeeList}>
       <div className={scss.thead}>
@@ -80,57 +107,73 @@ export default function Table({ employeeList, toUpdate }: {
             </div>
           )
         })}
+
+        {/*  */}
+        <div className={scss.ctrlBar}>
+          <div className={scss.searchlBar}>
+            <SearchBar02
+              doSearch={(valueArr: (string | number | null | undefined)[]) => {
+              }}
+              inputPropsArr={inputPropsArr}
+              selectPropsArr={selectPropsArr}
+            />
+          </div>
+          {/*  */}
+          <div className={scss.addBtnBox}>
+            <AddButton className={scss.addBtn}
+              label="新增操作人員"
+              onClick={() => { }}
+            />
+          </div>
+        </div>
       </div>
 
+      {/*  */}
       <div className={scss.tbody}>
         {employeeList.map((row, index) => {
-          const id = row.id
           return (
-            <CellWithBar key={index}>
-              <Link href={`/setting/employees/edit/${id}`}>
-                <div className={scss.row} >
-                  {tableKeyIndex.map((key, index) => {
-                    const data = row[key]
-                    const { width, flex } = tableConfig[key]
-                    const theStyle = { width, flex }
+            <div className={scss.row} key={index}>
+              {tableKeyIndex.map((key, index) => {
+                const data = row[key]
+                const { width, flex } = tableConfig[key]
+                const theStyle = { width, flex }
 
-                    if (key === "jobs" && Array.isArray(data)) {
+                if (key === "jobs" && Array.isArray(data)) {
+                  return (
+                    <div className={`${scss.column} ${scss.departmentInfo}`} key={index}
+                      style={theStyle}
+                    >
+                      {data.map((item, index) => {
+                        const { grade, name } = item
+                        const department = item.department
+                        const { name: departmentName } = department
+                        return (
+                          <div key={index}>
+                            {`字母 / ${departmentName} / ${name} / Level${grade}`}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                }
+
+                if (typeof data === "string")
+                  return (
+                    <div className={scss.column} key={index}
+                      style={theStyle}
+                    >
+                      <span>{data ?? "無資料"}</span>
+                    </div>
+                  )
+              })}
+
+              <div className={`${scss.column}`}>
+                <IconRemoveCircle className={scss.btnRemove}
+                  onClick={(e) => { openDelPanel(e, row) }} />
+              </div>
+            </div>
 
 
-                      return (
-                        <div className={`${scss.column} ${scss.departmentInfo}`} key={index}
-                          style={theStyle}
-                        >
-                          {data.map((item, index) => {
-                            const { grade, name } = item
-                            const department = item.department
-                            const { name: departmentName } = department
-                            return (
-                              <div key={index}>
-                                {`字母 / ${departmentName} / ${name} / Level${grade}`}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )
-                    }
-
-                    if (typeof data === "string")
-                      return (
-                        <div className={scss.column} key={index}
-                          style={theStyle}
-                        >
-                          <span>{data ?? "無資料"}</span>
-                        </div>
-                      )
-                  })}
-
-                  <div className={`${scss.column} ${scss.btnCell}`}>
-                    <IconDelete01 onClick={(e) => { openDelPanel(e, row) }} />
-                  </div>
-                </div>
-              </Link>
-            </CellWithBar>
           )
         })}
       </div>
