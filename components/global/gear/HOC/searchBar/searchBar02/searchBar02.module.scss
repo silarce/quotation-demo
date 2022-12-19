@@ -32,17 +32,10 @@
 // select
 
 div.selControl {
+  gap:10px;
   min-height: auto;
   padding: 0px 20px;
   cursor: pointer;
-  &.menuIsOpen {
-    div[class*="placeholder"] {
-      color: $colorActive01;
-    }
-    div[class*="singleValue"] {
-      color: $colorActive01;
-    }
-  }
 }
 div.selMenu {
   top: 6px;
@@ -81,9 +74,6 @@ div.selOption {
   &:hover {
     color: $colorMain;
     background-color: $bgc01;
-  }
-  &.isSelected {
-    color: $colorActive01;
   }
 }
 

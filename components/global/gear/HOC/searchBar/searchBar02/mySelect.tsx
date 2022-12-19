@@ -96,18 +96,12 @@ export default function MySelect(
       // menuIsOpen={true}
       classNames={{
         container: (state) => `${scss.selContainer} ${classNames?.container ?? ""}`,
-        control: (state) => {
-          const menuIsOpen = state["menuIsOpen"] ? scss.menuIsOpen : ""
-          return `${scss.selControl} ${classNames?.control ?? ""} ${menuIsOpen}`
-        },
+        control: (state) => `${scss.selControl} ${classNames?.control ?? ""} `,
         singleValue: (state) => `${scss.selSingleValue} ${classNames?.singleValue ?? ""}`,
         placeholder: (state) => `${scss.selPlaceholder} ${classNames?.placeholder ?? ""}`,
         menu: (state) => `${scss.selMenu} ${classNames?.menu ?? ""}`,
         menuList: (state) => `${scss.selMenuList} ${classNames?.menuList ?? ""}`,
-        option: (state) => {
-          const isSelected = state["isSelected"] ? scss.isSelected : ""
-          return `${scss.selOption} ${classNames?.option ?? ""} ${isSelected}`
-        },
+        option: (state) => `${scss.selOption} ${classNames?.option ?? ""}`,
         input: (state) => `${scss.selInput ?? ""} ${classNames?.input ?? ""}`,
       }}
     />
