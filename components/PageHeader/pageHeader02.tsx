@@ -104,9 +104,7 @@ export default function PageHeader02(
   const [active, setActive] = useState(0)
 
   const router = useRouter()
-  const { asPath } = router
-
-
+  const { pathname } = router
 
   return (
     <div className={style.container}>
@@ -118,7 +116,7 @@ export default function PageHeader02(
           active={active} setActive={setActive}
         />{/* 多個tag 附帶onClick */}
         <LinkList
-          linkList={linkList} asPath={asPath} />{/* 連結 */}
+          linkList={linkList} pathname={pathname} />{/* 連結 */}
       </div>
       {/* buttonBox */} {/* 右邊的部分 */}
       <PanelList panelList={panelList} />
@@ -177,21 +175,22 @@ function TagList({ tagList, active, setActive }:
 }
 
 // -----------
-function LinkList({ linkList, asPath }:
+function LinkList({ linkList, pathname }:
   {
     linkList: Tlink[]
-    asPath: string
+    pathname: string
   }) {
   if (!linkList[0]) return null
   return (
     <>
       {linkList.map((config, index) => {
         const { label, href } = config;
-        const isActive = href === asPath ? style.active : ""
+        const isActive = href === pathname ? style.active : ""
+
         return (
           <Link className={isActive} href={href} key={index}>
-              <span>{label}</span>
-              <hr className={style.bottomBar} />
+            <span>{label}</span>
+            <hr className={style.bottomBar} />
           </Link>
         )
       })}
