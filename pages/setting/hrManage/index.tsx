@@ -2,8 +2,7 @@
 // 人事權限管理
 
 import {
-  useState,
-  Dispatch, SetStateAction
+  useState, useEffect
 } from "react"
 
 // components
@@ -11,11 +10,6 @@ import Header from "components/page/setting/hrManage/header/header";
 import AddManager from "components/page/setting/hrManage/modal/AddManeger"
 import Card from "components/page/setting/hrManage/card/card";
 
-// gear
-import AddButton from "components/global/gear/button/addButton"
-
-// icon
-import { IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import scss from "./hrManage.module.scss"
@@ -27,20 +21,47 @@ import {
   fakeManagerList,
 } from "fakeDatabase/staff/fakeManagerList"
 
+// api
+import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
+
+
 export default function HrManage() {
   const [managerList, setManagerList] = useState<TdepartmentManageList>(fakeManagerList)
+  // --------------------------------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+  // --------------------------------------------------------------------------
+  const { data, update } = useEmployee({
+    pageSize: 999999999,
+    populate: ["jobs"],
+  })
+  const employeeList = data?.data || []
+  const meta = data?.meta
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true)
+      await update()
+      setIsReady(true)
+      setIsLoading(false)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  // --------------------------------------------------------------------------
 
 
   const [showAddManager, setShowAddManager] = useState(false)
-  const [selIndex, setSelIndex] = useState<number>(999)
-
 
   const showAdd = (selIndex: number) => {
     setShowAddManager(true)
-    setSelIndex(selIndex)
   }
 
 
+  // --------------------------------------------------------------------------
+  const onConfirm = (indexArr: number[]) => {
+    alert(indexArr)
+  }
+  const onCancel = () => setShowAddManager(false)
   // --------------------------------------------------------------------------
   return (
     <div className={scss.scrollContainer}>
@@ -74,11 +95,12 @@ export default function HrManage() {
       </div>
 
       <AddManager
-        {...{
-          visible: showAddManager, setVisible: setShowAddManager,
-          staffList: fakeStaffList, setManagerList,
-          selIndex
-        }}
+        visible={showAddManager}
+        employeeList={employeeList}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+
+
       />
 
     </div>
