@@ -20,14 +20,20 @@ export default function SelectEmployeePanel(
   {
     visible,
     employeeList,
+    label,
+    tip,
     onConfirm,
     onCancel,
+    selectLimit
   }:
     {
       visible: boolean,
       employeeList: Temployee[]
+      label: string
+      tip?: string
       onConfirm: (indexArr: number[]) => void
       onCancel: () => void
+      selectLimit?: number
     }) {
 
 
@@ -45,7 +51,12 @@ export default function SelectEmployeePanel(
       activeIndex.splice(theIndex, 1)
     }
     else {
-      activeIndex.push(index)
+      if (!selectLimit) {
+        activeIndex.push(index)
+      }
+      else if (activeIndex.length < selectLimit) {
+        activeIndex.push(index)
+      }
     }
     setActiveIndex([...activeIndex])
   }
@@ -65,8 +76,8 @@ export default function SelectEmployeePanel(
       footer={<TwoBtnFooter {...{ onConfirm: theOnConfirm, onCancel }} />}
     >
       <div className={style.title}>
-        <span>請選擇管理人員</span>
-        <span className={style.note}>可複選</span>
+        <span>{label}</span>
+        <span className={style.note}>{tip}</span>
       </div>
       <div className={style.listContainer}>
 
