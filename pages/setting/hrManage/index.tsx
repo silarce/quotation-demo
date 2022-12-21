@@ -96,6 +96,8 @@ export default function HrManage() {
 
       <SelectEmployeePanel
         visible={showAddManager}
+        label="請選擇管理人員"
+        tip="可複選"
         employeeList={employeeList}
         onConfirm={onConfirm}
         onCancel={onCancel}
