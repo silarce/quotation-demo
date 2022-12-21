@@ -1,6 +1,5 @@
 import {
   useState, useEffect,
-  Dispatch, SetStateAction
 } from "react"
 
 // antd
@@ -11,19 +10,13 @@ import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
 import CellWithBar from "components/global/gear/cell/cellWithBar";
 
 // css
-import style from "./addManeger.module.scss"
-
-// fakeData
-import {
-  TdepartmentManageList, TstaffInfo,
-} from "fakeDatabase/staff/fakeManagerList"
-
+import style from "./selectEmployeePanel.module.scss"
 
 // api
-import { useEmployee, Temployee } from "js/api/api_employee";
+import { Temployee } from "js/api/api_employee";
 
 // ===============================================================================
-export default function AddManager(
+export default function SelectEmployeePanel(
   {
     visible,
     employeeList,
