@@ -67,7 +67,7 @@ export default function ErpCtrlPermissions() {
 
   let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
   const employeeList = employeeData01?.data || []
-  // const meta = data?.meta
+  const employeeData01Meta = employeeData01?.meta
 
   const updateList = async () => {
     setIsLoading(true)
@@ -175,13 +175,17 @@ export default function ErpCtrlPermissions() {
   }
 
   // ------------------------------------------------------------------------
+  const removeEmployee = () => {
+    alert("api未提供")
+  }
+  // ------------------------------------------------------------------------
   return (
     <div className={scss.container}>
       <div className={scss.header}>
         <Header />
         <div className={scss.countBox}>
           <span>已加入人數 / 操作人數上限 :</span>
-          <span className={scss.numerator}>9</span>
+          <span className={scss.numerator}>{employeeData01Meta?.itemCount}</span>
           <span> / 30</span>
         </div>
       </div>
@@ -194,12 +198,13 @@ export default function ErpCtrlPermissions() {
               searchOption={options_departments}
               openAddPanel={openAddPanel}
               onSearch={onSearch}
+              onDelete={removeEmployee}
             />
           }
         </div>
         <LoadingCover01 isLoading={isLoading} />
       </div>
-      
+
       <SelectEmployeePanel
         visible={showAddPanel}
         label="請選擇操作人員"
@@ -213,12 +218,3 @@ export default function ErpCtrlPermissions() {
   )
 }
 
-
-
-
-
-/*
-把搜尋功能做出
-把新增操作人員做出來
-
-*/

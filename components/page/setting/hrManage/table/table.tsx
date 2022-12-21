@@ -32,6 +32,7 @@ export default function Table(
     searchOption,
     openAddPanel,
     onSearch,
+    onDelete
   }:
     {
       employeeList: Temployee[]
@@ -39,6 +40,7 @@ export default function Table(
       searchOption: Toption[]
       openAddPanel: () => void
       onSearch: (valueArr: (string | number | null | undefined)[]) => void
+      onDelete: () => void
     }) {
 
 
@@ -62,27 +64,6 @@ export default function Table(
     e.stopPropagation()
     const { id, idNumber, chName } = data
     setSelInfo({ id, idNumber, chName })
-  }
-
-  const deleteEmployee = async () => {
-    // 將員工的ERP權限移除的api還沒做好
-    // 下面的註解僅供參考
-
-    // if (!selInfo.id) return
-    // try {
-    //   setRootLoading(true)
-    //   await apiDeleteEmployee(selInfo.id)
-    //   await toUpdate()
-    //   ModalSuccess({ title: "刪除完成" })
-    // }
-    // catch {
-    //   await toUpdate()
-    //   ModalErr({ title: "刪除失敗" })
-    // }
-    // finally {
-    //   setRootLoading(false)
-    //   closeDelPanel()
-    // }
   }
 
   // ---------------------------------------------------------------------------
@@ -189,7 +170,7 @@ export default function Table(
         {...{
           visible: !!selInfo.id,
           text: `請確定要刪除「${selInfo.idNumber}」「${selInfo.chName}」?`,
-          onConfirm: deleteEmployee,
+          onConfirm: onDelete,
           onCancel: closeDelPanel,
         }} />
     </div>
