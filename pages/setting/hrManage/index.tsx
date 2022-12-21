@@ -7,7 +7,7 @@ import {
 
 // components
 import Header from "components/page/setting/hrManage/header/header";
-import AddManager from "components/page/setting/hrManage/modal/AddManeger"
+import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
 import Card from "components/page/setting/hrManage/card/card";
 
 
@@ -94,7 +94,7 @@ export default function HrManage() {
         </div>
       </div>
 
-      <AddManager
+      <SelectEmployeePanel
         visible={showAddManager}
         employeeList={employeeList}
         onConfirm={onConfirm}
