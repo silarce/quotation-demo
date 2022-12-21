@@ -11,6 +11,14 @@ import { TjobsData } from "./api_department"
 
 // =============================================
 // 員工資料
+
+export type Tuser = {
+  account: string
+  id: string
+  isActive: boolean
+  username: string
+}
+
 export type Temployee = {
   "id": string,
   "createdAt": string, // 2022-10-12T08:47:24.753Z"
@@ -40,6 +48,7 @@ export type Temployee = {
   "severanceDate": string,
   "processPermission": true,
   "jobs"?: TjobsData[]
+  "user"?: Tuser
 }
 
 // 員工資料列表
@@ -92,17 +101,19 @@ type Tpopulate =
 // =======================================================
 // 取得員工資料列表
 export type TapiGetEmployeeParams = {
-  order: "ASC" | "DESC",
-  page: number,
-  pageSize: number,
+  order?: "ASC" | "DESC",
+  page?: number,
+  pageSize?: number,
   filter?: {
     [key: string]: any
   }
-  populate?: Tpopulate
+  populate?: string[]
 }
 const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
+  // const api = "/employees?filter[user][$notNull]"
   const api = "/employees"
   return axi.get(api, { params })
+    // return axi.get(api)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err.message))
 }
