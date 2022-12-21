@@ -26,12 +26,19 @@ import { Toption } from "fakeDatabase/options/options";
 
 
 export default function Table(
-  { employeeList, toUpdate, searchOption, openAddPanel }:
+  {
+    employeeList,
+    toUpdate,
+    searchOption,
+    openAddPanel,
+    onSearch,
+  }:
     {
       employeeList: Temployee[]
       toUpdate: () => void
       searchOption: Toption[]
       openAddPanel: () => void
+      onSearch: (valueArr: (string | number | null | undefined)[]) => void
     }) {
 
 
@@ -115,8 +122,7 @@ export default function Table(
         <div className={scss.ctrlBar}>
           <div className={scss.searchlBar}>
             <SearchBar02
-              doSearch={(valueArr: (string | number | null | undefined)[]) => {
-              }}
+              doSearch={onSearch}
               inputConfigArr={inputPropsArr}
               selectConfigArr={selectPropsArr}
             />

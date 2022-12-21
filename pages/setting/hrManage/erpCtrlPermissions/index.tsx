@@ -17,7 +17,10 @@ import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonMo
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 
 // api
-import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
+import {
+  TapiGetEmployeeParams,
+  useEmployee, apiPostEmployeeErpUser,
+} from "js/api/api_employee";
 import { useDepartments } from "js/api/api_department";
 
 import scss from "./erpCtrlPermissions.module.scss"
@@ -40,6 +43,14 @@ export default function ErpCtrlPermissions() {
       user: {
         $notNull: true
       },
+      // 問後端這部分要怎麼設
+      // jobs: {
+      //   $contains: {
+      //     department: {
+      //       id: { $eq: "ce0ad704-148b-4c48-bdb2-5f1458c6a998" }
+      //     }
+      //   }
+      // },
       $or: {
         idNumber: {
           $contains: router.query.searchValue,
@@ -51,7 +62,6 @@ export default function ErpCtrlPermissions() {
     },
     populate: ["jobs.department", "user"]
   })
-
 
   let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
   const employeeList = employeeData01?.data || []
@@ -89,9 +99,14 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
-        .then((valueArr) => valueArr)
-        .catch(err => Promise.reject(err))
+      if (isReady) {
+        await updateEmployeeData01()
+      }
+      else {
+        await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
+          .then((valueArr) => valueArr)
+          .catch(err => Promise.reject(err))
+      }
       setIsReady(true)
       setIsLoading(false)
     })()
@@ -100,6 +115,28 @@ export default function ErpCtrlPermissions() {
 
 
   // ------------------------------------------------------------------------
+  // 搜尋功能 searchBar
+
+  const onSearch = (valueArr: (string | number | null | undefined)[]) => {
+
+    const department = valueArr[0]
+    const other = valueArr[1]
+
+    router.push(
+      {
+        pathname: "/setting/hrManage/erpCtrlPermissions",
+        query: {
+          department,
+          other
+        }
+      }
+    )
+    // 只是為了rerender，params只會被pathname控制，應該是不用做成狀態
+    setParams(state => ({ ...state }))
+  }
+
+  // ------------------------------------------------------------------------
+  // 新增操作人員
 
   const [showAddPanel, setShowAddPanel] = useState(false)
 
@@ -114,9 +151,6 @@ export default function ErpCtrlPermissions() {
   const onCancel = () => {
     setShowAddPanel(false)
   }
-
-
-
 
   // ------------------------------------------------------------------------
   return (
@@ -137,6 +171,7 @@ export default function ErpCtrlPermissions() {
               employeeList={employeeList} toUpdate={updateEmployeeData01}
               searchOption={options_departments}
               openAddPanel={openAddPanel}
+              onSearch={onSearch}
             />
           }
         </div>
@@ -162,7 +197,4 @@ export default function ErpCtrlPermissions() {
 把搜尋功能做出
 把新增操作人員做出來
 
-api已更新，要取得有權限的名單
-
-人事權限管理的AddManager也要改
 */

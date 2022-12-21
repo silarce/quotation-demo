@@ -221,5 +221,12 @@ export const apiDeleteEmployee = (id: string) => {
     .catch(err => Promise.reject(err))
 }
 
+// =======================================================
+// 新增ERP使用者
 
-
+export const apiPostEmployeeErpUser = (id: string) => {
+  const api = `/employees/${id}/erp-user`
+  return axi.post(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
