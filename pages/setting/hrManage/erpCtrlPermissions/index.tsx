@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 
 // component
 import Table from "components/page/setting/hrManage/table/table";
+import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
 
 // gear
 import Header from "components/page/setting/hrManage/header/header"
@@ -30,11 +31,15 @@ export default function ErpCtrlPermissions() {
   const [isReady, setIsReady] = useState(false)
   // ------------------------------------------------------------------------
 
+  // 列表-送進table裡面
   const [params, setParams] = useState<TapiGetEmployeeParams>({
     order: "ASC",
     page: 1,
-    pageSize: 12,
+    pageSize: 99999999999,
     filter: {
+      user: {
+        $notNull: true
+      },
       $or: {
         idNumber: {
           $contains: router.query.searchValue,
@@ -42,15 +47,26 @@ export default function ErpCtrlPermissions() {
         chName: {
           $contains: router.query.searchValue,
         },
-      }
+      },
     },
-    populate: ["jobs.department"]
+    populate: ["jobs.department", "user"]
   })
 
-  let { data, update } = useEmployee(params)
-  const employeeList = data?.data || []
-  const meta = data?.meta
 
+  let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
+  const employeeList = employeeData01?.data || []
+  // const meta = data?.meta
+
+  // ____________________________________________
+
+  // 新增操作人員用的
+  const { data: employeeData02, update: updateEmployeeData02 } = useEmployee({
+    pageSize: 999999999,
+    populate: ["jobs"],
+  })
+  const employeeList_all = employeeData02?.data || []
+
+  // ____________________________________________
 
   // 部門列表
   const { data: departmentsData, update: updateDepartments } = useDepartments()
@@ -73,7 +89,7 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      await Promise.all([update(), updateDepartments()])
+      await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
         .then((valueArr) => valueArr)
         .catch(err => Promise.reject(err))
       setIsReady(true)
@@ -81,6 +97,25 @@ export default function ErpCtrlPermissions() {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params])
+
+
+  // ------------------------------------------------------------------------
+
+  const [showAddPanel, setShowAddPanel] = useState(false)
+
+  const openAddPanel = () => {
+    setShowAddPanel(true)
+  }
+
+  const onConfirm = (indexArr: number[]) => {
+    alert(indexArr)
+  }
+
+  const onCancel = () => {
+    setShowAddPanel(false)
+  }
+
+
 
 
   // ------------------------------------------------------------------------
@@ -99,13 +134,35 @@ export default function ErpCtrlPermissions() {
         <div className={scss.main}>
           {isReady &&
             <Table
-              employeeList={employeeList} toUpdate={update}
+              employeeList={employeeList} toUpdate={updateEmployeeData01}
               searchOption={options_departments}
+              openAddPanel={openAddPanel}
             />
           }
         </div>
         <LoadingCover01 isLoading={isLoading} />
       </div>
+
+      {/* AddManager需要做大改 */}
+      <SelectEmployeePanel
+        visible={showAddPanel}
+        employeeList={employeeList_all}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
     </div>
   )
 }
+
+
+
+
+
+/*
+把搜尋功能做出
+把新增操作人員做出來
+
+api已更新，要取得有權限的名單
+
+人事權限管理的AddManager也要改
+*/

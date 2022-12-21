@@ -25,11 +25,14 @@ import { Temployee } from "js/api/api_employee"
 import { Toption } from "fakeDatabase/options/options";
 
 
-export default function Table({ employeeList, toUpdate, searchOption }: {
-  employeeList: Temployee[]
-  toUpdate: () => void
-  searchOption: Toption[]
-}) {
+export default function Table(
+  { employeeList, toUpdate, searchOption, openAddPanel }:
+    {
+      employeeList: Temployee[]
+      toUpdate: () => void
+      searchOption: Toption[]
+      openAddPanel: () => void
+    }) {
 
 
 
@@ -55,6 +58,9 @@ export default function Table({ employeeList, toUpdate, searchOption }: {
   }
 
   const deleteEmployee = async () => {
+    // 將員工的ERP權限移除的api還沒做好
+    // 下面的註解僅供參考
+
     // if (!selInfo.id) return
     // try {
     //   setRootLoading(true)
@@ -119,7 +125,7 @@ export default function Table({ employeeList, toUpdate, searchOption }: {
           <div className={scss.addBtnBox}>
             <AddButton className={scss.addBtn}
               label="新增操作人員"
-              onClick={() => { }}
+              onClick={openAddPanel}
             />
           </div>
         </div>
