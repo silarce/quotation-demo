@@ -15,6 +15,7 @@ import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEm
 import Header from "components/page/setting/hrManage/header/header"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 
 // api
 import {
@@ -24,6 +25,7 @@ import {
 import { useDepartments } from "js/api/api_department";
 
 import scss from "./erpCtrlPermissions.module.scss"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 
 // ==========================================================================
@@ -66,6 +68,13 @@ export default function ErpCtrlPermissions() {
   let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
   const employeeList = employeeData01?.data || []
   // const meta = data?.meta
+
+  const updateList = async () => {
+    setIsLoading(true)
+    await updateEmployeeData01()
+    setIsLoading(false)
+  }
+
 
   // ____________________________________________
 
@@ -144,8 +153,21 @@ export default function ErpCtrlPermissions() {
     setShowAddPanel(true)
   }
 
-  const onConfirm = (indexArr: number[]) => {
-    alert(indexArr)
+  const onConfirm = async (indexArr: number[]) => {
+    const id = employeeList_all[indexArr[0]].id
+    showRootLoading(true)
+    try {
+      await apiPostEmployeeErpUser(id)
+      setShowAddPanel(false)
+    }
+    catch (err) {
+      myAlert.err({
+        title: "新增操作人員失敗",
+      })
+    }
+
+    showRootLoading(false)
+    await updateList()
   }
 
   const onCancel = () => {
@@ -177,13 +199,15 @@ export default function ErpCtrlPermissions() {
         </div>
         <LoadingCover01 isLoading={isLoading} />
       </div>
-
-      {/* AddManager需要做大改 */}
+      
       <SelectEmployeePanel
         visible={showAddPanel}
+        label="請選擇操作人員"
+        tip="僅單選(後端還未提供複選api)"
         employeeList={employeeList_all}
         onConfirm={onConfirm}
         onCancel={onCancel}
+        selectLimit={1}
       />
     </div>
   )
