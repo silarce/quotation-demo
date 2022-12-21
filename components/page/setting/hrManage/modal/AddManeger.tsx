@@ -1,5 +1,5 @@
 import {
-  useState,
+  useState, useEffect,
   Dispatch, SetStateAction
 } from "react"
 
@@ -18,44 +18,47 @@ import {
   TdepartmentManageList, TstaffInfo,
 } from "fakeDatabase/staff/fakeManagerList"
 
+
+// api
+import { useEmployee, Temployee } from "js/api/api_employee";
+
+// ===============================================================================
 export default function AddManager(
-  { visible, setVisible, staffList, setManagerList, selIndex }:
+  {
+    visible,
+    employeeList,
+    onConfirm,
+    onCancel,
+  }:
     {
       visible: boolean,
-      setVisible: Dispatch<SetStateAction<boolean>>,
-      staffList: TstaffInfo[]
-      setManagerList: Dispatch<SetStateAction<TdepartmentManageList>>
-      selIndex: number
+      employeeList: Temployee[]
+      onConfirm: (indexArr: number[]) => void
+      onCancel: () => void
     }) {
-  // ==================================================
-  interface TselStaffList {
-    [key: string]: TstaffInfo
-  }
-  const [selStaff, setSelStaff] = useState<TselStaffList>({})
-  const selectStaff = (staffInfo: TstaffInfo) => {
-    const { staffId } = staffInfo
-    if (selStaff[staffId]) delete selStaff[staffId]
-    else selStaff[staffId] = staffInfo
-    setSelStaff({ ...selStaff })
+
+
+  const [activeIndex, setActiveIndex] = useState<number[]>([])
+
+
+  useEffect(() => {
+    if (!visible) setActiveIndex([])
+  }, [visible])
+
+
+  const onClick = (index: number) => {
+    const theIndex = activeIndex.indexOf(index)
+    if (theIndex !== -1) {
+      activeIndex.splice(theIndex, 1)
+    }
+    else {
+      activeIndex.push(index)
+    }
+    setActiveIndex([...activeIndex])
   }
 
-  // ===============================================
-  const addManager = () => {
-    const selStaffArrList = Object.values(selStaff)
-    setManagerList(state => {
-      state[selIndex].list = state[selIndex].list.concat(selStaffArrList)
-      return [...state]
-    })
-    cleanAndClose()
-  }
-  // ===============================================
+  const theOnConfirm = () => onConfirm(activeIndex)
 
-  const cleanAndClose = () => {
-    setSelStaff({})
-    setVisible(false)
-  }
-  const onConfirm = addManager
-  const onCancel = cleanAndClose
 
   return (
     <Modal
@@ -66,7 +69,7 @@ export default function AddManager(
       width={400}
       destroyOnClose={true}
       onCancel={onCancel}
-      footer={<TwoBtnFooter {...{ onConfirm, onCancel }} />}
+      footer={<TwoBtnFooter {...{ onConfirm: theOnConfirm, onCancel }} />}
     >
       <div className={style.title}>
         <span>請選擇管理人員</span>
@@ -74,18 +77,20 @@ export default function AddManager(
       </div>
       <div className={style.listContainer}>
 
-        {staffList.map((item, index) => {
-          const { staffId, chName, department01 } = item
-          const { jobTitle, level } = department01
+        {employeeList.map((item, index) => {
+          const { idNumber, chName, jobs } = item
+          const { name, grade } = jobs?.[0] ?? {}
+
+          const isActive = activeIndex.includes(index)
           return (
-            <CellWithBar key={index} isActive={!!selStaff[staffId]}>
+            <CellWithBar key={index} isActive={isActive}>
               <div className={`${style.listItem}`}
-                onClick={() => selectStaff(item)}
+                onClick={() => onClick(index)}
               >
-                <span>{staffId}</span>
+                <span>{idNumber}</span>
                 <span>{chName}</span>
-                <span>{jobTitle}</span>
-                <span>{level}</span>
+                <span>{name}</span>
+                <span>{grade && `Level ${grade}`}</span>
               </div>
             </CellWithBar>
           )
