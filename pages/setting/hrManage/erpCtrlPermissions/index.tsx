@@ -3,6 +3,7 @@
 // ERP操作權限
 
 import {
+  MouseEvent,
   useState, useEffect, useMemo
 } from "react"
 import { useRouter } from "next/router";
@@ -47,7 +48,7 @@ export default function ErpCtrlPermissions() {
         $notNull: true
       },
       // 收到空字串會壞掉
-      "jobs.department.id": router.query.department||undefined,
+      "jobs.department.id": router.query.department || undefined,
       chName: {
         $contains: router.query.chName,
       },
@@ -166,9 +167,28 @@ export default function ErpCtrlPermissions() {
   }
 
   // ------------------------------------------------------------------------
+  // 刪除功能
+
+  const [selIndex, setSelIndex] = useState<number>(-1)
+
+
+  const selId = employeeList[selIndex]?.id
+  const selIdNumber = employeeList[selIndex]?.idNumber
+  const selChName = employeeList[selIndex]?.chName
+
+  const openDelete = (e: MouseEvent, index: number) => {
+    e.stopPropagation()
+    setSelIndex(index)
+  }
+
   const removeEmployee = () => {
     alert("api未提供")
   }
+
+  const cancelDelete = () => {
+    setSelIndex(-1)
+  }
+
   // ------------------------------------------------------------------------
   return (
     <div className={scss.container}>
@@ -185,11 +205,11 @@ export default function ErpCtrlPermissions() {
         <div className={scss.main}>
           {isReady &&
             <Table
-              employeeList={employeeList} toUpdate={updateEmployeeData01}
+              employeeList={employeeList}
               searchOption={options_departments}
               openAddPanel={openAddPanel}
               onSearch={onSearch}
-              onDelete={removeEmployee}
+              onDelete={openDelete}
             />
           }
         </div>
@@ -205,6 +225,14 @@ export default function ErpCtrlPermissions() {
         onCancel={onCancel}
         selectLimit={1}
       />
+
+      <TwoButtonModal
+        visible={!!selId}
+        text={`請確定要刪除「${selIdNumber}」「${selChName}」?`}
+        onConfirm={removeEmployee}
+        onCancel={cancelDelete}
+      />
+
     </div>
   )
 }
@@ -214,7 +242,6 @@ export default function ErpCtrlPermissions() {
 
 新增操作人員應該要可複選，後端未提供相關api
 後端未提供解除操作權限的api
-要問後端怎麼filters要過濾department的話要怎麼做
 
 table裡的TwoButtonModal
 TwoButtonModal的onConfirm要改
