@@ -18,7 +18,7 @@ import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_
 
 // api
 import {
-  useCompanyInfo, TapiCompanyInfo,
+  useCompanyInfo, TcompanyInfoDto,
   apiPatchCompanyInfo,
   apiUploadCompanyLogo
 } from "js/api/api_company-info"
@@ -41,10 +41,10 @@ export default function CompanyInfo() {
     setData: setCompanyInfo,
     update: updateCompanyInfo,
   } = useCompanyInfo()
-  const [infoBackup, setInfoBackup] = useState<TapiCompanyInfo>()
+  const [infoBackup, setInfoBackup] = useState<TcompanyInfoDto>()
   // 更新資料
   const update = async () => {
-    const res = await updateCompanyInfo() as TapiCompanyInfo
+    const res = await updateCompanyInfo()
     if (res) setInfoBackup(_.cloneDeep(res))
   }
 
@@ -60,8 +60,8 @@ export default function CompanyInfo() {
   const [imgSrc, setImgSrc] = useState<string | null | undefined>("")
 
   useEffect(() => {
-    setImgSrc(companyInfo.logoLink)
-  }, [companyInfo.logoLink])
+    setImgSrc(companyInfo?.logoLink)
+  }, [companyInfo?.logoLink])
   // ===================================================
   const [editable, setEditable] = useState(false)
 
@@ -81,14 +81,14 @@ export default function CompanyInfo() {
       label: "上傳",
       onClick: async () => {
         const body = {
-          name: companyInfo.name || "",
-          phone: companyInfo.phone || "",
-          email: companyInfo.email || "",
-          county: companyInfo.county || "",
-          district: companyInfo.district || "",
-          address: companyInfo.address || "",
-          fax: companyInfo.fax || "",
-          taxId: companyInfo.taxId || "",
+          name: companyInfo?.name || "",
+          phone: companyInfo?.phone || "",
+          email: companyInfo?.email || "",
+          county: companyInfo?.county || "",
+          district: companyInfo?.district || "",
+          address: companyInfo?.address || "",
+          fax: companyInfo?.fax || "",
+          taxId: companyInfo?.taxId || "",
         }
         setRootLoading(true)
         try {
@@ -123,34 +123,34 @@ export default function CompanyInfo() {
   ]
   // ===================================================
   // 地址
-  const { county, district, address, logoLink } = companyInfo
+  const { county, district, address, logoLink } = companyInfo ?? {}
 
   // 選擇城市後清除地區
   const clearDistrict = () => {
-    companyInfo.district = null
-    setCompanyInfo({ ...companyInfo })
+    companyInfo!.district = ""
+    setCompanyInfo({ ...companyInfo! })
   }
 
   const searchInputProps = {
     county,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
-      if (companyInfo.county === option.value) return
-      companyInfo.county = option.value
+      if (companyInfo?.county === option.value) return
+      companyInfo!.county = option.value
       clearDistrict()
-      setCompanyInfo({ ...companyInfo })
+      setCompanyInfo({ ...companyInfo! })
     },
     district,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
-      if (companyInfo.district === option.value) return
-      companyInfo.district = option.value
-      setCompanyInfo({ ...companyInfo })
+      if (companyInfo?.district === option.value) return
+      companyInfo!.district = option.value
+      setCompanyInfo({ ...companyInfo! })
     },
     address,
     onChangeAddress: (value: string) => {
-      companyInfo.address = value
-      setCompanyInfo({ ...companyInfo })
+      companyInfo!.address = value
+      setCompanyInfo({ ...companyInfo! })
     },
   }
 
@@ -172,7 +172,7 @@ export default function CompanyInfo() {
   }
   // 清除
   const clearLogo = () => {
-    setImgSrc(companyInfo.logoLink)
+    setImgSrc(companyInfo?.logoLink)
     setImageFile(undefined)
   }
   // ===================================================
@@ -209,10 +209,10 @@ export default function CompanyInfo() {
         <div className={scss.formContainer}>
           {dataIndex.map((key, index) => {
             const { label } = config[key]
-            const stateValue = companyInfo[key] || ""
+            const stateValue = companyInfo?.[key] || ""
             const onChange = (value: string) => {
-              companyInfo[key] = value
-              setCompanyInfo({ ...companyInfo })
+              companyInfo![key] = value
+              setCompanyInfo({ ...companyInfo! })
             }
             // editable
             let styleInput02 = `${scss.input02}`
@@ -251,7 +251,7 @@ export default function CompanyInfo() {
 // ========================================================
 
 
-type TapiCompanyInfoKey = keyof TapiCompanyInfo
+type TapiCompanyInfoKey = keyof TcompanyInfoDto
 type TconfigKeys = Extract<TapiCompanyInfoKey,
   "name" | "phone" | "fax" | "email" | "taxId"
 >
