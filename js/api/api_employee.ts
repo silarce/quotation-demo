@@ -93,8 +93,7 @@ export type TpostEmployee = {
   "jobId": string[]
 }
 
-type Tpopulate =
-  "jobs.department"[]
+type Tpopulate = ("jobs" | "jobs.department")[]
 
 
 
