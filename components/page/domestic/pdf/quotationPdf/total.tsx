@@ -1,6 +1,6 @@
 
 // tool
-import changeNumberMoneyToChinese from "js/api/tools/numToChineseNum"
+import changeNumberMoneyToChinese from "js/tools/numToChineseNum"
 
 // css
 import style from "./quotationPdf.module.scss"
