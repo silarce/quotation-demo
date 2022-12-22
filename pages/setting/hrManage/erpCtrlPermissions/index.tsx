@@ -34,36 +34,43 @@ export default function ErpCtrlPermissions() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isReady, setIsReady] = useState(false)
+  // 只是用來rerender
+  const [rerender, setRerender] = useState(false)
   // ------------------------------------------------------------------------
 
-  // 列表-送進table裡面
-  const [params, setParams] = useState<TapiGetEmployeeParams>({
+
+
+  const params: TapiGetEmployeeParams = {
     order: "ASC",
     page: 1,
     pageSize: 99999999999,
+
+
     filter: {
       user: {
         $notNull: true
       },
-      // 問後端這部分要怎麼設
-      // jobs: {
-      //   $contains: {
-      //     department: {
-      //       id: { $eq: "ce0ad704-148b-4c48-bdb2-5f1458c6a998" }
-      //     }
-      //   }
+
+      // "jobs.department.id": "ce0ad704-148b-4c48-bdb2-5f1458c6a998",
+      "jobs.department.id": router.query.department,
+
+      // 問後端這個條件要怎麼設才能同時符合前面的兩個條件
+      // $or: {
+      //   idNumber: {
+      //     $contains: router.query.other,
+      //   },
+      //   chName: {
+      //     $contains: router.query.other,
+      //   },
       // },
-      $or: {
-        idNumber: {
-          $contains: router.query.searchValue,
-        },
-        chName: {
-          $contains: router.query.searchValue,
-        },
-      },
     },
+
+
     populate: ["jobs.department", "user"]
-  })
+  }
+
+
+  // 列表-送進table裡面
 
   let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
   const employeeList = employeeData01?.data || []
@@ -108,40 +115,37 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      if (isReady) {
-        await updateEmployeeData01()
-      }
-      else {
-        await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
-          .then((valueArr) => valueArr)
-          .catch(err => Promise.reject(err))
-      }
+
+      await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
+        .then((valueArr) => valueArr)
+        .catch(err => Promise.reject(err))
+
       setIsReady(true)
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [])
+
+
+  useEffect(() => {
+    if (!isReady) return
+    updateList()
+  }, [router.query])
+
 
 
   // ------------------------------------------------------------------------
   // 搜尋功能 searchBar
 
-  const onSearch = (valueArr: (string | number | null | undefined)[]) => {
+  const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
 
     const department = valueArr[0]
     const other = valueArr[1]
 
-    router.push(
-      {
-        pathname: "/setting/hrManage/erpCtrlPermissions",
-        query: {
-          department,
-          other
-        }
-      }
-    )
-    // 只是為了rerender，params只會被pathname控制，應該是不用做成狀態
-    setParams(state => ({ ...state }))
+    router.push({
+      pathname: "/setting/hrManage/erpCtrlPermissions",
+      query: { department, other }
+    })
   }
 
   // ------------------------------------------------------------------------
@@ -218,3 +222,16 @@ export default function ErpCtrlPermissions() {
   )
 }
 
+
+/*
+
+新增操作人員應該要可複選，後端未提供相關api
+後端未提供解除操作權限的api
+要問後端怎麼filters要過濾department的話要怎麼做
+
+table裡的TwoButtonModal
+TwoButtonModal的onConfirm要改
+把TwoButtonModal移到index.tsx
+table裡刪除按鈕的函數要提供index，再用這個index取得資料然後呼叫TwoButtonModal
+
+*/
