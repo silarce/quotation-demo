@@ -1,6 +1,7 @@
 import { axi } from "./_axiosCreator";
 
-
+// type
+import { TuserDto } from "./dtoTypes";
 
 
 // 登入
@@ -14,7 +15,7 @@ export const apiLogin =
     const api = "/auth/login"
     return axi.post(api, body)
       .then(({ data }) => {
-        return data
+        return data as TuserDto
       })
       .catch(err => Promise.reject(err))
   }
@@ -31,7 +32,7 @@ export const apiLogout = () => {
 export const apiAuthMe = () => {
   const api = "/auth/me"
   return axi.get(api)
-    .then(({ data }) => data)
+    .then(({ data }) => data as TuserDto)
     .catch(err => Promise.reject(err))
 }
 
