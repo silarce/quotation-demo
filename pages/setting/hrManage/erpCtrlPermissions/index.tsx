@@ -38,34 +38,21 @@ export default function ErpCtrlPermissions() {
   const [rerender, setRerender] = useState(false)
   // ------------------------------------------------------------------------
 
-
-
   const params: TapiGetEmployeeParams = {
     order: "ASC",
     page: 1,
     pageSize: 99999999999,
-
-
     filter: {
       user: {
         $notNull: true
       },
+      // 收到空字串會壞掉
+      "jobs.department.id": router.query.department||undefined,
+      chName: {
+        $contains: router.query.chName,
+      },
 
-      // "jobs.department.id": "ce0ad704-148b-4c48-bdb2-5f1458c6a998",
-      "jobs.department.id": router.query.department,
-
-      // 問後端這個條件要怎麼設才能同時符合前面的兩個條件
-      // $or: {
-      //   idNumber: {
-      //     $contains: router.query.other,
-      //   },
-      //   chName: {
-      //     $contains: router.query.other,
-      //   },
-      // },
     },
-
-
     populate: ["jobs.department", "user"]
   }
 
@@ -140,11 +127,11 @@ export default function ErpCtrlPermissions() {
   const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
 
     const department = valueArr[0]
-    const other = valueArr[1]
+    const chName = valueArr[1]
 
     router.push({
       pathname: "/setting/hrManage/erpCtrlPermissions",
-      query: { department, other }
+      query: { department, chName }
     })
   }
 

@@ -80,7 +80,7 @@ export default function Table(
   const inputPropsArr = [
     {
       props: {
-        placeholder: "請輸入搜尋內容",
+        placeholder: "搜尋中文姓名",
       }
     },
   ]
