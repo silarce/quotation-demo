@@ -1,0 +1,10 @@
+@use "styles/theme01" as *;
+@use "styles/layout" as *;
+
+.mainContainer {
+  > div {
+    padding: 38px 45px;
+    display: grid;
+    gap: 21px;
+  }
+}

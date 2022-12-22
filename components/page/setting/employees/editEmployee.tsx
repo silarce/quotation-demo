@@ -18,8 +18,7 @@ import { TpostEmployee, } from "js/api/api_employee";
 import type { TjobsData } from "js/api/api_department";
 
 // css
-import style from "./editEmployee.module.scss"
-// =====================================================
+import scss from "./editEmployee.module.scss"
 
 
 // =====================================================
@@ -40,14 +39,15 @@ export default function EditEmployee({ data, setData, check }: {
   if (!router.isReady) return null
   // ==================================================
   return (
-    <div className={style.editEmployee}>
+    <div className={scss.editEmployee}>
 
-      <div className={style.employeeId}>
+      <div className={scss.employeeId}>
         <InputSel
           label="使用者代號"
           placeholder="請輸入使用者代號"
-          className={style.input02}
+          className={scss.input02}
           disabled={idNumberIsDisabled}
+          showBaseline="auto"
           inputProps={{
             value: data.idNumber,
             onChange: (value: string) => {
@@ -56,13 +56,13 @@ export default function EditEmployee({ data, setData, check }: {
           }}
         />
         {check &&
-          <span className={style.checkTip}>
-            {check === "ok" ? <IconCheck01 className={style.check} cursor="auto" />
-              : check === "notOk" ? <IconCross01 className={style.cross} cursor="auto" />
+          <span className={scss.checkTip}>
+            {check === "ok" ? <IconCheck01 className={scss.check} cursor="auto" />
+              : check === "notOk" ? <IconCross01 className={scss.cross} cursor="auto" />
                 : <CircularProgress size={30} />
             }
             {check === "notOk" &&
-              <span className={style.alertTip}>
+              <span className={scss.alertTip}>
                 {data.idNumber ? "此代號已有人使用" : "請輸入使用者代號"}
               </span>
             }

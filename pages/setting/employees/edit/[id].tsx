@@ -13,7 +13,7 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 // css
-import style from "../../employees.module.scss"
+import style from "../employees.module.scss"
 
 // api
 import {

@@ -107,8 +107,11 @@ export default function List(
                         onFocus={() => { changeFocus(true) }}
                         onBlur={() => { changeFocus(false) }}
                       />
-                      <TheIcon className={style.iconCross01}
-                        onClick={editable && !dIsMarkedDel ? jMarkDel : undefined} />
+                      {editable &&
+                        <TheIcon className={style.iconCross01}
+                          onClick={editable && !dIsMarkedDel ? jMarkDel : undefined} />
+                      }
+
                     </label>
                     <div className={style.focusBg} />
                   </div>

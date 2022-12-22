@@ -19,7 +19,7 @@ import {
 import { Toption } from "fakeDatabase/options/options";
 import type { TprePostEmployee } from "../editEmployee";
 // css
-import style from "../editEmployee.module.scss"
+import scss from "../editEmployee.module.scss"
 
 
 // ============================================================
@@ -77,16 +77,16 @@ export default function EditEmployeeItem02({ data, setData }: {
   }
 
   return (
-    <div className={style.editEmployeeItem02}>
-      <p className={style.subTitle}>公司資訊</p>
-      <div className={style.form02}>
+    <div className={scss.editEmployeeItem02}>
+      <p className={scss.subTitle}>公司資訊</p>
+      <div className={scss.form02}>
         <>
-          <div className={style.selBox}>
+          <div className={scss.selBox}>
             {jobsKeyindex01.map((key, index) => {
               const { stateValue, label, options, onChange }
                 = jobsConfig01[key]
               return (
-                <InputSel key={index}
+                <InputSel className={scss.inputSel} key={index}
                   label={label}
                   presetStyle="s01"
                   selectProps={{
@@ -98,7 +98,7 @@ export default function EditEmployeeItem02({ data, setData }: {
               )
             })}
             <InputSel
-              className={style.input02}
+              className={scss.input02}
               label="職等"
               presetStyle="s01"
               disabled={true}
@@ -114,13 +114,13 @@ export default function EditEmployeeItem02({ data, setData }: {
             }
           </div>
           {isDepart02 &&
-            <div className={style.selBox}>
+            <div className={scss.selBox}>
               {jobsKeyindex01.map((key, index) => {
                 const { stateValue, label, options, onChange }
                   = jobsConfig02[key]
 
                 return (
-                  <InputSel key={index}
+                  <InputSel className={scss.inputSel} key={index}
                     label={label}
                     presetStyle="s01"
                     selectProps={{
@@ -132,7 +132,7 @@ export default function EditEmployeeItem02({ data, setData }: {
                 )
               })}
               <InputSel
-                className={style.input02}
+                className={scss.inputSel}
                 label="職等"
                 presetStyle="s01"
                 disabled={true}
@@ -148,9 +148,9 @@ export default function EditEmployeeItem02({ data, setData }: {
             </div>}
         </>
 
-        <div className={style.bottomContainer}>
+        <div className={scss.bottomContainer}>
           <div>
-            <InputSel
+            <InputSel className={scss.inputSel}
               label="年資"
               captionWidth="60px"
               presetStyle="s01"
@@ -177,7 +177,7 @@ export default function EditEmployeeItem02({ data, setData }: {
                 })
               }
               return (
-                <InputSel
+                <InputSel className={scss.inputSel}
                   key={index}
                   label={label}
                   captionWidth="60px"

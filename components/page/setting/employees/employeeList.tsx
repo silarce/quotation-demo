@@ -18,7 +18,7 @@ import { apiDeleteEmployee } from "js/api/api_employee";
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 // css
-import style from "./employeeList.module.scss"
+import scss from "./employeeList.module.scss"
 // type
 import { Temployee } from "js/api/api_employee"
 
@@ -68,13 +68,13 @@ export default function EmployeeList({ employeeList, toUpdate }: {
   }
 
   return (
-    <div className={style.employeeList}>
-      <div className={style.thead}>
-        {tableIndex.map((key, index) => {
+    <div className={scss.employeeList}>
+      <div className={scss.thead}>
+        {tableKeyIndex.map((key, index) => {
           const { label, width, flex } = tableConfig[key]
           const theStyle = { width, flex }
           return (
-            <div className={style.column} key={index}
+            <div className={scss.column} key={index}
               style={theStyle}>
               <span>{label}</span>
             </div>
@@ -82,45 +82,50 @@ export default function EmployeeList({ employeeList, toUpdate }: {
         })}
       </div>
 
-      <div className={style.tbody}>
+      <div className={scss.tbody}>
         {employeeList.map((row, index) => {
           const id = row.id
           return (
             <CellWithBar key={index}>
               <Link href={`/setting/employees/edit/${id}`}>
-                <div className={style.row} >
-                  {tableIndex.map((key, index) => {
+                <div className={scss.row} >
+                  {tableKeyIndex.map((key, index) => {
                     const data = row[key]
                     const { width, flex } = tableConfig[key]
                     const theStyle = { width, flex }
 
+                    if (key === "jobs" && Array.isArray(data)) {
+
+
+                      return (
+                        <div className={`${scss.column} ${scss.departmentInfo}`} key={index}
+                          style={theStyle}
+                        >
+                          {data.map((item, index) => {
+                            const { grade, name } = item
+                            const department = item.department
+                            const { name: departmentName } = department
+                            return (
+                              <div key={index}>
+                                {`字母 / ${departmentName} / ${name} / Level${grade}`}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    }
+
                     if (typeof data === "string")
                       return (
-                        <div className={style.column} key={index}
+                        <div className={scss.column} key={index}
                           style={theStyle}
                         >
-                          <span>{data}</span>
-                        </div>
-                      )
-                    if (Array.isArray(data))
-                      return (
-                        <div className={style.column} key={index}
-                          style={theStyle}
-                        >
-                          <span>{"人員的部門資料後端還沒做好"}</span>
-                        </div>
-                      )
-                    if (!data)
-                      return (
-                        <div className={style.column} key={index}
-                          style={theStyle}
-                        >
-                          <span>{"還無法取得資料"}</span>
+                          <span>{data ?? "無資料"}</span>
                         </div>
                       )
                   })}
 
-                  <div className={`${style.column} ${style.btnCell}`}>
+                  <div className={`${scss.column} ${scss.btnCell}`}>
                     <IconDelete01 onClick={(e) => { openDelPanel(e, row) }} />
                   </div>
                 </div>
@@ -142,16 +147,16 @@ export default function EmployeeList({ employeeList, toUpdate }: {
 
 // ============================================================
 
-type TtableIndexKeys = keyof Pick<Temployee,
+type TtableKeysIndex = keyof Pick<Temployee,
   "idNumber" | "chName" | "phone1" | "jobs">
 
-const tableIndex: TtableIndexKeys[] = [
+const tableKeyIndex: TtableKeysIndex[] = [
   "idNumber", "chName", "phone1", "jobs"
 ]
 
 const tableConfig
   : {
-    [key in TtableIndexKeys]: {
+    [key in TtableKeysIndex]: {
       label: string
       width: string
       flex?: string
