@@ -27,6 +27,15 @@ jobs:{
   }
 }
 
+符合A或B
+$or: {
+  idNumber: {
+    $contains: router.query.other,
+  },
+  chName: {
+    $contains: router.query.other,
+  },
+},
 
 
 
