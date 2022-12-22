@@ -93,8 +93,10 @@ export default function SearchBar02(
           setSelValueArr(state => [...state]) // 基本上會用到
         }
 
-        const propsCopy = _.cloneDeep(props)
+        const propsCopy = _.cloneDeep(props) as typeof props
         propsCopy.onChange = theOnChange
+
+        propsCopy.options.unshift({ label: "無", value: "" })
 
         return (
           <div key={index} className={scss.selectWrapper} style={boxStyle}>
