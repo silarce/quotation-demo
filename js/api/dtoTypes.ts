@@ -41,6 +41,17 @@ export type TcompanyInfoDto = {
   logoLink: string
 }
 
+// api文件沒有清楚contact的型別
+export type Tcontact = {
+  "id": string,
+  "createdAt": string //"2022-10-17T05:35:08.115Z",
+  "updatedAt": string //"2022-10-17T05:35:08.115Z",
+  "createdBy": string
+  "updatedBy": string
+  "deletedBy": string | null
+  "name": string
+  "phone": string
+}
 
 export type TcustomerDto = {
   id: string
@@ -61,7 +72,7 @@ export type TcustomerDto = {
   invoiceCounty: string | null
   invoiceDistrict: string | null
   invoiceAddress: string | null
-  contacts: {} | null
+  contacts: Tcontact[] | null
 }
 
 export type TemployeeDto = {

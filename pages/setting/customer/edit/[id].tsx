@@ -16,7 +16,7 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 
 // api
 import {
-  TapiGetCustomersParams, TcustomersData, TpostCustomer,
+  TapiGetCustomersParams, TcustomerDto, TpostCustomer,
   useCustomersById, apiPatchCustomers_id
 } from "js/api/api_customer";
 
@@ -103,8 +103,8 @@ export default function Edit() {
       <div className={style.mainContainer}>
         {isReady &&
           <EditCustomer
-            data={data as TcustomersData}
-            setData={setData as Dispatch<SetStateAction<TcustomersData>>} />
+            data={data as TpostCustomer}
+            setData={setData as Dispatch<SetStateAction<TpostCustomer>>} />
         }
       </div>
     </div>

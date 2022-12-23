@@ -19,7 +19,7 @@ import {
 import style from "../customer.module.scss"
 
 // type
-import { TcustomersData, TcontactData } from "js/api/api_customer";
+import { TcustomerDto, Tcontacts } from "js/api/api_customer";
 
 
 
@@ -33,16 +33,16 @@ import { TcustomersData, TcontactData } from "js/api/api_customer";
 export default function PanelHeader(
   { customersData, isActive, openDelPanel }:
     {
-      customersData: TcustomersData
+      customersData: TcustomerDto
       isActive: boolean
-      openDelPanel: (e: MouseEvent, data: TcustomersData) => void
+      openDelPanel: (e: MouseEvent, data: TcustomerDto) => void
     }) {
   // ====================================================
   const router = useRouter()
 
   // ====================================================
   const contact01
-    = customersData.contacts?.[0] ?? {} as Partial<TcontactData>
+    = customersData.contacts?.[0] ?? {} as Partial<Tcontacts>
   // ====================================================
 
   const toEdit = (e: MouseEvent) => {
@@ -105,11 +105,11 @@ export default function PanelHeader(
 
 
 
-// TcustomersData
+// TcustomerDto
 type TindexKeys01
-  = keyof Pick<TcustomersData, "customerNumber" | "category" | "name">
+  = keyof Pick<TcustomerDto, "customerNumber" | "category" | "name">
 type TindexKeys02
-  = keyof Pick<TcustomersData, "phone" | "fax">
+  = keyof Pick<TcustomerDto, "phone" | "fax">
 
 const indexKeys01: TindexKeys01[]
   = ["customerNumber", "category", "name"]

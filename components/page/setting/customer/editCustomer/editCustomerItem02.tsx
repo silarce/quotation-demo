@@ -12,17 +12,22 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import style from "../customer.module.scss"
 
 // type
-import { TcustomersData } from "js/api/api_customer";
+import { TcustomerDto, TpostCustomer } from "js/api/api_customer";
 
 // ======================================================
 export default function EditCustomerItem02({ data, setData }: {
-  data: TcustomersData
+  data: TpostCustomer
   setData:
-  Dispatch<SetStateAction<TcustomersData>>
+  Dispatch<SetStateAction<TpostCustomer>>
 }) {
 
-  const contacts = data.contacts ?? []
-  if (!contacts[0]) contacts.push({})
+
+
+  const contacts: TpostCustomer["contacts"] = (data.contacts ?? [])
+  if (!contacts[0]) contacts.push({
+    name: "",
+    phone: ""
+  })
 
   return (
     <div className={style.editCustomerItem02}>

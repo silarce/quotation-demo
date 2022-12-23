@@ -18,7 +18,7 @@ import style from "../customer.module.scss"
 
 // api
 import {
-  TapiGetCustomersParams, TcustomersData, TpostCustomer,
+  TapiGetCustomersParams, TcustomerDto, TpostCustomer,
   apiPostCustomers, useCheckCustomers
 } from "js/api/api_customer";
 // ====================================================
@@ -94,8 +94,8 @@ export default function Add() {
       <div className={style.mainContainer}>
 
         <EditCustomer
-          data={data as TcustomersData}
-          setData={setData as Dispatch<SetStateAction<TcustomersData>>}
+          data={data }
+          setData={setData}
           check={check}
         />
 
