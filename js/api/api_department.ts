@@ -163,11 +163,12 @@ export const useDepartments_managers = () => {
   return { data, setData, update }
 }
 
+
 type TpostDepartments_id_managersBody = {
   employeeIds: string[]
 }
-
-const apiPostDepartments_id_managers
+// 伺服器回應500錯誤
+export const apiPostDepartments_id_managers
   = (departmentId: string, body: TpostDepartments_id_managersBody) => {
     const api = `/departments/${departmentId}/managers`
     return axi.post(api, body)
@@ -175,7 +176,13 @@ const apiPostDepartments_id_managers
       .catch(err => Promise.reject(err))
   }
 
-
+export const apiDeleteDepartments_id_managers
+  = (departmentId: string, body: TpostDepartments_id_managersBody) => {
+    const api = `/departments/${departmentId}/managers`
+    return axi.delete(api, { data: { ...body } })
+      .then(({ data }) => data as TdepartmentManagerDto[])
+      .catch(err => Promise.reject(err))
+  }
 
 // =====================================================
 // =====================================================
