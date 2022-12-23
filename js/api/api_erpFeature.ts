@@ -29,9 +29,16 @@ type TpostErpFeaturesBody = {
 }
 
 ////////////////////////////////////////// 這個id是什麼的id
-export const apiPostErpFeatures_departments = (id: string, body: TpostErpFeaturesBody) => {
+export const apiPostErpFeatures_id_departments = (id: string, body: TpostErpFeaturesBody) => {
   const api = `/erp-features/${id}/departments`
   return axi.post(api, body)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
+
+export const apiDeleteErpFeatures_id_departments = (id: string, body: TpostErpFeaturesBody) => {
+  const api = `/erp-features/${id}/departments`
+  return axi.delete(api, { data: { ...body } })
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
