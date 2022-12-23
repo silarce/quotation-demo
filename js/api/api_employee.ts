@@ -74,7 +74,7 @@ const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
 }
 
 export const useEmployee = (params?: TapiGetEmployeeParams) => {
-  let [data, setData] = useState<Partial<TgetEmployee>>({})
+  let [data, setData] = useState<TgetEmployee>()
   const update = async () => {
     const data = await apiGetEmployee(params)
     if (data) setData(data)
@@ -138,7 +138,7 @@ const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
 }
 
 export const useEmployeeById = (id: string, params?: TapiGetEmployee_idParams) => {
-  const [data, setData] = useState<Partial<TemployeeDto>>({})
+  const [data, setData] = useState<TemployeeDto>()
 
   const update = async () => {
     const res = await apiGetEmployee_id(id, params)
