@@ -65,7 +65,7 @@ export default function Edit() {
       label: "上傳",
       onClick: async () => {
         try {
-          if (!data.id) return
+          if (!data?.id) return
           setRootLoading(true)
           // 如果第一層的id存在，會在api那邊把id刪掉
           await apiPatchCustomers_id(data.id, data as TpostCustomer)

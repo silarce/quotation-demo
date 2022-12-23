@@ -73,7 +73,7 @@ const apiGetCustomers = (params?: TapiGetCustomersParams) => {
 }
 
 export const useCustomers = (params?: TapiGetCustomersParams) => {
-  let [data, setData] = useState<Partial<TgetCustomers>>({})
+  let [data, setData] = useState<TgetCustomers>()
   const update = async () => {
     const data = await apiGetCustomers(params)
     if (data) setData(data)
@@ -135,7 +135,7 @@ const apiGetCustomers_id
 
 export const useCustomersById
   = (id: string, params?: TapiGetCustomersParams) => {
-    let [data, setData] = useState<Partial<TpostCustomer>>({})
+    let [data, setData] = useState<TpostCustomer>()
     const update = async () => {
       const data = await apiGetCustomers_id(id, params)
       if (data) setData(data)

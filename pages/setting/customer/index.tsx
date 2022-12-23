@@ -64,7 +64,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
   })
 
   const { data, update } = useCustomers(params)
-  const meta = data.meta
+  const meta = data?.meta
   // -----------------------------------------------------
   const setPage = (page: number) => {
     setParams(params => {
