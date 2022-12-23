@@ -17,7 +17,7 @@ import style from "../employees.module.scss"
 
 // api
 import {
-  TpostEmployee, Temployee,
+  TpostEmployee, TemployeeDto,
   apiPostEmployee,
 } from "js/api/api_employee";
 import type { TjobDto } from "js/api/api_department";
@@ -65,7 +65,7 @@ export default function AddEmployee() {
           let postData = _.cloneDeep(data)
           postData.jobId = postData.jobs.map((jobs: TjobDto) => jobs.id)
           postData = postData as TpostEmployee
-          const res = await apiPostEmployee(postData) as Temployee
+          const res = await apiPostEmployee(postData) as TemployeeDto
           router.push({
             pathname: `/setting/employees/edit/${res.id}`,
             query: {

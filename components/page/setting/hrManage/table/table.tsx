@@ -15,7 +15,7 @@ import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from "./table.module.scss"
 // type
-import { Temployee } from "js/api/api_employee"
+import { TemployeeDto } from "js/api/api_employee"
 import { Toption } from "fakeDatabase/options/options";
 
 
@@ -28,7 +28,7 @@ export default function Table(
     onDelete
   }:
     {
-      employeeList: Temployee[]
+      employeeList: TemployeeDto[]
       searchOption: Toption[]
       openAddPanel: () => void
       onSearch: (valueArr: (string | number | null | undefined)[]) => void
@@ -142,7 +142,7 @@ export default function Table(
 
 // ============================================================
 
-type TtableKeysIndex = keyof Pick<Temployee,
+type TtableKeysIndex = keyof Pick<TemployeeDto,
   "idNumber" | "chName" | "phone1" | "jobs">
 
 const tableKeyIndex: TtableKeysIndex[] = [
