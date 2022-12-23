@@ -4,7 +4,7 @@ import { axi } from "./_axiosCreator";
 
 
 // type
-import { TdepartmentDto, TjobDto, TpageMetaDto, } from "./dtoTypes";
+import { TpageMetaDto, TdepartmentDto, TjobDto, TdepartmentManagerDto } from "./dtoTypes";
 import { Toption } from "fakeDatabase/options/options";
 
 export type { TdepartmentDto, TjobDto }
@@ -138,6 +138,43 @@ export const apiDeleteJobs = (id: string) => {
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
+
+
+// =====================================================
+// =====================================================
+// =====================================================
+
+// departments/managers
+
+const apiGetDepartments_managers = () => {
+  const api = "/departments/managers"
+  return axi.get(api)
+    .then(({ data }) => data as TdepartmentManagerDto[])
+    .catch(err => Promise.reject(err))
+}
+
+export const useDepartments_managers = () => {
+  let [data, setData] = useState<TdepartmentManagerDto[]>()
+  const update = async () => {
+    const data = await apiGetDepartments_managers()
+    if (data) setData(data)
+    return data
+  }
+  return { data, setData, update }
+}
+
+type TpostDepartments_id_managersBody = {
+  employeeIds: string[]
+}
+
+const apiPostDepartments_id_managers
+  = (departmentId: string, body: TpostDepartments_id_managersBody) => {
+    const api = `/departments/${departmentId}/managers`
+    return axi.post(api, body)
+      .then(({ data }) => data as TdepartmentManagerDto[])
+      .catch(err => Promise.reject(err))
+  }
+
 
 
 // =====================================================
