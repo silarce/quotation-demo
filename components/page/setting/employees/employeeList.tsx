@@ -104,7 +104,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
                           {data.map((item, index) => {
                             const { grade, name } = item
                             const department = item.department
-                            const { name: departmentName } = department
+                            const { name: departmentName } = department ?? {}
                             return (
                               <div key={index}>
                                 {`字母 / ${departmentName} / ${name} / Level${grade}`}

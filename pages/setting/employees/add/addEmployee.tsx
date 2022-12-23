@@ -20,7 +20,7 @@ import {
   TpostEmployee, Temployee,
   apiPostEmployee,
 } from "js/api/api_employee";
-import type { TjobsData } from "js/api/api_department";
+import type { TjobDto } from "js/api/api_department";
 import { useCheckEmployee } from "js/api/api_employee";
 
 // type
@@ -63,7 +63,7 @@ export default function AddEmployee() {
         try {
           setRootLoading(true)
           let postData = _.cloneDeep(data)
-          postData.jobId = postData.jobs.map((jobs: TjobsData) => jobs.id)
+          postData.jobId = postData.jobs.map((jobs: TjobDto) => jobs.id)
           postData = postData as TpostEmployee
           const res = await apiPostEmployee(postData) as Temployee
           router.push({

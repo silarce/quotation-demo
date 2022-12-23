@@ -6,7 +6,7 @@ import {
 import { axi } from "./_axiosCreator";
 
 // type
-import { TjobsData } from "./api_department"
+import { TjobDto } from "./api_department"
 
 
 // =============================================
@@ -47,7 +47,7 @@ export type Temployee = {
   "retireDate": string,
   "severanceDate": string,
   "processPermission": true,
-  "jobs"?: TjobsData[]
+  "jobs"?: TjobDto[]
   "user"?: Tuser
 }
 

@@ -10,7 +10,7 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 
 // api
 import {
-  Tparams, TuseJobsOptions, TjobsData,
+  Tparams, TuseJobsOptions, TjobDto,
   useDepartments, useJobsOptions
 } from "js/api/api_department";
 
@@ -53,7 +53,7 @@ export default function EditEmployeeItem02({ data, setData }: {
   }, [])
 
   useEffect(() => {
-    const jobs: TjobsData[] = []
+    const jobs: TjobDto[] = []
     jobsOptions01.jobs && jobs.push(jobsOptions01.jobs)
     jobsOptions02.jobs && jobs.push(jobsOptions02.jobs)
     setData(data => ({

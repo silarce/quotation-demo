@@ -111,7 +111,7 @@ export type TdepartmentDto = {
   createdAt: string
   updatedAt: string
   name: string
-  jobs?: TjobDto
+  jobs?: TjobDto[] //api文件似乎有誤，這邊應該是陣列
 }
 
 export type TdepartmentManagerDto = {

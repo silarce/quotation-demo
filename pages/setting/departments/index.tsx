@@ -22,7 +22,7 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 
 // api
 import {
-  TdepartmentData, TjobsData, TgetDepartments,
+  TdepartmentDto, TjobDto, TgetDepartments,
   useDepartments,  // 取得部門列表
   apiPostDepartments, // 新增部門
   apiPatchDepartments, // 更新部門名稱
@@ -147,7 +147,7 @@ export default function Department() {
 // ========================================================
 
 
-type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
+type TmyDepartmentData = Partial<Omit<TdepartmentDto, "jobs">> & {
   jobs: TmyJobs[]
   dMethod?: "post" | "patch"
   isNew?: boolean
@@ -158,7 +158,7 @@ type TmyDepartmentData = Partial<Omit<TdepartmentData, "jobs">> & {
   changeFocus: (isFocus: boolean) => void
 }
 
-type TmyJobs = Partial<Omit<TjobsData, "department">> & {
+type TmyJobs = Partial<Omit<TjobDto, "department">> & {
   departmentId?: string | null
   id?: string
   grade?: number

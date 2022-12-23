@@ -4,7 +4,11 @@ import { axi } from "./_axiosCreator";
 
 
 // type
+import { TdepartmentDto, TjobDto, TpageMetaDto, } from "./dtoTypes";
 import { Toption } from "fakeDatabase/options/options";
+
+export type { TdepartmentDto, TjobDto }
+
 
 export type Tparams = {
   order?: "ASC" | "DESC",
@@ -16,30 +20,12 @@ export type Tparams = {
   populate?: string[]
 }
 
-export type Tmeta = {
-  "page": number,
-  "pageSize": number,
-  "itemCount": number,
-  "pageCount": number,
-  "hasPreviousPage": boolean,
-  "hasNextPage": boolean
-}
-
-
 // ==========================================================
 // ==========================================================
-// departments type
-export type TdepartmentData = {
-  "id": string,
-  "createdAt": string, //"2022-10-17T13:53:13.657Z"
-  "updatedAt": string, //"2022-10-17T13:53:13.657Z"
-  "name": string,
-  "jobs": TjobsData[]
-}
 
 export type TgetDepartments = {
-  data: TdepartmentData[]
-  meta: Tmeta
+  data: TdepartmentDto[]
+  meta: TpageMetaDto
 }
 
 
@@ -70,19 +56,6 @@ export const apiPostDepartments = (body: { name: string }) => {
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
-/*
-apiPostDepartments res長這樣
-{
-  "name": "測試01",
-  "createdBy": "60042df0-0499-4362-9293-f64ac4878332",
-  "updatedBy": "60042df0-0499-4362-9293-f64ac4878332",
-  "deletedBy": null,
-  "deletedAt": null,
-  "id": "a3bc8a39-da2b-494d-89dc-50208abeb222",
-  "createdAt": "2022-10-30T06:41:37.216Z",
-  "updatedAt": "2022-10-30T06:41:37.216Z"
-}
- */
 
 
 // 更新部門，目前只能變更name
@@ -107,25 +80,9 @@ export const apiDeleteDepartments = (id: string) => {
 // jobs type
 
 
-export type TjobsData =
-  {
-    "id": string,
-    "createdAt": string, // "2022-10-17T13:39:50.061Z"
-    "updatedAt": string, // "2022-10-17T13:39:50.061Z"
-    "name": string,
-    "grade": number,
-    "department": {
-      "id": string,
-      "createdAt": string, // "2022-10-17T13:39:50.061Z"
-      "updatedAt": string, // "2022-10-17T13:39:50.061Z"
-      "name": string,
-      // "jobs"?: string[]
-    },
-  }
-
 type TgetJobs = {
-  data: TjobsData[]
-  meta: Tmeta
+  data: TjobDto[]
+  meta: TpageMetaDto
 }
 
 
@@ -161,31 +118,6 @@ export const apiPostJobs = (body: {
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
-/*
- apiPostJobs res長這樣
-{
-  "name": "J測試01",
-  "grade": 1,
-  "department": {
-    "id": "a3bc8a39-da2b-494d-89dc-50208abeb222",
-    "createdAt": "2022-10-30T06:41:37.216Z",
-    "updatedAt": "2022-10-30T06:41:37.216Z",
-    "createdBy": "60042df0-0499-4362-9293-f64ac4878332",
-    "updatedBy": "60042df0-0499-4362-9293-f64ac4878332",
-    "deletedBy": null,
-    "name": "測試01",
-    "deletedAt": null
-  },
-  "createdBy": "60042df0-0499-4362-9293-f64ac4878332",
-  "updatedBy": "60042df0-0499-4362-9293-f64ac4878332",
-  "deletedBy": null,
-  "deletedAt": null,
-  "id": "f7709e5c-d6fa-425c-ace5-aecb3ffc8adc",
-  "createdAt": "2022-10-30T06:52:17.062Z",
-  "updatedAt": "2022-10-30T06:52:17.062Z"
-}
-*/
-
 
 
 // 更新職等
@@ -223,12 +155,12 @@ export const apiDeleteJobs = (id: string) => {
 //        與/setting/employees/add/addEmployee
 export const useJobsOptions = (
   departmentsData: Partial<TgetDepartments>,
-  defaultJobs?: TjobsData
+  defaultJobs?: TjobDto
 ) => {
 
   // 這裡先設定jobsData，要post前再把jobId取出然後post
   const [jobs, setJobs]
-    = useState<TjobsData | undefined>(defaultJobs)
+    = useState<TjobDto | undefined>(defaultJobs)
 
   const [department, setDepartment] =
     useState<Toption | null>(null) //部門
@@ -280,8 +212,8 @@ export const useJobsOptions = (
 
     if (!jobs) return
     setDepartment({
-      value: jobs.department.id,
-      label: jobs.department.name
+      value: jobs.department!.id,
+      label: jobs.department!.name
     })
     setJobName({
       value: jobs.id,
@@ -303,7 +235,7 @@ export const useJobsOptions = (
   // --------------------------------
   function optionsDepartmentsOri() {
     const optionsDepartmentsObj
-      = {} as { [key: string]: TdepartmentData }
+      = {} as { [key: string]: TdepartmentDto }
     const optionsDepartments
       = [] as Toption[]
 
@@ -323,7 +255,7 @@ export const useJobsOptions = (
 
   function optionsJobsOri() {
     const optionsJobsObj =
-      {} as { [key: string]: TjobsData }
+      {} as { [key: string]: TjobDto }
     const optionsJobs =
       [] as Toption[]
     if (department) {
@@ -343,6 +275,7 @@ export const useJobsOptions = (
     }
   }
 }
+
 
 export type TuseJobsOptions = ReturnType<typeof useJobsOptions>
 
