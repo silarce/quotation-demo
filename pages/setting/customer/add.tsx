@@ -14,7 +14,7 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 
 // css
-import style from "../customer.module.scss"
+import style from "./customer.module.scss"
 
 // api
 import {

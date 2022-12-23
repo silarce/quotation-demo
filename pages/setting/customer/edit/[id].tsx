@@ -21,7 +21,7 @@ import {
 } from "js/api/api_customer";
 
 // css
-import style from "../../customer.module.scss"
+import style from "../customer.module.scss"
 
 const params: TapiGetCustomersParams = {
   populate: ["contacts"]
