@@ -29,6 +29,12 @@ const defaultParams = (): Tparams => ({
   pageSize: 999,
   populate: ["jobs"]
 })
+
+
+
+
+
+
 // ============================================================
 export default function EditEmployeeItem02({ data, setData }: {
   data: TprePostEmployee
@@ -43,9 +49,9 @@ export default function EditEmployeeItem02({ data, setData }: {
   // ======================================================
   // 部門選擇所需的狀態與options
   const jobsOptions01
-    = useJobsOptions(departmentsData, data?.jobs?.[0])
+    = useJobsOptions(departmentsData??{}, data?.jobs?.[0])
   const jobsOptions02
-    = useJobsOptions(departmentsData, data?.jobs?.[1])
+    = useJobsOptions(departmentsData??{}, data?.jobs?.[1])
 
   useEffect(() => {
     updateDepartmentsData()

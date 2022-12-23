@@ -40,7 +40,7 @@ const apiGetDepartments = (params: Tparams) => {
 }
 
 export const useDepartments = (params: Tparams = {}) => {
-  let [data, setData] = useState<Partial<TgetDepartments>>({})
+  let [data, setData] = useState<TgetDepartments>()
   const update = async () => {
     const data = await apiGetDepartments(params)
     if (data) setData(data)
@@ -98,7 +98,7 @@ const apiGetJobs = (params: Tparams) => {
 }
 
 export const useJobs = (params: Tparams) => {
-  let [data, setData] = useState<Partial<TgetJobs>>({})
+  let [data, setData] = useState<TgetJobs>()
   const update = async () => {
     const data = await apiGetJobs(params)
     if (data) setData(data)

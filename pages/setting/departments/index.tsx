@@ -50,7 +50,7 @@ export default function Department() {
   // ---------------------------------------------------------
   // 取得部門列表
   const { data, setData, update } = useDepartments(params)
-  const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data)
+  const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data??{})
 
 
   const toUpdate = async () => {
@@ -109,7 +109,7 @@ export default function Department() {
         panelList={editable ? panelList02 : panelList01}
       />
       <div className={style.mainContainer}>
-        {data.data &&
+        {data?.data &&
           <div className={style.department}>
             <Caption />
             <List

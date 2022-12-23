@@ -86,9 +86,9 @@ export default function ErpCtrlPermissions() {
   const { data: departmentsData, update: updateDepartments } = useDepartments()
   // 用在搜尋bar的option
   const options_departments = useMemo(() => {
-    if (!departmentsData.data) return []
+    if (!departmentsData?.data) return []
 
-    return departmentsData.data.map((item) => {
+    return departmentsData?.data.map((item) => {
       const { id, name } = item
       return {
         value: id,
