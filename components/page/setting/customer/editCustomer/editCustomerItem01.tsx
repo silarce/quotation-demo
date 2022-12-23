@@ -118,7 +118,7 @@ export default function EditCustomerItem01({ data, setData }: {
             label={"客戶全稱"}
             presetStyle="s01"
             captionWidth="100px"
-            inputProps={{
+            textareaProps={{
               value: data["name"],
               onChange: createOnChange("name"),
             }}
