@@ -113,7 +113,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
 
-  const panel_quotation: TpanelList = [
+
+  const panel_quotation01: TpanelList = [
     {
       type: "myButton",
       label: "追加追減報價單",
@@ -129,13 +130,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
     {
-      type: allowEdit ? "redButton" : "myButton",
-      label: allowEdit ? "結束編輯" : `編輯`,
-      onClick: () => setAllowEdit(state => !state),
-      className: style.editButton
+      type: "myButton",
+      label: `編輯`,
+      onClick: () => setAllowEdit(state => true),
     },
     { type: "myButton", label: "返回", onClick: () => router.back() },
   ]
+
+
+  const panel_quotation02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => alert("上傳")
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => setAllowEdit(() => false)
+    },
+  ]
+
+
+
+
   // =========================================================
   // =========================================================
   // =========================================================
@@ -147,7 +165,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   return (
     <div className={style.container}>
-      <PageHeader02 tagList={tagList} panelList={panel_quotation} />
+      <PageHeader02 tagList={tagList}
+        panelList={allowEdit ? panel_quotation02 : panel_quotation01}
+      />
       {/*  */}
       <div className={style.mainContainer}>
         <div className={style.quotation}>
