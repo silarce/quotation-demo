@@ -37,11 +37,34 @@ export default function ProductList() {
     else checkedProdClass.splice(valueIndex, 1)
     setCheckedProdClass([...checkedProdClass])
   }
+  const checkDoorType = (value: TdoorTypeValues) => {
+    const valueIndex
+      = checkedDoorType.findIndex((item) => item === value)
+    if (valueIndex === -1) checkedDoorType.push(value)
+    else checkedDoorType.splice(valueIndex, 1)
+    setCheckedDoorType([...checkedDoorType])
+  }
 
-const filterProps = {
-  checkedProdClass,checkProdClass
-}
+  const checkPark = (value: TpartValues) => {
+    const valueIndex
+      = checkedPart.findIndex((item) => item === value)
+    if (valueIndex === -1) checkedPart.push(value)
+    else checkedPart.splice(valueIndex, 1)
+    setCheckedPart([...checkedPart])
+  }
 
+
+
+
+
+
+
+
+  const filterCtrl: TfilterCtrl = {
+    checkedProdClass, checkProdClass,
+    checkedDoorType, checkDoorType,
+    checkedPart, checkPark,
+  }
 
 
   // ---------------------------------------------------------------------------
@@ -70,10 +93,11 @@ const filterProps = {
       <div className={scss.mainContainer}>
 
         <div>
-          <FilterPanel 
-          prodClassOptions={prodClassOptions}
-          doorTypeOptions={doorTypeOptions}
-          partOptions={partOptions}
+          <FilterPanel
+            prodClassOptions={prodClassOptions}
+            doorTypeOptions={doorTypeOptions}
+            partOptions={partOptions}
+            filterCtrl={filterCtrl}
           />
 
         </div>
@@ -149,6 +173,23 @@ const partOptions: TcheckOption<TpartValues>[] = [
   { label: "配電箱及按鈕開關", value: "配電箱及按鈕開關" },
   { label: "安裝費(含送電及試車)", value: "安裝費(含送電及試車)" },
 ]
+
+
+
+// ==============================================================================
+
+export type TprodClassOptions = typeof prodClassOptions
+export type TdoorTypeOptions = typeof doorTypeOptions
+export type TpartOptions = typeof partOptions
+
+export type TfilterCtrl = {
+  checkedProdClass: TprodClassValues[]
+  checkProdClass: (value: TprodClassValues) => void
+  checkedDoorType: TdoorTypeValues[]
+  checkDoorType: (value: TdoorTypeValues) => void
+  checkedPart: TpartValues[]
+  checkPark: (value: TpartValues) => void
+}
 
 
 // ==============================================================================

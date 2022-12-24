@@ -12,8 +12,17 @@ const { Panel } = Collapse;
 import scss from "./filterPanel.module.scss"
 
 
+// type
+import type {
+  TprodClassOptions, TdoorTypeOptions, TpartOptions,
+  TfilterCtrl,
+} from 'pages/setting/productList';
+
 
 type TcheckOption = { label: string, value: string }
+
+
+
 
 // =============================================================================
 export default function FilterPanel(
@@ -21,21 +30,28 @@ export default function FilterPanel(
     prodClassOptions,
     doorTypeOptions,
     partOptions,
+    filterCtrl
   }:
     {
-      prodClassOptions: TcheckOption[]
-      doorTypeOptions: TcheckOption[]
-      partOptions: TcheckOption[]
+      prodClassOptions: TprodClassOptions
+      doorTypeOptions: TdoorTypeOptions
+      partOptions: TpartOptions
+      filterCtrl: TfilterCtrl
     }
 ) {
-
-
-
-
 
   const [isOpen, setIsOpen] = useState(false)
 
   const switchPanel = () => setIsOpen(!isOpen)
+
+
+  const {
+    checkedProdClass, checkProdClass,
+    checkedDoorType, checkDoorType,
+    checkedPart, checkPark,
+  } = filterCtrl
+
+
 
   // --------------------------------------------------------------------------
   return (
@@ -48,9 +64,6 @@ export default function FilterPanel(
           showArrow={false}
         >
 
-
-
-
           <div className={scss.panelBody}>
 
             <div>
@@ -58,9 +71,10 @@ export default function FilterPanel(
               <div className={scss.checkContainer}>
                 {prodClassOptions.map((option, index) => {
                   const { label, value } = option
+                  const checked = checkedProdClass.find((item) => item === value)
                   return (
                     <Checkbox className={scss.checkBox} key={index}
-                      checked={false} onChange={() => { console.log(value) }} >
+                      checked={!!checked} onChange={() => checkProdClass(value)} >
                       {label}
                     </Checkbox>
                   )
@@ -74,9 +88,10 @@ export default function FilterPanel(
               <div className={scss.checkContainer}>
                 {doorTypeOptions.map((option, index) => {
                   const { label, value } = option
+                  const checked = checkedDoorType.find((item) => item === value)
                   return (
                     <Checkbox className={scss.checkBox} key={index}
-                      checked={false} onChange={() => { console.log(value) }} >
+                      checked={!!checked} onChange={() => checkDoorType(value)} >
                       {label}
                     </Checkbox>
                   )
@@ -91,9 +106,10 @@ export default function FilterPanel(
               <div className={scss.checkContainer02}>
                 {partOptions.map((option, index) => {
                   const { label, value } = option
+                  const checked = checkedPart.find((item) => item === value)
                   return (
                     <Checkbox className={scss.checkBox} key={index}
-                      checked={false} onChange={() => { console.log(value) }} >
+                    checked={!!checked} onChange={() => checkPark(value)} >
                       {label}
                     </Checkbox>
                   )
