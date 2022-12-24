@@ -34,6 +34,7 @@ import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import Select03, { TcusStyleObj } from "components/global/gear/select/select03"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import TextareaModal from "components/global/gear/modal/simpleModal/textareaModal";
 
 // hook
 import useProfile from "components/page/domestic/quotation/hook/useProfile"
@@ -216,11 +217,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         </div>
       </div>
-      <InputModal
+      <TextareaModal
         visible={showMemoModal}
         setVisible={setShowMemoModal}
-        title={"請輸入註解"}
-        placeholder={"註解"}
+        title={"追加追減備註"}
+        placeholder={"請輸入備註"}
+        tip="最多25字"
+        textLength={25}
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
