@@ -312,7 +312,7 @@ const OldQuotationProduction = ({ productStates }:
         <QuotationProduction
           className={style.quotationProduction}
           productStates={productStates} />
-      </Panel>
+      </Panel> 
     </Collapse>
   )
 }
