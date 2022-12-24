@@ -166,6 +166,9 @@
 
 .collapse {
   border: none;
+  display: grid;
+  width:100%;
+  gap:10px;
   :global(.ant-collapse-item) :global(.ant-collapse-header) {
     padding: unset;
     // display: block;
@@ -177,10 +180,7 @@
   }
   :global(.ant-collapse-item) {
     border: solid 1px $colorMain;
-    border-bottom: 0;
-    &:nth-last-of-type(1) {
-      border-bottom: solid 1px $colorMain;
-    }
+    overflow: auto;
   }
   :global(.ant-collapse-extra) {
     margin-top: auto;

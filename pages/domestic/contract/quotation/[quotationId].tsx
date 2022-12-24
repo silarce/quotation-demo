@@ -118,7 +118,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     {
       type: "myButton",
       label: "追加追減報價單",
-      onClick: () => setSwitch02(state => !state)
+      onClick: () => setSwitch02(() => true)
     },
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
@@ -151,7 +151,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ]
 
+  const panel_quotation03: TpanelList = [
+    {
+      type: "myButton", label: "匯出報價單", img: iconUpload.src,
+      onClick: () => alert("匯出單價分析")
+    },
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => alert("上傳")
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => setSwitch02(() => false)
+    },
+  ]
 
+  const panelList =
+    allowEdit ? panel_quotation02 :
+      switch02 ? panel_quotation03 :
+        panel_quotation01
 
 
   // =========================================================
@@ -166,7 +186,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   return (
     <div className={style.container}>
       <PageHeader02 tagList={tagList}
-        panelList={allowEdit ? panel_quotation02 : panel_quotation01}
+        panelList={panelList}
       />
       {/*  */}
       <div className={style.mainContainer}>
@@ -276,7 +296,7 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 const OldQuotationProduction = ({ productStates }:
   { productStates: TuseProduct }) => {
 
-  const [isActive, setIsActive] = useState(true)
+  const [isActive, setIsActive] = useState(false)
   const panelSwitch = () => setIsActive(!isActive)
 
   return (
@@ -284,7 +304,7 @@ const OldQuotationProduction = ({ productStates }:
       className={`${style.oldQuotationProduction}`}
       expandIcon={() => <></>}
       accordion={false}
-      activeKey={+isActive}
+      activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
     >
       <Panel key={0}
         header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}
@@ -320,4 +340,12 @@ const OqpHeader = ({ isActive, panelSwitch }: {
 
 
 // =========================================================
+
+
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
 
