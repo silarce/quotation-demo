@@ -13,8 +13,26 @@ import scss from "./filterPanel.module.scss"
 
 
 
+type TcheckOption = { label: string, value: string }
+
 // =============================================================================
-export default function FilterPanel() {
+export default function FilterPanel(
+  {
+    prodClassOptions,
+    doorTypeOptions,
+    partOptions,
+  }:
+    {
+      prodClassOptions: TcheckOption[]
+      doorTypeOptions: TcheckOption[]
+      partOptions: TcheckOption[]
+    }
+) {
+
+
+
+
+
   const [isOpen, setIsOpen] = useState(false)
 
   const switchPanel = () => setIsOpen(!isOpen)
@@ -38,42 +56,50 @@ export default function FilterPanel() {
             <div>
               <p className={scss.caption}>類別</p>
               <div className={scss.checkContainer}>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火防煙捲系列
-                </Checkbox>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火防煙捲門系列
-                </Checkbox>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火系列
-                </Checkbox>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火防煙門系列
-                </Checkbox>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火防煙捲門系列
-                </Checkbox>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火防煙門系列
-                </Checkbox>
-                <Checkbox className={scss.checkBox}
-                  checked={false} onChange={() => { }} >
-                  防火防煙捲
-                </Checkbox>
-
-
+                {prodClassOptions.map((option, index) => {
+                  const { label, value } = option
+                  return (
+                    <Checkbox className={scss.checkBox} key={index}
+                      checked={false} onChange={() => { console.log(value) }} >
+                      {label}
+                    </Checkbox>
+                  )
+                })}
               </div>
             </div>
 
 
-            <div>22222</div>
-            <div>33333</div>
+            <div>
+              <p className={scss.caption}>門型</p>
+              <div className={scss.checkContainer}>
+                {doorTypeOptions.map((option, index) => {
+                  const { label, value } = option
+                  return (
+                    <Checkbox className={scss.checkBox} key={index}
+                      checked={false} onChange={() => { console.log(value) }} >
+                      {label}
+                    </Checkbox>
+                  )
+                })}
+              </div>
+            </div>
+
+
+
+            <div>
+              <p className={scss.caption}>顯示條件</p>
+              <div className={scss.checkContainer02}>
+                {partOptions.map((option, index) => {
+                  const { label, value } = option
+                  return (
+                    <Checkbox className={scss.checkBox} key={index}
+                      checked={false} onChange={() => { console.log(value) }} >
+                      {label}
+                    </Checkbox>
+                  )
+                })}
+              </div>
+            </div>
 
 
           </div>

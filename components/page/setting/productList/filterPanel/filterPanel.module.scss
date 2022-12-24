@@ -82,6 +82,11 @@
       }
     }
 
+    .checkContainer02 {
+      @extend .checkContainer;
+      grid-template-columns: 60px auto;
+    }
+
     &::after {
       content: "";
       height: 100%;
