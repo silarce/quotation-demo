@@ -106,7 +106,6 @@ export default function ProductList() {
             partOptions={partOptions}
             filterCtrl={filterCtrl}
           />
-
         </div>
 
         <div>

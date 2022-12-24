@@ -2,8 +2,6 @@ import { useState } from 'react';
 
 
 
-
-
 // antd
 import { Collapse, Checkbox } from 'antd';
 const { Panel } = Collapse;
@@ -17,10 +15,6 @@ import type {
   TprodClassOptions, TdoorTypeOptions, TpartOptions,
   TfilterCtrl,
 } from 'pages/setting/productList';
-
-
-type TcheckOption = { label: string, value: string }
-
 
 
 
@@ -57,11 +51,11 @@ export default function FilterPanel(
   // --------------------------------------------------------------------------
   return (
     <div className={scss.filterPanel}>
-      <Collapse activeKey={+!isOpen}
+      <Collapse activeKey={+isOpen}
 
         ghost>
         <Panel className={scss.panel} key={1}
-          header={<PanelHeader switchPanel={switchPanel} />}
+          header={<PanelHeader switchPanel={switchPanel} isOpen={isOpen} />}
           showArrow={false}
         >
 
@@ -138,14 +132,20 @@ export default function FilterPanel(
 // ==============================================================================
 
 const PanelHeader = (
-  { switchPanel }:
-    { switchPanel: () => void }
+  {
+    switchPanel,
+    isOpen
+  }:
+    {
+      switchPanel: () => void
+      isOpen: boolean
+    }
 ) => {
 
   return (
     <div className={scss.panelHeader}>
       <span>篩選內容</span>
-      <button onClick={switchPanel}><span>收合</span></button>
+      <button onClick={switchPanel}><span>{isOpen ? "收合" : "展開"}</span></button>
     </div>
   )
 }
