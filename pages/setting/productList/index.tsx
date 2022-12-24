@@ -53,8 +53,14 @@ export default function ProductList() {
     setCheckedPart([...checkedPart])
   }
 
+  const filterConfirm = () => {
 
-
+  }
+  const filterClear = () => {
+    setCheckedProdClass([]);
+    setCheckedDoorType([]);
+    setCheckedPart([]);
+  }
 
 
 
@@ -64,6 +70,7 @@ export default function ProductList() {
     checkedProdClass, checkProdClass,
     checkedDoorType, checkDoorType,
     checkedPart, checkPark,
+    filterConfirm, filterClear
   }
 
 
@@ -189,6 +196,8 @@ export type TfilterCtrl = {
   checkDoorType: (value: TdoorTypeValues) => void
   checkedPart: TpartValues[]
   checkPark: (value: TpartValues) => void
+  filterConfirm: () => void
+  filterClear: () => void
 }
 
 

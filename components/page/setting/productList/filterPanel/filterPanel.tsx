@@ -49,6 +49,7 @@ export default function FilterPanel(
     checkedProdClass, checkProdClass,
     checkedDoorType, checkDoorType,
     checkedPart, checkPark,
+    filterConfirm, filterClear
   } = filterCtrl
 
 
@@ -66,7 +67,7 @@ export default function FilterPanel(
 
           <div className={scss.panelBody}>
 
-            <div>
+            <div className={scss.item}>
               <p className={scss.caption}>類別</p>
               <div className={scss.checkContainer}>
                 {prodClassOptions.map((option, index) => {
@@ -83,7 +84,7 @@ export default function FilterPanel(
             </div>
 
 
-            <div>
+            <div className={scss.item}>
               <p className={scss.caption}>門型</p>
               <div className={scss.checkContainer}>
                 {doorTypeOptions.map((option, index) => {
@@ -101,7 +102,7 @@ export default function FilterPanel(
 
 
 
-            <div>
+            <div className={scss.item}>
               <p className={scss.caption}>顯示條件</p>
               <div className={scss.checkContainer02}>
                 {partOptions.map((option, index) => {
@@ -109,7 +110,7 @@ export default function FilterPanel(
                   const checked = checkedPart.find((item) => item === value)
                   return (
                     <Checkbox className={scss.checkBox} key={index}
-                    checked={!!checked} onChange={() => checkPark(value)} >
+                      checked={!!checked} onChange={() => checkPark(value)} >
                       {label}
                     </Checkbox>
                   )
@@ -117,6 +118,10 @@ export default function FilterPanel(
               </div>
             </div>
 
+            <div className={scss.sideBtnBox}>
+              <button onClick={filterConfirm}><span>篩選</span></button>
+              <button onClick={filterClear}><span>清除</span></button>
+            </div>
 
           </div>
 
