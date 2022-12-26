@@ -14,8 +14,14 @@ import scss from "./productList_Table.module.scss"
 import { TfakeData } from "pages/setting/productList"
 
 export default function ProductList_Table(
-  { fakeData }:
-    { fakeData: TfakeData[] }
+  {
+    fakeData,
+    doFilter
+  }:
+    {
+      fakeData: TfakeData[]
+      doFilter: (data: TfakeData) => boolean
+    }
 ) {
 
 
@@ -35,6 +41,9 @@ export default function ProductList_Table(
 
       <div className={scss.tbody}>
         {fakeData.map((obj, index) => {
+
+          if (!doFilter(obj)) return null
+
           return (
             <CellWithBar className={scss.row} key={index}>
               {keyIndex.map((key, index) => {

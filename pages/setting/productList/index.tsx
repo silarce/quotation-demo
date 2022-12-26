@@ -16,13 +16,6 @@ import scss from "./productList.module.scss"
 
 
 
-
-
-
-
-
-
-
 // ==============================================================================
 export default function ProductList() {
 
@@ -31,7 +24,15 @@ export default function ProductList() {
   const [checkedProdClass, setCheckedProdClass] = useState<TprodClassValues[]>([])
   const [checkedDoorType, setCheckedDoorType] = useState<TdoorTypeValues[]>([])
   const [checkedPart, setCheckedPart] = useState<TpartValues[]>([])
+  // 因為要按下篩選按鈕才做篩選的行為，所以要另外建立一個狀態
+  const [filterParams, setFilterParams]
+    = useState({
+      checkedProdClass: [...checkedProdClass],
+      checkedDoorType: [...checkedDoorType],
+      checkedPart: [...checkedPart],
+    })
 
+  // 點擊類別的checkBox
   const checkProdClass = (value: TprodClassValues) => {
     const valueIndex
       = checkedProdClass.findIndex((item) => item === value)
@@ -39,6 +40,7 @@ export default function ProductList() {
     else checkedProdClass.splice(valueIndex, 1)
     setCheckedProdClass([...checkedProdClass])
   }
+  // 點擊門型的checkBox
   const checkDoorType = (value: TdoorTypeValues) => {
     const valueIndex
       = checkedDoorType.findIndex((item) => item === value)
@@ -46,7 +48,7 @@ export default function ProductList() {
     else checkedDoorType.splice(valueIndex, 1)
     setCheckedDoorType([...checkedDoorType])
   }
-
+// 點擊顯示條件的checkBox
   const checkPark = (value: TpartValues) => {
     const valueIndex
       = checkedPart.findIndex((item) => item === value)
@@ -55,24 +57,50 @@ export default function ProductList() {
     setCheckedPart([...checkedPart])
   }
 
+  // 篩選按鈕
   const filterConfirm = () => {
-
+    setFilterParams({
+      checkedProdClass: [...checkedProdClass],
+      checkedDoorType: [...checkedDoorType],
+      checkedPart: [...checkedPart],
+    })
   }
+  // 清除按鈕
   const filterClear = () => {
     setCheckedProdClass([]);
     setCheckedDoorType([]);
     setCheckedPart([]);
+    setFilterParams({
+      checkedProdClass: [],
+      checkedDoorType: [],
+      checkedPart: [],
+    })
   }
 
-
-
-
-
+  // 打包起來送進FilterPanel
   const filterCtrl: TfilterCtrl = {
     checkedProdClass, checkProdClass,
     checkedDoorType, checkDoorType,
     checkedPart, checkPark,
     filterConfirm, filterClear
+  }
+
+  // 送到ProductList_Table裡面做篩選
+  const doFilter = (data: TfakeData) => {
+    const { checkedProdClass, checkedDoorType, checkedPart } = filterParams
+    const { prodClass, doorType, part, } = data
+    let check01 = true
+    if (checkedProdClass[0])
+      check01 = !!checkedProdClass.find((item) => item === prodClass)
+    let check02 = true
+    if (checkedDoorType[0])
+      check02 = !!checkedDoorType.find((item) => item === doorType)
+    let check03 = true
+    if (checkedPart[0])
+      check03 = !!checkedPart.find((item) => item === part)
+
+    if (check01 && check02 && check03) return true
+    return false
   }
 
 
@@ -98,9 +126,7 @@ export default function ProductList() {
         panelList={panelList}
       />
 
-
       <div className={scss.mainContainer}>
-
         <div>
           <FilterPanel
             prodClassOptions={prodClassOptions}
@@ -111,10 +137,11 @@ export default function ProductList() {
         </div>
         <div>
           <ProductList_Table
-            fakeData={fakeData} />
+            fakeData={fakeData}
+            doFilter={doFilter}
+          />
         </div>
       </div>
-
 
     </div>
   )
@@ -187,6 +214,11 @@ export type TfilterCtrl = {
 
 
 // ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
 
 export type TfakeData = {
   prodClass: string
@@ -214,8 +246,8 @@ const fakeData: TfakeData[] = [
     densityRatio: 7.63,
   },
   {
-    prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
+    prodClass: "防水防洪門系列",
+    doorType: "120A",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
@@ -226,8 +258,8 @@ const fakeData: TfakeData[] = [
   },
   {
     prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
-    part: "捲門片",
+    doorType: "SJ-302",
+    part: "支板",
     name: "一般型1.5t",
     length: 123,
     caliber: 123,
@@ -238,6 +270,72 @@ const fakeData: TfakeData[] = [
   {
     prodClass: "防火防煙捲門系列",
     doorType: "SJ-303AS",
+    part: "門箱",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "廠辦管制門",
+    doorType: "SJ-303AS",
+    part: "門箱",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "客製化",
+    doorType: "SJ-305D",
+    part: "電動機",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "圍牆大門",
+    doorType: "SJ-302",
+    part: "門箱",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防水防洪門系列",
+    doorType: "SJ-303A",
+    part: "安裝費(含送電及試車)",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防水防洪門系列",
+    doorType: "120A",
+    part: "配電箱及按鈕開關",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防水防洪門系列",
+    doorType: "SJ-305D",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
@@ -247,9 +345,31 @@ const fakeData: TfakeData[] = [
     densityRatio: 7.63,
   },
   {
-    prodClass: "防火防煙捲門系列",
+    prodClass: "機庫門",
+    doorType: "SJ-312",
+    part: "門軌",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防水防洪門系列",
+    doorType: "SJ-303A",
+    part: "電動機",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "圍牆大門",
     doorType: "SJ-303AS",
-    part: "捲門片",
+    part: "支板",
     name: "一般型1.5t",
     length: 123,
     caliber: 123,
@@ -259,7 +379,7 @@ const fakeData: TfakeData[] = [
   },
   {
     prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
+    doorType: "SJ-312",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
@@ -268,75 +388,7 @@ const fakeData: TfakeData[] = [
     expandHeight: 0.174,
     densityRatio: 7.63,
   },
-  {
-    prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
-    part: "捲門片",
-    name: "一般型1.5t",
-    length: 123,
-    caliber: 123,
-    thickness: "1.5t",
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
-    part: "捲門片",
-    name: "一般型1.5t",
-    length: 123,
-    caliber: 123,
-    thickness: "1.5t",
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
-    part: "捲門片",
-    name: "一般型1.5t",
-    length: 123,
-    caliber: 123,
-    thickness: "1.5t",
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: "防火防煙捲門系列",
-    doorType: "SJ-303AS",
-    part: "捲門片",
-    name: "一般型1.5t",
-    length: 123,
-    caliber: 123,
-    thickness: "1.5t",
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-
-
 ]
-
-
-
-
-// ==============================================================================
-// ==============================================================================
-// ==============================================================================
-// ==============================================================================
-// ==============================================================================
-// ==============================================================================
-// ==============================================================================
-// ==============================================================================
-
-
-
-
-
-
-
-
-
-
 
 
 
