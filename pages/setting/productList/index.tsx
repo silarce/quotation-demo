@@ -5,6 +5,8 @@ import { useState } from "react"
 
 // component
 import FilterPanel from "components/page/setting/productList/filterPanel/filterPanel"
+import ProductList_Table from "components/page/setting/productList/productList_Table/productList_Table"
+
 
 // glogal gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
@@ -107,25 +109,9 @@ export default function ProductList() {
             filterCtrl={filterCtrl}
           />
         </div>
-
         <div>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
-          <h1>table</h1>
+          <ProductList_Table
+            fakeData={fakeData} />
         </div>
       </div>
 
@@ -202,11 +188,12 @@ export type TfilterCtrl = {
 
 // ==============================================================================
 
-type TfakeData = {
-  doorType: string
+export type TfakeData = {
   prodClass: string
+  doorType: string
   part: string
   name: string
+  // breach: string // 底座角鐵開口
   length: number
   caliber: number // 口徑
   thickness: string //厚度
@@ -216,8 +203,8 @@ type TfakeData = {
 
 const fakeData: TfakeData[] = [
   {
-    doorType: "SJ-303AS",
     prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
@@ -227,8 +214,8 @@ const fakeData: TfakeData[] = [
     densityRatio: 7.63,
   },
   {
-    doorType: "SJ-303AS",
     prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
@@ -238,8 +225,8 @@ const fakeData: TfakeData[] = [
     densityRatio: 7.63,
   },
   {
-    doorType: "SJ-303AS",
     prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
@@ -249,8 +236,74 @@ const fakeData: TfakeData[] = [
     densityRatio: 7.63,
   },
   {
-    doorType: "SJ-303AS",
     prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
+    part: "捲門片",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
+    part: "捲門片",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
+    part: "捲門片",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
+    part: "捲門片",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
+    part: "捲門片",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
+    part: "捲門片",
+    name: "一般型1.5t",
+    length: 123,
+    caliber: 123,
+    thickness: "1.5t",
+    expandHeight: 0.174,
+    densityRatio: 7.63,
+  },
+  {
+    prodClass: "防火防煙捲門系列",
+    doorType: "SJ-303AS",
     part: "捲門片",
     name: "一般型1.5t",
     length: 123,
