@@ -167,7 +167,7 @@ export const useDepartments_managers = () => {
 type TpostDepartments_id_managersBody = {
   employeeIds: string[]
 }
-// 伺服器回應500錯誤
+
 export const apiPostDepartments_id_managers
   = (departmentId: string, body: TpostDepartments_id_managersBody) => {
     const api = `/departments/${departmentId}/managers`

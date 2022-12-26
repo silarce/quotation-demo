@@ -10,58 +10,96 @@ import Header from "components/page/setting/hrManage/header/header";
 import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
 import Card from "components/page/setting/hrManage/card/card";
 
+// gear
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 // css
 import scss from "./hrManage.module.scss"
 
-// fakeData
-import { fakeStaffList, TstaffInfo } from "fakeDatabase/staff/fakeStaffList";
-import {
-  TdepartmentManage, TdepartmentManageList,
-  fakeManagerList,
-} from "fakeDatabase/staff/fakeManagerList"
-
 // api
-import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
+import {
+  useDepartments_managers,
+  apiPostDepartments_id_managers, apiDeleteDepartments_id_managers,
+} from "js/api/api_department";
+import { useEmployee, TemployeeDto } from "js/api/api_employee";
 
 
 export default function HrManage() {
-  const [managerList, setManagerList] = useState<TdepartmentManageList>(fakeManagerList)
-  // --------------------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false)
-  const [isReady, setIsReady] = useState(false)
   // --------------------------------------------------------------------------
-  const { data, update } = useEmployee({
+  const { data, update } = useDepartments_managers()
+  const dataArr = data ?? []
+
+  const { data: employeeData, update: updateEmployeeData } = useEmployee({
     pageSize: 999999999,
     populate: ["jobs"],
+    filter: {
+      user: {
+        $notNull: true
+      },
+    }
   })
-  const employeeList = data?.data || []
-  const meta = data?.meta
+  const employeeList = employeeData?.data || []
+
+  const doUpdate = async () => {
+    setIsLoading(true)
+    try { await update() }
+    catch { myAlert.err({ title: "取得資料失敗" }) }
+    setIsLoading(false)
+
+  }
+
   // --------------------------------------------------------------------------
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      await update()
-      setIsReady(true)
+      await Promise.all([updateEmployeeData(), update()])
+        .catch(err => myAlert.err({ title: err }))
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   // --------------------------------------------------------------------------
 
-
   const [showAddManager, setShowAddManager] = useState(false)
+  // 被選中部門的id
+  const [selDepartmentId, setDelDepartmentId] = useState<string>()
 
-  const showAdd = (selIndex: number) => {
+  const showAdd = (departmentId: string) => {
+    setDelDepartmentId(departmentId)
     setShowAddManager(true)
   }
 
 
   // --------------------------------------------------------------------------
-  const onConfirm = (indexArr: number[]) => {
-    alert(indexArr)
+
+
+  const onConfirm = async (indexArr: number[]) => {
+    if (!selDepartmentId) return;
+
+    const selEmployeeIdArr: string[] = []
+    employeeList.forEach((item, index) => {
+      if (indexArr?.includes(index)) selEmployeeIdArr.push(item.id)
+    })
+    const body = { employeeIds: selEmployeeIdArr }
+
+    showRootLoading(true)
+    try {
+      await apiPostDepartments_id_managers(selDepartmentId, body)
+      setShowAddManager(false)
+    }
+    catch (err) {
+      myAlert.err({ title: "新增管理人員失敗", content: err as string })
+    }
+    showRootLoading(false)
+
+    await doUpdate()
   }
+
   const onCancel = () => setShowAddManager(false)
+
   // --------------------------------------------------------------------------
   return (
     <div className={scss.scrollContainer}>
@@ -69,29 +107,39 @@ export default function HrManage() {
       <Header />
 
       <div className={scss.mainContainer}>
-        <div style={{ width: "100%" }}>
-          {managerList.map((item, index) => {
+        <div className={scss.main} style={{ width: "100%" }}>
+          {dataArr.map((item, index) => {
+            const { id, name, employees } = item
 
-            const { departmentId, label, list } = item
-
-            const removeData = (itemIndex: number) => {
-              item.list.splice(itemIndex, 1)
-              setManagerList(state => [...state])
+            const removeData = async (itemIndex: number) => {
+              const employeeId = employees?.[itemIndex].id
+              if (!employeeId) return
+              const body = { employeeIds: [employeeId] }
+              showRootLoading(true)
+              try {
+                await apiDeleteDepartments_id_managers(id, body)
+              }
+              catch (err) {
+                myAlert.err({ title: "刪除管理人員失敗", content: err as string })
+              }
+              showRootLoading(false)
+              await doUpdate()
             }
 
             return (
-              <Card<TstaffInfo> key={index}
-                label={label}
+              <Card<TemployeeDto> key={index}
+                label={name}
                 addLabel={"新增管理人員"}
                 noDataTip={"目前尚未沒有管理人員"}
-                dataArr={list}
-                showAdd={() => showAdd(index)}
+                dataArr={employees ?? []}
+                showAdd={() => showAdd(id)}
                 removeData={removeData}
                 CustomItem={customCard}
               />
             )
           })}
         </div>
+        <LoadingCover01 isLoading={isLoading} />
       </div>
 
       <SelectEmployeePanel
@@ -101,10 +149,7 @@ export default function HrManage() {
         employeeList={employeeList}
         onConfirm={onConfirm}
         onCancel={onCancel}
-
-
       />
-
     </div>
   )
 }
@@ -112,21 +157,21 @@ export default function HrManage() {
 
 const customCard = (
   { data }:
-    { data: TstaffInfo }
+    { data: TemployeeDto }
 ) => {
 
-  const { staffId, chName, phone01, department01 } = data
-  const { jobTitle } = department01
+  const { idNumber, chName, phone1, jobs } = data
+  const { name } = jobs?.[0] ?? {}
 
   return (
     <div className={scss.customCard}>
       <div>
-        <span>{staffId}</span>
+        <span>{idNumber}</span>
         {" / "}
         <span>{chName}</span>
       </div>
-      <span>{jobTitle}</span>
-      <span>{phone01}</span>
+      <span>{name}</span>
+      <span>{phone1}</span>
     </div>
   )
 }

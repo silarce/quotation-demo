@@ -2,7 +2,8 @@
 @use "styles/layout" as *;
 
 .mainContainer {
-  > div {
+  position: relative;
+  > .main {
     padding: 38px 45px;
     display: grid;
     gap: 21px;
@@ -37,8 +38,7 @@
 }
 
 .customCard {
-  display: grid;
-  grid-template-columns: 120px fit-content(100%) 118px;
+  display: flex;
   gap: 20px;
   width: fit-content;
   span {
