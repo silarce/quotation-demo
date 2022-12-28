@@ -16,12 +16,12 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 
 // api
 import {
-  TapiGetCustomersParams, TcustomersData, TpostCustomer,
+  TapiGetCustomersParams, TcustomerDto, TpostCustomer,
   useCustomersById, apiPatchCustomers_id
 } from "js/api/api_customer";
 
 // css
-import style from "../../customer.module.scss"
+import style from "../customer.module.scss"
 
 const params: TapiGetCustomersParams = {
   populate: ["contacts"]
@@ -65,7 +65,7 @@ export default function Edit() {
       label: "上傳",
       onClick: async () => {
         try {
-          if (!data.id) return
+          if (!data?.id) return
           setRootLoading(true)
           // 如果第一層的id存在，會在api那邊把id刪掉
           await apiPatchCustomers_id(data.id, data as TpostCustomer)
@@ -103,8 +103,8 @@ export default function Edit() {
       <div className={style.mainContainer}>
         {isReady &&
           <EditCustomer
-            data={data as TcustomersData}
-            setData={setData as Dispatch<SetStateAction<TcustomersData>>} />
+            data={data as TpostCustomer}
+            setData={setData as Dispatch<SetStateAction<TpostCustomer>>} />
         }
       </div>
     </div>

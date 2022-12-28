@@ -113,11 +113,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
 
-  const panel_quotation: TpanelList = [
+
+  const panel_quotation01: TpanelList = [
     {
       type: "myButton",
       label: "追加追減報價單",
-      onClick: () => setSwitch02(state => !state)
+      onClick: () => setSwitch02(() => true)
     },
     {
       type: "myButton", label: "匯出報價單", img: iconUpload.src,
@@ -129,13 +130,50 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: "myButton", label: "送審", onClick: () => alert("送審") },
     {
-      type: allowEdit ? "redButton" : "myButton",
-      label: allowEdit ? "結束編輯" : `編輯`,
-      onClick: () => setAllowEdit(state => !state),
-      className: style.editButton
+      type: "myButton",
+      label: `編輯`,
+      onClick: () => setAllowEdit(state => true),
     },
     { type: "myButton", label: "返回", onClick: () => router.back() },
   ]
+
+
+  const panel_quotation02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => alert("上傳")
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => setAllowEdit(() => false)
+    },
+  ]
+
+  const panel_quotation03: TpanelList = [
+    {
+      type: "myButton", label: "匯出報價單", img: iconUpload.src,
+      onClick: () => alert("匯出單價分析")
+    },
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => alert("上傳")
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => setSwitch02(() => false)
+    },
+  ]
+
+  const panelList =
+    allowEdit ? panel_quotation02 :
+      switch02 ? panel_quotation03 :
+        panel_quotation01
+
+
   // =========================================================
   // =========================================================
   // =========================================================
@@ -147,7 +185,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   return (
     <div className={style.container}>
-      <PageHeader02 tagList={tagList} panelList={panel_quotation} />
+      <PageHeader02 tagList={tagList}
+        panelList={panelList}
+      />
       {/*  */}
       <div className={style.mainContainer}>
         <div className={style.quotation}>
@@ -256,7 +296,7 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 const OldQuotationProduction = ({ productStates }:
   { productStates: TuseProduct }) => {
 
-  const [isActive, setIsActive] = useState(true)
+  const [isActive, setIsActive] = useState(false)
   const panelSwitch = () => setIsActive(!isActive)
 
   return (
@@ -264,7 +304,7 @@ const OldQuotationProduction = ({ productStates }:
       className={`${style.oldQuotationProduction}`}
       expandIcon={() => <></>}
       accordion={false}
-      activeKey={+isActive}
+      activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
     >
       <Panel key={0}
         header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}
@@ -272,7 +312,7 @@ const OldQuotationProduction = ({ productStates }:
         <QuotationProduction
           className={style.quotationProduction}
           productStates={productStates} />
-      </Panel>
+      </Panel> 
     </Collapse>
   )
 }
@@ -300,4 +340,12 @@ const OqpHeader = ({ isActive, panelSwitch }: {
 
 
 // =========================================================
+
+
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
+  // 追加追減項目紀錄的style不對
 

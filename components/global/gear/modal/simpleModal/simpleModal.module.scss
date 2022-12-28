@@ -65,4 +65,79 @@
       }
     }
   }
-}
+} // inputModal
+
+.textareaModal {
+  :global(.ant-modal-content) {
+    padding: 20px 30px 24px 30px;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+    height: fit-content;
+    > .header {
+      position: relative;
+      margin: 0;
+      > p {
+        width: fit-content;
+        margin: auto;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+        color: #14256a;
+      }
+      .tip {
+        position: absolute;
+        right: 10px;
+        bottom: 0;
+        font-weight: 400;
+        font-size: 14px;
+        color: #ea1833;
+      }
+    }
+    > div {
+      padding-bottom: 6px;
+      margin: 20px 0;
+      > textarea {
+        width: 560px;
+        height: 140px;
+        padding: 16px 20px;
+        font-weight: 400;
+        font-size: 18px;
+        color: $colorText;
+        border: solid 1px $colorBorder01;
+        resize: none;
+      }
+    }
+  }
+
+  :global(.ant-modal-footer) {
+    display: flex;
+    justify-content: center;
+    flex-direction: row-reverse;
+    gap: 24px;
+    border: none;
+    padding: 0;
+    > button {
+      height: auto;
+      padding: 10px 44px;
+      margin: 0;
+      &:nth-of-type(1) {
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 19px;
+        border-color: $colorBorder01;
+      }
+      &:nth-of-type(2) {
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 19px;
+        background-color: transparent;
+        border-color: $colorActive01;
+
+        > span {
+          color: $colorActive01;
+        }
+      }
+    }
+  }
+} // textareaModal

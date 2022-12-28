@@ -20,7 +20,7 @@ import {
   TpostEmployee, TapiGetEmployee_idParams,
   useEmployeeById, apiPatchEmployee
 } from "js/api/api_employee";
-import type { TjobsData } from "js/api/api_department";
+import type { TjobDto } from "js/api/api_department";
 import type { TprePostEmployee } from "components/page/setting/employees/editEmployee";
 
 
@@ -54,7 +54,7 @@ export default function AddEmployee() {
         try {
           setRootLoading(true)
           let postData = _.cloneDeep(data)
-          postData.jobId = postData.jobs.map((jobs: TjobsData) => jobs.id)
+          postData.jobId = postData.jobs.map((jobs: TjobDto) => jobs.id)
 
           postData = postData as TpostEmployee
 

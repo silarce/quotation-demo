@@ -10,7 +10,7 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 
 // api
 import {
-  Tparams, TuseJobsOptions, TjobsData,
+  Tparams, TuseJobsOptions, TjobDto,
   useDepartments, useJobsOptions
 } from "js/api/api_department";
 
@@ -29,6 +29,12 @@ const defaultParams = (): Tparams => ({
   pageSize: 999,
   populate: ["jobs"]
 })
+
+
+
+
+
+
 // ============================================================
 export default function EditEmployeeItem02({ data, setData }: {
   data: TprePostEmployee
@@ -43,9 +49,9 @@ export default function EditEmployeeItem02({ data, setData }: {
   // ======================================================
   // 部門選擇所需的狀態與options
   const jobsOptions01
-    = useJobsOptions(departmentsData, data?.jobs?.[0])
+    = useJobsOptions(departmentsData??{}, data?.jobs?.[0])
   const jobsOptions02
-    = useJobsOptions(departmentsData, data?.jobs?.[1])
+    = useJobsOptions(departmentsData??{}, data?.jobs?.[1])
 
   useEffect(() => {
     updateDepartmentsData()
@@ -53,7 +59,7 @@ export default function EditEmployeeItem02({ data, setData }: {
   }, [])
 
   useEffect(() => {
-    const jobs: TjobsData[] = []
+    const jobs: TjobDto[] = []
     jobsOptions01.jobs && jobs.push(jobsOptions01.jobs)
     jobsOptions02.jobs && jobs.push(jobsOptions02.jobs)
     setData(data => ({

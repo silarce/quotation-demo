@@ -63,10 +63,17 @@ export default function SearchBar02(
     }
 ) {
 
-  const [inpValueArr, setInpValueArr] = useState<(string | number | null | undefined)[]>([])
-  const [selValueArr, setSelValueArr] = useState<(string | number | null | undefined)[]>([])
 
-  const valueArr = inpValueArr.concat(selValueArr)
+
+
+
+  const [inpValueArr, setInpValueArr]
+    = useState<(string | number | null | undefined)[]>(inputConfigArr?.map(() => undefined) ?? [])
+  const [selValueArr, setSelValueArr]
+    = useState<(string | number | null | undefined)[]>(selectConfigArr?.map(() => undefined) ?? [])
+
+
+  const valueArr = selValueArr.concat(inpValueArr)
 
 
   return (
@@ -86,8 +93,10 @@ export default function SearchBar02(
           setSelValueArr(state => [...state]) // 基本上會用到
         }
 
-        const propsCopy = _.cloneDeep(props)
+        const propsCopy = _.cloneDeep(props) as typeof props
         propsCopy.onChange = theOnChange
+
+        propsCopy.options.unshift({ label: "無", value: "" })
 
         return (
           <div key={index} className={scss.selectWrapper} style={boxStyle}>

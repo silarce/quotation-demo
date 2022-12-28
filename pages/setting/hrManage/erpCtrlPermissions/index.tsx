@@ -3,6 +3,7 @@
 // ERP操作權限
 
 import {
+  MouseEvent,
   useState, useEffect, useMemo
 } from "react"
 import { useRouter } from "next/router";
@@ -34,10 +35,11 @@ export default function ErpCtrlPermissions() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isReady, setIsReady] = useState(false)
+  // 只是用來rerender
+  const [rerender, setRerender] = useState(false)
   // ------------------------------------------------------------------------
 
-  // 列表-送進table裡面
-  const [params, setParams] = useState<TapiGetEmployeeParams>({
+  const params: TapiGetEmployeeParams = {
     order: "ASC",
     page: 1,
     pageSize: 99999999999,
@@ -45,25 +47,18 @@ export default function ErpCtrlPermissions() {
       user: {
         $notNull: true
       },
-      // 問後端這部分要怎麼設
-      // jobs: {
-      //   $contains: {
-      //     department: {
-      //       id: { $eq: "ce0ad704-148b-4c48-bdb2-5f1458c6a998" }
-      //     }
-      //   }
-      // },
-      $or: {
-        idNumber: {
-          $contains: router.query.searchValue,
-        },
-        chName: {
-          $contains: router.query.searchValue,
-        },
+      // 收到空字串會壞掉
+      "jobs.department.id": router.query.department || undefined,
+      chName: {
+        $contains: router.query.chName,
       },
+
     },
     populate: ["jobs.department", "user"]
-  })
+  }
+
+
+  // 列表-送進table裡面
 
   let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
   const employeeList = employeeData01?.data || []
@@ -91,9 +86,9 @@ export default function ErpCtrlPermissions() {
   const { data: departmentsData, update: updateDepartments } = useDepartments()
   // 用在搜尋bar的option
   const options_departments = useMemo(() => {
-    if (!departmentsData.data) return []
+    if (!departmentsData?.data) return []
 
-    return departmentsData.data.map((item) => {
+    return departmentsData?.data.map((item) => {
       const { id, name } = item
       return {
         value: id,
@@ -108,40 +103,37 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-      if (isReady) {
-        await updateEmployeeData01()
-      }
-      else {
-        await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
-          .then((valueArr) => valueArr)
-          .catch(err => Promise.reject(err))
-      }
+
+      await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
+        .then((valueArr) => valueArr)
+        .catch(err => Promise.reject(err))
+
       setIsReady(true)
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [])
+
+
+  useEffect(() => {
+    if (!isReady) return
+    updateList()
+  }, [router.query])
+
 
 
   // ------------------------------------------------------------------------
   // 搜尋功能 searchBar
 
-  const onSearch = (valueArr: (string | number | null | undefined)[]) => {
+  const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
 
     const department = valueArr[0]
-    const other = valueArr[1]
+    const chName = valueArr[1]
 
-    router.push(
-      {
-        pathname: "/setting/hrManage/erpCtrlPermissions",
-        query: {
-          department,
-          other
-        }
-      }
-    )
-    // 只是為了rerender，params只會被pathname控制，應該是不用做成狀態
-    setParams(state => ({ ...state }))
+    router.push({
+      pathname: "/setting/hrManage/erpCtrlPermissions",
+      query: { department, chName }
+    })
   }
 
   // ------------------------------------------------------------------------
@@ -175,9 +167,28 @@ export default function ErpCtrlPermissions() {
   }
 
   // ------------------------------------------------------------------------
+  // 刪除功能
+
+  const [selIndex, setSelIndex] = useState<number>(-1)
+
+
+  const selId = employeeList[selIndex]?.id
+  const selIdNumber = employeeList[selIndex]?.idNumber
+  const selChName = employeeList[selIndex]?.chName
+
+  const openDelete = (e: MouseEvent, index: number) => {
+    e.stopPropagation()
+    setSelIndex(index)
+  }
+
   const removeEmployee = () => {
     alert("api未提供")
   }
+
+  const cancelDelete = () => {
+    setSelIndex(-1)
+  }
+
   // ------------------------------------------------------------------------
   return (
     <div className={scss.container}>
@@ -194,11 +205,11 @@ export default function ErpCtrlPermissions() {
         <div className={scss.main}>
           {isReady &&
             <Table
-              employeeList={employeeList} toUpdate={updateEmployeeData01}
+              employeeList={employeeList}
               searchOption={options_departments}
               openAddPanel={openAddPanel}
               onSearch={onSearch}
-              onDelete={removeEmployee}
+              onDelete={openDelete}
             />
           }
         </div>
@@ -214,7 +225,27 @@ export default function ErpCtrlPermissions() {
         onCancel={onCancel}
         selectLimit={1}
       />
+
+      <TwoButtonModal
+        visible={!!selId}
+        text={`請確定要刪除「${selIdNumber}」「${selChName}」?`}
+        onConfirm={removeEmployee}
+        onCancel={cancelDelete}
+      />
+
     </div>
   )
 }
 
+
+/*
+
+新增操作人員應該要可複選，後端未提供相關api
+後端未提供解除操作權限的api
+
+table裡的TwoButtonModal
+TwoButtonModal的onConfirm要改
+把TwoButtonModal移到index.tsx
+table裡刪除按鈕的函數要提供index，再用這個index取得資料然後呼叫TwoButtonModal
+
+*/

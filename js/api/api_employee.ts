@@ -6,62 +6,18 @@ import {
 import { axi } from "./_axiosCreator";
 
 // type
-import { TjobsData } from "./api_department"
+import { TemployeeDto, TpageMetaDto } from "./dtoTypes";
 
+export type { TemployeeDto }
 
 // =============================================
 // 員工資料
 
-export type Tuser = {
-  account: string
-  id: string
-  isActive: boolean
-  username: string
-}
-
-export type Temployee = {
-  "id": string,
-  "createdAt": string, // 2022-10-12T08:47:24.753Z"
-  "updatedAt": string, // 2022-10-12T08:47:24.753Z"
-  "idNumber": string,
-  "chName": string,
-  "enName": string,
-  "identity": string,
-  "birthday": string,
-  "gender": string,
-  "marital": string,
-  "education": string,
-  "expertise": string,
-  "phone1": string,
-  "phone2": string,
-  "email": string,
-  "residenceCounty": string,
-  "residenceDistrict": string,
-  "residenceAddress": string,
-  "mailingCounty": string,
-  "mailingDistrict": string,
-  "mailingAddress": string,
-  "seniority": string,
-  "startDate": string,
-  "leaveDate": string,
-  "retireDate": string,
-  "severanceDate": string,
-  "processPermission": true,
-  "jobs"?: TjobsData[]
-  "user"?: Tuser
-}
 
 // 員工資料列表
 export type TgetEmployee = {
-  "data": Temployee[],
-  "meta": {
-    "page": number,
-    "pageSize": number,
-    "itemCount": number,
-    "pageCount": number,
-    "hasPreviousPage": boolean,
-    "hasNextPage": boolean
-  }
+  "data": TemployeeDto[],
+  "meta": TpageMetaDto
 }
 
 // 新增、更新員工資料的body
@@ -93,8 +49,7 @@ export type TpostEmployee = {
   "jobId": string[]
 }
 
-type Tpopulate =
-  "jobs.department"[]
+type Tpopulate = ("jobs" | "jobs.department")[]
 
 
 
@@ -119,7 +74,7 @@ const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
 }
 
 export const useEmployee = (params?: TapiGetEmployeeParams) => {
-  let [data, setData] = useState<Partial<TgetEmployee>>({})
+  let [data, setData] = useState<TgetEmployee>()
   const update = async () => {
     const data = await apiGetEmployee(params)
     if (data) setData(data)
@@ -183,7 +138,7 @@ const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
 }
 
 export const useEmployeeById = (id: string, params?: TapiGetEmployee_idParams) => {
-  const [data, setData] = useState<Partial<Temployee>>({})
+  const [data, setData] = useState<TemployeeDto>()
 
   const update = async () => {
     const res = await apiGetEmployee_id(id, params)

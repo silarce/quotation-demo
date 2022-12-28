@@ -20,12 +20,12 @@ import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from "./employeeList.module.scss"
 // type
-import { Temployee } from "js/api/api_employee"
+import { TemployeeDto } from "js/api/api_employee"
 
 
 
 export default function EmployeeList({ employeeList, toUpdate }: {
-  employeeList: Temployee[]
+  employeeList: TemployeeDto[]
   toUpdate: () => void
 }) {
 
@@ -43,7 +43,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
     })
   }
 
-  const openDelPanel = (e: MouseEvent, data: Temployee) => {
+  const openDelPanel = (e: MouseEvent, data: TemployeeDto) => {
     e.stopPropagation()
     const { id, idNumber, chName } = data
     setSelInfo({ id, idNumber, chName })
@@ -104,7 +104,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
                           {data.map((item, index) => {
                             const { grade, name } = item
                             const department = item.department
-                            const { name: departmentName } = department
+                            const { name: departmentName } = department ?? {}
                             return (
                               <div key={index}>
                                 {`字母 / ${departmentName} / ${name} / Level${grade}`}
@@ -147,7 +147,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
 
 // ============================================================
 
-type TtableKeysIndex = keyof Pick<Temployee,
+type TtableKeysIndex = keyof Pick<TemployeeDto,
   "idNumber" | "chName" | "phone1" | "jobs">
 
 const tableKeyIndex: TtableKeysIndex[] = [

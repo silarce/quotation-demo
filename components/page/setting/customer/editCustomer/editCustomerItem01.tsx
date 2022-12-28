@@ -19,13 +19,13 @@ const optionsCustomerCategory
 import style from "../customer.module.scss"
 
 // type
-import { TcustomersData } from "js/api/api_customer";
+import { TcustomerDto,TpostCustomer } from "js/api/api_customer";
 
 
 export default function EditCustomerItem01({ data, setData }: {
-  data: TcustomersData
+  data: TpostCustomer
   setData:
-  Dispatch<SetStateAction<TcustomersData>>
+  Dispatch<SetStateAction<TpostCustomer>>
 }) {
 
   const {
@@ -95,7 +95,7 @@ export default function EditCustomerItem01({ data, setData }: {
   }
   // ======================================================
   const createOnChange
-    = (key: keyof Omit<TcustomersData, "contacts">) => {
+    = (key: keyof Omit<TcustomerDto, "contacts">) => {
       return (value: string) => {
         setData(data => {
           data[key] = value
@@ -118,7 +118,7 @@ export default function EditCustomerItem01({ data, setData }: {
             label={"客戶全稱"}
             presetStyle="s01"
             captionWidth="100px"
-            inputProps={{
+            textareaProps={{
               value: data["name"],
               onChange: createOnChange("name"),
             }}
@@ -248,7 +248,7 @@ export default function EditCustomerItem01({ data, setData }: {
 
 // ==========================================================
 
-type TkeyIndex01Key = (keyof Pick<TcustomersData,
+type TkeyIndex01Key = (keyof Pick<TcustomerDto,
   "phone" | "fax">)
 
 const keyIndex01: TkeyIndex01Key[]

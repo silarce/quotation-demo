@@ -1,3 +1,44 @@
+filters
+
+  $and
+  $or
+  $eq: '等於',
+  $ne: '不等於',
+  $lt: '小於',
+  $lte: '小於等於',
+  $gt: '大於',
+  $gte: '大於等於',
+  $in: '包含 (須提供陣列)',
+  $notIn: '不包含 (須提供陣列)',
+  $contains: '含有 (部分比對字串)',
+  $notContains: '不含有 (部分比對字串)',
+  $null: '等於 Null',
+  $notNull: '不等於 Null',
+
+
+如果要過濾放在較深層的東西，可以這樣寫
+filters:{
+  "jobs.department.id": "ce0ad704-148b-4c48-bdb2-5f1458c6a998",
+}
+是指
+jobs:{
+  department:{
+    id:"ce0ad704-148b-4c48-bdb2-5f1458c6a998"
+  }
+}
+
+符合A或B
+$or: {
+  idNumber: {
+    $contains: router.query.other,
+  },
+  chName: {
+    $contains: router.query.other,
+  },
+},
+
+
+
 GET {{host}}/users?filter[username]=admin
 搜尋 username = "admin"
 
@@ -23,19 +64,24 @@ GET {{host}}/users?
 
 
 
+==============================================================
+populate
 
-filter
-  $and
-  $or
-  $eq: '等於',
-  $ne: '不等於',
-  $lt: '小於',
-  $lte: '小於等於',
-  $gt: '大於',
-  $gte: '大於等於',
-  $in: '包含 (須提供陣列)',
-  $notIn: '不包含 (須提供陣列)',
-  $contains: '含有 (部分比對字串)',
-  $notContains: '不含有 (部分比對字串)',
-  $null: '等於 Null',
-  $notNull: '不等於 Null',
+
+'jobs.department'代表巢狀，取得jobs，jobs下要取得department
+使用'jobs.department'的話'jobs'就可以省略
+
+{
+  populate: 'jobs'
+}
+{
+  populate: ['jobs']
+}
+{
+  populate: ['jobs', 'jobs.department']
+}
+"jobs"可省略
+{
+  populate: ['jobs.department']
+}
+

@@ -13,7 +13,7 @@ import CellWithBar from "components/global/gear/cell/cellWithBar";
 import style from "./selectEmployeePanel.module.scss"
 
 // api
-import { Temployee } from "js/api/api_employee";
+import { TemployeeDto } from "js/api/api_employee";
 
 // ===============================================================================
 export default function SelectEmployeePanel(
@@ -28,7 +28,7 @@ export default function SelectEmployeePanel(
   }:
     {
       visible: boolean,
-      employeeList: Temployee[]
+      employeeList: TemployeeDto[]
       label: string
       tip?: string
       onConfirm: (indexArr: number[]) => void

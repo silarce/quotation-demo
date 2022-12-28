@@ -1,0 +1,137 @@
+@use "styles/theme01" as *;
+
+@mixin btn {
+  padding: 5px 18px;
+  border: solid 1px $colorBorder01;
+  background-color: $bgc01;
+  font-weight: 400;
+  font-size: 16px;
+  cursor: pointer;
+  > span {
+    color: $colorMain;
+  }
+}
+
+.filterPanel {
+  :global(.ant-collapse) {
+    // border: none;
+    // background-color: transparent;
+
+    :global(.ant-collapse-item) {
+      :global(.ant-collapse-header) {
+        display: block;
+        padding: 0;
+        cursor: auto;
+      }
+      :global(.ant-collapse-content-box) {
+        padding: 0;
+      }
+    }
+  }
+
+  .panelHeader {
+    position: relative;
+    display: grid;
+    height: 50px;
+    background-color: $bgc01;
+    > span {
+      margin: auto;
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+    }
+    > button {
+      @include btn;
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+
+      &:hover {
+        > span {
+          color: $colorActive01;
+        }
+      }
+    }
+  }
+}
+
+.panelBody {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3fr 3fr 4fr;
+  padding: 7px 0px;
+  border-bottom: solid 1px $colorBorder01;
+  > .item {
+    position: relative;
+    padding: 20px 0 20px 48px;
+    .caption {
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+      margin: 0;
+      margin-bottom: 17px;
+    }
+    .checkContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 155px);
+      grid-template-rows: repeat(5, auto);
+      grid-auto-flow: column;
+      gap: 12px 30px;
+      :global(.ant-checkbox-wrapper) {
+        margin: 0;
+        font-weight: 400;
+        font-size: 16px;
+        > span:nth-of-type(2) {
+          padding-left: 7px;
+          padding-right: 0;
+        }
+        :global(.ant-checkbox-checked) {
+          :global(.ant-checkbox-inner) {
+            background-color: $colorMain;
+            border-color: $colorMain;
+          }
+        }
+      }
+    }
+
+    .checkContainer02 {
+      @extend .checkContainer;
+      grid-template-columns: 60px auto;
+    }
+
+    &::after {
+      content: "";
+      height: 100%;
+      width: 1px;
+      background-color: $colorBorder01;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+    &:nth-last-of-type(2) {
+      &::after {
+        width: 0;
+      }
+    }
+  } // item
+  .sideBtnBox {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    display: grid;
+    gap: 6px;
+    > button {
+      @include btn;
+      &:nth-of-type(1) {
+        border-color: $colorMain;
+      }
+      &:nth-of-type(2) {
+        border-color: $colorActive01;
+        > span {
+          color: $colorActive01;
+        }
+      }
+    }
+  }
+} // panelBody

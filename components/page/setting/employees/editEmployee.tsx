@@ -15,7 +15,7 @@ import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcon
 import CircularProgress from '@mui/material/CircularProgress';
 // type
 import { TpostEmployee, } from "js/api/api_employee";
-import type { TjobsData } from "js/api/api_department";
+import type { TjobDto } from "js/api/api_department";
 
 // css
 import scss from "./editEmployee.module.scss"
@@ -86,7 +86,7 @@ export default function EditEmployee({ data, setData, check }: {
 
 
 export type TprePostEmployee
-  = Omit<TpostEmployee, "jobId"> & { jobs: TjobsData[] }
+  = Omit<TpostEmployee, "jobId"> & { jobs: TjobDto[] }
 
 const emptyDataOri = (): TprePostEmployee => ({
   "idNumber": "",

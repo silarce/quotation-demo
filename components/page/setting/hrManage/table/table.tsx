@@ -1,18 +1,12 @@
 import {
   MouseEvent,
-  useState, useContext
 } from "react"
-import Link from "next/link";
 
 
 
 
 // global gear
-import CellWithBar from "components/global/gear/cell/cellWithBar"
-import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-import { ModalSuccess, ModalErr } from "components/global/gear/modal/simpleModal/alertModals";
-import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
-import InputSel from "components/global/gear/inputAndSel/inputSel";
+// import CellWithBar from "components/global/gear/cell/cellWithBar"
 import SearchBar02 from "components/global/gear/HOC/searchBar/searchBar02/searchBar02";
 import AddButton from "components/global/gear/button/addButton";
 
@@ -21,50 +15,26 @@ import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from "./table.module.scss"
 // type
-import { Temployee } from "js/api/api_employee"
+import { TemployeeDto } from "js/api/api_employee"
 import { Toption } from "fakeDatabase/options/options";
 
 
 export default function Table(
   {
     employeeList,
-    toUpdate,
     searchOption,
     openAddPanel,
     onSearch,
     onDelete
   }:
     {
-      employeeList: Temployee[]
-      toUpdate: () => void
+      employeeList: TemployeeDto[]
       searchOption: Toption[]
       openAddPanel: () => void
       onSearch: (valueArr: (string | number | null | undefined)[]) => void
-      onDelete: () => void
+      onDelete: (e: MouseEvent, index: number) => void
     }) {
 
-
-
-  // ---------------------------------------------------------------------------
-
-  const [selInfo, setSelInfo] = useState({
-    id: "",
-    idNumber: "",
-    chName: ""
-  })
-  const closeDelPanel = () => {
-    setSelInfo({
-      id: "",
-      idNumber: "",
-      chName: ""
-    })
-  }
-
-  const openDelPanel = (e: MouseEvent, data: Temployee) => {
-    e.stopPropagation()
-    const { id, idNumber, chName } = data
-    setSelInfo({ id, idNumber, chName })
-  }
 
   // ---------------------------------------------------------------------------
 
@@ -80,7 +50,7 @@ export default function Table(
   const inputPropsArr = [
     {
       props: {
-        placeholder: "請輸入搜尋內容",
+        placeholder: "搜尋中文姓名",
       }
     },
   ]
@@ -136,7 +106,7 @@ export default function Table(
                       {data.map((item, index) => {
                         const { grade, name } = item
                         const department = item.department
-                        const { name: departmentName } = department
+                        const { name: departmentName } = department??{}
                         return (
                           <div key={index}>
                             {`字母 / ${departmentName} / ${name} / Level${grade}`}
@@ -159,27 +129,20 @@ export default function Table(
 
               <div className={`${scss.column}`}>
                 <IconRemoveCircle className={scss.btnRemove}
-                  onClick={(e) => { openDelPanel(e, row) }} />
+                  onClick={(e) => { onDelete(e, index) }} />
               </div>
             </div>
-
           )
         })}
       </div>
-      <TwoButtonModal
-        {...{
-          visible: !!selInfo.id,
-          text: `請確定要刪除「${selInfo.idNumber}」「${selInfo.chName}」?`,
-          onConfirm: onDelete,
-          onCancel: closeDelPanel,
-        }} />
+
     </div>
   )
 }
 
 // ============================================================
 
-type TtableKeysIndex = keyof Pick<Temployee,
+type TtableKeysIndex = keyof Pick<TemployeeDto,
   "idNumber" | "chName" | "phone1" | "jobs">
 
 const tableKeyIndex: TtableKeysIndex[] = [

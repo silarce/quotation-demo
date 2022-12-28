@@ -3,19 +3,28 @@
 import style from "../customer.module.scss"
 
 // type
-import { TcustomersData } from "js/api/api_customer";
+import { TcustomerDto } from "js/api/api_customer";
 
 // ====================================================
 export default function PanelBody(
-  { customersData }: { customersData: TcustomersData }) {
+  { customersData }: { customersData: TcustomerDto }) {
 
   const {
-    nickname,
+    nickname, contacts
+  } = customersData
+
+  let {
     county, district, address,
-    invoiceCounty, invoiceDistrict, invoiceAddress,
-    contacts
-  }
-    = customersData
+    invoiceCounty, invoiceDistrict, invoiceAddress
+  } = customersData
+
+  county = county ?? ""
+  district = district ?? ""
+  address = address ?? ""
+  invoiceCounty = invoiceCounty ?? ""
+  invoiceDistrict = invoiceDistrict ?? ""
+  invoiceAddress = invoiceAddress ?? ""
+
   // ==================================================
 
 
@@ -75,11 +84,11 @@ export default function PanelBody(
 }
 
 // ==========================================================
-// TcustomersData
+// TcustomerDto
 
 
 type TindexKeys01
-  = keyof Pick<TcustomersData, "principal" | "taxId" | "taxDeductionCategory">
+  = keyof Pick<TcustomerDto, "principal" | "taxId" | "taxDeductionCategory">
 
 const indexKeys01: TindexKeys01[]
   = ["principal", "taxId", "taxDeductionCategory"]
