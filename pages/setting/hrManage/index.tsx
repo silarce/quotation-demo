@@ -201,8 +201,8 @@ const customCard = (
         {" / "}
         <span>{chName}</span>
       </div>
-      <span>{name}</span>
-      <span>{phone1}</span>
+      <span>{name || "無職稱"}</span>
+      <span>{phone1 || "無連絡電話"}</span>
     </div>
   )
 }
