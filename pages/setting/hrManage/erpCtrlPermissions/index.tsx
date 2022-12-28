@@ -58,10 +58,6 @@ export default function ErpCtrlPermissions() {
         },
 
       }
-      // chName: {
-      //   $contains: router.query.chName,
-      // },
-
     },
     populate: ["jobs.department", "user"]
   }
@@ -127,6 +123,7 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     if (!isReady) return
     updateList()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
 
