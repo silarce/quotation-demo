@@ -24,9 +24,14 @@ export default function PanelHeader({ budget, isActive, openQuotation }:
   const {
     quotationId, clientName, contactName,
     contactPhone, undertaker, discount,
-    doorQty, budgetAmount, } = budget
+    doorQty, } = budget
   const { date, country, projectName, } = budget
+  let { budgetAmount } = budget
 
+  if (typeof budgetAmount === "string") {
+    budgetAmount = parseFloat(budgetAmount)
+  }
+  budgetAmount = budgetAmount.toLocaleString()
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive}>

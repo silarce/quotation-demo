@@ -31,7 +31,12 @@ export default function PanelBody(
   return (
     <div className={style.panelBody}>
       {budgetDetail.map((item, index) => {
-        const { date, describe, discount, doorQty, contractAmount } = item
+        const { date, describe, discount, doorQty } = item
+        let { contractAmount } = item
+        if (typeof contractAmount === "string") {
+          contractAmount = parseFloat(contractAmount)
+        }
+        contractAmount = contractAmount.toLocaleString()
 
         return (
           <CellWithBar className={style.detailRow} key={index}>
