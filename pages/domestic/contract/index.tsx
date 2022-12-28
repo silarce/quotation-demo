@@ -27,14 +27,11 @@ import style from "./contract.module.scss"
 import { fakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
 
 // ===========================================
-
-
-
-
-
-
-// ===========================================
-
+// 合約列表單個項目展開裡的內容是追加追減項目
+// 合約列表單個項目展開裡的內容是追加追減項目
+// 合約列表單個項目展開裡的內容是追加追減項目
+// 合約列表單個項目展開裡的內容是追加追減項目
+// 合約列表單個項目展開裡的內容是追加追減項目
 export default function Contract() {
 
   // ===================================================
