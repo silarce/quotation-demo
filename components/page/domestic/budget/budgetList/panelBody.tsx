@@ -1,4 +1,4 @@
-
+import { MouseEvent } from "react";
 
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar";
@@ -16,12 +16,17 @@ import { TbudgetDetail } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup'
 
 
 
-export default function PanelBody({ budgetDetail }:
-  { budgetDetail: TbudgetDetail[] }) {
+export default function PanelBody(
+  { budgetDetail,
+    openQuotation
+  }:
+    {
+      budgetDetail: TbudgetDetail[]
+      openQuotation: (e: MouseEvent) => void
+    }
+) {
 
-  const onClick = () => {
-    alert("目前無功能")
-  }
+
 
   return (
     <div className={style.panelBody}>
@@ -35,7 +40,7 @@ export default function PanelBody({ budgetDetail }:
             <span>{discount}</span>
             <span>{doorQty}</span>
             <span>{contractAmount}</span>
-            <div><IconDetail onClick={onClick} /></div>
+            <div><IconDetail onClick={openQuotation} /></div>
           </CellWithBar>
         )
       })}

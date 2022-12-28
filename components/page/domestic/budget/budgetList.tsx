@@ -86,7 +86,7 @@ export default function BudgetList({ budgetList, searchObj }:
         <Panel key={index} className={style.panel}
           header={<PanelHeader budget={item} isActive={isActive} openQuotation={openQuotation} />}
         >
-          <PanelBody budgetDetail={detail} />
+          <PanelBody budgetDetail={detail} openQuotation={openQuotation}/>
         </Panel>
         )
         })}
