@@ -91,7 +91,8 @@ function useProduct(
   }
 
   const copyProduct = (index: number) => {
-    productList.splice(index, 0, _.cloneDeep(productList[index]) as ProdClass)
+    const newProdClass = _.cloneDeep(productList[index]) as ProdClass
+    productList.splice(index, 0, newProdClass)
     setProductList([...productList])
   }
 
@@ -215,8 +216,6 @@ class ProdClass {
     this.ejectionDoor = ejectionDoor
     this.typhoonProof = typhoonProof
 
-
-
     this.doorType = optionsGroup["doorType"].find((item) => item.value === doorType)
       ?? unexpectedOption(doorType)
     this.horsepower = optionsGroup["horsepower"].find((item) => item.value === horsepower)
@@ -320,23 +319,24 @@ class ProdClass {
       .toNumber().toLocaleString()
   }
   // --------------
-  onInputChange = (
-    value:string,
+  onInputChange(
+    value: string,
     key: keyof TproductString
-  ) => {
+  ) {
     const regex = /^area$|^unitPrice$|^subTotal$|^cai$/
     if (regex.test(key)) return
     key = key as Exclude<keyof TproductString,
       "area" | "unitPrice" | "subTotal" | "cai"
     >
+
     this[key] = value
     this.setProductList(state => [...state])
   }
 
-  onSelChange = (
+  onSelChange(
     option: Toption | null,
     key: keyof TproductObject
-  ) => {
+  ) {
     if (!option) return
     this[`${key}`] = option
 
@@ -352,9 +352,9 @@ class ProdClass {
     this.setProductList(state => [...state])
   }
 
-  onChcekBoxClick = (
+  onChcekBoxClick(
     key: keyof TproductBoolean
-  ) => {
+  ) {
     this[key] = !this[key]
     this.setProductList(state => [...state])
   }
@@ -393,7 +393,6 @@ class ProdClass {
       openType: this.openType,
     }
   }
-
 }
 
 
@@ -588,28 +587,6 @@ type TuseProduct = ReturnType<typeof useProduct>
 export default useProduct
 export { prodCellConfigOri }
 export type { TuseProduct, Tproduct, TprodKeys, ProdClass, PartClass }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
