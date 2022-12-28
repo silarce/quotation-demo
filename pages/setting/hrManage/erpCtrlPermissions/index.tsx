@@ -49,9 +49,18 @@ export default function ErpCtrlPermissions() {
       },
       // 收到空字串會壞掉
       "jobs.department.id": router.query.department || undefined,
-      chName: {
-        $contains: router.query.chName,
-      },
+      $or: {
+        chName: {
+          $contains: router.query.content,
+        },
+        idNumber: {
+          $contains: router.query.content,
+        },
+
+      }
+      // chName: {
+      //   $contains: router.query.chName,
+      // },
 
     },
     populate: ["jobs.department", "user"]
@@ -128,11 +137,11 @@ export default function ErpCtrlPermissions() {
   const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
 
     const department = valueArr[0]
-    const chName = valueArr[1]
+    const content = valueArr[1]
 
     router.push({
       pathname: "/setting/hrManage/erpCtrlPermissions",
-      query: { department, chName }
+      query: { department, content }
     })
   }
 
