@@ -33,7 +33,7 @@ $semiMaring: 0 8px;
   height: calc(842px * 2.7);
   padding: 60px 40px;
   // line-height:0.5
-  &.typeB {
+  &.spaceBetween {
     display: grid;
     align-content: space-between;
   }
@@ -131,6 +131,11 @@ $semiMaring: 0 8px;
       }
     }
   }
+}
+// ======================================================================
+.table_quoteTypeSum {
+  @extend .table;
+  grid-template-columns: 300px 200px repeat(2,1fr);
 }
 // ======================================================================
 .total {

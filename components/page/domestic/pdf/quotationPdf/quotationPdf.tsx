@@ -5,12 +5,15 @@ import React, {
 import html2canvas from 'html2canvas'
 import jsPDF from "jspdf"
 
+import Decimal from "decimal.js"
+
 const _ = require("lodash")
 
 // component
 import Header from "./header"
 import Profile from "./profile"
 import Table from "./table"
+import Table_quoteTypeSum, { TquoteTypeSumList } from "./table_quoteTypeSum"
 import Total from "./total"
 import Other from "./other"
 
@@ -21,7 +24,7 @@ import { setRootLoading, showRootLoading } from "components/global/gear/loadingC
 import Modal from "antd/lib/modal/Modal"
 
 // css
-import style from "./quotationPdf.module.scss"
+import scss from "./quotationPdf.module.scss"
 
 // type
 import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
@@ -51,6 +54,8 @@ export default function QuotationPdf(
       sinatureState: TuseSinature
     }
 ) {
+
+
 
   const [pdfType, setPdfType] = useState("typeA")
 
@@ -94,9 +99,9 @@ export default function QuotationPdf(
     showRootLoading(false)
   }
 
-
+  // ----------------------------------------------------------------------------
   return (
-    <Modal className={style.quotationPdf}
+    <Modal className={scss.quotationPdf}
       // wrapClassName={style.modal}
       visible={isVisable}
       onCancel={onCancel}
@@ -106,13 +111,13 @@ export default function QuotationPdf(
       width={"fit-content"}
     >
 
-      <div className={style.panel}>
-        <div className={style.left}>
-          <button className={pdfType === "typeA" ? style.active : ""}
+      <div className={scss.panel}>
+        <div className={scss.left}>
+          <button className={pdfType === "typeA" ? scss.active : ""}
             onClick={() => { setPdfType("typeA") }}>
             <span>typeA</span>
           </button>
-          <button className={pdfType === "typeB" ? style.active : ""}
+          <button className={pdfType === "typeB" ? scss.active : ""}
             onClick={() => { setPdfType("typeB") }}>
             <span>typeB</span>
           </button>
@@ -171,23 +176,29 @@ const PdfTypeA = (
   const chunkedList = _.chunk(productList, 12) as ProdClass[][]
   const pageCount = chunkedList.length
 
+  // --------------------------------------------------------------------------
   return (
     <>
+      {/* 每一頁 */}
       {chunkedList.map((chunk, index) => {
         return (
           <Fragment key={index}>
-            {index !== 0 && <hr className={style.hr} />}
-            <div className={style.pdf}
+            {index !== 0 && <hr className={scss.hr} />}
+            <div className={`${scss.pdf} ${scss.spaceBetween}`}
               ref={ele => refPdf.current[0] = ele}>
-              <Header />
-              <Profile profileState={profileState} index={index + 1} pageCount={pageCount} />
-              <Table productList={chunk} />
-              <Total remarkListState={remarkListState} prodState={prodState} />
-              <Other
-                rangeListState={rangeListState}
-                payInfoState={payInfoState}
-                sinatureState={sinatureState}
-              />
+              <div>
+                <Header />
+                <Profile profileState={profileState} index={index + 1} pageCount={pageCount} />
+                <Table productList={chunk} />
+              </div>
+              <div>
+                <Total remarkListState={remarkListState} prodState={prodState} />
+                <Other
+                  rangeListState={rangeListState}
+                  payInfoState={payInfoState}
+                  sinatureState={sinatureState}
+                />
+              </div>
             </div>
           </Fragment>
         )
@@ -220,14 +231,46 @@ const PdfTypeB = (
   const { productList } = prodState
   const chunkedList = _.chunk(productList, 40) as ProdClass[][]
   const pageCount = chunkedList.length + 1
+  // --------------------------------------------------------------------------
 
+
+
+  // console.log(productList)
+
+  const quoteTypeSumObj: TquoteTypeSumList = {}
+
+  productList.forEach((prod) => {
+    const { quoteType, qty, unitPrice, priceTotal } = prod
+    const key = quoteType.value
+
+    if (!quoteTypeSumObj[key]) quoteTypeSumObj[key] = {
+      quoteType: quoteType.label,
+      qtySum: 0,
+      unitPriceSum: 0,
+      priceTotleSum: 0,
+    }
+
+
+    quoteTypeSumObj[key].qtySum
+      = quoteTypeSumObj[key].qtySum + parseInt(qty)
+    quoteTypeSumObj[key].unitPriceSum
+      = new Decimal(quoteTypeSumObj[key].unitPriceSum).plus(unitPrice.replace(",", "")).toNumber()
+    quoteTypeSumObj[key].priceTotleSum
+      = new Decimal(quoteTypeSumObj[key].priceTotleSum).plus(priceTotal.replace(",", "")).toNumber()
+  })
+
+  const quoteTypeSumArr = Object.values(quoteTypeSumObj)
+
+  // --------------------------------------------------------------------------
   return (
     <>
-      <div className={`${style.pdf} ${style.typeB}`}
+      {/* 第一頁 */}
+      <div className={`${scss.pdf} ${scss.spaceBetween}`}
         ref={ele => refPdf.current[0] = ele}>
         <div>
           <Header />
           <Profile profileState={profileState} index={1} pageCount={pageCount} />
+          <Table_quoteTypeSum quoteTypeSumArr={quoteTypeSumArr} />
         </div>
         <div>
           <Total remarkListState={remarkListState} prodState={prodState} />
@@ -238,12 +281,12 @@ const PdfTypeB = (
           />
         </div>
       </div>
-
+      {/* 第一頁之後 */}
       {chunkedList.map((chunk, index) => {
         return (
           <Fragment key={index}>
-            <hr className={style.hr} />
-            <div className={style.pdf}
+            <hr className={scss.hr} />
+            <div className={scss.pdf}
               ref={ele => refPdf.current[index + 1] = ele}>
               <Header />
               <Profile profileState={profileState} index={index + 2} pageCount={pageCount} />

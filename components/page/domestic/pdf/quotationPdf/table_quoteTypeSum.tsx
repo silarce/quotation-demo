@@ -1,0 +1,101 @@
+
+// css
+import style from "./quotationPdf.module.scss"
+
+
+type TquoteTypeSum = {
+  quoteType: string
+  qtySum: number
+  unitPriceSum: number
+  priceTotleSum: number
+}
+
+export type TquoteTypeSumList = {
+  [key in string]: TquoteTypeSum
+}
+
+type TquoteTypeSumArr = TquoteTypeSum[]
+
+// ======================================================================
+export default function Table_quoteTypeSum(
+  { quoteTypeSumArr }:
+    { quoteTypeSumArr: TquoteTypeSumArr }
+) {
+
+
+
+
+  return (
+    <div className={style.table_quoteTypeSum}>
+
+      {/* thead */}
+      {indexKeys.map((key, index) => {
+        const { label, width } = config[key]
+        const theStyle = { width }
+        return (
+          <div className={style.theadCell} key={index} style={theStyle}>
+            <span>
+              {label}
+            </span>
+          </div>
+        )
+      })}
+
+      {/* tbody */}
+
+      {quoteTypeSumArr.map((row) => {
+        return indexKeys.map((key, cIndex) => {
+          let value = row[key]
+          const { width, align } = config[key]
+          const theStyle = { width }
+          const subClass = " " + style[align ?? ""]
+          return (
+            <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
+              <span>{value.toLocaleString()}</span>
+            </div>
+          )
+        })
+      })}
+    </div>
+  )
+}
+
+// =============================================================================
+
+type TindexKeys =
+  "quoteType" | "qtySum" | "unitPriceSum" | "priceTotleSum"
+
+type Tconfig = {
+  [key in TindexKeys]: {
+    label: string
+    width: string
+    align?: "center" | "right"
+  }
+}
+
+const indexKeys: TindexKeys[] = [
+  "quoteType", "qtySum", "unitPriceSum", "priceTotleSum"
+]
+
+const config: Tconfig = {
+  quoteType: {
+    label: "門型類型",
+    width: "auto",
+  },
+  qtySum: {
+    label: "樘數",
+    width: "auto",
+  },
+  unitPriceSum: {
+    label: "總單價金額",
+    width: "auto",
+  },
+  priceTotleSum: {
+    label: "總複價金額",
+    width: "auto",
+  },
+
+}
+
+// =============================================================================
+
