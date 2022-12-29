@@ -10,15 +10,20 @@ import Card from "components/page/setting/hrManage/card/card"
 import GridPanel from "components/page/setting/hrManage/modal/gridSelector.tsx/gridPanel"
 
 // gear
+import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 
 // api
-import { useErpFeatures } from "js/api/api_erpFeature"
+import {
+  useErpFeatures,
+  apiPostErpFeatures_id_departments, apiDeleteErpFeatures_id_departments
+} from "js/api/api_erpFeature"
 import { useDepartments } from "js/api/api_department"
 
 // css
 import scss from "./erpFuncPermissions.module.scss"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 
 // =============================================================================
@@ -28,11 +33,21 @@ export default function ErpFuncPermissions() {
   const { data: erpData, update: updateErp } = useErpFeatures()
   const erpArr = erpData ?? []
 
+  const updateList = async () => {
+    setIsLoading(true)
+    await updateErp()
+    setIsLoading(false)
+  }
+
+
   const { data: departmentsData, update: updateDepartments } = useDepartments()
   const departmentArr = departmentsData?.data ?? []
   const departmentNameArr = departmentArr.map((item) => item.name)
 
   // --------------------------------------------------------------------------
+
+
+
 
 
   useEffect(() => {
@@ -46,20 +61,37 @@ export default function ErpFuncPermissions() {
   // --------------------------------------------------------------------------
 
 
+  // 新增部門
+  const [erpId_add, setErpId_add] = useState<string>()
 
-
-  const [showPanel, setShowPanel] = useState(false)
-
-  const openPanel = () => {
-    setShowPanel(true)
+  const openAddPanel = (erpId: string) => {
+    setErpId_add(erpId)
   }
 
-  const panelOnCancel = () => {
-    setShowPanel(false)
+  const cancelAddPanel = () => {
+    setErpId_add(undefined)
   }
-  const panelOnConfirm = (indexArr: number[]) => {
-    alert("被選擇的index" + indexArr.join(","))
-    setShowPanel(false)
+  
+  const addDepartment = async (indexArr: number[]) => {
+    if (!erpId_add) return
+
+    const departmentsIdArr = departmentArr.map((item) => item.id)
+    const body = {
+      departmentIds: departmentsIdArr.filter((item, index) => {
+        return indexArr.includes(index)
+      })
+    }
+
+    try {
+      setRootLoading(true)
+      await apiPostErpFeatures_id_departments(erpId_add, body)
+      cancelAddPanel()
+    }
+    catch {
+      myAlert.err({ title: "新增部門失敗" })
+    }
+    setRootLoading(false)
+    await updateList()
   }
 
   // --------------------------------------------------------------------------
@@ -103,7 +135,7 @@ export default function ErpFuncPermissions() {
                 addLabel={"新增管理部門"}
                 noDataTip="尚未新增管理部門"
                 dataArr={demparmentsNameArr}
-                showAdd={openPanel}
+                showAdd={() => openAddPanel(id)}
                 removeData={removeData}
               />
             )
@@ -115,12 +147,12 @@ export default function ErpFuncPermissions() {
 
 
       <GridPanel
-        visible={showPanel}
+        visible={!!erpId_add}
         title="請選擇部門"
         note="可複選"
         dataArr={departmentNameArr}
-        onCancel={panelOnCancel}
-        onConfirm={panelOnConfirm}
+        onCancel={cancelAddPanel}
+        onConfirm={addDepartment}
       />
 
       <TwoButtonModal
