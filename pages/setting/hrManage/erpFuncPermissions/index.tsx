@@ -2,23 +2,49 @@
 // ERP功能權限
 // ERP功能權限
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 // component
 import Header from "components/page/setting/hrManage/header/header"
 import Card from "components/page/setting/hrManage/card/card"
 import GridPanel from "components/page/setting/hrManage/modal/gridSelector.tsx/gridPanel"
+
+// gear
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
+
+// api
+import { useErpFeatures } from "js/api/api_erpFeature"
+import { useDepartments } from "js/api/api_department"
 
 // css
 import scss from "./erpFuncPermissions.module.scss"
 
 
-
-
-
-
+// =============================================================================
 export default function ErpFuncPermissions() {
+  const [isLoading, setIsLoading] = useState(false)
+  // --------------------------------------------------------------------------
+  const { data: erpData, update: updateErp } = useErpFeatures()
+  const erpArr = erpData ?? []
+
+  const { data: departmentsData, update: updateDepartments } = useDepartments()
+  const departmentArr = departmentsData?.data ?? []
+  const departmentNameArr = departmentArr.map((item) => item.name)
+
+  // --------------------------------------------------------------------------
+
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true)
+      await Promise.all([updateErp(), updateDepartments()])
+      setIsLoading(false)
+    })()
+  }, [])
+
+  // --------------------------------------------------------------------------
+
 
 
 
@@ -61,33 +87,38 @@ export default function ErpFuncPermissions() {
 
       <div className={scss.mainContainer}>
         <div>
-          {indexKey.map((key, index) => {
-            const { label } = config[key]
-            const dataArr = fakeData[key].map((item) => item.label)
+          {erpArr.map((erp, index) => {
+
+            const { departments, id } = erp
+            const demparmentsNameArr = departments.map((item) => item.name)
 
             const removeData = (index: number) => {
-              openDelete(fakeData[key][index])
+              // openDelete(fakeData[key][index])
+
             }
 
             return (
               <Card key={index}
-                label={label}
+                label={"NAME"}
                 addLabel={"新增管理部門"}
                 noDataTip="尚未新增管理部門"
-                dataArr={dataArr}
+                dataArr={demparmentsNameArr}
                 showAdd={openPanel}
                 removeData={removeData}
               />
             )
           })}
         </div>
+        <LoadingCover01 isLoading={isLoading} />
       </div>
+
+
 
       <GridPanel
         visible={showPanel}
         title="請選擇部門"
         note="可複選"
-        dataArr={fakeDepartments}
+        dataArr={departmentNameArr}
         onCancel={panelOnCancel}
         onConfirm={panelOnConfirm}
       />
@@ -101,6 +132,7 @@ export default function ErpFuncPermissions() {
         onConfirm={confirmDelete}
         onCancel={() => setShowDelete(false)}
       />
+
 
     </div>
   )

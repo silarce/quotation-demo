@@ -9,13 +9,12 @@ import { TpageMetaDto, TerpFeatureDto } from "./dtoTypes";
 const apiGetErpFeatures = () => {
   const api = "/erp-features"
   return axi.get(api)
-    .then(({ data }) => data as TpageMetaDto[])
+    .then(({ data }) => data as TerpFeatureDto[])
     .catch(err => Promise.reject(err))
 }
 
-// 得到空陣列，怎麼新增資料?
-const useErpFeatures = () => {
-  const [data, setData] = useState<TpageMetaDto[]>()
+export const useErpFeatures = () => {
+  const [data, setData] = useState<TerpFeatureDto[]>()
   const update = async () => {
     const res = await apiGetErpFeatures()
     if (res) setData(res)

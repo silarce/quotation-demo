@@ -139,7 +139,7 @@ export type TerpFeatureDto = {
   createdAt: string
   updatedAt: string
   name: string
-  departments: TdepartmentDto
+  departments: TdepartmentDto[]
 }
 
 
