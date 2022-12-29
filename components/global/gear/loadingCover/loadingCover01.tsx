@@ -2,7 +2,7 @@
 
 
 
-import style from "./loadingCover.module.scss"
+import scss from "./loadingCover.module.scss"
 
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -18,13 +18,15 @@ export default function LoadingCover01({ isLoading, size, className = "" }
   }) {
 
 
-  const styleLoading = isLoading ? style.Loading : ""
 
-  className = `${className} ${style.loadingCover01} ${styleLoading}`
+
+  className = `${className} ${scss.loadingCover01}`
+
+  if (!isLoading) return null
 
   return (
     <div className={className}>
-      <CircularProgress className={style.icon}
+      <CircularProgress className={scss.icon}
         size={size ?? 100} />
     </div>
   )
