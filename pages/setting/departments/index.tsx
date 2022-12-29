@@ -2,7 +2,7 @@
 // 公司職等職稱
 import {
   ChangeEvent, Dispatch, SetStateAction, MouseEvent,
-  useState, useEffect, 
+  useState, useEffect, useMemo,
 } from "react"
 
 
@@ -40,7 +40,7 @@ import style from "./departments.module.scss"
 
 // ===========================================================
 const params = {
-  populate: ["jobs"]
+  populate: ["jobs"],
 }
 // ===========================================================
 export default function Department() {
@@ -51,7 +51,14 @@ export default function Department() {
   // ---------------------------------------------------------
   // 取得部門列表
   const { data, setData, update } = useDepartments(params)
-  const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data??{})
+  const departmentArr = data?.data ?? []
+
+  const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data ?? {})
+
+
+  const { CdepartmentArr, addCdepartment, removeCdepartment, }
+    = useClass(departmentArr)
+
 
 
   const toUpdate = async () => {
@@ -117,6 +124,8 @@ export default function Department() {
               myDepartment={myDepartment}
               setMyDepartment={setMyDepartment}
               editable={editable}
+              CdepartmentArr={CdepartmentArr}
+              removeCdepartment={removeCdepartment}
             />
           </div>
         }
@@ -127,13 +136,223 @@ export default function Department() {
         setVisible={setShowAdd}
         title={"請輸入新增部門"}
         placeholder={"新部門"}
-        onConfirm={addDepartment}
+        onConfirm={(v) => addCdepartment(v)}
       />
     </div>
   )
 }
 
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
 
+export class ClassDepartment {
+  id: string
+  _name: string
+  jobs: (ClassJob | undefined)[]
+  reRender: () => void //更新狀態
+
+  _isFocus = false
+
+  dWillDelete = false
+  dWillPatch = false
+  dIsNew = false
+
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  constructor(
+    department: TdepartmentDto | { newDepartmentName: string },
+    reRender: () => void
+  ) {
+
+    let jobs: TdepartmentDto["jobs"];
+    if ("id" in department) {
+      this.id = department.id
+      this._name = department.name
+      jobs = department.jobs ?? []
+    }
+    else {
+      this.id = ""
+      this._name = department.newDepartmentName
+      jobs = []
+      this.dIsNew = true
+    }
+
+    const preJobs: (ClassJob | undefined)[] = new Array(10).fill(undefined)
+    jobs.forEach((job) => {
+      const theIndex = job.grade - 1
+      preJobs[theIndex] = new ClassJob(job, reRender)
+    })
+    this.jobs = preJobs
+
+    this.reRender = reRender
+  } // constructor ------------------
+  // --------------------------------------------------------
+
+  get name() { return this._name }
+  set name(v: string) {
+    this._name = v
+    this.reRender()
+  }
+
+  get isFocus() { return this._isFocus }
+  set isFocus(v: boolean) {
+    this._isFocus = v
+    this.reRender()
+  }
+
+  addJob = (newJobindex: number) => {
+    this.jobs[newJobindex] = new ClassJob({ newJobindex }, this.reRender)
+    this.reRender()
+  }
+
+  // 刪除與反刪除按鈕
+  dShowDeletePanel = (e: MouseEvent) => {
+    e.preventDefault()
+    if (this.dWillDelete) {
+      this.dWillDelete = false
+      this.reRender()
+    }
+    else {
+      myAlert.confirm({
+        title: `請確認是否刪除？`,
+        content: `部門「${this.name}」`,
+        className: style.modalConfirm,
+        props: {
+          onOk: () => {
+            this.dWillDelete = !this.dWillDelete
+            this.reRender()
+          }
+        }
+      })
+    }
+
+
+  } // dShowDeletePanel
+
+  // 移除job
+  removeJob = (index: number) => {
+    this.jobs[index] = undefined
+    this.reRender()
+  }
+
+
+} // ClassDepartment ======================================================
+
+class ClassJob {
+  _name: string
+  grade: number
+  reRender: () => void
+  _isFocus = false
+
+  jWillDelete = false
+  jWillPatch = false
+  jIsNew = false
+
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  constructor(
+
+    job: TjobDto | { newJobindex: number },
+    reRender: () => void
+  ) {
+    if ("id" in job) {
+      this._name = job.name
+      this.grade = job.grade
+    }
+    else {
+      this._name = "新職稱"
+      this.grade = job.newJobindex + 1
+      this.jIsNew = true
+    }
+    this.reRender = reRender
+
+  } // constructor ------------------
+  // -----------------------------------------------------
+
+  get name() { return this._name }
+  set name(v: string) {
+    this.name = v
+    this.reRender()
+  }
+
+  get isFocus() { return this._isFocus }
+  set isFocus(v: boolean) {
+    this._isFocus = v
+    this.reRender()
+  }
+
+
+  // 刪除與反刪除按鈕
+  jShowDeletePanel = (e: MouseEvent) => {
+    e.preventDefault()
+
+    if (this.jWillDelete) {
+      this.jWillDelete = false
+      this.reRender()
+      return
+    }
+
+    myAlert.confirm({
+      title: `請確認是否刪除？`,
+      content: `職稱「${this.name}」`,
+      className: style.modalConfirm,
+      props: {
+        onOk: () => {
+          this.jWillDelete = !this.jWillDelete
+          this.reRender()
+        }
+      }
+    })
+
+  } // dShowDeletePanel
+
+
+} // ClassJob=================================================================
+
+const useClass = (departmentArr: TdepartmentDto[]) => {
+  const [CdepartmentArr, setCdepartmentArr] = useState<ClassDepartment[]>([])
+  const reRender = () => setCdepartmentArr(state => [...state])
+
+  useEffect(() => {
+    if (!departmentArr[0]) return;
+    const classArr
+      = departmentArr.map((department) => new ClassDepartment(department, reRender))
+    setCdepartmentArr(classArr)
+  }, [departmentArr])
+
+  const addCdepartment = (newDepartmentName: string) => {
+    CdepartmentArr.push(
+      new ClassDepartment({ newDepartmentName }, reRender)
+    )
+    reRender()
+  }
+  const removeCdepartment = (index: number) => {
+    CdepartmentArr.splice(index, 1)
+    reRender()
+  }
+
+  return { CdepartmentArr, addCdepartment, removeCdepartment, }
+
+}
+
+
+
+
+
+
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
 // ========================================================
 // ========================================================
 // ========================================================

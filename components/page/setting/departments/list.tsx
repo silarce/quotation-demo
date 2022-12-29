@@ -1,10 +1,10 @@
 
 import {
   Dispatch, SetStateAction,
-  useState, useRef, Fragment
+  useState, useRef, Fragment, MouseEvent,
 } from 'react';
 
-
+const _ = require("lodash")
 
 // component
 import AutosizeInput from 'react-input-autosize';
@@ -12,7 +12,7 @@ import AutosizeInput from 'react-input-autosize';
 // icon
 import { IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
 import iconAdd from "public/image/icon/add.svg"
-import { RedoOutlined } from '@ant-design/icons';
+import { CloseOutlined, RedoOutlined } from '@ant-design/icons';
 
 
 // css
@@ -20,18 +20,26 @@ import style from "./departments.module.scss"
 
 
 // type
-import { TuseDeparmentGrid } from 'pages/setting/departments';
+import { TuseDeparmentGrid, ClassDepartment } from 'pages/setting/departments';
 
 
 
 
 // =============================================
 export default function List(
-  { myDepartment, setMyDepartment, editable }:
+  {
+    myDepartment,
+    setMyDepartment,
+    editable,
+    CdepartmentArr,
+    removeCdepartment
+  }:
     {
       myDepartment: TuseDeparmentGrid["myDepartment"]
       setMyDepartment: TuseDeparmentGrid["setMyDepartment"]
       editable: boolean
+      CdepartmentArr: ClassDepartment[]
+      removeCdepartment: (index: number) => void
     }
 ) {
 
@@ -39,17 +47,27 @@ export default function List(
   return (
     <div className={style.list}>
       <div className={style.row}>
-        {myDepartment.map((dItem, dIndex) => {
-          const { name, jobs, dMethod, isMarkedDel: dIsMarkedDel, isFocus,
-            dOnChange, dMarkDel, changeFocus
-          } = dItem
+        {CdepartmentArr.map((department, dIndex) => {
+          const { id, name, jobs, isFocus,
+            dWillDelete, dWillPatch, dIsNew,
+            dShowDeletePanel, addJob, removeJob,
+          } = department
+
 
 
           let styleHead: string = `${style.cell} ${style.head}`
-          if (dIsMarkedDel) styleHead
+
+          if (dWillDelete) styleHead
             = `${styleHead} ${style.delete}`
+
           if (isFocus) styleHead = `${styleHead} ${style.isFocus}`
-          const TheIcon = dIsMarkedDel ? RedoOutlined : IconCross01
+
+          const DeleteSwitch = dWillDelete ? RedoOutlined : IconCross01
+
+          const onDelete = (e: MouseEvent) => {
+            if (dIsNew) removeCdepartment(dIndex)
+            else dShowDeletePanel(e)
+          }
 
           return (
             <div className={`${style.columns}`} key={dIndex}>
@@ -58,13 +76,16 @@ export default function List(
                 <label className={style.inputBox}>
                   <AutosizeInput type="text"
                     value={name}
-                    onChange={dOnChange}
-                    disabled={!editable || dIsMarkedDel}
-                    onFocus={() => changeFocus?.(true)}
-                    onBlur={() => changeFocus?.(false)}
+                    onChange={(e) => { department.name = e.target.value }}
+                    disabled={!editable || dWillDelete}
+                    onFocus={() => department.isFocus = true}
+                    onBlur={() => department.isFocus = false}
                   />
-                  <TheIcon className={style.iconCross01}
-                    onClick={editable ? dMarkDel : undefined} />
+                  {editable &&
+                    <DeleteSwitch className={style.iconCross01}
+                      onClick={editable ? onDelete : undefined} />
+                  }
+
                 </label>
                 <p>A</p>
                 <div className={style.focusBg} />
@@ -72,46 +93,50 @@ export default function List(
 
               {/* ============================ */}
 
-              {jobs?.reverse().map((item, index) => {
-                const { grade, id, name, jMethod,
-                  isMarkedDel, isNew, isFocus,
-                  jOnChange, addJobs, jMarkDel, changeFocus
-                } = item
+              {jobs.map((job, jIndex) => {
 
-                if (isNew && jMethod === "nothing") {
-                  let className = `${style.cell} ${style.empty}`
-                  if (dIsMarkedDel) className = `${className} ${style.delete}`
+                if (job === undefined) {
+                  const styleDelete = dWillDelete ? style.delete : ""
+                  let className = `${style.cell} ${style.empty} ${styleDelete}`
+
                   return (
-                    <div className={className} key={index}
-                      onClick={editable && !dIsMarkedDel ? addJobs : undefined}
+                    <div className={className} key={jIndex}
+                      onClick={editable && !dWillDelete ? () => addJob(jIndex) : undefined}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={iconAdd.src} alt=""
-                      />
+                      {/*  eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={iconAdd.src} alt="" />
                     </div>
                   )
                 }
 
+                const { name, grade, isFocus,
+                  jWillDelete, jWillPatch, jIsNew,
+                  jShowDeletePanel,
+                } = job
+
+                const onDelete = (e: MouseEvent) => {
+                  jIsNew ? removeJob(jIndex) : jShowDeletePanel(e)
+                }
+
                 let className: string = style.cell
-                if (isMarkedDel || dIsMarkedDel) className = `${style.cell} ${style.delete}`
+                if (jWillDelete || dWillDelete) className = `${style.cell} ${style.delete}`
                 if (isFocus) className = `${style.cell} ${style.isFocus}`
-                const TheIcon = isMarkedDel ? RedoOutlined : IconCross01
+                const DeleteSwitch = jWillDelete ? RedoOutlined : IconCross01
 
                 return (
-                  <div className={className} key={index}>
+                  <div className={className} key={jIndex}>
                     <label className={style.inputBox}>
                       <AutosizeInput type="text"
                         value={name ?? ""}
-                        onChange={jOnChange}
-                        disabled={!editable || isMarkedDel || dIsMarkedDel}
-                        onFocus={() => { changeFocus(true) }}
-                        onBlur={() => { changeFocus(false) }}
+                        onChange={(e) => job.name = e.target.value}
+                        disabled={!editable || jWillDelete || dWillDelete}
+                        onFocus={() => { job.isFocus = true }}
+                        onBlur={() => { job.isFocus = false }}
                       />
-                      {editable &&
-                        <TheIcon className={style.iconCross01}
-                          onClick={editable && !dIsMarkedDel ? jMarkDel : undefined} />
+                      {editable && !dWillDelete &&
+                        <DeleteSwitch className={style.iconCross01}
+                          onClick={onDelete} />
                       }
-
                     </label>
                     <div className={style.focusBg} />
                   </div>
