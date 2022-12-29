@@ -4,7 +4,7 @@ import { axi } from "./_axiosCreator";
 // type
 import { TpageMetaDto, TerpFeatureDto } from "./dtoTypes";
 
-
+export type {TerpFeatureDto}
 
 const apiGetErpFeatures = () => {
   const api = "/erp-features"

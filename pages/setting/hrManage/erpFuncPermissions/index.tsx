@@ -16,10 +16,14 @@ import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonMo
 
 // api
 import {
+  TerpFeatureDto,
   useErpFeatures,
   apiPostErpFeatures_id_departments, apiDeleteErpFeatures_id_departments
 } from "js/api/api_erpFeature"
-import { useDepartments } from "js/api/api_department"
+import {
+  TdepartmentDto,
+  useDepartments
+} from "js/api/api_department"
 
 // css
 import scss from "./erpFuncPermissions.module.scss"
@@ -59,8 +63,6 @@ export default function ErpFuncPermissions() {
   }, [])
 
   // --------------------------------------------------------------------------
-
-
   // 新增部門
   const [erpId_add, setErpId_add] = useState<string>()
 
@@ -71,7 +73,7 @@ export default function ErpFuncPermissions() {
   const cancelAddPanel = () => {
     setErpId_add(undefined)
   }
-  
+
   const addDepartment = async (indexArr: number[]) => {
     if (!erpId_add) return
 
@@ -95,20 +97,30 @@ export default function ErpFuncPermissions() {
   }
 
   // --------------------------------------------------------------------------
+  // 移除部門
+  const [erpData_del, setErpData_del] = useState<TerpFeatureDto>()
+  const [departmentData_del, setDepartmentData_del] = useState<TdepartmentDto>()
 
-  const [preDelData, setPreDelData] = useState<TdepartmentInfo>()
-  const [showDelete, setShowDelete] = useState(false)
+  const confirmDelete = async () => {
+    if (!erpData_del || !departmentData_del) return;
 
-  const openDelete = (department: TdepartmentInfo) => {
-    setPreDelData(department)
-    setShowDelete(true)
+    const body = { departmentIds: [departmentData_del.id] }
+
+    try {
+      setRootLoading(true)
+      await apiDeleteErpFeatures_id_departments(erpData_del.id, body)
+      cancelDelete()
+    }
+    catch {
+      myAlert.err({ title: "移除部門失敗" })
+    }
+    setRootLoading(false)
+    await updateList()
   }
 
-  const confirmDelete = () => {
-    if (!preDelData) return;
-
-    const { label } = preDelData
-    alert(`移除${label}`)
+  const cancelDelete = () => {
+    setErpData_del(undefined)
+    setDepartmentData_del(undefined)
   }
 
   // --------------------------------------------------------------------------
@@ -125,13 +137,13 @@ export default function ErpFuncPermissions() {
             const demparmentsNameArr = departments.map((item) => item.name)
 
             const removeData = (index: number) => {
-              // openDelete(fakeData[key][index])
-
+              setErpData_del(erp)
+              setDepartmentData_del(departments[index])
             }
 
             return (
               <Card key={index}
-                label={"NAME"}
+                label={"ERP_name"}
                 addLabel={"新增管理部門"}
                 noDataTip="尚未新增管理部門"
                 dataArr={demparmentsNameArr}
@@ -144,10 +156,8 @@ export default function ErpFuncPermissions() {
         <LoadingCover01 isLoading={isLoading} />
       </div>
 
-
-
       <GridPanel
-        visible={!!erpId_add}
+        visible={!!erpId_add && !!departmentData_del}
         title="請選擇部門"
         note="可複選"
         dataArr={departmentNameArr}
@@ -156,15 +166,11 @@ export default function ErpFuncPermissions() {
       />
 
       <TwoButtonModal
-        visible={showDelete}
-        setVisible={setShowDelete}
-        // 用刪除的字眼不準確，應該是請確認是否從xxx移除yy部
-        // 串接api時再處理
-        text={`請確認是否刪除${preDelData?.label}`}
+        visible={!!erpData_del}
+        text={`請確認是否從${"ERP_name"}移除${departmentData_del?.name}`}
         onConfirm={confirmDelete}
-        onCancel={() => setShowDelete(false)}
+        onCancel={() => cancelDelete()}
       />
-
 
     </div>
   )
