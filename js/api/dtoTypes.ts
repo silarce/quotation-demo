@@ -164,6 +164,17 @@ export type TupdateCompanyInfoDto = {
   "taxId": string,
 }
 
+export type TcreateDepartmentJobDto = {
+  name: string
+  grade: number
+}
+
+export type TupdateDepartmentJobDto = {
+  name: string
+  id: string
+  jobs: TcreateDepartmentJobDto
+}
+
 
 
 

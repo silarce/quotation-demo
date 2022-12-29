@@ -25,11 +25,12 @@ import {
   TdepartmentDto, TjobDto, TgetDepartments,
   useDepartments,  // 取得部門列表
   apiPostDepartments, // 新增部門
-  apiPatchDepartments, // 更新部門名稱
+  apiPatchDepartments_id, // 更新部門名稱
   apiDeleteDepartments, // 刪除部門
   apiPostJobs, // 新增職等
   apiPatchJobs, // 更新職等
   apiDeleteJobs, // 刪除職等
+  apiPatchDepartments, // 批次更新部門資料(包括name與底下的jobs)
 } from "js/api/api_department"
 
 // css
@@ -452,7 +453,7 @@ const uploads = async (
 
       let departmentId = department.id
 
-      if (dMethod === "patch") await apiPatchDepartments(departmentId!, { name: dName! })
+      if (dMethod === "patch") await apiPatchDepartments_id(departmentId!, { name: dName! })
       if (isMarkedDel) {
         await apiDeleteDepartments(departmentId!)
         continue
