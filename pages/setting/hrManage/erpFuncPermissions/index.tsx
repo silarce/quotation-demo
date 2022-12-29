@@ -153,7 +153,7 @@ export default function ErpFuncPermissions() {
       </div>
 
       <GridPanel
-        visible={!!erpId_add && !!departmentData_del}
+        visible={!!erpId_add}
         title="請選擇部門"
         note="可複選"
         dataArr={departmentNameArr}
@@ -162,7 +162,7 @@ export default function ErpFuncPermissions() {
       />
 
       <TwoButtonModal
-        visible={!!erpData_del}
+        visible={!!erpData_del && !!departmentData_del}
         text={`請確認是否從${"ERP_name"}移除${departmentData_del?.name}`}
         onConfirm={confirmDelete}
         onCancel={() => cancelDelete()}
