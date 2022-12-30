@@ -1,9 +1,7 @@
-import React, {
-  Dispatch, SetStateAction,
-  useState, useEffect, useRef, Fragment
-} from "react"
+import React, { useRef } from "react"
 import html2canvas from 'html2canvas'
 import jsPDF from "jspdf"
+import ExcelJs from "exceljs";
 
 const _ = require("lodash")
 
@@ -13,7 +11,7 @@ import Info from "./info"
 import Table from "./table"
 
 // global gear
-import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // antd
 import Modal from "antd/lib/modal/Modal"
@@ -23,11 +21,7 @@ import scss from "./quotationPdf_part.module.scss"
 
 // type
 import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
-import { TuseProduct, ProdClass } from "components/page/domestic/quotation/hook/useProduct"
-
-
-
-
+import { TuseProduct, ProdClass, PartClass } from "components/page/domestic/quotation/hook/useProduct"
 
 export default function QuotationPdf_part(
   { isVisable, onCancel,
@@ -42,11 +36,6 @@ export default function QuotationPdf_part(
     }
 ) {
 
-  // const [pdfType, setPdfType] = useState("typeA")
-
-  // useEffect(() => {
-  //   showRootLoading(true, "正在處理PDF")
-  // }, [])
 
   // ------------------------------------------------------------------
 
@@ -84,9 +73,88 @@ export default function QuotationPdf_part(
     showRootLoading(false)
   }
 
-  const dlExcel = () => {
+
+
+  const dlExcel = async () => {
+    const workbook = new ExcelJs.Workbook();
+    // -----------------------------------------------------------
+    const productList = prodState.productList
+
+    productList.forEach((item, index) => {
+      const { part, allData } = item
+
+      const sheetName = `${index + 1}`.padStart(3, "0")
+      const sheet = workbook.addWorksheet(sheetName)
+
+      // 寬度比 10:69
+      sheet.columns = [
+        { width: 30 },
+        { width: 10 }, // 在google試算表裡是69
+        { width: 20 },
+        { width: 10 },
+        { width: 20 },
+        { width: 25 },
+        { width: 20 },
+      ]
+      sheet.getRows(1, 100)?.forEach((row) => { row.font = { size: 16 } })
+
+      sheet.getRow(1).font = { bold: true, size: 18 }
+      sheet.getRow(4).font = { bold: true, size: 18 }
+
+      const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }))
+      const profileRows = infoKeyIndex.map((key) => allData[key])
+
+      sheet.addTable({
+        name: "profile",
+        ref: "A1",
+        style: {
+          showFirstColumn: true
+        },
+        columns: [{ name: "報價編號" }, ...profileColumns],
+        rows: [
+          [profileState.profile.quotationId, ...profileRows]
+        ]
+      })
+
+
+      const partColumns = keyIndex.map((key) => ({ name: config[key].label }))
+      const partRows = part.map((item) => {
+        return keyIndex.map((key) => item[key])
+      })
+
+      sheet.addTable({
+        name: "part",
+        ref: "A4",
+        style: {
+          showFirstColumn: true
+        },
+        columns: partColumns,
+        rows: partRows
+      })
+
+
+    })
+
+    // -----------------------------------------------------------
+
+    await workbook.xlsx.writeBuffer()
+
+    // -----------------------------------------------------------
+    // 表格裡面的資料都填寫完成之後，訂出下載的callback function
+    // 異步的等待他處理完之後，創建url與連結，觸發下載
+    workbook.xlsx.writeBuffer().then((content) => {
+      const link = document.createElement("a");
+      const blobData = new Blob([content], {
+        type: "application/vnd.ms-excel;charset=utf-8;"
+      });
+      link.download = '測試的試算表.xlsx';
+      link.href = URL.createObjectURL(blobData);
+      link.click();
+      link.remove()
+    });
 
   }
+
 
 
   // -------------------------------------------------------------------------
@@ -107,7 +175,7 @@ export default function QuotationPdf_part(
       width={"fit-content"}
     >
 
-      <div className={scss.panel}>
+      <div className={scss.panel} id="">
         <div />
         <div className={scss.panelRight}>
           <button onClick={dlPdf}><span>下載PDF</span></button>
@@ -138,183 +206,107 @@ export default function QuotationPdf_part(
 }
 // ========================================================================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ========================================================================
-// // typeA 用在只有一頁的情況
-// const PdfTypeA = (
-//   { refPdf,
-//     profileState,
-//     prodState,
-//     remarkListState,
-//     rangeListState,
-//     payInfoState,
-//     sinatureState
-//   }:
-//     {
-//       refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
-//       profileState: TuseProfile
-//       prodState: TuseProduct
-//       remarkListState: TuseRemarkList
-//       rangeListState: TuseRangeList
-//       payInfoState: TusePayInfo
-//       sinatureState: TuseSinature
-//     }
-// ) => {
-
-//   const { productList } = prodState
-//   const chunkedList = _.chunk(productList, 12) as ProdClass[][]
-//   const pageCount = chunkedList.length
-
-//   return (
-//     <>
-//       {chunkedList.map((chunk, index) => {
-//         return (
-//           <Fragment key={index}>
-//             {index !== 0 && <hr className={style.hr} />}
-//             <div className={style.pdf}
-//               ref={ele => refPdf.current[0] = ele}>
-//               <Header />
-//               <Profile profileState={profileState} index={index + 1} pageCount={pageCount} />
-//               <Table productList={chunk} />
-//               <Total remarkListState={remarkListState} prodState={prodState} />
-//               <Other
-//                 rangeListState={rangeListState}
-//                 payInfoState={payInfoState}
-//                 sinatureState={sinatureState}
-//               />
-//             </div>
-//           </Fragment>
-//         )
-//       })}
-//     </>
-//   )
-// }
-
-
-
-
-// // typeB 用在多頁的情況
-// const PdfTypeB = (
-//   { refPdf,
-//     profileState,
-//     prodState,
-//     remarkListState,
-//     rangeListState,
-//     payInfoState,
-//     sinatureState
-//   }:
-//     {
-//       refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
-//       profileState: TuseProfile
-//       prodState: TuseProduct
-//       remarkListState: TuseRemarkList
-//       rangeListState: TuseRangeList
-//       payInfoState: TusePayInfo
-//       sinatureState: TuseSinature
-//     }
-// ) => {
-
-//   const { productList } = prodState
-//   const chunkedList = _.chunk(productList, 40) as ProdClass[][]
-//   const pageCount = chunkedList.length + 1
-
-//   return (
-//     <>
-//       <div className={`${style.pdf} ${style.typeB}`}
-//         ref={ele => refPdf.current[0] = ele}>
-//         <div>
-//           <Header />
-//           <Profile profileState={profileState} index={1} pageCount={pageCount} />
-//         </div>
-//         <div>
-//           <Total remarkListState={remarkListState} prodState={prodState} />
-//           <Other
-//             rangeListState={rangeListState}
-//             payInfoState={payInfoState}
-//             sinatureState={sinatureState}
-//           />
-//         </div>
-//       </div>
-
-//       {chunkedList.map((chunk, index) => {
-//         return (
-//           <Fragment key={index}>
-//             <hr className={style.hr} />
-//             <div className={style.pdf}
-//               ref={ele => refPdf.current[index + 1] = ele}>
-//               <Header />
-//               <Profile profileState={profileState} index={index + 2} pageCount={pageCount} />
-//               <Table productList={chunk} />
-//             </div>
-//           </Fragment>
-//         )
-//       })}
-//     </>
-//   )
-// }
-
-// ========================================================================
-
-
-
+// ==============================================================================
+type TinfoKeyIndex =
+  keyof
+  Pick<
+    ProdClass["allData"],
+    "project" | "material" | "surface" | "doorType" | "size"
+  >
+type TinfoConfig = {
+  [key in TinfoKeyIndex]: { label: string }
+}
+
+const infoKeyIndex: TinfoKeyIndex[] =
+  ["project", "material", "surface", "doorType", "size"]
+const infoConfig: TinfoConfig = {
+  project: { label: "項目" },
+  material: { label: "材質" },
+  surface: { label: "表面" },
+  doorType: { label: "門型" },
+  size: { label: "尺寸" },
+}
+
+
+
+
+
+type TkeyIndex =
+  keyof
+  Pick<
+    PartClass,
+    "subTypeName" | "material" | "surface" | "unit" | "qty" | "price" | "totalPrice"
+  >
+type Tconfig = {
+  [key in TkeyIndex]: {
+    label: string
+    style: {
+      width: string
+      textAlign?: "left" | "center" | "right"
+      flex?: string
+    }
+  }
+}
+
+const keyIndex: TkeyIndex[] =
+  ["subTypeName", "material", "surface", "unit", "qty", "price", "totalPrice"]
+
+
+const config: Tconfig = {
+  subTypeName: {
+    label: "名稱",
+    style: {
+      width: "300px"
+    },
+  },
+  material: {
+    label: "材質",
+    style: {
+      width: "auto",
+      flex: "1"
+    },
+
+  },
+  surface: {
+    label: "表面",
+    style: {
+      width: "auto",
+      flex: "1"
+    },
+
+  },
+  unit: {
+    label: "單位",
+    style: {
+      width: "80px"
+    },
+
+  },
+  qty: {
+    label: "數量",
+    style: {
+      width: "100px",
+      textAlign: "right",
+    },
+
+  },
+  price: {
+    label: "單價",
+    style: {
+      width: "120px",
+      textAlign: "right",
+    },
+
+  },
+  totalPrice: {
+    label: "金額",
+    style: {
+      width: "150px",
+      textAlign: "right",
+    },
+
+  },
+}
 
 
 
