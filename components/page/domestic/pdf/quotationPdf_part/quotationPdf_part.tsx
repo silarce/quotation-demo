@@ -84,6 +84,10 @@ export default function QuotationPdf_part(
     showRootLoading(false)
   }
 
+  const dlExcel = () => {
+
+  }
+
 
   // -------------------------------------------------------------------------
 
@@ -105,8 +109,9 @@ export default function QuotationPdf_part(
 
       <div className={scss.panel}>
         <div />
-        <div>
+        <div className={scss.panelRight}>
           <button onClick={dlPdf}><span>下載PDF</span></button>
+          <button onClick={dlExcel}><span>下載EXCEL</span></button>
         </div>
       </div>
 

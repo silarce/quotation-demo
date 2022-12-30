@@ -130,19 +130,24 @@ $semiMaring: 0 8px;
   width: 100%;
   padding: 10px 20px;
   background-color: $bgc01;
-  button {
-    padding: 5px;
-    background-color: $colorBorder01;
-    cursor: pointer;
-    > span {
-      font-size: 18px;
-    }
-    &.active {
+  > .panelRight {
+    display: flex;
+    gap: 20px;
+    button {
+      padding: 5px;
+      background-color: $colorBorder01;
+      cursor: pointer;
       > span {
-        color: white;
+        font-size: 18px;
+      }
+      &.active {
+        > span {
+          color: white;
+        }
       }
     }
   }
+
   .left {
     display: flex;
     gap: 15px;
