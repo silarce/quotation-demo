@@ -20,7 +20,7 @@ import style from "./departments.module.scss"
 
 
 // type
-import { TuseDeparmentGrid, ClassDepartment } from 'pages/setting/departments';
+import { ClassDepartment } from 'pages/setting/departments';
 
 
 
@@ -28,15 +28,11 @@ import { TuseDeparmentGrid, ClassDepartment } from 'pages/setting/departments';
 // =============================================
 export default function List(
   {
-    myDepartment,
-    setMyDepartment,
     editable,
     CdepartmentArr,
     removeCdepartment
   }:
     {
-      myDepartment: TuseDeparmentGrid["myDepartment"]
-      setMyDepartment: TuseDeparmentGrid["setMyDepartment"]
       editable: boolean
       CdepartmentArr: ClassDepartment[]
       removeCdepartment: (index: number) => void
