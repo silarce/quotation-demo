@@ -1,8 +1,8 @@
 // 公司職等職稱
 // 公司職等職稱
 import {
-  ChangeEvent, Dispatch, SetStateAction, MouseEvent,
-  useState, useEffect, useMemo,
+  MouseEvent,
+  useState, useEffect, 
 } from "react"
 
 
@@ -18,17 +18,14 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import {  showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // api
 import {
-  TdepartmentDto, TjobDto, TgetDepartments, TupdateDepartmentJobDto,
+  TdepartmentDto, TjobDto,  TupdateDepartmentJobDto,
   useDepartments,  // 取得部門列表
   apiPostDepartments, // 新增部門
-  apiPatchDepartments_id, // 更新部門名稱
   apiDeleteDepartments, // 刪除部門
-  apiPostJobs, // 新增職等
-  apiPatchJobs, // 更新職等
   apiDeleteJobs, // 刪除職等
   apiPatchDepartments, // 批次更新部門資料(包括name與底下的jobs)
 } from "js/api/api_department"

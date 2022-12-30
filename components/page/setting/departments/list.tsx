@@ -1,10 +1,5 @@
 
-import {
-  Dispatch, SetStateAction,
-  useState, useRef, Fragment, MouseEvent,
-} from 'react';
-
-const _ = require("lodash")
+import { MouseEvent,} from 'react';
 
 // component
 import AutosizeInput from 'react-input-autosize';
@@ -12,12 +7,10 @@ import AutosizeInput from 'react-input-autosize';
 // icon
 import { IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
 import iconAdd from "public/image/icon/add.svg"
-import { CloseOutlined, RedoOutlined } from '@ant-design/icons';
-
+import {  RedoOutlined } from '@ant-design/icons';
 
 // css
 import style from "./departments.module.scss"
-
 
 // type
 import { ClassDepartment } from 'pages/setting/departments';
@@ -48,8 +41,6 @@ export default function List(
             dWillDelete, dWillPatch, dIsNew,
             dShowDeletePanel, addJob, removeJob,
           } = department
-
-
 
           let styleHead: string = `${style.cell} ${style.head}`
 
