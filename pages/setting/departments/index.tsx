@@ -40,11 +40,10 @@ import style from "./departments.module.scss"
 
 // ===========================================================
 const params = {
-  // order: "ASC",
   // order:"DESC",
   populate: ["jobs"],
+  // jobs的逆序排列在ClassDepartment做處理了
   // sort: "jobs.grade",
-  // explain: true
 }
 // ===========================================================
 export default function Department() {
@@ -261,7 +260,8 @@ export class ClassDepartment {
       const theIndex = job.grade - 1
       preJobs[theIndex] = new ClassJob(job, reRender)
     })
-    this.jobs = preJobs
+    // 將preJobs轉為逆序排列再賦值
+    this.jobs = preJobs.reverse()
 
     this.reRender = reRender
   } // constructor ------------------
