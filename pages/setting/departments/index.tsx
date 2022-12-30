@@ -18,11 +18,11 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // api
 import {
-  TdepartmentDto, TjobDto, TgetDepartments,
+  TdepartmentDto, TjobDto, TgetDepartments, TupdateDepartmentJobDto,
   useDepartments,  // 取得部門列表
   apiPostDepartments, // 新增部門
   apiPatchDepartments_id, // 更新部門名稱
@@ -40,7 +40,11 @@ import style from "./departments.module.scss"
 
 // ===========================================================
 const params = {
+  // order: "ASC",
+  // order:"DESC",
   populate: ["jobs"],
+  // sort: "jobs.grade",
+  // explain: true
 }
 // ===========================================================
 export default function Department() {
@@ -55,11 +59,11 @@ export default function Department() {
 
   const { myDepartment, setMyDepartment, addDepartment } = useDeparmentGrid(data ?? {})
 
-
-  const { CdepartmentArr, addCdepartment, removeCdepartment, }
+  // 將部門資料轉為Class
+  const { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData }
     = useClass(departmentArr)
 
-
+  // -------------------------------------------------------------------------
 
   const toUpdate = async () => {
     try {
@@ -77,6 +81,82 @@ export default function Department() {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // ---------------------------------------------------------
+  const upload = async () => {
+    // 刪除部門>刪除職等>新增部門>更新部門職等
+
+    // -------------------------------
+    // 刪除部門
+    showRootLoading(true, "正在刪除部門")
+    // 移除dWillDelete為true的Cdepartment，並取得被移除的Cdepartment
+    const departmentWillDeleteArr
+      = _.remove(CdepartmentArr, (item: ClassDepartment) => item.dWillDelete)
+    // dwe === departmentWillRemove
+    for (let dwr of departmentWillDeleteArr) {
+      const id = dwr.id
+      const name = dwr.name
+      try {
+        await apiDeleteDepartments(id)
+      }
+      catch {
+        alert(`刪除部門${name}發生錯誤`)
+      }
+    }
+    // -------------------------------
+    // 刪除職等
+    showRootLoading(true, "正在刪除職等")
+    const jobIdWillDeleteArr: ClassJob[] = []
+    // 把jWillDelete為true的job設為undefined
+    CdepartmentArr.forEach((department) => {
+      department.jobs.forEach((job, index) => {
+        if (job?.jWillDelete) {
+          jobIdWillDeleteArr.push(job)
+          department.jobs[index] = undefined
+        }
+      })
+    })
+
+    for (let Cjob of jobIdWillDeleteArr) {
+      const { id, name } = Cjob
+      try {
+        await apiDeleteJobs(id)
+      }
+      catch {
+        alert(`刪除職等${name}發生錯誤`)
+      }
+    }
+    // -------------------------------
+    // 新增部門
+    showRootLoading(true, "正在新增部門")
+    for (let Cdepartment of CdepartmentArr) {
+      if (Cdepartment.dIsNew) {
+        try {
+          const res = await apiPostDepartments({ name: Cdepartment.name })
+          Cdepartment.id = res.id
+        }
+        catch {
+          alert(`新增部門${Cdepartment.name}發生錯誤，流程中斷`)
+          showRootLoading(false)
+          toUpdate()
+          return
+        }
+      }
+    }
+    // -------------------------------
+    showRootLoading(true, "正在更新部門名稱與職等")
+    // 更新部門職等
+    const patchBody = getChangedData()
+    try {
+      await apiPatchDepartments(patchBody)
+    }
+    catch {
+      alert("更新部門名稱與職等發生錯誤")
+    }
+    // -------------------------------
+    showRootLoading(false)
+    await toUpdate()
+  }
 
   // ---------------------------------------------------------
 
@@ -99,7 +179,8 @@ export default function Department() {
     {
       type: "redButton",
       label: "上傳",
-      onClick: () => { uploads(myDepartment, toUpdate) }
+      // onClick: () => { uploads(myDepartment, toUpdate) }
+      onClick: () => { upload() }
     },
     {
       type: "myButton",
@@ -192,6 +273,7 @@ export class ClassDepartment {
   get name() { return this._name }
   set name(v: string) {
     this._name = v
+    this.dWillPatch = true
     this.reRender()
   }
 
@@ -240,6 +322,7 @@ export class ClassDepartment {
 } // ClassDepartment ======================================================
 
 class ClassJob {
+  id: string
   _name: string
   grade: number
   reRender: () => void
@@ -257,10 +340,12 @@ class ClassJob {
     reRender: () => void
   ) {
     if ("id" in job) {
+      this.id = job.id
       this._name = job.name
       this.grade = job.grade
     }
     else {
+      this.id = ""
       this._name = "新職稱"
       this.grade = job.newJobindex + 1
       this.jIsNew = true
@@ -272,7 +357,8 @@ class ClassJob {
 
   get name() { return this._name }
   set name(v: string) {
-    this.name = v
+    this._name = v
+    this.jWillPatch = true
     this.reRender()
   }
 
@@ -332,7 +418,45 @@ const useClass = (departmentArr: TdepartmentDto[]) => {
     reRender()
   }
 
-  return { CdepartmentArr, addCdepartment, removeCdepartment, }
+  const getChangedData = () => {
+
+    const patchArr: TupdateDepartmentJobDto[] = []
+
+    CdepartmentArr.forEach((department) => {
+      const { name, id,
+        dIsNew, dWillDelete, dWillPatch,
+      } = department
+
+      if (dWillDelete) return
+
+      const patchObj: TupdateDepartmentJobDto
+        = { id: id, name: name, jobs: [] }
+
+
+      if (!dWillPatch) patchObj.name = undefined
+
+      department.jobs.forEach((job) => {
+        if (!job) return
+        const { name, grade,
+          jWillDelete, jWillPatch, jIsNew,
+        } = job
+
+        if ((!jIsNew && !jWillPatch) || jWillDelete) return
+
+        patchObj.jobs.push({ name, grade })
+      })
+
+      if (!dWillPatch && !patchObj.jobs[0]) return;
+
+
+      patchArr.push(patchObj)
+    })
+
+    return patchArr
+  }
+
+
+  return { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData }
 
 }
 
@@ -656,7 +780,7 @@ export type TuseDeparmentGrid = ReturnType<typeof useDeparmentGrid>
 // =================================================================
 
 // 批次上傳
-const uploads = async (
+const uploads_old = async (
   myDepartment: TuseDeparmentGrid["myDepartment"],
   toUpdate: () => void
 ) => {

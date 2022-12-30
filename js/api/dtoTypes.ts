@@ -170,7 +170,7 @@ export type TcreateDepartmentJobDto = {
 }
 
 export type TupdateDepartmentJobDto = {
-  name: string
+  name?: string
   id: string
   jobs: TcreateDepartmentJobDto[]
 }

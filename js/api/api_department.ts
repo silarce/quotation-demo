@@ -10,7 +10,7 @@ import {
 } from "./dtoTypes";
 import { Toption } from "fakeDatabase/options/options";
 
-export type { TdepartmentDto, TjobDto }
+export type { TdepartmentDto, TjobDto, TupdateDepartmentJobDto }
 
 
 export type Tparams = {
@@ -56,7 +56,7 @@ export const useDepartments = (params: Tparams = {}) => {
 export const apiPostDepartments = (body: { name: string }) => {
   const api = "/departments"
   return axi.post(api, body)
-    .then(({ data }) => data)
+    .then(({ data }) => data as { id: string })
     .catch(err => Promise.reject(err))
 }
 
@@ -77,7 +77,7 @@ export const apiDeleteDepartments = (id: string) => {
 }
 
 // 批次更新部門資料(包括name與底下的jobs)
-export const apiPatchDepartments = (body: TupdateDepartmentJobDto) => {
+export const apiPatchDepartments = (body: TupdateDepartmentJobDto[]) => {
   const api = "/departments"
   return axi.patch(api, body)
     .then(({ data }) => data)
