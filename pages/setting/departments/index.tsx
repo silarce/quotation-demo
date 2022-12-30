@@ -60,7 +60,7 @@ export default function Department() {
 
   // 將部門資料轉為Class
   const { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData }
-    = useClass(departmentArr)
+    = useClass(departmentArr, editable)
 
   // -------------------------------------------------------------------------
 
@@ -393,16 +393,16 @@ class ClassJob {
 
 } // ClassJob=================================================================
 
-const useClass = (departmentArr: TdepartmentDto[]) => {
+const useClass = (departmentArr: TdepartmentDto[], editable: boolean) => {
   const [CdepartmentArr, setCdepartmentArr] = useState<ClassDepartment[]>([])
   const reRender = () => setCdepartmentArr(state => [...state])
 
   useEffect(() => {
-    if (!departmentArr[0]) return;
+    if (!departmentArr[0] || editable) return;
     const classArr
       = departmentArr.map((department) => new ClassDepartment(department, reRender))
     setCdepartmentArr(classArr)
-  }, [departmentArr])
+  }, [departmentArr, editable])
 
   const addCdepartment = (newDepartmentName: string) => {
     CdepartmentArr.push(
