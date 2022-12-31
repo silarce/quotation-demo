@@ -2,6 +2,7 @@ import React, { useRef } from "react"
 import html2canvas from 'html2canvas'
 import jsPDF from "jspdf"
 import ExcelJs from "exceljs";
+import Moment from 'moment';
 
 const _ = require("lodash")
 
@@ -147,7 +148,10 @@ export default function QuotationPdf_part(
       const blobData = new Blob([content], {
         type: "application/vnd.ms-excel;charset=utf-8;"
       });
-      link.download = '測試的試算表.xlsx';
+
+      const id = profileState.profile.quotationId
+      const today = Moment().format("yyyy-MM-DD")
+      link.download = `${id}_${today}.xlsx`;
       link.href = URL.createObjectURL(blobData);
       link.click();
       link.remove()
