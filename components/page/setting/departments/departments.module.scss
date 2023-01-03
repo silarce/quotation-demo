@@ -87,13 +87,15 @@
     display: flex;
     gap: 4px;
     .columns {
-      display: grid;
+      display: flex;
+      flex-direction:column-reverse; // cell逆序排列
       gap: 4px;
       > .cell.head {
         position: relative;
         padding-bottom: 8px;
         border-color: transparent;
         margin-bottom: 2px;
+        order: 1; // 把這一個cell移到最上面
         > p {
           position: relative;
           margin: auto;

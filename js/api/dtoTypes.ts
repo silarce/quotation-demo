@@ -139,7 +139,7 @@ export type TerpFeatureDto = {
   createdAt: string
   updatedAt: string
   name: string
-  departments: TdepartmentDto
+  departments: TdepartmentDto[]
 }
 
 
@@ -162,6 +162,17 @@ export type TupdateCompanyInfoDto = {
   "address": string,
   "fax": string,
   "taxId": string,
+}
+
+export type TcreateDepartmentJobDto = {
+  name: string
+  grade: number
+}
+
+export type TupdateDepartmentJobDto = {
+  name?: string
+  id: string
+  jobs: TcreateDepartmentJobDto[]
 }
 
 

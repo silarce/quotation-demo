@@ -4,10 +4,13 @@ import { axi } from "./_axiosCreator";
 
 
 // type
-import { TpageMetaDto, TdepartmentDto, TjobDto, TdepartmentManagerDto } from "./dtoTypes";
+import {
+  TpageMetaDto, TdepartmentDto, TjobDto,
+  TdepartmentManagerDto, TupdateDepartmentJobDto
+} from "./dtoTypes";
 import { Toption } from "fakeDatabase/options/options";
 
-export type { TdepartmentDto, TjobDto }
+export type { TdepartmentDto, TjobDto, TupdateDepartmentJobDto }
 
 
 export type Tparams = {
@@ -53,13 +56,13 @@ export const useDepartments = (params: Tparams = {}) => {
 export const apiPostDepartments = (body: { name: string }) => {
   const api = "/departments"
   return axi.post(api, body)
-    .then(({ data }) => data)
+    .then(({ data }) => data as { id: string })
     .catch(err => Promise.reject(err))
 }
 
 
 // 更新部門，目前只能變更name
-export const apiPatchDepartments = (id: string, body: { name: string }) => {
+export const apiPatchDepartments_id = (id: string, body: { name: string }) => {
   const api = `/departments/${id}`
   return axi.patch(api, body)
     .then(({ data }) => data)
@@ -69,6 +72,14 @@ export const apiPatchDepartments = (id: string, body: { name: string }) => {
 export const apiDeleteDepartments = (id: string) => {
   const api = `/departments/${id}`
   return axi.delete(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
+
+// 批次更新部門資料(包括name與底下的jobs)
+export const apiPatchDepartments = (body: TupdateDepartmentJobDto[]) => {
+  const api = "/departments"
+  return axi.patch(api, body)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }

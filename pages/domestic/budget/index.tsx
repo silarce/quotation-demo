@@ -31,6 +31,14 @@ import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetList
 import { Toption } from "components/global/gear/select/select03"
 
 // ===========================================
+// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
+// 點進去的報價單也一樣，僅是取得之資料的狀態不同
+// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
+// 點進去的報價單也一樣，僅是取得之資料的狀態不同
+// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
+// 點進去的報價單也一樣，僅是取得之資料的狀態不同
+// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
+// 點進去的報價單也一樣，僅是取得之資料的狀態不同
 
 export default function Budget() {
   const router = useRouter()

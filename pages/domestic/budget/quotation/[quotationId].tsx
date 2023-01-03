@@ -138,16 +138,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // optionQuotationState
   const panel_editable: TpanelList = [
-    // { type: "myButton", label: "狀態", onClick: () => alert("施工中") },
     {
+      // 報價/歷史狀態狀態
       custom: <QuotationStateSel
         quotationState={quotationState}
         setQuotationState={setQuotationState}
         options={optionQuotationState}
       />
     },
-    // { type: "myButton", label: "狀態", onClick: () => alert("施工中") },
-    // { type: "myButton", label: "歷史狀態", onClick: () => alert("歷史狀態") },
     { type: "redButton", label: "上傳", onClick: () => setShowMemoModal(true) },
     { type: "myButton", label: "取消", onClick: () => setAllowEdit(false) },
   ]
@@ -267,7 +265,11 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
     </div>
   )
 }
+
 // ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// 報價/歷史狀態狀態
 const QuotationStateSel = (
   { quotationState, setQuotationState, options }:
     {
@@ -358,7 +360,7 @@ const QuotationStateSel = (
         <div className={style.item}>
           <div><span>{"預算 > 投標"}</span></div>
           <div>
-            <span>2022-02-03</span>
+            <span>111-02-03</span>
             <span>10:23:30</span>
           </div>
         </div>
@@ -366,7 +368,7 @@ const QuotationStateSel = (
         <div className={style.item}>
           <div><span>{"預算 > 發包"}</span></div>
           <div>
-            <span>2022-02-03</span>
+            <span>111-02-03</span>
             <span>10:23:30</span>
           </div>
         </div>
@@ -374,7 +376,7 @@ const QuotationStateSel = (
         <div className={style.item}>
           <div><span>{"預算 > 發包"}</span></div>
           <div>
-            <span>2022-02-03</span>
+            <span>111-02-03</span>
             <span>10:23:30</span>
           </div>
         </div>
@@ -382,7 +384,7 @@ const QuotationStateSel = (
         <div className={style.item}>
           <div><span>{"預算 > 投標"}</span></div>
           <div>
-            <span>2022-02-03</span>
+            <span>111-02-03</span>
             <span>10:23:30</span>
           </div>
         </div>

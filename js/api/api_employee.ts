@@ -185,3 +185,11 @@ export const apiPostEmployeeErpUser = (id: string) => {
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
+// 刪除ERP使用者
+export const apiDeleteEmployeeErpUser = (id: string) => {
+  const api = `/employees/${id}/erp-user`
+  return axi.delete(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
+

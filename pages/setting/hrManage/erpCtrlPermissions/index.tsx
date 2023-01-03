@@ -16,12 +16,12 @@ import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEm
 import Header from "components/page/setting/hrManage/header/header"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
-import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
+import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 
 // api
 import {
   TapiGetEmployeeParams,
-  useEmployee, apiPostEmployeeErpUser,
+  useEmployee, apiPostEmployeeErpUser, apiDeleteEmployeeErpUser,
 } from "js/api/api_employee";
 import { useDepartments } from "js/api/api_department";
 
@@ -49,10 +49,15 @@ export default function ErpCtrlPermissions() {
       },
       // 收到空字串會壞掉
       "jobs.department.id": router.query.department || undefined,
-      chName: {
-        $contains: router.query.chName,
-      },
+      $or: {
+        chName: {
+          $contains: router.query.content,
+        },
+        idNumber: {
+          $contains: router.query.content,
+        },
 
+      }
     },
     populate: ["jobs.department", "user"]
   }
@@ -118,6 +123,7 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     if (!isReady) return
     updateList()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
 
@@ -128,11 +134,11 @@ export default function ErpCtrlPermissions() {
   const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
 
     const department = valueArr[0]
-    const chName = valueArr[1]
+    const content = valueArr[1]
 
     router.push({
       pathname: "/setting/hrManage/erpCtrlPermissions",
-      query: { department, chName }
+      query: { department, content }
     })
   }
 
@@ -181,8 +187,19 @@ export default function ErpCtrlPermissions() {
     setSelIndex(index)
   }
 
-  const removeEmployee = () => {
-    alert("api未提供")
+  const removeEmployee = async (employeeId: string) => {
+
+    setRootLoading(true)
+    try {
+      await apiDeleteEmployeeErpUser(employeeId)
+      setRootLoading(false)
+    }
+    catch {
+      myAlert.err({ title: "移除失敗" })
+    }
+    setRootLoading(false)
+    cancelDelete()
+    await updateList()
   }
 
   const cancelDelete = () => {
@@ -229,23 +246,10 @@ export default function ErpCtrlPermissions() {
       <TwoButtonModal
         visible={!!selId}
         text={`請確定要刪除「${selIdNumber}」「${selChName}」?`}
-        onConfirm={removeEmployee}
+        onConfirm={() => removeEmployee(selId)}
         onCancel={cancelDelete}
       />
 
     </div>
   )
 }
-
-
-/*
-
-新增操作人員應該要可複選，後端未提供相關api
-後端未提供解除操作權限的api
-
-table裡的TwoButtonModal
-TwoButtonModal的onConfirm要改
-把TwoButtonModal移到index.tsx
-table裡刪除按鈕的函數要提供index，再用這個index取得資料然後呼叫TwoButtonModal
-
-*/

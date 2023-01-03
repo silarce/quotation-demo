@@ -134,17 +134,16 @@ export default function ProductList({ productStates }:
     }
   ) {
 
-    const {
-      onInputChange, onSelChange, onChcekBoxClick,
-    } = dataItem
-
+    // const {
+    //   onInputChange, onSelChange, onChcekBoxClick,
+    // } = dataItem
 
     switch (type) {
 
       case "input": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (value: string) => onInputChange(value, key as keyof TproductString)
+          = (value: string) => dataItem.onInputChange(value, key as keyof TproductString)
         return (
           <InputSel
             disabled={disabled}
@@ -159,7 +158,7 @@ export default function ProductList({ productStates }:
       case "readOnly": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (value: string) => onInputChange(value, key as keyof TproductString)
+          = (value: string) => dataItem.onInputChange(value, key as keyof TproductString)
         return (
           <InputSel
             disabled={true}
@@ -176,7 +175,7 @@ export default function ProductList({ productStates }:
         if (typeof stateValue === "boolean") return null
         const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
-          (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
+          (option: Toption | null) => dataItem.onSelChange(option, key as keyof TproductObject)
         return (
           <InputSel
             disabled={disabled}
@@ -199,7 +198,7 @@ export default function ProductList({ productStates }:
         if (typeof stateValue === "boolean") return null
         const options = optionsObjList[key as ToptionsObjKey]
         const onChange =
-          (option: Toption | null) => onSelChange(option, key as keyof TproductObject)
+          (option: Toption | null) => dataItem.onSelChange(option, key as keyof TproductObject)
 
         const customComponents = {
           Option: OptionWithIcon01,
@@ -229,7 +228,7 @@ export default function ProductList({ productStates }:
         if (typeof stateValue !== "boolean") return null
         const onClick = () => {
           if (disabled) return
-          onChcekBoxClick(key as "ejectionDoor")
+          dataItem.onChcekBoxClick(key as "ejectionDoor")
         }
         return (
           <div className={styleL.checkbox}>
