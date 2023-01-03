@@ -129,7 +129,7 @@ export default function ErpFuncPermissions() {
         <div>
           {erpArr.map((erp, index) => {
 
-            const { departments, id } = erp
+            const { departments, id, name } = erp
             const demparmentsNameArr = departments.map((item) => item.name)
 
             const removeData = (index: number) => {
@@ -139,7 +139,7 @@ export default function ErpFuncPermissions() {
 
             return (
               <Card key={index}
-                label={"ERP_name"}
+                label={name}
                 addLabel={"新增管理部門"}
                 noDataTip="尚未新增管理部門"
                 dataArr={demparmentsNameArr}
