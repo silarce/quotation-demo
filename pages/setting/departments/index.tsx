@@ -2,7 +2,7 @@
 // 公司職等職稱
 import {
   MouseEvent,
-  useState, useEffect, 
+  useState, useEffect,
 } from "react"
 
 
@@ -18,16 +18,17 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-import {  showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // api
 import {
-  TdepartmentDto, TjobDto,  TupdateDepartmentJobDto,
+  TdepartmentDto, TjobDto, TupdateDepartmentJobDto,
   useDepartments,  // 取得部門列表
   apiPostDepartments, // 新增部門
   apiDeleteDepartments, // 刪除部門
   apiDeleteJobs, // 刪除職等
   apiPatchDepartments, // 批次更新部門資料(包括name與底下的jobs)
+  Tparams
 } from "js/api/api_department"
 
 // css
@@ -36,11 +37,13 @@ import style from "./departments.module.scss"
 
 
 // ===========================================================
-const params = {
-  // order:"DESC",
+const params: Tparams = {
   populate: ["jobs"],
-  // jobs的逆序排列在ClassDepartment做處理了
+  // order: "DESC",
   // sort: "jobs.grade",
+  /*  建立ClassJobArr時會將job取出依grade放進陣列相應位置
+      再用CSS做逆序排列，所以不會用到sort或order  
+      要改排列的話，找到departments.module.scss的.columns與.cell.head  */
 }
 // ===========================================================
 export default function Department() {
@@ -257,8 +260,7 @@ export class ClassDepartment {
       const theIndex = job.grade - 1
       preJobs[theIndex] = new ClassJob(job, reRender)
     })
-    // 將preJobs轉為逆序排列再賦值
-    this.jobs = preJobs.reverse()
+    this.jobs = preJobs
 
     this.reRender = reRender
   } // constructor ------------------
