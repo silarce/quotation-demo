@@ -78,36 +78,35 @@ export default function QuotationPdf_part(
 
   const dlExcel = async () => {
     const workbook = new ExcelJs.Workbook();
+
+    const sheetName = profileState.profile.quotationId
+    const sheet = workbook.addWorksheet(sheetName)
+    sheet.columns = [
+      { width: 30, /*font: { size: 16 }*/ }, // 直接在這邊設定font不知道為什麼無效
+      { width: 10, }, // 在google試算表裡10被換算為69
+      { width: 20, },
+      { width: 10, },
+      { width: 20, },
+      { width: 25, },
+      { width: 20, },
+    ]
+    sheet.columns.forEach((item, index) => item.font = { size: 16 })
     // -----------------------------------------------------------
     const productList = prodState.productList
 
+    let rowCount = 1
+
     productList.forEach((item, index) => {
+      sheet.getRow(rowCount).font = { bold: true, size: 18 }
+      sheet.getRow(rowCount + 3).font = { bold: true, size: 18 }
+
       const { part, allData } = item
-
-      const sheetName = `${index + 1}`.padStart(3, "0")
-      const sheet = workbook.addWorksheet(sheetName)
-
-      // 寬度比 10:69
-      sheet.columns = [
-        { width: 30 },
-        { width: 10 }, // 在google試算表裡是69
-        { width: 20 },
-        { width: 10 },
-        { width: 20 },
-        { width: 25 },
-        { width: 20 },
-      ]
-      sheet.getRows(1, 100)?.forEach((row) => { row.font = { size: 16 } })
-
-      sheet.getRow(1).font = { bold: true, size: 18 }
-      sheet.getRow(4).font = { bold: true, size: 18 }
 
       const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }))
       const profileRows = infoKeyIndex.map((key) => allData[key])
-
       sheet.addTable({
         name: "profile",
-        ref: "A1",
+        ref: `A${rowCount}`,
         style: {
           showFirstColumn: true
         },
@@ -122,10 +121,9 @@ export default function QuotationPdf_part(
       const partRows = part.map((item) => {
         return keyIndex.map((key) => item[key])
       })
-
       sheet.addTable({
         name: "part",
-        ref: "A4",
+        ref: `A${rowCount + 3}`,
         style: {
           showFirstColumn: true
         },
@@ -133,7 +131,8 @@ export default function QuotationPdf_part(
         rows: partRows
       })
 
-
+      // 這個迭代開始的的row編號 + header佔的row數 + part的數量 + 與下一次迭代的間隔
+      rowCount = rowCount + 4 + part.length + 3
     })
 
     // -----------------------------------------------------------
@@ -159,13 +158,11 @@ export default function QuotationPdf_part(
 
   }
 
-
-
   // -------------------------------------------------------------------------
 
   const { productList } = prodState
   const chunkedList = _.chunk(productList, 3) as ProdClass[][]
-  const pageCount = chunkedList.length
+  // const pageCount = chunkedList.length
 
   // -------------------------------------------------------------------------
   return (
