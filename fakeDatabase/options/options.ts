@@ -55,17 +55,16 @@ export const optionsCreator_customerCategory =
 
 
 // 類別
-
 export const optionsCreator_prodClass =
   (): Toption[] => [
     { value: "all", label: "不拘" },
     { value: "防火防煙捲門系列", label: "防火防煙捲門系列" },
-    { value: "防水防洪門系列", label: "防水防洪門系列" },
-    { value: "抗風防颱捲門系列", label: "抗風防颱捲門系列" },
-    { value: "廠辦管制門", label: "廠辦管制門" },
-    { value: "圍牆大門", label: "圍牆大門" },
-    { value: "機械門", label: "機械門" },
-    { value: "客製化", label: "客製化" },
+    // { value: "防水防洪門系列", label: "防水防洪門系列" },
+    // { value: "抗風防颱捲門系列", label: "抗風防颱捲門系列" },
+    // { value: "廠辦管制門", label: "廠辦管制門" },
+    // { value: "圍牆大門", label: "圍牆大門" },
+    // { value: "機械門", label: "機械門" },
+    // { value: "客製化", label: "客製化" },
   ]
 
 // 門型
