@@ -27,9 +27,15 @@ import style from "./memoList.module.scss"
 
 
 // fake
-import { optionsCreator_prodClass, optionsCreator_doorType, Toption } from "fakeDatabase/options/options"
+import {
+  optionsCreator_prodClass,
+  optionsCreator_doorType,
+  optionsCreator_doorForm,
+  Toption
+} from "fakeDatabase/options/options"
 const optionsProdClass = optionsCreator_prodClass()
 const optionsDoorType = optionsCreator_doorType()
+const optionsDoorForm = optionsCreator_doorForm()
 
 type TmemoState = {
   list: MemoClass[]
@@ -82,11 +88,12 @@ export default function MemoList() {
         setSearchValue("")
         setMemoState({ ...memoState })
       }
-    }
+    },
   ]
   // ------------------------------------------------------------------------
   const [prodClass, setProdClass] = useState<TselectProps["value"]>(null)
   const [doorType, setDoorType] = useState<TselectProps["value"]>(null)
+  const [doorForm, setDoorForm] = useState<TselectProps["value"]>(null)
 
   const selectPropsArr: TselectProps[] = [
     {
@@ -101,6 +108,13 @@ export default function MemoList() {
       options: optionsDoorType,
       onChange: (option: Toption | null) => { setDoorType(option?.value) },
       placeholder: "選擇門型",
+      boxStyle: { width: "145px" }
+    },
+    {
+      value: doorForm,
+      options: optionsDoorForm,
+      onChange: (option: Toption | null) => { setDoorForm(option?.value) },
+      placeholder: "選擇形式",
       boxStyle: { width: "145px" }
     },
   ]
