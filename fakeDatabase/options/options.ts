@@ -59,7 +59,6 @@ export const optionsCreator_customerCategory =
 export const optionsCreator_prodClass =
   (): Toption[] => [
     { value: "all", label: "不拘" },
-    { value: "捲門", label: "捲門" },
     { value: "防火防煙捲門系列", label: "防火防煙捲門系列" },
     { value: "防水防洪門系列", label: "防水防洪門系列" },
     { value: "抗風防颱捲門系列", label: "抗風防颱捲門系列" },
