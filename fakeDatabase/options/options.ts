@@ -57,7 +57,7 @@ export const optionsCreator_customerCategory =
 // 類別
 export const optionsCreator_prodClass =
   (): Toption[] => [
-    { value: "all", label: "不拘" },
+    { value: "", label: "不拘" },
     { value: "防火防煙捲門系列", label: "防火防煙捲門系列" },
     // { value: "防水防洪門系列", label: "防水防洪門系列" },
     // { value: "抗風防颱捲門系列", label: "抗風防颱捲門系列" },
@@ -70,7 +70,7 @@ export const optionsCreator_prodClass =
 // 門型
 export const optionsCreator_doorType =
   (): Toption[] => [
-    { value: "all", label: "不拘" },
+    { value: "", label: "不拘" },
     { value: "SJ-302", label: "SJ-302" },
     // { value: "SJ-302A", label: "SJ-302A" },
     // { value: "SJ-302AS", label: "SJ-302AS" },
@@ -83,9 +83,9 @@ export const optionsCreator_doorType =
   // 門的形式
 export const optionsCreator_doorForm =
   (): Toption[] => [
-    { value: "all", label: "不拘" },
-    { value: "normal", label: "一般" },
-    { value: "anteTyphoon", label: "防颱" },
+    { value: "", label: "不拘" },
+    { value: "一般", label: "一般" },
+    { value: "防颱", label: "防颱" },
   ]
 
 // 客戶列表搜尋用
