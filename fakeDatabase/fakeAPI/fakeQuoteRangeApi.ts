@@ -6,7 +6,7 @@ import {
 
 
 
-export class FakeApi_quoteRange {
+class ClassFakeApi_quoteRange {
   private _memoArr = fakeQuoteRangeDataArr
 
   private _fitler = (
@@ -69,3 +69,9 @@ export class FakeApi_quoteRange {
     else alert(`找不到這個id，id:${id}`)
   }
 }
+
+
+
+const fakeApi_quoteRange = new ClassFakeApi_quoteRange()
+
+export { fakeApi_quoteRange }

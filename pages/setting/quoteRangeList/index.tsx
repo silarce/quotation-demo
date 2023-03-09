@@ -26,7 +26,7 @@ import style from "./quoteRangeList.module.scss"
 
 
 // fake
-import { FakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi"
+import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi"
 import {
   optionsCreator_prodClass,
   optionsCreator_doorType,
@@ -45,7 +45,7 @@ export default function MemoList() {
   // const [isLoading, setIsLoading] = useState(false)
   // const [showAdd, setShowAdd] = useState(false)
   // ------------------------------------------------------------------------
-  const [fakeMemoArrState, setFakeMemoArrState] = useState({ wrapper: new FakeApi_quoteRange() })
+  const [fakeMemoArrState, setFakeMemoArrState] = useState({ wrapper: fakeApi_quoteRange })
   const reRender = () => {
     setFakeMemoArrState(state => ({ ...state }))
   }
@@ -118,8 +118,7 @@ export default function MemoList() {
     <div className={style.container}>
       <PageHeader02
         tag="報價範圍列表"
-        panelList={panelList}
-      />
+        panelList={panelList} />
 
       <div className={style.mainContainer}>
         <div>

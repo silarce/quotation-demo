@@ -26,7 +26,7 @@ import style from "./memoList.module.scss"
 
 
 // fake
-import { FakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi"
+import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi"
 import {
   optionsCreator_prodClass,
   optionsCreator_doorType,
@@ -45,7 +45,7 @@ export default function MemoList() {
   // const [isLoading, setIsLoading] = useState(false)
   // const [showAdd, setShowAdd] = useState(false)
   // ------------------------------------------------------------------------
-  const [fakeMemoArrState, setFakeMemoArrState] = useState({ wrapper: new FakeApi_memo() })
+  const [fakeMemoArrState, setFakeMemoArrState] = useState({ wrapper: fakeApi_memo })
   const reRender = () => {
     setFakeMemoArrState(state => ({ ...state }))
   }

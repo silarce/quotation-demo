@@ -7,7 +7,7 @@ import {
 
 
 
-export class FakeApi_memo {
+ class Class_FakeApi_memo {
   private _memoArr = fakeMemoDataArr
 
   private _fitler = (
@@ -73,3 +73,8 @@ export class FakeApi_memo {
     else alert(`找不到這個id，id:${id}`)
   }
 }
+
+
+const fakeApi_memo = new Class_FakeApi_memo()
+
+export { fakeApi_memo }
