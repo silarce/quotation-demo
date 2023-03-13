@@ -99,7 +99,9 @@ export default function ProductList({ productStates }:
                 const theStyle = { width }
                 const stateValue = dataItem[key]
                 const TheCell =
-                  cellSwitcher({ dataItem, key, type, disabled, stateValue })
+                  cellSwitcher({
+                    dataItem, key, type, disabled, stateValue,
+                  })
 
                 if (
                   (key === "ejectionDoor" && quoteType.quoteTypeType !== "rollerDoor")
@@ -123,7 +125,7 @@ export default function ProductList({ productStates }:
   // ===========================================================
   // ===========================================================
   // ===========================================================
-  function cellSwitcher({ dataItem, key, type, disabled, stateValue }:
+  function cellSwitcher({ dataItem, key, type, disabled, stateValue, }:
     {
       dataItem: ProdClass
       key: TprodKeys
@@ -173,7 +175,10 @@ export default function ProductList({ productStates }:
 
       case "select": {
         if (typeof stateValue === "boolean") return null
-        const options = optionsObjList[key as ToptionsObjKey]
+        const BOption = dataItem.BOption
+        let options: Toption[]
+        if (key === "B") { options = BOption }
+        else options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => dataItem.onSelChange(option, key as keyof TproductObject)
         return (

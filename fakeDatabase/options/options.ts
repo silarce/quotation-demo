@@ -142,18 +142,16 @@ export const optionsCreator_B =
 // 馬力
 export const optionsCreator_horsepower =
   (): Toption[] => [
-    { value: "1/4HP", label: "1/4HP" },
-    { value: "1/3HP", label: "1/3HP" },
-    { value: "1/2HP", label: "1/2HP" },
-    { value: "3/4HP", label: "3/4HP" },
-    { value: "1HP", label: "1HP" },
-    { value: "1 1/2HP", label: "1 1/2HP" },
-    { value: "2HP", label: "2HP" },
-    { value: "3HP", label: "3HP" },
-    { value: "5HP", label: "5HP" },
+    { value: "1/4 HP", label: "1/4 HP" },
+    { value: "1/3 HP", label: "1/3 HP" },
+    { value: "1/2 HP", label: "1/2 HP" },
+    { value: "3/4 HP", label: "3/4 HP" },
+    { value: "1 HP", label: "1 HP" },
+    { value: "1 1/2HP", label: "1 1/2 HP" },
+    { value: "2 HP", label: "2 HP" },
+    { value: "3 HP", label: "3 HP" },
+    { value: "5 HP", label: "5 HP" },
   ]
-
-
 // 報價單狀態
 export const optionsCreator_quotationState =
   (): Toption[] => [
