@@ -44,7 +44,11 @@ export default function BudgetList({ budgetList, searchObj }:
   const router = useRouter()
   // ----------------------------------------------------------------
   const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
-  const projectArr = projectSimple.wrapper.get()
+
+  const projectArr = projectSimple.wrapper.get({
+    filter: {}
+  })
+
   const reRender = () => setProjectSimple(state => ({ ...state }))
   // ----------------------------------------------------------------
 
@@ -81,6 +85,8 @@ export default function BudgetList({ budgetList, searchObj }:
             e.stopPropagation()
             router.push(`/domestic/budget/quotation/${quotationId}`)
           }
+
+
           // const { detail } = item
           // ===========================
           // 搜尋過濾
@@ -104,44 +110,6 @@ export default function BudgetList({ budgetList, searchObj }:
             </Panel>
           )
         })}
-
-
-        {/* {budgetList.map((item, index) => {
-          const { quotationId,
-            doorType,
-            country,
-            clientName,
-            projectName, } = item
-          const isActive = activeIndex === index
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation()
-            router.push(`/domestic/budget/quotation/${quotationId}`)
-          }
-          const { detail } = item
-          // ===========================
-          // 搜尋過濾
-          const regDoorType = new RegExp(searchObj.doorType)
-          const regCountry = new RegExp(searchObj.country)
-          const regClientName = new RegExp(searchObj.clientName)
-          const regProjectName = new RegExp(searchObj.projectName)
-          if (
-            !regDoorType.test(doorType) ||
-            !regCountry.test(country) ||
-            !regClientName.test(clientName) ||
-            !regProjectName.test(projectName)
-          ) return null
-          // ===========================
-
-          return (
-            <Panel key={index} className={style.panel}
-              header={<PanelHeader budget={item} isActive={isActive} openQuotation={openQuotation} />}
-            >
-              <PanelBody budgetDetail={detail} openQuotation={openQuotation} />
-            </Panel>
-          )
-        })} */}
-
 
       </Collapse>
     </div >

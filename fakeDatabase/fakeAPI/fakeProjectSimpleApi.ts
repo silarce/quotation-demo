@@ -1,29 +1,32 @@
 
-
 import { Tproject, fakeProjectData } from "fakeDatabase/domestic/_fakeProject"
 import { TclientProfile, fakeClienData } from "fakeDatabase/client/_fakeClients"
 
 
-
-
-type TprojectSimpleGet = Tproject & {
-  [key: string]: {
-    clientData: TclientProfile
-  }
-}
-
 class Class_fakeApi_projectSimple {
 
-  get = () => {
-    return Object.values(fakeProjectData).
-      map((item) => {
+  get = (
+    param?: {
+      filter?: {
+        county?: string,
+      }
+    }
+  ) => {
+    const filter = param?.filter
+    const arr = Object.values(fakeProjectData)
+      .map((item, index) => {
+
+        if (filter?.county) {
+          if (item.projectCounty !== filter.county) return
+        }
         return {
           ...item,
           clientData: fakeClienData[item.clientId]
         }
       })
+    const arr2 = arr.flatMap((item) => (item ? [item] : [])); // 清除undefined
+    return arr2
   }
-
 }
 
 
@@ -36,7 +39,7 @@ export { Class_fakeApi_projectSimple, fakeApi_projectSimple }
 
 
 
-
+type Tfoo = (string | undefined)[]
 
 
 
