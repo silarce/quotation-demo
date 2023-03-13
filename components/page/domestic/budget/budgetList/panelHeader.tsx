@@ -1,6 +1,5 @@
 import { MouseEvent } from 'react'
 
-
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar";
 
@@ -11,27 +10,43 @@ import style from "../budgetList.module.scss"
 import iconPlace from "public/image/icon/place.svg"
 import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
 
-//  type
-import { Tbudget } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 
-export default function PanelHeader({ budget, isActive, openQuotation }:
+import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+type TprojectSimple = ReturnType<Class_fakeApi_projectSimple['get']>[0];
+
+export default function PanelHeader({ projectData: projectData, isActive, openQuotation }:
   {
-    budget: Tbudget
+    projectData: TprojectSimple
     isActive: boolean
     openQuotation: (e: MouseEvent) => void
   }) {
 
   const {
-    quotationId, clientName, contactName,
-    contactPhone, undertaker, discount,
-    doorQty, } = budget
-  const { date, country, projectName, } = budget
-  let { budgetAmount } = budget
+    quotationId,
+    projectName,
+    undertaker, discount,
+    clientData,
+    tempDoorQty: doorQty,
+    tempBudgetAmount: budgetAmount,
+    date,
+    projectCounty: country
+  } = projectData
 
-  if (typeof budgetAmount === "string") {
-    budgetAmount = parseFloat(budgetAmount)
+  const {
+    name: clientName,
+    contact
+  } = clientData
+  const {
+    name: contactName,
+    phone: contactPhone,
+  } = contact[0]
+
+
+  let formatedBudgetAmount: string | number = budgetAmount
+  if (typeof formatedBudgetAmount === "string") {
+    formatedBudgetAmount = parseFloat(formatedBudgetAmount)
   }
-  budgetAmount = budgetAmount.toLocaleString()
+  formatedBudgetAmount = formatedBudgetAmount.toLocaleString()
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive}>
@@ -43,7 +58,7 @@ export default function PanelHeader({ budget, isActive, openQuotation }:
         <span>{undertaker}</span>
         <span>{discount}</span>
         <span>{doorQty}</span>
-        <span>{budgetAmount}</span>
+        <span>{formatedBudgetAmount}</span>
         <div><IconDetail onClick={openQuotation} /></div>
       </div>
       <div className={style.row02}>
@@ -59,3 +74,4 @@ export default function PanelHeader({ budget, isActive, openQuotation }:
     </CellWithBar>
   )
 }
+

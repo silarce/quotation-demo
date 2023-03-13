@@ -13,7 +13,6 @@ interface Tbudget {
   discount: string | number // 總折數
   doorQty: string | number// 橖數
   budgetAmount: string | number //合約金額
-
   doorType: string
 }
 
@@ -25,12 +24,15 @@ let fakeBudgetObjList: TbudgetObjList = {
   "S-110211-01": {
     quotationId: "S-110211-01",
     date: "111-02-02",
-    clientName: "新加坡商犀牛頓科技股份有限公司",
     country: "台北市",
-    projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+
+    clientName: "新加坡商犀牛頓科技股份有限公司",
     contactName: "陳小明小華",
     contactPhone: "0987654321",
+    
     undertaker: "陳小明小華",
+    projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+
     discount: "100.00",
     doorQty: "10",
     budgetAmount: "1606541",
