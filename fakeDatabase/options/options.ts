@@ -48,9 +48,9 @@ export const optionsCreator_taxDeductionCategory =
   ]
 export const optionsCreator_customerCategory =
   (): Toption[] => [
-    { value: "客戶", label: "客戶" },
-    { value: "廠商", label: "廠商" },
-    { value: "客戶廠商", label: "客戶廠商" },
+    { value: "營造", label: "營造" },
+    { value: "事務所", label: "事務所" },
+    { value: "業主", label: "業主" },
   ]
 
 
