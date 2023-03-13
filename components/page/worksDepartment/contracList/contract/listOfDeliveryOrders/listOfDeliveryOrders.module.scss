@@ -1,0 +1,146 @@
+@use "styles/theme01" as *;
+
+.profile {
+  display: grid;
+  height: fit-content;
+  margin: 40px 50px 0;
+  grid-template-columns: repeat(2, fit-content(100%));
+  gap: 18px 105px;
+  .input02 {
+    padding: 0;
+    > span {
+      color: $colorMain;
+    }
+    > hr {
+      border-color: $colorBorder01;
+    }
+  }
+}
+// ======================================================
+.editTransfer {
+  border: solid 1px $colorBorder01;
+  height: fit-content;
+  margin: 0 16px;
+  padding: 3px;
+  margin-top: 40px;
+  .thead,
+  .row {
+    display: flex;
+    padding: 0 22px;
+    align-content: flex-start;
+    > div {
+      &.deleteIcon {
+        width: 20px;
+        margin-right: 16px;
+        margin-top: 2px;
+        text-align: center;
+      }
+      &.indexNumber {
+        width: 20px;
+        margin-right: 10px;
+        margin-top: 2px;
+        text-align: center;
+      }
+      &.addIcon {
+        margin: auto;
+        margin-left: 0;
+        text-align: center;
+        cursor: pointer;
+        > * {
+          display: inline-block;
+          font-weight: 400;
+          font-size: 16px;
+          color: $colorMain;
+          vertical-align: middle;
+        }
+        > img {
+          margin-right: 20px;
+        }
+      }
+    }
+  }
+  .thead {
+    background-color: $bgc01;
+    padding-top: 11px;
+    padding-bottom: 11px;
+    > div {
+      &.center {
+        text-align: center;
+      }
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+        color: $colorMain;
+      }
+    }
+  }
+  .row {
+    > div {
+      height: fit-content;
+      padding: 10px 0;
+      &.center {
+        textarea {
+          text-align: center;
+        }
+      }
+      .input,
+      .sel {
+        padding: 0;
+        span,
+        textarea {
+          font-weight: 400;
+          font-size: 16px;
+          &::placeholder {
+            font-weight: 400;
+            font-size: 16px;
+          }
+        }
+      }
+      .sel {
+        // 為了對齊
+        margin-bottom: 0.14px;
+        min-height: 25.14px;
+      }
+    }
+  }
+  .tbody {
+    max-height: 230px;
+    overflow: auto;
+  }
+}
+
+// ======================================================
+.iconEdit {
+  border: solid 1px $colorBorder01;
+  height: 215px;
+  margin: 0 16px;
+  padding: 3px;
+  margin-top: 11px;
+  > .head {
+    background-color: $bgc01;
+    padding: 11px 30px;
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+    }
+  }
+}
+
+// ======================================================
+.signature {
+  margin: 65px 50px 40px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 45px;
+  .cell {
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+    }
+    > .input02 {
+      padding: 24px 0 14px;
+    }
+  }
+}

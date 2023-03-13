@@ -1,8 +1,122 @@
 @use "styles/theme01" as *;
 
-.orderList {
-  .grid {
-    display: grid;
-    grid-template-columns: auto;
+$cellgap: 16px;
+
+.orderTable {
+  border: solid 1px $colorBorder01;
+  padding: 4px;
+  padding-top: 0;
+  overflow: auto;
+  .thead {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    width: fit-content;
+    white-space: nowrap;
+    background-color: $bgc01;
+    padding: 11px;
+    padding-left: 22px;
+    padding-right: 33px;
+    border-top: solid 4px white;
+    .theadItem {
+      display: inline-flex;
+      padding: 2px 3px;
+      margin-left: $cellgap;
+      border: solid 1px transparent;
+      cursor: default;
+      &:nth-of-type(2) {
+        margin-left: 10px;
+      }
+      &.textCenter {
+        > * {
+          margin: auto;
+        }
+      }
+      > span {
+        color: $colorMain;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .tableList {
+    max-height: 410px;
+    width: fit-content;
+    .row {
+      position: relative;
+      display: inline-flex;
+      width: fit-content;
+      white-space: nowrap;
+      align-items: center;
+      padding: 11px;
+      padding-left: 22px;
+      padding-right: 33px;
+      &.bgcSub {
+        background-color: $bgc01;
+      }
+      .ribbon {
+        position: absolute;
+        left: 0;
+        top: 1px;
+        width: 3px;
+        height: calc(100% - 2px);
+        background-color: $colorMain;
+      }
+    }
+    .column {
+      position: relative;
+      padding: 2px 3px;
+      margin-left: $cellgap;
+      display: inline-flex;
+      align-items: center;
+      &:nth-of-type(2) {
+        margin-left: 10px;
+      }
+      &.textCenter {
+        > span {
+          margin: auto;
+        }
+      }
+      // > img {
+      //   display: inline-block;
+      //   margin-right: 6px;
+      // }
+      > span {
+        display: inline-block;
+        font-size: 16px;
+      }
+      .input03 {
+        padding: 0;
+      }
+    }
+  }
+
+  .indexCell {
+    width: 20px;
+    > span {
+      margin: auto;
+      font-weight: 400;
+      font-size: 16px;
+      color: $colorMain;
+    }
+  }
+
+  .pilar {
+    position: relative;
+    display: inline-flex;
+    width: 1px;
+    padding: 2px 0px;
+    margin-left: 10px;
+    margin-right: 6px;
+
+    > div {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      width: 1px;
+      height: 31px;
+      background-color: $colorBorder01;
+    }
   }
 }

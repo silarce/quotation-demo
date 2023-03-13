@@ -1,4 +1,13 @@
 
+
+// 用不到了，但暫時先留著備用
+// 用不到了，但暫時先留著備用
+// 用不到了，但暫時先留著備用
+// 用不到了，但暫時先留著備用
+// 用不到了，但暫時先留著備用
+
+
+
 import { useState, useMemo } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
@@ -44,7 +53,6 @@ function TheContractLayout({ router, children }:
   }) {
   const { contractId } = router.query
 
-
   const pathHead = `/worksDepartment/contractList/${contractId}`
 
   const linkList = [
@@ -84,12 +92,14 @@ function TheContractLayout({ router, children }:
 
   return (
     <div className={style.container}>
+      <div >
 
-      <div>
-        <div className={style.title}>
-          <span>合作編號</span>
-          <span>{contractId}</span>
-        </div>
+        {/* <PageHeader02 tag={`合作編號${contractId}`} /> */}
+        {/* <div className={style.title}>
+            <span>合作編號</span>
+            <span>{contractId}</span>
+          </div> */}
+
         <div className={style.headerWrapper}>
           <PageHeaderFlex01 linkList={linkList} />
         </div>
@@ -98,8 +108,7 @@ function TheContractLayout({ router, children }:
       <div className={`${style.mainContainer} ${style.childrenWrapper}`}>
         {children}
       </div>
-
-    </div>
+    </div >
 
   )
 }

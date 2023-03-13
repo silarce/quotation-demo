@@ -26,10 +26,11 @@ type TeInput = ChangeEvent<HTMLInputElement>
 const Input02 = (
   { label, stateValue, placeholder, onChange,
     id, className, width, labelWidth, gap,
-    disabled, isInput, inputType
+    disabled, labelColor, noUnderline,
+    isInput, inputType
   }:
     {
-      label: string,
+      label?: string,
       stateValue: string | number | undefined | null,
       onChange?: TonChangeTextarea | TonChangeInput
       placeholder?: string | false,
@@ -38,7 +39,9 @@ const Input02 = (
       width?: string
       labelWidth?: string
       gap?: string
-      disabled?: boolean | undefined
+      disabled?: boolean | undefined,
+      labelColor?: string
+      noUnderline?: boolean
       isInput?: true
       inputType?: "text" | "password"
 
@@ -55,20 +58,35 @@ const Input02 = (
   // ========================================================
 
   const lableStyle = {
-    width: width ? width : "",
-    gridTemplateColumns: labelWidth ? `${labelWidth} auto` : "",
-    gap: gap ? gap : "",
+    width: width ? width : undefined,
+    gridTemplateColumns:
+      !label ? `auto`
+        : labelWidth ? `${labelWidth} auto`
+          : undefined,
+    gap: gap ? gap : undefined,
   }
-
+  // --------------------------
   const styleDisabled = disabled ? style.disabled : ""
+  const styleLabelColor = (() => {
+    switch (labelColor) {
+      case "main": return style.colorMain;
+      default: return "";
+    }
+  })()
+  const styleNoUnderline = noUnderline ? style.noUnderline : ""
 
   // ========================================================
 
   return (
-    <label className={`${style.label} ${className} ${styleDisabled}`} htmlFor={id}
+    <label
+      className
+      ={[className, style.label, styleDisabled].join(" ")}
+      htmlFor={id}
       style={lableStyle}
     >
-      <span>{label}</span>
+      {label &&
+        <span className={styleLabelColor}>{label}</span>
+      }
       {!isInput &&
         <TextareaAutosize className={style.textArea}
           id={id} placeholder={placeholder}
@@ -105,7 +123,7 @@ const Input02 = (
       /> */}
 
 
-      <hr />
+      <hr className={styleNoUnderline} />
     </label>
   )
 }

@@ -32,7 +32,7 @@ import style from "../dndTable01.module.scss"
 
 // type
 import { Ttable01Config } from "../dndTable01"
-import { TdndCellConfigkeys } from "config/dndCellConfig"
+import { TdndCellConfigKeys } from "config/dndCellConfig"
 
 // config
 import { dndCellConfigOri } from "config/dndCellConfig"
@@ -42,7 +42,7 @@ const dndCellConfig = dndCellConfigOri()
 // =========================================================
 // =========================================================
 export default function DndThead
-  <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
+  <N extends TdndCellConfigKeys, I extends TdndCellConfigKeys>
   ({
     allowMove,
     theadIndex,
@@ -80,7 +80,7 @@ export default function DndThead
             const theadInfo = dndCellConfig[key]
             return (
               // key必須是items裡的值
-              <TheadItem key={key} theadInfo={theadInfo}
+              <TheadItem<typeof key> key={key} theadInfo={theadInfo}
                 allowMove={allowMove}
                 isMoving={isMoving === key}
               />

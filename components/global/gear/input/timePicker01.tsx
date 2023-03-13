@@ -11,6 +11,17 @@ import locale from 'antd/lib/date-picker/locale/zh_TW';
 // css
 import style from "./timePicker01.module.scss"
 
+
+
+// 基本上用onChange就可以了，用法跟input差不多
+// const onChange = (dateString: string) => {
+//   const value = dateString
+//   setData(data => {
+//     data[key] = value
+//     return { ...data }
+//   })
+// }
+// ===============================================
 export default function TimePicker01({
   label, stateValue, placeholder, onChange, onChange02,
   id, className, width, labelWidth, gap,

@@ -7,9 +7,11 @@
   gap: 40px;
   width: 100%;
   padding: 17px 4px 14px 4px;
+  height: fit-content;
   > * {
     margin: auto;
     margin-left: 0;
+    // margin-top: 0;
   }
   > span {
     font-weight: 500;
@@ -18,9 +20,10 @@
     margin-top: 0;
   }
   > textArea {
+    width: 100%;
+    margin-top: 1px;
     font-weight: 400;
     font-size: 18px;
-    width: 100%;
     resize: none;
     &::placeholder {
       color: $colorBorder01;
@@ -44,9 +47,17 @@
   textArea {
     background-color: transparent;
   }
-  &.disabled {
-    > hr {
+
+  &.disabled > .textArea ~ hr {
+    border-color: transparent ;
+  }
+
+  > hr {
+    &.noUnderline {
       border-color: transparent;
     }
+  }
+  .colorMain {
+    color: $colorMain;
   }
 }
