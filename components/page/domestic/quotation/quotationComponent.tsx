@@ -114,7 +114,7 @@ export default function QuotationComponent(
                 // _______
                 if (optionsObj[key]) {
                   const onChange = (option: Toption | null) => {
-                    if (key === "material" || key === "surface")
+                    if (key === "material")
                       onSelChange(option, key)
                   }
                   return (
@@ -143,13 +143,13 @@ export default function QuotationComponent(
 
 // type TpartKeys = keyof PartClass
 type TpartKeys = keyof Pick<PartClass,
-  "subType" | "subTypeName" | "id" | "material" | "surface" |
+  "subType" | "subTypeName" | "id" | "material" |
   "basicWeight" | "unit" | "qty" | "listPrice" | "totalListPrice" |
   "price" | "totalPrice"
 >
 
 const partKeys: TpartKeys[] = [
-  "subType", "subTypeName", "id", "material", "surface",
+  "subType", "subTypeName", "id", "material",
   "basicWeight", "unit", "qty", "listPrice", "totalListPrice",
   "price", "totalPrice",
 ]
@@ -166,7 +166,7 @@ const config: Tconfig = {
   "subTypeName": { label: "種類名稱", width: "160px" },
   "id": { label: "代號", width: "116px" },
   "material": { label: "材料", width: "120px" },
-  "surface": { label: "表面", width: "55px" },
+  // "surface": { label: "表面", width: "55px" },
   "basicWeight": { label: "重量基重", width: "75px" },
   "unit": { label: "單位", width: "40px" },
   "qty": { label: "數量", width: "60px" },

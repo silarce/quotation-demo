@@ -41,6 +41,8 @@ const optionsGroup = {
   doorType: optionsCreator_doorType(),
 }
 
+// tool
+import { calcReel, calcHorsepower, calcBAndD, } from "js/tools/PSC_v1.1"
 
 // ======================================================
 
@@ -153,16 +155,27 @@ function useProduct(
 // ============================================================================
 // ============================================================================
 
+// console.log(`面積：${(L * h) / 1000}`);
+// console.log(`材數：${((L * h) / 1000) * 10.89}`);
+// console.log(`重量：${weight}`);
+// console.log(`捲軸：${reelData}`);
+// console.log(`馬力：${horsepower}`);
+// console.log(`B：${B / 100}`);
+// console.log(`D：${D / 100}`);
+// console.log(`B的陣列：${bArray}`);
+
+
+
 class ProdClass {
   discount: Tproduct["discount"] = ""
   _discount: Tproduct["discount"]  // 折數
   project: Tproduct["project"]  // 項目
   // L: Tproduct["L"] = ""  // L
   // W: Tproduct["W"] = ""  // W
-  H: Tproduct["H"] = ""  // H
+  // h: Tproduct["h"] = ""  // h
   _L: number  // L
   _W: number  // W
-  _H: Tproduct["H"]  // H
+  _h: number  // h
   _qty: Tproduct["qty"]  // 數量
   memo: Tproduct["memo"] // 備註
 
@@ -173,6 +186,8 @@ class ProdClass {
   surface: Toption  // 表面
   doorRail: Toption  // 門軌
   B: Toption  // B
+  BOption: Toption[]
+  D: number
 
   ejectionDoor: Tproduct["ejectionDoor"]
   typhoonProof: Tproduct["typhoonProof"]
@@ -186,8 +201,12 @@ class ProdClass {
   thickness = "1.50t" //厚度
   openType = "電動"
 
+  _unitWeight: number
+  _weight: number
+  reel = "資料錯誤"
 
 
+  // constructor
   constructor(
     { product, setProductList }:
       {
@@ -197,10 +216,10 @@ class ProdClass {
   ) {
     const {
       discount, project, L, W,
-      H, B,
+      h, B,
       doorType, horsepower, qty,
       quoteType, material, surface, doorRail, memo,
-      ejectionDoor, typhoonProof
+      ejectionDoor, typhoonProof, unitWeight
     } = product
     this.setProductList = setProductList
 
@@ -208,7 +227,7 @@ class ProdClass {
     this.project = project
     this._L = parseFloat(L)
     this._W = parseFloat(W)
-    this._H = H
+    this._h = parseFloat(h)
     this.memo = memo
 
     this._qty = qty
@@ -216,10 +235,19 @@ class ProdClass {
     this.ejectionDoor = ejectionDoor
     this.typhoonProof = typhoonProof
 
+    this._unitWeight = unitWeight
+    this._weight = this._L * this._h * 22
+    this.reel = calcReel(this._L, this._weight)
+
     this.doorType = optionsGroup["doorType"].find((item) => item.value === doorType)
       ?? unexpectedOption(doorType)
-    this.horsepower = optionsGroup["horsepower"].find((item) => item.value === horsepower)
-      ?? unexpectedOption(horsepower)
+
+    if (horsepower) {
+      this.horsepower = optionsGroup["horsepower"].find((item) => item.value === horsepower)
+        ?? unexpectedOption(horsepower)
+    }
+    else this.horsepower = unexpectedOption(calcHorsepower(this._weight))
+
     this.quoteType = optionsGroup["quoteType"].find((item) => item.value === quoteType)
       ?? unexpectedOption(quoteType)
     this.material = optionsGroup["material"].find((item) => item.value === material)
@@ -228,11 +256,26 @@ class ProdClass {
       ?? unexpectedOption(surface)
     this.doorRail = optionsGroup["doorRail"].find((item) => item.value === doorRail)
       ?? unexpectedOption(doorRail)
-    this.B = optionsGroup["B"].find((item) => item.value === B)
-      ?? unexpectedOption(B)
+
+    const B_D_bArray = calcBAndD(this.reel, this._h)
+    if (B) {
+      this.B = optionsGroup["B"].find((item) => item.value === B)
+        ?? unexpectedOption(B)
+    }
+    else {
+      this.B = unexpectedOption(`${B_D_bArray.B}`)
+    }
+    this.D = B_D_bArray.D
+    this.BOption = (() => {
+      const bArray = B_D_bArray.bArray
+      const optionArr = bArray.map((item) => {
+        return unexpectedOption(`${item}`)
+      })
+      return optionArr
+    })()
 
 
-    let keys = ["discount", "H",]
+    let keys = ["discount",]
     keys.forEach((key) => {
       Object.defineProperty(this, key, {
         get() {
@@ -252,7 +295,7 @@ class ProdClass {
         setProductList,
         parent: this
       }))
-  }
+  } //  constructor constructor constructor constructor constructor
 
   get L() {
     return `${this._L}`
@@ -260,6 +303,7 @@ class ProdClass {
   set L(v) {
     this._W = 0
     this._L = new Decimal(parseFloat(v) || 0).abs().toNumber()
+    this._weight = this._L * this._h * 22
   }
   get W() {
     return `${this._W}`
@@ -269,10 +313,18 @@ class ProdClass {
     this._W = new Decimal(parseFloat(v) || 0).abs().toNumber()
   }
 
-  // L*(H+B)/10000 = area
+  get h() {
+    return `${this._h}`
+  }
+  set h(v) {
+    this._h = new Decimal(parseFloat(v) || 0).abs().toNumber()
+    this._weight = this._L * this._h * 22
+  }
+
+  // L*(h+B)/10000 = area
   get area() {
     return new Decimal(this._L || this._W)
-      .mul(Decimal.add(this._H, this.B.value))
+      .mul(Decimal.add(this._h, this.B.value))
       .div(100 * 100) // 把單位從平方公分轉為平方公尺
       .toFixed(2).toString()
   }
@@ -326,7 +378,7 @@ class ProdClass {
     const regex = /^area$|^unitPrice$|^subTotal$|^cai$/
     if (regex.test(key)) return
     key = key as Exclude<keyof TproductString,
-      "area" | "unitPrice" | "subTotal" | "cai"
+      "area" | "unitPrice" | "subTotal" | "cai" | "unitWeight"
     >
 
     this[key] = value
@@ -361,11 +413,13 @@ class ProdClass {
 
   get allData() {
     return {
+      reel: this.reel,
+
       discount: this.discount,
       project: this.project,
       L: this.L,
       W: this.W,
-      H: this.H,
+      h: this.h,
       qty: this.qty,
       area: this.area,
       cai: this.cai,
@@ -388,7 +442,7 @@ class ProdClass {
       priceTotal: this.priceTotal,
 
       // pdf要的資料
-      size: `${this._W || this._L} X ${this.H} + ${this.B.value}`,
+      size: `${this._W || this._L} X ${this.h} + ${this.B.value}`,
       thickness: this.thickness,
       openType: this.openType,
     }
@@ -408,6 +462,8 @@ class PartClass {
   subType: string
   subTypeName: string
   id: string | null
+  // material: Toption | string
+  // surface: Toption | string
   material: Toption | string
   surface: Toption | string
   basicWeight: string | null // 重量基重
@@ -445,10 +501,18 @@ class PartClass {
     this.listPrice = listPrice
     // this.price = price
 
-    this.material = optionsGroup["material"].find((item) => item.value === material)
-      ?? material
+
+
+    // this.material = optionsGroup["material"].find((item) => item.value === material)
+    //   ?? material
+    // this.surface = optionsGroup["surface"].find((item) => item.value === surface)
+    //   ?? surface
+
     this.surface = optionsGroup["surface"].find((item) => item.value === surface)
       ?? surface
+
+    this.material = material + " " + surface
+
 
     this.parent = parent
   }
@@ -456,7 +520,7 @@ class PartClass {
   get qty() {
     if (this._qty) return parseFloat(this._qty).toFixed(2)
     if (this.subTypeName === "門軌") {
-      const length = this.parent._H
+      const length = this.parent._h
       return new Decimal(length).div(100).toFixed(2).toString()
     }
     if (this.unit === "M") {
@@ -492,16 +556,15 @@ class PartClass {
   }
 }
 
-
-
 // ================================================================
 
 type TprodKeys = keyof Pick<ProdClass,
   "discount" | "project" | "quoteType" | "L" | "W" |
-  "H" | "B" | "area" | "cai" | "doorType" |
+  "h" | "B" | "area" | "cai" | "doorType" |
   "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
   "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor" |
-  "listPrice" | "listPriceTotal"
+  "listPrice" | "listPriceTotal" |
+  "reel"
 >
 
 type TprodCellConfig = {
@@ -520,7 +583,7 @@ function prodCellConfigOri(): TprodCellConfig {
   return {
     keyList: [
       "discount", "project", "quoteType", "L", "W",
-      "H", "B", "area", "cai", "doorType",
+      "h", "B", "area", "cai", "reel", "doorType",
       "material", "surface", "doorRail", "horsepower", "qty",
       "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
       "memo", "typhoonProof", "ejectionDoor",
@@ -531,7 +594,7 @@ function prodCellConfigOri(): TprodCellConfig {
       quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "select" },
       L: { id: "L", label: "L(m)", width: "60px", type: "input" },
       W: { id: "W", label: "W(m)", width: "60px", type: "input" },
-      H: { id: "H", label: "H(m)", width: "60px", type: "input" },
+      h: { id: "h", label: "h(m)", width: "60px", type: "input" },
       B: { id: "B", label: "B(m)", width: "60px", type: "select" },
       area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
       cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
@@ -548,6 +611,7 @@ function prodCellConfigOri(): TprodCellConfig {
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
       ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
       typhoonProof: { id: "typhoonProof", label: "防颱", width: "60px", type: "checkbox" },
+      reel: { id: "reel", label: "直徑", width: "75px", type: "readOnly" },
     }
   }
 }
@@ -559,7 +623,7 @@ const emptyProduct = (): Tproduct => ({
   quoteType: "不是捲門",
   L: "0",
   W: "0",
-  H: "0",
+  h: "0",
   B: "20",
   doorType: "",
   material: "不鏽鋼304#",
@@ -570,6 +634,7 @@ const emptyProduct = (): Tproduct => ({
   memo: "",
   ejectionDoor: false,
   typhoonProof: false,
+  unitWeight: 22,
 })
 
 const unexpectedOption = (v: string) => ({

@@ -26,6 +26,7 @@ interface TrecordProduct
   listPriceTotal: string
   unitPrice: string
   priceTotal: string
+  reel?: string
 }
 interface TchangeListItem {
   id: string // 編號
@@ -57,7 +58,7 @@ const fakeProduct01: TrecordProduct = {
   quoteType: "不是捲門",
   L: "516",
   W: "0",
-  H: "230",
+  h: "230",
   B: "45",
   area: (516 * (230 + 45) / 10000).toFixed(2),
   cai: (516 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
@@ -77,6 +78,7 @@ const fakeProduct01: TrecordProduct = {
   memo: "這是備註",
   typhoonProof: true,
   ejectionDoor: false,
+  unitWeight: 22,
 }
 
 const fakeProduct02: TrecordProduct = {
@@ -86,7 +88,7 @@ const fakeProduct02: TrecordProduct = {
   quoteType: "捲門",
   L: "0",
   W: "230",
-  H: "230",
+  h: "230",
   B: "45",
   area: (230 * (230 + 45) / 10000).toFixed(2),
   cai: (230 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
@@ -106,6 +108,7 @@ const fakeProduct02: TrecordProduct = {
   memo: "備註",
   typhoonProof: false,
   ejectionDoor: true,
+  unitWeight: 22,
 }
 
 
