@@ -9,11 +9,11 @@ import TableList from "./gear/tableList"
 import style from "./dndTable01.module.scss"
 
 // type
-import { TdndCellConfigkeys } from "config/dndCellConfig"
+import { TdndCellConfigKeys } from "config/dndCellConfig"
 
 
 export default function Table01
-  <N extends TdndCellConfigkeys, I extends TdndCellConfigkeys>
+  <N extends TdndCellConfigKeys, I extends TdndCellConfigKeys>
   ({ tableData, keyIndex, className = "" }:
     {
       tableData: Ttable01<N, I>
@@ -49,7 +49,7 @@ export default function Table01
 // =========================================================
 // =========================================================
 // =========================================================
-type Ttable01<N extends TdndCellConfigkeys, I extends TdndCellConfigkeys> = {
+type Ttable01<N extends TdndCellConfigKeys, I extends TdndCellConfigKeys> = {
   list: (
     {
       [key in N]: {
@@ -68,7 +68,7 @@ type Ttable01<N extends TdndCellConfigkeys, I extends TdndCellConfigkeys> = {
 
 // type Ttable01Config<keys extends string> = {
 //   keyIndex: keys[]
-type Ttable01Config<N extends TdndCellConfigkeys, I extends TdndCellConfigkeys> = {
+type Ttable01Config<N extends TdndCellConfigKeys, I extends TdndCellConfigKeys> = {
   keyIndex: (N | I)[]
   config: {
     [key in (N | I)]: {

@@ -1,7 +1,7 @@
 
 
-type Tconfig = {
-  id: string
+type Tconfig<key> = {
+  id: key
   label: string
   width: string
   type: string
@@ -10,9 +10,20 @@ type Tconfig = {
 
 
 
+type TdndCellConfigKeys =
+  "discount" | "project" | "quoteType" |
+  "L" | "W" | "H" | "B" | "area" | "cai"
+  | "doorType" | "material" | "surface" |
+  "doorRail" | "horsepower" | "qty"
+  | "unitPrice" | "subTotal" | "memo" |
+  "ejectionDoor" | "openType" | "thickness" |
+  "totalCai"
 
+type TdndCellConfig = {
+  [key in TdndCellConfigKeys]: Tconfig<key>
+}
 
-const dndCellConfigOri = (): { [key: string]: Tconfig } => ({
+const dndCellConfigOri = (): TdndCellConfig => ({
   discount: {
     id: "discount", label: "折數", width: "75px",
     type: "input", position: ""
@@ -47,6 +58,10 @@ const dndCellConfigOri = (): { [key: string]: Tconfig } => ({
   },
   cai: {
     id: "cai", label: "才數", width: "75px",
+    type: "input", position: ""
+  },
+  totalCai: {
+    id: "totalCai", label: "總才數", width: "75px",
     type: "input", position: ""
   },
   doorType: {
@@ -98,11 +113,78 @@ const dndCellConfigOri = (): { [key: string]: Tconfig } => ({
     type: "input", position: ""
   },
 })
+// =============================================================
 
 
-type TdndCellConfig = ReturnType<typeof dndCellConfigOri>
-type TdndCellConfigkeys = keyof TdndCellConfig
+type TdndCellConfigOutboundOrderKeys =
+  Extract<TdndCellConfigKeys,
+    "project" | "L" | "W" | "B" | "cai" |
+    "totalCai" | "doorType" | "material" | "horsepower" |
+    "surface" | "qty"
+  > |
+  "remark01" | "remark02" | "remark03" | "remark04" |
+  "appended" | "orderCreatedDate" | "finishAppended" |
+  "installer" | "installDate" | "implementQty"
 
-export { dndCellConfigOri }
-export type { TdndCellConfig, TdndCellConfigkeys, Tconfig }
+
+
+type TdndCellConfigOutboundOrder = {
+  [key in TdndCellConfigOutboundOrderKeys]: Tconfig<key>
+}
+
+const dndCellConfigOutboundOrderOri = (): TdndCellConfigOutboundOrder => ({
+  ...dndCellConfigOri(),
+  remark01: {
+    id: "remark01", label: "備註1", width: "65px",
+    type: "input", position: ""
+  },
+  remark02: {
+    id: "remark02", label: "備註2", width: "65px",
+    type: "input", position: ""
+  },
+  remark03: {
+    id: "remark03", label: "備註3", width: "65px",
+    type: "input", position: ""
+  },
+  remark04: {
+    id: "remark04", label: "備註4", width: "65px",
+    type: "input", position: ""
+  },
+  appended: {
+    id: "appended", label: "追加", width: "65px",
+    type: "input", position: ""
+  },
+  orderCreatedDate: {
+    id: "orderCreatedDate", label: "工作表開立日期", width: "115px",
+    type: "input", position: ""
+  },
+  finishAppended: {
+    id: "finishAppended", label: "完成追加", width: "75px",
+    type: "input", position: ""
+  },
+  installer: {
+    id: "installer", label: "安裝人員", width: "85px",
+    type: "input", position: ""
+  },
+  installDate: {
+    id: "installDate", label: "安裝日期", width: "85px",
+    type: "input", position: ""
+  },
+  implementQty: {
+    id: "implementQty", label: "實作數量", width: "75px",
+    type: "input", position: "center"
+  },
+})
+
+
+
+
+
+
+export { dndCellConfigOri, dndCellConfigOutboundOrderOri }
+export type {
+  TdndCellConfig, TdndCellConfigKeys, Tconfig,
+  TdndCellConfigOutboundOrder, TdndCellConfigOutboundOrderKeys
+
+}
 

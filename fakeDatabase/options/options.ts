@@ -48,35 +48,44 @@ export const optionsCreator_taxDeductionCategory =
   ]
 export const optionsCreator_customerCategory =
   (): Toption[] => [
-    { value: "客戶", label: "客戶" },
-    { value: "廠商", label: "廠商" },
-    { value: "客戶廠商", label: "客戶廠商" },
+    { value: "營造", label: "營造" },
+    { value: "事務所", label: "事務所" },
+    { value: "業主", label: "業主" },
   ]
 
 
 // 類別
-
 export const optionsCreator_prodClass =
   (): Toption[] => [
+    { value: "", label: "不拘" },
     { value: "防火防煙捲門系列", label: "防火防煙捲門系列" },
-    { value: "防水防洪門系列", label: "防水防洪門系列" },
-    { value: "抗風防颱捲門系列", label: "抗風防颱捲門系列" },
-    { value: "廠辦管制門", label: "廠辦管制門" },
-    { value: "圍牆大門", label: "圍牆大門" },
-    { value: "機械門", label: "機械門" },
-    { value: "客製化", label: "客製化" },
+    // { value: "防水防洪門系列", label: "防水防洪門系列" },
+    // { value: "抗風防颱捲門系列", label: "抗風防颱捲門系列" },
+    // { value: "廠辦管制門", label: "廠辦管制門" },
+    // { value: "圍牆大門", label: "圍牆大門" },
+    // { value: "機械門", label: "機械門" },
+    // { value: "客製化", label: "客製化" },
   ]
 
 // 門型
 export const optionsCreator_doorType =
   (): Toption[] => [
+    { value: "", label: "不拘" },
     { value: "SJ-302", label: "SJ-302" },
-    { value: "SJ-302A", label: "SJ-302A" },
-    { value: "SJ-302AS", label: "SJ-302AS" },
-    { value: "SJ-305D", label: "SJ-305D" },
-    { value: "SJ-312", label: "SJ-312" },
-    { value: "SJ-120A", label: "SJ-120A" },
-    { value: "SJ-303S", label: "SJ-303S" },
+    // { value: "SJ-302A", label: "SJ-302A" },
+    // { value: "SJ-302AS", label: "SJ-302AS" },
+    // { value: "SJ-305D", label: "SJ-305D" },
+    // { value: "SJ-312", label: "SJ-312" },
+    // { value: "SJ-120A", label: "SJ-120A" },
+    // { value: "SJ-303S", label: "SJ-303S" },
+  ]
+
+  // 門的形式
+export const optionsCreator_doorForm =
+  (): Toption[] => [
+    { value: "", label: "不拘" },
+    { value: "一般", label: "一般" },
+    { value: "防颱", label: "防颱" },
   ]
 
 // 客戶列表搜尋用
@@ -92,8 +101,8 @@ export const optionsCreator_clientSearch =
 export const optionsCreator_quoteType =
   (): Toption[] => [
     { value: "捲門", label: "捲門", quoteTypeType: "rollerDoor" },
-    { value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor" },
-    { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
+    // { value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor" },
+    // { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
   ]
 
 // 材料

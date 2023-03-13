@@ -23,6 +23,14 @@ import {
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
+
+
+// fake
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+
+
+
+
 const { Panel } = Collapse
 // ========================
 
@@ -34,6 +42,15 @@ export default function BudgetList({ budgetList, searchObj }:
     searchObj: TsearchObj
   }) {
   const router = useRouter()
+  // ----------------------------------------------------------------
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
+
+  const projectArr = projectSimple.wrapper.get({
+    filter: {}
+  })
+
+  const reRender = () => setProjectSimple(state => ({ ...state }))
+  // ----------------------------------------------------------------
 
 
   // panelHeader點擊變粉紅色用
@@ -55,41 +72,45 @@ export default function BudgetList({ budgetList, searchObj }:
         destroyInactivePanel={true}
         onChange={changeActive}
       >
-        {budgetList.map((item, index) => {
+        {projectArr.map((item, index) => {
           const { quotationId,
-            doorType,
-            country,
-            clientName,
-            projectName, } = item
+            projectCounty,
+            clientData,
+            projectName,
+            tempRecord,
+          } = item
           const isActive = activeIndex === index
 
           const openQuotation = (e: MouseEvent) => {
             e.stopPropagation()
             router.push(`/domestic/budget/quotation/${quotationId}`)
           }
-        const {detail} = item
-        // ===========================
-        // 搜尋過濾
-        const regDoorType = new RegExp(searchObj.doorType)
-        const regCountry = new RegExp(searchObj.country)
-        const regClientName = new RegExp(searchObj.clientName)
-        const regProjectName = new RegExp(searchObj.projectName)
-        if (
-        !regDoorType.test(doorType) ||
-        !regCountry.test(country) ||
-        !regClientName.test(clientName) ||
-        !regProjectName.test(projectName)
-        ) return null
-        // ===========================
 
-        return (
-        <Panel key={index} className={style.panel}
-          header={<PanelHeader budget={item} isActive={isActive} openQuotation={openQuotation} />}
-        >
-          <PanelBody budgetDetail={detail} openQuotation={openQuotation}/>
-        </Panel>
-        )
+
+          // const { detail } = item
+          // ===========================
+          // 搜尋過濾
+          // const regDoorType = new RegExp(searchObj.doorType)
+          // const regCountry = new RegExp(searchObj.country)
+          // const regClientName = new RegExp(searchObj.clientName)
+          // const regProjectName = new RegExp(searchObj.projectName)
+          // if (
+          //   !regDoorType.test(doorType) ||
+          //   !regCountry.test(country) ||
+          //   !regClientName.test(clientName) ||
+          //   !regProjectName.test(projectName)
+          // ) return null
+          // ===========================
+
+          return (
+            <Panel key={index} className={style.panel}
+              header={<PanelHeader projectData={item} isActive={isActive} openQuotation={openQuotation} />}
+            >
+              <PanelBody projectSimpleRecord={tempRecord} openQuotation={openQuotation} />
+            </Panel>
+          )
         })}
+
       </Collapse>
     </div >
   )

@@ -8,43 +8,40 @@ import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
 // css
 import style from "../budgetList.module.scss"
 
-//  type
-import { TbudgetDetail } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 
-
-
-
+import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+type TprojectSimpleRecord = ReturnType<Class_fakeApi_projectSimple['get']>[0]["tempRecord"];
 
 
 export default function PanelBody(
-  { budgetDetail,
+  { projectSimpleRecord: projectRecord,
     openQuotation
   }:
     {
-      budgetDetail: TbudgetDetail[]
+      projectSimpleRecord: TprojectSimpleRecord
       openQuotation: (e: MouseEvent) => void
     }
 ) {
 
 
-
   return (
     <div className={style.panelBody}>
-      {budgetDetail.map((item, index) => {
-        const { date, describe, discount, doorQty } = item
-        let { contractAmount } = item
-        if (typeof contractAmount === "string") {
-          contractAmount = parseFloat(contractAmount)
+      {projectRecord.map((item, index) => {
+        const { date, Remark, discount, doorQty, budgetAmount } = item
+
+        let formatedBudgetAmount: string | number = budgetAmount
+        if (typeof formatedBudgetAmount === "string") {
+          formatedBudgetAmount = parseFloat(formatedBudgetAmount)
         }
-        contractAmount = contractAmount.toLocaleString()
+        formatedBudgetAmount = formatedBudgetAmount.toLocaleString()
 
         return (
           <CellWithBar className={style.detailRow} key={index}>
             <span>{date}</span>
-            <span>{describe}</span>
+            <span>{Remark}</span>
             <span>{discount}</span>
             <span>{doorQty}</span>
-            <span>{contractAmount}</span>
+            <span>{formatedBudgetAmount}</span>
             <div><IconDetail onClick={openQuotation} /></div>
           </CellWithBar>
         )

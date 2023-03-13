@@ -8,9 +8,9 @@ import style from "../../dndTable01.module.scss"
 import { Tconfig } from "config/dndCellConfig"
 
 
-export default function TheadItem({ theadInfo, allowMove, isMoving }:
+export default function TheadItem<key extends string>({ theadInfo, allowMove, isMoving }:
   {
-    theadInfo: Tconfig
+    theadInfo: Tconfig<key>
     allowMove?: boolean
     isMoving?: boolean
   }) {

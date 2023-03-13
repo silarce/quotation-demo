@@ -154,7 +154,7 @@ const sidePathList: TsidePathList = {
           ]
         },
         {
-          label: "查詢派工作表",
+          label: "查詢工作表",
           path: path01 + "/unSet",
         },
         {

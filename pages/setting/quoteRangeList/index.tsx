@@ -7,18 +7,16 @@ import {
 
 const _ = require("lodash")
 
-
-
 // glogal gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
-// import InputModal from "components/global/gear/modal/simpleModal/inputModal"
-// import myAlert from "components/global/gear/modal/simpleModal/alertModals"
-import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+// import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
+// import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-import Input02 from "components/global/gear/input/input02"
+
 import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
+
 
 // icon
 import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
@@ -26,41 +24,75 @@ import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon
 // css
 import style from "./quoteRangeList.module.scss"
 
+
 // fake
-import { optionsCreator_prodClass, optionsCreator_doorType, Toption } from "fakeDatabase/options/options"
+import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi"
+import {
+  optionsCreator_prodClass,
+  optionsCreator_doorType,
+  optionsCreator_doorForm,
+  Toption
+} from "fakeDatabase/options/options"
 const optionsProdClass = optionsCreator_prodClass()
 const optionsDoorType = optionsCreator_doorType()
+const optionsDoorForm = optionsCreator_doorForm()
 
-type TquoteRangeState = {
-  list: QuoteRangeClass[]
-}
+
+
 // ==========================================================================
-export default function QuoteRangeList() {
-  const [isReady, setIsReady] = useState(false)
-  const [editable, setEditable] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showAdd, setShowAdd] = useState(false)
+export default function MemoList() {
+  // const [isReady, setIsReady] = useState(false)
+  // const [isLoading, setIsLoading] = useState(false)
+  // const [showAdd, setShowAdd] = useState(false)
   // ------------------------------------------------------------------------
-  const [quoteRangeState, setQuoteRangeState] = useState<TquoteRangeState>({ list: [] })
-
-  useEffect(() => {
-    if (quoteRangeState.list.length !== 0) return
-    fakeQuoteRangeListOri().forEach((quoteRange, index) => {
-      const newQuoteRange = new QuoteRangeClass({
-        quoteRange,
-        quoteRangeList: quoteRangeState.list,
-        setQuoteRangeState: setQuoteRangeState,
-      })
-      quoteRangeState.list.push(newQuoteRange)
-    })
-    setQuoteRangeState({ ...quoteRangeState })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+  const [fakeMemoArrState, setFakeMemoArrState] = useState({ wrapper: fakeApi_quoteRange })
+  const reRender = () => {
+    setFakeMemoArrState(state => ({ ...state }))
+  }
+  const memoFakeApi = fakeMemoArrState.wrapper
 
   // ------------------------------------------------------------------------
+  const [editableId, setEditableId] = useState(-1)
+  const [tempMemo, setTempMemo] = useState("")
+
+  // ------------------------------------------------------------------------
+  const [prodClass, setProdClass] = useState("")
+  const [doorType, setDoorType] = useState("")
   const [searchValue, setSearchValue] = useState("")
   const toSearch = (v: string) => setSearchValue(v)
+
+
+  const selectPropsArr: TselectProps[] = [
+    {
+      value: prodClass,
+      options: optionsProdClass,
+      onChange: (option: Toption | null) => {
+        if (typeof option?.value === "string")
+          setProdClass(option?.value)
+      },
+      placeholder: "選擇類別",
+      boxStyle: { width: "200px" }
+    },
+    {
+      value: doorType,
+      options: optionsDoorType,
+      onChange: (option: Toption | null) => {
+        if (typeof option?.value === "string")
+          setDoorType(option?.value)
+      },
+      placeholder: "選擇門型",
+      boxStyle: { width: "145px" }
+    },
+
+  ]
+
+  const filter = {
+    prodClass: [prodClass],
+    doorType: [doorType],
+    content: searchValue
+  }
+
+
   // ------------------------------------------------------------------------
   const panelList: TpanelList = [
     {
@@ -72,204 +104,97 @@ export default function QuoteRangeList() {
       type: "addButton",
       label: "新增報價範圍",
       onClick: () => {
-        const newQuoteRange = new QuoteRangeClass({
-          quoteRange: "",
-          quoteRangeList: quoteRangeState.list,
-          setQuoteRangeState: setQuoteRangeState,
+        memoFakeApi.post({
+          prodClass: ["防火防煙捲門系列"],
+          doorType: ["SJ-302"],
+          content: "",
         })
-        quoteRangeState.list.unshift(newQuoteRange)
-        setSearchValue("")
-        setQuoteRangeState({ ...quoteRangeState })
+        reRender()
       }
-    }
-  ]
-  // ------------------------------------------------------------------------
-  const [prodClass, setProdClass] = useState<TselectProps["value"]>(null)
-  const [doorType, setDoorType] = useState<TselectProps["value"]>(null)
-
-  const selectPropsArr: TselectProps[] = [
-    {
-      value: prodClass,
-      options: optionsProdClass,
-      onChange: (option: Toption | null) => { setProdClass(option?.value) },
-      placeholder: "選擇類別",
-      boxStyle: { width: "200px" }
-    },
-    {
-      value: doorType,
-      options: optionsDoorType,
-      onChange: (option: Toption | null) => { setDoorType(option?.value) },
-      placeholder: "選擇門型",
-      boxStyle: { width: "145px" }
     },
   ]
-
   // ------------------------------------------------------------------------
   return (
     <div className={style.container}>
       <PageHeader02
         tag="報價範圍列表"
-        panelList={panelList}
-      />
-
+        panelList={panelList} />
 
       <div className={style.mainContainer}>
         <div>
           <SelectBar selectPropsArr={selectPropsArr} />
         </div>
         <div className={style.quoteRangeList}>
-          {quoteRangeState.list.map((item, index) => {
-            const {
-              quoteRange, editable,
-              copy, changeEditable, deleteThis, onChange
-            } = item
-
-            // 與搜尋功能
-            const regex = new RegExp(searchValue)
-            if (!regex.test(quoteRange)) return null
+          {memoFakeApi.get(filter).reverse().map((item, index) => {
+            const { id, prodClass, doorType, content, } = item
+            const idEditable = editableId === id
+            const theContent = idEditable ? tempMemo : content
+            const toEdit = () => {
+              setEditableId(id)
+              setTempMemo(content)
+            }
+            const confirmEdit = () => {
+              setEditableId(-1)
+              memoFakeApi.put(
+                id,
+                { prodClass, doorType, content: tempMemo, }
+              )
+              // item.content = tempMemo;
+              reRender()
+              setTempMemo("")
+            }
+            const onChange = (v: string) => {
+              setTempMemo(v)
+            }
+            const onCopy = () => {
+              memoFakeApi.post({ prodClass, doorType, content })
+              reRender()
+            }
+            const onDelete = () => {
+              const delFun = () => {
+                memoFakeApi.delete(id)
+                reRender()
+              }
+              myAlert.confirm({
+                title: "確定刪除這個報價範圍?",
+                props: {
+                  onOk: delFun,
+                }
+              })
+            }
 
             return (
               <CellWithBar className={style.row} key={index}
-                isActive={editable}
-              >
-
-                <div className={style.index}><span>1</span></div>
-
+                isActive={idEditable}              >
+                <div className={style.index}><span>{index + 1}</span></div>
                 <div className={style.input}>
-                  <Input02 className={style.input03}
-                    stateValue={quoteRange}
-                    onChange={onChange}
+                  <InputSel className={style.input03}
                     label=""
-                    labelWidth="0"
                     gap="0"
-                    disabled={!editable}
+                    disabled={!idEditable}
+                    textareaProps={{
+                      value: theContent,
+                      onChange: onChange,
+                    }}
                   />
                 </div>
-
                 <div className={style.icon}>
-                  {editable
-                    ? <IconCheck02 onClick={() => changeEditable()} />
-                    : <IconEdit onClick={() => changeEditable()} />}
+                  {idEditable
+                    ? <IconCheck02 onClick={confirmEdit} />
+                    : <IconEdit onClick={toEdit} />}
                 </div>
                 <div className={style.icon}>
-                  <IconCopy onClick={() => copy()} />
+                  <IconCopy onClick={onCopy} />
                 </div>
                 <div className={style.icon}>
-                  <IconDelete01 onClick={() => deleteThis()} />
+                  <IconDelete01 onClick={onDelete} />
                 </div>
-
               </CellWithBar>
             )
-
           })}
-
-
-
         </div>
-
-
       </div>
-
     </div>
   )
 }
-
-
-// ==========================================================================
-
-class QuoteRangeClass {
-  quoteRange: string
-  setQuoteRangeState: Dispatch<SetStateAction<TquoteRangeState>>
-  rerender: () => void
-  quoteRangeList: QuoteRangeClass[] = []
-  editable = false
-
-  constructor(
-    { quoteRange,
-      quoteRangeList,
-      setQuoteRangeState,
-    }:
-      {
-        quoteRange: string
-        quoteRangeList: QuoteRangeClass[]
-        setQuoteRangeState: Dispatch<SetStateAction<TquoteRangeState>>
-      }
-  ) {
-    this.quoteRange = quoteRange
-    this.quoteRangeList = quoteRangeList
-    this.setQuoteRangeState = setQuoteRangeState
-    this.rerender = () => {
-      setQuoteRangeState(state => ({ ...state }))
-    }
-  }
-
-  copy = () => {
-    const copy = new QuoteRangeClass({
-      quoteRange: this.quoteRange,
-      quoteRangeList: this.quoteRangeList,
-      setQuoteRangeState: this.setQuoteRangeState,
-    })
-    this.quoteRangeList.unshift(copy)
-    this.rerender()
-  }
-
-  changeEditable = (v?: boolean) => {
-    this.quoteRangeList.forEach((other, index, arr) => {
-      if (other === this) return
-      other.editable = false
-    })
-    if (v === undefined)
-      this.editable = !this.editable
-    else this.editable = v
-    this.rerender()
-  }
-
-  deleteThis = () => {
-    const deleteThis = () => {
-      const index = this.quoteRangeList.findIndex((item) => item === this)
-      this.quoteRangeList.splice(index, 1)
-      this.rerender()
-    }
-    myAlert.confirm({
-      title: "確定刪除這個備註?",
-      props: {
-        onOk: deleteThis,
-      }
-    })
-  }
-
-  onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    if (!this.editable) return
-    const value = e.target.value
-    this.quoteRange = value
-    this.rerender()
-  }
-}
-
-
-
-// ==========================================================================
-const fakeQuoteRangeListOri = () => [
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "鐵件按裝前塗防銹漆壹次不包含外部油漆。",
-  "電源及全部電氣配管配線不在估價之内(由電氣工程施工)。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-  "電動捲門及大門使用三久捲門電動機及本公司規格配件。",
-]
-
-
-
-
-
-
 
