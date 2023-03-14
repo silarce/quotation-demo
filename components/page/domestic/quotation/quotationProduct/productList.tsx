@@ -94,13 +94,13 @@ export default function ProductList({ productStates }:
                 <span>1</span>
               </div>
               {theadIndex.map((key) => {
-                const { width, id, type } = cellConfig[key]
+                const { width, id, type, inputType } = cellConfig[key]
                 const textCenter = centerReg.test(id) ? styleL.textCenter : ""
                 const theStyle = { width }
                 const stateValue = dataItem[key]
                 const TheCell =
                   cellSwitcher({
-                    dataItem, key, type, disabled, stateValue,
+                    dataItem, key, type, disabled, stateValue, inputType,
                   })
 
                 if (
@@ -125,7 +125,7 @@ export default function ProductList({ productStates }:
   // ===========================================================
   // ===========================================================
   // ===========================================================
-  function cellSwitcher({ dataItem, key, type, disabled, stateValue, }:
+  function cellSwitcher({ dataItem, key, type, disabled, stateValue, inputType }:
     {
       dataItem: ProdClass
       key: TprodKeys
@@ -133,6 +133,7 @@ export default function ProductList({ productStates }:
       type: string
       disabled: boolean
       stateValue: string | boolean | Toption
+      inputType?: string
     }
   ) {
 
@@ -144,6 +145,7 @@ export default function ProductList({ productStates }:
 
       case "input": {
         if (typeof stateValue !== "string") return null
+
         const onChange
           = (value: string) => dataItem.onInputChange(value, key as keyof TproductString)
         return (
@@ -151,7 +153,8 @@ export default function ProductList({ productStates }:
             disabled={disabled}
             inputProps={{
               value: stateValue,
-              onChange: onChange
+              onChange: onChange,
+              inputType: inputType
             }}
           />
         )

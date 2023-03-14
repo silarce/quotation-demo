@@ -1,5 +1,5 @@
 import {
-  ChangeEvent, Dispatch, MouseEvent, SetStateAction,
+  ChangeEvent, Dispatch, MouseEvent, SetStateAction, HTMLInputTypeAttribute,
   useState, useEffect, useMemo
 } from "react"
 import Decimal from "decimal.js"
@@ -180,14 +180,11 @@ class ProdClass {
   memo: Tproduct["memo"] // 備註
 
   doorType: Toption  // 門型
-  horsepower: Toption  // 馬力
   quoteType: Toption  //報價別
   material: Toption  // 材料
   surface: Toption  // 表面
   doorRail: Toption  // 門軌
-  B: Toption  // B
-  BOption: Toption[]
-  D: number
+
 
   ejectionDoor: Tproduct["ejectionDoor"]
   typhoonProof: Tproduct["typhoonProof"]
@@ -202,9 +199,51 @@ class ProdClass {
   openType = "電動"
 
   _unitWeight: number
-  _weight: number
-  reel = "資料錯誤"
+  get weight() {
+    return this._L * this._h * this._unitWeight
+  }
+  get reel() {
+    return calcReel(this._L, this.weight)
+  }
 
+  // ---
+  _horsepower: Toption  // 馬力
+
+  get horsepower() {
+    if (this._horsepower.value === "autoCalc") {
+      return unexpectedOption(calcHorsepower(this.weight))
+    }
+    else return this._horsepower
+  }
+  set horsepower(v: Toption) {
+    this._horsepower = v
+  }
+  // ---
+  _B: Toption  // _B
+  get B_D_bArray() {
+    return calcBAndD(this.reel, this._h)
+  }
+  get D() {
+    return this.B_D_bArray.D / 100
+  }
+  get BOption(): Toption[] {
+    const optionArr = this.B_D_bArray.bArray.map((item) => {
+      return unexpectedOption(`${item}`)
+    })
+    if (optionArr[0]) { optionArr.unshift({ value: "autoCalc", label: "自動計算" }) }
+    return optionArr
+  }
+
+  get B() {
+    if (this._B.value === "autoCalc") {
+      return unexpectedOption(`${this.B_D_bArray.B / 100}`)
+    }
+    else return this._B
+  }
+  set B(v: Toption) {
+    this._B = v
+  }
+  // ---
 
   // constructor
   constructor(
@@ -236,17 +275,15 @@ class ProdClass {
     this.typhoonProof = typhoonProof
 
     this._unitWeight = unitWeight
-    this._weight = this._L * this._h * 22
-    this.reel = calcReel(this._L, this._weight)
 
     this.doorType = optionsGroup["doorType"].find((item) => item.value === doorType)
       ?? unexpectedOption(doorType)
 
     if (horsepower) {
-      this.horsepower = optionsGroup["horsepower"].find((item) => item.value === horsepower)
+      this._horsepower = optionsGroup["horsepower"].find((item) => item.value === horsepower)
         ?? unexpectedOption(horsepower)
     }
-    else this.horsepower = unexpectedOption(calcHorsepower(this._weight))
+    else this._horsepower = { value: "autoCalc", label: "自動計算" }
 
     this.quoteType = optionsGroup["quoteType"].find((item) => item.value === quoteType)
       ?? unexpectedOption(quoteType)
@@ -257,23 +294,10 @@ class ProdClass {
     this.doorRail = optionsGroup["doorRail"].find((item) => item.value === doorRail)
       ?? unexpectedOption(doorRail)
 
-    const B_D_bArray = calcBAndD(this.reel, this._h)
-    if (B) {
-      this.B = optionsGroup["B"].find((item) => item.value === B)
-        ?? unexpectedOption(B)
-    }
-    else {
-      this.B = unexpectedOption(`${B_D_bArray.B}`)
-    }
-    this.D = B_D_bArray.D
-    this.BOption = (() => {
-      const bArray = B_D_bArray.bArray
-      const optionArr = bArray.map((item) => {
-        return unexpectedOption(`${item}`)
-      })
-      return optionArr
+    this._B = (() => {
+      if (B) return unexpectedOption(B)
+      else return { value: "autoCalc", label: "自動計算" }
     })()
-
 
     let keys = ["discount",]
     keys.forEach((key) => {
@@ -282,8 +306,8 @@ class ProdClass {
           return this[`_${key}`]
         },
         set(v) {
-          if (!/^\d*\.?\d*$/.test(v)) return
-          this[`_${key}`] = new Decimal(parseFloat(v) || 0).abs().toString()
+          // if (!/^\d*\.?\d*$/.test(v)) return
+          this[`_${key}`] = new Decimal(parseFloat(v) || 0).toString()
         },
       })
     })
@@ -302,31 +326,33 @@ class ProdClass {
   }
   set L(v) {
     this._W = 0
-    this._L = new Decimal(parseFloat(v) || 0).abs().toNumber()
-    this._weight = this._L * this._h * 22
+    this._L = new Decimal(parseFloat(v) || 0).toNumber()
   }
   get W() {
     return `${this._W}`
   }
   set W(v) {
     this._L = 0
-    this._W = new Decimal(parseFloat(v) || 0).abs().toNumber()
+    // this._W = new Decimal(parseFloat(v) || 0).toNumber()
+    this._W = 0 // 暫時先固定為0
   }
-
   get h() {
     return `${this._h}`
   }
   set h(v) {
-    this._h = new Decimal(parseFloat(v) || 0).abs().toNumber()
-    this._weight = this._L * this._h * 22
+    this._h = new Decimal(parseFloat(v) || 0).toNumber()
   }
 
   // L*(h+B)/10000 = area
   get area() {
     return new Decimal(this._L || this._W)
-      .mul(Decimal.add(this._h, this.B.value))
-      .div(100 * 100) // 把單位從平方公分轉為平方公尺
+      .mul(this._h)
+      // .div(1000) // 把單位從平方公分轉為平方公尺
       .toFixed(2).toString()
+    // return new Decimal(this._L || this._W)
+    //   .mul(Decimal.add(this._h, this.B.value))
+    //   .div(100 * 100) // 把單位從平方公分轉為平方公尺
+    //   .toFixed(2).toString()
   }
   // area *10.89 = cai 取整數
   get cai() {
@@ -380,7 +406,6 @@ class ProdClass {
     key = key as Exclude<keyof TproductString,
       "area" | "unitPrice" | "subTotal" | "cai" | "unitWeight"
     >
-
     this[key] = value
     this.setProductList(state => [...state])
   }
@@ -575,6 +600,7 @@ type TprodCellConfig = {
       label: string
       width: string
       type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
+      inputType?: HTMLInputTypeAttribute
     }
   }
 }
@@ -589,12 +615,12 @@ function prodCellConfigOri(): TprodCellConfig {
       "memo", "typhoonProof", "ejectionDoor",
     ],
     cellConfig: {
-      discount: { id: "discount", label: "折數", width: "75px", type: "input" },
+      discount: { id: "discount", label: "折數", width: "75px", type: "input", inputType: "number" },
       project: { id: "project", label: "項目", width: "60px", type: "input" },
       quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "select" },
-      L: { id: "L", label: "L(m)", width: "60px", type: "input" },
-      W: { id: "W", label: "W(m)", width: "60px", type: "input" },
-      h: { id: "h", label: "h(m)", width: "60px", type: "input" },
+      L: { id: "L", label: "L(m)", width: "60px", type: "input", inputType: "number" },
+      W: { id: "W", label: "W(m)", width: "60px", type: "input", inputType: "number" },
+      h: { id: "h", label: "h(m)", width: "60px", type: "input", inputType: "number" },
       B: { id: "B", label: "B(m)", width: "60px", type: "select" },
       area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
       cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
@@ -611,7 +637,7 @@ function prodCellConfigOri(): TprodCellConfig {
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
       ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
       typhoonProof: { id: "typhoonProof", label: "防颱", width: "60px", type: "checkbox" },
-      reel: { id: "reel", label: "直徑", width: "75px", type: "readOnly" },
+      reel: { id: "reel", label: "捲軸", width: "75px", type: "readOnly" },
     }
   }
 }
@@ -624,7 +650,7 @@ const emptyProduct = (): Tproduct => ({
   L: "0",
   W: "0",
   h: "0",
-  B: "20",
+  B: "",
   doorType: "",
   material: "不鏽鋼304#",
   surface: "BA",
@@ -672,22 +698,4 @@ export type { TuseProduct, Tproduct, TprodKeys, ProdClass, PartClass }
 //     })
 //   }
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

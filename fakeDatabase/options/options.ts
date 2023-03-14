@@ -142,6 +142,7 @@ export const optionsCreator_B =
 // 馬力
 export const optionsCreator_horsepower =
   (): Toption[] => [
+    { value: "autoCalc", label: "自動計算" },
     { value: "1/4 HP", label: "1/4 HP" },
     { value: "1/3 HP", label: "1/3 HP" },
     { value: "1/2 HP", label: "1/2 HP" },
