@@ -155,7 +155,7 @@ function useProduct(
 // ============================================================================
 // ============================================================================
 
-// console.log(`面積：${(L * h) / 1000}`);
+// console.log(`面積：${(L * h) / 1000}`); // 應該是(L * h +B ) 單位為公尺m+
 // console.log(`材數：${((L * h) / 1000) * 10.89}`);
 // console.log(`重量：${weight}`);
 // console.log(`捲軸：${reelData}`);
@@ -343,16 +343,11 @@ class ProdClass {
     this._h = new Decimal(parseFloat(v) || 0).toNumber()
   }
 
-  // L*(h+B)/10000 = area
+  // L*(h+B) = area
   get area() {
     return new Decimal(this._L || this._W)
-      .mul(this._h)
-      // .div(1000) // 把單位從平方公分轉為平方公尺
+      .mul(Decimal.add(this._h, this.B.value))
       .toFixed(2).toString()
-    // return new Decimal(this._L || this._W)
-    //   .mul(Decimal.add(this._h, this.B.value))
-    //   .div(100 * 100) // 把單位從平方公分轉為平方公尺
-    //   .toFixed(2).toString()
   }
   // area *10.89 = cai 取整數
   get cai() {
