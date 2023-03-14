@@ -204,15 +204,15 @@ export default function ProductList({ productStates }:
 
       case "selectWithIcon": {
         if (typeof stateValue === "boolean") return null
-        const options = optionsObjList[key as ToptionsObjKey]
+        let options: Toption[]
+        if (key === "doorRail") options = dataItem.doorRailOptions
+        else options = optionsObjList[key as ToptionsObjKey]
         const onChange =
           (option: Toption | null) => dataItem.onSelChange(option, key as keyof TproductObject)
-
         const customComponents = {
           Option: OptionWithIcon01,
           SingleValue: SingleValueWithIcon01,
         }
-
         return (
           <InputSel
             disabled={disabled}
