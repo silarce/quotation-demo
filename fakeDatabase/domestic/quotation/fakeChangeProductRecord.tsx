@@ -62,9 +62,9 @@ const fakeProduct01: TrecordProduct = {
   B: "45",
   area: (516 * (230 + 45) / 10000).toFixed(2),
   cai: (516 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
-  doorType: "SJ-30287", //門型
-  material: "不鏽鋼304#",
-  surface: "BA",
+  doorType: "SJ-302", //門型
+  material: "SST304#",
+  surface: "2B",
   doorRail: {
     label: "60",
     icon: iconDoorRail60.src
@@ -92,9 +92,9 @@ const fakeProduct02: TrecordProduct = {
   B: "45",
   area: (230 * (230 + 45) / 10000).toFixed(2),
   cai: (230 * (230 + 45) / 10000 * 10.89).toFixed(0), //才數
-  doorType: "SJ-30287", //門型
-  material: "不鏽鋼304#",
-  surface: "BA",
+  doorType: "SJ-302", //門型
+  material: "SST304#",
+  surface: "2B",
   doorRail: {
     label: "75",
     icon: iconDoorRail75.src

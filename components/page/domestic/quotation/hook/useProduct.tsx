@@ -523,15 +523,15 @@ class PartClass {
 
 
 
-    // this.material = optionsGroup["material"].find((item) => item.value === material)
-    //   ?? material
-    // this.surface = optionsGroup["surface"].find((item) => item.value === surface)
-    //   ?? surface
-
+    this.material = optionsGroup["material"].find((item) => item.value === material)
+      ?? material
     this.surface = optionsGroup["surface"].find((item) => item.value === surface)
       ?? surface
 
-    this.material = material + " " + surface
+    // this.surface = optionsGroup["surface"].find((item) => item.value === surface)
+    //   ?? surface
+
+    // this.material = material + " " + surface
 
 
     this.parent = parent

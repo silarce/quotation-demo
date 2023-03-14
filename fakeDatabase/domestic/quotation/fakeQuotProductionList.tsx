@@ -47,9 +47,9 @@ const fakeQuotProductListOri = (): Tproduct[] => [
     B: "",
     // area: "14.19",
     // cai: "1540.5", //才數
-    doorType: "SJ-30287", //門型
-    material: "不鏽鋼304#",
-    surface: "BA",
+    doorType: "SJ-302", //門型
+    material: "SST304#",
+    surface: "2B",
     doorRail: "60",
     horsepower: "",
     qty: "1",
@@ -70,9 +70,9 @@ const fakeQuotProductListOri = (): Tproduct[] => [
     B: "",
     // area: "22.66",
     // cai: "200.87",
-    doorType: "SJ-302",
-    material: "不鏽鋼304#",
-    surface: "BA",
+    doorType: "SJ-302", //門型
+    material: "SST304#",
+    surface: "2B",
     doorRail: "75",
     horsepower: "",
     qty: "1",

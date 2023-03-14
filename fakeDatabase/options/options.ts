@@ -108,20 +108,21 @@ export const optionsCreator_quoteType =
 // 材料
 export const optionsCreator_material =
   (): Toption[] => [
-    { value: "不鏽鋼304#", label: "不鏽鋼304#" },
-    { value: "不鏽鋼316#", label: "不鏽鋼316#" },
-    { value: "鍍鋅鋼", label: "鍍鋅鋼" },
+    { value: "SST304#", label: "SST 304#" },
+    // { value: "SST316#", label: "SST 316#" },
+    // { value: "鐵材烤漆", label: "鐵材烤漆" },
+    // { value: "鍍鋅鋼板", label: "鍍鋅鋼板" },
+    // { value: "高耐鍍鋅鋼板", label: "高耐鍍鋅鋼板" },
   ]
 
 // 表面
 export const optionsCreator_surface =
   (): Toption[] => [
-    { value: "AA", label: "AA" },
-    { value: "BA", label: "BA" },
-    { value: "CC", label: "CC" },
-    { value: "DS", label: "DS" },
+    { value: "2B", label: "2B" },
+    // { value: "BA", label: "BA" },
+    // { value: "HL", label: "HL" },
+    // { value: "NO.4", label: "NO.4" },
   ]
-
 
 // 門軌
 export const optionsCreator_doorRail =
