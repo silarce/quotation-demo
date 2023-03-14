@@ -1,5 +1,6 @@
 import {
   ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent,
+  HTMLInputTypeAttribute,
   Dispatch, SetStateAction,
 } from "react"
 
@@ -13,6 +14,7 @@ export type TinputProps = {
   onChange: (value: string) => void
   className?: string
   attributes?: InputHTMLAttributes<HTMLInputElement>
+  inputType?: HTMLInputTypeAttribute
 }
 
 // ==============================================================================
@@ -35,6 +37,7 @@ export default function Input(
     onChange,
     className,
     attributes,
+    inputType,
   } = inputProps
 
 
@@ -45,7 +48,7 @@ export default function Input(
   return (
     <div className={inputClasses}>
       <input
-        type="text"
+        type={inputType ?? "text"}
         placeholder={placeholder}
         autoComplete="off"
         value={value}

@@ -6,7 +6,6 @@
 /* 字體 Noto sans */
 // @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap");
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -65,4 +64,10 @@ a {
   html > body {
     background-color: #fff;
   }
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
