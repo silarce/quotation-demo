@@ -4,9 +4,16 @@
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
 import iconDoorRail60 from "public/image/icon/doorRail/doorRail60.svg"
 import iconDoorRail98 from "public/image/icon/doorRail/doorRail98.svg"
-
-
-
+import iconDoorRail_sj302_30
+  from "public/image/fakeDB/doorRail/normal/SJ302_30.svg"
+import iconDoorRail_sj302_75_30t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_75_30t.svg"
+import iconDoorRail_sj302_90_30t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_90_30t.svg"
+import iconDoorRail_sj302_95_30t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg"
+import iconDoorRail_sj302_95_45t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg"
 
 
 
@@ -80,7 +87,7 @@ export const optionsCreator_doorType =
     // { value: "SJ-303S", label: "SJ-303S" },
   ]
 
-  // 門的形式
+// 門的形式
 export const optionsCreator_doorForm =
   (): Toption[] => [
     { value: "", label: "不拘" },
@@ -108,20 +115,21 @@ export const optionsCreator_quoteType =
 // 材料
 export const optionsCreator_material =
   (): Toption[] => [
-    { value: "不鏽鋼304#", label: "不鏽鋼304#" },
-    { value: "不鏽鋼316#", label: "不鏽鋼316#" },
-    { value: "鍍鋅鋼", label: "鍍鋅鋼" },
+    { value: "SST304#", label: "SST 304#" },
+    // { value: "SST316#", label: "SST 316#" },
+    // { value: "鐵材烤漆", label: "鐵材烤漆" },
+    // { value: "鍍鋅鋼板", label: "鍍鋅鋼板" },
+    // { value: "高耐鍍鋅鋼板", label: "高耐鍍鋅鋼板" },
   ]
 
 // 表面
 export const optionsCreator_surface =
   (): Toption[] => [
-    { value: "AA", label: "AA" },
-    { value: "BA", label: "BA" },
-    { value: "CC", label: "CC" },
-    { value: "DS", label: "DS" },
+    { value: "2B", label: "2B" },
+    // { value: "BA", label: "BA" },
+    // { value: "HL", label: "HL" },
+    // { value: "NO.4", label: "NO.4" },
   ]
-
 
 // 門軌
 export const optionsCreator_doorRail =
@@ -130,6 +138,30 @@ export const optionsCreator_doorRail =
     { value: "60", label: "60", icon: iconDoorRail60.src },
     { value: "98", label: "98", icon: iconDoorRail98.src },
   ]
+
+export const optionsCreator_doorRail_normal =
+  (): Toption[] => [
+    { value: "sj302_30", label: "30", icon: iconDoorRail_sj302_30.src },
+  ]
+
+export const optionsCreator_doorRail_antyTyphoon =
+  (): Toption[] => [
+    { value: "sj302_75_30t", label: "75_30t", icon: iconDoorRail_sj302_75_30t.src },
+    { value: "sj302_90_30t", label: "90_30t", icon: iconDoorRail_sj302_90_30t.src },
+    { value: "sj302_95_30t", label: "95_30t", icon: iconDoorRail_sj302_95_30t.src },
+    { value: "sj302_95_45t", label: "95_45t", icon: iconDoorRail_sj302_95_45t.src },
+  ]
+
+
+
+
+
+
+
+
+
+
+
 
 // B 報價單的B
 export const optionsCreator_B =

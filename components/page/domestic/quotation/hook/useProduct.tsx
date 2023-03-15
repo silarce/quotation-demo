@@ -30,6 +30,8 @@ import {
   optionsCreator_B,
   optionsCreator_horsepower,
   optionsCreator_doorType,
+  optionsCreator_doorRail_normal,
+  optionsCreator_doorRail_antyTyphoon,
 } from "fakeDatabase/options/options"
 const optionsGroup = {
   quoteType: optionsCreator_quoteType(),
@@ -39,6 +41,8 @@ const optionsGroup = {
   B: optionsCreator_B(),
   horsepower: optionsCreator_horsepower(),
   doorType: optionsCreator_doorType(),
+  doorRail_normal: optionsCreator_doorRail_normal(),
+  doorRail_antiTyphoon: optionsCreator_doorRail_antyTyphoon(),
 }
 
 // tool
@@ -155,7 +159,7 @@ function useProduct(
 // ============================================================================
 // ============================================================================
 
-// console.log(`面積：${(L * h) / 1000}`);
+// console.log(`面積：${(L * h) / 1000}`); // 應該是(L * h +B ) 單位為公尺m+
 // console.log(`材數：${((L * h) / 1000) * 10.89}`);
 // console.log(`重量：${weight}`);
 // console.log(`捲軸：${reelData}`);
@@ -183,11 +187,13 @@ class ProdClass {
   quoteType: Toption  //報價別
   material: Toption  // 材料
   surface: Toption  // 表面
-  doorRail: Toption  // 門軌
+
+
+
 
 
   ejectionDoor: Tproduct["ejectionDoor"]
-  typhoonProof: Tproduct["typhoonProof"]
+
 
   part: PartClass[]
 
@@ -244,6 +250,26 @@ class ProdClass {
     this._B = v
   }
   // ---
+  // 門軌
+  doorRail: Toption
+  // 防颱
+  _typhoonProof: Tproduct["typhoonProof"]
+  get typhoonProof() {
+    return this._typhoonProof
+  }
+  set typhoonProof(v: boolean) {
+    this._typhoonProof = v
+    this.doorRail = this.doorRailOptions[0]
+  }
+  // 門軌選項
+  get doorRailOptions() {
+    if (this.typhoonProof) return optionsGroup.doorRail_antiTyphoon
+    else return optionsGroup.doorRail_normal
+  }
+
+  // ---
+
+
 
   // constructor
   constructor(
@@ -272,7 +298,7 @@ class ProdClass {
     this._qty = qty
 
     this.ejectionDoor = ejectionDoor
-    this.typhoonProof = typhoonProof
+    this._typhoonProof = typhoonProof
 
     this._unitWeight = unitWeight
 
@@ -291,8 +317,10 @@ class ProdClass {
       ?? unexpectedOption(material)
     this.surface = optionsGroup["surface"].find((item) => item.value === surface)
       ?? unexpectedOption(surface)
+
     this.doorRail = optionsGroup["doorRail"].find((item) => item.value === doorRail)
       ?? unexpectedOption(doorRail)
+
 
     this._B = (() => {
       if (B) return unexpectedOption(B)
@@ -343,16 +371,11 @@ class ProdClass {
     this._h = new Decimal(parseFloat(v) || 0).toNumber()
   }
 
-  // L*(h+B)/10000 = area
+  // L*(h+B) = area
   get area() {
     return new Decimal(this._L || this._W)
-      .mul(this._h)
-      // .div(1000) // 把單位從平方公分轉為平方公尺
+      .mul(Decimal.add(this._h, this.B.value))
       .toFixed(2).toString()
-    // return new Decimal(this._L || this._W)
-    //   .mul(Decimal.add(this._h, this.B.value))
-    //   .div(100 * 100) // 把單位從平方公分轉為平方公尺
-    //   .toFixed(2).toString()
   }
   // area *10.89 = cai 取整數
   get cai() {
@@ -528,15 +551,15 @@ class PartClass {
 
 
 
-    // this.material = optionsGroup["material"].find((item) => item.value === material)
-    //   ?? material
-    // this.surface = optionsGroup["surface"].find((item) => item.value === surface)
-    //   ?? surface
-
+    this.material = optionsGroup["material"].find((item) => item.value === material)
+      ?? material
     this.surface = optionsGroup["surface"].find((item) => item.value === surface)
       ?? surface
 
-    this.material = material + " " + surface
+    // this.surface = optionsGroup["surface"].find((item) => item.value === surface)
+    //   ?? surface
+
+    // this.material = material + " " + surface
 
 
     this.parent = parent
@@ -627,7 +650,7 @@ function prodCellConfigOri(): TprodCellConfig {
       doorType: { id: "doorType", label: "門型", width: "100px", type: "select" },
       material: { id: "material", label: "材料", width: "120px", type: "select" },
       surface: { id: "surface", label: "表面", width: "55px", type: "select" },
-      doorRail: { id: "doorRail", label: "門軌", width: "75px", type: "selectWithIcon" },
+      doorRail: { id: "doorRail", label: "門軌", width: "145px", type: "selectWithIcon" },
       horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "select" },
       qty: { id: "qty", label: "數量", width: "43px", type: "input" },
       listPrice: { id: "listPrice", label: "牌價", width: "120px", type: "readOnly" },
