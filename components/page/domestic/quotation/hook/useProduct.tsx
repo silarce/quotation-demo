@@ -630,12 +630,13 @@ type TprodCellConfig = {
 
 function prodCellConfigOri(): TprodCellConfig {
   return {
+    // 這個會影響一開始的排列順序
     keyList: [
       "discount", "project", "quoteType", "L", "W",
       "h", "B", "area", "cai", "reel", "doorType",
-      "material", "surface", "doorRail", "horsepower", "qty",
+      "material", "surface", "doorRail", "typhoonProof", "horsepower", "qty",
       "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
-      "memo", "typhoonProof", "ejectionDoor",
+      "memo", "ejectionDoor",
     ],
     cellConfig: {
       discount: { id: "discount", label: "折數", width: "75px", type: "input", inputType: "number" },
