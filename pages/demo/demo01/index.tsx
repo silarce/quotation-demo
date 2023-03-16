@@ -12,17 +12,14 @@ import moment from 'moment'
 // antd
 import { Badge } from "antd"
 
-
-
-
-import scss from "./lab01.module.scss"
+import scss from "./demo01.module.scss"
 
 
 
 const localizer = momentLocalizer(moment)
 
 
-export default function Lab01() {
+export default function Demo01() {
   const [render, setRender] = useState(false)
   const reRender = () => {
     setRender((state) => !state)
@@ -101,27 +98,15 @@ const FooJSX = (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => {
 
 
 
-
-
-
-
-
-
-
-
-
 const Cviews = (e: EventWrapperProps<Class_isRead>) => {
-
   const { event } = e
   const { job, name, isReaded, switchIsReaded } = event
-
   const color = isReaded ? "blue" : "red"
-
   return (
     <div className="flex justify-between cursor-pointer px-2 mb-2 hover:bg-slate-200"
       onClick={switchIsReaded}
     >
-      <div className='grid grid-cols-[40px_auto] gap-2 justify-start'>
+      <div className='grid grid-cols-[40px_auto] gap-2 justify-start text-lg'>
         <span>{job}</span>
         <span>{name}</span>
       </div>
