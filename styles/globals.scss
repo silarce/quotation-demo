@@ -66,8 +66,10 @@ a {
   }
 }
 
+// 用來把input type="number"元素右邊的上下箭頭隱藏
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
