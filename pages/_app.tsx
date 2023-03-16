@@ -19,6 +19,14 @@ import { apiLogout, apiAuthMe } from 'js/api/api_auth'
 import '../styles/globals.scss'
 import 'antd/dist/antd.css';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals'
+import "react-big-calendar/lib/css/react-big-calendar.css" // 行事曆 UI用的
+
+// 全域moment語系轉換
+import 'moment/locale/zh-tw';
+
+
+
+
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
