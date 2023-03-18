@@ -23,13 +23,13 @@ export default function PanelHeader({ projectData: projectData, isActive, openQu
 
   const {
     quotationId,
-    projectName,
-    undertaker, discount,
+    constructionName: projectName,
+    undertaker, totalDiscount: discount,
     clientData,
     tempDoorQty: doorQty,
     tempBudgetAmount: budgetAmount,
     date,
-    projectCounty: country
+    constructionCounty: country
   } = projectData
 
   const {

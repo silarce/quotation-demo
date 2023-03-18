@@ -1,5 +1,5 @@
 
-import { Tproject, fakeProjectData } from "fakeDatabase/domestic/_fakeProject"
+import { Tquotation, fakeProjectData } from "fakeDatabase/domestic/_fakeProject"
 import { TclientProfile, fakeClienData } from "fakeDatabase/client/_fakeClients"
 
 
@@ -17,7 +17,7 @@ class Class_fakeApi_projectSimple {
       .map((item, index) => {
 
         if (filter?.county) {
-          if (item.projectCounty !== filter.county) return
+          if (item.constructionCounty !== filter.county) return
         }
         return {
           ...item,
@@ -33,15 +33,6 @@ class Class_fakeApi_projectSimple {
 const fakeApi_projectSimple = new Class_fakeApi_projectSimple()
 
 
-
-
 export { Class_fakeApi_projectSimple, fakeApi_projectSimple }
-
-
-
-type Tfoo = (string | undefined)[]
-
-
-
 
 

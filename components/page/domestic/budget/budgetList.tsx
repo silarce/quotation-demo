@@ -74,9 +74,9 @@ export default function BudgetList({ budgetList, searchObj }:
       >
         {projectArr.map((item, index) => {
           const { quotationId,
-            projectCounty,
+            constructionCounty: projectCounty,
             clientData,
-            projectName,
+            constructionName: projectName,
             tempRecord,
           } = item
           const isActive = activeIndex === index
