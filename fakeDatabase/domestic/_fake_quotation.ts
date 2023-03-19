@@ -88,7 +88,7 @@ type Tquotation = {
   }
 }
 
-const fakeProjectData: Tquotation = {
+const fakeQuotationData: Tquotation = {
   "S-110211-01": {
     // ---------------------------------------------------------
     quotationId: "S-110211-01",
@@ -204,10 +204,10 @@ function checkData(projectData: Tquotation): void {
   }
 }
 
-checkData(fakeProjectData)
+checkData(fakeQuotationData)
 
 export type { Tquotation }
-export { fakeProjectData }
+export { fakeQuotationData }
 
 
 

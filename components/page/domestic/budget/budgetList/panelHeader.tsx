@@ -11,7 +11,7 @@ import iconPlace from "public/image/icon/place.svg"
 import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
 
 
-import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 type TprojectSimple = ReturnType<Class_fakeApi_projectSimple['get']>[0];
 
 export default function PanelHeader({ projectData: projectData, isActive, openQuotation }:

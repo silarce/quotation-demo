@@ -26,7 +26,7 @@ import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
 // fake
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
 
 
