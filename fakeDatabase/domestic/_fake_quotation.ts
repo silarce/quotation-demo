@@ -6,89 +6,90 @@
 // contactName: string
 // clientName: string
 
-
 type Tquotation = {
-  [key: string]: {
-    quotationId: string //報價單Id // 報價編號
-    tempQuotationAging: number // 報價時效 天數 顯示`${quotationAging}天內`
-    date: string  //報價日期
-    constructionName: string // 工程名稱
-    undertaker: string //承辦人
-    totalDiscount: number // 總折數
-    tempDoorQty: number// 橖數
-    tempBudgetAmount: number //合約金額
-    constructionCounty: string // 工程地點城市
-    constructionDistrict: string // 工程地點行政區
-    constructionAddress: string // 工程地點剩餘地址
-    trackingStatus: string // 追蹤狀態 輸入字串
-    siteProgress: string // 工地進度 輸入字串
-    quoStatus: "預算" | "投標" | "發包" | "合約" // 報價單狀態，會使報價單出現在不同的頁面
-    // doorType :string // doorType可能是複數，還不確定怎麼不處理
-    // ---------------------------------------------------------
-    mainProduct: {
-      discount: number
-      category: string // 項目
-      series: string // 報價別 // 下拉式選單
-      L: number
-      W: number
-      h: number
-      B: number // 下拉式選單
-      doorType: string // 下拉式選單
-      material: string // 下拉式選單
-      surface: string // 下拉式選單
-      doorRail: string // 下拉式選單
-      horsepower: string // 下拉式選單
-      qty: number
-      memo: string
-      ejectionDoor: boolean
-      typhoonProof: boolean
-      unitWeight: number
-      part: {
-        partType: string
-        partName: string
-        partId: string
-        material: string
-        basicWeight: number | undefined
-        unit: "m2" | "M" | "組" | "套" | "支" | string
-        // qty: number // 從mainProduct的資料運算出來
-        listPrice: number  // 牌價
-      }[]
+  quotationId: string //報價單Id // 報價編號
+  tempQuotationAging: number // 報價時效 天數 顯示`${quotationAging}天內`
+  date: string  //報價日期
+  constructionName: string // 工程名稱
+  undertaker: string //承辦人
+  totalDiscount: number // 總折數
+  tempDoorQty: number// 橖數
+  tempBudgetAmount: number //合約金額
+  constructionCounty: string // 工程地點城市
+  constructionDistrict: string // 工程地點行政區
+  constructionAddress: string // 工程地點剩餘地址
+  trackingStatus: string // 追蹤狀態 輸入字串
+  siteProgress: string // 工地進度 輸入字串
+  quoStatus: "預算" | "投標" | "發包" | "合約" // 報價單狀態，會使報價單出現在不同的頁面
+  // doorType :string // doorType可能是複數，還不確定怎麼不處理
+  // ---------------------------------------------------------
+  mainProduct: {
+    discount: number
+    category: string // 項目
+    series: string // 報價別 // 下拉式選單
+    L: number
+    W: number
+    h: number
+    B: number // 下拉式選單
+    doorType: string // 下拉式選單
+    material: string // 下拉式選單
+    surface: string // 下拉式選單
+    doorRail: string // 下拉式選單
+    horsepower: string // 下拉式選單
+    qty: number
+    memo: string
+    ejectionDoor: boolean
+    typhoonProof: boolean
+    unitWeight: number
+    part: {
+      partType: string
+      partName: string
+      partId: string
+      material: string
+      basicWeight: number | undefined
+      unit: "m2" | "M" | "組" | "套" | "支" | string
+      // qty: number // 從mainProduct的資料運算出來
+      listPrice: number  // 牌價
     }[]
-    // ---------------------------------------------------------
-    accessory: {
-      accessoryId: string
-      name: string
-      unit: "M" | "組" | string
-      qty: number
-      listPrice: number
-      totalListPrice: number
-      price: number
-      totalPrice: number
-    }[]
-    // ---------------------------------------------------------
-    sinature: {
-      manager: string
-      director: string
-      attn: string
-    }
-    // ---------------------------------------------------------
-    // 
-    clientId: string, // 客戶id 用來關聯客戶資料以取得客戶名稱、聯絡人、電話那些資料
-    memoIdArr: number[]
-    rangeIdArr: number[]
-    // 
-    // ---------------------------------------------------------
-    tempRecord: {
-      date: string
-      discount: string
-      doorQty: string
-      budgetAmount: string
-      Remark: string
-    }[]
+  }[]
+  // ---------------------------------------------------------
+  accessory: {
+    accessoryId: string
+    name: string
+    unit: "M" | "組" | string
+    qty: number
+    listPrice: number
+    totalListPrice: number
+    price: number
+    totalPrice: number
+  }[]
+  // ---------------------------------------------------------
+  sinature: {
+    manager: string
+    director: string
+    attn: string
   }
+  // ---------------------------------------------------------
+  // 
+  clientId: string, // 客戶id 用來關聯客戶資料以取得客戶名稱、聯絡人、電話那些資料
+  memoIdArr: number[]
+  rangeIdArr: number[]
+  // 
+  // ---------------------------------------------------------
+  tempRecord: {
+    date: string
+    discount: string
+    doorQty: string
+    budgetAmount: string
+    Remark: string
+  }[]
 }
 
-const fakeQuotationData: Tquotation = {
+type TquotationList = {
+  [key: string]: Tquotation
+}
+
+const fakeQuotationDataList: TquotationList = {
   "S-110211-01": {
     // ---------------------------------------------------------
     quotationId: "S-110211-01",
@@ -195,7 +196,7 @@ const fakeQuotationData: Tquotation = {
 
 
 
-function checkData(projectData: Tquotation): void {
+function checkData(projectData: TquotationList): void {
   for (const [key, value] of Object.entries(projectData)) {
     if (key !== value.quotationId) {
       // 建立資料時quotationId必須要與其所屬物件的key相符
@@ -204,10 +205,10 @@ function checkData(projectData: Tquotation): void {
   }
 }
 
-checkData(fakeQuotationData)
+checkData(fakeQuotationDataList)
 
-export type { Tquotation }
-export { fakeQuotationData }
+export type { Tquotation, TquotationList }
+export { fakeQuotationDataList }
 
 
 
