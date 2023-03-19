@@ -59,7 +59,8 @@ import style from "./quotation.module.scss"
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 // import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 // =============================================================
-
+import { fakeApi_quotation_creator } from "fakeDatabase/fakeAPI/fakeQuotationApi";
+// =============================================================
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
@@ -78,6 +79,14 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
 
+  // =========================================================
+  // =========================================================
+
+  const foo = fakeApi_quotation_creator(router.query.quotationId as string)
+  console.log(foo?.get())
+  
+  // =========================================================
+  // =========================================================
   let {
     quotationId, //報價單id //若為新增報價單則為newQuotation
     newQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined

@@ -1,29 +1,46 @@
-import { Tquotation, fakeQuotationData } from "fakeDatabase/domestic/_fake_quotation"
+import { Tquotation, fakeQuotationDataList } from "fakeDatabase/domestic/_fakeQuotation"
 import { TclientProfile, fakeClienData } from "fakeDatabase/client/_fakeClients"
 
+import { fakeMemoDataArr } from "fakeDatabase/fakeMemo"
+import { fakeQuoteRangeDataArr } from "fakeDatabase/fakeQuoteRange"
 
-
-
+// const _ = require("lodash")
+import _ from "lodash"
 
 
 class Class_fakeApi_quotation {
+  constructor(quotation: Tquotation) {
+    this._quotation = quotation
+  } // constructor
 
 
-  constructor(quotationId: string) {
-
+  private _quotation: Tquotation
+  get() {
+    const theData = _.cloneDeep(this._quotation)
+    const clientData = _.cloneDeep(fakeClienData[theData.clientId])
+    const memoArr = theData.memoIdArr.map((id) => fakeMemoDataArr[id - 1])
+    const rangeArr = theData.rangeIdArr.map((id) => fakeQuoteRangeDataArr[id - 1])
+    return {
+      ...theData,
+      clientData,
+      memoArr,
+      rangeArr,
+    }
   }
-
-
-
-
-
+  // put(quotation: Tquotation) {
+  //   const { quotationId } = quotation
+  //   this._quotation = quotation
+  //   fakeQuotationDataList[quotationId] = quotation
+  // }
 }
 
 
+const fakeApi_quotation_creator = (id: string) => {
+  const quotation = fakeQuotationDataList[id]
+  if (quotation) return new Class_fakeApi_quotation(quotation)
+  return undefined
+}
 
 
-
-
-
-
-export { }
+export type { Class_fakeApi_quotation }
+export { fakeApi_quotation_creator }

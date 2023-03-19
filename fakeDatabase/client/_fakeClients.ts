@@ -22,7 +22,7 @@ interface TclientProfile {
 }
 
 interface TclientProfileList {
-  [key: string]:TclientProfile
+  [key: string]: TclientProfile
 }
 
 
@@ -151,7 +151,7 @@ checkData(fakeClienData)
 
 
 
-export type { TclientProfileList }
+export type { TclientProfile, TclientProfileList }
 
 export { fakeClienData }
 

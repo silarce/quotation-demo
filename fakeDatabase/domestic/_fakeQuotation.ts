@@ -25,7 +25,7 @@ type Tquotation = {
     // doorType :string // doorType可能是複數，還不確定怎麼不處理
   }
   // ---------------------------------------------------------
-  mainProduct: {
+  mainProductArr: {
     discount: number
     category: string // 項目
     series: string // 報價別 // 下拉式選單
@@ -50,7 +50,7 @@ type Tquotation = {
       material: string
       basicWeight: number | undefined
       unit: "m2" | "M" | "組" | "套" | "支" | string
-      // qty: number // 從mainProduct的資料運算出來
+      qty: number | undefined // 若是undefined就是從mainProduct的資料運算出來
       listPrice: number  // 牌價
     }[]
   }[]
@@ -111,7 +111,7 @@ const fakeQuotationDataList: TquotationList = {
       quoStatus: "預算",
     },
     // ---------------------------------------------------------
-    mainProduct: [
+    mainProductArr: [
       {
         discount: 100,
         category: "SD1",
@@ -139,6 +139,7 @@ const fakeQuotationDataList: TquotationList = {
             basicWeight: 99.99,
             unit: "m2",
             listPrice: 499,
+            qty: undefined
           },
           {
             partType: "SJ00",
@@ -148,6 +149,7 @@ const fakeQuotationDataList: TquotationList = {
             basicWeight: 99.99,
             unit: "組",
             listPrice: 499,
+            qty: 1
           }
         ]
       }
