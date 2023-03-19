@@ -1,6 +1,6 @@
 
 import { TquotationList, fakeQuotationDataList } from "fakeDatabase/domestic/_fake_quotation"
-import { TclientProfile, fakeClienData } from "fakeDatabase/client/_fakeClients"
+import { TclientProfileList, fakeClienData } from "fakeDatabase/client/_fakeClients"
 
 
 class Class_fakeApi_projectSimple {
