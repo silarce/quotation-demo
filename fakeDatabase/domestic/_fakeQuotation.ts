@@ -7,21 +7,23 @@
 // clientName: string
 
 type Tquotation = {
-  quotationId: string //報價單Id // 報價編號
-  tempQuotationAging: number // 報價時效 天數 顯示`${quotationAging}天內`
-  date: string  //報價日期
-  constructionName: string // 工程名稱
-  undertaker: string //承辦人
-  totalDiscount: number // 總折數
-  tempDoorQty: number// 橖數
-  tempBudgetAmount: number //合約金額
-  constructionCounty: string // 工程地點城市
-  constructionDistrict: string // 工程地點行政區
-  constructionAddress: string // 工程地點剩餘地址
-  trackingStatus: string // 追蹤狀態 輸入字串
-  siteProgress: string // 工地進度 輸入字串
-  quoStatus: "預算" | "投標" | "發包" | "合約" // 報價單狀態，會使報價單出現在不同的頁面
-  // doorType :string // doorType可能是複數，還不確定怎麼不處理
+  basicInfo: {
+    quotationId: string //報價單Id // 報價編號
+    tempQuotationAging: number // 報價時效 天數 顯示`${quotationAging}天內`
+    date: string  //報價日期
+    constructionName: string // 工程名稱
+    undertaker: string //承辦人
+    totalDiscount: number // 總折數
+    tempDoorQty: number// 橖數
+    tempBudgetAmount: number //合約金額
+    constructionCounty: string // 工程地點城市
+    constructionDistrict: string // 工程地點行政區
+    constructionAddress: string // 工程地點剩餘地址
+    trackingStatus: string // 追蹤狀態 輸入字串
+    siteProgress: string // 工地進度 輸入字串
+    quoStatus: "預算" | "投標" | "發包" | "合約" // 報價單狀態，會使報價單出現在不同的頁面
+    // doorType :string // doorType可能是複數，還不確定怎麼不處理
+  }
   // ---------------------------------------------------------
   mainProduct: {
     discount: number
@@ -92,20 +94,22 @@ type TquotationList = {
 const fakeQuotationDataList: TquotationList = {
   "S-110211-01": {
     // ---------------------------------------------------------
-    quotationId: "S-110211-01",
-    tempQuotationAging: 10,
-    date: "110-02-02",
-    constructionName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
-    undertaker: "陳小明小華",
-    totalDiscount: 99.99,
-    tempDoorQty: 99,
-    tempBudgetAmount: 999999,
-    constructionCounty: "臺北市",
-    constructionDistrict: "大安區",
-    constructionAddress: "什麼什麼路",
-    trackingStatus: "", // 追蹤狀態 輸入字串
-    siteProgress: "", //  工地進度 輸入字串
-    quoStatus: "預算",
+    basicInfo: {
+      quotationId: "S-110211-01",
+      tempQuotationAging: 10,
+      date: "110-02-02",
+      constructionName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+      undertaker: "陳小明小華",
+      totalDiscount: 99.99,
+      tempDoorQty: 99,
+      tempBudgetAmount: 999999,
+      constructionCounty: "臺北市",
+      constructionDistrict: "大安區",
+      constructionAddress: "什麼什麼路",
+      trackingStatus: "", // 追蹤狀態 輸入字串
+      siteProgress: "", //  工地進度 輸入字串
+      quoStatus: "預算",
+    },
     // ---------------------------------------------------------
     mainProduct: [
       {
@@ -198,7 +202,7 @@ const fakeQuotationDataList: TquotationList = {
 
 function checkData(projectData: TquotationList): void {
   for (const [key, value] of Object.entries(projectData)) {
-    if (key !== value.quotationId) {
+    if (key !== value.basicInfo.quotationId) {
       // 建立資料時quotationId必須要與其所屬物件的key相符
       throw new Error(`quotationId of project ${key} does not match its key`);
     }

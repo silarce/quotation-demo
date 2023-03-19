@@ -25,12 +25,12 @@ export default function PanelHeader({ projectData: projectData, isActive, openQu
     quotationId,
     constructionName: projectName,
     undertaker, totalDiscount: discount,
-    clientData,
     tempDoorQty: doorQty,
     tempBudgetAmount: budgetAmount,
     date,
     constructionCounty: country
-  } = projectData
+  } = projectData.basicInfo
+  const clientData = projectData.clientData
 
   const {
     name: clientName,

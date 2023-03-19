@@ -73,12 +73,15 @@ export default function BudgetList({ budgetList, searchObj }:
         onChange={changeActive}
       >
         {projectArr.map((item, index) => {
-          const { quotationId,
-            constructionCounty: projectCounty,
+          const {
             clientData,
-            constructionName: projectName,
             tempRecord,
           } = item
+          const {
+            quotationId,
+            constructionCounty: projectCounty,
+            constructionName: projectName,
+          } = item.basicInfo
           const isActive = activeIndex === index
 
           const openQuotation = (e: MouseEvent) => {

@@ -1,5 +1,5 @@
 
-import { TquotationList, fakeQuotationDataList } from "fakeDatabase/domestic/_fake_quotation"
+import { TquotationList, fakeQuotationDataList } from "fakeDatabase/domestic/_fakeQuotation"
 import { TclientProfileList, fakeClienData } from "fakeDatabase/client/_fakeClients"
 
 
@@ -17,7 +17,7 @@ class Class_fakeApi_projectSimple {
       .map((item, index) => {
 
         if (filter?.county) {
-          if (item.constructionCounty !== filter.county) return
+          if (item.basicInfo.constructionCounty !== filter.county) return
         }
         return {
           ...item,
