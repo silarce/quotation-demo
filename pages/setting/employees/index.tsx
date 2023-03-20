@@ -59,6 +59,7 @@ export default function Employees() {
     )
     setParams(params => ({
       ...params,
+      page: 1,
       filter: {
         $or: {
           idNumber: {
@@ -112,20 +113,15 @@ export default function Employees() {
     <div className={style.container}>
       <PageHeader02 tag="人員資料" panelList={panelList} />
       <div className={style.mainContainer}>
-        {isReady &&
-          <>
-            <EmployeeList
-              employeeList={employeeList} toUpdate={update} />
-            <div className={style.paginationBox}>
-              <Pagination
-                current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
-                pageSize={meta?.pageSize ?? 0}
-                onChange={setPage}
-              />
-            </div>
-          </>
-        }
-        <LoadingCover01 isLoading={isLoading} />
+        <EmployeeList
+          employeeList={employeeList} toUpdate={update} />
+        <div className={style.paginationBox}>
+          <Pagination
+            current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
+            pageSize={meta?.pageSize ?? 0}
+            onChange={setPage}
+          />
+        </div>
       </div>
     </div>
   )

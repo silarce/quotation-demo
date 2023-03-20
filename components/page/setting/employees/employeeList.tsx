@@ -126,7 +126,10 @@ export default function EmployeeList({ employeeList, toUpdate }: {
                   })}
 
                   <div className={`${scss.column} ${scss.btnCell}`}>
-                    <IconDelete01 onClick={(e) => { openDelPanel(e, row) }} />
+                    <IconDelete01 onClick={(e) => {
+                      e.preventDefault()
+                      openDelPanel(e, row)
+                    }} />
                   </div>
                 </div>
               </Link>
