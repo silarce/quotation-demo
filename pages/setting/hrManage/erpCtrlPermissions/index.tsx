@@ -123,7 +123,7 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     if (!isReady) return
     updateList()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
 
@@ -132,7 +132,7 @@ export default function ErpCtrlPermissions() {
   // 搜尋功能 searchBar
 
   const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
-
+    if (isLoading) return
     const department = valueArr[0]
     const content = valueArr[1]
 
@@ -148,10 +148,12 @@ export default function ErpCtrlPermissions() {
   const [showAddPanel, setShowAddPanel] = useState(false)
 
   const openAddPanel = () => {
+    if (isLoading) return
     setShowAddPanel(true)
   }
 
   const onConfirm = async (indexArr: number[]) => {
+    if (isLoading) return
     const id = employeeList_all[indexArr[0]].id
     showRootLoading(true)
     try {
@@ -184,11 +186,12 @@ export default function ErpCtrlPermissions() {
 
   const openDelete = (e: MouseEvent, index: number) => {
     e.stopPropagation()
+    if (isLoading) return
     setSelIndex(index)
   }
 
   const removeEmployee = async (employeeId: string) => {
-
+    if (isLoading) return
     setRootLoading(true)
     try {
       await apiDeleteEmployeeErpUser(employeeId)
@@ -230,7 +233,7 @@ export default function ErpCtrlPermissions() {
             />
           }
         </div>
-        <LoadingCover01 isLoading={isLoading} />
+        {/* <LoadingCover01 isLoading={isLoading} /> */}
       </div>
 
       <SelectEmployeePanel

@@ -63,6 +63,7 @@ export default function ErpFuncPermissions() {
   const [erpId_add, setErpId_add] = useState<string>()
 
   const openAddPanel = (erpId: string) => {
+    if (isLoading) return
     setErpId_add(erpId)
   }
 
@@ -71,6 +72,7 @@ export default function ErpFuncPermissions() {
   }
 
   const addDepartment = async (indexArr: number[]) => {
+    if (isLoading) return
     if (!erpId_add) return
 
     const departmentsIdArr = departmentArr.map((item) => item.id)
@@ -133,6 +135,7 @@ export default function ErpFuncPermissions() {
             const demparmentsNameArr = departments.map((item) => item.name)
 
             const removeData = (index: number) => {
+              if (isLoading) return
               setErpData_del(erp)
               setDepartmentData_del(departments[index])
             }
@@ -149,7 +152,7 @@ export default function ErpFuncPermissions() {
             )
           })}
         </div>
-        <LoadingCover01 isLoading={isLoading} />
+        {/* <LoadingCover01 isLoading={isLoading} /> */}
       </div>
 
       <GridPanel
