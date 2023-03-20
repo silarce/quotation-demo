@@ -255,7 +255,7 @@ export class ClassDepartment {
       this.dIsNew = true
     }
 
-    const preJobs: (ClassJob | undefined)[] = new Array(10).fill(undefined)
+    const preJobs: (ClassJob | undefined)[] = new Array(15).fill(undefined)
     jobs.forEach((job) => {
       const theIndex = job.grade - 1
       preJobs[theIndex] = new ClassJob(job, reRender)

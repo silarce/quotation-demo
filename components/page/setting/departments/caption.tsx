@@ -24,6 +24,21 @@ export default function Caption() {
       </div>
       
       <div className={`${style.cell}`}>
+        <span>Level 15</span>
+      </div>
+      <div className={`${style.cell}`}>
+        <span>Level 14</span>
+      </div>
+      <div className={`${style.cell}`}>
+        <span>Level 13</span>
+      </div>
+      <div className={`${style.cell}`}>
+        <span>Level 12</span>
+      </div>
+      <div className={`${style.cell}`}>
+        <span>Level 11</span>
+      </div>
+      <div className={`${style.cell}`}>
         <span>Level 10</span>
       </div>
       <div className={`${style.cell}`}>
