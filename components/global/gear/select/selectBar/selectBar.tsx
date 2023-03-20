@@ -89,13 +89,17 @@ export default function SelectBar(
           props.value = props.options.find((item) => item.value === selValue)
             ?? { label: selValue as string, value: selValue as string }
         }
+        console.group("selectBar.tsx")
+        console.log("props.value", props.value)
+        console.log("selValue", selValue)
+        console.groupEnd()
         // __________________________________________________
 
         return (
           <div className={scss.selBox} style={boxStyle} key={index}>
             <Select
               isDisabled={disabled}
-              value={value as Toption}
+              value={selValue as Toption}
               placeholder={placeholder}
               options={options}
               onChange={onChange}
