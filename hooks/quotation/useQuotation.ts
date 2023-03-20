@@ -2,7 +2,6 @@
 import { useState } from "react"
 import { Class_fakeApi_quotation } from "fakeDatabase/fakeAPI/fakeQuotationApi";
 
-import { Toption } from "fakeDatabase/options/options";
 
 import Decimal from "decimal.js"
 
@@ -10,17 +9,32 @@ import Decimal from "decimal.js"
 import { calcReel, calcHorsepower, calcBAndD, } from "js/tools/PSC_v1.1"
 
 
+import {
+  Toption,
+  optionsCreator_doorRail_normal,
+  optionsCreator_doorRail_antyTyphoon,
+} from "fakeDatabase/options/options"
+
+const doorRail_normal = optionsCreator_doorRail_normal()
+const doorRail_antiTyphoon = optionsCreator_doorRail_antyTyphoon()
+
+
+
+
+
+
 type TreRender = () => void
 type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
 
 
 
-const useQuotation = (data: Tdata) => {
+
+
+const useQuotation = (data: Tdata | undefined) => {
   const [render, setRender] = useState(false)
   const reRender: TreRender = () => setRender(state => !state)
-
-
-  return
+  if (!data) return undefined
+  return new Class_quotation(data, reRender)
 }
 
 
@@ -161,7 +175,7 @@ class Class_mainProduct {
   get reel() {
     return calcReel(this._L, this.weight)
   }
-  // ------
+  // ------------------
   get B_D_bArray() {
     return calcBAndD(this.reel, this._h)
   }
@@ -186,7 +200,7 @@ class Class_mainProduct {
     else return this._B
   }
   set B(v: Toption) { this._B = v; this._reRender() }
-  // ------
+  // ------------------
   private _doorType
   get doorType() { return this._doorType }
   set doorType(v: Toption) { this._doorType = v; this._reRender() }
@@ -198,10 +212,6 @@ class Class_mainProduct {
   private _surface
   get surface() { return this._surface }
   set surface(v: Toption) { this._surface = v; this._reRender() }
-
-  private _doorRail
-  get doorRail() { return this._doorRail }
-  set doorRail(v: Toption) { this._doorRail = v; this._reRender() }
 
   private _horsepower
   get horsepower() { return this._horsepower }
@@ -219,10 +229,26 @@ class Class_mainProduct {
   get ejectionDoor() { return this._ejectionDoor }
   set ejectionDoor(v: boolean) { this._ejectionDoor = v; this._reRender() }
 
+  private _doorRail
+  get doorRail() { return this._doorRail }
+  set doorRail(v: Toption) { this._doorRail = v; this._reRender() }
+
+  // ------------------
+  // 門軌選項
+  get doorRailOptions() {
+    if (this.typhoonProof) return doorRail_antiTyphoon
+    else return doorRail_normal
+  }
+
+  // 防颱
   private _typhoonProof
   get typhoonProof() { return this._typhoonProof }
-  set typhoonProof(v: boolean) { this._typhoonProof = v; this._reRender() }
-
+  set typhoonProof(v: boolean) {
+    this._typhoonProof = v;
+    this._doorRail = this.doorRailOptions[0]
+    this._reRender()
+  }
+  // ------------------
 
   // 牌價
   get listPrice() {
@@ -253,6 +279,8 @@ class Class_mainProduct {
       .mul(this.unitPrice.replaceAll(",", ""))
       .toNumber().toLocaleString()
   }
+
+
 
 
   get allData() {
@@ -368,12 +396,14 @@ class Class_part {
 
 class Class_quotation {
   constructor(data: Tdata, reRender: TreRender) {
-    this._reRender = reRender
-
+    this.basicInfo = new Class_basicInfo(data.basicInfo, reRender)
+    this.mainProduct =
+      data.mainProductArr
+        .map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
 
   }
-  private _reRender
-
+  basicInfo
+  mainProduct
 }
 
 
@@ -394,7 +424,7 @@ class Class_quotation {
 
 
 
-export { }
+export { useQuotation }
 
 
 
