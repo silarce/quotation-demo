@@ -69,7 +69,10 @@ export default function HrManage() {
   // 被選中部門的id
   const [selDepartmentId, setDelDepartmentId] = useState<string>()
   // 打開新增管理人員面板
-  const showAdd = (departmentId: string) => setDelDepartmentId(departmentId)
+  const showAdd = (departmentId: string) => {
+    if (isLoading) return;
+    setDelDepartmentId(departmentId)
+  }
 
   // 確定新增
   const onConfirm = async (indexArr: number[]) => {
@@ -142,6 +145,7 @@ export default function HrManage() {
             const { id, name, employees } = item
 
             const removeData = async (itemIndex: number) => {
+              if (isLoading) return;
               // 設定刪除目標
               setDelTarget({
                 department: item,
