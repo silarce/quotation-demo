@@ -162,7 +162,7 @@ export default function HrManage() {
             )
           })}
         </div>
-        <LoadingCover01 isLoading={isLoading} />
+        {/* <LoadingCover01 isLoading={isLoading} /> */}
       </div>
 
       <SelectEmployeePanel
