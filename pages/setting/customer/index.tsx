@@ -156,6 +156,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
             <CustomerList
               data={data as TgetCustomers}
               toUpdate={update}
+              isLoading={isLoading}
             />
             <div className={style.paginationBox}>
               <Pagination
@@ -166,9 +167,9 @@ function TheCustomer({ router }: { router: NextRouter }) {
             </div>
           </>
         }
-        <LoadingCover01
+        {/* <LoadingCover01
           isLoading={isLoading}
-        />
+        /> */}
       </div>
     </div>
   )

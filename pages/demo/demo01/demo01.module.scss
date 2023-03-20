@@ -29,6 +29,17 @@
       height: 8px;
     }
 
+    :global(.rbc-date-cell) {
+      > button {
+        display: block;
+        margin: auto;
+        margin-left: 10px;
+        font-weight: 600;
+        font-size: 24px;
+        cursor: auto;
+      }
+    }
+
     // :global(.rbc-row) {    }
   }
 

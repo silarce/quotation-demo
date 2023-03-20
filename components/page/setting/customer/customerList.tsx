@@ -28,10 +28,11 @@ import {
 } from "js/api/api_customer";
 
 export default function CustomerList(
-  { data, toUpdate }:
+  { data, toUpdate, isLoading }:
     {
       data: TgetCustomers
       toUpdate: () => void
+      isLoading: boolean
     }) {
 
   const customersList = data.data
@@ -61,6 +62,7 @@ export default function CustomerList(
 
   const openDelPanel = (e: MouseEvent, data: TcustomerDto) => {
     e.stopPropagation()
+    if (isLoading) return;
     const { id, customerNumber, name } = data
     setSelInfo({ id, customerNumber, name })
   }

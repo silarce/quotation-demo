@@ -82,6 +82,7 @@ export default function Department() {
 
   // ---------------------------------------------------------
   const upload = async () => {
+    setEditable(false)
     // 刪除部門>刪除職等>新增部門>更新部門職等
 
     // -------------------------------
@@ -163,7 +164,10 @@ export default function Department() {
     {
       type: "myButton",
       label: "編輯",
-      onClick: () => { setEditable(true) }
+      onClick: () => {
+        if (isLoading) return;
+        setEditable(true)
+      }
     }
   ]
   const panelList02: TpanelList = [
@@ -255,7 +259,7 @@ export class ClassDepartment {
       this.dIsNew = true
     }
 
-    const preJobs: (ClassJob | undefined)[] = new Array(10).fill(undefined)
+    const preJobs: (ClassJob | undefined)[] = new Array(15).fill(undefined)
     jobs.forEach((job) => {
       const theIndex = job.grade - 1
       preJobs[theIndex] = new ClassJob(job, reRender)

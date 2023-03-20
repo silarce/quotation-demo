@@ -5,8 +5,6 @@ import {
 import Link from "next/link";
 
 
-
-
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
@@ -24,9 +22,10 @@ import { TemployeeDto } from "js/api/api_employee"
 
 
 
-export default function EmployeeList({ employeeList, toUpdate }: {
+export default function EmployeeList({ employeeList, toUpdate, isLoading }: {
   employeeList: TemployeeDto[]
   toUpdate: () => void
+  isLoading: boolean
 }) {
 
 
@@ -45,6 +44,7 @@ export default function EmployeeList({ employeeList, toUpdate }: {
 
   const openDelPanel = (e: MouseEvent, data: TemployeeDto) => {
     e.stopPropagation()
+    if (isLoading) return;
     const { id, idNumber, chName } = data
     setSelInfo({ id, idNumber, chName })
   }
@@ -66,6 +66,8 @@ export default function EmployeeList({ employeeList, toUpdate }: {
       closeDelPanel()
     }
   }
+
+
 
   return (
     <div className={scss.employeeList}>
@@ -126,7 +128,10 @@ export default function EmployeeList({ employeeList, toUpdate }: {
                   })}
 
                   <div className={`${scss.column} ${scss.btnCell}`}>
-                    <IconDelete01 onClick={(e) => { openDelPanel(e, row) }} />
+                    <IconDelete01 onClick={(e) => {
+                      e.preventDefault()
+                      openDelPanel(e, row)
+                    }} />
                   </div>
                 </div>
               </Link>
