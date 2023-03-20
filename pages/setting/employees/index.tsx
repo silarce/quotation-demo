@@ -18,7 +18,6 @@ import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";
 
 // css
 import style from "./employees.module.scss"
-
 // ==================================================
 
 export default function Employees() {
@@ -49,6 +48,7 @@ export default function Employees() {
 
   // 搜尋功能
   const searchStaff = (searchValue: string) => {
+    if (isLoading) return
     router.push(
       {
         pathname: "/setting/employees",
@@ -103,18 +103,18 @@ export default function Employees() {
       type: "myButton",
       label: "新增員工資料",
       onClick: () => {
+        if (isLoading) return
         router.push(`/setting/employees/add/addEmployee`)
       }
     }
   ]
-
   // ====================================================
   return (
     <div className={style.container}>
       <PageHeader02 tag="人員資料" panelList={panelList} />
       <div className={style.mainContainer}>
         <EmployeeList
-          employeeList={employeeList} toUpdate={update} />
+          employeeList={employeeList} toUpdate={update} isLoading={isLoading}/>
         <div className={style.paginationBox}>
           <Pagination
             current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
