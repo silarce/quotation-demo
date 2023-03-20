@@ -21,11 +21,8 @@ const doorRail_antiTyphoon = optionsCreator_doorRail_antyTyphoon()
 
 
 
-
-
 type TreRender = () => void
 type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
-
 
 
 
@@ -213,9 +210,16 @@ class Class_mainProduct {
   get surface() { return this._surface }
   set surface(v: Toption) { this._surface = v; this._reRender() }
 
-  private _horsepower
-  get horsepower() { return this._horsepower }
-  set horsepower(v: Toption) { this._horsepower = v; this._reRender() }
+  private _horsepower: Toption  // 馬力
+  get horsepower() {
+    if (this._horsepower.value === "autoCalc") {
+      return unexpectedOption(calcHorsepower(this.weight))
+    }
+    else return this._horsepower
+  }
+  set horsepower(v: Toption) {
+    this._horsepower = v
+  }
 
   private _qty
   get qty() { return `${this._qty}` }
