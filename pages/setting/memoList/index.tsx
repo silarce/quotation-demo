@@ -68,7 +68,6 @@ export default function MemoList() {
       value: prodClass,
       options: optionsProdClass,
       onChange: (option: Toption | null) => {
-        console.log("onChange", "ProdClass", option)
         if (typeof option?.value === "string")
           setProdClass(option?.value)
       },
@@ -79,7 +78,6 @@ export default function MemoList() {
       value: doorType,
       options: optionsDoorType,
       onChange: (option: Toption | null) => {
-        console.log("onChange", "DoorType", option)
         if (typeof option?.value === "string")
           setDoorType(option?.value)
       },
@@ -90,7 +88,6 @@ export default function MemoList() {
       value: doorForm,
       options: optionsDoorForm,
       onChange: (option: Toption | null) => {
-        console.log("onChange", "DoorForm", option)
         if (typeof option?.value === "string")
           setDoorForm(option?.value)
       },
@@ -99,11 +96,7 @@ export default function MemoList() {
     },
   ]
 
-  console.group("memoList.tsx")
-  console.log("prodClass", prodClass)
-  console.log("doorType", doorType)
-  console.log("doorForm", doorForm)
-  console.groupEnd()
+
   // __________________
 
 
