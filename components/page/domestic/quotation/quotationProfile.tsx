@@ -1,6 +1,4 @@
-import {
-  useState, useMemo
-} from 'react'
+import { useState, } from 'react'
 import { format } from 'date-fns'
 
 // components
@@ -17,7 +15,7 @@ import scss from "./quotationProfile.module.scss"
 
 
 import { Class_basicInfo } from 'hooks/quotation/useQuotation'
-import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 
 
@@ -48,37 +46,22 @@ export default function QuotationProfile(
     tempQuotationAging,
     date,
     constructionName,
-    undertaker,
-    totalDiscount,
-    tempDoorQty,
-    tempBudgetAmount,
     constructionCounty,
     constructionDistrict,
     constructionAddress,
     trackingStatus,
     siteProgress,
-    quoStatus,
+
   } = basicInfo
 
   const {
-    clientId,
-    type,
     name: clientName,
-    shortName,
-    phone,
     fax,
-    head,
-    // address,
-    billAddress,
-    taxtNumber,
-    taxtType,
     clientState,
     contact,
   } = clientProfile ?? {}
 
   const { setBasicInfoString } = classBasicInfo
-
-  console.log(basicInfo)
 
   // ----------------------------------
   const builtDate = format(new Date(date), "yyy年MM月dd日")
@@ -103,18 +86,18 @@ export default function QuotationProfile(
   // ==============================================
   // 工程地點
   const selectInputList = {
-    county: basicInfo.constructionCounty,
+    county: constructionCounty,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
       setBasicInfoString("constructionCounty", option.value)
       setBasicInfoString("constructionDistrict", "")
     },
-    district: basicInfo.constructionDistrict,
+    district: constructionDistrict,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
       setBasicInfoString("constructionDistrict", option.value)
     },
-    address: basicInfo.constructionAddress,
+    address: constructionAddress,
     onChangeAddress: (value: string) => setBasicInfoString("constructionAddress", value),
   }
 
