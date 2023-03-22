@@ -192,7 +192,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 報價單基本資料 */}
-          <QuotationProfile profileState={profileState} disabled={!allowEdit} />
+          <QuotationProfile classBasicInfo={profileState} disabled={!allowEdit} />
 
           {/* switch01 */}
           <div className={style.switchBar}>

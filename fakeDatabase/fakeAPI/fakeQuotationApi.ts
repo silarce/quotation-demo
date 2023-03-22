@@ -1,5 +1,5 @@
 import { Tquotation, fakeQuotationDataList } from "fakeDatabase/domestic/_fakeQuotation"
-import { TclientProfile, fakeClienData } from "fakeDatabase/client/_fakeClients"
+import { TclientProfile, fakeClientProfileList } from "fakeDatabase/client/_fakeClients"
 
 import { fakeMemoDataArr } from "fakeDatabase/fakeMemo"
 import { fakeQuoteRangeDataArr } from "fakeDatabase/fakeQuoteRange"
@@ -17,12 +17,12 @@ class Class_fakeApi_quotation {
   private _quotation: Tquotation
   get() {
     const theData = _.cloneDeep(this._quotation)
-    const clientData = _.cloneDeep(fakeClienData[theData.clientId])
+    const fakeClienProfile = _.cloneDeep(fakeClientProfileList[theData.clientId])
     const memoArr = theData.memoIdArr.map((id) => fakeMemoDataArr[id - 1])
     const rangeArr = theData.rangeIdArr.map((id) => fakeQuoteRangeDataArr[id - 1])
     return {
       ...theData,
-      clientData,
+      fakeClienProfile,
       memoArr,
       rangeArr,
     }

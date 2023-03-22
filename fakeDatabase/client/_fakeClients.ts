@@ -26,7 +26,7 @@ interface TclientProfileList {
 }
 
 
-const fakeClienData: TclientProfileList = {
+const fakeClientProfileList: TclientProfileList = {
   "S00001": {
     clientId: "S00001",
     type: "客戶",
@@ -147,13 +147,13 @@ function checkData(projectData: TclientProfileList): void {
   }
 }
 
-checkData(fakeClienData)
+checkData(fakeClientProfileList)
 
 
 
 export type { TclientProfile, TclientProfileList }
 
-export { fakeClienData }
+export { fakeClientProfileList }
 
 
 

@@ -1,6 +1,6 @@
 
 import { TquotationList, fakeQuotationDataList } from "fakeDatabase/domestic/_fakeQuotation"
-import { TclientProfileList, fakeClienData } from "fakeDatabase/client/_fakeClients"
+import { TclientProfileList, fakeClientProfileList } from "fakeDatabase/client/_fakeClients"
 
 
 class Class_fakeApi_projectSimple {
@@ -21,7 +21,7 @@ class Class_fakeApi_projectSimple {
         }
         return {
           ...item,
-          clientData: fakeClienData[item.clientId]
+          clientData: fakeClientProfileList[item.clientId]
         }
       })
     const arr2 = arr.flatMap((item) => (item ? [item] : [])); // 清除undefined

@@ -1,5 +1,4 @@
 import {
-  ChangeEvent,
   useState, useMemo
 } from 'react'
 import { format } from 'date-fns'
@@ -16,10 +15,10 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
 // css
 import scss from "./quotationProfile.module.scss"
 
-// fakeData/type
-import type { TuseProfile } from "./hook/useProfile"
-import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
 
+import { Class_basicInfo } from 'hooks/quotation/useQuotation'
+import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
+import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 
 
 // ====================================================
@@ -31,95 +30,104 @@ const inputStyle = {
 }
 
 
-
 // ====================================================
 export default function QuotationProfile(
-  { profileState, disabled = false }:
+  { classBasicInfo, fakeClientList, disabled = false }:
     {
-      profileState: TuseProfile
+      classBasicInfo: Class_basicInfo
+      fakeClientList: ReturnType<Class_client["get"]>
       disabled: boolean
     }) {
 
   // ==============================================
+
   // 報價單資料
-  const { profile } = profileState
+  const { basicInfo, clientProfile } = classBasicInfo.all
+  const {
+    quotationId,
+    tempQuotationAging,
+    date,
+    constructionName,
+    undertaker,
+    totalDiscount,
+    tempDoorQty,
+    tempBudgetAmount,
+    constructionCounty,
+    constructionDistrict,
+    constructionAddress,
+    trackingStatus,
+    siteProgress,
+    quoStatus,
+  } = basicInfo
 
   const {
-    quotationId, ageing, projectName,
-    trackState, schedule, projectAddress,
-    clientName, contactPerson, contactPhone, fax,
-    clientState
-  } = profile
+    clientId,
+    type,
+    name: clientName,
+    shortName,
+    phone,
+    fax,
+    head,
+    // address,
+    billAddress,
+    taxtNumber,
+    taxtType,
+    clientState,
+    contact,
+  } = clientProfile ?? {}
 
-  const {
-    onChangeProjectName, onChangeTrackState,
-    onChangeSchedule, onChangeProjectAddress,
-    setClientName, setContactPerson,
-    setContactPhone, setFax,
-    setClientId, setClientState
-  } = profileState
+  const { setBasicInfoString } = classBasicInfo
+
+  console.log(basicInfo)
 
   // ----------------------------------
-  const builtDate = format(new Date(profile.builtDate), "yyy年MM月dd日")
+  const builtDate = format(new Date(date), "yyy年MM月dd日")
   // ----------------------------------
   // ==============================================
 
   // ==============================================
   // 客戶資料
-  const clientData = [
-    { label: "聯絡人", placeholder: "尚未選擇", value: contactPerson },
-    { label: "聯絡電話", placeholder: "尚未選擇", value: contactPhone },
+  const theClientData = [
+    { label: "聯絡人", placeholder: "尚未選擇", value: contact?.[0].name },
+    { label: "聯絡電話", placeholder: "尚未選擇", value: contact?.[0].phone },
     { label: "傳真號碼", placeholder: "尚未選擇", value: fax },
   ]
 
   // ==============================================
   const clearClient = () => {
     if (disabled) return
-    setClientId("")
-    setClientName("")
-    setContactPerson("")
-    setContactPhone("")
-    setFax("")
-    setClientState("")
+    classBasicInfo.clientProfile = undefined
   }
   // ==============================================
   const styleHaveState = clientState ? scss.haveState : ""
   // ==============================================
   // 工程地點
-
-  // 城市
-  const countryOptions = optionsCreator_county()
-  const [country, setCountry] = useState<Toption | null>(null)
-
-  // 地區
-  const [district, setDistrict] = useState<Toption | null>(null)
-  const districtOptions = useMemo(() => {
-    setDistrict(null)
-    return districtOptionsSelector(country?.value || "")
-  }, [country])
-
-  // 剩餘地址
-  const [address, setAddress] = useState("")
-
-
   const selectInputList = {
-    county: country?.value,
+    county: basicInfo.constructionCounty,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
-      setCountry(option)
+      setBasicInfoString("constructionCounty", option.value)
+      setBasicInfoString("constructionDistrict", "")
     },
-    district: district?.value,
+    district: basicInfo.constructionDistrict,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
-      setDistrict(option)
+      setBasicInfoString("constructionDistrict", option.value)
     },
-    address: address,
-    onChangeAddress: (value: string) => setAddress(value),
+    address: basicInfo.constructionAddress,
+    onChangeAddress: (value: string) => setBasicInfoString("constructionAddress", value),
   }
+
+
+
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
   const openModal = () => disabled ? "" : setShowModal(true)
+  const onConfirmClient = (client: ReturnType<Class_client["get"]>[0]) => {
+    classBasicInfo.clientProfile = client
+  }
+
   // ==============================================
 
 
@@ -132,8 +140,8 @@ export default function QuotationProfile(
           disabled={disabled}
           {...{ ...inputStyle }}
           inputProps={{
-            value: projectName,
-            onChange: onChangeProjectName,
+            value: constructionName,
+            onChange: (v) => { setBasicInfoString("constructionName", v) },
           }}
         />
         {/*  */}
@@ -149,7 +157,7 @@ export default function QuotationProfile(
                 captionWidth={inputStyle.captionWidth}
                 gap={inputStyle.gap}
                 textareaProps={{
-                  value: clientName,
+                  value: clientName ?? "",
                   onChange: () => { },
                 }}
               />
@@ -160,7 +168,7 @@ export default function QuotationProfile(
 
           <div>
             {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
-            {clientData.map((item, index) => {
+            {theClientData.map((item, index) => {
               const { label, value, placeholder } = item
               return (
                 <InputSel key={index}
@@ -171,7 +179,7 @@ export default function QuotationProfile(
                   showBaseline="invisible"
                   {...{ ...inputStyle }}
                   inputProps={{
-                    value: value,
+                    value: value ?? "",
                     onChange: () => { },
                   }}
                 />
@@ -187,8 +195,8 @@ export default function QuotationProfile(
               disabled={disabled}
               {...{ ...inputStyle }}
               inputProps={{
-                value: trackState,
-                onChange: onChangeTrackState,
+                value: trackingStatus,
+                onChange: (v) => { setBasicInfoString("trackingStatus", v) },
               }}
             />
 
@@ -199,8 +207,8 @@ export default function QuotationProfile(
               disabled={disabled}
               {...{ ...inputStyle }}
               inputProps={{
-                value: schedule,
-                onChange: onChangeSchedule,
+                value: siteProgress,
+                onChange: (v) => { setBasicInfoString("siteProgress", v) },
               }}
             />
           </div>
@@ -220,13 +228,17 @@ export default function QuotationProfile(
         <span>報價編號</span>
         <span>{quotationId}</span>
         <span>報價時效</span>
-        <span>{ageing}天內</span>
+        <span>{tempQuotationAging}天內</span>
         <span>報價日期</span>
         <span>{builtDate}</span>
       </div>
 
       {/* modal */}
-      <ClientSelector {...{ showModal, setShowModal, profileState }} />
+      <ClientSelector
+        {...{ showModal, setShowModal }}
+        fakeClientList={fakeClientList}
+        onConfirm={onConfirmClient}
+      />
 
     </div>
   )
@@ -234,13 +246,6 @@ export default function QuotationProfile(
 
 
 // ===================================================
-
-
-
-
-
-
-
 
 
 

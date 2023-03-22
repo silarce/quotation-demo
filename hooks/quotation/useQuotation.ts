@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Class_fakeApi_quotation } from "fakeDatabase/fakeAPI/fakeQuotationApi";
 
 
@@ -28,10 +28,15 @@ type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
 
 
 const useQuotation = (data: Tdata | undefined) => {
-  const [render, setRender] = useState(false)
-  const reRender: TreRender = () => setRender(state => !state)
-  if (!data) return undefined
-  return new Class_quotation(data, reRender)
+  const [render, setRender] = useState(0)
+  const reRender: TreRender = () => setRender(state => state+1)
+
+  const checkData = () => {
+    if (data) return new Class_quotation(data, reRender)
+    return undefined
+  }
+  const [classQuotaion, setQuotation] = useState(checkData())
+  return classQuotaion
 }
 
 
@@ -40,15 +45,23 @@ const useQuotation = (data: Tdata | undefined) => {
 
 
 
-class Class_basicInfo {
-  constructor(basicInfo: Tdata["basicInfo"], reRender: TreRender) {
+export class Class_basicInfo {
+  constructor(
+    basicInfo: Tdata["basicInfo"],
+    clientProfile: Tdata["fakeClienProfile"] | undefined,
+    reRender: TreRender) {
     this._reRender = reRender
     this._basicInfo = basicInfo
+    this._clientProfile = clientProfile
   }
   private _reRender
   private _basicInfo
+  private _clientProfile: Tdata["fakeClienProfile"] | undefined
   get all() {
-    return this._basicInfo
+    return {
+      basicInfo: this._basicInfo,
+      clientProfile: this._clientProfile
+    }
   }
   setBasicInfoString = (
     key: keyof Omit<typeof this._basicInfo,
@@ -74,7 +87,22 @@ class Class_basicInfo {
     this._basicInfo.quoStatus = v
     this._reRender()
   }
+
+  set clientProfile(data: Tdata["fakeClienProfile"] | undefined) {
+    this._clientProfile = data
+    this._reRender()
+  }
 }
+
+
+
+
+
+
+
+
+
+
 
 // ==================================================
 class Class_mainProduct {
@@ -393,18 +421,13 @@ class Class_part {
 
 
 
-
-
-
-
-
 class Class_quotation {
   constructor(data: Tdata, reRender: TreRender) {
-    this.basicInfo = new Class_basicInfo(data.basicInfo, reRender)
+    this.basicInfo
+      = new Class_basicInfo(data.basicInfo, data.fakeClienProfile, reRender)
     this.mainProduct =
       data.mainProductArr
         .map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
-
   }
   basicInfo
   mainProduct

@@ -58,12 +58,35 @@ import style from "./quotation.module.scss"
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 // import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
-// =============================================================
-import { fakeApi_quotation_creator } from "fakeDatabase/fakeAPI/fakeQuotationApi";
-// =============================================================
+
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
+
+
+
+
+
+
+
+// =============================================================
+// =============================================================
+// =============================================================
+// =============================================================
+import { fakeApi_quotation_creator } from "fakeDatabase/fakeAPI/fakeQuotationApi";
+import { useQuotation } from "hooks/quotation/useQuotation";
+import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+// =============================================================
+// =============================================================
+// =============================================================
+// =============================================================
+// =============================================================
+
+
+
+
+
+
 
 // =============================================================
 // =============================================================
@@ -81,10 +104,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
   // =========================================================
+  // =========================================================
+  // =========================================================
 
-  const foo = fakeApi_quotation_creator(router.query.quotationId as string)
-  console.log(foo?.get())
-  
+  const fakeQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
+  const classQuotation = useQuotation(fakeQuotaion?.get())
+  const fakeClientList = fakeApi_client.get()
+  // =========================================================
+  // =========================================================
   // =========================================================
   // =========================================================
   let {
@@ -116,15 +143,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     newQuotationId,
   })
   // 主產品資料
-  const prodState = useProduct(quotationData?.productList, !allowEdit)
-  // memo // 備註
-  const remarkListState = useRemarkList(quotationData)
-  // range // 報價範圍
-  const rangeListState = useRangeList(quotationData)
-  // payInfo // 支付資訊
-  const payInfoState = usePayInfo(quotationData)
-  // sinature //簽名
-  const sinatureState = useSinature(quotationData)
+  // const prodState = useProduct(quotationData?.productList, !allowEdit)
+  // // memo // 備註
+  // const remarkListState = useRemarkList(quotationData)
+  // // range // 報價範圍
+  // const rangeListState = useRangeList(quotationData)
+  // // payInfo // 支付資訊
+  // const payInfoState = usePayInfo(quotationData)
+  // // sinature //簽名
+  // const sinatureState = useSinature(quotationData)
 
   // --------------------------------------------------------------------------
 
@@ -178,6 +205,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+  if (!classQuotation) return null
+
   // --------------------------------------------------------------------------
   return (
     <div className={style.container}>
@@ -187,7 +216,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
-          <QuotationProfile profileState={profileState} disabled={!allowEdit} />
+          <QuotationProfile
+            classBasicInfo={classQuotation.basicInfo}
+            fakeClientList={fakeClientList}
+            disabled={!allowEdit} />
 
           {/* 基本資料 */}
           <div className={style.switchBar}>
@@ -197,34 +229,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/* 主產品設定 */}
-          <QuotationProduction productStates={prodState} />
+          {/* <QuotationProduction productStates={prodState} /> */}
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <QuotationComponent
+            {/* <QuotationComponent
               partList={prodState.productList[prodState.activeRow]?.part}
-              disabled={!allowEdit} />
+              disabled={!allowEdit} /> */}
             <hr />
             {/* 選配設定 */}
-            <QuotationAccessory activeRow={prodState.activeRow} />
+            {/* <QuotationAccessory activeRow={prodState.activeRow} /> */}
           </div>
 
           {/* 備註/報價範圍/付款資訊 */}
-          <QuotationTotal
+          {/* <QuotationTotal
             {...{
               remarkListState, rangeListState,
               payInfoState,
               disabled: !allowEdit,
               prodState: prodState
             }}
-          />
+          /> */}
           {/* 簽名 */}
-          <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
+          {/* <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} /> */}
 
 
         </div>
       </div>
-      <TextareaModal
+      {/* <TextareaModal
         visible={showMemoModal}
         setVisible={setShowMemoModal}
         title={"追加追減備註"}
@@ -233,8 +265,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         textLength={25}
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
-      />
-      <QuotationPdf
+      /> */}
+      {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
         profileState={profileState}
@@ -243,21 +275,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
         rangeListState={rangeListState}
         payInfoState={payInfoState}
         sinatureState={sinatureState}
-      />
+      /> */}
 
       {/*  */}
-      <QuotationPdf_part
+      {/* <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => { setShowPdf_part(false) }}
         profileState={profileState}
         prodState={prodState}
-      />
+      /> */}
       {/*  */}
     </div>
   )
 }
 
 
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
