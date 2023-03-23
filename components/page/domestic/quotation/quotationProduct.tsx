@@ -14,13 +14,21 @@ import styleL from "./local.module.scss"
 
 // type
 import type { TuseProduct } from "./hook/useProduct"
+import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
-
-export default function QuotationProduction({ productStates, switch02, className = "" }:
+export default function QuotationProduction({
+  mainProductArr,
+  prodCellConfig,
+  activeRow,
+  disabled,
+  switch02, className = "" }:
   {
-    productStates: TuseProduct
+    mainProductArr: Class_quotation["mainProductArr"]
+    prodCellConfig: Class_quotation["prodCellConfig"]
+    activeRow: Class_quotation["activeRow"]
     switch02?: boolean
+    disabled: boolean
     className?: string
   }) {
   // dnd與資料相關的東西都在這裡面
@@ -28,7 +36,7 @@ export default function QuotationProduction({ productStates, switch02, className
 
   const [allowMove, setAllowMove] = useState(false)
 
-  const { addProduct } = productStates
+  // const { addProduct } = productStates
 
   const borderRed = switch02 ? style.borderRed : ""
 
@@ -43,15 +51,19 @@ export default function QuotationProduction({ productStates, switch02, className
       </div>
       <div className={style.listContainer}>
         <div className={style.thead}>
-          <DndThead productStates={productStates} allowMove={allowMove} />
+          <DndThead prodCellConfig={prodCellConfig} allowMove={allowMove} />
         </div>
 
-        <ProductList productStates={productStates} />
-
-        <AddButton className={style.addBtn}
-          label="新增產品"
-          onClick={addProduct}
+        <ProductList
+          mainProductArr={mainProductArr}
+          activeRow={activeRow}
+          prodCellConfig={prodCellConfig}
+          disabled={disabled}
         />
+
+        {/* <AddButton className={style.addBtn}
+          label="新增產品"
+          onClick={addProduct} /> */}
       </div>
     </div>
   )

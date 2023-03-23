@@ -23,7 +23,7 @@ const fakePartGroup = fakePartGroupOri()
 // options
 import {
   Toption,
-  optionsCreator_quoteType,
+  optionsCreator_series,
   optionsCreator_material,
   optionsCreator_surface,
   optionsCreator_doorRail,
@@ -34,7 +34,7 @@ import {
   optionsCreator_doorRail_antyTyphoon,
 } from "fakeDatabase/options/options"
 const optionsGroup = {
-  quoteType: optionsCreator_quoteType(),
+  quoteType: optionsCreator_series(),
   material: optionsCreator_material(),
   surface: optionsCreator_surface(),
   doorRail: optionsCreator_doorRail(),
@@ -139,7 +139,7 @@ function useProduct(
 
   return {
     theadIndex, setTheadIndex,
-    productList, setProductList,
+    mainProductArr: productList, setProductList,
     activeRow, setActiveRow,
     addProduct, deleteProduct, copyProduct,
     changeAllDiscount,

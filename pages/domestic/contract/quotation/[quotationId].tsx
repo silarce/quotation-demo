@@ -215,7 +215,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               ?
               <>
                 {/* 主產品設定 */}
-                <QuotationProduction productStates={prodState} switch02={switch02} />
+                <QuotationProduction mainProductArr={prodState} switch02={switch02} />
                 {/* 原報價項目 */}
                 {switch02 &&
                   <OldQuotationProduction productStates={prodState02} />
@@ -223,7 +223,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 <div className={style.redWrapper}>
                   {/* 材料配件設定 */}
                   <QuotationComponent
-                    partList={prodState.productList[prodState.activeRow]?.part}
+                    partList={prodState.mainProductArr[prodState.activeRow]?.part}
                     disabled={!allowEdit} />
                   <hr />
                   {/* 選配設定 */}
@@ -311,7 +311,7 @@ const OldQuotationProduction = ({ productStates }:
       >
         <QuotationProduction
           className={style.quotationProduction}
-          productStates={productStates} />
+          mainProductArr={productStates} />
       </Panel> 
     </Collapse>
   )

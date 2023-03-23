@@ -1,5 +1,16 @@
 
 
+import iconDoorRail_sj302_30
+  from "public/image/fakeDB/doorRail/normal/SJ302_30.svg"
+import iconDoorRail_sj302_75_30t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_75_30t.svg"
+import iconDoorRail_sj302_90_30t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_90_30t.svg"
+import iconDoorRail_sj302_95_30t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg"
+import iconDoorRail_sj302_95_45t
+  from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg"
+
 // doorType: string[] // 封裝時再從主產品列表中取得資料
 
 // contactPhone: string
@@ -37,6 +48,7 @@ type Tquotation = {
     material: string // 下拉式選單
     surface: string // 下拉式選單
     doorRail: string // 下拉式選單
+    doorRailIcon: string //門軌的圖片
     horsepower: string // 下拉式選單
     qty: number
     memo: string
@@ -123,7 +135,8 @@ const fakeQuotationDataList: TquotationList = {
         doorType: "SJ-302", //門型
         material: "SST304#",
         surface: "2B",
-        doorRail: "60",
+        doorRail: "sj302_30",
+        doorRailIcon: iconDoorRail_sj302_30.src,
         horsepower: "1/4 HP",
         qty: 1,
         memo: "防颱",

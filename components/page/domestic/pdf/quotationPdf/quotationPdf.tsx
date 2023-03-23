@@ -172,7 +172,7 @@ const PdfTypeA = (
     }
 ) => {
 
-  const { productList } = prodState
+  const { mainProductArr: productList } = prodState
   const chunkedList = _.chunk(productList, 12) as ProdClass[][]
   const pageCount = chunkedList.length
 
@@ -228,7 +228,7 @@ const PdfTypeB = (
     }
 ) => {
 
-  const { productList } = prodState
+  const { mainProductArr: productList } = prodState
   const chunkedList = _.chunk(productList, 40) as ProdClass[][]
   const pageCount = chunkedList.length + 1
   // --------------------------------------------------------------------------

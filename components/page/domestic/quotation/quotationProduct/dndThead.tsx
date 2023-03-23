@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState } from "react"
 // --------------------
 import {
   DndContext,
@@ -27,24 +27,20 @@ import TheadItem from "./dndThead/theadItem"
 import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
-// data hook type config
-import type { TuseProduct, Tproduct } from "../hook/useProduct"
-// 格子的設定
-// import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
-import { prodCellConfigOri } from "../hook/useProduct"
-const { cellConfig } = prodCellConfigOri()
+// type
+import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
 // =========================================================
 // =========================================================
-export default function DndThead({ productStates, allowMove }:
+export default function DndThead({ prodCellConfig, allowMove }:
   {
-    productStates: TuseProduct
+    prodCellConfig: Class_quotation["prodCellConfig"] //  thead的目錄、排序
     allowMove: boolean
   }) {
 
   // thead的目錄、排序
-  const { theadIndex, setTheadIndex } = productStates
+  const [theadIndex, setTheadIndex] = useState(prodCellConfig.keyList)
   const sensors = useSensors(
     useSensor(PointerSensor),
   )
@@ -66,7 +62,7 @@ export default function DndThead({ productStates, allowMove }:
           strategy={horizontalListSortingStrategy}
         >
           {theadIndex.map((key, index) => {
-            const theadInfo = cellConfig[key]
+            const theadInfo = prodCellConfig.cellConfig[key]
             return (
               // key必須是items裡的值
               <TheadItem key={key} theadInfo={theadInfo}
@@ -91,12 +87,10 @@ export default function DndThead({ productStates, allowMove }:
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
-      // let oldIndex: number = theadIndex.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType">);
-      // let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType">);
       let oldIndex: number =
         theadIndex.
-          indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType" | "unitWeight">);
-      let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType" | "unitWeight">);
+          indexOf(active.id as typeof theadIndex[number]);
+      let newIndex: number = theadIndex.indexOf(over?.id as typeof theadIndex[number]);
       setTheadIndex((item) => {
         return arrayMove(item, oldIndex, newIndex)
       })
@@ -113,3 +107,5 @@ export default function DndThead({ productStates, allowMove }:
 
 // ===========================================================
 // ===========================================================
+
+

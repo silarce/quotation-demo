@@ -92,7 +92,7 @@ export default function QuotationPdf_part(
     ]
     sheet.columns.forEach((item, index) => item.font = { size: 16 })
     // -----------------------------------------------------------
-    const productList = prodState.productList
+    const productList = prodState.mainProductArr
 
     let rowCount = 1
 
@@ -160,7 +160,7 @@ export default function QuotationPdf_part(
 
   // -------------------------------------------------------------------------
 
-  const { productList } = prodState
+  const { mainProductArr: productList } = prodState
   const chunkedList = _.chunk(productList, 3) as ProdClass[][]
   // const pageCount = chunkedList.length
 

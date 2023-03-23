@@ -138,10 +138,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     useState(quotationId === "newQuotation" ? true : false)
   // --------------------------------------------------------------------------
   // profile //報價單基本資料
-  const profileState = useProfile({
-    quotationData,
-    newQuotationId,
-  })
+  // const profileState = useProfile({
+  //   quotationData,
+  //   newQuotationId,
+  // })
   // 主產品資料
   // const prodState = useProduct(quotationData?.productList, !allowEdit)
   // // memo // 備註
@@ -229,7 +229,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/* 主產品設定 */}
-          {/* <QuotationProduction productStates={prodState} /> */}
+          <QuotationProduction
+            mainProductArr={classQuotation.mainProductArr}
+            prodCellConfig={classQuotation.prodCellConfig}
+            activeRow={classQuotation.activeRow}
+            disabled={ classQuotation.disabled}
+          />
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}

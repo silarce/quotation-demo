@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, HTMLInputTypeAttribute } from "react"
 import { Class_fakeApi_quotation } from "fakeDatabase/fakeAPI/fakeQuotationApi";
 
 
@@ -26,26 +26,7 @@ type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
 
 
 
-
-const useQuotation = (data: Tdata | undefined) => {
-  const [render, setRender] = useState(0)
-  const reRender: TreRender = () => setRender(state => state+1)
-
-  const checkData = () => {
-    if (data) return new Class_quotation(data, reRender)
-    return undefined
-  }
-  const [classQuotaion, setQuotation] = useState(checkData())
-  return classQuotaion
-}
-
-
-
-
-
-
-
-export class Class_basicInfo {
+class Class_basicInfo {
   constructor(
     basicInfo: Tdata["basicInfo"],
     clientProfile: Tdata["fakeClienProfile"] | undefined,
@@ -125,7 +106,8 @@ class Class_mainProduct {
     this._doorType = unexpectedOption(mainProduct.doorType)
     this._material = unexpectedOption(mainProduct.material)
     this._surface = unexpectedOption(mainProduct.surface)
-    this._doorRail = unexpectedOption(mainProduct.doorRail)
+    // this._doorRail = unexpectedOption(mainProduct.doorRail)
+    this._doorRail = unexpectedOption(mainProduct.doorRail, mainProduct.doorRailIcon)
     this._horsepower = unexpectedOption(mainProduct.horsepower)
     this._qty = mainProduct.qty
     this._memo = mainProduct.memo
@@ -247,6 +229,7 @@ class Class_mainProduct {
   }
   set horsepower(v: Toption) {
     this._horsepower = v
+    this._reRender()
   }
 
   private _qty
@@ -350,6 +333,7 @@ class Class_mainProduct {
     }
   }
 
+
 }
 
 
@@ -421,16 +405,52 @@ class Class_part {
 
 
 
+// =============================================================
 class Class_quotation {
-  constructor(data: Tdata, reRender: TreRender) {
+  constructor(
+    reRender: TreRender,
+    data: Tdata,
+    prodCellConfig: TprodCellConfig
+  ) {
+    this._reRender = reRender
+
     this.basicInfo
       = new Class_basicInfo(data.basicInfo, data.fakeClienProfile, reRender)
-    this.mainProduct =
+    this.mainProductArr =
       data.mainProductArr
         .map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
-  }
+    this.prodCellConfig = prodCellConfig
+  } // constructor
+  private _reRender
   basicInfo
-  mainProduct
+  // -----
+  mainProductArr
+  prodCellConfig  // dnd head的狀態，也是資料分類目錄
+  private _activeRow = -1 // 被選中的mainProduct的index
+  get activeRow() { return this._activeRow }
+  set activeRow(v: number) {
+    this._activeRow = v
+    this._reRender()
+  }
+  private _disabled = false
+  get disabled() { return this._disabled }
+  set disabled(v: boolean) { this._disabled = v; this._reRender() }
+  // -----
+}
+
+
+
+
+const useQuotation = (data: Tdata | undefined) => {
+  const [render, setRender] = useState(0)
+  const reRender: TreRender = () => setRender(state => state + 1)
+
+  const checkData = () => {
+    if (data) return new Class_quotation(reRender, data, prodCellConfigOri())
+    return undefined
+  }
+  const [classQuotaion, setQuotation] = useState(checkData())
+  return classQuotaion
 }
 
 
@@ -439,6 +459,224 @@ class Class_quotation {
 
 
 
+export {
+  Class_quotation,
+  Class_basicInfo,
+  Class_mainProduct,
+  Class_part,
+  useQuotation
+}
+
+
+
+
+const unexpectedOption = (v: string, icon?: string) => {
+
+  if (icon) return {
+    value: v,
+    label: v,
+    icon
+  }
+
+
+  return {
+    value: v,
+    label: v,
+  }
+}
+
+
+
+
+
+// ==========================================================================
+
+
+// type TprodKeys = keyof Pick<Class_mainProduct,
+//   "discount" | "category" | "series" | "L" | "W" |
+//   "h" | "B" | "area" | "cai" | "doorType" |
+//   "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
+//   "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor" |
+//   "listPrice" | "listPriceTotal" |
+//   "reel"
+// >
+
+// export type TinputCellType =
+//   { [key in Extract<TprodKeys,
+//     "discount" | "category" | "L" | "W" | "h" | "qty" | "memo">]
+//     : { type: "input" } }
+// type TselectCellType =
+//   { [key in Extract<TprodKeys,
+//     "series" | "B" | "doorType" | "material" | "surface" | "horsepower">]
+//     : { type: "select" } }
+// type TselectWithIconCellType =
+//   { [key in Extract<TprodKeys, "doorRail">]: { type: "selectWithIcon" } }
+// type TcheckboxCellType =
+//   { [key in Extract<TprodKeys, "ejectionDoor" | "typhoonProof">]
+//     : { type: "checkbox" } }
+// type TreadOnlyCellType =
+//   { [key in Extract<TprodKeys,
+//     "listPrice" | "listPriceTotal" | "unitPrice" |
+//     "priceTotal" | "area" | "cai" | "reel">]
+//     : { type: "readOnly" } }
+
+
+
+type TinputCellType =
+  { [key in keyof Pick<Class_mainProduct,
+    "discount" | "category" | "L" | "W" | "h" | "qty" | "memo">]
+    : { type: "input" } }
+type TselectCellType =
+  { [key in keyof Pick<Class_mainProduct,
+    "series" | "B" | "doorType" | "material" | "surface" | "horsepower">]
+    : { type: "select" } }
+type TselectWithIconCellType =
+  { [key in keyof Pick<Class_mainProduct, "doorRail">]: { type: "selectWithIcon" } }
+type TcheckboxCellType =
+  { [key in keyof Pick<Class_mainProduct, "ejectionDoor" | "typhoonProof">]
+    : { type: "checkbox" } }
+type TreadOnlyCellType =
+  { [key in keyof Pick<Class_mainProduct,
+    "listPrice" | "listPriceTotal" | "unitPrice" |
+    "priceTotal" | "area" | "cai" | "reel">]
+    : { type: "readOnly" } }
+
+
+type TprodKeys = keyof (
+  TinputCellType & TselectCellType & TselectWithIconCellType &
+  TcheckboxCellType & TreadOnlyCellType
+)
+
+
+type TprodCellConfig = {
+  keyList: TprodKeys[]
+  cellConfig: {
+    [key in TprodKeys]: {
+      id: key
+      label: string
+      width: string
+      // type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
+      inputType?: HTMLInputTypeAttribute
+    }
+  } &
+  TinputCellType & TselectCellType &
+  TselectWithIconCellType & TcheckboxCellType & TreadOnlyCellType
+
+}
+
+
+
+
+function prodCellConfigOri(): TprodCellConfig {
+  return {
+    // 這個會影響一開始的排列順序
+    keyList: [
+      "discount", "category", "series", "L", "W",
+      "h", "B", "area", "cai", "reel", "doorType",
+      "material", "surface", "doorRail", "typhoonProof", "horsepower", "qty",
+      "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
+      "memo", "ejectionDoor",
+    ],
+    cellConfig: {
+      // input
+      discount: { id: "discount", label: "折數", width: "75px", type: "input", inputType: "number" },
+      category: { id: "category", label: "項目", width: "60px", type: "input" },
+      L: { id: "L", label: "L(m)", width: "60px", type: "input", inputType: "number" },
+      W: { id: "W", label: "W(m)", width: "60px", type: "input", inputType: "number" },
+      h: { id: "h", label: "h(m)", width: "60px", type: "input", inputType: "number" },
+      qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+      memo: { id: "memo", label: "備註", width: "90px", type: "input" },
+      // select
+      series: { id: "series", label: "報價別", width: "105px", type: "select" },
+      B: { id: "B", label: "B(m)", width: "60px", type: "select" },
+      doorType: { id: "doorType", label: "門型", width: "100px", type: "select" },
+      material: { id: "material", label: "材料", width: "120px", type: "select" },
+      surface: { id: "surface", label: "表面", width: "55px", type: "select" },
+      horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "select" },
+      // selectWithIcon
+      doorRail: { id: "doorRail", label: "門軌", width: "210px", type: "selectWithIcon" },
+      // checkbox
+      ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
+      typhoonProof: { id: "typhoonProof", label: "防颱", width: "60px", type: "checkbox" },
+      // readOnly
+      listPrice: { id: "listPrice", label: "牌價", width: "120px", type: "readOnly" },
+      listPriceTotal: { id: "listPriceTotal", label: "牌價複價", width: "140px", type: "readOnly" },
+      unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "readOnly" },
+      priceTotal: { id: "priceTotal", label: "複價", width: "140px", type: "readOnly" },
+      area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
+      cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
+      reel: { id: "reel", label: "捲軸", width: "75px", type: "readOnly" },
+    }
+  }
+}
+
+
+export type {
+  TinputCellType, TselectCellType, TselectWithIconCellType,
+  TcheckboxCellType, TreadOnlyCellType,
+}
+
+
+// type TprodKeys = keyof Pick<Class_mainProduct,
+//   "discount" | "category" | "series" | "L" | "W" |
+//   "h" | "B" | "area" | "cai" | "doorType" |
+//   "material" | "surface" | "doorRail" | "horsepower" | "qty" | "unitPrice" |
+//   "priceTotal" | "memo" | "typhoonProof" | "ejectionDoor" |
+//   "listPrice" | "listPriceTotal" |
+//   "reel"
+// >
+
+// type TprodCellConfig = {
+//   keyList: TprodKeys[]
+//   cellConfig: {
+//     [key in TprodKeys]: {
+//       id: key
+//       label: string
+//       width: string
+//       type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
+//       inputType?: HTMLInputTypeAttribute
+//     }
+//   }
+// }
+
+
+// function prodCellConfigOri(): TprodCellConfig {
+//   return {
+//     // 這個會影響一開始的排列順序
+//     keyList: [
+//       "discount", "category", "series", "L", "W",
+//       "h", "B", "area", "cai", "reel", "doorType",
+//       "material", "surface", "doorRail", "typhoonProof", "horsepower", "qty",
+//       "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
+//       "memo", "ejectionDoor",
+//     ],
+//     cellConfig: {
+//       discount: { id: "discount", label: "折數", width: "75px", type: "input", inputType: "number" },
+//       category: { id: "category", label: "項目", width: "60px", type: "input" },
+//       series: { id: "series", label: "報價別", width: "105px", type: "select" },
+//       L: { id: "L", label: "L(m)", width: "60px", type: "input", inputType: "number" },
+//       W: { id: "W", label: "W(m)", width: "60px", type: "input", inputType: "number" },
+//       h: { id: "h", label: "h(m)", width: "60px", type: "input", inputType: "number" },
+//       B: { id: "B", label: "B(m)", width: "60px", type: "select" },
+//       area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
+//       cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
+//       doorType: { id: "doorType", label: "門型", width: "100px", type: "select" },
+//       material: { id: "material", label: "材料", width: "120px", type: "select" },
+//       surface: { id: "surface", label: "表面", width: "55px", type: "select" },
+//       doorRail: { id: "doorRail", label: "門軌", width: "145px", type: "selectWithIcon" },
+//       horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "select" },
+//       qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+//       listPrice: { id: "listPrice", label: "牌價", width: "120px", type: "readOnly" },
+//       listPriceTotal: { id: "listPriceTotal", label: "牌價複價", width: "140px", type: "readOnly" },
+//       unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "readOnly" },
+//       priceTotal: { id: "priceTotal", label: "複價", width: "140px", type: "readOnly" },
+//       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
+//       ejectionDoor: { id: "ejectionDoor", label: "彈射門", width: "60px", type: "checkbox" },
+//       typhoonProof: { id: "typhoonProof", label: "防颱", width: "60px", type: "checkbox" },
+//       reel: { id: "reel", label: "捲軸", width: "75px", type: "readOnly" },
+//     }
+//   }
+// }
 
 
 
@@ -451,14 +689,7 @@ class Class_quotation {
 
 
 
-export { useQuotation }
 
-
-
-const unexpectedOption = (v: string) => ({
-  value: v,
-  label: v
-})
 
 
 
