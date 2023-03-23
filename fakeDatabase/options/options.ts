@@ -109,7 +109,7 @@ export const optionsCreator_series =
   (): Toption[] => [
     { value: "捲門", label: "捲門", seriesType: "rollerDoor" },
     // { value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor" },
-    // { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
+    { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
   ]
 
 // 材料
