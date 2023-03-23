@@ -144,7 +144,7 @@ class Class_mainProduct {
   private _L
   get L() { return `${this._L}` }
   set L(v: string) {
-    this._L = parseFloat(v)
+    this._L = new Decimal(parseFloat(v) || 0).toNumber()
     this._W = 0
     this._reRender()
   }
@@ -152,7 +152,7 @@ class Class_mainProduct {
   private _W
   get W() { return `${this._W}` }
   set W(v: string) {
-    this._W = parseFloat(v)
+    this._W = new Decimal(parseFloat(v) || 0).toNumber()
     this._L = 0
     this._reRender()
   }
@@ -160,7 +160,7 @@ class Class_mainProduct {
   private _h
   get h() { return `${this._h}` }
   set h(v: string) {
-    this._h = parseFloat(v)
+    this._h = new Decimal(parseFloat(v) || 0).toNumber()
     this._reRender()
   }
 
