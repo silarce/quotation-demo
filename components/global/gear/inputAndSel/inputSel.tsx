@@ -140,7 +140,7 @@ export default function InputSel(
       {inputProps &&
         <Input
           inputProps={inputProps}
-          placeholder={placeholder ?? `請輸入${label}`}
+          placeholder={placeholder ?? `請輸入${label??""}`}
           setIsFocus={setIsFocus}
           disabled={disabled}
         />
@@ -149,7 +149,7 @@ export default function InputSel(
       {textareaProps &&
         <Textarea
           textareaProps={textareaProps}
-          placeholder={placeholder ?? `請輸入${label}`}
+          placeholder={placeholder ?? `請輸入${label??""}`}
           setIsFocus={setIsFocus}
           disabled={disabled}
         />
@@ -158,7 +158,7 @@ export default function InputSel(
       {selectProps &&
         <MySelect
           selectProps={selectProps}
-          placeholder={placeholder ?? `請選擇${label}`}
+          placeholder={placeholder ?? `請選擇${label??""}`}
           disabled={disabled}
         />
       }

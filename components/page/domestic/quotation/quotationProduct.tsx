@@ -24,18 +24,13 @@ export default function QuotationProduction({
   className = "" }:
   {
     classQuotation: Class_quotation
-    disabled:boolean
+    disabled: boolean
     switch02?: boolean
     className?: string
   }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
 
-  const {
-    mainProductArr,
-    prodCellConfig,
-    activeMainProd: activeRow,
-  } = classQuotation
 
   const [allowMove, setAllowMove] = useState(false)
 
@@ -57,11 +52,11 @@ export default function QuotationProduction({
             allowMove={allowMove} />
         </div>
 
-        <ProductList classQuotation={classQuotation} disabled={disabled}/>
+        <ProductList classQuotation={classQuotation} disabled={disabled} />
 
-        {/* <AddButton className={style.addBtn}
+        <AddButton className={style.addBtn}
           label="新增產品"
-          onClick={addProduct} /> */}
+          onClick={classQuotation.addMainProd} />
       </div>
     </div>
   )

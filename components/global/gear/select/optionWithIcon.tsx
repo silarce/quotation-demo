@@ -17,7 +17,7 @@ export function OptionWithIcon01(props: any) {
     <Option {...props}>
       <div className={style.option}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={icon} alt="" />
+        {icon && <img src={icon} alt="iconImg" />}
         <span>{label}</span>
       </div>
     </Option>
