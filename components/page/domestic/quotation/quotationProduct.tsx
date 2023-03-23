@@ -13,24 +13,19 @@ import style from "./quotationProduct.module.scss"
 import styleL from "./local.module.scss"
 
 // type
-import type { TuseProduct } from "./hook/useProduct"
+
 import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
 export default function QuotationProduction({
   classQuotation,
-  // mainProductArr,
-  // prodCellConfig,
-  // activeRow,
-
-  switch02, className = "" }:
+  disabled,
+  switch02,
+  className = "" }:
   {
     classQuotation: Class_quotation
-    // mainProductArr: Class_quotation["mainProductArr"]
-    // prodCellConfig: Class_quotation["prodCellConfig"]
-    // activeRow: Class_quotation["activeRow"]
+    disabled:boolean
     switch02?: boolean
-
     className?: string
   }) {
   // dnd與資料相關的東西都在這裡面
@@ -39,16 +34,10 @@ export default function QuotationProduction({
   const {
     mainProductArr,
     prodCellConfig,
-    activeRow,
-    disabled,
-    keyList
+    activeMainProd: activeRow,
   } = classQuotation
 
-
-
   const [allowMove, setAllowMove] = useState(false)
-
-  // const { addProduct } = productStates
 
   const borderRed = switch02 ? style.borderRed : ""
 
@@ -68,12 +57,7 @@ export default function QuotationProduction({
             allowMove={allowMove} />
         </div>
 
-        <ProductList
-          mainProductArr={mainProductArr}
-          activeRow={activeRow}
-          prodCellConfig={prodCellConfig}
-          disabled={disabled}
-        />
+        <ProductList classQuotation={classQuotation} disabled={disabled}/>
 
         {/* <AddButton className={style.addBtn}
           label="新增產品"

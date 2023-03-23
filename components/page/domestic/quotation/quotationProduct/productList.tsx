@@ -95,22 +95,29 @@ const optionsObjList: ToptionsList = {
 // ==========================================================
 // ==========================================================
 export default function ProductList(
-  { mainProductArr, activeRow, prodCellConfig, disabled }:
+  { classQuotation, disabled }:
     {
-      mainProductArr: Class_quotation["mainProductArr"]
-      activeRow: Class_quotation["activeRow"]
-      prodCellConfig: Class_quotation["prodCellConfig"]
+      classQuotation: Class_quotation
       disabled: boolean
+
+      // disabled: boolean
     }) {
 
   // const { theadIndex, mainProductArr,
-  //   deleteProduct, copyProduct,
-  //   activeRow, setActiveRow,
+
   //   disabled
   // } = productStates
 
+  const {
+    mainProductArr,
+    prodCellConfig,
+    activeMainProd,
+    delMainProd, copyMainProd,
+  } = classQuotation
+
+
+
   const theadIndex = prodCellConfig.keyList
-  console.log(theadIndex)
   // =======================================
   const centerReg = /L|W|H|B|typhoonProof|ejectionDoor/
   // =======================================
@@ -119,17 +126,17 @@ export default function ProductList(
       {mainProductArr.map((dataItem, pIndex) => {
         const { series, doorType } = dataItem
         return (
-          <CellWithBar key={pIndex} isActive={activeRow === pIndex}>
+          <CellWithBar key={pIndex} isActive={activeMainProd === pIndex}>
             <div className={style.row}
-            // onClick={() => setActiveRow(pIndex)}
+              onClick={() => classQuotation.activeMainProd = pIndex}
             >
               <div className={style.buttonBox}>
 
                 <IconDelete01
-                // onClick={(e) => deleteProduct(e, pIndex)}
+                  onClick={(e) => { e.stopPropagation(), delMainProd(pIndex) }}
                 />
                 <IconCopy
-                // onClick={() => copyProduct(pIndex)}
+                  onClick={() => copyMainProd(pIndex)}
                 />
                 <span>{pIndex + 1}</span>
               </div>

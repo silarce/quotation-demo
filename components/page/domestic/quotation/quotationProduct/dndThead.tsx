@@ -42,7 +42,7 @@ export default function DndThead({ allowMove, classQuotation }:
 
   const {
     prodCellConfig, // 格子的資訊(label, width這些)
-    keyList: theadIndex, // thead的目錄、排序
+    mainProdkeyList: theadIndex, // thead的目錄、排序
   } = classQuotation
 
   const sensors = useSensors(
@@ -89,7 +89,7 @@ export default function DndThead({ allowMove, classQuotation }:
         theadIndex.
           indexOf(active.id as typeof theadIndex[number]);
       let newIndex: number = theadIndex.indexOf(over?.id as typeof theadIndex[number]);
-      classQuotation.keyList = arrayMove(theadIndex, oldIndex, newIndex)
+      classQuotation.mainProdkeyList = arrayMove(theadIndex, oldIndex, newIndex)
     }
   }
 

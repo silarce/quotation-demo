@@ -1,7 +1,7 @@
 
 import { useState, useEffect, HTMLInputTypeAttribute } from "react"
 import { Class_fakeApi_quotation } from "fakeDatabase/fakeAPI/fakeQuotationApi";
-
+import _ from "lodash"
 
 import Decimal from "decimal.js"
 
@@ -421,29 +421,43 @@ class Class_quotation {
         .map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
     this.prodCellConfig = prodCellConfig
   } // constructor
+
   private _reRender
+  // ---------------------
   basicInfo
-  // -----
+  // ---------------------
+
   mainProductArr
   prodCellConfig  // dnd head的狀態，也是資料分類目錄
-
-  get keyList() {
+  get mainProdkeyList() {
     return this.prodCellConfig.keyList
   }
-  set keyList(v: typeof this.prodCellConfig.keyList) {
+  set mainProdkeyList(v: typeof this.prodCellConfig.keyList) {
     this.prodCellConfig.keyList = v
     this._reRender()
   }
 
-  private _activeRow = -1 // 被選中的mainProduct的index
-  get activeRow() { return this._activeRow }
-  set activeRow(v: number) {
-    this._activeRow = v
+  private _activeMainProd = -1 // 被選中的mainProduct的index
+  get activeMainProd() { return this._activeMainProd }
+  set activeMainProd(v: number) {
+    this._activeMainProd = v
     this._reRender()
   }
-  private _disabled = false
-  get disabled() { return this._disabled }
-  set disabled(v: boolean) { this._disabled = v; this._reRender() }
+
+  delMainProd = (index: number) => {
+    this.mainProductArr.splice(index, 1)
+    this.activeMainProd = -1
+    this._reRender()
+  }
+  copyMainProd = (index: number) => {
+    this.mainProductArr.push(_.cloneDeep(this.mainProductArr[index]))
+    this.activeMainProd = index
+    this._reRender()
+  }
+  // ---------------------
+  // private _disabled = true
+  // get disabled() { return this._disabled }
+  // set disabled(v: boolean) { this._disabled = v; this._reRender() }
   // -----
 }
 
