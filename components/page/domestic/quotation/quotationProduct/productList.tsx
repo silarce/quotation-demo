@@ -110,7 +110,7 @@ export default function ProductList(
   // } = productStates
 
   const theadIndex = prodCellConfig.keyList
-
+  console.log(theadIndex)
   // =======================================
   const centerReg = /L|W|H|B|typhoonProof|ejectionDoor/
   // =======================================

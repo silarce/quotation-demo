@@ -18,21 +18,33 @@ import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
 export default function QuotationProduction({
-  mainProductArr,
-  prodCellConfig,
-  activeRow,
-  disabled,
+  classQuotation,
+  // mainProductArr,
+  // prodCellConfig,
+  // activeRow,
+
   switch02, className = "" }:
   {
-    mainProductArr: Class_quotation["mainProductArr"]
-    prodCellConfig: Class_quotation["prodCellConfig"]
-    activeRow: Class_quotation["activeRow"]
+    classQuotation: Class_quotation
+    // mainProductArr: Class_quotation["mainProductArr"]
+    // prodCellConfig: Class_quotation["prodCellConfig"]
+    // activeRow: Class_quotation["activeRow"]
     switch02?: boolean
-    disabled: boolean
+
     className?: string
   }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
+
+  const {
+    mainProductArr,
+    prodCellConfig,
+    activeRow,
+    disabled,
+    keyList
+  } = classQuotation
+
+
 
   const [allowMove, setAllowMove] = useState(false)
 
@@ -51,7 +63,9 @@ export default function QuotationProduction({
       </div>
       <div className={style.listContainer}>
         <div className={style.thead}>
-          <DndThead prodCellConfig={prodCellConfig} allowMove={allowMove} />
+          <DndThead
+            classQuotation={classQuotation}
+            allowMove={allowMove} />
         </div>
 
         <ProductList

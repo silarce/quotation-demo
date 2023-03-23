@@ -426,6 +426,15 @@ class Class_quotation {
   // -----
   mainProductArr
   prodCellConfig  // dnd head的狀態，也是資料分類目錄
+
+  get keyList() {
+    return this.prodCellConfig.keyList
+  }
+  set keyList(v: typeof this.prodCellConfig.keyList) {
+    this.prodCellConfig.keyList = v
+    this._reRender()
+  }
+
   private _activeRow = -1 // 被選中的mainProduct的index
   get activeRow() { return this._activeRow }
   set activeRow(v: number) {

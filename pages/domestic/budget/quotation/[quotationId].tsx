@@ -229,12 +229,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/* 主產品設定 */}
-          <QuotationProduction
-            mainProductArr={classQuotation.mainProductArr}
-            prodCellConfig={classQuotation.prodCellConfig}
-            activeRow={classQuotation.activeRow}
-            disabled={ classQuotation.disabled}
-          />
+          <QuotationProduction classQuotation={classQuotation} />
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}

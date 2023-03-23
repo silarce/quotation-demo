@@ -33,14 +33,18 @@ import { Class_quotation } from "hooks/quotation/useQuotation"
 
 // =========================================================
 // =========================================================
-export default function DndThead({ prodCellConfig, allowMove }:
+export default function DndThead({ allowMove, classQuotation }:
   {
-    prodCellConfig: Class_quotation["prodCellConfig"] //  thead的目錄、排序
+
+    classQuotation: Class_quotation
     allowMove: boolean
   }) {
 
-  // thead的目錄、排序
-  const [theadIndex, setTheadIndex] = useState(prodCellConfig.keyList)
+  const {
+    prodCellConfig, // 格子的資訊(label, width這些)
+    keyList: theadIndex, // thead的目錄、排序
+  } = classQuotation
+
   const sensors = useSensors(
     useSensor(PointerSensor),
   )
@@ -72,13 +76,7 @@ export default function DndThead({ prodCellConfig, allowMove }:
             )
           })}
         </SortableContext>
-        <DragOverlay dropAnimation={null}
-          // 為了讓滑鼠再拖移時保持cursor:"grabbing"而設這個style
-          style={{
-            width: "120px", height: "40px",
-            cursor: "grabbing", transition: "0s",
-          }}
-        />
+        <DragOverlay dropAnimation={null} />
       </DndContext>
     </div>
   )
@@ -91,9 +89,7 @@ export default function DndThead({ prodCellConfig, allowMove }:
         theadIndex.
           indexOf(active.id as typeof theadIndex[number]);
       let newIndex: number = theadIndex.indexOf(over?.id as typeof theadIndex[number]);
-      setTheadIndex((item) => {
-        return arrayMove(item, oldIndex, newIndex)
-      })
+      classQuotation.keyList = arrayMove(theadIndex, oldIndex, newIndex)
     }
   }
 
@@ -103,9 +99,4 @@ export default function DndThead({ prodCellConfig, allowMove }:
   }
 
 } // DndThead  
-
-
-// ===========================================================
-// ===========================================================
-
 
