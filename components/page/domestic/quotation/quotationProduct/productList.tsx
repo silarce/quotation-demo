@@ -124,7 +124,7 @@ export default function ProductList(
   return (
     <div className={style.container} >
       {mainProductArr.map((dataItem, pIndex) => {
-        const { series, doorType } = dataItem
+        const { series, seriesType, doorType } = dataItem
         return (
           <CellWithBar key={pIndex} isActive={activeMainProd === pIndex}>
             <div className={style.row}
@@ -151,7 +151,7 @@ export default function ProductList(
                   })
 
                 if (
-                  (key === "ejectionDoor" && series.seriesType !== "rollerDoor")
+                  (key === "ejectionDoor" && seriesType !== "rollerDoor")
                   || (key === "typhoonProof" && doorType.value !== "SJ-302")
                 ) return <div className={`${styleL.column}`} key={key} style={theStyle} />
 

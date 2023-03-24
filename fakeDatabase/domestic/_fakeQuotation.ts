@@ -40,6 +40,7 @@ type Tquotation = {
     discount: string
     category: string // 項目
     series: string // 報價別 // 下拉式選單
+    seriesType: "rollerDoor" | "normal" // 報價別類型 // 捲門或非捲門
     L: string
     W: string
     h: string
@@ -54,7 +55,7 @@ type Tquotation = {
     memo: string
     ejectionDoor: boolean
     typhoonProof: boolean
-    unitWeight: string
+    unitWeight: string // 單位重量
     part: {
       partType: string
       partName: string
@@ -143,6 +144,7 @@ const fakeQuotationDataList: TquotationList = {
         ejectionDoor: false,
         typhoonProof: false,
         unitWeight: "22",
+        seriesType: "normal",
         part: [
           {
             partType: "SJ00",

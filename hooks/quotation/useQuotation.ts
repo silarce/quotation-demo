@@ -19,11 +19,8 @@ const doorRail_normal = optionsCreator_doorRail_normal()
 const doorRail_antiTyphoon = optionsCreator_doorRail_antyTyphoon()
 
 
-
-
 type TreRender = () => void
 type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
-
 
 
 class Class_basicInfo {
@@ -96,6 +93,7 @@ class Class_mainProduct {
     this._category = mainProduct.category
     // this._series = mainProduct.series
     this._series = unexpectedOption(mainProduct.series)
+    this.seriesType = mainProduct.seriesType
     this._L = mainProduct.L
     this._W = mainProduct.W
     this._h = mainProduct.h
@@ -129,6 +127,7 @@ class Class_mainProduct {
   openType = "電動"
 
   private _reRender
+  seriesType
 
   private _partArr
   get partArr() { return this._partArr }
@@ -143,7 +142,12 @@ class Class_mainProduct {
 
   private _series: Toption
   get series() { return this._series }
-  set series(v: Toption) { this._series = v; this._reRender() }
+  set series(v: Toption) {
+    this._series = v;
+    this.seriesType = v.seriesType as typeof this.seriesType
+    this.ejectionDoor = false
+    this._reRender()
+  }
 
   private _L
   get L() { return this._L }
@@ -167,13 +171,20 @@ class Class_mainProduct {
     this._h = v
     this._reRender()
   }
-
+  // 面積
   get area() {
-    return new Decimal(this._L || this._W || 0)
-      .mul(Decimal.add(this._h || 0, this.B.value))
-      .toFixed(2).toString()
-  }
+    if (this.seriesType === "rollerDoor") {
+      return new Decimal(this._L || this._W || 0)
+        .mul(Decimal.add(this._h || 0, this.B.value))
+        .toFixed(2).toString()
 
+    } else {
+      return new Decimal(this._L || this._W || 0)
+        .mul(this._h || 0)
+        .toFixed(2).toString()
+    }
+  }
+  // 才數
   get cai() {
     return new Decimal(this.area).mul(10.89).toFixed(0).toString()
   }
@@ -298,9 +309,6 @@ class Class_mainProduct {
       .mul(this.unitPrice.replaceAll(",", ""))
       .toNumber().toLocaleString()
   }
-
-
-
 
   get allData() {
     return {
@@ -545,7 +553,7 @@ type TmainProdCheckboxCellType =
 type TmainProdReadOnlyCellType =
   { [key in keyof Pick<Class_mainProduct,
     "listPrice" | "listPriceTotal" | "unitPrice" |
-    "priceTotal" | "area" | "cai" | "reel">]
+    "priceTotal" | "area" | "cai">]
     : { type: "readOnly" } }
 
 
@@ -577,7 +585,7 @@ function mainProdCellConfigOri(): TprodCellConfig {
     // 這個會影響一開始的排列順序
     keyList: [
       "discount", "category", "series", "L", "W",
-      "h", "B", "area", "cai", "reel", "doorType",
+      "h", "B", "area", "cai", "doorType",
       "material", "surface", "doorRail", "typhoonProof", "horsepower", "qty",
       "listPrice", "listPriceTotal", "unitPrice", "priceTotal",
       "memo", "ejectionDoor",
@@ -610,7 +618,7 @@ function mainProdCellConfigOri(): TprodCellConfig {
       priceTotal: { id: "priceTotal", label: "複價", width: "140px", type: "readOnly" },
       area: { id: "area", label: "面積", width: "60px", type: "readOnly" },
       cai: { id: "cai", label: "才數", width: "75px", type: "readOnly" },
-      reel: { id: "reel", label: "捲軸", width: "75px", type: "readOnly" },
+      // reel: { id: "reel", label: "捲軸", width: "75px", type: "readOnly" },
     }
   }
 }
@@ -697,6 +705,7 @@ const emptyMainProd: Tdata["mainProductArr"][0] = {
   ejectionDoor: false,
   typhoonProof: false,
   unitWeight: "22",
+  seriesType: "normal",
   part: [
     {
       partType: "SJ00",

@@ -104,13 +104,17 @@ export const optionsCreator_clientSearch =
     { value: "phone", label: "電話" },
   ]
 
+
+type ToptionsSeries = Toption & { seriesType: "rollerDoor" | "normal" }
 // 報價別
 export const optionsCreator_series =
-  (): Toption[] => [
+  (): ToptionsSeries[] => [
     { value: "捲門", label: "捲門", seriesType: "rollerDoor" },
     // { value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor" },
-    { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
+    { value: "不是捲門", label: "不是捲門", seriesType: "normal" },
   ]
+
+
 
 // 材料
 export const optionsCreator_material =
