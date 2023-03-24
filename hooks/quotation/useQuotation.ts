@@ -377,7 +377,7 @@ class Class_part {
 
   private _qty
   get qty() {
-    if (this._qty) return this._qty.toFixed(2)
+    if (this._qty) return parseFloat(this._qty).toFixed(2)
     if (this.partType === "門軌") {
       const length = this._parent.h
       return new Decimal(length).div(100).toFixed(2).toString()
@@ -667,11 +667,12 @@ const partCellConfigOri = (): TpartCellConfig => {
 
 // =============================================================
 export type {
+  // mainProduct
   TmainProdInputCellType, TmainProdSelectCellType,
   TmainProdSelectWithIconCellType, TmainProdCheckboxCellType,
   TmainProdReadOnlyCellType,
-
-
+  // part
+  TpartReadOnlyCellType, TpartSelectCellType
 }
 
 
@@ -702,9 +703,9 @@ const emptyMainProd: Tdata["mainProductArr"][0] = {
       partName: "捲門片",
       partId: "SJ0000A0000",
       material: "SST 304",
-      basicWeight: 99.99,
+      basicWeight: "99.99",
       unit: "m2",
-      listPrice: 499,
+      listPrice: "499",
       qty: undefined
     },
     {
@@ -712,10 +713,10 @@ const emptyMainProd: Tdata["mainProductArr"][0] = {
       partName: "馬達機",
       partId: "SJ0000A0000",
       material: "SST 304",
-      basicWeight: 99.99,
+      basicWeight: "99.99",
       unit: "組",
-      listPrice: 499,
-      qty: 1
+      listPrice: "499",
+      qty: "1"
     }
   ]
 }

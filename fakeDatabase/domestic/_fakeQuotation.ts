@@ -60,10 +60,10 @@ type Tquotation = {
       partName: string
       partId: string
       material: string
-      basicWeight: number | undefined
+      basicWeight: string | undefined
       unit: "m2" | "M" | "組" | "套" | "支" | string
-      qty: number | undefined // 若是undefined就是從mainProduct的資料運算出來
-      listPrice: number  // 牌價
+      qty: string | undefined // 若是undefined就是從mainProduct的資料運算出來
+      listPrice: string  // 牌價
     }[]
   }[]
   // ---------------------------------------------------------
@@ -149,9 +149,9 @@ const fakeQuotationDataList: TquotationList = {
             partName: "捲門片",
             partId: "SJ0000A0000",
             material: "SST 304",
-            basicWeight: 99.99,
+            basicWeight: "99.99",
             unit: "m2",
-            listPrice: 499,
+            listPrice: "499",
             qty: undefined
           },
           {
@@ -159,10 +159,10 @@ const fakeQuotationDataList: TquotationList = {
             partName: "馬達機",
             partId: "SJ0000A0000",
             material: "SST 304",
-            basicWeight: 99.99,
+            basicWeight: "99.99",
             unit: "組",
-            listPrice: 499,
-            qty: 1
+            listPrice: "499",
+            qty: "1"
           }
         ]
       }
