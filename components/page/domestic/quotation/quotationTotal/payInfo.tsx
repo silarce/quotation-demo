@@ -1,5 +1,3 @@
-import { useMemo } from "react"
-import Decimal from "decimal.js"
 
 // global gear
 import Input03 from "components/global/gear/input/input03"
@@ -7,12 +5,7 @@ import Input03 from "components/global/gear/input/input03"
 // css
 import style from "./payInfo.module.scss"
 
-
-
 // type
-// type TpayMethod = TusePayInfo["payInfo"]["payMethod"]
-// import { TusePayInfo } from "../hook/usePayInfo"
-// import { TuseProduct } from "../hook/useProduct"
 import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
@@ -20,8 +13,6 @@ export default function PayInfo(
   { classQuotation, disabled }:
     {
       classQuotation: Class_quotation
-      // payInfoState: TusePayInfo
-      // changeAllDiscount: (v: string) => void
       disabled: boolean
     }) {
   // -----------------------------------------------------------------------
@@ -144,68 +135,9 @@ export default function PayInfo(
             <span>%</span>
           </div>
           {/*  */}
-
-
-          {/* {payMethodIndex.map((key, index) => {
-            const item = payMethodItems[key]
-            const { label, onChange } = item
-            return (
-              <div className={style.inputBox02} key={index}>
-                <span>{index + 1}.{label}</span>
-                <Input03 {...{
-                  stateValue: payMethod[key],
-                  onChange: onChange,
-                  placeholder: "請輸入%數",
-                  disabled
-                }} />
-                <span>%</span>
-              </div>
-            )
-          })} */}
         </div>
       </div>
     </div>
   )
 } // PayInfo
 // ============================
-
-
-
-// =====================================================
-// const payMethodIndex: (keyof TpayMethod)[] = [
-//   "deposit", "deliveryPayment",
-//   "installedPayment", "eleConnectPayment",
-// ]
-// const payMethodItemsCreator = (payInfoState: TusePayInfo) => {
-//   const {
-//     onChangeDeposit, onChangeFinalPayment,
-//     onChangeInstalledPayment, onChangeEleConnectPayment,
-//   } = payInfoState
-//   const payMethodItems = {
-//     deposit: {
-//       label: "訂製同時付總金額",
-//       onChange: onChangeDeposit
-//     },
-//     deliveryPayment: {
-//       label: "交貨同時付總金額",
-//       onChange: onChangeFinalPayment
-//     },
-//     installedPayment: {
-//       label: "按裝完成付總金額",
-//       onChange: onChangeInstalledPayment
-//     },
-//     eleConnectPayment: {
-//       label: "接電使用付總金額",
-//       onChange: onChangeEleConnectPayment
-//     },
-//   }
-//   return payMethodItems
-// }
-// =====================================================
-
-
-
-
-
-
-
