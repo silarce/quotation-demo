@@ -233,9 +233,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            {/* <QuotationComponent
-              partList={prodState.productList[prodState.activeRow]?.part}
-              disabled={!allowEdit} /> */}
+            <QuotationComponent
+              
+              classQuotation={classQuotation}
+              disabled={!allowEdit} />
             <hr />
             {/* 選配設定 */}
             {/* <QuotationAccessory activeRow={prodState.activeRow} /> */}

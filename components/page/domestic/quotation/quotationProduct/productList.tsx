@@ -66,12 +66,12 @@ import Placeholder from "react-select/dist/declarations/src/components/Placehold
 // ==========================================================
 import { Class_quotation } from "hooks/quotation/useQuotation"
 import type {
-  TinputCellType, TselectCellType, TselectWithIconCellType,
-  TcheckboxCellType, TreadOnlyCellType
+  TmainProdInputCellType, TmainProdSelectCellType, TmainProdSelectWithIconCellType,
+  TmainProdCheckboxCellType, TmainProdReadOnlyCellType
 } from "hooks/quotation/useQuotation"
 
 type ToptionsObjKey =
-  keyof Omit<(TselectCellType & TselectWithIconCellType), "B" | "doorRail">
+  keyof Omit<(TmainProdSelectCellType & TmainProdSelectWithIconCellType), "B" | "doorRail">
 
 type ToptionsList = {
   [key in ToptionsObjKey]: Toption[]
@@ -110,7 +110,7 @@ export default function ProductList(
 
   const {
     mainProductArr,
-    prodCellConfig,
+    mainProdCellConfig: prodCellConfig,
     activeMainProd,
     delMainProd, copyMainProd,
   } = classQuotation
@@ -177,7 +177,7 @@ export default function ProductList(
       // dataItem: ProdClass
       // key: TprodKeys
       dataItem: Class_quotation["mainProductArr"][number]
-      key: Class_quotation["prodCellConfig"]["keyList"][number]
+      key: Class_quotation["mainProdCellConfig"]["keyList"][number]
 
 
       type: "input" | "readOnly" | "select" | "selectWithIcon" | "checkbox"
@@ -198,7 +198,7 @@ export default function ProductList(
       case "input": {
         if (typeof stateValue !== "string") return null
         const onChange
-          = (value: string) => dataItem[key as keyof TinputCellType] = value
+          = (value: string) => dataItem[key as keyof TmainProdInputCellType] = value
 
         return (
           <InputSel
@@ -238,7 +238,7 @@ export default function ProductList(
         // const onChange =
         //   (option: Toption | null) => dataItem.onSelChange(option, key as keyof TproductObject)
         const onChange =
-          (option: Toption | null) => dataItem[key as keyof TselectCellType] = option!
+          (option: Toption | null) => dataItem[key as keyof TmainProdSelectCellType] = option!
         return (
           <InputSel
             disabled={disabled}
@@ -263,7 +263,7 @@ export default function ProductList(
         if (key === "doorRail") options = dataItem.doorRailOptions
         else options = optionsObjList[key as ToptionsObjKey]
         const onChange =
-          (option: Toption | null) => dataItem[key as keyof TselectWithIconCellType] = option!
+          (option: Toption | null) => dataItem[key as keyof TmainProdSelectWithIconCellType] = option!
         const customComponents = {
           Option: OptionWithIcon01,
           SingleValue: SingleValueWithIcon01,
@@ -291,7 +291,7 @@ export default function ProductList(
         if (typeof stateValue !== "boolean") return null
         const onClick = () => {
           if (disabled) return
-          dataItem[key as keyof TcheckboxCellType] = !dataItem[key]
+          dataItem[key as keyof TmainProdCheckboxCellType] = !dataItem[key]
         }
         return (
           <div className={styleL.checkbox}>

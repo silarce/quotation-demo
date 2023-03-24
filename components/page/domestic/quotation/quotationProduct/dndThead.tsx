@@ -41,7 +41,7 @@ export default function DndThead({ allowMove, classQuotation }:
   }) {
 
   const {
-    prodCellConfig, // 格子的資訊(label, width這些)
+    mainProdCellConfig: prodCellConfig, // 格子的資訊(label, width這些)
     mainProdkeyList: theadIndex, // thead的目錄、排序
   } = classQuotation
 

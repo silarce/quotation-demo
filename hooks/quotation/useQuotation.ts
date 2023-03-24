@@ -117,7 +117,7 @@ class Class_mainProduct {
     this._typhoonProof = mainProduct.typhoonProof
     this._unitWeight = mainProduct.unitWeight
 
-    this._part = mainProduct.part
+    this._partArr = mainProduct.part
       .map((partItem) => {
         return new Class_part(partItem, this, reRender)
       })
@@ -128,8 +128,10 @@ class Class_mainProduct {
   thickness = "1.50t" //厚度
   openType = "電動"
 
-  private _part
   private _reRender
+
+  private _partArr
+  get partArr() { return this._partArr }
 
   private _discount
   get discount() { return `${this._discount}` }
@@ -270,7 +272,7 @@ class Class_mainProduct {
   // 牌價
   get listPrice() {
     let listPrice = new Decimal(0)
-    this._part.forEach((part) => {
+    this._partArr.forEach((part) => {
       listPrice = listPrice.plus(part.totalListPrice)
     })
     return listPrice.toNumber().toLocaleString()
@@ -285,7 +287,7 @@ class Class_mainProduct {
   // 單價
   get unitPrice() {
     let unitPrice = new Decimal(0)
-    this._part.forEach((part) => {
+    this._partArr.forEach((part) => {
       unitPrice = unitPrice.plus(part.totalPrice)
     })
     return unitPrice.toNumber().toLocaleString()
@@ -412,7 +414,8 @@ class Class_quotation {
   constructor(
     reRender: TreRender,
     data: Tdata,
-    prodCellConfig: TprodCellConfig
+    prodCellConfig: TprodCellConfig,
+    partCellConfig: TpartCellConfig
   ) {
     this._reRender = reRender
 
@@ -421,21 +424,21 @@ class Class_quotation {
     this.mainProductArr =
       data.mainProductArr
         .map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
-    this.prodCellConfig = prodCellConfig
+    this.mainProdCellConfig = prodCellConfig
+    this.partCellConfig = partCellConfig
   } // constructor
 
   private _reRender
   // ---------------------
   basicInfo
   // ---------------------
-
   mainProductArr
-  prodCellConfig  // dnd head的狀態，也是資料分類目錄
+  mainProdCellConfig  // dnd head的狀態，也是資料分類目錄
   get mainProdkeyList() {
-    return this.prodCellConfig.keyList
+    return this.mainProdCellConfig.keyList
   }
-  set mainProdkeyList(v: typeof this.prodCellConfig.keyList) {
-    this.prodCellConfig.keyList = v
+  set mainProdkeyList(v: typeof this.mainProdCellConfig.keyList) {
+    this.mainProdCellConfig.keyList = v
     this._reRender()
   }
 
@@ -462,6 +465,11 @@ class Class_quotation {
     this._reRender()
   }
   // ---------------------
+  partCellConfig
+
+
+
+  // ---------------------
   // private _disabled = true
   // get disabled() { return this._disabled }
   // set disabled(v: boolean) { this._disabled = v; this._reRender() }
@@ -476,15 +484,17 @@ const useQuotation = (data: Tdata | undefined) => {
   const reRender: TreRender = () => setRender(state => state + 1)
 
   const checkData = () => {
-    if (data) return new Class_quotation(reRender, data, prodCellConfigOri())
+    if (data) return new Class_quotation(
+      reRender,
+      data,
+      mainProdCellConfigOri(),
+      partCellConfigOri()
+    )
     return undefined
   }
   const [classQuotaion, setQuotation] = useState(checkData())
   return classQuotaion
 }
-
-
-
 
 
 
@@ -496,8 +506,6 @@ export {
   Class_part,
   useQuotation
 }
-
-
 
 
 const unexpectedOption = (v: string, icon?: string) => {
@@ -521,20 +529,20 @@ const unexpectedOption = (v: string, icon?: string) => {
 
 // ==========================================================================
 
-type TinputCellType =
+type TmainProdInputCellType =
   { [key in keyof Pick<Class_mainProduct,
     "discount" | "category" | "L" | "W" | "h" | "qty" | "memo">]
     : { type: "input" } }
-type TselectCellType =
+type TmainProdSelectCellType =
   { [key in keyof Pick<Class_mainProduct,
     "series" | "B" | "doorType" | "material" | "surface" | "horsepower">]
     : { type: "select" } }
-type TselectWithIconCellType =
+type TmainProdSelectWithIconCellType =
   { [key in keyof Pick<Class_mainProduct, "doorRail">]: { type: "selectWithIcon" } }
-type TcheckboxCellType =
+type TmainProdCheckboxCellType =
   { [key in keyof Pick<Class_mainProduct, "ejectionDoor" | "typhoonProof">]
     : { type: "checkbox" } }
-type TreadOnlyCellType =
+type TmainProdReadOnlyCellType =
   { [key in keyof Pick<Class_mainProduct,
     "listPrice" | "listPriceTotal" | "unitPrice" |
     "priceTotal" | "area" | "cai" | "reel">]
@@ -542,8 +550,8 @@ type TreadOnlyCellType =
 
 
 type TprodKeys = keyof (
-  TinputCellType & TselectCellType & TselectWithIconCellType &
-  TcheckboxCellType & TreadOnlyCellType
+  TmainProdInputCellType & TmainProdSelectCellType & TmainProdSelectWithIconCellType &
+  TmainProdCheckboxCellType & TmainProdReadOnlyCellType
 )
 
 
@@ -558,12 +566,13 @@ type TprodCellConfig = {
       inputType?: HTMLInputTypeAttribute
     }
   } &
-  TinputCellType & TselectCellType &
-  TselectWithIconCellType & TcheckboxCellType & TreadOnlyCellType
+  TmainProdInputCellType & TmainProdSelectCellType &
+  TmainProdSelectWithIconCellType & TmainProdCheckboxCellType &
+  TmainProdReadOnlyCellType
 
 }
 
-function prodCellConfigOri(): TprodCellConfig {
+function mainProdCellConfigOri(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
     keyList: [
@@ -606,13 +615,64 @@ function prodCellConfigOri(): TprodCellConfig {
   }
 }
 
-export type {
-  TinputCellType, TselectCellType, TselectWithIconCellType,
-  TcheckboxCellType, TreadOnlyCellType,
+// =============================================================
+
+type TpartReadOnlyCellType =
+  { [key in keyof Pick<Class_part,
+    "partType" | "partName" | "partId" | "basicWeight" |
+    "unit" | "listPrice" | "qty" |
+    "totalListPrice" | "price" | "totalPrice">]
+    : { type: "readOnly" } }
+type TpartSelectCellType =
+  { [key in keyof Pick<Class_part, "material">]: { type: "select" } }
+
+type TpartKeys = keyof (TpartReadOnlyCellType & TpartSelectCellType)
+
+type TpartCellConfig = {
+  keyList: TpartKeys[]
+  cellConfig: {
+    [key in TpartKeys]: {
+      label: string
+      width: string
+      inputType?: HTMLInputTypeAttribute
+    }
+  } & TpartReadOnlyCellType & TpartSelectCellType
+}
+
+const partCellConfigOri = (): TpartCellConfig => {
+  return {
+    keyList: [
+      "partType", "partName", "partId", "material",
+      "basicWeight", "unit", "qty", "listPrice", "totalListPrice",
+      "price", "totalPrice",
+    ],
+    cellConfig: {
+      "partType": { label: "中類", width: "45px", type: "readOnly" },
+      "partName": { label: "種類名稱", width: "160px", type: "readOnly" },
+      "partId": { label: "代號", width: "116px", type: "readOnly" },
+      // "surface": { label: "表面", width: "55p,x" type:readOnly""},
+      "basicWeight": { label: "重量基重", width: "75px", type: "readOnly" },
+      "unit": { label: "單位", width: "40px", type: "readOnly" },
+      "qty": { label: "數量", width: "60px", type: "readOnly" },
+      "listPrice": { label: "牌價", width: "84px", type: "readOnly" },
+      "totalListPrice": { label: "牌價複價", width: "84px", type: "readOnly" },
+      "price": { label: "單價", width: "84px", type: "readOnly" },
+      "totalPrice": { label: "複價", width: "84px", type: "readOnly" },
+      "material": { label: "材料", width: "120px", type: "select" },
+    }
+  }
 }
 
 
 
+// =============================================================
+export type {
+  TmainProdInputCellType, TmainProdSelectCellType,
+  TmainProdSelectWithIconCellType, TmainProdCheckboxCellType,
+  TmainProdReadOnlyCellType,
+
+
+}
 
 
 // ===============================================================
@@ -659,14 +719,3 @@ const emptyMainProd: Tdata["mainProductArr"][0] = {
     }
   ]
 }
-
-
-
-
-
-
-
-
-
-
-
