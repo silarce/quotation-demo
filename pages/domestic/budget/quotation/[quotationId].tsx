@@ -233,13 +233,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <QuotationComponent
-              
-              classQuotation={classQuotation}
-              disabled={!allowEdit} />
+            <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} />
             <hr />
             {/* 選配設定 */}
-            {/* <QuotationAccessory activeRow={prodState.activeRow} /> */}
+            <QuotationAccessory activeRow={classQuotation.activeMainProd} />
           </div>
 
           {/* 備註/報價範圍/付款資訊 */}
@@ -441,4 +438,3 @@ const QuotationStateSel = (
     </div >
   )
 }
-
