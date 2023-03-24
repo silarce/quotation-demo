@@ -134,8 +134,8 @@ class Class_mainProduct {
   get partArr() { return this._partArr }
 
   private _discount
-  get discount() { return `${this._discount}` }
-  set discount(v: string) { this._discount = parseFloat(v); this._reRender() }
+  get discount() { return this._discount }
+  set discount(v: string) { this._discount = v; this._reRender() }
 
   private _category
   get category() { return this._category }
@@ -146,31 +146,31 @@ class Class_mainProduct {
   set series(v: Toption) { this._series = v; this._reRender() }
 
   private _L
-  get L() { return `${this._L}` }
+  get L() { return this._L }
   set L(v: string) {
-    this._L = new Decimal(parseFloat(v) || 0).toNumber()
-    this._W = 0
+    this._L = v
+    this._W = "0"
     this._reRender()
   }
 
   private _W
-  get W() { return `${this._W}` }
+  get W() { return this._W }
   set W(v: string) {
-    this._W = new Decimal(parseFloat(v) || 0).toNumber()
-    this._L = 0
+    this._W = v
+    this._L = "0"
     this._reRender()
   }
 
   private _h
   get h() { return `${this._h}` }
   set h(v: string) {
-    this._h = new Decimal(parseFloat(v) || 0).toNumber()
+    this._h = v
     this._reRender()
   }
 
   get area() {
-    return new Decimal(this._L || this._W)
-      .mul(Decimal.add(this._h, this.B.value))
+    return new Decimal(this._L || this._W || 0)
+      .mul(Decimal.add(this._h || 0, this.B.value))
       .toFixed(2).toString()
   }
 
@@ -180,15 +180,15 @@ class Class_mainProduct {
   // ------
   private _unitWeight
   get weight() {
-    return this._L * this._h * this._unitWeight
+    return new Decimal(this._L || 0).mul(this._h || 0).mul(this._unitWeight || 0).toString()
   }
 
   get reel() {
-    return calcReel(this._L, this.weight)
+    return calcReel(parseFloat(this._L), parseFloat(this.weight))
   }
   // ------------------
   get B_D_bArray() {
-    return calcBAndD(this.reel, this._h)
+    return calcBAndD(this.reel, parseFloat(this._h))
   }
 
   get D() {
@@ -227,7 +227,7 @@ class Class_mainProduct {
   private _horsepower: Toption  // 馬力
   get horsepower() {
     if (this._horsepower.value === "autoCalc") {
-      return unexpectedOption(calcHorsepower(this.weight))
+      return unexpectedOption(calcHorsepower(parseFloat(this.weight)))
     }
     else return this._horsepower
   }
@@ -237,11 +237,11 @@ class Class_mainProduct {
   }
 
   private _qty
-  get qty() { return `${this._qty}` }
-  set qty(v: string) { this._qty = parseFloat(v); this._reRender() }
+  get qty() { return this._qty }
+  set qty(v: string) { this._qty = v; this._reRender() }
 
   private _memo
-  get memo() { return `${this._memo}` }
+  get memo() { return this._memo }
   set memo(v: string) { this._memo = v; this._reRender() }
 
   private _ejectionDoor
@@ -678,24 +678,24 @@ export type {
 // ===============================================================
 
 const emptyMainProd: Tdata["mainProductArr"][0] = {
-  discount: 100,
+  discount: "100",
   category: "",
   series: "",
-  L: 0,
-  W: 0,
-  h: 0,
-  B: 0, //送到class裡面會被轉為"autoCalc"
+  L: "0",
+  W: "0",
+  h: "0",
+  B: "0", //送到class裡面會被轉為"autoCalc"
   doorType: "",
   material: "",
   surface: "",
   doorRail: "",
   doorRailIcon: "",
   horsepower: "",
-  qty: 1,
+  qty: "1",
   memo: "",
   ejectionDoor: false,
   typhoonProof: false,
-  unitWeight: 22,
+  unitWeight: "22",
   part: [
     {
       partType: "SJ00",

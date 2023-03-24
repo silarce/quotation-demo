@@ -37,24 +37,24 @@ type Tquotation = {
   }
   // ---------------------------------------------------------
   mainProductArr: {
-    discount: number
+    discount: string
     category: string // 項目
     series: string // 報價別 // 下拉式選單
-    L: number
-    W: number
-    h: number
-    B: number // 下拉式選單
+    L: string
+    W: string
+    h: string
+    B: string // 下拉式選單
     doorType: string // 下拉式選單
     material: string // 下拉式選單
     surface: string // 下拉式選單
     doorRail: string // 下拉式選單
     doorRailIcon: string //門軌的圖片
     horsepower: string // 下拉式選單
-    qty: number
+    qty: string
     memo: string
     ejectionDoor: boolean
     typhoonProof: boolean
-    unitWeight: number
+    unitWeight: string
     part: {
       partType: string
       partName: string
@@ -125,24 +125,24 @@ const fakeQuotationDataList: TquotationList = {
     // ---------------------------------------------------------
     mainProductArr: [
       {
-        discount: 100,
+        discount: "100",
         category: "SD1",
         series: "不是捲門",
-        L: 3,
-        W: 0,
-        h: 2,
-        B: 3.5,
+        L: "3",
+        W: "0",
+        h: "2",
+        B: "3.5",
         doorType: "SJ-302", //門型
         material: "SST304#",
         surface: "2B",
         doorRail: "sj302_30",
         doorRailIcon: iconDoorRail_sj302_30.src,
         horsepower: "1/4 HP",
-        qty: 1,
+        qty: "1",
         memo: "防颱",
         ejectionDoor: false,
         typhoonProof: false,
-        unitWeight: 22,
+        unitWeight: "22",
         part: [
           {
             partType: "SJ00",
