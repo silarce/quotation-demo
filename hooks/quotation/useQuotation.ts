@@ -22,7 +22,7 @@ const doorRail_antiTyphoon = optionsCreator_doorRail_antyTyphoon()
 type TreRender = () => void
 type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
 
-
+// =======================================================================
 class Class_basicInfo {
   constructor(
     basicInfo: Tdata["basicInfo"],
@@ -74,15 +74,7 @@ class Class_basicInfo {
 
 
 
-
-
-
-
-
-
-
-
-// ==================================================
+// =======================================================================
 class Class_mainProduct {
   constructor(
     mainProduct: Tdata["mainProductArr"][0],
@@ -348,7 +340,7 @@ class Class_mainProduct {
 
 }
 
-
+// =======================================================================
 class Class_part {
   constructor(
     part: Tdata["mainProductArr"][0]["part"][0],
@@ -414,10 +406,51 @@ class Class_part {
       .toString()
   }
 } // Class_part
+// =======================================================================
+class Class_payInfo {
+  constructor(reRender: () => void, payInfo: Tdata["payInfo"]) {
+    this._reRender = reRender
+    this._tradingLocation = payInfo.tradingLocation
+    this._tradingDate = payInfo.tradingDate
+    this._deposit = payInfo.deposit
+    this._deliveryPayment = payInfo.deliveryPayment
+    this._installedPayment = payInfo.installedPayment
+    this._eleConnectPayment = payInfo.eleConnectPayment
+  }
+  private _reRender
+
+  private _tradingLocation
+  get tradingLocation() { return this._tradingLocation }
+  set tradingLocation(v: string) { this._tradingLocation = v; this._reRender() }
+
+  private _tradingDate
+  get tradingDate() { return this._tradingDate }
+  set tradingDate(v: string) { this._tradingDate = v; this._reRender() }
+
+  private _deposit
+  get deposit() { return this._deposit }
+  set deposit(v: string) { this._deposit = v; this._reRender() }
+
+  private _deliveryPayment
+  get deliveryPayment() { return this._deliveryPayment }
+  set deliveryPayment(v: string) { this._deliveryPayment = v; this._reRender() }
+
+  private _installedPayment
+  get installedPayment() { return this._installedPayment }
+  set installedPayment(v: string) { this._installedPayment = v; this._reRender() }
+
+  private _eleConnectPayment
+  get eleConnectPayment() { return this._eleConnectPayment }
+  set eleConnectPayment(v: string) { this._eleConnectPayment = v; this._reRender() }
+
+}
 
 
-
-// =============================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
 class Class_quotation {
   constructor(
     reRender: TreRender,
@@ -430,17 +463,21 @@ class Class_quotation {
     this.basicInfo
       = new Class_basicInfo(data.basicInfo, data.fakeClienProfile, reRender)
     this.mainProductArr =
-      data.mainProductArr
-        .map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
+      data.mainProductArr.map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
+    this.payInfo = new Class_payInfo(reRender, data.payInfo)
+
     this.mainProdCellConfig = prodCellConfig
     this.partCellConfig = partCellConfig
+
+
   } // constructor
 
   private _reRender
   // ---------------------
   basicInfo
-  // ---------------------
   mainProductArr
+  payInfo
+  // ---------------------
   mainProdCellConfig  // dnd head的狀態，也是資料分類目錄
   get mainProdkeyList() {
     return this.mainProdCellConfig.keyList
@@ -474,15 +511,44 @@ class Class_quotation {
   }
   // ---------------------
   partCellConfig
+  // ---------------------
+  // 總折數
+  get avgDiscount() {
+    let avg = new Decimal(0)
+    this.mainProductArr.forEach((prod) => {
+      avg = avg.plus(prod.discount)
+    })
+    return avg.div(this.mainProductArr.length || 1).toString()
+  }
+  // 小計
+  get subTotal() {
+    let total = new Decimal(0)
+    this.mainProductArr.forEach((prod) => {
+      const priceTotal = prod.priceTotal.replaceAll(",", "")
+      total = total.plus(priceTotal)
+    })
+    return total.toString()
+  }
+  // 營業稅
+  get businessTax() { return new Decimal(this.subTotal).mul(0.05).toString() }
+  // 總計
+  get total() { return new Decimal(this.subTotal).add(this.businessTax).toString() }
+  // 變更所有mainProduct的折數
+  changeAllDiscount = (v: string) => {
+    this.mainProductArr.forEach((prod) => {
+      prod.discount = v
+    })
+    this._reRender()
+  }
+  // ---------------------
+
+  // 交貨地點
+
 
 
 
   // ---------------------
-  // private _disabled = true
-  // get disabled() { return this._disabled }
-  // set disabled(v: boolean) { this._disabled = v; this._reRender() }
-  // -----
-}
+} // Class_quotation
 
 
 
@@ -512,6 +578,7 @@ export {
   Class_basicInfo,
   Class_mainProduct,
   Class_part,
+  Class_payInfo,
   useQuotation
 }
 

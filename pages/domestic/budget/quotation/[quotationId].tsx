@@ -240,14 +240,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/* 備註/報價範圍/付款資訊 */}
-          {/* <QuotationTotal
-            {...{
-              remarkListState, rangeListState,
-              payInfoState,
-              disabled: !allowEdit,
-              prodState: prodState
-            }}
-          /> */}
+          <QuotationTotal
+            // {...{
+            //   remarkListState, rangeListState,
+            //   payInfoState,
+            //   prodState: prodState
+            // }}
+            classQuotation={classQuotation}
+            disabled={!allowEdit}
+          />
           {/* 簽名 */}
           {/* <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} /> */}
 
