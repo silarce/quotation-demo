@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 // component
-import StringList from "./quotationTotal/remarkList"
+import StringList from "./quotationTotal/TextListEditor"
 import PayInfo from "./quotationTotal/payInfo"
 import Appendix from "./quotationTotal/appendix"
 // css

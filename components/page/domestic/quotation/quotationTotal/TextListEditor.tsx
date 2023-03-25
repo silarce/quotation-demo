@@ -13,7 +13,7 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import styleL from "./local.module.scss"
 
 
-export default function RemarkList(
+export default function TextListEditor(
   {
     stringObj,
     alternateArr,
