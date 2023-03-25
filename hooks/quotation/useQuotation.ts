@@ -469,9 +469,30 @@ class Class_listString { // memo與 quoteRange
     this.stringArr.splice(index, 1)
     this._reRender()
   }
-}
+} // Class_listString
 
+// =======================================================================
+class Class_signature {
+  constructor(reRender: () => void, signature: Tdata["signature"]) {
+    this._reRender = reRender
+    this._manager = signature.manager
+    this._director = signature.director
+    this._attn = signature.attn
+  }
+  private _reRender
 
+  private _manager // 經理
+  get manager() { return this._manager }
+  set manager(v: string) { this._manager = v; this._reRender() }
+
+  private _director // 主管
+  get director() { return this._director }
+  set director(v: string) { this._director = v; this._reRender() }
+
+  private _attn // 經辦
+  get attn() { return this._attn }
+  set attn(v: string) { this._attn = v; this._reRender() }
+} // Class_signature
 
 // =======================================================================
 // =======================================================================
@@ -499,9 +520,10 @@ class Class_quotation {
     this.payInfo = new Class_payInfo(reRender, data.payInfo)
     // 備註
     this.classMemo = new Class_listString(reRender, data.memoArr)
+    // 報價範圍
     this.classQuoteRange = new Class_listString(reRender, data.quoteRangeArr)
-
-
+    // 簽名
+    this.classSignature = new Class_signature(reRender, data.signature)
 
     this.mainProdCellConfig = prodCellConfig
     this.partCellConfig = partCellConfig
@@ -516,6 +538,7 @@ class Class_quotation {
   payInfo
   classMemo
   classQuoteRange
+  classSignature
   // ---------------------
   mainProdCellConfig  // dnd head的狀態，也是資料分類目錄
   get mainProdkeyList() {

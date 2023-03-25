@@ -88,10 +88,10 @@ type Tquotation = {
     eleConnectPayment: string // 接電使用付總金額
   }
   // ---------------------------------------------------------
-  sinature: {
-    manager: string
-    director: string
-    attn: string
+  signature: {
+    manager: string // 經理
+    director: string // 主管
+    attn: string // 經辦
   }
   // ---------------------------------------------------------
   // 
@@ -201,7 +201,7 @@ const fakeQuotationDataList: TquotationList = {
       eleConnectPayment: "", // 接電使用付總金額
     },
     // ---------------------------------------------------------
-    sinature: {
+    signature: {
       manager: "王小明",
       director: "李小華",
       attn: "林小善",

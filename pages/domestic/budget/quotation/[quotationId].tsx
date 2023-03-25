@@ -112,9 +112,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const fakeQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
   const classQuotation = useQuotation(fakeQuotaion?.get())
   const fakeClientList = fakeApi_client.get()
+  const classSignature = classQuotation?.classSignature
+  const signatureArr = [
+    {
+      label: "經理",
+      signature: classSignature?.manager ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.manager = v },
+    },
+    {
+      label: "主管",
+      signature: classSignature?.director ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.director = v },
+    },
+    {
+      label: "經辦",
+      signature: classSignature?.attn ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.attn = v },
+    },
+  ]
 
   const getFakeMemo = fakeApi_memo.get
   const getFakeQuotaRange = fakeApi_quoteRange.get
+
 
 
   // =========================================================
@@ -248,18 +267,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
-            // {...{
-            //   remarkListState, rangeListState,
-            //   payInfoState,
-            //   prodState: prodState
-            // }}
             classQuotation={classQuotation}
             getFakeMemo={getFakeMemo}
             getFakeQuotaRange={getFakeQuotaRange}
             disabled={!allowEdit}
           />
           {/* 簽名 */}
-          {/* <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} /> */}
+          <QuotationSinature
+            signatureArr={signatureArr}
+            disabled={!allowEdit} />
 
 
         </div>
