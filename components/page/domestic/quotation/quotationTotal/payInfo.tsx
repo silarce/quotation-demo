@@ -17,7 +17,7 @@ export default function PayInfo(
     }) {
   // -----------------------------------------------------------------------
   const {
-    payInfo,
+    classPayInfo: payInfo,
     avgDiscount, subTotal, businessTax, total,
     changeAllDiscount,
   } = classQuotation

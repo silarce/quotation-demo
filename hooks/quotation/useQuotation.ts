@@ -15,6 +15,9 @@ import {
   optionsCreator_doorRail_antyTyphoon,
 } from "fakeDatabase/options/options"
 
+// type
+import { Tquotation, } from "fakeDatabase/domestic/_fakeQuotation"
+
 const doorRail_normal = optionsCreator_doorRail_normal()
 const doorRail_antiTyphoon = optionsCreator_doorRail_antyTyphoon()
 
@@ -25,22 +28,21 @@ type Tdata = ReturnType<Class_fakeApi_quotation["get"]>
 // =======================================================================
 class Class_basicInfo {
   constructor(
+    reRender: TreRender,
     basicInfo: Tdata["basicInfo"],
     clientProfile: Tdata["fakeClienProfile"] | undefined,
-    reRender: TreRender) {
+    classQuotation: Class_quotation,
+  ) {
+    this._classQuotation = classQuotation
     this._reRender = reRender
     this._basicInfo = basicInfo
     this._clientProfile = clientProfile
   }
+  _classQuotation
   private _reRender
   private _basicInfo
   private _clientProfile: Tdata["fakeClienProfile"] | undefined
-  get all() {
-    return {
-      basicInfo: this._basicInfo,
-      clientProfile: this._clientProfile
-    }
-  }
+
   setBasicInfoString = (
     key: keyof Omit<typeof this._basicInfo,
       "tempQuotationAging" | "totalDiscount" |
@@ -51,15 +53,6 @@ class Class_basicInfo {
     this._basicInfo[key] = value
     this._reRender()
   }
-  // setBasicInfoNumber = (
-  //   key: keyof Pick<typeof this._basicInfo,
-  //     "tempQuotationAging" | "totalDiscount" |
-  //     "tempDoorQty" | "tempBudgetAmount">,
-  //   value: number,
-  // ) => {
-  //   this._basicInfo[key] = value
-  //   this._reRender()
-  // }
 
   set quoStatus(v: "預算" | "投標" | "發包" | "合約") {
     this._basicInfo.quoStatus = v
@@ -68,7 +61,21 @@ class Class_basicInfo {
 
   set clientProfile(data: Tdata["fakeClienProfile"] | undefined) {
     this._clientProfile = data
+    this._classQuotation.clientId = data?.clientId ?? ""
     this._reRender()
+  }
+
+  get all() {
+    return {
+      basicInfo: this._basicInfo,
+      clientProfile: this._clientProfile
+    }
+  }
+
+  get postBody(): Tquotation["basicInfo"] {
+    return {
+      ...this._basicInfo
+    }
   }
 }
 
@@ -78,7 +85,8 @@ class Class_basicInfo {
 class Class_mainProduct {
   constructor(
     mainProduct: Tdata["mainProductArr"][0],
-    reRender: TreRender) {
+    reRender: TreRender,
+  ) {
     this._reRender = reRender
     // this._mainProduct = mainProduct
     this._discount = mainProduct.discount
@@ -337,7 +345,35 @@ class Class_mainProduct {
     }
   }
 
+  get postBody(): Tdata["mainProductArr"][number] {
+    return {
+      discount: this.discount,
+      category: this.category,
+      L: this.L,
+      W: this.W,
+      h: this.h,
+      qty: this.qty,
 
+
+      memo: this.memo,
+      doorType: this.doorType.value,
+      horsepower: this.horsepower.value,
+      series: this.series.value,
+
+      material: this.material.value,
+      surface: this.surface.value,
+      doorRail: this.doorRail.value,
+      B: this.B.value,
+
+      ejectionDoor: this.ejectionDoor,
+      typhoonProof: this.typhoonProof,
+
+      seriesType: this.seriesType,
+      doorRailIcon: this.doorRail.icon ?? "",
+      unitWeight: this._unitWeight,
+      part: this._partArr.map((classPart) => classPart.postBody)
+    }
+  }
 }
 
 // =======================================================================
@@ -405,6 +441,20 @@ class Class_part {
       .div(100).toFixed(2)
       .toString()
   }
+
+  get postBody(): Tdata["mainProductArr"][number]["part"][number] {
+    return {
+      partType: this.partType,
+      partName: this.partName,
+      partId: this.partId,
+      material: this._material.value,
+      basicWeight: this.basicWeight,
+      unit: this.unit,
+      qty: this.qty,
+      listPrice: this.listPrice,
+    }
+  }
+
 } // Class_part
 // =======================================================================
 class Class_payInfo {
@@ -506,18 +556,21 @@ class Class_quotation {
     prodCellConfig: TprodCellConfig,
     partCellConfig: TpartCellConfig
   ) {
+
+    this._quotaionDataOri = data
+
     this._reRender = reRender
 
     // 選配設定目前沒有設計要可以編輯，所以暫時直接在元件內用固定資料
 
     // 報價單基本資料
     this.basicInfo
-      = new Class_basicInfo(data.basicInfo, data.fakeClienProfile, reRender)
+      = new Class_basicInfo(reRender, data.basicInfo, data.fakeClienProfile, this)
     // 主產品設定 (包括材料配件設定)
     this.mainProductArr =
       data.mainProductArr.map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
     //  付款資訊
-    this.payInfo = new Class_payInfo(reRender, data.payInfo)
+    this.classPayInfo = new Class_payInfo(reRender, data.payInfo)
     // 備註
     this.classMemo = new Class_listString(reRender, data.memoArr)
     // 報價範圍
@@ -528,14 +581,16 @@ class Class_quotation {
     this.mainProdCellConfig = prodCellConfig
     this.partCellConfig = partCellConfig
 
+    this.clientId = data.clientId
 
   } // constructor
 
+  private _quotaionDataOri
   private _reRender
   // ---------------------
   basicInfo
   mainProductArr
-  payInfo
+  classPayInfo
   classMemo
   classQuoteRange
   classSignature
@@ -602,9 +657,24 @@ class Class_quotation {
     })
     this._reRender()
   }
+
+  // ---------------------
+  clientId
   // ---------------------
 
-
+  get postData(): Tquotation {
+    return {
+      basicInfo: this.basicInfo.postBody,
+      mainProductArr: this.mainProductArr.map((mp) => mp.postBody),
+      accessory: this._quotaionDataOri.accessory,
+      payInfo: this.classPayInfo,
+      signature: this.classSignature,
+      clientId: this.clientId,
+      memoArr: this.classMemo.stringArr,
+      quoteRangeArr: this.classQuoteRange.stringArr,
+      tempRecord: this._quotaionDataOri.tempRecord,
+    }
+  }
   // ---------------------
 } // Class_quotation
 
@@ -643,21 +713,9 @@ export {
 
 
 const unexpectedOption = (v: string, icon?: string) => {
-
-  if (icon) return {
-    value: v,
-    label: v,
-    icon
-  }
-
-
-  return {
-    value: v,
-    label: v,
-  }
+  if (icon) return { value: v, label: v, icon }
+  return { value: v, label: v, }
 }
-
-
 
 
 

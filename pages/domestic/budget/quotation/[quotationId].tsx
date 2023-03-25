@@ -10,8 +10,6 @@ import Select from 'react-select';
 import type { GroupBase, } from 'react-select';
 
 
-
-
 // components
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
@@ -36,13 +34,6 @@ import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import TextareaModal from "components/global/gear/modal/simpleModal/textareaModal";
 
-// hook
-import useProfile from "components/page/domestic/quotation/hook/useProfile"
-import useProduct, { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
-import useRemarkList from "components/page/domestic/quotation/hook/useRemarkList"
-import useRangeList from "components/page/domestic/quotation/hook/useRangeList"
-import usePayInfo from "components/page/domestic/quotation/hook/usePayInfo"
-import useSinature from "components/page/domestic/quotation/hook/useSinature"
 
 
 // icon
@@ -57,14 +48,10 @@ import style from "./quotation.module.scss"
 
 // fakeData type
 import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
-// import { fakeProdChangingRecordList } from "fakeDatabase/domestic/quotation/fakeChangeProductRecord"
 
 
 // 生成假資料
 const fakeQuotationObjList = fakeQuotationObjListOri()
-
-
-
 
 
 
@@ -83,7 +70,6 @@ import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
 // =============================================================
 // =============================================================
 // =============================================================
-
 
 
 
@@ -109,8 +95,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
 
-  const fakeQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
-  const classQuotation = useQuotation(fakeQuotaion?.get())
+  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
+
+  const classQuotation = useQuotation(fakeApiQuotaion?.get())
   const fakeClientList = fakeApi_client.get()
   const classSignature = classQuotation?.classSignature
   const signatureArr = [
@@ -185,9 +172,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [showMemoModal, setShowMemoModal] = useState(false)
   const inputModalOnConfirm = (v: string) => {
+    if (!fakeApiQuotaion || !classQuotation) return myAlert.warning({ title: "fakeApiQuotaion或classQuotation為undefined" })
     if (!v) return myAlert.warning({ title: "請輸入註解" })
-    alert("上傳")
+    fakeApiQuotaion.put(classQuotation.postData)
     setShowMemoModal(false)
+    setAllowEdit(false)
   }
 
   const tagList: TtagList = [
@@ -276,11 +265,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature
             signatureArr={signatureArr}
             disabled={!allowEdit} />
-
-
         </div>
       </div>
-      {/* <TextareaModal
+      <TextareaModal
         visible={showMemoModal}
         setVisible={setShowMemoModal}
         title={"追加追減備註"}
@@ -289,7 +276,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         textLength={25}
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
-      /> */}
+      />
       {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}

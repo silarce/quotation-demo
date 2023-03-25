@@ -1,5 +1,6 @@
 
 
+// 這些是門軌的圖片，未來可能會用到
 import iconDoorRail_sj302_30
   from "public/image/fakeDB/doorRail/normal/SJ302_30.svg"
 import iconDoorRail_sj302_75_30t

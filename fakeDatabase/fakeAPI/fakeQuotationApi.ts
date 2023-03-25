@@ -27,11 +27,12 @@ class Class_fakeApi_quotation {
       // rangeArr,
     }
   }
-  // put(quotation: Tquotation) {
-  //   const { quotationId } = quotation
-  //   this._quotation = quotation
-  //   fakeQuotationDataList[quotationId] = quotation
-  // }
+  put(quotation: Tquotation) {
+    const { quotationId } = quotation.basicInfo
+    this._quotation = quotation
+    fakeQuotationDataList[quotationId] = quotation
+  }
+
 }
 
 
