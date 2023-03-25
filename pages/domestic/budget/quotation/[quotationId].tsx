@@ -76,6 +76,8 @@ const fakeQuotationObjList = fakeQuotationObjListOri()
 import { fakeApi_quotation_creator } from "fakeDatabase/fakeAPI/fakeQuotationApi";
 import { useQuotation } from "hooks/quotation/useQuotation";
 import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
+import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
 // =============================================================
 // =============================================================
 // =============================================================
@@ -110,6 +112,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const fakeQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
   const classQuotation = useQuotation(fakeQuotaion?.get())
   const fakeClientList = fakeApi_client.get()
+
+  const getFakeMemo = fakeApi_memo.get
+  const getFakeQuotaRange = fakeApi_quoteRange.get
+
+
   // =========================================================
   // =========================================================
   // =========================================================
@@ -247,6 +254,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             //   prodState: prodState
             // }}
             classQuotation={classQuotation}
+            getFakeMemo={getFakeMemo}
+            getFakeQuotaRange={getFakeQuotaRange}
             disabled={!allowEdit}
           />
           {/* 簽名 */}

@@ -18,13 +18,13 @@ class Class_fakeApi_quotation {
   get() {
     const theData = _.cloneDeep(this._quotation)
     const fakeClienProfile = _.cloneDeep(fakeClientProfileList[theData.clientId])
-    const memoArr = theData.memoIdArr.map((id) => fakeMemoDataArr[id - 1])
-    const rangeArr = theData.rangeIdArr.map((id) => fakeQuoteRangeDataArr[id - 1])
+    // const memoArr = theData.memoIdArr.map((id) => fakeMemoDataArr[id - 1])
+    // const rangeArr = theData.rangeIdArr.map((id) => fakeQuoteRangeDataArr[id - 1])
     return {
       ...theData,
       fakeClienProfile,
-      memoArr,
-      rangeArr,
+      // memoArr,
+      // rangeArr,
     }
   }
   // put(quotation: Tquotation) {

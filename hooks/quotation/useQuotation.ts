@@ -442,8 +442,35 @@ class Class_payInfo {
   private _eleConnectPayment
   get eleConnectPayment() { return this._eleConnectPayment }
   set eleConnectPayment(v: string) { this._eleConnectPayment = v; this._reRender() }
+} // Class_payInfo
 
+// =======================================================================
+
+
+class Class_listString { // memo與 quoteRange
+  constructor(reRender: () => void, stringArr: Tdata["quoteRangeArr" | "memoArr"]) {
+    this._reRender = reRender
+    this.stringArr = stringArr
+  }
+
+  private _reRender
+  stringArr
+
+  editString = (index: number, v: string) => {
+    this.stringArr[index] = v
+    this._reRender()
+  }
+  addString = (v: string | string[]) => {
+    if (typeof v === "string") this.stringArr.push(v)
+    else this.stringArr = [...this.stringArr, ...v]
+    this._reRender()
+  }
+  delString = (index: number) => {
+    this.stringArr.splice(index, 1)
+    this._reRender()
+  }
 }
+
 
 
 // =======================================================================
@@ -460,11 +487,21 @@ class Class_quotation {
   ) {
     this._reRender = reRender
 
+    // 選配設定目前沒有設計要可以編輯，所以暫時直接在元件內用固定資料
+
+    // 報價單基本資料
     this.basicInfo
       = new Class_basicInfo(data.basicInfo, data.fakeClienProfile, reRender)
+    // 主產品設定 (包括材料配件設定)
     this.mainProductArr =
       data.mainProductArr.map((mainProduct) => new Class_mainProduct(mainProduct, reRender))
+    //  付款資訊
     this.payInfo = new Class_payInfo(reRender, data.payInfo)
+    // 備註
+    this.classMemo = new Class_listString(reRender, data.memoArr)
+    this.classQuoteRange = new Class_listString(reRender, data.quoteRangeArr)
+
+
 
     this.mainProdCellConfig = prodCellConfig
     this.partCellConfig = partCellConfig
@@ -477,6 +514,8 @@ class Class_quotation {
   basicInfo
   mainProductArr
   payInfo
+  classMemo
+  classQuoteRange
   // ---------------------
   mainProdCellConfig  // dnd head的狀態，也是資料分類目錄
   get mainProdkeyList() {
@@ -542,10 +581,6 @@ class Class_quotation {
   }
   // ---------------------
 
-  // 交貨地點
-
-
-
 
   // ---------------------
 } // Class_quotation
@@ -579,6 +614,7 @@ export {
   Class_mainProduct,
   Class_part,
   Class_payInfo,
+  Class_listString,
   useQuotation
 }
 
