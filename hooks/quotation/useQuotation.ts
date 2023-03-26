@@ -431,13 +431,13 @@ class Class_part {
   }
   // 單價 (有計算折數的單價)
   get price() {
-    return Decimal.mul(this.listPrice, this._parent.discount)
+    return Decimal.mul(this.listPrice, this._parent.discount || 0)
       .div(100).toFixed(2)
       .toString()
   }
   //複價 (有計算折數的複價)
   get totalPrice() {
-    return Decimal.mul(this.totalListPrice, this._parent.discount)
+    return Decimal.mul(this.totalListPrice, this._parent.discount || 0)
       .div(100).toFixed(2)
       .toString()
   }
@@ -650,7 +650,7 @@ class Class_quotation {
   get avgDiscount() {
     let avg = new Decimal(0)
     this.mainProductArr.forEach((prod) => {
-      avg = avg.plus(prod.discount)
+      avg = avg.plus(prod.discount || 0)
     })
     return avg.div(this.mainProductArr.length || 1).toString()
   }
