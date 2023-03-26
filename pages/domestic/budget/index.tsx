@@ -1,14 +1,10 @@
-import {
-  ChangeEvent
-  , useState
-} from 'react'
+import { useState } from 'react'
 import { useRouter } from "next/router";
 
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
-
 
 // components
 import BudgeList from "components/page/domestic/budget/budgetList"
@@ -28,9 +24,6 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 // fakeData
 // fake
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
-
-
-// import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 // type
 import { Toption } from "components/global/gear/select/select03"
 
@@ -46,15 +39,6 @@ import { Toption } from "components/global/gear/select/select03"
 
 export default function Budget() {
   const router = useRouter()
-  // const { fakeBudgetList } = fakeBudgetListGroup
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
-
-  const projectArr = projectSimple.wrapper.get({
-    filter: {}
-  })
-  // ===================================================
-  // panelList
-
   // 搜尋用的
   const [searchObj, setSearchObj] = useState<TsearchObj>({
     doorType: "",
@@ -62,6 +46,20 @@ export default function Budget() {
     clientName: "",
     projectName: "",
   })
+
+  // 資料
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
+  const projectArr = projectSimple.wrapper.get({
+    filter: {
+      county: searchObj.county,
+      clientName: searchObj.clientName,
+      constructionName: searchObj.projectName,
+    }
+  })
+
+
+  // ===================================================
+  // panelList
 
   const searchTargetList = [
     {
