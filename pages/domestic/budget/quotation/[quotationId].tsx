@@ -1,7 +1,7 @@
 // 報價單
 import React, {
   Dispatch, SetStateAction, FocusEvent,
-  useState, useMemo, useRef
+  useState, useMemo, useRef, useEffect
 } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
@@ -46,12 +46,12 @@ const optionQuotationState = optionsCreator_quotationState()
 // css
 import style from "./quotation.module.scss"
 
-// fakeData type
-import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
 
-// 生成假資料
-const fakeQuotationObjList = fakeQuotationObjListOri()
+// // fakeData type
+// import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
+// // 生成假資料
+// const fakeQuotationObjList = fakeQuotationObjListOri()
 
 
 // =============================================================
@@ -91,11 +91,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
   // =========================================================
+
+  // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
+  // let quotationData: Tquotation | undefined;
+  // if (typeof quotationId === "string" && quotationId !== "newQuotation") {
+  //   quotationData = fakeQuotationObjList[quotationId]
+  //   if (!quotationData) quotationData = undefined
+  // }
+  // --------------------------------------------------------------------------
+  // 是否可編輯
+  // const [allowEdit, setAllowEdit] =
+  //   useState(quotationId === "newQuotation" ? true : false)
+  const [allowEdit, setAllowEdit] = useState(false)
   // =========================================================
 
   const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
 
-  const classQuotation = useQuotation(fakeApiQuotaion?.get())
+  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get())
   const fakeClientList = fakeApi_client.get()
   const classSignature = classQuotation?.classSignature
   const signatureArr = [
@@ -119,6 +131,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const getFakeMemo = fakeApi_memo.get
   const getFakeQuotaRange = fakeApi_quoteRange.get
 
+  useEffect(() => {
+    reNewClassQuotation()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowEdit])
 
 
   // =========================================================
@@ -137,16 +153,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
-  let quotationData: Tquotation | undefined;
-  if (typeof quotationId === "string" && quotationId !== "newQuotation") {
-    quotationData = fakeQuotationObjList[quotationId]
-    if (!quotationData) quotationData = undefined
-  }
-  // --------------------------------------------------------------------------
-  // 是否可編輯
-  const [allowEdit, setAllowEdit] =
-    useState(quotationId === "newQuotation" ? true : false)
   // --------------------------------------------------------------------------
   const [quotationState, setQuotationState] = useState<Toption>({ value: "預算", label: "預算" })
 
@@ -196,8 +202,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  if (quotationId !== "newQuotation" && !quotationData)
-    return <NoQuotation quotationId={quotationId as string} />
+  // if (quotationId !== "newQuotation" && !quotationData)
+  //   return <NoQuotation quotationId={quotationId as string} />
+  // if (quotationId !== "newQuotation")
+  //   return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   if (!classQuotation) return null

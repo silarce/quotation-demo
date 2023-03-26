@@ -701,7 +701,6 @@ class Class_quotation {
 const useQuotation = (data: Tdata | undefined) => {
   const [render, setRender] = useState(0)
   const reRender: TreRender = () => setRender(state => state + 1)
-
   const checkData = () => {
     if (data) return new Class_quotation(
       reRender,
@@ -711,12 +710,13 @@ const useQuotation = (data: Tdata | undefined) => {
     )
     return undefined
   }
-  const [classQuotaion, setQuotation] = useState(checkData())
-  return classQuotaion
+  const reNew = () => {
+    setQuotation(checkData())
+  }
+
+  const [classQuotation, setQuotation] = useState(checkData())
+  return { classQuotation, reNew }
 }
-
-
-
 
 export {
   Class_quotation,
@@ -727,7 +727,6 @@ export {
   Class_listString,
   useQuotation
 }
-
 
 const unexpectedOption = (v: string, icon?: string) => {
   if (icon) return { value: v, label: v, icon }
