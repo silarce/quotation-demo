@@ -564,7 +564,7 @@ class Class_quotation {
     // 選配設定目前沒有設計要可以編輯，所以暫時直接在元件內用固定資料
 
     // 報價單基本資料
-    this.basicInfo
+    this.classBasicInfo
       = new Class_basicInfo(reRender, data.basicInfo, data.fakeClienProfile, this)
     // 主產品設定 (包括材料配件設定)
     this.mainProductArr =
@@ -588,7 +588,7 @@ class Class_quotation {
   private _quotaionDataOri
   private _reRender
   // ---------------------
-  basicInfo
+  classBasicInfo
   mainProductArr
   classPayInfo
   classMemo
@@ -664,7 +664,7 @@ class Class_quotation {
 
   get postData(): Tquotation {
     return {
-      basicInfo: this.basicInfo.postBody,
+      basicInfo: this.classBasicInfo.postBody,
       mainProductArr: this.mainProductArr.map((mp) => mp.postBody),
       accessory: this._quotaionDataOri.accessory,
       payInfo: this.classPayInfo,

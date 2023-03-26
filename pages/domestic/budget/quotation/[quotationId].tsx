@@ -232,7 +232,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           <QuotationProfile
-            classBasicInfo={classQuotation.basicInfo}
+            classBasicInfo={classQuotation.classBasicInfo}
             fakeClientList={fakeClientList}
             disabled={!allowEdit} />
 
@@ -277,16 +277,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
-      {/* <QuotationPdf
+      <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
-        profileState={profileState}
-        prodState={prodState}
-        remarkListState={remarkListState}
-        rangeListState={rangeListState}
-        payInfoState={payInfoState}
-        sinatureState={sinatureState}
-      /> */}
+        classQuotation={classQuotation}
+        // profileState={profileState}
+        // prodState={prodState}
+        // remarkListState={remarkListState}
+        // rangeListState={rangeListState}
+        // payInfoState={payInfoState}
+        // sinatureState={sinatureState}
+      />
 
       {/*  */}
       {/* <QuotationPdf_part

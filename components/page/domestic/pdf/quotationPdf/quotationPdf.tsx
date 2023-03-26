@@ -1,7 +1,4 @@
-import React, {
-  Dispatch, SetStateAction,
-  useState, useEffect, useRef, Fragment
-} from "react"
+import React, { useState, useRef, Fragment } from "react"
 import html2canvas from 'html2canvas'
 import jsPDF from "jspdf"
 
@@ -27,34 +24,25 @@ import Modal from "antd/lib/modal/Modal"
 import scss from "./quotationPdf.module.scss"
 
 // type
-import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
-import { TuseProduct, ProdClass } from "components/page/domestic/quotation/hook/useProduct"
-import { TuseRemarkList } from "components/page/domestic/quotation/hook/useRemarkList"
-import { TuseRangeList } from "components/page/domestic/quotation/hook/useRangeList"
-import { TusePayInfo } from "components/page/domestic/quotation/hook/usePayInfo"
-import { TuseSinature } from "components/page/domestic/quotation/hook/useSinature"
+import { Class_quotation } from "hooks/quotation/useQuotation"
 
 export default function QuotationPdf(
   { isVisable, onCancel,
-    profileState,
-    prodState,
-    remarkListState,
-    rangeListState,
-    payInfoState,
-    sinatureState,
+    classQuotation,
   }:
     {
       isVisable: boolean
       onCancel: () => void
-      profileState: TuseProfile
-      prodState: TuseProduct
-      remarkListState: TuseRemarkList
-      rangeListState: TuseRangeList
-      payInfoState: TusePayInfo
-      sinatureState: TuseSinature
+      classQuotation: Class_quotation
     }
 ) {
 
+
+  const {
+    classBasicInfo
+  } = classQuotation
+
+  const { quotationId } = classBasicInfo.all.basicInfo
 
 
   const [pdfType, setPdfType] = useState("typeA")
@@ -62,10 +50,6 @@ export default function QuotationPdf(
   // useEffect(() => {
   //   showRootLoading(true, "正在處理PDF")
   // }, [])
-
-  // ------------------------------------------------------------------
-
-  const quotationId = profileState.profile.quotationId
 
   // ------------------------------------------------------------------
   const refPdf = useRef<(HTMLDivElement | null)[]>([])
@@ -100,6 +84,54 @@ export default function QuotationPdf(
   }
 
   // ----------------------------------------------------------------------------
+  // profile
+  const profilePram = (() => {
+    const { basicInfo, clientProfile } = classQuotation.classBasicInfo.all
+    const {
+      quotationId,
+      date: builtDate,
+      constructionCounty,
+      constructionDistrict,
+      constructionAddress,
+    } = basicInfo
+    const {
+      name: clientName,
+      contact,
+      fax,
+    } = clientProfile ?? {}
+
+    return {
+      quotationId,
+      clientName: clientName ?? "",
+      contactPerson: contact?.[0].name ?? "",
+      contactPhone: contact?.[0].phone ?? "",
+      fax: fax ?? "",
+      builtDate,
+      projectAddress: constructionCounty + constructionDistrict + constructionAddress,
+    }
+  })()
+  // -------------------------------
+  // total
+  const totalPram = (() => {
+    const memoArr = classQuotation.classMemo.stringArr
+    const settlement = {
+      subTotal: parseFloat(classQuotation.subTotal),
+      businessTax: parseFloat(classQuotation.businessTax),
+      total: parseFloat(classQuotation.total),
+    }
+    return { memoArr, settlement, }
+  })()
+  // -------------------------------
+  // other
+  const otherPram = (() => {
+    const quoteRangeArr = classQuotation.classQuoteRange.stringArr
+    const payInfo = classQuotation.classPayInfo
+    const attn = classQuotation.classSignature.attn
+    return { quoteRangeArr, payInfo, attn, }
+  })()
+
+
+  // ----------------------------------------------------------------------------
   return (
     <Modal className={scss.quotationPdf}
       // wrapClassName={style.modal}
@@ -129,23 +161,18 @@ export default function QuotationPdf(
 
       {pdfType === "typeA" &&
         <PdfTypeA refPdf={refPdf}
-          profileState={profileState}
-          prodState={prodState}
-          remarkListState={remarkListState}
-          rangeListState={rangeListState}
-          payInfoState={payInfoState}
-          sinatureState={sinatureState}
-        />
+          productArr={classQuotation.mainProductArr.map((mp) => mp.allData)}
+          profilePram={profilePram}
+          totalPram={totalPram}
+          otherPram={otherPram} />
       }
       {pdfType === "typeB" &&
-        <PdfTypeB refPdf={refPdf}
-          profileState={profileState}
-          prodState={prodState}
-          remarkListState={remarkListState}
-          rangeListState={rangeListState}
-          payInfoState={payInfoState}
-          sinatureState={sinatureState}
-        />
+        <PdfTypeB
+          refPdf={refPdf}
+          productArr={classQuotation.mainProductArr.map((mp) => mp.allData)}
+          profilePram={profilePram}
+          totalPram={totalPram}
+          otherPram={otherPram} />
       }
     </Modal>
   )
@@ -154,26 +181,21 @@ export default function QuotationPdf(
 // typeA 用在只有一頁的情況
 const PdfTypeA = (
   { refPdf,
-    profileState,
-    prodState,
-    remarkListState,
-    rangeListState,
-    payInfoState,
-    sinatureState
+    productArr,
+    profilePram,
+    totalPram,
+    otherPram,
   }:
     {
       refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
-      profileState: TuseProfile
-      prodState: TuseProduct
-      remarkListState: TuseRemarkList
-      rangeListState: TuseRangeList
-      payInfoState: TusePayInfo
-      sinatureState: TuseSinature
+      productArr: Parameters<typeof Table>[0]["productList"]
+      profilePram: Parameters<typeof Profile>[0]["profileData"]
+      totalPram: Parameters<typeof Total>[0]
+      otherPram: Parameters<typeof Other>[0]
     }
 ) => {
 
-  const { mainProductArr: productList } = prodState
-  const chunkedList = _.chunk(productList, 12) as ProdClass[][]
+  const chunkedList = _.chunk(productArr, 12) as typeof productArr[]
   const pageCount = chunkedList.length
 
   // --------------------------------------------------------------------------
@@ -188,15 +210,15 @@ const PdfTypeA = (
               ref={ele => refPdf.current[0] = ele}>
               <div>
                 <Header />
-                <Profile profileState={profileState} index={index + 1} pageCount={pageCount} />
+                <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />
                 <Table productList={chunk} />
               </div>
               <div>
-                <Total remarkListState={remarkListState} prodState={prodState} />
+                <Total memoArr={totalPram.memoArr} settlement={totalPram.settlement} />
                 <Other
-                  rangeListState={rangeListState}
-                  payInfoState={payInfoState}
-                  sinatureState={sinatureState}
+                  quoteRangeArr={otherPram.quoteRangeArr}
+                  payInfo={otherPram.payInfo}
+                  attn={otherPram.attn}
                 />
               </div>
             </div>
@@ -209,48 +231,37 @@ const PdfTypeA = (
 
 // typeB 用在多頁的情況
 const PdfTypeB = (
-  { refPdf,
-    profileState,
-    prodState,
-    remarkListState,
-    rangeListState,
-    payInfoState,
-    sinatureState
+  {
+    refPdf,
+    productArr,
+    profilePram,
+    totalPram,
+    otherPram,
   }:
     {
       refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
-      profileState: TuseProfile
-      prodState: TuseProduct
-      remarkListState: TuseRemarkList
-      rangeListState: TuseRangeList
-      payInfoState: TusePayInfo
-      sinatureState: TuseSinature
+      productArr: (Parameters<typeof Table>[0]["productList"][number] & { series: string })[]
+      profilePram: Parameters<typeof Profile>[0]["profileData"]
+      totalPram: Parameters<typeof Total>[0]
+      otherPram: Parameters<typeof Other>[0]
     }
 ) => {
 
-  const { mainProductArr: productList } = prodState
-  const chunkedList = _.chunk(productList, 40) as ProdClass[][]
+  const chunkedList = _.chunk(productArr, 40) as typeof productArr[]
   const pageCount = chunkedList.length + 1
   // --------------------------------------------------------------------------
 
-
-
-  // console.log(productList)
-
+  // 根據series(門型類型)分類，計算樘數、總單價金額、總複價功能
   const quoteTypeSumObj: TquoteTypeSumList = {}
-
-  productList.forEach((prod) => {
-    const { quoteType, qty, unitPrice, priceTotal } = prod
-    const key = quoteType.value
-
+  productArr.forEach((prod) => {
+    const { series, qty, unitPrice, priceTotal } = prod
+    const key = series
     if (!quoteTypeSumObj[key]) quoteTypeSumObj[key] = {
-      quoteType: quoteType.label,
+      series: series,
       qtySum: 0,
       unitPriceSum: 0,
       priceTotleSum: 0,
     }
-
-
     quoteTypeSumObj[key].qtySum
       = quoteTypeSumObj[key].qtySum + parseInt(qty)
     quoteTypeSumObj[key].unitPriceSum
@@ -258,7 +269,6 @@ const PdfTypeB = (
     quoteTypeSumObj[key].priceTotleSum
       = new Decimal(quoteTypeSumObj[key].priceTotleSum).plus(priceTotal.replace(",", "")).toNumber()
   })
-
   const quoteTypeSumArr = Object.values(quoteTypeSumObj)
 
   // --------------------------------------------------------------------------
@@ -269,16 +279,15 @@ const PdfTypeB = (
         ref={ele => refPdf.current[0] = ele}>
         <div>
           <Header />
-          <Profile profileState={profileState} index={1} pageCount={pageCount} />
+          <Profile profileData={profilePram} index={1} pageCount={pageCount} />
           <Table_quoteTypeSum quoteTypeSumArr={quoteTypeSumArr} />
         </div>
         <div>
-          <Total remarkListState={remarkListState} prodState={prodState} />
+          <Total memoArr={totalPram.memoArr} settlement={totalPram.settlement} />
           <Other
-            rangeListState={rangeListState}
-            payInfoState={payInfoState}
-            sinatureState={sinatureState}
-          />
+            quoteRangeArr={otherPram.quoteRangeArr}
+            payInfo={otherPram.payInfo}
+            attn={otherPram.attn} />
         </div>
       </div>
       {/* 第一頁之後 */}
@@ -289,7 +298,7 @@ const PdfTypeB = (
             <div className={scss.pdf}
               ref={ele => refPdf.current[index + 1] = ele}>
               <Header />
-              <Profile profileState={profileState} index={index + 2} pageCount={pageCount} />
+              <Profile profileData={profilePram} index={index + 2} pageCount={pageCount} />
               <Table productList={chunk} />
             </div>
           </Fragment>
@@ -300,10 +309,3 @@ const PdfTypeB = (
 }
 
 // ========================================================================
-
-
-
-
-
-
-

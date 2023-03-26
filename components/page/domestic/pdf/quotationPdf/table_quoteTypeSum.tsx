@@ -4,7 +4,7 @@ import style from "./quotationPdf.module.scss"
 
 
 type TquoteTypeSum = {
-  quoteType: string
+  series: string
   qtySum: number
   unitPriceSum: number
   priceTotleSum: number
@@ -63,7 +63,7 @@ export default function Table_quoteTypeSum(
 // =============================================================================
 
 type TindexKeys =
-  "quoteType" | "qtySum" | "unitPriceSum" | "priceTotleSum"
+  "series" | "qtySum" | "unitPriceSum" | "priceTotleSum"
 
 type Tconfig = {
   [key in TindexKeys]: {
@@ -74,11 +74,11 @@ type Tconfig = {
 }
 
 const indexKeys: TindexKeys[] = [
-  "quoteType", "qtySum", "unitPriceSum", "priceTotleSum"
+  "series", "qtySum", "unitPriceSum", "priceTotleSum"
 ]
 
 const config: Tconfig = {
-  quoteType: {
+  series: {
     label: "門型類型",
     width: "auto",
   },
