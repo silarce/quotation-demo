@@ -88,6 +88,12 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
 
+  let {
+    quotationId, //報價單id //若為新增報價單則為newQuotation
+    isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
+  } = router.query
+
+
   // =========================================================
   // =========================================================
   // =========================================================
@@ -104,7 +110,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   //   useState(quotationId === "newQuotation" ? true : false)
   const [allowEdit, setAllowEdit] = useState(false)
   // =========================================================
-
   const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
 
   const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get())
@@ -141,11 +146,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
   // =========================================================
-  let {
-    quotationId, //報價單id //若為新增報價單則為newQuotation
-    newQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
-  } = router.query
-  if (typeof newQuotationId !== "string") newQuotationId = ""
+
   // --------------------------------------------------------------------------
 
   const [showPdf, setShowPdf] = useState(false)
@@ -160,15 +161,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const inputModalOnConfirm = (v: string) => {
     if (!fakeApiQuotaion || !classQuotation) return myAlert.warning({ title: "fakeApiQuotaion或classQuotation為undefined" })
     if (!v) return myAlert.warning({ title: "請輸入註解" })
-    fakeApiQuotaion.put(classQuotation.postData)
+    if (isNewQuotationId) fakeApiQuotaion.post(classQuotation.postData)
+    else fakeApiQuotaion.put(classQuotation.postData)
     setShowMemoModal(false)
     setAllowEdit(false)
   }
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${newQuotationId || quotationId}`,
-      onClick: () => alert(newQuotationId || quotationId)
+      label: `報價編號 ${quotationId}`,
+      onClick: () => alert(quotationId)
     },
     { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
@@ -292,7 +294,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     </div>
   )
 }
-
 
 // ==========================================================================
 // ==========================================================================

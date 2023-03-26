@@ -26,7 +26,11 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 
 
 // fakeData
-import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+// fake
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
+
+
+// import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 // type
 import { Toption } from "components/global/gear/select/select03"
 
@@ -42,8 +46,12 @@ import { Toption } from "components/global/gear/select/select03"
 
 export default function Budget() {
   const router = useRouter()
-  const { fakeBudgetList } = fakeBudgetListGroup
+  // const { fakeBudgetList } = fakeBudgetListGroup
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
 
+  const projectArr = projectSimple.wrapper.get({
+    filter: {}
+  })
   // ===================================================
   // panelList
 
@@ -104,11 +112,11 @@ export default function Budget() {
       type: "addButton",
       label: "新增報價單",
       onClick: () => {
-        let newQuotationId = `${fakeBudgetList.length + 1}`.padStart(2, "0")
+        let newQuotationId = `${projectArr.length + 1}`.padStart(2, "0")
         newQuotationId = "S-110211-" + newQuotationId
         router.push({
-          pathname: `/domestic/budget/quotation/newQuotation`,
-          query: { newQuotationId }
+          pathname: `/domestic/budget/quotation/${newQuotationId}`,
+          query: { isNewQuotation: true }
         })
       }
     },
@@ -122,7 +130,7 @@ export default function Budget() {
       <PageHeader02 tag="預算" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <BudgeList budgetList={fakeBudgetList} searchObj={searchObj} />
+        <BudgeList budgetList={projectArr} />
       </div>
     </div>
   )

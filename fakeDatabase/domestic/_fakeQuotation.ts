@@ -1,3 +1,6 @@
+import { format, subYears } from "date-fns"
+
+
 
 
 // 這些是門軌的圖片，未來可能會用到
@@ -256,15 +259,128 @@ function checkData(projectData: TquotationList): void {
 checkData(fakeQuotationDataList)
 
 export type { Tquotation, TquotationList }
-export { fakeQuotationDataList }
+export { fakeQuotationDataList, emptyQuotation }
 
 
 
 
-
-
-
-
+const emptyQuotation: Tquotation = {
+  // ---------------------------------------------------------
+  basicInfo: {
+    quotationId: "",
+    tempQuotationAging: 99,
+    date: "", // 時間是new date()，要在建立新報價單時處理，如果使用者操作時剛好過了一天，時間就不對了
+    constructionName: "",
+    undertaker: "",
+    totalDiscount: 99.99,
+    tempDoorQty: 99,
+    tempBudgetAmount: 999999,
+    constructionCounty: "",
+    constructionDistrict: "",
+    constructionAddress: "",
+    trackingStatus: "", // 追蹤狀態 輸入字串
+    siteProgress: "", //  工地進度 輸入字串
+    quoStatus: "預算",
+  },
+  // ---------------------------------------------------------
+  mainProductArr: [
+    {
+      discount: "100",
+      category: "",
+      series: "",
+      L: "0",
+      W: "0",
+      h: "0",
+      B: "0", //送到class裡面會被轉為"autoCalc"
+      doorType: "",
+      material: "",
+      surface: "",
+      doorRail: "",
+      doorRailIcon: "",
+      horsepower: "",
+      qty: "1",
+      memo: "",
+      ejectionDoor: false,
+      typhoonProof: false,
+      unitWeight: "22",
+      seriesType: "normal",
+      part: [
+        {
+          partType: "SJ00",
+          partName: "捲門片",
+          partId: "SJ0000A0000",
+          material: "SST 304",
+          basicWeight: "99.99",
+          unit: "m2",
+          listPrice: "499",
+          qty: undefined
+        },
+        {
+          partType: "SJ00",
+          partName: "馬達機",
+          partId: "SJ0000A0000",
+          material: "SST 304",
+          basicWeight: "99.99",
+          unit: "組",
+          listPrice: "499",
+          qty: "1"
+        }
+      ]
+    }
+  ],
+  // ---------------------------------------------------------
+  accessory: [
+    {
+      accessoryId: "SJ0A09",
+      name: "鋁合金障礙感知器",
+      unit: "M",
+      qty: 1,
+      listPrice: 999,
+      totalListPrice: 999,
+      price: 999,
+      totalPrice: 999,
+    },
+  ],
+  // ---------------------------------------------------------
+  payInfo: {
+    tradingLocation: "", // 交貨地點
+    tradingDate: "",  // 交貨日期
+    deposit: "", // 訂製同時付總金額
+    deliveryPayment: "", // 交貨同時付總金額
+    installedPayment: "", // 按裝完成付總金額
+    eleConnectPayment: "", // 接電使用付總金額
+  },
+  // ---------------------------------------------------------
+  signature: {
+    manager: "",
+    director: "",
+    attn: "",
+  },
+  // ---------------------------------------------------------
+  // 
+  clientId: "", // 客戶id 用來關聯客戶資料
+  memoArr: [],
+  quoteRangeArr: [],
+  // 
+  // ---------------------------------------------------------
+  // tempRecord 暫時先這樣，之後要改用編號關聯其他的資料
+  tempRecord: [
+    {
+      date: "111-01-02",
+      discount: "88.88",
+      doorQty: "88",
+      budgetAmount: "888,888",
+      Remark: "備註備註備註備註",
+    },
+    {
+      date: "111-01-01",
+      discount: "77.77",
+      doorQty: "77",
+      budgetAmount: "777,777",
+      Remark: "備註備註備註備註",
+    },
+  ]
+}
 
 
 
