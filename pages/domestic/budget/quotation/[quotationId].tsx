@@ -219,9 +219,43 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (quotationId !== "newQuotation" && !quotationData)
     return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
+  type TmainProduct = {
+    series: string
+    material: string
+    surface: string
+    doorType: string
+    size: string
+    part: Tpart[]
+  }
+
+  type Tpart = {
+    partName: string
+    material: string
+    unit: string
+    qty: string
+    price: string
+    totalPrice: string
+  }
+
+
+
+
+  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   if (!classQuotation) return null
 
+  // --------------------------------------------------------------------------
+  const quotationPdf_part_mainProductArr = (() => {
+    const theArr = classQuotation.mainProductArr.map((mp) => {
+      return {
+        ...mp.allData,
+        part: mp.partArr.map((part) => part.allData)
+      }
+    })
+    return theArr
+  })()
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   return (
     <div className={style.container}>
@@ -280,22 +314,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
-        classQuotation={classQuotation}
-        // profileState={profileState}
-        // prodState={prodState}
-        // remarkListState={remarkListState}
-        // rangeListState={rangeListState}
-        // payInfoState={payInfoState}
-        // sinatureState={sinatureState}
-      />
+        classQuotation={classQuotation} />
 
       {/*  */}
-      {/* <QuotationPdf_part
+      <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => { setShowPdf_part(false) }}
-        profileState={profileState}
-        prodState={prodState}
-      /> */}
+
+        // prodState={prodState}
+        mainProductArr={quotationPdf_part_mainProductArr}
+        // mainProductArr={classQuotation.mainProductArr}
+
+        quotationId={classQuotation.quotationId}
+      />
       {/*  */}
     </div>
   )

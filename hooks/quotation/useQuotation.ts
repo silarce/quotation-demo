@@ -455,6 +455,21 @@ class Class_part {
     }
   }
 
+  get allData() {
+    return {
+      partType: this.partType,
+      partName: this.partName,
+      partId: this.partId,
+      material: this._material.value,
+      basicWeight: this.basicWeight,
+      unit: this.unit,
+      qty: this.qty,
+      listPrice: this.listPrice,
+      price: this.price,
+      totalPrice: this.totalPrice,
+    }
+  }
+
 } // Class_part
 // =======================================================================
 class Class_payInfo {
@@ -563,6 +578,7 @@ class Class_quotation {
 
     // 選配設定目前沒有設計要可以編輯，所以暫時直接在元件內用固定資料
 
+    this.quotationId = data.basicInfo.quotationId
     // 報價單基本資料
     this.classBasicInfo
       = new Class_basicInfo(reRender, data.basicInfo, data.fakeClienProfile, this)
@@ -586,6 +602,7 @@ class Class_quotation {
   } // constructor
 
   private _quotaionDataOri
+  readonly quotationId
   private _reRender
   // ---------------------
   classBasicInfo

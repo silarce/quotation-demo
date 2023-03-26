@@ -13,7 +13,7 @@ import scss from "./quotationPdf_part.module.scss"
 export default function Info(
   { prodAllData, quotationId }:
     {
-      prodAllData: ProdClass["allData"]
+      prodAllData: TInfo
       quotationId: string
     }
 ) {
@@ -40,20 +40,26 @@ export default function Info(
   )
 }
 // ==============================================================================
+
+type TInfo = {
+  category: string
+  material: string
+  surface: string
+  doorType: string
+  size: string
+}
+
+
 type TinfoKeyIndex =
-  keyof
-  Pick<
-    ProdClass["allData"],
-    "project" | "material" | "surface" | "doorType" | "size"
-  >
+  "category" | "material" | "surface" | "doorType" | "size"
 type TinfoConfig = {
   [key in TinfoKeyIndex]: { label: string }
 }
 
 const infoKeyIndex: TinfoKeyIndex[] =
-  ["project", "material", "surface", "doorType", "size"]
+  ["category", "material", "surface", "doorType", "size"]
 const infoConfig: TinfoConfig = {
-  project: { label: "項目" },
+  category: { label: "項目" },
   material: { label: "材質" },
   surface: { label: "表面" },
   doorType: { label: "門型" },
