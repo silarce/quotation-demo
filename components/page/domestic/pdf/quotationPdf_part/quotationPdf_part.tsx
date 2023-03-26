@@ -20,26 +20,16 @@ import Modal from "antd/lib/modal/Modal"
 // css
 import scss from "./quotationPdf_part.module.scss"
 
-// type
-import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
-import { TuseProduct, ProdClass, PartClass } from "components/page/domestic/quotation/hook/useProduct"
-
 export default function QuotationPdf_part(
   { isVisable, onCancel,
 
-    // prodState,
     mainProductArr,
-
-
     quotationId,
   }:
     {
       isVisable: boolean
       onCancel: () => void
-
-      // prodState: TuseProduct
       mainProductArr: TmainProduct[]
-      // partArr: Tpart[]
       quotationId: string
     }
 ) {
@@ -99,7 +89,6 @@ export default function QuotationPdf_part(
     ]
     sheet.columns.forEach((item, index) => item.font = { size: 16 })
     // -----------------------------------------------------------
-    // const productList = prodState.mainProductArr
 
     let rowCount = 1
 
@@ -122,7 +111,6 @@ export default function QuotationPdf_part(
           [quotationId, ...profileRows]
         ]
       })
-
 
       const partColumns = keyIndex.map((key) => ({ name: config[key].label }))
       const partRows = part.map((item) => {
@@ -167,7 +155,6 @@ export default function QuotationPdf_part(
 
   // -------------------------------------------------------------------------
 
-  // const { mainProductArr: productList } = prodState
   const chunkedList = _.chunk(mainProductArr, 3) as TmainProduct[][]
   // const pageCount = chunkedList.length
 
@@ -228,10 +215,6 @@ type TmainProduct = {
   part: Tpart[]
 }
 
-
-
-
-
 type TinfoKeyIndex =
   "category" | "material" | "surface" | "doorType" | "size"
 type TinfoConfig = {
@@ -247,7 +230,6 @@ const infoConfig: TinfoConfig = {
   doorType: { label: "門型" },
   size: { label: "尺寸" },
 }
-
 
 // ----------------------------------------
 

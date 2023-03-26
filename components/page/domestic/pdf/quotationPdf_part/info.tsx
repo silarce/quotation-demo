@@ -1,14 +1,6 @@
 
-
-
-import { ProdClass } from "components/page/domestic/quotation/hook/useProduct"
-
-
 // css
 import scss from "./quotationPdf_part.module.scss"
-
-
-
 
 export default function Info(
   { prodAllData, quotationId }:

@@ -54,8 +54,6 @@ import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quota
 const fakeQuotationObjList = fakeQuotationObjListOri()
 
 
-
-
 // =============================================================
 // =============================================================
 // =============================================================
@@ -150,24 +148,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [allowEdit, setAllowEdit] =
     useState(quotationId === "newQuotation" ? true : false)
   // --------------------------------------------------------------------------
-  // profile //報價單基本資料
-  // const profileState = useProfile({
-  //   quotationData,
-  //   newQuotationId,
-  // })
-  // 主產品資料
-  // const prodState = useProduct(quotationData?.productList, !allowEdit)
-  // // memo // 備註
-  // const remarkListState = useRemarkList(quotationData)
-  // // range // 報價範圍
-  // const rangeListState = useRangeList(quotationData)
-  // // payInfo // 支付資訊
-  // const payInfoState = usePayInfo(quotationData)
-  // // sinature //簽名
-  // const sinatureState = useSinature(quotationData)
-
-  // --------------------------------------------------------------------------
-
   const [quotationState, setQuotationState] = useState<Toption>({ value: "預算", label: "預算" })
 
   const [showMemoModal, setShowMemoModal] = useState(false)
@@ -219,31 +199,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (quotationId !== "newQuotation" && !quotationData)
     return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
-  type TmainProduct = {
-    series: string
-    material: string
-    surface: string
-    doorType: string
-    size: string
-    part: Tpart[]
-  }
-
-  type Tpart = {
-    partName: string
-    material: string
-    unit: string
-    qty: string
-    price: string
-    totalPrice: string
-  }
-
-
-
-
-  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   if (!classQuotation) return null
-
   // --------------------------------------------------------------------------
   const quotationPdf_part_mainProductArr = (() => {
     const theArr = classQuotation.mainProductArr.map((mp) => {
@@ -320,11 +277,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => { setShowPdf_part(false) }}
-
-        // prodState={prodState}
         mainProductArr={quotationPdf_part_mainProductArr}
-        // mainProductArr={classQuotation.mainProductArr}
-
         quotationId={classQuotation.quotationId}
       />
       {/*  */}
