@@ -123,7 +123,7 @@ export default function Contract() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <ContractList contractList={contractList} searchObj={searchObj} />
+        <ContractList contractList={contractList} />
       </div>
     </div>
   )

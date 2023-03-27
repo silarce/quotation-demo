@@ -6,8 +6,8 @@ import React, {
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
-import Select from 'react-select';
-import type { GroupBase, } from 'react-select';
+// import Select from 'react-select';
+// import type { GroupBase, } from 'react-select';
 
 
 // components
@@ -17,24 +17,22 @@ import QuotationComponent from "components/page/domestic/quotation/quotationComp
 import QuotationAccessory from "components/page/domestic/quotation/quotationAccessory"
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
-import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
-import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
+// import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
+// import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
 import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
 import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/quotationPdf_part"
 
 // antd
-import type { MenuProps } from 'antd';
-import { Button, Dropdown, Space } from 'antd';
+// import type { MenuProps } from 'antd';
+// import { Button, Dropdown, Space } from 'antd';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
-import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
+// import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import Select03, { TcusStyleObj } from "components/global/gear/select/select03"
-import InputModal from "components/global/gear/modal/simpleModal/inputModal"
+// import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import TextareaModal from "components/global/gear/modal/simpleModal/textareaModal";
-
-
 
 // icon
 import iconUpload from "public/image/icon/upload.svg"
@@ -46,33 +44,14 @@ const optionQuotationState = optionsCreator_quotationState()
 // css
 import style from "./quotation.module.scss"
 
-
-
-// // fakeData type
-// import { Tquotation, fakeQuotationObjListOri } from "fakeDatabase/domestic/quotation/fakeQuotationList"
-// // 生成假資料
-// const fakeQuotationObjList = fakeQuotationObjListOri()
-
-
 // =============================================================
-// =============================================================
-// =============================================================
-// =============================================================
+
+// 假資料與fake api
 import { fakeApi_quotation_creator } from "fakeDatabase/fakeAPI/fakeQuotationApi";
 import { useQuotation } from "hooks/quotation/useQuotation";
 import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
 import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
-// =============================================================
-// =============================================================
-// =============================================================
-// =============================================================
-// =============================================================
-
-
-
-
-
 
 // =============================================================
 // =============================================================
