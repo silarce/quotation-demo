@@ -26,7 +26,8 @@ const { Panel } = Collapse
 
 export default function ContractList({ contractList, searchObj }:
   {
-    contractList: TfakeContractListSimple
+    // contractList: TfakeContractListSimple
+    contractList: Parameters<typeof ListHeader01>[0]["contract"][]
     searchObj: TsearchObj
   }) {
 
@@ -51,10 +52,7 @@ export default function ContractList({ contractList, searchObj }:
         onChange={changeActive}
       >
         {contractList.map((item, index) => {
-          const {
-            memoList, quotationId,
-            doorType, county,
-            clientName, projectName, } = item
+          const { quotationId, } = item
           const isActive = activeIndex === index
 
           const onClick = (e: MouseEvent) => {
@@ -67,16 +65,16 @@ export default function ContractList({ contractList, searchObj }:
           }
           // ===========================
           // 搜尋過濾
-          const regDoorType = new RegExp(searchObj.doorType)
-          const regCountry = new RegExp(searchObj.country)
-          const regClientName = new RegExp(searchObj.clientName)
-          const regProjectName = new RegExp(searchObj.projectName)
-          if (
-            !regDoorType.test(doorType) ||
-            !regCountry.test(county) ||
-            !regClientName.test(clientName) ||
-            !regProjectName.test(projectName)
-          ) return null
+          // const regDoorType = new RegExp(searchObj.doorType)
+          // const regCountry = new RegExp(searchObj.country)
+          // const regClientName = new RegExp(searchObj.clientName)
+          // const regProjectName = new RegExp(searchObj.projectName)
+          // if (
+          //   !regDoorType.test(doorType) ||
+          //   !regCountry.test(county) ||
+          //   !regClientName.test(clientName) ||
+          //   !regProjectName.test(projectName)
+          // ) return null
           // ===========================
 
 
@@ -86,8 +84,8 @@ export default function ContractList({ contractList, searchObj }:
                 <ListHeader01 contract={item} onClick={onClick} isActive={isActive} />
               }
             >
-              {memoList.length > 0
-                ? <ListBody01 memoList={memoList} />
+              {fakeListBody.length > 0
+                ? <ListBody01 memoList={fakeListBody} />
                 : <span>無備註</span>
               }
             </Panel>
@@ -99,4 +97,20 @@ export default function ContractList({ contractList, searchObj }:
 }
 
 
-
+const fakeListBody = [
+  {
+    memoId: "N-1110101-05",
+    memoDate: "111-01-01",
+    memoContent: "備註備註備註備註",
+  },
+  {
+    memoId: "N-1110101-05",
+    memoDate: "111-01-01",
+    memoContent: "備註備註備註備註",
+  },
+  {
+    memoId: "N-1110101-05",
+    memoDate: "111-01-01",
+    memoContent: "備註備註備註備註",
+  },
+]

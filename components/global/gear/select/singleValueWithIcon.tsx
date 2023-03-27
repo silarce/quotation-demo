@@ -13,7 +13,7 @@ export function SingleValueWithIcon01(props: any) {
   return (
     <SingleValue {...props} className={style.option}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={icon} alt="test" />
+      {icon && <img src={icon} alt="iconImg" />}
       <span>{label}</span>
     </SingleValue>
   )

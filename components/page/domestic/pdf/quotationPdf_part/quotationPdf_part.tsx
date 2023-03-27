@@ -20,27 +20,24 @@ import Modal from "antd/lib/modal/Modal"
 // css
 import scss from "./quotationPdf_part.module.scss"
 
-// type
-import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
-import { TuseProduct, ProdClass, PartClass } from "components/page/domestic/quotation/hook/useProduct"
-
 export default function QuotationPdf_part(
   { isVisable, onCancel,
-    profileState,
-    prodState,
+
+    mainProductArr,
+    quotationId,
   }:
     {
       isVisable: boolean
       onCancel: () => void
-      profileState: TuseProfile
-      prodState: TuseProduct
+      mainProductArr: TmainProduct[]
+      quotationId: string
     }
 ) {
 
 
   // ------------------------------------------------------------------
 
-  const quotationId = profileState.profile.quotationId
+
 
   // ------------------------------------------------------------------
   const refPdf = useRef<(HTMLDivElement | null)[]>([])
@@ -79,7 +76,7 @@ export default function QuotationPdf_part(
   const dlExcel = async () => {
     const workbook = new ExcelJs.Workbook();
 
-    const sheetName = profileState.profile.quotationId
+    const sheetName = quotationId
     const sheet = workbook.addWorksheet(sheetName)
     sheet.columns = [
       { width: 30, /*font: { size: 16 }*/ }, // 直接在這邊設定font不知道為什麼無效
@@ -92,18 +89,17 @@ export default function QuotationPdf_part(
     ]
     sheet.columns.forEach((item, index) => item.font = { size: 16 })
     // -----------------------------------------------------------
-    const productList = prodState.productList
 
     let rowCount = 1
 
-    productList.forEach((item, index) => {
+    mainProductArr.forEach((item, index) => {
       sheet.getRow(rowCount).font = { bold: true, size: 18 }
       sheet.getRow(rowCount + 3).font = { bold: true, size: 18 }
 
-      const { part, allData } = item
+      const { part } = item
 
       const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }))
-      const profileRows = infoKeyIndex.map((key) => allData[key])
+      const profileRows = infoKeyIndex.map((key) => item[key])
       sheet.addTable({
         name: "profile",
         ref: `A${rowCount}`,
@@ -112,10 +108,9 @@ export default function QuotationPdf_part(
         },
         columns: [{ name: "報價編號" }, ...profileColumns],
         rows: [
-          [profileState.profile.quotationId, ...profileRows]
+          [quotationId, ...profileRows]
         ]
       })
-
 
       const partColumns = keyIndex.map((key) => ({ name: config[key].label }))
       const partRows = part.map((item) => {
@@ -148,7 +143,7 @@ export default function QuotationPdf_part(
         type: "application/vnd.ms-excel;charset=utf-8;"
       });
 
-      const id = profileState.profile.quotationId
+      const id = quotationId
       const today = Moment().format("yyyy-MM-DD")
       link.download = `${id}_${today}.xlsx`;
       link.href = URL.createObjectURL(blobData);
@@ -160,8 +155,7 @@ export default function QuotationPdf_part(
 
   // -------------------------------------------------------------------------
 
-  const { productList } = prodState
-  const chunkedList = _.chunk(productList, 3) as ProdClass[][]
+  const chunkedList = _.chunk(mainProductArr, 3) as TmainProduct[][]
   // const pageCount = chunkedList.length
 
   // -------------------------------------------------------------------------
@@ -185,16 +179,19 @@ export default function QuotationPdf_part(
       </div>
 
 
-      {chunkedList.map((list, index) => {
+      {chunkedList.map((chunk, index) => {
         return (
           <div className={scss.pdf} key={index} ref={ele => refPdf.current[0] = ele}>
             {index !== 0 && <hr className={scss.hr} />}
             <Header />
-            {list.map((prod, index) => {
+            {chunk.map((prod, index) => {
               return (
                 <div className={scss.part} key={index}>
-                  <Info prodAllData={prod.allData} quotationId={quotationId} />
-                  <Table prod={prod} />
+                  <Info prodAllData={prod} quotationId={quotationId} />
+                  <Table
+                    partArr={prod.part}
+                    priceTotal={prod.priceTotal} // 主產品 複價
+                  />
                 </div>
               )
             })}
@@ -208,36 +205,47 @@ export default function QuotationPdf_part(
 // ========================================================================
 
 // ==============================================================================
+type TmainProduct = {
+  category: string
+  material: string
+  surface: string
+  doorType: string
+  size: string
+  priceTotal: string
+  part: Tpart[]
+}
+
 type TinfoKeyIndex =
-  keyof
-  Pick<
-    ProdClass["allData"],
-    "project" | "material" | "surface" | "doorType" | "size"
-  >
+  "category" | "material" | "surface" | "doorType" | "size"
 type TinfoConfig = {
   [key in TinfoKeyIndex]: { label: string }
 }
 
 const infoKeyIndex: TinfoKeyIndex[] =
-  ["project", "material", "surface", "doorType", "size"]
+  ["category", "material", "doorType", "size"]
 const infoConfig: TinfoConfig = {
-  project: { label: "項目" },
+  category: { label: "項目" },
   material: { label: "材質" },
   surface: { label: "表面" },
   doorType: { label: "門型" },
   size: { label: "尺寸" },
 }
 
+// ----------------------------------------
 
+type Tpart = {
+  partName: string
+  material: string
+  unit: string
+  qty: string
+  price: string
+  totalPrice: string
+}
 
 
 
 type TkeyIndex =
-  keyof
-  Pick<
-    PartClass,
-    "subTypeName" | "material" | "surface" | "unit" | "qty" | "price" | "totalPrice"
-  >
+  "partName" | "material" | "unit" | "qty" | "price" | "totalPrice"
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string
@@ -250,11 +258,10 @@ type Tconfig = {
 }
 
 const keyIndex: TkeyIndex[] =
-  ["subTypeName", "material", "surface", "unit", "qty", "price", "totalPrice"]
-
+  ["partName", "material", "unit", "qty", "price", "totalPrice"]
 
 const config: Tconfig = {
-  subTypeName: {
+  partName: {
     label: "名稱",
     style: {
       width: "300px"
@@ -268,14 +275,13 @@ const config: Tconfig = {
     },
 
   },
-  surface: {
-    label: "表面",
-    style: {
-      width: "auto",
-      flex: "1"
-    },
-
-  },
+  // surface: {
+  //   label: "表面",
+  //   style: {
+  //     width: "auto",
+  //     flex: "1"
+  //   },
+  // },
   unit: {
     label: "單位",
     style: {

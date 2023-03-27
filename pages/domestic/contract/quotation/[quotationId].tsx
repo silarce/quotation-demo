@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
@@ -46,6 +46,14 @@ const fakeQuotationObjList = fakeQuotationObjListOri()
 // =============================================================
 // =============================================================
 // =============================================================
+import { fakeApi_quotation_creator } from "fakeDatabase/fakeAPI/fakeQuotationApi";
+import { useQuotation } from "hooks/quotation/useQuotation";
+import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
+import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
+// =============================================================
+// =============================================================
+// =============================================================
 export default function Quotation() {
   const router = useRouter()
   const isReady = router.isReady
@@ -60,12 +68,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationId, //報價單id 
   } = router.query
 
-
-  // ======================================================
-  const [showPdf, setShowPdf] = useState(false)
-  const [showPdf_part, setShowPdf_part] = useState(false)
-  // ======================================================
-
+  // =========================================================
   // 正式接上api前先這樣處理
   let quotationData: Tquotation | undefined;
   quotationData = fakeQuotationObjList[quotationId as string]
@@ -74,6 +77,51 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 是否可編輯
   const [allowEdit, setAllowEdit] =
     useState(quotationId === "newQuotation" ? true : false)
+  // =========================================================
+  // =========================================================
+  // =========================================================
+  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string)
+
+  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get())
+  const fakeClientList = fakeApi_client.get()
+  const classSignature = classQuotation?.classSignature
+  const signatureArr = [
+    {
+      label: "經理",
+      signature: classSignature?.manager ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.manager = v },
+    },
+    {
+      label: "主管",
+      signature: classSignature?.director ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.director = v },
+    },
+    {
+      label: "經辦",
+      signature: classSignature?.attn ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.attn = v },
+    },
+  ]
+
+  const getFakeMemo = fakeApi_memo.get
+  const getFakeQuotaRange = fakeApi_quoteRange.get
+
+  useEffect(() => {
+    reNewClassQuotation()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowEdit])
+
+
+
+
+  // ======================================================
+  // ======================================================
+  // ======================================================
+  const [showPdf, setShowPdf] = useState(false)
+  const [showPdf_part, setShowPdf_part] = useState(false)
+  // ======================================================
+
+
 
   // 合約項目 追加/追減項目的開關
   // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
@@ -179,8 +227,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  if (quotationId !== "newQuotation" && !quotationData)
+  // if (quotationId !== "newQuotation" && !quotationData)
+  if (!classQuotation)
     return <NoQuotation quotationId={quotationId as string} />
+  // =========================================================
+  const quotationPdf_part_mainProductArr = (() => {
+    const theArr = classQuotation.mainProductArr.map((mp) => {
+      return {
+        ...mp.allData,
+        part: mp.partArr.map((part) => part.allData)
+      }
+    })
+    return theArr
+  })()
   // =========================================================
   // =========================================================
   return (
@@ -192,7 +251,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 報價單基本資料 */}
-          <QuotationProfile profileState={profileState} disabled={!allowEdit} />
+          <QuotationProfile
+            classBasicInfo={classQuotation.classBasicInfo}
+            fakeClientList={fakeClientList}
+            disabled={!allowEdit} />
 
           {/* switch01 */}
           <div className={style.switchBar}>
@@ -215,16 +277,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
               ?
               <>
                 {/* 主產品設定 */}
-                <QuotationProduction productStates={prodState} switch02={switch02} />
+                <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
                 {/* 原報價項目 */}
                 {switch02 &&
-                  <OldQuotationProduction productStates={prodState02} />
+                  <OldQuotationProduction classQuotation={classQuotation} />
                 }
                 <div className={style.redWrapper}>
                   {/* 材料配件設定 */}
-                  <QuotationComponent
-                    partList={prodState.productList[prodState.activeRow]?.part}
-                    disabled={!allowEdit} />
+                  <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} />
                   <hr />
                   {/* 選配設定 */}
                   <QuotationAccessory activeRow={prodState.activeRow} />
@@ -242,33 +302,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
-            {...{
-              remarkListState, rangeListState,
-              payInfoState,
-              disabled: !allowEdit,
-              prodState: prodState
-            }}
+            classQuotation={classQuotation}
+            getFakeMemo={getFakeMemo}
+            getFakeQuotaRange={getFakeQuotaRange}
+            disabled={!allowEdit}
           />
           {/* 簽名 */}
-          <QuotationSinature sinatureState={sinatureState} disabled={!allowEdit} />
+          <QuotationSinature
+            signatureArr={signatureArr}
+            disabled={!allowEdit} />
         </div>
       </div>
       <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
-        profileState={profileState}
-        prodState={prodState}
-        remarkListState={remarkListState}
-        rangeListState={rangeListState}
-        payInfoState={payInfoState}
-        sinatureState={sinatureState}
-      />
+        classQuotation={classQuotation} />
 
       <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => { setShowPdf_part(false) }}
-        profileState={profileState}
-        prodState={prodState}
+        mainProductArr={quotationPdf_part_mainProductArr}
+        quotationId={classQuotation.quotationId}
       />
     </div >
   )
@@ -293,8 +347,8 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 
 // =========================================================
 
-const OldQuotationProduction = ({ productStates }:
-  { productStates: TuseProduct }) => {
+const OldQuotationProduction = ({ classQuotation }:
+  { classQuotation: Parameters<typeof QuotationProduction>[0]["classQuotation"] }) => {
 
   const [isActive, setIsActive] = useState(false)
   const panelSwitch = () => setIsActive(!isActive)
@@ -309,10 +363,14 @@ const OldQuotationProduction = ({ productStates }:
       <Panel key={0}
         header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}
       >
+        {/* <QuotationProduction
+          className={style.quotationProduction}
+          mainProductArr={productStates} /> */}
         <QuotationProduction
           className={style.quotationProduction}
-          productStates={productStates} />
-      </Panel> 
+          classQuotation={classQuotation}
+          disabled={true} />
+      </Panel>
     </Collapse>
   )
 }

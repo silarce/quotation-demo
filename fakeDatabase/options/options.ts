@@ -20,7 +20,7 @@ import iconDoorRail_sj302_95_45t
 interface Toption {
   value: string
   label: string
-  quoteTypeType?: string
+  seriesType?: string
   icon?: string
   [key: string]: string | undefined
 }
@@ -104,13 +104,17 @@ export const optionsCreator_clientSearch =
     { value: "phone", label: "電話" },
   ]
 
+
+type ToptionsSeries = Toption & { seriesType: "rollerDoor" | "normal" }
 // 報價別
-export const optionsCreator_quoteType =
-  (): Toption[] => [
-    { value: "捲門", label: "捲門", quoteTypeType: "rollerDoor" },
+export const optionsCreator_series =
+  (): ToptionsSeries[] => [
+    { value: "捲門", label: "捲門", seriesType: "rollerDoor" },
     // { value: "大捲門", label: "大捲門", quoteTypeType: "rollerDoor" },
-    // { value: "不是捲門", label: "不是捲門", quoteTypeType: "normal" },
+    { value: "不是捲門", label: "不是捲門", seriesType: "normal" },
   ]
+
+
 
 // 材料
 export const optionsCreator_material =
@@ -141,15 +145,15 @@ export const optionsCreator_doorRail =
 
 export const optionsCreator_doorRail_normal =
   (): Toption[] => [
-    { value: "sj302_30", label: "30", icon: iconDoorRail_sj302_30.src },
+    { value: "sj302_30", label: "sj302_30", icon: iconDoorRail_sj302_30.src },
   ]
 
 export const optionsCreator_doorRail_antyTyphoon =
   (): Toption[] => [
-    { value: "sj302_75_30t", label: "75_30t", icon: iconDoorRail_sj302_75_30t.src },
-    { value: "sj302_90_30t", label: "90_30t", icon: iconDoorRail_sj302_90_30t.src },
-    { value: "sj302_95_30t", label: "95_30t", icon: iconDoorRail_sj302_95_30t.src },
-    { value: "sj302_95_45t", label: "95_45t", icon: iconDoorRail_sj302_95_45t.src },
+    { value: "sj302_75_30t", label: "sj302_75_30t", icon: iconDoorRail_sj302_75_30t.src },
+    { value: "sj302_90_30t", label: "sj302_90_30t", icon: iconDoorRail_sj302_90_30t.src },
+    { value: "sj302_95_30t", label: "sj302_95_30t", icon: iconDoorRail_sj302_95_30t.src },
+    { value: "sj302_95_45t", label: "sj302_95_45t", icon: iconDoorRail_sj302_95_45t.src },
   ]
 
 

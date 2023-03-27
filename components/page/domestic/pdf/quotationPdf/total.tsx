@@ -9,21 +9,34 @@ import style from "./quotationPdf.module.scss"
 import { TuseRemarkList } from "components/page/domestic/quotation/hook/useRemarkList"
 import { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
 
+
+
+
+type TmemoArr = string[]
+type Tsettlement = {
+  subTotal: number
+  businessTax: number
+  total: number
+}
+
+
+
 export default function Total(
-  { remarkListState, prodState }:
+  { memoArr, settlement }:
     {
-      remarkListState: TuseRemarkList
-      prodState: TuseProduct
+      memoArr: TmemoArr
+      settlement: Tsettlement
     }
 ) {
 
-  const { remarkList } = remarkListState
+  memoArr
 
-  const subTotal = prodState.subTotal
+
+  const subTotal = settlement.subTotal
     .toLocaleString(undefined, { maximumFractionDigits: 2 });;
-  const businessTax = prodState.businessTax
+  const businessTax = settlement.businessTax
     .toLocaleString(undefined, { maximumFractionDigits: 2 });
-  const total = prodState.total
+  const total = settlement.total
     .toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   return (
@@ -35,8 +48,7 @@ export default function Total(
         </div>
         <div>
           <ul>
-            {remarkList.map((data, index) => {
-              const { content } = data
+            {memoArr.map((content, index) => {
               return (
                 <li key={index}>
                   <span>{`(${index + 1})`}</span>

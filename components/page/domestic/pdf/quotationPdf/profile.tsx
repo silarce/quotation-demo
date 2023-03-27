@@ -5,10 +5,23 @@ import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
 
 
 
+
+
+type Tprofile = {
+  quotationId: string,
+  clientName: string,
+  contactPerson: string,
+  contactPhone: string,
+  fax: string,
+  builtDate: string,
+  projectAddress: string,
+}
+
+
 export default function Profile(
-  { profileState, index ,pageCount}:
+  { profileData, index, pageCount }:
     {
-      profileState: TuseProfile
+      profileData: Tprofile
       index: number
       pageCount: number
     }
@@ -17,10 +30,10 @@ export default function Profile(
 
 
   const {
-    quotationId, clientId, clientName, contactPerson, contactPhone,
-    fax, clientState, ageing, builtDate, projectName,
-    trackState, schedule, projectAddress
-  } = profileState.profile
+    quotationId, clientName, contactPerson, contactPhone,
+    fax, builtDate,
+    projectAddress
+  } = profileData
 
   const [year, month, day] = builtDate.split("-")
   const date = `${year}年${month}月${day}日`

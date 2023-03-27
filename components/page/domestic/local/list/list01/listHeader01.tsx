@@ -10,39 +10,56 @@ import style from "./listHeader01.module.scss"
 import { TfakeContractSimple } from "fakeDatabase/domestic/contractCombinder";
 
 
+type Tcontract = {
+  quotationId: string
+  clientName: string
+  quotationName: string
+  discount: string
+  priceTotal: string
+  contactPerson: string
+  contactPhone: string
+  attn: string
+}
+
+
 
 export default function ListHeader01(
   { className = "", contract, onClick, isActive }:
     {
       className?: string
-      contract: TfakeContractSimple
+      contract: Tcontract
       onClick: ((e: MouseEvent) => void) | (() => void)
       isActive?: boolean
     }) {
 
   const {
-    quotationId: contractId, clientName, projectName,
-    schedule, money, contactName,
-    contactPhone, undertaker,
+    quotationId,
+    clientName,
+    quotationName,
+    discount,
+    priceTotal,
+    contactPerson,
+    contactPhone,
+    attn: Attn,
   } = contract
 
-  const parsedMoney = money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const parsedPriceTotal = priceTotal.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
   const active = isActive ? style.active : ""
 
 
   return (
     <div className={`${className} ${style.container} ${active}`}>
-      <span>{contractId}</span>
+      <span>{quotationId}</span>
       <div className={style.name}>
         <span>{clientName}</span>
-        <span>{projectName}</span>
+        <span>{quotationName}</span>
       </div>
-      <span>{schedule}%</span>
-      <span>{parsedMoney}</span>
-      <span>{contactName}</span>
+      <span>{discount}%</span>
+      <span>{parsedPriceTotal}</span>
+      <span>{contactPerson}</span>
       <span>{contactPhone}</span>
-      <span>{undertaker}</span>
+      <span>{Attn}</span>
       <div>
         <IconDetail onClick={onClick} />
       </div>

@@ -17,18 +17,19 @@ import { Collapse } from 'antd';
 import style from "./budgetList.module.scss"
 
 // data type
-import {
-  TbudgetList,
-} from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+// import {
+//   TbudgetList,
+// } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
 
 
 // fake
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
 
+type TbudgetList = ReturnType<(typeof fakeApi_projectSimple)["get"]>
 
 
 const { Panel } = Collapse
@@ -36,20 +37,12 @@ const { Panel } = Collapse
 
 
 
-export default function BudgetList({ budgetList, searchObj }:
+export default function BudgetList({ budgetList }:
   {
     budgetList: TbudgetList
-    searchObj: TsearchObj
   }) {
   const router = useRouter()
-  // ----------------------------------------------------------------
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
 
-  const projectArr = projectSimple.wrapper.get({
-    filter: {}
-  })
-
-  const reRender = () => setProjectSimple(state => ({ ...state }))
   // ----------------------------------------------------------------
 
 
@@ -72,13 +65,16 @@ export default function BudgetList({ budgetList, searchObj }:
         destroyInactivePanel={true}
         onChange={changeActive}
       >
-        {projectArr.map((item, index) => {
-          const { quotationId,
-            projectCounty,
+        {budgetList.map((item, index) => {
+          const {
             clientData,
-            projectName,
             tempRecord,
           } = item
+          const {
+            quotationId,
+            constructionCounty: projectCounty,
+            constructionName: projectName,
+          } = item.basicInfo
           const isActive = activeIndex === index
 
           const openQuotation = (e: MouseEvent) => {

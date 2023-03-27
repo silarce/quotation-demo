@@ -4,34 +4,46 @@ import { useState } from "react"
 import ModalListSelectorWithSearch from "components/global/gear/modal/modalListSelectorWithSearch"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import Input03 from "components/global/gear/input/input03"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
-
 // css
 import styleL from "./local.module.scss"
 
-// type
-import { TuseRemarkList } from "../hook/useRemarkList"
-import { Tremark } from "fakeDatabase/domestic/quotation/fakeQuotationList"
 
-// data
-import { remarkOptions } from "fakeDatabase/domestic/quotation/fakeQuotRemarkList"
-
-
-export default function RemarkList({ remarkListState, disabled }:
+export default function TextListEditor(
   {
-    remarkListState: TuseRemarkList
-    disabled: boolean
-  }) {
+    stringObj,
+    alternateArr,
+    searchAlternate,
+    label,
+    disabled }:
+    {
+      stringObj: {
+        stringArr: string[]
+        editString: (index: number, v: string) => void
+        addString: (v: string | string[]) => void
+        delString: (index: number) => void
+      }
+      alternateArr: string[]
+      searchAlternate: (v: string) => void
+      label: string
+      disabled: boolean
+    }) {
 
-  const { remarkList, setRemarkList,
-    onChangeRemarkCreator, deleteRemark, addRemarks } = remarkListState
+  const {
+    stringArr,
+    editString,
+    addString,
+    delString,
+  } = stringObj
+
 
   // ====================================================
-  const [selRemark, setSelRemark] = useState<Tremark[]>([])
-  const toSelRemark = (remark: Tremark) => {
+  const [selRemark, setSelRemark] = useState<string[]>([])
+  const toSelRemark = (remark: string) => {
     const theIndex = selRemark.indexOf(remark)
     if (theIndex === -1) {
       selRemark.push(remark)
@@ -42,38 +54,37 @@ export default function RemarkList({ remarkListState, disabled }:
       setSelRemark([...selRemark])
     }
   }
+
   // ====================================================
   // ModalListSelectorWithSearch
   const [showAdd, setShowAdd] = useState(false)
-  const [searchValue, setSearchValue] = useState("")
 
   const toShowAdd = () => setShowAdd(true)
   const onCancel = () => {
     setShowAdd(false)
     setSelRemark([])
-    setSearchValue("")
+    searchAlternate("")
   }
-  const onConfirm = () => addRemarks(selRemark);
-  const onSearch = (value: string) => {
-    setSearchValue(value)
+
+  const onConfirm = () => {
+    if (!selRemark[0]) return myAlert.info({ title: "請選擇"+label })
+    addString(selRemark);
   }
 
   return (
     <div className={styleL.listContainer}>
-      <p>備註</p>
-      {remarkList.map((item, index) => {
-        const { content } = item
-        const onChange = onChangeRemarkCreator(index)
+      <p>{label}</p>
+      {stringArr.map((memo, index) => {
         return (
           <div key={index}>
             {disabled ?
               <span></span> :
-              <IconRemoveCircle onClick={() => deleteRemark(index)} />}
+              <IconRemoveCircle onClick={() => delString(index)} />}
             <span className={styleL.serialNumber}>{index + 1}</span>
             <Input03 {...{
-              stateValue: content,
-              onChange,
-              placeholder: "請輸入備註",
+              stateValue: memo,
+              onChange: (e) => editString(index, e.target.value),
+              placeholder: "請輸入"+label,
               showBaseline: "never",
               disabled
             }} />
@@ -86,23 +97,23 @@ export default function RemarkList({ remarkListState, disabled }:
           <IconAddCircle onClick={toShowAdd} />}
       </div>
       {/*  */}
-      <ModalListSelectorWithSearch {...{
-        label: "請選擇備註",
-        visible: showAdd,
-        onCancel, onConfirm, onSearch,
-      }}>
+      <ModalListSelectorWithSearch
+        label={`請選擇${label}`}
+        visible={showAdd}
+        onCancel={onCancel}
+        onConfirm={onConfirm}
+        onSearch={searchAlternate}
+      >
         <div className={styleL.addModalBody}>
-          {remarkOptions.map((item, index) => {
-            const { content } = item
+          {alternateArr.map((item, index) => {
+            const content = item
             const isActive = (selRemark.includes(item))
-            if (!content.includes(searchValue)) return null
             return (
               <CellWithBar className={styleL.cellWithBar} key={index}
                 isActive={isActive}
               >
                 <div className={styleL.row}
-                  onClick={() => toSelRemark(item)}
-                >
+                  onClick={() => toSelRemark(item)}>
                   <span>{content}</span>
                 </div>
               </CellWithBar>

@@ -1,29 +1,32 @@
 
 
+
+
 interface TclientProfile {
-  [key: string]:
-  {
-    clientId: string
-    type: string
-    name: string
-    shortName: string
-    phone: string
-    fax: string
-    head: string // 負責人
-    address: string
-    billAddress: string //發票地址
-    taxtNumber: string //統一編號
-    taxtType: string //扣稅類別
-    clientState: string
-    contact: {
-      name: string // 聯絡人
-      phone: string // 聯絡人電話
-    }[]
-  }
+  clientId: string
+  type: string
+  name: string
+  shortName: string
+  phone: string
+  fax: string
+  head: string // 負責人
+  address: string
+  billAddress: string //發票地址
+  taxtNumber: string //統一編號
+  taxtType: string //扣稅類別
+  clientState: string
+  contact: {
+    name: string // 聯絡人
+    phone: string // 聯絡人電話
+  }[]
+}
+
+interface TclientProfileList {
+  [key: string]: TclientProfile
 }
 
 
-const fakeClienData: TclientProfile = {
+const fakeClientProfileList: TclientProfileList = {
   "S00001": {
     clientId: "S00001",
     type: "客戶",
@@ -135,7 +138,7 @@ const fakeClienData: TclientProfile = {
 }
 
 
-function checkData(projectData: TclientProfile): void {
+function checkData(projectData: TclientProfileList): void {
   for (const [key, value] of Object.entries(projectData)) {
     if (key !== value.clientId) {
       // 建立資料時quotationId必須要與其所屬物件的key相符
@@ -144,13 +147,13 @@ function checkData(projectData: TclientProfile): void {
   }
 }
 
-checkData(fakeClienData)
+checkData(fakeClientProfileList)
 
 
 
-export type { TclientProfile }
+export type { TclientProfile, TclientProfileList }
 
-export { fakeClienData }
+export { fakeClientProfileList }
 
 
 

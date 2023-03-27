@@ -1,7 +1,4 @@
-import {
-  ChangeEvent,
-  useState
-} from "react";
+import { useState } from "react";
 
 
 // global gear
@@ -9,7 +6,6 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
-import BudgeList from "components/page/domestic/budget/budgetList"
 import ContractList from "components/page/domestic/contract/contractList";
 
 // option
@@ -23,8 +19,8 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 // css
 import style from "./contract.module.scss"
 
-// fakeData
-import { fakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
+// fake
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
 // ===========================================
 // 合約列表單個項目展開裡的內容是追加追減項目
@@ -45,6 +41,17 @@ export default function Contract() {
     projectName: "",
   })
 
+  // 資料
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
+  const projectArr = projectSimple.wrapper.get({
+    filter: {
+      county: searchObj.county,
+      clientName: searchObj.clientName,
+      constructionName: searchObj.projectName,
+    }
+  })
+  // ---------------------------------------------------
+  // panelList
   const searchTargetList = [
     {
       stateValue: optionsDoorType[0],
@@ -85,11 +92,30 @@ export default function Contract() {
     searchTargetList,
     doSearch
   }
+
+
   const panelList: TpanelList = [{
     searchGroup
   }]
 
   // ===================================================
+  const contractList = projectArr.map((item) => {
+
+    const { quotationId, constructionName } = item.basicInfo
+    const { name: clientName, contact } = item.clientData
+    const { attn } = item.signature
+
+    return {
+      quotationId: quotationId,
+      clientName: clientName,
+      quotationName: constructionName,
+      discount: "99.99",
+      priceTotal: "999999",
+      contactPerson: contact[0].name,
+      contactPhone: contact[0].phone,
+      attn: attn,
+    }
+  })
 
   return (
     <div className={style.container}>
@@ -97,7 +123,7 @@ export default function Contract() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <ContractList contractList={fakeContractListSimple} searchObj={searchObj} />
+        <ContractList contractList={contractList} searchObj={searchObj} />
       </div>
     </div>
   )

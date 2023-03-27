@@ -1,14 +1,10 @@
-import {
-  ChangeEvent
-  , useState
-} from 'react'
+import { useState } from 'react'
 import { useRouter } from "next/router";
 
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
-
 
 // components
 import BudgeList from "components/page/domestic/budget/budgetList"
@@ -26,7 +22,8 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 
 
 // fakeData
-import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+// fake
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 // type
 import { Toption } from "components/global/gear/select/select03"
 
@@ -42,11 +39,6 @@ import { Toption } from "components/global/gear/select/select03"
 
 export default function Budget() {
   const router = useRouter()
-  const { fakeBudgetList } = fakeBudgetListGroup
-
-  // ===================================================
-  // panelList
-
   // 搜尋用的
   const [searchObj, setSearchObj] = useState<TsearchObj>({
     doorType: "",
@@ -54,6 +46,20 @@ export default function Budget() {
     clientName: "",
     projectName: "",
   })
+
+  // 資料
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
+  const projectArr = projectSimple.wrapper.get({
+    filter: {
+      county: searchObj.county,
+      clientName: searchObj.clientName,
+      constructionName: searchObj.projectName,
+    }
+  })
+
+
+  // ===================================================
+  // panelList
 
   const searchTargetList = [
     {
@@ -104,11 +110,11 @@ export default function Budget() {
       type: "addButton",
       label: "新增報價單",
       onClick: () => {
-        let newQuotationId = `${fakeBudgetList.length + 1}`.padStart(2, "0")
+        let newQuotationId = `${projectArr.length + 1}`.padStart(2, "0")
         newQuotationId = "S-110211-" + newQuotationId
         router.push({
-          pathname: `/domestic/budget/quotation/newQuotation`,
-          query: { newQuotationId }
+          pathname: `/domestic/budget/quotation/${newQuotationId}`,
+          query: { isNewQuotation: true }
         })
       }
     },
@@ -122,7 +128,7 @@ export default function Budget() {
       <PageHeader02 tag="預算" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <BudgeList budgetList={fakeBudgetList} searchObj={searchObj} />
+        <BudgeList budgetList={projectArr} />
       </div>
     </div>
   )

@@ -13,52 +13,49 @@ import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals'
 import style from "./clientSelector.module.scss"
 
 // fakeData
-import {
-  TclientProfile,
-  fakeClientProfileList,
-} from "fakeDatabase/client/fakeClientList"
+// import {
+//   TclientProfile,
+//   fakeClientProfileList,
+// } from "fakeDatabase/client/fakeClientList"
 // fakeData/type
 import { TuseProfile } from "../hook/useProfile"
+import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+
+type TclientProfileList = ReturnType<Class_client["get"]>
 
 
 export default function ClientSelector(
-  { showModal, setShowModal, profileState }:
+  { showModal, setShowModal, fakeClientList, onConfirm }:
     {
       showModal: boolean
       setShowModal: Dispatch<SetStateAction<boolean>>
-      profileState: TuseProfile
+      fakeClientList: TclientProfileList
+      onConfirm: (v: TclientProfileList[0]) => void
     }
 ) {
 
-  const clientList = useMemo(() => {
+  const clientListArr = useMemo(() => {
     // 現在使用假資料，到時候要接api取資料
-    return fakeClientProfileList
+    // return fakeClientList
+    return Object.values(fakeClientList)
   }, [])
 
   // ==================================================
   // 被選的資料
-  const [selClient, setSelClient] = useState<TclientProfile>()
+  const [selClient, setSelClient] = useState<TclientProfileList[0]>()
   // 搜尋過濾
   const [searchValue, setSearchValue] = useState("")
   // ==================================================
-  const onClick = (item: TclientProfile) => {
+  const onClick = (item: TclientProfileList[0]) => {
     setSelClient(item)
   }
-  const onConfirm = () => {
-    if (!selClient) return ModalInfo("請選擇公司")
-    const { setClientId, setClientName, setContactPerson,
-      setContactPhone, setFax, setClientState } = profileState
-    const { clientId, shortName, contact, fax, clientState } = selClient
-    const { name: contactPerson, phone: contactPhone } = contact[0]
 
-    setClientId(clientId)
-    setClientName(shortName)
-    setContactPerson(contactPerson)
-    setContactPhone(contactPhone)
-    setFax(fax)
-    setClientState(clientState)
+  const theOnConfirm = () => {
+    if (!selClient) return ModalInfo("請選擇公司")
+    onConfirm(selClient)
     onCancel()
   }
+
   const onCancel = () => {
     setShowModal(false);
     setSearchValue("");
@@ -71,10 +68,11 @@ export default function ClientSelector(
     <ModalListSelectorWithSearch {...{
       label: "請選擇公司", visible: showModal,
       setVisible: setShowModal,
-      onConfirm, onCancel, onSearch
+      onConfirm: theOnConfirm, onCancel, onSearch
     }} >
       <ul className={style.container}>
-        {clientList.map((item, index) => {
+
+        {clientListArr.map((item, index) => {
           const { clientId } = item;
           const isActive = clientId === selClient?.clientId ? true : false
           const { name } = item

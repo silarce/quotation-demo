@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState } from "react"
 // --------------------
 import {
   DndContext,
@@ -27,24 +27,24 @@ import TheadItem from "./dndThead/theadItem"
 import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
-// data hook type config
-import type { TuseProduct, Tproduct } from "../hook/useProduct"
-// 格子的設定
-// import { prodCellConfigOri } from "fakeDatabase/domestic/quotation/fakeQuotProductionList_new"
-import { prodCellConfigOri } from "../hook/useProduct"
-const { cellConfig } = prodCellConfigOri()
+// type
+import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
 // =========================================================
 // =========================================================
-export default function DndThead({ productStates, allowMove }:
+export default function DndThead({ allowMove, classQuotation }:
   {
-    productStates: TuseProduct
+
+    classQuotation: Class_quotation
     allowMove: boolean
   }) {
 
-  // thead的目錄、排序
-  const { theadIndex, setTheadIndex } = productStates
+  const {
+    mainProdCellConfig: prodCellConfig, // 格子的資訊(label, width這些)
+    mainProdkeyList: theadIndex, // thead的目錄、排序
+  } = classQuotation
+
   const sensors = useSensors(
     useSensor(PointerSensor),
   )
@@ -66,7 +66,7 @@ export default function DndThead({ productStates, allowMove }:
           strategy={horizontalListSortingStrategy}
         >
           {theadIndex.map((key, index) => {
-            const theadInfo = cellConfig[key]
+            const theadInfo = prodCellConfig.cellConfig[key]
             return (
               // key必須是items裡的值
               <TheadItem key={key} theadInfo={theadInfo}
@@ -76,13 +76,7 @@ export default function DndThead({ productStates, allowMove }:
             )
           })}
         </SortableContext>
-        <DragOverlay dropAnimation={null}
-          // 為了讓滑鼠再拖移時保持cursor:"grabbing"而設這個style
-          style={{
-            width: "120px", height: "40px",
-            cursor: "grabbing", transition: "0s",
-          }}
-        />
+        <DragOverlay dropAnimation={null} />
       </DndContext>
     </div>
   )
@@ -91,15 +85,11 @@ export default function DndThead({ productStates, allowMove }:
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
-      // let oldIndex: number = theadIndex.indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType">);
-      // let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType">);
       let oldIndex: number =
         theadIndex.
-          indexOf(active.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType" | "unitWeight">);
-      let newIndex: number = theadIndex.indexOf(over?.id as Exclude<keyof Tproduct, "component" | "accessory" | "quoteTypeType" | "unitWeight">);
-      setTheadIndex((item) => {
-        return arrayMove(item, oldIndex, newIndex)
-      })
+          indexOf(active.id as typeof theadIndex[number]);
+      let newIndex: number = theadIndex.indexOf(over?.id as typeof theadIndex[number]);
+      classQuotation.mainProdkeyList = arrayMove(theadIndex, oldIndex, newIndex)
     }
   }
 
@@ -110,6 +100,3 @@ export default function DndThead({ productStates, allowMove }:
 
 } // DndThead  
 
-
-// ===========================================================
-// ===========================================================

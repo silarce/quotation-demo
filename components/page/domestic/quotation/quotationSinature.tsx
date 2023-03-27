@@ -1,46 +1,31 @@
 
 // global gear
 import Input03 from "components/global/gear/input/input03"
-
 // css
 import style from "./quotationSinature.module.scss"
 
-// type
-import { TuseSinature } from "./hook/useSinature"
 
-export default function QuotationSinature({ sinatureState, disabled = false }:
-  {
-    sinatureState: TuseSinature
-    disabled: boolean
-  }) {
-  const {
-    sinature, setSinature,
-    onChangeManager, onChangeDirector, onChangeAttn
-  } = sinatureState
-
-  const { manager, director, attn } = sinature
-
-  const sinatureList = [
-    { sinature: manager, onChange: onChangeManager },
-    { sinature: director, onChange: onChangeDirector },
-    { sinature: attn, onChange: onChangeAttn },
-  ]
-
+export default function QuotationSinature(
+  { signatureArr, disabled = false }:
+    {
+      signatureArr: { label: string, signature: string, onChange: (v: string) => void }[]
+      disabled: boolean
+    }) {
   return (
     <div className={style.container}>
-      {sinatureList.map((item, index) => {
-        const { sinature, onChange } = item
-        const { value, label } = sinature;
+      {signatureArr.map((item, index) => {
+        const { label, signature, onChange } = item
+
 
         return (
           <div key={index}>
             <span>{label}</span>
-            <Input03 {...{
-              stateValue: value,
-              onChange: onChange,
-              disabled,
-              showBaseline: "always"
-            }} />
+            <Input03
+              stateValue={signature}
+              onChange={(e) => onChange(e.target.value)}
+              disabled={disabled}
+              showBaseline={"always"}
+            />
           </div>
         )
       })}

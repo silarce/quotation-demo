@@ -13,22 +13,26 @@ import style from "./quotationProduct.module.scss"
 import styleL from "./local.module.scss"
 
 // type
-import type { TuseProduct } from "./hook/useProduct"
+
+import { Class_quotation } from "hooks/quotation/useQuotation"
 
 
-
-export default function QuotationProduction({ productStates, switch02, className = "" }:
+export default function QuotationProduction({
+  classQuotation,
+  disabled,
+  switch02,
+  className = "" }:
   {
-    productStates: TuseProduct
+    classQuotation: Class_quotation
+    disabled: boolean
     switch02?: boolean
     className?: string
   }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
 
-  const [allowMove, setAllowMove] = useState(false)
 
-  const { addProduct } = productStates
+  const [allowMove, setAllowMove] = useState(false)
 
   const borderRed = switch02 ? style.borderRed : ""
 
@@ -43,15 +47,16 @@ export default function QuotationProduction({ productStates, switch02, className
       </div>
       <div className={style.listContainer}>
         <div className={style.thead}>
-          <DndThead productStates={productStates} allowMove={allowMove} />
+          <DndThead
+            classQuotation={classQuotation}
+            allowMove={allowMove} />
         </div>
 
-        <ProductList productStates={productStates} />
+        <ProductList classQuotation={classQuotation} disabled={disabled} />
 
         <AddButton className={style.addBtn}
           label="新增產品"
-          onClick={addProduct}
-        />
+          onClick={classQuotation.addMainProd} />
       </div>
     </div>
   )

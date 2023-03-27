@@ -7,11 +7,35 @@ import { optionsCreator_doorRail } from "fakeDatabase/options/options"
 const optionsDoorRail = optionsCreator_doorRail()
 
 // type
-import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
+// import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
+
+
+
+
+
+type TproductList = {
+  category: string
+  size: string
+  doorType: string
+  material: string
+  thickness: string
+  surface: string
+  doorRail: string
+  horsepower: string
+  openType: string
+  qty: string
+  unitPrice: string
+  priceTotal: string
+  memo: string
+}[]
+
+
+
+
 
 export default function Table(
   { productList }:
-    { productList: ProdClass[] }
+    { productList: TproductList }
 ) {
 
   return (
@@ -37,8 +61,8 @@ export default function Table(
         )
       })}
 
-      {productList.map((row, rIndex) => {
-        const data = row.allData
+      {productList.map((item, rIndex) => {
+        const data = item
         return indexKeys.map((key, cIndex) => {
           let value = data[key]
           const { width, align } = config[key]
@@ -89,7 +113,7 @@ export default function Table(
 // =============================================================================
 
 type TindexKeys =
-  "project" | "size" | "doorType" | "material" | "thickness" |
+  "category" | "size" | "doorType" | "material" | "thickness" |
   "surface" | "doorRail" | "horsepower" | "openType" | "qty" |
   "unitPrice" | "priceTotal" | "memo"
 
@@ -102,13 +126,13 @@ type Tconfig = {
 }
 
 const indexKeys: TindexKeys[] = [
-  "project", "size", "doorType", "material", "thickness",
+  "category", "size", "doorType", "material", "thickness",
   "surface", "doorRail", "horsepower", "openType", "qty",
   "unitPrice", "priceTotal", "memo"
 ]
 
 const config: Tconfig = {
-  project: {
+  category: {
     label: "項目",
     width: "130px",
   },

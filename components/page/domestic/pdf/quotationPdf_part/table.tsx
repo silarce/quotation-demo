@@ -1,16 +1,16 @@
 
-import { ProdClass, PartClass } from "components/page/domestic/quotation/hook/useProduct"
-
 // css
 import scss from "./quotationPdf_part.module.scss"
 
-
 export default function Table(
-  { prod }:
-    { prod: ProdClass }
+  { partArr, priceTotal }:
+    {
+      partArr: Tpart[]
+      priceTotal: string
+    }
 ) {
 
-  const { part: partArr } = prod
+
 
   return (
     <div className={scss.table}>
@@ -44,7 +44,7 @@ export default function Table(
 
       <div className={scss.total}>
         <div><span>報價合計 : </span></div>
-        <div><span>{prod.priceTotal}</span></div>
+        <div><span>{priceTotal}</span></div>
       </div>
     </div>
   )
@@ -53,12 +53,18 @@ export default function Table(
 
 // ============================================================================
 
+type Tpart = {
+  partName: string
+  material: string
+  unit: string
+  qty: string
+  price: string
+  totalPrice: string
+}
+
+
 type TkeyIndex =
-  keyof
-  Pick<
-    PartClass,
-    "subTypeName" | "material" | "surface" | "unit" | "qty" | "price" | "totalPrice"
-  >
+  "partName" | "material" | "unit" | "qty" | "price" | "totalPrice"
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string
@@ -71,10 +77,10 @@ type Tconfig = {
 }
 
 const keyIndex: TkeyIndex[] =
-  ["subTypeName", "material", "surface", "unit", "qty", "price", "totalPrice"]
+  ["partName", "material", "unit", "qty", "price", "totalPrice"]
 
 const config: Tconfig = {
-  subTypeName: {
+  partName: {
     label: "名稱",
     style: {
       width: "300px"
@@ -82,14 +88,6 @@ const config: Tconfig = {
   },
   material: {
     label: "材質",
-    style: {
-      width: "auto",
-      flex: "1"
-    },
-
-  },
-  surface: {
-    label: "表面",
     style: {
       width: "auto",
       flex: "1"

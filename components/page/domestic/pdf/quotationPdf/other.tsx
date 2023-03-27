@@ -2,41 +2,39 @@
 // css
 import style from "./quotationPdf.module.scss"
 
-
-// type
-
-import { TuseRangeList } from "components/page/domestic/quotation/hook/useRangeList"
-import { TusePayInfo } from "components/page/domestic/quotation/hook/usePayInfo"
-import { TuseSinature } from "components/page/domestic/quotation/hook/useSinature"
-
-
-
 export default function Other(
   {
-    rangeListState,
-    payInfoState,
-    sinatureState
+    quoteRangeArr,
+    payInfo,
+    attn
   }:
     {
-      rangeListState: TuseRangeList
-      payInfoState: TusePayInfo
-      sinatureState: TuseSinature
+      quoteRangeArr: string[]
+      payInfo: {
+        tradingLocation: string
+        tradingDate: string
+        deposit: string
+        deliveryPayment: string
+        installedPayment: string
+        eleConnectPayment: string
+      }
+      attn: string
     }
 ) {
 
-  const { rangeList } = rangeListState
+  const rangeList = quoteRangeArr
 
-  const { payMethod, tradingDate, tradingLocation } = payInfoState.payInfo
+
   const {
-    deposit, //訂製
-    deliveryPayment, // 交貨
-    installedPayment, // 按裝
-    eleConnectPayment, // 接電
-  } = payMethod
+    tradingLocation,
+    tradingDate,
+    deposit,
+    deliveryPayment,
+    installedPayment,
+    eleConnectPayment,
+  } = payInfo
+
   const [year, month, day] = tradingDate.split("-")
-
-  const attn = sinatureState.sinature.attn.value
-
 
   return (
     <div className={style.other}>
@@ -44,8 +42,7 @@ export default function Other(
       <div className={style.range}>
         <h2>一、報價範圍</h2>
         <ol>
-          {rangeList.map((data, index) => {
-            const { content } = data
+          {rangeList.map((content, index) => {
             return (
               <li key={index}>{content}</li>
             )

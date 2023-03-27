@@ -7,7 +7,7 @@ import {
 
 
 
- class Class_FakeApi_memo {
+class Class_FakeApi_memo {
   private _memoArr = fakeMemoDataArr
 
   private _fitler = (
@@ -77,4 +77,4 @@ import {
 
 const fakeApi_memo = new Class_FakeApi_memo()
 
-export { fakeApi_memo }
+export { Class_FakeApi_memo, fakeApi_memo }

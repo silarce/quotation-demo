@@ -9,7 +9,7 @@ import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
 import style from "../budgetList.module.scss"
 
 
-import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeProjectSimpleApi';
+import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 type TprojectSimpleRecord = ReturnType<Class_fakeApi_projectSimple['get']>[0]["tempRecord"];
 
 
