@@ -23,13 +23,13 @@ import scss from "../editEmployee.module.scss"
 
 
 // ============================================================
+
 const defaultParams = (): Tparams => ({
   order: "ASC",
   page: 1,
   pageSize: 999,
   populate: ["jobs"]
 })
-
 
 
 
@@ -49,9 +49,9 @@ export default function EditEmployeeItem02({ data, setData }: {
   // ======================================================
   // 部門選擇所需的狀態與options
   const jobsOptions01
-    = useJobsOptions(departmentsData??{}, data?.jobs?.[0])
+    = useJobsOptions(departmentsData ?? {}, data?.jobs?.[0])
   const jobsOptions02
-    = useJobsOptions(departmentsData??{}, data?.jobs?.[1])
+    = useJobsOptions(departmentsData ?? {}, data?.jobs?.[1])
 
   useEffect(() => {
     updateDepartmentsData()
@@ -59,19 +59,16 @@ export default function EditEmployeeItem02({ data, setData }: {
   }, [])
 
   useEffect(() => {
-    const jobs: TjobDto[] = []
-    jobsOptions01.jobs && jobs.push(jobsOptions01.jobs)
+    const jobs: (TjobDto | undefined)[] = []
+    jobsOptions01.jobs ? jobs.push(jobsOptions01.jobs) : jobs.push(undefined)
     jobsOptions02.jobs && jobs.push(jobsOptions02.jobs)
-    setData(data => ({
-      ...data,
-      jobs
-    }))
+
+    setData(data => ({ ...data, jobs }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobsOptions01.jobs, jobsOptions02.jobs])
 
-
   const [jobsConfig01, jobsKeyindex01] = jobConfig(jobsOptions01)
-  const [jobsConfig02] = jobConfig(jobsOptions02)
+  const [jobsConfig02, jobsKeyindex02] = jobConfig(jobsOptions02)
 
   // ======================================================
 
@@ -87,6 +84,7 @@ export default function EditEmployeeItem02({ data, setData }: {
       <p className={scss.subTitle}>公司資訊</p>
       <div className={scss.form02}>
         <>
+
           <div className={scss.selBox}>
             {jobsKeyindex01.map((key, index) => {
               const { stateValue, label, options, onChange }
@@ -119,9 +117,11 @@ export default function EditEmployeeItem02({ data, setData }: {
               : <IconAddCircle onClick={switchNewDepart} />
             }
           </div>
+
+
           {isDepart02 &&
             <div className={scss.selBox}>
-              {jobsKeyindex01.map((key, index) => {
+              {jobsKeyindex02.map((key, index) => {
                 const { stateValue, label, options, onChange }
                   = jobsConfig02[key]
 
@@ -153,6 +153,14 @@ export default function EditEmployeeItem02({ data, setData }: {
               }
             </div>}
         </>
+
+
+
+
+
+
+
+
 
         <div className={scss.bottomContainer}>
           <div>

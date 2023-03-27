@@ -86,7 +86,7 @@ export default function EditEmployee({ data, setData, check }: {
 
 
 export type TprePostEmployee
-  = Omit<TpostEmployee, "jobId"> & { jobs: TjobDto[] }
+  = Omit<TpostEmployee, "jobId"> & { jobs: (TjobDto|undefined)[] }
 
 const emptyDataOri = (): TprePostEmployee => ({
   "idNumber": "",

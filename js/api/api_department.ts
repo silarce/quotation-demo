@@ -275,6 +275,7 @@ export const useJobsOptions = (
       label: jobs.name,
       // grade: `${jobs.grade}`
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   // ==============================================
   // ==============================================

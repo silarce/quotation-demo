@@ -52,17 +52,26 @@ export default function AddEmployee() {
       label: "上傳",
       onClick: async () => {
         try {
+          if (!data) throw new Error("data為undefined")
           setRootLoading(true)
-          let postData = _.cloneDeep(data)
-          postData.jobId = postData.jobs.map((jobs: TjobDto) => jobs.id)
+          let postData = _.cloneDeep(data) as typeof data & { jobId: string[] }
 
-          postData = postData as TpostEmployee
+          postData.jobId = (() => {
+            const arr = postData.jobs?.map((job: TjobDto | undefined) => {
+              return job?.id
+            }) ?? []
+            return arr.filter((item) => typeof item === "string") as string[]
+          })()
 
-          await apiPatchEmployee(postData, postData.id)
+          const thePostData = postData as TpostEmployee
+
+          await apiPatchEmployee(thePostData, postData.id)
           myAlert.success({ title: "變更人員資料完成" })
         }
-        catch {
-          myAlert.err({ title: "變更人員資料失敗" })
+        catch (error) {
+          const err = error as Error
+          const title = "變更人員資料失敗、未知原因"
+          myAlert.err({ title, content: err.message })
         }
         finally {
           setRootLoading(false)

@@ -58,13 +58,20 @@ export default function AddEmployee() {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-        if (check === "notOk") return myAlert.err({ title: "使用者代號錯誤" })
-        if (check === "loading") return myAlert.info({ title: "正在檢查使用者代號" })
         try {
+          if (check === "notOk") throw new Error("使用者代號錯誤")
+          if (check === "loading") throw new Error("正在檢查使用者代號")
           setRootLoading(true)
-          let postData = _.cloneDeep(data)
-          postData.jobId = postData.jobs.map((jobs: TjobDto) => jobs.id)
-          postData = postData as TpostEmployee
+          let postData = _.cloneDeep(data) as typeof data & { jobId: string[] }
+          
+          postData.jobId = (() => {
+            const arr = postData.jobs.map((job: TjobDto | undefined) => {
+              return job?.id
+            })
+            return arr.filter((item) => typeof item === "string") as string[]
+          })()
+
+          postData = postData
           const res = await apiPostEmployee(postData) as TemployeeDto
           router.push({
             pathname: `/setting/employees/edit/${res.id}`,
@@ -74,8 +81,10 @@ export default function AddEmployee() {
           })
           myAlert.success({ title: "新增人員完成" })
         }
-        catch {
-          myAlert.err({ title: "新增人員失敗" })
+        catch (error) {
+          const err = error as Error
+          const title = "新增使用者失敗、未知原因"
+          myAlert.err({ title, content: err.message })
         }
         finally {
           setRootLoading(false)
@@ -88,6 +97,9 @@ export default function AddEmployee() {
       onClick: () => { router.back() }
     }
   ]
+
+
+
 
   // =====================================================
   return (
@@ -135,11 +147,5 @@ const emptyDataOri = (): TprePostEmployee => ({
   "severanceDate": "",
   "jobs": [],
 })
-
-
-
-
-// ========================================================
-
 
 
