@@ -1,5 +1,5 @@
 
-import {  Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
@@ -217,10 +217,15 @@ export default function EditEmployeeItem01({ data, setData }: {
 
 // ============================================================
 type TkeyIndex01Key = (keyof Pick<TpostEmployee,
-  "chName" | "enName" | "identity" | "phone1" | "phone2">)
+  "chName" | "enName" |
+  // "identity" |
+  "phone1" | "phone2">)
+
 
 const keyIndex01: TkeyIndex01Key[]
-  = ["chName", "enName", "identity", "phone1", "phone2"]
+  = ["chName", "enName",
+    // "identity",
+    "phone1", "phone2"]
 
 const config01: {
   [key in TkeyIndex01Key]: {
@@ -233,9 +238,9 @@ const config01: {
   enName: {
     label: "英文姓名"
   },
-  identity: {
-    label: "身分證字號"
-  },
+  // identity: {
+  //   label: "身分證字號"
+  // },
   phone1: {
     label: "聯絡電話1"
   },

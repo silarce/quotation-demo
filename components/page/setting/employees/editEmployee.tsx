@@ -43,8 +43,8 @@ export default function EditEmployee({ data, setData, check }: {
 
       <div className={scss.employeeId}>
         <InputSel
-          label="使用者代號"
-          placeholder="請輸入使用者代號"
+          label="員工編號"
+          placeholder="請輸入員工編號"
           className={scss.input02}
           disabled={idNumberIsDisabled}
           showBaseline="auto"
@@ -63,7 +63,7 @@ export default function EditEmployee({ data, setData, check }: {
             }
             {check === "notOk" &&
               <span className={scss.alertTip}>
-                {data.idNumber ? "此代號已有人使用" : "請輸入使用者代號"}
+                {data.idNumber ? "此員工編號已有人使用" : "請輸入員工編號"}
               </span>
             }
 

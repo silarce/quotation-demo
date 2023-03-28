@@ -76,13 +76,13 @@ export type TcustomerDto = {
 }
 
 export type TemployeeDto = {
-  id: string
+  id: string // 應該是資料庫的 pk
   createdAt: string
   updatedAt: string
-  idNumber: string
+  idNumber: string // 員工編號
   chName: string
   enName: string
-  identity: string
+  identity: string  // 身分證字號
   birthday: string
   gender: string
   marital: string
