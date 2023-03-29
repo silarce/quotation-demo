@@ -42,80 +42,82 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
     <div className={scss.editEmployeeItem02}>
       <p className={scss.subTitle}>公司資訊</p>
       <div className={scss.form02}>
+        <div className={scss.jobsArr}>
+          {classJobGroupArr.map((group, index, arr) => {
+            const { department, job } = group
 
-        {classJobGroupArr.map((group, index, arr) => {
-          const { department, job } = group
+            const departmentValue = department ? {
+              value: department.id,
+              label: department.name
+            } : null
+            const jobValue = job ? {
+              value: job.id,
+              label: job.name,
+            } : null
 
-          const departmentValue = department ? {
-            value: department.id,
-            label: department.name
-          } : null
-          const jobValue = job ? {
-            value: job.id,
-            label: job.name,
-          } : null
+            const departmentOptionArr
+              = departmentJobOptionGroup.departmentOptionArr
 
-          const departmentOptionArr
-            = departmentJobOptionGroup.departmentOptionArr
+            const jobOptionArr
+              = department
+                ? departmentJobOptionGroup.jobOptionArrList[department.id]
+                : []
 
-          const jobOptionArr
-            = department
-              ? departmentJobOptionGroup.jobOptionArrList[department.id]
-              : []
+            return (
+              <div key={index} className={scss.selBox}>
 
-          return (
-            <div key={index} className={scss.selBox}>
-
-              <InputSel className={scss.inputSel}
-                label="部門"
-                presetStyle="s01"
-                selectProps={{
-                  value: departmentValue,
-                  options: departmentOptionArr,
-                  onChange: (option) => {
-                    if (!option) group.department = null
-                    else {
-                      group.department = {
-                        id: option.value,
-                        name: option.label
+                <InputSel className={scss.inputSel}
+                  label="部門"
+                  presetStyle="s01"
+                  selectProps={{
+                    value: departmentValue,
+                    options: departmentOptionArr,
+                    onChange: (option) => {
+                      if (!option) group.department = null
+                      else {
+                        group.department = {
+                          id: option.value,
+                          name: option.label
+                        }
                       }
-                    }
-                  },
-                }} />
-              <InputSel className={scss.inputSel} key={index}
-                label="職稱"
-                presetStyle="s01"
-                selectProps={{
-                  value: jobValue,
-                  options: jobOptionArr,
-                  onChange: (option) => {
-                    if (!option) group.job = null
-                    else {
-                      group.job = {
-                        id: option.value,
-                        name: option.label,
-                        grade: option.grade ?? ""
+                    },
+                  }} />
+                <InputSel className={scss.inputSel} key={index}
+                  label="職稱"
+                  presetStyle="s01"
+                  selectProps={{
+                    value: jobValue,
+                    options: jobOptionArr,
+                    onChange: (option) => {
+                      if (!option) group.job = null
+                      else {
+                        group.job = {
+                          id: option.value,
+                          name: option.label,
+                          grade: option.grade ?? ""
+                        }
                       }
-                    }
-                  },
-                }} />
-              <InputSel
-                className={scss.inputSel}
-                label="職等"
-                presetStyle="s01"
-                disabled={true}
-                inputProps={{
-                  value: job?.grade ?? "",
-                  onChange: () => { },
-                }}
-              />
-              <div className={scss.btnBox}>
-                {index === arr.length - 1 && <IconAddCircle onClick={addJobGroup} />}
-                {arr.length !== 1 && <IconRemoveCircle onClick={() => removeJobGroup(index)} />}
+                    },
+                  }} />
+                <InputSel
+                  className={scss.inputSel}
+                  label="職等"
+                  presetStyle="s01"
+                  disabled={true}
+                  inputProps={{
+                    value: job?.grade ?? "",
+                    onChange: () => { },
+                  }}
+                />
+                <div className={scss.btnBox}>
+                  {index === arr.length - 1 && <IconAddCircle onClick={addJobGroup} />}
+                  {arr.length !== 1 && <IconRemoveCircle onClick={() => removeJobGroup(index)} />}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
+
 
         <div className={scss.bottomContainer}>
           <div>

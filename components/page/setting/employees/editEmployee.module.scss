@@ -66,36 +66,42 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       }
     }
   }
-
   .editEmployeeItem02 {
     margin-top: 27px;
     .form02 {
       padding: 29px $leftPadding_div;
+      padding-right: 75px;
       border: solid 1px $colorBorder01;
-      .selBox {
-        display: inline-block;
-        position: relative;
-        width: 378px;
-        padding: 7px 18px 21px 18px;
-        margin-left: 75px;
-        border: solid 1px $colorBorder01;
-        &:nth-of-type(1) {
-          margin-left: 0;
-        }
-        .input02 {
-          hr {
-            border-color: $colorMain;
+      .jobsArr {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px 75px;
+        .selBox {
+          flex: none;
+          display: inline-block;
+          position: relative;
+          width: 378px;
+          padding: 7px 18px 21px 18px;
+          // margin-left: 75px;
+          border: solid 1px $colorBorder01;
+          &:nth-of-type(1) {
+            margin-left: 0;
           }
-        }
-        .btnBox {
-          position: absolute;
-          left: calc(100% + 12px);
-          top: 50%;
-          transform: translateY(-50%);
-          display: grid;
-          grid-gap: 20px;
-          > svg {
-            cursor: pointer;
+          .input02 {
+            hr {
+              border-color: $colorMain;
+            }
+          }
+          .btnBox {
+            position: absolute;
+            left: calc(100% + 12px);
+            top: 50%;
+            transform: translateY(-50%);
+            display: grid;
+            grid-gap: 20px;
+            > svg {
+              cursor: pointer;
+            }
           }
         }
       }
@@ -118,8 +124,8 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
           }
         }
       }
-    }
-  }
+    } // form02
+  } // editEmployeeItem02
 
   .inputSel {
     input,
