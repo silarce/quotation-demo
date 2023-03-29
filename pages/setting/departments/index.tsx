@@ -22,13 +22,13 @@ import { showRootLoading } from "components/global/gear/loadingCover/rootLoading
 
 // api
 import {
-  TdepartmentDto, TjobDto, TupdateDepartmentJobDto,
-  useDepartments,  // 取得部門列表
+  TdepartmentDto_jobs, TjobDto, TupdateDepartmentJobDto,
+  useDepartments_jobs,  // 取得部門列表
   apiPostDepartments, // 新增部門
   apiDeleteDepartments, // 刪除部門
   apiDeleteJobs, // 刪除職等
   apiPatchDepartments, // 批次更新部門資料(包括name與底下的jobs)
-  Tparams
+  Tparams_jobs
 } from "js/api/api_department"
 
 // css
@@ -37,7 +37,7 @@ import style from "./departments.module.scss"
 
 
 // ===========================================================
-const params: Tparams = {
+const params: Tparams_jobs = {
   populate: ["jobs"],
   // order: "DESC",
   // sort: "jobs.grade",
@@ -53,7 +53,7 @@ export default function Department() {
   const [showAdd, setShowAdd] = useState(false)
   // ---------------------------------------------------------
   // 取得部門列表
-  const { data, setData, update } = useDepartments(params)
+  const { data, setData, update } = useDepartments_jobs(params)
   const departmentArr = data?.data ?? []
 
 
@@ -242,11 +242,11 @@ export class ClassDepartment {
   // --------------------------------------------------------
   // --------------------------------------------------------
   constructor(
-    department: TdepartmentDto | { newDepartmentName: string },
+    department: TdepartmentDto_jobs | { newDepartmentName: string },
     reRender: () => void
   ) {
 
-    let jobs: TdepartmentDto["jobs"];
+    let jobs: TdepartmentDto_jobs["jobs"];
     if ("id" in department) {
       this.id = department.id
       this._name = department.name
@@ -396,7 +396,7 @@ class ClassJob {
 
 } // ClassJob=================================================================
 
-const useClass = (departmentArr: TdepartmentDto[], editable: boolean) => {
+const useClass = (departmentArr: TdepartmentDto_jobs[], editable: boolean) => {
   const [CdepartmentArr, setCdepartmentArr] = useState<ClassDepartment[]>([])
   const reRender = () => setCdepartmentArr(state => [...state])
 

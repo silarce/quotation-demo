@@ -113,7 +113,7 @@ export type TjobDto = {
   updatedAt: string
   name: string
   grade: number
-  department?: TdepartmentDto
+  department?: TdepartmentDto_jobs
   employees?: TemployeeDto[]
 }
 
@@ -122,7 +122,17 @@ export type TdepartmentDto = {
   createdAt: string
   updatedAt: string
   name: string
-  jobs?: TjobDto[] //api文件似乎有誤，這邊應該是陣列
+}
+
+/**
+ * TdepartmentDto型別裡加 jobs: TjobDto[] 
+ */
+export type TdepartmentDto_jobs = {
+  id: string
+  createdAt: string
+  updatedAt: string
+  name: string
+  jobs: TjobDto[] 
 }
 
 export type TdepartmentManagerDto = {
@@ -139,7 +149,7 @@ export type TerpFeatureDto = {
   createdAt: string
   updatedAt: string
   name: string
-  departments: TdepartmentDto[]
+  departments: TdepartmentDto_jobs[]
 }
 
 

@@ -10,8 +10,8 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 
 // api
 import {
-  Tparams, TuseJobsOptions, TjobDto,
-  useDepartments, useJobsOptions
+  Tparams_jobs, TuseJobsOptions, TjobDto,
+  useDepartments_jobs, useJobsOptions
 } from "js/api/api_department";
 
 
@@ -24,7 +24,7 @@ import scss from "../editEmployee.module.scss"
 
 // ============================================================
 
-const defaultParams = (): Tparams => ({
+const defaultParams = (): Tparams_jobs => ({
   order: "ASC",
   page: 1,
   pageSize: 999,
@@ -45,7 +45,7 @@ export default function EditEmployeeItem02({ data, setData }: {
   // ======================================================
   // 部門資料
   const { data: departmentsData, update: updateDepartmentsData }
-    = useDepartments(defaultParams())
+    = useDepartments_jobs(defaultParams())
   // ======================================================
   // 部門選擇所需的狀態與options
   const jobsOptions01

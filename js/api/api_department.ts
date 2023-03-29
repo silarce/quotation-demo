@@ -5,29 +5,29 @@ import { axi } from "./_axiosCreator";
 
 // type
 import {
-  TpageMetaDto, TdepartmentDto, TjobDto,
+  TpageMetaDto, TdepartmentDto, TdepartmentDto_jobs, TjobDto,
   TdepartmentManagerDto, TupdateDepartmentJobDto
 } from "./dtoTypes";
 import { Toption } from "fakeDatabase/options/options";
 
-export type { TdepartmentDto, TjobDto, TupdateDepartmentJobDto }
+export type { TdepartmentDto, TdepartmentDto_jobs, TjobDto, TupdateDepartmentJobDto }
 
 
-export type Tparams = {
+export type Tparams_jobs = {
   order?: "ASC" | "DESC",
   page?: number,
   pageSize?: number,
   filter?: {
     [key: string]: any
   }
-  populate?: string[]
+  populate?: "jobs"[]
 }
 
 // ==========================================================
 // ==========================================================
 
 export type TgetDepartments = {
-  data: TdepartmentDto[]
+  data: TdepartmentDto_jobs[]
   meta: TpageMetaDto
 }
 
@@ -35,14 +35,27 @@ export type TgetDepartments = {
 // ----------------------------------------------------
 // departments
 
-const apiGetDepartments = (params: Tparams) => {
+const apiGetDepartments = (params: Tparams_jobs) => {
   const api = "/departments"
   return axi.get(api, { params })
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
 
-export const useDepartments = (params: Tparams = {}) => {
+
+// export const useDepartments = (params: Tparams = {}) => {
+//   let [data, setData] = useState<TgetDepartments>()
+//   const update = async () => {
+//     const data = await apiGetDepartments(params)
+//     if (data) setData(data)
+//     return data
+//   }
+//   return { data, setData, update }
+// }
+/**
+ * data.data型別為TdepartmentDto_jobs[]
+ */
+export const useDepartments_jobs = (params: Tparams_jobs = {}) => {
   let [data, setData] = useState<TgetDepartments>()
   const update = async () => {
     const data = await apiGetDepartments(params)
@@ -51,6 +64,9 @@ export const useDepartments = (params: Tparams = {}) => {
   }
   return { data, setData, update }
 }
+
+
+
 
 // 新增部門
 export const apiPostDepartments = (body: { name: string }) => {
@@ -101,14 +117,14 @@ type TgetJobs = {
 // jobs
 
 // 取得所有職等
-const apiGetJobs = (params: Tparams) => {
+const apiGetJobs = (params: Tparams_jobs) => {
   const api = "/jobs"
   return axi.get(api, { params })
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
 
-export const useJobs = (params: Tparams) => {
+export const useJobs = (params: Tparams_jobs) => {
   let [data, setData] = useState<TgetJobs>()
   const update = async () => {
     const data = await apiGetJobs(params)
@@ -291,7 +307,7 @@ export const useJobsOptions = (
   // --------------------------------
   function optionsDepartmentsOri() {
     const optionsDepartmentsObj
-      = {} as { [key: string]: TdepartmentDto }
+      = {} as { [key: string]: TdepartmentDto_jobs }
     const optionsDepartments
       = [] as Toption[]
 
@@ -339,6 +355,111 @@ export type TuseJobsOptions = ReturnType<typeof useJobsOptions>
 
 
 
+
+
+
+// export const useJobsOptionsCreator = (departmentArr: TdepartmentDto[]) => {
+//   type TjobOptiion = { value: string, label: string, grade: string }
+
+//   return useMemo(() => {
+//     const departmentOptionArr: { value: string, label: string }[] = []
+//     /** key為department的id */
+//     const jobOptionArrList: { [key: string]: TjobOptiion[] } = {}
+//     departmentArr.forEach((de) => {
+//       const { id, jobs } = de
+//       departmentOptionArr.push({ value: de.id, label: de.name })
+//       jobOptionArrList[id] = jobs.map((job) => {
+//         return {
+//           value: job.id,
+//           label: job.name,
+//           grade: `${job.grade}`,
+//         }
+//       })
+//     })
+//     return {
+//       departmentOptionArr,
+//       jobOptionArrList
+//     }
+//   }, [departmentArr])
+
+// } // useJobsOptions02
+
+
+
+// type TdepartmentJobArr = {
+//   department: { id: string, name: string },
+//   job: { id: string, name: string, grade: string }
+// }
+// export const useDepertmentJobs = (
+//   // jobsArr: TjobDto[],
+//   // departmentOptionArr: ReturnType<typeof useJobsOptionsCreator>["departmentOptionArr"],
+//   // jobOptionList: ReturnType<typeof useJobsOptionsCreator>["jobOptionList"],
+//   jobsArrOri: TdepartmentJobArr[],
+//   departmentOptionArr: { value: string; label: string; }[],
+//   jobOptionArrList: { [key: string]: { value: string, label: string, grade: string }[]; },
+// ) => {
+
+//   type TdepartmentOption = typeof departmentOptionArr[number]
+//   type TjobOptionArr = typeof jobOptionArrList[string]
+//   type Tgroup = TdepartmentJobArr & {
+//     jobOptionArr: TjobOptionArr
+//   }
+
+//   const [groupArr, setGroupArr] = useState<Tgroup[]>([])
+
+//   useEffect(() => {
+//     const theGroupArr = jobsArrOri.map((job) => {
+//       const departmentId = job.department.id
+//       const jobOptionArr = jobOptionArrList[departmentId]
+//       return {
+//         ...job,
+//         jobOptionArr
+//       }
+//     })
+//     setGroupArr(theGroupArr)
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [jobsArrOri])
+// }
+
+
+
+
+
+
+// type TdepartmentJobArr = {
+//   department: { id: string, name: string },
+//   job: { id: string, name: string, grade: string }
+// }
+// export const useDepertmentJobs = (
+//   // jobsArr: TjobDto[],
+//   // departmentOptionArr: ReturnType<typeof useJobsOptionsCreator>["departmentOptionArr"],
+//   // jobOptionList: ReturnType<typeof useJobsOptionsCreator>["jobOptionList"],
+//   jobsArrOri: TdepartmentJobArr[],
+//   departmentOptionArr: { value: string; label: string; }[],
+//   jobOptionArrList: { [key: string]: { value: string, label: string, grade: string }[]; },
+// ) => {
+
+//   type TdepartmentOption = typeof departmentOptionArr[number]
+//   type TjobOptionArr = typeof jobOptionArrList[string]
+//   type Tgroup = TdepartmentJobArr & {
+//     jobOptionArr: TjobOptionArr
+//   }
+
+//   const [groupArr, setGroupArr] = useState<Tgroup[]>([])
+
+//   useEffect(() => {
+//     const theGroupArr = jobsArrOri.map((job) => {
+//       const departmentId = job.department.id
+//       const jobOptionArr = jobOptionArrList[departmentId]
+//       return {
+//         ...job,
+//         jobOptionArr
+//       }
+//     })
+//     setGroupArr(theGroupArr)
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [jobsArrOri])
+// }
 
 
 
