@@ -1,166 +1,121 @@
 
-import { useState, useEffect } from "react";
-import { Dispatch, SetStateAction } from "react";
-
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
-// api
-import {
-  Tparams_jobs, TuseJobsOptions, TjobDto,
-  useDepartments_jobs, useJobsOptions
-} from "js/api/api_department";
-
 
 // type
-import { Toption } from "fakeDatabase/options/options";
-import type { TprePostEmployee } from "../editEmployee";
+import { Class_employee } from "hooks/department-job-Employee/useEmployee";
 // css
 import scss from "../editEmployee.module.scss"
 
 
 // ============================================================
 
-const defaultParams = (): Tparams_jobs => ({
-  order: "ASC",
-  page: 1,
-  pageSize: 999,
-  populate: ["jobs"]
-})
-
-
+type TdepartmentJobOptionGroup = {
+  departmentOptionArr: {
+    value: string;
+    label: string;
+  }[];
+  jobOptionArrList: {
+    [key: string]: {
+      value: string;
+      label: string;
+      grade: string;
+    }[];
+  };
+}
 
 
 
 // ============================================================
-export default function EditEmployeeItem02({ data, setData }: {
-  data: TprePostEmployee
-  setData:
-  Dispatch<SetStateAction<TprePostEmployee>>
+export default function EditEmployeeItem02({ classEmployee, departmentJobOptionGroup }: {
+  classEmployee: Class_employee
+  departmentJobOptionGroup: TdepartmentJobOptionGroup
 }) {
 
-  // ======================================================
-  // 部門資料
-  const { data: departmentsData, update: updateDepartmentsData }
-    = useDepartments_jobs(defaultParams())
-  // ======================================================
-  // 部門選擇所需的狀態與options
-  const jobsOptions01
-    = useJobsOptions(departmentsData ?? {}, data?.jobs?.[0])
-  const jobsOptions02
-    = useJobsOptions(departmentsData ?? {}, data?.jobs?.[1])
-
-  useEffect(() => {
-    updateDepartmentsData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    const jobs: (TjobDto | undefined)[] = []
-    jobsOptions01.jobs ? jobs.push(jobsOptions01.jobs) : jobs.push(undefined)
-    jobsOptions02.jobs && jobs.push(jobsOptions02.jobs)
-
-    setData(data => ({ ...data, jobs }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobsOptions01.jobs, jobsOptions02.jobs])
-
-  const [jobsConfig01, jobsKeyindex01] = jobConfig(jobsOptions01)
-  const [jobsConfig02, jobsKeyindex02] = jobConfig(jobsOptions02)
-
-  // ======================================================
-
-  const [isDepart02, setIsDepart02] = useState(!!data?.jobs?.[1])
-
-  const switchNewDepart = () => {
-    setIsDepart02(state => !state)
-    jobsOptions02.clear()
-  }
+  const { classJobGroupArr, addJobGroup, removeJobGroup } = classEmployee
 
   return (
     <div className={scss.editEmployeeItem02}>
       <p className={scss.subTitle}>公司資訊</p>
       <div className={scss.form02}>
-        <>
 
-          <div className={scss.selBox}>
-            {jobsKeyindex01.map((key, index) => {
-              const { stateValue, label, options, onChange }
-                = jobsConfig01[key]
-              return (
-                <InputSel className={scss.inputSel} key={index}
-                  label={label}
-                  presetStyle="s01"
-                  selectProps={{
-                    value: stateValue,
-                    options: options,
-                    onChange: onChange,
-                  }}
-                />
-              )
-            })}
-            <InputSel
-              className={scss.input02}
-              label="職等"
-              presetStyle="s01"
-              disabled={true}
-              inputProps={{
-                value: data.jobs[0]?.grade ?? "",
-                onChange: () => { },
-              }}
-            />
+        {classJobGroupArr.map((group, index, arr) => {
+          const { department, job } = group
 
-            {isDepart02
-              ? <IconRemoveCircle onClick={switchNewDepart} />
-              : <IconAddCircle onClick={switchNewDepart} />
-            }
-          </div>
+          const departmentValue = department ? {
+            value: department.id,
+            label: department.name
+          } : null
+          const jobValue = job ? {
+            value: job.id,
+            label: job.name,
+          } : null
 
+          const departmentOptionArr
+            = departmentJobOptionGroup.departmentOptionArr
 
-          {isDepart02 &&
-            <div className={scss.selBox}>
-              {jobsKeyindex02.map((key, index) => {
-                const { stateValue, label, options, onChange }
-                  = jobsConfig02[key]
+          const jobOptionArr
+            = department
+              ? departmentJobOptionGroup.jobOptionArrList[department.id]
+              : []
 
-                return (
-                  <InputSel className={scss.inputSel} key={index}
-                    label={label}
-                    presetStyle="s01"
-                    selectProps={{
-                      value: stateValue,
-                      options: options,
-                      onChange: onChange,
-                    }}
-                  />
-                )
-              })}
+          return (
+            <div key={index} className={scss.selBox}>
+
+              <InputSel className={scss.inputSel}
+                label="部門"
+                presetStyle="s01"
+                selectProps={{
+                  value: departmentValue,
+                  options: departmentOptionArr,
+                  onChange: (option) => {
+                    if (!option) group.department = null
+                    else {
+                      group.department = {
+                        id: option.value,
+                        name: option.label
+                      }
+                    }
+                  },
+                }} />
+              <InputSel className={scss.inputSel} key={index}
+                label="職稱"
+                presetStyle="s01"
+                selectProps={{
+                  value: jobValue,
+                  options: jobOptionArr,
+                  onChange: (option) => {
+                    if (!option) group.job = null
+                    else {
+                      group.job = {
+                        id: option.value,
+                        name: option.label,
+                        grade: option.grade ?? ""
+                      }
+                    }
+                  },
+                }} />
               <InputSel
                 className={scss.inputSel}
                 label="職等"
                 presetStyle="s01"
                 disabled={true}
                 inputProps={{
-                  value: data.jobs[1]?.grade ?? "",
+                  value: job?.grade ?? "",
                   onChange: () => { },
                 }}
               />
-              {isDepart02
-                ? <IconRemoveCircle onClick={switchNewDepart} />
-                : <IconAddCircle onClick={switchNewDepart} />
-              }
-            </div>}
-        </>
-
-
-
-
-
-
-
-
+              <div className={scss.btnBox}>
+                {index === arr.length - 1 && <IconAddCircle onClick={addJobGroup} />}
+                {arr.length !== 1 && <IconRemoveCircle onClick={() => removeJobGroup(index)} />}
+              </div>
+            </div>
+          )
+        })}
 
         <div className={scss.bottomContainer}>
           <div>
@@ -169,26 +124,20 @@ export default function EditEmployeeItem02({ data, setData }: {
               captionWidth="60px"
               presetStyle="s01"
               inputProps={{
-                value: data.seniority,
+                value: classEmployee.seniority,
                 onChange: (value: string) => {
-                  setData(data => {
-                    data.seniority = value
-                    return { ...data }
-                  })
+                  classEmployee.seniority = value
                 },
               }}
             />
           </div>
           <div>
             {keyIndex02.map((key, index) => {
-              const stateValue = data[key]
+              const stateValue = classEmployee[key]
               const { label } = config02[key]
               const onChange = (dateString: string) => {
                 const value = dateString
-                setData(data => {
-                  data[key] = value
-                  return { ...data }
-                })
+                classEmployee[key] = value
               }
               return (
                 <InputSel className={scss.inputSel}
@@ -210,53 +159,6 @@ export default function EditEmployeeItem02({ data, setData }: {
   )
 } // EditEmployeeItem02
 
-
-// ============================================================
-function jobConfig(jobsOptions: TuseJobsOptions) {
-  const {
-    department, jobName, jobs,
-    optionsDepartments, onChangeDepartments,
-    optionsJobs, onChangeJobs,
-  } = jobsOptions
-
-  type TkeyIndex01Keys = "department" | "jobName";
-  //  | "grade";
-
-  const keyindex01: TkeyIndex01Keys[] = [
-    "department",
-    "jobName",
-    // "grade",
-  ];
-
-  const config01: {
-    [key in TkeyIndex01Keys]: {
-      stateValue: Toption | null | string
-      label: string;
-      options: Toption[];
-      onChange: (option: Toption | null) => void
-    };
-  } = {
-    "department": {
-      stateValue: department,
-      label: "部門",
-      options: optionsDepartments,
-      onChange: onChangeDepartments
-    },
-    "jobName": {
-      stateValue: jobName,
-      label: "職稱",
-      options: optionsJobs,
-      onChange: onChangeJobs
-    },
-    // "grade": {
-    //   stateValue: jobName?.grade ?? null,
-    //   label: "職等",
-    //   options: [{ value: "", label: "職等不能選擇" }],
-    //   onChange: () => { }
-    // },
-  };
-  return [config01, keyindex01] as const
-}
 // ============================================================
 
 type TkeyIndex02Keys =

@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 
 const _ = require("lodash")
 
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
-
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
@@ -16,16 +15,26 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 import style from "../employees.module.scss"
 
 // api
+import { TemployeeDto, apiPostEmployee, } from "js/api/api_employee";
 import {
-  TpostEmployee, TemployeeDto,
-  apiPostEmployee,
-} from "js/api/api_employee";
-import type { TjobDto } from "js/api/api_department";
+  Tparams_jobs,
+  useDepartments_jobs
+} from "js/api/api_department";
 import { useCheckEmployee } from "js/api/api_employee";
 
-// type
-import type { TprePostEmployee } from "components/page/setting/employees/editEmployee";
+// hook
+import { useClassEmployee } from "hooks/department-job-Employee/useEmployee";
+
+// tool
+import { jobsOptionsCreator } from "js/tools/selectOption/jobsOptionsCreator";
+
 // =====================================================
+const departmentParams: Tparams_jobs = {
+  order: "ASC",
+  page: 1,
+  pageSize: 999,
+  populate: ["jobs"]
+}
 
 // 防抖
 let timeoutId: NodeJS.Timeout;
@@ -33,7 +42,22 @@ let timeoutId: NodeJS.Timeout;
 export default function AddEmployee() {
   const router = useRouter()
 
-  const [data, setData] = useState<TprePostEmployee>(emptyDataOri())
+  // ------------------------------------------------------
+  const { data: departmentsDataWithMeta, update: updateDepartmentsData }
+    = useDepartments_jobs(departmentParams)
+  const departmentsData = departmentsDataWithMeta?.data
+
+  useEffect(() => {
+    (async () => { await updateDepartmentsData() })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  // ------------------------------------------------------
+  const classEmpolyee = useClassEmployee()
+
+  const departmentJobOptionGroup = useMemo(() => {
+    if (!departmentsData) return undefined
+    return jobsOptionsCreator(departmentsData)
+  }, [departmentsData])
 
   // =======================================================
   // 檢查idNumber是否不重複
@@ -41,38 +65,29 @@ export default function AddEmployee() {
     check,
     setCheck,
     reCheck
-  } = useCheckEmployee(data.idNumber)
+  } = useCheckEmployee(classEmpolyee?.idNumber ?? "")
 
   useEffect(() => {
     setCheck("loading")
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => {
-      if (!data.idNumber) return setCheck("notOk")
+      if (!classEmpolyee?.idNumber) return setCheck("notOk")
       reCheck()
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.idNumber])
+  }, [classEmpolyee?.idNumber])
   // =======================================================
   const panelList: TpanelList = [
     {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
+        if (!classEmpolyee) return
         try {
           if (check === "notOk") throw new Error("使用者代號錯誤")
           if (check === "loading") throw new Error("正在檢查使用者代號")
           setRootLoading(true)
-          let postData = _.cloneDeep(data) as typeof data & { jobId: string[] }
-          
-          postData.jobId = (() => {
-            const arr = postData.jobs.map((job: TjobDto | undefined) => {
-              return job?.id
-            })
-            return arr.filter((item) => typeof item === "string") as string[]
-          })()
-
-          postData = postData
-          const res = await apiPostEmployee(postData) as TemployeeDto
+          const res = await apiPostEmployee(classEmpolyee.postBody) as TemployeeDto
           router.push({
             pathname: `/setting/employees/edit/${res.id}`,
             query: {
@@ -83,7 +98,7 @@ export default function AddEmployee() {
         }
         catch (error) {
           const err = error as Error
-          const title = "新增使用者失敗、未知原因"
+          const title = "新增使用者失敗"
           myAlert.err({ title, content: err.message })
         }
         finally {
@@ -98,9 +113,6 @@ export default function AddEmployee() {
     }
   ]
 
-
-
-
   // =====================================================
   return (
     <div className={style.container}>
@@ -109,43 +121,14 @@ export default function AddEmployee() {
         panelList={panelList}
       />
       <div className={style.mainContainer}>
-        <EditEmployee data={data} setData={setData} check={check} />
+        {classEmpolyee && departmentJobOptionGroup &&
+          <EditEmployee
+            classEmployee={classEmpolyee}
+            departmentJobOptionGroup={departmentJobOptionGroup}
+            check={check} />
+        }
       </div>
     </div>
   )
 } // AddEmployee
-
-// ===========================================================
-// ===========================================================
-// ===========================================================
-// ===========================================================
-
-const emptyDataOri = (): TprePostEmployee => ({
-  "idNumber": "",
-  "chName": "",
-  "enName": "",
-  "identity": "",
-  "birthday": "",
-  "gender": "",
-  "marital": "",
-  "education": "",
-  "expertise": "",
-  "phone1": "",
-  "phone2": "",
-  "email": "",
-  "residenceCounty": "",
-  "residenceDistrict": "",
-  "residenceAddress": "",
-  "mailingCounty": "",
-  "mailingDistrict": "",
-  "mailingAddress": "",
-  "processPermission": true,
-  "seniority": "",
-  "startDate": "",
-  "leaveDate": "",
-  "retireDate": "",
-  "severanceDate": "",
-  "jobs": [],
-})
-
 

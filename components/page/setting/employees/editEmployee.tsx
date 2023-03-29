@@ -1,7 +1,4 @@
-import {
-  Dispatch, SetStateAction,
-  useEffect
-} from "react";
+
 import { useRouter } from "next/router";
 
 // component
@@ -14,23 +11,19 @@ import InputSel from "components/global/gear/inputAndSel/inputSel";
 import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
 import CircularProgress from '@mui/material/CircularProgress';
 // type
-import { TpostEmployee, } from "js/api/api_employee";
-import type { TjobDto } from "js/api/api_department";
+import { Class_employee } from "hooks/department-job-Employee/useEmployee";
+import { jobsOptionsCreator } from "js/tools/selectOption/jobsOptionsCreator";
 
 // css
 import scss from "./editEmployee.module.scss"
 
-
 // =====================================================
-export default function EditEmployee({ data, setData, check }: {
-  data: TprePostEmployee
-  setData: Dispatch<SetStateAction<TprePostEmployee>>
+export default function EditEmployee({ classEmployee, departmentJobOptionGroup, check }: {
+  classEmployee: Class_employee
+  departmentJobOptionGroup: ReturnType<typeof jobsOptionsCreator>
   check?: "ok" | "notOk" | "loading"
 }) {
   const router = useRouter()
-  // ===================================================
-  if (!data) data = emptyDataOri()
-  // ==================================================
 
   // ==================================================
   const idNumberIsDisabled
@@ -49,9 +42,9 @@ export default function EditEmployee({ data, setData, check }: {
           disabled={idNumberIsDisabled}
           showBaseline="auto"
           inputProps={{
-            value: data.idNumber,
-            onChange: (value: string) => {
-              setData(data => ({ ...data, idNumber: value }))
+            value: classEmployee.idNumber,
+            onChange: (v: string) => {
+              classEmployee.idNumber = v
             },
           }}
         />
@@ -63,63 +56,16 @@ export default function EditEmployee({ data, setData, check }: {
             }
             {check === "notOk" &&
               <span className={scss.alertTip}>
-                {data.idNumber ? "此員工編號已有人使用" : "請輸入員工編號"}
+                {classEmployee.idNumber ? "此員工編號已有人使用" : "請輸入員工編號"}
               </span>
             }
-
           </span>
         }
       </div>
 
-      <EditEmployeeItem01
-        data={data}
-        setData={setData}
-      />
-      <EditEmployeeItem02
-        data={data}
-        setData={setData}
-      />
+      <EditEmployeeItem01 classEmployee={classEmployee} />
+      <EditEmployeeItem02 classEmployee={classEmployee} departmentJobOptionGroup={departmentJobOptionGroup} />
     </div>
   )
 }
-// ===========================================================
-
-
-export type TprePostEmployee
-  = Omit<TpostEmployee, "jobId"> & { jobs: (TjobDto|undefined)[] }
-
-const emptyDataOri = (): TprePostEmployee => ({
-  "idNumber": "",
-  "chName": "",
-  "enName": "",
-  "identity": "",
-  "birthday": "",
-  "gender": "",
-  "marital": "",
-  "education": "",
-  "expertise": "",
-  "phone1": "",
-  "phone2": "",
-  "email": "",
-  "residenceCounty": "",
-  "residenceDistrict": "",
-  "residenceAddress": "",
-  "mailingCounty": "",
-  "mailingDistrict": "",
-  "mailingAddress": "",
-  "processPermission": true,
-  "seniority": "",
-  "startDate": "",
-  "leaveDate": "",
-  "retireDate": "",
-  "severanceDate": "",
-  "jobs": [],
-})
-
-
-
-
-
-
-
 

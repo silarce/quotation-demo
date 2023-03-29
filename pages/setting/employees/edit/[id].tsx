@@ -1,7 +1,4 @@
-import {
-  Dispatch, SetStateAction,
-  useState, useEffect
-} from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 const _ = require("lodash")
 
@@ -17,14 +14,26 @@ import style from "../employees.module.scss"
 
 // api
 import {
-  TpostEmployee, TapiGetEmployee_idParams,
+  TemployeeDto, TapiGetEmployee_idParams,
   useEmployeeById, apiPatchEmployee
 } from "js/api/api_employee";
-import type { TjobDto } from "js/api/api_department";
-import type { TprePostEmployee } from "components/page/setting/employees/editEmployee";
 
+import { Tparams_jobs, useDepartments_jobs, } from "js/api/api_department";
+
+import { useClassEmployee } from "hooks/department-job-Employee/useEmployee";
+// tool
+import { jobsOptionsCreator } from "js/tools/selectOption/jobsOptionsCreator";
+
+type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
 
 const theUseEmployeeByIdParams: TapiGetEmployee_idParams = {
+  populate: ["jobs"]
+}
+
+const departmentParams: Tparams_jobs = {
+  order: "ASC",
+  page: 1,
+  pageSize: 999,
   populate: ["jobs"]
 }
 
@@ -33,39 +42,43 @@ export default function AddEmployee() {
   const [isReady, setIsReady] = useState(false)
   // ================================================
 
-  let { data, setData, update } =
-    useEmployeeById(
-      router.query.id as string || "",
-      theUseEmployeeByIdParams)
+  let { data: employeeData_basic, setData: setEmployeeData, update: updateEmployee } =
+    useEmployeeById(router.query.id as string || "", theUseEmployeeByIdParams)
+  const employeeData = employeeData_basic as TemployeeDto_jobs | undefined
+
+  const { data: departmentsDataWithMeta, update: updateDepartmentsData }
+    = useDepartments_jobs(departmentParams)
+  const departmentsData = departmentsDataWithMeta?.data
 
   useEffect(() => {
     (async () => {
-      await update()
+      await Promise.all([updateEmployee(), updateDepartmentsData()])
       setIsReady(true)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const classEmployee = useClassEmployee(employeeData)
+
+  const departmentJobOptionGroup = useMemo(() => {
+    if (!departmentsData) return undefined
+    return jobsOptionsCreator(departmentsData)
+  }, [departmentsData])
+
 
   const panelList: TpanelList = [
     {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
+        if (!classEmployee) return
         try {
-          if (!data) throw new Error("data為undefined")
           setRootLoading(true)
-          let postData = _.cloneDeep(data) as typeof data & { jobId: string[] }
 
-          postData.jobId = (() => {
-            const arr = postData.jobs?.map((job: TjobDto | undefined) => {
-              return job?.id
-            }) ?? []
-            return arr.filter((item) => typeof item === "string") as string[]
-          })()
+          const { postBody, } = classEmployee
+          const id = postBody.id
 
-          const thePostData = postData as TpostEmployee
-
-          await apiPatchEmployee(thePostData, postData.id)
+          await apiPatchEmployee(postBody, id)
           myAlert.success({ title: "變更人員資料完成" })
         }
         catch (error) {
@@ -99,15 +112,15 @@ export default function AddEmployee() {
         panelList={panelList}
       />
       <div className={style.mainContainer}>
-        {isReady &&
+        {isReady && classEmployee && departmentJobOptionGroup &&
           <EditEmployee
-            data={data as TprePostEmployee}
-            setData={setData as Dispatch<SetStateAction<TprePostEmployee>>} />
+            classEmployee={classEmployee}
+            departmentJobOptionGroup={departmentJobOptionGroup}
+          />
         }
       </div>
     </div>
   )
 }
 
-// ===========================================================
 

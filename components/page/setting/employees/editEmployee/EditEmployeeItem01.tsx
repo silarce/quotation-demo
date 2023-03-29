@@ -1,6 +1,4 @@
 
-import { Dispatch, SetStateAction } from "react";
-
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
@@ -14,80 +12,56 @@ const [optionsGender, optionMarital]
   = [optionsCreator_gender(), optionsCreator_marital()]
 
 // type
-import { TpostEmployee } from "js/api/api_employee";
-import type { TprePostEmployee } from "../editEmployee";
+import { Class_employee } from "hooks/department-job-Employee/useEmployee";
+
 // css
 import scss from "../editEmployee.module.scss"
 
-export default function EditEmployeeItem01({ data, setData }: {
-  data: TprePostEmployee
-  setData:
-  Dispatch<SetStateAction<TprePostEmployee>>
+export default function EditEmployeeItem01({ classEmployee }: {
+  classEmployee: Class_employee
 }) {
-  const {
-    residenceCounty, residenceDistrict, residenceAddress,
-    mailingCounty, mailingDistrict, mailingAddress
-  } = data
 
-
-
+  // 地址參數
   const selectInputPropsResidence = {
-    county: residenceCounty,
+    county: classEmployee.residenceCounty,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
-      setData(data => {
-        data.residenceCounty = value
-        data.residenceDistrict = ""
-        return { ...data }
-      })
+      classEmployee.residenceCounty = value
+      classEmployee.residenceDistrict = ""
     },
-    district: residenceDistrict,
+    district: classEmployee.residenceDistrict,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
       const value = option.value
-      setData(data => {
-        data.residenceDistrict = value
-        return { ...data }
-      })
+      classEmployee.residenceDistrict = value
     },
-    address: residenceAddress,
+    address: classEmployee.residenceAddress,
     onChangeAddress: (value: string) => {
-      setData(data => {
-        data.residenceAddress = value
-        return { ...data }
-      })
-    },
-  }
-  const selectInputPropsMailing = {
-    county: mailingCounty,
-    onChangeCounty: (option: Toption | null) => {
-      if (!option) return
-      const value = option.value
-      setData(data => {
-        data.mailingCounty = value
-        data.mailingDistrict = ""
-        return { ...data }
-      })
-    },
-    district: mailingDistrict,
-    onChangeDistrict: (option: Toption | null) => {
-      if (!option) return
-      const value = option.value
-      setData(data => {
-        data.mailingDistrict = value
-        return { ...data }
-      })
-    },
-    address: mailingAddress,
-    onChangeAddress: (value: string) => {
-      setData(data => {
-        data.mailingAddress = value
-        return { ...data }
-      })
-    },
-  }
+      classEmployee.residenceAddress = value
 
+    },
+  }
+  // 地址參數
+  const selectInputPropsMailing = {
+    county: classEmployee.mailingCounty,
+    onChangeCounty: (option: Toption | null) => {
+      if (!option) return
+      const value = option.value
+      classEmployee.mailingCounty = value
+      classEmployee.mailingDistrict = ""
+    },
+    district: classEmployee.mailingDistrict,
+    onChangeDistrict: (option: Toption | null) => {
+      if (!option) return
+      const value = option.value
+      classEmployee.mailingDistrict = value
+    },
+    address: classEmployee.mailingAddress,
+    onChangeAddress: (value: string) => {
+      classEmployee.mailingAddress = value
+    },
+  }
 
 
   // ======================================================
@@ -99,12 +73,9 @@ export default function EditEmployeeItem01({ data, setData }: {
         <div>
           {keyIndex01.map((key, index) => {
             const { label } = config01[key]
-            const stateValue = data[key]
+            const stateValue = classEmployee[key]
             const onChange = (value: string) => {
-              setData(data => {
-                data[key] = value
-                return { ...data }
-              })
+              classEmployee[key] = value
             }
             return (
               <InputSel key={index}
@@ -133,12 +104,9 @@ export default function EditEmployeeItem01({ data, setData }: {
             presetStyle="s01"
             captionWidth={"40px"}
             datePickerProps={{
-              value: data.birthday,
+              value: classEmployee.birthday,
               onChange: (dateString: string) => {
-                setData(data => {
-                  data.birthday = dateString
-                  return { ...data }
-                })
+                classEmployee.birthday = dateString
               },
             }}
           />
@@ -146,15 +114,12 @@ export default function EditEmployeeItem01({ data, setData }: {
           {/*  */}
           {keyIndex02.map((key, index) => {
             const { label, options, width, labelWidth } = config02[key]
-            const stateValue = data[key]
+            const stateValue = classEmployee[key]
             if (options) {
               const onChange = (option: Toption | null) => {
                 if (!option) return
                 const { value } = option
-                setData(data => {
-                  data[key] = value
-                  return ({ ...data })
-                })
+                classEmployee[key] = value
               }
               return (
                 <InputSel key={index}
@@ -172,10 +137,7 @@ export default function EditEmployeeItem01({ data, setData }: {
               )
             }
             const onChange = (value: string) => {
-              setData(data => {
-                data[key] = value
-                return { ...data }
-              })
+              classEmployee[key] = value
             }
             return (
               <InputSel key={index}
@@ -216,7 +178,7 @@ export default function EditEmployeeItem01({ data, setData }: {
 
 
 // ============================================================
-type TkeyIndex01Key = (keyof Pick<TpostEmployee,
+type TkeyIndex01Key = (keyof Pick<Class_employee,
   "chName" | "enName" |
   // "identity" |
   "phone1" | "phone2">)
@@ -249,7 +211,7 @@ const config01: {
   },
 }
 // -------------------------
-type TkeyIndex02Key = (keyof Pick<TpostEmployee,
+type TkeyIndex02Key = (keyof Pick<Class_employee,
   "gender" | "marital" | "education" | "expertise">)
 
 const keyIndex02: TkeyIndex02Key[]
