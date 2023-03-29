@@ -13,7 +13,7 @@ import { Toption } from "fakeDatabase/options/options";
 export type { TdepartmentDto, TdepartmentDto_jobs, TjobDto, TupdateDepartmentJobDto }
 
 
-export type Tparams_jobs = {
+export type Tparams = {
   order?: "ASC" | "DESC",
   page?: number,
   pageSize?: number,
@@ -22,11 +22,24 @@ export type Tparams_jobs = {
   }
   populate?: "jobs"[]
 }
+export type Tparams_jobs = {
+  order?: "ASC" | "DESC",
+  page?: number,
+  pageSize?: number,
+  filter?: {
+    [key: string]: any
+  }
+  populate: "jobs"[]
+}
 
 // ==========================================================
 // ==========================================================
 
 export type TgetDepartments = {
+  data: TdepartmentDto[]
+  meta: TpageMetaDto
+}
+export type TgetDepartments_jobs = {
   data: TdepartmentDto_jobs[]
   meta: TpageMetaDto
 }
@@ -35,28 +48,28 @@ export type TgetDepartments = {
 // ----------------------------------------------------
 // departments
 
-const apiGetDepartments = (params: Tparams_jobs) => {
+const apiGetDepartments = (params: Tparams) => {
   const api = "/departments"
   return axi.get(api, { params })
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
 
+export const useDepartments = (params: Tparams = {}) => {
+  let [data, setData] = useState<TgetDepartments>()
+  const update = async () => {
+    const data = await apiGetDepartments(params)
+    if (data) setData(data)
+    return data
+  }
+  return { data, setData, update }
+}
 
-// export const useDepartments = (params: Tparams = {}) => {
-//   let [data, setData] = useState<TgetDepartments>()
-//   const update = async () => {
-//     const data = await apiGetDepartments(params)
-//     if (data) setData(data)
-//     return data
-//   }
-//   return { data, setData, update }
-// }
 /**
  * data.data型別為TdepartmentDto_jobs[]
  */
-export const useDepartments_jobs = (params: Tparams_jobs = {}) => {
-  let [data, setData] = useState<TgetDepartments>()
+export const useDepartments_jobs = (params: Tparams_jobs) => {
+  let [data, setData] = useState<TgetDepartments_jobs>()
   const update = async () => {
     const data = await apiGetDepartments(params)
     if (data) setData(data)
@@ -225,7 +238,7 @@ export const apiDeleteDepartments_id_managers
 // 目前使用在/setting/employees/edit/[id]
 //        與/setting/employees/add/addEmployee
 export const useJobsOptions = (
-  departmentsData: Partial<TgetDepartments>,
+  departmentsData: Partial<TgetDepartments_jobs>,
   defaultJobs?: TjobDto
 ) => {
 

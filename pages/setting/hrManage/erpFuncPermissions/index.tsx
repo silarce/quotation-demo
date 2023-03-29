@@ -21,8 +21,8 @@ import {
   apiPostErpFeatures_id_departments, apiDeleteErpFeatures_id_departments
 } from "js/api/api_erpFeature"
 import {
-  TdepartmentDto_jobs,
-  useDepartments_jobs
+  TdepartmentDto,
+  useDepartments
 } from "js/api/api_department"
 
 // css
@@ -44,7 +44,7 @@ export default function ErpFuncPermissions() {
   }
 
   // ________________
-  const { data: departmentsData, update: updateDepartments } = useDepartments_jobs()
+  const { data: departmentsData, update: updateDepartments } = useDepartments()
   const departmentArr = departmentsData?.data ?? []
   const departmentNameArr = departmentArr.map((item) => item.name)
 
@@ -97,7 +97,7 @@ export default function ErpFuncPermissions() {
   // --------------------------------------------------------------------------
   // 移除部門
   const [erpData_del, setErpData_del] = useState<TerpFeatureDto>()
-  const [departmentData_del, setDepartmentData_del] = useState<TdepartmentDto_jobs>()
+  const [departmentData_del, setDepartmentData_del] = useState<TdepartmentDto>()
 
   const confirmDelete = async () => {
     if (!erpData_del || !departmentData_del) return;

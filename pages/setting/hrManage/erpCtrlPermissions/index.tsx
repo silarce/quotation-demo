@@ -23,7 +23,7 @@ import {
   TapiGetEmployeeParams,
   useEmployee, apiPostEmployeeErpUser, apiDeleteEmployeeErpUser,
 } from "js/api/api_employee";
-import { useDepartments_jobs } from "js/api/api_department";
+import { useDepartments } from "js/api/api_department";
 
 import scss from "./erpCtrlPermissions.module.scss"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
@@ -88,7 +88,7 @@ export default function ErpCtrlPermissions() {
   // ____________________________________________
 
   // 部門列表
-  const { data: departmentsData, update: updateDepartments } = useDepartments_jobs()
+  const { data: departmentsData, update: updateDepartments } = useDepartments()
   // 用在搜尋bar的option
   const options_departments = useMemo(() => {
     if (!departmentsData?.data) return []
