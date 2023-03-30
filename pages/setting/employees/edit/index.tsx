@@ -9,6 +9,7 @@ import EditEmployee from "components/page/setting/employees/editEmployee";
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
+import InvalidIdTip from "components/global/InvalidIdTip";
 // css
 import style from "../employees.module.scss"
 
@@ -43,7 +44,7 @@ export default function AddEmployee() {
   // ================================================
 
   let { data: employeeData_basic, setData: setEmployeeData, update: updateEmployee } =
-    useEmployeeById(router.query.id as string || "", theUseEmployeeByIdParams)
+    useEmployeeById(router.query.employeeId as string || "", theUseEmployeeByIdParams)
   const employeeData = employeeData_basic as TemployeeDto_jobs | undefined
 
   const { data: departmentsDataWithMeta, update: updateDepartmentsData }
@@ -104,23 +105,27 @@ export default function AddEmployee() {
     }
   ]
 
+  if (isReady && !employeeData) {
+    return <InvalidIdTip />
+  }
 
-  return (
-    <div className={style.container}>
+  if (isReady && classEmployee && departmentJobOptionGroup) {
+    return (
+      <div className={style.container}>
+        <PageHeader02 tag="人員資料"
+          panelList={panelList}
+        />
+        <div className={style.mainContainer}>
 
-      <PageHeader02 tag="人員資料"
-        panelList={panelList}
-      />
-      <div className={style.mainContainer}>
-        {isReady && classEmployee && departmentJobOptionGroup &&
           <EditEmployee
             classEmployee={classEmployee}
             departmentJobOptionGroup={departmentJobOptionGroup}
           />
-        }
+
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+  
+  return null
 }
-
-
