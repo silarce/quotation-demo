@@ -53,7 +53,7 @@ function TheContractLayout({ router, children }:
   }) {
   const { contractId } = router.query
 
-  const pathHead = `/worksDepartment/contractList/${contractId}`
+  const pathHead = `/worksDepartment/contractList/contract`
 
   const linkList = [
     {

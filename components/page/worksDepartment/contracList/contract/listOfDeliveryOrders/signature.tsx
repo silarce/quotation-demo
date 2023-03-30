@@ -12,7 +12,7 @@ import style from "./listOfDeliveryOrders.module.scss"
 
 
 // fake
-import { Tsignature } from "pages/worksDepartment/contractList/[contractId]/listOfDeliveryOrders/edit/[id]"
+import { Tsignature } from "pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit"
 
 
 

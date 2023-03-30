@@ -1,6 +1,5 @@
 import React from "react"
 import { useRouter } from "next/router"
-import { NextRouter } from "next/router"
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
@@ -28,47 +27,72 @@ export default function PageHeader({ tagCallback, panelList }:
     && tagCallback(contractId as string)
     || `合約編號${contractId}`
 
-  const pathHead = `/worksDepartment/contractList/${contractId}`
+  const pathHead = `/worksDepartment/contractList/contract`
   const linkList = [
     {
       label: "工程聯絡單",
-      href: `${pathHead}/workContactDoc`,
+      href: {
+        pathname: `${pathHead}/workContactDoc`,
+        query: { contractId }
+      },
     },
     {
       label: "工作表",
-      href: `${pathHead}/workSheet`,
+      href: {
+        pathname: `${pathHead}/workSheet`,
+        query: { contractId }
+      },
     },
     {
       label: "出庫單",
-      href: `${pathHead}/outboundOrder`,
+      href: {
+        pathname: `${pathHead}/outboundOrder`,
+        query: { contractId }
+      },
     },
     {
       label: "應收帳款明細",
-      href: `${pathHead}/accountsReceivableDetails`,
+      href: {
+        pathname: `${pathHead}/accountsReceivableDetails`,
+        query: { contractId }
+      },
     },
     {
       label: "派工單列表",
-      href: `${pathHead}/dispatchList`,
+      href: {
+        pathname: `${pathHead}/dispatchList`,
+        query: { contractId }
+      },
     },
     {
       label: "送電備品列表",
-      href: `${pathHead}/powerTransmissionSpareList`,
+      href: {
+        pathname: `${pathHead}/powerTransmissionSpareList`,
+        query: { contractId }
+      },
     },
     {
       label: "調(退)貨單列表",
-      href: `${pathHead}/listOfDeliveryOrders`,
+      href: {
+        pathname: `${pathHead}/listOfDeliveryOrders`,
+        query: { contractId }
+      },
     },
     {
       label: "備忘錄",
-      href: `${pathHead}/memorandum`,
+      href: {
+        pathname: `${pathHead}/memorandum`,
+        query: { contractId }
+      },
+
     },
   ]
 
   return (
     <div>
-      <PageHeader02
-        tag={tag}
-        panelList={panelList} />
+      {/* 上面的 */}
+      <PageHeader02 tag={tag} panelList={panelList} />
+      {/* 下面的 */}
       <PageHeaderFlex01 linkList={linkList} />
     </div>
   )

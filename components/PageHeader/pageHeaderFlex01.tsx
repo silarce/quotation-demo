@@ -4,11 +4,12 @@ import {
 import Link from "next/link"
 import { useRouter } from "next/router"
 
+// type
+import { UrlObject } from 'url';
+
 
 // css
 import style from "./pageHeaderFlex01.module.scss"
-
-
 
 // type
 interface Ttag {
@@ -18,7 +19,7 @@ interface Ttag {
 
 interface Tlink {
   label: string
-  href: string
+  href: string | UrlObject
 }
 
 export default function PageHeaderFlex01(
@@ -33,7 +34,7 @@ export default function PageHeaderFlex01(
   const [active, setActive] = useState(0)
 
   const router = useRouter()
-  const { asPath } = router
+  const { asPath, pathname } = router
 
 
   return (
@@ -74,12 +75,15 @@ export default function PageHeaderFlex01(
       <>
         {linkList.map((config, index) => {
           const { label, href } = config;
-          const reg = new RegExp(`^${href}`)
-          const isActive = reg.test(asPath) ? style.active : ""
+          let hrefPathname: string
+          if (typeof href === "string") hrefPathname = href
+          else hrefPathname = href.pathname ?? ""
+          const reg = new RegExp(`^${hrefPathname}`)
+          const isActive = reg.test(router.pathname) ? style.active : ""
           return (
             <Link className={isActive} href={href} key={index}>
-                <span>{label}</span>
-                <hr className={style.bottomBar} />
+              <span>{label}</span>
+              <hr className={style.bottomBar} />
             </Link>
           )
         })}

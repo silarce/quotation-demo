@@ -41,7 +41,10 @@ export default function DispatchList() {
     {
       type: "addButton",
       label: "新增派工單",
-      onClick: () => router.push(`${router.asPath}/add`)
+      onClick: () => router.push({
+        pathname: `${router.pathname}/add`,
+        query: { ...router.query }
+      })
     }
   ]
 
