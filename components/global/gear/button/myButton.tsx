@@ -3,6 +3,10 @@ import classNames from "classnames"
 // icon
 import iconAdd from "public/image/icon/add.svg"
 import iconDelete01 from "public/image/icon/delete01.svg"
+import iconArrow02_left from "public/image/icon/arrow02_left.svg"
+import iconArrow02_right from "public/image/icon/arrow02_right.svg"
+
+
 
 
 import style from "./_button.module.scss"
@@ -12,8 +16,8 @@ import style from "./_button.module.scss"
 export default function MyButton(
   { label, onClick, className, img, preImg, px }:
     {
-      label: string
-      onClick: () => void
+      label?: string
+      onClick?: () => void
       className?: string
       img?: string
       preImg?: keyof typeof preImgList
@@ -30,7 +34,7 @@ export default function MyButton(
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {img && <img src={img} alt="" />}
-      <span >{label}</span>
+      {label && <span >{label}</span>}
     </button>
   )
 }
@@ -39,7 +43,9 @@ export default function MyButton(
 
 const preImgList = {
   add: iconAdd,
-  delete: iconDelete01
+  delete: iconDelete01,
+  arrow02_left: iconArrow02_left,
+  arrow02_right: iconArrow02_right,
 }
 
 
