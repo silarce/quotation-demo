@@ -31,6 +31,18 @@
 
 .button {
   @include button;
+  &.px22 {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  &.px44 {
+    padding-left: 44px;
+    padding-right: 44px;
+  }
+  &.px2227 {
+    padding-left: 22px;
+    padding-right: 27px;
+  }
 }
 
 .addButton {
