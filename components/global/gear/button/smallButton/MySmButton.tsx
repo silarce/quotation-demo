@@ -5,7 +5,7 @@ import style from "./_smallButton.module.scss"
 
 
 
-export default function MyButton(
+export default function MySmallButton(
   { label, onClick, className, img }:
     {
       label: string
