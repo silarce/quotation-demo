@@ -271,9 +271,10 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     margin-top: 27px;
     .form {
       padding: 29px $leftPadding_div;
+      padding-right: 75px;
       border: solid 1px $colorBorder01;
-      display: grid;
-      grid-template-columns: repeat(3, fit-content(100%));
+      display: flex;
+      flex-wrap: wrap;
       @media (max-width: 1536px) {
         grid-template-columns: repeat(2, fit-content(100%));
       }
