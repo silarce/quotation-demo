@@ -37,34 +37,10 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: "首頁",
-          list: [
-            {
-              label: "施工中",
-              path: path01 + "/",
-            },
-            {
-              label: "施工中",
-              path: path01 + "/",
-            },
-            {
-              label: "施工中",
-              path: path01 + "/",
-            },
-            {
-              label: "施工中",
-              path: path01 + "/",
-            },
-          ]
+          label: "日報表",
+          path: path01 + "/dailyReport",
         },
-        {
-          label: "施工中",
-          path: path01 + "/",
-        },
-        {
-          label: "施工中",
-          path: path01 + "/",
-        },
+
       ]
     }
   })(),
@@ -306,12 +282,13 @@ const sidePathList: TsidePathList = {
   // =======================================
 }
 
-
+// 上方nav用的路由表
+// components\Layer\Header\Nav\Nav.tsx
 const topPathList = [
   {
     icon: icon_home,
     label: "首頁",
-    path01: sidePathList["/home"].path01, href: "/home",
+    path01: sidePathList["/home"].path01, href: "/home/dailyReport",
   },
   {
     icon: icon_setting,
@@ -343,3 +320,41 @@ const topPathList = [
 
 export default sidePathList
 export { topPathList }
+
+
+// =========================================================
+// TsidePathConfig範例
+// {
+//   path01,
+//   list: [
+//     {
+//       label: "首頁",
+//       list: [
+//         {
+//           label: "施工中",
+//           path: path01 + "/",
+//         },
+//         {
+//           label: "施工中",
+//           path: path01 + "/",
+//         },
+//         {
+//           label: "施工中",
+//           path: path01 + "/",
+//         },
+//         {
+//           label: "施工中",
+//           path: path01 + "/",
+//         },
+//       ]
+//     },
+//     {
+//       label: "施工中",
+//       path: path01 + "/",
+//     },
+//     {
+//       label: "施工中",
+//       path: path01 + "/",
+//     },
+//   ]
+// }
