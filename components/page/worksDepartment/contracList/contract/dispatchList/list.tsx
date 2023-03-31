@@ -13,7 +13,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react"
 import style from "./dispatchList.module.scss"
 
 // fake
-import { TfakeDispatch } from "pages/worksDepartment/contractList/[contractId]/dispatchList"
+import { TfakeDispatch } from "pages/worksDepartment/contractList/contract/dispatchList"
 
 
 export default function List(

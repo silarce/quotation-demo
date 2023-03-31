@@ -18,9 +18,9 @@ import style from "./contractList.module.scss"
 
 // data type
 import {
-  TbudgetList,  
+  TbudgetList,
 } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
-import  { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
+import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
 const { Panel } = Collapse
@@ -65,7 +65,11 @@ export default function ContractList({ contractList, searchObj }:
 
           const openQuotation = (e: MouseEvent) => {
             e.stopPropagation()
-            router.push(`/worksDepartment/contractList/${quotationId}/workContactDoc`)
+            // router.push(`/worksDepartment/contractList/${quotationId}/workContactDoc`)
+            router.push({
+              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              query: { contractId: quotationId }
+            })
           }
           const { detail } = item
           // ===========================

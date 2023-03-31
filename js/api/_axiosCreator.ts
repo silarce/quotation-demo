@@ -34,11 +34,15 @@ axi.interceptors.response.use(
       switch (err.response.status) {
         case 401:
           if (ignore401.includes(url)) break
-          window.location.reload()
-          // myAlert.err({
-          //   title: "401錯誤、沒有權限",
-          //   content: "請重新登入或請求授權"
-          // })
+          myAlert.warning(
+            {
+              title: "系統提醒", content: "您已在其他地方登入",
+              props: {
+                onOk: () => { window.location.reload() },
+                onCancel: () => { window.location.reload() }
+              }
+            }
+          )
           console.log("401，沒有權限")
           break
         case 404:

@@ -24,7 +24,7 @@ import { optionsCreator_material } from "fakeDatabase/options/options"
 const optionMaterial = optionsCreator_material()
 
 // fake
-import { Ttransfer } from "pages/worksDepartment/contractList/[contractId]/listOfDeliveryOrders/edit/[id]"
+import { Ttransfer } from "pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit"
 
 
 export default function EditTransfer(

@@ -87,9 +87,14 @@ export default function EmployeeList({ employeeList, toUpdate, isLoading }: {
       <div className={scss.tbody}>
         {employeeList.map((row, index) => {
           const id = row.id
+          const href = {
+            pathname: "/setting/employees/edit",
+            query: { employeeId: id }
+          }
           return (
             <CellWithBar key={index}>
-              <Link href={`/setting/employees/edit/${id}`}>
+              {/* <Link href={`/setting/employees/edit/${id}`}> */}
+              <Link href={href}>
                 <div className={scss.row} >
                   {tableKeyIndex.map((key, index) => {
                     const data = row[key]

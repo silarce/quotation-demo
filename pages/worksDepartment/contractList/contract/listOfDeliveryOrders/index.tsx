@@ -39,7 +39,10 @@ export default function ListOfDeliveryOrders() {
     {
       type: "addButton",
       label: "建立調(退)貨單",
-      onClick: () => router.push(`${router.asPath}/add`)
+      onClick: () => router.push({
+        pathname: `${router.pathname}/add`,
+        query: { ...router.query }
+      })
     }
   ]
 
@@ -66,7 +69,11 @@ export default function ListOfDeliveryOrders() {
         <div className={style.tbody}>
           {data.map((rowData, rowIndex) => {
             const id = rowData.id
-            const onClick = () => router.push(`${router.asPath}/edit/${id}`)
+            const href = {
+              pathname: `${router.pathname}/edit`,
+              query: { ...router.query, id }
+            }
+            const onClick = () => router.push(href)
             return (
               <CellWithBar className={style.row} key={rowIndex}
                 onClick={onClick}

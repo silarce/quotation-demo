@@ -1,0 +1,370 @@
+import {
+  ChangeEvent, ComponentType,
+  useState, useEffect,
+} from "react"
+import Image from "next/image"
+import moment from 'moment'
+import classNames from "classnames"
+
+const _ = require("lodash")
+
+// 行事曆元件
+import BigCalendar from 'react-big-calendar';
+import {
+  EventProps, EventWrapperProps,
+  Calendar, momentLocalizer, CalendarProps,
+} from 'react-big-calendar'
+
+
+
+// antd
+import { Badge } from "antd"
+
+// global gear
+import PageHeader02 from "components/PageHeader/pageHeader02"
+import MyButton from "components/global/gear/button/myButton"
+
+
+// img
+import iconCircle from "public/image/icon/circle.svg"
+import iconCircle_Checked from "public/image/icon/circle_checked.svg"
+import iconRedDot from "public/image/icon/redDot.svg"
+
+// tool
+import { month_chToNumber } from "js/tools/date/conversionTable";
+
+// css
+import scss from "./dailyReport.module.scss"
+
+
+const localizer = momentLocalizer(moment)
+
+// =====================================================================
+
+export default function DailyReport() {
+  const [render, setRender] = useState(false)
+  const reRender = () => {
+    setRender((state) => !state)
+  }
+
+  const [eventsArr, setEventsArr]
+    = useState(lotFakeData.map((item) => new Class_isRead(item, reRender)))
+
+
+  return (
+    <div className={scss.container}>
+      <PageHeader02 tag="日報表" />
+      <div className={scss.mainContainer}>
+        <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px]`}>
+          <Calendar
+            localizer={localizer}
+            events={eventsArr}
+            showAllEvents
+            views={['month']}
+            style={{
+              minHeight: 750,
+              height: "100%"
+            }}
+
+            components={{
+              month: {
+                // event: Cevent,
+                header: Header, // 最上方標明星期幾的row
+                dateHeader: DateHeader, // 日期格
+              },
+              // event並不是dateCellWrappe的子元素
+              // !!!dateCellWrapper的props的型別是{}，但實際上props裡有三個property!!!
+              // !!!因此使用@ts-ignore !!!
+              // @ts-ignore 
+              dateCellWrapper: DateCellWrapper, //底下的格子，裡面沒有裝東西，似僅作為背景
+              // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              eventWrapper: EventWrapper, // 壓在格子上方的event
+              toolbar: ToolBar, // 最上方的操作面板
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ===============================================================
+
+const ToolBar = (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => {
+
+  const { onNavigate, label } = toolbar
+
+  // 'PREV' | 'NEXT' | 'TODAY' | 'DATE'
+  const nextMonth = () => {
+    onNavigate('NEXT');
+  }
+  const prevMonth = () => {
+    onNavigate('PREV');
+  }
+  const toToday = () => {
+    onNavigate('TODAY');
+  }
+
+  let [month, year] = label.split(" ")
+
+  const theMonth = month.replace("月", "") as keyof typeof month_chToNumber
+  const Nummonth = month_chToNumber[theMonth] ?? "錯誤月份"
+
+  return (
+    <div className={scss.toolBar}>
+      <div className={scss.left}>
+        <MyButton label="Today" onClick={toToday} px="px22" />
+      </div>
+      <div className={scss.center}>
+        <MyButton className={scss.arrow} preImg="arrow02_left"
+          onClick={prevMonth} />
+        <span>{Nummonth}月 {year}</span>
+        <MyButton className={scss.arrow} preImg="arrow02_right"
+          onClick={nextMonth} />
+      </div>
+      <div className={scss.right}>
+        <MyButton label="刪除員工" preImg="delete" onClick={() => { alert("刪除員工") }} px="px2227" />
+        <MyButton label="新增員工" preImg="add" onClick={() => { alert("新增員工") }} px="px2227" />
+      </div>
+    </div>
+  )
+
+}
+// ======================================================================
+
+// 壓在格子上方的event
+const EventWrapper = (e: EventWrapperProps<Class_isRead>) => {
+  const { event } = e
+  const { job, name, isChecked, switchIsReaded, isForbidden } = event
+  const theIsChecked = +isChecked as 0 | 1
+  const checkIcon =
+    isForbidden
+      ? checkIconTable["forbidden"]
+      : checkIconTable[`${theIsChecked}`]
+  return (
+    <div className={classNames("px-2 mb-2 cursor-pointer", scss.eventWrapper)}
+      onClick={switchIsReaded}
+    >
+      <div className={classNames(
+        "grid grid-cols-[20px_40px_auto] gap-2 justify-start items-center",
+        "text-lg"
+      )}>
+        <Image src={checkIcon} alt="" />
+        <span>{job}</span>
+        <span>{name}</span>
+      </div>
+    </div>
+  )
+}
+
+// ======================================================================
+const Header = (HeaderProps: BigCalendar.HeaderProps) => {
+  const { label } = HeaderProps
+  const day = label.replace("週", "")
+  return (
+    <div className="py-2">
+      <span>{day}</span>
+    </div>
+  )
+}
+
+// ======================================================================
+
+const DateHeader = (DateHeaderProps: BigCalendar.DateHeaderProps) => {
+  const { label, date } = DateHeaderProps
+  const showDate = parseInt(label)
+  const isCurrentMonth = moment(date).isSame(new Date(), "month")
+  return (
+    <div className={classNames("my-[10px] mx-2", scss.dateHeader)}>
+      <span className={classNames(
+        "block w-fit px-3 m-auto ml-0",
+        "text-base bg-[#e6e6e6] rounded-full",
+        { [scss.isCurrentMonth]: !isCurrentMonth }
+      )}>{showDate}</span>
+    </div>
+  )
+}
+
+// ======================================================================
+const DateCellWrapper = (props: {
+  range: Date[];
+  value: Date;
+  children: JSX.Element;
+}) => {
+
+  const { children, range, value } = props
+
+  const isToday = moment(value).isSame(new Date(), "date")
+
+  // children的className為 rbc-day-bg rbc-off-range-bg，留作備註
+  // rbc-day-bg rbc-off-range-bg
+  return (
+    <div className={classNames(
+      "rbc-day-bg", scss.dateCellWrapper,
+      { [scss.isToday]: isToday }
+    )}>
+      <div className={scss.border} />
+    </div>
+  )
+}
+// ======================================================================
+
+class Class_isRead implements Tevent {
+  constructor(data: Tdata, reRender: () => void) {
+    this._reRender = reRender
+
+    const { job, name, isChecked, date, isForbidden } = data
+    this.job = job
+    this.name = name
+    this.isChecked = isChecked
+    this.isForbidden = isForbidden
+    this.start = date
+    this.end = date
+  } // constructor
+
+  private _reRender: () => void
+  job
+  name
+  start
+  end
+  isChecked
+  isForbidden
+
+  switchIsReaded = () => {
+    if (this.isForbidden) return
+    this.isChecked = !this.isChecked
+    this._reRender()
+  }
+} // Class_isRead
+
+interface Tdata {
+  job: string
+  name: string
+  isChecked: boolean,
+  isForbidden: boolean,
+  date: string,
+}
+
+interface Tevent {
+  job: string
+  name: string
+  isChecked: boolean,
+  isForbidden: boolean,
+  start: string,
+  end: string,
+  // allDay?: boolean
+  // resource?: any,
+}
+
+const fakeData: Tdata[] = [
+  {
+    job: "BO",
+    name: "大雄",
+    isChecked: false,
+    isForbidden: true,
+    date: "2023-03-01",
+  },
+  {
+    job: "BO",
+    name: "靜香",
+    isChecked: false,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "PD",
+    name: "小夫",
+    isChecked: false,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "BO",
+    name: "胖虎",
+    isChecked: true,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "GA",
+    name: "小明",
+    isChecked: false,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "ED",
+    name: "曉東",
+    isChecked: true,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "ED",
+    name: "傑西",
+    isChecked: false,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "RD",
+    name: "凱莉",
+    isChecked: false,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+  {
+    job: "HR",
+    name: "哆啦",
+    isChecked: false,
+    isForbidden: true,
+    date: "2023-03-01",
+  },
+  {
+    job: "RD",
+    name: "A夢",
+    isChecked: false,
+    isForbidden: false,
+    date: "2023-03-01",
+  },
+]
+
+
+function generateData(
+  data: Tdata[],
+  startDate: string,
+  endDate: string
+): Tdata[] {
+  const newData: Tdata[] = []
+
+  const startTime = new Date(startDate).getTime()
+  const endTime = new Date(endDate).getTime()
+
+  data.forEach((item) => {
+    const { job, name, isChecked, isForbidden } = item
+
+    // 86400000 是一天
+    for (let time = startTime; time <= endTime; time += 86400000) {
+      const date = new Date(time).toISOString().slice(0, 10)
+      newData.push({
+        job,
+        name,
+        isChecked: isChecked,
+        isForbidden: isForbidden,
+        date,
+      })
+    }
+  })
+
+  return newData
+}
+
+
+const lotFakeData = generateData(fakeData, "2023-02-26", "2023-04-02")
+
+
+const checkIconTable = {
+  "0": iconCircle,
+  "1": iconCircle_Checked,
+  "forbidden": iconRedDot,
+}

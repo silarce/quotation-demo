@@ -6,17 +6,11 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react"
 // global gear
 import Input02 from "components/global/gear/input/input02"
 
-
 // css
 import style from "./powerTransmissionSpareList.module.scss"
 
-
 // fake
-import { Tsignature } from "pages/worksDepartment/contractList/[contractId]/powerTransmissionSpareList/edit/[id]"
-
-
-
-
+import { Tsignature } from "pages/worksDepartment/contractList/contract/powerTransmissionSpareList/edit"
 
 
 export default function Signature(

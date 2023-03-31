@@ -8,7 +8,7 @@ import TimePicker01 from "components/global/gear/input/timePicker01"
 import style from "./powerTransmissionSpareList.module.scss"
 
 // fake
-import type { Tprofile } from "pages/worksDepartment/contractList/[contractId]/powerTransmissionSpareList/edit/[id]"
+import type { Tprofile } from "pages/worksDepartment/contractList/contract/powerTransmissionSpareList/edit"
 
 
 

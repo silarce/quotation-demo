@@ -18,17 +18,14 @@ import { Collapse } from 'antd';
 import style from "./contractList.module.scss"
 
 // type
-import { TfakeContractListSimple } from "fakeDatabase/domestic/contractCombinder";
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 const { Panel } = Collapse
 
 
-export default function ContractList({ contractList, searchObj }:
+export default function ContractList({ contractList, }:
   {
-    // contractList: TfakeContractListSimple
     contractList: Parameters<typeof ListHeader01>[0]["contract"][]
-    searchObj: TsearchObj
   }) {
 
   const router = useRouter()
@@ -59,25 +56,11 @@ export default function ContractList({ contractList, searchObj }:
             e.stopPropagation()
             const isContract = true
             router.push({
-              pathname: `/domestic/contract/quotation/${quotationId}`,
-              query: { isContract }
+              pathname: `/domestic/contract/quotation`,
+              query: { quotationId,isContract }
             })
           }
-          // ===========================
-          // 搜尋過濾
-          // const regDoorType = new RegExp(searchObj.doorType)
-          // const regCountry = new RegExp(searchObj.country)
-          // const regClientName = new RegExp(searchObj.clientName)
-          // const regProjectName = new RegExp(searchObj.projectName)
-          // if (
-          //   !regDoorType.test(doorType) ||
-          //   !regCountry.test(county) ||
-          //   !regClientName.test(clientName) ||
-          //   !regProjectName.test(projectName)
-          // ) return null
-          // ===========================
-
-
+  
           return (
             <Panel key={index} className={style.panel}
               header={

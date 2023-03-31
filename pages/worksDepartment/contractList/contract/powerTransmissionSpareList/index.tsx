@@ -3,10 +3,7 @@
 // 送電備品列表
 
 
-import {
-  Dispatch, SetStateAction,
-  useState, useEffect
-} from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 
 // global gear
@@ -21,11 +18,11 @@ import PageHeader, { TpanelList } from "components/page/worksDepartment/contracL
 import style from "./powerTransmissionSpareList.module.scss"
 
 
-
-
 export default function PowerTransmissionSpareList() {
   const [isReady, setIsReady] = useState(false)
   const router = useRouter()
+
+
   // ----------------------------------------------------
   const [data, setData] = useState<TspareData[]>([])
 
@@ -40,10 +37,12 @@ export default function PowerTransmissionSpareList() {
     {
       type: "addButton",
       label: "建立料單",
-      onClick: () => router.push(`${router.asPath}/add`)
+      onClick: () => router.push({
+        pathname: `${router.pathname}/add`,
+        query: { ...router.query }
+      })
     }
   ]
-
 
   // ----------------------------------------------------
   if (!isReady) return null
@@ -68,7 +67,14 @@ export default function PowerTransmissionSpareList() {
         <div className={style.tbody}>
           {data.map((rowData, rowIndex) => {
             const id = rowData.id
-            const onClick = () => router.push(`${router.asPath}/edit/${id}`)
+            const href = {
+              pathname: `${router.pathname}/edit`,
+              query: {
+                ...router.query,
+                id
+              }
+            }
+            const onClick = () => router.push(href)
             return (
               <CellWithBar className={style.row} key={rowIndex}
                 onClick={onClick}

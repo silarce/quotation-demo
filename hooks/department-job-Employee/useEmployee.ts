@@ -1,0 +1,406 @@
+
+import { useState, useEffect } from "react";
+
+// type
+import { TemployeeDto } from "js/api/api_employee";
+type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
+
+
+
+class Class_employee {
+  constructor(reRender: () => void, employeeData: TemployeeDto_jobs) {
+    this._reRender = reRender
+    this._employeeData = employeeData
+
+    this.classJobGroupArr
+      = employeeData.jobs.map((job) => new Class_JobGroup(reRender, job))
+    if (!this.classJobGroupArr[0]) {
+      this.classJobGroupArr.push(new Class_JobGroup(reRender))
+    }
+  } // constructor
+
+  private _reRender
+  private _employeeData
+
+  readonly classJobGroupArr
+  addJobGroup = () => {
+    this.classJobGroupArr.push(new Class_JobGroup(this._reRender))
+    this._reRender()
+  }
+  removeJobGroup = (index: number) => {
+    if (this.classJobGroupArr.length === 1) return;
+    this.classJobGroupArr.splice(index, 1)
+    this._reRender()
+  }
+
+
+  get idNumber() {
+    return this._employeeData.idNumber
+  }
+  set idNumber(v: string) {
+    this._employeeData.idNumber = v
+    this._reRender()
+  }
+
+  get chName() {
+    return this._employeeData.chName
+  }
+  set chName(v: string) {
+    this._employeeData.chName = v
+    this._reRender()
+  }
+
+  get enName() {
+    return this._employeeData.enName
+  }
+  set enName(v: string) {
+    this._employeeData.enName = v
+    this._reRender()
+  }
+
+  get identity() {
+    return this._employeeData.identity
+  }
+  set identity(v: string) {
+    this._employeeData.identity = v
+    this._reRender()
+  }
+
+  get birthday() {
+    return this._employeeData.birthday
+  }
+  set birthday(v: string) {
+    this._employeeData.birthday = v
+    this._reRender()
+  }
+
+  get gender() {
+    return this._employeeData.gender
+  }
+  set gender(v: string) {
+    this._employeeData.gender = v
+    this._reRender()
+  }
+
+  get marital() {
+    return this._employeeData.marital
+  }
+  set marital(v: string) {
+    this._employeeData.marital = v
+    this._reRender()
+  }
+
+  get education() {
+    return this._employeeData.education
+  }
+  set education(v: string) {
+    this._employeeData.education = v
+    this._reRender()
+  }
+
+  get expertise() {
+    return this._employeeData.expertise
+  }
+  set expertise(v: string) {
+    this._employeeData.expertise = v
+    this._reRender()
+  }
+
+  get phone1() {
+    return this._employeeData.phone1
+  }
+  set phone1(v: string) {
+    this._employeeData.phone1 = v
+    this._reRender()
+  }
+
+  get phone2() {
+    return this._employeeData.phone2
+  }
+  set phone2(v: string) {
+    this._employeeData.phone2 = v
+    this._reRender()
+  }
+
+  get email() {
+    return this._employeeData.email
+  }
+  set email(v: string) {
+    this._employeeData.email = v
+    this._reRender()
+  }
+
+  get residenceCounty() {
+    return this._employeeData.residenceCounty
+  }
+  set residenceCounty(v: string) {
+    this._employeeData.residenceCounty = v
+    this._reRender()
+  }
+
+  get residenceDistrict() {
+    return this._employeeData.residenceDistrict
+  }
+  set residenceDistrict(v: string) {
+    this._employeeData.residenceDistrict = v
+    this._reRender()
+  }
+
+  get residenceAddress() {
+    return this._employeeData.residenceAddress
+  }
+  set residenceAddress(v: string) {
+    this._employeeData.residenceAddress = v
+    this._reRender()
+  }
+
+  get mailingCounty() {
+    return this._employeeData.mailingCounty
+  }
+  set mailingCounty(v: string) {
+    this._employeeData.mailingCounty = v
+    this._reRender()
+  }
+
+  get mailingDistrict() {
+    return this._employeeData.mailingDistrict
+  }
+  set mailingDistrict(v: string) {
+    this._employeeData.mailingDistrict = v
+    this._reRender()
+  }
+
+  get mailingAddress() {
+    return this._employeeData.mailingAddress
+  }
+  set mailingAddress(v: string) {
+    this._employeeData.mailingAddress = v
+    this._reRender()
+  }
+
+  get seniority() {
+    return this._employeeData.seniority
+  }
+  set seniority(v: string) {
+    this._employeeData.seniority = v
+    this._reRender()
+  }
+
+  get startDate() {
+    return this._employeeData.startDate
+  }
+  set startDate(v: string) {
+    this._employeeData.startDate = v
+    this._reRender()
+  }
+
+  get leaveDate() {
+    return this._employeeData.leaveDate
+  }
+  set leaveDate(v: string) {
+    this._employeeData.leaveDate = v
+    this._reRender()
+  }
+
+  get retireDate() {
+    return this._employeeData.retireDate
+  }
+  set retireDate(v: string) {
+    this._employeeData.retireDate = v
+    this._reRender()
+  }
+
+  get severanceDate() {
+    return this._employeeData.severanceDate
+  }
+  set severanceDate(v: string) {
+    this._employeeData.severanceDate = v
+    this._reRender()
+  }
+
+  get jobIdArr(): string[] {
+    const arr = this.classJobGroupArr.map((classJobGroup) => {
+      return classJobGroup.job?.id
+    })
+    const jobIdArrNoNull = arr.filter((item): item is string => !!item)
+    return jobIdArrNoNull
+  }
+
+  get postBody() {
+    return {
+      ...this._employeeData,
+      jobId: this.jobIdArr,
+    }
+  }
+  // ------------------------------
+  // 還未串接api的資料
+
+  private _militaryService = "" // 兵役別
+  get militaryService() {
+    return this._militaryService
+  }
+  set militaryService(v: string) {
+    this._militaryService = v
+    this._reRender()
+  }
+
+  private _emergencyContactRelationship = "" //緊急聯絡人關係
+  get emergencyContactRelationship() {
+    return this._emergencyContactRelationship
+  }
+  set emergencyContactRelationship(v: string) {
+    this._emergencyContactRelationship = v
+    this._reRender()
+  }
+
+  private _emergencyContactPhone = "" //緊急聯絡人電話
+  get emergencyContactPhone() {
+    return this._emergencyContactPhone
+  }
+  set emergencyContactPhone(v: string) {
+    this._emergencyContactPhone = v
+    this._reRender()
+  }
+
+  private _career: string[] = [""] // 個人資歷
+  get career() {
+    return this._career
+  }
+  setCareer = (index: number, v: string) => {
+    if (this._career[index] === undefined) return
+    this._career[index] = v
+    this._reRender()
+  }
+  addCareer = () => {
+    if (this._career.length === 3) return
+    this._career.push("")
+    this._reRender()
+  }
+  removeCareer = (index: number) => {
+    if (this._career.length === 1) return
+    this._career.splice(index, 1)
+    this._reRender()
+  }
+
+} // Class_employee
+
+class Class_JobGroup {
+  constructor(reRender: () => void, job?: TemployeeDto_jobs["jobs"][number]) {
+    this._reRender = reRender
+
+    if (job) {
+
+      this._department = {
+        id: job.department.id,
+        name: job.department.name
+      }
+      this._job = {
+        id: job.id,
+        name: job.name,
+        grade: `${job.grade}`,
+      }
+    }
+    else {
+      this._department = null
+      this._job = null
+    }
+  }
+  private _reRender
+  private _department
+  private _job
+
+  get department() {
+    return this._department
+  }
+  set department(v: typeof this._department) {
+    this._department = v
+    this._job = null
+    this._reRender()
+  }
+  get job() {
+    return this._job
+  }
+  set job(v: typeof this._job) {
+    this._job = v
+    this._reRender()
+  }
+} // Class_JobGroup
+
+// class Class_career {
+//   constructor(reRender: () => void, career: string) {
+//     this._reRender = reRender
+//     this._career = career
+//   } // constructor
+//   _reRender
+//   _career
+
+//   get() {
+//     return this._career
+//   }
+//   set(v: string) {
+//     this._career = v
+//     this._reRender()
+//   }
+// }
+
+
+
+
+
+
+
+// =============================================
+
+const useClassEmployee = (employeeData?: TemployeeDto_jobs) => {
+  const [render, setRender] = useState(0)
+  const reRender = () => setRender(state => state + 1)
+  const [classEmployee, setClassEmployee] = useState(new Class_employee(reRender, emptyDataOri()))
+
+  useEffect(() => {
+    if (employeeData) setClassEmployee(new Class_employee(reRender, employeeData))
+  }, [employeeData])
+  return classEmployee
+}
+export {
+  Class_employee, Class_JobGroup,
+  useClassEmployee
+}
+
+
+
+// ======================================================
+const emptyDataOri = (): TemployeeDto_jobs => ({
+  id: "",
+  createdAt: "",
+  updatedAt: "",
+  idNumber: "",
+  chName: "",
+  enName: "",
+  identity: "",
+  birthday: "",
+  gender: "",
+  marital: "",
+  education: "",
+  expertise: "",
+  phone1: "",
+  phone2: "",
+  email: "",
+  residenceCounty: "",
+  residenceDistrict: "",
+  residenceAddress: "",
+  mailingCounty: "",
+  mailingDistrict: "",
+  mailingAddress: "",
+  processPermission: true,
+  seniority: "",
+  startDate: "",
+  leaveDate: "",
+  retireDate: "",
+  severanceDate: "",
+  jobs: [],
+})
+
+
+
+
+

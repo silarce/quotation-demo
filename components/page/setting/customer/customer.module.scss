@@ -21,6 +21,7 @@
 .panelHeader {
   position: relative;
   display: grid;
+  // grid-template-columns: auto 300px 230px 130px;
   grid-template-columns: auto 300px 230px 130px;
   padding: 5px 0px;
   width: 100%;
@@ -51,7 +52,7 @@
 
   .cell01 {
     display: grid;
-    grid-template-columns: 58px 75px auto;
+    grid-template-columns: 75px 75px auto;
     gap: 30px;
     padding-left: 46px;
     > div:nth-of-type(3) {
@@ -270,9 +271,10 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
     margin-top: 27px;
     .form {
       padding: 29px $leftPadding_div;
+      padding-right: 75px;
       border: solid 1px $colorBorder01;
-      display: grid;
-      grid-template-columns: repeat(3, fit-content(100%));
+      display: flex;
+      flex-wrap: wrap;
       @media (max-width: 1536px) {
         grid-template-columns: repeat(2, fit-content(100%));
       }

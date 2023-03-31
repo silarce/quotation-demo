@@ -76,18 +76,18 @@ export type TcustomerDto = {
 }
 
 export type TemployeeDto = {
-  id: string
-  createdAt: string
-  updatedAt: string
-  idNumber: string
+  id: string // 應該是資料庫的 pk
+  createdAt: string  // 目前用不到
+  updatedAt: string  // 目前用不到
+  idNumber: string // 員工編號
   chName: string
   enName: string
-  identity: string
+  identity: string  // 身分證字號 // 目前用不到
   birthday: string
   gender: string
-  marital: string
+  marital: string // 婚姻
   education: string
-  expertise: string
+  expertise: string // 專長
   phone1: string
   phone2: string
   email: string
@@ -97,12 +97,12 @@ export type TemployeeDto = {
   mailingCounty: string
   mailingDistrict: string
   mailingAddress: string
-  processPermission: boolean
-  seniority: string
-  startDate: string
-  leaveDate: string
-  retireDate: string
-  severanceDate: string
+  processPermission: true //  處理權限? 目前用不到 // api文件表示這個值會是true
+  seniority: string // 年資
+  startDate: string // 到職日
+  leaveDate: string // 離職日
+  retireDate: string //退休日
+  severanceDate: string // 資遣日
   jobs?: TjobDto[]
   user?: TuserDto | null
 }
@@ -113,7 +113,7 @@ export type TjobDto = {
   updatedAt: string
   name: string
   grade: number
-  department?: TdepartmentDto
+  department: TdepartmentDto_jobs
   employees?: TemployeeDto[]
 }
 
@@ -122,7 +122,17 @@ export type TdepartmentDto = {
   createdAt: string
   updatedAt: string
   name: string
-  jobs?: TjobDto[] //api文件似乎有誤，這邊應該是陣列
+}
+
+/**
+ * TdepartmentDto型別裡加 jobs: TjobDto[] 
+ */
+export type TdepartmentDto_jobs = {
+  id: string
+  createdAt: string
+  updatedAt: string
+  name: string
+  jobs: TjobDto[]
 }
 
 export type TdepartmentManagerDto = {
@@ -139,7 +149,7 @@ export type TerpFeatureDto = {
   createdAt: string
   updatedAt: string
   name: string
-  departments: TdepartmentDto[]
+  departments: TdepartmentDto_jobs[]
 }
 
 

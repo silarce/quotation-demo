@@ -47,7 +47,10 @@ export default function PanelHeader(
 
   const toEdit = (e: MouseEvent) => {
     e.stopPropagation()
-    router.push(`/setting/customer/edit/${customersData.id}`)
+    router.push({
+      pathname: '/setting/customer/edit',
+      query: { id: customersData.id }
+    })
   }
 
   // ====================================================

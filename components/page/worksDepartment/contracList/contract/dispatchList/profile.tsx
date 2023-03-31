@@ -9,8 +9,8 @@ import style from "./dispatchList.module.scss"
 
 
 // fake
-import type { TfakeProfile } from "pages/worksDepartment/contractList/[contractId]/dispatchList"
-import type { TdispatchEmpty } from "pages/worksDepartment/contractList/[contractId]/dispatchList/add"
+import type { TfakeProfile } from "pages/worksDepartment/contractList/contract/dispatchList"
+import type { TdispatchEmpty } from "pages/worksDepartment/contractList/contract/dispatchList/add"
 
 export default function Profile(
   { profile, setProfile,

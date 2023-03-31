@@ -113,8 +113,8 @@ export default function Budget() {
         let newQuotationId = `${projectArr.length + 1}`.padStart(2, "0")
         newQuotationId = "S-110211-" + newQuotationId
         router.push({
-          pathname: `/domestic/budget/quotation/${newQuotationId}`,
-          query: { isNewQuotation: true }
+          pathname: `/domestic/budget/quotation`,
+          query: { newQuotationId, isNewQuotation: true }
         })
       }
     },

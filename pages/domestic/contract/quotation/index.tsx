@@ -23,12 +23,8 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHe
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // hook
-import useProfile from "components/page/domestic/quotation/hook/useProfile"
-import useProduct, { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
-import useRemarkList from "components/page/domestic/quotation/hook/useRemarkList"
-import useRangeList from "components/page/domestic/quotation/hook/useRangeList"
-import usePayInfo from "components/page/domestic/quotation/hook/usePayInfo"
-import useSinature from "components/page/domestic/quotation/hook/useSinature"
+
+import useProduct from "components/page/domestic/quotation/hook/useProduct"
 
 // icon
 import iconUpload from "public/image/icon/upload.svg"
@@ -121,8 +117,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [showPdf_part, setShowPdf_part] = useState(false)
   // ======================================================
 
-
-
   // 合約項目 追加/追減項目的開關
   // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
   const [switch01, setSwitch01] = useState(true)
@@ -132,19 +126,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [switch02, setSwitch02] = useState(false)
 
   // =========================================================
-  // profile //報價單基本資料
-  const profileState = useProfile({ quotationData })
   // 主產品資料
   const prodState = useProduct(quotationData?.productList, !allowEdit)
-  const prodState02 = useProduct(quotationData?.productList, !allowEdit)
-  // memo // 備註
-  const remarkListState = useRemarkList(quotationData)
-  // range // 報價範圍
-  const rangeListState = useRangeList(quotationData)
-  // payInfo // 支付資訊
-  const payInfoState = usePayInfo(quotationData)
-  // sinature //簽名
-  const sinatureState = useSinature(quotationData)
+
   // =========================================================
   // 追加追減項目
   const prodChangingRecord = useMemo(() => {
