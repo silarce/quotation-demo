@@ -3,6 +3,9 @@
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
 
+// icon
+import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
+
 // option
 import {
   Toption,
@@ -155,6 +158,34 @@ export default function EditEmployeeItem01({ classEmployee }: {
         </div>
         {/* 下面 */}
         <div >
+          <div>
+            {classEmployee.career.map((career, index, arr) => {
+              const onChange = (v: string) => classEmployee.setCareer(index, v)
+              const add = () => classEmployee.addCareer()
+              const remove = () => classEmployee.removeCareer(index)
+              const showAdd = arr.length === index + 1
+
+              return (
+                <div key={index}
+                  className="flex items-center gap-5">
+                  <InputSel
+                    className={scss.inputSel}
+                    label={`個人資歷 ${index + 1}`}
+                    captionWidth={"100px"}
+                    presetStyle="s01"
+                    inputProps={{
+                      value: career,
+                      onChange: onChange
+                    }}
+                  />
+                  <div className="grid grid-cols-2 gap-5">
+                    <IconRemoveCircle onClick={remove} />
+                    {showAdd && <IconAddCircle onClick={add} />}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
 
           <InputSelBar_address
             className={scss.inputSel}
@@ -222,13 +253,12 @@ const config01: {
 // -------------------------
 type TkeyIndex02Key = (keyof Pick<Class_employee,
   "gender" | "marital" | "education" | "expertise" |
-  "militaryService" | "education02" | "education03"
+  "militaryService"
 >)
 
 const keyIndex02: TkeyIndex02Key[]
-  = ["gender", "marital",
-    "education", "education02", "education03",
-    "expertise", "militaryService"]
+  = ["gender", "marital", "militaryService",
+    "education", "expertise",]
 
 
 const config02Width = "60px"
@@ -254,15 +284,7 @@ const config02: {
     labelWidth: config02Width,
   },
   education: {
-    label: "學歷1",
-    labelWidth: config02Width
-  },
-  education02: {
-    label: "學歷2",
-    labelWidth: config02Width
-  },
-  education03: {
-    label: "學歷3",
+    label: "學歷",
     labelWidth: config02Width
   },
   expertise: {

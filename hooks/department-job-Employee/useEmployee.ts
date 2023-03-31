@@ -262,21 +262,23 @@ class Class_employee {
     this._reRender()
   }
 
-  private _education02 = ""
-  get education02() {
-    return this._education02
+  private _career: string[] = [""] // 個人資歷
+  get career() {
+    return this._career
   }
-  set education02(v: string) {
-    this._education02 = v
+  setCareer = (index: number, v: string) => {
+    if (this._career[index] === undefined) return
+    this._career[index] = v
     this._reRender()
   }
-
-  private _education03 = ""
-  get education03() {
-    return this._education03
+  addCareer = () => {
+    if (this._career.length === 3) return
+    this._career.push("")
+    this._reRender()
   }
-  set education03(v: string) {
-    this._education03 = v
+  removeCareer = (index: number) => {
+    if (this._career.length === 1) return
+    this._career.splice(index, 1)
     this._reRender()
   }
 
@@ -322,8 +324,32 @@ class Class_JobGroup {
     this._job = v
     this._reRender()
   }
-}
+} // Class_JobGroup
 
+// class Class_career {
+//   constructor(reRender: () => void, career: string) {
+//     this._reRender = reRender
+//     this._career = career
+//   } // constructor
+//   _reRender
+//   _career
+
+//   get() {
+//     return this._career
+//   }
+//   set(v: string) {
+//     this._career = v
+//     this._reRender()
+//   }
+// }
+
+
+
+
+
+
+
+// =============================================
 
 const useClassEmployee = (employeeData?: TemployeeDto_jobs) => {
   const [render, setRender] = useState(0)
