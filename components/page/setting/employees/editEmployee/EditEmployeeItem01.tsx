@@ -81,7 +81,7 @@ export default function EditEmployeeItem01({ classEmployee }: {
               <InputSel key={index}
                 className={scss.inputSel}
                 label={label}
-                captionWidth="100px"
+                captionWidth="140px"
                 presetStyle="s01"
                 inputProps={{
                   value: stateValue,
@@ -102,7 +102,7 @@ export default function EditEmployeeItem01({ classEmployee }: {
             label={"生日"}
             width={"240px"}
             presetStyle="s01"
-            captionWidth={"40px"}
+            captionWidth={"60px"}
             datePickerProps={{
               value: classEmployee.birthday,
               onChange: (dateString: string) => {
@@ -181,13 +181,16 @@ export default function EditEmployeeItem01({ classEmployee }: {
 type TkeyIndex01Key = (keyof Pick<Class_employee,
   "chName" | "enName" |
   // "identity" |
-  "phone1" | "phone2">)
-
+  "phone1" | "phone2" |
+  "emergencyContactRelationship" | "emergencyContactPhone"
+>)
 
 const keyIndex01: TkeyIndex01Key[]
   = ["chName", "enName",
     // "identity",
-    "phone1", "phone2"]
+    "phone1", "phone2",
+    "emergencyContactRelationship", "emergencyContactPhone"
+  ]
 
 const config01: {
   [key in TkeyIndex01Key]: {
@@ -209,13 +212,26 @@ const config01: {
   phone2: {
     label: "聯絡電話2"
   },
+  emergencyContactRelationship: {
+    label: "緊急聯絡人關係"
+  },
+  emergencyContactPhone: {
+    label: "緊急聯絡人電話"
+  },
 }
 // -------------------------
 type TkeyIndex02Key = (keyof Pick<Class_employee,
-  "gender" | "marital" | "education" | "expertise">)
+  "gender" | "marital" | "education" | "expertise" |
+  "militaryService" | "education02" | "education03"
+>)
 
 const keyIndex02: TkeyIndex02Key[]
-  = ["gender", "marital", "education", "expertise"]
+  = ["gender", "marital",
+    "education", "education02", "education03",
+    "expertise", "militaryService"]
+
+
+const config02Width = "60px"
 
 const config02: {
   [key in TkeyIndex02Key]: {
@@ -229,21 +245,33 @@ const config02: {
     label: "性別",
     width: "240px",
     options: optionsGender,
-    labelWidth: "40px"
+    labelWidth: config02Width
   },
   marital: {
     label: "婚姻",
     width: "240px",
-    labelWidth: "40px",
-    options: optionMarital
+    options: optionMarital,
+    labelWidth: config02Width,
   },
   education: {
-    label: "學歷",
-    labelWidth: "40px"
+    label: "學歷1",
+    labelWidth: config02Width
+  },
+  education02: {
+    label: "學歷2",
+    labelWidth: config02Width
+  },
+  education03: {
+    label: "學歷3",
+    labelWidth: config02Width
   },
   expertise: {
     label: "專長",
-    labelWidth: "40px"
+    labelWidth: config02Width
+  },
+  militaryService: {
+    label: "兵役別",
+    labelWidth: config02Width
   },
 }
 

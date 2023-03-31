@@ -18,9 +18,9 @@ import {
   TemployeeDto, TapiGetEmployee_idParams,
   useEmployeeById, apiPatchEmployee
 } from "js/api/api_employee";
-
 import { Tparams_jobs, useDepartments_jobs, } from "js/api/api_department";
 
+// hook
 import { useClassEmployee } from "hooks/department-job-Employee/useEmployee";
 // tool
 import { jobsOptionsCreator } from "js/tools/selectOption/jobsOptionsCreator";

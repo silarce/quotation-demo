@@ -11,7 +11,7 @@ class Class_employee {
   constructor(reRender: () => void, employeeData: TemployeeDto_jobs) {
     this._reRender = reRender
     this._employeeData = employeeData
-    
+
     this.classJobGroupArr
       = employeeData.jobs.map((job) => new Class_JobGroup(reRender, job))
     if (!this.classJobGroupArr[0]) {
@@ -232,7 +232,55 @@ class Class_employee {
       jobId: this.jobIdArr,
     }
   }
-}
+  // ------------------------------
+  // 還未串接api的資料
+
+  private _militaryService = "" // 兵役別
+  get militaryService() {
+    return this._militaryService
+  }
+  set militaryService(v: string) {
+    this._militaryService = v
+    this._reRender()
+  }
+
+  private _emergencyContactRelationship = "" //緊急聯絡人關係
+  get emergencyContactRelationship() {
+    return this._emergencyContactRelationship
+  }
+  set emergencyContactRelationship(v: string) {
+    this._emergencyContactRelationship = v
+    this._reRender()
+  }
+
+  private _emergencyContactPhone = "" //緊急聯絡人電話
+  get emergencyContactPhone() {
+    return this._emergencyContactPhone
+  }
+  set emergencyContactPhone(v: string) {
+    this._emergencyContactPhone = v
+    this._reRender()
+  }
+
+  private _education02 = ""
+  get education02() {
+    return this._education02
+  }
+  set education02(v: string) {
+    this._education02 = v
+    this._reRender()
+  }
+
+  private _education03 = ""
+  get education03() {
+    return this._education03
+  }
+  set education03(v: string) {
+    this._education03 = v
+    this._reRender()
+  }
+
+} // Class_employee
 
 class Class_JobGroup {
   constructor(reRender: () => void, job?: TemployeeDto_jobs["jobs"][number]) {
