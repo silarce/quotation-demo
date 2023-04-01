@@ -140,10 +140,10 @@ const config01: Tconfig<TindexKeys01> = {
     label: "客戶編號"
   },
   category: {
-    label: "客戶類型"
+    label: "類別"
   },
   name: {
-    label: "客戶全稱"
+    label: "全稱"
   },
 }
 const config02: Tconfig<TindexKeys02> = {
