@@ -16,8 +16,8 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 
 // api
 import {
-  TapiGetCustomersParams, TcustomerDto, TpostCustomer,
-  useCustomersById, apiPatchCustomers_id
+  TapiGetCustomersParams, TcustomerDto, TpostCustomer, TprePostCustomer,
+  useCustomersById, apiPatchCustomers_id,
 } from "js/api/api_customer";
 
 // css
@@ -36,6 +36,15 @@ export default function Edit() {
   const {
     data, setData, update
   } = useCustomersById(router.query.id as string || "", params)
+
+  if (typeof data?.category === "string") { // 基本上data.category一定會是string
+    try {
+      data.category = JSON.parse(data.category) as string[]
+    } catch {
+      data.category = [data.category as string]
+    }
+  }
+
   // ------------------------------------------------------
   useEffect(() => {
     (async () => {
@@ -66,9 +75,23 @@ export default function Edit() {
       onClick: async () => {
         try {
           if (!data?.id) return
+          const postBody: TpostCustomer = (() => {
+            return {
+              ...data,
+              category: JSON.stringify(data.category),
+              county: data.county ?? "",
+              district: data.district ?? "",
+              address: data.address ?? "",
+              invoiceCounty: data.invoiceCounty ?? "",
+              invoiceDistrict: data.invoiceDistrict ?? "",
+              invoiceAddress: data.invoiceAddress ?? "",
+              contacts: data.contacts ?? []
+            }
+
+          })()
           setRootLoading(true)
           // 如果第一層的id存在，會在api那邊把id刪掉
-          await apiPatchCustomers_id(data.id, data as TpostCustomer)
+          await apiPatchCustomers_id(data.id, postBody)
           myAlert.success({ title: "變更客戶資料完成" })
         }
         catch {
@@ -103,11 +126,12 @@ export default function Edit() {
       <div className={style.mainContainer}>
         {isReady &&
           <EditCustomer
-            data={data as TpostCustomer}
-            setData={setData as Dispatch<SetStateAction<TpostCustomer>>} />
+            data={data as TprePostCustomer}
+            setData={setData as Dispatch<SetStateAction<TprePostCustomer>>} />
         }
       </div>
     </div>
   )
 
 }
+

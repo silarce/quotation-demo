@@ -19,7 +19,7 @@ import style from "./customer.module.scss"
 // api
 import {
   TapiGetCustomersParams, TcustomerDto, TpostCustomer,
-  apiPostCustomers, useCheckCustomers
+  apiPostCustomers, useCheckCustomers, TprePostCustomer,
 } from "js/api/api_customer";
 // ====================================================
 // 防抖
@@ -58,12 +58,18 @@ export default function Add() {
         if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
         if (check === "loading") return myAlert.info({ title: "正在檢查客戶編號" })
         try {
+          const postBody: TpostCustomer = {
+            ...data,
+            category: JSON.stringify(data.category)
+          }
           setRootLoading(true)
-          const res = await apiPostCustomers(data)
+          const res = await apiPostCustomers(postBody)
           router.push({
-            pathname: `/setting/customer/edit/${res.id}`,
+            // pathname: `/setting/customer/edit/${res.id}`,
+            pathname: "/setting/customer/edit",
             query: {
-              isNew: true
+              isNew: true,
+              id: res.id
             }
           })
           myAlert.success({ title: "新增客戶資料完成" })
@@ -94,7 +100,7 @@ export default function Add() {
       <div className={style.mainContainer}>
 
         <EditCustomer
-          data={data }
+          data={data}
           setData={setData}
           check={check}
         />
@@ -109,11 +115,11 @@ export default function Add() {
 // =============================================================
 // TpostCustomer
 
-const emptyCustomerOri = (): TpostCustomer => ({
+const emptyCustomerOri = (): TprePostCustomer => ({
   "customerNumber": "", //客戶編號
   "name": "", //客戶全稱
   "nickname": "", //客戶簡稱
-  "category": "", //客戶類型
+  "category": [], //客戶類型
   "principal": "", //客戶負責人
   "taxDeductionCategory": "", //扣稅類別
   "taxId": "", //統一編號

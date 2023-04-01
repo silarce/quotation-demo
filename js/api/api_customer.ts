@@ -10,6 +10,11 @@ export type { TcustomerDto, Tcontact as Tcontacts }
 
 // ===============================================================
 
+export const customerCategoryArr = ["營造", "事務所", "業主", "協力廠商",]
+
+
+// ===============================================================
+
 
 
 export type TapiGetCustomersParams = {
@@ -23,9 +28,11 @@ export type TapiGetCustomersParams = {
   sort?: string[]
 }
 
+// type TtempCustomerDto = TcustomerDto & { category: string[] }
+export type TtempCustomerDto = Omit<TcustomerDto, "category"> & { category: string | string[] }
 
 export type TgetCustomers = {
-  data: TcustomerDto[]
+  data: TtempCustomerDto[]
   meta: TpageMetaDto
 }
 
@@ -60,6 +67,9 @@ export type TpostCustomer = {
     "phone": string
   }[] //聯絡人
 }
+
+export type TprePostCustomer
+  = Omit<TpostCustomer, "category"> & { category: string[] }
 
 
 // ============================================================
@@ -135,7 +145,7 @@ const apiGetCustomers_id
 
 export const useCustomersById
   = (id: string, params?: TapiGetCustomersParams) => {
-    let [data, setData] = useState<TpostCustomer>()
+    let [data, setData] = useState<TtempCustomerDto>()
     const update = async () => {
       const data = await apiGetCustomers_id(id, params)
       if (data) setData(data)

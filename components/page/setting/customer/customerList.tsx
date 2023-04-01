@@ -23,7 +23,7 @@ import style from "./customer.module.scss"
 
 // api type
 import {
-  TcustomerDto, TgetCustomers,
+  TcustomerDto, TtempCustomerDto, TgetCustomers,
   apiDeleteCustomers_id
 } from "js/api/api_customer";
 
@@ -60,7 +60,7 @@ export default function CustomerList(
     })
   }
 
-  const openDelPanel = (e: MouseEvent, data: TcustomerDto) => {
+  const openDelPanel = (e: MouseEvent, data: TtempCustomerDto) => {
     e.stopPropagation()
     if (isLoading) return;
     const { id, customerNumber, name } = data
@@ -84,9 +84,6 @@ export default function CustomerList(
       closeDelPanel()
     }
   }
-
-
-
 
   // ========================================================
   return (
@@ -125,3 +122,5 @@ export default function CustomerList(
     </div>
   )
 }
+
+
