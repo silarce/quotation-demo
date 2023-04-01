@@ -8,6 +8,10 @@ import { Checkbox } from 'antd';
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
 
+// icon
+import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
+import CircularProgress from '@mui/material/CircularProgress';
+
 // option
 import {
   Toption,
@@ -27,10 +31,11 @@ import scss from "../customer.module.scss"
 import { TcustomerDto, TpostCustomer, TprePostCustomer, customerCategoryArr } from "js/api/api_customer";
 
 
-export default function EditCustomerItem01({ data, setData }: {
+export default function EditCustomerItem01({ data, setData, nameCheck }: {
   data: TprePostCustomer
   setData:
   Dispatch<SetStateAction<TprePostCustomer>>
+  nameCheck: "ok" | "notOk" | "loading"
 }) {
 
   const {
@@ -125,16 +130,34 @@ export default function EditCustomerItem01({ data, setData }: {
       <div className={scss.form01}>
         {/* 上邊 */}
         <div>
-          <InputSel
-            className={scss.input02}
-            label={"客戶全稱"}
-            presetStyle="s01"
-            captionWidth="100px"
-            textareaProps={{
-              value: data["name"],
-              onChange: createOnChange("name"),
-            }}
-          />
+
+          <div className={scss.customreName}>
+            <InputSel
+              className={scss.input02}
+              label={"客戶全稱"}
+              presetStyle="s01"
+              captionWidth="100px"
+              textareaProps={{
+                value: data["name"],
+                onChange: createOnChange("name"),
+              }}
+            />
+            {nameCheck &&
+              <span className={scss.checkTip}>
+                {nameCheck === "ok" ? <IconCheck01 className={scss.check} cursor="auto" />
+                  : nameCheck === "notOk" ? <IconCross01 className={scss.cross} cursor="auto" />
+                    : <CircularProgress size={30} />
+                }
+                {nameCheck === "notOk" &&
+                  <span className={scss.alertTip}>
+                    {data.name ? "此客戶全稱已被使用" : "請輸入客戶全稱"}
+                  </span>
+                }
+              </span>
+            }
+          </div>
+
+
           <InputSel
             className={scss.input02}
             label={"客戶簡稱"}

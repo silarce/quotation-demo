@@ -20,10 +20,12 @@ import style from "./customer.module.scss"
 import {
   TapiGetCustomersParams, TcustomerDto, TpostCustomer,
   apiPostCustomers, useCheckCustomers, TprePostCustomer,
+  useCheckCustomers_name,
 } from "js/api/api_customer";
 // ====================================================
 // 防抖
 let timeoutId: NodeJS.Timeout;
+let timeoutId_check: NodeJS.Timeout;
 // ====================================================
 export default function Add() {
   const router = useRouter()
@@ -38,6 +40,12 @@ export default function Add() {
     setCheck,
     reCheck
   } = useCheckCustomers(data.customerNumber)
+  const {
+    check: nameCheck,
+    setCheck: SetNameCheck,
+    reCheck: reNameCheck
+  } = useCheckCustomers_name(data.name)
+
 
   useEffect(() => {
     setCheck("loading")
@@ -48,6 +56,18 @@ export default function Add() {
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.customerNumber])
+
+
+  useEffect(() => {
+    SetNameCheck("loading")
+    clearTimeout(timeoutId_check)
+    timeoutId_check = setTimeout(() => {
+      if (!data.name) return SetNameCheck("notOk")
+      reNameCheck()
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.name])
+
   // ------------------------------------------------------
 
   const panelList: TpanelList = [
@@ -55,8 +75,16 @@ export default function Add() {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-        if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
-        if (check === "loading") return myAlert.info({ title: "正在檢查客戶編號" })
+
+
+        // if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
+        // if (check === "loading") return myAlert.info({ title: "正在檢查客戶編號" })
+        if (check === "notOk" || nameCheck === "notOk")
+          return myAlert.err({ title: "客戶編號或客戶全稱已被使用" })
+        if (check === "loading" || nameCheck === "loading")
+          return myAlert.info({ title: "正在檢查客戶編號或客戶全稱" })
+
+
         try {
           const postBody: TpostCustomer = {
             ...data,
@@ -103,6 +131,7 @@ export default function Add() {
           data={data}
           setData={setData}
           check={check}
+          nameCheck={nameCheck}
         />
 
       </div>

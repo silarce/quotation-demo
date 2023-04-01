@@ -1,7 +1,7 @@
 
 import {
   Dispatch, SetStateAction,
-  useEffect, useState
+  useEffect, useState, useMemo
 } from "react";
 import { useRouter } from "next/router";
 
@@ -17,7 +17,7 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 // api
 import {
   TapiGetCustomersParams, TcustomerDto, TpostCustomer, TprePostCustomer,
-  useCustomersById, apiPatchCustomers_id,
+  useCustomersById, apiPatchCustomers_id, useCheckCustomers_name,
 } from "js/api/api_customer";
 
 // css
@@ -28,6 +28,9 @@ const params: TapiGetCustomersParams = {
 }
 
 
+// =========================================================
+// 防抖
+let timeoutId_check: NodeJS.Timeout;
 // =========================================================
 export default function Edit() {
   const router = useRouter()
@@ -44,6 +47,15 @@ export default function Edit() {
       data.category = [data.category as string]
     }
   }
+
+  // 原本的客戶全稱
+  const [nameOri, setNameOri] = useState<string>()
+  useEffect(() => {
+    if (nameOri) return
+    setNameOri(data?.name)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.name])
+
 
   // ------------------------------------------------------
   useEffect(() => {
@@ -66,6 +78,25 @@ export default function Edit() {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  // ------------------------------------------------------
+
+  const {
+    check: nameCheck,
+    setCheck: SetNameCheck,
+    reCheck: reNameCheck
+  } = useCheckCustomers_name(data?.name ?? "")
+
+  useEffect(() => {
+    SetNameCheck("loading")
+    clearTimeout(timeoutId_check)
+    timeoutId_check = setTimeout(() => {
+      if (nameOri === data?.name) return SetNameCheck("ok")
+      if (!data?.name) return SetNameCheck("notOk")
+      reNameCheck()
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.name, nameOri])
+
   // ------------------------------------------------------
 
   const panelList: TpanelList = [
@@ -127,7 +158,8 @@ export default function Edit() {
         {isReady &&
           <EditCustomer
             data={data as TprePostCustomer}
-            setData={setData as Dispatch<SetStateAction<TprePostCustomer>>} />
+            setData={setData as Dispatch<SetStateAction<TprePostCustomer>>}
+            nameCheck={nameCheck} />
         }
       </div>
     </div>

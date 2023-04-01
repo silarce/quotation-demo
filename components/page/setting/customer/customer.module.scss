@@ -192,32 +192,6 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       padding-top: 0;
       padding-bottom: 0;
     }
-    .checkTip {
-      margin-left: 10px;
-      width: fit-content;
-      white-space: nowrap;
-      display: flex;
-      > * {
-        margin: auto;
-      }
-      > svg {
-        height: 20px;
-        width: auto;
-        margin-right: 5px;
-        &.check {
-          color: #42ba96;
-        }
-        &.cross {
-          color: red;
-        }
-      }
-      .muiCircular {
-        font-size: 10px;
-      }
-      .alertTip {
-        color: red;
-      }
-    }
   } // theId
   // --------------------------------------------------
   .editCustomerItem01 {
@@ -255,6 +229,10 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
         > span {
           color: $colorText;
         }
+      }
+      .customreName {
+        display: flex;
+        align-items: center;
       }
     }
     .subTitle {
@@ -338,5 +316,32 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       } // inputBox
     } // form
   } //editCustomerItem02
+
+  .checkTip {
+    margin-left: 10px;
+    width: fit-content;
+    white-space: nowrap;
+    display: flex;
+    > * {
+      margin: auto;
+    }
+    > svg {
+      height: 20px;
+      width: auto;
+      margin-right: 5px;
+      &.check {
+        color: #42ba96;
+      }
+      &.cross {
+        color: red;
+      }
+    }
+    .muiCircular {
+      font-size: 10px;
+    }
+    .alertTip {
+      color: red;
+    }
+  }
 }
 // =====================================================

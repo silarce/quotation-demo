@@ -20,10 +20,11 @@ import { TcustomerDto, TpostCustomer, TprePostCustomer } from "js/api/api_custom
 // css
 import style from "../customer.module.scss"
 
-export default function EditCustomer({ data, setData, check }: {
+export default function EditCustomer({ data, setData, check, nameCheck }: {
   data: TprePostCustomer
   setData: Dispatch<SetStateAction<TprePostCustomer>>
   check?: "ok" | "notOk" | "loading"
+  nameCheck: "ok" | "notOk" | "loading"
 }) {
 
   const router = useRouter()
@@ -67,6 +68,7 @@ export default function EditCustomer({ data, setData, check }: {
       <EditCustomerItem01
         data={data}
         setData={setData}
+        nameCheck={nameCheck}
       />
       <EditCustomerItem02
         data={data}

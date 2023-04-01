@@ -109,9 +109,7 @@ export const useCheckCustomers = (
       }
     }
   }
-
   const [check, setCheck] = useState<Tcheck>("loading")
-
   const update = async () => {
     try {
       setCheck("loading")
@@ -123,7 +121,39 @@ export const useCheckCustomers = (
       setCheck("notOk")
     }
   }
+  return {
+    check,
+    setCheck,
+    reCheck: update
+  }
+}
+export const useCheckCustomers_name = (
+  customerName: string,
+) => {
+  type Tcheck = "ok" | "notOk" | "loading"
 
+  const params: TapiGetCustomersParams = {
+    order: "ASC",
+    page: 1,
+    pageSize: 999,
+    filter: {
+      name: {
+        $eq: customerName
+      }
+    }
+  }
+  const [check, setCheck] = useState<Tcheck>("loading")
+  const update = async () => {
+    try {
+      setCheck("loading")
+      const res = await apiGetCustomers(params)
+      if (res.data.length === 0) setCheck("ok")
+      else setCheck("notOk")
+    }
+    catch {
+      setCheck("notOk")
+    }
+  }
   return {
     check,
     setCheck,
