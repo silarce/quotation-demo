@@ -54,11 +54,14 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
     doSearch: TdoSearch
     className?: string
   }) {
-
+console.log(searchTargetList)
   const [valueArr, setValueArr]
     = useState<(Toption | null | string)[]>(
       searchTargetList.map((item) => {
         const { defaultValue, options } = item
+
+        // console.log(defaultValue)
+
         if (defaultValue) return defaultValue
         if (options) return options[0]
         return ""

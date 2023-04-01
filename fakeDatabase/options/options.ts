@@ -53,12 +53,12 @@ export const optionsCreator_taxDeductionCategory =
     { value: "應稅外加", label: "應稅外加" },
     { value: "免稅", label: "免稅" },
   ]
-export const optionsCreator_customerCategory =
-  (): Toption[] => [
-    { value: "營造", label: "營造" },
-    { value: "事務所", label: "事務所" },
-    { value: "業主", label: "業主" },
-  ]
+// export const optionsCreator_customerCategory =
+//   (): Toption[] => [
+//     { value: "營造", label: "營造" },
+//     { value: "事務所", label: "事務所" },
+//     { value: "業主", label: "業主" },
+//   ]
 
 
 // 類別
@@ -99,7 +99,7 @@ export const optionsCreator_doorForm =
 export const optionsCreator_clientSearch =
   (): Toption[] => [
     { value: "customerNumber", label: "客戶編號" },
-    { value: "name", label: "客戶名稱" },
+    { value: "name", label: "客戶全稱" },
     { value: "contacts.name", label: "聯絡人" },
     { value: "phone", label: "電話" },
   ]
