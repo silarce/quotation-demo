@@ -1,5 +1,5 @@
 
-import { MouseEvent,} from 'react';
+import { MouseEvent, } from 'react';
 
 // component
 import AutosizeInput from 'react-input-autosize';
@@ -7,7 +7,7 @@ import AutosizeInput from 'react-input-autosize';
 // icon
 import { IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
 import iconAdd from "public/image/icon/add.svg"
-import {  RedoOutlined } from '@ant-design/icons';
+import { RedoOutlined } from '@ant-design/icons';
 
 // css
 import style from "./departments.module.scss"
@@ -74,7 +74,16 @@ export default function List(
                   }
 
                 </label>
-                <p>A</p>
+                <label className={style.inputBox}>
+                  <AutosizeInput type="text"
+                    defaultValue={"A" + dIndex + 1}
+                    // value={name}
+                    // onChange={(e) => { department.name = e.target.value }}
+                    disabled={!editable || dWillDelete}
+                    onFocus={() => department.isFocus = true}
+                    onBlur={() => department.isFocus = false}
+                  />
+                </label>
                 <div className={style.focusBg} />
               </div>
 
@@ -135,6 +144,7 @@ export default function List(
 
       </div>{/* coulmns */}
       <div className={style.rowBg} />
+
     </div>
   )
 }

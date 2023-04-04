@@ -11,20 +11,26 @@ import CustomerList from "components/page/setting/customer/customerList"
 import { Pagination } from 'antd';
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/pageHeader02"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // api
 import {
   TgetCustomers, TapiGetCustomersParams,
-  useCustomers
+  useCustomers, customerCategoryArr
 } from "js/api/api_customer"
 
 // css
 import style from "./customer.module.scss"
 
 // option
+import { optionsCreator_county } from "fakeDatabase/options/countryAndDistrict";
+const optionCountyArr = (() => {
+  const arr = optionsCreator_county()
+  arr.unshift({ value: "", label: "地區不拘" })
+  return arr
+})()
 import { optionsCreator_clientSearch, Toption } from "fakeDatabase/options/options"
 const clientSearchOptions = optionsCreator_clientSearch()
 const clientSearchOptionsObj: { [key: string]: Toption } = {}
@@ -47,12 +53,23 @@ function TheCustomer({ router }: { router: NextRouter }) {
   const [isReady, setIsReady] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------
+  // 搜尋用的filter
   const filter: TapiGetCustomersParams["filter"] = {}
-  const searchProperty = router.query.searchProperty as string
-  const searchValue = router.query.searchValue as string
-  if (searchProperty && searchProperty) {
-    filter[searchProperty] = {}
-    filter[searchProperty].$contains = searchValue
+  const searchCategory = router.query.searchCategory as string
+  const searchCounty = router.query.searchCounty as string
+  const searchOther = router.query.searchOther as string
+  const searchOtherValue = router.query.searchOtherValue as string
+  if (searchCategory) {
+    filter.category = {}
+    filter.category.$contains = searchCategory
+  }
+  if (searchCounty) {
+    filter.county = {}
+    filter.county.$contains = searchCounty
+  }
+  if (searchOther && searchOther) {
+    filter[searchOther] = {}
+    filter[searchOther].$contains = searchOtherValue
   }
 
   let [params, setParams] = useState<TapiGetCustomersParams>({
@@ -93,39 +110,69 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   // pageHeader
+
+  // 類別optionArr
+  const categoryOptionArr = (() => {
+    const optionArr = customerCategoryArr.map((category) => {
+      return {
+        value: category,
+        label: category
+      }
+    })
+    optionArr.unshift({ value: "", label: "類別不拘" })
+    return optionArr
+  })()
+
   const searchTargetList = [
+    {
+      options: categoryOptionArr,
+      width: "90px",
+      placeholder: "類別不拘",
+      defaultValue: searchCategory
+    },
+    {
+      options: optionCountyArr,
+      width: "90px",
+      placeholder: "地區不拘",
+      defaultValue: searchCounty
+    },
     {
       options: clientSearchOptions,
       width: "90px",
       defaultValue:
-        clientSearchOptionsObj[searchProperty] ?? clientSearchOptions[0]
+        clientSearchOptionsObj[searchOther] ?? clientSearchOptions[0]
     },
     {
       placeholder: "請輸入搜尋內容",
-      defaultValue: searchValue ?? ""
+      defaultValue: searchOtherValue ?? ""
     },
   ]
 
-  const searchGroup = {
+  const searchGroup: TsearchGroup = {
     searchTargetList,
     doSearch: (valueArr: (Toption | null | string)[]) => {
-      // if (typeof valueArr[0] === "string") return console.log("搜尋功能有錯誤")
-      // if (!valueArr?.[0]?.value) return console.log("搜尋功能有錯誤")
-      const searchProperty = (valueArr[0] as Toption).value
-      const searchValue = valueArr[1] as string
-
+      const searchCategory = (valueArr[0] as Toption).value
+      const searchCounty = (valueArr[1] as Toption).value
+      const searchOther = (valueArr[2] as Toption).value
+      const searchOtherValue = valueArr[3] as string
       router.push({
         pathname: "/setting/customer",
         query: {
-          searchProperty,
-          searchValue
+          searchCategory,
+          searchCounty,
+          searchOther,
+          searchOtherValue
         }
       })
 
       setParams(params => {
         const filter: TapiGetCustomersParams["filter"] = {}
-        filter[searchProperty] = {}
-        filter[searchProperty]["$contains"] = searchValue
+        filter.category = {}
+        filter.category["$contains"] = searchCategory
+        filter.county = {}
+        filter.county["$contains"] = searchCounty
+        filter[searchOther] = {}
+        filter[searchOther]["$contains"] = searchOtherValue
         return ({
           ...params,
           page: 1,

@@ -1,40 +1,47 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import classNames from "classnames"
+
+// antd
+import { Checkbox } from 'antd';
 
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address";
 
+// icon
+import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
+import CircularProgress from '@mui/material/CircularProgress';
+
 // option
 import {
   Toption,
-  optionsCreator_taxDeductionCategory, optionsCreator_customerCategory
+  optionsCreator_taxDeductionCategory,
+  //  optionsCreator_customerCategory
 } from "fakeDatabase/options/options";
 
 const optionsTaxDeductionCategory
   = optionsCreator_taxDeductionCategory()
-const optionsCustomerCategory
-  = optionsCreator_customerCategory()
+// const optionsCustomerCategory
+//   = optionsCreator_customerCategory()
 
 // css
-import style from "../customer.module.scss"
+import scss from "../customer.module.scss"
 
-// type
-import { TcustomerDto,TpostCustomer } from "js/api/api_customer";
+// type and config
+import { TcustomerDto, TpostCustomer, TprePostCustomer, customerCategoryArr } from "js/api/api_customer";
 
 
-export default function EditCustomerItem01({ data, setData }: {
-  data: TpostCustomer
+export default function EditCustomerItem01({ data, setData, nameCheck }: {
+  data: TprePostCustomer
   setData:
-  Dispatch<SetStateAction<TpostCustomer>>
+  Dispatch<SetStateAction<TprePostCustomer>>
+  nameCheck: "ok" | "notOk" | "loading"
 }) {
 
   const {
     county, district, address,
     invoiceCounty, invoiceDistrict, invoiceAddress
   } = data
-
-
-
 
   // ======================================================
   const selectInputPropsAddress = {
@@ -95,7 +102,7 @@ export default function EditCustomerItem01({ data, setData }: {
   }
   // ======================================================
   const createOnChange
-    = (key: keyof Omit<TcustomerDto, "contacts">) => {
+    = (key: keyof Omit<TcustomerDto, "contacts" | "category">) => {
       return (value: string) => {
         setData(data => {
           data[key] = value
@@ -104,27 +111,55 @@ export default function EditCustomerItem01({ data, setData }: {
       }
     }
   // ======================================================
+  const onChangeCategory = (checked: boolean, v: string) => {
+    if (checked) data.category.push(v)
+    else {
+      const index = data.category.findIndex((category) => category === v)
+      if (index !== -1) {
+        data.category.splice(index, 1)
+      }
+    }
+    setData(data => { return ({ ...data }) })
+  }
+
+  // ======================================================
   return (
-    <div className={style.editCustomerItem01}>
-      <p className={style.subTitle}>員工個人資料</p>
+    <div className={scss.editCustomerItem01}>
+      <p className={scss.subTitle}>員工個人資料</p>
 
-
-
-      <div className={style.form01}>
+      <div className={scss.form01}>
         {/* 上邊 */}
         <div>
+
+          <div className={scss.customreName}>
+            <InputSel
+              className={scss.input02}
+              label={"客戶全稱"}
+              presetStyle="s01"
+              captionWidth="100px"
+              textareaProps={{
+                value: data["name"],
+                onChange: createOnChange("name"),
+              }}
+            />
+            {nameCheck &&
+              <span className={scss.checkTip}>
+                {nameCheck === "ok" ? <IconCheck01 className={scss.check} cursor="auto" />
+                  : nameCheck === "notOk" ? <IconCross01 className={scss.cross} cursor="auto" />
+                    : <CircularProgress size={30} />
+                }
+                {nameCheck === "notOk" &&
+                  <span className={scss.alertTip}>
+                    {data.name ? "此客戶全稱已被使用" : "請輸入客戶全稱"}
+                  </span>
+                }
+              </span>
+            }
+          </div>
+
+
           <InputSel
-            className={style.input02}
-            label={"客戶全稱"}
-            presetStyle="s01"
-            captionWidth="100px"
-            textareaProps={{
-              value: data["name"],
-              onChange: createOnChange("name"),
-            }}
-          />
-          <InputSel
-            className={style.input02}
+            className={scss.input02}
             label={"客戶簡稱"}
             presetStyle="s01"
             captionWidth="100px"
@@ -137,7 +172,7 @@ export default function EditCustomerItem01({ data, setData }: {
         {/* 左邊 */}
         <div>
           <InputSel
-            className={style.input02}
+            className={scss.input02}
             label={"負責人"}
             presetStyle="s01"
             captionWidth="100px"
@@ -147,7 +182,7 @@ export default function EditCustomerItem01({ data, setData }: {
             }}
           />
           <InputSel
-            className={style.select02}
+            className={scss.select02}
             label={"扣稅類別"}
             presetStyle="s01"
             captionWidth="100px"
@@ -165,7 +200,7 @@ export default function EditCustomerItem01({ data, setData }: {
             }}
           />
           <InputSel
-            className={style.input02}
+            className={scss.input02}
             label={"統一編號"}
             presetStyle="s01"
             captionWidth="100px"
@@ -176,7 +211,7 @@ export default function EditCustomerItem01({ data, setData }: {
           />
         </div>
         {/* 垂直分隔線 */}
-        <div className={style.vr} />
+        <div className={scss.vr} />
         {/* 右邊 */}
         <div>
           {keyIndex01.map((key, index) => {
@@ -190,7 +225,7 @@ export default function EditCustomerItem01({ data, setData }: {
             }
             return (
               <InputSel key={index}
-                className={style.input02}
+                className={scss.input02}
                 label={label}
                 presetStyle="s01"
                 captionWidth="100px"
@@ -205,21 +240,39 @@ export default function EditCustomerItem01({ data, setData }: {
         {/* 下面 */}
         <div>
           <InputSelBar_address
-            className={style.selectInput}
+            className={scss.selectInput}
             label="公司地址"
             presetStyle="s01"
             captionWidth="100px"
             addressProps={selectInputPropsAddress} />
           <InputSelBar_address
-            className={style.selectInput}
+            className={scss.selectInput}
             label="發票地址"
             presetStyle="s01"
             captionWidth="100px"
             addressProps={selectInputPropsInvoice} />
         </div>
 
-        <div className={style.rightSide}>
-          <InputSel
+
+        <div className={classNames(scss.rightSide)}>
+          <div className={scss.checkboxGroup}>
+            <div>
+              <span>類別</span>
+            </div>
+            <div>
+              {customerCategoryArr.map((item, index) => {
+                const isChecked = !!data.category.find((category) => category === item)
+                return (
+                  <Checkbox key={index}
+                    checked={isChecked}
+                    onChange={(e) => { onChangeCategory(e.target.checked, item) }}
+                  >{item}</Checkbox>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* <InputSel
             className={style.select02}
             label={"類別"}
             presetStyle="s01"
@@ -236,13 +289,13 @@ export default function EditCustomerItem01({ data, setData }: {
                 })
               },
             }}
-          />
+          /> */}
+
         </div>
       </div> {/* form01 */}
       {/* 右側 */}
-    </div>
+    </div >
   )
-
 }
 
 

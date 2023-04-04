@@ -10,6 +10,11 @@ export type { TcustomerDto, Tcontact as Tcontacts }
 
 // ===============================================================
 
+export const customerCategoryArr = ["營造", "事務所", "業主", "協力廠商",]
+
+
+// ===============================================================
+
 
 
 export type TapiGetCustomersParams = {
@@ -23,9 +28,11 @@ export type TapiGetCustomersParams = {
   sort?: string[]
 }
 
+// type TtempCustomerDto = TcustomerDto & { category: string[] }
+export type TtempCustomerDto = Omit<TcustomerDto, "category"> & { category: string | string[] }
 
 export type TgetCustomers = {
-  data: TcustomerDto[]
+  data: TtempCustomerDto[]
   meta: TpageMetaDto
 }
 
@@ -60,6 +67,9 @@ export type TpostCustomer = {
     "phone": string
   }[] //聯絡人
 }
+
+export type TprePostCustomer
+  = Omit<TpostCustomer, "category"> & { category: string[] }
 
 
 // ============================================================
@@ -99,9 +109,7 @@ export const useCheckCustomers = (
       }
     }
   }
-
   const [check, setCheck] = useState<Tcheck>("loading")
-
   const update = async () => {
     try {
       setCheck("loading")
@@ -113,7 +121,39 @@ export const useCheckCustomers = (
       setCheck("notOk")
     }
   }
+  return {
+    check,
+    setCheck,
+    reCheck: update
+  }
+}
+export const useCheckCustomers_name = (
+  customerName: string,
+) => {
+  type Tcheck = "ok" | "notOk" | "loading"
 
+  const params: TapiGetCustomersParams = {
+    order: "ASC",
+    page: 1,
+    pageSize: 999,
+    filter: {
+      name: {
+        $eq: customerName
+      }
+    }
+  }
+  const [check, setCheck] = useState<Tcheck>("loading")
+  const update = async () => {
+    try {
+      setCheck("loading")
+      const res = await apiGetCustomers(params)
+      if (res.data.length === 0) setCheck("ok")
+      else setCheck("notOk")
+    }
+    catch {
+      setCheck("notOk")
+    }
+  }
   return {
     check,
     setCheck,
@@ -135,7 +175,7 @@ const apiGetCustomers_id
 
 export const useCustomersById
   = (id: string, params?: TapiGetCustomersParams) => {
-    let [data, setData] = useState<TpostCustomer>()
+    let [data, setData] = useState<TtempCustomerDto>()
     const update = async () => {
       const data = await apiGetCustomers_id(id, params)
       if (data) setData(data)

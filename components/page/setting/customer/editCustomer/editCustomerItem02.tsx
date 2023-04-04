@@ -12,13 +12,13 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto, TpostCustomer } from "js/api/api_customer";
+import { TcustomerDto, TpostCustomer,TprePostCustomer} from "js/api/api_customer";
 
 // ======================================================
 export default function EditCustomerItem02({ data, setData }: {
-  data: TpostCustomer
+  data: TprePostCustomer
   setData:
-  Dispatch<SetStateAction<TpostCustomer>>
+  Dispatch<SetStateAction<TprePostCustomer>>
 }) {
 
 

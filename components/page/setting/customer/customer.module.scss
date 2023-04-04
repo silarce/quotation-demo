@@ -192,32 +192,6 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       padding-top: 0;
       padding-bottom: 0;
     }
-    .checkTip {
-      margin-left: 10px;
-      width: fit-content;
-      white-space: nowrap;
-      display: flex;
-      > * {
-        margin: auto;
-      }
-      > svg {
-        height: 20px;
-        width: auto;
-        margin-right: 5px;
-        &.check {
-          color: #42ba96;
-        }
-        &.cross {
-          color: red;
-        }
-      }
-      .muiCircular {
-        font-size: 10px;
-      }
-      .alertTip {
-        color: red;
-      }
-    }
   } // theId
   // --------------------------------------------------
   .editCustomerItem01 {
@@ -242,7 +216,7 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
         position: absolute;
         top: 30px;
         right: 37px;
-        width: 238px;
+        // width: 238px;
       }
       // 垂直分隔線
       .vr {
@@ -256,6 +230,10 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
           color: $colorText;
         }
       }
+      .customreName {
+        display: flex;
+        align-items: center;
+      }
     }
     .subTitle {
       padding: 11px $leftPadding_title;
@@ -264,6 +242,36 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       line-height: 22px;
       background-color: $bgc01;
       margin: auto;
+    }
+
+    .checkboxGroup {
+      display: flex;
+      gap: 30px;
+      padding: 20px;
+      background-color: $bgc01;
+      > div:nth-of-type(1) {
+        font-size: 20px;
+        font-weight: 500;
+        color: $colorSub;
+        white-space: nowrap;
+      }
+      > div:nth-of-type(2) {
+        display: grid;
+        > :global(.ant-checkbox-wrapper) {
+          margin: 0;
+          > span:nth-of-type(2) {
+            font-size: 18px;
+            color: $colorMain;
+          }
+        }
+        :global(.ant-checkbox-inner) {
+          background-color: unset;
+          border-color: unset;
+          &::after {
+            border-color: $colorMain;
+          }
+        }
+      }
     }
   } // editCustomerItem01
   // --------------------------------------------------
@@ -308,5 +316,32 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       } // inputBox
     } // form
   } //editCustomerItem02
+
+  .checkTip {
+    margin-left: 10px;
+    width: fit-content;
+    white-space: nowrap;
+    display: flex;
+    > * {
+      margin: auto;
+    }
+    > svg {
+      height: 20px;
+      width: auto;
+      margin-right: 5px;
+      &.check {
+        color: #42ba96;
+      }
+      &.cross {
+        color: red;
+      }
+    }
+    .muiCircular {
+      font-size: 10px;
+    }
+    .alertTip {
+      color: red;
+    }
+  }
 }
 // =====================================================

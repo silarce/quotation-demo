@@ -259,7 +259,7 @@ function PanelList({ panelList }:
 
 
 
-export type { TpanelList, TtagList, TsearchObj }
+export type { TpanelList, TtagList, TsearchObj, TsearchGroup }
 
 // ===========================================================
 

@@ -19,7 +19,7 @@ import {
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto, Tcontacts } from "js/api/api_customer";
+import { TcustomerDto, TtempCustomerDto, Tcontacts } from "js/api/api_customer";
 
 
 
@@ -33,9 +33,9 @@ import { TcustomerDto, Tcontacts } from "js/api/api_customer";
 export default function PanelHeader(
   { customersData, isActive, openDelPanel }:
     {
-      customersData: TcustomerDto
+      customersData: TtempCustomerDto
       isActive: boolean
-      openDelPanel: (e: MouseEvent, data: TcustomerDto) => void
+      openDelPanel: (e: MouseEvent, data: TtempCustomerDto) => void
     }) {
   // ====================================================
   const router = useRouter()
@@ -52,16 +52,26 @@ export default function PanelHeader(
       query: { id: customersData.id }
     })
   }
-
+  // console.log(customersData)
   // ====================================================
   return (
     <CellWithBar isActive={isActive}>
-      <div className={`${style.panelHeader}`}
-      >
+      <div className={`${style.panelHeader}`}>
         <div className={style.cell01}>
           {indexKeys01.map((key, index) => {
-            const value = customersData[key]
+            let value = customersData[key]
             const { label } = config01[key]
+
+            if (key === "category") {
+              try {
+                value = JSON.parse(value as string)
+
+              } catch {
+                value = [value as string]
+              }
+              value = (value as string[]).join(" / ")
+            }
+
             return (
               <div key={index}>
                 <h6>{label}</h6>
@@ -130,10 +140,10 @@ const config01: Tconfig<TindexKeys01> = {
     label: "客戶編號"
   },
   category: {
-    label: "客戶類型"
+    label: "類別"
   },
   name: {
-    label: "客戶全稱"
+    label: "全稱"
   },
 }
 const config02: Tconfig<TindexKeys02> = {

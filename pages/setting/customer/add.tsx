@@ -19,11 +19,13 @@ import style from "./customer.module.scss"
 // api
 import {
   TapiGetCustomersParams, TcustomerDto, TpostCustomer,
-  apiPostCustomers, useCheckCustomers
+  apiPostCustomers, useCheckCustomers, TprePostCustomer,
+  useCheckCustomers_name,
 } from "js/api/api_customer";
 // ====================================================
 // 防抖
 let timeoutId: NodeJS.Timeout;
+let timeoutId_check: NodeJS.Timeout;
 // ====================================================
 export default function Add() {
   const router = useRouter()
@@ -38,6 +40,12 @@ export default function Add() {
     setCheck,
     reCheck
   } = useCheckCustomers(data.customerNumber)
+  const {
+    check: nameCheck,
+    setCheck: SetNameCheck,
+    reCheck: reNameCheck
+  } = useCheckCustomers_name(data.name)
+
 
   useEffect(() => {
     setCheck("loading")
@@ -48,6 +56,18 @@ export default function Add() {
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.customerNumber])
+
+
+  useEffect(() => {
+    SetNameCheck("loading")
+    clearTimeout(timeoutId_check)
+    timeoutId_check = setTimeout(() => {
+      if (!data.name) return SetNameCheck("notOk")
+      reNameCheck()
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.name])
+
   // ------------------------------------------------------
 
   const panelList: TpanelList = [
@@ -55,15 +75,29 @@ export default function Add() {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-        if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
-        if (check === "loading") return myAlert.info({ title: "正在檢查客戶編號" })
+
+
+        // if (check === "notOk") return myAlert.err({ title: "客戶編號錯誤" })
+        // if (check === "loading") return myAlert.info({ title: "正在檢查客戶編號" })
+        if (check === "notOk" || nameCheck === "notOk")
+          return myAlert.err({ title: "客戶編號或客戶全稱已被使用" })
+        if (check === "loading" || nameCheck === "loading")
+          return myAlert.info({ title: "正在檢查客戶編號或客戶全稱" })
+
+
         try {
+          const postBody: TpostCustomer = {
+            ...data,
+            category: JSON.stringify(data.category)
+          }
           setRootLoading(true)
-          const res = await apiPostCustomers(data)
+          const res = await apiPostCustomers(postBody)
           router.push({
-            pathname: `/setting/customer/edit/${res.id}`,
+            // pathname: `/setting/customer/edit/${res.id}`,
+            pathname: "/setting/customer/edit",
             query: {
-              isNew: true
+              isNew: true,
+              id: res.id
             }
           })
           myAlert.success({ title: "新增客戶資料完成" })
@@ -94,9 +128,10 @@ export default function Add() {
       <div className={style.mainContainer}>
 
         <EditCustomer
-          data={data }
+          data={data}
           setData={setData}
           check={check}
+          nameCheck={nameCheck}
         />
 
       </div>
@@ -109,11 +144,11 @@ export default function Add() {
 // =============================================================
 // TpostCustomer
 
-const emptyCustomerOri = (): TpostCustomer => ({
+const emptyCustomerOri = (): TprePostCustomer => ({
   "customerNumber": "", //客戶編號
   "name": "", //客戶全稱
   "nickname": "", //客戶簡稱
-  "category": "", //客戶類型
+  "category": [], //客戶類型
   "principal": "", //客戶負責人
   "taxDeductionCategory": "", //扣稅類別
   "taxId": "", //統一編號

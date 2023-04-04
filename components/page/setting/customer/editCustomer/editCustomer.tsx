@@ -15,15 +15,16 @@ import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcon
 import CircularProgress from '@mui/material/CircularProgress';
 
 // type
-import { TcustomerDto,TpostCustomer } from "js/api/api_customer";
+import { TcustomerDto, TpostCustomer, TprePostCustomer } from "js/api/api_customer";
 
 // css
 import style from "../customer.module.scss"
 
-export default function EditCustomer({ data, setData, check }: {
-  data: TpostCustomer
-  setData: Dispatch<SetStateAction<TpostCustomer>>
+export default function EditCustomer({ data, setData, check, nameCheck }: {
+  data: TprePostCustomer
+  setData: Dispatch<SetStateAction<TprePostCustomer>>
   check?: "ok" | "notOk" | "loading"
+  nameCheck: "ok" | "notOk" | "loading"
 }) {
 
   const router = useRouter()
@@ -67,6 +68,7 @@ export default function EditCustomer({ data, setData, check }: {
       <EditCustomerItem01
         data={data}
         setData={setData}
+        nameCheck={nameCheck}
       />
       <EditCustomerItem02
         data={data}
