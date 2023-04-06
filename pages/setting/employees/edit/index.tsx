@@ -80,6 +80,9 @@ export default function AddEmployee() {
           const id = postBody.id
 
           await apiPatchEmployee(postBody, id)
+          router.push({
+            pathname: `/setting/employees`,
+          })
           myAlert.success({ title: "變更人員資料完成" })
         }
         catch (error) {
