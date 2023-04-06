@@ -88,7 +88,7 @@
     gap: 4px;
     .columns {
       display: flex;
-      flex-direction:column-reverse; // cell逆序排列
+      flex-direction: column-reverse; // cell逆序排列
       gap: 4px;
       > .cell.head {
         position: relative;
@@ -96,15 +96,16 @@
         border-color: transparent;
         margin-bottom: 2px;
         order: 1; // 把這一個cell移到最上面
-        > p {
-          position: relative;
-          margin: auto;
-          margin-top: 3px;
-          text-align: center;
-          font-weight: 400;
-          font-size: 16px;
+        > .inputBox:nth-of-type(1) input {
           color: $colorMain;
-          z-index: 2;
+        }
+        > .inputBox:nth-of-type(2) {
+          input {
+            font-size: 14px;
+          }
+          &.notEditable {
+            border-bottom: solid 1px transparent;
+          }
         }
         &.isFocus {
           border: solid 1px $colorActive01;
