@@ -89,10 +89,10 @@ export default function AddEmployee() {
           setRootLoading(true)
           const res = await apiPostEmployee(classEmpolyee.postBody) as TemployeeDto
           router.push({
-            pathname: `/setting/employees/edit/${res.id}`,
-            query: {
-              isNew: true
-            }
+            pathname: `/setting/employees`,
+            // query: {
+            //   isNew: true
+            // }
           })
           myAlert.success({ title: "新增人員完成" })
         }

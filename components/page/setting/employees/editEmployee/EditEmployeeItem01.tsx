@@ -163,7 +163,7 @@ export default function EditEmployeeItem01({ classEmployee }: {
               const onChange = (v: string) => classEmployee.setCareer(index, v)
               const add = () => classEmployee.addCareer()
               const remove = () => classEmployee.removeCareer(index)
-              const showAdd = index !== 2
+              const showAdd = index !== 2 && arr.length === index + 1
 
               return (
                 <div key={index}

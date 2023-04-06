@@ -94,11 +94,7 @@ export default function Add() {
           const res = await apiPostCustomers(postBody)
           router.push({
             // pathname: `/setting/customer/edit/${res.id}`,
-            pathname: "/setting/customer/edit",
-            query: {
-              isNew: true,
-              id: res.id
-            }
+            pathname: "/setting/customer",
           })
           myAlert.success({ title: "新增客戶資料完成" })
         }
