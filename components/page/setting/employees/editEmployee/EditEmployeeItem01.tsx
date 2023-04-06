@@ -103,7 +103,7 @@ export default function EditEmployeeItem01({ classEmployee }: {
           <InputSel
             className={scss.inputSel}
             label={"生日"}
-            width={"240px"}
+            width={"260px"}
             presetStyle="s01"
             captionWidth={"60px"}
             datePickerProps={{
