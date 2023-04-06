@@ -1,12 +1,10 @@
 
 import { useRouter } from "next/router";
 
-
 import { MouseEvent } from "react"
 
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar";
-
 
 // icon
 import {
@@ -21,14 +19,7 @@ import style from "../customer.module.scss"
 // type
 import { TcustomerDto, TtempCustomerDto, Tcontacts } from "js/api/api_customer";
 
-
-
-
-
-
 // ====================================================
-
-
 
 export default function PanelHeader(
   { customersData, isActive, openDelPanel }:
@@ -52,7 +43,6 @@ export default function PanelHeader(
       query: { id: customersData.id }
     })
   }
-  // console.log(customersData)
   // ====================================================
   return (
     <CellWithBar isActive={isActive}>
@@ -69,7 +59,19 @@ export default function PanelHeader(
               } catch {
                 value = [value as string]
               }
-              value = (value as string[]).join(" / ")
+            }
+
+            if (Array.isArray(value)) {
+              return (
+                <div key={index}>
+                  <h6>{label}</h6>
+                    {value.map((v, index, arr) => {
+                      return (
+                        <span key={index} className="block">{v}</span>
+                      )
+                    })}
+                </div>
+              )
             }
 
             return (
