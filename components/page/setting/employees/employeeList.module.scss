@@ -2,7 +2,7 @@
 
 .employeeList {
   padding: 4px;
-
+  display: grid;
   .thead {
     background-color: $bgc01;
     display: flex;
@@ -12,6 +12,7 @@
     padding-right: 20px;
   }
   .tbody {
+    overflow: auto;
     .row {
       display: flex;
       gap: 63px;
