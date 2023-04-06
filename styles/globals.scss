@@ -58,6 +58,14 @@ a {
   box-sizing: border-box;
 }
 
+.ant-modal {
+  .ant-btn {
+    > span {
+      font-size: 16px;
+    }
+  }
+}
+
 // 出現404頁面的時候，把css蓋掉
 // 不然被bod的bgc會被設定成#000
 @media (prefers-color-scheme: dark) {
@@ -72,4 +80,3 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-

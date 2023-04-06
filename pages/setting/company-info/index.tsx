@@ -219,6 +219,7 @@ export default function CompanyInfo() {
             if (editable) styleInput02 = `${styleInput02} ${scss.editable}`
             return (
               <InputSel key={index}
+                className={scss.inputSel}
                 label={label}
                 captionWidth="80px"
                 gap="50px"

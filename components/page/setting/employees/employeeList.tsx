@@ -113,9 +113,9 @@ export default function EmployeeList({ employeeList, toUpdate, isLoading }: {
                             const department = item.department
                             const { name: departmentName } = department ?? {}
                             return (
-                              <div key={index}>
+                              <span key={index}>
                                 {`字母 / ${departmentName} / ${name} / Level${grade}`}
-                              </div>
+                              </span>
                             )
                           })}
                         </div>

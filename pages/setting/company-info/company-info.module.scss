@@ -86,6 +86,11 @@
 .formContainer {
   margin-top: 8px;
   width: 100%;
+  .inputSel {
+    input {
+      color: $colorMain;
+    }
+  }
 }
 
 .selectInput {

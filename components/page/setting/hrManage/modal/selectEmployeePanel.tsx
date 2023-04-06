@@ -70,7 +70,7 @@ export default function SelectEmployeePanel(
       visible={visible}
       closable={false}
       centered={true}
-      width={400}
+      width={720}
       destroyOnClose={true}
       onCancel={onCancel}
       footer={<TwoBtnFooter {...{ onConfirm: theOnConfirm, onCancel }} />}

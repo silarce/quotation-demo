@@ -2,7 +2,7 @@
 
 .container {
   :global(.ant-modal-content) {
-    width: 620px;
+    width: 720px;
     height: 490px;
     padding: 19px 30px;
     padding-top: 19px;
@@ -36,7 +36,6 @@
 }
 
 .listContainer {
-  width: 560px;
   height: 350px;
   border: solid 1px $colorBorder01;
   overflow: auto;
@@ -44,7 +43,7 @@
 }
 .listItem {
   display: grid;
-  grid-template-columns: 40px 50px 100px 55px;
+  grid-template-columns: 40px 1fr 1fr 70px;
   height: 54px;
   padding: 0 46px;
   gap: 60px;
