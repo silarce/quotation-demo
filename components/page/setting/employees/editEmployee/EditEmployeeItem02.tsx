@@ -128,9 +128,10 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
               inputProps={{
                 value: classEmployee.seniority,
                 onChange: (value: string) => {
-                  classEmployee.seniority = value
+                  // classEmployee.seniority = value
                 },
               }}
+              disabled
             />
           </div>
           <div>
