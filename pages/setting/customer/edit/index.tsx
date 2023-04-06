@@ -123,6 +123,9 @@ export default function Edit() {
           setRootLoading(true)
           // 如果第一層的id存在，會在api那邊把id刪掉
           await apiPatchCustomers_id(data.id, postBody)
+          router.push({
+            pathname: "/setting/customer",
+          })
           myAlert.success({ title: "變更客戶資料完成" })
         }
         catch {
@@ -137,10 +140,10 @@ export default function Edit() {
       type: "myButton",
       label: "取消",
       onClick: () => {
-        if (router.query.isNew) {
-          window.history.go(-2)
-          return
-        }
+        // if (router.query.isNew) {
+        //   window.history.go(-2)
+        //   return
+        // }
         router.back()
       }
     },
