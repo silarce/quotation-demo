@@ -116,12 +116,10 @@ export default function AddEmployee() {
           panelList={panelList}
         />
         <div className={style.mainContainer}>
-
           <EditEmployee
             classEmployee={classEmployee}
             departmentJobOptionGroup={departmentJobOptionGroup}
           />
-
         </div>
       </div>
     )
