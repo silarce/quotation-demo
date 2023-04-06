@@ -1,8 +1,11 @@
 
 import { useState, useEffect } from "react";
+import { differenceInDays, parseISO, formatDuration, parse } from 'date-fns';
+import moment from "moment"
 
 // type
 import { TemployeeDto } from "js/api/api_employee";
+import { duration } from "@mui/material";
 type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
 
 
@@ -178,13 +181,26 @@ class Class_employee {
     this._reRender()
   }
 
+
   get seniority() {
-    return this._employeeData.seniority
+    const mStartDate = moment(this.startDate,"yyyy-MM-DD") //到職日
+    if (!this.startDate) return "請輸入到職日"
+    if (this.leaveDate) {
+      const mLeaveDate = moment(this.leaveDate,"yyyy-MM-DD")
+      const duration = moment.duration(mLeaveDate.diff(mStartDate))
+      return `${duration.years()}年${duration.months()}月${duration.days()}天`
+    }
+    else {
+      const mNow = moment(new Date(),"yyyy-MM-DD").subtract(1911, "year")
+      const duration = moment.duration(mNow.diff(mStartDate))
+      return `${duration.years()}年${duration.months()}月${duration.days()}天`
+    }
   }
-  set seniority(v: string) {
-    this._employeeData.seniority = v
-    this._reRender()
-  }
+
+  // set seniority(v: string) {
+  //   // this._employeeData.seniority = v
+  //   // this._reRender()
+  // }
 
   get startDate() {
     return this._employeeData.startDate
