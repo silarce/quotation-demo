@@ -163,7 +163,7 @@ export default function EditEmployeeItem01({ classEmployee }: {
               const onChange = (v: string) => classEmployee.setCareer(index, v)
               const add = () => classEmployee.addCareer()
               const remove = () => classEmployee.removeCareer(index)
-              const showAdd = arr.length === index + 1
+              const showAdd = index !== 2
 
               return (
                 <div key={index}
@@ -273,13 +273,13 @@ const config02: {
 } = {
   gender: {
     label: "性別",
-    width: "240px",
+    width: "260px",
     options: optionsGender,
     labelWidth: config02Width
   },
   marital: {
     label: "婚姻",
-    width: "240px",
+    width: "260px",
     options: optionMarital,
     labelWidth: config02Width,
   },
