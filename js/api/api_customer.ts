@@ -1,21 +1,40 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { axi } from "./_axiosCreator";
 
 // type
 import type { TcustomerDto, TpageMetaDto, Tcontact } from "./dtoTypes";
 
-export type { TcustomerDto, Tcontact as Tcontacts }
 
+
+export type { TcustomerDto, Tcontact as Tcontacts }
 // ===============================================================
 
 export const customerCategoryArr = ["營造", "事務所", "業主", "協力廠商",]
 
 
+export const customerTypesLookup = {
+  construction: "營造",
+  firm: "事務所",
+  propertyOwner: "業主",
+  contractor: "協力廠商",
+}
+
+type TcustomerTypesLookupKeys = (keyof typeof customerTypesLookup)
+export const customerTypesArr
+  = (Object.keys(customerTypesLookup) as TcustomerTypesLookupKeys[])
+    .map((key) => ({ value: key, label: customerTypesLookup[key] }))
+
+// export const customerTypesArr = [
+//   { value: "construction", label: "營造" },
+//   { value: "firm", label: "事務所" },
+//   { value: "propertyOwner", label: "業主" },
+//   { value: "contractor", label: "協力廠商" },
+// ]
+
+
 // ===============================================================
-
-
 
 export type TapiGetCustomersParams = {
   order?: "ASC" | "DESC",
@@ -24,15 +43,12 @@ export type TapiGetCustomersParams = {
   filter?: {
     [key: string]: any
   }
-  populate?: "contacts"[]
+  populate?: ("contacts" | "types")[]
   sort?: string[]
 }
 
-// type TtempCustomerDto = TcustomerDto & { category: string[] }
-export type TtempCustomerDto = Omit<TcustomerDto, "category"> & { category: string | string[] }
-
 export type TgetCustomers = {
-  data: TtempCustomerDto[]
+  data: TcustomerDto[]
   meta: TpageMetaDto
 }
 
@@ -41,10 +57,10 @@ export type TpostCustomer = {
   "id"?: string,
   "createdAt"?: string // "2022-10-19T05:36:03.899Z",
   "updatedAt"?: string // "2022-10-19T05:36:03.899Z",
-  "customerNumber": string, //客戶編號
+  "customerNumber"?: undefined, // 客戶編號 後端不收
   "name": string, //客戶全稱
   "nickname": string, //客戶簡稱
-  "category": string, //客戶類型
+  types: ("construction" | "firm" | "propertyOwner" | "contractor")[]
   "principal": string, //客戶負責人
   "taxDeductionCategory": string, //扣稅類別
   "taxId": string, //統一編號
@@ -68,10 +84,6 @@ export type TpostCustomer = {
   }[] //聯絡人
 }
 
-export type TprePostCustomer
-  = Omit<TpostCustomer, "category"> & { category: string[] }
-
-
 // ============================================================
 // 取得客戶列表
 
@@ -93,28 +105,22 @@ export const useCustomers = (params?: TapiGetCustomersParams) => {
 }
 
 // ============================================================
-// 檢查客戶編號是否存在
-export const useCheckCustomers = (
-  customerNumber: string,
-) => {
-  type Tcheck = "ok" | "notOk" | "loading"
+const apiCustomersNameExist = (name: string) => {
+  const api = `/customers/name-exist/${name}`
+  return axi.get(api)
+    .then(({ data }) => data as { isExist: boolean })
+    .catch(err => Promise.reject(err.message))
+}
 
-  const params: TapiGetCustomersParams = {
-    order: "ASC",
-    page: 1,
-    pageSize: 999,
-    filter: {
-      customerNumber: {
-        $eq: customerNumber
-      }
-    }
-  }
+export const useApiCustomersNameExist = (name: string) => {
+  type Tcheck = "ok" | "notOk" | "loading"
   const [check, setCheck] = useState<Tcheck>("loading")
-  const update = async () => {
+
+  const reCheck = async () => {
     try {
       setCheck("loading")
-      const res = await apiGetCustomers(params)
-      if (res.data.length === 0) setCheck("ok")
+      const res = await apiCustomersNameExist(name)
+      if (!res.isExist) setCheck("ok")
       else setCheck("notOk")
     }
     catch {
@@ -124,43 +130,9 @@ export const useCheckCustomers = (
   return {
     check,
     setCheck,
-    reCheck: update
+    reCheck
   }
 }
-export const useCheckCustomers_name = (
-  customerName: string,
-) => {
-  type Tcheck = "ok" | "notOk" | "loading"
-
-  const params: TapiGetCustomersParams = {
-    order: "ASC",
-    page: 1,
-    pageSize: 999,
-    filter: {
-      name: {
-        $eq: customerName
-      }
-    }
-  }
-  const [check, setCheck] = useState<Tcheck>("loading")
-  const update = async () => {
-    try {
-      setCheck("loading")
-      const res = await apiGetCustomers(params)
-      if (res.data.length === 0) setCheck("ok")
-      else setCheck("notOk")
-    }
-    catch {
-      setCheck("notOk")
-    }
-  }
-  return {
-    check,
-    setCheck,
-    reCheck: update
-  }
-}
-
 
 // ============================================================
 // 取得個別客戶資料
@@ -175,7 +147,7 @@ const apiGetCustomers_id
 
 export const useCustomersById
   = (id: string, params?: TapiGetCustomersParams) => {
-    let [data, setData] = useState<TtempCustomerDto>()
+    let [data, setData] = useState<TcustomerDto>()
     const update = async () => {
       const data = await apiGetCustomers_id(id, params)
       if (data) setData(data)

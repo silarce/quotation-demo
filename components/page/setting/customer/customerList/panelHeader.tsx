@@ -17,16 +17,16 @@ import {
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto, TtempCustomerDto, Tcontacts } from "js/api/api_customer";
+import { TcustomerDto, Tcontacts, customerTypesLookup } from "js/api/api_customer";
 
 // ====================================================
 
 export default function PanelHeader(
   { customersData, isActive, openDelPanel }:
     {
-      customersData: TtempCustomerDto
+      customersData: TcustomerDto
       isActive: boolean
-      openDelPanel: (e: MouseEvent, data: TtempCustomerDto) => void
+      openDelPanel: (e: MouseEvent, data: TcustomerDto) => void
     }) {
   // ====================================================
   const router = useRouter()
@@ -52,24 +52,16 @@ export default function PanelHeader(
             let value = customersData[key]
             const { label } = config01[key]
 
-            if (key === "category") {
-              try {
-                value = JSON.parse(value as string)
-
-              } catch {
-                value = [value as string]
-              }
-            }
-
-            if (Array.isArray(value)) {
+            if (key === "types") {
               return (
                 <div key={index}>
                   <h6>{label}</h6>
-                    {value.map((v, index, arr) => {
-                      return (
-                        <span key={index} className="block">{v}</span>
-                      )
-                    })}
+                  {(value as TcustomerDto["types"]).map((v, index, arr) => {
+                    const label = customerTypesLookup[v.name]
+                    return (
+                      <span key={index} className="block">{label}</span>
+                    )
+                  })}
                 </div>
               )
             }
@@ -77,7 +69,7 @@ export default function PanelHeader(
             return (
               <div key={index}>
                 <h6>{label}</h6>
-                <span>{value}</span>
+                <span>{value as string}</span>
               </div>
             )
           })}
@@ -122,12 +114,12 @@ export default function PanelHeader(
 
 // TcustomerDto
 type TindexKeys01
-  = keyof Pick<TcustomerDto, "customerNumber" | "category" | "name">
+  = keyof Pick<TcustomerDto, "customerNumber" | "types" | "name">
 type TindexKeys02
   = keyof Pick<TcustomerDto, "phone" | "fax">
 
 const indexKeys01: TindexKeys01[]
-  = ["customerNumber", "category", "name"]
+  = ["customerNumber", "types", "name"]
 const indexKeys02: TindexKeys02[]
   = ["phone", "fax"]
 
@@ -141,7 +133,7 @@ const config01: Tconfig<TindexKeys01> = {
   customerNumber: {
     label: "客戶編號"
   },
-  category: {
+  types: {
     label: "類別"
   },
   name: {

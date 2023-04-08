@@ -3,11 +3,11 @@
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto,TtempCustomerDto } from "js/api/api_customer";
+import { TcustomerDto } from "js/api/api_customer";
 
 // ====================================================
 export default function PanelBody(
-  { customersData }: { customersData: TtempCustomerDto }) {
+  { customersData }: { customersData: TcustomerDto }) {
 
   const {
     nickname, contacts

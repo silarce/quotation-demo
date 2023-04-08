@@ -1,4 +1,3 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import classNames from "classnames"
 
 // antd
@@ -16,110 +15,64 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {
   Toption,
   optionsCreator_taxDeductionCategory,
-  //  optionsCreator_customerCategory
 } from "fakeDatabase/options/options";
-
 const optionsTaxDeductionCategory
   = optionsCreator_taxDeductionCategory()
-// const optionsCustomerCategory
-//   = optionsCreator_customerCategory()
 
 // css
 import scss from "../customer.module.scss"
 
 // type and config
-import { TcustomerDto, TpostCustomer, TprePostCustomer, customerCategoryArr } from "js/api/api_customer";
+import { customerTypesArr } from "js/api/api_customer";
+import { Class_customer } from "hooks/customer/useCustomer";
+import { TcustomerDto, TpostCustomer } from "js/api/api_customer";
 
 
-export default function EditCustomerItem01({ data, setData, nameCheck }: {
-  data: TprePostCustomer
-  setData:
-  Dispatch<SetStateAction<TprePostCustomer>>
+export default function EditCustomerItem01({ classCustomer, nameCheck }: {
+  classCustomer: Class_customer
   nameCheck: "ok" | "notOk" | "loading"
 }) {
 
-  const {
-    county, district, address,
-    invoiceCounty, invoiceDistrict, invoiceAddress
-  } = data
+  const { typeArr, addType, removeType, } = classCustomer
 
   // ======================================================
   const selectInputPropsAddress = {
-    county: county,
+    county: classCustomer.county,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
-      setData(data => {
-        data.county = value
-        data.district = ""
-        return { ...data }
-      })
+      classCustomer.county = value
+      classCustomer.district = ""
     },
-    district: district,
+    district: classCustomer.district,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
       const value = option.value
-      setData(data => {
-        data.district = value
-        return { ...data }
-      })
+      classCustomer.district = value
     },
-    address: address,
+    address: classCustomer.address,
     onChangeAddress: (value: string) => {
-      setData(data => {
-        data.address = value
-        return { ...data }
-      })
+      classCustomer.address = value
     },
   }
   const selectInputPropsInvoice = {
-    county: invoiceCounty,
+    county: classCustomer.invoiceCounty,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
       const value = option.value
-      setData(data => {
-        data.invoiceCounty = value
-        data.invoiceDistrict = ""
-        return { ...data }
-      })
+      classCustomer.invoiceCounty = value
+      classCustomer.invoiceDistrict = ""
     },
-    district: invoiceDistrict,
+    district: classCustomer.invoiceDistrict,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
       const value = option.value
-      setData(data => {
-        data.invoiceDistrict = value
-        return { ...data }
-      })
+      classCustomer.invoiceDistrict = value
     },
-    address: invoiceAddress,
+    address: classCustomer.invoiceAddress,
     onChangeAddress: (value: string) => {
-      setData(data => {
-        data.invoiceAddress = value
-        return { ...data }
-      })
+      classCustomer.invoiceAddress = value
     },
-  }
-  // ======================================================
-  const createOnChange
-    = (key: keyof Omit<TcustomerDto, "contacts" | "category">) => {
-      return (value: string) => {
-        setData(data => {
-          data[key] = value
-          return { ...data }
-        })
-      }
-    }
-  // ======================================================
-  const onChangeCategory = (checked: boolean, v: string) => {
-    if (checked) data.category.push(v)
-    else {
-      const index = data.category.findIndex((category) => category === v)
-      if (index !== -1) {
-        data.category.splice(index, 1)
-      }
-    }
-    setData(data => { return ({ ...data }) })
   }
 
   // ======================================================
@@ -138,8 +91,8 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
               presetStyle="s01"
               captionWidth="100px"
               textareaProps={{
-                value: data["name"],
-                onChange: createOnChange("name"),
+                value: classCustomer["name"],
+                onChange: (v) => classCustomer.name = v,
               }}
             />
             {nameCheck &&
@@ -150,7 +103,7 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
                 }
                 {nameCheck === "notOk" &&
                   <span className={scss.alertTip}>
-                    {data.name ? "此客戶全稱已被使用" : "請輸入客戶全稱"}
+                    {classCustomer.name ? "此客戶全稱已被使用" : "請輸入客戶全稱"}
                   </span>
                 }
               </span>
@@ -164,8 +117,8 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
             presetStyle="s01"
             captionWidth="100px"
             inputProps={{
-              value: data["nickname"],
-              onChange: createOnChange("nickname"),
+              value: classCustomer["nickname"],
+              onChange: (v) => classCustomer.nickname = v,
             }}
           />
         </div>
@@ -177,8 +130,8 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
             presetStyle="s01"
             captionWidth="100px"
             inputProps={{
-              value: data["principal"],
-              onChange: createOnChange("principal"),
+              value: classCustomer["principal"],
+              onChange: (v) => classCustomer.principal = v,
             }}
           />
           <InputSel
@@ -187,15 +140,12 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
             presetStyle="s01"
             captionWidth="100px"
             selectProps={{
-              value: data["taxDeductionCategory"],
+              value: classCustomer["taxDeductionCategory"],
               options: optionsTaxDeductionCategory,
               onChange: (option: Toption | null) => {
                 if (!option) return
                 const { value } = option
-                setData(data => {
-                  data["taxDeductionCategory"] = value
-                  return ({ ...data })
-                })
+                classCustomer["taxDeductionCategory"] = value
               },
             }}
           />
@@ -205,8 +155,8 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
             presetStyle="s01"
             captionWidth="100px"
             inputProps={{
-              value: data["taxId"],
-              onChange: createOnChange("taxId"),
+              value: classCustomer["taxId"],
+              onChange: (v) => classCustomer.taxId = v,
             }}
           />
         </div>
@@ -216,12 +166,9 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
         <div>
           {keyIndex01.map((key, index) => {
             const { label } = config01[key]
-            const stateValue = data[key]
+            const stateValue = classCustomer[key]
             const onChange = (value: string) => {
-              setData(data => {
-                data[key] = value
-                return { ...data }
-              })
+              classCustomer[key] = value
             }
             return (
               <InputSel key={index}
@@ -253,44 +200,27 @@ export default function EditCustomerItem01({ data, setData, nameCheck }: {
             addressProps={selectInputPropsInvoice} />
         </div>
 
-
         <div className={classNames(scss.rightSide)}>
           <div className={scss.checkboxGroup}>
             <div>
               <span>類別</span>
             </div>
             <div>
-              {customerCategoryArr.map((item, index) => {
-                const isChecked = !!data.category.find((category) => category === item)
+              {customerTypesArr.map((typeOption, index) => {
+                const typeIndex
+                  = typeArr.findIndex((type) => type === typeOption.value)
+                const onChange = (checked: boolean, v: TpostCustomer["types"][number]) => {
+                  checked ? addType(v) : removeType(typeIndex)
+                }
                 return (
                   <Checkbox key={index}
-                    checked={isChecked}
-                    onChange={(e) => { onChangeCategory(e.target.checked, item) }}
-                  >{item}</Checkbox>
+                    checked={typeIndex !== -1}
+                    onChange={(e) => { onChange(e.target.checked, typeOption.value) }}
+                  >{typeOption.label}</Checkbox>
                 )
               })}
             </div>
           </div>
-
-          {/* <InputSel
-            className={style.select02}
-            label={"類別"}
-            presetStyle="s01"
-            captionWidth="50px"
-            selectProps={{
-              value: data["category"],
-              options: optionsCustomerCategory,
-              onChange: (option: Toption | null) => {
-                if (!option) return
-                const { value } = option
-                setData(data => {
-                  data["category"] = value
-                  return ({ ...data })
-                })
-              },
-            }}
-          /> */}
-
         </div>
       </div> {/* form01 */}
       {/* 右側 */}

@@ -75,12 +75,13 @@ function TheCustomer({ router }: { router: NextRouter }) {
   let [params, setParams] = useState<TapiGetCustomersParams>({
     page: 1,
     pageSize: 8,
-    populate: ["contacts"],
+    populate: ["contacts", "types"],
     filter,
     // sort: []
   })
 
   const { data, update } = useCustomers(params)
+  
   const meta = data?.meta
   // -----------------------------------------------------
   const setPage = (page: number) => {

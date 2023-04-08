@@ -60,19 +60,24 @@ export type TcustomerDto = {
   customerNumber: string
   name: string
   nickname: string
-  category: string
   principal: string
   taxDeductionCategory: string
   taxId: string
   phone: string
   fax: string
-  county: string | null
-  district: string | null
-  address: string | null
-  invoiceCounty: string | null
-  invoiceDistrict: string | null
-  invoiceAddress: string | null
-  contacts: Tcontact[] | null
+  county: string
+  district: string
+  address: string
+  invoiceCounty: string
+  invoiceDistrict: string
+  invoiceAddress: string
+  contacts: Tcontact[]
+  types: { //客戶類型
+    id: string
+    createdAt: string
+    updateAt: string
+    name: "construction" | "firm" | "propertyOwner" | "contractor"
+  }[]
 }
 
 export type TemployeeDto = {
@@ -104,8 +109,8 @@ export type TemployeeDto = {
   retireDate: string //退休日
   severanceDate: string // 資遣日
   militaryServiceType: string // 兵役別
-  emergencyContactPhone:string // 緊急聯絡人電話
-  emergencyContactRelationship:string // 緊急聯絡人關係
+  emergencyContactPhone: string // 緊急聯絡人電話
+  emergencyContactRelationship: string // 緊急聯絡人關係
   qualifications: { name: string, years: number }[] // 個人資歷
   jobs?: TjobDto[]
   user?: TuserDto | null
