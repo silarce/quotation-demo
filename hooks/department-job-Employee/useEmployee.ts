@@ -1,7 +1,10 @@
 
+
 import { useState, useEffect } from "react";
 import { differenceInDays, parseISO, formatDuration, parse } from 'date-fns';
 import moment from "moment"
+
+import _ from "lodash"
 
 // type
 import { TemployeeDto } from "js/api/api_employee";
@@ -11,12 +14,22 @@ type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
 
 
 class Class_employee {
-  constructor(reRender: () => void, employeeData: TemployeeDto_jobs) {
+  constructor(reRender: () => void, employeeDataOri: TemployeeDto_jobs) {
     this._reRender = reRender
-    this._employeeData = employeeData
+
+    const employeeDataClone = _.cloneDeep(employeeDataOri)
+
+    if (!employeeDataClone.qualifications[0]) {
+      employeeDataClone.qualifications = [{ name: "", years: 0 }]
+    }
+
+    this._employeeData = employeeDataClone as TemployeeDto_jobs & (Pick<Required<TemployeeDto>, "qualifications">)
+
+    if (!this._employeeData.qualifications) this._employeeData.qualifications = []
+
 
     this.classJobGroupArr
-      = employeeData.jobs.map((job) => new Class_JobGroup(reRender, job))
+      = this._employeeData.jobs.map((job) => new Class_JobGroup(reRender, job))
     if (!this.classJobGroupArr[0]) {
       this.classJobGroupArr.push(new Class_JobGroup(reRender))
     }
@@ -183,15 +196,15 @@ class Class_employee {
 
 
   get seniority() {
-    const mStartDate = moment(this.startDate,"yyyy-MM-DD") //到職日
+    const mStartDate = moment(this.startDate, "yyyy-MM-DD") //到職日
     if (!this.startDate) return "請輸入到職日"
     if (this.leaveDate) {
-      const mLeaveDate = moment(this.leaveDate,"yyyy-MM-DD")
+      const mLeaveDate = moment(this.leaveDate, "yyyy-MM-DD")
       const duration = moment.duration(mLeaveDate.diff(mStartDate))
       return `${duration.years()}年${duration.months()}月${duration.days()}天`
     }
     else {
-      const mNow = moment(new Date(),"yyyy-MM-DD").subtract(1911, "year")
+      const mNow = moment(new Date(), "yyyy-MM-DD").subtract(1911, "year")
       const duration = moment.duration(mNow.diff(mStartDate))
       return `${duration.years()}年${duration.months()}月${duration.days()}天`
     }
@@ -234,6 +247,51 @@ class Class_employee {
     this._reRender()
   }
 
+  get militaryServiceType() {
+    return this._employeeData.militaryServiceType
+  }
+  set militaryServiceType(v: string) {
+    this._employeeData.militaryServiceType = v
+    this._reRender()
+  }
+
+  get emergencyContactPhone() {
+    return this._employeeData.emergencyContactPhone
+  }
+  set emergencyContactPhone(v: string) {
+    this._employeeData.emergencyContactPhone = v
+    this._reRender()
+  }
+
+  get emergencyContactRelationship() {
+    return this._employeeData.emergencyContactRelationship
+  }
+  set emergencyContactRelationship(v: string) {
+    this._employeeData.emergencyContactRelationship = v
+    this._reRender()
+  }
+
+  get qualifications() {
+    return this._employeeData.qualifications
+  }
+  setQualifications = (index: number, v: string, years?: number) => {
+    if (this._employeeData.qualifications[index] === undefined) return
+
+    this._employeeData.qualifications[index]
+      = { name: v, years: years ?? 0 }
+    this._reRender()
+  }
+  addQualifications = () => {
+    if (this._employeeData.qualifications.length === 3) return
+    this._employeeData.qualifications.push({ name: "", years: 0 })
+    this._reRender()
+  }
+  removeQualifications = (index: number) => {
+    if (this._employeeData.qualifications.length === 1) return
+    this._employeeData.qualifications.splice(index, 1)
+    this._reRender()
+  }
+
   get jobIdArr(): string[] {
     const arr = this.classJobGroupArr.map((classJobGroup) => {
       return classJobGroup.job?.id
@@ -243,59 +301,13 @@ class Class_employee {
   }
 
   get postBody() {
+    this._employeeData.qualifications
+      = this.qualifications.filter((item) => !!item.name)
+    this._reRender()
     return {
       ...this._employeeData,
       jobId: this.jobIdArr,
     }
-  }
-  // ------------------------------
-  // 還未串接api的資料
-
-  private _militaryService = "" // 兵役別
-  get militaryService() {
-    return this._militaryService
-  }
-  set militaryService(v: string) {
-    this._militaryService = v
-    this._reRender()
-  }
-
-  private _emergencyContactRelationship = "" //緊急聯絡人關係
-  get emergencyContactRelationship() {
-    return this._emergencyContactRelationship
-  }
-  set emergencyContactRelationship(v: string) {
-    this._emergencyContactRelationship = v
-    this._reRender()
-  }
-
-  private _emergencyContactPhone = "" //緊急聯絡人電話
-  get emergencyContactPhone() {
-    return this._emergencyContactPhone
-  }
-  set emergencyContactPhone(v: string) {
-    this._emergencyContactPhone = v
-    this._reRender()
-  }
-
-  private _career: string[] = [""] // 個人資歷
-  get career() {
-    return this._career
-  }
-  setCareer = (index: number, v: string) => {
-    if (this._career[index] === undefined) return
-    this._career[index] = v
-    this._reRender()
-  }
-  addCareer = () => {
-    if (this._career.length === 3) return
-    this._career.push("")
-    this._reRender()
-  }
-  removeCareer = (index: number) => {
-    if (this._career.length === 1) return
-    this._career.splice(index, 1)
-    this._reRender()
   }
 
 } // Class_employee
@@ -305,7 +317,6 @@ class Class_JobGroup {
     this._reRender = reRender
 
     if (job) {
-
       this._department = {
         id: job.department.id,
         name: job.department.name
@@ -341,29 +352,6 @@ class Class_JobGroup {
     this._reRender()
   }
 } // Class_JobGroup
-
-// class Class_career {
-//   constructor(reRender: () => void, career: string) {
-//     this._reRender = reRender
-//     this._career = career
-//   } // constructor
-//   _reRender
-//   _career
-
-//   get() {
-//     return this._career
-//   }
-//   set(v: string) {
-//     this._career = v
-//     this._reRender()
-//   }
-// }
-
-
-
-
-
-
 
 // =============================================
 
@@ -413,6 +401,10 @@ const emptyDataOri = (): TemployeeDto_jobs => ({
   leaveDate: "",
   retireDate: "",
   severanceDate: "",
+  militaryServiceType: "",
+  emergencyContactPhone: "",
+  emergencyContactRelationship: "",
+  qualifications: [{ name: "", years: 0 }],
   jobs: [],
 })
 

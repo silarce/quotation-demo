@@ -103,6 +103,10 @@ export type TemployeeDto = {
   leaveDate: string // 離職日
   retireDate: string //退休日
   severanceDate: string // 資遣日
+  militaryServiceType: string // 兵役別
+  emergencyContactPhone:string // 緊急聯絡人電話
+  emergencyContactRelationship:string // 緊急聯絡人關係
+  qualifications: { name: string, years: number }[] // 個人資歷
   jobs?: TjobDto[]
   user?: TuserDto | null
 }
