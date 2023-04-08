@@ -53,10 +53,10 @@ class Class_employee {
   get idNumber() {
     return this._employeeData.idNumber
   }
-  set idNumber(v: string) {
-    this._employeeData.idNumber = v
-    this._reRender()
-  }
+  // set idNumber(v: string) {
+  //   this._employeeData.idNumber = v
+  //   this._reRender()
+  // }
 
   get chName() {
     return this._employeeData.chName
@@ -306,6 +306,7 @@ class Class_employee {
     this._reRender()
     return {
       ...this._employeeData,
+      idNumber:undefined, // 後端不收這個
       jobId: this.jobIdArr,
     }
   }

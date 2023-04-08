@@ -8,8 +8,8 @@ import EditEmployeeItem02 from "./editEmployee/EditEmployeeItem02";
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 
 // icon
-import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
-import CircularProgress from '@mui/material/CircularProgress';
+// import { IconCheck01, IconCross01 } from "public/image/icon/svgComponent/svgIcons";
+// import CircularProgress from '@mui/material/CircularProgress';
 // type
 import { Class_employee } from "hooks/department-job-Employee/useEmployee";
 import { jobsOptionsCreator } from "js/tools/selectOption/jobsOptionsCreator";
@@ -26,8 +26,8 @@ export default function EditEmployee({ classEmployee, departmentJobOptionGroup, 
   const router = useRouter()
 
   // ==================================================
-  const idNumberIsDisabled
-    = router.pathname === "/setting/employees/edit/[id]"
+  // const idNumberIsDisabled
+  //   = router.pathname === "/setting/employees/edit/[id]"
   // ==================================================
   if (!router.isReady) return null
   // ==================================================
@@ -37,18 +37,18 @@ export default function EditEmployee({ classEmployee, departmentJobOptionGroup, 
       <div className={scss.employeeId}>
         <InputSel
           label="員工編號"
-          placeholder="請輸入員工編號"
+          placeholder="新員工"
           className={scss.input02}
-          disabled={idNumberIsDisabled}
+          disabled={true}
           showBaseline="auto"
           inputProps={{
-            value: classEmployee.idNumber,
+            value: classEmployee.idNumber ?? "新員工",
             onChange: (v: string) => {
-              classEmployee.idNumber = v
+              // classEmployee.idNumber = v
             },
           }}
         />
-        {check &&
+        {/* {check &&
           <span className={scss.checkTip}>
             {check === "ok" ? <IconCheck01 className={scss.check} cursor="auto" />
               : check === "notOk" ? <IconCross01 className={scss.cross} cursor="auto" />
@@ -60,7 +60,7 @@ export default function EditEmployee({ classEmployee, departmentJobOptionGroup, 
               </span>
             }
           </span>
-        }
+        } */}
       </div>
 
       <EditEmployeeItem01 classEmployee={classEmployee} />

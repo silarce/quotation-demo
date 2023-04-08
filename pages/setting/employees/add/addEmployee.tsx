@@ -61,21 +61,21 @@ export default function AddEmployee() {
 
   // =======================================================
   // 檢查idNumber是否不重複
-  const {
-    check,
-    setCheck,
-    reCheck
-  } = useCheckEmployee(classEmpolyee?.idNumber ?? "")
+  // const {
+  //   check,
+  //   setCheck,
+  //   reCheck
+  // } = useCheckEmployee(classEmpolyee?.idNumber ?? "")
 
-  useEffect(() => {
-    setCheck("loading")
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => {
-      if (!classEmpolyee?.idNumber) return setCheck("notOk")
-      reCheck()
-    }, 500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classEmpolyee?.idNumber])
+  // useEffect(() => {
+  //   setCheck("loading")
+  //   clearTimeout(timeoutId)
+  //   timeoutId = setTimeout(() => {
+  //     if (!classEmpolyee?.idNumber) return setCheck("notOk")
+  //     reCheck()
+  //   }, 500);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [classEmpolyee?.idNumber])
   // =======================================================
   const panelList: TpanelList = [
     {
@@ -84,8 +84,8 @@ export default function AddEmployee() {
       onClick: async () => {
         if (!classEmpolyee) return
         try {
-          if (check === "notOk") throw new Error("使用者代號錯誤")
-          if (check === "loading") throw new Error("正在檢查使用者代號")
+          // if (check === "notOk") throw new Error("使用者代號錯誤")
+          // if (check === "loading") throw new Error("正在檢查使用者代號")
           setRootLoading(true)
           const res = await apiPostEmployee(classEmpolyee.postBody) as TemployeeDto
           router.push({
@@ -125,7 +125,8 @@ export default function AddEmployee() {
           <EditEmployee
             classEmployee={classEmpolyee}
             departmentJobOptionGroup={departmentJobOptionGroup}
-            check={check} />
+            // check={check} D
+            />
         }
       </div>
     </div>

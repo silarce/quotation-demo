@@ -22,7 +22,7 @@ export type TgetEmployee = {
 
 // 新增、更新員工資料的body
 export type TpostEmployee = {
-  "idNumber": string
+  "idNumber": undefined
   "chName": string
   "enName": string
   "identity": string
