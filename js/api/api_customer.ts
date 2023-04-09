@@ -20,7 +20,7 @@ export const customerTypesLookup = Object.freeze({
   firm: "事務所",
   propertyOwner: "業主",
   contractor: "協力廠商",
-});
+} as const);
 
 type TcustomerTypesLookupKeys = (keyof typeof customerTypesLookup)
 export const customerTypesArr
