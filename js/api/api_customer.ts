@@ -1,14 +1,18 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { axi } from "./_axiosCreator";
 
 // type
-import type { TcustomerDto, TpageMetaDto, Tcontact } from "./dtoTypes";
+import type { TcustomerDto, TcustomerDto_Populate, TpageMetaDto, Tcontact } from "./dtoTypes";
+
+/**
+ * "types"、"contacts"為必須
+ */
+type TcustomerDto_TC = TcustomerDto_Populate<["types", "contacts"]>
 
 
-
-export type { TcustomerDto, Tcontact as Tcontacts }
+export type { TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts }
 // ===============================================================
 
 export const customerCategoryArr = ["營造", "事務所", "業主", "協力廠商",]
@@ -101,7 +105,7 @@ export const useCustomers = (params?: TapiGetCustomersParams) => {
     if (data) setData(data)
     return data
   }
-  return { data, setData, update }
+  return { data: data?.data, meta: data?.meta, setData, update }
 }
 
 // ============================================================
@@ -147,7 +151,7 @@ const apiGetCustomers_id
 
 export const useCustomersById
   = (id: string, params?: TapiGetCustomersParams) => {
-    let [data, setData] = useState<TcustomerDto>()
+    let [data, setData] = useState<TcustomerDto_TC>()
     const update = async () => {
       const data = await apiGetCustomers_id(id, params)
       if (data) setData(data)

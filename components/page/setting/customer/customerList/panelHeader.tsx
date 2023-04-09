@@ -17,16 +17,16 @@ import {
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto, Tcontacts, customerTypesLookup } from "js/api/api_customer";
+import { TcustomerDto_TC, Tcontacts, customerTypesLookup } from "js/api/api_customer";
 
 // ====================================================
 
 export default function PanelHeader(
   { customersData, isActive, openDelPanel }:
     {
-      customersData: TcustomerDto
+      customersData: TcustomerDto_TC
       isActive: boolean
-      openDelPanel: (e: MouseEvent, data: TcustomerDto) => void
+      openDelPanel: (e: MouseEvent, data: TcustomerDto_TC) => void
     }) {
   // ====================================================
   const router = useRouter()
@@ -56,7 +56,7 @@ export default function PanelHeader(
               return (
                 <div key={index}>
                   <h6>{label}</h6>
-                  {(value as TcustomerDto["types"]).map((v, index, arr) => {
+                  {(value as TcustomerDto_TC["types"]).map((v, index, arr) => {
                     const label = customerTypesLookup[v.name]
                     return (
                       <span key={index} className="block">{label}</span>
@@ -114,9 +114,9 @@ export default function PanelHeader(
 
 // TcustomerDto
 type TindexKeys01
-  = keyof Pick<TcustomerDto, "customerNumber" | "types" | "name">
+  = keyof Pick<TcustomerDto_TC, "customerNumber" | "types" | "name">
 type TindexKeys02
-  = keyof Pick<TcustomerDto, "phone" | "fax">
+  = keyof Pick<TcustomerDto_TC, "phone" | "fax">
 
 const indexKeys01: TindexKeys01[]
   = ["customerNumber", "types", "name"]

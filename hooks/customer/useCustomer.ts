@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import _ from "lodash"
 
-
 // type
-import { TcustomerDto, Tcontact } from "js/api/dtoTypes";
-import { TpostCustomer } from "js/api/api_customer";
-
+import { Tcontact } from "js/api/dtoTypes";
+import { TpostCustomer, TcustomerDto_TC } from "js/api/api_customer";
 
 
 class Class_customer {
-  constructor(reRender: () => void, customerOri: TcustomerDto) {
+  constructor(reRender: () => void, customerOri: TcustomerDto_TC) {
     this._reRender = reRender
     this._customerData = _.cloneDeep(customerOri)
     this._classContactArr =
@@ -157,7 +155,7 @@ class Class_customer {
 
 
 class Class_customerContact {
-  constructor(reRender: () => void, contact?: TcustomerDto["contacts"][number]) {
+  constructor(reRender: () => void, contact?: TcustomerDto_TC["contacts"][number]) {
     this._reRender = reRender
     this._contact = contact ?? { name: "", phone: "" }
   } // constructor
@@ -189,7 +187,7 @@ class Class_customerContact {
 } // Class_customerContacts
 
 
-const useClassCustomer = (customerData?: TcustomerDto | undefined) => {
+const useClassCustomer = (customerData?: TcustomerDto_TC | undefined) => {
   const [render, setRender] = useState(0)
   const reRender = () => setRender(state => state + 1)
   const [classCustomer, setClassCustomer]
@@ -202,14 +200,14 @@ const useClassCustomer = (customerData?: TcustomerDto | undefined) => {
 
 
 export { useClassCustomer, Class_customer }
-export type { TcustomerDto, Tcontact, TpostCustomer, }
+export type { TcustomerDto_TC, Tcontact, TpostCustomer, }
 
 
 
 
 
 
-const emptyCustomer = (): TcustomerDto => ({
+const emptyCustomer = (): TcustomerDto_TC => ({
   id: "",
   createdAt: "",
   updatedAt: "",

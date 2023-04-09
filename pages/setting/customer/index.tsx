@@ -17,8 +17,8 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // api
 import {
-  TgetCustomers, TapiGetCustomersParams,
-  useCustomers, customerCategoryArr
+  TapiGetCustomersParams,
+  useCustomers, customerCategoryArr, TcustomerDto_TC
 } from "js/api/api_customer"
 
 // css
@@ -80,9 +80,9 @@ function TheCustomer({ router }: { router: NextRouter }) {
     // sort: []
   })
 
-  const { data, update } = useCustomers(params)
-  
-  const meta = data?.meta
+  const { data: dataOri, meta, update } = useCustomers(params)
+  const data = (dataOri ?? []) as TcustomerDto_TC[]
+
   // -----------------------------------------------------
   const setPage = (page: number) => {
     setParams(params => {
@@ -202,7 +202,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
         {isReady &&
           <>
             <CustomerList
-              data={data as TgetCustomers}
+              customersList={data}
               toUpdate={update}
               isLoading={isLoading}
             />

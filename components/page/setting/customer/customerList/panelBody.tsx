@@ -3,11 +3,11 @@
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto } from "js/api/api_customer";
+import { TcustomerDto_TC } from "js/api/api_customer";
 
 // ====================================================
 export default function PanelBody(
-  { customersData }: { customersData: TcustomerDto }) {
+  { customersData }: { customersData: TcustomerDto_TC }) {
 
   const {
     nickname, contacts
@@ -88,7 +88,7 @@ export default function PanelBody(
 
 
 type TindexKeys01
-  = keyof Pick<TcustomerDto, "principal" | "taxId" | "taxDeductionCategory">
+  = keyof Pick<TcustomerDto_TC, "principal" | "taxId" | "taxDeductionCategory">
 
 const indexKeys01: TindexKeys01[]
   = ["principal", "taxId", "taxDeductionCategory"]

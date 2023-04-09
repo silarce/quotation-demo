@@ -25,7 +25,7 @@ import scss from "../customer.module.scss"
 // type and config
 import { customerTypesArr } from "js/api/api_customer";
 import { Class_customer } from "hooks/customer/useCustomer";
-import { TcustomerDto, TpostCustomer } from "js/api/api_customer";
+import { TcustomerDto_TC, TpostCustomer } from "js/api/api_customer";
 
 
 export default function EditCustomerItem01({ classCustomer, nameCheck }: {
@@ -231,7 +231,7 @@ export default function EditCustomerItem01({ classCustomer, nameCheck }: {
 
 // ==========================================================
 
-type TkeyIndex01Key = (keyof Pick<TcustomerDto,
+type TkeyIndex01Key = (keyof Pick<TcustomerDto_TC,
   "phone" | "fax">)
 
 const keyIndex01: TkeyIndex01Key[]

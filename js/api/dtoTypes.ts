@@ -71,14 +71,21 @@ export type TcustomerDto = {
   invoiceCounty: string
   invoiceDistrict: string
   invoiceAddress: string
-  contacts: Tcontact[]
-  types: { //客戶類型
+  contacts?: Tcontact[]
+  types?: { //客戶類型
     id: string
     createdAt: string
     updateAt: string
     name: "construction" | "firm" | "propertyOwner" | "contractor"
   }[]
 }
+
+type TcustomerDtoPopulateArr = (keyof Pick<TcustomerDto, "types" | "contacts">)[]
+
+export type TcustomerDto_Populate<populateArr extends TcustomerDtoPopulateArr = []>
+  = TcustomerDto & Required<Pick<TcustomerDto, populateArr[number]>>
+
+
 
 export type TemployeeDto = {
   id: string // 應該是資料庫的 pk
