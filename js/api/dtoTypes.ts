@@ -138,16 +138,13 @@ export type TdepartmentDto = {
   createdAt: string
   updatedAt: string
   name: string
+  code: string
 }
 
 /**
  * TdepartmentDto型別裡加 jobs: TjobDto[] 
  */
-export type TdepartmentDto_jobs = {
-  id: string
-  createdAt: string
-  updatedAt: string
-  name: string
+export type TdepartmentDto_jobs = TdepartmentDto & {
   jobs: TjobDto[]
 }
 
@@ -156,9 +153,9 @@ export type TdepartmentManagerDto = {
   createdAt: string
   updatedAt: string
   name: string
+  code: string
   employees?: TemployeeDto[]
 }
-
 
 export type TerpFeatureDto = {
   id: string
@@ -197,6 +194,7 @@ export type TcreateDepartmentJobDto = {
 
 export type TupdateDepartmentJobDto = {
   name?: string
+  code?: string
   id: string
   jobs: TcreateDepartmentJobDto[]
 }

@@ -131,7 +131,7 @@ export default function Department() {
     for (let Cdepartment of CdepartmentArr) {
       if (Cdepartment.dIsNew) {
         try {
-          const res = await apiPostDepartments({ name: Cdepartment.name })
+          const res = await apiPostDepartments({ name: Cdepartment.name, code: Cdepartment.code })
           Cdepartment.id = res.id
         }
         catch {
@@ -230,6 +230,7 @@ export default function Department() {
 export class ClassDepartment {
   id: string
   _name: string
+  _code: string
   jobs: (ClassJob | undefined)[]
   reRender: () => void //更新狀態
 
@@ -238,6 +239,8 @@ export class ClassDepartment {
   dWillDelete = false
   dWillPatch = false
   dIsNew = false
+  
+   
 
   // --------------------------------------------------------
   // --------------------------------------------------------
@@ -250,11 +253,13 @@ export class ClassDepartment {
     if ("id" in department) {
       this.id = department.id
       this._name = department.name
+      this._code = department.code
       jobs = department.jobs ?? []
     }
     else {
       this.id = ""
       this._name = department.newDepartmentName
+      this._code = ""
       jobs = []
       this.dIsNew = true
     }
@@ -276,6 +281,14 @@ export class ClassDepartment {
     this.dWillPatch = true
     this.reRender()
   }
+
+  get code() { return this._code }
+  set code(v: string) {
+    this._code = v
+    this.dWillPatch = true
+    this.reRender()
+  }
+
 
   get isFocus() { return this._isFocus }
   set isFocus(v: boolean) {
@@ -335,9 +348,8 @@ class ClassJob {
   // -----------------------------------------------------
   // -----------------------------------------------------
   constructor(
-
     job: TjobDto | { newJobindex: number },
-    reRender: () => void
+    reRender: () => void,
   ) {
     if ("id" in job) {
       this.id = job.id
@@ -423,43 +435,35 @@ const useClass = (departmentArr: TdepartmentDto_jobs[], editable: boolean) => {
     const patchArr: TupdateDepartmentJobDto[] = []
 
     CdepartmentArr.forEach((department) => {
-      const { name, id,
+      const { name, id, code,
         dIsNew, dWillDelete, dWillPatch,
       } = department
 
       if (dWillDelete) return
 
       const patchObj: TupdateDepartmentJobDto
-        = { id: id, name: name, jobs: [] }
-
+        = { id: id, name: name, code,jobs:[] }
 
       if (!dWillPatch) patchObj.name = undefined
 
-      department.jobs.forEach((job) => {
-        if (!job) return
-        const { name, grade,
-          jWillDelete, jWillPatch, jIsNew,
-        } = job
+      let isJobsChanged = false
 
-        if ((!jIsNew && !jWillPatch) || jWillDelete) return
+        department.jobs.forEach((job) => {
+          if (!job) return
+          const { name, grade,
+            jWillDelete, jWillPatch, jIsNew,
+          } = job
+          if (jWillDelete) return
+          if (jWillPatch||jIsNew) isJobsChanged = true
+  
+          patchObj.jobs!.push({ name, grade })
+        })
 
-        patchObj.jobs.push({ name, grade })
-      })
-
-      if (!dWillPatch && !patchObj.jobs[0]) return;
-
-
+      if (!dWillPatch && !isJobsChanged) return;
+  
       patchArr.push(patchObj)
     })
-
     return patchArr
   }
-
-
   return { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData }
-
 }
-
-
-
-

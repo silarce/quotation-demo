@@ -81,7 +81,7 @@ export const useDepartments_jobs = (params: Tparams_jobs) => {
 
 
 // 新增部門
-export const apiPostDepartments = (body: { name: string }) => {
+export const apiPostDepartments = (body: { name: string, code: string }) => {
   const api = "/departments"
   return axi.post(api, body)
     .then(({ data }) => data as { id: string })
@@ -89,8 +89,8 @@ export const apiPostDepartments = (body: { name: string }) => {
 }
 
 
-// 更新部門，目前只能變更name
-export const apiPatchDepartments_id = (id: string, body: { name: string }) => {
+// 更新部門
+export const apiPatchDepartments_id = (id: string, body: { name: string,code: string }) => {
   const api = `/departments/${id}`
   return axi.patch(api, body)
     .then(({ data }) => data)
