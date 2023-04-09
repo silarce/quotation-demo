@@ -198,9 +198,9 @@ class Class_employee {
   get seniority() {
     const mStartDate = moment(this.startDate, "yyyy-MM-DD") //到職日
     if (!this.startDate) return "請輸入到職日"
-    if (this.leaveDate) {
-      const mLeaveDate = moment(this.leaveDate, "yyyy-MM-DD")
-      const duration = moment.duration(mLeaveDate.diff(mStartDate))
+    if (this.leaveDate || this.severanceDate) {
+      const mEndDate = moment(this.leaveDate || this.severanceDate, "yyyy-MM-DD")
+      const duration = moment.duration(mEndDate.diff(mStartDate))
       return `${duration.years()}年${duration.months()}月${duration.days()}天`
     }
     else {
@@ -223,11 +223,12 @@ class Class_employee {
     this._reRender()
   }
 
-  get leaveDate() {
+  get leaveDate() { // 離職日
     return this._employeeData.leaveDate
   }
   set leaveDate(v: string) {
     this._employeeData.leaveDate = v
+    this._employeeData.severanceDate = ""
     this._reRender()
   }
 
@@ -239,11 +240,12 @@ class Class_employee {
     this._reRender()
   }
 
-  get severanceDate() {
+  get severanceDate() { // 資遣日
     return this._employeeData.severanceDate
   }
   set severanceDate(v: string) {
     this._employeeData.severanceDate = v
+    this._employeeData.leaveDate = ""
     this._reRender()
   }
 
@@ -306,7 +308,7 @@ class Class_employee {
     this._reRender()
     return {
       ...this._employeeData,
-      idNumber:undefined, // 後端不收這個
+      idNumber: undefined, // 後端不收這個
       jobId: this.jobIdArr,
     }
   }
