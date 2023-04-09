@@ -15,9 +15,6 @@ type TcustomerDto_TC = TcustomerDto_Populate<["types", "contacts"]>
 export type { TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts }
 // ===============================================================
 
-export const customerCategoryArr = ["營造", "事務所", "業主", "協力廠商",]
-
-
 export const customerTypesLookup = {
   construction: "營造",
   firm: "事務所",
