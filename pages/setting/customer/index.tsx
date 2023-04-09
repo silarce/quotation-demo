@@ -18,9 +18,9 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 // api
 import {
   TapiGetCustomersParams,
-  useCustomers, customerTypesLookup, TcustomerDto_TC
+  useCustomers, customerTypesLookup, customerTypesArr, TcustomerDto_TC
 } from "js/api/api_customer"
-const customerTypesArr = Object.values(customerTypesLookup)
+
 
 // css
 import style from "./customer.module.scss"
@@ -60,10 +60,12 @@ function TheCustomer({ router }: { router: NextRouter }) {
   const searchCounty = router.query.searchCounty as string
   const searchOther = router.query.searchOther as string
   const searchOtherValue = router.query.searchOtherValue as string
-  // if (searchTypes) {
-  //   filter.types = {}
-  //   filter.types.$contains = searchTypes
-  // }
+  if (searchTypes) {
+    filter.types = {}
+    filter["types.name"] = {
+      "$eq": searchTypes
+    }
+  }
   if (searchCounty) {
     filter.county = {}
     filter.county.$contains = searchCounty
@@ -115,10 +117,10 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
   // 類別optionArr
   const typesOptionArr = (() => {
-    const optionArr = customerTypesArr.map((types) => {
+    const optionArr: { value: string, label: string }[] = customerTypesArr.map((types) => {
       return {
-        value: types,
-        label: types
+        value: types.value,
+        label: types.label
       }
     })
     optionArr.unshift({ value: "", label: "類別不拘" })
@@ -130,7 +132,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
       options: typesOptionArr,
       width: "90px",
       placeholder: "類別不拘",
-      defaultValue: searchTypes
+      defaultValue: customerTypesLookup[searchTypes as keyof typeof customerTypesLookup]
     },
     {
       options: optionCountyArr,
@@ -170,9 +172,15 @@ function TheCustomer({ router }: { router: NextRouter }) {
       setParams(params => {
         const filter: TapiGetCustomersParams["filter"] = {}
 
-        // filter.types = {}
-        // filter.types.name = {}
-        // filter.types["number"].name["$contains"] = searchTypes
+        if (searchTypes) {
+          filter.types = {}
+          filter["types.name"] = {
+            "$eq": searchTypes
+          }
+          // filter["types.name"] = {
+          //   "$in": [searchTypes]
+          // }
+        }
 
         filter.county = {}
         filter.county["$contains"] = searchCounty
