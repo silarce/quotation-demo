@@ -159,10 +159,11 @@ export default function EditEmployeeItem01({ classEmployee }: {
         {/* 下面 */}
         <div >
           <div>
-            {classEmployee.career.map((career, index, arr) => {
-              const onChange = (v: string) => classEmployee.setCareer(index, v)
-              const add = () => classEmployee.addCareer()
-              const remove = () => classEmployee.removeCareer(index)
+            {classEmployee.qualifications.map((qualifications, index, arr) => {
+              const qualificationsName = qualifications.name
+              const onChange = (v: string) => classEmployee.setQualifications(index, v)
+              const add = () => classEmployee.addQualifications()
+              const remove = () => classEmployee.removeQualifications(index)
               const showAdd = index !== 2 && arr.length === index + 1
 
               return (
@@ -174,7 +175,7 @@ export default function EditEmployeeItem01({ classEmployee }: {
                     captionWidth={"100px"}
                     presetStyle="s01"
                     inputProps={{
-                      value: career,
+                      value: qualificationsName,
                       onChange: onChange
                     }}
                   />
@@ -253,11 +254,11 @@ const config01: {
 // -------------------------
 type TkeyIndex02Key = (keyof Pick<Class_employee,
   "gender" | "marital" | "education" | "expertise" |
-  "militaryService"
+  "militaryServiceType"
 >)
 
 const keyIndex02: TkeyIndex02Key[]
-  = ["gender", "marital", "militaryService",
+  = ["gender", "marital", "militaryServiceType",
     "education", "expertise",]
 
 
@@ -291,7 +292,7 @@ const config02: {
     label: "專長",
     labelWidth: config02Width
   },
-  militaryService: {
+  militaryServiceType: {
     label: "兵役別",
     labelWidth: config02Width
   },

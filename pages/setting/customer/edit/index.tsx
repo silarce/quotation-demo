@@ -1,8 +1,5 @@
 
-import {
-  Dispatch, SetStateAction,
-  useEffect, useState, useMemo
-} from "react";
+import { useEffect, useState, } from "react";
 import { useRouter } from "next/router";
 
 // component
@@ -16,9 +13,12 @@ import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingC
 
 // api
 import {
-  TapiGetCustomersParams, TcustomerDto, TpostCustomer, TprePostCustomer,
-  useCustomersById, apiPatchCustomers_id, useCheckCustomers_name,
+  TapiGetCustomersParams,
+  useCustomersById, apiPatchCustomers_id, useApiCustomersNameExist,
 } from "js/api/api_customer";
+
+// hook
+import { useClassCustomer } from "hooks/customer/useCustomer";
 
 // css
 import style from "../customer.module.scss"
@@ -26,7 +26,6 @@ import style from "../customer.module.scss"
 const params: TapiGetCustomersParams = {
   populate: ["contacts"]
 }
-
 
 // =========================================================
 // 防抖
@@ -40,14 +39,6 @@ export default function Edit() {
     data, setData, update
   } = useCustomersById(router.query.id as string || "", params)
 
-  if (typeof data?.category === "string") { // 基本上data.category一定會是string
-    try {
-      data.category = JSON.parse(data.category) as string[]
-    } catch {
-      data.category = [data.category as string]
-    }
-  }
-
   // 原本的客戶全稱
   const [nameOri, setNameOri] = useState<string>()
   useEffect(() => {
@@ -55,7 +46,6 @@ export default function Edit() {
     setNameOri(data?.name)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.name])
-
 
   // ------------------------------------------------------
   useEffect(() => {
@@ -80,22 +70,26 @@ export default function Edit() {
   }, [])
   // ------------------------------------------------------
 
+  const classCustomer = useClassCustomer(data)
+
+  // ------------------------------------------------------
+
   const {
     check: nameCheck,
     setCheck: SetNameCheck,
     reCheck: reNameCheck
-  } = useCheckCustomers_name(data?.name ?? "")
+  } = useApiCustomersNameExist(classCustomer.name)
 
   useEffect(() => {
     SetNameCheck("loading")
     clearTimeout(timeoutId_check)
     timeoutId_check = setTimeout(() => {
-      if (nameOri === data?.name) return SetNameCheck("ok")
-      if (!data?.name) return SetNameCheck("notOk")
+      if (nameOri === classCustomer.name) return SetNameCheck("ok")
+      if (!classCustomer.name) return SetNameCheck("notOk")
       reNameCheck()
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.name, nameOri])
+  }, [classCustomer.name, nameOri])
 
   // ------------------------------------------------------
 
@@ -105,24 +99,15 @@ export default function Edit() {
       label: "上傳",
       onClick: async () => {
         try {
-          if (!data?.id) return
-          const postBody: TpostCustomer = (() => {
-            return {
-              ...data,
-              category: JSON.stringify(data.category),
-              county: data.county ?? "",
-              district: data.district ?? "",
-              address: data.address ?? "",
-              invoiceCounty: data.invoiceCounty ?? "",
-              invoiceDistrict: data.invoiceDistrict ?? "",
-              invoiceAddress: data.invoiceAddress ?? "",
-              contacts: data.contacts ?? []
-            }
-
-          })()
+          if (nameCheck === "notOk")
+            return myAlert.err({ title: "客戶全稱已被使用" })
+          if (nameCheck === "loading")
+            return myAlert.info({ title: "正在檢查客戶全稱" })
+          const postBody = classCustomer.postBody
+          if (!postBody.id) return
           setRootLoading(true)
           // 如果第一層的id存在，會在api那邊把id刪掉
-          await apiPatchCustomers_id(data.id, postBody)
+          await apiPatchCustomers_id(postBody.id, postBody)
           router.push({
             pathname: "/setting/customer",
           })
@@ -140,10 +125,6 @@ export default function Edit() {
       type: "myButton",
       label: "取消",
       onClick: () => {
-        // if (router.query.isNew) {
-        //   window.history.go(-2)
-        //   return
-        // }
         router.back()
       }
     },
@@ -152,21 +133,17 @@ export default function Edit() {
   // =======================================================
   return (
     <div className={style.container}>
-
       <PageHeader02 tag="客戶列表"
         panelList={panelList}
       />
-
       <div className={style.mainContainer}>
         {isReady &&
           <EditCustomer
-            data={data as TprePostCustomer}
-            setData={setData as Dispatch<SetStateAction<TprePostCustomer>>}
+            classCustomer={classCustomer}
             nameCheck={nameCheck} />
         }
       </div>
     </div>
   )
-
 }
 

@@ -23,19 +23,19 @@ import style from "./customer.module.scss"
 
 // api type
 import {
-  TcustomerDto, TtempCustomerDto, TgetCustomers,
+    TcustomerDto_TC,
   apiDeleteCustomers_id
 } from "js/api/api_customer";
 
 export default function CustomerList(
-  { data, toUpdate, isLoading }:
+  { customersList, toUpdate, isLoading }:
     {
-      data: TgetCustomers
+      customersList: TcustomerDto_TC[]
       toUpdate: () => void
       isLoading: boolean
     }) {
 
-  const customersList = data.data
+
 
   // ========================================================
   // 點擊變粉紅色用
@@ -60,7 +60,7 @@ export default function CustomerList(
     })
   }
 
-  const openDelPanel = (e: MouseEvent, data: TtempCustomerDto) => {
+  const openDelPanel = (e: MouseEvent, data: TcustomerDto_TC) => {
     e.stopPropagation()
     if (isLoading) return;
     const { id, customerNumber, name } = data

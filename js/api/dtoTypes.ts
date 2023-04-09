@@ -60,20 +60,32 @@ export type TcustomerDto = {
   customerNumber: string
   name: string
   nickname: string
-  category: string
   principal: string
   taxDeductionCategory: string
   taxId: string
   phone: string
   fax: string
-  county: string | null
-  district: string | null
-  address: string | null
-  invoiceCounty: string | null
-  invoiceDistrict: string | null
-  invoiceAddress: string | null
-  contacts: Tcontact[] | null
+  county: string
+  district: string
+  address: string
+  invoiceCounty: string
+  invoiceDistrict: string
+  invoiceAddress: string
+  contacts?: Tcontact[]
+  types?: { //客戶類型
+    id: string
+    createdAt: string
+    updateAt: string
+    name: "construction" | "firm" | "propertyOwner" | "contractor"
+  }[]
 }
+
+type TcustomerDtoPopulateArr = (keyof Pick<TcustomerDto, "types" | "contacts">)[]
+
+export type TcustomerDto_Populate<populateArr extends TcustomerDtoPopulateArr = []>
+  = TcustomerDto & Required<Pick<TcustomerDto, populateArr[number]>>
+
+
 
 export type TemployeeDto = {
   id: string // 應該是資料庫的 pk
@@ -103,6 +115,10 @@ export type TemployeeDto = {
   leaveDate: string // 離職日
   retireDate: string //退休日
   severanceDate: string // 資遣日
+  militaryServiceType: string // 兵役別
+  emergencyContactPhone: string // 緊急聯絡人電話
+  emergencyContactRelationship: string // 緊急聯絡人關係
+  qualifications: { name: string, years: number }[] // 個人資歷
   jobs?: TjobDto[]
   user?: TuserDto | null
 }
@@ -122,16 +138,13 @@ export type TdepartmentDto = {
   createdAt: string
   updatedAt: string
   name: string
+  code: string
 }
 
 /**
  * TdepartmentDto型別裡加 jobs: TjobDto[] 
  */
-export type TdepartmentDto_jobs = {
-  id: string
-  createdAt: string
-  updatedAt: string
-  name: string
+export type TdepartmentDto_jobs = TdepartmentDto & {
   jobs: TjobDto[]
 }
 
@@ -140,9 +153,9 @@ export type TdepartmentManagerDto = {
   createdAt: string
   updatedAt: string
   name: string
+  code: string
   employees?: TemployeeDto[]
 }
-
 
 export type TerpFeatureDto = {
   id: string
@@ -181,6 +194,7 @@ export type TcreateDepartmentJobDto = {
 
 export type TupdateDepartmentJobDto = {
   name?: string
+  code?: string
   id: string
   jobs: TcreateDepartmentJobDto[]
 }

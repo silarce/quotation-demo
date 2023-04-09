@@ -22,30 +22,32 @@ export type TgetEmployee = {
 
 // 新增、更新員工資料的body
 export type TpostEmployee = {
-  "idNumber": string,
-  "chName": string,
-  "enName": string,
-  "identity": string,
-  "birthday": string,
-  "gender": string,
-  "marital": string,
-  "education": string,
-  "expertise": string,
-  "phone1": string,
-  "phone2": string,
-  "email": string,
-  "residenceCounty": string,
-  "residenceDistrict": string,
-  "residenceAddress": string,
-  "mailingCounty": string,
-  "mailingDistrict": string,
-  "mailingAddress": string,
-  "seniority": string,
-  "startDate": string,
-  "leaveDate": string,
-  "retireDate": string,
-  "severanceDate": string,
-  "processPermission": true,
+  "idNumber": undefined
+  "chName": string
+  "enName": string
+  "identity": string
+  "birthday": string
+  "gender": string
+  "marital": string
+  "education": string
+  "expertise": string
+  "phone1": string
+  "phone2": string
+  "email": string
+  "residenceCounty": string
+  "residenceDistrict": string
+  "residenceAddress": string
+  "mailingCounty": string
+  "mailingDistrict": string
+  "mailingAddress": string
+  "seniority": string
+  "startDate": string
+  "leaveDate": string
+  "retireDate": string
+  "severanceDate": string
+  "processPermission": true
+  militaryServiceType: string
+  "qualifications": { "name": string, "years": number }[]
   "jobId": string[]
 }
 

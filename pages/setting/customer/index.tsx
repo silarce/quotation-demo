@@ -17,9 +17,10 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // api
 import {
-  TgetCustomers, TapiGetCustomersParams,
-  useCustomers, customerCategoryArr
+  TapiGetCustomersParams,
+  useCustomers, customerTypesLookup, customerTypesArr, TcustomerDto_TC
 } from "js/api/api_customer"
+
 
 // css
 import style from "./customer.module.scss"
@@ -55,13 +56,15 @@ function TheCustomer({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 搜尋用的filter
   const filter: TapiGetCustomersParams["filter"] = {}
-  const searchCategory = router.query.searchCategory as string
+  const searchTypes = router.query.searchTypes as string
   const searchCounty = router.query.searchCounty as string
   const searchOther = router.query.searchOther as string
   const searchOtherValue = router.query.searchOtherValue as string
-  if (searchCategory) {
-    filter.category = {}
-    filter.category.$contains = searchCategory
+  if (searchTypes) {
+    filter.types = {}
+    filter["types.name"] = {
+      "$eq": searchTypes
+    }
   }
   if (searchCounty) {
     filter.county = {}
@@ -75,13 +78,14 @@ function TheCustomer({ router }: { router: NextRouter }) {
   let [params, setParams] = useState<TapiGetCustomersParams>({
     page: 1,
     pageSize: 8,
-    populate: ["contacts"],
+    populate: ["contacts", "types"],
     filter,
     // sort: []
   })
 
-  const { data, update } = useCustomers(params)
-  const meta = data?.meta
+  const { data: dataOri, meta, update } = useCustomers(params)
+  const data = (dataOri ?? []) as TcustomerDto_TC[]
+
   // -----------------------------------------------------
   const setPage = (page: number) => {
     setParams(params => {
@@ -112,11 +116,11 @@ function TheCustomer({ router }: { router: NextRouter }) {
   // pageHeader
 
   // 類別optionArr
-  const categoryOptionArr = (() => {
-    const optionArr = customerCategoryArr.map((category) => {
+  const typesOptionArr = (() => {
+    const optionArr: { value: string, label: string }[] = customerTypesArr.map((types) => {
       return {
-        value: category,
-        label: category
+        value: types.value,
+        label: types.label
       }
     })
     optionArr.unshift({ value: "", label: "類別不拘" })
@@ -125,10 +129,10 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
   const searchTargetList = [
     {
-      options: categoryOptionArr,
+      options: typesOptionArr,
       width: "90px",
       placeholder: "類別不拘",
-      defaultValue: searchCategory
+      defaultValue: customerTypesLookup[searchTypes as keyof typeof customerTypesLookup]
     },
     {
       options: optionCountyArr,
@@ -151,14 +155,14 @@ function TheCustomer({ router }: { router: NextRouter }) {
   const searchGroup: TsearchGroup = {
     searchTargetList,
     doSearch: (valueArr: (Toption | null | string)[]) => {
-      const searchCategory = (valueArr[0] as Toption).value
+      const searchTypes = (valueArr[0] as Toption).value
       const searchCounty = (valueArr[1] as Toption).value
       const searchOther = (valueArr[2] as Toption).value
       const searchOtherValue = valueArr[3] as string
       router.push({
         pathname: "/setting/customer",
         query: {
-          searchCategory,
+          searchTypes,
           searchCounty,
           searchOther,
           searchOtherValue
@@ -167,8 +171,17 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
       setParams(params => {
         const filter: TapiGetCustomersParams["filter"] = {}
-        filter.category = {}
-        filter.category["$contains"] = searchCategory
+
+        if (searchTypes) {
+          filter.types = {}
+          filter["types.name"] = {
+            "$eq": searchTypes
+          }
+          // filter["types.name"] = {
+          //   "$in": [searchTypes]
+          // }
+        }
+
         filter.county = {}
         filter.county["$contains"] = searchCounty
         filter[searchOther] = {}
@@ -201,7 +214,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
         {isReady &&
           <>
             <CustomerList
-              data={data as TgetCustomers}
+              customersList={data}
               toUpdate={update}
               isLoading={isLoading}
             />

@@ -38,7 +38,7 @@ export default function List(
     <div className={scss.list}>
       <div className={scss.row}>
         {CdepartmentArr.map((department, dIndex) => {
-          const { id, name, jobs, isFocus,
+          const { id, name, jobs, isFocus,code,
             dWillDelete, dWillPatch, dIsNew,
             dShowDeletePanel, addJob, removeJob,
           } = department
@@ -80,9 +80,9 @@ export default function List(
                   scss.inputBox,
                   { [scss.notEditable]: !editable || dWillDelete })}>
                   <AutosizeInput type="text"
-                    defaultValue={"A" + dIndex + 1}
-                    // value={name}
-                    // onChange={(e) => { department.name = e.target.value }}
+                    // defaultValue={"A" + dIndex + 1}
+                    value={code}
+                    onChange={(e) => { department.code = e.target.value }}
                     disabled={!editable || dWillDelete}
                     onFocus={() => department.isFocus = true}
                     onBlur={() => department.isFocus = false}

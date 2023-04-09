@@ -1,68 +1,33 @@
-import {
-  Dispatch, SetStateAction
-} from "react";
 
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
 
-
 // css
 import style from "../customer.module.scss"
 
 // type
-import { TcustomerDto, TpostCustomer,TprePostCustomer} from "js/api/api_customer";
+import { Class_customer } from "hooks/customer/useCustomer";
+
 
 // ======================================================
-export default function EditCustomerItem02({ data, setData }: {
-  data: TprePostCustomer
-  setData:
-  Dispatch<SetStateAction<TprePostCustomer>>
+export default function EditCustomerItem02({ classCustomer }: {
+  classCustomer: Class_customer
 }) {
-
-
-
-  const contacts: TpostCustomer["contacts"] = (data.contacts ?? [])
-  if (!contacts[0]) contacts.push({
-    name: "",
-    phone: ""
-  })
-
+  const { classContactArr, addContact, removeContact } = classCustomer
   return (
     <div className={style.editCustomerItem02}>
       <p className={style.subTitle}>公司資訊</p>
 
       <div className={`${style.form}`}>
-
-        {contacts?.map((item, index) => {
-          const { name, phone } = item
-          const onChange01 = (value: string) => {
-            setData(data => {
-              data.contacts![index].name = value
-              return { ...data }
-            })
+        {classContactArr?.map((classContact, index) => {
+          const onChangeName = (value: string) => {
+            classContact.name = value
           }
-          const onChange02 = (value: string) => {
-            setData(data => {
-              data.contacts![index].phone = value
-              return { ...data }
-            })
+          const onChangePhone = (value: string) => {
+            classContact.phone = value
           }
-
-          const addContact = () => {
-            data.contacts!.push({
-              name: "",
-              phone: ""
-            })
-            setData({ ...data })
-          }
-          const deleteContact = () => {
-            if (contacts.length === 1) return;
-            data.contacts!.splice(index, 1)
-            setData({ ...data })
-          }
-
           return (
             <div className={style.inputBox} key={index}>
               <InputSel
@@ -71,8 +36,8 @@ export default function EditCustomerItem02({ data, setData }: {
                 presetStyle="s01"
                 captionWidth="100px"
                 inputProps={{
-                  value: name ?? "",
-                  onChange: onChange01,
+                  value: classContact.name,
+                  onChange: onChangeName,
                 }}
               />
               <InputSel
@@ -81,15 +46,15 @@ export default function EditCustomerItem02({ data, setData }: {
                 presetStyle="s01"
                 captionWidth="100px"
                 inputProps={{
-                  value: phone ?? "",
-                  onChange: onChange02,
+                  value: classContact.phone,
+                  onChange: onChangePhone,
                 }}
               />
               <div className={style.buttonBox}>
                 <IconAddCircle onClick={addContact} />
                 <IconRemoveCircle
-                  className={contacts.length === 1 ? style.noShow : ""}
-                  onClick={deleteContact}
+                  className={classContactArr.length === 1 ? style.noShow : ""}
+                  onClick={() => removeContact(index)}
                 />
               </div>
             </div>

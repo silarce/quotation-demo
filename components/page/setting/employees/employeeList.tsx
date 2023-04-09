@@ -174,7 +174,7 @@ const tableConfig
   }
   = {
   "idNumber": {
-    label: "使用者代號",
+    label: "員工編號",
     width: "150px"
   },
   "chName": {
