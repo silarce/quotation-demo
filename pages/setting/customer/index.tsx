@@ -94,7 +94,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
     pageSize: 8,
     populate: ["contacts", "types"],
     filter,
-    // sort: []
+    sort: "customerNumber"
   })
 
   const { data: dataOri, meta, update } = useCustomers(params)
@@ -185,10 +185,14 @@ function TheCustomer({ router }: { router: NextRouter }) {
           // }
         }
 
-        filter.county = {}
-        filter.county["$contains"] = searchCounty
-        filter[searchOther] = {}
-        filter[searchOther]["$contains"] = searchOtherValue
+        if (searchCounty) {
+          filter.county = {}
+          filter.county["$contains"] = searchCounty
+        }
+        if (searchOtherValue) {
+          filter[searchOther] = {}
+          filter[searchOther]["$contains"] = searchOtherValue
+        }
         return ({
           ...params,
           page: 1,
