@@ -30,7 +30,7 @@ export type Tparams_jobs = {
     [key: string]: any
   }
   populate: "jobs"[]
-  sort: keyof TdepartmentDto // jobs還不能sort
+  sort?: keyof TdepartmentDto // jobs還不能sort
 }
 
 // ==========================================================
