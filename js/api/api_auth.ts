@@ -36,5 +36,18 @@ export const apiAuthMe = () => {
     .catch(err => Promise.reject(err))
 }
 
+/**  變更密碼 */
+export const apiAuthPassword = (
+  body: {
+    oldPassword: string
+    newPassword: string
+  }
+) => {
+  const api = "/auth/password"
+
+  return axi.patch(api, body)
+    .then(({ data }) => data as TuserDto)
+    .catch(err => Promise.reject(err))
+}
 
 
