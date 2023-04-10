@@ -29,6 +29,7 @@ export default function Employees() {
     order: "ASC",
     page: 1,
     pageSize: 12,
+    sort:"idNumber",
     filter: {
       $or: {
         idNumber: {
