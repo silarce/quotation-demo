@@ -43,6 +43,7 @@ export default function ErpCtrlPermissions() {
     order: "ASC",
     page: 1,
     pageSize: 999,
+    sort:"idNumber",
     filter: {
       user: {
         $notNull: true
