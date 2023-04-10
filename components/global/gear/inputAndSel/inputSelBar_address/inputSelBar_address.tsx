@@ -24,6 +24,8 @@ export type TaddressProps = {
   onChangeDistrict: (option: Toption | null) => void
   address: string | null | undefined
   onChangeAddress: (e: string) => void
+
+  showDistrict?: boolean
 }
 
 export default function InputSelBar_address(
@@ -40,6 +42,8 @@ export default function InputSelBar_address(
     hrColor,
     presetStyle,
     showBaseline,
+    customContyOption,
+    customDistrictOption,
   }:
     {
       label?: string
@@ -58,6 +62,15 @@ export default function InputSelBar_address(
       captionClassName?: string
 
       presetStyle?: "s01"
+
+      customContyOption?: {
+        optionArr: Toption[]
+        unshift?: boolean
+      }
+      customDistrictOption?: {
+        optionArr: Toption[]
+        unshift?: boolean
+      }
     }) {
 
   const {
@@ -68,6 +81,10 @@ export default function InputSelBar_address(
     address,
     onChangeAddress,
   } = addressProps
+
+  let { showDistrict } = addressProps
+  if (showDistrict === undefined) showDistrict = true
+
 
 
   if (presetStyle) {
@@ -85,10 +102,25 @@ export default function InputSelBar_address(
 
   // 地址
   // 城市
-  const countryOptions = optionsCreator_county()
+  let countryOptions = optionsCreator_county()
+  if (customContyOption) {
+    if (customContyOption.unshift) {
+      countryOptions = [...customContyOption.optionArr, ...countryOptions]
+    }
+    else
+      countryOptions = [...countryOptions, ...customContyOption.optionArr]
+  }
   // 地區
-  const districtOptions = useMemo(() => {
-    return districtOptionsSelector(county || "")
+  let districtOptions = useMemo(() => {
+    let contyOptions = districtOptionsSelector(county || "")
+    if (customDistrictOption) {
+      if (customDistrictOption.unshift) {
+        contyOptions = [...customDistrictOption.optionArr, ...contyOptions]
+      }
+      else
+        contyOptions = [...contyOptions, ...customDistrictOption.optionArr]
+    }
+    return contyOptions
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [county])
 
@@ -125,6 +157,11 @@ export default function InputSelBar_address(
       }
     },
   ]
+
+  if (showDistrict === false) {
+    selectInputList.splice(1, 1)
+  }
+
 
   // ------------------------------------------------------------------
   valueContanierClassName = `${valueContanierClassName ?? ""}`

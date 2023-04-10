@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 
-const _ = require("lodash")
+
+import _ from "lodash"
 
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
@@ -20,7 +21,7 @@ import {
   Tparams_jobs,
   useDepartments_jobs
 } from "js/api/api_department";
-import { useCheckEmployee } from "js/api/api_employee";
+// import { useCheckEmployee } from "js/api/api_employee";
 
 // hook
 import { useClassEmployee } from "hooks/department-job-Employee/useEmployee";
@@ -33,7 +34,7 @@ const departmentParams: Tparams_jobs = {
   order: "ASC",
   page: 1,
   pageSize: 999,
-  populate: ["jobs"]
+  populate: ["jobs"],
 }
 
 // 防抖
@@ -125,8 +126,8 @@ export default function AddEmployee() {
           <EditEmployee
             classEmployee={classEmpolyee}
             departmentJobOptionGroup={departmentJobOptionGroup}
-            // check={check} D
-            />
+          // check={check}
+          />
         }
       </div>
     </div>

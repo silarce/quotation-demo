@@ -1,9 +1,8 @@
-import {
-  MouseEvent,
-} from "react"
+import { MouseEvent, } from "react"
+import Image from "next/image";
 
-
-
+// antd
+import { Tooltip } from 'antd';
 
 // global gear
 // import CellWithBar from "components/global/gear/cell/cellWithBar"
@@ -12,6 +11,7 @@ import AddButton from "components/global/gear/button/addButton";
 
 // icon
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from "./table.module.scss"
 // type
@@ -58,6 +58,7 @@ export default function Table(
   return (
     <div className={scss.employeeList}>
       <div className={scss.thead}>
+
         {tableKeyIndex.map((key, index) => {
           const { label, width, flex } = tableConfig[key]
           const theStyle = { width, flex }
@@ -90,6 +91,7 @@ export default function Table(
 
       {/*  */}
       <div className={scss.tbody}>
+
         {employeeList.map((row, index) => {
           return (
             <div className={scss.row} key={index}>
@@ -105,11 +107,11 @@ export default function Table(
                     >
                       {data.map((item, index) => {
                         const { grade, name } = item
-                        const department = item.department
-                        const { name: departmentName } = department??{}
+                        const { name: departmentName, code }
+                          = item.department ?? {}
                         return (
                           <div key={index}>
-                            {`字母 / ${departmentName} / ${name} / Level${grade}`}
+                            {`${code} / ${departmentName} / ${name} / Level${grade}`}
                           </div>
                         )
                       })}
@@ -159,7 +161,7 @@ const tableConfig
   }
   = {
   "idNumber": {
-    label: "使用者代號",
+    label: "員工編號",
     width: "150px"
   },
   "chName": {

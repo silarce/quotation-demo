@@ -44,11 +44,11 @@ export type TcompanyInfoDto = {
 // api文件沒有清楚contact的型別
 export type Tcontact = {
   "id": string,
-  "createdAt": string //"2022-10-17T05:35:08.115Z",
-  "updatedAt": string //"2022-10-17T05:35:08.115Z",
-  "createdBy": string
-  "updatedBy": string
-  "deletedBy": string | null
+  // "createdAt": string //"2022-10-17T05:35:08.115Z",
+  // "updatedAt": string //"2022-10-17T05:35:08.115Z",
+  // "createdBy": string
+  // "updatedBy": string
+  // "deletedBy": string | null
   "name": string
   "phone": string
 }

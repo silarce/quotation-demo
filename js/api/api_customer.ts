@@ -45,7 +45,7 @@ export type TapiGetCustomersParams = {
     [key: string]: any
   }
   populate?: ("contacts" | "types")[]
-  sort?: string[]
+  sort?: keyof TcustomerDto
 }
 
 export type TgetCustomers = {

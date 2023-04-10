@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { axi } from "./_axiosCreator";
 
+import _ from "lodash"
 
 // type
 import {
@@ -29,6 +30,7 @@ export type Tparams_jobs = {
     [key: string]: any
   }
   populate: "jobs"[]
+  sort: keyof TdepartmentDto // jobs還不能sort
 }
 
 // ==========================================================
@@ -50,7 +52,7 @@ export type TgetDepartments_jobs = {
 const apiGetDepartments = (params: Tparams) => {
   const api = "/departments"
   return axi.get(api, { params })
-    .then(({ data }) => data)
+    .then(({ data }) => data as TgetDepartments)
     .catch(err => Promise.reject(err))
 }
 
@@ -67,11 +69,25 @@ export const useDepartments = (params: Tparams = {}) => {
 /**
  * data.data型別為TdepartmentDto_jobs[]
  */
-export const useDepartments_jobs = (params: Tparams_jobs) => {
+export const useDepartments_jobs = (
+  params: Tparams_jobs,
+  other?: {
+    sortJobs?: boolean
+  }) => {
+  if (!other) other = {}
+  if (!("sortJobs" in other)) other.sortJobs = true
+
   let [data, setData] = useState<TgetDepartments_jobs>()
   const update = async () => {
-    const data = await apiGetDepartments(params)
-    if (data) setData(data)
+    const data = await apiGetDepartments(params) as TgetDepartments_jobs | undefined
+    if (data) {
+      if (other?.sortJobs) { // 將裡面jobs根據grade排序
+        data.data.forEach((item) => {
+          item.jobs = _.sortBy(item.jobs, (job) => job.grade)
+        })
+      }
+      setData(data)
+    }
     return data
   }
   return { data, setData, update }
@@ -90,7 +106,7 @@ export const apiPostDepartments = (body: { name: string, code: string }) => {
 
 
 // 更新部門
-export const apiPatchDepartments_id = (id: string, body: { name: string,code: string }) => {
+export const apiPatchDepartments_id = (id: string, body: { name: string, code: string }) => {
   const api = `/departments/${id}`
   return axi.patch(api, body)
     .then(({ data }) => data)

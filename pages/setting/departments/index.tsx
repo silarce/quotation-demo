@@ -40,10 +40,13 @@ import style from "./departments.module.scss"
 const params: Tparams_jobs = {
   populate: ["jobs"],
   // order: "DESC",
-  // sort: "jobs.grade",
+  sort: "createdAt",
   /*  建立ClassJobArr時會將job取出依grade放進陣列相應位置
       再用CSS做逆序排列，所以不會用到sort或order  
-      要改排列的話，找到departments.module.scss的.columns與.cell.head  */
+      要改排列的話，找到departments.module.scss的.columns與.cell.head  
+
+      後記:現在jobs會在useDepartments_jobs裡做排序了
+      */
 }
 // ===========================================================
 export default function Department() {
@@ -156,7 +159,6 @@ export default function Department() {
     showRootLoading(false)
     await toUpdate()
   }
-
   // ---------------------------------------------------------
 
 

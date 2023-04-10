@@ -102,8 +102,6 @@ export default function EmployeeList({ employeeList, toUpdate, isLoading }: {
                     const theStyle = { width, flex }
 
                     if (key === "jobs" && Array.isArray(data)) {
-
-
                       return (
                         <div className={`${scss.column} ${scss.departmentInfo}`} key={index}
                           style={theStyle}
@@ -111,10 +109,11 @@ export default function EmployeeList({ employeeList, toUpdate, isLoading }: {
                           {data.map((item, index) => {
                             const { grade, name } = item
                             const department = item.department
-                            const { name: departmentName } = department ?? {}
+
+                            const { name: departmentName, code } = department ?? {}
                             return (
                               <span key={index}>
-                                {`字母 / ${departmentName} / ${name} / Level${grade}`}
+                                {`${code} / ${departmentName} / ${name} / Level${grade}`}
                               </span>
                             )
                           })}

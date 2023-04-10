@@ -65,6 +65,7 @@ export type TapiGetEmployeeParams = {
     [key: string]: any
   }
   populate?: string[]
+  sort?: keyof TemployeeDto
 }
 const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
   // const api = "/employees?filter[user][$notNull]"

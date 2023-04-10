@@ -6,6 +6,7 @@ import {
   MouseEvent,
   useState, useEffect, useMemo
 } from "react"
+import Image from "next/image";
 import { useRouter } from "next/router";
 
 // component
@@ -17,6 +18,9 @@ import Header from "components/page/setting/hrManage/header/header"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
+
+// icon
+import iconPassword from 'public/image/icon/password.svg';
 
 // api
 import {
@@ -42,7 +46,8 @@ export default function ErpCtrlPermissions() {
   const params: TapiGetEmployeeParams = {
     order: "ASC",
     page: 1,
-    pageSize: 99999999999,
+    pageSize: 999,
+    sort: "idNumber",
     filter: {
       user: {
         $notNull: true
@@ -80,7 +85,7 @@ export default function ErpCtrlPermissions() {
 
   // 新增操作人員用的
   const { data: employeeData02, update: updateEmployeeData02 } = useEmployee({
-    pageSize: 999999999,
+    pageSize: 999999,
     populate: ["jobs"],
   })
   const employeeList_all = employeeData02?.data || []
@@ -157,7 +162,16 @@ export default function ErpCtrlPermissions() {
     const id = employeeList_all[indexArr[0]].id
     showRootLoading(true)
     try {
-      await apiPostEmployeeErpUser(id)
+      const res = await apiPostEmployeeErpUser(id)
+      myAlert.info({
+        title: "預設密碼",
+        content: res.password,
+        props: {
+          maskClosable: false,
+          keyboard: false,
+          icon: <CustomIcon />
+        }
+      })
       setShowAddPanel(false)
     }
     catch (err) {
@@ -256,3 +270,24 @@ export default function ErpCtrlPermissions() {
     </div>
   )
 }
+
+
+// ==================================================================
+
+const CustomIcon = () => {
+
+
+  return (
+    <div className="text-center">
+      <Image src={iconPassword} alt=""
+        className="w-12 h-12"
+      />
+    </div>
+  )
+
+}
+
+
+
+
+

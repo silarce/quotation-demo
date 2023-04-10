@@ -54,7 +54,9 @@ export default function EditCustomerItem01({ classCustomer, nameCheck }: {
     onChangeAddress: (value: string) => {
       classCustomer.address = value
     },
+    showDistrict: classCustomer.county === "國外" ? false : true
   }
+
   const selectInputPropsInvoice = {
     county: classCustomer.invoiceCounty,
     onChangeCounty: (option: Toption | null) => {
@@ -73,6 +75,7 @@ export default function EditCustomerItem01({ classCustomer, nameCheck }: {
     onChangeAddress: (value: string) => {
       classCustomer.invoiceAddress = value
     },
+    showDistrict: classCustomer.invoiceCounty === "國外" ? false : true
   }
 
   // ======================================================
@@ -191,13 +194,19 @@ export default function EditCustomerItem01({ classCustomer, nameCheck }: {
             label="公司地址"
             presetStyle="s01"
             captionWidth="100px"
-            addressProps={selectInputPropsAddress} />
+            addressProps={selectInputPropsAddress}
+            customContyOption={{
+              optionArr: [{ value: "國外", label: "國外" }],
+            }} />
           <InputSelBar_address
             className={scss.selectInput}
             label="發票地址"
             presetStyle="s01"
             captionWidth="100px"
-            addressProps={selectInputPropsInvoice} />
+            addressProps={selectInputPropsInvoice}
+            customContyOption={{
+              optionArr: [{ value: "國外", label: "國外" }],
+            }} />
         </div>
 
         <div className={classNames(scss.rightSide)}>
