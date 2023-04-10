@@ -42,7 +42,7 @@ export default function ErpCtrlPermissions() {
   const params: TapiGetEmployeeParams = {
     order: "ASC",
     page: 1,
-    pageSize: 99999999999,
+    pageSize: 999,
     filter: {
       user: {
         $notNull: true
@@ -80,7 +80,7 @@ export default function ErpCtrlPermissions() {
 
   // 新增操作人員用的
   const { data: employeeData02, update: updateEmployeeData02 } = useEmployee({
-    pageSize: 999999999,
+    pageSize: 999999,
     populate: ["jobs"],
   })
   const employeeList_all = employeeData02?.data || []
