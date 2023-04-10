@@ -25,6 +25,18 @@ export type TuserDto = {
   employee?: TcompanyInfoDto
 }
 
+export type TUserPasswordDto = {
+  id: string
+  createdAt: string
+  updatedAt: string
+  account: string
+  username: string
+  roles?: string[] | null
+  groups?: string[] | null
+  isActive: boolean
+  password: string
+  employee: TemployeeDto
+}
 
 export type TcompanyInfoDto = {
   id: string

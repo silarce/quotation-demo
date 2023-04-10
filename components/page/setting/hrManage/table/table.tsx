@@ -1,8 +1,7 @@
 import { MouseEvent, } from "react"
 import Image from "next/image";
 
-// antd
-import { Tooltip } from 'antd';
+
 
 // global gear
 // import CellWithBar from "components/global/gear/cell/cellWithBar"
@@ -11,7 +10,7 @@ import AddButton from "components/global/gear/button/addButton";
 
 // icon
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
-
+import iconPassword from 'public/image/icon/password.svg';
 // css
 import scss from "./table.module.scss"
 // type
@@ -25,7 +24,8 @@ export default function Table(
     searchOption,
     openAddPanel,
     onSearch,
-    onDelete
+    onDelete,
+    onResetPw
   }:
     {
       employeeList: TemployeeDto[]
@@ -33,6 +33,7 @@ export default function Table(
       openAddPanel: () => void
       onSearch: (valueArr: (string | number | null | undefined)[]) => void
       onDelete: (e: MouseEvent, index: number) => void
+      onResetPw: (id: string) => void
     }) {
 
 
@@ -58,6 +59,13 @@ export default function Table(
   return (
     <div className={scss.employeeList}>
       <div className={scss.thead}>
+
+        {/* 密碼icon的位置 */}
+        <div className={scss.column}
+          style={{ width: "25px" }}>
+          <span>{ }</span>
+        </div>
+        {/*  */}
 
         {tableKeyIndex.map((key, index) => {
           const { label, width, flex } = tableConfig[key]
@@ -93,8 +101,20 @@ export default function Table(
       <div className={scss.tbody}>
 
         {employeeList.map((row, index) => {
+          const { idNumber, user } = row
+          const id = user!.id
           return (
             <div className={scss.row} key={index}>
+
+              {/*  */}
+              <div className={scss.column}
+                style={{ width: "25px" }}>
+                <Image className="cursor-pointer" src={iconPassword} alt=""
+                  onClick={() => onResetPw(id)} />
+              </div>
+              {/*  */}
+
+
               {tableKeyIndex.map((key, index) => {
                 const data = row[key]
                 const { width, flex } = tableConfig[key]
