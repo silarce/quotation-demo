@@ -18,6 +18,7 @@ import Header from "components/page/setting/hrManage/header/header"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 // icon
 import iconPassword from 'public/image/icon/password.svg';
@@ -28,9 +29,12 @@ import {
   useEmployee, apiPostEmployeeErpUser, apiDeleteEmployeeErpUser,
 } from "js/api/api_employee";
 import { useDepartments } from "js/api/api_department";
+import { apiPatchUserResetPassword } from "js/api/api_user";
 
+
+// css
 import scss from "./erpCtrlPermissions.module.scss"
-import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import { AxiosError } from "axios";
 
 
 // ==========================================================================
@@ -69,7 +73,6 @@ export default function ErpCtrlPermissions() {
 
 
   // 列表-送進table裡面
-
   let { data: employeeData01, update: updateEmployeeData01 } = useEmployee(params)
   const employeeList = employeeData01?.data || []
   const employeeData01Meta = employeeData01?.meta
@@ -79,7 +82,6 @@ export default function ErpCtrlPermissions() {
     await updateEmployeeData01()
     setIsLoading(false)
   }
-
 
   // ____________________________________________
 
@@ -131,8 +133,6 @@ export default function ErpCtrlPermissions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
-
-
   // ------------------------------------------------------------------------
   // 搜尋功能 searchBar
 
@@ -163,20 +163,19 @@ export default function ErpCtrlPermissions() {
     showRootLoading(true)
     try {
       const res = await apiPostEmployeeErpUser(id)
-      myAlert.info({
-        title: "預設密碼",
-        content: res.password,
-        props: {
-          maskClosable: false,
-          keyboard: false,
-          icon: <CustomIcon />
-        }
-      })
+      newPwTip({ title: "預設密碼", content: res.password })
       setShowAddPanel(false)
     }
-    catch (err) {
+    catch (error) {
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+      const { message, statusCode } = err.response?.data ?? {}
       myAlert.err({
-        title: "新增操作人員失敗",
+        title: statusCode,
+        content: message,
       })
     }
 
@@ -224,6 +223,35 @@ export default function ErpCtrlPermissions() {
   }
 
   // ------------------------------------------------------------------------
+
+  const resetPw = async (id: string) => {
+    try {
+      const res = await apiPatchUserResetPassword(id)
+      const { password, account, username } = res
+      myAlert.success({
+        props: {
+          title: "密碼重置成功",
+          content:
+            <ResetPwContent account={account} username={username} newPw={password} />
+        }
+      })
+    }
+    catch (error) {
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+      const { error: resSerror, message } = err.response?.data ?? {}
+      myAlert.err({
+        title: resSerror,
+        content: message
+      })
+    }
+  }
+
+
+  // ------------------------------------------------------------------------
   return (
     <div className={scss.container}>
       <div className={scss.header}>
@@ -244,6 +272,7 @@ export default function ErpCtrlPermissions() {
               openAddPanel={openAddPanel}
               onSearch={onSearch}
               onDelete={openDelete}
+              onResetPw={resetPw}
             />
           }
         </div>
@@ -274,9 +303,26 @@ export default function ErpCtrlPermissions() {
 
 // ==================================================================
 
+const newPwTip = (
+  { title, content }:
+    {
+      title: string
+      content: string
+    }
+) => {
+
+  myAlert.info({
+    title: title,
+    content: content,
+    props: {
+      maskClosable: false,
+      keyboard: false,
+      icon: <CustomIcon />
+    }
+  })
+}
+
 const CustomIcon = () => {
-
-
   return (
     <div className="text-center">
       <Image src={iconPassword} alt=""
@@ -284,9 +330,27 @@ const CustomIcon = () => {
       />
     </div>
   )
-
 }
 
+const ResetPwContent = (
+  { account, username, newPw }:
+    {
+      account: string
+      username: string
+      newPw: string
+    }
+) => {
+
+
+  return (
+    <div>
+      <span className="block">{account}</span>
+      <span className="block">{username}</span>
+      <span className="block">新密碼 : {newPw}</span>
+    </div>
+  )
+
+}
 
 
 

@@ -1,4 +1,5 @@
 import { useState, useContext } from "react"
+import { AxiosError } from "axios";
 
 // antd
 import { Modal } from 'antd';
@@ -39,7 +40,14 @@ export default function Info() {
       myAlert.success({ title: "變更密碼成功" })
     }
     catch (error) {
-      myAlert.err({ title: "變更密碼失敗" })
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+
+      const { message, statusCode } = err.response?.data ?? {}
+      myAlert.err({ title: statusCode, content: message })
     }
   }
   const onCancel = () => {
@@ -99,8 +107,8 @@ const ModalChangePw = (
     }
 ) => {
 
-  const [oldPw, setOldPw] = useState<string>()
-  const [newPw, setNewPw] = useState<string>()
+  const [oldPw, setOldPw] = useState<string>("")
+  const [newPw, setNewPw] = useState<string>("")
 
   const theOnConfirm = () => {
     if (!oldPw || !newPw) return;
@@ -108,11 +116,13 @@ const ModalChangePw = (
       oldPassword: oldPw,
       newPassword: newPw,
     })
+    setOldPw("")
+    setNewPw("")
   }
 
   const theOnCancel = () => {
-    setOldPw(undefined)
-    setNewPw(undefined)
+    setOldPw("")
+    setNewPw("")
     onCancel()
   }
 
@@ -127,10 +137,13 @@ const ModalChangePw = (
       onCancel={theOnCancel}
     >
 
-      <div className={scss.inputContainer}>
+      <form className={scss.inputContainer}
+        onClick={(e) => e.preventDefault}
+      >
         <label>
           <span>舊密碼</span>
           <input type="password"
+            autoComplete="new-password"
             value={oldPw}
             placeholder="請輸入舊密碼"
             onChange={(e) => setOldPw(e.target.value)}
@@ -140,12 +153,13 @@ const ModalChangePw = (
         <label className={scss.pwGroup}>
           <span>新密碼</span>
           <input type="password"
+            autoComplete="new-password"
             value={newPw}
             placeholder="請輸入新密碼"
             onChange={(e) => setNewPw(e.target.value)}
           />
         </label>
-      </div>
+      </form>
 
       <div className="mt-5">
         <TwoBtnFooter
