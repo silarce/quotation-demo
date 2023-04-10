@@ -226,6 +226,8 @@ export default function ErpCtrlPermissions() {
 
   const resetPw = async (id: string) => {
     try {
+      if (isLoading) return
+      setIsLoading(true)
       const res = await apiPatchUserResetPassword(id)
       const { password, account, username } = res
       myAlert.success({
@@ -247,6 +249,9 @@ export default function ErpCtrlPermissions() {
         title: resSerror,
         content: message
       })
+    }
+    finally {
+      setIsLoading(false)
     }
   }
 

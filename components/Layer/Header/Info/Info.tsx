@@ -27,6 +27,7 @@ import { LayerCtx } from "components/Layer/Layer"
 export default function Info() {
   const { reqLogout } = useContext(LayerCtx)
   const [showPwModal, setShowPwModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
 
   // ----------------------------------------------
@@ -35,7 +36,9 @@ export default function Info() {
   }
   const onConfirm = async (postBody: TpwPostBody) => {
     try {
-      const res = await apiAuthPassword(postBody)
+      if (isLoading) return
+      setIsLoading(true)
+      await apiAuthPassword(postBody)
       setShowPwModal(false)
       myAlert.success({ title: "變更密碼成功" })
     }
@@ -49,6 +52,7 @@ export default function Info() {
       const { message, statusCode } = err.response?.data ?? {}
       myAlert.err({ title: statusCode, content: message })
     }
+    finally { setIsLoading(false) }
   }
   const onCancel = () => {
     setShowPwModal(false)
@@ -140,6 +144,8 @@ const ModalChangePw = (
       <form className={scss.inputContainer}
         onClick={(e) => e.preventDefault}
       >
+        {/* 為了讓瀏覽器不要在控制台跳警告 */}
+        <input type="text" name="username" autoComplete="username" style={{ display: "none" }} />
         <label>
           <span>舊密碼</span>
           <input type="password"
@@ -159,6 +165,7 @@ const ModalChangePw = (
             onChange={(e) => setNewPw(e.target.value)}
           />
         </label>
+
       </form>
 
       <div className="mt-5">
