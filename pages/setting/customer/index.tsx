@@ -27,11 +27,6 @@ import style from "./customer.module.scss"
 
 // option
 import { optionsCreator_county } from "fakeDatabase/options/countryAndDistrict";
-const optionCountyArr = (() => {
-  const arr = optionsCreator_county()
-  arr.unshift({ value: "", label: "地區不拘" })
-  return arr
-})()
 import { optionsCreator_clientSearch, Toption } from "fakeDatabase/options/options"
 const clientSearchOptions = optionsCreator_clientSearch()
 const clientSearchOptionsObj: { [key: string]: Toption } = {}
@@ -39,6 +34,25 @@ clientSearchOptions.forEach((item, index) => {
   const { value, label } = item
   clientSearchOptionsObj[value] = { value, label }
 })
+
+// 類別optionArr
+const typesOptionArr = (() => {
+  const optionArr: { value: string, label: string }[] = customerTypesArr.map((types) => {
+    return {
+      value: types.value,
+      label: types.label
+    }
+  })
+  optionArr.unshift({ value: "", label: "類別不拘" })
+  return optionArr
+})()
+// 城市optionArr
+const optionCountyArr = (() => {
+  const arr = optionsCreator_county()
+  arr.unshift({ value: "", label: "地區不拘" })
+  arr.push({ value: "國外", label: "國外" })
+  return arr
+})()
 
 // ========================================================
 export default function Customer() {
@@ -115,17 +129,6 @@ function TheCustomer({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // pageHeader
 
-  // 類別optionArr
-  const typesOptionArr = (() => {
-    const optionArr: { value: string, label: string }[] = customerTypesArr.map((types) => {
-      return {
-        value: types.value,
-        label: types.label
-      }
-    })
-    optionArr.unshift({ value: "", label: "類別不拘" })
-    return optionArr
-  })()
 
   const searchTargetList = [
     {
