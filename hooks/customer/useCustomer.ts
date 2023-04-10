@@ -12,6 +12,7 @@ class Class_customer {
     this._customerData = _.cloneDeep(customerOri)
     this._classContactArr =
       this._customerData.contacts.map((contact) => new Class_customerContact(this._reRender, contact))
+    if (this._classContactArr.length === 0) this._classContactArr.push(new Class_customerContact(this._reRender))
     this._typesArr = this._customerData.types.map((type) => type.name)
 
   }
