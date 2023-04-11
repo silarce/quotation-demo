@@ -38,7 +38,7 @@ export default function List(
     <div className={scss.list}>
       <div className={scss.row}>
         {CdepartmentArr.map((department, dIndex) => {
-          const { id, name, jobs, isFocus,code,
+          const { id, name, jobs, isFocus, code,
             dWillDelete, dWillPatch, dIsNew,
             dShowDeletePanel, addJob, removeJob,
           } = department
@@ -104,7 +104,7 @@ export default function List(
                       onClick={editable && !dWillDelete ? () => addJob(jIndex) : undefined}
                     >
                       {/*  eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={iconAdd.src} alt="" />
+                      {editable && <img src={iconAdd.src} alt="" />}
                     </div>
                   )
                 }
