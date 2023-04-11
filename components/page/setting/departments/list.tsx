@@ -1,5 +1,5 @@
 
-import { MouseEvent, } from 'react';
+import { MouseEvent as reactMouseEvent, } from 'react';
 import classNames from 'classnames';
 
 // component
@@ -52,7 +52,7 @@ export default function List(
 
           const DeleteSwitch = dWillDelete ? RedoOutlined : IconCross01
 
-          const onDelete = (e: MouseEvent) => {
+          const onDelete = (e: reactMouseEvent) => {
             if (dIsNew) removeCdepartment(dIndex)
             else dShowDeletePanel(e)
           }
@@ -98,10 +98,14 @@ export default function List(
                 if (job === undefined) {
                   const styleDelete = dWillDelete ? scss.delete : ""
                   let className = `${scss.cell} ${scss.empty} ${styleDelete}`
+                  const onClick = () => {
+                    addJob(jIndex)
+                    makeInpuFocus()
+                  }
 
                   return (
                     <div className={className} key={jIndex}
-                      onClick={editable && !dWillDelete ? () => addJob(jIndex) : undefined}
+                      onClick={editable && !dWillDelete ? onClick : undefined}
                     >
                       {/*  eslint-disable-next-line @next/next/no-img-element */}
                       {editable && <img src={iconAdd.src} alt="" />}
@@ -114,7 +118,7 @@ export default function List(
                   jShowDeletePanel,
                 } = job
 
-                const onDelete = (e: MouseEvent) => {
+                const onDelete = (e: reactMouseEvent) => {
                   jIsNew ? removeJob(jIndex) : jShowDeletePanel(e)
                 }
 
@@ -124,7 +128,7 @@ export default function List(
                 const DeleteSwitch = jWillDelete ? RedoOutlined : IconCross01
 
                 return (
-                  <div className={className} key={jIndex}>
+                  <label className={className} key={jIndex}>
                     <label className={scss.inputBox}>
                       <AutosizeInput type="text"
                         value={name ?? ""}
@@ -139,7 +143,7 @@ export default function List(
                       }
                     </label>
                     <div className={scss.focusBg} />
-                  </div>
+                  </label>
                 )
               })}
             </div> // thead
@@ -155,3 +159,22 @@ export default function List(
 
 
 // =====================================================
+
+/**
+ * 點擊+符號後就會自動focus下面的input
+ */
+const makeInpuFocus = () => {
+  function foo(event: MouseEvent) {
+    const x = event.clientX;
+    const y = event.clientY;
+    const element = document.elementFromPoint(x, y);
+    if (element) {
+      const theEle = element as HTMLInputElement | HTMLLabelElement
+      if (theEle.focus) theEle.focus()
+      if (theEle.click) theEle.click()
+    }
+    document.removeEventListener('click', foo);
+  }
+  document.addEventListener('click', foo);
+}
+
