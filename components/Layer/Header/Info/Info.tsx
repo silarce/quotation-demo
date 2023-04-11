@@ -9,7 +9,8 @@ import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 // img
-import avatar from "public/image/avatar.png"
+// import avatar from "public/image/avatar.png"
+import iconMember from "public/image/icon/member.svg"
 // icon
 import logout from "public/image/icon/logout.svg"
 
@@ -64,7 +65,7 @@ export default function Info() {
   return (
     <div className={scss.container}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={avatar.src} alt="頭像" className={scss.avatar}
+      <img src={iconMember.src} alt="頭像" className={scss.avatar}
       />
 
       <div className={scss.name}>
