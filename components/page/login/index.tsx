@@ -37,10 +37,10 @@ export default function Login(
     { setIsLoged: Dispatch<SetStateAction<boolean>> }
 ) {
   const [isLoading, setIsLoading] = useState(false)
-  // const [account, setAccont] = useState("")
-  // const [password, setPassword] = useState("")
-  const [account, setAccont] = useState("admin")
-  const [password, setPassword] = useState("1qaz#EDC5tgb")
+  const [account, setAccont] = useState("")
+  const [password, setPassword] = useState("")
+  // const [account, setAccont] = useState("admin")
+  // const [password, setPassword] = useState("1qaz#EDC5tgb")
 
   const reqLog = async () => {
     if (isLoading) return;
