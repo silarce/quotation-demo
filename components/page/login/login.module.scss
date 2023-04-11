@@ -101,12 +101,12 @@
   border-top: solid 2px $colorActive01;
   padding: 40px 32px 30px 32px;
   .input02 {
-    padding-top: 0;
-    hr {
-      border-color: $colorMain;
-    }
     &:nth-of-type(1) {
       margin-bottom: 23px;
+    }
+    input {
+      background-color: #ddd;
+      padding-right: 50px;
     }
   }
   .btn {
