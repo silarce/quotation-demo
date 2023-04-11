@@ -6,9 +6,10 @@
   flex-wrap: nowrap;
   align-items: center;
   padding-bottom: 13px;
+  padding-right: 5px;
   border-bottom: solid 1px $colorMain;
-
   > span {
+    flex: none;
     font-weight: 500;
     font-size: 20px;
     min-width: fit-content;
@@ -21,6 +22,7 @@
     width: 100%;
   }
   > img {
+    flex: none;
     width: 18px;
     height: 18px;
     margin-left: 20px;
