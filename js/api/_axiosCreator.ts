@@ -2,7 +2,7 @@ import axios from "axios"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 const axi = axios.create({
-  baseURL: "https://sanjeou-erp-be.caprover.credot-web.com/",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,
 })
 
