@@ -2,7 +2,7 @@ import { useState, useContext } from "react"
 import { AxiosError } from "axios";
 
 // antd
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 
 // gear
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
@@ -42,7 +42,6 @@ export default function Info() {
       return myAlert.warning({ title: "新舊密碼長度不能小於8碼" })
     }
 
-
     try {
       if (isLoading) return
       setIsLoading(true)
@@ -60,6 +59,7 @@ export default function Info() {
       // myAlert.err({ title: statusCode, content: message })
       if (statusCode === 404) myAlert.err({ title: "舊密碼錯誤" })
       else myAlert.err({ title: "未知錯誤" })
+      return err
     }
     finally { setIsLoading(false) }
   }
@@ -93,9 +93,10 @@ export default function Info() {
       </div>
 
       <ModalChangePw
-        visible={showPwModal}
+        visible={isLoading || showPwModal}
         onConfirm={onConfirm}
         onCancel={onCancel}
+        isLoading={isLoading}
       />
     </div>
   )
@@ -109,11 +110,12 @@ type TpwPostBody = {
 }
 
 const ModalChangePw = (
-  { visible, onConfirm, onCancel }:
+  { visible, onConfirm, onCancel, isLoading }:
     {
       visible: boolean
       onConfirm: (posBody: TpwPostBody) => void
       onCancel: () => void
+      isLoading: boolean
     }
 ) => {
 
@@ -131,9 +133,8 @@ const ModalChangePw = (
       oldPassword: oldPw,
       newPassword: newPw,
     })
-    setOldPw("")
-    setNewPw("")
-    setNewPw2("")
+
+
   }
 
   const theOnCancel = () => {
@@ -153,6 +154,7 @@ const ModalChangePw = (
       footer={null}
       onCancel={theOnCancel}
       destroyOnClose={true}
+      afterClose={theOnCancel}
     >
 
       <div className={scss.header}>
@@ -189,9 +191,12 @@ const ModalChangePw = (
           />
         </form>
 
-        <div className={scss.confirmBtn}>
-          <button onClick={theOnConfirm}>確認</button>
-        </div>
+
+        <Button loading={isLoading}
+          className={scss.confirmBtn} onClick={theOnConfirm}>
+          確認
+        </Button>
+
       </div>
 
     </Modal>
