@@ -22,7 +22,7 @@ import imgArc from "public/image/blueArc.svg"
 import Imgbanner from "public/image/loginBanner.png"
 
 // api
-import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
+// import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
 
 // css
 import scss from "./login.module.scss"
@@ -33,8 +33,8 @@ import scss from "./login.module.scss"
 
 
 export default function Login(
-  { setIsLoged }:
-    { setIsLoged: Dispatch<SetStateAction<boolean>> }
+  { onLogin }:
+    { onLogin: (postBody: { account: string, password: string }) => {} }
 ) {
   const [isLoading, setIsLoading] = useState(false)
   const [account, setAccont] = useState("")
@@ -46,8 +46,7 @@ export default function Login(
     if (isLoading) return;
     try {
       setIsLoading(true)
-      await apiLogin({ account, password })
-      setIsLoged(true)
+      await onLogin({ account, password })
     }
     catch { myAlert.err({ title: "帳號或密碼錯誤" }) }
     finally { setIsLoading(false) }

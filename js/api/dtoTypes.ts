@@ -14,7 +14,7 @@ export type TpageMetaDto = {
 }
 
 
-
+/** 如果是admin帳號，不會有employee */
 export type TuserDto = {
   account: string
   createdAt: string
@@ -22,8 +22,18 @@ export type TuserDto = {
   isActive: boolean
   updatedAt: string
   username: string
-  employee?: TcompanyInfoDto
+  employee?: TemployeeDto & Required<Pick<TemployeeDto, "jobs">>
 }
+
+export type TuserDto_login = {
+  account: string
+  createdAt: string
+  id: string
+  isActive: boolean
+  updatedAt: string
+  username: string
+}
+
 
 export type TUserPasswordDto = {
   id: string

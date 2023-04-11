@@ -26,10 +26,15 @@ import { LayerCtx } from "components/Layer/Layer"
 
 
 export default function Info() {
-  const { reqLogout } = useContext(LayerCtx)
+  const { reqLogout, userInfo } = useContext(LayerCtx)
   const [showPwModal, setShowPwModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
+
+  // ----------------------------------------------
+
+  const userName = userInfo.username
+  const departmentName = userInfo.employee?.jobs[0].department.name ?? "admin"
 
   // ----------------------------------------------
   const openPwModal = () => {
@@ -60,8 +65,6 @@ export default function Info() {
   }
   // ----------------------------------------------
 
-
-
   return (
     <div className={scss.container}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -69,8 +72,8 @@ export default function Info() {
       />
 
       <div className={scss.name}>
-        <p>管理部</p>
-        <p>王小明</p>
+        <p>{departmentName}</p>
+        <p>{userName}</p>
       </div>
 
       <div className={scss.changePw} onClick={openPwModal}>
