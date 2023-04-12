@@ -2,14 +2,13 @@ import { useState, useContext } from "react"
 import { AxiosError } from "axios";
 
 // antd
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 
 // gear
-import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import Input_pw from "components/global/gear/inputAndSel/Input_pw";
 
 // img
-// import avatar from "public/image/avatar.png"
 import iconMember from "public/image/icon/member.svg"
 // icon
 import logout from "public/image/icon/logout.svg"
@@ -20,16 +19,13 @@ import { apiAuthPassword } from "js/api/api_auth";
 // css
 import scss from "./info.module.scss"
 
-
 // ctx
 import { LayerCtx } from "components/Layer/Layer"
-
 
 export default function Info() {
   const { reqLogout, userInfo } = useContext(LayerCtx)
   const [showPwModal, setShowPwModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
 
   // ----------------------------------------------
 
@@ -41,6 +37,11 @@ export default function Info() {
     setShowPwModal(true)
   }
   const onConfirm = async (postBody: TpwPostBody) => {
+    const { newPassword, oldPassword } = postBody
+    if (newPassword.length < 8 || oldPassword.length < 8) {
+      return myAlert.warning({ title: "新舊密碼長度不能小於8碼" })
+    }
+
     try {
       if (isLoading) return
       setIsLoading(true)
@@ -54,9 +55,11 @@ export default function Info() {
         message: string
         statusCode: number
       }>
-
       const { message, statusCode } = err.response?.data ?? {}
-      myAlert.err({ title: statusCode, content: message })
+      // myAlert.err({ title: statusCode, content: message })
+      if (statusCode === 404) myAlert.err({ title: "舊密碼錯誤" })
+      else myAlert.err({ title: "未知錯誤" })
+      return err
     }
     finally { setIsLoading(false) }
   }
@@ -90,11 +93,11 @@ export default function Info() {
       </div>
 
       <ModalChangePw
-        visible={showPwModal}
+        visible={isLoading || showPwModal}
         onConfirm={onConfirm}
         onCancel={onCancel}
+        isLoading={isLoading}
       />
-
     </div>
   )
 }
@@ -107,30 +110,37 @@ type TpwPostBody = {
 }
 
 const ModalChangePw = (
-  { visible, onConfirm, onCancel }:
+  { visible, onConfirm, onCancel, isLoading }:
     {
       visible: boolean
       onConfirm: (posBody: TpwPostBody) => void
       onCancel: () => void
+      isLoading: boolean
     }
 ) => {
 
-  const [oldPw, setOldPw] = useState<string>("")
-  const [newPw, setNewPw] = useState<string>("")
+  const [oldPw, setOldPw] = useState("")
+  const [newPw, setNewPw] = useState("")
+  const [newPw2, setNewPw2] = useState("")
 
   const theOnConfirm = () => {
-    if (!oldPw || !newPw) return;
+    if (!oldPw) return myAlert.warning({ title: "請輸入舊密碼" });
+    if (!newPw) return myAlert.warning({ title: "請輸入新密碼" });
+    if (!newPw2) return myAlert.warning({ title: "請確認新密碼" });
+    if (newPw !== newPw2) return myAlert.warning({ title: "新密碼與確認新密碼不相符" });
+
     onConfirm({
       oldPassword: oldPw,
       newPassword: newPw,
     })
-    setOldPw("")
-    setNewPw("")
+
+
   }
 
   const theOnCancel = () => {
     setOldPw("")
     setNewPw("")
+    setNewPw2("")
     onCancel()
   }
 
@@ -143,39 +153,50 @@ const ModalChangePw = (
       maskClosable={true}
       footer={null}
       onCancel={theOnCancel}
+      destroyOnClose={true}
+      afterClose={theOnCancel}
     >
 
-      <form className={scss.inputContainer}
-        onClick={(e) => e.preventDefault}
-      >
-        {/* 為了讓瀏覽器不要在控制台跳警告 */}
-        <input type="text" name="username" autoComplete="username" style={{ display: "none" }} />
-        <label>
-          <span>舊密碼</span>
-          <input type="password"
-            autoComplete="new-password"
+      <div className={scss.header}>
+        <div><span>變更密碼</span></div>
+      </div>
+
+      <div className={scss.body}>
+        <form className={scss.inputContainer} onSubmit={(e) => e.preventDefault}>
+          {/* 為了讓瀏覽器不要在控制台跳警告 */}
+          <input type="text" name="username" autoComplete="username" style={{ display: "none" }} />
+          <Input_pw
             value={oldPw}
-            placeholder="請輸入舊密碼"
-            onChange={(e) => setOldPw(e.target.value)}
+            onChange={setOldPw}
+            label="舊密碼"
+            inputType="auto"
+            captionWidth="100px"
+            firstGap="40px"
           />
-        </label>
-
-        <label className={scss.pwGroup}>
-          <span>新密碼</span>
-          <input type="password"
-            autoComplete="new-password"
+          <Input_pw
             value={newPw}
-            placeholder="請輸入新密碼"
-            onChange={(e) => setNewPw(e.target.value)}
+            onChange={setNewPw}
+            label="新密碼"
+            inputType="auto"
+            captionWidth="100px"
+            firstGap="40px"
           />
-        </label>
+          <Input_pw
+            value={newPw2}
+            onChange={setNewPw2}
+            label="確認新密碼"
+            inputType="auto"
+            captionWidth="100px"
+            firstGap="40px"
+          />
+        </form>
 
-      </form>
 
-      <div className="mt-5">
-        <TwoBtnFooter
-          onConfirm={theOnConfirm}
-          onCancel={theOnCancel} />
+        <Button loading={isLoading}
+          className={scss.confirmBtn} onClick={theOnConfirm}>
+          確認
+        </Button>
+
       </div>
 
     </Modal>
