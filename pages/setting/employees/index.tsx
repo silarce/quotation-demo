@@ -4,6 +4,9 @@ import {
 } from "react"
 import { useRouter } from "next/router";
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // components
 import EmployeeList from "components/page/setting/employees/employeeList";
 
@@ -29,7 +32,7 @@ export default function Employees() {
     order: "ASC",
     page: 1,
     pageSize: 12,
-    sort:"idNumber",
+    sort: "idNumber",
     filter: {
       $or: {
         idNumber: {
@@ -111,11 +114,11 @@ export default function Employees() {
   ]
   // ====================================================
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader02 tag="人員資料" panelList={panelList} />
-      <div className={style.mainContainer}>
-        <EmployeeList
-          employeeList={employeeList} toUpdate={update} isLoading={isLoading}/>
+      <div className={style.body}>
+          <EmployeeList
+            employeeList={employeeList} toUpdate={update} isLoading={isLoading} />
         <div className={style.paginationBox}>
           <Pagination
             current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
@@ -124,11 +127,6 @@ export default function Employees() {
           />
         </div>
       </div>
-    </div>
+    </SubLayer>
   )
 }
-
-
-// ============================================================
-// ============================================================
-// ============================================================
