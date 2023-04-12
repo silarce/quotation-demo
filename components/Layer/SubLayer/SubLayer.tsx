@@ -15,11 +15,11 @@ export default function SubLayer(
   return (
     <div className={classNames(scss.container, className)}>
       {childredArr[0]}
-
       <div className={classNames(scss.body, bodyClassName)}>
         {childredArr[1]}
+        {/*把剩下的childredArr的item放進來*/}
+        {childredArr.slice(2)}
       </div>
-
     </div>
   )
 }
