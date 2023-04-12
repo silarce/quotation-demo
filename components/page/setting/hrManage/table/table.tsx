@@ -41,7 +41,7 @@ export default function Table(
 
   const selectPropsArr = [
     {
-      boxStyle: { width: "180px" },
+      boxStyle: { width: "145px" },
       props: {
         placeholder: "請選擇部門",
         options: searchOption,
@@ -50,6 +50,7 @@ export default function Table(
   ]
   const inputPropsArr = [
     {
+      boxStyle: { width: "145px" },
       props: {
         placeholder: "搜尋中文姓名",
       }
@@ -190,7 +191,7 @@ const tableConfig
   },
   "phone1": {
     label: "電話",
-    width: "100px"
+    width: "160px"
   },
   "jobs": {
     label: "部門編號/部門名稱/職稱/職等",

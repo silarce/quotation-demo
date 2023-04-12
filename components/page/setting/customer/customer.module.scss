@@ -2,6 +2,7 @@
 
 .customerList {
   padding-left: 4px;
+  overflow: auto;
   .panel {
     :global(.ant-collapse-header) {
       display: block !important;

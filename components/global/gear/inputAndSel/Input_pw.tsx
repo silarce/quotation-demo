@@ -43,7 +43,7 @@ export default function Input_pw(
 
   const [isShowPw, setIsShowPw] = useState(false)
 
-  const iconEye = isShowPw ? iconEyeProhibit : iconEyeOpen
+  const iconEye = isShowPw ? iconEyeOpen : iconEyeProhibit
 
   let theInputType = inputType
   if (!inputType || inputType === "auto") {
