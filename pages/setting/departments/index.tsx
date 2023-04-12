@@ -5,8 +5,10 @@ import {
   useState, useEffect,
 } from "react"
 
-
 const _ = require("lodash")
+
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
 import List from "components/page/setting/departments/list"
@@ -196,12 +198,12 @@ export default function Department() {
   if (!isReady) return null
   // ---------------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader02
         tag="公司職等職稱"
         panelList={editable ? panelList02 : panelList01}
       />
-      <div className={style.mainContainer}>
+      <div>
         {data?.data &&
           <div className={style.department}>
             <Caption />
@@ -221,7 +223,7 @@ export default function Department() {
         placeholder={"新部門"}
         onConfirm={(v) => addCdepartment(v)}
       />
-    </div>
+    </SubLayer>
   )
 }
 

@@ -5,6 +5,9 @@ import {
   useState, useEffect
 } from "react"
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // components
 import Header from "components/page/setting/hrManage/header/header";
 import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
@@ -135,11 +138,11 @@ export default function HrManage() {
 
   // --------------------------------------------------------------------------
   return (
-    <div className={scss.scrollContainer}>
+    <SubLayer >
 
       <Header />
 
-      <div className={scss.mainContainer}>
+      <div className={scss.body}>
         <div className={scss.main} style={{ width: "100%" }}>
           {dataArr.map((item, index) => {
             const { id, name, employees } = item
@@ -185,7 +188,7 @@ export default function HrManage() {
         onCancel={delCancel}
       />
 
-    </div>
+    </SubLayer>
   )
 }
 // ====================================================================

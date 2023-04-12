@@ -4,6 +4,9 @@ import {
 } from "react"
 import { NextRouter, useRouter } from "next/router"
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // component
 import CustomerList from "components/page/setting/customer/customerList"
 
@@ -215,9 +218,9 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader02 tag="客戶列表" panelList={panelList} />
-      <div className={style.mainContainer} >
+      <div className={style.body}>
         {isReady &&
           <>
             <CustomerList
@@ -238,7 +241,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
           isLoading={isLoading}
         /> */}
       </div>
-    </div>
+    </SubLayer>
   )
 }
 
