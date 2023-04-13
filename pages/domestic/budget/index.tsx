@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from "next/router";
+import _ from "lodash"
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -44,7 +45,9 @@ type Trouter = ReturnType<typeof useRouter>
 
 export default function Budget() {
   const router = useRouter()
-  // 搜尋用的
+  // -----------------------------------------------------------------------
+  // 搜尋用的 //這個資料不會render在畫面上
+  // render在畫面上的是PageHeader02元件裡的狀態
   const [searchObj, setSearchObj] = useState<TsearchObj>({
     doorType: "",
     county: "",
@@ -62,8 +65,20 @@ export default function Budget() {
     }
   })
 
+  useEffect(() => {
+    const { doorType, county, clientName, projectName, }
+      = router.query as Record<string, string | undefined>
+    setSearchObj({
+      doorType: doorType ?? "",
+      county: county ?? "",
+      clientName: clientName ?? "",
+      projectName: projectName ?? "",
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query])
 
-// ----------------------------------------------------------
+
+  // ----------------------------------------------------------
   // panelList
 
   const searchTargetList = [
@@ -90,24 +105,32 @@ export default function Budget() {
   ]
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    let [doorTypeOption, countyOption, clientName, projectName] = valueArr
-    const doorType = (doorTypeOption as Toption).value
-    const county = (countyOption as Toption).value
-    clientName = clientName as string
-    projectName = projectName as string
-    setSearchObj({
-      doorType,
-      county,
-      clientName,
-      projectName,
-    })
-  }
+    const [doorTypeOption, countyOption, clientName, projectName] = valueArr;
+    const query = _.cloneDeep(router.query);
+    const params = [
+      { key: "doorType", value: (doorTypeOption as Toption).value },
+      { key: "county", value: (countyOption as Toption).value },
+      { key: "clientName", value: clientName as string },
+      { key: "projectName", value: projectName as string },
+    ];
+    params.forEach(({ key, value }) => {
+      value = value.trim()
+      if (value) query[key] = value;
+      else delete query[key];
+    });
+
+    router.push({
+      href: "",
+      query,
+    });
+  };
+
   const searchGroup = {
     searchTargetList,
     doSearch
   }
 
-// ----------------------------------------------------------
+  // ----------------------------------------------------------
 
   const panelList: TpanelList = [
     { searchGroup },
@@ -132,9 +155,7 @@ export default function Budget() {
 
   return (
     <SubLayer>
-      {/* header panel */}
       <PageHeader02 tag="預算" panelList={panelList} />
-      {/*  */}
       <div >
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0"
@@ -164,7 +185,8 @@ const ApprovalsBar = (
           approvalsStatus: "待審核"
         }
       },
-      isActive: query.approvalsStatus === "待審核"
+      // isActive: query.approvalsStatus === "待審核"
+      isActive: !query.approvalsStatus || query.approvalsStatus === "待審核"
     },
     {
       label: "審核中",
@@ -196,3 +218,7 @@ const ApprovalsBar = (
     </div>
   )
 }
+
+
+
+
