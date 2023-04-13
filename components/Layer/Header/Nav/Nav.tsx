@@ -26,18 +26,22 @@ export default function Nav() {
   return (
     <div className={styled.container}>
       {topPathList.map((item, index) => {
-        // const { icon, path01, href, label, subLabel: subLabel } = item
-        const { icon, path01, href, label,  } = item
+        const { icon, path01, href, label, subLabel: subLabel } = item
+        // const { icon, path01, href, label,  } = item
         const reg = new RegExp(`^${path01}`)
         let active = reg.test(pathname) ? styled.active : ""
         if (path01 === "/") active = pathname === path01 ? styled.active : ""
         return (
           <Link className={`${styled.link} ${active}`}
             href={href} key={index}>
-            {/* <Image src={icon} alt={label + subLabel} /> */}
-            <Image src={icon} alt={label} />
+
+            <Image src={icon} alt={label + subLabel} />
+            {/* <Image src={icon} alt={label} /> */}
+            
             <span>{label}</span>
-            {/* {subLabel && <span>{subLabel}</span>} */}
+            {subLabel && <span>{subLabel}</span>}
+
+
           </Link>
         )
       })}
