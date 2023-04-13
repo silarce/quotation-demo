@@ -2,6 +2,7 @@ import {
   Dispatch, SetStateAction,
   useState, Fragment, useEffect
 } from "react"
+import classNames from "classnames"
 
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -31,6 +32,7 @@ interface Ttag {
 interface Tlink {
   label: string
   href: string
+  isActive?: boolean
 }
 
 // 各種按鈕，可以變更或加上icon
@@ -189,11 +191,16 @@ function LinkList({ linkList, pathname }:
   return (
     <>
       {linkList.map((config, index) => {
-        const { label, href } = config;
-        const isActive = href === pathname ? style.active : ""
+        let { label, href, isActive } = config;
+
+        let classActive: string | undefined
+
+        if (isActive) classActive = style.active
+        if (isActive === false) classActive = undefined
+        if (isActive === undefined) classActive = href === pathname ? style.active : undefined
 
         return (
-          <Link className={isActive} href={href} key={index}>
+          <Link className={classNames(classActive)} href={href} key={index}>
             <span>{label}</span>
             <hr className={style.bottomBar} />
           </Link>
