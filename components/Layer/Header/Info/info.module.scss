@@ -76,25 +76,52 @@
 }
 
 .antdModalChangePw {
-  .inputContainer {
-    display: grid;
-    gap: 20px;
-    > label {
-      > * {
-        display: block;
-      }
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+
+  .header {
+    border-bottom: solid 2px $colorActive01;
+    > div {
+      width: fit-content;
+      padding: 15px 48px;
+      background-color: $bgc01;
       > span {
+        font-size: 18px;
+        font-weight: 400;
         color: $colorMain;
+      }
+    }
+  }
+  .body {
+    border: solid 1px $colorBorder01;
+    border-top: 0;
+    .inputContainer {
+      display: grid;
+      gap: 17px;
+      padding: 50px 48px;
+    }
+    .confirmBtn {
+      width: 100%;
+      padding: 14px;
+      background-color: $bgc01;
+      border-top: solid 1px $colorBorder01;
+      > span {
         font-size: 16px;
+        font-weight: 500;
+        color: $colorMain;
       }
-      input {
-        width: 250px;
-        padding: 5px;
-        border: solid 1px $colorBorder01;
-        &:focus {
-          border: solid 1px $colorActive01;
-        }
-      }
+      // width: 100%;
+      height: fit-content;
+      // padding: 10px 0;
+      // margin-top: 40px;
+      // background-color: $bgc01;
+      // border: solid 1px $colorBorder01;
+      // > span {
+      //   font-weight: 500;
+      //   font-size: 16px;
+      //   color: $colorMain;
+      // }
     }
   }
 }

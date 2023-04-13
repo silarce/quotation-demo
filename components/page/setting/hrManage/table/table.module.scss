@@ -6,10 +6,13 @@
   .thead {
     background-color: $bgc01;
     display: flex;
-    gap: 63px;
+    gap: 30px;
     height: 40px;
-    padding-left: 45px;
+    padding-left: 34px;
     // padding-right: 20px;
+    >*{
+      flex:none;
+    }
     .ctrlBar {
       display: flex;
       .searchlBar {
@@ -35,9 +38,9 @@
   .tbody {
     .row {
       display: flex;
-      gap: 63px;
+      gap: 30px;
       height: 53px;
-      padding-left: 45px;
+      padding-left: 34px;
       padding-right: 20px;
       border-bottom: solid 1px $colorBorder01;
       .column {

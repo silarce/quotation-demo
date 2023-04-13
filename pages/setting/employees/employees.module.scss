@@ -1,9 +1,11 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
 
-.mainContainer {
+
+.body {
+  display: grid;
   align-content: space-between;
-  >.paginationBox {
+  height: 100%;
+  > .paginationBox {
     display: flex;
     justify-content: flex-end;
     align-items: center;
