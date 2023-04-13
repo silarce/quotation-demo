@@ -59,6 +59,7 @@ export default function ErpFuncPermissions() {
       await Promise.all([updateErp(), updateDepartments()])
       setIsLoading(false)
     })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // --------------------------------------------------------------------------
