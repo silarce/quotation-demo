@@ -8,6 +8,10 @@ import {
 
 const _ = require("lodash")
 
+
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer"
+
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
@@ -177,12 +181,11 @@ export default function CompanyInfo() {
   }
   // ===================================================
   return (
-    <div className={scss.container}>
+    <SubLayer>
       <PageHeader02 tag="公司資料"
         panelList={editable ? panalList02 : panalList01}
       />
-      <div className={scss.mainContainer}>
-
+      <div className={scss.body}>
         {/* 左邊的圖片 */}
         <div className={scss.logoBox}>
           {logoLink
@@ -246,7 +249,7 @@ export default function CompanyInfo() {
           />
         </div>
       </div>
-    </div>
+    </SubLayer>
   )
 }
 // ========================================================

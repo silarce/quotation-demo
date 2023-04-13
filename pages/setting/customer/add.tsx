@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // component
 import EditCustomer from "components/page/setting/customer/editCustomer/editCustomer";
 
@@ -9,8 +12,6 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 
-// css
-import style from "./customer.module.scss"
 
 // api
 import { apiPostCustomers, useApiCustomersNameExist, } from "js/api/api_customer";
@@ -84,17 +85,17 @@ export default function Add() {
   ]
 
   return (
-    <div className={style.container}>
+    <SubLayer >
       <PageHeader02 tag="客戶列表"
         panelList={panelList}
       />
-      <div className={style.mainContainer}>
+      <div>
         <EditCustomer
           classCustomer={classCustomer}
           nameCheck={nameCheck}
         />
       </div>
-    </div>
+    </SubLayer>
   )
 }
 

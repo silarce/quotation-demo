@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 
-
 import _ from "lodash"
+
+import SubLayer from "components/Layer/SubLayer/SubLayer";
 
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
@@ -116,12 +117,12 @@ export default function AddEmployee() {
 
   // =====================================================
   return (
-    <div className={style.container}>
+    <SubLayer>
 
       <PageHeader02 tag="人員資料"
         panelList={panelList}
       />
-      <div className={style.mainContainer}>
+      <div>
         {classEmpolyee && departmentJobOptionGroup &&
           <EditEmployee
             classEmployee={classEmpolyee}
@@ -130,7 +131,7 @@ export default function AddEmployee() {
           />
         }
       </div>
-    </div>
+    </SubLayer>
   )
 } // AddEmployee
 

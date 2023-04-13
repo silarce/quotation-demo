@@ -3,6 +3,7 @@
 .employeeList {
   padding: 4px;
   display: grid;
+  overflow: hidden;
   .thead {
     background-color: $bgc01;
     display: flex;

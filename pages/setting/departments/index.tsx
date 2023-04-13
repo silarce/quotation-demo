@@ -5,8 +5,10 @@ import {
   useState, useEffect,
 } from "react"
 
-
 const _ = require("lodash")
+
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
 import List from "components/page/setting/departments/list"
@@ -196,12 +198,12 @@ export default function Department() {
   if (!isReady) return null
   // ---------------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader02
         tag="公司職等職稱"
         panelList={editable ? panelList02 : panelList01}
       />
-      <div className={style.mainContainer}>
+      <div>
         {data?.data &&
           <div className={style.department}>
             <Caption />
@@ -221,10 +223,16 @@ export default function Department() {
         placeholder={"新部門"}
         onConfirm={(v) => addCdepartment(v)}
       />
-    </div>
+    </SubLayer>
   )
 }
 
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
 // ==============================================================================
 // ==============================================================================
 // ==============================================================================
@@ -241,8 +249,8 @@ export class ClassDepartment {
   dWillDelete = false
   dWillPatch = false
   dIsNew = false
-  
-   
+
+
 
   // --------------------------------------------------------
   // --------------------------------------------------------
@@ -360,7 +368,7 @@ class ClassJob {
     }
     else {
       this.id = ""
-      this._name = "新職稱"
+      this._name = ""
       this.grade = job.newJobindex + 1
       this.jIsNew = true
     }
@@ -444,25 +452,24 @@ const useClass = (departmentArr: TdepartmentDto_jobs[], editable: boolean) => {
       if (dWillDelete) return
 
       const patchObj: TupdateDepartmentJobDto
-        = { id: id, name: name, code,jobs:[] }
+        = { id: id, name: name, code, jobs: [] }
 
       if (!dWillPatch) patchObj.name = undefined
 
       let isJobsChanged = false
 
-        department.jobs.forEach((job) => {
-          if (!job) return
-          const { name, grade,
-            jWillDelete, jWillPatch, jIsNew,
-          } = job
-          if (jWillDelete) return
-          if (jWillPatch||jIsNew) isJobsChanged = true
-  
-          patchObj.jobs!.push({ name, grade })
-        })
+      department.jobs.forEach((job) => {
+        if (!job) return
+        const { name, grade,
+          jWillDelete, jWillPatch, jIsNew,
+        } = job
+        if (jWillDelete || !name) return
+        if (jWillPatch || jIsNew) isJobsChanged = true
+        patchObj.jobs!.push({ name, grade })
+      })
 
       if (!dWillPatch && !isJobsChanged) return;
-  
+
       patchArr.push(patchObj)
     })
     return patchArr

@@ -58,6 +58,11 @@ a {
   box-sizing: border-box;
 }
 
+input::placeholder {
+  // color: $colorBorder01;
+  color: #c1c1c1;
+}
+
 .ant-modal {
   .ant-btn {
     > span {

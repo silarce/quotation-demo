@@ -2,7 +2,7 @@
 
 .container {
   :global(.ant-modal-content) {
-    width: 720px;
+    width: 800px;
     height: 490px;
     padding: 19px 30px;
     padding-top: 19px;
@@ -43,7 +43,7 @@
 }
 .listItem {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 70px;
+  grid-template-columns: 100px 1fr 1fr 70px;
   height: 54px;
   padding: 0 46px;
   gap: 60px;

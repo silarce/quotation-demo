@@ -4,6 +4,9 @@
 
 import { useState, useEffect } from "react"
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer"
+
 // component
 import Header from "components/page/setting/hrManage/header/header"
 import Card from "components/page/setting/hrManage/card/card"
@@ -123,11 +126,11 @@ export default function ErpFuncPermissions() {
 
   // --------------------------------------------------------------------------
   return (
-    <div className={scss.container}>
+    <SubLayer>
 
       <Header />
 
-      <div className={scss.mainContainer}>
+      <div className={scss.body}>
         <div>
           {erpArr.map((erp, index) => {
 
@@ -171,7 +174,7 @@ export default function ErpFuncPermissions() {
         onCancel={() => cancelDelete()}
       />
 
-    </div>
+    </SubLayer>
   )
 }
 
