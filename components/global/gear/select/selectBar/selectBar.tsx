@@ -84,7 +84,9 @@ export default function SelectBar(
         // 如果selectProps.value == false就轉為null
         // 如果是字串，就轉為Toption的型態
         let selValue = props.value
-        if (/string|number/.test(typeof selValue)) {
+
+        if (!selValue) selValue = null
+        else if (/string|number/.test(typeof selValue)) {
           selValue = props.options.find((item) => item.value === selValue)
             ?? { label: selValue as string, value: selValue as string }
         }

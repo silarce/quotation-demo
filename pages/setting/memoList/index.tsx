@@ -1,9 +1,6 @@
 // 公司職等職稱
 // 公司職等職稱
-import {
-  ChangeEvent, Dispatch, SetStateAction, MouseEvent,
-  useState, useEffect,
-} from "react"
+import { useState, } from "react"
 
 const _ = require("lodash")
 
