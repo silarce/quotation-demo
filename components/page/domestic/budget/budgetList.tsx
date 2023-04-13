@@ -1,9 +1,6 @@
-import {
-  useState,
-  MouseEvent
-} from 'react';
-
+import { useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
+import classNames from 'classnames';
 
 // components
 import Thead from './budgetList/thead';
@@ -31,9 +28,10 @@ const { Panel } = Collapse
 
 
 
-export default function BudgetList({ budgetList }:
+export default function BudgetList({ budgetList, className }:
   {
     budgetList: TbudgetList
+    className?: string
   }) {
   const router = useRouter()
 
@@ -50,7 +48,8 @@ export default function BudgetList({ budgetList }:
 
 
   return (
-    <div className={style.container}>
+    // <div className={style.container}>
+    <div className={classNames(style.container, className)}>
       <Thead />
 
       <Collapse
@@ -80,8 +79,8 @@ export default function BudgetList({ budgetList }:
             </Panel>
           )
         })}
-
       </Collapse>
+
     </div >
   )
 }

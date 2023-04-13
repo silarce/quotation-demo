@@ -1,7 +1,7 @@
 @use "styles/theme01" as *;
 
 .container {
-  padding: 4px;
+  // padding: 4px;
   :global(.ant-collapse) {
     border: none;
   }

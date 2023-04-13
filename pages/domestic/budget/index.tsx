@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useRouter } from "next/router";
 
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
@@ -24,8 +26,11 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 // fakeData
 // fake
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
+
 // type
 import { Toption } from "components/global/gear/select/select03"
+
+type Trouter = ReturnType<typeof useRouter>
 
 // ===========================================
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
@@ -58,7 +63,7 @@ export default function Budget() {
   })
 
 
-  // ===================================================
+// ----------------------------------------------------------
   // panelList
 
   const searchTargetList = [
@@ -102,7 +107,7 @@ export default function Budget() {
     doSearch
   }
 
-  // -----------------------
+// ----------------------------------------------------------
 
   const panelList: TpanelList = [
     { searchGroup },
@@ -123,16 +128,71 @@ export default function Budget() {
     },
   ]
 
-  // ===================================================
+  // ----------------------------------------------------------
 
   return (
-    <div className={style.container}>
+    <SubLayer>
       {/* header panel */}
       <PageHeader02 tag="預算" panelList={panelList} />
       {/*  */}
-      <div className={style.mainContainer}>
-        <BudgeList budgetList={projectArr} />
+      <div >
+        <ApprovalsBar router={router} />
+        <BudgeList className="m-[4px] mt-0"
+          budgetList={projectArr} />
       </div>
+    </SubLayer>
+  )
+}
+
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+
+const ApprovalsBar = (
+  { router }:
+    { router: Trouter }
+) => {
+  const query = router.query
+  const linkList = [
+    {
+      label: "待審核",
+      href: {
+        pathname: "",
+        query: {
+          ...query,
+          approvalsStatus: "待審核"
+        }
+      },
+      isActive: query.approvalsStatus === "待審核"
+    },
+    {
+      label: "審核中",
+      href: {
+        pathname: "",
+        query: {
+          ...query,
+          approvalsStatus: "審核中"
+        }
+      },
+      isActive: query.approvalsStatus === "審核中"
+    },
+    {
+      label: "審核完成",
+      href: {
+        pathname: "",
+        query: {
+          ...query,
+          approvalsStatus: "審核完成"
+        }
+      },
+      isActive: query.approvalsStatus === "審核完成"
+    },
+  ]
+
+  return (
+    <div className={style.approvalsBar}>
+      <PageHeader02 linkList={linkList} />
     </div>
   )
 }

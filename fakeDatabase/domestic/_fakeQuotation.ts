@@ -38,6 +38,7 @@ type Tquotation = {
     siteProgress: string // 工地進度 輸入字串
     quoStatus: "預算" | "投標" | "發包" | "合約" // 報價單狀態，會使報價單出現在不同的頁面
     // doorType :string // doorType可能是複數，還不確定怎麼不處理
+    approvalStatus: "待審核" | "審核中" | "審核完成" // 審核狀態
   }
   // ---------------------------------------------------------
   mainProductArr: {
@@ -135,6 +136,7 @@ const fakeQuotationDataList: TquotationList = {
       trackingStatus: "", // 追蹤狀態 輸入字串
       siteProgress: "", //  工地進度 輸入字串
       quoStatus: "預算",
+      approvalStatus: "待審核",
     },
     // ---------------------------------------------------------
     mainProductArr: [
@@ -281,6 +283,7 @@ const emptyQuotation: Tquotation = {
     trackingStatus: "", // 追蹤狀態 輸入字串
     siteProgress: "", //  工地進度 輸入字串
     quoStatus: "預算",
+    approvalStatus: "待審核"
   },
   // ---------------------------------------------------------
   mainProductArr: [
