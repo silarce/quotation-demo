@@ -3,9 +3,10 @@ import {
   useState, Fragment, useEffect
 } from "react"
 import classNames from "classnames"
-
 import Link from "next/link"
 import { useRouter } from "next/router"
+
+
 // global gear
 import MyButton from "components/global/gear/button/myButton"
 import RedButton from "components/global/gear/button/redButton"
@@ -21,6 +22,7 @@ import style from "./pageHeader02.module.scss"
 // type
 import { TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar"
 
+type Thref = React.ComponentProps<typeof Link>["href"];
 // ========================================================
 
 // type
@@ -31,7 +33,7 @@ interface Ttag {
 
 interface Tlink {
   label: string
-  href: string
+  href: Thref
   isActive?: boolean
 }
 
