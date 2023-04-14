@@ -145,20 +145,24 @@ const sidePathList: TsidePathList = {
           label: "統計表",
           list: [
             {
-              label: "業績統計表",
-              path: path01 + "/unSet",
+              label: "報價統計表",
+              path: path01 + "/quoteStatistics",
             },
             {
               label: "個人業績統計表",
-              path: path01 + "/unSet",
+              path: path01 + "/personalPerformanceStatistics",
+            },
+            {
+              label: "全區業績統計表",
+              path: path01 + "/districtPerformanceStatistics",
             },
             {
               label: "追加工程統計表",
-              path: path01 + "/unSet",
+              path: path01 + "/additionalEngineeringStatistics",
             },
             {
-              label: "報價統計表",
-              path: path01 + "/unSet",
+              label: "年度業績統計表",
+              path: path01 + "/annualPerformanceStatistics",
             },
           ]
         },
