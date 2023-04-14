@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from "next/router";
 import _ from "lodash"
+import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -13,7 +14,7 @@ import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 import BudgeList from "components/page/domestic/budget/budgetList"
 
 // css
-import style from "./budget.module.scss"
+import scss from "./budget.module.scss"
 
 // option
 import { optionsCreator_doorType } from 'fakeDatabase/options/options';
@@ -213,7 +214,7 @@ const ApprovalsBar = (
   ]
 
   return (
-    <div className={style.approvalsBar}>
+    <div className={scss.approvalsBar}>
       <PageHeader02 linkList={linkList} />
     </div>
   )

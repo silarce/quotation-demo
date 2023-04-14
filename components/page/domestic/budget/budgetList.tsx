@@ -1,4 +1,4 @@
-import { useState, MouseEvent } from 'react';
+import { useState, MouseEvent, createContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -6,24 +6,21 @@ import classNames from 'classnames';
 import Thead from './budgetList/thead';
 import PanelHeader from './budgetList/panelHeader';
 import PanelBody from './budgetList/panelBody';
-
 // antd
 import { Collapse } from 'antd';
-
 // css
 import style from "./budgetList.module.scss"
-
-
-
-
 // fake
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
-
 type TbudgetList = ReturnType<(typeof fakeApi_projectSimple)["get"]>
 
-
 const { Panel } = Collapse
+// ========================
+type TbudgetListContext = {
+  approvalsStatus: TbudgetList[number]["basicInfo"]["approvalStatus"]
+}
+export const budgetListContext = createContext<TbudgetListContext>(null!)
 // ========================
 
 
@@ -34,7 +31,8 @@ export default function BudgetList({ budgetList, className }:
     className?: string
   }) {
   const router = useRouter()
-
+  const approvalsStatus =
+    (router.query.approvalsStatus ?? "待審核") as TbudgetListContext["approvalsStatus"]
   // ----------------------------------------------------------------
 
 
@@ -58,27 +56,31 @@ export default function BudgetList({ budgetList, className }:
         destroyInactivePanel={true}
         onChange={changeActive}
       >
-        {budgetList.map((item, index) => {
-          const { tempRecord, } = item
-          const { quotationId, } = item.basicInfo
-          const isActive = activeIndex === index
+        <budgetListContext.Provider value={{ approvalsStatus: approvalsStatus }}>
+          {budgetList.map((item, index) => {
+            const { tempRecord, } = item
+            const { quotationId, } = item.basicInfo
+            const isActive = activeIndex === index
 
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation()
-            router.push({
-              pathname: "/domestic/budget/quotation",
-              query: { quotationId }
-            })
-          }
+            const openQuotation = (e: MouseEvent) => {
+              e.stopPropagation()
+              router.push({
+                pathname: "/domestic/budget/quotation",
+                query: { quotationId }
+              })
+            }
 
-          return (
-            <Panel key={index} className={style.panel}
-              header={<PanelHeader projectData={item} isActive={isActive} openQuotation={openQuotation} />}
-            >
-              <PanelBody projectSimpleRecord={tempRecord} openQuotation={openQuotation} />
-            </Panel>
-          )
-        })}
+            return (
+
+              <Panel key={index} className={style.panel}
+                header={<PanelHeader projectData={item} isActive={isActive} openQuotation={openQuotation} />}
+              >
+                <PanelBody projectSimpleRecord={tempRecord} openQuotation={openQuotation} />
+              </Panel>
+
+            )
+          })}
+        </budgetListContext.Provider>
       </Collapse>
 
     </div >
