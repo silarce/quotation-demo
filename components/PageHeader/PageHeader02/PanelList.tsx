@@ -85,7 +85,7 @@ export default function PanelList({ panelList }:
 
   if (!panelList[0]) return null
   return (
-    <div className={scss.buttonBox}>
+    <div className={scss.panelList}>
       {panelList.map((item, index) => {
         if (!item) return null
         // 客製化panel
