@@ -47,7 +47,7 @@ class Class_basicInfo {
     key: keyof Omit<typeof this._basicInfo,
       "tempQuotationAging" | "totalDiscount" |
       "tempDoorQty" | "tempBudgetAmount" |
-      "quoStatus">,
+      "quoStatus"| "approvalStatus">,
     value: string
   ) => {
     this._basicInfo[key] = value
