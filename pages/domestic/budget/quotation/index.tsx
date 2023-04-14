@@ -27,7 +27,7 @@ import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/qu
 // import { Button, Dropdown, Space } from 'antd';
 
 // global gear
-import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 // import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import Select03, { TcusStyleObj } from "components/global/gear/select/select03"
 // import InputModal from "components/global/gear/modal/simpleModal/inputModal"

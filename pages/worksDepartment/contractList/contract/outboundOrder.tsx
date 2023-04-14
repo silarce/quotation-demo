@@ -12,7 +12,7 @@ import OrderTable from "components/page/worksDepartment/contracList/contract/out
 import style from "./contract.module.scss"
 
 // type
-import { TpanelList } from "components/PageHeader/pageHeader02"
+import { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 
 
 

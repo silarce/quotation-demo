@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components

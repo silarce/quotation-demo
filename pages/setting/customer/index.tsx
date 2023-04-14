@@ -14,7 +14,7 @@ import CustomerList from "components/page/setting/customer/customerList"
 import { Pagination } from 'antd';
 
 // global gear
-import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
