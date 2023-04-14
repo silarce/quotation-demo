@@ -23,7 +23,7 @@ import { TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar"
 
 
 // 各種按鈕，可以變更或加上icon
-interface Tpanel01 {
+interface Tpanel_btn {
   type: "myButton" | "redButton" | "addButton" | "exportButton"
   label: string
   onClick: () => void
@@ -35,7 +35,7 @@ interface Tpanel01 {
 }
 
 // 搜尋input
-interface Tpanel02 {
+interface Tpanel_inpusearch {
   type: "inputSearch"
   placeholder: string
   onClick: (value: string) => void
@@ -50,7 +50,7 @@ interface Tpanel02 {
 }
 
 // 客製化元件
-interface Tpanel03 {
+interface Tpanel_custom {
   custom: JSX.Element
   type?: undefined
   label?: undefined
@@ -75,7 +75,7 @@ interface TpanelSearchBar {
 
 
 export type TpanelList = (
-  Tpanel01 | Tpanel02 | Tpanel03 | TpanelSearchBar | null
+  Tpanel_btn | Tpanel_inpusearch | Tpanel_custom | TpanelSearchBar | null
 )[]
 
 

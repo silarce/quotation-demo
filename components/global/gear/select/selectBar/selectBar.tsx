@@ -1,6 +1,5 @@
-import {
-  CSSProperties, FocusEvent,
-} from "react"
+import { CSSProperties, FocusEvent, } from "react"
+import classNames from "classnames";
 
 import Select, { Options, SingleValue, ActionMeta } from 'react-select';
 
@@ -42,12 +41,14 @@ export default function SelectBar(
   {
     selectPropsArr,
     disabled,
-    style
+    style,
+    className,
   }:
     {
       selectPropsArr: TselectProps[]
       disabled?: boolean | undefined
       style?: CSSProperties
+      className?: string
     }
 ) {
 
@@ -63,7 +64,7 @@ export default function SelectBar(
 
   // ------------------------------------------------------------------------
   return (
-    <div className={scss.selectBar}>
+    <div className={classNames(scss.selectBar, className)}>
 
       {selectPropsArr.map((props, index) => {
         const {
