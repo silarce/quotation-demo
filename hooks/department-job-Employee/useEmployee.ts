@@ -373,9 +373,6 @@ class Class_employee {
       retuenUndefined: true,
     })
 
-    console.log(this._employeeData.birthday)
-    console.log(birthday)
-
     const startDate = yearConversion_chToStandard({
       dateString: this._employeeData.startDate,
       retuenUndefined: true,
@@ -464,7 +461,6 @@ export {
   Class_employee, Class_JobGroup,
   useClassEmployee
 }
-
 
 
 // ======================================================
