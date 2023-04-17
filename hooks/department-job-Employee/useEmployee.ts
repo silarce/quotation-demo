@@ -1,16 +1,17 @@
 
 
 import { useState, useEffect } from "react";
-import { differenceInDays, parseISO, formatDuration, parse } from 'date-fns';
 import moment from "moment"
 
 import _ from "lodash"
 
+// tool
+import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
+import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
+
 // type
 import { TemployeeDto } from "js/api/api_employee";
-import { duration } from "@mui/material";
 type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
-
 
 
 class Class_employee {
@@ -27,6 +28,66 @@ class Class_employee {
 
     if (!this._employeeData.qualifications) this._employeeData.qualifications = []
 
+
+    this._employeeData.birthday = (() => {
+      if (!this._employeeData.birthday) return "";
+
+      
+      
+      const foo = yearConversion_standardToCh({
+        dateString: moment(this._employeeData.birthday).format("YYYY-MM-DD")
+      })
+      const bar = moment(foo).format("YYYY-MM-DD")
+      
+      // console.log(this._employeeData.birthday)
+      // console.log(moment(this._employeeData.birthday).format("YYYY-MM-DD"))
+      // console.log(foo)
+      // console.log(bar)
+
+      return bar
+    })()
+
+
+
+    this._employeeData.startDate = (() => {
+      if (!this._employeeData.startDate) return "";
+      const foo = yearConversion_standardToCh({
+        dateString: moment(this._employeeData.startDate).format("YYYY-MM-DD")
+      })
+      const bar = moment(foo).format("yyyy-MM-DD")
+      return bar
+    })()
+
+
+
+    this._employeeData.leaveDate = (() => {
+      if (!this._employeeData.leaveDate) return "";
+      const foo = yearConversion_standardToCh({
+        dateString: moment(this._employeeData.leaveDate).format("YYYY-MM-DD")
+      })
+      const bar = moment(foo).format("YYYY-MM-DD")
+      return bar
+    })()
+
+
+    this._employeeData.retireDate = (() => {
+      if (!this._employeeData.retireDate) return "";
+      const foo = yearConversion_standardToCh({
+        dateString: moment(this._employeeData.retireDate).format("YYYY-MM-DD")
+      })
+      const bar = moment(foo).format("YYYY-MM-DD")
+      return bar
+    })()
+
+
+    this._employeeData.severanceDate = (() => {
+      if (!this._employeeData.severanceDate) return "";
+      const foo = yearConversion_standardToCh({
+        dateString: moment(this._employeeData.severanceDate).format("YYYY-MM-DD")
+      })
+      const bar = moment(foo).format("YYYY-MM-DD")
+      return bar
+    })()
 
     this.classJobGroupArr
       = this._employeeData.jobs.map((job) => new Class_JobGroup(reRender, job))
@@ -306,10 +367,38 @@ class Class_employee {
     this._employeeData.qualifications
       = this.qualifications.filter((item) => !!item.name)
     this._reRender()
+
+    const birthday = yearConversion_chToStandard({
+      dateString: this._employeeData.birthday,
+      retuenUndefined: true,
+    })
+
+    const startDate = yearConversion_chToStandard({
+      dateString: this._employeeData.startDate,
+      retuenUndefined: true,
+    })
+    const leaveDate = yearConversion_chToStandard({
+      dateString: this._employeeData.leaveDate,
+      retuenUndefined: true,
+    })
+    const retireDate = yearConversion_chToStandard({
+      dateString: this._employeeData.retireDate,
+      retuenUndefined: true,
+    })
+    const severanceDate = yearConversion_chToStandard({
+      dateString: this._employeeData.severanceDate,
+      retuenUndefined: true,
+    })
+
     return {
       ...this._employeeData,
       idNumber: undefined, // 後端不收這個
       jobId: this.jobIdArr,
+      birthday,
+      startDate,
+      leaveDate,
+      retireDate,
+      severanceDate,
     }
   }
 
@@ -374,7 +463,6 @@ export {
 }
 
 
-
 // ======================================================
 const emptyDataOri = (): TemployeeDto_jobs => ({
   id: "",
@@ -410,8 +498,3 @@ const emptyDataOri = (): TemployeeDto_jobs => ({
   qualifications: [{ name: "", years: 0 }],
   jobs: [],
 })
-
-
-
-
-
