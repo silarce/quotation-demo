@@ -1,5 +1,4 @@
 
-
 import { useState, useEffect } from "react";
 import moment from "moment"
 
@@ -12,7 +11,6 @@ import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standa
 // type
 import { TemployeeDto } from "js/api/api_employee";
 type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
-
 
 class Class_employee {
   constructor(reRender: () => void, employeeDataOri: TemployeeDto_jobs) {
@@ -28,37 +26,30 @@ class Class_employee {
 
     if (!this._employeeData.qualifications) this._employeeData.qualifications = []
 
-
     this._employeeData.birthday = (() => {
-      if (!this._employeeData.birthday) return "";
+      const today = moment().format("yyyy-MM-DD")
+      this._employeeData.birthday = today
 
-      
-      
       const foo = yearConversion_standardToCh({
         dateString: moment(this._employeeData.birthday).format("YYYY-MM-DD")
       })
       const bar = moment(foo).format("YYYY-MM-DD")
-      
-      // console.log(this._employeeData.birthday)
-      // console.log(moment(this._employeeData.birthday).format("YYYY-MM-DD"))
-      // console.log(foo)
-      // console.log(bar)
 
       return bar
     })()
 
 
-
     this._employeeData.startDate = (() => {
-      if (!this._employeeData.startDate) return "";
+      const today = moment().format("yyyy-MM-DD")
+      this._employeeData.startDate = today
+
       const foo = yearConversion_standardToCh({
         dateString: moment(this._employeeData.startDate).format("YYYY-MM-DD")
       })
       const bar = moment(foo).format("yyyy-MM-DD")
+
       return bar
     })()
-
-
 
     this._employeeData.leaveDate = (() => {
       if (!this._employeeData.leaveDate) return "";
@@ -69,7 +60,6 @@ class Class_employee {
       return bar
     })()
 
-
     this._employeeData.retireDate = (() => {
       if (!this._employeeData.retireDate) return "";
       const foo = yearConversion_standardToCh({
@@ -78,7 +68,6 @@ class Class_employee {
       const bar = moment(foo).format("YYYY-MM-DD")
       return bar
     })()
-
 
     this._employeeData.severanceDate = (() => {
       if (!this._employeeData.severanceDate) return "";
