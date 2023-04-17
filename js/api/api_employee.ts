@@ -26,7 +26,7 @@ export type TpostEmployee = {
   "chName": string
   "enName": string
   "identity": string
-  "birthday": Date | undefined
+  "birthday": Date | undefined | string
   "gender": string
   "marital": string
   "education": string
