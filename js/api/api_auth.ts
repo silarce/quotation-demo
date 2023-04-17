@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { axi } from "./_axiosCreator";
+import _ from "lodash"
 
 // type
-import { TuserDto } from "./dtoTypes";
+import {
+  TuserDto,TuserDto_login,
+} from "./dtoTypes";
 
 
 // 登入
@@ -15,7 +19,7 @@ export const apiLogin =
     const api = "/auth/login"
     return axi.post(api, body)
       .then(({ data }) => {
-        return data as TuserDto
+        return data as TuserDto_login
       })
       .catch(err => Promise.reject(err))
   }
@@ -31,9 +35,26 @@ export const apiLogout = () => {
 // 取得使用者資料
 export const apiAuthMe = () => {
   const api = "/auth/me"
+  // 如果是admin帳號，不會有employee
   return axi.get(api)
     .then(({ data }) => data as TuserDto)
     .catch(err => Promise.reject(err))
+}
+
+export const useApiAuthMe = () => {
+  const [userInfo, setUserInfo] = useState<TuserDto>()
+  const updateUserInfo = async () => {
+    const res = await apiAuthMe()
+    if (res) {
+      if (res.employee) {
+        res.employee.jobs =
+          _.sortBy(res.employee.jobs, (job) => ["grade", "department.createdAt"])
+      }
+      setUserInfo(res)
+    }
+    return res
+  }
+  return { userInfo, setUserInfo, updateUserInfo }
 }
 
 /**  變更密碼 */

@@ -13,7 +13,7 @@ import Login from '../components/page/login'
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover'
 
 // api
-import { apiLogout, apiAuthMe } from 'js/api/api_auth'
+import { apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth'
 
 // css
 import '../styles/globals.scss'
@@ -23,9 +23,6 @@ import "react-big-calendar/lib/css/react-big-calendar.css" // 行事曆 UI用的
 
 // 全域moment語系轉換
 import 'moment/locale/zh-tw';
-
-
-
 
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -39,42 +36,50 @@ type AppPropsWithLayout = AppProps & {
 
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false)
-  const [isLoged, setIsLoged] = useState(false)
-  const router = appProps.router
-  // const firstPathname = router.pathname.split("/")[1]
 
+  // const router = appProps.router
+  // ----------------------------------------------------------------------------
   // 巢狀layout用的
   const getLayout = Component.getLayout ?? ((page) => page)
+  // ----------------------------------------------------------------------------
+  const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe()
 
   useEffect(() => {
     (async () => {
       // 檢查是否已登入
       try {
-        await apiAuthMe()
-        setIsLoged(true)
+        await updateUserInfo()
       }
       catch { }
       finally {
-        setTimeout(() => {
-          setReady(true)
-        }, 10);
+        setReady(true)
       }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // useEffect(() => {
-  //   if (isLoged && firstPathname === "login") router.push("/home")
-  //   if (!isLoged && ready) router.push("/login")
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isLoged, router.pathname])
+  // ----------------------------------------------------------------------------
 
-
+  const onLogin = async (
+    { account, password, }:
+      {
+        account: string
+        password: string
+      }
+  ) => {
+    try {
+      await apiLogin({ account, password })
+      await updateUserInfo()
+      // setIsLoged(true)
+    }
+    catch { myAlert.err({ title: "帳號或密碼錯誤" }) }
+  }
 
   // -----------------------------------------------------------------------
   const reqLogout = async () => {
     try {
       await apiLogout()
-      setIsLoged(false)
+      setUserInfo(undefined)
     }
     catch { myAlert.err({ title: "登出失敗" }) }
   }
@@ -95,13 +100,13 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   //   )
   // }
   // ------------------------------------------------------------------
-  if (!isLoged)
+  if (!userInfo)
     return (
       <>
         <Head>
           <title >三久ERP</title>
         </Head>
-        <Login setIsLoged={setIsLoged} />
+        <Login onLogin={onLogin} />
       </>
     )
   // ------------------------------------------------------------------
@@ -110,7 +115,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       <Head>
         <title>三久ERP</title>
       </Head>
-      <Layer reqLogout={reqLogout}>
+      <Layer reqLogout={reqLogout} userInfo={userInfo}>
         {getLayout(
           <Component {...pageProps} />
         )}

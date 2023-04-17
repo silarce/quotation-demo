@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 const _ = require("lodash")
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // component
 import EditEmployee from "components/page/setting/employees/editEmployee";
 
@@ -114,17 +117,17 @@ export default function AddEmployee() {
 
   if (isReady && classEmployee && departmentJobOptionGroup) {
     return (
-      <div className={style.container}>
+      <SubLayer>
         <PageHeader02 tag="人員資料"
           panelList={panelList}
         />
-        <div className={style.mainContainer}>
+        <div>
           <EditEmployee
             classEmployee={classEmployee}
             departmentJobOptionGroup={departmentJobOptionGroup}
           />
         </div>
-      </div>
+      </SubLayer>
     )
   }
 

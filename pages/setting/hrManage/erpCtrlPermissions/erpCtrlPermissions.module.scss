@@ -1,5 +1,4 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
 
 .header {
   position: relative;
@@ -16,9 +15,7 @@
   }
 }
 
-.mainContainer {
-  border: solid 1px $colorBorder01;
-}
+
 
 .main {
   padding: 3px;

@@ -174,15 +174,15 @@ const tableConfig
   = {
   "idNumber": {
     label: "員工編號",
-    width: "150px"
+    width: "120px"
   },
   "chName": {
     label: "姓名",
-    width: "150px"
+    width: "100px"
   },
   "phone1": {
     label: "電話",
-    width: "170px"
+    width: "110px"
   },
   "jobs": {
     label: "部門編號/部門名稱/職稱/職等",

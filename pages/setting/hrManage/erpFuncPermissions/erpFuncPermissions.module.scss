@@ -1,7 +1,7 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
 
-.mainContainer {
+
+.body {
   > div {
     padding: 38px 45px;
     display: grid;

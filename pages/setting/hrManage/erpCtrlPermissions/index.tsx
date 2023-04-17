@@ -9,6 +9,9 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/router";
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // component
 import Table from "components/page/setting/hrManage/table/table";
 import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
@@ -258,7 +261,7 @@ export default function ErpCtrlPermissions() {
 
   // ------------------------------------------------------------------------
   return (
-    <div className={scss.container}>
+    <SubLayer>
       <div className={scss.header}>
         <Header />
         <div className={scss.countBox}>
@@ -268,7 +271,7 @@ export default function ErpCtrlPermissions() {
         </div>
       </div>
 
-      <div className={scss.mainContainer} >
+      <div >
         <div className={scss.main}>
           {isReady &&
             <Table
@@ -301,7 +304,7 @@ export default function ErpCtrlPermissions() {
         onCancel={cancelDelete}
       />
 
-    </div>
+    </SubLayer>
   )
 }
 

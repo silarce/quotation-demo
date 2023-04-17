@@ -2,6 +2,9 @@
 import { useEffect, useState, } from "react";
 import { useRouter } from "next/router";
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+
 // component
 import EditCustomer from "components/page/setting/customer/editCustomer/editCustomer";
 
@@ -20,8 +23,6 @@ import {
 // hook
 import { useClassCustomer } from "hooks/customer/useCustomer";
 
-// css
-import style from "../customer.module.scss"
 
 const params: TapiGetCustomersParams = {
   populate: ["contacts"]
@@ -132,18 +133,18 @@ export default function Edit() {
 
   // =======================================================
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader02 tag="客戶列表"
         panelList={panelList}
       />
-      <div className={style.mainContainer}>
+      <div >
         {isReady &&
           <EditCustomer
             classCustomer={classCustomer}
             nameCheck={nameCheck} />
         }
       </div>
-    </div>
+    </SubLayer>
   )
 }
 

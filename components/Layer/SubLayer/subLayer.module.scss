@@ -1,0 +1,18 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-rows: min-content auto;
+  height: 100%;
+  .body {
+    position: relative;
+    border: solid 1px $colorBorder01;
+    overflow: auto;
+    scroll-behavior: smooth;
+    // > div {
+    //   height: 100%;
+    //   overflow: auto;
+    //   scroll-behavior: smooth;
+    // }
+  }
+}

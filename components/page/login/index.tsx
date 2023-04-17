@@ -1,18 +1,13 @@
-import {
-  Dispatch, SetStateAction,
-  useState
-} from "react"
+import { useState } from "react"
 
 import Image from "next/image"
-
-// component
-import Input02, { TeTextarea } from "components/global/gear/input/input02"
 
 // antd
 import { Button } from 'antd';
 
 // global gear
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import Input_pw from "components/global/gear/inputAndSel/Input_pw";
 
 // logo
 import logo from "public/image/logo/logoWithYear.svg"
@@ -21,20 +16,13 @@ import imgArc from "public/image/blueArc.svg"
 // img
 import Imgbanner from "public/image/loginBanner.png"
 
-// api
-import { apiLogin, apiLogout, apiAuthMe } from 'js/api/api_auth'
-
 // css
 import scss from "./login.module.scss"
 
 
-
-
-
-
 export default function Login(
-  { setIsLoged }:
-    { setIsLoged: Dispatch<SetStateAction<boolean>> }
+  { onLogin }:
+    { onLogin: (postBody: { account: string, password: string }) => {} }
 ) {
   const [isLoading, setIsLoading] = useState(false)
   const [account, setAccont] = useState("")
@@ -46,14 +34,11 @@ export default function Login(
     if (isLoading) return;
     try {
       setIsLoading(true)
-      await apiLogin({ account, password })
-      setIsLoged(true)
+      await onLogin({ account, password })
     }
     catch { myAlert.err({ title: "帳號或密碼錯誤" }) }
     finally { setIsLoading(false) }
   }
-
-
 
   return (
     <div className={scss.login}>
@@ -70,32 +55,28 @@ export default function Login(
       </div>
 
       <form className={scss.loginPanel}
-        onSubmit={() => { alert("test") }}>
+        onSubmit={() => { }}>
 
+        <Input_pw
+          value={account}
+          onChange={setAccont}
+          label={"帳號"}
+          inputType={"text"}
+          captionWidth="40px"
+          firstGap="50px"
+        />
+        <Input_pw
+          className="mt-[23px]"
+          value={password}
+          onChange={setPassword}
+          label={"密碼"}
+          inputType={"auto"}
+          captionWidth="40px"
+          firstGap="50px"
+        />
 
-        <Input02 className={scss.input02}
-          stateValue={account}
-          label="帳號"
-          labelWidth="40px"
-          gap="50px"
-          placeholder="請輸入帳號"
-          onChange={(e: TeTextarea) => setAccont(e.target.value)}
-          isInput={true}
-        />
-        <Input02 className={scss.input02}
-          stateValue={password}
-          label="密碼"
-          labelWidth="40px"
-          gap="50px"
-          placeholder="請輸入密碼"
-          onChange={(e: TeTextarea) => setPassword(e.target.value)}
-          isInput={true}
-          inputType="password"
-        />
-        {/* <button className={scss.btn}><span>登入</span></button> */}
         <Button className={scss.btn} loading={isLoading}
-          onClick={reqLog}
-        >
+          onClick={reqLog}>
           登入
         </Button>
       </form>
