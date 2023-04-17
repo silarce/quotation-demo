@@ -96,20 +96,29 @@
             }
           }
         }
+
         &.group03 {
-          display: flex;
-          flex-wrap: nowrap;
+          display: grid;
+          // grid-template-rows: auto;
           > div {
-            border-left: solid 1px $colorBorder01;
-            display: grid;
-            place-items: center;
-            > span {
-              font-size: 16px;
-              font-weight: 400;
-              color: $colorMain;
-            }
+            display: flex;
+            flex-wrap: nowrap;
+            border-top: solid 1px $colorBorder01;
             &:nth-of-type(1) {
-              border-left: 0;
+              border-top: 0;
+            }
+            > div {
+              border-left: solid 1px $colorBorder01;
+              display: grid;
+              place-items: center;
+              > span {
+                font-size: 16px;
+                font-weight: 400;
+                color: $colorMain;
+              }
+              &:nth-of-type(1) {
+                border-left: 0;
+              }
             }
           }
         }

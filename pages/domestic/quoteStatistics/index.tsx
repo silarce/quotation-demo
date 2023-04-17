@@ -90,7 +90,7 @@ export default function QuoteStatistics() {
         panelList={panelList} />
 
       <Table fakeDataArr={fakeDataArr} />
-      
+
     </SubLayer>
   )
 
@@ -110,10 +110,13 @@ export type TfakeData = {
     customerName: string
     contactPerson: string
     contactPhone: string
+    listPrice: string
+    bearPrice: string
+    percent: string
   }[]
-  listPrice: string
-  bearPrice: string
-  percent: string
+  // listPrice: string
+  // bearPrice: string
+  // percent: string
 }
 
 
@@ -122,23 +125,38 @@ const fakeDataOri01 = (): TfakeData => ({
   designDepartment: "賴文魁 三久",
   constructionName: "台中市台中地區農會四民辦事處新建工程",
   customer: [
-    { customerName: "昭雄營造", contactPerson: "王小明副理", contactPhone: "0987654321" },
+    {
+      customerName: "昭雄營造",
+      contactPerson: "王小明副理",
+      contactPhone: "0987654321",
+      listPrice: "1,373,614",
+      bearPrice: "841,913",
+      percent: "60%"
+    },
   ],
-  listPrice: "1,373,614",
-  bearPrice: "841,913",
-  percent: "60%"
 })
 const fakeDataOri02 = (): TfakeData => ({
   idNumber: "M-2222202",
   designDepartment: "賴文魁 三久",
   constructionName: "台中市台中地區農會四民辦事處新建工程",
   customer: [
-    { customerName: "昭雄營造", contactPerson: "王小明副理", contactPhone: "0987654321" },
-    { customerName: "勇立興建築", contactPerson: "王小明副理", contactPhone: "0987654321" },
+    {
+      customerName: "昭雄營造",
+      contactPerson: "王小明副理",
+      contactPhone: "0987654321",
+      listPrice: "1,373,614",
+      bearPrice: "841,913",
+      percent: "60%"
+    },
+    {
+      customerName: "勇立興建築",
+      contactPerson: "王小明副理",
+      contactPhone: "0987654321",
+      listPrice: "1,373",
+      bearPrice: "841",
+      percent: "40%"
+    },
   ],
-  listPrice: "1,373,614",
-  bearPrice: "841,913",
-  percent: "60%"
 })
 
 
