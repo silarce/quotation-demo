@@ -1,4 +1,6 @@
 
+// tool
+import { generateYearArray } from "js/tools/date/generateYearArray"
 
 // icon
 import iconDoorRail75 from "public/image/icon/doorRail/doorRail75.svg"
@@ -198,18 +200,92 @@ export const optionsCreator_quotationState =
   ]
 
 
+export const optionsCreator_month = (
+  { ch, emptyOption }:
+    {
+      ch?: boolean
+      emptyOption?: boolean
+    } = {}
+): Toption[] => {
+
+  const arrNumber = [
+    { value: "1", label: "1月" },
+    { value: "2", label: "2月" },
+    { value: "3", label: "3月" },
+    { value: "4", label: "4月" },
+    { value: "5", label: "5月" },
+    { value: "6", label: "6月" },
+    { value: "7", label: "7月" },
+    { value: "8", label: "8月" },
+    { value: "9", label: "9月" },
+    { value: "10", label: "10月" },
+    { value: "11", label: "11月" },
+    { value: "12", label: "12月" },
+  ]
+  const arrCh = [
+    { value: "1", label: "一月" },
+    { value: "2", label: "二月" },
+    { value: "3", label: "三月" },
+    { value: "4", label: "四月" },
+    { value: "5", label: "五月" },
+    { value: "6", label: "六月" },
+    { value: "7", label: "七月" },
+    { value: "8", label: "八月" },
+    { value: "9", label: "九月" },
+    { value: "10", label: "十月" },
+    { value: "11", label: "十一月" },
+    { value: "12", label: "十二月" },
+  ]
+  const optionArr = ch ? arrCh : arrNumber
+  if (emptyOption) optionArr.unshift({ value: "", label: "不拘" })
+  return optionArr
+}
+
+
+
+
+export const optionsCreator_region = (
+  { emptyOption }:
+    { emptyOption?: boolean } = {}
+): Toption[] => {
+  const optionArr = [
+    { value: "北部", label: "北部" },
+    { value: "中部", label: "中部" },
+    { value: "南部", label: "南部" },
+    { value: "東部", label: "東部" },
+  ]
+  if (emptyOption) optionArr.unshift({ value: "", label: "不拘" })
+  return optionArr
+}
+
+export const optionsCreator_year = (
+  {
+    startYear,
+    endYear,
+    emptyOption
+  }:
+    {
+      startYear?: number
+      endYear?: number
+      emptyOption?: boolean
+    } = {}
+): Toption[] => {
+  const yearArr = generateYearArray({ startYear, endYear }).reverse()
+  const optionArr = yearArr.map((year) => ({
+    value: year,
+    label: year + "年"
+  }))
+  if (emptyOption) optionArr.unshift({ value: "", label: "不拘" })
+  return optionArr
+}
+
+
 
 
 // export const optionsCreator_ =
 //   ():Toption[] => [
 
 //   ]
-
-
-
-
-
-
 
 
 

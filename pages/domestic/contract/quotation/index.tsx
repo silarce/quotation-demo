@@ -19,7 +19,7 @@ import { Collapse } from 'antd';
 const { Panel } = Collapse
 
 // global gear
-import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // hook

@@ -13,7 +13,7 @@ const _ = require("lodash")
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import InputSel from "components/global/gear/inputAndSel/inputSel"

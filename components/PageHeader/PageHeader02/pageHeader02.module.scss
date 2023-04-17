@@ -1,0 +1,73 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: space-between;
+  height: 58px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  > .prebuilt {
+    display: inline-block;
+    height: 100%;
+    > button,
+    > div,
+    > a {
+      position: relative;
+      display: inline-grid;
+      height: 100%;
+      padding: 0px 35px;
+      background-color: $bgc01;
+      > span {
+        font-weight: 400;
+        font-size: 18px;
+        color: $colorMain;
+        margin: auto;
+      }
+      > .bottomBar {
+        position: absolute;
+        bottom: -1px;
+        width: 100%;
+        border-width: 0 0 2px 0;
+        border-color: transparent;
+      }
+
+      &.active {
+        background-color: $chosenBgc01;
+        > .bottomBar {
+          border-color: $colorActive01;
+        }
+      }
+    }
+
+    > div {
+      padding: 0px 48px;
+      cursor: auto;
+      > .bottomBar {
+        border-color: $colorActive01;
+      }
+    }
+  }
+} // tagBox
+
+.right {
+  display: flex;
+}
+
+.panelList {
+  display: flex;
+  height: fit-content;
+  > * {
+    // display: inline-block;
+    margin: auto;
+    margin-left: 17px;
+    color: $colorMain;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+  }
+}

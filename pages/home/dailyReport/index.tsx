@@ -21,7 +21,7 @@ import {
 import { Badge } from "antd"
 
 // global gear
-import PageHeader02 from "components/PageHeader/pageHeader02"
+import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
 import MyButton from "components/global/gear/button/myButton"
 
 

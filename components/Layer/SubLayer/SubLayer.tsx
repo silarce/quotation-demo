@@ -3,6 +3,15 @@ import classNames from "classnames"
 
 import scss from "./subLayer.module.scss"
 
+
+
+/**
+ * 基本上children只收兩個ReactNode
+ * 
+ * 第三個以後會放在第二個children下面(不是裡面)
+ * 
+ * 第三個以後基本上是用來放position:absolute的元件(通常是Modal)
+ */
 export default function SubLayer(
   { children, className, bodyClassName }:
     {

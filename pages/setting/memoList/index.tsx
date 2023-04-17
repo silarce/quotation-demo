@@ -1,14 +1,11 @@
 // 公司職等職稱
 // 公司職等職稱
-import {
-  ChangeEvent, Dispatch, SetStateAction, MouseEvent,
-  useState, useEffect,
-} from "react"
+import { useState, } from "react"
 
 const _ = require("lodash")
 
 // glogal gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 // import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 // import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"

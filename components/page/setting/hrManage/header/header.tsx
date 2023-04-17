@@ -1,5 +1,5 @@
 
-import PageHeader02 from "components/PageHeader/pageHeader02";
+import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02";
 
 
 

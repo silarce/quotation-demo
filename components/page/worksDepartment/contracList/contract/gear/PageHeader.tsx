@@ -2,7 +2,7 @@ import React from "react"
 import { useRouter } from "next/router"
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import PageHeaderFlex01 from "components/PageHeader/pageHeaderFlex01"
 
 export type { TpanelList }
