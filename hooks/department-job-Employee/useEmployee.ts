@@ -266,6 +266,7 @@ class Class_employee {
     return this._employeeData.startDate
   }
   set startDate(v: string) {
+    if (!v) return;
     this._employeeData.startDate = v
     this._reRender()
   }
@@ -381,10 +382,10 @@ class Class_employee {
       idNumber: undefined, // 後端不收這個
       jobId: this.jobIdArr,
       birthday: birthday ?? "",
-      startDate: startDate,
-      leaveDate: leaveDate,
-      retireDate: retireDate,
-      severanceDate: severanceDate,
+      startDate: startDate ?? "",
+      leaveDate: leaveDate ?? "",
+      retireDate: retireDate ?? "",
+      severanceDate: severanceDate ?? "",
     }
   }
 
