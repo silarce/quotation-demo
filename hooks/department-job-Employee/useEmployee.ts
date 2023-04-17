@@ -27,14 +27,11 @@ class Class_employee {
     if (!this._employeeData.qualifications) this._employeeData.qualifications = []
 
     this._employeeData.birthday = (() => {
-      const today = moment().format("yyyy-MM-DD")
-      this._employeeData.birthday = today
-
+      if (!this._employeeData.birthday) return "";
       const foo = yearConversion_standardToCh({
         dateString: moment(this._employeeData.birthday).format("YYYY-MM-DD")
       })
       const bar = moment(foo).format("YYYY-MM-DD")
-
       return bar
     })()
 
@@ -383,11 +380,11 @@ class Class_employee {
       ...this._employeeData,
       idNumber: undefined, // 後端不收這個
       jobId: this.jobIdArr,
-      birthday,
-      startDate,
-      leaveDate,
-      retireDate,
-      severanceDate,
+      birthday: birthday ?? "",
+      startDate: startDate,
+      leaveDate: leaveDate,
+      retireDate: retireDate,
+      severanceDate: severanceDate,
     }
   }
 
