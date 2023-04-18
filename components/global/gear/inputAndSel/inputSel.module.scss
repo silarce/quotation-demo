@@ -28,11 +28,28 @@
     bottom: 0px;
     width: 100%;
     border-color: $colorMain;
+    &.isMust {
+      border-color: $colorActive01;
+    }
     &:global(.isFocus) {
       border-color: $colorActive01;
     }
     &:global(.invisible) {
       visibility: hidden;
+    }
+  }
+
+  .mustTip {
+    position: absolute;
+    right: calc(100% + 7px);
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 13px;
+    height: 16px;
+    > img {
+      width: 13px;
+      height: 16px;
     }
   }
 } //label

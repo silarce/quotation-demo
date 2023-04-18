@@ -5,11 +5,18 @@ import {
   useState
 } from "react"
 
+import classNames from "classnames";
+
+import Image from "next/image";
+
 // component
 import Input, { TinputProps } from "./cog/input";
 import MySelect, { TselectProps } from "./cog/mySelect";
 import Textarea, { TtextareaProps } from "./cog/textarea";
 import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
+
+// icon
+import iconMust from "public/image/icon/asterisk.svg"
 
 // css
 import scss from "./inputSel.module.scss"
@@ -34,14 +41,18 @@ export default function InputSel(
     disabled,
     presetStyle,
 
+    isMust,
+
     className,
     captionClassName,
     hrClassName,
+    mustTipClassName,
 
     inputProps,
     selectProps,
     textareaProps,
     datePickerProps,
+
   }:
     {
       label?: string
@@ -60,14 +71,19 @@ export default function InputSel(
       disabled?: boolean
       presetStyle?: "s01"
 
+      isMust?: boolean
+
       className?: string
       captionClassName?: string
       hrClassName?: string
+      mustTipClassName?: string
 
       inputProps?: TinputProps
       selectProps?: TselectProps
       textareaProps?: TtextareaProps
       datePickerProps?: TdatePickerProps
+
+
     }
 
 ) {
@@ -140,7 +156,7 @@ export default function InputSel(
       {inputProps &&
         <Input
           inputProps={inputProps}
-          placeholder={placeholder ?? `請輸入${label??""}`}
+          placeholder={placeholder ?? `請輸入${label ?? ""}`}
           setIsFocus={setIsFocus}
           disabled={disabled}
         />
@@ -149,7 +165,7 @@ export default function InputSel(
       {textareaProps &&
         <Textarea
           textareaProps={textareaProps}
-          placeholder={placeholder ?? `請輸入${label??""}`}
+          placeholder={placeholder ?? `請輸入${label ?? ""}`}
           setIsFocus={setIsFocus}
           disabled={disabled}
         />
@@ -158,7 +174,7 @@ export default function InputSel(
       {selectProps &&
         <MySelect
           selectProps={selectProps}
-          placeholder={placeholder ?? `請選擇${label??""}`}
+          placeholder={placeholder ?? `請選擇${label ?? ""}`}
           disabled={disabled}
         />
       }
@@ -174,9 +190,15 @@ export default function InputSel(
 
 
       {showBaseline !== "invisible" &&
-        <hr className={hrClasses}
+        <hr className={classNames(hrClasses, { [scss.isMust]: isMust })}
           style={hrStyle}
         />
+      }
+
+      {isMust &&
+        <div className={classNames(scss.mustTip, mustTipClassName)}>
+          <Image src={iconMust} alt="必填" />
+        </div>
       }
 
     </label>
