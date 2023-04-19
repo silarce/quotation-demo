@@ -1,5 +1,6 @@
 @use "styles/theme01" as *;
-@use "./select.module.scss" as *;
+// @use "./select.module.scss" as *;
+@use "components/deprecated/select/select.module.scss" as *;
 
 .label {
   display: block;
