@@ -1,10 +1,16 @@
 
-import {
-  CSSProperties, FocusEvent,
-} from "react"
+import { CSSProperties, FocusEvent, ComponentType } from "react"
+import classNames from "classnames";
 
 
-import Select, { Options, SingleValue, ActionMeta } from 'react-select';
+import Select,
+{
+  Options, SingleValue, ActionMeta, ClassNamesConfig,
+  OptionProps, DropdownIndicatorProps, SelectComponentsConfig
+}
+  from 'react-select';
+import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+
 
 // icon
 import iconArrowRed from "public/image/icon/arrow_down_red.svg"
@@ -15,25 +21,23 @@ import scss from "../inputSel.module.scss"
 // type
 import type { Toption } from "fakeDatabase/options/options"
 
-
-
-
 export type TselectProps = {
   value: Toption | string | number | null | undefined
   options: Toption[]
   className?: string
-  // onChange: (option: Toption | null, meta?: ActionMeta<Toption>) => void
   onChange: (option: SingleValue<Toption>, meta?: ActionMeta<Toption>) => void
   onFocus?: (e?: FocusEvent<HTMLInputElement>) => void
   onBlur?: (e?: FocusEvent<HTMLInputElement>) => void
-  /*不是className*/
-  classNames?: TselClassesObj
-
-
+  /**每個call back都要return classname */
+  // selClassNames?: ClassNamesConfig<Toption, false, GroupBase<Toption>>
+  selClassNames?: ClassNamesConfig<Toption, false, GroupBase<Toption>>
   selectRef?: React.LegacyRef<HTMLDivElement>
   openMenuOnFocus?: boolean
-  customComponents?: TselCustomComponents
-
+  /**
+   *  元件可以收一個參數，型別設定可以參考 mySelect.tsx裡的DropdownIndicator
+   * parameter的型別要從'react-select'引入
+  */
+  customComponents?: SelectComponentsConfig<Toption, false, GroupBase<Toption>>
   arrowType?: "red" | "black"
 }
 
@@ -72,17 +76,17 @@ export default function MySelect(
     onChange,
     onFocus,
     onBlur,
-    classNames,
+    selClassNames,
     selectRef,
     openMenuOnFocus,
     customComponents,
     arrowType,
   } = selectProps
 
-
   // 客製化元件
   // 箭頭
-  const DropdownIndicator = () => {
+  const DropdownIndicator = (foo: DropdownIndicatorProps<Toption, false, GroupBase<Toption>>) => {
+    console.log("foo", foo)
     if (disabled) return null
     const arrowImg = arrowType === "red" ? iconArrowRed.src
       : arrowType === "black" ? iconArrowBlack.src
@@ -93,98 +97,114 @@ export default function MySelect(
 
   // -------------------------------------------------------------------------
   return (
-    <div className={`${scss.selectBox} ${className}`} style={style}>
+    <div className={classNames(scss.selectBox, className)} style={style} >
       <Select
         isDisabled={disabled}
         value={value as Toption}
         placeholder={placeholder}
         options={options}
         onChange={onChange}
-        components={{ DropdownIndicator, ...customComponents }}
+        components={{
+          DropdownIndicator, ...customComponents,
+        }}
         unstyled={true}
         menuPortalTarget={document.getElementById("__next")}
         onFocus={onFocus}
         onBlur={onBlur}
-        // menuPosition={"fixed"}
-        // menuIsOpen={true} // 需要調整選單的CSS時就使用
+        menuPosition={"fixed"}
+        // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         classNames={{
-          container: (state) => `${scss.selContainer} ${classNames?.container ?? ""}`,
-          menu: (state) => `${scss.selMenu} ${classNames?.menu ?? ""}`,
-          placeholder: (state) => `${scss.selPlaceholder} ${classNames?.placeholder ?? ""}`,
-          singleValue: (state) => `${scss.selSingleValue} ${classNames?.singleValue ?? ""}`,
-          option: (state) => `${scss.selOption} ${classNames?.option ?? ""}`,
-          control: (state) => `${scss.selControl} ${classNames?.control ?? ""}`,
-          menuList: (state) => `${scss.selMenuList} ${classNames?.menuList ?? ""}`,
-          input: (state) => `${scss.input ?? ""} ${classNames?.input ?? ""}`,
+          container: (state) => classNames(scss.selContainer, selClassNames?.container?.(state)),
+          control: (state) => classNames(scss.selControl, selClassNames?.control?.(state)),
+          input: (state) => classNames(scss.input, selClassNames?.input?.(state)),
+          menu: (state) => classNames(scss.selMenu, selClassNames?.menu?.(state)),
+          menuList: (state) => classNames(scss.selMenuList, selClassNames?.menuList?.(state)),
+          option: (state) => classNames(scss.selOption, selClassNames?.option?.(state)),
+          placeholder: (state) => classNames(scss.selPlaceholder, selClassNames?.placeholder?.(state)),
+          singleValue: (state) => classNames(scss.selSingleValue, selClassNames?.singleValue?.(state)),
+          // ----------------
+          clearIndicator: (state) => classNames(selClassNames?.clearIndicator?.(state)),
+          dropdownIndicator: (state) => classNames(selClassNames?.dropdownIndicator?.(state)),
+          group: (state) => classNames(selClassNames?.group?.(state)),
+          groupHeading: (state) => classNames(selClassNames?.groupHeading?.(state)),
+          indicatorsContainer: (state) => classNames(selClassNames?.indicatorsContainer?.(state)),
+          indicatorSeparator: (state) => classNames(selClassNames?.indicatorSeparator?.(state)),
+          loadingIndicator: (state) => classNames(selClassNames?.loadingIndicator?.(state)),
+          loadingMessage: (state) => classNames(selClassNames?.loadingMessage?.(state)),
+          menuPortal: (state) => classNames(selClassNames?.menuPortal?.(state)),
+          multiValue: (state) => classNames(selClassNames?.multiValue?.(state)),
+          multiValueLabel: (state) => classNames(selClassNames?.multiValueLabel?.(state)),
+          multiValueRemove: (state) => classNames(selClassNames?.multiValueRemove?.(state)),
+          noOptionsMessage: (state) => classNames(selClassNames?.noOptionsMessage?.(state)),
+          valueContainer: (state) => classNames(selClassNames?.valueContainer?.(state)),
         }}
       />
-    </div>
+    </div >
   )
-
 }
-
-
 
 // =============================================================================
 
+// 以下留作參考，實際型別以上面的selectProps為主
+
 // Select 裡的子元件列表，這個列表用於classNames(不是className)
-type TselClassesObj = {
-  clearIndicator?: string
-  container?: string
-  control?: string
-  dropdownIndicator?: string
-  group?: string
-  groupHeading?: string
-  indicatorsContainer?: string
-  indicatorSeparator?: string
-  input?: string
-  loadingIndicator?: string
-  loadingMessage?: string
-  menu?: string
-  menuList?: string
-  menuPortal?: string
-  multiValue?: string
-  multiValueLabel?: string
-  multiValueRemove?: string
-  noOptionsMessage?: string
-  option?: string
-  placeholder?: string
-  singleValue?: string
-  valueContainer?: string
-}
+// type TselClassesObj = {
+//   clearIndicator?: string
+//   container?: string
+//   control?: string
+//   dropdownIndicator?: string
+//   group?: string
+//   groupHeading?: string
+//   indicatorsContainer?: string
+//   indicatorSeparator?: string
+//   input?: string
+//   loadingIndicator?: string
+//   loadingMessage?: string
+//   menu?: string
+//   menuList?: string
+//   menuPortal?: string
+//   multiValue?: string
+//   multiValueLabel?: string
+//   multiValueRemove?: string
+//   noOptionsMessage?: string
+//   option?: string
+//   placeholder?: string
+//   singleValue?: string
+//   valueContainer?: string
+// }
 
 
 // Select裡 可客制元件列表
-type Tcomponent
-  = (props?: { [key: string]: any }) => JSX.Element
+// type Tcomponent
+//   = (props?: { [key: string]: any }) => JSX.Element
 
-type TselCustomComponents = {
-  ClearIndicator?: Tcomponent
-  Control?: Tcomponent
-  DropdownIndicator?: Tcomponent
-  DownChevron?: Tcomponent
-  CrossIcon?: Tcomponent
-  Group?: Tcomponent
-  GroupHeading?: Tcomponent
-  IndicatorsContainer?: Tcomponent
-  IndicatorSeparator?: Tcomponent
-  Input?: Tcomponent
-  LoadingIndicator?: Tcomponent
-  Menu?: Tcomponent
-  MenuList?: Tcomponent
-  MenuPortal?: Tcomponent
-  LoadingMessage?: Tcomponent
-  NoOptionsMessage?: Tcomponent
-  MultiValue?: Tcomponent
-  MultiValueContainer?: Tcomponent
-  MultiValueLabel?: Tcomponent
-  MultiValueRemove?: Tcomponent
-  Option?: Tcomponent
-  Placeholder?: Tcomponent
-  SelectContainer?: Tcomponent
-  SingleValue?: Tcomponent
-  ValueContainer?: Tcomponent
-}
+// type TselCustomComponents = {
+//   ClearIndicator?: Tcomponent
+//   Control?: Tcomponent
+//   DropdownIndicator?: Tcomponent
+//   DownChevron?: Tcomponent
+//   CrossIcon?: Tcomponent
+//   Group?: Tcomponent
+//   GroupHeading?: Tcomponent
+//   IndicatorsContainer?: Tcomponent
+//   IndicatorSeparator?: Tcomponent
+//   Input?: Tcomponent
+//   LoadingIndicator?: Tcomponent
+//   Menu?: Tcomponent
+//   MenuList?: Tcomponent
+//   MenuPortal?: Tcomponent
+//   LoadingMessage?: Tcomponent
+//   NoOptionsMessage?: Tcomponent
+//   MultiValue?: Tcomponent
+//   MultiValueContainer?: Tcomponent
+//   MultiValueLabel?: Tcomponent
+//   MultiValueRemove?: Tcomponent
+//   Option?: Tcomponent
+//   Placeholder?: Tcomponent
+//   SelectContainer?: Tcomponent
+//   SingleValue?: Tcomponent
+//   ValueContainer?: Tcomponent
+// }
 
 
 

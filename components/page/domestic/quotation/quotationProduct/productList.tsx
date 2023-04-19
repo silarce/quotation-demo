@@ -247,10 +247,10 @@ export default function ProductList(
               options: options,
               onChange: onChange,
               arrowType: "black",
-              classNames: {
-                singleValue: style.inputSelSingleValue,
-                placeholder: style.inputSelPlaceholder,
-                input: style.inputSelInput
+              selClassNames: {
+                singleValue: () => style.inputSelSingleValue,
+                placeholder: () => style.inputSelPlaceholder,
+                input: () => style.inputSelInput
               }
             }}
           />
@@ -277,10 +277,10 @@ export default function ProductList(
               onChange: onChange,
               arrowType: "black",
               customComponents: customComponents,
-              classNames: {
-                singleValue: style.inputSelSingleValue,
-                placeholder: style.inputSelPlaceholder,
-                input: style.inputSelInput,
+              selClassNames: {
+                singleValue: () => style.inputSelSingleValue,
+                placeholder: () => style.inputSelPlaceholder,
+                input: () => style.inputSelInput,
               }
             }}
           />
