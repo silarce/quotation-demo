@@ -39,6 +39,8 @@ export type TselectProps = {
   */
   customComponents?: SelectComponentsConfig<Toption, false, GroupBase<Toption>>
   arrowType?: "red" | "black"
+
+  fontSize?: "12px" | "14px" | "16px" | "18px" | "20px"
 }
 
 // ==============================================================================
@@ -81,6 +83,7 @@ export default function MySelect(
     openMenuOnFocus,
     customComponents,
     arrowType,
+    fontSize,
   } = selectProps
 
   // 客製化元件
@@ -120,10 +123,24 @@ export default function MySelect(
           menuList: (state) => classNames(scss.selMenuList, selClassNames?.menuList?.(state)),
           option: (state) => {
             const isSelected = state.isSelected
-            return classNames(scss.selOption, { [scss.isSelected]: isSelected }, selClassNames?.option?.(state))
+            return classNames(
+              scss.selOption,
+              { [scss.isSelected]: isSelected },
+              selClassNames?.option?.(state),
+              { [scss[`fontSize${fontSize}`]]: fontSize },)
           },
-          placeholder: (state) => classNames(scss.selPlaceholder, selClassNames?.placeholder?.(state)),
-          singleValue: (state) => classNames(scss.selSingleValue, selClassNames?.singleValue?.(state)),
+          placeholder: (state) =>
+            classNames(
+              scss.selPlaceholder,
+              selClassNames?.placeholder?.(state),
+              { [scss[`fontSize${fontSize}`]]: fontSize },),
+          singleValue: (state) =>
+            classNames(
+              scss.selSingleValue,
+              selClassNames?.singleValue?.(state),
+              { [scss[`fontSize${fontSize}`]]: fontSize },
+            )
+          ,
           // ----------------
           clearIndicator: (state) => classNames(selClassNames?.clearIndicator?.(state)),
           dropdownIndicator: (state) => classNames(selClassNames?.dropdownIndicator?.(state)),
@@ -145,6 +162,22 @@ export default function MySelect(
     </div >
   )
 }
+
+// =============================================================================
+
+
+
+const fontSizeLookup = {
+  "12px": scss.fontSize12px,
+  "14px": scss.fontSize14px,
+  "16px": scss.fontSize16px,
+  "18px": scss.fontSize18px,
+  "20px": scss.fontSize20px,
+}
+
+
+
+
 
 // =============================================================================
 

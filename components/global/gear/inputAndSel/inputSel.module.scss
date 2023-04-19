@@ -111,7 +111,7 @@
   font-size: 18px;
   width: 100%;
   // color: $colorText;
-  color: pink;
+  // color: pink;
 }
 
 // ------------
@@ -147,7 +147,7 @@ div.selOption {
   // border-bottom: solid 1px $colorBorder01;
   white-space: nowrap;
   cursor: pointer;
-  
+
   &::after {
     content: "";
     position: absolute;
@@ -171,15 +171,43 @@ div.selOption {
   }
   &.isSelected {
     color: $colorActive01;
+    > span {
+      color: $colorActive01;
+    }
   }
 }
 
 .selPlaceholder {
   color: $colorBorder01;
+  font-weight: 400;
+  font-size: 18px;
 }
 
 .selSingleValue {
   color: $colorText;
+  font-weight: 400;
+  font-size: 18px;
+}
+
+.fontSize12px,
+div.fontSize12px {
+  font-size: 12px;
+}
+.fontSize14px,
+div.fontSize14px {
+  font-size: 14px;
+}
+.fontSize16px,
+div.fontSize16px {
+  font-size: 16px;
+}
+.fontSize18px,
+div.fontSize18px {
+  font-size: 18px;
+}
+.fontSize20px,
+div.fontSize20px {
+  font-size: 20px;
 }
 
 // .selContainer {
