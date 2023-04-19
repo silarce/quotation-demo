@@ -113,19 +113,17 @@
   // color: $colorText;
   color: pink;
 }
+
+// ------------
+// classNames
 .selContainer {
 }
+
 div.selControl {
   min-height: auto;
   cursor: pointer;
 }
 
-.selPlaceholder {
-  color: $colorBorder01;
-}
-.selSingleValue {
-  color: $colorText;
-}
 .selMenu {
   min-width: fit-content;
   background-color: #fff;
@@ -135,25 +133,99 @@ div.selControl {
 
 .selMenuList {
   min-width: fit-content;
-  padding: 0 12px;
+  // padding: 0 12px;
   background-color: #fff;
 }
 
 div.selOption {
-  padding: 10px 5px;
+  position: relative;
+  padding: 10px 17px;
+  padding-bottom: 11px; //配合::after的height
   color: $colorText;
   font-weight: 400;
   font-size: 18px;
-  border-bottom: solid 1px $colorBorder01;
+  // border-bottom: solid 1px $colorBorder01;
   white-space: nowrap;
   cursor: pointer;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - 34px); // 扣掉的px為.selOption左右paddin的和
+    height: 1px;
+    background-color: $colorBorder01;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+  }
 
   &:nth-last-of-type(1) {
-    border-bottom: none;
+    padding-bottom: 10px; //配合::after的height
+    &::after {
+      display: none;
+    }
   }
   &:hover {
+    // color: $colorMain;
+    background-color: $bgc01;
+  }
+  &.isSelected {
     color: $colorActive01;
   }
 }
+
+.selPlaceholder {
+  color: $colorBorder01;
+}
+
+.selSingleValue {
+  color: $colorText;
+}
+
+// .selContainer {
+// }
+
+// div.selControl {
+//   min-height: auto;
+//   cursor: pointer;
+// }
+
+// .selMenu {
+//   min-width: fit-content;
+//   background-color: #fff;
+//   box-sizing: border-box;
+//   filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
+// }
+
+// .selMenuList {
+//   min-width: fit-content;
+//   padding: 0 12px;
+//   background-color: #fff;
+// }
+
+// div.selOption {
+//   padding: 10px 5px;
+//   color: $colorText;
+//   font-weight: 400;
+//   font-size: 18px;
+//   border-bottom: solid 1px $colorBorder01;
+//   white-space: nowrap;
+//   cursor: pointer;
+
+//   &:nth-last-of-type(1) {
+//     border-bottom: none;
+//   }
+//   &:hover {
+//     color: $colorActive01;
+//   }
+// }
+
+// .selPlaceholder {
+//   color: $colorBorder01;
+// }
+
+// .selSingleValue {
+//   color: $colorText;
+// }
 
 // =================================================================

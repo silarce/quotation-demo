@@ -86,7 +86,6 @@ export default function MySelect(
   // 客製化元件
   // 箭頭
   const DropdownIndicator = (foo: DropdownIndicatorProps<Toption, false, GroupBase<Toption>>) => {
-    console.log("foo", foo)
     if (disabled) return null
     const arrowImg = arrowType === "red" ? iconArrowRed.src
       : arrowType === "black" ? iconArrowBlack.src
@@ -112,14 +111,18 @@ export default function MySelect(
         onFocus={onFocus}
         onBlur={onBlur}
         menuPosition={"fixed"}
-        // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
+        menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         classNames={{
           container: (state) => classNames(scss.selContainer, selClassNames?.container?.(state)),
           control: (state) => classNames(scss.selControl, selClassNames?.control?.(state)),
-          input: (state) => classNames(scss.input, selClassNames?.input?.(state)),
+          // input: (state) => classNames(scss.input, selClassNames?.input?.(state)),
           menu: (state) => classNames(scss.selMenu, selClassNames?.menu?.(state)),
           menuList: (state) => classNames(scss.selMenuList, selClassNames?.menuList?.(state)),
-          option: (state) => classNames(scss.selOption, selClassNames?.option?.(state)),
+          option: (state) => {
+            const isSelected = state.isSelected
+
+            return classNames(scss.selOption, { [scss.isSelected]: isSelected }, selClassNames?.option?.(state))
+          },
           placeholder: (state) => classNames(scss.selPlaceholder, selClassNames?.placeholder?.(state)),
           singleValue: (state) => classNames(scss.selSingleValue, selClassNames?.singleValue?.(state)),
           // ----------------
@@ -129,6 +132,7 @@ export default function MySelect(
           groupHeading: (state) => classNames(selClassNames?.groupHeading?.(state)),
           indicatorsContainer: (state) => classNames(selClassNames?.indicatorsContainer?.(state)),
           indicatorSeparator: (state) => classNames(selClassNames?.indicatorSeparator?.(state)),
+          input: (state) => classNames(selClassNames?.input?.(state)),
           loadingIndicator: (state) => classNames(selClassNames?.loadingIndicator?.(state)),
           loadingMessage: (state) => classNames(selClassNames?.loadingMessage?.(state)),
           menuPortal: (state) => classNames(selClassNames?.menuPortal?.(state)),
