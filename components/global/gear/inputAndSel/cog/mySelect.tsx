@@ -111,7 +111,7 @@ export default function MySelect(
         onFocus={onFocus}
         onBlur={onBlur}
         menuPosition={"fixed"}
-        menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
+        // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         classNames={{
           container: (state) => classNames(scss.selContainer, selClassNames?.container?.(state)),
           control: (state) => classNames(scss.selControl, selClassNames?.control?.(state)),
@@ -120,7 +120,6 @@ export default function MySelect(
           menuList: (state) => classNames(scss.selMenuList, selClassNames?.menuList?.(state)),
           option: (state) => {
             const isSelected = state.isSelected
-
             return classNames(scss.selOption, { [scss.isSelected]: isSelected }, selClassNames?.option?.(state))
           },
           placeholder: (state) => classNames(scss.selPlaceholder, selClassNames?.placeholder?.(state)),
