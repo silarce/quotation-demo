@@ -27,11 +27,11 @@ import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi"
 import {
   optionsCreator_prodClass,
   optionsCreator_doorType,
-  optionsCreator_doorForm,
+  // optionsCreator_doorForm,
   Toption
 } from "fakeDatabase/options/options"
-const optionsProdClass = optionsCreator_prodClass()
-const optionsDoorType = optionsCreator_doorType()
+const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
+const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
 // const optionsDoorForm = optionsCreator_doorForm()
 
 

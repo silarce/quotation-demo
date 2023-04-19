@@ -30,9 +30,9 @@ import {
   optionsCreator_doorForm,
   Toption
 } from "fakeDatabase/options/options"
-const optionsProdClass = optionsCreator_prodClass()
-const optionsDoorType = optionsCreator_doorType()
-const optionsDoorForm = optionsCreator_doorForm()
+const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
+const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
+const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
 
 
 
