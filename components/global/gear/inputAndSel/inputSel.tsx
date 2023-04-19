@@ -21,6 +21,7 @@ import iconMust from "public/image/icon/asterisk.svg"
 // css
 import scss from "./inputSel.module.scss"
 
+export type { TselectProps }
 
 
 // =============================================================================
