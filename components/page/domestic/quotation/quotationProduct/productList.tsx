@@ -247,6 +247,7 @@ export default function ProductList(
               options: options,
               onChange: onChange,
               arrowType: "black",
+              fontSize:"16px",
               selClassNames: {
                 singleValue: () => style.inputSelSingleValue,
                 placeholder: () => style.inputSelPlaceholder,
@@ -276,6 +277,7 @@ export default function ProductList(
               options: options,
               onChange: onChange,
               arrowType: "black",
+              fontSize:"16px",
               customComponents: customComponents,
               selClassNames: {
                 singleValue: () => style.inputSelSingleValue,
