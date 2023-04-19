@@ -1,6 +1,6 @@
 
 // global gear
-import Select03 from "components/global/gear/select/select03"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // css
 import style from "./quotationComponent.module.scss"
@@ -22,7 +22,7 @@ const optionsObj: {
 }
 
 // type
-import { Class_quotation,  TpartSelectCellType } from "hooks/quotation/useQuotation";
+import { Class_quotation, TpartSelectCellType } from "hooks/quotation/useQuotation";
 
 // =========================================================
 export default function QuotationComponent(
@@ -125,10 +125,14 @@ export default function QuotationComponent(
                   }
                   return (
                     <div className={styleL.column} key={cIndex} style={theStyle}>
-                      <Select03
-                        stateValue={item as Toption}
-                        options={optionsObj[key]}
-                        onChange={onChange}
+                      <InputSel
+                        selectProps={{
+                          value: item,
+                          options: optionsObj[key],
+                          onChange,
+                          arrowType: "black",
+                          fontSize:"16px"
+                        }}
                         disabled={disabled}
                       />
                     </div>
