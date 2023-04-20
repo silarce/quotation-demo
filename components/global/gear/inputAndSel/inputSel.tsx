@@ -20,6 +20,7 @@ import iconMust from "public/image/icon/asterisk.svg"
 
 // css
 import scss from "./inputSel.module.scss"
+import { CssBaselineProps } from "@mui/material";
 
 export type { TselectProps }
 
@@ -32,6 +33,7 @@ export default function InputSel(
     placeholder,
 
     captionWidth,
+    captionColor,
     width,
     gap,
     padding,
@@ -62,6 +64,7 @@ export default function InputSel(
       width?: CSSProperties["width"]
       gap?: CSSProperties["gap"]
       captionWidth?: CSSProperties["width"]
+      captionColor?: "main"
       padding?: CSSProperties["padding"]
       margin?: CSSProperties["margin"]
       hrColor?: CSSProperties["borderColor"]
@@ -129,7 +132,10 @@ export default function InputSel(
     return `${scss.label} ${className ?? ""}`
   })()
   const captionClasses = (() => {
-    return `${scss.caption} ${captionClassName ?? ""}`
+    return classNames(
+      scss.caption, captionClassName,
+      { [scss.colorMain]: captionColor === "main" }
+    )
   })()
   const hrClasses = (() => {
     const classIsFocus = (isFocus || "") && "isFocus"

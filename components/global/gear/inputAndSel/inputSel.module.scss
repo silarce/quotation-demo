@@ -19,6 +19,10 @@
     align-self: flex-start;
     > span {
       display: block;
+      color: inherit;
+    }
+    &.colorMain {
+      color: $colorMain;
     }
   }
 
@@ -193,6 +197,7 @@ div.selOption {
   font-size: 18px;
 }
 
+// ===========================
 .fontSize12px,
 div.fontSize12px {
   font-size: 12px;
@@ -213,51 +218,4 @@ div.fontSize18px {
 div.fontSize20px {
   font-size: 20px;
 }
-
-// .selContainer {
-// }
-
-// div.selControl {
-//   min-height: auto;
-//   cursor: pointer;
-// }
-
-// .selMenu {
-//   min-width: fit-content;
-//   background-color: #fff;
-//   box-sizing: border-box;
-//   filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
-// }
-
-// .selMenuList {
-//   min-width: fit-content;
-//   padding: 0 12px;
-//   background-color: #fff;
-// }
-
-// div.selOption {
-//   padding: 10px 5px;
-//   color: $colorText;
-//   font-weight: 400;
-//   font-size: 18px;
-//   border-bottom: solid 1px $colorBorder01;
-//   white-space: nowrap;
-//   cursor: pointer;
-
-//   &:nth-last-of-type(1) {
-//     border-bottom: none;
-//   }
-//   &:hover {
-//     color: $colorActive01;
-//   }
-// }
-
-// .selPlaceholder {
-//   color: $colorBorder01;
-// }
-
-// .selSingleValue {
-//   color: $colorText;
-// }
-
-// =================================================================
+// ===========================
