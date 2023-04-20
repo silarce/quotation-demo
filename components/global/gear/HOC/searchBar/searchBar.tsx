@@ -15,7 +15,7 @@ import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 import style from "./searchBar.module.scss"
 
 // type
-import { Toption } from "components/global/gear/select/select03"
+import { Toption } from "fakeDatabase/options/options"
 
 interface TsearchObj {
   [key: string]: string

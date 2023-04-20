@@ -14,7 +14,7 @@ import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 import scss from "./searchBar02.module.scss"
 
 // type
-import { Toption } from "components/global/gear/select/select03"
+import { Toption } from "fakeDatabase/options/options"
 
 
 export type TinputProps = {
