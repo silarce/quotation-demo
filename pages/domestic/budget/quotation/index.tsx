@@ -1,13 +1,12 @@
 // 報價單
 import React, {
   Dispatch, SetStateAction, FocusEvent,
-  useState, useMemo, useRef, useEffect
+  useState,  useRef, useEffect
 } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
-// import Select from 'react-select';
-// import type { GroupBase, } from 'react-select';
+
 
 
 // components
@@ -22,15 +21,9 @@ import QuotationSinature from "components/page/domestic/quotation/quotationSinat
 import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
 import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/quotationPdf_part"
 
-// antd
-// import type { MenuProps } from 'antd';
-// import { Button, Dropdown, Space } from 'antd';
-
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/pageHeader02"
-// import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
-import Select03, { TcusStyleObj } from "components/global/gear/select/select03"
-// import InputModal from "components/global/gear/modal/simpleModal/inputModal"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import TextareaModal from "components/global/gear/modal/simpleModal/textareaModal";
 
@@ -313,21 +306,6 @@ const QuotationStateSel = (
   const [isFocus, setIsFocus] = useState("")
   const [selIsOpen, setSelIsOpen] = useState<boolean | undefined>(undefined)
 
-  const customStyleObj: TcusStyleObj = {
-    menu: {
-      width: `172.38px`,
-      position: "relative",
-      right: "92px",
-      top: "3px",
-    },
-    menuList: {
-      width: "100%",
-    },
-    option: {
-      textAlign: "center"
-    },
-  }
-
   const onChange = (option: Toption | null) => {
     setQuotationState(option!)
     setIsFocus("")
@@ -366,15 +344,26 @@ const QuotationStateSel = (
         onClick={() => selRef.current.focus()}
       >
         <span>報價狀態 : </span>
-        <Select03 className={style.select03}
-          stateValue={quotationState}
-          options={options}
-          onChange={onChange}
-          customStyleObj={customStyleObj}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          selRef={selRef}
-          openMenuOnFocus={true}
+
+        <InputSel
+          className={style.select03}
+          showBaseline="invisible"
+          selectProps={{
+            value: quotationState,
+            options: options,
+            onChange: onChange,
+            selClassNames: {
+              menu: () => style.selMenu,
+              menuList: () => style.selMenuList,
+              option: () => style.selOption,
+            },
+            onFocus,
+            onBlur,
+            selectRef: selRef,
+            openMenuOnFocus: true,
+            fontSize: "16px",
+            arrowType: "black",
+          }}
         />
       </div>
 
