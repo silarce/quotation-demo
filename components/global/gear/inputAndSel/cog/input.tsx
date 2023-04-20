@@ -11,7 +11,7 @@ import scss from "../inputSel.module.scss"
 
 export type TinputProps = {
   value: string | number
-  onChange: (value: string) => void
+  onChange?: (value: string) => void
   className?: string
   attributes?: InputHTMLAttributes<HTMLInputElement>
   inputType?: HTMLInputTypeAttribute
@@ -54,7 +54,7 @@ export default function Input(
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange && onChange(e.target.value)}
         disabled={disabled}
         /*如果inputProps.attributes裡存在對應prop的話
         inputProps.attributes裡的prop會把上面對應的props蓋過去
