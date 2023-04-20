@@ -15,6 +15,7 @@ export type TinputProps = {
   className?: string
   attributes?: InputHTMLAttributes<HTMLInputElement>
   inputType?: HTMLInputTypeAttribute
+  
 }
 
 // ==============================================================================
