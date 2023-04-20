@@ -177,10 +177,14 @@ div.selOption {
   }
 }
 
-.selPlaceholder {
-  color: $colorBorder01;
+.selValueContainer {
+  color: $colorText;
   font-weight: 400;
   font-size: 18px;
+}
+
+.selPlaceholder {
+  color: $colorBorder01;
 }
 
 .selSingleValue {

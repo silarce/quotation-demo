@@ -134,19 +134,27 @@ export default function MySelect<
             return classNames(
               scss.selOption,
               { [scss.isSelected]: isSelected },
+              { [scss[`fontSize${fontSize}`]]: fontSize },
               selClassNames?.option?.(state),
-              { [scss[`fontSize${fontSize}`]]: fontSize },)
+            )
           },
+          valueContainer: (state) =>
+            classNames(
+              scss.selValueContainer,
+              { [scss[`fontSize${fontSize}`]]: fontSize },
+              selClassNames?.valueContainer?.(state)
+            ),
           placeholder: (state) =>
             classNames(
               scss.selPlaceholder,
+              { [scss[`fontSize${fontSize}`]]: fontSize },
               selClassNames?.placeholder?.(state),
-              { [scss[`fontSize${fontSize}`]]: fontSize },),
+            ),
           singleValue: (state) =>
             classNames(
               scss.selSingleValue,
-              selClassNames?.singleValue?.(state),
               { [scss[`fontSize${fontSize}`]]: fontSize },
+              selClassNames?.singleValue?.(state),
             )
           ,
           // ----------------
@@ -156,7 +164,6 @@ export default function MySelect<
           groupHeading: (state) => classNames(selClassNames?.groupHeading?.(state)),
           indicatorsContainer: (state) => classNames(selClassNames?.indicatorsContainer?.(state)),
           indicatorSeparator: (state) => classNames(selClassNames?.indicatorSeparator?.(state)),
-          input: (state) => classNames(selClassNames?.input?.(state)),
           loadingIndicator: (state) => classNames(selClassNames?.loadingIndicator?.(state)),
           loadingMessage: (state) => classNames(selClassNames?.loadingMessage?.(state)),
           menuPortal: (state) => classNames(selClassNames?.menuPortal?.(state)),
@@ -164,7 +171,7 @@ export default function MySelect<
           multiValueLabel: (state) => classNames(selClassNames?.multiValueLabel?.(state)),
           multiValueRemove: (state) => classNames(selClassNames?.multiValueRemove?.(state)),
           noOptionsMessage: (state) => classNames(selClassNames?.noOptionsMessage?.(state)),
-          valueContainer: (state) => classNames(selClassNames?.valueContainer?.(state)),
+          input: (state) => classNames(selClassNames?.input?.(state)),
         }}
       />
     </div >
