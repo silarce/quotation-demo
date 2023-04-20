@@ -1,15 +1,13 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
-import TimePicker01 from "components/global/gear/input/timePicker01"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // css
 import style from "./listOfDeliveryOrders.module.scss"
 
 // fake
 import type { Tprofile } from "pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit"
-
 
 
 
@@ -39,36 +37,37 @@ export default function Profile(
             })
           }
           return (
-            <TimePicker01 className={style.input02} key={index}
+            <InputSel className={style.input02} key={index}
+              datePickerProps={{
+                value: stateValue ?? "",
+                onChange,
+              }}
               label={label}
-              labelWidth="80px"
-              stateValue={stateValue}
-              onChange={onChange}
+              captionWidth="80px"
+              gap="40px"
               disabled={
                 !editable || key === "projectName" ? true : false
-              }
-            />
+              } />
           )
         }
         // -----
-        const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-          const value = e.target.value
+        const onChange = (v: string) => {
           setData(data => {
-            data[key] = value
+            data[key] = v
             return { ...data }
           })
         }
         return (
-          <Input02 className={style.input02} key={index}
+          <InputSel key={index} className={style.input02}
+            inputProps={{
+              value: stateValue ?? "",
+              onChange: onChange
+            }}
             label={label}
-            stateValue={stateValue}
-            onChange={onChange}
-            labelWidth="80px"
+            gap="40px"
+            captionWidth="80px"
             width={key === "projectName" ? "700px" : "255px"}
-            disabled={
-              !editable || key === "projectName" ? true : false
-            }
-          />
+            disabled={!editable || key === "projectName" ? true : false} />
         )
       })}
     </div>

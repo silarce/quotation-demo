@@ -67,7 +67,7 @@ const sidePathList: TsidePathList = {
             },
             {
               label: "人事權限管理",
-              path: path01 + "/hrManage",
+              path: path01 + "/hrManage/erpCtrlPermissions",
             },
           ]
         },

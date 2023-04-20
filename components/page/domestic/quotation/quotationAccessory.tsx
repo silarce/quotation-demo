@@ -1,17 +1,10 @@
-import {
-  useMemo,
-  Dispatch, SetStateAction
-} from "react"
-
-// global gear
-import Select03, { Toption } from "components/global/gear/select/select03"
 
 // css
-import style from "./quotationComponent.module.scss"
+// import style from "./quotationComponent.module.scss"
 import styleL from "./local.module.scss"
 
 // type
-import { TuseProduct } from "./hook/useProduct"
+// import { TuseProduct } from  "./hook/useProduct"
 
 
 // fake

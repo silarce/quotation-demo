@@ -3,7 +3,7 @@ import { useState } from "react"
 // global gear
 import ModalListSelectorWithSearch from "components/global/gear/modal/modalListSelectorWithSearch"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-import Input03 from "components/global/gear/input/input03"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // icon
@@ -67,7 +67,7 @@ export default function TextListEditor(
   }
 
   const onConfirm = () => {
-    if (!selRemark[0]) return myAlert.info({ title: "請選擇"+label })
+    if (!selRemark[0]) return myAlert.info({ title: "請選擇" + label })
     addString(selRemark);
   }
 
@@ -81,13 +81,15 @@ export default function TextListEditor(
               <span></span> :
               <IconRemoveCircle onClick={() => delString(index)} />}
             <span className={styleL.serialNumber}>{index + 1}</span>
-            <Input03 {...{
-              stateValue: memo,
-              onChange: (e) => editString(index, e.target.value),
-              placeholder: "請輸入"+label,
-              showBaseline: "never",
-              disabled
-            }} />
+            <InputSel
+              className={styleL.inputSel}
+              inputProps={{
+                value: memo,
+                onChange: (v) => editString(index, v),
+              }}
+              placeholder={"請輸入" + label}
+              showBaseline="auto"
+              disabled={disabled} />
           </div>
         )
       })}

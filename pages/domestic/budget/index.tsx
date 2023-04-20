@@ -30,7 +30,7 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
 // type
-import { Toption } from "components/global/gear/select/select03"
+import { Toption } from "fakeDatabase/options/options"
 
 type Trouter = ReturnType<typeof useRouter>
 

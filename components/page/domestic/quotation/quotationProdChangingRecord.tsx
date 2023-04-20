@@ -90,6 +90,7 @@ const PanelHeader = ({ record, isActive }:
           let value = record[key]
           if (key === "priceChange") {
             // -value是為了把負號拿掉
+            if (typeof value === "string") value = parseFloat(value)
             value = value < 0 ? `-$${-value}` : `+$${value}`
           }
           return (

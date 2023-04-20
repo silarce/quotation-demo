@@ -26,7 +26,7 @@ export type TpostEmployee = {
   "chName": string
   "enName": string
   "identity": string
-  "birthday": string
+  "birthday": Date | undefined | string
   "gender": string
   "marital": string
   "education": string
@@ -41,10 +41,10 @@ export type TpostEmployee = {
   "mailingDistrict": string
   "mailingAddress": string
   "seniority": string
-  "startDate": string
-  "leaveDate": string
-  "retireDate": string
-  "severanceDate": string
+  "startDate": Date | undefined | string
+  "leaveDate": Date | undefined | string
+  "retireDate": Date | undefined | string
+  "severanceDate": Date | undefined | string
   "processPermission": true
   militaryServiceType: string
   "qualifications": { "name": string, "years": number }[]

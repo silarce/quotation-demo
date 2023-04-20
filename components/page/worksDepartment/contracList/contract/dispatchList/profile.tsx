@@ -1,7 +1,7 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction } from "react"
 import { useRouter } from "next/router"
 // global gear
-import Input02 from "components/global/gear/input/input02"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 
 // css
@@ -35,42 +35,43 @@ export default function Profile(
       {/* left */}
       <div className={style.left}>
         {profile02 &&
-          <Input02 className={`${style.input02}`}
-            stateValue={派工日期}
+          <InputSel className={`${style.input02}`}
+            inputProps={{
+              value: 派工日期 ?? "",
+              onChange: (v: string) => {
+                setProfile02!(data => {
+                  data.派工日期 = v
+                  return { ...data }
+                })
+              },
+            }}
             label={"派工日期"}
             width={"255px"}
-            labelWidth={"80px"}
-            labelColor="main"
+            captionWidth={"80px"}
             gap={"24px"}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
-              const value = e.target.value
-              setProfile02!(data => {
-                data.派工日期 = value
-                return { ...data }
-              })
-            }}
+            captionClassName={style.caption}
+            captionColor="main"
           />
         }
 
         {indexKeys01.map((key, index) => {
-          const value = profile[key]
+          const value = profile[key] ?? ""
           const { label, labelWidth } = config[key]
-          const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value
+          const onChange = (v: string) => {
             setProfile(data => {
-              data[key] = value
+              data[key] = v
               return { ...data }
             })
           }
           return (
-            <Input02 className={`${style.input02}`} key={index}
-              stateValue={value}
+            <InputSel className={`${style.input02}`} key={index}
+              inputProps={{ value, onChange }}
               label={label}
-              labelWidth={labelWidth}
-              onChange={onChange}
-              labelColor="main"
+              captionWidth={labelWidth}
+              captionColor="main"
               gap={"24px"}
               disabled={true}
+              showBaseline="invisible"
             />
           )
         })}
@@ -79,12 +80,11 @@ export default function Profile(
       {/* right */}
       <div className={style.right}>
         {indexKeys02.map((key, index) => {
-          const value = profile[key]
+          const value = profile[key] ?? ""
           const { label, labelWidth } = config[key]
-          const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value
+          const onChange = (v: string) => {
             setProfile(data => {
-              data[key] = value
+              data[key] = v
               return { ...data }
             })
           }
@@ -95,14 +95,12 @@ export default function Profile(
           if (key === "管制卡編號" && !isAdd)
             styleShowUnderline = style.showUnderline
           const className = `${style.input02} ${styleShowUnderline}`
-
           return (
-            <Input02 className={className} key={index}
-              stateValue={value}
+            <InputSel className={className} key={index}
+              inputProps={{ value, onChange }}
               label={label}
-              labelWidth={labelWidth}
-              onChange={onChange}
-              labelColor="main"
+              captionWidth={labelWidth}
+              captionColor="main"
               gap={"24px"}
               disabled={styleShowUnderline ? true : false}
             />
@@ -114,20 +112,18 @@ export default function Profile(
 
           const value = profile02[key]
           const { label, labelWidth } = config[key]
-          const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value
+          const onChange = (v: string) => {
             setProfile(data => {
-              profile02[key] = value
+              profile02[key] = v
               return { ...data }
             })
           }
           return (
-            <Input02 className={style.input02} key={index}
-              stateValue={value}
+            <InputSel className={`${style.input02}`} key={index}
+              inputProps={{ value, onChange }}
               label={label}
-              labelWidth={labelWidth}
-              onChange={onChange}
-              labelColor="main"
+              captionWidth={labelWidth}
+              captionColor="main"
               gap={"24px"}
             />
           )

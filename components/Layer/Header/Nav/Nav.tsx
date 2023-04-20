@@ -34,14 +34,10 @@ export default function Nav() {
         return (
           <Link className={`${styled.link} ${active}`}
             href={href} key={index}>
-
             <Image src={icon} alt={label + subLabel} />
             {/* <Image src={icon} alt={label} /> */}
-            
             <span>{label}</span>
             {subLabel && <span>{subLabel}</span>}
-
-
           </Link>
         )
       })}

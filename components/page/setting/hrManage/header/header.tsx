@@ -14,16 +14,16 @@ export default function Header() {
 
 const linkArr = [
   {
-    label: "人事權限管理",
-    href: "/setting/hrManage",
+    label: "ERP操作權限",
+    href: "/setting/hrManage/erpCtrlPermissions",
   },
   {
     label: "ERP功能權限",
     href: "/setting/hrManage/erpFuncPermissions",
   },
   {
-    label: "ERP操作權限",
-    href: "/setting/hrManage/erpCtrlPermissions",
+    label: "人事權限管理",
+    href: "/setting/hrManage",
   },
 ]
 

@@ -1,17 +1,17 @@
 
-
 import { useState, useEffect } from "react";
-import { differenceInDays, parseISO, formatDuration, parse } from 'date-fns';
-import moment from "moment"
+import moment from "moment";
+import 'moment-timezone';
 
 import _ from "lodash"
 
+// tool
+import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
+import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
+
 // type
 import { TemployeeDto } from "js/api/api_employee";
-import { duration } from "@mui/material";
 type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
-
-
 
 class Class_employee {
   constructor(reRender: () => void, employeeDataOri: TemployeeDto_jobs) {
@@ -26,6 +26,20 @@ class Class_employee {
     this._employeeData = employeeDataClone as TemployeeDto_jobs & (Pick<Required<TemployeeDto>, "qualifications">)
 
     if (!this._employeeData.qualifications) this._employeeData.qualifications = []
+
+    this._employeeData.birthday = convertDate(this._employeeData.birthday)
+
+    this._employeeData.startDate = (() => {
+      if (!this._employeeData.startDate) {
+        const today = moment().format("yyyy-MM-DD")
+        this._employeeData.startDate = today
+      }
+      return convertDate(this._employeeData.startDate)
+    })()
+
+    this._employeeData.leaveDate = convertDate(this._employeeData.leaveDate)
+    this._employeeData.retireDate = convertDate(this._employeeData.retireDate)
+    this._employeeData.severanceDate = convertDate(this._employeeData.severanceDate)
 
 
     this.classJobGroupArr
@@ -219,6 +233,7 @@ class Class_employee {
     return this._employeeData.startDate
   }
   set startDate(v: string) {
+    if (!v) return;
     this._employeeData.startDate = v
     this._reRender()
   }
@@ -306,15 +321,44 @@ class Class_employee {
     this._employeeData.qualifications
       = this.qualifications.filter((item) => !!item.name)
     this._reRender()
+
+    const convertToDate = (dateString: string) => {
+      if (!dateString) return ""
+      return moment(yearConversion_chToStandard(dateString)).toDate()
+    }
+
+    const birthday =
+      convertToDate(this._employeeData.birthday)
+    const startDate =
+      convertToDate(this._employeeData.startDate)
+    const leaveDate =
+      convertToDate(this._employeeData.leaveDate)
+    const retireDate =
+      convertToDate(this._employeeData.retireDate)
+    const severanceDate =
+      convertToDate(this._employeeData.severanceDate)
+
+    // 直接傳date物件的話，時區會被轉變
     return {
       ...this._employeeData,
       idNumber: undefined, // 後端不收這個
       jobId: this.jobIdArr,
+      birthday: birthday,
+      startDate: startDate,
+      leaveDate: leaveDate,
+      retireDate: retireDate,
+      severanceDate: severanceDate,
     }
   }
 
 } // Class_employee
 
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
 class Class_JobGroup {
   constructor(reRender: () => void, job?: TemployeeDto_jobs["jobs"][number]) {
     this._reRender = reRender
@@ -374,7 +418,6 @@ export {
 }
 
 
-
 // ======================================================
 const emptyDataOri = (): TemployeeDto_jobs => ({
   id: "",
@@ -410,8 +453,14 @@ const emptyDataOri = (): TemployeeDto_jobs => ({
   qualifications: [{ name: "", years: 0 }],
   jobs: [],
 })
+// =======================================================================
 
-
-
-
+const convertDate = (dateString: string) => {
+  if (!dateString) return "";
+  dateString =
+    moment(dateString).tz('Asia/Taipei').format("YYYY-MM-DD")
+  const chDateString = yearConversion_standardToCh(dateString)
+  // const formatedDateString = moment(chDateString).format("YYYY-MM-DD")
+  return chDateString
+}
 
