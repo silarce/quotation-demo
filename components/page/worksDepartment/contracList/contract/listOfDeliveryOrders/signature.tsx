@@ -1,11 +1,8 @@
 
-
-
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
+import {  Dispatch, SetStateAction } from "react"
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
-
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // css
 import style from "./listOfDeliveryOrders.module.scss"
@@ -34,19 +31,19 @@ export default function Signature(
         const stateValue = signature[key]
 
         const onChange
-          = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value
-            signature[key] = value
+          = (v: string) => {
+            signature[key] = v
             setSignature({ ...signature })
           }
 
         return (
           <div className={style.cell} key={index}>
             <span>{label}</span>
-            <Input02
-              className={style.input02}
-              stateValue={stateValue}
-              onChange={onChange}
+            <InputSel className={style.input02}
+              inputProps={{
+                value: stateValue ?? "",
+                onChange
+              }}
               placeholder={placeholder}
               disabled={!editable}
             />
