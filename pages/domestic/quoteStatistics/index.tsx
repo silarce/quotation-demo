@@ -9,6 +9,9 @@ import Table from "components/page/domestic/quoteStatistics/index/Table"
 // gaer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar";
+type TselectPropsArr = Parameters<typeof SelectBar>[0]["selectPropsArr"]
+
+
 
 // option
 import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from "fakeDatabase/options/options";
@@ -34,33 +37,39 @@ export default function QuoteStatistics() {
   })
 
   // ------------------------------------------------------------------
-  const selectPropsArr: TselectProps[] = [
+  const selectPropsArr: TselectPropsArr = [
     {
-      value: serchObj.year,
-      options: yearOptionArr,
-      onChange: (option) => {
-        if (typeof option?.value === "string")
-          setSearchObj(obj => ({ ...obj, year: option.value }))
+      selectProps: {
+        value: serchObj.year,
+        options: yearOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === "string")
+            setSearchObj(obj => ({ ...obj, year: option.value }))
+        },
       },
       placeholder: "選擇年份",
       boxStyle: { width: "140px" }
     },
     {
-      value: serchObj.month,
-      options: monthOptionArr,
-      onChange: (option) => {
-        if (typeof option?.value === "string")
-          setSearchObj(obj => ({ ...obj, month: option.value }))
+      selectProps: {
+        value: serchObj.month,
+        options: monthOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === "string")
+            setSearchObj(obj => ({ ...obj, month: option.value }))
+        },
       },
       placeholder: "選擇月份",
       boxStyle: { width: "140px" }
     },
     {
-      value: serchObj.region,
-      options: regionOptionArr,
-      onChange: (option) => {
-        if (typeof option?.value === "string")
-          setSearchObj(obj => ({ ...obj, region: option.value }))
+      selectProps: {
+        value: serchObj.region,
+        options: regionOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === "string")
+            setSearchObj(obj => ({ ...obj, region: option.value }))
+        },
       },
       placeholder: "選擇區域",
       boxStyle: { width: "140px" }
