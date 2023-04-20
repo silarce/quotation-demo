@@ -1,16 +1,16 @@
 
-import { CSSProperties, FocusEvent, ComponentType } from "react"
+import { CSSProperties, FocusEvent } from "react"
 import classNames from "classnames";
 
 
 import Select,
 {
+  Props,
   Options, SingleValue, ActionMeta, ClassNamesConfig,
   OptionProps, DropdownIndicatorProps, SelectComponentsConfig
 }
   from 'react-select';
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
-
 
 // icon
 import iconArrowRed from "public/image/icon/arrow_down_red.svg"
@@ -21,6 +21,7 @@ import scss from "../inputSel.module.scss"
 // type
 import type { Toption } from "fakeDatabase/options/options"
 
+// type Tprops = Props<Toption, false, GroupBase<Toption>>
 export type TselectProps = {
   value: Toption | string | number | null | undefined
   options: Toption[]
@@ -29,10 +30,10 @@ export type TselectProps = {
   onFocus?: (e?: FocusEvent<HTMLInputElement>) => void
   onBlur?: (e?: FocusEvent<HTMLInputElement>) => void
   /**每個call back都要return classname */
-  // selClassNames?: ClassNamesConfig<Toption, false, GroupBase<Toption>>
   selClassNames?: ClassNamesConfig<Toption, false, GroupBase<Toption>>
-  selectRef?: React.LegacyRef<HTMLDivElement>
+  selectRef?: React.RefObject<HTMLDivElement>
   openMenuOnFocus?: boolean
+  isSearchable?: boolean
   /**
    *  元件可以收一個參數，型別設定可以參考 mySelect.tsx裡的DropdownIndicator
    * parameter的型別要從'react-select'引入
@@ -44,7 +45,11 @@ export type TselectProps = {
 }
 
 // ==============================================================================
-export default function MySelect(
+export default function MySelect<
+  Option = Toption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Toption> = GroupBase<Toption>
+>(
   {
     selectProps,
     placeholder,
@@ -70,7 +75,6 @@ export default function MySelect(
     }
   }
 
-
   const {
     value,
     options,
@@ -84,6 +88,7 @@ export default function MySelect(
     customComponents,
     arrowType,
     fontSize,
+    isSearchable,
   } = selectProps
 
   // 客製化元件
@@ -114,6 +119,9 @@ export default function MySelect(
         onFocus={onFocus}
         onBlur={onBlur}
         menuPosition={"fixed"}
+        ref={selectRef as any} // 實在是不知道怎麼設這個型別
+        isSearchable={isSearchable ?? false}
+        openMenuOnFocus={openMenuOnFocus}
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         classNames={{
           container: (state) => classNames(scss.selContainer, selClassNames?.container?.(state)),
@@ -162,21 +170,6 @@ export default function MySelect(
     </div >
   )
 }
-
-// =============================================================================
-
-
-
-const fontSizeLookup = {
-  "12px": scss.fontSize12px,
-  "14px": scss.fontSize14px,
-  "16px": scss.fontSize16px,
-  "18px": scss.fontSize18px,
-  "20px": scss.fontSize20px,
-}
-
-
-
 
 
 // =============================================================================
