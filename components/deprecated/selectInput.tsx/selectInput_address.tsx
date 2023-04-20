@@ -6,7 +6,7 @@ import {
 } from "react"
 
 // global gear
-import SelectInput from "components/global/gear/HOC/selectInput.tsx/selectInput"
+import SelectInput from "components/deprecated/selectInput.tsx/selectInput"
 
 // fakeData type
 import { Toption, optionsCreator_county, districtOptionsSelector } from 'fakeDatabase/options/countryAndDistrict'
