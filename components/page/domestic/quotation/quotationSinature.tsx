@@ -1,6 +1,6 @@
 
 // global gear
-import Input03 from "components/global/gear/input/input03"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 // css
 import style from "./quotationSinature.module.scss"
 
@@ -16,13 +16,14 @@ export default function QuotationSinature(
       {signatureArr.map((item, index) => {
         const { label, signature, onChange } = item
 
-
         return (
           <div key={index}>
             <span>{label}</span>
-            <Input03
-              stateValue={signature}
-              onChange={(e) => onChange(e.target.value)}
+            <InputSel
+              inputProps={{
+                value: signature ?? "",
+                onChange: (v) => onChange(v)
+              }}
               disabled={disabled}
               showBaseline={"always"}
             />

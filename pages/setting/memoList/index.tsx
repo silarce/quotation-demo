@@ -1,9 +1,6 @@
 // 公司職等職稱
 // 公司職等職稱
-import {
-  ChangeEvent, Dispatch, SetStateAction, MouseEvent,
-  useState, useEffect,
-} from "react"
+import { useState, } from "react"
 
 const _ = require("lodash")
 
@@ -14,7 +11,7 @@ import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 
-import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar"
+import SelectBar from "components/global/gear/select/selectBar/selectBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 
@@ -33,9 +30,9 @@ import {
   optionsCreator_doorForm,
   Toption
 } from "fakeDatabase/options/options"
-const optionsProdClass = optionsCreator_prodClass()
-const optionsDoorType = optionsCreator_doorType()
-const optionsDoorForm = optionsCreator_doorForm()
+const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
+const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
+const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
 
 
 
@@ -63,42 +60,47 @@ export default function MemoList() {
   const toSearch = (v: string) => setSearchValue(v)
 
 
-  const selectPropsArr: TselectProps[] = [
+  const selectPropsArr = [
     {
-      value: prodClass,
-      options: optionsProdClass,
-      onChange: (option: Toption | null) => {
-        if (typeof option?.value === "string")
-          setProdClass(option?.value)
-      },
+      boxStyle: { width: "200px" },
       placeholder: "選擇類別",
-      boxStyle: { width: "200px" }
+      selectProps: {
+        value: prodClass,
+        options: optionsProdClass,
+        onChange: (option: Toption | null) => {
+          if (typeof option?.value === "string")
+            setProdClass(option?.value)
+        },
+      },
     },
     {
-      value: doorType,
-      options: optionsDoorType,
-      onChange: (option: Toption | null) => {
-        if (typeof option?.value === "string")
-          setDoorType(option?.value)
-      },
       placeholder: "選擇門型",
-      boxStyle: { width: "145px" }
+      boxStyle: { width: "145px" },
+      selectProps: {
+        value: doorType,
+        options: optionsDoorType,
+        onChange: (option: Toption | null) => {
+          if (typeof option?.value === "string")
+            setDoorType(option?.value)
+        },
+      },
     },
     {
-      value: doorForm,
-      options: optionsDoorForm,
-      onChange: (option: Toption | null) => {
-        if (typeof option?.value === "string")
-          setDoorForm(option?.value)
-      },
       placeholder: "選擇形式",
-      boxStyle: { width: "145px" }
+      boxStyle: { width: "145px" },
+      selectProps: {
+        value: doorForm,
+        options: optionsDoorForm,
+        onChange: (option: Toption | null) => {
+          if (typeof option?.value === "string")
+            setDoorForm(option?.value)
+        },
+      },
+
     },
   ]
 
-
   // __________________
-
 
   const filter = {
     prodClass: [prodClass],
@@ -106,7 +108,6 @@ export default function MemoList() {
     doorForm: [doorForm],
     content: searchValue
   }
-
 
   // ------------------------------------------------------------------------
   const panelList: TpanelList = [

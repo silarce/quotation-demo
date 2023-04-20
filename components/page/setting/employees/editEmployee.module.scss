@@ -135,6 +135,9 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
         border-color: $colorMain;
       }
     }
+    .mustTip {
+      transform: translateY(calc(-50% - 3px));
+    }
   }
 
   // -------------------------------

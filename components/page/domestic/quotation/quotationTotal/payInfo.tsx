@@ -1,6 +1,6 @@
 
 // global gear
-import Input03 from "components/global/gear/input/input03"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // css
 import style from "./payInfo.module.scss"
@@ -70,68 +70,75 @@ export default function PayInfo(
       <div>
         <div className={style.inputBox01}>
           <span>交貨地點</span>
-          <Input03 {...{
-            placeholder: "請輸入交貨地址",
-            stateValue: tradingLocation,
-            onChange: (e) => { payInfo.tradingLocation = e.target.value },
-            disabled
-          }} />
+          <InputSel
+            inputProps={{
+              value: tradingLocation,
+              onChange: (v) => { payInfo.tradingLocation = v },
+            }}
+            placeholder={`請輸入交貨地址`}
+            disabled={disabled}
+          />
         </div>
         <div className={style.inputBox01}>
           <span>交貨日期</span>
-          <Input03 {...{
-            placeholder: `例 : 100-01-01`,
-            stateValue: tradingDate,
-            onChange: (e) => { payInfo.tradingDate = e.target.value },
-            disabled
-          }} />
+          <InputSel
+            inputProps={{
+              value: tradingDate,
+              onChange: (v) => { payInfo.tradingDate = v },
+            }}
+            placeholder={`例 : 100-01-01`}
+            disabled={disabled}
+          />
         </div>
-
         {/* 付款辦法 */}
         <div className={style.payMethodContainer}>
           <span>付款辦法</span>
 
           <div className={style.inputBox02}>
             <span>1.訂製同時付總金額</span>
-            <Input03 {...{
-              stateValue: deposit,
-              onChange: (e) => { payInfo.deposit = e.target.value },
-              placeholder: "請輸入%數",
-              disabled
-            }} />
+            <InputSel
+              inputProps={{
+                value: deposit,
+                onChange: (v) => { payInfo.deposit = v },
+              }}
+              placeholder="請輸入%數"
+              disabled={disabled} />
             <span>%</span>
           </div>
           {/*  */}
           <div className={style.inputBox02}>
             <span>2.交貨同時付總金額</span>
-            <Input03 {...{
-              stateValue: deliveryPayment,
-              onChange: (e) => { payInfo.deliveryPayment = e.target.value },
-              placeholder: "請輸入%數",
-              disabled
-            }} />
+            <InputSel
+              inputProps={{
+                value: deliveryPayment,
+                onChange: (v) => { payInfo.deliveryPayment = v },
+              }}
+              placeholder="請輸入%數"
+              disabled={disabled} />
             <span>%</span>
           </div>
           {/*  */}
           <div className={style.inputBox02}>
             <span>3.按裝完成付總金額</span>
-            <Input03 {...{
-              stateValue: installedPayment,
-              onChange: (e) => { payInfo.installedPayment = e.target.value },
-              placeholder: "請輸入%數",
-              disabled
-            }} />
+            <InputSel
+              inputProps={{
+                value: installedPayment,
+                onChange: (v) => { payInfo.installedPayment = v },
+              }}
+              placeholder="請輸入%數"
+              disabled={disabled} />
             <span>%</span>
           </div>
           {/*  */}
           <div className={style.inputBox02}>
             <span>4.接電使用付總金額</span>
-            <Input03 {...{
-              stateValue: eleConnectPayment,
-              onChange: (e) => { payInfo.eleConnectPayment = e.target.value },
-              placeholder: "請輸入%數",
-              disabled
-            }} />
+            <InputSel
+              inputProps={{
+                value: eleConnectPayment,
+                onChange: (v) => { payInfo.eleConnectPayment = v },
+              }}
+              placeholder="請輸入%數"
+              disabled={disabled} />
             <span>%</span>
           </div>
           {/*  */}

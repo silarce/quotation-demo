@@ -5,7 +5,7 @@ import Image from "next/image";
 
 // global gear
 // import CellWithBar from "components/global/gear/cell/cellWithBar"
-import SearchBar02 from "components/global/gear/HOC/searchBar/searchBar02/searchBar02";
+import SearchBar02, { TselectConfig } from "components/global/gear/HOC/searchBar/searchBar02/searchBar02";
 import AddButton from "components/global/gear/button/addButton";
 
 // icon
@@ -39,13 +39,11 @@ export default function Table(
 
   // ---------------------------------------------------------------------------
 
-  const selectPropsArr = [
+  const selectPropsArr: TselectConfig[] = [
     {
       boxStyle: { width: "145px" },
-      props: {
-        placeholder: "請選擇部門",
-        options: searchOption,
-      }
+      placeholder: "請選擇部門",
+      options: searchOption,
     },
   ]
   const inputPropsArr = [

@@ -1,12 +1,10 @@
 
-import {
-  Dispatch, SetStateAction,
-  useState, useEffect, ChangeEvent
-} from "react"
+import { Dispatch, SetStateAction, } from "react"
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
-import Select03 from "components/global/gear/select/select03"
+
+import InputSel from "components/global/gear/inputAndSel/inputSel"
+
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 
 // icon
@@ -85,9 +83,8 @@ export default function EditTransfer(
                     = config[key]
                   const theStyle = { width, marginRight, flex }
                   const onChangeInput
-                    = (e: ChangeEvent<HTMLTextAreaElement>) => {
-                      const value = e.target.value
-                      transferList[rowIndex][key] = value
+                    = (v: string) => {
+                      transferList[rowIndex][key] = v
                       setTransferList([...transferList])
                     }
                   const onChangeSel = (option: Toption | null) => {
@@ -98,21 +95,27 @@ export default function EditTransfer(
                   }
                   const className = center ? style.center : ""
                   return (
-                    <div className={className} key={index}
-                      style={theStyle}>
+                    <div className={className} key={index} style={theStyle}>
                       {type === "input" &&
-                        <Input02 className={style.input}
-                          stateValue={stateValue}
-                          onChange={onChangeInput}
+                        <InputSel
+                          textareaProps={{
+                            value: stateValue,
+                            onChange: onChangeInput,
+                            className: style.input
+                          }}
                           placeholder=""
                           disabled={!editable}
                         />
                       }
                       {type === "select" &&
-                        <Select03 className={style.sel}
-                          stateValue={stateValue}
-                          onChange={onChangeSel}
-                          options={options!}
+                        <InputSel
+                          selectProps={{
+                            value: stateValue,
+                            onChange: onChangeSel,
+                            options: options ?? [],
+                            fontSize: "16px",
+                            arrowType: "black",
+                          }}
                           placeholder=""
                           disabled={!editable}
                         />
