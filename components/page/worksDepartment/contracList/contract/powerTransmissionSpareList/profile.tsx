@@ -1,17 +1,13 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 // global gear
-import Input02 from "components/global/gear/input/input02"
-import TimePicker01 from "components/global/gear/input/timePicker01"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // css
 import style from "./powerTransmissionSpareList.module.scss"
 
 // fake
 import type { Tprofile } from "pages/worksDepartment/contractList/contract/powerTransmissionSpareList/edit"
-
-
-
 
 export default function Profile(
   { data, setData, editable }:
@@ -38,35 +34,40 @@ export default function Profile(
             })
           }
           return (
-            <TimePicker01 className={style.input02} key={index}
+            <InputSel className={style.input02} key={index}
+              datePickerProps={{ value: stateValue ?? "", onChange, }}
               label={label}
-              labelWidth="80px"
-              stateValue={stateValue}
-              onChange={onChange}
+              captionWidth="80px"
+              gap="40px"
+              captionColor="main"
               disabled={
                 !editable || key === "projectName" ? true : false
-              }
-            />
+              } />
           )
         }
         // -----
-        const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-          const value = e.target.value
+        const onChange = (v: string) => {
           setData(data => {
-            data[key] = value
+            data[key] = v
             return { ...data }
           })
         }
+        const showBaseline = key === "projectName" ? "invisible" : "always"
         return (
-          <Input02 className={style.input02} key={index}
+          <InputSel className={style.input02} key={index}
+            inputProps={{
+              value: stateValue ?? "",
+              onChange
+            }}
             label={label}
-            stateValue={stateValue}
-            onChange={onChange}
-            labelWidth="80px"
+            captionWidth="80px"
+            captionColor="main"
+            gap="40px"
             width={key === "projectName" ? "700px" : "255px"}
             disabled={
               !editable || key === "projectName" ? true : false
             }
+            showBaseline={showBaseline}
           />
         )
       })}
@@ -108,18 +109,3 @@ const config: {
     type: "date"
   },
 }
-
-
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
-// 把profile的時間input改為時間選擇器
