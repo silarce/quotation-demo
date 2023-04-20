@@ -75,18 +75,18 @@ const sidePathList: TsidePathList = {
           label: "客戶列表",
           path: path01 + "/customer",
         },
-        {
-          label: "產品列表",
-          path: path01 + "/productList"
-        },
-        {
-          label: "備註列表",
-          path: path01 + "/memoList"
-        },
-        {
-          label: "報價範圍列表",
-          path: path01 + "/quoteRangeList"
-        },
+        // {
+        //   label: "產品列表",
+        //   path: path01 + "/productList"
+        // },
+        // {
+        //   label: "備註列表",
+        //   path: path01 + "/memoList"
+        // },
+        // {
+        //   label: "報價範圍列表",
+        //   path: path01 + "/quoteRangeList"
+        // },
       ]
     }
   })(),
@@ -296,24 +296,24 @@ const topPathList = [
     path01: sidePathList["/setting"].path01,
     href: sidePathList["/setting"].path01 + "/company-info",
   },
-  {
-    icon: icon_domestic,
-    label: "營業部", subLabel: "-國內工程",
-    path01: sidePathList["/domestic"].path01,
-    href: sidePathList["/domestic"].path01 + "/budget",
-  },
-  {
-    icon: icon_foreign,
-    label: "營業部", subLabel: "-國外工程",
-    path01: sidePathList["/foreign"].path01,
-    href: sidePathList["/foreign"].path01 + "",
-  },
-  {
-    icon: icon_project,
-    label: "工務部",
-    path01: sidePathList["/worksDepartment"].path01,
-    href: sidePathList["/worksDepartment"].path01 + "/contractList",
-  },
+  // {
+  //   icon: icon_domestic,
+  //   label: "營業部", subLabel: "-國內工程",
+  //   path01: sidePathList["/domestic"].path01,
+  //   href: sidePathList["/domestic"].path01 + "/budget",
+  // },
+  // {
+  //   icon: icon_foreign,
+  //   label: "營業部", subLabel: "-國外工程",
+  //   path01: sidePathList["/foreign"].path01,
+  //   href: sidePathList["/foreign"].path01 + "",
+  // },
+  // {
+  //   icon: icon_project,
+  //   label: "工務部",
+  //   path01: sidePathList["/worksDepartment"].path01,
+  //   href: sidePathList["/worksDepartment"].path01 + "/contractList",
+  // },
 ]
 
 
