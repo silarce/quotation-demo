@@ -18,12 +18,12 @@ type TsidePathConfig = {
   list: {
     label: string
     path?: string
-    erpFeature: ErpFeaturesValues[]
+    erpFeature: ErpFeaturesValues[] | "allPass"
     list?: {
       label: string
       path: string
       /**空陣列會全部禁止 */
-      erpFeature: ErpFeaturesValues[]
+      erpFeature: ErpFeaturesValues[] | "allPass"
     }[]
   }[]
 }
@@ -34,7 +34,7 @@ type TtopPathListConfig = {
   subLabel?: string
   path01: string
   href: string
-  erpFeature: ErpFeaturesValues[]
+  erpFeature: ErpFeaturesValues[] | "allPass"
 }
 
 interface TsidePathList {
@@ -51,6 +51,9 @@ const erpFeaturesLookup = {
 } as const
 
 const { BasicDataCreation, HRAuthoritySetup } = erpFeaturesLookup
+
+/** "allPass" 即使沒有任何權限也pass */
+/** allPass 至少有一個權限就pass */
 const allPass = [BasicDataCreation, HRAuthoritySetup,]
 
 /**未決定權限的page會放這個，開發時可以把內容換成allPass方便開發 */
@@ -67,7 +70,7 @@ const sidePathList: TsidePathList = {
         {
           label: "日報表",
           path: path01 + "/dailyReport",
-          erpFeature: allPass,
+          erpFeature: "allPass",
         },
       ]
     }
@@ -367,7 +370,7 @@ const topPathList: TtopPathListConfig[] = [
     label: "首頁",
     path01: sidePathList["/home"].path01,
     href: "/home/dailyReport",
-    erpFeature: allPass,
+    erpFeature: "allPass",
   },
   {
     icon: icon_setting,

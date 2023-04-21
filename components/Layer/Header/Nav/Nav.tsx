@@ -14,11 +14,6 @@ import { LayerCtx } from "components/Layer/Layer"
 
 
 
-
-
-
-
-
 export default function Nav() {
   const router = useRouter()
   const { userErpFeature } = useContext(LayerCtx)
@@ -53,11 +48,12 @@ export default function Nav() {
 const checkErpFeature = (
   { erpFeature, userErpFeature, }:
     {
-      erpFeature: string[]
+      erpFeature: string[] | "allPass"
       userErpFeature: { id: string }[]
     }
 ) => {
   let isPassed: boolean = false
+  if (erpFeature === "allPass") return true
   isPassed = userErpFeature.some((item1) => {
     return erpFeature.includes(item1.id)
   })
