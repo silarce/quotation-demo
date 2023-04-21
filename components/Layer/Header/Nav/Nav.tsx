@@ -1,5 +1,5 @@
 
-
+import { useContext } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/router"
@@ -9,6 +9,8 @@ import styled from "./nav.module.scss"
 // 路由表
 import { topPathList } from "components/Layer/SideNav/pathList"
 
+// context
+import { LayerCtx } from "components/Layer/Layer"
 
 
 
@@ -19,6 +21,8 @@ import { topPathList } from "components/Layer/SideNav/pathList"
 
 export default function Nav() {
   const router = useRouter()
+  const { userErpFeature } = useContext(LayerCtx)
+
   const pathname = router.pathname
 
 
@@ -26,18 +30,18 @@ export default function Nav() {
   return (
     <div className={styled.container}>
       {topPathList.map((item, index) => {
-        // const { icon, path01, href, label, subLabel: subLabel } = item
-        const { icon, path01, href, label,  } = item
+        const { icon, path01, href, label, subLabel, erpFeature } = item
         const reg = new RegExp(`^${path01}`)
         let active = reg.test(pathname) ? styled.active : ""
         if (path01 === "/") active = pathname === path01 ? styled.active : ""
+        const isPassed = checkErpFeature({ erpFeature, userErpFeature })
+        if (!isPassed) return null
         return (
           <Link className={`${styled.link} ${active}`}
             href={href} key={index}>
-            {/* <Image src={icon} alt={label + subLabel} /> */}
-            <Image src={icon} alt={label} />
+            <Image src={icon} alt={label + subLabel} />
             <span>{label}</span>
-            {/* {subLabel && <span>{subLabel}</span>} */}
+            {subLabel && <span>{subLabel}</span>}
           </Link>
         )
       })}
@@ -46,3 +50,16 @@ export default function Nav() {
 }
 
 // ========================================
+const checkErpFeature = (
+  { erpFeature, userErpFeature, }:
+    {
+      erpFeature: string[]
+      userErpFeature: { id: string }[]
+    }
+) => {
+  let isPassed: boolean = false
+  isPassed = userErpFeature.some((item1) => {
+    return erpFeature.includes(item1.id)
+  })
+  return isPassed
+}
