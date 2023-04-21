@@ -31,8 +31,7 @@ export default function Employees() {
   const [params, setParams] = useState<TapiGetEmployeeParams>({
     order: "ASC",
     page: 1,
-    pageSize: 4,
-    // pageSize: 3,
+    pageSize: 12,
     sort: "idNumber",
     filter: {
       $or: {
