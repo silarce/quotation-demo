@@ -7,34 +7,36 @@ import Header from "./Header/Header"
 import SideNav from "./SideNav/SideNav";
 
 // type
-import { TuserDto } from "js/api/dtoTypes";
+import { TerpFeatureDto, TuserDto } from "js/api/dtoTypes";
 
 type TlayerCtx = {
   reqLogout: () => void
   userInfo: TuserDto
+  userErpFeature: TerpFeatureDto[]
 }
 
 export const LayerCtx = createContext<TlayerCtx>(null!)
 
 // ======================================================================
 export default function Layer(
-  { children, reqLogout, userInfo }:
+  { children, reqLogout, userInfo, userErpFeature }:
     {
       children: React.ReactNode
       reqLogout: () => void
       userInfo: TuserDto
+      userErpFeature: TerpFeatureDto[]
     }) {
 
   return (
     <div className={style.container}>
-      <LayerCtx.Provider value={{ reqLogout, userInfo }}>
+      <LayerCtx.Provider value={{ reqLogout, userInfo, userErpFeature }}>
         <Header />
+        <div className={style.wrapper}>
+          <SideNav />
+          {/* main */}
+          <div className={style.main}>{children}</div>
+        </div>
       </LayerCtx.Provider>
-      <div className={style.wrapper}>
-        <SideNav />
-        {/* main */}
-        <div className={style.main}>{children}</div>
-      </div>
     </div>
   )
 }
