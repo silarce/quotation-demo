@@ -52,15 +52,23 @@ function ExcelReader() {
 
         types: typesOri,
         contact1,
+        contactPhone1,
         contact2,
+        contactPhone2,
+        contact3,
+        contactPhone3,
 
         項次
       } = data
 
 
       const contacts: TpostCustomer["contacts"] = []
-      if (contact1) contacts.push({ name: contact1, phone: "", })
-      if (contact2) contacts.push({ name: contact2, phone: "", })
+      if (contact1 || contactPhone1)
+        contacts.push({ name: contact1 ?? "", phone: contactPhone1 ?? "", })
+      if (contact2 || contactPhone2)
+        contacts.push({ name: contact2 ?? "", phone: contactPhone2 ?? "", })
+      if (contact3 || contactPhone3)
+        contacts.push({ name: contact3 ?? "", phone: contactPhone3 ?? "", })
 
 
       const types = (() => {
@@ -120,12 +128,20 @@ function ExcelReader() {
         const haveUndefined = valuesArr.includes(undefined)
         if (haveUndefined) { throw Error }
 
+        console.log("項次", data.項次, "完成")
         console.log(body)
+        console.log("body", body)
+        console.log("---------------------------------------------------------")
       }
       catch (error) {
         isError = true
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("項次", data.項次, "失敗")
         console.log("data", data)
         console.log("body", body)
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       }
     }
   }
@@ -149,11 +165,20 @@ function ExcelReader() {
 
       try {
         // await apiPostCustomers(body)
+        console.log("項次", data.項次, "完成")
+        console.log("data", data)
+        console.log("body", body)
+        console.log("----------------------------------------------------------")
       }
       catch (error) {
         isError = true
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("項次", data.項次, "失敗")
         console.log("data", data)
         console.log("body", body)
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       }
     }
   }
@@ -185,17 +210,6 @@ function ExcelReader() {
 export default ExcelReader;
 
 // ==========================================================================
-
-// const apiTest = async () => {
-//   const arr = [1, 2, 3, 4, 5]
-//   for (const foo of arr) {
-//     try {
-//       await apiPostCustomers()
-//     }
-//     catch { }
-//   }
-// }
-
 
 const typesLookup = {
   "營造": "construction",
