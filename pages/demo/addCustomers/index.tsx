@@ -4,13 +4,16 @@ import _ from "lodash"
 
 import { TpostCustomer, apiPostCustomers, customerTypesLookup } from 'js/api/api_customer';
 
-
+import { Button } from 'antd';
 
 type SheetData = {
   [key: string]: string;
 };
 
 function ExcelReader() {
+  const [isUploading, setIsUploading] = useState(false)
+
+
   const [xlsxData, setXlsxData] = useState<SheetData[]>([]);
 
 
@@ -155,7 +158,9 @@ function ExcelReader() {
 
     let isError = false
 
-    for (const data of dataArr) {
+    // for (const data of dataArr) {
+    // for (const [index, data] of dataArr.entries()) {
+    for (const [index, data] of dataArr.entries()) {
       if (isError) return;
 
       const body: TpostCustomer = {
@@ -163,9 +168,10 @@ function ExcelReader() {
         ...data,
       }
 
+      setIsUploading(true)
       try {
-        // await apiPostCustomers(body)
-        console.log("項次", data.項次, "完成")
+        await apiPostCustomers(body)
+        console.log("項次", data.項次, "完成", "---", `筆數 ${index + 1}/${dataArr.length}`)
         console.log("data", data)
         console.log("body", body)
         console.log("----------------------------------------------------------")
@@ -174,12 +180,14 @@ function ExcelReader() {
         isError = true
         console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        console.log("項次", data.項次, "失敗")
+        console.log("項次", data.項次, "失敗", "---", `筆數 ${index + 1}/${dataArr.length}`)
+        console.log("下一次要從這一個項次開始")
         console.log("data", data)
         console.log("body", body)
         console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       }
+      setIsUploading(false)
     }
   }
 
@@ -190,18 +198,24 @@ function ExcelReader() {
       <input type="file" onChange={handleFileUpload} />
       <br />
       <br />
-      <button onClick={previewData} className="border-2 border-[#000]">預覽資料</button>
+      <Button onClick={isUploading ? undefined : previewData}
+        loading={isUploading}
+        className="border-2 border-[#000]">預覽資料</Button>
       <br />
       <br />
       {/* <button onClick={apiTest} className=" bg-gray-400">批次發api測試</button> */}
-      <button onClick={checkBody} className="border-2 border-[#000]">檢查body</button>
+      <Button onClick={isUploading ? undefined : checkBody}
+        loading={isUploading}
+        className="border-2 border-[#000]">檢查body</Button>
       <br />
       <br />
       <br />
       <br />
       <br />
       <br />
-      <button onClick={batchReq} className=" text-red-500 border-2 border-[#000]">發出api請求</button>
+      <Button onClick={isUploading ? undefined : batchReq} danger={true}
+        loading={isUploading}
+        className="[&>span]:text-red-500">發出api請求</Button>
       {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
     </div>
   );
@@ -241,4 +255,7 @@ const emptyCustomer = (): TpostCustomer => ({
   contacts: [],
   types: []
 })
+
+
+
 
