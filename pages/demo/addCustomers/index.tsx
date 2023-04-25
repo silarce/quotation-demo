@@ -170,7 +170,7 @@ function ExcelReader() {
 
       setIsUploading(true)
       try {
-        if (index === 3) throw Error
+        // if (index === 3) throw Error
         const response = await apiPostCustomers(body)
         console.log("項次", data.項次, "完成", "---", `筆數 ${index + 1}/${dataArr.length}`)
         console.log("response", response)
