@@ -1,7 +1,4 @@
-import {
-  MouseEvent,
-  useState, useContext
-} from "react"
+import { MouseEvent, useState, } from "react"
 import Link from "next/link";
 
 
@@ -131,12 +128,12 @@ export default function EmployeeList({ employeeList, toUpdate, isLoading }: {
                       )
                   })}
 
-                  <div className={`${scss.column} ${scss.btnCell}`}>
+                  {/* <div className={`${scss.column} ${scss.btnCell}`}>
                     <IconDelete01 onClick={(e) => {
                       e.preventDefault()
                       openDelPanel(e, row)
                     }} />
-                  </div>
+                  </div> */}
                 </div>
               </Link>
             </CellWithBar>
