@@ -100,6 +100,7 @@
           color: $colorMain;
         }
         > .inputBox:nth-of-type(2) {
+          transform: translateY(5px);
           input {
             font-size: 14px;
           }
@@ -116,7 +117,7 @@
 
   .rowBg {
     width: 100%;
-    height: 78.28px;
+    height: 71.14px;
     background-color: $bgc01;
     position: absolute;
     top: 0;
