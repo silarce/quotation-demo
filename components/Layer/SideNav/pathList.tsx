@@ -56,9 +56,8 @@ const { BasicDataCreation, HRAuthoritySetup } = erpFeaturesLookup
 /** allPass 至少有一個權限就pass */
 const allPass = [BasicDataCreation, HRAuthoritySetup,]
 
-/**未決定權限的page會放這個，開發時可以把內容換成allPass方便開發 */
-const devPass: ErpFeaturesValues[] = []
-
+/**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
+const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
 // =========================================================================
 
 const sidePathList: TsidePathList = {
