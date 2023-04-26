@@ -18,7 +18,6 @@ import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEm
 
 // gear
 import PageHeader02, { TsearchGroup, Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
-import Header from "components/page/setting/hrManage/header/header"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
