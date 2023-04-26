@@ -17,6 +17,7 @@ import Table from "components/page/setting/hrManage/table/table";
 import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
 
 // gear
+import PageHeader02, { TsearchGroup, Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import Header from "components/page/setting/hrManage/header/header"
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
@@ -38,6 +39,9 @@ import { apiPatchUserResetPassword } from "js/api/api_user";
 // css
 import scss from "./erpCtrlPermissions.module.scss"
 import { AxiosError } from "axios";
+
+// config
+import { hrManageLinkArr } from "components/page/setting/hrManage/hrManageLinkArr";
 
 
 // ==========================================================================
@@ -102,14 +106,17 @@ export default function ErpCtrlPermissions() {
   // 用在搜尋bar的option
   const options_departments = useMemo(() => {
     if (!departmentsData?.data) return []
-
-    return departmentsData?.data.map((item) => {
+    const optionArr = departmentsData?.data.map((item) => {
       const { id, name } = item
       return {
         value: id,
         label: name
       }
     })
+
+    optionArr.unshift({ value: "", label: "不拘" })
+
+    return optionArr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departmentsData])
 
@@ -136,19 +143,7 @@ export default function ErpCtrlPermissions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
-  // ------------------------------------------------------------------------
-  // 搜尋功能 searchBar
 
-  const onSearch = async (valueArr: (string | number | null | undefined)[]) => {
-    if (isLoading) return
-    const department = valueArr[0]
-    const content = valueArr[1]
-
-    router.push({
-      pathname: "/setting/hrManage/erpCtrlPermissions",
-      query: { department, content }
-    })
-  }
 
   // ------------------------------------------------------------------------
   // 新增操作人員
@@ -258,17 +253,53 @@ export default function ErpCtrlPermissions() {
     }
   }
 
+  // ------------------------------------------------------------------------
+  const searchTargetList: TsearchGroup["searchTargetList"] = [
+    {
+      options: options_departments,
+      width: "104px",
+      placeholder: "請選擇部門",
+    },
+    {
+      width: "134px",
+      placeholder: "請輸入搜尋內容",
+    },
+  ]
+
+  const searchGroup: TsearchGroup = {
+    searchTargetList,
+    doSearch: (valueArr: (Toption | null | string)[]) => {
+      const department = (valueArr[0] as Toption).value
+      const content = valueArr[1] as string
+
+      const query: {
+        department?: string
+        content?: string
+      } = {}
+      if (department) query.department = department
+      if (content) query.content = content
+
+      router.push({
+        pathname: "/setting/hrManage/erpCtrlPermissions",
+        query
+      })
+    }
+  }
+
+  const panelList: TpanelList = [
+    { searchGroup },
+    {
+      type: "addButton",
+      label: "新增操作人員",
+      onClick: openAddPanel,
+    }
+  ]
 
   // ------------------------------------------------------------------------
   return (
     <SubLayer>
       <div className={scss.header}>
-        <Header />
-        <div className={scss.countBox}>
-          <span>已加入人數 / 操作人數上限 :</span>
-          <span className={scss.numerator}>{employeeData01Meta?.itemCount}</span>
-          <span> / 30</span>
-        </div>
+        <PageHeader02 linkList={hrManageLinkArr} panelList={panelList} />
       </div>
 
       <div >
@@ -276,11 +307,9 @@ export default function ErpCtrlPermissions() {
           {isReady &&
             <Table
               employeeList={employeeList}
-              searchOption={options_departments}
-              openAddPanel={openAddPanel}
-              onSearch={onSearch}
               onDelete={openDelete}
               onResetPw={resetPw}
+              userCount={employeeData01Meta?.itemCount ?? ""}
             />
           }
         </div>

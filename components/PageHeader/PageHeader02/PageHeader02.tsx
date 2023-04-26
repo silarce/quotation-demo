@@ -14,7 +14,7 @@ import { TsearchObj } from "components/global/gear/HOC/searchBar/searchBar"
 import scss from "./pageHeader02.module.scss"
 
 // type
-import { TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar"
+import { TsearchGroup, Toption } from "components/global/gear/HOC/searchBar/searchBar"
 
 
 // ========================================================
@@ -71,7 +71,7 @@ export default function PageHeader02(
 
 
 
-export type { TpanelList, TtagList, TsearchObj, TsearchGroup }
+export type { TpanelList, TtagList, TsearchObj, TsearchGroup, Toption }
 
 // ===========================================================
 

@@ -1,13 +1,6 @@
 import { MouseEvent, } from "react"
 import Image from "next/image";
 
-
-
-// global gear
-// import CellWithBar from "components/global/gear/cell/cellWithBar"
-import SearchBar02, { TselectConfig } from "components/global/gear/HOC/searchBar/searchBar02/searchBar02";
-import AddButton from "components/global/gear/button/addButton";
-
 // icon
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 import iconPassword from 'public/image/icon/password.svg';
@@ -15,45 +8,23 @@ import iconPassword from 'public/image/icon/password.svg';
 import scss from "./table.module.scss"
 // type
 import { TemployeeDto } from "js/api/api_employee"
-import { Toption } from "fakeDatabase/options/options";
 
 
 export default function Table(
   {
     employeeList,
-    searchOption,
-    openAddPanel,
-    onSearch,
     onDelete,
-    onResetPw
+    onResetPw,
+    userCount
   }:
     {
       employeeList: TemployeeDto[]
-      searchOption: Toption[]
-      openAddPanel: () => void
-      onSearch: (valueArr: (string | number | null | undefined)[]) => void
       onDelete: (e: MouseEvent, index: number) => void
       onResetPw: (id: string) => void
+      userCount: string | number
     }) {
 
 
-  // ---------------------------------------------------------------------------
-
-  const selectPropsArr: TselectConfig[] = [
-    {
-      boxStyle: { width: "145px" },
-      placeholder: "請選擇部門",
-      options: searchOption,
-    },
-  ]
-  const inputPropsArr = [
-    {
-      boxStyle: { width: "145px" },
-      props: {
-        placeholder: "搜尋中文姓名",
-      }
-    },
-  ]
   // ---------------------------------------------------------------------------
   return (
     <div className={scss.employeeList}>
@@ -78,21 +49,10 @@ export default function Table(
         })}
 
         {/*  */}
-        <div className={scss.ctrlBar}>
-          <div className={scss.searchlBar}>
-            <SearchBar02
-              doSearch={onSearch}
-              inputConfigArr={inputPropsArr}
-              selectConfigArr={selectPropsArr}
-            />
-          </div>
-          {/*  */}
-          <div className={scss.addBtnBox}>
-            <AddButton className={scss.addBtn}
-              label="新增操作人員"
-              onClick={openAddPanel}
-            />
-          </div>
+        <div className={scss.countBox}>
+          <span>已加入人數 / 操作人數上限 :</span>
+          <span className={scss.numerator}>{userCount}</span>
+          <span> / 30</span>
         </div>
       </div>
 
