@@ -19,6 +19,10 @@
     align-self: flex-start;
     > span {
       display: block;
+      color: inherit;
+    }
+    &.colorMain {
+      color: $colorMain;
     }
   }
 
@@ -28,11 +32,28 @@
     bottom: 0px;
     width: 100%;
     border-color: $colorMain;
+    &.isMust {
+      border-color: $colorActive01;
+    }
     &:global(.isFocus) {
       border-color: $colorActive01;
     }
     &:global(.invisible) {
       visibility: hidden;
+    }
+  }
+
+  .mustTip {
+    position: absolute;
+    right: calc(100% + 7px);
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 13px;
+    height: 16px;
+    > img {
+      width: 13px;
+      height: 16px;
     }
   }
 } //label
@@ -94,21 +115,19 @@
   font-size: 18px;
   width: 100%;
   // color: $colorText;
-  color: pink;
+  // color: pink;
 }
+
+// ------------
+// classNames
 .selContainer {
 }
+
 div.selControl {
   min-height: auto;
   cursor: pointer;
 }
 
-.selPlaceholder {
-  color: $colorBorder01;
-}
-.selSingleValue {
-  color: $colorText;
-}
 .selMenu {
   min-width: fit-content;
   background-color: #fff;
@@ -118,25 +137,85 @@ div.selControl {
 
 .selMenuList {
   min-width: fit-content;
-  padding: 0 12px;
+  // padding: 0 12px;
   background-color: #fff;
 }
 
 div.selOption {
-  padding: 10px 5px;
+  position: relative;
+  padding: 10px 17px;
+  padding-bottom: 11px; //配合::after的height
   color: $colorText;
   font-weight: 400;
   font-size: 18px;
-  border-bottom: solid 1px $colorBorder01;
+  // border-bottom: solid 1px $colorBorder01;
   white-space: nowrap;
   cursor: pointer;
 
+  &::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - 34px); // 扣掉的px為.selOption左右paddin的和
+    height: 1px;
+    background-color: $colorBorder01;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+  }
+
   &:nth-last-of-type(1) {
-    border-bottom: none;
+    padding-bottom: 10px; //配合::after的height
+    &::after {
+      display: none;
+    }
   }
   &:hover {
+    // color: $colorMain;
+    background-color: $bgc01;
+  }
+  &.isSelected {
     color: $colorActive01;
+    > span {
+      color: $colorActive01;
+    }
   }
 }
 
-// =================================================================
+.selValueContainer {
+  color: $colorText;
+  font-weight: 400;
+  font-size: 18px;
+}
+
+.selPlaceholder {
+  color: $colorBorder01;
+}
+
+.selSingleValue {
+  color: $colorText;
+  font-weight: 400;
+  font-size: 18px;
+}
+
+// ===========================
+.fontSize12px,
+div.fontSize12px {
+  font-size: 12px;
+}
+.fontSize14px,
+div.fontSize14px {
+  font-size: 14px;
+}
+.fontSize16px,
+div.fontSize16px {
+  font-size: 16px;
+}
+.fontSize18px,
+div.fontSize18px {
+  font-size: 18px;
+}
+.fontSize20px,
+div.fontSize20px {
+  font-size: 20px;
+}
+// ===========================

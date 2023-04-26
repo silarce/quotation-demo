@@ -233,6 +233,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
                 current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
                 pageSize={meta?.pageSize ?? 0}
                 onChange={setPage}
+                showSizeChanger={false}
               />
             </div>
           </>

@@ -30,7 +30,7 @@ export default function Info() {
   // ----------------------------------------------
 
   const userName = userInfo.username
-  const departmentName = userInfo.employee?.jobs[0].department.name ?? "admin"
+  const departmentName = userInfo.employee?.jobs[0]?.department.name ?? "無部門"
 
   // ----------------------------------------------
   const openPwModal = () => {

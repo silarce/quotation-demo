@@ -117,13 +117,14 @@ export default function Employees() {
     <SubLayer>
       <PageHeader02 tag="人員資料" panelList={panelList} />
       <div className={style.body}>
-          <EmployeeList
-            employeeList={employeeList} toUpdate={update} isLoading={isLoading} />
+        <EmployeeList
+          employeeList={employeeList} toUpdate={update} isLoading={isLoading} />
         <div className={style.paginationBox}>
           <Pagination
             current={meta?.page ?? 1} total={meta?.itemCount ?? 0}
             pageSize={meta?.pageSize ?? 0}
             onChange={setPage}
+            showSizeChanger={false}
           />
         </div>
       </div>

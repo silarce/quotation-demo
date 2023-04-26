@@ -142,6 +142,9 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
                 const value = dateString
                 classEmployee[key] = value
               }
+
+              const isMust = key === "startDate" ? true : false
+
               return (
                 <InputSel className={scss.inputSel}
                   key={index}
@@ -152,6 +155,8 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
                     value: stateValue,
                     onChange: onChange,
                   }}
+                  isMust={isMust}
+                  mustTipClassName={scss.mustTip}
                 />
               )
             })}

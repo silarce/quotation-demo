@@ -290,7 +290,7 @@ export default function ErpCtrlPermissions() {
       <SelectEmployeePanel
         visible={showAddPanel}
         label="請選擇操作人員"
-        tip="僅單選(後端還未提供複選api)"
+        // tip="僅單選(後端還未提供複選api)"
         employeeList={employeeList_all}
         onConfirm={onConfirm}
         onCancel={onCancel}

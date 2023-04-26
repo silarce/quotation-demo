@@ -4,7 +4,7 @@ import _ from "lodash"
 
 // type
 import {
-  TuserDto,TuserDto_login,
+  TuserDto, TuserDto_login,
 } from "./dtoTypes";
 
 
@@ -55,6 +55,14 @@ export const useApiAuthMe = () => {
     return res
   }
   return { userInfo, setUserInfo, updateUserInfo }
+}
+
+// 取得使用者權限
+export const apiAuthPermissions = () => {
+  const api = "/auth/permissions"
+  return axi.get(api)
+    .then(({ data }) => data as TuserDto)
+    .catch(err => Promise.reject(err))
 }
 
 /**  變更密碼 */
