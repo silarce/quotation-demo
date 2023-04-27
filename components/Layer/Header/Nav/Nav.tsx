@@ -49,13 +49,13 @@ const checkErpFeature = (
   { erpFeature, userErpFeature, }:
     {
       erpFeature: string[] | "allPass"
-      userErpFeature: { id: string }[]
+      userErpFeature: { name: string }[]
     }
 ) => {
   let isPassed: boolean = false
   if (erpFeature === "allPass") return true
   isPassed = userErpFeature.some((item1) => {
-    return erpFeature.includes(item1.id)
+    return erpFeature.includes(item1.name)
   })
   return isPassed
 }

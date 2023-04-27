@@ -85,11 +85,11 @@ export default function Info() {
 
       <div className={scss.line} />
 
-      <div className={scss.logout}>
+      <div className={scss.logout} onClick={reqLogout}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={logout.src} alt="登出"
         />
-        <span onClick={reqLogout}>登出</span>
+        <span >登出</span>
       </div>
 
       <ModalChangePw

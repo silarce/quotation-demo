@@ -45,9 +45,11 @@ interface TsidePathList {
 
 const erpFeaturesLookup = {
   // 基本資料建立
-  BasicDataCreation: "5553602b-f640-4af0-aae6-7e284544a7a3",
+  // BasicDataCreation: "5553602b-f640-4af0-aae6-7e284544a7a3",
+  BasicDataCreation: "基本資料建立",
   // 人事權限建立
-  HRAuthoritySetup: "c02998a7-ee2f-4ce7-9f96-4af2740d50f4",
+  // HRAuthoritySetup: "c02998a7-ee2f-4ce7-9f96-4af2740d50f4",
+  HRAuthoritySetup: "人事權限建立",
 } as const
 
 const { BasicDataCreation, HRAuthoritySetup } = erpFeaturesLookup
