@@ -1,9 +1,4 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
-
-// .mainContainer {
-//   height: fit-content;
-// }
 
 .dailyReport {
   :global(.rbc-month-view) {
@@ -16,7 +11,14 @@
       border-bottom-width: 2px;
       font-size: 20px;
     }
+    :global(.rbc-month-header) {
+      > :global(.rbc-header) {
+        padding: 7px 0;
+        background-color: $bgc01;
+      }
+    }
   }
+
   :global(.rbc-month-row) {
     display: inline-table;
     height: fit-content;
@@ -61,8 +63,9 @@
 
   :global(.rbc-month-view) {
     border-width: 2px;
-    border-left:0;
-    border-right:0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
   }
 
   // :global(.rbc-event) {

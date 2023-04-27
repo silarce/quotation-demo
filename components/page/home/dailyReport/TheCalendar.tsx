@@ -68,11 +68,8 @@ export default function TheCalendar(
   const [eventsArr, setEventsArr]
     = useState(dataArr.map((data) => new Class_isRead(data, reRender)))
 
-    console.log(dataArr)
-
-
   return (
-    <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px]`}>
+    <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
       <Calendar
         localizer={localizer}
         events={eventsArr}
@@ -102,10 +99,15 @@ export default function TheCalendar(
     </div>
   )
 }
-
+// ======================================================================
+const checkIconTable = {
+  "0": iconCircle,
+  "1": iconCircle_Checked,
+  "forbidden": iconRedDot,
+}
 // ============================================================================
 
-export class Class_isRead implements Tevent {
+class Class_isRead implements Tevent {
   constructor(data: Tdata, reRender: () => void) {
     this._reRender = reRender
 
@@ -175,12 +177,7 @@ const ToolBar = (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => {
   )
 
 }
-// ======================================================================
-const checkIconTable = {
-  "0": iconCircle,
-  "1": iconCircle_Checked,
-  "forbidden": iconRedDot,
-}
+
 // ======================================================================
 
 // 壓在格子上方的event
@@ -213,7 +210,7 @@ const Header = (HeaderProps: BigCalendar.HeaderProps) => {
   const { label } = HeaderProps
   const day = label.replace("週", "")
   return (
-    <div className="py-2">
+    <div>
       <span>{day}</span>
     </div>
   )
