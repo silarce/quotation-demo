@@ -1,54 +1,25 @@
-import { useState, } from "react"
-import Image from "next/image"
-import moment from 'moment'
-import classNames from "classnames"
 
-const _ = require("lodash")
-
-// 行事曆元件
-import BigCalendar from 'react-big-calendar';
-import {
-  EventWrapperProps,
-  Calendar, momentLocalizer,
-} from 'react-big-calendar'
-
+import _ from "lodash"
 
 // component
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 
-
-// global gear
+// layer
 import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
-import MyButton from "components/global/gear/button/myButton"
+import SubLayer from "components/Layer/SubLayer/SubLayer"
 
-
-// img
-import iconCircle from "public/image/icon/circle.svg"
-import iconCircle_Checked from "public/image/icon/circle_checked.svg"
-import iconRedDot from "public/image/icon/redDot.svg"
-
-// tool
-import { month_chToNumber } from "js/tools/date/conversionTable";
-
-// css
-import scss from "./dailyReport.module.scss"
-
-
-const localizer = momentLocalizer(moment)
 
 // =====================================================================
 
 export default function DailyReport() {
 
   return (
-    <div className={scss.container}>
+    <SubLayer>
       <PageHeader02 tag="日報表" />
-      <div className={scss.mainContainer}>
-
+      <div >
         <TheCalendar dataArr={lotFakeData} />
-
       </div>
-    </div>
+    </SubLayer>
   )
 }
 
