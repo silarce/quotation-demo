@@ -1,8 +1,10 @@
+import { useState } from "react"
 
 import _ from "lodash"
 
 // component
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 
 // layer
 import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
@@ -12,14 +14,41 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 // =====================================================================
 
 export default function DailyReport() {
+  const [showSetReportEmpModal, setShowSetReportEmpModal] = useState(true)
+
+
+
+
+
+  const onConfirm = (employee: TfakeEmployee[]) => {
+    console.log(employee)
+  }
+  const onCancel = () => {
+    setShowSetReportEmpModal(false)
+  }
+  const onSearch = (v: string) => {
+    console.log(v)
+  }
+
 
   return (
-    <SubLayer>
-      <PageHeader02 tag="日報表" />
-      <div >
-        <TheCalendar dataArr={lotFakeData} />
-      </div>
-    </SubLayer>
+    <>
+      <SubLayer>
+        <PageHeader02 tag="日報表" />
+        <div >
+          <TheCalendar dataArr={lotFakeData} />
+        </div>
+
+      </SubLayer>
+
+      <SetReportEmpModal
+        visible={showSetReportEmpModal}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        onSearch={onSearch}
+        dataArr={_.cloneDeep(fakeEmployeeArr)}
+      />
+    </>
   )
 }
 
@@ -28,6 +57,90 @@ export default function DailyReport() {
 // ===============================================================
 // ===============================================================
 // ===============================================================
+// ===============================================================
+
+type TfakeEmployee = {
+  idNumber: string
+  chName: string
+  jobName: string
+  grade: string
+  shouldReport: boolean
+}
+
+
+const fakeEmployeeArr: TfakeEmployee[] = [
+  {
+    idNumber: "EM-11204-01",
+    chName: "李建一",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: false,
+  },
+  {
+    idNumber: "EM-11204-02",
+    chName: "王志二",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: true,
+  },
+  {
+    idNumber: "EM-11204-03",
+    chName: "張國三",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: false,
+  },
+  {
+    idNumber: "EM-11204-04",
+    chName: "劉文四",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: true,
+  },
+  {
+    idNumber: "EM-11204-05",
+    chName: "趙春五",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: false,
+  },
+  {
+    idNumber: "EM-11204-06",
+    chName: "陳慧六",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: true,
+  },
+  {
+    idNumber: "EM-11204-07",
+    chName: "楊天七",
+    jobName: "資深助理",
+    grade: "Level 2",
+    shouldReport: false,
+  },
+  {
+    idNumber: "EM-11204-08",
+    chName: "黃德八",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: false,
+  },
+  {
+    idNumber: "EM-11204-09",
+    chName: "周勇九",
+    jobName: "非常資深助理",
+    grade: "Level 3",
+    shouldReport: false,
+  },
+  {
+    idNumber: "EM-11204-10",
+    chName: "吳華十",
+    jobName: "助理",
+    grade: "Level 1",
+    shouldReport: false,
+  },
+]
+
 // ===============================================================
 
 interface Tdata {

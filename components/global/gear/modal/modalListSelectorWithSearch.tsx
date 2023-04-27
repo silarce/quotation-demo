@@ -1,5 +1,6 @@
 
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
+import classNames from "classnames"
 
 // antd
 import { Modal } from 'antd';
@@ -12,10 +13,15 @@ import InputSearch from 'components/global/gear/input/inputSearch';
 import style from "./modalListSelectorWithSearch.module.scss"
 
 
+type TmodalProps = Parameters<typeof Modal>[0]
+
+// =====================================================
 export default function ModalListSelectorWithSearch(
   { children, label, visible,
     onConfirm, onCancel, onSearch,
-    className, placeholder }:
+    className, placeholder,
+    width
+  }:
     {
       children: ReactNode
       label: string
@@ -26,19 +32,21 @@ export default function ModalListSelectorWithSearch(
       onSearch: (value: string) => void
       className?: string,
       placeholder?: string
+      width: string
     }) {
 
   // ======================================================
 
   return (
     <Modal
-      className={`${style.modal} ${className}`}
+      className={classNames(style.modal, className)}
       visible={visible}
       closable={false}
       centered={true}
       destroyOnClose={true}
       onCancel={onCancel}
-      footer={false}
+      footer={null}
+      width={width}
     >
       <div className={style.container}>
         <div className={style.header}>
