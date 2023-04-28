@@ -32,7 +32,7 @@ export default function ModalListSelectorWithSearch(
       onSearch: (value: string) => void
       className?: string,
       placeholder?: string
-      width: string
+      width?: string
     }) {
 
   // ======================================================
