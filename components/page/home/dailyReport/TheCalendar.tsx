@@ -56,8 +56,11 @@ interface Tevent {
 // ===========================================================================
 
 export default function TheCalendar(
-  { dataArr }:
-    { dataArr: Tdata[] }
+  { dataArr, editReportEmpArr }:
+    {
+      dataArr: Tdata[]
+      editReportEmpArr: () => void
+    }
 ) {
 
   const [render, setRender] = useState(false)
@@ -89,11 +92,13 @@ export default function TheCalendar(
           dateCellWrapper: DateCellWrapper, //底下的格子，裡面沒有裝東西，似僅作為背景
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           eventWrapper: EventWrapper, // 壓在格子上方的event
-          toolbar: ToolBar, // 最上方的操作面板
+          // toolbar: ToolBar, // 最上方的操作面板
+          toolbar:
+            (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => ToolBar(toolbar, editReportEmpArr), // 最上方的操作面板
         }}
       />
     </div>
-  )
+  ) // return
 }
 // ======================================================================
 const checkIconTable = {
@@ -133,7 +138,11 @@ class Class_isRead implements Tevent {
 
 // ============================================================================
 
-const ToolBar = (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => {
+const ToolBar = (
+  // toolbar: BigCalendar.ToolbarProps<Class_isRead, object>
+  toolbar: BigCalendar.ToolbarProps<Class_isRead, object>,
+  editReportEmpArr: () => void
+) => {
 
   const { onNavigate, label } = toolbar
 
@@ -166,8 +175,8 @@ const ToolBar = (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => {
           onClick={nextMonth} />
       </div>
       <div className={scss.right}>
-        <MyButton label="刪除員工" preImg="delete" onClick={() => { alert("刪除員工") }} px="px2227" />
-        <MyButton label="新增員工" preImg="add" onClick={() => { alert("新增員工") }} px="px2227" />
+        <MyButton label="回報人員設定" onClick={editReportEmpArr} px="px2227" />
+        {/* <MyButton label="編輯/新增回報" onClick={() => { alert("編輯/新增回報") }} px="px2227" /> */}
       </div>
     </div>
   )

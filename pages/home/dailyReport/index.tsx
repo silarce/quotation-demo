@@ -17,22 +17,27 @@ import scss from "./dailyReport.module.scss"
 // =====================================================================
 
 export default function DailyReport() {
-  const [showSetReportEmpModal, setShowSetReportEmpModal] = useState(true)
+  const [reportEmpArr_preEdit, setReportEmpArr_preEdit] = useState<TfakeEmployee[]>()
 
 
 
 
+  // ----------------------------------------------------------------------
+  // SetReportEmpModal
 
+  const editReportEmpArr = () => {
+    setReportEmpArr_preEdit(fakeEmployeeArr)
+  }
   const onConfirm = (employee: TfakeEmployee[]) => {
     console.log(employee)
   }
   const onCancel = () => {
-    setShowSetReportEmpModal(false)
+    setReportEmpArr_preEdit(undefined)
   }
   const onSearch = (v: string) => {
     console.log(v)
   }
-
+  // ----------------------------------------------------------------------
 
   return (
     <>
@@ -40,21 +45,18 @@ export default function DailyReport() {
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
         <PageHeader02 tag="日報表" />
 
-        {/* <div>
-          <TheCalendar dataArr={lotFakeData} />
-        </div> */}
-
-        <TheCalendar dataArr={lotFakeData} />
-
+        <TheCalendar dataArr={lotFakeData} 
+        editReportEmpArr={editReportEmpArr}
+        />
 
       </SubLayer>
 
       <SetReportEmpModal
-        visible={showSetReportEmpModal}
+        visible={!!reportEmpArr_preEdit}
         onConfirm={onConfirm}
         onCancel={onCancel}
         onSearch={onSearch}
-        dataArr={_.cloneDeep(fakeEmployeeArr)}
+        dataArr={fakeEmployeeArr ?? []}
       />
     </>
   )

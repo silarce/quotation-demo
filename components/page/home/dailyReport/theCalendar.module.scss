@@ -110,8 +110,9 @@
     }
   }
   .right {
-    display: grid;
-    grid-template-columns: auto auto;
+    display: flex;
+    flex-wrap: nowrap;
+    // grid-template-columns: auto auto;
     gap: 18px;
     width: fit-content;
     margin: auto;

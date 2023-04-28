@@ -1,4 +1,5 @@
 import { useState } from "react"
+import _ from "lodash"
 
 
 // gear
@@ -22,16 +23,18 @@ export default function SetReportEmpModal(
     onConfirm,
     onCancel,
     onSearch,
-    dataArr
+    dataArr,
   }:
     {
       visible: boolean
       onConfirm: (dataArr: Tdata[]) => void
       onCancel: () => void
       onSearch: (v: string) => void
+      /**會經過cloneDeep處理 */
       dataArr: Tdata[]
     }
 ) {
+  const dataArrCopy = _.cloneDeep(dataArr)
 
   const [render, setRender] = useState(1)
   const reRender = () => setRender(state => ++state)
@@ -42,13 +45,13 @@ export default function SetReportEmpModal(
       className={scss.antdModal}
       label="回報人員設定"
       visible={visible}
-      onConfirm={() => onConfirm(dataArr)}
+      onConfirm={() => onConfirm(dataArrCopy)}
       onCancel={onCancel}
       onSearch={onSearch}
       width="800px"
     >
       <div className={scss.body}>
-        {dataArr.map((data, index, arr) => {
+        {dataArrCopy.map((data, index, arr) => {
           const { idNumber, chName, jobName, grade, shouldReport } = data
           const onClick = () => {
             arr[index].shouldReport = !arr[index].shouldReport
