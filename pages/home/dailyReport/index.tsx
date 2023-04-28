@@ -1,4 +1,5 @@
 import { useState } from "react"
+import classNames from "classnames"
 
 import _ from "lodash"
 
@@ -10,6 +11,8 @@ import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModa
 import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
+// css
+import scss from "./dailyReport.module.scss"
 
 // =====================================================================
 
@@ -33,11 +36,16 @@ export default function DailyReport() {
 
   return (
     <>
-      <SubLayer>
+      {/* <SubLayer bodyClassName={scss.subLayer}> */}
+      <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
         <PageHeader02 tag="日報表" />
-        <div >
+
+        {/* <div>
           <TheCalendar dataArr={lotFakeData} />
-        </div>
+        </div> */}
+
+        <TheCalendar dataArr={lotFakeData} />
+
 
       </SubLayer>
 

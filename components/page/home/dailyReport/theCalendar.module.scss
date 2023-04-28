@@ -1,6 +1,15 @@
 @use "styles/theme01" as *;
 
 .dailyReport {
+  :global(.rbc-calendar) {
+    display: grid;
+    grid-template-rows: min-content auto;
+    :global(.rbc-month-view) {
+      height: 100%;
+      overflow: auto;
+    }
+  }
+
   :global(.rbc-month-view) {
     height: fit-content;
     :global(.rbc-header) {

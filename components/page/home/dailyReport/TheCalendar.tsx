@@ -69,17 +69,13 @@ export default function TheCalendar(
     = useState(dataArr.map((data) => new Class_isRead(data, reRender)))
 
   return (
-    <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
+    // <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
+    <div className={`${scss.dailyReport} h-full mx-[3px] mb-[3px]`}>
       <Calendar
         localizer={localizer}
         events={eventsArr}
         showAllEvents
         views={['month']}
-        style={{
-          minHeight: 750,
-          height: "100%"
-        }}
-
         components={{
           month: {
             // event: Cevent,
