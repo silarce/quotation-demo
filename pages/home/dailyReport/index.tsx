@@ -1,10 +1,11 @@
 import { useState } from "react"
 import classNames from "classnames"
+import { useRouter } from "next/router"
 
 import _ from "lodash"
 
 // layer
-import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 // component
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
@@ -29,6 +30,10 @@ const fakeDailyReport = generateData(fakeDailyReportOri, "2023-04-26", "2023-05-
 // =====================================================================
 
 export default function DailyReport() {
+  const router = useRouter()
+  const isSubordinate = router.query.isSubordinate ? true : false
+
+
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] = useState<TfakeEmployee[]>()
 
 
@@ -48,7 +53,7 @@ export default function DailyReport() {
     console.log(v)
   }
   // ----------------------------------------------------------------------
-  const panelList = [
+  const panelList01: TpanelList = [
     {
       custom: <CheckButton
         checkLabel="已讀"
@@ -59,6 +64,20 @@ export default function DailyReport() {
     }
   ]
 
+  const panelList02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => { },
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => { },
+    },
+  ]
+  const panelList = isSubordinate ? panelList01 : panelList02
+
   // ----------------------------------------------------------------------
 
   return (
@@ -67,10 +86,10 @@ export default function DailyReport() {
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
         <PageHeader02 tag="日報表" panelList={panelList} />
 
-        {/* <TheCalendar dataArr={fakeDailyReport}
+        <TheCalendar dataArr={fakeDailyReport}
           editReportEmpArr={editReportEmpArr}
-        /> */}
-        <ReportTable reportDetailArr={fakeReportDetailArr} />
+        />
+        {/* <ReportTable reportDetailArr={fakeReportDetailArr} isSubordinate={isSubordinate} /> */}
 
       </SubLayer>
 

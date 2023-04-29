@@ -61,9 +61,8 @@
     border-top: solid 1px $colorBorder01;
     .row {
       display: grid;
-      grid-template-columns: repeat(9, fit-content(100%));
+      grid-template-columns: repeat(8, fit-content(100%)) auto;
       border-bottom: solid 1px $colorBorder01;
-
       > div {
         padding: 12px 10px;
         border-right: solid 1px $colorBorder01;
@@ -86,6 +85,13 @@
           }
         }
       }
+    }
+    .newReportBtn {
+      border: none;
+      background-color: transparent;
+      padding: 0;
+      margin-top: 15px;
+      margin-left: 13px;
     }
   } // tbody
 } // table

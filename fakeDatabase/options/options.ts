@@ -182,16 +182,6 @@ export const optionsCreator_doorRail_antyTyphoon =
   ]
 
 
-
-
-
-
-
-
-
-
-
-
 // B 報價單的B
 export const optionsCreator_B =
   (): Toption[] => [
@@ -264,9 +254,6 @@ export const optionsCreator_month = (
   return optionArr
 }
 
-
-
-
 export const optionsCreator_region = (
   { emptyOption }:
     { emptyOption?: boolean } = {}
@@ -301,6 +288,22 @@ export const optionsCreator_year = (
   if (emptyOption) optionArr.unshift({ value: "", label: "不拘" })
   return optionArr
 }
+
+
+export const optionsCreator_dailyReportPeriod = (
+  { emptyOption }:
+    { emptyOption?: boolean } = {}
+): Toption[] => {
+  const optionArr = [
+    { value: "上午(內)", label: "上午(內)" },
+    { value: "上午(外)", label: "上午(外)" },
+    { value: "下午(內)", label: "下午(內)" },
+    { value: "下午(外)", label: "下午(外)" },
+  ]
+  if (emptyOption) optionArr.unshift({ value: "", label: "不拘" })
+  return optionArr
+}
+
 
 
 
