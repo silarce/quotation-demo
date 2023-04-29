@@ -1,5 +1,14 @@
-import { Carousel } from 'antd';
+import classNames from "classnames";
+
+
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+
+
 import Image from 'next/image';
+
 
 // icon
 import iconArrowRight from "public/image/icon/arrow_right.svg"
@@ -23,7 +32,7 @@ export default function TagCarousel(
   return (
     <div className={scss.container}>
 
-      <Carousel
+      <Slider
         className={scss.antdCarousel}
         arrows={true}
         dots={false}
@@ -41,28 +50,22 @@ export default function TagCarousel(
           const { name, date } = tag
           return (
             <div key={index}>
-              <div className={scss.cell}>
+              <div className={classNames(scss.cell, { [scss.isActive]: index === 0 })} >
                 <span>
-                  <span>{name}</span> <span>{date}</span>
+                  {`${name} ${date}`}
                 </span>
                 <Image src={iconRmove} alt="remove" className={scss.removeBtn}
                   onClick={() => removeTag(index)}
                 />
+                <hr />
               </div>
             </div>
           )
         })}
-      </Carousel>
-    </div>
+      </Slider >
+    </div >
   )
 }
-
-
-
-
-
-
-
 
 
 

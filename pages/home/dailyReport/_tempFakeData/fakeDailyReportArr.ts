@@ -10,14 +10,14 @@ interface TfakeDailyReport {
 const fakeDailyReport: TfakeDailyReport[] = [
   {
     job: "BO",
-    name: "大雄",
+    name: "葉大雄",
     isChecked: false,
     isForbidden: true,
     date: "2023-03-01",
   },
   {
     job: "BO",
-    name: "靜香",
+    name: "靜靜香",
     isChecked: false,
     isForbidden: false,
     date: "2023-03-01",
