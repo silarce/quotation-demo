@@ -188,6 +188,53 @@ export type TerpFeatureDto = {
 }
 
 
+export type TdailyReportItemDto = {
+  id: string
+  // createdAt: string // date
+  // updatedAt: string //date
+  periodOfDay: "AM" | "PM"
+  customerName: string
+  contactName: string
+  order: number
+  workingTypes: "install" | "repair" | "power-delivery" | "maintenace" | "inspection"
+  descriptiona: string
+}
+
+export type TdailyReportDto = {
+  id: string
+  // createdAt: string // date
+  // updatedAt: string //date
+  employee: TemployeeDto
+  reviewedByEmployee: TemployeeDto
+  reviewedAt: string // date
+  items: TdailyReportItemDto[]
+}
+
+export type TsetReportersDto = {
+  employeeIds: string[]
+}
+
+export type TcreateDailyReportItemDto = {
+  periodOfDay: "AM" | "PM"
+  customerName: string
+  contactName: string
+  workingTypes: "install" | "repair" | "power-delivery" | "maintenace" | "inspection"
+  descriptiona: string
+}
+
+export type TupdateDailyReportDto = {
+  date: string // date
+  items: TcreateDailyReportItemDto[]
+}
+
+
+
+
+
+
+
+
+
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
