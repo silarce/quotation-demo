@@ -52,14 +52,15 @@ interface Tevent {
   // resource?: any,
 }
 
-
+type Ttag = { name: string, date: string }
 // ===========================================================================
 
 export default function TheCalendar(
-  { dataArr, editReportEmpArr }:
+  { dataArr, editReportEmpArr, addTag }:
     {
       dataArr: Tdata[]
       editReportEmpArr: () => void
+      addTag: (employee: Ttag) => void
     }
 ) {
 
@@ -69,7 +70,7 @@ export default function TheCalendar(
   }
 
   const [eventsArr, setEventsArr]
-    = useState(dataArr.map((data) => new Class_isRead(data, reRender)))
+    = useState(dataArr.map((data) => new Class_isRead(data, reRender, addTag)))
 
   return (
     // <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
@@ -109,8 +110,9 @@ const checkIconTable = {
 // ============================================================================
 
 class Class_isRead implements Tevent {
-  constructor(data: Tdata, reRender: () => void) {
+  constructor(data: Tdata, reRender: () => void, addTag: (employee: Ttag) => void) {
     this._reRender = reRender
+    this._addTag = addTag
 
     const { job, name, isChecked, date, isForbidden } = data
     this.job = job
@@ -119,21 +121,34 @@ class Class_isRead implements Tevent {
     this.isForbidden = isForbidden
     this.start = date
     this.end = date
+    this.date = date
   } // constructor
 
-  private _reRender: () => void
+  private _reRender
+  private _addTag
+
   job
   name
   start
   end
+  date
   isChecked
   isForbidden
 
-  switchIsReaded = () => {
-    if (this.isForbidden) return
-    this.isChecked = !this.isChecked
+  addTag = () => {
+    this._addTag({
+      name: this.name,
+      date: this.date
+    })
     this._reRender()
   }
+
+
+  // switchIsReaded = () => {
+  //   if (this.isForbidden) return
+  //   this.isChecked = !this.isChecked
+  //   this._reRender()
+  // }
 } // Clss_isRead
 
 // ============================================================================
@@ -188,7 +203,7 @@ const ToolBar = (
 // 壓在格子上方的event
 const EventWrapper = (e: EventWrapperProps<Class_isRead>) => {
   const { event } = e
-  const { job, name, isChecked, switchIsReaded, isForbidden } = event
+  const { job, name, isChecked, isForbidden, addTag } = event
   const theIsChecked = +isChecked as 0 | 1
   const checkIcon =
     isForbidden
@@ -196,7 +211,7 @@ const EventWrapper = (e: EventWrapperProps<Class_isRead>) => {
       : checkIconTable[`${theIsChecked}`]
   return (
     <div className={classNames("px-2 mb-2 cursor-pointer", scss.eventWrapper)}
-      onClick={switchIsReaded}
+      onClick={addTag}
     >
       <div className={classNames(
         "grid grid-cols-[20px_40px_auto] gap-2 justify-start items-center",

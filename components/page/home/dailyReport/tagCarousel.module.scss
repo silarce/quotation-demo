@@ -1,0 +1,50 @@
+@use "styles/theme01" as *;
+
+.container {
+  // max-width: 750px;
+  max-width: 52vw;
+  margin-left: 20px;
+  
+  .antdCarousel {
+    // margin: auto;
+    
+
+    :global(.slick-list) {
+      :global(.slick-slide) {
+        background-color: $bgc01;
+
+        width: fit-content;
+        .cell {
+          display: flex;
+          flex-wrap: nowrap;
+          place-items: center;
+          gap: 10px;
+          height: 58px;
+          padding: 0 20px;
+          .removeBtn {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    :global(.slick-arrow) {
+      color: black;
+      // position: relative;
+      // display: inline-block;
+      top: 0;
+      margin: 0;
+
+      background-color: $bgc01;
+      height: 100%;
+
+      &:global(.slick-prev) {
+        transform: rotate(180deg);
+        left: -20px;
+      }
+      &:global(.slick-next) {
+        right: -20px;
+      }
+    }
+  } // antdCarousel
+}

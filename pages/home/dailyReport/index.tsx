@@ -1,8 +1,10 @@
 import { useState } from "react"
 import classNames from "classnames"
 import { useRouter } from "next/router"
-
 import _ from "lodash"
+
+// ui
+
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -11,6 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
+import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
 
@@ -26,6 +29,8 @@ import { TreportDetail, fakeReportDetailArr } from "./_tempFakeData/fakeReportDe
 import scss from "./dailyReport.module.scss"
 
 // =====================================================================
+type Ttag = { name: string, date: string }
+// =====================================================================
 const fakeDailyReport = generateData(fakeDailyReportOri, "2023-04-26", "2023-05-03")
 // =====================================================================
 
@@ -36,6 +41,17 @@ export default function DailyReport() {
 
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] = useState<TfakeEmployee[]>()
 
+  const [tagArr, setTagArr] = useState<Ttag[]>([])
+
+  // ----------------------------------------------------------------------
+  // TagCarousel
+  const addTag = (employee: Ttag) => {
+    setTagArr(arr => { arr.push(employee); return [...arr] })
+  }
+  const removeTag = (index: number) => {
+    setTagArr(arr => { arr.splice(index, 1); return [...arr] })
+  }
+  console.log(tagArr)
 
   // ----------------------------------------------------------------------
   // SetReportEmpModal
@@ -79,15 +95,25 @@ export default function DailyReport() {
   const panelList = isSubordinate ? panelList01 : panelList02
 
   // ----------------------------------------------------------------------
+  const customeLeft =
+    [
+      <TagCarousel key="1"
+        tagArr={tagArr}
+        removeTag={removeTag} />
+    ]
+  // ----------------------------------------------------------------------
 
   return (
     <>
       {/* <SubLayer bodyClassName={scss.subLayer}> */}
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
-        <PageHeader02 tag="日報表" panelList={panelList} />
+        <PageHeader02 tag="日報表" panelList={panelList}
+          customeLeft={customeLeft}
+        />
 
         <TheCalendar dataArr={fakeDailyReport}
           editReportEmpArr={editReportEmpArr}
+          addTag={addTag}
         />
         {/* <ReportTable reportDetailArr={fakeReportDetailArr} isSubordinate={isSubordinate} /> */}
 
@@ -103,4 +129,11 @@ export default function DailyReport() {
     </>
   )
 }
+
+// ==========================================================
+
+
+
+
+
 
