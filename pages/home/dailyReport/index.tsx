@@ -3,13 +3,15 @@ import classNames from "classnames"
 
 import _ from "lodash"
 
-// component
-import TheCalendar from "components/page/home/dailyReport/TheCalendar"
-import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
-
 // layer
 import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
+// component
+import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
+import ReportTable from "components/page/home/dailyReport/ReportTable"
+// gear
+import CheckButton from "components/global/gear/button/checkButton"
 
 // fakeData
 import { fakeEmployeeArr, TfakeEmployee } from "./_tempFakeData/fakeEmployeeArr"
@@ -17,6 +19,7 @@ import {
   TfakeDailyReport,
   fakeDailyReport as fakeDailyReportOri, generateData
 } from "./_tempFakeData/fakeDailyReportArr"
+import { TreportDetail, fakeReportDetailArr } from "./_tempFakeData/fakeReportDetailArr"
 
 // css
 import scss from "./dailyReport.module.scss"
@@ -45,16 +48,29 @@ export default function DailyReport() {
     console.log(v)
   }
   // ----------------------------------------------------------------------
+  const panelList = [
+    {
+      custom: <CheckButton
+        checkLabel="已讀"
+        uncheckLable="未讀"
+        onClick={(isCheck) => { console.log(isCheck) }}
+        defaultCheck={true}
+      />
+    }
+  ]
+
+  // ----------------------------------------------------------------------
 
   return (
     <>
       {/* <SubLayer bodyClassName={scss.subLayer}> */}
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
-        <PageHeader02 tag="日報表" />
+        <PageHeader02 tag="日報表" panelList={panelList} />
 
-        <TheCalendar dataArr={fakeDailyReport}
+        {/* <TheCalendar dataArr={fakeDailyReport}
           editReportEmpArr={editReportEmpArr}
-        />
+        /> */}
+        <ReportTable reportDetailArr={fakeReportDetailArr} />
 
       </SubLayer>
 
