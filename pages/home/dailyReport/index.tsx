@@ -184,7 +184,9 @@ export default function DailyReport(
   // ----------------------------------------------------------------------
   // TagCarousel
   const addTag = (tag: Ttag) => {
-    if (userInfo.employee!.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
+    if (isSubordinate) {
+      if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
+    }
     if (tagArr.some(tag => tag.reportId === tag.reportId)) return
     setTagArr(arr => { arr.push(tag); return [...arr] })
 
