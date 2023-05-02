@@ -14,6 +14,7 @@ import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // fakeData
 import { fakeEmployeeArr, TfakeEmployee } from "./_tempFakeData/fakeEmployeeArr"
@@ -68,6 +69,7 @@ export default function DailyReport(
       userErpFeature: TerpFeatureDto[]
     }
 ) {
+
   // -----------------------------------------------------------
   // const router = useRouter()
   // const isSubordinate = false
@@ -87,8 +89,6 @@ export default function DailyReport(
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
   // 
-  // const [reportInEdit, setReportInEdit] = useState<>()
-
 
   const [tagArr, setTagArr] = useState<Ttag[]>([])
 
@@ -112,15 +112,15 @@ export default function DailyReport(
     updateDailyReports,
   } = useApiDailyReports(thisMonth)
   // 取得自己指定日期的日報表
-  const {
-    dailyReport_my,
-    updateDailyReports_my
-  } = useApiDailyReports_my(today)
+  // const {
+  //   dailyReport_my,
+  //   updateDailyReports_my
+  // } = useApiDailyReports_my(today)
   // 取得指定日報表
-  const {
-    dailyReport_id,
-    updateDailyReports_id
-  } = useApiDailyReports_id("ddd")
+  // const {
+  //   dailyReport_id,
+  //   updateDailyReports_id
+  // } = useApiDailyReports_id("ddd")
   // 取得所有人員
   const { data: employeeRes, update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
@@ -204,11 +204,15 @@ export default function DailyReport(
       if (employee.shouldReport) employeeIds.push(employee.id)
     })
     try {
+      showRootLoading(true)
       await apiPatchDailyReports_Reporters({ employeeIds })
+      await updateDailyReports()
+      onCancel()
     }
     catch {
-      myAlert.err({ title: "更新失敗" })
+      myAlert.err({ title: "更新回報人員失敗" })
     }
+    finally { showRootLoading(false) }
   }
   const onCancel = () => {
     setReportEmpArr_preEdit(undefined)
@@ -221,8 +225,6 @@ export default function DailyReport(
   const [render, setRender] = useState(1)
   const reRender = () => setRender(state => ++state)
 
-
-  // const editNewDailyReport = (dailyReport?: TdailyReportDto | undefined) => {
   const editNewDailyReport = async (reportId?: string, employeeId?: string) => {
     let date: Date
     let items: Class_dailyReportItem[]
@@ -231,7 +233,16 @@ export default function DailyReport(
       items = [new Class_dailyReportItem(reRender)]
     }
     else {
-      const res = await apiDailyReports_id(reportId, ["items"])
+      let res;
+      try {
+        showRootLoading(true)
+        res = await apiDailyReports_id(reportId, ["items"])
+      }
+      catch {
+        myAlert.err({ title: "取得日報表失敗" })
+      }
+      finally { showRootLoading(false) }
+      if (!res) return;
       date = new Date(res.date)
       items
         = res.items.map((item) => new Class_dailyReportItem(reRender, item))
@@ -276,9 +287,14 @@ export default function DailyReport(
         if (!reportInEdit) return
         const date = reportInEdit.date
         const items = reportInEdit.items.map((item) => item.postBody)
-        try { await apiPatchDailyReports_my({ date, items }) }
-        catch { }
-
+        try {
+          showRootLoading(true)
+          await apiPatchDailyReports_my({ date, items })
+          await updateDailyReports()
+          cancelEditNewDailyReport()
+        }
+        catch { myAlert.err({ title: "更新日報表失敗" }) }
+        finally { showRootLoading(false) }
       },
     },
     {
