@@ -153,5 +153,12 @@ export const useApiDailyReports_id = (id: string) => {
 }
 
 
+// 審閱日報表
+export const apiDailyReports_review = (id: string) => {
+  const api = `/daily-reports/${id}/review`
+  return axi.post(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
 
 

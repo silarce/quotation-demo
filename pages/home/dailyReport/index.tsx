@@ -36,6 +36,7 @@ import {
   apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
   apiDailyReports_id,
+  apiDailyReports_review,
 } from "js/api/api_dailyReport"
 
 import {
@@ -224,13 +225,20 @@ export default function DailyReport(
 
   // 編輯中的日報表，送進ReportTable
   const [reportInEdit, setReportInEdit]
-    = useState<{ date: Date, items: Class_dailyReportItem[] }>()
+    = useState<{
+      id: string | undefined
+      date: Date,
+      reviewedAt: string | null | undefined,
+      items: Class_dailyReportItem[]
+    }>()
   const [render, setRender] = useState(1)
   const reRender = () => setRender(state => ++state)
 
   const editNewDailyReport = async (reportId?: string, employeeId?: string) => {
+    let id: string | undefined
     let date: Date
     let items: Class_dailyReportItem[]
+    let reviewedAt: string | null | undefined
     if (!reportId) {
       date = new Date()
       items = [new Class_dailyReportItem(reRender)]
@@ -246,21 +254,25 @@ export default function DailyReport(
       }
       finally { showRootLoading(false) }
       if (!res) return;
+      id = res.id
       date = new Date(res.date)
       items
         = res.items.map((item) => new Class_dailyReportItem(reRender, item))
+      reviewedAt = res.reviewedAt
     }
-    setReportInEdit({ date, items })
+    setReportInEdit({ id, date, items, reviewedAt })
   }
 
 
   const addDailyReportItem = () => {
     setReportInEdit(report => {
       if (!report) return report
+      const id = report.id
       const date = report.date
       const items = report.items
+      const reviewedAt = report.reviewedAt
       items.push(new Class_dailyReportItem(reRender))
-      return { date, items }
+      return { id, date, items, reviewedAt }
     })
 
   }
@@ -276,8 +288,26 @@ export default function DailyReport(
       custom: <CheckButton
         checkLabel="已讀"
         uncheckLable="未讀"
-        onClick={(isCheck) => { console.log(isCheck) }}
-        defaultCheck={true}
+        value={!!reportInEdit?.reviewedAt}
+        // defaultCheck={true}
+        // value={false}
+        // onClick={(isCheck) => { console.log(isCheck) }}
+        onClick={async () => {
+          if (!reportInEdit?.id) return;
+          try {
+            showRootLoading(true)
+            const res = await apiDailyReports_review(reportInEdit.id)
+
+            // setReportInEdit((report) => {
+
+            //   return report
+            // })
+
+          }
+          catch { myAlert.err({ title: "審核失敗" }) }
+          finally { showRootLoading(false) }
+
+        }}
       />
     }
   ]
