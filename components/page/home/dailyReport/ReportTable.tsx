@@ -19,32 +19,35 @@ import scss from "./reportTable.module.scss"
 import { optionsCreator_dailyReportPeriod } from "fakeDatabase/options/options"
 const optionArr_period = optionsCreator_dailyReportPeriod()
 
+// class
+import { Class_dailyReportItem } from "pages/home/dailyReport"
 
 // ==================================================
 export default function ReportTable(
-  { reportDetailArr, isSubordinate }:
+  { classDailyReportItemArr, addDailyReportItem, isSubordinate }:
     {
-      reportDetailArr: TreportDetail[]
+      classDailyReportItemArr: Class_dailyReportItem[]
+      addDailyReportItem: () => void
       isSubordinate: boolean
     }
 ) {
 
-  const [contentValue, setContentValue] = useState<string[]>([])
+  // const [contentValue, setContentValue] = useState<string[]>([])
 
 
   return (
     <div className={classNames(scss.table)}>
       {/*  */}
       <div className={classNames(scss.thead)}>
-        {keyArr.map(key => {
-          const { label, width, flex } = config[key]
-          if (key === "purpose") {
+        {headerKeyArr.map(key => {
+          const { label, width, flex } = config[key] ?? {}
+          if (key === "workingTypes") {
             return (
               <div key={key} className={classNames(scss.purposeColumn)} style={{ width }}>
                 <div><span>{label}</span></div>
                 <div>
-                  {purposeKeyArr.map(key => {
-                    const { label, width } = config[key]
+                  {workingTypesKeyArr.map(key => {
+                    const { label, width } = config[key] ?? {}
                     return (
                       <div key={key} className={classNames()} style={{ width }}>
                         <span>{label}</span>
@@ -67,14 +70,15 @@ export default function ReportTable(
 
       <div className={classNames(scss.tbody)}>
 
-        {reportDetailArr.map((data, index) => {
+        {classDailyReportItemArr.map((theClass, index) => {
           return (
             <div key={index} className={classNames(scss.row)}>
-              {keyArr.map((key) => {
-                const value = data[key]
-                const { label, width, flex } = config[key]
+              {bodyKeyArr.map((key) => {
+                const value = theClass[key]
+                const { label, width, flex } = config[key] ?? {}
                 // -----
-                if (key === "period") {
+                // if (key === "periodOfDay") {
+                if (key === "periodOfDay") {
                   return (
                     <div key={key} style={{ width }}>
                       {!isSubordinate
@@ -82,8 +86,8 @@ export default function ReportTable(
                         : <InputSel
                           selectProps={{
                             options: optionArr_period,
-                            value: "",
-                            onChange: () => { },
+                            value: theClass[key],
+                            onChange: (v) => { theClass[key] = v!.value as "AM" | "PM" },
                             arrowType: "black",
                           }} />
                       }
@@ -91,68 +95,55 @@ export default function ReportTable(
                   )
                 }
                 // -----
-                if (key === "purpose") {
-                  const purposeValue = data[key]
-                  return purposeKeyArr.map((purposeKey) => {
-                    const value = purposeValue[purposeKey]
 
-                    const { width } = config[purposeKey]
-                    return (
-                      <div key={purposeKey} className={scss.check}
-                        style={{ width }}>
-                        {(() => {
-                          if (isSubordinate) {
-                            return <Checkbox01
-                              stateValue={value}
-                              onClick={() => { }} />
-                          }
-                          else if (value) {
-                            return <Image src={iconCheck} alt="check" />
-                          }
-                          else return null
-                        })()}
-                      </div>
-                    )
-                  })
+                if (
+                  key === "install" ||
+                  key === "powerDelivery" ||
+                  key === "repair" ||
+                  key === "maintenace" ||
+                  key === "inspection"
+                ) {
+                  return (
+                    <div key={key} className={scss.check}
+                      style={{ width }}>
+                      {(() => {
+                        if (isSubordinate) {
+                          return <Checkbox01
+                            stateValue={theClass[key]}
+                            onClick={() => { theClass[key] = !theClass[key] }} />
+                        }
+                        else if (value) {
+                          return <Image src={iconCheck} alt="check" />
+                        }
+                        else return null
+                      })()}
+                    </div>
+                  )
                 }
+
                 // -----
-                if (key === "content") {
-
-                  const onChange = (v: string) => {
-                    setContentValue(arr => {
-                      arr[index] = v
-                      return [...arr]
-                    })
-                  }
-
+                // if (key === "description") {
+                if (
+                  key === "description" ||
+                  key === "customerName" ||
+                  key === "contactName"
+                ) {
                   return (
                     <div key={key} style={{ width, }} className={scss.content}>
                       {!isSubordinate
                         ? <span>{value as string}</span>
                         : <InputSel
                           textareaProps={{
-                            value: contentValue[index] ?? "",
-                            onChange: onChange,
+                            value: theClass[key] ?? "",
+                            onChange: (v) => { theClass[key] = v },
                             className: scss.textarea
                           }} />
                       }
                     </div>
                   )
                 }
-
                 // -----
-                return (
-                  <div key={key} style={{ width }}>
-                    {!isSubordinate
-                      ? <span>{value as string}</span>
-                      : <InputSel
-                        inputProps={{
-                          value: "",
-                          onChange: () => { }
-                        }} />
-                    }
-                  </div>
-                )
+                return null
               })}
             </div>
           )
@@ -163,6 +154,7 @@ export default function ReportTable(
             label="新增回報"
             preImg="add"
             className={scss.newReportBtn}
+            onClick={addDailyReportItem}
           />
         }
         <div>
@@ -175,44 +167,37 @@ export default function ReportTable(
 }
 // =================================================================
 
-type TreportDetail = {
-  period: string
-  customerName: string
-  contactPerson: string
-  purpose: {
-    openUp: boolean // 開拓
-    valuation: boolean // 估價
-    contract: boolean // 訂約
-    collectMoney: boolean // 收款
-    serve: boolean // 服務
-  }
-  content: string
-}
+// type TclassKeys = keyof Class_dailyReportItem
+type TclassKeys = Extract<keyof Class_dailyReportItem,
+  "periodOfDay" | "customerName" | "contactName" |
+  "install" | "powerDelivery" | "repair" | "maintenace" | "inspection" |
+  "description" | "workingTypes"
+>
 
-type Tkeys = keyof TreportDetail
-type TpurposeKeys = keyof TreportDetail["purpose"]
+const headerKeyArr: (TclassKeys)[] = [
+  "periodOfDay", "customerName", "contactName", "workingTypes", "description",
+]
+// const bodyKeyArr: TclassKeys[] = [
+const bodyKeyArr: (TclassKeys)[] = [
+  "periodOfDay", "customerName", "contactName",
+  "install", "powerDelivery", "repair", "maintenace", "inspection",
+  "description",
+]
+const workingTypesKeyArr = [
+  "install", "powerDelivery", "repair", "maintenace", "inspection",
+] as const
 
 type Tconfig = {
-  [key in (Tkeys | TpurposeKeys)]: {
+  [key in (TclassKeys)]?: {
     label: string
-    width: React.CSSProperties["width"]
-    // position?: "left" | "center"
+    width?: React.CSSProperties["width"]
     color?: "black" | "main"
     flex?: "auto"
   }
 }
 
-
-const keyArr: Tkeys[] = [
-  "period", "customerName", "contactPerson", "purpose", "content",
-]
-const purposeKeyArr: TpurposeKeys[] = [
-  "openUp", "valuation", "contract", "collectMoney", "serve",
-]
-
-
 const config: Tconfig = {
-  period: {
+  periodOfDay: {
     label: "上午/下午",
     width: "104px",
   },
@@ -220,42 +205,56 @@ const config: Tconfig = {
     label: "客戶名稱",
     width: "163px",
   },
-  contactPerson: {
+  contactName: {
     label: "接洽人",
     width: "147px",
   },
-  purpose: {
+  workingTypes: {
     label: "工作項目",
     width: "auto",
     // position: "center",
     color: "main"
   },
-  openUp: {
-    label: "開拓",
+
+
+  install: {
+    label: "安裝",
     width: "50px",
   },
-  valuation: {
-    label: "估價",
+  powerDelivery: {
+    label: "送電",
     width: "50px",
   },
-  contract: {
-    label: "訂約",
+  repair: {
+    label: "維修",
     width: "50px",
   },
-  collectMoney: {
-    label: "收款",
+  maintenace: {
+    label: "保養",
     width: "50px",
   },
-  serve: {
-    label: "服務",
+  inspection: {
+    label: "現勘",
     width: "50px",
   },
 
-  content: {
+
+  description: {
     label: "工作內容",
     width: "auto",
     flex: "auto"
   },
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

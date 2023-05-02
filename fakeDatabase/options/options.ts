@@ -295,10 +295,8 @@ export const optionsCreator_dailyReportPeriod = (
     { emptyOption?: boolean } = {}
 ): Toption[] => {
   const optionArr = [
-    { value: "上午(內)", label: "上午(內)" },
-    { value: "上午(外)", label: "上午(外)" },
-    { value: "下午(內)", label: "下午(內)" },
-    { value: "下午(外)", label: "下午(外)" },
+    { value: "AM", label: "AM" },
+    { value: "PM", label: "PM" },
   ]
   if (emptyOption) optionArr.unshift({ value: "", label: "不拘" })
   return optionArr

@@ -189,21 +189,22 @@ export type TerpFeatureDto = {
 
 
 export type TdailyReportItemDto = {
-  id: string
+  id?: string
+  order?: number
   // createdAt: Date // date
   // updatedAt: Date //date
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  order: number
   workingTypes: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]
-  descriptiona: string
+  description: string
 }
 
 export type TdailyReportDto = {
   id: string
   // createdAt: Date // date
   // updatedAt: Date //date
+  date: Date
   employee: TemployeeDto
   reviewedByEmployee: TemployeeDto
   reviewedAt: Date // date

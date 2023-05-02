@@ -26,6 +26,7 @@ import { TreportDetail, fakeReportDetailArr } from "./_tempFakeData/fakeReportDe
 
 // api
 import {
+  TcreateDailyReportItemDto,
   useApiDailyReports,
   useApiDailyReports_Reporters,
   useApiDailyReports_isReporters_me,
@@ -41,7 +42,7 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TerpFeatureDto } from "js/api/dtoTypes";
+import { TdailyReportDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
 
 
 
@@ -77,11 +78,13 @@ export default function DailyReport(
     return isSubordinate
   })()
   // -----------------------------------------------------------
-
-
-  // const [reportEmpArr_preEdit, setReportEmpArr_preEdit] = useState<TfakeEmployee[]>()
+  // state
+  // 送進SetReportEmpModal的arr
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
+  // 
+  // const [reportInEdit, setReportInEdit] = useState<>()
+
 
   const [tagArr, setTagArr] = useState<Ttag[]>([])
 
@@ -130,13 +133,15 @@ export default function DailyReport(
           updateEmployeeArr() // 取得所有人員
         ]
         await Promise.all(allArr)
+        // await updateDailyReports_id() // 取得指定日報表
       }
-      // await updateIsReporter()  // 檢查自己是不是回報人員
-      await updateDailyReports() // 取得指定月份所有日報表
-      // await updateDailyReports_my() // 取得自己指定日期的日報表
-      // await updateDailyReports_id() // 取得指定日報表
-    })()
 
+      await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
+      if (isSubordinate) {
+        // await updateIsReporter()  // 檢查自己是不是回報人員
+        await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
+      }
+    })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -182,6 +187,7 @@ export default function DailyReport(
 
   // ----------------------------------------------------------------------
   // SetReportEmpModal
+  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   const editReportEmpArr = () => {
     setReportEmpArr_preEdit(reportEmpArr)
   }
@@ -200,9 +206,46 @@ export default function DailyReport(
   const onCancel = () => {
     setReportEmpArr_preEdit(undefined)
   }
-  const onSearch = (v: string) => {
-    console.log(v)
+  // ----------------------------------------------------------------------
+
+
+  const [reportInEdit, setReportInEdit]
+    = useState<{ date: Date, items: Class_dailyReportItem[] }>()
+  const [render, setRender] = useState(1)
+  const reRender = () => setRender(state => ++state)
+
+
+  const editNewDailyReport = (dailyReport?: TdailyReportDto | undefined) => {
+    let date: Date
+    let items: Class_dailyReportItem[]
+    if (!dailyReport) {
+      date = new Date()
+      items = [new Class_dailyReportItem(reRender)]
+    }
+    else {
+      date = new Date(dailyReport.date)
+      items
+        = dailyReport.items.map((item) => new Class_dailyReportItem(reRender, item))
+    }
+    setReportInEdit({ date, items })
   }
+
+  const addDailyReportItem = () => {
+    setReportInEdit(report => {
+      if (!report) return report
+      const date = report.date
+      const items = report.items
+      items.push(new Class_dailyReportItem(reRender))
+      return { date, items }
+    })
+
+  }
+  const cancelEditNewDailyReport = () => {
+    setReportInEdit(undefined)
+  }
+
+
+
   // ----------------------------------------------------------------------
   const panelList01: TpanelList = [
     {
@@ -220,28 +263,28 @@ export default function DailyReport(
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-
-
-        // apiPatchDailyReports_my({
-        //   date: new Date(),
-        //   items: [
-        //     {
-        //       periodOfDay: "AM",
-        //       customerName: "測試",
-        //       contactName: "測試",
-        //       workingTypes: ["install"],
-        //       description: "測試測試測試測試",
-        //     }
-        //   ]
-        // })
-
+        if (!reportInEdit) return
+        const date = reportInEdit.date
+        const items = reportInEdit.items.map((item) => item.postBody)
+        // const date = new Date()
+        // const items = [
+        //   {
+        //     periodOfDay: "AM",
+        //     customerName: "測試",
+        //     contactName: "測試",
+        //     workingTypes: ["install"],
+        //     description: "測試測試測試測試",
+        //   }
+        // ]
+        try { await apiPatchDailyReports_my({ date, items }) }
+        catch { }
 
       },
     },
     {
       type: "myButton",
       label: "取消",
-      onClick: () => { },
+      onClick: cancelEditNewDailyReport,
     },
   ]
   const panelList = isSubordinate ? panelList02 : panelList01
@@ -264,11 +307,23 @@ export default function DailyReport(
           customeLeft={customeLeft}
         />
 
-        <TheCalendar dataArr={fakeDailyReport}
-          editReportEmpArr={editReportEmpArr}
-          addTag={addTag}
-        />
-        {/* <ReportTable reportDetailArr={fakeReportDetailArr} isSubordinate={isSubordinate} /> */}
+        {!reportInEdit &&
+          <TheCalendar
+            dataArr={fakeDailyReport}
+            editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
+            editDailyReport={isSubordinate ? editNewDailyReport : undefined}
+            // editDailyReport={isSubordinate ? () => { } : undefined}
+            addTag={addTag}
+            isSubordinate={isSubordinate}
+          />
+        }
+
+        {reportInEdit &&
+          <ReportTable
+            classDailyReportItemArr={reportInEdit.items}
+            addDailyReportItem={addDailyReportItem}
+            isSubordinate={isSubordinate} />
+        }
 
       </SubLayer>
 
@@ -283,10 +338,151 @@ export default function DailyReport(
   )
 }
 
-// ==========================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 
 
 
 
+export class Class_dailyReportItem {
+  constructor(
+    reRender: () => void,
+    dailyReportItem: TdailyReportItemDto = _.cloneDeep(emptyDailyReportItem)
+  ) {
+    this._reRender = reRender
+    this._item = dailyReportItem
 
+    this._install = this._item.workingTypes.includes("install")
+    this._repair = this._item.workingTypes.includes("repair")
+    this._powerDelivery = this._item.workingTypes.includes("power-delivery")
+    this._maintenace = this._item.workingTypes.includes("maintenace")
+    this._inspection = this._item.workingTypes.includes("inspection")
+
+  } // constructor
+  private _reRender
+  private _item
+  private _install
+  private _repair
+  private _powerDelivery
+  private _maintenace
+  private _inspection
+
+
+  get id() {
+    return this._item.id
+  }
+
+  get periodOfDay() {
+    return this._item.periodOfDay
+  }
+  set periodOfDay(v: "AM" | "PM") {
+    this._item.periodOfDay = v
+    this._reRender()
+  }
+
+  get customerName() {
+    return this._item.customerName
+  }
+  set customerName(v: string) {
+    this._item.customerName = v
+    console.log("test")
+    this._reRender()
+  }
+
+  get contactName() {
+    return this._item.contactName
+  }
+  set contactName(v: string) {
+    this._item.contactName = v
+    this._reRender()
+  }
+
+  get order() {
+    return this._item.order
+  }
+  // set order(v: string) {
+  //   this._item.order = v
+  //   this._reRender()
+  // }
+
+  get workingTypes() {
+    return this._item.workingTypes
+  }
+  // set workingTypes(v: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]) {
+  //   this._item.workingTypes = v
+  //   this._reRender()
+  // }
+  get install() { return this._install }
+  set install(v: boolean) {
+    this._install = v
+    this._reRender()
+  }
+
+  get repair() { return this._repair }
+  set repair(v: boolean) {
+    this._repair = v
+    this._reRender()
+  }
+
+  get powerDelivery() { return this._powerDelivery }
+  set powerDelivery(v: boolean) {
+    this._powerDelivery = v
+    this._reRender()
+  }
+
+  get maintenace() { return this._maintenace }
+  set maintenace(v: boolean) {
+    this._maintenace = v
+    this._reRender()
+  }
+
+  get inspection() { return this._inspection }
+  set inspection(v: boolean) {
+    this._inspection = v
+    this._reRender()
+  }
+
+
+  get description() {
+    return this._item.description
+  }
+  set description(v: string) {
+    this._item.description = v
+    this._reRender()
+  }
+
+  get postBody(): TcreateDailyReportItemDto {
+
+    const workingTypes: TcreateDailyReportItemDto["workingTypes"] = []
+    if (this.install) workingTypes.push("install")
+    if (this.repair) workingTypes.push("repair")
+    if (this.powerDelivery) workingTypes.push("power-delivery")
+    if (this.maintenace) workingTypes.push("maintenace")
+    if (this.inspection) workingTypes.push("inspection")
+
+    return {
+      periodOfDay: this.periodOfDay,
+      customerName: this.customerName,
+      contactName: this.contactName,
+      description: this.description,
+      workingTypes
+    }
+
+  }
+
+} // Class_dailyReportItem
+
+
+const emptyDailyReportItem: TdailyReportItemDto = {
+  periodOfDay: "AM",
+  customerName: "",
+  contactName: "",
+  workingTypes: [],
+  description: "",
+}
 

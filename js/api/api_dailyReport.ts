@@ -13,6 +13,7 @@ import {
 } from "./dtoTypes"
 
 
+export type { TcreateDailyReportItemDto }
 // =================================================================
 
 

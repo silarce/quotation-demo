@@ -56,11 +56,13 @@ type Ttag = { name: string, date: string }
 // ===========================================================================
 
 export default function TheCalendar(
-  { dataArr, editReportEmpArr, addTag }:
+  { dataArr, editReportEmpArr, addTag, isSubordinate, editDailyReport }:
     {
       dataArr: Tdata[]
-      editReportEmpArr: () => void
       addTag: (employee: Ttag) => void
+      isSubordinate: boolean
+      editReportEmpArr?: () => void
+      editDailyReport?: () => void
     }
 ) {
 
@@ -95,7 +97,8 @@ export default function TheCalendar(
           eventWrapper: EventWrapper, // 壓在格子上方的event
           // toolbar: ToolBar, // 最上方的操作面板
           toolbar:
-            (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => ToolBar(toolbar, editReportEmpArr), // 最上方的操作面板
+            (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) =>
+              ToolBar(toolbar, editReportEmpArr, editDailyReport), // 最上方的操作面板
         }}
       />
     </div>
@@ -156,7 +159,8 @@ class Class_isRead implements Tevent {
 const ToolBar = (
   // toolbar: BigCalendar.ToolbarProps<Class_isRead, object>
   toolbar: BigCalendar.ToolbarProps<Class_isRead, object>,
-  editReportEmpArr: () => void
+  editReportEmpArr?: () => void,
+  editDailyReport?: () => void
 ) => {
 
   const { onNavigate, label } = toolbar
@@ -190,8 +194,13 @@ const ToolBar = (
           onClick={nextMonth} />
       </div>
       <div className={scss.right}>
-        <MyButton label="回報人員設定" onClick={editReportEmpArr} px="px2227" />
-        {/* <MyButton label="編輯/新增回報" onClick={() => { alert("編輯/新增回報") }} px="px2227" /> */}
+        {editReportEmpArr &&
+          <MyButton label="回報人員設定" onClick={editReportEmpArr} px="px2227" />
+        }
+        {editDailyReport &&
+          <MyButton label="編輯/新增回報" onClick={() => editDailyReport()} px="px2227" />
+        }
+
       </div>
     </div>
   )

@@ -18,7 +18,10 @@ import iconRmove from "public/image/icon/remove03.svg"
 // css
 import scss from "./tagCarousel.module.scss"
 
-type Ttag = { name: string, date: string }
+type Ttag = {
+  name: string,
+  date: string
+}
 
 export default function TagCarousel(
   { tagArr, removeTag }:
