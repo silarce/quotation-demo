@@ -16,14 +16,6 @@ import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
-// fakeData
-import { fakeEmployeeArr, TfakeEmployee } from "./_tempFakeData/fakeEmployeeArr"
-import {
-  TfakeDailyReport,
-  fakeDailyReport as fakeDailyReportOri, generateData
-} from "./_tempFakeData/fakeDailyReportArr"
-import { TreportDetail, fakeReportDetailArr } from "./_tempFakeData/fakeReportDetailArr"
-
 
 // api
 import {
@@ -60,7 +52,7 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 // =====================================================================
 export type Ttag = { reportId: string, employeeId: string, name: string, date: string }
 // =====================================================================
-const fakeDailyReport = generateData(fakeDailyReportOri, "2023-04-26", "2023-05-03")
+
 // =====================================================================
 
 export default function DailyReport(
