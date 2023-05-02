@@ -178,7 +178,9 @@ export default function DailyReport(
   // ----------------------------------------------------------------------
   // TagCarousel
   const addTag = (employee: Ttag) => {
+    if (tagArr.some(tag => tag.id === employee.id)) return
     setTagArr(arr => { arr.push(employee); return [...arr] })
+
   }
   const removeTag = (index: number) => {
     setTagArr(arr => { arr.splice(index, 1); return [...arr] })
