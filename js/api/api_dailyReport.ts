@@ -71,10 +71,9 @@ export const useApiDailyReports_isReporters_me = () => {
 
 
 // 取得指定月份所有日報表
-type TapiDailyReports_Res = {
-  data: TdailyReportDto[]
-  meta: TpageMetaDto
-}
+type TapiDailyReports_Res = TdailyReportDto[]
+
+
 /**month格式為yyyy-MM 例:2022-02 */
 const apiDailyReports = (month: string) => {
   const api = `/daily-reports?month=${month}`

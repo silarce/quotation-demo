@@ -135,12 +135,11 @@ export default function DailyReport(
         await Promise.all(allArr)
         // await updateDailyReports_id() // 取得指定日報表
       }
-
-      await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
       if (isSubordinate) {
         // await updateIsReporter()  // 檢查自己是不是回報人員
-        await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
+        // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
       }
+      await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -360,7 +359,7 @@ export class Class_dailyReportItem {
     this._install = this._item.workingTypes.includes("install")
     this._repair = this._item.workingTypes.includes("repair")
     this._powerDelivery = this._item.workingTypes.includes("power-delivery")
-    this._maintenace = this._item.workingTypes.includes("maintenace")
+    this._maintenance = this._item.workingTypes.includes("maintenance")
     this._inspection = this._item.workingTypes.includes("inspection")
 
   } // constructor
@@ -369,7 +368,7 @@ export class Class_dailyReportItem {
   private _install
   private _repair
   private _powerDelivery
-  private _maintenace
+  private _maintenance
   private _inspection
 
 
@@ -435,9 +434,9 @@ export class Class_dailyReportItem {
     this._reRender()
   }
 
-  get maintenace() { return this._maintenace }
-  set maintenace(v: boolean) {
-    this._maintenace = v
+  get maintenance() { return this._maintenance }
+  set maintenance(v: boolean) {
+    this._maintenance = v
     this._reRender()
   }
 
@@ -462,7 +461,7 @@ export class Class_dailyReportItem {
     if (this.install) workingTypes.push("install")
     if (this.repair) workingTypes.push("repair")
     if (this.powerDelivery) workingTypes.push("power-delivery")
-    if (this.maintenace) workingTypes.push("maintenace")
+    if (this.maintenance) workingTypes.push("maintenance")
     if (this.inspection) workingTypes.push("inspection")
 
     return {

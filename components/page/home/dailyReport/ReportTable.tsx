@@ -100,7 +100,7 @@ export default function ReportTable(
                   key === "install" ||
                   key === "powerDelivery" ||
                   key === "repair" ||
-                  key === "maintenace" ||
+                  key === "maintenance" ||
                   key === "inspection"
                 ) {
                   return (
@@ -170,7 +170,7 @@ export default function ReportTable(
 // type TclassKeys = keyof Class_dailyReportItem
 type TclassKeys = Extract<keyof Class_dailyReportItem,
   "periodOfDay" | "customerName" | "contactName" |
-  "install" | "powerDelivery" | "repair" | "maintenace" | "inspection" |
+  "install" | "powerDelivery" | "repair" | "maintenance" | "inspection" |
   "description" | "workingTypes"
 >
 
@@ -180,11 +180,11 @@ const headerKeyArr: (TclassKeys)[] = [
 // const bodyKeyArr: TclassKeys[] = [
 const bodyKeyArr: (TclassKeys)[] = [
   "periodOfDay", "customerName", "contactName",
-  "install", "powerDelivery", "repair", "maintenace", "inspection",
+  "install", "powerDelivery", "repair", "maintenance", "inspection",
   "description",
 ]
 const workingTypesKeyArr = [
-  "install", "powerDelivery", "repair", "maintenace", "inspection",
+  "install", "powerDelivery", "repair", "maintenance", "inspection",
 ] as const
 
 type Tconfig = {
@@ -229,7 +229,7 @@ const config: Tconfig = {
     label: "維修",
     width: "50px",
   },
-  maintenace: {
+  maintenance: {
     label: "保養",
     width: "50px",
   },

@@ -196,7 +196,7 @@ export type TdailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  workingTypes: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]
+  workingTypes: ("install" | "repair" | "power-delivery" | "maintenance" | "inspection")[]
   description: string
 }
 
@@ -219,7 +219,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  workingTypes: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]
+  workingTypes: ("install" | "repair" | "power-delivery" | "maintenance" | "inspection")[]
   description: string
 }
 
