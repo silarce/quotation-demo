@@ -18,15 +18,16 @@ import iconRmove from "public/image/icon/remove03.svg"
 // css
 import scss from "./tagCarousel.module.scss"
 
-type Ttag = {
-  name: string,
-  date: string
-}
+// type
+import { Ttag } from "pages/home/dailyReport";
+
+
 
 export default function TagCarousel(
-  { tagArr, removeTag }:
+  { tagArr, editNewDailyReport, removeTag }:
     {
       tagArr: Ttag[]
+      editNewDailyReport: (reportId: string, employeeId: string) => void
       removeTag: (index: number) => void
     }
 ) {
@@ -50,15 +51,15 @@ export default function TagCarousel(
       >
 
         {tagArr.map((tag, index) => {
-          const { name, date } = tag
+          const { name, date, reportId, employeeId } = tag
           return (
-            <div key={index}>
+            <div key={index} onClick={() => editNewDailyReport(reportId, employeeId)}>
               <div className={classNames(scss.cell, { [scss.isActive]: index === 0 })} >
                 <span>
                   {`${name} ${date}`}
                 </span>
                 <Image src={iconRmove} alt="remove" className={scss.removeBtn}
-                  onClick={() => removeTag(index)}
+                  onClick={(e) => { e.stopPropagation(); removeTag(index) }}
                 />
                 <hr />
               </div>

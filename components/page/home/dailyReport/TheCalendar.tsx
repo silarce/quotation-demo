@@ -32,13 +32,15 @@ import scss from "./theCalendar.module.scss"
 
 // type
 import { TdailyReportDto, } from "js/api/api_dailyReport"
+import { Ttag } from "pages/home/dailyReport"
 
 const localizer = momentLocalizer(moment)
 
 // ===========================================================================
 
 type Tevent = {
-  id: string
+  reportId: string
+  employeeId: string
   name: string
   departmentCode: string
   date: string
@@ -47,7 +49,7 @@ type Tevent = {
   reviewedAt: string
 }
 
-type Ttag = { id: string, name: string, date: string }
+
 // ===========================================================================
 
 export default function TheCalendar(
@@ -69,12 +71,14 @@ export default function TheCalendar(
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
       const { date, id, reviewedAt, employee } = report
+      const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
       const departmentCode = jobs?.[0].department.code ?? ""
 
       return {
-        id,
+        reportId: id,
+        employeeId,
         name,
         departmentCode,
         date,
@@ -189,7 +193,7 @@ const EventWrapper = (
 ) => {
   const { event } = e
   const {
-    id, name, departmentCode,
+    reportId, employeeId, name, departmentCode,
     date, start, end,
     reviewedAt,
   } = event
@@ -198,7 +202,7 @@ const EventWrapper = (
   const checkIcon = reviewedAt ? checkIconTable["checked"] : checkIconTable["asked"]
 
   const onClick = () => {
-    addTag({ id, name, date })
+    addTag({ reportId, employeeId, name, date })
   }
 
   return (

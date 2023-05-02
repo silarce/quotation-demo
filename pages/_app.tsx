@@ -125,6 +125,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
         {getLayout(
           <Component {...pageProps}
+            userInfo={userInfo}
             userErpFeature={userErpFeature}
           />
         )}

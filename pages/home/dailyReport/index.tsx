@@ -34,6 +34,7 @@ import {
   useApiDailyReports_id,
   apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
+  apiDailyReports_id,
 } from "js/api/api_dailyReport"
 
 import {
@@ -42,7 +43,7 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
+import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
 
 
 
@@ -55,14 +56,17 @@ import scss from "./dailyReport.module.scss"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // =====================================================================
-type Ttag = { id: string, name: string, date: string }
+export type Ttag = { reportId: string, employeeId: string, name: string, date: string }
 // =====================================================================
 const fakeDailyReport = generateData(fakeDailyReportOri, "2023-04-26", "2023-05-03")
 // =====================================================================
 
 export default function DailyReport(
-  { userErpFeature }:
-    { userErpFeature: TerpFeatureDto[] }
+  { userInfo, userErpFeature, }:
+    {
+      userInfo: TuserDto
+      userErpFeature: TerpFeatureDto[]
+    }
 ) {
   // -----------------------------------------------------------
   // const router = useRouter()
@@ -140,6 +144,7 @@ export default function DailyReport(
         // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
       }
       await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
+      // await apiDailyReports_id("8ffea857-f99d-4afc-90a6-b762b7073d93")
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -177,9 +182,10 @@ export default function DailyReport(
 
   // ----------------------------------------------------------------------
   // TagCarousel
-  const addTag = (employee: Ttag) => {
-    if (tagArr.some(tag => tag.id === employee.id)) return
-    setTagArr(arr => { arr.push(employee); return [...arr] })
+  const addTag = (tag: Ttag) => {
+    if (userInfo.employee!.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
+    if (tagArr.some(tag => tag.reportId === tag.reportId)) return
+    setTagArr(arr => { arr.push(tag); return [...arr] })
 
   }
   const removeTag = (index: number) => {
@@ -216,20 +222,23 @@ export default function DailyReport(
   const reRender = () => setRender(state => ++state)
 
 
-  const editNewDailyReport = (dailyReport?: TdailyReportDto | undefined) => {
+  // const editNewDailyReport = (dailyReport?: TdailyReportDto | undefined) => {
+  const editNewDailyReport = async (reportId?: string, employeeId?: string) => {
     let date: Date
     let items: Class_dailyReportItem[]
-    if (!dailyReport) {
+    if (!reportId) {
       date = new Date()
       items = [new Class_dailyReportItem(reRender)]
     }
     else {
-      date = new Date(dailyReport.date)
+      const res = await apiDailyReports_id(reportId, ["items"])
+      date = new Date(res.date)
       items
-        = dailyReport.items.map((item) => new Class_dailyReportItem(reRender, item))
+        = res.items.map((item) => new Class_dailyReportItem(reRender, item))
     }
     setReportInEdit({ date, items })
   }
+
 
   const addDailyReportItem = () => {
     setReportInEdit(report => {
@@ -267,16 +276,6 @@ export default function DailyReport(
         if (!reportInEdit) return
         const date = reportInEdit.date
         const items = reportInEdit.items.map((item) => item.postBody)
-        // const date = new Date()
-        // const items = [
-        //   {
-        //     periodOfDay: "AM",
-        //     customerName: "測試",
-        //     contactName: "測試",
-        //     workingTypes: ["install"],
-        //     description: "測試測試測試測試",
-        //   }
-        // ]
         try { await apiPatchDailyReports_my({ date, items }) }
         catch { }
 
@@ -295,6 +294,7 @@ export default function DailyReport(
     [
       <TagCarousel key="1"
         tagArr={tagArr}
+        editNewDailyReport={editNewDailyReport}
         removeTag={removeTag} />
     ]
   // ----------------------------------------------------------------------
