@@ -107,7 +107,8 @@ export default function DailyReport() {
     <>
       {/* <SubLayer bodyClassName={scss.subLayer}> */}
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
-        <PageHeader02 tag="日報表" panelList={panelList}
+        <PageHeader02 tag="日報表" tagClassName={scss.pageHeaderTag}
+          panelList={panelList}
           customeLeft={customeLeft}
         />
 
