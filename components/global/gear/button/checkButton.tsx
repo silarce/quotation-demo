@@ -18,6 +18,9 @@ export default function CheckButton(
     className,
     px,
     defaultCheck,
+
+    value,
+
   }:
     {
       checkLabel?: string
@@ -26,12 +29,16 @@ export default function CheckButton(
       className?: string
       px?: "px22" | "px44" | "px2227"
       defaultCheck?: boolean
+
+      value?: boolean
+
     }) {
 
   const [isCheck, setIsCheck] = useState(defaultCheck ?? false)
 
   const theOnClick = () => {
     onClick(isCheck)
+    if (value !== undefined) return
     setIsCheck(state => !state)
   }
 
@@ -43,7 +50,9 @@ export default function CheckButton(
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <div className={classNames(scss2.checkbox)}>
-        {isCheck && <Image src={iconCheck} alt="check" />}
+        {/* {isCheck && <Image src={iconCheck} alt="check" />} */}
+        {value === undefined && isCheck && <Image src={iconCheck} alt="check" />}
+        {value && <Image src={iconCheck} alt="check" />}
       </div>
       {label && <span >{label}</span>}
     </button>
