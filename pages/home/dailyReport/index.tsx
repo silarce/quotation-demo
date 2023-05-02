@@ -320,12 +320,20 @@ export default function DailyReport(
         removeTag={removeTag} />
     ]
   // ----------------------------------------------------------------------
+  const tagOnClick = () => {
+    cancelEditNewDailyReport()
+  }
+  // ----------------------------------------------------------------------
 
   return (
     <>
-      {/* <SubLayer bodyClassName={scss.subLayer}> */}
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
-        <PageHeader02 tag="日報表" tagClassName={scss.pageHeaderTag}
+        <PageHeader02
+          tag="日報表"
+          tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
+          tagOnClick={tagOnClick}
+          // linkList={linkList}
+
           panelList={panelList}
           customeLeft={customeLeft}
         />
