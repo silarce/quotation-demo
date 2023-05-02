@@ -150,6 +150,7 @@ export default function DailyReport(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // ----------------------------------------------------------------------
 
   const reportEmpArr = useMemo(() => {
     if (!dailyReports_ReportersArr || !employeeArr) return []
@@ -219,7 +220,7 @@ export default function DailyReport(
   }
   // ----------------------------------------------------------------------
 
-
+  // 編輯中的日報表，送進ReportTable
   const [reportInEdit, setReportInEdit]
     = useState<{ date: Date, items: Class_dailyReportItem[] }>()
   const [render, setRender] = useState(1)
@@ -303,7 +304,10 @@ export default function DailyReport(
       onClick: cancelEditNewDailyReport,
     },
   ]
-  const panelList = isSubordinate ? panelList02 : panelList01
+
+  const panelList =
+    !reportInEdit ? undefined :
+      isSubordinate ? panelList02 : panelList01
 
   // ----------------------------------------------------------------------
   const customeLeft =
