@@ -124,7 +124,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       </Head>
       <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
         {getLayout(
-          <Component {...pageProps} />
+          <Component {...pageProps}
+            userErpFeature={userErpFeature}
+          />
         )}
       </Layer>
       {/* 全域loading cover */}
