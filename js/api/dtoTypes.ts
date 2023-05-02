@@ -204,10 +204,10 @@ export type TdailyReportDto = {
   id: string
   // createdAt: Date // date
   // updatedAt: Date //date
-  date: Date
+  date: string // yyyy-MM-DD
   employee: TemployeeDto
   reviewedByEmployee: TemployeeDto
-  reviewedAt: Date // date
+  reviewedAt: string // yyyy-MM-DD
   items: TdailyReportItemDto[]
 }
 

@@ -13,7 +13,7 @@ import {
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto }
+export type { TcreateDailyReportItemDto, TdailyReportDto }
 // =================================================================
 
 
@@ -71,19 +71,16 @@ export const useApiDailyReports_isReporters_me = () => {
 
 
 // 取得指定月份所有日報表
-type TapiDailyReports_Res = TdailyReportDto[]
-
-
 /**month格式為yyyy-MM 例:2022-02 */
 const apiDailyReports = (month: string) => {
   const api = `/daily-reports?month=${month}`
   return axi.get(api)
-    .then(({ data }) => data as TapiDailyReports_Res)
+    .then(({ data }) => data as TdailyReportDto[])
     .catch(err => Promise.reject(err))
 }
 /**month格式為yyyy-MM 例:2022-02 */
 export const useApiDailyReports = (month: string) => {
-  let [data, setData] = useState<TapiDailyReports_Res>()
+  let [data, setData] = useState<TdailyReportDto[]>()
   const update = async () => {
     const data = await apiDailyReports(month)
     if (data) setData(data)

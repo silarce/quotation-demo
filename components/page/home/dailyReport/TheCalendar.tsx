@@ -1,10 +1,10 @@
 
-import { useState, } from "react"
+import { useState, useMemo } from "react"
 import Image from "next/image"
 import moment from 'moment'
 import classNames from "classnames"
 
-const _ = require("lodash")
+import _ from "lodash"
 
 // 行事曆元件
 import BigCalendar from 'react-big-calendar';
@@ -29,57 +29,70 @@ import { month_chToNumber } from "js/tools/date/conversionTable";
 // css
 import scss from "./theCalendar.module.scss"
 
+
+// type
+import { TdailyReportDto, } from "js/api/api_dailyReport"
+
 const localizer = momentLocalizer(moment)
 
 // ===========================================================================
 
-interface Tdata {
-  job: string
+type Tevent = {
+  id: string
   name: string
-  isChecked: boolean,
-  isForbidden: boolean,
-  date: string,
+  departmentCode: string
+  date: string
+  start: string
+  end: string
+  reviewedAt: string
 }
 
-interface Tevent {
-  job: string
-  name: string
-  isChecked: boolean,
-  isForbidden: boolean,
-  start: string,
-  end: string,
-  // allDay?: boolean
-  // resource?: any,
-}
-
-type Ttag = { name: string, date: string }
+type Ttag = { id: string, name: string, date: string }
 // ===========================================================================
 
 export default function TheCalendar(
-  { dataArr, editReportEmpArr, addTag, isSubordinate, editDailyReport }:
+  {
+    // dataArr, 
+    editReportEmpArr, addTag,
+    isSubordinate, editDailyReport, dailyReportArr }:
     {
-      dataArr: Tdata[]
+      // dataArr: Tdata[]
       addTag: (employee: Ttag) => void
       isSubordinate: boolean
       editReportEmpArr?: () => void
       editDailyReport?: () => void
+      dailyReportArr: TdailyReportDto[]
     }
 ) {
 
-  const [render, setRender] = useState(false)
-  const reRender = () => {
-    setRender((state) => !state)
-  }
 
-  const [eventsArr, setEventsArr]
-    = useState(dataArr.map((data) => new Class_isRead(data, reRender, addTag)))
+  const theDailyReportArr: Tevent[] = useMemo(() => {
+    return dailyReportArr.map((report) => {
+      const { date, id, reviewedAt, employee } = report
+      const jobs = employee.jobs ?? []
+      const name = employee.chName
+      const departmentCode = jobs?.[0].department.code ?? ""
+
+      return {
+        id,
+        name,
+        departmentCode,
+        date,
+        start: report.date,
+        end: report.date,
+        reviewedAt,
+      }
+    })
+  }, [dailyReportArr])
+  // dailyReportArr
 
   return (
     // <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
     <div className={`${scss.dailyReport} h-full mx-[3px] mb-[3px]`}>
       <Calendar
         localizer={localizer}
-        events={eventsArr}
+        // events={eventsArr}
+        events={theDailyReportArr}
         showAllEvents
         views={['month']}
         components={{
@@ -94,10 +107,11 @@ export default function TheCalendar(
           // @ts-ignore 
           dateCellWrapper: DateCellWrapper, //底下的格子，裡面沒有裝東西，似僅作為背景
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          eventWrapper: EventWrapper, // 壓在格子上方的event
+          // eventWrapper: EventWrapper, // 壓在格子上方的event
+          eventWrapper: (e) => EventWrapper(e, addTag), // 壓在格子上方的event
           // toolbar: ToolBar, // 最上方的操作面板
           toolbar:
-            (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) =>
+            (toolbar: BigCalendar.ToolbarProps<Tevent, object>) =>
               ToolBar(toolbar, editReportEmpArr, editDailyReport), // 最上方的操作面板
         }}
       />
@@ -106,59 +120,15 @@ export default function TheCalendar(
 }
 // ======================================================================
 const checkIconTable = {
-  "0": iconCircle,
-  "1": iconCircle_Checked,
-  "forbidden": iconRedDot,
+  "asked": iconCircle,
+  "reported": iconCircle_Checked,
+  "checked": iconRedDot,
 }
-// ============================================================================
-
-class Class_isRead implements Tevent {
-  constructor(data: Tdata, reRender: () => void, addTag: (employee: Ttag) => void) {
-    this._reRender = reRender
-    this._addTag = addTag
-
-    const { job, name, isChecked, date, isForbidden } = data
-    this.job = job
-    this.name = name
-    this.isChecked = isChecked
-    this.isForbidden = isForbidden
-    this.start = date
-    this.end = date
-    this.date = date
-  } // constructor
-
-  private _reRender
-  private _addTag
-
-  job
-  name
-  start
-  end
-  date
-  isChecked
-  isForbidden
-
-  addTag = () => {
-    this._addTag({
-      name: this.name,
-      date: this.date
-    })
-    this._reRender()
-  }
-
-
-  // switchIsReaded = () => {
-  //   if (this.isForbidden) return
-  //   this.isChecked = !this.isChecked
-  //   this._reRender()
-  // }
-} // Clss_isRead
-
 // ============================================================================
 
 const ToolBar = (
   // toolbar: BigCalendar.ToolbarProps<Class_isRead, object>
-  toolbar: BigCalendar.ToolbarProps<Class_isRead, object>,
+  toolbar: BigCalendar.ToolbarProps<Tevent, object>,
   editReportEmpArr?: () => void,
   editDailyReport?: () => void
 ) => {
@@ -209,25 +179,38 @@ const ToolBar = (
 
 // ======================================================================
 
+
+
 // 壓在格子上方的event
-const EventWrapper = (e: EventWrapperProps<Class_isRead>) => {
+
+const EventWrapper = (
+  e: EventWrapperProps<Tevent>,
+  addTag: (employee: Ttag) => void
+) => {
   const { event } = e
-  const { job, name, isChecked, isForbidden, addTag } = event
-  const theIsChecked = +isChecked as 0 | 1
-  const checkIcon =
-    isForbidden
-      ? checkIconTable["forbidden"]
-      : checkIconTable[`${theIsChecked}`]
+  const {
+    id, name, departmentCode,
+    date, start, end,
+    reviewedAt,
+  } = event
+
+
+  const checkIcon = reviewedAt ? checkIconTable["checked"] : checkIconTable["asked"]
+
+  const onClick = () => {
+    addTag({ id, name, date })
+  }
+
   return (
     <div className={classNames("px-2 mb-2 cursor-pointer", scss.eventWrapper)}
-      onClick={addTag}
+      onClick={onClick}
     >
       <div className={classNames(
         "grid grid-cols-[20px_40px_auto] gap-2 justify-start items-center",
         "text-lg"
       )}>
         <Image src={checkIcon} alt="" />
-        <span>{job}</span>
+        <span>{departmentCode}</span>
         <span>{name}</span>
       </div>
     </div>

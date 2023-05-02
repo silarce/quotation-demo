@@ -26,7 +26,7 @@ import { TreportDetail, fakeReportDetailArr } from "./_tempFakeData/fakeReportDe
 
 // api
 import {
-  TcreateDailyReportItemDto,
+  TcreateDailyReportItemDto, TdailyReportDto,
   useApiDailyReports,
   useApiDailyReports_Reporters,
   useApiDailyReports_isReporters_me,
@@ -42,7 +42,7 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TdailyReportDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
+import { TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
 
 
 
@@ -55,7 +55,7 @@ import scss from "./dailyReport.module.scss"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // =====================================================================
-type Ttag = { name: string, date: string }
+type Ttag = { id: string, name: string, date: string }
 // =====================================================================
 const fakeDailyReport = generateData(fakeDailyReportOri, "2023-04-26", "2023-05-03")
 // =====================================================================
@@ -308,7 +308,7 @@ export default function DailyReport(
 
         {!reportInEdit &&
           <TheCalendar
-            dataArr={fakeDailyReport}
+            dailyReportArr={dailyReport ?? []}
             editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
             editDailyReport={isSubordinate ? editNewDailyReport : undefined}
             // editDailyReport={isSubordinate ? () => { } : undefined}
