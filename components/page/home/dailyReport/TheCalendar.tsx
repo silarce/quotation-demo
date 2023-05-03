@@ -46,7 +46,7 @@ type Tevent = {
   date: string
   start: string
   end: string
-  reviewedAt: string
+  reviewedAt: Date
 }
 
 

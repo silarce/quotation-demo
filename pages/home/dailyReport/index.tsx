@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
 import classNames from "classnames"
-import { useRouter } from "next/router"
 import _ from "lodash"
 import moment from "moment";
 
@@ -131,11 +130,6 @@ export default function DailyReport(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // ----------------------------------------------------------------------
-
-
-
-
 
   // ----------------------------------------------------------------------
   // TagCarousel
@@ -196,7 +190,9 @@ export default function DailyReport(
     report: reportInEdit,
     setReport,
     reNew_report,
-    addReportItem: addDailyReportItem } = useReport()
+    addReportItem: addDailyReportItem,
+    changeReviewToChecked
+  } = useReport()
 
   const editReport = async (reportId: string) => {
     const dailyReport = await reqApiDailyReports_id(reportId)
@@ -221,24 +217,18 @@ export default function DailyReport(
         checkLabel="已讀"
         uncheckLable="未讀"
         value={!!reportInEdit?.reviewedAt}
-        // defaultCheck={true}
-        // value={false}
-        // onClick={(isCheck) => { console.log(isCheck) }}
         onClick={async () => {
+          if (reportInEdit?.reviewedAt) {
+            return myAlert.warning({ title: "已審核過" })
+          }
           if (!reportInEdit?.id) return;
           try {
             showRootLoading(true)
             const res = await apiDailyReports_review(reportInEdit.id)
-
-            // setReportInEdit((report) => {
-
-            //   return report
-            // })
-
+            changeReviewToChecked(res.reviewedAt)
           }
           catch { myAlert.err({ title: "審核失敗" }) }
           finally { showRootLoading(false) }
-
         }}
       />
     }

@@ -15,7 +15,7 @@ type ThookEmptyReport = {
   id: string | undefined
   date: string
   items: Class_reportItem[]
-  reviewedAt: string | null | undefined
+  reviewedAt: Date | null | undefined
 }
 
 
@@ -204,7 +204,19 @@ const useReport = () => {
     })
   }
 
-  return { report, setReport, reNew_report, addReportItem }
+  const changeReviewToChecked = (reviewedAt: Date) => {
+    setReport(report => {
+      if (!report) return report
+      const id = report.id
+      const date = report.date
+      const items = report.items
+      return { id, date, items, reviewedAt }
+    })
+  }
+
+
+
+  return { report, setReport, reNew_report, addReportItem, changeReviewToChecked }
 }
 
 

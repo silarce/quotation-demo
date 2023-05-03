@@ -42,7 +42,9 @@ export default function CheckButton(
     setIsCheck(state => !state)
   }
 
-  const label = isCheck ? checkLabel : uncheckLable
+  let label
+  if (value) label = value ? checkLabel : uncheckLable
+  else label = isCheck ? checkLabel : uncheckLable
 
   return (
     <button className={classNames(scss.button, px && scss[px], className)}

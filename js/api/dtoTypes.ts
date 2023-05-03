@@ -207,7 +207,7 @@ export type TdailyReportDto = {
   date: string // yyyy-MM-DD
   employee: TemployeeDto
   reviewedByEmployee: TemployeeDto
-  reviewedAt: string // yyyy-MM-DD
+  reviewedAt: Date
   items: TdailyReportItemDto[]
 }
 
