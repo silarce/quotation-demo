@@ -66,11 +66,12 @@ export default function DailyReport(
   // 送進SetReportEmpModal的arr
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
-  // 
+
+  // 日報表tagArr，送進TagCarousel
   const [tagArr, setTagArr] = useState<Ttag[]>([])
 
   // ----------------------------------------------------------------------
-  const today = moment().format("YYYY-MM-DD");
+  // const today = moment().format("YYYY-MM-DD");
   const thisMonth = moment().format("YYYY-MM");
 
   // 取得所有回報人員
@@ -131,32 +132,7 @@ export default function DailyReport(
 
   // ----------------------------------------------------------------------
 
-  const reportEmpArr = useMemo(() => {
-    if (!dailyReports_ReportersArr || !employeeArr) return []
 
-    const result = employeeArr.map((item) => {
-      const match = dailyReports_ReportersArr.find((x) => x.id === item.id)
-      const shouldReport = match ? true : false
-
-      let theJobs = (() => {
-        if (item.jobs) {
-          return _.sortBy(item.jobs, "grade")
-        }
-        else return []
-      })();
-
-      const obj = {
-        id: item.id,
-        chName: item.chName,
-        idNumber: item.idNumber,
-        job: theJobs[0]?.name ?? "",
-        grade: theJobs[0]?.grade ?? "",
-        shouldReport
-      }
-      return obj
-    })
-    return result
-  }, [dailyReports_ReportersArr, employeeArr,])
 
 
 
@@ -177,6 +153,14 @@ export default function DailyReport(
   // ----------------------------------------------------------------------
   // 回報人員設定
   // SetReportEmpModal
+
+  const reportEmpArr = useMemo(() => {
+    return formatEmployeeArr({
+      dailyReports_ReportersArr,
+      employeeArr
+    })
+  }, [dailyReports_ReportersArr, employeeArr,])
+
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   const editReportEmpArr = () => {
     setReportEmpArr_preEdit(reportEmpArr)
@@ -383,16 +367,56 @@ const reqApiDailyReports_my = async () => {
 // ==========================================================================
 /**判斷是否為回報人員權限 */
 const checkIsSubordinate = (userInfo: TuserDto) => {
-    /**如果使用者是employee，從grade判斷 */
-    if (userInfo?.employee?.jobs) {
-      const jobs = userInfo.employee.jobs
-      if (!jobs[0]) return true
+  /**如果使用者是employee，從grade判斷 */
+  if (userInfo?.employee?.jobs) {
+    const jobs = userInfo.employee.jobs
+    if (!jobs[0]) return true
 
-      const jobsCopy = _.sortBy(jobs, "grade").reverse()
-      if (jobsCopy[0].grade >= 15) return false
-      else return true
-    }
-    /**使用者不是employee，那就是admin*/
-    return false
+    const jobsCopy = _.sortBy(jobs, "grade").reverse()
+    if (jobsCopy[0].grade >= 15) return false
+    else return true
+  }
+  /**使用者不是employee，那就是admin*/
+  return false
 }
+
+
+// ==========================================================================
+
+/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
+const formatEmployeeArr = (
+  { dailyReports_ReportersArr,
+    employeeArr }:
+    {
+      dailyReports_ReportersArr: TemployeeDto[]
+      employeeArr: TemployeeDto[] | undefined
+    }
+) => {
+  if (!dailyReports_ReportersArr || !employeeArr) return []
+
+  const result = employeeArr.map((item) => {
+    const match = dailyReports_ReportersArr.find((x) => x.id === item.id)
+    const shouldReport = match ? true : false
+
+    let theJobs = (() => {
+      if (item.jobs) {
+        return _.sortBy(item.jobs, "grade")
+      }
+      else return []
+    })();
+
+    const obj = {
+      id: item.id,
+      chName: item.chName,
+      idNumber: item.idNumber,
+      job: theJobs[0]?.name ?? "",
+      grade: theJobs[0]?.grade ?? "",
+      shouldReport
+    }
+    return obj
+  })
+  return result
+}
+
+
 
