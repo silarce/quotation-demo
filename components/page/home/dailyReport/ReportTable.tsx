@@ -20,13 +20,13 @@ import { optionsCreator_dailyReportPeriod } from "fakeDatabase/options/options"
 const optionArr_period = optionsCreator_dailyReportPeriod()
 
 // class
-import { Class_dailyReportItem } from "pages/home/dailyReport"
+import { Class_reportItem } from "pages/home/dailyReport"
 
 // ==================================================
 export default function ReportTable(
   { classDailyReportItemArr, addDailyReportItem, isSubordinate }:
     {
-      classDailyReportItemArr: Class_dailyReportItem[]
+      classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
       isSubordinate: boolean
     }
@@ -168,7 +168,7 @@ export default function ReportTable(
 // =================================================================
 
 // type TclassKeys = keyof Class_dailyReportItem
-type TclassKeys = Extract<keyof Class_dailyReportItem,
+type TclassKeys = Extract<keyof Class_reportItem,
   "periodOfDay" | "customerName" | "contactName" |
   "install" | "powerDelivery" | "repair" | "maintenance" | "inspection" |
   "description" | "workingTypes"

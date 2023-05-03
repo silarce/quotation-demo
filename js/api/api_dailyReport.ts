@@ -95,7 +95,7 @@ export const useApiDailyReports = (month: string) => {
 
 // 取得自己指定日期的日報表
 /**date格式為yyyy-MM-DD 例:2022-02-02 */
-const apiDailyReports_my = (date: string) => {
+export const apiDailyReports_my = (date: string) => {
   const api = `/daily-reports/my?date=${date}`
   return axi.get(api)
     .then(({ data }) => data as TdailyReportDto)

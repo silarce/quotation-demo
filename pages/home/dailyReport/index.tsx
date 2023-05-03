@@ -16,6 +16,8 @@ import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
+// hook
+import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
 
 // api
 import {
@@ -29,6 +31,7 @@ import {
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
+  apiDailyReports_my,
 } from "js/api/api_dailyReport"
 
 import {
@@ -39,29 +42,20 @@ import {
 // type
 import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
 
-
-
-
-
-
-
 // css
 import scss from "./dailyReport.module.scss"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // =====================================================================
 export type Ttag = { reportId: string, employeeId: string, name: string, date: string }
+export { Class_reportItem }
 // =====================================================================
 
 // =====================================================================
 
 export default function DailyReport(
-  { userInfo, }:
-    {
-      userInfo: TuserDto
-    }
+  { userInfo, }: { userInfo: TuserDto }
 ) {
-
   // -----------------------------------------------------------
 
   /**是否為低權限 */
@@ -219,62 +213,27 @@ export default function DailyReport(
   // ----------------------------------------------------------------------
 
   // 編輯中的日報表，送進ReportTable
-  const [reportInEdit, setReportInEdit]
-    = useState<{
-      id: string | undefined
-      date: Date,
-      reviewedAt: string | null | undefined,
-      items: Class_dailyReportItem[]
-    }>()
-  const [render, setRender] = useState(1)
-  const reRender = () => setRender(state => ++state)
+  const {
+    report: reportInEdit,
+    setReport,
+    reNew_report,
+    addReportItem: addDailyReportItem } = useReport()
 
-  const editNewDailyReport = async (reportId?: string, employeeId?: string) => {
-    let id: string | undefined
-    let date: Date
-    let items: Class_dailyReportItem[]
-    let reviewedAt: string | null | undefined
-    if (!reportId) {
-      date = new Date()
-      items = [new Class_dailyReportItem(reRender)]
-    }
-    else {
-      let res;
-      try {
-        showRootLoading(true)
-        res = await apiDailyReports_id(reportId, ["items"])
-      }
-      catch {
-        myAlert.err({ title: "取得日報表失敗" })
-      }
-      finally { showRootLoading(false) }
-      if (!res) return;
-      id = res.id
-      date = new Date(res.date)
-      items
-        = res.items.map((item) => new Class_dailyReportItem(reRender, item))
-      reviewedAt = res.reviewedAt
-    }
-    setReportInEdit({ id, date, items, reviewedAt })
+  const editReport = async (reportId: string) => {
+    const dailyReport = await reqApiDailyReports_id(reportId)
+    if (!dailyReport) return
+    reNew_report({ dailyReport })
   }
 
-
-  const addDailyReportItem = () => {
-    setReportInEdit(report => {
-      if (!report) return report
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const reviewedAt = report.reviewedAt
-      items.push(new Class_dailyReportItem(reRender))
-      return { id, date, items, reviewedAt }
-    })
-
+  const editReport_today = async () => {
+    const dailyReport = await reqApiDailyReports_my()
+    if (!dailyReport) return
+    reNew_report({ dailyReport })
   }
+
   const cancelEditNewDailyReport = () => {
-    setReportInEdit(undefined)
+    setReport(undefined)
   }
-
 
 
   // ----------------------------------------------------------------------
@@ -313,7 +272,7 @@ export default function DailyReport(
       label: "上傳",
       onClick: async () => {
         if (!reportInEdit) return
-        const date = reportInEdit.date
+        const date = new Date(reportInEdit.date)
         const items = reportInEdit.items.map((item) => item.postBody)
         try {
           showRootLoading(true)
@@ -341,7 +300,7 @@ export default function DailyReport(
     [
       <TagCarousel key="1"
         tagArr={tagArr}
-        editNewDailyReport={editNewDailyReport}
+        editReport={editReport}
         removeTag={removeTag} />
     ]
   // ----------------------------------------------------------------------
@@ -367,7 +326,7 @@ export default function DailyReport(
           <TheCalendar
             dailyReportArr={dailyReport ?? []}
             editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
-            editDailyReport={isSubordinate ? editNewDailyReport : undefined}
+            editDailyReport={isSubordinate ? editReport_today : undefined}
             // editDailyReport={isSubordinate ? () => { } : undefined}
             addTag={addTag}
             isSubordinate={isSubordinate}
@@ -394,151 +353,37 @@ export default function DailyReport(
   )
 }
 
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
 
-
-
-
-export class Class_dailyReportItem {
-  constructor(
-    reRender: () => void,
-    dailyReportItem: TdailyReportItemDto = _.cloneDeep(emptyDailyReportItem)
-  ) {
-    this._reRender = reRender
-    this._item = dailyReportItem
-
-    this._install = this._item.workingTypes.includes("install")
-    this._repair = this._item.workingTypes.includes("repair")
-    this._powerDelivery = this._item.workingTypes.includes("power-delivery")
-    this._maintenance = this._item.workingTypes.includes("maintenance")
-    this._inspection = this._item.workingTypes.includes("inspection")
-
-  } // constructor
-  private _reRender
-  private _item
-  private _install
-  private _repair
-  private _powerDelivery
-  private _maintenance
-  private _inspection
-
-
-  get id() {
-    return this._item.id
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+const reqApiDailyReports_id = async (reportId: string) => {
+  try {
+    showRootLoading(true)
+    const res = await apiDailyReports_id(reportId, ["items"])
+    return res
   }
-
-  get periodOfDay() {
-    return this._item.periodOfDay
+  catch {
+    myAlert.err({ title: "取得日報表失敗" })
   }
-  set periodOfDay(v: "AM" | "PM") {
-    this._item.periodOfDay = v
-    this._reRender()
+  finally { showRootLoading(false) }
+}
+
+
+const reqApiDailyReports_my = async () => {
+  try {
+    showRootLoading(true)
+    const today = moment().format("YYYY-MM-DD");
+    const res = await apiDailyReports_my(today)
+    return res
   }
-
-  get customerName() {
-    return this._item.customerName
+  catch {
+    myAlert.err({ title: "取得指定日期日報表失敗" })
   }
-  set customerName(v: string) {
-    this._item.customerName = v
-    console.log("test")
-    this._reRender()
-  }
-
-  get contactName() {
-    return this._item.contactName
-  }
-  set contactName(v: string) {
-    this._item.contactName = v
-    this._reRender()
-  }
-
-  get order() {
-    return this._item.order
-  }
-  // set order(v: string) {
-  //   this._item.order = v
-  //   this._reRender()
-  // }
-
-  get workingTypes() {
-    return this._item.workingTypes
-  }
-  // set workingTypes(v: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]) {
-  //   this._item.workingTypes = v
-  //   this._reRender()
-  // }
-  get install() { return this._install }
-  set install(v: boolean) {
-    this._install = v
-    this._reRender()
-  }
-
-  get repair() { return this._repair }
-  set repair(v: boolean) {
-    this._repair = v
-    this._reRender()
-  }
-
-  get powerDelivery() { return this._powerDelivery }
-  set powerDelivery(v: boolean) {
-    this._powerDelivery = v
-    this._reRender()
-  }
-
-  get maintenance() { return this._maintenance }
-  set maintenance(v: boolean) {
-    this._maintenance = v
-    this._reRender()
-  }
-
-  get inspection() { return this._inspection }
-  set inspection(v: boolean) {
-    this._inspection = v
-    this._reRender()
-  }
-
-
-  get description() {
-    return this._item.description
-  }
-  set description(v: string) {
-    this._item.description = v
-    this._reRender()
-  }
-
-  get postBody(): TcreateDailyReportItemDto {
-
-    const workingTypes: TcreateDailyReportItemDto["workingTypes"] = []
-    if (this.install) workingTypes.push("install")
-    if (this.repair) workingTypes.push("repair")
-    if (this.powerDelivery) workingTypes.push("power-delivery")
-    if (this.maintenance) workingTypes.push("maintenance")
-    if (this.inspection) workingTypes.push("inspection")
-
-    return {
-      periodOfDay: this.periodOfDay,
-      customerName: this.customerName,
-      contactName: this.contactName,
-      description: this.description,
-      workingTypes
-    }
-
-  }
-
-} // Class_dailyReportItem
-
-
-const emptyDailyReportItem: TdailyReportItemDto = {
-  periodOfDay: "AM",
-  customerName: "",
-  contactName: "",
-  workingTypes: [],
-  description: "",
+  finally { showRootLoading(false) }
 }
 

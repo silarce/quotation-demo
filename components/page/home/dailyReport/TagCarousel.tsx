@@ -24,10 +24,10 @@ import { Ttag } from "pages/home/dailyReport";
 
 
 export default function TagCarousel(
-  { tagArr, editNewDailyReport, removeTag }:
+  { tagArr, editReport, removeTag }:
     {
       tagArr: Ttag[]
-      editNewDailyReport: (reportId: string, employeeId: string) => void
+      editReport: (reportId: string) => void
       removeTag: (index: number) => void
     }
 ) {
@@ -53,7 +53,7 @@ export default function TagCarousel(
         {tagArr.map((tag, index) => {
           const { name, date, reportId, employeeId } = tag
           return (
-            <div key={index} onClick={() => editNewDailyReport(reportId, employeeId)}>
+            <div key={index} onClick={() => editReport(reportId)}>
               <div className={classNames(scss.cell, { [scss.isActive]: index === 0 })} >
                 <span>
                   {`${name} ${date}`}
