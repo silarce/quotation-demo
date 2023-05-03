@@ -114,15 +114,23 @@ const Tbody = (
               </div>
               {/*  */}
               <div className={classNames(scss.group, scss.group03)}>
-                {group03Keys.map((key, index) => {
-                  const { label, width } = colConfig[key]
-                  const value = data[key]
+
+                {data.customer.map((customer, index) => {
                   return (
-                    <div key={index} style={{ width }}>
-                      <span >{value}</span>
+                    <div key={index}>
+                      {group03Keys.map((key, index) => {
+                        const { width } = colConfig[key]
+                        const value = customer[key]
+                        return (
+                          <div key={index} style={{ width }}>
+                            <span >{value}</span>
+                          </div>
+                        )
+                      })}
                     </div>
                   )
                 })}
+
               </div>
             </div>
           </CellWithBar>
@@ -149,10 +157,10 @@ const Tfoot = () => {
       <div className={classNames(scss.group, scss.group03)}>
         {group03Keys.map((key, index) => {
           const { label, width } = colConfig[key]
-          // const value = data[key]
+          const value = fakeTotal[key]
           return (
             <div key={index} style={{ width }}>
-              <span >{100}</span>
+              <span >{value}</span>
             </div>
           )
         })}
@@ -254,4 +262,11 @@ const colConfig: Tconfig = {
     width: "138px",
     color: "black"
   },
+}
+
+
+const fakeTotal = {
+  listPrice: "1,373,614",
+  bearPrice: "841,913",
+  percent: "60%",
 }

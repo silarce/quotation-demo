@@ -8,7 +8,7 @@ import { useState, useEffect } from "react"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
-import Header from "components/page/setting/hrManage/header/header"
+import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02";
 import Card from "components/page/setting/hrManage/card/card"
 import GridPanel from "components/page/setting/hrManage/modal/gridSelector.tsx/gridPanel"
 
@@ -31,6 +31,9 @@ import {
 // css
 import scss from "./erpFuncPermissions.module.scss"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+
+// config
+import { hrManageLinkArr } from "components/page/setting/hrManage/hrManageLinkArr";
 
 
 // =============================================================================
@@ -59,7 +62,7 @@ export default function ErpFuncPermissions() {
       await Promise.all([updateErp(), updateDepartments()])
       setIsLoading(false)
     })()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // --------------------------------------------------------------------------
@@ -129,7 +132,7 @@ export default function ErpFuncPermissions() {
   return (
     <SubLayer>
 
-      <Header />
+      <PageHeader02 linkList={hrManageLinkArr} />
 
       <div className={scss.body}>
         <div>

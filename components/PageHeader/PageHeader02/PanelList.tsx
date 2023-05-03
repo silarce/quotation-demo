@@ -78,8 +78,6 @@ export type TpanelList = (
   Tpanel_btn | Tpanel_inpusearch | Tpanel_custom | TpanelSearchBar | null
 )[]
 
-
-
 export default function PanelList({ panelList }:
   { panelList: TpanelList }) {
 
@@ -87,13 +85,16 @@ export default function PanelList({ panelList }:
   return (
     <div className={scss.panelList}>
       {panelList.map((item, index) => {
+
         if (!item) return null
+
         // 客製化panel
         if (item.custom) return (
           <Fragment key={index}>
             {item.custom}
           </Fragment>
         )
+
         // 搜尋bar
         if (item.searchGroup) {
           const { searchTargetList, doSearch } = item.searchGroup
@@ -110,15 +111,16 @@ export default function PanelList({ panelList }:
           label, type, onClick,
           placeholder, className, img
         } = item
+
         return (
           <Fragment key={index}>
             {
-              type === "myButton" ? <MyButton {...{ label, onClick, className, img }} />
-                : type === "redButton" ? <RedButton {...{ label, onClick, className, img }} />
-                  : type === "addButton" ? <AddButton {...{ label, onClick, className, img }} />
-                    : type === "exportButton" ? <ExportButton {...{ label, onClick, className, img }} />
-                      : type === "inputSearch" ? <InputSearch {...item} />
-                        : <></>
+              type === "myButton" ? <MyButton label={label} onClick={onClick} className={className} img={img} />
+                : type === "redButton" ? <RedButton label={label} onClick={onClick} className={className} img={img} />
+                  : type === "addButton" ? <AddButton label={label} onClick={onClick} className={className} />
+                    : type === "exportButton" ? <ExportButton label={label} onClick={onClick} className={className} />
+                      : type === "inputSearch" ? <InputSearch placeholder={placeholder} onClick={onClick} className={className} />
+                        : null
             }
           </Fragment>
         )
@@ -126,3 +128,5 @@ export default function PanelList({ panelList }:
     </div>
   )
 } // PanelList
+
+

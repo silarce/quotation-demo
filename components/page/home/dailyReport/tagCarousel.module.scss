@@ -1,0 +1,67 @@
+@use "styles/theme01" as *;
+
+.container {
+  max-width: 52vw;
+  margin-left: 20px;
+  .antdCarousel {
+    height: 58px;
+    :global(.slick-list) {
+      height: 58px;
+      :global(.slick-slide) {
+        background-color: $bgc01;
+        .cell {
+          position: relative;
+          display: flex;
+          flex-wrap: nowrap;
+          place-items: center;
+          gap: 10px;
+          height: 58px;
+          padding: 0 20px;
+          cursor: pointer;
+          > span {
+            font-size: 14px;
+            font-weight: 400;
+            color: $colorMain;
+          }
+          .removeBtn {
+            cursor: pointer;
+          }
+
+          > hr {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            display: none;
+            width: 100%;
+            border-color: red;
+            border-top-width: 2px;
+            z-index: 100;
+          }
+
+          &.isActive {
+            background-color: #ffeeee;
+            > hr {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    :global(.slick-arrow) {
+      color: black;
+
+      background-color: $bgc01;
+      height: 100%;
+
+      &:global(.slick-prev) {
+        top: 0;
+        left: -20px;
+        transform: rotate(180deg);
+      }
+      &:global(.slick-next) {
+        right: -20px;
+      }
+    }
+  } // antdCarousel
+}

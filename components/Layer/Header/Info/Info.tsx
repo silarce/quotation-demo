@@ -30,7 +30,7 @@ export default function Info() {
   // ----------------------------------------------
 
   const userName = userInfo.username
-  const departmentName = userInfo.employee?.jobs[0].department.name ?? "admin"
+  const departmentName = userInfo.employee?.jobs[0]?.department.name ?? "無部門"
 
   // ----------------------------------------------
   const openPwModal = () => {
@@ -85,11 +85,11 @@ export default function Info() {
 
       <div className={scss.line} />
 
-      <div className={scss.logout}>
+      <div className={scss.logout} onClick={reqLogout}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={logout.src} alt="登出"
         />
-        <span onClick={reqLogout}>登出</span>
+        <span >登出</span>
       </div>
 
       <ModalChangePw

@@ -3,8 +3,10 @@ import {
   Fragment, useState
 } from "react"
 
+import classNames from "classnames"
+
 // globalGear
-import Select03 from "components/global/gear/select/select03"
+import InputSel from "../../inputAndSel/inputSel"
 
 // icon
 import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
@@ -13,7 +15,7 @@ import { IconSearch } from "public/image/icon/svgComponent/svgIcons"
 import style from "./searchBar.module.scss"
 
 // type
-import { Toption } from "components/global/gear/select/select03"
+import { Toption } from "fakeDatabase/options/options"
 
 interface TsearchObj {
   [key: string]: string
@@ -60,8 +62,6 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
       searchTargetList.map((item) => {
         const { defaultValue, options } = item
 
-        // console.log(defaultValue)
-
         if (defaultValue) return defaultValue
         if (options) return options[0]
         return ""
@@ -85,18 +85,30 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
         if (options) return (
           <div className={style.selectBox} key={index}
             style={theStyle}>
-            <Select03
-              className={`${style.select} ${className}`}
-              stateValue={valueArr[index] ?? options[0]}
-              options={options}
-              placeholder={placeholder}
-              onChange={(option: Toption | null) => {
-                if (!option) return
-                setValueArr(arr => {
-                  arr[index] = option
-                  return [...arr]
-                })
-              }} />
+
+            <InputSel
+              className={classNames(style.select, className)}
+              showBaseline="invisible"
+              selectProps={{
+                value: valueArr[index] ?? options[0],                
+                // value: undefined,                
+                options,
+                arrowType: "black",
+                onChange: (option: Toption | null) => {
+                  if (!option) return
+                  setValueArr(arr => {
+                    arr[index] = option
+                    return [...arr]
+                  })
+                },
+                selClassNames: {
+                  option: () => style.selOption,
+                  singleValue: () => style.selSinglevalue,
+                  placeholder: () => style.selPlaceholder
+                }
+              }}
+            />
+
           </div>
         )
         else return (
@@ -128,7 +140,7 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
 }
 
 
-export type { TsearchObj, TsearchGroup }
+export type { TsearchObj, TsearchGroup, Toption }
 
 
 

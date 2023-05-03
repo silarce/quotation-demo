@@ -5,6 +5,9 @@ import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 
+// antd
+import { ConfigProvider } from 'antd';
+
 // conponents
 import Layer from "components/Layer/Layer"
 import Login from '../components/page/login'
@@ -14,6 +17,7 @@ import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCov
 
 // api
 import { apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth'
+import { useApiErpFeaturesMe } from 'js/api/api_erpFeature'
 
 // css
 import '../styles/globals.scss'
@@ -43,12 +47,14 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe()
+  const { erpFeature: userErpFeature, updateErpFeature: updateUserErpFeature, } = useApiErpFeaturesMe()
 
   useEffect(() => {
     (async () => {
       // 檢查是否已登入
       try {
         await updateUserInfo()
+        await updateUserErpFeature()
       }
       catch { }
       finally {
@@ -70,6 +76,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     try {
       await apiLogin({ account, password })
       await updateUserInfo()
+      await updateUserErpFeature()
       // setIsLoged(true)
     }
     catch { myAlert.err({ title: "帳號或密碼錯誤" }) }
@@ -100,7 +107,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   //   )
   // }
   // ------------------------------------------------------------------
-  if (!userInfo)
+  if (!userInfo || !userErpFeature)
     return (
       <>
         <Head>
@@ -111,19 +118,22 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     )
   // ------------------------------------------------------------------
   return (
-    <>
+    <ConfigProvider autoInsertSpaceInButton={false}>
       <Head>
         <title>三久ERP</title>
       </Head>
-      <Layer reqLogout={reqLogout} userInfo={userInfo}>
+      <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
         {getLayout(
-          <Component {...pageProps} />
+          <Component {...pageProps}
+            userInfo={userInfo}
+            userErpFeature={userErpFeature}
+          />
         )}
       </Layer>
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
       <RootLoadingCover />
-    </>
+    </ConfigProvider>
   )
 }
 

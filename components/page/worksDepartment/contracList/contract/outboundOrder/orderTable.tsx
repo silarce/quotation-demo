@@ -1,14 +1,12 @@
-import { ChangeEvent, InputHTMLAttributes, useState } from "react"
+import { useState } from "react"
 import style from "./outboundOrder.module.scss"
 
 // global gear
-import Input03 from "components/global/gear/input/input03"
+import InputSel from "components/global/gear/inputAndSel/inputSel"
 
 // data
 import { dndCellConfigOutboundOrderOri, TdndCellConfigOutboundOrderKeys } from "config/dndCellConfig"
 const dndCellConfigOutboundOrder = dndCellConfigOutboundOrderOri()
-
-
 
 export default function OrderTable(
   { editable }:
@@ -102,11 +100,10 @@ export default function OrderTable(
                       const theStyle = { width }
                       const textCenter = position === "center" ? style.textCenter : ""
 
-                      const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-                        const value = e.target.value
+                      const onChange = (v: string) => {
                         orderList[groupIndex]
                           .list[rowIndex][key]
-                          .value = value
+                          .value = v
                         setOrderList([...orderList])
                       }
 
@@ -114,17 +111,18 @@ export default function OrderTable(
                         <div className={`${style.column} ${textCenter}`}
                           key={columnIndex} style={theStyle}
                         >
-                          <Input03
-                            stateValue={value}
-                            onChange={onChange}
+                          <InputSel
                             className={style.input03}
+                            inputProps={{
+                              value,
+                              onChange,
+                            }}
+                            placeholder=""
                             disabled={!editable}
                           />
                         </div>
                       )
                     })}
-
-                    {/*  */}
                     {/*  */}
                     {rowIndex !== 0 && <div className={style.ribbon}></div>}
                   </div> // row

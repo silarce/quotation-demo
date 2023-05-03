@@ -1,370 +1,541 @@
-import {
-  ChangeEvent, ComponentType,
-  useState, useEffect,
-} from "react"
-import Image from "next/image"
-import moment from 'moment'
+import { useState, useEffect, useMemo } from "react"
 import classNames from "classnames"
+import { useRouter } from "next/router"
+import _ from "lodash"
+import moment from "moment";
 
-const _ = require("lodash")
+// layer
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import SubLayer from "components/Layer/SubLayer/SubLayer"
+// component
+import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
+import ReportTable from "components/page/home/dailyReport/ReportTable"
+import TagCarousel from "components/page/home/dailyReport/TagCarousel"
+// gear
+import CheckButton from "components/global/gear/button/checkButton"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
-// 行事曆元件
-import BigCalendar from 'react-big-calendar';
+
+// api
 import {
-  EventProps, EventWrapperProps,
-  Calendar, momentLocalizer, CalendarProps,
-} from 'react-big-calendar'
+  TcreateDailyReportItemDto, TdailyReportDto,
+  useApiDailyReports,
+  useApiDailyReports_Reporters,
+  useApiDailyReports_isReporters_me,
+  useApiDailyReports_my,
+  useApiDailyReports_id,
+  apiPatchDailyReports_Reporters,
+  apiPatchDailyReports_my,
+  apiDailyReports_id,
+  apiDailyReports_review,
+} from "js/api/api_dailyReport"
+
+import {
+  TemployeeDto,
+  useEmployee
+} from "js/api/api_employee"
+
+// type
+import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
 
 
 
-// antd
-import { Badge } from "antd"
-
-// global gear
-import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02"
-import MyButton from "components/global/gear/button/myButton"
 
 
-// img
-import iconCircle from "public/image/icon/circle.svg"
-import iconCircle_Checked from "public/image/icon/circle_checked.svg"
-import iconRedDot from "public/image/icon/redDot.svg"
 
-// tool
-import { month_chToNumber } from "js/tools/date/conversionTable";
 
 // css
 import scss from "./dailyReport.module.scss"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
-
-const localizer = momentLocalizer(moment)
+// =====================================================================
+export type Ttag = { reportId: string, employeeId: string, name: string, date: string }
+// =====================================================================
 
 // =====================================================================
 
-export default function DailyReport() {
-  const [render, setRender] = useState(false)
-  const reRender = () => {
-    setRender((state) => !state)
+export default function DailyReport(
+  { userInfo, userErpFeature, }:
+    {
+      userInfo: TuserDto
+      userErpFeature: TerpFeatureDto[]
+    }
+) {
+
+  // -----------------------------------------------------------
+  // const router = useRouter()
+  // const isSubordinate = false
+  const isSubordinate = (() => {
+    let isSubordinate: boolean = true
+    if (userErpFeature) {
+      const result = userErpFeature.find((erp) => {
+        return erp.name === "人事權限建立"
+      })
+      if (result) isSubordinate = false
+    }
+    return isSubordinate
+  })()
+  // -----------------------------------------------------------
+  // state
+  // 送進SetReportEmpModal的arr
+  const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
+    useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
+  // 
+
+  const [tagArr, setTagArr] = useState<Ttag[]>([])
+
+  // ----------------------------------------------------------------------
+  const today = moment().format("YYYY-MM-DD");
+  const thisMonth = moment().format("YYYY-MM");
+
+  // 取得所有回報人員
+  const {
+    dailyReports_ReportersArr,
+    updateDailyReports_ReportersArr
+  } = useApiDailyReports_Reporters()
+  // 檢查自己是不是回報人員
+  const {
+    dailyReports_isReporters_me: isReporter,
+    updateDailyReports_isReporters_me: updateIsReporter
+  } = useApiDailyReports_isReporters_me()
+  // 取得指定月份所有日報表
+  const {
+    dailyReport,
+    updateDailyReports,
+  } = useApiDailyReports(thisMonth)
+  // 取得自己指定日期的日報表
+  // const {
+  //   dailyReport_my,
+  //   updateDailyReports_my
+  // } = useApiDailyReports_my(today)
+  // 取得指定日報表
+  // const {
+  //   dailyReport_id,
+  //   updateDailyReports_id
+  // } = useApiDailyReports_id("ddd")
+  // 取得所有人員
+  const { data: employeeRes, update: updateEmployeeArr }
+    = useEmployee({ pageSize: 999999, populate: ["jobs"] })
+  const employeeArr = employeeRes?.data
+
+  // ----------------------------------------------------------------------
+  useEffect(() => {
+
+    (async () => {
+
+      if (!isSubordinate) {
+        const allArr = [
+          updateDailyReports_ReportersArr(), // 取得所有回報人員
+          updateEmployeeArr() // 取得所有人員
+        ]
+        await Promise.all(allArr)
+        // await updateDailyReports_id() // 取得指定日報表
+      }
+      if (isSubordinate) {
+        // await updateIsReporter()  // 檢查自己是不是回報人員
+        // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
+      }
+      await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
+      // await apiDailyReports_id("8ffea857-f99d-4afc-90a6-b762b7073d93")
+    })()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ----------------------------------------------------------------------
+
+  const reportEmpArr = useMemo(() => {
+    if (!dailyReports_ReportersArr || !employeeArr) return []
+
+    const result = employeeArr.map((item) => {
+      const match = dailyReports_ReportersArr.find((x) => x.id === item.id)
+      const shouldReport = match ? true : false
+
+      let theJobs = (() => {
+        if (item.jobs) {
+          return _.sortBy(item.jobs, "grade")
+        }
+        else return []
+      })();
+
+      const obj = {
+        id: item.id,
+        chName: item.chName,
+        idNumber: item.idNumber,
+        job: theJobs[0]?.name ?? "",
+        grade: theJobs[0]?.grade ?? "",
+        shouldReport
+      }
+      return obj
+    })
+    return result
+  }, [dailyReports_ReportersArr, employeeArr,])
+
+
+
+  // ----------------------------------------------------------------------
+  // TagCarousel
+  const addTag = (tag: Ttag) => {
+    if (isSubordinate) {
+      if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
+    }
+    if (tagArr.some(tag => tag.reportId === tag.reportId)) return
+    setTagArr(arr => { arr.push(tag); return [...arr] })
+
+  }
+  const removeTag = (index: number) => {
+    setTagArr(arr => { arr.splice(index, 1); return [...arr] })
   }
 
-  const [eventsArr, setEventsArr]
-    = useState(lotFakeData.map((item) => new Class_isRead(item, reRender)))
+  // ----------------------------------------------------------------------
+  // SetReportEmpModal
+  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
+  const editReportEmpArr = () => {
+    setReportEmpArr_preEdit(reportEmpArr)
+  }
+  const onConfirm = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+    const employeeIds: string[] = []
+    employeeArr.forEach((employee) => {
+      if (employee.shouldReport) employeeIds.push(employee.id)
+    })
+    try {
+      showRootLoading(true)
+      await apiPatchDailyReports_Reporters({ employeeIds })
+      await updateDailyReports()
+      onCancel()
+    }
+    catch {
+      myAlert.err({ title: "更新回報人員失敗" })
+    }
+    finally { showRootLoading(false) }
+  }
+  const onCancel = () => {
+    setReportEmpArr_preEdit(undefined)
+  }
+  // ----------------------------------------------------------------------
 
+  // 編輯中的日報表，送進ReportTable
+  const [reportInEdit, setReportInEdit]
+    = useState<{
+      id: string | undefined
+      date: Date,
+      reviewedAt: string | null | undefined,
+      items: Class_dailyReportItem[]
+    }>()
+  const [render, setRender] = useState(1)
+  const reRender = () => setRender(state => ++state)
+
+  const editNewDailyReport = async (reportId?: string, employeeId?: string) => {
+    let id: string | undefined
+    let date: Date
+    let items: Class_dailyReportItem[]
+    let reviewedAt: string | null | undefined
+    if (!reportId) {
+      date = new Date()
+      items = [new Class_dailyReportItem(reRender)]
+    }
+    else {
+      let res;
+      try {
+        showRootLoading(true)
+        res = await apiDailyReports_id(reportId, ["items"])
+      }
+      catch {
+        myAlert.err({ title: "取得日報表失敗" })
+      }
+      finally { showRootLoading(false) }
+      if (!res) return;
+      id = res.id
+      date = new Date(res.date)
+      items
+        = res.items.map((item) => new Class_dailyReportItem(reRender, item))
+      reviewedAt = res.reviewedAt
+    }
+    setReportInEdit({ id, date, items, reviewedAt })
+  }
+
+
+  const addDailyReportItem = () => {
+    setReportInEdit(report => {
+      if (!report) return report
+      const id = report.id
+      const date = report.date
+      const items = report.items
+      const reviewedAt = report.reviewedAt
+      items.push(new Class_dailyReportItem(reRender))
+      return { id, date, items, reviewedAt }
+    })
+
+  }
+  const cancelEditNewDailyReport = () => {
+    setReportInEdit(undefined)
+  }
+
+
+
+  // ----------------------------------------------------------------------
+  const panelList01: TpanelList = [
+    {
+      custom: <CheckButton
+        checkLabel="已讀"
+        uncheckLable="未讀"
+        value={!!reportInEdit?.reviewedAt}
+        // defaultCheck={true}
+        // value={false}
+        // onClick={(isCheck) => { console.log(isCheck) }}
+        onClick={async () => {
+          if (!reportInEdit?.id) return;
+          try {
+            showRootLoading(true)
+            const res = await apiDailyReports_review(reportInEdit.id)
+
+            // setReportInEdit((report) => {
+
+            //   return report
+            // })
+
+          }
+          catch { myAlert.err({ title: "審核失敗" }) }
+          finally { showRootLoading(false) }
+
+        }}
+      />
+    }
+  ]
+
+  const panelList02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: async () => {
+        if (!reportInEdit) return
+        const date = reportInEdit.date
+        const items = reportInEdit.items.map((item) => item.postBody)
+        try {
+          showRootLoading(true)
+          await apiPatchDailyReports_my({ date, items })
+          await updateDailyReports()
+          cancelEditNewDailyReport()
+        }
+        catch { myAlert.err({ title: "更新日報表失敗" }) }
+        finally { showRootLoading(false) }
+      },
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: cancelEditNewDailyReport,
+    },
+  ]
+
+  const panelList =
+    !reportInEdit ? undefined :
+      isSubordinate ? panelList02 : panelList01
+
+  // ----------------------------------------------------------------------
+  const customeLeft =
+    [
+      <TagCarousel key="1"
+        tagArr={tagArr}
+        editNewDailyReport={editNewDailyReport}
+        removeTag={removeTag} />
+    ]
+  // ----------------------------------------------------------------------
+  const tagOnClick = () => {
+    cancelEditNewDailyReport()
+  }
+  // ----------------------------------------------------------------------
 
   return (
-    <div className={scss.container}>
-      <PageHeader02 tag="日報表" />
-      <div className={scss.mainContainer}>
-        <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px]`}>
-          <Calendar
-            localizer={localizer}
-            events={eventsArr}
-            showAllEvents
-            views={['month']}
-            style={{
-              minHeight: 750,
-              height: "100%"
-            }}
+    <>
+      <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
+        <PageHeader02
+          tag="日報表"
+          tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
+          tagOnClick={tagOnClick}
+          // linkList={linkList}
 
-            components={{
-              month: {
-                // event: Cevent,
-                header: Header, // 最上方標明星期幾的row
-                dateHeader: DateHeader, // 日期格
-              },
-              // event並不是dateCellWrappe的子元素
-              // !!!dateCellWrapper的props的型別是{}，但實際上props裡有三個property!!!
-              // !!!因此使用@ts-ignore !!!
-              // @ts-ignore 
-              dateCellWrapper: DateCellWrapper, //底下的格子，裡面沒有裝東西，似僅作為背景
-              // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              eventWrapper: EventWrapper, // 壓在格子上方的event
-              toolbar: ToolBar, // 最上方的操作面板
-            }}
+          panelList={panelList}
+          customeLeft={customeLeft}
+        />
+
+        {!reportInEdit &&
+          <TheCalendar
+            dailyReportArr={dailyReport ?? []}
+            editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
+            editDailyReport={isSubordinate ? editNewDailyReport : undefined}
+            // editDailyReport={isSubordinate ? () => { } : undefined}
+            addTag={addTag}
+            isSubordinate={isSubordinate}
           />
-        </div>
-      </div>
-    </div>
-  )
-}
+        }
 
-// ===============================================================
+        {reportInEdit &&
+          <ReportTable
+            classDailyReportItemArr={reportInEdit.items}
+            addDailyReportItem={addDailyReportItem}
+            isSubordinate={isSubordinate} />
+        }
 
-const ToolBar = (toolbar: BigCalendar.ToolbarProps<Class_isRead, object>) => {
+      </SubLayer>
 
-  const { onNavigate, label } = toolbar
-
-  // 'PREV' | 'NEXT' | 'TODAY' | 'DATE'
-  const nextMonth = () => {
-    onNavigate('NEXT');
-  }
-  const prevMonth = () => {
-    onNavigate('PREV');
-  }
-  const toToday = () => {
-    onNavigate('TODAY');
-  }
-
-  let [month, year] = label.split(" ")
-
-  const theMonth = month.replace("月", "") as keyof typeof month_chToNumber
-  const Nummonth = month_chToNumber[theMonth] ?? "錯誤月份"
-
-  return (
-    <div className={scss.toolBar}>
-      <div className={scss.left}>
-        <MyButton label="Today" onClick={toToday} px="px22" />
-      </div>
-      <div className={scss.center}>
-        <MyButton className={scss.arrow} preImg="arrow02_left"
-          onClick={prevMonth} />
-        <span>{Nummonth}月 {year}</span>
-        <MyButton className={scss.arrow} preImg="arrow02_right"
-          onClick={nextMonth} />
-      </div>
-      <div className={scss.right}>
-        <MyButton label="刪除員工" preImg="delete" onClick={() => { alert("刪除員工") }} px="px2227" />
-        <MyButton label="新增員工" preImg="add" onClick={() => { alert("新增員工") }} px="px2227" />
-      </div>
-    </div>
-  )
-
-}
-// ======================================================================
-
-// 壓在格子上方的event
-const EventWrapper = (e: EventWrapperProps<Class_isRead>) => {
-  const { event } = e
-  const { job, name, isChecked, switchIsReaded, isForbidden } = event
-  const theIsChecked = +isChecked as 0 | 1
-  const checkIcon =
-    isForbidden
-      ? checkIconTable["forbidden"]
-      : checkIconTable[`${theIsChecked}`]
-  return (
-    <div className={classNames("px-2 mb-2 cursor-pointer", scss.eventWrapper)}
-      onClick={switchIsReaded}
-    >
-      <div className={classNames(
-        "grid grid-cols-[20px_40px_auto] gap-2 justify-start items-center",
-        "text-lg"
-      )}>
-        <Image src={checkIcon} alt="" />
-        <span>{job}</span>
-        <span>{name}</span>
-      </div>
-    </div>
+      <SetReportEmpModal
+        visible={!!reportEmpArr_preEdit}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        // onSearch={onSearch}
+        dataArr={reportEmpArr_preEdit ?? []}
+      />
+    </>
   )
 }
 
 // ======================================================================
-const Header = (HeaderProps: BigCalendar.HeaderProps) => {
-  const { label } = HeaderProps
-  const day = label.replace("週", "")
-  return (
-    <div className="py-2">
-      <span>{day}</span>
-    </div>
-  )
-}
-
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 // ======================================================================
 
-const DateHeader = (DateHeaderProps: BigCalendar.DateHeaderProps) => {
-  const { label, date } = DateHeaderProps
-  const showDate = parseInt(label)
-  const isCurrentMonth = moment(date).isSame(new Date(), "month")
-  return (
-    <div className={classNames("my-[10px] mx-2", scss.dateHeader)}>
-      <span className={classNames(
-        "block w-fit px-3 m-auto ml-0",
-        "text-base bg-[#e6e6e6] rounded-full",
-        { [scss.isCurrentMonth]: !isCurrentMonth }
-      )}>{showDate}</span>
-    </div>
-  )
-}
 
-// ======================================================================
-const DateCellWrapper = (props: {
-  range: Date[];
-  value: Date;
-  children: JSX.Element;
-}) => {
 
-  const { children, range, value } = props
 
-  const isToday = moment(value).isSame(new Date(), "date")
-
-  // children的className為 rbc-day-bg rbc-off-range-bg，留作備註
-  // rbc-day-bg rbc-off-range-bg
-  return (
-    <div className={classNames(
-      "rbc-day-bg", scss.dateCellWrapper,
-      { [scss.isToday]: isToday }
-    )}>
-      <div className={scss.border} />
-    </div>
-  )
-}
-// ======================================================================
-
-class Class_isRead implements Tevent {
-  constructor(data: Tdata, reRender: () => void) {
+export class Class_dailyReportItem {
+  constructor(
+    reRender: () => void,
+    dailyReportItem: TdailyReportItemDto = _.cloneDeep(emptyDailyReportItem)
+  ) {
     this._reRender = reRender
+    this._item = dailyReportItem
 
-    const { job, name, isChecked, date, isForbidden } = data
-    this.job = job
-    this.name = name
-    this.isChecked = isChecked
-    this.isForbidden = isForbidden
-    this.start = date
-    this.end = date
+    this._install = this._item.workingTypes.includes("install")
+    this._repair = this._item.workingTypes.includes("repair")
+    this._powerDelivery = this._item.workingTypes.includes("power-delivery")
+    this._maintenance = this._item.workingTypes.includes("maintenance")
+    this._inspection = this._item.workingTypes.includes("inspection")
+
   } // constructor
+  private _reRender
+  private _item
+  private _install
+  private _repair
+  private _powerDelivery
+  private _maintenance
+  private _inspection
 
-  private _reRender: () => void
-  job
-  name
-  start
-  end
-  isChecked
-  isForbidden
 
-  switchIsReaded = () => {
-    if (this.isForbidden) return
-    this.isChecked = !this.isChecked
+  get id() {
+    return this._item.id
+  }
+
+  get periodOfDay() {
+    return this._item.periodOfDay
+  }
+  set periodOfDay(v: "AM" | "PM") {
+    this._item.periodOfDay = v
     this._reRender()
   }
-} // Class_isRead
 
-interface Tdata {
-  job: string
-  name: string
-  isChecked: boolean,
-  isForbidden: boolean,
-  date: string,
-}
+  get customerName() {
+    return this._item.customerName
+  }
+  set customerName(v: string) {
+    this._item.customerName = v
+    console.log("test")
+    this._reRender()
+  }
 
-interface Tevent {
-  job: string
-  name: string
-  isChecked: boolean,
-  isForbidden: boolean,
-  start: string,
-  end: string,
-  // allDay?: boolean
-  // resource?: any,
-}
+  get contactName() {
+    return this._item.contactName
+  }
+  set contactName(v: string) {
+    this._item.contactName = v
+    this._reRender()
+  }
 
-const fakeData: Tdata[] = [
-  {
-    job: "BO",
-    name: "大雄",
-    isChecked: false,
-    isForbidden: true,
-    date: "2023-03-01",
-  },
-  {
-    job: "BO",
-    name: "靜香",
-    isChecked: false,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "PD",
-    name: "小夫",
-    isChecked: false,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "BO",
-    name: "胖虎",
-    isChecked: true,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "GA",
-    name: "小明",
-    isChecked: false,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "ED",
-    name: "曉東",
-    isChecked: true,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "ED",
-    name: "傑西",
-    isChecked: false,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "RD",
-    name: "凱莉",
-    isChecked: false,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-  {
-    job: "HR",
-    name: "哆啦",
-    isChecked: false,
-    isForbidden: true,
-    date: "2023-03-01",
-  },
-  {
-    job: "RD",
-    name: "A夢",
-    isChecked: false,
-    isForbidden: false,
-    date: "2023-03-01",
-  },
-]
+  get order() {
+    return this._item.order
+  }
+  // set order(v: string) {
+  //   this._item.order = v
+  //   this._reRender()
+  // }
+
+  get workingTypes() {
+    return this._item.workingTypes
+  }
+  // set workingTypes(v: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]) {
+  //   this._item.workingTypes = v
+  //   this._reRender()
+  // }
+  get install() { return this._install }
+  set install(v: boolean) {
+    this._install = v
+    this._reRender()
+  }
+
+  get repair() { return this._repair }
+  set repair(v: boolean) {
+    this._repair = v
+    this._reRender()
+  }
+
+  get powerDelivery() { return this._powerDelivery }
+  set powerDelivery(v: boolean) {
+    this._powerDelivery = v
+    this._reRender()
+  }
+
+  get maintenance() { return this._maintenance }
+  set maintenance(v: boolean) {
+    this._maintenance = v
+    this._reRender()
+  }
+
+  get inspection() { return this._inspection }
+  set inspection(v: boolean) {
+    this._inspection = v
+    this._reRender()
+  }
 
 
-function generateData(
-  data: Tdata[],
-  startDate: string,
-  endDate: string
-): Tdata[] {
-  const newData: Tdata[] = []
+  get description() {
+    return this._item.description
+  }
+  set description(v: string) {
+    this._item.description = v
+    this._reRender()
+  }
 
-  const startTime = new Date(startDate).getTime()
-  const endTime = new Date(endDate).getTime()
+  get postBody(): TcreateDailyReportItemDto {
 
-  data.forEach((item) => {
-    const { job, name, isChecked, isForbidden } = item
+    const workingTypes: TcreateDailyReportItemDto["workingTypes"] = []
+    if (this.install) workingTypes.push("install")
+    if (this.repair) workingTypes.push("repair")
+    if (this.powerDelivery) workingTypes.push("power-delivery")
+    if (this.maintenance) workingTypes.push("maintenance")
+    if (this.inspection) workingTypes.push("inspection")
 
-    // 86400000 是一天
-    for (let time = startTime; time <= endTime; time += 86400000) {
-      const date = new Date(time).toISOString().slice(0, 10)
-      newData.push({
-        job,
-        name,
-        isChecked: isChecked,
-        isForbidden: isForbidden,
-        date,
-      })
+    return {
+      periodOfDay: this.periodOfDay,
+      customerName: this.customerName,
+      contactName: this.contactName,
+      description: this.description,
+      workingTypes
     }
-  })
 
-  return newData
+  }
+
+} // Class_dailyReportItem
+
+
+const emptyDailyReportItem: TdailyReportItemDto = {
+  periodOfDay: "AM",
+  customerName: "",
+  contactName: "",
+  workingTypes: [],
+  description: "",
 }
 
-
-const lotFakeData = generateData(fakeData, "2023-02-26", "2023-04-02")
-
-
-const checkIconTable = {
-  "0": iconCircle,
-  "1": iconCircle_Checked,
-  "forbidden": iconRedDot,
-}

@@ -7,7 +7,6 @@
   grid-template-columns: repeat(2, fit-content(100%));
   gap: 18px 105px;
   .input02 {
-    padding: 0;
     > span {
       color: $colorMain;
     }
@@ -83,9 +82,7 @@
           text-align: center;
         }
       }
-      .input,
-      .sel {
-        padding: 0;
+      .input {
         span,
         textarea {
           font-weight: 400;
@@ -95,11 +92,6 @@
             font-size: 16px;
           }
         }
-      }
-      .sel {
-        // 為了對齊
-        margin-bottom: 0.14px;
-        min-height: 25.14px;
       }
     }
   }

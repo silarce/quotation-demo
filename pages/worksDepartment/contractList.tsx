@@ -19,7 +19,7 @@ import style from "./contractList.module.scss"
 // fakeData
 import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 // type
-import { Toption } from "components/global/gear/select/select03"
+import { Toption } from "fakeDatabase/options/options"
 
 // ===========================================
 

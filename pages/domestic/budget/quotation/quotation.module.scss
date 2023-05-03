@@ -145,21 +145,15 @@
     }
     .select03 {
       width: 60px;
-      hr {
-        display: none;
-      }
-      [class$="MenuList"] {
-        background-color: pink !important;
-      }
     }
-    &.isFocus {
-      > span {
-        color: red;
-      }
-      .select03 div {
-        color: red;
-      }
-    }
+    // &.isFocus {
+    //   > span {
+    //     color: red;
+    //   }
+    //   .select03 div {
+    //     color: red;
+    //   }
+    // }
   }
   .history {
     width: fit-content;
@@ -213,4 +207,20 @@
   > span {
     width: 64px;
   }
+}
+
+// ===============================================
+
+div.selMenu {
+  width: 172.38px;
+  position: relative;
+  right: 92px;
+  top: 11px;
+}
+
+.selMenuList {
+  width: 100%;
+}
+.selOption {
+  text-align: center;
 }

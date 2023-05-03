@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, MouseEvent } from "react"
 import { useRouter } from "next/router"
 
 // component
@@ -14,7 +14,7 @@ import { TsearchObj } from "components/global/gear/HOC/searchBar/searchBar"
 import scss from "./pageHeader02.module.scss"
 
 // type
-import { TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar"
+import { TsearchGroup, Toption } from "components/global/gear/HOC/searchBar/searchBar"
 
 
 // ========================================================
@@ -22,6 +22,8 @@ import { TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar"
 export default function PageHeader02(
   {
     tag,
+    tagClassName,
+    tagOnClick,
     tagList = [],
     panelList = [],
     linkList = [],
@@ -30,6 +32,8 @@ export default function PageHeader02(
   }:
     {
       tag?: string // 最左邊的標籤(標題)
+      tagClassName?: string
+      tagOnClick?: (e: MouseEvent) => void
       tagList?: Ttag[] // 左邊的多個標籤，帶click事件
       linkList?: Tlink[] // 左邊的標籤，不過是Link
       /**外容器的display為flex*/
@@ -49,7 +53,7 @@ export default function PageHeader02(
       {/* tagBox */} {/* 左邊的部分 */}
       <div className={scss.left}>
         <div className={scss.prebuilt}>
-          <Tag tag={tag} />{/* 單一tag */}
+          <Tag tag={tag} className={tagClassName} onClick={tagOnClick} />{/* 單一tag */}
           <TagList
             tagList={tagList}
             active={active} setActive={setActive}
@@ -71,7 +75,7 @@ export default function PageHeader02(
 
 
 
-export type { TpanelList, TtagList, TsearchObj, TsearchGroup }
+export type { TpanelList, TtagList, TsearchObj, TsearchGroup, Toption }
 
 // ===========================================================
 

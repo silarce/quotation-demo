@@ -1,0 +1,97 @@
+@use "styles/theme01" as *;
+
+.table {
+  display: grid;
+  grid-template-rows: fit-content(100%) fit-content(100%);
+  height: 100%;
+  padding: 3px;
+  .thead {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    > div {
+      display: grid;
+      padding: 24px 20px;
+      font-size: 14px;
+      font-weight: 400;
+      background-color: $bgc01;
+      border-right: solid 1px $colorBorder01;
+      > span {
+        margin: auto 0;
+      }
+      &:nth-last-of-type(1) {
+        border-right: none;
+      }
+    }
+
+    > .purposeColumn {
+      padding: 0;
+      > div:nth-of-type(1) {
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 400;
+        text-align: center;
+        border-bottom: solid 1px $colorBorder01;
+        > span {
+          color: $colorMain;
+        }
+      }
+
+      > div:nth-of-type(2) {
+        display: flex;
+        flex-wrap: nowrap;
+        > div {
+          display: flex;
+          place-content: center;
+          padding: 6px 0;
+          font-size: 14px;
+          font-weight: 400;
+          border-right: solid 1px $colorBorder01;
+          &:nth-last-of-type(1) {
+            border-right: none;
+          }
+        }
+      }
+    } // purposeColumn
+  } // thead
+
+  .tbody {
+    height: 100%;
+    overflow: auto;
+    border-top: solid 1px $colorBorder01;
+    .row {
+      display: grid;
+      grid-template-columns: repeat(8, fit-content(100%)) auto;
+      border-bottom: solid 1px $colorBorder01;
+      > div {
+        padding: 12px 10px;
+        border-right: solid 1px $colorBorder01;
+
+        > span {
+          font-size: 16px;
+          font-weight: 400;
+          color: $colorMain;
+          word-break: break-all;
+          word-wrap: break-word;
+        }
+
+        &:nth-last-of-type(1) {
+          border-right: none;
+        }
+        &.check {
+          display: grid;
+          > * {
+            margin: auto;
+          }
+        }
+      }
+    }
+    .newReportBtn {
+      border: none;
+      background-color: transparent;
+      padding: 0;
+      margin-top: 15px;
+      margin-left: 13px;
+    }
+  } // tbody
+} // table
