@@ -56,26 +56,29 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 // =====================================================================
 
 export default function DailyReport(
-  { userInfo, userErpFeature, }:
+  { userInfo, }:
     {
       userInfo: TuserDto
-      userErpFeature: TerpFeatureDto[]
     }
 ) {
 
   // -----------------------------------------------------------
-  // const router = useRouter()
-  // const isSubordinate = false
+
+  /**是否為低權限 */
   const isSubordinate = (() => {
-    let isSubordinate: boolean = true
-    if (userErpFeature) {
-      const result = userErpFeature.find((erp) => {
-        return erp.name === "人事權限建立"
-      })
-      if (result) isSubordinate = false
+    /**如果使用者是employee，從grade判斷 */
+    if (userInfo?.employee?.jobs) {
+      const jobs = userInfo.employee.jobs
+      if (!jobs[0]) return true
+
+      const jobsCopy = _.sortBy(jobs, "grade").reverse()
+      if (jobsCopy[0].grade >= 15) return false
+      else return true
     }
-    return isSubordinate
+    /**使用者不是employee，那就是admin*/
+    return false
   })()
+
   // -----------------------------------------------------------
   // state
   // 送進SetReportEmpModal的arr
