@@ -33,13 +33,15 @@ export const useApiDailyReports_Reporters = () => {
     return data
   }
   return {
+    /** 所有需回報的人員 */
     dailyReports_ReportersArr: data,
     setDailyReports_ReportersArr: setData,
+    /**更新所有需回報的人員 */
     updateDailyReports_ReportersArr: update
   }
 }
 
-// 設定回報人員
+/**設定回報人員 */
 export const apiPatchDailyReports_Reporters = (body: { employeeIds: string[] }) => {
   const api = "/daily-reports/reporters"
   return axi.patch(api, body)
@@ -87,8 +89,10 @@ export const useApiDailyReports = (month: string) => {
     return data
   }
   return {
+    /** 指定月份所有日報表 */
     dailyReport: data,
     setDailyReports: setData,
+    /** 更新指定月份所有日報表*/
     updateDailyReports: update
   }
 }

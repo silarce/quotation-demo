@@ -79,6 +79,7 @@ export default function DailyReport(
     dailyReports_ReportersArr,
     updateDailyReports_ReportersArr
   } = useApiDailyReports_Reporters()
+
   // 檢查自己是不是回報人員
   const {
     dailyReports_isReporters_me,
@@ -162,6 +163,7 @@ export default function DailyReport(
   }, [dailyReports_ReportersArr, employeeArr,])
 
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
+  //**開啟回報人員設定面板 */
   const editReportEmpArr = () => {
     setReportEmpArr_preEdit(reportEmpArr)
   }
@@ -174,10 +176,10 @@ export default function DailyReport(
     try {
       showRootLoading(true)
       await apiPatchDailyReports_Reporters({ employeeIds })
-
-      await updateDailyReports()
-
-
+      await Promise.all([
+        updateDailyReports(),
+        updateDailyReports_ReportersArr(),
+      ])
       onCancel()
     }
     catch {
