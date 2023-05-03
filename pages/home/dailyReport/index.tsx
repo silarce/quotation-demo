@@ -58,20 +58,8 @@ export default function DailyReport(
 ) {
   // -----------------------------------------------------------
 
-  /**是否為低權限 */
-  const isSubordinate = (() => {
-    /**如果使用者是employee，從grade判斷 */
-    if (userInfo?.employee?.jobs) {
-      const jobs = userInfo.employee.jobs
-      if (!jobs[0]) return true
-
-      const jobsCopy = _.sortBy(jobs, "grade").reverse()
-      if (jobsCopy[0].grade >= 15) return false
-      else return true
-    }
-    /**使用者不是employee，那就是admin*/
-    return false
-  })()
+  /**是否為回報人員權限 */
+  const isSubordinate = checkIsSubordinate(userInfo)
 
   // -----------------------------------------------------------
   // state
@@ -79,7 +67,6 @@ export default function DailyReport(
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
   // 
-
   const [tagArr, setTagArr] = useState<Ttag[]>([])
 
   // ----------------------------------------------------------------------
@@ -188,11 +175,13 @@ export default function DailyReport(
   }
 
   // ----------------------------------------------------------------------
+  // 回報人員設定
   // SetReportEmpModal
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   const editReportEmpArr = () => {
     setReportEmpArr_preEdit(reportEmpArr)
   }
+
   const onConfirm = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
     const employeeIds: string[] = []
     employeeArr.forEach((employee) => {
@@ -201,7 +190,10 @@ export default function DailyReport(
     try {
       showRootLoading(true)
       await apiPatchDailyReports_Reporters({ employeeIds })
+
       await updateDailyReports()
+
+
       onCancel()
     }
     catch {
@@ -386,5 +378,21 @@ const reqApiDailyReports_my = async () => {
     myAlert.err({ title: "取得指定日期日報表失敗" })
   }
   finally { showRootLoading(false) }
+}
+
+// ==========================================================================
+/**判斷是否為回報人員權限 */
+const checkIsSubordinate = (userInfo: TuserDto) => {
+    /**如果使用者是employee，從grade判斷 */
+    if (userInfo?.employee?.jobs) {
+      const jobs = userInfo.employee.jobs
+      if (!jobs[0]) return true
+
+      const jobsCopy = _.sortBy(jobs, "grade").reverse()
+      if (jobsCopy[0].grade >= 15) return false
+      else return true
+    }
+    /**使用者不是employee，那就是admin*/
+    return false
 }
 
