@@ -51,12 +51,12 @@ export const apiPatchDailyReports_Reporters = (body: { employeeIds: string[] }) 
 const apiDailyReports_isReporters_me = () => {
   const api = "/daily-reports/is-reporter/me"
   return axi.get(api)
-    .then(({ data }) => data as boolean)
+    .then(({ data }) => data as { isReporter: boolean })
     .catch(err => Promise.reject(err))
 }
 
 export const useApiDailyReports_isReporters_me = () => {
-  let [data, setData] = useState<boolean>()
+  let [data, setData] = useState<{ isReporter: boolean }>()
   const update = async () => {
     const data = await apiDailyReports_isReporters_me()
     if (data) setData(data)

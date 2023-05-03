@@ -93,9 +93,11 @@ export default function DailyReport(
   } = useApiDailyReports_Reporters()
   // 檢查自己是不是回報人員
   const {
-    dailyReports_isReporters_me: isReporter,
+    dailyReports_isReporters_me,
     updateDailyReports_isReporters_me: updateIsReporter
   } = useApiDailyReports_isReporters_me()
+  const isReporter = dailyReports_isReporters_me?.isReporter
+
   // 取得指定月份所有日報表
   const {
     dailyReport,
@@ -130,7 +132,7 @@ export default function DailyReport(
         // await updateDailyReports_id() // 取得指定日報表
       }
       if (isSubordinate) {
-        // await updateIsReporter()  // 檢查自己是不是回報人員
+        await updateIsReporter()  // 檢查自己是不是回報人員
         // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
       }
       await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
@@ -211,7 +213,6 @@ export default function DailyReport(
     setReportEmpArr_preEdit(undefined)
   }
   // ----------------------------------------------------------------------
-
   // 編輯中的日報表，送進ReportTable
   const {
     report: reportInEdit,
@@ -234,7 +235,6 @@ export default function DailyReport(
   const cancelEditNewDailyReport = () => {
     setReport(undefined)
   }
-
 
   // ----------------------------------------------------------------------
   const panelList01: TpanelList = [
@@ -272,6 +272,7 @@ export default function DailyReport(
       label: "上傳",
       onClick: async () => {
         if (!reportInEdit) return
+        if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
         const date = new Date(reportInEdit.date)
         const items = reportInEdit.items.map((item) => item.postBody)
         try {
