@@ -173,7 +173,7 @@ const ToolBar = (
           <MyButton label="回報人員設定" onClick={editReportEmpArr} px="px2227" />
         }
         {editDailyReport &&
-          <MyButton label="編輯/新增回報" onClick={() => editDailyReport()} px="px2227" />
+          <MyButton label="編輯當日回報" onClick={() => editDailyReport()} px="px2227" />
         }
 
       </div>
