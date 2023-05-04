@@ -6,6 +6,10 @@ import moment from "moment";
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
+
+// antd
+import { Badge } from 'antd';
+
 // component
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
@@ -149,6 +153,32 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // ----------------------------------------------------------------------
+  // 編輯中的日報表，送進ReportTable
+  const {
+    report: reportInEdit,
+    setReport,
+    reNew_report,
+    addReportItem: addDailyReportItem,
+    changeReviewToChecked, switchIsEdit,
+    reportIsEdit
+  } = useReport()
+
+  const editReport = async (reportId: string) => {
+    const dailyReport = await reqApiDailyReports_id(reportId)
+    if (!dailyReport) return
+    reNew_report({ dailyReport })
+  }
+
+  const editReport_today = async () => {
+    const dailyReport = await reqApiDailyReports_my()
+    if (!dailyReport) return
+    reNew_report({ dailyReport })
+  }
+
+  const cancelEditNewDailyReport = () => {
+    setReport(undefined)
+  }
 
   // ----------------------------------------------------------------------
   // TagCarousel
@@ -209,31 +239,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const cancelSetReportEmpModal = () => {
     setReportEmpArr_preEdit(undefined)
   }
-  // ----------------------------------------------------------------------
-  // 編輯中的日報表，送進ReportTable
-  const {
-    report: reportInEdit,
-    setReport,
-    reNew_report,
-    addReportItem: addDailyReportItem,
-    changeReviewToChecked
-  } = useReport()
-
-  const editReport = async (reportId: string) => {
-    const dailyReport = await reqApiDailyReports_id(reportId)
-    if (!dailyReport) return
-    reNew_report({ dailyReport })
-  }
-
-  const editReport_today = async () => {
-    const dailyReport = await reqApiDailyReports_my()
-    if (!dailyReport) return
-    reNew_report({ dailyReport })
-  }
-
-  const cancelEditNewDailyReport = () => {
-    setReport(undefined)
-  }
 
   // ----------------------------------------------------------------------
   const panelList01: TpanelList = [
@@ -284,13 +289,40 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     {
       type: "myButton",
       label: "取消",
-      onClick: cancelEditNewDailyReport,
+      onClick: switchIsEdit,
     },
   ]
 
-  const panelList =
-    !reportInEdit ? undefined :
-      isSubordinate ? panelList02 : panelList01
+  const panelList03: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge01}
+        color="auto"
+        text="未讀" />
+    },
+    {
+      type: "myButton",
+      label: "編輯",
+      onClick: switchIsEdit
+    }
+  ]
+  const panelList04: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="總經理已閱讀" />
+    },
+  ]
+
+  const panelList = (() => {
+    if (!reportInEdit) return undefined
+    if (!isSubordinate) return panelList01
+    if (reportInEdit.reviewedAt) return panelList04
+    if (reportIsEdit) return panelList02
+    return panelList03
+  })()
+
 
   // ----------------------------------------------------------------------
   const customeLeft =
@@ -335,7 +367,11 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
-            isSubordinate={isSubordinate} />
+            isSubordinate={isSubordinate}
+            reviewedAt={!!reportInEdit.reviewedAt}
+            // isEdit={reportInEdit.isEdit} 
+            isEdit={reportIsEdit}
+          />
         }
       </SubLayer>
 

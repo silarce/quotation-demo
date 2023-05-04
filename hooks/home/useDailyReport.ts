@@ -16,6 +16,7 @@ type ThookEmptyReport = {
   date: string
   items: Class_reportItem[]
   reviewedAt: Date | null | undefined
+  isEdit: boolean
 }
 
 
@@ -172,6 +173,7 @@ const useReport = () => {
     date: moment().format("yyyy-MM-DD"),
     items: [new Class_reportItem(reRender)],
     reviewedAt: undefined,
+    isEdit: false
   })
 
   const reNew_report = (
@@ -188,6 +190,7 @@ const useReport = () => {
       date: dailyReport.date,
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       reviewedAt: dailyReport.reviewedAt,
+      isEdit: false
     }
     setReport(theReport)
   }
@@ -199,8 +202,9 @@ const useReport = () => {
       const date = report.date
       const items = report.items
       const reviewedAt = report.reviewedAt
+      const isEdit = report.isEdit
       items.push(new Class_reportItem(reRender))
-      return { id, date, items, reviewedAt }
+      return { id, date, items, reviewedAt, isEdit }
     })
   }
 
@@ -210,13 +214,34 @@ const useReport = () => {
       const id = report.id
       const date = report.date
       const items = report.items
-      return { id, date, items, reviewedAt }
+      const isEdit = report.isEdit
+      return { id, date, items, reviewedAt, isEdit }
+    })
+  }
+
+  const switchIsEdit = () => {
+    setReport(report => {
+      if (!report) return report
+      const id = report.id
+      const date = report.date
+      const items = report.items
+      const reviewedAt = report.reviewedAt
+      const isEdit = !report.isEdit
+      return { id, date, items, reviewedAt, isEdit }
     })
   }
 
 
+  const reportIsEdit = (() => {
+    if (!report) return false
+    return (report.reviewedAt || !report.isEdit) ? false : true
+  })()
 
-  return { report, setReport, reNew_report, addReportItem, changeReviewToChecked }
+  return {
+    report, setReport, reNew_report,
+    addReportItem, changeReviewToChecked, switchIsEdit,
+    reportIsEdit
+  }
 }
 
 

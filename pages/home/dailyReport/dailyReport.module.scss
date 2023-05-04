@@ -10,3 +10,30 @@
     display: none;
   }
 }
+
+.antdBadge01 {
+  display: flex;
+  place-items: center;
+  :global(.ant-badge-status-dot) {
+    background-color: $colorBorder01;
+    top: 1px;
+  }
+  :global(.ant-badge-status-text) {
+    color: $colorBorder01;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+.antdBadge02 {
+  display: flex;
+  place-items: center;
+  :global(.ant-badge-status-dot) {
+    background-color: #08f366;
+    top: 1px;
+  }
+  :global(.ant-badge-status-text) {
+    color: $colorMain;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
