@@ -13,11 +13,12 @@ import scss from "./subLayer.module.scss"
  * 第三個以後基本上是用來放position:absolute的元件(通常是Modal)
  */
 export default function SubLayer(
-  { children, className, bodyClassName }:
+  { children, className, bodyClassName,containerChildren }:
     {
       children: React.ReactNode
       className?: string
       bodyClassName?: string
+      containerChildren?: React.ReactNode
     }
 ) {
   const childredArr = React.Children.toArray(children)
@@ -29,6 +30,7 @@ export default function SubLayer(
         {/*把剩下的childredArr的item放進來*/}
         {childredArr.slice(2)}
       </div>
+      {containerChildren}
     </div>
   )
 }
