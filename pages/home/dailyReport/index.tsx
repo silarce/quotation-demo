@@ -134,20 +134,16 @@ export default function DailyReport(
   // ----------------------------------------------------------------------
   // TagCarousel
   const addTag = (tag: Ttag) => {
-
     if (isSubordinate) {
       if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
     }
-
     if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
-
     setTagArr(arr => { arr.push(tag); return [...arr] })
-
   }
-
-
-  const removeTag = (index: number) => {
+  
+  const removeTag = (index: number, tagReportId: string) => {
     setTagArr(arr => { arr.splice(index, 1); return [...arr] })
+    if (tagReportId === reportInEdit?.id) cancelEditNewDailyReport()
   }
 
   // ----------------------------------------------------------------------
@@ -166,8 +162,8 @@ export default function DailyReport(
   const editReportEmpArr = () => {
     setReportEmpArr_preEdit(reportEmpArr)
   }
-
-  const onConfirm = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+/**發出設定回報人員apiReq */
+  const reqApiPatchDailyReports_Reporters = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
     const employeeIds: string[] = []
     employeeArr.forEach((employee) => {
       if (employee.shouldReport) employeeIds.push(employee.id)
@@ -179,14 +175,15 @@ export default function DailyReport(
         updateDailyReports(),
         updateDailyReports_ReportersArr(),
       ])
-      onCancel()
+      cancelSetReportEmpModal()
     }
     catch {
       myAlert.err({ title: "更新回報人員失敗" })
     }
     finally { showRootLoading(false) }
   }
-  const onCancel = () => {
+  /**關閉回報人員設定面板 */
+  const cancelSetReportEmpModal = () => {
     setReportEmpArr_preEdit(undefined)
   }
   // ----------------------------------------------------------------------
@@ -320,8 +317,8 @@ export default function DailyReport(
 
       <SetReportEmpModal
         visible={!!reportEmpArr_preEdit}
-        onConfirm={onConfirm}
-        onCancel={onCancel}
+        onConfirm={reqApiPatchDailyReports_Reporters}
+        onCancel={cancelSetReportEmpModal}
         // onSearch={onSearch}
         dataArr={reportEmpArr_preEdit ?? []}
       />

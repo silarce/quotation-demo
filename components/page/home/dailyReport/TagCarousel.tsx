@@ -21,7 +21,7 @@ export default function TagCarousel(
     {
       tagArr: Ttag[]
       editReport: (reportId: string) => void
-      removeTag: (index: number) => void
+      removeTag: (index: number, tagReportId: string) => void
       activeId: string
     }
 ) {
@@ -53,7 +53,7 @@ export default function TagCarousel(
                   {`${name} ${date}`}
                 </span>
                 <Image src={iconRmove} alt="remove" className={scss.removeBtn}
-                  onClick={(e) => { e.stopPropagation(); removeTag(index) }}
+                  onClick={(e) => { e.stopPropagation(); removeTag(index, reportId) }}
                 />
                 <hr />
               </div>
