@@ -134,13 +134,18 @@ export default function DailyReport(
   // ----------------------------------------------------------------------
   // TagCarousel
   const addTag = (tag: Ttag) => {
+
     if (isSubordinate) {
       if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
     }
-    if (tagArr.some(tag => tag.reportId === tag.reportId)) return
+
+    if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
+
     setTagArr(arr => { arr.push(tag); return [...arr] })
 
   }
+
+
   const removeTag = (index: number) => {
     setTagArr(arr => { arr.splice(index, 1); return [...arr] })
   }
@@ -270,10 +275,12 @@ export default function DailyReport(
       <TagCarousel key="1"
         tagArr={tagArr}
         editReport={editReport}
-        removeTag={removeTag} />
+        removeTag={removeTag}
+        activeId={reportInEdit?.id ?? ""}
+      />
     ]
   // ----------------------------------------------------------------------
-  const tagOnClick = () => {
+  const leftTagOnClick = () => {
     cancelEditNewDailyReport()
   }
   // ----------------------------------------------------------------------
@@ -284,7 +291,7 @@ export default function DailyReport(
         <PageHeader02
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
-          tagOnClick={tagOnClick}
+          tagOnClick={leftTagOnClick}
           // linkList={linkList}
 
           panelList={panelList}
