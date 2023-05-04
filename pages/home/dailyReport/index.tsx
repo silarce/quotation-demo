@@ -15,6 +15,7 @@ import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 
 // hook
@@ -45,7 +46,6 @@ import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
 
 // css
 import scss from "./dailyReport.module.scss"
-import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // =====================================================================
 export type Ttag = { reportId: string, employeeId: string, name: string, date: string }
@@ -191,10 +191,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       showRootLoading(true)
       await apiPatchDailyReports_Reporters({ employeeIds })
       cancelSetReportEmpModal()
-      await Promise.all([
-        updateDailyReports_plus(),
-        updateDailyReports_ReportersArr(),
-      ])
+      myAlert.success({ title: "更新回報人員成功" })
+      try {
+        await Promise.all([
+          updateDailyReports_plus(),
+          updateDailyReports_ReportersArr(),
+        ])
+      }
+      catch { myAlert.err({ title: "日報表或回報人員取得失敗" }) }
     }
     catch {
       myAlert.err({ title: "更新回報人員失敗" })
