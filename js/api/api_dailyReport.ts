@@ -83,8 +83,8 @@ const apiDailyReports = (month: string) => {
 /**month格式為yyyy-MM 例:2022-02 */
 export const useApiDailyReports = (month: string) => {
   let [data, setData] = useState<TdailyReportDto[]>()
-  const update = async () => {
-    const data = await apiDailyReports(month)
+  const update = async (customMonth?: string) => {
+    const data = await apiDailyReports(customMonth ?? month)
     if (data) setData(data)
     return data
   }

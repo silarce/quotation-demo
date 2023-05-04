@@ -50,8 +50,6 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 export { Class_reportItem }
 // =====================================================================
 
-// =====================================================================
-
 export default function DailyReport(
   { userInfo, }: { userInfo: TuserDto }
 ) {
@@ -140,7 +138,7 @@ export default function DailyReport(
     if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
     setTagArr(arr => { arr.push(tag); return [...arr] })
   }
-  
+
   const removeTag = (index: number, tagReportId: string) => {
     setTagArr(arr => { arr.splice(index, 1); return [...arr] })
     if (tagReportId === reportInEdit?.id) cancelEditNewDailyReport()
@@ -300,9 +298,8 @@ export default function DailyReport(
             dailyReportArr={dailyReport ?? []}
             editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
             editDailyReport={isSubordinate ? editReport_today : undefined}
-            // editDailyReport={isSubordinate ? () => { } : undefined}
             addTag={addTag}
-            isSubordinate={isSubordinate}
+            updateDailyReports={updateDailyReports}
           />
         }
 

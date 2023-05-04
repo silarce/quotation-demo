@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from "react"
+import {  useMemo } from "react"
 import Image from "next/image"
 import moment from 'moment'
 import classNames from "classnames"
@@ -13,10 +13,8 @@ import {
   Calendar, momentLocalizer,
 } from 'react-big-calendar'
 
-
 // global gear
 import MyButton from "components/global/gear/button/myButton"
-
 
 // img
 import iconCircle from "public/image/icon/circle.svg"
@@ -28,7 +26,6 @@ import { month_chToNumber } from "js/tools/date/conversionTable";
 
 // css
 import scss from "./theCalendar.module.scss"
-
 
 // type
 import { TdailyReportDto, } from "js/api/api_dailyReport"
@@ -49,24 +46,22 @@ type Tevent = {
   reviewedAt: Date
 }
 
-
 // ===========================================================================
 
 export default function TheCalendar(
   {
-    // dataArr, 
     editReportEmpArr, addTag,
-    isSubordinate, editDailyReport, dailyReportArr }:
+    editDailyReport, dailyReportArr,
+    updateDailyReports
+  }:
     {
-      // dataArr: Tdata[]
       addTag: (employee: Ttag) => void
-      isSubordinate: boolean
       editReportEmpArr?: () => void
       editDailyReport?: () => void
       dailyReportArr: TdailyReportDto[]
+      updateDailyReports: () => void
     }
 ) {
-
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
@@ -87,11 +82,10 @@ export default function TheCalendar(
         reviewedAt,
       }
     })
-  }, [dailyReportArr])
-  // dailyReportArr
+  }, [dailyReportArr]) // dailyReportArr
+
 
   return (
-    // <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
     <div className={`${scss.dailyReport} h-full mx-[3px] mb-[3px]`}>
       <Calendar
         localizer={localizer}
@@ -116,7 +110,7 @@ export default function TheCalendar(
           // toolbar: ToolBar, // 最上方的操作面板
           toolbar:
             (toolbar: BigCalendar.ToolbarProps<Tevent, object>) =>
-              ToolBar(toolbar, editReportEmpArr, editDailyReport), // 最上方的操作面板
+              ToolBar({ toolbar, editReportEmpArr, editDailyReport, updateDailyReports }), // 最上方的操作面板
         }}
       />
     </div>
@@ -131,23 +125,33 @@ const checkIconTable = {
 // ============================================================================
 
 const ToolBar = (
-  // toolbar: BigCalendar.ToolbarProps<Class_isRead, object>
-  toolbar: BigCalendar.ToolbarProps<Tevent, object>,
-  editReportEmpArr?: () => void,
-  editDailyReport?: () => void
+  { toolbar,
+    editReportEmpArr, editDailyReport, updateDailyReports, }:
+    {
+      toolbar: BigCalendar.ToolbarProps<Tevent, object>,
+      editReportEmpArr?: () => void,
+      editDailyReport?: () => void
+      updateDailyReports: (month?: string) => void
+    }
 ) => {
 
-  const { onNavigate, label } = toolbar
+  const { onNavigate, label, date } = toolbar
+
 
   // 'PREV' | 'NEXT' | 'TODAY' | 'DATE'
-  const nextMonth = () => {
+  const nextMonth = async () => {
     onNavigate('NEXT');
+    const nextMonth = moment(date).add(1, 'months').format('YYYY-MM')
+    updateDailyReports(nextMonth)
   }
-  const prevMonth = () => {
+  const prevMonth = async () => {
     onNavigate('PREV');
+    const prevMonth = moment(date).subtract(1, 'months').format('YYYY-MM')
+    updateDailyReports(prevMonth)
   }
-  const toToday = () => {
+  const toToday = async () => {
     onNavigate('TODAY');
+    updateDailyReports()
   }
 
   let [month, year] = label.split(" ")
@@ -182,11 +186,7 @@ const ToolBar = (
 }
 
 // ======================================================================
-
-
-
 // 壓在格子上方的event
-
 const EventWrapper = (
   e: EventWrapperProps<Tevent>,
   addTag: (employee: Ttag) => void
@@ -197,7 +197,6 @@ const EventWrapper = (
     date, start, end,
     reviewedAt,
   } = event
-
 
   const checkIcon = reviewedAt ? checkIconTable["checked"] : checkIconTable["asked"]
 
