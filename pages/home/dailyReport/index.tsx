@@ -14,6 +14,8 @@ import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
+
 
 // hook
 import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
@@ -50,10 +52,10 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 export { Class_reportItem }
 // =====================================================================
 
-export default function DailyReport(
-  { userInfo, }: { userInfo: TuserDto }
-) {
+export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
+  const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
+
 
   /**是否為回報人員權限 */
   const isSubordinate = checkIsSubordinate(userInfo)
@@ -89,6 +91,18 @@ export default function DailyReport(
     dailyReport,
     updateDailyReports,
   } = useApiDailyReports(thisMonth)
+  /**取得指定月份所有日報表，額外做了loading的處理 */
+  const updateDailyReports_plus = async () => {
+    try {
+      showRootLoading(false)
+      setIsLoading(true)
+      await updateDailyReports()
+    }
+    catch { myAlert.warning({ title: "取得總日報表失敗" }) }
+    finally { setIsLoading(false) }
+  }
+
+
   // 取得自己指定日期的日報表
   // const {
   //   dailyReport_my,
@@ -108,21 +122,28 @@ export default function DailyReport(
   useEffect(() => {
 
     (async () => {
+      try {
+        setIsLoading(true)
+        if (!isSubordinate) {
+          const allArr = [
+            updateDailyReports_ReportersArr(), // 取得所有回報人員
+            updateEmployeeArr() // 取得所有人員
+          ]
+          await Promise.all(allArr)
+          // await updateDailyReports_id() // 取得指定日報表
+        }
 
-      if (!isSubordinate) {
-        const allArr = [
-          updateDailyReports_ReportersArr(), // 取得所有回報人員
-          updateEmployeeArr() // 取得所有人員
-        ]
-        await Promise.all(allArr)
-        // await updateDailyReports_id() // 取得指定日報表
+        if (isSubordinate) {
+          await updateIsReporter()  // 檢查自己是不是回報人員
+          // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
+        }
+        await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
+        // await apiDailyReports_id("8ffea857-f99d-4afc-90a6-b762b7073d93")
       }
-      if (isSubordinate) {
-        await updateIsReporter()  // 檢查自己是不是回報人員
-        // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
+      catch {
+        myAlert.err({ title: "取得初始資料失敗" })
       }
-      await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
-      // await apiDailyReports_id("8ffea857-f99d-4afc-90a6-b762b7073d93")
+      finally { setIsLoading(false) }
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -160,7 +181,7 @@ export default function DailyReport(
   const editReportEmpArr = () => {
     setReportEmpArr_preEdit(reportEmpArr)
   }
-/**發出設定回報人員apiReq */
+  /**發出設定回報人員apiReq */
   const reqApiPatchDailyReports_Reporters = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
     const employeeIds: string[] = []
     employeeArr.forEach((employee) => {
@@ -169,11 +190,11 @@ export default function DailyReport(
     try {
       showRootLoading(true)
       await apiPatchDailyReports_Reporters({ employeeIds })
+      cancelSetReportEmpModal()
       await Promise.all([
-        updateDailyReports(),
+        updateDailyReports_plus(),
         updateDailyReports_ReportersArr(),
       ])
-      cancelSetReportEmpModal()
     }
     catch {
       myAlert.err({ title: "更新回報人員失敗" })
@@ -226,6 +247,8 @@ export default function DailyReport(
             showRootLoading(true)
             const res = await apiDailyReports_review(reportInEdit.id)
             changeReviewToChecked(res.reviewedAt)
+            showRootLoading(false)
+            await updateDailyReports_plus()
           }
           catch { myAlert.err({ title: "審核失敗" }) }
           finally { showRootLoading(false) }
@@ -246,8 +269,9 @@ export default function DailyReport(
         try {
           showRootLoading(true)
           await apiPatchDailyReports_my({ date, items })
-          await updateDailyReports()
           cancelEditNewDailyReport()
+          myAlert.success({ title: "更新日報表完成" })
+          await updateDailyReports_plus()
         }
         catch { myAlert.err({ title: "更新日報表失敗" }) }
         finally { showRootLoading(false) }
@@ -282,13 +306,13 @@ export default function DailyReport(
 
   return (
     <>
-      <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}>
+      <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}
+        containerChildren={<LoadingCover01 isLoading={isLoading} />}
+      >
         <PageHeader02
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
-          // linkList={linkList}
-
           panelList={panelList}
           customeLeft={customeLeft}
         />
@@ -299,7 +323,7 @@ export default function DailyReport(
             editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
             editDailyReport={isSubordinate ? editReport_today : undefined}
             addTag={addTag}
-            updateDailyReports={updateDailyReports}
+            updateDailyReports={updateDailyReports_plus}
           />
         }
 
@@ -309,8 +333,8 @@ export default function DailyReport(
             addDailyReportItem={addDailyReportItem}
             isSubordinate={isSubordinate} />
         }
-
       </SubLayer>
+
 
       <SetReportEmpModal
         visible={!!reportEmpArr_preEdit}
