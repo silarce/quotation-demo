@@ -44,8 +44,7 @@ type Tevent = {
   start: string
   end: string
   reviewedAt: Date
-  createdAt: Date
-  updatedAt: Date
+  reportedAt: Date
 }
 
 // ===========================================================================
@@ -67,7 +66,7 @@ export default function TheCalendar(
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
-      const { date, id, reviewedAt, employee, createdAt, updatedAt } = report
+      const { date, id, reviewedAt, employee, reportedAt } = report
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
@@ -82,8 +81,7 @@ export default function TheCalendar(
         start: report.date,
         end: report.date,
         reviewedAt,
-        createdAt,
-        updatedAt,
+        reportedAt,
       }
     })
   }, [dailyReportArr]) // dailyReportArr
@@ -193,7 +191,7 @@ const EventWrapper = (
   const {
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    reviewedAt, createdAt, updatedAt
+    reviewedAt, reportedAt,
   } = event
 
   const checkIconLookup = {
@@ -202,12 +200,13 @@ const EventWrapper = (
     "checked": iconRedDot,
   }
 
-  // const checkIcon =
-  //   reviewedAt ? checkIconLookup["checked"]
-  //     : createdAt == updatedAt ? checkIconLookup["asked"]
-  //       : checkIconLookup["reported"]
   const checkIcon =
-    reviewedAt ? checkIconLookup["checked"] : checkIconLookup["asked"]
+    reviewedAt ? checkIconLookup["checked"]
+      : reportedAt ? checkIconLookup["reported"]
+        : checkIconLookup["asked"]
+
+  // const checkIcon =
+  //   reviewedAt ? checkIconLookup["checked"] : checkIconLookup["asked"]
 
 
 

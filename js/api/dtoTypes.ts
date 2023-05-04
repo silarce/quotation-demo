@@ -215,6 +215,7 @@ export type TdailyReportDto_simple = {
   date: string // yyyy-MM-DD
   employee: TemployeeDto
   id: string
+  reportedAt: Date
   reviewedAt: Date
   updatedAt: Date //date
 }
