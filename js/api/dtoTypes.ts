@@ -210,6 +210,14 @@ export type TdailyReportDto = {
   reviewedAt: Date
   items: TdailyReportItemDto[]
 }
+export type TdailyReportDto_simple = {
+  createdAt: Date // date
+  date: string // yyyy-MM-DD
+  employee: TemployeeDto
+  id: string
+  reviewedAt: Date
+  updatedAt: Date //date
+}
 
 export type TsetReportersDto = {
   employeeIds: string[]

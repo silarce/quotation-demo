@@ -1,5 +1,5 @@
 
-import {  useMemo } from "react"
+import { useMemo } from "react"
 import Image from "next/image"
 import moment from 'moment'
 import classNames from "classnames"
@@ -28,7 +28,7 @@ import { month_chToNumber } from "js/tools/date/conversionTable";
 import scss from "./theCalendar.module.scss"
 
 // type
-import { TdailyReportDto, } from "js/api/api_dailyReport"
+import { TdailyReportDto_simple } from "js/api/api_dailyReport"
 import { Ttag } from "pages/home/dailyReport"
 
 const localizer = momentLocalizer(moment)
@@ -44,6 +44,8 @@ type Tevent = {
   start: string
   end: string
   reviewedAt: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 // ===========================================================================
@@ -58,14 +60,14 @@ export default function TheCalendar(
       addTag: (employee: Ttag) => void
       editReportEmpArr?: () => void
       editDailyReport?: () => void
-      dailyReportArr: TdailyReportDto[]
+      dailyReportArr: TdailyReportDto_simple[]
       updateDailyReports: () => void
     }
 ) {
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
-      const { date, id, reviewedAt, employee } = report
+      const { date, id, reviewedAt, employee, createdAt, updatedAt } = report
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
@@ -80,6 +82,8 @@ export default function TheCalendar(
         start: report.date,
         end: report.date,
         reviewedAt,
+        createdAt,
+        updatedAt,
       }
     })
   }, [dailyReportArr]) // dailyReportArr
@@ -115,12 +119,6 @@ export default function TheCalendar(
       />
     </div>
   ) // return
-}
-// ======================================================================
-const checkIconTable = {
-  "asked": iconCircle,
-  "reported": iconCircle_Checked,
-  "checked": iconRedDot,
 }
 // ============================================================================
 
@@ -195,10 +193,23 @@ const EventWrapper = (
   const {
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    reviewedAt,
+    reviewedAt, createdAt, updatedAt
   } = event
 
-  const checkIcon = reviewedAt ? checkIconTable["checked"] : checkIconTable["asked"]
+  const checkIconLookup = {
+    "asked": iconCircle,
+    "reported": iconCircle_Checked,
+    "checked": iconRedDot,
+  }
+
+  // const checkIcon =
+  //   reviewedAt ? checkIconLookup["checked"]
+  //     : createdAt == updatedAt ? checkIconLookup["asked"]
+  //       : checkIconLookup["reported"]
+  const checkIcon =
+    reviewedAt ? checkIconLookup["checked"] : checkIconLookup["asked"]
+
+
 
   const onClick = () => {
     addTag({ reportId, employeeId, name, date })

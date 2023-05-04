@@ -8,12 +8,12 @@ import _ from "lodash"
 import {
   TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
-  TemployeeDto,
+  TemployeeDto, TdailyReportDto_simple,
   TpageMetaDto
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto }
+export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportDto_simple }
 // =================================================================
 
 
@@ -77,12 +77,12 @@ export const useApiDailyReports_isReporters_me = () => {
 const apiDailyReports = (month: string) => {
   const api = `/daily-reports?month=${month}`
   return axi.get(api)
-    .then(({ data }) => data as TdailyReportDto[])
+    .then(({ data }) => data as TdailyReportDto_simple[])
     .catch(err => Promise.reject(err))
 }
 /**month格式為yyyy-MM 例:2022-02 */
 export const useApiDailyReports = (month: string) => {
-  let [data, setData] = useState<TdailyReportDto[]>()
+  let [data, setData] = useState<TdailyReportDto_simple[]>()
   const update = async (customMonth?: string) => {
     const data = await apiDailyReports(customMonth ?? month)
     if (data) setData(data)
