@@ -41,7 +41,9 @@ type Tevent = {
   name: string
   departmentCode: string
   date: string
+  /** events必要的參數，藉以確認要顯示的日期*/
   start: string
+  /** events必要的參數，藉以確認要顯示的日期*/
   end: string
   reviewedAt: Date
   reportedAt: Date
@@ -91,7 +93,6 @@ export default function TheCalendar(
     <div className={`${scss.dailyReport} h-full mx-[3px] mb-[3px]`}>
       <Calendar
         localizer={localizer}
-        // events={eventsArr}
         events={theDailyReportArr}
         showAllEvents
         views={['month']}
@@ -204,11 +205,6 @@ const EventWrapper = (
     reviewedAt ? checkIconLookup["checked"]
       : reportedAt ? checkIconLookup["reported"]
         : checkIconLookup["asked"]
-
-  // const checkIcon =
-  //   reviewedAt ? checkIconLookup["checked"] : checkIconLookup["asked"]
-
-
 
   const onClick = () => {
     addTag({ reportId, employeeId, name, date })
