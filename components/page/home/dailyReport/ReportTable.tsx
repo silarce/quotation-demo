@@ -88,7 +88,7 @@ export default function ReportTable(
                 // if (key === "periodOfDay") {
                 if (key === "periodOfDay") {
                   return (
-                    <div key={key} style={{ width }}>
+                    <div key={key} style={{ width }} className={scss.select}>
                       {!readOlny
                         ? <span>{value as string}</span>
                         : <InputSel
@@ -97,6 +97,7 @@ export default function ReportTable(
                             value: theClass[key],
                             onChange: (v) => { theClass[key] = v!.value as "AM" | "PM" },
                             arrowType: "black",
+                            fontSize: "16px",
                           }} />
                       }
                     </div>
