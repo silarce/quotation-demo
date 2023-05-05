@@ -198,12 +198,17 @@ const sidePathList: TsidePathList = {
           erpFeature: devPass,
           list: [
             {
-              label: "業績統計表",
-              path: path01 + "/unSet",
+              label: "報價統計表",
+              path: path01 + "/quoteStatistics",
               erpFeature: devPass,
             },
             {
               label: "個人業績統計表",
+              path: path01 + "/unSet",
+              erpFeature: devPass,
+            },
+            {
+              label: "全區業績統計表",
               path: path01 + "/unSet",
               erpFeature: devPass,
             },
@@ -213,7 +218,7 @@ const sidePathList: TsidePathList = {
               erpFeature: devPass,
             },
             {
-              label: "報價統計表",
+              label: "年度業績統計表",
               path: path01 + "/unSet",
               erpFeature: devPass,
             },
