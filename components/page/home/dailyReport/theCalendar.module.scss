@@ -14,10 +14,10 @@
     height: fit-content;
     :global(.rbc-header) {
       &:not(:nth-of-type(1)) {
-        border-left-width: 2px;
+        border-left-width: 1px;
       }
 
-      border-bottom-width: 2px;
+      border-bottom-width: 1px;
       font-size: 20px;
     }
     :global(.rbc-month-header) {
@@ -42,13 +42,13 @@
     }
 
     &:not(:nth-of-type(2)) {
-      border-top-width: 2px;
+      border-top-width: 1px;
     }
     :global(.rbc-today) {
       background-color: unset;
     }
     :global(.rbc-day-bg):not(:nth-of-type(1)) {
-      border-left-width: 2px;
+      border-left-width: 1px;
     }
 
     :global(.ant-badge-status-dot) {
@@ -71,7 +71,7 @@
   }
 
   :global(.rbc-month-view) {
-    border-width: 2px;
+    border-width: 1px;
     border-left: 0;
     border-right: 0;
     border-bottom: 0;
@@ -143,7 +143,7 @@
       box-sizing: content-box;
       width: calc(100%);
       height: calc(100%);
-      border: solid 2px red;
+      border: solid 1px red;
       z-index: 1;
     }
   }
