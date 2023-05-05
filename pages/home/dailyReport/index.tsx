@@ -182,14 +182,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------------------------
   // TagCarousel
-  const addTag = (tag: Ttag) => {
+  const addTag = async (tag: Ttag) => {
     if (isSubordinate) {
       if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
     }
+    await editReport(tag.reportId)
     if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
     setTagArr(arr => { arr.push(tag); return [...arr] })
   }
-
   const removeTag = (index: number, tagReportId: string) => {
     setTagArr(arr => { arr.splice(index, 1); return [...arr] })
     if (tagReportId === reportInEdit?.id) cancelEditNewDailyReport()
@@ -240,6 +240,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     setReportEmpArr_preEdit(undefined)
   }
 
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   const panelList01: TpanelList = [
     {
@@ -406,7 +408,6 @@ const reqApiDailyReports_id = async (reportId: string) => {
   }
   finally { showRootLoading(false) }
 }
-
 
 const reqApiDailyReports_my = async () => {
   try {

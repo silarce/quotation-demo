@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import classNames from "classnames";
 import Image from 'next/image';
 
@@ -15,7 +16,6 @@ import scss from "./tagCarousel.module.scss"
 // type
 import { Ttag } from "pages/home/dailyReport";
 
-
 export default function TagCarousel(
   { tagArr, editReport, removeTag, activeId }:
     {
@@ -26,19 +26,36 @@ export default function TagCarousel(
     }
 ) {
 
+  const sliderRef = useRef<Slider>(null);
+
+  const onAddSlide = (activeId: string) => {
+    if (!sliderRef.current) return
+    const activeIndex = tagArr.findIndex((tag) => {
+      return tag.reportId === activeId
+    })
+    sliderRef.current.slickGoTo(activeIndex);
+  };
+
+  useEffect(() => {
+    onAddSlide(activeId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId])
+
 
   return (
     <div className={scss.container}>
 
       <Slider
+        ref={sliderRef}
         className={scss.antdCarousel}
-        arrows={true}
-        dots={false}
-        // slidesToShow={3}
-        variableWidth={true}
-        slidesToScroll={3}
         infinite={false}
+        dots={false}
 
+        // variableWidth={true}
+        slidesToShow={3}
+        slidesToScroll={3}
+
+        arrows={true}
         prevArrow={<PrevArrow />}
         nextArrow={<NextArrow />}
       >
@@ -71,7 +88,7 @@ export default function TagCarousel(
 
 const PrevArrow = (
   props: CustomArrowProps,
-  props02: ResponsiveObject
+  // props02: ResponsiveObject
 ) => {
   const { className, onClick } = props
   return (
@@ -84,7 +101,7 @@ const PrevArrow = (
 
 const NextArrow = (
   props: CustomArrowProps,
-  props02: ResponsiveObject
+  // props02: ResponsiveObject
 ) => {
   const { className, onClick } = props
   return (
