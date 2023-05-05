@@ -1,14 +1,18 @@
 @use "styles/theme01" as *;
 
 .container {
-  max-width: 52vw;
+  width: 700px;
   margin-left: 20px;
   .antdCarousel {
     height: 58px;
     :global(.slick-list) {
       height: 58px;
+      :global(.slick-track) {
+        margin-left: 0;
+      }
       :global(.slick-slide) {
         background-color: $bgc01;
+
         .cell {
           position: relative;
           display: flex;
