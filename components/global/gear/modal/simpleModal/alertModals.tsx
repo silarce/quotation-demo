@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import classNames from 'classnames';
 
 
 // antd
@@ -38,63 +38,75 @@ export const ModalInfo = (
 }
 
 export const ModalInfo02 = (
-  { title, content, props }: {
+  { title, content, props, className }: {
     title?: string | number
     content?: string | number
     props?: ModalFuncProps
+    className?: string
   }
 ) => {
+  const theClassName = classNames(modalProps.className, className,)
   return Modal.info({
     title,
     content,
     ...modalProps,
+    className: theClassName,
     ...props
   })
 }
 
 // ==================================================
 export const ModalSuccess = (
-  { title, content, props }: {
+  { title, content, props, className }: {
     title?: string | number
     content?: string | number
     props?: ModalFuncProps
+    className?: string
   }
 ) => {
+  const theClassName = classNames(modalProps.className, className,)
   return Modal.success({
     title,
     content,
     ...modalProps,
-    ...props
+    className: theClassName,
+    ...props,
   })
 }
 // ==================================================
 export const ModalErr = (
-  { title, content, props }: {
+  { title, content, props, className }: {
     title?: string | number
     content?: string | number
     props?: ModalFuncProps
+    className?: string
   }
 ) => {
+  const theClassName = classNames(modalProps.className, className,)
   return Modal.error({
     title,
     content,
     ...modalProps,
+    className: theClassName,
     ...props
   })
 }
 // ====================================================
 
 export const ModalWarning = (
-  { title, content, props }: {
+  { title, content, props, className }: {
     title?: string | number
     content?: string | number
     props?: ModalFuncProps
+    className?: string
   }
 ) => {
+  const theClassName = classNames(modalProps.className, className,)
   return Modal.warning({
     title,
     content,
     ...modalProps,
+    className: theClassName,
     ...props
   })
 }
@@ -110,8 +122,7 @@ export const ModalConfirm = (
   }
 ) => {
   let { className: className01 } = modalProps
-
-  const theClassName = `${className01} ${style.confirm} ${className}`
+  const theClassName = classNames(className01, style.confirm, className)
   return Modal.confirm({
     title,
     content,
@@ -132,9 +143,9 @@ export const ModalLoading = (theProps: {
 } = {}) => {
   const { title, content, showBtn, props } = theProps!
   const styleShowBtn = showBtn ? style.showBtn : ""
-  const className = `${style.loading} ${styleShowBtn}`
+  const theClassName = classNames(style.loading, styleShowBtn)
   return Modal.info({
-    className: className,
+    className: theClassName,
     title,
     content,
     icon: <LoadingOutlined />,

@@ -8,12 +8,12 @@ import _ from "lodash"
 import {
   TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
-  TemployeeDto,
+  TemployeeDto, TdailyReportDto_simple,
   TpageMetaDto
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto }
+export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportDto_simple }
 // =================================================================
 
 
@@ -33,13 +33,15 @@ export const useApiDailyReports_Reporters = () => {
     return data
   }
   return {
+    /** 所有需回報的人員 */
     dailyReports_ReportersArr: data,
     setDailyReports_ReportersArr: setData,
+    /**更新所有需回報的人員 */
     updateDailyReports_ReportersArr: update
   }
 }
 
-// 設定回報人員
+/**設定回報人員 */
 export const apiPatchDailyReports_Reporters = (body: { employeeIds: string[] }) => {
   const api = "/daily-reports/reporters"
   return axi.patch(api, body)
@@ -51,12 +53,12 @@ export const apiPatchDailyReports_Reporters = (body: { employeeIds: string[] }) 
 const apiDailyReports_isReporters_me = () => {
   const api = "/daily-reports/is-reporter/me"
   return axi.get(api)
-    .then(({ data }) => data as boolean)
+    .then(({ data }) => data as { isReporter: boolean })
     .catch(err => Promise.reject(err))
 }
 
 export const useApiDailyReports_isReporters_me = () => {
-  let [data, setData] = useState<boolean>()
+  let [data, setData] = useState<{ isReporter: boolean }>()
   const update = async () => {
     const data = await apiDailyReports_isReporters_me()
     if (data) setData(data)
@@ -75,27 +77,29 @@ export const useApiDailyReports_isReporters_me = () => {
 const apiDailyReports = (month: string) => {
   const api = `/daily-reports?month=${month}`
   return axi.get(api)
-    .then(({ data }) => data as TdailyReportDto[])
+    .then(({ data }) => data as TdailyReportDto_simple[])
     .catch(err => Promise.reject(err))
 }
 /**month格式為yyyy-MM 例:2022-02 */
 export const useApiDailyReports = (month: string) => {
-  let [data, setData] = useState<TdailyReportDto[]>()
-  const update = async () => {
-    const data = await apiDailyReports(month)
+  let [data, setData] = useState<TdailyReportDto_simple[]>()
+  const update = async (customMonth?: string) => {
+    const data = await apiDailyReports(customMonth ?? month)
     if (data) setData(data)
     return data
   }
   return {
+    /** 指定月份所有日報表 */
     dailyReport: data,
     setDailyReports: setData,
+    /** 更新指定月份所有日報表*/
     updateDailyReports: update
   }
 }
 
 // 取得自己指定日期的日報表
 /**date格式為yyyy-MM-DD 例:2022-02-02 */
-const apiDailyReports_my = (date: string) => {
+export const apiDailyReports_my = (date: string) => {
   const api = `/daily-reports/my?date=${date}`
   return axi.get(api)
     .then(({ data }) => data as TdailyReportDto)
@@ -153,11 +157,21 @@ export const useApiDailyReports_id = (id: string) => {
 }
 
 
+type TresReview = {
+  /**YYYY-MM-DD */
+  date: string
+  employeeId: string
+  id: string
+  reviewedAt: Date
+  reviewedByEmployee: { id: string }
+
+}
+
 // 審閱日報表
 export const apiDailyReports_review = (id: string) => {
   const api = `/daily-reports/${id}/review`
   return axi.post(api)
-    .then(({ data }) => data)
+    .then(({ data }) => data as TresReview)
     .catch(err => Promise.reject(err))
 }
 

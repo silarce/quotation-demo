@@ -207,8 +207,17 @@ export type TdailyReportDto = {
   date: string // yyyy-MM-DD
   employee: TemployeeDto
   reviewedByEmployee: TemployeeDto
-  reviewedAt: string // yyyy-MM-DD
+  reviewedAt: Date
   items: TdailyReportItemDto[]
+}
+export type TdailyReportDto_simple = {
+  createdAt: Date // date
+  date: string // yyyy-MM-DD
+  employee: TemployeeDto
+  id: string
+  reportedAt: Date
+  reviewedAt: Date
+  updatedAt: Date //date
 }
 
 export type TsetReportersDto = {

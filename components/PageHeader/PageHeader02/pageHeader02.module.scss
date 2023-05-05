@@ -60,7 +60,7 @@
 
 .panelList {
   display: flex;
-  height: fit-content;
+  min-height: fit-content;
   > * {
     // display: inline-block;
     margin: auto;

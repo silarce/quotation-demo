@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from "react"
+import { useMemo } from "react"
 import Image from "next/image"
 import moment from 'moment'
 import classNames from "classnames"
@@ -13,10 +13,8 @@ import {
   Calendar, momentLocalizer,
 } from 'react-big-calendar'
 
-
 // global gear
 import MyButton from "components/global/gear/button/myButton"
-
 
 // img
 import iconCircle from "public/image/icon/circle.svg"
@@ -29,9 +27,8 @@ import { month_chToNumber } from "js/tools/date/conversionTable";
 // css
 import scss from "./theCalendar.module.scss"
 
-
 // type
-import { TdailyReportDto, } from "js/api/api_dailyReport"
+import { TdailyReportDto_simple } from "js/api/api_dailyReport"
 import { Ttag } from "pages/home/dailyReport"
 
 const localizer = momentLocalizer(moment)
@@ -44,33 +41,34 @@ type Tevent = {
   name: string
   departmentCode: string
   date: string
+  /** events必要的參數，藉以確認要顯示的日期*/
   start: string
+  /** events必要的參數，藉以確認要顯示的日期*/
   end: string
-  reviewedAt: string
+  reviewedAt: Date
+  reportedAt: Date
 }
-
 
 // ===========================================================================
 
 export default function TheCalendar(
   {
-    // dataArr, 
     editReportEmpArr, addTag,
-    isSubordinate, editDailyReport, dailyReportArr }:
+    editDailyReport, dailyReportArr,
+    updateDailyReports
+  }:
     {
-      // dataArr: Tdata[]
       addTag: (employee: Ttag) => void
-      isSubordinate: boolean
       editReportEmpArr?: () => void
       editDailyReport?: () => void
-      dailyReportArr: TdailyReportDto[]
+      dailyReportArr: TdailyReportDto_simple[]
+      updateDailyReports: () => void
     }
 ) {
 
-
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
-      const { date, id, reviewedAt, employee } = report
+      const { date, id, reviewedAt, employee, reportedAt } = report
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
@@ -85,17 +83,16 @@ export default function TheCalendar(
         start: report.date,
         end: report.date,
         reviewedAt,
+        reportedAt,
       }
     })
-  }, [dailyReportArr])
-  // dailyReportArr
+  }, [dailyReportArr]) // dailyReportArr
+
 
   return (
-    // <div className={`${scss.dailyReport} h-full overflow-auto mx-[3px] mb-[3px]`}>
     <div className={`${scss.dailyReport} h-full mx-[3px] mb-[3px]`}>
       <Calendar
         localizer={localizer}
-        // events={eventsArr}
         events={theDailyReportArr}
         showAllEvents
         views={['month']}
@@ -116,38 +113,42 @@ export default function TheCalendar(
           // toolbar: ToolBar, // 最上方的操作面板
           toolbar:
             (toolbar: BigCalendar.ToolbarProps<Tevent, object>) =>
-              ToolBar(toolbar, editReportEmpArr, editDailyReport), // 最上方的操作面板
+              ToolBar({ toolbar, editReportEmpArr, editDailyReport, updateDailyReports }), // 最上方的操作面板
         }}
       />
     </div>
   ) // return
 }
-// ======================================================================
-const checkIconTable = {
-  "asked": iconCircle,
-  "reported": iconCircle_Checked,
-  "checked": iconRedDot,
-}
 // ============================================================================
 
 const ToolBar = (
-  // toolbar: BigCalendar.ToolbarProps<Class_isRead, object>
-  toolbar: BigCalendar.ToolbarProps<Tevent, object>,
-  editReportEmpArr?: () => void,
-  editDailyReport?: () => void
+  { toolbar,
+    editReportEmpArr, editDailyReport, updateDailyReports, }:
+    {
+      toolbar: BigCalendar.ToolbarProps<Tevent, object>,
+      editReportEmpArr?: () => void,
+      editDailyReport?: () => void
+      updateDailyReports: (month?: string) => void
+    }
 ) => {
 
-  const { onNavigate, label } = toolbar
+  const { onNavigate, label, date } = toolbar
+
 
   // 'PREV' | 'NEXT' | 'TODAY' | 'DATE'
-  const nextMonth = () => {
+  const nextMonth = async () => {
     onNavigate('NEXT');
+    const nextMonth = moment(date).add(1, 'months').format('YYYY-MM')
+    updateDailyReports(nextMonth)
   }
-  const prevMonth = () => {
+  const prevMonth = async () => {
     onNavigate('PREV');
+    const prevMonth = moment(date).subtract(1, 'months').format('YYYY-MM')
+    updateDailyReports(prevMonth)
   }
-  const toToday = () => {
+  const toToday = async () => {
     onNavigate('TODAY');
+    updateDailyReports()
   }
 
   let [month, year] = label.split(" ")
@@ -172,7 +173,7 @@ const ToolBar = (
           <MyButton label="回報人員設定" onClick={editReportEmpArr} px="px2227" />
         }
         {editDailyReport &&
-          <MyButton label="編輯/新增回報" onClick={() => editDailyReport()} px="px2227" />
+          <MyButton label="編輯當日回報" onClick={() => editDailyReport()} px="px2227" />
         }
 
       </div>
@@ -182,11 +183,7 @@ const ToolBar = (
 }
 
 // ======================================================================
-
-
-
 // 壓在格子上方的event
-
 const EventWrapper = (
   e: EventWrapperProps<Tevent>,
   addTag: (employee: Ttag) => void
@@ -195,11 +192,19 @@ const EventWrapper = (
   const {
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    reviewedAt,
+    reviewedAt, reportedAt,
   } = event
 
+  const checkIconLookup = {
+    "asked": iconCircle,
+    "reported": iconCircle_Checked,
+    "checked": iconRedDot,
+  }
 
-  const checkIcon = reviewedAt ? checkIconTable["checked"] : checkIconTable["asked"]
+  const checkIcon =
+    reviewedAt ? checkIconLookup["checked"]
+      : reportedAt ? checkIconLookup["reported"]
+        : checkIconLookup["asked"]
 
   const onClick = () => {
     addTag({ reportId, employeeId, name, date })

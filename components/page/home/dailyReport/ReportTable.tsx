@@ -20,20 +20,28 @@ import { optionsCreator_dailyReportPeriod } from "fakeDatabase/options/options"
 const optionArr_period = optionsCreator_dailyReportPeriod()
 
 // class
-import { Class_dailyReportItem } from "pages/home/dailyReport"
+import { Class_reportItem } from "pages/home/dailyReport"
 
 // ==================================================
 export default function ReportTable(
-  { classDailyReportItemArr, addDailyReportItem, isSubordinate }:
+  { classDailyReportItemArr, addDailyReportItem,
+    isSubordinate,
+    reviewedAt,
+    isEdit,
+  }:
     {
-      classDailyReportItemArr: Class_dailyReportItem[]
+      classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
       isSubordinate: boolean
+      reviewedAt: boolean
+      isEdit: boolean
     }
 ) {
 
-  // const [contentValue, setContentValue] = useState<string[]>([])
 
+  // const readOlny = (reviewedAt || !isSubordinate || !isEdit) ? false : true
+  // const readOlny = (reviewedAt || !isEdit) ? false : true
+  const readOlny = isEdit
 
   return (
     <div className={classNames(scss.table)}>
@@ -81,7 +89,7 @@ export default function ReportTable(
                 if (key === "periodOfDay") {
                   return (
                     <div key={key} style={{ width }}>
-                      {!isSubordinate
+                      {!readOlny
                         ? <span>{value as string}</span>
                         : <InputSel
                           selectProps={{
@@ -107,7 +115,7 @@ export default function ReportTable(
                     <div key={key} className={scss.check}
                       style={{ width }}>
                       {(() => {
-                        if (isSubordinate) {
+                        if (readOlny) {
                           return <Checkbox01
                             stateValue={theClass[key]}
                             onClick={() => { theClass[key] = !theClass[key] }} />
@@ -130,7 +138,7 @@ export default function ReportTable(
                 ) {
                   return (
                     <div key={key} style={{ width, }} className={scss.content}>
-                      {!isSubordinate
+                      {!readOlny
                         ? <span>{value as string}</span>
                         : <InputSel
                           textareaProps={{
@@ -149,7 +157,7 @@ export default function ReportTable(
           )
         })}
 
-        {isSubordinate &&
+        {readOlny &&
           <MyButton
             label="新增回報"
             preImg="add"
@@ -168,7 +176,7 @@ export default function ReportTable(
 // =================================================================
 
 // type TclassKeys = keyof Class_dailyReportItem
-type TclassKeys = Extract<keyof Class_dailyReportItem,
+type TclassKeys = Extract<keyof Class_reportItem,
   "periodOfDay" | "customerName" | "contactName" |
   "install" | "powerDelivery" | "repair" | "maintenance" | "inspection" |
   "description" | "workingTypes"
