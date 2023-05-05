@@ -28,15 +28,18 @@ export default function TagCarousel(
 
   const sliderRef = useRef<Slider>(null);
 
-  const onAddSlide = (index: number) => {
-    if (sliderRef.current) {
-      sliderRef.current.slickGoTo(index);
-    }
+  const onAddSlide = (activeId: string) => {
+    if (!sliderRef.current) return
+    const activeIndex = tagArr.findIndex((tag) => {
+      return tag.reportId === activeId
+    })
+    sliderRef.current.slickGoTo(activeIndex);
   };
 
   useEffect(() => {
-    onAddSlide(tagArr.length-1)
-  }, [tagArr.length])
+    onAddSlide(activeId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId])
 
 
   return (

@@ -186,11 +186,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (isSubordinate) {
       if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
     }
-    if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
     await editReport(tag.reportId)
+    if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
     setTagArr(arr => { arr.push(tag); return [...arr] })
   }
-
   const removeTag = (index: number, tagReportId: string) => {
     setTagArr(arr => { arr.splice(index, 1); return [...arr] })
     if (tagReportId === reportInEdit?.id) cancelEditNewDailyReport()
