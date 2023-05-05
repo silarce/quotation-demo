@@ -431,7 +431,7 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
     if (!jobs[0]) return true
 
     const jobsCopy = _.sortBy(jobs, "grade").reverse()
-    if (jobsCopy[0].grade >= 15) return false
+    if (jobsCopy[0].grade >= 14) return false
     else return true
   }
   /**使用者不是employee，那就是admin*/
