@@ -6,6 +6,9 @@ import Slider, { CustomArrowProps, ResponsiveObject } from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+// tools
+import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
+
 // icon
 import iconArrowRight from "public/image/icon/arrow_right.svg"
 import iconRmove from "public/image/icon/remove03.svg"
@@ -38,7 +41,7 @@ export default function TagCarousel(
 
   useEffect(() => {
     onAddSlide(activeId)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId])
 
 
@@ -63,11 +66,14 @@ export default function TagCarousel(
         {tagArr.map((tag, index) => {
           const { name, date, reportId, employeeId } = tag
 
+          let chDate = yearConversion_standardToCh(date)
+          chDate = chDate.startsWith('0') ? chDate.slice(1) : chDate;
+
           return (
             <div key={index} onClick={() => editReport(reportId)}>
               <div className={classNames(scss.cell, { [scss.isActive]: activeId === reportId })} >
                 <span>
-                  {`${name} ${date}`}
+                  {`${name} ${chDate}`}
                 </span>
                 <Image src={iconRmove} alt="remove" className={scss.removeBtn}
                   onClick={(e) => { e.stopPropagation(); removeTag(index, reportId) }}
