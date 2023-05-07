@@ -90,7 +90,8 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
               className={classNames(style.select, className)}
               showBaseline="invisible"
               selectProps={{
-                value: valueArr[index] ?? options[0],
+                value: valueArr[index] ?? options[0],                
+                // value: undefined,                
                 options,
                 arrowType: "black",
                 onChange: (option: Toption | null) => {
@@ -139,7 +140,7 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
 }
 
 
-export type { TsearchObj, TsearchGroup }
+export type { TsearchObj, TsearchGroup, Toption }
 
 
 

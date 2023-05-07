@@ -14,7 +14,7 @@ import EmployeeList from "components/page/setting/employees/employeeList";
 import { Pagination } from 'antd';
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 // api
 import { useEmployee, TapiGetEmployeeParams } from "js/api/api_employee";

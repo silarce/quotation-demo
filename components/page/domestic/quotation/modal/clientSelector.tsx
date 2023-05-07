@@ -38,6 +38,7 @@ export default function ClientSelector(
     // 現在使用假資料，到時候要接api取資料
     // return fakeClientList
     return Object.values(fakeClientList)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // ==================================================
