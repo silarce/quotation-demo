@@ -9,7 +9,7 @@ import ProductList_Table from "components/page/setting/productList/productList_T
 
 
 // glogal gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 
 // scss
 import scss from "./productList.module.scss"

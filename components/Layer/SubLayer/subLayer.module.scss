@@ -1,6 +1,7 @@
 @use "styles/theme01" as *;
 
 .container {
+  position: relative;
   display: grid;
   grid-template-rows: min-content auto;
   height: 100%;

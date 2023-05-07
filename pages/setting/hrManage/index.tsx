@@ -9,7 +9,7 @@ import {
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 
 // components
-import Header from "components/page/setting/hrManage/header/header";
+import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02";
 import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
 import Card from "components/page/setting/hrManage/card/card";
 
@@ -29,6 +29,9 @@ import {
   apiPostDepartments_id_managers, apiDeleteDepartments_id_managers,
 } from "js/api/api_department";
 import { useEmployee, TemployeeDto } from "js/api/api_employee";
+
+// config
+import { hrManageLinkArr } from "components/page/setting/hrManage/hrManageLinkArr";
 
 
 // ==========================================================================
@@ -140,7 +143,7 @@ export default function HrManage() {
   return (
     <SubLayer >
 
-      <Header />
+      <PageHeader02 linkList={hrManageLinkArr} />
 
       <div className={scss.body}>
         <div className={scss.main} style={{ width: "100%" }}>

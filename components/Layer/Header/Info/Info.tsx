@@ -29,7 +29,11 @@ export default function Info() {
 
   // ----------------------------------------------
 
-  const userName = userInfo.username
+  const userName = (() => {
+    if (userInfo.employee?.chName) return userInfo.employee.chName
+    if (userInfo.employee?.enName) return userInfo.employee.enName
+    else return userInfo.username
+  })()
   const departmentName = userInfo.employee?.jobs[0]?.department.name ?? "無部門"
 
   // ----------------------------------------------

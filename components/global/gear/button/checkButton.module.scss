@@ -1,0 +1,18 @@
+@use "styles/theme01" as *;
+
+.checkbox {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  border: solid 1px $colorMain;
+  cursor: pointer;
+  user-select: none;
+  > img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

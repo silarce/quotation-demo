@@ -9,7 +9,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer";
 import EditCustomer from "components/page/setting/customer/editCustomer/editCustomer";
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02";
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 

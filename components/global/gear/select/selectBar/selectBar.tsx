@@ -1,5 +1,5 @@
-import { CSSProperties, } from "react"
 
+import { CSSProperties, } from "react"
 import classNames from "classnames";
 
 import InputSel, { TselectProps } from "../../inputAndSel/inputSel";
@@ -16,7 +16,8 @@ export default function SelectBar(
   {
     selectPropsArr,
     disabled,
-    style
+    style,
+    className,
   }:
     {
       // selectPropsArr: TselectProps[]
@@ -27,13 +28,14 @@ export default function SelectBar(
       }[]
       disabled?: boolean | undefined
       style?: CSSProperties
+      className?: string
     }
 ) {
 
 
   // ------------------------------------------------------------------------
   return (
-    <div className={scss.selectBar}>
+    <div className={classNames(scss.selectBar, className)}>
 
       {selectPropsArr.map((props, index) => {
         const { boxStyle, selectProps, placeholder } = props

@@ -16,7 +16,7 @@ import Caption from "components/page/setting/departments/caption"
 
 
 // glogal gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"

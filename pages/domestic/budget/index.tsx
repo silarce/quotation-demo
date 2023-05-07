@@ -1,16 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from "next/router";
+import _ from "lodash"
+import classNames from 'classnames';
 
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/pageHeader02"
+import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
 import BudgeList from "components/page/domestic/budget/budgetList"
 
 // css
-import style from "./budget.module.scss"
+import scss from "./budget.module.scss"
 
 // option
 import { optionsCreator_doorType } from 'fakeDatabase/options/options';
@@ -24,8 +28,11 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 // fakeData
 // fake
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
+
 // type
 import { Toption } from "fakeDatabase/options/options"
+
+type Trouter = ReturnType<typeof useRouter>
 
 // ===========================================
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
@@ -39,7 +46,9 @@ import { Toption } from "fakeDatabase/options/options"
 
 export default function Budget() {
   const router = useRouter()
-  // 搜尋用的
+  // -----------------------------------------------------------------------
+  // 搜尋用的 //這個資料不會render在畫面上
+  // render在畫面上的是PageHeader02元件裡的狀態
   const [searchObj, setSearchObj] = useState<TsearchObj>({
     doorType: "",
     county: "",
@@ -57,8 +66,20 @@ export default function Budget() {
     }
   })
 
+  useEffect(() => {
+    const { doorType, county, clientName, projectName, }
+      = router.query as Record<string, string | undefined>
+    setSearchObj({
+      doorType: doorType ?? "",
+      county: county ?? "",
+      clientName: clientName ?? "",
+      projectName: projectName ?? "",
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query])
 
-  // ===================================================
+
+  // ----------------------------------------------------------
   // panelList
 
   const searchTargetList = [
@@ -85,24 +106,32 @@ export default function Budget() {
   ]
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    let [doorTypeOption, countyOption, clientName, projectName] = valueArr
-    const doorType = (doorTypeOption as Toption).value
-    const county = (countyOption as Toption).value
-    clientName = clientName as string
-    projectName = projectName as string
-    setSearchObj({
-      doorType,
-      county,
-      clientName,
-      projectName,
-    })
-  }
+    const [doorTypeOption, countyOption, clientName, projectName] = valueArr;
+    const query = _.cloneDeep(router.query);
+    const params = [
+      { key: "doorType", value: (doorTypeOption as Toption).value },
+      { key: "county", value: (countyOption as Toption).value },
+      { key: "clientName", value: clientName as string },
+      { key: "projectName", value: projectName as string },
+    ];
+    params.forEach(({ key, value }) => {
+      value = value.trim()
+      if (value) query[key] = value;
+      else delete query[key];
+    });
+
+    router.push({
+      href: "",
+      query,
+    });
+  };
+
   const searchGroup = {
     searchTargetList,
     doSearch
   }
 
-  // -----------------------
+  // ----------------------------------------------------------
 
   const panelList: TpanelList = [
     { searchGroup },
@@ -123,16 +152,74 @@ export default function Budget() {
     },
   ]
 
-  // ===================================================
+  // ----------------------------------------------------------
 
   return (
-    <div className={style.container}>
-      {/* header panel */}
+    <SubLayer>
       <PageHeader02 tag="預算" panelList={panelList} />
-      {/*  */}
-      <div className={style.mainContainer}>
-        <BudgeList budgetList={projectArr} />
+      <div >
+        <ApprovalsBar router={router} />
+        <BudgeList className="m-[4px] mt-0"
+          budgetList={projectArr} />
       </div>
+    </SubLayer>
+  )
+}
+
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+
+const ApprovalsBar = (
+  { router }:
+    { router: Trouter }
+) => {
+  const query = router.query
+  const linkList = [
+    {
+      label: "待審核",
+      href: {
+        pathname: "",
+        query: {
+          ...query,
+          approvalsStatus: "待審核"
+        }
+      },
+      // isActive: query.approvalsStatus === "待審核"
+      isActive: !query.approvalsStatus || query.approvalsStatus === "待審核"
+    },
+    {
+      label: "審核中",
+      href: {
+        pathname: "",
+        query: {
+          ...query,
+          approvalsStatus: "審核中"
+        }
+      },
+      isActive: query.approvalsStatus === "審核中"
+    },
+    {
+      label: "審核完成",
+      href: {
+        pathname: "",
+        query: {
+          ...query,
+          approvalsStatus: "審核完成"
+        }
+      },
+      isActive: query.approvalsStatus === "審核完成"
+    },
+  ]
+
+  return (
+    <div className={scss.approvalsBar}>
+      <PageHeader02 linkList={linkList} />
     </div>
   )
 }
+
+
+
+
