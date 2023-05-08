@@ -30,7 +30,6 @@ export default function SideNav() {
   // -------------------------------------------------------------------
 
   return (
-    // <div className={style.container}>
     <div className={classNames(style.container, "relative")}>
       {linkList?.list.map((item, index) => {
         const { label, path, list, erpFeature } = item
@@ -72,8 +71,6 @@ export default function SideNav() {
           )
         }
       })}
-
-      <Link href="/demo/addCustomers" className="w-5 h-5 absolute left-0 bottom-0 cursor-auto" />
     </div>
   )
 }
