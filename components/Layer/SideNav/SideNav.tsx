@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import classNames from 'classnames';
 
 // antd
 import { Collapse } from 'antd';
@@ -29,7 +30,7 @@ export default function SideNav() {
   // -------------------------------------------------------------------
 
   return (
-    <div className={style.container}>
+    <div className={classNames(style.container, "relative")}>
       {linkList?.list.map((item, index) => {
         const { label, path, list, erpFeature } = item
         const reg = new RegExp(`^${path}`)
