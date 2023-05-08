@@ -72,7 +72,7 @@ export default function TheCalendar(
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
-      const departmentCode = jobs?.[0].department.code ?? ""
+      const departmentCode = jobs?.[0]?.department.code ?? ""
 
       return {
         reportId: id,
