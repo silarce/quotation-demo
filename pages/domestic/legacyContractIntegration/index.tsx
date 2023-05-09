@@ -1,9 +1,12 @@
+import { useState } from "react";
 
 
+// layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-
-
+// component
+import Thead01 from "components/page/domestic/ui/table01/Thead01";
+import TbodyItem01 from "components/page/domestic/ui/table01/TbodyItem01";
 
 
 
@@ -17,30 +20,36 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 
 
 
+// fake data
+import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
+
+// ================================================================
+// type
+type TbudgetList = ReturnType<(typeof fakeApi_projectSimple)["get"]>
+type TbudgetListContext = {
+  approvalsStatus: TbudgetList[number]["basicInfo"]["approvalStatus"]
+}
 
 
 
 
-
-
-
-
+// ==================================================================
 
 export default function LegacyContractIntegration() {
 
 
+  // 資料
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
+  const projectArr = projectSimple.wrapper.get({
+    // filter: {
+    //   county: searchObj.county,
+    //   clientName: searchObj.clientName,
+    //   constructionName: searchObj.projectName,
+    // }
+  })
 
+  // --------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-  
   const searchTargetList = [
     {
       stateValue: optionsDoorType[0],
@@ -83,17 +92,23 @@ export default function LegacyContractIntegration() {
     }
   ]
 
-
   return (
     <SubLayer>
-
       <PageHeader02 tag="舊合約" panelList={panelList} />
-
       <div>
-        舊合約
+        <Thead01 />
+        <div>
+          {projectArr.map((item, index) => {
+            return (
+              <TbodyItem01 key={index}
+                projectData={item}
+                isActive={false}
+                openQuotation={() => { alert("test") }}
+              />
+            )
+          })}
+        </div>
       </div>
     </SubLayer>
   )
-
-
 }
