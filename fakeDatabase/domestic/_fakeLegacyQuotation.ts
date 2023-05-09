@@ -12,7 +12,7 @@ import iconDoorRail_sj302_30
 //   from "public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg"
 
 
-type Tquotation = {
+type TlegacyQuotation = {
   clientId: string, // 客戶id 用來關聯客戶資料以取得客戶名稱、聯絡人、電話那些資料
   // ---------------------------------------------------------
   basicInfo: {
@@ -89,11 +89,11 @@ type Tquotation = {
   // ---------------------------------------------------------
 }
 
-type TquotationList = {
-  [key: string]: Tquotation
+type TlegacyQuotationList = {
+  [key: string]: TlegacyQuotation
 }
 
-const fakeLegacyQuotationDataList: TquotationList = {
+const fakeLegacyQuotationDataList: TlegacyQuotationList = {
   "S-110211-01": {
     clientId: "S00001", // 客戶id 用來關聯客戶資料
     // ---------------------------------------------------------
@@ -195,7 +195,7 @@ const fakeLegacyQuotationDataList: TquotationList = {
 
 
 
-function checkData(projectData: TquotationList): void {
+function checkData(projectData: TlegacyQuotationList): void {
   for (const [key, value] of Object.entries(projectData)) {
     if (key !== value.basicInfo.quotationId) {
       // 建立資料時quotationId必須要與其所屬物件的key相符
@@ -206,13 +206,13 @@ function checkData(projectData: TquotationList): void {
 
 checkData(fakeLegacyQuotationDataList)
 
-export type { Tquotation, TquotationList }
+export type { TlegacyQuotation , TlegacyQuotationList }
 export { fakeLegacyQuotationDataList, emptyLegacyQuotation }
 
 
 
 
-const emptyLegacyQuotation: Tquotation = {
+const emptyLegacyQuotation: TlegacyQuotation = {
   clientId: "", // 客戶id 用來關聯客戶資料
   // ---------------------------------------------------------
   basicInfo: {
