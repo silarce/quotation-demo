@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
 // components
-import Thead from './budgetList/thead';
+import Thead01 from '../ui/table01/Thead01';
 import TbodyItem01 from '../ui/TbodyItem01';
 import PanelBody from './budgetList/tableBody';
 // antd
@@ -48,7 +48,7 @@ export default function BudgetList({ budgetList, className }:
   return (
     // <div className={style.container}>
     <div className={classNames(style.container, className)}>
-      <Thead />
+      <Thead01 />
 
       <Collapse
         expandIcon={() => <></>}
