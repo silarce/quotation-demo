@@ -21,17 +21,10 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 
 
 // fake data
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
-
+import { fakeApi_legacyProjectSimple } from "fakeDatabase/fakeAPI/fakeLegacyQuotationSimpleArrApi";
 // ================================================================
 // type
-type TbudgetList = ReturnType<(typeof fakeApi_projectSimple)["get"]>
-type TbudgetListContext = {
-  approvalsStatus: TbudgetList[number]["basicInfo"]["approvalStatus"]
-}
-
-
-
+type TbudgetList = ReturnType<(typeof fakeApi_legacyProjectSimple)["get"]>
 
 // ==================================================================
 
@@ -39,7 +32,7 @@ export default function LegacyContractIntegration() {
 
 
   // 資料
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
+  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_legacyProjectSimple })
   const projectArr = projectSimple.wrapper.get({
     // filter: {
     //   county: searchObj.county,
