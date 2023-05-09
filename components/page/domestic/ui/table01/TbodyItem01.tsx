@@ -13,15 +13,31 @@ import iconLongArrow from "public/image/icon/longArrow.svg"
 // css
 import scss from "./tbodyItem01.module.scss"
 
-
-import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
-type TprojectSimple = ReturnType<Class_fakeApi_projectSimple['get']>[0];
+// =================================================================
+// type
+type Tdata = {
+  basicInfo: {
+    quotationId: string
+    constructionName: string
+    undertaker: string
+    totalDiscount: string | number
+    tempDoorQty: string | number
+    tempBudgetAmount: string | number
+    date: string
+    constructionCounty: string
+  }
+  clientData: {
+    name: string
+    contact: { name: string, phone: string }[]
+  }
+}
 
 // =============================================================================
 export default function TbodyItem01(
   { projectData: projectData, isActive, openQuotation, approvalsStatus }:
     {
-      projectData: TprojectSimple
+      // projectData: TprojectSimple
+      projectData: Tdata
       isActive: boolean
       openQuotation: (e: MouseEvent) => void
       approvalsStatus?: string
