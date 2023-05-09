@@ -1,7 +1,6 @@
-import { MouseEvent, useContext } from 'react'
+import { MouseEvent } from 'react'
 import classNames from 'classnames';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar";
@@ -11,25 +10,23 @@ import iconPlace from "public/image/icon/place.svg"
 import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
 import iconLongArrow from "public/image/icon/longArrow.svg"
 
-// context
-import { budgetListContext } from '../budgetList';
-
 // css
-import scss from "../budgetList.module.scss"
-
+import scss from "./tbodyItem01.module.scss"
 
 
 import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 type TprojectSimple = ReturnType<Class_fakeApi_projectSimple['get']>[0];
 
-export default function PanelHeader({ projectData: projectData, isActive, openQuotation }:
-  {
-    projectData: TprojectSimple
-    isActive: boolean
-    openQuotation: (e: MouseEvent) => void
-  }) {
+// =============================================================================
+export default function TbodyItem01(
+  { projectData: projectData, isActive, openQuotation, approvalsStatus }:
+    {
+      projectData: TprojectSimple
+      isActive: boolean
+      openQuotation: (e: MouseEvent) => void
+      approvalsStatus?: string
+    }) {
 
-  const { approvalsStatus } = useContext(budgetListContext)
 
 
   const {
@@ -83,8 +80,7 @@ export default function PanelHeader({ projectData: projectData, isActive, openQu
         <span>{projectName}</span>
         <div></div>
       </div>
-
-      <Row03 approvalsStatus={approvalsStatus} />
+      {approvalsStatus && <Row03 approvalsStatus={approvalsStatus} />}
 
     </CellWithBar>
   )

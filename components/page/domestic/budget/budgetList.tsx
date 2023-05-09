@@ -4,8 +4,8 @@ import classNames from 'classnames';
 
 // components
 import Thead from './budgetList/thead';
-import PanelHeader from './budgetList/panelHeader';
-import PanelBody from './budgetList/panelBody';
+import TbodyItem01 from '../ui/TbodyItem01';
+import PanelBody from './budgetList/tableBody';
 // antd
 import { Collapse } from 'antd';
 // css
@@ -73,7 +73,7 @@ export default function BudgetList({ budgetList, className }:
             return (
 
               <Panel key={index} className={style.panel}
-                header={<PanelHeader projectData={item} isActive={isActive} openQuotation={openQuotation} />}
+                header={<TbodyItem01 projectData={item} isActive={isActive} openQuotation={openQuotation} approvalsStatus={approvalsStatus}/>}
               >
                 <PanelBody projectSimpleRecord={tempRecord} openQuotation={openQuotation} />
               </Panel>
