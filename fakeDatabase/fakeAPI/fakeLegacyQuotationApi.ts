@@ -59,5 +59,5 @@ const fakeApi_legacyQuotation_creator = (id: string) => {
 
 
 export type { Class_fakeApi_legacyQuotation }
-export { fakeApi_legacyQuotation_creator as fakeApi_quotation_creator }
+export { fakeApi_legacyQuotation_creator }
 
