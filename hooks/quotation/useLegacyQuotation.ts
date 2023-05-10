@@ -329,7 +329,9 @@ class Class_legacyQuotation {
     prodCellConfig: TprodCellConfig,
     partCellConfig: TpartCellConfig
   ) {
-
+    /**用來判斷這是哪個class */
+    this.identify = "legacy"
+    // 
     this._quotaionDataOri = data
     this._reRender = reRender
 
@@ -360,6 +362,7 @@ class Class_legacyQuotation {
   private _quotaionDataOri
   readonly quotationId
   private _reRender
+  identify
   // ---------------------
   classBasicInfo
   mainProductArr

@@ -163,7 +163,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
               合約項目
             </div>
           </div>
-          {/*  */}
+          {/* 主產品設定 */}
+          <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
           {/*  */}
           {/*  */}
           {/*  */}

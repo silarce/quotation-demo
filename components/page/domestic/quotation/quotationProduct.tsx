@@ -4,6 +4,7 @@ import { useState } from "react"
 // components
 import DndThead from "./quotationProduct/dndThead"
 import ProductList from "./quotationProduct/productList"
+import ProductList_legacy from "./quotationProduct/productList_legacy"
 
 // global gear
 import AddButton from "components/global/gear/button/addButton"
@@ -15,6 +16,8 @@ import styleL from "./local.module.scss"
 // type
 
 import { Class_quotation } from "hooks/quotation/useQuotation"
+import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+
 
 
 export default function QuotationProduction({
@@ -23,7 +26,7 @@ export default function QuotationProduction({
   switch02,
   className = "" }:
   {
-    classQuotation: Class_quotation
+    classQuotation: Class_quotation | Class_legacyQuotation
     disabled: boolean
     switch02?: boolean
     className?: string
@@ -52,7 +55,12 @@ export default function QuotationProduction({
             allowMove={allowMove} />
         </div>
 
-        <ProductList classQuotation={classQuotation} disabled={disabled} />
+        {classQuotation.identify === "normal" &&
+          <ProductList classQuotation={classQuotation as Class_quotation} disabled={disabled} />
+        }
+        {classQuotation.identify === "legacy" &&
+          <ProductList_legacy classQuotation={classQuotation as Class_legacyQuotation} disabled={disabled} />
+        }
 
         <AddButton className={style.addBtn}
           label="新增產品"

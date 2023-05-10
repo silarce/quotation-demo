@@ -47,7 +47,7 @@ class Class_basicInfo {
     key: keyof Omit<typeof this._basicInfo,
       "tempQuotationAging" | "totalDiscount" |
       "tempDoorQty" | "tempBudgetAmount" |
-      "quoStatus"| "approvalStatus">,
+      "quoStatus" | "approvalStatus">,
     value: string
   ) => {
     this._basicInfo[key] = value
@@ -571,7 +571,9 @@ class Class_quotation {
     prodCellConfig: TprodCellConfig,
     partCellConfig: TpartCellConfig
   ) {
-
+    /**用來判斷這是哪個class */
+    this.identify = "normal"
+    // 
     this._quotaionDataOri = data
 
     this._reRender = reRender
@@ -604,6 +606,7 @@ class Class_quotation {
   private _quotaionDataOri
   readonly quotationId
   private _reRender
+  identify
   // ---------------------
   classBasicInfo
   mainProductArr
