@@ -1,7 +1,3 @@
-import { ChangeEvent } from "react"
-
-import { components } from "react-select";
-const { Option } = components
 
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
@@ -11,7 +7,6 @@ import { OptionWithIcon01 } from "components/global/gear/select/optionWithIcon";
 import { SingleValueWithIcon01 } from "components/global/gear/select/singleValueWithIcon";
 
 
-
 // icon
 import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
@@ -19,17 +14,7 @@ import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 import style from "./productList.module.scss"
 import styleL from "../local.module.scss"
 
-import {
-  Toption, ToptionPlus,
-  optionsCreator_series,
-  optionsCreator_material,
-  optionsCreator_surface,
-  optionsCreator_doorRail,
-  optionsCreator_B,
-  optionsCreator_horsepower,
-  optionsCreator_doorType,
-} from "fakeDatabase/options/options"
-import Placeholder from "react-select/dist/declarations/src/components/Placeholder";
+import { Toption } from "fakeDatabase/options/options"
 
 
 // ==========================================================
@@ -40,27 +25,6 @@ import type {
   TmainProdCheckboxCellType
 } from "hooks/quotation/useLegacyQuotation"
 
-// type ToptionsObjKey =
-//   keyof Omit<(TmainProdSelectWithIconCellType), "B" | "doorRail">
-
-// type ToptionsList = {
-//   [key in ToptionsObjKey]: Toption[]
-// }
-
-// const optionsObjList: ToptionsList = {
-//   series: optionsCreator_series(),
-//   material: optionsCreator_material(),
-//   surface: optionsCreator_surface(),
-//   // doorRail: optionsCreator_doorRail(),
-//   // B: optionsCreator_B(),
-//   horsepower: optionsCreator_horsepower(),
-//   doorType: optionsCreator_doorType(),
-// }
-
-
-
-
-
 
 // ==========================================================
 // ==========================================================
@@ -69,14 +33,7 @@ export default function ProductList_legacy(
     {
       classQuotation: Class_legacyQuotation
       disabled: boolean
-
-      // disabled: boolean
     }) {
-
-  // const { theadIndex, mainProductArr,
-
-  //   disabled
-  // } = productStates
 
   const {
     mainProductArr,
@@ -86,15 +43,13 @@ export default function ProductList_legacy(
   } = classQuotation
 
 
-
   const theadIndex = prodCellConfig.keyList
   // =======================================
-  const centerReg = /L|W|H|B|typhoonProof|ejectionDoor/
+  const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/
   // =======================================
   return (
     <div className={style.container} >
       {mainProductArr.map((dataItem, pIndex) => {
-        const { series, doorType } = dataItem
         return (
           <CellWithBar key={pIndex} isActive={activeMainProd === pIndex}>
             <div className={style.row}
@@ -108,7 +63,7 @@ export default function ProductList_legacy(
                 <IconCopy
                   onClick={() => copyMainProd(pIndex)}
                 />
-                <span>{pIndex + 1}</span>
+                {/* <span>{pIndex + 1}</span> */}
               </div>
               {theadIndex.map((key) => {
                 const { width, id, type, inputType } = prodCellConfig.cellConfig[key]
@@ -119,11 +74,6 @@ export default function ProductList_legacy(
                   cellSwitcher({
                     dataItem, key, type, disabled, stateValue, inputType,
                   })
-
-                if (
-                  (key === "ejectionDoor" || key === "typhoonProof")
-                ) return <div className={`${styleL.column}`} key={key} style={theStyle} />
-
                 return (
                   <div className={`${styleL.column} ${textCenter}`}
                     key={key} style={theStyle} >
@@ -143,24 +93,14 @@ export default function ProductList_legacy(
   // ===========================================================
   function cellSwitcher({ dataItem, key, type, disabled, stateValue, inputType }:
     {
-      // dataItem: ProdClass
-      // key: TprodKeys
       dataItem: Class_legacyQuotation["mainProductArr"][number]
       key: Class_legacyQuotation["mainProdCellConfig"]["keyList"][number]
-
-
-      type: "input" | "readOnly" | "select" | "selectWithIcon" | "checkbox"
-      // type: Class_quotation["prodCellConfig"]["cellConfig"]
+      type: "input" | "selectWithIcon" | "checkbox"
       disabled: boolean
       stateValue: string | boolean | Toption
       inputType?: string
     }
   ) {
-
-    // const {
-    //   onInputChange, onSelChange, onChcekBoxClick,
-    // } = dataItem
-
 
     switch (type) {
 
