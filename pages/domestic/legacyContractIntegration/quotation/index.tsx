@@ -169,6 +169,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/*  */}
           {/*  */}
           {/*  */}
+          <QuotationSinature
+            signatureArr={signatureArr}
+            disabled={!allowEdit} />
 
 
         </div>
