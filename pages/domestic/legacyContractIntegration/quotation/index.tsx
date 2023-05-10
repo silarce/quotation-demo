@@ -153,7 +153,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div>
         <div className={style.quotation}>
           {/*  */}
-          
+          <QuotationProfile
+            classBasicInfo={classQuotation.classBasicInfo}
+            fakeClientList={fakeClientList}
+            disabled={!allowEdit} />
           {/*  */}
           <div className={style.switchBar}>
             <div className={style.active}>
