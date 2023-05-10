@@ -50,8 +50,8 @@ type TlegacyQuotation = {
     doorRailIcon: string //門軌的圖片 // 隨doorRail變動
     horsepower: string //馬力
     qty: string //數量
-    price: string // 單價
-    subTotalPrice: string // 複價
+    unitPrice: string // 單價
+    priceSubTotal: string // 複價
     typhoonProof: boolean // 防颱
     ejectionDoor: boolean // 彈射門
     memo: string
@@ -131,8 +131,8 @@ const fakeLegacyQuotationDataList: TlegacyQuotationList = {
         doorRailIcon: iconDoorRail_sj302_30.src,
         horsepower: "1/4 HP",
         qty: "1",
-        price: "99",
-        subTotalPrice: "999",
+        unitPrice: "99",
+        priceSubTotal: "999",
         memo: "防颱",
         ejectionDoor: false,
         typhoonProof: false,
@@ -249,8 +249,8 @@ const emptyLegacyQuotation: TlegacyQuotation = {
       doorRailIcon: "",
       horsepower: "",
       qty: "",
-      price: "",
-      subTotalPrice: "",
+      unitPrice: "",
+      priceSubTotal: "",
       memo: "",
       ejectionDoor: false,
       typhoonProof: false,
