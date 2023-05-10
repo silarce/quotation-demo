@@ -25,7 +25,7 @@ class Class_basicInfo {
     reRender: TreRender,
     basicInfo: Tdata["basicInfo"],
     clientProfile: Tdata["fakeClienProfile"] | undefined,
-    classQuotation: Class_quotation,
+    classQuotation: Class_legacyQuotation,
   ) {
     this._classQuotation = classQuotation
     this._reRender = reRender
@@ -322,7 +322,7 @@ class Class_signature {
 // =======================================================================
 // =======================================================================
 // =======================================================================
-class Class_quotation {
+class Class_legacyQuotation {
   constructor(
     reRender: TreRender,
     data: Tdata,
@@ -423,11 +423,11 @@ class Class_quotation {
 
 
 
-const useQuotation = (data: Tdata | undefined) => {
+const useLegacyQuotation = (data: Tdata | undefined) => {
   const [render, setRender] = useState(0)
   const reRender: TreRender = () => setRender(state => state + 1)
   const checkData = () => {
-    if (data) return new Class_quotation(
+    if (data) return new Class_legacyQuotation(
       reRender,
       data,
       mainProdCellConfigOri(),
@@ -444,13 +444,13 @@ const useQuotation = (data: Tdata | undefined) => {
 }
 
 export {
-  Class_quotation,
+  Class_legacyQuotation,
   Class_basicInfo,
   Class_mainProduct,
   Class_part,
   Class_payInfo,
   Class_listString,
-  useQuotation
+  useLegacyQuotation
 }
 
 const unexpectedOption = (v: string, icon?: string) => {
