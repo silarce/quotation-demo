@@ -95,13 +95,13 @@ type TlegacyQuotationList = {
 
 const fakeLegacyQuotationDataList: TlegacyQuotationList = {
   "S-110211-01": {
-    clientId: "S00001", // 客戶id 用來關聯客戶資料
+    clientId: "S00002", // 客戶id 用來關聯客戶資料
     // ---------------------------------------------------------
     basicInfo: {
       quotationId: "S-110211-01",
       tempQuotationAging: 10,
       date: "110-02-02",
-      constructionName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+      constructionName: "舊合約整合測試專案",
       undertaker: "陳小明小華",
       totalDiscount: 99.99,
       tempDoorQty: 99,
