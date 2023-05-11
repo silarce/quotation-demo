@@ -32,36 +32,25 @@ export default function QuotationOtherSetting(
 
   const [activeIndex, setActiveIndex] = useState(-1)
 
-
-
   const { partCellConfig, } = classQuotation
-
 
   const activeProd = classQuotation.mainProductArr[classQuotation.activeMainProd]
   const partList = activeProd?.partArr ?? []
 
   const { addPart, removePart } = activeProd ?? {}
 
-
   const partKeyindex = partCellConfig.keyList
   const cellConfig = partCellConfig.cellConfig
-
 
   useEffect(() => {
     setActiveIndex(-1)
   }, [activeProd])
-
-
-
-
-
 
   return (
     <div className={scss.container}>
       <div className={styleL.header}>
         <h2>其他設定</h2>
       </div>
-
 
       <div className={styleL.scrollDiv + " " + scss.scrollDiv}>
 
@@ -71,9 +60,9 @@ export default function QuotationOtherSetting(
           <div className={scss.delBtn}>
             <span></span>
           </div>
-          <div className={styleL.rowIndex}>
+          {/* <div className={styleL.rowIndex}>
             <span></span>
-          </div>
+          </div> */}
           {partKeyindex.map((item, index) => {
             const { label, flex, width } = cellConfig[item]
             const theStyle = { width, flex }
@@ -107,9 +96,9 @@ export default function QuotationOtherSetting(
                 />
               </div>
 
-              <div className={styleL.rowIndex}>
+              {/* <div className={styleL.rowIndex}>
                 <span>{pIndex + 1}</span>
-              </div>
+              </div> */}
 
               {partKeyindex.map((key, cIndex) => {
                 const { width, flex, type } = cellConfig[key]

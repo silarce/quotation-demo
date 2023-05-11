@@ -601,9 +601,9 @@ const partCellConfigOri = (): TpartCellConfig => {
       "category": { label: "項目", width: "60px", type: "input" },
       "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
       "qty": { label: "數量", width: "60px", type: "input" },
-      "price": { label: "單價", width: "84px", type: "input" },
-      "subTotalPrice": { label: "複價", width: "60px", type: "input" },
-      "memo": { label: "備註", width: "60px", type: "input" },
+      "price": { label: "單價", width: "110px", type: "input" },
+      "subTotalPrice": { label: "複價", width: "110px", type: "input" },
+      "memo": { label: "備註", width: "170px", type: "input" },
 
     }
   }
