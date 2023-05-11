@@ -62,12 +62,11 @@ export default function ProductList_legacy(
                     e.stopPropagation();
                     if (disabled) return
                     delMainProd(pIndex)
-                  }}
-                />
-                <IconCopy
-                  onClick={() => { if (disabled) return; copyMainProd(pIndex) }}
-                />
-                {/* <span>{pIndex + 1}</span> */}
+                  }} />
+                <IconCopy onClick={() => { if (disabled) return; copyMainProd(pIndex) }} />
+                {/*  */}
+                <span>{pIndex + 1}</span>
+                {/*  */}
               </div>
               {theadIndex.map((key) => {
                 const { width, id, type, inputType } = prodCellConfig.cellConfig[key]

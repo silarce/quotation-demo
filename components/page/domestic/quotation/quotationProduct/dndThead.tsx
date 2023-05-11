@@ -54,7 +54,9 @@ export default function DndThead({ allowMove, classQuotation }:
   // =======================================================
   return (
     <div className={styleL.thead}>
+      {/*  */}
       <div className={style.emptyBlock} />
+      {/*  */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

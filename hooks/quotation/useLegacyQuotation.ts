@@ -542,7 +542,7 @@ function mainProdCellConfigOri(): TprodCellConfig {
     ],
     cellConfig: {
       // input
-      idNumber: { id: "idNumber", label: "編號", width: "60px", type: "input" },
+      idNumber: { id: "idNumber", label: "編號", width: "100px", type: "input" },
       category: { id: "category", label: "項目", width: "60px", type: "input" },
       L: { id: "L", label: "L(m)", width: "60px", type: "input", inputType: "number" },
       W: { id: "W", label: "W(m)", width: "60px", type: "input", inputType: "number" },
