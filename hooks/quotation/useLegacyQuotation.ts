@@ -91,6 +91,12 @@ class Class_mainProduct {
   private _reRender
   private _mainProduct
   private _partArr
+  // 這兩個資料出現在PDF中，但是沒出現在主產品設定中
+  // 目前還沒接api，先用寫死的假資料
+  thickness = "1.50t" //厚度
+  openType = "電動"
+
+
   get partArr() { return this._partArr }
 
   get idNumber() { return this._mainProduct.idNumber }
@@ -143,7 +149,7 @@ class Class_mainProduct {
   set qty(v) { this._mainProduct.qty = v; this._reRender() }
 
   get unitPrice() { return this._mainProduct.unitPrice }
-  set unitPrice(v) { console.log(v);this._mainProduct.unitPrice = v; this._reRender() }
+  set unitPrice(v) { console.log(v); this._mainProduct.unitPrice = v; this._reRender() }
 
   get priceSubTotal() { return this._mainProduct.priceSubTotal }
   set priceSubTotal(v) { this._mainProduct.priceSubTotal = v; this._reRender() }
@@ -179,7 +185,15 @@ class Class_mainProduct {
 
 
   // ------------------
-  get allData() { return this._mainProduct }
+  get allData() {
+    return {
+      ...this._mainProduct,
+      // pdf要的資料
+      size: `${this.W || this.L} X ${this.h} + ${this.B}`,
+      thickness: this.thickness,
+      openType: this.openType,
+    }
+  }
 
   get postBody(): Tdata["mainProductArr"][number] {
     return {

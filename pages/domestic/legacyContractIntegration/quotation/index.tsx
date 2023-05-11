@@ -177,6 +177,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={!allowEdit} />
         </div>
       </div>
+      <QuotationPdf
+        isVisable={showPdf}
+        onCancel={() => { setShowPdf(false) }}
+        classQuotation={classQuotation} />
     </SubLayer>
   )
 }
