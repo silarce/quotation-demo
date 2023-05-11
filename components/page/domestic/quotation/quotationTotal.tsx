@@ -3,11 +3,13 @@ import { useState } from "react"
 // component
 import StringList from "./quotationTotal/TextListEditor"
 import PayInfo from "./quotationTotal/payInfo"
+import PayInfo_legacy from "./quotationTotal/payInfo_legacy"
 import Appendix from "./quotationTotal/appendix"
 // css
 import style from "./quotationTotal.module.scss"
 // type
 import { Class_quotation } from "hooks/quotation/useQuotation"
+import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
 import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
 import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
 
@@ -20,13 +22,16 @@ export default function QuotationTotal(
     disabled = false,
   }:
     {
-      classQuotation: Class_quotation
+      classQuotation: Class_quotation | Class_legacyQuotation
       getFakeMemo: typeof fakeApi_memo["get"]
       getFakeQuotaRange: typeof fakeApi_quoteRange["get"]
       disabled: boolean
     }) {
-  const { classMemo, classQuoteRange } = classQuotation
 
+  const { identify } = classQuotation
+
+  // --------------------
+  const { classMemo, classQuoteRange } = classQuotation
   // --------------------
   const memoObj = {
     stringArr: classMemo.stringArr,
@@ -79,10 +84,17 @@ export default function QuotationTotal(
             disabled={disabled} />
           <Appendix disabled={disabled} />
         </div>
-        <PayInfo
-          classQuotation={classQuotation}
-          disabled={disabled}
-        />
+        {identify === "normal" &&
+          <PayInfo
+            classQuotation={classQuotation}
+            disabled={disabled}
+          />}
+        {identify === "legacy" &&
+          <PayInfo_legacy
+            classQuotation={classQuotation}
+            disabled={disabled}
+          />}
+
       </div>
     </div >
   )

@@ -24,10 +24,10 @@ export default function InputModal(
   }:
     {
       visible: boolean,
-      setVisible: Dispatch<SetStateAction<boolean>>,
       title: string
-      placeholder: string
+      placeholder?: string
       onConfirm: (value: string) => void
+      setVisible?: Dispatch<SetStateAction<boolean>>,
       className?: string
       autoCloseOnConfirm?: boolean
       onCancel?: () => void
@@ -43,13 +43,13 @@ export default function InputModal(
   const thisOnConfirm = async () => {
     await onConfirm(value)
     if (autoCloseOnConfirm) {
-      setVisible(false)
+      setVisible?.(false)
       setValue("")
     }
   }
   const thisOnCancel = () => {
     onCancel && onCancel()
-    setVisible(false)
+    setVisible?.(false)
     setValue("")
   }
 

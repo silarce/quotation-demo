@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
 // components
-import Thead from './budgetList/thead';
-import PanelHeader from './budgetList/panelHeader';
-import PanelBody from './budgetList/panelBody';
+import Thead01 from '../ui/table01/Thead01';
+import TbodyItem01 from '../ui/table01/TbodyItem01';
+import PanelBody from './budgetList/tableBody';
 // antd
 import { Collapse } from 'antd';
 // css
@@ -48,7 +48,7 @@ export default function BudgetList({ budgetList, className }:
   return (
     // <div className={style.container}>
     <div className={classNames(style.container, className)}>
-      <Thead />
+      <Thead01 />
 
       <Collapse
         expandIcon={() => <></>}
@@ -73,7 +73,7 @@ export default function BudgetList({ budgetList, className }:
             return (
 
               <Panel key={index} className={style.panel}
-                header={<PanelHeader projectData={item} isActive={isActive} openQuotation={openQuotation} />}
+                header={<TbodyItem01 projectData={item} isActive={isActive} openQuotation={openQuotation} approvalsStatus={approvalsStatus}/>}
               >
                 <PanelBody projectSimpleRecord={tempRecord} openQuotation={openQuotation} />
               </Panel>

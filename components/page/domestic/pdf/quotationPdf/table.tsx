@@ -13,7 +13,7 @@ const optionsDoorRail = optionsCreator_doorRail()
 
 
 
-type TproductList = {
+export type TtableProdList = {
   category: string
   size: string
   doorType: string
@@ -35,7 +35,7 @@ type TproductList = {
 
 export default function Table(
   { productList }:
-    { productList: TproductList }
+    { productList: TtableProdList }
 ) {
 
   return (

@@ -1,0 +1,82 @@
+@use "styles/theme01" as *;
+
+div.panelHeader {
+  padding: 17px 30px;
+  border: none;
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+  .row01 {
+    display: grid;
+    grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
+    gap: 22px;
+    margin-bottom: 16px;
+  }
+  .row02 {
+    display: grid;
+    grid-template-columns: 110px 65px auto 20px;
+    gap: 22px;
+    .place {
+      > * {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      > span {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  .row03 {
+    display: flex;
+    gap: 14px;
+    margin-top: 19px;
+    > .step {
+      padding: 6px 16px 6px 13px;
+      background-color: $bgc01;
+      width: fit-content;
+      border-radius: 17px;
+      > * {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      > .spot {
+        width: 6px;
+        height: 6px;
+        margin-right: 10px;
+        background-color: $colorBorder01;
+        border-radius: 50%;
+      }
+      > span {
+        font-size: 16px;
+        font-weight: 400;
+        color: $colorBorder01;
+      }
+
+      &.success {
+        .spot {
+          background-color: greenyellow;
+        }
+        span {
+          color: $colorMain;
+        }
+      }
+      &.notSuccess {
+        .spot {
+          background-color: #ea1833;
+        }
+        span {
+          color: $colorMain;
+        }
+      }
+    }
+  } // row03
+} // div.panelHeader

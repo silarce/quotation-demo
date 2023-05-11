@@ -15,8 +15,15 @@ import scss from "./quotationProfile.module.scss"
 
 
 import { Class_basicInfo } from 'hooks/quotation/useQuotation'
+import { Class_basicInfo as Class_legacyBasicInfo } from 'hooks/quotation/useLegacyQuotation'
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+
+
+// ====================================================
+type TclassBasicInfo = {
+  
+}
 
 
 // ====================================================
@@ -26,13 +33,12 @@ const inputStyle = {
   padding: "21px 0px 4px 0px",
   labelWidth: "80px",
 }
-
-
 // ====================================================
 export default function QuotationProfile(
   { classBasicInfo, fakeClientList, disabled = false }:
     {
-      classBasicInfo: Class_basicInfo
+      // classBasicInfo: Class_basicInfo | Class_legacyBasicInfo
+      classBasicInfo: Class_basicInfo | Class_legacyBasicInfo
       fakeClientList: ReturnType<Class_client["get"]>
       disabled: boolean
     }) {

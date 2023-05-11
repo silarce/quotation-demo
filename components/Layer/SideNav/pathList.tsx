@@ -178,6 +178,11 @@ const sidePathList: TsidePathList = {
               path: path01 + "/report",
               erpFeature: devPass,
             },
+            {
+              label: "舊合約整合",
+              path: path01 + "/legacyContractIntegration",
+              erpFeature: devPass,
+            },
           ]
         },
         {
