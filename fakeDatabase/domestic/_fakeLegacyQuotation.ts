@@ -274,11 +274,7 @@ const emptyLegacyQuotation: TlegacyQuotation = {
     tradingLocation: "", // 交貨地點
     tradingDate: "",  // 交貨日期
     // payWay: []
-    payWay: [
-      { label: "一二三四五六七八九十十二", value: "123" },
-      { label: "一二三四五六七八九十十二", value: "123" },
-      { label: "一二三四五六七八九十十二", value: "123" },
-    ]
+    payWay: []
   },
   // ---------------------------------------------------------
   signature: {

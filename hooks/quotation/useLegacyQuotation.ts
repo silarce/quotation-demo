@@ -143,10 +143,10 @@ class Class_mainProduct {
   set qty(v) { this._mainProduct.qty = v; this._reRender() }
 
   get unitPrice() { return this._mainProduct.unitPrice }
-  set unitPrice(v) { this._mainProduct.unitPrice = v; this._reRender }
+  set unitPrice(v) { console.log(v);this._mainProduct.unitPrice = v; this._reRender() }
 
   get priceSubTotal() { return this._mainProduct.priceSubTotal }
-  set priceSubTotal(v) { this._mainProduct.priceSubTotal = v; this._reRender }
+  set priceSubTotal(v) { this._mainProduct.priceSubTotal = v; this._reRender() }
 
   /** 防颱*/
   get typhoonProof() { return this._mainProduct.typhoonProof }
@@ -533,13 +533,13 @@ function mainProdCellConfigOri(): TprodCellConfig {
       L: { id: "L", label: "L(m)", width: "60px", type: "input", inputType: "number" },
       W: { id: "W", label: "W(m)", width: "60px", type: "input", inputType: "number" },
       h: { id: "h", label: "h(m)", width: "60px", type: "input", inputType: "number" },
-      B: { id: "B", label: "B(m)", width: "60px", type: "input" },
-      qty: { id: "qty", label: "數量", width: "43px", type: "input" },
+      B: { id: "B", label: "B(m)", width: "60px", type: "input", inputType: "number" },
+      qty: { id: "qty", label: "數量", width: "55px", type: "input", inputType: "number" },
       memo: { id: "memo", label: "備註", width: "90px", type: "input" },
-      unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "input" },
-      priceSubTotal: { id: "priceSubTotal", label: "複價", width: "140px", type: "input" },
-      area: { id: "area", label: "面積", width: "60px", type: "input" },
-      cai: { id: "cai", label: "才數", width: "75px", type: "input" },
+      unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "input", inputType: "number" },
+      priceSubTotal: { id: "priceSubTotal", label: "複價", width: "140px", type: "input", inputType: "number" },
+      area: { id: "area", label: "面積", width: "60px", type: "input", inputType: "number" },
+      cai: { id: "cai", label: "才數", width: "75px", type: "input", inputType: "number" },
       series: { id: "series", label: "報價別", width: "105px", type: "input" },
       doorType: { id: "doorType", label: "門型", width: "100px", type: "input" },
       material: { id: "material", label: "材料", width: "120px", type: "input" },

@@ -131,7 +131,7 @@ export default function QuotationOtherSetting(
             </CellWithBar>
           )
         })}
-        {activeProd &&
+        {activeProd && !disabled &&
           <AddButton
             className={scss.addBtn}
             label="新增項目"

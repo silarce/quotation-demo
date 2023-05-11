@@ -58,10 +58,14 @@ export default function ProductList_legacy(
               <div className={style.buttonBox}>
 
                 <IconDelete01
-                  onClick={(e) => { e.stopPropagation(), delMainProd(pIndex) }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (disabled) return
+                    delMainProd(pIndex)
+                  }}
                 />
                 <IconCopy
-                  onClick={() => copyMainProd(pIndex)}
+                  onClick={() => { if (disabled) return; copyMainProd(pIndex) }}
                 />
                 {/* <span>{pIndex + 1}</span> */}
               </div>

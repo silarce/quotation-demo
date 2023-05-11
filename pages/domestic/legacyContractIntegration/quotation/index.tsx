@@ -14,8 +14,6 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
 import QuotationOtherSetting from "components/page/domestic/quotation/quotationOtherSetting"
-import QuotationComponent from "components/page/domestic/quotation/quotationComponent"
-import QuotationAccessory from "components/page/domestic/quotation/quotationAccessory"
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 
@@ -24,16 +22,10 @@ import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/qu
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import InputSel from "components/global/gear/inputAndSel/inputSel"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
-import TextareaModal from "components/global/gear/modal/simpleModal/textareaModal";
-
 // icon
 import iconUpload from "public/image/icon/upload.svg"
 
-// option
-import { optionsCreator_quotationState, Toption } from "fakeDatabase/options/options"
-const optionQuotationState = optionsCreator_quotationState()
 
 // css
 import style from "./quotation.module.scss"
@@ -100,9 +92,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false)
   const [showPdf_part, setShowPdf_part] = useState(false)
-  // -----------------------------------------------------------------------
-
-
 
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
@@ -115,7 +104,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // optionQuotationState
   const panel_editable: TpanelList = [
-    { type: "redButton", label: "上傳", onClick: () => { alert("上傳") } },
+    {
+      type: "redButton", label: "上傳", onClick: () => {
+        if (!fakeApiQuotaion || !classQuotation) return myAlert.warning({ title: "fakeApiQuotaion或classQuotation為undefined" })
+        if (isNewQuotationId) fakeApiQuotaion.post(classQuotation.postData)
+        else fakeApiQuotaion.put(classQuotation.postData)
+        setAllowEdit(false)
+      }
+    },
     { type: "myButton", label: "取消", onClick: () => setAllowEdit(false) },
   ]
   const panel_noEditable: TpanelList = [
@@ -175,25 +171,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
             getFakeQuotaRange={getFakeQuotaRange}
             disabled={!allowEdit}
           />
-
-
-
-
-          {/*  */}
-          {/*  */}
-          {/*  */}
+          {/* 簽名 */}
           <QuotationSinature
             signatureArr={signatureArr}
             disabled={!allowEdit} />
-
-
         </div>
       </div>
-
-
     </SubLayer>
   )
-
 }
 
 
