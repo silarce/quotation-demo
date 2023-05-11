@@ -571,9 +571,7 @@ class Class_quotation {
     prodCellConfig: TprodCellConfig,
     partCellConfig: TpartCellConfig
   ) {
-    /**用來判斷這是哪個class */
-    this.identify = "normal"
-    // 
+
     this._quotaionDataOri = data
 
     this._reRender = reRender
@@ -606,7 +604,8 @@ class Class_quotation {
   private _quotaionDataOri
   readonly quotationId
   private _reRender
-  identify
+  /**用來判斷這是哪個class */
+  identify = "normal" as const
   // ---------------------
   classBasicInfo
   mainProductArr

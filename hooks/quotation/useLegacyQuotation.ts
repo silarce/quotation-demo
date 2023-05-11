@@ -269,9 +269,11 @@ class Class_payInfo {
   }
   addPayWay = (label: string) => {
     this._payInfo.payWay.push({ label, value: "" })
+    this._reRender()
   }
   removePayWay = (index: number) => {
     this._payInfo.payWay.splice(index, 1)
+    this._reRender()
   }
   // ----------------------------------------------------
   postBody = () => {
@@ -342,9 +344,6 @@ class Class_legacyQuotation {
     prodCellConfig: TprodCellConfig,
     partCellConfig: TpartCellConfig
   ) {
-    /**用來判斷這是哪個class */
-    this.identify = "legacy"
-    // 
     this._quotaionDataOri = data
     this._reRender = reRender
 
@@ -375,7 +374,8 @@ class Class_legacyQuotation {
   private _quotaionDataOri
   readonly quotationId
   private _reRender
-  identify
+  /**用來判斷這是哪個class */
+  identify = "legacy" as const
   // ---------------------
   classBasicInfo
   mainProductArr

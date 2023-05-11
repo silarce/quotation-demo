@@ -168,7 +168,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
           {/* 其他設定 */}
           <QuotationOtherSetting classQuotation={classQuotation} disabled={!allowEdit} />
-          {/*  */}
+          {/* 備註/報價範圍/付款資訊 */}
+          <QuotationTotal
+            classQuotation={classQuotation}
+            getFakeMemo={getFakeMemo}
+            getFakeQuotaRange={getFakeQuotaRange}
+            disabled={!allowEdit}
+          />
+
+
+
+
           {/*  */}
           {/*  */}
           {/*  */}
