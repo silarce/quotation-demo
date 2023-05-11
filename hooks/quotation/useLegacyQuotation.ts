@@ -10,7 +10,7 @@ import {
 
 
 // type
-import { TlegacyQuotation, emptyLegacyQuotation } from "fakeDatabase/domestic/_fakeLegacyQuotation"
+import { TlegacyQuotation, emptyLegacyQuotation, emptyPart } from "fakeDatabase/domestic/_fakeLegacyQuotation"
 type TreRender = () => void
 type Tdata = ReturnType<Class_fakeApi_legacyQuotation["get"]>
 
@@ -165,6 +165,19 @@ class Class_mainProduct {
     if (this.typhoonProof) return doorRail_antiTyphoon
     else return doorRail_normal
   }
+  // ------------------
+
+  addPart = () => {
+    this._partArr.push(new Class_part(_.cloneDeep(emptyPart), this._reRender))
+    this._reRender()
+  }
+
+  removePart = (index: number) => {
+    this._partArr.splice(index, 1)
+    this._reRender()
+  }
+
+
   // ------------------
   get allData() { return this._mainProduct }
 
@@ -558,6 +571,7 @@ type TpartCellConfig = {
     [key in TpartKeys]: {
       label: string
       width: string
+      flex?: string
       inputType?: HTMLInputTypeAttribute
     }
   } & TpartInputCellType
@@ -571,7 +585,7 @@ const partCellConfigOri = (): TpartCellConfig => {
     ],
     cellConfig: {
       "category": { label: "項目", width: "60px", type: "input" },
-      "content": { label: "內容", width: "60px", type: "input" },
+      "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
       "qty": { label: "數量", width: "60px", type: "input" },
       "price": { label: "單價", width: "84px", type: "input" },
       "subTotalPrice": { label: "複價", width: "60px", type: "input" },

@@ -140,19 +140,19 @@ const fakeLegacyQuotationDataList: TlegacyQuotationList = {
         part: [
           {
             category: "SD2",
-            content: "",
+            content: "拆門及重新安裝",
             qty: "2",
             price: "299",
-            subTotalPrice: "",
-            memo: "",
+            subTotalPrice: "999",
+            memo: "防颱防颱防颱防颱防颱",
           },
           {
             category: "SD1",
-            content: "",
+            content: "拆門及重新安裝",
             qty: "1",
             price: "499",
-            subTotalPrice: "",
-            memo: "",
+            subTotalPrice: "999",
+            memo: "防颱防颱防颱防颱防颱",
           }
         ]
       }
@@ -206,10 +206,18 @@ function checkData(projectData: TlegacyQuotationList): void {
 
 checkData(fakeLegacyQuotationDataList)
 
-export type { TlegacyQuotation , TlegacyQuotationList }
-export { fakeLegacyQuotationDataList, emptyLegacyQuotation }
+export type { TlegacyQuotation, TlegacyQuotationList }
+export { fakeLegacyQuotationDataList, emptyLegacyQuotation, emptyPart }
 
 
+const emptyPart: TlegacyQuotation["mainProductArr"][number]["part"][number] = {
+  category: "",
+  content: "",
+  qty: "",
+  price: "",
+  subTotalPrice: "",
+  memo: "",
+}
 
 
 const emptyLegacyQuotation: TlegacyQuotation = {
@@ -254,7 +262,7 @@ const emptyLegacyQuotation: TlegacyQuotation = {
       memo: "",
       ejectionDoor: false,
       typhoonProof: false,
-      part: []
+      part: [emptyPart]
     }
   ],
   // ---------------------------------------------------------
@@ -277,4 +285,5 @@ const emptyLegacyQuotation: TlegacyQuotation = {
   memoArr: [],
   quoteRangeArr: [],
 }
+
 

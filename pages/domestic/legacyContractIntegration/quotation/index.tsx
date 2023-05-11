@@ -13,6 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 // components
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
+import QuotationOtherSetting from "components/page/domestic/quotation/quotationOtherSetting"
 import QuotationComponent from "components/page/domestic/quotation/quotationComponent"
 import QuotationAccessory from "components/page/domestic/quotation/quotationAccessory"
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
@@ -152,7 +153,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       <div>
         <div className={style.quotation}>
-          {/*  */}
+          {/* 基本資料 */}
           <QuotationProfile
             classBasicInfo={classQuotation.classBasicInfo}
             fakeClientList={fakeClientList}
@@ -165,7 +166,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
           {/* 主產品設定 */}
           <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
-          {/*  */}
+          {/* 其他設定 */}
+          <QuotationOtherSetting classQuotation={classQuotation} disabled={!allowEdit} />
           {/*  */}
           {/*  */}
           {/*  */}
