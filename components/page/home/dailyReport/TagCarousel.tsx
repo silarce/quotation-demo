@@ -55,8 +55,8 @@ export default function TagCarousel(
         dots={false}
 
         // variableWidth={true}
-        slidesToShow={3}
-        slidesToScroll={3}
+        slidesToShow={2}
+        slidesToScroll={2}
 
         arrows={true}
         prevArrow={<PrevArrow />}

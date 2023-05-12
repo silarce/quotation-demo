@@ -11,7 +11,8 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import { Badge } from 'antd';
 
 // component
-import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+// import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
@@ -56,6 +57,13 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 export { Class_reportItem }
 // =====================================================================
 
+const reviewOptions = [
+  { label: "全部", value: "" },
+  { label: "未審核", value: "viewed" },
+  { label: "已審核", value: "notViewed" },
+]
+
+// =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
@@ -95,6 +103,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     dailyReport,
     updateDailyReports,
   } = useApiDailyReports(thisMonth)
+  const sortedDailyReport = useMemo(() => {
+    return _.sortBy(dailyReport, "date").reverse()
+  }, [dailyReport])
   /**取得指定月份所有日報表，額外做了loading的處理 */
   const updateDailyReports_plus = async () => {
     try {
@@ -188,10 +199,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
     await editReport(tag.reportId)
     if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
-    setTagArr(arr => { arr.push(tag); return [...arr] })
+    setTagArr(arr => {
+      const newArr = _.cloneDeep(arr);
+      newArr.push(tag);
+      return newArr
+    })
   }
   const removeTag = (index: number, tagReportId: string) => {
-    setTagArr(arr => { arr.splice(index, 1); return [...arr] })
+    setTagArr(arr => {
+      const newArr = _.cloneDeep(arr);
+      newArr.splice(index, 1);
+      return newArr
+    })
     if (tagReportId === reportInEdit?.id) cancelEditNewDailyReport()
   }
 
@@ -317,6 +336,31 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
+  const searchGroup = {
+    searchTargetList: [
+      {
+        options: reviewOptions,
+        width: "110px"
+      },
+      {
+        placeholder: "搜尋日期",
+        width: "150px"
+      }
+    ],
+    doSearch: () => { }
+  }
+
+
+  const panelListNormal: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "審核人員設定",
+      onClick: editReportEmpArr
+    }
+  ]
+
+
   const panelList = (() => {
     if (!reportInEdit) return undefined
     if (!isSubordinate) return panelList01
@@ -351,14 +395,25 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
-          panelList={panelList}
+          // panelList={panelList}
+          panelList={panelListNormal}
           customeLeft={customeLeft}
         />
 
-        {!reportInEdit &&
+        {/* 廢棄 */}
+        {/* {!reportInEdit &&
           <TheCalendar
             dailyReportArr={dailyReport ?? []}
             editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
+            editDailyReport={isSubordinate ? editReport_today : undefined}
+            addTag={addTag}
+            updateDailyReports={updateDailyReports_plus}
+          />
+        } */}
+        {!reportInEdit &&
+          <ReporterList
+            dailyReportArr={sortedDailyReport ?? []}
+            // editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
             editDailyReport={isSubordinate ? editReport_today : undefined}
             addTag={addTag}
             updateDailyReports={updateDailyReports_plus}
@@ -475,6 +530,7 @@ const formatEmployeeArr = (
   })
   return result
 }
+
 
 
 
