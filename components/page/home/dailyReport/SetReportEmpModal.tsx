@@ -25,6 +25,8 @@ export default function SetReportEmpModal(
     onCancel,
     // onSearch,
     dataArr,
+    label,
+    tip,
   }:
     {
       visible: boolean
@@ -33,6 +35,8 @@ export default function SetReportEmpModal(
       // onSearch: (v: string) => void
       /**會經過cloneDeep處理 */
       dataArr: TsetReportEmpModalData[]
+      label?: string
+      tip?: string
     }
 ) {
 
@@ -56,13 +60,13 @@ export default function SetReportEmpModal(
   return (
     <ModalListSelectorWithSearch
       className={scss.antdModal}
-      label="審核人員設定"
+      label={label ?? ""}
       visible={visible}
       onConfirm={() => onConfirm(theDataArr)}
       onCancel={onCancel}
       onSearch={onSearch}
       width="800px"
-      tip="可複選"
+      tip={tip}
     >
       <div className={scss.body}>
         {theDataArr.map((data, index) => {

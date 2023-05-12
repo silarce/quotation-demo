@@ -75,8 +75,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // -----------------------------------------------------------
   // state
-  // 送進SetReportEmpModal的arr
+  // 送進 審核人員設定 SetReportEmpModal的arr
   const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
+    useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
+
+  // 送進 選擇審核人員 SetReportEmpModal的arr
+  const [reviewerArr_preEdit, setreviewerArr_preEdit] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
 
   // 日報表tagArr，送進TagCarousel
@@ -143,7 +147,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         if (!isSubordinate) {
           const allArr = [
             updateDailyReports_ReportersArr(), // 取得所有回報人員
-            updateEmployeeArr() // 取得所有人員
+            // updateEmployeeArr() // 取得所有人員
           ]
           await Promise.all(allArr)
           // await updateDailyReports_id() // 取得指定日報表
@@ -155,6 +159,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         }
         await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
         // await apiDailyReports_id("8ffea857-f99d-4afc-90a6-b762b7073d93")
+
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // 原本只在上面的if (!isSubordinate)執行，現在暫時拿出來執行
+        await updateEmployeeArr() // 取得所有人員
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
       }
       catch {
         myAlert.err({ title: "取得初始資料失敗" })
@@ -261,6 +275,41 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   // ----------------------------------------------------------------------
+  // 審核人員列表 
+  // 等api好了之後要改
+
+  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
+  //**開啟審核人員選擇面板 */
+
+  const empArr = useMemo(() => {
+    return formatEmployeeArr_Temp({ employeeArr })
+  }, [employeeArr])
+
+  const choseReviewerArr = () => {
+    setreviewerArr_preEdit(empArr)
+  }
+  const cancelReviewerArr = () => {
+    setreviewerArr_preEdit(undefined)
+  }
+
+  const reqApiPatchDailyReports_my = async () => {
+    cancelReviewerArr()
+    if (!reportInEdit) return
+    if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
+    const date = new Date(reportInEdit.date)
+    const items = reportInEdit.items.map((item) => item.postBody)
+    try {
+      showRootLoading(true)
+      await apiPatchDailyReports_my({ date, items })
+      cancelEditNewDailyReport()
+      myAlert.success({ title: "更新日報表完成" })
+      await updateDailyReports_withLoading()
+    }
+    catch { myAlert.err({ title: "更新日報表失敗" }) }
+    finally { showRootLoading(false) }
+  }
+
+  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   const doSearch: TdoSearch = (arr) => { console.log(arr) }
@@ -343,19 +392,20 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       type: "redButton",
       label: "上傳",
       onClick: async () => {
-        if (!reportInEdit) return
-        if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
-        const date = new Date(reportInEdit.date)
-        const items = reportInEdit.items.map((item) => item.postBody)
-        try {
-          showRootLoading(true)
-          await apiPatchDailyReports_my({ date, items })
-          cancelEditNewDailyReport()
-          myAlert.success({ title: "更新日報表完成" })
-          await updateDailyReports_withLoading()
-        }
-        catch { myAlert.err({ title: "更新日報表失敗" }) }
-        finally { showRootLoading(false) }
+        choseReviewerArr()
+        // if (!reportInEdit) return
+        // if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
+        // const date = new Date(reportInEdit.date)
+        // const items = reportInEdit.items.map((item) => item.postBody)
+        // try {
+        //   showRootLoading(true)
+        //   await apiPatchDailyReports_my({ date, items })
+        //   cancelEditNewDailyReport()
+        //   myAlert.success({ title: "更新日報表完成" })
+        //   await updateDailyReports_withLoading()
+        // }
+        // catch { myAlert.err({ title: "更新日報表失敗" }) }
+        // finally { showRootLoading(false) }
       },
     },
     {
@@ -446,8 +496,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         visible={!!reportEmpArr_preEdit}
         onConfirm={reqApiPatchDailyReports_Reporters}
         onCancel={cancelSetReportEmpModal}
-        // onSearch={onSearch}
         dataArr={reportEmpArr_preEdit ?? []}
+        label="審核人員設定"
+        tip="可複選"
+      />
+
+      <SetReportEmpModal
+        visible={!!reviewerArr_preEdit}
+        onConfirm={reqApiPatchDailyReports_my}
+        onCancel={cancelReviewerArr}
+        dataArr={reviewerArr_preEdit ?? []}
+        label="選擇審核人員"
+        tip="可複選"
       />
     </>
   )
@@ -540,6 +600,61 @@ const formatEmployeeArr = (
   return result
 }
 
+/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
+const formatEmployeeArr_Temp = (
+  { employeeArr }:
+    {
+      employeeArr: TemployeeDto[] | undefined
+    }
+) => {
+  if (!employeeArr) return []
 
+  const result = employeeArr.map((item) => {
+    const shouldReport = false
+    let theJobs = (() => {
+      if (item.jobs) {
+        return _.sortBy(item.jobs, "grade")
+      }
+      else return []
+    })();
+
+    const obj = {
+      id: item.id,
+      chName: item.chName,
+      idNumber: item.idNumber,
+      job: theJobs[0]?.name ?? "",
+      grade: theJobs[0]?.grade ?? "",
+      shouldReport
+    }
+    return obj
+  })
+  return result
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========================================================================
+/**
+待辦事項
+
+get /daily-reports 沒有提供reviewer的資料，目前是用假資料
+
+TdailyReportItemDto 目前沒有餐費property，所以目前只有可以打字的欄位
+但patch /daily-reports/my 時該欄位沒有用處
+
+上傳前的
+選擇審核人員因為沒有api提供哪些帳號是審核人員，所以現在也是先做一個樣子而已
+
+ */
 
 
