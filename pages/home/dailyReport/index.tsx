@@ -48,6 +48,7 @@ import {
 
 // type
 import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
+import { TdoSearch } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
 import scss from "./dailyReport.module.scss"
@@ -107,7 +108,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     return _.sortBy(dailyReport, "date").reverse()
   }, [dailyReport])
   /**取得指定月份所有日報表，額外做了loading的處理 */
-  const updateDailyReports_plus = async () => {
+  const updateDailyReports_withLoading = async () => {
     try {
       showRootLoading(false)
       setIsLoading(true)
@@ -243,7 +244,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       myAlert.success({ title: "更新回報人員成功" })
       try {
         await Promise.all([
-          updateDailyReports_plus(),
+          updateDailyReports_withLoading(),
           updateDailyReports_ReportersArr(),
         ])
       }
@@ -262,7 +263,43 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  const panelList01: TpanelList = [
+  const doSearch: TdoSearch = (arr) => { console.log(arr) }
+  const searchTargetList = (() => {
+    const arr = [
+      { options: reviewOptions, width: "110px" },
+      { placeholder: "搜尋日期", width: "150px" }
+    ]
+    if (isSubordinate) arr.shift()
+    return arr
+  })()
+
+  const searchGroup = {
+    searchTargetList,
+    doSearch
+  }
+
+  // 
+  const panelList_reviewer_notInEdit: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "審核人員設定",
+      onClick: editReportEmpArr
+    }
+  ]
+
+  const panelList_reporter_notInEdit: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "今日回報",
+      onClick: editReport_today
+    }
+  ]
+
+
+
+  const panelList_reviewer_inEdit: TpanelList = [
     {
       custom: <CheckButton
         checkLabel="已讀"
@@ -278,7 +315,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             const res = await apiDailyReports_review(reportInEdit.id)
             changeReviewToChecked(res.reviewedAt)
             showRootLoading(false)
-            await updateDailyReports_plus()
+            await updateDailyReports_withLoading()
           }
           catch { myAlert.err({ title: "審核失敗" }) }
           finally { showRootLoading(false) }
@@ -287,7 +324,21 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
   ]
 
-  const panelList02: TpanelList = [
+  const panelList_reporter_inEdit01: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge01}
+        color="auto"
+        text="未讀" />
+    },
+    {
+      type: "myButton",
+      label: "編輯",
+      onClick: switchIsEdit
+    }
+  ]
+
+  const panelList_reporter_inEdit02: TpanelList = [
     {
       type: "redButton",
       label: "上傳",
@@ -301,7 +352,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           await apiPatchDailyReports_my({ date, items })
           cancelEditNewDailyReport()
           myAlert.success({ title: "更新日報表完成" })
-          await updateDailyReports_plus()
+          await updateDailyReports_withLoading()
         }
         catch { myAlert.err({ title: "更新日報表失敗" }) }
         finally { showRootLoading(false) }
@@ -314,20 +365,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
-  const panelList03: TpanelList = [
-    {
-      custom: <Badge
-        className={scss.antdBadge01}
-        color="auto"
-        text="未讀" />
-    },
-    {
-      type: "myButton",
-      label: "編輯",
-      onClick: switchIsEdit
-    }
-  ]
-  const panelList04: TpanelList = [
+  const panelList_reporter_reviewed: TpanelList = [
     {
       custom: <Badge
         className={scss.antdBadge02}
@@ -336,37 +374,19 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
-  const searchGroup = {
-    searchTargetList: [
-      {
-        options: reviewOptions,
-        width: "110px"
-      },
-      {
-        placeholder: "搜尋日期",
-        width: "150px"
-      }
-    ],
-    doSearch: () => { }
-  }
-
-
-  const panelListNormal: TpanelList = [
-    { searchGroup },
-    {
-      type: "myButton",
-      label: "審核人員設定",
-      onClick: editReportEmpArr
-    }
-  ]
-
-
   const panelList = (() => {
-    if (!reportInEdit) return undefined
-    if (!isSubordinate) return panelList01
-    if (reportInEdit.reviewedAt) return panelList04
-    if (reportIsEdit) return panelList02
-    return panelList03
+    if (!isSubordinate) {
+      if (!reportInEdit) return panelList_reviewer_notInEdit
+      else return panelList_reviewer_inEdit
+    }
+    else {
+      if (!reportInEdit) return panelList_reporter_notInEdit
+      else {
+        if (reportInEdit.reviewedAt) return panelList_reporter_reviewed
+        if (reportIsEdit) return panelList_reporter_inEdit02
+        return panelList_reporter_inEdit01
+      }
+    }
   })()
 
 
@@ -395,28 +415,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
-          // panelList={panelList}
-          panelList={panelListNormal}
+          panelList={panelList}
           customeLeft={customeLeft}
         />
 
-        {/* 廢棄 */}
-        {/* {!reportInEdit &&
-          <TheCalendar
-            dailyReportArr={dailyReport ?? []}
-            editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
-            editDailyReport={isSubordinate ? editReport_today : undefined}
-            addTag={addTag}
-            updateDailyReports={updateDailyReports_plus}
-          />
-        } */}
         {!reportInEdit &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             // editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
-            editDailyReport={isSubordinate ? editReport_today : undefined}
+            // editDailyReport={isSubordinate ? editReport_today : undefined}
             addTag={addTag}
-            updateDailyReports={updateDailyReports_plus}
+            updateDailyReports={updateDailyReports_withLoading}
           />
         }
 

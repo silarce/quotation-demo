@@ -28,22 +28,19 @@ import { TdailyReportDto_simple } from "js/api/api_dailyReport"
 import { Ttag } from "pages/home/dailyReport"
 
 
-
-
-
 export default function ReporterList(
   {
     dailyReportArr,
     addTag,
     // editReportEmpArr,
-    editDailyReport,
+    // editDailyReport,
     updateDailyReports
   }:
     {
       dailyReportArr: TdailyReportDto_simple[]
       addTag: (employee: Ttag) => void
       // editReportEmpArr?: () => void
-      editDailyReport?: () => void
+      // editDailyReport?: () => void
       updateDailyReports: () => void
     }
 ) {
@@ -57,9 +54,6 @@ export default function ReporterList(
       return newArr
     })
   }
-
-
-  // console.log(dailyReportArr)
 
   return (
     <div className={scss.container}>
