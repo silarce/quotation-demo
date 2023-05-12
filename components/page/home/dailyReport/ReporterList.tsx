@@ -127,9 +127,6 @@ const fakeReviewerArr = [
   { statu: true, name: "李冠華" },
   { statu: false, name: "李冠華" },
   { statu: true, name: "李冠華" },
-  { statu: true, name: "李冠華" },
-  { statu: true, name: "李冠華" },
-  { statu: false, name: "李冠華" },
 ]
 
 

@@ -6,8 +6,8 @@ import Slider, { CustomArrowProps, ResponsiveObject } from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-// tools
-import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
+// // tools
+// import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
 
 // icon
 import iconArrowRight from "public/image/icon/arrow_right.svg"
@@ -66,14 +66,11 @@ export default function TagCarousel(
         {tagArr.map((tag, index) => {
           const { name, date, reportId, employeeId } = tag
 
-          let chDate = yearConversion_standardToCh(date)
-          chDate = chDate.startsWith('0') ? chDate.slice(1) : chDate;
-
           return (
             <div key={index} onClick={() => editReport(reportId)}>
               <div className={classNames(scss.cell, { [scss.isActive]: activeId === reportId })} >
                 <span>
-                  {`${name} ${chDate}`}
+                  {`${name} ${date}`}
                 </span>
                 <Image src={iconRmove} alt="remove" className={scss.removeBtn}
                   onClick={(e) => { e.stopPropagation(); removeTag(index, reportId) }}
