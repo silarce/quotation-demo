@@ -53,7 +53,7 @@ class Class_reportItem {
   private _maintenance
   private _inspection
   // 後端還沒有這個property
-  private _meals = "888"
+  private _meals = ""
   // 
 
 
@@ -175,7 +175,8 @@ const useReport = () => {
   const reRender = () => setRender(state => ++state)
 
   const [report, setReport] = useState<ThookEmptyReport>()
-
+  const [reportTemp, setReportTemp] = useState<ThookEmptyReport>()
+  // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
     date: moment().format("yyyy-MM-DD"),
@@ -183,16 +184,14 @@ const useReport = () => {
     reviewedAt: undefined,
     isEdit: false
   })
-
+  // 
   const reNew_report = (
     { dailyReport }:
       {
         dailyReport?: TdailyReportDto,
       }
   ) => {
-    if (!dailyReport) {
-      return setReport(emptyReportCre())
-    }
+    if (!dailyReport) return setReport(emptyReportCre())
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
       date: dailyReport.date,
@@ -202,7 +201,7 @@ const useReport = () => {
     }
     setReport(theReport)
   }
-
+  // 
   const addReportItem = () => {
     setReport(report => {
       if (!report) return report
@@ -215,7 +214,7 @@ const useReport = () => {
       return { id, date, items, reviewedAt, isEdit }
     })
   }
-
+  // 
   const changeReviewToChecked = (reviewedAt: Date) => {
     setReport(report => {
       if (!report) return report
@@ -226,10 +225,18 @@ const useReport = () => {
       return { id, date, items, reviewedAt, isEdit }
     })
   }
-
+  // 
   const switchIsEdit = () => {
+    if (!report) return
+    if (!report.isEdit) setReportTemp(_.cloneDeep(report))
+    else {
+      setReport(_.cloneDeep(reportTemp))
+      setReportTemp(undefined)
+      return;
+    }
+
     setReport(report => {
-      if (!report) return report
+      if (!report) return
       const id = report.id
       const date = report.date
       const items = report.items
@@ -238,13 +245,12 @@ const useReport = () => {
       return { id, date, items, reviewedAt, isEdit }
     })
   }
-
-
+  // 
   const reportIsEdit = (() => {
     if (!report) return false
     return (report.reviewedAt || !report.isEdit) ? false : true
   })()
-
+  // 
   return {
     report, setReport, reNew_report,
     addReportItem, changeReviewToChecked, switchIsEdit,
