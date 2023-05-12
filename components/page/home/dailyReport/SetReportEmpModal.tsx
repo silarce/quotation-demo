@@ -56,12 +56,13 @@ export default function SetReportEmpModal(
   return (
     <ModalListSelectorWithSearch
       className={scss.antdModal}
-      label="回報人員設定"
+      label="審核人員設定"
       visible={visible}
       onConfirm={() => onConfirm(theDataArr)}
       onCancel={onCancel}
       onSearch={onSearch}
       width="800px"
+      tip="可複選"
     >
       <div className={scss.body}>
         {theDataArr.map((data, index) => {
@@ -90,20 +91,6 @@ export default function SetReportEmpModal(
               return null;
             }
           }
-
-          // 都做好後研究為什麼這樣寫newArr不更新
-          // const onClick = () => {
-          //   // arr[index].shouldReport = !arr[index].shouldReport
-          //   setTheDataArr((arr) => {
-          //     const newArr = [...arr]
-          //     newArr[index].shouldReport = !newArr[index].shouldReport
-          //     console.log("after", newArr[index].shouldReport) 
-          //     console.log(newArr[index])
-          //     return newArr
-          //   })
-          //   // arr[index].shouldReport = !arr[index].shouldReport
-          //   // reRender()
-          // }
           return (
             <CellWithBar key={index} className={scss.row}
               isActive={shouldReport}
