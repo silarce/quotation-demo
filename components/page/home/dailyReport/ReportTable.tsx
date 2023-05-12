@@ -38,9 +38,6 @@ export default function ReportTable(
     }
 ) {
 
-
-  // const readOlny = (reviewedAt || !isSubordinate || !isEdit) ? false : true
-  // const readOlny = (reviewedAt || !isEdit) ? false : true
   const readOlny = isEdit
 
   return (
@@ -49,23 +46,7 @@ export default function ReportTable(
       <div className={classNames(scss.thead)}>
         {headerKeyArr.map(key => {
           const { label, width, flex } = config[key] ?? {}
-          if (key === "workingTypes") {
-            return (
-              <div key={key} className={classNames(scss.purposeColumn)} style={{ width }}>
-                <div><span>{label}</span></div>
-                <div>
-                  {workingTypesKeyArr.map(key => {
-                    const { label, width } = config[key] ?? {}
-                    return (
-                      <div key={key} className={classNames()} style={{ width }}>
-                        <span>{label}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          }
+
           // 
           return (
             <div key={key} className={classNames()} style={{ width, flex }}>
@@ -85,10 +66,9 @@ export default function ReportTable(
                 const value = theClass[key]
                 const { label, width, flex } = config[key] ?? {}
                 // -----
-                // if (key === "periodOfDay") {
                 if (key === "periodOfDay") {
                   return (
-                    <div key={key} style={{ width }} className={scss.select}>
+                    <div key={key} style={{ width, flex }} className={scss.select}>
                       {!readOlny
                         ? <span>{value as string}</span>
                         : <InputSel
@@ -103,42 +83,17 @@ export default function ReportTable(
                     </div>
                   )
                 }
-                // -----
 
-                if (
-                  key === "install" ||
-                  key === "powerDelivery" ||
-                  key === "repair" ||
-                  key === "maintenance" ||
-                  key === "inspection"
-                ) {
-                  return (
-                    <div key={key} className={scss.check}
-                      style={{ width }}>
-                      {(() => {
-                        if (readOlny) {
-                          return <Checkbox01
-                            stateValue={theClass[key]}
-                            onClick={() => { theClass[key] = !theClass[key] }} />
-                        }
-                        else if (value) {
-                          return <Image src={iconCheck} alt="check" />
-                        }
-                        else return null
-                      })()}
-                    </div>
-                  )
-                }
 
                 // -----
-                // if (key === "description") {
                 if (
                   key === "description" ||
                   key === "customerName" ||
-                  key === "contactName"
+                  key === "contactName" ||
+                  key === "meals"
                 ) {
                   return (
-                    <div key={key} style={{ width, }} className={scss.content}>
+                    <div key={key} style={{ width, flex }} className={scss.content}>
                       {!readOlny
                         ? <span>{value as string}</span>
                         : <InputSel
@@ -178,23 +133,18 @@ export default function ReportTable(
 
 // type TclassKeys = keyof Class_dailyReportItem
 type TclassKeys = Extract<keyof Class_reportItem,
-  "periodOfDay" | "customerName" | "contactName" |
-  "install" | "powerDelivery" | "repair" | "maintenance" | "inspection" |
-  "description" | "workingTypes"
+  "periodOfDay" | "customerName" | "contactName" | "description"
+  | "meals"
 >
 
 const headerKeyArr: (TclassKeys)[] = [
-  "periodOfDay", "customerName", "contactName", "workingTypes", "description",
+  "periodOfDay", "customerName", "contactName", "description", "meals",
 ]
 // const bodyKeyArr: TclassKeys[] = [
 const bodyKeyArr: (TclassKeys)[] = [
-  "periodOfDay", "customerName", "contactName",
-  "install", "powerDelivery", "repair", "maintenance", "inspection",
-  "description",
+  "periodOfDay", "customerName", "contactName", "description",
+  "meals",
 ]
-const workingTypesKeyArr = [
-  "install", "powerDelivery", "repair", "maintenance", "inspection",
-] as const
 
 type Tconfig = {
   [key in (TclassKeys)]?: {
@@ -218,40 +168,14 @@ const config: Tconfig = {
     label: "接洽人",
     width: "147px",
   },
-  workingTypes: {
-    label: "工作項目",
-    width: "auto",
-    // position: "center",
-    color: "main"
-  },
-
-
-  install: {
-    label: "安裝",
-    width: "50px",
-  },
-  powerDelivery: {
-    label: "送電",
-    width: "50px",
-  },
-  repair: {
-    label: "維修",
-    width: "50px",
-  },
-  maintenance: {
-    label: "保養",
-    width: "50px",
-  },
-  inspection: {
-    label: "現勘",
-    width: "50px",
-  },
-
-
   description: {
     label: "工作內容",
     width: "auto",
-    flex: "auto"
+    flex: "auto",
+  },
+  meals: {
+    label: "餐費",
+    width: "104px",
   },
 }
 

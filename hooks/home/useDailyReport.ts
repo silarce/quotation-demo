@@ -52,6 +52,10 @@ class Class_reportItem {
   private _powerDelivery
   private _maintenance
   private _inspection
+  // 後端還沒有這個property
+  private _meals = "888"
+  // 
+
 
 
   get id() {
@@ -128,7 +132,6 @@ class Class_reportItem {
     this._reRender()
   }
 
-
   get description() {
     return this._item.description
   }
@@ -136,6 +139,11 @@ class Class_reportItem {
     this._item.description = v
     this._reRender()
   }
+
+  // 後端還沒有這個property
+  get meals() { return this._meals }
+  set meals(v) { this._meals = v; this._reRender() }
+  // 
 
   get postBody(): TcreateDailyReportItemDto {
 
