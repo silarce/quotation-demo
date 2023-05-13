@@ -90,7 +90,7 @@ export default function ReportTable(
                   key === "description" ||
                   key === "customerName" ||
                   key === "contactName" ||
-                  key === "meals"
+                  key === "mealsCost"
                 ) {
                   return (
                     <div key={key} style={{ width, flex }} className={scss.content}>
@@ -134,16 +134,16 @@ export default function ReportTable(
 // type TclassKeys = keyof Class_dailyReportItem
 type TclassKeys = Extract<keyof Class_reportItem,
   "periodOfDay" | "customerName" | "contactName" | "description"
-  | "meals"
+  | "mealsCost"
 >
 
 const headerKeyArr: (TclassKeys)[] = [
-  "periodOfDay", "customerName", "contactName", "description", "meals",
+  "periodOfDay", "customerName", "contactName", "description", "mealsCost",
 ]
 // const bodyKeyArr: TclassKeys[] = [
 const bodyKeyArr: (TclassKeys)[] = [
   "periodOfDay", "customerName", "contactName", "description",
-  "meals",
+  "mealsCost",
 ]
 
 type Tconfig = {
@@ -173,7 +173,7 @@ const config: Tconfig = {
     width: "auto",
     flex: "auto",
   },
-  meals: {
+  mealsCost: {
     label: "餐費",
     width: "104px",
   },

@@ -30,16 +30,17 @@ import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
 import {
   TcreateDailyReportItemDto, TdailyReportDto,
   useApiDailyReports,
-  useApiDailyReports_Reporters,
-  useApiDailyReports_isReporters_me,
+  // useApiDailyReports_Reporters,
+  // useApiDailyReports_isReporters_me,
   useApiDailyReports_my,
   useApiDailyReports_id,
   useApiDailyReports_reviewers,
-  apiPatchDailyReports_Reporters,
+  // apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
   apiDailyReports_my,
+  apiPatchDailyReports_viewers,
 } from "js/api/api_dailyReport"
 
 import {
@@ -93,18 +94,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // const today = moment().format("YYYY-MM-DD");
   const thisMonth = moment().format("YYYY-MM");
 
-  // 取得所有回報人員
-  const {
-    dailyReports_ReportersArr,
-    updateDailyReports_ReportersArr
-  } = useApiDailyReports_Reporters()
+  // // 取得所有回報人員
+  // const {
+  //   dailyReports_ReportersArr,
+  //   updateDailyReports_ReportersArr
+  // } = useApiDailyReports_Reporters()
 
   // 檢查自己是不是回報人員
-  const {
-    dailyReports_isReporters_me,
-    updateDailyReports_isReporters_me: updateIsReporter
-  } = useApiDailyReports_isReporters_me()
-  const isReporter = dailyReports_isReporters_me?.isReporter
+  // const {
+  //   dailyReports_isReporters_me,
+  //   updateDailyReports_isReporters_me: updateIsReporter
+  // } = useApiDailyReports_isReporters_me()
+  // const isReporter = dailyReports_isReporters_me?.isReporter
 
   // 取得指定月份所有日報表
   const {
@@ -227,41 +228,40 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   // ----------------------------------------------------------------------
-  // 回報人員設定
+  // 審核人員設定
   // SetReportEmpModal
-
   const reportEmpArr = useMemo(() => {
-    return formatReporterArr({
-      dailyReports_ReportersArr,
+    return formatRiewerPickArr({
+      dailyReports_ReportersArr: reviewersArr,
       employeeArr
     })
-  }, [dailyReports_ReportersArr, employeeArr,])
+  }, [reviewersArr, employeeArr,])
 
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   //**開啟回報人員設定面板 */
-  const editReportEmpArr = async () => {
+  const editRivewerPickArr = async () => {
     const allArr = [
-      updateDailyReports_ReportersArr(), // 取得所有回報人員
+      updateReviewerssArr(), // 取得所有回報人員
       updateEmployeeArr() // 取得所有人員
     ]
     await Promise.all(allArr)
     setReportEmpArr_preEdit(reportEmpArr)
   }
-  /**發出設定回報人員apiReq */
-  const reqApiPatchDailyReports_Reporters = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+  /**發出設定審核人員apiReq */
+  const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
     const employeeIds: string[] = []
     employeeArr.forEach((employee) => {
       if (employee.shouldReport) employeeIds.push(employee.id)
     })
     try {
       showRootLoading(true)
-      await apiPatchDailyReports_Reporters({ employeeIds })
+      await apiPatchDailyReports_viewers({ employeeIds })
       cancelSetReportEmpModal()
       myAlert.success({ title: "更新回報人員成功" })
       try {
         await Promise.all([
           updateDailyReports_withLoading(),
-          updateDailyReports_ReportersArr(),
+          updateReviewerssArr(),
         ])
       }
       catch { myAlert.err({ title: "日報表或回報人員取得失敗" }) }
@@ -294,17 +294,24 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
   /**發出更新日報表請求 */
   const reqApiPatchDailyReports_my = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+
     const employeeIds: string[] = []
     employeeArr.forEach((employee) => {
       if (employee.shouldReport) employeeIds.push(employee.id)
     })
     if (!reportInEdit) return
-    if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
-    const date = new Date(reportInEdit.date)
+    
     const items = reportInEdit.items.map((item) => item.postBody)
     try {
       showRootLoading(true)
-      await apiPatchDailyReports_my({ date, items })
+      // await apiPatchDailyReports_my({ date, items })
+      await apiPatchDailyReports_my({
+        date: reportInEdit.date,
+        body: {
+          reviewerIds: employeeIds,
+          items
+        }
+      })
       cancelEditNewDailyReport()
       myAlert.success({ title: "更新日報表完成" })
       await updateDailyReports_withLoading()
@@ -338,7 +345,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     {
       type: "myButton",
       label: "審核人員設定",
-      onClick: editReportEmpArr
+      onClick: editRivewerPickArr
     }
   ]
 
@@ -473,12 +480,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           customeLeft={customeLeft}
         />
 
-        {/* {!reportInEdit &&
+        {!reportInEdit &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
-        } */}
+        }
 
         {reportInEdit &&
           <ReportTable
@@ -495,7 +502,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
       <SetReportEmpModal
         visible={!!reportEmpArr_preEdit}
-        onConfirm={reqApiPatchDailyReports_Reporters}
+        onConfirm={reqApiPatchDailyReports_viewers}
         onCancel={cancelSetReportEmpModal}
         dataArr={reportEmpArr_preEdit ?? []}
         label="審核人員設定"
@@ -567,7 +574,7 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
 // ==========================================================================
 
 /** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatReporterArr = (
+const formatRiewerPickArr = (
   { dailyReports_ReportersArr,
     employeeArr }:
     {
@@ -667,5 +674,17 @@ api更新後
   前者我直有做一次的經驗，應該會需要幾個小時研究
 2.審核人員設定與選擇審核人員的資料要改成點了按鈕才取得資料
  */
+
+
+
+
+// 前一版要設定那些人要回報
+// 這一版要改成設定哪些是審核人員
+
+// 審核人員可以看到所有日報表
+// 非審核人員只能看到自己的日報表
+
+
+
 
 

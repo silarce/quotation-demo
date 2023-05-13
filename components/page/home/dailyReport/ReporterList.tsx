@@ -16,7 +16,7 @@ import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standa
 import scss from "./reporterList.module.scss"
 
 // type
-import { TdailyReportDto_simple } from "js/api/api_dailyReport"
+import { TdailyReportDto } from "js/api/api_dailyReport"
 import { Ttag } from "pages/home/dailyReport"
 
 
@@ -26,19 +26,16 @@ export default function ReporterList(
     addTag,
   }:
     {
-      dailyReportArr: TdailyReportDto_simple[]
+      dailyReportArr: TdailyReportDto[]
       addTag: (employee: Ttag) => void
     }
 ) {
-
-  const [reviewerArr, setReviewerArr] = useState(fakeReviewerArr)
-
 
   return (
     <div className={scss.container}>
       {dailyReportArr.map((report, index) => {
 
-        const { date, employee, id: reportId } = report
+        const { date, employee, id: reportId, reviewedByEmployee } = report
         const { chName, id: employeeId } = employee
         const chDate = yearConversion_standardToCh(date, true)
 
@@ -56,13 +53,16 @@ export default function ReporterList(
             <div className={classNames("w-[95px]")}><span>{chDate}</span></div>
             <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
             <div className={classNames(scss.reviewerList, "w-full")}>
-              {reviewerArr.map((item, index) => {
-                const { statu, name } = item
+
+              {reviewedByEmployee.map((item, index) => {
+                const { chName } = item
                 return (
                   <StatuBtn key={index}
-                    statu={statu} name={name} />
+                    statu={false} name={chName} />
                 )
               })}
+
+
             </div>
           </CellWithBar>
         )
@@ -91,15 +91,6 @@ const StatuBtn = (
 
 // ==========================================================================
 
-const fakeReviewerArr = [
-  { statu: true, name: "李冠華" },
-  { statu: true, name: "李冠華" },
-  { statu: false, name: "李冠華" },
-  { statu: false, name: "李冠華" },
-  { statu: true, name: "李冠華" },
-  { statu: false, name: "李冠華" },
-  { statu: true, name: "李冠華" },
-]
 
 
 

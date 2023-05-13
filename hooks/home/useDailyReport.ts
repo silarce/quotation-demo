@@ -24,7 +24,7 @@ const emptyReportItem: TdailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  workingTypes: [],
+  mealsCost: "",
   description: "",
 }
 
@@ -38,23 +38,11 @@ class Class_reportItem {
     this._reRender = reRender
     this._item = reportItem
 
-    this._install = this._item.workingTypes.includes("install")
-    this._repair = this._item.workingTypes.includes("repair")
-    this._powerDelivery = this._item.workingTypes.includes("power-delivery")
-    this._maintenance = this._item.workingTypes.includes("maintenance")
-    this._inspection = this._item.workingTypes.includes("inspection")
+
 
   } // constructor
   private _reRender
   private _item
-  private _install
-  private _repair
-  private _powerDelivery
-  private _maintenance
-  private _inspection
-  // 後端還沒有這個property
-  private _meals = ""
-  // 
 
 
 
@@ -95,42 +83,9 @@ class Class_reportItem {
   //   this._reRender()
   // }
 
-  get workingTypes() {
-    return this._item.workingTypes
-  }
-  // set workingTypes(v: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]) {
-  //   this._item.workingTypes = v
-  //   this._reRender()
-  // }
-  get install() { return this._install }
-  set install(v: boolean) {
-    this._install = v
-    this._reRender()
-  }
 
-  get repair() { return this._repair }
-  set repair(v: boolean) {
-    this._repair = v
-    this._reRender()
-  }
-
-  get powerDelivery() { return this._powerDelivery }
-  set powerDelivery(v: boolean) {
-    this._powerDelivery = v
-    this._reRender()
-  }
-
-  get maintenance() { return this._maintenance }
-  set maintenance(v: boolean) {
-    this._maintenance = v
-    this._reRender()
-  }
-
-  get inspection() { return this._inspection }
-  set inspection(v: boolean) {
-    this._inspection = v
-    this._reRender()
-  }
+  get mealsCost() { return this._item.mealsCost }
+  set mealsCost(v) { this._item.mealsCost = v; this._reRender() }
 
   get description() {
     return this._item.description
@@ -140,28 +95,14 @@ class Class_reportItem {
     this._reRender()
   }
 
-  // 後端還沒有這個property
-  get meals() { return this._meals }
-  set meals(v) { this._meals = v; this._reRender() }
-  // 
-
   get postBody(): TcreateDailyReportItemDto {
-
-    const workingTypes: TcreateDailyReportItemDto["workingTypes"] = []
-    if (this.install) workingTypes.push("install")
-    if (this.repair) workingTypes.push("repair")
-    if (this.powerDelivery) workingTypes.push("power-delivery")
-    if (this.maintenance) workingTypes.push("maintenance")
-    if (this.inspection) workingTypes.push("inspection")
-
     return {
       periodOfDay: this.periodOfDay,
       customerName: this.customerName,
       contactName: this.contactName,
+      mealsCost: this.mealsCost,
       description: this.description,
-      workingTypes
     }
-
   }
 
 } // Class_dailyReportItem
