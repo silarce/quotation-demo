@@ -41,6 +41,8 @@ import {
   apiDailyReports_review,
   apiDailyReports_my,
   apiPatchDailyReports_reviewers,
+
+  apiPatchDailyReports_my_test
 } from "js/api/api_dailyReport"
 
 import {
@@ -111,7 +113,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const {
     dailyReport,
     updateDailyReports,
-  } = useApiDailyReports(thisMonth)
+  } = useApiDailyReports()
   const sortedDailyReport = useMemo(() => {
     return _.sortBy(dailyReport, "date").reverse()
   }, [dailyReport])
@@ -195,9 +197,13 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   const editReport_today = async () => {
+
+// await apiPatchDailyReports_my_test()
+
     const dailyReport = await reqApiDailyReports_my()
     if (!dailyReport) return
     reNew_report({ dailyReport })
+
   }
 
   const cancelEditNewDailyReport = () => {
