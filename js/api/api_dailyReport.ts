@@ -30,7 +30,15 @@ type TgetDailyReports = {
 /**month格式為yyyy-MM 例:2022-02 */
 const apiDailyReports = () => {
   const api = `/daily-reports`
-  return axi.get(api)
+  const params = {
+    populate: [
+      "employee", "reviewers", "reviewedByEmployee",
+      // "items",
+    ]
+  }
+
+
+  return axi.get(api, { params })
     .then(({ data }) => data as TgetDailyReports)
     .catch(err => Promise.reject(err))
 }
@@ -166,39 +174,10 @@ export const apiPatchDailyReports_reviewers = (body: { employeeIds: string[] }) 
 }
 
 
-
-// 更新自己的指定日期的日報表
-export const apiPatchDailyReports_my_test = (
-  // { date, body }:
-  //   {
-  //     /**YYYY-MM-DD */
-  //     date: string
-  //     body: {
-  //       reviewerIds: string[]
-  //       items: TcreateDailyReportItemDto[]
-  //     }
-  //   }
-) => {
-
-  const date = "2023-05-13"
-  const body = {
-    reviewerIds: ["3480f17e-07d8-42b1-ad52-cfb0de9c6049"],
-    items: [
-      {
-        periodOfDay: "AM",
-        customerName: "aaa",
-        contactName: "aaa",
-        mealsCost: "999",
-        description: "aaa",
-      }
-    ]
-  }
-
-
-  const api = `/daily-reports/my?date=${date}`
-  return axi.patch(api, body)
-    .then(({ data }) => data)
+/**確認使用者是否為審核人員 */
+export const apiIsReviewer = () => {
+  const api = "/daily-reports/is-reviewer/me"
+  return axi.get(api)
+    .then(({ data }) => data as { isReviewer: boolean })
     .catch(err => Promise.reject(err))
 }
-
-

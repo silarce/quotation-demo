@@ -41,8 +41,6 @@ import {
   apiDailyReports_review,
   apiDailyReports_my,
   apiPatchDailyReports_reviewers,
-
-  apiPatchDailyReports_my_test
 } from "js/api/api_dailyReport"
 
 import {

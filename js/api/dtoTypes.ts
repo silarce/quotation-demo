@@ -208,7 +208,7 @@ export type TdailyReportDto = {
   employee: TemployeeDto
   /**審核者的id arr */
   reviewers: string[]
-  reviewedByEmployee: TemployeeDto[]
+  reviewedByEmployee?: TemployeeDto[]
   reportedAt: Date
   reviewedAt: Date
   items: TdailyReportItemDto[]
