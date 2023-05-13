@@ -484,12 +484,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           customeLeft={customeLeft}
         />
 
-        {/* {!reportInEdit &&
+        {!reportInEdit &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
-        } */}
+        }
 
         {reportInEdit &&
           <ReportTable

@@ -54,13 +54,13 @@ export default function ReporterList(
             <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
             <div className={classNames(scss.reviewerList, "w-full")}>
 
-              {reviewedByEmployee?.map((item, index) => {
+              {/* {reviewedByEmployee?.map((item, index) => {
                 const { chName } = item
                 return (
                   <StatuBtn key={index}
                     statu={false} name={chName} />
                 )
-              })}
+              })} */}
 
 
             </div>
