@@ -88,6 +88,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [tagArr, setTagArr] = useState<Ttag[]>([])
 
   // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // const today = moment().format("YYYY-MM-DD");
   const thisMonth = moment().format("YYYY-MM");
 
@@ -142,6 +144,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const employeeArr = employeeRes?.data
 
   // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   useEffect(() => {
 
     (async () => {
@@ -154,9 +158,11 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           // ]
           // await Promise.all(allArr)
         }
+
         if (isSubordinate) {
-          await updateIsReporter()  // 檢查自己是不是回報人員
+          // await updateIsReporter()  // 檢查自己是不是回報人員
         }
+
         await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
       }
       catch {
@@ -168,6 +174,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // 編輯中的日報表，送進ReportTable
   const {
@@ -452,7 +460,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     cancelEditNewDailyReport()
   }
   // ----------------------------------------------------------------------
-
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}
@@ -466,12 +473,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           customeLeft={customeLeft}
         />
 
-        {!reportInEdit &&
+        {/* {!reportInEdit &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
-        }
+        } */}
 
         {reportInEdit &&
           <ReportTable
