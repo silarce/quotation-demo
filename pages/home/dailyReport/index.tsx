@@ -78,7 +78,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // -----------------------------------------------------------
   // state
   // 送進 審核人員設定 SetReportEmpModal的arr
-  const [reportEmpArr_preEdit, setReportEmpArr_preEdit] =
+  const [reviewersPickArr, setReviewersPickArr] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
 
   // 送進 選擇審核人員 SetReportEmpModal的arr
@@ -127,7 +127,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   // 取得所有審核人員
-  const { reviewersArr, updateReviewerssArr } = useApiDailyReports_reviewers()
+  const { reviewersArr, updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
   // 取得自己指定日期的日報表
   // const {
@@ -230,22 +230,27 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // 審核人員設定
   // SetReportEmpModal
-  const reportEmpArr = useMemo(() => {
-    return formatRiewerPickArr({
-      dailyReports_ReportersArr: reviewersArr,
-      employeeArr
-    })
-  }, [reviewersArr, employeeArr,])
 
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   //**開啟回報人員設定面板 */
   const editRivewerPickArr = async () => {
-    const allArr = [
-      updateReviewerssArr(), // 取得所有回報人員
+
+    const resArr = await Promise.all([
+      updateReviewersArr(), // 取得所有回報人員
       updateEmployeeArr() // 取得所有人員
-    ]
-    await Promise.all(allArr)
-    setReportEmpArr_preEdit(reportEmpArr)
+    ])
+
+    const reviewersArr = resArr[0]
+    const employeeArr = resArr[1].data
+    const reviewersPickArr = formatRiewerPickArr(
+      {
+        dailyReports_ReportersArr: reviewersArr,
+        employeeArr
+      }
+    )
+
+    setReviewersPickArr(reviewersPickArr)
+
   }
   /**發出設定審核人員apiReq */
   const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
@@ -261,7 +266,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       try {
         await Promise.all([
           updateDailyReports_withLoading(),
-          updateReviewerssArr(),
+          updateReviewersArr(),
         ])
       }
       catch { myAlert.err({ title: "日報表或回報人員取得失敗" }) }
@@ -273,7 +278,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
   /**關閉回報人員設定面板 */
   const cancelSetReportEmpModal = () => {
-    setReportEmpArr_preEdit(undefined)
+    setReviewersPickArr(undefined)
   }
 
   // ----------------------------------------------------------------------
@@ -286,7 +291,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   //**開啟審核人員選擇面板 */
   const choseReviewerArr = async () => {
-    await updateReviewerssArr()
+    await updateReviewersArr()
     setreviewerArr_preEdit(reviewerArr)
   }
   const cancelReviewerArr = () => {
@@ -300,7 +305,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (employee.shouldReport) employeeIds.push(employee.id)
     })
     if (!reportInEdit) return
-    
+
     const items = reportInEdit.items.map((item) => item.postBody)
     try {
       showRootLoading(true)
@@ -499,12 +504,11 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         }
       </SubLayer>
 
-
       <SetReportEmpModal
-        visible={!!reportEmpArr_preEdit}
+        visible={!!reviewersPickArr}
         onConfirm={reqApiPatchDailyReports_viewers}
         onCancel={cancelSetReportEmpModal}
-        dataArr={reportEmpArr_preEdit ?? []}
+        dataArr={reviewersPickArr ?? []}
         label="審核人員設定"
         tip="可複選"
       />
