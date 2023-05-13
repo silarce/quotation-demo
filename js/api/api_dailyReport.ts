@@ -5,11 +5,13 @@ import { axi } from "./_axiosCreator";
 import _ from "lodash"
 
 
+
 import {
   TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
-  TemployeeDto, TdailyReportDto_simple,
-  TpageMetaDto
+  TdailyReportDto_simple,
+  TpageMetaDto,
+  TemployeeDto,
 } from "./dtoTypes"
 
 
@@ -175,4 +177,27 @@ export const apiDailyReports_review = (id: string) => {
     .catch(err => Promise.reject(err))
 }
 
+// 取得所有審核人員
+const apiDailyReports_reviewers = () => {
+  const api = "/daily-reports/reviewers"
+  return axi.get(api)
+    .then(({ data }) => data as TemployeeDto[])
+    .catch(err => Promise.reject(err))
+}
+
+export const useApiDailyReports_reviewers = () => {
+  let [data, setData] = useState<TemployeeDto[]>([])
+  const update = async () => {
+    const data = await apiDailyReports_reviewers()
+    if (data) setData(data)
+    return data
+  }
+  return {
+    /** 所有需回報的人員 */
+    reviewersArr: data,
+    setReviewersArr: setData,
+    /**更新所有需回報的人員 */
+    updateReviewerssArr: update
+  }
+}
 

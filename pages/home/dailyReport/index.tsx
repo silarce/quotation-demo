@@ -34,6 +34,7 @@ import {
   useApiDailyReports_isReporters_me,
   useApiDailyReports_my,
   useApiDailyReports_id,
+  useApiDailyReports_reviewers,
   apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
   apiDailyReports_id,
@@ -122,6 +123,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     finally { setIsLoading(false) }
   }
 
+  // 取得所有審核人員
+  const { reviewersArr, updateReviewerssArr } = useApiDailyReports_reviewers()
 
   // 取得自己指定日期的日報表
   // const {
@@ -145,30 +148,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       try {
         setIsLoading(true)
         if (!isSubordinate) {
-          const allArr = [
-            updateDailyReports_ReportersArr(), // 取得所有回報人員
-            // updateEmployeeArr() // 取得所有人員
-          ]
-          await Promise.all(allArr)
-          // await updateDailyReports_id() // 取得指定日報表
+          // const allArr = [
+          //   // updateDailyReports_ReportersArr(), // 取得所有回報人員
+          //   // updateEmployeeArr() // 取得所有人員
+          // ]
+          // await Promise.all(allArr)
         }
-
         if (isSubordinate) {
           await updateIsReporter()  // 檢查自己是不是回報人員
-          // await updateDailyReports_my() // 取得自己指定日期的日報表 //基本上就是當日
         }
         await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
-        // await apiDailyReports_id("8ffea857-f99d-4afc-90a6-b762b7073d93")
-
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // 原本只在上面的if (!isSubordinate)執行，現在暫時拿出來執行
-        await updateEmployeeArr() // 取得所有人員
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
       }
       catch {
         myAlert.err({ title: "取得初始資料失敗" })
@@ -234,7 +223,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // SetReportEmpModal
 
   const reportEmpArr = useMemo(() => {
-    return formatEmployeeArr({
+    return formatReporterArr({
       dailyReports_ReportersArr,
       employeeArr
     })
@@ -242,7 +231,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   //**開啟回報人員設定面板 */
-  const editReportEmpArr = () => {
+  const editReportEmpArr = async () => {
+    const allArr = [
+      updateDailyReports_ReportersArr(), // 取得所有回報人員
+      updateEmployeeArr() // 取得所有人員
+    ]
+    await Promise.all(allArr)
     setReportEmpArr_preEdit(reportEmpArr)
   }
   /**發出設定回報人員apiReq */
@@ -277,23 +271,25 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // 審核人員列表 
   // 等api好了之後要改
-
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
+  const reviewerArr = useMemo(() => {
+    return formatEmployeeArr({ employeeArr: reviewersArr })
+  }, [reviewersArr])
+
   //**開啟審核人員選擇面板 */
-
-  const empArr = useMemo(() => {
-    return formatEmployeeArr_Temp({ employeeArr })
-  }, [employeeArr])
-
-  const choseReviewerArr = () => {
-    setreviewerArr_preEdit(empArr)
+  const choseReviewerArr = async () => {
+    await updateReviewerssArr()
+    setreviewerArr_preEdit(reviewerArr)
   }
   const cancelReviewerArr = () => {
     setreviewerArr_preEdit(undefined)
   }
-
-  const reqApiPatchDailyReports_my = async () => {
-    cancelReviewerArr()
+  /**發出更新日報表請求 */
+  const reqApiPatchDailyReports_my = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+    const employeeIds: string[] = []
+    employeeArr.forEach((employee) => {
+      if (employee.shouldReport) employeeIds.push(employee.id)
+    })
     if (!reportInEdit) return
     if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
     const date = new Date(reportInEdit.date)
@@ -307,6 +303,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
     catch { myAlert.err({ title: "更新日報表失敗" }) }
     finally { showRootLoading(false) }
+    cancelReviewerArr()
   }
 
   // ----------------------------------------------------------------------
@@ -566,7 +563,7 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
 // ==========================================================================
 
 /** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatEmployeeArr = (
+const formatReporterArr = (
   { dailyReports_ReportersArr,
     employeeArr }:
     {
@@ -601,7 +598,7 @@ const formatEmployeeArr = (
 }
 
 /** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatEmployeeArr_Temp = (
+const formatEmployeeArr = (
   { employeeArr }:
     {
       employeeArr: TemployeeDto[] | undefined
@@ -648,13 +645,23 @@ const formatEmployeeArr_Temp = (
 待辦事項
 
 get /daily-reports 沒有提供reviewer的資料，目前是用假資料
+>>get /daily-reports/reviewers
 
 TdailyReportItemDto 目前沒有餐費property，所以目前只有可以打字的欄位
 但patch /daily-reports/my 時該欄位沒有用處
 
+
 上傳前的
 選擇審核人員因為沒有api提供哪些帳號是審核人員，所以現在也是先做一個樣子而已
 
+api更新後
+日報表總表的搜尋功能還記得要做
+
+等新的api出來後會做其他優化
+1.總表會改成分頁取得，滾輪滑到底後會自動取得下一頁然後接在底下
+  或是要做成分頁?
+  前者我直有做一次的經驗，應該會需要幾個小時研究
+2.審核人員設定與選擇審核人員的資料要改成點了按鈕才取得資料
  */
 
 
