@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import moment from "moment";
+import { AxiosError } from "axios";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -28,12 +29,13 @@ import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
 
 // api
 import {
-  TcreateDailyReportItemDto, TdailyReportDto,
+  // TcreateDailyReportItemDto,
+  // TdailyReportDto,
   useApiDailyReports,
   // useApiDailyReports_Reporters,
   // useApiDailyReports_isReporters_me,
-  useApiDailyReports_my,
-  useApiDailyReports_id,
+  // useApiDailyReports_my,
+  // useApiDailyReports_id,
   useApiDailyReports_reviewers,
   // apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
@@ -92,7 +94,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // const today = moment().format("YYYY-MM-DD");
-  const thisMonth = moment().format("YYYY-MM");
+  // const thisMonth = moment().format("YYYY-MM");
 
   // // 取得所有回報人員
   // const {
@@ -195,13 +197,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   const editReport_today = async () => {
-
-// await apiPatchDailyReports_my_test()
-
-    const dailyReport = await reqApiDailyReports_my()
-    if (!dailyReport) return
-    reNew_report({ dailyReport })
-
+    const res = await reqApiDailyReports_my()
+    if (res === "fail") return
+    else reNew_report({ dailyReport: res })
   }
 
   const cancelEditNewDailyReport = () => {
@@ -486,12 +484,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           customeLeft={customeLeft}
         />
 
-        {!reportInEdit &&
+        {/* {!reportInEdit &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
-        }
+        } */}
 
         {reportInEdit &&
           <ReportTable
@@ -546,15 +544,35 @@ const reqApiDailyReports_id = async (reportId: string) => {
   finally { showRootLoading(false) }
 }
 
-const reqApiDailyReports_my = async () => {
+const reqApiDailyReports_my = async (
+  param?: {
+    /**YYYY-MM-DD */
+    date?: string
+  }
+) => {
+
+  const date = (() => {
+    const today = moment().format("YYYY-MM-DD");
+    if (!param?.date) return today
+    else return moment(param.date).format("YYYY-MM-DD");
+  })()
+
   try {
     showRootLoading(true)
-    const today = moment().format("YYYY-MM-DD");
-    const res = await apiDailyReports_my(today)
+    const res = await apiDailyReports_my(date)
     return res
   }
-  catch {
+  catch (error) {
+    const err = error as AxiosError<{
+      error: string
+      message: string
+      statusCode: number
+    }>
+    const { message, statusCode } = err.response?.data ?? {}
+    // 
+    if (statusCode === 404) return
     myAlert.err({ title: "取得指定日期日報表失敗" })
+    return "fail"
   }
   finally { showRootLoading(false) }
 }
