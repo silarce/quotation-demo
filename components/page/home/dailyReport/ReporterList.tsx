@@ -1,7 +1,5 @@
 
-import { useState, useMemo } from "react"
-import Image from "next/image"
-import moment from 'moment'
+import { useState } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 
@@ -10,12 +8,6 @@ import { Badge } from "antd"
 
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
-// import MyButton from "components/global/gear/button/myButton"
-
-// img
-// import iconCircle from "public/image/icon/circle.svg"
-// import iconCircle_Checked from "public/image/icon/circle_checked.svg"
-// import iconRedDot from "public/image/icon/redDot.svg"
 
 // tool
 import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
@@ -32,28 +24,15 @@ export default function ReporterList(
   {
     dailyReportArr,
     addTag,
-    // editReportEmpArr,
-    // editDailyReport,
-    updateDailyReports
   }:
     {
       dailyReportArr: TdailyReportDto_simple[]
       addTag: (employee: Ttag) => void
-      // editReportEmpArr?: () => void
-      // editDailyReport?: () => void
-      updateDailyReports: () => void
     }
 ) {
 
   const [reviewerArr, setReviewerArr] = useState(fakeReviewerArr)
-  const switchStatu = (index: number) => {
-    setReviewerArr(arr => {
-      const newArr = [...arr]
-      newArr[index] = { ...newArr[index] }
-      newArr[index].statu = !newArr[index].statu
-      return newArr
-    })
-  }
+
 
   return (
     <div className={scss.container}>
@@ -80,7 +59,7 @@ export default function ReporterList(
               {reviewerArr.map((item, index) => {
                 const { statu, name } = item
                 return (
-                  <StatuBtn key={index} onClick={() => switchStatu(index)}
+                  <StatuBtn key={index}
                     statu={statu} name={name} />
                 )
               })}
@@ -95,19 +74,18 @@ export default function ReporterList(
 // ==========================================================================
 
 const StatuBtn = (
-  { statu, name, onClick }:
+  { statu, name }:
     {
       statu: boolean
       name: string
-      onClick?: () => void
     }
 ) => {
   const color = statu ? "green" : "red"
   return (
-    <button className={scss.statuBtn} onClick={(e) => { e.stopPropagation(); onClick?.() }}>
+    <div className={scss.statuBtn}>
       <Badge color={color} />
       <span>{name}</span>
-    </button>
+    </div>
   )
 }
 

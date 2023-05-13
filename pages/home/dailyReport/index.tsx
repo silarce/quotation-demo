@@ -469,10 +469,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         {!reportInEdit &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
-            // editReportEmpArr={isSubordinate ? undefined : editReportEmpArr}
-            // editDailyReport={isSubordinate ? editReport_today : undefined}
             addTag={addTag}
-            updateDailyReports={updateDailyReports_withLoading}
           />
         }
 
