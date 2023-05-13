@@ -218,9 +218,15 @@ export const useApiDailyReports_reviewers = () => {
 }
 
 /**設定審核人員 */
-export const apiPatchDailyReports_viewers = (body: { employeeIds: string[] }) => {
-  const api = "/daily-reports/viewers"
+export const apiPatchDailyReports_reviewers = (body: { employeeIds: string[] }) => {
+  const api = "/daily-reports/reviewers"
   return axi.patch(api, body)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
+
+
+
+
+
+
