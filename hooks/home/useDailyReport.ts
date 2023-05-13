@@ -24,7 +24,7 @@ const emptyReportItem: TdailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  mealsCost: "",
+  mealsCost: 0,
   description: "",
 }
 
@@ -37,13 +37,13 @@ class Class_reportItem {
   ) {
     this._reRender = reRender
     this._item = reportItem
-
+    this._mealsCost = `${this._item.mealsCost}`
 
 
   } // constructor
   private _reRender
   private _item
-
+  private _mealsCost
 
 
   get id() {
@@ -63,7 +63,6 @@ class Class_reportItem {
   }
   set customerName(v: string) {
     this._item.customerName = v
-    console.log("test")
     this._reRender()
   }
 
@@ -84,8 +83,8 @@ class Class_reportItem {
   // }
 
 
-  get mealsCost() { return this._item.mealsCost }
-  set mealsCost(v) { this._item.mealsCost = v; this._reRender() }
+  get mealsCost() { return this._mealsCost }
+  set mealsCost(v) { this._mealsCost = v; this._reRender() }
 
   get description() {
     return this._item.description
@@ -96,11 +95,12 @@ class Class_reportItem {
   }
 
   get postBody(): TcreateDailyReportItemDto {
+    const mealsCost = parseFloat(this.mealsCost) || 0
     return {
       periodOfDay: this.periodOfDay,
       customerName: this.customerName,
       contactName: this.contactName,
-      mealsCost: this.mealsCost,
+      mealsCost,
       description: this.description,
     }
   }

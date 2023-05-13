@@ -89,8 +89,7 @@ export default function ReportTable(
                 if (
                   key === "description" ||
                   key === "customerName" ||
-                  key === "contactName" ||
-                  key === "mealsCost"
+                  key === "contactName"
                 ) {
                   return (
                     <div key={key} style={{ width, flex }} className={scss.content}>
@@ -107,6 +106,29 @@ export default function ReportTable(
                   )
                 }
                 // -----
+                if (
+                  key === "mealsCost"
+                ) {
+                  return (
+                    <div key={key} style={{ width, flex }} className={scss.content}>
+                      {!readOlny
+                        ? <span>{value as string}</span>
+                        : <InputSel
+                          inputProps={{
+                            value: theClass[key] ?? "",
+                            onChange: (v) => { theClass[key] = v },
+                            className: scss.textarea,
+                            inputType: "number"
+                          }} />
+                      }
+                    </div>
+                  )
+                }
+                // -----
+
+
+
+
                 return null
               })}
             </div>

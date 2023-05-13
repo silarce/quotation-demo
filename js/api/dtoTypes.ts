@@ -196,7 +196,7 @@ export type TdailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: string
+  mealsCost: number
   description: string
 }
 
@@ -231,7 +231,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: string
+  mealsCost: number
   description: string
 }
 
