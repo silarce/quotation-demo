@@ -79,7 +79,7 @@ const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
 export const useEmployee = (params?: TapiGetEmployeeParams) => {
   let [data, setData] = useState<TgetEmployee>()
   const update = async () => {
-    const data = await apiGetEmployee(params)
+    const data = await apiGetEmployee(params) as TgetEmployee
     if (data) setData(data)
     return data
   }

@@ -196,7 +196,7 @@ export type TdailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  workingTypes: ("install" | "repair" | "power-delivery" | "maintenance" | "inspection")[]
+  mealsCost: number
   description: string
 }
 
@@ -206,7 +206,10 @@ export type TdailyReportDto = {
   // updatedAt: Date //date
   date: string // yyyy-MM-DD
   employee: TemployeeDto
-  reviewedByEmployee: TemployeeDto
+  /**審核者的id arr */
+  reviewers: string[]
+  reviewedByEmployee?: TemployeeDto[]
+  reportedAt: Date
   reviewedAt: Date
   items: TdailyReportItemDto[]
 }
@@ -228,7 +231,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  workingTypes: ("install" | "repair" | "power-delivery" | "maintenance" | "inspection")[]
+  mealsCost: number
   description: string
 }
 

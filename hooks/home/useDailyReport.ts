@@ -24,7 +24,7 @@ const emptyReportItem: TdailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  workingTypes: [],
+  mealsCost: 0,
   description: "",
 }
 
@@ -37,21 +37,13 @@ class Class_reportItem {
   ) {
     this._reRender = reRender
     this._item = reportItem
+    this._mealsCost = `${this._item.mealsCost}`
 
-    this._install = this._item.workingTypes.includes("install")
-    this._repair = this._item.workingTypes.includes("repair")
-    this._powerDelivery = this._item.workingTypes.includes("power-delivery")
-    this._maintenance = this._item.workingTypes.includes("maintenance")
-    this._inspection = this._item.workingTypes.includes("inspection")
 
   } // constructor
   private _reRender
   private _item
-  private _install
-  private _repair
-  private _powerDelivery
-  private _maintenance
-  private _inspection
+  private _mealsCost
 
 
   get id() {
@@ -71,7 +63,6 @@ class Class_reportItem {
   }
   set customerName(v: string) {
     this._item.customerName = v
-    console.log("test")
     this._reRender()
   }
 
@@ -91,43 +82,9 @@ class Class_reportItem {
   //   this._reRender()
   // }
 
-  get workingTypes() {
-    return this._item.workingTypes
-  }
-  // set workingTypes(v: ("install" | "repair" | "power-delivery" | "maintenace" | "inspection")[]) {
-  //   this._item.workingTypes = v
-  //   this._reRender()
-  // }
-  get install() { return this._install }
-  set install(v: boolean) {
-    this._install = v
-    this._reRender()
-  }
 
-  get repair() { return this._repair }
-  set repair(v: boolean) {
-    this._repair = v
-    this._reRender()
-  }
-
-  get powerDelivery() { return this._powerDelivery }
-  set powerDelivery(v: boolean) {
-    this._powerDelivery = v
-    this._reRender()
-  }
-
-  get maintenance() { return this._maintenance }
-  set maintenance(v: boolean) {
-    this._maintenance = v
-    this._reRender()
-  }
-
-  get inspection() { return this._inspection }
-  set inspection(v: boolean) {
-    this._inspection = v
-    this._reRender()
-  }
-
+  get mealsCost() { return this._mealsCost }
+  set mealsCost(v) { this._mealsCost = v; this._reRender() }
 
   get description() {
     return this._item.description
@@ -138,22 +95,14 @@ class Class_reportItem {
   }
 
   get postBody(): TcreateDailyReportItemDto {
-
-    const workingTypes: TcreateDailyReportItemDto["workingTypes"] = []
-    if (this.install) workingTypes.push("install")
-    if (this.repair) workingTypes.push("repair")
-    if (this.powerDelivery) workingTypes.push("power-delivery")
-    if (this.maintenance) workingTypes.push("maintenance")
-    if (this.inspection) workingTypes.push("inspection")
-
+    const mealsCost = parseFloat(this.mealsCost) || 0
     return {
       periodOfDay: this.periodOfDay,
       customerName: this.customerName,
       contactName: this.contactName,
+      mealsCost,
       description: this.description,
-      workingTypes
     }
-
   }
 
 } // Class_dailyReportItem
@@ -167,7 +116,8 @@ const useReport = () => {
   const reRender = () => setRender(state => ++state)
 
   const [report, setReport] = useState<ThookEmptyReport>()
-
+  const [reportTemp, setReportTemp] = useState<ThookEmptyReport>()
+  // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
     date: moment().format("yyyy-MM-DD"),
@@ -175,16 +125,14 @@ const useReport = () => {
     reviewedAt: undefined,
     isEdit: false
   })
-
+  // 
   const reNew_report = (
     { dailyReport }:
       {
         dailyReport?: TdailyReportDto,
       }
   ) => {
-    if (!dailyReport) {
-      return setReport(emptyReportCre())
-    }
+    if (!dailyReport) return setReport(emptyReportCre())
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
       date: dailyReport.date,
@@ -194,7 +142,7 @@ const useReport = () => {
     }
     setReport(theReport)
   }
-
+  // 
   const addReportItem = () => {
     setReport(report => {
       if (!report) return report
@@ -207,7 +155,7 @@ const useReport = () => {
       return { id, date, items, reviewedAt, isEdit }
     })
   }
-
+  // 
   const changeReviewToChecked = (reviewedAt: Date) => {
     setReport(report => {
       if (!report) return report
@@ -218,10 +166,18 @@ const useReport = () => {
       return { id, date, items, reviewedAt, isEdit }
     })
   }
-
+  // 
   const switchIsEdit = () => {
+    if (!report) return
+    if (!report.isEdit) setReportTemp(_.cloneDeep(report))
+    else {
+      setReport(_.cloneDeep(reportTemp))
+      setReportTemp(undefined)
+      return;
+    }
+
     setReport(report => {
-      if (!report) return report
+      if (!report) return
       const id = report.id
       const date = report.date
       const items = report.items
@@ -230,13 +186,12 @@ const useReport = () => {
       return { id, date, items, reviewedAt, isEdit }
     })
   }
-
-
+  // 
   const reportIsEdit = (() => {
     if (!report) return false
     return (report.reviewedAt || !report.isEdit) ? false : true
   })()
-
+  // 
   return {
     report, setReport, reNew_report,
     addReportItem, changeReviewToChecked, switchIsEdit,
