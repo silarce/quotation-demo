@@ -175,6 +175,21 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const res = await reqApiDailyReports_my()
     if (res === "fail") return
     else reNew_report({ dailyReport: res })
+
+    if (res && userInfo?.employee?.id) {
+      const tag = {
+        reportId: res.id,
+        employeeId: userInfo.employee.id,
+        name: userInfo.employee.chName,
+        date: res.date
+      }
+      if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
+      setTagArr(arr => {
+        const newArr = _.cloneDeep(arr);
+        newArr.push(tag);
+        return newArr
+      })
+    }
   }
 
   const cancelEditNewDailyReport = () => {
