@@ -168,13 +168,13 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const editReport = async (reportId: string) => {
     const dailyReport = await reqApiDailyReports_id(reportId)
     if (!dailyReport) return
-    reNew_report({ dailyReport })
+    reNew_report({ dailyReport, userInfo })
   }
 
   const editReport_today = async () => {
     const res = await reqApiDailyReports_my()
     if (res === "fail") return
-    else reNew_report({ dailyReport: res })
+    else reNew_report({ dailyReport: res, userInfo })
 
     if (res && userInfo?.employee?.id) {
       const tag = {
@@ -387,16 +387,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       custom: <CheckButton
         checkLabel="已讀"
         uncheckLable="未讀"
-        value={!!reportInEdit?.isReviewCompleted}
+        value={!!reportInEdit?.isReviewedByUser}
         onClick={async () => {
-          if (reportInEdit?.isReviewCompleted) {
+          if (reportInEdit?.isReviewedByUser) {
             return myAlert.warning({ title: "已審核過" })
           }
           if (!reportInEdit?.id) return;
           try {
             showRootLoading(true)
             const res = await apiDailyReports_review(reportInEdit.id)
-            changeReviewToChecked(res.isReviewCompleted)
+            changeReviewToChecked(!!res)
             showRootLoading(false)
             await updateDailyReports_withLoading()
           }
@@ -551,7 +551,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 const reqApiDailyReports_id = async (reportId: string) => {
   try {
     showRootLoading(true)
-    const res = await apiDailyReports_id(reportId, ["items"])
+    const res = await apiDailyReports_id(reportId)
     return res
   }
   catch {

@@ -3,7 +3,7 @@ import _ from "lodash"
 import moment from "moment";
 
 // type
-import { TdailyReportItemDto } from "js/api/dtoTypes";
+import { TdailyReportItemDto, TemployeeDto, TuserDto } from "js/api/dtoTypes";
 // api
 import {
   TcreateDailyReportItemDto, TdailyReportDto,
@@ -15,7 +15,7 @@ type ThookEmptyReport = {
   id: string | undefined
   date: string
   items: Class_reportItem[]
-  isReviewCompleted: boolean
+  isReviewedByUser: boolean
   isEdit: boolean
   employeeId: string | undefined
 }
@@ -123,15 +123,16 @@ const useReport = () => {
     id: undefined,
     date: moment().format("yyyy-MM-DD"),
     items: [new Class_reportItem(reRender)],
-    isReviewCompleted: false,
+    isReviewedByUser: false,
     isEdit: false,
     employeeId: undefined
   })
   // 
   const reNew_report = (
-    { dailyReport }:
+    { dailyReport, userInfo }:
       {
         dailyReport?: TdailyReportDto,
+        userInfo: TuserDto
       }
   ) => {
     if (!dailyReport) return setReport(emptyReportCre())
@@ -139,7 +140,12 @@ const useReport = () => {
       id: dailyReport.id,
       date: dailyReport.date,
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
-      isReviewCompleted: dailyReport.isReviewCompleted,
+      isReviewedByUser: dailyReport.reviewStatus.some((statu) => {
+        const employeeId = statu.reviewerEmployee.id
+        const reviewedAt = statu.reviewedAt
+        if (employeeId === userInfo.employee?.id) return !!reviewedAt
+        return false
+      }),
       isEdit: false,
       employeeId: dailyReport.employee?.id
     }
@@ -152,15 +158,15 @@ const useReport = () => {
       const id = report.id
       const date = report.date
       const items = report.items
-      const isReviewCompleted = report.isReviewCompleted
+      const isReviewedByUser = report.isReviewedByUser
       const isEdit = report.isEdit
       const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
-      return { id, date, items, isReviewCompleted, isEdit, employeeId }
+      return { id, date, items, isReviewedByUser, isEdit, employeeId }
     })
   }
   // 
-  const changeReviewToChecked = (isReviewCompleted: boolean) => {
+  const changeReviewToChecked = (isReviewedByUser: boolean) => {
     setReport(report => {
       if (!report) return report
       const id = report.id
@@ -168,7 +174,7 @@ const useReport = () => {
       const items = report.items
       const isEdit = report.isEdit
       const employeeId = report.employeeId
-      return { id, date, items, isReviewCompleted, isEdit, employeeId }
+      return { id, date, items, isReviewedByUser, isEdit, employeeId }
     })
   }
   // 
@@ -186,16 +192,16 @@ const useReport = () => {
       const id = report.id
       const date = report.date
       const items = report.items
-      const isReviewCompleted = report.isReviewCompleted
+      const isReviewedByUser = report.isReviewedByUser
       const isEdit = !report.isEdit
       const employeeId = report.employeeId
-      return { id, date, items, isReviewCompleted, isEdit, employeeId }
+      return { id, date, items, isReviewedByUser, isEdit, employeeId }
     })
   }
   // 
   const reportIsEdit = (() => {
     if (!report) return false
-    return (report.isReviewCompleted || !report.isEdit) ? false : true
+    return (report.isReviewedByUser || !report.isEdit) ? false : true
   })()
   // 
   return {
