@@ -141,7 +141,7 @@ const useReport = () => {
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       isReviewCompleted: dailyReport.isReviewCompleted,
       isEdit: false,
-      employeeId: dailyReport.employee.id
+      employeeId: dailyReport.employee?.id
     }
     setReport(theReport)
   }
