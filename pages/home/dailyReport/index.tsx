@@ -440,7 +440,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (identity === "reviewer") {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
-        if (!reportInEdit?.id || reportInEdit?.employeeId === userInfo?.employee?.id) {
+        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
           if (isReportEdit) return panelList_reporter_inEdit02
           return panelList_reporter_inEdit01
         }
