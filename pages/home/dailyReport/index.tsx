@@ -8,9 +8,6 @@ import { AxiosError } from "axios";
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
-// antd
-import { Badge } from 'antd';
-
 // component
 // import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
@@ -299,7 +296,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const items = reportInEdit.items.map((item) => item.postBody)
     try {
       showRootLoading(true)
-      // await apiPatchDailyReports_my({ date, items })
       await apiPatchDailyReports_my({
         date: reportInEdit.date,
         body: {
@@ -311,7 +307,20 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       myAlert.success({ title: "更新日報表完成" })
       await updateDailyReports_withLoading()
     }
-    catch { myAlert.err({ title: "更新日報表失敗" }) }
+    catch (error) {
+
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+      const { message, statusCode } = err.response?.data ?? {}
+
+      const isReviewed = message?.includes("has already reviewed")
+      if (isReviewed) return myAlert.warning({ title: "更新日報表失敗", content: "該日報表已被審核，不能再變更" })
+
+      myAlert.err({ title: "更新日報表失敗" })
+    }
     finally { showRootLoading(false) }
     cancelReviewerArr()
   }
