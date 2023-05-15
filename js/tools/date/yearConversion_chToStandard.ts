@@ -1,12 +1,15 @@
-import moment from 'moment';
+// import moment from 'moment';
 
 
 
 
 export const yearConversion_chToStandard = (
+  /** YYY-MM-DD */
   dateStringOri: string
 ) => {
-  if (!dateStringOri) return ""
+
+  const pattern = /^\d{3}-\d{2}-\d{2}$/
+  if (!pattern.test(dateStringOri)) return false
 
   const arr = dateStringOri.split("-")
   const year = (parseInt(arr[0]) + 1911).toString().padStart(4, "0")
