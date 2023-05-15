@@ -43,6 +43,7 @@ import {
   apiDailyReports_review,
   apiDailyReports_my,
   apiPatchDailyReports_reviewers,
+  apiIsReviewer,
 } from "js/api/api_dailyReport"
 
 import {
@@ -75,7 +76,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
   /**是否為回報人員權限 */
-  const isSubordinate = checkIsSubordinate(userInfo)
+
+  const [identity, setIdentity] = useState<"manager" | "reviewer" | "reporter">()
+
+  useEffect(() => {
+    (async () => {
+      const isSubordinate = checkIsSubordinate(userInfo)
+      if (!isSubordinate) return setIdentity("manager")
+      const isReviewer = await apiIsReviewer()
+      if (isReviewer.isReviewer) return setIdentity("reviewer")
+      return setIdentity("reporter")
+    })()
+  }, [userInfo])
 
   // -----------------------------------------------------------
   // state
@@ -131,17 +143,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // 取得所有審核人員
   const { reviewersArr, updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
-  // 取得自己指定日期的日報表
-  // const {
-  //   dailyReport_my,
-  //   updateDailyReports_my
-  // } = useApiDailyReports_my(today)
-  // 取得指定日報表
-  // const {
-  //   dailyReport_id,
-  //   updateDailyReports_id
-  // } = useApiDailyReports_id("ddd")
-  // 取得所有人員
   const { data: employeeRes, update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
@@ -150,30 +151,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   useEffect(() => {
-
     (async () => {
       try {
         setIsLoading(true)
-        if (!isSubordinate) {
-          // const allArr = [
-          //   // updateDailyReports_ReportersArr(), // 取得所有回報人員
-          //   // updateEmployeeArr() // 取得所有人員
-          // ]
-          // await Promise.all(allArr)
-        }
-
-        if (isSubordinate) {
-          // await updateIsReporter()  // 檢查自己是不是回報人員
-        }
-
         await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
       }
-      catch {
-        myAlert.err({ title: "取得初始資料失敗" })
-      }
+      catch { myAlert.err({ title: "取得總日報失敗" }) }
       finally { setIsLoading(false) }
     })()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -209,8 +194,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // TagCarousel
   const addTag = async (tag: Ttag) => {
-    if (isSubordinate) {
-      if (userInfo.employee?.id !== tag.employeeId) return myAlert.warning({ title: "只能編輯自己的日報表" })
+    if (identity === "reporter") {
+      if (userInfo.employee?.id !== tag.employeeId)
+        return myAlert.warning({ title: "只能編輯自己的日報表" })
     }
     await editReport(tag.reportId)
     if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
@@ -334,7 +320,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       { options: reviewOptions, width: "110px" },
       { placeholder: "搜尋日期", width: "150px" }
     ]
-    if (isSubordinate) arr.shift()
+    if (identity === "reporter") arr.shift()
     return arr
   })()
 
@@ -343,14 +329,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     doSearch
   }
 
-  // 
-  const panelList_reviewer_notInEdit: TpanelList = [
+  // --------------------
+  const panelList_manager_notInEdit: TpanelList = [
     { searchGroup },
     {
       type: "myButton",
       label: "審核人員設定",
       onClick: editRivewerPickArr
     }
+  ]
+
+  const panelList_reviewer_notInEdit: TpanelList = [
+    { searchGroup },
   ]
 
   const panelList_reporter_notInEdit: TpanelList = [
@@ -407,22 +397,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     {
       type: "redButton",
       label: "上傳",
-      onClick: async () => {
-        choseReviewerArr()
-        // if (!reportInEdit) return
-        // if (!isReporter) return myAlert.info({ title: "您不是需回報人員" })
-        // const date = new Date(reportInEdit.date)
-        // const items = reportInEdit.items.map((item) => item.postBody)
-        // try {
-        //   showRootLoading(true)
-        //   await apiPatchDailyReports_my({ date, items })
-        //   cancelEditNewDailyReport()
-        //   myAlert.success({ title: "更新日報表完成" })
-        //   await updateDailyReports_withLoading()
-        // }
-        // catch { myAlert.err({ title: "更新日報表失敗" }) }
-        // finally { showRootLoading(false) }
-      },
+      onClick: choseReviewerArr,
     },
     {
       type: "myButton",
@@ -441,11 +416,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
 
   const panelList = (() => {
-    if (!isSubordinate) {
+
+    if (identity === "manager") {
+      if (!reportInEdit) return panelList_manager_notInEdit
+      else return panelList_reviewer_inEdit
+    }
+
+    if (identity === "reviewer") {
       if (!reportInEdit) return panelList_reviewer_notInEdit
       else return panelList_reviewer_inEdit
     }
-    else {
+
+    if (identity === "reporter") {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
         if (reportInEdit.reviewedAt) return panelList_reporter_reviewed
@@ -453,6 +435,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         return panelList_reporter_inEdit01
       }
     }
+    return []
   })()
 
 
@@ -495,7 +478,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
-            isSubordinate={isSubordinate}
             reviewedAt={!!reportInEdit.reviewedAt}
             // isEdit={reportInEdit.isEdit} 
             isEdit={reportIsEdit}
@@ -678,13 +660,6 @@ const formatEmployeeArr = (
 /**
 待辦事項
 
-get /daily-reports 沒有提供reviewer的資料，目前是用假資料
->>get /daily-reports/reviewers
-
-TdailyReportItemDto 目前沒有餐費property，所以目前只有可以打字的欄位
-但patch /daily-reports/my 時該欄位沒有用處
-
-
 上傳前的
 選擇審核人員因為沒有api提供哪些帳號是審核人員，所以現在也是先做一個樣子而已
 
@@ -700,14 +675,25 @@ api更新後
 
 
 
+/**
+代辦事項 
 
-// 前一版要設定那些人要回報
-// 這一版要改成設定哪些是審核人員
+get /daily-reports
+的reviewedByEmployee給的是單一物件，而不是陣列，等後端把這個做好後才能顯示審核者列表
 
-// 審核人員可以看到所有日報表
-// 非審核人員只能看到自己的日報表
+當審核者無法看非屬自己的日報表(上一個版本做的設計)，要做修改
 
+審核者是否同時會是回報者?
 
+總表的搜尋功能還沒做
 
+三個等級
+LV14
+審核者
+回報者
 
+使用者為審核者時要隱藏 審核人員設定按鈕
+審核者不一定是LV14，PageHeader02的panelList的判斷規則要做修改
+可以用 get /daily-reports/is-reviewer/me判斷是否為審核者
 
+ */

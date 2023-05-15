@@ -25,14 +25,12 @@ import { Class_reportItem } from "pages/home/dailyReport"
 // ==================================================
 export default function ReportTable(
   { classDailyReportItemArr, addDailyReportItem,
-    isSubordinate,
     reviewedAt,
     isEdit,
   }:
     {
       classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
-      isSubordinate: boolean
       reviewedAt: boolean
       isEdit: boolean
     }
