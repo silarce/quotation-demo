@@ -9,14 +9,14 @@ import _ from "lodash"
 import {
   TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
-  TdailyReportDto_simple, TemployeeDto,
+  TemployeeDto,
   TpageMetaDto,
 
 
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportDto_simple }
+export type { TcreateDailyReportItemDto, TdailyReportDto }
 // =================================================================
 
 
@@ -33,7 +33,7 @@ const apiDailyReports = (filter?: { [key: string]: any }) => {
 
   const params = {
     populate: [
-      "employee", "reviewers", "reviewedByEmployee",
+      "employee", "reviewStatus.reviewerEmployee", "isReviewCompleted",
       // "items",
     ],
     filter
@@ -127,21 +127,12 @@ export const useApiDailyReports_id = (id: string) => {
   }
 }
 
-type TresReview = {
-  /**YYYY-MM-DD */
-  date: string
-  employeeId: string
-  id: string
-  reviewedAt: Date
-  reviewedByEmployee: { id: string }
-
-}
 
 // 審閱日報表
 export const apiDailyReports_review = (id: string) => {
   const api = `/daily-reports/${id}/review`
   return axi.post(api)
-    .then(({ data }) => data as TresReview)
+    .then(({ data }) => data as TdailyReportDto)
     .catch(err => Promise.reject(err))
 }
 

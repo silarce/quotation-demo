@@ -374,16 +374,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       custom: <CheckButton
         checkLabel="已讀"
         uncheckLable="未讀"
-        value={!!reportInEdit?.reviewedAt}
+        value={!!reportInEdit?.isReviewCompleted}
         onClick={async () => {
-          if (reportInEdit?.reviewedAt) {
+          if (reportInEdit?.isReviewCompleted) {
             return myAlert.warning({ title: "已審核過" })
           }
           if (!reportInEdit?.id) return;
           try {
             showRootLoading(true)
             const res = await apiDailyReports_review(reportInEdit.id)
-            changeReviewToChecked(res.reviewedAt)
+            changeReviewToChecked(res.isReviewCompleted)
             showRootLoading(false)
             await updateDailyReports_withLoading()
           }
@@ -445,7 +445,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (identity === "reporter") {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
-        if (reportInEdit.reviewedAt) return panelList_reporter_reviewed
+        if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
         if (reportIsEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
       }
@@ -493,7 +493,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
-            reviewedAt={!!reportInEdit.reviewedAt}
+            reviewedAt={!!reportInEdit.isReviewCompleted}
             // isEdit={reportInEdit.isEdit} 
             isEdit={reportIsEdit}
           />
@@ -693,13 +693,12 @@ get /daily-reports
 的reviewedByEmployee給的是單一物件，而不是陣列，等後端把這個做好後才能顯示審核者列表
 
 當審核者無法看非屬自己的日報表(上一個版本做的設計)，要做修改
+>>OK
 
 審核者是否同時會是回報者?
 
 總表的搜尋功能還沒做
-
-
-
+>> OK
 
 三個等級
 LV14

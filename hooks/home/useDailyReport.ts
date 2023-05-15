@@ -15,7 +15,7 @@ type ThookEmptyReport = {
   id: string | undefined
   date: string
   items: Class_reportItem[]
-  reviewedAt: Date | null | undefined
+  isReviewCompleted: boolean
   isEdit: boolean
 }
 
@@ -122,7 +122,7 @@ const useReport = () => {
     id: undefined,
     date: moment().format("yyyy-MM-DD"),
     items: [new Class_reportItem(reRender)],
-    reviewedAt: undefined,
+    isReviewCompleted: false,
     isEdit: false
   })
   // 
@@ -137,7 +137,7 @@ const useReport = () => {
       id: dailyReport.id,
       date: dailyReport.date,
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
-      reviewedAt: dailyReport.reviewedAt,
+      isReviewCompleted: dailyReport.isReviewCompleted,
       isEdit: false
     }
     setReport(theReport)
@@ -149,21 +149,21 @@ const useReport = () => {
       const id = report.id
       const date = report.date
       const items = report.items
-      const reviewedAt = report.reviewedAt
+      const isReviewCompleted = report.isReviewCompleted
       const isEdit = report.isEdit
       items.push(new Class_reportItem(reRender))
-      return { id, date, items, reviewedAt, isEdit }
+      return { id, date, items, isReviewCompleted, isEdit }
     })
   }
   // 
-  const changeReviewToChecked = (reviewedAt: Date) => {
+  const changeReviewToChecked = (isReviewCompleted: boolean) => {
     setReport(report => {
       if (!report) return report
       const id = report.id
       const date = report.date
       const items = report.items
       const isEdit = report.isEdit
-      return { id, date, items, reviewedAt, isEdit }
+      return { id, date, items, isReviewCompleted, isEdit }
     })
   }
   // 
@@ -181,15 +181,15 @@ const useReport = () => {
       const id = report.id
       const date = report.date
       const items = report.items
-      const reviewedAt = report.reviewedAt
+      const isReviewCompleted = report.isReviewCompleted
       const isEdit = !report.isEdit
-      return { id, date, items, reviewedAt, isEdit }
+      return { id, date, items, isReviewCompleted, isEdit }
     })
   }
   // 
   const reportIsEdit = (() => {
     if (!report) return false
-    return (report.reviewedAt || !report.isEdit) ? false : true
+    return (report.isReviewCompleted || !report.isEdit) ? false : true
   })()
   // 
   return {
