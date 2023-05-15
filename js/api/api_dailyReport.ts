@@ -28,25 +28,29 @@ type TgetDailyReports = {
 
 // 取得指定月份所有日報表
 /**month格式為yyyy-MM 例:2022-02 */
-const apiDailyReports = () => {
+const apiDailyReports = (filter?: { [key: string]: any }) => {
   const api = `/daily-reports`
+
   const params = {
     populate: [
       "employee", "reviewers", "reviewedByEmployee",
       // "items",
-    ]
+    ],
+    filter
   }
-
 
   return axi.get(api, { params })
     .then(({ data }) => data as TgetDailyReports)
     .catch(err => Promise.reject(err))
 }
+
 /**month格式為yyyy-MM 例:2022-02 */
-export const useApiDailyReports = () => {
-  let [res, setRes] = useState<TgetDailyReports>()
+export const useApiDailyReports = (
+  params?: { filter?: { [key: string]: any } }) => {
+
+  const [res, setRes] = useState<TgetDailyReports>()
   const update = async () => {
-    const data = await apiDailyReports()
+    const data = await apiDailyReports(params?.filter)
     if (data) setRes(data)
     return data
   }
@@ -55,7 +59,7 @@ export const useApiDailyReports = () => {
     dailyReport: res?.data,
     setDailyReports: setRes,
     /** 更新指定月份所有日報表*/
-    updateDailyReports: update
+    updateDailyReports: update,
   }
 }
 

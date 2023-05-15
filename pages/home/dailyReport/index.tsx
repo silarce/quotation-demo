@@ -27,6 +27,8 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 // hook
 import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
 
+import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
+
 // api
 import {
   // TcreateDailyReportItemDto,
@@ -53,7 +55,7 @@ import {
 
 // type
 import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
-import { TdoSearch } from "components/global/gear/HOC/searchBar/searchBar";
+import { TdoSearch, Toption } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
 import scss from "./dailyReport.module.scss"
@@ -63,20 +65,17 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 export { Class_reportItem }
 // =====================================================================
 
-const reviewOptions = [
-  { label: "全部", value: "" },
-  { label: "未審核", value: "viewed" },
-  { label: "已審核", value: "notViewed" },
+const reportedAtOptions = [
+  { label: "全部", value: "全部" },
+  { label: "未審核", value: "未審核" },
+  { label: "已審核", value: "已審核" },
 ]
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
-
-
-  /**是否為回報人員權限 */
-
+  /**權限 */
   const [identity, setIdentity] = useState<"manager" | "reviewer" | "reporter">()
 
   useEffect(() => {
@@ -108,27 +107,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // const today = moment().format("YYYY-MM-DD");
   // const thisMonth = moment().format("YYYY-MM");
 
-  // // 取得所有回報人員
-  // const {
-  //   dailyReports_ReportersArr,
-  //   updateDailyReports_ReportersArr
-  // } = useApiDailyReports_Reporters()
-
-  // 檢查自己是不是回報人員
-  // const {
-  //   dailyReports_isReporters_me,
-  //   updateDailyReports_isReporters_me: updateIsReporter
-  // } = useApiDailyReports_isReporters_me()
-  // const isReporter = dailyReports_isReporters_me?.isReporter
-
   // 取得指定月份所有日報表
+
+  const [params, setParams] = useState<{ filter?: { [key: string]: any } }>({ filter: undefined })
+
+
   const {
-    dailyReport,
-    updateDailyReports,
-  } = useApiDailyReports()
+    dailyReport, updateDailyReports, } = useApiDailyReports(params)
   const sortedDailyReport = useMemo(() => {
     return _.sortBy(dailyReport, "date").reverse()
   }, [dailyReport])
+
   /**取得指定月份所有日報表，額外做了loading的處理 */
   const updateDailyReports_withLoading = async () => {
     try {
@@ -139,6 +128,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     catch { myAlert.warning({ title: "取得總日報表失敗" }) }
     finally { setIsLoading(false) }
   }
+
 
   // 取得所有審核人員
   const { reviewersArr, updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
@@ -160,7 +150,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       finally { setIsLoading(false) }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [params])
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -314,15 +304,42 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  const doSearch: TdoSearch = (arr) => { console.log(arr) }
   const searchTargetList = (() => {
     const arr = [
-      { options: reviewOptions, width: "110px" },
+      { options: reportedAtOptions, width: "110px" },
       { placeholder: "搜尋日期", width: "150px" }
     ]
     if (identity === "reporter") arr.shift()
     return arr
   })()
+
+  const doSearch: TdoSearch = (arr) => {
+
+    const reviewedAtValue = (arr[0] as Toption).value
+    const reviewedAt = (() => {
+      if (reviewedAtValue === "全部") return undefined
+      if (reviewedAtValue === "未審核") return { $null: true }
+      if (reviewedAtValue === "已審核") return { $notNull: true }
+    })()
+
+    const date = (() => {
+      const theDate = arr[1] as string
+      if (!theDate) return undefined
+      const date = yearConversion_chToStandard(theDate)
+      if (!date) return "wrongDate"
+      return date
+    })()
+
+    if (date === "wrongDate")
+      return myAlert.warning({ title: "時間格式錯誤", content: "時間格式例:101-01-01" })
+
+    setParams({
+      filter: {
+        reviewedAt,
+        date: { $eq: date }
+      }
+    })
+  }
 
   const searchGroup = {
     searchTargetList,
@@ -351,8 +368,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       onClick: editReport_today
     }
   ]
-
-
 
   const panelList_reviewer_inEdit: TpanelList = [
     {
@@ -652,10 +667,6 @@ const formatEmployeeArr = (
 
 
 
-
-
-
-
 // ========================================================================
 /**
 待辦事項
@@ -687,6 +698,9 @@ get /daily-reports
 
 總表的搜尋功能還沒做
 
+
+
+
 三個等級
 LV14
 審核者
@@ -695,5 +709,6 @@ LV14
 使用者為審核者時要隱藏 審核人員設定按鈕
 審核者不一定是LV14，PageHeader02的panelList的判斷規則要做修改
 可以用 get /daily-reports/is-reviewer/me判斷是否為審核者
+>> OK
 
  */
