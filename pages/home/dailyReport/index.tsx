@@ -162,7 +162,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     reNew_report,
     addReportItem: addDailyReportItem,
     changeReviewToChecked, switchIsEdit,
-    reportIsEdit
+    reportIsEdit: isReportEdit
   } = useReport()
 
   const editReport = async (reportId: string) => {
@@ -347,6 +347,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   // --------------------
+  /**manager 審核人員設定 */
   const panelList_manager_notInEdit: TpanelList = [
     { searchGroup },
     {
@@ -356,10 +357,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
   ]
 
-  const panelList_reviewer_notInEdit: TpanelList = [
-    { searchGroup },
-  ]
-
+  /**reporter 今日回報 */
   const panelList_reporter_notInEdit: TpanelList = [
     { searchGroup },
     {
@@ -368,7 +366,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       onClick: editReport_today
     }
   ]
-
+  /**reviewer 已讀/未讀 */
   const panelList_reviewer_inEdit: TpanelList = [
     {
       custom: <CheckButton
@@ -394,13 +392,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
   ]
 
+  /**reporter 編輯 */
   const panelList_reporter_inEdit01: TpanelList = [
-    {
-      custom: <Badge
-        className={scss.antdBadge01}
-        color="auto"
-        text="未讀" />
-    },
+    // {
+    //   custom: <Badge
+    //     className={scss.antdBadge01}
+    //     color="auto"
+    //     text="未讀" />
+    // },
     {
       type: "myButton",
       label: "編輯",
@@ -408,6 +407,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
   ]
 
+  /**reporter 上傳 取消 */
   const panelList_reporter_inEdit02: TpanelList = [
     {
       type: "redButton",
@@ -421,14 +421,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
-  const panelList_reporter_reviewed: TpanelList = [
-    {
-      custom: <Badge
-        className={scss.antdBadge02}
-        color="auto"
-        text="總經理已閱讀" />
-    },
-  ]
+  // const panelList_reporter_reviewed: TpanelList = [
+  //   {
+  //     custom: <Badge
+  //       className={scss.antdBadge02}
+  //       color="auto"
+  //       text="總經理已閱讀" />
+  //   },
+  // ]
 
   const panelList = (() => {
 
@@ -438,15 +438,21 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
 
     if (identity === "reviewer") {
-      if (!reportInEdit) return panelList_reviewer_notInEdit
-      else return panelList_reviewer_inEdit
+      if (!reportInEdit) return panelList_reporter_notInEdit
+      else {
+        if (!reportInEdit?.id || reportInEdit?.employeeId === userInfo?.employee?.id) {
+          if (isReportEdit) return panelList_reporter_inEdit02
+          return panelList_reporter_inEdit01
+        }
+        else return panelList_reviewer_inEdit
+      }
     }
 
     if (identity === "reporter") {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
-        if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
-        if (reportIsEdit) return panelList_reporter_inEdit02
+        // if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
+        if (isReportEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
       }
     }
@@ -493,9 +499,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
-            reviewedAt={!!reportInEdit.isReviewCompleted}
-            // isEdit={reportInEdit.isEdit} 
-            isEdit={reportIsEdit}
+            isEdit={isReportEdit}
           />
         }
       </SubLayer>

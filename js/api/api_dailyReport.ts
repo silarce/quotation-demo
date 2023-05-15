@@ -107,7 +107,7 @@ export const apiPatchDailyReports_my = (
 // 取得指定日報表
 export const apiDailyReports_id = (id: string, populate?: "items"[]) => {
   const api = `/daily-reports/${id}`
-  const params = { populate }
+  const params = { populate:["items","employee"] }
   return axi.get(api, { params })
     .then(({ data }) => data as TdailyReportDto)
     .catch(err => Promise.reject(err))

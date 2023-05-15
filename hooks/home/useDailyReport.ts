@@ -17,6 +17,7 @@ type ThookEmptyReport = {
   items: Class_reportItem[]
   isReviewCompleted: boolean
   isEdit: boolean
+  employeeId: string | undefined
 }
 
 
@@ -123,7 +124,8 @@ const useReport = () => {
     date: moment().format("yyyy-MM-DD"),
     items: [new Class_reportItem(reRender)],
     isReviewCompleted: false,
-    isEdit: false
+    isEdit: false,
+    employeeId: undefined
   })
   // 
   const reNew_report = (
@@ -138,7 +140,8 @@ const useReport = () => {
       date: dailyReport.date,
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       isReviewCompleted: dailyReport.isReviewCompleted,
-      isEdit: false
+      isEdit: false,
+      employeeId: dailyReport.employee.id
     }
     setReport(theReport)
   }
@@ -151,8 +154,9 @@ const useReport = () => {
       const items = report.items
       const isReviewCompleted = report.isReviewCompleted
       const isEdit = report.isEdit
+      const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
-      return { id, date, items, isReviewCompleted, isEdit }
+      return { id, date, items, isReviewCompleted, isEdit, employeeId }
     })
   }
   // 
@@ -163,7 +167,8 @@ const useReport = () => {
       const date = report.date
       const items = report.items
       const isEdit = report.isEdit
-      return { id, date, items, isReviewCompleted, isEdit }
+      const employeeId = report.employeeId
+      return { id, date, items, isReviewCompleted, isEdit, employeeId }
     })
   }
   // 
@@ -183,7 +188,8 @@ const useReport = () => {
       const items = report.items
       const isReviewCompleted = report.isReviewCompleted
       const isEdit = !report.isEdit
-      return { id, date, items, isReviewCompleted, isEdit }
+      const employeeId = report.employeeId
+      return { id, date, items, isReviewCompleted, isEdit, employeeId }
     })
   }
   // 
