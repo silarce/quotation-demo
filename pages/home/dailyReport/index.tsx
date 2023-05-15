@@ -409,7 +409,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             showRootLoading(false)
             await updateDailyReports_withLoading()
           }
-          catch { myAlert.err({ title: "審核失敗" }) }
+          catch (error) {
+            const err = error as AxiosError<{
+              error: string
+              message: string
+              statusCode: number
+            }>
+            const { message, statusCode } = err.response?.data ?? {}
+
+            if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
+            myAlert.err({ title: "審核失敗" })
+          }
           finally { showRootLoading(false) }
         }}
       />
@@ -458,7 +468,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
-      else return panelList_reviewer_inEdit
+      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
+      else return []
     }
 
     if (identity === "reviewer") {
@@ -468,7 +479,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           if (isReportEdit) return panelList_reporter_inEdit02
           return panelList_reporter_inEdit01
         }
-        else return panelList_reviewer_inEdit
+        else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
+        return []
       }
     }
 
