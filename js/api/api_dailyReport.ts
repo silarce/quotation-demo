@@ -9,14 +9,14 @@ import _ from "lodash"
 import {
   TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
-  TdailyReportDto_simple, TemployeeDto,
+  TemployeeDto,
   TpageMetaDto,
 
 
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportDto_simple }
+export type { TcreateDailyReportItemDto, TdailyReportDto }
 // =================================================================
 
 
@@ -28,25 +28,29 @@ type TgetDailyReports = {
 
 // 取得指定月份所有日報表
 /**month格式為yyyy-MM 例:2022-02 */
-const apiDailyReports = () => {
+const apiDailyReports = (filter?: { [key: string]: any }) => {
   const api = `/daily-reports`
+
   const params = {
     populate: [
-      "employee", "reviewers", "reviewedByEmployee",
+      "employee", "reviewStatus.reviewerEmployee", "isReviewCompleted",
       // "items",
-    ]
+    ],
+    filter
   }
-
 
   return axi.get(api, { params })
     .then(({ data }) => data as TgetDailyReports)
     .catch(err => Promise.reject(err))
 }
+
 /**month格式為yyyy-MM 例:2022-02 */
-export const useApiDailyReports = () => {
-  let [res, setRes] = useState<TgetDailyReports>()
+export const useApiDailyReports = (
+  params?: { filter?: { [key: string]: any } }) => {
+
+  const [res, setRes] = useState<TgetDailyReports>()
   const update = async () => {
-    const data = await apiDailyReports()
+    const data = await apiDailyReports(params?.filter)
     if (data) setRes(data)
     return data
   }
@@ -55,7 +59,7 @@ export const useApiDailyReports = () => {
     dailyReport: res?.data,
     setDailyReports: setRes,
     /** 更新指定月份所有日報表*/
-    updateDailyReports: update
+    updateDailyReports: update,
   }
 }
 
@@ -101,9 +105,9 @@ export const apiPatchDailyReports_my = (
 }
 
 // 取得指定日報表
-export const apiDailyReports_id = (id: string, populate?: "items"[]) => {
+export const apiDailyReports_id = (id: string) => {
   const api = `/daily-reports/${id}`
-  const params = { populate }
+  const params = { populate: ["items", "employee", "reviewStatus.reviewerEmployee"] }
   return axi.get(api, { params })
     .then(({ data }) => data as TdailyReportDto)
     .catch(err => Promise.reject(err))
@@ -123,21 +127,12 @@ export const useApiDailyReports_id = (id: string) => {
   }
 }
 
-type TresReview = {
-  /**YYYY-MM-DD */
-  date: string
-  employeeId: string
-  id: string
-  reviewedAt: Date
-  reviewedByEmployee: { id: string }
-
-}
 
 // 審閱日報表
 export const apiDailyReports_review = (id: string) => {
   const api = `/daily-reports/${id}/review`
   return axi.post(api)
-    .then(({ data }) => data as TresReview)
+    .then(({ data }) => data as TdailyReportDto)
     .catch(err => Promise.reject(err))
 }
 

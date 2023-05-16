@@ -200,28 +200,25 @@ export type TdailyReportItemDto = {
   description: string
 }
 
+
 export type TdailyReportDto = {
   id: string
-  // createdAt: Date // date
-  // updatedAt: Date //date
+  createdAt: string // date
+  updatedAt: string //date
   date: string // yyyy-MM-DD
   employee: TemployeeDto
-  /**審核者的id arr */
-  reviewers: string[]
-  reviewedByEmployee?: TemployeeDto[]
+  reviewStatus: {
+    id: string
+    createdAt: string // date
+    updatedAt: string //date
+    reviewerEmployee: TemployeeDto
+    reviewedAt: string | null //date
+  }[]
+  isReviewCompleted: boolean
   reportedAt: Date
-  reviewedAt: Date
   items: TdailyReportItemDto[]
 }
-export type TdailyReportDto_simple = {
-  createdAt: Date // date
-  date: string // yyyy-MM-DD
-  employee: TemployeeDto
-  id: string
-  reportedAt: Date
-  reviewedAt: Date
-  updatedAt: Date //date
-}
+
 
 export type TsetReportersDto = {
   employeeIds: string[]

@@ -103,7 +103,7 @@ export default function SetReportEmpModal(
               <span>{idNumber}</span>
               <span>{chName}</span>
               <span>{job}</span>
-              <span>{grade}</span>
+              <span>LV {grade}</span>
             </CellWithBar>
           )
         })}

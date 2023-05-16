@@ -1,16 +1,8 @@
-import { useState } from "react"
-
-
-import Image from "next/image"
 import classNames from "classnames"
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
-import Checkbox01 from "components/global/gear/checkbox/checkbox01"
 import MyButton from "components/global/gear/button/myButton"
-
-// icon
-import iconCheck from "public/image/icon/check.svg"
 
 // css
 import scss from "./reportTable.module.scss"
@@ -25,13 +17,11 @@ import { Class_reportItem } from "pages/home/dailyReport"
 // ==================================================
 export default function ReportTable(
   { classDailyReportItemArr, addDailyReportItem,
-    reviewedAt,
     isEdit,
   }:
     {
       classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
-      reviewedAt: boolean
       isEdit: boolean
     }
 ) {
@@ -44,7 +34,6 @@ export default function ReportTable(
       <div className={classNames(scss.thead)}>
         {headerKeyArr.map(key => {
           const { label, width, flex } = config[key] ?? {}
-
           // 
           return (
             <div key={key} className={classNames()} style={{ width, flex }}>
@@ -81,8 +70,6 @@ export default function ReportTable(
                     </div>
                   )
                 }
-
-
                 // -----
                 if (
                   key === "description" ||
@@ -123,10 +110,6 @@ export default function ReportTable(
                   )
                 }
                 // -----
-
-
-
-
                 return null
               })}
             </div>
@@ -143,9 +126,7 @@ export default function ReportTable(
         }
         <div>
         </div>
-
       </div>
-
     </div>
   )
 }

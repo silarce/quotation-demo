@@ -35,7 +35,7 @@ export default function ReporterList(
     <div className={scss.container}>
       {dailyReportArr.map((report, index) => {
 
-        const { date, employee, id: reportId, reviewedByEmployee } = report
+        const { date, employee, id: reportId, reviewStatus } = report
         const { chName, id: employeeId } = employee
         const chDate = yearConversion_standardToCh(date, true)
 
@@ -54,15 +54,14 @@ export default function ReporterList(
             <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
             <div className={classNames(scss.reviewerList, "w-full")}>
 
-              {/* {reviewedByEmployee?.map((item, index) => {
-                const { chName } = item
+              {reviewStatus?.map((item, index) => {
+                const { reviewerEmployee, reviewedAt } = item
+                const { chName, } = reviewerEmployee
                 return (
                   <StatuBtn key={index}
-                    statu={false} name={chName} />
+                    statu={!!reviewedAt} name={chName} />
                 )
-              })} */}
-
-
+              })}
             </div>
           </CellWithBar>
         )
