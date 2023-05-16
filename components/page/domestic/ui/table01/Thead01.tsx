@@ -2,10 +2,11 @@
 
 
 // css
-import style from "../budgetList.module.scss"
+
+import style from "./thead01.module.scss"
 
 
-export default function Thead() {
+export default function Thead01() {
 
   return (
     <div className={style.thead}>

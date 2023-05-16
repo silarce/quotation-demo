@@ -13,10 +13,7 @@ export default function Other(
       payInfo: {
         tradingLocation: string
         tradingDate: string
-        deposit: string
-        deliveryPayment: string
-        installedPayment: string
-        eleConnectPayment: string
+        payWay: { label: string, value: string }[]
       }
       attn: string
     }
@@ -28,10 +25,11 @@ export default function Other(
   const {
     tradingLocation,
     tradingDate,
-    deposit,
-    deliveryPayment,
-    installedPayment,
-    eleConnectPayment,
+    payWay,
+    // deposit,
+    // deliveryPayment,
+    // installedPayment,
+    // eleConnectPayment,
   } = payInfo
 
   const [year, month, day] = tradingDate.split("-")
@@ -67,7 +65,17 @@ export default function Other(
         <div className={style.pay}>
           <h2>四、付款辦法 : </h2>
           <ol>
-            <li>
+            {payWay.map((way, index) => {
+              const { label, value } = way
+              return (
+                <li key={index}>
+                  <h2>{label}</h2>
+                  <h2>{value}</h2>
+                  <h2>%</h2>
+                </li>
+              )
+            })}
+            {/* <li>
               <h2>訂製同時付總金額</h2>
               <h2>{deposit}</h2>
               <h2>%</h2>
@@ -86,7 +94,7 @@ export default function Other(
               <h2>接電使用付總金額</h2>
               <h2>{eleConnectPayment}</h2>
               <h2>%</h2>
-            </li>
+            </li> */}
           </ol>
         </div>
 

@@ -196,29 +196,29 @@ export type TdailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  workingTypes: ("install" | "repair" | "power-delivery" | "maintenance" | "inspection")[]
+  mealsCost: number
   description: string
 }
 
+
 export type TdailyReportDto = {
   id: string
-  // createdAt: Date // date
-  // updatedAt: Date //date
+  createdAt: string // date
+  updatedAt: string //date
   date: string // yyyy-MM-DD
   employee: TemployeeDto
-  reviewedByEmployee: TemployeeDto
-  reviewedAt: Date
+  reviewStatus: {
+    id: string
+    createdAt: string // date
+    updatedAt: string //date
+    reviewerEmployee: TemployeeDto
+    reviewedAt: string | null //date
+  }[]
+  isReviewCompleted: boolean
+  reportedAt: Date
   items: TdailyReportItemDto[]
 }
-export type TdailyReportDto_simple = {
-  createdAt: Date // date
-  date: string // yyyy-MM-DD
-  employee: TemployeeDto
-  id: string
-  reportedAt: Date
-  reviewedAt: Date
-  updatedAt: Date //date
-}
+
 
 export type TsetReportersDto = {
   employeeIds: string[]
@@ -228,7 +228,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  workingTypes: ("install" | "repair" | "power-delivery" | "maintenance" | "inspection")[]
+  mealsCost: number
   description: string
 }
 

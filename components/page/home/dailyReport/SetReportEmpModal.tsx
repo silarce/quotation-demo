@@ -25,6 +25,8 @@ export default function SetReportEmpModal(
     onCancel,
     // onSearch,
     dataArr,
+    label,
+    tip,
   }:
     {
       visible: boolean
@@ -33,6 +35,8 @@ export default function SetReportEmpModal(
       // onSearch: (v: string) => void
       /**會經過cloneDeep處理 */
       dataArr: TsetReportEmpModalData[]
+      label?: string
+      tip?: string
     }
 ) {
 
@@ -56,12 +60,13 @@ export default function SetReportEmpModal(
   return (
     <ModalListSelectorWithSearch
       className={scss.antdModal}
-      label="回報人員設定"
+      label={label ?? ""}
       visible={visible}
       onConfirm={() => onConfirm(theDataArr)}
       onCancel={onCancel}
       onSearch={onSearch}
       width="800px"
+      tip={tip}
     >
       <div className={scss.body}>
         {theDataArr.map((data, index) => {
@@ -90,20 +95,6 @@ export default function SetReportEmpModal(
               return null;
             }
           }
-
-          // 都做好後研究為什麼這樣寫newArr不更新
-          // const onClick = () => {
-          //   // arr[index].shouldReport = !arr[index].shouldReport
-          //   setTheDataArr((arr) => {
-          //     const newArr = [...arr]
-          //     newArr[index].shouldReport = !newArr[index].shouldReport
-          //     console.log("after", newArr[index].shouldReport) 
-          //     console.log(newArr[index])
-          //     return newArr
-          //   })
-          //   // arr[index].shouldReport = !arr[index].shouldReport
-          //   // reRender()
-          // }
           return (
             <CellWithBar key={index} className={scss.row}
               isActive={shouldReport}
@@ -112,7 +103,7 @@ export default function SetReportEmpModal(
               <span>{idNumber}</span>
               <span>{chName}</span>
               <span>{job}</span>
-              <span>{grade}</span>
+              <span>LV {grade}</span>
             </CellWithBar>
           )
         })}

@@ -1,0 +1,45 @@
+@use "styles/theme01" as *;
+
+.container {
+  height: 100%;
+  padding: 3px;
+  overflow: auto;
+  scroll-behavior: smooth;
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 27px;
+  padding: 26px;
+  border-bottom: solid 1px black;
+  cursor: pointer;
+  &:nth-last-of-type(1) {
+    border: none;
+  }
+  > div {
+    span {
+      font-size: 16px;
+      font-weight: 400;
+    }
+    &.chName span {
+      color: $colorMain;
+    }
+    &.reviewerList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 27px;
+      width: 100%;
+    }
+  }
+}
+
+.statuBtn {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  place-content: center;
+  padding: 6px 16px 6px 13px;
+  background-color: $bgc01;
+  border-radius: 17px;
+}
