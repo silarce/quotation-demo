@@ -100,6 +100,7 @@ export type TcustomerDto = {
     updateAt: string
     name: "construction" | "firm" | "propertyOwner" | "contractor"
   }[]
+  legacyContracts?: TlegacyContractDto[]
 }
 
 type TcustomerDtoPopulateArr = (keyof Pick<TcustomerDto, "types" | "contacts">)[]
@@ -237,12 +238,269 @@ export type TupdateDailyReportDto = {
   items: TcreateDailyReportItemDto[]
 }
 
+// =======================================================
+
+/**付款辦法 */
+export type TpaymentMethodDto = {
+  /**付款階段(里程碑) */
+  milestone: string
+  /**總付款比例(0.0 - 1.0) */
+  totalPaymentRatio: string
+}
+
+/**舊合約產品 */
+export type TlegacyConatractProductDto = {
+  id: string
+  /**date */
+  createdAt: string
+  /**date */
+  updatedAt: string
+  /**編號 */
+  idNumber: number
+  /**項目名 */
+  itemName: string
+  /**報價別 */
+  quoteType: string
+  /**門型 */
+  doorType: string
+  /**L(m) */
+  length: number
+  /**W(m) */
+  width: number
+  /**h(m) */
+  height: number
+  /**B(m) */
+  thickness: number
+  /**面積 */
+  area: string
+  /**才數 */
+  volume: string
+  /**材質 */
+  material: string
+  /**表面 */
+  surface: string
+  /**門軌 */
+  doorTrack: string
+  /**馬力 */
+  horsepower: string
+  /**數量 */
+  quantity: number
+  /**單價 */
+  unitPrice: number
+  /**複價 */
+  totalPrice: number
+  /**防颱 */
+  typhoonProtection: boolean
+  /**彈射門 */
+  bounceDoor: boolean
+  /**備註 */
+  notes: string
+}
+
+/**舊合約額外項目 */
+export type TlegacyContractAdditionDto = {
+  id: string
+  /**date */
+  createdAt: string
+  /**date */
+  updatedAt: string
+  /**項目索引 */
+  itemIndex: string
+  /**內容 */
+  content: string
+  /**數量 */
+  quantity: number
+  /**單價 */
+  unitPrice: number
+  /**複價 */
+  totalPrice: number
+  /**備註 */
+  notes: string
+}
+
+/**舊合約 */
+export type TlegacyContractDto = {
+  id: string
+  /**date */
+  createdAt: string
+  /**date */
+  updatedAt: string
+  /**合約編號 */
+  contractNumber: string
+  /**報價時效 */
+  quoteValidity: string
+  /**報價日期 */
+  quoteDate: string
+  /**工程名稱 */
+  projectName: string
+  /**客戶名稱 */
+  customerName: string
+  /**聯絡人 */
+  contactPerson: string
+  /**聯絡電話 */
+  contactNumber: string
+  /**傳真號碼 */
+  faxNumber: string
+  /**追蹤狀態 */
+  trackingStatus: string
+  /**工地進度 */
+  projectProgress: string
+  /**工地位置縣市 */
+  projectCity: string
+  /**工地位置地區 */
+  projectDistrict: string
+  /**工地位置地址 */
+  projectAddress: string
+  /**折扣率(0.0 - 1.0 */
+  discountRate: string
+  /**小計 */
+  subTotal: number
+  /**營業稅 */
+  salesTax: number
+  /**總計 */
+  total: number
+  /**交貨地點 */
+  deliveryLocation: string
+  /**交貨日期 */
+  deliveryDate: string
+  /**付款方式 */
+  paymentMethods: TpaymentMethodDto[]
+  /**備註 */
+  notes: string[]
+  /**報價範圍 */
+  quoteScopes: string[]
+  /**經理 */
+  managerName: string
+  /**主管 */
+  supervisorName: string
+  /**經辦人 */
+  operatorName: string
+  /**客戶 */
+  customer: TcustomerDto
+  /**產品 */
+  products: TlegacyConatractProductDto[]
+  /**額外項目 */
+  additions: TlegacyContractAdditionDto[]
+}
 
 
+export type TcreateLegacyContractProductDto = {
+  /**編號 */
+  idNumber: number;
+  /** 項目名 */
+  itemName: string;
+  /** 報價別 */
+  quoteType: string;
+  /** 門型 */
+  doorType: string;
+  /** L(m) */
+  length: number;
+  /** W(m) */
+  width: number;
+  /** h(m) */
+  height: number;
+  /** B(m) */
+  thickness: number;
+  /** 面積 */
+  area: string;
+  /** 才數 */
+  volume: string;
+  /** 材質 */
+  material: string;
+  /** 表面 */
+  surface: string;
+  /** 門軌 */
+  doorTrack: string;
+  /** 馬力 */
+  horsepower: string;
+  /** 數量 */
+  quantity: number;
+  /** 單價 */
+  unitPrice: number;
+  /** 複價 */
+  totalPrice: number;
+  /** 防颱 */
+  typhoonProtection: boolean;
+  /** 彈射門 */
+  bounceDoor: boolean;
+  /** 備註 */
+  notes: string;
+}
+
+export type TcreateLegacyContractAdditionDto = {
+  /**項目索引 */
+  itemIndex: number;
+  /** 內容 */
+  content: string;
+  /** 數量 */
+  quantity: number;
+  /** 單價 */
+  unitPrice: number;
+  /** 複價 */
+  totalPrice: number;
+  /** 備註 */
+  notes: string;
+};
 
 
-
-
+export type TcreateLegacyContractDto = {
+  /* 客戶ID */
+  customerId: string
+  /* 合約編號 */
+  contractNumber: string
+  /* 報價時段 */
+  quoteValidity?: string | null
+  /* 報價日期 date*/
+  quoteDate?: string | null
+  /* 工程名稱 */
+  projectName: string
+  /* 客戶名稱 */
+  customerName: string
+  /* 聯絡人 */
+  contactPerson: string
+  /* 聯絡電話 */
+  contactNumber: string
+  /* 傳真號碼 */
+  faxNumber?: string | null
+  /* 追蹤狀態 */
+  trackingStatus?: string | null
+  /* 工地進度 */
+  projectProgress?: string | null
+  /* 工地位置縣市 */
+  projectCity: string
+  /* 工地位置地區 */
+  projectDistrict: string
+  /* 工地位置地址 */
+  projectAddress: string
+  /* 折扣率 0.0-1.0*/
+  discountRate: string
+  /* 小計 */
+  subTotal: number
+  /* 營業稅 */
+  salesTax: number
+  /* 總計 */
+  total: number
+  /* 交貨地點 */
+  deliveryLocation: string
+  /* 交貨日期 date*/
+  deliveryDate: string
+  /* 付款方式 */
+  paymentMethods: TpaymentMethodDto[]
+  /* 備註 */
+  notes: string[]
+  /* 報價範圍 */
+  quoteScopes: string[]
+  /* 經理 */
+  managerName: string
+  /* 主管 */
+  supervisorName: string
+  /* 經辦人 */
+  operatorName: string
+  /* 產品 */
+  products: TcreateLegacyContractProductDto[]
+  /* 額外項目 */
+  additions: TcreateLegacyContractAdditionDto[]
+}
 
 
 // ==========================================================================
