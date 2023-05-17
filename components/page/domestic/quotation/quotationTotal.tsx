@@ -9,7 +9,7 @@ import Appendix from "./quotationTotal/appendix"
 import style from "./quotationTotal.module.scss"
 // type
 import { Class_quotation } from "hooks/quotation/useQuotation"
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
 import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
 import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
 
