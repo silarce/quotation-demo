@@ -340,11 +340,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const doSearch: TdoSearch = (arr) => {
 
     const reviewedAtValue = (arr[0] as Toption).value
-    const reviewedAt = (() => {
+    const isReviewCompleted = (() => {
       if (reviewedAtValue === "全部") return undefined
-      if (reviewedAtValue === "未審核") return { $null: true }
-      if (reviewedAtValue === "已審核") return { $notNull: true }
+      if (reviewedAtValue === "未審核") return { $eq: false }
+      if (reviewedAtValue === "已審核") return { $eq: true }
     })()
+    // const reviewedAt = (() => {
+    //   if (reviewedAtValue === "全部") return undefined
+    //   if (reviewedAtValue === "未審核") return { $null: true }
+    //   if (reviewedAtValue === "已審核") return { $notNull: true }
+    // })()
 
     const date = (() => {
       const theDate = arr[1] as string
@@ -359,7 +364,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
     setParams({
       filter: {
-        reviewedAt,
+        // reviewStatus:{reviewedAt},
+        isReviewCompleted,
         date: { $eq: date }
       }
     })
