@@ -1,0 +1,49 @@
+@use "styles/theme01" as *;
+
+.container {
+  width: calc(100% - (17px * 2));
+  padding: 0 4px;
+  margin: auto;
+  margin-top: 17px;
+  border: solid 1px $colorBorder01;
+  .addBtn {
+    width: fit-content;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+  }
+}
+
+// .listContainer {
+//   width: 100%;
+//   overflow: auto;
+//   max-height: 500px;
+//   .thead {
+//     position: sticky;
+//     top: 0;
+//     z-index: 1;
+//   }
+// }
+
+.scrollDiv {
+  max-height: 463px;
+  .thead {
+    position: sticky;
+    top: 0;
+    display: flex;
+    width: 100%;
+    padding-left: 20px;
+    .delBtn {
+      width: 40px;
+    }
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    padding-left: 20px;
+    place-items: center;
+    .delBtn {
+      width: 40px;
+    }
+  }
+}

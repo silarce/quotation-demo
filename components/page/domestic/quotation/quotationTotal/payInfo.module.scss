@@ -5,6 +5,9 @@
   min-height: 496px;
   padding: 20px 25px;
   border: solid 1px $colorBorder01;
+  &.legacy {
+    width: 400px;
+  }
 }
 
 .payBox {
@@ -35,9 +38,11 @@
         border-bottom: solid 1px $colorMain;
       }
       > span {
+        display: inline-block;
         color: $colorMain;
         font-weight: 400;
         font-size: 16px;
+        width: 15px;
       }
     }
   }
@@ -69,12 +74,27 @@
     color: $colorMain;
     margin-bottom: 12px;
   }
+  .btn {
+    width: 16px;
+  }
 }
 
 .inputBox02 {
   display: grid;
   grid-template-columns: 155px auto fit-content(100%);
   margin-top: 7px;
+  &.legacy {
+    grid-template-columns: min-content 220px auto fit-content(100%);
+    .label {
+      margin-left: 6px;
+    }
+  }
+
+  > * {
+    margin: auto;
+    margin-left: 0;
+  }
+
   > label {
     padding: unset;
     input {
@@ -82,6 +102,7 @@
       font-size: 16px;
     }
   }
+
   > span {
     font-weight: 400;
     font-size: 16px;

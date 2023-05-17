@@ -324,7 +324,9 @@ class Class_employee {
 
     const convertToDate = (dateString: string) => {
       if (!dateString) return ""
-      return moment(yearConversion_chToStandard(dateString)).toDate()
+      const theDateString = yearConversion_chToStandard(dateString)
+      if (!theDateString) return ""
+      return moment(theDateString).toDate()
     }
 
     const birthday =

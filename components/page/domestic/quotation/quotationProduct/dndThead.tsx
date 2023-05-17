@@ -29,14 +29,14 @@ import styleL from "../local.module.scss"
 
 // type
 import { Class_quotation } from "hooks/quotation/useQuotation"
+import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
 
 
 // =========================================================
 // =========================================================
 export default function DndThead({ allowMove, classQuotation }:
   {
-
-    classQuotation: Class_quotation
+    classQuotation: Class_quotation | Class_legacyQuotation
     allowMove: boolean
   }) {
 
@@ -54,7 +54,9 @@ export default function DndThead({ allowMove, classQuotation }:
   // =======================================================
   return (
     <div className={styleL.thead}>
+      {/*  */}
       <div className={style.emptyBlock} />
+      {/*  */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -66,7 +68,8 @@ export default function DndThead({ allowMove, classQuotation }:
           strategy={horizontalListSortingStrategy}
         >
           {theadIndex.map((key, index) => {
-            const theadInfo = prodCellConfig.cellConfig[key]
+            // const theadInfo = prodCellConfig.cellConfig[key];
+            const theadInfo = prodCellConfig.cellConfig[key as keyof typeof prodCellConfig.cellConfig];
             return (
               // key必須是items裡的值
               <TheadItem key={key} theadInfo={theadInfo}
@@ -81,15 +84,25 @@ export default function DndThead({ allowMove, classQuotation }:
     </div>
   )
   // ============================================
+  // function handleDragEnd(e: DragEndEvent) {
+  //   const { active, over } = e
+  //   setIsMoving("")
+  //   if (active.id !== over?.id) {
+  //     let oldIndex: number =
+  //       theadIndex.
+  //         indexOf(active.id as typeof theadIndex[number]);
+  //     let newIndex: number = theadIndex.indexOf(over?.id as typeof theadIndex[number]);
+  //     classQuotation.mainProdkeyList = arrayMove(theadIndex, oldIndex, newIndex)
+  //   }
+  // }
   function handleDragEnd(e: DragEndEvent) {
     const { active, over } = e
     setIsMoving("")
     if (active.id !== over?.id) {
       let oldIndex: number =
-        theadIndex.
-          indexOf(active.id as typeof theadIndex[number]);
-      let newIndex: number = theadIndex.indexOf(over?.id as typeof theadIndex[number]);
-      classQuotation.mainProdkeyList = arrayMove(theadIndex, oldIndex, newIndex)
+        theadIndex.indexOf(active.id as keyof typeof prodCellConfig.cellConfig);
+      let newIndex: number = theadIndex.indexOf(over?.id as keyof typeof prodCellConfig.cellConfig);
+      classQuotation.mainProdkeyList = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.mainProdkeyList
     }
   }
 
