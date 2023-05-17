@@ -11,7 +11,7 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import style from "./payInfo.module.scss"
 
 // type
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
 
 
 export default function PayInfo_legacy(
@@ -34,7 +34,7 @@ export default function PayInfo_legacy(
     total,
     tradingLocation,
     tradingDate,
-    payWay,
+    paymentMethods: payWay,
 
     editPayWay,
     addPayWay,

@@ -31,7 +31,7 @@ import iconUpload from "public/image/icon/upload.svg"
 import style from "./quotation.module.scss"
 // ========================================================================
 import { fakeApi_legacyQuotation_creator } from "fakeDatabase/fakeAPI/fakeLegacyQuotationApi"
-import { useLegacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { useLegacyQuotation } from "hooks/quotation/useLegacyContract"
 import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
 import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
@@ -60,24 +60,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   const fakeApiQuotaion = fakeApi_legacyQuotation_creator(router.query.quotationId as string)
 
-  const { classQuotation, reNew: reNewClassQuotation } = useLegacyQuotation(fakeApiQuotaion?.get())
+  const { classQuotation, rewind: reNewClassQuotation } = useLegacyQuotation(fakeApiQuotaion?.get())
   const fakeClientList = fakeApi_client.get()
   const classSignature = classQuotation?.classSignature
   const signatureArr = [
     {
       label: "經理",
-      signature: classSignature?.manager ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.manager = v },
+      signature: classSignature?.managerName ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.managerName = v },
     },
     {
       label: "主管",
-      signature: classSignature?.director ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.director = v },
+      signature: classSignature?.supervisorName ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.supervisorName = v },
     },
     {
       label: "經辦",
-      signature: classSignature?.attn ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.attn = v },
+      signature: classSignature?.operatorName ?? "",
+      onChange: (v: string) => { if (classSignature) classSignature.operatorName = v },
     },
   ]
 
@@ -128,7 +128,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (!classQuotation) return null
   // -----------------------------------------------------------------------
   const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
+    const theArr = classQuotation.classProductArr.map((mp) => {
       return {
         ...mp.allData,
         part: mp.partArr.map((part) => part.allData)

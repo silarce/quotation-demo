@@ -39,6 +39,18 @@ type TgetLegacyContracts = {
 }
 
 
+export type {
+  TpaymentMethodDto,
+  TlegacyContractProductDto,
+  TlegacyContractAdditionDto,
+  TlegacyContractDto,
+  TcreateLegacyContractProductDto,
+  TcreateLegacyContractAdditionDto,
+  TcreateLegacyContractDto,
+  TupdateLegacyContractDto,
+}
+
+
 // =================================================================
 
 const apiGetLegacyContracts = (params?: Tparams) => {
@@ -64,7 +76,7 @@ export const useLegacyContracts = (params?: Tparams) => {
 }
 
 
-const apiGetLegacyContracts_id = (id: string, params: Tparams = {}) => {
+export const apiGetLegacyContracts_id = (id: string, params: Tparams = {}) => {
   const api = `/legacy-contracts/${id}`
   return axi.get(api, { params })
     .then(({ data }) => data as TgetLegacyContracts)

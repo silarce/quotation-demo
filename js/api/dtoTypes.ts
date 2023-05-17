@@ -250,7 +250,7 @@ export type TpaymentMethodDto = {
 
 /**舊合約產品 */
 export type TlegacyContractProductDto = {
-  id: string
+  readonly id: string
   /**date */
   createdAt: string
   /**date */
@@ -299,13 +299,13 @@ export type TlegacyContractProductDto = {
 
 /**舊合約額外項目 */
 export type TlegacyContractAdditionDto = {
-  id: string
+  readonly id: string
   /**date */
   createdAt: string
   /**date */
   updatedAt: string
   /**項目索引 */
-  itemIndex: string
+  itemIndex: number
   /**內容 */
   content: string
   /**數量 */
@@ -325,6 +325,7 @@ export type TlegacyContractDto = {
   createdAt: string
   /**date */
   updatedAt: string
+  // 
   /**合約編號 */
   contractNumber: string
   /**報價時效 */
@@ -351,6 +352,7 @@ export type TlegacyContractDto = {
   projectDistrict: string
   /**工地位置地址 */
   projectAddress: string
+  // 
   /**折扣率(0.0 - 1.0 */
   discountRate: string
   /**小計 */
@@ -365,6 +367,7 @@ export type TlegacyContractDto = {
   deliveryDate: string
   /**付款方式 */
   paymentMethods: TpaymentMethodDto[]
+  // 
   /**備註 */
   notes: string[]
   /**報價範圍 */
@@ -375,12 +378,13 @@ export type TlegacyContractDto = {
   supervisorName: string
   /**經辦人 */
   operatorName: string
-  /**客戶 */
-  customer: TcustomerDto
   /**產品 */
   products: TlegacyContractProductDto[]
   /**額外項目 */
   additions: TlegacyContractAdditionDto[]
+  // 
+  /**客戶 */
+  customer: TcustomerDto
 }
 
 
@@ -486,16 +490,19 @@ export type TcreateLegacyContractDto = {
   deliveryDate: string
   /* 付款方式 */
   paymentMethods: TpaymentMethodDto[]
+  // 
   /* 備註 */
   notes: string[]
   /* 報價範圍 */
   quoteScopes: string[]
+  // 
   /* 經理 */
   managerName: string
   /* 主管 */
   supervisorName: string
   /* 經辦人 */
   operatorName: string
+  // 
   /* 產品 */
   products: TcreateLegacyContractProductDto[]
   /* 額外項目 */

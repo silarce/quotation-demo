@@ -7,7 +7,7 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import AddButton from "components/global/gear/button/addButton"
 
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
 
 // icon
 import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
@@ -32,9 +32,9 @@ export default function QuotationOtherSetting(
 
   const [activeIndex, setActiveIndex] = useState(-1)
 
-  const { partCellConfig, } = classQuotation
+  const { additionCellConfig: partCellConfig, } = classQuotation
 
-  const activeProd = classQuotation.mainProductArr[classQuotation.activeMainProd]
+  const activeProd = classQuotation.classProductArr[classQuotation.activeProd]
   const partList = activeProd?.partArr ?? []
 
   const { addPart, removePart } = activeProd ?? {}
