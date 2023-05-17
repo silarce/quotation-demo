@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import _ from "lodash"
 
@@ -18,13 +18,23 @@ const optionsCounty = optionsCreator_county()
 optionsDoorType.unshift({ value: "", label: "不拘" })
 optionsCounty.unshift({ value: "", label: "不拘" })
 
-// fake data
-import { fakeApi_legacyProjectSimple } from "fakeDatabase/fakeAPI/fakeLegacyQuotationSimpleArrApi";
 // ==================================================================
+
+// api
+import { useLegacyContracts } from "js/api/api_legacy-contract";
+
+
+
+
+
+
+
+
+
 
 export default function LegacyContractIntegration() {
   const router = useRouter()
-  // -----------------------------------------------------------------------
+
   // 搜尋用的 //這個資料不會render在畫面上
   // render在畫面上的是PageHeader02元件裡的狀態
   const [searchObj, setSearchObj] = useState<TsearchObj>({
@@ -33,15 +43,18 @@ export default function LegacyContractIntegration() {
     clientName: "",
     projectName: "",
   })
+
+  // -----------------------------------------------------------------------
+
+  const { legacyContractsArr, updateLegacyContracts, } = useLegacyContracts()
+
+  useEffect(() => {
+    (async () => { await updateLegacyContracts() })()
+  }, [])
+
+  // -----------------------------------------------------------------------
+
   // 資料
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_legacyProjectSimple })
-  const projectArr = projectSimple.wrapper.get({
-    filter: {
-      county: searchObj.county,
-      clientName: searchObj.clientName,
-      constructionName: searchObj.projectName,
-    }
-  })
 
   useEffect(() => {
     const { doorType, county, clientName, projectName, }
@@ -112,15 +125,17 @@ export default function LegacyContractIntegration() {
       type: "addButton",
       label: "新增報價單",
       onClick: () => {
-        let newQuotationId = `${projectArr.length + 1}`.padStart(2, "0")
-        newQuotationId = "S-110211-" + newQuotationId
-        router.push({
-          pathname: `/domestic/legacyContractIntegration/quotation`,
-          query: {
-            quotationId: newQuotationId,
-            isNewQuotation: true
-          }
-        })
+
+        // let newQuotationId = `${projectArr.length + 1}`.padStart(2, "0")
+        // newQuotationId = "S-110211-" + newQuotationId
+        // router.push({
+        //   pathname: `/domestic/legacyContractIntegration/quotation`,
+        //   query: {
+        //     quotationId: newQuotationId,
+        //     isNewQuotation: true
+        //   }
+        // })
+
       }
     }
   ]
@@ -131,15 +146,42 @@ export default function LegacyContractIntegration() {
       <div>
         <Thead01 />
         <div>
-          {projectArr.map((item, index) => {
-            const quotationId = item.basicInfo.quotationId
+          {legacyContractsArr?.map((item, index) => {
+
+            const discountRate = (() => {
+              const discountRate =
+                Math.round(parseFloat(item.discountRate) * 100);
+              return discountRate.toString() + "%";
+            })()
+
+            const basicInfo = {
+              quotationId: item.id,
+              constructionName: item.projectName,
+              /**承辦人 */
+              undertaker: item.operatorName,
+              totalDiscount: discountRate,
+              tempDoorQty: "晚點再做",
+              tempBudgetAmount: item.total,
+              date: item.quoteDate,
+              constructionCounty: item.projectCity,
+            }
+            const clientData = {
+              name: item.customerName,
+              contact: [{
+                name: item.contactPerson,
+                phone: item.contactNumber
+              }]
+            }
+            const projectData = { basicInfo, clientData }
+
             const href = {
               pathname: "/domestic/legacyContractIntegration/quotation/",
-              query: { quotationId }
+              query: { quotationId: basicInfo.quotationId }
             }
+
             return (
               <TbodyItem01 key={index}
-                projectData={item}
+                projectData={projectData}
                 isActive={false}
                 openQuotation={() => { router.push(href) }}
               />
