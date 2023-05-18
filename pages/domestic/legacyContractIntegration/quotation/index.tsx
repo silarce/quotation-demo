@@ -14,7 +14,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 // import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
-import QuotationOtherSetting from "components/page/domestic/quotation/quotationOtherSetting"
+import QuotationAdditions from "components/page/domestic/quotation/quotationAdditions"
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 
@@ -191,9 +191,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </div>
           </div>
           {/* 主產品設定 */}
-          <QuotationProduction classQuotation={classLegacyContract} disabled={!allowEdit} />
+          <QuotationProduction legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 其他設定 */}
-          {/* <QuotationOtherSetting classQuotation={classQuotation} disabled={!allowEdit} /> */}
+          <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 備註/報價範圍/付款資訊 */}
           {/* <QuotationTotal
             classQuotation={classQuotation}

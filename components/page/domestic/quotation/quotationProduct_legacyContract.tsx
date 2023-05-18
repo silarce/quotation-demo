@@ -19,12 +19,12 @@ import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 
 export default function QuotationProduction({
-  classQuotation,
+  legacyContract,
   disabled,
   switch02,
   className = "" }:
   {
-    classQuotation: Class_legacyContract
+    legacyContract: Class_legacyContract
     disabled: boolean
     switch02?: boolean
     className?: string
@@ -49,15 +49,15 @@ export default function QuotationProduction({
       <div className={style.listContainer}>
         <div className={style.thead}>
           <DndThead
-            classQuotation={classQuotation}
+            classQuotation={legacyContract}
             allowMove={allowMove} />
         </div>
 
-        <ProductList_legacy classQuotation={classQuotation as Class_legacyContract} disabled={disabled} />
+        <ProductList_legacy classQuotation={legacyContract as Class_legacyContract} disabled={disabled} />
 
         <AddButton className={style.addBtn}
           label="新增產品"
-          onClick={classQuotation.addProd} />
+          onClick={legacyContract.addProd} />
       </div>
     </div>
   )

@@ -1,10 +1,7 @@
-import { useState, useEffect, HTMLInputTypeAttribute } from "react"
+import { useState, HTMLInputTypeAttribute } from "react"
 import _ from "lodash"
 
-
-
 import {
-  Toption,
   optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection
 } from "js/utils/options/doorTrackOptions"
 
