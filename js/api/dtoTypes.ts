@@ -333,7 +333,7 @@ export type TlegacyContractDto = {
   contractNumber: string
   /**報價時效 */
   quoteValidity: string
-  /**報價日期 */
+  /**報價日期 date*/
   quoteDate: string
   /**工程名稱 */
   projectName: string
@@ -366,7 +366,7 @@ export type TlegacyContractDto = {
   total: number
   /**交貨地點 */
   deliveryLocation: string
-  /**交貨日期 */
+  /**交貨日期 date*/
   deliveryDate: string
   /**付款方式 */
   paymentMethods: TpaymentMethodDto[]
@@ -458,7 +458,7 @@ export type TcreateLegacyContractDto = {
   /* 報價時段 */
   quoteValidity?: string | null
   /* 報價日期 date*/
-  quoteDate?: string | null
+  quoteDate?: Date | null
   /* 工程名稱 */
   projectName: string
   /* 客戶名稱 */
@@ -490,7 +490,7 @@ export type TcreateLegacyContractDto = {
   /* 交貨地點 */
   deliveryLocation: string
   /* 交貨日期 date*/
-  deliveryDate: string
+  deliveryDate: Date
   /* 付款方式 */
   paymentMethods: TpaymentMethodDto[]
   // 

@@ -1,6 +1,7 @@
 import { useState, HTMLInputTypeAttribute } from "react"
 import _ from "lodash"
 import Decimal from "decimal.js"
+import moment from "moment"
 
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import { checkDateFormat } from "js/tools/date/checkDate"
@@ -26,14 +27,20 @@ type TreRender = () => void
 class Class_basicInfo {
   constructor(
     reRender: TreRender,
-    legacyContract: TlegacyContractDto | TcreateLegacyContractDto
+    legacyContract: TlegacyContractDto | TemptyLegacyContract
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
-    this._legacyContract.quoteDate
-      = yearConversion_standardToCh(this._legacyContract.quoteDate ?? "", true)
-    this._legacyContract.deliveryDate
-      = yearConversion_standardToCh(this._legacyContract.deliveryDate ?? "", true)
+    this._legacyContract.quoteDate = (() => {
+      if (!this._legacyContract.quoteDate) return ""
+      const quoteDate = moment(this._legacyContract.quoteDate).format("YYYY-MM-DD")
+      return yearConversion_standardToCh(quoteDate ?? "", true)
+    })()
+    this._legacyContract.deliveryDate = (() => {
+      if (!this._legacyContract.deliveryDate) return ""
+      const deliveryDate = moment(this._legacyContract.deliveryDate).format("YYYY-MM-DD")
+      return yearConversion_standardToCh(deliveryDate ?? "", true)
+    })()
   }
 
   private _reRender
@@ -77,17 +84,6 @@ class Class_basicInfo {
 
   get projectAddress() { return this._legacyContract.projectAddress }
   set projectAddress(v) { this._legacyContract.projectAddress = v; this._reRender() }
-
-
-  // get customer() {
-  //   if ("customer" in this._legacyContract) return this._legacyContract.customer
-  //   return undefined
-  // }
-  // set customer(v) {
-  //   if (!v) return
-  //   else
-  //     this._legacyContract.customer = v;
-  // }
 
 }
 
@@ -234,7 +230,7 @@ class Class_addition {
 class Class_payInfo {
   constructor(
     reRender: () => void,
-    legacyContract: TlegacyContractDto | TcreateLegacyContractDto
+    legacyContract: TlegacyContractDto | TemptyLegacyContract
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
@@ -290,7 +286,7 @@ class Class_payInfo {
 class Class_listString {
   constructor(
     reRender: () => void,
-    stringArr: (TlegacyContractDto | TcreateLegacyContractDto)["notes" | "quoteScopes"]
+    stringArr: (TlegacyContractDto | TemptyLegacyContract)["notes" | "quoteScopes"]
   ) {
     this._reRender = reRender
     this.stringArr = stringArr
@@ -318,26 +314,25 @@ class Class_listString {
 class Class_signature {
   constructor(
     reRender: () => void,
-    legacyContract: TlegacyContractDto | TcreateLegacyContractDto
+    legacyContract: TlegacyContractDto | TemptyLegacyContract
   ) {
     this._reRender = reRender
-    this._managerName = legacyContract.managerName
-    this._supervisorName = legacyContract.supervisorName
-    this._operatorName = legacyContract.operatorName
+    this._legacyContract = legacyContract
   }
   private _reRender
+  private _legacyContract
 
-  private _managerName // 經理
-  get managerName() { return this._managerName }
-  set managerName(v: string) { this._managerName = v; this._reRender() }
+  // 經理
+  get managerName() { return this._legacyContract.managerName }
+  set managerName(v: string) { this._legacyContract.managerName = v; this._reRender() }
 
-  private _supervisorName // 主管
-  get supervisorName() { return this._supervisorName }
-  set supervisorName(v: string) { this._supervisorName = v; this._reRender() }
+  // 主管
+  get supervisorName() { return this._legacyContract.supervisorName }
+  set supervisorName(v: string) { this._legacyContract.supervisorName = v; this._reRender() }
 
-  private _operatorName // 經辦人
-  get operatorName() { return this._operatorName }
-  set operatorName(v: string) { this._operatorName = v; this._reRender() }
+  // 經辦人
+  get operatorName() { return this._legacyContract.operatorName }
+  set operatorName(v: string) { this._legacyContract.operatorName = v; this._reRender() }
 } // Class_signature
 
 // =======================================================================
@@ -348,7 +343,7 @@ class Class_signature {
 class Class_legacyContract {
   constructor(
     reRender: TreRender,
-    legacyContract: (TlegacyContractDto | TcreateLegacyContractDto) & { customer?: TcustomerDto | undefined },
+    legacyContract: (TlegacyContractDto | TemptyLegacyContract) & { customer?: TcustomerDto | undefined },
     prodCellConfig: TprodCellConfig,
     additionCellConfig: TadditionCellConfig
   ) {
@@ -458,22 +453,21 @@ class Class_legacyContract {
 
     const { quoteDate, deliveryDate, } = this._legacyContract
 
-    if (!checkDateFormat(quoteDate ?? "", "tw")) {
+    if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
       myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
     }
-    if (!checkDateFormat(deliveryDate ?? "", "tw")) {
+    if (!checkDateFormat(deliveryDate as string ?? "", "tw")) {
       myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
     }
 
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract)
 
-    legacyContractCopy.quoteDate
-      = yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string
+    const quoteDate_Date
+      = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
 
-    legacyContractCopy.deliveryDate
-      = yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string
-
+    const deliveryDate_Date
+      = new Date(yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string)
 
     legacyContractCopy.discountRate
       = Decimal.div(legacyContractCopy.discountRate, 100).toString()
@@ -485,6 +479,8 @@ class Class_legacyContract {
     return {
       ...legacyContractCopy,
       customerId,
+      quoteDate: quoteDate_Date,
+      deliveryDate: deliveryDate_Date,
     }
   }
   // ---------------------
@@ -498,7 +494,7 @@ const useLegacyContract = (data: TlegacyContractDto | undefined) => {
   const checkData = () => {
     return new Class_legacyContract(
       reRender,
-      data ?? emptyLegacyContract(),
+      _.cloneDeep(data) ?? emptyLegacyContract(),
       prodCellConfigCre(),
       additionCellConfigCre()
     )
@@ -699,7 +695,14 @@ const emptyAdditionCre = (): TcreateLegacyContractAdditionDto => {
   }
 }
 
-const emptyLegacyContract = (): TcreateLegacyContractDto => {
+
+type TemptyLegacyContract =
+  Omit<TcreateLegacyContractDto, "deliveryDate"> &
+  { deliveryDate: TcreateLegacyContractDto["deliveryDate"] | string }
+
+
+// const emptyLegacyContract = (): TcreateLegacyContractDto => {
+const emptyLegacyContract = (): TemptyLegacyContract => {
   return {
     customerId: "",
     contractNumber: "",
@@ -731,3 +734,6 @@ const emptyLegacyContract = (): TcreateLegacyContractDto => {
     additions: [],
   }
 }
+
+
+

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import _ from "lodash"
+import moment from "moment";
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -107,10 +108,10 @@ export default function LegacyContractIntegration() {
       else delete query[key];
     });
 
-    router.push({
-      href: "",
-      query,
-    });
+    // router.push({
+    //   href: "",
+    //   query,
+    // });
   };
 
   // -------------------------------------------------------
@@ -125,16 +126,9 @@ export default function LegacyContractIntegration() {
       type: "addButton",
       label: "新增報價單",
       onClick: () => {
-
-        // let newQuotationId = `${projectArr.length + 1}`.padStart(2, "0")
-        // newQuotationId = "S-110211-" + newQuotationId
-        // router.push({
-        //   pathname: `/domestic/legacyContractIntegration/quotation`,
-        //   query: {
-        //     quotationId: newQuotationId,
-        //     isNewQuotation: true
-        //   }
-        // })
+        router.push({
+          pathname: `/domestic/legacyContractIntegration/quotation`,
+        })
 
       }
     }
@@ -155,14 +149,15 @@ export default function LegacyContractIntegration() {
             })()
 
             const basicInfo = {
-              quotationId: item.id,
+              quotationId: item.contactNumber,
               constructionName: item.projectName,
               /**承辦人 */
               undertaker: item.operatorName,
               totalDiscount: discountRate,
-              tempDoorQty: "晚點再做",
+              tempDoorQty: "n",
               tempBudgetAmount: item.total,
-              date: item.quoteDate,
+              // date: item.quoteDate,
+              date: moment(item.quoteDate).format("YYYY-MM-DD"),
               constructionCounty: item.projectCity,
             }
             const clientData = {
@@ -176,7 +171,7 @@ export default function LegacyContractIntegration() {
 
             const href = {
               pathname: "/domestic/legacyContractIntegration/quotation/",
-              query: { quotationId: basicInfo.quotationId }
+              query: { contractId:item.id }
             }
 
             return (

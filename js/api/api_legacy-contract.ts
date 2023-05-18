@@ -28,7 +28,7 @@ type Tparams = {
   filter?: {
     [key: string]: any
   }
-  populate?: "jobs"[]
+  populate?: string[]
 }
 
 

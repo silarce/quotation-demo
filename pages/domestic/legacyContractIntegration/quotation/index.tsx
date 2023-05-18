@@ -64,50 +64,60 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false)
   // --------------------------------------------------------------------------
-  let [params, setParams] = useState<TapiGetCustomersParams>({
+  let [customerParams, setCustomerParams] = useState<TapiGetCustomersParams>({
     page: 1,
     pageSize: 20,
     populate: ["contacts", "types"],
     // filter,
     sort: "customerNumber"
   })
-  const { data: customerArr, update: updateCustomerArr } = useCustomers(params)
+  const { data: customerArr, update: updateCustomerArr } = useCustomers(customerParams)
   // --------------------------------------------------------------------------
-  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId)
+  let [legacyContractParams, setLegacyContractParams] = useState({
+    // populate: ["customer", "products", "additions","fax"],
+    populate: ["customer", "products", "additions"],
+  })
+  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
 
   useEffect(() => {
     (async () => {
-      await Promise.all([updateCustomerArr(), updateLegacyContract(),])
+      updateCustomerArr()
+      updateLegacyContract()
     })()
   }, [])
 
+  useEffect(() => {
+    (async () => {
+      updateLegacyContract()
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId])
+
   const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
 
-  const classSignature = classLegacyContract?.classSignature
+  const classSignature = classLegacyContract.classSignature
   const signatureArr = [
     {
       label: "經理",
-      signature: classSignature?.managerName ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.managerName = v },
+      signature: classSignature.managerName ,
+      onChange: (v: string) => { classSignature.managerName = v },
     },
     {
       label: "主管",
-      signature: classSignature?.supervisorName ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.supervisorName = v },
+      signature: classSignature.supervisorName ,
+      onChange: (v: string) => { classSignature.supervisorName = v },
     },
     {
       label: "經辦",
-      signature: classSignature?.operatorName ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.operatorName = v },
+      signature: classSignature.operatorName ,
+      onChange: (v: string) => { classSignature.operatorName = v },
     },
   ]
-
-
 
   useEffect(() => {
     rewind()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowEdit])
+  }, [allowEdit, legacyContract])
 
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false)
@@ -130,10 +140,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         if (!postBody) return
         try {
           showRootLoading(true)
-          await apiPostLegacyContracts(classLegacyContract.postBody)
+          const res = await apiPostLegacyContracts(classLegacyContract.postBody)
+          router.push({
+            query: {
+              contractId: res.id
+            }
+          })
           myAlert.success({ title: "上傳完成" })
         }
-        catch { myAlert.err({title:"上傳失敗"})}
+        catch { myAlert.err({ title: "上傳失敗" }) }
         finally { showRootLoading(false) }
         setAllowEdit(false)
       }
