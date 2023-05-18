@@ -35,7 +35,11 @@ import style from "./quotation.module.scss"
 import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLegacyContract"
 // ========================================================================
 // api
-import { useLegacyContract_id, apiPostLegacyContracts } from "js/api/api_legacy-contract"
+import {
+  useLegacyContract_id,
+  apiPostLegacyContracts,
+  apiPatchLegacyContracts_id
+} from "js/api/api_legacy-contract"
 import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
 
 
@@ -82,7 +86,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   useEffect(() => {
     (async () => {
       updateCustomerArr()
-      updateLegacyContract()
     })()
   }, [])
 
@@ -99,17 +102,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const signatureArr = [
     {
       label: "經理",
-      signature: classSignature.managerName ,
+      signature: classSignature.managerName,
       onChange: (v: string) => { classSignature.managerName = v },
     },
     {
       label: "主管",
-      signature: classSignature.supervisorName ,
+      signature: classSignature.supervisorName,
       onChange: (v: string) => { classSignature.supervisorName = v },
     },
     {
       label: "經辦",
-      signature: classSignature.operatorName ,
+      signature: classSignature.operatorName,
       onChange: (v: string) => { classSignature.operatorName = v },
     },
   ]
@@ -140,13 +143,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         if (!postBody) return
         try {
           showRootLoading(true)
-          const res = await apiPostLegacyContracts(classLegacyContract.postBody)
-          router.push({
-            query: {
-              contractId: res.id
-            }
-          })
+
+          const res =
+            contractId
+              ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
+              : await apiPostLegacyContracts(classLegacyContract.postBody)
           myAlert.success({ title: "上傳完成" })
+
+          if (contractId) updateLegacyContract()
+          else router.push({ query: { contractId: res.id } })
         }
         catch { myAlert.err({ title: "上傳失敗" }) }
         finally { showRootLoading(false) }
