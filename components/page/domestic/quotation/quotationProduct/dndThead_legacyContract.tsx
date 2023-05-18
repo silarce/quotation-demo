@@ -28,15 +28,14 @@ import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
 // type
-import { Class_quotation } from "hooks/quotation/useQuotation"
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 
 // =========================================================
 // =========================================================
 export default function DndThead({ allowMove, classQuotation }:
   {
-    classQuotation: Class_quotation | Class_legacyQuotation
+    classQuotation: Class_legacyContract
     allowMove: boolean
   }) {
 

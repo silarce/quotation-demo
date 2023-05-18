@@ -11,13 +11,13 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import style from "./payInfo.module.scss"
 
 // type
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 
 export default function PayInfo_legacy(
   { classQuotation, disabled }:
     {
-      classQuotation: Class_legacyQuotation
+      classQuotation: Class_legacyContract
       disabled: boolean
     }) {
   // -----------------------------------------------------------------------

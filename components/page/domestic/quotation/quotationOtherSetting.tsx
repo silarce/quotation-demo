@@ -7,7 +7,7 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import AddButton from "components/global/gear/button/addButton"
 
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 // icon
 import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
@@ -25,7 +25,7 @@ export default function QuotationOtherSetting(
     classQuotation,
     disabled }:
     {
-      classQuotation: Class_legacyQuotation
+      classQuotation: Class_legacyContract
       disabled: boolean
     }
 ) {

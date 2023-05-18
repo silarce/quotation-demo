@@ -1,16 +1,12 @@
 import { useState, useEffect, HTMLInputTypeAttribute } from "react"
-// import { Class_fakeApi_legacyQuotation } from "fakeDatabase/fakeAPI/fakeLegacyQuotationApi"
 import _ from "lodash"
+
+
 
 import {
   Toption,
-  optionsCreator_doorRail_normal,
-  optionsCreator_doorRail_antyTyphoon,
-} from "fakeDatabase/options/options"
-
-
-// type
-// import { TlegacyQuotation, emptyLegacyQuotation, emptyPart } from "fakeDatabase/domestic/_fakeLegacyQuotation"
+  optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection
+} from "js/utils/options/doorTrackOptions"
 
 import {
   TlegacyContractDto, TcreateLegacyContractDto,
@@ -18,15 +14,10 @@ import {
   TlegacyContractAdditionDto, TcreateLegacyContractAdditionDto, TcustomerDto,
 } from "js/api/dtoTypes"
 
-
+const options_doorTrack_normal = optionsCre_doorTrack_normal()
+const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection()
 
 type TreRender = () => void
-// type Tdata = ReturnType<Class_fakeApi_legacyQuotation["get"]>
-
-
-const doorRail_normal = optionsCreator_doorRail_normal()
-const doorRail_antiTyphoon = optionsCreator_doorRail_antyTyphoon()
-
 
 // =======================================================================
 class Class_basicInfo {
@@ -100,7 +91,6 @@ class Class_basicInfo {
 class Class_product {
   constructor(
     reRender: TreRender,
-    // legacyProduct: TlegacyContractDto["products"][number] | TcreateLegacyContractProductDto
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto
   ) {
     this._reRender = reRender
@@ -115,14 +105,21 @@ class Class_product {
   // thickness = "1.50t" //厚度
   readonly openType = "電動"
 
+  readonly options_doorTrack_normal = options_doorTrack_normal
+  readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection
+
+  get options_doorTrack() {
+    if (this.typhoonProtection) return this.options_doorTrack_typhoonProtection
+    else return this.options_doorTrack_normal
+  }
 
   get id() {
     if ("id" in this._product) return this._product.id
     return undefined
   }
 
-  get idNumber() { return this._product.idNumber }
-  set idNumber(v) { this._product.idNumber = v; this._reRender() }
+  get idNumber() { return this._product.idNumber.toString() }
+  set idNumber(v) { this._product.idNumber = parseFloat(v); this._reRender() }
 
   get itemName() { return this._product.itemName }
   set itemName(v) { this._product.itemName = v; this._reRender() }
@@ -133,17 +130,17 @@ class Class_product {
   get doorType() { return this._product.doorType }
   set doorType(v) { this._product.doorType = v; this._reRender() }
 
-  get length() { return this._product.length }
-  set length(v) { this._product.length = v; this._reRender() }
+  get length() { return this._product.length.toString() }
+  set length(v) { this._product.length = parseFloat(v); this._reRender() }
 
-  get width() { return this._product.width }
-  set width(v) { this._product.width = v; this._reRender() }
+  get width() { return this._product.width.toString() }
+  set width(v) { this._product.width = parseFloat(v); this._reRender() }
 
-  get height() { return this._product.height }
-  set height(v) { this._product.height = v; this._reRender() }
+  get height() { return this._product.height.toString() }
+  set height(v) { this._product.height = parseFloat(v); this._reRender() }
 
-  get thickness() { return this._product.thickness }
-  set thickness(v) { this._product.thickness = v; this._reRender() }
+  get thickness() { return this._product.thickness.toString() }
+  set thickness(v) { this._product.thickness = parseFloat(v); this._reRender() }
 
   get area() { return this._product.area }
   set area(v) { this._product.area = v; this._reRender() }
@@ -163,17 +160,21 @@ class Class_product {
   get horsepower() { return this._product.horsepower }
   set horsepower(v) { this._product.horsepower = v; this._reRender() }
 
-  get quantity() { return this._product.quantity }
-  set quantity(v) { this._product.quantity = v; this._reRender() }
+  get quantity() { return this._product.quantity.toString() }
+  set quantity(v) { this._product.quantity = parseFloat(v); this._reRender() }
 
-  get unitPrice() { return this._product.unitPrice }
-  set unitPrice(v) { this._product.unitPrice = v; this._reRender() }
+  get unitPrice() { return this._product.unitPrice.toString() }
+  set unitPrice(v) { this._product.unitPrice = parseFloat(v); this._reRender() }
 
-  get totalPrice() { return this._product.totalPrice }
-  set totalPrice(v) { this._product.totalPrice = v; this._reRender() }
+  get totalPrice() { return this._product.totalPrice.toString() }
+  set totalPrice(v) { this._product.totalPrice = parseFloat(v); this._reRender() }
 
   get typhoonProtection() { return this._product.typhoonProtection }
-  set typhoonProtection(v) { this._product.typhoonProtection = v; this._reRender() }
+  set typhoonProtection(v) {
+    this._product.typhoonProtection = v;
+    this._product.doorTrack = ""
+    this._reRender()
+  }
 
   get bounceDoor() { return this._product.bounceDoor }
   set bounceDoor(v) { this._product.bounceDoor = v; this._reRender() }
@@ -203,20 +204,20 @@ class Class_addition {
     return undefined
   }
 
-  get itemIndex() { return this._addition.itemIndex }
-  set itemIndex(v) { this._addition.itemIndex = v; this._reRender() }
+  get itemIndex() { return this._addition.itemIndex.toString() }
+  set itemIndex(v) { this._addition.itemIndex = parseFloat(v); this._reRender() }
 
   get content() { return this._addition.content }
   set content(v) { this._addition.content = v; this._reRender() }
 
-  get quantity() { return this._addition.quantity }
-  set quantity(v) { this._addition.quantity = v; this._reRender() }
+  get quantity() { return this._addition.quantity.toString() }
+  set quantity(v) { this._addition.quantity = parseFloat(v); this._reRender() }
 
-  get unitPrice() { return this._addition.unitPrice }
-  set unitPrice(v) { this._addition.unitPrice = v; this._reRender() }
+  get unitPrice() { return this._addition.unitPrice.toString() }
+  set unitPrice(v) { this._addition.unitPrice = parseFloat(v); this._reRender() }
 
-  get totalPrice() { return this._addition.totalPrice }
-  set totalPrice(v) { this._addition.totalPrice = v; this._reRender() }
+  get totalPrice() { return this._addition.totalPrice.toString() }
+  set totalPrice(v) { this._addition.totalPrice = parseFloat(v); this._reRender() }
 
   get notes() { return this._addition.notes }
   set notes(v) { this._addition.notes = v; this._reRender() }
@@ -237,14 +238,15 @@ class Class_payInfo {
   get discountRate() { return this._legacyContract.discountRate }
   set discountRate(v) { this._legacyContract.discountRate = v; this._reRender() }
 
-  get subTotal() { return this._legacyContract.subTotal }
-  set subTotal(v) { this._legacyContract.subTotal = v; this._reRender() }
+  // get subTotal() { return `${this._legacyContract.subTotal}` }
+  get subTotal() { return this._legacyContract.subTotal.toString() }
+  set subTotal(v) { this._legacyContract.subTotal = parseFloat(v); this._reRender() }
 
-  get salesTax() { return this._legacyContract.salesTax }
-  set salesTax(v) { this._legacyContract.salesTax = v; this._reRender() }
+  get salesTax() { return this._legacyContract.salesTax.toString() }
+  set salesTax(v) { this._legacyContract.salesTax = parseFloat(v); this._reRender() }
 
-  get total() { return this._legacyContract.total }
-  set total(v) { this._legacyContract.total = v; this._reRender() }
+  get total() { return this._legacyContract.total.toString() }
+  set total(v) { this._legacyContract.total = parseFloat(v); this._reRender() }
 
   get deliveryLocation() { return this._legacyContract.deliveryLocation }
   set deliveryLocation(v) { this._legacyContract.deliveryLocation = v; this._reRender() }
@@ -445,10 +447,10 @@ class Class_legacyContract {
     }
   }
   // ---------------------
-} // Class_quotation
+} // Class_legacyContract
 
 
-const useLegacyQuotation = (data: TlegacyContractDto | undefined) => {
+const useLegacyContract = (data: TlegacyContractDto | undefined) => {
   const [render, setRender] = useState(0)
   const reRender: TreRender = () => setRender(state => state + 1)
 
@@ -470,13 +472,13 @@ const useLegacyQuotation = (data: TlegacyContractDto | undefined) => {
 }
 
 export {
-  Class_legacyContract as Class_legacyQuotation,
+  Class_legacyContract,
   Class_basicInfo,
   Class_product,
   Class_addition,
   Class_payInfo,
   Class_listString,
-  useLegacyQuotation
+  useLegacyContract
 }
 
 // 這是什麼?
@@ -551,7 +553,7 @@ function prodCellConfigCre(): TprodCellConfig {
       volume: { id: "volume", label: "才數", width: "75px", type: "input", inputType: "number" },
       material: { id: "material", label: "材料", width: "120px", type: "input" },
       surface: { id: "surface", label: "表面", width: "55px", type: "input" },
-      doorTrack: { id: "doorTrack", label: "門軌", width: "210px", type: "selectWithIcon" },
+      doorTrack: { id: "doorTrack", label: "門軌", width: "300px", type: "selectWithIcon" },
       horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "input" },
       quantity: { id: "quantity", label: "數量", width: "55px", type: "input", inputType: "number" },
       unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "input", inputType: "number" },

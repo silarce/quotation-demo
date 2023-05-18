@@ -25,7 +25,7 @@ import scss from "./quotationPdf.module.scss"
 
 // type
 import { Class_quotation } from "hooks/quotation/useQuotation"
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 export default function QuotationPdf(
   { isVisable, onCancel,
@@ -34,7 +34,7 @@ export default function QuotationPdf(
     {
       isVisable: boolean
       onCancel: () => void
-      classQuotation: Class_quotation | Class_legacyQuotation
+      classQuotation: Class_quotation | Class_legacyContract
       // classQuotation: Class_quotation
     }
 ) {

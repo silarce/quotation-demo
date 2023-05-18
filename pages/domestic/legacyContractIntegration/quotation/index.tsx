@@ -13,7 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 // components
 // import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
-import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
+import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
 import QuotationOtherSetting from "components/page/domestic/quotation/quotationOtherSetting"
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
@@ -32,7 +32,7 @@ import iconUpload from "public/image/icon/upload.svg"
 import style from "./quotation.module.scss"
 // ========================================================================
 import { fakeApi_legacyQuotation_creator } from "fakeDatabase/fakeAPI/fakeLegacyQuotationApi"
-import { Class_legacyQuotation, useLegacyQuotation } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLegacyContract"
 import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
 import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
@@ -88,7 +88,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   }, [])
 
-  const { classLegacyContract, rewind } = useLegacyQuotation(legacyContract)
+  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
 
   const classSignature = classLegacyContract?.classSignature
   const signatureArr = [
@@ -191,7 +191,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </div>
           </div>
           {/* 主產品設定 */}
-          {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
+          <QuotationProduction classQuotation={classLegacyContract} disabled={!allowEdit} />
           {/* 其他設定 */}
           {/* <QuotationOtherSetting classQuotation={classQuotation} disabled={!allowEdit} /> */}
           {/* 備註/報價範圍/付款資訊 */}

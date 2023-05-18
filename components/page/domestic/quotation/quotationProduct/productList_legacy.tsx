@@ -19,7 +19,7 @@ import { Toption } from "fakeDatabase/options/options"
 
 // ==========================================================
 // ==========================================================
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract, Class_product } from "hooks/quotation/useLegacyContract"
 import type {
   TprodInputCellType, TprodSelectWithIconCellType,
   TprodCheckboxCellType
@@ -31,15 +31,16 @@ import type {
 export default function ProductList_legacy(
   { classQuotation, disabled }:
     {
-      classQuotation: Class_legacyQuotation
+      classQuotation: Class_legacyContract
       disabled: boolean
     }) {
 
   const {
-    classProductArr: mainProductArr,
-    prodCellConfig: prodCellConfig,
-    activeProd: activeMainProd,
-    delProd: delMainProd, copyProd: copyMainProd,
+    classProductArr,
+    prodCellConfig,
+    activeProd,
+    delProd,
+    copyProd,
   } = classQuotation
 
 
@@ -49,9 +50,9 @@ export default function ProductList_legacy(
   // =======================================
   return (
     <div className={style.container} >
-      {mainProductArr.map((dataItem, pIndex) => {
+      {classProductArr.map((dataItem, pIndex) => {
         return (
-          <CellWithBar key={pIndex} isActive={activeMainProd === pIndex}>
+          <CellWithBar key={pIndex} isActive={activeProd === pIndex}>
             <div className={style.row}
               onClick={() => classQuotation.activeProd = pIndex}
             >
@@ -61,9 +62,9 @@ export default function ProductList_legacy(
                   onClick={(e) => {
                     e.stopPropagation();
                     if (disabled) return
-                    delMainProd(pIndex)
+                    delProd(pIndex)
                   }} />
-                <IconCopy onClick={() => { if (disabled) return; copyMainProd(pIndex) }} />
+                <IconCopy onClick={() => { if (disabled) return; copyProd(pIndex) }} />
                 {/*  */}
                 <span>{pIndex + 1}</span>
                 {/*  */}
@@ -96,11 +97,11 @@ export default function ProductList_legacy(
   // ===========================================================
   function cellSwitcher({ dataItem, key, type, disabled, stateValue, inputType }:
     {
-      dataItem: Class_legacyQuotation["classProductArr"][number]
-      key: Class_legacyQuotation["prodCellConfig"]["keyList"][number]
+      dataItem: Class_product
+      key: Class_legacyContract["prodCellConfig"]["keyList"][number]
       type: "input" | "selectWithIcon" | "checkbox"
       disabled: boolean
-      stateValue: string | boolean | Toption
+      stateValue: string | boolean | number
       inputType?: string
     }
   ) {
@@ -130,7 +131,7 @@ export default function ProductList_legacy(
         let options: Toption[]
         // if (key === "doorRail") options = dataItem.doorRailOptions
         // else options = optionsObjList[key as ToptionsObjKey]
-        options = dataItem.doorRailOptions
+        options = dataItem.options_doorTrack
 
         const onChange =
           (option: Toption | null) => dataItem[key as keyof TprodSelectWithIconCellType] = option!.value

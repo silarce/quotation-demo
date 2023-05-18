@@ -15,7 +15,7 @@ import scss from "./quotationProfile.module.scss"
 
 
 // import { Class_basicInfo } from 'hooks/quotation/useQuotation'
-import { Class_basicInfo, Class_legacyQuotation } from 'hooks/quotation/useLegacyContract'
+import { Class_basicInfo, Class_legacyContract } from 'hooks/quotation/useLegacyContract'
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 // import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 
@@ -36,7 +36,7 @@ const inputStyle = {
 export default function QuotationProfile(
   { classLegacyContract, classBasicInfo, customerArr, disabled = false }:
     {
-      classLegacyContract: Class_legacyQuotation
+      classLegacyContract: Class_legacyContract
       classBasicInfo: Class_basicInfo
       customerArr: TcustomerDto[]
       disabled: boolean
