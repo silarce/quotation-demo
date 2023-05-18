@@ -2,7 +2,7 @@ import { useState, } from 'react'
 import { format } from 'date-fns'
 
 // components
-import ClientSelector from './modal/clientSelector'
+import CustomerSelector from './modal/customerSelector'
 // glogal gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel'
 import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address'
@@ -14,17 +14,16 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
 import scss from "./quotationProfile.module.scss"
 
 
-import { Class_basicInfo } from 'hooks/quotation/useQuotation'
-import { Class_basicInfo as Class_legacyBasicInfo } from 'hooks/quotation/useLegacyContract'
+// import { Class_basicInfo } from 'hooks/quotation/useQuotation'
+import { Class_basicInfo, Class_legacyQuotation } from 'hooks/quotation/useLegacyContract'
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
-import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+// import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 
+// type
+import { TcustomerDto } from 'js/api/dtoTypes'
 
-// ====================================================
-type TclassBasicInfo = {
-  
-}
-
+// config
+import { customerTypesLookup } from 'config/lookupTable'
 
 // ====================================================
 const inputStyle = {
@@ -35,102 +34,103 @@ const inputStyle = {
 }
 // ====================================================
 export default function QuotationProfile(
-  { classBasicInfo, fakeClientList, disabled = false }:
+  { classLegacyContract, classBasicInfo, customerArr, disabled = false }:
     {
-      // classBasicInfo: Class_basicInfo | Class_legacyBasicInfo
-      classBasicInfo: Class_basicInfo | Class_legacyBasicInfo
-      fakeClientList: ReturnType<Class_client["get"]>
+      classLegacyContract: Class_legacyQuotation
+      classBasicInfo: Class_basicInfo
+      customerArr: TcustomerDto[]
       disabled: boolean
     }) {
 
-  // ==============================================
+  // =============================================
+  const { customer } = classLegacyContract
 
-  // 報價單資料
-  const { basicInfo, clientProfile } = classBasicInfo.all
   const {
-    quotationId,
-    tempQuotationAging,
-    date,
-    constructionName,
-    constructionCounty,
-    constructionDistrict,
-    constructionAddress,
+    contractNumber,
+    quoteValidity,
+    quoteDate,
+    projectName,
+    customerName,
+    contactPerson,
+    contactNumber,
+    faxNumber,
     trackingStatus,
-    siteProgress,
+    projectProgress,
+    projectCity,
+    projectDistrict,
+    projectAddress,
+  } = classBasicInfo
 
-  } = basicInfo
-
-  const {
-    name: clientName,
-    fax,
-    clientState,
-    contact,
-  } = clientProfile ?? {}
-
-  const { setBasicInfoString } = classBasicInfo
-
-  // ----------------------------------
-  const builtDate = format(new Date(date), "yyy年MM月dd日")
-  // ----------------------------------
-  // ==============================================
+  const customerTypes = (customer?.types?.map((type) => customerTypesLookup[type.name]))?.join("/") ?? "無類別"
 
   // ==============================================
   // 客戶資料
+  // const theClientData = [
+  //   { label: "聯絡人", placeholder: "尚未選擇", value: contactPerson },
+  //   { label: "聯絡電話", placeholder: "尚未選擇", value: contactNumber },
+  //   { label: "傳真號碼", placeholder: "尚未選擇", value: faxNumber },
+  // ]
   const theClientData = [
-    { label: "聯絡人", placeholder: "尚未選擇", value: contact?.[0].name },
-    { label: "聯絡電話", placeholder: "尚未選擇", value: contact?.[0].phone },
-    { label: "傳真號碼", placeholder: "尚未選擇", value: fax },
+    { label: "聯絡人", placeholder: "尚未選擇", value: contactPerson },
+    { label: "聯絡電話", placeholder: "尚未選擇", value: contactNumber },
+    { label: "傳真號碼", placeholder: "尚未選擇", value: faxNumber },
   ]
 
   // ==============================================
   const clearClient = () => {
     if (disabled) return
-    classBasicInfo.clientProfile = undefined
+    classBasicInfo.customerName = ""
+    classBasicInfo.contactPerson = ""
+    classBasicInfo.contactNumber = ""
+    classBasicInfo.faxNumber = ""
   }
   // ==============================================
-  const styleHaveState = clientState ? scss.haveState : ""
+  const styleHaveState = customerName ? scss.haveState : ""
   // ==============================================
   // 工程地點
   const selectInputList = {
-    county: constructionCounty,
+    county: projectCity,
     onChangeCounty: (option: Toption | null) => {
       if (!option) return
-      setBasicInfoString("constructionCounty", option.value)
-      setBasicInfoString("constructionDistrict", "")
+      classBasicInfo.projectCity = option.value
+      classBasicInfo.projectDistrict = ""
     },
-    district: constructionDistrict,
+    district: projectDistrict,
     onChangeDistrict: (option: Toption | null) => {
       if (!option) return
-      setBasicInfoString("constructionDistrict", option.value)
+      classBasicInfo.projectDistrict = option.value
     },
-    address: constructionAddress,
-    onChangeAddress: (value: string) => setBasicInfoString("constructionAddress", value),
+    address: projectAddress,
+    onChangeAddress: (value: string) => classBasicInfo.projectAddress = value,
   }
-
-
 
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
   const openModal = () => disabled ? "" : setShowModal(true)
-  const onConfirmClient = (client: ReturnType<Class_client["get"]>[0]) => {
-    classBasicInfo.clientProfile = client
+  const onConfirmClient = (customer: TcustomerDto) => {
+    classLegacyContract.customer = customer
+    classBasicInfo.customerName = customer.name
+    classBasicInfo.contactPerson = customer.contacts?.[0]?.name ?? ""
+    classBasicInfo.contactNumber = customer.contacts?.[0]?.phone ?? ""
+    classBasicInfo.faxNumber = customer.fax
   }
 
   // ==============================================
 
-
   return (
     <div className={scss.container}>
       <div className={scss.profile}>
-        <span className={`${scss.clientState}  ${styleHaveState}`}>狀態 : {clientState || "尚未選擇客戶"}</span>
+        <span className={`${scss.clientState}  ${styleHaveState}`}>
+          類別 : {customerTypes || "尚未選擇客戶"}
+        </span>
         <InputSel
           label="工程名稱"
           disabled={disabled}
           {...{ ...inputStyle }}
           inputProps={{
-            value: constructionName,
-            onChange: (v) => { setBasicInfoString("constructionName", v) },
+            value: projectName,
+            onChange: (v) => { classBasicInfo.projectName = v },
           }}
         />
         {/*  */}
@@ -146,12 +146,12 @@ export default function QuotationProfile(
                 captionWidth={inputStyle.captionWidth}
                 gap={inputStyle.gap}
                 textareaProps={{
-                  value: clientName ?? "",
+                  value: customerName ?? "",
                   onChange: () => { },
                 }}
               />
-              {!clientName && <button onClick={openModal}>請選擇客戶</button>}
-              {clientName && !disabled && <IconRemove02 onClick={clearClient} />}
+              {!customerName && <button onClick={openModal}>請選擇客戶</button>}
+              {customerName && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
 
@@ -184,8 +184,8 @@ export default function QuotationProfile(
               disabled={disabled}
               {...{ ...inputStyle }}
               inputProps={{
-                value: trackingStatus,
-                onChange: (v) => { setBasicInfoString("trackingStatus", v) },
+                value: trackingStatus ?? "",
+                onChange: (v) => { classBasicInfo.trackingStatus = v },
               }}
             />
 
@@ -196,8 +196,8 @@ export default function QuotationProfile(
               disabled={disabled}
               {...{ ...inputStyle }}
               inputProps={{
-                value: siteProgress,
-                onChange: (v) => { setBasicInfoString("siteProgress", v) },
+                value: projectProgress ?? "",
+                onChange: (v) => { classBasicInfo.projectProgress = v },
               }}
             />
           </div>
@@ -213,19 +213,35 @@ export default function QuotationProfile(
         />
       </div>
 
-      <div className={scss.time}>
-        <span>報價編號</span>
-        <span>{quotationId}</span>
-        <span>報價時效</span>
-        <span>{tempQuotationAging}天內</span>
-        <span>報價日期</span>
-        <span>{builtDate}</span>
+      <div className={scss.time_legacy}>
+        <InputSel
+          label="報價編號"
+          showBaseline="invisible"
+          inputProps={{
+            value: contractNumber,
+            onChange: (v) => { classBasicInfo.contractNumber = v }
+          }} />
+        <InputSel
+          label="報價時效"
+          showBaseline="invisible"
+          inputProps={{
+            value: quoteValidity ?? "",
+            onChange: (v) => { classBasicInfo.quoteValidity = v }
+          }} />
+        <InputSel
+          label="報價日期"
+          showBaseline="invisible"
+          inputProps={{
+            value: quoteDate ?? "",
+            onChange: (v) => { classBasicInfo.quoteDate = v }
+          }} />
       </div>
 
+
       {/* modal */}
-      <ClientSelector
+      <CustomerSelector
         {...{ showModal, setShowModal }}
-        fakeClientList={fakeClientList}
+        customerArr={customerArr}
         onConfirm={onConfirmClient}
       />
 

@@ -15,7 +15,7 @@ import {
 import {
   TlegacyContractDto, TcreateLegacyContractDto,
   TlegacyContractProductDto, TcreateLegacyContractProductDto,
-  TlegacyContractAdditionDto, TcreateLegacyContractAdditionDto,
+  TlegacyContractAdditionDto, TcreateLegacyContractAdditionDto, TcustomerDto,
 } from "js/api/dtoTypes"
 
 
@@ -328,21 +328,15 @@ class Class_signature {
 // =======================================================================
 // =======================================================================
 // =======================================================================
-class Class_legacyQuotation {
+class Class_legacyContract {
   constructor(
     reRender: TreRender,
-    legacyContract: TlegacyContractDto | TcreateLegacyContractDto,
+    legacyContract: (TlegacyContractDto | TcreateLegacyContractDto) & { customer?: TcustomerDto | undefined },
     prodCellConfig: TprodCellConfig,
     additionCellConfig: TadditionCellConfig
   ) {
     this._legacyContract = legacyContract
     this._reRender = reRender
-
-    this.customerId = (() => {
-      if ("customer" in this._legacyContract)
-        return this._legacyContract.customer.id
-      return undefined
-    })()
 
     /**  報價單基本資料*/
     this.classBasicInfo
@@ -365,12 +359,10 @@ class Class_legacyQuotation {
     this.prodCellConfig = prodCellConfig
     this.additionCellConfig = additionCellConfig
 
-
   } // constructor
 
   private _legacyContract
   private _reRender
-  customerId
   /**用來判斷這是哪個class */
   identify = "legacy" as const
   // ---------------------
@@ -383,18 +375,26 @@ class Class_legacyQuotation {
   classSignature
   // ---------------------
 
+  get customer() {
+    return this._legacyContract.customer
+  }
+  set customer(v) {
+    this._legacyContract.customer = v
+    this._reRender()
+  }
+
   // ---------------------
   get prodkeyList() {
     return this.prodCellConfig.keyList
   }
-  set prodkeyList(v: typeof this.prodCellConfig.keyList) {
+  set prodkeyList(v) {
     this.prodCellConfig.keyList = v
     this._reRender()
   }
 
   private _activeProd = -1 // 被選中的mainProduct的index
   get activeProd() { return this._activeProd }
-  set activeProd(v: number) {
+  set activeProd(v) {
     this._activeProd = v
     this._reRender()
   }
@@ -435,9 +435,7 @@ class Class_legacyQuotation {
 
   get postData(): TcreateLegacyContractDto | false {
     const customerId = (() => {
-      if ("customer" in this._legacyContract)
-        return this._legacyContract.customer.id
-      return undefined
+      return this._legacyContract.customer?.id
     })()
 
     if (!customerId) return false
@@ -455,7 +453,7 @@ const useLegacyQuotation = (data: TlegacyContractDto | undefined) => {
   const reRender: TreRender = () => setRender(state => state + 1)
 
   const checkData = () => {
-    return new Class_legacyQuotation(
+    return new Class_legacyContract(
       reRender,
       data ?? emptyLegacyContract(),
       prodCellConfigCre(),
@@ -464,15 +462,15 @@ const useLegacyQuotation = (data: TlegacyContractDto | undefined) => {
   }
   // 回朔到修改前的狀態
   const rewind = () => {
-    setQuotation(checkData())
+    setClassLegacyContract(checkData())
   }
 
-  const [classQuotation, setQuotation] = useState(checkData())
-  return { classQuotation, rewind }
+  const [classLegacyContract, setClassLegacyContract] = useState(checkData())
+  return { classLegacyContract, rewind }
 }
 
 export {
-  Class_legacyQuotation,
+  Class_legacyContract as Class_legacyQuotation,
   Class_basicInfo,
   Class_product,
   Class_addition,

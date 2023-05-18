@@ -77,17 +77,32 @@ export const useLegacyContracts = (params?: Tparams) => {
 
 
 export const apiGetLegacyContracts_id = (id: string, params: Tparams = {}) => {
+
   const api = `/legacy-contracts/${id}`
   return axi.get(api, { params })
-    .then(({ data }) => data as TgetLegacyContracts)
+    .then(({ data }) => data as TlegacyContractDto)
     .catch(err => Promise.reject(err))
+}
+
+export const useLegacyContract_id = (id: string | undefined, params?: Tparams) => {
+  let [res, setRes] = useState<TlegacyContractDto>()
+  const update = async () => {
+    if (!id) return undefined
+    const res = await apiGetLegacyContracts_id(id, params)
+    if (res) setRes(res)
+    return res
+  }
+  return {
+    legacyContract: res,
+    updateLegacyContract: update
+  }
 }
 
 
 export const apiPostLegacyContracts = (body: TcreateLegacyContractDto) => {
   const api = `/legacy-contracts`
   return axi.post(api)
-    .then(({ data }) => data as TgetLegacyContracts)
+    .then(({ data }) => data as TlegacyContractDto)
     .catch(err => Promise.reject(err))
 }
 
@@ -95,14 +110,14 @@ export const apiPostLegacyContracts = (body: TcreateLegacyContractDto) => {
 export const apiPatchLegacyContracts_id = (id: string, body: TupdateLegacyContractDto) => {
   const api = `/legacy-contracts/${id}`
   return axi.patch(api, body)
-    .then(({ data }) => data as TgetLegacyContracts)
+    .then(({ data }) => data as TlegacyContractDto)
     .catch(err => Promise.reject(err))
 }
 
 export const apiDeleteLegacyContracts_id = (id: string) => {
   const api = `/legacy-contracts/${id}`
   return axi.delete(api)
-    .then(({ data }) => data as TgetLegacyContracts)
+    .then(({ data }) => data as TlegacyContractDto)
     .catch(err => Promise.reject(err))
 }
 

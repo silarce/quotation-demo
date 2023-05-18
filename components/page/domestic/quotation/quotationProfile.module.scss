@@ -88,6 +88,25 @@
   }
 }
 
+.time_legacy {
+  display: grid;
+  gap: 16px;
+  height: fit-content;
+  padding: 18px 24px;
+  background-color: $bgc01;
+  span,
+  input {
+    font-weight: 400;
+    font-size: 18px;
+    &:nth-of-type(odd) {
+      color: $colorMain;
+    }
+    &:nth-of-type(even) {
+      color: $colorText;
+    }
+  }
+}
+
 .input02 {
   > span {
     color: $colorMain;
