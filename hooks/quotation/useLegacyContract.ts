@@ -1,5 +1,6 @@
 import { useState, HTMLInputTypeAttribute } from "react"
 import _ from "lodash"
+import Decimal from "decimal.js"
 
 import {
   optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection
@@ -232,10 +233,18 @@ class Class_payInfo {
   private _reRender
   private _legacyContract
 
-  get discountRate() { return this._legacyContract.discountRate }
-  set discountRate(v) { this._legacyContract.discountRate = v; this._reRender() }
+  get discountRate() {
+    // return Decimal.mul(this._legacyContract.discountRate || "0", 100).toString()
+    return this._legacyContract.discountRate
+  }
+  set discountRate(v) {
+    // if (!v) v = "0"
+    // this._legacyContract.discountRate = Decimal.div(v, 100).toString();
+    this._legacyContract.discountRate = v;
+    this._reRender()
+  }
 
-  // get subTotal() { return `${this._legacyContract.subTotal}` }
+
   get subTotal() { return this._legacyContract.subTotal.toString() }
   set subTotal(v) { this._legacyContract.subTotal = parseFloat(v); this._reRender() }
 
@@ -252,15 +261,15 @@ class Class_payInfo {
   set deliveryDate(v) { this._legacyContract.deliveryDate = v; this._reRender() }
 
   get paymentMethods() { return this._legacyContract.paymentMethods }
-  editPayWay = (index: number, v: string) => {
+  editPayMethod = (index: number, v: string) => {
     this._legacyContract.paymentMethods[index].totalPaymentRatio = v;
     this._reRender()
   }
-  addPayWay = (milestone: string) => {
-    this._legacyContract.paymentMethods.push({ milestone, totalPaymentRatio: "" })
+  addPayMethod = (milestone: string) => {
+    this._legacyContract.paymentMethods.push({ milestone, totalPaymentRatio: "0" })
     this._reRender()
   }
-  removePayWay = (index: number) => {
+  removePayMethod = (index: number) => {
     this._legacyContract.paymentMethods.splice(index, 1)
     this._reRender()
   }
@@ -671,7 +680,7 @@ const emptyLegacyContract = (): TcreateLegacyContractDto => {
     projectCity: "",
     projectDistrict: "",
     projectAddress: "",
-    discountRate: "",
+    discountRate: "0",
     subTotal: 0,
     salesTax: 0,
     total: 0,

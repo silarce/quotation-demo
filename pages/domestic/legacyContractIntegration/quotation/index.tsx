@@ -15,7 +15,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
 import QuotationAdditions from "components/page/domestic/quotation/quotationAdditions"
-import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
+import QuotationTotal from "components/page/domestic/quotation/quotationTotal_legacyContract"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 
 import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
@@ -195,12 +195,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 其他設定 */}
           <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 備註/報價範圍/付款資訊 */}
-          {/* <QuotationTotal
-            classQuotation={classQuotation}
-            getFakeMemo={getFakeMemo}
-            getFakeQuotaRange={getFakeQuotaRange}
+          <QuotationTotal
+            legacyContract={classLegacyContract}
             disabled={!allowEdit}
-          /> */}
+          />
           {/* 簽名 */}
           {/* <QuotationSinature
             signatureArr={signatureArr}

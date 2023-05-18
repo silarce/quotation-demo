@@ -91,7 +91,7 @@ export default function QuotationTotal(
           />}
         {identify === "legacy" &&
           <PayInfo_legacy
-            classQuotation={classQuotation}
+            legacyContract={classQuotation}
             disabled={disabled}
           />}
 
