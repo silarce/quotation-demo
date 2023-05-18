@@ -54,10 +54,11 @@ export default function QuotationProduction({
         </div>
 
         <ProductList_legacy classQuotation={legacyContract as Class_legacyContract} disabled={disabled} />
-
-        <AddButton className={style.addBtn}
-          label="新增產品"
-          onClick={legacyContract.addProd} />
+        {!disabled &&
+          <AddButton className={style.addBtn}
+            label="新增產品"
+            onClick={legacyContract.addProd} />
+        }
       </div>
     </div>
   )
