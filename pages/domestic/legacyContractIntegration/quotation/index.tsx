@@ -24,22 +24,18 @@ import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/qu
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+
 // icon
 import iconUpload from "public/image/icon/upload.svg"
-
 
 // css
 import style from "./quotation.module.scss"
 // ========================================================================
-import { fakeApi_legacyQuotation_creator } from "fakeDatabase/fakeAPI/fakeLegacyQuotationApi"
 import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLegacyContract"
-import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
-import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
-import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
 // ========================================================================
 // api
-
-import { useLegacyContract_id } from "js/api/api_legacy-contract"
+import { useLegacyContract_id, apiPostLegacyContracts } from "js/api/api_legacy-contract"
 import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
 
 
@@ -70,22 +66,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   let [params, setParams] = useState<TapiGetCustomersParams>({
     page: 1,
-    pageSize: 8,
+    pageSize: 20,
     populate: ["contacts", "types"],
     // filter,
     sort: "customerNumber"
   })
   const { data: customerArr, update: updateCustomerArr } = useCustomers(params)
   // --------------------------------------------------------------------------
-
   const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId)
 
   useEffect(() => {
     (async () => {
-      await updateCustomerArr()
-      await updateLegacyContract()
+      await Promise.all([updateCustomerArr(), updateLegacyContract(),])
     })()
-
   }, [])
 
   const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
@@ -109,11 +102,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ]
 
-  // const getFakeMemo = fakeApi_memo.get
-  // const getFakeQuotaRange = fakeApi_quoteRange.get
+
 
   useEffect(() => {
-    1
     rewind()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit])
@@ -131,13 +122,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
 
-  // optionQuotationState
   const panel_editable: TpanelList = [
     {
-      type: "redButton", label: "上傳", onClick: () => {
-        // if (!fakeApiQuotaion || !classQuotation) return myAlert.warning({ title: "fakeApiQuotaion或classQuotation為undefined" })
-        // if (isNewQuotationId) fakeApiQuotaion.post(classQuotation.postData)
-        // else fakeApiQuotaion.put(classQuotation.postData)
+      type: "redButton", label: "上傳", onClick: async () => {
+
+        const postBody = classLegacyContract.postBody
+        if (!postBody) return
+        try {
+          showRootLoading(true)
+          await apiPostLegacyContracts(classLegacyContract.postBody)
+          myAlert.success({ title: "上傳完成" })
+        }
+        catch { myAlert.err({title:"上傳失敗"})}
+        finally { showRootLoading(false) }
         setAllowEdit(false)
       }
     },
@@ -200,9 +197,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={!allowEdit}
           />
           {/* 簽名 */}
-          {/* <QuotationSinature
+          <QuotationSinature
             signatureArr={signatureArr}
-            disabled={!allowEdit} /> */}
+            disabled={!allowEdit} />
         </div>
       </div>
       {/* <QuotationPdf

@@ -101,7 +101,7 @@ export const useLegacyContract_id = (id: string | undefined, params?: Tparams) =
 
 export const apiPostLegacyContracts = (body: TcreateLegacyContractDto) => {
   const api = `/legacy-contracts`
-  return axi.post(api)
+  return axi.post(api, body)
     .then(({ data }) => data as TlegacyContractDto)
     .catch(err => Promise.reject(err))
 }

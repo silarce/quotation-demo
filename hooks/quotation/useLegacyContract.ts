@@ -2,6 +2,11 @@ import { useState, HTMLInputTypeAttribute } from "react"
 import _ from "lodash"
 import Decimal from "decimal.js"
 
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import { checkDateFormat } from "js/tools/date/checkDate"
+import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard"
+import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
+
 import {
   optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection
 } from "js/utils/options/doorTrackOptions"
@@ -25,6 +30,10 @@ class Class_basicInfo {
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
+    this._legacyContract.quoteDate
+      = yearConversion_standardToCh(this._legacyContract.quoteDate ?? "", true)
+    this._legacyContract.deliveryDate
+      = yearConversion_standardToCh(this._legacyContract.deliveryDate ?? "", true)
   }
 
   private _reRender
@@ -441,14 +450,40 @@ class Class_legacyContract {
   additionCellConfig
   // ---------------------
 
-  get postData(): TcreateLegacyContractDto | false {
+  get postBody(): TcreateLegacyContractDto | false {
     const customerId = (() => {
       return this._legacyContract.customer?.id
     })()
+    if (!customerId) { myAlert.warning({ title: "沒有選擇客戶" }); return false }
 
-    if (!customerId) return false
+    const { quoteDate, deliveryDate, } = this._legacyContract
+
+    if (!checkDateFormat(quoteDate ?? "", "tw")) {
+      myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
+    }
+    if (!checkDateFormat(deliveryDate ?? "", "tw")) {
+      myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
+    }
+
+
+    const legacyContractCopy = _.cloneDeep(this._legacyContract)
+
+    legacyContractCopy.quoteDate
+      = yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string
+
+    legacyContractCopy.deliveryDate
+      = yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string
+
+
+    legacyContractCopy.discountRate
+      = Decimal.div(legacyContractCopy.discountRate, 100).toString()
+
+    legacyContractCopy.paymentMethods.forEach((item) => {
+      item.totalPaymentRatio = Decimal.div(item.totalPaymentRatio, 100).toString()
+    })
+
     return {
-      ...this._legacyContract,
+      ...legacyContractCopy,
       customerId,
     }
   }
