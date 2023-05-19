@@ -181,7 +181,7 @@ const sidePathList: TsidePathList = {
             {
               label: "舊合約整合",
               path: path01 + "/legacyContractIntegration",
-              erpFeature: devPass,
+              erpFeature: "allPass",
             },
           ]
         },
@@ -397,8 +397,8 @@ const topPathList: TtopPathListConfig[] = [
     label: "營業部",
     subLabel: "-國內工程",
     path01: sidePathList["/domestic"].path01,
-    href: sidePathList["/domestic"].path01 + "/budget",
-    erpFeature: devPass,
+    href: sidePathList["/domestic"].path01 + "/legacyContractIntegration",
+    erpFeature: "allPass",
   },
   {
     icon: icon_foreign,
