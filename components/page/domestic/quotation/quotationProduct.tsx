@@ -16,7 +16,6 @@ import styleL from "./local.module.scss"
 // type
 
 import { Class_quotation } from "hooks/quotation/useQuotation"
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
 
 
 
@@ -26,7 +25,7 @@ export default function QuotationProduction({
   switch02,
   className = "" }:
   {
-    classQuotation: Class_quotation | Class_legacyQuotation
+    classQuotation: Class_quotation
     disabled: boolean
     switch02?: boolean
     className?: string
@@ -55,12 +54,7 @@ export default function QuotationProduction({
             allowMove={allowMove} />
         </div>
 
-        {classQuotation.identify === "normal" &&
           <ProductList classQuotation={classQuotation as Class_quotation} disabled={disabled} />
-        }
-        {classQuotation.identify === "legacy" &&
-          <ProductList_legacy classQuotation={classQuotation as Class_legacyQuotation} disabled={disabled} />
-        }
 
         <AddButton className={style.addBtn}
           label="新增產品"

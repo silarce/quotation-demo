@@ -232,7 +232,7 @@ export default function QuotationProfile(
           label="報價日期"
           showBaseline="invisible"
           inputProps={{
-            value: quoteDate ?? "",
+            value: quoteDate as string ?? "",
             onChange: (v) => { classBasicInfo.quoteDate = v }
           }} />
       </div>
