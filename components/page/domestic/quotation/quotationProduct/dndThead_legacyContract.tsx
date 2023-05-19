@@ -28,20 +28,20 @@ import style from "./dndThead.module.scss"
 import styleL from "../local.module.scss"
 
 // type
-import { Class_quotation } from "hooks/quotation/useQuotation"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 
 // =========================================================
 // =========================================================
 export default function DndThead({ allowMove, classQuotation }:
   {
-    classQuotation: Class_quotation
+    classQuotation: Class_legacyContract
     allowMove: boolean
   }) {
 
   const {
-    mainProdCellConfig: prodCellConfig, // 格子的資訊(label, width這些)
-    mainProdkeyList: theadIndex, // thead的目錄、排序
+    prodCellConfig: prodCellConfig, // 格子的資訊(label, width這些)
+    prodkeyList: theadIndex, // thead的目錄、排序
   } = classQuotation
 
   const sensors = useSensors(
@@ -101,7 +101,7 @@ export default function DndThead({ allowMove, classQuotation }:
       let oldIndex: number =
         theadIndex.indexOf(active.id as keyof typeof prodCellConfig.cellConfig);
       let newIndex: number = theadIndex.indexOf(over?.id as keyof typeof prodCellConfig.cellConfig);
-      classQuotation.mainProdkeyList = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.mainProdkeyList
+      classQuotation.prodkeyList = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyList
     }
   }
 

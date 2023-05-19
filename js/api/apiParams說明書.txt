@@ -63,6 +63,18 @@ GET {{host}}/users?
   filter[isActive]=false
 
 
+如果是array
+{
+  "types.name": {
+    "$in": ["propertyOwner", "contractor"]
+  }
+}
+
+{
+  "types.name": {
+    "$eq": "propertyOwner"
+  }
+}
 
 ==============================================================
 populate

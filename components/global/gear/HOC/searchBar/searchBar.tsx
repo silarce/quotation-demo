@@ -18,7 +18,7 @@ import style from "./searchBar.module.scss"
 import { Toption } from "fakeDatabase/options/options"
 
 interface TsearchObj {
-  [key: string]: string
+  [key: string]: string | undefined
 }
 
 interface TsearchTargetSel {
@@ -90,7 +90,7 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
               className={classNames(style.select, className)}
               showBaseline="invisible"
               selectProps={{
-                value: valueArr[index] ?? options[0],                
+                value: valueArr[index] ?? options[0],
                 // value: undefined,                
                 options,
                 arrowType: "black",

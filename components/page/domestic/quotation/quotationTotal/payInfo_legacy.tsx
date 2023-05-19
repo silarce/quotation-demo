@@ -11,42 +11,41 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import style from "./payInfo.module.scss"
 
 // type
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 
 export default function PayInfo_legacy(
-  { classQuotation, disabled }:
+  { legacyContract,
+    disabled }:
     {
-      classQuotation: Class_legacyQuotation
+      legacyContract: Class_legacyContract
       disabled: boolean
     }) {
   // -----------------------------------------------------------------------
   const [modalIsShow, setModalIsShow] = useState(false)
   // -----------------------------------------------------------------------
-  const { classPayInfo } = classQuotation
+  const { classPayInfo } = legacyContract
 
 
 
   const {
-    totalDiscount,
+    discountRate,
     subTotal,
-    tax,
+    salesTax,
     total,
-    tradingLocation,
-    tradingDate,
-    payWay,
+    deliveryLocation,
+    deliveryDate,
+    paymentMethods,
 
-    editPayWay,
-    addPayWay,
-    removePayWay,
-
-
+    editPayMethod,
+    addPayMethod,
+    removePayMethod,
   } = classPayInfo
 
   // -----------------------------------------------------------------------
   const countList = [
     { label: "小計", key: "subTotal" },
-    { label: "營業稅(5%)", key: "tax" },
+    { label: "營業稅(5%)", key: "salesTax" },
     { label: "總計", key: "total" },
   ] as const
   // -----------------------------------------------------------------------
@@ -58,10 +57,11 @@ export default function PayInfo_legacy(
         <div className={style.avgDiscount}>
           <span>{"總折數"}</span>
           <div>
-            <input type="text" className="bg-transparent"
-              value={totalDiscount}
-              onChange={(e) => classPayInfo.totalDiscount = e.target.value}
+            <input type="number" className="bg-transparent"
+              value={discountRate}
+              onChange={(e) => classPayInfo.discountRate = e.target.value}
               disabled={disabled}
+
             />
             <span>%</span>
           </div>
@@ -73,7 +73,7 @@ export default function PayInfo_legacy(
             <div key={index} className={style.avgDiscount}>
               <span>{label}</span>
               <div>
-                <input type="text" className="bg-transparent"
+                <input type="number" className="bg-transparent"
                   value={classPayInfo[key]}
                   onChange={(e) => classPayInfo[key] = e.target.value}
                   disabled={disabled}
@@ -91,8 +91,8 @@ export default function PayInfo_legacy(
           <span>交貨地點</span>
           <InputSel
             inputProps={{
-              value: tradingLocation,
-              onChange: (v) => { classPayInfo.tradingLocation = v },
+              value: deliveryLocation,
+              onChange: (v) => { classPayInfo.deliveryLocation = v },
             }}
             placeholder={`請輸入交貨地址`}
             disabled={disabled}
@@ -102,8 +102,8 @@ export default function PayInfo_legacy(
           <span>交貨日期</span>
           <InputSel
             inputProps={{
-              value: tradingDate,
-              onChange: (v) => { classPayInfo.tradingDate = v },
+              value: deliveryDate as string,
+              onChange: (v) => { classPayInfo.deliveryDate = v },
             }}
             placeholder={`例 : 100-01-01`}
             disabled={disabled}
@@ -113,18 +113,19 @@ export default function PayInfo_legacy(
         <div className={style.payMethodContainer}>
           <span>付款辦法</span>
 
-          {payWay.map((way, index) => {
-            const { value, label } = way
+          {paymentMethods.map((method, index) => {
+            const { totalPaymentRatio, milestone } = method
             return (
               <div key={index}
                 className={classNames(style.inputBox02, style.legacy)}>
                 <IconRemoveCircle className={style.btn}
-                  onClick={() => removePayWay(index)} />
-                <span className={style.label}>{index + 1}.{label}</span>
+                  onClick={() => removePayMethod(index)} />
+                <span className={style.label}>{index + 1}.{milestone}</span>
                 <InputSel
                   inputProps={{
-                    value,
-                    onChange: (v) => { editPayWay(index, v) },
+                    value: totalPaymentRatio,
+                    onChange: (v) => { editPayMethod(index, v) },
+                    inputType: "number",
                   }}
                   placeholder="請輸入%數"
                   disabled={disabled} />
@@ -132,14 +133,15 @@ export default function PayInfo_legacy(
               </div>
             )
           })}
-          <IconAddCircle className={style.btn} onClick={() => { setModalIsShow(true) }} />
+          {!disabled && <IconAddCircle className={style.btn} onClick={() => { setModalIsShow(true) }} />}
+
         </div>
       </div>
       <InputModal
         visible={modalIsShow}
         title="新增付款辦法"
         placeholder="請輸入付款辦法描述"
-        onConfirm={(v) => { addPayWay(v); setModalIsShow(false) }}
+        onConfirm={(v) => { addPayMethod(v); setModalIsShow(false) }}
         onCancel={() => { setModalIsShow(false) }}
       />
     </div>

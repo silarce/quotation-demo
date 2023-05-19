@@ -11,30 +11,41 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 
 // components
-import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
-import QuotationProduction from "components/page/domestic/quotation/quotationProduct"
-import QuotationOtherSetting from "components/page/domestic/quotation/quotationOtherSetting"
-import QuotationTotal from "components/page/domestic/quotation/quotationTotal"
+
+import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
+import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
+import QuotationAdditions from "components/page/domestic/quotation/quotationAdditions"
+import QuotationTotal from "components/page/domestic/quotation/quotationTotal_legacyContract"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 
-import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
-import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/quotationPdf_part"
+import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+
 // icon
 import iconUpload from "public/image/icon/upload.svg"
-
 
 // css
 import style from "./quotation.module.scss"
 // ========================================================================
-import { fakeApi_legacyQuotation_creator } from "fakeDatabase/fakeAPI/fakeLegacyQuotationApi"
-import { useLegacyQuotation } from "hooks/quotation/useLegacyQuotation"
-import { fakeApi_client } from "fakeDatabase/fakeAPI/fakeClientApi";
-import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
-import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
+import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLegacyContract"
+// ========================================================================
+// api
+import {
+  useLegacyContract_id,
+  apiPostLegacyContracts,
+  apiPatchLegacyContracts_id
+} from "js/api/api_legacy-contract"
+import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
+
+
+
+
+
+
 // ========================================================================
 // ========================================================================
 // ========================================================================
@@ -50,65 +61,99 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
 
-  let {
-    quotationId, //報價單id //若為新增報價單則為newQuotation
-    isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
-  } = router.query
+  /**合約id，若為undefined就逮代表為新增合約 */
+  const contractId = router.query.contractId as string | undefined
 
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false)
   // --------------------------------------------------------------------------
-  const fakeApiQuotaion = fakeApi_legacyQuotation_creator(router.query.quotationId as string)
+  let [customerParams, setCustomerParams] = useState<TapiGetCustomersParams>({
+    page: 1,
+    pageSize: 20,
+    populate: ["contacts", "types"],
+    // filter,
+    sort: "customerNumber"
+  })
+  const { data: customerArr, update: updateCustomerArr } = useCustomers(customerParams)
+  // --------------------------------------------------------------------------
+  let [legacyContractParams, setLegacyContractParams] = useState({
+    // populate: ["customer", "products", "additions","fax"],
+    populate: ["customer", "products", "additions"],
+  })
+  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
 
-  const { classQuotation, reNew: reNewClassQuotation } = useLegacyQuotation(fakeApiQuotaion?.get())
-  const fakeClientList = fakeApi_client.get()
-  const classSignature = classQuotation?.classSignature
+  useEffect(() => {
+    (async () => {
+      updateCustomerArr()
+    })()
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      updateLegacyContract()
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId])
+
+  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+
+  const classSignature = classLegacyContract.classSignature
   const signatureArr = [
     {
       label: "經理",
-      signature: classSignature?.manager ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.manager = v },
+      signature: classSignature.managerName,
+      onChange: (v: string) => { classSignature.managerName = v },
     },
     {
       label: "主管",
-      signature: classSignature?.director ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.director = v },
+      signature: classSignature.supervisorName,
+      onChange: (v: string) => { classSignature.supervisorName = v },
     },
     {
       label: "經辦",
-      signature: classSignature?.attn ?? "",
-      onChange: (v: string) => { if (classSignature) classSignature.attn = v },
+      signature: classSignature.operatorName,
+      onChange: (v: string) => { classSignature.operatorName = v },
     },
   ]
 
-  const getFakeMemo = fakeApi_memo.get
-  const getFakeQuotaRange = fakeApi_quoteRange.get
-
   useEffect(() => {
-    reNewClassQuotation()
+    rewind()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowEdit])
+  }, [allowEdit, legacyContract])
 
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false)
-  const [showPdf_part, setShowPdf_part] = useState(false)
+  
 
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
-      label: `報價編號 ${quotationId}`,
-      onClick: () => alert(quotationId)
+      label: `報價編號 ${classLegacyContract.classBasicInfo.contractNumber}`,
+      onClick: () => { }
     },
-    { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
+    // { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ]
 
-  // optionQuotationState
   const panel_editable: TpanelList = [
     {
-      type: "redButton", label: "上傳", onClick: () => {
-        if (!fakeApiQuotaion || !classQuotation) return myAlert.warning({ title: "fakeApiQuotaion或classQuotation為undefined" })
-        if (isNewQuotationId) fakeApiQuotaion.post(classQuotation.postData)
-        else fakeApiQuotaion.put(classQuotation.postData)
+      type: "redButton", label: "上傳", onClick: async () => {
+
+        const postBody = classLegacyContract.postBody
+        if (!postBody) return
+        try {
+          showRootLoading(true)
+
+          const res =
+            contractId
+              ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
+              : await apiPostLegacyContracts(classLegacyContract.postBody)
+          myAlert.success({ title: "上傳完成" })
+
+          if (contractId) updateLegacyContract()
+          else router.push({ query: { contractId: res.id } })
+        }
+        catch { myAlert.err({ title: "上傳失敗" }) }
+        finally { showRootLoading(false) }
         setAllowEdit(false)
       }
     },
@@ -120,22 +165,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => setShowPdf(true)
     },
     { type: "myButton", label: "編輯", onClick: () => setAllowEdit(true) },
-    { type: "myButton", label: "送審", onClick: () => alert("送審") },
+    // { type: "myButton", label: "送審", onClick: () => alert("送審") },
     { type: "myButton", label: "返回", onClick: () => router.back() },
   ]
 
   // -----------------------------------------------------------------------
-  if (!classQuotation) return null
-  // -----------------------------------------------------------------------
-  const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
-      return {
-        ...mp.allData,
-        part: mp.partArr.map((part) => part.allData)
-      }
-    })
-    return theArr
-  })()
+  if (!classLegacyContract) return null
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -151,8 +186,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile
-            classBasicInfo={classQuotation.classBasicInfo}
-            fakeClientList={fakeClientList}
+            classLegacyContract={classLegacyContract}
+            classBasicInfo={classLegacyContract.classBasicInfo}
+            customerArr={customerArr ?? []}
             disabled={!allowEdit} />
           {/*  */}
           <div className={style.switchBar}>
@@ -161,14 +197,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </div>
           </div>
           {/* 主產品設定 */}
-          <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
+          <QuotationProduction legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 其他設定 */}
-          <QuotationOtherSetting classQuotation={classQuotation} disabled={!allowEdit} />
+          <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
-            classQuotation={classQuotation}
-            getFakeMemo={getFakeMemo}
-            getFakeQuotaRange={getFakeQuotaRange}
+            legacyContract={classLegacyContract}
             disabled={!allowEdit}
           />
           {/* 簽名 */}
@@ -180,11 +214,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
-        classQuotation={classQuotation} />
+        classLegacyContract={classLegacyContract} />
     </SubLayer>
   )
 }
 
+// ============================================================================
+/**
+代辦事項
+
+客戶名單有數千筆，要選擇客戶時要怎麼呈現?
+還有客戶名單的搜尋功能要記得做
+
+
+ */
 
 
 

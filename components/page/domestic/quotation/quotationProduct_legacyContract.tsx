@@ -2,7 +2,7 @@ import { useState } from "react"
 
 
 // components
-import DndThead from "./quotationProduct/dndThead"
+import DndThead from "./quotationProduct/dndThead_legacyContract"
 import ProductList from "./quotationProduct/productList"
 import ProductList_legacy from "./quotationProduct/productList_legacy"
 
@@ -14,18 +14,17 @@ import style from "./quotationProduct.module.scss"
 import styleL from "./local.module.scss"
 
 // type
-
-import { Class_quotation } from "hooks/quotation/useQuotation"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 
 
 export default function QuotationProduction({
-  classQuotation,
+  legacyContract,
   disabled,
   switch02,
   className = "" }:
   {
-    classQuotation: Class_quotation
+    legacyContract: Class_legacyContract
     disabled: boolean
     switch02?: boolean
     className?: string
@@ -50,15 +49,16 @@ export default function QuotationProduction({
       <div className={style.listContainer}>
         <div className={style.thead}>
           <DndThead
-            classQuotation={classQuotation}
+            classQuotation={legacyContract}
             allowMove={allowMove} />
         </div>
 
-          <ProductList classQuotation={classQuotation as Class_quotation} disabled={disabled} />
-
-        <AddButton className={style.addBtn}
-          label="新增產品"
-          onClick={classQuotation.addMainProd} />
+        <ProductList_legacy classQuotation={legacyContract as Class_legacyContract} disabled={disabled} />
+        {!disabled &&
+          <AddButton className={style.addBtn}
+            label="新增產品"
+            onClick={legacyContract.addProd} />
+        }
       </div>
     </div>
   )
