@@ -578,7 +578,7 @@ function prodCellConfigCre(): TprodCellConfig {
     ],
     cellConfig: {
       // input
-      idNumber: { id: "idNumber", label: "編號", width: "100px", type: "input" },
+      idNumber: { id: "idNumber", label: "編號", width: "100px", type: "input", inputType: "number" },
       itemName: { id: "itemName", label: "項目", width: "60px", type: "input" },
       quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "input" },
       doorType: { id: "doorType", label: "門型", width: "100px", type: "input" },

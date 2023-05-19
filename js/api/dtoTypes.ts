@@ -518,72 +518,12 @@ export type TupdateLegacyContractDto
     additions: Partial<TcreateLegacyContractAdditionDto>[]
   }>;
 
-
-// export type TupdateLegacyContractDto = {
-//   /** 合約編號 */
-//   contractNumber?: string;
-//   /** 報價時效 */
-//   quoteValidity?: string;
-//   /** 報價日期 */
-//   quoteDate?: string;
-//   /** 工程名稱 */
-//   projectName?: string;
-//   /** 客戶名稱 */
-//   customerName?: string;
-//   /** 聯絡人 */
-//   contactPerson?: string;
-//   /** 聯絡電話 */
-//   contactNumber?: string;
-//   /** 傳真號碼 */
-//   faxNumber?: string;
-//   /** 追蹤狀態 */
-//   trackingStatus?: string;
-//   /** 工地進度 */
-//   projectProgress?: string;
-//   /** 工地位置縣市 */
-//   projectCity?: string;
-//   /** 工地位置地區 */
-//   projectDistrict?: string;
-//   /** 工地位置地址 */
-//   projectAddress?: string;
-//   /** 折扣率(0.0 - 1.0) */
-//   discountRate?: string;
-//   /** 小計 */
-//   subTotal?: number;
-//   /** 營業稅 */
-//   salesTax?: number;
-//   /** 總計 */
-//   total?: number;
-//   /** 交貨地點 */
-//   deliveryLocation?: string;
-//   /** 交貨日期 */
-//   deliveryDate?: string;
-//   /** 付款方式 */
-//   paymentMethods?: TpaymentMethodDto[];
-//   /** 備註 */
-//   notes?: string[];
-//   /** 報價範圍 */
-//   quoteScopes?: string[];
-//   /** 經理 */
-//   managerName?: string;
-//   /** 主管 */
-//   supervisorName?: string;
-//   /** 經辦人 */
-//   operatorName?: string;
-//   /** 產品 */
-//   products?: UpdateLegacyContractProductDto[];
-//   /** 額外項目 */
-//   additions?: UpdateLegacyContractAdditionDto[];
-// };
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
-// post put patch
-// post put patch
-// post put patch
 
 export type TupdateCompanyInfoDto = {
   "name": string,
