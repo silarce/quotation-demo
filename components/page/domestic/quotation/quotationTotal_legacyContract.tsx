@@ -1,10 +1,7 @@
-import { useState } from "react"
-
 // component
 import StringList from "./quotationTotal/TextListEditor"
-import PayInfo from "./quotationTotal/payInfo"
 import PayInfo_legacy from "./quotationTotal/payInfo_legacy"
-import Appendix from "./quotationTotal/appendix"
+import Appendix from "./quotationTotal/appendix_legacy"
 // css
 import style from "./quotationTotal.module.scss"
 // type
@@ -16,10 +13,14 @@ export default function QuotationTotal(
   {
     legacyContract,
     disabled = false,
+    addFile: addFile,
+    removeFile
   }:
     {
       legacyContract: Class_legacyContract
       disabled: boolean
+      addFile: (file: File) => void
+      removeFile: (index: number) => void
     }) {
 
 
@@ -57,7 +58,10 @@ export default function QuotationTotal(
             alternateArr={undefined} searchAlternate={() => { }}
             label="報價範圍"
             disabled={disabled} />
-          <Appendix disabled={disabled} />
+          <Appendix disabled={disabled}
+            addFile={addFile}
+            removeFile={removeFile}
+          />
         </div>
         <PayInfo_legacy
           legacyContract={legacyContract}

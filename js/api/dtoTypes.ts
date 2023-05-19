@@ -13,6 +13,20 @@ export type TpageMetaDto = {
   hasNextPage: boolean
 }
 
+export type TfileDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  parent: string;
+  name: string;
+  size: number;
+  mime?: string;
+  etag: string;
+  isDir: boolean;
+  isWritable: boolean;
+  isDeletable: boolean;
+}
+
 
 /** 如果是admin帳號，不會有employee */
 export type TuserDto = {

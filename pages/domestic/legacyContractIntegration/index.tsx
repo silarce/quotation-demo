@@ -62,6 +62,7 @@ export default function LegacyContractIntegration() {
 
   useEffect(() => {
     (async () => { await updateLegacyContracts() })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchObj])
 
   // -----------------------------------------------------------------------

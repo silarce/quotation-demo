@@ -37,10 +37,12 @@ import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLega
 import {
   useLegacyContract_id,
   apiPostLegacyContracts,
-  apiPatchLegacyContracts_id
+  apiPatchLegacyContracts_id,
+  apiPostLegacyContracts_id_attachments
 } from "js/api/api_legacy-contract"
 import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
 
+import { apiUploadCompanyLogo } from "js/api/api_company-info"
 
 
 
@@ -86,6 +88,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     (async () => {
       updateCustomerArr()
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -122,9 +125,39 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [allowEdit, legacyContract])
 
   // -----------------------------------------------------------------------
-  const [showPdf, setShowPdf] = useState(false)
-  
 
+  const [fileArr, setFileArr] = useState<File[]>([])
+  const addFile = (file: File) => {
+    setFileArr(arr => {
+      const arrCopy = [...arr]
+      arrCopy.push(file)
+      return arrCopy
+    })
+  }
+
+  const removeFile = (index: number) => {
+    setFileArr(arr => {
+      const arrCopy = [...arr]
+      arrCopy.splice(index, 1)
+      return arrCopy
+    })
+  }
+
+  const uploadAttachment = async () => {
+    const formData = new FormData
+
+    formData.append("image", fileArr[0])
+
+    if (!contractId) return
+    try {
+      // await apiUploadCompanyLogo(formData)
+      await apiPostLegacyContracts_id_attachments(contractId, formData)
+    } catch (error) {
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  const [showPdf, setShowPdf] = useState(false)
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
@@ -142,6 +175,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         if (!postBody) return
         try {
           showRootLoading(true)
+
+          // await uploadAttachment()
 
           const res =
             contractId
@@ -204,6 +239,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationTotal
             legacyContract={classLegacyContract}
             disabled={!allowEdit}
+            addFile={addFile}
+            removeFile={removeFile}
           />
           {/* 簽名 */}
           <QuotationSinature

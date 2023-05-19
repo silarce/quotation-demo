@@ -124,6 +124,21 @@ export const apiDeleteLegacyContracts_id = (id: string) => {
 
 
 
+/**取得舊合約附件 */
+export const apiGetLegacyContracts_id_attachments = (id: string) => {
+  const api = `/legacy-contracts/${id}/attachments`
+  return axi.get(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
+
+/**上傳舊合約附件 */
+export const apiPostLegacyContracts_id_attachments = (id: string, body: FormData) => {
+  const api = `/legacy-contracts/${id}/attachments`
+  return axi.post(api, body)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
 
 
 
