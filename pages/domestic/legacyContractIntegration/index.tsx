@@ -22,13 +22,10 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 // ==================================================================
 
 // api
-import { useLegacyContracts } from "js/api/api_legacy-contract";
-
-
-
-
-
-
+import {
+  Tparams,
+  useLegacyContracts
+} from "js/api/api_legacy-contract";
 
 
 
@@ -47,7 +44,16 @@ export default function LegacyContractIntegration() {
 
   // -----------------------------------------------------------------------
 
-  const { legacyContractsArr, updateLegacyContracts, } = useLegacyContracts()
+  let [params, setParams] = useState<Tparams>({
+    page: 1,
+    pageSize: 999,
+    populate: ["products"],
+    // filter,
+    sort: "createdAt"
+  })
+
+
+  const { legacyContractsArr, updateLegacyContracts, } = useLegacyContracts(params)
 
   useEffect(() => {
     (async () => { await updateLegacyContracts() })()
@@ -129,7 +135,6 @@ export default function LegacyContractIntegration() {
         router.push({
           pathname: `/domestic/legacyContractIntegration/quotation`,
         })
-
       }
     }
   ]
@@ -148,13 +153,21 @@ export default function LegacyContractIntegration() {
               return discountRate.toString() + "%";
             })()
 
+            const tempDoorQty = (() => {
+              let qty = 0;
+              item.products.forEach((prod) => {
+                qty = qty + prod.quantity
+              })
+              return qty
+            })()
+
             const basicInfo = {
-              quotationId: item.contactNumber,
+              quotationId: item.contractNumber,
               constructionName: item.projectName,
               /**承辦人 */
               undertaker: item.operatorName,
               totalDiscount: discountRate,
-              tempDoorQty: "n",
+              tempDoorQty: tempDoorQty,
               tempBudgetAmount: item.total,
               // date: item.quoteDate,
               date: moment(item.quoteDate).format("YYYY-MM-DD"),
@@ -171,7 +184,7 @@ export default function LegacyContractIntegration() {
 
             const href = {
               pathname: "/domestic/legacyContractIntegration/quotation/",
-              query: { contractId:item.id }
+              query: { contractId: item.id }
             }
 
             return (

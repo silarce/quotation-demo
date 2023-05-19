@@ -21,7 +21,7 @@ import {
 
 
 
-type Tparams = {
+export type Tparams = {
   order?: "ASC" | "DESC",
   page?: number,
   pageSize?: number,
@@ -29,6 +29,7 @@ type Tparams = {
     [key: string]: any
   }
   populate?: string[]
+  sort?: string
 }
 
 
