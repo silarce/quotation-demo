@@ -100,7 +100,7 @@ export default function QuotationAdditions(
               </div> */}
 
               {additionKeyindex.map((key, cIndex) => {
-                const { width, flex, type } = cellConfig[key]
+                const { width, flex, type, inputType } = cellConfig[key]
                 const theStyle = { width, flex }
 
 
@@ -110,7 +110,8 @@ export default function QuotationAdditions(
                       disabled={disabled}
                       inputProps={{
                         value: part[key],
-                        onChange: (v) => part[key] = v
+                        onChange: (v) => part[key] = v,
+                        inputType: inputType
                       }}
                     />
                   </div>

@@ -122,7 +122,11 @@ class Class_product {
   }
 
   get idNumber() { return this._product.idNumber.toString() }
-  set idNumber(v) { this._product.idNumber = parseFloat(v); this._reRender() }
+  set idNumber(v) {
+    if (!v) v = "0"
+    this._product.idNumber = parseFloat(v);
+    this._reRender()
+  }
 
   get itemName() { return this._product.itemName }
   set itemName(v) { this._product.itemName = v; this._reRender() }
@@ -134,16 +138,32 @@ class Class_product {
   set doorType(v) { this._product.doorType = v; this._reRender() }
 
   get length() { return this._product.length.toString() }
-  set length(v) { this._product.length = parseFloat(v); this._reRender() }
+  set length(v) {
+    if (!v) v = "0"
+    this._product.length = parseFloat(v);
+    this._reRender()
+  }
 
   get width() { return this._product.width.toString() }
-  set width(v) { this._product.width = parseFloat(v); this._reRender() }
+  set width(v) {
+    if (!v) v = "0"
+    this._product.width = parseFloat(v);
+    this._reRender()
+  }
 
   get height() { return this._product.height.toString() }
-  set height(v) { this._product.height = parseFloat(v); this._reRender() }
+  set height(v) {
+    if (!v) v = "0"
+    this._product.height = parseFloat(v);
+    this._reRender()
+  }
 
   get thickness() { return this._product.thickness.toString() }
-  set thickness(v) { this._product.thickness = parseFloat(v); this._reRender() }
+  set thickness(v) {
+    if (!v) v = "0"
+    this._product.thickness = parseFloat(v);
+    this._reRender()
+  }
 
   get area() { return this._product.area }
   set area(v) { this._product.area = v; this._reRender() }
@@ -164,13 +184,25 @@ class Class_product {
   set horsepower(v) { this._product.horsepower = v; this._reRender() }
 
   get quantity() { return this._product.quantity.toString() }
-  set quantity(v) { this._product.quantity = parseFloat(v); this._reRender() }
+  set quantity(v) {
+    if (!v) v = "0"
+    this._product.quantity = parseFloat(v);
+    this._reRender()
+  }
 
   get unitPrice() { return this._product.unitPrice.toString() }
-  set unitPrice(v) { this._product.unitPrice = parseFloat(v); this._reRender() }
+  set unitPrice(v) {
+    if (!v) v = "0"
+    this._product.unitPrice = parseFloat(v);
+    this._reRender()
+  }
 
   get totalPrice() { return this._product.totalPrice.toString() }
-  set totalPrice(v) { this._product.totalPrice = parseFloat(v); this._reRender() }
+  set totalPrice(v) {
+    if (!v) v = "0"
+    this._product.totalPrice = parseFloat(v);
+    this._reRender()
+  }
 
   get typhoonProtection() { return this._product.typhoonProtection }
   set typhoonProtection(v) {
@@ -209,19 +241,35 @@ class Class_addition {
   }
 
   get itemIndex() { return this._addition.itemIndex.toString() }
-  set itemIndex(v) { this._addition.itemIndex = parseFloat(v); this._reRender() }
+  set itemIndex(v) {
+    if (!v) v = "0"
+    this._addition.itemIndex = parseFloat(v);
+    this._reRender()
+  }
 
   get content() { return this._addition.content }
   set content(v) { this._addition.content = v; this._reRender() }
 
   get quantity() { return this._addition.quantity.toString() }
-  set quantity(v) { this._addition.quantity = parseFloat(v); this._reRender() }
+  set quantity(v) {
+    if (!v) v = "0"
+    this._addition.quantity = parseFloat(v);
+    this._reRender()
+  }
 
   get unitPrice() { return this._addition.unitPrice.toString() }
-  set unitPrice(v) { this._addition.unitPrice = parseFloat(v); this._reRender() }
+  set unitPrice(v) {
+    if (!v) v = "0"
+    this._addition.unitPrice = parseFloat(v);
+    this._reRender()
+  }
 
   get totalPrice() { return this._addition.totalPrice.toString() }
-  set totalPrice(v) { this._addition.totalPrice = parseFloat(v); this._reRender() }
+  set totalPrice(v) {
+    if (!v) v = "0"
+    this._addition.totalPrice = parseFloat(v);
+    this._reRender()
+  }
 
   get notes() { return this._addition.notes }
   set notes(v) { this._addition.notes = v; this._reRender() }
@@ -237,21 +285,22 @@ class Class_payInfo {
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
+    this._legacyContract.discountRate = Decimal.mul(this._legacyContract.discountRate || "0", 100).toString()
+    this._legacyContract.paymentMethods.forEach((item) => {
+      item.totalPaymentRatio = Decimal.mul(item.totalPaymentRatio || "0", 100).toString()
+    })
+
   }
   private _reRender
   private _legacyContract
 
   get discountRate() {
-    // return Decimal.mul(this._legacyContract.discountRate || "0", 100).toString()
     return this._legacyContract.discountRate
   }
   set discountRate(v) {
-    // if (!v) v = "0"
-    // this._legacyContract.discountRate = Decimal.div(v, 100).toString();
     this._legacyContract.discountRate = v;
     this._reRender()
   }
-
 
   get subTotal() { return this._legacyContract.subTotal.toString() }
   set subTotal(v) { this._legacyContract.subTotal = parseFloat(v); this._reRender() }
@@ -637,11 +686,11 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       "unitPrice", "totalPrice", "notes",
     ],
     cellConfig: {
-      "itemIndex": { label: "項目", width: "60px", type: "input" },
+      "itemIndex": { label: "項目", width: "60px", type: "input", inputType: "number" },
       "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
-      "quantity": { label: "數量", width: "60px", type: "input" },
-      "unitPrice": { label: "單價", width: "110px", type: "input" },
-      "totalPrice": { label: "複價", width: "110px", type: "input" },
+      "quantity": { label: "數量", width: "60px", type: "input", inputType: "number" },
+      "unitPrice": { label: "單價", width: "110px", type: "input", inputType: "number" },
+      "totalPrice": { label: "複價", width: "110px", type: "input", inputType: "number" },
       "notes": { label: "備註", width: "170px", type: "input" },
 
     }

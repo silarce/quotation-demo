@@ -102,7 +102,7 @@ export default function PayInfo_legacy(
           <span>交貨日期</span>
           <InputSel
             inputProps={{
-              value: deliveryDate,
+              value: deliveryDate as string,
               onChange: (v) => { classPayInfo.deliveryDate = v },
             }}
             placeholder={`例 : 100-01-01`}
