@@ -28,48 +28,53 @@ import {
 } from "js/api/api_legacy-contract";
 
 
-
-
 export default function LegacyContractIntegration() {
   const router = useRouter()
 
   // 搜尋用的 //這個資料不會render在畫面上
   // render在畫面上的是PageHeader02元件裡的狀態
   const [searchObj, setSearchObj] = useState<TsearchObj>({
-    doorType: "",
-    county: "",
-    clientName: "",
-    projectName: "",
+    doorType: undefined,
+    projectCity: undefined,
+    customerName: undefined,
+    projectName: undefined,
   })
 
   // -----------------------------------------------------------------------
 
-  let [params, setParams] = useState<Tparams>({
+
+  const filter = {
+    "products.doorType": { $eq: searchObj.doorType },
+    "projectCity": { $eq: searchObj.projectCity },
+    "customerName": { $contains: searchObj.customerName },
+    "projectName": { $contains: searchObj.projectName },
+  }
+
+  const params = {
     page: 1,
     pageSize: 999,
     populate: ["products"],
-    // filter,
+    filter,
     sort: "createdAt"
-  })
-
+  }
 
   const { legacyContractsArr, updateLegacyContracts, } = useLegacyContracts(params)
 
   useEffect(() => {
     (async () => { await updateLegacyContracts() })()
-  }, [])
+  }, [searchObj])
 
   // -----------------------------------------------------------------------
 
   // 資料
 
   useEffect(() => {
-    const { doorType, county, clientName, projectName, }
+    const { doorType, projectCity, customerName, projectName, }
       = router.query as Record<string, string | undefined>
     setSearchObj({
       doorType: doorType ?? "",
-      county: county ?? "",
-      clientName: clientName ?? "",
+      projectCity: projectCity ?? "",
+      customerName: customerName ?? "",
       projectName: projectName ?? "",
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,12 +105,12 @@ export default function LegacyContractIntegration() {
     },
   ]
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    const [doorTypeOption, countyOption, clientName, projectName] = valueArr;
+    const [doorTypeOption, projectCityOption, customerName, projectName] = valueArr;
     const query = _.cloneDeep(router.query);
     const params = [
       { key: "doorType", value: (doorTypeOption as Toption).value },
-      { key: "county", value: (countyOption as Toption).value },
-      { key: "clientName", value: clientName as string },
+      { key: "projectCity", value: (projectCityOption as Toption).value },
+      { key: "customerName", value: customerName as string },
       { key: "projectName", value: projectName as string },
     ];
     params.forEach(({ key, value }) => {
@@ -114,10 +119,9 @@ export default function LegacyContractIntegration() {
       else delete query[key];
     });
 
-    // router.push({
-    //   href: "",
-    //   query,
-    // });
+    router.push({
+      query,
+    });
   };
 
   // -------------------------------------------------------
