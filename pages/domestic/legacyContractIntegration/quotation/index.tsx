@@ -166,7 +166,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => setShowPdf(true)
     },
     { type: "myButton", label: "編輯", onClick: () => setAllowEdit(true) },
-    { type: "myButton", label: "送審", onClick: () => alert("送審") },
+    // { type: "myButton", label: "送審", onClick: () => alert("送審") },
     { type: "myButton", label: "返回", onClick: () => router.back() },
   ]
 
