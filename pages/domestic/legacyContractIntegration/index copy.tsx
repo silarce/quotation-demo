@@ -37,54 +37,54 @@ export default function LegacyContractIntegration() {
 
   const [viewRef, inView] = useInView();
 
+  useEffect(() => {
+    console.log(inView)
+  }, [inView])
+
+
   // -----------------------------------------------------------------------
 
   // 搜尋用的 //這個資料不會render在畫面上
   // render在畫面上的是PageHeader02元件裡的狀態
-  const [searchObj, setSearchObj] = useState<TsearchObj>()
+  const [searchObj, setSearchObj] = useState<TsearchObj>({
+    doorType: undefined,
+    projectCity: undefined,
+    customerName: undefined,
+    projectName: undefined,
+  })
 
   // -----------------------------------------------------------------------
-  const [page, setPage] = useState(1)
+
+
+
 
   const filter = {
-    "products.doorType": { $eq: searchObj?.doorType },
-    "projectCity": { $eq: searchObj?.projectCity },
-    "customerName": { $contains: searchObj?.customerName },
-    "projectName": { $contains: searchObj?.projectName },
+    "products.doorType": { $eq: searchObj.doorType },
+    "projectCity": { $eq: searchObj.projectCity },
+    "customerName": { $contains: searchObj.customerName },
+    "projectName": { $contains: searchObj.projectName },
   }
 
   const params = {
-    page: page,
-    pageSize: 7,
+    page: 1,
+    pageSize: 999,
     populate: ["products"],
     filter,
     sort: "createdAt"
   }
 
-  const { legacyContractsArr, legacyContractsMeta,
+  const { legacyContractsArr,
     updateLegacyContracts, updateLegacyContracts_infinite
   } = useLegacyContracts(params)
 
   useEffect(() => {
-    if (!searchObj) return;
-    (async () => await updateLegacyContracts())()
+    (async () => { await updateLegacyContracts() })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchObj])
 
-  useEffect(() => {
-    if (!inView) return
-    if (page === 1) return;
-    (async () => await updateLegacyContracts_infinite())()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
-
-  useEffect(() => {
-    if (!legacyContractsMeta?.hasNextPage || !inView) return
-    setPage(page => ++page)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView])
-
   // -----------------------------------------------------------------------
+
+  // 資料
 
   useEffect(() => {
     const { doorType, projectCity, customerName, projectName, }
@@ -136,8 +136,7 @@ export default function LegacyContractIntegration() {
       if (value) query[key] = value;
       else delete query[key];
     });
-    
-    setPage(1);
+
     router.push({
       query,
     });
@@ -210,7 +209,10 @@ export default function LegacyContractIntegration() {
               query: { contractId: item.id }
             }
             return (
-              <div key={index} ref={arr.length - 3 === index ? viewRef : undefined}>
+              <div key={index}
+                ref={arr.length - 1 === index ? viewRef : undefined}
+                className="h-[350px]"
+              >
                 <TbodyItem01
                   projectData={projectData}
                   isActive={false}

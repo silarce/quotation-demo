@@ -68,11 +68,23 @@ export const useLegacyContracts = (params?: Tparams) => {
     if (res) setRes(res)
     return res
   }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetLegacyContracts(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    res.data = [...oldData, ...newData]
+    setRes({ ...res })
+    return apiRes
+  }
+
   return {
     legacyContractsArr: res?.data,
     legacyContractsMeta: res?.meta,
     setLegacyContracts: setRes,
-    updateLegacyContracts: update
+    updateLegacyContracts: update,
+    updateLegacyContracts_infinite: update_infinite
   }
 }
 
@@ -121,7 +133,6 @@ export const apiDeleteLegacyContracts_id = (id: string) => {
     .then(({ data }) => data as TlegacyContractDto)
     .catch(err => Promise.reject(err))
 }
-
 
 
 /**取得舊合約附件 */
