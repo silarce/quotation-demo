@@ -185,6 +185,7 @@ class Class_product {
   get notes() { return this._product.notes }
   set notes(v) { this._product.notes = v; this._reRender() }
 
+  get postProd() { return this._product }
 }
 
 // =======================================================================
@@ -224,6 +225,8 @@ class Class_addition {
 
   get notes() { return this._addition.notes }
   set notes(v) { this._addition.notes = v; this._reRender() }
+
+  get postAddition() { return this._addition }
 
 } // Class_part
 // =======================================================================
@@ -462,6 +465,9 @@ class Class_legacyContract {
 
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract)
+
+    legacyContractCopy.products = this.classProductArr.map((prod) => prod.postProd)
+    legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition)
 
     const quoteDate_Date
       = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
