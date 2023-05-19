@@ -8,7 +8,7 @@ const _ = require("lodash")
 
 // component
 import Header from "./header"
-import Profile from "./profile"
+import Profile, { Tprofile } from "./profile"
 import Table, { TtableProdList } from "./table"
 import Table_quoteTypeSum, { TquoteTypeSumList } from "./table_quoteTypeSum"
 import Total from "./total"
@@ -24,26 +24,24 @@ import Modal from "antd/lib/modal/Modal"
 import scss from "./quotationPdf.module.scss"
 
 // type
-import { Class_quotation } from "hooks/quotation/useQuotation"
 import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
+
+type TtableProdList_series = (TtableProdList[number] & { series: string })[]
 
 export default function QuotationPdf(
   { isVisable, onCancel,
-    classQuotation,
+    classLegacyContract,
   }:
     {
       isVisable: boolean
       onCancel: () => void
-      classQuotation: Class_quotation | Class_legacyContract
-      // classQuotation: Class_quotation
+      classLegacyContract: Class_legacyContract
     }
 ) {
-  /**這個變數用來識別是哪個Class */
-  const identify = classQuotation.identify
 
-  const { classBasicInfo } = classQuotation
+  const { classBasicInfo } = classLegacyContract
 
-  const { quotationId } = classBasicInfo.all.basicInfo
+  const { contractNumber } = classBasicInfo
 
 
   const [pdfType, setPdfType] = useState("typeA")
@@ -80,51 +78,40 @@ export default function QuotationPdf(
       // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
       doc.addImage(image, "JPEG", 0, 0, pageWidth, pageHeight,);
     }
-    doc.save(`${quotationId}.pdf`)
+    doc.save(`${contractNumber}.pdf`)
     showRootLoading(false)
   }
 
   // ----------------------------------------------------------------------------
   // profile
-  const profilePram = (() => {
-    const { basicInfo, clientProfile } = classQuotation.classBasicInfo.all
+  const profilePram: Tprofile = (() => {
     const {
-      quotationId,
-      date: builtDate,
-      constructionCounty,
-      constructionDistrict,
-      constructionAddress,
-    } = basicInfo
-    const {
-      name: clientName,
-      contact,
-      fax,
-    } = clientProfile ?? {}
+      customerName,
+      contactPerson,
+      contactNumber,
+      faxNumber,
+      quoteDate,
+      projectCity, projectDistrict, projectAddress,
+    } = classBasicInfo
 
     return {
-      quotationId,
-      clientName: clientName ?? "",
-      contactPerson: contact?.[0].name ?? "",
-      contactPhone: contact?.[0].phone ?? "",
-      fax: fax ?? "",
-      builtDate,
-      projectAddress: constructionCounty + constructionDistrict + constructionAddress,
+      quotationId: contractNumber,
+      clientName: customerName,
+      contactPerson: contactPerson,
+      contactPhone: contactNumber,
+      fax: faxNumber ?? "",
+      builtDate: quoteDate as string ?? "",
+      projectAddress: projectCity + projectDistrict + projectAddress,
     }
   })()
   // -------------------------------
   // total
   const totalPram = (() => {
-    const memoArr = classQuotation.classMemo.stringArr
+    const memoArr = classLegacyContract.classMemo.stringArr
 
-    const subTotal =
-      identify === "normal" ? classQuotation.subTotal :
-        identify === "legacy" ? classQuotation.classPayInfo.subTotal : "-1"
-    const businessTax =
-      identify === "normal" ? classQuotation.businessTax :
-        identify === "legacy" ? classQuotation.classPayInfo.tax : "-1"
-    const total =
-      identify === "normal" ? classQuotation.total :
-        identify === "legacy" ? classQuotation.classPayInfo.total : "-1"
+    const subTotal = classLegacyContract.classPayInfo.subTotal
+    const businessTax = classLegacyContract.classPayInfo.salesTax
+    const total = classLegacyContract.classPayInfo.total
 
     const settlement = {
       subTotal: parseFloat(subTotal), //小計
@@ -137,28 +124,20 @@ export default function QuotationPdf(
   // -------------------------------
   // other
   const otherPram = (() => {
-    const quoteRangeArr = classQuotation.classQuoteRange.stringArr
-    const attn = classQuotation.classSignature.operatorName
+    const quoteRangeArr = classLegacyContract.classQuoteRange.stringArr
+    const attn = classLegacyContract.classSignature.operatorName
+
     const payInfo = (() => {
-      if (identify === "normal") {
-        const {
-          tradingLocation, tradingDate,
-          deposit, deliveryPayment, installedPayment, eleConnectPayment,
-        } = classQuotation.classPayInfo
-        return {
-          tradingLocation,
-          tradingDate,
-          payWay: [
-            { label: "訂製同時付總金額", value: deposit },
-            { label: "交貨同時付總金額", value: deliveryPayment },
-            { label: "按裝完成付總金額", value: installedPayment },
-            { label: "接電使用付總金額", value: eleConnectPayment },
-          ]
-        }
-      }
-      if (identify === "legacy") {
-        const { tradingLocation, tradingDate, paymentMethods: payWay } = classQuotation.classPayInfo
-        return { tradingLocation, tradingDate, payWay }
+      const { deliveryLocation, deliveryDate, paymentMethods } = classLegacyContract.classPayInfo
+      const payWay = paymentMethods.map((item) => ({
+        label: item.milestone,
+        value: item.totalPaymentRatio
+      }))
+
+      return {
+        tradingLocation: deliveryLocation,
+        tradingDate: deliveryDate as string,
+        payWay
       }
     })()
 
@@ -166,17 +145,29 @@ export default function QuotationPdf(
   })()
 
 
-  const productArr = (() => {
-    if (identify === "normal") return classQuotation.mainProductArr.map((mp) => mp.allData)
-    if (identify === "legacy") {
-      return classQuotation.classProductArr.map((mp) => {
-        return {
-          ...mp.allData,
-          priceTotal: mp.allData.priceSubTotal
-        }
-      })
-    }
-    return []
+
+
+  const productArr: TtableProdList_series = (() => {
+    const classProdArr = classLegacyContract.classProductArr
+    return classProdArr.map((prod) => {
+      const size = `${prod.width || prod.length} X ${prod.height} + ${prod.thickness}`
+      return {
+        category: prod.idNumber,
+        size,
+        doorType: prod.doorType,
+        material: prod.material,
+        thickness: prod.thickness,
+        surface: prod.surface,
+        doorRail: prod.doorTrack,
+        horsepower: prod.horsepower,
+        openType: "",
+        qty: prod.quantity,
+        unitPrice: prod.unitPrice,
+        priceTotal: prod.totalPrice,
+        memo: prod.notes,
+        series: prod.itemName
+      }
+    })
   })()
 
 
@@ -237,8 +228,8 @@ const PdfTypeA = (
   }:
     {
       refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
-      productArr: Parameters<typeof Table>[0]["productList"]
-      profilePram: Parameters<typeof Profile>[0]["profileData"]
+      productArr: TtableProdList
+      profilePram: Tprofile
       totalPram: Parameters<typeof Total>[0]
       otherPram: Parameters<typeof Other>[0]
     }
@@ -246,7 +237,6 @@ const PdfTypeA = (
 
   const chunkedList = _.chunk(productArr, 12) as typeof productArr[]
   const pageCount = chunkedList.length
-
   // --------------------------------------------------------------------------
   return (
     <>
@@ -274,6 +264,25 @@ const PdfTypeA = (
           </Fragment>
         )
       })}
+      {chunkedList.length === 0 &&
+        <Fragment>
+          <div className={`${scss.pdf} ${scss.spaceBetween}`}
+            ref={ele => refPdf.current[0] = ele}>
+            <div>
+              <Header />
+              <Profile profileData={profilePram} index={1} pageCount={1} />
+            </div>
+            <div>
+              <Total memoArr={totalPram.memoArr} settlement={totalPram.settlement} />
+              <Other
+                quoteRangeArr={otherPram.quoteRangeArr}
+                payInfo={otherPram.payInfo}
+                attn={otherPram.attn}
+              />
+            </div>
+          </div>
+        </Fragment>
+      }
     </>
   )
 }
@@ -289,8 +298,8 @@ const PdfTypeB = (
   }:
     {
       refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>
-      productArr: (Parameters<typeof Table>[0]["productList"][number] & { series: string })[]
-      profilePram: Parameters<typeof Profile>[0]["profileData"]
+      productArr: TtableProdList_series
+      profilePram: Tprofile
       totalPram: Parameters<typeof Total>[0]
       otherPram: Parameters<typeof Other>[0]
     }

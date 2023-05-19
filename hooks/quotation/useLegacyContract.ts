@@ -103,11 +103,6 @@ class Class_product {
   private _reRender
   private _product
 
-  // 這兩個資料出現在PDF中，但是沒出現在主產品設定中
-  // 目前還沒接api，先用寫死的假資料
-  // thickness = "1.50t" //厚度
-  readonly openType = "電動"
-
   readonly options_doorTrack_normal = options_doorTrack_normal
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection
 

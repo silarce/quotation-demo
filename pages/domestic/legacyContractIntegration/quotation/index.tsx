@@ -11,15 +11,14 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 
 // components
-// import QuotationProfile from "components/page/domestic/quotation/quotationProfile"
+
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
 import QuotationAdditions from "components/page/domestic/quotation/quotationAdditions"
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal_legacyContract"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 
-import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
-import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/quotationPdf_part"
+import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -124,7 +123,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false)
-  const [showPdf_part, setShowPdf_part] = useState(false)
+  
 
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
@@ -173,16 +172,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   if (!classLegacyContract) return null
   // -----------------------------------------------------------------------
-  // const quotationPdf_part_mainProductArr = (() => {
-  //   const theArr = classQuotation.classProductArr.map((mp) => {
-  //     return {
-  //       ...mp.allData,
-  //       part: mp.partArr.map((part) => part.allData)
-  //     }
-  //   })
-  //   return theArr
-  // })()
-  // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -222,10 +211,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={!allowEdit} />
         </div>
       </div>
-      {/* <QuotationPdf
+      <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
-        classQuotation={classQuotation} /> */}
+        classLegacyContract={classLegacyContract} />
     </SubLayer>
   )
 }
