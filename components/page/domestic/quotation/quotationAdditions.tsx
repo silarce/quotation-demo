@@ -103,7 +103,6 @@ export default function QuotationAdditions(
                 const { width, flex, type, inputType } = cellConfig[key]
                 const theStyle = { width, flex }
 
-
                 return (
                   <div className={styleL.column} key={cIndex} style={theStyle}>
                     <InputSel

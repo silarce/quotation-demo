@@ -272,6 +272,8 @@ export type TlegacyContractProductDto = {
   createdAt: string
   /**date */
   updatedAt: string
+  /**折數 0.0~1.0*/
+  discountRate: string
   /**編號 */
   idNumber: number
   /**項目名 */
@@ -321,8 +323,8 @@ export type TlegacyContractAdditionDto = {
   createdAt: string
   /**date */
   updatedAt: string
-  /**項目索引 */
-  itemIndex: number
+  /**項目名 */
+  itemName: string
   /**內容 */
   content: string
   /**數量 */
@@ -408,6 +410,8 @@ export type TlegacyContractDto = {
 export type TcreateLegacyContractProductDto = {
   /**編號 */
   idNumber: number;
+  /**折數 0.0~1.0*/
+  discountRate: string
   /** 項目名 */
   itemName: string;
   /** 報價別 */
@@ -449,8 +453,8 @@ export type TcreateLegacyContractProductDto = {
 }
 
 export type TcreateLegacyContractAdditionDto = {
-  /**項目索引 */
-  itemIndex: number;
+  /**項目名 */
+  itemName: string;
   /** 內容 */
   content: string;
   /** 數量 */
