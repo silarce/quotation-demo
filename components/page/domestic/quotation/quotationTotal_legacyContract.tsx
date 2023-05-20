@@ -58,10 +58,10 @@ export default function QuotationTotal(
             alternateArr={undefined} searchAlternate={() => { }}
             label="報價範圍"
             disabled={disabled} />
-          <Appendix disabled={disabled}
+          {/* <Appendix disabled={disabled}
             addFile={addFile}
             removeFile={removeFile}
-          />
+          /> */}
         </div>
         <PayInfo_legacy
           legacyContract={legacyContract}
