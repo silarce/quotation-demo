@@ -1,8 +1,9 @@
 
 import {
   Dispatch, SetStateAction,
-  useState, useMemo
+  useState, useMemo, useEffect
 } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 // global gear
 import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch'
@@ -18,21 +19,30 @@ import { TcustomerDto } from 'js/api/dtoTypes';
 
 
 export default function CustomerSelector(
-  { showModal, setShowModal, customerArr, onConfirm }:
+  {
+    showModal, setShowModal,
+    customerArr, getCustomerByPage,
+    searchCustomer,
+    onConfirm }:
     {
       showModal: boolean
       setShowModal: Dispatch<SetStateAction<boolean>>
       customerArr: TcustomerDto[]
+      getCustomerByPage: () => void
+      searchCustomer: (v: string) => void
       onConfirm: (v: TcustomerDto) => void
     }
 ) {
 
-  // const clientListArr = useMemo(() => {
-  //   // 現在使用假資料，到時候要接api取資料
-  //   // return fakeClientList
-  //   return Object.values(fakeClientList)
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
+  const [viewRef, inView] = useInView();
+
+
+  useEffect(() => {
+    if (!inView) return
+    getCustomerByPage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
 
   // ==================================================
   // 被選的資料
@@ -54,19 +64,22 @@ export default function CustomerSelector(
     setShowModal(false);
     setSearchValue("");
     setSelClient(undefined)
+    searchCustomer("")
   }
-  const onSearch = (value: string) => { setSearchValue(value) }
+
+  // const onSearch = (value: string) => { setSearchValue(value) }
   // ==================================================
 
   return (
     <ModalListSelectorWithSearch {...{
       label: "請選擇公司", visible: showModal,
       setVisible: setShowModal,
-      onConfirm: theOnConfirm, onCancel, onSearch
-    }} >
+      onConfirm: theOnConfirm, onCancel
+    }}
+      onSearch={searchCustomer}
+    >
       <ul className={style.container}>
-
-        {customerArr.map((item, index) => {
+        {customerArr.map((item, index, arr) => {
           const { id } = item;
           const isActive = id === selClient?.id ? true : false
           const { name } = item
@@ -79,8 +92,8 @@ export default function CustomerSelector(
               element="li"
             >
               <div className={style.item}
-                onClick={() => onClick(item)}
-              >
+                ref={arr.length - 7 === index ? viewRef : undefined}
+                onClick={() => onClick(item)}>
                 {name}
               </div>
             </CellWrapper>

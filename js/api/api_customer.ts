@@ -107,11 +107,25 @@ export const useCustomers = (params?: TapiGetCustomersParams) => {
     if (data) setRes(data)
     return data
   }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetCustomers(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    res.data = [...oldData, ...newData]
+    setRes({ ...res })
+    return apiRes
+  }
+
+
+
   return {
     data: res?.data,
     meta: res?.meta,
     setData: setRes,
-    update
+    update,
+    update_infinite
   }
 }
 

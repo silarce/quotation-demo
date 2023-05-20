@@ -69,27 +69,59 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false)
   // --------------------------------------------------------------------------
-  let [customerParams, setCustomerParams] = useState<TapiGetCustomersParams>({
-    page: 1,
-    pageSize: 20,
+  const [page_customer, setPage_customer] = useState(1)
+  const [searchCustomerName, setSearchCustomerName] = useState<string>()
+
+  const customerParams: TapiGetCustomersParams = {
+    page: page_customer,
+    pageSize: 10,
     populate: ["contacts", "types"],
-    // filter,
+    // filter:{$contains:""},
+    filter: { "name": { $contains: searchCustomerName } },
     sort: "customerNumber"
-  })
-  const { data: customerArr, update: updateCustomerArr } = useCustomers(customerParams)
-  // --------------------------------------------------------------------------
-  let [legacyContractParams, setLegacyContractParams] = useState({
-    // populate: ["customer", "products", "additions","fax"],
-    populate: ["customer", "products", "additions"],
-  })
-  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
+  }
+
+  const {
+    data: customerArr, meta: customerMeta,
+    update: updateCustomerArr, update_infinite: updateCustomerArr_infinite } = useCustomers(customerParams)
+
+  const getCustomerByPage = () => {
+    if (!customerMeta?.hasNextPage) return
+    setPage_customer(page => ++page)
+  }
+
+  const searchCustomer = (v: string | undefined) => {
+    setPage_customer(1)
+    if (!v) v = undefined
+    setSearchCustomerName(v)
+  }
 
   useEffect(() => {
     (async () => {
       updateCustomerArr()
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [searchCustomerName])
+
+  useEffect(() => {
+    if (page_customer === 1) return;
+    (async () => {
+      await updateCustomerArr_infinite()
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page_customer])
+
+
+
+
+  // --------------------------------------------------------------------------
+  let [legacyContractParams, setLegacyContractParams] = useState({
+    // populate: ["customer", "products", "additions","fax"],
+    populate: ["customer", "products", "additions"],
+  })
+  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
+  // --------------------------------------------------------------------------
+
 
   useEffect(() => {
     (async () => {
@@ -224,6 +256,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classLegacyContract={classLegacyContract}
             classBasicInfo={classLegacyContract.classBasicInfo}
             customerArr={customerArr ?? []}
+            customerMeta={customerMeta}
+            getCustomerByPage={getCustomerByPage}
+            searchCustomer={searchCustomer}
             disabled={!allowEdit} />
           {/*  */}
           <div className={style.switchBar}>

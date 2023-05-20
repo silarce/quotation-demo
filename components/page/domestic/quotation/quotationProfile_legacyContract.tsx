@@ -20,7 +20,7 @@ import { Toption } from 'fakeDatabase/options/countryAndDistrict'
 // import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 
 // type
-import { TcustomerDto } from 'js/api/dtoTypes'
+import { TcustomerDto, TpageMetaDto } from 'js/api/dtoTypes'
 
 // config
 import { customerTypesLookup } from 'config/lookupTable'
@@ -34,11 +34,17 @@ const inputStyle = {
 }
 // ====================================================
 export default function QuotationProfile(
-  { classLegacyContract, classBasicInfo, customerArr, disabled = false }:
+  { classLegacyContract, classBasicInfo,
+    customerArr, getCustomerByPage,
+    searchCustomer,
+    disabled = false }:
     {
       classLegacyContract: Class_legacyContract
       classBasicInfo: Class_basicInfo
       customerArr: TcustomerDto[]
+      customerMeta: TpageMetaDto | undefined
+      getCustomerByPage: () => void
+      searchCustomer: (v: string) => void
       disabled: boolean
     }) {
 
@@ -65,11 +71,6 @@ export default function QuotationProfile(
 
   // ==============================================
   // 客戶資料
-  // const theClientData = [
-  //   { label: "聯絡人", placeholder: "尚未選擇", value: contactPerson },
-  //   { label: "聯絡電話", placeholder: "尚未選擇", value: contactNumber },
-  //   { label: "傳真號碼", placeholder: "尚未選擇", value: faxNumber },
-  // ]
   const theClientData = [
     { label: "聯絡人", placeholder: "尚未選擇", value: contactPerson },
     { label: "聯絡電話", placeholder: "尚未選擇", value: contactNumber },
@@ -107,7 +108,10 @@ export default function QuotationProfile(
   // ==============================================
   // modal
   const [showModal, setShowModal] = useState(false)
-  const openModal = () => disabled ? "" : setShowModal(true)
+  const openModal = () => {
+    if (disabled) return
+    setShowModal(true)
+  }
   const onConfirmClient = (customer: TcustomerDto) => {
     classLegacyContract.customer = customer
     classBasicInfo.customerName = customer.name
@@ -242,6 +246,8 @@ export default function QuotationProfile(
       <CustomerSelector
         {...{ showModal, setShowModal }}
         customerArr={customerArr}
+        getCustomerByPage={getCustomerByPage}
+        searchCustomer={searchCustomer}
         onConfirm={onConfirmClient}
       />
 
