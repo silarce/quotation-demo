@@ -238,10 +238,11 @@ export default function QuotationProfile(
           label="報價日期"
           showBaseline="invisible"
           disabled={disabled}
-          inputProps={{
+          datePickerProps={{
             value: quoteDate as string ?? "",
             onChange: (v) => { classBasicInfo.quoteDate = v }
-          }} />
+          }}
+        />
       </div>
 
 
