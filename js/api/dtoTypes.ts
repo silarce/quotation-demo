@@ -74,7 +74,7 @@ export type TcompanyInfoDto = {
   address: string
   fax: string
   taxId: string
-  logoLink: string
+  logoFileId: string
 }
 
 // api文件沒有清楚contact的型別
