@@ -5,7 +5,6 @@ import React, {
 } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
-import Image from "next/image"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -47,7 +46,7 @@ import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
 import { apiGetFileDownload_id } from "js/api/api_file"
 
 // type
-import { TattachmentInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy"
+import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
 
 
 
@@ -120,75 +119,96 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let [legacyContractParams, setLegacyContractParams] = useState({
     populate: ["customer", "products", "additions"],
   })
+
   const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
+  // 這是class
+  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId)
+
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([])
   const [fileArr, setFileArr] = useState<File[]>([])
 
 
-
-  
-  const attachmentsInfo: TattachmentInfo[] = useMemo(() => {
+  useEffect(() => {
     const arr = attachments?.map((item) => {
       const imageReg = /^image/
       const pdfReg = /pdf$/
       const fileType = imageReg.test(item.mime) ? "image"
         : pdfReg.test(item.mime) ? "pdf" : "other"
       return {
+        fileId: item.id,
         fileType,
         fileName: item.name,
         fileSrc: `${domain}file/download/${item.id}`,
-        // fileSrc: `https://gaia.komica.org/00b/src/1684580436003.jpg`,
         isNew: false,
       }
     })
-    return arr ?? []
+    setFileInfoArr(arr ?? [])
   }, [attachments])
 
-
-
-
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
-
-  const addFile = (file: File) => {
-    setFileArr(arr => {
-      const arrCopy = [...arr]
-      arrCopy.push(file)
-      return arrCopy
-    })
+  const removeFileInfo = (index: number) => {
+    fileInfoArr[index].willDelete = true
+    setFileInfoArr([...fileInfoArr])
+    // removeFile(index)
   }
 
-  const removeFile = (index: number) => {
-    setFileArr(arr => {
-      const arrCopy = [...arr]
-      arrCopy.splice(index, 1)
-      return arrCopy
-    })
+  const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
+    setFileInfoArr([...newImgInfoArr])
   }
+
+
+  // const addFile = (file: File) => {
+  //   setFileArr(arr => {
+  //     const arrCopy = [...arr]
+  //     arrCopy.push(file)
+  //     return arrCopy
+  //   })
+  // }
+
+  // const removeFile = (index: number) => {
+  //   setFileArr(arr => {
+  //     const arrCopy = [...arr]
+  //     arrCopy.splice(index, 1)
+  //     return arrCopy
+  //   })
+  // }
 
   const appendixParams = {
-    attachmentsInfo,
-    addFile,
-    removeFile,
+    fileInfoArr,
+    // addFile,
+    // removeFile,
+    removeFileInfo,
+    toSetFileInfo,
   }
 
 
-  const uploadAttachment = async (id: string) => {
+  const uploadAttachment = async (contractId: string) => {
+    // 移除附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew } = info
+      if (!fileId || !willDelete || isNew) continue;
+      try {
+        await apiDelLegacyContracts_id_attachments(contractId, fileId)
+      }
+      catch (error) {
+        console.log(error)
+      }
+    }
 
-    // apiDelLegacyContracts_id_attachments
-
-    // for (const file of fileArr) {
-    //   const formData = new FormData
-    //   formData.append("file", file)
-    //   try {
-    //     await apiPostLegacyContracts_id_attachments(id, formData)
-    //   }
-    //   catch (error) { }
-    // }
-
-
-
+    // 上傳附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew, file } = info
+      if (fileId || !file || willDelete || !isNew) continue
+      const formData = new FormData
+      formData.append("file", file)
+      try {
+        await apiPostLegacyContracts_id_attachments(contractId, formData)
+      }
+      catch (error) { console.log(error) }
+    }
   }
-
 
   useEffect(() => {
     (async () => {
@@ -254,7 +274,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
               : await apiPostLegacyContracts(classLegacyContract.postBody)
 
-          showRootLoading(true, "正在上傳附件")
+          showRootLoading(true, "正在更新附件")
           await uploadAttachment(res.id)
 
           if (contractId) {

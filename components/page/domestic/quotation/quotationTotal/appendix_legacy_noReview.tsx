@@ -19,12 +19,14 @@ import iconAttacth from "public/image/icon/attach.svg"
 import styleL from "./local.module.scss"
 import scss from "./appendix_legacy_noReview.module.scss"
 // type
-export type TattachmentInfo = {
+export type TfileInfo = {
+  fileId?: string,
   fileType: string
   fileName: string
   fileSrc: string
   isNew: boolean
   willDelete?: boolean
+  file?: File
 }
 
 
@@ -34,26 +36,21 @@ export default function Appendix(
     {
       disabled: boolean
       appendixParams: {
-        addFile: (file: File) => void
-        removeFile: (index: number) => void
-        attachmentsInfo: TattachmentInfo[]
+        fileInfoArr: TfileInfo[]
+        // addFile: (file: File) => void
+        // removeFile: (index: number) => void
+        removeFileInfo: (index: number) => void
+        toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void
       }
     }) {
 
-  const { addFile, removeFile, attachmentsInfo, } = appendixParams
-
-  const [imgInfoArr, setImgInfoArr] = useState<TattachmentInfo[]>(attachmentsInfo)
-
-
-  useEffect(() => {
-    setImgInfoArr(attachmentsInfo)
-  }, [attachmentsInfo])
-
-  const removeImgInfo = (index: number) => {
-    imgInfoArr.splice(index, 1)
-    setImgInfoArr([...imgInfoArr])
-    removeFile(index)
-  }
+  const {
+    fileInfoArr,
+    // addFile,
+    // removeFile,
+    removeFileInfo,
+    toSetFileInfo,
+  } = appendixParams
 
 
   const preloadImg = (e: ChangeEvent<HTMLInputElement>) => {
@@ -77,15 +74,16 @@ export default function Appendix(
 
     const fileSrc = URL.createObjectURL(file);
 
-    imgInfoArr.push({
+    fileInfoArr.push({
       fileType,
       fileName,
       fileSrc,
-      isNew: true
+      isNew: true,
+      file
     })
 
-    addFile(file)
-    setImgInfoArr([...imgInfoArr])
+    // addFile(file)
+    toSetFileInfo([...fileInfoArr])
   }
 
   // =========================================================
@@ -94,14 +92,19 @@ export default function Appendix(
   return (
     <div className={`${styleL.appendix} ${styleL.listContainer} `}>
       <p>附件</p>
-      {imgInfoArr.map((item, index) => {
-        const { fileType, fileName, fileSrc, } = item
+      {fileInfoArr.map((item, index) => {
+        const { fileType, fileName, fileSrc, willDelete } = item
 
+        if (willDelete) return null
         return (
           <div key={index} className={classNames(scss.row, scss.rowPlus)}>
             {disabled ?
               <span></span> :
-              <IconRemoveCircle onClick={() => removeImgInfo(index)} />}
+              <IconRemoveCircle onClick={() => {
+                // removeFile(index)
+                removeFileInfo(index)
+              }
+              } />}
             <span className={styleL.serialNumber}>
               {/*  eslint-disable-next-line @next/next/no-img-element */}
               <img src={iconAttacth.src} alt="" />

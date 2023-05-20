@@ -160,16 +160,16 @@ export const useLegacyContracts_id_attachments = (id: string | undefined) => {
 
 
 /**上傳舊合約附件 */
-export const apiPostLegacyContracts_id_attachments = (id: string, body: FormData) => {
-  const api = `/legacy-contracts/${id}/attachments`
+export const apiPostLegacyContracts_id_attachments = (contractId: string, body: FormData) => {
+  const api = `/legacy-contracts/${contractId}/attachments`
   return axi.post(api, body)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))
 }
 
 /**移除舊合約附件 */
-export const apiDelLegacyContracts_id_attachments = (id: string, fileId: string) => {
-  const api = `/legacy-contracts/${id}/attachments/${fileId}`
+export const apiDelLegacyContracts_id_attachments = (contractId: string, fileId: string) => {
+  const api = `/legacy-contracts/${contractId}/attachments/${fileId}`
   return axi.delete(api)
     .then(({ data }) => data)
     .catch(err => Promise.reject(err))

@@ -8,7 +8,7 @@ import style from "./quotationTotal.module.scss"
 // type
 import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
-import { TattachmentInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy"
+import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
 
 
 export default function QuotationTotal(
@@ -21,9 +21,11 @@ export default function QuotationTotal(
       legacyContract: Class_legacyContract
       disabled: boolean
       appendixParams: {
-        addFile: (file: File) => void
-        removeFile: (index: number) => void
-        attachmentsInfo: TattachmentInfo[]
+        fileInfoArr: TfileInfo[]
+        // addFile: (file: File) => void
+        // removeFile: (index: number) => void
+        removeFileInfo: (index: number) => void
+        toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void
       }
     }) {
 
