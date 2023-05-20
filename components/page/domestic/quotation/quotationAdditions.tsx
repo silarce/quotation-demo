@@ -59,9 +59,9 @@ export default function QuotationAdditions(
           <div className={scss.delBtn}>
             <span></span>
           </div>
-          {/* <div className={styleL.rowIndex}>
+          <div className={styleL.rowIndex}>
             <span></span>
-          </div> */}
+          </div>
           {additionKeyindex.map((item, index) => {
             const { label, flex, width } = cellConfig[item]
             const theStyle = { width, flex }
@@ -95,9 +95,9 @@ export default function QuotationAdditions(
                 />
               </div>
 
-              {/* <div className={styleL.rowIndex}>
+              <div className={styleL.rowIndex}>
                 <span>{pIndex + 1}</span>
-              </div> */}
+              </div>
 
               {additionKeyindex.map((key, cIndex) => {
                 const { width, flex, type, inputType } = cellConfig[key]
