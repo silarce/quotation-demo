@@ -6,6 +6,7 @@ const axi = axios.create({
   withCredentials: true,
 })
 
+export const domain = process.env.NEXT_PUBLIC_API_BASE_URL
 
 
 axi.interceptors.request.use(

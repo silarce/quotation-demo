@@ -1,26 +1,30 @@
 // component
 import StringList from "./quotationTotal/TextListEditor"
 import PayInfo_legacy from "./quotationTotal/payInfo_legacy"
-import Appendix from "./quotationTotal/appendix_legacy"
+// import Appendix from "./quotationTotal/appendix_legacy"
+import Appendix from "./quotationTotal/appendix_legacy_noReview"
 // css
 import style from "./quotationTotal.module.scss"
 // type
 import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
+import { TattachmentInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy"
 
 
 export default function QuotationTotal(
   {
     legacyContract,
     disabled = false,
-    addFile: addFile,
-    removeFile
+    appendixParams,
   }:
     {
       legacyContract: Class_legacyContract
       disabled: boolean
-      addFile: (file: File) => void
-      removeFile: (index: number) => void
+      appendixParams: {
+        addFile: (file: File) => void
+        removeFile: (index: number) => void
+        attachmentsInfo: TattachmentInfo[]
+      }
     }) {
 
 
@@ -59,8 +63,7 @@ export default function QuotationTotal(
             label="報價範圍"
             disabled={disabled} />
           <Appendix disabled={disabled}
-            addFile={addFile}
-            removeFile={removeFile}
+            appendixParams={appendixParams}
           />
         </div>
         <PayInfo_legacy

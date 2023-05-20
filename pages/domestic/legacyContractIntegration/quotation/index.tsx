@@ -1,10 +1,11 @@
 // 報價單
 import React, {
   Dispatch, SetStateAction, FocusEvent,
-  useState, useRef, useEffect
+  useState, useRef, useEffect, useMemo,
 } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
+import Image from "next/image"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -36,14 +37,17 @@ import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLega
 // api
 import {
   useLegacyContract_id,
+  useLegacyContracts_id_attachments,
   apiPostLegacyContracts,
   apiPatchLegacyContracts_id,
-  apiPostLegacyContracts_id_attachments
+  apiPostLegacyContracts_id_attachments,
+  apiDelLegacyContracts_id_attachments
 } from "js/api/api_legacy-contract"
 import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
+import { apiGetFileDownload_id } from "js/api/api_file"
 
-import { apiUploadCompanyLogo } from "js/api/api_company-info"
-
+// type
+import { TattachmentInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy"
 
 
 
@@ -112,25 +116,92 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [page_customer])
 
 
-
-
   // --------------------------------------------------------------------------
   let [legacyContractParams, setLegacyContractParams] = useState({
-    // populate: ["customer", "products", "additions","fax"],
     populate: ["customer", "products", "additions"],
   })
   const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
-  // --------------------------------------------------------------------------
+  const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId)
+  const [fileArr, setFileArr] = useState<File[]>([])
+
+
+
+  
+  const attachmentsInfo: TattachmentInfo[] = useMemo(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/
+      const pdfReg = /pdf$/
+      const fileType = imageReg.test(item.mime) ? "image"
+        : pdfReg.test(item.mime) ? "pdf" : "other"
+      return {
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}file/download/${item.id}`,
+        // fileSrc: `https://gaia.komica.org/00b/src/1684580436003.jpg`,
+        isNew: false,
+      }
+    })
+    return arr ?? []
+  }, [attachments])
+
+
+
+
+  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+
+  const addFile = (file: File) => {
+    setFileArr(arr => {
+      const arrCopy = [...arr]
+      arrCopy.push(file)
+      return arrCopy
+    })
+  }
+
+  const removeFile = (index: number) => {
+    setFileArr(arr => {
+      const arrCopy = [...arr]
+      arrCopy.splice(index, 1)
+      return arrCopy
+    })
+  }
+
+  const appendixParams = {
+    attachmentsInfo,
+    addFile,
+    removeFile,
+  }
+
+
+  const uploadAttachment = async (id: string) => {
+
+    // apiDelLegacyContracts_id_attachments
+
+    // for (const file of fileArr) {
+    //   const formData = new FormData
+    //   formData.append("file", file)
+    //   try {
+    //     await apiPostLegacyContracts_id_attachments(id, formData)
+    //   }
+    //   catch (error) { }
+    // }
+
+
+
+  }
 
 
   useEffect(() => {
     (async () => {
-      updateLegacyContract()
+      await Promise.all([
+        updateLegacyContract(),
+        updateAttachments()
+      ])
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId])
 
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+  // --------------------------------------------------------------------------
+
 
   const classSignature = classLegacyContract.classSignature
   const signatureArr = [
@@ -156,37 +227,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit, legacyContract])
 
-  // -----------------------------------------------------------------------
-
-  const [fileArr, setFileArr] = useState<File[]>([])
-  const addFile = (file: File) => {
-    setFileArr(arr => {
-      const arrCopy = [...arr]
-      arrCopy.push(file)
-      return arrCopy
-    })
-  }
-
-  const removeFile = (index: number) => {
-    setFileArr(arr => {
-      const arrCopy = [...arr]
-      arrCopy.splice(index, 1)
-      return arrCopy
-    })
-  }
-
-  const uploadAttachment = async () => {
-    const formData = new FormData
-
-    formData.append("file", fileArr[0])
-
-    if (!contractId) return
-    try {
-      // await apiUploadCompanyLogo(formData)
-      await apiPostLegacyContracts_id_attachments(contractId, formData)
-    } catch (error) {
-    }
-  }
 
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false)
@@ -208,17 +248,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
         try {
           showRootLoading(true)
 
-          // await uploadAttachment()
 
           const res =
             contractId
               ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
               : await apiPostLegacyContracts(classLegacyContract.postBody)
-          myAlert.success({ title: "上傳完成" })
 
-          if (contractId) updateLegacyContract()
+          showRootLoading(true, "正在上傳附件")
+          await uploadAttachment(res.id)
+
+          if (contractId) {
+            await Promise.all([
+              updateLegacyContract(),
+              updateAttachments()
+            ])
+          }
           else router.push({ query: { contractId: res.id } })
 
+          myAlert.success({ title: "上傳完成" })
         }
         catch { myAlert.err({ title: "上傳失敗" }) }
         finally { showRootLoading(false) }
@@ -275,8 +322,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationTotal
             legacyContract={classLegacyContract}
             disabled={!allowEdit}
-            addFile={addFile}
-            removeFile={removeFile}
+            appendixParams={appendixParams}
           />
           {/* 簽名 */}
           <QuotationSinature
@@ -288,8 +334,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
         classLegacyContract={classLegacyContract} />
+
+      {/* <img src="https://gaia.komica.org/00b/src/1684580436003.jpg" alt="" /> */}
+      {/* <Image
+        // crossOrigin="anonymous"
+        src="https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed"
+        alt="" 
+        width={100}
+        height={100}
+        /> */}
+      {/* <img
+        // crossOrigin="anonymous"
+        src="https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed"
+        alt=""
+      /> */}
+
     </SubLayer>
   )
 }
 
 
+// https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed 

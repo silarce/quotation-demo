@@ -20,7 +20,7 @@ export type TfileDto = {
   parent: string;
   name: string;
   size: number;
-  mime?: string;
+  mime: string;
   etag: string;
   isDir: boolean;
   isWritable: boolean;

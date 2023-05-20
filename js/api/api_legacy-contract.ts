@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-import { axi } from "./_axiosCreator";
+import { axi, domain } from "./_axiosCreator";
 
 import _ from "lodash"
-
 
 
 
@@ -17,9 +16,10 @@ import {
   TcreateLegacyContractDto,
   TupdateLegacyContractDto,
   TpageMetaDto,
+  TfileDto
 } from "./dtoTypes"
 
-
+export { domain }
 
 export type Tparams = {
   order?: "ASC" | "DESC",
@@ -143,6 +143,22 @@ export const apiGetLegacyContracts_id_attachments = (id: string) => {
     .catch(err => Promise.reject(err))
 }
 
+export const useLegacyContracts_id_attachments = (id: string | undefined) => {
+  let [res, setRes] = useState<TfileDto[]>()
+  const update = async () => {
+    if (!id) return undefined
+    const res = await apiGetLegacyContracts_id_attachments(id) as TfileDto[]
+    if (res) setRes(res)
+    return res
+  }
+  return {
+    attachments: res,
+    updateAttachments: update,
+    domain
+  }
+}
+
+
 /**上傳舊合約附件 */
 export const apiPostLegacyContracts_id_attachments = (id: string, body: FormData) => {
   const api = `/legacy-contracts/${id}/attachments`
@@ -151,6 +167,13 @@ export const apiPostLegacyContracts_id_attachments = (id: string, body: FormData
     .catch(err => Promise.reject(err))
 }
 
+/**移除舊合約附件 */
+export const apiDelLegacyContracts_id_attachments = (id: string, fileId: string) => {
+  const api = `/legacy-contracts/${id}/attachments/${fileId}`
+  return axi.delete(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
 
 
 

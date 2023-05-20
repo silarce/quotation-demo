@@ -2,11 +2,11 @@ import {
   ChangeEvent,
   useState, useEffect
 } from "react"
+import Link from "next/link";
+import classNames from "classnames";
 
 import dynamic from "next/dynamic";
 
-// antd
-import { Image } from 'antd';
 
 // global gear
 const PdfViewer01 = dynamic(() => import("components/global/gear/pdf/pdfViewer01"))
@@ -17,13 +17,14 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import iconAttacth from "public/image/icon/attach.svg"
 // css
 import styleL from "./local.module.scss"
-
+import scss from "./appendix_legacy_noReview.module.scss"
 // type
 export type TattachmentInfo = {
   fileType: string
   fileName: string
   fileSrc: string
   isNew: boolean
+  willDelete?: boolean
 }
 
 
@@ -44,13 +45,9 @@ export default function Appendix(
   const [imgInfoArr, setImgInfoArr] = useState<TattachmentInfo[]>(attachmentsInfo)
 
 
-  
-
   useEffect(() => {
     setImgInfoArr(attachmentsInfo)
   }, [attachmentsInfo])
-
-
 
   const removeImgInfo = (index: number) => {
     imgInfoArr.splice(index, 1)
@@ -67,40 +64,32 @@ export default function Appendix(
 
     const file = e.target.files[0]
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file)
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      if (!e.target) return
-      if (typeof e.target.result !== "string") return
-      const { name: fileName, type } = file
-      const fileType =
-        imageReg.test(type) ? "image"
-          : pdfReg.test(type) ? "pdf" : "other"
-      const fileSrc = e.target.result || ""
+    const { name: fileName, type } = file
 
-      if (fileType === "other") {
-        console.log(fileType)
-        return ModalInfo("只能上傳圖片或pdf")
-      }
 
-      addFile(file)
-
-      imgInfoArr.push({
-        fileType,
-        fileName,
-        fileSrc,
-        isNew: true
-      })
-      setImgInfoArr([...imgInfoArr])
+    const fileType =
+      imageReg.test(type) ? "image"
+        : pdfReg.test(type) ? "pdf" : "other"
+    if (fileType === "other") {
+      console.log(fileType)
+      return ModalInfo("只能上傳圖片或pdf")
     }
+
+    const fileSrc = URL.createObjectURL(file);
+
+    imgInfoArr.push({
+      fileType,
+      fileName,
+      fileSrc,
+      isNew: true
+    })
+
+    addFile(file)
+    setImgInfoArr([...imgInfoArr])
   }
 
   // =========================================================
-  // modal switch
-  const [showModal, setShowModal] = useState(-1)
-  const closeModal = () => {
-    setShowModal(-1)
-  }
+
 
   return (
     <div className={`${styleL.appendix} ${styleL.listContainer} `}>
@@ -109,7 +98,7 @@ export default function Appendix(
         const { fileType, fileName, fileSrc, } = item
 
         return (
-          <div key={index}>
+          <div key={index} className={classNames(scss.row, scss.rowPlus)}>
             {disabled ?
               <span></span> :
               <IconRemoveCircle onClick={() => removeImgInfo(index)} />}
@@ -117,28 +106,13 @@ export default function Appendix(
               {/*  eslint-disable-next-line @next/next/no-img-element */}
               <img src={iconAttacth.src} alt="" />
             </span>
-            {/* <span className={styleL.serialNumber}>{index + 1}</span> */}
-            <span className={styleL.fileName}
-              onClick={() => setShowModal(index)}>{fileName}</span>
-            {fileType === "pdf" && showModal === index &&
-              <PdfViewer01 pdfSrc={fileSrc} fileName={fileName}
-                closeModal={closeModal} />
-            }
-            {fileType === "image" &&
-              // eslint-disable-next-line jsx-a11y/alt-text
-              <Image
-                rootClassName={styleL.antdImage}
-                style={{ display: 'none' }}
-                src={fileSrc as string}
-                preview={{
-                  visible: showModal === index,
-                  onVisibleChange: () => {
-                    setShowModal(-1);
-                  },
-                  mask: null,
-                }}
-              />
-            }
+
+            <a className={classNames(styleL.fileName, scss.link)} href={fileSrc} download={fileName}>
+              {fileName}
+            </a>
+            {/* <Link className={classNames(styleL.fileName, scss.link)} href={fileSrc}>
+              {fileName}
+            </Link> */}
           </div>
         )
       })}
@@ -153,7 +127,7 @@ export default function Appendix(
           </label>
         }
       </div>
-      
+
     </div>
   )
 }
