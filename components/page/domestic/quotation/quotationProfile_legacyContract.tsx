@@ -221,6 +221,7 @@ export default function QuotationProfile(
         <InputSel
           label="報價編號"
           showBaseline="invisible"
+          disabled={disabled}
           inputProps={{
             value: contractNumber,
             onChange: (v) => { classBasicInfo.contractNumber = v }
@@ -228,6 +229,7 @@ export default function QuotationProfile(
         <InputSel
           label="報價時效"
           showBaseline="invisible"
+          disabled={disabled}
           inputProps={{
             value: quoteValidity ?? "",
             onChange: (v) => { classBasicInfo.quoteValidity = v }
@@ -235,6 +237,7 @@ export default function QuotationProfile(
         <InputSel
           label="報價日期"
           showBaseline="invisible"
+          disabled={disabled}
           inputProps={{
             value: quoteDate as string ?? "",
             onChange: (v) => { classBasicInfo.quoteDate = v }
