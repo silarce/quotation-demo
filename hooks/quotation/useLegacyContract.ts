@@ -681,7 +681,7 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       "unitPrice", "totalPrice", "notes",
     ],
     cellConfig: {
-      "itemIndex": { label: "項目", width: "60px", type: "input", inputType: "number" },
+      "itemIndex": { label: "項目索引", width: "80px", type: "input", inputType: "number" },
       "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
       "quantity": { label: "數量", width: "60px", type: "input", inputType: "number" },
       "unitPrice": { label: "單價", width: "110px", type: "input", inputType: "number" },
