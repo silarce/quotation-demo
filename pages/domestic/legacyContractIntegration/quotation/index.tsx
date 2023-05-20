@@ -178,7 +178,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const uploadAttachment = async () => {
     const formData = new FormData
 
-    formData.append("image", fileArr[0])
+    formData.append("file", fileArr[0])
 
     if (!contractId) return
     try {
@@ -218,6 +218,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           if (contractId) updateLegacyContract()
           else router.push({ query: { contractId: res.id } })
+
         }
         catch { myAlert.err({ title: "上傳失敗" }) }
         finally { showRootLoading(false) }
