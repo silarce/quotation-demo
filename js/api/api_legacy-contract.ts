@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-import { axi } from "./_axiosCreator";
+import { axi, domain } from "./_axiosCreator";
 
 import _ from "lodash"
-
 
 
 
@@ -17,9 +16,10 @@ import {
   TcreateLegacyContractDto,
   TupdateLegacyContractDto,
   TpageMetaDto,
+  TfileDto
 } from "./dtoTypes"
 
-
+export { domain }
 
 export type Tparams = {
   order?: "ASC" | "DESC",
@@ -68,11 +68,23 @@ export const useLegacyContracts = (params?: Tparams) => {
     if (res) setRes(res)
     return res
   }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetLegacyContracts(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    res.data = [...oldData, ...newData]
+    setRes({ ...res })
+    return apiRes
+  }
+
   return {
     legacyContractsArr: res?.data,
     legacyContractsMeta: res?.meta,
     setLegacyContracts: setRes,
-    updateLegacyContracts: update
+    updateLegacyContracts: update,
+    updateLegacyContracts_infinite: update_infinite
   }
 }
 
@@ -123,8 +135,45 @@ export const apiDeleteLegacyContracts_id = (id: string) => {
 }
 
 
+/**取得舊合約附件 */
+export const apiGetLegacyContracts_id_attachments = (id: string) => {
+  const api = `/legacy-contracts/${id}/attachments`
+  return axi.get(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
+
+export const useLegacyContracts_id_attachments = (id: string | undefined) => {
+  let [res, setRes] = useState<TfileDto[]>()
+  const update = async () => {
+    if (!id) return undefined
+    const res = await apiGetLegacyContracts_id_attachments(id) as TfileDto[]
+    if (res) setRes(res)
+    return res
+  }
+  return {
+    attachments: res,
+    updateAttachments: update,
+    domain
+  }
+}
 
 
+/**上傳舊合約附件 */
+export const apiPostLegacyContracts_id_attachments = (contractId: string, body: FormData) => {
+  const api = `/legacy-contracts/${contractId}/attachments`
+  return axi.post(api, body)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
+
+/**移除舊合約附件 */
+export const apiDelLegacyContracts_id_attachments = (contractId: string, fileId: string) => {
+  const api = `/legacy-contracts/${contractId}/attachments/${fileId}`
+  return axi.delete(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject(err))
+}
 
 
 

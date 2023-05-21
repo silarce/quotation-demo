@@ -94,14 +94,18 @@ class Class_basicInfo {
 class Class_product {
   constructor(
     reRender: TreRender,
-    legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto
+    legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto,
+    countTotalDiscount: () => void
   ) {
     this._reRender = reRender
     this._product = legacyProduct
+    this._product.discountRate = Decimal.mul(this._product.discountRate || "0", 100).toString()
+    this._countTotalDiscount = countTotalDiscount
   } // constructor
 
   private _reRender
   private _product
+  private _countTotalDiscount
 
   readonly options_doorTrack_normal = options_doorTrack_normal
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection
@@ -122,6 +126,23 @@ class Class_product {
     this._product.idNumber = parseFloat(v);
     this._reRender()
   }
+
+  get discountRate() { return this._product.discountRate }
+  set discountRate(v) {
+    if (!v) v = "0"
+    if (parseFloat(v) > 100) v = "100"
+    this._product.discountRate = v;
+    this._countTotalDiscount()
+    this._reRender()
+  }
+
+  set discountRate_noLoop(v: string) {
+    if (!v) v = "0"
+    if (parseFloat(v) > 100) v = "100"
+    this._product.discountRate = v;
+    this._reRender()
+  }
+
 
   get itemName() { return this._product.itemName }
   set itemName(v) { this._product.itemName = v; this._reRender() }
@@ -220,7 +241,6 @@ class Class_product {
 class Class_addition {
   constructor(
     reRender: TreRender,
-    // addition: TlegacyContractDto["additions"][number]
     addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto
   ) {
     this._reRender = reRender
@@ -235,12 +255,8 @@ class Class_addition {
     return undefined
   }
 
-  get itemIndex() { return this._addition.itemIndex.toString() }
-  set itemIndex(v) {
-    if (!v) v = "0"
-    this._addition.itemIndex = parseFloat(v);
-    this._reRender()
-  }
+  get itemName() { return this._addition.itemName }
+  set itemName(v) { this._addition.itemName = v; this._reRender() }
 
   get content() { return this._addition.content }
   set content(v) { this._addition.content = v; this._reRender() }
@@ -276,7 +292,9 @@ class Class_addition {
 class Class_payInfo {
   constructor(
     reRender: () => void,
-    legacyContract: TlegacyContractDto | TemptyLegacyContract
+    legacyContract: TlegacyContractDto | TemptyLegacyContract,
+    classProductArr: Class_product[],
+    editAllProdDiscount: (v: string) => void
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
@@ -284,21 +302,73 @@ class Class_payInfo {
     this._legacyContract.paymentMethods.forEach((item) => {
       item.totalPaymentRatio = Decimal.mul(item.totalPaymentRatio || "0", 100).toString()
     })
-
+    this._classProductArr = classProductArr
+    this._editAllProdDiscount = editAllProdDiscount
   }
   private _reRender
   private _legacyContract
+  private _classProductArr
+  private _editAllProdDiscount
 
   get discountRate() {
     return this._legacyContract.discountRate
   }
   set discountRate(v) {
+    if (parseFloat(v) > 100) v = "100"
+    if (!v) v = "0"
+
+    const discountRate = Decimal.div(v, 100)
+    const subTotal: string = (() => {
+      let subTotal = new Decimal(0)
+      this._classProductArr.forEach(prod => {
+        if (!prod.totalPrice) return
+        subTotal = subTotal.add(prod.totalPrice)
+      })
+      return subTotal.mul(discountRate).toString()
+    })()
+
     this._legacyContract.discountRate = v;
+    this.subTotal = subTotal
+    this._editAllProdDiscount(v)
     this._reRender()
   }
 
+  set discountRate_noLoop(v: string) {
+    if (parseFloat(v) > 100) v = "100"
+    if (!v) v = "0"
+
+    const discountRate = Decimal.div(v, 100)
+    const subTotal: string = (() => {
+      let subTotal = new Decimal(0)
+      this._classProductArr.forEach(prod => {
+        if (!prod.totalPrice) return
+        subTotal = subTotal.add(prod.totalPrice)
+      })
+      return subTotal.mul(discountRate).toString()
+    })()
+
+    this._legacyContract.discountRate = v;
+    this.subTotal = subTotal
+    this._reRender()
+  }
+
+
+
+
+
   get subTotal() { return this._legacyContract.subTotal.toString() }
-  set subTotal(v) { this._legacyContract.subTotal = parseFloat(v); this._reRender() }
+  set subTotal(v) {
+    if (!v) v = "0"
+
+    const salesTax = Decimal.mul(v, 0.05).toString()
+
+    const total = Decimal.add(salesTax, v).toString()
+
+    this._legacyContract.subTotal = parseFloat(v);
+    this.salesTax = salesTax
+    this.total = total
+    this._reRender()
+  }
 
   get salesTax() { return this._legacyContract.salesTax.toString() }
   set salesTax(v) { this._legacyContract.salesTax = parseFloat(v); this._reRender() }
@@ -325,6 +395,7 @@ class Class_payInfo {
     this._legacyContract.paymentMethods.splice(index, 1)
     this._reRender()
   }
+
 } // Class_payInfo
 
 // =======================================================================
@@ -396,18 +467,26 @@ class Class_legacyContract {
   ) {
     this._legacyContract = legacyContract
     this._reRender = reRender
-
     /**  報價單基本資料*/
     this.classBasicInfo
       = new Class_basicInfo(reRender, this._legacyContract)
+
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     this.classProductArr =
-      this._legacyContract.products.map((product) => new Class_product(reRender, product))
+      this._legacyContract.products.map((product) => {
+        return new Class_product(reRender, product, this.countTotalDiscount)
+      })
+    // this.classProductArr =
+    //   this._legacyContract.products.map((product) => {
+    //     return new Class_product(reRender, product, this)
+    //   })
+
     /**額外項目 */
     this.classAdditionArr =
       this._legacyContract.additions.map((addition) => new Class_addition(reRender, addition))
     /**   付款資訊*/
-    this.classPayInfo = new Class_payInfo(reRender, this._legacyContract)
+    this.classPayInfo
+      = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount)
     /**  備註*/
     this.classMemo = new Class_listString(reRender, this._legacyContract.notes)
     /**  報價範圍*/
@@ -433,6 +512,22 @@ class Class_legacyContract {
   classQuoteRange
   classSignature
   // ---------------------
+
+  countTotalDiscount = () => {
+    let totalDiscount = new Decimal(0)
+    this.classProductArr.forEach((prod) => {
+      totalDiscount = Decimal.add(prod.discountRate, totalDiscount)
+    })
+    this.classPayInfo.discountRate_noLoop =
+      // Decimal.div(totalDiscount, this.classProductArr.length).toString()
+      Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2)
+  }
+  editAllProdDiscount = (v: string) => {
+    this.classProductArr.forEach((prod) => {
+      prod.discountRate_noLoop = v
+    })
+  }
+
 
   get customer() {
     return this._legacyContract.customer
@@ -469,7 +564,7 @@ class Class_legacyContract {
     this._reRender()
   }
   addProd = () => {
-    this.classProductArr.push(new Class_product(this._reRender, emptyProdCre()))
+    this.classProductArr.push(new Class_product(this._reRender, emptyProdCre(), this.countTotalDiscount))
     this._activeProd = this.classProductArr.length - 1
     this._reRender()
   }
@@ -568,19 +663,12 @@ export {
   useLegacyContract
 }
 
-// 這是什麼?
-const unexpectedOption = (v: string, icon?: string) => {
-  if (icon) return { value: v, label: v, icon }
-  return { value: v, label: v, }
-}
-
-
 
 // ==========================================================================
 
 type TprodInputCellType =
   { [key in keyof Pick<Class_product,
-    "idNumber" | "itemName" | "quoteType" | "doorType" |
+    "discountRate" | "idNumber" | "itemName" | "quoteType" | "doorType" |
     "length" | "width" | "height" | "thickness" | "area" | "volume" |
     "material" | "surface" | "horsepower" |
     "quantity" | "unitPrice" | "totalPrice" |
@@ -618,7 +706,7 @@ function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
     keyList: [
-      "idNumber", "itemName", "quoteType",
+      "idNumber", "discountRate", "itemName", "quoteType",
       "length", "width", "height", "thickness", "area", "volume",
       "doorType", "material", "surface", "doorTrack",
       "typhoonProtection", "horsepower",
@@ -629,6 +717,7 @@ function prodCellConfigCre(): TprodCellConfig {
     cellConfig: {
       // input
       idNumber: { id: "idNumber", label: "編號", width: "100px", type: "input", inputType: "number" },
+      discountRate: { id: "discountRate", label: "折數", width: "60px", type: "input", inputType: "number" },
       itemName: { id: "itemName", label: "項目", width: "60px", type: "input" },
       quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "input" },
       doorType: { id: "doorType", label: "門型", width: "100px", type: "input" },
@@ -656,7 +745,7 @@ function prodCellConfigCre(): TprodCellConfig {
 
 type TaddtionInputCellType =
   { [key in keyof Pick<Class_addition,
-    "itemIndex" | "content" | "quantity" |
+    "itemName" | "content" | "quantity" |
     "unitPrice" | "totalPrice" | "notes"
   >]: { type: "input" } }
 
@@ -677,11 +766,11 @@ type TadditionCellConfig = {
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
     keyList: [
-      "itemIndex", "content", "quantity",
+      "itemName", "content", "quantity",
       "unitPrice", "totalPrice", "notes",
     ],
     cellConfig: {
-      "itemIndex": { label: "項目", width: "60px", type: "input", inputType: "number" },
+      "itemName": { label: "項目", width: "60px", type: "input" },
       "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
       "quantity": { label: "數量", width: "60px", type: "input", inputType: "number" },
       "unitPrice": { label: "單價", width: "110px", type: "input", inputType: "number" },
@@ -712,6 +801,7 @@ export type {
 const emptyProdCre = (): TcreateLegacyContractProductDto => {
   return {
     idNumber: 0,
+    discountRate: "1.0",
     itemName: "",
     quoteType: "",
     doorType: "",
@@ -736,7 +826,7 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
 
 const emptyAdditionCre = (): TcreateLegacyContractAdditionDto => {
   return {
-    itemIndex: 0,
+    itemName: "",
     content: "",
     quantity: 0,
     unitPrice: 0,
@@ -768,7 +858,7 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
     projectCity: "",
     projectDistrict: "",
     projectAddress: "",
-    discountRate: "0",
+    discountRate: "100",
     subTotal: 0,
     salesTax: 0,
     total: 0,

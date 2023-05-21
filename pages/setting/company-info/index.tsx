@@ -24,7 +24,8 @@ import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_
 import {
   useCompanyInfo, TcompanyInfoDto,
   apiPatchCompanyInfo,
-  apiUploadCompanyLogo
+  apiUploadCompanyLogo,
+  domain
 } from "js/api/api_company-info"
 
 // icon
@@ -64,8 +65,9 @@ export default function CompanyInfo() {
   const [imgSrc, setImgSrc] = useState<string | null | undefined>("")
 
   useEffect(() => {
-    setImgSrc(companyInfo?.logoLink)
-  }, [companyInfo?.logoLink])
+    const logoId = companyInfo?.logoFileId
+    setImgSrc(`${domain}file/download/${logoId}`)
+  }, [companyInfo?.logoFileId])
   // ===================================================
   const [editable, setEditable] = useState(false)
 
@@ -127,7 +129,7 @@ export default function CompanyInfo() {
   ]
   // ===================================================
   // 地址
-  const { county, district, address, logoLink } = companyInfo ?? {}
+  const { county, district, address, logoFileId: logoLink } = companyInfo ?? {}
 
   // 選擇城市後清除地區
   const clearDistrict = () => {
@@ -176,7 +178,7 @@ export default function CompanyInfo() {
   }
   // 清除
   const clearLogo = () => {
-    setImgSrc(companyInfo?.logoLink)
+    setImgSrc(companyInfo?.logoFileId)
     setImageFile(undefined)
   }
   // ===================================================

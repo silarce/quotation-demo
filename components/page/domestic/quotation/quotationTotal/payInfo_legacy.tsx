@@ -1,6 +1,7 @@
 import { useState } from "react"
 import classNames from "classnames"
 
+
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
@@ -98,12 +99,13 @@ export default function PayInfo_legacy(
             disabled={disabled}
           />
         </div>
-        <div className={style.inputBox01}>
+        <div className={classNames(style.inputBox01, style.date)}>
           <span>交貨日期</span>
           <InputSel
-            inputProps={{
+            datePickerProps={{
               value: deliveryDate as string,
               onChange: (v) => { classPayInfo.deliveryDate = v },
+              datePickerClassName: style.datePicker
             }}
             placeholder={`例 : 100-01-01`}
             disabled={disabled}

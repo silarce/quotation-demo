@@ -1,7 +1,7 @@
 // 報價單
 import React, {
   Dispatch, SetStateAction, FocusEvent,
-  useState, useRef, useEffect
+  useState, useRef, useEffect, useMemo,
 } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
@@ -36,12 +36,17 @@ import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLega
 // api
 import {
   useLegacyContract_id,
+  useLegacyContracts_id_attachments,
   apiPostLegacyContracts,
-  apiPatchLegacyContracts_id
+  apiPatchLegacyContracts_id,
+  apiPostLegacyContracts_id_attachments,
+  apiDelLegacyContracts_id_attachments
 } from "js/api/api_legacy-contract"
 import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
+import { apiGetFileDownload_id } from "js/api/api_file"
 
-
+// type
+import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
 
 
 
@@ -67,35 +72,156 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false)
   // --------------------------------------------------------------------------
-  let [customerParams, setCustomerParams] = useState<TapiGetCustomersParams>({
-    page: 1,
-    pageSize: 20,
+  const [page_customer, setPage_customer] = useState(1)
+  const [searchCustomerName, setSearchCustomerName] = useState<string>()
+
+  const customerParams: TapiGetCustomersParams = {
+    page: page_customer,
+    pageSize: 10,
     populate: ["contacts", "types"],
-    // filter,
+    // filter:{$contains:""},
+    filter: { "name": { $contains: searchCustomerName } },
     sort: "customerNumber"
-  })
-  const { data: customerArr, update: updateCustomerArr } = useCustomers(customerParams)
-  // --------------------------------------------------------------------------
-  let [legacyContractParams, setLegacyContractParams] = useState({
-    // populate: ["customer", "products", "additions","fax"],
-    populate: ["customer", "products", "additions"],
-  })
-  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
+  }
+
+  const {
+    data: customerArr, meta: customerMeta,
+    update: updateCustomerArr, update_infinite: updateCustomerArr_infinite } = useCustomers(customerParams)
+
+  const getCustomerByPage = () => {
+    if (!customerMeta?.hasNextPage) return
+    setPage_customer(page => ++page)
+  }
+
+  const searchCustomer = (v: string | undefined) => {
+    setPage_customer(1)
+    if (!v) v = undefined
+    setSearchCustomerName(v)
+  }
 
   useEffect(() => {
     (async () => {
       updateCustomerArr()
     })()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchCustomerName])
+
+  useEffect(() => {
+    if (page_customer === 1) return;
+    (async () => {
+      await updateCustomerArr_infinite()
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page_customer])
+
+
+  // --------------------------------------------------------------------------
+  let [legacyContractParams, setLegacyContractParams] = useState({
+    populate: ["customer", "products", "additions"],
+  })
+
+  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
+  // 這是class
+  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+
+  const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId)
+
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([])
+  const [fileArr, setFileArr] = useState<File[]>([])
+
+
+  useEffect(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/
+      const pdfReg = /pdf$/
+      const fileType = imageReg.test(item.mime) ? "image"
+        : pdfReg.test(item.mime) ? "pdf" : "other"
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}file/download/${item.id}`,
+        isNew: false,
+      }
+    })
+    setFileInfoArr(arr ?? [])
+  }, [attachments])
+
+  const removeFileInfo = (index: number) => {
+    fileInfoArr[index].willDelete = true
+    setFileInfoArr([...fileInfoArr])
+    // removeFile(index)
+  }
+
+  const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
+    setFileInfoArr([...newImgInfoArr])
+  }
+
+
+  // const addFile = (file: File) => {
+  //   setFileArr(arr => {
+  //     const arrCopy = [...arr]
+  //     arrCopy.push(file)
+  //     return arrCopy
+  //   })
+  // }
+
+  // const removeFile = (index: number) => {
+  //   setFileArr(arr => {
+  //     const arrCopy = [...arr]
+  //     arrCopy.splice(index, 1)
+  //     return arrCopy
+  //   })
+  // }
+
+  const appendixParams = {
+    fileInfoArr,
+    // addFile,
+    // removeFile,
+    removeFileInfo,
+    toSetFileInfo,
+  }
+
+
+  const uploadAttachment = async (contractId: string) => {
+    // 移除附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew } = info
+      if (!fileId || !willDelete || isNew) continue;
+      try {
+        await apiDelLegacyContracts_id_attachments(contractId, fileId)
+      }
+      catch (error) {
+        console.log(error)
+      }
+    }
+
+    // 上傳附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew, file } = info
+      if (fileId || !file || willDelete || !isNew) continue
+      const formData = new FormData
+      formData.append("file", file)
+      try {
+        await apiPostLegacyContracts_id_attachments(contractId, formData)
+      }
+      catch (error) { console.log(error) }
+    }
+  }
 
   useEffect(() => {
     (async () => {
-      updateLegacyContract()
+      await Promise.all([
+        updateLegacyContract(),
+        updateAttachments()
+      ])
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId])
 
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+  // --------------------------------------------------------------------------
+
 
   const classSignature = classLegacyContract.classSignature
   const signatureArr = [
@@ -121,10 +247,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit, legacyContract])
 
+
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false)
-  
-
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
@@ -143,14 +268,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
         try {
           showRootLoading(true)
 
+
           const res =
             contractId
               ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
               : await apiPostLegacyContracts(classLegacyContract.postBody)
-          myAlert.success({ title: "上傳完成" })
 
-          if (contractId) updateLegacyContract()
+          showRootLoading(true, "正在更新附件")
+          await uploadAttachment(res.id)
+
+          if (contractId) {
+            await Promise.all([
+              updateLegacyContract(),
+              updateAttachments()
+            ])
+          }
           else router.push({ query: { contractId: res.id } })
+
+          myAlert.success({ title: "上傳完成" })
         }
         catch { myAlert.err({ title: "上傳失敗" }) }
         finally { showRootLoading(false) }
@@ -189,6 +324,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classLegacyContract={classLegacyContract}
             classBasicInfo={classLegacyContract.classBasicInfo}
             customerArr={customerArr ?? []}
+            customerMeta={customerMeta}
+            getCustomerByPage={getCustomerByPage}
+            searchCustomer={searchCustomer}
             disabled={!allowEdit} />
           {/*  */}
           <div className={style.switchBar}>
@@ -204,6 +342,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationTotal
             legacyContract={classLegacyContract}
             disabled={!allowEdit}
+            appendixParams={appendixParams}
           />
           {/* 簽名 */}
           <QuotationSinature
@@ -215,23 +354,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
         classLegacyContract={classLegacyContract} />
+
+      {/* <img src="https://gaia.komica.org/00b/src/1684580436003.jpg" alt="" /> */}
+      {/* <Image
+        // crossOrigin="anonymous"
+        src="https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed"
+        alt="" 
+        width={100}
+        height={100}
+        /> */}
+      {/* <img
+        // crossOrigin="anonymous"
+        src="https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed"
+        alt=""
+      /> */}
+
     </SubLayer>
   )
 }
 
-// ============================================================================
-/**
-代辦事項
 
-客戶名單有數千筆，要選擇客戶時要怎麼呈現?
-還有客戶名單的搜尋功能要記得做
-
-
- */
-
-
-
-
-
-
-
+// https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed 
