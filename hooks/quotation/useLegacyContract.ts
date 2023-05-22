@@ -454,12 +454,14 @@ class Class_payInfo {
     v = v.replace(/,/g, "")
 
     const numberRegex = /^(\d+(\.\d+)?|)$/;
-
-    // const numberRegex = /^(\d+(\.\d+)?|)$/;
     if (!numberRegex.test(v)) return;
 
+    v = new Decimal(v || 0).toDecimalPlaces(0).toString()
+
     this._total = v; // 必須可以接受空字串""
-    this._legacyContract.total = parseFloat(v || "0");// 必須是num;ber
+    this._legacyContract.total = parseFloat(v || "0");// 必須是number
+    // this._total = v; // 必須可以接受空字串""
+    // this._legacyContract.total = parseFloat(v || "0");// 必須是num
     this._reRender()
   }
 
