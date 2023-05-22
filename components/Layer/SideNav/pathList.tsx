@@ -141,7 +141,8 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "報價",
-          erpFeature: devPass,
+          // erpFeature: devPass,
+          erpFeature: "allPass",
           list: [
             {
               label: "預算",
