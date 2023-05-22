@@ -101,7 +101,7 @@ class Class_product {
     this._product = legacyProduct
 
     this._countTotalDiscount = countTotalDiscount
-    
+
     this._idNumber = this._product.idNumber.toString()
     this._length = this._product.length.toString()
     this._width = this._product.width.toString()
@@ -110,13 +110,8 @@ class Class_product {
     this._quantity = this._product.quantity.toString()
     this._unitPrice = this._product.unitPrice.toString()
     this._totalPrice = this._product.totalPrice.toString()
-    
-    // this._product.discountRate
-    //   = Decimal.mul(this._product.discountRate || "0", 100).toString()
     this._discountRate
       = Decimal.mul(this._product.discountRate || "0", 100).toString()
-    // this._discountRate = this._product.discountRate
-
   } // constructor
 
   private _reRender
@@ -154,38 +149,19 @@ class Class_product {
 
   get discountRate() { return this._discountRate }
   set discountRate(v) {
-    if (!v) v = "0"
     if (parseFloat(v) > 100) v = "100"
     this._discountRate = v;
-    this._product.discountRate = Decimal.div(v, 100).toString();
+    this._product.discountRate = Decimal.div(v || 0, 100).toString();
     this._countTotalDiscount()
     this._reRender()
   }
 
   set discountRate_noLoop(v: string) {
-    if (!v) v = "0"
     if (parseFloat(v) > 100) v = "100"
     this._discountRate = v;
-    this._product.discountRate = Decimal.div(v, 100).toString();
+    this._product.discountRate = Decimal.div(v || 0, 100).toString();
     this._reRender()
   }
-
-  // get discountRate() { return this._product.discountRate }
-  // set discountRate(v) {
-  //   if (!v) v = "0"
-  //   if (parseFloat(v) > 100) v = "100"
-  //   this._product.discountRate = v;
-  //   this._countTotalDiscount()
-  //   this._reRender()
-  // }
-
-  // set discountRate_noLoop(v: string) {
-  //   if (!v) v = "0"
-  //   if (parseFloat(v) > 100) v = "100"
-  //   this._product.discountRate = v;
-  //   this._reRender()
-  // }
-
 
   get itemName() { return this._product.itemName }
   set itemName(v) { this._product.itemName = v; this._reRender() }
@@ -249,15 +225,31 @@ class Class_product {
     this._reRender()
   }
 
-  get unitPrice() { return this._unitPrice }
+  get unitPrice() {
+    if (!this._unitPrice) return ""
+    return parseFloat(this._unitPrice).toLocaleString()
+  }
   set unitPrice(v) {
+    v = v.replace(/,/g, "")
+
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    if (!numberRegex.test(v)) return;
+
     this._unitPrice = v;
     this._product.unitPrice = parseFloat(v || "0");
     this._reRender()
   }
 
-  get totalPrice() { return this._totalPrice }
+  get totalPrice() {
+    if (!this._totalPrice) return ""
+    return parseFloat(this._totalPrice).toLocaleString()
+  }
   set totalPrice(v) {
+    v = v.replace(/,/g, "")
+
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    if (!numberRegex.test(v)) return;
+
     this._totalPrice = v;
     this._product.totalPrice = parseFloat(v || "0");
     this._reRender()
@@ -375,9 +367,8 @@ class Class_payInfo {
   }
   set discountRate(v) {
     if (parseFloat(v) > 100) v = "100"
-    if (!v) v = "0"
 
-    const discountRate = Decimal.div(v, 100)
+    const discountRate = Decimal.div(v || 0, 100)
     const subTotal: string = (() => {
       let subTotal = new Decimal(0)
       this._classProductArr.forEach(prod => {
@@ -387,17 +378,16 @@ class Class_payInfo {
       return subTotal.mul(discountRate).toString()
     })()
 
-    this._legacyContract.discountRate = v;
     this.subTotal = subTotal
-    this._editAllProdDiscount(v)
+    this._legacyContract.discountRate = v || "0";
+    this._editAllProdDiscount(v || "0")
     this._reRender()
   }
 
   set discountRate_noLoop(v: string) {
     if (parseFloat(v) > 100) v = "100"
-    if (!v) v = "0"
 
-    const discountRate = Decimal.div(v, 100)
+    const discountRate = Decimal.div(v || 0, 100)
     const subTotal: string = (() => {
       let subTotal = new Decimal(0)
       this._classProductArr.forEach(prod => {
@@ -407,15 +397,23 @@ class Class_payInfo {
       return subTotal.mul(discountRate).toString()
     })()
 
-    this._legacyContract.discountRate = v;
     this.subTotal = subTotal
+    this._legacyContract.discountRate = v || "0";
     this._reRender()
   }
 
-  get subTotal() { return this._subTotal }
+  get subTotal() {
+    if (!this._subTotal) return ""
+    return parseFloat(this._subTotal).toLocaleString()
+  }
   set subTotal(v) {
-    const salesTax = Decimal.mul(v, 0.05).toString()
-    const total = Decimal.add(salesTax, v).toString()
+    v = v.replace(/,/g, "")
+
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    if (!numberRegex.test(v)) return;
+
+    const salesTax = Decimal.mul(v || 0, 0.05).toString()
+    const total = Decimal.add(salesTax, v || 0).toString()
     this._subTotal = v;
     this._legacyContract.subTotal = parseFloat(v || "0");
     this.salesTax = salesTax
@@ -423,17 +421,35 @@ class Class_payInfo {
     this._reRender()
   }
 
-  get salesTax() { return this._salesTax }
+  get salesTax() {
+    if (!this._salesTax) return ""
+    return parseFloat(this._salesTax).toLocaleString()
+  }
   set salesTax(v) {
+    v = v.replace(/,/g, "")
+
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    if (!numberRegex.test(v)) return;
+
     this._salesTax = v;
-    this._legacyContract.salesTax = parseFloat(v || "v");
+    this._legacyContract.salesTax = parseFloat(v || "0");
     this._reRender()
   }
 
-  get total() { return this._total }
+  get total() {
+    if (!this._total) return ""
+    return parseFloat(this._total).toLocaleString()
+  }
   set total(v) {
-    this._total = v;
-    this._legacyContract.total = parseFloat(v || "0");
+    v = v.replace(/,/g, "")
+
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+
+    // const numberRegex = /^(\d+(\.\d+)?|)$/;
+    if (!numberRegex.test(v)) return;
+
+    this._total = v; // 必須可以接受空字串""
+    this._legacyContract.total = parseFloat(v || "0");// 必須是num;ber
     this._reRender()
   }
 
@@ -577,7 +593,7 @@ class Class_legacyContract {
   countTotalDiscount = () => {
     let totalDiscount = new Decimal(0)
     this.classProductArr.forEach((prod) => {
-      totalDiscount = Decimal.add(prod.discountRate, totalDiscount)
+      totalDiscount = Decimal.add(prod.discountRate || 0, totalDiscount)
     })
     this.classPayInfo.discountRate_noLoop =
       Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2)
@@ -792,8 +808,8 @@ function prodCellConfigCre(): TprodCellConfig {
       doorTrack: { id: "doorTrack", label: "門軌", width: "300px", type: "selectWithIcon" },
       horsepower: { id: "horsepower", label: "馬力", width: "90px", type: "input" },
       quantity: { id: "quantity", label: "數量", width: "55px", type: "input", inputType: "number" },
-      unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "input", inputType: "number" },
-      totalPrice: { id: "totalPrice", label: "複價", width: "140px", type: "input", inputType: "number" },
+      unitPrice: { id: "unitPrice", label: "單價", width: "120px", type: "input", inputType: "text" },
+      totalPrice: { id: "totalPrice", label: "複價", width: "140px", type: "input", inputType: "text" },
       typhoonProtection: { id: "typhoonProtection", label: "防颱", width: "60px", type: "checkbox" },
       bounceDoor: { id: "bounceDoor", label: "彈射門", width: "60px", type: "checkbox" },
       notes: { id: "notes", label: "備註", width: "90px", type: "input" },
