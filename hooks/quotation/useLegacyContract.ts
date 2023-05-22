@@ -229,8 +229,9 @@ class Class_product {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-    v = parseInt(v).toString()
+
     this._quantity = v;
+    v = parseInt(v || "0").toString()
     this._product.quantity = parseInt(v || "0");
     this._reRender()
   }
@@ -316,8 +317,8 @@ class Class_addition {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-    v = parseInt(v).toString()
     this._quantity = v
+    v = parseInt(v || "0").toString()
     this._addition.quantity = parseInt(v || "0");
     this._reRender()
   }
@@ -756,7 +757,9 @@ export {
 
 type TprodInputCellType =
   { [key in keyof Pick<Class_product,
-    "discountRate" | "idNumber" | "itemName" | "quoteType" | "doorType" |
+    "discountRate" |
+    "idNumber" |
+    "itemName" | "quoteType" | "doorType" |
     "length" | "width" | "height" | "thickness" | "area" | "volume" |
     "material" | "surface" | "horsepower" |
     "quantity" | "unitPrice" | "totalPrice" |
@@ -794,7 +797,8 @@ function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
     keyList: [
-      "idNumber", "discountRate", "itemName", "quoteType",
+      "idNumber",
+      "discountRate", "itemName", "quoteType",
       "length", "width", "height", "thickness", "area", "volume",
       "doorType", "material", "surface", "doorTrack",
       "typhoonProtection", "horsepower",
