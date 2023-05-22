@@ -229,8 +229,9 @@ class Class_product {
 
   get quantity() { return this._quantity }
   set quantity(v) {
+    v = parseInt(v).toString()
     this._quantity = v;
-    this._product.quantity = parseFloat(v || "0");
+    this._product.quantity = parseInt(v || "0");
     this._reRender()
   }
 
@@ -315,8 +316,9 @@ class Class_addition {
 
   get quantity() { return this._quantity }
   set quantity(v) {
+    v = parseInt(v).toString()
     this._quantity = v
-    this._addition.quantity = parseFloat(v || "0");
+    this._addition.quantity = parseInt(v || "0");
     this._reRender()
   }
 
