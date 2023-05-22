@@ -99,9 +99,9 @@ class Class_product {
   ) {
     this._reRender = reRender
     this._product = legacyProduct
-    this._product.discountRate = Decimal.mul(this._product.discountRate || "0", 100).toString()
-    this._countTotalDiscount = countTotalDiscount
 
+    this._countTotalDiscount = countTotalDiscount
+    
     this._idNumber = this._product.idNumber.toString()
     this._length = this._product.length.toString()
     this._width = this._product.width.toString()
@@ -110,6 +110,13 @@ class Class_product {
     this._quantity = this._product.quantity.toString()
     this._unitPrice = this._product.unitPrice.toString()
     this._totalPrice = this._product.totalPrice.toString()
+    
+    // this._product.discountRate
+    //   = Decimal.mul(this._product.discountRate || "0", 100).toString()
+    this._discountRate
+      = Decimal.mul(this._product.discountRate || "0", 100).toString()
+    // this._discountRate = this._product.discountRate
+
   } // constructor
 
   private _reRender
@@ -123,6 +130,7 @@ class Class_product {
   private _quantity
   private _unitPrice
   private _totalPrice
+  private _discountRate
 
   readonly options_doorTrack_normal = options_doorTrack_normal
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection
@@ -144,11 +152,12 @@ class Class_product {
     this._reRender()
   }
 
-  get discountRate() { return this._product.discountRate }
+  get discountRate() { return this._discountRate }
   set discountRate(v) {
     if (!v) v = "0"
     if (parseFloat(v) > 100) v = "100"
-    this._product.discountRate = v;
+    this._discountRate = v;
+    this._product.discountRate = Decimal.div(v, 100).toString();
     this._countTotalDiscount()
     this._reRender()
   }
@@ -156,9 +165,26 @@ class Class_product {
   set discountRate_noLoop(v: string) {
     if (!v) v = "0"
     if (parseFloat(v) > 100) v = "100"
-    this._product.discountRate = v;
+    this._discountRate = v;
+    this._product.discountRate = Decimal.div(v, 100).toString();
     this._reRender()
   }
+
+  // get discountRate() { return this._product.discountRate }
+  // set discountRate(v) {
+  //   if (!v) v = "0"
+  //   if (parseFloat(v) > 100) v = "100"
+  //   this._product.discountRate = v;
+  //   this._countTotalDiscount()
+  //   this._reRender()
+  // }
+
+  // set discountRate_noLoop(v: string) {
+  //   if (!v) v = "0"
+  //   if (parseFloat(v) > 100) v = "100"
+  //   this._product.discountRate = v;
+  //   this._reRender()
+  // }
 
 
   get itemName() { return this._product.itemName }
@@ -892,7 +918,7 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
     projectCity: "",
     projectDistrict: "",
     projectAddress: "",
-    discountRate: "100",
+    discountRate: "1.0",
     subTotal: 0,
     salesTax: 0,
     total: 0,
