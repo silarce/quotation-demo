@@ -219,24 +219,24 @@ export default function QuotationProfile(
 
       <div className={scss.time_legacy}>
         <InputSel
-          label="報價編號"
-          showBaseline="invisible"
+          label="合約編號"
+          showBaseline="auto"
           disabled={disabled}
           inputProps={{
             value: contractNumber,
             onChange: (v) => { classBasicInfo.contractNumber = v }
           }} />
-        <InputSel
-          label="報價時效"
+        {/* <InputSel
+          label="舊合約時效"
           showBaseline="invisible"
           disabled={disabled}
           inputProps={{
             value: quoteValidity ?? "",
             onChange: (v) => { classBasicInfo.quoteValidity = v }
-          }} />
+          }} /> */}
         <InputSel
-          label="報價日期"
-          showBaseline="invisible"
+          label="合約日期"
+          showBaseline="auto"
           disabled={disabled}
           datePickerProps={{
             value: quoteDate as string ?? "",

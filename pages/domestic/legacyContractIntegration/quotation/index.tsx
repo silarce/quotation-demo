@@ -1,17 +1,12 @@
-// 報價單
-import React, {
-  Dispatch, SetStateAction, FocusEvent,
-  useState, useRef, useEffect, useMemo,
-} from "react"
+// 舊合約
+import React, { useState, useEffect, } from "react"
 import { useRouter } from "next/router"
 import { NextRouter } from "next/router"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
-
 // components
-
 import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
 import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
 import QuotationAdditions from "components/page/domestic/quotation/quotationAdditions"
@@ -25,13 +20,10 @@ import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHe
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
-// icon
-import iconUpload from "public/image/icon/upload.svg"
-
 // css
 import style from "./quotation.module.scss"
 // ========================================================================
-import { Class_legacyContract, useLegacyContract } from "hooks/quotation/useLegacyContract"
+import {  useLegacyContract } from "hooks/quotation/useLegacyContract"
 // ========================================================================
 // api
 import {
@@ -43,12 +35,9 @@ import {
   apiDelLegacyContracts_id_attachments
 } from "js/api/api_legacy-contract"
 import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
-import { apiGetFileDownload_id } from "js/api/api_file"
 
 // type
 import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
-
-
 
 
 // ========================================================================
@@ -158,27 +147,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setFileInfoArr([...newImgInfoArr])
   }
 
-
-  // const addFile = (file: File) => {
-  //   setFileArr(arr => {
-  //     const arrCopy = [...arr]
-  //     arrCopy.push(file)
-  //     return arrCopy
-  //   })
-  // }
-
-  // const removeFile = (index: number) => {
-  //   setFileArr(arr => {
-  //     const arrCopy = [...arr]
-  //     arrCopy.splice(index, 1)
-  //     return arrCopy
-  //   })
-  // }
-
   const appendixParams = {
     fileInfoArr,
-    // addFile,
-    // removeFile,
     removeFileInfo,
     toSetFileInfo,
   }
@@ -253,7 +223,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
-      label: `報價編號 ${classLegacyContract.classBasicInfo.contractNumber}`,
+      label: `合約編號 ${classLegacyContract.classBasicInfo.contractNumber}`,
       onClick: () => { }
     },
     // { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
@@ -295,10 +265,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: "myButton", label: "取消", onClick: () => setAllowEdit(false) },
   ]
   const panel_noEditable: TpanelList = [
-    {
-      type: "myButton", label: "匯出報價單", img: iconUpload.src,
-      onClick: () => setShowPdf(true)
-    },
+    // {
+    //   type: "myButton", label: "匯出舊合約", img: iconUpload.src,
+    //   onClick: () => setShowPdf(true)
+    // },
     { type: "myButton", label: "編輯", onClick: () => setAllowEdit(true) },
     // { type: "myButton", label: "送審", onClick: () => alert("送審") },
     { type: "myButton", label: "返回", onClick: () => router.back() },

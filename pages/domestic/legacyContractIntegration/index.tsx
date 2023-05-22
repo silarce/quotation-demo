@@ -153,7 +153,7 @@ export default function LegacyContractIntegration() {
     },
     {
       type: "addButton",
-      label: "新增報價單",
+      label: "新增舊合約",
       onClick: () => {
         router.push({
           pathname: `/domestic/legacyContractIntegration/quotation`,
