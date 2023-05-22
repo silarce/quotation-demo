@@ -101,28 +101,11 @@ class Class_product {
     this._product = legacyProduct
     this._product.discountRate = Decimal.mul(this._product.discountRate || "0", 100).toString()
     this._countTotalDiscount = countTotalDiscount
-
-    this._idNumber = this._product.idNumber.toString()
-    this._length = this._product.length.toString()
-    this._width = this._product.width.toString()
-    this._height = this._product.height.toString()
-    this._thickness = this._product.thickness.toString()
-    this._quantity = this._product.quantity.toString()
-    this._unitPrice = this._product.unitPrice.toString()
-    this._totalPrice = this._product.totalPrice.toString()
   } // constructor
 
   private _reRender
   private _product
   private _countTotalDiscount
-  private _idNumber
-  private _length
-  private _width
-  private _height
-  private _thickness
-  private _quantity
-  private _unitPrice
-  private _totalPrice
 
   readonly options_doorTrack_normal = options_doorTrack_normal
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection
@@ -137,10 +120,10 @@ class Class_product {
     return undefined
   }
 
-  get idNumber() { return this._idNumber }
+  get idNumber() { return this._product.idNumber.toString() }
   set idNumber(v) {
-    this._idNumber = v;
-    this._product.idNumber = parseFloat(v || "0");
+    if (!v) v = "0"
+    this._product.idNumber = parseFloat(v);
     this._reRender()
   }
 
@@ -170,31 +153,35 @@ class Class_product {
   get doorType() { return this._product.doorType }
   set doorType(v) { this._product.doorType = v; this._reRender() }
 
-  get length() { return this._length }
+  get length() { return this._product.length.toString() }
   set length(v) {
-    this._length = v;
-    this._product.length = parseFloat(v || "0");
+    // if (!v) v = "0"
+    // this._product.length = parseFloat(v);
+    this._product.length = v;
     this._reRender()
   }
 
-  get width() { return this._width }
+  get width() { return this._product.width.toString() }
   set width(v) {
-    this._width = v;
-    this._product.width = parseFloat(v || "0");
+    // if (!v) v = "0"
+    // this._product.width = parseFloat(v);
+    this._product.width = v;
     this._reRender()
   }
 
-  get height() { return this._height }
+  get height() { return this._product.height.toString() }
   set height(v) {
-    this._height = v;
-    this._product.height = parseFloat(v || "0");
+    // if (!v) v = "0"
+    // this._product.height = parseFloat(v);
+    this._product.height = v;
     this._reRender()
   }
 
-  get thickness() { return this._thickness }
+  get thickness() { return this._product.thickness.toString() }
   set thickness(v) {
-    this._thickness = v;
-    this._product.thickness = parseFloat(v || "0");
+    // if (!v) v = "0"
+    // this._product.thickness = parseFloat(v);
+    this._product.thickness = v;
     this._reRender()
   }
 
@@ -216,24 +203,24 @@ class Class_product {
   get horsepower() { return this._product.horsepower }
   set horsepower(v) { this._product.horsepower = v; this._reRender() }
 
-  get quantity() { return this._quantity }
+  get quantity() { return this._product.quantity.toString() }
   set quantity(v) {
-    this._quantity = v;
-    this._product.quantity = parseFloat(v || "0");
+    if (!v) v = "0"
+    this._product.quantity = parseFloat(v);
     this._reRender()
   }
 
-  get unitPrice() { return this._unitPrice }
+  get unitPrice() { return this._product.unitPrice.toString() }
   set unitPrice(v) {
-    this._unitPrice = v;
-    this._product.unitPrice = parseFloat(v || "0");
+    if (!v) v = "0"
+    this._product.unitPrice = parseFloat(v);
     this._reRender()
   }
 
-  get totalPrice() { return this._totalPrice }
+  get totalPrice() { return this._product.totalPrice.toString() }
   set totalPrice(v) {
-    this._totalPrice = v;
-    this._product.totalPrice = parseFloat(v || "0");
+    if (!v) v = "0"
+    this._product.totalPrice = parseFloat(v);
     this._reRender()
   }
 
@@ -263,17 +250,9 @@ class Class_addition {
     this._reRender = reRender
     this._addition = addition
 
-    this._quantity = addition.quantity.toString()
-    this._unitPrice = addition.unitPrice.toString()
-    this._totalPrice = addition.totalPrice.toString()
-
-
   } // constructor
   private _reRender
   private _addition
-  private _quantity
-  private _unitPrice
-  private _totalPrice
 
   get id() {
     if ("id" in this._addition) return this._addition.id
@@ -286,27 +265,24 @@ class Class_addition {
   get content() { return this._addition.content }
   set content(v) { this._addition.content = v; this._reRender() }
 
-  get quantity() { return this._quantity }
+  get quantity() { return this._addition.quantity.toString() }
   set quantity(v) {
-
-    this._quantity = v
-    this._addition.quantity = parseInt(v || "0");
+    if (!v) v = "0"
+    this._addition.quantity = parseFloat(v);
     this._reRender()
   }
 
-  get unitPrice() { return this._unitPrice }
+  get unitPrice() { return this._addition.unitPrice.toString() }
   set unitPrice(v) {
-
-    this._unitPrice = v
-    this._addition.unitPrice = parseFloat(v || "0");
+    if (!v) v = "0"
+    this._addition.unitPrice = parseFloat(v);
     this._reRender()
   }
 
-  get totalPrice() { return this._totalPrice }
+  get totalPrice() { return this._addition.totalPrice.toString() }
   set totalPrice(v) {
-
-    this._totalPrice = v
-    this._addition.totalPrice = parseFloat(v || "0");
+    if (!v) v = "0"
+    this._addition.totalPrice = parseFloat(v);
     this._reRender()
   }
 
@@ -332,21 +308,11 @@ class Class_payInfo {
     })
     this._classProductArr = classProductArr
     this._editAllProdDiscount = editAllProdDiscount
-    this._subTotal = this._legacyContract.subTotal.toString()
-    this._salesTax = this._legacyContract.salesTax.toString()
-    this._total = this._legacyContract.total.toString()
-
-
-
-
   }
   private _reRender
   private _legacyContract
   private _classProductArr
   private _editAllProdDiscount
-  private _subTotal
-  private _salesTax
-  private _total
 
   get discountRate() {
     return this._legacyContract.discountRate
@@ -390,30 +356,29 @@ class Class_payInfo {
     this._reRender()
   }
 
-  get subTotal() { return this._subTotal }
+
+
+
+
+  get subTotal() { return this._legacyContract.subTotal.toString() }
   set subTotal(v) {
+    if (!v) v = "0"
+
     const salesTax = Decimal.mul(v, 0.05).toString()
+
     const total = Decimal.add(salesTax, v).toString()
-    this._subTotal = v;
-    this._legacyContract.subTotal = parseFloat(v || "0");
+
+    this._legacyContract.subTotal = parseFloat(v);
     this.salesTax = salesTax
     this.total = total
     this._reRender()
   }
 
-  get salesTax() { return this._salesTax }
-  set salesTax(v) {
-    this._salesTax = v;
-    this._legacyContract.salesTax = parseFloat(v || "v");
-    this._reRender()
-  }
+  get salesTax() { return this._legacyContract.salesTax.toString() }
+  set salesTax(v) { this._legacyContract.salesTax = parseFloat(v); this._reRender() }
 
-  get total() { return this._total }
-  set total(v) {
-    this._total = v;
-    this._legacyContract.total = parseFloat(v || "0");
-    this._reRender()
-  }
+  get total() { return this._legacyContract.total.toString() }
+  set total(v) { this._legacyContract.total = parseFloat(v); this._reRender() }
 
   get deliveryLocation() { return this._legacyContract.deliveryLocation }
   set deliveryLocation(v) { this._legacyContract.deliveryLocation = v; this._reRender() }
@@ -558,6 +523,7 @@ class Class_legacyContract {
       totalDiscount = Decimal.add(prod.discountRate, totalDiscount)
     })
     this.classPayInfo.discountRate_noLoop =
+      // Decimal.div(totalDiscount, this.classProductArr.length).toString()
       Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2)
   }
   editAllProdDiscount = (v: string) => {
