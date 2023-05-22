@@ -229,8 +229,9 @@ class Class_product {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-    v = parseInt(v).toString()
+
     this._quantity = v;
+    v = parseInt(v || "0").toString()
     this._product.quantity = parseInt(v || "0");
     this._reRender()
   }
@@ -316,8 +317,8 @@ class Class_addition {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-    v = parseInt(v).toString()
     this._quantity = v
+    v = parseInt(v || "0").toString()
     this._addition.quantity = parseInt(v || "0");
     this._reRender()
   }
@@ -560,15 +561,13 @@ class Class_legacyContract {
     this.classBasicInfo
       = new Class_basicInfo(reRender, this._legacyContract)
 
+
+    const sortedProdArr = _.sortBy(this._legacyContract.products, "idNumber")
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     this.classProductArr =
-      this._legacyContract.products.map((product) => {
+      sortedProdArr.map((product) => {
         return new Class_product(reRender, product, this.countTotalDiscount)
       })
-    // this.classProductArr =
-    //   this._legacyContract.products.map((product) => {
-    //     return new Class_product(reRender, product, this)
-    //   })
 
     /**額外項目 */
     this.classAdditionArr =
@@ -693,7 +692,12 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract)
 
-    legacyContractCopy.products = this.classProductArr.map((prod) => prod.postProd)
+    legacyContractCopy.products = this.classProductArr.map((prod, index) => {
+      const thePost = prod.postProd
+      thePost.idNumber = index + 1
+      return thePost
+    })
+
     legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition)
 
     const quoteDate_Date
@@ -756,7 +760,9 @@ export {
 
 type TprodInputCellType =
   { [key in keyof Pick<Class_product,
-    "discountRate" | "idNumber" | "itemName" | "quoteType" | "doorType" |
+    "discountRate" |
+    "idNumber" |
+    "itemName" | "quoteType" | "doorType" |
     "length" | "width" | "height" | "thickness" | "area" | "volume" |
     "material" | "surface" | "horsepower" |
     "quantity" | "unitPrice" | "totalPrice" |
@@ -794,7 +800,8 @@ function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
     keyList: [
-      "idNumber", "discountRate", "itemName", "quoteType",
+      "idNumber",
+      "discountRate", "itemName", "quoteType",
       "length", "width", "height", "thickness", "area", "volume",
       "doorType", "material", "surface", "doorTrack",
       "typhoonProtection", "horsepower",
