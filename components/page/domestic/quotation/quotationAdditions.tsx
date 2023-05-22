@@ -75,14 +75,6 @@ export default function QuotationAdditions(
 
 
         {/* tbody */}
-        {/* <div>
-          {additionArr.length === 0 &&
-            <>
-              <div className={styleL.rowIndex}></div>
-              <span className={styleL.noListTip}>尚未選擇產品</span>
-            </>}
-        </div> */}
-        {/*  */}
         {additionArr?.map((part, pIndex) => {
           return (
             <CellWithBar key={pIndex} isActive={activeIndex === pIndex}
@@ -91,7 +83,11 @@ export default function QuotationAdditions(
             >
               <div className={scss.delBtn}>
                 <IconDelete01
-                  onClick={(e) => { e.stopPropagation(), delAddition(pIndex) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (disabled) return;
+                    delAddition(pIndex)
+                  }}
                 />
               </div>
 
