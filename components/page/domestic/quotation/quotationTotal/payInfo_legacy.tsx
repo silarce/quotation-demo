@@ -62,7 +62,6 @@ export default function PayInfo_legacy(
               value={discountRate}
               onChange={(e) => classPayInfo.discountRate = e.target.value}
               disabled={disabled}
-
             />
             <span>%</span>
           </div>
@@ -74,7 +73,7 @@ export default function PayInfo_legacy(
             <div key={index} className={style.avgDiscount}>
               <span>{label}</span>
               <div>
-                <input type="number" className="bg-transparent"
+                <input type="text" className="bg-transparent"
                   value={classPayInfo[key]}
                   onChange={(e) => classPayInfo[key] = e.target.value}
                   disabled={disabled}
