@@ -290,7 +290,7 @@ class Class_addition {
   set quantity(v) {
 
     this._quantity = v
-    this._addition.quantity = parseInt(v || "0");
+    this._addition.quantity = parseFloat(v || "0");
     this._reRender()
   }
 
@@ -335,10 +335,6 @@ class Class_payInfo {
     this._subTotal = this._legacyContract.subTotal.toString()
     this._salesTax = this._legacyContract.salesTax.toString()
     this._total = this._legacyContract.total.toString()
-
-
-
-
   }
   private _reRender
   private _legacyContract
