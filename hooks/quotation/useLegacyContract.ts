@@ -561,15 +561,13 @@ class Class_legacyContract {
     this.classBasicInfo
       = new Class_basicInfo(reRender, this._legacyContract)
 
+
+    const sortedProdArr = _.sortBy(this._legacyContract.products, "idNumber")
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     this.classProductArr =
-      this._legacyContract.products.map((product) => {
+      sortedProdArr.map((product) => {
         return new Class_product(reRender, product, this.countTotalDiscount)
       })
-    // this.classProductArr =
-    //   this._legacyContract.products.map((product) => {
-    //     return new Class_product(reRender, product, this)
-    //   })
 
     /**額外項目 */
     this.classAdditionArr =
@@ -694,7 +692,12 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract)
 
-    legacyContractCopy.products = this.classProductArr.map((prod) => prod.postProd)
+    legacyContractCopy.products = this.classProductArr.map((prod, index) => {
+      const thePost = prod.postProd
+      thePost.idNumber = index + 1
+      return thePost
+    })
+
     legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition)
 
     const quoteDate_Date
