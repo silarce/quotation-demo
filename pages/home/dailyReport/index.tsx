@@ -28,15 +28,8 @@ import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToSt
 
 // api
 import {
-  // TcreateDailyReportItemDto,
-  // TdailyReportDto,
   useApiDailyReports,
-  // useApiDailyReports_Reporters,
-  // useApiDailyReports_isReporters_me,
-  // useApiDailyReports_my,
-  // useApiDailyReports_id,
   useApiDailyReports_reviewers,
-  // apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -51,7 +44,7 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
+import { TuserDto, } from "js/api/dtoTypes";
 import { TdoSearch, Toption } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
