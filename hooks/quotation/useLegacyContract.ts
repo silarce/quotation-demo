@@ -102,16 +102,25 @@ class Class_product {
 
     this._countTotalDiscount = countTotalDiscount
 
-    this._idNumber = this._product.idNumber.toString()
-    this._length = this._product.length.toString()
-    this._width = this._product.width.toString()
-    this._height = this._product.height.toString()
-    this._thickness = this._product.thickness.toString()
-    this._quantity = this._product.quantity.toString()
-    this._unitPrice = this._product.unitPrice.toString()
-    this._totalPrice = this._product.totalPrice.toString()
+    this._idNumber =
+      this._product.idNumber ? this._product.idNumber.toString() : ""
+    this._length =
+      this._product.length ? this._product.length.toString() : ""
+    this._width =
+      this._product.width ? this._product.width.toString() : ""
+    this._height =
+      this._product.height ? this._product.height.toString() : ""
+    this._thickness =
+      this._product.thickness ? this._product.thickness.toString() : ""
+    this._quantity =
+      this._product.quantity ? this._product.quantity.toString() : ""
+    this._unitPrice =
+      this._product.unitPrice ? this._product.unitPrice.toString() : ""
+    this._totalPrice =
+      this._product.totalPrice ? this._product.totalPrice.toString() : ""
+
     this._discountRate
-      = Decimal.mul(this._product.discountRate || "0", 100).toString()
+      = this._product.discountRate === "0" ? "" : Decimal.mul(this._product.discountRate || "0", 100).toString()
   } // constructor
 
   private _reRender
@@ -281,9 +290,9 @@ class Class_addition {
     this._reRender = reRender
     this._addition = addition
 
-    this._quantity = addition.quantity.toString()
-    this._unitPrice = addition.unitPrice.toString()
-    this._totalPrice = addition.totalPrice.toString()
+    this._quantity = addition.quantity ? addition.quantity.toString() : ""
+    this._unitPrice = addition.unitPrice ? addition.unitPrice.toString() : ""
+    this._totalPrice = addition.totalPrice ? addition.totalPrice.toString() : ""
 
 
   } // constructor
@@ -306,7 +315,6 @@ class Class_addition {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-
     this._quantity = v
     this._addition.quantity = parseFloat(v || "0");
     this._reRender()
