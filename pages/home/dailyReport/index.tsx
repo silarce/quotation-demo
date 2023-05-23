@@ -72,7 +72,8 @@ const reportedAtOptions = [
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const userId = userInfo.employee?.id ?? ""
   const router = useRouter()
-  const isMine = router.query.isMine ?? "true"
+  const isMine = router.query.isMine === undefined ? true
+    : router.query.isMine === "true" ? true : false
   const isCalendar = router.query.isCalendar === "true" ? true : false
 
   const [isLoading, setIsLoading] = useState(false)
@@ -112,8 +113,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }>()
 
   const filterIsMine = (() => {
-    if (isMine === "true") return { $eq: userId }
-    if (isMine === "false") return { $ne: userId }
+    if (isMine) return { $eq: userId }
+    if (!isMine) return { $ne: userId }
     return undefined
   })()
 
