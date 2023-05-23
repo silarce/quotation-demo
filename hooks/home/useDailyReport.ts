@@ -5,11 +5,13 @@ import moment from "moment";
 // type
 import { TdailyReportItemDto, TemployeeDto, TuserDto } from "js/api/dtoTypes";
 // api
-import {
-  TcreateDailyReportItemDto, TdailyReportDto,
-} from "js/api/api_dailyReport"
+import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 
 
+// option
+import { optionsCreator_mealsCost } from "fakeDatabase/options/options";
+
+// =================================================================
 
 type ThookEmptyReport = {
   id: string | undefined
@@ -22,40 +24,49 @@ type ThookEmptyReport = {
 }
 
 
-const emptyReportItem: TdailyReportItemDto = {
+const emptyReportItem: TcreateDailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  mealsCost: 0,
+  mealsCost: "breakfase",
   description: "",
+  departureTime: "",
+  arrivalTime: "",
+  departureWorksiteTime: "",
+  licensePlate: "",
+  stayLength: "",
+  workers: [],
+  dispatchOrderId: ""
 }
 
+// =================================================================
 
 /**不送dailyReportItem參數會自動送進emptyDailyReportItem */
 class Class_reportItem {
   constructor(
     reRender: () => void,
-    reportItem: TdailyReportItemDto = _.cloneDeep(emptyReportItem)
+    reportItem: TdailyReportItemDto | TcreateDailyReportItemDto = _.cloneDeep(emptyReportItem)
   ) {
     this._reRender = reRender
     this._item = reportItem
-    this._mealsCost = `${this._item.mealsCost}`
+    // this._mealsCost = `${this._item.mealsCost}`
 
 
   } // constructor
   private _reRender
   private _item
-  private _mealsCost
+  // private _mealsCost
 
 
   get id() {
-    return this._item.id
+    if ("id" in this._item) return this._item.id
+    return undefined
   }
 
   get periodOfDay() {
     return this._item.periodOfDay
   }
-  set periodOfDay(v: "AM" | "PM") {
+  set periodOfDay(v) {
     this._item.periodOfDay = v
     this._reRender()
   }
@@ -77,16 +88,15 @@ class Class_reportItem {
   }
 
   get order() {
-    return this._item.order
+    if ("order" in this._item) return this._item.order
+    return undefined
   }
-  // set order(v: string) {
-  //   this._item.order = v
-  //   this._reRender()
-  // }
 
-
-  get mealsCost() { return this._mealsCost }
-  set mealsCost(v) { this._mealsCost = v; this._reRender() }
+  get mealsCost() { return this._item.mealsCost }
+  set mealsCost(v) {
+    this._item.mealsCost = v as ("breakfase" | "lunch" | "dinner");
+    this._reRender()
+  }
 
   get description() {
     return this._item.description
@@ -96,14 +106,50 @@ class Class_reportItem {
     this._reRender()
   }
 
+  get departureTime() { return this._item.departureTime }
+  set departureTime(v) { this._item.departureTime = v; this._reRender() }
+
+  get arrivalTime() { return this._item.arrivalTime }
+  set arrivalTime(v) { this._item.arrivalTime = v; this._reRender() }
+
+  get departureWorksiteTime() { return this._item.departureWorksiteTime }
+  set departureWorksiteTime(v) {
+    console.log(v)
+    // this._item.departureWorksiteTime = v;
+    this._reRender()
+  }
+
+  get licensePlate() { return this._item.licensePlate }
+  set licensePlate(v) { this._item.licensePlate = v; this._reRender() }
+
+  get stayLength() { return this._item.stayLength }
+  set stayLength(v) { this._item.stayLength = v; this._reRender() }
+
+  get dispatchOrderId() { return this._item.dispatchOrderId }
+  set dispatchOrderId(v) { this._item.dispatchOrderId = v; this._reRender() }
+
+
+  get workers() { return this._item.workers as TemployeeDto[] }
+  set workers(v: TemployeeDto[]) { this._item.workers = v }
+
+
   get postBody(): TcreateDailyReportItemDto {
-    const mealsCost = parseFloat(this.mealsCost) || 0
+
     return {
       periodOfDay: this.periodOfDay,
       customerName: this.customerName,
       contactName: this.contactName,
-      mealsCost,
+      mealsCost: 999,
       description: this.description,
+
+      // departureTime: this.departureTime || "",
+      // arrivalTime: this.arrivalTime || "",
+      // departureWorksiteTime: this.departureWorksiteTime || "",
+      // licensePlate: this.licensePlate || "",
+      // stayLength: this.stayLength || "",
+
+      // workers: [],
+      // dispatchOrderId: this.dispatchOrderId ?? ""
     }
   }
 
@@ -119,6 +165,8 @@ const useReport = () => {
 
   const [report, setReport] = useState<ThookEmptyReport>()
   const [reportTemp, setReportTemp] = useState<ThookEmptyReport>()
+
+  const opitonArr_mealsCost = optionsCreator_mealsCost()
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
@@ -128,7 +176,7 @@ const useReport = () => {
     isReviewedByUser: false,
     isEdit: false,
     employeeId: undefined
-  })
+  }) // emptyReportCre
   // 
   const reNew_report = (
     { dailyReport, userInfo }:
@@ -145,9 +193,9 @@ const useReport = () => {
       const reviewedAt = statu.reviewedAt
       if (employeeId === userInfo.employee?.id) {
         isAllowToReview = true
-        return !!reviewedAt
       }
-      return false
+      return !!reviewedAt
+      // return false
     })
 
     const theReport: ThookEmptyReport = {

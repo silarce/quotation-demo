@@ -203,16 +203,37 @@ export type TerpFeatureDto = {
 }
 
 
+// export type TdailyReportItemDto = {
+//   id?: string
+//   order?: number
+//   // createdAt: Date // date
+//   // updatedAt: Date //date
+//   periodOfDay: "AM" | "PM"
+//   customerName: string
+//   contactName: string
+//   mealsCost: number
+//   description: string
+// }
 export type TdailyReportItemDto = {
-  id?: string
-  order?: number
-  // createdAt: Date // date
-  // updatedAt: Date //date
+  readonly id?: string
+  readonly order?: number
+  readonly createdAt: Date // date
+  readonly updatedAt: Date //date
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: number
+  mealsCost: "breakfase" | "lunch" | "dinner"
   description: string
+  /**date */
+  departureTime?: string | undefined
+  /**date */
+  arrivalTime?: string | undefined
+  /**date */
+  departureWorksiteTime?: string | undefined
+  licensePlate?: string | undefined
+  stayLength?: string | undefined
+  workers?: TemployeeDto[] | undefined
+  dispatchOrderId?: string | undefined
 }
 
 
@@ -243,8 +264,18 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: number
+  mealsCost: "breakfase" | "lunch" | "dinner" | number
   description: string
+  /**date */
+  departureTime?: string
+  /**date */
+  arrivalTime?: string
+  /**date */
+  departureWorksiteTime?: string
+  licensePlate?: string
+  stayLength?: string
+  workers?: string[]
+  dispatchOrderId?: string
 }
 
 export type TupdateDailyReportDto = {

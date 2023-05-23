@@ -20,6 +20,8 @@ import { showRootLoading } from "components/global/gear/loadingCover/rootLoading
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
+// antd
+import { Badge } from "antd"
 
 // hook
 import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
@@ -28,15 +30,8 @@ import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToSt
 
 // api
 import {
-  // TcreateDailyReportItemDto,
-  // TdailyReportDto,
   useApiDailyReports,
-  // useApiDailyReports_Reporters,
-  // useApiDailyReports_isReporters_me,
-  // useApiDailyReports_my,
-  // useApiDailyReports_id,
   useApiDailyReports_reviewers,
-  // apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -51,7 +46,7 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
+import { TuserDto, } from "js/api/dtoTypes";
 import { TdoSearch, Toption } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
@@ -133,6 +128,30 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const { data: employeeRes, update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
+  // ---------------------------
+
+  const [searchValue, setSearchValue] = useState<string>()
+  const params_panel = {
+    pageSize: 999999,
+    populate: ["jobs"],
+    filter: {
+      chName: { $contains: searchValue || undefined }
+    }
+  }
+  const { data: employeeRes_panel, update: updateEmployeeArr_panel }
+    = useEmployee(params_panel)
+  const employeeArr_panel = employeeRes_panel?.data
+
+  const editSearchValue = (v: string | undefined) => {
+    setSearchValue(v)
+  }
+
+  useEffect(() => {
+    if (searchValue === undefined) return
+    updateEmployeeArr_panel()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
+
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -461,14 +480,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
-  // const panelList_reporter_reviewed: TpanelList = [
-  //   {
-  //     custom: <Badge
-  //       className={scss.antdBadge02}
-  //       color="auto"
-  //       text="總經理已閱讀" />
-  //   },
-  // ]
+  const panelList_reporter_reviewed: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已審核" />
+    },
+  ]
 
   const panelList = (() => {
 
@@ -483,6 +502,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       else {
         if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
           if (isReportEdit) return panelList_reporter_inEdit02
+          if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
           return panelList_reporter_inEdit01
         }
         else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
@@ -494,6 +514,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
         // if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
+        if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
         if (isReportEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
       }
@@ -539,9 +560,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
+            employeeArr={employeeArr_panel ?? []}
+            updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
             isEdit={isReportEdit}
+            editSearchValue={editSearchValue}
           />
         }
       </SubLayer>
