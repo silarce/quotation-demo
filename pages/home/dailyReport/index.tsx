@@ -522,7 +522,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     return []
   })()
 
-  console.log(reportInEdit?.isReviewedByUser)
 
   // ----------------------------------------------------------------------
   const customeLeft =
