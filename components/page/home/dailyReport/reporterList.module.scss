@@ -20,7 +20,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 27px;
-  padding: 26px;
+  padding: 15px;
   border-bottom: solid 1px black;
   cursor: pointer;
   &:nth-last-of-type(1) {
@@ -30,6 +30,11 @@
     span {
       font-size: 16px;
       font-weight: 400;
+    }
+    &.chDate,
+    &.chName {
+      position: relative;
+      top: 6px;
     }
     &.chName span {
       color: $colorMain;
