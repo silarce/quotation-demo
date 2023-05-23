@@ -14,13 +14,13 @@ import Input, { TinputProps } from "./cog/input";
 import MySelect, { TselectProps } from "./cog/mySelect";
 import Textarea, { TtextareaProps } from "./cog/textarea";
 import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
+import MyTimePicker, { TtimePickerProps } from "./cog/myTimePicker";
 
 // icon
 import iconMust from "public/image/icon/asterisk.svg"
 
 // css
 import scss from "./inputSel.module.scss"
-import { CssBaselineProps } from "@mui/material";
 
 export type { TselectProps }
 
@@ -55,6 +55,7 @@ export default function InputSel(
     selectProps,
     textareaProps,
     datePickerProps,
+    timePickerProps,
 
   }:
     {
@@ -86,6 +87,7 @@ export default function InputSel(
       selectProps?: TselectProps
       textareaProps?: TtextareaProps
       datePickerProps?: TdatePickerProps
+      timePickerProps?: TtimePickerProps
 
 
     }
@@ -189,6 +191,14 @@ export default function InputSel(
       {datePickerProps &&
         <MyDatePicker
           datePickerProps={datePickerProps}
+          setIsFocus={setIsFocus}
+          placeholder={placeholder}
+          disabled={disabled}
+        />
+      }
+      {timePickerProps &&
+        <MyTimePicker
+          timePickerProps={timePickerProps}
           setIsFocus={setIsFocus}
           placeholder={placeholder}
           disabled={disabled}
