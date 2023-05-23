@@ -232,7 +232,8 @@ export type TdailyReportItemDto = {
   departureWorksiteTime?: string | undefined
   licensePlate?: string | undefined
   stayLength?: string | undefined
-  workers?: string[] | undefined
+  workers?: TemployeeDto[] | undefined
+  dispatchOrderId?: string | undefined
 }
 
 
@@ -273,6 +274,8 @@ export type TcreateDailyReportItemDto = {
   departureWorksiteTime: string
   licensePlate: string
   stayLength: string
+  workers: string[]
+  dispatchOrderId: string
 }
 
 export type TupdateDailyReportDto = {

@@ -7,6 +7,7 @@ import { TdailyReportItemDto, TemployeeDto, TuserDto } from "js/api/dtoTypes";
 // api
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 
+
 // option
 import { optionsCreator_mealsCost } from "fakeDatabase/options/options";
 
@@ -34,6 +35,8 @@ const emptyReportItem: TcreateDailyReportItemDto = {
   departureWorksiteTime: "",
   licensePlate: "",
   stayLength: "",
+  workers: [],
+  dispatchOrderId: ""
 }
 
 // =================================================================
@@ -63,7 +66,7 @@ class Class_reportItem {
   get periodOfDay() {
     return this._item.periodOfDay
   }
-  set periodOfDay(v: "AM" | "PM") {
+  set periodOfDay(v) {
     this._item.periodOfDay = v
     this._reRender()
   }
@@ -118,13 +121,19 @@ class Class_reportItem {
   get stayLength() { return this._item.stayLength }
   set stayLength(v) { this._item.stayLength; this._reRender() }
 
+  get dispatchOrderId() { return this._item.dispatchOrderId }
+  set dispatchOrderId(v) { this._item.dispatchOrderId; this._reRender() }
 
 
+  get workers() { return this._item.workers }
+  selectWorkers = (v: TemployeeDto[]) => {
+
+  }
 
 
 
   get postBody(): TcreateDailyReportItemDto {
-    const mealsCost = parseFloat(this.mealsCost) || 0
+
     return {
       periodOfDay: this.periodOfDay,
       customerName: this.customerName,
@@ -136,6 +145,9 @@ class Class_reportItem {
       departureWorksiteTime: this.departureWorksiteTime || "",
       licensePlate: this.licensePlate || "",
       stayLength: this.stayLength || "",
+
+      workers: [],
+      dispatchOrderId: this.dispatchOrderId ?? ""
     }
   }
 

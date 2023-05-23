@@ -6,13 +6,18 @@ import MyButton from "components/global/gear/button/myButton"
 
 // css
 import scss from "./reportTable.module.scss"
-
 // option
-import { optionsCreator_dailyReportPeriod } from "fakeDatabase/options/options"
+import {
+  Toption,
+  optionsCreator_dailyReportPeriod, optionsCreator_mealsCost,
+} from "fakeDatabase/options/options"
+
 const optionArr_period = optionsCreator_dailyReportPeriod()
+const optionArr_mealsCost = optionsCreator_mealsCost()
 
 // class
 import { Class_reportItem } from "pages/home/dailyReport"
+
 
 // ==================================================
 export default function ReportTable(
@@ -34,7 +39,7 @@ export default function ReportTable(
       <div className={classNames(scss.thead)}>
 
         {headerKeyArr.map((key, index) => {
-          const { label, style, className } = config[key] ?? {}
+          const { label, style, headerClassName: className } = config[key] ?? {}
           // 
           return (
             <div key={key} style={style}
@@ -46,6 +51,68 @@ export default function ReportTable(
         })}
       </div>
       {/*  */}
+
+      <div className={classNames(scss.tbody)}>
+
+        {classDailyReportItemArr.map((theClass, rIndex) => {
+          return (
+            <div key={rIndex} className={classNames(scss.row)}>
+
+              {bodyKeyArr.map((key, cIndex) => {
+                const {
+                  eleType, optionArr, label,
+                  headerClassName, bodyClassName,
+                } = config[key] ?? {}
+
+                if (eleType === "select") {
+                  return (
+                    <div key={cIndex}
+                      className={classNames(scss.cell, headerClassName, bodyClassName)}>
+                      <InputSel
+                        selectProps={{
+                          options: optionArr ?? [],
+                          value: theClass[key] as string,
+                          // @ts-ignore
+                          onChange: (v) => { theClass[key] = v!.value },
+                          arrowType: "black",
+                          fontSize: "16px",
+                        }} />
+                    </div>
+                  )
+                }
+                if (eleType === "input") {
+                  return (
+                    <div key={cIndex}
+                      className={classNames(
+                        scss.cell,
+                        headerClassName, bodyClassName)}>
+                      <InputSel
+                        inputProps={{
+                          value: theClass[key] as string,
+                          // @ts-ignore
+                          onChange: (v) => { theClass[key] = v },
+                          className: scss.textarea,
+                          inputType: "number",
+                        }} />
+                    </div>
+                  )
+                }
+
+                return (
+                  <div key={cIndex}
+                    className={classNames(scss.cell, headerClassName, bodyClassName)}>
+                    {cIndex}
+                  </div>
+                )
+              })}
+            </div>
+          )
+
+        })}
+
+      </div>
+
+
 
       {/* <div className={classNames(scss.tbody)}>
 
@@ -151,102 +218,142 @@ export default function ReportTable(
 //   "mealsCost",
 // ]
 
+type TclassKeys = keyof Class_reportItem
 
+// type TheaderKey = 
 
-const headerKeyArr = [
+const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "periodOfDay",
   "workingTime",
   "customerName",
   "contactName",
   "description",
   "workers",
-  "DispatchOrderId",
+  "dispatchOrderId",
   "mealsCost",
 
   "departureTime",
   "departureWorksiteTime",
-
   "licensePlate",
   "stayLength",
-
   "arrivalTime",
-
 ]
 
+const bodyKeyArr: TclassKeys[] = [
+  "periodOfDay",
+  "departureTime",
+  "departureWorksiteTime",
+  "customerName",
+  "contactName",
+  "description",
+  "workers",
+  "dispatchOrderId",
+  "mealsCost",
+  "arrivalTime",
+  "licensePlate",
+  "stayLength",
+]
 
 type Tconfig = {
-  [key in string]: {
-    eleType?: "input" | "select"
+  [key in (TclassKeys | "workingTime")]?:
+  {
     label: string
     color?: "black" | "main"
     style?: React.CSSProperties
-    className?: string
-  }
+    headerClassName: string
+    bodyClassName: string
+    optionArr?: Toption[]
+  } & (
+    { eleType?: "input" } |
+    {
+      eleType?: "select"
+      optionArr: Toption[]
+    }
+  )
 }
+
+
+
+
 const config: Tconfig = {
   periodOfDay: {
-    eleType: "input",
+    eleType: "select",
+    optionArr: optionArr_period,
     label: "上午/下午",
-    className: classNames("w-[104px] row-span-6")
+    headerClassName: classNames("w-[104px] row-span-6"),
+    bodyClassName: classNames("row-span-2"),
   },
   workingTime: {
     label: "工務時間",
-    className: classNames("w-[170px] row-span-2 col-span-2"),
+    headerClassName: classNames("w-[170px] row-span-2 col-span-2"),
+    bodyClassName: classNames(),
   },
   customerName: {
     eleType: "input",
     label: "客戶名稱",
-    className: classNames("w-[120px] row-span-6", scss.textLeft),
+    headerClassName: classNames("w-[120px] row-span-6", scss.textLeft),
+    bodyClassName: classNames("row-span-2"),
   },
   contactName: {
     eleType: "input",
     label: "接洽人",
-    className: classNames("w-[147px] row-span-6", scss.textLeft),
+    headerClassName: classNames("w-[147px] row-span-6", scss.textLeft),
+    bodyClassName: classNames("row-span-2"),
   },
   description: {
     eleType: "input",
     label: "工作內容",
-    className: classNames("w-auto row-span-6", scss.textLeft),
+    headerClassName: classNames("w-auto row-span-6", scss.textLeft),
+    bodyClassName: classNames("row-span-2"),
   },
   workers: {
     eleType: "input",
     label: "工務人員",
-    className: classNames("w-[140px] row-span-6", scss.textLeft),
+    headerClassName: classNames("w-[140px] row-span-6", scss.textLeft),
+    bodyClassName: classNames("row-span-2"),
   },
-  DispatchOrderId: {
+  dispatchOrderId: {
     eleType: "input",
     label: "派工單序號",
-    className: classNames("w-[160px] row-span-3", scss.textLeft),
+    headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
+    bodyClassName: classNames("row-span-1"),
   },
   mealsCost: {
     eleType: "select",
+    optionArr: optionArr_mealsCost,
     label: "餐費",
-    className: classNames("w-[85px] row-span-3", scss.rightEdge),
+    headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
+    bodyClassName: classNames("row-span-1"),
   },
   departureTime: {
     eleType: "input",
     label: "出發",
-    className: classNames("w-[85px] row-span-2"),
+    headerClassName: classNames("w-[85px] row-span-2"),
+    bodyClassName: classNames("row-span-1"),
   },
   departureWorksiteTime: {
     eleType: "input",
     label: "離工地",
-    className: classNames("w-[85px] row-span-4"),
+    headerClassName: classNames("w-[85px] row-span-4"),
+    bodyClassName: classNames("row-span-2"),
   },
   arrivalTime: {
     eleType: "input",
     label: "目的地",
-    className: classNames("w-[85px] row-span-2"),
+    headerClassName: classNames("w-[85px] row-span-2"),
+    bodyClassName: classNames("row-span-1"),
   },
   licensePlate: {
     eleType: "input",
     label: "車牌",
-    className: classNames("w-[160px] row-span-3", scss.textLeft),
+    headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
+    bodyClassName: classNames("row-span-1"),
   },
   stayLength: {
     eleType: "input",
     label: "住宿",
-    className: classNames("w-[85px] row-span-3", scss.rightEdge),
+    headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
+    bodyClassName: classNames("row-span-1"),
   },
 }
 
