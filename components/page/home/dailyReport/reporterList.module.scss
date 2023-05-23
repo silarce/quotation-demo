@@ -7,6 +7,15 @@
   scroll-behavior: smooth;
 }
 
+.groupHeader {
+  padding: 10px 20px;
+  background-color: $bgc01;
+  > span {
+    font-size: 16px;
+    font-weight: 400;
+  }
+}
+
 .row {
   display: flex;
   flex-wrap: nowrap;
