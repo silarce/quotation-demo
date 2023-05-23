@@ -20,6 +20,8 @@ import { showRootLoading } from "components/global/gear/loadingCover/rootLoading
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
+// antd
+import { Badge } from "antd"
 
 // hook
 import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
@@ -478,14 +480,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
-  // const panelList_reporter_reviewed: TpanelList = [
-  //   {
-  //     custom: <Badge
-  //       className={scss.antdBadge02}
-  //       color="auto"
-  //       text="總經理已閱讀" />
-  //   },
-  // ]
+  const panelList_reporter_reviewed: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已審核" />
+    },
+  ]
 
   const panelList = (() => {
 
@@ -500,6 +502,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       else {
         if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
           if (isReportEdit) return panelList_reporter_inEdit02
+          if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
           return panelList_reporter_inEdit01
         }
         else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
@@ -511,6 +514,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
         // if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
+        if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
         if (isReportEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
       }
@@ -518,6 +522,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     return []
   })()
 
+  console.log(reportInEdit?.isReviewedByUser)
 
   // ----------------------------------------------------------------------
   const customeLeft =

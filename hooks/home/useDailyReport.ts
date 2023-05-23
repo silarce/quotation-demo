@@ -176,7 +176,7 @@ const useReport = () => {
     isReviewedByUser: false,
     isEdit: false,
     employeeId: undefined
-  })
+  }) // emptyReportCre
   // 
   const reNew_report = (
     { dailyReport, userInfo }:
@@ -193,9 +193,9 @@ const useReport = () => {
       const reviewedAt = statu.reviewedAt
       if (employeeId === userInfo.employee?.id) {
         isAllowToReview = true
-        return !!reviewedAt
       }
-      return false
+      return !!reviewedAt
+      // return false
     })
 
     const theReport: ThookEmptyReport = {
