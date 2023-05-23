@@ -72,8 +72,20 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "日報表",
-          path: path01 + "/dailyReport",
+          // path: path01 + "/dailyReport",
           erpFeature: "allPass",
+          list: [
+            {
+              label: "我的日報表",
+              path: path01 + "/dailyReport?identity=reporter",
+              erpFeature: "allPass",
+            },
+            {
+              label: "審核日報表",
+              path: path01 + "/dailyReport?identity=reviewer",
+              erpFeature: "allPass",
+            },
+          ]
         },
       ]
     }
