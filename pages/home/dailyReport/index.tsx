@@ -32,6 +32,7 @@ import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToSt
 
 // icon
 import iconFourCube from "public/image/icon/fourCube.svg"
+import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
   useApiDailyReports,
@@ -71,7 +72,8 @@ const reportedAtOptions = [
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const userId = userInfo.employee?.id ?? ""
   const router = useRouter()
-  const isMine = router.query.isMine
+  const isMine = router.query.isMine ?? "true"
+  const isCalendar = router.query.isCalendar === "true" ? true : false
 
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
@@ -399,20 +401,30 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
     if (date === "wrongDate")
       return myAlert.warning({ title: "時間格式錯誤", content: "時間格式例:101-01-01" })
-
     setSearchObj({
       isReviewCompleted,
       date
     })
-
-
   }
-
   const searchGroup = {
     searchTargetList,
     doSearch
   }
 
+  // --------------------
+  const listSwitchButton: TpanelList[number] = {
+    type: "myButton",
+    label: isCalendar ? "列表" : "月曆",
+    onClick: () => {
+      router.push({
+        query: {
+          ...router.query,
+          isCalendar: isCalendar ? "false" : "true"
+        }
+      })
+    },
+    img: isCalendar ? iconMenu.src : iconFourCube.src
+  }
   // --------------------
   /**manager 審核人員設定 */
   const panelList_manager_notInEdit: TpanelList = [
@@ -422,12 +434,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       label: "審核人員設定",
       onClick: editRivewerPickArr
     },
-    {
-      type: "myButton",
-      label: "月曆",
-      onClick: () => { },
-      img: iconFourCube.src
-    }
+    listSwitchButton
   ]
 
   /**reporter 今日回報 */
@@ -438,12 +445,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       label: "今日回報",
       onClick: editReport_today
     },
-    {
-      type: "myButton",
-      label: "月曆",
-      onClick: () => { },
-      img: iconFourCube.src
-    }
+    listSwitchButton
   ]
   /**reviewer 已讀/未讀 */
   const panelList_reviewer_inEdit: TpanelList = [
@@ -581,17 +583,21 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           customeLeft={customeLeft}
         />
 
-        {!reportInEdit &&
-          // <TheCalendar
-          //   addTag={addTag}
-          //   dailyReportArr={sortedDailyReport}
-          //   updateDailyReports={updateDailyReports}
-          // />
+        {!reportInEdit && !isCalendar &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
         }
+        {!reportInEdit && isCalendar &&
+          <TheCalendar
+            addTag={addTag}
+            dailyReportArr={sortedDailyReport}
+            updateDailyReports={updateDailyReports}
+          />
+        }
+
+
 
         {reportInEdit &&
           <ReportTable
@@ -765,27 +771,3 @@ const formatEmployeeArr = (
 }
 
 
-
-
-
-
-
-
-
-
-
-/**
-空心圓是還沒審核完
-綠實心是全部審核完
-
-
-
-
-
-
-
-
-
-
-
- */
