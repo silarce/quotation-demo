@@ -9,7 +9,7 @@ import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/Pag
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
-// import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
@@ -567,10 +567,15 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         />
 
         {!reportInEdit &&
-          <ReporterList
-            dailyReportArr={sortedDailyReport ?? []}
+          <TheCalendar
             addTag={addTag}
+            dailyReportArr={sortedDailyReport}
+            updateDailyReports={updateDailyReports}
           />
+          // <ReporterList
+          //   dailyReportArr={sortedDailyReport ?? []}
+          //   addTag={addTag}
+          // />
         }
 
         {reportInEdit &&
