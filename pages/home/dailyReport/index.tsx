@@ -26,8 +26,11 @@ import { Badge } from "antd"
 // hook
 import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
 
+// tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
 
+// icon
+import iconFourCube from "public/image/icon/fourCube.svg"
 // api
 import {
   useApiDailyReports,
@@ -350,7 +353,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const searchTargetList = (() => {
     const arr = [
       { options: reportedAtOptions, width: "110px" },
-      { placeholder: "搜尋日期", width: "150px" }
+      { placeholder: "搜尋日期", width: "80px" }
     ]
     if (identity === "reporter") arr.shift()
     return arr
@@ -403,6 +406,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       type: "myButton",
       label: "審核人員設定",
       onClick: editRivewerPickArr
+    },
+    {
+      type: "myButton",
+      label: "月曆",
+      onClick: () => { },
+      img: iconFourCube.src
     }
   ]
 
@@ -413,6 +422,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       type: "myButton",
       label: "今日回報",
       onClick: editReport_today
+    },
+    {
+      type: "myButton",
+      label: "月曆",
+      onClick: () => { },
+      img: iconFourCube.src
     }
   ]
   /**reviewer 已讀/未讀 */
@@ -737,13 +752,20 @@ const formatEmployeeArr = (
 
 
 
-// ========================================================================
+
+
 /**
-待辦事項
+空心圓是還沒審核完
+綠實心是全部審核完
 
-等新的api出來後會做其他優化
-1.總表會改成分頁取得，滾輪滑到底後會自動取得下一頁然後接在底下
-  或是要做成分頁?
-  前者我直有做一次的經驗，應該會需要幾個小時研究
+
+
+
+
+
+
+
+
+
+
  */
-
