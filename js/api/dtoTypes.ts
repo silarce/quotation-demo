@@ -264,18 +264,18 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: "breakfase" | "lunch" | "dinner"
+  mealsCost: "breakfase" | "lunch" | "dinner" | number
   description: string
   /**date */
-  departureTime: string
+  departureTime?: string
   /**date */
-  arrivalTime: string
+  arrivalTime?: string
   /**date */
-  departureWorksiteTime: string
-  licensePlate: string
-  stayLength: string
-  workers: string[]
-  dispatchOrderId: string
+  departureWorksiteTime?: string
+  licensePlate?: string
+  stayLength?: string
+  workers?: string[]
+  dispatchOrderId?: string
 }
 
 export type TupdateDailyReportDto = {

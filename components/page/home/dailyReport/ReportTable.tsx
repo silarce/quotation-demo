@@ -1,8 +1,12 @@
+import { useState } from "react"
+
 import classNames from "classnames"
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import MyButton from "components/global/gear/button/myButton"
+import EmployeeSelector from "components/global/gear/modal/employeeSelector"
+import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // css
 import scss from "./reportTable.module.scss"
@@ -12,27 +16,64 @@ import {
   optionsCreator_dailyReportPeriod, optionsCreator_mealsCost,
 } from "fakeDatabase/options/options"
 
-const optionArr_period = optionsCreator_dailyReportPeriod()
-const optionArr_mealsCost = optionsCreator_mealsCost()
-
 // class
 import { Class_reportItem } from "pages/home/dailyReport"
+import { TemployeeDto } from "js/api/dtoTypes"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
+import { dialogActionsClasses } from "@mui/material"
+
 
 
 // ==================================================
+const optionArr_period = optionsCreator_dailyReportPeriod()
+const optionArr_mealsCost = optionsCreator_mealsCost()
+
+// ==================================================
 export default function ReportTable(
-  { classDailyReportItemArr, addDailyReportItem,
+  { classDailyReportItemArr,
+    addDailyReportItem,
     isEdit,
+    employeeArr,
+    updateEmployeeArr
   }:
     {
       classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
       isEdit: boolean
+      employeeArr: TemployeeDto[]
+      updateEmployeeArr: () => void
     }
 ) {
 
-  const readOlny = isEdit
+  const [showModal, setShowModal] = useState(false)
 
+  const [activeItem, setActiveItem] = useState<Class_reportItem>()
+
+
+  const toShowModal = async () => {
+    try {
+      showRootLoading(true)
+      await updateEmployeeArr()
+    }
+    catch { myAlert.err({ title: "取得人員資料失敗" }) }
+    finally {
+      showRootLoading(false)
+    }
+    setShowModal(true)
+  }
+
+  const modalOnCancel = () => {
+    setShowModal(false)
+  }
+
+  const modalOnConfirm = (v: TemployeeDto[]) => {
+    if (!activeItem) return
+    activeItem.workers = v
+  }
+
+  const disabled = !isEdit
+
+  // ------------------------------------------------
   return (
     <div className={classNames(scss.table)}>
       {/*  */}
@@ -51,9 +92,7 @@ export default function ReportTable(
         })}
       </div>
       {/*  */}
-
       <div className={classNames(scss.tbody)}>
-
         {classDailyReportItemArr.map((theClass, rIndex) => {
           return (
             <div key={rIndex} className={classNames(scss.row)}>
@@ -69,6 +108,8 @@ export default function ReportTable(
                     <div key={cIndex}
                       className={classNames(scss.cell, headerClassName, bodyClassName)}>
                       <InputSel
+                        disabled={disabled}
+                        showBaseline="auto"
                         selectProps={{
                           options: optionArr ?? [],
                           value: theClass[key] as string,
@@ -87,17 +128,80 @@ export default function ReportTable(
                         scss.cell,
                         headerClassName, bodyClassName)}>
                       <InputSel
+                        disabled={disabled}
+                        showBaseline="auto"
                         inputProps={{
                           value: theClass[key] as string,
                           // @ts-ignore
                           onChange: (v) => { theClass[key] = v },
                           className: scss.textarea,
-                          inputType: "number",
                         }} />
                     </div>
                   )
                 }
-
+                if (eleType === "textarea") {
+                  return (
+                    <div key={cIndex}
+                      className={classNames(
+                        scss.cell,
+                        headerClassName, bodyClassName)}>
+                      <InputSel
+                        disabled={disabled}
+                        showBaseline="auto"
+                        textareaProps={{
+                          value: theClass[key] as string,
+                          // @ts-ignore
+                          onChange: (v) => { theClass[key] = v },
+                          className: scss.textarea,
+                        }} />
+                    </div>
+                  )
+                }
+                if (eleType === "timePicker") {
+                  return (
+                    <div key={cIndex}
+                      className={classNames(
+                        scss.cell,
+                        headerClassName, bodyClassName)}>
+                      <InputSel
+                        disabled={disabled}
+                        showBaseline="auto"
+                        timePickerProps={{
+                          value: theClass[key] as string,
+                          // @ts-ignore
+                          onChange: (v) => { theClass[key] = v },
+                        }} />
+                    </div>
+                  )
+                }
+                if (eleType === "modal" && key === "workers") {
+                  const workersArr = theClass["workers"]
+                  return (
+                    <div key={cIndex}
+                      className={
+                        classNames(scss.cell, headerClassName, bodyClassName, "cursor-pointer")}
+                      onClick={() => {
+                        if (disabled) return;
+                        setActiveItem(theClass)
+                        toShowModal()
+                      }}
+                    >
+                      {!workersArr && !disabled &&
+                        <div className="grid place-content-center">
+                          <span>點擊選擇人員</span>
+                        </div>
+                      }
+                      {workersArr?.map((worker, wIndex) => {
+                        worker = worker as TemployeeDto
+                        return (
+                          <div key={wIndex}>
+                            <span>{worker.chName}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                }
                 return (
                   <div key={cIndex}
                     className={classNames(scss.cell, headerClassName, bodyClassName)}>
@@ -107,86 +211,8 @@ export default function ReportTable(
               })}
             </div>
           )
-
         })}
-
-      </div>
-
-
-
-      {/* <div className={classNames(scss.tbody)}>
-
-        {classDailyReportItemArr.map((theClass, index) => {
-          return (
-            <div key={index} className={classNames(scss.row)}>
-              {bodyKeyArr.map((key) => {
-                const value = theClass[key]
-                const { label, width, flex } = config[key] ?? {}
-                // -----
-                if (key === "periodOfDay") {
-                  return (
-                    <div key={key} style={{ width, flex }} className={scss.select}>
-                      {!readOlny
-                        ? <span>{value as string}</span>
-                        : <InputSel
-                          selectProps={{
-                            options: optionArr_period,
-                            value: theClass[key],
-                            onChange: (v) => { theClass[key] = v!.value as "AM" | "PM" },
-                            arrowType: "black",
-                            fontSize: "16px",
-                          }} />
-                      }
-                    </div>
-                  )
-                }
-                // -----
-                if (
-                  key === "description" ||
-                  key === "customerName" ||
-                  key === "contactName"
-                ) {
-                  return (
-                    <div key={key} style={{ width, flex }} className={scss.content}>
-                      {!readOlny
-                        ? <span>{value as string}</span>
-                        : <InputSel
-                          textareaProps={{
-                            value: theClass[key] ?? "",
-                            onChange: (v) => { theClass[key] = v },
-                            className: scss.textarea
-                          }} />
-                      }
-                    </div>
-                  )
-                }
-                // -----
-                if (
-                  key === "mealsCost"
-                ) {
-                  return (
-                    <div key={key} style={{ width, flex }} className={scss.content}>
-                      {!readOlny
-                        ? <span>{value as string}</span>
-                        : <InputSel
-                          inputProps={{
-                            value: theClass[key] ?? "",
-                            onChange: (v) => { theClass[key] = v },
-                            className: scss.textarea,
-                            inputType: "number"
-                          }} />
-                      }
-                    </div>
-                  )
-                }
-                // -----
-                return null
-              })}
-            </div>
-          )
-        })}
-
-        {readOlny &&
+        {!disabled &&
           <MyButton
             label="新增回報"
             preImg="add"
@@ -194,33 +220,22 @@ export default function ReportTable(
             onClick={addDailyReportItem}
           />
         }
-        <div>
-        </div>
-      </div> */}
+      </div>
+      <EmployeeSelector
+        showModal={showModal}
+        employeeArr={employeeArr}
+        searchCustomer={(v) => { }}
+        onConfirm={modalOnConfirm}
+        onCancel={modalOnCancel}
+        label="選擇工務人員"
+      />
     </div>
   )
 }
 // =================================================================
 
-// // type TclassKeys = keyof Class_dailyReportItem
-// type TclassKeys = Extract<keyof Class_reportItem,
-//   "periodOfDay" | "customerName" | "contactName" | "description" |
-//   "mealsCost" |
-//   "departureTime" | "arrivalTime" | "departureWorksiteTime" |
-//   "licensePlate" | "stayLength" | "workers">
-
-// const headerKeyArr: (TclassKeys)[] = [
-//   "periodOfDay", "customerName", "contactName", "description", "mealsCost",
-// ]
-// // const bodyKeyArr: TclassKeys[] = [
-// const bodyKeyArr: (TclassKeys)[] = [
-//   "periodOfDay", "customerName", "contactName", "description",
-//   "mealsCost",
-// ]
 
 type TclassKeys = keyof Class_reportItem
-
-// type TheaderKey = 
 
 const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "periodOfDay",
@@ -264,7 +279,7 @@ type Tconfig = {
     bodyClassName: string
     optionArr?: Toption[]
   } & (
-    { eleType?: "input" } |
+    { eleType?: "input" | "timePicker" | "textarea" | "modal" } |
     {
       eleType?: "select"
       optionArr: Toption[]
@@ -301,13 +316,13 @@ const config: Tconfig = {
     bodyClassName: classNames("row-span-2"),
   },
   description: {
-    eleType: "input",
+    eleType: "textarea",
     label: "工作內容",
     headerClassName: classNames("w-auto row-span-6", scss.textLeft),
     bodyClassName: classNames("row-span-2"),
   },
   workers: {
-    eleType: "input",
+    eleType: "modal",
     label: "工務人員",
     headerClassName: classNames("w-[140px] row-span-6", scss.textLeft),
     bodyClassName: classNames("row-span-2"),
@@ -326,19 +341,19 @@ const config: Tconfig = {
     bodyClassName: classNames("row-span-1"),
   },
   departureTime: {
-    eleType: "input",
+    eleType: "timePicker",
     label: "出發",
     headerClassName: classNames("w-[85px] row-span-2"),
     bodyClassName: classNames("row-span-1"),
   },
   departureWorksiteTime: {
-    eleType: "input",
+    eleType: "timePicker",
     label: "離工地",
     headerClassName: classNames("w-[85px] row-span-4"),
     bodyClassName: classNames("row-span-2"),
   },
   arrivalTime: {
-    eleType: "input",
+    eleType: "timePicker",
     label: "目的地",
     headerClassName: classNames("w-[85px] row-span-2"),
     bodyClassName: classNames("row-span-1"),

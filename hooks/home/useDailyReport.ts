@@ -107,29 +107,30 @@ class Class_reportItem {
   }
 
   get departureTime() { return this._item.departureTime }
-  set departureTime(v) { this._item.departureTime; this._reRender() }
+  set departureTime(v) { this._item.departureTime = v; this._reRender() }
 
   get arrivalTime() { return this._item.arrivalTime }
-  set arrivalTime(v) { this._item.arrivalTime; this._reRender() }
+  set arrivalTime(v) { this._item.arrivalTime = v; this._reRender() }
 
   get departureWorksiteTime() { return this._item.departureWorksiteTime }
-  set departureWorksiteTime(v) { this._item.departureWorksiteTime; this._reRender() }
-
-  get licensePlate() { return this._item.licensePlate }
-  set licensePlate(v) { this._item.licensePlate; this._reRender() }
-
-  get stayLength() { return this._item.stayLength }
-  set stayLength(v) { this._item.stayLength; this._reRender() }
-
-  get dispatchOrderId() { return this._item.dispatchOrderId }
-  set dispatchOrderId(v) { this._item.dispatchOrderId; this._reRender() }
-
-
-  get workers() { return this._item.workers }
-  selectWorkers = (v: TemployeeDto[]) => {
-
+  set departureWorksiteTime(v) {
+    console.log(v)
+    // this._item.departureWorksiteTime = v;
+    this._reRender()
   }
 
+  get licensePlate() { return this._item.licensePlate }
+  set licensePlate(v) { this._item.licensePlate = v; this._reRender() }
+
+  get stayLength() { return this._item.stayLength }
+  set stayLength(v) { this._item.stayLength = v; this._reRender() }
+
+  get dispatchOrderId() { return this._item.dispatchOrderId }
+  set dispatchOrderId(v) { this._item.dispatchOrderId = v; this._reRender() }
+
+
+  get workers() { return this._item.workers as TemployeeDto[] }
+  set workers(v: TemployeeDto[]) { this._item.workers = v }
 
 
   get postBody(): TcreateDailyReportItemDto {
@@ -138,16 +139,17 @@ class Class_reportItem {
       periodOfDay: this.periodOfDay,
       customerName: this.customerName,
       contactName: this.contactName,
-      mealsCost: this.mealsCost,
+      mealsCost: 999,
       description: this.description,
-      departureTime: this.departureTime || "",
-      arrivalTime: this.arrivalTime || "",
-      departureWorksiteTime: this.departureWorksiteTime || "",
-      licensePlate: this.licensePlate || "",
-      stayLength: this.stayLength || "",
 
-      workers: [],
-      dispatchOrderId: this.dispatchOrderId ?? ""
+      // departureTime: this.departureTime || "",
+      // arrivalTime: this.arrivalTime || "",
+      // departureWorksiteTime: this.departureWorksiteTime || "",
+      // licensePlate: this.licensePlate || "",
+      // stayLength: this.stayLength || "",
+
+      // workers: [],
+      // dispatchOrderId: this.dispatchOrderId ?? ""
     }
   }
 

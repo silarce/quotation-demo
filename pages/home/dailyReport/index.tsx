@@ -127,6 +127,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
 
+
+
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -532,6 +534,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
+            employeeArr={employeeArr ?? []}
+            updateEmployeeArr={updateEmployeeArr}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
             isEdit={isReportEdit}
