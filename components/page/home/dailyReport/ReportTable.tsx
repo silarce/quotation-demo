@@ -20,7 +20,6 @@ import {
 import { Class_reportItem } from "pages/home/dailyReport"
 import { TemployeeDto } from "js/api/dtoTypes"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
-import { dialogActionsClasses } from "@mui/material"
 
 
 
@@ -34,7 +33,8 @@ export default function ReportTable(
     addDailyReportItem,
     isEdit,
     employeeArr,
-    updateEmployeeArr
+    updateEmployeeArr,
+    editSearchValue
   }:
     {
       classDailyReportItemArr: Class_reportItem[]
@@ -42,6 +42,7 @@ export default function ReportTable(
       isEdit: boolean
       employeeArr: TemployeeDto[]
       updateEmployeeArr: () => void
+      editSearchValue: (v: string | undefined) => void
     }
 ) {
 
@@ -63,6 +64,7 @@ export default function ReportTable(
   }
 
   const modalOnCancel = () => {
+    editSearchValue(undefined)
     setShowModal(false)
   }
 
@@ -224,7 +226,7 @@ export default function ReportTable(
       <EmployeeSelector
         showModal={showModal}
         employeeArr={employeeArr}
-        searchCustomer={(v) => { }}
+        searchCustomer={editSearchValue}
         onConfirm={modalOnConfirm}
         onCancel={modalOnCancel}
         label="選擇工務人員"

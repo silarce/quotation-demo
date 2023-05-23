@@ -126,7 +126,29 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const { data: employeeRes, update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
+  // ---------------------------
 
+  const [searchValue, setSearchValue] = useState<string>()
+  const params_panel = {
+    pageSize: 999999,
+    populate: ["jobs"],
+    filter: {
+      chName: { $contains: searchValue || undefined }
+    }
+  }
+  const { data: employeeRes_panel, update: updateEmployeeArr_panel }
+    = useEmployee(params_panel)
+  const employeeArr_panel = employeeRes_panel?.data
+
+  const editSearchValue = (v: string | undefined) => {
+    setSearchValue(v)
+  }
+
+  useEffect(() => {
+    if (searchValue === undefined) return
+    updateEmployeeArr_panel()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
 
 
   // ----------------------------------------------------------------------
@@ -534,11 +556,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
-            employeeArr={employeeArr ?? []}
-            updateEmployeeArr={updateEmployeeArr}
+            employeeArr={employeeArr_panel ?? []}
+            updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
             isEdit={isReportEdit}
+            editSearchValue={editSearchValue}
           />
         }
       </SubLayer>
