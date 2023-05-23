@@ -17,7 +17,7 @@ import {
 import MyButton from "components/global/gear/button/myButton"
 
 // icon
-import iconRedDot from "public/image/icon/redDot.svg"
+import iconCircle from "public/image/icon/circle.svg"
 import icongreenDot from "public/image/icon/greenDot.svg"
 
 // tool
@@ -195,7 +195,7 @@ const EventWrapper = (
   } = event
 
 
-  const checkIcon = isReviewCompleted ? icongreenDot : iconRedDot
+  const checkIcon = isReviewCompleted ? icongreenDot : iconCircle
 
   const onClick = () => {
     addTag({ reportId, employeeId, name, date })
