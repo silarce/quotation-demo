@@ -3,6 +3,7 @@ import classNames from "classnames"
 import _ from "lodash"
 import moment from "moment";
 import { AxiosError } from "axios";
+import { useRouter } from "next/router";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -68,6 +69,10 @@ const reportedAtOptions = [
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
+  const userId = userInfo.employee?.id ?? ""
+  const router = useRouter()
+  const isMine = router.query.isMine
+
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
   /**權限 */
@@ -99,14 +104,24 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  // const today = moment().format("YYYY-MM-DD");
-  // const thisMonth = moment().format("YYYY-MM");
+  const [searchObj, setSearchObj] = useState<{
+    isReviewCompleted: boolean | undefined
+    date: string | undefined
+  }>()
 
-  // 取得指定月份所有日報表
+  const filterIsMine = (() => {
+    if (isMine === "true") return { $eq: userId }
+    if (isMine === "false") return { $ne: userId }
+    return undefined
+  })()
 
-  const [params, setParams] = useState<{ filter?: { [key: string]: any } }>({ filter: undefined })
-
-
+  const params = {
+    filter: {
+      "employee.id": filterIsMine,
+      isReviewCompleted: { $eq: searchObj?.isReviewCompleted },
+      date: { $eq: searchObj?.date }
+    },
+  }
   const {
     dailyReport, updateDailyReports, } = useApiDailyReports(params)
   const sortedDailyReport = useMemo(() => {
@@ -160,6 +175,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   useEffect(() => {
+    if (!router.isReady) return
     (async () => {
       try {
         setIsLoading(true)
@@ -169,7 +185,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       finally { setIsLoading(false) }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [searchObj, isMine])
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -364,8 +380,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const reviewedAtValue = (arr[0] as Toption).value
     const isReviewCompleted = (() => {
       if (reviewedAtValue === "全部") return undefined
-      if (reviewedAtValue === "未審核") return { $eq: false }
-      if (reviewedAtValue === "已審核") return { $eq: true }
+      if (reviewedAtValue === "未審核") return false
+      if (reviewedAtValue === "已審核") return true
     })()
     // const reviewedAt = (() => {
     //   if (reviewedAtValue === "全部") return undefined
@@ -384,13 +400,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (date === "wrongDate")
       return myAlert.warning({ title: "時間格式錯誤", content: "時間格式例:101-01-01" })
 
-    setParams({
-      filter: {
-        // reviewStatus:{reviewedAt},
-        isReviewCompleted,
-        date: { $eq: date }
-      }
+    setSearchObj({
+      isReviewCompleted,
+      date
     })
+
+
   }
 
   const searchGroup = {
@@ -567,15 +582,15 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         />
 
         {!reportInEdit &&
-          <TheCalendar
-            addTag={addTag}
-            dailyReportArr={sortedDailyReport}
-            updateDailyReports={updateDailyReports}
-          />
-          // <ReporterList
-          //   dailyReportArr={sortedDailyReport ?? []}
+          // <TheCalendar
           //   addTag={addTag}
+          //   dailyReportArr={sortedDailyReport}
+          //   updateDailyReports={updateDailyReports}
           // />
+          <ReporterList
+            dailyReportArr={sortedDailyReport ?? []}
+            addTag={addTag}
+          />
         }
 
         {reportInEdit &&
