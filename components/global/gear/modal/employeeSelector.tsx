@@ -54,32 +54,34 @@ export default function EmployeeSelector(
 
   // ==================================================
   // 被選的資料
-  // const [selClient, setSelClient] = useState<TemployeeDto>()
-  const [activeKeyArr, setActiveKeyArr] = useState<number[]>([])
-
+  const [selEmployee, setSelEmployee] = useState<TemployeeDto[]>([])
+  
   // 搜尋過濾
   // ==================================================
-  const onClick = (newKey: number) => {
-    const index = activeKeyArr.findIndex((key) => { key === newKey })
-    const arrCopy = _.cloneDeep(activeKeyArr)
-    if (index === -1) { arrCopy.push(newKey) }
+  const onClick = (newEmp: TemployeeDto) => {
+
+    const index = selEmployee.findIndex((emp) => {
+      return emp.id === newEmp.id
+    })
+
+    const arrCopy = _.cloneDeep(selEmployee)
+    if (index === -1) { arrCopy.push(newEmp) }
     else { arrCopy.splice(index, 1) }
-    setActiveKeyArr(arrCopy)
+
+    setSelEmployee(arrCopy)
   }
 
   const theOnConfirm = () => {
-    if (!activeKeyArr) return ModalInfo("請選擇公司")
-    const theEmployeeArr = activeKeyArr.map((key) => employeeArr[key])
-    onConfirm(theEmployeeArr)
+    if (!selEmployee[0]) return ModalInfo("請選擇公司")
+    onConfirm(selEmployee)
     theOnCancel()
   }
 
   const theOnCancel = () => {
     onCancel()
-    setActiveKeyArr([])
+    setSelEmployee([])
   }
 
-  // const onSearch = (value: string) => { setSearchValue(value) }
   // ==================================================
 
   return (
@@ -93,15 +95,14 @@ export default function EmployeeSelector(
       className={style.container}
     >
       <div className={style.listContainer}>
-        {employeeArr.map((item, index) => {
-          const { idNumber, chName, jobs } = item
+        {employeeArr.map((emp, index) => {
+          const { idNumber, chName, jobs } = emp
           const { name, grade } = jobs?.[0] ?? {}
-
-          const isActive = activeKeyArr.includes(index)
+          const isActive = selEmployee.some((selEmp) => { return selEmp.id === emp.id })
           return (
             <CellWithBar key={index} isActive={isActive}>
               <div className={`${style.listItem}`}
-                onClick={() => onClick(index)}
+                onClick={() => onClick(emp)}
               >
                 <span>{idNumber}</span>
                 <span>{chName}</span>
