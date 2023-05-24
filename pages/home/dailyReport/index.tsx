@@ -179,6 +179,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   useEffect(() => {
     if (!router.isReady) return
+    cancelEditNewDailyReport();
     (async () => {
       try {
         setIsLoading(true)
@@ -188,7 +189,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       finally { setIsLoading(false) }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchObj, isMine])
+  }, [searchObj, isMine, router])
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
