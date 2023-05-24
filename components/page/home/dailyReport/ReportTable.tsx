@@ -70,11 +70,9 @@ export default function ReportTable(
   }
 
   const modalOnConfirm = (v: TemployeeDto) => {
-    console.log(activeItem)
     if (!activeItem) return
     activeItem.addWorker(v)
   }
-
   const disabled = !isEdit
 
   // ------------------------------------------------
@@ -103,8 +101,8 @@ export default function ReportTable(
 
               {bodyKeyArr.map((key, cIndex) => {
                 const {
-                  eleType, optionArr, label, inputType,
-                  headerClassName, bodyClassName, suffix
+                  eleType, optionArr, label, inputType, placeholder,
+                  headerClassName, bodyClassName, suffix,
                 } = config[key] ?? {}
 
                 if (eleType === "select") {
@@ -114,6 +112,7 @@ export default function ReportTable(
                       <InputSel
                         disabled={disabled}
                         showBaseline="auto"
+                        placeholder={placeholder}
                         selectProps={{
                           options: optionArr ?? [],
                           value: theClass[key] as string,
@@ -135,6 +134,7 @@ export default function ReportTable(
                         className="inline-grid"
                         disabled={disabled}
                         showBaseline="auto"
+                        placeholder={placeholder}
                         inputProps={{
                           value: theClass[key] as string,
                           inputType,
@@ -155,6 +155,7 @@ export default function ReportTable(
                       <InputSel
                         disabled={disabled}
                         showBaseline="auto"
+                        placeholder={placeholder}
                         textareaProps={{
                           value: theClass[key] as string,
                           // @ts-ignore
@@ -173,6 +174,7 @@ export default function ReportTable(
                       <InputSel
                         disabled={disabled}
                         showBaseline="auto"
+                        placeholder={placeholder}
                         timePickerProps={{
                           value: theClass[key] as string,
                           onChange02: (v) => {
@@ -185,10 +187,9 @@ export default function ReportTable(
                   )
                 }
 
-
                 if (eleType === "modal" && key === "workers") {
                   const workersArr = theClass["workers"]
-                  const onClick = () => {
+                  const onAdd = () => {
                     if (disabled) return;
                     setActiveItem(theClass)
                     toShowModal()
@@ -197,31 +198,44 @@ export default function ReportTable(
                   return (
                     <div key={cIndex}
                       className={
-                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName, "cursor-pointer")}
+                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName)}
                     >
                       {!workersArr[0] && !disabled &&
-                        <div className={"grid place-content-center"} onClick={onClick}>
-                          <IconAddCircle className={scss.icon} />
+                        <div className={scss.worker} >
+                          <span></span>
+                          <IconAddCircle className={scss.icon} onClick={onAdd} />
                         </div>
                       }
-                      {workersArr?.map((worker, wIndex) => {
+                      {workersArr?.map((worker, wIndex, arr) => {
                         worker = worker as TemployeeDto
                         const onRemove = () => {
                           theClass.removeWorker(wIndex)
                         }
+
+                        const isLast = arr.length === wIndex + 1
+
                         return (
-                          <div key={wIndex} className={scss.worker} onClick={onRemove}>
-                            <span>{worker.chName}</span>
-                            <IconRemoveCircle className={scss.icon} />
+                          <div key={wIndex} className={scss.worker} >
+                            <InputSel
+                              disabled={true}
+                              showBaseline={disabled ? "invisible" : "always"}
+                              inputProps={{
+                                value: worker.chName,
+                              }}
+                            />
+                            {/* <span>{worker.chName}</span> */}
+                            {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />}
                           </div>
                         )
                       })}
-                      {workersArr[0] && !disabled &&
+
+                      {/* {workersArr[0] && !disabled &&
                         <div className={scss.worker}>
                           <span></span>
                           <IconAddCircle className={scss.icon} onClick={onClick} />
                         </div>
-                      }
+                      } */}
                     </div>
                   )
                 }
@@ -297,6 +311,7 @@ type Tconfig = {
   [key in (TclassKeys | "workingTime")]?:
   {
     label: string
+    placeholder: string
     color?: "black" | "main"
     style?: React.CSSProperties
     headerClassName: string
@@ -314,48 +329,53 @@ type Tconfig = {
 }
 
 
-
-
 const config: Tconfig = {
   periodOfDay: {
     eleType: "select",
     optionArr: optionArr_period,
     label: "上午/下午",
+    placeholder: "時段",
     headerClassName: classNames("w-[104px] row-span-6"),
     bodyClassName: classNames("row-span-2"),
   },
   workingTime: {
     label: "工務時間",
+    placeholder: "時間",
     headerClassName: classNames("w-[170px] row-span-2 col-span-2"),
     bodyClassName: classNames(),
   },
   customerName: {
     eleType: "input",
     label: "客戶名稱",
+    placeholder: "客戶名稱",
     headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
   contactName: {
     eleType: "input",
     label: "接洽人",
+    placeholder: "請輸入接洽人",
     headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
   description: {
     eleType: "textarea",
     label: "工作內容",
+    placeholder: "請輸入接洽內容",
     headerClassName: classNames("w-auto row-span-6", scss.textLeft),
     bodyClassName: classNames("row-span-2"),
   },
   workers: {
     eleType: "modal",
     label: "工務人員",
+    placeholder: "接洽人",
     headerClassName: classNames("w-[140px] row-span-6", scss.textLeft),
     bodyClassName: classNames("row-span-2"),
   },
   dispatchOrderId: {
     eleType: "input",
     label: "派工單序號",
+    placeholder: "派工單序號",
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
@@ -363,36 +383,42 @@ const config: Tconfig = {
     eleType: "select",
     optionArr: optionArr_mealsCost,
     label: "餐費",
+    placeholder: "餐費",
     headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
     bodyClassName: classNames("row-span-1"),
   },
   departureTime: {
     eleType: "timePicker",
     label: "出發",
+    placeholder: "時間",
     headerClassName: classNames("w-[85px] row-span-2"),
     bodyClassName: classNames("row-span-1"),
   },
   departureWorksiteTime: {
     eleType: "timePicker",
     label: "離工地",
+    placeholder: "時間",
     headerClassName: classNames("w-[85px] row-span-4"),
     bodyClassName: classNames("row-span-2"),
   },
   arrivalTime: {
     eleType: "timePicker",
     label: "目的地",
+    placeholder: "時間",
     headerClassName: classNames("w-[85px] row-span-2"),
     bodyClassName: classNames("row-span-1"),
   },
   licensePlate: {
     eleType: "input",
     label: "車牌",
+    placeholder: "車牌",
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
   stayLength: {
     eleType: "input",
     label: "住宿",
+    placeholder: "天數",
     inputType: "number",
     headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
     bodyClassName: classNames("row-span-1", scss.suffix),

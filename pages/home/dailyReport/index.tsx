@@ -598,8 +598,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           />
         }
 
-
-
         {reportInEdit &&
           <ReportTable
             employeeArr={employeeArr_panel ?? []}

@@ -34,21 +34,23 @@
   .tbody {
     height: 100%;
     overflow: auto;
-    border-top: solid 1px $colorBorder01;
     .row {
       display: grid;
       grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
       width: 100%;
-      border-bottom: solid 1px $colorBorder01;
-
       > .cell {
         display: grid;
         padding: 15px 20px;
         border: solid 1px $colorBorder01;
         border-width: 0 1px 1px 0;
+        > label {
+          margin: auto;
+        }
         span,
+        div,
         input {
           font-size: 16px;
+          color: $colorMain;
         }
         &.rightEdge {
           border-right: 0;
@@ -60,32 +62,6 @@
           grid-template-columns: auto min-content;
         }
       }
-
-      // > div {
-      //   padding: 12px 10px;
-      //   border-right: solid 1px $colorBorder01;
-      //   > span {
-      //     font-size: 16px;
-      //     font-weight: 400;
-      //     color: $colorMain;
-      //     word-break: break-all;
-      //     word-wrap: break-word;
-      //   }
-      //   &:nth-last-of-type(1) {
-      //     border-right: none;
-      //   }
-      //   &.check {
-      //     display: grid;
-      //     > * {
-      //       margin: auto;
-      //     }
-      //   }
-      //   &.content {
-      //     textarea {
-      //       font-size: 16px;
-      //     }
-      //   }
-      // }
     } // row
     .newReportBtn {
       border: none;
@@ -103,6 +79,7 @@
       display: grid;
       grid-template-columns: auto min-content;
       gap: 4px;
+      align-items: center;
     }
   }
   .icon {
