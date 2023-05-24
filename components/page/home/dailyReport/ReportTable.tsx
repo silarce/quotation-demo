@@ -21,7 +21,8 @@ import { Class_reportItem } from "pages/home/dailyReport"
 import { TemployeeDto } from "js/api/dtoTypes"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
-
+// icon
+import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()

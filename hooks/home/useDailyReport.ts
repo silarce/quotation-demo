@@ -28,7 +28,7 @@ const emptyReportItem: TcreateDailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  mealsCost: "breakfase",
+  meals: "breakfase",
   description: "",
   departureTime: "",
   arrivalTime: "",
@@ -49,7 +49,14 @@ class Class_reportItem {
   ) {
     this._reRender = reRender
     this._item = reportItem
-    // this._mealsCost = `${this._item.mealsCost}`
+    // if (!this._item.periodOfDay) this._item.periodOfDay = "AM"
+    // if (!this._item.meals) this._item.meals = "breakfase"
+
+    // const timeKeyArr = ["departureTime", "arrivalTime", "departureWorksiteTime",]
+    // timeKeyArr.forEach((key) => {
+    //   if (this._item[key]===null)
+    // })
+    // createdAt
 
 
   } // constructor
@@ -92,9 +99,9 @@ class Class_reportItem {
     return undefined
   }
 
-  get mealsCost() { return this._item.mealsCost }
-  set mealsCost(v) {
-    this._item.mealsCost = v as ("breakfase" | "lunch" | "dinner");
+  get meals() { return this._item.meals }
+  set meals(v) {
+    this._item.meals = v as ("breakfase" | "lunch" | "dinner");
     this._reRender()
   }
 
@@ -135,18 +142,29 @@ class Class_reportItem {
 
   get postBody(): TcreateDailyReportItemDto {
 
+
+    const defaultTime = (() => {
+      if ("createdAt" in this._item) {
+        return moment(this._item.createdAt).startOf('day').toDate()
+      }
+      else {
+        return moment().startOf('day').toDate()
+      }
+    })()
+
+
     return {
-      periodOfDay: this.periodOfDay,
+      periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
-      mealsCost: 999,
+      meals: this.meals || "breakfase",
       description: this.description,
 
-      // departureTime: this.departureTime || "",
-      // arrivalTime: this.arrivalTime || "",
-      // departureWorksiteTime: this.departureWorksiteTime || "",
-      // licensePlate: this.licensePlate || "",
-      // stayLength: this.stayLength || "",
+      departureTime: this.departureTime || defaultTime,
+      arrivalTime: this.arrivalTime || defaultTime,
+      departureWorksiteTime: this.departureWorksiteTime || defaultTime,
+      licensePlate: this.licensePlate || "",
+      stayLength: this.stayLength || "",
 
       // workers: [],
       // dispatchOrderId: this.dispatchOrderId ?? ""
