@@ -222,7 +222,7 @@ export type TdailyReportItemDto = {
   periodOfDay: "AM" | "PM" | null
   customerName: string
   contactName: string
-  meals: "breakfase" | "lunch" | "dinner" | null
+  meals: "breakfast" | "lunch" | "dinner" | null
   description: string
   /**date */
   departureTime?: string | null
@@ -231,7 +231,7 @@ export type TdailyReportItemDto = {
   /**date */
   departureWorksiteTime?: string | null
   licensePlate?: string | null
-  stayLength?: string | null
+  stayLength?: number | null
   workers?: TemployeeDto[] | undefined
   dispatchOrderId?: string | undefined
 }
@@ -264,7 +264,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  meals: "breakfase" | "lunch" | "dinner"
+  meals: "breakfast" | "lunch" | "dinner"
   description: string
   /**date 發出req時會自動被轉為字串*/
   departureTime: Date | string
@@ -273,7 +273,7 @@ export type TcreateDailyReportItemDto = {
   /**date 發出req時會自動被轉為字串*/
   departureWorksiteTime: Date | string
   licensePlate: string
-  stayLength: string
+  stayLength: number
   workers?: string[]
   dispatchOrderId?: string
 }

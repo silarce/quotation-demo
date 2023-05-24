@@ -56,6 +56,9 @@
         &.textLeft {
           // margin-left: 20px;
         }
+        &.suffix {
+          grid-template-columns: auto min-content;
+        }
       }
 
       // > div {

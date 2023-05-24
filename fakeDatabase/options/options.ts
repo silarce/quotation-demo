@@ -306,7 +306,7 @@ export const optionsCreator_dailyReportPeriod = (
 export const optionsCreator_mealsCost =
   (): Toption[] => {
     return [
-      { value: "breakfase", label: "早餐" },
+      { value: "breakfast", label: "早餐" },
       { value: "lunch", label: "午餐" },
       { value: "dinner", label: "晚餐" },
     ]

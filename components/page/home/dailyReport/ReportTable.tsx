@@ -103,8 +103,8 @@ export default function ReportTable(
 
               {bodyKeyArr.map((key, cIndex) => {
                 const {
-                  eleType, optionArr, label,
-                  headerClassName, bodyClassName,
+                  eleType, optionArr, label, inputType,
+                  headerClassName, bodyClassName, suffix
                 } = config[key] ?? {}
 
                 if (eleType === "select") {
@@ -132,14 +132,17 @@ export default function ReportTable(
                         scss.cell,
                         headerClassName, bodyClassName)}>
                       <InputSel
+                        className="inline-grid"
                         disabled={disabled}
                         showBaseline="auto"
                         inputProps={{
                           value: theClass[key] as string,
+                          inputType,
                           // @ts-ignore
                           onChange: (v) => { theClass[key] = v },
                           className: scss.textarea,
                         }} />
+                      {suffix && <span>{suffix}</span>}
                     </div>
                   )
                 }
@@ -296,6 +299,8 @@ type Tconfig = {
     headerClassName: string
     bodyClassName: string
     optionArr?: Toption[]
+    inputType?: "number" | "text"
+    suffix?: string
   } & (
     { eleType?: "input" | "timePicker" | "textarea" | "modal" } |
     {
@@ -385,8 +390,10 @@ const config: Tconfig = {
   stayLength: {
     eleType: "input",
     label: "住宿",
+    inputType: "number",
     headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
-    bodyClassName: classNames("row-span-1"),
+    bodyClassName: classNames("row-span-1", scss.suffix),
+    suffix: "天"
   },
 }
 

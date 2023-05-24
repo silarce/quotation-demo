@@ -28,7 +28,7 @@ type ThookEmptyReport = {
 //   periodOfDay: "AM",
 //   customerName: "",
 //   contactName: "",
-//   meals: "breakfase",
+//   meals: "breakfast",
 //   description: "",
 //   departureTime: "",
 //   arrivalTime: "",
@@ -46,13 +46,13 @@ const emptyReportItem: TdailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  meals: "breakfase",
+  meals: "breakfast",
   description: "",
   departureTime: "",
   arrivalTime: "",
   departureWorksiteTime: "",
   licensePlate: "",
-  stayLength: "",
+  stayLength: null,
   workers: [],
   dispatchOrderId: ""
 }
@@ -68,8 +68,9 @@ class Class_reportItem {
     this._reRender = reRender
     this._item = reportItem
     if (!this._item.workers) this._item.workers = []
+    this._stayLength = `${this._item.stayLength}`
     // if (!this._item.periodOfDay) this._item.periodOfDay = "AM"
-    // if (!this._item.meals) this._item.meals = "breakfase"
+    // if (!this._item.meals) this._item.meals = "breakfast"
 
     // const timeKeyArr = ["departureTime", "arrivalTime", "departureWorksiteTime",]
     // timeKeyArr.forEach((key) => {
@@ -81,6 +82,7 @@ class Class_reportItem {
   } // constructor
   private _reRender
   private _item
+  private _stayLength
   // private _mealsCost
 
 
@@ -120,7 +122,7 @@ class Class_reportItem {
 
   get meals() { return this._item.meals }
   set meals(v) {
-    this._item.meals = v as ("breakfase" | "lunch" | "dinner");
+    this._item.meals = v as ("breakfast" | "lunch" | "dinner");
     this._reRender()
   }
 
@@ -140,20 +142,24 @@ class Class_reportItem {
 
   get departureWorksiteTime() { return this._item.departureWorksiteTime }
   set departureWorksiteTime(v) {
-    console.log(v)
-    // this._item.departureWorksiteTime = v;
+    this._item.departureWorksiteTime = v;
     this._reRender()
   }
 
   get licensePlate() { return this._item.licensePlate }
   set licensePlate(v) { this._item.licensePlate = v; this._reRender() }
 
-  get stayLength() { return this._item.stayLength }
-  set stayLength(v) { this._item.stayLength = v; this._reRender() }
+  get stayLength() {
+    return this._stayLength
+  }
+  set stayLength(v) {
+    this._stayLength = v
+    this._item.stayLength = parseInt(v);
+    this._reRender()
+  }
 
   get dispatchOrderId() { return this._item.dispatchOrderId }
   set dispatchOrderId(v) { this._item.dispatchOrderId = v; this._reRender() }
-
 
   get workers() { return this._item.workers as TemployeeDto[] }
   addWorker = (v: TemployeeDto) => {
@@ -165,13 +171,7 @@ class Class_reportItem {
     this._reRender()
   }
 
-
-
-
-
   get postBody(): TcreateDailyReportItemDto {
-
-
     const defaultTime = (() => {
       if ("createdAt" in this._item) {
         return moment(this._item.createdAt).startOf('day').toDate()
@@ -181,19 +181,29 @@ class Class_reportItem {
       }
     })()
 
-
     return {
+      // periodOfDay: null,
+      // customerName: null,
+      // contactName: null,
+      // meals: null,
+      // description: null,
+      // departureTime: null,
+      // arrivalTime: null,
+      // departureWorksiteTime: null,
+      // licensePlate: null,
+      // stayLength: null,
+
       periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
-      meals: this.meals || "breakfase",
+      meals: this.meals || "breakfast",
       description: this.description,
 
       departureTime: this.departureTime || defaultTime,
       arrivalTime: this.arrivalTime || defaultTime,
       departureWorksiteTime: this.departureWorksiteTime || defaultTime,
       licensePlate: this.licensePlate || "",
-      stayLength: this.stayLength || "",
+      stayLength: this._item.stayLength || 0,
 
       // workers: [],
       // dispatchOrderId: this.dispatchOrderId ?? ""
