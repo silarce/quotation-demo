@@ -274,7 +274,7 @@ export type TcreateDailyReportItemDto = {
   departureWorksiteTime: string | null
   licensePlate: string
   stayLength: number
-  workerIds: string[]
+  workerIds: string[] | null
   workOrderNumber: string
 }
 
