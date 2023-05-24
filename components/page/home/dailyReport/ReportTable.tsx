@@ -201,9 +201,9 @@ export default function ReportTable(
                         classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName)}
                     >
                       {!workersArr[0] && !disabled &&
-                        <div className={scss.worker} onClick={onAdd}>
+                        <div className={scss.worker} >
                           <span></span>
-                          <IconAddCircle className={scss.icon} />
+                          <IconAddCircle className={scss.icon} onClick={onAdd} />
                         </div>
                       }
                       {workersArr?.map((worker, wIndex, arr) => {
@@ -216,7 +216,14 @@ export default function ReportTable(
 
                         return (
                           <div key={wIndex} className={scss.worker} >
-                            <span>{worker.chName}</span>
+                            <InputSel
+                              disabled={true}
+                              showBaseline={disabled ? "invisible" : "always"}
+                              inputProps={{
+                                value: worker.chName,
+                              }}
+                            />
+                            {/* <span>{worker.chName}</span> */}
                             {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
                             {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />}
                           </div>

@@ -34,18 +34,18 @@
   .tbody {
     height: 100%;
     overflow: auto;
-    border-top: solid 1px $colorBorder01;
     .row {
       display: grid;
       grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
       width: 100%;
-      border-bottom: solid 1px $colorBorder01;
-
       > .cell {
         display: grid;
         padding: 15px 20px;
         border: solid 1px $colorBorder01;
         border-width: 0 1px 1px 0;
+        > label {
+          margin: auto;
+        }
         span,
         input {
           font-size: 16px;
