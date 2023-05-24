@@ -11,8 +11,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-	loader: 'akamai',
-	path: '/',
+    loader: 'akamai',
+    path: '/',
+    domains: ["sanjeou-erp-be.caprover.credot-web.com"],
   },
 }
 

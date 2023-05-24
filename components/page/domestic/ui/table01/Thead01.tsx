@@ -10,7 +10,7 @@ export default function Thead01() {
 
   return (
     <div className={style.thead}>
-      <span>報價編號 / 日期</span>
+      <span>合約編號 / 日期</span>
       <span>客戶名稱 / 工程名稱</span>
       <span>聯絡人</span>
       <span>聯絡電話</span>

@@ -3,6 +3,9 @@ import { useState } from "react";
 
 import { axi } from "./_axiosCreator";
 
+// config
+import { customerTypesLookup } from 'config/lookupTable'
+
 // type
 import type { TcustomerDto, TcustomerDto_Populate, TpageMetaDto, Tcontact } from "./dtoTypes";
 
@@ -14,13 +17,15 @@ type TcustomerDto_TC = TcustomerDto_Populate<["types", "contacts"]>
 
 export type { TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts }
 // ===============================================================
+export { customerTypesLookup }
+// ===============================================================
 
-export const customerTypesLookup = Object.freeze({
-  construction: "營造",
-  firm: "事務所",
-  propertyOwner: "業主",
-  contractor: "協力廠商",
-} as const);
+// export const customerTypesLookup = Object.freeze({
+//   construction: "營造",
+//   firm: "事務所",
+//   propertyOwner: "業主",
+//   contractor: "協力廠商",
+// } as const);
 
 type TcustomerTypesLookupKeys = (keyof typeof customerTypesLookup)
 export const customerTypesArr
@@ -96,13 +101,32 @@ const apiGetCustomers = (params?: TapiGetCustomersParams) => {
 }
 
 export const useCustomers = (params?: TapiGetCustomersParams) => {
-  let [data, setData] = useState<TgetCustomers>()
+  let [res, setRes] = useState<TgetCustomers>()
   const update = async () => {
     const data = await apiGetCustomers(params)
-    if (data) setData(data)
+    if (data) setRes(data)
     return data
   }
-  return { data: data?.data, meta: data?.meta, setData, update }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetCustomers(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    res.data = [...oldData, ...newData]
+    setRes({ ...res })
+    return apiRes
+  }
+
+
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    setData: setRes,
+    update,
+    update_infinite
+  }
 }
 
 // ============================================================

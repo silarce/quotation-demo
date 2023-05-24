@@ -3,13 +3,14 @@ import classNames from "classnames"
 import _ from "lodash"
 import moment from "moment";
 import { AxiosError } from "axios";
+import { useRouter } from "next/router";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
-// import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
@@ -20,23 +21,22 @@ import { showRootLoading } from "components/global/gear/loadingCover/rootLoading
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
+// antd
+import { Badge } from "antd"
 
 // hook
 import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
 
+// tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
 
+// icon
+import iconFourCube from "public/image/icon/fourCube.svg"
+import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  // TcreateDailyReportItemDto,
-  // TdailyReportDto,
   useApiDailyReports,
-  // useApiDailyReports_Reporters,
-  // useApiDailyReports_isReporters_me,
-  // useApiDailyReports_my,
-  // useApiDailyReports_id,
   useApiDailyReports_reviewers,
-  // apiPatchDailyReports_Reporters,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -51,7 +51,7 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
+import { TuserDto, } from "js/api/dtoTypes";
 import { TdoSearch, Toption } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
@@ -70,6 +70,12 @@ const reportedAtOptions = [
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
+  const userId = userInfo.employee?.id ?? ""
+  const router = useRouter()
+  const isMine = router.query.isMine === undefined ? true
+    : router.query.isMine === "true" ? true : false
+  const isCalendar = router.query.isCalendar === "true" ? true : false
+
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
   /**權限 */
@@ -101,14 +107,24 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  // const today = moment().format("YYYY-MM-DD");
-  // const thisMonth = moment().format("YYYY-MM");
+  const [searchObj, setSearchObj] = useState<{
+    isReviewCompleted: boolean | undefined
+    date: string | undefined
+  }>()
 
-  // 取得指定月份所有日報表
+  const filterIsMine = (() => {
+    if (isMine) return { $eq: userId }
+    if (!isMine) return { $ne: userId }
+    return undefined
+  })()
 
-  const [params, setParams] = useState<{ filter?: { [key: string]: any } }>({ filter: undefined })
-
-
+  const params = {
+    filter: {
+      "employee.id": filterIsMine,
+      isReviewCompleted: { $eq: searchObj?.isReviewCompleted },
+      date: { $eq: searchObj?.date },
+    },
+  }
   const {
     dailyReport, updateDailyReports, } = useApiDailyReports(params)
   const sortedDailyReport = useMemo(() => {
@@ -133,11 +149,37 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const { data: employeeRes, update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
+  // ---------------------------
+
+  const [searchValue, setSearchValue] = useState<string>()
+  const params_panel = {
+    pageSize: 999999,
+    populate: ["jobs"],
+    filter: {
+      chName: { $contains: searchValue || undefined }
+    }
+  }
+  const { data: employeeRes_panel, update: updateEmployeeArr_panel }
+    = useEmployee(params_panel)
+  const employeeArr_panel = employeeRes_panel?.data
+
+  const editSearchValue = (v: string | undefined) => {
+    setSearchValue(v)
+  }
+
+  useEffect(() => {
+    if (searchValue === undefined) return
+    updateEmployeeArr_panel()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
+
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   useEffect(() => {
+    if (!router.isReady) return
+    cancelEditNewDailyReport();
     (async () => {
       try {
         setIsLoading(true)
@@ -147,7 +189,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       finally { setIsLoading(false) }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [searchObj, isMine, router])
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -331,7 +373,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const searchTargetList = (() => {
     const arr = [
       { options: reportedAtOptions, width: "110px" },
-      { placeholder: "搜尋日期", width: "150px" }
+      { placeholder: "搜尋日期", width: "80px" }
     ]
     if (identity === "reporter") arr.shift()
     return arr
@@ -342,8 +384,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const reviewedAtValue = (arr[0] as Toption).value
     const isReviewCompleted = (() => {
       if (reviewedAtValue === "全部") return undefined
-      if (reviewedAtValue === "未審核") return { $eq: false }
-      if (reviewedAtValue === "已審核") return { $eq: true }
+      if (reviewedAtValue === "未審核") return false
+      if (reviewedAtValue === "已審核") return true
     })()
     // const reviewedAt = (() => {
     //   if (reviewedAtValue === "全部") return undefined
@@ -361,21 +403,30 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
     if (date === "wrongDate")
       return myAlert.warning({ title: "時間格式錯誤", content: "時間格式例:101-01-01" })
-
-    setParams({
-      filter: {
-        // reviewStatus:{reviewedAt},
-        isReviewCompleted,
-        date: { $eq: date }
-      }
+    setSearchObj({
+      isReviewCompleted,
+      date
     })
   }
-
   const searchGroup = {
     searchTargetList,
     doSearch
   }
 
+  // --------------------
+  const listSwitchButton: TpanelList[number] = {
+    type: "myButton",
+    label: isCalendar ? "列表" : "月曆",
+    onClick: () => {
+      router.push({
+        query: {
+          ...router.query,
+          isCalendar: isCalendar ? "false" : "true"
+        }
+      })
+    },
+    img: isCalendar ? iconMenu.src : iconFourCube.src
+  }
   // --------------------
   /**manager 審核人員設定 */
   const panelList_manager_notInEdit: TpanelList = [
@@ -384,7 +435,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       type: "myButton",
       label: "審核人員設定",
       onClick: editRivewerPickArr
-    }
+    },
+    listSwitchButton
   ]
 
   /**reporter 今日回報 */
@@ -394,7 +446,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       type: "myButton",
       label: "今日回報",
       onClick: editReport_today
-    }
+    },
+    listSwitchButton
   ]
   /**reviewer 已讀/未讀 */
   const panelList_reviewer_inEdit: TpanelList = [
@@ -461,14 +514,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
   ]
 
-  // const panelList_reporter_reviewed: TpanelList = [
-  //   {
-  //     custom: <Badge
-  //       className={scss.antdBadge02}
-  //       color="auto"
-  //       text="總經理已閱讀" />
-  //   },
-  // ]
+  const panelList_reporter_reviewed: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已審核" />
+    },
+  ]
 
   const panelList = (() => {
 
@@ -483,6 +536,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       else {
         if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
           if (isReportEdit) return panelList_reporter_inEdit02
+          if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
           return panelList_reporter_inEdit01
         }
         else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
@@ -494,6 +548,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
         // if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
+        if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
         if (isReportEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
       }
@@ -530,18 +585,28 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           customeLeft={customeLeft}
         />
 
-        {!reportInEdit &&
+        {!reportInEdit && !isCalendar &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
         }
+        {!reportInEdit && isCalendar &&
+          <TheCalendar
+            addTag={addTag}
+            dailyReportArr={sortedDailyReport}
+            updateDailyReports={updateDailyReports}
+          />
+        }
 
         {reportInEdit &&
           <ReportTable
+            employeeArr={employeeArr_panel ?? []}
+            updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
             isEdit={isReportEdit}
+            editSearchValue={editSearchValue}
           />
         }
       </SubLayer>
@@ -705,21 +770,4 @@ const formatEmployeeArr = (
   return result
 }
 
-
-
-
-
-
-
-
-
-// ========================================================================
-/**
-待辦事項
-
-等新的api出來後會做其他優化
-1.總表會改成分頁取得，滾輪滑到底後會自動取得下一頁然後接在底下
-  或是要做成分頁?
-  前者我直有做一次的經驗，應該會需要幾個小時研究
- */
 

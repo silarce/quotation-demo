@@ -72,8 +72,19 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "日報表",
-          path: path01 + "/dailyReport",
           erpFeature: "allPass",
+          list: [
+            {
+              label: "我的日報表",
+              path: path01 + "/dailyReport?isMine=true",
+              erpFeature: "allPass",
+            },
+            {
+              label: "審核日報表",
+              path: path01 + "/dailyReport?isMine=false",
+              erpFeature: "allPass",
+            },
+          ]
         },
       ]
     }
@@ -141,7 +152,8 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "報價",
-          erpFeature: devPass,
+          // erpFeature: devPass,
+          erpFeature: "allPass",
           list: [
             {
               label: "預算",
@@ -181,7 +193,7 @@ const sidePathList: TsidePathList = {
             {
               label: "舊合約整合",
               path: path01 + "/legacyContractIntegration",
-              erpFeature: devPass,
+              erpFeature: "allPass",
             },
           ]
         },
@@ -397,8 +409,8 @@ const topPathList: TtopPathListConfig[] = [
     label: "營業部",
     subLabel: "-國內工程",
     path01: sidePathList["/domestic"].path01,
-    href: sidePathList["/domestic"].path01 + "/budget",
-    erpFeature: devPass,
+    href: sidePathList["/domestic"].path01 + "/legacyContractIntegration",
+    erpFeature: "allPass",
   },
   {
     icon: icon_foreign,

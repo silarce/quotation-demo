@@ -1,0 +1,6 @@
+@use "styles/theme01" as *;
+
+.row.rowPlus {
+  grid-template-columns: 16px fit-content(100%) fit-content(100%);
+}
+

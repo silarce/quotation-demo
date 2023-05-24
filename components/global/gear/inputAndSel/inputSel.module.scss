@@ -105,6 +105,29 @@
   }
 } // datePickerBox
 
+.timePickerBox {
+  .timePicker {
+    padding: 0;
+    input {
+      font-weight: 400;
+      font-size: 18px;
+      width: 100%;
+      resize: none;
+      &::placeholder {
+        color: $colorBorder01;
+      }
+    }
+  }
+} // datePickerBox
+.timePickerPopupt {
+  :global(.ant-picker-footer) {
+    button {
+      background-color: $bgc01;
+      border: solid 1px $colorBorder01;
+    }
+  }
+}
+
 // =================================================================
 // Select
 // select的選單元件會portal到#__next

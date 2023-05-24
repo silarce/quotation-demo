@@ -6,91 +6,63 @@
   height: 100%;
   padding: 3px;
   .thead {
-    display: flex;
-    flex-wrap: nowrap;
-    width: 100%;
-    > div {
+    display: grid;
+    grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
+    grid-template-rows: repeat(6, auto);
+    height: 75px;
+    > .cell {
       display: grid;
-      padding: 24px 20px;
-      font-size: 14px;
-      font-weight: 400;
       background-color: $bgc01;
-      border-right: solid 1px $colorBorder01;
+      border: solid 1px $colorBorder01;
+      border-width: 0 1px 1px 0;
       > span {
-        margin: auto 0;
-      }
-      &:nth-last-of-type(1) {
-        border-right: none;
-      }
-    }
-
-    > .purposeColumn {
-      padding: 0;
-      > div:nth-of-type(1) {
-        padding: 10px;
+        margin: auto;
         font-size: 14px;
         font-weight: 400;
-        text-align: center;
-        border-bottom: solid 1px $colorBorder01;
+      }
+      &.rightEdge {
+        border-right: 0;
+      }
+      &.textLeft {
         > span {
-          color: $colorMain;
+          margin-left: 20px;
         }
       }
-
-      > div:nth-of-type(2) {
-        display: flex;
-        flex-wrap: nowrap;
-        > div {
-          display: flex;
-          place-content: center;
-          padding: 6px 0;
-          font-size: 14px;
-          font-weight: 400;
-          border-right: solid 1px $colorBorder01;
-          &:nth-last-of-type(1) {
-            border-right: none;
-          }
-        }
-      }
-    } // purposeColumn
+    }
   } // thead
 
   .tbody {
     height: 100%;
     overflow: auto;
-    border-top: solid 1px $colorBorder01;
     .row {
-      display: flex;
-      width:100%;
-      border-bottom: solid 1px $colorBorder01;
-      > div {
-        padding: 12px 10px;
-        border-right: solid 1px $colorBorder01;
-
-        > span {
+      display: grid;
+      grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
+      width: 100%;
+      > .cell {
+        display: grid;
+        padding: 15px 20px;
+        border: solid 1px $colorBorder01;
+        border-width: 0 1px 1px 0;
+        > label {
+          margin: auto;
+        }
+        span,
+        div,
+        input {
           font-size: 16px;
-          font-weight: 400;
           color: $colorMain;
-          word-break: break-all;
-          word-wrap: break-word;
         }
-
-        &:nth-last-of-type(1) {
-          border-right: none;
+        &.rightEdge {
+          border-right: 0;
         }
-        &.check {
-          display: grid;
-          > * {
-            margin: auto;
-          }
+        &.textLeft {
+          // margin-left: 20px;
         }
-        &.content {
-          textarea {
-            font-size: 16px;
-          }
+        &.suffix {
+          grid-template-columns: auto min-content;
         }
       }
-    }
+    } // row
     .newReportBtn {
       border: none;
       background-color: transparent;
@@ -99,4 +71,19 @@
       margin-left: 13px;
     }
   } // tbody
+
+  .workerCell {
+    display: grid;
+    gap: 5px;
+    .worker {
+      display: grid;
+      grid-template-columns: auto min-content;
+      gap: 4px;
+      align-items: center;
+    }
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
 } // table

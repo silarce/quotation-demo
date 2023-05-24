@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 
-import { axi } from "./_axiosCreator";
+import { axi, domain } from "./_axiosCreator";
 
 // type
 import { TcompanyInfoDto, TupdateCompanyInfoDto } from "./dtoTypes";
 
 export type { TcompanyInfoDto, TupdateCompanyInfoDto };
+export { domain }
 
 // =============================================
 // 取得公司資訊

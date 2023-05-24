@@ -7,7 +7,7 @@ import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
 
 
 
-type Tprofile = {
+export type Tprofile = {
   quotationId: string,
   clientName: string,
   contactPerson: string,

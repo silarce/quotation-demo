@@ -69,7 +69,7 @@ export default function QueryQuotationList(
           }
           // ===========================
           // 搜尋過濾
-          const regQueryQuotationId = new RegExp(searchObj.queryQuotationId)
+          const regQueryQuotationId = new RegExp(searchObj.queryQuotationId ?? "")
           if (!regQueryQuotationId.test(queryQuotationId)) return null
           // ===========================
 

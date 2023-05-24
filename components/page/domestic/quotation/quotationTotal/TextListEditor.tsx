@@ -27,7 +27,7 @@ export default function TextListEditor(
         addString: (v: string | string[]) => void
         delString: (index: number) => void
       }
-      alternateArr: string[]
+      alternateArr: string[] | undefined
       searchAlternate: (v: string) => void
       label: string
       disabled: boolean
@@ -59,7 +59,10 @@ export default function TextListEditor(
   // ModalListSelectorWithSearch
   const [showAdd, setShowAdd] = useState(false)
 
-  const toShowAdd = () => setShowAdd(true)
+  const toShowAdd = () => {
+    if (!alternateArr) return addString("")
+    setShowAdd(true)
+  }
   const onCancel = () => {
     setShowAdd(false)
     setSelRemark([])
@@ -107,7 +110,7 @@ export default function TextListEditor(
         onSearch={searchAlternate}
       >
         <div className={styleL.addModalBody}>
-          {alternateArr.map((item, index) => {
+          {alternateArr?.map((item, index) => {
             const content = item
             const isActive = (selRemark.includes(item))
             return (

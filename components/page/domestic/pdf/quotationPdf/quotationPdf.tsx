@@ -25,7 +25,6 @@ import scss from "./quotationPdf.module.scss"
 
 // type
 import { Class_quotation } from "hooks/quotation/useQuotation"
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
 
 export default function QuotationPdf(
   { isVisable, onCancel,
@@ -34,7 +33,7 @@ export default function QuotationPdf(
     {
       isVisable: boolean
       onCancel: () => void
-      classQuotation: Class_quotation | Class_legacyQuotation
+      classQuotation: Class_quotation
       // classQuotation: Class_quotation
     }
 ) {
@@ -116,15 +115,9 @@ export default function QuotationPdf(
   const totalPram = (() => {
     const memoArr = classQuotation.classMemo.stringArr
 
-    const subTotal =
-      identify === "normal" ? classQuotation.subTotal :
-        identify === "legacy" ? classQuotation.classPayInfo.subTotal : "-1"
-    const businessTax =
-      identify === "normal" ? classQuotation.businessTax :
-        identify === "legacy" ? classQuotation.classPayInfo.tax : "-1"
-    const total =
-      identify === "normal" ? classQuotation.total :
-        identify === "legacy" ? classQuotation.classPayInfo.total : "-1"
+    const subTotal = classQuotation.subTotal
+    const businessTax = classQuotation.businessTax
+    const total = classQuotation.total
 
     const settlement = {
       subTotal: parseFloat(subTotal), //小計
@@ -140,25 +133,19 @@ export default function QuotationPdf(
     const quoteRangeArr = classQuotation.classQuoteRange.stringArr
     const attn = classQuotation.classSignature.attn
     const payInfo = (() => {
-      if (identify === "normal") {
-        const {
-          tradingLocation, tradingDate,
-          deposit, deliveryPayment, installedPayment, eleConnectPayment,
-        } = classQuotation.classPayInfo
-        return {
-          tradingLocation,
-          tradingDate,
-          payWay: [
-            { label: "訂製同時付總金額", value: deposit },
-            { label: "交貨同時付總金額", value: deliveryPayment },
-            { label: "按裝完成付總金額", value: installedPayment },
-            { label: "接電使用付總金額", value: eleConnectPayment },
-          ]
-        }
-      }
-      if (identify === "legacy") {
-        const { tradingLocation, tradingDate, payWay } = classQuotation.classPayInfo
-        return { tradingLocation, tradingDate, payWay }
+      const {
+        tradingLocation, tradingDate,
+        deposit, deliveryPayment, installedPayment, eleConnectPayment,
+      } = classQuotation.classPayInfo
+      return {
+        tradingLocation,
+        tradingDate,
+        payWay: [
+          { label: "訂製同時付總金額", value: deposit },
+          { label: "交貨同時付總金額", value: deliveryPayment },
+          { label: "按裝完成付總金額", value: installedPayment },
+          { label: "接電使用付總金額", value: eleConnectPayment },
+        ]
       }
     })()
 
@@ -166,19 +153,7 @@ export default function QuotationPdf(
   })()
 
 
-  const productArr = (() => {
-    if (identify === "normal") return classQuotation.mainProductArr.map((mp) => mp.allData)
-    if (identify === "legacy") {
-      return classQuotation.mainProductArr.map((mp) => {
-        return {
-          ...mp.allData,
-          priceTotal: mp.allData.priceSubTotal
-        }
-      })
-    }
-    return []
-  })()
-
+  const productArr = classQuotation.mainProductArr.map((mp) => mp.allData)
 
   // ----------------------------------------------------------------------------
   return (
