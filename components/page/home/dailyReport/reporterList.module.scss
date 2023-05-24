@@ -21,11 +21,9 @@
   flex-wrap: nowrap;
   gap: 27px;
   padding: 15px;
-  border-bottom: solid 1px black;
+  border-bottom: solid 1px $colorBorder01;
   cursor: pointer;
-  &:nth-last-of-type(1) {
-    border: none;
-  }
+
   > div {
     span {
       font-size: 16px;

@@ -70,11 +70,9 @@ export default function ReportTable(
   }
 
   const modalOnConfirm = (v: TemployeeDto) => {
-    console.log(activeItem)
     if (!activeItem) return
     activeItem.addWorker(v)
   }
-
   const disabled = !isEdit
 
   // ------------------------------------------------
