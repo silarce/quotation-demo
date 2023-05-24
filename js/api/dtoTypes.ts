@@ -215,10 +215,10 @@ export type TerpFeatureDto = {
 //   description: string
 // }
 export type TdailyReportItemDto = {
-  readonly id?: string
-  readonly order?: number
-  readonly createdAt: Date // date
-  readonly updatedAt: Date //date
+  readonly id: string
+  readonly order: number
+  readonly createdAt: string // date
+  readonly updatedAt: string //date
   periodOfDay: "AM" | "PM" | null
   customerName: string
   contactName: string

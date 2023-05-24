@@ -33,7 +33,8 @@ export default function EmployeeSelector(
       showModal: boolean
       employeeArr: TemployeeDto[]
       searchCustomer: (v: string) => void
-      onConfirm: (v: TemployeeDto[]) => void
+      // onConfirm: (v: TemployeeDto[]) => void
+      onConfirm: (v: TemployeeDto) => void
       onCancel: () => void
       label?: string
       getCustomerByPage?: () => void
@@ -54,33 +55,53 @@ export default function EmployeeSelector(
 
   // ==================================================
   // 被選的資料
-  const [selEmployee, setSelEmployee] = useState<TemployeeDto[]>([])
-  
+  const [selEmployee, setSelEmployee] = useState<TemployeeDto>()
+
   // 搜尋過濾
   // ==================================================
   const onClick = (newEmp: TemployeeDto) => {
-
-    const index = selEmployee.findIndex((emp) => {
-      return emp.id === newEmp.id
-    })
-
-    const arrCopy = _.cloneDeep(selEmployee)
-    if (index === -1) { arrCopy.push(newEmp) }
-    else { arrCopy.splice(index, 1) }
-
-    setSelEmployee(arrCopy)
+    setSelEmployee(newEmp)
   }
 
   const theOnConfirm = () => {
-    if (!selEmployee[0]) return ModalInfo("請選擇公司")
+    if (!selEmployee) return ModalInfo("請選擇公司")
     onConfirm(selEmployee)
     theOnCancel()
   }
 
   const theOnCancel = () => {
     onCancel()
-    setSelEmployee([])
+    setSelEmployee(undefined)
   }
+
+  // // 被選的資料
+  // const [selEmployee, setSelEmployee] = useState<TemployeeDto[]>([])
+
+  // // 搜尋過濾
+  // // ==================================================
+  // const onClick = (newEmp: TemployeeDto) => {
+
+  //   const index = selEmployee.findIndex((emp) => {
+  //     return emp.id === newEmp.id
+  //   })
+
+  //   const arrCopy = _.cloneDeep(selEmployee)
+  //   if (index === -1) { arrCopy.push(newEmp) }
+  //   else { arrCopy.splice(index, 1) }
+
+  //   setSelEmployee(arrCopy)
+  // }
+
+  // const theOnConfirm = () => {
+  //   if (!selEmployee[0]) return ModalInfo("請選擇公司")
+  //   onConfirm(selEmployee)
+  //   theOnCancel()
+  // }
+
+  // const theOnCancel = () => {
+  //   onCancel()
+  //   setSelEmployee([])
+  // }
 
   // ==================================================
 
@@ -98,7 +119,8 @@ export default function EmployeeSelector(
         {employeeArr.map((emp, index) => {
           const { idNumber, chName, jobs } = emp
           const { name, grade } = jobs?.[0] ?? {}
-          const isActive = selEmployee.some((selEmp) => { return selEmp.id === emp.id })
+          // const isActive = selEmployee.some((selEmp) => { return selEmp.id === emp.id })
+          const isActive = selEmployee?.id === emp.id
           return (
             <CellWithBar key={index} isActive={isActive}>
               <div className={`${style.listItem}`}

@@ -92,4 +92,18 @@
       margin-left: 13px;
     }
   } // tbody
+
+  .workerCell {
+    display: grid;
+    gap: 5px;
+    .worker {
+      display: grid;
+      grid-template-columns: auto min-content;
+      gap: 4px;
+    }
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
 } // table

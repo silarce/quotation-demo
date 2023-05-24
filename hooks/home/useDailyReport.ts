@@ -24,7 +24,25 @@ type ThookEmptyReport = {
 }
 
 
-const emptyReportItem: TcreateDailyReportItemDto = {
+// const emptyReportItem: TcreateDailyReportItemDto = {
+//   periodOfDay: "AM",
+//   customerName: "",
+//   contactName: "",
+//   meals: "breakfase",
+//   description: "",
+//   departureTime: "",
+//   arrivalTime: "",
+//   departureWorksiteTime: "",
+//   licensePlate: "",
+//   stayLength: "",
+//   workers: [],
+//   dispatchOrderId: ""
+// }
+const emptyReportItem: TdailyReportItemDto = {
+  id: "",
+  order: -1,
+  createdAt: "",
+  updatedAt: "",
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
@@ -45,10 +63,11 @@ const emptyReportItem: TcreateDailyReportItemDto = {
 class Class_reportItem {
   constructor(
     reRender: () => void,
-    reportItem: TdailyReportItemDto | TcreateDailyReportItemDto = _.cloneDeep(emptyReportItem)
+    reportItem: TdailyReportItemDto = _.cloneDeep(emptyReportItem)
   ) {
     this._reRender = reRender
     this._item = reportItem
+    if (!this._item.workers) this._item.workers = []
     // if (!this._item.periodOfDay) this._item.periodOfDay = "AM"
     // if (!this._item.meals) this._item.meals = "breakfase"
 
@@ -137,7 +156,17 @@ class Class_reportItem {
 
 
   get workers() { return this._item.workers as TemployeeDto[] }
-  set workers(v: TemployeeDto[]) { this._item.workers = v }
+  addWorker = (v: TemployeeDto) => {
+    this._item.workers!.push(v)
+    this._reRender()
+  }
+  removeWorker = (index: number) => {
+    this._item.workers?.splice(index, 1)
+    this._reRender()
+  }
+
+
+
 
 
   get postBody(): TcreateDailyReportItemDto {

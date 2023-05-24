@@ -69,9 +69,10 @@ export default function ReportTable(
     setShowModal(false)
   }
 
-  const modalOnConfirm = (v: TemployeeDto[]) => {
+  const modalOnConfirm = (v: TemployeeDto) => {
+    console.log(activeItem)
     if (!activeItem) return
-    activeItem.workers = v
+    activeItem.addWorker(v)
   }
 
   const disabled = !isEdit
@@ -177,34 +178,48 @@ export default function ReportTable(
                     </div>
                   )
                 }
+
+
                 if (eleType === "modal" && key === "workers") {
                   const workersArr = theClass["workers"]
+                  const onClick = () => {
+                    if (disabled) return;
+                    setActiveItem(theClass)
+                    toShowModal()
+                  }
+
                   return (
                     <div key={cIndex}
                       className={
-                        classNames(scss.cell, headerClassName, bodyClassName, "cursor-pointer")}
-                      onClick={() => {
-                        if (disabled) return;
-                        setActiveItem(theClass)
-                        toShowModal()
-                      }}
+                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName, "cursor-pointer")}
                     >
-                      {!workersArr && !disabled &&
-                        <div className="grid place-content-center">
-                          <span>點擊選擇人員</span>
+                      {!workersArr[0] && !disabled &&
+                        <div className={"grid place-content-center"} onClick={onClick}>
+                          <IconAddCircle className={scss.icon} />
                         </div>
                       }
                       {workersArr?.map((worker, wIndex) => {
                         worker = worker as TemployeeDto
+                        const onRemove = () => {
+                          theClass.removeWorker(wIndex)
+                        }
                         return (
-                          <div key={wIndex}>
+                          <div key={wIndex} className={scss.worker} onClick={onRemove}>
                             <span>{worker.chName}</span>
+                            <IconRemoveCircle className={scss.icon} />
                           </div>
                         )
                       })}
+                      {workersArr[0] && !disabled &&
+                        <div className={scss.worker}>
+                          <span></span>
+                          <IconAddCircle className={scss.icon} onClick={onClick} />
+                        </div>
+                      }
                     </div>
                   )
                 }
+
                 return (
                   <div key={cIndex}
                     className={classNames(scss.cell, headerClassName, bodyClassName)}>
@@ -247,8 +262,8 @@ const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "description",
   "workers",
   "dispatchOrderId",
-  "mealsCost",
-  
+  "meals",
+
   "departureTime",
   "departureWorksiteTime",
   "contactName",
@@ -265,7 +280,7 @@ const bodyKeyArr: TclassKeys[] = [
   "description",
   "workers",
   "dispatchOrderId",
-  "mealsCost",
+  "meals",
   "arrivalTime",
   "contactName",
   "licensePlate",
@@ -336,7 +351,7 @@ const config: Tconfig = {
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
-  mealsCost: {
+  meals: {
     eleType: "select",
     optionArr: optionArr_mealsCost,
     label: "餐費",
