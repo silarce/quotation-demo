@@ -145,9 +145,16 @@ class Class_reportItem {
   }
 
   get postBody(): TcreateDailyReportItemDto {
-    const workerIdArr = this.workers.map((worker) => {
-      return worker.id
-    })
+    const workerIdArr = (() => {
+      const idArr = this.workers.map((worker) => {
+        return worker.id
+      })
+      if (!idArr[0]) return null
+      return idArr
+    })()
+
+
+
     return {
       periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
@@ -162,7 +169,10 @@ class Class_reportItem {
       stayLength: this._item.stayLength || 0,
 
       workerIds: workerIdArr,
-      workOrderNumber: this.dispatchOrderId ?? ""
+      // workerIds: null,
+      workOrderNumber: this.dispatchOrderId ?? "",
+      // workerIds: null,
+      // workOrderNumber: null
     }
   }
 

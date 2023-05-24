@@ -142,7 +142,7 @@ export default function ReportTable(
                           onChange: (v) => { theClass[key] = v },
                           className: scss.textarea,
                         }} />
-                      {suffix && <span>{suffix}</span>}
+                      {suffix && disabled && <span>{suffix}</span>}
                     </div>
                   )
                 }
