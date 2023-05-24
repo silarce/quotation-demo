@@ -7,7 +7,7 @@
   padding: 3px;
   .thead {
     display: grid;
-    grid-template-columns: repeat(5, fit-content(100%)) auto repeat(3, fit-content(100%));
+    grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
     grid-template-rows: repeat(6, auto);
     height: 75px;
     > .cell {
@@ -37,7 +37,7 @@
     border-top: solid 1px $colorBorder01;
     .row {
       display: grid;
-      grid-template-columns: repeat(5, fit-content(100%)) auto repeat(3, fit-content(100%));
+      grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
       width: 100%;
       border-bottom: solid 1px $colorBorder01;
 
