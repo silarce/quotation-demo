@@ -79,9 +79,9 @@ export default function MyTimePicker(
   // ---------------------------------------------------------------------------
   // 將stateValue轉為moment物件
   const theValue = (() => {
-    const themoment = moment(value, "HH-mm")
+    const themoment = moment(value)
     let theValue
-    if (themoment.format("HH-mm") === "Invalid date")
+    if (themoment.format("YYYY-MM-DD HH:mm:ss") === "Invalid date")
       theValue = undefined
     else theValue = themoment
     return theValue
