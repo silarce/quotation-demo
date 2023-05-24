@@ -293,23 +293,23 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     try {
       showRootLoading(true)
       await apiPatchDailyReports_reviewers({ employeeIds })
-      cancelSetReportEmpModal()
-      myAlert.success({ title: "更新回報人員成功" })
+      cancelSetRivewerModal()
+      myAlert.success({ title: "更新審核人員成功" })
       try {
         await Promise.all([
           updateDailyReports_withLoading(),
           updateReviewersArr(),
         ])
       }
-      catch { myAlert.err({ title: "日報表或回報人員取得失敗" }) }
+      catch { myAlert.err({ title: "日報表或審核人員取得失敗" }) }
     }
     catch {
-      myAlert.err({ title: "更新回報人員失敗" })
+      myAlert.err({ title: "更新審核人員失敗" })
     }
     finally { showRootLoading(false) }
   }
   /**關閉回報人員設定面板 */
-  const cancelSetReportEmpModal = () => {
+  const cancelSetRivewerModal = () => {
     setReviewersPickArr(undefined)
   }
 
@@ -614,7 +614,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       <SetReportEmpModal
         visible={!!reviewersPickArr}
         onConfirm={reqApiPatchDailyReports_viewers}
-        onCancel={cancelSetReportEmpModal}
+        onCancel={cancelSetRivewerModal}
         dataArr={reviewersPickArr ?? []}
         label="審核人員設定"
         tip="可複選"
