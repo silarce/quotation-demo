@@ -122,7 +122,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     filter: {
       "employee.id": filterIsMine,
       isReviewCompleted: { $eq: searchObj?.isReviewCompleted },
-      date: { $eq: searchObj?.date }
+      date: { $eq: searchObj?.date },
     },
   }
   const {
