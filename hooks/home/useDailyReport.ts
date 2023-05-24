@@ -23,21 +23,6 @@ type ThookEmptyReport = {
   employeeId: string | undefined
 }
 
-
-// const emptyReportItem: TcreateDailyReportItemDto = {
-//   periodOfDay: "AM",
-//   customerName: "",
-//   contactName: "",
-//   meals: "breakfast",
-//   description: "",
-//   departureTime: "",
-//   arrivalTime: "",
-//   departureWorksiteTime: "",
-//   licensePlate: "",
-//   stayLength: "",
-//   workers: [],
-//   dispatchOrderId: ""
-// }
 const emptyReportItem: TdailyReportItemDto = {
   id: "",
   order: -1,
@@ -69,22 +54,10 @@ class Class_reportItem {
     this._item = reportItem
     if (!this._item.workers) this._item.workers = []
     this._stayLength = `${this._item.stayLength}`
-    // if (!this._item.periodOfDay) this._item.periodOfDay = "AM"
-    // if (!this._item.meals) this._item.meals = "breakfast"
-
-    // const timeKeyArr = ["departureTime", "arrivalTime", "departureWorksiteTime",]
-    // timeKeyArr.forEach((key) => {
-    //   if (this._item[key]===null)
-    // })
-    // createdAt
-
-
   } // constructor
   private _reRender
   private _item
   private _stayLength
-  // private _mealsCost
-
 
   get id() {
     if ("id" in this._item) return this._item.id
@@ -172,28 +145,10 @@ class Class_reportItem {
   }
 
   get postBody(): TcreateDailyReportItemDto {
-
-    // const defaultTime = (() => {
-    //   if ("createdAt" in this._item) {
-    //     return moment(this._item.createdAt).startOf('day').toDate()
-    //   }
-    //   else {
-    //     return moment().startOf('day').toDate()
-    //   }
-    // })()
-
+    const workerIdArr = this.workers.map((worker) => {
+      return worker.id
+    })
     return {
-      // periodOfDay: null,
-      // customerName: null,
-      // contactName: null,
-      // meals: null,
-      // description: null,
-      // departureTime: null,
-      // arrivalTime: null,
-      // departureWorksiteTime: null,
-      // licensePlate: null,
-      // stayLength: null,
-
       periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
@@ -206,8 +161,8 @@ class Class_reportItem {
       licensePlate: this.licensePlate || "",
       stayLength: this._item.stayLength || 0,
 
-      // workers: [],
-      // dispatchOrderId: this.dispatchOrderId ?? ""
+      workers: workerIdArr,
+      dispatchOrderId: this.dispatchOrderId ?? ""
     }
   }
 
