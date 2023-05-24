@@ -39,7 +39,7 @@ const emptyReportItem: TdailyReportItemDto = {
   licensePlate: "",
   stayLength: null,
   workers: [],
-  dispatchOrderId: ""
+  workOrderNumber: ""
 }
 
 // =================================================================
@@ -131,8 +131,8 @@ class Class_reportItem {
     this._reRender()
   }
 
-  get dispatchOrderId() { return this._item.dispatchOrderId }
-  set dispatchOrderId(v) { this._item.dispatchOrderId = v; this._reRender() }
+  get dispatchOrderId() { return this._item.workOrderNumber }
+  set dispatchOrderId(v) { this._item.workOrderNumber = v; this._reRender() }
 
   get workers() { return this._item.workers as TemployeeDto[] }
   addWorker = (v: TemployeeDto) => {
@@ -161,8 +161,8 @@ class Class_reportItem {
       licensePlate: this.licensePlate || "",
       stayLength: this._item.stayLength || 0,
 
-      workers: workerIdArr,
-      dispatchOrderId: this.dispatchOrderId ?? ""
+      workerIds: workerIdArr,
+      workOrderNumber: this.dispatchOrderId ?? ""
     }
   }
 
