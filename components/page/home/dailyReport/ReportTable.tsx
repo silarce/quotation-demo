@@ -21,7 +21,8 @@ import { Class_reportItem } from "pages/home/dailyReport"
 import { TemployeeDto } from "js/api/dtoTypes"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
-
+// icon
+import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()
@@ -68,9 +69,10 @@ export default function ReportTable(
     setShowModal(false)
   }
 
-  const modalOnConfirm = (v: TemployeeDto[]) => {
+  const modalOnConfirm = (v: TemployeeDto) => {
+    console.log(activeItem)
     if (!activeItem) return
-    activeItem.workers = v
+    activeItem.addWorker(v)
   }
 
   const disabled = !isEdit
@@ -101,8 +103,8 @@ export default function ReportTable(
 
               {bodyKeyArr.map((key, cIndex) => {
                 const {
-                  eleType, optionArr, label,
-                  headerClassName, bodyClassName,
+                  eleType, optionArr, label, inputType,
+                  headerClassName, bodyClassName, suffix
                 } = config[key] ?? {}
 
                 if (eleType === "select") {
@@ -130,14 +132,17 @@ export default function ReportTable(
                         scss.cell,
                         headerClassName, bodyClassName)}>
                       <InputSel
+                        className="inline-grid"
                         disabled={disabled}
                         showBaseline="auto"
                         inputProps={{
                           value: theClass[key] as string,
+                          inputType,
                           // @ts-ignore
                           onChange: (v) => { theClass[key] = v },
                           className: scss.textarea,
                         }} />
+                      {suffix && <span>{suffix}</span>}
                     </div>
                   )
                 }
@@ -176,34 +181,48 @@ export default function ReportTable(
                     </div>
                   )
                 }
+
+
                 if (eleType === "modal" && key === "workers") {
                   const workersArr = theClass["workers"]
+                  const onClick = () => {
+                    if (disabled) return;
+                    setActiveItem(theClass)
+                    toShowModal()
+                  }
+
                   return (
                     <div key={cIndex}
                       className={
-                        classNames(scss.cell, headerClassName, bodyClassName, "cursor-pointer")}
-                      onClick={() => {
-                        if (disabled) return;
-                        setActiveItem(theClass)
-                        toShowModal()
-                      }}
+                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName, "cursor-pointer")}
                     >
-                      {!workersArr && !disabled &&
-                        <div className="grid place-content-center">
-                          <span>點擊選擇人員</span>
+                      {!workersArr[0] && !disabled &&
+                        <div className={"grid place-content-center"} onClick={onClick}>
+                          <IconAddCircle className={scss.icon} />
                         </div>
                       }
                       {workersArr?.map((worker, wIndex) => {
                         worker = worker as TemployeeDto
+                        const onRemove = () => {
+                          theClass.removeWorker(wIndex)
+                        }
                         return (
-                          <div key={wIndex}>
+                          <div key={wIndex} className={scss.worker} onClick={onRemove}>
                             <span>{worker.chName}</span>
+                            <IconRemoveCircle className={scss.icon} />
                           </div>
                         )
                       })}
+                      {workersArr[0] && !disabled &&
+                        <div className={scss.worker}>
+                          <span></span>
+                          <IconAddCircle className={scss.icon} onClick={onClick} />
+                        </div>
+                      }
                     </div>
                   )
                 }
+
                 return (
                   <div key={cIndex}
                     className={classNames(scss.cell, headerClassName, bodyClassName)}>
@@ -243,14 +262,14 @@ const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "periodOfDay",
   "workingTime",
   "customerName",
-  "contactName",
   "description",
   "workers",
   "dispatchOrderId",
-  "mealsCost",
+  "meals",
 
   "departureTime",
   "departureWorksiteTime",
+  "contactName",
   "licensePlate",
   "stayLength",
   "arrivalTime",
@@ -261,12 +280,12 @@ const bodyKeyArr: TclassKeys[] = [
   "departureTime",
   "departureWorksiteTime",
   "customerName",
-  "contactName",
   "description",
   "workers",
   "dispatchOrderId",
-  "mealsCost",
+  "meals",
   "arrivalTime",
+  "contactName",
   "licensePlate",
   "stayLength",
 ]
@@ -280,6 +299,8 @@ type Tconfig = {
     headerClassName: string
     bodyClassName: string
     optionArr?: Toption[]
+    inputType?: "number" | "text"
+    suffix?: string
   } & (
     { eleType?: "input" | "timePicker" | "textarea" | "modal" } |
     {
@@ -308,14 +329,14 @@ const config: Tconfig = {
   customerName: {
     eleType: "input",
     label: "客戶名稱",
-    headerClassName: classNames("w-[120px] row-span-6", scss.textLeft),
-    bodyClassName: classNames("row-span-2"),
+    headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
+    bodyClassName: classNames("row-span-1"),
   },
   contactName: {
     eleType: "input",
     label: "接洽人",
-    headerClassName: classNames("w-[147px] row-span-6", scss.textLeft),
-    bodyClassName: classNames("row-span-2"),
+    headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
+    bodyClassName: classNames("row-span-1"),
   },
   description: {
     eleType: "textarea",
@@ -335,7 +356,7 @@ const config: Tconfig = {
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
-  mealsCost: {
+  meals: {
     eleType: "select",
     optionArr: optionArr_mealsCost,
     label: "餐費",
@@ -369,8 +390,10 @@ const config: Tconfig = {
   stayLength: {
     eleType: "input",
     label: "住宿",
+    inputType: "number",
     headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
-    bodyClassName: classNames("row-span-1"),
+    bodyClassName: classNames("row-span-1", scss.suffix),
+    suffix: "天"
   },
 }
 

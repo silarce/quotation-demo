@@ -215,23 +215,23 @@ export type TerpFeatureDto = {
 //   description: string
 // }
 export type TdailyReportItemDto = {
-  readonly id?: string
-  readonly order?: number
-  readonly createdAt: Date // date
-  readonly updatedAt: Date //date
-  periodOfDay: "AM" | "PM"
+  readonly id: string
+  readonly order: number
+  readonly createdAt: string // date
+  readonly updatedAt: string //date
+  periodOfDay: "AM" | "PM" | null
   customerName: string
   contactName: string
-  mealsCost: "breakfase" | "lunch" | "dinner"
+  meals: "breakfast" | "lunch" | "dinner" | null
   description: string
   /**date */
-  departureTime?: string | undefined
+  departureTime?: string | null
   /**date */
-  arrivalTime?: string | undefined
+  arrivalTime?: string | null
   /**date */
-  departureWorksiteTime?: string | undefined
-  licensePlate?: string | undefined
-  stayLength?: string | undefined
+  departureWorksiteTime?: string | null
+  licensePlate?: string | null
+  stayLength?: number | null
   workers?: TemployeeDto[] | undefined
   dispatchOrderId?: string | undefined
 }
@@ -264,16 +264,16 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: "breakfase" | "lunch" | "dinner" | number
+  meals: "breakfast" | "lunch" | "dinner"
   description: string
-  /**date */
-  departureTime?: string
-  /**date */
-  arrivalTime?: string
-  /**date */
-  departureWorksiteTime?: string
-  licensePlate?: string
-  stayLength?: string
+  /**date 發出req時會自動被轉為字串*/
+  departureTime: Date | string
+  /**date 發出req時會自動被轉為字串*//**date */
+  arrivalTime: Date | string
+  /**date 發出req時會自動被轉為字串*/
+  departureWorksiteTime: Date | string
+  licensePlate: string
+  stayLength: number
   workers?: string[]
   dispatchOrderId?: string
 }

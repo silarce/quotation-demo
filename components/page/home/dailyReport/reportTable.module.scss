@@ -7,7 +7,7 @@
   padding: 3px;
   .thead {
     display: grid;
-    grid-template-columns: repeat(5, fit-content(100%)) auto repeat(3, fit-content(100%));
+    grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
     grid-template-rows: repeat(6, auto);
     height: 75px;
     > .cell {
@@ -37,7 +37,7 @@
     border-top: solid 1px $colorBorder01;
     .row {
       display: grid;
-      grid-template-columns: repeat(5, fit-content(100%)) auto repeat(3, fit-content(100%));
+      grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
       width: 100%;
       border-bottom: solid 1px $colorBorder01;
 
@@ -55,6 +55,9 @@
         }
         &.textLeft {
           // margin-left: 20px;
+        }
+        &.suffix {
+          grid-template-columns: auto min-content;
         }
       }
 
@@ -92,4 +95,18 @@
       margin-left: 13px;
     }
   } // tbody
+
+  .workerCell {
+    display: grid;
+    gap: 5px;
+    .worker {
+      display: grid;
+      grid-template-columns: auto min-content;
+      gap: 4px;
+    }
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
 } // table
