@@ -76,7 +76,11 @@ export default function AddEmployee() {
       label: "上傳",
       onClick: async () => {
         if (!classEmployee) return
-        if(!classEmployee.startDate) return myAlert.warning({title:"請輸入到職日"})
+        if (!classEmployee.startDate) return myAlert.warning({ title: "請輸入到職日" })
+
+
+        console.log(classEmployee.startDate)
+
         try {
           setRootLoading(true)
 

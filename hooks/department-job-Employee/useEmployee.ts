@@ -34,6 +34,11 @@ class Class_employee {
         const today = moment().format("yyyy-MM-DD")
         this._employeeData.startDate = today
       }
+
+      // const foo = convertDate(this._employeeData.startDate)
+      // console.log(this._employeeData.startDate)
+      // console.log(foo)
+
       return convertDate(this._employeeData.startDate)
     })()
 
@@ -324,7 +329,15 @@ class Class_employee {
 
     const convertToDate = (dateString: string) => {
       if (!dateString) return ""
-      const theDateString = yearConversion_chToStandard(dateString)
+
+      const chDateArr = dateString.split("-")
+      if (chDateArr[0].length === 4 && chDateArr[0][0] === "0") {
+        chDateArr[0] = chDateArr[0].replace("0", "")
+      }
+      const chDate = chDateArr.join("-")
+
+      const theDateString = yearConversion_chToStandard(chDate)
+
       if (!theDateString) return ""
       return moment(theDateString).toDate()
     }
@@ -333,6 +346,9 @@ class Class_employee {
       convertToDate(this._employeeData.birthday)
     const startDate =
       convertToDate(this._employeeData.startDate)
+
+    // console.log(startDate)
+
     const leaveDate =
       convertToDate(this._employeeData.leaveDate)
     const retireDate =
