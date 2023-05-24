@@ -175,8 +175,11 @@ export default function ReportTable(
                         showBaseline="auto"
                         timePickerProps={{
                           value: theClass[key] as string,
-                          // @ts-ignore
-                          onChange: (v) => { theClass[key] = v },
+                          onChange02: (v) => {
+                            const foo = v?.toISOString()
+                            // @ts-ignore
+                            theClass[key] = foo
+                          },
                         }} />
                     </div>
                   )

@@ -48,9 +48,9 @@ const emptyReportItem: TdailyReportItemDto = {
   contactName: "",
   meals: "breakfast",
   description: "",
-  departureTime: "",
-  arrivalTime: "",
-  departureWorksiteTime: "",
+  departureTime: null,
+  arrivalTime: null,
+  departureWorksiteTime: null,
   licensePlate: "",
   stayLength: null,
   workers: [],
@@ -172,14 +172,15 @@ class Class_reportItem {
   }
 
   get postBody(): TcreateDailyReportItemDto {
-    const defaultTime = (() => {
-      if ("createdAt" in this._item) {
-        return moment(this._item.createdAt).startOf('day').toDate()
-      }
-      else {
-        return moment().startOf('day').toDate()
-      }
-    })()
+
+    // const defaultTime = (() => {
+    //   if ("createdAt" in this._item) {
+    //     return moment(this._item.createdAt).startOf('day').toDate()
+    //   }
+    //   else {
+    //     return moment().startOf('day').toDate()
+    //   }
+    // })()
 
     return {
       // periodOfDay: null,
@@ -199,9 +200,9 @@ class Class_reportItem {
       meals: this.meals || "breakfast",
       description: this.description,
 
-      departureTime: this.departureTime || defaultTime,
-      arrivalTime: this.arrivalTime || defaultTime,
-      departureWorksiteTime: this.departureWorksiteTime || defaultTime,
+      departureTime: this.departureTime || null,
+      arrivalTime: this.arrivalTime || null,
+      departureWorksiteTime: this.departureWorksiteTime || null,
       licensePlate: this.licensePlate || "",
       stayLength: this._item.stayLength || 0,
 

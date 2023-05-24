@@ -267,11 +267,11 @@ export type TcreateDailyReportItemDto = {
   meals: "breakfast" | "lunch" | "dinner"
   description: string
   /**date 發出req時會自動被轉為字串*/
-  departureTime: Date | string
+  departureTime: string | null
   /**date 發出req時會自動被轉為字串*//**date */
-  arrivalTime: Date | string
+  arrivalTime: string | null
   /**date 發出req時會自動被轉為字串*/
-  departureWorksiteTime: Date | string
+  departureWorksiteTime: string | null
   licensePlate: string
   stayLength: number
   workers?: string[]
