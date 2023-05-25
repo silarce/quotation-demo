@@ -23,7 +23,11 @@ type ThookEmptyReport = {
   employeeId: string | undefined
 }
 
-const emptyReportItem: TdailyReportItemDto = {
+
+// type TemptyReportItem = TdailyReportItemDto & { meals: "none" }
+type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
+
+const emptyReportItem: TemptyReportItem = {
   id: "",
   order: -1,
   createdAt: "",
@@ -31,7 +35,7 @@ const emptyReportItem: TdailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  meals: "breakfast",
+  meals: "none",
   description: "",
   departureTime: null,
   arrivalTime: null,
@@ -48,7 +52,8 @@ const emptyReportItem: TdailyReportItemDto = {
 class Class_reportItem {
   constructor(
     reRender: () => void,
-    reportItem: TdailyReportItemDto = _.cloneDeep(emptyReportItem)
+    // reportItem: TdailyReportItemDto = _.cloneDeep(emptyReportItem)
+    reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)
   ) {
     this._reRender = reRender
     this._item = reportItem
@@ -153,13 +158,16 @@ class Class_reportItem {
       return idArr
     })()
 
-
+    const meals = (() => {
+      if (this.meals === "none") return null
+      else return this.meals
+    })()
 
     return {
       periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
-      meals: this.meals || "breakfast",
+      meals,
       description: this.description,
 
       departureTime: this.departureTime || null,
@@ -169,10 +177,7 @@ class Class_reportItem {
       stayLength: this._item.stayLength || 0,
 
       workerIds: workerIdArr,
-      // workerIds: null,
       workOrderNumber: this.dispatchOrderId ?? "",
-      // workerIds: null,
-      // workOrderNumber: null
     }
   }
 
