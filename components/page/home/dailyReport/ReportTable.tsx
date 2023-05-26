@@ -5,7 +5,7 @@ import classNames from "classnames"
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import MyButton from "components/global/gear/button/myButton"
-import EmployeeSelector from "components/global/gear/modal/employeeSelector"
+import WorkerSelector from "components/global/gear/modal/workerSelector"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // css
@@ -18,7 +18,7 @@ import {
 
 // class
 import { Class_reportItem } from "pages/home/dailyReport"
-import { TemployeeDto } from "js/api/dtoTypes"
+import { TemployeeDto, TdailyReportWokerDto } from "js/api/dtoTypes"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // icon
@@ -33,7 +33,7 @@ export default function ReportTable(
   { classDailyReportItemArr,
     addDailyReportItem,
     isEdit,
-    employeeArr,
+    workerArr,
     updateEmployeeArr,
     editSearchValue
   }:
@@ -41,7 +41,7 @@ export default function ReportTable(
       classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
       isEdit: boolean
-      employeeArr: TemployeeDto[]
+      workerArr: TdailyReportWokerDto[]
       updateEmployeeArr: () => void
       editSearchValue: (v: string | undefined) => void
     }
@@ -69,7 +69,7 @@ export default function ReportTable(
     setShowModal(false)
   }
 
-  const modalOnConfirm = (v: TemployeeDto) => {
+  const modalOnConfirm = (v: TdailyReportWokerDto) => {
     if (!activeItem) return
     activeItem.addWorker(v)
   }
@@ -207,7 +207,6 @@ export default function ReportTable(
                         </div>
                       }
                       {workersArr?.map((worker, wIndex, arr) => {
-                        worker = worker as TemployeeDto
                         const onRemove = () => {
                           theClass.removeWorker(wIndex)
                         }
@@ -259,9 +258,9 @@ export default function ReportTable(
           />
         }
       </div>
-      <EmployeeSelector
+      <WorkerSelector
         showModal={showModal}
-        employeeArr={employeeArr}
+        employeeArr={workerArr}
         searchCustomer={editSearchValue}
         onConfirm={modalOnConfirm}
         onCancel={modalOnCancel}

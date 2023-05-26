@@ -35,8 +35,10 @@ import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
+  Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
+  useApiGetDailyReportsWorkers,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -162,18 +164,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
   // ---------------------------
-
+  // 取得工務人員
   const [searchValue, setSearchValue] = useState<string>()
-  const params_panel = {
+  const params_panel: Tparams = {
     pageSize: 999999,
     populate: ["jobs"],
     filter: {
       chName: { $contains: searchValue || undefined }
     }
   }
-  const { data: employeeRes_panel, update: updateEmployeeArr_panel }
-    = useEmployee(params_panel)
-  const employeeArr_panel = employeeRes_panel?.data
+  const { workers, updateWorkers: updateEmployeeArr_panel }
+    = useApiGetDailyReportsWorkers(params_panel)
 
   const editSearchValue = (v: string | undefined) => {
     setSearchValue(v)
@@ -609,7 +610,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
-            employeeArr={employeeArr_panel ?? []}
+            workerArr={workers ?? []}
             updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
