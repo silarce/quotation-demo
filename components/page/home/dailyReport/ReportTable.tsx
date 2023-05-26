@@ -346,8 +346,8 @@ const config: Tconfig = {
   },
   customerName: {
     eleType: "input",
-    label: "客戶名稱",
-    placeholder: "客戶名稱",
+    label: "客戶名稱/工程名稱",
+    placeholder: "客戶名稱/工程名稱",
     headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
     bodyClassName: classNames("row-span-1"),
   },
