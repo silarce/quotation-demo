@@ -23,7 +23,6 @@ const modalProps = {
   centered: true,
 }
 
-
 export const ModalInfo = (
   title?: string | number,
   content?: string | number,
@@ -116,7 +115,7 @@ export const ModalWarning = (
 export const ModalConfirm = (
   { title, content, props, className }: {
     title?: string | number
-    content?: string | number
+    content?: string | number | React.ReactNode
     props?: ModalFuncProps
     className?: string
   }

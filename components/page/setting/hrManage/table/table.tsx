@@ -20,7 +20,7 @@ export default function Table(
     {
       employeeList: TemployeeDto[]
       onDelete: (e: MouseEvent, index: number) => void
-      onResetPw: (id: string) => void
+      onResetPw: (employee: TemployeeDto) => void
       userCount: string | number
     }) {
 
@@ -59,8 +59,8 @@ export default function Table(
       {/*  */}
       <div className={scss.tbody}>
 
-        {employeeList.map((row, index) => {
-          const { idNumber, user } = row
+        {employeeList.map((employee, index) => {
+          const { idNumber, user } = employee
           const id = user!.id
           return (
             <div className={scss.row} key={index}>
@@ -69,13 +69,12 @@ export default function Table(
               <div className={scss.column}
                 style={{ width: "25px" }}>
                 <Image className="cursor-pointer" src={iconPassword} alt=""
-                  onClick={() => onResetPw(id)} />
+                  onClick={() => onResetPw(employee)} />
               </div>
               {/*  */}
 
-
               {tableKeyIndex.map((key, index) => {
-                const data = row[key]
+                const data = employee[key]
                 const { width, flex } = tableConfig[key]
                 const theStyle = { width, flex }
 

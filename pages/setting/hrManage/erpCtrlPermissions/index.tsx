@@ -265,35 +265,53 @@ export default function ErpCtrlPermissions() {
 
   // ------------------------------------------------------------------------
 
-  const resetPw = async (id: string) => {
-    try {
-      if (isLoading) return
-      setIsLoading(true)
-      const res = await apiPatchUserResetPassword(id)
-      const { password, account, username } = res
-      myAlert.success({
-        props: {
-          title: "密碼重置成功",
-          content:
-            <ResetPwContent account={account} username={username} newPw={password} />
-        }
-      })
+  // const resetPw = async (id: string) => {
+  const resetPw = async (employee: TemployeeDto) => {
+    const { user, chName, idNumber } = employee
+
+    const onConfirm = async () => {
+      try {
+        if (isLoading) return
+        setIsLoading(true)
+        const res = await apiPatchUserResetPassword(user!.id)
+        const { password, account, username } = res
+        myAlert.success({
+          props: {
+            title: "密碼重置成功",
+            content:
+              <ResetPwContent account={account} username={chName} newPw={password} />
+          }
+        })
+      }
+      catch (error) {
+        const err = error as AxiosError<{
+          error: string
+          message: string
+          statusCode: number
+        }>
+        const { error: resSerror, message } = err.response?.data ?? {}
+        myAlert.err({
+          title: resSerror,
+          content: message
+        })
+      }
+      finally {
+        setIsLoading(false)
+      }
     }
-    catch (error) {
-      const err = error as AxiosError<{
-        error: string
-        message: string
-        statusCode: number
-      }>
-      const { error: resSerror, message } = err.response?.data ?? {}
-      myAlert.err({
-        title: resSerror,
-        content: message
-      })
-    }
-    finally {
-      setIsLoading(false)
-    }
+
+    myAlert.confirm({
+      title: `是否重設密碼`,
+      // content: `id number: ${idNumber}`,
+      content: <>
+        <span>{`id number: ${idNumber}`}</span>
+        <br />
+        <span>{`名字: ${chName}`}</span></>,
+      // content: `請確認是否刪除${chName}`,
+      props: {
+        onOk: onConfirm,
+      }
+    })
   }
 
   // ------------------------------------------------------------------------
