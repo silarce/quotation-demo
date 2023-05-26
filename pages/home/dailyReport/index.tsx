@@ -223,7 +223,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       finally { setIsLoading(false) }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchObj, isMine, router])
+  }, [searchObj])
+
+  useEffect(() => {
+    setSearchObj({
+      isUserReviewed: undefined,
+      date: undefined,
+    })
+  }, [isMine])
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -553,7 +560,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
 
   const panelList = (() => {
-
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
       else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
@@ -607,6 +613,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         containerChildren={<LoadingCover01 isLoading={isLoading} />}
       >
         <PageHeader02
+          key={+isMine}
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
