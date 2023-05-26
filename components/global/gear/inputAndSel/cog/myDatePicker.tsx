@@ -13,9 +13,6 @@ import locale from 'antd/lib/date-picker/locale/zh_TW';
 // css
 import scss from "../inputSel.module.scss"
 
-
-
-
 export type TdatePickerProps = {
   value: string
   boxClassName?: string
@@ -26,12 +23,9 @@ export type TdatePickerProps = {
     moment: moment.Moment | null,
     dateString: string
   ) => void,
-
   onFocus?: () => void
   onBlur?: () => void
-
 }
-
 
 export default function MyDatePicker(
   {
@@ -47,7 +41,6 @@ export default function MyDatePicker(
       disabled?: boolean | undefined
     }
 ) {
-
 
   const {
     value,
@@ -71,15 +64,9 @@ export default function MyDatePicker(
   // ---------------------------------------------------------------------------
   // 將stateValue轉為moment物件
   const theValue = (() => {
-    const themoment = moment(value, "y-MM-DD")
-    let theValue
-    if (themoment.format("y-MM-DD") === "Invalid date")
-      theValue = undefined
-    else theValue = themoment
-    return theValue
+    const theMoment = moment(value)
+    return theMoment.isValid() ? theMoment : undefined
   })()
-
-
   // ---------------------------------------------------------------------------
   const theOnChange = onChange02 ? onChange02
     : onChange ? (
@@ -88,8 +75,6 @@ export default function MyDatePicker(
       onChange(dateString)
     }
       : undefined
-
-
 
   const datePickerBoxClassName = (() => {
     return `${scss.datePickerBox} ${boxClassName ?? ""}`

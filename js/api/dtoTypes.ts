@@ -264,7 +264,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  meals: "breakfast" | "lunch" | "dinner"
+  meals: "breakfast" | "lunch" | "dinner" | null
   description: string
   /**date 發出req時會自動被轉為字串*/
   departureTime: string | null
