@@ -121,18 +121,39 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   })()
 
   const params = (() => {
+
+    let userId = userInfo.employee?.id
     let isUserReviewed
-    if (searchObj?.isUserReviewed === undefined) isUserReviewed = undefined
-    if (searchObj?.isUserReviewed === true) isUserReviewed = { $notNull: true }
-    if (searchObj?.isUserReviewed === false) isUserReviewed = { $null: true }
+    let isReviewCompleted
+    if (searchObj?.isUserReviewed === undefined) {
+      isUserReviewed = undefined
+      isReviewCompleted = undefined
+    }
+    if (searchObj?.isUserReviewed === true) {
+      isUserReviewed = { $notNull: true }
+      isReviewCompleted = true
+    }
+    if (searchObj?.isUserReviewed === false) {
+      isUserReviewed = { $null: true }
+      isReviewCompleted = false
+    }
+
+    if (isMine) {
+      userId = undefined
+      isUserReviewed = undefined
+    }
+    else {
+      isReviewCompleted = undefined
+    }
+
     return {
       filter: {
         "employee.id": filterIsMine,
         "$and": {
           "reviewStatus.reviewedAt": isUserReviewed,
-          "reviewStatus.reviewerEmployee.id": { $eq: userInfo.employee?.id },
+          "reviewStatus.reviewerEmployee.id": { $eq: userId },
         },
-
+        "isReviewCompleted": { $eq: isReviewCompleted },
         date: { $eq: searchObj?.date },
       },
     }
