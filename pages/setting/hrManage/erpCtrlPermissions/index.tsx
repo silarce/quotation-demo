@@ -14,13 +14,11 @@ import SubLayer from "components/Layer/SubLayer/SubLayer";
 
 // component
 import Table from "components/page/setting/hrManage/table/table";
-import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
 import EmployeeSelector from "components/global/gear/modal/employeeSelector02";
 
 // gear
 import PageHeader02, { TsearchGroup, Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
@@ -265,7 +263,6 @@ export default function ErpCtrlPermissions() {
 
   // ------------------------------------------------------------------------
 
-  // const resetPw = async (id: string) => {
   const resetPw = async (employee: TemployeeDto) => {
     const { user, chName, idNumber } = employee
 
@@ -302,12 +299,10 @@ export default function ErpCtrlPermissions() {
 
     myAlert.confirm({
       title: `是否重設密碼`,
-      // content: `id number: ${idNumber}`,
       content: <>
         <span>{`id number: ${idNumber}`}</span>
         <br />
         <span>{`名字: ${chName}`}</span></>,
-      // content: `請確認是否刪除${chName}`,
       props: {
         onOk: onConfirm,
       }
@@ -380,7 +375,6 @@ export default function ErpCtrlPermissions() {
       <EmployeeSelector
         showModal={showAddPanel}
         label="請選擇操作人員"
-        // tip="可複選"
         employeeArr={employeeArr_02 || []}
         onConfirm={onConfirm}
         onCancel={onCancel}

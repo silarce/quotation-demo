@@ -8,7 +8,6 @@ import _ from "lodash"
 
 // global gear
 import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch'
-import CellWrapper from 'components/global/gear/cell/cellWithBar';
 import CellWithBar from "components/global/gear/cell/cellWithBar";
 import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -18,13 +17,16 @@ import style from "./employeeSelector.module.scss"
 // type
 import { TemployeeDto } from 'js/api/dtoTypes';
 
+// api
+import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
 
 
-export default function EmployeeSelector(
+
+export default function EmployeeSelector03(
   {
-    showModal, setShowModal,
-    employeeArr, getCustomerByPage,
-    searchEmployee,
+    showModal,
+    // employeeArr,
+    // searchEmployee,
     onConfirm,
     onCancel,
     label,
@@ -33,43 +35,81 @@ export default function EmployeeSelector(
   }:
     {
       showModal: boolean
-      employeeArr: TemployeeDto[]
-      searchEmployee: (v: string) => void
       onConfirm: (v: TemployeeDto[]) => void
       onCancel: () => void
       label?: string
       tip?: React.ReactNode
-      getCustomerByPage?: () => void
-      setShowModal?: Dispatch<SetStateAction<boolean>>
       selLimit?: 1
+      // employeeArr: TemployeeDto[]
+      // searchEmployee: (v: string) => void
+      // getCustomerByPage?: () => void
+      // setShowModal?: Dispatch<SetStateAction<boolean>>
     }
 ) {
 
-  // const [viewRef, inView] = useInView();
-
-
-  // useEffect(() => {
-  //   if (!inView) return
-  //   getCustomerByPage()
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [inView])
-
-
-  // ==================================================
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
 
-  // 搜尋過濾
+  const [searchValue, setSearchValue] =
+    useState<string | undefined | null>(null)
+  const [page, setPage] = useState(1)
+
+  const params: TapiGetEmployeeParams = (() => {
+    const allNum = /^\d+$/.test(searchValue ?? "n")
+    const grade = allNum ? searchValue : undefined
+    return {
+      page: page,
+      pageSize: 20,
+      populate: ["jobs"],
+      filter: {
+        "$or": {
+          idNumber: { $containsi: searchValue },
+          chName: { $containsi: searchValue },
+          "jobs.name": { $containsi: searchValue },
+          "jobs.grade": { $eq: grade },
+        }
+      }
+    }
+  })()
+
+  const { data, update, update_infinite } = useEmployee(params)
+  const employeeArr = data?.data || []
+  const meta = data?.meta
+
+  const [viewRef, inView] = useInView();
+
+  useEffect(() => {
+    if (!showModal) return
+    setPage(1)
+    update()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue, showModal])
+
+  useEffect(() => {
+    if (!showModal) return
+    if (!inView) return
+    if (!meta?.hasNextPage) return;
+    setPage(page => ++page)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
+  useEffect(() => {
+    if (page === 1) return;
+    update_infinite()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
+
+
+
   // ==================================================
+
   const onClick = (newEmp: TemployeeDto) => {
     const newArr = [...selEmployeeArr]
-
     if (selLimit === 1) {
       newArr[0] = newEmp
       setSelEmployeeArr(newArr)
       return
     }
-
     const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id)
     if (theIndex > -1) newArr.splice(theIndex, 1)
     else newArr.push(newEmp)
@@ -87,34 +127,9 @@ export default function EmployeeSelector(
     setSelEmployeeArr([])
   }
 
-  // // 被選的資料
-  // const [selEmployee, setSelEmployee] = useState<TemployeeDto[]>([])
-
-  // // 搜尋過濾
-  // // ==================================================
-  // const onClick = (newEmp: TemployeeDto) => {
-
-  //   const index = selEmployee.findIndex((emp) => {
-  //     return emp.id === newEmp.id
-  //   })
-
-  //   const arrCopy = _.cloneDeep(selEmployee)
-  //   if (index === -1) { arrCopy.push(newEmp) }
-  //   else { arrCopy.splice(index, 1) }
-
-  //   setSelEmployee(arrCopy)
-  // }
-
-  // const theOnConfirm = () => {
-  //   if (!selEmployee[0]) return ModalInfo("請選擇公司")
-  //   onConfirm(selEmployee)
-  //   theOnCancel()
-  // }
-
-  // const theOnCancel = () => {
-  //   onCancel()
-  //   setSelEmployee([])
-  // }
+  const onSearch = (v: string) => {
+    setSearchValue(v)
+  }
 
   // ==================================================
 
@@ -124,21 +139,28 @@ export default function EmployeeSelector(
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={searchEmployee}
+      onSearch={onSearch}
       width={"800"}
       className={style.container}
       tip={tip}
     >
       <div className={style.listContainer}>
-        {employeeArr.map((emp, index) => {
+        {employeeArr.map((emp, index, arr) => {
           const { idNumber, chName, jobs } = emp
           const { name, grade } = jobs?.[0] ?? {}
 
           const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
+
+          const theViewRef = (() => {
+            if (arr.length - 11 === index) return viewRef
+            return undefined
+          })()
+
           return (
             <CellWithBar key={index} isActive={isActive}>
               <div className={`${style.listItem}`}
                 onClick={() => onClick(emp)}
+                ref={theViewRef}
               >
                 <span>{idNumber}</span>
                 <span>{chName}</span>
