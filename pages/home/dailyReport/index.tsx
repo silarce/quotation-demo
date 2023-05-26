@@ -108,7 +108,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   const [searchObj, setSearchObj] = useState<{
-    isReviewCompleted: boolean | undefined
+    isUserReviewed: boolean | undefined
     date: string | undefined
   }>()
 
@@ -118,13 +118,25 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     return undefined
   })()
 
-  const params = {
-    filter: {
-      "employee.id": filterIsMine,
-      isReviewCompleted: { $eq: searchObj?.isReviewCompleted },
-      date: { $eq: searchObj?.date },
-    },
-  }
+  const params = (() => {
+    let isUserReviewed
+    if (searchObj?.isUserReviewed === undefined) isUserReviewed = undefined
+    if (searchObj?.isUserReviewed === true) isUserReviewed = { $notNull: true }
+    if (searchObj?.isUserReviewed === false) isUserReviewed = { $null: true }
+    return {
+      filter: {
+        "employee.id": filterIsMine,
+        "$and": {
+          "reviewStatus.reviewedAt": isUserReviewed,
+          "reviewStatus.reviewerEmployee.id": { $eq: userInfo.employee?.id },
+        },
+
+        date: { $eq: searchObj?.date },
+      },
+    }
+  })()
+
+
   const {
     dailyReport, updateDailyReports, } = useApiDailyReports(params)
   const sortedDailyReport = useMemo(() => {
@@ -382,16 +394,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const doSearch: TdoSearch = (arr) => {
 
     const reviewedAtValue = (arr[0] as Toption).value
-    const isReviewCompleted = (() => {
+    const isUserReviewed = (() => {
       if (reviewedAtValue === "全部") return undefined
       if (reviewedAtValue === "未審核") return false
       if (reviewedAtValue === "已審核") return true
     })()
-    // const reviewedAt = (() => {
-    //   if (reviewedAtValue === "全部") return undefined
-    //   if (reviewedAtValue === "未審核") return { $null: true }
-    //   if (reviewedAtValue === "已審核") return { $notNull: true }
-    // })()
+
 
     const date = (() => {
       const theDate = arr[1] as string
@@ -404,7 +412,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (date === "wrongDate")
       return myAlert.warning({ title: "時間格式錯誤", content: "時間格式例:101-01-01" })
     setSearchObj({
-      isReviewCompleted,
+      isUserReviewed,
       date
     })
   }
@@ -547,7 +555,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (identity === "reporter") {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
-        // if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
+        // if (reportInEdit.isUserReviewed) return panelList_reporter_reviewed
         if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
         if (isReportEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
