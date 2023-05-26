@@ -28,6 +28,7 @@ export default function EmployeeSelector(
     onConfirm,
     onCancel,
     label,
+    tip,
   }:
     {
       showModal: boolean
@@ -37,8 +38,10 @@ export default function EmployeeSelector(
       onConfirm: (v: TemployeeDto[]) => void
       onCancel: () => void
       label?: string
+      tip?: React.ReactNode
       getCustomerByPage?: () => void
       setShowModal?: Dispatch<SetStateAction<boolean>>
+
     }
 ) {
 
@@ -117,6 +120,7 @@ export default function EmployeeSelector(
       onSearch={searchEmployee}
       width={"800"}
       className={style.container}
+      tip={tip}
     >
       <div className={style.listContainer}>
         {employeeArr.map((emp, index) => {

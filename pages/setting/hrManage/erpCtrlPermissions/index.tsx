@@ -362,35 +362,21 @@ export default function ErpCtrlPermissions() {
       <EmployeeSelector
         showModal={showAddPanel}
         label="請選擇操作人員"
-        // tip="僅單選(後端還未提供複選api)"
+        tip="可複選"
         employeeArr={employeeArr_02 || []}
         onConfirm={onConfirm}
         onCancel={onCancel}
         searchEmployee={searchEmployee}
-      // selectLimit={1}
       />
-
-      {/* <SelectEmployeePanel
-        visible={showAddPanel}
-        label="請選擇操作人員"
-        // tip="僅單選(後端還未提供複選api)"
-        employeeList={employeeList_all}
-        onConfirm={onConfirm}
-        onCancel={onCancel}
-        selectLimit={1}
-      /> */}
-
       <TwoButtonModal
         visible={!!selId}
         text={`請確定要刪除「${selIdNumber}」「${selChName}」?`}
         onConfirm={() => removeEmployee(selId)}
         onCancel={cancelDelete}
       />
-
     </SubLayer>
   )
 }
-
 
 // ==================================================================
 
