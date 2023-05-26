@@ -409,7 +409,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       { options: reportedAtOptions, width: "110px" },
       { placeholder: "搜尋日期", width: "80px" }
     ]
-    if (identity === "reporter") arr.shift()
     return arr
   })()
 
