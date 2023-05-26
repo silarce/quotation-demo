@@ -29,6 +29,7 @@ export default function EmployeeSelector(
     onCancel,
     label,
     tip,
+    selLimit,
   }:
     {
       showModal: boolean
@@ -41,7 +42,8 @@ export default function EmployeeSelector(
       tip?: React.ReactNode
       getCustomerByPage?: () => void
       setShowModal?: Dispatch<SetStateAction<boolean>>
-
+      // selLimit?: number
+      selLimit?: 1
     }
 ) {
 
@@ -63,6 +65,13 @@ export default function EmployeeSelector(
   // ==================================================
   const onClick = (newEmp: TemployeeDto) => {
     const newArr = [...selEmployeeArr]
+
+    if (selLimit === 1) {
+      newArr[0] = newEmp
+      setSelEmployeeArr(newArr)
+      return
+    }
+
     const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id)
     if (theIndex > -1) newArr.splice(theIndex, 1)
     else newArr.push(newEmp)

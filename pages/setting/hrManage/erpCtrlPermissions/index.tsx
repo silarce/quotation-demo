@@ -362,11 +362,12 @@ export default function ErpCtrlPermissions() {
       <EmployeeSelector
         showModal={showAddPanel}
         label="請選擇操作人員"
-        tip="可複選"
+        // tip="可複選"
         employeeArr={employeeArr_02 || []}
         onConfirm={onConfirm}
         onCancel={onCancel}
         searchEmployee={searchEmployee}
+        selLimit={1}
       />
       <TwoButtonModal
         visible={!!selId}
