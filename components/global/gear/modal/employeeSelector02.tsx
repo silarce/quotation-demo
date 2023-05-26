@@ -24,7 +24,7 @@ export default function EmployeeSelector(
   {
     showModal, setShowModal,
     employeeArr, getCustomerByPage,
-    searchCustomer: searchEmployee,
+    searchEmployee,
     onConfirm,
     onCancel,
     label,
@@ -32,9 +32,9 @@ export default function EmployeeSelector(
     {
       showModal: boolean
       employeeArr: TemployeeDto[]
-      searchCustomer: (v: string) => void
+      searchEmployee: (v: string) => void
       // onConfirm: (v: TemployeeDto[]) => void
-      onConfirm: (v: TemployeeDto) => void
+      onConfirm: (v: TemployeeDto[]) => void
       onCancel: () => void
       label?: string
       getCustomerByPage?: () => void
@@ -54,23 +54,27 @@ export default function EmployeeSelector(
 
   // ==================================================
   // 被選的資料
-  const [selEmployee, setSelEmployee] = useState<TemployeeDto>()
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
 
   // 搜尋過濾
   // ==================================================
   const onClick = (newEmp: TemployeeDto) => {
-    setSelEmployee(newEmp)
+    const newArr = [...selEmployeeArr]
+    const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id)
+    if (theIndex > -1) newArr.splice(theIndex, 1)
+    else newArr.push(newEmp)
+    setSelEmployeeArr(newArr)
   }
 
   const theOnConfirm = () => {
-    if (!selEmployee) return ModalInfo("請選擇公司")
-    onConfirm(selEmployee)
+    if (!selEmployeeArr) return ModalInfo("請選擇公司")
+    onConfirm(selEmployeeArr)
     theOnCancel()
   }
 
   const theOnCancel = () => {
     onCancel()
-    setSelEmployee(undefined)
+    setSelEmployeeArr([])
   }
 
   // // 被選的資料
@@ -118,8 +122,8 @@ export default function EmployeeSelector(
         {employeeArr.map((emp, index) => {
           const { idNumber, chName, jobs } = emp
           const { name, grade } = jobs?.[0] ?? {}
-          // const isActive = selEmployee.some((selEmp) => { return selEmp.id === emp.id })
-          const isActive = selEmployee?.id === emp.id
+
+          const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
           return (
             <CellWithBar key={index} isActive={isActive}>
               <div className={`${style.listItem}`}
