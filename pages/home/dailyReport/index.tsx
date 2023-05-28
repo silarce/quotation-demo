@@ -35,8 +35,10 @@ import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
+  Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
+  useApiGetDailyReportsWorkers,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -119,18 +121,39 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   })()
 
   const params = (() => {
+
+    let userId = userInfo.employee?.id
     let isUserReviewed
-    if (searchObj?.isUserReviewed === undefined) isUserReviewed = undefined
-    if (searchObj?.isUserReviewed === true) isUserReviewed = { $notNull: true }
-    if (searchObj?.isUserReviewed === false) isUserReviewed = { $null: true }
+    let isReviewCompleted
+    if (searchObj?.isUserReviewed === undefined) {
+      isUserReviewed = undefined
+      isReviewCompleted = undefined
+    }
+    if (searchObj?.isUserReviewed === true) {
+      isUserReviewed = { $notNull: true }
+      isReviewCompleted = true
+    }
+    if (searchObj?.isUserReviewed === false) {
+      isUserReviewed = { $null: true }
+      isReviewCompleted = false
+    }
+
+    if (isMine) {
+      userId = undefined
+      isUserReviewed = undefined
+    }
+    else {
+      isReviewCompleted = undefined
+    }
+
     return {
       filter: {
         "employee.id": filterIsMine,
         "$and": {
           "reviewStatus.reviewedAt": isUserReviewed,
-          "reviewStatus.reviewerEmployee.id": { $eq: userInfo.employee?.id },
+          "reviewStatus.reviewerEmployee.id": { $eq: userId },
         },
-
+        "isReviewCompleted": { $eq: isReviewCompleted },
         date: { $eq: searchObj?.date },
       },
     }
@@ -162,18 +185,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
   const employeeArr = employeeRes?.data
   // ---------------------------
-
+  // 取得工務人員
   const [searchValue, setSearchValue] = useState<string>()
-  const params_panel = {
+  const params_panel: Tparams = {
     pageSize: 999999,
     populate: ["jobs"],
     filter: {
       chName: { $contains: searchValue || undefined }
     }
   }
-  const { data: employeeRes_panel, update: updateEmployeeArr_panel }
-    = useEmployee(params_panel)
-  const employeeArr_panel = employeeRes_panel?.data
+  const { workers, updateWorkers: updateEmployeeArr_panel }
+    = useApiGetDailyReportsWorkers(params_panel)
 
   const editSearchValue = (v: string | undefined) => {
     setSearchValue(v)
@@ -201,7 +223,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       finally { setIsLoading(false) }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchObj, isMine, router])
+  }, [searchObj])
+
+  useEffect(() => {
+    setSearchObj({
+      isUserReviewed: undefined,
+      date: undefined,
+    })
+  }, [isMine])
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -387,7 +416,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       { options: reportedAtOptions, width: "110px" },
       { placeholder: "搜尋日期", width: "80px" }
     ]
-    if (identity === "reporter") arr.shift()
     return arr
   })()
 
@@ -532,7 +560,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
 
   const panelList = (() => {
-
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
       else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
@@ -586,6 +613,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         containerChildren={<LoadingCover01 isLoading={isLoading} />}
       >
         <PageHeader02
+          key={+isMine}
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
@@ -609,7 +637,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
-            employeeArr={employeeArr_panel ?? []}
+            workerArr={workers ?? []}
             updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}

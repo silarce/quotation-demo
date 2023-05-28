@@ -16,7 +16,7 @@ import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals'
 import style from "./employeeSelector.module.scss"
 
 // type
-import { TemployeeDto } from 'js/api/dtoTypes';
+import {  TdailyReportWokerDto } from 'js/api/dtoTypes';
 
 
 
@@ -24,26 +24,23 @@ export default function EmployeeSelector(
   {
     showModal, setShowModal,
     employeeArr, getCustomerByPage,
-    searchEmployee,
+    searchCustomer: searchEmployee,
     onConfirm,
     onCancel,
     label,
-    tip,
-    selLimit,
   }:
     {
       showModal: boolean
-      employeeArr: TemployeeDto[]
-      searchEmployee: (v: string) => void
-      onConfirm: (v: TemployeeDto[]) => void
+      employeeArr: TdailyReportWokerDto[]
+      searchCustomer: (v: string) => void
+      onConfirm: (v: TdailyReportWokerDto) => void
       onCancel: () => void
       label?: string
-      tip?: React.ReactNode
       getCustomerByPage?: () => void
       setShowModal?: Dispatch<SetStateAction<boolean>>
-      selLimit?: 1
     }
 ) {
+
 
   // const [viewRef, inView] = useInView();
 
@@ -57,34 +54,23 @@ export default function EmployeeSelector(
 
   // ==================================================
   // 被選的資料
-  const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
+  const [selEmployee, setSelEmployee] = useState<TdailyReportWokerDto>()
 
   // 搜尋過濾
   // ==================================================
-  const onClick = (newEmp: TemployeeDto) => {
-    const newArr = [...selEmployeeArr]
-
-    if (selLimit === 1) {
-      newArr[0] = newEmp
-      setSelEmployeeArr(newArr)
-      return
-    }
-
-    const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id)
-    if (theIndex > -1) newArr.splice(theIndex, 1)
-    else newArr.push(newEmp)
-    setSelEmployeeArr(newArr)
+  const onClick = (newEmp: TdailyReportWokerDto) => {
+    setSelEmployee(newEmp)
   }
 
   const theOnConfirm = () => {
-    if (!selEmployeeArr) return ModalInfo("請選擇公司")
-    onConfirm(selEmployeeArr)
+    if (!selEmployee) return ModalInfo("請選擇公司")
+    onConfirm(selEmployee)
     theOnCancel()
   }
 
   const theOnCancel = () => {
     onCancel()
-    setSelEmployeeArr([])
+    setSelEmployee(undefined)
   }
 
   // // 被選的資料
@@ -127,14 +113,13 @@ export default function EmployeeSelector(
       onSearch={searchEmployee}
       width={"800"}
       className={style.container}
-      tip={tip}
     >
       <div className={style.listContainer}>
         {employeeArr.map((emp, index) => {
           const { idNumber, chName, jobs } = emp
           const { name, grade } = jobs?.[0] ?? {}
-
-          const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
+          // const isActive = selEmployee.some((selEmp) => { return selEmp.id === emp.id })
+          const isActive = selEmployee?.id === emp.id
           return (
             <CellWithBar key={index} isActive={isActive}>
               <div className={`${style.listItem}`}

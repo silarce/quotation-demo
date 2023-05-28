@@ -11,12 +11,13 @@ import {
   TcreateDailyReportItemDto, TupdateDailyReportDto,
   TemployeeDto,
   TpageMetaDto,
-
-
+  TdailyReportWorkerJobsDto,
+  TdailyReportWokerDto,
+  Tparams,
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto }
+export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportWokerDto as TdailyReportWokerDro, Tparams }
 // =================================================================
 
 
@@ -175,4 +176,30 @@ export const apiIsReviewer = () => {
   return axi.get(api)
     .then(({ data }) => data as { isReviewer: boolean })
     .catch(err => Promise.reject(err))
+}
+
+
+type TgetDailyReportsWorkers = {
+  data: TdailyReportWokerDto[]
+  meta: TpageMetaDto
+}
+
+export const apiGetDailyReportsWorkers = (params?: Tparams) => {
+  const api = "/daily-reports/workers"
+  return axi.get(api, { params })
+    .then(({ data }) => data as TgetDailyReportsWorkers)
+    .catch(err => Promise.reject(err))
+}
+
+export const useApiGetDailyReportsWorkers = (params?: Tparams) => {
+  const [res, setRes] = useState<TgetDailyReportsWorkers>()
+  const update = async () => {
+    const res = await apiGetDailyReportsWorkers(params)
+    if (res) setRes(res)
+    return res
+  }
+  return {
+    workers: res?.data, meta: res?.meta,
+    updateWorkers: update, setRes,
+  }
 }
