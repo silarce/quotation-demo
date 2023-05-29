@@ -325,7 +325,8 @@ export default function ErpCtrlPermissions() {
   const searchGroup: TsearchGroup = {
     searchTargetList,
     doSearch: (valueArr: (Toption | null | string)[]) => {
-      const department = (valueArr[0] as Toption).value
+
+      const department = (valueArr[0] as Toption | null)?.value
       const content = valueArr[1] as string
 
       const query: {
