@@ -14,12 +14,11 @@ import SubLayer from "components/Layer/SubLayer/SubLayer";
 
 // component
 import Table from "components/page/setting/hrManage/table/table";
-import SelectEmployeePanel from "components/page/setting/hrManage/modal/selectEmployeePanel"
+import EmployeeSelector from "components/global/gear/modal/employeeSelector02";
 
 // gear
 import PageHeader02, { TsearchGroup, Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import TwoButtonModal from "components/global/gear/modal/simpleModal/twoButtonModal"
-import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import { setRootLoading, showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
@@ -28,7 +27,7 @@ import iconPassword from 'public/image/icon/password.svg';
 
 // api
 import {
-  TapiGetEmployeeParams,
+  TapiGetEmployeeParams, TemployeeDto,
   useEmployee, apiPostEmployeeErpUser, apiDeleteEmployeeErpUser,
 } from "js/api/api_employee";
 import { useDepartments } from "js/api/api_department";
@@ -49,8 +48,7 @@ export default function ErpCtrlPermissions() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isReady, setIsReady] = useState(false)
-  // 只是用來rerender
-  const [rerender, setRerender] = useState(false)
+
   // ------------------------------------------------------------------------
 
   const params: TapiGetEmployeeParams = {
@@ -91,13 +89,30 @@ export default function ErpCtrlPermissions() {
 
   // ____________________________________________
 
-  // 新增操作人員用的
-  const { data: employeeData02, update: updateEmployeeData02 } = useEmployee({
-    pageSize: 999999,
-    populate: ["jobs"],
-  })
-  const employeeList_all = employeeData02?.data || []
+  const [empArr02SearchValue, setEmpArr02SearchValue] =
+    useState<string | undefined | null>(null)
 
+  // 新增操作人員用的
+  const params_employeeArr_02 = (() => {
+    const allNum = /^\d+$/.test(empArr02SearchValue ?? "n")
+    const grade = allNum ? empArr02SearchValue : undefined
+    return {
+      pageSize: 999999,
+      populate: ["jobs"],
+      filter: {
+        "$or": {
+          idNumber: { $containsi: empArr02SearchValue },
+          chName: { $containsi: empArr02SearchValue },
+          "jobs.name": { $containsi: empArr02SearchValue },
+          "jobs.grade": { $eq: grade },
+        }
+      }
+    }
+  })()
+
+  const { data: employeeData02, update: updateEmployeeData02 }
+    = useEmployee(params_employeeArr_02)
+  const employeeArr_02 = employeeData02?.data ?? []
   // ____________________________________________
 
   // 部門列表
@@ -124,17 +139,14 @@ export default function ErpCtrlPermissions() {
   useEffect(() => {
     (async () => {
       setIsLoading(true)
-
-      await Promise.all([updateEmployeeData01(), updateEmployeeData02(), updateDepartments()])
+      await Promise.all([updateEmployeeData01(), updateDepartments()])
         .then((valueArr) => valueArr)
         .catch(err => Promise.reject(err))
-
       setIsReady(true)
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
 
   useEffect(() => {
     if (!isReady) return
@@ -142,6 +154,21 @@ export default function ErpCtrlPermissions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
+  useEffect(() => {
+    if (empArr02SearchValue === null) return;
+    if (isLoading) return
+    (async () => {
+      try {
+        showRootLoading(true)
+        await updateEmployeeData02()
+        setShowAddPanel(true)
+      } catch (error) {
+        myAlert.err({ title: "取得人員資料失敗" })
+      }
+      showRootLoading(false)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [empArr02SearchValue])
 
 
   // ------------------------------------------------------------------------
@@ -149,39 +176,54 @@ export default function ErpCtrlPermissions() {
 
   const [showAddPanel, setShowAddPanel] = useState(false)
 
-  const openAddPanel = () => {
+  const openAddPanel = async () => {
     if (isLoading) return
-    setShowAddPanel(true)
+    try {
+      showRootLoading(true)
+      await updateEmployeeData02()
+      setShowAddPanel(true)
+    } catch (error) {
+      myAlert.err({ title: "取得人員資料失敗" })
+    }
+    showRootLoading(false)
   }
 
-  const onConfirm = async (indexArr: number[]) => {
+  const onConfirm = async (employeeArr: TemployeeDto[]) => {
     if (isLoading) return
-    const id = employeeList_all[indexArr[0]].id
-    showRootLoading(true)
-    try {
-      const res = await apiPostEmployeeErpUser(id)
-      newPwTip({ title: "預設密碼", content: res.password })
-      setShowAddPanel(false)
-    }
-    catch (error) {
-      const err = error as AxiosError<{
-        error: string
-        message: string
-        statusCode: number
-      }>
-      const { message, statusCode } = err.response?.data ?? {}
-      myAlert.err({
-        title: statusCode,
-        content: message,
-      })
-    }
 
+    const employeeIdArr = employeeArr.map((emp) => emp.id)
+    showRootLoading(true)
+
+    for (const id of employeeIdArr) {
+      try {
+        const res = await apiPostEmployeeErpUser(id)
+        newPwTip({ title: "預設密碼", content: res.password })
+        setShowAddPanel(false)
+      }
+      catch (error) {
+        const err = error as AxiosError<{
+          error: string
+          message: string
+          statusCode: number
+        }>
+        const { message, statusCode } = err.response?.data ?? {}
+        myAlert.err({
+          title: statusCode,
+          content: message,
+        })
+      }
+    }
     showRootLoading(false)
     await updateList()
   }
 
   const onCancel = () => {
     setShowAddPanel(false)
+  }
+
+  const searchEmployee = (v: string) => {
+    if (!v) setEmpArr02SearchValue(undefined)
+    setEmpArr02SearchValue(v)
   }
 
   // ------------------------------------------------------------------------
@@ -221,35 +263,50 @@ export default function ErpCtrlPermissions() {
 
   // ------------------------------------------------------------------------
 
-  const resetPw = async (id: string) => {
-    try {
-      if (isLoading) return
-      setIsLoading(true)
-      const res = await apiPatchUserResetPassword(id)
-      const { password, account, username } = res
-      myAlert.success({
-        props: {
-          title: "密碼重置成功",
-          content:
-            <ResetPwContent account={account} username={username} newPw={password} />
-        }
-      })
+  const resetPw = async (employee: TemployeeDto) => {
+    const { user, chName, idNumber } = employee
+
+    const onConfirm = async () => {
+      try {
+        if (isLoading) return
+        setIsLoading(true)
+        const res = await apiPatchUserResetPassword(user!.id)
+        const { password, account, username } = res
+        myAlert.success({
+          props: {
+            title: "密碼重置成功",
+            content:
+              <ResetPwContent account={account} username={chName} newPw={password} />
+          }
+        })
+      }
+      catch (error) {
+        const err = error as AxiosError<{
+          error: string
+          message: string
+          statusCode: number
+        }>
+        const { error: resSerror, message } = err.response?.data ?? {}
+        myAlert.err({
+          title: resSerror,
+          content: message
+        })
+      }
+      finally {
+        setIsLoading(false)
+      }
     }
-    catch (error) {
-      const err = error as AxiosError<{
-        error: string
-        message: string
-        statusCode: number
-      }>
-      const { error: resSerror, message } = err.response?.data ?? {}
-      myAlert.err({
-        title: resSerror,
-        content: message
-      })
-    }
-    finally {
-      setIsLoading(false)
-    }
+
+    myAlert.confirm({
+      title: `是否重設密碼`,
+      content: <>
+        <span>{`id number: ${idNumber}`}</span>
+        <br />
+        <span>{`名字: ${chName}`}</span></>,
+      props: {
+        onOk: onConfirm,
+      }
+    })
   }
 
   // ------------------------------------------------------------------------
@@ -315,27 +372,24 @@ export default function ErpCtrlPermissions() {
         {/* <LoadingCover01 isLoading={isLoading} /> */}
       </div>
 
-      <SelectEmployeePanel
-        visible={showAddPanel}
+      <EmployeeSelector
+        showModal={showAddPanel}
         label="請選擇操作人員"
-        // tip="僅單選(後端還未提供複選api)"
-        employeeList={employeeList_all}
+        employeeArr={employeeArr_02 || []}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        selectLimit={1}
+        searchEmployee={searchEmployee}
+        selLimit={1}
       />
-
       <TwoButtonModal
         visible={!!selId}
         text={`請確定要刪除「${selIdNumber}」「${selChName}」?`}
         onConfirm={() => removeEmployee(selId)}
         onCancel={cancelDelete}
       />
-
     </SubLayer>
   )
 }
-
 
 // ==================================================================
 

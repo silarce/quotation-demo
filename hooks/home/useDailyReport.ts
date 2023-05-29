@@ -3,7 +3,7 @@ import _ from "lodash"
 import moment from "moment";
 
 // type
-import { TdailyReportItemDto, TemployeeDto, TuserDto } from "js/api/dtoTypes";
+import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoTypes";
 // api
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 
@@ -23,7 +23,9 @@ type ThookEmptyReport = {
   employeeId: string | undefined
 }
 
-const emptyReportItem: TdailyReportItemDto = {
+type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
+
+const emptyReportItem: TemptyReportItem = {
   id: "",
   order: -1,
   createdAt: "",
@@ -31,7 +33,7 @@ const emptyReportItem: TdailyReportItemDto = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  meals: "breakfast",
+  meals: "none",
   description: "",
   departureTime: null,
   arrivalTime: null,
@@ -48,16 +50,18 @@ const emptyReportItem: TdailyReportItemDto = {
 class Class_reportItem {
   constructor(
     reRender: () => void,
-    reportItem: TdailyReportItemDto = _.cloneDeep(emptyReportItem)
+    reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)
   ) {
     this._reRender = reRender
     this._item = reportItem
-    if (!this._item.workers) this._item.workers = []
     this._stayLength = `${this._item.stayLength}`
+    this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
+
   } // constructor
   private _reRender
   private _item
   private _stayLength
+  private _workers
 
   get id() {
     if ("id" in this._item) return this._item.id
@@ -134,13 +138,14 @@ class Class_reportItem {
   get dispatchOrderId() { return this._item.workOrderNumber }
   set dispatchOrderId(v) { this._item.workOrderNumber = v; this._reRender() }
 
-  get workers() { return this._item.workers as TemployeeDto[] }
-  addWorker = (v: TemployeeDto) => {
-    this._item.workers!.push(v)
+
+  get workers() { return this._workers }
+  addWorker = (v: TdailyReportWokerDto) => {
+    this._workers.push(v)
     this._reRender()
   }
   removeWorker = (index: number) => {
-    this._item.workers?.splice(index, 1)
+    this._workers?.splice(index, 1)
     this._reRender()
   }
 
@@ -153,13 +158,16 @@ class Class_reportItem {
       return idArr
     })()
 
-
+    const meals = (() => {
+      if (this.meals === "none") return null
+      else return this.meals
+    })()
 
     return {
       periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
-      meals: this.meals || "breakfast",
+      meals,
       description: this.description,
 
       departureTime: this.departureTime || null,
@@ -169,16 +177,11 @@ class Class_reportItem {
       stayLength: this._item.stayLength || 0,
 
       workerIds: workerIdArr,
-      // workerIds: null,
       workOrderNumber: this.dispatchOrderId ?? "",
-      // workerIds: null,
-      // workOrderNumber: null
     }
   }
 
 } // Class_dailyReportItem
-
-
 
 
 const useReport = () => {
@@ -218,7 +221,6 @@ const useReport = () => {
         isAllowToReview = true
       }
       return !!reviewedAt
-      // return false
     })
 
     const theReport: ThookEmptyReport = {

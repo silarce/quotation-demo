@@ -16,7 +16,7 @@ import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals'
 import style from "./employeeSelector.module.scss"
 
 // type
-import { TemployeeDto } from 'js/api/dtoTypes';
+import {  TdailyReportWokerDto } from 'js/api/dtoTypes';
 
 
 
@@ -31,16 +31,16 @@ export default function EmployeeSelector(
   }:
     {
       showModal: boolean
-      employeeArr: TemployeeDto[]
+      employeeArr: TdailyReportWokerDto[]
       searchCustomer: (v: string) => void
-      // onConfirm: (v: TemployeeDto[]) => void
-      onConfirm: (v: TemployeeDto) => void
+      onConfirm: (v: TdailyReportWokerDto) => void
       onCancel: () => void
       label?: string
       getCustomerByPage?: () => void
       setShowModal?: Dispatch<SetStateAction<boolean>>
     }
 ) {
+
 
   // const [viewRef, inView] = useInView();
 
@@ -54,11 +54,11 @@ export default function EmployeeSelector(
 
   // ==================================================
   // 被選的資料
-  const [selEmployee, setSelEmployee] = useState<TemployeeDto>()
+  const [selEmployee, setSelEmployee] = useState<TdailyReportWokerDto>()
 
   // 搜尋過濾
   // ==================================================
-  const onClick = (newEmp: TemployeeDto) => {
+  const onClick = (newEmp: TdailyReportWokerDto) => {
     setSelEmployee(newEmp)
   }
 

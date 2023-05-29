@@ -1,8 +1,15 @@
 
 
-// get
-// get
-// get
+export type Tparams = {
+  order?: "ASC" | "DESC",
+  page?: number,
+  pageSize?: number,
+  filter?: {
+    [key: string]: any
+  }
+  populate?: string[]
+  sort?: string
+}
 
 export type TpageMetaDto = {
   page: number
@@ -264,7 +271,7 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  meals: "breakfast" | "lunch" | "dinner"
+  meals: "breakfast" | "lunch" | "dinner" | null
   description: string
   /**date 發出req時會自動被轉為字串*/
   departureTime: string | null
@@ -281,6 +288,26 @@ export type TcreateDailyReportItemDto = {
 export type TupdateDailyReportDto = {
   date: Date // date
   items: TcreateDailyReportItemDto[]
+}
+
+export type TdailyReportWorkerJobsDto = {
+  name: TjobDto["name"]
+  grade: TjobDto["grade"]
+}
+// export type TdailyReportWorkerJobsDto = Pick<TjobDto, "name" | "grade">
+
+
+// export type TdailyReportWokerDro = {
+//   id: string
+//   idNumber: string
+//   chName: string,
+//   jobs: TdailyReportWorkerJobsDto[]
+// }
+export type TdailyReportWokerDto = {
+  id: TemployeeDto["id"]
+  idNumber: TemployeeDto["idNumber"]
+  chName: TemployeeDto["chName"]
+  jobs: TdailyReportWorkerJobsDto[]
 }
 
 // =======================================================

@@ -66,7 +66,6 @@ export default function EditEmployeeItem01({ classEmployee }: {
     },
   }
 
-
   // ======================================================
   return (
     <div className={scss.editEmployeeItem01}>
@@ -99,7 +98,6 @@ export default function EditEmployeeItem01({ classEmployee }: {
         {/* 右邊 */}
         <div>
           {/*  */}
-
           <InputSel
             className={scss.inputSel}
             label={"生日"}
@@ -108,8 +106,8 @@ export default function EditEmployeeItem01({ classEmployee }: {
             captionWidth={"60px"}
             datePickerProps={{
               value: classEmployee.birthday,
-              onChange: (dateString: string) => {
-                classEmployee.birthday = dateString
+              onChange02: (moment: moment.Moment | null) => {
+                classEmployee.birthday = moment?.toISOString() ?? ""
               },
             }}
           />
@@ -297,11 +295,4 @@ const config02: {
     labelWidth: config02Width
   },
 }
-
-
-
-
-
-
-
 
