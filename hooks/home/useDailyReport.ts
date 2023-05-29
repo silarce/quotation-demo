@@ -18,7 +18,9 @@ type ThookEmptyReport = {
   date: string
   items: Class_reportItem[]
   isAllowToReview: boolean
+  isReviewedByOther: boolean
   isReviewedByUser: boolean
+  isReviewCompleted: boolean
   isEdit: boolean
   employeeId: string | undefined
 }
@@ -199,7 +201,9 @@ const useReport = () => {
     date: moment().format("yyyy-MM-DD"),
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,
+    isReviewedByOther: false,
     isReviewedByUser: false,
+    isReviewCompleted: false,
     isEdit: false,
     employeeId: undefined
   }) // emptyReportCre
@@ -214,11 +218,15 @@ const useReport = () => {
     if (!dailyReport) return setReport(emptyReportCre())
 
     let isAllowToReview: boolean = false
-    const isReviewedByUser = dailyReport.reviewStatus.some((statu) => {
+
+    let isReviewedByUser: boolean = false
+
+    const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
       const employeeId = statu.reviewerEmployee.id
       const reviewedAt = statu.reviewedAt
       if (employeeId === userInfo.employee?.id) {
         isAllowToReview = true
+        if (reviewedAt) isReviewedByUser = true
       }
       return !!reviewedAt
     })
@@ -228,7 +236,9 @@ const useReport = () => {
       date: dailyReport.date,
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       isAllowToReview,
+      isReviewedByOther: isReviewedByOther,
       isReviewedByUser,
+      isReviewCompleted: dailyReport.isReviewCompleted,
       isEdit: false,
       employeeId: dailyReport.employee?.id
     }
@@ -242,24 +252,36 @@ const useReport = () => {
       const date = report.date
       const items = report.items
       const isAllowToReview = report.isAllowToReview
+      const isReviewedByOther = report.isReviewedByOther
       const isReviewedByUser = report.isReviewedByUser
+      const isReviewCompleted = report.isReviewCompleted
       const isEdit = report.isEdit
       const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
-      return { id, date, items, isAllowToReview, isReviewedByUser, isEdit, employeeId }
+      return {
+        id, date, items,
+        isAllowToReview, isReviewedByOther, isReviewedByUser, isReviewCompleted,
+        isEdit, employeeId
+      }
     })
   }
   // 
-  const changeReviewToChecked = (isReviewedByUser: boolean) => {
+  const changeReviewToChecked = (isReviewedByOther: boolean) => {
     setReport(report => {
       if (!report) return report
+      const isReviewedByUser = true
       const id = report.id
       const date = report.date
       const items = report.items
       const isEdit = report.isEdit
       const isAllowToReview = report.isAllowToReview
+      const isReviewCompleted = report.isReviewCompleted
       const employeeId = report.employeeId
-      return { id, date, items, isReviewedByUser, isEdit, isAllowToReview, employeeId }
+      return {
+        id, date, items,
+        isAllowToReview, isReviewedByOther, isReviewCompleted, isReviewedByUser,
+        isEdit, employeeId
+      }
     })
   }
   // 
@@ -278,16 +300,22 @@ const useReport = () => {
       const date = report.date
       const items = report.items
       const isAllowToReview = report.isAllowToReview
+      const isReviewedByOther = report.isReviewedByOther
       const isReviewedByUser = report.isReviewedByUser
+      const isReviewCompleted = report.isReviewCompleted
       const isEdit = !report.isEdit
       const employeeId = report.employeeId
-      return { id, date, items, isAllowToReview, isReviewedByUser, isEdit, employeeId }
+      return {
+        id, date, items,
+        isAllowToReview, isReviewedByOther, isReviewCompleted, isReviewedByUser,
+        isEdit, employeeId
+      }
     })
   }
   // 
   const reportIsEdit = (() => {
     if (!report) return false
-    return (report.isReviewedByUser || !report.isEdit) ? false : true
+    return (report.isReviewedByOther || !report.isEdit) ? false : true
   })()
   // 
   return {

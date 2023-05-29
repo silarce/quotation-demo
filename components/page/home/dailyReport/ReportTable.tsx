@@ -18,7 +18,7 @@ import {
 
 // class
 import { Class_reportItem } from "pages/home/dailyReport"
-import { TemployeeDto, TdailyReportWokerDto } from "js/api/dtoTypes"
+import { TdailyReportWokerDto } from "js/api/dtoTypes"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // icon
@@ -78,9 +78,9 @@ export default function ReportTable(
   // ------------------------------------------------
   return (
     <div className={classNames(scss.table)}>
+      <div className={scss.roof} />
       {/*  */}
       <div className={classNames(scss.thead)}>
-
         {headerKeyArr.map((key, index) => {
           const { label, style, headerClassName: className } = config[key] ?? {}
           // 

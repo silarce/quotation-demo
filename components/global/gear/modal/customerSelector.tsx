@@ -1,6 +1,6 @@
 
 import {
-  useState,  useEffect
+  useState, useEffect
 } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from "lodash"
@@ -12,13 +12,13 @@ import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/ale
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from "./employeeSelector.module.scss"
-
-// type
-import { TemployeeDto } from 'js/api/dtoTypes';
+import style from "./customerSelector.module.scss"
 
 // api
-import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
+import {
+  TcustomerDto, TapiGetCustomersParams,
+  useCustomers,
+} from 'js/api/api_customer';
 
 
 
@@ -33,7 +33,7 @@ export default function EmployeeSelector03(
   }:
     {
       showModal: boolean
-      onConfirm: (v: TemployeeDto[]) => void
+      onConfirm: (v: TcustomerDto[]) => void
       onCancel: () => void
       label?: string
       tip?: React.ReactNode
@@ -43,34 +43,33 @@ export default function EmployeeSelector03(
   const [isLoading, setIsLoading] = useState(false)
 
   // 被選的資料
-  const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto[]>([])
 
   const [searchValue, setSearchValue] =
     useState<string | undefined | null>(null)
   const [pageObj, setPageObj] = useState({ page: -1 })
   const page = pageObj.page
 
-  const params: TapiGetEmployeeParams = (() => {
+  const params: TapiGetCustomersParams = (() => {
     const allNum = /^\d+$/.test(searchValue ?? "n")
     const grade = allNum ? searchValue : undefined
     return {
       page: page,
       pageSize: 20,
-      populate: ["jobs"],
+      // populate: [],
       filter: {
         "$or": {
-          idNumber: { $contains: searchValue },
-          chName: { $contains: searchValue },
-          "jobs.name": { $contains: searchValue },
-          "jobs.grade": { $eq: grade },
+          customerNumber: { $contains: searchValue },
+          name: { $contains: searchValue },
+          // "jobs.name": { $contains: searchValue },
+          // "jobs.grade": { $eq: grade },
         }
       }
     }
   })()
 
-  const { data, setData, update, update_infinite } = useEmployee(params)
-  const employeeArr = data?.data || []
-  const meta = data?.meta
+  const { data: customerArr, meta, setData, update, update_infinite } = useCustomers(params)
+
 
   const [viewRef, inView] = useInView();
 
@@ -104,7 +103,7 @@ export default function EmployeeSelector03(
         try {
           setIsLoading(true)
           await update()
-        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+        } catch (error) { myAlert.err({ title: "取得客戶資料失敗" }) }
         setIsLoading(false)
       })()
     }
@@ -112,7 +111,7 @@ export default function EmployeeSelector03(
       (async () => {
         try {
           await update_infinite()
-        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+        } catch (error) { myAlert.err({ title: "取得客戶資料失敗" }) }
       })()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,7 +121,7 @@ export default function EmployeeSelector03(
 
   // ==================================================
 
-  const onClick = (newEmp: TemployeeDto) => {
+  const onClick = (newEmp: TcustomerDto) => {
     const newArr = [...selEmployeeArr]
     if (selLimit === 1) {
       newArr[0] = newEmp
@@ -136,7 +135,7 @@ export default function EmployeeSelector03(
   }
 
   const theOnConfirm = () => {
-    if (!selEmployeeArr) return ModalInfo("請選擇公司")
+    if (!selEmployeeArr) return ModalInfo("請選擇客戶")
     onConfirm(selEmployeeArr)
     theOnCancel()
   }
@@ -165,9 +164,8 @@ export default function EmployeeSelector03(
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
         <div className={style.listContainer}>
-          {employeeArr.map((emp, index, arr) => {
-            const { idNumber, chName, jobs } = emp
-            const { name, grade } = jobs?.[0] ?? {}
+          {customerArr?.map((emp, index, arr) => {
+            const { customerNumber, name } = emp
 
             const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
 
@@ -182,10 +180,8 @@ export default function EmployeeSelector03(
                   onClick={() => onClick(emp)}
                   ref={theViewRef}
                 >
-                  <span>{idNumber}</span>
-                  <span>{chName}</span>
+                  <span>{customerNumber}</span>
                   <span>{name}</span>
-                  <span>{grade && `Level ${grade}`}</span>
                 </div>
               </CellWithBar>
             )

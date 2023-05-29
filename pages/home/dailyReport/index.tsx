@@ -485,38 +485,42 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     },
     listSwitchButton
   ]
-  /**reviewer 已讀/未讀 */
-  const panelList_reviewer_inEdit: TpanelList = [
+  // ---
+  const doCheck = async () => {
+  
+      if (reportInEdit?.isReviewedByUser === true) {
+        return myAlert.warning({ title: "已審核過" })
+      }
+      if (!reportInEdit?.id) return;
+      try {
+        showRootLoading(true)
+        const res = await apiDailyReports_review(reportInEdit.id)
+        changeReviewToChecked(!!res)
+        showRootLoading(false)
+        await updateDailyReports_withLoading()
+      }
+      catch (error) {
+        const err = error as AxiosError<{
+          error: string
+          message: string
+          statusCode: number
+        }>
+        const { message, statusCode } = err.response?.data ?? {}
+        if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
+        myAlert.err({ title: "審核失敗" })
+      }
+      finally { showRootLoading(false) }
+  }
+
+  /**reviewer 已讀/未讀 isReviewedByUser */
+  const panelList_reviewer_inEdit_user: TpanelList = [
     {
       custom: <CheckButton
+        // checkLabel="已讀"
         checkLabel="已讀"
         uncheckLable="未讀"
         value={!!reportInEdit?.isReviewedByUser}
-        onClick={async () => {
-          if (reportInEdit?.isReviewedByUser) {
-            return myAlert.warning({ title: "已審核過" })
-          }
-          if (!reportInEdit?.id) return;
-          try {
-            showRootLoading(true)
-            const res = await apiDailyReports_review(reportInEdit.id)
-            changeReviewToChecked(!!res)
-            showRootLoading(false)
-            await updateDailyReports_withLoading()
-          }
-          catch (error) {
-            const err = error as AxiosError<{
-              error: string
-              message: string
-              statusCode: number
-            }>
-            const { message, statusCode } = err.response?.data ?? {}
-
-            if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
-            myAlert.err({ title: "審核失敗" })
-          }
-          finally { showRootLoading(false) }
-        }}
+        onClick={doCheck}
       />
     }
   ]
@@ -562,7 +566,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const panelList = (() => {
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
-      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
+      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
       else return []
     }
 
@@ -571,10 +575,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       else {
         if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
           if (isReportEdit) return panelList_reporter_inEdit02
-          if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
+          if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
           return panelList_reporter_inEdit01
         }
-        else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
+        else if (reportInEdit.isAllowToReview) {
+          return panelList_reviewer_inEdit_user
+          // if (reportInEdit.isReviewedByUser) return panelList_reviewer_inEdit_user
+          // if (reportInEdit.isReviewedByOther) return panelList_reviewer_inEdit
+        }
         return []
       }
     }
@@ -583,7 +591,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (!reportInEdit) return panelList_reporter_notInEdit
       else {
         // if (reportInEdit.isUserReviewed) return panelList_reporter_reviewed
-        if (reportInEdit.isReviewedByUser) return panelList_reporter_reviewed
+        if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
         if (isReportEdit) return panelList_reporter_inEdit02
         return panelList_reporter_inEdit01
       }
