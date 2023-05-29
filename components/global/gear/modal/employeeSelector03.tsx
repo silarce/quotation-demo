@@ -1,7 +1,6 @@
 
 import {
-  Dispatch, SetStateAction,
-  useState, useMemo, useEffect
+  useState,  useEffect
 } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from "lodash"
@@ -9,10 +8,11 @@ import _ from "lodash"
 // global gear
 import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch'
 import CellWithBar from "components/global/gear/cell/cellWithBar";
-import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from "./employeeSelector.module.scss"
+import style from "./employeeSelector03.module.scss"
 
 // type
 import { TemployeeDto } from 'js/api/dtoTypes';
@@ -25,8 +25,6 @@ import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
 export default function EmployeeSelector03(
   {
     showModal,
-    // employeeArr,
-    // searchEmployee,
     onConfirm,
     onCancel,
     label,
@@ -40,19 +38,17 @@ export default function EmployeeSelector03(
       label?: string
       tip?: React.ReactNode
       selLimit?: 1
-      // employeeArr: TemployeeDto[]
-      // searchEmployee: (v: string) => void
-      // getCustomerByPage?: () => void
-      // setShowModal?: Dispatch<SetStateAction<boolean>>
     }
 ) {
+  const [isLoading, setIsLoading] = useState(false)
 
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
 
   const [searchValue, setSearchValue] =
     useState<string | undefined | null>(null)
-  const [page, setPage] = useState(1)
+  const [pageObj, setPageObj] = useState({ page: -1 })
+  const page = pageObj.page
 
   const params: TapiGetEmployeeParams = (() => {
     const allNum = /^\d+$/.test(searchValue ?? "n")
@@ -63,8 +59,8 @@ export default function EmployeeSelector03(
       populate: ["jobs"],
       filter: {
         "$or": {
-          idNumber: { $containsi: searchValue },
-          chName: { $containsi: searchValue },
+          idNumber: { $contains: searchValue },
+          chName: { $contains: searchValue },
           "jobs.name": { $containsi: searchValue },
           "jobs.grade": { $eq: grade },
         }
@@ -72,7 +68,7 @@ export default function EmployeeSelector03(
     }
   })()
 
-  const { data, update, update_infinite } = useEmployee(params)
+  const { data, setData, update, update_infinite } = useEmployee(params)
   const employeeArr = data?.data || []
   const meta = data?.meta
 
@@ -80,24 +76,47 @@ export default function EmployeeSelector03(
 
   useEffect(() => {
     if (!showModal) return
-    setPage(1)
-    update()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal])
-
-  useEffect(() => {
-    if (!showModal) return
     if (!inView) return
     if (!meta?.hasNextPage) return;
-    setPage(page => ++page)
+    const newPageObj = { ...pageObj, page: pageObj.page + 1 }
+    setPageObj(newPageObj)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView])
 
   useEffect(() => {
-    if (page === 1) return;
-    update_infinite()
+    if (!showModal) {
+      const newPageObj = { ...pageObj, page: -1 }
+      setPageObj(newPageObj);
+      setData(undefined)
+      return
+    }
+    const newPageObj = { ...pageObj, page: 1 }
+    setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [searchValue, showModal])
+
+
+  useEffect(() => {
+    if (page === -1) return
+    if (page === 1) {
+      setData(undefined);
+      (async () => {
+        try {
+          setIsLoading(true)
+          await update()
+        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+        setIsLoading(false)
+      })()
+    }
+    else {
+      (async () => {
+        try {
+          await update_infinite()
+        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+      })()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageObj])
 
 
 
@@ -144,33 +163,35 @@ export default function EmployeeSelector03(
       className={style.container}
       tip={tip}
     >
-      <div className={style.listContainer}>
-        {employeeArr.map((emp, index, arr) => {
-          const { idNumber, chName, jobs } = emp
-          const { name, grade } = jobs?.[0] ?? {}
+      <LoadingCoverWrapper01 isLoading={isLoading}>
+        <div className={style.listContainer}>
+          {employeeArr.map((emp, index, arr) => {
+            const { idNumber, chName, jobs } = emp
+            const { name, grade } = jobs?.[0] ?? {}
 
-          const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
+            const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
 
-          const theViewRef = (() => {
-            if (arr.length - 11 === index) return viewRef
-            return undefined
-          })()
+            const theViewRef = (() => {
+              if (arr.length - 11 === index) return viewRef
+              return undefined
+            })()
 
-          return (
-            <CellWithBar key={index} isActive={isActive}>
-              <div className={`${style.listItem}`}
-                onClick={() => onClick(emp)}
-                ref={theViewRef}
-              >
-                <span>{idNumber}</span>
-                <span>{chName}</span>
-                <span>{name}</span>
-                <span>{grade && `Level ${grade}`}</span>
-              </div>
-            </CellWithBar>
-          )
-        })}
-      </div>
+            return (
+              <CellWithBar key={index} isActive={isActive}>
+                <div className={`${style.listItem}`}
+                  onClick={() => onClick(emp)}
+                  ref={theViewRef}
+                >
+                  <span>{idNumber}</span>
+                  <span>{chName}</span>
+                  <span>{name}</span>
+                  <span>{grade && `Level ${grade}`}</span>
+                </div>
+              </CellWithBar>
+            )
+          })}
+        </div>
+      </LoadingCoverWrapper01>
     </ModalListSelectorWithSearch >
   )
 }
