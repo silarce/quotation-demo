@@ -14,7 +14,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer";
 
 // component
 import Table from "components/page/setting/hrManage/table/table";
-import EmployeeSelector from "components/global/gear/modal/employeeSelector02";
+import EmployeeSelector from "components/global/gear/modal/employeeSelector03";
 
 // gear
 import PageHeader02, { TsearchGroup, Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
@@ -89,32 +89,6 @@ export default function ErpCtrlPermissions() {
 
   // ____________________________________________
 
-  const [empArr02SearchValue, setEmpArr02SearchValue] =
-    useState<string | undefined | null>(null)
-
-  // 新增操作人員用的
-  const params_employeeArr_02 = (() => {
-    const allNum = /^\d+$/.test(empArr02SearchValue ?? "n")
-    const grade = allNum ? empArr02SearchValue : undefined
-    return {
-      pageSize: 999999,
-      populate: ["jobs"],
-      filter: {
-        "$or": {
-          idNumber: { $containsi: empArr02SearchValue },
-          chName: { $containsi: empArr02SearchValue },
-          "jobs.name": { $containsi: empArr02SearchValue },
-          "jobs.grade": { $eq: grade },
-        }
-      }
-    }
-  })()
-
-  const { data: employeeData02, update: updateEmployeeData02 }
-    = useEmployee(params_employeeArr_02)
-  const employeeArr_02 = employeeData02?.data ?? []
-  // ____________________________________________
-
   // 部門列表
   const { data: departmentsData, update: updateDepartments } = useDepartments()
   // 用在搜尋bar的option
@@ -154,22 +128,6 @@ export default function ErpCtrlPermissions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query])
 
-  useEffect(() => {
-    if (empArr02SearchValue === null) return;
-    if (isLoading) return
-    (async () => {
-      try {
-        showRootLoading(true)
-        await updateEmployeeData02()
-        setShowAddPanel(true)
-      } catch (error) {
-        myAlert.err({ title: "取得人員資料失敗" })
-      }
-      showRootLoading(false)
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [empArr02SearchValue])
-
 
   // ------------------------------------------------------------------------
   // 新增操作人員
@@ -177,15 +135,7 @@ export default function ErpCtrlPermissions() {
   const [showAddPanel, setShowAddPanel] = useState(false)
 
   const openAddPanel = async () => {
-    if (isLoading) return
-    try {
-      showRootLoading(true)
-      await updateEmployeeData02()
-      setShowAddPanel(true)
-    } catch (error) {
-      myAlert.err({ title: "取得人員資料失敗" })
-    }
-    showRootLoading(false)
+    setShowAddPanel(true)
   }
 
   const onConfirm = async (employeeArr: TemployeeDto[]) => {
@@ -219,11 +169,6 @@ export default function ErpCtrlPermissions() {
 
   const onCancel = () => {
     setShowAddPanel(false)
-  }
-
-  const searchEmployee = (v: string) => {
-    if (!v) setEmpArr02SearchValue(undefined)
-    setEmpArr02SearchValue(v)
   }
 
   // ------------------------------------------------------------------------
@@ -375,11 +320,9 @@ export default function ErpCtrlPermissions() {
 
       <EmployeeSelector
         showModal={showAddPanel}
-        label="請選擇操作人員"
-        employeeArr={employeeArr_02 || []}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        searchEmployee={searchEmployee}
+        label="請選擇操作人員"
         selLimit={1}
       />
       <TwoButtonModal
