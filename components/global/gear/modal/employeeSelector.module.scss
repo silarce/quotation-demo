@@ -4,12 +4,13 @@
 .container {
   :global(.ant-modal-content) {
     width: 800px;
-    height: 490px;
+    height: fit-content;
     padding: 19px 30px;
     padding-top: 19px;
   }
 }
 .listContainer {
+  height: 350px;
   padding: 0 1px;
 }
 .listItem {

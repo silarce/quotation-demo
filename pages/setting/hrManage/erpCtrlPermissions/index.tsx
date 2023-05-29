@@ -14,7 +14,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer";
 
 // component
 import Table from "components/page/setting/hrManage/table/table";
-import EmployeeSelector from "components/global/gear/modal/employeeSelector03";
+import EmployeeSelector from "components/global/gear/modal/employeeSelector";
 
 // gear
 import PageHeader02, { TsearchGroup, Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
