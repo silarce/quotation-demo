@@ -61,7 +61,7 @@ export default function EmployeeSelector03(
         "$or": {
           idNumber: { $contains: searchValue },
           chName: { $contains: searchValue },
-          "jobs.name": { $containsi: searchValue },
+          "jobs.name": { $contains: searchValue },
           "jobs.grade": { $eq: grade },
         }
       }
