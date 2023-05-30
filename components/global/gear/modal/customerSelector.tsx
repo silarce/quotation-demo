@@ -45,17 +45,16 @@ export default function CustomerSelector(
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto[]>([])
 
-  const [searchValue, setSearchValue] =
-    useState<string | undefined | null>(null)
+  const [searchValue, setSearchValue] = useState<string | undefined>()
   const [pageObj, setPageObj] = useState({ page: -1 })
   const page = pageObj.page
 
   const params: TapiGetCustomersParams = (() => {
-    const allNum = /^\d+$/.test(searchValue ?? "n")
     return {
       page: page,
       pageSize: 20,
       populate: ["contacts", "types"],
+      sort: "customerNumber",
       filter: {
         "$or": {
           customerNumber: { $contains: searchValue },
@@ -65,7 +64,8 @@ export default function CustomerSelector(
     }
   })()
 
-  const { data: customerArr, meta, setData, update, update_infinite } = useCustomers(params)
+  const { data: customerArr, meta, setData, update, update_infinite }
+    = useCustomers(params)
 
 
   const [viewRef, inView] = useInView();
@@ -84,13 +84,13 @@ export default function CustomerSelector(
       const newPageObj = { ...pageObj, page: -1 }
       setPageObj(newPageObj);
       setData(undefined)
+      setSearchValue(undefined)
       return
     }
     const newPageObj = { ...pageObj, page: 1 }
     setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, showModal])
-
 
   useEffect(() => {
     if (page === -1) return
