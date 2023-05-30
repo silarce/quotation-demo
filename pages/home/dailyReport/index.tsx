@@ -38,7 +38,6 @@ import {
   Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
-  useApiGetDailyReportsWorkers,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -179,34 +178,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
   // 取得所有審核人員
-  const { reviewersArr, updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
+  const { updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
-  const { data: employeeRes, update: updateEmployeeArr }
+  const { update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
-  const employeeArr = employeeRes?.data
-  // ---------------------------
-  // 取得工務人員
-  const [searchValue, setSearchValue] = useState<string>()
-  const params_panel: Tparams = {
-    pageSize: 999999,
-    populate: ["jobs"],
-    filter: {
-      chName: { $contains: searchValue || undefined }
-    }
-  }
-  const { workers, updateWorkers: updateEmployeeArr_panel }
-    = useApiGetDailyReportsWorkers(params_panel)
-
-  const editSearchValue = (v: string | undefined) => {
-    setSearchValue(v)
-  }
-
-  useEffect(() => {
-    if (searchValue === undefined) return
-    updateEmployeeArr_panel()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue])
-
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -487,29 +462,29 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
   // ---
   const doCheck = async () => {
-  
-      if (reportInEdit?.isReviewedByUser === true) {
-        return myAlert.warning({ title: "已審核過" })
-      }
-      if (!reportInEdit?.id) return;
-      try {
-        showRootLoading(true)
-        const res = await apiDailyReports_review(reportInEdit.id)
-        changeReviewToChecked(!!res)
-        showRootLoading(false)
-        await updateDailyReports_withLoading()
-      }
-      catch (error) {
-        const err = error as AxiosError<{
-          error: string
-          message: string
-          statusCode: number
-        }>
-        const { message, statusCode } = err.response?.data ?? {}
-        if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
-        myAlert.err({ title: "審核失敗" })
-      }
-      finally { showRootLoading(false) }
+
+    if (reportInEdit?.isReviewedByUser === true) {
+      return myAlert.warning({ title: "已審核過" })
+    }
+    if (!reportInEdit?.id) return;
+    try {
+      showRootLoading(true)
+      const res = await apiDailyReports_review(reportInEdit.id)
+      changeReviewToChecked(!!res)
+      showRootLoading(false)
+      await updateDailyReports_withLoading()
+    }
+    catch (error) {
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+      const { message, statusCode } = err.response?.data ?? {}
+      if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
+      myAlert.err({ title: "審核失敗" })
+    }
+    finally { showRootLoading(false) }
   }
 
   /**reviewer 已讀/未讀 isReviewedByUser */
@@ -645,12 +620,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
-            workerArr={workers ?? []}
-            updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
             isEdit={isReportEdit}
-            editSearchValue={editSearchValue}
           />
         }
       </SubLayer>

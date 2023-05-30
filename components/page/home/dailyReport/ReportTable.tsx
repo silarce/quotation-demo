@@ -19,7 +19,6 @@ import {
 // class
 import { Class_reportItem } from "pages/home/dailyReport"
 import { TdailyReportWokerDto } from "js/api/dtoTypes"
-import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
@@ -33,17 +32,11 @@ export default function ReportTable(
   { classDailyReportItemArr,
     addDailyReportItem,
     isEdit,
-    workerArr,
-    updateEmployeeArr,
-    editSearchValue
   }:
     {
       classDailyReportItemArr: Class_reportItem[]
       addDailyReportItem: () => void
       isEdit: boolean
-      workerArr: TdailyReportWokerDto[]
-      updateEmployeeArr: () => void
-      editSearchValue: (v: string | undefined) => void
     }
 ) {
 
@@ -53,25 +46,15 @@ export default function ReportTable(
 
 
   const toShowModal = async () => {
-    try {
-      showRootLoading(true)
-      await updateEmployeeArr()
-    }
-    catch { myAlert.err({ title: "取得人員資料失敗" }) }
-    finally {
-      showRootLoading(false)
-    }
     setShowModal(true)
   }
-
   const modalOnCancel = () => {
-    editSearchValue(undefined)
     setShowModal(false)
   }
 
-  const modalOnConfirm = (v: TdailyReportWokerDto) => {
+  const modalOnConfirm = (workerArr: TdailyReportWokerDto[]) => {
     if (!activeItem) return
-    activeItem.addWorker(v)
+    activeItem.addWorker(workerArr[0])
   }
   const disabled = !isEdit
 
@@ -260,11 +243,10 @@ export default function ReportTable(
       </div>
       <WorkerSelector
         showModal={showModal}
-        employeeArr={workerArr}
-        searchCustomer={editSearchValue}
         onConfirm={modalOnConfirm}
         onCancel={modalOnCancel}
         label="選擇工務人員"
+        selLimit={1}
       />
     </div>
   )
