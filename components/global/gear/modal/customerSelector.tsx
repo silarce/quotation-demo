@@ -22,7 +22,7 @@ import {
 
 
 
-export default function EmployeeSelector03(
+export default function CustomerSelector(
   {
     showModal,
     onConfirm,
