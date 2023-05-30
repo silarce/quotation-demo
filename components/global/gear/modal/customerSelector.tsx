@@ -52,17 +52,14 @@ export default function CustomerSelector(
 
   const params: TapiGetCustomersParams = (() => {
     const allNum = /^\d+$/.test(searchValue ?? "n")
-    const grade = allNum ? searchValue : undefined
     return {
       page: page,
       pageSize: 20,
-      // populate: [],
+      populate: ["contacts", "types"],
       filter: {
         "$or": {
           customerNumber: { $contains: searchValue },
           name: { $contains: searchValue },
-          // "jobs.name": { $contains: searchValue },
-          // "jobs.grade": { $eq: grade },
         }
       }
     }
