@@ -17,7 +17,7 @@ import {
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportWokerDto as TdailyReportWokerDro, Tparams }
+export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportWokerDto, Tparams }
 // =================================================================
 
 
@@ -198,8 +198,22 @@ export const useApiGetDailyReportsWorkers = (params?: Tparams) => {
     if (res) setRes(res)
     return res
   }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetDailyReportsWorkers(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    apiRes.data = [...oldData, ...newData]
+    setRes({ ...apiRes })
+    return apiRes
+  }
+
+
   return {
     workers: res?.data, meta: res?.meta,
-    updateWorkers: update, setRes,
+    updateWorkers: update,
+    updateWorkers_infinite: update_infinite,
+    setRes,
   }
 }
