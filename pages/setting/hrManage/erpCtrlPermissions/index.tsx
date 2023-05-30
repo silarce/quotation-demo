@@ -221,7 +221,7 @@ export default function ErpCtrlPermissions() {
           props: {
             title: "密碼重置成功",
             content:
-              <ResetPwContent account={account} username={chName} newPw={password} />
+              <ResetPwContent account={idNumber} username={chName} newPw={password} />
           }
         })
       }
