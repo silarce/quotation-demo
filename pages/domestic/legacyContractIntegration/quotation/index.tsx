@@ -73,36 +73,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     sort: "customerNumber"
   }
 
-  const {
-    data: customerArr, meta: customerMeta,
-    update: updateCustomerArr, update_infinite: updateCustomerArr_infinite } = useCustomers(customerParams)
-
-  const getCustomerByPage = () => {
-    if (!customerMeta?.hasNextPage) return
-    setPage_customer(page => ++page)
-  }
-
-  const searchCustomer = (v: string | undefined) => {
-    setPage_customer(1)
-    if (!v) v = undefined
-    setSearchCustomerName(v)
-  }
-
-  useEffect(() => {
-    (async () => {
-      updateCustomerArr()
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchCustomerName])
-
-  useEffect(() => {
-    if (page_customer === 1) return;
-    (async () => {
-      await updateCustomerArr_infinite()
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page_customer])
-
 
   // --------------------------------------------------------------------------
   let [legacyContractParams, setLegacyContractParams] = useState({
@@ -115,10 +85,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId)
 
-
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([])
-  const [fileArr, setFileArr] = useState<File[]>([])
-
 
   useEffect(() => {
     const arr = attachments?.map((item) => {
@@ -293,10 +260,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationProfile
             classLegacyContract={classLegacyContract}
             classBasicInfo={classLegacyContract.classBasicInfo}
-            customerArr={customerArr ?? []}
-            customerMeta={customerMeta}
-            getCustomerByPage={getCustomerByPage}
-            searchCustomer={searchCustomer}
             disabled={!allowEdit} />
           {/*  */}
           <div className={style.switchBar}>
@@ -324,24 +287,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
         classLegacyContract={classLegacyContract} />
-
-      {/* <img src="https://gaia.komica.org/00b/src/1684580436003.jpg" alt="" /> */}
-      {/* <Image
-        // crossOrigin="anonymous"
-        src="https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed"
-        alt="" 
-        width={100}
-        height={100}
-        /> */}
-      {/* <img
-        // crossOrigin="anonymous"
-        src="https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed"
-        alt=""
-      /> */}
-
     </SubLayer>
   )
 }
-
-
-// https://sanjeou-erp-be.caprover.credot-web.com/file/download/99c1e51b-6be3-4178-97e3-710d5d5318ed 

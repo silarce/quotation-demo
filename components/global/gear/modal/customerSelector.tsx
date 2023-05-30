@@ -22,7 +22,7 @@ import {
 
 
 
-export default function EmployeeSelector03(
+export default function CustomerSelector(
   {
     showModal,
     onConfirm,
@@ -45,30 +45,27 @@ export default function EmployeeSelector03(
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto[]>([])
 
-  const [searchValue, setSearchValue] =
-    useState<string | undefined | null>(null)
+  const [searchValue, setSearchValue] = useState<string | undefined>()
   const [pageObj, setPageObj] = useState({ page: -1 })
   const page = pageObj.page
 
   const params: TapiGetCustomersParams = (() => {
-    const allNum = /^\d+$/.test(searchValue ?? "n")
-    const grade = allNum ? searchValue : undefined
     return {
       page: page,
       pageSize: 20,
-      // populate: [],
+      populate: ["contacts", "types"],
+      sort: "customerNumber",
       filter: {
         "$or": {
           customerNumber: { $contains: searchValue },
           name: { $contains: searchValue },
-          // "jobs.name": { $contains: searchValue },
-          // "jobs.grade": { $eq: grade },
         }
       }
     }
   })()
 
-  const { data: customerArr, meta, setData, update, update_infinite } = useCustomers(params)
+  const { data: customerArr, meta, setData, update, update_infinite }
+    = useCustomers(params)
 
 
   const [viewRef, inView] = useInView();
@@ -87,13 +84,13 @@ export default function EmployeeSelector03(
       const newPageObj = { ...pageObj, page: -1 }
       setPageObj(newPageObj);
       setData(undefined)
+      setSearchValue(undefined)
       return
     }
     const newPageObj = { ...pageObj, page: 1 }
     setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, showModal])
-
 
   useEffect(() => {
     if (page === -1) return

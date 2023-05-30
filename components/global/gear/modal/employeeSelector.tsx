@@ -1,6 +1,6 @@
 
 import {
-  useState,  useEffect
+  useState, useEffect
 } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from "lodash"
@@ -22,7 +22,7 @@ import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
 
 
 
-export default function EmployeeSelector03(
+export default function EmployeeSelector(
   {
     showModal,
     onConfirm,
@@ -45,8 +45,7 @@ export default function EmployeeSelector03(
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
 
-  const [searchValue, setSearchValue] =
-    useState<string | undefined | null>(null)
+  const [searchValue, setSearchValue] = useState<string | undefined>()
   const [pageObj, setPageObj] = useState({ page: -1 })
   const page = pageObj.page
 
@@ -57,6 +56,7 @@ export default function EmployeeSelector03(
       page: page,
       pageSize: 20,
       populate: ["jobs"],
+      sort:"idNumber",
       filter: {
         "$or": {
           idNumber: { $contains: searchValue },
@@ -88,6 +88,7 @@ export default function EmployeeSelector03(
       const newPageObj = { ...pageObj, page: -1 }
       setPageObj(newPageObj);
       setData(undefined)
+      setSearchValue(undefined)
       return
     }
     const newPageObj = { ...pageObj, page: 1 }
