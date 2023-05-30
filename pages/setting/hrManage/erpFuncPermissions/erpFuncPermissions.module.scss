@@ -1,10 +1,62 @@
 @use "styles/theme01" as *;
 
-
 .body {
-  > div {
-    padding: 38px 45px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 15px;
+  .card {
     display: grid;
-    gap: 21px;
+    grid-template-columns: min-content auto;
+    height: 300px;
+    .left {
+      display: grid;
+      place-content: center;
+      padding: 14px;
+      background-color: $bgc01;
+      > span {
+        line-height: 22px;
+        font-size: 18px;
+        font-weight: 400;
+        color: $colorMain;
+      }
+    }
+    .right {
+      border: solid 1px $colorBorder01;
+      padding: 3px;
+      overflow: auto;
+
+  
+      .row {
+        display: grid;
+        grid-template-columns: auto 18px;
+        gap: 40px;
+        padding: 17px;
+        padding-left: 46px;
+        > div > span {
+          font-size: 16px;
+          font-weight: 400;
+        }
+        .removeBtn {
+          width: 18px;
+          height: 24px;
+          stroke: $colorMain;
+          fill: transparent;
+        }
+      }
+      .row_btn {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        > div {
+          .btn {
+            display: block;
+            margin: auto;
+            border: 0;
+            background-color: transparent;
+          }
+        }
+      }
+    }
   }
 }
