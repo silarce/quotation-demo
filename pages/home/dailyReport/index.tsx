@@ -13,6 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
+import SetReportEmpModal_2 from "components/page/home/dailyReport/SetReportEmpModal_2"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
@@ -35,10 +36,8 @@ import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
-  useApiGetDailyReportsWorkers,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -99,9 +98,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [reviewersPickArr, setReviewersPickArr] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
 
-  // 送進 選擇審核人員 SetReportEmpModal的arr
-  const [reviewerArr, setReviewerArr] =
-    useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
+  // 每個日報上傳前要選reviewer，這是那個modal的開關
+  const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false)
+
 
   // 日報表tagArr，送進TagCarousel
   const [tagArr, setTagArr] = useState<Ttag[]>([])
@@ -179,34 +178,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
   // 取得所有審核人員
-  const { reviewersArr, updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
+  const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
-  const { data: employeeRes, update: updateEmployeeArr }
+  const { update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
-  const employeeArr = employeeRes?.data
-  // ---------------------------
-  // 取得工務人員
-  const [searchValue, setSearchValue] = useState<string>()
-  const params_panel: Tparams = {
-    pageSize: 999999,
-    populate: ["jobs"],
-    filter: {
-      chName: { $contains: searchValue || undefined }
-    }
-  }
-  const { workers, updateWorkers: updateEmployeeArr_panel }
-    = useApiGetDailyReportsWorkers(params_panel)
-
-  const editSearchValue = (v: string | undefined) => {
-    setSearchValue(v)
-  }
-
-  useEffect(() => {
-    if (searchValue === undefined) return
-    updateEmployeeArr_panel()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue])
-
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -356,33 +331,25 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------------------------
   // 更新日報表
-  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
 
-  //**開啟審核人員選擇面板 */
-  const choseReviewerArr = async () => {
-    const reviewerArr = await updateReviewersArr()
-    const formetedViewerArr = formatEmployeeArr({ employeeArr: reviewerArr })
-    setReviewerArr(formetedViewerArr)
-  }
-  const cancelReviewerArr = () => {
-    setReviewerArr(undefined)
-  }
   /**發出更新日報表請求 */
-  const reqApiPatchDailyReports_my = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
-
-    const employeeIds: string[] = []
-    employeeArr.forEach((employee) => {
-      if (employee.shouldReport) employeeIds.push(employee.id)
-    })
+  const reqApiPatchDailyReports_my = async (
+    reviewerArr: TemployeeDto[],
+    examinerArr: TemployeeDto[],
+  ) => {
     if (!reportInEdit) return
 
+    const reviewerIds = reviewerArr.map((emp) => emp.id)
+    const examinerIds = examinerArr.map((emp) => emp.id)
     const items = reportInEdit.items.map((item) => item.postBody)
+
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({
         date: reportInEdit.date,
         body: {
-          reviewerIds: employeeIds,
+          reviewerIds,
+          examinerIds,
           items
         }
       })
@@ -405,7 +372,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       myAlert.err({ title: "更新日報表失敗" })
     }
     finally { showRootLoading(false) }
-    cancelReviewerArr()
+    setShowReviewerForReportModal(false)
   }
 
   // ----------------------------------------------------------------------
@@ -487,29 +454,29 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
   // ---
   const doCheck = async () => {
-  
-      if (reportInEdit?.isReviewedByUser === true) {
-        return myAlert.warning({ title: "已審核過" })
-      }
-      if (!reportInEdit?.id) return;
-      try {
-        showRootLoading(true)
-        const res = await apiDailyReports_review(reportInEdit.id)
-        changeReviewToChecked(!!res)
-        showRootLoading(false)
-        await updateDailyReports_withLoading()
-      }
-      catch (error) {
-        const err = error as AxiosError<{
-          error: string
-          message: string
-          statusCode: number
-        }>
-        const { message, statusCode } = err.response?.data ?? {}
-        if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
-        myAlert.err({ title: "審核失敗" })
-      }
-      finally { showRootLoading(false) }
+
+    if (reportInEdit?.isReviewedByUser === true) {
+      return myAlert.warning({ title: "已審核過" })
+    }
+    if (!reportInEdit?.id) return;
+    try {
+      showRootLoading(true)
+      const res = await apiDailyReports_review(reportInEdit.id)
+      changeReviewToChecked(!!res)
+      showRootLoading(false)
+      await updateDailyReports_withLoading()
+    }
+    catch (error) {
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+      const { message, statusCode } = err.response?.data ?? {}
+      if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
+      myAlert.err({ title: "審核失敗" })
+    }
+    finally { showRootLoading(false) }
   }
 
   /**reviewer 已讀/未讀 isReviewedByUser */
@@ -545,7 +512,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     {
       type: "redButton",
       label: "上傳",
-      onClick: choseReviewerArr,
+      onClick: () => setShowReviewerForReportModal(true),
     },
     {
       type: "myButton",
@@ -564,6 +531,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
 
   const panelList = (() => {
+    if (reportInEdit?.isUserIsViewer) {
+      return []
+    }
+
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
       else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
@@ -580,8 +551,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         }
         else if (reportInEdit.isAllowToReview) {
           return panelList_reviewer_inEdit_user
-          // if (reportInEdit.isReviewedByUser) return panelList_reviewer_inEdit_user
-          // if (reportInEdit.isReviewedByOther) return panelList_reviewer_inEdit
         }
         return []
       }
@@ -645,12 +614,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         {reportInEdit &&
           <ReportTable
-            workerArr={workers ?? []}
-            updateEmployeeArr={updateEmployeeArr_panel}
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
             isEdit={isReportEdit}
-            editSearchValue={editSearchValue}
           />
         }
       </SubLayer>
@@ -664,13 +630,11 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         tip="可複選"
       />
 
-      <SetReportEmpModal
-        visible={!!reviewerArr}
+      <SetReportEmpModal_2
+        visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
-        onCancel={cancelReviewerArr}
-        dataArr={reviewerArr ?? []}
-        label="選擇審核人員"
-        tip="可複選"
+        onCancel={() => setShowReviewerForReportModal(false)}
+        userId={userInfo.employee?.id}
       />
     </>
   )
@@ -745,7 +709,6 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
   return false
 }
 
-
 // ==========================================================================
 
 /** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
@@ -782,36 +745,3 @@ const formatRiewerPickArr = (
   })
   return result
 }
-
-/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatEmployeeArr = (
-  { employeeArr }:
-    {
-      employeeArr: TemployeeDto[] | undefined
-    }
-) => {
-  if (!employeeArr) return []
-
-  const result = employeeArr.map((item) => {
-    const shouldReport = false
-    let theJobs = (() => {
-      if (item.jobs) {
-        return _.sortBy(item.jobs, "grade")
-      }
-      else return []
-    })();
-
-    const obj = {
-      id: item.id,
-      chName: item.chName,
-      idNumber: item.idNumber,
-      job: theJobs[0]?.name ?? "",
-      grade: theJobs[0]?.grade ?? "",
-      shouldReport
-    }
-    return obj
-  })
-  return result
-}
-
-

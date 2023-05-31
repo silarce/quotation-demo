@@ -71,16 +71,20 @@ export default function ReporterList(
               return (
                 <CellWithBar key={index} className={classNames(scss.row)}
                   onClick={() => { addTag(tag) }}>
-                  {/* <div className={classNames("w-[95px]", scss.chDate)}><span>{chDate}</span></div> */}
                   <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
                   <div className={classNames(scss.reviewerList, "w-full")}>
 
                     {reviewStatus?.map((item, index) => {
-                      const { reviewerEmployee, reviewedAt } = item
-                      const { chName, } = reviewerEmployee
+                      const { reviewerEmployee, reviewedAt, type } = item
+                      let statu = (() => {
+                        if (type === "examiner") return "gray"
+                        if (reviewedAt) return "green"
+                        return "red"
+                      })()
+                      const { chName } = reviewerEmployee
                       return (
                         <StatuBtn key={index}
-                          statu={!!reviewedAt} name={chName} />
+                          statu={statu} name={chName} />
                       )
                     })}
                   </div>
@@ -101,14 +105,14 @@ export default function ReporterList(
 const StatuBtn = (
   { statu, name }:
     {
-      statu: boolean
+      statu: string
       name: string
     }
 ) => {
-  const color = statu ? "green" : "red"
+
   return (
     <div className={scss.statuBtn}>
-      <Badge color={color} />
+      <Badge color={statu} />
       <span>{name}</span>
     </div>
   )

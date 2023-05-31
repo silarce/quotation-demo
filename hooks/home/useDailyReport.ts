@@ -21,6 +21,7 @@ type ThookEmptyReport = {
   isReviewedByOther: boolean
   isReviewedByUser: boolean
   isReviewCompleted: boolean
+  isUserIsViewer: boolean
   isEdit: boolean
   employeeId: string | undefined
 }
@@ -204,6 +205,7 @@ const useReport = () => {
     isReviewedByOther: false,
     isReviewedByUser: false,
     isReviewCompleted: false,
+    isUserIsViewer: false,
     isEdit: false,
     employeeId: undefined
   }) // emptyReportCre
@@ -218,14 +220,17 @@ const useReport = () => {
     if (!dailyReport) return setReport(emptyReportCre())
 
     let isAllowToReview: boolean = false
-
     let isReviewedByUser: boolean = false
+    let isUserIsViewer: boolean = false
 
     const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
-      const employeeId = statu.reviewerEmployee.id
+      const statuType = statu.type
+      const reviewerId = statu.reviewerEmployee?.id ?? null
+      // const examinerId = statu.examinerEmployee?.id ?? null
       const reviewedAt = statu.reviewedAt
-      if (employeeId === userInfo.employee?.id) {
+      if (reviewerId === userInfo.employee?.id) {
         isAllowToReview = true
+        if (statuType === "examiner") isUserIsViewer = true
         if (reviewedAt) isReviewedByUser = true
       }
       return !!reviewedAt
@@ -239,6 +244,7 @@ const useReport = () => {
       isReviewedByOther: isReviewedByOther,
       isReviewedByUser,
       isReviewCompleted: dailyReport.isReviewCompleted,
+      isUserIsViewer,
       isEdit: false,
       employeeId: dailyReport.employee?.id
     }
@@ -255,12 +261,14 @@ const useReport = () => {
       const isReviewedByOther = report.isReviewedByOther
       const isReviewedByUser = report.isReviewedByUser
       const isReviewCompleted = report.isReviewCompleted
+      const isUserIsViewer = report.isUserIsViewer
       const isEdit = report.isEdit
       const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
       return {
         id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewedByUser, isReviewCompleted,
+        isAllowToReview, isReviewedByOther, isReviewedByUser,
+        isReviewCompleted, isUserIsViewer,
         isEdit, employeeId
       }
     })
@@ -276,10 +284,12 @@ const useReport = () => {
       const isEdit = report.isEdit
       const isAllowToReview = report.isAllowToReview
       const isReviewCompleted = report.isReviewCompleted
+      const isUserIsViewer = report.isUserIsViewer
       const employeeId = report.employeeId
       return {
         id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewCompleted, isReviewedByUser,
+        isAllowToReview, isReviewedByOther, isReviewCompleted,
+        isReviewedByUser, isUserIsViewer,
         isEdit, employeeId
       }
     })
@@ -303,11 +313,13 @@ const useReport = () => {
       const isReviewedByOther = report.isReviewedByOther
       const isReviewedByUser = report.isReviewedByUser
       const isReviewCompleted = report.isReviewCompleted
+      const isUserIsViewer = report.isUserIsViewer
       const isEdit = !report.isEdit
       const employeeId = report.employeeId
       return {
         id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewCompleted, isReviewedByUser,
+        isAllowToReview, isReviewedByOther, isReviewCompleted,
+        isReviewedByUser, isUserIsViewer,
         isEdit, employeeId
       }
     })
