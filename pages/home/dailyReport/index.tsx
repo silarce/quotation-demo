@@ -639,10 +639,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
         onCancel={() => setShowReviewerForReportModal(false)}
-        label="選擇審核人員"
-        tip="可複選"
       />
-
     </>
   )
 }
