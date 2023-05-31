@@ -534,7 +534,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (reportInEdit?.isUserIsViewer) {
       return []
     }
-    
+
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
       else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
@@ -634,6 +634,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
         onCancel={() => setShowReviewerForReportModal(false)}
+        userId={userInfo.employee?.id}
       />
     </>
   )

@@ -15,18 +15,22 @@ import { TemployeeDto, useApiDailyReports_reviewers } from "js/api/api_dailyRepo
 
 // css
 import scss from "./setReportEmpModal_2.module.scss"
+import { ConsoleSqlOutlined } from "@ant-design/icons"
 
 
 export default function SetReportEmpModal(
   { visible,
     onConfirm,
     onCancel,
+    userId
   }:
     {
       visible: boolean
       // onConfirm: (dataArr: TemployeeDto[]) => void
       onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void
       onCancel: () => void
+      userId: string |
+      undefined
     }
 ) {
 
@@ -116,6 +120,7 @@ export default function SetReportEmpModal(
           onSearch={onSearch_reviewer}
           onClick={onClick_reviewer}
           label="請選擇審核人員"
+          userId={userId}
         />
       </div>
 
@@ -128,7 +133,8 @@ export default function SetReportEmpModal(
           searchValue={searchValue_examiner}
           onSearch={onSearch_examiner}
           onClick={onClick_examiner}
-          label="請選擇審核人員"
+          label="請選擇檢視人員"
+          userId={userId}
         />
         {/*  */}
         <TwoBtnFooter
@@ -151,6 +157,7 @@ const Selector = (
     onSearch,
     onClick,
     label,
+    userId,
   }:
     {
       employeeArr: TemployeeDto[]
@@ -160,6 +167,7 @@ const Selector = (
       onSearch: (v: string) => void
       onClick: (v: TemployeeDto) => void
       label: string
+      userId: string | undefined
     }
 ) => {
 
@@ -193,6 +201,8 @@ const Selector = (
               return null;
             }
           }
+
+          if (userId === id) return null
 
           const isOther = otherSelEmployeeArr.some((other) => other.id === id)
           if (isOther) return null
