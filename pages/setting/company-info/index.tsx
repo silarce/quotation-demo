@@ -1,13 +1,12 @@
-// 公司資料
-// 公司資料
 
 import {
   ChangeEvent,
   useState, useEffect,
 } from "react"
+import _ from "lodash"
+import classNames from "classnames";
 
-const _ = require("lodash")
-
+import Image from "next/image";
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -19,17 +18,21 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address"
 
-
 // api
 import {
   useCompanyInfo, TcompanyInfoDto,
   apiPatchCompanyInfo,
   apiUploadCompanyLogo,
+  apiDelCompanyLogo,
   domain
 } from "js/api/api_company-info"
 
 // icon
 import { IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
+import imgLogo from "public/image/logo/LOGO.svg"
+
+
+
 
 // css
 import scss from "./company-info.module.scss"
@@ -65,14 +68,68 @@ export default function CompanyInfo() {
   const [imgSrc, setImgSrc] = useState<string | null | undefined>("")
 
   useEffect(() => {
-    const logoId = companyInfo?.logoFileId
-    setImgSrc(`${domain}file/download/${logoId}`)
+    const logoFileId = companyInfo?.logoFileId
+    setImgSrc(`${domain}file/download/${logoFileId}`)
   }, [companyInfo?.logoFileId])
-  // ===================================================
-  const [editable, setEditable] = useState(false)
 
   // ===================================================
+  const [editable, setEditable] = useState(false)
   // ===================================================
+  // 地址
+  const { county, district, address, logoFileId: logoLink } = companyInfo ?? {}
+
+  // 選擇城市後清除地區
+  const clearDistrict = () => {
+    companyInfo!.district = ""
+    setCompanyInfo({ ...companyInfo! })
+  }
+
+  const searchInputProps = {
+    county,
+    onChangeCounty: (option: Toption | null) => {
+      if (!option) return
+      if (companyInfo?.county === option.value) return
+      companyInfo!.county = option.value
+      clearDistrict()
+      setCompanyInfo({ ...companyInfo! })
+    },
+    district,
+    onChangeDistrict: (option: Toption | null) => {
+      if (!option) return
+      if (companyInfo?.district === option.value) return
+      companyInfo!.district = option.value
+      setCompanyInfo({ ...companyInfo! })
+    },
+    address,
+    onChangeAddress: (value: string) => {
+      companyInfo!.address = value
+      setCompanyInfo({ ...companyInfo! })
+    },
+  }
+
+  // ===================================================
+  // 選擇圖片
+  const selectImg = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+    if (!e.target.files[0]) return
+    const file = e.target.files[0]
+    setImageFile(file)
+    // 預覽圖片
+    const reader = new FileReader();
+    reader.readAsDataURL(file)
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      if (!e.target) return
+      setImgSrc(e.target.result as string)
+    }
+  }
+  // 清除
+  const clearLogo = () => {
+    const logoFileId = companyInfo?.logoFileId
+    setImgSrc(`${domain}file/download/${logoFileId}`)
+    setImageFile(undefined)
+  }
+
+  // ------------------------------------------------------------------------
   // pageHeader
   const panalList01: TpanelList = [
     {
@@ -127,90 +184,36 @@ export default function CompanyInfo() {
       }
     },
   ]
-  // ===================================================
-  // 地址
-  const { county, district, address, logoFileId: logoLink } = companyInfo ?? {}
+  // ------------------------------------------------------------------------
 
-  // 選擇城市後清除地區
-  const clearDistrict = () => {
-    companyInfo!.district = ""
-    setCompanyInfo({ ...companyInfo! })
-  }
-
-  const searchInputProps = {
-    county,
-    onChangeCounty: (option: Toption | null) => {
-      if (!option) return
-      if (companyInfo?.county === option.value) return
-      companyInfo!.county = option.value
-      clearDistrict()
-      setCompanyInfo({ ...companyInfo! })
-    },
-    district,
-    onChangeDistrict: (option: Toption | null) => {
-      if (!option) return
-      if (companyInfo?.district === option.value) return
-      companyInfo!.district = option.value
-      setCompanyInfo({ ...companyInfo! })
-    },
-    address,
-    onChangeAddress: (value: string) => {
-      companyInfo!.address = value
-      setCompanyInfo({ ...companyInfo! })
-    },
-  }
-
-  // ===================================================
-  // 上傳照片
-
-  // 選擇圖片
-  const selectImg = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
-    const file = e.target.files[0]
-    setImageFile(file)
-    // 預覽圖片
-    const reader = new FileReader();
-    reader.readAsDataURL(file)
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      if (!e.target) return
-      setImgSrc(e.target.result as string)
-    }
-  }
-  // 清除
-  const clearLogo = () => {
-    setImgSrc(companyInfo?.logoFileId)
-    setImageFile(undefined)
-  }
-  // ===================================================
+  // const btnLabel = imgSrc ? "刪除logo" : "上傳公司logo"
+  // const onImg = imgSrc ? 移除圖片的函式 : selectImg
+  const btnLabel = imgSrc ? "上傳公司logo" : "上傳公司logo"
+  const onImg = imgSrc ? selectImg : selectImg
+  // ------------------------------------------------------------------------
   return (
     <SubLayer>
       <PageHeader02 tag="公司資料"
         panelList={editable ? panalList02 : panalList01}
       />
       <div className={scss.body}>
-        {/* 左邊的圖片 */}
-        <div className={scss.logoBox}>
-          {logoLink
-            // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={imgSrc || ""} alt="logo" />
-            : <span>LOGO</span>}
-          {!editable
-            ? ""
-            : <div className={scss.loadButtonBox}>
-              <label className={scss.loadPhotoButton}
-                htmlFor="uploadLogo">
-                <span>上傳公司Logo</span>
-                <input id="uploadLogo" type="file"
-                  onChange={selectImg}
-                />
-              </label>
+        {/* logo */}
+        <div className={classNames(scss.logoBox,)}>
+          <Image className={scss.logo}
+            src={imgSrc || imgLogo} alt="logo" width={300} height={300} />
+          {editable &&
+            <div className={classNames(scss.panel)}>
               <span>{"(上限10MB)"}</span>
-              <IconDelete01 onClick={clearLogo} />
+              <label className={classNames(scss.btn, { [scss.red]: false })}
+                htmlFor="uploadLogo">
+                <span>{btnLabel}</span>
+                <input
+                  id="uploadLogo" type="file" onChange={onImg} />
+              </label>
             </div>
           }
         </div>
-
-        {/* 右邊的表單 */}
+        {/* info */}
         <div className={scss.formContainer}>
           {dataIndex.map((key, index) => {
             const { label } = config[key]
@@ -255,7 +258,6 @@ export default function CompanyInfo() {
   )
 }
 // ========================================================
-
 
 type TapiCompanyInfoKey = keyof TcompanyInfoDto
 type TconfigKeys = Extract<TapiCompanyInfoKey,

@@ -17,7 +17,13 @@ import {
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportWokerDto as TdailyReportWokerDro, Tparams }
+export type {
+  TcreateDailyReportItemDto,
+  TdailyReportDto,
+  TdailyReportWokerDto,
+  Tparams,
+  TemployeeDto
+}
 // =================================================================
 
 
@@ -93,10 +99,7 @@ export const apiPatchDailyReports_my = (
     {
       /**YYYY-MM-DD */
       date: string
-      body: {
-        reviewerIds: string[]
-        items: TcreateDailyReportItemDto[]
-      }
+      body: TupdateDailyReportDto
     }
 ) => {
   const api = `/daily-reports/my?date=${date}`
@@ -157,7 +160,7 @@ export const useApiDailyReports_reviewers = () => {
     reviewersArr: data,
     setReviewersArr: setData,
     /**更新所有需回報的人員 */
-    updateReviewerssArr: update
+    updateReviewersArr: update
   }
 }
 
@@ -198,8 +201,22 @@ export const useApiGetDailyReportsWorkers = (params?: Tparams) => {
     if (res) setRes(res)
     return res
   }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetDailyReportsWorkers(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    apiRes.data = [...oldData, ...newData]
+    setRes({ ...apiRes })
+    return apiRes
+  }
+
+
   return {
     workers: res?.data, meta: res?.meta,
-    updateWorkers: update, setRes,
+    updateWorkers: update,
+    updateWorkers_infinite: update_infinite,
+    setRes,
   }
 }

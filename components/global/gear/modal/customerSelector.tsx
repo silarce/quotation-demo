@@ -12,17 +12,17 @@ import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/ale
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from "./employeeSelector.module.scss"
-
-// type
-import { Tparams } from 'js/api/dtoTypes';
+import style from "./customerSelector.module.scss"
 
 // api
-import { useApiGetDailyReportsWorkers, TdailyReportWokerDto } from 'js/api/api_dailyReport';
+import {
+  TcustomerDto, TapiGetCustomersParams,
+  useCustomers,
+} from 'js/api/api_customer';
 
 
 
-export default function WorkerSelector(
+export default function CustomerSelector(
   {
     showModal,
     onConfirm,
@@ -33,7 +33,7 @@ export default function WorkerSelector(
   }:
     {
       showModal: boolean
-      onConfirm: (v: TdailyReportWokerDto[]) => void
+      onConfirm: (v: TcustomerDto[]) => void
       onCancel: () => void
       label?: string
       tip?: React.ReactNode
@@ -43,34 +43,30 @@ export default function WorkerSelector(
   const [isLoading, setIsLoading] = useState(false)
 
   // 被選的資料
-  const [selEmployeeArr, setSelEmployeeArr] = useState<TdailyReportWokerDto[]>([])
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto[]>([])
 
   const [searchValue, setSearchValue] = useState<string | undefined>()
   const [pageObj, setPageObj] = useState({ page: -1 })
   const page = pageObj.page
 
-  const params: Tparams = (() => {
-    const allNum = /^\d+$/.test(searchValue ?? "n")
-    const grade = allNum ? searchValue : undefined
+  const params: TapiGetCustomersParams = (() => {
     return {
       page: page,
       pageSize: 20,
-      populate: ["jobs"],
-      sort: "idNumber",
+      populate: ["contacts", "types"],
+      sort: "customerNumber",
       filter: {
         "$or": {
-          idNumber: { $contains: searchValue },
-          chName: { $contains: searchValue },
-          "jobs.name": { $contains: searchValue },
-          "jobs.grade": { $eq: grade },
+          customerNumber: { $contains: searchValue },
+          name: { $contains: searchValue },
         }
       }
     }
   })()
 
-  const { workers, meta, setRes, updateWorkers, updateWorkers_infinite } = useApiGetDailyReportsWorkers(params)
-  const workerArr = workers || []
-  
+  const { data: customerArr, meta, setData, update, update_infinite }
+    = useCustomers(params)
+
 
   const [viewRef, inView] = useInView();
 
@@ -87,7 +83,7 @@ export default function WorkerSelector(
     if (!showModal) {
       const newPageObj = { ...pageObj, page: -1 }
       setPageObj(newPageObj);
-      setRes(undefined)
+      setData(undefined)
       setSearchValue(undefined)
       return
     }
@@ -96,24 +92,23 @@ export default function WorkerSelector(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, showModal])
 
-
   useEffect(() => {
     if (page === -1) return
     if (page === 1) {
-      setRes(undefined);
+      setData(undefined);
       (async () => {
         try {
           setIsLoading(true)
-          await updateWorkers()
-        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+          await update()
+        } catch (error) { myAlert.err({ title: "取得客戶資料失敗" }) }
         setIsLoading(false)
       })()
     }
     else {
       (async () => {
         try {
-          await updateWorkers_infinite()
-        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+          await update_infinite()
+        } catch (error) { myAlert.err({ title: "取得客戶資料失敗" }) }
       })()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,7 +118,7 @@ export default function WorkerSelector(
 
   // ==================================================
 
-  const onClick = (newEmp: TdailyReportWokerDto) => {
+  const onClick = (newEmp: TcustomerDto) => {
     const newArr = [...selEmployeeArr]
     if (selLimit === 1) {
       newArr[0] = newEmp
@@ -137,7 +132,7 @@ export default function WorkerSelector(
   }
 
   const theOnConfirm = () => {
-    if (!selEmployeeArr) return ModalInfo("請選擇公司")
+    if (!selEmployeeArr) return ModalInfo("請選擇客戶")
     onConfirm(selEmployeeArr)
     theOnCancel()
   }
@@ -166,9 +161,8 @@ export default function WorkerSelector(
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
         <div className={style.listContainer}>
-          {workerArr.map((emp, index, arr) => {
-            const { idNumber, chName, jobs } = emp
-            const { name, grade } = jobs?.[0] ?? {}
+          {customerArr?.map((emp, index, arr) => {
+            const { customerNumber, name } = emp
 
             const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
 
@@ -183,10 +177,8 @@ export default function WorkerSelector(
                   onClick={() => onClick(emp)}
                   ref={theViewRef}
                 >
-                  <span>{idNumber}</span>
-                  <span>{chName}</span>
+                  <span>{customerNumber}</span>
                   <span>{name}</span>
-                  <span>{grade && `Level ${grade}`}</span>
                 </div>
               </CellWithBar>
             )

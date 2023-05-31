@@ -1,11 +1,9 @@
 import { useState, } from 'react'
-import { format } from 'date-fns'
 
-// components
-import CustomerSelector from './modal/customerSelector'
 // glogal gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel'
 import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address'
+import CustomerSelector from 'components/global/gear/modal/customerSelector'
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
@@ -13,11 +11,9 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
 // css
 import scss from "./quotationProfile.module.scss"
 
-
-// import { Class_basicInfo } from 'hooks/quotation/useQuotation'
 import { Class_basicInfo, Class_legacyContract } from 'hooks/quotation/useLegacyContract'
 import { Toption } from 'fakeDatabase/options/countryAndDistrict'
-// import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
+
 
 // type
 import { TcustomerDto, TpageMetaDto } from 'js/api/dtoTypes'
@@ -34,17 +30,13 @@ const inputStyle = {
 }
 // ====================================================
 export default function QuotationProfile(
-  { classLegacyContract, classBasicInfo,
-    customerArr, getCustomerByPage,
-    searchCustomer,
-    disabled = false }:
+  { classLegacyContract,
+    classBasicInfo,
+    disabled = false
+  }:
     {
       classLegacyContract: Class_legacyContract
       classBasicInfo: Class_basicInfo
-      customerArr: TcustomerDto[]
-      customerMeta: TpageMetaDto | undefined
-      getCustomerByPage: () => void
-      searchCustomer: (v: string) => void
       disabled: boolean
     }) {
 
@@ -112,7 +104,8 @@ export default function QuotationProfile(
     if (disabled) return
     setShowModal(true)
   }
-  const onConfirmClient = (customer: TcustomerDto) => {
+  const onConfirmClient = (customerArr: TcustomerDto[]) => {
+    const customer = customerArr[0]
     classLegacyContract.customer = customer
     classBasicInfo.customerName = customer.name
     classBasicInfo.contactPerson = customer.contacts?.[0]?.name ?? ""
@@ -248,11 +241,11 @@ export default function QuotationProfile(
 
       {/* modal */}
       <CustomerSelector
-        {...{ showModal, setShowModal }}
-        customerArr={customerArr}
-        getCustomerByPage={getCustomerByPage}
-        searchCustomer={searchCustomer}
+        showModal={showModal}
         onConfirm={onConfirmClient}
+        onCancel={() => setShowModal(false)}
+        label="請選擇客戶"
+        selLimit={1}
       />
 
     </div>

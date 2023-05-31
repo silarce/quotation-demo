@@ -1,16 +1,15 @@
 
 import {
-  Dispatch, SetStateAction,
-  useState, useMemo, useEffect
+  useState, useEffect
 } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from "lodash"
 
 // global gear
 import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch'
-import CellWrapper from 'components/global/gear/cell/cellWithBar';
 import CellWithBar from "components/global/gear/cell/cellWithBar";
-import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
 import style from "./employeeSelector.module.scss"
@@ -18,89 +17,139 @@ import style from "./employeeSelector.module.scss"
 // type
 import { TemployeeDto } from 'js/api/dtoTypes';
 
+// api
+import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
+
 
 
 export default function EmployeeSelector(
   {
-    showModal, setShowModal,
-    employeeArr, getCustomerByPage,
-    searchCustomer: searchEmployee,
+    showModal,
     onConfirm,
     onCancel,
     label,
+    tip,
+    selLimit,
   }:
     {
       showModal: boolean
-      employeeArr: TemployeeDto[]
-      searchCustomer: (v: string) => void
-      // onConfirm: (v: TemployeeDto[]) => void
-      onConfirm: (v: TemployeeDto) => void
+      onConfirm: (v: TemployeeDto[]) => void
       onCancel: () => void
       label?: string
-      getCustomerByPage?: () => void
-      setShowModal?: Dispatch<SetStateAction<boolean>>
+      tip?: React.ReactNode
+      selLimit?: 1
     }
 ) {
+  const [isLoading, setIsLoading] = useState(false)
 
-  // const [viewRef, inView] = useInView();
-
-
-  // useEffect(() => {
-  //   if (!inView) return
-  //   getCustomerByPage()
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [inView])
-
-
-  // ==================================================
   // 被選的資料
-  const [selEmployee, setSelEmployee] = useState<TemployeeDto>()
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([])
 
-  // 搜尋過濾
+  const [searchValue, setSearchValue] = useState<string | undefined>()
+  const [pageObj, setPageObj] = useState({ page: -1 })
+  const page = pageObj.page
+
+  const params: TapiGetEmployeeParams = (() => {
+    const allNum = /^\d+$/.test(searchValue ?? "n")
+    const grade = allNum ? searchValue : undefined
+    return {
+      page: page,
+      pageSize: 20,
+      populate: ["jobs"],
+      sort:"idNumber",
+      filter: {
+        "$or": {
+          idNumber: { $contains: searchValue },
+          chName: { $contains: searchValue },
+          "jobs.name": { $contains: searchValue },
+          "jobs.grade": { $eq: grade },
+        }
+      }
+    }
+  })()
+
+  const { data, setData, update, update_infinite } = useEmployee(params)
+  const employeeArr = data?.data || []
+  const meta = data?.meta
+
+  const [viewRef, inView] = useInView();
+
+  useEffect(() => {
+    if (!showModal) return
+    if (!inView) return
+    if (!meta?.hasNextPage) return;
+    const newPageObj = { ...pageObj, page: pageObj.page + 1 }
+    setPageObj(newPageObj)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
+  useEffect(() => {
+    if (!showModal) {
+      const newPageObj = { ...pageObj, page: -1 }
+      setPageObj(newPageObj);
+      setData(undefined)
+      setSearchValue(undefined)
+      return
+    }
+    const newPageObj = { ...pageObj, page: 1 }
+    setPageObj(newPageObj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue, showModal])
+
+
+  useEffect(() => {
+    if (page === -1) return
+    if (page === 1) {
+      setData(undefined);
+      (async () => {
+        try {
+          setIsLoading(true)
+          await update()
+        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+        setIsLoading(false)
+      })()
+    }
+    else {
+      (async () => {
+        try {
+          await update_infinite()
+        } catch (error) { myAlert.err({ title: "取得人員資料失敗" }) }
+      })()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageObj])
+
+
+
   // ==================================================
+
   const onClick = (newEmp: TemployeeDto) => {
-    setSelEmployee(newEmp)
+    const newArr = [...selEmployeeArr]
+    if (selLimit === 1) {
+      newArr[0] = newEmp
+      setSelEmployeeArr(newArr)
+      return
+    }
+    const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id)
+    if (theIndex > -1) newArr.splice(theIndex, 1)
+    else newArr.push(newEmp)
+    setSelEmployeeArr(newArr)
   }
 
   const theOnConfirm = () => {
-    if (!selEmployee) return ModalInfo("請選擇公司")
-    onConfirm(selEmployee)
+    if (!selEmployeeArr) return ModalInfo("請選擇公司")
+    onConfirm(selEmployeeArr)
     theOnCancel()
   }
 
   const theOnCancel = () => {
     onCancel()
-    setSelEmployee(undefined)
+    setSelEmployeeArr([])
   }
 
-  // // 被選的資料
-  // const [selEmployee, setSelEmployee] = useState<TemployeeDto[]>([])
-
-  // // 搜尋過濾
-  // // ==================================================
-  // const onClick = (newEmp: TemployeeDto) => {
-
-  //   const index = selEmployee.findIndex((emp) => {
-  //     return emp.id === newEmp.id
-  //   })
-
-  //   const arrCopy = _.cloneDeep(selEmployee)
-  //   if (index === -1) { arrCopy.push(newEmp) }
-  //   else { arrCopy.splice(index, 1) }
-
-  //   setSelEmployee(arrCopy)
-  // }
-
-  // const theOnConfirm = () => {
-  //   if (!selEmployee[0]) return ModalInfo("請選擇公司")
-  //   onConfirm(selEmployee)
-  //   theOnCancel()
-  // }
-
-  // const theOnCancel = () => {
-  //   onCancel()
-  //   setSelEmployee([])
-  // }
+  const onSearch = (v: string) => {
+    setSearchValue(v)
+  }
 
   // ==================================================
 
@@ -110,30 +159,40 @@ export default function EmployeeSelector(
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={searchEmployee}
+      onSearch={onSearch}
       width={"800"}
       className={style.container}
+      tip={tip}
     >
-      <div className={style.listContainer}>
-        {employeeArr.map((emp, index) => {
-          const { idNumber, chName, jobs } = emp
-          const { name, grade } = jobs?.[0] ?? {}
-          // const isActive = selEmployee.some((selEmp) => { return selEmp.id === emp.id })
-          const isActive = selEmployee?.id === emp.id
-          return (
-            <CellWithBar key={index} isActive={isActive}>
-              <div className={`${style.listItem}`}
-                onClick={() => onClick(emp)}
-              >
-                <span>{idNumber}</span>
-                <span>{chName}</span>
-                <span>{name}</span>
-                <span>{grade && `Level ${grade}`}</span>
-              </div>
-            </CellWithBar>
-          )
-        })}
-      </div>
+      <LoadingCoverWrapper01 isLoading={isLoading}>
+        <div className={style.listContainer}>
+          {employeeArr.map((emp, index, arr) => {
+            const { idNumber, chName, jobs } = emp
+            const { name, grade } = jobs?.[0] ?? {}
+
+            const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
+
+            const theViewRef = (() => {
+              if (arr.length - 11 === index) return viewRef
+              return undefined
+            })()
+
+            return (
+              <CellWithBar key={index} isActive={isActive}>
+                <div className={`${style.listItem}`}
+                  onClick={() => onClick(emp)}
+                  ref={theViewRef}
+                >
+                  <span>{idNumber}</span>
+                  <span>{chName}</span>
+                  <span>{name}</span>
+                  <span>{grade && `Level ${grade}`}</span>
+                </div>
+              </CellWithBar>
+            )
+          })}
+        </div>
+      </LoadingCoverWrapper01>
     </ModalListSelectorWithSearch >
   )
 }

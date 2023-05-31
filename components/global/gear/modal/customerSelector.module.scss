@@ -1,6 +1,5 @@
 @use "styles/theme01" as *;
 
-
 .container {
   :global(.ant-modal-content) {
     width: 800px;
@@ -15,9 +14,9 @@
 }
 .listItem {
   display: grid;
-  grid-template-columns: 100px 1fr 1fr 70px;
+  grid-template-columns: 100px auto;
   height: 54px;
-  padding: 0 46px;
+  padding: 0 42px;
   gap: 60px;
   border-bottom: solid 1px $colorBorder01;
   cursor: pointer;

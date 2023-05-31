@@ -2,78 +2,53 @@
 
 .body {
   position: relative;
-  > .main {
-    padding: 38px 45px;
-    display: grid;
-    gap: 21px;
-  }
-}
-
-.departHeader {
   display: grid;
-  grid-template-columns: auto auto;
-  justify-content: space-between;
-  padding: 11px 41px;
-  background-color: $bgc01;
-  > * {
-    display: inline-block;
-    margin: auto;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 22px;
-    color: $colorMain;
+  gap: 15px;
+  padding: 15px;
+  .card {
+    display: grid;
+    grid-template-columns: min-content auto;
+    height: 300px;
+    .left {
+      display: grid;
+      place-content: center;
+      padding: 14px;
+      background-color: $bgc01;
+      > span {
+        line-height: 22px;
+        font-size: 18px;
+        font-weight: 400;
+        color: $colorMain;
+      }
+    }
+    .right {
+      border: solid 1px $colorBorder01;
+      padding: 3px;
+      overflow: auto;
+      .addBtn {
+        padding:16px;
+        padding-left: 0;
+        margin-left: 46px;
+        background-color: transparent;
+        border: 0;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 112px 100px 120px auto 18px;
+        gap: 40px;
+        padding: 17px;
+        padding-left: 46px;
+        > div > span {
+          font-size: 16px;
+          font-weight: 400;
+        }
+        .removeBtn {
+          width: 18px;
+          height: 24px;
+          stroke: $colorMain;
+          fill:transparent
+        }
+      }
+    }
   }
-}
-
-.cardContainer {
-  padding: 14px 35px;
-  padding-bottom: 24px;
-  border: solid 1px $colorBorder01;
-  > span {
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 22px;
-  }
-}
-
-.customCard {
-  display: flex;
-  gap: 20px;
-  width: fit-content;
-  span {
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 22px;
-  }
-}
-
-.card {
-  position: relative;
-  display: inline-grid;
-  grid-template-columns: 120px fit-content(100%) 118px;
-  gap: 20px;
-  width: fit-content;
-  padding: 22px 33px;
-  margin: 14px 80px 0px 0px;
-  border: solid 1px $colorBorder01;
-  border-left: solid 2px $colorActive01;
-  &:nth-of-type(n + 4) {
-    margin-top: 40px;
-  }
-  span {
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 22px;
-  }
-  > svg {
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 12px);
-    transform: translateY(-50%);
-    cursor: pointer;
-  }
-}
-
-.addBtn {
-  border: none;
 }
