@@ -345,10 +345,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
   /**發出更新日報表請求 */
-  const reqApiPatchDailyReports_my = async (employeeArr: TemployeeDto[]) => {
+  const reqApiPatchDailyReports_my = async (
+    reviewerArr: TemployeeDto[],
+    examinerArr: TemployeeDto[],
+  ) => {
     if (!reportInEdit) return
 
-    const employeeIds = employeeArr.map((emp) => emp.id)
+    const reviewerIds = reviewerArr.map((emp) => emp.id)
+    const examinerIds = examinerArr.map((emp) => emp.id)
     const items = reportInEdit.items.map((item) => item.postBody)
 
     try {
@@ -356,7 +360,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       await apiPatchDailyReports_my({
         date: reportInEdit.date,
         body: {
-          reviewerIds: employeeIds,
+          reviewerIds,
+          examinerIds,
           items
         }
       })

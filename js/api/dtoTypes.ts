@@ -286,7 +286,8 @@ export type TcreateDailyReportItemDto = {
 }
 
 export type TupdateDailyReportDto = {
-  date: Date // date
+  reviewerIds: string[]
+  examinerIds: string[]
   items: TcreateDailyReportItemDto[]
 }
 
@@ -294,21 +295,15 @@ export type TdailyReportWorkerJobsDto = {
   name: TjobDto["name"]
   grade: TjobDto["grade"]
 }
-// export type TdailyReportWorkerJobsDto = Pick<TjobDto, "name" | "grade">
 
-
-// export type TdailyReportWokerDro = {
-//   id: string
-//   idNumber: string
-//   chName: string,
-//   jobs: TdailyReportWorkerJobsDto[]
-// }
 export type TdailyReportWokerDto = {
   id: TemployeeDto["id"]
   idNumber: TemployeeDto["idNumber"]
   chName: TemployeeDto["chName"]
   jobs: TdailyReportWorkerJobsDto[]
 }
+
+
 
 // =======================================================
 // =======================================================

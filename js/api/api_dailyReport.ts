@@ -99,10 +99,7 @@ export const apiPatchDailyReports_my = (
     {
       /**YYYY-MM-DD */
       date: string
-      body: {
-        reviewerIds: string[]
-        items: TcreateDailyReportItemDto[]
-      }
+      body: TupdateDailyReportDto
     }
 ) => {
   const api = `/daily-reports/my?date=${date}`

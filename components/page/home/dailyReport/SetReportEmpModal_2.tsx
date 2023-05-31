@@ -24,7 +24,8 @@ export default function SetReportEmpModal(
   }:
     {
       visible: boolean
-      onConfirm: (dataArr: TemployeeDto[]) => void
+      // onConfirm: (dataArr: TemployeeDto[]) => void
+      onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void
       onCancel: () => void
     }
 ) {
@@ -131,7 +132,7 @@ export default function SetReportEmpModal(
         />
         {/*  */}
         <TwoBtnFooter
-          onConfirm={() => onConfirm(selReviewerArr)}
+          onConfirm={() => onConfirm(selReviewerArr, selExaminerArr)}
           onCancel={onCancel}
         />
       </div>
