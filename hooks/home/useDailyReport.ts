@@ -224,15 +224,14 @@ const useReport = () => {
     let isUserIsViewer: boolean = false
 
     const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
+      const statuType = statu.type
       const reviewerId = statu.reviewerEmployee?.id ?? null
-      const examinerId = statu.examinerEmployee?.id ?? null
+      // const examinerId = statu.examinerEmployee?.id ?? null
       const reviewedAt = statu.reviewedAt
       if (reviewerId === userInfo.employee?.id) {
         isAllowToReview = true
+        if (statuType === "examiner") isUserIsViewer = true
         if (reviewedAt) isReviewedByUser = true
-      }
-      if (examinerId === userInfo.employee?.id) {
-        isUserIsViewer = true
       }
       return !!reviewedAt
     })

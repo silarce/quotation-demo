@@ -243,6 +243,17 @@ export type TdailyReportItemDto = {
   workOrderNumber: string | null
 }
 
+export type TdailyReportReviewStatusDto = {
+  id: string
+  createdAt: string // date
+  updatedAt: string //date
+  reviewerEmployeeId: string
+  reviewerEmployee: TemployeeDto
+  reviewedAt: string | null //date
+  type: "reviewer" | "examiner"
+  // examinerEmployeeId: string
+  // examinerEmployee: TemployeeDto | null
+}
 
 export type TdailyReportDto = {
   id: string
@@ -250,17 +261,7 @@ export type TdailyReportDto = {
   updatedAt: string //date
   date: string // yyyy-MM-DD
   employee: TemployeeDto
-  reviewStatus: {
-    id: string
-    createdAt: string // date
-    updatedAt: string //date
-    reviewerEmployeeId: string
-    reviewerEmployee: TemployeeDto | null
-    reviewedAt: string | null //date
-    examinerEmployeeId: string
-    examinerEmployee: TemployeeDto | null
-
-  }[]
+  reviewStatus: TdailyReportReviewStatusDto[]
   isReviewCompleted: boolean
   reportedAt: Date
   items: TdailyReportItemDto[]
