@@ -185,9 +185,9 @@ const Selector = (
       <div className={scss.body}>
         {employeeArr.map((emp, index) => {
           const { idNumber, chName, jobs, id } = emp
-          const sortedJobs = _.sortBy(jobs, "grade")
-          const jobName = sortedJobs[0].name
-          const grade = sortedJobs[0].grade
+          const sortedJobs = _.sortBy(jobs || [], "grade")
+          const jobName = sortedJobs[0]?.name || ""
+          const grade = sortedJobs[0]?.grade || ""
           const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
 
           if (searchValue) {
