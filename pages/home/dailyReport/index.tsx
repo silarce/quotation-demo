@@ -13,6 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
+import SetReportEmpModal_2 from "components/page/home/dailyReport/SetReportEmpModal_2"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
@@ -35,7 +36,6 @@ import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
   apiPatchDailyReports_my,
@@ -98,9 +98,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [reviewersPickArr, setReviewersPickArr] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
 
-  // 送進 選擇審核人員 SetReportEmpModal的arr
-  const [reviewerArr, setReviewerArr] =
-    useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
+  // 每個日報上傳前要選reviewer，這是那個modal的開關
+  const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false)
+
 
   // 日報表tagArr，送進TagCarousel
   const [tagArr, setTagArr] = useState<Ttag[]>([])
@@ -178,7 +178,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
   // 取得所有審核人員
-  const { updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
+  const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
   const { update: updateEmployeeArr }
     = useEmployee({ pageSize: 999999, populate: ["jobs"] })
@@ -334,24 +334,23 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
 
   //**開啟審核人員選擇面板 */
-  const choseReviewerArr = async () => {
-    const reviewerArr = await updateReviewersArr()
-    const formetedViewerArr = formatEmployeeArr({ employeeArr: reviewerArr })
-    setReviewerArr(formetedViewerArr)
-  }
-  const cancelReviewerArr = () => {
-    setReviewerArr(undefined)
-  }
-  /**發出更新日報表請求 */
-  const reqApiPatchDailyReports_my = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+  // const choseReviewerArr = async () => {
+  //   const reviewerArr = await updateReviewersArr()
+  //   const formetedViewerArr = formatEmployeeArr({ employeeArr: reviewerArr })
+  //   setReviewerArr(formetedViewerArr)
+  // }
+  // const cancelReviewerArr = () => {
+  //   setReviewerArr(undefined)
+  // }
 
-    const employeeIds: string[] = []
-    employeeArr.forEach((employee) => {
-      if (employee.shouldReport) employeeIds.push(employee.id)
-    })
+
+  /**發出更新日報表請求 */
+  const reqApiPatchDailyReports_my = async (employeeArr: TemployeeDto[]) => {
     if (!reportInEdit) return
 
+    const employeeIds = employeeArr.map((emp) => emp.id)
     const items = reportInEdit.items.map((item) => item.postBody)
+
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({
@@ -380,7 +379,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       myAlert.err({ title: "更新日報表失敗" })
     }
     finally { showRootLoading(false) }
-    cancelReviewerArr()
+    setShowReviewerForReportModal(false)
   }
 
   // ----------------------------------------------------------------------
@@ -520,7 +519,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     {
       type: "redButton",
       label: "上傳",
-      onClick: choseReviewerArr,
+      onClick: () => setShowReviewerForReportModal(true),
     },
     {
       type: "myButton",
@@ -636,14 +635,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         tip="可複選"
       />
 
-      <SetReportEmpModal
-        visible={!!reviewerArr}
+      <SetReportEmpModal_2
+        visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
-        onCancel={cancelReviewerArr}
-        dataArr={reviewerArr ?? []}
+        onCancel={() => setShowReviewerForReportModal(false)}
         label="選擇審核人員"
         tip="可複選"
       />
+
     </>
   )
 }

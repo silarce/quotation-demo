@@ -17,7 +17,13 @@ import {
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto, TdailyReportWokerDto, Tparams }
+export type {
+  TcreateDailyReportItemDto,
+  TdailyReportDto,
+  TdailyReportWokerDto,
+  Tparams,
+  TemployeeDto
+}
 // =================================================================
 
 
@@ -157,7 +163,7 @@ export const useApiDailyReports_reviewers = () => {
     reviewersArr: data,
     setReviewersArr: setData,
     /**更新所有需回報的人員 */
-    updateReviewerssArr: update
+    updateReviewersArr: update
   }
 }
 
