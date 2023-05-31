@@ -71,12 +71,12 @@ export default function ReporterList(
               return (
                 <CellWithBar key={index} className={classNames(scss.row)}
                   onClick={() => { addTag(tag) }}>
-                  {/* <div className={classNames("w-[95px]", scss.chDate)}><span>{chDate}</span></div> */}
                   <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
                   <div className={classNames(scss.reviewerList, "w-full")}>
 
                     {reviewStatus?.map((item, index) => {
                       const { reviewerEmployee, reviewedAt } = item
+                      if (!reviewerEmployee) return null
                       const { chName, } = reviewerEmployee
                       return (
                         <StatuBtn key={index}

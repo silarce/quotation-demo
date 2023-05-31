@@ -254,8 +254,12 @@ export type TdailyReportDto = {
     id: string
     createdAt: string // date
     updatedAt: string //date
-    reviewerEmployee: TemployeeDto
+    reviewerEmployeeId: string
+    reviewerEmployee: TemployeeDto | null
     reviewedAt: string | null //date
+    examinerEmployeeId: string
+    examinerEmployee: TemployeeDto | null
+
   }[]
   isReviewCompleted: boolean
   reportedAt: Date

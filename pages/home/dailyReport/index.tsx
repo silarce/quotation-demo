@@ -331,18 +331,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------------------------
   // 更新日報表
-  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
-
-  //**開啟審核人員選擇面板 */
-  // const choseReviewerArr = async () => {
-  //   const reviewerArr = await updateReviewersArr()
-  //   const formetedViewerArr = formatEmployeeArr({ employeeArr: reviewerArr })
-  //   setReviewerArr(formetedViewerArr)
-  // }
-  // const cancelReviewerArr = () => {
-  //   setReviewerArr(undefined)
-  // }
-
 
   /**發出更新日報表請求 */
   const reqApiPatchDailyReports_my = async (
@@ -543,6 +531,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ]
 
   const panelList = (() => {
+    if (reportInEdit?.isUserIsViewer) {
+      return []
+    }
+    
     if (identity === "manager") {
       if (!reportInEdit) return panelList_manager_notInEdit
       else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
@@ -559,8 +551,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         }
         else if (reportInEdit.isAllowToReview) {
           return panelList_reviewer_inEdit_user
-          // if (reportInEdit.isReviewedByUser) return panelList_reviewer_inEdit_user
-          // if (reportInEdit.isReviewedByOther) return panelList_reviewer_inEdit
         }
         return []
       }
@@ -718,7 +708,6 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
   return false
 }
 
-
 // ==========================================================================
 
 /** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
@@ -755,36 +744,3 @@ const formatRiewerPickArr = (
   })
   return result
 }
-
-/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatEmployeeArr = (
-  { employeeArr }:
-    {
-      employeeArr: TemployeeDto[] | undefined
-    }
-) => {
-  if (!employeeArr) return []
-
-  const result = employeeArr.map((item) => {
-    const shouldReport = false
-    let theJobs = (() => {
-      if (item.jobs) {
-        return _.sortBy(item.jobs, "grade")
-      }
-      else return []
-    })();
-
-    const obj = {
-      id: item.id,
-      chName: item.chName,
-      idNumber: item.idNumber,
-      job: theJobs[0]?.name ?? "",
-      grade: theJobs[0]?.grade ?? "",
-      shouldReport
-    }
-    return obj
-  })
-  return result
-}
-
-
