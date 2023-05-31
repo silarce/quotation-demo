@@ -157,7 +157,7 @@ class Class_reportItem {
       const idArr = this.workers.map((worker) => {
         return worker.id
       })
-      if (!idArr[0]) return null
+      if (idArr.length === 0) return null
       return idArr
     })()
 
@@ -172,15 +172,27 @@ class Class_reportItem {
       contactName: this.contactName,
       meals,
       description: this.description,
-
       departureTime: this.departureTime || null,
       arrivalTime: this.arrivalTime || null,
       departureWorksiteTime: this.departureWorksiteTime || null,
       licensePlate: this.licensePlate || "",
       stayLength: this._item.stayLength || 0,
-
       workerIds: workerIdArr,
       workOrderNumber: this.dispatchOrderId ?? "",
+      // test
+      // periodOfDay: "AM",
+      // customerName: "",
+      // contactName: "",
+      // meals: null,
+      // description: "",
+      // departureTime: null,
+      // arrivalTime: null,
+      // departureWorksiteTime: null,
+      // licensePlate: "",
+      // stayLength: 0,
+      // workerIds: null,
+      // workOrderNumber: "",
+      // 
     }
   }
 

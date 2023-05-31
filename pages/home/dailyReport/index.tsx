@@ -337,11 +337,19 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     reviewerArr: TemployeeDto[],
     examinerArr: TemployeeDto[],
   ) => {
+
     if (!reportInEdit) return
+
+    if (reviewerArr.length === 0) {
+      return myAlert.warning({ title: "請選擇審核人員" })
+    }
 
     const reviewerIds = reviewerArr.map((emp) => emp.id)
     const examinerIds = examinerArr.map((emp) => emp.id)
-    const items = reportInEdit.items.map((item) => item.postBody)
+
+    const items = reportInEdit.items.map((item) => {
+      return item.postBody
+    })
 
     try {
       showRootLoading(true)
