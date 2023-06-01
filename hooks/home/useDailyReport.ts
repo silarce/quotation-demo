@@ -8,9 +8,6 @@ import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoT
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 
 
-// option
-import { optionsCreator_mealsCost } from "fakeDatabase/options/options";
-
 // =================================================================
 
 type ThookEmptyReport = {
@@ -207,7 +204,6 @@ const useReport = () => {
   const [report, setReport] = useState<ThookEmptyReport>()
   const [reportTemp, setReportTemp] = useState<ThookEmptyReport>()
 
-  const opitonArr_mealsCost = optionsCreator_mealsCost()
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
@@ -238,7 +234,6 @@ const useReport = () => {
     const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
       const statuType = statu.type
       const reviewerId = statu.reviewerEmployee?.id ?? null
-      // const examinerId = statu.examinerEmployee?.id ?? null
       const reviewedAt = statu.reviewedAt
       if (reviewerId === userInfo.employee?.id) {
         isAllowToReview = true
@@ -261,28 +256,14 @@ const useReport = () => {
       employeeId: dailyReport.employee?.id
     }
     setReport(theReport)
-  }
+  } // reNew_report
   // 
   const addReportItem = () => {
     setReport(report => {
       if (!report) return report
-      const id = report.id
-      const date = report.date
       const items = report.items
-      const isAllowToReview = report.isAllowToReview
-      const isReviewedByOther = report.isReviewedByOther
-      const isReviewedByUser = report.isReviewedByUser
-      const isReviewCompleted = report.isReviewCompleted
-      const isUserIsViewer = report.isUserIsViewer
-      const isEdit = report.isEdit
-      const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
-      return {
-        id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewedByUser,
-        isReviewCompleted, isUserIsViewer,
-        isEdit, employeeId
-      }
+      return { ...report }
     })
   }
   // 
@@ -290,20 +271,7 @@ const useReport = () => {
     setReport(report => {
       if (!report) return report
       const isReviewedByUser = true
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const isEdit = report.isEdit
-      const isAllowToReview = report.isAllowToReview
-      const isReviewCompleted = report.isReviewCompleted
-      const isUserIsViewer = report.isUserIsViewer
-      const employeeId = report.employeeId
-      return {
-        id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewCompleted,
-        isReviewedByUser, isUserIsViewer,
-        isEdit, employeeId
-      }
+      return { ...report, isReviewedByOther, isReviewedByUser, }
     })
   }
   // 
@@ -315,25 +283,10 @@ const useReport = () => {
       setReportTemp(undefined)
       return;
     }
-
     setReport(report => {
       if (!report) return
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const isAllowToReview = report.isAllowToReview
-      const isReviewedByOther = report.isReviewedByOther
-      const isReviewedByUser = report.isReviewedByUser
-      const isReviewCompleted = report.isReviewCompleted
-      const isUserIsViewer = report.isUserIsViewer
       const isEdit = !report.isEdit
-      const employeeId = report.employeeId
-      return {
-        id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewCompleted,
-        isReviewedByUser, isUserIsViewer,
-        isEdit, employeeId
-      }
+      return { ...report, isEdit, }
     })
   }
   // 
@@ -341,6 +294,7 @@ const useReport = () => {
     if (!report) return false
     return (report.isReviewedByOther || !report.isEdit) ? false : true
   })()
+  // 
   // 
   return {
     report, setReport, reNew_report,
