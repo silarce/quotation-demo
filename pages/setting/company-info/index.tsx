@@ -28,11 +28,7 @@ import {
 } from "js/api/api_company-info"
 
 // icon
-import { IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
-import imgLogo from "public/image/logo/LOGO.svg"
-
-
-
+import imgLogo2 from "public/image/logo/LOGO_2.svg"
 
 // css
 import scss from "./company-info.module.scss"
@@ -69,6 +65,7 @@ export default function CompanyInfo() {
 
   useEffect(() => {
     const logoFileId = companyInfo?.logoFileId
+    if (!logoFileId) return;
     setImgSrc(`${domain}file/download/${logoFileId}`)
   }, [companyInfo?.logoFileId])
 
@@ -123,10 +120,16 @@ export default function CompanyInfo() {
     }
   }
   // 清除
-  const clearLogo = () => {
+  const resetLogo = () => {
     const logoFileId = companyInfo?.logoFileId
     setImgSrc(`${domain}file/download/${logoFileId}`)
     setImageFile(undefined)
+  }
+  const clearLogo = () => {
+    setTimeout(() => {
+      setImgSrc(undefined)
+      setImageFile(undefined)
+    }, 0);
   }
 
   // ------------------------------------------------------------------------
@@ -161,6 +164,9 @@ export default function CompanyInfo() {
             formData.append("image", imageFile)
             await apiUploadCompanyLogo(formData)
           }
+          if (!imgSrc) {
+            apiDelCompanyLogo()
+          }
           await update()
           myAlert.success({ title: "上傳成功" })
         }
@@ -180,16 +186,11 @@ export default function CompanyInfo() {
       onClick: () => {
         setEditable(false)
         setCompanyInfo(_.cloneDeep(infoBackup))
-        clearLogo()
+        resetLogo()
       }
     },
   ]
-  // ------------------------------------------------------------------------
 
-  // const btnLabel = imgSrc ? "刪除logo" : "上傳公司logo"
-  // const onImg = imgSrc ? 移除圖片的函式 : selectImg
-  const btnLabel = imgSrc ? "上傳公司logo" : "上傳公司logo"
-  const onImg = imgSrc ? selectImg : selectImg
   // ------------------------------------------------------------------------
   return (
     <SubLayer>
@@ -199,16 +200,22 @@ export default function CompanyInfo() {
       <div className={scss.body}>
         {/* logo */}
         <div className={classNames(scss.logoBox,)}>
-          <Image className={scss.logo}
-            src={imgSrc || imgLogo} alt="logo" width={300} height={300} />
+          <Image className={classNames(scss.logo)}
+            src={imgSrc || imgLogo2} alt="logo" width={300} height={300}
+            priority={true}
+          />
           {editable &&
             <div className={classNames(scss.panel)}>
               <span>{"(上限10MB)"}</span>
-              <label className={classNames(scss.btn, { [scss.red]: false })}
-                htmlFor="uploadLogo">
-                <span>{btnLabel}</span>
-                <input
-                  id="uploadLogo" type="file" onChange={onImg} />
+              <label className={classNames(scss.btn, { [scss.red]: !!imgSrc })}
+                htmlFor="uploadLogo"
+                onClick={imgSrc ? clearLogo : undefined}
+              >
+                <span>{imgSrc ? "刪除logo" : "上傳公司logo"}</span>
+                {!imgSrc &&
+                  <input
+                    id="uploadLogo" type="file"
+                    onChange={selectImg} />}
               </label>
             </div>
           }

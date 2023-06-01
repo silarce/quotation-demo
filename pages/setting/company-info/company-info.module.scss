@@ -21,6 +21,11 @@
     width: 300px;
     height: 300px;
     object-fit: cover;
+    &.emptyLogo {
+      width: unset;
+      height: unset;
+      // object-fit: unset;
+    }
   }
   .panel {
     position: absolute;
