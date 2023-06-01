@@ -14,11 +14,10 @@ import InputSearch from 'components/global/gear/input/inputSearch';
 import { TemployeeDto, useApiDailyReports_reviewers } from "js/api/api_dailyReport"
 
 // css
-import scss from "./setReportEmpModal_2.module.scss"
-import { ConsoleSqlOutlined } from "@ant-design/icons"
+import scss from "./reviewerAndExaminerSelector.module.scss"
 
 
-export default function SetReportEmpModal(
+export default function ReviewerAndExaminerSelector(
   { visible,
     onConfirm,
     onCancel,
@@ -26,7 +25,6 @@ export default function SetReportEmpModal(
   }:
     {
       visible: boolean
-      // onConfirm: (dataArr: TemployeeDto[]) => void
       onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void
       onCancel: () => void
       userId: string |

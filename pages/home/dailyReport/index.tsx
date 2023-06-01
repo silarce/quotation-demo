@@ -13,7 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
-import SetReportEmpModal_2 from "components/page/home/dailyReport/SetReportEmpModal_2"
+import SetReportEmpModal_2 from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
