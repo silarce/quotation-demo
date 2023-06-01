@@ -14,7 +14,7 @@ import style from "./outsourcing.module.scss"
 
 // option
 import { optionsCreator_doorType } from 'js/utils/options/options';
-import { optionsCreator_county } from 'fakeDatabase/options/countryAndDistrict';
+import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 const optionsDoorType = optionsCreator_doorType()
 const optionsCounty = optionsCreator_county()
 optionsDoorType.unshift({ value: "", label: "不拘" })

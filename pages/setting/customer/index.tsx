@@ -29,7 +29,7 @@ import {
 import style from "./customer.module.scss"
 
 // option
-import { optionsCreator_county } from "fakeDatabase/options/countryAndDistrict";
+import { optionsCreator_county } from "js/utils/options/countryAndDistrict";
 import { optionsCreator_clientSearch, Toption } from "js/utils/options/options"
 const clientSearchOptions = optionsCreator_clientSearch()
 const clientSearchOptionsObj: { [key: string]: Toption } = {}

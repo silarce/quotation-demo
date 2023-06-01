@@ -34,7 +34,7 @@ import imgLogo2 from "public/image/logo/LOGO_2.svg"
 import scss from "./company-info.module.scss"
 
 // fakeData type
-import { Toption } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption } from 'js/utils/options/countryAndDistrict'
 
 
 export default function CompanyInfo() {

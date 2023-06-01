@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-import { Toption } from "../../js/utils/options/options"
+import { Toption } from "./options"
 
 export type { Toption }
 
