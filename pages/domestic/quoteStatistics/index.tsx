@@ -14,7 +14,7 @@ type TselectPropsArr = Parameters<typeof SelectBar>[0]["selectPropsArr"]
 
 
 // option
-import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from "fakeDatabase/options/options";
+import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from "js/utils/options/options";
 const monthOptionArr = optionsCreator_month({ emptyOption: true })
 const regionOptionArr = optionsCreator_region({ emptyOption: true })
 const yearOptionArr = optionsCreator_year()

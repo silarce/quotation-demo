@@ -19,7 +19,7 @@ import iconArrowBlack from "public/image/icon/arrow_down.svg"
 import scss from "../inputSel.module.scss"
 
 // type
-import type { Toption } from "fakeDatabase/options/options"
+import type { Toption } from "js/utils/options/options"
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
 export type TselectProps = {

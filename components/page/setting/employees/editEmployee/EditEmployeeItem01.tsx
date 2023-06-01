@@ -10,7 +10,7 @@ import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/
 import {
   Toption,
   optionsCreator_gender, optionsCreator_marital
-} from "fakeDatabase/options/options";
+} from "js/utils/options/options";
 const [optionsGender, optionMarital]
   = [optionsCreator_gender(), optionsCreator_marital()]
 

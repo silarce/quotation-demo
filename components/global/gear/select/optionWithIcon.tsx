@@ -6,7 +6,7 @@ import { OptionProps, }
   from 'react-select';
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
 
-import type { Toption } from "fakeDatabase/options/options"
+import type { Toption } from "js/utils/options/options"
 
 const { Option } = components
 

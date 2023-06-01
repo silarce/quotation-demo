@@ -11,7 +11,7 @@ import InputSel from "../inputSel"
 import scss from "./inputSelBar.module.scss"
 
 // type
-import type { Toption } from "fakeDatabase/options/options"
+import type { Toption } from "js/utils/options/options"
 // component
 import Input, { TinputProps } from "../cog/input";
 import MySelect, { TselectProps } from "../cog/mySelect";

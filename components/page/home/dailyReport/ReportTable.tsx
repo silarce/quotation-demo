@@ -14,7 +14,7 @@ import scss from "./reportTable.module.scss"
 import {
   Toption,
   optionsCreator_dailyReportPeriod, optionsCreator_mealsCost,
-} from "fakeDatabase/options/options"
+} from "js/utils/options/options"
 
 // class
 import { Class_reportItem } from "pages/home/dailyReport"

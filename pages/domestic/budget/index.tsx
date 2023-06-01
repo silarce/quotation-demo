@@ -17,7 +17,7 @@ import BudgeList from "components/page/domestic/budget/budgetList"
 import scss from "./budget.module.scss"
 
 // option
-import { optionsCreator_doorType } from 'fakeDatabase/options/options';
+import { optionsCreator_doorType } from 'js/utils/options/options';
 import { optionsCreator_county } from 'fakeDatabase/options/countryAndDistrict';
 const optionsDoorType = optionsCreator_doorType()
 const optionsCounty = optionsCreator_county()
@@ -30,7 +30,7 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
 // type
-import { Toption } from "fakeDatabase/options/options"
+import { Toption } from "js/utils/options/options"
 
 type Trouter = ReturnType<typeof useRouter>
 

@@ -31,7 +31,7 @@ import TextareaModal from "components/global/gear/modal/simpleModal/textareaModa
 import iconUpload from "public/image/icon/upload.svg"
 
 // option
-import { optionsCreator_quotationState, Toption } from "fakeDatabase/options/options"
+import { optionsCreator_quotationState, Toption } from "js/utils/options/options"
 const optionQuotationState = optionsCreator_quotationState()
 
 // css
