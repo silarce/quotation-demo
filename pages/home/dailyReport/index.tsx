@@ -13,7 +13,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
-import SetReportEmpModal_2 from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
+import ReviewerAndExaminerSelector from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 // gear
@@ -638,7 +638,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         tip="可複選"
       />
 
-      <SetReportEmpModal_2
+      <ReviewerAndExaminerSelector
         visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
         onCancel={() => setShowReviewerForReportModal(false)}
