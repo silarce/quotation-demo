@@ -15,7 +15,7 @@ import scss from "./quotationProfile.module.scss"
 
 
 import { Class_basicInfo } from 'hooks/quotation/useQuotation'
-import { Toption } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption } from 'js/utils/options/countryAndDistrict'
 import { Class_client } from "fakeDatabase/fakeAPI/fakeClientApi";
 
 // ====================================================

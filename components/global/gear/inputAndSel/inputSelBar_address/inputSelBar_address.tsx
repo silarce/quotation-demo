@@ -15,7 +15,7 @@ import scss from "./inputSelBar_address.module.scss"
 import {
   Toption,
   optionsCreator_county, districtOptionsSelector
-} from 'fakeDatabase/options/countryAndDistrict'
+} from 'js/utils/options/countryAndDistrict'
 
 export type TaddressProps = {
   county: string | null | undefined

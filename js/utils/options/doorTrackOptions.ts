@@ -17,7 +17,7 @@ import icon_sJ312_150_90t from "public/image/doorTrack/normal/SJ312_150_90t.svg"
 
 
 // type
-import { Toption } from "fakeDatabase/options/options"
+import { Toption } from "js/utils/options/options"
 
 export type { Toption }
 
