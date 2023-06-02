@@ -181,7 +181,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
   const { update: updateEmployeeArr }
-    = useEmployee({ pageSize: 999999, populate: ["jobs"] })
+    = useEmployee({
+      pageSize: 999999, populate: ["jobs", "user"],
+      sort: "idNumber",
+    })
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -302,10 +305,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
   /**發出設定審核人員apiReq */
   const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
-    const employeeIds: string[] = []
+
+    const shouldReportEmpArr: typeof employeeArr = []
     employeeArr.forEach((employee) => {
-      if (employee.shouldReport) employeeIds.push(employee.id)
+      if (employee.shouldReport) shouldReportEmpArr.push(employee)
     })
+
+    const isPass = !shouldReportEmpArr.some(emp => emp.isHaveUser === false)
+    if (!isPass) return myAlert.warning({ title: "名單錯誤", content: "只能選擇有ERP操作權限的人員" })
+
+    const employeeIds = shouldReportEmpArr.map(emp => emp.id)
+
     try {
       showRootLoading(true)
       await apiPatchDailyReports_reviewers({ employeeIds })
@@ -733,7 +743,6 @@ const formatRiewerPickArr = (
   const result = employeeArr.map((item) => {
     const match = dailyReports_ReportersArr.find((x) => x.id === item.id)
     const shouldReport = match ? true : false
-
     let theJobs = (() => {
       if (item.jobs) {
         return _.sortBy(item.jobs, "grade")
@@ -747,7 +756,8 @@ const formatRiewerPickArr = (
       idNumber: item.idNumber,
       job: theJobs[0]?.name ?? "",
       grade: theJobs[0]?.grade ?? "",
-      shouldReport
+      shouldReport,
+      isHaveUser: !!item.user
     }
     return obj
   })
