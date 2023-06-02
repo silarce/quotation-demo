@@ -162,8 +162,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const {
     dailyReport, updateDailyReports, } = useApiDailyReports(params)
   const sortedDailyReport = useMemo(() => {
-    const copy = dailyReport?.reverse()
-    return _.sortBy(copy, "date").reverse()
+    // const copy = dailyReport?.reverse()
+    return _.sortBy(dailyReport, "date").reverse()
   }, [dailyReport])
 
   /**取得指定月份所有日報表，額外做了loading的處理 */
