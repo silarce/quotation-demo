@@ -51,13 +51,14 @@ export default function MealSelector(
 
   return (
     <ModalListSelectorWithSearch
-      className={scss.antdModal}
+      className={scss.antdModal_meals}
       label={"選擇餐費"}
       visible={visible}
       onConfirm={() => onConfirm(mealArr)}
       onCancel={onCancel}
       onSearch={onSearch}
-      width="800px"
+      width="500px"
+      noSearch={true}
     // tip={tip}
     >
       <div className={scss.body}>
