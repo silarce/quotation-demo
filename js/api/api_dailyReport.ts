@@ -43,6 +43,7 @@ const apiDailyReports = (filter?: { [key: string]: any }) => {
       "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
     filter,
     pageSize: 100,
+    sort: "date"
   }
 
   return axi.get(api, { params })
