@@ -23,32 +23,38 @@ export default function MealSelector(
   }:
     {
       visible: boolean
-      onConfirm: (v: TdailyReportItemDto["meals"][number] | undefined) => void
+      onConfirm: (v: TdailyReportItemDto["meals"]) => void
       onCancel: () => void
       label?: string
       tip?: string
     }
 ) {
 
-
-  const [meal, setMeal] = useState<Tmeal>()
+  const [mealArr, setMealArr] = useState<Tmeal[]>([])
 
   useEffect(() => {
-    if (!visible) setMeal(undefined)
+    if (!visible) setMealArr([])
   }, [visible])
 
+
+  const onClick = (v: TdailyReportItemDto["meals"][number]) => {
+    const copyArr = [...mealArr]
+    const theIndex = mealArr.findIndex((theMeal) => theMeal === v)
+    if (theIndex > -1) copyArr.splice(theIndex, 1)
+    else copyArr.push(v)
+    setMealArr(copyArr)
+  }
 
   const onSearch = (v: string) => {
 
   }
-
 
   return (
     <ModalListSelectorWithSearch
       className={scss.antdModal}
       label={"選擇餐費"}
       visible={visible}
-      onConfirm={() => onConfirm(meal)}
+      onConfirm={() => onConfirm(mealArr)}
       onCancel={onCancel}
       onSearch={onSearch}
       width="800px"
@@ -56,14 +62,14 @@ export default function MealSelector(
     >
       <div className={scss.body}>
 
-        {mealArr.map((data, index) => {
+        {mealArrOption.map((data, index) => {
           const { value, label } = data
 
-          const onClick = () => {
-            setMeal(value)
-          };
+          // const onClick = () => {
+          //   setMealArr(value)
+          // };
 
-          const isActive = value === meal
+          const isActive = mealArr.some(meal => meal === value)
           // if (searchValue) {
           //   const regex = new RegExp(searchValue, 'i');
           //   if (
@@ -80,7 +86,7 @@ export default function MealSelector(
           return (
             <CellWithBar key={index} className={scss.row}
               isActive={isActive}
-              onClick={onClick}
+              onClick={() => onClick(data.value)}
             >
               <span>{label}</span>
             </CellWithBar>
@@ -93,12 +99,8 @@ export default function MealSelector(
 }
 
 
-const mealArr = [
+const mealArrOption = [
   { value: "breakfast", label: "早餐" },
   { value: "lunch", label: "午餐" },
   { value: "dinner", label: "晚餐" },
 ] as const
-
-
-
-

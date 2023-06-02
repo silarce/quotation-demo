@@ -66,9 +66,11 @@ export default function ReportTable(
     activeItem.addWorker(workerArr[0])
   }
 
-  const modalOnConfirm_meals = (v: TdailyReportItemDto["meals"][number] | undefined) => {
-    if (!activeItem || !v) return
-    activeItem.addMeals(v)
+  const modalOnConfirm_meals = (v: TdailyReportItemDto["meals"]) => {
+    if (!activeItem) return
+    v.forEach((value) => activeItem.addMeals(value))
+    modalOnCancel_meals()
+    // activeItem.addMeals(v)
   }
 
   const disabled = !isEdit
