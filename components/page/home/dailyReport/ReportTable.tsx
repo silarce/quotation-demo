@@ -19,7 +19,7 @@ import {
 
 // class
 import { Class_reportItem } from "pages/home/dailyReport"
-import { TdailyReportWokerDto } from "js/api/dtoTypes"
+import { TdailyReportItemDto, TdailyReportWokerDto } from "js/api/dtoTypes"
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
@@ -41,22 +41,36 @@ export default function ReportTable(
     }
 ) {
 
-  const [showModal, setShowModal] = useState(false)
+  const [showModal_worker, setShowModal_worker] = useState(false)
+  const [showModal_meals, setShowModal_meals] = useState(false)
 
   const [activeItem, setActiveItem] = useState<Class_reportItem>()
 
 
-  const toShowModal = async () => {
-    setShowModal(true)
+  const toShowModal_worker = async () => {
+    setShowModal_worker(true)
   }
-  const modalOnCancel = () => {
-    setShowModal(false)
+  const modalOnCancel_worker = () => {
+    setShowModal_worker(false)
   }
 
-  const modalOnConfirm = (workerArr: TdailyReportWokerDto[]) => {
+  const toShowModal_meals = async () => {
+    setShowModal_meals(true)
+  }
+  const modalOnCancel_meals = () => {
+    setShowModal_meals(false)
+  }
+
+  const modalOnConfirm_worker = (workerArr: TdailyReportWokerDto[]) => {
     if (!activeItem) return
     activeItem.addWorker(workerArr[0])
   }
+
+  const modalOnConfirm_meals = (v: TdailyReportItemDto["meals"][number] | undefined) => {
+    if (!activeItem || !v) return
+    activeItem.addMeals(v)
+  }
+
   const disabled = !isEdit
 
   // ------------------------------------------------
@@ -176,7 +190,7 @@ export default function ReportTable(
                   const onAdd = () => {
                     if (disabled) return;
                     setActiveItem(theClass)
-                    toShowModal()
+                    toShowModal_worker()
                   }
 
                   return (
@@ -223,6 +237,60 @@ export default function ReportTable(
                     </div>
                   )
                 }
+                // ---------------------
+                if (eleType === "modal" && key === "meals") {
+                  // const mealsArr = theClass["meals"]
+                  const mealsArr = theClass["meals"]
+                  const onAdd = () => {
+                    if (disabled) return;
+                    setActiveItem(theClass)
+                    toShowModal_meals()
+                  }
+
+                  return (
+                    <div key={cIndex}
+                      className={
+                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName)}
+                    >
+                      {!mealsArr[0] && !disabled &&
+                        <div className={scss.worker} >
+                          <span></span>
+                          <IconAddCircle className={scss.icon} onClick={onAdd} />
+                        </div>
+                      }
+                      {mealsArr?.map((meals, wIndex, arr) => {
+                        const onRemove = () => {
+                          theClass.removeMeals(wIndex)
+                        }
+
+                        const isLast = arr.length === wIndex + 1
+
+                        return (
+                          <div key={wIndex} className={scss.worker} >
+                            <InputSel
+                              disabled={true}
+                              showBaseline={disabled ? "invisible" : "always"}
+                              inputProps={{
+                                value: mealsLookup[meals]
+                              }}
+                            />
+                            {/* <span>{worker.chName}</span> */}
+                            {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
+                          </div>
+                        )
+                      })}
+
+                      {mealsArr[0] && !disabled &&
+                        <div className={scss.worker}>
+                          <span></span>
+                          <IconAddCircle className={scss.icon} onClick={onAdd} />
+                        </div>
+                      }
+                    </div>
+                  )
+                }
 
                 return (
                   <div key={cIndex}
@@ -244,18 +312,18 @@ export default function ReportTable(
         }
       </div>
       <WorkerSelector
-        showModal={showModal}
-        onConfirm={modalOnConfirm}
-        onCancel={modalOnCancel}
+        showModal={showModal_worker}
+        onConfirm={modalOnConfirm_worker}
+        onCancel={modalOnCancel_worker}
         label="選擇工務人員"
         selLimit={1}
       />
 
-      {/* <MealSelector
-        visible={true}
-        onConfirm={(v) => {console.log(v) }}
-        onCancel={() => { }}
-      /> */}
+      <MealSelector
+        visible={showModal_meals}
+        onConfirm={modalOnConfirm_meals}
+        onCancel={modalOnCancel_meals}
+      />
 
     </div>
   )
@@ -370,11 +438,11 @@ const config: Tconfig = {
     bodyClassName: classNames("row-span-1"),
   },
   meals: {
-    eleType: "select",
-    optionArr: optionArr_mealsCost,
+    eleType: "modal",
+    // optionArr: optionArr_mealsCost,
     label: "餐費",
     placeholder: "餐費",
-    headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
+    headerClassName: classNames("w-[100px] row-span-3", scss.rightEdge),
     bodyClassName: classNames("row-span-1"),
   },
   departureTime: {
@@ -410,7 +478,7 @@ const config: Tconfig = {
     label: "住宿",
     placeholder: "天數",
     inputType: "number",
-    headerClassName: classNames("w-[85px] row-span-3", scss.rightEdge),
+    headerClassName: classNames("w-[100px] row-span-3", scss.rightEdge),
     bodyClassName: classNames("row-span-1", scss.suffix),
     suffix: "天"
   },
@@ -418,5 +486,10 @@ const config: Tconfig = {
 
 
 
-
+const mealsLookup = {
+  none: "無",
+  breakfast: "早餐",
+  lunch: "午餐",
+  dinner: "晚餐",
+} as const
 

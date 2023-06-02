@@ -9,8 +9,9 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 import scss from "./mealSelector.module.scss"
 
 
+import { TdailyReportItemDto } from "js/api/dtoTypes"
 
-type Tmeal = "none" | "breakfast" | "lunch" | "dinner"
+type Tmeal = "breakfast" | "lunch" | "dinner"
 
 
 export default function MealSelector(
@@ -22,7 +23,7 @@ export default function MealSelector(
   }:
     {
       visible: boolean
-      onConfirm: (v: string) => void
+      onConfirm: (v: TdailyReportItemDto["meals"][number] | undefined) => void
       onCancel: () => void
       label?: string
       tip?: string
@@ -30,10 +31,10 @@ export default function MealSelector(
 ) {
 
 
-  const [meal, setMeal] = useState<Tmeal>("none")
+  const [meal, setMeal] = useState<Tmeal>()
 
   useEffect(() => {
-
+    if (!visible) setMeal(undefined)
   }, [visible])
 
 
@@ -54,7 +55,6 @@ export default function MealSelector(
     // tip={tip}
     >
       <div className={scss.body}>
-
 
         {mealArr.map((data, index) => {
           const { value, label } = data
@@ -94,7 +94,6 @@ export default function MealSelector(
 
 
 const mealArr = [
-  { value: "none", label: "無" },
   { value: "breakfast", label: "早餐" },
   { value: "lunch", label: "午餐" },
   { value: "dinner", label: "晚餐" },
