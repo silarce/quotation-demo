@@ -65,8 +65,8 @@ export { Class_reportItem }
 
 const reportedAtOptions = [
   { label: "全部", value: "全部" },
-  { label: "未審核", value: "未審核" },
-  { label: "已審核", value: "已審核" },
+  { label: "未檢視", value: "未檢視" },
+  { label: "已檢視", value: "已檢視" },
 ]
 
 // =====================================================================
@@ -94,7 +94,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // -----------------------------------------------------------
   // state
-  // 送進 審核人員設定 SetReportEmpModal的arr
+  // 送進 檢視人員設定 SetReportEmpModal的arr
   const [reviewersPickArr, setReviewersPickArr] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
 
@@ -177,7 +177,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
 
-  // 取得所有審核人員
+  // 取得所有檢視人員
   const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
 
   const { update: updateEmployeeArr }
@@ -279,7 +279,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   // ----------------------------------------------------------------------
-  // 審核人員設定
+  // 檢視人員設定
   // SetReportEmpModal
 
   // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
@@ -287,7 +287,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const editRivewerPickArr = async () => {
 
     const resArr = await Promise.all([
-      updateReviewersArr(), // 取得所有審核人員
+      updateReviewersArr(), // 取得所有檢視人員
       updateEmployeeArr() // 取得所有人員
     ])
 
@@ -303,7 +303,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     setReviewersPickArr(reviewersPickArr)
 
   }
-  /**發出設定審核人員apiReq */
+  /**發出設定檢視人員apiReq */
   const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
 
     const shouldReportEmpArr: typeof employeeArr = []
@@ -320,17 +320,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       showRootLoading(true)
       await apiPatchDailyReports_reviewers({ employeeIds })
       cancelSetRivewerModal()
-      myAlert.success({ title: "更新審核人員成功" })
+      myAlert.success({ title: "更新檢視人員成功" })
       try {
         await Promise.all([
           updateDailyReports_withLoading(),
           updateReviewersArr(),
         ])
       }
-      catch { myAlert.err({ title: "日報表或審核人員取得失敗" }) }
+      catch { myAlert.err({ title: "日報表或檢視人員取得失敗" }) }
     }
     catch {
-      myAlert.err({ title: "更新審核人員失敗" })
+      myAlert.err({ title: "更新檢視人員失敗" })
     }
     finally { showRootLoading(false) }
   }
@@ -351,7 +351,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     if (!reportInEdit) return
 
     if (reviewerArr.length === 0) {
-      return myAlert.warning({ title: "請選擇審核人員" })
+      return myAlert.warning({ title: "請選擇檢視人員" })
     }
 
     const reviewerIds = reviewerArr.map((emp) => emp.id)
@@ -385,7 +385,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       const { message, statusCode } = err.response?.data ?? {}
 
       const isReviewed = message?.includes("has already reviewed")
-      if (isReviewed) return myAlert.warning({ title: "更新日報表失敗", content: "該日報表已被審核，不能再變更" })
+      if (isReviewed) return myAlert.warning({ title: "更新日報表失敗", content: "該日報表已被檢視，不能再變更" })
 
       myAlert.err({ title: "更新日報表失敗" })
     }
@@ -409,8 +409,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const reviewedAtValue = (arr[0] as Toption).value
     const isUserReviewed = (() => {
       if (reviewedAtValue === "全部") return undefined
-      if (reviewedAtValue === "未審核") return false
-      if (reviewedAtValue === "已審核") return true
+      if (reviewedAtValue === "未檢視") return false
+      if (reviewedAtValue === "已檢視") return true
     })()
 
 
@@ -449,12 +449,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     img: isCalendar ? iconMenu.src : iconFourCube.src
   }
   // --------------------
-  /**manager 審核人員設定 */
+  /**manager 檢視人員設定 */
   const panelList_manager_notInEdit: TpanelList = [
     { searchGroup },
     {
       type: "myButton",
-      label: "審核人員設定",
+      label: "檢視人員設定",
       onClick: editRivewerPickArr
     },
     listSwitchButton
@@ -474,7 +474,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const doCheck = async () => {
 
     if (reportInEdit?.isReviewedByUser === true) {
-      return myAlert.warning({ title: "已審核過" })
+      return myAlert.warning({ title: "已檢視過" })
     }
     if (!reportInEdit?.id) return;
     try {
@@ -491,8 +491,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         statusCode: number
       }>
       const { message, statusCode } = err.response?.data ?? {}
-      if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
-      myAlert.err({ title: "審核失敗" })
+      if (statusCode === 403) return myAlert.warning({ title: "您沒有權限檢視該日報表" })
+      myAlert.err({ title: "檢視失敗" })
     }
     finally { showRootLoading(false) }
   }
@@ -544,7 +544,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       custom: <Badge
         className={scss.antdBadge02}
         color="auto"
-        text="已審核" />
+        text="已檢視" />
     },
   ]
 
@@ -644,7 +644,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         onConfirm={reqApiPatchDailyReports_viewers}
         onCancel={cancelSetRivewerModal}
         dataArr={reviewersPickArr ?? []}
-        label="審核人員設定"
+        label="檢視人員設定"
         tip="可複選"
       />
 

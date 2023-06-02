@@ -35,11 +35,11 @@ export default function ReviewerAndExaminerSelector(
   // 搜尋字串
   const [searchValue_reviewer, setSearchValue_reviewer] = useState<string>()
   const [searchValue_examiner, setSearchValue_examiner] = useState<string>()
-  // 被選擇的審核人員
+  // 被選擇的檢視人員
   const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>([])
   const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>([])
 
-  // 取得所有審核人員
+  // 取得所有檢視人員
   const {
     reviewersArr,
     updateReviewersArr, setReviewersArr
@@ -117,7 +117,7 @@ export default function ReviewerAndExaminerSelector(
           searchValue={searchValue_reviewer}
           onSearch={onSearch_reviewer}
           onClick={onClick_reviewer}
-          label="請選擇審核人員"
+          label="請選擇檢視人員"
           userId={userId}
         />
       </div>
@@ -131,7 +131,7 @@ export default function ReviewerAndExaminerSelector(
           searchValue={searchValue_examiner}
           onSearch={onSearch_examiner}
           onClick={onClick_examiner}
-          label="請選擇檢視人員"
+          label="請選擇觀察人員"
           userId={userId}
         />
         {/*  */}
