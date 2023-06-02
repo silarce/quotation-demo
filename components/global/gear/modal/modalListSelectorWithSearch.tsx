@@ -20,7 +20,7 @@ export default function ModalListSelectorWithSearch(
   { children, label, visible,
     onConfirm, onCancel, onSearch,
     className, placeholder,
-    width, tip,
+    width, tip, noSearch
   }:
     {
       children: ReactNode
@@ -34,6 +34,7 @@ export default function ModalListSelectorWithSearch(
       placeholder?: string
       width?: string
       tip?: React.ReactNode
+      noSearch?: boolean
     }) {
 
   // ======================================================
@@ -55,8 +56,9 @@ export default function ModalListSelectorWithSearch(
             <div className={style.label}>{label}</div>
             <div className={style.tip}>{tip}</div>
           </div>
-          <InputSearch placeholder={placeholder || '輸入關鍵字'}
-            onClick={onSearch} />
+          {!noSearch && <InputSearch placeholder={placeholder || '輸入關鍵字'}
+            onClick={onSearch} />}
+
         </div>
         {/*  */}
         <div className={style.body}>

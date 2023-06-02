@@ -16,10 +16,26 @@
   }
 }
 
+.antdModal_meals {
+  :global(.ant-modal-content) {
+    width: 500px;
+    height: 490px;
+    padding: 19px 30px;
+    padding-top: 19px;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+    margin-bottom: 19px;
+  }
+  :global(.ant-modal-footer) {
+    padding: 0;
+  }
+}
+
 .body {
   .row {
     display: grid;
-    grid-template-columns: 100px 1fr 1fr 70px;
+    grid-template-columns: auto;
     height: 54px;
     padding: 0 46px;
     gap: 60px;
