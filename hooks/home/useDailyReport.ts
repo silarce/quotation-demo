@@ -58,8 +58,8 @@ class Class_reportItem {
     this._item = reportItem
     this._stayLength = `${this._item.stayLength}`
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
-    // this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
-    this._meals = ([]) as TdailyReportItemDto["meals"]
+    this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
+    // this._meals = ([]) as TdailyReportItemDto["meals"]
 
   } // constructor
   private _reRender
@@ -182,7 +182,7 @@ class Class_reportItem {
       customerName: this.customerName,
       contactName: this.contactName,
       // meals,
-      meals: null as any,
+      meals,
       description: this.description,
       departureTime: this.departureTime || null,
       arrivalTime: this.arrivalTime || null,
