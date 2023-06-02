@@ -206,18 +206,19 @@ export default function ReportTable(
                               }}
                             />
                             {/* <span>{worker.chName}</span> */}
-                            {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />}
+                            {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
                           </div>
                         )
                       })}
 
-                      {/* {workersArr[0] && !disabled &&
+                      {workersArr[0] && !disabled &&
                         <div className={scss.worker}>
                           <span></span>
-                          <IconAddCircle className={scss.icon} onClick={onClick} />
+                          <IconAddCircle className={scss.icon} onClick={onAdd} />
                         </div>
-                      } */}
+                      }
                     </div>
                   )
                 }
@@ -326,7 +327,7 @@ const config: Tconfig = {
     bodyClassName: classNames(),
   },
   customerName: {
-    eleType: "input",
+    eleType: "textarea",
     label: "客戶名稱/工程名稱",
     placeholder: "客戶名稱/工程名稱",
     headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),

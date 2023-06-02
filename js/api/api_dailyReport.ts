@@ -40,7 +40,7 @@ const apiDailyReports = (filter?: { [key: string]: any }) => {
 
   const params = {
     populate: [
-      "employee", "reviewStatus.reviewerEmployee", "isReviewCompleted",
+      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",
       // "items",
     ],
     filter
