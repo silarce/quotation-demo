@@ -16,6 +16,7 @@ export type TsetReportEmpModalData = {
   job: string
   grade: number
   shouldReport: boolean
+  isHaveUser: boolean
 }
 
 

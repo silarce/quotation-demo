@@ -15,10 +15,10 @@ import addIcon from "public/image/icon/add.svg"
 import style from "./listOfDeliveryOrders.module.scss"
 
 // type
-import { Toption } from "fakeDatabase/options/options"
+import { Toption } from "js/utils/options/options"
 
 // other
-import { optionsCreator_material } from "fakeDatabase/options/options"
+import { optionsCreator_material } from "js/utils/options/options"
 const optionMaterial = optionsCreator_material()
 
 // fake

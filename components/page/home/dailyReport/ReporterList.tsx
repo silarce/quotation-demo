@@ -68,13 +68,20 @@ export default function ReporterList(
                 name: chName,
                 date: chDate,
               }
+
+              const sortteStatuArr = _.sortBy(reviewStatus, (statu) => {
+                const jobArr = statu.reviewerEmployee.jobs ?? []
+                const sortedJobs = _.sortBy(jobArr, "grade")
+                return sortedJobs[0]?.grade
+              })
+
               return (
                 <CellWithBar key={index} className={classNames(scss.row)}
                   onClick={() => { addTag(tag) }}>
                   <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
                   <div className={classNames(scss.reviewerList, "w-full")}>
 
-                    {reviewStatus?.map((item, index) => {
+                    {sortteStatuArr?.map((item, index) => {
                       const { reviewerEmployee, reviewedAt, type } = item
                       let statu = (() => {
                         if (type === "examiner") return "gray"

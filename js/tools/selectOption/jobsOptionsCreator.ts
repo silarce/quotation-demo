@@ -6,7 +6,7 @@ import {
 
 
 
-import { Toption } from "fakeDatabase/options/options";
+import { Toption } from "js/utils/options/options";
 
 export type { TdepartmentDto, TdepartmentDto_jobs, TjobDto, TupdateDepartmentJobDto }
 

@@ -8,9 +8,6 @@ import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoT
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 
 
-// option
-import { optionsCreator_mealsCost } from "fakeDatabase/options/options";
-
 // =================================================================
 
 type ThookEmptyReport = {
@@ -26,7 +23,9 @@ type ThookEmptyReport = {
   employeeId: string | undefined
 }
 
-type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
+// type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
+type TemptyReportItem = TdailyReportItemDto
+
 
 const emptyReportItem: TemptyReportItem = {
   id: "",
@@ -36,7 +35,7 @@ const emptyReportItem: TemptyReportItem = {
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  meals: "none",
+  meals: [],
   description: "",
   departureTime: null,
   arrivalTime: null,
@@ -59,12 +58,15 @@ class Class_reportItem {
     this._item = reportItem
     this._stayLength = `${this._item.stayLength}`
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
+    this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
+    // this._meals = ([]) as TdailyReportItemDto["meals"]
 
   } // constructor
   private _reRender
   private _item
   private _stayLength
   private _workers
+  private _meals
 
   get id() {
     if ("id" in this._item) return this._item.id
@@ -100,9 +102,18 @@ class Class_reportItem {
     return undefined
   }
 
-  get meals() { return this._item.meals }
-  set meals(v) {
-    this._item.meals = v as ("breakfast" | "lunch" | "dinner");
+  get meals() { return this._meals }
+  // set meals(v) {
+  //   this._item.meals = v as ("breakfast" | "lunch" | "dinner");
+  //   this._reRender()
+  // }
+
+  addMeals = (v: TdailyReportItemDto["meals"][number]) => {
+    this._meals.push(v)
+    this._reRender()
+  }
+  removeMeals = (index: number) => {
+    this._meals?.splice(index, 1)
     this._reRender()
   }
 
@@ -162,14 +173,15 @@ class Class_reportItem {
     })()
 
     const meals = (() => {
-      if (this.meals === "none") return null
-      else return this.meals
+      if (this._meals.length === 0) return []
+      else return this._meals
     })()
 
     return {
       periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
+      // meals,
       meals,
       description: this.description,
       departureTime: this.departureTime || null,
@@ -207,7 +219,6 @@ const useReport = () => {
   const [report, setReport] = useState<ThookEmptyReport>()
   const [reportTemp, setReportTemp] = useState<ThookEmptyReport>()
 
-  const opitonArr_mealsCost = optionsCreator_mealsCost()
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
@@ -238,7 +249,6 @@ const useReport = () => {
     const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
       const statuType = statu.type
       const reviewerId = statu.reviewerEmployee?.id ?? null
-      // const examinerId = statu.examinerEmployee?.id ?? null
       const reviewedAt = statu.reviewedAt
       if (reviewerId === userInfo.employee?.id) {
         isAllowToReview = true
@@ -261,28 +271,14 @@ const useReport = () => {
       employeeId: dailyReport.employee?.id
     }
     setReport(theReport)
-  }
+  } // reNew_report
   // 
   const addReportItem = () => {
     setReport(report => {
       if (!report) return report
-      const id = report.id
-      const date = report.date
       const items = report.items
-      const isAllowToReview = report.isAllowToReview
-      const isReviewedByOther = report.isReviewedByOther
-      const isReviewedByUser = report.isReviewedByUser
-      const isReviewCompleted = report.isReviewCompleted
-      const isUserIsViewer = report.isUserIsViewer
-      const isEdit = report.isEdit
-      const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
-      return {
-        id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewedByUser,
-        isReviewCompleted, isUserIsViewer,
-        isEdit, employeeId
-      }
+      return { ...report }
     })
   }
   // 
@@ -290,20 +286,7 @@ const useReport = () => {
     setReport(report => {
       if (!report) return report
       const isReviewedByUser = true
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const isEdit = report.isEdit
-      const isAllowToReview = report.isAllowToReview
-      const isReviewCompleted = report.isReviewCompleted
-      const isUserIsViewer = report.isUserIsViewer
-      const employeeId = report.employeeId
-      return {
-        id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewCompleted,
-        isReviewedByUser, isUserIsViewer,
-        isEdit, employeeId
-      }
+      return { ...report, isReviewedByOther, isReviewedByUser, }
     })
   }
   // 
@@ -315,25 +298,10 @@ const useReport = () => {
       setReportTemp(undefined)
       return;
     }
-
     setReport(report => {
       if (!report) return
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const isAllowToReview = report.isAllowToReview
-      const isReviewedByOther = report.isReviewedByOther
-      const isReviewedByUser = report.isReviewedByUser
-      const isReviewCompleted = report.isReviewCompleted
-      const isUserIsViewer = report.isUserIsViewer
       const isEdit = !report.isEdit
-      const employeeId = report.employeeId
-      return {
-        id, date, items,
-        isAllowToReview, isReviewedByOther, isReviewCompleted,
-        isReviewedByUser, isUserIsViewer,
-        isEdit, employeeId
-      }
+      return { ...report, isEdit, }
     })
   }
   // 
@@ -341,6 +309,7 @@ const useReport = () => {
     if (!report) return false
     return (report.isReviewedByOther || !report.isEdit) ? false : true
   })()
+  // 
   // 
   return {
     report, setReport, reNew_report,

@@ -40,10 +40,11 @@ const apiDailyReports = (filter?: { [key: string]: any }) => {
 
   const params = {
     populate: [
-      "employee", "reviewStatus.reviewerEmployee", "isReviewCompleted",
-      // "items",
-    ],
-    filter
+      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
+    filter,
+    pageSize: 100,
+    sort: "date",
+    order: "DESC"
   }
 
   return axi.get(api, { params })

@@ -13,35 +13,51 @@ import InputSearch from 'components/global/gear/input/inputSearch';
 
 import { TemployeeDto, useApiDailyReports_reviewers } from "js/api/api_dailyReport"
 
+import { TdailyReportReviewStatusDto } from "js/api/dtoTypes"
+
 // css
-import scss from "./setReportEmpModal_2.module.scss"
-import { ConsoleSqlOutlined } from "@ant-design/icons"
+import scss from "./reviewerAndExaminerSelector.module.scss"
 
 
-export default function SetReportEmpModal(
+export default function ReviewerAndExaminerSelector(
   { visible,
     onConfirm,
     onCancel,
-    userId
+    userId,
+    lastStatus
   }:
     {
       visible: boolean
-      // onConfirm: (dataArr: TemployeeDto[]) => void
       onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void
       onCancel: () => void
-      userId: string |
-      undefined
+      userId: string | undefined
+      lastStatus: TdailyReportReviewStatusDto[]
+      // defaultRviewer: TemployeeDto[]
+      // defaultExaminer: TemployeeDto[]
     }
 ) {
+
+  const defaultRviewer: TemployeeDto[] = []
+  const defaultExaminer: TemployeeDto[] = []
+
+  lastStatus.forEach((status) => {
+    if (status.type === "reviewer") {
+      defaultRviewer.push(status.reviewerEmployee)
+    }
+    if (status.type === "examiner") {
+      defaultExaminer.push(status.reviewerEmployee)
+    }
+  })
+
 
   // 搜尋字串
   const [searchValue_reviewer, setSearchValue_reviewer] = useState<string>()
   const [searchValue_examiner, setSearchValue_examiner] = useState<string>()
-  // 被選擇的審核人員
-  const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>([])
-  const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>([])
+  // 被選擇的檢視人員
+  const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>(defaultRviewer)
+  const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>(defaultExaminer)
 
-  // 取得所有審核人員
+  // 取得所有檢視人員
   const {
     reviewersArr,
     updateReviewersArr, setReviewersArr
@@ -51,6 +67,8 @@ export default function SetReportEmpModal(
   useEffect(() => {
     if (visible) {
       (async () => {
+        setSelReviewerArr(defaultRviewer)
+        setSelExaminerArr(defaultExaminer)
         await updateReviewersArr()
       })()
     }
@@ -119,7 +137,7 @@ export default function SetReportEmpModal(
           searchValue={searchValue_reviewer}
           onSearch={onSearch_reviewer}
           onClick={onClick_reviewer}
-          label="請選擇審核人員"
+          label="請選擇檢視人員"
           userId={userId}
         />
       </div>
@@ -133,7 +151,7 @@ export default function SetReportEmpModal(
           searchValue={searchValue_examiner}
           onSearch={onSearch_examiner}
           onClick={onClick_examiner}
-          label="請選擇檢視人員"
+          label="請選擇觀察人員"
           userId={userId}
         />
         {/*  */}

@@ -14,7 +14,7 @@ import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 import style from "./productList.module.scss"
 import styleL from "../local.module.scss"
 
-import { Toption } from "fakeDatabase/options/options"
+import { Toption } from "js/utils/options/options"
 
 
 // ==========================================================
