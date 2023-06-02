@@ -7,6 +7,7 @@ import InputSel from "components/global/gear/inputAndSel/inputSel"
 import MyButton from "components/global/gear/button/myButton"
 import WorkerSelector from "components/global/gear/modal/workerSelector"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import MealSelector from "./MealSelector"
 
 // css
 import scss from "./reportTable.module.scss"
@@ -248,6 +249,11 @@ export default function ReportTable(
         onCancel={modalOnCancel}
         label="選擇工務人員"
         selLimit={1}
+      />
+      <MealSelector
+        visible={true}
+        onConfirm={(v) => {console.log(v) }}
+        onCancel={() => { }}
       />
     </div>
   )
