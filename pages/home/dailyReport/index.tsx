@@ -162,7 +162,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const {
     dailyReport, updateDailyReports, } = useApiDailyReports(params)
   const sortedDailyReport = useMemo(() => {
-    return _.sortBy(dailyReport, "date").reverse()
+    const copy = dailyReport?.reverse()
+    return _.sortBy(copy, "date").reverse()
   }, [dailyReport])
 
   /**取得指定月份所有日報表，額外做了loading的處理 */
@@ -653,6 +654,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         onConfirm={reqApiPatchDailyReports_my}
         onCancel={() => setShowReviewerForReportModal(false)}
         userId={userInfo.employee?.id}
+        lastStatus={sortedDailyReport[0]?.reviewStatus || []}
+
       />
     </>
   )

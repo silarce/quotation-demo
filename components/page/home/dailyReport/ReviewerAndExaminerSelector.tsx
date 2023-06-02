@@ -13,6 +13,8 @@ import InputSearch from 'components/global/gear/input/inputSearch';
 
 import { TemployeeDto, useApiDailyReports_reviewers } from "js/api/api_dailyReport"
 
+import { TdailyReportReviewStatusDto } from "js/api/dtoTypes"
+
 // css
 import scss from "./reviewerAndExaminerSelector.module.scss"
 
@@ -21,23 +23,39 @@ export default function ReviewerAndExaminerSelector(
   { visible,
     onConfirm,
     onCancel,
-    userId
+    userId,
+    lastStatus
   }:
     {
       visible: boolean
       onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void
       onCancel: () => void
-      userId: string |
-      undefined
+      userId: string | undefined
+      lastStatus: TdailyReportReviewStatusDto[]
+      // defaultRviewer: TemployeeDto[]
+      // defaultExaminer: TemployeeDto[]
     }
 ) {
+
+  const defaultRviewer: TemployeeDto[] = []
+  const defaultExaminer: TemployeeDto[] = []
+
+  lastStatus.forEach((status) => {
+    if (status.type === "reviewer") {
+      defaultRviewer.push(status.reviewerEmployee)
+    }
+    if (status.type === "examiner") {
+      defaultExaminer.push(status.reviewerEmployee)
+    }
+  })
+
 
   // 搜尋字串
   const [searchValue_reviewer, setSearchValue_reviewer] = useState<string>()
   const [searchValue_examiner, setSearchValue_examiner] = useState<string>()
   // 被選擇的檢視人員
-  const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>([])
-  const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>([])
+  const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>(defaultRviewer)
+  const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>(defaultExaminer)
 
   // 取得所有檢視人員
   const {
@@ -49,6 +67,8 @@ export default function ReviewerAndExaminerSelector(
   useEffect(() => {
     if (visible) {
       (async () => {
+        setSelReviewerArr(defaultRviewer)
+        setSelExaminerArr(defaultExaminer)
         await updateReviewersArr()
       })()
     }
