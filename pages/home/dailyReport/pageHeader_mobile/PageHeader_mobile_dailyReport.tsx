@@ -3,12 +3,12 @@
 import MyButton from "components/global/gear/button/myButton"
 
 
-import scss from "./pageHeader_mobile.module.scss"
+import scss from "./pageHeader_mobile_dailyReport.module.scss"
 
 // icon
 import iconSearch from "public/image/icon/search.svg"
 
-export default function PageHeader_mobile() {
+export default function PageHeader_mobile_dailyReport() {
 
   return (
     <div className={scss.container}>
