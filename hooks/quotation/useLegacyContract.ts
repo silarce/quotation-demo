@@ -248,6 +248,7 @@ class Class_product {
     this._quantity = v;
     v = parseInt(v || "0").toString()
     this._product.quantity = parseInt(v || "0");
+    this.countTotalPrice()
     this._reRender()
   }
 
@@ -263,6 +264,7 @@ class Class_product {
 
     this._unitPrice = v;
     this._product.unitPrice = parseFloat(v || "0");
+    this.countTotalPrice()
     this._reRender()
   }
 
@@ -280,6 +282,14 @@ class Class_product {
     this._product.totalPrice = parseFloat(v || "0");
     this._reRender()
   }
+
+  countTotalPrice = () => {
+    const quantity = this.quantity.replace(/,/g, "") || 0
+    const unitPrice = this.unitPrice.replace(/,/g, "") || 0
+    const total = Decimal.mul(quantity, unitPrice).toString()
+    this.totalPrice = total
+  }
+
 
   get typhoonProtection() { return this._product.typhoonProtection }
   set typhoonProtection(v) {
