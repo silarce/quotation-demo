@@ -42,6 +42,7 @@
     "react-hook-form": "^7.44.2",
     "react-input-autosize": "^3.0.0",
     "react-intersection-observer": "^9.4.3",
+    "react-responsive": "^9.0.2",
     "react-select": "^5.7.0",
     "react-slick": "^0.29.0",
     "react-sortable-hoc": "^2.0.0",
