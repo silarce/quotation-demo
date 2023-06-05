@@ -34,7 +34,9 @@ export default function Login(
     if (isLoading) return;
     try {
       setIsLoading(true)
-      await onLogin({ account, password })
+      const acc = account.trim()
+      const pw = password.trim()
+      await onLogin({ account: acc, password: pw })
     }
     catch { myAlert.err({ title: "帳號或密碼錯誤" }) }
     finally { setIsLoading(false) }
