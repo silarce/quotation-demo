@@ -92,6 +92,7 @@ export default function ReporterList(
                 <CellWithBar key={index} className={classNames(scss.row)}
                   onClick={() => { addTag(tag) }}>
                   <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
+
                   <div className={classNames(scss.reviewerList, "w-full")}>
 
                     {sortteStatuArr?.map((item, index) => {
@@ -101,16 +102,11 @@ export default function ReporterList(
                         if (reviewedAt) return "green"
                         return "red"
                       })()
-                      const { chName, jobs, id } = reviewerEmployee
-
-                      const sortedJobs = _.sortBy(jobs, "grade").reverse()
-                      const grade = sortedJobs?.[0]?.grade || ""
+                      const { chName } = reviewerEmployee
 
                       return (
                         <StatuBtn key={index}
-                          // statu={statu} name={chName} />
-                          statu={statu} name={chName + " " + grade} />
-
+                          statu={statu} name={chName} />
                       )
                     })}
                   </div>

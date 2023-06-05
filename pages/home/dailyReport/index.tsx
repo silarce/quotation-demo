@@ -609,6 +609,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}
         containerChildren={<LoadingCover01 isLoading={isLoading} />}
       >
+        {/*  */}
         <PageHeader02
           key={+isMine}
           tag="日報表"
@@ -617,9 +618,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           panelList={panelList}
           customeLeft={customeLeft}
         />
-
         <PageHeader_mobile />
-
+        {/*  */}
         {!reportInEdit && !isCalendar &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
