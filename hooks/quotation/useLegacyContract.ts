@@ -99,8 +99,17 @@ class Class_product {
   ) {
     this._reRender = reRender
     this._product = legacyProduct
+    const foo = legacyProduct
 
     this._countTotalDiscount = countTotalDiscount
+
+
+    this._id = (() => {
+      // if ("id" in this._product) return this._product?.id
+      if ("id" in legacyProduct) return legacyProduct.id
+      return undefined
+    })()
+
 
     this._idNumber =
       this._product.idNumber ? this._product.idNumber.toString() : ""
@@ -121,11 +130,13 @@ class Class_product {
 
     this._discountRate
       = this._product.discountRate === "0" ? "" : Decimal.mul(this._product.discountRate || "0", 100).toString()
+
   } // constructor
 
   private _reRender
   private _product
   private _countTotalDiscount
+  private _id
   private _idNumber
   private _length
   private _width
@@ -145,9 +156,13 @@ class Class_product {
   }
 
   get id() {
-    if ("id" in this._product) return this._product.id
-    return undefined
+    return this._id
   }
+
+  set id(v) {
+    this._id = v
+  }
+
 
   get idNumber() { return this._idNumber }
   set idNumber(v) {
@@ -279,7 +294,12 @@ class Class_product {
   get notes() { return this._product.notes }
   set notes(v) { this._product.notes = v; this._reRender() }
 
-  get postProd() { return this._product }
+  get postProd() {
+    return {
+      ...this._product,
+      id: this.id
+    }
+  }
 }
 
 // =======================================================================
@@ -646,7 +666,9 @@ class Class_legacyContract {
     this._reRender()
   }
   copyProd = (index: number) => {
-    this.classProductArr.push(_.cloneDeep(this.classProductArr[index]))
+    const copy = _.cloneDeep(this.classProductArr[index])
+    copy.id = undefined
+    this.classProductArr.push(copy)
     this.activeProd = index
     this._reRender()
   }
@@ -694,7 +716,7 @@ class Class_legacyContract {
 
     legacyContractCopy.products = this.classProductArr.map((prod, index) => {
       const thePost = prod.postProd
-      thePost.idNumber = index + 1
+      // if(!thePost.idNumber) thePost.idNumber = index + 1
       return thePost
     })
 
