@@ -1,0 +1,35 @@
+@use "styles/theme01" as *;
+
+.searchDrawer {
+  position: absolute;
+  z-index: 1;
+  // :global(.ant-drawer)
+  :global(.ant-drawer-content) {
+    height: auto;
+    :global(.ant-drawer-body) {
+      padding: 25px;
+
+      .sel {
+        padding-left: 12px;
+      }
+      .inputWrapper {
+        display: grid;
+        grid-template-columns: auto fit-content(100%);
+        align-items: center;
+        padding-left: 12px;
+        margin-top: 12px;
+        border-bottom: solid 1px black;
+        input {
+          font-weight: 500;
+          font-size: 16px;
+        }
+      }
+    }
+  } // .ant-drawer-content
+
+  .iconClose {
+    position: absolute;
+    right: 25px;
+    top: 25px;
+  }
+}

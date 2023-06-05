@@ -1,28 +1,31 @@
 
-
+// gear
 import MyButton from "components/global/gear/button/myButton"
 
-
+// css
 import scss from "./pageHeader_mobile_dailyReport.module.scss"
 
 // icon
 import iconSearch from "public/image/icon/search.svg"
 
-export default function PageHeader_mobile_dailyReport() {
+
+
+// ====================================================================
+export default function PageHeader_mobile_dailyReport(
+  { doShowDrawer }:
+    { doShowDrawer: () => void }
+) {
 
   return (
     <div className={scss.container}>
       <div className={scss.right}>
         <MyButton label="搜尋" img={iconSearch.src}
-          onClick={() => { }} />
+          onClick={doShowDrawer} />
         <MyButton label="審核人員設定" onClick={() => { }} />
       </div>
     </div>
   )
 }
-
-
-
-
+// ====================================================================
 
 

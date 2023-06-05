@@ -17,6 +17,9 @@ import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModa
 import ReviewerAndExaminerSelector from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
+// mobile
+import SearchDrawer from "components/page/home/dailyReport/SearchDrawer";
+
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
@@ -415,7 +418,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (reviewedAtValue === "已檢視") return true
     })()
 
-
     const date = (() => {
       const theDate = arr[1] as string
       if (!theDate) return undefined
@@ -606,6 +608,17 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
+  // mobile
+  const [showSearchDrawer, setShowSearchDrawer] = useState(false)
+  const doShowDrawer = () => { setShowSearchDrawer(true) }
+  const closeShowDrawer = () => { setShowSearchDrawer(false) }
+
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   return (
     <>
@@ -621,7 +634,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           panelList={panelList}
           customeLeft={customeLeft}
         />
-        <PageHeader_mobile_dailyReport />
+        <PageHeader_mobile_dailyReport
+          doShowDrawer={doShowDrawer}
+        />
         {/*  */}
         {!reportInEdit && !isCalendar &&
           <ReporterList
@@ -644,6 +659,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             isEdit={isReportEdit}
           />
         }
+        {/* mobile */}
+        <SearchDrawer visible={showSearchDrawer}
+          onSearch={doSearch}
+          onCancel={closeShowDrawer}
+        />
+        {/*  */}
       </SubLayer>
 
       <SetReportEmpModal
@@ -661,7 +682,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         onCancel={() => setShowReviewerForReportModal(false)}
         userId={userInfo.employee?.id}
         lastStatus={sortedDailyReport[0]?.reviewStatus || []}
-
       />
     </>
   )
@@ -772,3 +792,12 @@ const formatRiewerPickArr = (
   })
   return result
 }
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
