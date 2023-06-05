@@ -45,7 +45,8 @@ type TappContext = {
   rwd1023: boolean
 }
 
-const AppContext = createContext<TappContext>(null!)
+export const AppContext = createContext<TappContext>(null!)
+
 
 // =============================================================================
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {

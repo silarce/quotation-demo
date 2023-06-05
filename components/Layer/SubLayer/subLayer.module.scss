@@ -5,6 +5,10 @@
   display: grid;
   grid-template-rows: min-content auto;
   height: 100%;
+  @screen laptop {
+    max-width: 640px;
+    margin: auto;
+  }
   .body {
     position: relative;
     border: solid 1px $colorBorder01;

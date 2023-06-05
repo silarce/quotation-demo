@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader_mobile from "components/PageHeader/pageHeader_mobile/PageHeader_mobile";
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
@@ -616,6 +617,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           panelList={panelList}
           customeLeft={customeLeft}
         />
+
+        <PageHeader_mobile />
 
         {!reportInEdit && !isCalendar &&
           <ReporterList

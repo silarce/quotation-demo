@@ -1,0 +1,17 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: none;
+  height: 60px;
+  padding: 0 24px;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  border: solid 1px $colorBorder01;
+  .iconMenu {
+    margin: auto;
+    cursor: pointer;
+  }
+  @screen laptop {
+    display: grid;
+  }
+}
