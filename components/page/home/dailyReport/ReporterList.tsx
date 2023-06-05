@@ -71,9 +71,10 @@ export default function ReporterList(
 
               const sortteStatuArr = _.sortBy(reviewStatus, (statu) => {
                 const jobArr = statu.reviewerEmployee.jobs ?? []
-                const sortedJobs = _.sortBy(jobArr, "grade")
-                return sortedJobs[0]?.grade
-              })
+                const sortedJobs = _.sortBy(jobArr, "grade").reverse()
+                const grade = sortedJobs[0]?.grade || 0
+                return grade
+              }).reverse()
 
               return (
                 <CellWithBar key={index} className={classNames(scss.row)}
@@ -89,6 +90,7 @@ export default function ReporterList(
                         return "red"
                       })()
                       const { chName } = reviewerEmployee
+
                       return (
                         <StatuBtn key={index}
                           statu={statu} name={chName} />
