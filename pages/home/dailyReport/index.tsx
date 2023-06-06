@@ -226,7 +226,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     addReportItem: addDailyReportItem,
     changeReviewToChecked, switchIsEdit,
     reportIsEdit: isReportEdit
-  } = useReport()
+  } = useReport({ userInfo })
 
   const editReport = async (reportId: string) => {
     const dailyReport = await reqApiDailyReports_id(reportId)
@@ -637,6 +637,19 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         <PageHeader_mobile_dailyReport
           doShowDrawer={doShowDrawer}
           editRivewerPickArr={editRivewerPickArr}
+          employeeChName={reportInEdit?.employeeChName}
+          date={reportInEdit?.date}
+
+          userInfo={userInfo}
+          identity={identity}
+          reportInEdit={reportInEdit}
+          doCheck={doCheck}
+          isReportEdit={isReportEdit}
+          editReport_today={editReport_today}
+
+          switchIsEdit={switchIsEdit}
+          setShowReviewerForReportModal={setShowReviewerForReportModal}
+          cancelEditNewDailyReport={cancelEditNewDailyReport}
         />
         {/*  */}
         {!reportInEdit && !isCalendar &&

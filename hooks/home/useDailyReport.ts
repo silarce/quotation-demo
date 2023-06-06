@@ -8,6 +8,7 @@ import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoT
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 
 
+
 // =================================================================
 
 type ThookEmptyReport = {
@@ -21,6 +22,7 @@ type ThookEmptyReport = {
   isUserIsViewer: boolean
   isEdit: boolean
   employeeId: string | undefined
+  employeeChName: string
 }
 
 // type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
@@ -211,7 +213,10 @@ class Class_reportItem {
 } // Class_dailyReportItem
 
 
-const useReport = () => {
+const useReport = (
+  { userInfo }:
+    { userInfo: TuserDto }
+) => {
 
   const [render, setRender] = useState(1)
   const reRender = () => setRender(state => ++state)
@@ -230,7 +235,8 @@ const useReport = () => {
     isReviewCompleted: false,
     isUserIsViewer: false,
     isEdit: false,
-    employeeId: undefined
+    employeeId: undefined,
+    employeeChName: userInfo.employee?.chName || ""
   }) // emptyReportCre
   // 
   const reNew_report = (
@@ -268,7 +274,8 @@ const useReport = () => {
       isReviewCompleted: dailyReport.isReviewCompleted,
       isUserIsViewer,
       isEdit: false,
-      employeeId: dailyReport.employee?.id
+      employeeId: dailyReport.employee?.id,
+      employeeChName: dailyReport.employee?.chName,
     }
     setReport(theReport)
   } // reNew_report
@@ -318,5 +325,5 @@ const useReport = () => {
   }
 }
 
-
+export type { ThookEmptyReport }
 export { Class_reportItem, useReport }

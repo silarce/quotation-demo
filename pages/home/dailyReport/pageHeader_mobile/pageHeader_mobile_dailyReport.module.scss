@@ -2,21 +2,31 @@
 
 .container {
   display: none;
-  padding: 10px;
   background-color: white;
-  .right {
-    display: flex;
-    gap: 10px;
-    width: fit-content;
-    margin: auto;
-    margin-right: 0;
+  .title {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    height: 60px;
+    padding: 0 26px;
+    border-bottom: solid 1px $colorBorder01;
+    > * {
+      margin: auto;
+    }
+    > img {
+      margin-left: 0;
+    }
+  }
+  .btnBar {
+    padding: 10px;
+    .right {
+      display: flex;
+      gap: 10px;
+      width: fit-content;
+      margin: auto;
+      margin-right: 0;
+    }
   }
   @screen laptop {
     display: block;
   }
-
-
-
-
-  
 }
