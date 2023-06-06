@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, createContext } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 
+import { useMediaQuery } from 'react-responsive'
+
 // antd
-import { ConfigProvider } from 'antd';
+import { ConfigProvider as AntdConfigProvider } from 'antd';
 
 // conponents
 import Layer from "components/Layer/Layer"
@@ -38,8 +40,20 @@ type AppPropsWithLayout = AppProps & {
 }
 
 
+// =============================================================================
+type TappContext = {
+  rwd1023: boolean
+}
+
+export const AppContext = createContext<TappContext>(null!)
+
+
+// =============================================================================
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false)
+
+  const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' })
+
 
   // const router = appProps.router
   // ----------------------------------------------------------------------------
@@ -91,6 +105,10 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     catch { myAlert.err({ title: "登出失敗" }) }
   }
   // -----------------------------------------------------------------------
+  const appContextValue = {
+    rwd1023
+  }
+  // -----------------------------------------------------------------------
   if (!ready) return null
   // -----------------------------------------------------------------------
   // const noLayoutList = ["login"]
@@ -118,22 +136,25 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     )
   // ------------------------------------------------------------------
   return (
-    <ConfigProvider autoInsertSpaceInButton={false}>
+    <AntdConfigProvider autoInsertSpaceInButton={false}>
       <Head>
         <title>三久ERP</title>
       </Head>
-      <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
-        {getLayout(
-          <Component {...pageProps}
-            userInfo={userInfo}
-            userErpFeature={userErpFeature}
-          />
-        )}
-      </Layer>
+      <AppContext.Provider value={appContextValue}>
+        <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+          {getLayout(
+            <Component {...pageProps}
+              userInfo={userInfo}
+              userErpFeature={userErpFeature}
+              rwd1023={rwd1023}
+            />
+          )}
+        </Layer>
+      </AppContext.Provider>
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
       <RootLoadingCover />
-    </ConfigProvider>
+    </AntdConfigProvider>
   )
 }
 

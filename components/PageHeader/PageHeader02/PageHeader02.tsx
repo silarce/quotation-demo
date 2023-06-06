@@ -16,7 +16,6 @@ import scss from "./pageHeader02.module.scss"
 // type
 import { TsearchGroup, Toption } from "components/global/gear/HOC/searchBar/searchBar"
 
-
 // ========================================================
 
 export default function PageHeader02(

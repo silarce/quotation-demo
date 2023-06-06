@@ -6,8 +6,6 @@ import {
 import _ from "lodash"
 import classNames from "classnames";
 
-import Image from "next/image";
-
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
@@ -200,10 +198,14 @@ export default function CompanyInfo() {
       <div className={scss.body}>
         {/* logo */}
         <div className={classNames(scss.logoBox,)}>
-          <Image className={classNames(scss.logo)}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={classNames(scss.logo)}
+            src={imgSrc || imgLogo2.src} alt="logo"
+          />
+          {/* <Image className={classNames(scss.logo)}
             src={imgSrc || imgLogo2} alt="logo" width={300} height={300}
             priority={true}
-          />
+          /> */}
           {editable &&
             <div className={classNames(scss.panel)}>
               <span>{"(上限10MB)"}</span>

@@ -1,7 +1,5 @@
 
-import {
-  useState, useEffect
-} from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from "lodash"
 
@@ -20,6 +18,7 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 // api
 import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
 
+import { AppContext } from "pages/_app"
 
 
 export default function EmployeeSelector(
@@ -40,6 +39,8 @@ export default function EmployeeSelector(
       selLimit?: 1
     }
 ) {
+
+  const { rwd1023 } = useContext(AppContext)
   const [isLoading, setIsLoading] = useState(false)
 
   // 被選的資料
@@ -56,7 +57,7 @@ export default function EmployeeSelector(
       page: page,
       pageSize: 20,
       populate: ["jobs"],
-      sort:"idNumber",
+      sort: "idNumber",
       filter: {
         "$or": {
           idNumber: { $contains: searchValue },
@@ -160,7 +161,7 @@ export default function EmployeeSelector(
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       onSearch={onSearch}
-      width={"800"}
+      width={rwd1023 ? "80vw" : "800px"}
       className={style.container}
       tip={tip}
     >
@@ -179,11 +180,11 @@ export default function EmployeeSelector(
 
             return (
               <CellWithBar key={index} isActive={isActive}>
-                <div className={`${style.listItem}`}
+                <div className={style.row}
                   onClick={() => onClick(emp)}
                   ref={theViewRef}
                 >
-                  <span>{idNumber}</span>
+                  <span className={style.idNumber}>{idNumber}</span>
                   <span>{chName}</span>
                   <span>{name}</span>
                   <span>{grade && `Level ${grade}`}</span>

@@ -5,6 +5,10 @@
   padding: 3px;
   overflow: auto;
   scroll-behavior: smooth;
+  @screen laptop {
+    // min-height: calc(100vh - 120px);
+    // height:760px
+  }
 }
 
 .groupHeader {
@@ -17,13 +21,21 @@
 }
 
 .row {
-  display: flex;
-  flex-wrap: nowrap;
+  // display: flex;
+  // flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: fit-content(100%) auto;
   gap: 27px;
   padding: 15px;
   padding-left: 65px;
   border-bottom: solid 1px $colorBorder01;
   cursor: pointer;
+  @screen laptop {
+    padding-left: 32px;
+    grid-template-columns: auto;
+    overflow: auto;
+    width: fit-content;
+  }
 
   > div {
     span {
@@ -35,14 +47,25 @@
       position: relative;
       top: 6px;
     }
-    &.chName span {
-      color: $colorMain;
+    &.chName {
+      span {
+        color: $colorMain;
+      }
+      @screen laptop {
+        position: sticky;
+        left: 0;
+      }
     }
     &.reviewerList {
       display: flex;
       flex-wrap: wrap;
       gap: 27px;
       width: 100%;
+      @screen laptop {
+        width: fit-content;
+        overflow: auto;
+        flex-wrap: nowrap;
+      }
     }
   }
 }
@@ -50,11 +73,17 @@
 .statuBtn {
   display: flex;
   flex-wrap: nowrap;
+  // display: grid;
+  // grid-template-columns: auto auto;
   gap: 10px;
   place-content: center;
   padding: 6px 16px 6px 13px;
   background-color: $bgc01;
   border-radius: 17px;
+  > span {
+    white-space: nowrap;
+  }
+
   :global(.ant-badge-status-dot) {
     width: 15px;
     height: 15px;

@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 
 import classNames from "classnames"
+
+import Image from "next/image"
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
@@ -8,6 +10,9 @@ import MyButton from "components/global/gear/button/myButton"
 import WorkerSelector from "components/global/gear/modal/workerSelector"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import MealSelector from "./MealSelector"
+import CheckButton from "components/global/gear/button/checkButton"
+
+
 
 // css
 import scss from "./reportTable.module.scss"
@@ -23,7 +28,10 @@ import { TdailyReportItemDto, TdailyReportWokerDto } from "js/api/dtoTypes"
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
+import iconArrow from "public/image/icon/arrow03_left.svg"
 
+// other
+import { AppContext } from "pages/_app"
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()
 const optionArr_mealsCost = optionsCreator_mealsCost()
@@ -40,6 +48,8 @@ export default function ReportTable(
       isEdit: boolean
     }
 ) {
+  const { rwd1023 } = useContext(AppContext)
+
 
   const [showModal_worker, setShowModal_worker] = useState(false)
   const [showModal_meals, setShowModal_meals] = useState(false)
@@ -76,258 +86,305 @@ export default function ReportTable(
   const disabled = !isEdit
 
   // ------------------------------------------------
+  const theHeaderKeyArr = rwd1023 ? headerKeyArr_mobile : headerKeyArr
+  const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr
+
+  // ------------------------------------------------
+
+  // ------------------------------------------------
   return (
-    <div className={classNames(scss.table)}>
-      <div className={scss.roof} />
-      {/*  */}
-      <div className={classNames(scss.thead)}>
-        {headerKeyArr.map((key, index) => {
-          const { label, style, headerClassName: className } = config[key] ?? {}
-          // 
-          return (
-            <div key={key} style={style}
-              className={classNames(scss.cell, className)} >
-              <span>{label}</span>
-            </div>
-          )
-          // 
-        })}
-      </div>
-      {/*  */}
-      <div className={classNames(scss.tbody)}>
-        {classDailyReportItemArr.map((theClass, rIndex) => {
-          return (
-            <div key={rIndex} className={classNames(scss.row)}>
+    <>
 
-              {bodyKeyArr.map((key, cIndex) => {
-                const {
-                  eleType, optionArr, label, inputType, placeholder,
-                  headerClassName, bodyClassName, suffix,
-                } = config[key] ?? {}
-
-                if (eleType === "select") {
-                  return (
-                    <div key={cIndex}
-                      className={classNames(scss.cell, headerClassName, bodyClassName)}>
-                      <InputSel
-                        disabled={disabled}
-                        showBaseline="auto"
-                        placeholder={placeholder}
-                        selectProps={{
-                          options: optionArr ?? [],
-                          value: theClass[key] as string,
-                          // @ts-ignore
-                          onChange: (v) => { theClass[key] = v!.value },
-                          arrowType: "black",
-                          fontSize: "16px",
-                        }} />
-                    </div>
-                  )
-                }
-                if (eleType === "input") {
-                  return (
-                    <div key={cIndex}
-                      className={classNames(
-                        scss.cell,
-                        headerClassName, bodyClassName)}>
-                      <InputSel
-                        className="inline-grid"
-                        disabled={disabled}
-                        showBaseline="auto"
-                        placeholder={placeholder}
-                        inputProps={{
-                          value: theClass[key] as string,
-                          inputType,
-                          // @ts-ignore
-                          onChange: (v) => { theClass[key] = v },
-                          className: scss.textarea,
-                        }} />
-                      {suffix && disabled && <span>{suffix}</span>}
-                    </div>
-                  )
-                }
-                if (eleType === "textarea") {
-                  return (
-                    <div key={cIndex}
-                      className={classNames(
-                        scss.cell,
-                        headerClassName, bodyClassName)}>
-                      <InputSel
-                        disabled={disabled}
-                        showBaseline="auto"
-                        placeholder={placeholder}
-                        textareaProps={{
-                          value: theClass[key] as string,
-                          // @ts-ignore
-                          onChange: (v) => { theClass[key] = v },
-                          className: scss.textarea,
-                        }} />
-                    </div>
-                  )
-                }
-                if (eleType === "timePicker") {
-                  return (
-                    <div key={cIndex}
-                      className={classNames(
-                        scss.cell,
-                        headerClassName, bodyClassName)}>
-                      <InputSel
-                        disabled={disabled}
-                        showBaseline="auto"
-                        placeholder={placeholder}
-                        timePickerProps={{
-                          value: theClass[key] as string,
-                          onChange02: (v) => {
-                            const foo = v?.toISOString()
-                            // @ts-ignore
-                            theClass[key] = foo
-                          },
-                        }} />
-                    </div>
-                  )
-                }
-
-                if (eleType === "modal" && key === "workers") {
-                  const workersArr = theClass["workers"]
-                  const onAdd = () => {
-                    if (disabled) return;
-                    setActiveItem(theClass)
-                    toShowModal_worker()
-                  }
-
-                  return (
-                    <div key={cIndex}
-                      className={
-                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName)}
-                    >
-                      {!workersArr[0] && !disabled &&
-                        <div className={scss.worker} >
-                          <span></span>
-                          <IconAddCircle className={scss.icon} onClick={onAdd} />
-                        </div>
-                      }
-                      {workersArr?.map((worker, wIndex, arr) => {
-                        const onRemove = () => {
-                          theClass.removeWorker(wIndex)
-                        }
-
-                        const isLast = arr.length === wIndex + 1
-
-                        return (
-                          <div key={wIndex} className={scss.worker} >
-                            <InputSel
-                              disabled={true}
-                              showBaseline={disabled ? "invisible" : "always"}
-                              inputProps={{
-                                value: worker.chName,
-                              }}
-                            />
-                            {/* <span>{worker.chName}</span> */}
-                            {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
-                          </div>
-                        )
-                      })}
-
-                      {workersArr[0] && !disabled &&
-                        <div className={scss.worker}>
-                          <span></span>
-                          <IconAddCircle className={scss.icon} onClick={onAdd} />
-                        </div>
-                      }
-                    </div>
-                  )
-                }
-                // ---------------------
-                if (eleType === "modal" && key === "meals") {
-                  // const mealsArr = theClass["meals"]
-                  const mealsArr = theClass["meals"]
-                  const onAdd = () => {
-                    if (disabled) return;
-                    setActiveItem(theClass)
-                    toShowModal_meals()
-                  }
-
-                  return (
-                    <div key={cIndex}
-                      className={
-                        classNames(scss.cell, scss.workerCell, headerClassName, bodyClassName)}
-                    >
-                      {!mealsArr[0] && !disabled &&
-                        <div className={scss.worker} >
-                          <span></span>
-                          <IconAddCircle className={scss.icon} onClick={onAdd} />
-                        </div>
-                      }
-                      {mealsArr?.map((meals, wIndex, arr) => {
-                        const onRemove = () => {
-                          theClass.removeMeals(wIndex)
-                        }
-
-                        const isLast = arr.length === wIndex + 1
-
-                        return (
-                          <div key={wIndex} className={scss.worker} >
-                            <InputSel
-                              disabled={true}
-                              showBaseline={disabled ? "invisible" : "always"}
-                              inputProps={{
-                                value: mealsLookup[meals]
-                              }}
-                            />
-                            {/* <span>{worker.chName}</span> */}
-                            {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
-                          </div>
-                        )
-                      })}
-
-                      {mealsArr[0] && !disabled &&
-                        <div className={scss.worker}>
-                          <span></span>
-                          <IconAddCircle className={scss.icon} onClick={onAdd} />
-                        </div>
-                      }
-                    </div>
-                  )
-                }
-
-                return (
-                  <div key={cIndex}
-                    className={classNames(scss.cell, headerClassName, bodyClassName)}>
-                    {cIndex}
-                  </div>
-                )
-              })}
-            </div>
-          )
-        })}
-        {!disabled &&
-          <MyButton
-            label="新增回報"
-            preImg="add"
-            className={scss.newReportBtn}
-            onClick={addDailyReportItem}
+      {/* <div className={scss.panel}>
+        <div className={scss.title}>
+          <Image src={iconArrow} alt="return" />
+          <span>{employeeChName} {date}</span>
+          <div />
+        </div>
+        <div className={scss.btnBar}>
+          <CheckButton
+            checkLabel="已讀"
+            uncheckLable="未讀"
+            value={!!reportInEdit?.isReviewedByUser}
+            onClick={doCheck}
           />
-        }
+        </div>
+      </div> */}
+
+
+      <div className={classNames(scss.table)}>
+        
+
+        <div className={scss.roof} />
+        {/*  */}
+        <div className={classNames(scss.thead)}>
+          {theHeaderKeyArr.map((key, index) => {
+            let { label, label_mobile, headerClassName, headerClassName_mobile } = config[key] ?? {}
+            if (!rwd1023) headerClassName_mobile = undefined
+            return (
+              <div key={key}
+                className={classNames(
+                  scss.cell,
+                  headerClassName,
+                  headerClassName_mobile,
+                )} >
+                <span>{rwd1023 ? (label_mobile || label) : label}</span>
+              </div>
+            )
+            // 
+          })}
+        </div>
+        {/*  */}
+        <div className={classNames(scss.tbody)}>
+          {classDailyReportItemArr.map((theClass, rIndex) => {
+            return (
+              <div key={rIndex} className={classNames(scss.row)}>
+
+                {theBodyKeyArr.map((key, cIndex) => {
+                  let {
+                    eleType, optionArr, label, inputType,
+                    placeholder, placeholder_mobile,
+                    headerClassName, bodyClassName,
+                    headerClassName_mobile, bodyClassName_mobile,
+                    suffix
+                  } = config[key] ?? {}
+
+                  if (!rwd1023) {
+                    headerClassName_mobile = undefined
+                    bodyClassName_mobile = undefined
+                  }
+
+                  const thePlaceholder =
+                    rwd1023 ? (placeholder_mobile || placeholder) : placeholder
+
+                  if (eleType === "select") {
+                    return (
+                      <div key={cIndex}
+                        className={classNames(
+                          scss.cell, headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                        <InputSel
+                          disabled={disabled}
+                          showBaseline="auto"
+                          placeholder={thePlaceholder}
+                          selectProps={{
+                            options: optionArr ?? [],
+                            value: theClass[key] as string,
+                            // @ts-ignore
+                            onChange: (v) => { theClass[key] = v!.value },
+                            arrowType: "black",
+                            fontSize: "16px",
+                          }} />
+                      </div>
+                    )
+                  }
+                  if (eleType === "input") {
+                    return (
+                      <div key={cIndex}
+                        className={classNames(
+                          scss.cell,
+                          headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                        <InputSel
+                          className="inline-grid"
+                          disabled={disabled}
+                          showBaseline="auto"
+                          placeholder={thePlaceholder}
+                          inputProps={{
+                            value: theClass[key] as string,
+                            inputType,
+                            // @ts-ignore
+                            onChange: (v) => { theClass[key] = v },
+                            className: scss.textarea,
+                          }} />
+                        {suffix && disabled && <span>{suffix}</span>}
+                      </div>
+                    )
+                  }
+                  if (eleType === "textarea") {
+                    return (
+                      <div key={cIndex}
+                        className={classNames(
+                          scss.cell,
+                          headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                        <InputSel
+                          disabled={disabled}
+                          showBaseline="auto"
+                          placeholder={thePlaceholder}
+                          textareaProps={{
+                            value: theClass[key] as string,
+                            // @ts-ignore
+                            onChange: (v) => { theClass[key] = v },
+                            className: scss.textarea,
+                          }} />
+                      </div>
+                    )
+                  }
+                  if (eleType === "timePicker") {
+                    return (
+                      <div key={cIndex}
+                        className={classNames(
+                          scss.cell,
+                          headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                        <InputSel
+                          disabled={disabled}
+                          showBaseline="auto"
+                          placeholder={thePlaceholder}
+                          timePickerProps={{
+                            value: theClass[key] as string,
+                            onChange02: (v) => {
+                              const foo = v?.toISOString()
+                              // @ts-ignore
+                              theClass[key] = foo
+                            },
+                          }} />
+                      </div>
+                    )
+                  }
+
+                  if (eleType === "modal" && key === "workers") {
+                    const workersArr = theClass["workers"]
+                    const onAdd = () => {
+                      if (disabled) return;
+                      setActiveItem(theClass)
+                      toShowModal_worker()
+                    }
+
+                    return (
+                      <div key={cIndex}
+                        className={
+                          classNames(
+                            scss.cell, scss.workerCell,
+                            headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}
+                      >
+                        {!workersArr[0] && !disabled &&
+                          <div className={scss.worker} >
+                            <span></span>
+                            <IconAddCircle className={scss.icon} onClick={onAdd} />
+                          </div>
+                        }
+                        {workersArr?.map((worker, wIndex, arr) => {
+                          const onRemove = () => {
+                            theClass.removeWorker(wIndex)
+                          }
+
+                          const isLast = arr.length === wIndex + 1
+
+                          return (
+                            <div key={wIndex} className={scss.worker} >
+                              <InputSel
+                                disabled={true}
+                                showBaseline={disabled ? "invisible" : "always"}
+                                inputProps={{
+                                  value: worker.chName,
+                                }}
+                              />
+                              {/* <span>{worker.chName}</span> */}
+                              {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                              {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
+                            </div>
+                          )
+                        })}
+
+                        {workersArr[0] && !disabled &&
+                          <div className={scss.worker}>
+                            <span></span>
+                            <IconAddCircle className={scss.icon} onClick={onAdd} />
+                          </div>
+                        }
+                      </div>
+                    )
+                  }
+                  // ---------------------
+                  if (eleType === "modal" && key === "meals") {
+                    // const mealsArr = theClass["meals"]
+                    const mealsArr = theClass["meals"]
+                    const onAdd = () => {
+                      if (disabled) return;
+                      setActiveItem(theClass)
+                      toShowModal_meals()
+                    }
+
+                    return (
+                      <div key={cIndex}
+                        className={
+                          classNames(scss.cell, scss.workerCell,
+                            headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}
+                      >
+                        {!mealsArr[0] && !disabled &&
+                          <div className={scss.worker} >
+                            <span></span>
+                            <IconAddCircle className={scss.icon} onClick={onAdd} />
+                          </div>
+                        }
+                        {mealsArr?.map((meals, wIndex, arr) => {
+                          const onRemove = () => {
+                            theClass.removeMeals(wIndex)
+                          }
+
+                          const isLast = arr.length === wIndex + 1
+
+                          return (
+                            <div key={wIndex} className={scss.worker} >
+                              <InputSel
+                                disabled={true}
+                                showBaseline={disabled ? "invisible" : "always"}
+                                inputProps={{
+                                  value: mealsLookup[meals]
+                                }}
+                              />
+                              {/* <span>{worker.chName}</span> */}
+                              {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                              {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
+                            </div>
+                          )
+                        })}
+
+                        {mealsArr[0] && !disabled &&
+                          <div className={scss.worker}>
+                            <span></span>
+                            <IconAddCircle className={scss.icon} onClick={onAdd} />
+                          </div>
+                        }
+                      </div>
+                    )
+                  }
+                  return (
+                    <div key={cIndex}
+                      className={classNames(scss.cell,
+                        headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                      {cIndex}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+          {!disabled &&
+            <MyButton
+              label="新增回報"
+              preImg="add"
+              className={scss.newReportBtn}
+              onClick={addDailyReportItem}
+            />
+          }
+        </div>
+        <WorkerSelector
+          showModal={showModal_worker}
+          onConfirm={modalOnConfirm_worker}
+          onCancel={modalOnCancel_worker}
+          label="選擇工務人員"
+          selLimit={1}
+        />
+
+        <MealSelector
+          visible={showModal_meals}
+          onConfirm={modalOnConfirm_meals}
+          onCancel={modalOnCancel_meals}
+        />
+
       </div>
-      <WorkerSelector
-        showModal={showModal_worker}
-        onConfirm={modalOnConfirm_worker}
-        onCancel={modalOnCancel_worker}
-        label="選擇工務人員"
-        selLimit={1}
-      />
-
-      <MealSelector
-        visible={showModal_meals}
-        onConfirm={modalOnConfirm_meals}
-        onCancel={modalOnCancel_meals}
-      />
-
-    </div>
+    </>
   )
 }
 // =================================================================
@@ -351,6 +408,20 @@ const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "stayLength",
   "arrivalTime",
 ]
+const headerKeyArr_mobile: TclassKeys[] = [
+  "periodOfDay",
+  "departureTime",
+  "arrivalTime",
+  "departureWorksiteTime",
+  "customerName",
+  "contactName",
+  "description",
+  "workers",
+  "dispatchOrderId",
+  "licensePlate",
+  "meals",
+  "stayLength",
+]
 
 const bodyKeyArr: TclassKeys[] = [
   "periodOfDay",
@@ -371,11 +442,15 @@ type Tconfig = {
   [key in (TclassKeys | "workingTime")]?:
   {
     label: string
+    label_mobile?: string
     placeholder: string
+    placeholder_mobile?: string
     color?: "black" | "main"
-    style?: React.CSSProperties
+
     headerClassName: string
+    headerClassName_mobile: string
     bodyClassName: string
+    bodyClassName_mobile: string
     optionArr?: Toption[]
     inputType?: "number" | "text"
     suffix?: string
@@ -396,48 +471,65 @@ const config: Tconfig = {
     label: "上午/下午",
     placeholder: "時段",
     headerClassName: classNames("w-[104px] row-span-6"),
+    headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-2"),
+    bodyClassName_mobile: classNames("h-[43px]"),
+
   },
   workingTime: {
     label: "工務時間",
     placeholder: "時間",
     headerClassName: classNames("w-[170px] row-span-2 col-span-2"),
+    headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames(),
+    bodyClassName_mobile: classNames("h-[43px]"),
   },
   customerName: {
     eleType: "textarea",
     label: "客戶名稱/工程名稱",
+    label_mobile: "客戶名稱",
     placeholder: "客戶名稱/工程名稱",
+    placeholder_mobile: "客戶名稱",
     headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
+    headerClassName_mobile: classNames("h-[62px]"),
     bodyClassName: classNames("row-span-1"),
+    bodyClassName_mobile: classNames("h-[62px]"),
   },
   contactName: {
     eleType: "input",
     label: "接洽人",
     placeholder: "請輸入接洽人",
     headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
+    headerClassName_mobile: classNames("h-[62px]"),
     bodyClassName: classNames("row-span-1"),
+    bodyClassName_mobile: classNames("h-[62px]"),
   },
   description: {
     eleType: "textarea",
     label: "工作內容",
     placeholder: "請輸入接洽內容",
     headerClassName: classNames("w-auto row-span-6", scss.textLeft),
+    headerClassName_mobile: classNames("h-[300px]"),
     bodyClassName: classNames("row-span-2"),
+    bodyClassName_mobile: classNames("h-[300px]"),
   },
   workers: {
     eleType: "modal",
     label: "工務人員",
     placeholder: "接洽人",
     headerClassName: classNames("w-[140px] row-span-6", scss.textLeft),
+    headerClassName_mobile: classNames("h-[120px]"),
     bodyClassName: classNames("row-span-2"),
+    bodyClassName_mobile: classNames("h-[120px]"),
   },
   dispatchOrderId: {
     eleType: "input",
     label: "派工單序號",
     placeholder: "派工單序號",
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
+    headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-1"),
+    bodyClassName_mobile: classNames("h-[43px]"),
   },
   meals: {
     eleType: "modal",
@@ -445,35 +537,45 @@ const config: Tconfig = {
     label: "餐費",
     placeholder: "餐費",
     headerClassName: classNames("w-[100px] row-span-3", scss.rightEdge),
+    headerClassName_mobile: classNames("h-[120px]"),
     bodyClassName: classNames("row-span-1"),
+    bodyClassName_mobile: classNames("h-[120px]"),
   },
   departureTime: {
     eleType: "timePicker",
     label: "出發",
     placeholder: "時間",
     headerClassName: classNames("w-[85px] row-span-2"),
-    bodyClassName: classNames("row-span-1"),
+    headerClassName_mobile: classNames("h-[43px]", scss.single),
+    bodyClassName: classNames("row-span-1", scss.single),
+    bodyClassName_mobile: classNames("h-[43px]"),
   },
   departureWorksiteTime: {
     eleType: "timePicker",
     label: "離工地",
     placeholder: "時間",
     headerClassName: classNames("w-[85px] row-span-4"),
+    headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-2"),
+    bodyClassName_mobile: classNames("h-[43px]"),
   },
   arrivalTime: {
     eleType: "timePicker",
     label: "目的地",
     placeholder: "時間",
     headerClassName: classNames("w-[85px] row-span-2"),
-    bodyClassName: classNames("row-span-1"),
+    headerClassName_mobile: classNames("h-[43px]", scss.single),
+    bodyClassName: classNames("row-span-1", scss.single),
+    bodyClassName_mobile: classNames("h-[43px]"),
   },
   licensePlate: {
     eleType: "input",
     label: "車牌",
     placeholder: "車牌",
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
+    headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-1"),
+    bodyClassName_mobile: classNames("h-[43px]"),
   },
   stayLength: {
     eleType: "input",
@@ -481,7 +583,9 @@ const config: Tconfig = {
     placeholder: "天數",
     inputType: "number",
     headerClassName: classNames("w-[100px] row-span-3", scss.rightEdge),
+    headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-1", scss.suffix),
+    bodyClassName_mobile: classNames("h-[43px]", scss.stayLength),
     suffix: "天"
   },
 }

@@ -11,9 +11,16 @@
     padding: 0;
     height: 100%;
     margin-bottom: 19px;
+    overflow: auto;
   }
   :global(.ant-modal-footer) {
     padding: 0;
+  }
+  @screen laptop {
+    :global(.ant-modal-content) {
+      width: 80vw;
+      // height: 80vh;
+    }
   }
 }
 
@@ -27,6 +34,11 @@
   grid-template-columns: auto 188px;
   justify-content: space-between;
   margin-bottom: 11px;
+  @screen laptop {
+    grid-template-columns: auto;
+    justify-content: unset;
+    width: 100%;
+  }
 }
 .left {
   margin: auto;
@@ -43,6 +55,15 @@
     font-weight: 400;
     font-size: 14px;
     color: red;
+  }
+  @screen laptop {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    width: 100%;
+    .tip {
+      margin: auto;
+      margin-right: 0;
+    }
   }
 }
 
@@ -71,6 +92,19 @@
       font-size: 16px;
       line-height: 19px;
       color: $colorText;
+    }
+    @screen laptop {
+      grid-template-columns: 100px 100px 70px;
+      gap: 0px 60px;
+      height: 70px;
+      padding: 10px 12px;
+      > span {
+        font-size: 14px;
+        line-height: unset;
+      }
+      .idNumber {
+        grid-column: span 3;
+      }
     }
   }
 }

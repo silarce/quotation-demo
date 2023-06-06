@@ -13,7 +13,7 @@ const Home: NextPage = () => {
 
 
   useEffect(() => {
-    router.push("/home")
+    router.push("/home/dailyReport?isMine=true")
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

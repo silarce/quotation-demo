@@ -12,7 +12,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     unoptimized: true,
-    domains: ["sanjeou-erp-be.caprover.credot-web.com"],
+    // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
   },
 }
 
