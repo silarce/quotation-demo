@@ -79,7 +79,7 @@
 
   max-height: 377.328px;
   // height: 377.328px;
-  height:auto;
+  height: auto;
   height: 30vh;
   background-repeat: no-repeat;
   background-size: cover;
@@ -96,6 +96,9 @@
       font-size: 40px;
       font-weight: 700;
       letter-spacing: 0.15em;
+      @screen laptop {
+        font-size: 30px;
+      }
     }
   }
 }
@@ -110,6 +113,10 @@
   background-color: #fff;
   border: solid 1px $colorBorder01;
   border-top: solid 2px $colorActive01;
+  @screen laptop {
+    width: 80vw;
+  }
+
   .input02 {
     &:nth-of-type(1) {
       margin-bottom: 23px;

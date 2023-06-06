@@ -10,10 +10,7 @@ import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
 import InputSearch from 'components/global/gear/input/inputSearch';
 
 // css
-import style from "./modalListSelectorWithSearch.module.scss"
-
-
-type TmodalProps = Parameters<typeof Modal>[0]
+import scss from "./modalListSelectorWithSearch.module.scss"
 
 // =====================================================
 export default function ModalListSelectorWithSearch(
@@ -41,7 +38,7 @@ export default function ModalListSelectorWithSearch(
 
   return (
     <Modal
-      className={classNames(style.modal, className)}
+      className={classNames(scss.modal, className)}
       visible={visible}
       closable={false}
       centered={true}
@@ -50,18 +47,20 @@ export default function ModalListSelectorWithSearch(
       footer={null}
       width={width}
     >
-      <div className={style.container}>
-        <div className={style.header}>
-          <div className={style.left}>
-            <div className={style.label}>{label}</div>
-            <div className={style.tip}>{tip}</div>
+      <div className={scss.container}>
+        <div className={scss.header}>
+          <div className={scss.left}>
+            <div className={scss.filler} />
+            <div className={scss.label}>{label}</div>
+            <div className={scss.tip}>{tip}</div>
           </div>
-          {!noSearch && <InputSearch placeholder={placeholder || '輸入關鍵字'}
-            onClick={onSearch} />}
-
+          {!noSearch &&
+            <InputSearch className={classNames(scss.right, scss.plus)}
+              placeholder={placeholder || '輸入關鍵字'}
+              onClick={onSearch} />}
         </div>
         {/*  */}
-        <div className={style.body}>
+        <div className={scss.body}>
           {children}
         </div>
         {/*  */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import _ from "lodash"
 import classNames from "classnames"
 
@@ -18,6 +18,8 @@ import { TdailyReportReviewStatusDto } from "js/api/dtoTypes"
 // css
 import scss from "./reviewerAndExaminerSelector.module.scss"
 
+import { AppContext } from "pages/_app"
+
 
 export default function ReviewerAndExaminerSelector(
   { visible,
@@ -36,6 +38,8 @@ export default function ReviewerAndExaminerSelector(
       // defaultExaminer: TemployeeDto[]
     }
 ) {
+
+  const { rwd1023 } = useContext(AppContext)
 
   const defaultRviewer: TemployeeDto[] = []
   const defaultExaminer: TemployeeDto[] = []
@@ -127,7 +131,7 @@ export default function ReviewerAndExaminerSelector(
       destroyOnClose={true}
       onCancel={onCancel}
       footer={null}
-      width={800}
+      width={rwd1023 ? "80vw" : "800px"}
     >
       <div className={scss.container}>
         <Selector
@@ -193,6 +197,7 @@ const Selector = (
     <>
       <div className={scss.header}>
         <div className={scss.left}>
+          <div />
           <div className={scss.label}>{label}</div>
           <div className={scss.tip}>{"可複選"}</div>
         </div>
@@ -230,7 +235,7 @@ const Selector = (
               isActive={isActive}
               onClick={() => onClick(emp)}
             >
-              <span>{idNumber}</span>
+              <span className={scss.idNumber}>{idNumber}</span>
               <span>{chName}</span>
               <span>{jobName}</span>
               <span>LV {grade}</span>

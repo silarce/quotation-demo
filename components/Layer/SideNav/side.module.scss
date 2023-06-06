@@ -8,6 +8,9 @@
   height: 100%;
   background-color: $bgc01;
   overflow: auto;
+  @screen laptop {
+    display: none;
+  }
 }
 
 .collapse {

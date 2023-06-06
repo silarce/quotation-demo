@@ -17,6 +17,7 @@ import scss from "./reporterList.module.scss"
 
 // type
 import { TdailyReportDto } from "js/api/api_dailyReport"
+import { TdailyReportReviewStatusDto } from "js/api/dtoTypes"
 import { Ttag } from "pages/home/dailyReport"
 
 
@@ -69,16 +70,29 @@ export default function ReporterList(
                 date: chDate,
               }
 
-              const sortteStatuArr = _.sortBy(reviewStatus, (statu) => {
-                const jobArr = statu.reviewerEmployee.jobs ?? []
-                const sortedJobs = _.sortBy(jobArr, "grade")
-                return sortedJobs[0]?.grade
-              })
+              const statusChecker = (status: TdailyReportReviewStatusDto) => {
+                const { reviewedAt, type } = status
+                if (type === "examiner") return 1
+                if (!reviewedAt) return 2
+                else return 3
+              }
+
+              const gradeChecker = (status: TdailyReportReviewStatusDto) => {
+                const jobArr = status.reviewerEmployee.jobs ?? []
+                const sortedJobs = _.sortBy(jobArr, "grade").reverse()
+                const grade = sortedJobs[0]?.grade || 0
+                return grade
+              }
+
+              const sortteStatuArr =
+                _.sortBy(reviewStatus, [statusChecker, gradeChecker])
+                  .reverse()
 
               return (
                 <CellWithBar key={index} className={classNames(scss.row)}
                   onClick={() => { addTag(tag) }}>
                   <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
+
                   <div className={classNames(scss.reviewerList, "w-full")}>
 
                     {sortteStatuArr?.map((item, index) => {
@@ -89,6 +103,7 @@ export default function ReporterList(
                         return "red"
                       })()
                       const { chName } = reviewerEmployee
+
                       return (
                         <StatuBtn key={index}
                           statu={statu} name={chName} />
@@ -126,17 +141,3 @@ const StatuBtn = (
 }
 
 // ==========================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-

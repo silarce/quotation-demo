@@ -23,7 +23,7 @@ import { showRootLoading } from "components/global/gear/loadingCover/rootLoading
 // css
 import style from "./quotation.module.scss"
 // ========================================================================
-import {  useLegacyContract } from "hooks/quotation/useLegacyContract"
+import { useLegacyContract } from "hooks/quotation/useLegacyContract"
 // ========================================================================
 // api
 import {
@@ -34,7 +34,6 @@ import {
   apiPostLegacyContracts_id_attachments,
   apiDelLegacyContracts_id_attachments
 } from "js/api/api_legacy-contract"
-import { useCustomers, TapiGetCustomersParams } from "js/api/api_customer"
 
 // type
 import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
@@ -63,16 +62,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   const [page_customer, setPage_customer] = useState(1)
   const [searchCustomerName, setSearchCustomerName] = useState<string>()
-
-  const customerParams: TapiGetCustomersParams = {
-    page: page_customer,
-    pageSize: 10,
-    populate: ["contacts", "types"],
-    // filter:{$contains:""},
-    filter: { "name": { $contains: searchCustomerName } },
-    sort: "customerNumber"
-  }
-
 
   // --------------------------------------------------------------------------
   let [legacyContractParams, setLegacyContractParams] = useState({
@@ -202,10 +191,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         const postBody = classLegacyContract.postBody
         if (!postBody) return
+
+        console.log(postBody.products)
+
         try {
           showRootLoading(true)
-
-
           const res =
             contractId
               ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
@@ -226,6 +216,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
         catch { myAlert.err({ title: "上傳失敗" }) }
         finally { showRootLoading(false) }
+
+
         setAllowEdit(false)
       }
     },

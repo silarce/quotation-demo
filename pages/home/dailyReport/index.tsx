@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader_mobile_dailyReport from "pages/home/dailyReport/pageHeader_mobile/PageHeader_mobile_dailyReport";
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
@@ -16,6 +17,9 @@ import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModa
 import ReviewerAndExaminerSelector from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
+// mobile
+import SearchDrawer from "components/page/home/dailyReport/SearchDrawer";
+
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
@@ -222,7 +226,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     addReportItem: addDailyReportItem,
     changeReviewToChecked, switchIsEdit,
     reportIsEdit: isReportEdit
-  } = useReport()
+  } = useReport({ userInfo })
 
   const editReport = async (reportId: string) => {
     const dailyReport = await reqApiDailyReports_id(reportId)
@@ -414,7 +418,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       if (reviewedAtValue === "已檢視") return true
     })()
 
-
     const date = (() => {
       const theDate = arr[1] as string
       if (!theDate) return undefined
@@ -603,11 +606,26 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     cancelEditNewDailyReport()
   }
   // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // mobile
+  const [showSearchDrawer, setShowSearchDrawer] = useState(false)
+  const doShowDrawer = () => { setShowSearchDrawer(true) }
+  const closeShowDrawer = () => { setShowSearchDrawer(false) }
+
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}
         containerChildren={<LoadingCover01 isLoading={isLoading} />}
       >
+        {/*  */}
         <PageHeader02
           key={+isMine}
           tag="日報表"
@@ -616,7 +634,24 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           panelList={panelList}
           customeLeft={customeLeft}
         />
+        <PageHeader_mobile_dailyReport
+          doShowDrawer={doShowDrawer}
+          editRivewerPickArr={editRivewerPickArr}
+          employeeChName={reportInEdit?.employeeChName}
+          date={reportInEdit?.date}
 
+          userInfo={userInfo}
+          identity={identity}
+          reportInEdit={reportInEdit}
+          doCheck={doCheck}
+          isReportEdit={isReportEdit}
+          editReport_today={editReport_today}
+
+          switchIsEdit={switchIsEdit}
+          setShowReviewerForReportModal={setShowReviewerForReportModal}
+          cancelEditNewDailyReport={cancelEditNewDailyReport}
+        />
+        {/*  */}
         {!reportInEdit && !isCalendar &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
@@ -638,6 +673,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             isEdit={isReportEdit}
           />
         }
+        {/* mobile */}
+        <SearchDrawer visible={showSearchDrawer}
+          onSearch={doSearch}
+          onCancel={closeShowDrawer}
+        />
+        {/*  */}
       </SubLayer>
 
       <SetReportEmpModal
@@ -655,7 +696,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         onCancel={() => setShowReviewerForReportModal(false)}
         userId={userInfo.employee?.id}
         lastStatus={sortedDailyReport[0]?.reviewStatus || []}
-
       />
     </>
   )
@@ -766,3 +806,12 @@ const formatRiewerPickArr = (
   })
   return result
 }
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
