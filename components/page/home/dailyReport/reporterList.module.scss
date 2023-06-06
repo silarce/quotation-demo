@@ -5,6 +5,10 @@
   padding: 3px;
   overflow: auto;
   scroll-behavior: smooth;
+  @screen laptop {
+    // min-height: calc(100vh - 120px);
+    // height:760px
+  }
 }
 
 .groupHeader {
