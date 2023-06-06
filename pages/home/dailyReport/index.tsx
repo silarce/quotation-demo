@@ -636,6 +636,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         />
         <PageHeader_mobile_dailyReport
           doShowDrawer={doShowDrawer}
+          editRivewerPickArr={editRivewerPickArr}
         />
         {/*  */}
         {!reportInEdit && !isCalendar &&

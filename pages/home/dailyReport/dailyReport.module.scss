@@ -3,7 +3,6 @@
 .subLayer.plus {
   overflow: hidden;
   height: 100%;
-  background-color: #ddd;
   @screen laptop {
     min-height: calc(100vh - 60px);
   }
