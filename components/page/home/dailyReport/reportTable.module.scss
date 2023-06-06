@@ -78,6 +78,7 @@
     // display: none !important;
     // height: 100%;
     // overflow: auto;
+    z-index: 0;
     @screen laptop {
       display: flex;
       flex-wrap: nowrap;
