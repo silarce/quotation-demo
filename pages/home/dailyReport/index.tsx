@@ -36,6 +36,7 @@ import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDai
 
 // tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
+import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate";
 
 // icon
 import iconFourCube from "public/image/icon/fourCube.svg"
@@ -84,6 +85,7 @@ type TdailyReportContext = {
   switchIsEdit: () => void
   setShowReviewerForReportModal: (v: boolean) => void
   cancelEditNewDailyReport: () => void
+  changeReportDate: (v: string) => void
 }
 
 
@@ -181,11 +183,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   })()
 
 
-  const {
-    dailyReport, updateDailyReports, } = useApiDailyReports(params)
-  const sortedDailyReport = useMemo(() => {
-    // const copy = dailyReport?.reverse()
-    return _.sortBy(dailyReport, "date").reverse()
+  const { dailyReport, updateDailyReports } = useApiDailyReports(params)
+  const { sortedDailyReport, reportDateArr } = useMemo(() => {
+    const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+    const reportDateArr = (() => {
+      if (!isMine) return []
+      const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
+      return arr
+    })()
+    return { sortedDailyReport, reportDateArr }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReport])
 
   /**取得指定月份所有日報表，額外做了loading的處理 */
@@ -244,7 +251,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     addReportItem: addDailyReportItem,
     removeReportItem: removeDailyReportItem,
     changeReviewToChecked, switchIsEdit,
-    reportIsEdit: isReportEdit
+    reportIsEdit: isReportEdit,
+    changeReportDate
   } = useReport({ userInfo })
 
   const editReport = async (reportId: string) => {
@@ -254,24 +262,26 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   const editReport_today = async () => {
-    const res = await reqApiDailyReports_my()
-    if (res === "fail") return
-    else reNew_report({ dailyReport: res, userInfo })
+    // const res = await reqApiDailyReports_my()
+    // if (res === "fail") return
+    // else reNew_report({ dailyReport: res, userInfo })
 
-    if (res && userInfo?.employee?.id) {
-      const tag = {
-        reportId: res.id,
-        employeeId: userInfo.employee.id,
-        name: userInfo.employee.chName,
-        date: res.date
-      }
-      if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
-      setTagArr(arr => {
-        const newArr = _.cloneDeep(arr);
-        newArr.push(tag);
-        return newArr
-      })
-    }
+    // if (res && userInfo?.employee?.id) {
+    //   const tag = {
+    //     reportId: res.id,
+    //     employeeId: userInfo.employee.id,
+    //     name: userInfo.employee.chName,
+    //     date: res.date
+    //   }
+    //   if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
+    //   setTagArr(arr => {
+    //     const newArr = _.cloneDeep(arr);
+    //     newArr.push(tag);
+    //     return newArr
+    //   })
+    // }
+    reNew_report({ dailyReport: undefined, userInfo })
+
   }
 
   const cancelEditNewDailyReport = () => {
@@ -373,22 +383,20 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ) => {
 
     if (!reportInEdit) return
-
     if (reviewerArr.length === 0) {
       return myAlert.warning({ title: "請選擇檢視人員" })
     }
-
     const reviewerIds = reviewerArr.map((emp) => emp.id)
     const examinerIds = examinerArr.map((emp) => emp.id)
-
     const items = reportInEdit.items.map((item) => {
       return item.postBody
     })
-
+    const theDate = convertDate_add1911(reportInEdit.date)
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({
-        date: reportInEdit.date,
+        // date: reportInEdit.date,
+        date: theDate,
         body: {
           reviewerIds,
           examinerIds,
@@ -483,12 +491,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     listSwitchButton
   ]
 
-  /**reporter 今日回報 */
+  /**reporter 新增回報 */
   const panelList_reporter_notInEdit: TpanelList = [
     { searchGroup },
     {
       type: "myButton",
-      label: "今日回報",
+      label: "新增回報",
       onClick: editReport_today
     },
     listSwitchButton
@@ -621,9 +629,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       />
     ]
   // ----------------------------------------------------------------------
-  const leftTagOnClick = () => {
-    cancelEditNewDailyReport()
-  }
+  const leftTagOnClick = () => { cancelEditNewDailyReport() }
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -633,7 +639,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const closeShowDrawer = () => { setShowSearchDrawer(false) }
 
 
-  const dailyReportContextValue = {
+  const dailyReportContextValue: TdailyReportContext = {
     // doShowDrawer,
     // editReport_today,
     reportInEdit,
@@ -641,6 +647,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     switchIsEdit,
     setShowReviewerForReportModal,
     cancelEditNewDailyReport,
+    changeReportDate
   }
 
 
@@ -713,6 +720,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             addDailyReportItem={addDailyReportItem}
             removeDailyReportItem={removeDailyReportItem}
             isEdit={isReportEdit}
+            reportDateArr={reportDateArr}
           />
         </DailyReportContext.Provider>
 
@@ -735,6 +743,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         tip="可複選"
       />
 
+      {/* 上傳前選擇兩種人員 */}
       <ReviewerAndExaminerSelector
         visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}

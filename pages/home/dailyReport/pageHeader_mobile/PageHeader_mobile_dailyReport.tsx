@@ -107,7 +107,7 @@ export default function PageHeader_mobile_dailyReport(
       <>
         <MyButton label="搜尋" img={iconSearch.src}
           onClick={doShowDrawer} />
-        <MyButton label="今日回報"
+        <MyButton label="新增回報"
           onClick={editReport_today} />
       </>
     )

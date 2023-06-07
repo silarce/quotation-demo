@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 
 import classNames from "classnames"
 import Image from "next/image"
+import moment from 'moment';
 
 // antd
 import { Drawer } from "antd"
@@ -37,6 +38,7 @@ import { IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
 import { AppContext } from "pages/_app"
 import { DailyReportContext } from "pages/home/dailyReport"
 
+
 // type
 import { ThookEmptyReport } from "hooks/home/useDailyReport"
 import { TuserDto } from "js/api/dtoTypes"
@@ -51,18 +53,22 @@ export default function ReportTable(
     addDailyReportItem,
     removeDailyReportItem,
     isEdit,
-
+    reportDateArr
   }:
     {
       classDailyReportItemArr: Class_reportItem[] | undefined
       addDailyReportItem: () => void
       removeDailyReportItem: (index: number) => void
       isEdit: boolean
-
+      reportDateArr: string[]
     }
 ) {
   const router = useRouter()
   const isMine = (router.query.isMine === "true") ? true : false
+
+  const { reportInEdit } = useContext(DailyReportContext)
+
+
 
   const { rwd1023 } = useContext(AppContext)
 
@@ -127,10 +133,11 @@ export default function ReportTable(
       {/*  */}
       {/*  */}
       {/*  */}
-
+      {!reportInEdit?.id &&
+        <DatePicker reportDateArr={reportDateArr} />
+      }
 
       <div className={classNames(scss.table)}>
-
         <div className={scss.roof} />
         {/*  */}
         <div className={classNames(scss.thead)}>
@@ -641,7 +648,52 @@ const mealsLookup = {
 
 
 // ==============================================================================
+// ==============================================================================
+// ==============================================================================
+const DatePicker = (
+  { reportDateArr }:
+    { reportDateArr: string[] }
+) => {
 
+  const { reportInEdit, changeReportDate } = useContext(DailyReportContext)
+
+  return (
+    <div className={scss.datePickerWrapper}>
+      <InputSel
+        label="日報表日期"
+        captionColor="main"
+        gap="24px"
+        width={"245px"}
+        className={scss.datePicker}
+        placeholder="請選擇日期"
+        datePickerProps={{
+          value: reportInEdit?.date || "",
+          onChange02(moment, dateString) {
+            const dateStr = moment?.toISOString() ?? ""
+            changeReportDate(dateStr)
+          },
+          antdDatePickerProps: {
+            disabledDate: (date) => {
+              const disabledDate = reportDateArr.some((theDate) => {
+                return date.isSame(moment(theDate), "day")
+              })
+              return disabledDate
+            }
+          }
+        }}
+      />
+    </div>
+  )
+
+}
+
+
+
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// mobile
 const Panel = () => {
 
   return (
@@ -652,11 +704,10 @@ const Panel = () => {
   )
 }
 
-
 const TitlePanel = () => {
   const { reportInEdit, cancelEditNewDailyReport } = useContext(DailyReportContext)
   const employeeChName = reportInEdit?.employeeChName
-  const date = reportInEdit?.date
+  const date = moment(reportInEdit?.date).format("y-MM-DD")
   return (
     <div className={scss.TitlePanel}>
       <div className={classNames(scss.left)}>
@@ -667,8 +718,6 @@ const TitlePanel = () => {
     </div>
   )
 }
-
-
 
 function Bar_reporter_inEdit02() {
 
@@ -691,34 +740,4 @@ function Bar_reporter_inEdit02() {
     </div>
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -7,23 +7,36 @@
     display: none;
   }
   :global(.ant-drawer-content-wrapper) {
-
     transition-duration: 0s;
   }
   :global(.ant-drawer-content) {
     :global(.ant-drawer-body) {
       padding: 0;
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: fit-content auto;
+      @screen laptop {
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: fit-content auto;
+      }
     }
   }
 } // wrapper
 
+.datePickerWrapper {
+  padding: 18px 35px;
+  .datePicker {
+    :global(.ant-picker) {
+      width: 100%;
+    }
+  }
+  @screen laptop {
+    margin: auto;
+  }
+}
+
 .table {
   position: relative;
   display: grid;
-  grid-template-rows: fit-content(100%) fit-content(100%);
+  grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
   height: 100%;
   padding: 3px;
   padding-top: 0;
@@ -31,6 +44,8 @@
   overflow: auto;
   @screen laptop {
     display: flex;
+    // width: fit-content;
+    // max-width: 100vw;
     // width: 100vw;
   }
   .roof {
