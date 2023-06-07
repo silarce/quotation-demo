@@ -224,6 +224,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     setReport,
     reNew_report,
     addReportItem: addDailyReportItem,
+    removeReportItem: removeDailyReportItem,
     changeReviewToChecked, switchIsEdit,
     reportIsEdit: isReportEdit
   } = useReport({ userInfo })
@@ -670,6 +671,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
+            removeDailyReportItem={removeDailyReportItem}
             isEdit={isReportEdit}
           />
         }

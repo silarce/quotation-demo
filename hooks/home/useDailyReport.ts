@@ -288,6 +288,15 @@ const useReport = (
       return { ...report }
     })
   }
+  const removeReportItem = (index: number) => {
+    setReport(report => {
+      if (!report) return report
+      const items = report.items
+      items.splice(index, 1)
+      return { ...report }
+    })
+
+  }
   // 
   const changeReviewToChecked = (isReviewedByOther: boolean) => {
     setReport(report => {
@@ -320,7 +329,7 @@ const useReport = (
   // 
   return {
     report, setReport, reNew_report,
-    addReportItem, changeReviewToChecked, switchIsEdit,
+    addReportItem, removeReportItem, changeReviewToChecked, switchIsEdit,
     reportIsEdit
   }
 }
