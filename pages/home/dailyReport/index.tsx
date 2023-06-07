@@ -685,13 +685,13 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
         {/*  */}
-        {!reportInEdit && !isCalendar &&
+        {!isCalendar &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
         }
-        {!reportInEdit && isCalendar &&
+        {isCalendar &&
           <TheCalendar
             addTag={addTag}
             dailyReportArr={sortedDailyReport}
