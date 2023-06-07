@@ -134,7 +134,7 @@ export default function ReportTable(
       {/*  */}
       {/*  */}
       {!reportInEdit?.id &&
-        <DatePicker reportDateArr={reportDateArr} />
+        <DatePicker reportDateArr={reportDateArr} disabled={disabled} />
       }
 
       <div className={classNames(scss.table)}>
@@ -651,8 +651,11 @@ const mealsLookup = {
 // ==============================================================================
 // ==============================================================================
 const DatePicker = (
-  { reportDateArr }:
-    { reportDateArr: string[] }
+  { reportDateArr, disabled }:
+    {
+      reportDateArr: string[]
+      disabled: boolean
+    }
 ) => {
 
   const { reportInEdit, changeReportDate } = useContext(DailyReportContext)
@@ -666,6 +669,7 @@ const DatePicker = (
         width={"245px"}
         className={scss.datePicker}
         placeholder="請選擇日期"
+        disabled={disabled}
         datePickerProps={{
           value: reportInEdit?.date || "",
           onChange02(moment, dateString) {
