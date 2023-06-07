@@ -6,7 +6,7 @@ import {
 
 import moment from 'moment';
 // antd
-import { DatePicker } from 'antd';
+import { DatePicker, DatePickerProps } from 'antd';
 import 'moment/locale/zh-tw';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
@@ -25,6 +25,7 @@ export type TdatePickerProps = {
   ) => void,
   onFocus?: () => void
   onBlur?: () => void
+  antdDatePickerProps?: DatePickerProps
 }
 
 export default function MyDatePicker(
@@ -50,6 +51,7 @@ export default function MyDatePicker(
     onChange02,
     onFocus,
     onBlur,
+    antdDatePickerProps,
   } = datePickerProps
 
   const theOnFocus = () => {
@@ -95,11 +97,18 @@ export default function MyDatePicker(
         format={"y-MM-DD"}
         disabled={disabled}
         bordered={false}
-        showToday={false}
+        // showToday={false}
         autoComplete="off"
         onChange={theOnChange}
         onFocus={theOnFocus}
         onBlur={theOnBlur}
+        {
+        ...{
+          // 上面的showToday有型別錯誤，不知道為什麼
+          showToday: false,
+          ...antdDatePickerProps
+        }
+        }
       />
     </div>
   )

@@ -6,8 +6,8 @@ import moment from "moment";
 import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoTypes";
 // api
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
-
-
+// other
+import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
 
 // =================================================================
 
@@ -170,7 +170,7 @@ class Class_reportItem {
       const idArr = this.workers.map((worker) => {
         return worker.id
       })
-      if (idArr.length === 0) return null
+      if (idArr.length === 0) return []
       return idArr
     })()
 
@@ -227,7 +227,8 @@ const useReport = (
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
-    date: moment().format("yyyy-MM-DD"),
+    // date: moment().format("yyyy-MM-DD"),
+    date: convertDate_reduce1911(moment().format("yyyy-MM-DD")),
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,
     isReviewedByOther: false,
@@ -266,7 +267,7 @@ const useReport = (
 
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
-      date: dailyReport.date,
+      date: convertDate_reduce1911(dailyReport.date),
       items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       isAllowToReview,
       isReviewedByOther: isReviewedByOther,
@@ -285,6 +286,14 @@ const useReport = (
       if (!report) return report
       const items = report.items
       items.push(new Class_reportItem(reRender))
+      return { ...report }
+    })
+  }
+  const removeReportItem = (index: number) => {
+    setReport(report => {
+      if (!report) return report
+      const items = report.items
+      items.splice(index, 1)
       return { ...report }
     })
   }
@@ -312,6 +321,14 @@ const useReport = (
     })
   }
   // 
+  const changeReportDate = (v: string) => {
+    setReport(report => {
+      if (!report) return report
+      report.date = v
+      return { ...report }
+    })
+  }
+  // 
   const reportIsEdit = (() => {
     if (!report) return false
     return (report.isReviewedByOther || !report.isEdit) ? false : true
@@ -320,7 +337,8 @@ const useReport = (
   // 
   return {
     report, setReport, reNew_report,
-    addReportItem, changeReviewToChecked, switchIsEdit,
+    addReportItem, removeReportItem, changeReviewToChecked, switchIsEdit,
+    changeReportDate,
     reportIsEdit
   }
 }

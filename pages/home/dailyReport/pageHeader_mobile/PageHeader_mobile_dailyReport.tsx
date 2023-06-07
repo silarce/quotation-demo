@@ -51,37 +51,10 @@ export default function PageHeader_mobile_dailyReport(
     }
 ) {
 
-
-
   const Bar = (() => {
 
-    // if (identity === "manager") {
-    //   if (!reportInEdit) return Bar_manager_notInEdit
-    //   else if (reportInEdit.isAllowToReview) return Bar_reviewer_inEdit_user
-    //   else return () => { return null }
-    // }
-
-    // if (identity === "reviewer") {
-    //   if (!reportInEdit) return Bar_reporter_notInEdit
-    //   else {
-    //     if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-    //       if (isReportEdit) return Bar_reporter_inEdit02
-    //       if (reportInEdit.isReviewedByOther) return Bar_reporter_reviewed
-    //       return Bar_reporter_inEdit01
-    //     }
-    //     else if (reportInEdit.isAllowToReview) {
-    //       return Bar_reviewer_inEdit_user
-    //     }
-    //     return []
-    //   }
-    // }
-
-
-    if (reportInEdit) return Bar_reporter_inEdit02
-    else return Bar_reporter_notInEdit
-
-
-    // return () => { return null }1
+  return Bar_reporter_notInEdit
+    // return () => { return null }
   })()
 
 
@@ -106,53 +79,54 @@ export default function PageHeader_mobile_dailyReport(
   )
   // --------------------------------------------------------------
 
-  function Bar_manager_notInEdit() {
-    return (
-      <>
-        <MyButton label="搜尋" img={iconSearch.src}
-          onClick={doShowDrawer} />
-        <MyButton label="審核人員設定" onClick={editRivewerPickArr} />
-      </>
-    )
-  }
+  // function Bar_manager_notInEdit() {
+  //   return (
+  //     <>
+  //       <MyButton label="搜尋" img={iconSearch.src}
+  //         onClick={doShowDrawer} />
+  //       <MyButton label="審核人員設定" onClick={editRivewerPickArr} />
+  //     </>
+  //   )
+  // }
   // 
-  function Bar_reviewer_inEdit_user() {
-    return (
-      <CheckButton
-        // checkLabel="已讀"
-        checkLabel="已讀"
-        uncheckLable="未讀"
-        value={!!reportInEdit?.isReviewedByUser}
-        onClick={doCheck}
-      />
-    )
-  }
+  // function Bar_reviewer_inEdit_user() {
+  //   return (
+  //     <CheckButton
+  //       // checkLabel="已讀"
+  //       checkLabel="已讀"
+  //       uncheckLable="未讀"
+  //       value={!!reportInEdit?.isReviewedByUser}
+  //       onClick={doCheck}
+  //     />
+  //   )
+  // }
+
   // 
   function Bar_reporter_notInEdit() {
     return (
       <>
         <MyButton label="搜尋" img={iconSearch.src}
           onClick={doShowDrawer} />
-        <MyButton label="今日回報"
+        <MyButton label="新增回報"
           onClick={editReport_today} />
       </>
     )
   }
   // 
-  function Bar_reporter_inEdit02() {
-    return (
-      <>
+  // function Bar_reporter_inEdit02() {
+  //   return (
+  //     <>
 
-        <MyButton label={isReportEdit ? "取消" : "編輯"}
-          onClick={switchIsEdit} />
+  //       <MyButton label={isReportEdit ? "取消" : "編輯"}
+  //         onClick={switchIsEdit} />
 
-        {isReportEdit &&
-          <MyButton label="上傳"
-            onClick={() => { setShowReviewerForReportModal(true) }} />
-        }
-      </>
-    )
-  }
+  //       {isReportEdit &&
+  //         <MyButton label="上傳"
+  //           onClick={() => { setShowReviewerForReportModal(true) }} />
+  //       }
+  //     </>
+  //   )
+  // }
   // 
 
 
