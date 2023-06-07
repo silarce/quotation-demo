@@ -170,7 +170,7 @@ class Class_reportItem {
       const idArr = this.workers.map((worker) => {
         return worker.id
       })
-      if (idArr.length === 0) return null
+      if (idArr.length === 0) return []
       return idArr
     })()
 
