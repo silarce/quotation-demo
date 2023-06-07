@@ -1,6 +1,23 @@
 @use "styles/theme01" as *;
 
-.wrapper {
+.drawer {
+  position: absolute;
+  // width: 100%;
+  :global(.ant-drawer-mask) {
+    display: none;
+  }
+  :global(.ant-drawer-content-wrapper) {
+
+    transition-duration: 0s;
+  }
+  :global(.ant-drawer-content) {
+    :global(.ant-drawer-body) {
+      padding: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: fit-content auto;
+    }
+  }
 } // wrapper
 
 .table {
@@ -14,7 +31,7 @@
   overflow: auto;
   @screen laptop {
     display: flex;
-    width: 100vw;
+    // width: 100vw;
   }
   .roof {
     position: sticky;
@@ -56,6 +73,7 @@
       }
     }
     @screen laptop {
+      position: relative;
       top: 0;
       left: 0;
       grid-template-columns: 57px 57px;
@@ -195,3 +213,38 @@
     height: 16px;
   }
 } // table
+
+// =====================================================================
+
+.TitlePanel {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  height: 60px;
+  padding: 0 26px;
+  border-bottom: solid 1px $colorBorder01;
+  > * {
+    margin: auto;
+  }
+  .left {
+    margin-left: 0;
+  }
+  .center {
+    span {
+      font-size: 20px;
+      font-weight: 400;
+      color: $colorMain;
+    }
+  }
+  .right {
+    margin-right: 0;
+  }
+}
+
+.Bar_reporter_inEdit02 {
+  display: flex;
+  gap: 10px;
+  width: fit-content;
+  padding: 10px;
+  margin: auto;
+  margin-right: 0;
+}

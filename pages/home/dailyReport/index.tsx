@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, createContext } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import moment from "moment";
@@ -17,8 +17,10 @@ import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModa
 import ReviewerAndExaminerSelector from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
+
 // mobile
 import SearchDrawer from "components/page/home/dailyReport/SearchDrawer";
+import DailyReportTablePanel_mobile from "components/page/home/dailyReport/DailyReportTablePanel_mobile"
 
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
@@ -30,7 +32,7 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import { Badge } from "antd"
 
 // hook
-import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
+import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDailyReport";
 
 // tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
@@ -72,6 +74,22 @@ const reportedAtOptions = [
   { label: "未檢視", value: "未檢視" },
   { label: "已檢視", value: "已檢視" },
 ]
+
+// =====================================================================
+type TdailyReportContext = {
+  // doShowDrawer: () => void
+  // editReport_today: () => void
+  reportInEdit: ThookEmptyReport | undefined
+  isReportEdit: boolean
+  switchIsEdit: () => void
+  setShowReviewerForReportModal: (v: boolean) => void
+  cancelEditNewDailyReport: () => void
+}
+
+
+
+export const DailyReportContext = createContext<TdailyReportContext>(null!)
+
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
@@ -615,6 +633,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const closeShowDrawer = () => { setShowSearchDrawer(false) }
 
 
+  const dailyReportContextValue = {
+    // doShowDrawer,
+    // editReport_today,
+    reportInEdit,
+    isReportEdit,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+    cancelEditNewDailyReport,
+  }
+
+
+
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -652,6 +682,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           setShowReviewerForReportModal={setShowReviewerForReportModal}
           cancelEditNewDailyReport={cancelEditNewDailyReport}
         />
+
+
         {/*  */}
         {!reportInEdit && !isCalendar &&
           <ReporterList
@@ -667,14 +699,25 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           />
         }
 
-        {reportInEdit &&
+        {/* {reportInEdit &&
+            <ReportTable
+              classDailyReportItemArr={reportInEdit.items}
+              addDailyReportItem={addDailyReportItem}
+              removeDailyReportItem={removeDailyReportItem}
+              isEdit={isReportEdit}
+            />
+        } */}
+        <DailyReportContext.Provider value={dailyReportContextValue}>
           <ReportTable
-            classDailyReportItemArr={reportInEdit.items}
+            classDailyReportItemArr={reportInEdit?.items}
             addDailyReportItem={addDailyReportItem}
             removeDailyReportItem={removeDailyReportItem}
             isEdit={isReportEdit}
           />
-        }
+        </DailyReportContext.Provider>
+
+
+
         {/* mobile */}
         <SearchDrawer visible={showSearchDrawer}
           onSearch={doSearch}

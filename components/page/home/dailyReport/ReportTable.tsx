@@ -2,6 +2,10 @@ import { useState, useContext } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
+import Image from "next/image"
+
+// antd
+import { Drawer } from "antd"
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
@@ -10,8 +14,6 @@ import WorkerSelector from "components/global/gear/modal/workerSelector"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import MealSelector from "./MealSelector"
 import CheckButton from "components/global/gear/button/checkButton"
-
-
 
 // css
 import scss from "./reportTable.module.scss"
@@ -26,11 +28,19 @@ import { Class_reportItem } from "pages/home/dailyReport"
 import { TdailyReportItemDto, TdailyReportWokerDto } from "js/api/dtoTypes"
 
 // icon
+import iconSearch from "public/image/icon/search.svg"
 import { IconAddCircle, IconRemoveCircle, IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
 import iconArrow from "public/image/icon/arrow03_left.svg"
+import { IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
 
 // other
 import { AppContext } from "pages/_app"
+import { DailyReportContext } from "pages/home/dailyReport"
+
+// type
+import { ThookEmptyReport } from "hooks/home/useDailyReport"
+import { TuserDto } from "js/api/dtoTypes"
+
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()
 const optionArr_mealsCost = optionsCreator_mealsCost()
@@ -41,12 +51,14 @@ export default function ReportTable(
     addDailyReportItem,
     removeDailyReportItem,
     isEdit,
+
   }:
     {
-      classDailyReportItemArr: Class_reportItem[]
+      classDailyReportItemArr: Class_reportItem[] | undefined
       addDailyReportItem: () => void
       removeDailyReportItem: (index: number) => void
       isEdit: boolean
+
     }
 ) {
   const router = useRouter()
@@ -94,10 +106,29 @@ export default function ReportTable(
   const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr
 
   // ------------------------------------------------
-
+  // ------------------------------------------------
   // ------------------------------------------------
   return (
-    <>
+    <Drawer
+      className={scss.drawer}
+      visible={!!classDailyReportItemArr}
+      // getContainer={false}
+      getContainer={rwd1023 ? undefined : false}
+      width={"100%"}
+      closable={false}
+    >
+
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {rwd1023 && <Panel />}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+
+
       <div className={classNames(scss.table)}>
 
         <div className={scss.roof} />
@@ -127,7 +158,7 @@ export default function ReportTable(
         </div>
         {/*  */}
         <div className={classNames(scss.tbody)}>
-          {classDailyReportItemArr.map((theClass, rIndex) => {
+          {classDailyReportItemArr?.map((theClass, rIndex) => {
             return (
               <div key={rIndex} className={classNames(scss.row)}>
 
@@ -383,7 +414,7 @@ export default function ReportTable(
         />
 
       </div>
-    </>
+    </Drawer>
   )
 }
 // =================================================================
@@ -606,3 +637,88 @@ const mealsLookup = {
   lunch: "午餐",
   dinner: "晚餐",
 } as const
+
+
+
+// ==============================================================================
+
+const Panel = () => {
+
+  return (
+    <div>
+      <TitlePanel />
+      <Bar_reporter_inEdit02 />
+    </div>
+  )
+}
+
+
+const TitlePanel = () => {
+  const { reportInEdit, cancelEditNewDailyReport } = useContext(DailyReportContext)
+  const employeeChName = reportInEdit?.employeeChName
+  const date = reportInEdit?.date
+  return (
+    <div className={scss.TitlePanel}>
+      <div className={classNames(scss.left)}>
+        <Image src={iconArrow} alt="return" onClick={cancelEditNewDailyReport} />
+      </div>
+      <div className={classNames(scss.center)}><span>{employeeChName} {date}</span></div>
+      {/* <div className={classNames(scss.right)}><IconCheck02 /></div> */}
+    </div>
+  )
+}
+
+
+
+function Bar_reporter_inEdit02() {
+
+  const {
+    isReportEdit,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+  } = useContext(DailyReportContext)
+
+  return (
+    <div className={scss.Bar_reporter_inEdit02}>
+
+      {isReportEdit &&
+        <MyButton label="上傳"
+          onClick={() => { setShowReviewerForReportModal(true) }} />
+      }
+      <MyButton label={isReportEdit ? "取消" : "編輯"}
+        onClick={switchIsEdit} />
+
+    </div>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
