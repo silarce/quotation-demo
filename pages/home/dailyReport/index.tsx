@@ -688,6 +688,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           identity={identity}
           editReport_today={editReport_today}
           cancelEditNewDailyReport={cancelEditNewDailyReport}
+          isSearch={!!(searchObj?.isUserReviewed !== undefined || searchObj?.date !== undefined)}
         />
 
 
