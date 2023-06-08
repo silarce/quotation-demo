@@ -38,9 +38,9 @@ export default function PageHeader_mobile_dailyReport(
 ) {
 
   const Bar = (() => {
-    if (identity = "manager") return Bar_manager_notInEdit
-    if (identity = "reviewer") return Bar_manager_notInEdit
-    return () => { return null }
+    if (identity === "manager") return Bar_manager_notInEdit
+    if (identity === "reviewer") return Bar_reporter_notInEdit
+    return Bar_reporter_notInEdit
   })()
 
 
@@ -74,20 +74,7 @@ export default function PageHeader_mobile_dailyReport(
       </>
     )
   }
-  // 
-  // function Bar_reviewer_inEdit_user() {
-  //   return (
-  //     <CheckButton
-  //       // checkLabel="已讀"
-  //       checkLabel="已讀"
-  //       uncheckLable="未讀"
-  //       value={!!reportInEdit?.isReviewedByUser}
-  //       onClick={doCheck}
-  //     />
-  //   )
-  // }
-
-  // 
+  // -------------------------------------------
   function Bar_reporter_notInEdit() {
     return (
       <>
@@ -98,26 +85,6 @@ export default function PageHeader_mobile_dailyReport(
       </>
     )
   }
-  // 
-  // function Bar_reporter_inEdit02() {
-  //   return (
-  //     <>
-
-  //       <MyButton label={isReportEdit ? "取消" : "編輯"}
-  //         onClick={switchIsEdit} />
-
-  //       {isReportEdit &&
-  //         <MyButton label="上傳"
-  //           onClick={() => { setShowReviewerForReportModal(true) }} />
-  //       }
-  //     </>
-  //   )
-  // }
-  // 
-
-
-
-
 
 } // PageHeader_mobile_dailyReport
 // ====================================================================
