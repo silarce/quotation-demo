@@ -752,16 +752,25 @@ const Panel = () => {
 }
 
 const TitlePanel = () => {
-  const { reportInEdit, cancelEditNewDailyReport } = useContext(DailyReportContext)
+
+  const {
+    reportInEdit, cancelEditNewDailyReport,
+    isReportEdit, setShowReviewerForReportModal
+  }
+    = useContext(DailyReportContext)
   const employeeChName = reportInEdit?.employeeChName
   const date = moment(reportInEdit?.date).format("y-MM-DD")
+
   return (
     <div className={scss.TitlePanel}>
       <div className={classNames(scss.left)}>
         <Image src={iconArrow} alt="return" onClick={cancelEditNewDailyReport} />
       </div>
       <div className={classNames(scss.center)}><span>{employeeChName} {date}</span></div>
-      {/* <div className={classNames(scss.right)}><IconCheck02 /></div> */}
+      {isReportEdit &&
+        <div className={classNames(scss.right)}
+          onClick={() => setShowReviewerForReportModal(true)}><IconCheck02 /></div>
+      }
     </div>
   )
 }
@@ -776,10 +785,10 @@ function Bar_reporter_inEdit02() {
 
   return (
     <div className={scss.bar}>
-      {isReportEdit &&
+      {/* {isReportEdit &&
         <MyButton label="上傳"
           onClick={() => { setShowReviewerForReportModal(true) }} />
-      }
+      } */}
       <MyButton label={isReportEdit ? "取消" : "編輯"}
         onClick={switchIsEdit} />
     </div>
