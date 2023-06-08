@@ -816,7 +816,7 @@ function Bar_reviewer_inEdit_user() {
 const Bar_reporter_reviewed = () => {
 
   return (
-    <div className={scss.bar}>
+    <div className={classNames(scss.bar, scss.reviwedBdage)}>
       <Badge
         className={scss.antdBadge02}
         color="auto"
