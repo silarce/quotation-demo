@@ -22,15 +22,8 @@ export default function PageHeader_mobile_dailyReport(
   { doShowDrawer, editRivewerPickArr,
     employeeChName,
     date,
-
-    userInfo,
     identity,
-    reportInEdit,
-    doCheck,
-    isReportEdit,
     editReport_today,
-    switchIsEdit,
-    setShowReviewerForReportModal,
     cancelEditNewDailyReport,
   }:
     {
@@ -38,23 +31,16 @@ export default function PageHeader_mobile_dailyReport(
       editRivewerPickArr: () => void
       employeeChName: string | undefined
       date: string | undefined
-
-      userInfo: TuserDto
-      identity: string | undefined
-      reportInEdit: ThookEmptyReport | undefined
-      doCheck: () => void
-      isReportEdit: boolean
+      identity: "manager" | "reviewer" | "reporter" | undefined
       editReport_today: () => void
-      switchIsEdit: () => void
-      setShowReviewerForReportModal: (v: boolean) => void
       cancelEditNewDailyReport: () => void
     }
 ) {
 
   const Bar = (() => {
-
-  return Bar_reporter_notInEdit
-    // return () => { return null }
+    if (identity = "manager") return Bar_manager_notInEdit
+    if (identity = "reviewer") return Bar_manager_notInEdit
+    return () => { return null }
   })()
 
 
@@ -79,15 +65,15 @@ export default function PageHeader_mobile_dailyReport(
   )
   // --------------------------------------------------------------
 
-  // function Bar_manager_notInEdit() {
-  //   return (
-  //     <>
-  //       <MyButton label="搜尋" img={iconSearch.src}
-  //         onClick={doShowDrawer} />
-  //       <MyButton label="審核人員設定" onClick={editRivewerPickArr} />
-  //     </>
-  //   )
-  // }
+  function Bar_manager_notInEdit() {
+    return (
+      <>
+        <MyButton label="搜尋" img={iconSearch.src}
+          onClick={doShowDrawer} />
+        <MyButton label="審核人員設定" onClick={editRivewerPickArr} />
+      </>
+    )
+  }
   // 
   // function Bar_reviewer_inEdit_user() {
   //   return (

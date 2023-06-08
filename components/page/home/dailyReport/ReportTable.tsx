@@ -6,7 +6,7 @@ import Image from "next/image"
 import moment from 'moment';
 
 // antd
-import { Drawer } from "antd"
+import { Drawer, Badge } from "antd"
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
@@ -700,10 +700,53 @@ const DatePicker = (
 // mobile
 const Panel = () => {
 
+  const {
+    identity, reportInEdit, isReportEdit,
+    userInfo,
+  } = useContext(DailyReportContext)
+
+
+  const Below = (() => {
+    if (reportInEdit?.isUserIsViewer) {
+      return () => null
+    }
+    if (identity === "manager") {
+      if (!reportInEdit) return () => null
+      else if (reportInEdit.isAllowToReview) return Bar_reviewer_inEdit_user
+      else return () => null
+    }
+
+    if (identity === "reviewer") {
+      if (!reportInEdit) return () => null
+      else {
+        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
+          if (isReportEdit) return Bar_reporter_inEdit02
+          if (reportInEdit.isReviewedByOther) return Bar_reporter_reviewed
+          return Bar_reporter_inEdit02
+        }
+        else if (reportInEdit.isAllowToReview) {
+          return Bar_reviewer_inEdit_user
+        }
+        return () => null
+      }
+    }
+
+    if (identity === "reporter") {
+      if (!reportInEdit) return () => null
+      else {
+        if (reportInEdit.isReviewedByOther) return Bar_reporter_reviewed
+        if (isReportEdit) return Bar_reporter_inEdit02
+        return Bar_reporter_inEdit02
+      }
+    }
+    return () => null
+  })()
+
+
   return (
     <div>
       <TitlePanel />
-      <Bar_reporter_inEdit02 />
+      <Below />
     </div>
   )
 }
@@ -732,16 +775,46 @@ function Bar_reporter_inEdit02() {
   } = useContext(DailyReportContext)
 
   return (
-    <div className={scss.Bar_reporter_inEdit02}>
-
+    <div className={scss.bar}>
       {isReportEdit &&
         <MyButton label="上傳"
           onClick={() => { setShowReviewerForReportModal(true) }} />
       }
       <MyButton label={isReportEdit ? "取消" : "編輯"}
         onClick={switchIsEdit} />
-
     </div>
   )
 }
+
+function Bar_reviewer_inEdit_user() {
+  const {
+    reportInEdit,
+    doCheck
+  } = useContext(DailyReportContext)
+
+  return (
+    <div className={scss.bar}>
+      <CheckButton
+        checkLabel="已讀"
+        uncheckLable="未讀"
+        value={!!reportInEdit?.isReviewedByUser}
+        onClick={doCheck}
+      />
+    </div>
+  )
+}
+
+const Bar_reporter_reviewed = () => {
+
+  return (
+    <div className={scss.bar}>
+      <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已檢視" />
+    </div>
+  )
+
+}
+
 

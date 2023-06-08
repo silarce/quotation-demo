@@ -86,6 +86,10 @@ type TdailyReportContext = {
   setShowReviewerForReportModal: (v: boolean) => void
   cancelEditNewDailyReport: () => void
   changeReportDate: (v: string) => void
+  identity: "manager" | "reviewer" | "reporter" | undefined
+  // editRivewerPickArr: () => void
+  doCheck: () => void,
+  userInfo: TuserDto
 }
 
 
@@ -647,7 +651,11 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     switchIsEdit,
     setShowReviewerForReportModal,
     cancelEditNewDailyReport,
-    changeReportDate
+    changeReportDate,
+    identity,
+    // editRivewerPickArr,
+    doCheck,
+    userInfo,
   }
 
 
@@ -677,16 +685,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           editRivewerPickArr={editRivewerPickArr}
           employeeChName={reportInEdit?.employeeChName}
           date={reportInEdit?.date}
-
-          userInfo={userInfo}
           identity={identity}
-          reportInEdit={reportInEdit}
-          doCheck={doCheck}
-          isReportEdit={isReportEdit}
           editReport_today={editReport_today}
-
-          switchIsEdit={switchIsEdit}
-          setShowReviewerForReportModal={setShowReviewerForReportModal}
           cancelEditNewDailyReport={cancelEditNewDailyReport}
         />
 
