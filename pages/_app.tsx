@@ -131,7 +131,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         <Head>
           <title >三久ERP</title>
         </Head>
-        <Login onLogin={onLogin} />
+        <AppContext.Provider value={appContextValue}>
+          <Login onLogin={onLogin} />
+        </AppContext.Provider>
       </>
     )
   // ------------------------------------------------------------------

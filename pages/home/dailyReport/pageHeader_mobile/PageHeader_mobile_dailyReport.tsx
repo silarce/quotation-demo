@@ -1,21 +1,16 @@
 import Image from "next/image"
-
+import classNames from "classnames"
 
 // gear
 import MyButton from "components/global/gear/button/myButton"
-import CheckButton from "components/global/gear/button/checkButton"
-
 
 // css
 import scss from "./pageHeader_mobile_dailyReport.module.scss"
 
 // icon
 import iconSearch from "public/image/icon/search.svg"
+import iconSearch_hover from "public/image/icon/search_hover.svg"
 import iconArrow from "public/image/icon/arrow03_left.svg"
-
-// type
-import { ThookEmptyReport } from "hooks/home/useDailyReport"
-import { TuserDto } from "js/api/dtoTypes"
 
 // ====================================================================
 export default function PageHeader_mobile_dailyReport(
@@ -25,6 +20,7 @@ export default function PageHeader_mobile_dailyReport(
     identity,
     editReport_today,
     cancelEditNewDailyReport,
+    isSearch,
   }:
     {
       doShowDrawer: () => void
@@ -34,6 +30,7 @@ export default function PageHeader_mobile_dailyReport(
       identity: "manager" | "reviewer" | "reporter" | undefined
       editReport_today: () => void
       cancelEditNewDailyReport: () => void
+      isSearch: boolean
     }
 ) {
 
@@ -57,7 +54,7 @@ export default function PageHeader_mobile_dailyReport(
 
       <div className={scss.btnBar}>
         <div className={scss.right}>
-          <Bar />
+          <Bar isSearch={isSearch} />
         </div>
       </div>
 
@@ -65,20 +62,28 @@ export default function PageHeader_mobile_dailyReport(
   )
   // --------------------------------------------------------------
 
-  function Bar_manager_notInEdit() {
+  function Bar_manager_notInEdit(
+    { isSearch }:
+      { isSearch: boolean }
+  ) {
     return (
       <>
-        <MyButton label="搜尋" img={iconSearch.src}
+        <MyButton className={classNames(scss.searchBtn, { [scss.active]: isSearch })}
+          label="搜尋" img={isSearch ? iconSearch_hover.src : iconSearch.src}
           onClick={doShowDrawer} />
         <MyButton label="審核人員設定" onClick={editRivewerPickArr} />
       </>
     )
   }
   // -------------------------------------------
-  function Bar_reporter_notInEdit() {
+  function Bar_reporter_notInEdit(
+    { isSearch }:
+      { isSearch: boolean }
+  ) {
     return (
       <>
-        <MyButton label="搜尋" img={iconSearch.src}
+        <MyButton className={classNames(scss.searchBtn, { [scss.active]: isSearch })}
+          label="搜尋" img={isSearch ? iconSearch_hover.src : iconSearch.src}
           onClick={doShowDrawer} />
         <MyButton label="新增回報"
           onClick={editReport_today} />
