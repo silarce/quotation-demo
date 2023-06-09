@@ -1,4 +1,4 @@
-import { useState, HTMLInputTypeAttribute } from "react"
+import { useState, useEffect, HTMLInputTypeAttribute } from "react"
 import _ from "lodash"
 import Decimal from "decimal.js"
 import moment from "moment"
@@ -95,14 +95,15 @@ class Class_product {
   constructor(
     reRender: TreRender,
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto,
-    countTotalDiscount: () => void
+    countTotalDiscount: () => void,
+    countSubTotal: () => void
   ) {
     this._reRender = reRender
     this._product = legacyProduct
     const foo = legacyProduct
 
     this._countTotalDiscount = countTotalDiscount
-
+    this._countSubTotal = countSubTotal
 
     this._id = (() => {
       // if ("id" in this._product) return this._product?.id
@@ -136,6 +137,7 @@ class Class_product {
   private _reRender
   private _product
   private _countTotalDiscount
+  private _countSubTotal
   private _id
   private _idNumber
   private _length
@@ -280,6 +282,7 @@ class Class_product {
 
     this._totalPrice = v;
     this._product.totalPrice = parseFloat(v || "0");
+    this._countSubTotal()
     this._reRender()
   }
 
@@ -443,7 +446,7 @@ class Class_payInfo {
     this._legacyContract.discountRate = v || "0";
     this._reRender()
   }
-/**小計 */
+  /**小計 */
   get subTotal() {
     if (!this._subTotal) return ""
     return parseFloat(this._subTotal).toLocaleString()
@@ -598,7 +601,7 @@ class Class_legacyContract {
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     this.classProductArr =
       sortedProdArr.map((product) => {
-        return new Class_product(reRender, product, this.countTotalDiscount)
+        return new Class_product(reRender, product, this.countTotalDiscount, this.countSubTotal)
       })
 
     /**額外項目 */
@@ -636,7 +639,8 @@ class Class_legacyContract {
   countTotalDiscount = () => {
     let totalDiscount = new Decimal(0)
     this.classProductArr.forEach((prod) => {
-      totalDiscount = Decimal.add(prod.discountRate || 0, totalDiscount)
+      const discountRate = prod.discountRate.replace(/,/g, "") || 0
+      totalDiscount = Decimal.add(discountRate || 0, totalDiscount)
     })
     this.classPayInfo.discountRate_noLoop =
       Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2)
@@ -647,6 +651,14 @@ class Class_legacyContract {
     })
   }
 
+  countSubTotal = () => {
+    let subTotal = new Decimal(0)
+    this.classProductArr.forEach((prod) => {
+      const totalPrice = prod.totalPrice.replace(/,/g, "") || 0
+      subTotal = Decimal.add(totalPrice || 0, subTotal)
+    })
+    this.classPayInfo.subTotal = subTotal.toString()
+  }
 
   get customer() {
     return this._legacyContract.customer
@@ -685,7 +697,9 @@ class Class_legacyContract {
     this._reRender()
   }
   addProd = () => {
-    this.classProductArr.push(new Class_product(this._reRender, emptyProdCre(), this.countTotalDiscount))
+    this.classProductArr.push(new Class_product(
+      this._reRender, emptyProdCre(), this.countTotalDiscount, this.countSubTotal
+    ))
     this._activeProd = this.classProductArr.length - 1
     this._reRender()
   }
@@ -702,6 +716,7 @@ class Class_legacyContract {
     this.classAdditionArr.push(new Class_addition(this._reRender, emptyAdditionCre()))
     this._reRender()
   }
+
 
   // ---------------------
   prodCellConfig  // dnd head的狀態，也是資料分類目錄
