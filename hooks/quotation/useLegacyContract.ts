@@ -443,7 +443,6 @@ class Class_payInfo {
 
   /**總折數 */
   get discountRate() {
-
     return this._legacyContract.discountRate
   }
   set discountRate(v) {
@@ -1075,5 +1074,26 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
   }
 }
 
+
+/**
+筆記
+countTotalDiscount 計算總折數
+editAllProdDiscount 變更所有主產品折數
+countSubTotal 計算小計
+
+以下情況會呼叫特定函式
+變更主產品設定與其他設定的複價時 countSubTotal
+變更數量或單價時會自動計算、變更複價，所以也會呼叫 countSubTotal
+變更主產品設定的折數 countSubTotal countTotalDiscount
+變更總折數 先呼叫editAllProdDiscount再呼叫countSubTotal (必須照順序)
+
+新增產品 countTotalDiscount
+移除產品 countTotalDiscount countSubTotal
+複製產品 countTotalDiscount countSubTotal
+新增項目 
+移除項目 countSubTotal
+複製項目 countSubTotal 
+
+ */
 
 
