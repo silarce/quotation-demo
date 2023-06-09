@@ -1078,8 +1078,16 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
 /**
 筆記
 countTotalDiscount 計算總折數
+運作方式:將所有主產品的折數加起來並平均，計算到小數點第二位
+
 editAllProdDiscount 變更所有主產品折數
+運作方式:將所有主產品的折數設定為指定值
+
 countSubTotal 計算小計
+運作方式:const x = (將所有個別主產品的複價與折數相乘)後加總
+        const y = 將其他設定所有的複價加總
+        reuturn x+y
+        程式的運作不是如上面描述，但概念是上面所述
 
 以下情況會呼叫特定函式
 變更主產品設定與其他設定的複價時 countSubTotal
