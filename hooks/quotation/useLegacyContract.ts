@@ -736,6 +736,8 @@ class Class_legacyContract {
   delProd = (index: number) => {
     this.classProductArr.splice(index, 1)
     this.activeProd = -1
+    this.countTotalDiscount()
+    this.countSubTotal()
     this._reRender()
   }
   copyProd = (index: number) => {
@@ -743,6 +745,8 @@ class Class_legacyContract {
     copy.id = undefined
     this.classProductArr.push(copy)
     this.activeProd = index
+    this.countTotalDiscount()
+    this.countSubTotal()
     this._reRender()
   }
   addProd = () => {
@@ -750,15 +754,18 @@ class Class_legacyContract {
       this._reRender, emptyProdCre(), this.countTotalDiscount, this.countSubTotal
     ))
     this._activeProd = this.classProductArr.length - 1
+    this.countTotalDiscount()
     this._reRender()
   }
 
   delAddition = (index: number) => {
     this.classAdditionArr.splice(index, 1)
+    this.countSubTotal()
     this._reRender()
   }
   copyAddition = (index: number) => {
     this.classAdditionArr.push(_.cloneDeep(this.classAdditionArr[index]))
+    this.countSubTotal()
     this._reRender()
   }
   addAddition = () => {
