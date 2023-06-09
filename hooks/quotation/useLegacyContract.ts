@@ -322,10 +322,12 @@ class Class_product {
 class Class_addition {
   constructor(
     reRender: TreRender,
-    addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto
+    addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto,
+    countSubTotal: () => void
   ) {
     this._reRender = reRender
     this._addition = addition
+    this._countSubTotal = countSubTotal
 
     this._quantity = addition.quantity ? addition.quantity.toString() : ""
     this._unitPrice = addition.unitPrice ? addition.unitPrice.toString() : ""
@@ -335,6 +337,7 @@ class Class_addition {
   } // constructor
   private _reRender
   private _addition
+  private _countSubTotal
   private _quantity
   private _unitPrice
   private _totalPrice
@@ -383,6 +386,7 @@ class Class_addition {
     if (!checkIsNumberStr(v)) return
     this._totalPrice = v
     this._addition.totalPrice = parseFloat(v || "0");
+    this._countSubTotal()
     this._reRender()
   }
 
@@ -630,7 +634,7 @@ class Class_legacyContract {
 
     /**額外項目 */
     this.classAdditionArr =
-      this._legacyContract.additions.map((addition) => new Class_addition(reRender, addition))
+      this._legacyContract.additions.map((addition) => new Class_addition(reRender, addition, this.countSubTotal))
     /**   付款資訊*/
     this.classPayInfo
       = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount)
@@ -681,6 +685,11 @@ class Class_legacyContract {
       const totalPrice = prod.totalPrice.replace(/,/g, "") || 0
       subTotal = Decimal.add(totalPrice || 0, subTotal)
     })
+    this.classAdditionArr.forEach((addi) => {
+      const totalPrice = addi.totalPrice.replace(/,/g, "") || 0
+      subTotal = Decimal.add(totalPrice || 0, subTotal)
+    })
+
     this.classPayInfo.subTotal = subTotal.toString()
   }
 
@@ -737,7 +746,7 @@ class Class_legacyContract {
     this._reRender()
   }
   addAddition = () => {
-    this.classAdditionArr.push(new Class_addition(this._reRender, emptyAdditionCre()))
+    this.classAdditionArr.push(new Class_addition(this._reRender, emptyAdditionCre(), this.countSubTotal))
     this._reRender()
   }
 
