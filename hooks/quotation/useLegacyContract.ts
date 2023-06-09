@@ -18,6 +18,8 @@ import {
   TlegacyContractAdditionDto, TcreateLegacyContractAdditionDto, TcustomerDto,
 } from "js/api/dtoTypes"
 
+import { checkIsNumberStr, clearThousandsSeparator } from "js/utils/helpers/universal"
+
 const options_doorTrack_normal = optionsCre_doorTrack_normal()
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection()
 
@@ -337,6 +339,8 @@ class Class_addition {
   private _unitPrice
   private _totalPrice
 
+
+
   get id() {
     if ("id" in this._addition) return this._addition.id
     return undefined
@@ -353,29 +357,49 @@ class Class_addition {
     this._quantity = v
     v = parseInt(v || "0").toString()
     this._addition.quantity = parseInt(v || "0");
+    this._countTotalPrice()
     this._reRender()
   }
 
-  get unitPrice() { return this._unitPrice }
+  get unitPrice() {
+    if (!this._unitPrice) return ""
+    return parseFloat(this._unitPrice).toLocaleString()
+  }
   set unitPrice(v) {
-
+    v = clearThousandsSeparator(v)
+    if (!checkIsNumberStr(v)) return
     this._unitPrice = v
     this._addition.unitPrice = parseFloat(v || "0");
+    this._countTotalPrice()
     this._reRender()
   }
 
-  get totalPrice() { return this._totalPrice }
+  get totalPrice() {
+    if (!this._totalPrice) return ""
+    return parseFloat(this._totalPrice).toLocaleString()
+  }
   set totalPrice(v) {
-
+    v = clearThousandsSeparator(v)
+    if (!checkIsNumberStr(v)) return
     this._totalPrice = v
     this._addition.totalPrice = parseFloat(v || "0");
     this._reRender()
   }
 
+
+
   get notes() { return this._addition.notes }
   set notes(v) { this._addition.notes = v; this._reRender() }
 
   get postAddition() { return this._addition }
+
+  private _countTotalPrice = () => {
+    const quantity = clearThousandsSeparator(this.quantity)
+    const unitPrice = clearThousandsSeparator(this.unitPrice)
+    this.totalPrice = Decimal.mul(quantity, unitPrice).toString()
+  }
+
+
 
 } // Class_part
 // =======================================================================
@@ -917,8 +941,8 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       "itemName": { label: "項目", width: "60px", type: "input" },
       "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
       "quantity": { label: "數量", width: "60px", type: "input", inputType: "number" },
-      "unitPrice": { label: "單價", width: "110px", type: "input", inputType: "number" },
-      "totalPrice": { label: "複價", width: "110px", type: "input", inputType: "number" },
+      "unitPrice": { label: "單價", width: "110px", type: "input", },
+      "totalPrice": { label: "複價", width: "110px", type: "input", },
       "notes": { label: "備註", width: "170px", type: "input" },
 
     }
