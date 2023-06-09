@@ -19,6 +19,7 @@ import {
 } from "js/api/dtoTypes"
 
 import { checkIsNumberStr, clearThousandsSeparator } from "js/utils/helpers/universal"
+import { CONFIG_FILES } from "next/dist/shared/lib/constants"
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal()
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection()
@@ -181,6 +182,7 @@ class Class_product {
     this._discountRate = v;
     this._product.discountRate = Decimal.div(v || 0, 100).toString();
     this._countTotalDiscount()
+    this._countSubTotal()
     this._reRender()
   }
 
@@ -412,7 +414,8 @@ class Class_payInfo {
     reRender: () => void,
     legacyContract: TlegacyContractDto | TemptyLegacyContract,
     classProductArr: Class_product[],
-    editAllProdDiscount: (v: string) => void
+    editAllProdDiscount: (v: string) => void,
+    countSubTotal: () => void
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
@@ -422,6 +425,9 @@ class Class_payInfo {
     })
     this._classProductArr = classProductArr
     this._editAllProdDiscount = editAllProdDiscount
+    this._countSubTotal = countSubTotal
+
+
     this._subTotal = this._legacyContract.subTotal.toString()
     this._salesTax = this._legacyContract.salesTax.toString()
     this._total = this._legacyContract.total.toString()
@@ -430,12 +436,14 @@ class Class_payInfo {
   private _legacyContract
   private _classProductArr
   private _editAllProdDiscount
+  private _countSubTotal
   private _subTotal
   private _salesTax
   private _total
 
   /**總折數 */
   get discountRate() {
+
     return this._legacyContract.discountRate
   }
   set discountRate(v) {
@@ -444,16 +452,20 @@ class Class_payInfo {
     const discountRate = Decimal.div(v || 0, 100)
     const subTotal: string = (() => {
       let subTotal = new Decimal(0)
+
       this._classProductArr.forEach(prod => {
         if (!prod.totalPrice) return
         subTotal = subTotal.add(prod.totalPrice)
       })
-      return subTotal.mul(discountRate).toString()
-    })()
 
+      return subTotal.mul(discountRate).toString()
+
+    })()
     this.subTotal = subTotal
-    this._legacyContract.discountRate = v || "0";
+
     this._editAllProdDiscount(v || "0")
+    this._countSubTotal()
+    this._legacyContract.discountRate = v || "0";
     this._reRender()
   }
 
@@ -637,7 +649,7 @@ class Class_legacyContract {
       this._legacyContract.additions.map((addition) => new Class_addition(reRender, addition, this.countSubTotal))
     /**   付款資訊*/
     this.classPayInfo
-      = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount)
+      = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount, this.countSubTotal)
     /**  備註*/
     this.classMemo = new Class_listString(reRender, this._legacyContract.notes)
     /**  報價範圍*/
@@ -664,6 +676,7 @@ class Class_legacyContract {
   classSignature
   // ---------------------
 
+  /**計算總折數 */
   countTotalDiscount = () => {
     let totalDiscount = new Decimal(0)
     this.classProductArr.forEach((prod) => {
@@ -673,23 +686,26 @@ class Class_legacyContract {
     this.classPayInfo.discountRate_noLoop =
       Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2)
   }
+  /**變更所有主產品的折數 */
   editAllProdDiscount = (v: string) => {
     this.classProductArr.forEach((prod) => {
       prod.discountRate_noLoop = v
     })
   }
 
+  /**計算小計 */
   countSubTotal = () => {
     let subTotal = new Decimal(0)
     this.classProductArr.forEach((prod) => {
-      const totalPrice = prod.totalPrice.replace(/,/g, "") || 0
+      let totalPrice = prod.totalPrice.replace(/,/g, "") || 0
+      const discountRate = Decimal.div(prod.discountRate, 100)
+      totalPrice = Decimal.mul(totalPrice, discountRate).toString()
       subTotal = Decimal.add(totalPrice || 0, subTotal)
     })
     this.classAdditionArr.forEach((addi) => {
       const totalPrice = addi.totalPrice.replace(/,/g, "") || 0
       subTotal = Decimal.add(totalPrice || 0, subTotal)
     })
-
     this.classPayInfo.subTotal = subTotal.toString()
   }
 
