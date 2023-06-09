@@ -1,9 +1,11 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useMemo } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
 import Image from "next/image"
 import moment from 'moment';
+
+import _ from "lodash"
 
 // antd
 import { Drawer, Badge } from "antd"
@@ -68,10 +70,14 @@ export default function ReportTable(
   const isMine = (router.query.isMine === "true") ? true : false
 
   const { reportInEdit } = useContext(DailyReportContext)
-
-
-
   const { rwd1023 } = useContext(AppContext)
+
+  /**將 classDailyReportItemArr依"arrivalTime"排序*/
+  const sortedClassDailyReportItemArr = useMemo(() => {
+    return _.sortBy(classDailyReportItemArr, "arrivalTime")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classDailyReportItemArr])
+
 
 
   const [showModal_worker, setShowModal_worker] = useState(false)
@@ -172,7 +178,8 @@ export default function ReportTable(
         </div>
         {/*  */}
         <div className={classNames(scss.tbody)}>
-          {classDailyReportItemArr?.map((theClass, rIndex) => {
+          {/* {classDailyReportItemArr?.map((theClass, rIndex) => { */}
+          {sortedClassDailyReportItemArr?.map((theClass, rIndex) => {
             return (
               <div key={rIndex} className={classNames(scss.row)}>
 
