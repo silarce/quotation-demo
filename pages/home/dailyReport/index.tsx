@@ -392,10 +392,28 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
     const reviewerIds = reviewerArr.map((emp) => emp.id)
     const examinerIds = examinerArr.map((emp) => emp.id)
-    const items = reportInEdit.items.map((item) => {
-      return item.postBody
-    })
+
     const theDate = convertDate_add1911(reportInEdit.date)
+
+    const items = reportInEdit.items.map((item) => {
+      const year = new Date(theDate).getFullYear()
+      const month = new Date(theDate).getMonth()
+      const th = new Date(theDate).getDate()
+
+      const setDateToReportDate = (dateStr: string) => {
+        const date = new Date(dateStr)
+        date.setFullYear(year)
+        date.setMonth(month)
+        date.setDate(th)
+        return date.toISOString()
+      }
+      const postBody = item.postBody
+      postBody.arrivalTime = setDateToReportDate(postBody.arrivalTime!)
+      postBody.departureTime = setDateToReportDate(postBody.departureTime!)
+      postBody.departureWorksiteTime = setDateToReportDate(postBody.departureWorksiteTime!)
+      return postBody
+    })
+
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({

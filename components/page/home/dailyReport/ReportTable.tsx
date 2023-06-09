@@ -72,14 +72,6 @@ export default function ReportTable(
   const { reportInEdit } = useContext(DailyReportContext)
   const { rwd1023 } = useContext(AppContext)
 
-  /**將 classDailyReportItemArr依"arrivalTime"排序*/
-  const sortedClassDailyReportItemArr = useMemo(() => {
-    return _.sortBy(classDailyReportItemArr, "arrivalTime")
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classDailyReportItemArr])
-
-
-
   const [showModal_worker, setShowModal_worker] = useState(false)
   const [showModal_meals, setShowModal_meals] = useState(false)
   const [showModal_licensePlate, setShowModal_licensePlate] = useState(false)
@@ -178,8 +170,8 @@ export default function ReportTable(
         </div>
         {/*  */}
         <div className={classNames(scss.tbody)}>
-          {/* {classDailyReportItemArr?.map((theClass, rIndex) => { */}
-          {sortedClassDailyReportItemArr?.map((theClass, rIndex) => {
+          {classDailyReportItemArr?.map((theClass, rIndex) => {
+          {/* {sortedClassDailyReportItemArr?.map((theClass, rIndex) => { */}
             return (
               <div key={rIndex} className={classNames(scss.row)}>
 
@@ -868,5 +860,8 @@ const Bar_reporter_reviewed = () => {
   )
 
 }
+
+
+// ===================================================================
 
 
