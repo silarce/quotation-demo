@@ -257,6 +257,7 @@ export default function ReportTable(
                             // @ts-ignore
                             onChange: (v) => { theClass[key] = v },
                             className: scss.textarea,
+                            allowNewLineByUser: key === "description"
                           }} />
                       </div>
                     )
