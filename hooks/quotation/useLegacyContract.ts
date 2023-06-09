@@ -403,6 +403,7 @@ class Class_payInfo {
   private _salesTax
   private _total
 
+  /**總折數 */
   get discountRate() {
     return this._legacyContract.discountRate
   }
@@ -442,7 +443,7 @@ class Class_payInfo {
     this._legacyContract.discountRate = v || "0";
     this._reRender()
   }
-
+/**小計 */
   get subTotal() {
     if (!this._subTotal) return ""
     return parseFloat(this._subTotal).toLocaleString()
@@ -462,6 +463,7 @@ class Class_payInfo {
     this._reRender()
   }
 
+  /**營業稅 */
   get salesTax() {
     if (!this._salesTax) return ""
     return parseFloat(this._salesTax).toLocaleString()
@@ -476,7 +478,7 @@ class Class_payInfo {
     this._legacyContract.salesTax = parseFloat(v || "0");
     this._reRender()
   }
-
+  /**總計 */
   get total() {
     if (!this._total) return ""
     return parseFloat(this._total).toLocaleString()
@@ -832,7 +834,7 @@ function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
     keyList: [
-      "idNumber",
+      // "idNumber",
       "discountRate", "itemName", "quoteType",
       "length", "width", "height", "thickness", "area", "volume",
       "doorType", "material", "surface", "doorTrack",
