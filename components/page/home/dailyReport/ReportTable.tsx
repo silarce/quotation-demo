@@ -1,9 +1,11 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useMemo } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
 import Image from "next/image"
 import moment from 'moment';
+
+import _ from "lodash"
 
 // antd
 import { Drawer, Badge } from "antd"
@@ -12,8 +14,9 @@ import { Drawer, Badge } from "antd"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import MyButton from "components/global/gear/button/myButton"
 import WorkerSelector from "components/global/gear/modal/workerSelector"
-import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+// import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import MealSelector from "./MealSelector"
+import LicensePlateSelector from "./LicensePlateSelector";
 import CheckButton from "components/global/gear/button/checkButton"
 
 // css
@@ -67,14 +70,11 @@ export default function ReportTable(
   const isMine = (router.query.isMine === "true") ? true : false
 
   const { reportInEdit } = useContext(DailyReportContext)
-
-
-
   const { rwd1023 } = useContext(AppContext)
-
 
   const [showModal_worker, setShowModal_worker] = useState(false)
   const [showModal_meals, setShowModal_meals] = useState(false)
+  const [showModal_licensePlate, setShowModal_licensePlate] = useState(false)
 
   const [activeItem, setActiveItem] = useState<Class_reportItem>()
 
@@ -102,7 +102,12 @@ export default function ReportTable(
     if (!activeItem) return
     v.forEach((value) => activeItem.addMeals(value))
     modalOnCancel_meals()
-    // activeItem.addMeals(v)
+  }
+
+  const modalOnConfirm_licensePlate = (v: string | undefined) => {
+    if (!activeItem) return
+    activeItem.licensePlate = v ?? ""
+    setShowModal_licensePlate(false)
   }
 
   const disabled = !isEdit
@@ -166,6 +171,7 @@ export default function ReportTable(
         {/*  */}
         <div className={classNames(scss.tbody)}>
           {classDailyReportItemArr?.map((theClass, rIndex) => {
+          {/* {sortedClassDailyReportItemArr?.map((theClass, rIndex) => { */}
             return (
               <div key={rIndex} className={classNames(scss.row)}>
 
@@ -243,6 +249,7 @@ export default function ReportTable(
                             // @ts-ignore
                             onChange: (v) => { theClass[key] = v },
                             className: scss.textarea,
+                            allowNewLineByUser: key === "description"
                           }} />
                       </div>
                     )
@@ -306,10 +313,7 @@ export default function ReportTable(
                                   value: worker.chName,
                                 }}
                               />
-                              {/* <span>{worker.chName}</span> */}
                               {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                              {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
                             </div>
                           )
                         })}
@@ -325,7 +329,6 @@ export default function ReportTable(
                   }
                   // ---------------------
                   if (eleType === "modal" && key === "meals") {
-                    // const mealsArr = theClass["meals"]
                     const mealsArr = theClass["meals"]
                     const onAdd = () => {
                       if (disabled) return;
@@ -357,10 +360,7 @@ export default function ReportTable(
                                   value: mealsLookup[meals]
                                 }}
                               />
-                              {/* <span>{worker.chName}</span> */}
                               {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                              {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
                             </div>
                           )
                         })}
@@ -374,6 +374,36 @@ export default function ReportTable(
                       </div>
                     )
                   }
+                  // 
+                  if (eleType === "modal" && key === "licensePlate") {
+                    const licensePlate = theClass["licensePlate"]
+
+                    const onAdd = () => {
+                      if (disabled) return;
+                      setActiveItem(theClass)
+                      setShowModal_licensePlate(true)
+                    }
+                    return (
+                      <div key={cIndex}
+                        className={
+                          classNames(scss.cell, scss.workerCell,
+                            headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}
+                      >
+                        <div className={scss.worker} >
+                          <InputSel
+                            disabled={true}
+                            showBaseline={disabled ? "invisible" : "always"}
+                            placeholder={thePlaceholder}
+                            inputProps={{
+                              value: licensePlate ?? ""
+                            }}
+                          />
+                          {!disabled && <IconAddCircle className={scss.icon} onClick={onAdd} />}
+                        </div>
+                      </div>
+                    )
+                  }
+
                   // 
                   if (key === "remove") {
                     const onClick = disabled ? undefined : () => removeDailyReportItem(rIndex)
@@ -418,6 +448,12 @@ export default function ReportTable(
           visible={showModal_meals}
           onConfirm={modalOnConfirm_meals}
           onCancel={modalOnCancel_meals}
+        />
+
+        <LicensePlateSelector
+          visible={showModal_licensePlate}
+          onConfirm={modalOnConfirm_licensePlate}
+          onCancel={() => setShowModal_licensePlate(false)}
         />
 
       </div>
@@ -608,9 +644,9 @@ const config: Tconfig = {
     bodyClassName_mobile: classNames("h-[43px]"),
   },
   licensePlate: {
-    eleType: "input",
+    eleType: "modal",
     label: "車牌",
-    placeholder: "車牌",
+    placeholder: "請選擇",
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
     headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-1"),
@@ -780,7 +816,6 @@ function Bar_reporter_inEdit02() {
   const {
     isReportEdit,
     switchIsEdit,
-    setShowReviewerForReportModal,
   } = useContext(DailyReportContext)
 
   return (
@@ -825,5 +860,8 @@ const Bar_reporter_reviewed = () => {
   )
 
 }
+
+
+// ===================================================================
 
 

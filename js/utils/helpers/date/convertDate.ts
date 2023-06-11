@@ -1,3 +1,4 @@
+/**返回ISOString */
 export const convertDate_reduce1911 = (ISOString: string) => {
   if (!ISOString) return ISOString
   const dateTime = new Date(ISOString)
@@ -6,7 +7,7 @@ export const convertDate_reduce1911 = (ISOString: string) => {
   dateTime.setFullYear(chYear)
   return dateTime.toISOString()
 }
-
+/**返回ISOString */
 export const convertDate_add1911 = (ISOString: string) => {
   if (!ISOString) return ISOString
   const dateTime = new Date(ISOString)
