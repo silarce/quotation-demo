@@ -253,7 +253,6 @@ class Class_product {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-
     this._quantity = v;
     v = parseInt(v || "0").toString()
     this._product.quantity = parseInt(v || "0");
@@ -293,7 +292,7 @@ class Class_product {
     this._reRender()
   }
 
-  countTotalPrice = () => {
+  countTotalPrice() {
     const quantity = this.quantity.replace(/,/g, "") || 0
     const unitPrice = this.unitPrice.replace(/,/g, "") || 0
     const total = Decimal.mul(quantity, unitPrice).toString()
