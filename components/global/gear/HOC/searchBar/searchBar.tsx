@@ -85,10 +85,10 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
         if (options) return (
           <div className={style.selectBox} key={index}
             style={theStyle}>
-
             <InputSel
               className={classNames(style.select, className)}
               showBaseline="invisible"
+              placeholder={placeholder}
               selectProps={{
                 value: valueArr[index] ?? options[0],
                 // value: undefined,                
