@@ -1,0 +1,16 @@
+@use "styles/theme01" as *;
+
+.mustTip {
+  position: absolute;
+  right: calc(100% + 7px);
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 13px;
+  height: 16px;
+  > img {
+    width: 13px;
+    height: 16px;
+  }
+}
+
