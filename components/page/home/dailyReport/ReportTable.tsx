@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo, useRef } from "react"
+import { useState, useContext, } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
@@ -32,7 +32,6 @@ import { Class_reportItem } from "pages/home/dailyReport"
 import { TdailyReportItemDto, TdailyReportWokerDto } from "js/api/dtoTypes"
 
 // icon
-import iconSearch from "public/image/icon/search.svg"
 import { IconAddCircle, IconRemoveCircle, IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
 import iconArrow from "public/image/icon/arrow03_left.svg"
 import { IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
@@ -42,9 +41,6 @@ import { AppContext } from "pages/_app"
 import { DailyReportContext } from "pages/home/dailyReport"
 
 
-// type
-import { ThookEmptyReport } from "hooks/home/useDailyReport"
-import { TuserDto } from "js/api/dtoTypes"
 
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()
@@ -117,6 +113,7 @@ export default function ReportTable(
   const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr
 
   // ------------------------------------------------
+  /**用來觸發目的地、離工地的focus */
   const [timeTrigger, setTimeTrigger] = useState({ rIndex: -1, key: "" })
   // ------------------------------------------------
   // ------------------------------------------------
@@ -258,7 +255,6 @@ export default function ReportTable(
                   }
                   if (eleType === "timePicker") {
 
-
                     const focusTrigger =
                       (timeTrigger.rIndex === rIndex && timeTrigger.key === key)
 
@@ -266,8 +262,6 @@ export default function ReportTable(
                       let theKey: string = "";
                       if (key === "departureTime") theKey = "arrivalTime"
                       if (key === "arrivalTime") theKey = "departureWorksiteTime"
-
-
                       setTimeTrigger({ rIndex, key: theKey })
                     }
 
@@ -744,9 +738,6 @@ const DatePicker = (
   )
 
 }
-
-
-
 
 // ==============================================================================
 // ==============================================================================
