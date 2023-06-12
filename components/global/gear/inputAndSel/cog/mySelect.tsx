@@ -102,12 +102,19 @@ export default function MySelect<
     return <img src={arrowImg} alt="下拉箭頭" />
   }
 
+  const theValue = (() => {
+    if (typeof value === "object" && value) {
+      if(!value.value) return null
+    }
+    return value
+  })()
+
   // -------------------------------------------------------------------------
   return (
     <div className={classNames(scss.selectBox, className)} style={style} >
       <Select
         isDisabled={disabled}
-        value={value as Toption}
+        value={theValue as Toption | null}
         placeholder={placeholder}
         options={options}
         onChange={onChange}
