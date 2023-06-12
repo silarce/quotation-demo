@@ -57,7 +57,10 @@ export default function PayInfo_legacy(
 
       <div className={style.payBox}>
         <div className={classNames(style.avgDiscount, "relative")}>
-          <span>{"總折數"}</span>
+          <span className="relative">
+            {"總折數"}
+            <MustTip_simple preStyle="minimal" />
+          </span>
           <div>
             <input type="number" className="bg-transparent"
               value={discountRate}
@@ -66,14 +69,17 @@ export default function PayInfo_legacy(
             />
             <span>%</span>
           </div>
-          <MustTip_simple />
+
         </div>
 
         {countList.map((item, index) => {
           let { label, key } = item
           return (
             <div key={index} className={classNames(style.avgDiscount, "relative")}>
-              <span>{label}</span>
+              <span className="relative">
+                {label}
+                <MustTip_simple preStyle="minimal" />
+              </span>
               <div>
                 <input type="text" className="bg-transparent"
                   value={classPayInfo[key]}
@@ -82,7 +88,6 @@ export default function PayInfo_legacy(
                 />
                 <span></span>
               </div>
-              <MustTip_simple />
             </div>
           )
         })}
@@ -93,7 +98,6 @@ export default function PayInfo_legacy(
         <div className={style.inputBox01}>
           <span>交貨地點</span>
           <InputSel
-            isMust={true}
             inputProps={{
               value: deliveryLocation,
               onChange: (v) => { classPayInfo.deliveryLocation = v },
@@ -105,7 +109,6 @@ export default function PayInfo_legacy(
         <div className={classNames(style.inputBox01, style.date)}>
           <span>交貨日期</span>
           <InputSel
-            isMust={true}
             datePickerProps={{
               value: deliveryDate as string,
               onChange: (v) => { classPayInfo.deliveryDate = v },
@@ -118,7 +121,6 @@ export default function PayInfo_legacy(
         {/* 付款辦法 */}
         <div className={classNames(style.payMethodContainer, "relative")}>
           <span>付款辦法</span>
-          <MustTip_simple />
           {paymentMethods.map((method, index) => {
             const { totalPaymentRatio, milestone } = method
             return (

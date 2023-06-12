@@ -123,6 +123,7 @@ export default function QuotationProfile(
         </span>
         <InputSel
           isMust={true}
+          isMustPreStyle="minimal"
           label="工程名稱"
           disabled={disabled}
           {...{ ...inputStyle }}
@@ -137,6 +138,7 @@ export default function QuotationProfile(
             <div>
               <InputSel
                 isMust={true}
+                isMustPreStyle="minimal"
                 label={"客戶名稱"}
                 placeholder={""}
                 disabled={true}
@@ -217,6 +219,7 @@ export default function QuotationProfile(
       <div className={scss.time_legacy}>
         <InputSel
           isMust={true}
+          isMustPreStyle="minimal"
           label="合約編號"
           showBaseline="auto"
           disabled={disabled}

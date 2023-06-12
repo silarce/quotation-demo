@@ -6,7 +6,6 @@ import classNames from "classnames"
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import AddButton from "components/global/gear/button/addButton"
-import MustTip_simple from "components/global/gear/other/mustTip_simple"
 
 import { Class_legacyContract, Class_addition } from "hooks/quotation/useLegacyContract"
 
@@ -69,7 +68,6 @@ export default function QuotationAdditions(
             return (
               <div className={classNames(styleL.theadCell, "relative")} key={index} style={theStyle}>
                 <span>{label}</span>
-                <MustTip_simple />
               </div>
             )
           })}

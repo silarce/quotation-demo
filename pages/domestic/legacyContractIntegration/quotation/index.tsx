@@ -91,6 +91,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     })
     setFileInfoArr(arr ?? [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments])
 
   const removeFileInfo = (index: number) => {
