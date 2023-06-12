@@ -104,14 +104,14 @@ export default function MySelect<
 
   const theValue = (() => {
     if (typeof value === "object" && value) {
-      if(!value.value) return null
+      if (!value.value) return null
     }
     return value
   })()
 
   // -------------------------------------------------------------------------
   return (
-    <div className={classNames(scss.selectBox, className)} style={style} >
+    <div className={classNames(scss.selectBox, className)} style={style}    >
       <Select
         isDisabled={disabled}
         value={theValue as Toption | null}
@@ -164,6 +164,10 @@ export default function MySelect<
               selClassNames?.singleValue?.(state),
             )
           ,
+          menuPortal: (state) => classNames(
+            scss.selMenuPortal,scss.plus,
+            selClassNames?.menuPortal?.(state)
+          ),
           // ----------------
           clearIndicator: (state) => classNames(selClassNames?.clearIndicator?.(state)),
           dropdownIndicator: (state) => classNames(selClassNames?.dropdownIndicator?.(state)),
@@ -173,7 +177,6 @@ export default function MySelect<
           indicatorSeparator: (state) => classNames(selClassNames?.indicatorSeparator?.(state)),
           loadingIndicator: (state) => classNames(selClassNames?.loadingIndicator?.(state)),
           loadingMessage: (state) => classNames(selClassNames?.loadingMessage?.(state)),
-          menuPortal: (state) => classNames(selClassNames?.menuPortal?.(state)),
           multiValue: (state) => classNames(selClassNames?.multiValue?.(state)),
           multiValueLabel: (state) => classNames(selClassNames?.multiValueLabel?.(state)),
           multiValueRemove: (state) => classNames(selClassNames?.multiValueRemove?.(state)),
