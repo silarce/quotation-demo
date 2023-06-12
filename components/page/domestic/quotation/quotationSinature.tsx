@@ -20,6 +20,8 @@ export default function QuotationSinature(
           <div key={index}>
             <span>{label}</span>
             <InputSel
+              isMust={true}
+              mustTipClassName={style.mustTip}
               inputProps={{
                 value: signature ?? "",
                 onChange: (v) => onChange(v)

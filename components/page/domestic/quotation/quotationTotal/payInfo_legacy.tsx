@@ -5,6 +5,7 @@ import classNames from "classnames"
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
+import MustTip_simple from "components/global/gear/other/mustTip_simple"
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
@@ -55,7 +56,7 @@ export default function PayInfo_legacy(
     <div className={classNames(style.container, style.legacy)}>
 
       <div className={style.payBox}>
-        <div className={style.avgDiscount}>
+        <div className={classNames(style.avgDiscount, "relative")}>
           <span>{"總折數"}</span>
           <div>
             <input type="number" className="bg-transparent"
@@ -65,12 +66,13 @@ export default function PayInfo_legacy(
             />
             <span>%</span>
           </div>
+          <MustTip_simple />
         </div>
 
         {countList.map((item, index) => {
           let { label, key } = item
           return (
-            <div key={index} className={style.avgDiscount}>
+            <div key={index} className={classNames(style.avgDiscount, "relative")}>
               <span>{label}</span>
               <div>
                 <input type="text" className="bg-transparent"
@@ -80,6 +82,7 @@ export default function PayInfo_legacy(
                 />
                 <span></span>
               </div>
+              <MustTip_simple />
             </div>
           )
         })}
@@ -90,6 +93,7 @@ export default function PayInfo_legacy(
         <div className={style.inputBox01}>
           <span>交貨地點</span>
           <InputSel
+            isMust={true}
             inputProps={{
               value: deliveryLocation,
               onChange: (v) => { classPayInfo.deliveryLocation = v },
@@ -101,6 +105,7 @@ export default function PayInfo_legacy(
         <div className={classNames(style.inputBox01, style.date)}>
           <span>交貨日期</span>
           <InputSel
+            isMust={true}
             datePickerProps={{
               value: deliveryDate as string,
               onChange: (v) => { classPayInfo.deliveryDate = v },
@@ -111,9 +116,9 @@ export default function PayInfo_legacy(
           />
         </div>
         {/* 付款辦法 */}
-        <div className={style.payMethodContainer}>
+        <div className={classNames(style.payMethodContainer, "relative")}>
           <span>付款辦法</span>
-
+          <MustTip_simple />
           {paymentMethods.map((method, index) => {
             const { totalPaymentRatio, milestone } = method
             return (

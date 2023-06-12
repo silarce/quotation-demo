@@ -1,23 +1,16 @@
-import {
-  ChangeEvent, CSSProperties,
-  useState
-} from "react"
+import { CSSProperties, useState } from "react"
 
 // gear
-import InputSel from "../inputSel"
+import MustTip_simple from "../../other/mustTip_simple";
 
 
 // css
 import scss from "./inputSelBar.module.scss"
 
-// type
-import type { Toption } from "js/utils/options/options"
 // component
 import Input, { TinputProps } from "../cog/input";
 import MySelect, { TselectProps } from "../cog/mySelect";
 import Textarea, { TtextareaProps } from "../cog/textarea";
-
-
 
 
 type TinputPropsWrapper = {
@@ -51,6 +44,8 @@ export default function InputSelBar(
     disabled,
     className, captionClassName, hrClassName,
     valueContanierClassName,
+    isMust,
+    mustTipClassName
   }:
     {
       label?: string
@@ -71,6 +66,8 @@ export default function InputSelBar(
       valueContanierClassName?: string
       captionClassName?: string
       hrClassName?: string
+      isMust?: boolean
+      mustTipClassName?: string
     }
 ) {
 
@@ -178,6 +175,8 @@ export default function InputSelBar(
           style={hrStyle}
         />
       }
+
+      {isMust && <MustTip_simple className={mustTipClassName} />}
 
     </div>
   )
