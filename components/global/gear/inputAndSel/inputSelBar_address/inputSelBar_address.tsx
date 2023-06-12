@@ -44,6 +44,8 @@ export default function InputSelBar_address(
     showBaseline,
     customContyOption,
     customDistrictOption,
+    isMust,
+    mustTipClassName,
   }:
     {
       label?: string
@@ -71,6 +73,8 @@ export default function InputSelBar_address(
         optionArr: Toption[]
         unshift?: boolean
       }
+      isMust?: boolean
+      mustTipClassName?: string
     }) {
 
   const {
@@ -180,6 +184,8 @@ export default function InputSelBar_address(
       disabled={disabled}
       hrColor={hrColor}
       showBaseline={showBaseline}
+      isMust={isMust}
+      mustTipClassName={mustTipClassName}
     />
   )
 }

@@ -16,6 +16,9 @@ import Textarea, { TtextareaProps } from "./cog/textarea";
 import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
 import MyTimePicker, { TtimePickerProps } from "./cog/myTimePicker";
 
+// gear
+import MustTip_simple from "../other/mustTip_simple";
+
 // icon
 import iconMust from "public/image/icon/asterisk.svg"
 
@@ -57,6 +60,7 @@ export default function InputSel(
     datePickerProps,
     timePickerProps,
 
+    isMustPreStyle,
   }:
     {
       label?: string
@@ -89,6 +93,7 @@ export default function InputSel(
       datePickerProps?: TdatePickerProps
       timePickerProps?: TtimePickerProps
 
+      isMustPreStyle?: "minimal"
 
     }
 
@@ -157,8 +162,11 @@ export default function InputSel(
     <label className={labelClasses} style={lableStyle}    >
 
       {label &&
-        <div className={captionClasses} style={captionStyle}>
+        <div className={classNames(captionClasses, "relative")} style={captionStyle}>
           <span>{label}</span>
+          {isMust &&
+            <MustTip_simple className={mustTipClassName} preStyle={isMustPreStyle} />
+          }
         </div>
       }
 
@@ -212,11 +220,7 @@ export default function InputSel(
         />
       }
 
-      {isMust &&
-        <div className={classNames(scss.mustTip, mustTipClassName)}>
-          <Image src={iconMust} alt="必填" />
-        </div>
-      }
+
 
     </label>
   )

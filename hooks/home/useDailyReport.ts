@@ -6,8 +6,8 @@ import moment from "moment";
 import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoTypes";
 // api
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
-
-
+// other
+import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
 
 // =================================================================
 
@@ -28,6 +28,20 @@ type ThookEmptyReport = {
 // type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
 type TemptyReportItem = TdailyReportItemDto
 
+const emptyTimeCre = () => {
+  const date = new Date()
+  date.setHours(0)
+  date.setMinutes(0)
+  date.setSeconds(0)
+  return date.toISOString()
+}
+// const emptyTime = (() => {
+//   const date = new Date()
+//   date.setHours(0)
+//   date.setMinutes(0)
+//   date.setSeconds(0)
+//   return date.toISOString()
+// })()
 
 const emptyReportItem: TemptyReportItem = {
   id: "",
@@ -39,14 +53,15 @@ const emptyReportItem: TemptyReportItem = {
   contactName: "",
   meals: [],
   description: "",
-  departureTime: null,
-  arrivalTime: null,
-  departureWorksiteTime: null,
+  departureTime: emptyTimeCre(),
+  arrivalTime: emptyTimeCre(),
+  departureWorksiteTime: emptyTimeCre(),
   licensePlate: "",
   stayLength: null,
   workers: [],
   workOrderNumber: ""
 }
+
 
 // =================================================================
 
@@ -62,6 +77,9 @@ class Class_reportItem {
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
     this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
     // this._meals = ([]) as TdailyReportItemDto["meals"]
+    // if (!this.arrivalTime) this.arrivalTime = emptyTimeCre()
+    // if (!this.departureTime) this.departureTime = emptyTimeCre()
+    // if (!this.departureWorksiteTime) this.departureWorksiteTime = emptyTimeCre()
 
   } // constructor
   private _reRender
@@ -105,10 +123,6 @@ class Class_reportItem {
   }
 
   get meals() { return this._meals }
-  // set meals(v) {
-  //   this._item.meals = v as ("breakfast" | "lunch" | "dinner");
-  //   this._reRender()
-  // }
 
   addMeals = (v: TdailyReportItemDto["meals"][number]) => {
     this._meals.push(v)
@@ -170,7 +184,7 @@ class Class_reportItem {
       const idArr = this.workers.map((worker) => {
         return worker.id
       })
-      if (idArr.length === 0) return null
+      if (idArr.length === 0) return []
       return idArr
     })()
 
@@ -186,9 +200,9 @@ class Class_reportItem {
       // meals,
       meals,
       description: this.description,
-      departureTime: this.departureTime || null,
-      arrivalTime: this.arrivalTime || null,
-      departureWorksiteTime: this.departureWorksiteTime || null,
+      departureTime: this.departureTime || emptyTimeCre(),
+      arrivalTime: this.arrivalTime || emptyTimeCre(),
+      departureWorksiteTime: this.departureWorksiteTime || emptyTimeCre(),
       licensePlate: this.licensePlate || "",
       stayLength: this._item.stayLength || 0,
       workerIds: workerIdArr,
@@ -227,7 +241,8 @@ const useReport = (
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
-    date: moment().format("yyyy-MM-DD"),
+    // date: moment().format("yyyy-MM-DD"),
+    date: convertDate_reduce1911(moment().format("yyyy-MM-DD")),
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,
     isReviewedByOther: false,
@@ -264,10 +279,14 @@ const useReport = (
       return !!reviewedAt
     })
 
+
+    const sortedItems = _.sortBy(dailyReport.items, "arrivalTime")
+
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
-      date: dailyReport.date,
-      items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
+      date: convertDate_reduce1911(dailyReport.date),
+      // items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
+      items: sortedItems.map((item) => new Class_reportItem(reRender, item)),
       isAllowToReview,
       isReviewedByOther: isReviewedByOther,
       isReviewedByUser,
@@ -285,6 +304,14 @@ const useReport = (
       if (!report) return report
       const items = report.items
       items.push(new Class_reportItem(reRender))
+      return { ...report }
+    })
+  }
+  const removeReportItem = (index: number) => {
+    setReport(report => {
+      if (!report) return report
+      const items = report.items
+      items.splice(index, 1)
       return { ...report }
     })
   }
@@ -312,6 +339,14 @@ const useReport = (
     })
   }
   // 
+  const changeReportDate = (v: string) => {
+    setReport(report => {
+      if (!report) return report
+      report.date = v
+      return { ...report }
+    })
+  }
+  // 
   const reportIsEdit = (() => {
     if (!report) return false
     return (report.isReviewedByOther || !report.isEdit) ? false : true
@@ -320,7 +355,8 @@ const useReport = (
   // 
   return {
     report, setReport, reNew_report,
-    addReportItem, changeReviewToChecked, switchIsEdit,
+    addReportItem, removeReportItem, changeReviewToChecked, switchIsEdit,
+    changeReportDate,
     reportIsEdit
   }
 }

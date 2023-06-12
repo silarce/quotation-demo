@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, createContext } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import moment from "moment";
@@ -17,8 +17,10 @@ import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModa
 import ReviewerAndExaminerSelector from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
+
 // mobile
 import SearchDrawer from "components/page/home/dailyReport/SearchDrawer";
+import DailyReportTablePanel_mobile from "components/page/home/dailyReport/DailyReportTablePanel_mobile"
 
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
@@ -30,10 +32,11 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import { Badge } from "antd"
 
 // hook
-import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
+import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDailyReport";
 
 // tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
+import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate";
 
 // icon
 import iconFourCube from "public/image/icon/fourCube.svg"
@@ -72,6 +75,27 @@ const reportedAtOptions = [
   { label: "未檢視", value: "未檢視" },
   { label: "已檢視", value: "已檢視" },
 ]
+
+// =====================================================================
+type TdailyReportContext = {
+  // doShowDrawer: () => void
+  // editReport_today: () => void
+  reportInEdit: ThookEmptyReport | undefined
+  isReportEdit: boolean
+  switchIsEdit: () => void
+  setShowReviewerForReportModal: (v: boolean) => void
+  cancelEditNewDailyReport: () => void
+  changeReportDate: (v: string) => void
+  identity: "manager" | "reviewer" | "reporter" | undefined
+  // editRivewerPickArr: () => void
+  doCheck: () => void,
+  userInfo: TuserDto
+}
+
+
+
+export const DailyReportContext = createContext<TdailyReportContext>(null!)
+
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
@@ -163,11 +187,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   })()
 
 
-  const {
-    dailyReport, updateDailyReports, } = useApiDailyReports(params)
-  const sortedDailyReport = useMemo(() => {
-    // const copy = dailyReport?.reverse()
-    return _.sortBy(dailyReport, "date").reverse()
+  const { dailyReport, updateDailyReports } = useApiDailyReports(params)
+  const { sortedDailyReport, reportDateArr } = useMemo(() => {
+    const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+    const reportDateArr = (() => {
+      if (!isMine) return []
+      const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
+      return arr
+    })()
+    return { sortedDailyReport, reportDateArr }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReport])
 
   /**取得指定月份所有日報表，額外做了loading的處理 */
@@ -224,8 +253,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     setReport,
     reNew_report,
     addReportItem: addDailyReportItem,
+    removeReportItem: removeDailyReportItem,
     changeReviewToChecked, switchIsEdit,
-    reportIsEdit: isReportEdit
+    reportIsEdit: isReportEdit,
+    changeReportDate
   } = useReport({ userInfo })
 
   const editReport = async (reportId: string) => {
@@ -235,24 +266,26 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   const editReport_today = async () => {
-    const res = await reqApiDailyReports_my()
-    if (res === "fail") return
-    else reNew_report({ dailyReport: res, userInfo })
+    // const res = await reqApiDailyReports_my()
+    // if (res === "fail") return
+    // else reNew_report({ dailyReport: res, userInfo })
 
-    if (res && userInfo?.employee?.id) {
-      const tag = {
-        reportId: res.id,
-        employeeId: userInfo.employee.id,
-        name: userInfo.employee.chName,
-        date: res.date
-      }
-      if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
-      setTagArr(arr => {
-        const newArr = _.cloneDeep(arr);
-        newArr.push(tag);
-        return newArr
-      })
-    }
+    // if (res && userInfo?.employee?.id) {
+    //   const tag = {
+    //     reportId: res.id,
+    //     employeeId: userInfo.employee.id,
+    //     name: userInfo.employee.chName,
+    //     date: res.date
+    //   }
+    //   if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
+    //   setTagArr(arr => {
+    //     const newArr = _.cloneDeep(arr);
+    //     newArr.push(tag);
+    //     return newArr
+    //   })
+    // }
+    reNew_report({ dailyReport: undefined, userInfo })
+
   }
 
   const cancelEditNewDailyReport = () => {
@@ -354,22 +387,38 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   ) => {
 
     if (!reportInEdit) return
-
     if (reviewerArr.length === 0) {
       return myAlert.warning({ title: "請選擇檢視人員" })
     }
-
     const reviewerIds = reviewerArr.map((emp) => emp.id)
     const examinerIds = examinerArr.map((emp) => emp.id)
 
+    const theDate = convertDate_add1911(reportInEdit.date)
+
     const items = reportInEdit.items.map((item) => {
-      return item.postBody
+      const year = new Date(theDate).getFullYear()
+      const month = new Date(theDate).getMonth()
+      const th = new Date(theDate).getDate()
+
+      const setDateToReportDate = (dateStr: string) => {
+        const date = new Date(dateStr)
+        date.setFullYear(year)
+        date.setMonth(month)
+        date.setDate(th)
+        return date.toISOString()
+      }
+      const postBody = item.postBody
+      postBody.arrivalTime = setDateToReportDate(postBody.arrivalTime!)
+      postBody.departureTime = setDateToReportDate(postBody.departureTime!)
+      postBody.departureWorksiteTime = setDateToReportDate(postBody.departureWorksiteTime!)
+      return postBody
     })
 
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({
-        date: reportInEdit.date,
+        // date: reportInEdit.date,
+        date: theDate,
         body: {
           reviewerIds,
           examinerIds,
@@ -464,12 +513,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     listSwitchButton
   ]
 
-  /**reporter 今日回報 */
+  /**reporter 新增回報 */
   const panelList_reporter_notInEdit: TpanelList = [
     { searchGroup },
     {
       type: "myButton",
-      label: "今日回報",
+      label: "新增回報",
       onClick: editReport_today
     },
     listSwitchButton
@@ -602,9 +651,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       />
     ]
   // ----------------------------------------------------------------------
-  const leftTagOnClick = () => {
-    cancelEditNewDailyReport()
-  }
+  const leftTagOnClick = () => { cancelEditNewDailyReport() }
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -612,6 +659,23 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [showSearchDrawer, setShowSearchDrawer] = useState(false)
   const doShowDrawer = () => { setShowSearchDrawer(true) }
   const closeShowDrawer = () => { setShowSearchDrawer(false) }
+
+
+  const dailyReportContextValue: TdailyReportContext = {
+    // doShowDrawer,
+    // editReport_today,
+    reportInEdit,
+    isReportEdit,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+    cancelEditNewDailyReport,
+    changeReportDate,
+    identity,
+    // editRivewerPickArr,
+    doCheck,
+    userInfo,
+  }
+
 
 
   // ----------------------------------------------------------------------
@@ -639,26 +703,21 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           editRivewerPickArr={editRivewerPickArr}
           employeeChName={reportInEdit?.employeeChName}
           date={reportInEdit?.date}
-
-          userInfo={userInfo}
           identity={identity}
-          reportInEdit={reportInEdit}
-          doCheck={doCheck}
-          isReportEdit={isReportEdit}
           editReport_today={editReport_today}
-
-          switchIsEdit={switchIsEdit}
-          setShowReviewerForReportModal={setShowReviewerForReportModal}
           cancelEditNewDailyReport={cancelEditNewDailyReport}
+          isSearch={!!(searchObj?.isUserReviewed !== undefined || searchObj?.date !== undefined)}
         />
+
+
         {/*  */}
-        {!reportInEdit && !isCalendar &&
+        {!isCalendar &&
           <ReporterList
             dailyReportArr={sortedDailyReport ?? []}
             addTag={addTag}
           />
         }
-        {!reportInEdit && isCalendar &&
+        {isCalendar &&
           <TheCalendar
             addTag={addTag}
             dailyReportArr={sortedDailyReport}
@@ -666,13 +725,26 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           />
         }
 
-        {reportInEdit &&
+        {/* {reportInEdit &&
+            <ReportTable
+              classDailyReportItemArr={reportInEdit.items}
+              addDailyReportItem={addDailyReportItem}
+              removeDailyReportItem={removeDailyReportItem}
+              isEdit={isReportEdit}
+            />
+        } */}
+        <DailyReportContext.Provider value={dailyReportContextValue}>
           <ReportTable
-            classDailyReportItemArr={reportInEdit.items}
+            classDailyReportItemArr={reportInEdit?.items}
             addDailyReportItem={addDailyReportItem}
+            removeDailyReportItem={removeDailyReportItem}
             isEdit={isReportEdit}
+            reportDateArr={reportDateArr}
           />
-        }
+        </DailyReportContext.Provider>
+
+
+
         {/* mobile */}
         <SearchDrawer visible={showSearchDrawer}
           onSearch={doSearch}
@@ -690,6 +762,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         tip="可複選"
       />
 
+      {/* 上傳前選擇兩種人員 */}
       <ReviewerAndExaminerSelector
         visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}

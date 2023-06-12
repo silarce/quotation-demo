@@ -25,6 +25,17 @@
       margin: auto;
       margin-right: 0;
     }
+
+    .searchBtn.active {
+      border-color: red;
+      span {
+        color: red;
+      }
+      svg {
+        stroke: red;
+        fill: red;
+      }
+    }
   }
   @screen laptop {
     display: block;

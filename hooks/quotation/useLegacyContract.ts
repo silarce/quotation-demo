@@ -1,4 +1,4 @@
-import { useState, HTMLInputTypeAttribute } from "react"
+import { useState, useEffect, HTMLInputTypeAttribute } from "react"
 import _ from "lodash"
 import Decimal from "decimal.js"
 import moment from "moment"
@@ -17,6 +17,9 @@ import {
   TlegacyContractProductDto, TcreateLegacyContractProductDto,
   TlegacyContractAdditionDto, TcreateLegacyContractAdditionDto, TcustomerDto,
 } from "js/api/dtoTypes"
+
+import { checkIsNumberStr, clearThousandsSeparator } from "js/utils/helpers/universal"
+import { CONFIG_FILES } from "next/dist/shared/lib/constants"
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal()
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection()
@@ -95,14 +98,15 @@ class Class_product {
   constructor(
     reRender: TreRender,
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto,
-    countTotalDiscount: () => void
+    countTotalDiscount: () => void,
+    countSubTotal: () => void
   ) {
     this._reRender = reRender
     this._product = legacyProduct
     const foo = legacyProduct
 
     this._countTotalDiscount = countTotalDiscount
-
+    this._countSubTotal = countSubTotal
 
     this._id = (() => {
       // if ("id" in this._product) return this._product?.id
@@ -136,6 +140,7 @@ class Class_product {
   private _reRender
   private _product
   private _countTotalDiscount
+  private _countSubTotal
   private _id
   private _idNumber
   private _length
@@ -177,6 +182,7 @@ class Class_product {
     this._discountRate = v;
     this._product.discountRate = Decimal.div(v || 0, 100).toString();
     this._countTotalDiscount()
+    this._countSubTotal()
     this._reRender()
   }
 
@@ -280,6 +286,7 @@ class Class_product {
 
     this._totalPrice = v;
     this._product.totalPrice = parseFloat(v || "0");
+    this._countSubTotal()
     this._reRender()
   }
 
@@ -317,10 +324,12 @@ class Class_product {
 class Class_addition {
   constructor(
     reRender: TreRender,
-    addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto
+    addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto,
+    countSubTotal: () => void
   ) {
     this._reRender = reRender
     this._addition = addition
+    this._countSubTotal = countSubTotal
 
     this._quantity = addition.quantity ? addition.quantity.toString() : ""
     this._unitPrice = addition.unitPrice ? addition.unitPrice.toString() : ""
@@ -330,9 +339,12 @@ class Class_addition {
   } // constructor
   private _reRender
   private _addition
+  private _countSubTotal
   private _quantity
   private _unitPrice
   private _totalPrice
+
+
 
   get id() {
     if ("id" in this._addition) return this._addition.id
@@ -350,29 +362,50 @@ class Class_addition {
     this._quantity = v
     v = parseInt(v || "0").toString()
     this._addition.quantity = parseInt(v || "0");
+    this._countTotalPrice()
     this._reRender()
   }
 
-  get unitPrice() { return this._unitPrice }
+  get unitPrice() {
+    if (!this._unitPrice) return ""
+    return parseFloat(this._unitPrice).toLocaleString()
+  }
   set unitPrice(v) {
-
+    v = clearThousandsSeparator(v)
+    if (!checkIsNumberStr(v)) return
     this._unitPrice = v
     this._addition.unitPrice = parseFloat(v || "0");
+    this._countTotalPrice()
     this._reRender()
   }
 
-  get totalPrice() { return this._totalPrice }
+  get totalPrice() {
+    if (!this._totalPrice) return ""
+    return parseFloat(this._totalPrice).toLocaleString()
+  }
   set totalPrice(v) {
-
+    v = clearThousandsSeparator(v)
+    if (!checkIsNumberStr(v)) return
     this._totalPrice = v
     this._addition.totalPrice = parseFloat(v || "0");
+    this._countSubTotal()
     this._reRender()
   }
+
+
 
   get notes() { return this._addition.notes }
   set notes(v) { this._addition.notes = v; this._reRender() }
 
   get postAddition() { return this._addition }
+
+  private _countTotalPrice = () => {
+    const quantity = clearThousandsSeparator(this.quantity)
+    const unitPrice = clearThousandsSeparator(this.unitPrice)
+    this.totalPrice = Decimal.mul(quantity, unitPrice).toString()
+  }
+
+
 
 } // Class_part
 // =======================================================================
@@ -381,7 +414,8 @@ class Class_payInfo {
     reRender: () => void,
     legacyContract: TlegacyContractDto | TemptyLegacyContract,
     classProductArr: Class_product[],
-    editAllProdDiscount: (v: string) => void
+    editAllProdDiscount: (v: string) => void,
+    countSubTotal: () => void
   ) {
     this._reRender = reRender
     this._legacyContract = legacyContract
@@ -391,6 +425,9 @@ class Class_payInfo {
     })
     this._classProductArr = classProductArr
     this._editAllProdDiscount = editAllProdDiscount
+    this._countSubTotal = countSubTotal
+
+
     this._subTotal = this._legacyContract.subTotal.toString()
     this._salesTax = this._legacyContract.salesTax.toString()
     this._total = this._legacyContract.total.toString()
@@ -399,10 +436,12 @@ class Class_payInfo {
   private _legacyContract
   private _classProductArr
   private _editAllProdDiscount
+  private _countSubTotal
   private _subTotal
   private _salesTax
   private _total
 
+  /**總折數 */
   get discountRate() {
     return this._legacyContract.discountRate
   }
@@ -412,16 +451,20 @@ class Class_payInfo {
     const discountRate = Decimal.div(v || 0, 100)
     const subTotal: string = (() => {
       let subTotal = new Decimal(0)
+
       this._classProductArr.forEach(prod => {
         if (!prod.totalPrice) return
         subTotal = subTotal.add(prod.totalPrice)
       })
-      return subTotal.mul(discountRate).toString()
-    })()
 
+      return subTotal.mul(discountRate).toString()
+
+    })()
     this.subTotal = subTotal
-    this._legacyContract.discountRate = v || "0";
+
     this._editAllProdDiscount(v || "0")
+    this._countSubTotal()
+    this._legacyContract.discountRate = v || "0";
     this._reRender()
   }
 
@@ -442,7 +485,7 @@ class Class_payInfo {
     this._legacyContract.discountRate = v || "0";
     this._reRender()
   }
-
+  /**小計 */
   get subTotal() {
     if (!this._subTotal) return ""
     return parseFloat(this._subTotal).toLocaleString()
@@ -462,6 +505,7 @@ class Class_payInfo {
     this._reRender()
   }
 
+  /**營業稅 */
   get salesTax() {
     if (!this._salesTax) return ""
     return parseFloat(this._salesTax).toLocaleString()
@@ -476,7 +520,7 @@ class Class_payInfo {
     this._legacyContract.salesTax = parseFloat(v || "0");
     this._reRender()
   }
-
+  /**總計 */
   get total() {
     if (!this._total) return ""
     return parseFloat(this._total).toLocaleString()
@@ -596,15 +640,15 @@ class Class_legacyContract {
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     this.classProductArr =
       sortedProdArr.map((product) => {
-        return new Class_product(reRender, product, this.countTotalDiscount)
+        return new Class_product(reRender, product, this.countTotalDiscount, this.countSubTotal)
       })
 
     /**額外項目 */
     this.classAdditionArr =
-      this._legacyContract.additions.map((addition) => new Class_addition(reRender, addition))
+      this._legacyContract.additions.map((addition) => new Class_addition(reRender, addition, this.countSubTotal))
     /**   付款資訊*/
     this.classPayInfo
-      = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount)
+      = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount, this.countSubTotal)
     /**  備註*/
     this.classMemo = new Class_listString(reRender, this._legacyContract.notes)
     /**  報價範圍*/
@@ -631,20 +675,38 @@ class Class_legacyContract {
   classSignature
   // ---------------------
 
+  /**計算總折數 */
   countTotalDiscount = () => {
     let totalDiscount = new Decimal(0)
     this.classProductArr.forEach((prod) => {
-      totalDiscount = Decimal.add(prod.discountRate || 0, totalDiscount)
+      const discountRate = prod.discountRate.replace(/,/g, "") || 0
+      totalDiscount = Decimal.add(discountRate || 0, totalDiscount)
     })
     this.classPayInfo.discountRate_noLoop =
       Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2)
   }
+  /**變更所有主產品的折數 */
   editAllProdDiscount = (v: string) => {
     this.classProductArr.forEach((prod) => {
       prod.discountRate_noLoop = v
     })
   }
 
+  /**計算小計 */
+  countSubTotal = () => {
+    let subTotal = new Decimal(0)
+    this.classProductArr.forEach((prod) => {
+      let totalPrice = prod.totalPrice.replace(/,/g, "") || 0
+      const discountRate = Decimal.div(prod.discountRate, 100)
+      totalPrice = Decimal.mul(totalPrice, discountRate).toString()
+      subTotal = Decimal.add(totalPrice || 0, subTotal)
+    })
+    this.classAdditionArr.forEach((addi) => {
+      const totalPrice = addi.totalPrice.replace(/,/g, "") || 0
+      subTotal = Decimal.add(totalPrice || 0, subTotal)
+    })
+    this.classPayInfo.subTotal = subTotal.toString()
+  }
 
   get customer() {
     return this._legacyContract.customer
@@ -673,6 +735,8 @@ class Class_legacyContract {
   delProd = (index: number) => {
     this.classProductArr.splice(index, 1)
     this.activeProd = -1
+    this.countTotalDiscount()
+    this.countSubTotal()
     this._reRender()
   }
   copyProd = (index: number) => {
@@ -680,26 +744,34 @@ class Class_legacyContract {
     copy.id = undefined
     this.classProductArr.push(copy)
     this.activeProd = index
+    this.countTotalDiscount()
+    this.countSubTotal()
     this._reRender()
   }
   addProd = () => {
-    this.classProductArr.push(new Class_product(this._reRender, emptyProdCre(), this.countTotalDiscount))
+    this.classProductArr.push(new Class_product(
+      this._reRender, emptyProdCre(), this.countTotalDiscount, this.countSubTotal
+    ))
     this._activeProd = this.classProductArr.length - 1
+    this.countTotalDiscount()
     this._reRender()
   }
 
   delAddition = (index: number) => {
     this.classAdditionArr.splice(index, 1)
+    this.countSubTotal()
     this._reRender()
   }
   copyAddition = (index: number) => {
     this.classAdditionArr.push(_.cloneDeep(this.classAdditionArr[index]))
+    this.countSubTotal()
     this._reRender()
   }
   addAddition = () => {
-    this.classAdditionArr.push(new Class_addition(this._reRender, emptyAdditionCre()))
+    this.classAdditionArr.push(new Class_addition(this._reRender, emptyAdditionCre(), this.countSubTotal))
     this._reRender()
   }
+
 
   // ---------------------
   prodCellConfig  // dnd head的狀態，也是資料分類目錄
@@ -832,7 +904,7 @@ function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
     keyList: [
-      "idNumber",
+      // "idNumber",
       "discountRate", "itemName", "quoteType",
       "length", "width", "height", "thickness", "area", "volume",
       "doorType", "material", "surface", "doorTrack",
@@ -900,8 +972,8 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       "itemName": { label: "項目", width: "60px", type: "input" },
       "content": { label: "內容", width: "auto", flex: "auto", type: "input" },
       "quantity": { label: "數量", width: "60px", type: "input", inputType: "number" },
-      "unitPrice": { label: "單價", width: "110px", type: "input", inputType: "number" },
-      "totalPrice": { label: "複價", width: "110px", type: "input", inputType: "number" },
+      "unitPrice": { label: "單價", width: "110px", type: "input", },
+      "totalPrice": { label: "複價", width: "110px", type: "input", },
       "notes": { label: "備註", width: "170px", type: "input" },
 
     }
@@ -1002,5 +1074,34 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
   }
 }
 
+
+/**
+筆記
+countTotalDiscount 計算總折數
+運作方式:將所有主產品的折數加起來並平均，計算到小數點第二位
+
+editAllProdDiscount 變更所有主產品折數
+運作方式:將所有主產品的折數設定為指定值
+
+countSubTotal 計算小計
+運作方式:const x = (將所有個別主產品的複價與折數相乘)後加總
+        const y = 將其他設定所有的複價加總
+        reuturn x+y
+        程式的運作不是如上面描述，但概念是上面所述
+
+以下情況會呼叫特定函式
+變更主產品設定與其他設定的複價時 countSubTotal
+變更數量或單價時會自動計算、變更複價，所以也會呼叫 countSubTotal
+變更主產品設定的折數 countSubTotal countTotalDiscount
+變更總折數 先呼叫editAllProdDiscount再呼叫countSubTotal (必須照順序)
+
+新增產品 countTotalDiscount
+移除產品 countTotalDiscount countSubTotal
+複製產品 countTotalDiscount countSubTotal
+新增項目 
+移除項目 countSubTotal
+複製項目 countSubTotal 
+
+ */
 
 

@@ -91,6 +91,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     })
     setFileInfoArr(arr ?? [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments])
 
   const removeFileInfo = (index: number) => {
@@ -282,3 +283,79 @@ function TheQuotation({ router }: { router: NextRouter }) {
     </SubLayer>
   )
 }
+
+/**
+customerId
+contracatNumber
+projectName
+customerName
+contactPerson
+contactNumber
+projectCity
+projectDistrict
+projectAddress
+discountRate
+subtotal
+salesTax
+total
+deliveryLocation
+deliveryDate
+notes
+quoteScopes
+managerName
+spuervisorName
+operatorName
+
+
+paymentMenthods:{
+  milestone
+  totalPaymentRatio
+}
+
+products:{
+  idNumber
+  itemName
+  quoteType
+  doorType
+  length
+  width
+  height
+  thickness
+  area
+  volume
+  material
+  surface
+  doorTrack
+  horsepower
+  quantity
+  discountRate
+  unitPrice
+  totalPrice
+  typhoonProtection
+  bounceDoor
+  notes
+}
+
+additions:{
+  itemName
+  content
+  quantity
+  unitPrice
+  totalPrive
+  notes
+}
+
+
+
+ */
+
+
+/**
+quoteValidity
+quoteDate
+faxNumber
+trackingStatus
+projectProgress
+
+
+ */

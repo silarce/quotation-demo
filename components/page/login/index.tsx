@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 
 import Image from "next/image"
 
@@ -15,20 +15,23 @@ import erpLogo from "public/image/logo/erpLogo.svg"
 import imgArc from "public/image/blueArc.svg"
 // img
 import Imgbanner from "public/image/loginBanner.png"
+import Imgbanner_mobile from "public/image/loginBanner_mobile.png"
 
 // css
 import scss from "./login.module.scss"
+
+import { AppContext } from "pages/_app";
 
 
 export default function Login(
   { onLogin }:
     { onLogin: (postBody: { account: string, password: string }) => {} }
 ) {
+  const { rwd1023 } = useContext(AppContext)
+
   const [isLoading, setIsLoading] = useState(false)
   const [account, setAccont] = useState("")
   const [password, setPassword] = useState("")
-  // const [account, setAccont] = useState("admin")
-  // const [password, setPassword] = useState("1qaz#EDC5tgb")
 
   const reqLog = async () => {
     if (isLoading) return;
@@ -50,7 +53,9 @@ export default function Login(
         <div><Image src={imgArc} alt="" /></div>
       </div>
 
-      <div className={scss.banner} style={{ backgroundImage: `url(${Imgbanner.src})` }}>
+      {/* <div className={scss.banner} style={{ backgroundImage: `url(${Imgbanner.src})` }}> */}
+      <div className={scss.banner}
+        style={{ backgroundImage: `url(${rwd1023 ? Imgbanner_mobile.src : Imgbanner.src})` }}>
         <div>
           <span>登入系統</span>
         </div>

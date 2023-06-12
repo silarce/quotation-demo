@@ -5,6 +5,7 @@ import classNames from "classnames"
 // global gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import InputModal from "components/global/gear/modal/simpleModal/inputModal"
+import MustTip_simple from "components/global/gear/other/mustTip_simple"
 // icon
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
@@ -55,8 +56,11 @@ export default function PayInfo_legacy(
     <div className={classNames(style.container, style.legacy)}>
 
       <div className={style.payBox}>
-        <div className={style.avgDiscount}>
-          <span>{"總折數"}</span>
+        <div className={classNames(style.avgDiscount, "relative")}>
+          <span className="relative">
+            {"總折數"}
+            <MustTip_simple preStyle="minimal" />
+          </span>
           <div>
             <input type="number" className="bg-transparent"
               value={discountRate}
@@ -65,13 +69,17 @@ export default function PayInfo_legacy(
             />
             <span>%</span>
           </div>
+
         </div>
 
         {countList.map((item, index) => {
           let { label, key } = item
           return (
-            <div key={index} className={style.avgDiscount}>
-              <span>{label}</span>
+            <div key={index} className={classNames(style.avgDiscount, "relative")}>
+              <span className="relative">
+                {label}
+                <MustTip_simple preStyle="minimal" />
+              </span>
               <div>
                 <input type="text" className="bg-transparent"
                   value={classPayInfo[key]}
@@ -111,9 +119,8 @@ export default function PayInfo_legacy(
           />
         </div>
         {/* 付款辦法 */}
-        <div className={style.payMethodContainer}>
+        <div className={classNames(style.payMethodContainer, "relative")}>
           <span>付款辦法</span>
-
           {paymentMethods.map((method, index) => {
             const { totalPaymentRatio, milestone } = method
             return (

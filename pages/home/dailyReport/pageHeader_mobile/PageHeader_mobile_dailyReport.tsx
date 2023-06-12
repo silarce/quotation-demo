@@ -1,87 +1,43 @@
 import Image from "next/image"
-
+import classNames from "classnames"
 
 // gear
 import MyButton from "components/global/gear/button/myButton"
-import CheckButton from "components/global/gear/button/checkButton"
-
 
 // css
 import scss from "./pageHeader_mobile_dailyReport.module.scss"
 
 // icon
 import iconSearch from "public/image/icon/search.svg"
+import iconSearch_hover from "public/image/icon/search_hover.svg"
 import iconArrow from "public/image/icon/arrow03_left.svg"
-
-// type
-import { ThookEmptyReport } from "hooks/home/useDailyReport"
-import { TuserDto } from "js/api/dtoTypes"
 
 // ====================================================================
 export default function PageHeader_mobile_dailyReport(
   { doShowDrawer, editRivewerPickArr,
     employeeChName,
     date,
-
-    userInfo,
     identity,
-    reportInEdit,
-    doCheck,
-    isReportEdit,
     editReport_today,
-    switchIsEdit,
-    setShowReviewerForReportModal,
     cancelEditNewDailyReport,
+    isSearch,
   }:
     {
       doShowDrawer: () => void
       editRivewerPickArr: () => void
       employeeChName: string | undefined
       date: string | undefined
-
-      userInfo: TuserDto
-      identity: string | undefined
-      reportInEdit: ThookEmptyReport | undefined
-      doCheck: () => void
-      isReportEdit: boolean
+      identity: "manager" | "reviewer" | "reporter" | undefined
       editReport_today: () => void
-      switchIsEdit: () => void
-      setShowReviewerForReportModal: (v: boolean) => void
       cancelEditNewDailyReport: () => void
+      isSearch: boolean
     }
 ) {
 
-
-
   const Bar = (() => {
-
-    // if (identity === "manager") {
-    //   if (!reportInEdit) return Bar_manager_notInEdit
-    //   else if (reportInEdit.isAllowToReview) return Bar_reviewer_inEdit_user
-    //   else return () => { return null }
-    // }
-
-    // if (identity === "reviewer") {
-    //   if (!reportInEdit) return Bar_reporter_notInEdit
-    //   else {
-    //     if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-    //       if (isReportEdit) return Bar_reporter_inEdit02
-    //       if (reportInEdit.isReviewedByOther) return Bar_reporter_reviewed
-    //       return Bar_reporter_inEdit01
-    //     }
-    //     else if (reportInEdit.isAllowToReview) {
-    //       return Bar_reviewer_inEdit_user
-    //     }
-    //     return []
-    //   }
-    // }
-
-
-    if (reportInEdit) return Bar_reporter_inEdit02
-    else return Bar_reporter_notInEdit
-
-
-    // return () => { return null }1
+    if (identity === "manager") return Bar_manager_notInEdit
+    if (identity === "reviewer") return Bar_reporter_notInEdit
+    return Bar_reporter_notInEdit
   })()
 
 
@@ -98,7 +54,7 @@ export default function PageHeader_mobile_dailyReport(
 
       <div className={scss.btnBar}>
         <div className={scss.right}>
-          <Bar />
+          <Bar isSearch={isSearch} />
         </div>
       </div>
 
@@ -106,58 +62,34 @@ export default function PageHeader_mobile_dailyReport(
   )
   // --------------------------------------------------------------
 
-  function Bar_manager_notInEdit() {
+  function Bar_manager_notInEdit(
+    { isSearch }:
+      { isSearch: boolean }
+  ) {
     return (
       <>
-        <MyButton label="搜尋" img={iconSearch.src}
+        <MyButton className={classNames(scss.searchBtn, { [scss.active]: isSearch })}
+          label="搜尋" img={isSearch ? iconSearch_hover.src : iconSearch.src}
           onClick={doShowDrawer} />
         <MyButton label="審核人員設定" onClick={editRivewerPickArr} />
       </>
     )
   }
-  // 
-  function Bar_reviewer_inEdit_user() {
-    return (
-      <CheckButton
-        // checkLabel="已讀"
-        checkLabel="已讀"
-        uncheckLable="未讀"
-        value={!!reportInEdit?.isReviewedByUser}
-        onClick={doCheck}
-      />
-    )
-  }
-  // 
-  function Bar_reporter_notInEdit() {
+  // -------------------------------------------
+  function Bar_reporter_notInEdit(
+    { isSearch }:
+      { isSearch: boolean }
+  ) {
     return (
       <>
-        <MyButton label="搜尋" img={iconSearch.src}
+        <MyButton className={classNames(scss.searchBtn, { [scss.active]: isSearch })}
+          label="搜尋" img={isSearch ? iconSearch_hover.src : iconSearch.src}
           onClick={doShowDrawer} />
-        <MyButton label="今日回報"
+        <MyButton label="新增回報"
           onClick={editReport_today} />
       </>
     )
   }
-  // 
-  function Bar_reporter_inEdit02() {
-    return (
-      <>
-
-        <MyButton label={isReportEdit ? "取消" : "編輯"}
-          onClick={switchIsEdit} />
-
-        {isReportEdit &&
-          <MyButton label="上傳"
-            onClick={() => { setShowReviewerForReportModal(true) }} />
-        }
-      </>
-    )
-  }
-  // 
-
-
-
-
 
 } // PageHeader_mobile_dailyReport
 // ====================================================================

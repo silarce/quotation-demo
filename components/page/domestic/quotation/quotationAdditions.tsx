@@ -66,7 +66,7 @@ export default function QuotationAdditions(
             const { label, flex, width } = cellConfig[item]
             const theStyle = { width, flex }
             return (
-              <div className={styleL.theadCell} key={index} style={theStyle}>
+              <div className={classNames(styleL.theadCell, "relative")} key={index} style={theStyle}>
                 <span>{label}</span>
               </div>
             )

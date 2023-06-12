@@ -2,6 +2,7 @@
 import { useMemo } from "react"
 import classNames from "classnames"
 import _ from "lodash"
+import moment from "moment"
 
 // antd
 import { Badge } from "antd"
@@ -19,6 +20,7 @@ import scss from "./reporterList.module.scss"
 import { TdailyReportDto } from "js/api/api_dailyReport"
 import { TdailyReportReviewStatusDto } from "js/api/dtoTypes"
 import { Ttag } from "pages/home/dailyReport"
+import { convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
 
 
 type TgroupReport = { date: string, reportArr: TdailyReportDto[] }
@@ -52,16 +54,17 @@ export default function ReporterList(
 
       {groupReportArr.map((group, index) => {
         const { date, reportArr } = group
+        const twDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
         return (
           <div key={index}>
             <div className={classNames(scss.groupHeader)}>
-              <span>{date}</span>
+              <span>{twDate}</span>
             </div>
 
             {reportArr.map((report, index) => {
               const { date, employee, id: reportId, reviewStatus } = report
               const { chName, id: employeeId } = employee
-              const chDate = yearConversion_standardToCh(date, true)
+              const chDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
 
               const tag: Ttag = {
                 reportId,

@@ -1,18 +1,23 @@
-import { useState, useContext } from "react"
+import { useState, useContext, } from "react"
+import { useRouter } from "next/router"
 
 import classNames from "classnames"
-
 import Image from "next/image"
+import moment from 'moment';
+
+import _ from "lodash"
+
+// antd
+import { Drawer, Badge } from "antd"
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import MyButton from "components/global/gear/button/myButton"
 import WorkerSelector from "components/global/gear/modal/workerSelector"
-import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+// import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import MealSelector from "./MealSelector"
+import LicensePlateSelector from "./LicensePlateSelector";
 import CheckButton from "components/global/gear/button/checkButton"
-
-
 
 // css
 import scss from "./reportTable.module.scss"
@@ -27,11 +32,16 @@ import { Class_reportItem } from "pages/home/dailyReport"
 import { TdailyReportItemDto, TdailyReportWokerDto } from "js/api/dtoTypes"
 
 // icon
-import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
+import { IconAddCircle, IconRemoveCircle, IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
 import iconArrow from "public/image/icon/arrow03_left.svg"
+import { IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
 
 // other
 import { AppContext } from "pages/_app"
+import { DailyReportContext } from "pages/home/dailyReport"
+
+
+
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()
 const optionArr_mealsCost = optionsCreator_mealsCost()
@@ -40,19 +50,27 @@ const optionArr_mealsCost = optionsCreator_mealsCost()
 export default function ReportTable(
   { classDailyReportItemArr,
     addDailyReportItem,
+    removeDailyReportItem,
     isEdit,
+    reportDateArr
   }:
     {
-      classDailyReportItemArr: Class_reportItem[]
+      classDailyReportItemArr: Class_reportItem[] | undefined
       addDailyReportItem: () => void
+      removeDailyReportItem: (index: number) => void
       isEdit: boolean
+      reportDateArr: string[]
     }
 ) {
-  const { rwd1023 } = useContext(AppContext)
+  const router = useRouter()
+  const isMine = (router.query.isMine === "true") ? true : false
 
+  const { reportInEdit } = useContext(DailyReportContext)
+  const { rwd1023 } = useContext(AppContext)
 
   const [showModal_worker, setShowModal_worker] = useState(false)
   const [showModal_meals, setShowModal_meals] = useState(false)
+  const [showModal_licensePlate, setShowModal_licensePlate] = useState(false)
 
   const [activeItem, setActiveItem] = useState<Class_reportItem>()
 
@@ -80,7 +98,12 @@ export default function ReportTable(
     if (!activeItem) return
     v.forEach((value) => activeItem.addMeals(value))
     modalOnCancel_meals()
-    // activeItem.addMeals(v)
+  }
+
+  const modalOnConfirm_licensePlate = (v: string | undefined) => {
+    if (!activeItem) return
+    activeItem.licensePlate = v ?? ""
+    setShowModal_licensePlate(false)
   }
 
   const disabled = !isEdit
@@ -90,37 +113,47 @@ export default function ReportTable(
   const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr
 
   // ------------------------------------------------
-
+  /**用來觸發目的地、離工地的focus */
+  const [timeTrigger, setTimeTrigger] = useState({ rIndex: -1, key: "" })
+  // ------------------------------------------------
+  // ------------------------------------------------
   // ------------------------------------------------
   return (
-    <>
+    <Drawer
+      className={scss.drawer}
+      visible={!!classDailyReportItemArr}
+      // getContainer={false}
+      getContainer={rwd1023 ? undefined : false}
+      width={"100%"}
+      closable={false}
+    >
 
-      {/* <div className={scss.panel}>
-        <div className={scss.title}>
-          <Image src={iconArrow} alt="return" />
-          <span>{employeeChName} {date}</span>
-          <div />
-        </div>
-        <div className={scss.btnBar}>
-          <CheckButton
-            checkLabel="已讀"
-            uncheckLable="未讀"
-            value={!!reportInEdit?.isReviewedByUser}
-            onClick={doCheck}
-          />
-        </div>
-      </div> */}
-
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {rwd1023 && <Panel />}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {!reportInEdit?.id &&
+        <DatePicker reportDateArr={reportDateArr} disabled={disabled} />
+      }
 
       <div className={classNames(scss.table)}>
-        
-
         <div className={scss.roof} />
         {/*  */}
         <div className={classNames(scss.thead)}>
           {theHeaderKeyArr.map((key, index) => {
             let { label, label_mobile, headerClassName, headerClassName_mobile } = config[key] ?? {}
             if (!rwd1023) headerClassName_mobile = undefined
+
+            const theLabel = (() => {
+              if (key === "remove" && !isMine) return undefined
+              return rwd1023 ? (label_mobile || label) : label
+            })()
+
             return (
               <div key={key}
                 className={classNames(
@@ -128,7 +161,7 @@ export default function ReportTable(
                   headerClassName,
                   headerClassName_mobile,
                 )} >
-                <span>{rwd1023 ? (label_mobile || label) : label}</span>
+                <span>{theLabel}</span>
               </div>
             )
             // 
@@ -136,7 +169,8 @@ export default function ReportTable(
         </div>
         {/*  */}
         <div className={classNames(scss.tbody)}>
-          {classDailyReportItemArr.map((theClass, rIndex) => {
+          {classDailyReportItemArr?.map((theClass, rIndex) => {
+            {/* {sortedClassDailyReportItemArr?.map((theClass, rIndex) => { */ }
             return (
               <div key={rIndex} className={classNames(scss.row)}>
 
@@ -168,7 +202,7 @@ export default function ReportTable(
                           placeholder={thePlaceholder}
                           selectProps={{
                             options: optionArr ?? [],
-                            value: theClass[key] as string,
+                            value: theClass[key as TclassKeys] as string,
                             // @ts-ignore
                             onChange: (v) => { theClass[key] = v!.value },
                             arrowType: "black",
@@ -189,7 +223,7 @@ export default function ReportTable(
                           showBaseline="auto"
                           placeholder={thePlaceholder}
                           inputProps={{
-                            value: theClass[key] as string,
+                            value: theClass[key as TclassKeys] as string,
                             inputType,
                             // @ts-ignore
                             onChange: (v) => { theClass[key] = v },
@@ -210,15 +244,27 @@ export default function ReportTable(
                           showBaseline="auto"
                           placeholder={thePlaceholder}
                           textareaProps={{
-                            value: theClass[key] as string,
+                            value: theClass[key as TclassKeys] as string,
                             // @ts-ignore
                             onChange: (v) => { theClass[key] = v },
                             className: scss.textarea,
+                            allowNewLineByUser: key === "description"
                           }} />
                       </div>
                     )
                   }
                   if (eleType === "timePicker") {
+
+                    const focusTrigger =
+                      (timeTrigger.rIndex === rIndex && timeTrigger.key === key)
+
+                    const changeTrigger = () => {
+                      let theKey: string = "";
+                      if (key === "departureTime") theKey = "arrivalTime"
+                      if (key === "arrivalTime") theKey = "departureWorksiteTime"
+                      setTimeTrigger({ rIndex, key: theKey })
+                    }
+
                     return (
                       <div key={cIndex}
                         className={classNames(
@@ -229,12 +275,14 @@ export default function ReportTable(
                           showBaseline="auto"
                           placeholder={thePlaceholder}
                           timePickerProps={{
-                            value: theClass[key] as string,
+                            value: theClass[key as TclassKeys] as string,
                             onChange02: (v) => {
                               const foo = v?.toISOString()
                               // @ts-ignore
                               theClass[key] = foo
+                              changeTrigger()
                             },
+                            focusTrigger: focusTrigger
                           }} />
                       </div>
                     )
@@ -277,10 +325,7 @@ export default function ReportTable(
                                   value: worker.chName,
                                 }}
                               />
-                              {/* <span>{worker.chName}</span> */}
                               {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                              {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
                             </div>
                           )
                         })}
@@ -296,14 +341,12 @@ export default function ReportTable(
                   }
                   // ---------------------
                   if (eleType === "modal" && key === "meals") {
-                    // const mealsArr = theClass["meals"]
                     const mealsArr = theClass["meals"]
                     const onAdd = () => {
                       if (disabled) return;
                       setActiveItem(theClass)
                       toShowModal_meals()
                     }
-
                     return (
                       <div key={cIndex}
                         className={
@@ -320,9 +363,6 @@ export default function ReportTable(
                           const onRemove = () => {
                             theClass.removeMeals(wIndex)
                           }
-
-                          const isLast = arr.length === wIndex + 1
-
                           return (
                             <div key={wIndex} className={scss.worker} >
                               <InputSel
@@ -332,10 +372,7 @@ export default function ReportTable(
                                   value: mealsLookup[meals]
                                 }}
                               />
-                              {/* <span>{worker.chName}</span> */}
                               {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                              {/* {!isLast && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            {isLast && <IconAddCircle className={scss.icon} onClick={onAdd} />} */}
                             </div>
                           )
                         })}
@@ -349,13 +386,55 @@ export default function ReportTable(
                       </div>
                     )
                   }
-                  return (
-                    <div key={cIndex}
-                      className={classNames(scss.cell,
-                        headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
-                      {cIndex}
-                    </div>
-                  )
+                  // 
+                  if (eleType === "modal" && key === "licensePlate") {
+                    const licensePlate = theClass["licensePlate"]
+
+                    const onAdd = () => {
+                      if (disabled) return;
+                      setActiveItem(theClass)
+                      setShowModal_licensePlate(true)
+                    }
+                    return (
+                      <div key={cIndex}
+                        className={
+                          classNames(scss.cell, scss.workerCell,
+                            headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}
+                      >
+                        <div className={scss.worker} >
+                          <InputSel
+                            disabled={true}
+                            showBaseline={disabled ? "invisible" : "always"}
+                            placeholder={thePlaceholder}
+                            inputProps={{
+                              value: licensePlate ?? ""
+                            }}
+                          />
+                          {!disabled && <IconAddCircle className={scss.icon} onClick={onAdd} />}
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  // 
+                  if (key === "remove") {
+                    const onClick = disabled ? undefined : () => removeDailyReportItem(rIndex)
+                    return (
+                      <div key={cIndex}
+                        className={classNames(scss.cell,
+                          headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                        {isMine && <IconDelete01 onClick={onClick} />}
+                      </div>
+                    )
+                  }
+                  // 
+                  // return (
+                  //   <div key={cIndex}
+                  //     className={classNames(scss.cell,
+                  //       headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
+                  //     {cIndex}
+                  //   </div>
+                  // )
                 })}
               </div>
             )
@@ -383,8 +462,14 @@ export default function ReportTable(
           onCancel={modalOnCancel_meals}
         />
 
+        <LicensePlateSelector
+          visible={showModal_licensePlate}
+          onConfirm={modalOnConfirm_licensePlate}
+          onCancel={() => setShowModal_licensePlate(false)}
+        />
+
       </div>
-    </>
+    </Drawer>
   )
 }
 // =================================================================
@@ -392,7 +477,7 @@ export default function ReportTable(
 
 type TclassKeys = keyof Class_reportItem
 
-const headerKeyArr: (TclassKeys | "workingTime")[] = [
+const headerKeyArr: (TclassKeys | "workingTime" | "remove")[] = [
   "periodOfDay",
   "workingTime",
   "customerName",
@@ -400,6 +485,7 @@ const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "workers",
   "dispatchOrderId",
   "meals",
+  "remove",
 
   "departureTime",
   "departureWorksiteTime",
@@ -408,7 +494,7 @@ const headerKeyArr: (TclassKeys | "workingTime")[] = [
   "stayLength",
   "arrivalTime",
 ]
-const headerKeyArr_mobile: TclassKeys[] = [
+const headerKeyArr_mobile: (TclassKeys | "remove")[] = [
   "periodOfDay",
   "departureTime",
   "arrivalTime",
@@ -421,9 +507,10 @@ const headerKeyArr_mobile: TclassKeys[] = [
   "licensePlate",
   "meals",
   "stayLength",
+  "remove",
 ]
 
-const bodyKeyArr: TclassKeys[] = [
+const bodyKeyArr: (TclassKeys | "remove")[] = [
   "periodOfDay",
   "departureTime",
   "departureWorksiteTime",
@@ -432,6 +519,7 @@ const bodyKeyArr: TclassKeys[] = [
   "workers",
   "dispatchOrderId",
   "meals",
+  "remove",
   "arrivalTime",
   "contactName",
   "licensePlate",
@@ -439,7 +527,7 @@ const bodyKeyArr: TclassKeys[] = [
 ]
 
 type Tconfig = {
-  [key in (TclassKeys | "workingTime")]?:
+  [key in (TclassKeys | "workingTime" | "remove")]?:
   {
     label: string
     label_mobile?: string
@@ -455,7 +543,7 @@ type Tconfig = {
     inputType?: "number" | "text"
     suffix?: string
   } & (
-    { eleType?: "input" | "timePicker" | "textarea" | "modal" } |
+    { eleType?: "input" | "timePicker" | "textarea" | "modal" | "icon" } |
     {
       eleType?: "select"
       optionArr: Toption[]
@@ -533,10 +621,9 @@ const config: Tconfig = {
   },
   meals: {
     eleType: "modal",
-    // optionArr: optionArr_mealsCost,
     label: "餐費",
     placeholder: "餐費",
-    headerClassName: classNames("w-[100px] row-span-3", scss.rightEdge),
+    headerClassName: classNames("w-[100px] row-span-3"),
     headerClassName_mobile: classNames("h-[120px]"),
     bodyClassName: classNames("row-span-1"),
     bodyClassName_mobile: classNames("h-[120px]"),
@@ -569,9 +656,9 @@ const config: Tconfig = {
     bodyClassName_mobile: classNames("h-[43px]"),
   },
   licensePlate: {
-    eleType: "input",
+    eleType: "modal",
     label: "車牌",
-    placeholder: "車牌",
+    placeholder: "請選擇",
     headerClassName: classNames("w-[160px] row-span-3", scss.textLeft),
     headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-1"),
@@ -582,15 +669,22 @@ const config: Tconfig = {
     label: "住宿",
     placeholder: "天數",
     inputType: "number",
-    headerClassName: classNames("w-[100px] row-span-3", scss.rightEdge),
+    headerClassName: classNames("w-[100px] row-span-3",),
     headerClassName_mobile: classNames("h-[43px]"),
     bodyClassName: classNames("row-span-1", scss.suffix),
     bodyClassName_mobile: classNames("h-[43px]", scss.stayLength),
     suffix: "天"
   },
+  remove: {
+    eleType: "icon",
+    label: "刪除",
+    placeholder: "",
+    headerClassName: classNames("w-[60px] row-span-6", scss.rightEdge),
+    headerClassName_mobile: classNames("h-[43px]"),
+    bodyClassName: classNames("row-span-2"),
+    bodyClassName_mobile: classNames("h-[43px]"),
+  }
 }
-
-
 
 const mealsLookup = {
   none: "無",
@@ -598,4 +692,185 @@ const mealsLookup = {
   lunch: "午餐",
   dinner: "晚餐",
 } as const
+
+
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+const DatePicker = (
+  { reportDateArr, disabled }:
+    {
+      reportDateArr: string[]
+      disabled: boolean
+    }
+) => {
+
+  const { reportInEdit, changeReportDate } = useContext(DailyReportContext)
+
+  return (
+    <div className={scss.datePickerWrapper}>
+      <InputSel
+        label="日報表日期"
+        captionColor="main"
+        gap="24px"
+        width={"245px"}
+        className={scss.datePicker}
+        placeholder="請選擇日期"
+        disabled={disabled}
+        datePickerProps={{
+          value: reportInEdit?.date || "",
+          onChange02(moment, dateString) {
+            const dateStr = moment?.toISOString() ?? ""
+            changeReportDate(dateStr)
+          },
+          antdDatePickerProps: {
+            disabledDate: (date) => {
+              const disabledDate = reportDateArr.some((theDate) => {
+                return date.isSame(moment(theDate), "day")
+              })
+              return disabledDate
+            }
+          }
+        }}
+      />
+    </div>
+  )
+
+}
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// mobile
+const Panel = () => {
+
+  const {
+    identity, reportInEdit, isReportEdit,
+    userInfo,
+  } = useContext(DailyReportContext)
+
+
+  const Below = (() => {
+    if (reportInEdit?.isUserIsViewer) {
+      return () => null
+    }
+    if (identity === "manager") {
+      if (!reportInEdit) return () => null
+      else if (reportInEdit.isAllowToReview) return Bar_reviewer_inEdit_user
+      else return () => null
+    }
+
+    if (identity === "reviewer") {
+      if (!reportInEdit) return () => null
+      else {
+        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
+          if (isReportEdit) return Bar_reporter_inEdit02
+          if (reportInEdit.isReviewedByOther) return Bar_reporter_reviewed
+          return Bar_reporter_inEdit02
+        }
+        else if (reportInEdit.isAllowToReview) {
+          return Bar_reviewer_inEdit_user
+        }
+        return () => null
+      }
+    }
+
+    if (identity === "reporter") {
+      if (!reportInEdit) return () => null
+      else {
+        if (reportInEdit.isReviewedByOther) return Bar_reporter_reviewed
+        if (isReportEdit) return Bar_reporter_inEdit02
+        return Bar_reporter_inEdit02
+      }
+    }
+    return () => null
+  })()
+
+
+  return (
+    <div>
+      <TitlePanel />
+      <Below />
+    </div>
+  )
+}
+
+const TitlePanel = () => {
+
+  const {
+    reportInEdit, cancelEditNewDailyReport,
+    isReportEdit, setShowReviewerForReportModal
+  }
+    = useContext(DailyReportContext)
+  const employeeChName = reportInEdit?.employeeChName
+  const date = moment(reportInEdit?.date).format("y-MM-DD")
+
+  return (
+    <div className={scss.TitlePanel}>
+      <div className={classNames(scss.left)}>
+        <Image src={iconArrow} alt="return" onClick={cancelEditNewDailyReport} />
+      </div>
+      <div className={classNames(scss.center)}><span>{employeeChName} {date}</span></div>
+      {isReportEdit &&
+        <div className={classNames(scss.right)}
+          onClick={() => setShowReviewerForReportModal(true)}><IconCheck02 /></div>
+      }
+    </div>
+  )
+}
+
+function Bar_reporter_inEdit02() {
+
+  const {
+    isReportEdit,
+    switchIsEdit,
+  } = useContext(DailyReportContext)
+
+  return (
+    <div className={scss.bar}>
+      {/* {isReportEdit &&
+        <MyButton label="上傳"
+          onClick={() => { setShowReviewerForReportModal(true) }} />
+      } */}
+      <MyButton label={isReportEdit ? "取消" : "編輯"}
+        onClick={switchIsEdit} />
+    </div>
+  )
+}
+
+function Bar_reviewer_inEdit_user() {
+  const {
+    reportInEdit,
+    doCheck
+  } = useContext(DailyReportContext)
+
+  return (
+    <div className={scss.bar}>
+      <CheckButton
+        checkLabel="已讀"
+        uncheckLable="未讀"
+        value={!!reportInEdit?.isReviewedByUser}
+        onClick={doCheck}
+      />
+    </div>
+  )
+}
+
+const Bar_reporter_reviewed = () => {
+
+  return (
+    <div className={classNames(scss.bar, scss.reviwedBdage)}>
+      <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已檢視" />
+    </div>
+  )
+
+}
+
+
+// ===================================================================
+
 
