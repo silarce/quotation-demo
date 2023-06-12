@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo } from "react"
+import { useState, useContext, useMemo, useRef } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
@@ -117,6 +117,8 @@ export default function ReportTable(
   const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr
 
   // ------------------------------------------------
+  const [timeTrigger, setTimeTrigger] = useState({ rIndex: -1, key: "" })
+  // ------------------------------------------------
   // ------------------------------------------------
   // ------------------------------------------------
   return (
@@ -171,7 +173,7 @@ export default function ReportTable(
         {/*  */}
         <div className={classNames(scss.tbody)}>
           {classDailyReportItemArr?.map((theClass, rIndex) => {
-          {/* {sortedClassDailyReportItemArr?.map((theClass, rIndex) => { */}
+            {/* {sortedClassDailyReportItemArr?.map((theClass, rIndex) => { */ }
             return (
               <div key={rIndex} className={classNames(scss.row)}>
 
@@ -255,6 +257,20 @@ export default function ReportTable(
                     )
                   }
                   if (eleType === "timePicker") {
+
+
+                    const focusTrigger =
+                      (timeTrigger.rIndex === rIndex && timeTrigger.key === key)
+
+                    const changeTrigger = () => {
+                      let theKey: string = "";
+                      if (key === "departureTime") theKey = "arrivalTime"
+                      if (key === "arrivalTime") theKey = "departureWorksiteTime"
+
+
+                      setTimeTrigger({ rIndex, key: theKey })
+                    }
+
                     return (
                       <div key={cIndex}
                         className={classNames(
@@ -270,7 +286,9 @@ export default function ReportTable(
                               const foo = v?.toISOString()
                               // @ts-ignore
                               theClass[key] = foo
+                              changeTrigger()
                             },
+                            focusTrigger: focusTrigger
                           }} />
                       </div>
                     )
