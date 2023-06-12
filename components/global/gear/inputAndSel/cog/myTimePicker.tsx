@@ -1,5 +1,6 @@
 
 import {
+  useRef, useEffect,
   ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent,
   Dispatch, SetStateAction,
 } from "react"
@@ -27,6 +28,7 @@ export type TtimePickerProps = {
   ) => void,
   onFocus?: () => void
   onBlur?: () => void
+  focusTrigger?: boolean
 }
 
 
@@ -46,6 +48,10 @@ export default function MyTimePicker(
     }
 ) {
 
+  const ref = useRef<HTMLInputElement>(null!)
+
+
+
   const {
     value,
     boxClassName,
@@ -54,6 +60,7 @@ export default function MyTimePicker(
     onChange02,
     onFocus,
     onBlur,
+    focusTrigger,
   } = timePickerProps
 
   const theOnFocus = () => {
@@ -75,6 +82,13 @@ export default function MyTimePicker(
   })()
 
 
+  console.log(focusTrigger)
+
+  useEffect(() => {
+    if (focusTrigger) ref.current.focus()
+  }, [focusTrigger])
+
+
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   // 將stateValue轉為moment物件
@@ -89,7 +103,7 @@ export default function MyTimePicker(
 
   return (
     <div className={classNames(scss.timePickerBox, boxClassName)}>
-      <TimePicker
+      <TimePicker ref={ref}
         className={classNames(scss.timePicker, timePickerClassName)}
         popupClassName={classNames(scss.timePickerPopupt)}
         locale={locale}
