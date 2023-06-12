@@ -9,11 +9,24 @@ import scss from "./mustTip_simple.module.scss"
 
 
 export default function MustTip_simple(
-  { className }:
-    { className?: string }
+  { className, preStyle }:
+    {
+      className?: string
+      preStyle?: "minimal"
+
+    }
 ) {
+
+console.log(preStyle)
+
+  const theClassName = classNames(
+    scss.mustTip,
+    { [scss.minimal]: preStyle === "minimal" },
+    className,
+  )
+
   return (
-    <div className={classNames(scss.mustTip, className)}>
+    <div className={theClassName}>
       <Image src={iconMust} alt="必填" />
     </div>
   )

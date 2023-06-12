@@ -3,9 +3,6 @@ import classNames from "classnames"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
-// gear
-import MustTip_simple from "components/global/gear/other/mustTip_simple"
-
 // css
 import style from "./theadItem.module.scss"
 import styleL from "../../local.module.scss"
@@ -58,8 +55,6 @@ export default function TheadItem({ theadInfo, allowMove, isMoving }:
     }
       ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}>
       <span>{label}</span>
-
-      <MustTip_simple />
     </div>
   )
 }

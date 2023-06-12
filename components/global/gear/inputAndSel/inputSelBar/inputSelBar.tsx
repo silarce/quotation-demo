@@ -1,5 +1,5 @@
 import { CSSProperties, useState } from "react"
-
+import classNames from "classnames";
 // gear
 import MustTip_simple from "../../other/mustTip_simple";
 
@@ -114,8 +114,9 @@ export default function InputSelBar(
     <div className={labelClasses} style={lableStyle}>
 
       {label &&
-        <div className={captionClasses} style={captionStyle}>
+        <div className={classNames(captionClasses, "relative")} style={captionStyle}>
           <span>{label}</span>
+          {isMust && <MustTip_simple className={mustTipClassName} preStyle="minimal" />}
         </div>
       }
 
@@ -168,16 +169,11 @@ export default function InputSelBar(
         })}
       </div>
 
-
-
       {showBaseline !== "invisible" &&
         <hr className={hrClasses}
           style={hrStyle}
         />
       }
-
-      {isMust && <MustTip_simple className={mustTipClassName} />}
-
     </div>
   )
 
