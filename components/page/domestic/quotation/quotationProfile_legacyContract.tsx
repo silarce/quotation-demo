@@ -122,6 +122,7 @@ export default function QuotationProfile(
           類別 : {customerTypes || "尚未選擇客戶"}
         </span>
         <InputSel
+          isMust={true}
           label="工程名稱"
           disabled={disabled}
           {...{ ...inputStyle }}
@@ -135,6 +136,7 @@ export default function QuotationProfile(
           <div className={`${scss.clientName} ${disabled ? scss.disabled : ""}`}>
             <div>
               <InputSel
+                isMust={true}
                 label={"客戶名稱"}
                 placeholder={""}
                 disabled={true}
@@ -201,17 +203,20 @@ export default function QuotationProfile(
         </div> {/* form02 */}
 
         <InputSelBar_address
+          // isMust={true}
           label="工程地點"
           captionClassName={scss.input02}
           showBaseline="auto"
           {...{ ...inputStyle }}
           addressProps={selectInputList}
           disabled={disabled}
+          isMust={true}
         />
       </div>
 
       <div className={scss.time_legacy}>
         <InputSel
+          isMust={true}
           label="合約編號"
           showBaseline="auto"
           disabled={disabled}
