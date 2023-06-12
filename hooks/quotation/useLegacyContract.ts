@@ -194,7 +194,10 @@ class Class_product {
   }
 
   get itemName() { return this._product.itemName }
-  set itemName(v) { this._product.itemName = v; this._reRender() }
+  set itemName(v) {
+    if (v.length >= 11) { v = v.slice(0, 10) };
+    this._product.itemName = v; this._reRender()
+  }
 
   get quoteType() { return this._product.quoteType }
   set quoteType(v) { this._product.quoteType = v; this._reRender() }
@@ -250,7 +253,6 @@ class Class_product {
 
   get quantity() { return this._quantity }
   set quantity(v) {
-
     this._quantity = v;
     v = parseInt(v || "0").toString()
     this._product.quantity = parseInt(v || "0");
@@ -290,7 +292,7 @@ class Class_product {
     this._reRender()
   }
 
-  countTotalPrice = () => {
+  countTotalPrice() {
     const quantity = this.quantity.replace(/,/g, "") || 0
     const unitPrice = this.unitPrice.replace(/,/g, "") || 0
     const total = Decimal.mul(quantity, unitPrice).toString()
@@ -352,7 +354,10 @@ class Class_addition {
   }
 
   get itemName() { return this._addition.itemName }
-  set itemName(v) { this._addition.itemName = v; this._reRender() }
+  set itemName(v) {
+    if (v.length >= 11) { v = v.slice(0, 10) };
+    this._addition.itemName = v; this._reRender()
+  }
 
   get content() { return this._addition.content }
   set content(v) { this._addition.content = v; this._reRender() }

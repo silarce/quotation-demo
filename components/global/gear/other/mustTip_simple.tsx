@@ -17,8 +17,6 @@ export default function MustTip_simple(
     }
 ) {
 
-console.log(preStyle)
-
   const theClassName = classNames(
     scss.mustTip,
     { [scss.minimal]: preStyle === "minimal" },

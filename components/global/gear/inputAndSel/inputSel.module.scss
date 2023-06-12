@@ -163,6 +163,9 @@ div.selControl {
   // padding: 0 12px;
   background-color: #fff;
 }
+.selMenuPortal.plus {
+  z-index: 2;
+}
 
 div.selOption {
   position: relative;
