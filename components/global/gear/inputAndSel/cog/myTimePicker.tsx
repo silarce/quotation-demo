@@ -81,9 +81,6 @@ export default function MyTimePicker(
     return undefined
   })()
 
-
-  console.log(focusTrigger)
-
   useEffect(() => {
     if (focusTrigger) ref.current.focus()
   }, [focusTrigger])

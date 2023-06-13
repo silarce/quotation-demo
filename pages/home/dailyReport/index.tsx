@@ -36,7 +36,10 @@ import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDai
 
 // tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
-import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate";
+import {
+  // convertDate_add1911,
+  // convertDate_reduce1911
+} from "js/utils/helpers/date/convertDate";
 
 // icon
 import iconFourCube from "public/image/icon/fourCube.svg"
@@ -192,7 +195,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
     const reportDateArr = (() => {
       if (!isMine) return []
-      const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
+      // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
+      const arr = dailyReport?.map((report) => report.date) ?? []
       return arr
     })()
     return { sortedDailyReport, reportDateArr }
@@ -393,7 +397,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const reviewerIds = reviewerArr.map((emp) => emp.id)
     const examinerIds = examinerArr.map((emp) => emp.id)
 
-    const theDate = convertDate_add1911(reportInEdit.date)
+    const theDate = reportInEdit.date
 
     const items = reportInEdit.items.map((item) => {
       const year = new Date(theDate).getFullYear()

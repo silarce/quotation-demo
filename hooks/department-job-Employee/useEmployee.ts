@@ -5,10 +5,6 @@ import 'moment-timezone';
 
 import _ from "lodash"
 
-// tool
-import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
-import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
-
 // type
 import { TemployeeDto } from "js/api/api_employee";
 type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
@@ -27,18 +23,19 @@ class Class_employee {
 
     if (!this._employeeData.qualifications) this._employeeData.qualifications = []
 
-    // this._employeeData.birthday = convertDate(this._employeeData.birthday)
-    this._employeeData.birthday = convertDate_reduce1911(this._employeeData.birthday)
+    // this._employeeData.birthday = convertDate_reduce1911(this._employeeData.birthday)
 
     this._employeeData.startDate = (() => {
       if (!this._employeeData.startDate) {
-        return convertDate_reduce1911(new Date().toISOString())
+        // return convertDate_reduce1911(new Date().toISOString())
+        return (new Date().toISOString())
       }
-      return convertDate_reduce1911(this._employeeData.startDate)
+      // return convertDate_reduce1911(this._employeeData.startDate)
+      return (this._employeeData.startDate)
     })()
-    this._employeeData.leaveDate = convertDate_reduce1911(this._employeeData.leaveDate)
-    this._employeeData.retireDate = convertDate_reduce1911(this._employeeData.retireDate)
-    this._employeeData.severanceDate = convertDate_reduce1911(this._employeeData.severanceDate)
+    // this._employeeData.leaveDate = convertDate_reduce1911(this._employeeData.leaveDate)
+    // this._employeeData.retireDate = convertDate_reduce1911(this._employeeData.retireDate)
+    // this._employeeData.severanceDate = convertDate_reduce1911(this._employeeData.severanceDate)
 
     this.classJobGroupArr
       = this._employeeData.jobs.map((job) => new Class_JobGroup(reRender, job))
@@ -210,13 +207,18 @@ class Class_employee {
     if (!this.startDate) return "請輸入到職日"
     if (this.leaveDate || this.severanceDate) {
       const mEndDate = moment(this.leaveDate || this.severanceDate)
+      if (mStartDate.isAfter(mEndDate)) return "離職日或資遣日早於到職日"
       const duration = moment.duration(mEndDate.diff(mStartDate))
       return `${duration.years()}年${duration.months()}月${duration.days()}天`
     }
     else {
-      const mNow = moment(new Date()).subtract(1911, "year")
-      const duration = moment.duration(mNow.diff(mStartDate))
-      return `${duration.years()}年${duration.months()}月${duration.days()}天`
+      return "請輸入離職日或資遣日"
+      // const mNow = moment(new Date()).subtract(1911, "year")
+      // const mNow = moment(new Date())
+
+      // if(!mNow.isAfter(mStartDate)) return "離職日小於到職日"
+      // const duration = moment.duration(mNow.diff(mStartDate))
+      // return `${duration.years()}年${duration.months()}月${duration.days()}天`
     }
   }
 
@@ -313,16 +315,16 @@ class Class_employee {
       = this.qualifications.filter((item) => !!item.name)
     this._reRender()
 
-    const birthday =
-      convertDate_add1911(this._employeeData.birthday)
-    const startDate =
-      convertDate_add1911(this._employeeData.startDate)
-    const leaveDate =
-      convertDate_add1911(this._employeeData.leaveDate)
-    const retireDate =
-      convertDate_add1911(this._employeeData.retireDate)
-    const severanceDate =
-      convertDate_add1911(this._employeeData.severanceDate)
+    const birthday = this._employeeData.birthday
+    // convertDate_add1911(this._employeeData.birthday)
+    const startDate = this._employeeData.startDate
+    // convertDate_add1911(this._employeeData.startDate)
+    const leaveDate = this._employeeData.leaveDate
+    // convertDate_add1911(this._employeeData.leaveDate)
+    const retireDate = this._employeeData.retireDate
+    // convertDate_add1911(this._employeeData.retireDate)
+    const severanceDate = this._employeeData.severanceDate
+    // convertDate_add1911(this._employeeData.severanceDate)
 
     // 直接傳date物件的話，時區會被轉變
     return {
@@ -440,20 +442,20 @@ const emptyDataOri = (): TemployeeDto_jobs => ({
 })
 // =======================================================================
 
-const convertDate_reduce1911 = (ISOString: string) => {
-  if (!ISOString) return ISOString
-  const dateTime = new Date(ISOString)
-  const year = dateTime.getFullYear()
-  const chYear = year - 1911
-  dateTime.setFullYear(chYear)
-  return dateTime.toISOString()
-}
+// const convertDate_reduce1911 = (ISOString: string) => {
+//   if (!ISOString) return ISOString
+//   const dateTime = new Date(ISOString)
+//   const year = dateTime.getFullYear()
+//   const chYear = year - 1911
+//   dateTime.setFullYear(chYear)
+//   return dateTime.toISOString()
+// }
 
-const convertDate_add1911 = (ISOString: string) => {
-  if (!ISOString) return ISOString
-  const dateTime = new Date(ISOString)
-  const twYear = dateTime.getFullYear()
-  const year = twYear + 1911
-  dateTime.setFullYear(year)
-  return dateTime.toISOString()
-}
+// const convertDate_add1911 = (ISOString: string) => {
+//   if (!ISOString) return ISOString
+//   const dateTime = new Date(ISOString)
+//   const twYear = dateTime.getFullYear()
+//   const year = twYear + 1911
+//   dateTime.setFullYear(year)
+//   return dateTime.toISOString()
+// }

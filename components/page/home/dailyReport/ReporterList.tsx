@@ -64,13 +64,13 @@ export default function ReporterList(
             {reportArr.map((report, index) => {
               const { date, employee, id: reportId, reviewStatus } = report
               const { chName, id: employeeId } = employee
-              const chDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
+              const twDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
 
               const tag: Ttag = {
                 reportId,
                 employeeId,
                 name: chName,
-                date: chDate,
+                date: twDate,
               }
 
               const statusChecker = (status: TdailyReportReviewStatusDto) => {

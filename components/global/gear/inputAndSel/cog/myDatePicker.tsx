@@ -10,6 +10,9 @@ import { DatePicker, DatePickerProps } from 'antd';
 import 'moment/locale/zh-tw';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
+import { convertDate_reduce1911 } from "js/utils/helpers/date/convertDate";
+
+
 // css
 import scss from "../inputSel.module.scss"
 
@@ -93,8 +96,14 @@ export default function MyDatePicker(
         locale={locale}
         value={theValue}
         placeholder={placeholder ?? "例 : 100-01-01"}
-        defaultPickerValue={moment().year(moment().year() - 1911)}
-        format={"y-MM-DD"}
+        defaultPickerValue={moment()}
+        // defaultPickerValue={moment().year(moment().year() - 1911)}
+        // format回傳日期的日期會導致input不能用
+        format={(theMoment) => {
+          const twDate = convertDate_reduce1911(theMoment.toISOString())
+          return moment(twDate).format("yy-MM-DD")
+        }}
+        // format={"yy-MM-DD"}
         disabled={disabled}
         bordered={false}
         // showToday={false}

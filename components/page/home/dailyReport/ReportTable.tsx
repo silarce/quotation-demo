@@ -253,6 +253,11 @@ export default function ReportTable(
                       </div>
                     )
                   }
+
+
+
+
+
                   if (eleType === "timePicker") {
 
                     const focusTrigger =
@@ -664,8 +669,20 @@ const config: Tconfig = {
     bodyClassName: classNames("row-span-1"),
     bodyClassName_mobile: classNames("h-[43px]"),
   },
+  // stayLength: {
+  //   eleType: "input",
+  //   label: "住宿",
+  //   placeholder: "天數",
+  //   inputType: "number",
+  //   headerClassName: classNames("w-[100px] row-span-3",),
+  //   headerClassName_mobile: classNames("h-[43px]"),
+  //   bodyClassName: classNames("row-span-1", scss.suffix),
+  //   bodyClassName_mobile: classNames("h-[43px]", scss.stayLength),
+  //   suffix: "天"
+  // },
   stayLength: {
-    eleType: "input",
+    eleType: "select",
+    optionArr: [{ value: "0", label: "無" }, { value: "1", label: "有" }],
     label: "住宿",
     placeholder: "天數",
     inputType: "number",
@@ -726,6 +743,9 @@ const DatePicker = (
           },
           antdDatePickerProps: {
             disabledDate: (date) => {
+              // 比當日晚的日期都不能選
+              if (date.isAfter(moment())) { return true }
+              // 已經存在的日期都不能選
               const disabledDate = reportDateArr.some((theDate) => {
                 return date.isSame(moment(theDate), "day")
               })
