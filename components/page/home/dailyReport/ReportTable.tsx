@@ -743,6 +743,9 @@ const DatePicker = (
           },
           antdDatePickerProps: {
             disabledDate: (date) => {
+              // 比當日晚的日期都不能選
+              if (date.isAfter(moment())) { return true }
+              // 已經存在的日期都不能選
               const disabledDate = reportDateArr.some((theDate) => {
                 return date.isSame(moment(theDate), "day")
               })
