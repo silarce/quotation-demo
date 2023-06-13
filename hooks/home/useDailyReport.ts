@@ -7,7 +7,7 @@ import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoT
 // api
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 // other
-import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
+// import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
 
 // =================================================================
 
@@ -242,7 +242,8 @@ const useReport = (
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
     // date: moment().format("yyyy-MM-DD"),
-    date: convertDate_reduce1911(moment().format("yyyy-MM-DD")),
+    date: moment().toISOString(),
+    // date: convertDate_reduce1911(moment().format("yyyy-MM-DD")),
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,
     isReviewedByOther: false,
@@ -284,7 +285,8 @@ const useReport = (
 
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
-      date: convertDate_reduce1911(dailyReport.date),
+      // date: convertDate_reduce1911(dailyReport.date),
+      date: dailyReport.date,
       // items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       items: sortedItems.map((item) => new Class_reportItem(reRender, item)),
       isAllowToReview,
