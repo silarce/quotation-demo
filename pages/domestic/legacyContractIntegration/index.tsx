@@ -53,12 +53,13 @@ export default function LegacyContractIntegration() {
     "projectName": { $contains: searchObj?.projectName },
   }
 
-  const params = {
+  const params:Tparams = {
     page: page,
     pageSize: 7,
     populate: ["products"],
     filter,
-    sort: "createdAt"
+    sort: "quoteDate",
+    order: "DESC"
   }
 
   const { legacyContractsArr, legacyContractsMeta,
@@ -136,7 +137,7 @@ export default function LegacyContractIntegration() {
       if (value) query[key] = value;
       else delete query[key];
     });
-    
+
     setPage(1);
     router.push({
       query,
