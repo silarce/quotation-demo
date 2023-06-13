@@ -1,11 +1,17 @@
 // 公司職等職稱
 // 公司職等職稱
-import { useState, } from "react"
+import { CSSProperties, useState, } from "react"
 
 const _ = require("lodash")
 
+// layer
+import SubLayer from "components/Layer/SubLayer/SubLayer"
+
+// component
+import Table_annotation from "components/page/setting/momoList/table_annotation"
+
 // glogal gear
-import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
 // import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 // import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
@@ -21,15 +27,16 @@ import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon
 // css
 import style from "./memoList.module.scss"
 
+// type
+import { TannotationDto } from "js/api/dtoTypes"
 
-// fake
-import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi"
 import {
   optionsCreator_prodClass,
   optionsCreator_doorType,
   optionsCreator_doorForm,
   Toption
 } from "js/utils/options/options"
+
 const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
 const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
@@ -42,177 +49,151 @@ export default function MemoList() {
   // const [isLoading, setIsLoading] = useState(false)
   // const [showAdd, setShowAdd] = useState(false)
   // ------------------------------------------------------------------------
-  const [fakeMemoArrState, setFakeMemoArrState] = useState({ wrapper: fakeApi_memo })
-  const reRender = () => {
-    setFakeMemoArrState(state => ({ ...state }))
-  }
-  const memoFakeApi = fakeMemoArrState.wrapper
+  // const { classAnnotation, newClassAnno, clearAnno, } = useClassAnnotation()
+  const hookPack = useClassAnnotation()
+  const { classAnnotation, newClassAnno, clearAnno, } = hookPack
+
+  const apiReq = () => { alert("test") }
+
 
   // ------------------------------------------------------------------------
-  const [editableId, setEditableId] = useState(-1)
-  const [tempMemo, setTempMemo] = useState("")
-
-  // ------------------------------------------------------------------------
-  const [prodClass, setProdClass] = useState("")
-  const [doorType, setDoorType] = useState("")
-  const [doorForm, setDoorForm] = useState("")
-  const [searchValue, setSearchValue] = useState("")
-  const toSearch = (v: string) => setSearchValue(v)
 
 
-  const selectPropsArr = [
+  const searchTargetList: TsearchGroup["searchTargetList"] = [
     {
-      boxStyle: { width: "200px" },
       placeholder: "選擇類別",
-      selectProps: {
-        value: prodClass,
-        options: optionsProdClass,
-        onChange: (option: Toption | null) => {
-          if (typeof option?.value === "string")
-            setProdClass(option?.value)
-        },
-      },
+      options: optionsProdClass
     },
     {
       placeholder: "選擇門型",
-      boxStyle: { width: "145px" },
-      selectProps: {
-        value: doorType,
-        options: optionsDoorType,
-        onChange: (option: Toption | null) => {
-          if (typeof option?.value === "string")
-            setDoorType(option?.value)
-        },
-      },
+      options: optionsDoorType
     },
     {
       placeholder: "選擇形式",
-      boxStyle: { width: "145px" },
-      selectProps: {
-        value: doorForm,
-        options: optionsDoorForm,
-        onChange: (option: Toption | null) => {
-          if (typeof option?.value === "string")
-            setDoorForm(option?.value)
-        },
-      },
-
+      options: optionsDoorForm
     },
+    {
+      placeholder: "請輸入搜尋內容"
+    }
   ]
 
-  // __________________
-
-  const filter = {
-    prodClass: [prodClass],
-    doorType: [doorType],
-    doorForm: [doorForm],
-    content: searchValue
+  const searchGroup = {
+    searchTargetList,
+    doSearch: () => { }
   }
 
-  // ------------------------------------------------------------------------
+
   const panelList: TpanelList = [
-    {
-      type: "inputSearch",
-      placeholder: "請輸入搜尋內容",
-      onClick: toSearch
-    },
+    { searchGroup },
     {
       type: "addButton",
       label: "新增備註",
-      onClick: () => {
-        memoFakeApi.post({
-          prodClass: ["防火防煙捲門系列"],
-          doorType: ["SJ-302"],
-          doorForm: ["一般", "防颱"],
-          content: "",
-        })
-        reRender()
-      }
+      onClick: newClassAnno,
     },
   ]
   // ------------------------------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer className={style.container}>
       <PageHeader02
         tag="備註列表"
         panelList={panelList}
       />
 
-      <div className={style.mainContainer}>
-        <div>
-          <SelectBar selectPropsArr={selectPropsArr} />
-        </div>
-        <div className={style.memoList}>
-          {memoFakeApi.get(filter).reverse().map((item, index) => {
-            const { id, prodClass, doorType, doorForm, content, } = item
-            const idEditable = editableId === id
-            const theContent = idEditable ? tempMemo : content
-            const toEdit = () => {
-              setEditableId(id)
-              setTempMemo(content)
-            }
-            const confirmEdit = () => {
-              setEditableId(-1)
-              memoFakeApi.put(
-                id,
-                { prodClass, doorType, doorForm, content: tempMemo, }
-              )
-              // item.content = tempMemo;
-              reRender()
-              setTempMemo("")
-            }
-            const onChange = (v: string) => {
-              setTempMemo(v)
-            }
-            const onCopy = () => {
-              memoFakeApi.post({ prodClass, doorType, doorForm, content })
-              reRender()
-            }
-            const onDelete = () => {
-              const delFun = () => {
-                memoFakeApi.delete(id)
-                reRender()
-              }
-              myAlert.confirm({
-                title: "確定刪除這個備註?",
-                props: {
-                  onOk: delFun,
-                }
-              })
-            }
-
-            return (
-              <CellWithBar className={style.row} key={index}
-                isActive={idEditable}              >
-                <div className={style.index}><span>{index + 1}</span></div>
-                <div className={style.input}>
-                  <InputSel className={style.input03}
-                    label=""
-                    gap="0"
-                    disabled={!idEditable}
-                    textareaProps={{
-                      value: theContent,
-                      onChange: onChange,
-                    }}
-                  />
-                </div>
-                <div className={style.icon}>
-                  {idEditable
-                    ? <IconCheck02 onClick={confirmEdit} />
-                    : <IconEdit onClick={toEdit} />}
-                </div>
-                <div className={style.icon}>
-                  <IconCopy onClick={onCopy} />
-                </div>
-                <div className={style.icon}>
-                  <IconDelete01 onClick={onDelete} />
-                </div>
-              </CellWithBar>
-            )
-          })}
-        </div>
+      <div >
+        <Table_annotation
+          hookPack={hookPack}
+          apiReq={apiReq}
+        />
       </div>
-    </div>
+
+    </SubLayer>
   )
 }
+
+
+// ===================================================================================
+
+const emptyAnnotation = {
+  id: undefined,
+  category: undefined,
+  doorModelName: undefined,
+  type: undefined,
+  description: "",
+}
+
+
+export class Class_annotation {
+  constructor(
+    { reRender,
+      annotation = emptyAnnotation,
+      source
+    }: {
+      reRender: () => void
+      annotation?: {
+        id: string | undefined
+        category: string | undefined
+        doorModelName: string | undefined
+        type: string | undefined
+        description: string
+      }
+      source: "new" | "edit"
+    }
+  ) {
+    this._reRender = reRender
+    this._annotation = annotation
+  } // constructor
+
+  private _reRender
+  private _annotation
+
+  get id() { return this._annotation.id }
+
+  get category() { return this._annotation.category }
+  set category(v) { this._annotation.category = v; this._reRender() }
+
+  get doorModelName() { return this._annotation.doorModelName }
+  set doorModelName(v) { this._annotation.doorModelName = v; this._reRender() }
+
+  get type() { return this._annotation.type }
+  set type(v) { this._annotation.type = v; this._reRender() }
+
+  get description() { return this._annotation.description }
+  set description(v) { this._annotation.description = v; this._reRender() }
+}
+
+const useClassAnnotation = () => {
+
+  const [render, setRender] = useState(0)
+  const reRender = () => { setRender(state => ++state) }
+  const [classAnnotation, setClassAnnotation] = useState<Class_annotation>()
+
+  const newClassAnno = () => {
+    const theClass = new Class_annotation({ reRender, source: "new" })
+    setClassAnnotation(theClass)
+  }
+
+  const editClassAnno = (annotation: TannotationDto) => {
+    const theClass = new Class_annotation({ reRender, annotation, source: "edit" })
+    setClassAnnotation(theClass)
+  }
+
+  const clearAnno = () => {
+    setClassAnnotation(undefined)
+  }
+
+  return {
+    classAnnotation,
+    newClassAnno,
+    editClassAnno,
+    clearAnno,
+  }
+
+}
+
+export type TuseClassAnnotation = typeof useClassAnnotation
+
+
+// =========================================================================
+
+
 

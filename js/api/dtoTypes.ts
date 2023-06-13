@@ -596,6 +596,33 @@ export type TupdateLegacyContractDto
   }>;
 
 // ==========================================================================
+
+
+export type TannotationDto = {
+  id: string
+  createdAt: string
+  updateAt: string
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
+
+export type TcreateAnnotationDto = {
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
+
+
+
+
+
+
+
+
+
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
