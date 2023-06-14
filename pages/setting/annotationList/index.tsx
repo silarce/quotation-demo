@@ -8,7 +8,7 @@ const _ = require("lodash")
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
-import Table_annotation from "components/page/setting/annotation/table_annotation"
+import Table_annotation from "components/page/setting/annotationList/table_annotation"
 
 // glogal gear
 import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
