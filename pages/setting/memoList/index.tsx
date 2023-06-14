@@ -1,6 +1,6 @@
 // 公司職等職稱
 // 公司職等職稱
-import { CSSProperties, useState, } from "react"
+import { useState, } from "react"
 
 const _ = require("lodash")
 
@@ -15,20 +15,13 @@ import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/Pa
 // import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 // import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
-import CellWithBar from "components/global/gear/cell/cellWithBar"
-
-import SelectBar from "components/global/gear/select/selectBar/selectBar"
-import InputSel from "components/global/gear/inputAndSel/inputSel"
-
-
-// icon
-import { IconEdit, IconCopy, IconDelete01, IconCheck02 } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import style from "./memoList.module.scss"
 
 // type
 import { TannotationDto } from "js/api/dtoTypes"
+import { Tparams } from "js/api/dtoTypes"
 
 import {
   optionsCreator_prodClass,
@@ -41,7 +34,7 @@ const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
 const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
 
-
+type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type" | "description">>
 
 // ==========================================================================
 export default function MemoList() {
@@ -50,11 +43,33 @@ export default function MemoList() {
   // const [showAdd, setShowAdd] = useState(false)
   // ------------------------------------------------------------------------
   // const { classAnnotation, newClassAnno, clearAnno, } = useClassAnnotation()
+
+
+
+  const [filter, setFilter] = useState<Tfilter>({
+    category: undefined,
+    doorModelName: undefined,
+    type: undefined,
+    description: undefined,
+  })
+
+
+  const params: Tparams = {
+    filter: {
+      category: { "$eq": filter.category },
+      doorModelName: { "$eq": filter.doorModelName },
+      type: { "$eq": filter.type },
+      description: { "$eq": filter.description },
+    }
+  }
+
+
   const hookPack = useClassAnnotation()
-  const { classAnnotation, newClassAnno, clearAnno, } = hookPack
+  const { newClassAnno, } = hookPack
 
-  const apiReq = () => { alert("test") }
-
+  const apiReq = (method: "post" | "patch" | "delete") => {
+    alert("test")
+  }
 
   // ------------------------------------------------------------------------
 
@@ -77,11 +92,18 @@ export default function MemoList() {
     }
   ]
 
-  const searchGroup = {
-    searchTargetList,
-    doSearch: () => { }
+  const doSearch: TsearchGroup["doSearch"] = (arr) => {
+    const category = (arr[0] as Toption).value
+    const doorModelName = (arr[1] as Toption).value
+    const type = (arr[2] as Toption).value as Tfilter["type"]
+    const description = arr[3] as string
+    setFilter({ category, doorModelName, type, description, })
   }
 
+  const searchGroup: TsearchGroup = {
+    searchTargetList,
+    doSearch
+  }
 
   const panelList: TpanelList = [
     { searchGroup },
@@ -141,10 +163,12 @@ export class Class_annotation {
   ) {
     this._reRender = reRender
     this._annotation = annotation
+    this.source = source
   } // constructor
 
   private _reRender
   private _annotation
+  source
 
   get id() { return this._annotation.id }
 
@@ -177,15 +201,18 @@ const useClassAnnotation = () => {
     setClassAnnotation(theClass)
   }
 
+  const copyClassAnno = (annotation: TannotationDto) => {
+    const theClass = new Class_annotation({ reRender, annotation, source: "new" })
+    setClassAnnotation(theClass)
+  }
+
   const clearAnno = () => {
     setClassAnnotation(undefined)
   }
 
   return {
     classAnnotation,
-    newClassAnno,
-    editClassAnno,
-    clearAnno,
+    newClassAnno, editClassAnno, clearAnno, copyClassAnno,
   }
 
 }

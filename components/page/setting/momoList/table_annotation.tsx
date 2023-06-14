@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, createContext } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import Image from "next/image"
@@ -37,11 +37,11 @@ export default function Table_annotation(
   }:
     {
       hookPack: ReturnType<TuseClassAnnotation>
-      apiReq: () => void
+      apiReq: (method: "post" | "patch" | "delete") => void
     }
 ) {
 
-  const { classAnnotation, clearAnno, editClassAnno } = hookPack
+  const { classAnnotation, clearAnno, editClassAnno, copyClassAnno } = hookPack
 
 
   const annotationArr = fakeAnnotation
@@ -50,12 +50,18 @@ export default function Table_annotation(
   return (
     <div className={scss.container}>
       <Thead />
-      <AddRow classAnnotation={classAnnotation}
-        clearAnno={clearAnno}
-        apiReq={apiReq}
-      />
+      {classAnnotation?.source === "new" &&
+        <AddRow classAnnotation={classAnnotation}
+          cancel={clearAnno}
+          confirm={() => apiReq("post")}
+        />
+      }
       <BodyRowGroup annotationArr={annotationArr}
         editClassAnno={editClassAnno}
+        classAnnotation={classAnnotation}
+        clearAnno={clearAnno}
+        apiReq={apiReq}
+        copyClassAnno={copyClassAnno}
       />
     </div>
   )
@@ -80,11 +86,11 @@ const Thead = () => {
 }
 
 const AddRow = (
-  { classAnnotation, clearAnno, apiReq }:
+  { classAnnotation, cancel, confirm }:
     {
       classAnnotation?: Class_annotation
-      clearAnno: () => void
-      apiReq: () => void
+      cancel: () => void
+      confirm: () => void
     }
 ) => {
 
@@ -123,10 +129,10 @@ const AddRow = (
         )
       })}
       <Image className={config.confirm.className} src={iconCheck} alt="確認"
-        onClick={apiReq}
+        onClick={confirm}
       />
       <Image className={config.cancel.className} src={iconCross} alt="取消"
-        onClick={clearAnno}
+        onClick={cancel}
       />
     </CellWithBar>
   )
@@ -134,10 +140,21 @@ const AddRow = (
 
 
 const BodyRowGroup = (
-  { annotationArr, editClassAnno }:
+  {
+    annotationArr,
+    editClassAnno,
+    classAnnotation,
+    clearAnno,
+    apiReq,
+    copyClassAnno,
+  }:
     {
       annotationArr: TannotationDto[] | undefined
       editClassAnno: (annotation: TannotationDto) => void
+      classAnnotation: Class_annotation | undefined
+      clearAnno: () => void
+      apiReq: (method: "post" | "patch" | "delete") => void
+      copyClassAnno: (annotation: TannotationDto) => void
     }
 ) => {
   const annotaionLookup = _.groupBy(annotationArr, "category")
@@ -151,15 +168,29 @@ const BodyRowGroup = (
             <div className={classNames(scss.row, scss.rowTitle)}><span>{annKey}</span></div>
             {arr.map((ann,) => {
               const { id, doorModelName, type, description, } = ann
+
+              if (classAnnotation?.id === id && classAnnotation.source==="edit") return (
+                <AddRow classAnnotation={classAnnotation}
+                  cancel={clearAnno}
+                  confirm={() => apiReq("patch")}
+                />
+              )
+
               return (
                 <CellWithBar key={id} className={classNames(scss.row, scss.item)}>
                   <div className={config["category"].className}></div>
                   <div className={config["doorModelName"].className}><span>{doorModelName}</span></div>
                   <div className={config["type"].className}><span>{typeLookup[type]}</span></div>
                   <div className={config["description"].className}><span>{description}</span></div>
-                  <div className={config["edit"].className}><IconEdit /></div>
-                  <div className={config["copy"].className}><IconCopy /></div>
-                  <div className={config["del"].className}><IconDelete01 /></div>
+                  <div className={config["edit"].className}
+                    onClick={() => editClassAnno(ann)}
+                  ><IconEdit /></div>
+                  <div className={config["copy"].className}
+                    onClick={() => copyClassAnno(ann)}
+                  ><IconCopy /></div>
+                  <div className={config["del"].className}
+                    onClick={() => apiReq("delete")}
+                  ><IconDelete01 /></div>
                 </CellWithBar>
               )
             })}
@@ -278,25 +309,3 @@ const fakeAnnotation: TannotationDto[] = [
 
 
 // ==========================================================================
-
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
-// 接著做編輯功能
