@@ -23,7 +23,10 @@ import { showRootLoading } from "components/global/gear/loadingCover/rootLoading
 // css
 import style from "./quotation.module.scss"
 // ========================================================================
+// ========================================================================
+// hook
 import { useLegacyContract } from "hooks/quotation/useLegacyContract"
+// ========================================================================
 // ========================================================================
 // api
 import {
@@ -193,8 +196,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         const postBody = classLegacyContract.postBody
         if (!postBody) return
 
-        console.log(postBody.products)
-
         try {
           showRootLoading(true)
           const res =
@@ -283,79 +284,3 @@ function TheQuotation({ router }: { router: NextRouter }) {
     </SubLayer>
   )
 }
-
-/**
-customerId
-contracatNumber
-projectName
-customerName
-contactPerson
-contactNumber
-projectCity
-projectDistrict
-projectAddress
-discountRate
-subtotal
-salesTax
-total
-deliveryLocation
-deliveryDate
-notes
-quoteScopes
-managerName
-spuervisorName
-operatorName
-
-
-paymentMenthods:{
-  milestone
-  totalPaymentRatio
-}
-
-products:{
-  idNumber
-  itemName
-  quoteType
-  doorType
-  length
-  width
-  height
-  thickness
-  area
-  volume
-  material
-  surface
-  doorTrack
-  horsepower
-  quantity
-  discountRate
-  unitPrice
-  totalPrice
-  typhoonProtection
-  bounceDoor
-  notes
-}
-
-additions:{
-  itemName
-  content
-  quantity
-  unitPrice
-  totalPrive
-  notes
-}
-
-
-
- */
-
-
-/**
-quoteValidity
-quoteDate
-faxNumber
-trackingStatus
-projectProgress
-
-
- */

@@ -111,7 +111,10 @@ export default function PayInfo_legacy(
           <InputSel
             datePickerProps={{
               value: deliveryDate as string,
-              onChange: (v) => { classPayInfo.deliveryDate = v },
+              // onChange: (v) => { classPayInfo.deliveryDate = v },
+              onChange02(moment) {
+                classPayInfo.deliveryDate = moment?.toISOString() || ""
+              },
               datePickerClassName: style.datePicker
             }}
             placeholder={`例 : 100-01-01`}
