@@ -48,21 +48,28 @@ export default function Table_annotation(
 
 
   return (
-    <div className={scss.container}>
+    <div className={scss.table}>
       <Thead />
-      {classAnnotation?.source === "new" &&
-        <AddRow classAnnotation={classAnnotation}
-          cancel={clearAnno}
-          confirm={() => apiReq("post")}
+
+      <div className={scss.tbodyWrapper}>
+        {classAnnotation?.source === "new" &&
+          <EditRow className={scss.editRow_add}
+            classAnnotation={classAnnotation}
+            cancel={clearAnno}
+            confirm={() => apiReq("post")}
+          />
+        }
+        <BodyRowGroup annotationArr={annotationArr}
+          editClassAnno={editClassAnno}
+          classAnnotation={classAnnotation}
+          clearAnno={clearAnno}
+          apiReq={apiReq}
+          copyClassAnno={copyClassAnno}
         />
-      }
-      <BodyRowGroup annotationArr={annotationArr}
-        editClassAnno={editClassAnno}
-        classAnnotation={classAnnotation}
-        clearAnno={clearAnno}
-        apiReq={apiReq}
-        copyClassAnno={copyClassAnno}
-      />
+      </div>
+
+
+
     </div>
   )
 }
@@ -85,19 +92,20 @@ const Thead = () => {
   )
 }
 
-const AddRow = (
-  { classAnnotation, cancel, confirm }:
+const EditRow = (
+  { classAnnotation, cancel, confirm, className }:
     {
       classAnnotation?: Class_annotation
       cancel: () => void
       confirm: () => void
+      className?: string
     }
 ) => {
 
 
   if (!classAnnotation) return null
   return (
-    <CellWithBar isActive={true} className={classNames(scss.row, scss.addRow)}>
+    <CellWithBar isActive={true} className={classNames(scss.row, scss.editRow, className)}>
       {addKeyArr.map(key => {
         const { className, optionArr } = config[key]
         return (
@@ -169,8 +177,8 @@ const BodyRowGroup = (
             {arr.map((ann,) => {
               const { id, doorModelName, type, description, } = ann
 
-              if (classAnnotation?.id === id && classAnnotation.source==="edit") return (
-                <AddRow classAnnotation={classAnnotation}
+              if (classAnnotation?.id === id && classAnnotation.source === "edit") return (
+                <EditRow classAnnotation={classAnnotation}
                   cancel={clearAnno}
                   confirm={() => apiReq("patch")}
                 />

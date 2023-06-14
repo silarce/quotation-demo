@@ -3,16 +3,15 @@
 .row {
   display: flex;
   align-items: flex-start;
-  // display: grid;
-  // grid-template-columns: 156px 86px 64px auto repeat(3, 20px);
   gap: 15px;
   padding: 0 22px;
 }
 
-.row_add {
-  // display: grid;
-  // grid-template-columns: 156px 86px 64px auto repeat(2, 20px);
-  gap: 15px;
+.table {
+  display: grid;
+  grid-template-rows: min-content auto;
+  height: 100%;
+  padding: 3px;
 }
 
 .thead {
@@ -25,24 +24,36 @@
     font-weight: 400;
   }
 }
-.tbody {
-  margin-top: 2px;
-  span {
-    font-size: 16px;
-    font-weight: 400;
-  }
-  .rowTitle {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    background-color: $bgc01;
-  }
-  .item {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-} // tbody
 
-.addRow {
+.tbodyWrapper {
+  position: relative;
+  height: 100%;
+  margin-top: 2px;
+  overflow: auto;
+  .editRow_add {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .tbody {
+    span {
+      font-size: 16px;
+      font-weight: 400;
+    }
+    .rowTitle {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      background-color: $bgc01;
+    }
+    .item {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  } // tbody
+} // tbodyWrapper
+
+.editRow {
   padding-top: 10px;
   padding-bottom: 10px;
   img {

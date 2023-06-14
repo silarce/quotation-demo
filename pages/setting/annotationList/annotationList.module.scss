@@ -1,47 +1,6 @@
 @use "styles/theme01" as *;
 @use "styles/layout" as *;
 
-.mainContainer {
-  padding: 4px;
-}
-
-.memoList {
-  margin-top:3px;
-  .row {
-    display: flex;
-    padding: 10px 25px;
-    > div {
-      display: flex;
-      margin-top: 0;
-      > * {
-        margin: auto;
-      }
-    }
-
-    .index {
-      margin: 1px 7px auto 0px;
-      width: 20px;
-      > span {
-        font-weight: 400;
-        font-size: 16px;
-        color: $colorMain;
-      }
-    }
-    .input {
-      flex: auto;
-      > .input03 {
-        padding: 0;
-        position: relative;
-        top: -2px;
-      }
-    }
-    .icon {
-      margin-right: 20px;
-      margin-top: 4px;
-      height: fit-content;
-      &:nth-last-of-type(2) {
-        margin-right: 0px;
-      }
-    }
-  }
+.subLayer.plus {
+  overflow: hidden;
 }

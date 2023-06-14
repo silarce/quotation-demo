@@ -1,8 +1,7 @@
 // 公司職等職稱
 // 公司職等職稱
 import { useState, } from "react"
-
-const _ = require("lodash")
+import classNames from "classnames"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -17,7 +16,7 @@ import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/Pa
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
-import style from "./annotationList.module.scss"
+import scss from "./annotationList.module.scss"
 
 // type
 import { TannotationDto } from "js/api/dtoTypes"
@@ -115,18 +114,15 @@ export default function MemoList() {
   ]
   // ------------------------------------------------------------------------
   return (
-    <SubLayer className={style.container}>
+    <SubLayer className={scss.container} bodyClassName={classNames(scss.subLayer, scss.plus)}>
       <PageHeader02
         tag="備註列表"
         panelList={panelList}
       />
-
-      <div >
         <Table_annotation
           hookPack={hookPack}
           apiReq={apiReq}
         />
-      </div>
 
     </SubLayer>
   )
