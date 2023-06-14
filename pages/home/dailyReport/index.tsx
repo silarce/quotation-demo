@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, createContext } from "react"
 import classNames from "classnames"
 import _ from "lodash"
-import moment from "moment";
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 
@@ -20,7 +19,6 @@ import TagCarousel from "components/page/home/dailyReport/TagCarousel"
 
 // mobile
 import SearchDrawer from "components/page/home/dailyReport/SearchDrawer";
-import DailyReportTablePanel_mobile from "components/page/home/dailyReport/DailyReportTablePanel_mobile"
 
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
@@ -36,10 +34,7 @@ import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDai
 
 // tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
-import {
-  // convertDate_add1911,
-  // convertDate_reduce1911
-} from "js/utils/helpers/date/convertDate";
+
 
 // icon
 import iconFourCube from "public/image/icon/fourCube.svg"
@@ -51,7 +46,6 @@ import {
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
-  apiDailyReports_my,
   apiPatchDailyReports_reviewers,
   apiIsReviewer,
 } from "js/api/api_dailyReport"
@@ -81,8 +75,6 @@ const reportedAtOptions = [
 
 // =====================================================================
 type TdailyReportContext = {
-  // doShowDrawer: () => void
-  // editReport_today: () => void
   reportInEdit: ThookEmptyReport | undefined
   isReportEdit: boolean
   switchIsEdit: () => void
@@ -90,15 +82,11 @@ type TdailyReportContext = {
   cancelEditNewDailyReport: () => void
   changeReportDate: (v: string) => void
   identity: "manager" | "reviewer" | "reporter" | undefined
-  // editRivewerPickArr: () => void
   doCheck: () => void,
   userInfo: TuserDto
 }
 
-
-
 export const DailyReportContext = createContext<TdailyReportContext>(null!)
-
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
@@ -270,26 +258,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   const editReport_today = async () => {
-    // const res = await reqApiDailyReports_my()
-    // if (res === "fail") return
-    // else reNew_report({ dailyReport: res, userInfo })
-
-    // if (res && userInfo?.employee?.id) {
-    //   const tag = {
-    //     reportId: res.id,
-    //     employeeId: userInfo.employee.id,
-    //     name: userInfo.employee.chName,
-    //     date: res.date
-    //   }
-    //   if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
-    //   setTagArr(arr => {
-    //     const newArr = _.cloneDeep(arr);
-    //     newArr.push(tag);
-    //     return newArr
-    //   })
-    // }
     reNew_report({ dailyReport: undefined, userInfo })
-
   }
 
   const cancelEditNewDailyReport = () => {
@@ -554,56 +523,19 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     finally { showRootLoading(false) }
   }
 
-  /**reviewer 已讀/未讀 isReviewedByUser */
-  const panelList_reviewer_inEdit_user: TpanelList = [
-    {
-      custom: <CheckButton
-        // checkLabel="已讀"
-        checkLabel="已讀"
-        uncheckLable="未讀"
-        value={!!reportInEdit?.isReviewedByUser}
-        onClick={doCheck}
-      />
-    }
-  ]
 
-  /**reporter 編輯 */
-  const panelList_reporter_inEdit01: TpanelList = [
-    // {
-    //   custom: <Badge
-    //     className={scss.antdBadge01}
-    //     color="auto"
-    //     text="未讀" />
-    // },
-    {
-      type: "myButton",
-      label: "編輯",
-      onClick: switchIsEdit
-    }
-  ]
+  const {
+    panelList_reviewer_inEdit_user,
+    panelList_reporter_inEdit01,
+    panelList_reporter_inEdit02,
+    panelList_reporter_reviewed,
+  } = panelListCreator({
+    reportInEdit,
+    doCheck,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+  })
 
-  /**reporter 上傳 取消 */
-  const panelList_reporter_inEdit02: TpanelList = [
-    {
-      type: "redButton",
-      label: "上傳",
-      onClick: () => setShowReviewerForReportModal(true),
-    },
-    {
-      type: "myButton",
-      label: "取消",
-      onClick: switchIsEdit,
-    },
-  ]
-
-  const panelList_reporter_reviewed: TpanelList = [
-    {
-      custom: <Badge
-        className={scss.antdBadge02}
-        color="auto"
-        text="已檢視" />
-    },
-  ]
 
   const panelList = (() => {
     if (reportInEdit?.isUserIsViewer) {
@@ -729,14 +661,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           />
         }
 
-        {/* {reportInEdit &&
-            <ReportTable
-              classDailyReportItemArr={reportInEdit.items}
-              addDailyReportItem={addDailyReportItem}
-              removeDailyReportItem={removeDailyReportItem}
-              isEdit={isReportEdit}
-            />
-        } */}
         <DailyReportContext.Provider value={dailyReportContextValue}>
           <ReportTable
             classDailyReportItemArr={reportInEdit?.items}
@@ -746,8 +670,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             reportDateArr={reportDateArr}
           />
         </DailyReportContext.Provider>
-
-
 
         {/* mobile */}
         <SearchDrawer visible={showSearchDrawer}
@@ -794,39 +716,6 @@ const reqApiDailyReports_id = async (reportId: string) => {
   }
   catch {
     myAlert.err({ title: "取得日報表失敗" })
-  }
-  finally { showRootLoading(false) }
-}
-
-const reqApiDailyReports_my = async (
-  param?: {
-    /**YYYY-MM-DD */
-    date?: string
-  }
-) => {
-
-  const date = (() => {
-    const today = moment().format("YYYY-MM-DD");
-    if (!param?.date) return today
-    else return moment(param.date).format("YYYY-MM-DD");
-  })()
-
-  try {
-    showRootLoading(true)
-    const res = await apiDailyReports_my(date)
-    return res
-  }
-  catch (error) {
-    const err = error as AxiosError<{
-      error: string
-      message: string
-      statusCode: number
-    }>
-    const { message, statusCode } = err.response?.data ?? {}
-    // 
-    if (statusCode === 404) return
-    myAlert.err({ title: "取得指定日期日報表失敗" })
-    return "fail"
   }
   finally { showRootLoading(false) }
 }
@@ -884,11 +773,89 @@ const formatRiewerPickArr = (
   return result
 }
 
-// ============================================================================
-// ============================================================================
-// ============================================================================
-// ============================================================================
-// ============================================================================
-// ============================================================================
-// ============================================================================
+// ==========================================================================
+
+
+
+const panelListCreator = (
+  { reportInEdit,
+    doCheck,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+  }:
+    {
+      reportInEdit: ThookEmptyReport | undefined
+      doCheck: () => void
+      switchIsEdit: () => void
+      setShowReviewerForReportModal: (v: boolean) => void
+
+    }
+) => {
+
+  /**reviewer 已讀/未讀 isReviewedByUser */
+  const panelList_reviewer_inEdit_user: TpanelList = [
+    {
+      custom: <CheckButton
+        // checkLabel="已讀"
+        checkLabel="已讀"
+        uncheckLable="未讀"
+        value={!!reportInEdit?.isReviewedByUser}
+        onClick={doCheck}
+      />
+    }
+  ]
+
+  /**reporter 編輯 */
+  const panelList_reporter_inEdit01: TpanelList = [
+    {
+      type: "myButton",
+      label: "編輯",
+      onClick: switchIsEdit
+    }
+  ]
+
+  /**reporter 上傳 取消 */
+  const panelList_reporter_inEdit02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => setShowReviewerForReportModal(true),
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: switchIsEdit,
+    },
+  ]
+
+  const panelList_reporter_reviewed: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已檢視" />
+    },
+  ]
+
+  return {
+    panelList_reviewer_inEdit_user,
+    panelList_reporter_inEdit01,
+    panelList_reporter_inEdit02,
+    panelList_reporter_reviewed,
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
