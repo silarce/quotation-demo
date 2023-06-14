@@ -1,0 +1,57 @@
+@use "styles/theme01" as *;
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  // display: grid;
+  // grid-template-columns: 156px 86px 64px auto repeat(3, 20px);
+  gap: 15px;
+  padding: 0 22px;
+}
+
+.row_add {
+  // display: grid;
+  // grid-template-columns: 156px 86px 64px auto repeat(2, 20px);
+  gap: 15px;
+}
+
+.thead {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: $bgc01;
+  > div > span {
+    color: #979797;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+.tbody {
+  margin-top: 2px;
+  span {
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .rowTitle {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: $bgc01;
+  }
+  .item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+} // tbody
+
+.addRow {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  img {
+    cursor: pointer;
+  }
+}
+
+.inputSel_textarea {
+  textarea {
+    font-size: 16px;
+  }
+}
