@@ -17,7 +17,7 @@ import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/Pa
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
-import style from "./memoList.module.scss"
+import style from "./annotationList.module.scss"
 
 // type
 import { TannotationDto } from "js/api/dtoTypes"

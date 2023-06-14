@@ -21,8 +21,8 @@ import iconCross from "public/image/icon/cross_thin.svg"
 // type
 import { TannotationDto, TcreateAnnotationDto } from "js/api/dtoTypes"
 import { Toption } from "js/utils/options/options"
-import { Class_annotation } from "pages/setting/memoList"
-import { TuseClassAnnotation } from "pages/setting/memoList"
+import { Class_annotation } from "pages/setting/annotationList"
+import { TuseClassAnnotation } from "pages/setting/annotationList"
 
 // =======================================================================
 const optionArr_category = optionsCreator_category()

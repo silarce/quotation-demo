@@ -147,7 +147,7 @@ const sidePathList: TsidePathList = {
         },
         {
           label: "備註列表",
-          path: path01 + "/memoList",
+          path: path01 + "/annotationList",
           erpFeature: devPass,
         },
         {
