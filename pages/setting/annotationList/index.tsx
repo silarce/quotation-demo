@@ -1,6 +1,6 @@
 // 公司職等職稱
 // 公司職等職稱
-import { useState, } from "react"
+import { useState, useEffect } from "react"
 import classNames from "classnames"
 
 // layer
@@ -17,6 +17,10 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
 import scss from "./annotationList.module.scss"
+
+// api
+import { useGetAnnotation } from "js/api/api_workSheet"
+
 
 // type
 import { TannotationDto } from "js/api/dtoTypes"
@@ -43,15 +47,12 @@ export default function MemoList() {
   // ------------------------------------------------------------------------
   // const { classAnnotation, newClassAnno, clearAnno, } = useClassAnnotation()
 
-
-
   const [filter, setFilter] = useState<Tfilter>({
     category: undefined,
     doorModelName: undefined,
     type: undefined,
     description: undefined,
   })
-
 
   const params: Tparams = {
     filter: {
@@ -61,6 +62,22 @@ export default function MemoList() {
       description: { "$eq": filter.description },
     }
   }
+
+  const {
+    annotationArr,
+    annotationMeta,
+    update,
+    update_infinite,
+  } = useGetAnnotation()
+
+
+  // useEffect(() => {
+  //   update_infinite()
+  // }, [])
+
+
+
+
 
 
   const hookPack = useClassAnnotation()
@@ -119,10 +136,10 @@ export default function MemoList() {
         tag="備註列表"
         panelList={panelList}
       />
-        <Table_annotation
-          hookPack={hookPack}
-          apiReq={apiReq}
-        />
+      <Table_annotation
+        hookPack={hookPack}
+        apiReq={apiReq}
+      />
 
     </SubLayer>
   )
