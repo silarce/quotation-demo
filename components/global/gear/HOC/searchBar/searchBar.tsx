@@ -29,6 +29,8 @@ interface TsearchTargetSel {
   className?: string
   width?: string
   defaultValue?: string | Toption
+  value?: string | Toption
+  onChange?: (v: string) => void
 }
 
 interface TsearchTargetInput {
@@ -39,6 +41,8 @@ interface TsearchTargetInput {
   width?: string
   options?: undefined
   defaultValue?: string
+  value?: string
+  onChange?: (v: string) => void
 }
 
 export type TdoSearch
@@ -47,15 +51,18 @@ export type TdoSearch
 interface TsearchGroup {
   searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
   doSearch: TdoSearch
+  controlled?: boolean
 }
 
 
-export default function SearchBar({ searchTargetList, doSearch, className = "" }:
-  {
-    searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
-    doSearch: TdoSearch
-    className?: string
-  }) {
+export default function SearchBar(
+  { searchTargetList, doSearch, className = "", controlled }:
+    {
+      searchTargetList: (TsearchTargetSel | TsearchTargetInput)[]
+      doSearch: TdoSearch
+      controlled?: boolean
+      className?: string
+    }) {
 
   const [valueArr, setValueArr]
     = useState<(Toption | null | string)[]>(
@@ -67,21 +74,28 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
         return ""
       })
     )
-
   return (
     <div className={`${style.container} ${className}`}>
 
       {searchTargetList.map((item, index) => {
-        const { options, placeholder, width, defaultValue }
-          = item
+        const {
+          options, placeholder, width, defaultValue,
+          value, onChange
+        } = item
         const className = item.className || ""
         const theStyle = { width }
-        if (valueArr[index] === undefined) {
+
+        // console.log(value)
+
+
+        if (valueArr[index] === undefined && !controlled) {
           setValueArr(arr => {
             arr[index] = options?.[0] ?? null
             return [...arr]
           })
         }
+
+
         if (options) return (
           <div className={style.selectBox} key={index}
             style={theStyle}>
@@ -90,12 +104,15 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
               showBaseline="invisible"
               placeholder={placeholder}
               selectProps={{
-                value: valueArr[index] ?? options[0],
-                // value: undefined,                
+                value: controlled ? value : valueArr[index] ?? options[0],
                 options,
                 arrowType: "black",
                 onChange: (option: Toption | null) => {
                   if (!option) return
+                  if (controlled) {
+                    onChange?.(option.value)
+                    return
+                  }
                   setValueArr(arr => {
                     arr[index] = option
                     return [...arr]
@@ -118,9 +135,15 @@ export default function SearchBar({ searchTargetList, doSearch, className = "" }
               <input type="text" autoComplete="off"
                 style={theStyle}
                 placeholder={placeholder}
-                value={typeof valueArr[index] === "string" ? valueArr[index] as string : ""}
+                value={
+                  controlled ? value : typeof valueArr[index] === "string" ? valueArr[index] as string : ""
+                }
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const value = e.target.value
+                  if (controlled) {
+                    onChange?.(value)
+                    return
+                  }
                   setValueArr(arr => {
                     arr[index] = value
                     return [...arr]
