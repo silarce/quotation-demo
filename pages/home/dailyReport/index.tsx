@@ -423,10 +423,23 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
+
   const searchTargetList = (() => {
+    const defaultIsUserReviewed = (() => {
+      if (searchObj?.isUserReviewed === undefined) return "全部"
+      if (searchObj?.isUserReviewed === false) return "未檢視"
+      if (searchObj?.isUserReviewed === true) return "已檢視"
+    })()
+
     const arr = [
-      { options: reportedAtOptions, width: "110px" },
-      { placeholder: "搜尋日期", width: "80px" }
+      {
+        options: reportedAtOptions, width: "110px",
+        defaultValue: defaultIsUserReviewed
+      },
+      {
+        placeholder: "搜尋日期", width: "80px",
+        defaultValue: searchObj?.date
+      }
     ]
     return arr
   })()
