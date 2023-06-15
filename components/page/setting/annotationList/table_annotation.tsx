@@ -32,19 +32,18 @@ const optionArr_doorForm = optionsCreator_doorForm()
 // =======================================================================
 export default function Table_annotation(
   {
+    annotationArr,
     hookPack,
     apiReq,
   }:
     {
+      annotationArr: TannotationDto[] | undefined
       hookPack: ReturnType<TuseClassAnnotation>
       apiReq: (method: "post" | "patch" | "delete") => void
     }
 ) {
 
   const { classAnnotation, clearAnno, editClassAnno, copyClassAnno } = hookPack
-
-
-  const annotationArr = fakeAnnotation
 
 
   return (
@@ -285,35 +284,35 @@ const typeLookup = {
 // =============================================================================
 
 
-const fakeAnnotation: TannotationDto[] = [
-  {
-    id: "frsdgtsdh-jryufghj-dfg",
-    createdAt: "",
-    updateAt: "",
-    category: "防火防煙捲門系列",
-    doorModelName: "SJ-302",
-    type: "normal",
-    description: "AAAAAAAAAAA",
-  },
-  {
-    id: "gsdfg-fg-dfg",
-    createdAt: "",
-    updateAt: "",
-    category: "防火防煙捲門系列",
-    doorModelName: "SJ-302",
-    type: "normal",
-    description: "BBBBBBB",
-  },
-  {
-    id: "fs-fsddss-dfsdfg",
-    createdAt: "",
-    updateAt: "",
-    category: "防水防洪門系列",
-    doorModelName: "SJ-302",
-    type: "anti-typhoon",
-    description: "CCCCCCCCCCC",
-  },
-]
+// const fakeAnnotation: TannotationDto[] = [
+//   {
+//     id: "frsdgtsdh-jryufghj-dfg",
+//     createdAt: "",
+//     updateAt: "",
+//     category: "防火防煙捲門系列",
+//     doorModelName: "SJ-302",
+//     type: "normal",
+//     description: "AAAAAAAAAAA",
+//   },
+//   {
+//     id: "gsdfg-fg-dfg",
+//     createdAt: "",
+//     updateAt: "",
+//     category: "防火防煙捲門系列",
+//     doorModelName: "SJ-302",
+//     type: "normal",
+//     description: "BBBBBBB",
+//   },
+//   {
+//     id: "fs-fsddss-dfsdfg",
+//     createdAt: "",
+//     updateAt: "",
+//     category: "防水防洪門系列",
+//     doorModelName: "SJ-302",
+//     type: "anti-typhoon",
+//     description: "CCCCCCCCCCC",
+//   },
+// ]
 
 
 // ==========================================================================
