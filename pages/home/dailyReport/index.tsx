@@ -471,31 +471,42 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-
+  const onChange_isUserReviewed =
+    (v: string) => {
+      setSearchObj(obj => ({
+        ...obj,
+        isUserReviewed: v as (typeof searchObj["isUserReviewed"])
+      }))
+    }
+  const onChange_date =
+    (v: string) => {
+      setSearchObj(obj => ({
+        ...obj,
+        date: v
+      }))
+    }
 
   const searchTargetList = (() => {
     const arr = [
       {
         options: reportedAtOptions, width: "110px",
         value: searchObj?.isUserReviewed,
-        onChange: (v: string) => { setSearchObj(obj => ({ ...obj, isUserReviewed: v as (typeof searchObj["isUserReviewed"]) })) }
+        onChange: onChange_isUserReviewed
       },
       {
         placeholder: "搜尋日期", width: "80px",
         value: searchObj?.date,
-        onChange: (v: string) => { setSearchObj(obj => ({ ...obj, date: v })) }
+        onChange: onChange_date
       }
     ]
     return arr
   })()
 
-  const doSearch: TdoSearch = (arr) => {
-
+  const doSearch: TdoSearch = () => {
     if (searchObj.date) {
       const date = yearConversion_chToStandard(searchObj.date)
       if (!date) return myAlert.warning({ title: "搜尋時間格式錯誤", content: "例:101-01-01" })
     }
-
     router.push({
       query: {
         isUserReviewed: searchObj.isUserReviewed,
@@ -729,6 +740,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         <SearchDrawer visible={showSearchDrawer}
           onSearch={doSearch}
           onCancel={closeShowDrawer}
+          searchObj={searchObj}
+          onChange_isUserReviewed={onChange_isUserReviewed}
+          onChange_date={onChange_date}
         />
         {/*  */}
       </SubLayer>
