@@ -4,6 +4,8 @@
   :global(.rbc-calendar) {
     display: grid;
     grid-template-rows: min-content auto;
+    position: relative;
+    z-index: 1;
     :global(.rbc-month-view) {
       height: 100%;
       overflow: auto;
