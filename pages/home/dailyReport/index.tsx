@@ -182,6 +182,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       isReviewCompleted = undefined
     }
 
+    const date = yearConversion_chToStandard(searchQuery?.date) || undefined
+
     return {
       filter: {
         "employee.id": filterIsMine,
@@ -190,7 +192,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           "reviewStatus.reviewerEmployee.id": { $eq: userId },
         },
         "isReviewCompleted": { $eq: isReviewCompleted },
-        date: { $eq: searchQuery?.date },
+        date: { $eq: date },
       },
     }
   })()
