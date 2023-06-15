@@ -27,6 +27,7 @@ import { month_chToNumber } from "js/tools/date/conversionTable";
 import scss from "./theCalendar.module.scss"
 
 // type
+import { TuserDto } from "js/api/dtoTypes"
 import { TdailyReportDto } from "js/api/api_dailyReport"
 import { Ttag } from "pages/home/dailyReport"
 
@@ -35,6 +36,7 @@ const localizer = momentLocalizer(moment)
 // ===========================================================================
 
 type Tevent = {
+  isMine: boolean
   reportId: string
   employeeId: string
   name: string
@@ -46,12 +48,15 @@ type Tevent = {
   end: string
   isReviewCompleted: boolean
   reportedAt: Date
+  isReviewedByUser: boolean
 }
 
 // ===========================================================================
 
 export default function TheCalendar(
   {
+    isMine,
+    userInfo,
     addTag,
     // editReportEmpArr,
     // editDailyReport,
@@ -59,6 +64,8 @@ export default function TheCalendar(
     updateDailyReports
   }:
     {
+      isMine: boolean
+      userInfo: TuserDto
       addTag: (employee: Ttag) => void
       // editReportEmpArr?: () => void
       // editDailyReport?: () => void
@@ -69,13 +76,23 @@ export default function TheCalendar(
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
-      const { date, id, isReviewCompleted, employee, reportedAt } = report
+      const { date, id, isReviewCompleted, employee, reportedAt, reviewStatus } = report
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
       const departmentCode = jobs?.[0]?.department.code ?? ""
 
+      const userId = userInfo?.employee?.id
+      const isReviewedByUser =
+        reviewStatus.some((status) => {
+          if (status.reviewedAt) {
+            return status.reviewerEmployeeId === userId
+          }
+        })
+
+
       return {
+        isMine,
         reportId: id,
         employeeId,
         name,
@@ -85,6 +102,7 @@ export default function TheCalendar(
         end: report.date,
         isReviewCompleted,
         reportedAt,
+        isReviewedByUser
       }
     })
   }, [dailyReportArr]) // dailyReportArr
@@ -189,13 +207,18 @@ const EventWrapper = (
 ) => {
   const { event } = e
   const {
+    isMine,
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    isReviewCompleted, reportedAt,
+    isReviewCompleted, reportedAt, isReviewedByUser,
   } = event
 
 
-  const checkIcon = isReviewCompleted ? icongreenDot : iconCircle
+  // const checkIcon = isReviewCompleted ? icongreenDot : iconCircle
+  const checkIcon = (() => {
+    if (isMine) return isReviewCompleted ? icongreenDot : iconCircle
+    return isReviewedByUser ? icongreenDot : iconCircle
+  })()
 
   const onClick = () => {
     addTag({ reportId, employeeId, name, date })

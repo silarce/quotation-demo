@@ -668,6 +668,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         }
         {isCalendar &&
           <TheCalendar
+            isMine={isMine}
+            userInfo={userInfo}
             addTag={addTag}
             dailyReportArr={sortedDailyReport}
             updateDailyReports={updateDailyReports}
