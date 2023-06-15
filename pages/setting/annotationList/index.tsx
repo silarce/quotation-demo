@@ -19,7 +19,10 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import scss from "./annotationList.module.scss"
 
 // api
-import { useGetAnnotation } from "js/api/api_workSheet"
+import {
+  useGetAnnotation,
+  apiPostAnnotation, apiPatchAnnotation, apiDeleteAnnotation,
+} from "js/api/api_workSheet"
 
 
 // type
@@ -65,26 +68,43 @@ export default function MemoList() {
 
   const {
     annotationArr,
-    annotationMeta,
-    update,
-    update_infinite,
-  } = useGetAnnotation()
+    // annotationMeta,
+    update_anno,
+  } = useGetAnnotation(params)
 
-
-  // useEffect(() => {
-  //   update_infinite()
-  // }, [])
-
-
-
-
-
+  useEffect(() => {
+    update_anno()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const hookPack = useClassAnnotation()
-  const { newClassAnno, } = hookPack
+  const { classAnnotation, newClassAnno, } = hookPack
 
-  const apiReq = (method: "post" | "patch" | "delete") => {
-    alert("test")
+  const apiReq = async (method: "post" | "patch" | "delete") => {
+    if (!classAnnotation) return
+
+    let { id, apiBody, } = classAnnotation
+
+    const { category, doorModelName, type, description, } = apiBody
+
+    if (!category) return myAlert.warning({ title: "請選擇類型" })
+    if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
+    if (!type) return myAlert.warning({ title: "請選擇形式" })
+
+
+    const body = { category, doorModelName, type, description, }
+
+    try {
+      const apiReq = (() => {
+        if (method === "post") return () => apiPostAnnotation({ body })
+        if (method === "patch") return () => apiPatchAnnotation({ body, id: id! })
+        if (method === "delete") return () => apiDeleteAnnotation({ id: id! })
+      })()
+      await apiReq?.()
+    }
+    catch (err) {
+      myAlert.err({ title: "上傳失敗" })
+    }
   }
 
   // ------------------------------------------------------------------------
@@ -137,6 +157,7 @@ export default function MemoList() {
         panelList={panelList}
       />
       <Table_annotation
+        annotationArr={annotationArr}
         hookPack={hookPack}
         apiReq={apiReq}
       />
@@ -196,6 +217,17 @@ export class Class_annotation {
 
   get description() { return this._annotation.description }
   set description(v) { this._annotation.description = v; this._reRender() }
+
+  get apiBody() {
+    return {
+      category: this.category ?? "",
+      doorModelName: this.doorModelName ?? "",
+      type: this.type as "normal" | "anti-typhoon" | "",
+      description: this.description ?? "",
+    }
+  }
+
+
 }
 
 const useClassAnnotation = () => {
