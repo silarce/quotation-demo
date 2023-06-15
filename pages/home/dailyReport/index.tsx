@@ -260,7 +260,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   useEffect(() => {
     toUpdateDailyReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery.isUserReviewed, searchQuery.date])
+  }, [searchQuery.isUserReviewed, searchQuery.date, isMine])
 
   useEffect(() => {
     if (!dailyReport) return
