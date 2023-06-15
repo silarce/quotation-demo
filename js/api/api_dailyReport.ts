@@ -42,7 +42,7 @@ const apiDailyReports = (filter?: { [key: string]: any }) => {
     populate: [
       "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
     filter,
-    pageSize: 100,
+    pageSize: 200,
     sort: "date",
     order: "DESC"
   }
