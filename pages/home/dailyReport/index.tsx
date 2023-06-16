@@ -44,6 +44,7 @@ import iconMenu from "public/image/icon/menu.svg"
 import {
   TdailyReportDto,
   useApiDailyReports, useApiDailyReports_reviewers,
+  useApiDailyReports_v2,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -199,21 +200,38 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   })()
 
 
-  const { dailyReport, updateDailyReports } = useApiDailyReports(params)
-  const { sortedDailyReport } = useMemo(() => {
-    // 在params裡已經排序了
-    // const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
-    const sortedDailyReport = dailyReport ?? []
-    /** */
-    // const reportDateArr = (() => {
-    //   if (!isMine) return []
-    //   // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
-    //   const arr = dailyReport?.map((report) => report.date) ?? []
-    //   return arr
-    // })()
-    return { sortedDailyReport,  }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dailyReport])
+  // const { dailyReport, updateDailyReports } = useApiDailyReports(params)
+
+  const {
+    data: dailyReportArr,
+    viewRef, reset,
+    isLoading: isLoading_v2,
+  } = useApiDailyReports_v2(params)
+
+  // 接著做月曆的資料
+  // 接著做月曆的資料
+  // 接著做月曆的資料
+  // 接著做月曆的資料
+  // 接著做月曆的資料
+  // 接著做月曆的資料
+
+
+
+
+  // const { sortedDailyReport } = useMemo(() => {
+  //   // 在params裡已經排序了
+  //   // const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+  //   // const sortedDailyReport = dailyReport ?? []
+  //   /** */
+  //   // const reportDateArr = (() => {
+  //   //   if (!isMine) return []
+  //   //   // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
+  //   //   const arr = dailyReport?.map((report) => report.date) ?? []
+  //   //   return arr
+  //   // })()
+  //   return { sortedDailyReport, }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dailyReport])
 
 
 
@@ -222,7 +240,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     try {
       showRootLoading(false)
       setIsLoading(true)
-      await updateDailyReports()
+      await reset()
     }
     catch { myAlert.warning({ title: "取得總日報表失敗" }) }
     finally { setIsLoading(false) }
@@ -252,7 +270,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     cancelEditNewDailyReport();
     try {
       setIsLoading(true)
-      await updateDailyReports()
+      await reset()
     }
     catch {
       if (searchQuery?.date) {
@@ -271,7 +289,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }, [searchQuery.isUserReviewed, searchQuery.date, isMine])
 
   useEffect(() => {
-    if (!dailyReport) return
+    if (!dailyReportArr) return
     router.push({
       query: {
         isUserReviewed: "全部",
@@ -605,7 +623,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
-    sortedDailyReport,
+    sortedDailyReport: dailyReportArr ?? [],
   })
 
 
@@ -695,7 +713,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}
-        containerChildren={<LoadingCover01 isLoading={isLoading} />}
+        containerChildren={<LoadingCover01 isLoading={isLoading || isLoading_v2} />}
       >
         {/*  */}
         <PageHeader02
@@ -721,8 +739,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         {/*  */}
         {!isCalendar &&
           <ReporterList
-            dailyReportArr={sortedDailyReport ?? []}
+            dailyReportArr={dailyReportArr ?? []}
             addTag={addTag}
+            viewRef={viewRef}
           />
         }
         {isCalendar &&
@@ -730,8 +749,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             isMine={isMine}
             userInfo={userInfo}
             addTag={addTag}
-            dailyReportArr={sortedDailyReport}
-            updateDailyReports={updateDailyReports}
+            dailyReportArr={dailyReportArr ?? []}
+            updateDailyReports={reset}
           />
         }
 
@@ -770,7 +789,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         onConfirm={reqApiPatchDailyReports_my}
         onCancel={() => setShowReviewerForReportModal(false)}
         userId={userInfo.employee?.id}
-        lastStatus={sortedDailyReport[0]?.reviewStatus || []}
+        lastStatus={dailyReportArr?.[0]?.reviewStatus || []}
       />
     </>
   )

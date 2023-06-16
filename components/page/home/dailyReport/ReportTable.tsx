@@ -118,7 +118,7 @@ export default function ReportTable(
       }
       catch { }
       setIsLoading(false)
-    }, 1000);
+    }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monthStart, monthEnd])
 
