@@ -24,7 +24,7 @@ import scss from "./reportTable.module.scss"
 // option
 import {
   Toption,
-  optionsCreator_dailyReportPeriod, optionsCreator_mealsCost,
+  optionsCreator_dailyReportPeriod,
 } from "js/utils/options/options"
 
 // class
@@ -44,8 +44,6 @@ import { DailyReportContext } from "pages/home/dailyReport"
 
 // ==================================================
 const optionArr_period = optionsCreator_dailyReportPeriod()
-const optionArr_mealsCost = optionsCreator_mealsCost()
-
 // ==================================================
 export default function ReportTable(
   { classDailyReportItemArr,
@@ -253,10 +251,6 @@ export default function ReportTable(
                       </div>
                     )
                   }
-
-
-
-
 
                   if (eleType === "timePicker") {
 

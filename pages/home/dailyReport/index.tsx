@@ -3,6 +3,7 @@ import classNames from "classnames"
 import _ from "lodash"
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
+import moment from "moment";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -41,8 +42,8 @@ import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  useApiDailyReports,
-  useApiDailyReports_reviewers,
+  TdailyReportDto,
+  useApiDailyReports, useApiDailyReports_reviewers,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -200,7 +201,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   const { dailyReport, updateDailyReports } = useApiDailyReports(params)
   const { sortedDailyReport, reportDateArr } = useMemo(() => {
-    const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+    // 在params裡已經排序了
+    // const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+    const sortedDailyReport = dailyReport ?? []
+    /** */
     const reportDateArr = (() => {
       if (!isMine) return []
       // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
@@ -210,6 +214,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     return { sortedDailyReport, reportDateArr }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReport])
+
+
 
   /**取得指定月份所有日報表，額外做了loading的處理 */
   const updateDailyReports_withLoading = async () => {
@@ -599,6 +605,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
+    sortedDailyReport,
   })
 
 
@@ -852,13 +859,14 @@ const panelListCreator = (
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
+    sortedDailyReport
   }:
     {
       reportInEdit: ThookEmptyReport | undefined
       doCheck: () => void
       switchIsEdit: () => void
       setShowReviewerForReportModal: (v: boolean) => void
-
+      sortedDailyReport: TdailyReportDto[]
     }
 ) => {
 
@@ -889,7 +897,14 @@ const panelListCreator = (
     {
       type: "redButton",
       label: "上傳",
-      onClick: () => setShowReviewerForReportModal(true),
+      onClick: () => {
+        const lastDate = moment(sortedDailyReport[0].date)
+        const date = moment(reportInEdit?.date)
+        const isSameDate = lastDate.isSame(date, "day")
+        if (isSameDate)
+          return myAlert.warning({ title: "今日的日報表已存在", content: "請至列表點選今日的日報表或選擇其他日期" })
+        setShowReviewerForReportModal(true)
+      },
     },
     {
       type: "myButton",
