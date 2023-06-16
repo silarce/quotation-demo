@@ -57,7 +57,7 @@ const emptyReportItem: TemptyReportItem = {
   arrivalTime: emptyTimeCre(),
   departureWorksiteTime: emptyTimeCre(),
   licensePlate: "",
-  stayLength: null,
+  stayLength: 0,
   workers: [],
   workOrderNumber: ""
 }
@@ -73,7 +73,7 @@ class Class_reportItem {
   ) {
     this._reRender = reRender
     this._item = reportItem
-    this._stayLength = `${this._item.stayLength}`
+    this._stayLength = `${this._item.stayLength || 0}`
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
     this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
     // this._meals = ([]) as TdailyReportItemDto["meals"]

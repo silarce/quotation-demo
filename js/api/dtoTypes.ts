@@ -596,6 +596,37 @@ export type TupdateLegacyContractDto
   }>;
 
 // ==========================================================================
+// work-sheet
+
+export type TannotationDto = {
+  id: string
+  createdAt: string
+  updateAt: string
+  /**類別 */
+  category: string
+  /**門型 */
+  doorModelName: string
+  /**型式 */
+  type: "normal" | "anti-typhoon"
+  /**內容 */
+  description: string
+}
+
+export type TcreateAnnotationDto = {
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
+
+
+
+
+
+
+
+
+
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================

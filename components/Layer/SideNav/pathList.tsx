@@ -147,12 +147,12 @@ const sidePathList: TsidePathList = {
         },
         {
           label: "備註列表",
-          path: path01 + "/memoList",
+          path: path01 + "/annotationList",
           erpFeature: devPass,
         },
         {
           label: "報價範圍列表",
-          path: path01 + "/quoteRangeList",
+          path: path01 + "/quoteScopeList",
           erpFeature: devPass,
         },
       ]

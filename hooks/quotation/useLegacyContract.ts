@@ -5,8 +5,8 @@ import moment from "moment"
 
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import { checkDateFormat } from "js/tools/date/checkDate"
-import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard"
-import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
+// import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard"
+// import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
 
 import {
   optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection
@@ -36,13 +36,15 @@ class Class_basicInfo {
     this._legacyContract = legacyContract
     this._legacyContract.quoteDate = (() => {
       if (!this._legacyContract.quoteDate) return ""
-      const quoteDate = moment(this._legacyContract.quoteDate).format("YYYY-MM-DD")
-      return yearConversion_standardToCh(quoteDate ?? "", true)
+      // const quoteDate = moment(this._legacyContract.quoteDate).format("YYYY-MM-DD")
+      // return yearConversion_standardToCh(quoteDate ?? "", true)
+      return this._legacyContract.quoteDate
     })()
     this._legacyContract.deliveryDate = (() => {
       if (!this._legacyContract.deliveryDate) return ""
-      const deliveryDate = moment(this._legacyContract.deliveryDate).format("YYYY-MM-DD")
-      return yearConversion_standardToCh(deliveryDate ?? "", true)
+      // const deliveryDate = moment(this._legacyContract.deliveryDate).format("YYYY-MM-DD")
+      // return yearConversion_standardToCh(deliveryDate ?? "", true)
+      return this._legacyContract.deliveryDate
     })()
   }
 
@@ -56,7 +58,10 @@ class Class_basicInfo {
   set quoteValidity(v) { this._legacyContract.quoteValidity = v; this._reRender() }
 
   get quoteDate() { return this._legacyContract.quoteDate }
-  set quoteDate(v) { this._legacyContract.quoteDate = v; this._reRender() }
+  set quoteDate(v) {
+    this._legacyContract.quoteDate = v;
+    this._reRender()
+  }
 
   get projectName() { return this._legacyContract.projectName }
   set projectName(v) { this._legacyContract.projectName = v; this._reRender() }
@@ -789,13 +794,19 @@ class Class_legacyContract {
     })()
     if (!customerId) { myAlert.warning({ title: "沒有選擇客戶" }); return false }
 
+    
     const { quoteDate, deliveryDate, } = this._legacyContract
-
-    if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
-      myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
+    // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
+    //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
+    // }
+    // if (!checkDateFormat(deliveryDate as string ?? "", "tw")) {
+    //   myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
+    // }
+    if (!quoteDate) {
+      myAlert.warning({ title: "請選擇報價日期" }); return false
     }
-    if (!checkDateFormat(deliveryDate as string ?? "", "tw")) {
-      myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
+    if (!deliveryDate) {
+      myAlert.warning({ title: "請選擇交貨日期" }); return false
     }
 
 
@@ -810,10 +821,12 @@ class Class_legacyContract {
     legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition)
 
     const quoteDate_Date
-      = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
+      = new Date(legacyContractCopy.quoteDate as string)
+    // = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
 
     const deliveryDate_Date
-      = new Date(yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string)
+      = new Date(legacyContractCopy.deliveryDate as string)
+    // = new Date(yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string)
 
     legacyContractCopy.discountRate
       = Decimal.div(legacyContractCopy.discountRate, 100).toString()

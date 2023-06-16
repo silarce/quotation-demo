@@ -241,7 +241,9 @@ export default function QuotationProfile(
           disabled={disabled}
           datePickerProps={{
             value: quoteDate as string ?? "",
-            onChange: (v) => { classBasicInfo.quoteDate = v }
+            onChange02(moment, dateString) {
+              classBasicInfo.quoteDate = moment?.toISOString()
+            },
           }}
         />
       </div>

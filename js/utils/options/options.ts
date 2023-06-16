@@ -323,3 +323,5 @@ export const optionsCreator_mealsCost =
 
 
 export type { Toption, ToptionPlus }
+
+export { addEmpty }

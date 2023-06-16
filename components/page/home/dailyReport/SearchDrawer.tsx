@@ -28,20 +28,32 @@ const reportedAtOptions = [
 
 // ============================================================================
 export default function SearchDrawer(
-  { visible, onSearch, onCancel }:
+  {
+    visible, onSearch, onCancel,
+    searchObj,
+    onChange_isUserReviewed,
+    onChange_date,
+  }:
     {
       visible: boolean
       onSearch: TdoSearch
       onCancel: () => void
+      searchObj: {
+        isUserReviewed: "全部" | "未檢視" | "已檢視"
+        date: string
+      }
+      onChange_isUserReviewed: (v: string) => void
+      onChange_date: (v: string) => void
     }
 ) {
 
-  const [isUserReviewed, setIsUserReviewed] = useState<Toption>(reportedAtOptions[0])
+  // const [isUserReviewed, setIsUserReviewed] = useState<Toption>(reportedAtOptions[0])
 
-  const [date, setDate] = useState("")
+  // const [date, setDate] = useState("")
 
   const doSearch = () => {
-    onSearch([isUserReviewed, date])
+    onCancel()
+    onSearch([])
   }
 
   return (
@@ -57,9 +69,9 @@ export default function SearchDrawer(
         className={scss.sel}
         width={"104px"}
         selectProps={{
-          value: isUserReviewed,
+          value: searchObj.isUserReviewed,
           options: reportedAtOptions,
-          onChange: (v) => { setIsUserReviewed(v!) },
+          onChange: (v) => { onChange_isUserReviewed(v!.value) },
           arrowType: "black"
         }}
       />
@@ -68,9 +80,9 @@ export default function SearchDrawer(
         <label className={scss.label}>
           <input type="text" autoComplete="off"
             placeholder={"請輸入日期"}
-            value={date}
+            value={searchObj.date}
             onChange={(e) => {
-              setDate(e.target.value)
+              onChange_date(e.target.value)
             }}
           />
         </label>
