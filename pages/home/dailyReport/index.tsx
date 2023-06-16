@@ -200,18 +200,18 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
   const { dailyReport, updateDailyReports } = useApiDailyReports(params)
-  const { sortedDailyReport, reportDateArr } = useMemo(() => {
+  const { sortedDailyReport } = useMemo(() => {
     // 在params裡已經排序了
     // const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
     const sortedDailyReport = dailyReport ?? []
     /** */
-    const reportDateArr = (() => {
-      if (!isMine) return []
-      // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
-      const arr = dailyReport?.map((report) => report.date) ?? []
-      return arr
-    })()
-    return { sortedDailyReport, reportDateArr }
+    // const reportDateArr = (() => {
+    //   if (!isMine) return []
+    //   // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
+    //   const arr = dailyReport?.map((report) => report.date) ?? []
+    //   return arr
+    // })()
+    return { sortedDailyReport,  }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReport])
 
@@ -741,7 +741,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             addDailyReportItem={addDailyReportItem}
             removeDailyReportItem={removeDailyReportItem}
             isEdit={isReportEdit}
-            reportDateArr={reportDateArr}
           />
         </DailyReportContext.Provider>
 

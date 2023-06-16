@@ -7,6 +7,7 @@ import { axi } from "./_axiosCreator";
 
 
 
+
 import {
   TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
@@ -36,9 +37,11 @@ type TgetDailyReports = {
 
 // 取得指定月份所有日報表
 /**month格式為yyyy-MM 例:2022-02 */
-const apiDailyReports = (filter?: { [key: string]: any }) => {
+const apiDailyReports = (
+  filter?: { [key: string]: any },
+  controller?: AbortController
+) => {
   const api = `/daily-reports`
-
   const params = {
     populate: [
       "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
@@ -48,27 +51,26 @@ const apiDailyReports = (filter?: { [key: string]: any }) => {
     order: "DESC"
   }
 
-  return axi.get(api, { params })
+  return axi.get(api, { params, signal: controller?.signal })
     .then(({ data }) => data as TgetDailyReports)
     .catch(err => Promise.reject(err))
 }
 
-/**month格式為yyyy-MM 例:2022-02 */
-export const useApiDailyReports = (
-  params?: { filter?: { [key: string]: any } }) => {
+// export const useApiDailyReports = (params?: { filter?: { [key: string]: any } }) => {
+export const useApiDailyReports = (params?: Tparams) => {
+  const controller = new AbortController();
 
   const [res, setRes] = useState<TgetDailyReports>()
   const update = async () => {
-    const data = await apiDailyReports(params?.filter)
+    const data = await apiDailyReports(params?.filter, controller)
     if (data) setRes(data)
     return data
   }
   return {
-    /** 指定月份所有日報表 */
     dailyReport: res?.data,
     setDailyReports: setRes,
-    /** 更新指定月份所有日報表*/
     updateDailyReports: update,
+    controller: controller
   }
 }
 
