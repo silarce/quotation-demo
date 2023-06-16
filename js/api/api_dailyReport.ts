@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useInView } from 'react-intersection-observer';
+import _ from "lodash"
 
 import { axi } from "./_axiosCreator";
 
-import _ from "lodash"
 
 
 
@@ -70,6 +71,79 @@ export const useApiDailyReports = (
     updateDailyReports: update,
   }
 }
+
+// ----
+export const useApiDailyReports_v2 = (
+  { customeParams }:
+    { customeParams: Tparams }
+) => {
+
+  const [viewRef, inView] = useInView();
+  const [page, setPage] = useState(1)
+
+  const params: Tparams = {
+    page,
+    pageSize: 20,
+    sort: "date",
+    order: "DESC",
+    populate: [
+      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted"
+    ],
+    ...customeParams
+  }
+
+  const [dataArrQueue, setDataArrQueue] = useState<TgetDailyReports["data"][]>([])
+  const [data, setData] = useState<TgetDailyReports["data"]>()
+  const [meta, setMeta] = useState<TgetDailyReports["meta"]>()
+
+  const update_infinite = async () => {
+    if (meta && !meta.hasNextPage) return
+    const res = await apiDailyReports(params)
+    const dataArrQueueCopy = [...dataArrQueue]
+    dataArrQueueCopy[page - 1] = res.data
+    setDataArrQueue(dataArrQueueCopy)
+    setData(dataArrQueueCopy.flat())
+    return res
+  }
+
+  const nextPage = async () => {
+    if (meta && !meta.hasNextPage) return
+    setPage(page + 1)
+  }
+
+  const reset = () => {
+    setDataArrQueue([])
+    setData(undefined)
+    setMeta(undefined)
+    setPage(1)
+  }
+
+  useEffect(() => {
+    update_infinite()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
+
+  useEffect(() => {
+    if (inView) nextPage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
+  useEffect(() => {
+    reset()
+  }, [customeParams])
+
+  return {
+    data, meta,
+    setData, nextPage, reset,
+    viewRef
+  }
+}
+
+
+
+
+
+
 
 // 取得自己指定日期的日報表
 /**date格式為yyyy-MM-DD 例:2022-02-02 */
