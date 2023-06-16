@@ -1,4 +1,4 @@
-import { useState, createContext } from "react"
+import { useState, createContext, forwardRef } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import Image from "next/image"
@@ -36,11 +36,13 @@ export default function Table_annotation(
     annotationArr,
     hookPack,
     apiReq,
+    viewRef,
   }:
     {
       annotationArr: TannotationDto[] | undefined
       hookPack: ReturnType<TuseClassAnnotation>
       apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
+      viewRef: (node?: Element | null | undefined) => void
     }
 ) {
 
@@ -63,6 +65,7 @@ export default function Table_annotation(
           clearAnno={clearAnno}
           apiReq={apiReq}
           copyClassAnno={copyClassAnno}
+          viewRef={viewRef}
         />
       </div>
     </div>
@@ -147,6 +150,7 @@ const BodyRowGroup = (
     clearAnno,
     apiReq,
     copyClassAnno,
+    viewRef,
   }:
     {
       annotationArr: TannotationDto[] | undefined
@@ -155,6 +159,7 @@ const BodyRowGroup = (
       clearAnno: () => void
       apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
       copyClassAnno: (annotation: TannotationDto) => void
+      viewRef: (node?: Element | null | undefined) => void
     }
 ) => {
   const annotaionLookup = _.groupBy(annotationArr, "category")
@@ -166,7 +171,7 @@ const BodyRowGroup = (
         return (
           <div className={scss.bodyRowGroup} key={annKey}>
             <div className={classNames(scss.row, scss.rowTitle)}><span>{annKey}</span></div>
-            {arr.map((ann,) => {
+            {arr.map((ann, index) => {
               const { id, doorModelName, type, description, } = ann
 
               if (classAnnotation?.id === id && classAnnotation.source === "edit") return (
@@ -176,9 +181,12 @@ const BodyRowGroup = (
                 />
               )
 
+              const ref = (index === arr.length - 5) ? viewRef : undefined
+              // const ref = (index === arr.length - 5) ? undefined : undefined
+
               return (
                 <CellWithBar key={id} className={classNames(scss.row, scss.item)}>
-                  <div className={config["category"].className}></div>
+                  <div ref={ref} className={config["category"].className}></div>
                   <div className={config["doorModelName"].className}><span>{doorModelName}</span></div>
                   <div className={config["type"].className}><span>{typeLookup[type]}</span></div>
                   <div className={config["description"].className}><span>{description}</span></div>

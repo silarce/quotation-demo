@@ -119,8 +119,6 @@ export const useCustomers = (params?: TapiGetCustomersParams) => {
     return apiRes
   }
 
-
-
   return {
     data: res?.data,
     meta: res?.meta,

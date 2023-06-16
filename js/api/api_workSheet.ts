@@ -1,7 +1,5 @@
-
-import {
-  useState, useEffect
-} from "react";
+import { useState, useEffect } from "react";
+import { useInView } from 'react-intersection-observer';
 
 import { axi } from "./_axiosCreator";
 
@@ -44,16 +42,6 @@ export const useGetAnnotation = (otherParams?: Tparams) => {
     return res
   }
 
-  // const update_infinite = async () => {
-  //   if (!res) return
-  //   const apiRes = await apiGetAnnotation(params)
-  //   const newData = apiRes.data
-  //   const oldData = res.data
-  //   const mergedData = [...oldData, ...newData]
-  //   apiRes.data = [...oldData, ...newData]
-  //   setRes({ data: mergedData, meta: apiRes.meta })
-  //   setPage(page => ++page)
-  // }
   return {
     annotationArr: res?.data,
     annotationMeta: res?.meta,
@@ -61,6 +49,84 @@ export const useGetAnnotation = (otherParams?: Tparams) => {
     // update_infinite_anno: update_infinite,
   }
 }
+
+export const useGetAnnotation_v2 = (customParams?: Tparams) => {
+  /**viewRef不可以放在 */
+  const [viewRef, inView] = useInView();
+  const [page, setPage] = useState(1)
+
+  const params = {
+    page,
+    // pageSize必須大於畫面一次可顯示的item數量才不會壞掉    
+    // 不過應該只有在嚴格模式會壞掉
+    pageSize: 20,
+    sort: "category",
+    order: "DESC",
+    ...customParams
+  } as const
+
+
+  const [dataArrQueue, setDataArrQueue] = useState<TgetAnnotation["data"][]>([])
+
+  const [data, setData] = useState<TgetAnnotation["data"]>()
+  const [meta, setMeta] = useState<TgetAnnotation["meta"]>()
+
+
+
+  
+  const update_infinite = async () => {
+    if (meta && !meta.hasNextPage) return
+    const res = await apiGetAnnotation(params)
+    const dataArrQueueCopy = [...dataArrQueue]
+    dataArrQueueCopy[page - 1] = res.data
+    setDataArrQueue(dataArrQueueCopy)
+    setData(dataArrQueueCopy.flat())
+    setMeta(res.meta)
+    return res
+  }
+
+  const nextPage = async () => {
+    if (meta && !meta.hasNextPage) return
+    setPage(page + 1)
+  }
+
+  const reset = () => {
+    setDataArrQueue([])
+    setData(undefined)
+    setMeta(undefined)
+    setPage(1)
+  }
+
+  useEffect(() => {
+    update_infinite()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
+
+  useEffect(() => {
+    if (inView) nextPage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
+  // useEffect(() => {
+  //   reset()
+  // }, [])
+
+  return {
+    data, meta, setData,
+    nextPage, reset,
+    viewRef,
+  }
+} // useGetAnnotation_v2
+
+
+
+
+
+
+
+
+
+
 
 export const apiPostAnnotation = ({ body }: { body: TcreateAnnotationDto }) => {
   const api = "/work-sheet/presets/annotations"

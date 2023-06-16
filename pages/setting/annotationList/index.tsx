@@ -18,7 +18,7 @@ import scss from "./annotationList.module.scss"
 
 // api
 import {
-  useGetAnnotation,
+  useGetAnnotation_v2,
   apiPostAnnotation, apiPatchAnnotation, apiDeleteAnnotation,
 } from "js/api/api_workSheet"
 
@@ -45,6 +45,7 @@ type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type
 export default function MemoList() {
   const [isLoading, setIsLoading] = useState(false)
   // ------------------------------------------------------------------------
+
   const [filter, setFilter] = useState<Tfilter>({
     category: undefined,
     doorModelName: undefined,
@@ -60,15 +61,14 @@ export default function MemoList() {
       description: { "$eq": filter.description },
     }
   }
-  const {
-    annotationArr,
-    update_anno,
-  } = useGetAnnotation(params)
+
+  const { data: annotationArr, reset, viewRef } = useGetAnnotation_v2(params)
+
 
   useEffect(() => {
-    update_anno()
+    reset()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [filter])
 
   const hookPack = useClassAnnotation()
   const { classAnnotation, newClassAnno, clearAnno } = hookPack
@@ -98,7 +98,7 @@ export default function MemoList() {
         if (method === "delete") return () => apiDeleteAnnotation({ id: delId! })
       })()
       await apiReq?.()
-      await update_anno()
+      await reset()
       clearAnno()
     }
     catch (err) {
@@ -160,6 +160,7 @@ export default function MemoList() {
         annotationArr={annotationArr}
         hookPack={hookPack}
         apiReq={apiReq}
+        viewRef={viewRef}
       />
       <LoadingCover01 isLoading={isLoading} />
     </SubLayer>
@@ -237,7 +238,7 @@ const useClassAnnotation = () => {
 
   const editClassAnno = (annotation: TannotationDto) => {
     const copy = _.cloneDeep(annotation)
-    const theClass = new Class_annotation({ reRender, annotation:copy, source: "edit" })
+    const theClass = new Class_annotation({ reRender, annotation: copy, source: "edit" })
     setClassAnnotation(theClass)
   }
 
