@@ -165,7 +165,6 @@ export default function MemoList() {
     </SubLayer>
   )
 }
-
 // ==========================================================================
 const emptyAnnotationCre = () => ({
   id: undefined,
@@ -237,7 +236,8 @@ const useClassAnnotation = () => {
   }
 
   const editClassAnno = (annotation: TannotationDto) => {
-    const theClass = new Class_annotation({ reRender, annotation, source: "edit" })
+    const copy = _.cloneDeep(annotation)
+    const theClass = new Class_annotation({ reRender, annotation:copy, source: "edit" })
     setClassAnnotation(theClass)
   }
 

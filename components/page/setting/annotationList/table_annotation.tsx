@@ -46,11 +46,9 @@ export default function Table_annotation(
 
   const { classAnnotation, clearAnno, editClassAnno, copyClassAnno } = hookPack
 
-
   return (
     <div className={scss.table}>
       <Thead />
-
       <div className={scss.tbodyWrapper}>
         {classAnnotation?.source === "new" &&
           <EditRow className={scss.editRow_add}
@@ -67,16 +65,11 @@ export default function Table_annotation(
           copyClassAnno={copyClassAnno}
         />
       </div>
-
-
-
     </div>
   )
 }
 
 // ===========================================================================
-
-
 const Thead = () => {
   return (
     <div className={classNames(scss.row, scss.thead)}>
@@ -146,7 +139,6 @@ const EditRow = (
   )
 }
 
-
 const BodyRowGroup = (
   {
     annotationArr,
@@ -215,7 +207,6 @@ const BodyRowGroup = (
   )
 }
 
-
 // ===========================================================================
 
 type Tconfig = {
@@ -225,8 +216,6 @@ type Tconfig = {
     readonly optionArr?: Toption[]
   }
 }
-
-
 
 const config: Tconfig = {
   category: {
@@ -265,7 +254,6 @@ const config: Tconfig = {
   },
 }
 
-
 const headKeyArr = [
   "category", "doorModelName", "type", "description",
 ] as const
@@ -277,10 +265,8 @@ const bodyKeyArr = [
 
 const addKeyArr = [
   "category", "doorModelName", "type", "description",
-  // "confirm", "cancel"
 ] as const
 
-// ===========================================================================
 
 // =============================================================================
 const typeLookup = {
@@ -291,35 +277,4 @@ const typeLookup = {
 // =============================================================================
 
 
-// const fakeAnnotation: TannotationDto[] = [
-//   {
-//     id: "frsdgtsdh-jryufghj-dfg",
-//     createdAt: "",
-//     updateAt: "",
-//     category: "防火防煙捲門系列",
-//     doorModelName: "SJ-302",
-//     type: "normal",
-//     description: "AAAAAAAAAAA",
-//   },
-//   {
-//     id: "gsdfg-fg-dfg",
-//     createdAt: "",
-//     updateAt: "",
-//     category: "防火防煙捲門系列",
-//     doorModelName: "SJ-302",
-//     type: "normal",
-//     description: "BBBBBBB",
-//   },
-//   {
-//     id: "fs-fsddss-dfsdfg",
-//     createdAt: "",
-//     updateAt: "",
-//     category: "防水防洪門系列",
-//     doorModelName: "SJ-302",
-//     type: "anti-typhoon",
-//     description: "CCCCCCCCCCC",
-//   },
-// ]
 
-
-// ==========================================================================
