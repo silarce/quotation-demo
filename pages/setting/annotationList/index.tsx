@@ -4,14 +4,14 @@ import _ from "lodash"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
+// import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 
 // component
 import Table_annotation from "components/page/setting/annotationList/table_annotation"
 
 // glogal gear
 import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
-// import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-// import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
@@ -44,10 +44,8 @@ type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type
 // ==========================================================================
 export default function MemoList() {
   // const [isReady, setIsReady] = useState(false)
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [showAdd, setShowAdd] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   // ------------------------------------------------------------------------
-  // const { classAnnotation, newClassAnno, clearAnno, } = useClassAnnotation()
 
   const [filter, setFilter] = useState<Tfilter>({
     category: undefined,
@@ -77,7 +75,7 @@ export default function MemoList() {
   }, [])
 
   const hookPack = useClassAnnotation()
-  const { classAnnotation, newClassAnno, } = hookPack
+  const { classAnnotation, newClassAnno, clearAnno } = hookPack
 
   const apiReq = async (method: "post" | "patch" | "delete") => {
     if (!classAnnotation) return
@@ -90,20 +88,23 @@ export default function MemoList() {
     if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
     if (!type) return myAlert.warning({ title: "請選擇形式" })
 
-
     const body = { category, doorModelName, type, description, }
 
     try {
+      setIsLoading(true)
       const apiReq = (() => {
         if (method === "post") return () => apiPostAnnotation({ body })
         if (method === "patch") return () => apiPatchAnnotation({ body, id: id! })
         if (method === "delete") return () => apiDeleteAnnotation({ id: id! })
       })()
       await apiReq?.()
+      await update_anno()
+      clearAnno()
     }
     catch (err) {
       myAlert.err({ title: "上傳失敗" })
     }
+    setIsLoading(false)
   }
 
   // ------------------------------------------------------------------------
@@ -160,7 +161,7 @@ export default function MemoList() {
         hookPack={hookPack}
         apiReq={apiReq}
       />
-
+      <LoadingCover01 isLoading={isLoading} />
     </SubLayer>
   )
 }
@@ -247,7 +248,7 @@ const useClassAnnotation = () => {
 
   const copyClassAnno = (annotation: TannotationDto) => {
     const copy = _.cloneDeep(annotation)
-    const theClass = new Class_annotation({ reRender, annotation:copy, source: "new" })
+    const theClass = new Class_annotation({ reRender, annotation: copy, source: "new" })
     setClassAnnotation(theClass)
   }
 
