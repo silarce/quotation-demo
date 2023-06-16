@@ -231,37 +231,37 @@ type Tconfig = {
 const config: Tconfig = {
   category: {
     label: "類別",
-    className: "w-[156px]",
+    className: "w-[156px] flex-none",
     optionArr: optionArr_category,
   },
   doorModelName: {
     label: "門型",
-    className: "w-[86px]",
+    className: "w-[86px] flex-none",
     optionArr: optionArr_doorModel,
   },
   type: {
     label: "形式",
-    className: "w-[64px]",
+    className: "w-[64px] flex-none",
     optionArr: optionArr_doorForm,
   },
   description: {
     label: "內容",
-    className: scss.desc,
+    className: "w-auto flex-auto",
   },
   edit: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   copy: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   del: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   confirm: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   cancel: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
 }
 

@@ -5,9 +5,6 @@
   align-items: flex-start;
   gap: 15px;
   padding: 0 22px;
-  > * {
-    flex: none;
-  }
 }
 
 .table {
@@ -37,6 +34,7 @@
     position: sticky;
     top: 0;
     z-index: 1;
+    width: 100%;
   }
 
   .tbody {
@@ -52,10 +50,6 @@
     .item {
       padding-top: 10px;
       padding-bottom: 10px;
-      .desc {
-        width: auto;
-        flex: auto;
-      }
     }
   } // tbody
 } // tbodyWrapper
