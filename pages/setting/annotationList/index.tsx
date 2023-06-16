@@ -58,7 +58,7 @@ export default function MemoList() {
       category: { "$eq": filter.category },
       doorModelName: { "$eq": filter.doorModelName },
       type: { "$eq": filter.type },
-      description: { "$eq": filter.description },
+      description: { "$contains": filter.description },
     }
   }
   const {
