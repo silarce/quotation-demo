@@ -246,7 +246,7 @@ const config: Tconfig = {
   },
   description: {
     label: "內容",
-    className: "w-auto flex-auto",
+    className: scss.desc,
   },
   edit: {
     className: "w-[20px]",
