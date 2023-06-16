@@ -5,6 +5,8 @@ import {
   addEmpty
 } from "./options"
 
+export type { Toption }
+
 
 // 類別
 export const optionsCreator_category =
@@ -34,7 +36,7 @@ export const optionsCreator_doorModel =
       // { value: "SJ-302A", label: "SJ-302A" },
       // { value: "SJ-302AS", label: "SJ-302AS" },
       // { value: "SJ-305D", label: "SJ-305D" },
-      // { value: "SJ-312", label: "SJ-312" },
+      { value: "SJ-312", label: "SJ-312" },
       // { value: "SJ-120A", label: "SJ-120A" },
       // { value: "SJ-303S", label: "SJ-303S" },
     ]
