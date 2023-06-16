@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
@@ -41,46 +41,52 @@ export default function WdContractList() {
   const [clientName, setClientName] = useState("")
   const [projectName, setProjectName] = useState("")
 
-  const searchTargetList = [
+  const searchTargetList: TsearchGroup["searchTargetList"] = [
     {
-      stateValue: doorType,
+      // stateValue: doorType,
       options: doorTypeOptions,
       placeholder: "選擇門型",
       width: "90px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setDoorType(option)
-      }
+      // onChange: (option: Toption | null) => {
+      //   if (!option) return
+      //   setDoorType(option)
+      // }
     },
     {
-      stateValue: country,
+      // stateValue: country,
       options: countryOptions,
       placeholder: "選擇地區",
       width: "80px",
-      onChange: (option: Toption | null) => {
-        if (!option) return
-        setCountry(option)
-      }
+      // onChange: (option: Toption | null) => {
+      //   if (!option) return
+      //   setCountry(option)
+      // }
     },
     {
-      stateValue: clientName,
+      // stateValue: clientName,
       placeholder: "請輸入客戶名稱",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)
+      // onChange: (e: ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)
     },
     {
-      stateValue: projectName,
+      // stateValue: projectName,
       placeholder: "請輸入專案名稱",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)
+      // onChange: (e: ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)
     },
   ]
 
-  const doSearch = () => {
+  const doSearch: TsearchGroup["doSearch"] = (vArr) => {
+    const doorType = (vArr[0] as Toption).value
+    const country = (vArr[1] as Toption).value
+    const clientName = vArr[2] as string
+    const projectName = vArr[3] as string
+    
     setSearchObj({
-      doorType: doorType.value,
-      country: country.value,
+      doorType: doorType,
+      country: country,
       clientName: clientName,
       projectName: projectName,
     })
+
   }
 
   const searchGroup = {
