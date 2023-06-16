@@ -1,7 +1,6 @@
-// 公司職等職稱
-// 公司職等職稱
 import { useState, useEffect } from "react"
 import classNames from "classnames"
+import _ from "lodash"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -247,7 +246,8 @@ const useClassAnnotation = () => {
   }
 
   const copyClassAnno = (annotation: TannotationDto) => {
-    const theClass = new Class_annotation({ reRender, annotation, source: "new" })
+    const copy = _.cloneDeep(annotation)
+    const theClass = new Class_annotation({ reRender, annotation:copy, source: "new" })
     setClassAnnotation(theClass)
   }
 
