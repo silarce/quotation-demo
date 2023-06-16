@@ -6,6 +6,7 @@ import Image from "next/image"
 // gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
 import scss from "./table_annotation.module.scss"
@@ -39,7 +40,7 @@ export default function Table_annotation(
     {
       annotationArr: TannotationDto[] | undefined
       hookPack: ReturnType<TuseClassAnnotation>
-      apiReq: (method: "post" | "patch" | "delete") => void
+      apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
     }
 ) {
 
@@ -160,7 +161,7 @@ const BodyRowGroup = (
       editClassAnno: (annotation: TannotationDto) => void
       classAnnotation: Class_annotation | undefined
       clearAnno: () => void
-      apiReq: (method: "post" | "patch" | "delete") => void
+      apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
       copyClassAnno: (annotation: TannotationDto) => void
     }
 ) => {
@@ -196,7 +197,13 @@ const BodyRowGroup = (
                     onClick={() => copyClassAnno(ann)}
                   ><IconCopy /></div>
                   <div className={config["del"].className}
-                    onClick={() => apiReq("delete")}
+                    onClick={() => myAlert.confirm({
+                      title: "確定刪除備註?",
+                      content: description,
+                      props: {
+                        onOk: () => apiReq("delete", id)
+                      }
+                    })}
                   ><IconDelete01 /></div>
                 </CellWithBar>
               )

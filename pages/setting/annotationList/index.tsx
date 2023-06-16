@@ -43,10 +43,8 @@ type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type
 
 // ==========================================================================
 export default function MemoList() {
-  // const [isReady, setIsReady] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   // ------------------------------------------------------------------------
-
   const [filter, setFilter] = useState<Tfilter>({
     category: undefined,
     doorModelName: undefined,
@@ -62,10 +60,8 @@ export default function MemoList() {
       description: { "$eq": filter.description },
     }
   }
-
   const {
     annotationArr,
-    // annotationMeta,
     update_anno,
   } = useGetAnnotation(params)
 
@@ -77,25 +73,31 @@ export default function MemoList() {
   const hookPack = useClassAnnotation()
   const { classAnnotation, newClassAnno, clearAnno } = hookPack
 
-  const apiReq = async (method: "post" | "patch" | "delete") => {
-    if (!classAnnotation) return
+  const apiReq = async (method: "post" | "patch" | "delete", delId?: string) => {
 
-    let { id, apiBody, } = classAnnotation
+    let id: undefined | string = undefined
+    let body: undefined | Parameters<typeof apiPostAnnotation>[0]["body"] = undefined
 
-    const { category, doorModelName, type, description, } = apiBody
-
-    if (!category) return myAlert.warning({ title: "請選擇類型" })
-    if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
-    if (!type) return myAlert.warning({ title: "請選擇形式" })
-
-    const body = { category, doorModelName, type, description, }
+    if (method !== "delete") {
+      if (!classAnnotation) return
+      let { id, apiBody, } = classAnnotation
+      const { category, doorModelName, type, description, } = apiBody
+      if (!category) return myAlert.warning({ title: "請選擇類型" })
+      if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
+      if (!type) return myAlert.warning({ title: "請選擇形式" })
+      id = id
+      body = { category, doorModelName, type, description, }
+    }
 
     try {
       setIsLoading(true)
+
       const apiReq = (() => {
-        if (method === "post") return () => apiPostAnnotation({ body })
-        if (method === "patch") return () => apiPatchAnnotation({ body, id: id! })
-        if (method === "delete") return () => apiDeleteAnnotation({ id: id! })
+        if (body && id) {
+          if (method === "post") return () => apiPostAnnotation({ body: body! })
+          if (method === "patch") return () => apiPatchAnnotation({ body: body!, id: id! })
+        }
+        if (method === "delete") return () => apiDeleteAnnotation({ id: delId! })
       })()
       await apiReq?.()
       await update_anno()
@@ -166,7 +168,6 @@ export default function MemoList() {
   )
 }
 
-
 // ===================================================================================
 
 const emptyAnnotation = {
@@ -176,7 +177,6 @@ const emptyAnnotation = {
   type: undefined,
   description: "",
 }
-
 
 export class Class_annotation {
   constructor(
@@ -226,8 +226,6 @@ export class Class_annotation {
       description: this.description ?? "",
     }
   }
-
-
 }
 
 const useClassAnnotation = () => {
@@ -269,4 +267,10 @@ export type TuseClassAnnotation = typeof useClassAnnotation
 // =========================================================================
 
 
+const { foo } = (() => {
+
+  const foo = "123"
+
+  return { foo }
+})()
 
