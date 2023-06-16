@@ -6,6 +6,7 @@ import Image from "next/image"
 // gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
 import scss from "./table_annotation.module.scss"
@@ -39,17 +40,15 @@ export default function Table_annotation(
     {
       annotationArr: TannotationDto[] | undefined
       hookPack: ReturnType<TuseClassAnnotation>
-      apiReq: (method: "post" | "patch" | "delete") => void
+      apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
     }
 ) {
 
   const { classAnnotation, clearAnno, editClassAnno, copyClassAnno } = hookPack
 
-
   return (
     <div className={scss.table}>
       <Thead />
-
       <div className={scss.tbodyWrapper}>
         {classAnnotation?.source === "new" &&
           <EditRow className={scss.editRow_add}
@@ -66,16 +65,11 @@ export default function Table_annotation(
           copyClassAnno={copyClassAnno}
         />
       </div>
-
-
-
     </div>
   )
 }
 
 // ===========================================================================
-
-
 const Thead = () => {
   return (
     <div className={classNames(scss.row, scss.thead)}>
@@ -145,7 +139,6 @@ const EditRow = (
   )
 }
 
-
 const BodyRowGroup = (
   {
     annotationArr,
@@ -160,7 +153,7 @@ const BodyRowGroup = (
       editClassAnno: (annotation: TannotationDto) => void
       classAnnotation: Class_annotation | undefined
       clearAnno: () => void
-      apiReq: (method: "post" | "patch" | "delete") => void
+      apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
       copyClassAnno: (annotation: TannotationDto) => void
     }
 ) => {
@@ -196,7 +189,13 @@ const BodyRowGroup = (
                     onClick={() => copyClassAnno(ann)}
                   ><IconCopy /></div>
                   <div className={config["del"].className}
-                    onClick={() => apiReq("delete")}
+                    onClick={() => myAlert.confirm({
+                      title: "確定刪除備註?",
+                      content: description,
+                      props: {
+                        onOk: () => apiReq("delete", id)
+                      }
+                    })}
                   ><IconDelete01 /></div>
                 </CellWithBar>
               )
@@ -208,7 +207,6 @@ const BodyRowGroup = (
   )
 }
 
-
 // ===========================================================================
 
 type Tconfig = {
@@ -219,22 +217,20 @@ type Tconfig = {
   }
 }
 
-
-
 const config: Tconfig = {
   category: {
     label: "類別",
-    className: "w-[156px]",
+    className: "w-[156px] flex-none",
     optionArr: optionArr_category,
   },
   doorModelName: {
     label: "門型",
-    className: "w-[86px]",
+    className: "w-[86px] flex-none",
     optionArr: optionArr_doorModel,
   },
   type: {
     label: "形式",
-    className: "w-[64px]",
+    className: "w-[64px] flex-none",
     optionArr: optionArr_doorForm,
   },
   description: {
@@ -242,22 +238,21 @@ const config: Tconfig = {
     className: "w-auto flex-auto",
   },
   edit: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   copy: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   del: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   confirm: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   cancel: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
 }
-
 
 const headKeyArr = [
   "category", "doorModelName", "type", "description",
@@ -270,10 +265,8 @@ const bodyKeyArr = [
 
 const addKeyArr = [
   "category", "doorModelName", "type", "description",
-  // "confirm", "cancel"
 ] as const
 
-// ===========================================================================
 
 // =============================================================================
 const typeLookup = {
@@ -284,35 +277,4 @@ const typeLookup = {
 // =============================================================================
 
 
-// const fakeAnnotation: TannotationDto[] = [
-//   {
-//     id: "frsdgtsdh-jryufghj-dfg",
-//     createdAt: "",
-//     updateAt: "",
-//     category: "防火防煙捲門系列",
-//     doorModelName: "SJ-302",
-//     type: "normal",
-//     description: "AAAAAAAAAAA",
-//   },
-//   {
-//     id: "gsdfg-fg-dfg",
-//     createdAt: "",
-//     updateAt: "",
-//     category: "防火防煙捲門系列",
-//     doorModelName: "SJ-302",
-//     type: "normal",
-//     description: "BBBBBBB",
-//   },
-//   {
-//     id: "fs-fsddss-dfsdfg",
-//     createdAt: "",
-//     updateAt: "",
-//     category: "防水防洪門系列",
-//     doorModelName: "SJ-302",
-//     type: "anti-typhoon",
-//     description: "CCCCCCCCCCC",
-//   },
-// ]
 
-
-// ==========================================================================

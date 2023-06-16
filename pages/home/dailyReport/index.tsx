@@ -3,6 +3,7 @@ import classNames from "classnames"
 import _ from "lodash"
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
+import moment from "moment";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -41,8 +42,8 @@ import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  useApiDailyReports,
-  useApiDailyReports_reviewers,
+  TdailyReportDto,
+  useApiDailyReports, useApiDailyReports_reviewers,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
@@ -182,6 +183,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       isReviewCompleted = undefined
     }
 
+    const date = yearConversion_chToStandard(searchQuery?.date) || undefined
+
     return {
       filter: {
         "employee.id": filterIsMine,
@@ -190,7 +193,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           "reviewStatus.reviewerEmployee.id": { $eq: userId },
         },
         "isReviewCompleted": { $eq: isReviewCompleted },
-        date: { $eq: searchQuery?.date },
+        date: { $eq: date },
       },
     }
   })()
@@ -198,7 +201,10 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   const { dailyReport, updateDailyReports } = useApiDailyReports(params)
   const { sortedDailyReport, reportDateArr } = useMemo(() => {
-    const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+    // 在params裡已經排序了
+    // const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
+    const sortedDailyReport = dailyReport ?? []
+    /** */
     const reportDateArr = (() => {
       if (!isMine) return []
       // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
@@ -208,6 +214,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     return { sortedDailyReport, reportDateArr }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReport])
+
+
 
   /**取得指定月份所有日報表，額外做了loading的處理 */
   const updateDailyReports_withLoading = async () => {
@@ -260,7 +268,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   useEffect(() => {
     toUpdateDailyReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery.isUserReviewed, searchQuery.date])
+  }, [searchQuery.isUserReviewed, searchQuery.date, isMine])
 
   useEffect(() => {
     if (!dailyReport) return
@@ -471,31 +479,42 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-
+  const onChange_isUserReviewed =
+    (v: string) => {
+      setSearchObj(obj => ({
+        ...obj,
+        isUserReviewed: v as (typeof searchObj["isUserReviewed"])
+      }))
+    }
+  const onChange_date =
+    (v: string) => {
+      setSearchObj(obj => ({
+        ...obj,
+        date: v
+      }))
+    }
 
   const searchTargetList = (() => {
     const arr = [
       {
         options: reportedAtOptions, width: "110px",
         value: searchObj?.isUserReviewed,
-        onChange: (v: string) => { setSearchObj(obj => ({ ...obj, isUserReviewed: v as (typeof searchObj["isUserReviewed"]) })) }
+        onChange: onChange_isUserReviewed
       },
       {
         placeholder: "搜尋日期", width: "80px",
         value: searchObj?.date,
-        onChange: (v: string) => { setSearchObj(obj => ({ ...obj, date: v })) }
+        onChange: onChange_date
       }
     ]
     return arr
   })()
 
-  const doSearch: TdoSearch = (arr) => {
-
+  const doSearch: TdoSearch = () => {
     if (searchObj.date) {
       const date = yearConversion_chToStandard(searchObj.date)
       if (!date) return myAlert.warning({ title: "搜尋時間格式錯誤", content: "例:101-01-01" })
     }
-
     router.push({
       query: {
         isUserReviewed: searchObj.isUserReviewed,
@@ -586,6 +605,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
+    sortedDailyReport,
   })
 
 
@@ -729,6 +749,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         <SearchDrawer visible={showSearchDrawer}
           onSearch={doSearch}
           onCancel={closeShowDrawer}
+          searchObj={searchObj}
+          onChange_isUserReviewed={onChange_isUserReviewed}
+          onChange_date={onChange_date}
         />
         {/*  */}
       </SubLayer>
@@ -836,13 +859,14 @@ const panelListCreator = (
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
+    sortedDailyReport
   }:
     {
       reportInEdit: ThookEmptyReport | undefined
       doCheck: () => void
       switchIsEdit: () => void
       setShowReviewerForReportModal: (v: boolean) => void
-
+      sortedDailyReport: TdailyReportDto[]
     }
 ) => {
 
@@ -873,7 +897,14 @@ const panelListCreator = (
     {
       type: "redButton",
       label: "上傳",
-      onClick: () => setShowReviewerForReportModal(true),
+      onClick: () => {
+        const lastDate = moment(sortedDailyReport[0].date)
+        const date = moment(reportInEdit?.date)
+        const isSameDate = lastDate.isSame(date, "day")
+        if (isSameDate)
+          return myAlert.warning({ title: "今日的日報表已存在", content: "請至列表點選今日的日報表或選擇其他日期" })
+        setShowReviewerForReportModal(true)
+      },
     },
     {
       type: "myButton",

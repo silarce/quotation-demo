@@ -1,18 +1,16 @@
-// 公司職等職稱
-// 公司職等職稱
 import { useState, useEffect } from "react"
 import classNames from "classnames"
+import _ from "lodash"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 
 // component
 import Table_annotation from "components/page/setting/annotationList/table_annotation"
 
 // glogal gear
 import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
-// import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-// import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
@@ -24,32 +22,29 @@ import {
   apiPostAnnotation, apiPatchAnnotation, apiDeleteAnnotation,
 } from "js/api/api_workSheet"
 
-
 // type
 import { TannotationDto } from "js/api/dtoTypes"
 import { Tparams } from "js/api/dtoTypes"
 
+// other
 import {
-  optionsCreator_prodClass,
-  optionsCreator_doorType,
-  optionsCreator_doorForm,
-  Toption
-} from "js/utils/options/options"
+  Toption,
+  optionsCreator_category,
+  optionsCreator_doorModel,
+  optionsCreator_doorForm
+} from "js/utils/options/productOptions"
 
-const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
-const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
+// ==========================================================================
+const optionsCategory = optionsCreator_category({ haveEmpty: true })
+const optionsDoorModel = optionsCreator_doorModel({ haveEmpty: true })
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
 
 type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type" | "description">>
 
 // ==========================================================================
 export default function MemoList() {
-  // const [isReady, setIsReady] = useState(false)
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [showAdd, setShowAdd] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   // ------------------------------------------------------------------------
-  // const { classAnnotation, newClassAnno, clearAnno, } = useClassAnnotation()
-
   const [filter, setFilter] = useState<Tfilter>({
     category: undefined,
     doorModelName: undefined,
@@ -65,10 +60,8 @@ export default function MemoList() {
       description: { "$eq": filter.description },
     }
   }
-
   const {
     annotationArr,
-    // annotationMeta,
     update_anno,
   } = useGetAnnotation(params)
 
@@ -78,33 +71,40 @@ export default function MemoList() {
   }, [])
 
   const hookPack = useClassAnnotation()
-  const { classAnnotation, newClassAnno, } = hookPack
+  const { classAnnotation, newClassAnno, clearAnno } = hookPack
 
-  const apiReq = async (method: "post" | "patch" | "delete") => {
-    if (!classAnnotation) return
+  const apiReq = async (method: "post" | "patch" | "delete", delId?: string) => {
 
-    let { id, apiBody, } = classAnnotation
+    let id: undefined | string = undefined
+    let body: undefined | Parameters<typeof apiPostAnnotation>[0]["body"] = undefined
 
-    const { category, doorModelName, type, description, } = apiBody
-
-    if (!category) return myAlert.warning({ title: "請選擇類型" })
-    if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
-    if (!type) return myAlert.warning({ title: "請選擇形式" })
-
-
-    const body = { category, doorModelName, type, description, }
+    if (method !== "delete") {
+      if (!classAnnotation) return
+      let { id: classId, apiBody, } = classAnnotation
+      const { category, doorModelName, type, description, } = apiBody
+      if (!category) return myAlert.warning({ title: "請選擇類型" })
+      if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
+      if (!type) return myAlert.warning({ title: "請選擇形式" })
+      id = classId
+      body = { category, doorModelName, type, description, }
+    }
 
     try {
+      setIsLoading(true)
+
       const apiReq = (() => {
-        if (method === "post") return () => apiPostAnnotation({ body })
-        if (method === "patch") return () => apiPatchAnnotation({ body, id: id! })
-        if (method === "delete") return () => apiDeleteAnnotation({ id: id! })
+        if (method === "post") return () => apiPostAnnotation({ body: body! })
+        if (method === "patch") return () => apiPatchAnnotation({ body: body!, id: id! })
+        if (method === "delete") return () => apiDeleteAnnotation({ id: delId! })
       })()
       await apiReq?.()
+      await update_anno()
+      clearAnno()
     }
     catch (err) {
       myAlert.err({ title: "上傳失敗" })
     }
+    setIsLoading(false)
   }
 
   // ------------------------------------------------------------------------
@@ -113,11 +113,11 @@ export default function MemoList() {
   const searchTargetList: TsearchGroup["searchTargetList"] = [
     {
       placeholder: "選擇類別",
-      options: optionsProdClass
+      options: optionsCategory
     },
     {
       placeholder: "選擇門型",
-      options: optionsDoorType
+      options: optionsDoorModel
     },
     {
       placeholder: "選擇形式",
@@ -161,27 +161,23 @@ export default function MemoList() {
         hookPack={hookPack}
         apiReq={apiReq}
       />
-
+      <LoadingCover01 isLoading={isLoading} />
     </SubLayer>
   )
 }
-
-
-// ===================================================================================
-
-const emptyAnnotation = {
+// ==========================================================================
+const emptyAnnotationCre = () => ({
   id: undefined,
   category: undefined,
   doorModelName: undefined,
   type: undefined,
   description: "",
-}
-
+})
 
 export class Class_annotation {
   constructor(
     { reRender,
-      annotation = emptyAnnotation,
+      annotation = emptyAnnotationCre(),
       source
     }: {
       reRender: () => void
@@ -226,8 +222,6 @@ export class Class_annotation {
       description: this.description ?? "",
     }
   }
-
-
 }
 
 const useClassAnnotation = () => {
@@ -242,12 +236,14 @@ const useClassAnnotation = () => {
   }
 
   const editClassAnno = (annotation: TannotationDto) => {
-    const theClass = new Class_annotation({ reRender, annotation, source: "edit" })
+    const copy = _.cloneDeep(annotation)
+    const theClass = new Class_annotation({ reRender, annotation:copy, source: "edit" })
     setClassAnnotation(theClass)
   }
 
   const copyClassAnno = (annotation: TannotationDto) => {
-    const theClass = new Class_annotation({ reRender, annotation, source: "new" })
+    const copy = _.cloneDeep(annotation)
+    const theClass = new Class_annotation({ reRender, annotation: copy, source: "new" })
     setClassAnnotation(theClass)
   }
 
@@ -264,8 +260,5 @@ const useClassAnnotation = () => {
 
 export type TuseClassAnnotation = typeof useClassAnnotation
 
-
 // =========================================================================
-
-
 

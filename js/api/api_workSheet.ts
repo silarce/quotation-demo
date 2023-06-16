@@ -33,6 +33,7 @@ export const useGetAnnotation = (otherParams?: Tparams) => {
   const params = {
     page,
     pageSize: 9999,
+    sort: "category",
     ...otherParams
   }
 
@@ -77,7 +78,7 @@ export const apiPatchAnnotation = ({ body, id }: { body: TcreateAnnotationDto, i
 
 export const apiDeleteAnnotation = ({ id }: { id: string }) => {
   const api = `/work-sheet/presets/annotations/${id}`
-  return axi.patch(api)
+  return axi.delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err))
 }
