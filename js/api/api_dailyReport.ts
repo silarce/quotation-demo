@@ -6,11 +6,10 @@ import { axi } from "./_axiosCreator";
 
 
 import {
-  TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
+  TdailyReportDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
   TemployeeDto,
   TpageMetaDto,
-  TdailyReportWorkerJobsDto,
   TdailyReportWokerDto,
   Tparams,
 } from "./dtoTypes"
@@ -52,11 +51,12 @@ const apiDailyReports = (
 }
 
 export const useApiDailyReports = (params?: Tparams) => {
-  const controller = new AbortController();
-
+  const [controller, setController] = useState<AbortController>()
   const [res, setRes] = useState<TgetDailyReports>()
-  const update = async (dynamicFilter?: Tparams["filter"]) => {
 
+  const update = async (dynamicFilter?: Tparams["filter"]) => {
+    const newController = new AbortController()
+    setController(newController)
     const theParams: Tparams = {
       ...params,
       filter: {
@@ -64,16 +64,16 @@ export const useApiDailyReports = (params?: Tparams) => {
         ...dynamicFilter
       }
     }
-
-    const data = await apiDailyReports(theParams, controller)
+    const data = await apiDailyReports(theParams, newController)
     if (data) setRes(data)
     return data
   }
+
   return {
     dailyReport: res?.data,
     setDailyReports: setRes,
     updateDailyReports: update,
-    controller: controller
+    controller
   }
 }
 
@@ -129,6 +129,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
   }
 
   useEffect(() => {
+    if (render === 0) return
     update_infinite()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, render])
@@ -148,40 +149,6 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
     viewRef, isLoading
   }
 } // useGetAnnotation_v2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // 取得自己指定日期的日報表

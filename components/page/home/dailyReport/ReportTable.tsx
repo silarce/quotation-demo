@@ -99,7 +99,9 @@ export default function ReportTable(
   const [isLoading, setIsLoading] = useState(false)
   const { dailyReport, updateDailyReports, controller } = useApiDailyReports(param)
 
-  const cancelReq = () => controller.abort()
+  const cancelReq = () => {
+    if (controller) controller.abort()
+  }
 
   useEffect(() => {
     if (classDailyReportItemArr === undefined) return;
