@@ -3,7 +3,7 @@ import classNames from "classnames"
 import _ from "lodash"
 import { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import moment from "moment";
+import moment, { Moment } from "moment";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -35,14 +35,14 @@ import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDai
 
 // tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
-
+import { filterCre_nextAndPrevMonth } from "js/utils/helpers/params/filterCreator";
 
 // icon
 import iconFourCube from "public/image/icon/fourCube.svg"
 import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  TdailyReportDto,
+  TdailyReportDto, Tparams,
   useApiDailyReports, useApiDailyReports_reviewers,
   useApiDailyReports_v2,
   apiPatchDailyReports_my,
@@ -199,21 +199,32 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     }
   })()
 
+  const params_calendar = {
+    ...params,
+    pageSize: 999,
+  }
 
-  // const { dailyReport, updateDailyReports } = useApiDailyReports(params)
+  /**月曆用的 */
+  const { dailyReport: dailyReport_calendar,
+    updateDailyReports: updateDailyReports_calendar } = useApiDailyReports(params_calendar)
 
+  const update_calendar = async (dynamicParams?: Tparams) => {
+    try {
+      setIsLoading(true)
+      await updateDailyReports_calendar(dynamicParams)
+    }
+    catch { myAlert.err({ title: "取得月曆日報表列表失敗" }) }
+    setIsLoading(false)
+  }
+
+
+
+  /**列表用的資料 */
   const {
     data: dailyReportArr,
     viewRef, reset,
     isLoading: isLoading_v2,
   } = useApiDailyReports_v2(params)
-
-  // 接著做月曆的資料
-  // 接著做月曆的資料
-  // 接著做月曆的資料
-  // 接著做月曆的資料
-  // 接著做月曆的資料
-  // 接著做月曆的資料
 
 
 
@@ -235,15 +246,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
 
 
-  /**取得指定月份所有日報表，額外做了loading的處理 */
+  /**取得指定月份所有日報表，額外做了loading的處理 (改用reset後不用setIsLoading)*/
   const updateDailyReports_withLoading = async () => {
-    try {
-      showRootLoading(false)
-      setIsLoading(true)
-      await reset()
-    }
-    catch { myAlert.warning({ title: "取得總日報表失敗" }) }
-    finally { setIsLoading(false) }
+    reset()
+    // try {
+    //   showRootLoading(false)
+    //   setIsLoading(true)
+    //   await reset()
+    // }
+    // catch { myAlert.warning({ title: "取得總日報表失敗" }) }
+    // finally { setIsLoading(false) }
   }
 
 
@@ -427,7 +439,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // 更新日報表
 
-  /**發出更新日報表請求 */
+  /**發出更新日報表請求 (上傳 按鈕)*/
   const reqApiPatchDailyReports_my = async (
     reviewerArr: TemployeeDto[],
     examinerArr: TemployeeDto[],
@@ -474,7 +486,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       })
       cancelEditNewDailyReport()
       myAlert.success({ title: "更新日報表完成" })
-      await updateDailyReports_withLoading()
+      if (isCalendar) {
+        const now = moment()
+        const dynamicFilter = filterCre_nextAndPrevMonth(now)
+        await update_calendar(dynamicFilter)
+      }
+      else await updateDailyReports_withLoading()
     }
     catch (error) {
 
@@ -597,7 +614,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       const res = await apiDailyReports_review(reportInEdit.id)
       changeReviewToChecked(!!res)
       showRootLoading(false)
-      await updateDailyReports_withLoading()
+      if (isCalendar) {
+        const now = moment()
+        const dynamicFilter = filterCre_nextAndPrevMonth(now)
+        await update_calendar(dynamicFilter)
+      }
+      else await updateDailyReports_withLoading()
     }
     catch (error) {
       const err = error as AxiosError<{
@@ -749,8 +771,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
             isMine={isMine}
             userInfo={userInfo}
             addTag={addTag}
-            dailyReportArr={dailyReportArr ?? []}
-            updateDailyReports={reset}
+            dailyReportArr={dailyReport_calendar ?? []}
+            update_calendar={update_calendar}
           />
         }
 
@@ -947,8 +969,6 @@ const panelListCreator = (
     panelList_reporter_reviewed,
   }
 }
-
-
 
 
 

@@ -83,6 +83,7 @@ export default function ReportTable(
   const userId = userInfo.employee?.id
 
   const param = {
+    pageSize: 999,
     filter: {
       $and: {
         "employee.id": { $eq: userId },

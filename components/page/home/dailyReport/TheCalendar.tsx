@@ -1,7 +1,7 @@
 
-import { useMemo } from "react"
+import { useMemo, useEffect } from "react"
 import Image from "next/image"
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import classNames from "classnames"
 
 import _ from "lodash"
@@ -22,12 +22,13 @@ import icongreenDot from "public/image/icon/greenDot.svg"
 
 // tool
 import { month_chToNumber } from "js/tools/date/conversionTable";
+import { filterCre_nextAndPrevMonth } from "js/utils/helpers/params/filterCreator"
 
 // css
 import scss from "./theCalendar.module.scss"
 
 // type
-import { TuserDto } from "js/api/dtoTypes"
+import { TuserDto, Tparams } from "js/api/dtoTypes"
 import { TdailyReportDto } from "js/api/api_dailyReport"
 import { Ttag } from "pages/home/dailyReport"
 
@@ -58,21 +59,19 @@ export default function TheCalendar(
     isMine,
     userInfo,
     addTag,
-    // editReportEmpArr,
-    // editDailyReport,
     dailyReportArr,
-    updateDailyReports
+    update_calendar
   }:
     {
       isMine: boolean
       userInfo: TuserDto
       addTag: (employee: Ttag) => void
-      // editReportEmpArr?: () => void
-      // editDailyReport?: () => void
       dailyReportArr: TdailyReportDto[]
-      updateDailyReports: () => void
+      update_calendar: (dynimicFilter: Tparams["filter"]) => void
     }
 ) {
+
+
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
     return dailyReportArr.map((report) => {
@@ -90,7 +89,6 @@ export default function TheCalendar(
           }
         })
 
-
       return {
         isMine,
         reportId: id,
@@ -105,7 +103,16 @@ export default function TheCalendar(
         isReviewedByUser
       }
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReportArr]) // dailyReportArr
+
+
+  useEffect(() => {
+    const now = moment()
+    const filter = filterCre_nextAndPrevMonth(now)
+    update_calendar(filter)
+  }, [])
+
 
 
   return (
@@ -132,7 +139,7 @@ export default function TheCalendar(
           // toolbar: ToolBar, // 最上方的操作面板
           toolbar:
             (toolbar: BigCalendar.ToolbarProps<Tevent, object>) =>
-              ToolBar({ toolbar, updateDailyReports }), // 最上方的操作面板
+              ToolBar({ toolbar, update_calendar: update_calendar }), // 最上方的操作面板
         }}
       />
     </div>
@@ -141,32 +148,35 @@ export default function TheCalendar(
 // ============================================================================
 
 const ToolBar = (
-  { toolbar, updateDailyReports, }:
+  { toolbar, update_calendar }:
     {
       toolbar: BigCalendar.ToolbarProps<Tevent, object>,
-      // editReportEmpArr?: () => void,
-      // editDailyReport?: () => void
-      updateDailyReports: (month?: string) => void
+      update_calendar: (dynimicFilter: Tparams["filter"]) => void
     }
 ) => {
 
   const { onNavigate, label, date } = toolbar
 
 
+
+
   // 'PREV' | 'NEXT' | 'TODAY' | 'DATE'
   const nextMonth = async () => {
     onNavigate('NEXT');
-    const nextMonth = moment(date).add(1, 'months').format('YYYY-MM')
-    updateDailyReports(nextMonth)
+    const nextMonth = moment(date).add(1, 'months')
+    const dynamicFilter = filterCre_nextAndPrevMonth(nextMonth)
+    update_calendar(dynamicFilter)
   }
   const prevMonth = async () => {
     onNavigate('PREV');
-    const prevMonth = moment(date).subtract(1, 'months').format('YYYY-MM')
-    updateDailyReports(prevMonth)
+    const prevMonth = moment(date).subtract(1, 'months')
+    const dynamicFilter = filterCre_nextAndPrevMonth(prevMonth)
+    update_calendar(dynamicFilter)
   }
   const toToday = async () => {
     onNavigate('TODAY');
-    updateDailyReports()
+    const dynamicFilter = filterCre_nextAndPrevMonth(moment())
+    update_calendar(dynamicFilter)
   }
 
   let [month, year] = label.split(" ")

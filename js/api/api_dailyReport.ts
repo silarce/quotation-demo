@@ -41,7 +41,6 @@ const apiDailyReports = (
   const params = {
     populate: [
       "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
-    pageSize: 200,
     sort: "date",
     order: "DESC",
     ...customParams
@@ -56,8 +55,17 @@ export const useApiDailyReports = (params?: Tparams) => {
   const controller = new AbortController();
 
   const [res, setRes] = useState<TgetDailyReports>()
-  const update = async () => {
-    const data = await apiDailyReports(params, controller)
+  const update = async (dynamicFilter?: Tparams["filter"]) => {
+
+    const theParams: Tparams = {
+      ...params,
+      filter: {
+        ...params?.filter,
+        ...dynamicFilter
+      }
+    }
+
+    const data = await apiDailyReports(theParams, controller)
     if (data) setRes(data)
     return data
   }
