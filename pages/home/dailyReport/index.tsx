@@ -227,17 +227,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     setIsLoading(false)
   }
 
-
-
-
   /**列表用的資料 */
   const {
     data: dailyReportArr,
     viewRef, reset,
     isLoading: isLoading_v2,
   } = useApiDailyReports_v2(params)
-
-
 
   // 取得所有檢視人員
   const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
