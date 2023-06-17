@@ -238,18 +238,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   } = useApiDailyReports_v2(params)
 
 
-  /**取得指定月份所有日報表，額外做了loading的處理 (改用reset後不用setIsLoading)*/
-  const updateDailyReports_withLoading = async () => {
-    reset()
-    // try {
-    //   showRootLoading(false)
-    //   setIsLoading(true)
-    //   await reset()
-    // }
-    // catch { myAlert.warning({ title: "取得總日報表失敗" }) }
-    // finally { setIsLoading(false) }
-  }
-
 
   // 取得所有檢視人員
   const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
@@ -395,29 +383,26 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
   /**發出設定檢視人員apiReq */
   const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
-
     const shouldReportEmpArr: typeof employeeArr = []
     employeeArr.forEach((employee) => {
       if (employee.shouldReport) shouldReportEmpArr.push(employee)
     })
-
     const isPass = !shouldReportEmpArr.some(emp => emp.isHaveUser === false)
     if (!isPass) return myAlert.warning({ title: "名單錯誤", content: "只能選擇有ERP操作權限的人員" })
-
     const employeeIds = shouldReportEmpArr.map(emp => emp.id)
-
     try {
       showRootLoading(true)
       await apiPatchDailyReports_reviewers({ employeeIds })
       cancelSetRivewerModal()
       myAlert.success({ title: "更新檢視人員成功" })
       try {
-        await Promise.all([
-          updateDailyReports_withLoading(),
-          updateReviewersArr(),
-        ])
+        await updateReviewersArr()
+        // await Promise.all([
+        //   reset(),
+        //   updateReviewersArr(),
+        // ])
       }
-      catch { myAlert.err({ title: "日報表或檢視人員取得失敗" }) }
+      catch { myAlert.err({ title: "檢視人員取得失敗" }) }
     }
     catch {
       myAlert.err({ title: "更新檢視人員失敗" })
@@ -484,7 +469,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         const dynamicFilter = filterCre_nextAndPrevMonth(now)
         await update_calendar(dynamicFilter)
       }
-      else await updateDailyReports_withLoading()
+      else reset()
     }
     catch (error) {
 
@@ -613,7 +598,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         const dynamicFilter = filterCre_nextAndPrevMonth(now)
         await update_calendar(dynamicFilter)
       }
-      else await updateDailyReports_withLoading()
+      else reset()
     }
     catch (error) {
       const err = error as AxiosError<{
