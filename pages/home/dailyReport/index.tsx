@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo, createContext } from "react"
+import { useState, useEffect, createContext } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import { AxiosError } from "axios";
-import { useRouter } from "next/router";
-import moment, { Moment } from "moment";
+import { useRouter, NextRouter } from "next/router";
+import moment from "moment";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -59,7 +59,7 @@ import {
 
 // type
 import { TuserDto, } from "js/api/dtoTypes";
-import { TdoSearch, Toption } from "components/global/gear/HOC/searchBar/searchBar";
+import { TdoSearch, TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
 import scss from "./dailyReport.module.scss"
@@ -69,11 +69,16 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 export { Class_reportItem }
 // =====================================================================
 
+type Tidentity = "manager" | "reviewer" | "reporter" | undefined
+
+
+
 const reportedAtOptions = [
   { label: "全部", value: "全部" },
   { label: "未檢視", value: "未檢視" },
   { label: "已檢視", value: "已檢視" },
 ]
+
 
 // =====================================================================
 type TdailyReportContext = {
@@ -83,7 +88,7 @@ type TdailyReportContext = {
   setShowReviewerForReportModal: (v: boolean) => void
   cancelEditNewDailyReport: () => void
   changeReportDate: (v: string) => void
-  identity: "manager" | "reviewer" | "reporter" | undefined
+  identity: Tidentity
   doCheck: () => void,
   userInfo: TuserDto
 }
@@ -109,7 +114,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
   /**權限 */
-  const [identity, setIdentity] = useState<"manager" | "reviewer" | "reporter">()
+  const [identity, setIdentity] = useState<Tidentity>()
 
   useEffect(() => {
     (async () => {
@@ -293,9 +298,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }, [isMine])
 
 
-
-
-
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -354,11 +356,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // 檢視人員設定
   // SetReportEmpModal
-
-  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
+  
   //**開啟回報人員設定面板 */
   const editRivewerPickArr = async () => {
-
     const resArr = await Promise.all([
       updateReviewersArr(), // 取得所有檢視人員
       updateEmployeeArr() // 取得所有人員
@@ -372,10 +372,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         employeeArr
       }
     )
-
     setReviewersPickArr(reviewersPickArr)
-
   }
+
   /**發出設定檢視人員apiReq */
   const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
     const shouldReportEmpArr: typeof employeeArr = []
@@ -392,10 +391,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       myAlert.success({ title: "更新檢視人員成功" })
       try {
         await updateReviewersArr()
-        // await Promise.all([
-        //   reset(),
-        //   updateReviewersArr(),
-        // ])
       }
       catch { myAlert.err({ title: "檢視人員取得失敗" }) }
     }
@@ -449,7 +444,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({
-        // date: reportInEdit.date,
         date: theDate,
         body: {
           reviewerIds,
@@ -495,12 +489,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       }))
     }
   const onChange_date =
-    (v: string) => {
-      setSearchObj(obj => ({
-        ...obj,
-        date: v
-      }))
-    }
+    (v: string) => { setSearchObj(obj => ({ ...obj, date: v })) }
 
   const searchTargetList = (() => {
     const arr = [
@@ -534,51 +523,14 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   } // doSearch
 
-  const searchGroup = {
+  const searchGroup: TsearchGroup = {
     searchTargetList,
     doSearch,
     controlled: true,
   }
 
-  // --------------------
-  const listSwitchButton: TpanelList[number] = {
-    type: "myButton",
-    label: isCalendar ? "列表" : "月曆",
-    onClick: () => {
-      router.push({
-        query: {
-          ...router.query,
-          isCalendar: isCalendar ? "false" : "true"
-        }
-      })
-    },
-    img: isCalendar ? iconMenu.src : iconFourCube.src
-  }
-  // --------------------
-  /**manager 檢視人員設定 */
-  const panelList_manager_notInEdit: TpanelList = [
-    { searchGroup },
-    {
-      type: "myButton",
-      label: "檢視人員設定",
-      onClick: editRivewerPickArr
-    },
-    listSwitchButton
-  ]
-
-  /**reporter 新增回報 */
-  const panelList_reporter_notInEdit: TpanelList = [
-    { searchGroup },
-    {
-      type: "myButton",
-      label: "新增回報",
-      onClick: editReport_today
-    },
-    listSwitchButton
-  ]
-  // ---
+  // ---------------------------
   const doCheck = async () => {
-
     if (reportInEdit?.isReviewedByUser === true) {
       return myAlert.warning({ title: "已檢視過" })
     }
@@ -609,58 +561,21 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
 
-  const {
-    panelList_reviewer_inEdit_user,
-    panelList_reporter_inEdit01,
-    panelList_reporter_inEdit02,
-    panelList_reporter_reviewed,
-  } = panelListCreator({
+  const { panelList } = panelListCreator({
     reportInEdit,
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
     sortedDailyReport: dailyReportArr ?? [],
+    isCalendar,
+    router,
+    searchGroup,
+    editRivewerPickArr,
+    editReport_today,
+    identity,
+    isReportEdit,
+    userInfo,
   })
-
-
-  const panelList = (() => {
-    if (reportInEdit?.isUserIsViewer) {
-      return []
-    }
-
-    if (identity === "manager") {
-      if (!reportInEdit) return panelList_manager_notInEdit
-      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
-      else return []
-    }
-
-    if (identity === "reviewer") {
-      if (!reportInEdit) return panelList_reporter_notInEdit
-      else {
-        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-          if (isReportEdit) return panelList_reporter_inEdit02
-          if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
-          return panelList_reporter_inEdit01
-        }
-        else if (reportInEdit.isAllowToReview) {
-          return panelList_reviewer_inEdit_user
-        }
-        return []
-      }
-    }
-
-    if (identity === "reporter") {
-      if (!reportInEdit) return panelList_reporter_notInEdit
-      else {
-        // if (reportInEdit.isUserReviewed) return panelList_reporter_reviewed
-        if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
-        if (isReportEdit) return panelList_reporter_inEdit02
-        return panelList_reporter_inEdit01
-      }
-    }
-    return []
-  })()
-
 
   // ----------------------------------------------------------------------
   const customeLeft =
@@ -682,23 +597,13 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const doShowDrawer = () => { setShowSearchDrawer(true) }
   const closeShowDrawer = () => { setShowSearchDrawer(false) }
 
+  // ----------------------------------------------------------------------
 
   const dailyReportContextValue: TdailyReportContext = {
-    // doShowDrawer,
-    // editReport_today,
-    reportInEdit,
-    isReportEdit,
-    switchIsEdit,
-    setShowReviewerForReportModal,
-    cancelEditNewDailyReport,
-    changeReportDate,
-    identity,
-    // editRivewerPickArr,
-    doCheck,
-    userInfo,
+    reportInEdit, isReportEdit,
+    switchIsEdit, setShowReviewerForReportModal, cancelEditNewDailyReport,
+    changeReportDate, identity, doCheck, userInfo,
   }
-
-
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -865,7 +770,17 @@ const formatRiewerPickArr = (
 }
 
 // ==========================================================================
-
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
 
 
 const panelListCreator = (
@@ -873,7 +788,15 @@ const panelListCreator = (
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
-    sortedDailyReport
+    sortedDailyReport,
+    isCalendar,
+    router,
+    searchGroup,
+    editRivewerPickArr,
+    editReport_today,
+    identity,
+    isReportEdit,
+    userInfo
   }:
     {
       reportInEdit: ThookEmptyReport | undefined
@@ -881,8 +804,54 @@ const panelListCreator = (
       switchIsEdit: () => void
       setShowReviewerForReportModal: (v: boolean) => void
       sortedDailyReport: TdailyReportDto[]
+      isCalendar: boolean
+      router: NextRouter
+      searchGroup: TsearchGroup
+      editRivewerPickArr: () => void
+      editReport_today: () => void
+      identity: Tidentity
+      isReportEdit: boolean
+      userInfo: TuserDto
     }
 ) => {
+
+
+
+  const listSwitchButton: TpanelList[number] = {
+    type: "myButton",
+    label: isCalendar ? "列表" : "月曆",
+    onClick: () => {
+      router.push({
+        query: {
+          ...router.query,
+          isCalendar: isCalendar ? "false" : "true"
+        }
+      })
+    },
+    img: isCalendar ? iconMenu.src : iconFourCube.src
+  }
+
+  /**manager 檢視人員設定 */
+  const panelList_manager_notInEdit: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "檢視人員設定",
+      onClick: editRivewerPickArr
+    },
+    listSwitchButton
+  ]
+
+  /**reporter 新增回報 */
+  const panelList_reporter_notInEdit: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "新增回報",
+      onClick: editReport_today
+    },
+    listSwitchButton
+  ]
 
   /**reviewer 已讀/未讀 isReviewedByUser */
   const panelList_reviewer_inEdit_user: TpanelList = [
@@ -936,11 +905,51 @@ const panelListCreator = (
     },
   ]
 
+  const panelList = (() => {
+    if (reportInEdit?.isUserIsViewer) {
+      return []
+    }
+
+    if (identity === "manager") {
+      if (!reportInEdit) return panelList_manager_notInEdit
+      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
+      else return []
+    }
+
+    if (identity === "reviewer") {
+      if (!reportInEdit) return panelList_reporter_notInEdit
+      else {
+        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
+          if (isReportEdit) return panelList_reporter_inEdit02
+          if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
+          return panelList_reporter_inEdit01
+        }
+        else if (reportInEdit.isAllowToReview) {
+          return panelList_reviewer_inEdit_user
+        }
+        return []
+      }
+    }
+
+    if (identity === "reporter") {
+      if (!reportInEdit) return panelList_reporter_notInEdit
+      else {
+        if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
+        if (isReportEdit) return panelList_reporter_inEdit02
+        return panelList_reporter_inEdit01
+      }
+    }
+    return []
+  })()
+
   return {
+    panelList_manager_notInEdit,
+    panelList_reporter_notInEdit,
     panelList_reviewer_inEdit_user,
     panelList_reporter_inEdit01,
     panelList_reporter_inEdit02,
     panelList_reporter_reviewed,
+    panelList,
   }
 }
 
