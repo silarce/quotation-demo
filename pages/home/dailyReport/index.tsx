@@ -658,10 +658,9 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
         <DailyReportContext.Provider value={dailyReportContextValue}>
           <ReportTable
-            classDailyReportItemArr={reportInEdit?.items}
             addDailyReportItem={addDailyReportItem}
             removeDailyReportItem={removeDailyReportItem}
-            isEdit={isReportEdit}
+       
           />
         </DailyReportContext.Provider>
 

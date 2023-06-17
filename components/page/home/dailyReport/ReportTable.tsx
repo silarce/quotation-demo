@@ -58,17 +58,13 @@ let timeoutId: NodeJS.Timeout
 const optionArr_period = optionsCreator_dailyReportPeriod()
 // ==================================================
 export default function ReportTable(
-  { classDailyReportItemArr,
+  {
     addDailyReportItem,
     removeDailyReportItem,
-    isEdit,
   }:
     {
-      classDailyReportItemArr: Class_reportItem[] | undefined
       addDailyReportItem: () => void
       removeDailyReportItem: (index: number) => void
-      isEdit: boolean
-
     }
 ) {
   const router = useRouter()
@@ -76,6 +72,11 @@ export default function ReportTable(
 
   const { reportInEdit, userInfo } = useContext(DailyReportContext)
   const { rwd1023 } = useContext(AppContext)
+
+  const classDailyReportItemArr = reportInEdit?.items
+
+  const isEdit = reportInEdit?.isEdit
+
 
   const [monthStart, setMonthStart] = useState<string>()
   const [monthEnd, setMonthEnd] = useState<string>()
@@ -805,15 +806,27 @@ const DatePicker = (
 ) => {
 
   const { reportInEdit, changeReportDate } = useContext(DailyReportContext)
+  const isEdit = reportInEdit?.isEdit
+
 
   const defaultValue = useMemo(() => {
     if (!dailyReport) return undefined
-    if (!reportInEdit?.date) return undefined
-    const inEditDate = moment(reportInEdit?.date) // 應該會是當日
-    if (!dailyReport?.[0]) return inEditDate
+    const inEditDate = moment()
+
+    if (!dailyReport?.[0]) {
+      if (reportInEdit) {
+        reportInEdit.date = inEditDate.toISOString()
+      }
+      return inEditDate
+    }
     const lastDate = moment(dailyReport?.[0].date)
     if (lastDate.isSame(inEditDate, "day")) return undefined
-    return inEditDate
+    else {
+      if (reportInEdit) {
+        reportInEdit.date = inEditDate.toISOString()
+      }
+      return inEditDate
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [!!dailyReport])
 
@@ -821,7 +834,8 @@ const DatePicker = (
     <div className={scss.datePickerWrapper}>
       <InputSel
         /**key是為了使defaultValue更新 */
-        key={`${defaultValue}`}
+        // key={`${defaultValue}`}
+        key={`${defaultValue} ${isEdit}`}
         label="日報表日期"
         captionColor="main"
         gap="24px"
