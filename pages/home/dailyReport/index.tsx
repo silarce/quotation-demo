@@ -421,6 +421,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     const examinerIds = examinerArr.map((emp) => emp.id)
 
     const theDate = reportInEdit.date
+    if (!theDate) return myAlert.warning({ title: "請選擇日期" })
 
     const items = reportInEdit.items.map((item) => {
       const year = new Date(theDate).getFullYear()
@@ -566,7 +567,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
-    sortedDailyReport: dailyReportArr ?? [],
+    dailyReportArr: dailyReportArr ?? [],
     isCalendar,
     router,
     searchGroup,
@@ -788,7 +789,7 @@ const panelListCreator = (
     doCheck,
     switchIsEdit,
     setShowReviewerForReportModal,
-    sortedDailyReport,
+    dailyReportArr,
     isCalendar,
     router,
     searchGroup,
@@ -803,7 +804,7 @@ const panelListCreator = (
       doCheck: () => void
       switchIsEdit: () => void
       setShowReviewerForReportModal: (v: boolean) => void
-      sortedDailyReport: TdailyReportDto[]
+      dailyReportArr: TdailyReportDto[]
       isCalendar: boolean
       router: NextRouter
       searchGroup: TsearchGroup
@@ -881,14 +882,7 @@ const panelListCreator = (
       type: "redButton",
       label: "上傳",
       onClick: () => {
-        // 沒有id代表為新建的日報表
-        if (!reportInEdit?.id) {
-          const lastDate = moment(sortedDailyReport[0].date)
-          const date = moment(reportInEdit?.date)
-          const isSameDate = lastDate.isSame(date, "day")
-          if (isSameDate)
-            return myAlert.warning({ title: "今日的日報表已存在", content: "請至列表點選今日的日報表或選擇其他日期" })
-        }
+        if (!reportInEdit?.date) return myAlert.warning({ title: "請選擇日期" })
         setShowReviewerForReportModal(true)
       },
     },

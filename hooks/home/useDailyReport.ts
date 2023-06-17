@@ -13,7 +13,7 @@ import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyRep
 
 type ThookEmptyReport = {
   id: string | undefined
-  date: string
+  date: string | null
   items: Class_reportItem[]
   isAllowToReview: boolean
   isReviewedByOther: boolean
@@ -242,7 +242,8 @@ const useReport = (
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
     // date: moment().format("yyyy-MM-DD"),
-    date: moment().toISOString(),
+    // date: moment().toISOString(),
+    date: null,
     // date: convertDate_reduce1911(moment().format("yyyy-MM-DD")),
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,

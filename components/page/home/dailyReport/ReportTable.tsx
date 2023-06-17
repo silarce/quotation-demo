@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useContext, useEffect, useMemo } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
@@ -97,7 +97,7 @@ export default function ReportTable(
 
 
   const [isLoading, setIsLoading] = useState(false)
-  const { dailyReport, updateDailyReports, controller } = useApiDailyReports(param)
+  const { dailyReport, setDailyReports, updateDailyReports, controller } = useApiDailyReports(param)
 
   const cancelReq = () => {
     if (controller) controller.abort()
@@ -124,6 +124,18 @@ export default function ReportTable(
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monthStart, monthEnd])
+
+  useEffect(() => {
+    if (isEdit) return
+    setDailyReports(undefined)
+    setMonthStart(undefined)
+    setMonthEnd(undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit])
+
+
+
+
 
   const [showModal_worker, setShowModal_worker] = useState(false)
   const [showModal_meals, setShowModal_meals] = useState(false)
@@ -794,11 +806,22 @@ const DatePicker = (
 
   const { reportInEdit, changeReportDate } = useContext(DailyReportContext)
 
+  const defaultValue = useMemo(() => {
+    if (!dailyReport) return undefined
+    if (!reportInEdit?.date) return undefined
+    const inEditDate = moment(reportInEdit?.date) // 應該會是當日
+    if (!dailyReport?.[0]) return inEditDate
+    const lastDate = moment(dailyReport?.[0].date)
+    if (lastDate.isSame(inEditDate, "day")) return undefined
+    return inEditDate
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!dailyReport])
+
   return (
     <div className={scss.datePickerWrapper}>
       <InputSel
         /**key是為了使defaultValue更新 */
-        key={+!!reportInEdit?.date}
+        key={`${defaultValue}`}
         label="日報表日期"
         captionColor="main"
         gap="24px"
@@ -814,7 +837,8 @@ const DatePicker = (
             changeReportDate(dateStr)
           },
           antdDatePickerProps: {
-            defaultValue: moment(reportInEdit?.date || undefined),
+            // defaultValue: moment(reportInEdit?.date || undefined),
+            defaultValue: defaultValue,
             disabledDate: (date) => {
               if (isLoading) return true
               // 比當日晚的日期都不能選
