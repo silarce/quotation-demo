@@ -51,7 +51,11 @@ export const useGetAnnotation = (otherParams?: Tparams) => {
 }
 
 export const useGetAnnotation_v2 = (customParams?: Tparams) => {
-  /**viewRef不可以放在 */
+  /**就只是為了render */
+  const [render, setRender] = useState(0)
+  const [isLoading, setIsloading] = useState(false)
+  /**viewRef 不可以放在一開始就會出現在畫面上的item上，
+   * 不然無法觸發nextPage */
   const [viewRef, inView] = useInView();
   const [page, setPage] = useState(1)
 
@@ -65,18 +69,15 @@ export const useGetAnnotation_v2 = (customParams?: Tparams) => {
     ...customParams
   } as const
 
-
   const [dataArrQueue, setDataArrQueue] = useState<TgetAnnotation["data"][]>([])
-
   const [data, setData] = useState<TgetAnnotation["data"]>()
   const [meta, setMeta] = useState<TgetAnnotation["meta"]>()
 
 
-
-  
   const update_infinite = async () => {
     if (meta && !meta.hasNextPage) return
     const res = await apiGetAnnotation(params)
+    setIsloading(false)
     const dataArrQueueCopy = [...dataArrQueue]
     dataArrQueueCopy[page - 1] = res.data
     setDataArrQueue(dataArrQueueCopy)
@@ -91,16 +92,18 @@ export const useGetAnnotation_v2 = (customParams?: Tparams) => {
   }
 
   const reset = () => {
+    setIsloading(true)
     setDataArrQueue([])
     setData(undefined)
     setMeta(undefined)
     setPage(1)
+    setRender(state => ++state)
   }
 
   useEffect(() => {
     update_infinite()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [page, render])
 
   useEffect(() => {
     if (inView) nextPage()
@@ -114,7 +117,7 @@ export const useGetAnnotation_v2 = (customParams?: Tparams) => {
   return {
     data, meta, setData,
     nextPage, reset,
-    viewRef,
+    viewRef, isLoading
   }
 } // useGetAnnotation_v2
 

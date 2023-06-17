@@ -17,7 +17,7 @@ import { convertDate_reduce1911 } from "js/utils/helpers/date/convertDate";
 import scss from "../inputSel.module.scss"
 
 export type TdatePickerProps = {
-  value: string
+  value?: string | undefined
   boxClassName?: string
   datePickerClassName?: string
 
@@ -69,6 +69,7 @@ export default function MyDatePicker(
   // ---------------------------------------------------------------------------
   // 將stateValue轉為moment物件
   const theValue = (() => {
+    if (!value) return undefined
     const theMoment = moment(value)
     return theMoment.isValid() ? theMoment : undefined
   })()
@@ -96,7 +97,8 @@ export default function MyDatePicker(
         locale={locale}
         value={theValue}
         placeholder={placeholder ?? "例 : 100-01-01"}
-        defaultPickerValue={moment()}
+        // defaultPickerValue={moment()}
+        // defaultValue={moment()}
         // defaultPickerValue={moment().year(moment().year() - 1911)}
         // format回傳日期的日期會導致input不能用
         format={(theMoment) => {

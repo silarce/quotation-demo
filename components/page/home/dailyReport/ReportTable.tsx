@@ -1,4 +1,4 @@
-import { useState, useContext, } from "react"
+import { useState, useContext, useEffect } from "react"
 import { useRouter } from "next/router"
 
 import classNames from "classnames"
@@ -8,19 +8,29 @@ import moment from 'moment';
 import _ from "lodash"
 
 // antd
-import { Drawer, Badge } from "antd"
+import { Drawer, Badge, Spin } from "antd"
+import { LoadingOutlined } from '@ant-design/icons';
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import MyButton from "components/global/gear/button/myButton"
 import WorkerSelector from "components/global/gear/modal/workerSelector"
-// import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import MealSelector from "./MealSelector"
 import LicensePlateSelector from "./LicensePlateSelector";
 import CheckButton from "components/global/gear/button/checkButton"
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 
 // css
 import scss from "./reportTable.module.scss"
+
+// api
+import {
+  TdailyReportDto,
+  useApiDailyReports
+} from "js/api/api_dailyReport";
+
+
+
 // option
 import {
   Toption,
@@ -41,8 +51,10 @@ import { AppContext } from "pages/_app"
 import { DailyReportContext } from "pages/home/dailyReport"
 
 
-
 // ==================================================
+// 防抖
+let timeoutId: NodeJS.Timeout
+// 
 const optionArr_period = optionsCreator_dailyReportPeriod()
 // ==================================================
 export default function ReportTable(
@@ -50,21 +62,65 @@ export default function ReportTable(
     addDailyReportItem,
     removeDailyReportItem,
     isEdit,
-    reportDateArr
   }:
     {
       classDailyReportItemArr: Class_reportItem[] | undefined
       addDailyReportItem: () => void
       removeDailyReportItem: (index: number) => void
       isEdit: boolean
-      reportDateArr: string[]
+
     }
 ) {
   const router = useRouter()
   const isMine = (router.query.isMine === "true") ? true : false
 
-  const { reportInEdit } = useContext(DailyReportContext)
+  const { reportInEdit, userInfo } = useContext(DailyReportContext)
   const { rwd1023 } = useContext(AppContext)
+
+  const [monthStart, setMonthStart] = useState<string>()
+  const [monthEnd, setMonthEnd] = useState<string>()
+
+  const userId = userInfo.employee?.id
+
+  const param = {
+    filter: {
+      $and: {
+        "employee.id": { $eq: userId },
+        date: {
+          $gte: monthStart,
+          $lte: monthEnd
+        },
+      }
+    }
+  }
+
+
+  const [isLoading, setIsLoading] = useState(false)
+  const { dailyReport, updateDailyReports, controller } = useApiDailyReports(param)
+
+  const cancelReq = () => controller.abort()
+
+  useEffect(() => {
+    if (classDailyReportItemArr === undefined) return;
+    const now = moment()
+    setMonthStart(now.clone().subtract(1, "month").startOf("month").toISOString())
+    setMonthEnd(now.clone().add(1, "month").startOf("month").toISOString())
+  }, [classDailyReportItemArr])
+
+  useEffect(() => {
+    if (!monthStart || !monthEnd) return;
+    clearTimeout(timeoutId)
+    setIsLoading(true)
+
+    timeoutId = setTimeout(async () => {
+      try {
+        await updateDailyReports()
+      }
+      catch { }
+      setIsLoading(false)
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthStart, monthEnd])
 
   const [showModal_worker, setShowModal_worker] = useState(false)
   const [showModal_meals, setShowModal_meals] = useState(false)
@@ -136,7 +192,13 @@ export default function ReportTable(
       {/*  */}
       {/*  */}
       {!reportInEdit?.id &&
-        <DatePicker reportDateArr={reportDateArr} disabled={disabled} />
+        <DatePicker disabled={disabled}
+          setMonthStart={setMonthStart}
+          setMonthEnd={setMonthEnd}
+          isLoading={isLoading}
+          dailyReport={dailyReport}
+          cancelReq={cancelReq}
+        />
       }
 
       <div className={classNames(scss.table)}>
@@ -710,10 +772,20 @@ const mealsLookup = {
 // ==============================================================================
 // ==============================================================================
 const DatePicker = (
-  { reportDateArr, disabled }:
+  { disabled,
+    setMonthStart,
+    setMonthEnd,
+    isLoading,
+    dailyReport,
+    cancelReq
+  }:
     {
-      reportDateArr: string[]
       disabled: boolean
+      setMonthStart: (ISOstring: string) => void
+      setMonthEnd: (ISOstring: string) => void
+      isLoading: boolean
+      dailyReport: TdailyReportDto[] | undefined
+      cancelReq: () => void
     }
 ) => {
 
@@ -722,6 +794,8 @@ const DatePicker = (
   return (
     <div className={scss.datePickerWrapper}>
       <InputSel
+        /**key是為了使defaultValue更新 */
+        key={+!!reportInEdit?.date}
         label="日報表日期"
         captionColor="main"
         gap="24px"
@@ -730,28 +804,51 @@ const DatePicker = (
         placeholder="請選擇日期"
         disabled={disabled}
         datePickerProps={{
-          value: reportInEdit?.date || "",
+          // value: reportInEdit?.date || "",
+          value: undefined,
           onChange02(moment, dateString) {
             const dateStr = moment?.toISOString() ?? ""
             changeReportDate(dateStr)
           },
           antdDatePickerProps: {
+            defaultValue: moment(reportInEdit?.date || undefined),
             disabledDate: (date) => {
+              if (isLoading) return true
               // 比當日晚的日期都不能選
               if (date.isAfter(moment())) { return true }
-              // 已經存在的日期都不能選
-              const disabledDate = reportDateArr.some((theDate) => {
-                return date.isSame(moment(theDate), "day")
+
+              // // 已經存在的日期都不能選
+              if (!dailyReport) return true
+              const disabledDate = dailyReport.some((report) => {
+                return date.isSame(moment(report.date), "day")
               })
+
               return disabledDate
-            }
-          }
+            },
+            onPanelChange: (theMoment, mode) => {
+              cancelReq()
+              const start =
+                theMoment.clone().subtract(1, "month").startOf("month").toISOString()
+              const end =
+                theMoment.clone().endOf("month").add(1, "month").toISOString()
+              setMonthStart(start)
+              setMonthEnd(end)
+            },
+            dateRender: isLoading ? DateRender : undefined
+          },
         }}
       />
     </div>
   )
-
 }
+
+
+const DateRender = () => {
+  return (
+    <Spin indicator={<LoadingOutlined />} />
+  )
+}
+
 
 // ==============================================================================
 // ==============================================================================
