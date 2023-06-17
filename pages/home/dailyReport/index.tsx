@@ -356,7 +356,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // 檢視人員設定
   // SetReportEmpModal
-  
+
   //**開啟回報人員設定面板 */
   const editRivewerPickArr = async () => {
     const resArr = await Promise.all([
@@ -881,11 +881,14 @@ const panelListCreator = (
       type: "redButton",
       label: "上傳",
       onClick: () => {
-        const lastDate = moment(sortedDailyReport[0].date)
-        const date = moment(reportInEdit?.date)
-        const isSameDate = lastDate.isSame(date, "day")
-        if (isSameDate)
-          return myAlert.warning({ title: "今日的日報表已存在", content: "請至列表點選今日的日報表或選擇其他日期" })
+        // 沒有id代表為新建的日報表
+        if (!reportInEdit?.id) {
+          const lastDate = moment(sortedDailyReport[0].date)
+          const date = moment(reportInEdit?.date)
+          const isSameDate = lastDate.isSame(date, "day")
+          if (isSameDate)
+            return myAlert.warning({ title: "今日的日報表已存在", content: "請至列表點選今日的日報表或選擇其他日期" })
+        }
         setShowReviewerForReportModal(true)
       },
     },
