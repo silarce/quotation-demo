@@ -241,17 +241,15 @@ const useReport = (
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
-    // date: moment().format("yyyy-MM-DD"),
     // date: moment().toISOString(),
     date: null,
-    // date: convertDate_reduce1911(moment().format("yyyy-MM-DD")),
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,
     isReviewedByOther: false,
     isReviewedByUser: false,
     isReviewCompleted: false,
     isUserIsViewer: false,
-    isEdit: false,
+    isEdit: true,
     employeeId: undefined,
     employeeChName: userInfo.employee?.chName || ""
   }) // emptyReportCre
@@ -329,6 +327,12 @@ const useReport = (
   // 
   const switchIsEdit = () => {
     if (!report) return
+    /** emptyReportCre.isEdit預設為true
+     * 所以新增回報後不會有編輯按鈕，就不會曾經執行過setReportTemp(_.cloneDeep(report))
+     * 所以reportTemp會是undefine
+     * 所以按下取消按鈕執行setReport(_.cloneDeep(reportTemp))後
+     * report就變成undefine，就直接關掉編輯面板了
+    */
     if (!report.isEdit) setReportTemp(_.cloneDeep(report))
     else {
       setReport(_.cloneDeep(reportTemp))
