@@ -151,7 +151,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
-
   const filterIsMine = (() => {
     if (isMine) return { $eq: userId }
     if (!isMine) return { $ne: userId }
@@ -208,14 +207,26 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   const { dailyReport: dailyReport_calendar,
     updateDailyReports: updateDailyReports_calendar } = useApiDailyReports(params_calendar)
 
-  const update_calendar = async (dynamicParams?: Tparams) => {
+  const update_calendar = async (dynamicFilter?: Tparams["filter"]) => {
     try {
       setIsLoading(true)
-      await updateDailyReports_calendar(dynamicParams)
+      await updateDailyReports_calendar(dynamicFilter)
     }
     catch { myAlert.err({ title: "取得月曆日報表列表失敗" }) }
     setIsLoading(false)
   }
+
+  const update_calendar_thisMonth = async () => {
+    const now = moment()
+    const filter = filterCre_nextAndPrevMonth(now)
+    try {
+      setIsLoading(true)
+      await updateDailyReports_calendar(filter)
+    }
+    catch { myAlert.err({ title: "取得月曆日報表列表失敗" }) }
+    setIsLoading(false)
+  }
+
 
 
 
@@ -225,25 +236,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     viewRef, reset,
     isLoading: isLoading_v2,
   } = useApiDailyReports_v2(params)
-
-
-
-
-  // const { sortedDailyReport } = useMemo(() => {
-  //   // 在params裡已經排序了
-  //   // const sortedDailyReport = _.sortBy(dailyReport, "date").reverse()
-  //   // const sortedDailyReport = dailyReport ?? []
-  //   /** */
-  //   // const reportDateArr = (() => {
-  //   //   if (!isMine) return []
-  //   //   // const arr = dailyReport?.map((report) => convertDate_reduce1911(report.date)) ?? []
-  //   //   const arr = dailyReport?.map((report) => report.date) ?? []
-  //   //   return arr
-  //   // })()
-  //   return { sortedDailyReport, }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [dailyReport])
-
 
 
   /**取得指定月份所有日報表，額外做了loading的處理 (改用reset後不用setIsLoading)*/
@@ -282,7 +274,8 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     cancelEditNewDailyReport();
     try {
       setIsLoading(true)
-      await reset()
+      if (isCalendar) await update_calendar_thisMonth()
+      else await reset()
     }
     catch {
       if (searchQuery?.date) {
@@ -555,6 +548,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         isUserReviewed: searchObj.isUserReviewed,
         date: searchObj.date,
         isMine,
+        isCalendar
       }
     })
 
