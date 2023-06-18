@@ -26,7 +26,7 @@ export default function PageHeader_mobile_dailyReport(
       doShowDrawer: () => void
       editRivewerPickArr: () => void
       employeeChName: string | undefined
-      date: string | undefined
+      date: string | undefined | null
       identity: "manager" | "reviewer" | "reporter" | undefined
       editReport_today: () => void
       cancelEditNewDailyReport: () => void
@@ -47,7 +47,7 @@ export default function PageHeader_mobile_dailyReport(
       {employeeChName &&
         <div className={scss.title}>
           <Image src={iconArrow} alt="return" onClick={cancelEditNewDailyReport} />
-          <span>{employeeChName} {date}</span>
+          <span>{employeeChName} {date || ""}</span>
           <div />
         </div>
       }

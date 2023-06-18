@@ -5,14 +5,11 @@ import _ from "lodash"
 import { axi } from "./_axiosCreator";
 
 
-
-
 import {
-  TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
+  TdailyReportDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
   TemployeeDto,
   TpageMetaDto,
-  TdailyReportWorkerJobsDto,
   TdailyReportWokerDto,
   Tparams,
 } from "./dtoTypes"
@@ -35,74 +32,85 @@ type TgetDailyReports = {
 }
 
 // 取得指定月份所有日報表
-/**month格式為yyyy-MM 例:2022-02 */
-const apiDailyReports = (filter?: { [key: string]: any }) => {
+const apiDailyReports = (
+  customParams?: Tparams,
+  controller?: AbortController
+) => {
   const api = `/daily-reports`
-
   const params = {
     populate: [
       "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
-    filter,
-    pageSize: 200,
     sort: "date",
-    order: "DESC"
+    order: "DESC",
+    ...customParams
   }
 
-  return axi.get(api, { params })
+  return axi.get(api, { params, signal: controller?.signal })
     .then(({ data }) => data as TgetDailyReports)
     .catch(err => Promise.reject(err))
 }
 
-/**month格式為yyyy-MM 例:2022-02 */
-export const useApiDailyReports = (
-  params?: { filter?: { [key: string]: any } }) => {
-
+export const useApiDailyReports = (params?: Tparams) => {
+  const [controller, setController] = useState<AbortController>()
   const [res, setRes] = useState<TgetDailyReports>()
-  const update = async () => {
-    const data = await apiDailyReports(params?.filter)
+
+  const update = async (dynamicFilter?: Tparams["filter"]) => {
+    const newController = new AbortController()
+    setController(newController)
+    const theParams: Tparams = {
+      ...params,
+      filter: {
+        ...params?.filter,
+        ...dynamicFilter
+      }
+    }
+    const data = await apiDailyReports(theParams, newController)
     if (data) setRes(data)
     return data
   }
+
   return {
-    /** 指定月份所有日報表 */
     dailyReport: res?.data,
     setDailyReports: setRes,
-    /** 更新指定月份所有日報表*/
     updateDailyReports: update,
+    controller
   }
 }
 
 // ----
-export const useApiDailyReports_v2 = (
-  { customeParams }:
-    { customeParams: Tparams }
-) => {
 
+
+export const useApiDailyReports_v2 = (customParams?: Tparams) => {
+  /**就只是為了render */
+  const [render, setRender] = useState(0)
+  const [isLoading, setIsloading] = useState(false)
+  /**viewRef 不可以放在一開始就會出現在畫面上的item上，
+   * 不然無法觸發nextPage */
   const [viewRef, inView] = useInView();
   const [page, setPage] = useState(1)
 
-  const params: Tparams = {
+  const params = {
     page,
-    pageSize: 20,
-    sort: "date",
-    order: "DESC",
-    populate: [
-      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted"
-    ],
-    ...customeParams
-  }
+    // pageSize必須大於畫面一次可顯示的item數量才不會壞掉    
+    // 不過應該只有在嚴格模式會壞掉
+    pageSize: 15,
+    ...customParams
+  } as const
 
   const [dataArrQueue, setDataArrQueue] = useState<TgetDailyReports["data"][]>([])
   const [data, setData] = useState<TgetDailyReports["data"]>()
   const [meta, setMeta] = useState<TgetDailyReports["meta"]>()
 
+
   const update_infinite = async () => {
     if (meta && !meta.hasNextPage) return
     const res = await apiDailyReports(params)
+    setIsloading(false)
     const dataArrQueueCopy = [...dataArrQueue]
     dataArrQueueCopy[page - 1] = res.data
     setDataArrQueue(dataArrQueueCopy)
     setData(dataArrQueueCopy.flat())
+    setMeta(res.meta)
     return res
   }
 
@@ -112,37 +120,35 @@ export const useApiDailyReports_v2 = (
   }
 
   const reset = () => {
+    setIsloading(true)
     setDataArrQueue([])
     setData(undefined)
     setMeta(undefined)
     setPage(1)
+    setRender(state => ++state)
   }
 
   useEffect(() => {
+    if (render === 0) return
     update_infinite()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [page, render])
 
   useEffect(() => {
     if (inView) nextPage()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView])
 
-  useEffect(() => {
-    reset()
-  }, [customeParams])
+  // useEffect(() => {
+  //   reset()
+  // }, [])
 
   return {
-    data, meta,
-    setData, nextPage, reset,
-    viewRef
+    data, meta, setData,
+    nextPage, reset,
+    viewRef, isLoading
   }
-}
-
-
-
-
-
+} // useGetAnnotation_v2
 
 
 // 取得自己指定日期的日報表

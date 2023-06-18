@@ -58,12 +58,14 @@ export default function MemoList() {
       category: { "$eq": filter.category },
       doorModelName: { "$eq": filter.doorModelName },
       type: { "$eq": filter.type },
-      description: { "$eq": filter.description },
+      description: { "$contains": filter.description },
     }
   }
-
-  const { data: annotationArr, reset, viewRef } = useGetAnnotation_v2(params)
-
+  const {
+    data: annotationArr,
+    reset, viewRef,
+    isLoading: getIsLoading
+  } = useGetAnnotation_v2(params)
 
   useEffect(() => {
     reset()
@@ -113,7 +115,8 @@ export default function MemoList() {
   const searchTargetList: TsearchGroup["searchTargetList"] = [
     {
       placeholder: "選擇類別",
-      options: optionsCategory
+      options: optionsCategory,
+      width:"150px"
     },
     {
       placeholder: "選擇門型",
@@ -162,7 +165,7 @@ export default function MemoList() {
         apiReq={apiReq}
         viewRef={viewRef}
       />
-      <LoadingCover01 isLoading={isLoading} />
+      <LoadingCover01 isLoading={isLoading || getIsLoading} />
     </SubLayer>
   )
 }

@@ -29,10 +29,12 @@ export default function ReporterList(
   {
     dailyReportArr,
     addTag,
+    viewRef,
   }:
     {
       dailyReportArr: TdailyReportDto[]
       addTag: (employee: Ttag) => void
+      viewRef: (node?: Element | null | undefined) => void
     }
 ) {
 
@@ -52,16 +54,30 @@ export default function ReporterList(
   return (
     <div className={scss.container}>
 
-      {groupReportArr.map((group, index) => {
+      {groupReportArr.map((group, gIndex) => {
         const { date, reportArr } = group
         const twDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
+
+        // const ref = (groupReportArr.length - 3 === gIndex) ? viewRef : undefined
+
         return (
-          <div key={index}>
+          <div key={gIndex}>
             <div className={classNames(scss.groupHeader)}>
               <span>{twDate}</span>
             </div>
 
-            {reportArr.map((report, index) => {
+            {reportArr.map((report, rIndex) => {
+
+              const ref = (() => {
+                if (groupReportArr.length - 3 === gIndex) {
+                  if (reportArr.length >= 3) {
+                    if (reportArr.length - 3 === rIndex) return viewRef
+                  }
+                  else if (rIndex === 0) return viewRef
+                }
+                return undefined
+              })()
+
               const { date, employee, id: reportId, reviewStatus } = report
               const { chName, id: employeeId } = employee
               const twDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
@@ -92,9 +108,10 @@ export default function ReporterList(
                   .reverse()
 
               return (
-                <CellWithBar key={index} className={classNames(scss.row)}
+                <CellWithBar key={rIndex} className={classNames(scss.row)}
                   onClick={() => { addTag(tag) }}>
-                  <div className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
+                  <div ref={ref}
+                    className={classNames(scss.chName, "w-[120px]")}><span>{chName}</span></div>
 
                   <div className={classNames(scss.reviewerList, "w-full")}>
 
