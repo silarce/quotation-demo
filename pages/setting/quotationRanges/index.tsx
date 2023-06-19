@@ -1,50 +1,50 @@
-// 公司職等職稱
-// 公司職等職稱
-import { useState, } from "react"
-
-const _ = require("lodash")
+import { useState, useEffect } from "react"
+import classNames from "classnames"
+import _ from "lodash"
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
 
 // component
-import Table_annotation from "components/page/setting/quoteScopeList/table_quoteScopes"
+import Table_quotationRanges from "components/page/setting/quotationRanges/table_quotationRanges"
 
 // glogal gear
 import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
-// import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-// import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
-import style from "./quotationRanges.module.scss"
+import scss from "./quotationRanges.module.scss"
+
+// api
+import {
+  useGetQuotationRanges_v2,
+  apiPostQuotationRanges, apiPatchQuotationRanges, apiDeleteQuotationRanges,
+} from "js/api/api_workSheet"
 
 // type
-import { TannotationDto } from "js/api/dtoTypes"
+import { TquotationRangeDto } from "js/api/dtoTypes"
 import { Tparams } from "js/api/dtoTypes"
 
+// other
 import {
-  optionsCreator_prodClass,
-  optionsCreator_doorType,
-  optionsCreator_doorForm,
-  Toption
-} from "js/utils/options/options"
+  Toption,
+  optionsCreator_category,
+  optionsCreator_doorModel,
+  optionsCreator_doorForm
+} from "js/utils/options/productOptions"
 
-const optionsProdClass = optionsCreator_prodClass({ haveEmpty: true })
-const optionsDoorType = optionsCreator_doorType({ haveEmpty: true })
+// ==========================================================================
+const optionsCategory = optionsCreator_category({ haveEmpty: true })
+const optionsDoorModel = optionsCreator_doorModel({ haveEmpty: true })
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
 
-type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type" | "description">>
+type Tfilter = Partial<Pick<TquotationRangeDto, "category" | "doorModelName" | "type" | "description">>
 
 // ==========================================================================
 export default function QuotationRanges() {
-  // const [isReady, setIsReady] = useState(false)
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [showAdd, setShowAdd] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   // ------------------------------------------------------------------------
-  // const { classAnnotation, newClassAnno, clearAnno, } = useClassAnnotation()
-
-
 
   const [filter, setFilter] = useState<Tfilter>({
     category: undefined,
@@ -53,22 +53,60 @@ export default function QuotationRanges() {
     description: undefined,
   })
 
-
   const params: Tparams = {
     filter: {
       category: { "$eq": filter.category },
       doorModelName: { "$eq": filter.doorModelName },
       type: { "$eq": filter.type },
-      description: { "$eq": filter.description },
+      description: { "$contains": filter.description },
     }
   }
+  const {
+    data: quotationRangeArr,
+    reset, viewRef,
+    isLoading: getIsLoading
+  } = useGetQuotationRanges_v2(params)
 
+  useEffect(() => {
+    reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter])
 
-  const hookPack = useClassAnnotation()
-  const { newClassAnno, } = hookPack
+  const hookPack = useClassQuotationRange()
+  const { classQuotationRange, newClassRange, clearRange: clearRange } = hookPack
 
-  const apiReq = (method: "post" | "patch" | "delete") => {
-    alert("test")
+  const apiReq = async (method: "post" | "patch" | "delete", delId?: string) => {
+
+    let id: undefined | string = undefined
+    let body: undefined | Parameters<typeof apiPostQuotationRanges>[0]["body"] = undefined
+
+    if (method !== "delete") {
+      if (!classQuotationRange) return
+      let { id: classId, apiBody, } = classQuotationRange
+      const { category, doorModelName, type, description, } = apiBody
+      if (!category) return myAlert.warning({ title: "請選擇類型" })
+      if (!doorModelName) return myAlert.warning({ title: "請選擇門型" })
+      if (!type) return myAlert.warning({ title: "請選擇形式" })
+      id = classId
+      body = { category, doorModelName, type, description, }
+    }
+
+    try {
+      setIsLoading(true)
+
+      const apiReq = (() => {
+        if (method === "post") return () => apiPostQuotationRanges({ body: body! })
+        if (method === "patch") return () => apiPatchQuotationRanges({ body: body!, id: id! })
+        if (method === "delete") return () => apiDeleteQuotationRanges({ id: delId! })
+      })()
+      await apiReq?.()
+      await reset()
+      clearRange()
+    }
+    catch (err) {
+      myAlert.err({ title: "上傳失敗" })
+    }
+    setIsLoading(false)
   }
 
   // ------------------------------------------------------------------------
@@ -77,11 +115,12 @@ export default function QuotationRanges() {
   const searchTargetList: TsearchGroup["searchTargetList"] = [
     {
       placeholder: "選擇類別",
-      options: optionsProdClass
+      options: optionsCategory,
+      width: "150px"
     },
     {
       placeholder: "選擇門型",
-      options: optionsDoorType
+      options: optionsDoorModel
     },
     {
       placeholder: "選擇形式",
@@ -109,49 +148,44 @@ export default function QuotationRanges() {
     { searchGroup },
     {
       type: "addButton",
-      label: "新增報價範圍",
-      onClick: newClassAnno,
+      label: "新增備註",
+      onClick: newClassRange,
     },
   ]
   // ------------------------------------------------------------------------
   return (
-    <SubLayer className={style.container}>
+    <SubLayer className={scss.container} bodyClassName={classNames(scss.subLayer, scss.plus)}>
       <PageHeader02
-        tag="報價範圍列表"
+        tag="備註列表"
         panelList={panelList}
       />
-
-      <div >
-        <Table_annotation
-          hookPack={hookPack}
-          apiReq={apiReq}
-        />
-      </div>
-
+      <Table_quotationRanges
+        quotationRangeArr={quotationRangeArr}
+        hookPack={hookPack}
+        apiReq={apiReq}
+        viewRef={viewRef}
+      />
+      <LoadingCover01 isLoading={isLoading || getIsLoading} />
     </SubLayer>
   )
 }
-
-
-// ===================================================================================
-
-const emptyAnnotation = {
+// ==========================================================================
+const emptyQuotationRangeCre = () => ({
   id: undefined,
   category: undefined,
   doorModelName: undefined,
   type: undefined,
   description: "",
-}
+})
 
-
-export class Class_annotation {
+export class Class_quotationRange {
   constructor(
     { reRender,
-      annotation = emptyAnnotation,
+      quotationRange = emptyQuotationRangeCre(),
       source
     }: {
       reRender: () => void
-      annotation?: {
+      quotationRange?: {
         id: string | undefined
         category: string | undefined
         doorModelName: string | undefined
@@ -162,65 +196,73 @@ export class Class_annotation {
     }
   ) {
     this._reRender = reRender
-    this._annotation = annotation
+    this._quotationRange = quotationRange
     this.source = source
   } // constructor
 
   private _reRender
-  private _annotation
+  private _quotationRange
   source
 
-  get id() { return this._annotation.id }
+  get id() { return this._quotationRange.id }
 
-  get category() { return this._annotation.category }
-  set category(v) { this._annotation.category = v; this._reRender() }
+  get category() { return this._quotationRange.category }
+  set category(v) { this._quotationRange.category = v; this._reRender() }
 
-  get doorModelName() { return this._annotation.doorModelName }
-  set doorModelName(v) { this._annotation.doorModelName = v; this._reRender() }
+  get doorModelName() { return this._quotationRange.doorModelName }
+  set doorModelName(v) { this._quotationRange.doorModelName = v; this._reRender() }
 
-  get type() { return this._annotation.type }
-  set type(v) { this._annotation.type = v; this._reRender() }
+  get type() { return this._quotationRange.type }
+  set type(v) { this._quotationRange.type = v; this._reRender() }
 
-  get description() { return this._annotation.description }
-  set description(v) { this._annotation.description = v; this._reRender() }
+  get description() { return this._quotationRange.description }
+  set description(v) { this._quotationRange.description = v; this._reRender() }
+
+  get apiBody() {
+    return {
+      category: this.category ?? "",
+      doorModelName: this.doorModelName ?? "",
+      type: this.type as "normal" | "anti-typhoon" | "",
+      description: this.description ?? "",
+    }
+  }
 }
 
-const useClassAnnotation = () => {
+const useClassQuotationRange = () => {
 
   const [render, setRender] = useState(0)
   const reRender = () => { setRender(state => ++state) }
-  const [classAnnotation, setClassAnnotation] = useState<Class_annotation>()
+  const [classQuotationRange, setClassQuotationRange] = useState<Class_quotationRange>()
 
-  const newClassAnno = () => {
-    const theClass = new Class_annotation({ reRender, source: "new" })
-    setClassAnnotation(theClass)
+  const newClassRange = () => {
+    const theClass = new Class_quotationRange({ reRender, source: "new" })
+    setClassQuotationRange(theClass)
   }
 
-  const editClassAnno = (annotation: TannotationDto) => {
-    const theClass = new Class_annotation({ reRender, annotation, source: "edit" })
-    setClassAnnotation(theClass)
+  const editClassRange = (quotationRange: TquotationRangeDto) => {
+    const copy = _.cloneDeep(quotationRange)
+    const theClass = new Class_quotationRange({ reRender, quotationRange: copy, source: "edit" })
+    setClassQuotationRange(theClass)
   }
 
-  const copyClassAnno = (annotation: TannotationDto) => {
-    const theClass = new Class_annotation({ reRender, annotation, source: "new" })
-    setClassAnnotation(theClass)
+  const copyClassRange = (quotationRange: TquotationRangeDto) => {
+    const copy = _.cloneDeep(quotationRange)
+    const theClass = new Class_quotationRange({ reRender, quotationRange: copy, source: "new" })
+    setClassQuotationRange(theClass)
   }
 
-  const clearAnno = () => {
-    setClassAnnotation(undefined)
+  const clearRange = () => {
+    setClassQuotationRange(undefined)
   }
 
   return {
-    classAnnotation,
-    newClassAnno, editClassAnno, clearAnno, copyClassAnno,
+    classQuotationRange,
+    newClassRange, editClassRange, clearRange, copyClassRange,
   }
 
 }
 
-export type TuseClassAnnotation = typeof useClassAnnotation
-
+export type TuseClassQuotationRange = typeof useClassQuotationRange
 
 // =========================================================================
-
-
 

@@ -1,4 +1,4 @@
-import { useState, createContext } from "react"
+import { useState, createContext, forwardRef } from "react"
 import classNames from "classnames"
 import _ from "lodash"
 import Image from "next/image"
@@ -6,9 +6,10 @@ import Image from "next/image"
 // gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
+import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
-import scss from "./table_quoteScopes.module.scss"
+import scss from "./table_quotationRanges.module.scss"
 
 // options
 import { optionsCreator_category, optionsCreator_doorModel, optionsCreator_doorForm } from "js/utils/options/productOptions"
@@ -19,10 +20,10 @@ import iconCheck from "public/image/icon/check02.svg"
 import iconCross from "public/image/icon/cross_thin.svg"
 
 // type
-import { TannotationDto, TcreateAnnotationDto } from "js/api/dtoTypes"
+import { TquotationRangeDto, TcreateQuotationRangeDto } from "js/api/dtoTypes"
 import { Toption } from "js/utils/options/options"
-import { Class_annotation } from "pages/setting/quoteScopeList"
-import { TuseClassAnnotation } from "pages/setting/quoteScopeList"
+import { Class_quotationRange } from "pages/setting/quotationRanges"
+import { TuseClassQuotationRange } from "pages/setting/quotationRanges"
 
 // =======================================================================
 const optionArr_category = optionsCreator_category()
@@ -30,46 +31,48 @@ const optionArr_doorModel = optionsCreator_doorModel()
 const optionArr_doorForm = optionsCreator_doorForm()
 
 // =======================================================================
-export default function Table_annotation(
+export default function Table_quotationRange(
   {
+    quotationRangeArr,
     hookPack,
     apiReq,
+    viewRef,
   }:
     {
-      hookPack: ReturnType<TuseClassAnnotation>
-      apiReq: (method: "post" | "patch" | "delete") => void
+      quotationRangeArr: TquotationRangeDto[] | undefined
+      hookPack: ReturnType<TuseClassQuotationRange>
+      apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
+      viewRef: (node?: Element | null | undefined) => void
     }
 ) {
 
-  const { classAnnotation, clearAnno, editClassAnno, copyClassAnno } = hookPack
-
-
-  const annotationArr = fakeAnnotation
-
+  const { classQuotationRange, clearRange, editClassRange, copyClassRange } = hookPack
 
   return (
-    <div className={scss.container}>
+    <div className={scss.table}>
       <Thead />
-      {classAnnotation?.source === "new" &&
-        <AddRow classAnnotation={classAnnotation}
-          cancel={clearAnno}
-          confirm={() => apiReq("post")}
+      <div className={scss.tbodyWrapper}>
+        {classQuotationRange?.source === "new" &&
+          <EditRow className={scss.editRow_add}
+            classQuotationRange={classQuotationRange}
+            cancel={clearRange}
+            confirm={() => apiReq("post")}
+          />
+        }
+        <BodyRowGroup quotationRangeArr={quotationRangeArr}
+          editClassRange={editClassRange}
+          classQuotationRange={classQuotationRange}
+          clearRange={clearRange}
+          apiReq={apiReq}
+          copyClassRange={copyClassRange}
+          viewRef={viewRef}
         />
-      }
-      <BodyRowGroup annotationArr={annotationArr}
-        editClassAnno={editClassAnno}
-        classAnnotation={classAnnotation}
-        clearAnno={clearAnno}
-        apiReq={apiReq}
-        copyClassAnno={copyClassAnno}
-      />
+      </div>
     </div>
   )
 }
 
 // ===========================================================================
-
-
 const Thead = () => {
   return (
     <div className={classNames(scss.row, scss.thead)}>
@@ -85,19 +88,20 @@ const Thead = () => {
   )
 }
 
-const AddRow = (
-  { classAnnotation, cancel, confirm }:
+const EditRow = (
+  { classQuotationRange, cancel, confirm, className }:
     {
-      classAnnotation?: Class_annotation
+      classQuotationRange?: Class_quotationRange
       cancel: () => void
       confirm: () => void
+      className?: string
     }
 ) => {
 
 
-  if (!classAnnotation) return null
+  if (!classQuotationRange) return null
   return (
-    <CellWithBar isActive={true} className={classNames(scss.row, scss.addRow)}>
+    <CellWithBar isActive={true} className={classNames(scss.row, scss.editRow, className)}>
       {addKeyArr.map(key => {
         const { className, optionArr } = config[key]
         return (
@@ -106,9 +110,9 @@ const AddRow = (
               if (optionArr) return (
                 <InputSel
                   selectProps={{
-                    value: classAnnotation[key],
+                    value: classQuotationRange[key],
                     options: optionArr,
-                    onChange: (option) => { classAnnotation[key] = option!.value },
+                    onChange: (option) => { classQuotationRange[key] = option!.value },
                     arrowType: "black",
                     fontSize: "16px"
                   }}
@@ -117,8 +121,8 @@ const AddRow = (
               return (
                 <InputSel
                   textareaProps={{
-                    value: classAnnotation[key] ?? "",
-                    onChange: (v) => { classAnnotation[key] = v },
+                    value: classQuotationRange[key] ?? "",
+                    onChange: (v) => { classQuotationRange[key] = v },
                     className: scss.inputSel_textarea
                   }}
                 />
@@ -138,58 +142,68 @@ const AddRow = (
   )
 }
 
-
 const BodyRowGroup = (
   {
-    annotationArr,
-    editClassAnno,
-    classAnnotation,
-    clearAnno,
+    quotationRangeArr,
+    editClassRange,
+    classQuotationRange,
+    clearRange,
     apiReq,
-    copyClassAnno,
+    copyClassRange,
+    viewRef,
   }:
     {
-      annotationArr: TannotationDto[] | undefined
-      editClassAnno: (annotation: TannotationDto) => void
-      classAnnotation: Class_annotation | undefined
-      clearAnno: () => void
-      apiReq: (method: "post" | "patch" | "delete") => void
-      copyClassAnno: (annotation: TannotationDto) => void
+      quotationRangeArr: TquotationRangeDto[] | undefined
+      editClassRange: (quotationRange: TquotationRangeDto) => void
+      classQuotationRange: Class_quotationRange | undefined
+      clearRange: () => void
+      apiReq: (method: "post" | "patch" | "delete", delId?: string) => void
+      copyClassRange: (quotationRange: TquotationRangeDto) => void
+      viewRef: (node?: Element | null | undefined) => void
     }
 ) => {
-  const annotaionLookup = _.groupBy(annotationArr, "category")
-  const keyArr = Object.keys(annotaionLookup)
+  const quotationRangeLookup = _.groupBy(quotationRangeArr, "category")
+  const keyArr = Object.keys(quotationRangeLookup)
   return (
     <div className={scss.tbody}>
-      {keyArr.map((annKey) => {
-        const arr = annotaionLookup[annKey]
+      {keyArr.map((rangeKey) => {
+        const arr = quotationRangeLookup[rangeKey]
         return (
-          <div className={scss.bodyRowGroup} key={annKey}>
-            <div className={classNames(scss.row, scss.rowTitle)}><span>{annKey}</span></div>
-            {arr.map((ann,) => {
-              const { id, doorModelName, type, description, } = ann
+          <div className={scss.bodyRowGroup} key={rangeKey}>
+            <div className={classNames(scss.row, scss.rowTitle)}><span>{rangeKey}</span></div>
+            {arr.map((range, index) => {
+              const { id, doorModelName, type, description, } = range
 
-              if (classAnnotation?.id === id && classAnnotation.source === "edit") return (
-                <AddRow classAnnotation={classAnnotation}
-                  cancel={clearAnno}
+              if (classQuotationRange?.id === id && classQuotationRange.source === "edit") return (
+                <EditRow classQuotationRange={classQuotationRange}
+                  cancel={clearRange}
                   confirm={() => apiReq("patch")}
                 />
               )
 
+              const ref = (index === arr.length - 5) ? viewRef : undefined
+              // const ref = (index === arr.length - 5) ? undefined : undefined
+
               return (
                 <CellWithBar key={id} className={classNames(scss.row, scss.item)}>
-                  <div className={config["category"].className}></div>
+                  <div ref={ref} className={config["category"].className}></div>
                   <div className={config["doorModelName"].className}><span>{doorModelName}</span></div>
                   <div className={config["type"].className}><span>{typeLookup[type]}</span></div>
                   <div className={config["description"].className}><span>{description}</span></div>
                   <div className={config["edit"].className}
-                    onClick={() => editClassAnno(ann)}
+                    onClick={() => editClassRange(range)}
                   ><IconEdit /></div>
                   <div className={config["copy"].className}
-                    onClick={() => copyClassAnno(ann)}
+                    onClick={() => copyClassRange(range)}
                   ><IconCopy /></div>
                   <div className={config["del"].className}
-                    onClick={() => apiReq("delete")}
+                    onClick={() => myAlert.confirm({
+                      title: "確定刪除備註?",
+                      content: description,
+                      props: {
+                        onOk: () => apiReq("delete", id)
+                      }
+                    })}
                   ><IconDelete01 /></div>
                 </CellWithBar>
               )
@@ -201,7 +215,6 @@ const BodyRowGroup = (
   )
 }
 
-
 // ===========================================================================
 
 type Tconfig = {
@@ -212,22 +225,20 @@ type Tconfig = {
   }
 }
 
-
-
 const config: Tconfig = {
   category: {
     label: "類別",
-    className: "w-[156px]",
+    className: "w-[156px] flex-none",
     optionArr: optionArr_category,
   },
   doorModelName: {
     label: "門型",
-    className: "w-[86px]",
+    className: "w-[86px] flex-none",
     optionArr: optionArr_doorModel,
   },
   type: {
     label: "形式",
-    className: "w-[64px]",
+    className: "w-[64px] flex-none",
     optionArr: optionArr_doorForm,
   },
   description: {
@@ -235,22 +246,21 @@ const config: Tconfig = {
     className: "w-auto flex-auto",
   },
   edit: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   copy: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   del: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   confirm: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
   cancel: {
-    className: "w-[20px]",
+    className: "w-[20px] flex-none",
   },
 }
-
 
 const headKeyArr = [
   "category", "doorModelName", "type", "description",
@@ -263,10 +273,8 @@ const bodyKeyArr = [
 
 const addKeyArr = [
   "category", "doorModelName", "type", "description",
-  // "confirm", "cancel"
 ] as const
 
-// ===========================================================================
 
 // =============================================================================
 const typeLookup = {
@@ -277,35 +285,4 @@ const typeLookup = {
 // =============================================================================
 
 
-const fakeAnnotation: TannotationDto[] = [
-  {
-    id: "frsdgtsdh-jryufghj-dfg",
-    createdAt: "",
-    updateAt: "",
-    category: "防火防煙捲門系列",
-    doorModelName: "SJ-302",
-    type: "normal",
-    description: "AAAAAAAAAAA",
-  },
-  {
-    id: "gsdfg-fg-dfg",
-    createdAt: "",
-    updateAt: "",
-    category: "防火防煙捲門系列",
-    doorModelName: "SJ-302",
-    type: "normal",
-    description: "BBBBBBB",
-  },
-  {
-    id: "fs-fsddss-dfsdfg",
-    createdAt: "",
-    updateAt: "",
-    category: "防水防洪門系列",
-    doorModelName: "SJ-302",
-    type: "anti-typhoon",
-    description: "CCCCCCCCCCC",
-  },
-]
 
-
-// ==========================================================================
