@@ -62,13 +62,14 @@ const erpFeaturesLookup = {
   // 人事權限建立
   // HRAuthoritySetup: "c02998a7-ee2f-4ce7-9f96-4af2740d50f4",
   HRAuthoritySetup: "人事權限建立",
+  legacyContractIntegration: "舊合約"
 } as const
 
-const { BasicDataCreation, HRAuthoritySetup } = erpFeaturesLookup
+const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration } = erpFeaturesLookup
 
 /** "allPass" 即使沒有任何權限也pass */
 /** allPass 至少有一個權限就pass */
-const allPass = [BasicDataCreation, HRAuthoritySetup,]
+const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration]
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
 const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
@@ -167,7 +168,7 @@ const sidePathList: TsidePathList = {
         {
           label: "報價",
           // erpFeature: devPass,
-          erpFeature: "allPass",
+          erpFeature: [legacyContractIntegration],
           list: [
             {
               label: "預算",
@@ -207,7 +208,7 @@ const sidePathList: TsidePathList = {
             {
               label: "舊合約整合",
               path: path01 + "/legacyContractIntegration",
-              erpFeature: "allPass",
+              erpFeature: [legacyContractIntegration],
             },
           ]
         },
