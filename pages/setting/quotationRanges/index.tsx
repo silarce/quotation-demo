@@ -17,7 +17,7 @@ import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/Pa
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
 // css
-import style from "./quoteScopeList.module.scss"
+import style from "./quotationRanges.module.scss"
 
 // type
 import { TannotationDto } from "js/api/dtoTypes"
@@ -37,7 +37,7 @@ const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true })
 type Tfilter = Partial<Pick<TannotationDto, "category" | "doorModelName" | "type" | "description">>
 
 // ==========================================================================
-export default function MemoList() {
+export default function QuotationRanges() {
   // const [isReady, setIsReady] = useState(false)
   // const [isLoading, setIsLoading] = useState(false)
   // const [showAdd, setShowAdd] = useState(false)

@@ -152,7 +152,7 @@ const sidePathList: TsidePathList = {
         },
         {
           label: "報價範圍列表",
-          path: path01 + "/quoteScopeList",
+          path: path01 + "/quotationRanges",
           erpFeature: devPass,
         },
       ]
