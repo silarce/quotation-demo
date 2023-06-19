@@ -23,6 +23,7 @@ type ThookEmptyReport = {
   isEdit: boolean
   employeeId: string | undefined
   employeeChName: string
+  prevDate: string | undefined
 }
 
 // type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
@@ -251,17 +252,24 @@ const useReport = (
     isUserIsViewer: false,
     isEdit: true,
     employeeId: undefined,
-    employeeChName: userInfo.employee?.chName || ""
+    employeeChName: userInfo.employee?.chName || "",
+    prevDate: undefined
   }) // emptyReportCre
-  // 
+
+  // 建立編輯日報表
   const reNew_report = (
-    { dailyReport, userInfo }:
+    { dailyReport, userInfo, prevDate }:
       {
         dailyReport?: TdailyReportDto,
         userInfo: TuserDto
+        prevDate?: string | undefined,
       }
   ) => {
-    if (!dailyReport) return setReport(emptyReportCre())
+    if (!dailyReport) {
+      const emptyReport = emptyReportCre()
+      emptyReport.prevDate = prevDate
+      return setReport(emptyReport)
+    }
 
     let isAllowToReview: boolean = false
     let isReviewedByUser: boolean = false
@@ -296,6 +304,7 @@ const useReport = (
       isEdit: false,
       employeeId: dailyReport.employee?.id,
       employeeChName: dailyReport.employee?.chName,
+      prevDate: prevDate
     }
     setReport(theReport)
   } // reNew_report

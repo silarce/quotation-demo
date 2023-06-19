@@ -18,6 +18,7 @@ export default function MealSelector(
   { visible,
     onConfirm,
     onCancel,
+    isYesterdaySamePrevDate
     // label,
     // tip,
   }:
@@ -27,6 +28,7 @@ export default function MealSelector(
       onCancel: () => void
       label?: string
       tip?: string
+      isYesterdaySamePrevDate: boolean
     }
 ) {
 
@@ -66,24 +68,9 @@ export default function MealSelector(
         {mealArrOption.map((data, index) => {
           const { value, label } = data
 
-          // const onClick = () => {
-          //   setMealArr(value)
-          // };
+          if (!isYesterdaySamePrevDate && value === "breakfast") return null
 
           const isActive = mealArr.some(meal => meal === value)
-          // if (searchValue) {
-          //   const regex = new RegExp(searchValue, 'i');
-          //   if (
-          //     !idNumber.match(regex) &&
-          //     !chName.match(regex) &&
-          //     !job.match(regex) &&
-          //     !`${grade}`.match(regex)
-          //   ) {
-          //     return null;
-          //   }
-          // }
-
-
           return (
             <CellWithBar key={index} className={scss.row}
               isActive={isActive}
