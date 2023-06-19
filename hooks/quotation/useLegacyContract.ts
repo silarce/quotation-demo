@@ -935,7 +935,7 @@ function prodCellConfigCre(): TprodCellConfig {
       // input
       idNumber: { id: "idNumber", label: "編號", width: "100px", type: "input", inputType: "number" },
       discountRate: { id: "discountRate", label: "折數", width: "60px", type: "input", inputType: "number" },
-      itemName: { id: "itemName", label: "項目", width: "60px", type: "input" },
+      itemName: { id: "itemName", label: "項目", width: "100px", type: "input" },
       quoteType: { id: "quoteType", label: "報價別", width: "105px", type: "input" },
       doorType: { id: "doorType", label: "門型", width: "100px", type: "input" },
       length: { id: "length", label: "L(m)", width: "60px", type: "input", inputType: "number" },

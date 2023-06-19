@@ -62,9 +62,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false)
-  // --------------------------------------------------------------------------
-  const [page_customer, setPage_customer] = useState(1)
-  const [searchCustomerName, setSearchCustomerName] = useState<string>()
 
   // --------------------------------------------------------------------------
   let [legacyContractParams, setLegacyContractParams] = useState({
