@@ -72,9 +72,9 @@ const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration } = erpFe
 const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration]
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
-const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
+// const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
 // const devPass: TtopPathListConfig["erpFeature"] = (allPass) as TtopPathListConfig["erpFeature"]
-// const devPass: TtopPathListConfig["erpFeature"] = "allPass"
+const devPass: TtopPathListConfig["erpFeature"] = "allPass"
 // =========================================================================
 
 const sidePathList: TsidePathList = {
@@ -153,7 +153,7 @@ const sidePathList: TsidePathList = {
         },
         {
           label: "報價範圍列表",
-          path: path01 + "/quoteScopeList",
+          path: path01 + "/quotationRanges",
           erpFeature: devPass,
         },
       ]
