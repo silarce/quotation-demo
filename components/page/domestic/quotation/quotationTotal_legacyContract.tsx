@@ -2,7 +2,6 @@ import { useState } from "react"
 // component
 import TextListEditor_v2 from "./quotationTotal/TextListEditor_v2"
 import PayInfo_legacy from "./quotationTotal/payInfo_legacy"
-// import Appendix from "./quotationTotal/appendix_legacy"
 import Appendix from "./quotationTotal/appendix_legacy_noReview"
 // css
 import style from "./quotationTotal.module.scss"
@@ -11,14 +10,11 @@ import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 
 import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
 
-
-
 // gear
 import WorkSheetSelector from "components/global/gear/modal/workSheetSelector"
 
 // type
-import { Class_listString } from "hooks/quotation/useLegacyContract"
-import { TgetAnnotation, TgetQuotataionRanges} from 'js/api/api_workSheet';
+import { TgetAnnotation, TgetQuotataionRanges } from 'js/api/api_workSheet';
 
 
 
@@ -33,8 +29,6 @@ export default function QuotationTotal(
       disabled: boolean
       appendixParams: {
         fileInfoArr: TfileInfo[]
-        // addFile: (file: File) => void
-        // removeFile: (index: number) => void
         removeFileInfo: (index: number) => void
         toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void
       }
@@ -44,12 +38,8 @@ export default function QuotationTotal(
   const [show_qr, setShow_qr] = useState(false)
 
 
-
-
-
   // --------------------
-  const { classNotes: classMemo, classQuoteScopes: classQuoteRange } = legacyContract
-
+  const { classNotes, classQuoteScopes } = legacyContract
   // --------------------
 
   const showAnnoSelector = () => {
@@ -76,19 +66,19 @@ export default function QuotationTotal(
 
   // --------------------
   const annoObj = {
-    stringArr: classMemo.stringArr,
-    editString: classMemo.editString,
-    addString: classMemo.addString,
-    delString: classMemo.delString,
+    stringArr: classNotes.stringArr,
+    editString: classNotes.editString,
+    addString: classNotes.addString,
+    delString: classNotes.delString,
     showSelector: showAnnoSelector
   }
 
   // --------------------
   const quoteRangeObj = {
-    stringArr: classQuoteRange.stringArr,
-    editString: classQuoteRange.editString,
-    addString: classQuoteRange.addString,
-    delString: classQuoteRange.delString,
+    stringArr: classQuoteScopes.stringArr,
+    editString: classQuoteScopes.editString,
+    addString: classQuoteScopes.addString,
+    delString: classQuoteScopes.delString,
     showSelector: showQrSelector
   }
 
@@ -98,7 +88,6 @@ export default function QuotationTotal(
     <div className={style.container}>
       <TextListEditor_v2
         stringObj={annoObj}
-        searchAlternate={() => { }}
         label="備註"
         disabled={disabled}
       />
@@ -106,7 +95,6 @@ export default function QuotationTotal(
         <div>
           <TextListEditor_v2
             stringObj={quoteRangeObj}
-            searchAlternate={() => { }}
             label="報價範圍"
             disabled={disabled} />
           <Appendix disabled={disabled}

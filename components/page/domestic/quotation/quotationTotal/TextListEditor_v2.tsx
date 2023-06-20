@@ -1,8 +1,6 @@
 import { useState } from "react"
 
 // global gear
-import ModalListSelectorWithSearch from "components/global/gear/modal/modalListSelectorWithSearch"
-import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
@@ -16,60 +14,28 @@ import styleL from "./local.module.scss"
 export default function TextListEditor_v2(
   {
     stringObj,
-    searchAlternate,
     label,
     disabled }:
     {
       stringObj: {
         stringArr: string[]
         editString: (index: number, v: string) => void
-        addString: (v: string | string[]) => void
         delString: (index: number) => void
         showSelector: () => void
       }
-      searchAlternate: (v: string) => void
       label: string
       disabled: boolean
     }) {
 
   const {
     stringArr,
-    editString, addString, delString,
+    editString,  delString,
     showSelector,
   } = stringObj
 
 
-  // ====================================================
-  const [selRemark, setSelRemark] = useState<string[]>([])
-  const toSelRemark = (remark: string) => {
-    const theIndex = selRemark.indexOf(remark)
-    if (theIndex === -1) {
-      selRemark.push(remark)
-      setSelRemark([...selRemark])
-    }
-    if (theIndex > -1) {
-      selRemark.splice(theIndex, 1)
-      setSelRemark([...selRemark])
-    }
-  }
-
-  // ====================================================
-  // ModalListSelectorWithSearch
-  const [showAdd, setShowAdd] = useState(false)
-
   const toShowAdd = () => {
     showSelector()
-    setShowAdd(true)
-  }
-  const onCancel = () => {
-    setShowAdd(false)
-    setSelRemark([])
-    searchAlternate("")
-  }
-
-  const onConfirm = () => {
-    if (!selRemark[0]) return myAlert.info({ title: "請選擇" + label })
-    addString(selRemark);
   }
 
   return (
@@ -84,7 +50,7 @@ export default function TextListEditor_v2(
             <span className={styleL.serialNumber}>{index + 1}</span>
             <InputSel
               className={styleL.inputSel}
-              inputProps={{
+              textareaProps={{
                 value: memo,
                 onChange: (v) => editString(index, v),
               }}
