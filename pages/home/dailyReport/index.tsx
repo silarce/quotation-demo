@@ -667,7 +667,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             addDailyReportItem={addDailyReportItem}
             removeDailyReportItem={removeDailyReportItem}
-
           />
         </DailyReportContext.Provider>
 
