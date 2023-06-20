@@ -159,6 +159,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
             userInfo={userInfo}
             userErpFeature={userErpFeature}
             rwd1023={rwd1023}
+            onLogin={onLogin}
           />
         )}
         {/* </Layer> */}
