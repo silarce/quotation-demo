@@ -22,6 +22,10 @@ type TgetQuotataionRanges = {
   meta: TpageMetaDto
 }
 
+export type {
+  Tparams,
+  TgetAnnotation, TgetQuotataionRanges
+}
 
 
 

@@ -22,6 +22,8 @@ import {
 // other
 import { optionsCreator_doorForm } from 'js/utils/options/productOptions';
 
+// ================================================================
+
 const doorFormLookup = (() => {
   const optionArr = optionsCreator_doorForm()
   const lookup: { [key: string]: string } = {}
@@ -42,6 +44,7 @@ const doorFormLookup_reverse = (() => {
   return lookup
 })()
 
+// ================================================================
 export default function WorkSheetSelector(
   {
     showModal,
