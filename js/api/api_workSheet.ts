@@ -113,6 +113,7 @@ export const useGetAnnotation_v2 = (customParams?: Tparams) => {
   }
 
   useEffect(() => {
+    if (render === 0) return
     update_infinite()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, render])
@@ -217,6 +218,7 @@ export const useGetQuotationRanges_v2 = (customParams?: Tparams) => {
   }
 
   useEffect(() => {
+    if (render === 0) return
     update_infinite()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, render])
