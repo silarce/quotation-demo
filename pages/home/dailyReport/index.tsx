@@ -285,7 +285,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   useEffect(() => {
     toUpdateDailyReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery.isUserReviewed, searchQuery.date, isMine])
+  }, [searchQuery.isUserReviewed, searchQuery.date, isMine, isCalendar])
 
   useEffect(() => {
     if (!dailyReportArr) return
@@ -583,6 +583,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     identity,
     isReportEdit,
     userInfo,
+    dailyReport_calendar,
   })
 
   // ----------------------------------------------------------------------
@@ -802,14 +803,15 @@ const panelListCreator = (
     editReport_today,
     identity,
     isReportEdit,
-    userInfo
+    userInfo,
+    dailyReport_calendar
   }:
     {
       reportInEdit: ThookEmptyReport | undefined
       doCheck: () => void
       switchIsEdit: () => void
       setShowReviewerForReportModal: (v: boolean) => void
-      dailyReportArr: TdailyReportDto[]
+      dailyReportArr: TdailyReportDto[] | undefined
       isCalendar: boolean
       router: NextRouter
       searchGroup: TsearchGroup
@@ -818,6 +820,7 @@ const panelListCreator = (
       identity: Tidentity
       isReportEdit: boolean
       userInfo: TuserDto
+      dailyReport_calendar: TdailyReportDto[] | undefined
     }
 ) => {
 
@@ -854,7 +857,14 @@ const panelListCreator = (
     {
       type: "myButton",
       label: "新增回報",
-      onClick: () => editReport_today(dailyReportArr[0].date)
+      onClick: () => {
+        if (isCalendar && dailyReport_calendar) {
+          editReport_today(dailyReport_calendar[0].date)
+        }
+        if (!isCalendar && dailyReportArr) {
+          editReport_today(dailyReportArr[0].date)
+        }
+      }
     },
     listSwitchButton
   ]
