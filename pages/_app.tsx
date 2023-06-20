@@ -57,8 +57,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // const router = appProps.router
   // ----------------------------------------------------------------------------
-  // 巢狀layout用的
-  const getLayout = Component.getLayout ?? ((page) => page)
+
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe()
   const { erpFeature: userErpFeature, updateErpFeature: updateUserErpFeature, } = useApiErpFeaturesMe()
@@ -137,21 +136,32 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       </>
     )
   // ------------------------------------------------------------------
+
+  // 巢狀layout用的
+  // const getLayout = Component.getLayout ?? ((page) => page)
+  const getLayout = Component.getLayout ?? ((page) => {
+    return (
+      <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+        {page}
+      </Layer>
+    )
+  })
+  // ------------------------------------------------------------------
   return (
     <AntdConfigProvider autoInsertSpaceInButton={false}>
       <Head>
         <title>三久ERP</title>
       </Head>
       <AppContext.Provider value={appContextValue}>
-        <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
-          {getLayout(
-            <Component {...pageProps}
-              userInfo={userInfo}
-              userErpFeature={userErpFeature}
-              rwd1023={rwd1023}
-            />
-          )}
-        </Layer>
+        {/* <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}> */}
+        {getLayout(
+          <Component {...pageProps}
+            userInfo={userInfo}
+            userErpFeature={userErpFeature}
+            rwd1023={rwd1023}
+          />
+        )}
+        {/* </Layer> */}
       </AppContext.Provider>
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
