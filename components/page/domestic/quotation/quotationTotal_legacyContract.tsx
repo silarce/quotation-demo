@@ -18,7 +18,7 @@ import WorkSheetSelector from "components/global/gear/modal/workSheetSelector"
 
 // type
 import { Class_listString } from "hooks/quotation/useLegacyContract"
-import { TgetAnnotation, } from 'js/api/api_workSheet';
+import { TgetAnnotation, TgetQuotataionRanges} from 'js/api/api_workSheet';
 
 
 
@@ -41,6 +41,7 @@ export default function QuotationTotal(
     }) {
 
   const [show_anno, setShow_anno] = useState(false)
+  const [show_qr, setShow_qr] = useState(false)
 
 
 
@@ -62,6 +63,17 @@ export default function QuotationTotal(
     annoObj.addString(vArr)
   }
 
+  const showQrSelector = () => {
+    setShow_qr(true)
+  }
+  const cancelQrSelector = () => {
+    setShow_qr(false)
+  }
+  const onConfirm_qr = (v: TgetQuotataionRanges["data"]) => {
+    const vArr = v.map((item) => item.description)
+    quoteRangeObj.addString(vArr)
+  }
+
   // --------------------
   const annoObj = {
     stringArr: classMemo.stringArr,
@@ -77,6 +89,7 @@ export default function QuotationTotal(
     editString: classQuoteRange.editString,
     addString: classQuoteRange.addString,
     delString: classQuoteRange.delString,
+    showSelector: showQrSelector
   }
 
 
@@ -87,14 +100,15 @@ export default function QuotationTotal(
         stringObj={annoObj}
         searchAlternate={() => { }}
         label="備註"
-        disabled={disabled} />
+        disabled={disabled}
+      />
       <div className={style.layer01}>
         <div>
-          {/* <TextListEditor_v2
+          <TextListEditor_v2
             stringObj={quoteRangeObj}
             searchAlternate={() => { }}
             label="報價範圍"
-            disabled={disabled} /> */}
+            disabled={disabled} />
           <Appendix disabled={disabled}
             appendixParams={appendixParams}
           />
@@ -105,11 +119,17 @@ export default function QuotationTotal(
         />
       </div>
 
-
       <WorkSheetSelector
         showModal={show_anno}
         onConfirm={onConfirm_anno}
         onCancel={cancelAnnoSelector}
+        apiFamily="annotation"
+      />
+      <WorkSheetSelector
+        showModal={show_qr}
+        onConfirm={onConfirm_qr}
+        onCancel={cancelQrSelector}
+        apiFamily="quotationRanges"
       />
     </div >
   )

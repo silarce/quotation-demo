@@ -15,8 +15,8 @@ import style from "./workSheetSelector.module.scss"
 
 
 import {
-  Tparams, TgetAnnotation,
-  useGetAnnotation_v2
+  Tparams, TgetAnnotation, TgetQuotataionRanges,
+  useGetAnnotation_v2, useGetQuotationRanges_v2
 } from 'js/api/api_workSheet';
 
 // other
@@ -53,18 +53,20 @@ export default function WorkSheetSelector(
     label,
     tip,
     selLimit,
+    apiFamily,
   }:
     {
       showModal: boolean
-      onConfirm: (v: TgetAnnotation["data"]) => void
+      onConfirm: (v: TgetAnnotation["data"] | TgetQuotataionRanges["data"]) => void
       onCancel: () => void
       label?: string
       tip?: React.ReactNode
       selLimit?: 1
+      apiFamily: "annotation" | "quotationRanges"
     }
 ) {
   // 被選的資料
-  const [selSheetArr, setSelSheetArr] = useState<TgetAnnotation["data"]>([])
+  const [selSheetArr, setSelSheetArr] = useState<TgetAnnotation["data"] | TgetQuotataionRanges["data"]>([])
 
   const [searchValue, setSearchValue] = useState<string | undefined>()
 
@@ -85,17 +87,28 @@ export default function WorkSheetSelector(
     }
   })()
 
+  const annoPack = useGetAnnotation_v2(params)
+
+
+  const qrPack = useGetQuotationRanges_v2(params)
+
   const {
     data: sheetArr,
     reset,
     setData,
     viewRef,
     isLoading,
-  } = useGetAnnotation_v2(params)
+  } = (() => {
+
+    if (apiFamily === "annotation") return annoPack
+    else return qrPack
+  })()
+
+
 
   // ==================================================
 
-  const onClick = (newSheet: TgetAnnotation["data"][number]) => {
+  const onClick = (newSheet: TgetAnnotation["data"][number] | TgetQuotataionRanges["data"][number]) => {
     const newArr = [...selSheetArr]
     if (selLimit === 1) {
       newArr[0] = newSheet
@@ -123,9 +136,13 @@ export default function WorkSheetSelector(
     setSearchValue(v)
   }
   useEffect(() => {
-    reset()
+    if (showModal) reset()
+    if (!showModal) {
+      setSearchValue(undefined)
+      setData(undefined)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue])
+  }, [searchValue, showModal])
 
 
   // ==================================================
