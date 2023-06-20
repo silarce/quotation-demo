@@ -620,9 +620,26 @@ export type TcreateAnnotationDto = {
 }
 
 
+export type TcreateQuotationRangeDto = {
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
 
-
-
+export type TquotationRangeDto = {
+  id: string
+  createdAt: string
+  updateAt: string
+  /**類別 */
+  category: string
+  /**門型 */
+  doorModelName: string
+  /**型式 */
+  type: "normal" | "anti-typhoon"
+  /**內容 */
+  description: string
+}
 
 
 

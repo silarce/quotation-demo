@@ -2,19 +2,14 @@
 
 .mustTip {
   position: absolute;
-  right: calc(100% + 7px);
-  top: 50%;
+  right: calc(100% + 3px);
+  top: 40%;
   transform: translateY(-50%);
-  width: 13px;
-  height: 16px;
+  width: 10px;
   > img {
-    // width: 13px;
-    // height: 16px;
+    display: block;
   }
   &.minimal {
-    width: 10px;
-    height: 10px;
-    top: -8px;
-    right: -12px;
+    
   }
 }

@@ -239,6 +239,7 @@ export default function QuotationProfile(
           label="合約日期"
           showBaseline="auto"
           disabled={disabled}
+          isMust={true}
           datePickerProps={{
             value: quoteDate as string ?? "",
             onChange02(moment, dateString) {

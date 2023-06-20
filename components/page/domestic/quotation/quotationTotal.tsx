@@ -31,7 +31,7 @@ export default function QuotationTotal(
   const { identify } = classQuotation
 
   // --------------------
-  const { classMemo, classQuoteRange } = classQuotation
+  const { classNotes: classMemo, classQuoteScopes: classQuoteRange } = classQuotation
   // --------------------
   const memoObj = {
     stringArr: classMemo.stringArr,

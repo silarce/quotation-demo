@@ -48,8 +48,8 @@ type Tevent = {
   /** events必要的參數，藉以確認要顯示的日期*/
   end: string
   isReviewCompleted: boolean
-  reportedAt: Date
   isReviewedByUser: boolean
+  prevDate: string
 }
 
 // ===========================================================================
@@ -74,8 +74,8 @@ export default function TheCalendar(
 
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
-    return dailyReportArr.map((report) => {
-      const { date, id, isReviewCompleted, employee, reportedAt, reviewStatus } = report
+    return dailyReportArr.map((report, index) => {
+      const { date, id, isReviewCompleted, employee, reviewStatus } = report
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
@@ -89,6 +89,8 @@ export default function TheCalendar(
           }
         })
 
+      const prevDate = dailyReportArr[index + 1]?.date
+
       return {
         isMine,
         reportId: id,
@@ -99,19 +101,20 @@ export default function TheCalendar(
         start: report.date,
         end: report.date,
         isReviewCompleted,
-        reportedAt,
-        isReviewedByUser
+        isReviewedByUser,
+        prevDate
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReportArr]) // dailyReportArr
 
 
-  useEffect(() => {
-    const now = moment()
-    const filter = filterCre_nextAndPrevMonth(now)
-    update_calendar(filter)
-  }, [])
+  // useEffect(() => {
+  //   const now = moment()
+  //   const filter = filterCre_nextAndPrevMonth(now)
+  //   update_calendar(filter)
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
 
 
@@ -220,7 +223,8 @@ const EventWrapper = (
     isMine,
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    isReviewCompleted, reportedAt, isReviewedByUser,
+    isReviewCompleted, isReviewedByUser,
+    prevDate,
   } = event
 
 
@@ -231,7 +235,7 @@ const EventWrapper = (
   })()
 
   const onClick = () => {
-    addTag({ reportId, employeeId, name, date })
+    addTag({ reportId, employeeId, name, date, prevDate })
   }
 
   return (

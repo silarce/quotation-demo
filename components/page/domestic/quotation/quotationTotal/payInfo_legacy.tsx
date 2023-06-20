@@ -107,7 +107,10 @@ export default function PayInfo_legacy(
           />
         </div>
         <div className={classNames(style.inputBox01, style.date)}>
-          <span>交貨日期</span>
+          <span className={"relative"}>
+            <MustTip_simple />
+            交貨日期
+          </span>
           <InputSel
             datePickerProps={{
               value: deliveryDate as string,

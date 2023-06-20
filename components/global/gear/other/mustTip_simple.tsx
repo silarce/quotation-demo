@@ -13,7 +13,6 @@ export default function MustTip_simple(
     {
       className?: string
       preStyle?: "minimal"
-
     }
 ) {
 

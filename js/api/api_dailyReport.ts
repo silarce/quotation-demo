@@ -104,6 +104,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
 
   const update_infinite = async () => {
     if (meta && !meta.hasNextPage) return
+    setIsloading(true)
     const res = await apiDailyReports(params)
     setIsloading(false)
     const dataArrQueueCopy = [...dataArrQueue]
