@@ -1,46 +1,53 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, createContext } from "react"
 import classNames from "classnames"
 import _ from "lodash"
-import moment from "moment";
 import { AxiosError } from "axios";
+import { useRouter, NextRouter } from "next/router";
+import moment from "moment";
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader_mobile_dailyReport from "pages/home/dailyReport/pageHeader_mobile/PageHeader_mobile_dailyReport";
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
-// import TheCalendar from "components/page/home/dailyReport/TheCalendar"
+import TheCalendar from "components/page/home/dailyReport/TheCalendar"
 import ReporterList from "components/page/home/dailyReport/ReporterList";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
+import ReviewerAndExaminerSelector from "components/page/home/dailyReport/ReviewerAndExaminerSelector"
 import ReportTable from "components/page/home/dailyReport/ReportTable"
 import TagCarousel from "components/page/home/dailyReport/TagCarousel"
+
+// mobile
+import SearchDrawer from "components/page/home/dailyReport/SearchDrawer";
+
 // gear
 import CheckButton from "components/global/gear/button/checkButton"
 import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
 import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 
+// antd
+import { Badge } from "antd"
 
 // hook
-import { Class_reportItem, useReport } from "hooks/home/useDailyReport";
+import { Class_reportItem, useReport, ThookEmptyReport } from "hooks/home/useDailyReport";
 
+// tool
 import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard";
+import { filterCre_nextAndPrevMonth } from "js/utils/helpers/params/filterCreator";
 
+// icon
+import iconFourCube from "public/image/icon/fourCube.svg"
+import iconMenu from "public/image/icon/menu.svg"
 // api
 import {
-  // TcreateDailyReportItemDto,
-  // TdailyReportDto,
-  useApiDailyReports,
-  // useApiDailyReports_Reporters,
-  // useApiDailyReports_isReporters_me,
-  // useApiDailyReports_my,
-  // useApiDailyReports_id,
-  useApiDailyReports_reviewers,
-  // apiPatchDailyReports_Reporters,
+  TdailyReportDto, Tparams,
+  useApiDailyReports, useApiDailyReports_reviewers,
+  useApiDailyReports_v2,
   apiPatchDailyReports_my,
   apiDailyReports_id,
   apiDailyReports_review,
-  apiDailyReports_my,
   apiPatchDailyReports_reviewers,
   apiIsReviewer,
 } from "js/api/api_dailyReport"
@@ -51,8 +58,8 @@ import {
 } from "js/api/api_employee"
 
 // type
-import { TuserDto, TdailyReportItemDto, TerpFeatureDto } from "js/api/dtoTypes";
-import { TdoSearch, Toption } from "components/global/gear/HOC/searchBar/searchBar";
+import { TuserDto, } from "js/api/dtoTypes";
+import { TdoSearch, TsearchGroup } from "components/global/gear/HOC/searchBar/searchBar";
 
 // css
 import scss from "./dailyReport.module.scss"
@@ -62,18 +69,52 @@ export type Ttag = { reportId: string, employeeId: string, name: string, date: s
 export { Class_reportItem }
 // =====================================================================
 
+type Tidentity = "manager" | "reviewer" | "reporter" | undefined
+
+
+
 const reportedAtOptions = [
   { label: "全部", value: "全部" },
-  { label: "未審核", value: "未審核" },
-  { label: "已審核", value: "已審核" },
+  { label: "未檢視", value: "未檢視" },
+  { label: "已檢視", value: "已檢視" },
 ]
+
+
+// =====================================================================
+type TdailyReportContext = {
+  reportInEdit: ThookEmptyReport | undefined
+  isReportEdit: boolean
+  switchIsEdit: () => void
+  setShowReviewerForReportModal: (v: boolean) => void
+  cancelEditNewDailyReport: () => void
+  changeReportDate: (v: string) => void
+  identity: Tidentity
+  doCheck: () => void,
+  userInfo: TuserDto
+}
+
+export const DailyReportContext = createContext<TdailyReportContext>(null!)
 
 // =====================================================================
 export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
+  const userId = userInfo.employee?.id ?? ""
+  const router = useRouter()
+  const searchQuery = {
+    isUserReviewed: router.query.isUserReviewed || "全部",
+    date: router.query.date || "",
+  } as {
+    isUserReviewed: typeof searchObj["isUserReviewed"]
+    date: string
+  }
+
+  const isMine = router.query.isMine === undefined ? true
+    : router.query.isMine === "true" ? true : false
+  const isCalendar = router.query.isCalendar === "true" ? true : false
+
   const [isLoading, setIsLoading] = useState(false)
   // -----------------------------------------------------------
   /**權限 */
-  const [identity, setIdentity] = useState<"manager" | "reviewer" | "reporter">()
+  const [identity, setIdentity] = useState<Tidentity>()
 
   useEffect(() => {
     (async () => {
@@ -87,13 +128,13 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // -----------------------------------------------------------
   // state
-  // 送進 審核人員設定 SetReportEmpModal的arr
+  // 送進 檢視人員設定 SetReportEmpModal的arr
   const [reviewersPickArr, setReviewersPickArr] =
     useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
 
-  // 送進 選擇審核人員 SetReportEmpModal的arr
-  const [reviewerArr, setReviewerArr] =
-    useState<Parameters<typeof SetReportEmpModal>[0]["dataArr"]>()
+  // 每個日報上傳前要選reviewer，這是那個modal的開關
+  const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false)
+
 
   // 日報表tagArr，送進TagCarousel
   const [tagArr, setTagArr] = useState<Ttag[]>([])
@@ -101,53 +142,161 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  // const today = moment().format("YYYY-MM-DD");
-  // const thisMonth = moment().format("YYYY-MM");
+  const [searchObj, setSearchObj] = useState<{
+    isUserReviewed: "全部" | "未檢視" | "已檢視"
+    date: string
+  }>({ isUserReviewed: "全部", date: "" })
 
-  // 取得指定月份所有日報表
+  const searchObjToQuery = () => {
+    setSearchObj({
+      isUserReviewed: searchQuery.isUserReviewed,
+      date: searchQuery.date,
+    })
+  }
 
-  const [params, setParams] = useState<{ filter?: { [key: string]: any } }>({ filter: undefined })
+  // ----------------------------------------------------------------------
 
+  const filterIsMine = (() => {
+    if (isMine) return { $eq: userId }
+    if (!isMine) return { $ne: userId }
+    return undefined
+  })()
 
-  const {
-    dailyReport, updateDailyReports, } = useApiDailyReports(params)
-  const sortedDailyReport = useMemo(() => {
-    return _.sortBy(dailyReport, "date").reverse()
-  }, [dailyReport])
+  const params = (() => {
 
-  /**取得指定月份所有日報表，額外做了loading的處理 */
-  const updateDailyReports_withLoading = async () => {
-    try {
-      showRootLoading(false)
-      setIsLoading(true)
-      await updateDailyReports()
+    let userId = userInfo.employee?.id
+    let isUserReviewed
+    let isReviewCompleted
+    if (searchQuery?.isUserReviewed === undefined) {
+      isUserReviewed = undefined
+      isReviewCompleted = undefined
     }
-    catch { myAlert.warning({ title: "取得總日報表失敗" }) }
+    if (searchQuery?.isUserReviewed === "已檢視") {
+      isUserReviewed = { $notNull: true }
+      isReviewCompleted = true
+    }
+    if (searchQuery?.isUserReviewed === "未檢視") {
+      isUserReviewed = { $null: true }
+      isReviewCompleted = false
+    }
+
+    if (isMine) {
+      userId = undefined
+      isUserReviewed = undefined
+    }
+    else {
+      isReviewCompleted = undefined
+    }
+
+    const date = yearConversion_chToStandard(searchQuery?.date) || undefined
+
+    return {
+      filter: {
+        "employee.id": filterIsMine,
+        "$and": {
+          "reviewStatus.reviewedAt": isUserReviewed,
+          "reviewStatus.reviewerEmployee.id": { $eq: userId },
+        },
+        "isReviewCompleted": { $eq: isReviewCompleted },
+        date: { $eq: date },
+      },
+    }
+  })()
+
+  const params_calendar = {
+    ...params,
+    pageSize: 999,
+  }
+
+  /**月曆用的 */
+  const { dailyReport: dailyReport_calendar,
+    updateDailyReports: updateDailyReports_calendar } = useApiDailyReports(params_calendar)
+
+  const update_calendar = async (dynamicFilter?: Tparams["filter"]) => {
+    try {
+      setIsLoading(true)
+      await updateDailyReports_calendar(dynamicFilter)
+    }
+    catch { myAlert.err({ title: "取得月曆日報表列表失敗" }) }
+    setIsLoading(false)
+  }
+
+  const update_calendar_thisMonth = async () => {
+    const now = moment()
+    const filter = filterCre_nextAndPrevMonth(now)
+    try {
+      setIsLoading(true)
+      await updateDailyReports_calendar(filter)
+    }
+    catch { myAlert.err({ title: "取得月曆日報表列表失敗" }) }
+    setIsLoading(false)
+  }
+
+  /**列表用的資料 */
+  const {
+    data: dailyReportArr,
+    viewRef, reset,
+    isLoading: isLoading_v2,
+  } = useApiDailyReports_v2(params)
+
+  // 取得所有檢視人員
+  const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers()
+
+  const { update: updateEmployeeArr }
+    = useEmployee({
+      pageSize: 999999, populate: ["jobs", "user"],
+      sort: "idNumber",
+    })
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+
+  /**取得總表 沒有loading spin*/
+  const toUpdateDailyReports = async () => {
+    if (!router.isReady) return
+    setSearchObj({
+      isUserReviewed: (router.query.isUserReviewed ?? "全部") as typeof searchObj["isUserReviewed"],
+      date: (router.query.date ?? "") as string
+    })
+    cancelEditNewDailyReport();
+    try {
+      setIsLoading(true)
+      if (isCalendar) await update_calendar_thisMonth()
+      else await reset()
+    }
+    catch {
+      if (searchQuery?.date) {
+        myAlert.err({ title: "取得總日報失敗", content: "日期格式錯誤，請檢察搜尋日期或網址的date參數" })
+        return
+      }
+      myAlert.err({ title: "取得總日報失敗" })
+    }
     finally { setIsLoading(false) }
   }
 
 
-  // 取得所有審核人員
-  const { reviewersArr, updateReviewerssArr: updateReviewersArr } = useApiDailyReports_reviewers()
-
-  const { data: employeeRes, update: updateEmployeeArr }
-    = useEmployee({ pageSize: 999999, populate: ["jobs"] })
-  const employeeArr = employeeRes?.data
-
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true)
-        await updateDailyReports() // 取得指定月份所有日報表 //基本上就是當月
-      }
-      catch { myAlert.err({ title: "取得總日報失敗" }) }
-      finally { setIsLoading(false) }
-    })()
+    toUpdateDailyReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [searchQuery.isUserReviewed, searchQuery.date, isMine])
+
+  useEffect(() => {
+    if (!dailyReportArr) return
+    router.push({
+      query: {
+        isUserReviewed: "全部",
+        date: "",
+        isMine,
+      }
+    })
+    setSearchObj({
+      isUserReviewed: "全部",
+      date: "",
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMine])
+
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -158,35 +307,22 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     setReport,
     reNew_report,
     addReportItem: addDailyReportItem,
+    removeReportItem: removeDailyReportItem,
     changeReviewToChecked, switchIsEdit,
-    reportIsEdit: isReportEdit
-  } = useReport()
+    reportIsEdit: isReportEdit,
+    changeReportDate
+  } = useReport({ userInfo })
 
   const editReport = async (reportId: string) => {
     const dailyReport = await reqApiDailyReports_id(reportId)
     if (!dailyReport) return
     reNew_report({ dailyReport, userInfo })
+    searchObjToQuery()
   }
 
   const editReport_today = async () => {
-    const res = await reqApiDailyReports_my()
-    if (res === "fail") return
-    else reNew_report({ dailyReport: res, userInfo })
-
-    if (res && userInfo?.employee?.id) {
-      const tag = {
-        reportId: res.id,
-        employeeId: userInfo.employee.id,
-        name: userInfo.employee.chName,
-        date: res.date
-      }
-      if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
-      setTagArr(arr => {
-        const newArr = _.cloneDeep(arr);
-        newArr.push(tag);
-        return newArr
-      })
-    }
+    reNew_report({ dailyReport: undefined, userInfo })
+    searchObjToQuery()
   }
 
   const cancelEditNewDailyReport = () => {
@@ -218,15 +354,13 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   // ----------------------------------------------------------------------
-  // 審核人員設定
+  // 檢視人員設定
   // SetReportEmpModal
 
-  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
   //**開啟回報人員設定面板 */
   const editRivewerPickArr = async () => {
-
     const resArr = await Promise.all([
-      updateReviewersArr(), // 取得所有審核人員
+      updateReviewersArr(), // 取得所有檢視人員
       updateEmployeeArr() // 取得所有人員
     ])
 
@@ -238,74 +372,94 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
         employeeArr
       }
     )
-
     setReviewersPickArr(reviewersPickArr)
-
   }
-  /**發出設定審核人員apiReq */
+
+  /**發出設定檢視人員apiReq */
   const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
-    const employeeIds: string[] = []
+    const shouldReportEmpArr: typeof employeeArr = []
     employeeArr.forEach((employee) => {
-      if (employee.shouldReport) employeeIds.push(employee.id)
+      if (employee.shouldReport) shouldReportEmpArr.push(employee)
     })
+    const isPass = !shouldReportEmpArr.some(emp => emp.isHaveUser === false)
+    if (!isPass) return myAlert.warning({ title: "名單錯誤", content: "只能選擇有ERP操作權限的人員" })
+    const employeeIds = shouldReportEmpArr.map(emp => emp.id)
     try {
       showRootLoading(true)
       await apiPatchDailyReports_reviewers({ employeeIds })
-      cancelSetReportEmpModal()
-      myAlert.success({ title: "更新回報人員成功" })
+      cancelSetRivewerModal()
+      myAlert.success({ title: "更新檢視人員成功" })
       try {
-        await Promise.all([
-          updateDailyReports_withLoading(),
-          updateReviewersArr(),
-        ])
+        await updateReviewersArr()
       }
-      catch { myAlert.err({ title: "日報表或回報人員取得失敗" }) }
+      catch { myAlert.err({ title: "檢視人員取得失敗" }) }
     }
     catch {
-      myAlert.err({ title: "更新回報人員失敗" })
+      myAlert.err({ title: "更新檢視人員失敗" })
     }
     finally { showRootLoading(false) }
   }
   /**關閉回報人員設定面板 */
-  const cancelSetReportEmpModal = () => {
+  const cancelSetRivewerModal = () => {
     setReviewersPickArr(undefined)
   }
 
   // ----------------------------------------------------------------------
   // 更新日報表
-  // 搜尋功能寫在SetReportEmpModal裡面，不經由後端，在前端直接過濾
 
-  //**開啟審核人員選擇面板 */
-  const choseReviewerArr = async () => {
-    const reviewerArr = await updateReviewersArr()
-    const formetedViewerArr = formatEmployeeArr({ employeeArr: reviewerArr })
-    setReviewerArr(formetedViewerArr)
-  }
-  const cancelReviewerArr = () => {
-    setReviewerArr(undefined)
-  }
-  /**發出更新日報表請求 */
-  const reqApiPatchDailyReports_my = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]["dataArr"]) => {
+  /**發出更新日報表請求 (上傳 按鈕)*/
+  const reqApiPatchDailyReports_my = async (
+    reviewerArr: TemployeeDto[],
+    examinerArr: TemployeeDto[],
+  ) => {
 
-    const employeeIds: string[] = []
-    employeeArr.forEach((employee) => {
-      if (employee.shouldReport) employeeIds.push(employee.id)
-    })
     if (!reportInEdit) return
+    if (reviewerArr.length === 0) {
+      return myAlert.warning({ title: "請選擇檢視人員" })
+    }
+    const reviewerIds = reviewerArr.map((emp) => emp.id)
+    const examinerIds = examinerArr.map((emp) => emp.id)
 
-    const items = reportInEdit.items.map((item) => item.postBody)
+    const theDate = reportInEdit.date
+    if (!theDate) return myAlert.warning({ title: "請選擇日期" })
+
+    const items = reportInEdit.items.map((item) => {
+      const year = new Date(theDate).getFullYear()
+      const month = new Date(theDate).getMonth()
+      const th = new Date(theDate).getDate()
+
+      const setDateToReportDate = (dateStr: string) => {
+        const date = new Date(dateStr)
+        date.setFullYear(year)
+        date.setMonth(month)
+        date.setDate(th)
+        return date.toISOString()
+      }
+      const postBody = item.postBody
+      postBody.arrivalTime = setDateToReportDate(postBody.arrivalTime!)
+      postBody.departureTime = setDateToReportDate(postBody.departureTime!)
+      postBody.departureWorksiteTime = setDateToReportDate(postBody.departureWorksiteTime!)
+      return postBody
+    })
+
     try {
       showRootLoading(true)
       await apiPatchDailyReports_my({
-        date: reportInEdit.date,
+        date: theDate,
         body: {
-          reviewerIds: employeeIds,
+          reviewerIds,
+          examinerIds,
           items
         }
       })
       cancelEditNewDailyReport()
       myAlert.success({ title: "更新日報表完成" })
-      await updateDailyReports_withLoading()
+      if (isCalendar) {
+        const now = moment()
+        const dynamicFilter = filterCre_nextAndPrevMonth(now)
+        await update_calendar(dynamicFilter)
+      }
+      else reset()
     }
     catch (error) {
 
@@ -317,184 +471,112 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       const { message, statusCode } = err.response?.data ?? {}
 
       const isReviewed = message?.includes("has already reviewed")
-      if (isReviewed) return myAlert.warning({ title: "更新日報表失敗", content: "該日報表已被審核，不能再變更" })
+      if (isReviewed) return myAlert.warning({ title: "更新日報表失敗", content: "該日報表已被檢視，不能再變更" })
 
       myAlert.err({ title: "更新日報表失敗" })
     }
     finally { showRootLoading(false) }
-    cancelReviewerArr()
+    setShowReviewerForReportModal(false)
   }
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
+  const onChange_isUserReviewed =
+    (v: string) => {
+      setSearchObj(obj => ({
+        ...obj,
+        isUserReviewed: v as (typeof searchObj["isUserReviewed"])
+      }))
+    }
+  const onChange_date =
+    (v: string) => { setSearchObj(obj => ({ ...obj, date: v })) }
+
   const searchTargetList = (() => {
     const arr = [
-      { options: reportedAtOptions, width: "110px" },
-      { placeholder: "搜尋日期", width: "150px" }
+      {
+        options: reportedAtOptions, width: "110px",
+        value: searchObj?.isUserReviewed,
+        onChange: onChange_isUserReviewed
+      },
+      {
+        placeholder: "搜尋日期", width: "80px",
+        value: searchObj?.date,
+        onChange: onChange_date
+      }
     ]
-    if (identity === "reporter") arr.shift()
     return arr
   })()
 
-  const doSearch: TdoSearch = (arr) => {
-
-    const reviewedAtValue = (arr[0] as Toption).value
-    const reviewedAt = (() => {
-      if (reviewedAtValue === "全部") return undefined
-      if (reviewedAtValue === "未審核") return { $null: true }
-      if (reviewedAtValue === "已審核") return { $notNull: true }
-    })()
-
-    const date = (() => {
-      const theDate = arr[1] as string
-      if (!theDate) return undefined
-      const date = yearConversion_chToStandard(theDate)
-      if (!date) return "wrongDate"
-      return date
-    })()
-
-    if (date === "wrongDate")
-      return myAlert.warning({ title: "時間格式錯誤", content: "時間格式例:101-01-01" })
-
-    setParams({
-      filter: {
-        reviewedAt,
-        date: { $eq: date }
+  const doSearch: TdoSearch = () => {
+    if (searchObj.date) {
+      const date = yearConversion_chToStandard(searchObj.date)
+      if (!date) return myAlert.warning({ title: "搜尋時間格式錯誤", content: "例:101-01-01" })
+    }
+    router.push({
+      query: {
+        isUserReviewed: searchObj.isUserReviewed,
+        date: searchObj.date,
+        isMine,
+        isCalendar
       }
     })
-  }
 
-  const searchGroup = {
+  } // doSearch
+
+  const searchGroup: TsearchGroup = {
     searchTargetList,
-    doSearch
+    doSearch,
+    controlled: true,
   }
 
-  // --------------------
-  /**manager 審核人員設定 */
-  const panelList_manager_notInEdit: TpanelList = [
-    { searchGroup },
-    {
-      type: "myButton",
-      label: "審核人員設定",
-      onClick: editRivewerPickArr
+  // ---------------------------
+  const doCheck = async () => {
+    if (reportInEdit?.isReviewedByUser === true) {
+      return myAlert.warning({ title: "已檢視過" })
     }
-  ]
-
-  /**reporter 今日回報 */
-  const panelList_reporter_notInEdit: TpanelList = [
-    { searchGroup },
-    {
-      type: "myButton",
-      label: "今日回報",
-      onClick: editReport_today
-    }
-  ]
-  /**reviewer 已讀/未讀 */
-  const panelList_reviewer_inEdit: TpanelList = [
-    {
-      custom: <CheckButton
-        checkLabel="已讀"
-        uncheckLable="未讀"
-        value={!!reportInEdit?.isReviewedByUser}
-        onClick={async () => {
-          if (reportInEdit?.isReviewedByUser) {
-            return myAlert.warning({ title: "已審核過" })
-          }
-          if (!reportInEdit?.id) return;
-          try {
-            showRootLoading(true)
-            const res = await apiDailyReports_review(reportInEdit.id)
-            changeReviewToChecked(!!res)
-            showRootLoading(false)
-            await updateDailyReports_withLoading()
-          }
-          catch (error) {
-            const err = error as AxiosError<{
-              error: string
-              message: string
-              statusCode: number
-            }>
-            const { message, statusCode } = err.response?.data ?? {}
-
-            if (statusCode === 403) return myAlert.warning({ title: "您沒有權限審核該日報表" })
-            myAlert.err({ title: "審核失敗" })
-          }
-          finally { showRootLoading(false) }
-        }}
-      />
-    }
-  ]
-
-  /**reporter 編輯 */
-  const panelList_reporter_inEdit01: TpanelList = [
-    // {
-    //   custom: <Badge
-    //     className={scss.antdBadge01}
-    //     color="auto"
-    //     text="未讀" />
-    // },
-    {
-      type: "myButton",
-      label: "編輯",
-      onClick: switchIsEdit
-    }
-  ]
-
-  /**reporter 上傳 取消 */
-  const panelList_reporter_inEdit02: TpanelList = [
-    {
-      type: "redButton",
-      label: "上傳",
-      onClick: choseReviewerArr,
-    },
-    {
-      type: "myButton",
-      label: "取消",
-      onClick: switchIsEdit,
-    },
-  ]
-
-  // const panelList_reporter_reviewed: TpanelList = [
-  //   {
-  //     custom: <Badge
-  //       className={scss.antdBadge02}
-  //       color="auto"
-  //       text="總經理已閱讀" />
-  //   },
-  // ]
-
-  const panelList = (() => {
-
-    if (identity === "manager") {
-      if (!reportInEdit) return panelList_manager_notInEdit
-      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
-      else return []
-    }
-
-    if (identity === "reviewer") {
-      if (!reportInEdit) return panelList_reporter_notInEdit
-      else {
-        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-          if (isReportEdit) return panelList_reporter_inEdit02
-          return panelList_reporter_inEdit01
-        }
-        else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit
-        return []
+    if (!reportInEdit?.id) return;
+    try {
+      showRootLoading(true)
+      const res = await apiDailyReports_review(reportInEdit.id)
+      changeReviewToChecked(!!res)
+      showRootLoading(false)
+      if (isCalendar) {
+        const now = moment()
+        const dynamicFilter = filterCre_nextAndPrevMonth(now)
+        await update_calendar(dynamicFilter)
       }
+      else reset()
     }
-
-    if (identity === "reporter") {
-      if (!reportInEdit) return panelList_reporter_notInEdit
-      else {
-        // if (reportInEdit.isReviewCompleted) return panelList_reporter_reviewed
-        if (isReportEdit) return panelList_reporter_inEdit02
-        return panelList_reporter_inEdit01
-      }
+    catch (error) {
+      const err = error as AxiosError<{
+        error: string
+        message: string
+        statusCode: number
+      }>
+      const { message, statusCode } = err.response?.data ?? {}
+      if (statusCode === 403) return myAlert.warning({ title: "您沒有權限檢視該日報表" })
+      myAlert.err({ title: "檢視失敗" })
     }
-    return []
-  })()
+    finally { showRootLoading(false) }
+  }
 
+
+  const { panelList } = panelListCreator({
+    reportInEdit,
+    doCheck,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+    dailyReportArr: dailyReportArr ?? [],
+    isCalendar,
+    router,
+    searchGroup,
+    editRivewerPickArr,
+    editReport_today,
+    identity,
+    isReportEdit,
+    userInfo,
+  })
 
   // ----------------------------------------------------------------------
   const customeLeft =
@@ -507,55 +589,108 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
       />
     ]
   // ----------------------------------------------------------------------
-  const leftTagOnClick = () => {
-    cancelEditNewDailyReport()
+  const leftTagOnClick = () => { cancelEditNewDailyReport() }
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // mobile
+  const [showSearchDrawer, setShowSearchDrawer] = useState(false)
+  const doShowDrawer = () => { setShowSearchDrawer(true) }
+  const closeShowDrawer = () => { setShowSearchDrawer(false) }
+
+  // ----------------------------------------------------------------------
+
+  const dailyReportContextValue: TdailyReportContext = {
+    reportInEdit, isReportEdit,
+    switchIsEdit, setShowReviewerForReportModal, cancelEditNewDailyReport,
+    changeReportDate, identity, doCheck, userInfo,
   }
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayer, scss.plus)}
-        containerChildren={<LoadingCover01 isLoading={isLoading} />}
+        containerChildren={<LoadingCover01 isLoading={isLoading || isLoading_v2} />}
       >
+        {/*  */}
         <PageHeader02
+          // key={+isMine}
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
           panelList={panelList}
           customeLeft={customeLeft}
         />
+        <PageHeader_mobile_dailyReport
+          doShowDrawer={doShowDrawer}
+          editRivewerPickArr={editRivewerPickArr}
+          employeeChName={reportInEdit?.employeeChName}
+          date={reportInEdit?.date}
+          identity={identity}
+          editReport_today={editReport_today}
+          cancelEditNewDailyReport={cancelEditNewDailyReport}
+          isSearch={!!(searchObj?.isUserReviewed !== undefined || searchObj?.date !== undefined)}
+        />
 
-        {!reportInEdit &&
+
+        {/*  */}
+        {!isCalendar &&
           <ReporterList
-            dailyReportArr={sortedDailyReport ?? []}
+            dailyReportArr={dailyReportArr ?? []}
             addTag={addTag}
+            viewRef={viewRef}
+          />
+        }
+        {isCalendar &&
+          <TheCalendar
+            isMine={isMine}
+            userInfo={userInfo}
+            addTag={addTag}
+            dailyReportArr={dailyReport_calendar ?? []}
+            update_calendar={update_calendar}
           />
         }
 
-        {reportInEdit &&
+        <DailyReportContext.Provider value={dailyReportContextValue}>
           <ReportTable
-            classDailyReportItemArr={reportInEdit.items}
             addDailyReportItem={addDailyReportItem}
-            isEdit={isReportEdit}
+            removeDailyReportItem={removeDailyReportItem}
+       
           />
-        }
+        </DailyReportContext.Provider>
+
+        {/* mobile */}
+        <SearchDrawer visible={showSearchDrawer}
+          onSearch={doSearch}
+          onCancel={closeShowDrawer}
+          searchObj={searchObj}
+          onChange_isUserReviewed={onChange_isUserReviewed}
+          onChange_date={onChange_date}
+        />
+        {/*  */}
       </SubLayer>
 
       <SetReportEmpModal
         visible={!!reviewersPickArr}
         onConfirm={reqApiPatchDailyReports_viewers}
-        onCancel={cancelSetReportEmpModal}
+        onCancel={cancelSetRivewerModal}
         dataArr={reviewersPickArr ?? []}
-        label="審核人員設定"
+        label="檢視人員設定"
         tip="可複選"
       />
 
-      <SetReportEmpModal
-        visible={!!reviewerArr}
+      {/* 上傳前選擇兩種人員 */}
+      <ReviewerAndExaminerSelector
+        visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
-        onCancel={cancelReviewerArr}
-        dataArr={reviewerArr ?? []}
-        label="選擇審核人員"
-        tip="可複選"
+        onCancel={() => setShowReviewerForReportModal(false)}
+        userId={userInfo.employee?.id}
+        lastStatus={dailyReportArr?.[0]?.reviewStatus || []}
       />
     </>
   )
@@ -581,39 +716,6 @@ const reqApiDailyReports_id = async (reportId: string) => {
   finally { showRootLoading(false) }
 }
 
-const reqApiDailyReports_my = async (
-  param?: {
-    /**YYYY-MM-DD */
-    date?: string
-  }
-) => {
-
-  const date = (() => {
-    const today = moment().format("YYYY-MM-DD");
-    if (!param?.date) return today
-    else return moment(param.date).format("YYYY-MM-DD");
-  })()
-
-  try {
-    showRootLoading(true)
-    const res = await apiDailyReports_my(date)
-    return res
-  }
-  catch (error) {
-    const err = error as AxiosError<{
-      error: string
-      message: string
-      statusCode: number
-    }>
-    const { message, statusCode } = err.response?.data ?? {}
-    // 
-    if (statusCode === 404) return
-    myAlert.err({ title: "取得指定日期日報表失敗" })
-    return "fail"
-  }
-  finally { showRootLoading(false) }
-}
-
 // ==========================================================================
 /**判斷是否為回報人員權限 */
 const checkIsSubordinate = (userInfo: TuserDto) => {
@@ -629,7 +731,6 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
   /**使用者不是employee，那就是admin*/
   return false
 }
-
 
 // ==========================================================================
 
@@ -647,7 +748,6 @@ const formatRiewerPickArr = (
   const result = employeeArr.map((item) => {
     const match = dailyReports_ReportersArr.find((x) => x.id === item.id)
     const shouldReport = match ? true : false
-
     let theJobs = (() => {
       if (item.jobs) {
         return _.sortBy(item.jobs, "grade")
@@ -661,42 +761,192 @@ const formatRiewerPickArr = (
       idNumber: item.idNumber,
       job: theJobs[0]?.name ?? "",
       grade: theJobs[0]?.grade ?? "",
-      shouldReport
+      shouldReport,
+      isHaveUser: !!item.user
     }
     return obj
   })
   return result
 }
 
-/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatEmployeeArr = (
-  { employeeArr }:
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+
+
+const panelListCreator = (
+  { reportInEdit,
+    doCheck,
+    switchIsEdit,
+    setShowReviewerForReportModal,
+    dailyReportArr,
+    isCalendar,
+    router,
+    searchGroup,
+    editRivewerPickArr,
+    editReport_today,
+    identity,
+    isReportEdit,
+    userInfo
+  }:
     {
-      employeeArr: TemployeeDto[] | undefined
+      reportInEdit: ThookEmptyReport | undefined
+      doCheck: () => void
+      switchIsEdit: () => void
+      setShowReviewerForReportModal: (v: boolean) => void
+      dailyReportArr: TdailyReportDto[]
+      isCalendar: boolean
+      router: NextRouter
+      searchGroup: TsearchGroup
+      editRivewerPickArr: () => void
+      editReport_today: () => void
+      identity: Tidentity
+      isReportEdit: boolean
+      userInfo: TuserDto
     }
 ) => {
-  if (!employeeArr) return []
 
-  const result = employeeArr.map((item) => {
-    const shouldReport = false
-    let theJobs = (() => {
-      if (item.jobs) {
-        return _.sortBy(item.jobs, "grade")
-      }
-      else return []
-    })();
 
-    const obj = {
-      id: item.id,
-      chName: item.chName,
-      idNumber: item.idNumber,
-      job: theJobs[0]?.name ?? "",
-      grade: theJobs[0]?.grade ?? "",
-      shouldReport
+
+  const listSwitchButton: TpanelList[number] = {
+    type: "myButton",
+    label: isCalendar ? "列表" : "月曆",
+    onClick: () => {
+      router.push({
+        query: {
+          ...router.query,
+          isCalendar: isCalendar ? "false" : "true"
+        }
+      })
+    },
+    img: isCalendar ? iconMenu.src : iconFourCube.src
+  }
+
+  /**manager 檢視人員設定 */
+  const panelList_manager_notInEdit: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "檢視人員設定",
+      onClick: editRivewerPickArr
+    },
+    listSwitchButton
+  ]
+
+  /**reporter 新增回報 */
+  const panelList_reporter_notInEdit: TpanelList = [
+    { searchGroup },
+    {
+      type: "myButton",
+      label: "新增回報",
+      onClick: editReport_today
+    },
+    listSwitchButton
+  ]
+
+  /**reviewer 已讀/未讀 isReviewedByUser */
+  const panelList_reviewer_inEdit_user: TpanelList = [
+    {
+      custom: <CheckButton
+        // checkLabel="已讀"
+        checkLabel="已讀"
+        uncheckLable="未讀"
+        value={!!reportInEdit?.isReviewedByUser}
+        onClick={doCheck}
+      />
     }
-    return obj
-  })
-  return result
+  ]
+
+  /**reporter 編輯 */
+  const panelList_reporter_inEdit01: TpanelList = [
+    {
+      type: "myButton",
+      label: "編輯",
+      onClick: switchIsEdit
+    }
+  ]
+
+  /**reporter 上傳 取消 */
+  const panelList_reporter_inEdit02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: () => {
+        if (!reportInEdit?.date) return myAlert.warning({ title: "請選擇日期" })
+        setShowReviewerForReportModal(true)
+      },
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: switchIsEdit,
+    },
+  ]
+
+  const panelList_reporter_reviewed: TpanelList = [
+    {
+      custom: <Badge
+        className={scss.antdBadge02}
+        color="auto"
+        text="已檢視" />
+    },
+  ]
+
+  const panelList = (() => {
+    if (reportInEdit?.isUserIsViewer) {
+      return []
+    }
+
+    if (identity === "manager") {
+      if (!reportInEdit) return panelList_manager_notInEdit
+      else if (reportInEdit.isAllowToReview) return panelList_reviewer_inEdit_user
+      else return []
+    }
+
+    if (identity === "reviewer") {
+      if (!reportInEdit) return panelList_reporter_notInEdit
+      else {
+        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
+          if (isReportEdit) return panelList_reporter_inEdit02
+          if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
+          return panelList_reporter_inEdit01
+        }
+        else if (reportInEdit.isAllowToReview) {
+          return panelList_reviewer_inEdit_user
+        }
+        return []
+      }
+    }
+
+    if (identity === "reporter") {
+      if (!reportInEdit) return panelList_reporter_notInEdit
+      else {
+        if (reportInEdit.isReviewedByOther) return panelList_reporter_reviewed
+        if (isReportEdit) return panelList_reporter_inEdit02
+        return panelList_reporter_inEdit01
+      }
+    }
+    return []
+  })()
+
+  return {
+    panelList_manager_notInEdit,
+    panelList_reporter_notInEdit,
+    panelList_reviewer_inEdit_user,
+    panelList_reporter_inEdit01,
+    panelList_reporter_inEdit02,
+    panelList_reporter_reviewed,
+    panelList,
+  }
 }
 
 
@@ -707,13 +957,7 @@ const formatEmployeeArr = (
 
 
 
-// ========================================================================
-/**
-待辦事項
 
-等新的api出來後會做其他優化
-1.總表會改成分頁取得，滾輪滑到底後會自動取得下一頁然後接在底下
-  或是要做成分頁?
-  前者我直有做一次的經驗，應該會需要幾個小時研究
- */
+
+
 

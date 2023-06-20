@@ -1,7 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useInView } from 'react-intersection-observer';
 
 import { axi } from "./_axiosCreator";
+
+// config
+import { customerTypesLookup } from 'config/lookupTable'
 
 // type
 import type { TcustomerDto, TcustomerDto_Populate, TpageMetaDto, Tcontact } from "./dtoTypes";
@@ -14,13 +18,15 @@ type TcustomerDto_TC = TcustomerDto_Populate<["types", "contacts"]>
 
 export type { TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts }
 // ===============================================================
+export { customerTypesLookup }
+// ===============================================================
 
-export const customerTypesLookup = Object.freeze({
-  construction: "營造",
-  firm: "事務所",
-  propertyOwner: "業主",
-  contractor: "協力廠商",
-} as const);
+// export const customerTypesLookup = Object.freeze({
+//   construction: "營造",
+//   firm: "事務所",
+//   propertyOwner: "業主",
+//   contractor: "協力廠商",
+// } as const);
 
 type TcustomerTypesLookupKeys = (keyof typeof customerTypesLookup)
 export const customerTypesArr
@@ -96,13 +102,30 @@ const apiGetCustomers = (params?: TapiGetCustomersParams) => {
 }
 
 export const useCustomers = (params?: TapiGetCustomersParams) => {
-  let [data, setData] = useState<TgetCustomers>()
+  let [res, setRes] = useState<TgetCustomers>()
   const update = async () => {
     const data = await apiGetCustomers(params)
-    if (data) setData(data)
+    if (data) setRes(data)
     return data
   }
-  return { data: data?.data, meta: data?.meta, setData, update }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetCustomers(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    res.data = [...oldData, ...newData]
+    setRes({ ...res })
+    return apiRes
+  }
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    setData: setRes,
+    update,
+    update_infinite
+  }
 }
 
 // ============================================================
@@ -186,6 +209,77 @@ export const apiDeleteCustomers_id
       .then(({ data }) => data)
       .catch(err => Promise.reject(err.message))
   }
+
+
+
+
+// =============================================================================
+
+
+export const useCustomers_infinite_lab = (customParams?: TapiGetCustomersParams) => {
+  const [viewRef, inView] = useInView();
+  const [page, setPage] = useState(1)
+
+  const params = {
+    page,
+    // pageSize必須大於畫面一次可顯示的item數量才不會壞掉    
+    // 不過應該只有在嚴格模式會壞掉
+    pageSize: 20, 
+    sort: "customerNumber"
+  } as const
+
+  const [dataArrQueue, setDataArrQueue] = useState<TgetCustomers["data"][]>([])
+
+  const [data, setData] = useState<TgetCustomers["data"]>()
+  const [meta, setMeta] = useState<TgetCustomers["meta"]>()
+
+  const update_infinite = async () => {
+    if (meta && !meta.hasNextPage) return
+    const res = await apiGetCustomers(params)
+    const dataArrQueueCopy = [...dataArrQueue]
+    dataArrQueueCopy[page - 1] = res.data
+    setDataArrQueue(dataArrQueueCopy)
+    setData(dataArrQueueCopy.flat())
+    return res
+  }
+
+  const nextPage = async () => {
+    if (meta && !meta.hasNextPage) return
+    setPage(page + 1)
+  }
+
+  const reset = () => {
+    setDataArrQueue([])
+    setData(undefined)
+    setMeta(undefined)
+    setPage(1)
+  }
+
+  useEffect(() => {
+    update_infinite()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
+
+  useEffect(() => {
+    if (inView) nextPage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
+  useEffect(() => {
+    reset()
+  }, [customParams])
+
+  return {
+    data,
+    meta,
+    setData,
+    // update,
+    nextPage,
+    viewRef,
+    reset
+  }
+}
+
 
 
 

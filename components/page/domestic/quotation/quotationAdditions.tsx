@@ -7,7 +7,7 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import AddButton from "components/global/gear/button/addButton"
 
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { Class_legacyContract, Class_addition } from "hooks/quotation/useLegacyContract"
 
 // icon
 import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
@@ -15,36 +15,35 @@ import { IconDelete01, IconCopy } from "public/image/icon/svgComponent/svgIcons"
 
 // css
 import styleL from "./local.module.scss"
-import scss from "./quotationOtherSetting.module.scss"
+import scss from "./quotationAdditions.module.scss"
 
 
 
 
-export default function QuotationOtherSetting(
+export default function QuotationAdditions(
   {
-    classQuotation,
+    legacyContract,
     disabled }:
     {
-      classQuotation: Class_legacyQuotation
+      legacyContract: Class_legacyContract
       disabled: boolean
     }
 ) {
 
   const [activeIndex, setActiveIndex] = useState(-1)
 
-  const { partCellConfig, } = classQuotation
+  const { additionCellConfig: additionCellConfig, } = legacyContract
 
-  const activeProd = classQuotation.mainProductArr[classQuotation.activeMainProd]
-  const partList = activeProd?.partArr ?? []
 
-  const { addPart, removePart } = activeProd ?? {}
 
-  const partKeyindex = partCellConfig.keyList
-  const cellConfig = partCellConfig.cellConfig
+  const additionArr = legacyContract.classAdditionArr
 
-  useEffect(() => {
-    setActiveIndex(-1)
-  }, [activeProd])
+  const { addAddition, delAddition } = legacyContract ?? {}
+
+  const additionKeyindex = additionCellConfig.keyList
+  const cellConfig = additionCellConfig.cellConfig
+
+
 
   return (
     <div className={scss.container}>
@@ -60,14 +59,14 @@ export default function QuotationOtherSetting(
           <div className={scss.delBtn}>
             <span></span>
           </div>
-          {/* <div className={styleL.rowIndex}>
+          <div className={styleL.rowIndex}>
             <span></span>
-          </div> */}
-          {partKeyindex.map((item, index) => {
+          </div>
+          {additionKeyindex.map((item, index) => {
             const { label, flex, width } = cellConfig[item]
             const theStyle = { width, flex }
             return (
-              <div className={styleL.theadCell} key={index} style={theStyle}>
+              <div className={classNames(styleL.theadCell, "relative")} key={index} style={theStyle}>
                 <span>{label}</span>
               </div>
             )
@@ -76,15 +75,7 @@ export default function QuotationOtherSetting(
 
 
         {/* tbody */}
-        <div>
-          {partList.length === 0 &&
-            <>
-              <div className={styleL.rowIndex}></div>
-              <span className={styleL.noListTip}>尚未選擇產品</span>
-            </>}
-        </div>
-        {/*  */}
-        {partList?.map((part, pIndex) => {
+        {additionArr?.map((part, pIndex) => {
           return (
             <CellWithBar key={pIndex} isActive={activeIndex === pIndex}
               className={classNames(styleL.row, scss.row)}
@@ -92,18 +83,21 @@ export default function QuotationOtherSetting(
             >
               <div className={scss.delBtn}>
                 <IconDelete01
-                  onClick={(e) => { e.stopPropagation(), removePart(pIndex) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (disabled) return;
+                    delAddition(pIndex)
+                  }}
                 />
               </div>
 
-              {/* <div className={styleL.rowIndex}>
+              <div className={styleL.rowIndex}>
                 <span>{pIndex + 1}</span>
-              </div> */}
+              </div>
 
-              {partKeyindex.map((key, cIndex) => {
-                const { width, flex, type } = cellConfig[key]
+              {additionKeyindex.map((key, cIndex) => {
+                const { width, flex, type, inputType } = cellConfig[key]
                 const theStyle = { width, flex }
-
 
                 return (
                   <div className={styleL.column} key={cIndex} style={theStyle}>
@@ -111,7 +105,8 @@ export default function QuotationOtherSetting(
                       disabled={disabled}
                       inputProps={{
                         value: part[key],
-                        onChange: (v) => part[key] = v
+                        onChange: (v) => part[key] = v,
+                        inputType: inputType
                       }}
                     />
                   </div>
@@ -120,11 +115,11 @@ export default function QuotationOtherSetting(
             </CellWithBar>
           )
         })}
-        {activeProd && !disabled &&
+        {!disabled &&
           <AddButton
             className={scss.addBtn}
             label="新增項目"
-            onClick={addPart} />
+            onClick={addAddition} />
         }
       </div>
 

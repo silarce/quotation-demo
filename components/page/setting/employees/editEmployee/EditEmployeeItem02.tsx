@@ -138,13 +138,10 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
             {keyIndex02.map((key, index) => {
               const stateValue = classEmployee[key]
               const { label } = config02[key]
-              const onChange = (dateString: string) => {
-                const value = dateString
-                classEmployee[key] = value
+              const onChange02 = (moment: moment.Moment | null) => {
+                classEmployee[key] = moment?.toISOString() ?? ""
               }
-
               const isMust = key === "startDate" ? true : false
-
               return (
                 <InputSel className={scss.inputSel}
                   key={index}
@@ -153,7 +150,7 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
                   presetStyle="s01"
                   datePickerProps={{
                     value: stateValue,
-                    onChange: onChange,
+                    onChange02: onChange02,
                   }}
                   isMust={isMust}
                   mustTipClassName={scss.mustTip}

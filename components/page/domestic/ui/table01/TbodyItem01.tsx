@@ -19,6 +19,7 @@ type Tdata = {
   basicInfo: {
     quotationId: string
     constructionName: string
+    /**承辦人 */
     undertaker: string
     totalDiscount: string | number
     tempDoorQty: string | number

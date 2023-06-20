@@ -5,6 +5,9 @@
   grid-template-columns: repeat(2, auto);
   justify-content: space-between;
   height: 58px;
+  @screen laptop {
+    display: none;
+  }
 }
 
 .left {

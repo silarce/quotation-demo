@@ -84,7 +84,20 @@ export const useEmployee = (params?: TapiGetEmployeeParams) => {
     return data
   }
 
-  return { data, setData, update }
+  const update_infinite = async () => {
+    if (!data) return
+    const apiRes = await apiGetEmployee(params)
+    const newData = apiRes.data
+    const oldData = data.data
+    apiRes.data = [...oldData, ...newData]
+
+    setData({ ...apiRes })
+
+    return apiRes
+  }
+
+
+  return { data, setData, update, update_infinite }
 }
 
 export const useCheckEmployee = (

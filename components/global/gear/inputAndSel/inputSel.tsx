@@ -14,13 +14,16 @@ import Input, { TinputProps } from "./cog/input";
 import MySelect, { TselectProps } from "./cog/mySelect";
 import Textarea, { TtextareaProps } from "./cog/textarea";
 import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
+import MyTimePicker, { TtimePickerProps } from "./cog/myTimePicker";
+
+// gear
+import MustTip_simple from "../other/mustTip_simple";
 
 // icon
 import iconMust from "public/image/icon/asterisk.svg"
 
 // css
 import scss from "./inputSel.module.scss"
-import { CssBaselineProps } from "@mui/material";
 
 export type { TselectProps }
 
@@ -55,7 +58,9 @@ export default function InputSel(
     selectProps,
     textareaProps,
     datePickerProps,
+    timePickerProps,
 
+    isMustPreStyle,
   }:
     {
       label?: string
@@ -86,7 +91,9 @@ export default function InputSel(
       selectProps?: TselectProps
       textareaProps?: TtextareaProps
       datePickerProps?: TdatePickerProps
+      timePickerProps?: TtimePickerProps
 
+      isMustPreStyle?: "minimal"
 
     }
 
@@ -155,8 +162,11 @@ export default function InputSel(
     <label className={labelClasses} style={lableStyle}    >
 
       {label &&
-        <div className={captionClasses} style={captionStyle}>
+        <div className={classNames(captionClasses, "relative")} style={captionStyle}>
           <span>{label}</span>
+          {isMust &&
+            <MustTip_simple className={mustTipClassName} preStyle={isMustPreStyle} />
+          }
         </div>
       }
 
@@ -194,6 +204,14 @@ export default function InputSel(
           disabled={disabled}
         />
       }
+      {timePickerProps &&
+        <MyTimePicker
+          timePickerProps={timePickerProps}
+          setIsFocus={setIsFocus}
+          placeholder={placeholder}
+          disabled={disabled}
+        />
+      }
 
 
       {showBaseline !== "invisible" &&
@@ -202,11 +220,7 @@ export default function InputSel(
         />
       }
 
-      {isMust &&
-        <div className={classNames(scss.mustTip, mustTipClassName)}>
-          <Image src={iconMust} alt="必填" />
-        </div>
-      }
+
 
     </label>
   )

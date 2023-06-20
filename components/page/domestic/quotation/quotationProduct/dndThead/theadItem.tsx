@@ -1,10 +1,11 @@
+import classNames from "classnames"
 
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
 // css
 import style from "./theadItem.module.scss"
-import styleL from "../..//local.module.scss"
+import styleL from "../../local.module.scss"
 
 
 interface TtheadItem {
@@ -49,8 +50,10 @@ export default function TheadItem({ theadInfo, allowMove, isMoving }:
   const styleIsCentewr = lwhbReg.test(id) ? styleL.textCenter : ""
 
   return (
-    <div className={`${styleL.theadCell} ${styleAllowMove} ${styleIsMoving} ${styleIsCentewr}`}
-      ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}      >
+    <div className={
+      classNames(styleL.theadCell, styleAllowMove, styleIsMoving, styleIsCentewr, "relative")
+    }
+      ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}>
       <span>{label}</span>
     </div>
   )

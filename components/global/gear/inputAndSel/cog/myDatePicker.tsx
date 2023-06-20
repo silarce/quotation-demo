@@ -6,18 +6,18 @@ import {
 
 import moment from 'moment';
 // antd
-import { DatePicker } from 'antd';
+import { DatePicker, DatePickerProps } from 'antd';
 import 'moment/locale/zh-tw';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
+
+import { convertDate_reduce1911 } from "js/utils/helpers/date/convertDate";
+
 
 // css
 import scss from "../inputSel.module.scss"
 
-
-
-
 export type TdatePickerProps = {
-  value: string
+  value?: string | undefined
   boxClassName?: string
   datePickerClassName?: string
 
@@ -26,12 +26,10 @@ export type TdatePickerProps = {
     moment: moment.Moment | null,
     dateString: string
   ) => void,
-
   onFocus?: () => void
   onBlur?: () => void
-
+  antdDatePickerProps?: DatePickerProps
 }
-
 
 export default function MyDatePicker(
   {
@@ -48,7 +46,6 @@ export default function MyDatePicker(
     }
 ) {
 
-
   const {
     value,
     boxClassName,
@@ -57,6 +54,7 @@ export default function MyDatePicker(
     onChange02,
     onFocus,
     onBlur,
+    antdDatePickerProps,
   } = datePickerProps
 
   const theOnFocus = () => {
@@ -71,15 +69,10 @@ export default function MyDatePicker(
   // ---------------------------------------------------------------------------
   // 將stateValue轉為moment物件
   const theValue = (() => {
-    const themoment = moment(value, "y-MM-DD")
-    let theValue
-    if (themoment.format("y-MM-DD") === "Invalid date")
-      theValue = undefined
-    else theValue = themoment
-    return theValue
+    if (!value) return undefined
+    const theMoment = moment(value)
+    return theMoment.isValid() ? theMoment : undefined
   })()
-
-
   // ---------------------------------------------------------------------------
   const theOnChange = onChange02 ? onChange02
     : onChange ? (
@@ -88,8 +81,6 @@ export default function MyDatePicker(
       onChange(dateString)
     }
       : undefined
-
-
 
   const datePickerBoxClassName = (() => {
     return `${scss.datePickerBox} ${boxClassName ?? ""}`
@@ -106,15 +97,29 @@ export default function MyDatePicker(
         locale={locale}
         value={theValue}
         placeholder={placeholder ?? "例 : 100-01-01"}
-        defaultPickerValue={moment().year(moment().year() - 1911)}
-        format={"y-MM-DD"}
+        // defaultPickerValue={moment()}
+        // defaultValue={moment()}
+        // defaultPickerValue={moment().year(moment().year() - 1911)}
+        // format回傳日期的日期會導致input不能用
+        format={(theMoment) => {
+          const twDate = convertDate_reduce1911(theMoment.toISOString())
+          return moment(twDate).format("yy-MM-DD")
+        }}
+        // format={"yy-MM-DD"}
         disabled={disabled}
         bordered={false}
-        showToday={false}
+        // showToday={false}
         autoComplete="off"
         onChange={theOnChange}
         onFocus={theOnFocus}
         onBlur={theOnBlur}
+        {
+        ...{
+          // 上面的showToday有型別錯誤，不知道為什麼
+          showToday: false,
+          ...antdDatePickerProps
+        }
+        }
       />
     </div>
   )

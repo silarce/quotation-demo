@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import _ from "lodash"
 
 
@@ -8,6 +8,9 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 
 import scss from "./setReportEmpModal.module.scss"
 
+import { AppContext } from "pages/_app"
+
+// ========================================================================
 
 export type TsetReportEmpModalData = {
   id: string
@@ -16,9 +19,10 @@ export type TsetReportEmpModalData = {
   job: string
   grade: number
   shouldReport: boolean
+  isHaveUser: boolean
 }
 
-
+// ========================================================================
 export default function SetReportEmpModal(
   { visible,
     onConfirm,
@@ -39,6 +43,9 @@ export default function SetReportEmpModal(
       tip?: string
     }
 ) {
+
+  const { rwd1023 } = useContext(AppContext)
+
 
   const [theDataArr, setTheDataArr]
     = useState<TsetReportEmpModalData[]>(_.cloneDeep(dataArr))
@@ -65,7 +72,7 @@ export default function SetReportEmpModal(
       onConfirm={() => onConfirm(theDataArr)}
       onCancel={onCancel}
       onSearch={onSearch}
-      width="800px"
+      width={rwd1023 ? "80vw" : "800px"}
       tip={tip}
     >
       <div className={scss.body}>
@@ -100,7 +107,7 @@ export default function SetReportEmpModal(
               isActive={shouldReport}
               onClick={onClick}
             >
-              <span>{idNumber}</span>
+              <span className={scss.idNumber}>{idNumber}</span>
               <span>{chName}</span>
               <span>{job}</span>
               <span>LV {grade}</span>

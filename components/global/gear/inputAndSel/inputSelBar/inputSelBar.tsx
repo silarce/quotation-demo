@@ -1,23 +1,16 @@
-import {
-  ChangeEvent, CSSProperties,
-  useState
-} from "react"
-
+import { CSSProperties, useState } from "react"
+import classNames from "classnames";
 // gear
-import InputSel from "../inputSel"
+import MustTip_simple from "../../other/mustTip_simple";
 
 
 // css
 import scss from "./inputSelBar.module.scss"
 
-// type
-import type { Toption } from "fakeDatabase/options/options"
 // component
 import Input, { TinputProps } from "../cog/input";
 import MySelect, { TselectProps } from "../cog/mySelect";
 import Textarea, { TtextareaProps } from "../cog/textarea";
-
-
 
 
 type TinputPropsWrapper = {
@@ -51,6 +44,8 @@ export default function InputSelBar(
     disabled,
     className, captionClassName, hrClassName,
     valueContanierClassName,
+    isMust,
+    mustTipClassName
   }:
     {
       label?: string
@@ -71,6 +66,8 @@ export default function InputSelBar(
       valueContanierClassName?: string
       captionClassName?: string
       hrClassName?: string
+      isMust?: boolean
+      mustTipClassName?: string
     }
 ) {
 
@@ -117,8 +114,9 @@ export default function InputSelBar(
     <div className={labelClasses} style={lableStyle}>
 
       {label &&
-        <div className={captionClasses} style={captionStyle}>
+        <div className={classNames(captionClasses, "relative")} style={captionStyle}>
           <span>{label}</span>
+          {isMust && <MustTip_simple className={mustTipClassName} preStyle="minimal" />}
         </div>
       }
 
@@ -171,14 +169,11 @@ export default function InputSelBar(
         })}
       </div>
 
-
-
       {showBaseline !== "invisible" &&
         <hr className={hrClasses}
           style={hrStyle}
         />
       }
-
     </div>
   )
 

@@ -1,13 +1,10 @@
-// 公司資料
-// 公司資料
 
 import {
   ChangeEvent,
   useState, useEffect,
 } from "react"
-
-const _ = require("lodash")
-
+import _ from "lodash"
+import classNames from "classnames";
 
 // layer
 import SubLayer from "components/Layer/SubLayer/SubLayer"
@@ -19,22 +16,23 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import InputSel from "components/global/gear/inputAndSel/inputSel"
 import InputSelBar_address from "components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address"
 
-
 // api
 import {
   useCompanyInfo, TcompanyInfoDto,
   apiPatchCompanyInfo,
-  apiUploadCompanyLogo
+  apiUploadCompanyLogo,
+  apiDelCompanyLogo,
+  domain
 } from "js/api/api_company-info"
 
 // icon
-import { IconDelete01 } from "public/image/icon/svgComponent/svgIcons"
+import imgLogo2 from "public/image/logo/LOGO_2.svg"
 
 // css
 import scss from "./company-info.module.scss"
 
 // fakeData type
-import { Toption } from 'fakeDatabase/options/countryAndDistrict'
+import { Toption } from 'js/utils/options/countryAndDistrict'
 
 
 export default function CompanyInfo() {
@@ -64,70 +62,16 @@ export default function CompanyInfo() {
   const [imgSrc, setImgSrc] = useState<string | null | undefined>("")
 
   useEffect(() => {
-    setImgSrc(companyInfo?.logoLink)
-  }, [companyInfo?.logoLink])
-  // ===================================================
-  const [editable, setEditable] = useState(false)
+    const logoFileId = companyInfo?.logoFileId
+    if (!logoFileId) return;
+    setImgSrc(`${domain}file/download/${logoFileId}`)
+  }, [companyInfo?.logoFileId])
 
   // ===================================================
-  // ===================================================
-  // pageHeader
-  const panalList01: TpanelList = [
-    {
-      type: "myButton",
-      label: "編輯",
-      onClick: () => { setEditable(true) }
-    }
-  ]
-  const panalList02: TpanelList = [
-    {
-      type: "redButton",
-      label: "上傳",
-      onClick: async () => {
-        const body = {
-          name: companyInfo?.name || "",
-          phone: companyInfo?.phone || "",
-          email: companyInfo?.email || "",
-          county: companyInfo?.county || "",
-          district: companyInfo?.district || "",
-          address: companyInfo?.address || "",
-          fax: companyInfo?.fax || "",
-          taxId: companyInfo?.taxId || "",
-        }
-        setRootLoading(true)
-        try {
-          await apiPatchCompanyInfo(body)
-          if (imageFile) {
-            const formData = new FormData
-            formData.append("image", imageFile)
-            await apiUploadCompanyLogo(formData)
-          }
-          await update()
-          myAlert.success({ title: "上傳成功" })
-        }
-        catch (err) {
-          await update()
-          myAlert.err({ title: err as string })
-        }
-        finally {
-          setRootLoading(false)
-          setEditable(false)
-        }
-      }
-    },
-    {
-      type: "myButton",
-      label: "取消",
-      onClick: () => {
-        setEditable(false)
-        setCompanyInfo(_.cloneDeep(infoBackup))
-        clearLogo()
-      }
-    },
-  ]
+  const [editable, setEditable] = useState(false)
   // ===================================================
   // 地址
-  const { county, district, address, logoLink } = companyInfo ?? {}
+  const { county, district, address, logoFileId: logoLink } = companyInfo ?? {}
 
   // 選擇城市後清除地區
   const clearDistrict = () => {
@@ -159,11 +103,10 @@ export default function CompanyInfo() {
   }
 
   // ===================================================
-  // 上傳照片
-
   // 選擇圖片
   const selectImg = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
+    if (!e.target.files[0]) return
     const file = e.target.files[0]
     setImageFile(file)
     // 預覽圖片
@@ -175,40 +118,111 @@ export default function CompanyInfo() {
     }
   }
   // 清除
-  const clearLogo = () => {
-    setImgSrc(companyInfo?.logoLink)
+  const resetLogo = () => {
+    const logoFileId = companyInfo?.logoFileId
+    setImgSrc(`${domain}file/download/${logoFileId}`)
     setImageFile(undefined)
   }
-  // ===================================================
+  const clearLogo = () => {
+    setTimeout(() => {
+      setImgSrc(undefined)
+      setImageFile(undefined)
+    }, 0);
+  }
+
+  // ------------------------------------------------------------------------
+  // pageHeader
+  const panalList01: TpanelList = [
+    {
+      type: "myButton",
+      label: "編輯",
+      onClick: () => { setEditable(true) }
+    }
+  ]
+  const panalList02: TpanelList = [
+    {
+      type: "redButton",
+      label: "上傳",
+      onClick: async () => {
+        const body = {
+          name: companyInfo?.name || "",
+          phone: companyInfo?.phone || "",
+          email: companyInfo?.email || "",
+          county: companyInfo?.county || "",
+          district: companyInfo?.district || "",
+          address: companyInfo?.address || "",
+          fax: companyInfo?.fax || "",
+          taxId: companyInfo?.taxId || "",
+        }
+        setRootLoading(true)
+        try {
+          await apiPatchCompanyInfo(body)
+          if (imageFile) {
+            const formData = new FormData
+            formData.append("image", imageFile)
+            await apiUploadCompanyLogo(formData)
+          }
+          if (!imgSrc) {
+            apiDelCompanyLogo()
+          }
+          await update()
+          myAlert.success({ title: "上傳成功" })
+        }
+        catch (err) {
+          await update()
+          myAlert.err({ title: err as string })
+        }
+        finally {
+          setRootLoading(false)
+          setEditable(false)
+        }
+      }
+    },
+    {
+      type: "myButton",
+      label: "取消",
+      onClick: () => {
+        setEditable(false)
+        setCompanyInfo(_.cloneDeep(infoBackup))
+        resetLogo()
+      }
+    },
+  ]
+
+  // ------------------------------------------------------------------------
   return (
     <SubLayer>
       <PageHeader02 tag="公司資料"
         panelList={editable ? panalList02 : panalList01}
       />
       <div className={scss.body}>
-        {/* 左邊的圖片 */}
-        <div className={scss.logoBox}>
-          {logoLink
-            // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={imgSrc || ""} alt="logo" />
-            : <span>LOGO</span>}
-          {!editable
-            ? ""
-            : <div className={scss.loadButtonBox}>
-              <label className={scss.loadPhotoButton}
-                htmlFor="uploadLogo">
-                <span>上傳公司Logo</span>
-                <input id="uploadLogo" type="file"
-                  onChange={selectImg}
-                />
-              </label>
+        {/* logo */}
+        <div className={classNames(scss.logoBox,)}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={classNames(scss.logo)}
+            src={imgSrc || imgLogo2.src} alt="logo"
+          />
+          {/* <Image className={classNames(scss.logo)}
+            src={imgSrc || imgLogo2} alt="logo" width={300} height={300}
+            priority={true}
+          /> */}
+          {editable &&
+            <div className={classNames(scss.panel)}>
               <span>{"(上限10MB)"}</span>
-              <IconDelete01 onClick={clearLogo} />
+              <label className={classNames(scss.btn, { [scss.red]: !!imgSrc })}
+                htmlFor="uploadLogo"
+                onClick={imgSrc ? clearLogo : undefined}
+              >
+                <span>{imgSrc ? "刪除logo" : "上傳公司logo"}</span>
+                {!imgSrc &&
+                  <input
+                    id="uploadLogo" type="file"
+                    onChange={selectImg} />}
+              </label>
             </div>
           }
         </div>
-
-        {/* 右邊的表單 */}
+        {/* info */}
         <div className={scss.formContainer}>
           {dataIndex.map((key, index) => {
             const { label } = config[key]
@@ -253,7 +267,6 @@ export default function CompanyInfo() {
   )
 }
 // ========================================================
-
 
 type TapiCompanyInfoKey = keyof TcompanyInfoDto
 type TconfigKeys = Extract<TapiCompanyInfoKey,

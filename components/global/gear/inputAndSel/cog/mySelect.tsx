@@ -19,7 +19,7 @@ import iconArrowBlack from "public/image/icon/arrow_down.svg"
 import scss from "../inputSel.module.scss"
 
 // type
-import type { Toption } from "fakeDatabase/options/options"
+import type { Toption } from "js/utils/options/options"
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
 export type TselectProps = {
@@ -102,12 +102,19 @@ export default function MySelect<
     return <img src={arrowImg} alt="下拉箭頭" />
   }
 
+  const theValue = (() => {
+    if (typeof value === "object" && value) {
+      if (!value.value) return null
+    }
+    return value
+  })()
+
   // -------------------------------------------------------------------------
   return (
-    <div className={classNames(scss.selectBox, className)} style={style} >
+    <div className={classNames(scss.selectBox, className)} style={style}    >
       <Select
         isDisabled={disabled}
-        value={value as Toption}
+        value={theValue as Toption | null}
         placeholder={placeholder}
         options={options}
         onChange={onChange}
@@ -157,6 +164,10 @@ export default function MySelect<
               selClassNames?.singleValue?.(state),
             )
           ,
+          menuPortal: (state) => classNames(
+            scss.selMenuPortal,scss.plus,
+            selClassNames?.menuPortal?.(state)
+          ),
           // ----------------
           clearIndicator: (state) => classNames(selClassNames?.clearIndicator?.(state)),
           dropdownIndicator: (state) => classNames(selClassNames?.dropdownIndicator?.(state)),
@@ -166,7 +177,6 @@ export default function MySelect<
           indicatorSeparator: (state) => classNames(selClassNames?.indicatorSeparator?.(state)),
           loadingIndicator: (state) => classNames(selClassNames?.loadingIndicator?.(state)),
           loadingMessage: (state) => classNames(selClassNames?.loadingMessage?.(state)),
-          menuPortal: (state) => classNames(selClassNames?.menuPortal?.(state)),
           multiValue: (state) => classNames(selClassNames?.multiValue?.(state)),
           multiValueLabel: (state) => classNames(selClassNames?.multiValueLabel?.(state)),
           multiValueRemove: (state) => classNames(selClassNames?.multiValueRemove?.(state)),

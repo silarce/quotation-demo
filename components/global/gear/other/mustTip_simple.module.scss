@@ -1,0 +1,15 @@
+@use "styles/theme01" as *;
+
+.mustTip {
+  position: absolute;
+  right: calc(100% + 3px);
+  top: 40%;
+  transform: translateY(-50%);
+  width: 10px;
+  > img {
+    display: block;
+  }
+  &.minimal {
+    
+  }
+}

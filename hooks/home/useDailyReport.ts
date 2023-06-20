@@ -3,59 +3,100 @@ import _ from "lodash"
 import moment from "moment";
 
 // type
-import { TdailyReportItemDto, TemployeeDto, TuserDto } from "js/api/dtoTypes";
+import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoTypes";
 // api
-import {
-  TcreateDailyReportItemDto, TdailyReportDto,
-} from "js/api/api_dailyReport"
+import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
+// other
+// import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
 
-
+// =================================================================
 
 type ThookEmptyReport = {
   id: string | undefined
-  date: string
+  date: string | null
   items: Class_reportItem[]
   isAllowToReview: boolean
+  isReviewedByOther: boolean
   isReviewedByUser: boolean
+  isReviewCompleted: boolean
+  isUserIsViewer: boolean
   isEdit: boolean
   employeeId: string | undefined
+  employeeChName: string
 }
 
+// type TemptyReportItem = Omit<TdailyReportItemDto, "meals"> & { meals: TdailyReportItemDto["meals"] | "none" }
+type TemptyReportItem = TdailyReportItemDto
 
-const emptyReportItem: TdailyReportItemDto = {
+const emptyTimeCre = () => {
+  const date = new Date()
+  date.setHours(0)
+  date.setMinutes(0)
+  date.setSeconds(0)
+  return date.toISOString()
+}
+// const emptyTime = (() => {
+//   const date = new Date()
+//   date.setHours(0)
+//   date.setMinutes(0)
+//   date.setSeconds(0)
+//   return date.toISOString()
+// })()
+
+const emptyReportItem: TemptyReportItem = {
+  id: "",
+  order: -1,
+  createdAt: "",
+  updatedAt: "",
   periodOfDay: "AM",
   customerName: "",
   contactName: "",
-  mealsCost: 0,
+  meals: [],
   description: "",
+  departureTime: emptyTimeCre(),
+  arrivalTime: emptyTimeCre(),
+  departureWorksiteTime: emptyTimeCre(),
+  licensePlate: "",
+  stayLength: 0,
+  workers: [],
+  workOrderNumber: ""
 }
 
+
+// =================================================================
 
 /**不送dailyReportItem參數會自動送進emptyDailyReportItem */
 class Class_reportItem {
   constructor(
     reRender: () => void,
-    reportItem: TdailyReportItemDto = _.cloneDeep(emptyReportItem)
+    reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)
   ) {
     this._reRender = reRender
     this._item = reportItem
-    this._mealsCost = `${this._item.mealsCost}`
-
+    this._stayLength = `${this._item.stayLength || 0}`
+    this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
+    this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
+    // this._meals = ([]) as TdailyReportItemDto["meals"]
+    // if (!this.arrivalTime) this.arrivalTime = emptyTimeCre()
+    // if (!this.departureTime) this.departureTime = emptyTimeCre()
+    // if (!this.departureWorksiteTime) this.departureWorksiteTime = emptyTimeCre()
 
   } // constructor
   private _reRender
   private _item
-  private _mealsCost
-
+  private _stayLength
+  private _workers
+  private _meals
 
   get id() {
-    return this._item.id
+    if ("id" in this._item) return this._item.id
+    return undefined
   }
 
   get periodOfDay() {
     return this._item.periodOfDay
   }
-  set periodOfDay(v: "AM" | "PM") {
+  set periodOfDay(v) {
     this._item.periodOfDay = v
     this._reRender()
   }
@@ -77,16 +118,20 @@ class Class_reportItem {
   }
 
   get order() {
-    return this._item.order
+    if ("order" in this._item) return this._item.order
+    return undefined
   }
-  // set order(v: string) {
-  //   this._item.order = v
-  //   this._reRender()
-  // }
 
+  get meals() { return this._meals }
 
-  get mealsCost() { return this._mealsCost }
-  set mealsCost(v) { this._mealsCost = v; this._reRender() }
+  addMeals = (v: TdailyReportItemDto["meals"][number]) => {
+    this._meals.push(v)
+    this._reRender()
+  }
+  removeMeals = (index: number) => {
+    this._meals?.splice(index, 1)
+    this._reRender()
+  }
 
   get description() {
     return this._item.description
@@ -96,39 +141,118 @@ class Class_reportItem {
     this._reRender()
   }
 
+  get departureTime() { return this._item.departureTime }
+  set departureTime(v) { this._item.departureTime = v; this._reRender() }
+
+  get arrivalTime() { return this._item.arrivalTime }
+  set arrivalTime(v) { this._item.arrivalTime = v; this._reRender() }
+
+  get departureWorksiteTime() { return this._item.departureWorksiteTime }
+  set departureWorksiteTime(v) {
+    this._item.departureWorksiteTime = v;
+    this._reRender()
+  }
+
+  get licensePlate() { return this._item.licensePlate }
+  set licensePlate(v) { this._item.licensePlate = v; this._reRender() }
+
+  get stayLength() {
+    return this._stayLength
+  }
+  set stayLength(v) {
+    this._stayLength = v
+    this._item.stayLength = parseInt(v);
+    this._reRender()
+  }
+
+  get dispatchOrderId() { return this._item.workOrderNumber }
+  set dispatchOrderId(v) { this._item.workOrderNumber = v; this._reRender() }
+
+
+  get workers() { return this._workers }
+  addWorker = (v: TdailyReportWokerDto) => {
+    this._workers.push(v)
+    this._reRender()
+  }
+  removeWorker = (index: number) => {
+    this._workers?.splice(index, 1)
+    this._reRender()
+  }
+
   get postBody(): TcreateDailyReportItemDto {
-    const mealsCost = parseFloat(this.mealsCost) || 0
+    const workerIdArr = (() => {
+      const idArr = this.workers.map((worker) => {
+        return worker.id
+      })
+      if (idArr.length === 0) return []
+      return idArr
+    })()
+
+    const meals = (() => {
+      if (this._meals.length === 0) return []
+      else return this._meals
+    })()
+
     return {
-      periodOfDay: this.periodOfDay,
+      periodOfDay: this.periodOfDay || "AM",
       customerName: this.customerName,
       contactName: this.contactName,
-      mealsCost,
+      // meals,
+      meals,
       description: this.description,
+      departureTime: this.departureTime || emptyTimeCre(),
+      arrivalTime: this.arrivalTime || emptyTimeCre(),
+      departureWorksiteTime: this.departureWorksiteTime || emptyTimeCre(),
+      licensePlate: this.licensePlate || "",
+      stayLength: this._item.stayLength || 0,
+      workerIds: workerIdArr,
+      workOrderNumber: this.dispatchOrderId ?? "",
+      // test
+      // periodOfDay: "AM",
+      // customerName: "",
+      // contactName: "",
+      // meals: null,
+      // description: "",
+      // departureTime: null,
+      // arrivalTime: null,
+      // departureWorksiteTime: null,
+      // licensePlate: "",
+      // stayLength: 0,
+      // workerIds: null,
+      // workOrderNumber: "",
+      // 
     }
   }
 
 } // Class_dailyReportItem
 
 
-
-
-const useReport = () => {
+const useReport = (
+  { userInfo }:
+    { userInfo: TuserDto }
+) => {
 
   const [render, setRender] = useState(1)
   const reRender = () => setRender(state => ++state)
 
   const [report, setReport] = useState<ThookEmptyReport>()
   const [reportTemp, setReportTemp] = useState<ThookEmptyReport>()
+
   // ------------------------------------------------------------------
   const emptyReportCre = (): ThookEmptyReport => ({
     id: undefined,
-    date: moment().format("yyyy-MM-DD"),
+    // date: moment().toISOString(),
+    date: null,
     items: [new Class_reportItem(reRender)],
     isAllowToReview: false,
+    isReviewedByOther: false,
     isReviewedByUser: false,
-    isEdit: false,
-    employeeId: undefined
-  })
+    isReviewCompleted: false,
+    isUserIsViewer: false,
+    isEdit: true,
+    employeeId: undefined,
+    employeeChName: userInfo.employee?.chName || ""
+  }) // emptyReportCre
   // 
   const reNew_report = (
     { dailyReport, userInfo }:
@@ -140,89 +264,109 @@ const useReport = () => {
     if (!dailyReport) return setReport(emptyReportCre())
 
     let isAllowToReview: boolean = false
-    const isReviewedByUser = dailyReport.reviewStatus.some((statu) => {
-      const employeeId = statu.reviewerEmployee.id
+    let isReviewedByUser: boolean = false
+    let isUserIsViewer: boolean = false
+
+    const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
+      const statuType = statu.type
+      const reviewerId = statu.reviewerEmployee?.id ?? null
       const reviewedAt = statu.reviewedAt
-      if (employeeId === userInfo.employee?.id) {
+      if (reviewerId === userInfo.employee?.id) {
         isAllowToReview = true
-        return !!reviewedAt
+        if (statuType === "examiner") isUserIsViewer = true
+        if (reviewedAt) isReviewedByUser = true
       }
-      return false
+      return !!reviewedAt
     })
+
+
+    const sortedItems = _.sortBy(dailyReport.items, "arrivalTime")
 
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
+      // date: convertDate_reduce1911(dailyReport.date),
       date: dailyReport.date,
-      items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
+      // items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
+      items: sortedItems.map((item) => new Class_reportItem(reRender, item)),
       isAllowToReview,
+      isReviewedByOther: isReviewedByOther,
       isReviewedByUser,
+      isReviewCompleted: dailyReport.isReviewCompleted,
+      isUserIsViewer,
       isEdit: false,
-      employeeId: dailyReport.employee?.id
+      employeeId: dailyReport.employee?.id,
+      employeeChName: dailyReport.employee?.chName,
     }
     setReport(theReport)
-  }
+  } // reNew_report
   // 
   const addReportItem = () => {
     setReport(report => {
       if (!report) return report
-      const id = report.id
-      const date = report.date
       const items = report.items
-      const isAllowToReview = report.isAllowToReview
-      const isReviewedByUser = report.isReviewedByUser
-      const isEdit = report.isEdit
-      const employeeId = report.employeeId
       items.push(new Class_reportItem(reRender))
-      return { id, date, items, isAllowToReview, isReviewedByUser, isEdit, employeeId }
+      return { ...report }
+    })
+  }
+  const removeReportItem = (index: number) => {
+    setReport(report => {
+      if (!report) return report
+      const items = report.items
+      items.splice(index, 1)
+      return { ...report }
     })
   }
   // 
-  const changeReviewToChecked = (isReviewedByUser: boolean) => {
+  const changeReviewToChecked = (isReviewedByOther: boolean) => {
     setReport(report => {
       if (!report) return report
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const isEdit = report.isEdit
-      const isAllowToReview = report.isAllowToReview
-      const employeeId = report.employeeId
-      return { id, date, items, isReviewedByUser, isEdit, isAllowToReview, employeeId }
+      const isReviewedByUser = true
+      return { ...report, isReviewedByOther, isReviewedByUser, }
     })
   }
   // 
   const switchIsEdit = () => {
     if (!report) return
+    /** emptyReportCre.isEdit預設為true
+     * 所以新增回報後不會有編輯按鈕，就不會曾經執行過setReportTemp(_.cloneDeep(report))
+     * 所以reportTemp會是undefine
+     * 所以按下取消按鈕執行setReport(_.cloneDeep(reportTemp))後
+     * report就變成undefine，就直接關掉編輯面板了
+    */
     if (!report.isEdit) setReportTemp(_.cloneDeep(report))
     else {
       setReport(_.cloneDeep(reportTemp))
       setReportTemp(undefined)
       return;
     }
-
     setReport(report => {
       if (!report) return
-      const id = report.id
-      const date = report.date
-      const items = report.items
-      const isAllowToReview = report.isAllowToReview
-      const isReviewedByUser = report.isReviewedByUser
       const isEdit = !report.isEdit
-      const employeeId = report.employeeId
-      return { id, date, items, isAllowToReview, isReviewedByUser, isEdit, employeeId }
+      return { ...report, isEdit, }
+    })
+  }
+  // 
+  const changeReportDate = (v: string) => {
+    setReport(report => {
+      if (!report) return report
+      report.date = v
+      return { ...report }
     })
   }
   // 
   const reportIsEdit = (() => {
     if (!report) return false
-    return (report.isReviewedByUser || !report.isEdit) ? false : true
+    return (report.isReviewedByOther || !report.isEdit) ? false : true
   })()
+  // 
   // 
   return {
     report, setReport, reNew_report,
-    addReportItem, changeReviewToChecked, switchIsEdit,
+    addReportItem, removeReportItem, changeReviewToChecked, switchIsEdit,
+    changeReportDate,
     reportIsEdit
   }
 }
 
-
+export type { ThookEmptyReport }
 export { Class_reportItem, useReport }

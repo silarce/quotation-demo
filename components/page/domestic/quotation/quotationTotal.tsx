@@ -9,7 +9,7 @@ import Appendix from "./quotationTotal/appendix"
 import style from "./quotationTotal.module.scss"
 // type
 import { Class_quotation } from "hooks/quotation/useQuotation"
-import { Class_legacyQuotation } from "hooks/quotation/useLegacyQuotation"
+import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
 import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
 import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
 
@@ -22,7 +22,7 @@ export default function QuotationTotal(
     disabled = false,
   }:
     {
-      classQuotation: Class_quotation | Class_legacyQuotation
+      classQuotation: Class_quotation | Class_legacyContract
       getFakeMemo: typeof fakeApi_memo["get"]
       getFakeQuotaRange: typeof fakeApi_quoteRange["get"]
       disabled: boolean
@@ -91,7 +91,7 @@ export default function QuotationTotal(
           />}
         {identify === "legacy" &&
           <PayInfo_legacy
-            classQuotation={classQuotation}
+            legacyContract={classQuotation}
             disabled={disabled}
           />}
 

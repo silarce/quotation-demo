@@ -1,0 +1,43 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: none;
+  background-color: white;
+  .title {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    height: 60px;
+    padding: 0 26px;
+    border-bottom: solid 1px $colorBorder01;
+    > * {
+      margin: auto;
+    }
+    > img {
+      margin-left: 0;
+    }
+  }
+  .btnBar {
+    padding: 10px;
+    .right {
+      display: flex;
+      gap: 10px;
+      width: fit-content;
+      margin: auto;
+      margin-right: 0;
+    }
+
+    .searchBtn.active {
+      border-color: red;
+      span {
+        color: red;
+      }
+      svg {
+        stroke: red;
+        fill: red;
+      }
+    }
+  }
+  @screen laptop {
+    display: block;
+  }
+}

@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
+import PageHeader02, { TpanelList, TsearchGroup } from "components/PageHeader/PageHeader02/PageHeader02"
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 
@@ -38,21 +38,22 @@ export default function Budget() {
 
   const [queryQuotationId, setQueryQuotationId] = useState("")
 
-  const searchTargetList = [
+  const searchTargetList: TsearchGroup["searchTargetList"] = [
     {
-      stateValue: queryQuotationId,
+      // stateValue: queryQuotationId,
       placeholder: "請輸入報價單編號",
-      onChange: (e: ChangeEvent<HTMLInputElement>) => setQueryQuotationId(e.target.value)
+      // onChange: (e: ChangeEvent<HTMLInputElement>) => setQueryQuotationId(e.target.value)
     },
   ]
 
-  const doSearch = () => {
+  const doSearch: TsearchGroup["doSearch"] = (vArr) => {
+    const queryQuotationId = vArr[0] as string
     setSearchObj({
       queryQuotationId: queryQuotationId,
     })
   }
 
-  const searchGroup = {
+  const searchGroup: TsearchGroup = {
     searchTargetList,
     doSearch
   }

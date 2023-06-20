@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 
-import { axi } from "./_axiosCreator";
+import { axi, domain } from "./_axiosCreator";
 
 // type
 import { TcompanyInfoDto, TupdateCompanyInfoDto } from "./dtoTypes";
 
 export type { TcompanyInfoDto, TupdateCompanyInfoDto };
+export { domain }
 
 // =============================================
 // 取得公司資訊
@@ -51,6 +52,13 @@ export const apiUploadCompanyLogo = (formData: FormData) => {
     .catch(err => Promise.reject("公司LOGO更新失敗"))
 }
 
+// 移除LOGO
+export const apiDelCompanyLogo = () => {
+  const api = "/company-info/logo"
+  return axi.delete(api)
+    .then(({ data }) => data)
+    .catch(err => Promise.reject("公司LOGO移除失敗"))
+}
 
 
 

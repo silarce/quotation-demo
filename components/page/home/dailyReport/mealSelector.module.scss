@@ -1,0 +1,57 @@
+@use "styles/theme01" as *;
+
+.antdModal {
+  :global(.ant-modal-content) {
+    width: 800px;
+    height: 490px;
+    padding: 19px 30px;
+    padding-top: 19px;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+    margin-bottom: 19px;
+  }
+  :global(.ant-modal-footer) {
+    padding: 0;
+  }
+}
+
+.antdModal_meals {
+  :global(.ant-modal-content) {
+    width: 500px;
+    height: 490px;
+    padding: 19px 30px;
+    padding-top: 19px;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+    margin-bottom: 19px;
+  }
+  :global(.ant-modal-footer) {
+    padding: 0;
+  }
+}
+
+.body {
+  .row {
+    display: grid;
+    grid-template-columns: auto;
+    height: 54px;
+    padding: 0 46px;
+    gap: 60px;
+    border-bottom: solid 1px $colorBorder01;
+    cursor: pointer;
+
+    &:nth-last-of-type(1) {
+      border: none;
+    }
+    > span {
+      margin: auto;
+      margin-left: 0;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 19px;
+      color: $colorText;
+    }
+  }
+}

@@ -1,8 +1,15 @@
 
 
-// get
-// get
-// get
+export type Tparams = {
+  order?: "ASC" | "DESC",
+  page?: number,
+  pageSize?: number,
+  filter?: {
+    [key: string]: any
+  }
+  populate?: string[]
+  sort?: string
+}
 
 export type TpageMetaDto = {
   page: number
@@ -11,6 +18,20 @@ export type TpageMetaDto = {
   pageCount: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export type TfileDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  parent: string;
+  name: string;
+  size: number;
+  mime: string;
+  etag: string;
+  isDir: boolean;
+  isWritable: boolean;
+  isDeletable: boolean;
 }
 
 
@@ -60,7 +81,7 @@ export type TcompanyInfoDto = {
   address: string
   fax: string
   taxId: string
-  logoLink: string
+  logoFileId: string
 }
 
 // api文件沒有清楚contact的型別
@@ -100,6 +121,7 @@ export type TcustomerDto = {
     updateAt: string
     name: "construction" | "firm" | "propertyOwner" | "contractor"
   }[]
+  legacyContracts?: TlegacyContractDto[]
 }
 
 type TcustomerDtoPopulateArr = (keyof Pick<TcustomerDto, "types" | "contacts">)[]
@@ -188,18 +210,51 @@ export type TerpFeatureDto = {
 }
 
 
+// export type TdailyReportItemDto = {
+//   id?: string
+//   order?: number
+//   // createdAt: Date // date
+//   // updatedAt: Date //date
+//   periodOfDay: "AM" | "PM"
+//   customerName: string
+//   contactName: string
+//   mealsCost: number
+//   description: string
+// }
 export type TdailyReportItemDto = {
-  id?: string
-  order?: number
-  // createdAt: Date // date
-  // updatedAt: Date //date
-  periodOfDay: "AM" | "PM"
+  readonly id: string
+  readonly order: number
+  readonly createdAt: string // date
+  readonly updatedAt: string //date
+  periodOfDay: "AM" | "PM" | null
   customerName: string
   contactName: string
-  mealsCost: number
+  // meals: "breakfast" | "lunch" | "dinner" | null
+  meals: ("breakfast" | "lunch" | "dinner")[]
   description: string
+  /**date */
+  departureTime?: string | null
+  /**date */
+  arrivalTime?: string | null
+  /**date */
+  departureWorksiteTime?: string | null
+  licensePlate?: string | null
+  stayLength?: number | null
+  workers: TemployeeDto[] | null
+  workOrderNumber: string | null
 }
 
+export type TdailyReportReviewStatusDto = {
+  id: string
+  createdAt: string // date
+  updatedAt: string //date
+  reviewerEmployeeId: string
+  reviewerEmployee: TemployeeDto
+  reviewedAt: string | null //date
+  type: "reviewer" | "examiner"
+  // examinerEmployeeId: string
+  // examinerEmployee: TemployeeDto | null
+}
 
 export type TdailyReportDto = {
   id: string
@@ -207,13 +262,7 @@ export type TdailyReportDto = {
   updatedAt: string //date
   date: string // yyyy-MM-DD
   employee: TemployeeDto
-  reviewStatus: {
-    id: string
-    createdAt: string // date
-    updatedAt: string //date
-    reviewerEmployee: TemployeeDto
-    reviewedAt: string | null //date
-  }[]
+  reviewStatus: TdailyReportReviewStatusDto[]
   isReviewCompleted: boolean
   reportedAt: Date
   items: TdailyReportItemDto[]
@@ -228,32 +277,378 @@ export type TcreateDailyReportItemDto = {
   periodOfDay: "AM" | "PM"
   customerName: string
   contactName: string
-  mealsCost: number
+  meals: ("breakfast" | "lunch" | "dinner")[]
   description: string
+  /**date 發出req時會自動被轉為字串*/
+  departureTime: string | null
+  /**date 發出req時會自動被轉為字串*//**date */
+  arrivalTime: string | null
+  /**date 發出req時會自動被轉為字串*/
+  departureWorksiteTime: string | null
+  licensePlate: string
+  stayLength: number
+  workerIds: string[] | null
+  workOrderNumber: string
 }
 
 export type TupdateDailyReportDto = {
-  date: Date // date
+  reviewerIds: string[]
+  examinerIds: string[]
   items: TcreateDailyReportItemDto[]
+}
+
+export type TdailyReportWorkerJobsDto = {
+  name: TjobDto["name"]
+  grade: TjobDto["grade"]
+}
+
+export type TdailyReportWokerDto = {
+  id: TemployeeDto["id"]
+  idNumber: TemployeeDto["idNumber"]
+  chName: TemployeeDto["chName"]
+  jobs: TdailyReportWorkerJobsDto[]
+}
+
+
+
+// =======================================================
+// =======================================================
+// =======================================================
+// =======================================================
+
+/**付款辦法 */
+export type TpaymentMethodDto = {
+  /**付款階段(里程碑) */
+  milestone: string
+  /**總付款比例(0.0 - 1.0) */
+  totalPaymentRatio: string
+}
+
+/**舊合約產品 */
+export type TlegacyContractProductDto = {
+  readonly id: string
+  /**date */
+  createdAt: string
+  /**date */
+  updatedAt: string
+  /**折數 0.0~1.0*/
+  discountRate: string
+  /**編號 */
+  idNumber: number
+  /**項目名 */
+  itemName: string
+  /**報價別 */
+  quoteType: string
+  /**門型 */
+  doorType: string
+  /**L(m) */
+  length: number
+  /**W(m) */
+  width: number
+  /**h(m) */
+  height: number
+  /**B(m) */
+  thickness: number
+  /**面積 */
+  area: string
+  /**才數 */
+  volume: string
+  /**材質 */
+  material: string
+  /**表面 */
+  surface: string
+  /**門軌 */
+  doorTrack: string
+  /**馬力 */
+  horsepower: string
+  /**數量 */
+  quantity: number
+  /**單價 */
+  unitPrice: number
+  /**複價 */
+  totalPrice: number
+  /**防颱 */
+  typhoonProtection: boolean
+  /**彈射門 */
+  bounceDoor: boolean
+  /**備註 */
+  notes: string
+}
+
+/**舊合約額外項目 */
+export type TlegacyContractAdditionDto = {
+  readonly id: string
+  /**date */
+  createdAt: string
+  /**date */
+  updatedAt: string
+  /**項目名 */
+  itemName: string
+  /**內容 */
+  content: string
+  /**數量 */
+  quantity: number
+  /**單價 */
+  unitPrice: number
+  /**複價 */
+  totalPrice: number
+  /**備註 */
+  notes: string
+}
+
+/**舊合約 */
+export type TlegacyContractDto = {
+  id: string
+  /**date */
+  createdAt: string
+  /**date */
+  updatedAt: string
+  // 
+  /**合約編號 */
+  contractNumber: string
+  /**報價時效 */
+  quoteValidity: string
+  /**報價日期 date*/
+  quoteDate: string
+  /**工程名稱 */
+  projectName: string
+  /**客戶名稱 */
+  customerName: string
+  /**聯絡人 */
+  contactPerson: string
+  /**聯絡電話 */
+  contactNumber: string
+  /**傳真號碼 */
+  faxNumber: string
+  /**追蹤狀態 */
+  trackingStatus: string
+  /**工地進度 */
+  projectProgress: string
+  /**工地位置縣市 */
+  projectCity: string
+  /**工地位置地區 */
+  projectDistrict: string
+  /**工地位置地址 */
+  projectAddress: string
+  // 
+  /**折扣率(0.0 - 1.0 */
+  discountRate: string
+  /**小計 */
+  subTotal: number
+  /**營業稅 */
+  salesTax: number
+  /**總計 */
+  total: number
+  /**交貨地點 */
+  deliveryLocation: string
+  /**交貨日期 date*/
+  deliveryDate: string
+  /**付款方式 */
+  paymentMethods: TpaymentMethodDto[]
+  // 
+  /**備註 */
+  notes: string[]
+  /**報價範圍 */
+  quoteScopes: string[]
+  /**經理 */
+  managerName: string
+  /**主管 */
+  supervisorName: string
+  /**經辦人 */
+  operatorName: string
+  /**產品 */
+  products: TlegacyContractProductDto[]
+  /**額外項目 */
+  additions: TlegacyContractAdditionDto[]
+  // 
+  /**客戶 */
+  customer: TcustomerDto
+}
+
+
+export type TcreateLegacyContractProductDto = {
+  /**編號 */
+  idNumber: number;
+  /**折數 0.0~1.0*/
+  discountRate: string
+  /** 項目名 */
+  itemName: string;
+  /** 報價別 */
+  quoteType: string;
+  /** 門型 */
+  doorType: string;
+  /** L(m) */
+  length: number;
+  /** W(m) */
+  width: number;
+  /** h(m) */
+  height: number;
+  /** B(m) */
+  thickness: number;
+  /** 面積 */
+  area: string;
+  /** 才數 */
+  volume: string;
+  /** 材質 */
+  material: string;
+  /** 表面 */
+  surface: string;
+  /** 門軌 */
+  doorTrack: string;
+  /** 馬力 */
+  horsepower: string;
+  /** 數量 */
+  quantity: number;
+  /** 單價 */
+  unitPrice: number;
+  /** 複價 */
+  totalPrice: number;
+  /** 防颱 */
+  typhoonProtection: boolean;
+  /** 彈射門 */
+  bounceDoor: boolean;
+  /** 備註 */
+  notes: string;
+}
+
+export type TcreateLegacyContractAdditionDto = {
+  /**項目名 */
+  itemName: string;
+  /** 內容 */
+  content: string;
+  /** 數量 */
+  quantity: number;
+  /** 單價 */
+  unitPrice: number;
+  /** 複價 */
+  totalPrice: number;
+  /** 備註 */
+  notes: string;
+};
+
+
+export type TcreateLegacyContractDto = {
+  /* 客戶ID */
+  customerId: string
+  /* 合約編號 */
+  contractNumber: string
+  /* 報價時段 */
+  quoteValidity?: string | null
+  /* 報價日期 date*/
+  quoteDate?: Date | null
+  /* 工程名稱 */
+  projectName: string
+  /* 客戶名稱 */
+  customerName: string
+  /* 聯絡人 */
+  contactPerson: string
+  /* 聯絡電話 */
+  contactNumber: string
+  /* 傳真號碼 */
+  faxNumber?: string | null
+  /* 追蹤狀態 */
+  trackingStatus?: string | null
+  /* 工地進度 */
+  projectProgress?: string | null
+  /* 工地位置縣市 */
+  projectCity: string
+  /* 工地位置地區 */
+  projectDistrict: string
+  /* 工地位置地址 */
+  projectAddress: string
+  /* 折扣率 0.0-1.0*/
+  discountRate: string
+  /* 小計 */
+  subTotal: number
+  /* 營業稅 */
+  salesTax: number
+  /* 總計 */
+  total: number
+  /* 交貨地點 */
+  deliveryLocation: string
+  /* 交貨日期 date*/
+  deliveryDate: Date
+  /* 付款方式 */
+  paymentMethods: TpaymentMethodDto[]
+  // 
+  /* 備註 */
+  notes: string[]
+  /* 報價範圍 */
+  quoteScopes: string[]
+  // 
+  /* 經理 */
+  managerName: string
+  /* 主管 */
+  supervisorName: string
+  /* 經辦人 */
+  operatorName: string
+  // 
+  /* 產品 */
+  products: TcreateLegacyContractProductDto[]
+  /* 額外項目 */
+  additions: TcreateLegacyContractAdditionDto[]
+}
+
+export type TupdateLegacyContractDto
+  = Partial<Omit<TcreateLegacyContractDto, "products" | "additions"> & {
+    products: Partial<TcreateLegacyContractProductDto>[]
+    additions: Partial<TcreateLegacyContractAdditionDto>[]
+  }>;
+
+// ==========================================================================
+// work-sheet
+
+export type TannotationDto = {
+  id: string
+  createdAt: string
+  updateAt: string
+  /**類別 */
+  category: string
+  /**門型 */
+  doorModelName: string
+  /**型式 */
+  type: "normal" | "anti-typhoon"
+  /**內容 */
+  description: string
+}
+
+export type TcreateAnnotationDto = {
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
+
+
+export type TcreateQuotationRangeDto = {
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
+
+export type TquotationRangeDto = {
+  id: string
+  createdAt: string
+  updateAt: string
+  /**類別 */
+  category: string
+  /**門型 */
+  doorModelName: string
+  /**型式 */
+  type: "normal" | "anti-typhoon"
+  /**內容 */
+  description: string
 }
 
 
 
 
-
-
-
-
-
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
-// ==========================================================================
-// post put patch
-// post put patch
-// post put patch
 
 export type TupdateCompanyInfoDto = {
   "name": string,

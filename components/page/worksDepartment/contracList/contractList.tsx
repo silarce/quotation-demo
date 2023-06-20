@@ -74,10 +74,10 @@ export default function ContractList({ contractList, searchObj }:
           const { detail } = item
           // ===========================
           // 搜尋過濾
-          const regDoorType = new RegExp(searchObj.doorType)
-          const regCountry = new RegExp(searchObj.country)
-          const regClientName = new RegExp(searchObj.clientName)
-          const regProjectName = new RegExp(searchObj.projectName)
+          const regDoorType = new RegExp(searchObj.doorType ?? "")
+          const regCountry = new RegExp(searchObj.country ?? "")
+          const regClientName = new RegExp(searchObj.clientName ?? "")
+          const regProjectName = new RegExp(searchObj.projectName ?? "")
           if (
             !regDoorType.test(doorType) ||
             !regCountry.test(country) ||

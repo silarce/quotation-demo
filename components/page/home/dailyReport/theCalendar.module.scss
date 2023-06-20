@@ -1,0 +1,153 @@
+@use "styles/theme01" as *;
+
+.dailyReport {
+  :global(.rbc-calendar) {
+    display: grid;
+    grid-template-rows: min-content auto;
+    position: relative;
+    z-index: 1;
+    :global(.rbc-month-view) {
+      height: 100%;
+      overflow: auto;
+    }
+  }
+
+  :global(.rbc-month-view) {
+    height: fit-content;
+    :global(.rbc-header) {
+      &:not(:nth-of-type(1)) {
+        border-left-width: 1px;
+      }
+
+      border-bottom-width: 1px;
+      font-size: 20px;
+    }
+    :global(.rbc-month-header) {
+      > :global(.rbc-header) {
+        padding: 7px 0;
+        background-color: $bgc01;
+      }
+    }
+  }
+
+  :global(.rbc-month-row) {
+    display: inline-table;
+    height: fit-content;
+    min-height: 150px;
+    overflow: visible;
+
+    :global(.rbc-row-bg) {
+      overflow: visible;
+      :global(.rbc-off-range-bg) {
+        background-color: unset;
+      }
+    }
+
+    &:not(:nth-of-type(2)) {
+      border-top-width: 1px;
+    }
+    :global(.rbc-today) {
+      background-color: unset;
+    }
+    :global(.rbc-day-bg):not(:nth-of-type(1)) {
+      border-left-width: 1px;
+    }
+
+    :global(.ant-badge-status-dot) {
+      width: 8px;
+      height: 8px;
+    }
+
+    :global(.rbc-date-cell) {
+      > button {
+        display: block;
+        margin: auto;
+        margin-left: 10px;
+        font-weight: 600;
+        font-size: 24px;
+        cursor: auto;
+      }
+    }
+
+    // :global(.rbc-row) {    }
+  }
+
+  :global(.rbc-month-view) {
+    border-width: 1px;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  // :global(.rbc-event) {
+  //   background-color: unset;
+  // }
+  // :global(.rbc-event:focus) {
+  //   outline: unset;
+  // }
+}
+
+.toolBar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 20px 17px;
+  .left {
+  }
+  .center {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    > span {
+      font-size: 18px;
+      color: $colorMain;
+    }
+    .arrow {
+      display: inline-grid;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      > img {
+        margin: auto;
+      }
+    }
+  }
+  .right {
+    display: flex;
+    flex-wrap: nowrap;
+    // grid-template-columns: auto auto;
+    gap: 18px;
+    width: fit-content;
+    margin: auto;
+    margin-right: 0;
+  }
+}
+
+.dateHeader {
+  .isCurrentMonth {
+    color: $colorBorder01;
+  }
+}
+
+.eventWrapper {
+  margin: 0 1px;
+  &:hover {
+    background-color: $hoverBgc01;
+  }
+}
+
+.dateCellWrapper {
+  position: relative;
+  &.isToday {
+    .border {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-sizing: content-box;
+      width: calc(100%);
+      height: calc(100%);
+      border: solid 1px red;
+      z-index: 1;
+    }
+  }
+}

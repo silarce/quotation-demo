@@ -13,7 +13,7 @@ import {
   Toption,
   optionsCreator_doorRail_normal,
   optionsCreator_doorRail_antyTyphoon,
-} from "fakeDatabase/options/options"
+} from "js/utils/options/options"
 
 // type
 import { Tquotation, } from "fakeDatabase/domestic/_fakeQuotation"

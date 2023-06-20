@@ -3,7 +3,7 @@
 import style from "./quotationPdf.module.scss"
 
 // option
-import { optionsCreator_doorRail } from "fakeDatabase/options/options"
+import { optionsCreator_doorRail } from "js/utils/options/options"
 const optionsDoorRail = optionsCreator_doorRail()
 
 // type

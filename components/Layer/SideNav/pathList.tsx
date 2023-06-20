@@ -18,10 +18,16 @@ type TsidePathConfig = {
   list: {
     label: string
     path?: string
+    query?: {
+      [key: string]: string
+    }
     erpFeature: ErpFeaturesValues[] | "allPass"
     list?: {
       label: string
       path: string
+      query?: {
+        [key: string]: string
+      }
       /**空陣列會全部禁止 */
       erpFeature: ErpFeaturesValues[] | "allPass"
     }[]
@@ -33,7 +39,13 @@ type TtopPathListConfig = {
   label: string
   subLabel?: string
   path01: string
-  href: string
+  href: {
+    pathname: string
+    query?: {
+      [key: string]: string
+    }
+  }
+
   erpFeature: ErpFeaturesValues[] | "allPass"
 }
 
@@ -72,8 +84,21 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "日報表",
-          path: path01 + "/dailyReport",
           erpFeature: "allPass",
+          list: [
+            {
+              label: "我的日報表",
+              path: path01 + "/dailyReport",
+              query: { isMine: "true" },
+              erpFeature: "allPass",
+            },
+            {
+              label: "審核日報表",
+              path: path01 + "/dailyReport",
+              query: { isMine: "false" },
+              erpFeature: "allPass",
+            },
+          ]
         },
       ]
     }
@@ -122,12 +147,12 @@ const sidePathList: TsidePathList = {
         },
         {
           label: "備註列表",
-          path: path01 + "/memoList",
+          path: path01 + "/annotationList",
           erpFeature: devPass,
         },
         {
           label: "報價範圍列表",
-          path: path01 + "/quoteRangeList",
+          path: path01 + "/quotationRanges",
           erpFeature: devPass,
         },
       ]
@@ -141,7 +166,8 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "報價",
-          erpFeature: devPass,
+          // erpFeature: devPass,
+          erpFeature: "allPass",
           list: [
             {
               label: "預算",
@@ -181,7 +207,7 @@ const sidePathList: TsidePathList = {
             {
               label: "舊合約整合",
               path: path01 + "/legacyContractIntegration",
-              erpFeature: devPass,
+              erpFeature: "allPass",
             },
           ]
         },
@@ -382,14 +408,19 @@ const topPathList: TtopPathListConfig[] = [
     icon: icon_home,
     label: "首頁",
     path01: sidePathList["/home"].path01,
-    href: "/home/dailyReport",
+    href: {
+      pathname: "/home/dailyReport",
+      query: { isMine: "true" }
+    },
     erpFeature: "allPass",
   },
   {
     icon: icon_setting,
     label: "公司設定",
     path01: sidePathList["/setting"].path01,
-    href: sidePathList["/setting"].path01 + "/company-info",
+    href: {
+      pathname: sidePathList["/setting"].path01 + "/company-info",
+    },
     erpFeature: [BasicDataCreation, HRAuthoritySetup],
   },
   {
@@ -397,32 +428,34 @@ const topPathList: TtopPathListConfig[] = [
     label: "營業部",
     subLabel: "-國內工程",
     path01: sidePathList["/domestic"].path01,
-    href: sidePathList["/domestic"].path01 + "/budget",
-    erpFeature: devPass,
+    href: {
+      pathname: sidePathList["/domestic"].path01 + "/legacyContractIntegration",
+    },
+    erpFeature: "allPass",
   },
   {
     icon: icon_foreign,
     label: "營業部",
     subLabel: "-國外工程",
     path01: sidePathList["/foreign"].path01,
-    href: sidePathList["/foreign"].path01 + "",
+    href: {
+      pathname: sidePathList["/foreign"].path01 + "",
+    },
     erpFeature: devPass,
   },
   {
     icon: icon_project,
     label: "工務部",
     path01: sidePathList["/worksDepartment"].path01,
-    href: sidePathList["/worksDepartment"].path01 + "/contractList",
+    href: {
+      pathname: sidePathList["/worksDepartment"].path01 + "/contractList",
+    },
     erpFeature: devPass,
   },
 ]
 
-
-
 export default sidePathList
 export { topPathList }
-
-
 
 // =========================================================
 // TsidePathConfig範例

@@ -97,11 +97,12 @@ export default function PanelList({ panelList }:
 
         // 搜尋bar
         if (item.searchGroup) {
-          const { searchTargetList, doSearch } = item.searchGroup
+          const { searchTargetList, doSearch, controlled } = item.searchGroup
           return (
             <SearchBar
               key={index}
               searchTargetList={searchTargetList}
+              controlled={controlled}
               doSearch={doSearch}
             />
           )

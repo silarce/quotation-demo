@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
+import _ from "lodash"
 
 // antd
 import { Collapse } from 'antd';
@@ -26,6 +27,7 @@ export default function SideNav() {
   // 會導致無法取到路由表的值
   const asPath = router.asPath
   const parentPath = "/" + asPath.split("/")[1]
+  const routerQuery = router.query
   let linkList = sidePathList[parentPath]
   // -------------------------------------------------------------------
 
@@ -54,14 +56,19 @@ export default function SideNav() {
               <Panel header={label} key={`${index}`}>
                 <ul>
                   {list.map((item, index) => {
-                    const { label, path, erpFeature } = item
+                    const { label, path, erpFeature, query } = item
                     const reg = new RegExp(`^${path}`)
-                    let active = reg.test(asPath) ? style.active : ""
+                    let isActive = (() => {
+                      const isMatch = _.isMatch(routerQuery, query ?? {})
+                      return reg.test(asPath) && isMatch
+                    })()
+                    const href = { pathname: path, query }
                     const isPassed = checkErpFeature({ erpFeature, userErpFeature })
                     if (!isPassed) return null
                     return (
-                      <li className={active} key={index}>
-                        <Link href={path}>{label}</Link>
+                      // <li className={active} key={index}>
+                      <li className={classNames({ [style.active]: isActive })} key={index}>
+                        <Link href={href}>{label}</Link>
                       </li>
                     )
                   })}
@@ -90,5 +97,3 @@ const checkErpFeature = (
   })
   return isPassed
 }
-
-

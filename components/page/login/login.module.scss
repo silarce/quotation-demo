@@ -70,6 +70,22 @@
       margin-left: 0;
     }
   }
+  @screen laptop {
+    padding: 0 26px;
+    > div {
+      &:nth-of-type(1) {
+        margin-left: unset;
+        flex: none;
+        width: 100%;
+      }
+      &:nth-of-type(2) {
+        display: none;
+      }
+      &:nth-of-type(3) {
+        display: none;
+      }
+    }
+  }
 }
 
 .banner {
@@ -79,10 +95,12 @@
 
   max-height: 377.328px;
   // height: 377.328px;
-  height:auto;
   height: 30vh;
   background-repeat: no-repeat;
   background-size: cover;
+  @screen laptop {
+    height: 135px;
+  }
   > div {
     position: absolute;
     top: 50%;
@@ -96,6 +114,9 @@
       font-size: 40px;
       font-weight: 700;
       letter-spacing: 0.15em;
+      @screen laptop {
+        font-size: 18px;
+      }
     }
   }
 }
@@ -110,6 +131,10 @@
   background-color: #fff;
   border: solid 1px $colorBorder01;
   border-top: solid 2px $colorActive01;
+  @screen laptop {
+    width: 90vw;
+  }
+
   .input02 {
     &:nth-of-type(1) {
       margin-bottom: 23px;

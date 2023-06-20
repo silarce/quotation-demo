@@ -1,22 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useInView } from 'react-intersection-observer';
+import _ from "lodash"
 
 import { axi } from "./_axiosCreator";
 
-import _ from "lodash"
-
-
 
 import {
-  TdailyReportItemDto, TdailyReportDto, TsetReportersDto,
+  TdailyReportDto,
   TcreateDailyReportItemDto, TupdateDailyReportDto,
   TemployeeDto,
   TpageMetaDto,
-
-
+  TdailyReportWokerDto,
+  Tparams,
 } from "./dtoTypes"
 
 
-export type { TcreateDailyReportItemDto, TdailyReportDto }
+export type {
+  TcreateDailyReportItemDto,
+  TdailyReportDto,
+  TdailyReportWokerDto,
+  Tparams,
+  TemployeeDto
+}
 // =================================================================
 
 
@@ -27,41 +32,124 @@ type TgetDailyReports = {
 }
 
 // 取得指定月份所有日報表
-/**month格式為yyyy-MM 例:2022-02 */
-const apiDailyReports = (filter?: { [key: string]: any }) => {
+const apiDailyReports = (
+  customParams?: Tparams,
+  controller?: AbortController
+) => {
   const api = `/daily-reports`
-
   const params = {
     populate: [
-      "employee", "reviewStatus.reviewerEmployee", "isReviewCompleted",
-      // "items",
-    ],
-    filter
+      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
+    sort: "date",
+    order: "DESC",
+    ...customParams
   }
 
-  return axi.get(api, { params })
+  return axi.get(api, { params, signal: controller?.signal })
     .then(({ data }) => data as TgetDailyReports)
     .catch(err => Promise.reject(err))
 }
 
-/**month格式為yyyy-MM 例:2022-02 */
-export const useApiDailyReports = (
-  params?: { filter?: { [key: string]: any } }) => {
-
+export const useApiDailyReports = (params?: Tparams) => {
+  const [controller, setController] = useState<AbortController>()
   const [res, setRes] = useState<TgetDailyReports>()
-  const update = async () => {
-    const data = await apiDailyReports(params?.filter)
+
+  const update = async (dynamicFilter?: Tparams["filter"]) => {
+    const newController = new AbortController()
+    setController(newController)
+    const theParams: Tparams = {
+      ...params,
+      filter: {
+        ...params?.filter,
+        ...dynamicFilter
+      }
+    }
+    const data = await apiDailyReports(theParams, newController)
     if (data) setRes(data)
     return data
   }
+
   return {
-    /** 指定月份所有日報表 */
     dailyReport: res?.data,
     setDailyReports: setRes,
-    /** 更新指定月份所有日報表*/
     updateDailyReports: update,
+    controller
   }
 }
+
+// ----
+
+
+export const useApiDailyReports_v2 = (customParams?: Tparams) => {
+  /**就只是為了render */
+  const [render, setRender] = useState(0)
+  const [isLoading, setIsloading] = useState(false)
+  /**viewRef 不可以放在一開始就會出現在畫面上的item上，
+   * 不然無法觸發nextPage */
+  const [viewRef, inView] = useInView();
+  const [page, setPage] = useState(1)
+
+  const params = {
+    page,
+    // pageSize必須大於畫面一次可顯示的item數量才不會壞掉    
+    // 不過應該只有在嚴格模式會壞掉
+    pageSize: 15,
+    ...customParams
+  } as const
+
+  const [dataArrQueue, setDataArrQueue] = useState<TgetDailyReports["data"][]>([])
+  const [data, setData] = useState<TgetDailyReports["data"]>()
+  const [meta, setMeta] = useState<TgetDailyReports["meta"]>()
+
+
+  const update_infinite = async () => {
+    if (meta && !meta.hasNextPage) return
+    const res = await apiDailyReports(params)
+    setIsloading(false)
+    const dataArrQueueCopy = [...dataArrQueue]
+    dataArrQueueCopy[page - 1] = res.data
+    setDataArrQueue(dataArrQueueCopy)
+    setData(dataArrQueueCopy.flat())
+    setMeta(res.meta)
+    return res
+  }
+
+  const nextPage = async () => {
+    if (meta && !meta.hasNextPage) return
+    setPage(page + 1)
+  }
+
+  const reset = () => {
+    setIsloading(true)
+    setDataArrQueue([])
+    setData(undefined)
+    setMeta(undefined)
+    setPage(1)
+    setRender(state => ++state)
+  }
+
+  useEffect(() => {
+    if (render === 0) return
+    update_infinite()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, render])
+
+  useEffect(() => {
+    if (inView) nextPage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
+
+  // useEffect(() => {
+  //   reset()
+  // }, [])
+
+  return {
+    data, meta, setData,
+    nextPage, reset,
+    viewRef, isLoading
+  }
+} // useGetAnnotation_v2
+
 
 // 取得自己指定日期的日報表
 /**date格式為yyyy-MM-DD 例:2022-02-02 */
@@ -92,10 +180,7 @@ export const apiPatchDailyReports_my = (
     {
       /**YYYY-MM-DD */
       date: string
-      body: {
-        reviewerIds: string[]
-        items: TcreateDailyReportItemDto[]
-      }
+      body: TupdateDailyReportDto
     }
 ) => {
   const api = `/daily-reports/my?date=${date}`
@@ -107,7 +192,7 @@ export const apiPatchDailyReports_my = (
 // 取得指定日報表
 export const apiDailyReports_id = (id: string) => {
   const api = `/daily-reports/${id}`
-  const params = { populate: ["items", "employee", "reviewStatus.reviewerEmployee"] }
+  const params = { populate: ["items.workers", "employee", "reviewStatus.reviewerEmployee"] }
   return axi.get(api, { params })
     .then(({ data }) => data as TdailyReportDto)
     .catch(err => Promise.reject(err))
@@ -156,7 +241,7 @@ export const useApiDailyReports_reviewers = () => {
     reviewersArr: data,
     setReviewersArr: setData,
     /**更新所有需回報的人員 */
-    updateReviewerssArr: update
+    updateReviewersArr: update
   }
 }
 
@@ -175,4 +260,44 @@ export const apiIsReviewer = () => {
   return axi.get(api)
     .then(({ data }) => data as { isReviewer: boolean })
     .catch(err => Promise.reject(err))
+}
+
+
+type TgetDailyReportsWorkers = {
+  data: TdailyReportWokerDto[]
+  meta: TpageMetaDto
+}
+
+export const apiGetDailyReportsWorkers = (params?: Tparams) => {
+  const api = "/daily-reports/workers"
+  return axi.get(api, { params })
+    .then(({ data }) => data as TgetDailyReportsWorkers)
+    .catch(err => Promise.reject(err))
+}
+
+export const useApiGetDailyReportsWorkers = (params?: Tparams) => {
+  const [res, setRes] = useState<TgetDailyReportsWorkers>()
+  const update = async () => {
+    const res = await apiGetDailyReportsWorkers(params)
+    if (res) setRes(res)
+    return res
+  }
+
+  const update_infinite = async () => {
+    if (!res) return
+    const apiRes = await apiGetDailyReportsWorkers(params)
+    const newData = apiRes.data
+    const oldData = res.data
+    apiRes.data = [...oldData, ...newData]
+    setRes({ ...apiRes })
+    return apiRes
+  }
+
+
+  return {
+    workers: res?.data, meta: res?.meta,
+    updateWorkers: update,
+    updateWorkers_infinite: update_infinite,
+    setRes,
+  }
 }

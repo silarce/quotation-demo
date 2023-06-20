@@ -2,6 +2,10 @@
 
 .subLayer.plus {
   overflow: hidden;
+  height: 100%;
+  @screen laptop {
+    min-height: calc(100vh - 60px);
+  }
 }
 
 .pageHeaderTag.plus.pplus {

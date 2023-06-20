@@ -24,6 +24,7 @@ export type TtextareaProps = {
   value: string
   onChange?: (value: string) => void
   className?: string
+  allowNewLineByUser?: boolean
   props?: TextareaAutosizeProps
 }
 
@@ -48,6 +49,7 @@ export default function Textarea(
     value,
     onChange,
     className,
+    allowNewLineByUser,
     props,
   } = textareaProps
 
@@ -67,8 +69,10 @@ export default function Textarea(
         onChange={(e) => onChange?.(e.target.value)}
         disabled={disabled}
         onKeyDown={(e) => {
-          if (e.code === "Enter") e.preventDefault()
-          if (e.code === "NumpadEnter") e.preventDefault()
+          if (!allowNewLineByUser) {
+            if (e.code === "Enter") e.preventDefault()
+            if (e.code === "NumpadEnter") e.preventDefault()
+          }
         }}
         /*如果props裡存在對應prop的話
         props裡的prop會把上面對應的prop蓋過去*/

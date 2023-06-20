@@ -6,6 +6,7 @@ const axi = axios.create({
   withCredentials: true,
 })
 
+export const domain = process.env.NEXT_PUBLIC_API_BASE_URL
 
 
 axi.interceptors.request.use(
@@ -27,7 +28,7 @@ axi.interceptors.response.use(
   },
   (err) => {
 
-    const url = err.config.url
+    const url = err.config?.url ?? ""
     const ignore401 = ["/auth/login", "/auth/me"]
 
     if (err.response) {

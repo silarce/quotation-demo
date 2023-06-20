@@ -4,6 +4,7 @@ import style from "./layer.module.scss"
 
 // components
 import Header from "./Header/Header"
+import Header_mobile from "./Header/Header_mobile";
 import SideNav from "./SideNav/SideNav";
 
 // type
@@ -31,6 +32,7 @@ export default function Layer(
     <div className={style.container}>
       <LayerCtx.Provider value={{ reqLogout, userInfo, userErpFeature }}>
         <Header />
+        <Header_mobile />
         <div className={style.wrapper}>
           <SideNav />
           {/* main */}

@@ -302,7 +302,16 @@ export const optionsCreator_dailyReportPeriod = (
   return optionArr
 }
 
-
+/**餐費類別 */
+export const optionsCreator_mealsCost =
+  (): Toption[] => {
+    return [
+      { value: "none", label: "無" },
+      { value: "breakfast", label: "早餐" },
+      { value: "lunch", label: "午餐" },
+      { value: "dinner", label: "晚餐" },
+    ]
+  }
 
 
 
@@ -314,3 +323,5 @@ export const optionsCreator_dailyReportPeriod = (
 
 
 export type { Toption, ToptionPlus }
+
+export { addEmpty }
