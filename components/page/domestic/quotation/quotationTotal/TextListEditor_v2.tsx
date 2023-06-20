@@ -8,7 +8,7 @@ import myAlert from "components/global/gear/modal/simpleModal/alertModals"
 import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
 
 // css
-import styleL from "./local.module.scss"
+import scss from "./TextListEditor_v2.module.scss"
 
 
 export default function TextListEditor_v2(
@@ -39,7 +39,7 @@ export default function TextListEditor_v2(
   }
 
   return (
-    <div className={styleL.listContainer}>
+    <div className={scss.listContainer}>
       <p>{label}</p>
       {stringArr.map((memo, index) => {
         return (
@@ -47,9 +47,9 @@ export default function TextListEditor_v2(
             {disabled ?
               <span></span> :
               <IconRemoveCircle onClick={() => delString(index)} />}
-            <span className={styleL.serialNumber}>{index + 1}</span>
+            <span className={scss.serialNumber}>{index + 1}</span>
             <InputSel
-              className={styleL.inputSel}
+              className={scss.inputSel}
               textareaProps={{
                 value: memo,
                 onChange: (v) => editString(index, v),
