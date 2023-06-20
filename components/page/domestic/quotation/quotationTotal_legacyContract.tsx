@@ -50,6 +50,7 @@ export default function QuotationTotal(
   }
   const onConfirm_anno = (v: TgetAnnotation["data"]) => {
     const vArr = v.map((item) => item.description)
+    if (!vArr[0]) vArr[0] = ""
     annoObj.addString(vArr)
   }
 
@@ -61,6 +62,7 @@ export default function QuotationTotal(
   }
   const onConfirm_qr = (v: TgetQuotataionRanges["data"]) => {
     const vArr = v.map((item) => item.description)
+    if (!vArr[0]) vArr[0] = ""
     quoteRangeObj.addString(vArr)
   }
 
@@ -108,12 +110,16 @@ export default function QuotationTotal(
       </div>
 
       <WorkSheetSelector
+        label="備註"
+        tip="可複選、可不選(按確定即可)"
         showModal={show_anno}
         onConfirm={onConfirm_anno}
         onCancel={cancelAnnoSelector}
         apiFamily="annotation"
       />
       <WorkSheetSelector
+        label="報價範圍"
+        tip="可複選、可不選(按確定即可)"
         showModal={show_qr}
         onConfirm={onConfirm_qr}
         onCancel={cancelQrSelector}
