@@ -109,11 +109,12 @@ export default function TheCalendar(
   }, [dailyReportArr]) // dailyReportArr
 
 
-  useEffect(() => {
-    const now = moment()
-    const filter = filterCre_nextAndPrevMonth(now)
-    update_calendar(filter)
-  }, [])
+  // useEffect(() => {
+  //   const now = moment()
+  //   const filter = filterCre_nextAndPrevMonth(now)
+  //   update_calendar(filter)
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
 
 

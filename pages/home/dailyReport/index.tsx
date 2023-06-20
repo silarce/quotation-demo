@@ -258,7 +258,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
 
-  /**取得總表 沒有loading spin*/
   const toUpdateDailyReports = async () => {
     if (!router.isReady) return
     setSearchObj({
