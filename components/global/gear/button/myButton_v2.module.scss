@@ -1,0 +1,53 @@
+@use "styles/theme01" as *;
+
+.button {
+  height: unset;
+  padding: 10px 44px;
+  color: $colorMain;
+  border: solid 1px $colorBorder01;
+  background-color: $bgc01;
+  &:hover {
+    border: solid 1px $colorBorder01;
+    background-color: $hoverBgc01;
+  }
+  @media (max-width: 1440px) {
+    padding: 10px 20px;
+  }
+  @media (max-width: 1240px) {
+    padding: 10px 10px;
+  }
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > span {
+    font-weight: 500;
+    font-size: 16px;
+    color: $colorMain;
+    transform: translateY(-1px);
+  }
+  > img {
+    margin-right: 5px;
+  }
+  &.px22 {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  &.px44 {
+    padding-left: 44px;
+    padding-right: 44px;
+  }
+  &.px2227 {
+    padding-left: 22px;
+    padding-right: 27px;
+  }
+  &.danger {
+    border-color: #ea1833;
+    > span {
+      color: #ea1833;
+    }
+    &:hover {
+      background-color: $chosenBgc01;
+    }
+  }
+}
