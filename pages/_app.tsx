@@ -12,7 +12,7 @@ import { ConfigProvider as AntdConfigProvider } from 'antd';
 
 // conponents
 import Layer from "components/Layer/Layer"
-import Login from '../components/page/login'
+// import Login from '../components/page/login'
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover'
@@ -54,9 +54,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' })
 
-
-  // const router = appProps.router
-  // ----------------------------------------------------------------------------
+  const router = appProps.router
 
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe()
@@ -109,43 +107,86 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   }
   // -----------------------------------------------------------------------
   if (!ready) return null
-  // -----------------------------------------------------------------------
-  // const noLayoutList = ["login"]
-  // if (noLayoutList.includes(firstPathname)) {
+  if ((!userInfo || !userErpFeature) && router.route !== "/login") {
+    router.push("/login")
+    return null
+  }
+  if ((userInfo && userErpFeature) && router.route === "/login") router.push("/home")
+  // ------------------------------------------------------------------
+  // if (!userInfo || !userErpFeature)
   //   return (
   //     <>
   //       <Head>
   //         <title >三久ERP</title>
   //       </Head>
-  //       {getLayout(
-  //         <Component {...pageProps} setIsLoged={setIsLoged} />
-  //       )}
+  //       <AppContext.Provider value={appContextValue}>
+  //         <Login onLogin={onLogin} />
+  //       </AppContext.Provider>
   //     </>
   //   )
-  // }
-  // ------------------------------------------------------------------
-  if (!userInfo || !userErpFeature)
-    return (
-      <>
-        <Head>
-          <title >三久ERP</title>
-        </Head>
-        <AppContext.Provider value={appContextValue}>
-          <Login onLogin={onLogin} />
-        </AppContext.Provider>
-      </>
-    )
   // ------------------------------------------------------------------
 
   // 巢狀layout用的
   // const getLayout = Component.getLayout ?? ((page) => page)
-  const getLayout = Component.getLayout ?? ((page) => {
-    return (
-      <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
-        {page}
-      </Layer>
-    )
-  })
+  // const getLayout = Component.getLayout ?? ((page) => {
+  //   return (
+  //     <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+  //       {page}
+  //     </Layer>
+  //   )
+  // })
+
+
+  let getLayout = Component.getLayout
+
+  if (!getLayout) {
+    if (!userInfo || !userErpFeature) getLayout = (page) => page
+    else {
+      getLayout = (page) => {
+        return (
+          <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+            {page}
+          </Layer>
+        )
+      }
+    }
+  }
+
+
+
+
+  // if (!getLayout && userInfo && userErpFeature)
+  //   getLayout = (page) => {
+  //     return (
+  //       <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+  //         {page}
+  //       </Layer>
+  //     )
+  //   }
+  // else if (!getLayout) getLayout = (page) => (<div>{page}</div>)
+
+
+
+  // let getLayout = Component.getLayout
+  // if (!getLayout && userInfo && userErpFeature)
+  //   getLayout = (page) => {
+  //     return (
+  //       <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+  //         {page}
+  //       </Layer>
+  //     )
+  //   }
+  // else if (!getLayout) getLayout = (page) => (<div>{page}</div>)
+
+  // let getLayout = Component.getLayout
+
+  // if (!getLayout) {
+  //   if (!userInfo || !userErpFeature) getLayout = (page) => page
+  //   else getLayout = (page) => page
+  // }
+
+
+
   // ------------------------------------------------------------------
   return (
     <AntdConfigProvider autoInsertSpaceInButton={false}>
