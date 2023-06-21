@@ -57,7 +57,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe()
-  const { erpFeature: userErpFeature, updateErpFeature: updateUserErpFeature, } = useApiErpFeaturesMe()
+  const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature, } = useApiErpFeaturesMe()
 
   useEffect(() => {
     (async () => {
@@ -97,6 +97,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     try {
       await apiLogout()
       setUserInfo(undefined)
+      setErpFeature(undefined)
     }
     catch { myAlert.err({ title: "登出失敗" }) }
   }
