@@ -1,3 +1,4 @@
+import _ from "lodash"
 
 // tool
 import { generateYearArray } from "js/tools/date/generateYearArray"
@@ -35,6 +36,31 @@ interface ToptionPlus {
 /**會改變原本的陣列 */
 const addEmpty = (optionArr: Toption[]) => {
   optionArr.unshift({ value: "", label: "不拘" })
+}
+
+// =======================================================================
+
+const createNumberRangeOptionArr = (
+  { start, end, suffix, padStart,
+  }:
+    {
+      start: number
+      end: number
+      suffix?: string
+      padStart?: [number, string]
+    }
+): Toption[] => {
+  const arr = _.range(start, end + 1)
+  const arrStr = arr.map((item) => item.toString())
+  const arrOption = arrStr.map((item) => {
+    const value = item
+    let label = item
+    if (padStart) label = label.padStart(padStart[0], padStart[1])
+    if (suffix) label = label + suffix
+
+    return { value, label }
+  })
+  return arrOption
 }
 
 // =======================================================================
@@ -324,4 +350,4 @@ export const optionsCreator_mealsCost =
 
 export type { Toption, ToptionPlus }
 
-export { addEmpty }
+export { addEmpty, createNumberRangeOptionArr }

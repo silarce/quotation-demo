@@ -1,55 +1,68 @@
-import { useState, useEffect, createContext, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import classNames from "classnames"
 import _ from "lodash"
-import { AxiosError } from "axios";
-import { useRouter, NextRouter } from "next/router";
+
+import { useRouter } from "next/router";
 import moment from "moment";
 
 
 // layer
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import PageHeader_mobile_dailyReport from "pages/home/dailyReport/pageHeader_mobile/PageHeader_mobile_dailyReport";
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // components
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
 
+// gear
+import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar";
 
 // api
 import {
-  TdailyReportDto, Tparams,
-  useApiDailyReports, useApiDailyReports_reviewers,
-  useApiDailyReports_v2,
-  apiPatchDailyReports_my,
-  apiDailyReports_id,
-  apiDailyReports_review,
-  apiPatchDailyReports_reviewers,
-  apiIsReviewer,
+  TdailyReportDto,
+  useApiDailyReports,
 } from "js/api/api_dailyReport"
 
+// css
 import scss from "./monthReport.module.scss"
 
-
+// other
+import { createNumberRangeOptionArr } from "js/utils/options/options";
+import { convertDate_reduce1911, convertDate_add1911 } from "js/utils/helpers/date/convertDate";
+import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 
 // =============================================================
 
 
 export default function MonthReport() {
-
   const router = useRouter()
-  const query = router.query as {
-    month?: string | undefined,
-    year?: string | undefined
-  }
+  // const query = router.query as {
+  //   month?: string | undefined,
+  //   year?: string | undefined
+  // }
 
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  // -------------------------------------------------------------------------
+
+  const thisYear_tw =
+    moment(convertDate_reduce1911(new Date().toISOString())).format("yy")
+  const thisMonth =
+    moment(convertDate_reduce1911(new Date().toISOString())).format("M")
+
+  const [year_tw, setYear_tw] = useState<string>(thisYear_tw)
+  const [month, setMonth] = useState<string>(thisMonth)
 
   const { params, isoDate } = useMemo(() => {
+
     const dateStr = (() => {
-      const year = query.year ?? moment().format("YYYY")
-      const month = query.month ?? moment().format("MM")
-      return `${year}-${month}`
+      const year_stand = (() => {
+        return moment(convertDate_add1911(year_tw)).format("YYYY")
+      })()
+      const theMonth = moment(month).format("MM")
+      return `${year_stand}-${theMonth}`
     })()
+
     const isoDate = moment(dateStr).toISOString()
     const monthStart: string =
       moment(isoDate).startOf('month').toISOString()
@@ -68,15 +81,9 @@ export default function MonthReport() {
         },
       }
     }
-
     return { params, isoDate }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query.month, query.year])
-
-
-
-
-
+  }, [year_tw, month])
 
   const {
     dailyReport,
@@ -86,7 +93,14 @@ export default function MonthReport() {
 
   useEffect(() => {
     if (!router.isReady) return
-    updateDailyReports()
+    (async () => {
+      try {
+        setIsLoading(true)
+        await updateDailyReports()
+      }
+      catch { myAlert.err({ title: "取得資料失敗" }) }
+      setIsLoading(false)
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, params])
 
@@ -115,12 +129,56 @@ export default function MonthReport() {
   // --------------------------------------------------
 
 
+
+  const yearOptionArr = createNumberRangeOptionArr({
+    start: parseInt(thisYear_tw),
+    end: 100,
+    suffix: "年"
+  }
+  )
+  const monthOptionArr = createNumberRangeOptionArr({
+    start: 1,
+    end: 12,
+    suffix: "月",
+    padStart: [2, "0"]
+  })
+
+  const selectPropsArr: { selectProps: TselectProps }[] = [
+    {
+      selectProps: {
+        value: year_tw,
+        options: yearOptionArr,
+        onChange: (option) => { setYear_tw(option!.value) },
+      }
+    },
+    {
+      selectProps: {
+        value: month,
+        options: monthOptionArr,
+        onChange: (option) => { setMonth(option!.value) },
+      }
+    }
+  ]
+
+
+  const panelList: TpanelList = [
+    {
+      custom: <SelectBar
+        selectPropsArr={selectPropsArr}
+      />
+    },
+  ]
+
+
   // --------------------------------------------------
   return (
-    <SubLayer bodyClassName={classNames(scss.subLayerBody,scss.plus)}>
-      <PageHeader02 tag="報表" />
+    <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
+      isLoading_subLayer={isLoading}
+    >
+      <PageHeader02 tag="報表" panelList={panelList} />
 
       <MonthReportTable
+        key={year_tw + month}
         isoDate={isoDate}
         groupedReport={groupedReport}
       />
@@ -128,26 +186,6 @@ export default function MonthReport() {
     </SubLayer>
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

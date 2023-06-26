@@ -13,6 +13,8 @@ import { TdailyReportDto } from "js/api/dtoTypes";
 import { myConfig } from "config/myConfig";
 
 
+
+
 // =============================================================
 
 export default function MonthReportTable(
@@ -195,7 +197,7 @@ const Side = (
       <div className={classNames(scss.cell)}><span>合計</span></div>
       <div className={classNames(scss.cell)}><span>餐費</span></div>
       <div className={classNames(scss.cell)}><span>外宿費</span></div>
-      <div className={classNames(scss.cell,scss.bottom)}><span>餐加宿</span></div>
+      <div className={classNames(scss.cell, scss.bottom)}><span>餐加宿</span></div>
 
     </div>
   )
