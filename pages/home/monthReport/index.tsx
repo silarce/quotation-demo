@@ -27,6 +27,7 @@ import {
   apiIsReviewer,
 } from "js/api/api_dailyReport"
 
+import scss from "./monthReport.module.scss"
 
 
 
@@ -116,7 +117,7 @@ export default function MonthReport() {
 
   // --------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer bodyClassName={classNames(scss.subLayerBody,scss.plus)}>
       <PageHeader02 tag="報表" />
 
       <MonthReportTable
