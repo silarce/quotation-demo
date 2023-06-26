@@ -11,6 +11,9 @@ import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/Pag
 import PageHeader_mobile_dailyReport from "pages/home/dailyReport/pageHeader_mobile/PageHeader_mobile_dailyReport";
 import SubLayer from "components/Layer/SubLayer/SubLayer"
 
+// components
+import MonthReportTable from "components/page/home/monthReport/monthReportTable";
+
 
 // api
 import {
@@ -40,23 +43,22 @@ export default function MonthReport() {
   }
 
 
-  const params: Tparams = useMemo(() => {
-    // let monthStart: string | undefined =
-    //   moment(`${query.year}-${query.month}-01`).startOf('month').toISOString()
-    // let monthEnd: string | undefined =
-    //   moment(`${query.year}-${query.month}-01`).endOf('month').toISOString()
-
-    // if (!query.month || !query.year) {
-    //   monthStart = undefined
-    //   monthEnd = undefined
-    // }
-
+  const { params, isoDate } = useMemo(() => {
+    const dateStr = (() => {
+      const year = query.year ?? moment().format("YYYY")
+      const month = query.month ?? moment().format("MM")
+      return `${year}-${month}`
+    })()
+    const isoDate = moment(dateStr).toISOString()
     const monthStart: string =
-      moment("2023-06").startOf('month').toISOString()
+      moment(isoDate).startOf('month').toISOString()
     const monthEnd: string =
-      moment("2023-06").endOf('month').toISOString()
+      moment(isoDate).endOf('month').toISOString()
 
-    return {
+
+    const params = {
+      populate:
+        ["employee", "items"],
       pageSize: 999,
       filter: {
         date: {
@@ -65,8 +67,14 @@ export default function MonthReport() {
         },
       }
     }
+
+    return { params, isoDate }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.month, query.year])
+
+
+
+
 
 
   const {
@@ -87,12 +95,17 @@ export default function MonthReport() {
     const groupedArray = Object.entries(grouped).map(([key, value]) => grouped[key])
 
     const groupedObj = groupedArray.map((group) => {
-      const obj: { [key: string]: typeof group[number] } = {}
+      const obj: { [key: string]: (typeof group[number]) | undefined } = {}
+      let chName: string = ""
       group.forEach((item) => {
         const dateDay = moment(item.date).format("DD")
         obj[dateDay] = item
+        chName = item.employee.chName
       })
-      return obj
+      return {
+        chName,
+        list: obj
+      }
     })
     return groupedObj
   }, [dailyReport])
@@ -106,8 +119,10 @@ export default function MonthReport() {
     <SubLayer>
       <PageHeader02 tag="報表" />
 
-      <div></div>
-
+      <MonthReportTable
+        isoDate={isoDate}
+        groupedReport={groupedReport}
+      />
 
     </SubLayer>
   )
