@@ -102,7 +102,7 @@ const sidePathList: TsidePathList = {
             {
               label: "報表",
               path: path01 + "/monthReport",
-              erpFeature: devPass,
+              erpFeature: "allPass",
             },
           ]
         },
