@@ -54,7 +54,6 @@ const Login: NextPageWithLayout<{
           <div><Image src={imgArc} alt="" /></div>
         </div>
 
-        {/* <div className={scss.banner} style={{ backgroundImage: `url(${Imgbanner.src})` }}> */}
         <div className={scss.banner}
           style={{ backgroundImage: `url(${rwd1023 ? Imgbanner_mobile.src : Imgbanner.src})` }}>
           <div>

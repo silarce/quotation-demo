@@ -99,6 +99,11 @@ const sidePathList: TsidePathList = {
               query: { isMine: "false" },
               erpFeature: "allPass",
             },
+            {
+              label: "報表",
+              path: path01 + "/monthReport",
+              erpFeature: devPass,
+            },
           ]
         },
       ]
