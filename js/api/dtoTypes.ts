@@ -239,7 +239,7 @@ export type TdailyReportItemDto = {
   /**date */
   departureWorksiteTime?: string | null
   licensePlate?: string | null
-  stayLength?: number | null
+  stayLength?: number | null // 基本上是 1|0|null，但如果舊資料沒有更新過，那就可能會是其他數值
   workers: TemployeeDto[] | null
   workOrderNumber: string | null
 }
@@ -286,7 +286,7 @@ export type TcreateDailyReportItemDto = {
   /**date 發出req時會自動被轉為字串*/
   departureWorksiteTime: string | null
   licensePlate: string
-  stayLength: number
+  stayLength: number // 基本上是 1|0
   workerIds: string[] | null
   workOrderNumber: string
 }

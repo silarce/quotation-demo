@@ -1,0 +1,134 @@
+@use "styles/theme01" as *;
+
+@mixin cell {
+  width: auto;
+  height: 32px;
+  text-align: center;
+  line-height: 32px;
+  border: 1px solid $colorBorder01;
+  border-width: 0 1px 1px 0;
+  &.bottom {
+    border-bottom: solid 1px black;
+  }
+  &.isHoliday {
+    background-color: #fee;
+    > span {
+      color: $colorActive01;
+    }
+  }
+} //cell
+
+.container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+  margin: 3px;
+  margin-top: 0;
+  border-top: solid 3px white;
+
+  .table {
+    white-space: nowrap;
+    > * {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .side {
+      .head {
+        position: sticky;
+        top: 0dvi;
+        z-index: 1;
+        width: 66px;
+        height: 70px;
+        text-align: center;
+        line-height: 70px;
+        background-color: $bgc01;
+        border: 1px solid $colorBorder01;
+        border-width: 0 1px 1px 0;
+      }
+      .cell {
+        @include cell;
+        background-color: $bgc01;
+      }
+    }
+
+    .main {
+      white-space: nowrap;
+      .item {
+        width: 190px;
+        display: inline-block;
+        .head {
+          position: sticky;
+          top: 0px;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          width: 100%;
+          background-color: $bgc01;
+          > div {
+            &.cell {
+              @include cell;
+            }
+            &:nth-of-type(1) {
+              grid-column: span 4;
+              height: 38px;
+              line-height: 38px;
+            }
+          }
+        } // head
+        .row {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          &.isHoliday {
+            background-color: #fee;
+            > span {
+              color: $colorActive01;
+            }
+          }
+          > .cell {
+            @include cell;
+          }
+        }
+        > .cell {
+          @include cell;
+        }
+      } // item
+    } // main
+  } // table
+
+  .total {
+    position: sticky;
+    left: 0;
+    background-color: $bgc01;
+    > div {
+      width: fit-content;
+      margin: auto;
+      margin-right: 0;
+      > div {
+        display: inline-block;
+        height: 43px;
+        line-height: 43px;
+        text-align: center;
+        &:nth-of-type(1) {
+          width: 170px;
+          border: solid 1px $colorBorder01;
+          border-width: 0 1px;
+        }
+        &:nth-of-type(2) {
+          width: 110px;
+          background-color: white;
+        }
+      }
+    }
+  }
+} //container
+
+.myBadge {
+  display: inline-grid;
+  :global(.ant-badge-status-dot) {
+    width: 10px;
+    height: 10px;
+    top: unset;
+  }
+}

@@ -38,8 +38,8 @@ const apiDailyReports = (
 ) => {
   const api = `/daily-reports`
   const params = {
-    populate: [
-      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
+    populate:
+      ["employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted"],
     sort: "date",
     order: "DESC",
     ...customParams
