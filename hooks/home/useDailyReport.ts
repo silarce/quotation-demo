@@ -274,8 +274,9 @@ const useReport = (
     let isAllowToReview: boolean = false
     let isReviewedByUser: boolean = false
     let isUserIsViewer: boolean = false
+    let isReviewedByOther: boolean = false
 
-    const isReviewedByOther = dailyReport.reviewStatus.some((statu) => {
+    dailyReport.reviewStatus.forEach((statu) => {
       const statuType = statu.type
       const reviewerId = statu.reviewerEmployee?.id ?? null
       const reviewedAt = statu.reviewedAt
@@ -284,9 +285,8 @@ const useReport = (
         if (statuType === "examiner") isUserIsViewer = true
         if (reviewedAt) isReviewedByUser = true
       }
-      return !!reviewedAt
+      if (!!reviewedAt) isReviewedByOther = true
     })
-
 
     const sortedItems = _.sortBy(dailyReport.items, "arrivalTime")
 

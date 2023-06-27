@@ -12,8 +12,7 @@ import { TdailyReportDto } from "js/api/dtoTypes";
 // other
 import { myConfig } from "config/myConfig";
 
-
-
+import { holidaysLookup } from "config/date/holidaysLookup";
 
 // =============================================================
 
@@ -30,9 +29,12 @@ export default function MonthReportTable(
     }
 ) {
 
-  const dayArr = useMemo(() => {
+
+  const { weekDays: dayArr, holidayLookup_month } = useMemo(() => {
     const weekDays = [];
     const date = moment(isoDate).startOf('month');
+    const year = date.year();
+    const month = (date.month() + 1) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
     const daysInMonth = date.daysInMonth();
 
     for (let i = 0; i < daysInMonth; i++) {
@@ -46,7 +48,10 @@ export default function MonthReportTable(
       });
       date.add(1, 'day');
     }
-    return weekDays;
+
+    const holidayLookup_month = holidaysLookup[year]?.[month]
+
+    return { weekDays, year, month, holidayLookup_month };
   }, [isoDate]);
 
 
@@ -56,7 +61,7 @@ export default function MonthReportTable(
   return (
     <div className={scss.container}>
       <div className={scss.table}>
-        <Side dayArr={dayArr} />
+        <Side dayArr={dayArr} holidayLookup_month={holidayLookup_month} />
         {/* group */}
         <div className={scss.main}>
 
@@ -74,7 +79,7 @@ export default function MonthReportTable(
 
                 {dayArr.map((dayObj) => {
                   const { day, date, dateMoment } = dayObj
-                  const dateDay = dateMoment.date().toString().padStart(2, "0")
+                  const dateDay = dateMoment.date().toString()
                   const { items } = list[dateDay] ?? {}
                   let breakfast = 0
                   let lunch = 0
@@ -95,7 +100,9 @@ export default function MonthReportTable(
                   dinnerTotal = dinnerTotal + dinner
                   stayLengthTotal = stayLengthTotal + stayLength
 
-                  const isHoliday = checkIsHoliday(day)
+                  let isHoliday = false
+                  const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {}
+                  if (是否放假 === "2") isHoliday = true
 
                   return (
                     <div key={date} className={classNames(scss.row, { [scss.isHoliday]: isHoliday })}>
@@ -150,16 +157,6 @@ export default function MonthReportTable(
     </div>
   )
 }
-
-// =============================================================
-// =============================================================
-// =============================================================
-
-const checkIsHoliday = (day: number) => {
-  if (day === 0 || day === 6) return true
-  return false
-}
-
 // =============================================================
 // =============================================================
 // =============================================================
@@ -172,13 +169,14 @@ const MyBadge = () => {
 
 
 const Side = (
-  { dayArr }:
+  { dayArr, holidayLookup_month }:
     {
       dayArr: {
         day: number;
         date: string;
         dateMoment: moment.Moment;
       }[]
+      holidayLookup_month: typeof holidaysLookup[number][number]
     }
 ) => {
   return (
@@ -187,7 +185,12 @@ const Side = (
       {dayArr.map((dayObj) => {
         const { day, date, dateMoment } = dayObj
         const dateDay = dateMoment.date()
-        const isHoliday = checkIsHoliday(day)
+
+
+        let isHoliday = false
+        const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {}
+        if (是否放假 === "2") isHoliday = true
+
         return (
           <div key={date} className={classNames(scss.cell, { [scss.isHoliday]: isHoliday })}>
             <span>{dateDay}</span>
@@ -197,7 +200,7 @@ const Side = (
       <div className={classNames(scss.cell, scss.mainColor)}><span>合計</span></div>
       <div className={classNames(scss.cell)}><span>餐費</span></div>
       <div className={classNames(scss.cell)}><span>外宿費</span></div>
-      <div className={classNames(scss.cell, scss.bottom,scss.mainColor)}><span>餐加宿</span></div>
+      <div className={classNames(scss.cell, scss.bottom, scss.mainColor)}><span>餐加宿</span></div>
 
     </div>
   )
