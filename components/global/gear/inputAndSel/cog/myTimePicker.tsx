@@ -117,6 +117,7 @@ export default function MyTimePicker(
         onBlur={theOnBlur}
         suffixIcon={null}
         allowClear={false}
+        inputReadOnly={true}
       />
     </div>
   )
