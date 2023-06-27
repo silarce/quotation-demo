@@ -74,7 +74,7 @@ export default function MonthReportTable(
 
                 {dayArr.map((dayObj) => {
                   const { day, date, dateMoment } = dayObj
-                  const dateDay = dateMoment.date().toString().padStart(2, "0")
+                  const dateDay = dateMoment.date().toString()
                   const { items } = list[dateDay] ?? {}
                   let breakfast = 0
                   let lunch = 0

@@ -113,7 +113,7 @@ export default function MonthReport() {
       const obj: { [key: string]: (typeof group[number]) | undefined } = {}
       let chName: string = ""
       group.forEach((item) => {
-        const dateDay = moment(item.date).format("DD")
+        const dateDay = moment(item.date).format("D")
         obj[dateDay] = item
         chName = item.employee.chName
       })
@@ -124,8 +124,6 @@ export default function MonthReport() {
     })
     return groupedObj
   }, [dailyReport])
-
-
   // --------------------------------------------------
 
 
