@@ -7,11 +7,14 @@ type Tcalendar = {
   備註: string,
 }
 
+
 type Tcalendar_group = {
-  [key: string]: (Tcalendar & {
-    iso: string
-    dateDay: string
-  })[]
+  [key: string]: {
+    [key: string]: (Tcalendar & {
+      iso: string
+      dateDay: string
+    })
+  }
 }
 
 const filterHolidays = (calendar: Tcalendar[]) => {
@@ -20,15 +23,15 @@ const filterHolidays = (calendar: Tcalendar[]) => {
   calendar.forEach((c) => {
     if (c.是否放假 === "2") {
       const month = moment(c.西元日期).month() + 1
-      if (!calendar_group[month]) calendar_group[month] = []
+      if (!calendar_group[month]) calendar_group[month] = {}
       const iso = moment(c.西元日期).toISOString()
       const dateDay = moment(c.西元日期).date().toString()
 
-      calendar_group[month].push({
+      calendar_group[month][dateDay] = {
         ...c,
         iso,
         dateDay
-      })
+      }
     }
   })
   return calendar_group
