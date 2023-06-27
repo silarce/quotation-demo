@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import _ from "lodash"
 
 
@@ -10,6 +10,10 @@ import scss from "./mealSelector.module.scss"
 
 
 import { TdailyReportItemDto } from "js/api/dtoTypes"
+
+// other
+import { AppContext } from "pages/_app"
+
 
 type Tmeal = "breakfast" | "lunch" | "dinner"
 
@@ -31,6 +35,7 @@ export default function MealSelector(
       isYesterdaySamePrevDate: boolean
     }
 ) {
+  const { rwd1023 } = useContext(AppContext)
 
   const [mealArr, setMealArr] = useState<Tmeal[]>([])
 
@@ -59,7 +64,7 @@ export default function MealSelector(
       onConfirm={() => onConfirm(mealArr)}
       onCancel={onCancel}
       onSearch={onSearch}
-      width="500px"
+      width={rwd1023 ? "80vw" : "500px"}
       noSearch={true}
     // tip={tip}
     >

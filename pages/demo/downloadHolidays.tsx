@@ -11,7 +11,7 @@ import { createJSONDonwload } from "js/utils/helpers/createJSONDonwload";
 import calendar from "public/calendar/112年中華民國政府行政機關辦公日曆表.json"
 
 
-// 以後有空再改成用input引入檔案
+// 以後有空再改成用input引入檔案，不然每次都要改import實在麻煩
 
 
 export default function Labe00() {
