@@ -1,7 +1,7 @@
 
-import { useMemo, useEffect } from "react"
+import { useMemo } from "react"
 import Image from "next/image"
-import moment, { Moment } from 'moment'
+import moment from 'moment'
 import classNames from "classnames"
 
 import _ from "lodash"
@@ -49,6 +49,7 @@ type Tevent = {
   end: string
   isReviewCompleted: boolean
   isReviewedByUser: boolean
+  isAllowToReview: boolean
   prevDate: string
 }
 
@@ -82,12 +83,20 @@ export default function TheCalendar(
       const departmentCode = jobs?.[0]?.department.code ?? ""
 
       const userId = userInfo?.employee?.id
-      const isReviewedByUser =
-        reviewStatus.some((status) => {
-          if (status.reviewedAt) {
-            return status.reviewerEmployeeId === userId
-          }
-        })
+
+      let isReviewedByUser = false
+      let isAllowToReview = false
+
+      reviewStatus.forEach((statu) => {
+        const { type, reviewerEmployee, reviewedAt, reviewerEmployeeId } = statu
+        const reviewerId = reviewerEmployee?.id ?? null
+        if (reviewerId === userInfo.employee?.id && type === "reviewer") {
+          isAllowToReview = true
+        }
+        if (reviewedAt) {
+          return isReviewedByUser = (reviewerEmployeeId === userId)
+        }
+      })
 
       const prevDate = dailyReportArr[index + 1]?.date
 
@@ -102,20 +111,12 @@ export default function TheCalendar(
         end: report.date,
         isReviewCompleted,
         isReviewedByUser,
+        isAllowToReview,
         prevDate
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReportArr]) // dailyReportArr
-
-
-  // useEffect(() => {
-  //   const now = moment()
-  //   const filter = filterCre_nextAndPrevMonth(now)
-  //   update_calendar(filter)
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
-
 
 
   return (
@@ -223,7 +224,7 @@ const EventWrapper = (
     isMine,
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    isReviewCompleted, isReviewedByUser,
+    isReviewCompleted, isReviewedByUser, isAllowToReview,
     prevDate,
   } = event
 
@@ -246,7 +247,10 @@ const EventWrapper = (
         "grid grid-cols-[20px_40px_auto] gap-2 justify-start items-center",
         "text-lg"
       )}>
-        <Image src={checkIcon} alt="" />
+
+        {(isAllowToReview || isMine) && <Image src={checkIcon} alt="" />}
+        {(!isAllowToReview && !isMine) && <div />}
+
         <span>{departmentCode}</span>
         <span>{name}</span>
       </div>
