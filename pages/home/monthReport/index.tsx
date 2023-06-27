@@ -29,8 +29,10 @@ import scss from "./monthReport.module.scss"
 import { createNumberRangeOptionArr } from "js/utils/options/options";
 import { convertDate_reduce1911, convertDate_add1911 } from "js/utils/helpers/date/convertDate";
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
+import { holidaysLookup } from "config/date/holidaysLookup";
 
 
+const holidaysLookupKeyArr = Object.keys(holidaysLookup)
 // =============================================================
 
 
@@ -129,8 +131,8 @@ export default function MonthReport() {
 
 
   const yearOptionArr = createNumberRangeOptionArr({
-    start: parseInt(thisYear_tw),
-    end: 100,
+    start: +holidaysLookupKeyArr[0],
+    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1],
     suffix: "年"
   }
   )
