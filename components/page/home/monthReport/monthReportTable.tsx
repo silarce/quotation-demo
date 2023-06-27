@@ -209,7 +209,7 @@ const Head = (
 ) => {
   return (
     <div className={scss.head}>
-      <div className={scss.cell}><span>{chName}</span></div>
+      <div className={classNames(scss.cell,scss.chName)}><span>{chName}</span></div>
       <div className={scss.cell}><span>早</span></div>
       <div className={scss.cell}><span>中</span></div>
       <div className={scss.cell}><span>晚</span></div>

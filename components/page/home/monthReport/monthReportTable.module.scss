@@ -74,6 +74,9 @@
               grid-column: span 4;
               height: 38px;
               line-height: 38px;
+              > span {
+                color: $colorMain;
+              }
             }
           }
         } // head

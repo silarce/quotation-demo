@@ -143,20 +143,22 @@ export default function MonthReport() {
     padStart: [2, "0"]
   })
 
-  const selectPropsArr: { selectProps: TselectProps }[] = [
+  const selectPropsArr: Parameters<typeof SelectBar>[0]["selectPropsArr"] = [
     {
       selectProps: {
         value: year_tw,
         options: yearOptionArr,
         onChange: (option) => { setYear_tw(option!.value) },
-      }
+      },
+      boxStyle: { width: "110px" }
     },
     {
       selectProps: {
         value: month,
         options: monthOptionArr,
         onChange: (option) => { setMonth(option!.value) },
-      }
+      },
+      boxStyle: { width: "100px" }
     }
   ]
 
