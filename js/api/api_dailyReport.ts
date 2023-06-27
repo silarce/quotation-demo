@@ -94,7 +94,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
     page,
     // pageSize必須大於畫面一次可顯示的item數量才不會壞掉    
     // 不過應該只有在嚴格模式會壞掉
-    pageSize: 15,
+    pageSize: 50,
     ...customParams
   } as const
 
