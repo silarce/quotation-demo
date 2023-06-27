@@ -108,10 +108,10 @@ export default function MonthReportTable(
                 })}
 
                 <div className={classNames(scss.row)}>
-                  <div className={scss.cell}><span>{breakfastTotal}</span></div>
-                  <div className={scss.cell}><span>{lunchTotal}</span></div>
-                  <div className={scss.cell}><span>{dinnerTotal}</span></div>
-                  <div className={scss.cell}><span>{stayLengthTotal}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{breakfastTotal}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{lunchTotal}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{dinnerTotal}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{stayLengthTotal}</span></div>
                 </div>
 
                 {(() => {
@@ -128,8 +128,8 @@ export default function MonthReportTable(
 
                   return (
                     <>
-                      <div className={scss.cell}><span>{mealsCostTotal}</span></div>
-                      <div className={scss.cell}><span>{styCostTotal}</span></div>
+                      <div className={classNames(scss.cell, scss.mainColor)}><span>{mealsCostTotal}</span></div>
+                      <div className={classNames(scss.cell, scss.mainColor)}><span>{styCostTotal}</span></div>
                       <div className={classNames(scss.cell, scss.bottom)}><span>{total}</span></div>
                     </>
                   )
@@ -194,10 +194,10 @@ const Side = (
           </div>
         )
       })}
-      <div className={classNames(scss.cell)}><span>合計</span></div>
+      <div className={classNames(scss.cell, scss.mainColor)}><span>合計</span></div>
       <div className={classNames(scss.cell)}><span>餐費</span></div>
       <div className={classNames(scss.cell)}><span>外宿費</span></div>
-      <div className={classNames(scss.cell, scss.bottom)}><span>餐加宿</span></div>
+      <div className={classNames(scss.cell, scss.bottom,scss.mainColor)}><span>餐加宿</span></div>
 
     </div>
   )
@@ -209,7 +209,7 @@ const Head = (
 ) => {
   return (
     <div className={scss.head}>
-      <div className={classNames(scss.cell,scss.chName)}><span>{chName}</span></div>
+      <div className={classNames(scss.cell, scss.chName)}><span>{chName}</span></div>
       <div className={scss.cell}><span>早</span></div>
       <div className={scss.cell}><span>中</span></div>
       <div className={scss.cell}><span>晚</span></div>

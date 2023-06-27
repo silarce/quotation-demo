@@ -16,6 +16,12 @@
       color: $colorActive01;
     }
   }
+  &.mainColor {
+    color: $colorMain;
+    > span {
+      color: $colorMain;
+    }
+  }
 } //cell
 
 .container {
@@ -50,6 +56,11 @@
       .cell {
         @include cell;
         background-color: $bgc01;
+        &.mainColor {
+          > span {
+            color: $colorMain;
+          }
+        }
       }
     }
 
@@ -91,6 +102,7 @@
           }
           > .cell {
             @include cell;
+            color: $colorMain;
           }
         }
         > .cell {
@@ -113,6 +125,9 @@
         height: 43px;
         line-height: 43px;
         text-align: center;
+        > span {
+          color: $colorMain;
+        }
         &:nth-of-type(1) {
           width: 170px;
           border: solid 1px $colorBorder01;
