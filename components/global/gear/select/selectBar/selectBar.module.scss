@@ -33,8 +33,7 @@ div.selControl {
   }
 }
 div.selMenu {
-  
-  top:6px;
+  top: 6px;
   min-width: fit-content;
   background-color: #fff;
   box-sizing: border-box;
@@ -71,7 +70,7 @@ div.selOption {
     color: $colorMain;
     background-color: $bgc01;
   }
-  &.isSelected{
+  &.isSelected {
     color: $colorActive01;
   }
 }
@@ -84,6 +83,7 @@ div.selOption {
 .selSingleValue {
   font-size: 16px;
   font-weight: 500px;
+  color: $colorMain;
 }
 .selInput {
   font-size: 16px;
