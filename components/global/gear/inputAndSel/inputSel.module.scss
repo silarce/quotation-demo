@@ -244,4 +244,39 @@ div.fontSize18px {
 div.fontSize20px {
   font-size: 20px;
 }
-// ===========================
+
+// =================================================================
+
+.checkBar {
+  display: flex;
+  gap: 35px;
+  justify-content: right;
+  > * {
+    flex: none;
+    width: fit-content;
+  }
+
+  .wrapper {
+    text-align: right;
+    > span {
+      font-size: 18px;
+      color: $colorMain;
+      margin-right: 7px;
+    }
+    .antdCheck {
+      transform: translateY(-1px);
+      :global(.ant-checkbox) {
+        :global(.ant-checkbox-inner) {
+          // width: 15px;
+          // height: 15px;
+          border-color: $colorBorder01;
+        }
+      }
+      :global(.ant-checkbox-checked) {
+        :global(.ant-checkbox-inner) {
+          background-color: $colorMain;
+        }
+      }
+    }
+  }
+}
