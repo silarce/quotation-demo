@@ -3,9 +3,9 @@ import React, {
   Dispatch, SetStateAction, FocusEvent,
   useState, useRef, useEffect
 } from "react"
-import { useRouter } from "next/router"
-import { NextRouter } from "next/router"
+import { useRouter, NextRouter } from "next/router"
 
+import moment from "moment"
 
 
 
@@ -20,6 +20,7 @@ import QuotationSinature from "components/page/domestic/quotation/quotationSinat
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
 import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf"
 import QuotationPdf_part from "components/page/domestic/pdf/quotationPdf_part/quotationPdf_part"
+import QuotationStateSel from "components/page/domestic/budget/quotationStateSel"
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -152,9 +153,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     {
       // 報價/歷史狀態狀態
       custom: <QuotationStateSel
-        quotationState={quotationState}
-        setQuotationState={setQuotationState}
-        options={optionQuotationState}
+      quotationState={quotationState}
+      setQuotationState={setQuotationState}
+      history={fakeQuotationStateHistory}
+
       />
     },
     { type: "redButton", label: "上傳", onClick: () => setShowMemoModal(true) },
@@ -292,124 +294,26 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
-// 報價/歷史狀態狀態
-const QuotationStateSel = (
-  { quotationState, setQuotationState, options }:
-    {
-      quotationState: Toption
-      setQuotationState: Dispatch<SetStateAction<Toption>>
-      options: Toption[]
-    }
-) => {
-  // -------------------------------------------------------------------------
-  // 報價狀態
-  const [isFocus, setIsFocus] = useState("")
-  const [selIsOpen, setSelIsOpen] = useState<boolean | undefined>(undefined)
 
-  const onChange = (option: Toption | null) => {
-    setQuotationState(option!)
-    setIsFocus("")
-    setSelIsOpen(undefined)
-  }
-  const onFocus = (e?: FocusEvent<HTMLInputElement>) => {
-    setIsFocus(style.isFocus)
-  }
-  const onBlur = () => {
-    setIsFocus("")
-    setSelIsOpen(undefined)
-  }
-  // --------------------------------------------------------------
-  // 歷史狀態
-  const [showHistory, setShowHistory] = useState("")
-  const historyRef = useRef<HTMLDivElement>(null!)
-  const historyListRef = useRef<HTMLDivElement>(null!)
-  const selRef = useRef<HTMLDivElement>(null!)
-
-  const closeHistoryList = (e: MouseEvent) => {
-
-    if (historyRef.current.contains(e.target as Node)) return
-    if (historyListRef.current.contains(e.target as Node)) return
-
-    setShowHistory("")
-    document.removeEventListener('mousedown', closeHistoryList)
-  }
-  const openHistoryList = () => {
-    setShowHistory(style.isShow)
-    document.addEventListener('mousedown', closeHistoryList)
-  }
-  // --------------------------------------------------------------
-  return (
-    <div className={style.quotationState}>
-      <div className={`${style.sel} ${isFocus}`}
-        onClick={() => selRef.current.focus()}
-      >
-        <span>報價狀態 : </span>
-
-        <InputSel
-          className={style.select03}
-          showBaseline="invisible"
-          selectProps={{
-            value: quotationState,
-            options: options,
-            onChange: onChange,
-            selClassNames: {
-              menu: () => style.selMenu,
-              menuList: () => style.selMenuList,
-              option: () => style.selOption,
-            },
-            onFocus,
-            onBlur,
-            selectRef: selRef,
-            openMenuOnFocus: true,
-            fontSize: "16px",
-            arrowType: "black",
-          }}
-        />
-      </div>
-
-      <div className={style.history} ref={historyRef}
-        onClick={openHistoryList}>
-        <span>
-          歷史狀態
-        </span>
-      </div>
-
-      <div className={`${style.historyList} ${showHistory}`} ref={historyListRef}
-      >
-        <div className={style.item}>
-          <div><span>{"預算 > 投標"}</span></div>
-          <div>
-            <span>111-02-03</span>
-            <span>10:23:30</span>
-          </div>
-        </div>
-        <hr />
-        <div className={style.item}>
-          <div><span>{"預算 > 發包"}</span></div>
-          <div>
-            <span>111-02-03</span>
-            <span>10:23:30</span>
-          </div>
-        </div>
-        <hr />
-        <div className={style.item}>
-          <div><span>{"預算 > 發包"}</span></div>
-          <div>
-            <span>111-02-03</span>
-            <span>10:23:30</span>
-          </div>
-        </div>
-        <hr />
-        <div className={style.item}>
-          <div><span>{"預算 > 投標"}</span></div>
-          <div>
-            <span>111-02-03</span>
-            <span>10:23:30</span>
-          </div>
-        </div>
-        <hr />
-      </div>
-
-    </div >
-  )
-}
+const fakeQuotationStateHistory = [
+  {
+    state_from: "預算",
+    state_to: "投標",
+    isoString: moment("111-02-03 10:23:30").toISOString(),
+  },
+  {
+    state_from: "預算",
+    state_to: "發包",
+    isoString: moment("111-02-10 09:15:08").toISOString(),
+  },
+  {
+    state_from: "預算",
+    state_to: "發包",
+    isoString: moment("111-03-05 15:01:46").toISOString(),
+  },
+  {
+    state_from: "預算",
+    state_to: "投標",
+    isoString: moment("111-03-23 13:45:11").toISOString(),
+  },
+]
