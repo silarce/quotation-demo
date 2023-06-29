@@ -14,13 +14,10 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
 
 // gear
-import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar";
+import SelectBar from "components/global/gear/select/selectBar/selectBar";
 
 // api
-import {
-  TdailyReportDto,
-  useApiDailyReports,
-} from "js/api/api_dailyReport"
+import { useApiAccountReports, } from "js/api/api_dailyReport"
 
 // css
 import scss from "./monthReport.module.scss"
@@ -33,6 +30,7 @@ import { holidaysLookup } from "config/date/holidaysLookup";
 
 
 const holidaysLookupKeyArr = Object.keys(holidaysLookup)
+
 // =============================================================
 
 
@@ -55,42 +53,19 @@ export default function MonthReport() {
   const [year_tw, setYear_tw] = useState<string>(thisYear_tw)
   const [month, setMonth] = useState<string>(thisMonth)
 
-  const { params, isoDate } = useMemo(() => {
-
-    const dateStr = (() => {
+  const isoDate = useMemo(() => {
+    const isoDate = (() => {
       const year_stand = (() => {
         return moment(convertDate_add1911(year_tw)).format("YYYY")
       })()
       const theMonth = moment(month).format("MM")
-      return `${year_stand}-${theMonth}`
+      // 因為時區誤差，所以設15號
+      return moment(`${year_stand}-${theMonth}-15`).toISOString()
     })()
-
-    const isoDate = moment(dateStr).toISOString()
-    const monthStart: string =
-      moment(isoDate).startOf('month').toISOString()
-    const monthEnd: string =
-      moment(isoDate).endOf('month').toISOString()
-
-
-    const params = {
-      populate:
-        ["employee", "items"],
-      pageSize: 999,
-      filter: {
-        date: {
-          $gte: monthStart,
-          $lte: monthEnd
-        },
-      }
-    }
-    return { params, isoDate }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return isoDate
   }, [year_tw, month])
 
-  const {
-    dailyReport,
-    setDailyReports, updateDailyReports,
-  } = useApiDailyReports(params)
+  const { accountingReport, updateAccountReports, } = useApiAccountReports(isoDate)
 
 
   useEffect(() => {
@@ -98,37 +73,16 @@ export default function MonthReport() {
     (async () => {
       try {
         setIsLoading(true)
-        await updateDailyReports()
+        await updateAccountReports()
       }
       catch { myAlert.err({ title: "取得資料失敗" }) }
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, params])
+  }, [router.isReady, isoDate])
 
-  const groupedReport = useMemo(() => {
-    const sorted = (_.sortBy(dailyReport, ["id", "date"]) ?? []).reverse()
-    const grouped = _.groupBy(sorted, (report) => report.employee.id) as { [key: string]: TdailyReportDto[] }
-    const groupedArray = Object.entries(grouped).map(([key, value]) => grouped[key])
 
-    const groupedObj = groupedArray.map((group) => {
-      const obj: { [key: string]: (typeof group[number]) | undefined } = {}
-      let chName: string = ""
-      group.forEach((item) => {
-        const dateDay = moment(item.date).format("D")
-        obj[dateDay] = item
-        chName = item.employee.chName
-      })
-      return {
-        chName,
-        list: obj
-      }
-    })
-    return groupedObj
-  }, [dailyReport])
   // --------------------------------------------------
-
-
 
   const yearOptionArr = createNumberRangeOptionArr({
     start: +holidaysLookupKeyArr[0],
@@ -182,12 +136,9 @@ export default function MonthReport() {
       <MonthReportTable
         key={year_tw + month}
         isoDate={isoDate}
-        groupedReport={groupedReport}
+        accountingReport={accountingReport}
       />
 
     </SubLayer>
   )
 }
-
-
-

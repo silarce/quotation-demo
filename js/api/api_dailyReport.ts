@@ -11,6 +11,8 @@ import {
   TemployeeDto,
   TpageMetaDto,
   TdailyReportWokerDto,
+  TaccountingReportStatistic,
+  TaccountingReportDto,
   Tparams,
 } from "./dtoTypes"
 
@@ -20,7 +22,8 @@ export type {
   TdailyReportDto,
   TdailyReportWokerDto,
   Tparams,
-  TemployeeDto
+  TemployeeDto,
+  TaccountingReportDto
 }
 // =================================================================
 
@@ -303,3 +306,34 @@ export const useApiGetDailyReportsWorkers = (params?: Tparams) => {
     setRes,
   }
 }
+
+
+
+type TgetAccountingReport = {
+  data: TaccountingReportDto[]
+  meta: TpageMetaDto
+}
+
+const apiAccountingReport = (date: string) => {
+  const api = "/daily-reports/accounting-report"
+  const params = { date }
+  return axi.get(api, { params })
+    .then(({ data }) => data as TgetAccountingReport)
+    .catch(err => Promise.reject(err))
+}
+
+export const useApiAccountReports = (date: string) => {
+  const [res, setRes] = useState<TgetAccountingReport>()
+  const update = async (dynamicDate?: string) => {
+    const data = await apiAccountingReport(dynamicDate || date)
+    if (data) setRes(data)
+    return data
+  }
+  return {
+    accountingReport: res?.data,
+    setAccountReports: setRes,
+    updateAccountReports: update,
+  }
+}
+
+

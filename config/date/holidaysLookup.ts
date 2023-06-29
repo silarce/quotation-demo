@@ -23,8 +23,11 @@ type Tlookup = {
 }
 
 const holidaysLookup: Tlookup = {
+  "112": holidays_112,
+  "113": holidays_113,
+  // 省下轉換年份的麻煩
   "2023": holidays_112,
-  "2024": holidays_113
+  "2024": holidays_113,
 }
 
 export { holidaysLookup };
