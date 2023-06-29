@@ -1,6 +1,29 @@
 @use "styles/layout" as *;
 @use "styles/theme01" as *;
 
+.subTitle {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 400;
+  color: $colorMain;
+  background-color: $bgc01;
+  padding: 15px;
+  text-align: center;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: fit-content(100%) auto;
+  margin-top: 11px;
+  .left {
+    display: grid;
+    gap: 14px;
+    max-height: 470px;
+    padding: 0 9px;
+    overflow-y: scroll;
+  }
+}
+
 .sel {
   > * {
     margin: auto;

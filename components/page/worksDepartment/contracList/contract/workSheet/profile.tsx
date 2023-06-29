@@ -12,10 +12,9 @@ import { TfakeworkSheet } from "pages/worksDepartment/contractList/contract/work
 
 
 export default function WorkSheetProfile(
-  { control, fakeWorkSheet, disabled }:
+  { control, disabled }:
     {
       control: Control<TfakeworkSheet, any>
-      fakeWorkSheet: TfakeworkSheet
       disabled: boolean
     }
 ) {
@@ -55,7 +54,7 @@ export default function WorkSheetProfile(
           })}
         </div>
       </div>
-      
+
       <div className={scss.right}>
         {configArr_right.map((item) => {
           const { key, label, className } = item

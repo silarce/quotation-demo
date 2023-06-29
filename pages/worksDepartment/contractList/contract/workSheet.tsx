@@ -7,6 +7,8 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // component
 import WorkSheetProfile from "components/page/worksDepartment/contracList/contract/workSheet/profile"
+import WorkSheetCard from "components/page/worksDepartment/contracList/contract/workSheet/card";
+
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
@@ -28,6 +30,12 @@ export default function WorkSheet() {
   const [disabled, setDisabled] = useState(true)
 
   const { control, handleSubmit } = useForm({ defaultValues: fakeWorkSheet });
+
+  const [activeCard, setActiveCard] = useState(-1)
+
+
+
+
 
   const onSubmit: SubmitHandler<TfakeworkSheet> = data => {
     alert(JSON.stringify(data))
@@ -56,16 +64,26 @@ export default function WorkSheet() {
 
 
   return (
-    <SubLayer className={scss.container}>
+    <SubLayer>
       <PageHeader panelList={panelList} />
+
       <form >
-
-        <WorkSheetProfile control={control} disabled={disabled}
-          fakeWorkSheet={fakeWorkSheet}
-        />
-
-
-
+        <WorkSheetProfile control={control} disabled={disabled} />
+        <div className={scss.subTitle}>工程項目</div>
+        <div className={scss.main}>
+          <div className={scss.left}>
+            {[0, 1, 2, 3, 4, 5, 6].map((key, index) => {
+              const onClick = () => setActiveCard(key)
+              const isActive = key === activeCard
+              return (
+                <div key={key} onClick={onClick}>
+                  <WorkSheetCard isActive={isActive} />
+                </div>
+              )
+            })}
+          </div>
+          <div className={scss.right}></div>
+        </div>
       </form>
 
     </SubLayer>
