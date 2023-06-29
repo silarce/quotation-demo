@@ -24,7 +24,8 @@ type TcheckProps = {
     }
   }
   onChange: (v: Tcheck) => void,
-  checkStyle?: CSSProperties
+  checkStyle?: CSSProperties,
+  isRadio?: boolean,
 }
 
 type Tcheck = { [key: string]: boolean }
@@ -32,16 +33,11 @@ type Tcheck = { [key: string]: boolean }
 export type { TcheckProps }
 
 export default function CheckBar(
-  {
-    checkProps,
-
-  }:
-    {
-      checkProps: TcheckProps
-    }
+  { checkProps, }:
+    { checkProps: TcheckProps }
 ) {
 
-  const { propsList, onChange, checkStyle } = checkProps
+  const { propsList, onChange, checkStyle, isRadio } = checkProps
 
 
   const [checkList, setCheckList] = useState<Tcheck>({})
@@ -73,7 +69,11 @@ export default function CheckBar(
         const { label, disabled, className, style } = propsList[key]
         const onChange = (v: boolean) => {
           const copy = { ...checkList }
-          copy[key] = v
+          if (isRadio) {
+            keyArr.forEach(key => copy[key] = false)
+            copy[key] = v
+          }
+          else copy[key] = v
           setCheckList(copy)
         }
         return (
