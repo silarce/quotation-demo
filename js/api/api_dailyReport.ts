@@ -343,7 +343,7 @@ export const useApiAccountReports = (params?: Tparams) => {
     return data
   }
   return {
-    accountReport: res?.data,
+    accountingReport: res?.data,
     setAccountReports: setRes,
     updateAccountReports: update,
   }
