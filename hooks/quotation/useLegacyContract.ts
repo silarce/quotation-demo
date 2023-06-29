@@ -600,6 +600,8 @@ class Class_listString {
     this.stringArr.splice(index, 1)
     this._reRender()
   }
+
+
 } // Class_listString
 
 // =======================================================================
@@ -660,9 +662,9 @@ class Class_legacyContract {
     this.classPayInfo
       = new Class_payInfo(reRender, this._legacyContract, this.classProductArr, this.editAllProdDiscount, this.countSubTotal)
     /**  備註*/
-    this.classMemo = new Class_listString(reRender, this._legacyContract.notes)
+    this.classNotes = new Class_listString(reRender, this._legacyContract.notes)
     /**  報價範圍*/
-    this.classQuoteRange = new Class_listString(reRender, this._legacyContract.quoteScopes)
+    this.classQuoteScopes = new Class_listString(reRender, this._legacyContract.quoteScopes)
     /**  簽名*/
     this.classSignature = new Class_signature(reRender, this._legacyContract)
 
@@ -680,8 +682,8 @@ class Class_legacyContract {
   classProductArr
   classAdditionArr
   classPayInfo
-  classMemo
-  classQuoteRange
+  classNotes
+  classQuoteScopes
   classSignature
   // ---------------------
 
@@ -794,7 +796,7 @@ class Class_legacyContract {
     })()
     if (!customerId) { myAlert.warning({ title: "沒有選擇客戶" }); return false }
 
-    
+
     const { quoteDate, deliveryDate, } = this._legacyContract
     // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
@@ -835,9 +837,14 @@ class Class_legacyContract {
       item.totalPaymentRatio = Decimal.div(item.totalPaymentRatio, 100).toString()
     })
 
+    const notes = this.classNotes.stringArr
+    const quoteScopes = this.classQuoteScopes.stringArr
+
     return {
       ...legacyContractCopy,
       customerId,
+      notes,
+      quoteScopes,
       quoteDate: quoteDate_Date,
       deliveryDate: deliveryDate_Date,
     }

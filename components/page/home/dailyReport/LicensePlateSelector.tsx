@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import _ from "lodash"
 
 
@@ -8,6 +8,8 @@ import CellWithBar from "components/global/gear/cell/cellWithBar"
 
 import scss from "./licensePlateSelector.module.scss"
 
+// other
+import { AppContext } from "pages/_app"
 
 
 /**車牌選擇器 */
@@ -26,6 +28,8 @@ export default function LicensePlateSelector(
       tip?: string
     }
 ) {
+  const { rwd1023 } = useContext(AppContext)
+
 
   const [sel, setSel] = useState<string>()
 
@@ -54,7 +58,7 @@ export default function LicensePlateSelector(
       onConfirm={() => onConfirm(sel)}
       onCancel={onCancel}
       onSearch={onSearch}
-      width="500px"
+      width={rwd1023 ? "80vw" : "500px"}
       noSearch={true}
     // tip={tip}
     >

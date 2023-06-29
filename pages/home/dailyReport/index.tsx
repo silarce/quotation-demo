@@ -65,7 +65,13 @@ import { TdoSearch, TsearchGroup } from "components/global/gear/HOC/searchBar/se
 import scss from "./dailyReport.module.scss"
 
 // =====================================================================
-export type Ttag = { reportId: string, employeeId: string, name: string, date: string }
+export type Ttag = {
+  reportId: string,
+  employeeId: string,
+  name: string,
+  date: string,
+  prevDate: string
+}
 export { Class_reportItem }
 // =====================================================================
 
@@ -252,7 +258,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
 
-  /**取得總表 沒有loading spin*/
   const toUpdateDailyReports = async () => {
     if (!router.isReady) return
     setSearchObj({
@@ -279,7 +284,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   useEffect(() => {
     toUpdateDailyReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery.isUserReviewed, searchQuery.date, isMine])
+  }, [searchQuery.isUserReviewed, searchQuery.date, isMine, isCalendar])
 
   useEffect(() => {
     if (!dailyReportArr) return
@@ -313,15 +318,16 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     changeReportDate
   } = useReport({ userInfo })
 
-  const editReport = async (reportId: string) => {
+  const editReport = async (reportId: string, prevDate: string | undefined) => {
     const dailyReport = await reqApiDailyReports_id(reportId)
     if (!dailyReport) return
-    reNew_report({ dailyReport, userInfo })
+    reNew_report({ dailyReport, userInfo, prevDate: prevDate })
     searchObjToQuery()
   }
 
-  const editReport_today = async () => {
-    reNew_report({ dailyReport: undefined, userInfo })
+  const editReport_today = async (prevDate: string | undefined) => {
+
+    reNew_report({ dailyReport: undefined, userInfo, prevDate })
     searchObjToQuery()
   }
 
@@ -331,12 +337,12 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------------------------
   // TagCarousel
-  const addTag = async (tag: Ttag) => {
+  const addTag = async (tag: Ttag,) => {
     if (identity === "reporter") {
       if (userInfo.employee?.id !== tag.employeeId)
         return myAlert.warning({ title: "只能編輯自己的日報表" })
     }
-    await editReport(tag.reportId)
+    await editReport(tag.reportId, tag.prevDate)
     if (tagArr.some(theTag => theTag.reportId === tag.reportId)) return
     setTagArr(arr => {
       const newArr = _.cloneDeep(arr);
@@ -576,6 +582,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
     identity,
     isReportEdit,
     userInfo,
+    dailyReport_calendar,
   })
 
   // ----------------------------------------------------------------------
@@ -632,7 +639,7 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           employeeChName={reportInEdit?.employeeChName}
           date={reportInEdit?.date}
           identity={identity}
-          editReport_today={editReport_today}
+          editReport_today={() => editReport_today(dailyReportArr?.[0]?.date)}
           cancelEditNewDailyReport={cancelEditNewDailyReport}
           isSearch={!!(searchObj?.isUserReviewed !== undefined || searchObj?.date !== undefined)}
         />
@@ -660,7 +667,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
           <ReportTable
             addDailyReportItem={addDailyReportItem}
             removeDailyReportItem={removeDailyReportItem}
-       
           />
         </DailyReportContext.Provider>
 
@@ -796,22 +802,24 @@ const panelListCreator = (
     editReport_today,
     identity,
     isReportEdit,
-    userInfo
+    userInfo,
+    dailyReport_calendar
   }:
     {
       reportInEdit: ThookEmptyReport | undefined
       doCheck: () => void
       switchIsEdit: () => void
       setShowReviewerForReportModal: (v: boolean) => void
-      dailyReportArr: TdailyReportDto[]
+      dailyReportArr: TdailyReportDto[] | undefined
       isCalendar: boolean
       router: NextRouter
       searchGroup: TsearchGroup
       editRivewerPickArr: () => void
-      editReport_today: () => void
+      editReport_today: (prevDate: string) => void
       identity: Tidentity
       isReportEdit: boolean
       userInfo: TuserDto
+      dailyReport_calendar: TdailyReportDto[] | undefined
     }
 ) => {
 
@@ -848,7 +856,14 @@ const panelListCreator = (
     {
       type: "myButton",
       label: "新增回報",
-      onClick: editReport_today
+      onClick: () => {
+        if (isCalendar && dailyReport_calendar) {
+          editReport_today(dailyReport_calendar[0].date)
+        }
+        if (!isCalendar && dailyReportArr) {
+          editReport_today(dailyReportArr[0].date)
+        }
+      }
     },
     listSwitchButton
   ]

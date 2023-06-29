@@ -23,7 +23,7 @@ export default function TagCarousel(
   { tagArr, editReport, removeTag, activeId }:
     {
       tagArr: Ttag[]
-      editReport: (reportId: string) => void
+      editReport: (reportId: string, prevReportDate: string) => void
       removeTag: (index: number, tagReportId: string) => void
       activeId: string
     }
@@ -64,10 +64,10 @@ export default function TagCarousel(
       >
 
         {tagArr.map((tag, index) => {
-          const { name, date, reportId, employeeId } = tag
+          const { name, date, reportId, employeeId, prevDate: prevReportDate } = tag
 
           return (
-            <div key={index} onClick={() => editReport(reportId)}>
+            <div key={index} onClick={() => editReport(reportId, prevReportDate)}>
               <div className={classNames(scss.cell, { [scss.isActive]: activeId === reportId })} >
                 <span>
                   {`${name} ${date}`}

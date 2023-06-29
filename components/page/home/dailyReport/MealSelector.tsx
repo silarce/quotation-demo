@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import _ from "lodash"
 
 
@@ -11,6 +11,10 @@ import scss from "./mealSelector.module.scss"
 
 import { TdailyReportItemDto } from "js/api/dtoTypes"
 
+// other
+import { AppContext } from "pages/_app"
+
+
 type Tmeal = "breakfast" | "lunch" | "dinner"
 
 
@@ -18,6 +22,7 @@ export default function MealSelector(
   { visible,
     onConfirm,
     onCancel,
+    isYesterdaySamePrevDate
     // label,
     // tip,
   }:
@@ -27,8 +32,10 @@ export default function MealSelector(
       onCancel: () => void
       label?: string
       tip?: string
+      isYesterdaySamePrevDate: boolean
     }
 ) {
+  const { rwd1023 } = useContext(AppContext)
 
   const [mealArr, setMealArr] = useState<Tmeal[]>([])
 
@@ -57,7 +64,7 @@ export default function MealSelector(
       onConfirm={() => onConfirm(mealArr)}
       onCancel={onCancel}
       onSearch={onSearch}
-      width="500px"
+      width={rwd1023 ? "80vw" : "500px"}
       noSearch={true}
     // tip={tip}
     >
@@ -66,24 +73,9 @@ export default function MealSelector(
         {mealArrOption.map((data, index) => {
           const { value, label } = data
 
-          // const onClick = () => {
-          //   setMealArr(value)
-          // };
+          if (!isYesterdaySamePrevDate && value === "breakfast") return null
 
           const isActive = mealArr.some(meal => meal === value)
-          // if (searchValue) {
-          //   const regex = new RegExp(searchValue, 'i');
-          //   if (
-          //     !idNumber.match(regex) &&
-          //     !chName.match(regex) &&
-          //     !job.match(regex) &&
-          //     !`${grade}`.match(regex)
-          //   ) {
-          //     return null;
-          //   }
-          // }
-
-
           return (
             <CellWithBar key={index} className={scss.row}
               isActive={isActive}

@@ -12,7 +12,6 @@ import { ConfigProvider as AntdConfigProvider } from 'antd';
 
 // conponents
 import Layer from "components/Layer/Layer"
-import Login from '../components/page/login'
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover'
@@ -54,14 +53,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' })
 
+  const router = appProps.router
 
-  // const router = appProps.router
-  // ----------------------------------------------------------------------------
-  // 巢狀layout用的
-  const getLayout = Component.getLayout ?? ((page) => page)
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe()
-  const { erpFeature: userErpFeature, updateErpFeature: updateUserErpFeature, } = useApiErpFeaturesMe()
+  const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature, } = useApiErpFeaturesMe()
 
   useEffect(() => {
     (async () => {
@@ -101,6 +97,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     try {
       await apiLogout()
       setUserInfo(undefined)
+      setErpFeature(undefined)
     }
     catch { myAlert.err({ title: "登出失敗" }) }
   }
@@ -110,32 +107,32 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   }
   // -----------------------------------------------------------------------
   if (!ready) return null
-  // -----------------------------------------------------------------------
-  // const noLayoutList = ["login"]
-  // if (noLayoutList.includes(firstPathname)) {
-  //   return (
-  //     <>
-  //       <Head>
-  //         <title >三久ERP</title>
-  //       </Head>
-  //       {getLayout(
-  //         <Component {...pageProps} setIsLoged={setIsLoged} />
-  //       )}
-  //     </>
-  //   )
-  // }
+  if ((!userInfo || !userErpFeature) && router.route !== "/login") {
+    router.push("/login")
+    return null
+  }
+  if ((userInfo && userErpFeature) && router.route === "/login") router.push("/home")
   // ------------------------------------------------------------------
-  if (!userInfo || !userErpFeature)
-    return (
-      <>
-        <Head>
-          <title >三久ERP</title>
-        </Head>
-        <AppContext.Provider value={appContextValue}>
-          <Login onLogin={onLogin} />
-        </AppContext.Provider>
-      </>
-    )
+
+  let getLayout = Component.getLayout
+
+  if (!getLayout) {
+    if (!userInfo || !userErpFeature) getLayout = (page) => page
+    else {
+      getLayout = (page) => {
+        return (
+          <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
+            {page}
+          </Layer>
+        )
+      }
+    }
+  }
+
+  /**
+  關於AntdConfigProvider的作用
+  根据 Ant Design 设计规范要求，我们会在按钮内(文本按钮和链接按钮除外)只有两个汉字时自动添加空格，如果你不需要这个特性，可以设置 ConfigProvider 的 autoInsertSpaceInButton 为 false。
+   */
   // ------------------------------------------------------------------
   return (
     <AntdConfigProvider autoInsertSpaceInButton={false}>
@@ -143,15 +140,14 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         <title>三久ERP</title>
       </Head>
       <AppContext.Provider value={appContextValue}>
-        <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
-          {getLayout(
-            <Component {...pageProps}
-              userInfo={userInfo}
-              userErpFeature={userErpFeature}
-              rwd1023={rwd1023}
-            />
-          )}
-        </Layer>
+        {getLayout(
+          <Component {...pageProps}
+            userInfo={userInfo}
+            userErpFeature={userErpFeature}
+            rwd1023={rwd1023}
+            onLogin={onLogin}
+          />
+        )}
       </AppContext.Provider>
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}

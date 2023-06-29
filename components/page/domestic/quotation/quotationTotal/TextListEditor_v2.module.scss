@@ -1,0 +1,109 @@
+@use "styles/theme01" as *;
+
+.listContainer {
+  > p {
+    font-weight: 400;
+    font-size: 18px;
+    color: $colorMain;
+    margin: 0;
+    margin-bottom: 15px;
+    margin-top: 28px;
+  }
+
+  // 裡面裝了兩個span 一個svg
+  > div {
+    display: grid;
+    grid-template-columns: 16px fit-content(100%) auto;
+    // height: 25px;
+    // height: 24px;
+    margin-bottom: 8px;
+    &:nth-last-of-type(1) {
+      margin-bottom: 0;
+    }
+    > * {
+      margin: auto;
+      margin-top: 0;
+    }
+    > svg {
+      display: inline-block;
+      width: 100%;
+      height: 26px;
+    }
+    > span {
+      display: inline-block;
+      font-weight: 400;
+      font-size: 16px;
+      margin-left: 0;
+      &.serialNumber {
+        // 這是裝了數字的元素
+        width: 20px;
+        margin-left: 7px;
+        margin-right: 6px;
+        text-align: center;
+      }
+    }
+
+    > label {
+      padding: 0;
+      > input {
+        font-weight: 400;
+        font-size: 16px;
+      }
+      > svg {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  .inputSel {
+    textarea {
+      font-size: 16px;
+    }
+    hr {
+      border-color: transparent;
+    }
+  }
+}
+
+.addModalBody {
+  padding: 0 3px;
+  .cellWithBar {
+    .row {
+      padding: 17px 42px;
+      border-bottom: solid 1px $colorBorder01;
+      cursor: pointer;
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+      }
+    }
+    &:nth-last-of-type(1) {
+      > .row {
+        border: none;
+      }
+    }
+  }
+}
+
+.appendix {
+  .fileName {
+    cursor: pointer;
+    border-bottom: solid 1px black;
+    line-height: 24px;
+  }
+  .serialNumber {
+    > img {
+      display: inline;
+    }
+  }
+}
+
+// 這不能放在appendix下
+// 因為antd的Image會portal到最外層
+.antdImage {
+  img {
+    display: inline;
+  }
+}

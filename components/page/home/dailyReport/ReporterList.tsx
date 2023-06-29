@@ -10,9 +10,6 @@ import { Badge } from "antd"
 // global gear
 import CellWithBar from "components/global/gear/cell/cellWithBar"
 
-// tool
-import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
-
 // css
 import scss from "./reporterList.module.scss"
 
@@ -58,8 +55,6 @@ export default function ReporterList(
         const { date, reportArr } = group
         const twDate = moment(convertDate_reduce1911(date)).format("y-MM-DD")
 
-        // const ref = (groupReportArr.length - 3 === gIndex) ? viewRef : undefined
-
         return (
           <div key={gIndex}>
             <div className={classNames(scss.groupHeader)}>
@@ -87,6 +82,7 @@ export default function ReporterList(
                 employeeId,
                 name: chName,
                 date: twDate,
+                prevDate: groupReportArr?.[gIndex + 1]?.date
               }
 
               const statusChecker = (status: TdailyReportReviewStatusDto) => {

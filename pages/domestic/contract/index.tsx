@@ -1,19 +1,18 @@
 import { useState } from "react";
-
+import { useRouter } from "next/router";
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
 import ContractList from "components/page/domestic/contract/contractList";
 
 // option
-import { optionsCreator_doorType, Toption } from 'js/utils/options/options';
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-const optionsDoorType = optionsCreator_doorType()
+import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
+
+const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true })
 const optionsCounty = optionsCreator_county()
-optionsDoorType.unshift({ value: "", label: "不拘" })
 optionsCounty.unshift({ value: "", label: "不拘" })
 
 // css
@@ -29,70 +28,67 @@ import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleA
 // 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
 export default function Contract() {
+  const router = useRouter()
 
   // ===================================================
-  // panelList
-
-  // 搜尋用的
-  const [searchObj, setSearchObj] = useState<TsearchObj>({
-    doorType: "",
-    county: "",
-    clientName: "",
-    projectName: "",
-  })
-
+ 
   // 資料
   const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
   const projectArr = projectSimple.wrapper.get({
     filter: {
-      county: searchObj.county,
-      clientName: searchObj.clientName,
-      constructionName: searchObj.projectName,
+      county: router.query.county as string,
+      clientName: router.query.clientName as string,
+      constructionName: router.query.projectName as string,
     }
   })
   // ---------------------------------------------------
   // panelList
+
   const searchTargetList = [
     {
-      stateValue: optionsDoorType[0],
-      options: optionsDoorType,
+      options: optionDoorModel,
       placeholder: "選擇門型",
       width: "100px",
+      defaultValue: router.query.doorModel as string
     },
     {
-      stateValue: optionsCounty[0],
       options: optionsCounty,
       placeholder: "選擇地區",
       width: "80px",
+      defaultValue: router.query.county as string
     },
     {
-      stateValue: "",
       placeholder: "請輸入客戶名稱",
+      defaultValue: router.query.clientName as string
     },
     {
-      stateValue: "",
       placeholder: "請輸入專案名稱",
+      defaultValue: router.query.projectName as string
     },
   ]
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    let [doorTypeOption, countyOption, clientName, projectName] = valueArr
-    const doorType = (doorTypeOption as Toption).value
-    const county = (countyOption as Toption).value
-    clientName = clientName as string
-    projectName = projectName as string
-    setSearchObj({
-      doorType,
-      county,
-      clientName,
-      projectName,
-    })
-  }
+    const doorModel = (valueArr[0] as Toption).value
+    const county = (valueArr[1] as Toption).value
+    const clientName = (valueArr[2] as string)
+    const projectName = (valueArr[3] as string)
+
+    router.push({
+      href: "",
+      query: {
+        ...router.query,
+        doorModel,
+        county,
+        clientName,
+        projectName
+      },
+    });
+  };
+
   const searchGroup = {
     searchTargetList,
     doSearch
   }
-
 
   const panelList: TpanelList = [{
     searchGroup

@@ -13,7 +13,7 @@ import QuotationAdditions from "components/page/domestic/quotation/quotationAddi
 import QuotationTotal from "components/page/domestic/quotation/quotationTotal_legacyContract"
 import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
 
-import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
+// import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
@@ -176,7 +176,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
 
   // -----------------------------------------------------------------------
-  const [showPdf, setShowPdf] = useState(false)
+  // const [showPdf, setShowPdf] = useState(false)
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
@@ -274,10 +274,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={!allowEdit} />
         </div>
       </div>
-      <QuotationPdf
+      {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => { setShowPdf(false) }}
-        classLegacyContract={classLegacyContract} />
+        classLegacyContract={classLegacyContract} /> */}
     </SubLayer>
   )
 }

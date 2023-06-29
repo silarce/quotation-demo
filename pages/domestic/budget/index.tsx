@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react'
-import { useRouter } from "next/router";
+import { useState } from 'react'
+import { useRouter, NextRouter } from "next/router";
 import _ from "lodash"
-import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
 import BudgeList from "components/page/domestic/budget/budgetList"
@@ -17,11 +15,12 @@ import BudgeList from "components/page/domestic/budget/budgetList"
 import scss from "./budget.module.scss"
 
 // option
-import { optionsCreator_doorType } from 'js/utils/options/options';
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-const optionsDoorType = optionsCreator_doorType()
+import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
+
+
+const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true })
 const optionsCounty = optionsCreator_county()
-optionsDoorType.unshift({ value: "", label: "不拘" })
 optionsCounty.unshift({ value: "", label: "不拘" })
 
 
@@ -29,10 +28,6 @@ optionsCounty.unshift({ value: "", label: "不拘" })
 // fake
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
-// type
-import { Toption } from "js/utils/options/options"
-
-type Trouter = ReturnType<typeof useRouter>
 
 // ===========================================
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
@@ -46,83 +41,58 @@ type Trouter = ReturnType<typeof useRouter>
 
 export default function Budget() {
   const router = useRouter()
-  // -----------------------------------------------------------------------
-  // 搜尋用的 //這個資料不會render在畫面上
-  // render在畫面上的是PageHeader02元件裡的狀態
-  const [searchObj, setSearchObj] = useState<TsearchObj>({
-    doorType: "",
-    county: "",
-    clientName: "",
-    projectName: "",
-  })
 
   // 資料
   const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple })
   const projectArr = projectSimple.wrapper.get({
     filter: {
-      county: searchObj.county,
-      clientName: searchObj.clientName,
-      constructionName: searchObj.projectName,
+      county: router.query.county as string,
+      clientName: router.query.clientName as string,
+      constructionName: router.query.projectName as string,
     }
   })
-
-  useEffect(() => {
-    const { doorType, county, clientName, projectName, }
-      = router.query as Record<string, string | undefined>
-    setSearchObj({
-      doorType: doorType ?? "",
-      county: county ?? "",
-      clientName: clientName ?? "",
-      projectName: projectName ?? "",
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.query])
-
 
   // ----------------------------------------------------------
   // panelList
 
   const searchTargetList = [
     {
-      stateValue: optionsDoorType[0],
-      options: optionsDoorType,
+      options: optionDoorModel,
       placeholder: "選擇門型",
       width: "100px",
+      defaultValue: router.query.doorModel as string
     },
     {
-      stateValue: optionsCounty[0],
       options: optionsCounty,
       placeholder: "選擇地區",
       width: "80px",
+      defaultValue: router.query.county as string
     },
     {
-      stateValue: "",
       placeholder: "請輸入客戶名稱",
+      defaultValue: router.query.clientName as string
     },
     {
-      stateValue: "",
       placeholder: "請輸入專案名稱",
+      defaultValue: router.query.projectName as string
     },
   ]
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    const [doorTypeOption, countyOption, clientName, projectName] = valueArr;
-    const query = _.cloneDeep(router.query);
-    const params = [
-      { key: "doorType", value: (doorTypeOption as Toption).value },
-      { key: "county", value: (countyOption as Toption).value },
-      { key: "clientName", value: clientName as string },
-      { key: "projectName", value: projectName as string },
-    ];
-    params.forEach(({ key, value }) => {
-      value = value.trim()
-      if (value) query[key] = value;
-      else delete query[key];
-    });
+    const doorModel = (valueArr[0] as Toption).value
+    const county = (valueArr[1] as Toption).value
+    const clientName = (valueArr[2] as string)
+    const projectName = (valueArr[3] as string)
 
     router.push({
       href: "",
-      query,
+      query: {
+        ...router.query,
+        doorModel,
+        county,
+        clientName,
+        projectName
+      },
     });
   };
 
@@ -173,7 +143,7 @@ export default function Budget() {
 
 const ApprovalsBar = (
   { router }:
-    { router: Trouter }
+    { router: NextRouter }
 ) => {
   const query = router.query
   const linkList = [
@@ -186,7 +156,6 @@ const ApprovalsBar = (
           approvalsStatus: "待審核"
         }
       },
-      // isActive: query.approvalsStatus === "待審核"
       isActive: !query.approvalsStatus || query.approvalsStatus === "待審核"
     },
     {

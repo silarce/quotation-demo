@@ -77,15 +77,26 @@ div.selOption {
 
 .selPlaceholder {
   font-size: 16px;
-  font-weight: 500px;
+  font-weight: 500;
   color: $colorBorder01;
 }
 .selSingleValue {
   font-size: 16px;
-  font-weight: 500px;
+  font-weight: 500;
   color: $colorMain;
+  // padding-right: 10px;
 }
 .selInput {
   font-size: 16px;
-  font-weight: 500px;
+  font-weight: 500;
+}
+
+.mr10 {
+  margin-right: 10px;
+}
+.mr20 {
+  margin-right: 20px;
+}
+.mr30 {
+  margin-right: 30px;
 }
