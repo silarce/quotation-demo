@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import _ from "lodash"
 
 // layer
 import PageHeader, { TpanelList } from "components/page/worksDepartment/contracList/contract/gear/PageHeader"
@@ -8,7 +9,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 // component
 import WorkSheetProfile from "components/page/worksDepartment/contracList/contract/workSheet/profile"
 import WorkSheetCard from "components/page/worksDepartment/contracList/contract/workSheet/card";
-
+import WorkSheetProduct from "components/page/worksDepartment/contracList/contract/workSheet/product";
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
@@ -29,9 +30,26 @@ const optionArr_doorTrack = optionsCre_doorTrack_normal()
 export default function WorkSheet() {
   const [disabled, setDisabled] = useState(true)
 
-  const { control, handleSubmit } = useForm({ defaultValues: fakeWorkSheet });
+  const { control, handleSubmit, watch, setValue } = useForm({ defaultValues: fakeWorkSheet });
 
   const [activeCard, setActiveCard] = useState(-1)
+
+
+
+  const fakeWorkSheet_ori = useMemo(() => {
+    const copy = _.cloneDeep(watch())
+    const keyArr = [
+      "itemName", "doorType", "length", "height",
+      "thickness", "quantity", "material",
+    ] as const
+
+    keyArr.forEach(key => {
+      setValue(key, "")
+    })
+    setValue("typhoonProtection", true)
+    return copy
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
 
 
@@ -81,9 +99,23 @@ export default function WorkSheet() {
                 </div>
               )
             })}
-          </div>
-          <div className={scss.right}></div>
-        </div>
+          </div> {/* left */}
+
+
+          <div className={scss.right}>
+            <WorkSheetProduct
+              control={control}
+              fakeWorkSheet_ori={fakeWorkSheet_ori}
+              disabled={disabled}
+            />
+
+            <hr />
+
+          </div> {/* right */}
+
+
+        </div> {/* main */}
+
       </form>
 
     </SubLayer>
@@ -93,6 +125,7 @@ export default function WorkSheet() {
 // ====================================================================
 
 export type TfakeworkSheet = {
+  // profile right
   /**工程編號 */
   projectNumber: string
   /**承包商 */
@@ -104,6 +137,7 @@ export type TfakeworkSheet = {
   /**公司傳真 */
   companyFax: string
 
+  // profile left
   /**工程名稱 */
   projectName: string
   /**工程內容 */
@@ -123,16 +157,37 @@ export type TfakeworkSheet = {
   /**工程負責人電話 */
   projectPrincipalPhone: string
 
+  // 合約產品項目
+  /**項目 */
+  itemName: string
+  /**門型 */
+  doorType: string
+  /**全寬(L) */
+  length: string
+  /**淨高(h) */
+  height: string
+  /**捲箱高(B) */
+  thickness: string
+  /**數量 */
+  quantity: string
+  /**材質 */
+  material: string
+  /**防颱 */
+  typhoonProtection: boolean
+
+
 };
 
 
 const fakeWorkSheet: TfakeworkSheet = {
+  // profile right
   projectNumber: "工程編號",
   contractor: "承包商",
   principal: "負責人",
   companyPhone: "公司電話",
   companyFax: "公司傳真",
 
+  // profile left
   projectName: "工程名稱",
   projectDesc: "工程內容",
   constructionSiteNumber: "工地電話",
@@ -142,6 +197,29 @@ const fakeWorkSheet: TfakeworkSheet = {
   projectAddress: "花巷草弄20號",
   projectPrincipal: "工程負責人",
   projectPrincipalPhone: "工程負責人電話",
+
+  // 合約產品項目
+  /**項目 */
+  itemName: "項目",
+  /**門型 */
+  doorType: "門型",
+  /**全寬(L) */
+  length: "全寬(L)",
+  /**淨高(h) */
+  height: "淨高(h)",
+  /**捲箱高(B) */
+  thickness: "捲箱高(B)",
+  /**數量 */
+  quantity: "數量",
+  /**材質 */
+  material: "材質",
+  /**防颱 */
+  typhoonProtection: true,
+
+
+
+
+
 }
 
 

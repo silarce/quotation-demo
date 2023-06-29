@@ -22,6 +22,16 @@
     padding: 0 9px;
     overflow-y: scroll;
   }
+  .right {
+    margin-left: 10px;
+    margin-right: 22px;
+    > hr {
+      margin: 32px 0;
+      &:nth-of-type(1) {
+        margin-top: 10px;
+      }
+    }
+  }
 }
 
 .sel {
