@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import classNames from "classnames";
 import moment from "moment";
 import { Badge } from "antd";
@@ -7,7 +7,7 @@ import { Badge } from "antd";
 import scss from "./monthReportTable.module.scss"
 
 // type
-import { TdailyReportDto } from "js/api/dtoTypes";
+import { TaccountingReportDto, TaccountingReportStatistic } from "js/api/dtoTypes";
 
 // other
 import { myConfig } from "config/myConfig";
@@ -19,16 +19,15 @@ import { holidaysLookup } from "config/date/holidaysLookup";
 export default function MonthReportTable(
   {
     isoDate,
-    groupedReport }:
+    accountingReport = []
+  }:
     {
       isoDate: string
-      groupedReport: {
-        chName: string;
-        list: { [key: string]: TdailyReportDto | undefined; }
-      }[]
+      accountingReport: TaccountingReportDto[] | undefined
     }
 ) {
 
+  const ref_main = useRef<HTMLDivElement>(null)
 
   const { weekDays: dayArr, holidayLookup_month } = useMemo(() => {
     const weekDays = [];
@@ -57,16 +56,31 @@ export default function MonthReportTable(
 
   // -----------------------------------------------------------------
   let monthTotal = 0
+
+  const mainWidth = (() => {
+    if (!ref_main.current?.getBoundingClientRect().width) return 0
+    return ref_main.current?.getBoundingClientRect().width + 66 + "px"
+  })()
+
   // -----------------------------------------------------------------
   return (
     <div className={scss.container}>
       <div className={scss.table}>
         <Side dayArr={dayArr} holidayLookup_month={holidayLookup_month} />
         {/* group */}
-        <div className={scss.main}>
+        <div className={scss.main} ref={ref_main}>
 
-          {groupedReport.map((group, gIndex) => {
-            const { chName, list } = group
+          {accountingReport.map((accReport, aIndex) => {
+            const { employeeId, employeeName, statistic, } = accReport
+
+            const statisticsObj = (() => {
+              const obj: { [key: string]: TaccountingReportStatistic } = {}
+              statistic.forEach((item) => {
+                const dateDay = moment(item.date).date()
+                obj[dateDay] = item
+              })
+              return obj
+            })()
 
             let breakfastTotal = 0
             let lunchTotal = 0
@@ -74,27 +88,27 @@ export default function MonthReportTable(
             let stayLengthTotal = 0
 
             return (
-              <div key={gIndex} className={scss.item}>
-                <Head chName={chName} />
+              <div key={aIndex} className={scss.item}>
+                <Head chName={employeeName ?? ""} />
 
                 {dayArr.map((dayObj) => {
                   const { day, date, dateMoment } = dayObj
                   const dateDay = dateMoment.date().toString()
-                  const { items } = list[dateDay] ?? {}
+
+                  const statistics =
+                    statisticsObj[dateDay] as TaccountingReportStatistic | undefined
+
                   let breakfast = 0
                   let lunch = 0
                   let dinner = 0
-                  let stayLength = 0
+                  let stayLength = statistics?.stayLength ?? 0
 
-                  items?.forEach((item) => {
-                    stayLength = stayLength + (item.stayLength || 0)
-                    const meals = item.meals
-                    meals.forEach((meal) => {
-                      if (meal === "breakfast") breakfast++
-                      if (meal === "lunch") lunch++
-                      if (meal === "dinner") dinner++
-                    })
+                  statistics?.meals?.forEach((meal) => {
+                    if (meal === "breakfast") breakfast++
+                    if (meal === "lunch") lunch++
+                    if (meal === "dinner") dinner++
                   })
+
                   breakfastTotal = breakfastTotal + breakfast
                   lunchTotal = lunchTotal + lunch
                   dinnerTotal = dinnerTotal + dinner
@@ -147,7 +161,7 @@ export default function MonthReportTable(
         </div>{/* group */}
       </div> {/* table */}
 
-      <div className={scss.total}>
+      <div className={scss.total} style={{ width: mainWidth }}>
         <div>
           <div><span>本月總合計</span></div>
           <div><span>{monthTotal}</span></div>

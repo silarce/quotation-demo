@@ -319,7 +319,7 @@ export type TaccountingReportStatistic = {
 export type TaccountingReportDto = {
   employeeId: string
   employeeName: string | null
-  statistics: TaccountingReportStatistic[]
+  statistic: TaccountingReportStatistic[]
 }
 
 

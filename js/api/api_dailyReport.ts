@@ -314,31 +314,18 @@ type TgetAccountingReport = {
   meta: TpageMetaDto
 }
 
-const apiAccountingReport = (
-  customParams?: Tparams,
-) => {
-  const api = "daily-repoorts/accounting-report"
-  const params = {
-    sort: "date",
-    order: "DESC",
-    ...customParams
-  }
+const apiAccountingReport = (date: string) => {
+  const api = "/daily-reports/accounting-report"
+  const params = { date }
   return axi.get(api, { params })
     .then(({ data }) => data as TgetAccountingReport)
     .catch(err => Promise.reject(err))
 }
 
-export const useApiAccountReports = (params?: Tparams) => {
+export const useApiAccountReports = (date: string) => {
   const [res, setRes] = useState<TgetAccountingReport>()
-  const update = async (dynamicFilter?: Tparams["filter"]) => {
-    const theParams: Tparams = {
-      ...params,
-      filter: {
-        ...params?.filter,
-        ...dynamicFilter
-      }
-    }
-    const data = await apiAccountingReport(theParams)
+  const update = async (dynamicDate?: string) => {
+    const data = await apiAccountingReport(dynamicDate || date)
     if (data) setRes(data)
     return data
   }
