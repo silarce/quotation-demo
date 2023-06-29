@@ -17,15 +17,16 @@ type TcheckProps = {
   propsList: {
     [key: string]: {
       value: boolean
-      label: string
+      label?: string
       disabled?: boolean
       className?: string
       style?: CSSProperties
     }
   }
-  onChange: (v: Tcheck) => void,
+  onChange?: (v: Tcheck) => void,
   checkStyle?: CSSProperties,
   isRadio?: boolean,
+  toAside?: "left"
 }
 
 type Tcheck = { [key: string]: boolean }
@@ -37,7 +38,7 @@ export default function CheckBar(
     { checkProps: TcheckProps }
 ) {
 
-  const { propsList, onChange, checkStyle, isRadio } = checkProps
+  const { propsList, onChange, checkStyle, isRadio, toAside: textAlign } = checkProps
 
 
   const [checkList, setCheckList] = useState<Tcheck>({})
@@ -58,12 +59,13 @@ export default function CheckBar(
 
 
   useEffect(() => {
-    onChange(checkList)
+    if (onChange) onChange(checkList)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkList])
 
+
   return (
-    <div className={classNames(scss.checkBar)}>
+    <div className={classNames(scss.checkBar, { [scss[`aside${textAlign}`]]: textAlign },)}>
       {keyArr.map((key) => {
         const value = checkList[key]
         const { label, disabled, className, style } = propsList[key]
@@ -78,8 +80,11 @@ export default function CheckBar(
         }
         return (
           <label key={key} style={{ ...checkStyle, ...style }}
-            className={classNames(scss.wrapper, className)} >
-            <span>{label}</span>
+            className={classNames(
+              scss.wrapper,
+              { [scss[`aside${textAlign}`]]: textAlign },
+              className)} >
+            {label && <span>{label}</span>}
             <Checkbox className={classNames(scss.antdCheck)} checked={value}
               onChange={(e) => onChange(e.target.checked)}
               disabled={disabled}
