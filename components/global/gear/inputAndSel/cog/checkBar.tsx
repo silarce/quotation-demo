@@ -34,8 +34,11 @@ type Tcheck = { [key: string]: boolean }
 export type { TcheckProps }
 
 export default function CheckBar(
-  { checkProps, }:
-    { checkProps: TcheckProps }
+  { checkProps, disabled }:
+    {
+      checkProps: TcheckProps
+      disabled?: boolean
+    }
 ) {
 
   const { propsList, onChange, checkStyle, isRadio, toAside: textAlign } = checkProps
@@ -68,7 +71,7 @@ export default function CheckBar(
     <div className={classNames(scss.checkBar, { [scss[`aside${textAlign}`]]: textAlign },)}>
       {keyArr.map((key) => {
         const value = checkList[key]
-        const { label, disabled, className, style } = propsList[key]
+        const { label, disabled: disabled_item, className, style } = propsList[key]
         const onChange = (v: boolean) => {
           const copy = { ...checkList }
           if (isRadio) {
@@ -78,6 +81,9 @@ export default function CheckBar(
           else copy[key] = v
           setCheckList(copy)
         }
+
+        const theDisabled = disabled_item !== undefined ? disabled_item : disabled
+
         return (
           <label key={key} style={{ ...checkStyle, ...style }}
             className={classNames(
@@ -87,7 +93,7 @@ export default function CheckBar(
             {label && <span>{label}</span>}
             <Checkbox className={classNames(scss.antdCheck)} checked={value}
               onChange={(e) => onChange(e.target.checked)}
-              disabled={disabled}
+              disabled={theDisabled}
             />
           </label>
         )

@@ -286,6 +286,13 @@ div.fontSize20px {
           background-color: $colorMain;
         }
       }
+      :global(.ant-checkbox-disabled) {
+        :global(.ant-checkbox-inner) {
+          &::after {
+            border-color: #fff;
+          }
+        }
+      }
     }
   }
 }

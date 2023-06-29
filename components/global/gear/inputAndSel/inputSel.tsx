@@ -219,6 +219,7 @@ export default function InputSel(
       {checkProps &&
         <CheckBar
           checkProps={checkProps}
+          disabled={disabled}
         />
       }
 
