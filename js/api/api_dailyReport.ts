@@ -11,6 +11,8 @@ import {
   TemployeeDto,
   TpageMetaDto,
   TdailyReportWokerDto,
+  TaccountingReportStatistic,
+  TaccountingReportDto,
   Tparams,
 } from "./dtoTypes"
 
@@ -20,7 +22,8 @@ export type {
   TdailyReportDto,
   TdailyReportWokerDto,
   Tparams,
-  TemployeeDto
+  TemployeeDto,
+  TaccountingReportDto
 }
 // =================================================================
 
@@ -38,8 +41,8 @@ const apiDailyReports = (
 ) => {
   const api = `/daily-reports`
   const params = {
-    populate: [
-      "employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted",],
+    populate:
+      ["employee", "reviewStatus.reviewerEmployee.jobs", "isReviewCompleted"],
     sort: "date",
     order: "DESC",
     ...customParams
@@ -51,6 +54,7 @@ const apiDailyReports = (
 }
 
 export const useApiDailyReports = (params?: Tparams) => {
+  /**用來取消請求 */
   const [controller, setController] = useState<AbortController>()
   const [res, setRes] = useState<TgetDailyReports>()
 
@@ -93,7 +97,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
     page,
     // pageSize必須大於畫面一次可顯示的item數量才不會壞掉    
     // 不過應該只有在嚴格模式會壞掉
-    pageSize: 15,
+    pageSize: 50,
     ...customParams
   } as const
 
@@ -104,6 +108,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
 
   const update_infinite = async () => {
     if (meta && !meta.hasNextPage) return
+    setIsloading(true)
     const res = await apiDailyReports(params)
     setIsloading(false)
     const dataArrQueueCopy = [...dataArrQueue]
@@ -301,3 +306,34 @@ export const useApiGetDailyReportsWorkers = (params?: Tparams) => {
     setRes,
   }
 }
+
+
+
+type TgetAccountingReport = {
+  data: TaccountingReportDto[]
+  meta: TpageMetaDto
+}
+
+const apiAccountingReport = (date: string) => {
+  const api = "/daily-reports/accounting-report"
+  const params = { date }
+  return axi.get(api, { params })
+    .then(({ data }) => data as TgetAccountingReport)
+    .catch(err => Promise.reject(err))
+}
+
+export const useApiAccountReports = (date: string) => {
+  const [res, setRes] = useState<TgetAccountingReport>()
+  const update = async (dynamicDate?: string) => {
+    const data = await apiAccountingReport(dynamicDate || date)
+    if (data) setRes(data)
+    return data
+  }
+  return {
+    accountingReport: res?.data,
+    setAccountReports: setRes,
+    updateAccountReports: update,
+  }
+}
+
+

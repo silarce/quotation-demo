@@ -113,6 +113,7 @@ export default function MyDatePicker(
         onChange={theOnChange}
         onFocus={theOnFocus}
         onBlur={theOnBlur}
+        inputReadOnly={true}
         {
         ...{
           // 上面的showToday有型別錯誤，不知道為什麼

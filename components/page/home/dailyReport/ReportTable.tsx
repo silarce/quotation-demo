@@ -75,7 +75,16 @@ export default function ReportTable(
 
   const classDailyReportItemArr = reportInEdit?.items
 
-  const isEdit = reportInEdit?.isEdit
+
+  const { isEdit, prevDate } = reportInEdit ?? {}
+
+
+  const isYesterdaySamePrevDate = (() => {
+    if (!reportInEdit) return false
+    if (!prevDate) return false
+    const yesterday = moment(reportInEdit.date).subtract(1, "day")
+    return moment(prevDate).isSame(yesterday)
+  })()
 
 
   const [monthStart, setMonthStart] = useState<string>()
@@ -537,6 +546,7 @@ export default function ReportTable(
           visible={showModal_meals}
           onConfirm={modalOnConfirm_meals}
           onCancel={modalOnCancel_meals}
+          isYesterdaySamePrevDate={isYesterdaySamePrevDate}
         />
 
         <LicensePlateSelector
@@ -1025,4 +1035,13 @@ const Bar_reporter_reviewed = () => {
 
 // ===================================================================
 
+
+
+/**
+取得日期
+取得下一筆資料的日期
+
+要先知道正在編輯的資料的index
+
+ */
 

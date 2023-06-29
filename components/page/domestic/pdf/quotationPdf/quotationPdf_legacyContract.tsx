@@ -107,7 +107,7 @@ export default function QuotationPdf(
   // -------------------------------
   // total
   const totalPram = (() => {
-    const memoArr = classLegacyContract.classMemo.stringArr
+    const memoArr = classLegacyContract.classNotes.stringArr
 
     const subTotal = classLegacyContract.classPayInfo.subTotal
     const businessTax = classLegacyContract.classPayInfo.salesTax
@@ -124,7 +124,7 @@ export default function QuotationPdf(
   // -------------------------------
   // other
   const otherPram = (() => {
-    const quoteRangeArr = classLegacyContract.classQuoteRange.stringArr
+    const quoteRangeArr = classLegacyContract.classQuoteScopes.stringArr
     const attn = classLegacyContract.classSignature.operatorName
 
     const payInfo = (() => {

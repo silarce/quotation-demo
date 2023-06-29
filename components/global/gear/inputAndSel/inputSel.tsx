@@ -15,6 +15,7 @@ import MySelect, { TselectProps } from "./cog/mySelect";
 import Textarea, { TtextareaProps } from "./cog/textarea";
 import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
 import MyTimePicker, { TtimePickerProps } from "./cog/myTimePicker";
+import CheckBar, { TcheckProps } from "./cog/checkBar";
 
 // gear
 import MustTip_simple from "../other/mustTip_simple";
@@ -59,6 +60,7 @@ export default function InputSel(
     textareaProps,
     datePickerProps,
     timePickerProps,
+    checkProps,
 
     isMustPreStyle,
   }:
@@ -92,6 +94,7 @@ export default function InputSel(
       textareaProps?: TtextareaProps
       datePickerProps?: TdatePickerProps
       timePickerProps?: TtimePickerProps
+      checkProps?: TcheckProps
 
       isMustPreStyle?: "minimal"
 
@@ -210,6 +213,12 @@ export default function InputSel(
           setIsFocus={setIsFocus}
           placeholder={placeholder}
           disabled={disabled}
+        />
+      }
+
+      {checkProps &&
+        <CheckBar
+          checkProps={checkProps}
         />
       }
 

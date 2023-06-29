@@ -1,7 +1,7 @@
 
-import { useMemo, useEffect } from "react"
+import { useMemo } from "react"
 import Image from "next/image"
-import moment, { Moment } from 'moment'
+import moment from 'moment'
 import classNames from "classnames"
 
 import _ from "lodash"
@@ -48,8 +48,9 @@ type Tevent = {
   /** events必要的參數，藉以確認要顯示的日期*/
   end: string
   isReviewCompleted: boolean
-  reportedAt: Date
   isReviewedByUser: boolean
+  isAllowToReview: boolean
+  prevDate: string
 }
 
 // ===========================================================================
@@ -74,20 +75,30 @@ export default function TheCalendar(
 
 
   const theDailyReportArr: Tevent[] = useMemo(() => {
-    return dailyReportArr.map((report) => {
-      const { date, id, isReviewCompleted, employee, reportedAt, reviewStatus } = report
+    return dailyReportArr.map((report, index) => {
+      const { date, id, isReviewCompleted, employee, reviewStatus } = report
       const employeeId = employee.id
       const jobs = employee.jobs ?? []
       const name = employee.chName
       const departmentCode = jobs?.[0]?.department.code ?? ""
 
       const userId = userInfo?.employee?.id
-      const isReviewedByUser =
-        reviewStatus.some((status) => {
-          if (status.reviewedAt) {
-            return status.reviewerEmployeeId === userId
-          }
-        })
+
+      let isReviewedByUser = false
+      let isAllowToReview = false
+
+      reviewStatus.forEach((statu) => {
+        const { type, reviewerEmployee, reviewedAt, reviewerEmployeeId } = statu
+        const reviewerId = reviewerEmployee?.id ?? null
+        if (reviewerId === userInfo.employee?.id && type === "reviewer") {
+          isAllowToReview = true
+        }
+        if (reviewedAt) {
+          return isReviewedByUser = (reviewerEmployeeId === userId)
+        }
+      })
+
+      const prevDate = dailyReportArr[index + 1]?.date
 
       return {
         isMine,
@@ -99,20 +110,13 @@ export default function TheCalendar(
         start: report.date,
         end: report.date,
         isReviewCompleted,
-        reportedAt,
-        isReviewedByUser
+        isReviewedByUser,
+        isAllowToReview,
+        prevDate
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyReportArr]) // dailyReportArr
-
-
-  useEffect(() => {
-    const now = moment()
-    const filter = filterCre_nextAndPrevMonth(now)
-    update_calendar(filter)
-  }, [])
-
 
 
   return (
@@ -220,7 +224,8 @@ const EventWrapper = (
     isMine,
     reportId, employeeId, name, departmentCode,
     date, start, end,
-    isReviewCompleted, reportedAt, isReviewedByUser,
+    isReviewCompleted, isReviewedByUser, isAllowToReview,
+    prevDate,
   } = event
 
 
@@ -231,7 +236,7 @@ const EventWrapper = (
   })()
 
   const onClick = () => {
-    addTag({ reportId, employeeId, name, date })
+    addTag({ reportId, employeeId, name, date, prevDate })
   }
 
   return (
@@ -242,7 +247,10 @@ const EventWrapper = (
         "grid grid-cols-[20px_40px_auto] gap-2 justify-start items-center",
         "text-lg"
       )}>
-        <Image src={checkIcon} alt="" />
+
+        {(isAllowToReview || isMine) && <Image src={checkIcon} alt="" />}
+        {(!isAllowToReview && !isMine) && <div />}
+
         <span>{departmentCode}</span>
         <span>{name}</span>
       </div>

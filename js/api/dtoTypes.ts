@@ -239,7 +239,7 @@ export type TdailyReportItemDto = {
   /**date */
   departureWorksiteTime?: string | null
   licensePlate?: string | null
-  stayLength?: number | null
+  stayLength?: number | null // 基本上是 1|0|null，但如果舊資料沒有更新過，那就可能會是其他數值
   workers: TemployeeDto[] | null
   workOrderNumber: string | null
 }
@@ -286,7 +286,7 @@ export type TcreateDailyReportItemDto = {
   /**date 發出req時會自動被轉為字串*/
   departureWorksiteTime: string | null
   licensePlate: string
-  stayLength: number
+  stayLength: number // 基本上是 1|0
   workerIds: string[] | null
   workOrderNumber: string
 }
@@ -308,6 +308,21 @@ export type TdailyReportWokerDto = {
   chName: TemployeeDto["chName"]
   jobs: TdailyReportWorkerJobsDto[]
 }
+
+// 文件上就沒有Dto後綴
+export type TaccountingReportStatistic = {
+  date: string
+  meals: ("breakfast" | "lunch" | "dinner")[]
+  stayLength: number
+}
+
+export type TaccountingReportDto = {
+  employeeId: string
+  employeeName: string | null
+  statistic: TaccountingReportStatistic[]
+}
+
+
 
 
 
@@ -620,9 +635,26 @@ export type TcreateAnnotationDto = {
 }
 
 
+export type TcreateQuotationRangeDto = {
+  category: string
+  doorModelName: string
+  type: "normal" | "anti-typhoon"
+  description: string
+}
 
-
-
+export type TquotationRangeDto = {
+  id: string
+  createdAt: string
+  updateAt: string
+  /**類別 */
+  category: string
+  /**門型 */
+  doorModelName: string
+  /**型式 */
+  type: "normal" | "anti-typhoon"
+  /**內容 */
+  description: string
+}
 
 
 
