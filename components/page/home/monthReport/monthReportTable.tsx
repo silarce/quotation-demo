@@ -1,7 +1,12 @@
-import { useMemo, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import classNames from "classnames";
 import moment from "moment";
+
+import { useRouter } from "next/router";
+
+// antd
 import { Badge } from "antd";
+
 
 // css
 import scss from "./monthReportTable.module.scss"
@@ -27,7 +32,13 @@ export default function MonthReportTable(
     }
 ) {
 
+
+
   const ref_main = useRef<HTMLDivElement>(null)
+  const [ref, setRef] = useState(ref_main);
+
+
+
 
   const { weekDays: dayArr, holidayLookup_month } = useMemo(() => {
     const weekDays = [];
@@ -57,10 +68,26 @@ export default function MonthReportTable(
   // -----------------------------------------------------------------
   let monthTotal = 0
 
-  const mainWidth = (() => {
-    if (!ref_main.current?.getBoundingClientRect().width) return 0
-    return ref_main.current?.getBoundingClientRect().width + 66 + "px"
-  })()
+
+
+  // const mainWidth = (() => {
+  //   if (!ref_main.current?.getBoundingClientRect().width) return 0
+  //   return ref_main.current?.getBoundingClientRect().width + 66 + "px"
+  // })()
+
+  // ref_main.current?.getBoundingClientRect().width  don't trigger rerender 
+  
+  // const mainWidth = useMemo(() => {
+  //   console.log(ref_main.current?.getBoundingClientRect().width)
+  //   if (!ref_main.current?.getBoundingClientRect().width) return 0
+  //   return ref_main.current?.getBoundingClientRect().width + 66 + "px"
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [ref?.current])
+
+  // console.log(ref_main.current?.getBoundingClientRect().width)
+
+  // console.log(router.isReady)
+  // console.log(mainWidth)
 
   // -----------------------------------------------------------------
   return (
@@ -68,8 +95,8 @@ export default function MonthReportTable(
       <div className={scss.table}>
         <Side dayArr={dayArr} holidayLookup_month={holidayLookup_month} />
         {/* group */}
-        <div className={scss.main} ref={ref_main}>
-
+        {/* <div className={scss.main} ref={ref_main}> */}
+        <div className={scss.main}>
           {accountingReport.map((accReport, aIndex) => {
             const { employeeId, employeeName, statistic, } = accReport
 
@@ -161,7 +188,8 @@ export default function MonthReportTable(
         </div>{/* group */}
       </div> {/* table */}
 
-      <div className={scss.total} style={{ width: mainWidth }}>
+      {/* <div className={scss.total} style={{ width: mainWidth }}> */}
+      <div className={scss.total}>
         <div>
           <div><span>本月總合計</span></div>
           <div><span>{monthTotal}</span></div>
