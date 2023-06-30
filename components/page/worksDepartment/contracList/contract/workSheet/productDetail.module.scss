@@ -1,0 +1,38 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-left: 57px;
+  > p {
+    margin-top: 20px;
+    margin-bottom: 27px;
+    // margin-left: 57px;
+    color: $colorMain;
+    font-size: 20px;
+    // grid的span佔兩格
+    grid-column: span 2;
+  }
+  .left,
+  .right {
+    display: grid;
+    gap: 50px;
+    > .list {
+      display: grid;
+      gap: 15px;
+    }
+    .sutTitle {
+      margin-bottom: 20px;
+      color: $colorMain;
+      font-size: 18px;
+      font-weight: 700;
+    }
+  }
+  .left {
+    // margin-left: 57px;
+  }
+  .right {
+    margin-right: 72px;
+  }
+}
