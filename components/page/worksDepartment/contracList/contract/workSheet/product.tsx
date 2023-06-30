@@ -71,7 +71,6 @@ export default function WorkSheetProduct(
 
               <Controller key={key} name={key} control={control}
                 render={({ field }) => {
-                  console.log(field)
                   return (
                     <InputSel className={classNames(scss.inputSel, className)}
                       label={label}

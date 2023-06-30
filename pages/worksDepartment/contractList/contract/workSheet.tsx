@@ -117,6 +117,7 @@ export default function WorkSheet() {
               disabled={disabled}
             />
 
+            <hr />
 
 
 
@@ -241,9 +242,9 @@ export type TfakeworkSheet = {
     /** 廠商*/
     manufacturer: string
     /** 電供*/
-    voltage: string
+    powerSupply: string
     /** 電壓*/
-    amperage: string
+    voltage: string
     /** 支撐架*/
     support: boolean
     /** 鏈條型式*/
@@ -262,9 +263,9 @@ export type TfakeworkSheet = {
     /** 消音條*/
     silencer: boolean
     /** 型式*/
-    type: string
+    doorTrackType: string
     /** 型式2*/
-    typeName: string
+    doorTrackName: string
   }
 };
 
@@ -364,9 +365,9 @@ const fakeWorkSheet: TfakeworkSheet = {
     /** 廠商*/
     manufacturer: "大同",
     /** 電供*/
-    voltage: "單相",
+    powerSupply: "單相",
     /** 電壓*/
-    amperage: "220V",
+    voltage: "220V",
     /** 支撐架*/
     support: true,
     /** 鏈條型式*/
@@ -385,9 +386,9 @@ const fakeWorkSheet: TfakeworkSheet = {
     /** 消音條*/
     silencer: true,
     /** 型式*/
-    type: "彎",
+    doorTrackType: "彎",
     /** 型式2*/
-    typeName: "sJ302_30"
+    doorTrackName: "sJ302_30"
   },
 
 }
