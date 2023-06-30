@@ -58,9 +58,12 @@ export default function CheckBar(
     })
     setCheckList(list)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [propsList])
+  }, [])
+  // }, [propsList])
 
 
+
+  // 會造成無限循環，要修
   useEffect(() => {
     if (onChange) onChange(checkList)
     // eslint-disable-next-line react-hooks/exhaustive-deps
