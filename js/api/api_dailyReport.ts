@@ -316,7 +316,10 @@ type TgetAccountingReport = {
 
 const apiAccountingReport = (date: string) => {
   const api = "/daily-reports/accounting-report"
-  const params = { date }
+  const params = {
+    date,
+    pageSize: 99999
+  }
   return axi.get(api, { params })
     .then(({ data }) => data as TgetAccountingReport)
     .catch(err => Promise.reject(err))
