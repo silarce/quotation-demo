@@ -12,12 +12,16 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // components
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
+import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
+import EmployeeSelector from "components/global/gear/modal/employeeSelector";
+
 
 // gear
 import SelectBar from "components/global/gear/select/selectBar/selectBar";
 
 // api
 import { useApiAccountReports, } from "js/api/api_dailyReport"
+import { TemployeeDto } from "js/api/api_dailyReport";
 
 // css
 import scss from "./monthReport.module.scss"
@@ -84,6 +88,22 @@ export default function MonthReport() {
 
   // --------------------------------------------------
 
+  const [isShowSelector, setIsShowSelector] = useState<boolean>(false)
+
+  const [employeeIdArr, setEmployeeIdArr] = useState<string[]>()
+
+  const onConfirm = (arr: TemployeeDto[]) => {
+    if (arr.length === 0) return setEmployeeIdArr(undefined)
+    const idArr = arr.map((item) => item.id)
+    setEmployeeIdArr(idArr)
+  }
+
+  const onCancel = () => {
+    setIsShowSelector(false)
+  }
+
+  // --------------------------------------------------
+
   const yearOptionArr = createNumberRangeOptionArr({
     start: +holidaysLookupKeyArr[0],
     end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1],
@@ -116,8 +136,13 @@ export default function MonthReport() {
     }
   ]
 
-
   const panelList: TpanelList = [
+    {
+      type: "myButton",
+      label: "搜尋",
+      onClick: () => { setIsShowSelector(true) },
+      className: scss.btn,
+    },
     {
       custom: <SelectBar
         selectPropsArr={selectPropsArr}
@@ -125,20 +150,27 @@ export default function MonthReport() {
     },
   ]
 
-
   // --------------------------------------------------
   return (
-    <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
-      isLoading_subLayer={isLoading}
-    >
-      <PageHeader02 tag="報表" panelList={panelList} />
+    <>
+      <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
+        isLoading_subLayer={isLoading}
+      >
+        <PageHeader02 tag="報表" panelList={panelList} />
 
-      <MonthReportTable
-        key={year_tw + month}
-        isoDate={isoDate}
-        accountingReport={accountingReport}
+        <MonthReportTable
+          key={year_tw + month}
+          isoDate={isoDate}
+          accountingReport={accountingReport}
+          employeeIdArr={employeeIdArr}
+        />
+      </SubLayer>
+      <EmployeeSelector
+        showModal={isShowSelector}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        tip="不選擇並按確定即可取消搜尋"
       />
-
-    </SubLayer>
+    </>
   )
 }
