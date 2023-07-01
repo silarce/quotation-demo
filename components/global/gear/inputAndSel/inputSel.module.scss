@@ -251,6 +251,9 @@ div.fontSize20px {
   display: flex;
   gap: 35px;
   justify-content: right;
+  &.asideleft {
+    justify-content: left;
+  }
   > * {
     flex: none;
     width: fit-content;
@@ -259,6 +262,11 @@ div.fontSize20px {
   .wrapper {
     text-align: right;
     cursor: pointer;
+
+    &.asideleft {
+      text-align: left;
+    }
+
     > span {
       font-size: 18px;
       color: $colorMain;
@@ -276,6 +284,13 @@ div.fontSize20px {
       :global(.ant-checkbox-checked) {
         :global(.ant-checkbox-inner) {
           background-color: $colorMain;
+        }
+      }
+      :global(.ant-checkbox-disabled) {
+        :global(.ant-checkbox-inner) {
+          &::after {
+            border-color: #fff;
+          }
         }
       }
     }

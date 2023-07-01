@@ -26,7 +26,14 @@ import iconMust from "public/image/icon/asterisk.svg"
 // css
 import scss from "./inputSel.module.scss"
 
-export type { TselectProps }
+export type {
+  TinputProps,
+  TselectProps,
+  TtextareaProps,
+  TdatePickerProps,
+  TtimePickerProps,
+  TcheckProps,
+}
 
 
 // =============================================================================
@@ -219,6 +226,7 @@ export default function InputSel(
       {checkProps &&
         <CheckBar
           checkProps={checkProps}
+          disabled={disabled}
         />
       }
 
