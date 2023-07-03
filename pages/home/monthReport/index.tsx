@@ -90,6 +90,7 @@ export default function MonthReport() {
 
   const [isShowSelector, setIsShowSelector] = useState<boolean>(false)
 
+  // 搜尋/過濾用的
   const [employeeIdArr, setEmployeeIdArr] = useState<string[]>()
 
   const onConfirm = (arr: TemployeeDto[]) => {
@@ -152,6 +153,21 @@ export default function MonthReport() {
     },
   ]
 
+
+  // --------------------------------------------------
+
+
+
+  //使搜尋清單只會有存在於accountingReport的人員
+  const accountingReportIdArr = accountingReport?.map((item) => item.employeeId)
+
+  const customFilter = {
+    id: {
+      $in: accountingReportIdArr
+    },
+  }
+
+
   // --------------------------------------------------
   return (
     <>
@@ -171,6 +187,7 @@ export default function MonthReport() {
         showModal={isShowSelector}
         onConfirm={onConfirm}
         onCancel={onCancel}
+        customFilter={customFilter}
       />
     </>
   )
