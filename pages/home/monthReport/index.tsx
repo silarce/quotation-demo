@@ -138,9 +138,11 @@ export default function MonthReport() {
 
   const panelList: TpanelList = [
     {
-      type: "myButton",
-      label: "搜尋",
-      onClick: () => { setIsShowSelector(true) },
+      type: employeeIdArr ? "redButton" : "myButton",
+      label: employeeIdArr ? "清除搜尋" : "搜尋",
+      onClick: () => {
+        employeeIdArr ? setEmployeeIdArr(undefined) : setIsShowSelector(true)
+      },
       className: scss.btn,
     },
     {
@@ -169,7 +171,6 @@ export default function MonthReport() {
         showModal={isShowSelector}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        tip="不選擇並按確定即可取消搜尋"
       />
     </>
   )
