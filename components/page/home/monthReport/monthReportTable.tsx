@@ -13,7 +13,7 @@ import scss from "./monthReportTable.module.scss"
 
 // type
 import { TaccountingReportDto, TaccountingReportStatistic } from "js/api/dtoTypes";
-
+import { TemployeeDto } from "js/api/api_dailyReport";
 // other
 import { myConfig } from "config/myConfig";
 
@@ -24,11 +24,15 @@ import { holidaysLookup } from "config/date/holidaysLookup";
 export default function MonthReportTable(
   {
     isoDate,
-    accountingReport = []
+    accountingReport = [],
+    employeeIdArr,
+    pushReportId
   }:
     {
       isoDate: string
       accountingReport: TaccountingReportDto[] | undefined
+      employeeIdArr: string[] | undefined
+      pushReportId: (reportId: string) => void
     }
 ) {
 
@@ -76,7 +80,7 @@ export default function MonthReportTable(
   // })()
 
   // ref_main.current?.getBoundingClientRect().width  don't trigger rerender 
-  
+
   // const mainWidth = useMemo(() => {
   //   console.log(ref_main.current?.getBoundingClientRect().width)
   //   if (!ref_main.current?.getBoundingClientRect().width) return 0
@@ -99,6 +103,14 @@ export default function MonthReportTable(
         <div className={scss.main}>
           {accountingReport.map((accReport, aIndex) => {
             const { employeeId, employeeName, statistic, } = accReport
+
+            const shouldShow = (() => {
+              if (!employeeIdArr) return true
+              if (employeeIdArr.includes(employeeId)) return true
+              return false
+            })()
+
+            if (!shouldShow) return null
 
             const statisticsObj = (() => {
               const obj: { [key: string]: TaccountingReportStatistic } = {}
@@ -145,8 +157,17 @@ export default function MonthReportTable(
                   const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {}
                   if (是否放假 === "2") isHoliday = true
 
+
+                  // const onClick = () => pushReportId("目前api沒有給日報表id")
+                  const onClick = undefined
+
                   return (
-                    <div key={date} className={classNames(scss.row, { [scss.isHoliday]: isHoliday })}>
+                    <div key={date} onClick={onClick}
+                      className={classNames(
+                        scss.row,
+                        {
+                          [scss.isHoliday]: isHoliday,
+                        })}>
                       <div className={scss.cell}>{breakfast !== 0 && <MyBadge />}</div>
                       <div className={scss.cell}>{lunch !== 0 && <MyBadge />}</div>
                       <div className={scss.cell}>{dinner !== 0 && <MyBadge />}</div>

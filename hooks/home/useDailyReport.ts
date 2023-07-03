@@ -1,13 +1,11 @@
 import { useState, } from "react"
 import _ from "lodash"
-import moment from "moment";
 
 // type
 import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from "js/api/dtoTypes";
 // api
 import { TcreateDailyReportItemDto, TdailyReportDto, } from "js/api/api_dailyReport"
 // other
-// import { convertDate_add1911, convertDate_reduce1911 } from "js/utils/helpers/date/convertDate"
 
 // =================================================================
 
@@ -36,13 +34,6 @@ const emptyTimeCre = () => {
   date.setSeconds(0)
   return date.toISOString()
 }
-// const emptyTime = (() => {
-//   const date = new Date()
-//   date.setHours(0)
-//   date.setMinutes(0)
-//   date.setSeconds(0)
-//   return date.toISOString()
-// })()
 
 const emptyReportItem: TemptyReportItem = {
   id: "",
@@ -77,10 +68,6 @@ class Class_reportItem {
     this._stayLength = `${this._item.stayLength || 0}`
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[]
     this._meals = (reportItem.meals || []) as TdailyReportItemDto["meals"]
-    // this._meals = ([]) as TdailyReportItemDto["meals"]
-    // if (!this.arrivalTime) this.arrivalTime = emptyTimeCre()
-    // if (!this.departureTime) this.departureTime = emptyTimeCre()
-    // if (!this.departureWorksiteTime) this.departureWorksiteTime = emptyTimeCre()
 
   } // constructor
   private _reRender
@@ -208,20 +195,6 @@ class Class_reportItem {
       stayLength: this._item.stayLength || 0,
       workerIds: workerIdArr,
       workOrderNumber: this.dispatchOrderId ?? "",
-      // test
-      // periodOfDay: "AM",
-      // customerName: "",
-      // contactName: "",
-      // meals: null,
-      // description: "",
-      // departureTime: null,
-      // arrivalTime: null,
-      // departureWorksiteTime: null,
-      // licensePlate: "",
-      // stayLength: 0,
-      // workerIds: null,
-      // workOrderNumber: "",
-      // 
     }
   }
 
@@ -292,9 +265,7 @@ const useReport = (
 
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
-      // date: convertDate_reduce1911(dailyReport.date),
       date: dailyReport.date,
-      // items: dailyReport.items.map((item) => new Class_reportItem(reRender, item)),
       items: sortedItems.map((item) => new Class_reportItem(reRender, item)),
       isAllowToReview,
       isReviewedByOther: isReviewedByOther,

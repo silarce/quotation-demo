@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from "lodash"
 
@@ -16,9 +16,15 @@ import style from "./employeeSelector.module.scss"
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 // api
-import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
+import {
+  Tparams, TapiGetEmployeeParams,
+  useEmployee,
+} from 'js/api/api_employee';
 
 import { AppContext } from "pages/_app"
+
+
+
 
 
 export default function EmployeeSelector(
@@ -29,6 +35,9 @@ export default function EmployeeSelector(
     label,
     tip,
     selLimit,
+    customParams,
+    customFilter
+
   }:
     {
       showModal: boolean
@@ -37,6 +46,8 @@ export default function EmployeeSelector(
       label?: string
       tip?: React.ReactNode
       selLimit?: 1
+      customParams?: Tparams
+      customFilter?: Tparams["filter"]
     }
 ) {
 
@@ -50,7 +61,9 @@ export default function EmployeeSelector(
   const [pageObj, setPageObj] = useState({ page: -1 })
   const page = pageObj.page
 
-  const params: TapiGetEmployeeParams = (() => {
+
+
+  const params: Tparams = (() => {
     const allNum = /^\d+$/.test(searchValue ?? "n")
     const grade = allNum ? searchValue : undefined
     return {
@@ -60,14 +73,23 @@ export default function EmployeeSelector(
       sort: "idNumber",
       filter: {
         "$or": {
-          idNumber: { $contains: searchValue },
+          idNumber: {
+            $contains: searchValue,
+          },
           chName: { $contains: searchValue },
           "jobs.name": { $contains: searchValue },
           "jobs.grade": { $eq: grade },
-        }
-      }
+        },
+        ...customFilter
+      },
+      ...customParams
     }
   })()
+
+
+
+
+
 
   const { data, setData, update, update_infinite } = useEmployee(params)
   const employeeArr = data?.data || []
