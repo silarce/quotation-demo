@@ -326,7 +326,6 @@ export default function DailyReport({ userInfo, }: { userInfo: TuserDto }) {
   }
 
   const editReport_today = async (prevDate: string | undefined) => {
-
     reNew_report({ dailyReport: undefined, userInfo, prevDate })
     searchObjToQuery()
   }
