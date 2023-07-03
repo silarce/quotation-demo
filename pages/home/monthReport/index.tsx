@@ -14,6 +14,7 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
 import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import EmployeeSelector from "components/global/gear/modal/employeeSelector";
+import ReportTable_simple from "components/page/home/monthReport/reportTable_simple";
 
 
 // gear
@@ -136,7 +137,7 @@ export default function MonthReport() {
     }
   ]
 
-  const panelList: TpanelList = [
+  const panelList_list: TpanelList = [
     {
       type: employeeIdArr ? "redButton" : "myButton",
       label: employeeIdArr ? "清除搜尋" : "搜尋",
@@ -179,15 +180,20 @@ export default function MonthReport() {
       <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
         isLoading_subLayer={isLoading}
       >
-        <PageHeader02 tag="報表" panelList={panelList} />
+        <PageHeader02 tag="報表" panelList={panelList_list} />
 
-        <MonthReportTable
-          key={year_tw + month}
-          isoDate={isoDate}
-          accountingReport={accountingReport}
-          employeeIdArr={employeeIdArr}
-          pushReportId={pushReportId}
-        />
+        {!query.reportId &&
+          <MonthReportTable
+            key={year_tw + month}
+            isoDate={isoDate}
+            accountingReport={accountingReport}
+            employeeIdArr={employeeIdArr}
+            pushReportId={pushReportId}
+          />
+        }
+
+        {query.reportId && <ReportTable_simple />}
+
       </SubLayer>
       <EmployeeSelector
         showModal={isShowSelector}

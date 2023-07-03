@@ -14,6 +14,7 @@ import {
   TaccountingReportStatistic,
   TaccountingReportDto,
   Tparams,
+  TdailyReportItemDto,
 } from "./dtoTypes"
 
 
@@ -23,7 +24,8 @@ export type {
   TdailyReportWokerDto,
   Tparams,
   TemployeeDto,
-  TaccountingReportDto
+  TaccountingReportDto,
+  TdailyReportItemDto,
 }
 // =================================================================
 
