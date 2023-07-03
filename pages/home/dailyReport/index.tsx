@@ -857,10 +857,10 @@ const panelListCreator = (
       label: "新增回報",
       onClick: () => {
         if (isCalendar && dailyReport_calendar) {
-          editReport_today(dailyReport_calendar[0].date)
+          editReport_today(dailyReport_calendar?.[0]?.date)
         }
         if (!isCalendar && dailyReportArr) {
-          editReport_today(dailyReportArr[0].date)
+          editReport_today(dailyReportArr?.[0]?.date)
         }
       }
     },
