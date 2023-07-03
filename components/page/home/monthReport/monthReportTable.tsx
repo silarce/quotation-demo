@@ -25,12 +25,14 @@ export default function MonthReportTable(
   {
     isoDate,
     accountingReport = [],
-    employeeIdArr
+    employeeIdArr,
+    pushReportId
   }:
     {
       isoDate: string
       accountingReport: TaccountingReportDto[] | undefined
       employeeIdArr: string[] | undefined
+      pushReportId: (reportId: string) => void
     }
 ) {
 
@@ -155,8 +157,16 @@ export default function MonthReportTable(
                   const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {}
                   if (是否放假 === "2") isHoliday = true
 
+
+                  const onClick = () => pushReportId("目前api沒有給日報表id")
+
                   return (
-                    <div key={date} className={classNames(scss.row, { [scss.isHoliday]: isHoliday })}>
+                    <div key={date} onClick={onClick}
+                      className={classNames(
+                        scss.row,
+                        {
+                          [scss.isHoliday]: isHoliday,
+                        })}>
                       <div className={scss.cell}>{breakfast !== 0 && <MyBadge />}</div>
                       <div className={scss.cell}>{lunch !== 0 && <MyBadge />}</div>
                       <div className={scss.cell}>{dinner !== 0 && <MyBadge />}</div>

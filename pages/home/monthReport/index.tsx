@@ -40,10 +40,9 @@ const holidaysLookupKeyArr = Object.keys(holidaysLookup)
 
 export default function MonthReport() {
   const router = useRouter()
-  // const query = router.query as {
-  //   month?: string | undefined,
-  //   year?: string | undefined
-  // }
+  const query = router.query as {
+    reportId: string
+  }
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -156,8 +155,16 @@ export default function MonthReport() {
 
   // --------------------------------------------------
 
+  const pushReportId = (id: string) => {
+    router.push({
+      query: {
+        ...query,
+        reportId: id
+      }
+    })
+  }
 
-
+  // --------------------------------------------------
   //使搜尋清單只會有存在於accountingReport的人員
   const accountingReportIdArr = accountingReport?.map((item) => item.employeeId)
 
@@ -166,8 +173,6 @@ export default function MonthReport() {
       $in: accountingReportIdArr
     },
   }
-
-
   // --------------------------------------------------
   return (
     <>
@@ -181,6 +186,7 @@ export default function MonthReport() {
           isoDate={isoDate}
           accountingReport={accountingReport}
           employeeIdArr={employeeIdArr}
+          pushReportId={pushReportId}
         />
       </SubLayer>
       <EmployeeSelector
