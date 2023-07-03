@@ -90,6 +90,7 @@ export default function MonthReport() {
 
   const [isShowSelector, setIsShowSelector] = useState<boolean>(false)
 
+  // 搜尋/過濾用的
   const [employeeIdArr, setEmployeeIdArr] = useState<string[]>()
 
   const onConfirm = (arr: TemployeeDto[]) => {
@@ -138,9 +139,11 @@ export default function MonthReport() {
 
   const panelList: TpanelList = [
     {
-      type: "myButton",
-      label: "搜尋",
-      onClick: () => { setIsShowSelector(true) },
+      type: employeeIdArr ? "redButton" : "myButton",
+      label: employeeIdArr ? "清除搜尋" : "搜尋",
+      onClick: () => {
+        employeeIdArr ? setEmployeeIdArr(undefined) : setIsShowSelector(true)
+      },
       className: scss.btn,
     },
     {
@@ -149,6 +152,21 @@ export default function MonthReport() {
       />
     },
   ]
+
+
+  // --------------------------------------------------
+
+
+
+  //使搜尋清單只會有存在於accountingReport的人員
+  const accountingReportIdArr = accountingReport?.map((item) => item.employeeId)
+
+  const customFilter = {
+    id: {
+      $in: accountingReportIdArr
+    },
+  }
+
 
   // --------------------------------------------------
   return (
@@ -169,7 +187,7 @@ export default function MonthReport() {
         showModal={isShowSelector}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        tip="不選擇並按確定即可取消搜尋"
+        customFilter={customFilter}
       />
     </>
   )

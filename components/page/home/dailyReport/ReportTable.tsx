@@ -75,17 +75,7 @@ export default function ReportTable(
 
   const classDailyReportItemArr = reportInEdit?.items
 
-
   const { isEdit, prevDate } = reportInEdit ?? {}
-
-
-  const isYesterdaySamePrevDate = (() => {
-    if (!reportInEdit) return false
-    if (!prevDate) return false
-    const yesterday = moment(reportInEdit.date).subtract(1, "day")
-    return moment(prevDate).isSame(yesterday)
-  })()
-
 
   const [monthStart, setMonthStart] = useState<string>()
   const [monthEnd, setMonthEnd] = useState<string>()
@@ -107,7 +97,41 @@ export default function ReportTable(
 
 
   const [isLoading, setIsLoading] = useState(false)
-  const { dailyReport, setDailyReports, updateDailyReports, controller } = useApiDailyReports(param)
+  /**從當月的上個月到當月的下個月的資料 */
+  const {
+    dailyReport: dailyReport_calendar,
+    setDailyReports: setDailyReports_calendar,
+    updateDailyReports: updateDailyReports_calendar,
+    controller
+  } = useApiDailyReports(param)
+
+
+  const isYesterdayHasReport = useMemo(() => {
+    if (!reportInEdit) return false
+
+    const yesterday = moment(reportInEdit.date).subtract(1, "day")
+
+    // dailyReport_calendar是undefined就代表日期選擇器沒有被渲染出來
+    // 就代表不是新增日報表，而是編輯已存在日報表
+    if (!dailyReport_calendar) {
+      // prevDate為該日報表前一筆資料的日期
+      return moment(prevDate).isSame(yesterday)
+    }
+    /**其實在編輯已存在日報表時可以用isYesterdayHaveReport的作法把總表送進來處理
+     * 但是prevDate已經做好了，所以就繼續用prevDate來處理
+     */
+
+    /**該日報表日期的前一天 */
+    const isYesterdayHaveReport = dailyReport_calendar?.some((report) => {
+      const reportDateM = moment(report.date)
+      return moment(reportDateM).isSame(yesterday, "day")
+    })
+
+    return isYesterdayHaveReport ?? false
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportInEdit?.date])
+
+
 
   const cancelReq = () => {
     if (controller) controller.abort()
@@ -127,7 +151,7 @@ export default function ReportTable(
 
     timeoutId = setTimeout(async () => {
       try {
-        await updateDailyReports()
+        await updateDailyReports_calendar()
       }
       catch { }
       setIsLoading(false)
@@ -137,14 +161,11 @@ export default function ReportTable(
 
   useEffect(() => {
     if (isEdit) return
-    setDailyReports(undefined)
+    setDailyReports_calendar(undefined)
     setMonthStart(undefined)
     setMonthEnd(undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit])
-
-
-
 
 
   const [showModal_worker, setShowModal_worker] = useState(false)
@@ -221,7 +242,7 @@ export default function ReportTable(
           setMonthStart={setMonthStart}
           setMonthEnd={setMonthEnd}
           isLoading={isLoading}
-          dailyReport={dailyReport}
+          dailyReport={dailyReport_calendar}
           cancelReq={cancelReq}
         />
       }
@@ -513,14 +534,6 @@ export default function ReportTable(
                       </div>
                     )
                   }
-                  // 
-                  // return (
-                  //   <div key={cIndex}
-                  //     className={classNames(scss.cell,
-                  //       headerClassName, bodyClassName, headerClassName_mobile, bodyClassName_mobile)}>
-                  //     {cIndex}
-                  //   </div>
-                  // )
                 })}
               </div>
             )
@@ -546,7 +559,7 @@ export default function ReportTable(
           visible={showModal_meals}
           onConfirm={modalOnConfirm_meals}
           onCancel={modalOnCancel_meals}
-          isYesterdaySamePrevDate={isYesterdaySamePrevDate}
+          isYesterdaySamePrevDate={isYesterdayHasReport}
         />
 
         <LicensePlateSelector
@@ -751,17 +764,6 @@ const config: Tconfig = {
     bodyClassName: classNames("row-span-1"),
     bodyClassName_mobile: classNames("h-[43px]"),
   },
-  // stayLength: {
-  //   eleType: "input",
-  //   label: "住宿",
-  //   placeholder: "天數",
-  //   inputType: "number",
-  //   headerClassName: classNames("w-[100px] row-span-3",),
-  //   headerClassName_mobile: classNames("h-[43px]"),
-  //   bodyClassName: classNames("row-span-1", scss.suffix),
-  //   bodyClassName_mobile: classNames("h-[43px]", scss.stayLength),
-  //   suffix: "天"
-  // },
   stayLength: {
     eleType: "select",
     optionArr: [{ value: "0", label: "無" }, { value: "1", label: "有" }],
@@ -803,7 +805,7 @@ const DatePicker = (
     setMonthEnd,
     isLoading,
     dailyReport,
-    cancelReq
+    cancelReq,
   }:
     {
       disabled: boolean
@@ -817,7 +819,6 @@ const DatePicker = (
 
   const { reportInEdit, changeReportDate } = useContext(DailyReportContext)
   const isEdit = reportInEdit?.isEdit
-
 
   const defaultValue = useMemo(() => {
     if (!dailyReport) return undefined
@@ -839,6 +840,16 @@ const DatePicker = (
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [!!dailyReport])
+
+
+
+
+
+
+
+  const [fooDate, setFooDate] = useState<string>()
+
+
 
   return (
     <div className={scss.datePickerWrapper}>
@@ -870,11 +881,12 @@ const DatePicker = (
 
               // // 已經存在的日期都不能選
               if (!dailyReport) return true
-              const disabledDate = dailyReport.some((report) => {
-                return date.isSame(moment(report.date), "day")
-              })
 
-              return disabledDate
+              const isDisabledDate = dailyReport.some((report) => {
+                const isSame = date.isSame(moment(report.date), "day")
+                return isSame
+              })
+              return isDisabledDate
             },
             onPanelChange: (theMoment, mode) => {
               cancelReq()
@@ -1034,14 +1046,3 @@ const Bar_reporter_reviewed = () => {
 
 
 // ===================================================================
-
-
-
-/**
-取得日期
-取得下一筆資料的日期
-
-要先知道正在編輯的資料的index
-
- */
-
