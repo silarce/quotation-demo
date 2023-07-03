@@ -158,7 +158,8 @@ export default function MonthReportTable(
                   if (是否放假 === "2") isHoliday = true
 
 
-                  const onClick = () => pushReportId("目前api沒有給日報表id")
+                  // const onClick = () => pushReportId("目前api沒有給日報表id")
+                  const onClick = undefined
 
                   return (
                     <div key={date} onClick={onClick}
