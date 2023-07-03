@@ -140,7 +140,7 @@ const Item = (
                       customComponents: {
                         Option: (props) => OptionWithIcon01(props, {
                           showLabel: false,
-                          className: scss.selSingleValue_custom,
+                          className: scss.selOption_custom,
                         }),
                         SingleValue: (props) => SingleValueWithIcon01(props, {
                           showLabel: false,
@@ -581,10 +581,6 @@ const configArr_right: Tconfig[] = [
         options: option_doorTrack_normal,
         checkBarPropsListCre: undefined,
       }
-
-
-
     ]
   }
-
 ]
