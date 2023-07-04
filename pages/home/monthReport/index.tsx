@@ -153,6 +153,23 @@ export default function MonthReport() {
     },
   ]
 
+  const panelList_showReport: TpanelList = [
+    {
+      type: "myButton",
+      label: "返回",
+      onClick: () => {
+        router.push({
+          query: {
+            ...query,
+            reportId: undefined
+          }
+        })
+      },
+      className: scss.btn,
+    },
+  ]
+
+  const panelList = query.reportId ? panelList_showReport : panelList_list
 
   // --------------------------------------------------
 
@@ -175,13 +192,13 @@ export default function MonthReport() {
     },
   }
   // --------------------------------------------------
-  
+
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
         isLoading_subLayer={isLoading}
       >
-        <PageHeader02 tag="報表" panelList={panelList_list} />
+        <PageHeader02 tag="報表" panelList={panelList} />
 
         {!query.reportId &&
           <MonthReportTable
