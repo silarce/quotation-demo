@@ -22,6 +22,9 @@ type TsidePathConfig = {
       [key: string]: string
     }
     erpFeature: ErpFeaturesValues[] | "allPass"
+    otherPermissions?: {
+      grade?: number
+    }
     list?: {
       label: string
       path: string
@@ -30,6 +33,9 @@ type TsidePathConfig = {
       }
       /**空陣列會全部禁止 */
       erpFeature: ErpFeaturesValues[] | "allPass"
+      otherPermissions?: {
+        grade?: number
+      }
     }[]
   }[]
 }
@@ -103,6 +109,9 @@ const sidePathList: TsidePathList = {
               label: "報表",
               path: path01 + "/monthReport",
               erpFeature: "allPass",
+              otherPermissions: {
+                grade: 14,
+              }
             },
           ]
         },
