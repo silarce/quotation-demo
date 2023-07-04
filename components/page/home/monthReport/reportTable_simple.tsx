@@ -74,7 +74,7 @@ export default function ReportTable_simple(
 
 
       <div className={classNames(scss.tbody, scss_locale.tbody)}>
-        {dailyReport_id?.items.map((item) => {
+        {dailyReport_id?.items.map((item, index) => {
 
           const { id } = item
 
@@ -92,9 +92,9 @@ export default function ReportTable_simple(
                     <div key={key}
                       className={classNames(
                         scss.cell, headerClassName, bodyClassName)}>
-                      {value?.map((meal) => {
+                      {value?.map((meal,mealIndex) => {
                         return (
-                          <span key={id}>{meal}</span>
+                          <span key={mealIndex}>{meal}</span>
                         )
                       })}
                     </div>

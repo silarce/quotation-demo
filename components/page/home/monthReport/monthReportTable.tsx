@@ -250,7 +250,6 @@ export default function MonthReportTable(
         </div>{/* group */}
       </div> {/* table */}
 
-      {/* <div className={scss.total} style={{ width: mainWidth }}> */}
       <div className={scss.total}>
         <div>
           <div><span>本月總合計</span></div>

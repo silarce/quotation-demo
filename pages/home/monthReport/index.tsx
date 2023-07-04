@@ -12,7 +12,6 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // components
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
-import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import EmployeeSelector from "components/global/gear/modal/employeeSelector";
 import ReportTable_simple from "components/page/home/monthReport/reportTable_simple";
 
@@ -59,12 +58,10 @@ export default function MonthReport() {
 
   const isoDate = useMemo(() => {
     const isoDate = (() => {
-      const year_stand = (() => {
-        return moment(convertDate_add1911(year_tw)).format("YYYY")
-      })()
-      const theMonth = moment(month).format("MM")
+      const year_i18n = parseInt(year_tw) + 1911
       // 因為時區誤差，所以設15號
-      return moment(`${year_stand}-${theMonth}-15`).toISOString()
+      return moment(`${year_i18n}-${month}-15`).toISOString()
+
     })()
     return isoDate
   }, [year_tw, month])
@@ -107,7 +104,7 @@ export default function MonthReport() {
 
   const yearOptionArr = createNumberRangeOptionArr({
     start: +holidaysLookupKeyArr[0],
-    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1],
+    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1] - 1911,
     suffix: "年"
   }
   )
