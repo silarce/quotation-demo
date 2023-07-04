@@ -314,6 +314,8 @@ export type TaccountingReportStatistic = {
   date: string
   meals: ("breakfast" | "lunch" | "dinner")[]
   stayLength: number
+  dailyReportId: string
+  isWorker: boolean
 }
 
 export type TaccountingReportDto = {

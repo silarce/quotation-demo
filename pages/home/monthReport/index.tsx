@@ -12,8 +12,8 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // components
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
-import SetReportEmpModal from "components/page/home/dailyReport/SetReportEmpModal"
 import EmployeeSelector from "components/global/gear/modal/employeeSelector";
+import ReportTable_simple from "components/page/home/monthReport/reportTable_simple";
 
 
 // gear
@@ -58,12 +58,10 @@ export default function MonthReport() {
 
   const isoDate = useMemo(() => {
     const isoDate = (() => {
-      const year_stand = (() => {
-        return moment(convertDate_add1911(year_tw)).format("YYYY")
-      })()
-      const theMonth = moment(month).format("MM")
+      const year_i18n = parseInt(year_tw) + 1911
       // 因為時區誤差，所以設15號
-      return moment(`${year_stand}-${theMonth}-15`).toISOString()
+      return moment(`${year_i18n}-${month}-15`).toISOString()
+
     })()
     return isoDate
   }, [year_tw, month])
@@ -106,7 +104,7 @@ export default function MonthReport() {
 
   const yearOptionArr = createNumberRangeOptionArr({
     start: +holidaysLookupKeyArr[0],
-    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1],
+    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1] - 1911,
     suffix: "年"
   }
   )
@@ -136,7 +134,7 @@ export default function MonthReport() {
     }
   ]
 
-  const panelList: TpanelList = [
+  const panelList_list: TpanelList = [
     {
       type: employeeIdArr ? "redButton" : "myButton",
       label: employeeIdArr ? "清除搜尋" : "搜尋",
@@ -152,6 +150,23 @@ export default function MonthReport() {
     },
   ]
 
+  const panelList_showReport: TpanelList = [
+    {
+      type: "myButton",
+      label: "返回",
+      onClick: () => {
+        router.push({
+          query: {
+            ...query,
+            reportId: undefined
+          }
+        })
+      },
+      className: scss.btn,
+    },
+  ]
+
+  const panelList = query.reportId ? panelList_showReport : panelList_list
 
   // --------------------------------------------------
 
@@ -174,6 +189,7 @@ export default function MonthReport() {
     },
   }
   // --------------------------------------------------
+
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
@@ -181,13 +197,18 @@ export default function MonthReport() {
       >
         <PageHeader02 tag="報表" panelList={panelList} />
 
-        <MonthReportTable
-          key={year_tw + month}
-          isoDate={isoDate}
-          accountingReport={accountingReport}
-          employeeIdArr={employeeIdArr}
-          pushReportId={pushReportId}
-        />
+        {!query.reportId &&
+          <MonthReportTable
+            key={year_tw + month}
+            isoDate={isoDate}
+            accountingReport={accountingReport}
+            employeeIdArr={employeeIdArr}
+            pushReportId={pushReportId}
+          />
+        }
+
+        {query.reportId && <ReportTable_simple reportId={query.reportId} />}
+
       </SubLayer>
       <EmployeeSelector
         showModal={isShowSelector}
