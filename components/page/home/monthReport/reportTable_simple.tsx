@@ -1,42 +1,30 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import classNames from "classnames";
 import moment from "moment";
+import TextareaAutosize from 'react-textarea-autosize';
 
-import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
-
+// layer
+import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01";
 
 // gear
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 // api
 import {
-  TdailyReportDto, TdailyReportItemDto,
+  TdailyReportItemDto,
   useApiDailyReports_id,
 } from "js/api/api_dailyReport";
 
-
-// config
-// import {
-//   Tconfig,
-//   headerKeyArr, bodyKeyArr, config
-// } from "../dailyReport/ReportTable";
-
-
 // css
-// import scss from "./reportTable_simple.module.scss"
 import scss from "../dailyReport/reportTable.module.scss"
 import scss_locale from "./reportTable_simple.module.scss"
 
-
-
 export default function ReportTable_simple(
   {
-    // reportId = "1af97beb-eafd-4654-8c76-56c6cf3f2c72",
-    reportId = "bbd576ff-f31f-4fb6-8f25-74d273a9583c",
+    reportId,
   }:
     {
-      reportId?: string
-
+      reportId: string
     }
 ) {
 
@@ -45,16 +33,19 @@ export default function ReportTable_simple(
     updateDailyReports_id,
   } = useApiDailyReports_id(reportId)
 
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
 
 
   useEffect(() => {
-
     (async () => {
       try {
-        updateDailyReports_id()
+        setIsLoading(true)
+        await updateDailyReports_id()
       } catch (error) {
         myAlert.err({ title: "取得日報表失敗" })
       }
+      setIsLoading(false)
 
     })()
 
@@ -94,7 +85,6 @@ export default function ReportTable_simple(
                 let { headerClassName, bodyClassName, } = config[key] ?? {}
 
                 let value = item[key]
-
 
                 if (key === "meals") {
                   value = value as TdailyReportItemDto["meals"]
@@ -146,17 +136,13 @@ export default function ReportTable_simple(
                       </div>
                     </div>
                   )
-
                 }
 
                 if (
                   key === "departureTime" ||
                   key === "departureWorksiteTime" ||
                   key === "arrivalTime"
-                ) {
-                  value = moment(value as string).format("HH:mm")
-                }
-
+                ) { value = moment(value as string).format("HH:mm") }
 
                 return (
                   <div key={key}
@@ -171,6 +157,8 @@ export default function ReportTable_simple(
           )
         })}
       </div>
+
+      <LoadingCover01 isLoading={isLoading} />
     </div>
   )
 

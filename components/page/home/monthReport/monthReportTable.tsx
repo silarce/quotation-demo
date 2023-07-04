@@ -102,8 +102,9 @@ export default function MonthReportTable(
         {/* <div className={scss.main} ref={ref_main}> */}
         <div className={scss.main}>
           {accountingReport.map((accReport, aIndex) => {
-            const { employeeId, employeeName, statistic, } = accReport
+            const { employeeId, employeeName, statistic } = accReport
 
+            // 過濾/搜尋用的
             const shouldShow = (() => {
               if (!employeeIdArr) return true
               if (employeeIdArr.includes(employeeId)) return true
@@ -121,10 +122,22 @@ export default function MonthReportTable(
               return obj
             })()
 
-            let breakfastTotal = 0
-            let lunchTotal = 0
-            let dinnerTotal = 0
-            let stayLengthTotal = 0
+
+            /**
+              多個worker會共用同一個(同一個id)日報表
+              為了避免重複計算月總計
+             */
+            // 用於顯示這個item的總計，不管isWorker為何都會計算
+            let breakfastTotal_item = 0
+            let lunchTotal_item = 0
+            let dinnerTotal_item = 0
+            let stayLengthTotal_item = 0
+
+            // 用於計算月總計，如果isWorker為false，就不計算
+            let breakfastTotal_calc = 0
+            let lunchTotal_calc = 0
+            let dinnerTotal_calc = 0
+            let stayLengthTotal_calc = 0
 
             return (
               <div key={aIndex} className={scss.item}>
@@ -137,6 +150,8 @@ export default function MonthReportTable(
                   const statistics =
                     statisticsObj[dateDay] as TaccountingReportStatistic | undefined
 
+                  const { dailyReportId, isWorker } = statistics ?? {}
+
                   let breakfast = 0
                   let lunch = 0
                   let dinner = 0
@@ -148,26 +163,37 @@ export default function MonthReportTable(
                     if (meal === "dinner") dinner++
                   })
 
-                  breakfastTotal = breakfastTotal + breakfast
-                  lunchTotal = lunchTotal + lunch
-                  dinnerTotal = dinnerTotal + dinner
-                  stayLengthTotal = stayLengthTotal + stayLength
+                  breakfastTotal_item = breakfastTotal_item + breakfast
+                  lunchTotal_item = lunchTotal_item + lunch
+                  dinnerTotal_item = dinnerTotal_item + dinner
+                  stayLengthTotal_item = stayLengthTotal_item + stayLength
+
+                  if (!isWorker) {
+                    breakfastTotal_calc = breakfastTotal_calc + breakfast
+                    lunchTotal_calc = lunchTotal_calc + lunch
+                    dinnerTotal_calc = dinnerTotal_calc + dinner
+                    stayLengthTotal_calc = stayLengthTotal_calc + stayLength
+                  }
+
+
+
 
                   let isHoliday = false
                   const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {}
                   if (是否放假 === "2") isHoliday = true
 
 
-                  const onClick = () => pushReportId("目前api沒有給日報表id")
-                  // const onClick = undefined
+                  const onClick = () => {
+                    if (dailyReportId) pushReportId(dailyReportId)
+                  }
 
                   return (
                     <div key={date} onClick={onClick}
                       className={classNames(
                         scss.row,
-                        {
-                          [scss.isHoliday]: isHoliday,
-                        })}>
+                        { [scss.isHoliday]: isHoliday, },
+                        { [scss.pointer]: !!dailyReportId, },
+                      )}>
                       <div className={scss.cell}>{breakfast !== 0 && <MyBadge />}</div>
                       <div className={scss.cell}>{lunch !== 0 && <MyBadge />}</div>
                       <div className={scss.cell}>{dinner !== 0 && <MyBadge />}</div>
@@ -177,23 +203,38 @@ export default function MonthReportTable(
                 })}
 
                 <div className={classNames(scss.row)}>
-                  <div className={classNames(scss.cell, scss.mainColor)}><span>{breakfastTotal}</span></div>
-                  <div className={classNames(scss.cell, scss.mainColor)}><span>{lunchTotal}</span></div>
-                  <div className={classNames(scss.cell, scss.mainColor)}><span>{dinnerTotal}</span></div>
-                  <div className={classNames(scss.cell, scss.mainColor)}><span>{stayLengthTotal}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{breakfastTotal_item}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{lunchTotal_calc}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{dinnerTotal_item}</span></div>
+                  <div className={classNames(scss.cell, scss.mainColor)}><span>{stayLengthTotal_item}</span></div>
                 </div>
 
                 {(() => {
                   const { breakfastCost, lunchCost, dinnerCost, stayCost } = myConfig
 
-                  const mealsCostTotal =
-                    breakfastTotal * breakfastCost +
-                    lunchTotal * lunchCost +
-                    dinnerTotal * dinnerCost
 
-                  const styCostTotal = stayLengthTotal * stayCost
+
+                  // -------
+                  // const mealsCostTotal_item =
+                  //   breakfastTotal_item * breakfastCost +
+                  //   lunchTotal_item * lunchCost +
+                  //   dinnerTotal_item * dinnerCost
+
+                  // const styCostTotal_item = stayLengthTotal_item * stayCost
+                  // const total_item = mealsCostTotal_item + styCostTotal_item
+                  // -------
+                  const mealsCostTotal =
+                    breakfastTotal_calc * breakfastCost +
+                    lunchTotal_calc * lunchCost +
+                    dinnerTotal_calc * dinnerCost
+
+                  const styCostTotal = stayLengthTotal_calc * stayCost
                   const total = mealsCostTotal + styCostTotal
+
                   monthTotal = monthTotal + total
+                  // -------
+
+
 
                   return (
                     <>

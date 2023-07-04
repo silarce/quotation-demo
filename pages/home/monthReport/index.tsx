@@ -175,10 +175,7 @@ export default function MonthReport() {
     },
   }
   // --------------------------------------------------
-
-
-  console.log(accountingReport)
-
+  
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
@@ -196,7 +193,7 @@ export default function MonthReport() {
           />
         }
 
-        {query.reportId && <ReportTable_simple />}
+        {query.reportId && <ReportTable_simple reportId={query.reportId} />}
 
       </SubLayer>
       <EmployeeSelector

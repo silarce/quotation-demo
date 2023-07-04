@@ -1,6 +1,7 @@
 @use "styles/theme01" as *;
 
 .table {
+  position: relative;
   .thead {
     grid-template-columns: repeat(4, fit-content(100%)) auto repeat(3, fit-content(100%));
   }
