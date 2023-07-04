@@ -175,6 +175,10 @@ export default function MonthReport() {
     },
   }
   // --------------------------------------------------
+
+
+  console.log(accountingReport)
+
   return (
     <>
       <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
