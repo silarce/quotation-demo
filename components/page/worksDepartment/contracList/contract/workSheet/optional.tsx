@@ -11,10 +11,13 @@ import scss from './optional.module.scss'
 export default function WorkSheetOptional(
   {
     optionArr,
-    onChange }:
+    onChange,
+    disabled
+  }:
     {
       optionArr: { value: string, label: string }[],
       onChange: (arr: string[]) => void
+      disabled: boolean
     }
 ) {
 
@@ -25,6 +28,7 @@ export default function WorkSheetOptional(
       <div>
         <Checkbox.Group
           className={scss.checkGroup}
+          disabled={disabled}
           options={optionArr}
           //  (arr: CheckboxValueType[]) => void
           onChange={(arr) => { onChange(arr as string[]) }} />

@@ -18,6 +18,11 @@
     > span {
       font-size: 18px;
     }
+    &:global(.ant-checkbox-wrapper-disabled) {
+      > span {
+        color: $colorSub;
+      }
+    }
   }
 
   :global(.ant-checkbox) {

@@ -123,12 +123,13 @@ export default function WorkSheet() {
             <WorkSheetOptional
               optionArr={options}
               onChange={(arr) => { }}
+              disabled={disabled}
             />
 
             <hr />
 
-            <WorkSheetProductDetail02 watch={watch} 
-            fakeWorkSheet_ori={fakeWorkSheet_ori}
+            <WorkSheetProductDetail02 watch={watch}
+              fakeWorkSheet_ori={fakeWorkSheet_ori}
             />
 
           </div> {/* right */}
