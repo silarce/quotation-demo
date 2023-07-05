@@ -67,6 +67,10 @@ export default function MyTimePicker_mui(
           /**	If true, the open picker button will not be rendered (renders only the field). */
           // disableOpenPicker={true}
 
+          timeSteps={{
+            minutes: 1,
+          }}
+
           ampm={false}
           slotProps={{
             popper: { anchorEl: ref.current },
