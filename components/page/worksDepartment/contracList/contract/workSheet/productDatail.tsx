@@ -60,7 +60,6 @@ export default function WorkSheetProductDetail(
       </div> {/* left */}
 
 
-
       <div className={scss.right}>
         {configArr_right.map((item) => {
           const { key: pKey, label, list } = item

@@ -12,6 +12,7 @@ import WorkSheetCard from "components/page/worksDepartment/contracList/contract/
 import WorkSheetProduct from "components/page/worksDepartment/contracList/contract/workSheet/product";
 import WorkSheetProductDetail from "components/page/worksDepartment/contracList/contract/workSheet/productDatail";
 import WorkSheetOptional from "components/page/worksDepartment/contracList/contract/workSheet/optional";
+import WorkSheetProductDetail02 from "components/page/worksDepartment/contracList/contract/workSheet/productDatail02";
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
@@ -129,6 +130,9 @@ export default function WorkSheet() {
             />
 
             <hr />
+
+
+            <WorkSheetProductDetail02 />
 
           </div> {/* right */}
 
