@@ -1,6 +1,9 @@
 @use "styles/theme01" as *;
 
 .card {
+  display: grid;
+  grid-template-columns: auto 80px;
+  justify-content: space-between;
   width: 186px;
   padding: 10px;
   padding-bottom: 5px;
@@ -10,6 +13,7 @@
   &.active {
     background-color: #fee;
   }
+
   .left {
     display: grid;
     justify-content: space-between;

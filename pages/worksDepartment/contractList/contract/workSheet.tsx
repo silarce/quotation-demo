@@ -21,6 +21,10 @@ import { SingleValueWithIcon01 } from "components/global/gear/select/singleValue
 // css
 import scss from "./workSheet.module.scss"
 
+// image
+import imgIdk from "public/image/fake/idk01.png"
+
+
 
 // other
 import { optionsCre_doorTrack_normal } from "js/utils/options/doorTrackOptions";
@@ -96,7 +100,7 @@ export default function WorkSheet() {
               const isActive = key === activeCard
               return (
                 <div key={key} onClick={onClick}>
-                  <WorkSheetCard isActive={isActive} />
+                  <WorkSheetCard isActive={isActive} img={imgIdk} />
                 </div>
               )
             })}

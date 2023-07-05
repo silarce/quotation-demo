@@ -1,14 +1,17 @@
 import classNames from "classnames"
 
-import Image from "next/image"
+import Image, { StaticImageData } from "next/image"
 
 
 
 import scss from "./card.module.scss"
 
 export default function WorkSheetCard(
-  { isActive }:
-    { isActive?: boolean }
+  { isActive, img }:
+    {
+      isActive?: boolean
+      img: StaticImageData
+    }
 ) {
 
 
@@ -20,7 +23,7 @@ export default function WorkSheetCard(
         <span>數量 : 12樘</span>
       </div>
       <div className={scss.right}>
-        {/* <Image src={ } alt="" /> */}
+        <Image src={img} alt="" />
       </div>
     </div>
   )
