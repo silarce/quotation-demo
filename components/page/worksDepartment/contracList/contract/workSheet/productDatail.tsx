@@ -134,8 +134,13 @@ const Item = (
                     arrowType: "black",
                   }
                   if (cKey === "doorTrackName") {
+
+
                     selectProps = {
                       ...selectProps,
+                      onChange: (v) => {
+                        onChange(v?.value)
+                      },
                       customComponents: {
                         Option: (props) => OptionWithIcon01(props, {
                           showLabel: false,
@@ -148,7 +153,7 @@ const Item = (
                       }
                     }
                   }
-                }
+                } //   if (module === "select")
 
                 if (module === "checkBar") {
                   const checkBarPropsList = checkBarPropsListCre!()
@@ -178,7 +183,7 @@ const Item = (
                       field.onChange(value)
                     }
                   }
-                }
+                }  //  if (module === "checkBar")
 
                 return (
                   <InputSel className={classNames(
