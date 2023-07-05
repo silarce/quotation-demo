@@ -38,7 +38,9 @@ export default function Labe00() {
 
       <div className="p-5">
 
-        <div className={scss.box} ref={ref}
+        <div 
+        // className={scss.box}
+        //  ref={ref}
         // onClick={() => { open || setOpen(true) }}
         >
           <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -46,22 +48,22 @@ export default function Labe00() {
 
               // label="喵喵喵"
               // value={value || null}
-              ampm={false}
-              className={scss.foo}
+              // ampm={false}
+              // className={scss.foo}
               /**	If true, the open picker button will not be rendered (renders only the field). */
               // disableOpenPicker={true}
 
-              open={open}
-              onClose={() => setOpen(false)}
-              onAccept={(date) => {
-                // const thedate = date
-                setOpen(false)
-                // console.log("acc", date)
-                // setValue(date!)
-                // console.log(thedate.format("HH:mm"))
+              // open={open}
+              // onClose={() => setOpen(false)}
+              // onAccept={(date) => {
+              //   // const thedate = date
+              //   setOpen(false)
+              //   // console.log("acc", date)
+              //   // setValue(date!)
+              //   // console.log(thedate.format("HH:mm"))
 
 
-              }}
+              // }}
 
 
               // onChange={(date) => { console.log("onChange",date) }}
@@ -70,24 +72,24 @@ export default function Labe00() {
               // skipDisabled={true}
 
 
-              slotProps={{
-                popper: { anchorEl: ref.current },
-              }}
+              // slotProps={{
+              //   popper: { anchorEl: ref.current },
+              // }}
 
-              slots={{
-                field: (params) => {
-                  return (
-                    <TimeField
-                      {...params}
-                      onClick={(e) => {
-                        // @ts-ignore
-                        if (params.onClick) params.onClick(e)
-                        setOpen(true)
-                      }}
-                    />
-                  );
-                }
-              }}
+              // slots={{
+              //   field: (params) => {
+              //     return (
+              //       <TimeField
+              //         {...params}
+              //         onClick={(e) => {
+              //           // @ts-ignore
+              //           if (params.onClick) params.onClick(e)
+              //           setOpen(true)
+              //         }}
+              //       />
+              //     );
+              //   }
+              // }}
 
 
             />
