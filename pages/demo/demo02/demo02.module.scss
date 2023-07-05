@@ -1,0 +1,41 @@
+.lab {
+}
+
+.box {
+  width: 300px;
+  background-color: pink;
+}
+
+.foo {
+  // background-color: pink;
+  width: 100%;
+
+  &:global(.MuiFormControl-root) {
+    // display: block;
+  }
+  :global(.MuiInputBase-root) {
+    padding: 0;
+    // display: block !important;
+  }
+
+  input {
+    padding: 0;
+    background-color: #ddd;
+    // width: 100px;
+    // display: block;
+  }
+
+  fieldset {
+    // border: none;
+    // padding: 0;
+    display: none;
+  }
+
+  :global(.MuiInputAdornment-root) {
+    display: none;
+  }
+}
+
+.timeField {
+  position: relative;
+}

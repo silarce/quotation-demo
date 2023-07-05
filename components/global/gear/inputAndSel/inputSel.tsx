@@ -1,13 +1,8 @@
 
-import {
-  ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent,
-
-  useState
-} from "react"
+import { CSSProperties, useState } from "react"
 
 import classNames from "classnames";
 
-import Image from "next/image";
 
 // component
 import Input, { TinputProps } from "./cog/input";
@@ -15,13 +10,13 @@ import MySelect, { TselectProps } from "./cog/mySelect";
 import Textarea, { TtextareaProps } from "./cog/textarea";
 import MyDatePicker, { TdatePickerProps } from "./cog/myDatePicker";
 import MyTimePicker, { TtimePickerProps } from "./cog/myTimePicker";
+import MyTimePicker_mui, { TtimePickerProps_mui } from "./cog/myTimePicker_mui";
+
 import CheckBar, { TcheckProps } from "./cog/checkBar";
 
 // gear
 import MustTip_simple from "../other/mustTip_simple";
 
-// icon
-import iconMust from "public/image/icon/asterisk.svg"
 
 // css
 import scss from "./inputSel.module.scss"
@@ -60,6 +55,8 @@ export default function InputSel(
     textareaProps,
     datePickerProps,
     timePickerProps,
+    timePickerProps_mui,
+
     checkProps,
 
     isMustPreStyle,
@@ -94,10 +91,9 @@ export default function InputSel(
       textareaProps?: TtextareaProps
       datePickerProps?: TdatePickerProps
       timePickerProps?: TtimePickerProps
+      timePickerProps_mui?: TtimePickerProps_mui
       checkProps?: TcheckProps
-
       isMustPreStyle?: "minimal"
-
     }
 
 ) {
@@ -215,6 +211,14 @@ export default function InputSel(
           disabled={disabled}
         />
       }
+
+      {
+        timePickerProps_mui &&
+        <MyTimePicker_mui
+          timePickerProps_mui={timePickerProps_mui}
+        />
+      }
+
 
       {checkProps &&
         <CheckBar

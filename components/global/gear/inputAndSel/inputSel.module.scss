@@ -120,10 +120,36 @@
   }
 } // datePickerBox
 .timePickerPopupt {
+  :global(.ant-picker-content) {
+    height: 300px;
+    :global(.ant-picker-time-panel-column) {
+      width: 80px;
+      :global(.ant-picker-time-panel-cell) {
+        :global(.ant-picker-time-panel-cell-inner) {
+          height: 40px;
+          padding: 0;
+          text-align: center;
+          line-height: 40px;
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
   :global(.ant-picker-footer) {
-    button {
-      background-color: $bgc01;
-      border: solid 1px $colorBorder01;
+    :global(.ant-picker-ok) {
+      float: unset;
+      margin: 5px auto;
+      width: 100%;
+      button {
+        display: block;
+        height: auto;
+        width: 100%;
+
+        padding: 5px 15px;
+        background-color: $bgc01;
+        border: solid 1px $colorBorder01;
+      }
     }
   }
 }
@@ -278,6 +304,44 @@ div.fontSize20px {
           background-color: $colorMain;
         }
       }
+    }
+  }
+}
+
+// =================================================================
+
+.timePicker_mui_wrapper {
+  height: fit-content;
+  width: 100%;
+  .timePicker_mui {
+    width: 100%;
+
+    &:global(.MuiFormControl-root) {
+      display: block;
+    }
+    :global(.MuiInputBase-root) {
+      padding: 0;
+      display: block;
+      line-height: inherit;
+    }
+
+    input {
+      padding: 0;
+      font-size: 18px;
+      font-weight: 400;
+      font-family: "Noto Sans TC", sans-serif;
+      height: auto;
+      line-height: inherit;
+    }
+
+    fieldset {
+      // border: none;
+      // padding: 0;
+      display: none;
+    }
+
+    :global(.MuiInputAdornment-root) {
+      display: none;
     }
   }
 }
