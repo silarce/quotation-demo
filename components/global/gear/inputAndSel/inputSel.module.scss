@@ -120,14 +120,18 @@
   }
 } // datePickerBox
 .timePickerPopupt {
-  :global(.ant-picker-time-panel-column) {
-    width: 80px;
-    :global(.ant-picker-time-panel-cell) {
-      :global(.ant-picker-time-panel-cell-inner) {
-        height: 40px;
-        padding: 0;
-        text-align: center;
-        line-height: 40px;
+  :global(.ant-picker-content) {
+    height: 300px;
+    :global(.ant-picker-time-panel-column) {
+      width: 80px;
+      :global(.ant-picker-time-panel-cell) {
+        :global(.ant-picker-time-panel-cell-inner) {
+          height: 40px;
+          padding: 0;
+          text-align: center;
+          line-height: 40px;
+          font-size: 20px;
+        }
       }
     }
   }
