@@ -28,12 +28,6 @@ import imgIdk from "public/image/fake/idk01.png"
 
 
 
-// other
-import { optionsCre_doorTrack_normal } from "js/utils/options/doorTrackOptions";
-
-const optionArr_doorTrack = optionsCre_doorTrack_normal()
-
-
 export default function WorkSheet() {
   const [disabled, setDisabled] = useState(true)
 
@@ -59,7 +53,8 @@ export default function WorkSheet() {
   }, [])
 
 
-  console.log(watch())
+  // console.log(watch())
+  // console.log(watch("doorType"))
 
 
 
@@ -132,7 +127,9 @@ export default function WorkSheet() {
 
             <hr />
 
-            <WorkSheetProductDetail02 />
+            <WorkSheetProductDetail02 watch={watch} 
+            fakeWorkSheet_ori={fakeWorkSheet_ori}
+            />
 
           </div> {/* right */}
 
@@ -306,19 +303,19 @@ const fakeWorkSheet: TfakeworkSheet = {
   // 
   // 合約產品項目
   /**項目 */
-  itemName: "項目",
+  itemName: "D-SD1-1",
   /**門型 */
-  doorType: "門型",
+  doorType: "SJ-302",
   /**全寬(L) */
-  length: "全寬(L)",
+  length: "5.25",
   /**淨高(h) */
-  height: "淨高(h)",
+  height: "4.87",
   /**捲箱高(B) */
-  thickness: "捲箱高(B)",
+  thickness: "5.50",
   /**數量 */
-  quantity: "數量",
+  quantity: "12",
   /**材質 */
-  material: "材質",
+  material: "不鏽鋼304#",
   /**防颱 */
   typhoonProtection: true,
 
