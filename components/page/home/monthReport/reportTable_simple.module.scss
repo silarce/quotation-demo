@@ -12,12 +12,7 @@
       > div {
         display: grid;
         gap: 5px;
-        // place-content: center;
         align-items: center;
-        padding: 20px;
-        > span {
-          text-align: center;
-        }
         .textareaBox {
           height: fit-content;
           width: 100%;
@@ -27,12 +22,12 @@
             display: block;
             width: 100%;
             font-weight: 400;
-            font-size: 18px;
+            font-size: 16px;
             resize: none;
             background-color: transparent;
           }
         } // textareaBox
-      }
-    }
+      } // div
+    } // row
   }
 }
