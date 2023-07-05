@@ -16,11 +16,13 @@ import sidePathList from './pathList';
 
 // context
 import { LayerCtx } from '../Layer';
+import { TuserDto } from 'js/api/dtoTypes';
+import { is } from 'date-fns/locale';
 
 
 export default function SideNav() {
   const router = useRouter()
-  const { userErpFeature } = useContext(LayerCtx)
+  const { userErpFeature, userInfo } = useContext(LayerCtx)
 
   // -------------------------------------------------------------------
   // pathname與route在404的時候值是"_error"
@@ -34,11 +36,15 @@ export default function SideNav() {
   return (
     <div className={classNames(style.container, "relative")}>
       {linkList?.list.map((item, index) => {
-        const { label, path, list, erpFeature } = item
+        const { label, path, list, erpFeature, otherPermissions } = item
         const reg = new RegExp(`^${path}`)
         let active = reg.test(asPath) ? style.active : ""
 
-        const isPassed = checkErpFeature({ erpFeature, userErpFeature })
+        let isPassed = false
+        isPassed = checkErpFeature({ erpFeature, userErpFeature })
+        if (isPassed && otherPermissions)
+          isPassed = checkOtherPermissions({ userInfo, otherPermissions })
+
         if (!isPassed) return null
 
         if (path) {
@@ -56,14 +62,19 @@ export default function SideNav() {
               <Panel header={label} key={`${index}`}>
                 <ul>
                   {list.map((item, index) => {
-                    const { label, path, erpFeature, query } = item
+                    const { label, path, erpFeature, query, otherPermissions } = item
                     const reg = new RegExp(`^${path}`)
                     let isActive = (() => {
                       const isMatch = _.isMatch(routerQuery, query ?? {})
                       return reg.test(asPath) && isMatch
                     })()
                     const href = { pathname: path, query }
-                    const isPassed = checkErpFeature({ erpFeature, userErpFeature })
+
+                    let isPassed = false
+                    isPassed = checkErpFeature({ erpFeature, userErpFeature })
+                    if (isPassed && otherPermissions)
+                      isPassed = checkOtherPermissions({ userInfo, otherPermissions })
+
                     if (!isPassed) return null
                     return (
                       // <li className={active} key={index}>
@@ -97,3 +108,37 @@ const checkErpFeature = (
   })
   return isPassed
 }
+
+
+const checkOtherPermissions = (
+  { userInfo, otherPermissions }:
+    {
+      userInfo: TuserDto
+      otherPermissions: {
+        grade?: number
+      }
+    }
+) => {
+
+  let isPassed = false
+  const { grade } = otherPermissions
+
+
+  const { jobs } = userInfo?.employee ?? {}
+
+  // -------------------------
+  if (grade) {
+    const highestGrade = (() => {
+      if (jobs) {
+        const sortedJobs = _.sortBy(jobs, "grade").reverse()
+        return sortedJobs[0].grade
+      }
+      return null
+    })()
+    if (highestGrade && highestGrade >= grade) isPassed = true
+  }
+  // -------------------------
+
+  return isPassed
+}
+

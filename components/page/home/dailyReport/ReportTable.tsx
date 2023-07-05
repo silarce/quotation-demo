@@ -841,16 +841,6 @@ const DatePicker = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [!!dailyReport])
 
-
-
-
-
-
-
-  const [fooDate, setFooDate] = useState<string>()
-
-
-
   return (
     <div className={scss.datePickerWrapper}>
       <InputSel
@@ -1046,3 +1036,10 @@ const Bar_reporter_reviewed = () => {
 
 
 // ===================================================================
+
+
+export type { Tconfig }
+
+export {
+  headerKeyArr, bodyKeyArr, config
+}
