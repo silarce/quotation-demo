@@ -11,6 +11,7 @@ import WorkSheetProfile from "components/page/worksDepartment/contracList/contra
 import WorkSheetCard from "components/page/worksDepartment/contracList/contract/workSheet/card";
 import WorkSheetProduct from "components/page/worksDepartment/contracList/contract/workSheet/product";
 import WorkSheetProductDetail from "components/page/worksDepartment/contracList/contract/workSheet/productDatail";
+import WorkSheetOptional from "components/page/worksDepartment/contracList/contract/workSheet/optional";
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
@@ -122,8 +123,12 @@ export default function WorkSheet() {
             />
 
             <hr />
+            <WorkSheetOptional
+              optionArr={options}
+              onChange={(arr) => { }}
+            />
 
-
+            <hr />
 
           </div> {/* right */}
 
@@ -399,7 +404,22 @@ const fakeWorkSheet: TfakeworkSheet = {
 
 
 
+// ===========================================================================
 
+const options = [
+  { value: "門楣", label: "門楣" },
+  { value: "防颱底座鎖固", label: "防颱底座鎖固" },
+  { value: "UL 熔金體", label: "UL 熔金體" },
+  { value: "智慧型密碼開關", label: "智慧型密碼開關" },
+  { value: "遙控器(1:2)", label: "遙控器(1:2)" },
+  { value: "防颱活動中柱(滑軌)", label: "防颱活動中柱(滑軌)" },
+  { value: "颱風活動中柱(可拆式)", label: "颱風活動中柱(可拆式)" },
+  { value: "防爆裝置", label: "防爆裝置" },
+  { value: "手動關閉裝置", label: "手動關閉裝置" },
+  { value: "UPS", label: "UPS" },
+  { value: "煙感+中繼器", label: "煙感+中繼器" },
+  { value: "彈射門", label: "彈射門" },
+];
 
 
 
