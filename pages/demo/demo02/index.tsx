@@ -49,6 +49,9 @@ export default function Labe00() {
               // label="喵喵喵"
               // value={value || null}
               ampm={true}
+              timeSteps={{
+                minutes: 1,
+              }}
               // className={scss.foo}
               /**	If true, the open picker button will not be rendered (renders only the field). */
               // disableOpenPicker={true}
