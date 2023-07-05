@@ -1041,5 +1041,6 @@ const Bar_reporter_reviewed = () => {
 export type { Tconfig }
 
 export {
-  headerKeyArr, bodyKeyArr, config
+  headerKeyArr, bodyKeyArr, config,
+  mealsLookup
 }

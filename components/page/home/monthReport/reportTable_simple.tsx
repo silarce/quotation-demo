@@ -19,6 +19,9 @@ import {
 import scss from "../dailyReport/reportTable.module.scss"
 import scss_locale from "./reportTable_simple.module.scss"
 
+// other
+import { mealsLookup } from "components/page/home/dailyReport/ReportTable";
+
 export default function ReportTable_simple(
   {
     reportId,
@@ -92,9 +95,9 @@ export default function ReportTable_simple(
                     <div key={key}
                       className={classNames(
                         scss.cell, headerClassName, bodyClassName)}>
-                      {value?.map((meal,mealIndex) => {
+                      {value?.map((meal, mealIndex) => {
                         return (
-                          <span key={mealIndex}>{meal}</span>
+                          <span key={mealIndex}>{mealsLookup[meal]}</span>
                         )
                       })}
                     </div>
@@ -142,12 +145,19 @@ export default function ReportTable_simple(
                   key === "departureTime" ||
                   key === "departureWorksiteTime" ||
                   key === "arrivalTime"
-                ) { value = moment(value as string).format("HH:mm") }
+                ) {
+                  if (value === null) value = "00-00"
+                  else value = moment(value as string).format("HH:mm")
+                }
+
+                if (key === "stayLength") {
+                  value = value ? "有" : "無"
+                }
 
                 return (
                   <div key={key}
                     className={classNames(
-                      scss.cell, headerClassName, bodyClassName)}>
+                      scss.cell, headerClassName, bodyClassName,scss.foo)}>
                     <span>{value as string}</span>
                   </div>
                 )
@@ -242,7 +252,7 @@ const config: Tconfig = {
   contactName: {
     label: "接洽人",
     placeholder: "請輸入接洽人",
-    headerClassName: classNames("w-[250px] row-span-3", scss.textLeft),
+    headerClassName: classNames("w-[250px] row-span-3", scss.textLeft,),
     bodyClassName: classNames("row-span-1"),
   },
   description: {
@@ -253,7 +263,7 @@ const config: Tconfig = {
   },
   workers: {
     label: "工務人員",
-    placeholder: "接洽人",
+    placeholder: "工務人員",
     headerClassName: classNames("w-[140px] row-span-6", scss.textLeft),
     bodyClassName: classNames("row-span-2"),
   },
