@@ -59,6 +59,7 @@ export default function WorkSheet() {
   }, [])
 
 
+  console.log(watch())
 
 
 
@@ -93,7 +94,7 @@ export default function WorkSheet() {
       <PageHeader panelList={panelList} />
 
       <form >
-        <WorkSheetProfile control={control} disabled={disabled} />
+        <WorkSheetProfile control={control} watch={watch} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>
           <div className={scss.left}>
@@ -130,7 +131,6 @@ export default function WorkSheet() {
             />
 
             <hr />
-
 
             <WorkSheetProductDetail02 />
 
@@ -285,24 +285,25 @@ export type TfakeworkSheet = {
 
 
 const fakeWorkSheet: TfakeworkSheet = {
+  // profile的資料不應該編輯，之後要把profile的資料從抽出另外處理
   // profile right
-  projectNumber: "工程編號",
-  contractor: "承包商",
-  principal: "負責人",
-  companyPhone: "公司電話",
-  companyFax: "公司傳真",
+  projectNumber: "M-1101201",
+  contractor: "創典科技A有限公司",
+  principal: "李先生",
+  companyPhone: "04-1234567",
+  companyFax: "04-1234567",
 
   // profile left
-  projectName: "工程名稱",
-  projectDesc: "工程內容",
-  constructionSiteNumber: "工地電話",
-  constructionSiteFax: "工地傳真",
-  projectCity: "高雄市",
-  projectDistrict: "大樹區",
-  projectAddress: "花巷草弄20號",
-  projectPrincipal: "工程負責人",
-  projectPrincipalPhone: "工程負責人電話",
-
+  projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+  projectDesc: "捲門＋大門工程",
+  constructionSiteNumber: "04-1234567",
+  constructionSiteFax: "04-1234567",
+  projectCity: "台中市",
+  projectDistrict: "梧棲區",
+  projectAddress: "經二路27號",
+  projectPrincipal: "王先生",
+  projectPrincipalPhone: "0987654321",
+  // 
   // 合約產品項目
   /**項目 */
   itemName: "項目",
