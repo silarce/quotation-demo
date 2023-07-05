@@ -1,3 +1,11 @@
 .subLayerBody.plus {
-  overflow: hidden ;
+  overflow: hidden;
+}
+
+.btn {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  > span {
+    font-size: 16px;
+  }
 }

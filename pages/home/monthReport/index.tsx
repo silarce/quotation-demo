@@ -12,15 +12,16 @@ import SubLayer from "components/Layer/SubLayer/SubLayer"
 
 // components
 import MonthReportTable from "components/page/home/monthReport/monthReportTable";
+import EmployeeSelector from "components/global/gear/modal/employeeSelector";
+import ReportTable_simple from "components/page/home/monthReport/reportTable_simple";
+
 
 // gear
-import SelectBar, { TselectProps } from "components/global/gear/select/selectBar/selectBar";
+import SelectBar from "components/global/gear/select/selectBar/selectBar";
 
 // api
-import {
-  TdailyReportDto,
-  useApiDailyReports,
-} from "js/api/api_dailyReport"
+import { useApiAccountReports, } from "js/api/api_dailyReport"
+import { TemployeeDto } from "js/api/api_dailyReport";
 
 // css
 import scss from "./monthReport.module.scss"
@@ -33,15 +34,15 @@ import { holidaysLookup } from "config/date/holidaysLookup";
 
 
 const holidaysLookupKeyArr = Object.keys(holidaysLookup)
+
 // =============================================================
 
 
 export default function MonthReport() {
   const router = useRouter()
-  // const query = router.query as {
-  //   month?: string | undefined,
-  //   year?: string | undefined
-  // }
+  const query = router.query as {
+    reportId: string
+  }
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -55,42 +56,17 @@ export default function MonthReport() {
   const [year_tw, setYear_tw] = useState<string>(thisYear_tw)
   const [month, setMonth] = useState<string>(thisMonth)
 
-  const { params, isoDate } = useMemo(() => {
+  const isoDate = useMemo(() => {
+    const isoDate = (() => {
+      const year_i18n = parseInt(year_tw) + 1911
+      // 因為時區誤差，所以設15號
+      return moment(`${year_i18n}-${month}-15`).toISOString()
 
-    const dateStr = (() => {
-      const year_stand = (() => {
-        return moment(convertDate_add1911(year_tw)).format("YYYY")
-      })()
-      const theMonth = moment(month).format("MM")
-      return `${year_stand}-${theMonth}`
     })()
-
-    const isoDate = moment(dateStr).toISOString()
-    const monthStart: string =
-      moment(isoDate).startOf('month').toISOString()
-    const monthEnd: string =
-      moment(isoDate).endOf('month').toISOString()
-
-
-    const params = {
-      populate:
-        ["employee", "items"],
-      pageSize: 999,
-      filter: {
-        date: {
-          $gte: monthStart,
-          $lte: monthEnd
-        },
-      }
-    }
-    return { params, isoDate }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return isoDate
   }, [year_tw, month])
 
-  const {
-    dailyReport,
-    setDailyReports, updateDailyReports,
-  } = useApiDailyReports(params)
+  const { accountingReport, updateAccountReports, } = useApiAccountReports(isoDate)
 
 
   useEffect(() => {
@@ -98,41 +74,37 @@ export default function MonthReport() {
     (async () => {
       try {
         setIsLoading(true)
-        await updateDailyReports()
+        await updateAccountReports()
       }
       catch { myAlert.err({ title: "取得資料失敗" }) }
       setIsLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, params])
+  }, [router.isReady, isoDate])
 
-  const groupedReport = useMemo(() => {
-    const sorted = (_.sortBy(dailyReport, ["id", "date"]) ?? []).reverse()
-    const grouped = _.groupBy(sorted, (report) => report.employee.id) as { [key: string]: TdailyReportDto[] }
-    const groupedArray = Object.entries(grouped).map(([key, value]) => grouped[key])
 
-    const groupedObj = groupedArray.map((group) => {
-      const obj: { [key: string]: (typeof group[number]) | undefined } = {}
-      let chName: string = ""
-      group.forEach((item) => {
-        const dateDay = moment(item.date).format("D")
-        obj[dateDay] = item
-        chName = item.employee.chName
-      })
-      return {
-        chName,
-        list: obj
-      }
-    })
-    return groupedObj
-  }, [dailyReport])
   // --------------------------------------------------
 
+  const [isShowSelector, setIsShowSelector] = useState<boolean>(false)
 
+  // 搜尋/過濾用的
+  const [employeeIdArr, setEmployeeIdArr] = useState<string[]>()
+
+  const onConfirm = (arr: TemployeeDto[]) => {
+    if (arr.length === 0) return setEmployeeIdArr(undefined)
+    const idArr = arr.map((item) => item.id)
+    setEmployeeIdArr(idArr)
+  }
+
+  const onCancel = () => {
+    setIsShowSelector(false)
+  }
+
+  // --------------------------------------------------
 
   const yearOptionArr = createNumberRangeOptionArr({
     start: +holidaysLookupKeyArr[0],
-    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1],
+    end: +holidaysLookupKeyArr[holidaysLookupKeyArr.length - 1] - 1911,
     suffix: "年"
   }
   )
@@ -162,8 +134,15 @@ export default function MonthReport() {
     }
   ]
 
-
-  const panelList: TpanelList = [
+  const panelList_list: TpanelList = [
+    {
+      type: employeeIdArr ? "redButton" : "myButton",
+      label: employeeIdArr ? "清除搜尋" : "搜尋",
+      onClick: () => {
+        employeeIdArr ? setEmployeeIdArr(undefined) : setIsShowSelector(true)
+      },
+      className: scss.btn,
+    },
     {
       custom: <SelectBar
         selectPropsArr={selectPropsArr}
@@ -171,23 +150,72 @@ export default function MonthReport() {
     },
   ]
 
+  const panelList_showReport: TpanelList = [
+    {
+      type: "myButton",
+      label: "返回",
+      onClick: () => {
+        router.push({
+          query: {
+            ...query,
+            reportId: undefined
+          }
+        })
+      },
+      className: scss.btn,
+    },
+  ]
+
+  const panelList = query.reportId ? panelList_showReport : panelList_list
 
   // --------------------------------------------------
+
+  const pushReportId = (id: string) => {
+    router.push({
+      query: {
+        ...query,
+        reportId: id
+      }
+    })
+  }
+
+  // --------------------------------------------------
+  //使搜尋清單只會有存在於accountingReport的人員
+  const accountingReportIdArr = accountingReport?.map((item) => item.employeeId)
+
+  const customFilter = {
+    id: {
+      $in: accountingReportIdArr
+    },
+  }
+  // --------------------------------------------------
+
   return (
-    <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
-      isLoading_subLayer={isLoading}
-    >
-      <PageHeader02 tag="報表" panelList={panelList} />
+    <>
+      <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}
+        isLoading_subLayer={isLoading}
+      >
+        <PageHeader02 tag="報表" panelList={panelList} />
 
-      <MonthReportTable
-        key={year_tw + month}
-        isoDate={isoDate}
-        groupedReport={groupedReport}
+        {!query.reportId &&
+          <MonthReportTable
+            key={year_tw + month}
+            isoDate={isoDate}
+            accountingReport={accountingReport}
+            employeeIdArr={employeeIdArr}
+            pushReportId={pushReportId}
+          />
+        }
+
+        {query.reportId && <ReportTable_simple reportId={query.reportId} />}
+
+      </SubLayer>
+      <EmployeeSelector
+        showModal={isShowSelector}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        customFilter={customFilter}
       />
-
-    </SubLayer>
+    </>
   )
 }
-
-
-
