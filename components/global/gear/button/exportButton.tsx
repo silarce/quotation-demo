@@ -1,37 +1,22 @@
-
-
 // icon
-import iconAdd from "public/image/icon/upload.svg"
+import iconAdd from 'public/image/icon/upload.svg';
 
-import style from "./_button.module.scss"
+import style from './_button.module.scss';
 
-
-
-export default function ExportButton({ label, onClick, className }:
-  {
-    label: string
-    onClick: () => void
-    className?: string
-  }) {
-
-
+export default function ExportButton({
+  label,
+  onClick,
+  className,
+}: {
+  label: string;
+  onClick: () => void;
+  className?: string;
+}) {
   return (
-    <button className={`${style.addButton} ${className || ""}`}
-      onClick={onClick}
-    >
+    <button className={`${style.addButton} ${className || ''}`} onClick={onClick}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={iconAdd.src} alt="add" />
-      <span >{label}</span>
+      <span>{label}</span>
     </button>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-

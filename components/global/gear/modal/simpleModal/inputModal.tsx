@@ -1,57 +1,55 @@
-import {
-  Dispatch, SetStateAction,
-  useEffect, useState
-} from "react"
-
-
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 // antd
 import { Modal } from 'antd';
 
 //global gear
-import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
+import TwoBtnFooter from 'components/global/gear/modal/footer/twoBtnFooter';
 
 // css
-import style from "./simpleModal.module.scss"
+import style from './simpleModal.module.scss';
 
-
-export default function InputModal(
-  {
-    visible, setVisible, title, placeholder, className,
-    autoCloseOnConfirm = true,
-    onConfirm, onCancel
-
-  }:
-    {
-      visible: boolean,
-      title: string
-      placeholder?: string
-      onConfirm: (value: string) => void
-      setVisible?: Dispatch<SetStateAction<boolean>>,
-      className?: string
-      autoCloseOnConfirm?: boolean
-      onCancel?: () => void
-    }) {
-
-  const [value, setValue] = useState("")
+export default function InputModal({
+  visible,
+  setVisible,
+  title,
+  placeholder,
+  className,
+  autoCloseOnConfirm = true,
+  onConfirm,
+  onCancel,
+}: {
+  visible: boolean;
+  title: string;
+  placeholder?: string;
+  onConfirm: (value: string) => void;
+  setVisible?: Dispatch<SetStateAction<boolean>>;
+  className?: string;
+  autoCloseOnConfirm?: boolean;
+  onCancel?: () => void;
+}) {
+  const [value, setValue] = useState('');
 
   useEffect(() => {
-    if (visible === false) setValue("")
-  }, [visible])
-
+    if (visible === false) {
+      setValue('');
+    }
+  }, [visible]);
 
   const thisOnConfirm = async () => {
-    await onConfirm(value)
+    await onConfirm(value);
+
     if (autoCloseOnConfirm) {
-      setVisible?.(false)
-      setValue("")
+      setVisible?.(false);
+      setValue('');
     }
-  }
+  };
+
   const thisOnCancel = () => {
-    onCancel && onCancel()
-    setVisible?.(false)
-    setValue("")
-  }
+    onCancel && onCancel();
+    setVisible?.(false);
+    setValue('');
+  };
 
   return (
     <Modal
@@ -61,24 +59,14 @@ export default function InputModal(
       centered={true}
       width={405}
       onCancel={onCancel}
-      footer={<TwoBtnFooter
-        onConfirm={thisOnConfirm}
-        onCancel={thisOnCancel}
-      />}
+      footer={<TwoBtnFooter onConfirm={thisOnConfirm} onCancel={thisOnCancel} />}
     >
       <p>{title}</p>
       <div>
-        <input type="text" placeholder={placeholder}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
+        <input type="text" placeholder={placeholder} value={value} onChange={(e) => setValue(e.target.value)} />
       </div>
     </Modal>
-  )
+  );
 }
 
 // ============================================
-
-
-
-

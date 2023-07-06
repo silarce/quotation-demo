@@ -1,77 +1,78 @@
+import { CSSProperties, FocusEvent } from 'react';
+import classNames from 'classnames';
 
-import { CSSProperties, FocusEvent } from "react"
-import classNames from "classnames";
-
-
-import Select,
-{
+import Select, {
   Props,
-  Options, SingleValue, ActionMeta, ClassNamesConfig,
-  OptionProps, DropdownIndicatorProps, SelectComponentsConfig
-}
-  from 'react-select';
+  Options,
+  SingleValue,
+  ActionMeta,
+  ClassNamesConfig,
+  OptionProps,
+  DropdownIndicatorProps,
+  SelectComponentsConfig,
+} from 'react-select';
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
 
 // icon
-import iconArrowRed from "public/image/icon/arrow_down_red.svg"
-import iconArrowBlack from "public/image/icon/arrow_down.svg"
+import iconArrowRed from 'public/image/icon/arrow_down_red.svg';
+import iconArrowBlack from 'public/image/icon/arrow_down.svg';
 // css
-import scss from "../inputSel.module.scss"
+import scss from '../inputSel.module.scss';
 
 // type
-import type { Toption } from "js/utils/options/options"
+import type { Toption } from 'js/utils/options/options';
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
 export type TselectProps = {
-  value: Toption | string | number | null | undefined
-  options: Toption[]
-  className?: string
-  onChange: (option: SingleValue<Toption>, meta?: ActionMeta<Toption>) => void
-  onFocus?: (e?: FocusEvent<HTMLInputElement>) => void
-  onBlur?: (e?: FocusEvent<HTMLInputElement>) => void
+  value: Toption | string | number | null | undefined;
+  options: Toption[];
+  className?: string;
+  onChange: (option: SingleValue<Toption>, meta?: ActionMeta<Toption>) => void;
+  onFocus?: (e?: FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (e?: FocusEvent<HTMLInputElement>) => void;
   /**每個call back都要return classname */
-  selClassNames?: ClassNamesConfig<Toption, false, GroupBase<Toption>>
-  selectRef?: React.RefObject<HTMLDivElement>
-  openMenuOnFocus?: boolean
-  isSearchable?: boolean
+  selClassNames?: ClassNamesConfig<Toption, false, GroupBase<Toption>>;
+  selectRef?: React.RefObject<HTMLDivElement>;
+  openMenuOnFocus?: boolean;
+  isSearchable?: boolean;
   /**
    *  元件可以收一個參數，型別設定可以參考 mySelect.tsx裡的DropdownIndicator
    * parameter的型別要從'react-select'引入
-  */
-  customComponents?: SelectComponentsConfig<Toption, false, GroupBase<Toption>>
-  arrowType?: "red" | "black"
+   */
+  customComponents?: SelectComponentsConfig<Toption, false, GroupBase<Toption>>;
+  arrowType?: 'red' | 'black';
 
-  fontSize?: "12px" | "14px" | "16px" | "18px" | "20px"
-}
+  fontSize?: '12px' | '14px' | '16px' | '18px' | '20px';
+};
 
 // ==============================================================================
 export default function MySelect<
   Option = Toption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Toption> = GroupBase<Toption>
->(
-  {
-    selectProps,
-    placeholder,
-    disabled,
-    style
-  }:
-    {
-      selectProps: TselectProps
-      placeholder?: string | undefined
-      disabled: boolean | undefined
-      style?: CSSProperties
-    }
-) {
-
+>({
+  selectProps,
+  placeholder,
+  disabled,
+  style,
+}: {
+  selectProps: TselectProps;
+  placeholder?: string | undefined;
+  disabled: boolean | undefined;
+  style?: CSSProperties;
+}) {
   // 如果selectProps.value == false就轉為null
   // 如果是字串，就轉為Toption的型態
   if (selectProps) {
-    const selValue = selectProps.value
-    if (!selValue) selectProps.value = null
-    else if (/string|number/.test(typeof selValue)) {
-      selectProps.value = selectProps.options.find((item) => item.value === selValue)
-        ?? { label: selValue as string, value: selValue as string }
+    const selValue = selectProps.value;
+
+    if (!selValue) {
+      selectProps.value = null;
+    } else if (/string|number/.test(typeof selValue)) {
+      selectProps.value = selectProps.options.find((item) => item.value === selValue) ?? {
+        label: selValue as string,
+        value: selValue as string,
+      };
     }
   }
 
@@ -89,29 +90,35 @@ export default function MySelect<
     arrowType,
     fontSize,
     isSearchable,
-  } = selectProps
+  } = selectProps;
 
   // 客製化元件
   // 箭頭
   const DropdownIndicator = (foo: DropdownIndicatorProps<Toption, false, GroupBase<Toption>>) => {
-    if (disabled) return null
-    const arrowImg = arrowType === "red" ? iconArrowRed.src
-      : arrowType === "black" ? iconArrowBlack.src
-        : iconArrowRed.src
+    if (disabled) {
+      return null;
+    }
+
+    const arrowImg =
+      arrowType === 'red' ? iconArrowRed.src : arrowType === 'black' ? iconArrowBlack.src : iconArrowRed.src;
+
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={arrowImg} alt="下拉箭頭" />
-  }
+    return <img src={arrowImg} alt="下拉箭頭" />;
+  };
 
   const theValue = (() => {
-    if (typeof value === "object" && value) {
-      if (!value.value) return null
+    if (typeof value === 'object' && value) {
+      if (!value.value) {
+        return null;
+      }
     }
-    return value
-  })()
+
+    return value;
+  })();
 
   // -------------------------------------------------------------------------
   return (
-    <div className={classNames(scss.selectBox, className)} style={style}    >
+    <div className={classNames(scss.selectBox, className)} style={style}>
       <Select
         isDisabled={disabled}
         value={theValue as Toption | null}
@@ -119,13 +126,14 @@ export default function MySelect<
         options={options}
         onChange={onChange}
         components={{
-          DropdownIndicator, ...customComponents,
+          DropdownIndicator,
+          ...customComponents,
         }}
         unstyled={true}
-        menuPortalTarget={document.getElementById("__next")}
+        menuPortalTarget={document.getElementById('__next')}
         onFocus={onFocus}
         onBlur={onBlur}
-        menuPosition={"fixed"}
+        menuPosition={'fixed'}
         ref={selectRef as any} // 實在是不知道怎麼設這個型別
         isSearchable={isSearchable ?? false}
         openMenuOnFocus={openMenuOnFocus}
@@ -137,13 +145,14 @@ export default function MySelect<
           menu: (state) => classNames(scss.selMenu, selClassNames?.menu?.(state)),
           menuList: (state) => classNames(scss.selMenuList, selClassNames?.menuList?.(state)),
           option: (state) => {
-            const isSelected = state.isSelected
+            const isSelected = state.isSelected;
+
             return classNames(
               scss.selOption,
               { [scss.isSelected]: isSelected },
               { [scss[`fontSize${fontSize}`]]: fontSize },
-              selClassNames?.option?.(state),
-            )
+              selClassNames?.option?.(state)
+            );
           },
           valueContainer: (state) =>
             classNames(
@@ -155,19 +164,15 @@ export default function MySelect<
             classNames(
               scss.selPlaceholder,
               { [scss[`fontSize${fontSize}`]]: fontSize },
-              selClassNames?.placeholder?.(state),
+              selClassNames?.placeholder?.(state)
             ),
           singleValue: (state) =>
             classNames(
               scss.selSingleValue,
               { [scss[`fontSize${fontSize}`]]: fontSize },
-              selClassNames?.singleValue?.(state),
-            )
-          ,
-          menuPortal: (state) => classNames(
-            scss.selMenuPortal,scss.plus,
-            selClassNames?.menuPortal?.(state)
-          ),
+              selClassNames?.singleValue?.(state)
+            ),
+          menuPortal: (state) => classNames(scss.selMenuPortal, scss.plus, selClassNames?.menuPortal?.(state)),
           // ----------------
           clearIndicator: (state) => classNames(selClassNames?.clearIndicator?.(state)),
           dropdownIndicator: (state) => classNames(selClassNames?.dropdownIndicator?.(state)),
@@ -184,10 +189,9 @@ export default function MySelect<
           input: (state) => classNames(selClassNames?.input?.(state)),
         }}
       />
-    </div >
-  )
+    </div>
+  );
 }
-
 
 // =============================================================================
 
@@ -218,7 +222,6 @@ export default function MySelect<
 //   singleValue?: string
 //   valueContainer?: string
 // }
-
 
 // Select裡 可客制元件列表
 // type Tcomponent
@@ -251,16 +254,3 @@ export default function MySelect<
 //   SingleValue?: Tcomponent
 //   ValueContainer?: Tcomponent
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -2,7 +2,6 @@
 // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
 CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
-
 // =====================================================
 const path = require('path');
 // =====================================================
@@ -14,16 +13,20 @@ const nextConfig = {
     unoptimized: true,
     // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
   },
-}
+};
 
 module.exports = {
   ...nextConfig,
   future: {
-    webpack5: true
+    webpack5: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   webpack: (config) => {
     // 使import路徑大小寫敏感
-    config.plugins.push(new CaseSensitivePathsPlugin())
-    return config
+    config.plugins.push(new CaseSensitivePathsPlugin());
+
+    return config;
   },
-}
+};
