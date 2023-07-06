@@ -64,7 +64,7 @@ export default function CompanyInfo() {
       return;
     }
 
-    setImgSrc(`${domain}file/download/${logoFileId}`);
+    setImgSrc(`${domain}/file/download/${logoFileId}`);
   }, [companyInfo?.logoFileId]);
 
   // ===================================================
