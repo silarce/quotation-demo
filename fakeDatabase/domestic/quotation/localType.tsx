@@ -1,7 +1,6 @@
 type Toption = {
-  value: string
-  label: string
-}
+  value: string;
+  label: string;
+};
 
-
-export type { Toption }
+export type { Toption };

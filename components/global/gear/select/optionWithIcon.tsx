@@ -1,28 +1,25 @@
+import { components } from 'react-select';
 
-
-import { components } from "react-select";
-
-import { OptionProps, } from 'react-select';
+import { OptionProps } from 'react-select';
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
 
-import type { Toption } from "js/utils/options/options"
+import type { Toption } from 'js/utils/options/options';
 
-const { Option } = components
+const { Option } = components;
 
-import style from "./optionWithIcon.module.scss"
-
+import style from './optionWithIcon.module.scss';
 
 export function OptionWithIcon01(
   props: OptionProps<Toption, false, GroupBase<Toption>>,
   props2?: {
-    className?: string
-    showLabel?: boolean
+    className?: string;
+    showLabel?: boolean;
   }
 ) {
-  const { className, showLabel = true, } = props2 || {}
+  const { className, showLabel = true } = props2 || {};
 
-  const { data } = props
-  const { label, icon } = data
+  const { data } = props;
+  const { label, icon } = data;
 
   return (
     <Option {...props} className={style.option}>
@@ -30,5 +27,5 @@ export function OptionWithIcon01(
       {icon && <img src={icon} alt="iconImg" />}
       {showLabel && <span>{label}</span>}
     </Option>
-  )
+  );
 }

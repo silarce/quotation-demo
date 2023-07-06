@@ -1,28 +1,13 @@
-
-
-
-
-
-
-
 // css
-import style from "./departments.module.scss"
-
-
-
-
+import style from './departments.module.scss';
 
 export default function Caption() {
-
-
-
-
   return (
     <div className={style.caption}>
       <div className={`${style.cell} ${style.head}`}>
         <span>職等/部門</span>
       </div>
-      
+
       <div className={`${style.cell}`}>
         <span>Level 15</span>
       </div>
@@ -68,28 +53,6 @@ export default function Caption() {
       <div className={`${style.cell}`}>
         <span>Level 1</span>
       </div>
-
-
-
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

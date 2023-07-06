@@ -1,21 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
+import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import styles from '../../styles/index.module.scss';
 
-import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import styles from '../../styles/index.module.scss'
-
-
-import InputSel from 'components/global/gear/inputAndSel/inputSel'
-
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 const Home: NextPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
-    router.push("/home/dailyReport?isMine=true")
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    router.push('/home/dailyReport?isMine=true');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -23,9 +20,7 @@ const Home: NextPage = () => {
         <h1>首頁</h1>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
-
-
+export default Home;

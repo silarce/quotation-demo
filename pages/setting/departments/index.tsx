@@ -1,230 +1,235 @@
 // 公司職等職稱
 // 公司職等職稱
-import {
-  MouseEvent,
-  useState, useEffect,
-} from "react"
+import { MouseEvent, useState, useEffect } from 'react';
 
-const _ = require("lodash")
+import _ from 'lodash';
 
 // layer
-import SubLayer from "components/Layer/SubLayer/SubLayer"
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import List from "components/page/setting/departments/list"
-import Caption from "components/page/setting/departments/caption"
-
+import List from 'components/page/setting/departments/list';
+import Caption from 'components/page/setting/departments/caption';
 
 // glogal gear
-import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import InputModal from "components/global/gear/modal/simpleModal/inputModal"
-import myAlert from "components/global/gear/modal/simpleModal/alertModals"
-import LoadingCover01 from "components/global/gear/loadingCover/loadingCover01"
-import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // api
 import {
-  TdepartmentDto_jobs, TjobDto, TupdateDepartmentJobDto,
-  useDepartments_jobs,  // 取得部門列表
+  TdepartmentDto_jobs,
+  TjobDto,
+  TupdateDepartmentJobDto,
+  useDepartments_jobs, // 取得部門列表
   apiPostDepartments, // 新增部門
   apiDeleteDepartments, // 刪除部門
   apiDeleteJobs, // 刪除職等
   apiPatchDepartments, // 批次更新部門資料(包括name與底下的jobs)
-  Tparams_jobs
-} from "js/api/api_department"
+  Tparams_jobs,
+} from 'js/api/api_department';
 
 // css
-import style from "./departments.module.scss"
-
-
+import style from './departments.module.scss';
 
 // ===========================================================
 const params: Tparams_jobs = {
-  populate: ["jobs"],
+  populate: ['jobs'],
   // order: "DESC",
-  sort: "createdAt",
+  sort: 'createdAt',
   /*  建立ClassJobArr時會將job取出依grade放進陣列相應位置
       再用CSS做逆序排列，所以不會用到sort或order  
       要改排列的話，找到departments.module.scss的.columns與.cell.head  
 
       後記:現在jobs會在useDepartments_jobs裡做排序了
       */
-}
+};
+
 // ===========================================================
 export default function Department() {
-  const [isReady, setIsReady] = useState(false)
-  const [editable, setEditable] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showAdd, setShowAdd] = useState(false)
+  const [isReady, setIsReady] = useState(false);
+  const [editable, setEditable] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
   // ---------------------------------------------------------
   // 取得部門列表
-  const { data, setData, update } = useDepartments_jobs(params)
-  const departmentArr = data?.data ?? []
-
+  const { data, setData, update } = useDepartments_jobs(params);
+  const departmentArr = data?.data ?? [];
 
   // 將部門資料轉為Class
-  const { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData }
-    = useClass(departmentArr, editable)
+  const { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData } = useClass(departmentArr, editable);
 
   // -------------------------------------------------------------------------
 
   const toUpdate = async () => {
     try {
-      setIsLoading(true)
-      return await update()
+      setIsLoading(true);
+
+      return await update();
+    } catch {
+    } finally {
+      setIsLoading(false);
     }
-    catch { }
-    finally { setIsLoading(false) }
-  }
+  };
 
   useEffect(() => {
     (async () => {
-      await toUpdate()
-      setIsReady(true)
-    })()
+      await toUpdate();
+      setIsReady(true);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   // ---------------------------------------------------------
   const upload = async () => {
-    setEditable(false)
+    setEditable(false);
     // 刪除部門>刪除職等>新增部門>更新部門職等
 
     // -------------------------------
     // 刪除部門
-    showRootLoading(true, "正在刪除部門")
+    showRootLoading(true, '正在刪除部門');
     // 移除dWillDelete為true的Cdepartment，並取得被移除的Cdepartment
-    const departmentWillDeleteArr
-      = _.remove(CdepartmentArr, (item: ClassDepartment) => item.dWillDelete)
+    const departmentWillDeleteArr = _.remove(CdepartmentArr, (item: ClassDepartment) => item.dWillDelete);
+
     // dwe === departmentWillRemove
-    for (let dwr of departmentWillDeleteArr) {
-      const id = dwr.id
-      const name = dwr.name
+    for (const dwr of departmentWillDeleteArr) {
+      const id = dwr.id;
+      const name = dwr.name;
+
       try {
-        await apiDeleteDepartments(id)
-      }
-      catch {
-        alert(`刪除部門${name}發生錯誤`)
+        await apiDeleteDepartments(id);
+      } catch {
+        alert(`刪除部門${name}發生錯誤`);
       }
     }
+
     // -------------------------------
     // 刪除職等
-    showRootLoading(true, "正在刪除職等")
-    const jobIdWillDeleteArr: ClassJob[] = []
+    showRootLoading(true, '正在刪除職等');
+    const jobIdWillDeleteArr: ClassJob[] = [];
     // 把jWillDelete為true的job設為undefined
     CdepartmentArr.forEach((department) => {
       department.jobs.forEach((job, index) => {
         if (job?.jWillDelete) {
-          jobIdWillDeleteArr.push(job)
-          department.jobs[index] = undefined
+          jobIdWillDeleteArr.push(job);
+          department.jobs[index] = undefined;
         }
-      })
-    })
+      });
+    });
 
-    for (let Cjob of jobIdWillDeleteArr) {
-      const { id, name } = Cjob
+    for (const Cjob of jobIdWillDeleteArr) {
+      const { id, name } = Cjob;
+
       try {
-        await apiDeleteJobs(id)
-      }
-      catch {
-        alert(`刪除職等${name}發生錯誤`)
+        await apiDeleteJobs(id);
+      } catch {
+        alert(`刪除職等${name}發生錯誤`);
       }
     }
+
     // -------------------------------
     // 新增部門
-    showRootLoading(true, "正在新增部門")
-    for (let Cdepartment of CdepartmentArr) {
+    showRootLoading(true, '正在新增部門');
+
+    for (const Cdepartment of CdepartmentArr) {
       if (Cdepartment.dIsNew) {
         try {
-          const res = await apiPostDepartments({ name: Cdepartment.name, code: Cdepartment.code })
-          Cdepartment.id = res.id
-        }
-        catch {
-          alert(`新增部門${Cdepartment.name}發生錯誤，流程中斷`)
-          showRootLoading(false)
-          toUpdate()
-          return
+          const res = await apiPostDepartments({ name: Cdepartment.name, code: Cdepartment.code });
+          Cdepartment.id = res.id;
+        } catch {
+          alert(`新增部門${Cdepartment.name}發生錯誤，流程中斷`);
+          showRootLoading(false);
+          toUpdate();
+
+          return;
         }
       }
     }
-    // -------------------------------
-    showRootLoading(true, "正在更新部門名稱與職等")
-    // 更新部門職等
-    const patchBody = getChangedData()
-    try {
-      await apiPatchDepartments(patchBody)
-    }
-    catch {
-      alert("更新部門名稱與職等發生錯誤")
-    }
-    // -------------------------------
-    showRootLoading(false)
-    await toUpdate()
-  }
-  // ---------------------------------------------------------
 
+    // -------------------------------
+    showRootLoading(true, '正在更新部門名稱與職等');
+    // 更新部門職等
+    const patchBody = getChangedData();
+
+    try {
+      await apiPatchDepartments(patchBody);
+    } catch {
+      alert('更新部門名稱與職等發生錯誤');
+    }
+
+    // -------------------------------
+    showRootLoading(false);
+    await toUpdate();
+  };
+  // ---------------------------------------------------------
 
   const panelList01: TpanelList = [
     {
-      type: "myButton",
-      label: "編輯",
+      type: 'myButton',
+      label: '編輯',
       onClick: () => {
-        if (isLoading) return;
-        setEditable(true)
-      }
-    }
-  ]
+        if (isLoading) {
+          return;
+        }
+
+        setEditable(true);
+      },
+    },
+  ];
   const panelList02: TpanelList = [
     {
-      type: "addButton",
-      label: "新增部門",
+      type: 'addButton',
+      label: '新增部門',
       onClick: () => {
-        setShowAdd(true)
-      }
+        setShowAdd(true);
+      },
     },
     {
-      type: "redButton",
-      label: "上傳",
+      type: 'redButton',
+      label: '上傳',
       // onClick: () => { uploads(myDepartment, toUpdate) }
-      onClick: () => { upload() }
+      onClick: () => {
+        upload();
+      },
     },
     {
-      type: "myButton",
-      label: "取消",
-      onClick: () => { setEditable(false) }
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setEditable(false);
+      },
     },
-  ]
+  ];
+
   // ---------------------------------------------------------
-  if (!isReady) return null
+  if (!isReady) {
+    return null;
+  }
+
   // ---------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader02
-        tag="公司職等職稱"
-        panelList={editable ? panelList02 : panelList01}
-      />
+      <PageHeader02 tag="公司職等職稱" panelList={editable ? panelList02 : panelList01} />
       <div>
-        {data?.data &&
+        {data?.data && (
           <div className={style.department}>
             <Caption />
-            <List
-              editable={editable}
-              CdepartmentArr={CdepartmentArr}
-              removeCdepartment={removeCdepartment}
-            />
+            <List editable={editable} CdepartmentArr={CdepartmentArr} removeCdepartment={removeCdepartment} />
           </div>
-        }
+        )}
         <LoadingCover01 isLoading={isLoading} />
       </div>
       <InputModal
         visible={showAdd}
         setVisible={setShowAdd}
-        title={"請輸入新增部門"}
-        placeholder={"新部門"}
+        title={'請輸入新增部門'}
+        placeholder={'新部門'}
         onConfirm={(v) => addCdepartment(v)}
       />
     </SubLayer>
-  )
+  );
 }
 
 // ==============================================================================
@@ -238,167 +243,162 @@ export default function Department() {
 // ==============================================================================
 
 export class ClassDepartment {
-  id: string
-  _name: string
-  _code: string
-  jobs: (ClassJob | undefined)[]
-  reRender: () => void //更新狀態
+  id: string;
+  _name: string;
+  _code: string;
+  jobs: (ClassJob | undefined)[];
+  reRender: () => void; //更新狀態
 
-  _isFocus = false
+  _isFocus = false;
 
-  dWillDelete = false
-  dWillPatch = false
-  dIsNew = false
-
-
+  dWillDelete = false;
+  dWillPatch = false;
+  dIsNew = false;
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  constructor(
-    department: TdepartmentDto_jobs | { newDepartmentName: string },
-    reRender: () => void
-  ) {
+  constructor(department: TdepartmentDto_jobs | { newDepartmentName: string }, reRender: () => void) {
+    let jobs: TdepartmentDto_jobs['jobs'];
 
-    let jobs: TdepartmentDto_jobs["jobs"];
-    if ("id" in department) {
-      this.id = department.id
-      this._name = department.name
-      this._code = department.code
-      jobs = department.jobs ?? []
-    }
-    else {
-      this.id = ""
-      this._name = department.newDepartmentName
-      this._code = ""
-      jobs = []
-      this.dIsNew = true
+    if ('id' in department) {
+      this.id = department.id;
+      this._name = department.name;
+      this._code = department.code;
+      jobs = department.jobs ?? [];
+    } else {
+      this.id = '';
+      this._name = department.newDepartmentName;
+      this._code = '';
+      jobs = [];
+      this.dIsNew = true;
     }
 
-    const preJobs: (ClassJob | undefined)[] = new Array(15).fill(undefined)
+    const preJobs: (ClassJob | undefined)[] = new Array(15).fill(undefined);
     jobs.forEach((job) => {
-      const theIndex = job.grade - 1
-      preJobs[theIndex] = new ClassJob(job, reRender)
-    })
-    this.jobs = preJobs
+      const theIndex = job.grade - 1;
+      preJobs[theIndex] = new ClassJob(job, reRender);
+    });
+    this.jobs = preJobs;
 
-    this.reRender = reRender
+    this.reRender = reRender;
   } // constructor ------------------
   // --------------------------------------------------------
 
-  get name() { return this._name }
+  get name() {
+    return this._name;
+  }
   set name(v: string) {
-    this._name = v
-    this.dWillPatch = true
-    this.reRender()
+    this._name = v;
+    this.dWillPatch = true;
+    this.reRender();
   }
 
-  get code() { return this._code }
+  get code() {
+    return this._code;
+  }
   set code(v: string) {
-    this._code = v
-    this.dWillPatch = true
-    this.reRender()
+    this._code = v;
+    this.dWillPatch = true;
+    this.reRender();
   }
 
-
-  get isFocus() { return this._isFocus }
+  get isFocus() {
+    return this._isFocus;
+  }
   set isFocus(v: boolean) {
-    this._isFocus = v
-    this.reRender()
+    this._isFocus = v;
+    this.reRender();
   }
 
   addJob = (newJobindex: number) => {
-    this.jobs[newJobindex] = new ClassJob({ newJobindex }, this.reRender)
-    this.reRender()
-  }
+    this.jobs[newJobindex] = new ClassJob({ newJobindex }, this.reRender);
+    this.reRender();
+  };
 
   // 刪除與反刪除按鈕
   dShowDeletePanel = (e: MouseEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+
     if (this.dWillDelete) {
-      this.dWillDelete = false
-      this.reRender()
-    }
-    else {
+      this.dWillDelete = false;
+      this.reRender();
+    } else {
       myAlert.confirm({
         title: `請確認是否刪除？`,
         content: `部門「${this.name}」`,
         className: style.modalConfirm,
         props: {
           onOk: () => {
-            this.dWillDelete = !this.dWillDelete
-            this.reRender()
-          }
-        }
-      })
+            this.dWillDelete = !this.dWillDelete;
+            this.reRender();
+          },
+        },
+      });
     }
-
-
-  } // dShowDeletePanel
+  }; // dShowDeletePanel
 
   // 移除job
   removeJob = (index: number) => {
-    this.jobs[index] = undefined
-    this.reRender()
-  }
-
-
+    this.jobs[index] = undefined;
+    this.reRender();
+  };
 } // ClassDepartment ======================================================
 
 class ClassJob {
-  id: string
-  _name: string
-  grade: number
-  reRender: () => void
-  _isFocus = false
+  id: string;
+  _name: string;
+  grade: number;
+  reRender: () => void;
+  _isFocus = false;
 
-  jWillDelete = false
-  jWillPatch = false
-  jIsNew = false
+  jWillDelete = false;
+  jWillPatch = false;
+  jIsNew = false;
 
   // -----------------------------------------------------
   // -----------------------------------------------------
-  constructor(
-    job: TjobDto | { newJobindex: number },
-    reRender: () => void,
-  ) {
-    if ("id" in job) {
-      this.id = job.id
-      this._name = job.name
-      this.grade = job.grade
+  constructor(job: TjobDto | { newJobindex: number }, reRender: () => void) {
+    if ('id' in job) {
+      this.id = job.id;
+      this._name = job.name;
+      this.grade = job.grade;
+    } else {
+      this.id = '';
+      this._name = '';
+      this.grade = job.newJobindex + 1;
+      this.jIsNew = true;
     }
-    else {
-      this.id = ""
-      this._name = ""
-      this.grade = job.newJobindex + 1
-      this.jIsNew = true
-    }
-    this.reRender = reRender
 
+    this.reRender = reRender;
   } // constructor ------------------
   // -----------------------------------------------------
 
-  get name() { return this._name }
+  get name() {
+    return this._name;
+  }
   set name(v: string) {
-    this._name = v
-    this.jWillPatch = true
-    this.reRender()
+    this._name = v;
+    this.jWillPatch = true;
+    this.reRender();
   }
 
-  get isFocus() { return this._isFocus }
+  get isFocus() {
+    return this._isFocus;
+  }
   set isFocus(v: boolean) {
-    this._isFocus = v
-    this.reRender()
+    this._isFocus = v;
+    this.reRender();
   }
-
 
   // 刪除與反刪除按鈕
   jShowDeletePanel = (e: MouseEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (this.jWillDelete) {
-      this.jWillDelete = false
-      this.reRender()
-      return
+      this.jWillDelete = false;
+      this.reRender();
+
+      return;
     }
 
     myAlert.confirm({
@@ -407,72 +407,82 @@ class ClassJob {
       className: style.modalConfirm,
       props: {
         onOk: () => {
-          this.jWillDelete = !this.jWillDelete
-          this.reRender()
-        }
-      }
-    })
-
-  } // dShowDeletePanel
-
-
+          this.jWillDelete = !this.jWillDelete;
+          this.reRender();
+        },
+      },
+    });
+  }; // dShowDeletePanel
 } // ClassJob=================================================================
 
 const useClass = (departmentArr: TdepartmentDto_jobs[], editable: boolean) => {
-  const [CdepartmentArr, setCdepartmentArr] = useState<ClassDepartment[]>([])
-  const reRender = () => setCdepartmentArr(state => [...state])
+  const [CdepartmentArr, setCdepartmentArr] = useState<ClassDepartment[]>([]);
+  const reRender = () => setCdepartmentArr((state) => [...state]);
 
   useEffect(() => {
-    if (!departmentArr[0] || editable) return;
-    const classArr
-      = departmentArr.map((department) => new ClassDepartment(department, reRender))
-    setCdepartmentArr(classArr)
-  }, [departmentArr, editable])
+    if (!departmentArr[0] || editable) {
+      return;
+    }
+
+    const classArr = departmentArr.map((department) => new ClassDepartment(department, reRender));
+    setCdepartmentArr(classArr);
+  }, [departmentArr, editable]);
 
   const addCdepartment = (newDepartmentName: string) => {
-    CdepartmentArr.push(
-      new ClassDepartment({ newDepartmentName }, reRender)
-    )
-    reRender()
-  }
+    CdepartmentArr.push(new ClassDepartment({ newDepartmentName }, reRender));
+    reRender();
+  };
+
   const removeCdepartment = (index: number) => {
-    CdepartmentArr.splice(index, 1)
-    reRender()
-  }
+    CdepartmentArr.splice(index, 1);
+    reRender();
+  };
 
   const getChangedData = () => {
-
-    const patchArr: TupdateDepartmentJobDto[] = []
+    const patchArr: TupdateDepartmentJobDto[] = [];
 
     CdepartmentArr.forEach((department) => {
-      const { name, id, code,
-        dIsNew, dWillDelete, dWillPatch,
-      } = department
+      const { name, id, code, dIsNew, dWillDelete, dWillPatch } = department;
 
-      if (dWillDelete) return
+      if (dWillDelete) {
+        return;
+      }
 
-      const patchObj: TupdateDepartmentJobDto
-        = { id: id, name: name, code, jobs: [] }
+      const patchObj: TupdateDepartmentJobDto = { id: id, name: name, code, jobs: [] };
 
-      if (!dWillPatch) patchObj.name = undefined
+      if (!dWillPatch) {
+        patchObj.name = undefined;
+      }
 
-      let isJobsChanged = false
+      let isJobsChanged = false;
 
       department.jobs.forEach((job) => {
-        if (!job) return
-        const { name, grade,
-          jWillDelete, jWillPatch, jIsNew,
-        } = job
-        if (jWillDelete || !name) return
-        if (jWillPatch || jIsNew) isJobsChanged = true
-        patchObj.jobs!.push({ name, grade })
-      })
+        if (!job) {
+          return;
+        }
 
-      if (!dWillPatch && !isJobsChanged) return;
+        const { name, grade, jWillDelete, jWillPatch, jIsNew } = job;
 
-      patchArr.push(patchObj)
-    })
-    return patchArr
-  }
-  return { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData }
-}
+        if (jWillDelete || !name) {
+          return;
+        }
+
+        if (jWillPatch || jIsNew) {
+          isJobsChanged = true;
+        }
+
+        patchObj.jobs!.push({ name, grade });
+      });
+
+      if (!dWillPatch && !isJobsChanged) {
+        return;
+      }
+
+      patchArr.push(patchObj);
+    });
+
+    return patchArr;
+  };
+
+  return { CdepartmentArr, addCdepartment, removeCdepartment, getChangedData };
+};

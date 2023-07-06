@@ -1,39 +1,35 @@
-import { useState } from "react"
-import style from "./outboundOrder.module.scss"
+import { useState } from 'react';
+import style from './outboundOrder.module.scss';
 
 // global gear
-import InputSel from "components/global/gear/inputAndSel/inputSel"
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // data
-import { dndCellConfigOutboundOrderOri, TdndCellConfigOutboundOrderKeys } from "config/dndCellConfig"
-const dndCellConfigOutboundOrder = dndCellConfigOutboundOrderOri()
+import { dndCellConfigOutboundOrderOri, TdndCellConfigOutboundOrderKeys } from 'config/dndCellConfig';
+const dndCellConfigOutboundOrder = dndCellConfigOutboundOrderOri();
 
-export default function OrderTable(
-  { editable }:
-    { editable: boolean }) {
-
-  const [orderList, setOrderList] = useState(fakeOrderData)
+export default function OrderTable({ editable }: { editable: boolean }) {
+  const [orderList, setOrderList] = useState(fakeOrderData);
 
   return (
     <div className={style.orderTable}>
-
       <div className={style.thead}>
         {/*  */}
         <div className={`${style.theadItem} ${style.indexCell}`} />
         {/*  */}
 
         {orderKeyIndex01.map((key, index) => {
-          const { label, width, position } = dndCellConfigOutboundOrder[key]
+          const { label, width, position } = dndCellConfigOutboundOrder[key];
           const theStyle = {
-            width
-          }
-          const textCenter = position === "center" ? style.textCenter : ""
+            width,
+          };
+          const textCenter = position === 'center' ? style.textCenter : '';
+
           return (
-            <div className={`${style.theadItem} ${textCenter}`}
-              key={index} style={theStyle}>
+            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
-          )
+          );
         })}
         {/* 灰色柱子 */}
         <div className={` ${style.pilar}`}>
@@ -41,76 +37,80 @@ export default function OrderTable(
         </div>
         {/*  */}
         {orderKeyIndex02.map((key, index) => {
-          const { label, width, position } = dndCellConfigOutboundOrder[key]
+          const { label, width, position } = dndCellConfigOutboundOrder[key];
           const theStyle = {
-            width
-          }
-          const textCenter = position === "center" ? style.textCenter : ""
+            width,
+          };
+          const textCenter = position === 'center' ? style.textCenter : '';
+
           return (
-            <div className={`${style.theadItem} ${textCenter}`}
-              key={index} style={theStyle}>
+            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
-          )
+          );
         })}
       </div>
 
       <div className={style.tableList}>
         {orderList.map((item, groupIndex) => {
-          const { project, list } = item
+          const { project, list } = item;
 
           return (
             <div key={groupIndex}>
               {list.map((row, rowIndex) => {
-                const bgcSub = rowIndex !== 0 ? style.bgcSub : ""
+                const bgcSub = rowIndex !== 0 ? style.bgcSub : '';
+
                 return (
-                  <div className={`${style.row} ${bgcSub}`}
-                    key={rowIndex}>
+                  <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
-                    {rowIndex === 0
-                      ? <div className={`${style.column} ${style.indexCell}`}>
+                    {rowIndex === 0 ? (
+                      <div className={`${style.column} ${style.indexCell}`}>
                         <span>{groupIndex + 1}</span>
                       </div>
-                      : <div className={`${style.column} ${style.indexCell}`}>
+                    ) : (
+                      <div className={`${style.column} ${style.indexCell}`}>
                         <span></span>
                       </div>
-                    }
+                    )}
                     {/*  */}
                     {orderKeyIndex01.map((key, columnIndex) => {
-                      let { value } = row[key]
-                      if (rowIndex !== 0 && columnIndex === 0) value = ""
-                      const { width, position } = dndCellConfigOutboundOrder[key]
-                      const theStyle = { width }
-                      const textCenter = position === "center" ? style.textCenter : ""
+                      let { value } = row[key];
+
+                      if (rowIndex !== 0 && columnIndex === 0) {
+                        value = '';
+                      }
+
+                      const { width, position } = dndCellConfigOutboundOrder[key];
+                      const theStyle = { width };
+                      const textCenter = position === 'center' ? style.textCenter : '';
+
                       return (
-                        <div className={`${style.column} ${textCenter}`}
-                          key={columnIndex} style={theStyle}
-                        >
+                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
                           <span>{value}</span>
                         </div>
-                      )
+                      );
                     })}
                     {/* 沒有柱子的灰色柱子 */}
                     <div className={`${style.pilar}`} />
                     {/*  */}
                     {orderKeyIndex02.map((key, columnIndex) => {
-                      let { value } = row[key]
-                      if (rowIndex !== 0 && columnIndex === 0) value = ""
-                      const { width, position } = dndCellConfigOutboundOrder[key]
-                      const theStyle = { width }
-                      const textCenter = position === "center" ? style.textCenter : ""
+                      let { value } = row[key];
 
-                      const onChange = (v: string) => {
-                        orderList[groupIndex]
-                          .list[rowIndex][key]
-                          .value = v
-                        setOrderList([...orderList])
+                      if (rowIndex !== 0 && columnIndex === 0) {
+                        value = '';
                       }
 
+                      const { width, position } = dndCellConfigOutboundOrder[key];
+                      const theStyle = { width };
+                      const textCenter = position === 'center' ? style.textCenter : '';
+
+                      const onChange = (v: string) => {
+                        orderList[groupIndex].list[rowIndex][key].value = v;
+                        setOrderList([...orderList]);
+                      };
+
                       return (
-                        <div className={`${style.column} ${textCenter}`}
-                          key={columnIndex} style={theStyle}
-                        >
+                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
                           <InputSel
                             className={style.input03}
                             inputProps={{
@@ -121,104 +121,115 @@ export default function OrderTable(
                             disabled={!editable}
                           />
                         </div>
-                      )
+                      );
                     })}
                     {/*  */}
                     {rowIndex !== 0 && <div className={style.ribbon}></div>}
                   </div> // row
-                ) // return
+                ); // return
               })}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
 // =======================================================
 const orderKeyIndex01: TdndCellConfigOutboundOrderKeys[] = [
-  "project", "L", "W", "B", "qty",
-  "implementQty", "cai", "totalCai", "doorType",
-  "material", "horsepower", "surface",
-]
-
+  'project',
+  'L',
+  'W',
+  'B',
+  'qty',
+  'implementQty',
+  'cai',
+  'totalCai',
+  'doorType',
+  'material',
+  'horsepower',
+  'surface',
+];
 
 const orderKeyIndex02: TdndCellConfigOutboundOrderKeys[] = [
-  "remark01", "remark02", "remark03", "remark04",
-  "appended", "orderCreatedDate", "finishAppended",
-  "installer", "installDate",
-]
-
-
-
+  'remark01',
+  'remark02',
+  'remark03',
+  'remark04',
+  'appended',
+  'orderCreatedDate',
+  'finishAppended',
+  'installer',
+  'installDate',
+];
 
 const fakeOrderDataItemOri = () => ({
   project: {
-    value: "SD2"
+    value: 'SD2',
   },
   L: {
-    value: "516"
+    value: '516',
   },
   W: {
-    value: "230"
+    value: '230',
   },
   B: {
-    value: "45"
+    value: '45',
   },
   qty: {
-    value: "1"
+    value: '1',
   },
   implementQty: {
-    value: "1"
+    value: '1',
   },
   cai: {
-    value: "22181.49"
+    value: '22181.49',
   },
   totalCai: {
-    value: "22181.49"
+    value: '22181.49',
   },
   doorType: {
-    value: "SJ-302"
+    value: 'SJ-302',
   },
   material: {
-    value: "不鏽鋼304#"
+    value: '不鏽鋼304#',
   },
   horsepower: {
-    value: "1/3HP"
+    value: '1/3HP',
   },
   surface: {
-    value: "烤漆"
+    value: '烤漆',
   },
 
   remark01: {
-    value: ""
+    value: '',
   },
   remark02: {
-    value: ""
+    value: '',
   },
   remark03: {
-    value: ""
+    value: '',
   },
   remark04: {
-    value: ""
+    value: '',
   },
   appended: {
-    value: ""
+    value: '',
   },
   orderCreatedDate: {
-    value: ""
+    value: '',
   },
   finishAppended: {
-    value: ""
+    value: '',
   },
   installer: {
-    value: ""
+    value: '',
   },
   installDate: {
-    value: ""
+    value: '',
   },
-})
+});
 // const fakeOrderDataItem = {
 //   project: {
 //     value: "SD2"
@@ -286,39 +297,25 @@ const fakeOrderDataItemOri = () => ({
 //   },
 // }
 
-
 const fakeOrderData = [
   {
-    project: "SD2",
-    list: [
-      fakeOrderDataItemOri(), fakeOrderDataItemOri()
-    ]
+    project: 'SD2',
+    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
   },
   {
-    project: "SD3",
-    list: [
-      fakeOrderDataItemOri(), fakeOrderDataItemOri(), fakeOrderDataItemOri()
-    ]
+    project: 'SD3',
+    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri(), fakeOrderDataItemOri()],
   },
   {
-    project: "SD4",
-    list: [
-      fakeOrderDataItemOri(), fakeOrderDataItemOri()
-    ]
+    project: 'SD4',
+    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
   },
   {
-    project: "SD5",
-    list: [
-      fakeOrderDataItemOri()
-    ]
+    project: 'SD5',
+    list: [fakeOrderDataItemOri()],
   },
   {
-    project: "SD5",
-    list: [
-      fakeOrderDataItemOri()
-    ]
+    project: 'SD5',
+    list: [fakeOrderDataItemOri()],
   },
-]
-
-
-
+];

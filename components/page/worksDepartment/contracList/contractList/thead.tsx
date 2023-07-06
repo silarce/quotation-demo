@@ -1,12 +1,7 @@
-
-
-
 // css
-import style from "../contractList.module.scss"
-
+import style from '../contractList.module.scss';
 
 export default function Thead() {
-
   return (
     <div className={style.thead}>
       <span>報價編號 / 日期</span>
@@ -19,9 +14,7 @@ export default function Thead() {
       <span>合約金額</span>
       <span>{/* 按鈕格 留白 */}</span>
     </div>
-  )
+  );
 }
 
-
 // ======================
-

@@ -1,70 +1,76 @@
-import { useState } from "react"
+import { useState } from 'react';
 // component
-import TextListEditor_v2 from "./quotationTotal/TextListEditor_v2"
-import PayInfo_legacy from "./quotationTotal/payInfo_legacy"
-import Appendix from "./quotationTotal/appendix_legacy_noReview"
+import TextListEditor_v2 from './quotationTotal/TextListEditor_v2';
+import PayInfo_legacy from './quotationTotal/payInfo_legacy';
+import Appendix from './quotationTotal/appendix_legacy_noReview';
 // css
-import style from "./quotationTotal.module.scss"
+import style from './quotationTotal.module.scss';
 // type
-import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
-import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // gear
-import WorkSheetSelector from "components/global/gear/modal/workSheetSelector"
+import WorkSheetSelector from 'components/global/gear/modal/workSheetSelector';
 
 // type
 import { TgetAnnotation, TgetQuotataionRanges } from 'js/api/api_workSheet';
 
-
-
-export default function QuotationTotal(
-  {
-    legacyContract,
-    disabled = false,
-    appendixParams,
-  }:
-    {
-      legacyContract: Class_legacyContract
-      disabled: boolean
-      appendixParams: {
-        fileInfoArr: TfileInfo[]
-        removeFileInfo: (index: number) => void
-        toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void
-      }
-    }) {
-
-  const [show_anno, setShow_anno] = useState(false)
-  const [show_qr, setShow_qr] = useState(false)
-
+export default function QuotationTotal({
+  legacyContract,
+  disabled = false,
+  appendixParams,
+}: {
+  legacyContract: Class_legacyContract;
+  disabled: boolean;
+  appendixParams: {
+    fileInfoArr: TfileInfo[];
+    removeFileInfo: (index: number) => void;
+    toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void;
+  };
+}) {
+  const [show_anno, setShow_anno] = useState(false);
+  const [show_qr, setShow_qr] = useState(false);
 
   // --------------------
-  const { classNotes, classQuoteScopes } = legacyContract
+  const { classNotes, classQuoteScopes } = legacyContract;
   // --------------------
 
   const showAnnoSelector = () => {
-    setShow_anno(true)
-  }
+    setShow_anno(true);
+  };
+
   const cancelAnnoSelector = () => {
-    setShow_anno(false)
-  }
-  const onConfirm_anno = (v: TgetAnnotation["data"]) => {
-    const vArr = v.map((item) => item.description)
-    if (!vArr[0]) vArr[0] = ""
-    annoObj.addString(vArr)
-  }
+    setShow_anno(false);
+  };
+
+  const onConfirm_anno = (v: TgetAnnotation['data']) => {
+    const vArr = v.map((item) => item.description);
+
+    if (!vArr[0]) {
+      vArr[0] = '';
+    }
+
+    annoObj.addString(vArr);
+  };
 
   const showQrSelector = () => {
-    setShow_qr(true)
-  }
+    setShow_qr(true);
+  };
+
   const cancelQrSelector = () => {
-    setShow_qr(false)
-  }
-  const onConfirm_qr = (v: TgetQuotataionRanges["data"]) => {
-    const vArr = v.map((item) => item.description)
-    if (!vArr[0]) vArr[0] = ""
-    quoteRangeObj.addString(vArr)
-  }
+    setShow_qr(false);
+  };
+
+  const onConfirm_qr = (v: TgetQuotataionRanges['data']) => {
+    const vArr = v.map((item) => item.description);
+
+    if (!vArr[0]) {
+      vArr[0] = '';
+    }
+
+    quoteRangeObj.addString(vArr);
+  };
 
   // --------------------
   const annoObj = {
@@ -72,8 +78,8 @@ export default function QuotationTotal(
     editString: classNotes.editString,
     addString: classNotes.addString,
     delString: classNotes.delString,
-    showSelector: showAnnoSelector
-  }
+    showSelector: showAnnoSelector,
+  };
 
   // --------------------
   const quoteRangeObj = {
@@ -81,32 +87,19 @@ export default function QuotationTotal(
     editString: classQuoteScopes.editString,
     addString: classQuoteScopes.addString,
     delString: classQuoteScopes.delString,
-    showSelector: showQrSelector
-  }
-
+    showSelector: showQrSelector,
+  };
 
   // ====================================================
   return (
     <div className={style.container}>
-      <TextListEditor_v2
-        stringObj={annoObj}
-        label="備註"
-        disabled={disabled}
-      />
+      <TextListEditor_v2 stringObj={annoObj} label="備註" disabled={disabled} />
       <div className={style.layer01}>
         <div>
-          <TextListEditor_v2
-            stringObj={quoteRangeObj}
-            label="報價範圍"
-            disabled={disabled} />
-          <Appendix disabled={disabled}
-            appendixParams={appendixParams}
-          />
+          <TextListEditor_v2 stringObj={quoteRangeObj} label="報價範圍" disabled={disabled} />
+          <Appendix disabled={disabled} appendixParams={appendixParams} />
         </div>
-        <PayInfo_legacy
-          legacyContract={legacyContract}
-          disabled={disabled}
-        />
+        <PayInfo_legacy legacyContract={legacyContract} disabled={disabled} />
       </div>
 
       <WorkSheetSelector
@@ -125,6 +118,6 @@ export default function QuotationTotal(
         onCancel={cancelQrSelector}
         apiFamily="quotationRanges"
       />
-    </div >
-  )
+    </div>
+  );
 }

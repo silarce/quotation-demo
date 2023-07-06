@@ -1,13 +1,8 @@
-
-
-
 // css
 
-import style from "./thead01.module.scss"
-
+import style from './thead01.module.scss';
 
 export default function Thead01() {
-
   return (
     <div className={style.thead}>
       <span>合約編號 / 日期</span>
@@ -20,9 +15,7 @@ export default function Thead01() {
       <span>合約金額</span>
       <span>{/* 按鈕格 留白 */}</span>
     </div>
-  )
+  );
 }
 
-
 // ======================
-

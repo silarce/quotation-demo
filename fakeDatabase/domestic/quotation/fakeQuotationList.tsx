@@ -1,45 +1,34 @@
+import { fakeQuotationIndex } from '../quotationIndex';
 
-import { fakeQuotationIndex } from "../quotationIndex"
+import { TquotProfile, fakeQuotProfileObjList } from './fakeQuotProfileList';
 
-import {
-  TquotProfile, fakeQuotProfileObjList
-} from "./fakeQuotProfileList"
+import { Tproduct, fakeQuotProductListOri } from './fakeQuotProductionList';
 
-import {
-  Tproduct, fakeQuotProductListOri,
-} from "./fakeQuotProductionList"
+import { Tremark, remarkOptions, fakeQuotRemarkList } from './fakeQuotRemarkList';
 
-import {
-  Tremark,
-  remarkOptions, fakeQuotRemarkList,
-} from "./fakeQuotRemarkList"
+import { Trange, rangeOptions, fakeQuotRangeList } from './fakeQuotRangeList';
 
-import {
-  Trange,
-  rangeOptions, fakeQuotRangeList
-} from "./fakeQuotRangeList"
+import { Tsinature, fakeSinature } from './fakeSinature';
 
-import { Tsinature, fakeSinature, } from "./fakeSinature"
-
-import { TpayInfo, fakeQuotPayInfo } from "./fakeQuotPayInfo"
+import { TpayInfo, fakeQuotPayInfo } from './fakeQuotPayInfo';
 
 interface Tquotation {
-  profile: TquotProfile
-  productList: Tproduct[]
-  remarkList: Tremark[]
-  rangeList: Trange[]
-  payInfo: TpayInfo
-  sinature: Tsinature
+  profile: TquotProfile;
+  productList: Tproduct[];
+  remarkList: Tremark[];
+  rangeList: Trange[];
+  payInfo: TpayInfo;
+  sinature: Tsinature;
 }
 
 interface TquotationObjList {
-  [key: string]: Tquotation
+  [key: string]: Tquotation;
 }
 
-type TquotationList = Tquotation[]
+type TquotationList = Tquotation[];
 
 const fakeQuotationObjListOri = () => {
-  let fakeQuotationObjList: TquotationObjList = {}
+  const fakeQuotationObjList: TquotationObjList = {};
   fakeQuotationIndex.forEach((key) => {
     fakeQuotationObjList[key] = {
       profile: fakeQuotProfileObjList[key],
@@ -48,14 +37,13 @@ const fakeQuotationObjListOri = () => {
       rangeList: fakeQuotRangeList,
       payInfo: fakeQuotPayInfo,
       sinature: fakeSinature,
-    }
-  })
-  return fakeQuotationObjList
-}
+    };
+  });
 
+  return fakeQuotationObjList;
+};
 
-const fakeQuotationListOri = () => Object.values(fakeQuotationObjListOri())
-
+const fakeQuotationListOri = () => Object.values(fakeQuotationObjListOri());
 
 export type {
   Tquotation,
@@ -67,10 +55,6 @@ export type {
   Trange,
   TpayInfo,
   Tsinature,
-}
+};
 
-
-
-export {
-  fakeQuotationObjListOri, fakeQuotationListOri
-}
+export { fakeQuotationObjListOri, fakeQuotationListOri };

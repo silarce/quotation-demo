@@ -1,93 +1,104 @@
-import {
-  useState, Fragment
-} from "react"
-import Link from "next/link"
-import { useRouter } from "next/router"
+import { useState, Fragment } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 // type
 import { UrlObject } from 'url';
 
-
 // css
-import style from "./pageHeaderFlex01.module.scss"
+import style from './pageHeaderFlex01.module.scss';
 
 // type
 interface Ttag {
-  label: string
-  onClick: () => void
+  label: string;
+  onClick: () => void;
 }
 
 interface Tlink {
-  label: string
-  href: string | UrlObject
+  label: string;
+  href: string | UrlObject;
 }
 
-export default function PageHeaderFlex01(
-  {
-    tagList = [],
-    linkList = [],
-  }:
-    {
-      tagList?: Ttag[] // 左邊的多個標籤，帶click事件
-      linkList?: Tlink[] // 左邊的標籤，不過是Link
-    }) {
-  const [active, setActive] = useState(0)
+export default function PageHeaderFlex01({
+  tagList = [],
+  linkList = [],
+}: {
+  tagList?: Ttag[]; // 左邊的多個標籤，帶click事件
+  linkList?: Tlink[]; // 左邊的標籤，不過是Link
+}) {
+  const [active, setActive] = useState(0);
 
-  const router = useRouter()
-  const { asPath, pathname } = router
-
+  const router = useRouter();
+  const { asPath, pathname } = router;
 
   return (
     <div className={style.pageHeaderFlex01}>
-      <TagList />{/* 多個tag 附帶onClick */}
-      <LinkList />{/* 連結 */}
-    </div >
-  )
+      <TagList />
+      {/* 多個tag 附帶onClick */}
+      <LinkList />
+      {/* 連結 */}
+    </div>
+  );
+
   // =====================================
   // ---
   function TagList() {
-    if (!tagList[0]) return null
+    if (!tagList[0]) {
+      return null;
+    }
+
     return (
       <>
         {tagList.map((item, index) => {
-          const { label, onClick } = item
+          const { label, onClick } = item;
+
           const theOnClick = () => {
             onClick();
-            setActive(index)
-          }
-          const isActive = active === index ? style.active : ""
+            setActive(index);
+          };
+
+          const isActive = active === index ? style.active : '';
+
           return (
-            <button key={index} className={isActive}
-              onClick={theOnClick}
-            >
+            <button key={index} className={isActive} onClick={theOnClick}>
               <span>{label}</span>
               <hr className={style.bottomBar} />
             </button>
-          )
+          );
         })}
       </>
-    )
+    );
   }
+
   // ---
   function LinkList() {
-    if (!linkList[0]) return null
+    if (!linkList[0]) {
+      return null;
+    }
+
     return (
       <>
         {linkList.map((config, index) => {
           const { label, href } = config;
-          let hrefPathname: string
-          if (typeof href === "string") hrefPathname = href
-          else hrefPathname = href.pathname ?? ""
-          const reg = new RegExp(`^${hrefPathname}`)
-          const isActive = reg.test(router.pathname) ? style.active : ""
+          let hrefPathname: string;
+
+          if (typeof href === 'string') {
+            hrefPathname = href;
+          } else {
+            hrefPathname = href.pathname ?? '';
+          }
+
+          const reg = new RegExp(`^${hrefPathname}`);
+          const isActive = reg.test(router.pathname) ? style.active : '';
+
           return (
             <Link className={isActive} href={href} key={index}>
               <span>{label}</span>
               <hr className={style.bottomBar} />
             </Link>
-          )
+          );
         })}
       </>
-    )
+    );
   }
 }

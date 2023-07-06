@@ -1,15 +1,10 @@
-import {
-  useRef, useEffect, useState,
-  MutableRefObject, ForwardRefRenderFunction, forwardRef,
-  MouseEvent
-} from "react"
+import { useRef, useEffect, useState, MutableRefObject, ForwardRefRenderFunction, forwardRef, MouseEvent } from 'react';
 
-import { Moment } from "moment";
+import { Moment } from 'moment';
 
-import SubLayer from "components/Layer/SubLayer/SubLayer";
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 import * as React from 'react';
-
 
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -17,35 +12,28 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import TextField from '@mui/material/TextField';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 
-import InputSel from "components/global/gear/inputAndSel/inputSel";
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
-
-import scss from "./demo02.module.scss"
-
+import scss from './demo02.module.scss';
 
 export default function Labe00() {
-
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement>(null!);
-  const ref = useRef<HTMLDivElement>(null!)
+  const ref = useRef<HTMLDivElement>(null!);
 
-
-  const [open, setOpen] = useState(false)
-
+  const [open, setOpen] = useState(false);
 
   return (
     <SubLayer className="">
       <div></div>
 
       <div className="p-5">
-
-        <div 
+        <div
         // className={scss.box}
         //  ref={ref}
         // onClick={() => { open || setOpen(true) }}
         >
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <TimePicker
-
               // label="喵喵喵"
               // value={value || null}
               ampm={true}
@@ -65,15 +53,12 @@ export default function Labe00() {
               //   // setValue(date!)
               //   // console.log(thedate.format("HH:mm"))
 
-
               // }}
-
 
               // onChange={(date) => { console.log("onChange",date) }}
 
               // selectedSections="hours"
               // skipDisabled={true}
-
 
               // slotProps={{
               //   popper: { anchorEl: ref.current },
@@ -93,8 +78,6 @@ export default function Labe00() {
               //     );
               //   }
               // }}
-
-
             />
           </LocalizationProvider>
         </div>
@@ -102,22 +85,9 @@ export default function Labe00() {
         <br />
 
         <div className="w-[150px] inline-block">
-          <InputSel
-            label="DEMO"
-            timePickerProps_mui={{
-            }}
-          />
+          <InputSel label="DEMO" timePickerProps_mui={{}} />
         </div>
-
-
-
-
-
       </div>
-
-
-
-    </SubLayer >
-  )
+    </SubLayer>
+  );
 }
-

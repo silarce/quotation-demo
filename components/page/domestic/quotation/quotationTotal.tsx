@@ -1,94 +1,92 @@
-import { useState } from "react"
+import { useState } from 'react';
 
 // component
-import StringList from "./quotationTotal/TextListEditor"
-import PayInfo from "./quotationTotal/payInfo"
-import PayInfo_legacy from "./quotationTotal/payInfo_legacy"
-import Appendix from "./quotationTotal/appendix"
+import StringList from './quotationTotal/TextListEditor';
+import PayInfo from './quotationTotal/payInfo';
+import PayInfo_legacy from './quotationTotal/payInfo_legacy';
+import Appendix from './quotationTotal/appendix';
 // css
-import style from "./quotationTotal.module.scss"
+import style from './quotationTotal.module.scss';
 // type
-import { Class_quotation } from "hooks/quotation/useQuotation"
-import { fakeApi_memo } from "fakeDatabase/fakeAPI/fakeMemoApi";
-import { fakeApi_quoteRange } from "fakeDatabase/fakeAPI/fakeQuoteRangeApi";
+import { Class_quotation } from 'hooks/quotation/useQuotation';
+import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
+import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 
-
-export default function QuotationTotal(
-  {
-    classQuotation,
-    getFakeMemo,
-    getFakeQuotaRange,
-    disabled = false,
-  }:
-    {
-      classQuotation: Class_quotation 
-      getFakeMemo: typeof fakeApi_memo["get"]
-      getFakeQuotaRange: typeof fakeApi_quoteRange["get"]
-      disabled: boolean
-    }) {
-
-  const { identify } = classQuotation
+export default function QuotationTotal({
+  classQuotation,
+  getFakeMemo,
+  getFakeQuotaRange,
+  disabled = false,
+}: {
+  classQuotation: Class_quotation;
+  getFakeMemo: (typeof fakeApi_memo)['get'];
+  getFakeQuotaRange: (typeof fakeApi_quoteRange)['get'];
+  disabled: boolean;
+}) {
+  const { identify } = classQuotation;
 
   // --------------------
-  const {  classMemo,  classQuoteRange } = classQuotation
+  const { classMemo, classQuoteRange } = classQuotation;
   // --------------------
   const memoObj = {
     stringArr: classMemo.stringArr,
     editString: classMemo.editString,
     addString: classMemo.addString,
     delString: classMemo.delString,
-  }
+  };
 
-  const [alternateMemoSearchValue, setAlternateMemoSearchValue] = useState("")
+  const [alternateMemoSearchValue, setAlternateMemoSearchValue] = useState('');
   const memoFilter = {
-    content: alternateMemoSearchValue
-  }
+    content: alternateMemoSearchValue,
+  };
+
   const searchAlternateMemo = (v: string) => {
-    setAlternateMemoSearchValue(v)
-  }
-  const alternateMemo = getFakeMemo(memoFilter).map((memo) => memo.content)
+    setAlternateMemoSearchValue(v);
+  };
+
+  const alternateMemo = getFakeMemo(memoFilter).map((memo) => memo.content);
   // --------------------
   const quoteRangeObj = {
     stringArr: classQuoteRange.stringArr,
     editString: classQuoteRange.editString,
     addString: classQuoteRange.addString,
     delString: classQuoteRange.delString,
-  }
+  };
 
-  const [quoteRangeSearchValue, setQuoteRangeSearchValue] = useState("")
+  const [quoteRangeSearchValue, setQuoteRangeSearchValue] = useState('');
   const quoteRangeFilter = {
-    content: quoteRangeSearchValue
-  }
-  const searchAlternateQuoteRange = (v: string) => {
-    setQuoteRangeSearchValue(v)
-  }
-  const alternateQuoteRange =
-    getFakeQuotaRange(quoteRangeFilter).map((quoateRange) => quoateRange.content)
+    content: quoteRangeSearchValue,
+  };
 
+  const searchAlternateQuoteRange = (v: string) => {
+    setQuoteRangeSearchValue(v);
+  };
+
+  const alternateQuoteRange = getFakeQuotaRange(quoteRangeFilter).map((quoateRange) => quoateRange.content);
 
   // ====================================================
   return (
     <div className={style.container}>
       <StringList
         stringObj={memoObj}
-        alternateArr={alternateMemo} searchAlternate={searchAlternateMemo}
+        alternateArr={alternateMemo}
+        searchAlternate={searchAlternateMemo}
         label="備註"
-        disabled={disabled} />
+        disabled={disabled}
+      />
       <div className={style.layer01}>
         <div>
           <StringList
             stringObj={quoteRangeObj}
-            alternateArr={alternateQuoteRange} searchAlternate={searchAlternateQuoteRange}
+            alternateArr={alternateQuoteRange}
+            searchAlternate={searchAlternateQuoteRange}
             label="報價範圍"
-            disabled={disabled} />
+            disabled={disabled}
+          />
           <Appendix disabled={disabled} />
         </div>
-        {identify === "normal" &&
-          <PayInfo
-            classQuotation={classQuotation}
-            disabled={disabled}
-          />}
+        {identify === 'normal' && <PayInfo classQuotation={classQuotation} disabled={disabled} />}
       </div>
-    </div >
-  )
+    </div>
+  );
 }

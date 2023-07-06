@@ -1,55 +1,47 @@
 import {
-  ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent,
+  ChangeEvent,
+  InputHTMLAttributes,
+  CSSProperties,
+  FocusEvent,
   HTMLInputTypeAttribute,
-  Dispatch, SetStateAction,
-} from "react"
-
+  Dispatch,
+  SetStateAction,
+} from 'react';
 
 // css
-import scss from "../inputSel.module.scss"
-
+import scss from '../inputSel.module.scss';
 
 export type TinputProps = {
-  value: string | number
-  onChange?: (value: string) => void
-  className?: string
-  attributes?: InputHTMLAttributes<HTMLInputElement>
-  inputType?: HTMLInputTypeAttribute
-  
-}
+  value: string | number;
+  onChange?: (value: string) => void;
+  className?: string;
+  attributes?: InputHTMLAttributes<HTMLInputElement>;
+  inputType?: HTMLInputTypeAttribute;
+};
 
 // ==============================================================================
-export default function Input(
-  { placeholder,
-    inputProps,
-    setIsFocus,
-    disabled
-  }:
-    {
-      placeholder?: string | undefined
-      inputProps: TinputProps
-      setIsFocus: Dispatch<SetStateAction<boolean>>
-      disabled: boolean | undefined
-    }
-) {
-
-  const {
-    value,
-    onChange,
-    className,
-    attributes,
-    inputType,
-  } = inputProps
-
+export default function Input({
+  placeholder,
+  inputProps,
+  setIsFocus,
+  disabled,
+}: {
+  placeholder?: string | undefined;
+  inputProps: TinputProps;
+  setIsFocus: Dispatch<SetStateAction<boolean>>;
+  disabled: boolean | undefined;
+}) {
+  const { value, onChange, className, attributes, inputType } = inputProps;
 
   const inputClasses = (() => {
-    return `${scss.inputBox} ${className ?? ""}`
-  })()
+    return `${scss.inputBox} ${className ?? ''}`;
+  })();
+
   // -------------------------------------------------------------------------
   return (
     <div className={inputClasses}>
       <input
-        type={inputType ?? "text"}
+        type={inputType ?? 'text'}
         placeholder={placeholder}
         autoComplete="off"
         value={value}
@@ -63,11 +55,5 @@ export default function Input(
         {...attributes}
       />
     </div>
-  )
+  );
 }
-
-
-
-
-
-

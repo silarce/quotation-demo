@@ -1,174 +1,156 @@
-
-import {
-  useMemo,
-  ChangeEvent,
-  CSSProperties,
-} from "react"
+import { useMemo, ChangeEvent, CSSProperties } from 'react';
 
 // global gear
-import InputSelBar, { TselInputPropsArr } from "../inputSelBar/inputSelBar"
+import InputSelBar, { TselInputPropsArr } from '../inputSelBar/inputSelBar';
 
 // css
-import scss from "./inputSelBar_address.module.scss"
+import scss from './inputSelBar_address.module.scss';
 
 // fakeData type
-import {
-  Toption,
-  optionsCreator_county, districtOptionsSelector
-} from 'js/utils/options/countryAndDistrict'
+import { Toption, optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
 
 export type TaddressProps = {
-  county: string | null | undefined
-  onChangeCounty: (option: Toption | null) => void
-  district: string | null | undefined
-  onChangeDistrict: (option: Toption | null) => void
-  address: string | null | undefined
-  onChangeAddress: (e: string) => void
+  county: string | null | undefined;
+  onChangeCounty: (option: Toption | null) => void;
+  district: string | null | undefined;
+  onChangeDistrict: (option: Toption | null) => void;
+  address: string | null | undefined;
+  onChangeAddress: (e: string) => void;
 
-  showDistrict?: boolean
-}
+  showDistrict?: boolean;
+};
 
-export default function InputSelBar_address(
-  {
-    label,
-    addressProps,
-    captionWidth,
-    gap,
-    padding,
-    className,
-    captionClassName,
-    valueContanierClassName,
-    disabled,
-    hrColor,
-    presetStyle,
-    showBaseline,
-    customContyOption,
-    customDistrictOption,
-    isMust,
-    mustTipClassName,
-  }:
-    {
-      label?: string
-      addressProps: TaddressProps
+export default function InputSelBar_address({
+  label,
+  addressProps,
+  captionWidth,
+  gap,
+  padding,
+  className,
+  captionClassName,
+  valueContanierClassName,
+  disabled,
+  hrColor,
+  presetStyle,
+  showBaseline,
+  customContyOption,
+  customDistrictOption,
+  isMust,
+  mustTipClassName,
+}: {
+  label?: string;
+  addressProps: TaddressProps;
 
-      captionWidth?: CSSProperties["width"]
-      gap?: CSSProperties["gap"]
-      padding?: CSSProperties["padding"]
-      hrColor?: CSSProperties["borderColor"]
+  captionWidth?: CSSProperties['width'];
+  gap?: CSSProperties['gap'];
+  padding?: CSSProperties['padding'];
+  hrColor?: CSSProperties['borderColor'];
 
-      disabled?: boolean
-      showBaseline?: "invisible" | "always" | "auto"
+  disabled?: boolean;
+  showBaseline?: 'invisible' | 'always' | 'auto';
 
-      className?: string
-      valueContanierClassName?: string
-      captionClassName?: string
+  className?: string;
+  valueContanierClassName?: string;
+  captionClassName?: string;
 
-      presetStyle?: "s01"
+  presetStyle?: 's01';
 
-      customContyOption?: {
-        optionArr: Toption[]
-        unshift?: boolean
-      }
-      customDistrictOption?: {
-        optionArr: Toption[]
-        unshift?: boolean
-      }
-      isMust?: boolean
-      mustTipClassName?: string
-    }) {
+  customContyOption?: {
+    optionArr: Toption[];
+    unshift?: boolean;
+  };
+  customDistrictOption?: {
+    optionArr: Toption[];
+    unshift?: boolean;
+  };
+  isMust?: boolean;
+  mustTipClassName?: string;
+}) {
+  const { county, onChangeCounty, district, onChangeDistrict, address, onChangeAddress } = addressProps;
 
-  const {
-    county,
-    onChangeCounty,
-    district,
-    onChangeDistrict,
-    address,
-    onChangeAddress,
-  } = addressProps
+  let { showDistrict } = addressProps;
 
-  let { showDistrict } = addressProps
-  if (showDistrict === undefined) showDistrict = true
-
-
+  if (showDistrict === undefined) {
+    showDistrict = true;
+  }
 
   if (presetStyle) {
     switch (presetStyle) {
-      case "s01":
-        padding = "17px 4px 14px 4px"
-        gap = "40px"
+      case 's01':
+        padding = '17px 4px 14px 4px';
+        gap = '40px';
         break;
       default:
         break;
     }
   }
 
-
-
   // 地址
   // 城市
-  let countryOptions = optionsCreator_county()
+  let countryOptions = optionsCreator_county();
+
   if (customContyOption) {
     if (customContyOption.unshift) {
-      countryOptions = [...customContyOption.optionArr, ...countryOptions]
+      countryOptions = [...customContyOption.optionArr, ...countryOptions];
+    } else {
+      countryOptions = [...countryOptions, ...customContyOption.optionArr];
     }
-    else
-      countryOptions = [...countryOptions, ...customContyOption.optionArr]
   }
+
   // 地區
-  let districtOptions = useMemo(() => {
-    let contyOptions = districtOptionsSelector(county || "")
+  const districtOptions = useMemo(() => {
+    let contyOptions = districtOptionsSelector(county || '');
+
     if (customDistrictOption) {
       if (customDistrictOption.unshift) {
-        contyOptions = [...customDistrictOption.optionArr, ...contyOptions]
+        contyOptions = [...customDistrictOption.optionArr, ...contyOptions];
+      } else {
+        contyOptions = [...contyOptions, ...customDistrictOption.optionArr];
       }
-      else
-        contyOptions = [...contyOptions, ...customDistrictOption.optionArr]
     }
-    return contyOptions
+
+    return contyOptions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [county])
-
-
+  }, [county]);
 
   const selectInputList: TselInputPropsArr = [
     {
-      type: "select",
-      placeholder: "選擇縣市",
-      style: { width: "90px" },
+      type: 'select',
+      placeholder: '選擇縣市',
+      style: { width: '90px' },
       props: {
         value: county ?? null,
         options: countryOptions,
         onChange: onChangeCounty,
-      }
+      },
     },
     {
-      type: "select",
-      placeholder: "選擇地區",
-      style: { width: "90px" },
+      type: 'select',
+      placeholder: '選擇地區',
+      style: { width: '90px' },
       props: {
         value: district ?? null,
         options: districtOptions,
         onChange: onChangeDistrict,
-      }
+      },
     },
     {
-      type: "textarea",
-      placeholder: "請輸入剩餘地址",
+      type: 'textarea',
+      placeholder: '請輸入剩餘地址',
       props: {
-        value: address || "",
+        value: address || '',
         onChange: onChangeAddress,
-        className: `${scss.address} ${scss.addressPlus}`
-      }
+        className: `${scss.address} ${scss.addressPlus}`,
+      },
     },
-  ]
+  ];
 
   if (showDistrict === false) {
-    selectInputList.splice(1, 1)
+    selectInputList.splice(1, 1);
   }
 
-
   // ------------------------------------------------------------------
-  valueContanierClassName = `${valueContanierClassName ?? ""}`
+  valueContanierClassName = `${valueContanierClassName ?? ''}`;
 
   // ------------------------------------------------------------------
   return (
@@ -187,6 +169,5 @@ export default function InputSelBar_address(
       isMust={isMust}
       mustTipClassName={mustTipClassName}
     />
-  )
+  );
 }
-

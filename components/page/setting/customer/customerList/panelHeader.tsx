@@ -1,69 +1,69 @@
+import { useRouter } from 'next/router';
 
-import { useRouter } from "next/router";
-
-import { MouseEvent } from "react"
+import { MouseEvent } from 'react';
 
 // global gear
-import CellWithBar from "components/global/gear/cell/cellWithBar";
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
-import {
-  IconDelete01 as IconDelete,
-  IconEdit
-} from "public/image/icon/svgComponent/svgIcons"
-
+import { IconDelete01 as IconDelete, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from "../customer.module.scss"
+import style from '../customer.module.scss';
 
 // type
-import { TcustomerDto_TC, Tcontacts, customerTypesLookup } from "js/api/api_customer";
+import { TcustomerDto_TC, Tcontacts, customerTypesLookup } from 'js/api/api_customer';
 
 // ====================================================
 
-export default function PanelHeader(
-  { customersData, isActive, openDelPanel }:
-    {
-      customersData: TcustomerDto_TC
-      isActive: boolean
-      openDelPanel: (e: MouseEvent, data: TcustomerDto_TC) => void
-    }) {
+export default function PanelHeader({
+  customersData,
+  isActive,
+  openDelPanel,
+}: {
+  customersData: TcustomerDto_TC;
+  isActive: boolean;
+  openDelPanel: (e: MouseEvent, data: TcustomerDto_TC) => void;
+}) {
   // ====================================================
-  const router = useRouter()
+  const router = useRouter();
 
   // ====================================================
-  const contact01
-    = customersData.contacts?.[0] ?? {} as Partial<Tcontacts>
+  const contact01 = customersData.contacts?.[0] ?? ({} as Partial<Tcontacts>);
   // ====================================================
 
   const toEdit = (e: MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     router.push({
       pathname: '/setting/customer/edit',
-      query: { id: customersData.id }
-    })
-  }
+      query: { id: customersData.id },
+    });
+  };
+
   // ====================================================
   return (
     <CellWithBar isActive={isActive}>
       <div className={`${style.panelHeader}`}>
         <div className={style.cell01}>
           {indexKeys01.map((key, index) => {
-            let value = customersData[key]
-            const { label } = config01[key]
+            const value = customersData[key];
+            const { label } = config01[key];
 
-            if (key === "types") {
+            if (key === 'types') {
               return (
                 <div key={index}>
                   <h6>{label}</h6>
-                  {(value as TcustomerDto_TC["types"]).map((v, index, arr) => {
-                    const label = customerTypesLookup[v.name]
+                  {(value as TcustomerDto_TC['types']).map((v, index, arr) => {
+                    const label = customerTypesLookup[v.name];
+
                     return (
-                      <span key={index} className="block">{label}</span>
-                    )
+                      <span key={index} className="block">
+                        {label}
+                      </span>
+                    );
                   })}
                 </div>
-              )
+              );
             }
 
             return (
@@ -71,29 +71,30 @@ export default function PanelHeader(
                 <h6>{label}</h6>
                 <span>{value as string}</span>
               </div>
-            )
+            );
           })}
         </div>
         {/* ============================ */}
         <div className={style.cell02}>
           {indexKeys02.map((key, index) => {
-            const value = customersData[key]
-            const { label } = config02[key]
+            const value = customersData[key];
+            const { label } = config02[key];
+
             return (
               <div key={index}>
                 <h6>{label}</h6>
                 <span>{value}</span>
               </div>
-            )
+            );
           })}
         </div>
         {/* ============================ */}
         <div className={style.cell03}>
           <div>
             <h6>聯絡人 1 / 電話</h6>
-            <span>{contact01.name || ""}</span>
+            <span>{contact01.name || ''}</span>
             <span> / </span>
-            <span>{contact01.phone || ""}</span>
+            <span>{contact01.phone || ''}</span>
           </div>
         </div>
         {/* ============================ */}
@@ -105,58 +106,40 @@ export default function PanelHeader(
         </div>
       </div>
     </CellWithBar>
-  )
+  );
 }
 
 // ===========================================================
 
-
-
 // TcustomerDto
-type TindexKeys01
-  = keyof Pick<TcustomerDto_TC, "customerNumber" | "types" | "name">
-type TindexKeys02
-  = keyof Pick<TcustomerDto_TC, "phone" | "fax">
+type TindexKeys01 = keyof Pick<TcustomerDto_TC, 'customerNumber' | 'types' | 'name'>;
+type TindexKeys02 = keyof Pick<TcustomerDto_TC, 'phone' | 'fax'>;
 
-const indexKeys01: TindexKeys01[]
-  = ["customerNumber", "types", "name"]
-const indexKeys02: TindexKeys02[]
-  = ["phone", "fax"]
+const indexKeys01: TindexKeys01[] = ['customerNumber', 'types', 'name'];
+const indexKeys02: TindexKeys02[] = ['phone', 'fax'];
 
 type Tconfig<indexKeys extends string> = {
   [key in indexKeys]: {
-    label: string
-  }
-}
+    label: string;
+  };
+};
 
 const config01: Tconfig<TindexKeys01> = {
   customerNumber: {
-    label: "客戶編號"
+    label: '客戶編號',
   },
   types: {
-    label: "類別"
+    label: '類別',
   },
   name: {
-    label: "全稱"
+    label: '全稱',
   },
-}
+};
 const config02: Tconfig<TindexKeys02> = {
   phone: {
-    label: "公司電話"
+    label: '公司電話',
   },
   fax: {
-    label: "公司傳真"
+    label: '公司傳真',
   },
-}
-
-
-
-
-
-
-
-
-
-
-
-
+};
