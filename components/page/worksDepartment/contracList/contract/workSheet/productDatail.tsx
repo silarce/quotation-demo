@@ -125,7 +125,9 @@ const Item = (
                 if (module === "select") {
                   selectProps = {
                     value: value as string,
-                    onChange,
+                    onChange: (v) => {
+                      onChange(v?.value)
+                    },
                     options: options ?? [],
                     selClassNames: {
                       singleValue: (state) => { return scss.selSingleValue },

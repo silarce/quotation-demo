@@ -78,9 +78,9 @@ const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration } = erpFe
 const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration]
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
-const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
+// const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
 // const devPass: TtopPathListConfig["erpFeature"] = (allPass) as TtopPathListConfig["erpFeature"]
-// const devPass: TtopPathListConfig["erpFeature"] = "allPass"
+const devPass: TtopPathListConfig["erpFeature"] = "allPass"
 // =========================================================================
 
 const sidePathList: TsidePathList = {
@@ -126,27 +126,32 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: "基本資料建立",
-          erpFeature: [BasicDataCreation, HRAuthoritySetup],
+          // erpFeature: [BasicDataCreation, HRAuthoritySetup],
+          erpFeature: allPass,
           list: [
             {
               label: "公司資料",
               path: path01 + "/company-info",
-              erpFeature: [BasicDataCreation],
+              // erpFeature: [BasicDataCreation],
+              erpFeature: allPass,
             },
             {
               label: "公司職等職稱",
               path: path01 + "/departments",
-              erpFeature: [BasicDataCreation],
+              // erpFeature: [BasicDataCreation],
+              erpFeature: allPass,
             },
             {
               label: "人員資料",
               path: path01 + "/employees",
-              erpFeature: [BasicDataCreation],
+              // erpFeature: [BasicDataCreation],
+              erpFeature: allPass,
             },
             {
               label: "人事權限管理",
               path: path01 + "/hrManage/erpCtrlPermissions",
-              erpFeature: [HRAuthoritySetup],
+              // erpFeature: [HRAuthoritySetup],
+              erpFeature: allPass,
             },
           ]
         },
@@ -163,12 +168,14 @@ const sidePathList: TsidePathList = {
         {
           label: "備註列表",
           path: path01 + "/annotationList",
-          erpFeature: [BasicDataCreation],
+          // erpFeature: [BasicDataCreation],
+          erpFeature: allPass,
         },
         {
           label: "報價範圍列表",
           path: path01 + "/quotationRanges",
-          erpFeature: [BasicDataCreation],
+          // erpFeature: [BasicDataCreation],
+          erpFeature: allPass,
         },
       ]
     }
@@ -182,7 +189,8 @@ const sidePathList: TsidePathList = {
         {
           label: "報價",
           // erpFeature: devPass,
-          erpFeature: [legacyContractIntegration],
+          // erpFeature: [legacyContractIntegration],
+          erpFeature: allPass,
           list: [
             {
               label: "預算",
@@ -222,7 +230,8 @@ const sidePathList: TsidePathList = {
             {
               label: "舊合約整合",
               path: path01 + "/legacyContractIntegration",
-              erpFeature: [legacyContractIntegration],
+              // erpFeature: [legacyContractIntegration],
+              erpFeature: allPass,
             },
           ]
         },
@@ -436,7 +445,8 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList["/setting"].path01 + "/company-info",
     },
-    erpFeature: [BasicDataCreation, HRAuthoritySetup],
+    // erpFeature: [BasicDataCreation, HRAuthoritySetup],
+    erpFeature: allPass,
   },
   {
     icon: icon_domestic,
