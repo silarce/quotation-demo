@@ -55,7 +55,7 @@ export default function EmployeeSelector({
     return {
       page: page,
       pageSize: 20,
-      populate: ['jobs'],
+      populate: ['jobs.department'],
       sort: 'idNumber',
       filter: {
         $or: {
@@ -199,7 +199,7 @@ export default function EmployeeSelector({
         <div className={style.listContainer}>
           {employeeArr.map((emp, index, arr) => {
             const { idNumber, chName, jobs } = emp;
-            const { name, grade } = jobs?.[0] ?? {};
+            const { name, grade, department } = jobs?.[0] ?? {};
 
             const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
 
@@ -216,7 +216,7 @@ export default function EmployeeSelector({
                 <div className={style.row} onClick={() => onClick(emp)} ref={theViewRef}>
                   <span className={style.idNumber}>{idNumber}</span>
                   <span>{chName}</span>
-                  <span>{name}</span>
+                  <span>{name ? `${department?.name} / ${name}` : ''}</span>
                   <span>{grade && `Level ${grade}`}</span>
                 </div>
               </CellWithBar>
