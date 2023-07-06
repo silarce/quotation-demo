@@ -143,7 +143,7 @@ export default function CompanyInfo() {
   // 清除
   const resetLogo = () => {
     const logoFileId = companyInfo?.logoFileId;
-    setImgSrc(`${domain}file/download/${logoFileId}`);
+    setImgSrc(`${domain}/file/download/${logoFileId}`);
     setImageFile(undefined);
   };
 
