@@ -163,7 +163,14 @@ export type TemployeeDto = {
   emergencyContactPhone: string // 緊急聯絡人電話
   emergencyContactRelationship: string // 緊急聯絡人關係
   qualifications: { name: string, years: number }[] // 個人資歷
-  jobs?: TjobDto[]
+  // jobs?: TjobDto[]
+  /**
+   * 實際上不會給undefined，但常常要取jobs[0]，
+   * 而jobs常常是空陣列而取到undefined
+   * 為了避免可能的錯誤(已發生過很多次)，
+   * 型別乾脆改寫成(TjobDto | undefined)[]
+  */
+  jobs?: (TjobDto | undefined)[]
   user?: TuserDto | null
 }
 
