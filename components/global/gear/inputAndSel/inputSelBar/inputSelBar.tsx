@@ -1,77 +1,76 @@
-import { CSSProperties, useState } from "react"
-import classNames from "classnames";
+import { CSSProperties, useState } from 'react';
+import classNames from 'classnames';
 // gear
-import MustTip_simple from "../../other/mustTip_simple";
-
+import MustTip_simple from '../../other/mustTip_simple';
 
 // css
-import scss from "./inputSelBar.module.scss"
+import scss from './inputSelBar.module.scss';
 
 // component
-import Input, { TinputProps } from "../cog/input";
-import MySelect, { TselectProps } from "../cog/mySelect";
-import Textarea, { TtextareaProps } from "../cog/textarea";
-
+import Input, { TinputProps } from '../cog/input';
+import MySelect, { TselectProps } from '../cog/mySelect';
+import Textarea, { TtextareaProps } from '../cog/textarea';
 
 type TinputPropsWrapper = {
-  type: "input",
-  props: TinputProps
-  placeholder?: string
-  style?: CSSProperties
-}
+  type: 'input';
+  props: TinputProps;
+  placeholder?: string;
+  style?: CSSProperties;
+};
 type TselectPropsWrapper = {
-  type: "select",
-  props: TselectProps
-  placeholder?: string
-  style?: CSSProperties
-}
+  type: 'select';
+  props: TselectProps;
+  placeholder?: string;
+  style?: CSSProperties;
+};
 type TtextareaPropsWrapper = {
-  type: "textarea",
-  props: TtextareaProps
-  placeholder?: string
-  style?: CSSProperties
-}
+  type: 'textarea';
+  props: TtextareaProps;
+  placeholder?: string;
+  style?: CSSProperties;
+};
 
-export type TselInputPropsArr
-  = (TinputPropsWrapper | TselectPropsWrapper | TtextareaPropsWrapper)[]
+export type TselInputPropsArr = (TinputPropsWrapper | TselectPropsWrapper | TtextareaPropsWrapper)[];
 
 // =========================================================================
-export default function InputSelBar(
-  {
-    label, propsArr,
-    captionWidth, width, gap, padding, hrColor,
-    showBaseline = "always",
-    disabled,
-    className, captionClassName, hrClassName,
-    valueContanierClassName,
-    isMust,
-    mustTipClassName
-  }:
-    {
-      label?: string
-      propsArr:
-      (TinputPropsWrapper | TselectPropsWrapper | TtextareaPropsWrapper)[]
+export default function InputSelBar({
+  label,
+  propsArr,
+  captionWidth,
+  width,
+  gap,
+  padding,
+  hrColor,
+  showBaseline = 'always',
+  disabled,
+  className,
+  captionClassName,
+  hrClassName,
+  valueContanierClassName,
+  isMust,
+  mustTipClassName,
+}: {
+  label?: string;
+  propsArr: (TinputPropsWrapper | TselectPropsWrapper | TtextareaPropsWrapper)[];
 
-      width?: CSSProperties["width"]
-      gap?: CSSProperties["gap"]
-      captionWidth?: CSSProperties["width"]
-      padding?: CSSProperties["padding"]
-      hrColor?: CSSProperties["borderColor"]
+  width?: CSSProperties['width'];
+  gap?: CSSProperties['gap'];
+  captionWidth?: CSSProperties['width'];
+  padding?: CSSProperties['padding'];
+  hrColor?: CSSProperties['borderColor'];
 
-      /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
-      showBaseline?: "invisible" | "always" | "auto"
-      disabled?: boolean
+  /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
+  showBaseline?: 'invisible' | 'always' | 'auto';
+  disabled?: boolean;
 
-      className?: string
-      valueContanierClassName?: string
-      captionClassName?: string
-      hrClassName?: string
-      isMust?: boolean
-      mustTipClassName?: string
-    }
-) {
-
-  const [isFocus, setIsFocus] = useState(false)
+  className?: string;
+  valueContanierClassName?: string;
+  captionClassName?: string;
+  hrClassName?: string;
+  isMust?: boolean;
+  mustTipClassName?: string;
+}) {
+  const [isFocus, setIsFocus] = useState(false);
 
   // -----------------------------------------------------------------------
   // 由外部控制的css，會寫在inline
@@ -79,113 +78,110 @@ export default function InputSelBar(
   const lableStyle: CSSProperties = {
     width: width,
     gap: gap,
-    gridTemplateColumns: !label ? "auto" : undefined,
-    padding: padding
-  }
+    gridTemplateColumns: !label ? 'auto' : undefined,
+    padding: padding,
+  };
   const captionStyle: CSSProperties = {
     width: captionWidth,
-  }
+  };
   const hrStyle: CSSProperties = {
-    borderColor: hrColor
-  }
+    borderColor: hrColor,
+  };
   // -----------------------------------------------------------------------
   // 根據不同的狀況設定className
 
   const labelClasses = (() => {
-    return `${scss.label} ${className ?? ""}`
-  })()
+    return `${scss.label} ${className ?? ''}`;
+  })();
   const captionClasses = (() => {
-    return `${scss.caption} ${captionClassName ?? ""}`
-  })()
+    return `${scss.caption} ${captionClassName ?? ''}`;
+  })();
   const valueContainerClasses = (() => {
-    return `${scss.valueContanier} ${valueContanierClassName ?? ""}`
-  })()
+    return `${scss.valueContanier} ${valueContanierClassName ?? ''}`;
+  })();
   const hrClasses = (() => {
-    const classIsFocus = (isFocus || "") && "isFocus"
+    const classIsFocus = (isFocus || '') && 'isFocus';
     const classInvisible = (() => {
-      if (showBaseline === "always") return ""
-      if (disabled) return "invisible"
-    })()
-    return `${scss.hr} ${classIsFocus} ${classInvisible} ${hrClassName ?? ""}`
-  })()
+      if (showBaseline === 'always') {
+        return '';
+      }
+
+      if (disabled) {
+        return 'invisible';
+      }
+    })();
+
+    return `${scss.hr} ${classIsFocus} ${classInvisible} ${hrClassName ?? ''}`;
+  })();
+
   // ------------------------------------------------------------------------
   return (
     // 包裝的元素不可以是label，否則select會壞掉
     <div className={labelClasses} style={lableStyle}>
-
-      {label &&
-        <div className={classNames(captionClasses, "relative")} style={captionStyle}>
+      {label && (
+        <div className={classNames(captionClasses, 'relative')} style={captionStyle}>
           <span>{label}</span>
           {isMust && <MustTip_simple className={mustTipClassName} preStyle="minimal" />}
         </div>
-      }
+      )}
 
       <div className={valueContainerClasses}>
         {propsArr.map((item, index) => {
-          const { type, placeholder, props, style } = item
-          if (type === "input")
+          const { type, placeholder, props, style } = item;
+
+          if (type === 'input') {
             return (
-              <Input key={index}
+              <Input
+                key={index}
                 inputProps={props}
                 placeholder={placeholder}
                 setIsFocus={setIsFocus}
                 disabled={disabled}
               />
-            )
-          if (type === "textarea")
+            );
+          }
+
+          if (type === 'textarea') {
             return (
-              <Textarea key={index}
+              <Textarea
+                key={index}
                 textareaProps={props}
                 placeholder={placeholder}
                 setIsFocus={setIsFocus}
                 disabled={disabled}
               />
-            )
-          if (type === "select") {
-            if (!props.arrowType) props.arrowType = "black"
+            );
+          }
 
+          if (type === 'select') {
+            if (!props.arrowType) {
+              props.arrowType = 'black';
+            }
 
-            const oldOnFocus = props.onFocus
+            const oldOnFocus = props.onFocus;
+
             props.onFocus = () => {
-              setIsFocus(true)
-              oldOnFocus?.()
-            }
-            const oldOnBlur = props.onBlur
+              setIsFocus(true);
+              oldOnFocus?.();
+            };
+
+            const oldOnBlur = props.onBlur;
+
             props.onBlur = () => {
-              setIsFocus(false)
-              oldOnBlur?.()
-            }
+              setIsFocus(false);
+              oldOnBlur?.();
+            };
 
             return (
-              <MySelect key={index}
-                selectProps={props}
-                placeholder={placeholder}
-                disabled={disabled}
-                style={style}
-              />
-            )
+              <MySelect key={index} selectProps={props} placeholder={placeholder} disabled={disabled} style={style} />
+            );
           }
-          return null
+
+          return null;
         })}
       </div>
 
-      {showBaseline !== "invisible" &&
-        <hr className={hrClasses}
-          style={hrStyle}
-        />
-      }
+      {showBaseline !== 'invisible' && <hr className={hrClasses} style={hrStyle} />}
     </div>
-  )
-
+  );
 }
-
-
-
-
-
-
-
-
-
-
-

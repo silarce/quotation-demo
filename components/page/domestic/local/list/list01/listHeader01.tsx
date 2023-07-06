@@ -1,37 +1,34 @@
+import { MouseEvent } from 'react';
 
-import { MouseEvent } from "react";
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
-
-import style from "./listHeader01.module.scss"
-
+import style from './listHeader01.module.scss';
 
 // type
-import { TfakeContractSimple } from "fakeDatabase/domestic/contractCombinder";
-
+import { TfakeContractSimple } from 'fakeDatabase/domestic/contractCombinder';
 
 type Tcontract = {
-  quotationId: string
-  clientName: string
-  quotationName: string
-  discount: string
-  priceTotal: string
-  contactPerson: string
-  contactPhone: string
-  attn: string
-}
+  quotationId: string;
+  clientName: string;
+  quotationName: string;
+  discount: string;
+  priceTotal: string;
+  contactPerson: string;
+  contactPhone: string;
+  attn: string;
+};
 
-
-
-export default function ListHeader01(
-  { className = "", contract, onClick, isActive }:
-    {
-      className?: string
-      contract: Tcontract
-      onClick: ((e: MouseEvent) => void) | (() => void)
-      isActive?: boolean
-    }) {
-
+export default function ListHeader01({
+  className = '',
+  contract,
+  onClick,
+  isActive,
+}: {
+  className?: string;
+  contract: Tcontract;
+  onClick: ((e: MouseEvent) => void) | (() => void);
+  isActive?: boolean;
+}) {
   const {
     quotationId,
     clientName,
@@ -41,12 +38,11 @@ export default function ListHeader01(
     contactPerson,
     contactPhone,
     attn: Attn,
-  } = contract
+  } = contract;
 
-  const parsedPriceTotal = priceTotal.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const parsedPriceTotal = priceTotal.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-  const active = isActive ? style.active : ""
-
+  const active = isActive ? style.active : '';
 
   return (
     <div className={`${className} ${style.container} ${active}`}>
@@ -66,5 +62,5 @@ export default function ListHeader01(
       {/* hover時左邊的藍色直條 */}
       <div className={style.leftBar} />
     </div>
-  )
+  );
 }

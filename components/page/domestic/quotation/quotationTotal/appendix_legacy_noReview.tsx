@@ -1,75 +1,69 @@
-import {
-  ChangeEvent,
-  useState, useEffect
-} from "react"
-import Link from "next/link";
-import classNames from "classnames";
+import { ChangeEvent, useState, useEffect } from 'react';
+import Link from 'next/link';
+import classNames from 'classnames';
 
-import dynamic from "next/dynamic";
-
+import dynamic from 'next/dynamic';
 
 // global gear
-const PdfViewer01 = dynamic(() => import("components/global/gear/pdf/pdfViewer01"))
-import { ModalInfo } from "components/global/gear/modal/simpleModal/alertModals";
+const PdfViewer01 = dynamic(() => import('components/global/gear/pdf/pdfViewer01'));
+import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
-import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
-import iconAttacth from "public/image/icon/attach.svg"
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+import iconAttacth from 'public/image/icon/attach.svg';
 // css
-import styleL from "./local.module.scss"
-import scss from "./appendix_legacy_noReview.module.scss"
+import styleL from './local.module.scss';
+import scss from './appendix_legacy_noReview.module.scss';
 // type
 export type TfileInfo = {
-  fileId?: string,
-  fileType: string
-  fileName: string
-  fileSrc: string
-  isNew: boolean
-  willDelete?: boolean
-  file?: File
-}
+  fileId?: string;
+  fileType: string;
+  fileName: string;
+  fileSrc: string;
+  isNew: boolean;
+  willDelete?: boolean;
+  file?: File;
+};
 
-
-
-export default function Appendix(
-  { disabled, appendixParams }:
-    {
-      disabled: boolean
-      appendixParams: {
-        fileInfoArr: TfileInfo[]
-        // addFile: (file: File) => void
-        // removeFile: (index: number) => void
-        removeFileInfo: (index: number) => void
-        toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void
-      }
-    }) {
-
+export default function Appendix({
+  disabled,
+  appendixParams,
+}: {
+  disabled: boolean;
+  appendixParams: {
+    fileInfoArr: TfileInfo[];
+    // addFile: (file: File) => void
+    // removeFile: (index: number) => void
+    removeFileInfo: (index: number) => void;
+    toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void;
+  };
+}) {
   const {
     fileInfoArr,
     // addFile,
     // removeFile,
     removeFileInfo,
     toSetFileInfo,
-  } = appendixParams
-
+  } = appendixParams;
 
   const preloadImg = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
+    if (!e.target.files) {
+      return;
+    }
 
-    const imageReg = /^image/
-    const pdfReg = /pdf$/
+    const imageReg = /^image/;
+    const pdfReg = /pdf$/;
 
-    const file = e.target.files[0]
+    const file = e.target.files[0];
 
-    const { name: fileName, type } = file
+    const { name: fileName, type } = file;
 
+    const fileType = imageReg.test(type) ? 'image' : pdfReg.test(type) ? 'pdf' : 'other';
 
-    const fileType =
-      imageReg.test(type) ? "image"
-        : pdfReg.test(type) ? "pdf" : "other"
-    if (fileType === "other") {
-      console.log(fileType)
-      return ModalInfo("只能上傳圖片或pdf")
+    if (fileType === 'other') {
+      console.log(fileType);
+
+      return ModalInfo('只能上傳圖片或pdf');
     }
 
     const fileSrc = URL.createObjectURL(file);
@@ -79,32 +73,37 @@ export default function Appendix(
       fileName,
       fileSrc,
       isNew: true,
-      file
-    })
+      file,
+    });
 
     // addFile(file)
-    toSetFileInfo([...fileInfoArr])
-  }
+    toSetFileInfo([...fileInfoArr]);
+  };
 
   // =========================================================
-
 
   return (
     <div className={`${styleL.appendix} ${styleL.listContainer} `}>
       <p>附件</p>
       {fileInfoArr.map((item, index) => {
-        const { fileType, fileName, fileSrc, willDelete } = item
+        const { fileType, fileName, fileSrc, willDelete } = item;
 
-        if (willDelete) return null
+        if (willDelete) {
+          return null;
+        }
+
         return (
           <div key={index} className={classNames(scss.row, scss.rowPlus)}>
-            {disabled ?
-              <span></span> :
-              <IconRemoveCircle onClick={() => {
-                // removeFile(index)
-                removeFileInfo(index)
-              }
-              } />}
+            {disabled ? (
+              <span></span>
+            ) : (
+              <IconRemoveCircle
+                onClick={() => {
+                  // removeFile(index)
+                  removeFileInfo(index);
+                }}
+              />
+            )}
             <span className={styleL.serialNumber}>
               {/*  eslint-disable-next-line @next/next/no-img-element */}
               <img src={iconAttacth.src} alt="" />
@@ -117,33 +116,18 @@ export default function Appendix(
               {fileName}
             </Link> */}
           </div>
-        )
+        );
       })}
       <div>
-        {disabled
-          ? <span></span>
-          : <label htmlFor="uploadImg">
-            <input id="uploadImg" type="file" style={{ display: "none" }}
-              onChange={preloadImg}
-            />
-            <IconAddCircle onClick={() => { }} />
+        {disabled ? (
+          <span></span>
+        ) : (
+          <label htmlFor="uploadImg">
+            <input id="uploadImg" type="file" style={{ display: 'none' }} onChange={preloadImg} />
+            <IconAddCircle onClick={() => {}} />
           </label>
-        }
+        )}
       </div>
-
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

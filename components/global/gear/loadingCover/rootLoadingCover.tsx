@@ -1,9 +1,3 @@
-
-
-
-
-
-
 /*
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -40,32 +34,27 @@ import styled from '@emotion/styled';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-
 const MyBackDrop = styled(Backdrop)`
-z-index: 9999;
-display: grid;
-align-content: center;
-gap:20px;
->*{
-  margin:auto;
-}
-h1{
-  
-  font-size:50px;
-  color:white;
-}
-`
+  z-index: 9999;
+  display: grid;
+  align-content: center;
+  gap: 20px;
+  > * {
+    margin: auto;
+  }
+  h1 {
+    font-size: 50px;
+    color: white;
+  }
+`;
 const MyCircularProgress = styled(CircularProgress)`
+  color: white;
+`;
 
-color:white;
-`
+let rootLoading: boolean;
+export let setRootLoading: Dispatch<SetStateAction<boolean>>;
 
-
-let rootLoading: boolean
-export let setRootLoading: Dispatch<SetStateAction<boolean>>
-
-export let showRootLoading: (isShow: boolean, title?: string) => void
-
+export let showRootLoading: (isShow: boolean, title?: string) => void;
 
 // 使用前先看置頂說明
 // 使用前先看置頂說明
@@ -74,30 +63,25 @@ export default function RootLoadingCover() {
   // 使用前先看置頂說明
   // 使用前先看置頂說明
   // 使用前先看置頂說明
-  [rootLoading, setRootLoading] = useState(false)
-  const [title, setTitle] = useState("")
+  [rootLoading, setRootLoading] = useState(false);
+  const [title, setTitle] = useState('');
 
   showRootLoading = (isShow: boolean, title?: string) => {
-    setRootLoading(isShow)
-    if (title) setTitle(title)
-    if (!isShow) setTitle("")
-  }
+    setRootLoading(isShow);
+
+    if (title) {
+      setTitle(title);
+    }
+
+    if (!isShow) {
+      setTitle('');
+    }
+  };
 
   return (
-    <MyBackDrop
-      open={rootLoading}
-    >
+    <MyBackDrop open={rootLoading}>
       <MyCircularProgress size={100} />
-      {title &&
-        <h1>{title}</h1>
-      }
-    </MyBackDrop >
-  )
+      {title && <h1>{title}</h1>}
+    </MyBackDrop>
+  );
 }
-
-
-
-
-
-
-

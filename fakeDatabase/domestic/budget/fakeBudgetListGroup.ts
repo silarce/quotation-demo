@@ -1,36 +1,29 @@
-
 import {
   Tbudget as TbudgetOri,
-  TbudgetObjList as TbudgetObjListOri,
-  fakeBudgetObjList as fakeBudgetObjListOri, 
-  fakeBudgetKeyList
-} from "./fakeBudgetList_basic";
-import {
-  TbudgetDetail,
-  fakeBudgetDetailList
-} from "./fakeBudgetDetailList";
+  // TbudgetObjList as TbudgetObjListOri,
+  fakeBudgetObjList as fakeBudgetObjListOri,
+  fakeBudgetKeyList,
+} from './fakeBudgetList_basic';
+import { TbudgetDetail, fakeBudgetDetailList } from './fakeBudgetDetailList';
 
-const _ = require("lodash")
+import _ from 'lodash';
 
-interface Tbudget extends TbudgetOri {
-  detail: TbudgetDetail[]
+interface Tbudget_detail extends TbudgetOri {
+  detail: TbudgetDetail[];
 }
 
 interface TbudgetObjList {
-  [key: string]: Tbudget
+  [key: string]: Tbudget_detail;
 }
-type TbudgetList = Tbudget[]
+type TbudgetList = Tbudget_detail[];
 
-const fakeBudgetObjList: TbudgetObjList = _.cloneDeep(fakeBudgetObjListOri)
-
+const fakeBudgetObjList: TbudgetObjList = _.cloneDeep(fakeBudgetObjListOri) as TbudgetObjList;
 
 fakeBudgetKeyList.forEach((key) => {
-  fakeBudgetObjList[key].detail = fakeBudgetDetailList
-})
+  fakeBudgetObjList[key].detail = fakeBudgetDetailList;
+});
 
-
-const fakeBudgetList: TbudgetList = Object.values(fakeBudgetObjList)
-
+const fakeBudgetList: TbudgetList = Object.values(fakeBudgetObjList);
 
 // const row01Config = {
 //   quotationId: {
@@ -98,24 +91,20 @@ const fakeBudgetList: TbudgetList = Object.values(fakeBudgetObjList)
 
 const fakeBudgetListGroup = {
   row01Index: [
-    "quotationId", "clientName", "contactName",
-    "contactPhone", "undertaker", "discount",
-    "doorQty", "budgetAmount",
+    'quotationId',
+    'clientName',
+    'contactName',
+    'contactPhone',
+    'undertaker',
+    'discount',
+    'doorQty',
+    'budgetAmount',
   ],
-  row02Index: [
-    "date", "country", "projectName",
-  ],
-  fakeBudgetList
-}
+  row02Index: ['date', 'country', 'projectName'],
+  fakeBudgetList,
+};
 
+type TfakeBudgetListGroup = typeof fakeBudgetListGroup;
 
-type TfakeBudgetListGroup = typeof fakeBudgetListGroup
-
-export type {
-  Tbudget,
-  TfakeBudgetListGroup,
-  TbudgetObjList,
-  TbudgetList,
-  TbudgetDetail
-}
-export { fakeBudgetListGroup }
+export type { Tbudget_detail as Tbudget, TfakeBudgetListGroup, TbudgetObjList, TbudgetList, TbudgetDetail };
+export { fakeBudgetListGroup };

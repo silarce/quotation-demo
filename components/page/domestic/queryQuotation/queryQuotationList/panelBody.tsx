@@ -1,32 +1,28 @@
-
-
 // global gear
-import CellWithBar from "components/global/gear/cell/cellWithBar";
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
-import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from "../queryQuotationList.module.scss"
+import style from '../queryQuotationList.module.scss';
 
 // type
 import { TqueryQuotation } from 'pages/domestic/queryQuotation';
 
-
-
-
-
-export default function PanelBody({ stepList }:
-  { stepList: TqueryQuotation["stepList"] }) {
-
+export default function PanelBody({ stepList }: { stepList: TqueryQuotation['stepList'] }) {
   const onClick = () => {
-    alert("目前無功能")
-  }
+    alert('目前無功能');
+  };
 
   return (
     <div className={style.panelBody}>
       {stepList.map((item, index) => {
-        if (index === 0) return null
-        const { step, date, clientName } = item
+        if (index === 0) {
+          return null;
+        }
+
+        const { step, date, clientName } = item;
+
         return (
           <CellWithBar className={style.row} key={index}>
             <span></span>
@@ -35,10 +31,12 @@ export default function PanelBody({ stepList }:
             <span className={style.clientName}>{clientName}</span>
             <span></span>
             <span></span>
-            <div><IconDetail onClick={onClick} /></div>
+            <div>
+              <IconDetail onClick={onClick} />
+            </div>
           </CellWithBar>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

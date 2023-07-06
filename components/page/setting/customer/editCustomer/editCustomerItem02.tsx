@@ -1,21 +1,18 @@
-
 // global gear
-import InputSel from "components/global/gear/inputAndSel/inputSel";
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 // icon
-import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from "../customer.module.scss"
+import style from '../customer.module.scss';
 
 // type
-import { Class_customer } from "hooks/customer/useCustomer";
-
+import { Class_customer } from 'hooks/customer/useCustomer';
 
 // ======================================================
-export default function EditCustomerItem02({ classCustomer }: {
-  classCustomer: Class_customer
-}) {
-  const { classContactArr, addContact, removeContact } = classCustomer
+export default function EditCustomerItem02({ classCustomer }: { classCustomer: Class_customer }) {
+  const { classContactArr, addContact, removeContact } = classCustomer;
+
   return (
     <div className={style.editCustomerItem02}>
       <p className={style.subTitle}>公司資訊</p>
@@ -23,11 +20,13 @@ export default function EditCustomerItem02({ classCustomer }: {
       <div className={`${style.form}`}>
         {classContactArr?.map((classContact, index) => {
           const onChangeName = (value: string) => {
-            classContact.name = value
-          }
+            classContact.name = value;
+          };
+
           const onChangePhone = (value: string) => {
-            classContact.phone = value
-          }
+            classContact.phone = value;
+          };
+
           return (
             <div className={style.inputBox} key={index}>
               <InputSel
@@ -42,7 +41,7 @@ export default function EditCustomerItem02({ classCustomer }: {
               />
               <InputSel
                 className={style.input02}
-                label={"電話"}
+                label={'電話'}
                 presetStyle="s01"
                 captionWidth="100px"
                 inputProps={{
@@ -53,14 +52,14 @@ export default function EditCustomerItem02({ classCustomer }: {
               <div className={style.buttonBox}>
                 <IconAddCircle onClick={addContact} />
                 <IconRemoveCircle
-                  className={classContactArr.length === 1 ? style.noShow : ""}
+                  className={classContactArr.length === 1 ? style.noShow : ''}
                   onClick={() => removeContact(index)}
                 />
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
