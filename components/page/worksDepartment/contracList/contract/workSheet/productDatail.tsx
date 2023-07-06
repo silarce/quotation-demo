@@ -60,7 +60,6 @@ export default function WorkSheetProductDetail(
       </div> {/* left */}
 
 
-
       <div className={scss.right}>
         {configArr_right.map((item) => {
           const { key: pKey, label, list } = item
@@ -135,12 +134,17 @@ const Item = (
                     arrowType: "black",
                   }
                   if (cKey === "doorTrackName") {
+
+
                     selectProps = {
                       ...selectProps,
+                      onChange: (v) => {
+                        onChange(v?.value)
+                      },
                       customComponents: {
                         Option: (props) => OptionWithIcon01(props, {
                           showLabel: false,
-                          className: scss.selSingleValue_custom,
+                          className: scss.selOption_custom,
                         }),
                         SingleValue: (props) => SingleValueWithIcon01(props, {
                           showLabel: false,
@@ -149,7 +153,7 @@ const Item = (
                       }
                     }
                   }
-                }
+                } //   if (module === "select")
 
                 if (module === "checkBar") {
                   const checkBarPropsList = checkBarPropsListCre!()
@@ -179,7 +183,7 @@ const Item = (
                       field.onChange(value)
                     }
                   }
-                }
+                }  //  if (module === "checkBar")
 
                 return (
                   <InputSel className={classNames(
@@ -581,10 +585,6 @@ const configArr_right: Tconfig[] = [
         options: option_doorTrack_normal,
         checkBarPropsListCre: undefined,
       }
-
-
-
     ]
   }
-
 ]

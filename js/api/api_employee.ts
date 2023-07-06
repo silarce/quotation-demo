@@ -6,9 +6,9 @@ import {
 import { axi } from "./_axiosCreator";
 
 // type
-import { TemployeeDto, TpageMetaDto } from "./dtoTypes";
+import { Tparams, TemployeeDto, TpageMetaDto } from "./dtoTypes";
 
-export type { TemployeeDto }
+export type { TemployeeDto, Tparams }
 
 // =============================================
 // 員工資料
@@ -67,7 +67,7 @@ export type TapiGetEmployeeParams = {
   populate?: string[]
   sort?: keyof TemployeeDto
 }
-const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
+const apiGetEmployee = (params?: Tparams) => {
   // const api = "/employees?filter[user][$notNull]"
   const api = "/employees"
   return axi.get(api, { params })
@@ -76,7 +76,7 @@ const apiGetEmployee = (params?: TapiGetEmployeeParams) => {
     .catch(err => Promise.reject(err.message))
 }
 
-export const useEmployee = (params?: TapiGetEmployeeParams) => {
+export const useEmployee = (params?: Tparams) => {
   let [data, setData] = useState<TgetEmployee>()
   const update = async () => {
     const data = await apiGetEmployee(params) as TgetEmployee

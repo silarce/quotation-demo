@@ -8,7 +8,7 @@
   border: 1px solid $colorBorder01;
   border-width: 0 1px 1px 0;
   &.bottom {
-    border-bottom: solid 1px black;
+    border-bottom: 0;
   }
   &.isHoliday {
     background-color: #fee;
@@ -100,6 +100,9 @@
               color: $colorActive01;
             }
           }
+          &.pointer {
+            cursor: pointer;
+          }
           > .cell {
             @include cell;
             color: $colorMain;
@@ -116,6 +119,9 @@
     position: sticky;
     left: 0;
     background-color: $bgc01;
+    border-top: solid 1px black;
+    border-right: solid 1px $colorBorder01;
+    max-width: 100%;
     > div {
       width: fit-content;
       margin: auto;

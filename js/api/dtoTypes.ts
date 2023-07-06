@@ -309,6 +309,23 @@ export type TdailyReportWokerDto = {
   jobs: TdailyReportWorkerJobsDto[]
 }
 
+// 文件上就沒有Dto後綴
+export type TaccountingReportStatistic = {
+  date: string
+  meals: ("breakfast" | "lunch" | "dinner")[]
+  stayLength: number
+  dailyReportId: string
+  isWorker: boolean
+}
+
+export type TaccountingReportDto = {
+  employeeId: string
+  employeeName: string | null
+  statistic: TaccountingReportStatistic[]
+}
+
+
+
 
 
 // =======================================================

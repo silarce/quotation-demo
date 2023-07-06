@@ -11,6 +11,8 @@ import WorkSheetProfile from "components/page/worksDepartment/contracList/contra
 import WorkSheetCard from "components/page/worksDepartment/contracList/contract/workSheet/card";
 import WorkSheetProduct from "components/page/worksDepartment/contracList/contract/workSheet/product";
 import WorkSheetProductDetail from "components/page/worksDepartment/contracList/contract/workSheet/productDatail";
+import WorkSheetOptional from "components/page/worksDepartment/contracList/contract/workSheet/optional";
+import WorkSheetProductDetail02 from "components/page/worksDepartment/contracList/contract/workSheet/productDatail02";
 
 // gear
 import InputSel from "components/global/gear/inputAndSel/inputSel";
@@ -21,11 +23,9 @@ import { SingleValueWithIcon01 } from "components/global/gear/select/singleValue
 // css
 import scss from "./workSheet.module.scss"
 
+// image
+import imgIdk from "public/image/fake/idk01.png"
 
-// other
-import { optionsCre_doorTrack_normal } from "js/utils/options/doorTrackOptions";
-
-const optionArr_doorTrack = optionsCre_doorTrack_normal()
 
 
 export default function WorkSheet() {
@@ -53,6 +53,8 @@ export default function WorkSheet() {
   }, [])
 
 
+  // console.log(watch())
+  // console.log(watch("doorType"))
 
 
 
@@ -87,7 +89,7 @@ export default function WorkSheet() {
       <PageHeader panelList={panelList} />
 
       <form >
-        <WorkSheetProfile control={control} disabled={disabled} />
+        <WorkSheetProfile control={control} watch={watch} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>
           <div className={scss.left}>
@@ -96,7 +98,7 @@ export default function WorkSheet() {
               const isActive = key === activeCard
               return (
                 <div key={key} onClick={onClick}>
-                  <WorkSheetCard isActive={isActive} />
+                  <WorkSheetCard isActive={isActive} img={imgIdk} />
                 </div>
               )
             })}
@@ -118,8 +120,17 @@ export default function WorkSheet() {
             />
 
             <hr />
+            <WorkSheetOptional
+              optionArr={options}
+              onChange={(arr) => { }}
+              disabled={disabled}
+            />
 
+            <hr />
 
+            <WorkSheetProductDetail02 watch={watch}
+              fakeWorkSheet_ori={fakeWorkSheet_ori}
+            />
 
           </div> {/* right */}
 
@@ -272,39 +283,40 @@ export type TfakeworkSheet = {
 
 
 const fakeWorkSheet: TfakeworkSheet = {
+  // profile的資料不應該編輯，之後要把profile的資料從抽出另外處理
   // profile right
-  projectNumber: "工程編號",
-  contractor: "承包商",
-  principal: "負責人",
-  companyPhone: "公司電話",
-  companyFax: "公司傳真",
+  projectNumber: "M-1101201",
+  contractor: "創典科技A有限公司",
+  principal: "李先生",
+  companyPhone: "04-1234567",
+  companyFax: "04-1234567",
 
   // profile left
-  projectName: "工程名稱",
-  projectDesc: "工程內容",
-  constructionSiteNumber: "工地電話",
-  constructionSiteFax: "工地傳真",
-  projectCity: "高雄市",
-  projectDistrict: "大樹區",
-  projectAddress: "花巷草弄20號",
-  projectPrincipal: "工程負責人",
-  projectPrincipalPhone: "工程負責人電話",
-
+  projectName: "台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程",
+  projectDesc: "捲門＋大門工程",
+  constructionSiteNumber: "04-1234567",
+  constructionSiteFax: "04-1234567",
+  projectCity: "台中市",
+  projectDistrict: "梧棲區",
+  projectAddress: "經二路27號",
+  projectPrincipal: "王先生",
+  projectPrincipalPhone: "0987654321",
+  // 
   // 合約產品項目
   /**項目 */
-  itemName: "項目",
+  itemName: "D-SD1-1",
   /**門型 */
-  doorType: "門型",
+  doorType: "SJ-302",
   /**全寬(L) */
-  length: "全寬(L)",
+  length: "5.25",
   /**淨高(h) */
-  height: "淨高(h)",
+  height: "4.87",
   /**捲箱高(B) */
-  thickness: "捲箱高(B)",
+  thickness: "5.50",
   /**數量 */
-  quantity: "數量",
+  quantity: "12",
   /**材質 */
-  material: "材質",
+  material: "不鏽鋼304#",
   /**防颱 */
   typhoonProtection: true,
 
@@ -395,7 +407,22 @@ const fakeWorkSheet: TfakeworkSheet = {
 
 
 
+// ===========================================================================
 
+const options = [
+  { value: "門楣", label: "門楣" },
+  { value: "防颱底座鎖固", label: "防颱底座鎖固" },
+  { value: "UL 熔金體", label: "UL 熔金體" },
+  { value: "智慧型密碼開關", label: "智慧型密碼開關" },
+  { value: "遙控器(1:2)", label: "遙控器(1:2)" },
+  { value: "防颱活動中柱(滑軌)", label: "防颱活動中柱(滑軌)" },
+  { value: "颱風活動中柱(可拆式)", label: "颱風活動中柱(可拆式)" },
+  { value: "防爆裝置", label: "防爆裝置" },
+  { value: "手動關閉裝置", label: "手動關閉裝置" },
+  { value: "UPS", label: "UPS" },
+  { value: "煙感+中繼器", label: "煙感+中繼器" },
+  { value: "彈射門", label: "彈射門" },
+];
 
 
 

@@ -1,4 +1,4 @@
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, UseFormSetValue } from "react-hook-form";
 import classNames from "classnames";
 
 import InputSel from "components/global/gear/inputAndSel/inputSel"
@@ -11,26 +11,36 @@ import { TfakeworkSheet } from "pages/worksDepartment/contractList/contract/work
 
 
 
+
 export default function WorkSheetProfile(
-  { control, disabled }:
+  { control, disabled, watch }:
     {
       control: Control<TfakeworkSheet, any>
       disabled: boolean
+      // watch: UseFormSetValue<TfakeworkSheet>
+      watch: () => TfakeworkSheet
     }
 ) {
 
+
+  const wholeAddress = (() => {
+    const { projectCity, projectDistrict, projectAddress } = watch()
+    return `${projectCity}${projectDistrict}${projectAddress}`
+  })()
+
+  // profile的資料不應該編輯，之後要把Controller拿掉
   return (
     <div className={scss.profile}>
 
       <div className={scss.left}>
         <div className={scss.top}>
-          <Controller name="projectDesc" control={control}
+          <Controller name="projectName" control={control}
             render={({ field }) =>
               <InputSel className={scss.inputSel} label="工程名稱"
                 inputProps={field}
                 captionColor="main" disabled={disabled} showBaseline="auto" />
             } />
-          <Controller name="projectName" control={control}
+          <Controller name="projectDesc" control={control}
             render={({ field }) =>
               <InputSel className={scss.inputSel} label="工程內容"
                 inputProps={field}
@@ -39,16 +49,20 @@ export default function WorkSheetProfile(
         </div>
 
         <hr />
-        {/* 工程地點之後要改成下拉式選單 */}
         <div className={scss.bottom}>
           {configArr_left.map((item) => {
             const { key, label, className } = item
             return (
               <Controller key={key} name={key} control={control}
-                render={({ field }) =>
-                  <InputSel className={classNames(scss.inputSel, className)} label={label}
-                    inputProps={field}
-                    captionColor="main" disabled={disabled} showBaseline="auto" />
+                render={({ field }) => {
+                  const inputProps = field
+                  if (key === "projectAddress") inputProps.value = wholeAddress
+                  return (
+                    <InputSel className={classNames(scss.inputSel, className)} label={label}
+                      inputProps={inputProps}
+                      captionColor="main" disabled={disabled} showBaseline="auto" />
+                  )
+                }
                 } />
             )
           })}
