@@ -131,7 +131,7 @@ const checkOtherPermissions = (
     const highestGrade = (() => {
       if (jobs) {
         const sortedJobs = _.sortBy(jobs, "grade").reverse()
-        return sortedJobs[0].grade
+        return sortedJobs[0]?.grade ?? null
       }
       return null
     })()
