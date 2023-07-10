@@ -1,7 +1,7 @@
 // 報價單
 import React, {
   Dispatch, SetStateAction, FocusEvent,
-  useState, useRef
+  useState, useRef, Fragment
 } from "react"
 import moment from "moment"
 
@@ -67,7 +67,7 @@ export default function QuotationStateSel(
     setShowHistory("")
     document.removeEventListener('mousedown', closeHistoryList)
   }
-  
+
   const openHistoryList = () => {
     setShowHistory(scss.isShow)
     // 設定事件，點擊畫面就關掉
@@ -119,7 +119,7 @@ export default function QuotationStateSel(
           const timeString = mDate.format("HH:mm:ss")
 
           return (
-            <>
+            <Fragment key={index}>
               <div className={scss.item}>
                 <div><span>{`${state_from} > ${state_to}`}</span></div>
                 <div>
@@ -128,7 +128,7 @@ export default function QuotationStateSel(
                 </div>
               </div>
               {!(arr.length - 1 === index) && <hr />}
-            </>
+            </Fragment>
           )
         })}
       </div>
