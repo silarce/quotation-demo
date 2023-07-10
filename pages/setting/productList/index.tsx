@@ -3,15 +3,21 @@
 // 產品列表
 import { useState } from 'react';
 
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+
 // component
 import FilterPanel from 'components/page/setting/productList/filterPanel/filterPanel';
 import ProductList_Table from 'components/page/setting/productList/productList_Table/productList_Table';
+import ProductList_table_02 from 'components/page/setting/productList/productList_Table_02';
+import TabBar from 'components/page/setting/productList/tabBar';
 
 // glogal gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // scss
 import scss from './productList.module.scss';
+import { type } from 'os';
 
 // ==============================================================================
 export default function ProductList() {
@@ -25,6 +31,9 @@ export default function ProductList() {
     checkedDoorType: [...checkedDoorType],
     checkedPart: [...checkedPart],
   });
+
+  const [tabQuery, setTabQuery] = useState('底座');
+  const switchTab = (query: string) => setTabQuery(query);
 
   // 點擊類別的checkBox
   const checkProdClass = (value: TprodClassValues) => {
@@ -146,19 +155,24 @@ export default function ProductList() {
     <div className={scss.container}>
       <PageHeader02 tag="產品列表" panelList={panelList} />
 
-      <div className={scss.mainContainer}>
+      <SubLayer>
         <div>
-          <FilterPanel
-            prodClassOptions={prodClassOptions}
-            doorTypeOptions={doorTypeOptions}
-            partOptions={partOptions}
-            filterCtrl={filterCtrl}
-          />
+          <div>
+            <FilterPanel
+              prodClassOptions={prodClassOptions}
+              doorTypeOptions={doorTypeOptions}
+              partOptions={partOptions}
+              filterCtrl={filterCtrl}
+            />
+          </div>
+
+          <TabBar query={tabQuery} switchTab={switchTab} />
+          <ProductList_table_02 fakeDataArr={fakeDataArr} />
+          {/* <div>
+            <ProductList_Table fakeData={fakeData} doFilter={doFilter} />
+          </div> */}
         </div>
-        <div>
-          <ProductList_Table fakeData={fakeData} doFilter={doFilter} />
-        </div>
-      </div>
+      </SubLayer>
     </div>
   );
 }
@@ -257,159 +271,323 @@ export type TfakeData = {
   densityRatio: number; // 密度比
 };
 
-const fakeData: TfakeData[] = [
-  {
-    prodClass: '防火防煙捲門系列',
-    doorType: 'SJ-303AS',
-    part: '捲門片',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+// const fakeData: TfakeData[] = [
+//   {
+//     prodClass: '防火防煙捲門系列',
+//     doorType: 'SJ-303AS',
+//     part: '捲門片',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防水防洪門系列',
+//     doorType: '120A',
+//     part: '捲門片',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防火防煙捲門系列',
+//     doorType: 'SJ-302',
+//     part: '支板',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防火防煙捲門系列',
+//     doorType: 'SJ-303AS',
+//     part: '門箱',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '廠辦管制門',
+//     doorType: 'SJ-303AS',
+//     part: '門箱',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '客製化',
+//     doorType: 'SJ-305D',
+//     part: '電動機',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '圍牆大門',
+//     doorType: 'SJ-302',
+//     part: '門箱',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防水防洪門系列',
+//     doorType: 'SJ-303A',
+//     part: '安裝費(含送電及試車)',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防水防洪門系列',
+//     doorType: '120A',
+//     part: '配電箱及按鈕開關',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防水防洪門系列',
+//     doorType: 'SJ-305D',
+//     part: '捲門片',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '機庫門',
+//     doorType: 'SJ-312',
+//     part: '門軌',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防水防洪門系列',
+//     doorType: 'SJ-303A',
+//     part: '電動機',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '圍牆大門',
+//     doorType: 'SJ-303AS',
+//     part: '支板',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+//   {
+//     prodClass: '防火防煙捲門系列',
+//     doorType: 'SJ-312',
+//     part: '捲門片',
+//     name: '一般型1.5t',
+//     length: 123,
+//     caliber: 123,
+//     thickness: '1.5t',
+//     expandHeight: 0.174,
+//     densityRatio: 7.63,
+//   },
+// ];
+
+export type TfakeData02 = {
+  doorType: string; // 門型 // SH-303AS
+  prodClass: string; // 類別 防火防煙捲門系列
+  base: TfakeBase; // 底座
+  rollDoorPiece: TfakeRollDoorPiece; // 捲門片
+  doorTrack: TfakeDoorTrack; // 門軌
+  supportPlate: TfakeSupportPlate; // 支板
+  reel: TfakeReel; // 捲軸
+  motor: TfakeMotor; // 電動機
+  motorParts: TfakeMotorParts; // 電動機配件
+  reelBox: TfakeReelBox; // 捲箱
+};
+
+// 底座
+export type TfakeBase = {
+  // name: '底座'; // 類型
+  type01: string; // 形式1
+  type02: string | undefined; // 形式2
+  surface: boolean; // 表面
+};
+// 捲門片
+export type TfakeRollDoorPiece = {
+  // name: '捲門片'; // 類型
+  type: string; // 型式
+  surface: boolean; // 表面
+  material: string; // 材質
+  thickness: string | undefined; // 厚度
+};
+
+// 門軌
+export type TfakeDoorTrack = {
+  // name: '門軌'; // 類型
+  type: string; // 型式
+  surface: boolean; // 表面
+  material: string; // 材質
+  thickness: string | undefined; // 厚度
+  noiseStrip: boolean; //消音條
+};
+
+// 支板
+export type TfakeSupportPlate = {
+  // name: '支板'; // 類型
+  chainGearNumber: string; // 鏈齒輪番號
+  reelBox: string; // 捲箱型式
+  supplier: string | undefined; // 廠商 供應商
+  maxMotorWeight: string | undefined; // 最大馬達重量
+  minMotorWeight: string | undefined; // 最小馬達重量
+  horsepower: string | undefined; // 馬力數
+};
+
+// 捲軸
+export type TfakeReel = {
+  // name: '捲軸'; // 類型
+  size: string; // 捲軸尺寸
+  bearing: string | undefined; // 軸承
+};
+
+// 電動機
+export type TfakeMotor = {
+  // name: '電動機'; // 類型
+  horsepower: string; // 馬力數
+  weight: string; // 重量
+  supportFrame: boolean; // 支撐架
+  powerSupplier: string | undefined; // 電供
+  voltage: string | undefined; // 電壓
+  chainGearNumber: string; // 鏈齒輪番號
+  supplier: string; // 廠商 供應商
+};
+
+// 馬達配件
+export type TfakeMotorParts = {
+  // name: '馬達配件'; // 類型
+  chain: string; // 鏈條
+  lockCase: string; // 鎖盒
+  bearing: string; // 軸承
+};
+
+// 捲箱
+export type TfakeReelBox = {
+  // name: '捲箱'; // 類型
+  thickness: string; // 厚度
+  surface: boolean; // 表面
+  material: string; // 材質
+  front: string; // 前面
+  back: string; // 後面
+  type: string; // 捲箱型式
+};
+
+const fakeDate2: TfakeData02 = {
+  doorType: 'SH-303AS',
+  prodClass: '防火防煙捲門系列',
+  base: {
+    type01: '一般型',
+    type02: undefined,
+    surface: false,
   },
-  {
-    prodClass: '防水防洪門系列',
-    doorType: '120A',
-    part: '捲門片',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
+  rollDoorPiece: {
+    type: '一般型',
+    surface: false,
+    material: '鍍鋅鋼板(1.5t)',
     thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
   },
-  {
-    prodClass: '防火防煙捲門系列',
-    doorType: 'SJ-302',
-    part: '支板',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
+  doorTrack: {
+    type: '一般型',
+    surface: true,
+    material: '鍍鋅鋼板(1.5t)',
     thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+    noiseStrip: false,
   },
-  {
-    prodClass: '防火防煙捲門系列',
-    doorType: 'SJ-303AS',
-    part: '門箱',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+  supportPlate: {
+    chainGearNumber: '#530',
+    reelBox: '捲箱',
+    supplier: undefined,
+    maxMotorWeight: undefined,
+    minMotorWeight: undefined,
+    horsepower: undefined,
   },
-  {
-    prodClass: '廠辦管制門',
-    doorType: 'SJ-303AS',
-    part: '門箱',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+  reel: {
+    size: '5',
+    bearing: undefined,
   },
-  {
-    prodClass: '客製化',
-    doorType: 'SJ-305D',
-    part: '電動機',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+  motor: {
+    horsepower: '1/4HP',
+    weight: '300KG',
+    supportFrame: false,
+    powerSupplier: undefined,
+    voltage: undefined,
+    chainGearNumber: '#640',
+    supplier: '大同',
   },
-  {
-    prodClass: '圍牆大門',
-    doorType: 'SJ-302',
-    part: '門箱',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+  motorParts: {
+    chain: '單排',
+    lockCase: '外露式',
+    bearing: '#6208',
   },
-  {
-    prodClass: '防水防洪門系列',
-    doorType: 'SJ-303A',
-    part: '安裝費(含送電及試車)',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
+  reelBox: {
+    thickness: '0.8T',
+    surface: true,
+    material: '鍍鋅鋼板',
+    front: '正雲白',
+    back: '正乳白',
+    type: '捲箱',
   },
-  {
-    prodClass: '防水防洪門系列',
-    doorType: '120A',
-    part: '配電箱及按鈕開關',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: '防水防洪門系列',
-    doorType: 'SJ-305D',
-    part: '捲門片',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: '機庫門',
-    doorType: 'SJ-312',
-    part: '門軌',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: '防水防洪門系列',
-    doorType: 'SJ-303A',
-    part: '電動機',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: '圍牆大門',
-    doorType: 'SJ-303AS',
-    part: '支板',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
-  {
-    prodClass: '防火防煙捲門系列',
-    doorType: 'SJ-312',
-    part: '捲門片',
-    name: '一般型1.5t',
-    length: 123,
-    caliber: 123,
-    thickness: '1.5t',
-    expandHeight: 0.174,
-    densityRatio: 7.63,
-  },
+};
+
+const fakeDataArr: TfakeData02[] = [
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
+  fakeDate2,
 ];
