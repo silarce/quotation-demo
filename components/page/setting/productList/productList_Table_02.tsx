@@ -5,17 +5,49 @@ import scss from './productList_Table_02.module.scss';
 import { TfakeData02 } from 'pages/setting/productList';
 
 export default function ProductList_table_02({ fakeDataArr }: { fakeDataArr: TfakeData02[] }) {
-  return <div></div>;
+  return (
+    <div className={scss.table}>
+      <div className={scss.thead}>
+        <div className={classNames(scss.column, config.doorType.className)}>
+          <span>{config.doorType.label}</span>
+        </div>
+        <div className={classNames(scss.column, config.prodClass.className)}>
+          <span>{config.prodClass.label}</span>
+        </div>
+        {keyList['base'].map((key, index) => {
+          const { label, className } = configList['base'][key];
+
+          return (
+            <div className={classNames(scss.column, className)} key={index}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 // ==========================================================
+
+const keyList = {
+  base: ['type01', 'type02', 'surface'],
+  rollDoorPiece: ['type', 'surface', 'material', 'thickness'],
+  doorTrack: ['type', 'surface', 'material', 'thickness', 'noiseStrip'],
+  supportPlate: ['chainGearNumber', 'reelBox', 'supplier', 'maxMotorWeight', 'minMotorWeight', 'horsepower'],
+  reel: ['size', 'bearing'],
+  motor: ['horsepower', 'weight', 'supportFrame', 'powerSupplier', 'voltage', 'chainGearNumber', 'supplier'],
+  motorParts: ['chain', 'lockCase', 'bearing'],
+  reelBox: ['thickness', 'surface', 'material', 'front', 'back', 'type'],
+} as const;
+
 const config = {
   doorType: {
     label: '門型',
     className: classNames('w-[90px]'),
   },
   prodClass: {
-    label: '門型',
+    label: '類型',
     className: classNames('w-[112px]'),
   },
   type01: {
@@ -50,10 +82,6 @@ const config = {
     label: '鏈齒輪番號',
     className: classNames('w-[96px]'),
   },
-  reelBox: {
-    label: '捲箱型式',
-    className: classNames('w-[96px]'),
-  },
   supplier: {
     label: '廠商',
     className: classNames('w-[60px]'),
@@ -69,10 +97,6 @@ const config = {
   horsepower: {
     label: '馬力數',
     className: classNames('w-[60px]'),
-  },
-  size: {
-    label: '捲軸尺寸',
-    className: classNames('w-[78px]'),
   },
   bearing: {
     label: '軸承',
@@ -109,5 +133,40 @@ const config = {
   back: {
     label: '後面',
     className: classNames('w-[90px]'),
+  },
+} as const;
+
+const configList = {
+  base: {
+    ...config,
+  },
+  rollDoorPiece: {
+    ...config,
+  },
+  doorTrack: {
+    ...config,
+  },
+  supportPlate: {
+    ...config,
+  },
+  reel: {
+    ...config,
+    size: {
+      label: '捲軸尺寸',
+      className: classNames('w-[78px]'),
+    },
+    type: {
+      label: '捲箱型式',
+      className: classNames('w-[96px]'),
+    },
+  },
+  motor: {
+    ...config,
+  },
+  motorParts: {
+    ...config,
+  },
+  reelBox: {
+    ...config,
   },
 } as const;
