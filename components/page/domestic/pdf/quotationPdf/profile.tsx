@@ -1,42 +1,31 @@
 // css
-import style from "./quotationPdf.module.scss"
+import style from './quotationPdf.module.scss';
 // type
-import { TuseProfile } from "components/page/domestic/quotation/hook/useProfile"
-
-
-
-
+import { TuseProfile } from 'components/page/domestic/quotation/hook/useProfile';
 
 export type Tprofile = {
-  quotationId: string,
-  clientName: string,
-  contactPerson: string,
-  contactPhone: string,
-  fax: string,
-  builtDate: string,
-  projectAddress: string,
-}
+  quotationId: string;
+  clientName: string;
+  contactPerson: string;
+  contactPhone: string;
+  fax: string;
+  builtDate: string;
+  projectAddress: string;
+};
 
+export default function Profile({
+  profileData,
+  index,
+  pageCount,
+}: {
+  profileData: Tprofile;
+  index: number;
+  pageCount: number;
+}) {
+  const { quotationId, clientName, contactPerson, contactPhone, fax, builtDate, projectAddress } = profileData;
 
-export default function Profile(
-  { profileData, index, pageCount }:
-    {
-      profileData: Tprofile
-      index: number
-      pageCount: number
-    }
-) {
-
-
-
-  const {
-    quotationId, clientName, contactPerson, contactPhone,
-    fax, builtDate,
-    projectAddress
-  } = profileData
-
-  const [year, month, day] = builtDate.split("-")
-  const date = `${year}年${month}月${day}日`
+  const [year, month, day] = builtDate.split('-');
+  const date = `${year}年${month}月${day}日`;
 
   return (
     <div className={style.profile}>
@@ -80,7 +69,7 @@ export default function Profile(
           <div className={style.info}>
             <span>報價時效</span>
             <span className={style.semi}>:</span>
-            <span>{"十天內"}</span>
+            <span>{'十天內'}</span>
           </div>
           <div className={style.info}>
             <span>報價日期</span>
@@ -104,21 +93,5 @@ export default function Profile(
         <span>{projectAddress}</span>
       </div>
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

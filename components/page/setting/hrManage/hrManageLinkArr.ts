@@ -1,15 +1,14 @@
-
 export const hrManageLinkArr = [
   {
-    label: "ERP操作權限",
-    href: "/setting/hrManage/erpCtrlPermissions",
+    label: 'ERP操作權限',
+    href: '/setting/hrManage/erpCtrlPermissions',
   },
   {
-    label: "ERP功能權限",
-    href: "/setting/hrManage/erpFuncPermissions",
+    label: 'ERP功能權限',
+    href: '/setting/hrManage/erpFuncPermissions',
   },
   {
-    label: "人事權限管理",
-    href: "/setting/hrManage",
+    label: '人事權限管理',
+    href: '/setting/hrManage',
   },
-]
+];

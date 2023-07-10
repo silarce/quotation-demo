@@ -1,12 +1,7 @@
-
-
-
 // css
-import style from "../queryQuotationList.module.scss"
-
+import style from '../queryQuotationList.module.scss';
 
 export default function Thead() {
-
   return (
     <div className={style.thead}>
       <span>報價編號</span>
@@ -17,9 +12,7 @@ export default function Thead() {
       <span>連絡電話</span>
       <span>{/* 按鈕格 留白 */}</span>
     </div>
-  )
+  );
 }
 
-
 // ======================
-

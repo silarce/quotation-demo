@@ -1,136 +1,138 @@
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/router";
-const _ = require("lodash")
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // layer
-import SubLayer from "components/Layer/SubLayer/SubLayer";
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import EditEmployee from "components/page/setting/employees/editEmployee";
+import EditEmployee from 'components/page/setting/employees/editEmployee';
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
-import myAlert from "components/global/gear/modal/simpleModal/alertModals";
-import { setRootLoading } from "components/global/gear/loadingCover/rootLoadingCover";
-import InvalidIdTip from "components/global/InvalidIdTip";
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { setRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import InvalidIdTip from 'components/global/InvalidIdTip';
 // css
-import style from "../employees.module.scss"
+import style from '../employees.module.scss';
 
 // api
-import {
-  TemployeeDto, TapiGetEmployee_idParams,
-  useEmployeeById, apiPatchEmployee
-} from "js/api/api_employee";
-import { Tparams_jobs, useDepartments_jobs, } from "js/api/api_department";
+import { TemployeeDto, TapiGetEmployee_idParams, useEmployeeById, apiPatchEmployee } from 'js/api/api_employee';
+import { Tparams_jobs, useDepartments_jobs } from 'js/api/api_department';
 
 // hook
-import { useClassEmployee } from "hooks/department-job-Employee/useEmployee";
+import { useClassEmployee } from 'hooks/department-job-Employee/useEmployee';
 // tool
-import { jobsOptionsCreator } from "js/tools/selectOption/jobsOptionsCreator";
+import { jobsOptionsCreator } from 'js/tools/selectOption/jobsOptionsCreator';
 
-type TemployeeDto_jobs = TemployeeDto & (Pick<Required<TemployeeDto>, "jobs">)
+type TemployeeDto_jobs = TemployeeDto & Pick<Required<TemployeeDto>, 'jobs'>;
 
 const theUseEmployeeByIdParams: TapiGetEmployee_idParams = {
-  populate: ["jobs"]
-}
+  populate: ['jobs'],
+};
 
 const departmentParams: Tparams_jobs = {
-  order: "ASC",
+  order: 'ASC',
   page: 1,
   pageSize: 999,
-  populate: ["jobs"]
-}
+  populate: ['jobs'],
+};
 
 export default function AddEmployee() {
-  const router = useRouter()
-  const [isReady, setIsReady] = useState(false)
+  const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
   // ================================================
 
-  let { data: employeeData_basic, setData: setEmployeeData, update: updateEmployee } =
-    useEmployeeById(router.query.employeeId as string || "", theUseEmployeeByIdParams)
-  const employeeData = employeeData_basic as TemployeeDto_jobs | undefined
+  const {
+    data: employeeData_basic,
+    setData: setEmployeeData,
+    update: updateEmployee,
+  } = useEmployeeById((router.query.employeeId as string) || '', theUseEmployeeByIdParams);
+  const employeeData = employeeData_basic as TemployeeDto_jobs | undefined;
 
-  const { data: departmentsDataWithMeta, update: updateDepartmentsData }
-    = useDepartments_jobs(departmentParams)
-  const departmentsData = departmentsDataWithMeta?.data
+  const { data: departmentsDataWithMeta, update: updateDepartmentsData } = useDepartments_jobs(departmentParams);
+  const departmentsData = departmentsDataWithMeta?.data;
 
   useEffect(() => {
     (async () => {
-      await Promise.all([updateEmployee(), updateDepartmentsData()])
-      setIsReady(true)
-    })()
+      await Promise.all([updateEmployee(), updateDepartmentsData()]);
+      setIsReady(true);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
-  const classEmployee = useClassEmployee(employeeData)
+  const classEmployee = useClassEmployee(employeeData);
 
   const departmentJobOptionGroup = useMemo(() => {
-    if (!departmentsData) return undefined
-    return jobsOptionsCreator(departmentsData)
-  }, [departmentsData])
+    if (!departmentsData) {
+      return undefined;
+    }
 
+    return jobsOptionsCreator(departmentsData);
+  }, [departmentsData]);
 
   const panelList: TpanelList = [
     {
-      type: "redButton",
-      label: "上傳",
+      type: 'redButton',
+      label: '上傳',
       onClick: async () => {
-        if (!classEmployee) return
-        if (!classEmployee.startDate) return myAlert.warning({ title: "請輸入到職日" })
+        if (!classEmployee) {
+          return;
+        }
+
+        if (!classEmployee.startDate) {
+          return myAlert.warning({ title: '請輸入到職日' });
+        }
+
         try {
-          setRootLoading(true)
+          setRootLoading(true);
 
-          const { postBody, } = classEmployee
-          const id = postBody.id
+          const { postBody } = classEmployee;
+          const id = postBody.id;
 
-          await apiPatchEmployee(postBody, id)
+          await apiPatchEmployee(postBody, id);
           router.push({
             pathname: `/setting/employees`,
-          })
-          myAlert.success({ title: "變更人員資料完成" })
+          });
+          myAlert.success({ title: '變更人員資料完成' });
+        } catch (error) {
+          const err = error as Error;
+          const title = '變更人員資料失敗、未知原因';
+          myAlert.err({ title, content: err.message });
+        } finally {
+          setRootLoading(false);
         }
-        catch (error) {
-          const err = error as Error
-          const title = "變更人員資料失敗、未知原因"
-          myAlert.err({ title, content: err.message })
-        }
-        finally {
-          setRootLoading(false)
-        }
-      }
+      },
     },
     {
-      type: "myButton",
-      label: "取消",
+      type: 'myButton',
+      label: '取消',
       onClick: () => {
         if (router.query.isNew) {
-          window.history.go(-2)
-          return
+          window.history.go(-2);
+
+          return;
         }
-        router.back()
-      }
-    }
-  ]
+
+        router.back();
+      },
+    },
+  ];
 
   if (isReady && !employeeData) {
-    return <InvalidIdTip />
+    return <InvalidIdTip />;
   }
 
   if (isReady && classEmployee && departmentJobOptionGroup) {
     return (
       <SubLayer>
-        <PageHeader02 tag="人員資料"
-          panelList={panelList}
-        />
+        <PageHeader02 tag="人員資料" panelList={panelList} />
         <div>
-          <EditEmployee
-            classEmployee={classEmployee}
-            departmentJobOptionGroup={departmentJobOptionGroup}
-          />
+          <EditEmployee classEmployee={classEmployee} departmentJobOptionGroup={departmentJobOptionGroup} />
         </div>
       </SubLayer>
-    )
+    );
   }
 
-  return null
+  return null;
 }

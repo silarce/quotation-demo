@@ -1,73 +1,54 @@
-import { useState } from "react"
-
+import { useState } from 'react';
 
 // components
-import DndThead from "./quotationProduct/dndThead_legacyContract"
-import ProductList from "./quotationProduct/productList"
-import ProductList_legacy from "./quotationProduct/productList_legacy"
+import DndThead from './quotationProduct/dndThead_legacyContract';
+import ProductList from './quotationProduct/productList';
+import ProductList_legacy from './quotationProduct/productList_legacy';
 
 // global gear
-import AddButton from "components/global/gear/button/addButton"
+import AddButton from 'components/global/gear/button/addButton';
 
 // css
-import style from "./quotationProduct.module.scss"
-import styleL from "./local.module.scss"
+import style from './quotationProduct.module.scss';
+import styleL from './local.module.scss';
 
 // type
-import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
-
-
+import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
 export default function QuotationProduction({
   legacyContract,
   disabled,
   switch02,
-  className = "" }:
-  {
-    legacyContract: Class_legacyContract
-    disabled: boolean
-    switch02?: boolean
-    className?: string
-  }) {
+  className = '',
+}: {
+  legacyContract: Class_legacyContract;
+  disabled: boolean;
+  switch02?: boolean;
+  className?: string;
+}) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
 
+  const [allowMove, setAllowMove] = useState(false);
 
-  const [allowMove, setAllowMove] = useState(false)
-
-  const borderRed = switch02 ? style.borderRed : ""
+  const borderRed = switch02 ? style.borderRed : '';
 
   return (
     <div className={`${style.container} ${borderRed} ${className}`}>
       <div className={styleL.header}>
         <h2>主產品設定</h2>
-        <button className={((allowMove && styleL.active) || "")}
-          onClick={() => setAllowMove(state => !state)}>
-          {allowMove ? "確定排序" : "設定排序"}
+        <button className={(allowMove && styleL.active) || ''} onClick={() => setAllowMove((state) => !state)}>
+          {allowMove ? '確定排序' : '設定排序'}
         </button>
       </div>
       <div className={style.listContainer}>
         <div className={style.thead}>
-          <DndThead
-            classQuotation={legacyContract}
-            allowMove={allowMove} />
+          <DndThead classQuotation={legacyContract} allowMove={allowMove} />
         </div>
 
         <ProductList_legacy classQuotation={legacyContract as Class_legacyContract} disabled={disabled} />
-        {!disabled &&
-          <AddButton className={style.addBtn}
-            label="新增產品"
-            onClick={legacyContract.addProd} />
-        }
+        {!disabled && <AddButton className={style.addBtn} label="新增產品" onClick={legacyContract.addProd} />}
       </div>
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-

@@ -1,34 +1,30 @@
-import { useState } from "react"
-import classNames from "classnames"
-
+import { useState } from 'react';
+import classNames from 'classnames';
 
 // global gear
-import InputSel from "components/global/gear/inputAndSel/inputSel"
-import InputModal from "components/global/gear/modal/simpleModal/inputModal"
-import MustTip_simple from "components/global/gear/other/mustTip_simple"
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal';
+import MustTip_simple from 'components/global/gear/other/mustTip_simple';
 // icon
-import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons"
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from "./payInfo.module.scss"
+import style from './payInfo.module.scss';
 
 // type
-import { Class_legacyContract } from "hooks/quotation/useLegacyContract"
+import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
-
-export default function PayInfo_legacy(
-  { legacyContract,
-    disabled }:
-    {
-      legacyContract: Class_legacyContract
-      disabled: boolean
-    }) {
+export default function PayInfo_legacy({
+  legacyContract,
+  disabled,
+}: {
+  legacyContract: Class_legacyContract;
+  disabled: boolean;
+}) {
   // -----------------------------------------------------------------------
-  const [modalIsShow, setModalIsShow] = useState(false)
+  const [modalIsShow, setModalIsShow] = useState(false);
   // -----------------------------------------------------------------------
-  const { classPayInfo } = legacyContract
-
-
+  const { classPayInfo } = legacyContract;
 
   const {
     discountRate,
@@ -42,54 +38,57 @@ export default function PayInfo_legacy(
     editPayMethod,
     addPayMethod,
     removePayMethod,
-  } = classPayInfo
+  } = classPayInfo;
 
   // -----------------------------------------------------------------------
   const countList = [
-    { label: "小計", key: "subTotal" },
-    { label: "營業稅(5%)", key: "salesTax" },
-    { label: "總計", key: "total" },
-  ] as const
+    { label: '小計', key: 'subTotal' },
+    { label: '營業稅(5%)', key: 'salesTax' },
+    { label: '總計', key: 'total' },
+  ] as const;
+
   // -----------------------------------------------------------------------
   return (
-
     <div className={classNames(style.container, style.legacy)}>
-
       <div className={style.payBox}>
-        <div className={classNames(style.avgDiscount, "relative")}>
+        <div className={classNames(style.avgDiscount, 'relative')}>
           <span className="relative">
-            {"總折數"}
+            {'總折數'}
             <MustTip_simple preStyle="minimal" />
           </span>
           <div>
-            <input type="number" className="bg-transparent"
+            <input
+              type="number"
+              className="bg-transparent"
               value={discountRate}
-              onChange={(e) => classPayInfo.discountRate = e.target.value}
+              onChange={(e) => (classPayInfo.discountRate = e.target.value)}
               disabled={disabled}
             />
             <span>%</span>
           </div>
-
         </div>
 
         {countList.map((item, index) => {
-          let { label, key } = item
+          const { label, key } = item;
+
           return (
-            <div key={index} className={classNames(style.avgDiscount, "relative")}>
+            <div key={index} className={classNames(style.avgDiscount, 'relative')}>
               <span className="relative">
                 {label}
                 <MustTip_simple preStyle="minimal" />
               </span>
               <div>
-                <input type="text" className="bg-transparent"
+                <input
+                  type="text"
+                  className="bg-transparent"
                   value={classPayInfo[key]}
-                  onChange={(e) => classPayInfo[key] = e.target.value}
+                  onChange={(e) => (classPayInfo[key] = e.target.value)}
                   disabled={disabled}
                 />
                 <span></span>
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -100,14 +99,16 @@ export default function PayInfo_legacy(
           <InputSel
             inputProps={{
               value: deliveryLocation,
-              onChange: (v) => { classPayInfo.deliveryLocation = v },
+              onChange: (v) => {
+                classPayInfo.deliveryLocation = v;
+              },
             }}
             placeholder={`請輸入交貨地址`}
             disabled={disabled}
           />
         </div>
         <div className={classNames(style.inputBox01, style.date)}>
-          <span className={"relative"}>
+          <span className={'relative'}>
             <MustTip_simple />
             交貨日期
           </span>
@@ -116,49 +117,64 @@ export default function PayInfo_legacy(
               value: deliveryDate as string,
               // onChange: (v) => { classPayInfo.deliveryDate = v },
               onChange02(moment) {
-                classPayInfo.deliveryDate = moment?.toISOString() || ""
+                classPayInfo.deliveryDate = moment?.toISOString() || '';
               },
-              datePickerClassName: style.datePicker
+              datePickerClassName: style.datePicker,
             }}
             placeholder={`例 : 100-01-01`}
             disabled={disabled}
           />
         </div>
         {/* 付款辦法 */}
-        <div className={classNames(style.payMethodContainer, "relative")}>
+        <div className={classNames(style.payMethodContainer, 'relative')}>
           <span>付款辦法</span>
           {paymentMethods.map((method, index) => {
-            const { totalPaymentRatio, milestone } = method
+            const { totalPaymentRatio, milestone } = method;
+
             return (
-              <div key={index}
-                className={classNames(style.inputBox02, style.legacy)}>
-                <IconRemoveCircle className={style.btn}
-                  onClick={() => removePayMethod(index)} />
-                <span className={style.label}>{index + 1}.{milestone}</span>
+              <div key={index} className={classNames(style.inputBox02, style.legacy)}>
+                <IconRemoveCircle className={style.btn} onClick={() => removePayMethod(index)} />
+                <span className={style.label}>
+                  {index + 1}.{milestone}
+                </span>
                 <InputSel
                   inputProps={{
                     value: totalPaymentRatio,
-                    onChange: (v) => { editPayMethod(index, v) },
-                    inputType: "number",
+                    onChange: (v) => {
+                      editPayMethod(index, v);
+                    },
+                    inputType: 'number',
                   }}
                   placeholder="請輸入%數"
-                  disabled={disabled} />
+                  disabled={disabled}
+                />
                 <span>%</span>
               </div>
-            )
+            );
           })}
-          {!disabled && <IconAddCircle className={style.btn} onClick={() => { setModalIsShow(true) }} />}
-
+          {!disabled && (
+            <IconAddCircle
+              className={style.btn}
+              onClick={() => {
+                setModalIsShow(true);
+              }}
+            />
+          )}
         </div>
       </div>
       <InputModal
         visible={modalIsShow}
         title="新增付款辦法"
         placeholder="請輸入付款辦法描述"
-        onConfirm={(v) => { addPayMethod(v); setModalIsShow(false) }}
-        onCancel={() => { setModalIsShow(false) }}
+        onConfirm={(v) => {
+          addPayMethod(v);
+          setModalIsShow(false);
+        }}
+        onCancel={() => {
+          setModalIsShow(false);
+        }}
       />
     </div>
-  )
+  );
 } // PayInfo
 // ============================

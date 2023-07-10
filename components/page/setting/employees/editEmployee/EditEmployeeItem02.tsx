@@ -1,16 +1,13 @@
-
 // global gear
-import InputSel from "components/global/gear/inputAndSel/inputSel";
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // icon
-import { IconAddCircle, IconRemoveCircle } from "public/image/icon/svgComponent/svgIcons";
-
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // type
-import { Class_employee } from "hooks/department-job-Employee/useEmployee";
+import { Class_employee } from 'hooks/department-job-Employee/useEmployee';
 // css
-import scss from "../editEmployee.module.scss"
-
+import scss from '../editEmployee.module.scss';
 
 // ============================================================
 
@@ -26,17 +23,17 @@ type TdepartmentJobOptionGroup = {
       grade: string;
     }[];
   };
-}
-
-
+};
 
 // ============================================================
-export default function EditEmployeeItem02({ classEmployee, departmentJobOptionGroup }: {
-  classEmployee: Class_employee
-  departmentJobOptionGroup: TdepartmentJobOptionGroup
+export default function EditEmployeeItem02({
+  classEmployee,
+  departmentJobOptionGroup,
+}: {
+  classEmployee: Class_employee;
+  departmentJobOptionGroup: TdepartmentJobOptionGroup;
 }) {
-
-  const { classJobGroupArr, addJobGroup, removeJobGroup } = classEmployee
+  const { classJobGroupArr, addJobGroup, removeJobGroup } = classEmployee;
 
   return (
     <div className={scss.editEmployeeItem02}>
@@ -44,69 +41,75 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
       <div className={scss.form02}>
         <div className={scss.jobsArr}>
           {classJobGroupArr.map((group, index, arr) => {
-            const { department, job } = group
+            const { department, job } = group;
 
-            const departmentValue = department ? {
-              value: department.id,
-              label: department.name
-            } : null
-            const jobValue = job ? {
-              value: job.id,
-              label: job.name,
-            } : null
+            const departmentValue = department
+              ? {
+                  value: department.id,
+                  label: department.name,
+                }
+              : null;
+            const jobValue = job
+              ? {
+                  value: job.id,
+                  label: job.name,
+                }
+              : null;
 
-            const departmentOptionArr
-              = departmentJobOptionGroup.departmentOptionArr
+            const departmentOptionArr = departmentJobOptionGroup.departmentOptionArr;
 
-            const jobOptionArr
-              = department
-                ? departmentJobOptionGroup.jobOptionArrList[department.id]
-                : []
+            const jobOptionArr = department ? departmentJobOptionGroup.jobOptionArrList[department.id] : [];
 
             return (
               <div key={index} className={scss.selBox}>
-
-                <InputSel className={scss.inputSel}
+                <InputSel
+                  className={scss.inputSel}
                   label="部門"
                   presetStyle="s01"
                   selectProps={{
                     value: departmentValue,
                     options: departmentOptionArr,
                     onChange: (option) => {
-                      if (!option) group.department = null
-                      else {
+                      if (!option) {
+                        group.department = null;
+                      } else {
                         group.department = {
                           id: option.value,
-                          name: option.label
-                        }
+                          name: option.label,
+                        };
                       }
                     },
-                  }} />
-                <InputSel className={scss.inputSel} key={index}
+                  }}
+                />
+                <InputSel
+                  className={scss.inputSel}
+                  key={index}
                   label="職稱"
                   presetStyle="s01"
                   selectProps={{
                     value: jobValue,
                     options: jobOptionArr,
                     onChange: (option) => {
-                      if (!option) group.job = null
-                      else {
+                      if (!option) {
+                        group.job = null;
+                      } else {
                         group.job = {
                           id: option.value,
                           name: option.label,
-                          grade: option.grade ?? ""
-                        }
+                          grade: option.grade ?? '',
+                        };
                       }
                     },
-                  }} />
+                  }}
+                />
                 <InputSel
                   className={scss.inputSel}
                   label="職等"
                   presetStyle="s01"
                   disabled={true}
                   inputProps={{
-                    value: job?.grade ?? "",
-                    onChange: () => { },
+                    value: job?.grade ?? '',
+                    onChange: () => {},
                   }}
                 />
                 <div className={scss.btnBox}>
@@ -114,14 +117,14 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
                   {arr.length !== 1 && <IconRemoveCircle onClick={() => removeJobGroup(index)} />}
                 </div>
               </div>
-            )
+            );
           })}
         </div>
 
-
         <div className={scss.bottomContainer}>
           <div>
-            <InputSel className={scss.inputSel}
+            <InputSel
+              className={scss.inputSel}
               label="年資"
               captionWidth="60px"
               presetStyle="s01"
@@ -136,14 +139,18 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
           </div>
           <div>
             {keyIndex02.map((key, index) => {
-              const stateValue = classEmployee[key]
-              const { label } = config02[key]
+              const stateValue = classEmployee[key];
+              const { label } = config02[key];
+
               const onChange02 = (moment: moment.Moment | null) => {
-                classEmployee[key] = moment?.toISOString() ?? ""
-              }
-              const isMust = key === "startDate" ? true : false
+                classEmployee[key] = moment?.toISOString() ?? '';
+              };
+
+              const isMust = key === 'startDate' ? true : false;
+
               return (
-                <InputSel className={scss.inputSel}
+                <InputSel
+                  className={scss.inputSel}
                   key={index}
                   label={label}
                   captionWidth="60px"
@@ -155,42 +162,38 @@ export default function EditEmployeeItem02({ classEmployee, departmentJobOptionG
                   isMust={isMust}
                   mustTipClassName={scss.mustTip}
                 />
-              )
+              );
             })}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 } // EditEmployeeItem02
 
 // ============================================================
 
-type TkeyIndex02Keys =
-  "startDate" | "leaveDate" | "retireDate" | "severanceDate"
+type TkeyIndex02Keys = 'startDate' | 'leaveDate' | 'retireDate' | 'severanceDate';
 
-const keyIndex02: TkeyIndex02Keys[] = [
-  "startDate", "leaveDate", "retireDate", "severanceDate"
-]
+const keyIndex02: TkeyIndex02Keys[] = ['startDate', 'leaveDate', 'retireDate', 'severanceDate'];
 
 const config02: {
   [key in TkeyIndex02Keys]: {
-    label: string
-  }
+    label: string;
+  };
 } = {
-  "startDate": {
-    label: "到職日"
+  startDate: {
+    label: '到職日',
   },
-  "leaveDate": {
-    label: "離職日"
+  leaveDate: {
+    label: '離職日',
   },
-  "retireDate": {
-    label: "退休日"
+  retireDate: {
+    label: '退休日',
   },
-  "severanceDate": {
-    label: "資遣日"
+  severanceDate: {
+    label: '資遣日',
   },
-}
+};
 
 // ===============================================================
-

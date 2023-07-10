@@ -1,39 +1,43 @@
-
 import { ReactNode } from 'react';
-import classNames from "classnames"
+import classNames from 'classnames';
 
 // antd
 import { Modal } from 'antd';
 
 // global gear
-import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
+import TwoBtnFooter from 'components/global/gear/modal/footer/twoBtnFooter';
 import InputSearch from 'components/global/gear/input/inputSearch';
 
 // css
-import scss from "./modalListSelectorWithSearch.module.scss"
+import scss from './modalListSelectorWithSearch.module.scss';
 
 // =====================================================
-export default function ModalListSelectorWithSearch(
-  { children, label, visible,
-    onConfirm, onCancel, onSearch,
-    className, placeholder,
-    width, tip, noSearch
-  }:
-    {
-      children: ReactNode
-      label: string
-      visible: boolean
-      // onClick會寫在children裡面
-      onConfirm: () => void
-      onCancel: () => void
-      onSearch: (value: string) => void
-      className?: string,
-      placeholder?: string
-      width?: string
-      tip?: React.ReactNode
-      noSearch?: boolean
-    }) {
-
+export default function ModalListSelectorWithSearch({
+  children,
+  label,
+  visible,
+  onConfirm,
+  onCancel,
+  onSearch,
+  className,
+  placeholder,
+  width,
+  tip,
+  noSearch,
+}: {
+  children: ReactNode;
+  label: string;
+  visible: boolean;
+  // onClick會寫在children裡面
+  onConfirm: () => void;
+  onCancel: () => void;
+  onSearch: (value: string) => void;
+  className?: string;
+  placeholder?: string;
+  width?: string;
+  tip?: React.ReactNode;
+  noSearch?: boolean;
+}) {
   // ======================================================
 
   return (
@@ -54,26 +58,19 @@ export default function ModalListSelectorWithSearch(
             <div className={scss.label}>{label}</div>
             <div className={scss.tip}>{tip}</div>
           </div>
-          {!noSearch &&
-            <InputSearch className={classNames(scss.right, scss.plus)}
+          {!noSearch && (
+            <InputSearch
+              className={classNames(scss.right, scss.plus)}
               placeholder={placeholder || '輸入關鍵字'}
-              onClick={onSearch} />}
+              onClick={onSearch}
+            />
+          )}
         </div>
         {/*  */}
-        <div className={scss.body}>
-          {children}
-        </div>
+        <div className={scss.body}>{children}</div>
         {/*  */}
         <TwoBtnFooter {...{ onConfirm, onCancel }} />
       </div>
     </Modal>
-  )
+  );
 }
-
-
-
-
-
-
-
-

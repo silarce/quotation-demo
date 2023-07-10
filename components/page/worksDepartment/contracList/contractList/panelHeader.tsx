@@ -1,32 +1,29 @@
-import { MouseEvent } from 'react'
-
+import { MouseEvent } from 'react';
 
 // global gear
-import CellWithBar from "components/global/gear/cell/cellWithBar";
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // css
-import style from "../contractList.module.scss"
+import style from '../contractList.module.scss';
 
 // icon
-import iconPlace from "public/image/icon/place.svg"
-import { IconDetail } from "public/image/icon/svgComponent/svgIcons"
+import iconPlace from 'public/image/icon/place.svg';
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 //  type
 import { Tbudget } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 
-export default function PanelHeader({ contract, isActive, openQuotation }:
-  {
-    contract: Tbudget
-    isActive: boolean
-    openQuotation: (e: MouseEvent) => void
-  }) {
-
-  const {
-    quotationId, clientName, contactName,
-    contactPhone, undertaker, discount,
-    doorQty, budgetAmount, } = contract
-  const { date, country, projectName, } = contract
-
+export default function PanelHeader({
+  contract,
+  isActive,
+  openQuotation,
+}: {
+  contract: Tbudget;
+  isActive: boolean;
+  openQuotation: (e: MouseEvent) => void;
+}) {
+  const { quotationId, clientName, contactName, contactPhone, undertaker, discount, doorQty, budgetAmount } = contract;
+  const { date, country, projectName } = contract;
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive}>
@@ -39,7 +36,9 @@ export default function PanelHeader({ contract, isActive, openQuotation }:
         <span>{discount}</span>
         <span>{doorQty}</span>
         <span>{budgetAmount}</span>
-        <div><IconDetail onClick={openQuotation} /></div>
+        <div>
+          <IconDetail onClick={openQuotation} />
+        </div>
       </div>
       <div className={style.row02}>
         <span>{date}</span>
@@ -52,5 +51,5 @@ export default function PanelHeader({ contract, isActive, openQuotation }:
         <div></div>
       </div>
     </CellWithBar>
-  )
+  );
 }

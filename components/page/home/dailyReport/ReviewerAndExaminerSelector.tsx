@@ -1,126 +1,130 @@
-import { useState, useEffect, useContext } from "react"
-import _ from "lodash"
-import classNames from "classnames"
+import { useState, useEffect, useContext } from 'react';
+import _ from 'lodash';
+import classNames from 'classnames';
 
 // antd
-import { Modal } from "antd"
+import { Modal } from 'antd';
 
 // gear
-import CellWithBar from "components/global/gear/cell/cellWithBar"
-import TwoBtnFooter from "components/global/gear/modal/footer/twoBtnFooter";
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import TwoBtnFooter from 'components/global/gear/modal/footer/twoBtnFooter';
 import InputSearch from 'components/global/gear/input/inputSearch';
 
+import { TemployeeDto, useApiDailyReports_reviewers } from 'js/api/api_dailyReport';
 
-import { TemployeeDto, useApiDailyReports_reviewers } from "js/api/api_dailyReport"
-
-import { TdailyReportReviewStatusDto } from "js/api/dtoTypes"
+import { TdailyReportReviewStatusDto } from 'js/api/dtoTypes';
 
 // css
-import scss from "./reviewerAndExaminerSelector.module.scss"
+import scss from './reviewerAndExaminerSelector.module.scss';
 
-import { AppContext } from "pages/_app"
+import { AppContext } from 'pages/_app';
 
+export default function ReviewerAndExaminerSelector({
+  visible,
+  onConfirm,
+  onCancel,
+  userId,
+  lastStatus,
+}: {
+  visible: boolean;
+  onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void;
+  onCancel: () => void;
+  userId: string | undefined;
+  lastStatus: TdailyReportReviewStatusDto[];
+  // defaultRviewer: TemployeeDto[]
+  // defaultExaminer: TemployeeDto[]
+}) {
+  const { rwd1023 } = useContext(AppContext);
 
-export default function ReviewerAndExaminerSelector(
-  { visible,
-    onConfirm,
-    onCancel,
-    userId,
-    lastStatus
-  }:
-    {
-      visible: boolean
-      onConfirm: (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => void
-      onCancel: () => void
-      userId: string | undefined
-      lastStatus: TdailyReportReviewStatusDto[]
-      // defaultRviewer: TemployeeDto[]
-      // defaultExaminer: TemployeeDto[]
-    }
-) {
-
-  const { rwd1023 } = useContext(AppContext)
-
-  const defaultRviewer: TemployeeDto[] = []
-  const defaultExaminer: TemployeeDto[] = []
+  const defaultRviewer: TemployeeDto[] = [];
+  const defaultExaminer: TemployeeDto[] = [];
 
   lastStatus.forEach((status) => {
-    if (status.type === "reviewer") {
-      defaultRviewer.push(status.reviewerEmployee)
+    if (status.type === 'reviewer') {
+      defaultRviewer.push(status.reviewerEmployee);
     }
-    if (status.type === "examiner") {
-      defaultExaminer.push(status.reviewerEmployee)
-    }
-  })
 
+    if (status.type === 'examiner') {
+      defaultExaminer.push(status.reviewerEmployee);
+    }
+  });
 
   // 搜尋字串
-  const [searchValue_reviewer, setSearchValue_reviewer] = useState<string>()
-  const [searchValue_examiner, setSearchValue_examiner] = useState<string>()
+  const [searchValue_reviewer, setSearchValue_reviewer] = useState<string>();
+  const [searchValue_examiner, setSearchValue_examiner] = useState<string>();
   // 被選擇的檢視人員
-  const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>(defaultRviewer)
-  const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>(defaultExaminer)
+  const [selReviewerArr, setSelReviewerArr] = useState<TemployeeDto[]>(defaultRviewer);
+  const [selExaminerArr, setSelExaminerArr] = useState<TemployeeDto[]>(defaultExaminer);
 
   // 取得所有檢視人員
-  const {
-    reviewersArr,
-    updateReviewersArr, setReviewersArr
-  } = useApiDailyReports_reviewers()
-
+  const { reviewersArr, updateReviewersArr, setReviewersArr } = useApiDailyReports_reviewers();
 
   useEffect(() => {
     if (visible) {
       (async () => {
-        setSelReviewerArr(defaultRviewer)
-        setSelExaminerArr(defaultExaminer)
-        await updateReviewersArr()
-      })()
-    }
-    else {
-      setReviewersArr([])
-      setSelReviewerArr([])
-      setSelExaminerArr([])
+        setSelReviewerArr(defaultRviewer);
+        setSelExaminerArr(defaultExaminer);
+        await updateReviewersArr();
+      })();
+    } else {
+      setReviewersArr([]);
+      setSelReviewerArr([]);
+      setSelExaminerArr([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible])
-
+  }, [visible]);
 
   const onClick_reviewer = (newViewer: TemployeeDto) => {
-    const newArr = [...selReviewerArr]
+    const newArr = [...selReviewerArr];
     // if (selLimit === 1) {
     //   newArr[0] = newEmp
     //   setSelEmployeeArr(newArr)
     //   return
     // }
-    const theIndex = newArr.findIndex((emp) => emp.id === newViewer.id)
-    if (theIndex > -1) newArr.splice(theIndex, 1)
-    else newArr.push(newViewer)
-    setSelReviewerArr(newArr)
-  }
+    const theIndex = newArr.findIndex((emp) => emp.id === newViewer.id);
+
+    if (theIndex > -1) {
+      newArr.splice(theIndex, 1);
+    } else {
+      newArr.push(newViewer);
+    }
+
+    setSelReviewerArr(newArr);
+  };
 
   const onClick_examiner = (newExaminer: TemployeeDto) => {
-    const newArr = [...selExaminerArr]
+    const newArr = [...selExaminerArr];
     // if (selLimit === 1) {
     //   newArr[0] = newEmp
     //   setSelEmployeeArr(newArr)
     //   return
     // }
-    const theIndex = newArr.findIndex((emp) => emp.id === newExaminer.id)
-    if (theIndex > -1) newArr.splice(theIndex, 1)
-    else newArr.push(newExaminer)
-    setSelExaminerArr(newArr)
-  }
+    const theIndex = newArr.findIndex((emp) => emp.id === newExaminer.id);
 
+    if (theIndex > -1) {
+      newArr.splice(theIndex, 1);
+    } else {
+      newArr.push(newExaminer);
+    }
 
+    setSelExaminerArr(newArr);
+  };
 
   const onSearch_reviewer = (v: string | undefined) => {
-    if (!v) v = undefined
-    setSearchValue_reviewer(v)
-  }
+    if (!v) {
+      v = undefined;
+    }
+
+    setSearchValue_reviewer(v);
+  };
+
   const onSearch_examiner = (v: string | undefined) => {
-    if (!v) v = undefined
-    setSearchValue_examiner(v)
-  }
+    if (!v) {
+      v = undefined;
+    }
+
+    setSearchValue_examiner(v);
+  };
 
   return (
     <Modal
@@ -131,7 +135,7 @@ export default function ReviewerAndExaminerSelector(
       destroyOnClose={true}
       onCancel={onCancel}
       footer={null}
-      width={rwd1023 ? "80vw" : "800px"}
+      width={rwd1023 ? '80vw' : '800px'}
     >
       <div className={scss.container}>
         <Selector
@@ -159,93 +163,80 @@ export default function ReviewerAndExaminerSelector(
           userId={userId}
         />
         {/*  */}
-        <TwoBtnFooter
-          onConfirm={() => onConfirm(selReviewerArr, selExaminerArr)}
-          onCancel={onCancel}
-        />
+        <TwoBtnFooter onConfirm={() => onConfirm(selReviewerArr, selExaminerArr)} onCancel={onCancel} />
       </div>
-    </Modal >
-  )
+    </Modal>
+  );
 }
 
 // ==========================================================================
 
-const Selector = (
-  {
-    employeeArr,
-    selEmployeeArr,
-    otherSelEmployeeArr,
-    searchValue,
-    onSearch,
-    onClick,
-    label,
-    userId,
-  }:
-    {
-      employeeArr: TemployeeDto[]
-      selEmployeeArr: TemployeeDto[]
-      otherSelEmployeeArr: TemployeeDto[]
-      searchValue: string | undefined
-      onSearch: (v: string) => void
-      onClick: (v: TemployeeDto) => void
-      label: string
-      userId: string | undefined
-    }
-) => {
-
+const Selector = ({
+  employeeArr,
+  selEmployeeArr,
+  otherSelEmployeeArr,
+  searchValue,
+  onSearch,
+  onClick,
+  label,
+  userId,
+}: {
+  employeeArr: TemployeeDto[];
+  selEmployeeArr: TemployeeDto[];
+  otherSelEmployeeArr: TemployeeDto[];
+  searchValue: string | undefined;
+  onSearch: (v: string) => void;
+  onClick: (v: TemployeeDto) => void;
+  label: string;
+  userId: string | undefined;
+}) => {
   return (
     <>
       <div className={scss.header}>
         <div className={scss.left}>
           <div />
           <div className={scss.label}>{label}</div>
-          <div className={scss.tip}>{"可複選"}</div>
+          <div className={scss.tip}>{'可複選'}</div>
         </div>
-        <InputSearch placeholder="請輸入搜尋內容"
-          onClick={onSearch} />
+        <InputSearch placeholder="請輸入搜尋內容" onClick={onSearch} />
       </div>
       {/*  */}
       <div className={scss.body}>
         {employeeArr.map((emp, index) => {
-          const { idNumber, chName, jobs, id } = emp
-          const sortedJobs = _.sortBy(jobs || [], "grade")
-          const jobName = sortedJobs[0]?.name || ""
-          const grade = sortedJobs[0]?.grade || ""
-          const isActive = selEmployeeArr.some(selEmp => selEmp.id === emp.id)
+          const { idNumber, chName, jobs, id } = emp;
+          const sortedJobs = _.sortBy(jobs || [], 'grade');
+          const jobName = sortedJobs[0]?.name || '';
+          const grade = sortedJobs[0]?.grade || '';
+          const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
 
           if (searchValue) {
             const regex = new RegExp(searchValue, 'i');
-            if (
-              !idNumber.match(regex) &&
-              !chName.match(regex) &&
-              !jobName.match(regex) &&
-              !`${grade}`.match(regex)
-            ) {
+
+            if (!idNumber.match(regex) && !chName.match(regex) && !jobName.match(regex) && !`${grade}`.match(regex)) {
               return null;
             }
           }
 
-          if (userId === id) return null
+          if (userId === id) {
+            return null;
+          }
 
-          const isOther = otherSelEmployeeArr.some((other) => other.id === id)
-          if (isOther) return null
+          const isOther = otherSelEmployeeArr.some((other) => other.id === id);
+
+          if (isOther) {
+            return null;
+          }
 
           return (
-            <CellWithBar key={index} className={scss.row}
-              isActive={isActive}
-              onClick={() => onClick(emp)}
-            >
+            <CellWithBar key={index} className={scss.row} isActive={isActive} onClick={() => onClick(emp)}>
               <span className={scss.idNumber}>{idNumber}</span>
               <span>{chName}</span>
               <span>{jobName}</span>
               <span>LV {grade}</span>
             </CellWithBar>
-          )
+          );
         })}
       </div>
     </>
-  )
-
-
-}
-
+  );
+};

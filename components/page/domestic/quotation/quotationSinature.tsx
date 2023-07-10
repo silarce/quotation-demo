@@ -1,47 +1,34 @@
-
 // global gear
-import InputSel from "components/global/gear/inputAndSel/inputSel"
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 // css
-import style from "./quotationSinature.module.scss"
+import style from './quotationSinature.module.scss';
 
-
-export default function QuotationSinature(
-  { signatureArr, disabled = false }:
-    {
-      signatureArr: { label: string, signature: string, onChange: (v: string) => void }[]
-      disabled: boolean
-    }) {
+export default function QuotationSinature({
+  signatureArr,
+  disabled = false,
+}: {
+  signatureArr: { label: string; signature: string; onChange: (v: string) => void }[];
+  disabled: boolean;
+}) {
   return (
     <div className={style.container}>
       {signatureArr.map((item, index) => {
-        const { label, signature, onChange } = item
+        const { label, signature, onChange } = item;
 
         return (
           <div key={index}>
             <span>{label}</span>
             <InputSel
               inputProps={{
-                value: signature ?? "",
-                onChange: (v) => onChange(v)
+                value: signature ?? '',
+                onChange: (v) => onChange(v),
               }}
               disabled={disabled}
-              showBaseline={"always"}
+              showBaseline={'always'}
             />
           </div>
-        )
+        );
       })}
     </div>
-  )
-
-
+  );
 }
-
-
-
-
-
-
-
-
-
-

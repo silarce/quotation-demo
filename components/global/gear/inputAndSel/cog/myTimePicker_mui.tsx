@@ -1,9 +1,8 @@
+import { useRef, useState } from 'react';
 
-import { useRef, useState, } from "react"
+import classNames from 'classnames';
 
-import classNames from "classnames";
-
-import { Moment } from "moment";
+import { Moment } from 'moment';
 
 // mui
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -12,88 +11,77 @@ import { TimePicker, TimePickerProps } from '@mui/x-date-pickers/TimePicker';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 
 // css
-import scss from "../inputSel.module.scss"
+import scss from '../inputSel.module.scss';
 
 export type TtimePickerProps_mui = {
-  defaultValue?: Moment | null
-  value?: Moment | null
-  onAccept?: (v: { moment: Moment, isoString: string, dateString: string }) => void
-  TimePickerProps?: TimePickerProps<Moment>
-  wrapperClassName?: string
-  className?: string
-}
-
+  defaultValue?: Moment | null;
+  value?: Moment | null;
+  onAccept?: (v: { moment: Moment; isoString: string; dateString: string }) => void;
+  TimePickerProps?: TimePickerProps<Moment>;
+  wrapperClassName?: string;
+  className?: string;
+};
 
 // ==============================================================================
-export default function MyTimePicker_mui(
-  { timePickerProps_mui }:
-    { timePickerProps_mui: TtimePickerProps_mui }
-) {
+export default function MyTimePicker_mui({ timePickerProps_mui }: { timePickerProps_mui: TtimePickerProps_mui }) {
+  const ref = useRef<HTMLDivElement>(null!);
+  const [open, setOpen] = useState(false);
 
-  const ref = useRef<HTMLDivElement>(null!)
-  const [open, setOpen] = useState(false)
-
-  const {
-    defaultValue,
-    value,
-    onAccept,
-    TimePickerProps,
-    wrapperClassName,
-    className,
-  } = timePickerProps_mui
-
+  const { defaultValue, value, onAccept, TimePickerProps, wrapperClassName, className } = timePickerProps_mui;
 
   return (
     <div ref={ref} className={classNames(scss.timePicker_mui_wrapper, wrapperClassName)}>
       <LocalizationProvider dateAdapter={AdapterMoment}>
-        <TimePicker className={classNames(scss.timePicker_mui, className)}
+        <TimePicker
+          className={classNames(scss.timePicker_mui, className)}
           open={open}
-
           defaultValue={defaultValue}
           value={value}
-
           onClose={() => setOpen(false)}
           onAccept={(date) => {
-            setOpen(false)
+            setOpen(false);
+
             if (onAccept) {
               onAccept({
                 moment: date!,
                 isoString: date!.toISOString(),
-                dateString: date!.format("HH:mm"),
-              })
+                dateString: date!.format('HH:mm'),
+              });
             }
           }}
-
           /**	If true, the open picker button will not be rendered (renders only the field). */
           // disableOpenPicker={true}
 
+          timeSteps={{
+            minutes: 1,
+          }}
           ampm={false}
           slotProps={{
             popper: { anchorEl: ref.current },
           }}
-
           slots={{
             field: (params) => {
               return (
                 <TimeField
                   {...params}
                   onClick={(e) => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
-                    if (params.onClick) params.onClick(e)
-                    setOpen(true)
+                    if (params.onClick) {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      params.onClick(e);
+                    }
+
+                    setOpen(true);
                   }}
                 />
               );
-            }
+            },
           }}
           {...TimePickerProps}
         />
       </LocalizationProvider>
     </div>
-  )
+  );
 }
-
-
-
-
-

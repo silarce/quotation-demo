@@ -1,28 +1,24 @@
-
-
-import { components, SingleValueProps } from "react-select";
-import classNames from "classnames";
+import { components, SingleValueProps } from 'react-select';
+import classNames from 'classnames';
 
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
-const { SingleValue } = components
+const { SingleValue } = components;
 
-import type { Toption } from "js/utils/options/options"
+import type { Toption } from 'js/utils/options/options';
 
-
-import style from "./optionWithIcon.module.scss"
+import style from './optionWithIcon.module.scss';
 
 export function SingleValueWithIcon01(
   props: SingleValueProps<Toption, false, GroupBase<Toption>>,
   props2?: {
-    className?: string
-    showLabel?: boolean
+    className?: string;
+    showLabel?: boolean;
   }
 ) {
+  const { className, showLabel = true } = props2 || {};
 
-  const { className, showLabel = true, } = props2 || {}
-
-  const { data } = props
-  const { label, icon } = data
+  const { data } = props;
+  const { label, icon } = data;
 
   return (
     <SingleValue {...props} className={classNames(style.option, className)}>
@@ -30,5 +26,5 @@ export function SingleValueWithIcon01(
       {icon && <img src={icon} alt="iconImg" />}
       {showLabel && <span>{label}</span>}
     </SingleValue>
-  )
+  );
 }

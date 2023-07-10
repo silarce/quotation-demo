@@ -1,31 +1,31 @@
 // 舊合約
-import React, { useState, useEffect, } from "react"
-import { useRouter } from "next/router"
-import { NextRouter } from "next/router"
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { NextRouter } from 'next/router';
 
 // layer
-import SubLayer from "components/Layer/SubLayer/SubLayer"
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile from "components/page/domestic/quotation/quotationProfile_legacyContract"
-import QuotationProduction from "components/page/domestic/quotation/quotationProduct_legacyContract"
-import QuotationAdditions from "components/page/domestic/quotation/quotationAdditions"
-import QuotationTotal from "components/page/domestic/quotation/quotationTotal_legacyContract"
-import QuotationSinature from "components/page/domestic/quotation/quotationSinature"
+import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_legacyContract';
+import QuotationProduction from 'components/page/domestic/quotation/quotationProduct_legacyContract';
+import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
+import QuotationTotal from 'components/page/domestic/quotation/quotationTotal_legacyContract';
+import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
 // import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
 
 // global gear
-import PageHeader02, { TtagList, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import myAlert from "components/global/gear/modal/simpleModal/alertModals"
-import { showRootLoading } from "components/global/gear/loadingCover/rootLoadingCover"
+import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // css
-import style from "./quotation.module.scss"
+import style from './quotation.module.scss';
 // ========================================================================
 // ========================================================================
 // hook
-import { useLegacyContract } from "hooks/quotation/useLegacyContract"
+import { useLegacyContract } from 'hooks/quotation/useLegacyContract';
 // ========================================================================
 // ========================================================================
 // api
@@ -35,145 +35,154 @@ import {
   apiPostLegacyContracts,
   apiPatchLegacyContracts_id,
   apiPostLegacyContracts_id_attachments,
-  apiDelLegacyContracts_id_attachments
-} from "js/api/api_legacy-contract"
+  apiDelLegacyContracts_id_attachments,
+} from 'js/api/api_legacy-contract';
 
 // type
-import { TfileInfo } from "components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview"
-
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // ========================================================================
 // ========================================================================
 // ========================================================================
 
 export default function Quotation() {
-  const router = useRouter()
-  const isReady = router.isReady
+  const router = useRouter();
+  const isReady = router.isReady;
 
-  if (!isReady) return null
+  if (!isReady) {
+    return null;
+  }
 
-  return <TheQuotation router={router} />
+  return <TheQuotation router={router} />;
 }
 
 function TheQuotation({ router }: { router: NextRouter }) {
-
   /**合約id，若為undefined就逮代表為新增合約 */
-  const contractId = router.query.contractId as string | undefined
+  const contractId = router.query.contractId as string | undefined;
 
   // --------------------------------------------------------------------------
-  const [allowEdit, setAllowEdit] = useState(false)
+  const [allowEdit, setAllowEdit] = useState(false);
 
   // --------------------------------------------------------------------------
-  let [legacyContractParams, setLegacyContractParams] = useState({
-    populate: ["customer", "products", "additions"],
-  })
+  const [legacyContractParams, setLegacyContractParams] = useState({
+    populate: ['customer', 'products', 'additions'],
+  });
 
-  const { legacyContract, updateLegacyContract, } = useLegacyContract_id(contractId, legacyContractParams)
+  const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
   // 這是class
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract)
+  const { classLegacyContract, rewind } = useLegacyContract(legacyContract);
 
-  const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId)
+  const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
-  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([])
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
   useEffect(() => {
     const arr = attachments?.map((item) => {
-      const imageReg = /^image/
-      const pdfReg = /pdf$/
-      const fileType = imageReg.test(item.mime) ? "image"
-        : pdfReg.test(item.mime) ? "pdf" : "other"
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+
       return {
         fileId: item.id,
         fileType,
         fileName: item.name,
         fileSrc: `${domain}file/download/${item.id}`,
         isNew: false,
-      }
-    })
-    setFileInfoArr(arr ?? [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attachments])
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
 
   const removeFileInfo = (index: number) => {
-    fileInfoArr[index].willDelete = true
-    setFileInfoArr([...fileInfoArr])
+    fileInfoArr[index].willDelete = true;
+    setFileInfoArr([...fileInfoArr]);
     // removeFile(index)
-  }
+  };
 
   const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
-    setFileInfoArr([...newImgInfoArr])
-  }
+    setFileInfoArr([...newImgInfoArr]);
+  };
 
   const appendixParams = {
     fileInfoArr,
     removeFileInfo,
     toSetFileInfo,
-  }
-
+  };
 
   const uploadAttachment = async (contractId: string) => {
     // 移除附件
     for (const info of fileInfoArr) {
-      const { fileId, willDelete, isNew } = info
-      if (!fileId || !willDelete || isNew) continue;
-      try {
-        await apiDelLegacyContracts_id_attachments(contractId, fileId)
+      const { fileId, willDelete, isNew } = info;
+
+      if (!fileId || !willDelete || isNew) {
+        continue;
       }
-      catch (error) {
-        console.log(error)
+
+      try {
+        await apiDelLegacyContracts_id_attachments(contractId, fileId);
+      } catch (error) {
+        console.log(error);
       }
     }
 
     // 上傳附件
     for (const info of fileInfoArr) {
-      const { fileId, willDelete, isNew, file } = info
-      if (fileId || !file || willDelete || !isNew) continue
-      const formData = new FormData
-      formData.append("file", file)
-      try {
-        await apiPostLegacyContracts_id_attachments(contractId, formData)
+      const { fileId, willDelete, isNew, file } = info;
+
+      if (fileId || !file || willDelete || !isNew) {
+        continue;
       }
-      catch (error) { console.log(error) }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        await apiPostLegacyContracts_id_attachments(contractId, formData);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
+  };
 
   useEffect(() => {
     (async () => {
-      await Promise.all([
-        updateLegacyContract(),
-        updateAttachments()
-      ])
-    })()
+      await Promise.all([updateLegacyContract(), updateAttachments()]);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId])
+  }, [contractId]);
 
   // --------------------------------------------------------------------------
 
-
-  const classSignature = classLegacyContract.classSignature
+  const classSignature = classLegacyContract.classSignature;
   const signatureArr = [
     {
-      label: "經理",
+      label: '經理',
       signature: classSignature.managerName,
-      onChange: (v: string) => { classSignature.managerName = v },
+      onChange: (v: string) => {
+        classSignature.managerName = v;
+      },
     },
     {
-      label: "主管",
+      label: '主管',
       signature: classSignature.supervisorName,
-      onChange: (v: string) => { classSignature.supervisorName = v },
+      onChange: (v: string) => {
+        classSignature.supervisorName = v;
+      },
     },
     {
-      label: "經辦",
+      label: '經辦',
       signature: classSignature.operatorName,
-      onChange: (v: string) => { classSignature.operatorName = v },
+      onChange: (v: string) => {
+        classSignature.operatorName = v;
+      },
     },
-  ]
+  ];
 
   useEffect(() => {
-    rewind()
+    rewind();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowEdit, legacyContract])
-
+  }, [allowEdit, legacyContract]);
 
   // -----------------------------------------------------------------------
   // const [showPdf, setShowPdf] = useState(false)
@@ -181,69 +190,73 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const tagList: TtagList = [
     {
       label: `合約編號 ${classLegacyContract.classBasicInfo.contractNumber}`,
-      onClick: () => { }
+      onClick: () => {},
     },
     // { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
-  ]
+  ];
 
   const panel_editable: TpanelList = [
     {
-      type: "redButton", label: "上傳", onClick: async () => {
+      type: 'redButton',
+      label: '上傳',
+      onClick: async () => {
+        const postBody = classLegacyContract.postBody;
 
-        const postBody = classLegacyContract.postBody
-        if (!postBody) return
+        if (!postBody) {
+          return;
+        }
 
         try {
-          showRootLoading(true)
-          const res =
-            contractId
-              ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
-              : await apiPostLegacyContracts(classLegacyContract.postBody)
+          showRootLoading(true);
+          const res = contractId
+            ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
+            : await apiPostLegacyContracts(classLegacyContract.postBody);
 
-          showRootLoading(true, "正在更新附件")
-          await uploadAttachment(res.id)
+          showRootLoading(true, '正在更新附件');
+          await uploadAttachment(res.id);
 
           if (contractId) {
-            await Promise.all([
-              updateLegacyContract(),
-              updateAttachments()
-            ])
+            await Promise.all([updateLegacyContract(), updateAttachments()]);
+          } else {
+            router.push({ query: { contractId: res.id } });
           }
-          else router.push({ query: { contractId: res.id } })
 
-          myAlert.success({ title: "上傳完成" })
+          myAlert.success({ title: '上傳完成' });
+        } catch {
+          myAlert.err({ title: '上傳失敗' });
+        } finally {
+          showRootLoading(false);
         }
-        catch { myAlert.err({ title: "上傳失敗" }) }
-        finally { showRootLoading(false) }
 
-
-        setAllowEdit(false)
-      }
+        setAllowEdit(false);
+      },
     },
-    { type: "myButton", label: "取消", onClick: () => setAllowEdit(false) },
-  ]
+    { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
+  ];
   const panel_noEditable: TpanelList = [
     // {
     //   type: "myButton", label: "匯出舊合約", img: iconUpload.src,
     //   onClick: () => setShowPdf(true)
     // },
-    { type: "myButton", label: "編輯", onClick: () => setAllowEdit(true) },
+    { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
     // { type: "myButton", label: "送審", onClick: () => alert("送審") },
-    { type: "myButton", label: "返回", onClick: () => router.back() },
-  ]
+    { type: 'myButton', label: '返回', onClick: () => router.back() },
+  ];
 
   // -----------------------------------------------------------------------
-  if (!classLegacyContract) return null
+  if (!classLegacyContract) {
+    return null;
+  }
+
+  // console.log(classLegacyContract.postBody);
+
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   return (
     <SubLayer>
-
-      <PageHeader02 tagList={tagList}
-        panelList={allowEdit ? panel_editable : panel_noEditable}
-      />
+      <PageHeader02 tagList={tagList} panelList={allowEdit ? panel_editable : panel_noEditable} />
 
       <div>
         <div className={style.quotation}>
@@ -251,27 +264,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationProfile
             classLegacyContract={classLegacyContract}
             classBasicInfo={classLegacyContract.classBasicInfo}
-            disabled={!allowEdit} />
+            disabled={!allowEdit}
+          />
           {/*  */}
           <div className={style.switchBar}>
-            <div className={style.active}>
-              合約項目
-            </div>
+            <div className={style.active}>合約項目</div>
           </div>
           {/* 主產品設定 */}
           <QuotationProduction legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 其他設定 */}
           <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 備註/報價範圍/付款資訊 */}
-          <QuotationTotal
-            legacyContract={classLegacyContract}
-            disabled={!allowEdit}
-            appendixParams={appendixParams}
-          />
+          <QuotationTotal legacyContract={classLegacyContract} disabled={!allowEdit} appendixParams={appendixParams} />
           {/* 簽名 */}
-          <QuotationSinature
-            signatureArr={signatureArr}
-            disabled={!allowEdit} />
+          <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
         </div>
       </div>
       {/* <QuotationPdf
@@ -279,5 +285,5 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onCancel={() => { setShowPdf(false) }}
         classLegacyContract={classLegacyContract} /> */}
     </SubLayer>
-  )
+  );
 }
