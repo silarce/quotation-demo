@@ -217,6 +217,22 @@ class Class_product {
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
+  calcArea = () => {
+    const area = Decimal.add(this._height || '0', this._thickness || '0') // h+b
+      /** "0"被視為true，所以用型別為number的值來計算 */
+      .mul(this._product.width || this._product.length || '0') // *w or *h
+      .toFixed(2)
+      .toString();
+
+    return area;
+  };
+
+  calcVolume = () => {
+    return Decimal.mul(this.area || 0, 0.89)
+      .toFixed(2)
+      .toString();
+  };
+
   get options_doorTrack() {
     if (this.typhoonProtection) {
       return this.options_doorTrack_typhoonProtection;
@@ -301,6 +317,10 @@ class Class_product {
   set length(v) {
     this._length = v;
     this._product.length = parseFloat(v || '0');
+    this._width = '0';
+    this._product.width = 0;
+
+    this.area = this.calcArea();
     this._reRender();
   }
 
@@ -310,6 +330,9 @@ class Class_product {
   set width(v) {
     this._width = v;
     this._product.width = parseFloat(v || '0');
+    this._length = '0';
+    this._product.length = 0;
+    this.area = this.calcArea();
     this._reRender();
   }
 
@@ -319,15 +342,18 @@ class Class_product {
   set height(v) {
     this._height = v;
     this._product.height = parseFloat(v || '0');
+    this.area = this.calcArea();
     this._reRender();
   }
 
+  /** 這個就是B */
   get thickness() {
     return this._thickness;
   }
   set thickness(v) {
     this._thickness = v;
     this._product.thickness = parseFloat(v || '0');
+    this.area = this.calcArea();
     this._reRender();
   }
 
@@ -336,9 +362,11 @@ class Class_product {
   }
   set area(v) {
     this._product.area = v;
+    this.volume = this.calcVolume();
     this._reRender();
   }
 
+  /** 才數*/
   get volume() {
     return this._product.volume;
   }
