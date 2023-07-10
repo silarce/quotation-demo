@@ -698,7 +698,7 @@ class Class_payInfo {
           return;
         }
 
-        subTotal = subTotal.add(prod.totalPrice);
+        subTotal = subTotal.add(clearThousandsSeparator(prod.totalPrice));
       });
 
       return subTotal.mul(discountRate).toString();
