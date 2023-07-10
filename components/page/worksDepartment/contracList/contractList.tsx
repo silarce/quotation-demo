@@ -1,7 +1,4 @@
-import {
-  useState,
-  MouseEvent
-} from 'react';
+import { useState, MouseEvent } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -14,97 +11,79 @@ import PanelBody from './contractList/panelBody';
 import { Collapse } from 'antd';
 
 // css
-import style from "./contractList.module.scss"
+import style from './contractList.module.scss';
 
 // data type
-import {
-  TbudgetList,
-} from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+import { TbudgetList } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
-
-const { Panel } = Collapse
+const { Panel } = Collapse;
 // ========================
 
-
-
-export default function ContractList({ contractList, searchObj }:
-  {
-    contractList: TbudgetList
-    searchObj: TsearchObj
-  }) {
-  const router = useRouter()
-
+export default function ContractList({
+  contractList,
+  searchObj,
+}: {
+  contractList: TbudgetList;
+  searchObj: TsearchObj;
+}) {
+  const router = useRouter();
 
   // panelHeader點擊變粉紅色用
-  const [activeIndex, setActiveIndex] = useState(-1)
+  const [activeIndex, setActiveIndex] = useState(-1);
+
   const changeActive = (panelIndex: string | string[]) => {
-    const activeIndex = parseInt(panelIndex as string)
-    setActiveIndex(activeIndex)
-  }
-
-
+    const activeIndex = parseInt(panelIndex as string);
+    setActiveIndex(activeIndex);
+  };
 
   return (
     <div className={style.container}>
       <Thead />
 
-      <Collapse
-        expandIcon={() => <></>}
-        accordion={true}
-        destroyInactivePanel={true}
-        onChange={changeActive}
-      >
+      <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
         {contractList.map((item, index) => {
-          const { quotationId,
-            doorType,
-            country,
-            clientName,
-            projectName, } = item
-          const isActive = activeIndex === index
+          const { quotationId, doorType, country, clientName, projectName } = item;
+          const isActive = activeIndex === index;
 
           const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation()
+            e.stopPropagation();
             // router.push(`/worksDepartment/contractList/${quotationId}/workContactDoc`)
             router.push({
               pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId: quotationId }
-            })
-          }
-          const { detail } = item
+              query: { contractId: quotationId },
+            });
+          };
+
+          const { detail } = item;
           // ===========================
           // 搜尋過濾
-          const regDoorType = new RegExp(searchObj.doorType ?? "")
-          const regCountry = new RegExp(searchObj.country ?? "")
-          const regClientName = new RegExp(searchObj.clientName ?? "")
-          const regProjectName = new RegExp(searchObj.projectName ?? "")
+          const regDoorType = new RegExp(searchObj.doorType ?? '');
+          const regCountry = new RegExp(searchObj.country ?? '');
+          const regClientName = new RegExp(searchObj.clientName ?? '');
+          const regProjectName = new RegExp(searchObj.projectName ?? '');
+
           if (
             !regDoorType.test(doorType) ||
             !regCountry.test(country) ||
             !regClientName.test(clientName) ||
             !regProjectName.test(projectName)
-          ) return null
+          ) {
+            return null;
+          }
           // ===========================
 
           return (
-            <Panel key={index} className={style.panel}
+            <Panel
+              key={index}
+              className={style.panel}
               header={<PanelHeader contract={item} isActive={isActive} openQuotation={openQuotation} />}
             >
               <PanelBody contractDetail={detail} />
             </Panel>
-          )
+          );
         })}
       </Collapse>
-    </div >
-  )
+    </div>
+  );
 }
-
-
-
-
-
-
-
-
-
-

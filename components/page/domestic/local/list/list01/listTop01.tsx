@@ -1,14 +1,7 @@
-
-
-
 // css
-import style from "./listTop01.module.scss"
+import style from './listTop01.module.scss';
 
 export default function ListTop01() {
-
-
-
-
   return (
     <div className={style.container}>
       <span>報價編號</span>
@@ -20,7 +13,5 @@ export default function ListTop01() {
       <span>承辦人</span>
       <span>{/* 按鈕格 留白 */}</span>
     </div>
-  )
-
-
+  );
 }

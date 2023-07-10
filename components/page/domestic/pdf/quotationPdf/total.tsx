@@ -1,43 +1,26 @@
-
 // tool
-import changeNumberMoneyToChinese from "js/tools/numToChineseNum"
+import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
 
 // css
-import style from "./quotationPdf.module.scss"
+import style from './quotationPdf.module.scss';
 
 // type
-import { TuseRemarkList } from "components/page/domestic/quotation/hook/useRemarkList"
-import { TuseProduct } from "components/page/domestic/quotation/hook/useProduct"
+import { TuseRemarkList } from 'components/page/domestic/quotation/hook/useRemarkList';
+import { TuseProduct } from 'components/page/domestic/quotation/hook/useProduct';
 
-
-
-
-type TmemoArr = string[]
+type TmemoArr = string[];
 type Tsettlement = {
-  subTotal: number
-  businessTax: number
-  total: number
-}
+  subTotal: number;
+  businessTax: number;
+  total: number;
+};
 
+export default function Total({ memoArr, settlement }: { memoArr: TmemoArr; settlement: Tsettlement }) {
+  memoArr;
 
-
-export default function Total(
-  { memoArr, settlement }:
-    {
-      memoArr: TmemoArr
-      settlement: Tsettlement
-    }
-) {
-
-  memoArr
-
-
-  const subTotal = settlement.subTotal
-    .toLocaleString(undefined, { maximumFractionDigits: 2 });;
-  const businessTax = settlement.businessTax
-    .toLocaleString(undefined, { maximumFractionDigits: 2 });
-  const total = settlement.total
-    .toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const subTotal = settlement.subTotal.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const businessTax = settlement.businessTax.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const total = settlement.total.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   return (
     <div className={style.total}>
@@ -54,7 +37,7 @@ export default function Total(
                   <span>{`(${index + 1})`}</span>
                   <span>{content}</span>
                 </li>
-              )
+              );
             })}
           </ul>
         </div>
@@ -69,7 +52,9 @@ export default function Total(
             </div>
             <span>{`(共 ${1} 頁)`}</span>
           </div>
-          <div><span>{subTotal}</span></div>
+          <div>
+            <span>{subTotal}</span>
+          </div>
           <div></div>
         </div>
 
@@ -79,7 +64,9 @@ export default function Total(
               <span>營業稅5%</span>
             </div>
           </div>
-          <div><span>{businessTax}</span></div>
+          <div>
+            <span>{businessTax}</span>
+          </div>
           <div></div>
         </div>
 
@@ -89,38 +76,18 @@ export default function Total(
               <span>總</span>
               <span>計</span>
             </div>
-            <span>
-              新台幣:
-            </span>
+            <span>新台幣:</span>
             <span>{changeNumberMoneyToChinese(total)}元整</span>
             <span>總金額</span>
           </div>
-          <div><span>{total}</span></div>
+          <div>
+            <span>{total}</span>
+          </div>
           <div></div>
         </div>
       </div>
-
-
-
     </div>
-  )
+  );
 }
 
 // =======================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

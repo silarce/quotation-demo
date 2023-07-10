@@ -1,25 +1,20 @@
-
-import { TfakeData } from "pages/domestic/quoteStatistics"
-import classNames from "classnames"
+import { TfakeData } from 'pages/domestic/quoteStatistics';
+import classNames from 'classnames';
 
 // gear
-import CellWithBar from "components/global/gear/cell/cellWithBar"
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // css
-import scss from "./quoteStatistics.module.scss"
+import scss from './quoteStatistics.module.scss';
 
-export default function Table(
-  { fakeDataArr }:
-    { fakeDataArr: TfakeData[] }
-) {
-
+export default function Table({ fakeDataArr }: { fakeDataArr: TfakeData[] }) {
   return (
     <div className={classNames(scss.table)}>
       <Thead />
       <Tbody dataArr={fakeDataArr} />
       <Tfoot />
     </div>
-  )
+  );
 }
 
 // =======================================================================
@@ -35,52 +30,61 @@ const Thead = () => {
       {/*  */}
       <div className={classNames(scss.group, scss.group01)}>
         {group01Keys.map((key, index) => {
-          let label
-          if (index === 0) label = "工程資訊"
-          const width = colConfig[key].width
+          let label;
+
+          if (index === 0) {
+            label = '工程資訊';
+          }
+
+          const width = colConfig[key].width;
 
           return (
             <div key={index} style={{ width }}>
               <span>{label}</span>
             </div>
-          )
+          );
         })}
       </div>
       {/*  */}
       <div className={classNames(scss.group, scss.group02)}>
         {group02Keys.map((key, index) => {
-          let label
-          if (index === 0) label = "客戶資訊"
-          const width = colConfig[key].width
+          let label;
+
+          if (index === 0) {
+            label = '客戶資訊';
+          }
+
+          const width = colConfig[key].width;
 
           return (
             <div key={index} style={{ width }}>
               <span>{label}</span>
             </div>
-          )
+          );
         })}
       </div>
       {/*  */}
       <div className={classNames(scss.group, scss.group03)}>
-        <div><span>捲門</span></div>
+        <div>
+          <span>捲門</span>
+        </div>
         {group03Keys.map((key, index) => {
-          const { width, headLabel } = colConfig[key]
+          const { width, headLabel } = colConfig[key];
+
           return (
             <div key={index} style={{ width }}>
               <span>{headLabel}</span>
             </div>
-          )
+          );
         })}
       </div>
       {/*  */}
     </div>
-  )
-}
+  );
+};
+
 // =======================================================================
-const Tbody = (
-  { dataArr }:
-    { dataArr: TfakeData[] }
-) => {
+const Tbody = ({ dataArr }: { dataArr: TfakeData[] }) => {
   return (
     <div className={scss.tbody}>
       {dataArr.map((data, index) => {
@@ -89,11 +93,10 @@ const Tbody = (
             <div className={scss.row}>
               <div className={classNames(scss.group, scss.group01)}>
                 {group01Keys.map((key, index) => {
-                  const { label, width } = colConfig[key]
-                  const value = data[key]
-                  return (
-                    <Info key={index} label={label} value={value} width={width} />
-                  )
+                  const { label, width } = colConfig[key];
+                  const value = data[key];
+
+                  return <Info key={index} label={label} value={value} width={width} />;
                 })}
               </div>
               {/*  */}
@@ -102,43 +105,41 @@ const Tbody = (
                   return (
                     <div key={index}>
                       {group02Keys.map((key, index) => {
-                        const { label, width } = colConfig[key]
-                        const value = customer[key]
-                        return (
-                          <Info key={index} label={label} value={value} width={width} />
-                        )
+                        const { label, width } = colConfig[key];
+                        const value = customer[key];
+
+                        return <Info key={index} label={label} value={value} width={width} />;
                       })}
                     </div>
-                  )
+                  );
                 })}
               </div>
               {/*  */}
               <div className={classNames(scss.group, scss.group03)}>
-
                 {data.customer.map((customer, index) => {
                   return (
                     <div key={index}>
                       {group03Keys.map((key, index) => {
-                        const { width } = colConfig[key]
-                        const value = customer[key]
+                        const { width } = colConfig[key];
+                        const value = customer[key];
+
                         return (
                           <div key={index} style={{ width }}>
-                            <span >{value}</span>
+                            <span>{value}</span>
                           </div>
-                        )
+                        );
                       })}
                     </div>
-                  )
+                  );
                 })}
-
               </div>
             </div>
           </CellWithBar>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 // =======================================================================
 
 const Tfoot = () => {
@@ -156,35 +157,37 @@ const Tfoot = () => {
       </div>
       <div className={classNames(scss.group, scss.group03)}>
         {group03Keys.map((key, index) => {
-          const { label, width } = colConfig[key]
-          const value = fakeTotal[key]
+          const { label, width } = colConfig[key];
+          const value = fakeTotal[key];
+
           return (
             <div key={index} style={{ width }}>
-              <span >{value}</span>
+              <span>{value}</span>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
-}
+  );
+};
 
 // =======================================================================
-const Info = (
-  { label, value, width }:
-    {
-      label: string | undefined
-      value: string | undefined
-      width: React.CSSProperties["width"]
-    }
-) => {
+const Info = ({
+  label,
+  value,
+  width,
+}: {
+  label: string | undefined;
+  value: string | undefined;
+  width: React.CSSProperties['width'];
+}) => {
   return (
     <div className={scss.info} style={{ width }}>
       <span>{label}</span>
       <span>{value}</span>
     </div>
-  )
-}
+  );
+};
 
 // =======================================================================
 // =======================================================================
@@ -192,81 +195,84 @@ const Info = (
 // =======================================================================
 // =======================================================================
 // =======================================================================
-type TconfigKey =
-  Exclude<keyof TfakeData | keyof TfakeData["customer"][number], "customer">
+type TconfigKey = Exclude<keyof TfakeData | keyof TfakeData['customer'][number], 'customer'>;
 
 type Tconfig = {
   [key in TconfigKey]: {
-    label?: string
-    headLabel?: string
-    width: Exclude<React.CSSProperties["width"], undefined>
-    color?: "black" | "colorMain"
-  }
-}
+    label?: string;
+    headLabel?: string;
+    width: Exclude<React.CSSProperties['width'], undefined>;
+    color?: 'black' | 'colorMain';
+  };
+};
 
-const group01Keys: Extract<TconfigKey, "idNumber" | "designDepartment" | "constructionName">[] =
-  ["idNumber", "designDepartment", "constructionName"]
+const group01Keys: Extract<TconfigKey, 'idNumber' | 'designDepartment' | 'constructionName'>[] = [
+  'idNumber',
+  'designDepartment',
+  'constructionName',
+];
 
-const group02Keys: Extract<TconfigKey, "customerName" | "contactPerson" | "contactPhone">[] =
-  ["customerName", "contactPerson", "contactPhone"]
+const group02Keys: Extract<TconfigKey, 'customerName' | 'contactPerson' | 'contactPhone'>[] = [
+  'customerName',
+  'contactPerson',
+  'contactPhone',
+];
 
-const group03Keys: Extract<TconfigKey, "listPrice" | "bearPrice" | "percent">[] =
-  ["listPrice", "bearPrice", "percent"]
+const group03Keys: Extract<TconfigKey, 'listPrice' | 'bearPrice' | 'percent'>[] = ['listPrice', 'bearPrice', 'percent'];
 
 const colConfig: Tconfig = {
   idNumber: {
-    label: "編號",
-    width: "95px",
-    color: "black"
+    label: '編號',
+    width: '95px',
+    color: 'black',
   },
   designDepartment: {
-    label: "設計單位",
-    width: "100px",
-    color: "black"
+    label: '設計單位',
+    width: '100px',
+    color: 'black',
   },
   constructionName: {
-    label: "工程名稱",
-    width: "auto",
-    color: "black"
+    label: '工程名稱',
+    width: 'auto',
+    color: 'black',
   },
   customerName: {
-    label: "客戶",
-    width: "110px",
-    color: "black"
+    label: '客戶',
+    width: '110px',
+    color: 'black',
   },
   contactPerson: {
-    label: "聯絡人",
-    width: "90px",
-    color: "black"
+    label: '聯絡人',
+    width: '90px',
+    color: 'black',
   },
   contactPhone: {
-    label: "聯絡電話",
-    width: "105px",
-    color: "black"
+    label: '聯絡電話',
+    width: '105px',
+    color: 'black',
   },
   listPrice: {
     label: undefined,
-    headLabel: "牌價",
-    width: "138px",
-    color: "black"
+    headLabel: '牌價',
+    width: '138px',
+    color: 'black',
   },
   bearPrice: {
     label: undefined,
-    headLabel: "承價",
-    width: "138px",
-    color: "black"
+    headLabel: '承價',
+    width: '138px',
+    color: 'black',
   },
   percent: {
     label: undefined,
-    headLabel: "百分比",
-    width: "138px",
-    color: "black"
+    headLabel: '百分比',
+    width: '138px',
+    color: 'black',
   },
-}
-
+};
 
 const fakeTotal = {
-  listPrice: "1,373,614",
-  bearPrice: "841,913",
-  percent: "60%",
-}
+  listPrice: '1,373,614',
+  bearPrice: '841,913',
+  percent: '60%',
+};

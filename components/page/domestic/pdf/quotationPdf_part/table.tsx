@@ -1,27 +1,22 @@
-
 // css
-import scss from "./quotationPdf_part.module.scss"
+import scss from './quotationPdf_part.module.scss';
 
-export default function Table(
-  { partArr, priceTotal }:
-    {
-      partArr: Tpart[]
-      priceTotal: string
-    }
-) {
-
-
-
+export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; priceTotal: string }) {
   return (
     <div className={scss.table}>
       <div className={scss.thead}>
-        <div style={{ width: "90px" }}><span>項次:</span></div>
+        <div style={{ width: '90px' }}>
+          <span>項次:</span>
+        </div>
         {keyIndex.map((key, index) => {
-          const { label, style } = config[key]
-          const { width, flex } = style
+          const { label, style } = config[key];
+          const { width, flex } = style;
+
           return (
-            <div key={index} style={{ width, flex }}><span>{label}</span></div>
-          )
+            <div key={index} style={{ width, flex }}>
+              <span>{label}</span>
+            </div>
+          );
         })}
       </div>
 
@@ -29,113 +24,100 @@ export default function Table(
         {partArr.map((part, pIndex) => {
           return (
             <div className={scss.row} key={pIndex}>
-              <div style={{ width: "90px" }}><span>{pIndex}</span></div>
+              <div style={{ width: '90px' }}>
+                <span>{pIndex}</span>
+              </div>
               {keyIndex.map((key, cIndex) => {
-                const { style } = config[key]
-                const value = part[key] as string
+                const { style } = config[key];
+                const value = part[key] as string;
+
                 return (
-                  <div key={cIndex} style={style}><span>{value}</span></div>
-                )
+                  <div key={cIndex} style={style}>
+                    <span>{value}</span>
+                  </div>
+                );
               })}
             </div>
-          )
+          );
         })}
       </div>
 
       <div className={scss.total}>
-        <div><span>報價合計 : </span></div>
-        <div><span>{priceTotal}</span></div>
+        <div>
+          <span>報價合計 : </span>
+        </div>
+        <div>
+          <span>{priceTotal}</span>
+        </div>
       </div>
     </div>
-  )
+  );
 }
-
 
 // ============================================================================
 
 type Tpart = {
-  partName: string
-  material: string
-  unit: string
-  qty: string
-  price: string
-  totalPrice: string
-}
+  partName: string;
+  material: string;
+  unit: string;
+  qty: string;
+  price: string;
+  totalPrice: string;
+};
 
-
-type TkeyIndex =
-  "partName" | "material" | "unit" | "qty" | "price" | "totalPrice"
+type TkeyIndex = 'partName' | 'material' | 'unit' | 'qty' | 'price' | 'totalPrice';
 type Tconfig = {
   [key in TkeyIndex]: {
-    label: string
+    label: string;
     style: {
-      width: string
-      textAlign?: "left" | "center" | "right"
-      flex?: string
-    }
-  }
-}
+      width: string;
+      textAlign?: 'left' | 'center' | 'right';
+      flex?: string;
+    };
+  };
+};
 
-const keyIndex: TkeyIndex[] =
-  ["partName", "material", "unit", "qty", "price", "totalPrice"]
+const keyIndex: TkeyIndex[] = ['partName', 'material', 'unit', 'qty', 'price', 'totalPrice'];
 
 const config: Tconfig = {
   partName: {
-    label: "名稱",
+    label: '名稱',
     style: {
-      width: "300px"
+      width: '300px',
     },
   },
   material: {
-    label: "材質",
+    label: '材質',
     style: {
-      width: "auto",
-      flex: "1"
+      width: 'auto',
+      flex: '1',
     },
-
   },
   unit: {
-    label: "單位",
+    label: '單位',
     style: {
-      width: "80px"
+      width: '80px',
     },
-
   },
   qty: {
-    label: "數量",
+    label: '數量',
     style: {
-      width: "100px",
-      textAlign: "right",
+      width: '100px',
+      textAlign: 'right',
     },
-
   },
   price: {
-    label: "單價",
+    label: '單價',
     style: {
-      width: "120px",
-      textAlign: "right",
+      width: '120px',
+      textAlign: 'right',
     },
-
   },
   totalPrice: {
-    label: "金額",
+    label: '金額',
     style: {
-      width: "150px",
-      textAlign: "right",
+      width: '150px',
+      textAlign: 'right',
     },
-
   },
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+};

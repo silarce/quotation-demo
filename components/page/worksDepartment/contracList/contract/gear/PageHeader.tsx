@@ -1,92 +1,89 @@
-import React from "react"
-import { useRouter } from "next/router"
+import React from 'react';
+import { useRouter } from 'next/router';
 
 // global gear
-import PageHeader02, { TpanelList } from "components/PageHeader/PageHeader02/PageHeader02"
-import PageHeaderFlex01 from "components/PageHeader/pageHeaderFlex01"
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
 
-export type { TpanelList }
+export type { TpanelList };
 
+export default function PageHeader({
+  tagCallback,
+  panelList,
+}: {
+  tagCallback?: (contractId: string) => string;
+  panelList?: TpanelList;
+}) {
+  const router = useRouter();
+  const isReady = router.isReady;
 
+  if (!isReady) {
+    return null;
+  }
 
-export default function PageHeader({ tagCallback, panelList }:
-  {
-    tagCallback?: (contractId: string) => string
-    panelList?: TpanelList
-  }) {
+  const { contractId } = router.query;
 
-  const router = useRouter()
-  const isReady = router.isReady
-  if (!isReady) return null
+  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號${contractId}`;
 
-
-  const { contractId } = router.query
-
-  const tag
-    = tagCallback
-    && tagCallback(contractId as string)
-    || `合約編號${contractId}`
-
-  const pathHead = `/worksDepartment/contractList/contract`
+  const pathHead = `/worksDepartment/contractList/contract`;
   const linkList = [
     {
-      label: "工程聯絡單",
+      label: '工程聯絡單',
       href: {
         pathname: `${pathHead}/workContactDoc`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "工作表",
+      label: '工作表',
       href: {
         pathname: `${pathHead}/workSheet`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "出庫單",
+      label: '出庫單',
       href: {
         pathname: `${pathHead}/outboundOrder`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "應收帳款明細",
+      label: '應收帳款明細',
       href: {
         pathname: `${pathHead}/accountsReceivableDetails`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "派工單列表",
+      label: '派工單列表',
       href: {
         pathname: `${pathHead}/dispatchList`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "送電備品列表",
+      label: '送電備品列表',
       href: {
         pathname: `${pathHead}/powerTransmissionSpareList`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "調(退)貨單列表",
+      label: '調(退)貨單列表',
       href: {
         pathname: `${pathHead}/listOfDeliveryOrders`,
-        query: { contractId }
+        query: { contractId },
       },
     },
     {
-      label: "備忘錄",
+      label: '備忘錄',
       href: {
         pathname: `${pathHead}/memorandum`,
-        query: { contractId }
+        query: { contractId },
       },
-
     },
-  ]
+  ];
 
   return (
     <div>
@@ -95,22 +92,5 @@ export default function PageHeader({ tagCallback, panelList }:
       {/* 下面的 */}
       <PageHeaderFlex01 linkList={linkList} />
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,47 +1,45 @@
-import { useState, } from 'react'
+import { useState } from 'react';
 
 // glogal gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel'
-import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address'
-import CustomerSelector from 'components/global/gear/modal/customerSelector'
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address';
+import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
 // icon
-import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons'
+import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import scss from "./quotationProfile.module.scss"
+import scss from './quotationProfile.module.scss';
 
-import { Class_basicInfo, Class_legacyContract } from 'hooks/quotation/useLegacyContract'
-import { Toption } from 'js/utils/options/countryAndDistrict'
-
+import { Class_basicInfo, Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Toption } from 'js/utils/options/countryAndDistrict';
 
 // type
-import { TcustomerDto, TpageMetaDto } from 'js/api/dtoTypes'
+import { TcustomerDto, TpageMetaDto } from 'js/api/dtoTypes';
 
 // config
-import { customerTypesLookup } from 'config/lookupTable'
+import { customerTypesLookup } from 'config/lookupTable';
 
 // ====================================================
 const inputStyle = {
-  captionWidth: "80px",
-  gap: "24px",
-  padding: "21px 0px 4px 0px",
-  labelWidth: "80px",
-}
-// ====================================================
-export default function QuotationProfile(
-  { classLegacyContract,
-    classBasicInfo,
-    disabled = false
-  }:
-    {
-      classLegacyContract: Class_legacyContract
-      classBasicInfo: Class_basicInfo
-      disabled: boolean
-    }) {
+  captionWidth: '80px',
+  gap: '24px',
+  padding: '21px 0px 4px 0px',
+  labelWidth: '80px',
+};
 
+// ====================================================
+export default function QuotationProfile({
+  classLegacyContract,
+  classBasicInfo,
+  disabled = false,
+}: {
+  classLegacyContract: Class_legacyContract;
+  classBasicInfo: Class_basicInfo;
+  disabled: boolean;
+}) {
   // =============================================
-  const { customer } = classLegacyContract
+  const { customer } = classLegacyContract;
 
   const {
     contractNumber,
@@ -57,70 +55,83 @@ export default function QuotationProfile(
     projectCity,
     projectDistrict,
     projectAddress,
-  } = classBasicInfo
+  } = classBasicInfo;
 
-  const customerTypes = (customer?.types?.map((type) => customerTypesLookup[type.name]))?.join("/") ?? "無類別"
+  const customerTypes = customer?.types?.map((type) => customerTypesLookup[type.name])?.join('/') ?? '無類別';
 
   // ==============================================
   // 客戶資料
   const theClientData = [
-    { label: "聯絡人", placeholder: "尚未選擇", value: contactPerson },
-    { label: "聯絡電話", placeholder: "尚未選擇", value: contactNumber },
-    { label: "傳真號碼", placeholder: "尚未選擇", value: faxNumber },
-  ]
+    { label: '聯絡人', placeholder: '尚未選擇', value: contactPerson },
+    { label: '聯絡電話', placeholder: '尚未選擇', value: contactNumber },
+    { label: '傳真號碼', placeholder: '尚未選擇', value: faxNumber },
+  ];
 
   // ==============================================
   const clearClient = () => {
-    if (disabled) return
-    classBasicInfo.customerName = ""
-    classBasicInfo.contactPerson = ""
-    classBasicInfo.contactNumber = ""
-    classBasicInfo.faxNumber = ""
-  }
+    if (disabled) {
+      return;
+    }
+
+    classBasicInfo.customerName = '';
+    classBasicInfo.contactPerson = '';
+    classBasicInfo.contactNumber = '';
+    classBasicInfo.faxNumber = '';
+  };
+
   // ==============================================
-  const styleHaveState = customerName ? scss.haveState : ""
+  const styleHaveState = customerName ? scss.haveState : '';
   // ==============================================
   // 工程地點
   const selectInputList = {
     county: projectCity,
     onChangeCounty: (option: Toption | null) => {
-      if (!option) return
-      classBasicInfo.projectCity = option.value
-      classBasicInfo.projectDistrict = ""
+      if (!option) {
+        return;
+      }
+
+      classBasicInfo.projectCity = option.value;
+      classBasicInfo.projectDistrict = '';
     },
     district: projectDistrict,
     onChangeDistrict: (option: Toption | null) => {
-      if (!option) return
-      classBasicInfo.projectDistrict = option.value
+      if (!option) {
+        return;
+      }
+
+      classBasicInfo.projectDistrict = option.value;
     },
     address: projectAddress,
-    onChangeAddress: (value: string) => classBasicInfo.projectAddress = value,
-  }
+    onChangeAddress: (value: string) => (classBasicInfo.projectAddress = value),
+  };
 
   // ==============================================
   // modal
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+
   const openModal = () => {
-    if (disabled) return
-    setShowModal(true)
-  }
+    if (disabled) {
+      return;
+    }
+
+    setShowModal(true);
+  };
+
   const onConfirmClient = (customerArr: TcustomerDto[]) => {
-    const customer = customerArr[0]
-    classLegacyContract.customer = customer
-    classBasicInfo.customerName = customer.name
-    classBasicInfo.contactPerson = customer.contacts?.[0]?.name ?? ""
-    classBasicInfo.contactNumber = customer.contacts?.[0]?.phone ?? ""
-    classBasicInfo.faxNumber = customer.fax
-  }
+    const customer = customerArr[0];
+    classLegacyContract.customer = customer;
+    classBasicInfo.customerName = customer.name;
+    classBasicInfo.contactPerson = customer.contacts?.[0]?.name ?? '';
+    classBasicInfo.contactNumber = customer.contacts?.[0]?.phone ?? '';
+    classBasicInfo.faxNumber = customer.fax;
+  };
 
   // ==============================================
 
   return (
     <div className={scss.container}>
       <div className={scss.profile}>
-        <span className={`${scss.clientState}  ${styleHaveState}`}>
-          類別 : {customerTypes || "尚未選擇客戶"}
-        </span>
+        <span className={`${scss.clientState}  ${styleHaveState}`}>類別 : {customerTypes || '尚未選擇客戶'}</span>
         <InputSel
           isMust={true}
           isMustPreStyle="minimal"
@@ -129,26 +140,28 @@ export default function QuotationProfile(
           {...{ ...inputStyle }}
           inputProps={{
             value: projectName,
-            onChange: (v) => { classBasicInfo.projectName = v },
+            onChange: (v) => {
+              classBasicInfo.projectName = v;
+            },
           }}
         />
         {/*  */}
         <div className={scss.form02}>
-          <div className={`${scss.clientName} ${disabled ? scss.disabled : ""}`}>
+          <div className={`${scss.clientName} ${disabled ? scss.disabled : ''}`}>
             <div>
               <InputSel
                 isMust={true}
                 isMustPreStyle="minimal"
-                label={"客戶名稱"}
-                placeholder={""}
+                label={'客戶名稱'}
+                placeholder={''}
                 disabled={true}
                 showBaseline="invisible"
                 captionClassName={scss.input02}
                 captionWidth={inputStyle.captionWidth}
                 gap={inputStyle.gap}
                 textareaProps={{
-                  value: customerName ?? "",
-                  onChange: () => { },
+                  value: customerName ?? '',
+                  onChange: () => {},
                 }}
               />
               {!customerName && <button onClick={openModal}>請選擇客戶</button>}
@@ -159,9 +172,11 @@ export default function QuotationProfile(
           <div>
             {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
             {theClientData.map((item, index) => {
-              const { label, value, placeholder } = item
+              const { label, value, placeholder } = item;
+
               return (
-                <InputSel key={index}
+                <InputSel
+                  key={index}
                   label={label}
                   placeholder={placeholder}
                   captionClassName={scss.input02}
@@ -169,15 +184,14 @@ export default function QuotationProfile(
                   showBaseline="invisible"
                   {...{ ...inputStyle }}
                   inputProps={{
-                    value: value ?? "",
-                    onChange: () => { },
+                    value: value ?? '',
+                    onChange: () => {},
                   }}
                 />
-              )
+              );
             })}
           </div>
           <div>
-
             <InputSel
               label="追蹤狀態"
               captionClassName={scss.input02}
@@ -185,8 +199,10 @@ export default function QuotationProfile(
               disabled={disabled}
               {...{ ...inputStyle }}
               inputProps={{
-                value: trackingStatus ?? "",
-                onChange: (v) => { classBasicInfo.trackingStatus = v },
+                value: trackingStatus ?? '',
+                onChange: (v) => {
+                  classBasicInfo.trackingStatus = v;
+                },
               }}
             />
 
@@ -197,13 +213,15 @@ export default function QuotationProfile(
               disabled={disabled}
               {...{ ...inputStyle }}
               inputProps={{
-                value: projectProgress ?? "",
-                onChange: (v) => { classBasicInfo.projectProgress = v },
+                value: projectProgress ?? '',
+                onChange: (v) => {
+                  classBasicInfo.projectProgress = v;
+                },
               }}
             />
           </div>
-        </div> {/* form02 */}
-
+        </div>{' '}
+        {/* form02 */}
         <InputSelBar_address
           // isMust={true}
           label="工程地點"
@@ -225,8 +243,11 @@ export default function QuotationProfile(
           disabled={disabled}
           inputProps={{
             value: contractNumber,
-            onChange: (v) => { classBasicInfo.contractNumber = v }
-          }} />
+            onChange: (v) => {
+              classBasicInfo.contractNumber = v;
+            },
+          }}
+        />
         {/* <InputSel
           label="舊合約時效"
           showBaseline="invisible"
@@ -241,14 +262,13 @@ export default function QuotationProfile(
           disabled={disabled}
           isMust={true}
           datePickerProps={{
-            value: quoteDate as string ?? "",
+            value: (quoteDate as string) ?? '',
             onChange02(moment, dateString) {
-              classBasicInfo.quoteDate = moment?.toISOString()
+              classBasicInfo.quoteDate = moment?.toISOString();
             },
           }}
         />
       </div>
-
 
       {/* modal */}
       <CustomerSelector
@@ -258,24 +278,8 @@ export default function QuotationProfile(
         label="請選擇客戶"
         selLimit={1}
       />
-
     </div>
-  )
+  );
 }
 
-
 // ===================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-

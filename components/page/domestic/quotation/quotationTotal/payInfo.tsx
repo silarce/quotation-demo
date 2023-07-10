@@ -1,52 +1,35 @@
-
 // global gear
-import InputSel from "components/global/gear/inputAndSel/inputSel"
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // css
-import style from "./payInfo.module.scss"
+import style from './payInfo.module.scss';
 
 // type
-import { Class_quotation } from "hooks/quotation/useQuotation"
+import { Class_quotation } from 'hooks/quotation/useQuotation';
 
-
-export default function PayInfo(
-  { classQuotation, disabled }:
-    {
-      classQuotation: Class_quotation
-      disabled: boolean
-    }) {
+export default function PayInfo({ classQuotation, disabled }: { classQuotation: Class_quotation; disabled: boolean }) {
   // -----------------------------------------------------------------------
-  const {
-    classPayInfo: payInfo,
-    avgDiscount, subTotal, businessTax, total,
-    changeAllDiscount,
-  } = classQuotation
+  const { classPayInfo: payInfo, avgDiscount, subTotal, businessTax, total, changeAllDiscount } = classQuotation;
 
-  const {
-    tradingLocation,
-    tradingDate,
-    deposit,
-    deliveryPayment,
-    installedPayment,
-    eleConnectPayment,
-  } = payInfo
+  const { tradingLocation, tradingDate, deposit, deliveryPayment, installedPayment, eleConnectPayment } = payInfo;
 
   // -----------------------------------------------------------------------
   const countList = [
-    { label: "小計", value: subTotal },
-    { label: "營業稅(5%)", value: businessTax },
-    { label: "總計", value: total },
-  ]
+    { label: '小計', value: subTotal },
+    { label: '營業稅(5%)', value: businessTax },
+    { label: '總計', value: total },
+  ];
+
   // -----------------------------------------------------------------------
   return (
-
     <div className={style.container}>
-
       <div className={style.payBox}>
         <div className={style.avgDiscount}>
-          <span>{"總折數"}</span>
+          <span>{'總折數'}</span>
           <div>
-            <input type="text" className="bg-transparent"
+            <input
+              type="text"
+              className="bg-transparent"
               value={avgDiscount}
               onChange={(e) => changeAllDiscount(e.target.value)}
               disabled={disabled}
@@ -55,15 +38,16 @@ export default function PayInfo(
           </div>
         </div>
         {countList.map((item, index) => {
-          let { label, value } = item
+          const { label, value } = item;
           // 加千分位
           const theValue = parseFloat(value).toFixed(2).toLocaleString();
+
           return (
             <div key={index}>
               <span>{label}</span>
               <span>{theValue}</span>
             </div>
-          )
+          );
         })}
       </div>
       <hr className={style.grayHr} />
@@ -73,7 +57,9 @@ export default function PayInfo(
           <InputSel
             inputProps={{
               value: tradingLocation,
-              onChange: (v) => { payInfo.tradingLocation = v },
+              onChange: (v) => {
+                payInfo.tradingLocation = v;
+              },
             }}
             placeholder={`請輸入交貨地址`}
             disabled={disabled}
@@ -84,7 +70,9 @@ export default function PayInfo(
           <InputSel
             inputProps={{
               value: tradingDate,
-              onChange: (v) => { payInfo.tradingDate = v },
+              onChange: (v) => {
+                payInfo.tradingDate = v;
+              },
             }}
             placeholder={`例 : 100-01-01`}
             disabled={disabled}
@@ -99,10 +87,13 @@ export default function PayInfo(
             <InputSel
               inputProps={{
                 value: deposit,
-                onChange: (v) => { payInfo.deposit = v },
+                onChange: (v) => {
+                  payInfo.deposit = v;
+                },
               }}
               placeholder="請輸入%數"
-              disabled={disabled} />
+              disabled={disabled}
+            />
             <span>%</span>
           </div>
           {/*  */}
@@ -111,10 +102,13 @@ export default function PayInfo(
             <InputSel
               inputProps={{
                 value: deliveryPayment,
-                onChange: (v) => { payInfo.deliveryPayment = v },
+                onChange: (v) => {
+                  payInfo.deliveryPayment = v;
+                },
               }}
               placeholder="請輸入%數"
-              disabled={disabled} />
+              disabled={disabled}
+            />
             <span>%</span>
           </div>
           {/*  */}
@@ -123,10 +117,13 @@ export default function PayInfo(
             <InputSel
               inputProps={{
                 value: installedPayment,
-                onChange: (v) => { payInfo.installedPayment = v },
+                onChange: (v) => {
+                  payInfo.installedPayment = v;
+                },
               }}
               placeholder="請輸入%數"
-              disabled={disabled} />
+              disabled={disabled}
+            />
             <span>%</span>
           </div>
           {/*  */}
@@ -135,16 +132,19 @@ export default function PayInfo(
             <InputSel
               inputProps={{
                 value: eleConnectPayment,
-                onChange: (v) => { payInfo.eleConnectPayment = v },
+                onChange: (v) => {
+                  payInfo.eleConnectPayment = v;
+                },
               }}
               placeholder="請輸入%數"
-              disabled={disabled} />
+              disabled={disabled}
+            />
             <span>%</span>
           </div>
           {/*  */}
         </div>
       </div>
     </div>
-  )
+  );
 } // PayInfo
 // ============================
