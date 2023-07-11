@@ -182,7 +182,7 @@ const doorTypeOptions: TcheckOption[] = [
   { label: 'SJ-303AS', value: 'SJ-303AS' },
   { label: 'SJ-305D', value: 'SJ-305D' },
 ];
-const partOptions: TcheckOption[] = [
+export const partOptions: TcheckOption[] = [
   { label: '支板', value: 'supportPlate' },
   { label: '底座', value: 'base' },
   { label: '門軌', value: 'doorTrack' },
