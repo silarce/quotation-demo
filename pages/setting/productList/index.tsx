@@ -102,6 +102,7 @@ export default function ProductList() {
       checkedDoorType: [],
       checkedPart: [],
     });
+    setTabQuery(undefined);
   };
 
   // 打包起來送進FilterPanel
