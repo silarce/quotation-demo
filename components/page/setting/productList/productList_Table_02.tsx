@@ -121,14 +121,20 @@ type TkeyList = {
 };
 
 const keyList: TkeyList = {
-  base: ['type01', 'type02', 'surface'],
-  rollDoorPiece: ['type', 'surface', 'material', 'thickness'],
-  doorTrack: ['type', 'surface', 'material', 'thickness', 'noiseStrip'],
-  supportPlate: ['chainGearNumber', 'reelBoxType', 'supplier', 'maxMotorWeight', 'minMotorWeight', 'horsepower'],
-  reel: ['size', 'bearing'],
-  motor: ['horsepower', 'weight', 'supportFrame', 'powerSupplier', 'voltage', 'chainGearNumber', 'supplier'],
+  base: ['type01', 'type02', 'paint', 'material'],
+  // rollDoorPiece: ['type', 'surface', 'material', 'thickness'],
+  rollDoorPiece: ['type', 'paint'],
+  rollDoorMaterial: ['material', 'thickness'],
+  // doorTrack: ['type', 'surface', 'material', 'thickness', 'noiseStrip'],
+  doorTrack: ['type01', 'paint', 'noiseStrip', 'material', 'thickness'],
+  // supportPlate: ['chainGearNumber', 'reelBoxType', 'supplier', 'maxMotorWeight', 'minMotorWeight', 'horsepower'],
+  supportPlate: ['bearing', 'chain', 'reelBoxType'],
+  reel: ['size', 'haveConvex'],
+  // motor: ['horsepower', 'weight', 'supportFrame', 'powerSupplier', 'voltage', 'chainGearNumber', 'supplier'],
+  motor: ['horsepower', 'weight', 'supportFrame', 'powerSupplier', 'voltage', 'chain', 'supplier'],
   motorParts: ['chain', 'lockCase', 'bearing'],
-  reelBox: ['thickness', 'surface', 'material', 'front', 'back', 'type'],
+  // reelBox: ['thickness', 'surface', 'material', 'front', 'back', 'type'],
+  reelBox: ['thickness', 'paint', 'front', 'type', 'thickness', 'material'],
 };
 
 type Tconfig = {
@@ -204,7 +210,7 @@ const config = {
     className: classNames('w-[60px]'),
   },
   weight: {
-    label: '重量',
+    label: '荷重',
     className: classNames('w-[90px]'),
   },
   supportFrame: {
@@ -228,12 +234,20 @@ const config = {
     className: classNames('w-[60px]'),
   },
   front: {
-    label: '前面',
+    label: '正面',
     className: classNames('w-[90px]'),
   },
   back: {
     label: '後面',
     className: classNames('w-[90px]'),
+  },
+  paint: {
+    label: '烤漆',
+    className: classNames('w-[90px]'),
+  },
+  haveConvex: {
+    label: '有無凸',
+    className: classNames('w-[60px]'),
   },
 } as const;
 

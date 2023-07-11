@@ -220,6 +220,7 @@ const partOptions: TcheckOption[] = [
   { label: '電動機', value: 'motor' },
   { label: '電動機配件', value: 'motorParts' },
   { label: '捲門片', value: 'rollDoorPiece' },
+  { label: '捲門材質', value: 'rollDoorMaterial' },
   // { label: '門箱', value: '門箱' },
   // { label: '配電箱及按鈕開關', value: '配電箱及按鈕開關' },
   // { label: '安裝費(含送電及試車)', value: '安裝費(含送電及試車)' },
@@ -258,8 +259,9 @@ export type TfakeData = {
   supportPlate: TfakeSupportPlate; // 支板
   reel: TfakeReel; // 捲軸
   motor: TfakeMotor; // 電動機
-  motorParts: TfakeMotorParts; // 電動機配件
+  motorParts: TfakeMotorParts; // 馬達配件
   reelBox: TfakeReelBox; // 捲箱
+  rollDoorMaterial: TfakeRollDoorMaterial; // 捲門材質
 };
 
 // 底座
@@ -267,13 +269,21 @@ export type TfakeBase = {
   // name: '底座'; // 類型
   type01: string; // 形式1
   type02: string | undefined; // 形式2
-  surface: boolean; // 表面
+  paint: string | undefined; // 烤漆
+  // surface: boolean; // 表面
+  material: string; // 材質
 };
 // 捲門片
 export type TfakeRollDoorPiece = {
   // name: '捲門片'; // 類型
   type: string; // 型式
-  surface: boolean; // 表面
+  paint: string | undefined; // 烤漆
+  // surface: boolean; // 表面
+  // material: string; // 材質
+  // thickness: string | undefined; // 厚度
+};
+// 捲門材質
+export type TfakeRollDoorMaterial = {
   material: string; // 材質
   thickness: string | undefined; // 厚度
 };
@@ -281,29 +291,33 @@ export type TfakeRollDoorPiece = {
 // 門軌
 export type TfakeDoorTrack = {
   // name: '門軌'; // 類型
-  type: string; // 型式
-  surface: boolean; // 表面
-  material: string; // 材質
-  thickness: string | undefined; // 厚度
+  type01: string; // 型式
+  // surface: boolean; // 表面
+  paint: string | undefined; // 烤漆
   noiseStrip: boolean; //消音條
+  thickness: string | undefined; // 厚度
+  material: string; // 材質
 };
 
 // 支板
 export type TfakeSupportPlate = {
   // name: '支板'; // 類型
-  chainGearNumber: string; // 鏈齒輪番號
+  // chainGearNumber: string; // 鏈齒輪番號
+  // supplier: string | undefined; // 廠商 供應商
+  // maxMotorWeight: string | undefined; // 最大馬達重量
+  // minMotorWeight: string | undefined; // 最小馬達重量
+  // horsepower: string | undefined; // 馬力數
+  bearing: string; // 軸承
+  chain: string; // 鍊條
   reelBoxType: string; // 捲箱型式
-  supplier: string | undefined; // 廠商 供應商
-  maxMotorWeight: string | undefined; // 最大馬達重量
-  minMotorWeight: string | undefined; // 最小馬達重量
-  horsepower: string | undefined; // 馬力數
 };
 
 // 捲軸
 export type TfakeReel = {
   // name: '捲軸'; // 類型
   size: string; // 捲軸尺寸
-  bearing: string | undefined; // 軸承
+  // bearing: string | undefined; // 軸承
+  haveConvex: boolean;
 };
 
 // 電動機
@@ -312,9 +326,10 @@ export type TfakeMotor = {
   horsepower: string; // 馬力數
   weight: string; // 重量
   supportFrame: boolean; // 支撐架
-  powerSupplier: string | undefined; // 電供
-  voltage: string | undefined; // 電壓
-  chainGearNumber: string; // 鏈齒輪番號
+  powerSupplier: string; // 電供
+  voltage: string; // 電壓
+  chain: string; // 鍊條
+  // chainGearNumber: string; // 鏈齒輪番號
   supplier: string; // 廠商 供應商
 };
 
@@ -329,12 +344,13 @@ export type TfakeMotorParts = {
 // 捲箱
 export type TfakeReelBox = {
   // name: '捲箱'; // 類型
-  thickness: string; // 厚度
-  surface: boolean; // 表面
-  material: string; // 材質
+  paint: string; // 烤漆
   front: string; // 前面
-  back: string; // 後面
+  // surface: boolean; // 表面
+  // back: string; // 正面
   type: string; // 捲箱型式
+  thickness: string; // 厚度
+  material: string; // 材質
 };
 
 const fakeDate2: TfakeData = {
@@ -343,40 +359,52 @@ const fakeDate2: TfakeData = {
   base: {
     type01: '一般型',
     type02: undefined,
-    surface: false,
+    // surface: false,
+    paint: '一般烤',
+    material: '鍍鋅鋼板',
   },
   rollDoorPiece: {
     type: '一般型',
-    surface: false,
-    material: '鍍鋅鋼板(1.5t)',
+    paint: '一般烤',
+    // surface: false,
+    // material: '鍍鋅鋼板(1.5t)',
+    // thickness: '1.5t',
+  },
+  rollDoorMaterial: {
+    material: '鍍鋅鋼板',
     thickness: '1.5t',
   },
   doorTrack: {
-    type: '一般型',
-    surface: true,
+    type01: '一般型',
+    // surface: true,
+    paint: '一般烤',
     material: '鍍鋅鋼板(1.5t)',
     thickness: '1.5t',
     noiseStrip: false,
   },
   supportPlate: {
-    chainGearNumber: '#530',
+    bearing: '6208#',
     reelBoxType: '捲箱',
-    supplier: undefined,
-    maxMotorWeight: undefined,
-    minMotorWeight: undefined,
-    horsepower: undefined,
+    chain: '#530',
+    // chainGearNumber: '#530',
+    // supplier: undefined,
+    // maxMotorWeight: undefined,
+    // minMotorWeight: undefined,
+    // horsepower: undefined,
   },
   reel: {
     size: '5',
-    bearing: undefined,
+    // bearing: undefined,
+    haveConvex: true,
   },
   motor: {
     horsepower: '1/4HP',
     weight: '300KG',
     supportFrame: false,
-    powerSupplier: undefined,
-    voltage: undefined,
-    chainGearNumber: '#640',
+    powerSupplier: '單相',
+    voltage: '220V',
+    // chainGearNumber: '#640',
+    chain: '#530',
     supplier: '大同',
   },
   motorParts: {
@@ -385,11 +413,12 @@ const fakeDate2: TfakeData = {
     bearing: '#6208',
   },
   reelBox: {
+    paint: '一般烤',
     thickness: '0.8T',
-    surface: true,
+    // surface: true,
     material: '鍍鋅鋼板',
     front: '正雲白',
-    back: '正乳白',
+    // back: '正乳白',
     type: '捲箱',
   },
 };
