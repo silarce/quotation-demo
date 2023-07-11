@@ -13,14 +13,25 @@ import { TfakeData, partOptions } from 'pages/setting/productList';
 
 // ===================================================================
 
-type TpartLookup = {
-  [key in (typeof partOptions)[number]['value']]: (typeof partOptions)[number]['label'];
-};
-const partLookup: TpartLookup = {};
+// type TpartLookup = {
+//   [key in (typeof partOptions)[number]['value']]: (typeof partOptions)[number]['label'];
+// };
+// const partLookup: TpartLookup = {};
 
-partOptions.forEach((item) => {
-  partLookup[item.value] = item.label;
-});
+// partOptions.forEach((item) => {
+//   partLookup[item.value] = item.label;
+// });
+const partLookup = {
+  supportPlate: '支板',
+  base: '底座',
+  doorTrack: '門軌',
+  reel: '捲軸',
+  reelBox: '捲箱',
+  motor: '電動機',
+  motorParts: '電動機配件',
+  rollDoorPiece: '捲門片',
+  rollDoorMaterial: '捲門材質',
+};
 
 // ===================================================================
 
