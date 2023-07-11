@@ -2,10 +2,12 @@
 
 .table {
   height: 100%;
-  display: grid;
-  grid-template-rows: fit-content(100%) auto;
+  overflow: auto;
 
   .thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     display: flex;
     gap: 22px;
     padding: 11px 22px;
@@ -15,13 +17,15 @@
     > .column {
       font-weight: 400;
       font-size: 16px;
+      &.textCenter {
+        text-align: center;
+      }
       > span {
         color: $colorMain;
       }
     }
   }
   .tbody {
-    overflow-y:scroll;
     .row {
       display: flex;
       gap: 22px;
@@ -29,6 +33,13 @@
       .column {
         font-weight: 400;
         font-size: 16px;
+        &.textCenter {
+          text-align: center;
+        }
+        .icon {
+          width: 14px;
+          height: 14px;
+        }
       }
     }
   }
