@@ -31,7 +31,7 @@ export default function FilterPanel({
   partOptions: TcheckOption[];
   filterCtrl: TfilterCtrl;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const switchPanel = () => setIsOpen(!isOpen);
 
