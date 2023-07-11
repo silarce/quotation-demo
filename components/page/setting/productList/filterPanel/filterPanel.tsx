@@ -17,6 +17,9 @@ export default function FilterPanel({
   partOptions,
   filterCtrl,
 }: {
+  // prodClassOptions: TprodClassOptions;
+  // doorTypeOptions: TdoorTypeOptions;
+  // partOptions: TpartOptions;
   prodClassOptions: TprodClassOptions;
   doorTypeOptions: TdoorTypeOptions;
   partOptions: TpartOptions;

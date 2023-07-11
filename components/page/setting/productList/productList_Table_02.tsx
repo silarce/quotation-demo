@@ -1,10 +1,27 @@
 import classNames from 'classnames';
+import Image from 'next/image';
+// gear
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 import scss from './productList_Table_02.module.scss';
 
-import { TfakeData02 } from 'pages/setting/productList';
+// icon
+import iconCrossRed from 'public/image/icon/cross_red.svg';
+import iconCheckGreen from 'public/image/icon/check_green.svg';
+// fake
+import { TfakeData } from 'pages/setting/productList';
 
-export default function ProductList_table_02({ fakeDataArr }: { fakeDataArr: TfakeData02[] }) {
+// ===================================================================
+
+export default function ProductList_table_02({
+  fakeDataArr,
+  tabQuery,
+}: {
+  fakeDataArr: TfakeData[];
+  tabQuery: 'base' | 'rollDoorPiece' | 'doorTrack' | 'supportPlate' | 'reel' | 'motor' | 'motorParts' | 'reelBox';
+}) {
+  const theConfig = configList[tabQuery];
+
   return (
     <div className={scss.table}>
       <div className={scss.thead}>
@@ -14,13 +31,54 @@ export default function ProductList_table_02({ fakeDataArr }: { fakeDataArr: Tfa
         <div className={classNames(scss.column, config.prodClass.className)}>
           <span>{config.prodClass.label}</span>
         </div>
-        {keyList['base'].map((key, index) => {
-          const { label, className } = configList['base'][key];
+        {keyList[tabQuery].map((key, index) => {
+          const { label, className } = theConfig?.[key] ?? {};
 
           return (
             <div className={classNames(scss.column, className)} key={index}>
               <span>{label}</span>
             </div>
+          );
+        })}
+      </div>
+
+      <div className={scss.tbody}>
+        {fakeDataArr.map((obj, index) => {
+          // if (!doFilter(obj)) {
+          //   return null;
+          // }
+
+          return (
+            <CellWithBar className={scss.row} key={index}>
+              <div className={classNames(scss.column, config.doorType.className)}>
+                <span>{obj.doorType}</span>
+              </div>
+              <div className={classNames(scss.column, config.prodClass.className)}>
+                <span>{obj.prodClass}</span>
+              </div>
+
+              {keyList[tabQuery].map((key, index) => {
+                const { className } = theConfig?.[key] ?? {};
+
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const data = obj[tabQuery][key] as string | undefined | boolean;
+
+                if (data === true) {
+                  return (
+                    <div key={index} className={classNames(scss.column, className)}>
+                      <Image className={scss.icon} src={iconCheckGreen} alt="check" />
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={index} className={classNames(scss.column, className)}>
+                    {data ? <span>{data}</span> : <Image className={scss.crossRed} src={iconCrossRed} alt="no value" />}
+                  </div>
+                );
+              })}
+            </CellWithBar>
           );
         })}
       </div>
@@ -30,16 +88,41 @@ export default function ProductList_table_02({ fakeDataArr }: { fakeDataArr: Tfa
 
 // ==========================================================
 
-const keyList = {
+// type TkeyList = {
+//   base: Array<keyof TfakeData['base']>;
+//   rollDoorPiece: Array<keyof TfakeData['rollDoorPiece']>;
+//   doorTrack: Array<keyof TfakeData['doorTrack']>;
+//   supportPlate: Array<keyof TfakeData['supportPlate']>;
+//   reel: Array<keyof TfakeData['reel']>;
+//   motor: Array<keyof TfakeData['motor']>;
+//   motorParts: Array<keyof TfakeData['motorParts']>;
+//   reelBox: Array<keyof TfakeData['reelBox']>;
+// };
+type TkeyList = {
+  [key in keyof Omit<TfakeData, 'doorType' | 'prodClass'>]: Array<keyof TfakeData[key]>;
+};
+
+const keyList: TkeyList = {
   base: ['type01', 'type02', 'surface'],
   rollDoorPiece: ['type', 'surface', 'material', 'thickness'],
   doorTrack: ['type', 'surface', 'material', 'thickness', 'noiseStrip'],
-  supportPlate: ['chainGearNumber', 'reelBox', 'supplier', 'maxMotorWeight', 'minMotorWeight', 'horsepower'],
+  supportPlate: ['chainGearNumber', 'reelBoxType', 'supplier', 'maxMotorWeight', 'minMotorWeight', 'horsepower'],
   reel: ['size', 'bearing'],
   motor: ['horsepower', 'weight', 'supportFrame', 'powerSupplier', 'voltage', 'chainGearNumber', 'supplier'],
   motorParts: ['chain', 'lockCase', 'bearing'],
   reelBox: ['thickness', 'surface', 'material', 'front', 'back', 'type'],
-} as const;
+};
+
+type Tconfig = {
+  [key in string]: {
+    label: string;
+    className: string;
+  };
+};
+
+type TconfigList = {
+  [key in keyof TfakeData]?: Tconfig;
+};
 
 const config = {
   doorType: {
@@ -48,15 +131,15 @@ const config = {
   },
   prodClass: {
     label: '類型',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   type01: {
     label: '型式一',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   type02: {
     label: '型式二',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   surface: {
     label: '表面',
@@ -64,11 +147,11 @@ const config = {
   },
   type: {
     label: '型式',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   material: {
     label: '材質',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   thickness: {
     label: '厚度',
@@ -80,7 +163,7 @@ const config = {
   },
   chainGearNumber: {
     label: '鏈齒輪番號',
-    className: classNames('w-[96px]'),
+    className: classNames('w-[95px]'),
   },
   supplier: {
     label: '廠商',
@@ -88,11 +171,11 @@ const config = {
   },
   maxMotorWeight: {
     label: '最大馬達重量',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   minMotorWeight: {
     label: '最小馬達重量',
-    className: classNames('w-[112px]'),
+    className: classNames('w-[130px]'),
   },
   horsepower: {
     label: '馬力數',
@@ -119,8 +202,8 @@ const config = {
     className: classNames('w-[60px]'),
   },
   chain: {
-    label: '鏈齒輪番號',
-    className: classNames('w-[px]'),
+    label: '鏈條',
+    className: classNames('w-[60px]'),
   },
   lockCase: {
     label: '鎖盒',
@@ -136,7 +219,7 @@ const config = {
   },
 } as const;
 
-const configList = {
+const configList: TconfigList = {
   base: {
     ...config,
   },
@@ -148,6 +231,10 @@ const configList = {
   },
   supportPlate: {
     ...config,
+    reelBoxType: {
+      label: '捲箱型式',
+      className: classNames('w-[95px]'),
+    },
   },
   reel: {
     ...config,
@@ -165,8 +252,12 @@ const configList = {
   },
   motorParts: {
     ...config,
+    // chain: {
+    //   label: '鏈條',
+    //   className: classNames('w-[60px]'),
+    // },
   },
   reelBox: {
     ...config,
   },
-} as const;
+};

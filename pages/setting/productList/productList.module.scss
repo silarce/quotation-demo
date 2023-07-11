@@ -1,6 +1,18 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
 
-.mainContainer {
+.subLayer {
+  overflow: hidden !important;
+}
+
+.wrapper {
   padding: 4px;
+  // border: solid 1px $colorBorder01;
+  height: 100%;
+  // overflow: auto;
+}
+
+.main {
+  margin-top: 4px;
+  height: 100%;
+  // overflow: auto;
 }
