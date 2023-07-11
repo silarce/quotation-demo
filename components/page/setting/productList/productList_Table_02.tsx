@@ -288,4 +288,7 @@ const configList: TconfigList = {
   reelBox: {
     ...config,
   },
+  rollDoorMaterial: {
+    ...config,
+  },
 };

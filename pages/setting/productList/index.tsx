@@ -116,42 +116,13 @@ export default function ProductList() {
     filterClear,
   };
 
-  // // 送到ProductList_Table裡面做篩選
-  // const doFilter = (data: TfakeData) => {
-  //   const { checkedProdClass, checkedDoorType, checkedPart } = filterParams;
-  //   const { prodClass, doorType, part } = data;
-  //   let check01 = true;
-
-  //   if (checkedProdClass[0]) {
-  //     check01 = !!checkedProdClass.find((item) => item === prodClass);
-  //   }
-
-  //   let check02 = true;
-
-  //   if (checkedDoorType[0]) {
-  //     check02 = !!checkedDoorType.find((item) => item === doorType);
-  //   }
-
-  //   let check03 = true;
-
-  //   if (checkedPart[0]) {
-  //     check03 = !!checkedPart.find((item) => item === part);
-  //   }
-
-  //   if (check01 && check02 && check03) {
-  //     return true;
-  //   }
-
-  //   return false;
-  // };
-
   // ---------------------------------------------------------------------------
   const panelList: TpanelList = [
-    {
-      type: 'inputSearch',
-      placeholder: '請輸入搜尋內容',
-      onClick: () => {},
-    },
+    // {
+    //   type: 'inputSearch',
+    //   placeholder: '請輸入搜尋內容',
+    //   onClick: () => {},
+    // },
   ];
 
   // ---------------------------------------------------------------------------
@@ -344,7 +315,7 @@ export type TfakeMotorParts = {
 // 捲箱
 export type TfakeReelBox = {
   // name: '捲箱'; // 類型
-  paint: string; // 烤漆
+  paint: string | undefined; // 烤漆
   front: string; // 前面
   // surface: boolean; // 表面
   // back: string; // 正面
@@ -378,7 +349,7 @@ const fakeDate2: TfakeData = {
     type01: '一般型',
     // surface: true,
     paint: '一般烤',
-    material: '鍍鋅鋼板(1.5t)',
+    material: '鍍鋅鋼板',
     thickness: '1.5t',
     noiseStrip: false,
   },
@@ -393,7 +364,7 @@ const fakeDate2: TfakeData = {
     // horsepower: undefined,
   },
   reel: {
-    size: '5',
+    size: '5"',
     // bearing: undefined,
     haveConvex: true,
   },
@@ -422,28 +393,97 @@ const fakeDate2: TfakeData = {
     type: '捲箱',
   },
 };
+const fakeDate3: TfakeData = {
+  doorType: '120A',
+  prodClass: '機庫門',
+  base: {
+    type01: '防颱型',
+    type02: '止水型',
+    // surface: false,
+    paint: '一般烤',
+    material: '白鐵',
+  },
+  rollDoorPiece: {
+    type: '防颱型',
+    paint: '一般烤',
+    // surface: false,
+    // material: '鍍鋅鋼板(1.5t)',
+    // thickness: '1.5t',
+  },
+  rollDoorMaterial: {
+    material: '白鐵',
+    thickness: '1.5t',
+  },
+  doorTrack: {
+    type01: '防颱型',
+    // surface: true,
+    paint: undefined,
+    material: '白鐵',
+    thickness: '1.5t',
+    noiseStrip: true,
+  },
+  supportPlate: {
+    bearing: 'UCSF214',
+    reelBoxType: '捲箱+鐵箱',
+    chain: '#850',
+    // chainGearNumber: '#530',
+    // supplier: undefined,
+    // maxMotorWeight: undefined,
+    // minMotorWeight: undefined,
+    // horsepower: undefined,
+  },
+  reel: {
+    size: '10"',
+    // bearing: undefined,
+    haveConvex: false,
+  },
+  motor: {
+    horsepower: '1HP',
+    weight: '1000KG',
+    supportFrame: true,
+    powerSupplier: '三相',
+    voltage: '280V',
+    // chainGearNumber: '#640',
+    chain: '#640',
+    supplier: '東元',
+  },
+  motorParts: {
+    chain: '雙排',
+    lockCase: '防盜式',
+    bearing: 'UCFS214',
+  },
+  reelBox: {
+    paint: undefined,
+    thickness: '1.0T',
+    // surface: true,
+    material: '白鐵',
+    front: '正乳白',
+    // back: '正乳白',
+    type: '捲箱+鐵箱',
+  },
+};
 
 const fakeDataArr: TfakeData[] = [
   fakeDate2,
+  fakeDate3,
+  fakeDate2,
+  fakeDate3,
+  fakeDate2,
+  fakeDate3,
+  fakeDate2,
+  fakeDate2,
+  fakeDate3,
+  fakeDate3,
   fakeDate2,
   fakeDate2,
   fakeDate2,
   fakeDate2,
   fakeDate2,
+  fakeDate3,
+  fakeDate3,
   fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
-  fakeDate2,
+  fakeDate3,
+  fakeDate3,
+  fakeDate3,
   fakeDate2,
 ];
