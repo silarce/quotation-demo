@@ -9,7 +9,18 @@ import scss from './productList_Table_02.module.scss';
 import iconCrossRed from 'public/image/icon/cross_red.svg';
 import iconCheckGreen from 'public/image/icon/check_green.svg';
 // fake
-import { TfakeData } from 'pages/setting/productList';
+import { TfakeData, partOptions } from 'pages/setting/productList';
+
+// ===================================================================
+
+type TpartLookup = {
+  [key in (typeof partOptions)[number]['value']]: (typeof partOptions)[number]['label'];
+};
+const partLookup: TpartLookup = {};
+
+partOptions.forEach((item) => {
+  partLookup[item.value] = item.label;
+});
 
 // ===================================================================
 
@@ -72,7 +83,8 @@ export default function ProductList_table_02({
                 <span>{obj.doorType}</span>
               </div>
               <div className={classNames(scss.column, config.prodClass.className)}>
-                <span>{obj.prodClass}</span>
+                {/* <span>{obj.prodClass}</span> */}
+                <span>{partLookup[tabQuery]}</span>
               </div>
 
               {keyList[tabQuery].map((key, index) => {
