@@ -4,20 +4,33 @@ import scss from './tabBar.module.scss';
 
 export default function TabBar({
   query,
+  tabArr,
   switchTab,
 }: {
-  query: string;
+  query: string | undefined;
+  tabArr: { value: string; label: string }[];
   switchTab: (
     query: 'base' | 'rollDoorPiece' | 'doorTrack' | 'supportPlate' | 'reel' | 'motor' | 'motorParts' | 'reelBox'
   ) => void;
 }) {
   return (
     <div className={scss.bar}>
-      {configArr.map((item, index) => {
+      {tabArr.map((item, index) => {
         const isActive = query === item.value;
         const { value, label } = item;
 
-        const onClick = () => switchTab(value);
+        const onClick = () =>
+          switchTab(
+            value as
+              | 'base'
+              | 'rollDoorPiece'
+              | 'doorTrack'
+              | 'supportPlate'
+              | 'reel'
+              | 'motor'
+              | 'motorParts'
+              | 'reelBox'
+          );
 
         return (
           <div key={index} onClick={onClick} className={classNames(scss.tab, { [scss.active]: isActive })}>

@@ -6,13 +6,13 @@
 
 .wrapper {
   padding: 4px;
-  // border: solid 1px $colorBorder01;
   height: 100%;
-  // overflow: auto;
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
 }
 
 .main {
   margin-top: 4px;
   height: 100%;
-  // overflow: auto;
+  overflow: hidden;
 }

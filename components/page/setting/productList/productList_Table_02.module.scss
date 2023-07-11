@@ -1,8 +1,6 @@
 @use "styles/theme01" as *;
 
 .table {
-  display: grid;
-  grid-template-rows: fit-content(100%) auto;
   height: 100%;
   overflow: auto;
 

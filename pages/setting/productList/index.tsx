@@ -19,11 +19,18 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import scss from './productList.module.scss';
 
 // ==============================================================================
+
+export type TcheckOption = {
+  label: string;
+  value: string;
+};
+
+// ==============================================================================
 export default function ProductList() {
   // ---------------------------------------------------------------------------
-  const [checkedProdClass, setCheckedProdClass] = useState<TprodClassValues[]>([]);
-  const [checkedDoorType, setCheckedDoorType] = useState<TdoorTypeValues[]>([]);
-  const [checkedPart, setCheckedPart] = useState<TpartValues[]>([]);
+  const [checkedProdClass, setCheckedProdClass] = useState<string[]>([]);
+  const [checkedDoorType, setCheckedDoorType] = useState<string[]>([]);
+  const [checkedPart, setCheckedPart] = useState<string[]>([]);
   // 因為要按下篩選按鈕才做篩選的行為，所以要另外建立一個狀態
   const [filterParams, setFilterParams] = useState({
     checkedProdClass: [...checkedProdClass],
@@ -33,13 +40,11 @@ export default function ProductList() {
 
   const [tabQuery, setTabQuery] = useState<
     'base' | 'rollDoorPiece' | 'doorTrack' | 'supportPlate' | 'reel' | 'motor' | 'motorParts' | 'reelBox'
-  >('base');
+  >();
   const switchTab = (query: typeof tabQuery) => setTabQuery(query);
 
-  console.log(filterParams);
-
   // 點擊類別的checkBox
-  const checkProdClass = (value: TprodClassValues) => {
+  const checkProdClass = (value: string) => {
     const valueIndex = checkedProdClass.findIndex((item) => item === value);
 
     if (valueIndex === -1) {
@@ -52,7 +57,7 @@ export default function ProductList() {
   };
 
   // 點擊門型的checkBox
-  const checkDoorType = (value: TdoorTypeValues) => {
+  const checkDoorType = (value: string) => {
     const valueIndex = checkedDoorType.findIndex((item) => item === value);
 
     if (valueIndex === -1) {
@@ -65,7 +70,7 @@ export default function ProductList() {
   };
 
   // 點擊顯示條件的checkBox
-  const checkPark = (value: TpartValues) => {
+  const checkPark = (value: string) => {
     const valueIndex = checkedPart.findIndex((item) => item === value);
 
     if (valueIndex === -1) {
@@ -84,6 +89,7 @@ export default function ProductList() {
       checkedDoorType: [...checkedDoorType],
       checkedPart: [...checkedPart],
     });
+    setTabQuery(checkedPart[0] as typeof tabQuery);
   };
 
   // 清除按鈕
@@ -149,22 +155,32 @@ export default function ProductList() {
   ];
 
   // ---------------------------------------------------------------------------
+  const tabArr: TcheckOption[] = [];
+  filterParams.checkedPart.forEach((item) => {
+    const tab = partOptions.find((option) => {
+      return option.value === item;
+    });
+    tab && tabArr.push(tab);
+  });
+
+  // ---------------------------------------------------------------------------
   return (
     <SubLayer className={scss.container} bodyClassName={scss.subLayer}>
       <PageHeader02 tag="產品列表" panelList={panelList} />
 
       <div className={scss.wrapper}>
-        <div>
-          <FilterPanel
-            prodClassOptions={prodClassOptions}
-            doorTypeOptions={doorTypeOptions}
-            partOptions={partOptions}
-            filterCtrl={filterCtrl}
-          />
-        </div>
+        <FilterPanel
+          prodClassOptions={prodClassOptions}
+          doorTypeOptions={doorTypeOptions}
+          partOptions={partOptions}
+          filterCtrl={filterCtrl}
+        />
+
         <div className={scss.main}>
-          <TabBar query={tabQuery} switchTab={switchTab} />
-          <ProductList_table_02 fakeDataArr={fakeDataArr} tabQuery={tabQuery} />
+          <TabBar query={tabQuery} tabArr={tabArr} switchTab={switchTab} />
+          {tabQuery && (
+            <ProductList_table_02 fakeDataArr={fakeDataArr} tabQuery={tabQuery} filterParams={filterParams} />
+          )}
         </div>
       </div>
     </SubLayer>
@@ -172,34 +188,13 @@ export default function ProductList() {
 }
 
 // ==============================================================================
-type TprodClassValues =
-  | '防火防煙捲門系列'
-  | '防水防洪門系列'
-  | '抗風防颱捲門系列'
-  | '廠辦管制門'
-  | '圍牆大門'
-  | '機庫門'
-  | '客製化';
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
 
-type TdoorTypeValues = '120A' | 'SJ-312' | 'SJ-302' | 'SJ-303A' | 'SJ-303AS' | 'SJ-305D';
-
-type TpartValues =
-  | '支板'
-  | '捲門片'
-  | '底座'
-  | '電動機'
-  | '門軌'
-  | '配電箱及按鈕開關'
-  | '門箱'
-  | '安裝費(含送電及試車)'
-  | '捲軸';
-
-type TcheckOption<value> = {
-  label: string;
-  value: value;
-};
-
-const prodClassOptions: TcheckOption<TprodClassValues>[] = [
+const prodClassOptions: TcheckOption[] = [
   { label: '防火防煙捲門系列', value: '防火防煙捲門系列' },
   { label: '防水防洪門系列', value: '防水防洪門系列' },
   { label: '抗風防颱捲門系列', value: '抗風防颱捲門系列' },
@@ -208,7 +203,7 @@ const prodClassOptions: TcheckOption<TprodClassValues>[] = [
   { label: '機庫門', value: '機庫門' },
   { label: '客製化', value: '客製化' },
 ];
-const doorTypeOptions: TcheckOption<TdoorTypeValues>[] = [
+const doorTypeOptions: TcheckOption[] = [
   { label: '120A', value: '120A' },
   { label: 'SJ-312', value: 'SJ-312' },
   { label: 'SJ-302', value: 'SJ-302' },
@@ -216,16 +211,18 @@ const doorTypeOptions: TcheckOption<TdoorTypeValues>[] = [
   { label: 'SJ-303AS', value: 'SJ-303AS' },
   { label: 'SJ-305D', value: 'SJ-305D' },
 ];
-const partOptions: TcheckOption<TpartValues>[] = [
-  { label: '支板', value: '支板' },
-  { label: '底座', value: '底座' },
-  { label: '門軌', value: '門軌' },
-  { label: '門箱', value: '門箱' },
-  { label: '捲軸', value: '捲軸' },
-  { label: '捲門片', value: '捲門片' },
-  { label: '電動機', value: '電動機' },
-  { label: '配電箱及按鈕開關', value: '配電箱及按鈕開關' },
-  { label: '安裝費(含送電及試車)', value: '安裝費(含送電及試車)' },
+const partOptions: TcheckOption[] = [
+  { label: '支板', value: 'supportPlate' },
+  { label: '底座', value: 'base' },
+  { label: '門軌', value: 'doorTrack' },
+  { label: '捲軸', value: 'reel' },
+  { label: '捲箱', value: 'reelBox' },
+  { label: '電動機', value: 'motor' },
+  { label: '電動機配件', value: 'motorParts' },
+  { label: '捲門片', value: 'rollDoorPiece' },
+  // { label: '門箱', value: '門箱' },
+  // { label: '配電箱及按鈕開關', value: '配電箱及按鈕開關' },
+  // { label: '安裝費(含送電及試車)', value: '安裝費(含送電及試車)' },
 ];
 
 // ==============================================================================
@@ -235,12 +232,12 @@ export type TdoorTypeOptions = typeof doorTypeOptions;
 export type TpartOptions = typeof partOptions;
 
 export type TfilterCtrl = {
-  checkedProdClass: TprodClassValues[];
-  checkProdClass: (value: TprodClassValues) => void;
-  checkedDoorType: TdoorTypeValues[];
-  checkDoorType: (value: TdoorTypeValues) => void;
-  checkedPart: TpartValues[];
-  checkPark: (value: TpartValues) => void;
+  checkedProdClass: string[];
+  checkProdClass: (value: string) => void;
+  checkedDoorType: string[];
+  checkDoorType: (value: string) => void;
+  checkedPart: string[];
+  checkPark: (value: string) => void;
   filterConfirm: () => void;
   filterClear: () => void;
 };
@@ -251,19 +248,6 @@ export type TfilterCtrl = {
 // ==============================================================================
 // ==============================================================================
 // ==============================================================================
-
-// export type TfakeData = {
-//   prodClass: string;
-//   doorType: string;
-//   part: string;
-//   name: string;
-//   // breach: string // 底座角鐵開口
-//   length: number;
-//   caliber: number; // 口徑
-//   thickness: string; //厚度
-//   expandHeight: number; //展開門片高
-//   densityRatio: number; // 密度比
-// };
 
 export type TfakeData = {
   doorType: string; // 門型 // SH-303AS
@@ -354,7 +338,7 @@ export type TfakeReelBox = {
 };
 
 const fakeDate2: TfakeData = {
-  doorType: 'SH-303AS',
+  doorType: 'SJ-302',
   prodClass: '防火防煙捲門系列',
   base: {
     type01: '一般型',

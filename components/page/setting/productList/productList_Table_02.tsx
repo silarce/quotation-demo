@@ -16,9 +16,15 @@ import { TfakeData } from 'pages/setting/productList';
 export default function ProductList_table_02({
   fakeDataArr,
   tabQuery,
+  filterParams,
 }: {
   fakeDataArr: TfakeData[];
   tabQuery: 'base' | 'rollDoorPiece' | 'doorTrack' | 'supportPlate' | 'reel' | 'motor' | 'motorParts' | 'reelBox';
+  filterParams: {
+    checkedProdClass: string[];
+    checkedDoorType: string[];
+    checkedPart: string[];
+  };
 }) {
   const theConfig = configList[tabQuery];
 
@@ -44,9 +50,21 @@ export default function ProductList_table_02({
 
       <div className={scss.tbody}>
         {fakeDataArr.map((obj, index) => {
-          // if (!doFilter(obj)) {
-          //   return null;
-          // }
+          const { checkedProdClass, checkedDoorType } = filterParams;
+
+          let isPassed = true;
+
+          if (checkedProdClass.length > 0) {
+            isPassed = checkedProdClass.includes(obj.prodClass);
+          }
+
+          if (checkedDoorType.length > 0) {
+            isPassed = checkedDoorType.includes(obj.doorType);
+          }
+
+          if (!isPassed) {
+            return null;
+          }
 
           return (
             <CellWithBar className={scss.row} key={index}>
@@ -252,10 +270,6 @@ const configList: TconfigList = {
   },
   motorParts: {
     ...config,
-    // chain: {
-    //   label: '鏈條',
-    //   className: classNames('w-[60px]'),
-    // },
   },
   reelBox: {
     ...config,
