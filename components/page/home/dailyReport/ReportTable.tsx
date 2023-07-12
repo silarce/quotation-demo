@@ -1084,7 +1084,11 @@ const TitlePanel = () => {
   const { reportInEdit, cancelEditNewDailyReport, isReportEdit, setShowReviewerForReportModal } =
     useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
-  const date = moment(reportInEdit?.date).format('y-MM-DD');
+  let date = moment(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
+
+  if (date === 'Invalid date') {
+    date = '請選擇日期';
+  }
 
   return (
     <div className={scss.TitlePanel}>
