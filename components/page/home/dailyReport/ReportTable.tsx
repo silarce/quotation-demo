@@ -372,7 +372,7 @@ export default function ReportTable({
                               // @ts-ignore
                               theClass[key] = v;
                             },
-                            className: scss.textarea,
+                            // className: scss.textarea,
                           }}
                         />
                         {suffix && disabled && <span>{suffix}</span>}
@@ -381,6 +381,8 @@ export default function ReportTable({
                   }
 
                   if (eleType === 'textarea') {
+                    console.log(key);
+
                     return (
                       <div
                         key={cIndex}
@@ -389,7 +391,8 @@ export default function ReportTable({
                           headerClassName,
                           bodyClassName,
                           headerClassName_mobile,
-                          bodyClassName_mobile
+                          bodyClassName_mobile,
+                          scss.textareaCell
                         )}
                       >
                         <InputSel
@@ -405,7 +408,11 @@ export default function ReportTable({
                               // @ts-ignore
                               theClass[key] = v;
                             },
-                            className: scss.textarea,
+                            className: classNames(
+                              scss.textarea,
+                              { [scss.customerName]: key === 'customerName' },
+                              { [scss.description]: key === 'description' }
+                            ),
                             allowNewLineByUser: key === 'description',
                           }}
                         />
