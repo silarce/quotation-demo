@@ -381,8 +381,6 @@ export default function ReportTable({
                   }
 
                   if (eleType === 'textarea') {
-                    console.log(key);
-
                     return (
                       <div
                         key={cIndex}
@@ -414,6 +412,9 @@ export default function ReportTable({
                               { [scss.description]: key === 'description' }
                             ),
                             allowNewLineByUser: key === 'description',
+                            props: {
+                              maxLength: 600,
+                            },
                           }}
                         />
                       </div>
