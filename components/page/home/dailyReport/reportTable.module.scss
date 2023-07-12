@@ -190,6 +190,22 @@
               width: 30px;
             }
           }
+          &.textareaCell {
+            place-content: unset;
+            overflow-y: hidden;
+            .textarea {
+              &.customerName {
+                textarea {
+                  max-height: 62px;
+                }
+              }
+              &.description {
+                textarea {
+                  max-height: 300px;
+                }
+              }
+            }
+          }
         }
       }
     } // row

@@ -372,7 +372,7 @@ export default function ReportTable({
                               // @ts-ignore
                               theClass[key] = v;
                             },
-                            className: scss.textarea,
+                            // className: scss.textarea,
                           }}
                         />
                         {suffix && disabled && <span>{suffix}</span>}
@@ -381,6 +381,8 @@ export default function ReportTable({
                   }
 
                   if (eleType === 'textarea') {
+                    console.log(key);
+
                     return (
                       <div
                         key={cIndex}
@@ -389,7 +391,8 @@ export default function ReportTable({
                           headerClassName,
                           bodyClassName,
                           headerClassName_mobile,
-                          bodyClassName_mobile
+                          bodyClassName_mobile,
+                          scss.textareaCell
                         )}
                       >
                         <InputSel
@@ -405,7 +408,11 @@ export default function ReportTable({
                               // @ts-ignore
                               theClass[key] = v;
                             },
-                            className: scss.textarea,
+                            className: classNames(
+                              scss.textarea,
+                              { [scss.customerName]: key === 'customerName' },
+                              { [scss.description]: key === 'description' }
+                            ),
                             allowNewLineByUser: key === 'description',
                           }}
                         />
@@ -1084,7 +1091,11 @@ const TitlePanel = () => {
   const { reportInEdit, cancelEditNewDailyReport, isReportEdit, setShowReviewerForReportModal } =
     useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
-  const date = moment(reportInEdit?.date).format('y-MM-DD');
+  let date = moment(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
+
+  if (date === 'Invalid date') {
+    date = '請選擇日期';
+  }
 
   return (
     <div className={scss.TitlePanel}>

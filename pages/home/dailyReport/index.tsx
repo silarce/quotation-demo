@@ -501,7 +501,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     try {
       showRootLoading(true);
       await apiPatchDailyReports_my({
-        date: theDate,
+        date: moment(theDate).format('YYYY-MM-DD'),
         body: {
           reviewerIds,
           examinerIds,
