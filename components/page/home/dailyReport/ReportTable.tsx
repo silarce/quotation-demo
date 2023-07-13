@@ -186,7 +186,7 @@ export default function ReportTable({
   };
 
   const modalOnConfirm_worker = (workerArr: TdailyReportWokerDto[]) => {
-    if (!activeItem) {
+    if (!activeItem || workerArr.length === 0) {
       return;
     }
 
