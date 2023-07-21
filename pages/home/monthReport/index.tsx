@@ -19,7 +19,7 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 
 // api
 import { useApiAccountReports } from 'js/api/api_dailyReport';
-import { TemployeeDto } from 'js/api/api_dailyReport';
+import { TemployeeDto, TaccountingReportDto } from 'js/api/api_dailyReport';
 
 // css
 import scss from './monthReport.module.scss';
@@ -169,6 +169,15 @@ export default function MonthReport() {
   ];
 
   const panelList = query.reportId ? panelList_showReport : panelList_list;
+  panelList.unshift({
+    type: 'exportButton',
+    label: '下載Excel檔',
+    // onClick: () => exportExcel(accountingReport),
+    onClick: () => {
+      alert('功能開發中');
+    },
+    className: scss.btn,
+  });
 
   // --------------------------------------------------
 
@@ -218,3 +227,17 @@ export default function MonthReport() {
     </>
   );
 }
+
+// =============================================================
+
+// import ExcelJs from 'exceljs';
+
+// const exportExcel = (data: TaccountingReportDto[] | undefined) => {
+//   console.log(data);
+
+//   const workbook = new ExcelJs.Workbook();
+//   // const sheetName = 'foo';
+//   const sheet = workbook.addWorksheet('foo');
+
+//   sheet.columns = [{ header: '日期', key: 'date', width: 20 }];
+// };
