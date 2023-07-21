@@ -170,12 +170,12 @@ export default function MonthReportTable({
                   dinnerTotal_item = dinnerTotal_item + dinner;
                   stayLengthTotal_item = stayLengthTotal_item + stayLength;
 
-                  if (!isWorker) {
-                    breakfastTotal_calc = breakfastTotal_calc + breakfast;
-                    lunchTotal_calc = lunchTotal_calc + lunch;
-                    dinnerTotal_calc = dinnerTotal_calc + dinner;
-                    stayLengthTotal_calc = stayLengthTotal_calc + stayLength;
-                  }
+                  // if (!isWorker) {
+                  breakfastTotal_calc = breakfastTotal_calc + breakfast;
+                  lunchTotal_calc = lunchTotal_calc + lunch;
+                  dinnerTotal_calc = dinnerTotal_calc + dinner;
+                  stayLengthTotal_calc = stayLengthTotal_calc + stayLength;
+                  // }
 
                   let isHoliday = false;
                   const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {};
