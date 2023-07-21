@@ -411,7 +411,8 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       return false;
     }
 
-    return report.isReviewedByOther || !report.isEdit ? false : true;
+    // return report.isReviewedByOther || !report.isEdit ? false : true;
+    return !report.isEdit ? false : true;
   })();
 
   //

@@ -95,6 +95,7 @@ type TdailyReportContext = {
   userInfo: TuserDto;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const DailyReportContext = createContext<TdailyReportContext>(null!);
 
 // =====================================================================
@@ -491,8 +492,11 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       };
 
       const postBody = item.postBody;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       postBody.arrivalTime = setDateToReportDate(postBody.arrivalTime!);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       postBody.departureTime = setDateToReportDate(postBody.departureTime!);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       postBody.departureWorksiteTime = setDateToReportDate(postBody.departureWorksiteTime!);
 
       return postBody;
@@ -1004,6 +1008,11 @@ const panelListCreator = ({
     },
   ];
 
+  if (reportInEdit?.isReviewedByOther) {
+    panelList_reporter_inEdit01.push(panelList_reporter_reviewed[0]);
+    panelList_reporter_inEdit02.push(panelList_reporter_reviewed[0]);
+  }
+
   const panelList = (() => {
     if (reportInEdit?.isUserIsViewer) {
       return [];
@@ -1028,9 +1037,9 @@ const panelListCreator = ({
             return panelList_reporter_inEdit02;
           }
 
-          if (reportInEdit.isReviewedByOther) {
-            return panelList_reporter_reviewed;
-          }
+          // if (reportInEdit.isReviewedByOther) {
+          //   return panelList_reporter_reviewed;
+          // }
 
           return panelList_reporter_inEdit01;
         } else if (reportInEdit.isAllowToReview) {
@@ -1045,9 +1054,9 @@ const panelListCreator = ({
       if (!reportInEdit) {
         return panelList_reporter_notInEdit;
       } else {
-        if (reportInEdit.isReviewedByOther) {
-          return panelList_reporter_reviewed;
-        }
+        // if (reportInEdit.isReviewedByOther) {
+        //   return panelList_reporter_reviewed;
+        // }
 
         if (isReportEdit) {
           return panelList_reporter_inEdit02;
@@ -1056,6 +1065,44 @@ const panelListCreator = ({
         return panelList_reporter_inEdit01;
       }
     }
+
+    // if (identity === 'reviewer') {
+    //   if (!reportInEdit) {
+    //     return panelList_reporter_notInEdit;
+    //   } else {
+    //     if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
+    //       if (isReportEdit) {
+    //         return panelList_reporter_inEdit02;
+    //       }
+
+    //       if (reportInEdit.isReviewedByOther) {
+    //         return panelList_reporter_reviewed;
+    //       }
+
+    //       return panelList_reporter_inEdit01;
+    //     } else if (reportInEdit.isAllowToReview) {
+    //       return panelList_reviewer_inEdit_user;
+    //     }
+
+    //     return [];
+    //   }
+    // }
+
+    // if (identity === 'reporter') {
+    //   if (!reportInEdit) {
+    //     return panelList_reporter_notInEdit;
+    //   } else {
+    //     if (reportInEdit.isReviewedByOther) {
+    //       return panelList_reporter_reviewed;
+    //     }
+
+    //     if (isReportEdit) {
+    //       return panelList_reporter_inEdit02;
+    //     }
+
+    //     return panelList_reporter_inEdit01;
+    //   }
+    // }
 
     return [];
   })();
