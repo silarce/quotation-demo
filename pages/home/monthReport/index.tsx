@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import ExcelJs from 'exceljs';
 
 // layer
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -29,6 +30,9 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { holidaysLookup } from 'config/date/holidaysLookup';
 import { myConfig } from 'config/myConfig';
+
+// icon
+import iconDownload from 'public/image/icon/download.svg';
 
 const holidaysLookupKeyArr = Object.keys(holidaysLookup);
 
@@ -148,7 +152,7 @@ export default function MonthReport() {
       className: scss.btn,
     },
     {
-      custom: <SelectBar selectPropsArr={selectPropsArr} />,
+      custom: <SelectBar className={scss.selectBar} selectPropsArr={selectPropsArr} />,
     },
   ];
 
@@ -170,12 +174,10 @@ export default function MonthReport() {
 
   const panelList = query.reportId ? panelList_showReport : panelList_list;
   panelList.unshift({
-    type: 'exportButton',
+    type: 'myButton',
     label: '下載Excel檔',
     onClick: () => exportExcel(accountingReport, employeeIdArr),
-    // onClick: () => {
-    //   alert('功能開發中');
-    // },
+    img: iconDownload.src,
     className: scss.btn,
   });
 
@@ -228,9 +230,12 @@ export default function MonthReport() {
   );
 }
 
-// =============================================================
-
-import ExcelJs from 'exceljs';
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 
 const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employeeIdArr: string[] | undefined) => {
   const workbook = new ExcelJs.Workbook();
