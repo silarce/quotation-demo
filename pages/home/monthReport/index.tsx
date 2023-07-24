@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
 
 import { useRouter } from 'next/router';
 import moment from 'moment';
@@ -26,9 +25,10 @@ import scss from './monthReport.module.scss';
 
 // other
 import { createNumberRangeOptionArr } from 'js/utils/options/options';
-import { convertDate_reduce1911, convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { holidaysLookup } from 'config/date/holidaysLookup';
+import { myConfig } from 'config/myConfig';
 
 const holidaysLookupKeyArr = Object.keys(holidaysLookup);
 
@@ -172,7 +172,7 @@ export default function MonthReport() {
   panelList.unshift({
     type: 'exportButton',
     label: '下載Excel檔',
-    onClick: () => exportExcel(accountingReport),
+    onClick: () => exportExcel(accountingReport, employeeIdArr),
     // onClick: () => {
     //   alert('功能開發中');
     // },
@@ -232,136 +232,108 @@ export default function MonthReport() {
 
 import ExcelJs from 'exceljs';
 
-const exportExcel = async (dataArr: TaccountingReportDto[] | undefined) => {
-  // console.log(data);
+const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employeeIdArr: string[] | undefined) => {
   const workbook = new ExcelJs.Workbook();
-
-  // const sheetName = 'foo';
-  // const sheet = workbook.addWorksheet('foo');
-
-  // sheet.columns = [
-  //   { header: '日期1', key: 'date', width: 20 },
-  //   { header: '日期2', key: 'date1', width: 20 },
-  //   { header: '日期3', key: 'date2', width: 20 },
-  //   { header: '日期4', key: 'date3', width: 20 },
-  // ];
-  // const worksheet = workbook.getWorksheet('foo');
-
-  // sheet.mergeCells('A1:B1');
-
-  // 第一個值為row1，會蓋掉header
-  // undefined會被當成空白
-  // sheet.getColumn(1).values = [1, 2, 3, 4, 5];
-  // sheet.getColumn('date1').values = [5, 4, 3, 2, 1, 0];
-  // sheet.getColumn('date2').values = [undefined, undefined, 3, 2, , 0];
-
-  // sheet.addTable({
-  //   name: 'MyTable',
-  //   ref: 'A1',
-  //   // style: {
-  //   //   showFirstColumn: true,
-  //   // },
-
-  //   columns: [{ name: 'a' }],
-  //   rows: [['1', '1', '1', '1', '1']],
-  // });
-
-  // sheet.addTable({
-  //   name: 'MyTable',
-  //   ref: 'A1',
-  //   columns: [{ name: 'a' }, { name: 'b' }],
-  //   rows: [['1', '5']],
-  // });
-  // sheet.addTable({
-  //   name: 'MyTable',
-  //   ref: 'C1',
-  //   columns: [{ name: 'a' }, { name: 'b' }],
-  //   rows: [['1', '5']],
-  // });
-  // sheet.addTable({
-  //   name: 'MyTable',
-  //   ref: 'E1',
-  //   columns: [{ name: 'a' }, { name: 'b' }],
-  //   rows: [['1', '5']],
-  // });
-
-  // sheet.addTable({
-  //   name: 'MyTotal',
-  //   ref: 'G1',
-  //   headerRow: true,
-  //   totalsRow: true,
-  //   columns: [
-  //     { name: 'Date', totalsRowLabel: 'Totals:', filterButton: true },
-  //     // { name: 'Amount', totalsRowFunction: 'sum', filterButton: false },
-  //     { name: 'Amount', totalsRowFunction: 'average', filterButton: false },
-  //   ],
-  //   rows: [
-  //     [new Date('2019-07-20'), 70.1],
-  //     [new Date('2019-07-21'), 70.6],
-  //     [new Date('2019-07-22'), 70.1],
-  //   ],
-  // });
-
-  // -----------------------------------------------------------
   const sheet = workbook.addWorksheet('報表');
   // -----------------------------------------------------------
 
   const cA = sheet.getColumn(1);
-  cA.width = 15;
   cA.key = 'caption';
+  cA.width = 18;
+  cA.font = {
+    bold: true,
+    size: 16,
+  };
+  cA.alignment = {
+    vertical: 'middle',
+    horizontal: 'center',
+  };
   sheet.mergeCells('A1:A2');
 
   const dateDayArr = new Array(31).fill(0).map((item, index) => index + 1);
-
   cA.values = [undefined, '日期', ...dateDayArr, '合計', '餐費', '外宿費', '餐+宿', '本月總合計'];
   // -----------------------------------------------------------
-
-  dataArr?.forEach((data, index) => {
+  let monthTotal = 0;
+  let tableCount = 0;
+  // -----------------------------------------------------------
+  dataArr?.forEach((data) => {
     const { employeeName, employeeId, statistic } = data;
-    // const { date, meals, stayLength, dailyReportId, isWorker } = statistic;
 
+    // 過濾/搜尋用的
+    const shouldShow = filterIdArr({ employeeIdArr, employeeId });
+
+    if (!shouldShow) {
+      return;
+    }
+
+    const class_statisticCalc = new Class_statisticCalc();
     const dataRow: Array<Array<'V' | '1' | undefined>> = new Array(31).fill([]);
 
     statistic.forEach((item) => {
       const { date, meals, stayLength, dailyReportId } = item;
 
+      const { isBreakfast, isLunch, isDinner } = class_statisticCalc.calcQty(meals ?? []);
+      class_statisticCalc.stayLength = class_statisticCalc.stayLength + stayLength;
+
+      const breakfast = isBreakfast ? 'V' : undefined;
+      const lunch = isLunch ? 'V' : undefined;
+      const dinner = isDinner ? 'V' : undefined;
+
       const stayLengthV = stayLength ? '1' : undefined;
-
-      let breakfast: 'V' | undefined = undefined;
-      let lunch: 'V' | undefined = undefined;
-      let dinner: 'V' | undefined = undefined;
-
-      meals?.forEach((meal) => {
-        if (meal === 'breakfast') {
-          breakfast = 'V';
-        }
-
-        if (meal === 'lunch') {
-          lunch = 'V';
-        }
-
-        if (meal === 'dinner') {
-          dinner = 'V';
-        }
-      });
 
       const dateDay = new Date(date).getDate();
       dataRow[dateDay - 1] = [breakfast, lunch, dinner, stayLengthV];
     });
 
-    // console.log(dataRow[0]);
+    monthTotal = monthTotal + class_statisticCalc.subTotal;
 
     sheet.addTable({
       name: employeeId,
-      ref: `${numberToLetters(index * 4 + 2)}1`,
+      ref: `${numberToLetters(tableCount * 4 + 2)}1`,
       headerRow: false,
       columns: [{ name: 'breakfast' }, { name: 'lunch' }, { name: 'dinner' }, { name: 'stayLength' }],
-      rows: [[employeeName], ['早', '中', '晚', '外宿'], ...dataRow],
+      rows: [
+        [employeeName],
+        ['早', '中', '晚', '外宿'],
+        ...dataRow,
+        [
+          class_statisticCalc.breakfastQty,
+          class_statisticCalc.lunchQty,
+          class_statisticCalc.dinnerQty,
+          class_statisticCalc.stayLength,
+        ],
+        [class_statisticCalc.total_mealsCost],
+        [class_statisticCalc.stayCost],
+        [class_statisticCalc.subTotal],
+      ],
     });
 
-    sheet.mergeCells(`${numberToLetters(index * 4 + 2)}1:${numberToLetters(index * 4 + 2 + 3)}1`);
+    sheet.mergeCells(`${numberToLetters(tableCount * 4 + 2)}1:${numberToLetters(tableCount * 4 + 2 + 3)}1`);
+    sheet.mergeCells(`${numberToLetters(tableCount * 4 + 2)}35:${numberToLetters(tableCount * 4 + 2 + 3)}35`);
+    sheet.mergeCells(`${numberToLetters(tableCount * 4 + 2)}36:${numberToLetters(tableCount * 4 + 2 + 3)}36`);
+    sheet.mergeCells(`${numberToLetters(tableCount * 4 + 2)}37:${numberToLetters(tableCount * 4 + 2 + 3)}37`);
+
+    tableCount++;
   });
 
+  sheet.eachRow((row, rowNumber) => {
+    row.eachCell((cell, colNumber) => {
+      cell.font = { size: 14 };
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+    });
+  });
+
+  const cell_total_caption = sheet.getCell('A38');
+  const cell_total = sheet.getCell('B38');
+  cell_total_caption.font = { bold: true, size: 16 };
+
+  cell_total.value = monthTotal;
+  cell_total.font = { bold: true, size: 16 };
+  cell_total.numFmt = '#,##0.00;[Red]-#,##0.00';
+  sheet.mergeCells(`B38:E38`);
   // -----------------------------------------------------------
 
   await workbook.xlsx.writeBuffer();
@@ -375,17 +347,15 @@ const exportExcel = async (dataArr: TaccountingReportDto[] | undefined) => {
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    const id = 'foo';
-    // const today = Moment().format('yyyy-MM-DD');
-    // link.download = `${id}_${today}.xlsx`;
-    link.download = `foo.xlsx`;
+    const today = moment().format('yyyy-MM-DD');
+    link.download = `三久ERP_報表_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();
     link.remove();
   });
 };
 
-// 數字轉字母 // from gpt3.5
+// 數字轉字母
 function numberToLetters(num: number) {
   let result = '';
 
@@ -397,3 +367,70 @@ function numberToLetters(num: number) {
 
   return result;
 }
+
+class Class_statisticCalc {
+  // 各項的數量合計
+  breakfastQty = 0;
+  lunchQty = 0;
+  dinnerQty = 0;
+  stayLength = 0;
+
+  calcQty = (meals: string[]) => {
+    let isBreakfast = false;
+    let isLunch = false;
+    let isDinner = false;
+    meals?.forEach((meal) => {
+      if (meal === 'breakfast') {
+        this.breakfastQty++;
+        isBreakfast = true;
+      }
+
+      if (meal === 'lunch') {
+        this.lunchQty++;
+        isLunch = true;
+      }
+
+      if (meal === 'dinner') {
+        this.dinnerQty++;
+        isDinner = true;
+      }
+    });
+
+    return {
+      isBreakfast,
+      isLunch,
+      isDinner,
+    };
+  };
+
+  // 餐費
+  get total_mealsCost() {
+    return (
+      this.breakfastQty * myConfig.breakfastCost +
+      this.lunchQty * myConfig.lunchCost +
+      this.dinnerQty * myConfig.dinnerCost
+    );
+  }
+  // 外宿費
+  get stayCost() {
+    return this.stayLength * myConfig.stayCost;
+  }
+  // 餐加宿
+  get subTotal() {
+    return this.total_mealsCost + this.stayCost;
+  }
+}
+
+const filterIdArr = ({ employeeIdArr, employeeId }: { employeeIdArr: string[] | undefined; employeeId: string }) => {
+  if (!employeeIdArr) {
+    return true;
+  }
+
+  if (employeeIdArr.includes(employeeId)) {
+    return true;
+  }
+
+  return false;
+};
+
+export { Class_statisticCalc, filterIdArr };

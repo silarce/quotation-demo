@@ -2,8 +2,6 @@ import { useState, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { useRouter } from 'next/router';
-
 // antd
 import { Badge } from 'antd';
 
@@ -12,9 +10,8 @@ import scss from './monthReportTable.module.scss';
 
 // type
 import { TaccountingReportDto, TaccountingReportStatistic } from 'js/api/dtoTypes';
-import { TemployeeDto } from 'js/api/api_dailyReport';
 // other
-import { myConfig } from 'config/myConfig';
+import { Class_statisticCalc, filterIdArr } from 'pages/home/monthReport';
 
 import { holidaysLookup } from 'config/date/holidaysLookup';
 
@@ -92,17 +89,7 @@ export default function MonthReportTable({
             const { employeeId, employeeName, statistic } = accReport;
 
             // 過濾/搜尋用的
-            const shouldShow = (() => {
-              if (!employeeIdArr) {
-                return true;
-              }
-
-              if (employeeIdArr.includes(employeeId)) {
-                return true;
-              }
-
-              return false;
-            })();
+            const shouldShow = filterIdArr({ employeeIdArr, employeeId });
 
             if (!shouldShow) {
               return null;
@@ -118,21 +105,7 @@ export default function MonthReportTable({
               return obj;
             })();
 
-            /**
-              多個worker會共用同一個(同一個id)日報表
-              為了避免重複計算月總計
-             */
-            // 用於顯示這個item的總計，不管isWorker為何都會計算
-            let breakfastTotal_item = 0;
-            let lunchTotal_item = 0;
-            let dinnerTotal_item = 0;
-            let stayLengthTotal_item = 0;
-
-            // 用於計算月總計，如果isWorker為false，就不計算
-            let breakfastTotal_calc = 0;
-            let lunchTotal_calc = 0;
-            let dinnerTotal_calc = 0;
-            let stayLengthTotal_calc = 0;
+            const class_statisticCalc = new Class_statisticCalc();
 
             return (
               <div key={aIndex} className={scss.item}>
@@ -146,37 +119,13 @@ export default function MonthReportTable({
 
                   const { dailyReportId, isWorker } = statistics ?? {};
 
-                  let breakfast = 0;
-                  let lunch = 0;
-                  let dinner = 0;
                   const stayLength = statistics?.stayLength ?? 0;
 
-                  statistics?.meals?.forEach((meal) => {
-                    if (meal === 'breakfast') {
-                      breakfast++;
-                    }
+                  /**計算合計的同時return這個item是否有早午晚餐 */
+                  const { isBreakfast, isLunch, isDinner } = class_statisticCalc.calcQty(statistics?.meals ?? []);
+                  class_statisticCalc.stayLength = class_statisticCalc.stayLength + stayLength;
 
-                    if (meal === 'lunch') {
-                      lunch++;
-                    }
-
-                    if (meal === 'dinner') {
-                      dinner++;
-                    }
-                  });
-
-                  breakfastTotal_item = breakfastTotal_item + breakfast;
-                  lunchTotal_item = lunchTotal_item + lunch;
-                  dinnerTotal_item = dinnerTotal_item + dinner;
-                  stayLengthTotal_item = stayLengthTotal_item + stayLength;
-
-                  // if (!isWorker) {
-                  breakfastTotal_calc = breakfastTotal_calc + breakfast;
-                  lunchTotal_calc = lunchTotal_calc + lunch;
-                  dinnerTotal_calc = dinnerTotal_calc + dinner;
-                  stayLengthTotal_calc = stayLengthTotal_calc + stayLength;
-                  // }
-
+                  // --------------
                   let isHoliday = false;
                   const { 是否放假 } = holidayLookup_month?.[dateDay] ?? {};
 
@@ -200,60 +149,43 @@ export default function MonthReportTable({
                         { [scss.pointer]: !!dailyReportId }
                       )}
                     >
-                      <div className={scss.cell}>{breakfast !== 0 && <MyBadge />}</div>
-                      <div className={scss.cell}>{lunch !== 0 && <MyBadge />}</div>
-                      <div className={scss.cell}>{dinner !== 0 && <MyBadge />}</div>
+                      <div className={scss.cell}>{isBreakfast && <MyBadge />}</div>
+                      <div className={scss.cell}>{isLunch && <MyBadge />}</div>
+                      <div className={scss.cell}>{isDinner && <MyBadge />}</div>
                       <div className={scss.cell}>{stayLength || null}</div>
                     </div>
                   );
                 })}
 
+                {/* 合計 */}
                 <div className={classNames(scss.row)}>
                   <div className={classNames(scss.cell, scss.mainColor)}>
-                    <span>{breakfastTotal_item}</span>
+                    <span>{class_statisticCalc.breakfastQty}</span>
                   </div>
                   <div className={classNames(scss.cell, scss.mainColor)}>
-                    <span>{lunchTotal_calc}</span>
+                    <span>{class_statisticCalc.lunchQty}</span>
                   </div>
                   <div className={classNames(scss.cell, scss.mainColor)}>
-                    <span>{dinnerTotal_item}</span>
+                    <span>{class_statisticCalc.dinnerQty}</span>
                   </div>
                   <div className={classNames(scss.cell, scss.mainColor)}>
-                    <span>{stayLengthTotal_item}</span>
+                    <span>{class_statisticCalc.stayLength}</span>
                   </div>
                 </div>
 
                 {(() => {
-                  const { breakfastCost, lunchCost, dinnerCost, stayCost } = myConfig;
-
-                  // -------
-                  // const mealsCostTotal_item =
-                  //   breakfastTotal_item * breakfastCost +
-                  //   lunchTotal_item * lunchCost +
-                  //   dinnerTotal_item * dinnerCost
-
-                  // const styCostTotal_item = stayLengthTotal_item * stayCost
-                  // const total_item = mealsCostTotal_item + styCostTotal_item
-                  // -------
-                  const mealsCostTotal =
-                    breakfastTotal_calc * breakfastCost + lunchTotal_calc * lunchCost + dinnerTotal_calc * dinnerCost;
-
-                  const styCostTotal = stayLengthTotal_calc * stayCost;
-                  const total = mealsCostTotal + styCostTotal;
-
-                  monthTotal = monthTotal + total;
-                  // -------
+                  monthTotal = monthTotal + class_statisticCalc.subTotal;
 
                   return (
                     <>
                       <div className={classNames(scss.cell, scss.mainColor)}>
-                        <span>{mealsCostTotal}</span>
+                        <span>{class_statisticCalc.total_mealsCost}</span>
                       </div>
                       <div className={classNames(scss.cell, scss.mainColor)}>
-                        <span>{styCostTotal}</span>
+                        <span>{class_statisticCalc.stayCost}</span>
                       </div>
                       <div className={classNames(scss.cell, scss.bottom)}>
-                        <span>{total}</span>
+                        <span>{class_statisticCalc.subTotal}</span>
                       </div>
                     </>
                   );
