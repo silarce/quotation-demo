@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 import { useRouter } from 'next/router';
 import moment from 'moment';
@@ -425,7 +426,9 @@ class Class_statisticCalc {
     let isBreakfast = false;
     let isLunch = false;
     let isDinner = false;
-    meals?.forEach((meal) => {
+
+    // 去除陣列中的重複值後forEach
+    _.uniq(meals ?? []).forEach((meal) => {
       if (meal === 'breakfast') {
         this.breakfastQty++;
         isBreakfast = true;
