@@ -1,5 +1,5 @@
 // 報價單
-import React, { Dispatch, SetStateAction, FocusEvent, useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 
 import moment from 'moment';
@@ -19,7 +19,6 @@ import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 

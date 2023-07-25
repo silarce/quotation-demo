@@ -127,6 +127,11 @@ class Class_mainProduct {
     return this._partArr;
   }
 
+  addPart = () => {
+    this._partArr.push(new Class_part(emptyPartOri(), this, this._reRender));
+    this._reRender();
+  };
+
   private _discount;
   get discount() {
     return this._discount;
@@ -1083,4 +1088,17 @@ const emptyMainProd: Tdata['mainProductArr'][0] = {
       qty: '1',
     },
   ],
+};
+
+const emptyPartOri = () => {
+  return {
+    partType: 'SJ00',
+    partName: '捲門片',
+    partId: 'SJ0000A0000',
+    material: 'SST 304',
+    basicWeight: '99.99',
+    unit: 'm2',
+    listPrice: '499',
+    qty: undefined,
+  };
 };

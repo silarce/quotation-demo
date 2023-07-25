@@ -645,6 +645,35 @@ export type TquotationRangeDto = {
 };
 
 // ==========================================================================
+
+// 報價單編號
+// quotationNumber: string;
+// 報價日期
+// quotationDate: Date;
+// 報價時效
+// validityPeriod: string;
+// 客戶
+// customer: string;
+// 工程名稱
+// projectName: string;
+// 縣市
+// county: string;
+// 區
+// district: string;
+//  聯絡人
+// contactPerson: string;
+//  聯絡電話
+// contactNumber: string;
+// 承辦人
+// projectManager: string;
+// 總折數
+// discount: number;
+// 樘數
+// quantity: string;
+// 編輯備註
+// editNotes: string;
+
+// ==========================================================================
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
