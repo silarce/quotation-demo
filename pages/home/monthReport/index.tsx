@@ -240,6 +240,8 @@ export default function MonthReport() {
 const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employeeIdArr: string[] | undefined) => {
   const workbook = new ExcelJs.Workbook();
   const sheet = workbook.addWorksheet('報表');
+
+  sheet.views = [{ state: 'frozen', xSplit: 1, ySplit: 2 }];
   // -----------------------------------------------------------
 
   const cA = sheet.getColumn(1);
@@ -272,8 +274,14 @@ const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employee
     }
 
     const class_statisticCalc = new Class_statisticCalc();
-    const dataRow: Array<Array<'V' | '1' | undefined>> = new Array(31).fill([]);
 
+    // const dataRow: Array<Array<'V' | '1' | undefined>> = new Array(31).fill([]);
+    const c1Arr: Array<'V' | '1' | undefined> = new Array(31).fill(undefined);
+    const c2Arr: Array<'V' | '1' | undefined> = new Array(31).fill(undefined);
+    const c3Arr: Array<'V' | '1' | undefined> = new Array(31).fill(undefined);
+    const c4Arr: Array<'V' | '1' | undefined> = new Array(31).fill(undefined);
+
+    // -----------------------------------------------------------
     statistic.forEach((item) => {
       const { date, meals, stayLength, dailyReportId } = item;
 
@@ -287,31 +295,58 @@ const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employee
       const stayLengthV = stayLength ? '1' : undefined;
 
       const dateDay = new Date(date).getDate();
-      dataRow[dateDay - 1] = [breakfast, lunch, dinner, stayLengthV];
+      // dataRow[dateDay - 1] = [breakfast, lunch, dinner, stayLengthV];
+      c1Arr[dateDay - 1] = breakfast;
+      c2Arr[dateDay - 1] = lunch;
+      c3Arr[dateDay - 1] = dinner;
+      c4Arr[dateDay - 1] = stayLengthV;
     });
+
+    // -----------------------------------------------------------
+    const c1 = sheet.getColumn(`${numberToLetters(tableCount * 4 + 2)}`);
+    const c2 = sheet.getColumn(`${numberToLetters(tableCount * 4 + 2 + 1)}`);
+    const c3 = sheet.getColumn(`${numberToLetters(tableCount * 4 + 2 + 2)}`);
+    const c4 = sheet.getColumn(`${numberToLetters(tableCount * 4 + 2 + 3)}`);
+
+    c1.values = [
+      employeeName,
+      '早',
+      ...c1Arr,
+      class_statisticCalc.breakfastQty,
+      class_statisticCalc.total_mealsCost,
+      class_statisticCalc.stayCost,
+      class_statisticCalc.subTotal,
+    ];
+    c2.values = [undefined, '午', ...c2Arr, class_statisticCalc.lunchQty];
+    c3.values = [undefined, '晚', ...c3Arr, class_statisticCalc.dinnerQty];
+    c4.values = [undefined, '外宿', ...c4Arr, class_statisticCalc.stayLength];
+
+    // -----------------------------------------------------------
 
     monthTotal = monthTotal + class_statisticCalc.subTotal;
 
-    sheet.addTable({
-      name: employeeId,
-      ref: `${numberToLetters(tableCount * 4 + 2)}1`,
-      headerRow: false,
-      columns: [{ name: 'breakfast' }, { name: 'lunch' }, { name: 'dinner' }, { name: 'stayLength' }],
-      rows: [
-        [employeeName],
-        ['早', '中', '晚', '外宿'],
-        ...dataRow,
-        [
-          class_statisticCalc.breakfastQty,
-          class_statisticCalc.lunchQty,
-          class_statisticCalc.dinnerQty,
-          class_statisticCalc.stayLength,
-        ],
-        [class_statisticCalc.total_mealsCost],
-        [class_statisticCalc.stayCost],
-        [class_statisticCalc.subTotal],
-      ],
-    });
+    // -----------------------------------------------------------
+    // sheet.addTable({
+    //   name: employeeId,
+    //   ref: `${numberToLetters(tableCount * 4 + 2)}1`,
+    //   headerRow: false,
+    //   columns: [{ name: 'breakfast' }, { name: 'lunch' }, { name: 'dinner' }, { name: 'stayLength' }],
+    //   rows: [
+    //     [employeeName],
+    //     ['早', '中', '晚', '外宿'],
+    //     ...dataRow,
+    //     [
+    //       class_statisticCalc.breakfastQty,
+    //       class_statisticCalc.lunchQty,
+    //       class_statisticCalc.dinnerQty,
+    //       class_statisticCalc.stayLength,
+    //     ],
+    //     [class_statisticCalc.total_mealsCost],
+    //     [class_statisticCalc.stayCost],
+    //     [class_statisticCalc.subTotal],
+    //   ],
+    // });
+    // -----------------------------------------------------------
 
     sheet.mergeCells(`${numberToLetters(tableCount * 4 + 2)}1:${numberToLetters(tableCount * 4 + 2 + 3)}1`);
     sheet.mergeCells(`${numberToLetters(tableCount * 4 + 2)}35:${numberToLetters(tableCount * 4 + 2 + 3)}35`);
