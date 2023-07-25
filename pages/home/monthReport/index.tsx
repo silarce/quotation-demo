@@ -238,6 +238,12 @@ export default function MonthReport() {
 // ======================================================================
 
 const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employeeIdArr: string[] | undefined) => {
+  /**
+   * 在同一個worksheet裡面(未試過不同worksheet的情況)，
+   * 不能同時使用addTable與mergeCells
+   * addTable與mergeCells都用的話，產出的xlsx檔無法給微軟的excel開啟
+   */
+
   const workbook = new ExcelJs.Workbook();
   const sheet = workbook.addWorksheet('報表');
 
