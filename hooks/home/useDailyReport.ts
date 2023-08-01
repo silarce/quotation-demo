@@ -117,6 +117,10 @@ class Class_reportItem {
   }
 
   addMeals = (v: TdailyReportItemDto['meals'][number]) => {
+    if (this._meals.includes(v)) {
+      return;
+    }
+
     this._meals.push(v);
     this._reRender();
   };
@@ -411,7 +415,8 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       return false;
     }
 
-    return report.isReviewedByOther || !report.isEdit ? false : true;
+    // return report.isReviewedByOther || !report.isEdit ? false : true;
+    return !report.isEdit ? false : true;
   })();
 
   //

@@ -69,7 +69,7 @@ export default function SideNav() {
               <Panel header={label} key={`${index}`}>
                 <ul>
                   {list.map((item, index) => {
-                    const { label, path, erpFeature, query, otherPermissions } = item;
+                    const { label, path, erpFeature, query, otherPermissions, exception } = item;
                     const reg = new RegExp(`^${path}`);
                     const isActive = (() => {
                       const isMatch = _.isMatch(routerQuery, query ?? {});
@@ -82,7 +82,7 @@ export default function SideNav() {
                     isPassed = checkErpFeature({ erpFeature, userErpFeature });
 
                     if (isPassed && otherPermissions) {
-                      isPassed = checkOtherPermissions({ userInfo, otherPermissions });
+                      isPassed = checkOtherPermissions({ userInfo, otherPermissions, exception });
                     }
 
                     if (!isPassed) {
@@ -129,12 +129,32 @@ const checkErpFeature = ({
 const checkOtherPermissions = ({
   userInfo,
   otherPermissions,
+  exception,
 }: {
   userInfo: TuserDto;
   otherPermissions: {
     grade?: number;
   };
+  exception?: {
+    idNumber?: string[];
+  };
 }) => {
+  // -------------------------------------------------------
+  // -------------------------------------------------------
+  if (exception) {
+    const { idNumber } = exception;
+
+    // if (idNumber === userInfo?.employee?.idNumber) {
+    //   return true;
+    // }
+
+    if (idNumber && idNumber.includes(userInfo?.employee?.idNumber ?? '')) {
+      return true;
+    }
+  }
+  // -------------------------------------------------------
+  // -------------------------------------------------------
+
   let isPassed = false;
   const { grade } = otherPermissions;
 

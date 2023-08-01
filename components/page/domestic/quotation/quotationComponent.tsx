@@ -1,5 +1,6 @@
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import AddButton from 'components/global/gear/button/addButton';
 
 // css
 import style from './quotationComponent.module.scss';
@@ -28,6 +29,7 @@ export default function QuotationComponent({
 }) {
   const { partCellConfig } = classQuotation;
   const partList = classQuotation.mainProductArr[classQuotation.activeMainProd]?.partArr;
+  const addPart = classQuotation.mainProductArr[classQuotation.activeMainProd]?.addPart;
   const partKeyindex = partCellConfig.keyList;
   const cellConfig = partCellConfig.cellConfig;
 
@@ -149,6 +151,7 @@ export default function QuotationComponent({
             </div>
           );
         })}
+        {partList && !disabled && <AddButton className={style.addBtn} label="新增材料/配件" onClick={addPart} />}
       </div>
     </>
   );

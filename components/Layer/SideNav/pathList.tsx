@@ -32,6 +32,10 @@ type TsidePathConfig = {
       otherPermissions?: {
         grade?: number;
       };
+      // 例外，只要符合其中一個就通過
+      exception?: {
+        idNumber?: string[];
+      };
     }[];
   }[];
 };
@@ -109,6 +113,9 @@ const sidePathList: TsidePathList = {
               erpFeature: 'allPass',
               otherPermissions: {
                 grade: 14,
+              },
+              exception: {
+                idNumber: ['EM-10902-01'], // 會計的帳號(只在正式環境中)
               },
             },
           ],

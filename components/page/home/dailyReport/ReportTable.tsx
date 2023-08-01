@@ -61,7 +61,9 @@ export default function ReportTable({
 
   const classDailyReportItemArr = reportInEdit?.items;
 
-  const { isEdit, prevDate } = reportInEdit ?? {};
+  const { id, isEdit, prevDate, isReviewedByOther, isReviewCompleted, isReviewedByUser } = reportInEdit ?? {};
+
+  const isReviewed = isReviewedByOther || isReviewCompleted || isReviewedByUser;
 
   const [monthStart, setMonthStart] = useState<string>();
   const [monthEnd, setMonthEnd] = useState<string>();
@@ -81,7 +83,10 @@ export default function ReportTable({
     },
   };
 
+  // ----------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
+  const disabledOri = !(isEdit && !isReviewed);
+  // ----------------------------------------------------------
   /**從當月的上個月到當月的下個月的資料 */
   const {
     dailyReport: dailyReport_calendar,
@@ -186,7 +191,7 @@ export default function ReportTable({
   };
 
   const modalOnConfirm_worker = (workerArr: TdailyReportWokerDto[]) => {
-    if (!activeItem) {
+    if (!activeItem || workerArr.length === 0) {
       return;
     }
 
@@ -210,8 +215,6 @@ export default function ReportTable({
     activeItem.licensePlate = v ?? '';
     setShowModal_licensePlate(false);
   };
-
-  const disabled = !isEdit;
 
   // ------------------------------------------------
   const theHeaderKeyArr = rwd1023 ? headerKeyArr_mobile : headerKeyArr;
@@ -244,7 +247,7 @@ export default function ReportTable({
       {/*  */}
       {!reportInEdit?.id && (
         <DatePicker
-          disabled={disabled}
+          disabled={disabledOri}
           setMonthStart={setMonthStart}
           setMonthEnd={setMonthEnd}
           isLoading={isLoading}
@@ -253,7 +256,7 @@ export default function ReportTable({
         />
       )}
 
-      <div className={classNames(scss.table)}>
+      <div className={classNames(scss.table)} key={id}>
         <div className={scss.roof} />
         {/*  */}
         <div className={classNames(scss.thead)}>
@@ -303,6 +306,12 @@ export default function ReportTable({
                     bodyClassName,
                     suffix,
                   } = config[key] ?? {};
+
+                  let disabled = disabledOri;
+
+                  if (key === 'meals' || key === 'stayLength') {
+                    disabled = !isEdit;
+                  }
 
                   if (!rwd1023) {
                     headerClassName_mobile = undefined;
@@ -372,7 +381,7 @@ export default function ReportTable({
                               // @ts-ignore
                               theClass[key] = v;
                             },
-                            className: scss.textarea,
+                            // className: scss.textarea,
                           }}
                         />
                         {suffix && disabled && <span>{suffix}</span>}
@@ -389,7 +398,8 @@ export default function ReportTable({
                           headerClassName,
                           bodyClassName,
                           headerClassName_mobile,
-                          bodyClassName_mobile
+                          bodyClassName_mobile,
+                          scss.textareaCell
                         )}
                       >
                         <InputSel
@@ -405,8 +415,15 @@ export default function ReportTable({
                               // @ts-ignore
                               theClass[key] = v;
                             },
-                            className: scss.textarea,
+                            className: classNames(
+                              scss.textarea,
+                              { [scss.customerName]: key === 'customerName' },
+                              { [scss.description]: key === 'description' }
+                            ),
                             allowNewLineByUser: key === 'description',
+                            props: {
+                              maxLength: 600,
+                            },
                           }}
                         />
                       </div>
@@ -637,7 +654,7 @@ export default function ReportTable({
                           bodyClassName_mobile
                         )}
                       >
-                        {isMine && <IconDelete01 onClick={onClick} />}
+                        {isMine && !disabled && <IconDelete01 onClick={onClick} />}
                       </div>
                     );
                   }
@@ -645,7 +662,7 @@ export default function ReportTable({
               </div>
             );
           })}
-          {!disabled && (
+          {!disabledOri && (
             <MyButton label="新增回報" preImg="add" className={scss.newReportBtn} onClick={addDailyReportItem} />
           )}
         </div>
@@ -1040,9 +1057,9 @@ const Panel = () => {
             return Bar_reporter_inEdit02;
           }
 
-          if (reportInEdit.isReviewedByOther) {
-            return Bar_reporter_reviewed;
-          }
+          // if (reportInEdit.isReviewedByOther) {
+          //   return Bar_reporter_reviewed;
+          // }
 
           return Bar_reporter_inEdit02;
         } else if (reportInEdit.isAllowToReview) {
@@ -1057,9 +1074,9 @@ const Panel = () => {
       if (!reportInEdit) {
         return () => null;
       } else {
-        if (reportInEdit.isReviewedByOther) {
-          return Bar_reporter_reviewed;
-        }
+        // if (reportInEdit.isReviewedByOther) {
+        //   return Bar_reporter_reviewed;
+        // }
 
         if (isReportEdit) {
           return Bar_reporter_inEdit02;
@@ -1084,7 +1101,11 @@ const TitlePanel = () => {
   const { reportInEdit, cancelEditNewDailyReport, isReportEdit, setShowReviewerForReportModal } =
     useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
-  const date = moment(reportInEdit?.date).format('y-MM-DD');
+  let date = moment(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
+
+  if (date === 'Invalid date') {
+    date = '請選擇日期';
+  }
 
   return (
     <div className={scss.TitlePanel}>
@@ -1106,7 +1127,7 @@ const TitlePanel = () => {
 };
 
 function Bar_reporter_inEdit02() {
-  const { isReportEdit, switchIsEdit } = useContext(DailyReportContext);
+  const { isReportEdit, switchIsEdit, reportInEdit } = useContext(DailyReportContext);
 
   return (
     <div className={scss.bar}>
@@ -1115,6 +1136,7 @@ function Bar_reporter_inEdit02() {
           onClick={() => { setShowReviewerForReportModal(true) }} />
       } */}
       <MyButton label={isReportEdit ? '取消' : '編輯'} onClick={switchIsEdit} />
+      {reportInEdit?.isReviewedByOther && <Badge className={scss.antdBadge02} color="auto" text="已檢視" />}
     </div>
   );
 }
@@ -1129,13 +1151,13 @@ function Bar_reviewer_inEdit_user() {
   );
 }
 
-const Bar_reporter_reviewed = () => {
-  return (
-    <div className={classNames(scss.bar, scss.reviwedBdage)}>
-      <Badge className={scss.antdBadge02} color="auto" text="已檢視" />
-    </div>
-  );
-};
+// const Bar_reporter_reviewed = () => {
+//   return (
+//     <div className={classNames(scss.bar, scss.reviwedBdage)}>
+//       <Badge className={scss.antdBadge02} color="auto" text="已檢視" />
+//     </div>
+//   );
+// };
 
 // ===================================================================
 
