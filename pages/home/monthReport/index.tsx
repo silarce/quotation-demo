@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 import { useRouter } from 'next/router';
 import moment from 'moment';
@@ -238,6 +239,12 @@ export default function MonthReport() {
 // ======================================================================
 
 const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employeeIdArr: string[] | undefined) => {
+  /**
+   * 在同一個worksheet裡面(未試過不同worksheet的情況)，
+   * 不能同時使用addTable與mergeCells
+   * addTable與mergeCells都用的話，產出的xlsx檔無法給微軟的excel開啟
+   */
+
   const workbook = new ExcelJs.Workbook();
   const sheet = workbook.addWorksheet('報表');
 
@@ -419,7 +426,9 @@ class Class_statisticCalc {
     let isBreakfast = false;
     let isLunch = false;
     let isDinner = false;
-    meals?.forEach((meal) => {
+
+    // 去除陣列中的重複值後forEach
+    _.uniq(meals ?? []).forEach((meal) => {
       if (meal === 'breakfast') {
         this.breakfastQty++;
         isBreakfast = true;

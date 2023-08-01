@@ -117,6 +117,10 @@ class Class_reportItem {
   }
 
   addMeals = (v: TdailyReportItemDto['meals'][number]) => {
+    if (this._meals.includes(v)) {
+      return;
+    }
+
     this._meals.push(v);
     this._reRender();
   };
