@@ -117,6 +117,7 @@ export default function QuotationAdditions({
                       control={control}
                       render={({ field }) => (
                         <InputSel
+                          suffix={key === 'quantity' ? '樘' : undefined}
                           disabled={disabled}
                           inputProps={{
                             ...field,
