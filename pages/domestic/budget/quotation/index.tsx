@@ -250,7 +250,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} />
             <hr />
             {/* 選配設定 */}
-            <QuotationAccessory activeRow={classQuotation.activeMainProd} />
+            <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} />
           </div>
           {/* 其他設定 */}
           <QuotationAdditions disabled={!allowEdit} />

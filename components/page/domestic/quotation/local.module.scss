@@ -38,7 +38,6 @@
   padding: 2px 3px;
   margin-left: 16px;
   border: solid 1px transparent;
-  width: 100%;
   cursor: default;
   > span {
     color: $colorMain;
@@ -101,7 +100,8 @@
     padding-bottom: 1px;
   }
   &.textCenter {
-    input,div {
+    input,
+    div {
       text-align: center;
     }
     .checkbox {
