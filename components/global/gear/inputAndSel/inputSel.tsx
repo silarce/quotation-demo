@@ -18,7 +18,7 @@ import MustTip_simple from '../other/mustTip_simple';
 // css
 import scss from './inputSel.module.scss';
 
-export type { TselectProps };
+export type { TselectProps, TinputProps };
 
 // =============================================================================
 
