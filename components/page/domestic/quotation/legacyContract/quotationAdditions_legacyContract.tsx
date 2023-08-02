@@ -13,8 +13,8 @@ import { Class_legacyContract, Class_addition } from 'hooks/quotation/useLegacyC
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import styleL from './local.module.scss';
-import scss from './quotationAdditions.module.scss';
+import styleL from '../local.module.scss';
+import scss from '../quotationAdditions.module.scss';
 
 export default function QuotationAdditions({
   legacyContract,

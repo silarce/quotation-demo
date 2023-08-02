@@ -1,16 +1,16 @@
 import { useState } from 'react';
 
 // components
-import DndThead from './quotationProduct/dndThead_legacyContract';
-import ProductList from './quotationProduct/productList';
-import ProductList_legacy from './quotationProduct/productList_legacy';
+import DndThead from '../quotationProduct/dndThead_legacyContract';
+import ProductList from '../quotationProduct/productList';
+import ProductList_legacy from '../quotationProduct/productList_legacy';
 
 // global gear
 import AddButton from 'components/global/gear/button/addButton';
 
 // css
-import style from './quotationProduct.module.scss';
-import styleL from './local.module.scss';
+import style from '../quotationProduct.module.scss';
+import styleL from '../local.module.scss';
 
 // type
 import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';

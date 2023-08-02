@@ -1,10 +1,10 @@
 import { useState } from 'react';
 // component
-import TextListEditor_v2 from './quotationTotal/TextListEditor_v2';
-import PayInfo_legacy from './quotationTotal/payInfo_legacy';
-import Appendix from './quotationTotal/appendix_legacy_noReview';
+import TextListEditor_v2 from '../quotationTotal/TextListEditor_v2';
+import PayInfo_legacy from '../quotationTotal/payInfo_legacy';
+import Appendix from '../quotationTotal/appendix_legacy_noReview';
 // css
-import style from './quotationTotal.module.scss';
+import style from '../quotationTotal.module.scss';
 // type
 import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
