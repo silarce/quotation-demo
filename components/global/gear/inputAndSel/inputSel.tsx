@@ -24,6 +24,7 @@ export type { TselectProps };
 
 export default function InputSel({
   label,
+  suffix,
   placeholder,
 
   captionWidth,
@@ -57,6 +58,7 @@ export default function InputSel({
   isMustPreStyle,
 }: {
   label?: string;
+  suffix?: string;
   placeholder?: string;
 
   width?: CSSProperties['width'];
@@ -196,6 +198,12 @@ export default function InputSel({
       {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />}
 
       {checkProps && <CheckBar checkProps={checkProps} />}
+
+      {suffix && (
+        <div className={scss.suffix}>
+          <span>{suffix}</span>
+        </div>
+      )}
 
       {showBaseline !== 'invisible' && (
         <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
