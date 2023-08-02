@@ -16,6 +16,7 @@ import QuotationSinature from 'components/page/domestic/quotation/quotationSinat
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
+import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -251,6 +252,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             {/* 選配設定 */}
             <QuotationAccessory activeRow={classQuotation.activeMainProd} />
           </div>
+          {/* 其他設定 */}
+          <QuotationAdditions disabled={!allowEdit} />
 
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
