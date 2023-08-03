@@ -1,7 +1,6 @@
 // 報價單
 import React, { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-
 import moment from 'moment';
 
 // components
@@ -22,6 +21,7 @@ import QuotationAdditions from 'components/page/domestic/quotation/quotationAddi
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
+import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -61,6 +61,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationId, //報價單id //若為新增報價單則為newQuotation
     isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
   } = router.query;
+
+  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
 
   // =========================================================
   // =========================================================
@@ -194,7 +196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => setShowPdf_part(true),
     },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    { type: 'myButton', label: '送審', onClick: () => alert('送審') },
+    { type: 'myButton', label: '送審', onClick: () => setEmployeeSelectorShow(true) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -294,6 +296,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationId={classQuotation.quotationId}
       />
       {/*  */}
+      <EmployeeSelector
+        showModal={employeeSelectorShow}
+        label="請選擇審核人員"
+        onConfirm={(arr) => {
+          setEmployeeSelectorShow(false);
+        }}
+        onCancel={() => {
+          setEmployeeSelectorShow(false);
+        }}
+      />
     </div>
   );
 }
