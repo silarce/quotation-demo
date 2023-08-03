@@ -30,7 +30,7 @@ class Class_basicInfo {
     this._reRender = reRender;
     this._basicInfo = basicInfo;
     this._clientProfile = clientProfile;
-  }
+  } // constructor
   _classQuotation;
   private _reRender;
   private _basicInfo;
@@ -39,7 +39,8 @@ class Class_basicInfo {
   setBasicInfoString = (
     key: keyof Omit<
       typeof this._basicInfo,
-      'tempQuotationAging' | 'totalDiscount' | 'tempDoorQty' | 'tempBudgetAmount' | 'quoStatus' | 'approvalStatus'
+      // 'tempQuotationAging' |
+      'totalDiscount' | 'tempDoorQty' | 'tempBudgetAmount' | 'quoStatus' | 'approvalStatus'
     >,
     value: string
   ) => {

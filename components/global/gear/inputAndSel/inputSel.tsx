@@ -45,6 +45,7 @@ export default function InputSel({
   captionClassName,
   hrClassName,
   mustTipClassName,
+  suffixClassName,
 
   inputProps,
   selectProps,
@@ -80,6 +81,7 @@ export default function InputSel({
   captionClassName?: string;
   hrClassName?: string;
   mustTipClassName?: string;
+  suffixClassName?: string;
 
   inputProps?: TinputProps;
   selectProps?: TselectProps;
@@ -200,7 +202,7 @@ export default function InputSel({
       {checkProps && <CheckBar checkProps={checkProps} />}
 
       {suffix && (
-        <div className={scss.suffix}>
+        <div className={classNames(scss.suffix, suffixClassName)}>
           <span>{suffix}</span>
         </div>
       )}

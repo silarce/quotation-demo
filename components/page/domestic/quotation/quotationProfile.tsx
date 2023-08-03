@@ -215,12 +215,45 @@ export default function QuotationProfile({
       </div>
 
       <div className={scss.time}>
-        <span>報價編號</span>
-        <span>{quotationId}</span>
-        <span>報價時效</span>
-        <span>{tempQuotationAging}天內</span>
-        <span>報價日期</span>
-        <span>{builtDate}</span>
+        <div>
+          <InputSel
+            label="報價編號"
+            showBaseline="invisible"
+            captionClassName={scss.caption}
+            gap="24px"
+            inputProps={{
+              value: quotationId,
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            label="報價時效"
+            showBaseline="auto"
+            disabled={disabled}
+            suffix="天內"
+            suffixClassName="text-[18px]"
+            captionClassName={scss.caption}
+            gap="24px"
+            inputProps={{
+              value: tempQuotationAging,
+              onChange: (v) => {
+                setBasicInfoString('tempQuotationAging', v);
+              },
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            label="報價日期"
+            showBaseline="invisible"
+            captionClassName={scss.caption}
+            gap="24px"
+            inputProps={{
+              value: builtDate,
+            }}
+          />
+        </div>
       </div>
 
       {/* modal */}
