@@ -153,7 +153,7 @@ export default function QuotationAccessory({ disabled = true, activeRow }: { dis
               </div>
             );
           })}
-        {!disabled && (
+        {!disabled && activeRow > -1 && (
           <MyButton
             className={scss_l.addBtn}
             preImg="add"
