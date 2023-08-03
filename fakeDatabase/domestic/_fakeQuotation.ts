@@ -57,6 +57,7 @@ type Tquotation = {
       partType: string;
       partName: string;
       partId: string;
+      specification: string;
       material: string;
       basicWeight: string | undefined;
       unit: 'm2' | 'M' | '組' | '套' | '支' | string;
@@ -157,6 +158,7 @@ const fakeQuotationDataList: TquotationList = {
             partType: 'SJ00',
             partName: '捲門片',
             partId: 'SJ0000A0000',
+            specification: '規格001',
             material: 'SST 304',
             basicWeight: '99.99',
             unit: 'm2',
@@ -167,6 +169,7 @@ const fakeQuotationDataList: TquotationList = {
             partType: 'SJ00',
             partName: '馬達機',
             partId: 'SJ0000A0000',
+            specification: '規格002',
             material: 'SST 304',
             basicWeight: '99.99',
             unit: '組',
@@ -295,6 +298,7 @@ const emptyQuotation: Tquotation = {
           partType: 'SJ00',
           partName: '捲門片',
           partId: 'SJ0000A0000',
+          specification: '規格001',
           material: 'SST 304',
           basicWeight: '99.99',
           unit: 'm2',
@@ -305,6 +309,7 @@ const emptyQuotation: Tquotation = {
           partType: 'SJ00',
           partName: '馬達機',
           partId: 'SJ0000A0000',
+          specification: '規格001',
           material: 'SST 304',
           basicWeight: '99.99',
           unit: '組',

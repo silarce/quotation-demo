@@ -453,6 +453,7 @@ class Class_part {
     this.partType = part.partType;
     this.partName = part.partName;
     this.partId = part.partId;
+    this.specification = part.specification;
     this._material = unexpectedOption(part.material);
     this.basicWeight = part.basicWeight;
     this.unit = part.unit;
@@ -465,6 +466,7 @@ class Class_part {
   partType;
   partName;
   partId;
+  specification;
 
   basicWeight;
   unit;
@@ -524,6 +526,7 @@ class Class_part {
       partType: this.partType,
       partName: this.partName,
       partId: this.partId,
+      specification: this.specification,
       material: this._material.value,
       basicWeight: this.basicWeight,
       unit: this.unit,
@@ -967,6 +970,7 @@ function mainProdCellConfigOri(): TprodCellConfig {
 }
 
 // =============================================================
+// 材料配件設定
 
 type TpartReadOnlyCellType = {
   [key in keyof Pick<
@@ -974,6 +978,7 @@ type TpartReadOnlyCellType = {
     | 'partType'
     | 'partName'
     | 'partId'
+    | 'specification'
     | 'basicWeight'
     | 'unit'
     | 'listPrice'
@@ -1005,6 +1010,7 @@ const partCellConfigOri = (): TpartCellConfig => {
       'partType',
       'partName',
       'partId',
+      'specification',
       'material',
       'basicWeight',
       'unit',
@@ -1018,6 +1024,7 @@ const partCellConfigOri = (): TpartCellConfig => {
       partType: { label: '中類', width: '45px', type: 'readOnly' },
       partName: { label: '種類名稱', width: '160px', type: 'readOnly' },
       partId: { label: '代號', width: '116px', type: 'readOnly' },
+      specification: { label: '規格', width: '80px', type: 'readOnly' },
       // "surface": { label: "表面", width: "55p,x" type:readOnly""},
       basicWeight: { label: '重量基重', width: '75px', type: 'readOnly' },
       unit: { label: '單位', width: '40px', type: 'readOnly' },
@@ -1071,6 +1078,7 @@ const emptyMainProd: Tdata['mainProductArr'][0] = {
       partType: 'SJ00',
       partName: '捲門片',
       partId: 'SJ0000A0000',
+      specification: '規格001',
       material: 'SST 304',
       basicWeight: '99.99',
       unit: 'm2',
@@ -1081,6 +1089,7 @@ const emptyMainProd: Tdata['mainProductArr'][0] = {
       partType: 'SJ00',
       partName: '馬達機',
       partId: 'SJ0000A0000',
+      specification: '規格003',
       material: 'SST 304',
       basicWeight: '99.99',
       unit: '組',
@@ -1095,6 +1104,7 @@ const emptyPartOri = () => {
     partType: 'SJ00',
     partName: '捲門片',
     partId: 'SJ0000A0000',
+    specification: '規格001',
     material: 'SST 304',
     basicWeight: '99.99',
     unit: 'm2',
