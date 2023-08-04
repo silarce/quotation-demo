@@ -1,0 +1,11 @@
+@use "styles/theme01" as *;
+
+.valueContainer {
+  width: 100%;
+  display: flex;
+
+  gap: 20px;
+  > * {
+    flex: 0 1 auto;
+  }
+}

@@ -10,6 +10,7 @@ import MyDatePicker, { TdatePickerProps } from './cog/myDatePicker';
 import MyTimePicker, { TtimePickerProps } from './cog/myTimePicker';
 import MyTimePicker_mui, { TtimePickerProps_mui } from './cog/myTimePicker_mui';
 import CheckBar, { TcheckboxProps } from './cog/checkBar';
+import TheBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
@@ -31,6 +32,7 @@ export default function InputSel({
   timePickerProps,
   timePickerProps_mui,
   checkBoxProps,
+  inputSelBarProps,
   //
   className,
   wrapperPreStyle,
@@ -67,6 +69,7 @@ export default function InputSel({
   timePickerProps?: TtimePickerProps;
   timePickerProps_mui?: TtimePickerProps_mui;
   checkBoxProps?: TcheckboxProps;
+  inputSelBarProps?: Omit<TinputSelBarProps, 'onFocus' | 'onBlur'>;
   //
   className?: string;
   wrapperPreStyle?: 'ps01';
@@ -132,7 +135,15 @@ export default function InputSel({
   // ------------------------------------------------------------------------
 
   return (
-    <label className={classNames(scss.label, className)} style={wrapperStyle}>
+    <label
+      className={classNames(scss.label, className)}
+      style={wrapperStyle}
+      onClick={(e) => {
+        if (inputSelBarProps) {
+          e.preventDefault();
+        }
+      }}
+    >
       {caption && (
         <div
           className={classNames(scss.caption, wrapperPreStyle && scss[wrapperPreStyle], captionClassName)}
@@ -280,6 +291,17 @@ export default function InputSel({
           isRadio={checkBoxProps.isRadio}
           onChange={checkBoxProps.onChange}
           checkBoxArr={checkBoxProps.checkBoxArr}
+        />
+      )}
+
+      {inputSelBarProps && (
+        <TheBar
+          fontClassName={fontClassName}
+          disabled={inputSelBarProps.disabled}
+          valueContanierClassName={inputSelBarProps.valueContanierClassName}
+          propsArr={inputSelBarProps.propsArr}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
         />
       )}
 
