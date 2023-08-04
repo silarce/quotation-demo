@@ -10,15 +10,15 @@ import scss from './inputSelBar.module.scss';
 
 type TinputPropsWrapper = {
   type: 'input';
-  props?: TinputProps;
+  itemProps?: TinputProps;
 };
 type TselectPropsWrapper = {
   type: 'select';
-  props?: TselectProps;
+  itemProps?: TselectProps;
 };
 type TtextareaPropsWrapper = {
   type: 'textarea';
-  props?: TtextareaProps;
+  itemProps?: TtextareaProps;
 };
 
 export type TselInputPropsArr = (TinputPropsWrapper | TselectPropsWrapper | TtextareaPropsWrapper)[];
@@ -33,28 +33,35 @@ export type TinputSelBarProps = {
 };
 
 // ===========================================================================
-const TheBar = ({ disabled, fontClassName, valueContanierClassName, propsArr, onFocus, onBlur }: TinputSelBarProps) => {
+const InputSelBar = ({
+  disabled,
+  fontClassName,
+  valueContanierClassName,
+  propsArr,
+  onFocus,
+  onBlur,
+}: TinputSelBarProps) => {
   return (
     <div className={classNames(scss.valueContainer, valueContanierClassName)}>
       {propsArr.map((item, index) => {
-        const { type, props } = item;
+        const { type, itemProps } = item;
 
         if (type === 'input') {
           return (
             <Input
               key={index}
-              wrapperClassName={classNames(fontClassName, props?.wrapperClassName)}
+              wrapperClassName={classNames(fontClassName, itemProps?.wrapperClassName)}
               // wrapperClassName={props?.wrapperClassName}
               inputAttr={{
                 disabled,
-                ...props?.inputAttr,
+                ...itemProps?.inputAttr,
                 onFocus: (e) => {
                   onFocus && onFocus(e);
-                  props?.inputAttr?.onFocus?.(e);
+                  itemProps?.inputAttr?.onFocus?.(e);
                 },
                 onBlur: (e) => {
                   onBlur && onBlur(e);
-                  props?.inputAttr?.onBlur?.(e);
+                  itemProps?.inputAttr?.onBlur?.(e);
                 },
               }}
             />
@@ -65,20 +72,20 @@ const TheBar = ({ disabled, fontClassName, valueContanierClassName, propsArr, on
           return (
             <Textarea
               key={index}
-              wrapperClassName={props?.wrapperClassName}
-              allowNewLineByUser={props?.allowNewLineByUser}
+              wrapperClassName={itemProps?.wrapperClassName}
+              allowNewLineByUser={itemProps?.allowNewLineByUser}
               props={{
                 disabled,
-                ...props?.props,
+                ...itemProps?.props,
                 onFocus: (e) => {
                   onFocus && onFocus(e);
-                  props?.props?.onFocus?.(e);
+                  itemProps?.props?.onFocus?.(e);
                 },
                 onBlur: (e) => {
                   onBlur && onBlur(e);
-                  props?.props?.onBlur?.(e);
+                  itemProps?.props?.onBlur?.(e);
                 },
-                className: classNames(fontClassName, props?.props?.className),
+                className: classNames(fontClassName, itemProps?.props?.className),
               }}
             />
           );
@@ -88,19 +95,19 @@ const TheBar = ({ disabled, fontClassName, valueContanierClassName, propsArr, on
           return (
             <MySelect
               key={index}
-              wrapperClassName={props?.wrapperClassName}
-              arrowType={props?.arrowType || 'black'}
+              wrapperClassName={itemProps?.wrapperClassName}
+              arrowType={itemProps?.arrowType || 'black'}
               fontClassName={fontClassName}
               props={{
                 isDisabled: disabled,
-                ...props?.props,
+                ...itemProps?.props,
                 onFocus: (e) => {
                   onFocus && onFocus(e);
-                  props?.props?.onFocus?.(e);
+                  itemProps?.props?.onFocus?.(e);
                 },
                 onBlur: (e) => {
                   onBlur && onBlur(e);
-                  props?.props?.onBlur?.(e);
+                  itemProps?.props?.onBlur?.(e);
                 },
               }}
             />
@@ -113,4 +120,4 @@ const TheBar = ({ disabled, fontClassName, valueContanierClassName, propsArr, on
   );
 };
 
-export default TheBar;
+export default InputSelBar;

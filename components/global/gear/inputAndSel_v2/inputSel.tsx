@@ -10,7 +10,7 @@ import MyDatePicker, { TdatePickerProps } from './cog/myDatePicker';
 import MyTimePicker, { TtimePickerProps } from './cog/myTimePicker';
 import MyTimePicker_mui, { TtimePickerProps_mui } from './cog/myTimePicker_mui';
 import CheckBar, { TcheckboxProps } from './cog/checkBar';
-import TheBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
+import InputSelBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
@@ -18,7 +18,51 @@ import MustTip_simple from '../other/mustTip_simple';
 // css
 import scss from './inputSel.module.scss';
 
-export type { TselectProps, TinputProps };
+type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
+
+export type { TinputSelProps, TselectProps, TinputProps, TtextareaProps, TinputSelBarProps_reduce };
+
+// =============================================================================
+
+type TinputSelProps = {
+  disabled?: boolean;
+  //
+  inputProps?: TinputProps;
+  selectProps?: TselectProps;
+  textareaProps?: TtextareaProps;
+  datePickerProps?: TdatePickerProps;
+  timePickerProps?: TtimePickerProps;
+  timePickerProps_mui?: TtimePickerProps_mui;
+  checkBoxProps?: TcheckboxProps;
+  inputSelBarProps?: Omit<TinputSelBarProps, 'onFocus' | 'onBlur'>;
+  //
+  className?: string;
+  wrapperPreStyle?: 'ps01';
+  wrapperStyle?: CSSProperties;
+  //
+  caption?: string;
+  captionClassName?: string;
+  captionStyle?: React.CSSProperties;
+  captionColor?: 'main' | 'sub' | 'text' | 'active';
+  captionSize?: 'sm' | 'base' | 'lg' | 'xl';
+  captionWeight?: 'normal' | 'medium' | 'semibold';
+  //
+  fontSize?: 'sm' | 'base' | 'lg' | 'xl';
+  fontWeight?: 'normal' | 'medium' | 'semibold';
+  fontColor?: 'main' | 'sub' | 'text' | 'active';
+  //
+  /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
+  showBaseline?: 'invisible' | 'always' | 'auto';
+  hrClassName?: string;
+  hrStyle?: CSSProperties;
+  //
+  isMust?: boolean;
+  isMustPreStyle?: 'minimal';
+  mustTipClassName?: string;
+  //
+  suffix?: string;
+  suffixClassName?: string;
+};
 
 // =============================================================================
 
@@ -59,45 +103,7 @@ export default function InputSel({
   //
   suffix,
   suffixClassName,
-}: {
-  disabled?: boolean;
-  //
-  inputProps?: TinputProps;
-  selectProps?: TselectProps;
-  textareaProps?: TtextareaProps;
-  datePickerProps?: TdatePickerProps;
-  timePickerProps?: TtimePickerProps;
-  timePickerProps_mui?: TtimePickerProps_mui;
-  checkBoxProps?: TcheckboxProps;
-  inputSelBarProps?: Omit<TinputSelBarProps, 'onFocus' | 'onBlur'>;
-  //
-  className?: string;
-  wrapperPreStyle?: 'ps01';
-  wrapperStyle?: CSSProperties;
-  //
-  caption?: string;
-  captionClassName?: string;
-  captionStyle?: React.CSSProperties;
-  captionColor?: 'main' | 'sub' | 'text' | 'active';
-  captionSize?: 'sm' | 'base' | 'lg' | 'xl';
-  captionWeight?: 'normal' | 'medium' | 'semibold';
-  //
-  fontSize?: 'sm' | 'base' | 'lg' | 'xl';
-  fontWeight?: 'normal' | 'medium' | 'semibold';
-  fontColor?: 'main' | 'sub' | 'text' | 'active';
-  //
-  /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
-  showBaseline?: 'invisible' | 'always' | 'auto';
-  hrClassName?: string;
-  hrStyle?: CSSProperties;
-  //
-  isMust?: boolean;
-  isMustPreStyle?: 'minimal';
-  mustTipClassName?: string;
-  //
-  suffix?: string;
-  suffixClassName?: string;
-}) {
+}: TinputSelProps) {
   const [isFocus, setIsFocus] = useState(false);
 
   const fontClassName = classNames(
@@ -295,7 +301,7 @@ export default function InputSel({
       )}
 
       {inputSelBarProps && (
-        <TheBar
+        <InputSelBar
           fontClassName={fontClassName}
           disabled={inputSelBarProps.disabled}
           valueContanierClassName={inputSelBarProps.valueContanierClassName}

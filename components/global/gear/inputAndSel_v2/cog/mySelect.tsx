@@ -2,15 +2,18 @@ import classNames from 'classnames';
 
 import Select, {
   Props,
+  DropdownIndicatorProps,
+  //
   // Options,
   // SingleValue,
   // ActionMeta,
   // ClassNamesConfig,
   // OptionProps,
-  DropdownIndicatorProps,
   // SelectComponentsConfig,
 } from 'react-select';
-// import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+// type
+import type { Toption } from 'js/utils/options/options';
 
 // icon
 import iconArrowRed from 'public/image/icon/arrow_down_red.svg';
@@ -20,18 +23,27 @@ import scss from '../inputSel.module.scss';
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
 
-export type TselectProps = {
-  props?: Props;
+export type TselectProps<
+  Option = Toption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+> = {
+  props?: Props<Option, IsMulti, Group>;
   wrapperClassName?: string;
   arrowType?: 'red' | 'black';
   fontClassName?: string;
 };
 
 // ==============================================================================
-export default function MySelect({ props, wrapperClassName, arrowType, fontClassName }: TselectProps) {
+export default function MySelect<
+  Option = Toption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+>({ props, wrapperClassName, arrowType, fontClassName }: TselectProps<Option, IsMulti, Group>) {
   // 客製化元件
   // 箭頭
-  const DropdownIndicator = (indicatorProps: DropdownIndicatorProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const DropdownIndicator = (indicatorProps: DropdownIndicatorProps<Option, IsMulti, Group>) => {
     if (props?.isDisabled) {
       return null;
     }
@@ -49,6 +61,7 @@ export default function MySelect({ props, wrapperClassName, arrowType, fontClass
       <Select
         components={{
           DropdownIndicator,
+          //
           ...props?.components,
         }}
         unstyled={true}
