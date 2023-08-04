@@ -1,0 +1,377 @@
+@use "styles/theme01" as *;
+
+.label {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+
+  &.ps01 {
+    padding: 17px 4px 14px 4px;
+    gap: 40px;
+  }
+
+  > * {
+    margin-left: 0;
+  }
+  .caption {
+    position: relative;
+    flex: none;
+    align-self: flex-start;
+    > span {
+      display: block;
+      color: inherit;
+    }
+    &.colorMain {
+      color: $colorMain;
+    }
+  }
+  .suffix {
+    flex: none;
+  }
+
+  .hr {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 100%;
+    border-color: $colorMain;
+    &.isMust {
+      border-color: $colorActive01;
+    }
+    &:global(.isFocus) {
+      border-color: $colorActive01;
+    }
+    &:global(.invisible) {
+      visibility: hidden;
+    }
+  }
+
+  .mustTip {
+    position: absolute;
+    right: calc(100% + 7px);
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 13px;
+    height: 16px;
+    > img {
+      width: 13px;
+      height: 16px;
+    }
+  }
+} //label
+
+.inputBox {
+  height: fit-content;
+  // font-weight: 400;
+  // font-size: 18px;
+  width: 100%;
+  > input {
+    display: block;
+    width: 100%;
+    background: transparent;
+    &::placeholder {
+      color: $colorBorder01;
+    }
+  }
+} // inputBox
+
+.textareaBox {
+  height: fit-content;
+  width: 100%;
+  font-size: 0px;
+  > textarea {
+    display: block;
+    width: 100%;
+    // font-weight: 400;
+    // font-size: 18px;
+    resize: none;
+    background-color: transparent;
+    &::placeholder {
+      color: $colorBorder01;
+    }
+  }
+} // textareaBox
+
+.datePickerBox {
+  width: 100%;
+  .timePicker {
+    padding: 0;
+    width: 100%;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+    line-height: unset;
+    border: none;
+    :global(.ant-picker-input) {
+      font-weight: inherit;
+      font-size: inherit;
+      color: inherit;
+      line-height: unset;
+      input {
+        width: 100%;
+        font-weight: inherit;
+        font-size: inherit;
+        color: inherit;
+        line-height: unset;
+        // line-height: 28px;
+        cursor: pointer;
+        &::placeholder {
+          color: $colorBorder01;
+        }
+      }
+    }
+  }
+} // datePickerBox
+
+.timePickerBox {
+  width: 100%;
+  .timePicker {
+    width: 100%;
+    padding: 0;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+    line-height: unset;
+    border: none;
+    :global(.ant-picker-input) {
+      font-weight: inherit;
+      font-size: inherit;
+      color: inherit;
+      line-height: unset;
+      input {
+        width: 100%;
+        font-weight: inherit;
+        font-size: inherit;
+        color: inherit;
+        line-height: unset;
+        cursor: pointer;
+        &::placeholder {
+          color: $colorBorder01;
+        }
+      }
+    }
+  }
+} // datePickerBox
+.timePickerPopupt {
+  :global(.ant-picker-content) {
+    height: 300px;
+    :global(.ant-picker-time-panel-column) {
+      width: 80px;
+      :global(.ant-picker-time-panel-cell) {
+        :global(.ant-picker-time-panel-cell-inner) {
+          height: 40px;
+          padding: 0;
+          text-align: center;
+          line-height: 40px;
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  :global(.ant-picker-footer) {
+    :global(.ant-picker-ok) {
+      float: unset;
+      margin: 5px auto;
+      width: 100%;
+      button {
+        display: block;
+        height: auto;
+        width: 100%;
+
+        padding: 5px 15px;
+        background-color: $bgc01;
+        border: solid 1px $colorBorder01;
+      }
+    }
+  }
+}
+
+// =================================================================
+// Select
+// select的選單元件會portal到#__next
+// 所以不能用巢狀文法
+.selectBox {
+  height: fit-content;
+  font-weight: 400;
+  font-size: 18px;
+  width: 100%;
+}
+
+// ------------
+// classNames
+.selContainer {
+}
+
+div.selControl {
+  min-height: auto;
+  cursor: pointer;
+}
+
+.selMenu {
+  min-width: fit-content;
+  background-color: #fff;
+  box-sizing: border-box;
+  filter: drop-shadow(0px 3px 15px rgba(0, 0, 0, 0.15));
+}
+
+.selMenuList {
+  min-width: fit-content;
+  // padding: 0 12px;
+  background-color: #fff;
+}
+.selMenuPortal.plus {
+  z-index: 3;
+}
+
+.selOption.plus {
+  position: relative;
+  padding: 10px 17px;
+  padding-bottom: 11px; //配合::after的height
+  // color: $colorText;
+  font-weight: 400;
+  font-size: 18px;
+  // border-bottom: solid 1px $colorBorder01;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - 34px); // 扣掉的px為.selOption左右paddin的和
+    height: 1px;
+    background-color: $colorBorder01;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+  }
+
+  &:nth-last-of-type(1) {
+    padding-bottom: 10px; //配合::after的height
+    &::after {
+      display: none;
+    }
+  }
+  &:hover {
+    // color: $colorMain;
+    background-color: $bgc01;
+  }
+  &.isSelected {
+    color: $colorActive01;
+    > span {
+      color: $colorActive01;
+    }
+  }
+}
+
+.selValueContainer {
+  // color: $colorText;
+  // font-weight: 400;
+  // font-size: 18px;
+}
+
+.selPlaceholder {
+  color: $colorBorder01;
+}
+
+.selSingleValue {
+  // color: $colorText;
+  // font-weight: 400;
+  // font-size: 18px;
+}
+
+// =================================================================
+
+.checkBar {
+  display: flex;
+  gap: 35px;
+  justify-content: right;
+  > * {
+    flex: none;
+    width: fit-content;
+  }
+
+  .antdCheck {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    transform: translateY(-1px);
+    > span:nth-of-type(2) {
+      padding: 0;
+      margin-right: 7px;
+    }
+    :global(.ant-checkbox) {
+      :global(.ant-checkbox-inner) {
+        // width: 15px;
+        // height: 15px;
+        border-color: $colorBorder01;
+      }
+    }
+    :global(.ant-checkbox-checked) {
+      :global(.ant-checkbox-inner) {
+        background-color: $colorMain;
+      }
+    }
+  } // antdCheck
+}
+
+// =================================================================
+
+.timePicker_mui_wrapper {
+  height: fit-content;
+  width: 100%;
+  .timePicker_mui {
+    width: 100%;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+
+    &:global(.MuiFormControl-root) {
+      display: block;
+    }
+    :global(.MuiInputBase-root) {
+      padding: 0;
+      display: block;
+      line-height: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      color: inherit;
+      input {
+        padding: 0;
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        font-family: "Noto Sans TC", sans-serif;
+        height: auto;
+        line-height: inherit;
+      }
+    }
+
+    fieldset {
+      // border: none;
+      // padding: 0;
+      display: none;
+    }
+
+    :global(.MuiInputAdornment-root) {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 0;
+      > button {
+        width: 100%;
+        height: 100%;
+        border-radius: unset;
+      }
+      svg {
+        display: none;
+      }
+    }
+  }
+}
