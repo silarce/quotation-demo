@@ -43,12 +43,12 @@ type TinputSelProps = {
   caption?: string;
   captionClassName?: string;
   captionStyle?: React.CSSProperties;
+  captionSize?: '14' | '16' | '18' | '20';
+  captionWeight?: '400' | '500' | '600' | '700';
   captionColor?: 'main' | 'sub' | 'text' | 'active';
-  captionSize?: 'sm' | 'base' | 'lg' | 'xl';
-  captionWeight?: 'normal' | 'medium' | 'semibold';
   //
-  fontSize?: 'sm' | 'base' | 'lg' | 'xl';
-  fontWeight?: 'normal' | 'medium' | 'semibold';
+  fontSize?: '14' | '16' | '18' | '20';
+  fontWeight?: '400' | '500' | '600' | '700';
   fontColor?: 'main' | 'sub' | 'text' | 'active';
   //
   /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
@@ -85,12 +85,12 @@ export default function InputSel({
   caption,
   captionClassName,
   captionStyle,
+  captionSize = '20',
+  captionWeight = '500',
   captionColor = 'main',
-  captionSize = 'xl',
-  captionWeight = 'medium',
   //
-  fontSize = 'lg',
-  fontWeight = 'normal',
+  fontSize = '18',
+  fontWeight = '400',
   fontColor = 'sub',
   //
   showBaseline = 'always',
@@ -108,16 +108,16 @@ export default function InputSel({
 
   const fontClassName = classNames(
     //
-    `text-${fontSize}`,
-    `font-${fontWeight}`,
-    `text-${fontColor}`
+    `f${fontSize}`,
+    `f${fontWeight}`,
+    `c${fontColor}`
   );
 
-  captionClassName = classNames(
+  const captionFontClassName = classNames(
     //
-    `text-${captionSize}`,
-    `font-[${captionWeight}]`,
-    `text-${captionColor}`
+    `f${captionSize}`,
+    `f${captionWeight}`,
+    `c${captionColor}`
   );
 
   // -----------------------------------------------------------------------
@@ -152,7 +152,12 @@ export default function InputSel({
     >
       {caption && (
         <div
-          className={classNames(scss.caption, wrapperPreStyle && scss[wrapperPreStyle], captionClassName)}
+          className={classNames(
+            captionFontClassName,
+            scss.caption,
+            wrapperPreStyle && scss[wrapperPreStyle],
+            captionClassName
+          )}
           style={captionStyle}
         >
           <span>{caption}</span>
@@ -323,5 +328,3 @@ export default function InputSel({
     </label>
   );
 }
-
-// =============================================================================
