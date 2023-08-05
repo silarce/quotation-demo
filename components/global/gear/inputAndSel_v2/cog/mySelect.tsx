@@ -30,6 +30,7 @@ export type TselectProps<
 > = {
   props?: Props<Option, IsMulti, Group>;
   wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
   arrowType?: 'red' | 'black';
   fontClassName?: string;
 };
@@ -39,7 +40,7 @@ export default function MySelect<
   Option = Toption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->({ props, wrapperClassName, arrowType, fontClassName }: TselectProps<Option, IsMulti, Group>) {
+>({ props, wrapperClassName, wrapperStyle, arrowType, fontClassName }: TselectProps<Option, IsMulti, Group>) {
   // 客製化元件
   // 箭頭
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -57,7 +58,7 @@ export default function MySelect<
 
   // -------------------------------------------------------------------------
   return (
-    <div className={classNames(scss.selectBox, wrapperClassName)}>
+    <div className={classNames(scss.selectBox, wrapperClassName)} style={wrapperStyle}>
       <Select
         components={{
           DropdownIndicator,

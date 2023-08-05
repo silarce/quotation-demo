@@ -19,13 +19,19 @@ interface TextareaAutosizeProps extends Omit<TextareaProps, 'style'> {
 export type TtextareaProps = {
   props?: TextareaAutosizeProps;
   wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
   allowNewLineByUser?: boolean;
 };
 
 // =====================================================================
-export default function Textarea({ wrapperClassName, props, allowNewLineByUser = false }: TtextareaProps) {
+export default function Textarea({
+  wrapperClassName,
+  wrapperStyle,
+  props,
+  allowNewLineByUser = false,
+}: TtextareaProps) {
   return (
-    <div className={classNames(scss.textareaBox, wrapperClassName)}>
+    <div className={classNames(scss.textareaBox, wrapperClassName)} style={wrapperStyle}>
       <TextareaAutosize
         autoComplete="off"
         onKeyDown={(e) => {

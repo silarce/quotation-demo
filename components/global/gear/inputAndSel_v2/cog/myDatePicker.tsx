@@ -15,17 +15,12 @@ import scss from '../inputSel.module.scss';
 export type TdatePickerProps = {
   props?: DatePickerProps;
   wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
 };
 
-export default function MyDatePicker({
-  props,
-  wrapperClassName,
-}: {
-  props?: DatePickerProps;
-  wrapperClassName?: string;
-}) {
+export default function MyDatePicker({ props, wrapperClassName, wrapperStyle }: TdatePickerProps) {
   return (
-    <div className={classNames(scss.datePickerBox, wrapperClassName)}>
+    <div className={classNames(scss.datePickerBox, wrapperClassName)} style={wrapperStyle}>
       <DatePicker
         locale={locale}
         format={(theMoment) => {

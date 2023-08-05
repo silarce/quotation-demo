@@ -19,6 +19,7 @@ export type TcheckBoxInfo = {
 
 export type TcheckboxProps = {
   wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
   fontClassName?: string;
   onChange?: (v: string[]) => void;
   isRadio?: boolean;
@@ -27,7 +28,14 @@ export type TcheckboxProps = {
 
 // ===================================================================
 
-export default function CheckBar({ wrapperClassName, fontClassName, isRadio, onChange, checkBoxArr }: TcheckboxProps) {
+export default function CheckBar({
+  wrapperClassName,
+  wrapperStyle,
+  fontClassName,
+  isRadio,
+  onChange,
+  checkBoxArr,
+}: TcheckboxProps) {
   const [arr, setArr] = useState(checkBoxArr);
 
   useEffect(() => {
@@ -44,7 +52,7 @@ export default function CheckBar({ wrapperClassName, fontClassName, isRadio, onC
   }, [arr]);
 
   return (
-    <div className={classNames(scss.checkBar, wrapperClassName)}>
+    <div className={classNames(scss.checkBar, wrapperClassName)} style={wrapperStyle}>
       {arr.map((item, index) => {
         const { key, value, label, props } = item;
 

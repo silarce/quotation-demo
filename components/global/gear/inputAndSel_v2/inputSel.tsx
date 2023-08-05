@@ -168,6 +168,7 @@ export default function InputSel({
       {inputProps && (
         <Input
           wrapperClassName={classNames(fontClassName, inputProps.wrapperClassName)}
+          wrapperStyle={inputProps.wrapperStyle}
           inputAttr={{
             disabled,
             placeholder: `請輸入${caption ?? ''}`,
@@ -189,6 +190,7 @@ export default function InputSel({
       {textareaProps && (
         <Textarea
           wrapperClassName={textareaProps.wrapperClassName}
+          wrapperStyle={textareaProps.wrapperStyle}
           allowNewLineByUser={textareaProps.allowNewLineByUser}
           props={{
             disabled,
@@ -212,6 +214,7 @@ export default function InputSel({
       {selectProps && (
         <MySelect
           wrapperClassName={selectProps.wrapperClassName}
+          wrapperStyle={selectProps.wrapperStyle}
           arrowType={selectProps.arrowType}
           fontClassName={fontClassName}
           props={{
@@ -235,6 +238,7 @@ export default function InputSel({
       {datePickerProps && (
         <MyDatePicker
           wrapperClassName={classNames(fontClassName, datePickerProps.wrapperClassName)}
+          wrapperStyle={datePickerProps.wrapperStyle}
           props={{
             disabled,
             placeholder: '例 : 100-01-01',
@@ -256,6 +260,7 @@ export default function InputSel({
       {timePickerProps && (
         <MyTimePicker
           wrapperClassName={classNames(fontClassName, timePickerProps.wrapperClassName)}
+          wrapperStyle={timePickerProps.wrapperStyle}
           props={{
             disabled,
             placeholder: 'HH:mm',
@@ -278,6 +283,7 @@ export default function InputSel({
       {timePickerProps_mui && (
         <MyTimePicker_mui
           wrapperClassName={classNames(fontClassName, timePickerProps_mui.wrapperClassName)}
+          wrapperStyle={timePickerProps_mui.wrapperStyle}
           props={{
             disabled,
             //
@@ -298,6 +304,7 @@ export default function InputSel({
       {checkBoxProps && (
         <CheckBar
           wrapperClassName={classNames(checkBoxProps.wrapperClassName)}
+          wrapperStyle={checkBoxProps.wrapperStyle}
           fontClassName={fontClassName}
           isRadio={checkBoxProps.isRadio}
           onChange={checkBoxProps.onChange}
@@ -307,9 +314,10 @@ export default function InputSel({
 
       {inputSelBarProps && (
         <InputSelBar
+          wrapperClassName={inputSelBarProps.wrapperClassName}
+          wrapperStyle={inputSelBarProps.wrapperStyle}
           fontClassName={fontClassName}
           disabled={inputSelBarProps.disabled}
-          valueContanierClassName={inputSelBarProps.valueContanierClassName}
           propsArr={inputSelBarProps.propsArr}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
