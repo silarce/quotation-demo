@@ -116,7 +116,7 @@ export default function QuotationStateSel({
           const timeString = mDate.format('HH:mm:ss');
 
           return (
-            <>
+            <React.Fragment key={index}>
               <div className={scss.item}>
                 <div>
                   <span>{`${state_from} > ${state_to}`}</span>
@@ -127,7 +127,7 @@ export default function QuotationStateSel({
                 </div>
               </div>
               {!(arr.length - 1 === index) && <hr />}
-            </>
+            </React.Fragment>
           );
         })}
       </div>

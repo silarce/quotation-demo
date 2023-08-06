@@ -18,12 +18,13 @@ import MustTip_simple from '../other/mustTip_simple';
 // css
 import scss from './inputSel.module.scss';
 
-export type { TselectProps };
+export type { TselectProps, TinputProps };
 
 // =============================================================================
 
 export default function InputSel({
   label,
+  suffix,
   placeholder,
 
   captionWidth,
@@ -44,6 +45,7 @@ export default function InputSel({
   captionClassName,
   hrClassName,
   mustTipClassName,
+  suffixClassName,
 
   inputProps,
   selectProps,
@@ -57,6 +59,7 @@ export default function InputSel({
   isMustPreStyle,
 }: {
   label?: string;
+  suffix?: string;
   placeholder?: string;
 
   width?: CSSProperties['width'];
@@ -78,6 +81,7 @@ export default function InputSel({
   captionClassName?: string;
   hrClassName?: string;
   mustTipClassName?: string;
+  suffixClassName?: string;
 
   inputProps?: TinputProps;
   selectProps?: TselectProps;
@@ -196,6 +200,12 @@ export default function InputSel({
       {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />}
 
       {checkProps && <CheckBar checkProps={checkProps} />}
+
+      {suffix && (
+        <div className={classNames(scss.suffix, suffixClassName)}>
+          <span>{suffix}</span>
+        </div>
+      )}
 
       {showBaseline !== 'invisible' && (
         <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />

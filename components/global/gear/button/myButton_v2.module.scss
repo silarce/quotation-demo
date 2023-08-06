@@ -50,4 +50,8 @@
       background-color: $chosenBgc01;
     }
   }
+  &.transparent {
+    background-color: transparent;
+    border: none;
+  }
 }

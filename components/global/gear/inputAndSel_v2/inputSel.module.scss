@@ -2,25 +2,23 @@
 
 .label {
   position: relative;
-
-  // display: grid;
-  // grid-template-columns: fit-content(100%) auto;
-
   display: flex;
   flex-wrap: nowrap;
-
   align-items: center;
   gap: 20px;
   width: 100%;
+
+  &.ps01 {
+    padding: 17px 4px 14px 4px;
+    gap: 40px;
+  }
 
   > * {
     margin-left: 0;
   }
   .caption {
+    position: relative;
     flex: none;
-    font-weight: 500;
-    font-size: 20px;
-    color: $colorText;
     align-self: flex-start;
     > span {
       display: block;
@@ -68,8 +66,8 @@
 
 .inputBox {
   height: fit-content;
-  font-weight: 400;
-  font-size: 18px;
+  // font-weight: 400;
+  // font-size: 18px;
   width: 100%;
   > input {
     display: block;
@@ -88,8 +86,8 @@
   > textarea {
     display: block;
     width: 100%;
-    font-weight: 400;
-    font-size: 18px;
+    // font-weight: 400;
+    // font-size: 18px;
     resize: none;
     background-color: transparent;
     &::placeholder {
@@ -99,30 +97,61 @@
 } // textareaBox
 
 .datePickerBox {
+  width: 100%;
   .timePicker {
     padding: 0;
-    input {
-      font-weight: 400;
-      font-size: 18px;
-      width: 100%;
-      resize: none;
-      &::placeholder {
-        color: $colorBorder01;
+    width: 100%;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+    line-height: unset;
+    border: none;
+    :global(.ant-picker-input) {
+      font-weight: inherit;
+      font-size: inherit;
+      color: inherit;
+      line-height: unset;
+      input {
+        width: 100%;
+        font-weight: inherit;
+        font-size: inherit;
+        color: inherit;
+        line-height: unset;
+        // line-height: 28px;
+        cursor: pointer;
+        &::placeholder {
+          color: $colorBorder01;
+        }
       }
     }
   }
 } // datePickerBox
 
 .timePickerBox {
+  width: 100%;
   .timePicker {
+    width: 100%;
     padding: 0;
-    input {
-      font-weight: 400;
-      font-size: 18px;
-      width: 100%;
-      resize: none;
-      &::placeholder {
-        color: $colorBorder01;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+    line-height: unset;
+    border: none;
+    :global(.ant-picker-input) {
+      font-weight: inherit;
+      font-size: inherit;
+      color: inherit;
+      line-height: unset;
+      input {
+        width: 100%;
+        font-weight: inherit;
+        font-size: inherit;
+        color: inherit;
+        line-height: unset;
+        cursor: pointer;
+        &::placeholder {
+          color: $colorBorder01;
+        }
       }
     }
   }
@@ -171,8 +200,6 @@
   font-weight: 400;
   font-size: 18px;
   width: 100%;
-  // color: $colorText;
-  // color: pink;
 }
 
 // ------------
@@ -201,11 +228,11 @@ div.selControl {
   z-index: 3;
 }
 
-div.selOption {
+.selOption.plus {
   position: relative;
   padding: 10px 17px;
   padding-bottom: 11px; //配合::after的height
-  color: $colorText;
+  // color: $colorText;
   font-weight: 400;
   font-size: 18px;
   // border-bottom: solid 1px $colorBorder01;
@@ -242,9 +269,9 @@ div.selOption {
 }
 
 .selValueContainer {
-  color: $colorText;
-  font-weight: 400;
-  font-size: 18px;
+  // color: $colorText;
+  // font-weight: 400;
+  // font-size: 18px;
 }
 
 .selPlaceholder {
@@ -252,31 +279,9 @@ div.selOption {
 }
 
 .selSingleValue {
-  color: $colorText;
-  font-weight: 400;
-  font-size: 18px;
-}
-
-// ===========================
-.fontSize12px,
-div.fontSize12px {
-  font-size: 12px;
-}
-.fontSize14px,
-div.fontSize14px {
-  font-size: 14px;
-}
-.fontSize16px,
-div.fontSize16px {
-  font-size: 16px;
-}
-.fontSize18px,
-div.fontSize18px {
-  font-size: 18px;
-}
-.fontSize20px,
-div.fontSize20px {
-  font-size: 20px;
+  // color: $colorText;
+  // font-weight: 400;
+  // font-size: 18px;
 }
 
 // =================================================================
@@ -290,30 +295,28 @@ div.fontSize20px {
     width: fit-content;
   }
 
-  .wrapper {
-    text-align: right;
-    cursor: pointer;
-    > span {
-      font-size: 18px;
-      color: $colorMain;
+  .antdCheck {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    transform: translateY(-1px);
+    > span:nth-of-type(2) {
+      padding: 0;
       margin-right: 7px;
     }
-    .antdCheck {
-      transform: translateY(-1px);
-      :global(.ant-checkbox) {
-        :global(.ant-checkbox-inner) {
-          // width: 15px;
-          // height: 15px;
-          border-color: $colorBorder01;
-        }
-      }
-      :global(.ant-checkbox-checked) {
-        :global(.ant-checkbox-inner) {
-          background-color: $colorMain;
-        }
+    :global(.ant-checkbox) {
+      :global(.ant-checkbox-inner) {
+        // width: 15px;
+        // height: 15px;
+        border-color: $colorBorder01;
       }
     }
-  }
+    :global(.ant-checkbox-checked) {
+      :global(.ant-checkbox-inner) {
+        background-color: $colorMain;
+      }
+    }
+  } // antdCheck
 }
 
 // =================================================================
@@ -323,6 +326,9 @@ div.fontSize20px {
   width: 100%;
   .timePicker_mui {
     width: 100%;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
 
     &:global(.MuiFormControl-root) {
       display: block;
@@ -331,15 +337,18 @@ div.fontSize20px {
       padding: 0;
       display: block;
       line-height: inherit;
-    }
-
-    input {
-      padding: 0;
-      font-size: 18px;
-      font-weight: 400;
-      font-family: "Noto Sans TC", sans-serif;
-      height: auto;
-      line-height: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      color: inherit;
+      input {
+        padding: 0;
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        font-family: "Noto Sans TC", sans-serif;
+        height: auto;
+        line-height: inherit;
+      }
     }
 
     fieldset {
@@ -349,7 +358,20 @@ div.fontSize20px {
     }
 
     :global(.MuiInputAdornment-root) {
-      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 0;
+      > button {
+        width: 100%;
+        height: 100%;
+        border-radius: unset;
+      }
+      svg {
+        display: none;
+      }
     }
   }
 }
