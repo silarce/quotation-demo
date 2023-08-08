@@ -11,12 +11,13 @@ import scss from '../inputSel.module.scss';
 
 export type TtimePickerProps = {
   wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
   props?: TimePickerProps;
 };
 
-export default function MyTimePicker({ wrapperClassName, props }: TtimePickerProps) {
+export default function MyTimePicker({ wrapperClassName, wrapperStyle, props }: TtimePickerProps) {
   return (
-    <div className={classNames(scss.timePickerBox, wrapperClassName)}>
+    <div className={classNames(scss.timePickerBox, wrapperClassName)} style={wrapperStyle}>
       <TimePicker
         locale={locale}
         format="HH-mm"

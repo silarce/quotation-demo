@@ -14,22 +14,17 @@ import scss from '../inputSel.module.scss';
 
 export type TtimePickerProps_mui = {
   wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
   props?: TimePickerProps<Moment>;
 };
 
 // ==============================================================================
-export default function MyTimePicker_mui({
-  wrapperClassName,
-  props,
-}: {
-  wrapperClassName?: string;
-  props?: TimePickerProps<Moment>;
-}) {
+export default function MyTimePicker_mui({ wrapperClassName, wrapperStyle, props }: TtimePickerProps_mui) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ref_wrapper = useRef<HTMLDivElement>(null!);
 
   return (
-    <div ref={ref_wrapper} className={classNames(scss.timePicker_mui_wrapper, wrapperClassName)}>
+    <div ref={ref_wrapper} className={classNames(scss.timePicker_mui_wrapper, wrapperClassName)} style={wrapperStyle}>
       <LocalizationProvider dateAdapter={AdapterMoment}>
         <TimePicker
           ampm={false}
