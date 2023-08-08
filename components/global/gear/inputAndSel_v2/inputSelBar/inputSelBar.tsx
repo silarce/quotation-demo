@@ -26,7 +26,8 @@ export type TselInputPropsArr = (TinputPropsWrapper | TselectPropsWrapper | Ttex
 export type TinputSelBarProps = {
   disabled?: boolean;
   fontClassName?: string;
-  valueContanierClassName?: string;
+  wrapperClassName?: string;
+  wrapperStyle?: React.CSSProperties;
   propsArr: TselInputPropsArr;
   onFocus?: (e: React.FocusEvent) => void;
   onBlur?: (e: React.FocusEvent) => void;
@@ -36,13 +37,14 @@ export type TinputSelBarProps = {
 const InputSelBar = ({
   disabled,
   fontClassName,
-  valueContanierClassName,
+  wrapperClassName,
+  wrapperStyle,
   propsArr,
   onFocus,
   onBlur,
 }: TinputSelBarProps) => {
   return (
-    <div className={classNames(scss.valueContainer, valueContanierClassName)}>
+    <div className={classNames(scss.container, wrapperClassName)} style={wrapperStyle}>
       {propsArr.map((item, index) => {
         const { type, itemProps } = item;
 
@@ -50,8 +52,8 @@ const InputSelBar = ({
           return (
             <Input
               key={index}
+              {...itemProps}
               wrapperClassName={classNames(fontClassName, itemProps?.wrapperClassName)}
-              // wrapperClassName={props?.wrapperClassName}
               inputAttr={{
                 disabled,
                 ...itemProps?.inputAttr,
@@ -72,8 +74,9 @@ const InputSelBar = ({
           return (
             <Textarea
               key={index}
-              wrapperClassName={itemProps?.wrapperClassName}
-              allowNewLineByUser={itemProps?.allowNewLineByUser}
+              {...itemProps}
+              // wrapperClassName={itemProps?.wrapperClassName}
+              // allowNewLineByUser={itemProps?.allowNewLineByUser}
               props={{
                 disabled,
                 ...itemProps?.props,
@@ -95,9 +98,12 @@ const InputSelBar = ({
           return (
             <MySelect
               key={index}
-              wrapperClassName={itemProps?.wrapperClassName}
-              arrowType={itemProps?.arrowType || 'black'}
               fontClassName={fontClassName}
+              arrowType={'black'}
+              //
+              {...itemProps}
+              //
+              wrapperClassName={classNames(itemProps?.wrapperClassName)}
               props={{
                 isDisabled: disabled,
                 ...itemProps?.props,
