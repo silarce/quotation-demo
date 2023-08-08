@@ -35,15 +35,19 @@
 
   .table {
     white-space: nowrap;
+    width: fit-content;
     > * {
       display: inline-block;
       vertical-align: top;
     }
 
     .side {
+      position: sticky;
+      left: 0;
+      z-index: 2;
       .head {
         position: sticky;
-        top: 0dvi;
+        top: 0;
         z-index: 1;
         width: 66px;
         height: 70px;
@@ -62,7 +66,7 @@
           }
         }
       }
-    }
+    } // side
 
     .main {
       white-space: nowrap;
