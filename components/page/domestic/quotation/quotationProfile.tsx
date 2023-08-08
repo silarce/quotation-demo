@@ -4,8 +4,9 @@ import { format } from 'date-fns';
 // components
 import ClientSelector from './modal/clientSelector';
 // glogal gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
-import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import AddressBar, { TaddressProps } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+// import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address';
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
@@ -18,11 +19,18 @@ import { Toption } from 'js/utils/options/countryAndDistrict';
 import { Class_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
 
 // ====================================================
-const inputStyle = {
-  captionWidth: '80px',
-  gap: '24px',
+
+const wrapperStyle = {
   padding: '21px 0px 4px 0px',
-  labelWidth: '80px',
+  gap: '24px',
+};
+const captionStyle = {
+  width: '80px',
+};
+
+const inputSelProps: TinputSelProps = {
+  wrapperStyle,
+  captionStyle,
 };
 
 // ====================================================
@@ -81,26 +89,41 @@ export default function QuotationProfile({
   const styleHaveState = clientState ? scss.haveState : '';
   // ==============================================
   // 工程地點
-  const selectInputList = {
-    county: constructionCounty,
-    onChangeCounty: (option: Toption | null) => {
-      if (!option) {
-        return;
-      }
+  const addressProps: TaddressProps = {
+    county: {
+      props: {
+        // value: { value: constructionCounty, label: constructionCounty },
+        value: constructionCounty ? { value: constructionCounty, label: constructionCounty } : null,
+        onChange: (option: Toption | null) => {
+          if (!option) {
+            return;
+          }
 
-      setBasicInfoString('constructionCounty', option.value);
-      setBasicInfoString('constructionDistrict', '');
+          setBasicInfoString('constructionCounty', option.value);
+          setBasicInfoString('constructionDistrict', '');
+        },
+      },
     },
-    district: constructionDistrict,
-    onChangeDistrict: (option: Toption | null) => {
-      if (!option) {
-        return;
-      }
+    district: {
+      props: {
+        value: constructionDistrict ? { value: constructionDistrict, label: constructionDistrict } : null,
+        onChange: (option: Toption | null) => {
+          if (!option) {
+            return;
+          }
 
-      setBasicInfoString('constructionDistrict', option.value);
+          setBasicInfoString('constructionDistrict', option.value);
+        },
+      },
     },
-    address: constructionAddress,
-    onChangeAddress: (value: string) => setBasicInfoString('constructionAddress', value),
+    address: {
+      props: {
+        value: constructionAddress,
+        onChange: (e) => {
+          setBasicInfoString('constructionAddress', e.target.value);
+        },
+      },
+    },
   };
 
   // ==============================================
@@ -119,13 +142,15 @@ export default function QuotationProfile({
       <div className={scss.profile}>
         <span className={`${scss.clientState}  ${styleHaveState}`}>狀態 : {clientState || '尚未選擇客戶'}</span>
         <InputSel
-          label="工程名稱"
+          caption="工程名稱"
           disabled={disabled}
-          {...{ ...inputStyle }}
-          inputProps={{
-            value: constructionName,
-            onChange: (v) => {
-              setBasicInfoString('constructionName', v);
+          {...inputSelProps}
+          textareaProps={{
+            props: {
+              value: constructionName,
+              onChange: (e) => {
+                setBasicInfoString('constructionName', e.target.value);
+              },
             },
           }}
         />
@@ -134,16 +159,17 @@ export default function QuotationProfile({
           <div className={`${scss.clientName} ${disabled ? scss.disabled : ''}`}>
             <div>
               <InputSel
-                label={'客戶名稱'}
-                placeholder={''}
+                caption={'客戶名稱'}
                 disabled={true}
                 showBaseline="invisible"
                 captionClassName={scss.input02}
-                captionWidth={inputStyle.captionWidth}
-                gap={inputStyle.gap}
+                captionStyle={{ width: captionStyle.width }}
+                wrapperStyle={{ gap: wrapperStyle.gap }}
                 textareaProps={{
-                  value: clientName ?? '',
-                  onChange: () => {},
+                  props: {
+                    placeholder: undefined,
+                    value: clientName ?? '',
+                  },
                 }}
               />
               {!clientName && <button onClick={openModal}>請選擇客戶</button>}
@@ -159,15 +185,16 @@ export default function QuotationProfile({
               return (
                 <InputSel
                   key={index}
-                  label={label}
-                  placeholder={placeholder}
+                  caption={label}
                   captionClassName={scss.input02}
                   disabled={true}
                   showBaseline="invisible"
-                  {...{ ...inputStyle }}
+                  {...inputSelProps}
                   inputProps={{
-                    value: value ?? '',
-                    onChange: () => {},
+                    props: {
+                      placeholder: placeholder,
+                      value: value ?? '',
+                    },
                   }}
                 />
               );
@@ -175,82 +202,98 @@ export default function QuotationProfile({
           </div>
           <div>
             <InputSel
-              label="追蹤狀態"
+              caption="追蹤狀態"
               captionClassName={scss.input02}
               showBaseline="auto"
               disabled={disabled}
-              {...{ ...inputStyle }}
+              {...inputSelProps}
               inputProps={{
-                value: trackingStatus,
-                onChange: (v) => {
-                  setBasicInfoString('trackingStatus', v);
+                props: {
+                  value: trackingStatus,
+                  onChange: (e) => {
+                    setBasicInfoString('trackingStatus', e.target.value);
+                  },
                 },
               }}
             />
 
             <InputSel
-              label="工地進度"
+              caption="工地進度"
               captionClassName={scss.input02}
               showBaseline="auto"
               disabled={disabled}
-              {...{ ...inputStyle }}
+              {...inputSelProps}
               inputProps={{
-                value: siteProgress,
-                onChange: (v) => {
-                  setBasicInfoString('siteProgress', v);
+                props: {
+                  value: siteProgress,
+                  onChange: (e) => {
+                    setBasicInfoString('siteProgress', e.target.value);
+                  },
                 },
               }}
             />
           </div>
         </div>{' '}
         {/* form02 */}
-        <InputSelBar_address
-          label="工程地點"
-          captionClassName={scss.input02}
-          showBaseline="auto"
-          {...{ ...inputStyle }}
-          addressProps={selectInputList}
-          disabled={disabled}
+        <AddressBar
+          addressProps={addressProps}
+          inputSelProps={{
+            caption: '工程地點',
+            disabled,
+            captionClassName: scss.input02,
+            showBaseline: 'auto',
+            captionStyle,
+            wrapperStyle: { padding: wrapperStyle.padding, gap: wrapperStyle.gap },
+          }}
         />
       </div>
 
       <div className={scss.time}>
         <div>
           <InputSel
-            label="報價編號"
+            disabled={true}
+            caption="報價編號"
             showBaseline="invisible"
             captionClassName={scss.caption}
-            gap="24px"
+            wrapperStyle={{ gap: wrapperStyle.gap }}
             inputProps={{
-              value: quotationId,
-            }}
-          />
-        </div>
-        <div>
-          <InputSel
-            label="報價時效"
-            showBaseline="auto"
-            disabled={disabled}
-            suffix="天內"
-            suffixClassName="text-[18px]"
-            captionClassName={scss.caption}
-            gap="24px"
-            inputProps={{
-              value: tempQuotationAging,
-              onChange: (v) => {
-                setBasicInfoString('tempQuotationAging', v);
+              props: {
+                value: quotationId,
               },
             }}
           />
         </div>
         <div>
           <InputSel
-            label="報價日期"
+            caption="報價時效"
+            showBaseline="auto"
+            disabled={disabled}
+            suffix="天內"
+            suffixClassName="text-[18px]"
+            captionClassName={scss.caption}
+            wrapperStyle={{ gap: wrapperStyle.gap }}
+            inputProps={{
+              props: {
+                value: tempQuotationAging,
+                onChange: (e) => {
+                  setBasicInfoString('tempQuotationAging', e.target.value);
+                },
+              },
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            disabled={true}
+            caption="報價日期"
             showBaseline="invisible"
             captionClassName={scss.caption}
-            gap="24px"
+            wrapperStyle={{ gap: wrapperStyle.gap }}
             inputProps={{
-              value: builtDate,
+              props: {
+                placeholder: '無日期',
+                value: builtDate,
+              },
             }}
           />
         </div>
