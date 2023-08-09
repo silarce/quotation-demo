@@ -145,7 +145,7 @@ export default function InputSel({
       className={classNames(scss.label, className)}
       style={wrapperStyle}
       onClick={(e) => {
-        if (inputSelBarProps) {
+        if (inputSelBarProps || checkBoxProps) {
           e.preventDefault();
         }
       }}
@@ -308,7 +308,7 @@ export default function InputSel({
           fontClassName={fontClassName}
           isRadio={checkBoxProps.isRadio}
           onChange={checkBoxProps.onChange}
-          checkBoxArr={checkBoxProps.checkBoxArr}
+          propsArr={checkBoxProps.propsArr}
         />
       )}
 
