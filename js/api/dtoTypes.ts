@@ -646,27 +646,6 @@ export type TquotationRangeDto = {
 
 // ==========================================================================
 
-export type TcreateQuotationContentDto = {
-  quotationNumber: string; // 報價單編號
-  version: number; // 版本號
-  quotationDate: Date; // 報價日期
-  validityPeriod: string; // 報價時效
-  customerId: string; // 客戶ID
-  projectName: string; // 工程名稱
-  county: string; // 縣市
-  district: string; // 區
-  contactPerson: string; //  聯絡人
-  contactNumber: string; //  聯絡電話
-  projectManager: string; // 承辦人
-  discount: number; // 總折數
-  quantity: string; // 樘數
-  editNotes: string; // 編輯備註
-  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態
-  managerId: string; // 經理ID
-  supervisorId: string; // 主管ID
-  agentId: string; // 經辦人ID
-};
-
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
@@ -694,4 +673,62 @@ export type TupdateDepartmentJobDto = {
   code?: string;
   id: string;
   jobs: TcreateDepartmentJobDto[];
+};
+
+// ==========================================================================
+
+// quotation
+
+export type TquotationContentDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  version: number;
+  quotationDate: string;
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  contactPerson: string;
+  contactNumber: string;
+  discount: string;
+  quantity: number;
+  editNotes: string;
+  totalPrice: number;
+  status: 'Budget' | 'Bidding' | 'Contracting';
+  customer: TcustomerDto;
+  managerEmployee: TemployeeDto | null;
+  suervisorEmployee: TemployeeDto | null;
+  agentEmployee: TemployeeDto;
+};
+
+export type TquotationDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  latestContent: TquotationContentDto;
+  contents: TquotationContentDto;
+};
+
+export type TcreateQuotationContentDto = {
+  quotationNumber: string; // 報價單編號
+  version: number; // 版本號
+  quotationDate: Date; // 報價日期
+  validityPeriod: string; // 報價時效
+  customerId: string; // 客戶ID
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  projectManager: string; // 承辦人
+  discount: number; // 總折數
+  quantity: string; // 樘數
+  editNotes: string; // 編輯備註
+  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態
+  managerId: string; // 經理ID
+  supervisorId: string; // 主管ID
+  agentId: string; // 經辦人ID
 };
