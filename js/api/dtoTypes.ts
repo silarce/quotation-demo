@@ -713,9 +713,7 @@ export type TquotationDto = {
 };
 
 export type TcreateQuotationContentDto = {
-  quotationNumber: string; // 報價單編號
-  version: number; // 版本號
-  quotationDate: Date; // 報價日期
+  quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
   customerId: string; // 客戶ID
   projectName: string; // 工程名稱
@@ -723,12 +721,17 @@ export type TcreateQuotationContentDto = {
   district: string; // 區
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
-  projectManager: string; // 承辦人
-  discount: number; // 總折數
-  quantity: string; // 樘數
+  discount: string; // 總折數
+  quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態
-  managerId: string; // 經理ID
-  supervisorId: string; // 主管ID
+  totalPrice: number; // 報價金額
+  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  managerId?: string | undefined | null; // 經理ID
+  supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
+
+  // quotationNumber: string; // 報價單編號
+  // version: number; // 版本號
+  // customerId: string; // 客戶ID
+  // projectManager: string; // 承辦人
 };

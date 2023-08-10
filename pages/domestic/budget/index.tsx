@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import _ from 'lodash';
 
@@ -36,18 +36,25 @@ import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleA
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
 // 點進去的報價單也一樣，僅是取得之資料的狀態不同
 
+// ===========================================
+// ===========================================
+
+import { useGetQuotation, apiPostQuotation } from 'js/api/api_quotation';
+
+// ===========================================
+// ===========================================
+
 export default function Budget() {
   const router = useRouter();
+  // ===========================================
 
-  // 資料
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple });
-  const projectArr = projectSimple.wrapper.get({
-    filter: {
-      county: router.query.county as string,
-      clientName: router.query.clientName as string,
-      constructionName: router.query.projectName as string,
-    },
-  });
+  const { data: quoatationArr, meta, update } = useGetQuotation();
+
+  useEffect(() => {
+    update();
+  }, []);
+
+  // ===========================================
 
   // ----------------------------------------------------------
   // panelList
@@ -106,12 +113,12 @@ export default function Budget() {
       type: 'addButton',
       label: '新增報價單',
       onClick: () => {
-        let newQuotationId = `${projectArr.length + 1}`.padStart(2, '0');
-        newQuotationId = 'S-110211-' + newQuotationId;
+        // let newQuotationId = `${projectArr.length + 1}`.padStart(2, '0');
+        // newQuotationId = 'S-110211-' + newQuotationId;
         router.push({
           pathname: `/domestic/budget/quotation`,
           query: {
-            quotationId: newQuotationId,
+            quotationId: 'new',
             isNewQuotation: true,
           },
         });
@@ -126,7 +133,7 @@ export default function Budget() {
       <PageHeader02 tag="預算" panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
-        <BudgeList className="m-[4px] mt-0" budgetList={projectArr} />
+        <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
       </div>
     </SubLayer>
   );

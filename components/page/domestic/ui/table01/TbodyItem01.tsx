@@ -1,6 +1,7 @@
 import { MouseEvent } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
+import moment from 'moment';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -13,73 +14,64 @@ import iconLongArrow from 'public/image/icon/longArrow.svg';
 // css
 import scss from './tbodyItem01.module.scss';
 
-// =================================================================
-// type
-type Tdata = {
-  basicInfo: {
-    quotationId: string;
-    constructionName: string;
-    /**承辦人 */
-    undertaker: string;
-    totalDiscount: string | number;
-    tempDoorQty: string | number;
-    tempBudgetAmount: string | number;
-    date: string;
-    constructionCounty: string;
-  };
-  clientData: {
-    name: string;
-    contact: { name: string; phone: string }[];
-  };
-};
+import { TquotationContentDto } from 'js/api/api_quotation';
+
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // =============================================================================
 export default function TbodyItem01({
-  projectData: projectData,
+  quotationContent,
   isActive,
   openQuotation,
-  approvalsStatus,
-}: {
-  // projectData: TprojectSimple
-  projectData: Tdata;
+}: // approvalsStatus,
+{
+  quotationContent: TquotationContentDto;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
-  approvalsStatus?: string;
+  // approvalsStatus?: string;
 }) {
   const {
-    quotationId,
-    constructionName: projectName,
-    undertaker,
-    totalDiscount: discount,
-    tempDoorQty: doorQty,
-    tempBudgetAmount: budgetAmount,
-    date,
-    constructionCounty: country,
-  } = projectData.basicInfo;
-  const clientData = projectData.clientData;
+    // id,
+    // createdAt,
+    // updateAt,
+    quotationNumber,
+    // version,
+    quotationDate,
+    // validityPeriod,
+    projectName,
+    county,
+    // district,
+    contactPerson,
+    contactNumber,
+    discount,
+    quantity,
+    // editNotes,
+    totalPrice,
+    // status,
+    customer,
+    // managerEmployee,
+    // suervisorEmployee,
+    agentEmployee,
+  } = quotationContent;
 
-  const { name: clientName, contact } = clientData;
-  const { name: contactName, phone: contactPhone } = contact[0];
+  const { name: customerName } = customer;
 
-  let formatedBudgetAmount: string | number = budgetAmount;
+  const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
 
-  if (typeof formatedBudgetAmount === 'string') {
-    formatedBudgetAmount = parseFloat(formatedBudgetAmount);
-  }
-
-  formatedBudgetAmount = formatedBudgetAmount.toLocaleString();
+  const approvalsStatus = '待審核 '; // 之後api會再補這個狀態資料
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive}>
       <div className={scss.row01}>
-        <span>{quotationId}</span>
-        <span className={scss.clientName}>{clientName}</span>
-        <span>{contactName}</span>
-        <span>{contactPhone}</span>
-        <span>{undertaker}</span>
+        <span>{quotationNumber}</span>
+        <span className={scss.clientName}>{customerName}</span>
+        <span>{contactPerson}</span>
+        <span>{contactNumber}</span>
+        <span>{agentEmployee.chName || agentEmployee.enName}</span>
         <span>{discount}</span>
-        <span>{doorQty}</span>
-        <span>{formatedBudgetAmount}</span>
+        <span>{quantity}</span>
+        <span>{totalPrice.toLocaleString()}</span>
         <div>
           <IconDetail onClick={openQuotation} />
         </div>
@@ -90,7 +82,7 @@ export default function TbodyItem01({
         <div className={scss.place}>
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconPlace.src} alt="place" />
-          <span className={scss.country}>{country}</span>
+          <span className={scss.country}>{county}</span>
         </div>
         <span>{projectName}</span>
         <div></div>
