@@ -51,7 +51,13 @@ export const apiGetQuotation_Id = async (id: string) => {
   const api = `/quotation/${id}`;
 
   const params = {
-    populate: ['contents', 'latestContent.customer', 'latestContent.agentEmployee'],
+    populate: [
+      'contents',
+      'latestContent.customer',
+      'latestContent.agentEmployee',
+      'latestContent.supervisorEmployee',
+      'latestContent.managerEmployee',
+    ],
   };
 
   return axi
@@ -87,7 +93,16 @@ export const apiPostQuotation = (body: TcreateQuotationContentDto) => {
   const api = '/quotation';
 
   return axi
-    .post<TgetQuotation>(api, body)
+    .post<TquotationDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) => {
+  const api = `/quotation/${id}`;
+
+  return axi
+    .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };

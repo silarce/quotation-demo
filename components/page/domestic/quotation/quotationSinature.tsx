@@ -3,13 +3,18 @@ import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inp
 // css
 import style from './quotationSinature.module.scss';
 
-export type { TinputProps };
+type TsignatureProps = {
+  label: string;
+  inputProps: TinputProps;
+};
+
+export type { TinputProps, TsignatureProps };
 
 export default function QuotationSinature({
   signatureArr,
   disabled = false,
 }: {
-  signatureArr: { label: string; inputProps: TinputProps }[];
+  signatureArr: TsignatureProps[];
   disabled: boolean;
 }) {
   return (

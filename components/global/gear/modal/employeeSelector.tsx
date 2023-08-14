@@ -19,6 +19,8 @@ import { Tparams, TapiGetEmployeeParams, useEmployee } from 'js/api/api_employee
 
 import { AppContext } from 'pages/_app';
 
+export type { TemployeeDto };
+
 export default function EmployeeSelector({
   showModal,
   onConfirm,

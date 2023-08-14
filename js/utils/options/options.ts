@@ -220,9 +220,9 @@ export const optionsCreator_horsepower = (): Toption[] => [
 ];
 // 報價單狀態
 export const optionsCreator_quotationState = (): Toption[] => [
-  { value: '預算', label: '預算' },
-  { value: '投標', label: '投標' },
-  { value: '發包', label: '發包' },
+  { value: 'Budget', label: '預算' },
+  { value: 'Bidding', label: '投標' },
+  { value: 'Contracting', label: '發包' },
 ];
 
 export const optionsCreator_month = ({

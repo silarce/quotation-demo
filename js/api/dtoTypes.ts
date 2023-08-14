@@ -111,7 +111,7 @@ export type TcustomerDto = {
   invoiceDistrict: string;
   invoiceAddress: string;
   contacts?: Tcontact[];
-  types?: {
+  types: {
     //客戶類型
     id: string;
     createdAt: string;
@@ -690,6 +690,7 @@ export type TquotationContentDto = {
   projectName: string; // 工程名稱
   county: string; // 縣市
   district: string; // 區
+  address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
   discount: string; // 總折數
@@ -699,7 +700,7 @@ export type TquotationContentDto = {
   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
   customer: TcustomerDto;
   managerEmployee: TemployeeDto | null;
-  suervisorEmployee: TemployeeDto | null;
+  supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
 };
 
@@ -709,7 +710,7 @@ export type TquotationDto = {
   updateAt: string;
   quotationNumber: string;
   latestContent: TquotationContentDto;
-  contents: TquotationContentDto;
+  contents: TquotationContentDto[];
 };
 
 export type TcreateQuotationContentDto = {
@@ -719,9 +720,11 @@ export type TcreateQuotationContentDto = {
   projectName: string; // 工程名稱
   county: string; // 縣市
   district: string; // 區
+  address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
-  discount: string; // 總折數
+  // discount: string; // 總折數
+  discount: number; // 總折數
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   totalPrice: number; // 報價金額
