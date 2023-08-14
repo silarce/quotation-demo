@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 // components
 import Thead01 from '../ui/table01/Thead01';
-import TbodyItem01 from '../ui/table01/TbodyItem01';
+import TbodyItem01, { TBodyItemContent } from '../ui/table01/TbodyItem01';
 import PanelBody from './budgetList/tableBody';
 // antd
 import { Collapse } from 'antd';
@@ -60,12 +60,24 @@ export default function BudgetList({
               });
             };
 
+            const quotationContent: TBodyItemContent = {
+              ...quotation.latestContent,
+              customerName: quotation.latestContent.customer.name,
+              agentEmployeeName:
+                quotation.latestContent.agentEmployee.chName || quotation.latestContent.agentEmployee.enName,
+            };
+
             return (
               <Panel
                 key={index}
                 className={style.panel}
                 header={
-                  <TbodyItem01 quotationContent={latestContent} isActive={isActive} openQuotation={openQuotation} />
+                  <TbodyItem01
+                    quotationContent={quotationContent}
+                    isActive={isActive}
+                    openQuotation={openQuotation}
+                    approvalsStatus="待審核"
+                  />
                 }
               >
                 {/* 等api補資料再作 */}

@@ -15,51 +15,57 @@ import iconLongArrow from 'public/image/icon/longArrow.svg';
 import scss from './tbodyItem01.module.scss';
 
 import { TquotationContentDto } from 'js/api/api_quotation';
+import { TcustomerDto, TemployeeDto } from 'js/api/dtoTypes';
 
 // utils
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+
+// =============================================================================
+type TBodyItemContent = {
+  quotationNumber: string;
+  quotationDate: string;
+  projectName: string;
+  county: string;
+  contactPerson: string;
+  contactNumber: string;
+  discount: string;
+  quantity: number;
+  totalPrice: number;
+  customerName: string;
+  agentEmployeeName: string;
+};
+
+export type { TBodyItemContent };
 
 // =============================================================================
 export default function TbodyItem01({
   quotationContent,
   isActive,
   openQuotation,
-}: // approvalsStatus,
-{
-  quotationContent: TquotationContentDto;
+  approvalsStatus,
+}: {
+  quotationContent: TBodyItemContent;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
-  // approvalsStatus?: string;
+  approvalsStatus?: string;
 }) {
   const {
-    // id,
-    // createdAt,
-    // updateAt,
     quotationNumber,
-    // version,
     quotationDate,
-    // validityPeriod,
     projectName,
     county,
-    // district,
     contactPerson,
     contactNumber,
     discount,
     quantity,
-    // editNotes,
     totalPrice,
-    // status,
-    customer,
-    // managerEmployee,
-    // suervisorEmployee,
-    agentEmployee,
+    customerName,
+    agentEmployeeName,
   } = quotationContent;
-
-  const { name: customerName } = customer;
 
   const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
 
-  const approvalsStatus = '待審核 '; // 之後api會再補這個狀態資料
+  // const approvalsStatus = '待審核 '; // 之後api會再補這個狀態資料
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive}>
@@ -68,7 +74,7 @@ export default function TbodyItem01({
         <span className={scss.clientName}>{customerName}</span>
         <span>{contactPerson}</span>
         <span>{contactNumber}</span>
-        <span>{agentEmployee.chName || agentEmployee.enName}</span>
+        <span>{agentEmployeeName}</span>
         <span>{discount}</span>
         <span>{quantity}</span>
         <span>{totalPrice.toLocaleString()}</span>
