@@ -11,6 +11,9 @@ import CustomerSelector from 'components/global/gear/modal/customerSelector';
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
+// config
+import { customerTypesLookup } from 'js/api/api_customer';
+
 // css
 import scss from './quotationProfile.module.scss';
 
@@ -108,6 +111,7 @@ export default function QuotationProfile({
   const [customerOri, setCustomerOri] = useState<TcustomerDto_TC>();
 
   // 客戶名稱與與傳真號碼要從data_customer取得
+  // 還有客戶types
 
   // ----------------------------------------------------------------
 
@@ -159,7 +163,8 @@ export default function QuotationProfile({
   const addressProps: TaddressProps = {
     county: {
       props: {
-        value: county ? { value: county, label: county } : null,
+        isDisabled: disabled,
+        value: watch('county') ? { value: watch('county'), label: watch('county') } : null,
         onChange: (option: Toption | null) => {
           if (!option) {
             return;
@@ -172,7 +177,8 @@ export default function QuotationProfile({
     },
     district: {
       props: {
-        value: district ? { value: district, label: district } : null,
+        isDisabled: disabled,
+        value: watch('district') ? { value: watch('district'), label: watch('district') } : null,
         onChange: (option: Toption | null) => {
           if (!option) {
             return;
@@ -184,13 +190,15 @@ export default function QuotationProfile({
     },
     address: {
       props: {
+        disabled,
         ...register('address'),
       },
     },
   };
 
   // ----------------------------------------------------------------
-  const customerTypes = data_customer?.types.map((type) => type.name).join('/');
+  // const customerTypes = data_customer?.types.map((type) => type.name).join('/');
+  const customerTypes = data_customer?.types.map((type) => customerTypesLookup[type.name]).join('/');
   const styleHaveState = customerTypes ? scss.haveState : '';
 
   // ----------------------------------------------------------------
@@ -220,7 +228,9 @@ export default function QuotationProfile({
   return (
     <div className={scss.container}>
       <div className={scss.profile}>
-        <span className={classNames(scss.clientState, styleHaveState)}>狀態 : {customerTypes || '尚未選擇客戶'}</span>
+        <span className={classNames(scss.clientState, styleHaveState)}>
+          客戶類別 : {customerTypes || '尚未選擇客戶'}
+        </span>
         <InputSel
           caption="工程名稱"
           disabled={disabled}
