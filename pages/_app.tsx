@@ -17,7 +17,7 @@ import Layer from 'components/Layer/Layer';
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // api
-import { apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
+import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
 import { useApiErpFeaturesMe } from 'js/api/api_erpFeature';
 
 // css
@@ -41,6 +41,7 @@ type AppPropsWithLayout = AppProps & {
 // =============================================================================
 type TappContext = {
   rwd1023: boolean;
+  userInfo: TuserDto | undefined;
 };
 
 export const AppContext = createContext<TappContext>(null!);
@@ -98,6 +99,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // -----------------------------------------------------------------------
   const appContextValue = {
     rwd1023,
+    userInfo,
   };
 
   // -----------------------------------------------------------------------

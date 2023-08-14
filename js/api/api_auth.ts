@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 // type
 import { TuserDto, TuserDto_login } from './dtoTypes';
+export type { TuserDto };
 
 // 登入
 export const apiLogin = (body: { account: string; password: string }) => {
