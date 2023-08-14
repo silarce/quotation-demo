@@ -194,17 +194,17 @@ const sidePathList: TsidePathList = {
             {
               label: '預算',
               path: path01 + '/budget',
-              erpFeature: devPass,
+              erpFeature: 'allPass',
             },
             {
               label: '投標',
               path: path01 + '/tender',
-              erpFeature: devPass,
+              erpFeature: 'allPass',
             },
             {
               label: '發包',
               path: path01 + '/outsourcing',
-              erpFeature: devPass,
+              erpFeature: 'allPass',
             },
             {
               label: '合約',
