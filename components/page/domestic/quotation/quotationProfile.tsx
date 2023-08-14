@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { format } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import classNames from 'classnames';
 
-// components
-import ClientSelector from './modal/clientSelector';
 // glogal gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar, { TaddressProps } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
-// import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address';
+
+import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
@@ -14,10 +14,11 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from './quotationProfile.module.scss';
 
-import { Class_basicInfo } from 'hooks/quotation/useQuotation';
 import { Toption } from 'js/utils/options/countryAndDistrict';
-import { Class_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
 
+// ====================================================
+import { TcustomerDto } from 'js/api/dtoTypes';
+import { useCustomersById, TcustomerDto_TC } from 'js/api/api_customer';
 // ====================================================
 
 const wrapperStyle = {
@@ -34,123 +35,199 @@ const inputSelProps: TinputSelProps = {
 };
 
 // ====================================================
+type TquotationProfile = {
+  id: string;
+  quotationNumber: string;
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  customer: TcustomerDto;
+};
+
+type TformBody = {
+  validityPeriod: string;
+  customerId?: string;
+  projectName: string;
+  county: string;
+  district: string;
+  contactPerson: string;
+  contactNumber: string;
+  // api還沒上的資料
+  address?: string; // 剩餘地址
+  trackingStatus?: string; // 追蹤狀態
+  siteProgress?: string; // 工地進度
+};
+
+type TprofileReturnBody = Omit<TformBody, 'address' | 'trackingStatus' | 'siteProgress'>;
+export type { TprofileReturnBody };
+
+// =================================================================
 export default function QuotationProfile({
-  classBasicInfo,
-  fakeClientList,
+  profile,
   disabled = false,
+  onProfileChange,
 }: {
-  classBasicInfo: Class_basicInfo;
-  fakeClientList: ReturnType<Class_client['get']>;
+  profile: TquotationProfile | undefined;
   disabled: boolean;
+  onProfileChange?: (v: TprofileReturnBody) => void;
 }) {
-  // ==============================================
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => (disabled ? '' : setShowModal(true));
+  // ----------------------------------------------------------------
+  const { register, control, reset, watch, setValue } = useForm<TformBody>();
 
+  useEffect(() => {
+    // console.log(watch());
+    onProfileChange?.(watch());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch()]);
+
+  // ----------------------------------------------------------------
   // 報價單資料
-  const { basicInfo, clientProfile } = classBasicInfo.all;
   const {
-    quotationId,
-    tempQuotationAging,
-    date,
-    constructionName,
-    constructionCounty,
-    constructionDistrict,
-    constructionAddress,
-    trackingStatus,
-    siteProgress,
-  } = basicInfo;
+    id,
+    quotationNumber,
+    quotationDate,
+    validityPeriod,
+    projectName,
+    county,
+    district,
+    contactPerson,
+    contactNumber,
+    customer,
+  } = profile ?? {};
+  // ----------------------------------------------------------------
 
-  const { name: clientName, fax, clientState, contact } = clientProfile ?? {};
+  // 客戶資料
+  const { data: data_customer, setData: setCustomer, update: update_cunstomer } = useCustomersById(customer?.id);
+  // 取消編輯時重置用的
+  const [customerOri, setCustomerOri] = useState<TcustomerDto_TC>();
 
-  const { setBasicInfoString } = classBasicInfo;
+  // 客戶名稱與與傳真號碼要從data_customer取得
 
-  // ----------------------------------
-  const builtDate = format(new Date(date), 'yyy年MM月dd日');
-  // ----------------------------------
-  // ==============================================
+  // ----------------------------------------------------------------
 
-  // ==============================================
+  useEffect(() => {
+    (async () => {
+      const res = await update_cunstomer();
+
+      if (res) {
+        setValue('customerId', res.id);
+
+        if (!customerOri && profile?.id) {
+          setCustomerOri(res);
+        }
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  // ----------------------------------------------------------------
+
+  useEffect(() => {
+    reset({
+      validityPeriod,
+      customerId: customer?.id,
+      projectName,
+      county,
+      district,
+      contactPerson,
+      contactNumber,
+      // api還沒上的資料
+      address: '',
+      trackingStatus: '',
+      siteProgress: '',
+    });
+    setCustomer(customerOri);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, disabled]);
+
+  // ----------------------------------------------------------------
   // 客戶資料
   const theClientData = [
-    { label: '聯絡人', placeholder: '尚未選擇', value: contact?.[0].name },
-    { label: '聯絡電話', placeholder: '尚未選擇', value: contact?.[0].phone },
-    { label: '傳真號碼', placeholder: '尚未選擇', value: fax },
+    { label: '聯絡人', placeholder: '尚未選擇', value: watch('contactPerson') },
+    { label: '聯絡電話', placeholder: '尚未選擇', value: watch('contactNumber') },
+    { label: '傳真號碼', placeholder: '尚未選擇', value: data_customer?.fax },
   ];
 
-  // ==============================================
-  const clearClient = () => {
-    if (disabled) {
-      return;
-    }
-
-    classBasicInfo.clientProfile = undefined;
-  };
-
-  // ==============================================
-  const styleHaveState = clientState ? scss.haveState : '';
-  // ==============================================
   // 工程地點
   const addressProps: TaddressProps = {
     county: {
       props: {
-        // value: { value: constructionCounty, label: constructionCounty },
-        value: constructionCounty ? { value: constructionCounty, label: constructionCounty } : null,
+        value: county ? { value: county, label: county } : null,
         onChange: (option: Toption | null) => {
           if (!option) {
             return;
           }
 
-          setBasicInfoString('constructionCounty', option.value);
-          setBasicInfoString('constructionDistrict', '');
+          setValue('county', option.value);
+          setValue('district', '');
         },
       },
     },
     district: {
       props: {
-        value: constructionDistrict ? { value: constructionDistrict, label: constructionDistrict } : null,
+        value: district ? { value: district, label: district } : null,
         onChange: (option: Toption | null) => {
           if (!option) {
             return;
           }
 
-          setBasicInfoString('constructionDistrict', option.value);
+          setValue('district', option.value);
         },
       },
     },
     address: {
       props: {
-        value: constructionAddress,
-        onChange: (e) => {
-          setBasicInfoString('constructionAddress', e.target.value);
-        },
+        ...register('address'),
       },
     },
   };
 
-  // ==============================================
-  // modal
-  const [showModal, setShowModal] = useState(false);
-  const openModal = () => (disabled ? '' : setShowModal(true));
+  // ----------------------------------------------------------------
+  const customerTypes = data_customer?.types.map((type) => type.name).join('/');
+  const styleHaveState = customerTypes ? scss.haveState : '';
 
-  const onConfirmClient = (client: ReturnType<Class_client['get']>[0]) => {
-    classBasicInfo.clientProfile = client;
+  // ----------------------------------------------------------------
+  const customeSelConfirm = (v: TcustomerDto_TC[]) => {
+    if (v.length === 0) {
+      return;
+    }
+
+    setCustomer(v[0]);
+    setValue('customerId', v[0].id);
+    setValue('contactPerson', v[0].contacts[0].name);
+    setValue('contactNumber', v[0].contacts[0].phone);
   };
 
-  // ==============================================
+  const clearClient = () => {
+    if (disabled) {
+      return;
+    }
 
+    setCustomer(undefined);
+    setValue('customerId', undefined);
+    setValue('contactPerson', '');
+    setValue('contactNumber', '');
+  };
+
+  // ----------------------------------------------------------------------
   return (
     <div className={scss.container}>
       <div className={scss.profile}>
-        <span className={`${scss.clientState}  ${styleHaveState}`}>狀態 : {clientState || '尚未選擇客戶'}</span>
+        <span className={classNames(scss.clientState, styleHaveState)}>狀態 : {customerTypes || '尚未選擇客戶'}</span>
         <InputSel
           caption="工程名稱"
           disabled={disabled}
           {...inputSelProps}
           textareaProps={{
             props: {
-              value: constructionName,
-              onChange: (e) => {
-                setBasicInfoString('constructionName', e.target.value);
-              },
+              ...register('projectName'),
             },
           }}
         />
@@ -168,12 +245,12 @@ export default function QuotationProfile({
                 textareaProps={{
                   props: {
                     placeholder: undefined,
-                    value: clientName ?? '',
+                    value: data_customer?.name ?? '',
                   },
                 }}
               />
-              {!clientName && <button onClick={openModal}>請選擇客戶</button>}
-              {clientName && !disabled && <IconRemove02 onClick={clearClient} />}
+              {!data_customer && <button onClick={openModal}>請選擇客戶</button>}
+              {data_customer && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
 
@@ -209,10 +286,7 @@ export default function QuotationProfile({
               {...inputSelProps}
               inputProps={{
                 props: {
-                  value: trackingStatus,
-                  onChange: (e) => {
-                    setBasicInfoString('trackingStatus', e.target.value);
-                  },
+                  ...register('trackingStatus'),
                 },
               }}
             />
@@ -225,10 +299,7 @@ export default function QuotationProfile({
               {...inputSelProps}
               inputProps={{
                 props: {
-                  value: siteProgress,
-                  onChange: (e) => {
-                    setBasicInfoString('siteProgress', e.target.value);
-                  },
+                  ...register('siteProgress'),
                 },
               }}
             />
@@ -258,7 +329,7 @@ export default function QuotationProfile({
             wrapperStyle={{ gap: wrapperStyle.gap }}
             inputProps={{
               props: {
-                value: quotationId,
+                value: quotationNumber ?? '',
               },
             }}
           />
@@ -274,10 +345,7 @@ export default function QuotationProfile({
             wrapperStyle={{ gap: wrapperStyle.gap }}
             inputProps={{
               props: {
-                value: tempQuotationAging,
-                onChange: (e) => {
-                  setBasicInfoString('tempQuotationAging', e.target.value);
-                },
+                ...register('validityPeriod'),
               },
             }}
           />
@@ -292,7 +360,7 @@ export default function QuotationProfile({
             inputProps={{
               props: {
                 placeholder: '無日期',
-                value: builtDate,
+                value: quotationDate ?? '',
               },
             }}
           />
@@ -300,7 +368,13 @@ export default function QuotationProfile({
       </div>
 
       {/* modal */}
-      <ClientSelector {...{ showModal, setShowModal }} fakeClientList={fakeClientList} onConfirm={onConfirmClient} />
+      <CustomerSelector
+        label="請選擇客戶"
+        selLimit={1}
+        showModal={showModal}
+        onConfirm={customeSelConfirm}
+        onCancel={() => setShowModal(false)}
+      />
     </div>
   );
 }

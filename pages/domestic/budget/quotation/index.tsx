@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
+import classNames from 'classnames';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { TprofileReturnBody } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
 import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
 import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
@@ -45,6 +46,12 @@ import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 // =============================================================
 // =============================================================
 // =============================================================
+
+import { useGetQuotation_id, TquotationDto } from 'js/api/api_quotation';
+
+// =============================================================
+// =============================================================
+// =============================================================
 export default function Quotation() {
   const router = useRouter();
   const isReady = router.isReady;
@@ -58,11 +65,20 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
-    quotationId, //報價單id //若為新增報價單則為newQuotation
-    isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
-  } = router.query;
+    id, //報價單id //若為新增報價單則為newQuotation
+    // isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
+  } = router.query as { id: string | undefined };
 
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+
+  // =========================================================
+  // =========================================================
+  // =========================================================
+  const { data, update } = useGetQuotation_id(id as string);
+
+  useEffect(() => {
+    update();
+  }, [id]);
 
   // =========================================================
   // =========================================================
@@ -149,11 +165,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return myAlert.warning({ title: '請輸入註解' });
     }
 
-    if (isNewQuotationId) {
-      fakeApiQuotaion.post(classQuotation.postData);
-    } else {
-      fakeApiQuotaion.put(classQuotation.postData);
-    }
+    // if (isNewQuotationId) {
+    //   fakeApiQuotaion.post(classQuotation.postData);
+    // } else {
+    //   fakeApiQuotaion.put(classQuotation.postData);
+    // }
 
     setShowMemoModal(false);
     setAllowEdit(false);
@@ -161,8 +177,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${quotationId}`,
-      onClick: () => alert(quotationId),
+      label: id ? `報價編號 ${data?.latestContent.quotationNumber || ''}` : '新報價單',
+      onClick: () => alert(id),
     },
     { label: '工程聯絡單', onClick: () => alert('工程聯絡單') },
   ];
@@ -227,45 +243,53 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+
+  const onProfileChange = (v: TprofileReturnBody) => {
+    console.log(v);
+  };
+
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   return (
     <div className={style.container}>
       <PageHeader02 tagList={tagList} panelList={allowEdit ? panel_editable : panel_noEditable} />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
-          <QuotationProfile
-            classBasicInfo={classQuotation.classBasicInfo}
-            fakeClientList={fakeClientList}
+          {/* 基本資料 */}
+          <QuotationProfile //
+            profile={data?.latestContent}
             disabled={!allowEdit}
+            onProfileChange={onProfileChange}
           />
 
-          {/* 基本資料 */}
           <div className={style.switchBar}>
             <div className={style.active}>合約項目</div>
           </div>
 
           {/* 主產品設定 */}
-          <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
+          {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
 
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} />
+            {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
             <hr />
             {/* 選配設定 */}
-            <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} />
+            {/* <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} /> */}
           </div>
           {/* 其他設定 */}
-          <QuotationAdditions disabled={!allowEdit} />
+          {/* <QuotationAdditions disabled={!allowEdit} /> */}
 
           {/* 備註/報價範圍/付款資訊 */}
-          <QuotationTotal
+          {/* <QuotationTotal
             classQuotation={classQuotation}
             getFakeMemo={getFakeMemo}
             getFakeQuotaRange={getFakeQuotaRange}
             disabled={!allowEdit}
-          />
+          /> */}
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
+          {/* <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} /> */}
         </div>
       </div>
       <TextareaModal
@@ -278,23 +302,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
-      <QuotationPdf
+      {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => {
           setShowPdf(false);
         }}
         classQuotation={classQuotation}
-      />
+      /> */}
 
       {/*  */}
-      <QuotationPdf_part
+      {/* <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => {
           setShowPdf_part(false);
         }}
         mainProductArr={quotationPdf_part_mainProductArr}
         quotationId={classQuotation.quotationId}
-      />
+      /> */}
       {/*  */}
       <EmployeeSelector
         showModal={employeeSelectorShow}
@@ -360,3 +384,10 @@ const fakeQuotationStateHistory = [
     isoString: moment('0111-03-23 13:45:11').toISOString(),
   },
 ];
+
+// 先把api client建立起來，然後建立幾筆資料
+// 先把api client建立起來，然後建立幾筆資料
+// 先把api client建立起來，然後建立幾筆資料
+// 先把api client建立起來，然後建立幾筆資料
+// 先把api client建立起來，然後建立幾筆資料
+// 先把api client建立起來，然後建立幾筆資料

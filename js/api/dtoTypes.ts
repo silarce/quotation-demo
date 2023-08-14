@@ -678,25 +678,25 @@ export type TupdateDepartmentJobDto = {
 // ==========================================================================
 
 // quotation
-
+// add comment
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
   updateAt: string;
   quotationNumber: string;
   version: number;
-  quotationDate: string;
-  validityPeriod: string;
-  projectName: string;
-  county: string;
-  district: string;
-  contactPerson: string;
-  contactNumber: string;
-  discount: string;
-  quantity: number;
-  editNotes: string;
-  totalPrice: number;
-  status: 'Budget' | 'Bidding' | 'Contracting';
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  discount: string; // 總折數
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  totalPrice: number; // 報價金額
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
   customer: TcustomerDto;
   managerEmployee: TemployeeDto | null;
   suervisorEmployee: TemployeeDto | null;
@@ -729,9 +729,4 @@ export type TcreateQuotationContentDto = {
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
-
-  // quotationNumber: string; // 報價單編號
-  // version: number; // 版本號
-  // customerId: string; // 客戶ID
-  // projectManager: string; // 承辦人
 };

@@ -23,8 +23,6 @@ const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 
 // fakeData
-// fake
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
 // ===========================================
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
@@ -39,7 +37,7 @@ import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleA
 // ===========================================
 // ===========================================
 
-import { useGetQuotation, apiPostQuotation } from 'js/api/api_quotation';
+import { useGetQuotation } from 'js/api/api_quotation';
 
 // ===========================================
 // ===========================================
@@ -113,14 +111,8 @@ export default function Budget() {
       type: 'addButton',
       label: '新增報價單',
       onClick: () => {
-        // let newQuotationId = `${projectArr.length + 1}`.padStart(2, '0');
-        // newQuotationId = 'S-110211-' + newQuotationId;
         router.push({
           pathname: `/domestic/budget/quotation`,
-          query: {
-            quotationId: 'new',
-            isNewQuotation: true,
-          },
         });
       },
     },
