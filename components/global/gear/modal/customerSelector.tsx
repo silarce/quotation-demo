@@ -12,7 +12,7 @@ import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 import style from './customerSelector.module.scss';
 
 // api
-import { TcustomerDto, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
+import { TcustomerDto, TcustomerDto_TC, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
 
 export default function CustomerSelector({
   showModal,
@@ -23,7 +23,7 @@ export default function CustomerSelector({
   selLimit,
 }: {
   showModal: boolean;
-  onConfirm: (v: TcustomerDto[]) => void;
+  onConfirm: (v: TcustomerDto_TC[]) => void;
   onCancel: () => void;
   label?: string;
   tip?: React.ReactNode;
@@ -32,7 +32,7 @@ export default function CustomerSelector({
   const [isLoading, setIsLoading] = useState(false);
 
   // 被選的資料
-  const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto[]>([]);
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto_TC[]>([]);
 
   const [searchValue, setSearchValue] = useState<string | undefined>();
   const [pageObj, setPageObj] = useState({ page: -1 });
@@ -53,7 +53,9 @@ export default function CustomerSelector({
     };
   })();
 
-  const { data: customerArr, meta, setData, update, update_infinite } = useCustomers(params);
+  const res = useCustomers(params);
+  const { meta, setData, update, update_infinite } = res;
+  const customerArr = res?.data as TcustomerDto_TC[] | undefined;
 
   const [viewRef, inView] = useInView();
 
@@ -122,7 +124,7 @@ export default function CustomerSelector({
 
   // ==================================================
 
-  const onClick = (newEmp: TcustomerDto) => {
+  const onClick = (newEmp: TcustomerDto_TC) => {
     const newArr = [...selEmployeeArr];
 
     if (selLimit === 1) {
