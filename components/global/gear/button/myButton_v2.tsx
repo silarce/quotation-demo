@@ -30,7 +30,7 @@ export default function MyButton_v2({
   img?: string;
   preImg?: keyof typeof preImgList;
   px?: 'px22' | 'px44' | 'px2227';
-  theme?: 'danger' | undefined;
+  theme?: 'danger' | 'transparent' | undefined;
   // https://4x.ant.design/components/button-cn/#
   onClick?: MouseEventHandler<HTMLElement> | undefined;
   className?: string;

@@ -1,7 +1,6 @@
 // 報價單
 import React, { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-
 import moment from 'moment';
 
 // components
@@ -16,11 +15,13 @@ import QuotationSinature from 'components/page/domestic/quotation/quotationSinat
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
+import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
+import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -60,6 +61,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationId, //報價單id //若為新增報價單則為newQuotation
     isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
   } = router.query;
+
+  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
 
   // =========================================================
   // =========================================================
@@ -193,7 +196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => setShowPdf_part(true),
     },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    { type: 'myButton', label: '送審', onClick: () => alert('送審') },
+    { type: 'myButton', label: '送審', onClick: () => setEmployeeSelectorShow(true) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -249,8 +252,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} />
             <hr />
             {/* 選配設定 */}
-            <QuotationAccessory activeRow={classQuotation.activeMainProd} />
+            <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} />
           </div>
+          {/* 其他設定 */}
+          <QuotationAdditions disabled={!allowEdit} />
 
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal
@@ -291,6 +296,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationId={classQuotation.quotationId}
       />
       {/*  */}
+      <EmployeeSelector
+        showModal={employeeSelectorShow}
+        label="請選擇審核人員"
+        onConfirm={(arr) => {
+          setEmployeeSelectorShow(false);
+        }}
+        onCancel={() => {
+          setEmployeeSelectorShow(false);
+        }}
+      />
     </div>
   );
 }

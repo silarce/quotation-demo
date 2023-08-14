@@ -7,10 +7,10 @@ import { NextRouter } from 'next/router';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_legacyContract';
-import QuotationProduction from 'components/page/domestic/quotation/quotationProduct_legacyContract';
-import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
-import QuotationTotal from 'components/page/domestic/quotation/quotationTotal_legacyContract';
+import QuotationProfile from 'components/page/domestic/quotation/legacyContract/quotationProfile_legacyContract';
+import QuotationProduction from 'components/page/domestic/quotation/legacyContract/quotationProduct_legacyContract';
+import QuotationAdditions from 'components/page/domestic/quotation/legacyContract/quotationAdditions_legacyContract';
+import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
 import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
 // import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"

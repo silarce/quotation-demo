@@ -4,7 +4,19 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        main: "#14256a",
+        sub: "#404040",
+        text: "#404040",
+        active: "#ea1833",
+        border: "#c1c1c1",
+        bgc01: "#f5f5f5",
+        bgc02: "#fcfcfc",
+        hoverBgc: "#ecf1ff",
+        chosenBgc: "#ffeeee",
+      }
+    },
     screens: {
       // xxl: { max: "1535px" },
       // => @media (max-width: 1535px) { ... }
