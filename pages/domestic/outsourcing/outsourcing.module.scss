@@ -1,6 +1,5 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
 
-.mainContainer {
-
+.approvalsBar {
+  border-bottom: solid 1px $colorBorder01;
 }

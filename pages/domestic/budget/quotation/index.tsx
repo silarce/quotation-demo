@@ -345,20 +345,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
   const panel_noEditable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => setShowPdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出材料/配件',
-      img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出材料/配件',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf_part(true),
+    // },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    { type: 'myButton', label: '送審', onClick: () => openEmpSel('inspector') },
+    // { type: 'myButton', label: '送審', onClick: () => openEmpSel('inspector') },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 

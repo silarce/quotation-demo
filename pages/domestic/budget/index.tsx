@@ -44,13 +44,31 @@ import { useGetQuotation } from 'js/api/api_quotation';
 
 export default function Budget() {
   const router = useRouter();
+  const { county, customerName, projectName } = router.query;
   // ===========================================
 
-  const { data: quoatationArr, meta, update } = useGetQuotation();
+  const params = {
+    filter: {
+      'latestContent.status': {
+        $eq: 'Budget',
+      },
+      'latestContent.projectName': {
+        $contains: projectName || undefined,
+      },
+      'latestContent.customer.name': {
+        $contains: customerName || undefined,
+      },
+      'latestContent.county': {
+        $contains: county || undefined,
+      },
+    },
+  };
+
+  const { data: quoatationArr, meta, update } = useGetQuotation(params);
 
   useEffect(() => {
     update();
-  }, []);
+  }, [county, customerName, projectName]);
 
   // ===========================================
 
@@ -58,12 +76,12 @@ export default function Budget() {
   // panelList
 
   const searchTargetList = [
-    {
-      options: optionDoorModel,
-      placeholder: '選擇門型',
-      width: '100px',
-      defaultValue: router.query.doorModel as string,
-    },
+    // {
+    //   options: optionDoorModel,
+    //   placeholder: '選擇門型',
+    //   width: '100px',
+    //   defaultValue: router.query.doorModel as string,
+    // },
     {
       options: optionsCounty,
       placeholder: '選擇地區',
@@ -81,18 +99,18 @@ export default function Budget() {
   ];
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    const doorModel = (valueArr[0] as Toption).value;
-    const county = (valueArr[1] as Toption).value;
-    const clientName = valueArr[2] as string;
-    const projectName = valueArr[3] as string;
+    // const doorType = (valueArr[0] as Toption).value;
+    const county = (valueArr[0] as Toption).value;
+    const customerName = valueArr[1] as string;
+    const projectName = valueArr[2] as string;
 
     router.push({
       href: '',
       query: {
         ...router.query,
-        doorModel,
+        // doorType,
         county,
-        clientName,
+        customerName,
         projectName,
       },
     });

@@ -1,29 +1,28 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { useRouter, NextRouter } from 'next/router';
+import _ from 'lodash';
+
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
 import BudgeList from 'components/page/domestic/budget/budgetList';
 
 // css
-import style from './outsourcing.module.scss';
+import scss from './outsourcing.module.scss';
 
 // option
-import { optionsCreator_doorType } from 'js/utils/options/options';
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-const optionsDoorType = optionsCreator_doorType();
+import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
+
+const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
-optionsDoorType.unshift({ value: '', label: '不拘' });
 optionsCounty.unshift({ value: '', label: '不拘' });
 
 // fakeData
-// fake
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
-// type
-import { Toption } from 'js/utils/options/options';
 
 // ===========================================
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
@@ -35,62 +34,84 @@ import { Toption } from 'js/utils/options/options';
 // 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
 // 點進去的報價單也一樣，僅是取得之資料的狀態不同
 
+// ===========================================
+// ===========================================
+
+import { useGetQuotation } from 'js/api/api_quotation';
+
+// ===========================================
+// ===========================================
+
 export default function Budget() {
   const router = useRouter();
-  // 搜尋用的
-  const [searchObj, setSearchObj] = useState<TsearchObj>({
-    doorType: '',
-    county: '',
-    clientName: '',
-    projectName: '',
-  });
+  const { county, customerName, projectName } = router.query;
+  // ===========================================
 
-  // 資料
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple });
-  const projectArr = projectSimple.wrapper.get({
+  const params = {
     filter: {
-      county: searchObj.county,
-      clientName: searchObj.clientName,
-      constructionName: searchObj.projectName,
+      'latestContent.status': {
+        $eq: 'Contracting',
+      },
+      'latestContent.projectName': {
+        $contains: projectName || undefined,
+      },
+      'latestContent.customer.name': {
+        $contains: customerName || undefined,
+      },
+      'latestContent.county': {
+        $contains: county || undefined,
+      },
     },
-  });
+  };
 
-  // ===================================================
+  const { data: quoatationArr, meta, update } = useGetQuotation(params);
+
+  useEffect(() => {
+    update();
+  }, [county, customerName, projectName]);
+  // ===========================================
+
+  // ----------------------------------------------------------
   // panelList
 
   const searchTargetList = [
+    // {
+    //   options: optionDoorModel,
+    //   placeholder: '選擇門型',
+    //   width: '100px',
+    //   defaultValue: router.query.doorModel as string,
+    // },
     {
-      stateValue: optionsDoorType[0],
-      options: optionsDoorType,
-      placeholder: '選擇門型',
-      width: '100px',
-    },
-    {
-      stateValue: optionsCounty[0],
       options: optionsCounty,
       placeholder: '選擇地區',
       width: '80px',
+      defaultValue: router.query.county as string,
     },
     {
-      stateValue: '',
       placeholder: '請輸入客戶名稱',
+      defaultValue: router.query.clientName as string,
     },
     {
-      stateValue: '',
       placeholder: '請輸入專案名稱',
+      defaultValue: router.query.projectName as string,
     },
   ];
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    const [doorTypeOption, countyOption, clientName, projectName] = valueArr;
-    const doorType = (doorTypeOption as Toption).value;
-    const county = (countyOption as Toption).value;
+    // const doorType = (valueArr[0] as Toption).value;
+    const county = (valueArr[0] as Toption).value;
+    const customerName = valueArr[1] as string;
+    const projectName = valueArr[2] as string;
 
-    setSearchObj({
-      doorType,
-      county,
-      clientName: clientName as string,
-      projectName: projectName as string,
+    router.push({
+      href: '',
+      query: {
+        ...router.query,
+        // doorType,
+        county,
+        customerName,
+        projectName,
+      },
     });
   };
 
@@ -99,7 +120,7 @@ export default function Budget() {
     doSearch,
   };
 
-  // -----------------------
+  // ----------------------------------------------------------
 
   const panelList: TpanelList = [
     { searchGroup },
@@ -107,26 +128,72 @@ export default function Budget() {
       type: 'addButton',
       label: '新增報價單',
       onClick: () => {
-        let newQuotationId = `${projectArr.length + 1}`.padStart(2, '0');
-        newQuotationId = 'S-110211-' + newQuotationId;
         router.push({
           pathname: `/domestic/budget/quotation`,
-          query: { newQuotationId, isNewQuotation: true },
         });
       },
     },
   ];
 
-  // ===================================================
+  // ----------------------------------------------------------
 
   return (
-    <div className={style.container}>
-      {/* header panel */}
-      <PageHeader02 tag="發包" panelList={panelList} />
-      {/*  */}
-      <div className={style.mainContainer}>
-        <BudgeList budgetList={projectArr} />
+    <SubLayer>
+      <PageHeader02 tag="預算" panelList={panelList} />
+      <div>
+        <ApprovalsBar router={router} />
+        <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
       </div>
-    </div>
+    </SubLayer>
   );
 }
+
+// ========================================================
+// ========================================================
+// ========================================================
+// ========================================================
+
+const ApprovalsBar = ({ router }: { router: NextRouter }) => {
+  const query = router.query;
+  const linkList = [
+    {
+      label: '待審核',
+      href: {
+        pathname: '',
+        query: {
+          ...query,
+          approvalsStatus: '待審核',
+        },
+      },
+      isActive: !query.approvalsStatus || query.approvalsStatus === '待審核',
+    },
+    {
+      label: '審核中',
+      href: {
+        pathname: '',
+        query: {
+          ...query,
+          approvalsStatus: '審核中',
+        },
+      },
+      isActive: query.approvalsStatus === '審核中',
+    },
+    {
+      label: '審核完成',
+      href: {
+        pathname: '',
+        query: {
+          ...query,
+          approvalsStatus: '審核完成',
+        },
+      },
+      isActive: query.approvalsStatus === '審核完成',
+    },
+  ];
+
+  return (
+    <div className={scss.approvalsBar}>
+      <PageHeader02 linkList={linkList} />
+    </div>
+  );
+};

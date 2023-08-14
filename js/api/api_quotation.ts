@@ -4,21 +4,33 @@ import { useInView } from 'react-intersection-observer';
 import { axi } from './_axiosCreator';
 
 // type
-import type { TpageMetaDto, TquotationContentDto, TquotationDto, TcreateQuotationContentDto } from './dtoTypes';
-import { get } from 'lodash';
+import type {
+  Tparams,
+  TpageMetaDto,
+  TquotationContentDto,
+  TquotationDto,
+  TcreateQuotationContentDto,
+} from './dtoTypes';
 
-export type { TpageMetaDto, TquotationContentDto, TquotationDto, TcreateQuotationContentDto } from './dtoTypes';
+export type {
+  Tparams,
+  TpageMetaDto,
+  TquotationContentDto,
+  TquotationDto,
+  TcreateQuotationContentDto,
+} from './dtoTypes';
 
 type TgetQuotation = {
   data: TquotationDto[];
   meta: TpageMetaDto;
 };
 
-export const apiGetQuotation = async () => {
+export const apiGetQuotation = async (params?: Tparams) => {
   const api = '/quotation';
 
-  const params = {
+  params = {
     populate: ['contents', 'latestContent.customer', 'latestContent.agentEmployee'],
+    ...params,
   };
 
   return axi
@@ -27,11 +39,11 @@ export const apiGetQuotation = async () => {
     .catch((err) => Promise.reject(err.message));
 };
 
-export const useGetQuotation = () => {
+export const useGetQuotation = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetQuotation>();
 
   const update = async () => {
-    const newRes = await apiGetQuotation();
+    const newRes = await apiGetQuotation(customParams);
 
     if (newRes) {
       setRes(newRes);
