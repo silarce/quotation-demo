@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import classNames from 'classnames';
 
 // glogal gear
@@ -76,18 +76,20 @@ export default function QuotationProfile({
 }: {
   profile: TquotationProfile | undefined;
   disabled: boolean;
-  onProfileChange?: (v: TprofileReturnBody) => void;
+  onProfileChange?: (v: Partial<TprofileReturnBody>) => void;
 }) {
+  // ----------------------------------------------------------------
+
   const [showModal, setShowModal] = useState(false);
   const openModal = () => (disabled ? '' : setShowModal(true));
   // ----------------------------------------------------------------
   const { register, control, reset, watch, setValue } = useForm<TformBody>();
+  const watchState = useWatch({ control });
 
   useEffect(() => {
-    // console.log(watch());
-    onProfileChange?.(watch());
+    onProfileChange?.(watchState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch()]);
+  }, [watchState]);
 
   // ----------------------------------------------------------------
   // 報價單資料

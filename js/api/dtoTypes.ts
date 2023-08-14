@@ -725,7 +725,7 @@ export type TcreateQuotationContentDto = {
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   totalPrice: number; // 報價金額
-  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID

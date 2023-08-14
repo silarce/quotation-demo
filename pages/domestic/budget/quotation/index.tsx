@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
+import { useForm, Controller, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
 
 // components
@@ -34,7 +35,7 @@ const optionQuotationState = optionsCreator_quotationState();
 // css
 import style from './quotation.module.scss';
 
-// =============================================================
+// ------------------------------------------------------------------
 
 // 假資料與fake api
 import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
@@ -43,15 +44,15 @@ import { fakeApi_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
 import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
 import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 
-// =============================================================
-// =============================================================
-// =============================================================
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
 
-import { useGetQuotation_id, TquotationDto } from 'js/api/api_quotation';
+import { TquotationDto, TcreateQuotationContentDto, useGetQuotation_id } from 'js/api/api_quotation';
 
-// =============================================================
-// =============================================================
-// =============================================================
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
 export default function Quotation() {
   const router = useRouter();
   const isReady = router.isReady;
@@ -71,18 +72,51 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
 
-  // =========================================================
-  // =========================================================
-  // =========================================================
+  // ---------------------------------------------------------
+  const { register, control, reset, watch, setValue } = useForm<TcreateQuotationContentDto>(); // ---------------------------------------------------------
   const { data, update } = useGetQuotation_id(id as string);
 
   useEffect(() => {
-    update();
+    (async () => {
+      const res = await update();
+
+      if (res?.latestContent) {
+        const lContent = res.latestContent;
+        reset({
+          quotationDate: lContent.quotationDate,
+          validityPeriod: lContent.validityPeriod,
+          customerId: lContent.customer.id,
+          projectName: lContent.projectName,
+          county: lContent.county,
+          district: lContent.district,
+          contactPerson: lContent.contactPerson,
+          contactNumber: lContent.contactNumber,
+          discount: lContent.discount,
+          quantity: lContent.quantity,
+          editNotes: lContent.editNotes,
+          totalPrice: lContent.totalPrice,
+          status: lContent.status,
+          managerId: lContent.managerEmployee?.id,
+          supervisorId: lContent.suervisorEmployee?.id,
+          agentId: lContent.agentEmployee?.id,
+        });
+      }
+    })();
   }, [id]);
 
-  // =========================================================
-  // =========================================================
-  // =========================================================
+  const onProfileChange = (v: Partial<TprofileReturnBody>) => {
+    setValue('validityPeriod', v.validityPeriod ?? '');
+    setValue('customerId', v.customerId ?? '');
+    setValue('projectName', v.projectName ?? '');
+    setValue('county', v.county ?? '');
+    setValue('district', v.district ?? '');
+    setValue('contactPerson', v.contactPerson ?? '');
+    setValue('contactNumber', v.contactNumber ?? '');
+  };
+
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
 
   // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
   // let quotationData: Tquotation | undefined;
@@ -95,7 +129,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const [allowEdit, setAllowEdit] =
   //   useState(quotationId === "newQuotation" ? true : false)
   const [allowEdit, setAllowEdit] = useState(false);
-  // =========================================================
+  // ---------------------------------------------------------
   const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
 
   const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
@@ -139,10 +173,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit]);
 
-  // =========================================================
-  // =========================================================
-  // =========================================================
-  // =========================================================
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
 
   // --------------------------------------------------------------------------
 
@@ -244,10 +278,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  const onProfileChange = (v: TprofileReturnBody) => {
-    console.log(v);
-  };
-
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -265,7 +295,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           />
 
           <div className={style.switchBar}>
-            <div className={style.active}>合約項目</div>
+            <div className={style.active}>報價項目</div>
           </div>
 
           {/* 主產品設定 */}
@@ -289,7 +319,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={!allowEdit}
           /> */}
           {/* 簽名 */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} /> */}
+          <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
         </div>
       </div>
       <TextareaModal
@@ -334,14 +364,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   );
 }
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
 const NoQuotation = ({ quotationId }: { quotationId: string }) => {
   const router = useRouter();
 
@@ -358,9 +388,9 @@ const NoQuotation = ({ quotationId }: { quotationId: string }) => {
   );
 };
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
 
 const fakeQuotationStateHistory = [
   {
@@ -391,3 +421,5 @@ const fakeQuotationStateHistory = [
 // 先把api client建立起來，然後建立幾筆資料
 // 先把api client建立起來，然後建立幾筆資料
 // 先把api client建立起來，然後建立幾筆資料
+
+// 新增報價單的時候要自動帶使用者的名字降去經辦人，而且不能再改
