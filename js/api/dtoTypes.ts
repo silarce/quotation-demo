@@ -702,6 +702,11 @@ export type TquotationContentDto = {
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
+  //審核相關
+  reviewSalesEmployee: TemployeeDto | null;
+  salesReviewedAt: string | null;
+  reviewSupervisorEmployee: TemployeeDto | null;
+  supervisorReviewedAt: string | null;
 };
 
 export type TquotationDto = {

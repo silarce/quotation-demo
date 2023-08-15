@@ -107,7 +107,7 @@ export const apiPostQuotation = (body: TcreateQuotationContentDto) => {
   return axi
     .post<TquotationDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) => {
@@ -116,5 +116,38 @@ export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) 
   return axi
     .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiQuotationSubmitReview = (
+  id: string,
+  body: {
+    reviewSalesEmployeeId: string | null;
+    reviewSupervisorEmployeeId: string | null;
+  }
+) => {
+  const api = `/quotation/${id}/submit-review`;
+
+  return axi
+    .patch<undefined>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiQuotationReview = (id: string) => {
+  const api = `/quotation/${id}/review`;
+
+  return axi
+    .patch<undefined>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiQuotationunLock = (id: string) => {
+  const api = `/quotation/${id}/unLock`;
+
+  return axi
+    .patch<undefined>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
 };
