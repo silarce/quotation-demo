@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // components
 import BudgeList from 'components/page/domestic/budget/budgetList';
@@ -33,7 +33,9 @@ import { useGetQuotation } from 'js/api/api_quotation';
 export default function Budget() {
   const router = useRouter();
   const { county, customerName, projectName, status } = router.query;
-  // ===========================================
+  // ----------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
+  // ----------------------------------------------------
 
   const params = {
     filter: {
@@ -55,10 +57,12 @@ export default function Budget() {
   const { data: quoatationArr, meta, update } = useGetQuotation(params);
 
   useEffect(() => {
-    update();
+    (async () => {
+      setIsLoading(true);
+      await update();
+      setIsLoading(false);
+    })();
   }, [county, customerName, projectName, status]);
-
-  // ===========================================
 
   // ----------------------------------------------------------
   // panelList
@@ -133,6 +137,7 @@ export default function Budget() {
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
       </div>
+      <LoadingCover01 isLoading={isLoading} />
     </SubLayer>
   );
 }
