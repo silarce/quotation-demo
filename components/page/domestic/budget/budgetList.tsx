@@ -55,7 +55,7 @@ export default function BudgetList({
             const openQuotation = (e: MouseEvent) => {
               e.stopPropagation();
               router.push({
-                pathname: '/domestic/budget/quotation',
+                pathname: `/domestic/quotationList/quotation`,
                 query: { id },
               });
             };

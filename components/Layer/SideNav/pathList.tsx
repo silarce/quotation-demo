@@ -193,19 +193,43 @@ const sidePathList: TsidePathList = {
           list: [
             {
               label: '預算',
-              path: path01 + '/budget',
-              erpFeature: 'allPass',
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Budget',
+              },
+              erpFeature: [legacyContractIntegration],
             },
             {
               label: '投標',
-              path: path01 + '/tender',
-              erpFeature: 'allPass',
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Bidding',
+              },
+              erpFeature: [legacyContractIntegration],
             },
             {
               label: '發包',
-              path: path01 + '/outsourcing',
-              erpFeature: 'allPass',
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Contracting',
+              },
+              erpFeature: [legacyContractIntegration],
             },
+            // {
+            //   label: '預算',
+            //   path: path01 + '/budget',
+            //   erpFeature: 'allPass',
+            // },
+            // {
+            //   label: '投標',
+            //   path: path01 + '/tender',
+            //   erpFeature: 'allPass',
+            // },
+            // {
+            //   label: '發包',
+            //   path: path01 + '/outsourcing',
+            //   erpFeature: 'allPass',
+            // },
             {
               label: '合約',
               path: path01 + '/contract',

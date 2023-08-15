@@ -12,7 +12,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import BudgeList from 'components/page/domestic/budget/budgetList';
 
 // css
-import scss from './outsourcing.module.scss';
+import scss from './index.module.scss';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -21,18 +21,6 @@ import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptio
 const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
-
-// fakeData
-
-// ===========================================
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
 
 // ===========================================
 // ===========================================
@@ -44,13 +32,13 @@ import { useGetQuotation } from 'js/api/api_quotation';
 
 export default function Budget() {
   const router = useRouter();
-  const { county, customerName, projectName } = router.query;
+  const { county, customerName, projectName, status } = router.query;
   // ===========================================
 
   const params = {
     filter: {
       'latestContent.status': {
-        $eq: 'Contracting',
+        $eq: status,
       },
       'latestContent.projectName': {
         $contains: projectName || undefined,
@@ -68,7 +56,8 @@ export default function Budget() {
 
   useEffect(() => {
     update();
-  }, [county, customerName, projectName]);
+  }, [county, customerName, projectName, status]);
+
   // ===========================================
 
   // ----------------------------------------------------------
@@ -129,7 +118,7 @@ export default function Budget() {
       label: '新增報價單',
       onClick: () => {
         router.push({
-          pathname: `/domestic/budget/quotation`,
+          pathname: `/domestic/quotationList/quotation`,
         });
       },
     },
