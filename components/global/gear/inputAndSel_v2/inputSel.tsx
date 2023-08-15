@@ -20,7 +20,7 @@ import scss from './inputSel.module.scss';
 
 type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
 
-export type { TinputSelProps, TselectProps, TinputProps, TtextareaProps, TinputSelBarProps_reduce };
+export type { TinputSelProps, TselectProps, TinputProps, TcheckboxProps, TtextareaProps, TinputSelBarProps_reduce };
 
 // =============================================================================
 
