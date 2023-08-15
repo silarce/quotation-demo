@@ -723,8 +723,7 @@ export type TcreateQuotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
-  // discount: string; // 總折數
-  discount: number; // 總折數
+  discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   totalPrice: number; // 報價金額

@@ -382,7 +382,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data.address ?? '',
       contactPerson: data.contactPerson ?? '',
       contactNumber: data.contactNumber ?? '',
-      discount: Number(data.discount ?? 0) ?? 100,
+      discount: `${Number(data.discount ?? 0)}` ?? '100',
       quantity: data.quantity ?? 0,
       editNotes: data.editNotes ?? '',
       totalPrice: data.totalPrice ?? 0,
