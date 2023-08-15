@@ -248,11 +248,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 報價單基本資料 */}
-          <QuotationProfile
+          {/* <QuotationProfile
             classBasicInfo={classQuotation.classBasicInfo}
             fakeClientList={fakeClientList}
             disabled={!allowEdit}
-          />
+          /> */}
 
           {/* switch01 */}
           <div className={style.switchBar}>
@@ -297,7 +297,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={!allowEdit}
           />
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
+          {/* <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} /> */}
         </div>
       </div>
       <QuotationPdf

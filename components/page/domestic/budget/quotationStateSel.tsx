@@ -26,7 +26,7 @@ export default function QuotationStateSel({
   history,
 }: {
   quotationState: Toption;
-  setQuotationState: Dispatch<SetStateAction<Toption>>;
+  setQuotationState: (v: Toption) => void;
   history: TquotationStateHistory[];
 }) {
   // -------------------------------------------------------------------------

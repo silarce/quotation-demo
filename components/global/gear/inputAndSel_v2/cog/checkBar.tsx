@@ -23,7 +23,8 @@ export type TcheckboxProps = {
   fontClassName?: string;
   onChange?: (v: string[]) => void;
   isRadio?: boolean;
-  checkBoxArr: TcheckBoxInfo[];
+  /**送進來的值必須是狀態，或是寫在hook外的值 */
+  propsArr: TcheckBoxInfo[];
 };
 
 // ===================================================================
@@ -34,22 +35,22 @@ export default function CheckBar({
   fontClassName,
   isRadio,
   onChange,
-  checkBoxArr,
+  propsArr,
 }: TcheckboxProps) {
-  const [arr, setArr] = useState(checkBoxArr);
+  const [arr, setArr] = useState<TcheckBoxInfo[]>(propsArr);
 
   useEffect(() => {
-    setArr(checkBoxArr);
-  }, [checkBoxArr]);
+    setArr(propsArr);
+  }, [propsArr]);
 
-  useEffect(() => {
+  // 用來將ceheck為true的key值傳出去;
+  const theOnChange = (arr: TcheckBoxInfo[]) => {
     const keyArr: string[] = [];
     arr.map((item) => {
       item.value && keyArr.push(item.key);
     });
-    onChange && onChange(keyArr);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arr]);
+    onChange?.(keyArr);
+  };
 
   return (
     <div className={classNames(scss.checkBar, wrapperClassName)} style={wrapperStyle}>
@@ -68,19 +69,29 @@ export default function CheckBar({
           copy[index].value = e.target.checked;
 
           setArr(copy);
-          props?.onChange && props.onChange(e);
+          props?.onChange?.(e); // props.onChange是個別box的onChange
+          theOnChange(copy); //theOnChange在上面定義了，用來將ceheck為true的key值傳出去
         };
 
         return (
-          <Checkbox
+          <label
+            //inputSel最外層的e.preventDefault會連帶的使Checkbox外層label的預設點擊事件失效
+            //在這邊包一個label並呼叫e.stopPropagation()可以避免
+            //但不知道為什麼在Checkbox的onClick呼叫e.stopPropagation()沒有效果
             key={key}
-            checked={value}
-            {...props}
-            className={classNames(scss.antdCheck, props?.className)}
-            onChange={onChange}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           >
-            <span className={classNames(fontClassName)}>{label}</span>
-          </Checkbox>
+            <Checkbox
+              checked={value}
+              {...props}
+              className={classNames(scss.antdCheck, props?.className)}
+              onChange={onChange}
+            >
+              <span className={classNames(fontClassName)}>{label}</span>
+            </Checkbox>
+          </label>
         );
       })}
     </div>

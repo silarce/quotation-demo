@@ -111,7 +111,7 @@ export type TcustomerDto = {
   invoiceDistrict: string;
   invoiceAddress: string;
   contacts?: Tcontact[];
-  types?: {
+  types: {
     //客戶類型
     id: string;
     createdAt: string;
@@ -646,27 +646,6 @@ export type TquotationRangeDto = {
 
 // ==========================================================================
 
-export type TcreateQuotationContentDto = {
-  quotationNumber: string; // 報價單編號
-  version: number; // 版本號
-  quotationDate: Date; // 報價日期
-  validityPeriod: string; // 報價時效
-  customerId: string; // 客戶ID
-  projectName: string; // 工程名稱
-  county: string; // 縣市
-  district: string; // 區
-  contactPerson: string; //  聯絡人
-  contactNumber: string; //  聯絡電話
-  projectManager: string; // 承辦人
-  discount: number; // 總折數
-  quantity: string; // 樘數
-  editNotes: string; // 編輯備註
-  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態
-  managerId: string; // 經理ID
-  supervisorId: string; // 主管ID
-  agentId: string; // 經辦人ID
-};
-
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
@@ -694,4 +673,63 @@ export type TupdateDepartmentJobDto = {
   code?: string;
   id: string;
   jobs: TcreateDepartmentJobDto[];
+};
+
+// ==========================================================================
+
+// quotation
+// add comment
+export type TquotationContentDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  version: number;
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string; // 剩餘地址
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  discount: string; // 總折數
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  totalPrice: number; // 報價金額
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  customer: TcustomerDto;
+  managerEmployee: TemployeeDto | null;
+  supervisorEmployee: TemployeeDto | null;
+  agentEmployee: TemployeeDto;
+};
+
+export type TquotationDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  latestContent: TquotationContentDto;
+  contents: TquotationContentDto[];
+};
+
+export type TcreateQuotationContentDto = {
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  customerId: string; // 客戶ID
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string; // 剩餘地址
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  // discount: string; // 總折數
+  discount: number; // 總折數
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  totalPrice: number; // 報價金額
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  managerId?: string | undefined | null; // 經理ID
+  supervisorId?: string | undefined | null; // 主管ID
+  agentId: string; // 經辦人ID
 };

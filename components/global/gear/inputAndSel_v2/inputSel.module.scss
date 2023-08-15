@@ -6,7 +6,6 @@
   flex-wrap: nowrap;
   align-items: center;
   gap: 20px;
-  width: 100%;
 
   &.ps01 {
     padding: 17px 4px 14px 4px;
@@ -299,6 +298,7 @@ div.selControl {
     display: inline-flex;
     flex-direction: row-reverse;
     align-items: center;
+    margin: unset;
     transform: translateY(-1px);
     > span:nth-of-type(2) {
       padding: 0;

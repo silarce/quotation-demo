@@ -178,16 +178,25 @@ export const useApiCustomersNameExist = (name: string) => {
 const apiGetCustomers_id = (id: string, params?: TapiGetCustomersParams) => {
   const api = `/customers/${id}`;
 
+  params = {
+    ...params,
+    populate: ['contacts', 'types', ...(params?.populate ?? [])],
+  };
+
   return axi
-    .get(api, { params })
+    .get<TcustomerDto_TC>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
 
-export const useCustomersById = (id: string, params?: TapiGetCustomersParams) => {
+export const useCustomersById = (id: string | undefined, params?: TapiGetCustomersParams) => {
   const [data, setData] = useState<TcustomerDto_TC>();
 
   const update = async () => {
+    if (!id) {
+      return;
+    }
+
     const data = await apiGetCustomers_id(id, params);
 
     if (data) {

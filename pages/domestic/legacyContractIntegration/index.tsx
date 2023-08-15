@@ -10,7 +10,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 // component
 import Thead01 from 'components/page/domestic/ui/table01/Thead01';
-import TbodyItem01 from 'components/page/domestic/ui/table01/TbodyItem01';
+import TbodyItem01, { TBodyItemContent } from 'components/page/domestic/ui/table01/TbodyItem01';
 
 // option
 import { optionsCreator_doorType, Toption } from 'js/utils/options/options';
@@ -216,7 +216,20 @@ export default function LegacyContractIntegration() {
                 },
               ],
             };
-            const projectData = { basicInfo, clientData };
+            // const projectData = { basicInfo, clientData };
+            const quotationContent: TBodyItemContent = {
+              quotationNumber: item.contractNumber, // 合約編號
+              quotationDate: moment(item.quoteDate).format('YYYY-MM-DD'), //報價日期
+              projectName: item.projectName /**工程名稱 */,
+              county: item.projectCity /**工地位置縣市 */,
+              contactPerson: item.contactPerson /**聯絡人 */,
+              contactNumber: item.contactNumber /**聯絡電話 */,
+              discount: discountRate /**折扣率 */,
+              quantity: tempDoorQty /**產品 數量 計算來的*/,
+              totalPrice: item.total /**總計 */,
+              customerName: item.customerName /**客戶名稱 */,
+              agentEmployeeName: item.operatorName /**經辦人 */,
+            };
 
             const href = {
               pathname: '/domestic/legacyContractIntegration/quotation/',
@@ -226,7 +239,7 @@ export default function LegacyContractIntegration() {
             return (
               <div key={index} ref={arr.length - 3 === index ? viewRef : undefined}>
                 <TbodyItem01
-                  projectData={projectData}
+                  quotationContent={quotationContent}
                   isActive={false}
                   openQuotation={() => {
                     router.push(href);

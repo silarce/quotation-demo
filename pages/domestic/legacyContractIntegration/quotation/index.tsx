@@ -11,7 +11,7 @@ import QuotationProfile from 'components/page/domestic/quotation/legacyContract/
 import QuotationProduction from 'components/page/domestic/quotation/legacyContract/quotationProduct_legacyContract';
 import QuotationAdditions from 'components/page/domestic/quotation/legacyContract/quotationAdditions_legacyContract';
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
-import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
+import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
 
 // import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
 
@@ -155,26 +155,38 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const classSignature = classLegacyContract.classSignature;
-  const signatureArr = [
+  const signatureArr: { label: string; inputProps: TinputProps }[] = [
     {
       label: '經理',
-      signature: classSignature.managerName,
-      onChange: (v: string) => {
-        classSignature.managerName = v;
+      inputProps: {
+        props: {
+          value: classSignature.managerName,
+          onChange: (e) => {
+            classSignature.managerName = e.target.value;
+          },
+        },
       },
     },
     {
       label: '主管',
-      signature: classSignature.supervisorName,
-      onChange: (v: string) => {
-        classSignature.supervisorName = v;
+      inputProps: {
+        props: {
+          value: classSignature.supervisorName,
+          onChange: (e) => {
+            classSignature.supervisorName = e.target.value;
+          },
+        },
       },
     },
     {
       label: '經辦',
-      signature: classSignature.operatorName,
-      onChange: (v: string) => {
-        classSignature.operatorName = v;
+      inputProps: {
+        props: {
+          value: classSignature.operatorName,
+          onChange: (e) => {
+            classSignature.operatorName = e.target.value;
+          },
+        },
       },
     },
   ];

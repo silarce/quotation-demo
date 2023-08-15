@@ -145,7 +145,7 @@ export default function InputSel({
       className={classNames(scss.label, className)}
       style={wrapperStyle}
       onClick={(e) => {
-        if (inputSelBarProps) {
+        if (inputSelBarProps || checkBoxProps) {
           e.preventDefault();
         }
       }}
@@ -169,18 +169,18 @@ export default function InputSel({
         <Input
           wrapperClassName={classNames(fontClassName, inputProps.wrapperClassName)}
           wrapperStyle={inputProps.wrapperStyle}
-          inputAttr={{
+          props={{
             disabled,
             placeholder: `請輸入${caption ?? ''}`,
             //
-            ...inputProps.inputAttr,
+            ...inputProps.props,
             //
             onFocus: (e) => {
-              inputProps.inputAttr?.onFocus?.(e);
+              inputProps.props?.onFocus?.(e);
               setIsFocus(true);
             },
             onBlur: (e) => {
-              inputProps.inputAttr?.onBlur?.(e);
+              inputProps.props?.onBlur?.(e);
               setIsFocus(false);
             },
           }}
@@ -308,7 +308,7 @@ export default function InputSel({
           fontClassName={fontClassName}
           isRadio={checkBoxProps.isRadio}
           onChange={checkBoxProps.onChange}
-          checkBoxArr={checkBoxProps.checkBoxArr}
+          propsArr={checkBoxProps.propsArr}
         />
       )}
 
