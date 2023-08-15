@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm, Controller, useFormState } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
 
 // components
@@ -29,10 +29,6 @@ import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
 
-// option
-import { optionsCreator_quotationState, Toption } from 'js/utils/options/options';
-const optionQuotationState = optionsCreator_quotationState();
-
 // css
 import style from './quotation.module.scss';
 
@@ -43,7 +39,6 @@ import { AppContext } from 'pages/_app';
 // 假資料與fake api
 import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
 import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
 import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 
@@ -62,7 +57,6 @@ import {
   apiPostQuotation,
   apiPatchQuotation,
 } from 'js/api/api_quotation';
-import { set } from 'lodash';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -84,8 +78,7 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
-    id, //報價單id //若為新增報價單則為newQuotation
-    // isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
+    id, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
   // ----------------------------------------------------------------
   const { userInfo } = useContext(AppContext);
@@ -95,15 +88,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
 
   // ---------------------------------------------------------
-  // const { register, control, reset, watch, setValue } = useForm<TcreateQuotationContentDto>();
-  // const { register, control, reset, watch, setValue } = useForm<TquotationContentDto>();
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
   const { data, update } = useGetQuotation_id(id as string);
 
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
-      await update();
+      try {
+        setIsLoading(true);
+        await update();
+      } catch (error) {}
+
       setIsLoading(false);
     })();
   }, [id]);
@@ -215,15 +209,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   })();
 
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-
-  // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
-  // let quotationData: Tquotation | undefined;
-  // if (typeof quotationId === "string" && quotationId !== "newQuotation") {
-  //   quotationData = fakeQuotationObjList[quotationId]
-  //   if (!quotationData) quotationData = undefined
-  // }
   // --------------------------------------------------------------------------
   // 是否可編輯
   const [allowEdit, setAllowEdit] = useState(false);
@@ -286,7 +271,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
-  const [quotationState, setQuotationState] = useState<Toption>({ value: '預算', label: '預算' });
 
   const [showMemoModal, setShowMemoModal] = useState(false);
 
@@ -336,7 +320,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setQuotationState={(option) => {
             setValue('status', option.value as TquotationContentDto['status']);
           }}
-          // history={fakeQuotationStateHistory}
           history={history}
         />
       ),
@@ -362,12 +345,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
-  // --------------------------------------------------------------------------
-  // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  // if (quotationId !== "newQuotation" && !quotationData)
-  //   return <NoQuotation quotationId={quotationId as string} />
-  // if (quotationId !== "newQuotation")
-  //   return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   if (!classQuotation) {
@@ -523,16 +500,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onCancel={onEmpSelCancel}
         selLimit={1}
       />
-      {/* <EmployeeSelector
-        showModal={employeeSelectorShow}
-        label="請選擇審核人員"
-        onConfirm={(arr) => {
-          setEmployeeSelectorShow(false);
-        }}
-        onCancel={() => {
-          setEmployeeSelectorShow(false);
-        }}
-      /> */}
     </div>
   );
 }
@@ -545,54 +512,3 @@ function TheQuotation({ router }: { router: NextRouter }) {
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
-const NoQuotation = ({ quotationId }: { quotationId: string }) => {
-  const router = useRouter();
-
-  const toBack = () => {
-    router.back();
-  };
-
-  return (
-    <div className={style.noQuotation}>
-      <span>沒有這個報價單ID</span>
-      <span>{quotationId}</span>
-      <button onClick={toBack}>回上一頁</button>
-    </div>
-  );
-};
-
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-
-const fakeQuotationStateHistory = [
-  {
-    state_from: '預算',
-    state_to: '投標',
-    isoString: moment('0111-02-03 05:11:05').toISOString(),
-  },
-  {
-    state_from: '預算',
-    state_to: '發包',
-    isoString: moment('0111-02-10 09:15:08').toISOString(),
-  },
-  {
-    state_from: '預算',
-    state_to: '發包',
-    isoString: moment('0111-03-05 15:01:46').toISOString(),
-  },
-  {
-    state_from: '預算',
-    state_to: '投標',
-    isoString: moment('0111-03-23 13:45:11').toISOString(),
-  },
-];
-
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-
-// 新增報價單的時候要自動帶使用者的名字降去經辦人，而且不能再改
