@@ -228,7 +228,7 @@ class Class_product {
   };
 
   calcVolume = () => {
-    return Decimal.mul(this.area || 0, 0.89)
+    return Decimal.mul(this.area || 0, 10.89)
       .toFixed(2)
       .toString();
   };
