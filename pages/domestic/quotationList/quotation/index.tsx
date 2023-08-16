@@ -25,6 +25,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -49,6 +50,7 @@ import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
 
+// api
 import {
   TquotationDto,
   TquotationContentDto,
@@ -56,6 +58,9 @@ import {
   useGetQuotation_id,
   apiPostQuotation,
   apiPatchQuotation,
+  apiQuotationSubmitReview,
+  apiQuotationReview,
+  apiQuotationunLock,
 } from 'js/api/api_quotation';
 
 // ------------------------------------------------------------------
@@ -86,6 +91,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ----------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  // ---------------------------------------------------------
+  const [reviewSales, setReviewSales] = useState<TemployeeDto>();
+  const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
@@ -154,11 +162,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setValue('contactNumber', v.contactNumber ?? '');
   };
 
-  // ---------------------------------------------------------
+  // --------------------------------------------------------------
 
-  const [empSelConfirmKey, setEmpSelConfirmKey] = useState<'manager' | 'supervisor' | 'inspector'>();
+  const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
+    'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor'
+  >();
 
-  const openEmpSel = (v: 'manager' | 'supervisor' | 'inspector') => {
+  const openEmpSel = (v: 'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor') => {
     setEmpSelConfirmKey(v);
     setEmployeeSelectorShow(true);
   };
@@ -168,43 +178,57 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setEmpSelConfirmKey(undefined);
   };
 
-  const changeManager = (v: TemployeeDto[]) => {
-    setValue('managerEmployee', v[0]);
-    onEmpSelCancel();
-  };
-
-  const changeSupervisor = (v: TemployeeDto[]) => {
-    setValue('supervisorEmployee', v[0]);
-    onEmpSelCancel();
-  };
-
-  const changeinspector = (v: TemployeeDto[]) => {
-    console.log(v);
-    onEmpSelCancel();
-  };
-
   const empSelProps = (() => {
     if (empSelConfirmKey === 'manager') {
       return {
         label: '請選擇經理',
-        onConfirm: changeManager,
         onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setValue('managerEmployee', v[0]);
+          onEmpSelCancel();
+        },
       };
     }
 
     if (empSelConfirmKey === 'supervisor') {
       return {
         label: '請選擇主管',
-        onConfirm: changeSupervisor,
         onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setValue('supervisorEmployee', v[0]);
+          onEmpSelCancel();
+        },
       };
     }
 
-    if (empSelConfirmKey === 'inspector') {
+    if (empSelConfirmKey === 'reviewSales') {
       return {
-        label: '請選擇審核者',
-        onConfirm: changeinspector,
+        label: '請選擇審核業務',
+        tip: '可不選，直接按確定',
         onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setReviewSales(v[0]);
+          onEmpSelCancel();
+          setTimeout(() => {
+            openEmpSel('reviewSupervisor');
+          }, 300);
+        },
+      };
+    }
+
+    if (empSelConfirmKey === 'reviewSupervisor') {
+      return {
+        label: '請選擇審核經理',
+        tip: '可不選，直接按確定',
+        onCancel: onEmpSelCancel,
+        onConfirm: async (v: TemployeeDto[]) => {
+          setReviewSupervisor(v[0]);
+          onEmpSelCancel();
+          reqSetReviewer({
+            reviewSales,
+            reviewSupervisor: v[0],
+          });
+        },
       };
     }
   })();
@@ -284,7 +308,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setShowMemoModal(false);
 
     setTimeout(() => {
-      reqPost();
+      reqUpdateQuotation();
     }, 10);
   };
 
@@ -341,7 +365,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   onClick: () => setShowPdf_part(true),
     // },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    // { type: 'myButton', label: '送審', onClick: () => openEmpSel('inspector') },
+    { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -367,7 +391,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  const reqPost = async () => {
+  const reqUpdateQuotation = async () => {
     const data = watch();
 
     const body: TcreateQuotationContentDto = {
@@ -418,6 +442,36 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setIsLoading(false);
   };
 
+  const reqSetReviewer = async ({
+    reviewSales,
+    reviewSupervisor,
+  }: {
+    reviewSales: TemployeeDto | undefined;
+    reviewSupervisor: TemployeeDto | undefined;
+  }) => {
+    if (!id) {
+      return;
+    }
+
+    const reviewSalesEmployeeId = reviewSales?.id || null;
+    const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(id, {
+        reviewSalesEmployeeId,
+        reviewSupervisorEmployeeId,
+      });
+      await update();
+    } catch (error) {
+      myAlert.err({ title: '更新審核人員失敗' });
+    } finally {
+      setReviewSales(undefined);
+      setReviewSupervisor(undefined);
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -460,6 +514,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
           /> */}
           {/* 簽名 */}
           <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
+          {/* 審核人員 */}
+          <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
+            <InputSel
+              caption="審核業務"
+              inputProps={{
+                props: {
+                  disabled: true,
+                  value:
+                    (data?.latestContent.reviewSalesEmployee?.chName ||
+                      data?.latestContent.reviewSalesEmployee?.enName) ??
+                    '',
+                },
+              }}
+            />
+            <InputSel
+              caption="審核主管"
+              inputProps={{
+                props: {
+                  disabled: true,
+                  value:
+                    (data?.latestContent.reviewSupervisorEmployee?.chName ||
+                      data?.latestContent.reviewSupervisorEmployee?.enName) ??
+                    '',
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
       <LoadingCover01 isLoading={isLoading} />
@@ -494,10 +575,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <EmployeeSelector
         showModal={employeeSelectorShow}
         label={empSelProps?.label}
+        tip={empSelProps?.tip}
         onConfirm={(v) => {
           empSelProps?.onConfirm(v);
         }}
-        onCancel={onEmpSelCancel}
+        onCancel={() => empSelProps?.onCancel()}
         selLimit={1}
       />
     </div>

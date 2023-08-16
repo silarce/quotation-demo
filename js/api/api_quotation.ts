@@ -69,6 +69,8 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',
       'latestContent.managerEmployee',
+      'latestContent.reviewSalesEmployee',
+      'latestContent.reviewSupervisorEmployee',
     ],
   };
 
@@ -119,6 +121,7 @@ export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) 
     .catch((err) => Promise.reject(err));
 };
 
+// 設定報價單審核人員
 export const apiQuotationSubmitReview = (
   id: string,
   body: {
@@ -134,6 +137,7 @@ export const apiQuotationSubmitReview = (
     .catch((err) => Promise.reject(err));
 };
 
+// 審核該報價單
 export const apiQuotationReview = (id: string) => {
   const api = `/quotation/${id}/review`;
 
