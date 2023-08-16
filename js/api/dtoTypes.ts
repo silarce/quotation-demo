@@ -538,7 +538,7 @@ export type TcreateLegacyContractDto = {
   /* 報價時段 */
   quoteValidity?: string | null;
   /* 報價日期 date*/
-  quoteDate?: Date | null;
+  quoteDate?: string | null;
   /* 工程名稱 */
   projectName: string;
   /* 客戶名稱 */
@@ -570,7 +570,7 @@ export type TcreateLegacyContractDto = {
   /* 交貨地點 */
   deliveryLocation: string;
   /* 交貨日期 date*/
-  deliveryDate: Date;
+  deliveryDate: string;
   /* 付款方式 */
   paymentMethods: TpaymentMethodDto[];
   //

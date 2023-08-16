@@ -21,7 +21,6 @@ import {
 } from 'js/api/dtoTypes';
 
 import { checkIsNumberStr, clearThousandsSeparator } from 'js/utils/helpers/universal';
-import { CONFIG_FILES } from 'next/dist/shared/lib/constants';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
@@ -1088,10 +1087,43 @@ class Class_legacyContract {
 
     legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition);
 
-    const quoteDate_Date = new Date(legacyContractCopy.quoteDate as string);
+    const quoteDate_Date = (() => {
+      if (!legacyContractCopy.quoteDate) {
+        return '';
+      }
+
+      const date = moment(legacyContractCopy.quoteDate as string);
+
+      if (date.isValid()) {
+        return '';
+      } else {
+        // console.log(date.toISOString());
+
+        return date.toISOString();
+      }
+    })();
+
+    // const quoteDate_Date = legacyContractCopy.quoteDate
+    //   ? new Date(legacyContractCopy.quoteDate as string).toISOString()
+    //   : '';
     // = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
 
-    const deliveryDate_Date = new Date(legacyContractCopy.deliveryDate as string);
+    const deliveryDate_Date = (() => {
+      if (!legacyContractCopy.deliveryDate) {
+        return '';
+      }
+
+      const date = moment(legacyContractCopy.deliveryDate);
+
+      if (date.isValid()) {
+        return '';
+      } else {
+        return date.toISOString();
+      }
+    })();
+    // const deliveryDate_Date = legacyContractCopy.deliveryDate
+    //   ? new Date(legacyContractCopy.deliveryDate).toISOString()
+    //   : '';
     // = new Date(yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string)
 
     legacyContractCopy.discountRate = Decimal.div(legacyContractCopy.discountRate, 100).toString();
@@ -1102,6 +1134,8 @@ class Class_legacyContract {
 
     const notes = this.classNotes.stringArr;
     const quoteScopes = this.classQuoteScopes.stringArr;
+
+    // console.log('quoteDate_Date', quoteDate_Date);
 
     return {
       ...legacyContractCopy,
@@ -1149,6 +1183,9 @@ export {
 };
 
 // ==========================================================================
+
+// console.log(isNaN(new Date('1111-11-11').getTime()));
+// console.log(isNaN(new Date('aaaa').getTime()));
 
 type TprodInputCellType = {
   [key in keyof Pick<
