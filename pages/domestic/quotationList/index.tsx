@@ -26,16 +26,39 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 // ===========================================
 
 import { useGetQuotation } from 'js/api/api_quotation';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ===========================================
 // ===========================================
 
 export default function Budget() {
   const router = useRouter();
-  const { county, customerName, projectName, status } = router.query;
+  const { county, customerName, projectName, status, reviewStatus } = router.query as { [key: string]: string };
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
+  //審核中
+  const reviewStatusFilter_inReview = {
+    $or: {
+      'latestContent.reviewSalesEmployee': { $notNull: true },
+      'latestContent.reviewSupervisorEmployee': { $notNull: true },
+    },
+  };
+
+  // 已審核
+  const reviewStatusFilter_reviewed = {
+    $or: {
+      'latestContent.salesReviewedAt': { $notNull: true },
+      'latestContent.supervisorReviewedAt': { $notNull: true },
+    },
+  };
+
+  const reviewStatusFilter =
+    reviewStatus === '審核中'
+      ? reviewStatusFilter_inReview
+      : reviewStatus === '審核完成'
+      ? reviewStatusFilter_reviewed
+      : undefined; // 待審核
 
   const params = {
     filter: {
@@ -51,6 +74,7 @@ export default function Budget() {
       'latestContent.county': {
         $contains: county || undefined,
       },
+      ...reviewStatusFilter,
     },
   };
 
@@ -59,10 +83,16 @@ export default function Budget() {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      await update();
+
+      try {
+        await update();
+      } catch (error) {
+        myAlert.err({ title: '取得資料失敗' });
+      }
+
       setIsLoading(false);
     })();
-  }, [county, customerName, projectName, status]);
+  }, [router.query]);
 
   // ----------------------------------------------------------
   // panelList
@@ -156,10 +186,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          approvalsStatus: '待審核',
+          reviewStatus: '待審核',
         },
       },
-      isActive: !query.approvalsStatus || query.approvalsStatus === '待審核',
+      isActive: !query.reviewStatus || query.reviewStatus === '待審核',
     },
     {
       label: '審核中',
@@ -167,10 +197,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          approvalsStatus: '審核中',
+          reviewStatus: '審核中',
         },
       },
-      isActive: query.approvalsStatus === '審核中',
+      isActive: query.reviewStatus === '審核中',
     },
     {
       label: '審核完成',
@@ -178,10 +208,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          approvalsStatus: '審核完成',
+          reviewStatus: '審核完成',
         },
       },
-      isActive: query.approvalsStatus === '審核完成',
+      isActive: query.reviewStatus === '審核完成',
     },
   ];
 
