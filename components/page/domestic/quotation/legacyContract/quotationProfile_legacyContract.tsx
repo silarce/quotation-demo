@@ -260,7 +260,7 @@ export default function QuotationProfile({
             value: quoteValidity ?? "",
             onChange: (v) => { classBasicInfo.quoteValidity = v }
           }} /> */}
-        {/* <InputSel
+        <InputSel
           label="合約日期"
           showBaseline="auto"
           disabled={disabled}
@@ -271,7 +271,7 @@ export default function QuotationProfile({
               classBasicInfo.quoteDate = moment?.toISOString();
             },
           }}
-        /> */}
+        />
       </div>
 
       {/* modal */}

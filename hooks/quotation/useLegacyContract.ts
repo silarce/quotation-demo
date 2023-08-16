@@ -1055,7 +1055,7 @@ class Class_legacyContract {
       return false;
     }
 
-    let { quoteDate, deliveryDate } = this._legacyContract;
+    const { quoteDate, deliveryDate } = this._legacyContract;
 
     // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
@@ -1065,15 +1065,15 @@ class Class_legacyContract {
     // }
 
     if (!quoteDate) {
-      // myAlert.warning({ title: '請選擇報價日期' });
-      // return false;
-      quoteDate = '';
+      myAlert.warning({ title: '請選擇合約日期' });
+
+      return false;
     }
 
     if (!deliveryDate) {
-      // myAlert.warning({ title: '請選擇交貨日期' });
-      // return false;
-      deliveryDate = '';
+      myAlert.warning({ title: '請選擇交貨日期' });
+
+      return false;
     }
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
@@ -1095,11 +1095,9 @@ class Class_legacyContract {
       const date = moment(legacyContractCopy.quoteDate as string);
 
       if (date.isValid()) {
-        return '';
-      } else {
-        // console.log(date.toISOString());
-
         return date.toISOString();
+      } else {
+        return '';
       }
     })();
 
@@ -1116,9 +1114,9 @@ class Class_legacyContract {
       const date = moment(legacyContractCopy.deliveryDate);
 
       if (date.isValid()) {
-        return '';
-      } else {
         return date.toISOString();
+      } else {
+        return '';
       }
     })();
     // const deliveryDate_Date = legacyContractCopy.deliveryDate
@@ -1134,8 +1132,6 @@ class Class_legacyContract {
 
     const notes = this.classNotes.stringArr;
     const quoteScopes = this.classQuoteScopes.stringArr;
-
-    // console.log('quoteDate_Date', quoteDate_Date);
 
     return {
       ...legacyContractCopy,
