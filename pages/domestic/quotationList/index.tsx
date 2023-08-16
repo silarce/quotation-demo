@@ -37,6 +37,15 @@ export default function Budget() {
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
+  // 未審核
+
+  const reviewStatusFilter_noReview = {
+    $and: {
+      'latestContent.reviewSalesEmployee': { $null: true },
+      'latestContent.reviewSupervisorEmployee': { $null: true },
+    },
+  };
+
   //審核中
   const reviewStatusFilter_inReview = {
     $or: {
@@ -58,7 +67,7 @@ export default function Budget() {
       ? reviewStatusFilter_inReview
       : reviewStatus === '審核完成'
       ? reviewStatusFilter_reviewed
-      : undefined; // 待審核
+      : reviewStatusFilter_noReview; // 待審核
 
   const params = {
     filter: {
@@ -74,7 +83,7 @@ export default function Budget() {
       'latestContent.county': {
         $contains: county || undefined,
       },
-      ...reviewStatusFilter,
+      // ...reviewStatusFilter,
     },
   };
 
