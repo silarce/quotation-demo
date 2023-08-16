@@ -37,7 +37,7 @@ export default function TextListEditor_v2({
         return (
           <div key={index}>
             {disabled ? <span></span> : <IconRemoveCircle onClick={() => delString(index)} />}
-            <span className={scss.serialNumber}>{index + 1}</span>
+            <span className={scss.serialNumber}></span>
             <InputSel
               className={scss.inputSel}
               textareaProps={{
