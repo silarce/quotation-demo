@@ -87,7 +87,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = router.query as { id: string | undefined };
   // ----------------------------------------------------------------
   const { userInfo } = useContext(AppContext);
-
+  const userId = userInfo?.employee?.id;
   // ----------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
@@ -98,6 +98,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
   const { data, update } = useGetQuotation_id(id as string);
+
+  let isReviewer = false;
+  const reviewSalesEmployeeId = data?.latestContent?.reviewSalesEmployee?.id;
+  const reviewSupervisorEmployeeId = data?.latestContent?.reviewSupervisorEmployee?.id;
+
+  if (userId) {
+    if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
+      isReviewer = true;
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -364,8 +374,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   img: iconUpload.src,
     //   onClick: () => setShowPdf_part(true),
     // },
+    (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
+    (!!id || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -468,6 +479,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } finally {
       setReviewSales(undefined);
       setReviewSupervisor(undefined);
+      setIsLoading(false);
+    }
+  };
+
+  // 現在只有admin可以呼叫這系列的api，所以無法測試
+  const reqReview = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationReview(id);
+      await update();
+    } catch (error) {
+      myAlert.err({ title: '審核失敗' });
+    } finally {
       setIsLoading(false);
     }
   };
