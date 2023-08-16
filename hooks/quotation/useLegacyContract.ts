@@ -1056,7 +1056,7 @@ class Class_legacyContract {
       return false;
     }
 
-    const { quoteDate, deliveryDate } = this._legacyContract;
+    let { quoteDate, deliveryDate } = this._legacyContract;
 
     // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
@@ -1064,16 +1064,17 @@ class Class_legacyContract {
     // if (!checkDateFormat(deliveryDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
     // }
-    if (!quoteDate) {
-      myAlert.warning({ title: '請選擇報價日期' });
 
-      return false;
+    if (!quoteDate) {
+      // myAlert.warning({ title: '請選擇報價日期' });
+      // return false;
+      quoteDate = '';
     }
 
     if (!deliveryDate) {
-      myAlert.warning({ title: '請選擇交貨日期' });
-
-      return false;
+      // myAlert.warning({ title: '請選擇交貨日期' });
+      // return false;
+      deliveryDate = '';
     }
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
