@@ -1394,7 +1394,24 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
     total: 0,
     deliveryLocation: '',
     deliveryDate: '',
-    paymentMethods: [],
+    paymentMethods: [
+      {
+        milestone: '訂製同時付總金額',
+        totalPaymentRatio: '0',
+      },
+      {
+        milestone: '交貨同時付總金額',
+        totalPaymentRatio: '0',
+      },
+      {
+        milestone: '按裝同時付總金額',
+        totalPaymentRatio: '0',
+      },
+      {
+        milestone: '接電同時付總金額',
+        totalPaymentRatio: '0',
+      },
+    ],
     notes: [],
     quoteScopes: [],
     managerName: '',
