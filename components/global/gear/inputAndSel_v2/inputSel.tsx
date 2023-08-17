@@ -142,7 +142,7 @@ export default function InputSel({
 
   return (
     <label
-      className={classNames(scss.label, className)}
+      className={classNames(scss.label, className, 'w-full')}
       style={wrapperStyle}
       onClick={(e) => {
         if (inputSelBarProps || checkBoxProps) {
