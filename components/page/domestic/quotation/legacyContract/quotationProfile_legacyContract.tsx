@@ -62,10 +62,10 @@ export default function QuotationProfile({
   // ==============================================
   // 客戶資料
   const theClientData = [
-    { label: '聯絡人', placeholder: '尚未選擇', value: contactPerson },
-    { label: '聯絡電話', placeholder: '尚未選擇', value: contactNumber },
-    { label: '傳真號碼', placeholder: '尚未選擇', value: faxNumber },
-  ];
+    { key: 'contactPerson', label: '聯絡人', placeholder: undefined, value: contactPerson },
+    { key: 'contactNumber', label: '聯絡電話', placeholder: undefined, value: contactNumber },
+    { key: 'faxNumber', label: '傳真號碼', placeholder: undefined, value: faxNumber },
+  ] as const;
 
   // ==============================================
   const clearClient = () => {
@@ -172,7 +172,7 @@ export default function QuotationProfile({
           <div>
             {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
             {theClientData.map((item, index) => {
-              const { label, value, placeholder } = item;
+              const { key, label, value, placeholder } = item;
 
               return (
                 <InputSel
@@ -180,12 +180,16 @@ export default function QuotationProfile({
                   label={label}
                   placeholder={placeholder}
                   captionClassName={scss.input02}
-                  disabled={true}
-                  showBaseline="invisible"
+                  // disabled={true}
+                  disabled={disabled}
+                  showBaseline="auto"
                   {...{ ...inputStyle }}
                   inputProps={{
                     value: value ?? '',
-                    onChange: () => {},
+                    // onChange: () => {},
+                    onChange: (v) => {
+                      classBasicInfo[key] = v;
+                    },
                   }}
                 />
               );

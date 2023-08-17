@@ -29,7 +29,13 @@ export const apiGetQuotation = async (params?: Tparams) => {
   const api = '/quotation';
 
   params = {
-    populate: ['contents', 'latestContent.customer', 'latestContent.agentEmployee'],
+    populate: [
+      'contents',
+      'latestContent.customer',
+      'latestContent.agentEmployee',
+      'latestContent.reviewSalesEmployee',
+      'latestContent.reviewSupervisorEmployee',
+    ],
     ...params,
   };
 
@@ -69,6 +75,8 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',
       'latestContent.managerEmployee',
+      'latestContent.reviewSalesEmployee',
+      'latestContent.reviewSupervisorEmployee',
     ],
   };
 
@@ -107,7 +115,7 @@ export const apiPostQuotation = (body: TcreateQuotationContentDto) => {
   return axi
     .post<TquotationDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) => {
@@ -116,5 +124,40 @@ export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) 
   return axi
     .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
+};
+
+// 設定報價單審核人員
+export const apiQuotationSubmitReview = (
+  id: string,
+  body: {
+    reviewSalesEmployeeId: string | null;
+    reviewSupervisorEmployeeId: string | null;
+  }
+) => {
+  const api = `/quotation/${id}/submit-review`;
+
+  return axi
+    .patch<undefined>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 審核該報價單
+export const apiQuotationReview = (id: string) => {
+  const api = `/quotation/${id}/review`;
+
+  return axi
+    .patch<undefined>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiQuotationunLock = (id: string) => {
+  const api = `/quotation/${id}/unLock`;
+
+  return axi
+    .patch<undefined>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
 };

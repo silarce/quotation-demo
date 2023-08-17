@@ -13,12 +13,15 @@ import QuotationAdditions from 'components/page/domestic/quotation/legacyContrac
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
 import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
 
-// import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+
+// icon
+import iconUpload from 'public/image/icon/upload.svg';
 
 // css
 import style from './quotation.module.scss';
@@ -197,7 +200,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [allowEdit, legacyContract]);
 
   // -----------------------------------------------------------------------
-  // const [showPdf, setShowPdf] = useState(false)
+  const [showPdf, setShowPdf] = useState(false);
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
@@ -217,6 +220,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         if (!postBody) {
           return;
         }
+
+        console.log('quoteDate', postBody.quoteDate);
+        console.log('deliveryDate', postBody.deliveryDate);
 
         try {
           showRootLoading(true);
@@ -246,10 +252,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
   const panel_noEditable: TpanelList = [
-    // {
-    //   type: "myButton", label: "匯出舊合約", img: iconUpload.src,
-    //   onClick: () => setShowPdf(true)
-    // },
+    {
+      type: 'myButton',
+      label: '匯出舊合約',
+      img: iconUpload.src,
+      onClick: () => setShowPdf(true),
+    },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
     // { type: "myButton", label: "送審", onClick: () => alert("送審") },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
@@ -292,10 +300,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
         </div>
       </div>
-      {/* <QuotationPdf
+      <QuotationPdf
         isVisable={showPdf}
-        onCancel={() => { setShowPdf(false) }}
-        classLegacyContract={classLegacyContract} /> */}
+        onCancel={() => {
+          setShowPdf(false);
+        }}
+        classLegacyContract={classLegacyContract}
+      />
     </SubLayer>
   );
 }

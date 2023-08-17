@@ -13,9 +13,16 @@ import style from './quotationProduct.module.scss';
 import styleL from './local.module.scss';
 
 // type
+import {
+  TinputSelProps,
+  TinputProps,
+  TselectProps,
+  TcheckboxProps,
+} from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import { Class_quotation } from 'hooks/quotation/useQuotation';
 
+// ======================================================================
 export default function QuotationProduction({
   classQuotation,
   disabled,
@@ -54,3 +61,126 @@ export default function QuotationProduction({
     </div>
   );
 }
+// =========================================================================
+
+type Tkey = 'discount' | 'category' | 'series' | 'ejectionDoor' | 'listPrice'; // | 'doorRail';
+
+const keyArr: Tkey[] = [
+  //
+  'discount',
+  'category',
+  'series',
+  'ejectionDoor',
+  'listPrice',
+  // 'doorRail',
+];
+
+const disabled = false;
+
+// const config = {
+//   discount: { id: 'discount', label: '折數', width: '75px', type: 'input', inputType: 'number' },
+//   category: { id: 'category', label: '項目', width: '60px', type: 'input' },
+//   // select
+//   series: { id: 'series', label: '報價別', width: '105px', type: 'select' },
+//   // selectWithIcon
+//   doorRail: { id: 'doorRail', label: '門軌', width: '210px', type: 'selectWithIcon' },
+//   // checkbox
+//   ejectionDoor: { id: 'ejectionDoor', label: '彈射門', width: '60px', type: 'checkbox' },
+//   // readOnly
+//   listPrice: { id: 'listPrice', label: '牌價', width: '120px', type: 'readOnly' },
+// } as const;
+
+type Tconfig = {
+  [key in Tkey]: {
+    label: string; // header用的
+    inputSelProps: TinputSelProps; // body用的
+  };
+};
+
+const config: Tconfig = {
+  discount: {
+    label: '折數',
+    inputSelProps: {
+      disabled,
+      wrapperStyle: {
+        width: '75px',
+      },
+      inputProps: {
+        props: {
+          type: 'number',
+        },
+      },
+    },
+  },
+  category: {
+    label: '項目',
+    inputSelProps: {
+      disabled,
+      wrapperStyle: {
+        width: '60px',
+      },
+      inputProps: {
+        props: {},
+      },
+    },
+  },
+  series: {
+    label: '報價別',
+    inputSelProps: {
+      disabled,
+      wrapperStyle: {
+        width: '105px',
+      },
+      selectProps: {
+        props: {
+          options: [
+            { value: '1', label: '1' },
+            { value: '2', label: '2' },
+          ],
+        },
+      },
+    },
+  },
+  ejectionDoor: {
+    label: '彈射門',
+    inputSelProps: {
+      disabled,
+      wrapperStyle: {
+        width: '60px',
+      },
+      checkBoxProps: {
+        propsArr: [{ key: 'ejectionDoor' }],
+      },
+    },
+  },
+  listPrice: {
+    label: '牌價',
+    inputSelProps: {
+      disabled,
+      wrapperStyle: {
+        width: '120px',
+      },
+      inputProps: {
+        props: { disabled: true },
+      },
+    },
+  },
+  // doorRail: {
+  //   label: '門軌',
+  //   inputSelProps: {
+  //     disabled,
+  //     wrapperStyle: {
+  //       width: '210px',
+  //     },
+  //     selectProps: {
+  //       props: {
+  //         options: [
+  //           { value: '1', label: '1' },
+  //           { value: '2', label: '2' },
+  //         ],
+  //       },
+  //     },
+  //   },
+  // },
+  //
+};

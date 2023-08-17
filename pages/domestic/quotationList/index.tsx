@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // components
 import BudgeList from 'components/page/domestic/budget/budgetList';
 
 // css
-import scss from './budget.module.scss';
+import scss from './index.module.scss';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -22,35 +22,57 @@ const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 
-// fakeData
-
-// ===========================================
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-// 預算、投標、發包 的介面完全一樣，僅是取得之資料的狀態不同
-// 點進去的報價單也一樣，僅是取得之資料的狀態不同
-
 // ===========================================
 // ===========================================
 
 import { useGetQuotation } from 'js/api/api_quotation';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ===========================================
 // ===========================================
 
 export default function Budget() {
   const router = useRouter();
-  const { county, customerName, projectName } = router.query;
-  // ===========================================
+  const { county, customerName, projectName, status, reviewStatus } = router.query as { [key: string]: string };
+  // ----------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
+  // ----------------------------------------------------
+  // 未審核
+
+  const reviewStatusFilter_noReview = {
+    $and: {
+      'latestContent.reviewSalesEmployee': { $null: true },
+      'latestContent.reviewSupervisorEmployee': { $null: true },
+    },
+  };
+
+  //審核中
+  const reviewStatusFilter_inReview = {
+    $or: {
+      'latestContent.reviewSalesEmployee': { $notNull: true },
+      'latestContent.reviewSupervisorEmployee': { $notNull: true },
+    },
+  };
+
+  // 已審核
+  const reviewStatusFilter_reviewed = {
+    $or: {
+      'latestContent.salesReviewedAt': { $notNull: true },
+      'latestContent.supervisorReviewedAt': { $notNull: true },
+    },
+  };
+
+  const reviewStatusFilter =
+    reviewStatus === '審核中'
+      ? reviewStatusFilter_inReview
+      : reviewStatus === '審核完成'
+      ? reviewStatusFilter_reviewed
+      : reviewStatusFilter_noReview; // 待審核
 
   const params = {
     filter: {
       'latestContent.status': {
-        $eq: 'Budget',
+        $eq: status,
       },
       'latestContent.projectName': {
         $contains: projectName || undefined,
@@ -61,16 +83,25 @@ export default function Budget() {
       'latestContent.county': {
         $contains: county || undefined,
       },
+      // ...reviewStatusFilter,
     },
   };
 
   const { data: quoatationArr, meta, update } = useGetQuotation(params);
 
   useEffect(() => {
-    update();
-  }, [county, customerName, projectName]);
+    (async () => {
+      setIsLoading(true);
 
-  // ===========================================
+      try {
+        await update();
+      } catch (error) {
+        myAlert.err({ title: '取得資料失敗' });
+      }
+
+      setIsLoading(false);
+    })();
+  }, [router.query]);
 
   // ----------------------------------------------------------
   // panelList
@@ -130,7 +161,7 @@ export default function Budget() {
       label: '新增報價單',
       onClick: () => {
         router.push({
-          pathname: `/domestic/budget/quotation`,
+          pathname: `/domestic/quotationList/quotation`,
         });
       },
     },
@@ -145,6 +176,7 @@ export default function Budget() {
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
       </div>
+      <LoadingCover01 isLoading={isLoading} />
     </SubLayer>
   );
 }
@@ -163,10 +195,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          approvalsStatus: '待審核',
+          reviewStatus: '待審核',
         },
       },
-      isActive: !query.approvalsStatus || query.approvalsStatus === '待審核',
+      isActive: !query.reviewStatus || query.reviewStatus === '待審核',
     },
     {
       label: '審核中',
@@ -174,10 +206,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          approvalsStatus: '審核中',
+          reviewStatus: '審核中',
         },
       },
-      isActive: query.approvalsStatus === '審核中',
+      isActive: query.reviewStatus === '審核中',
     },
     {
       label: '審核完成',
@@ -185,10 +217,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          approvalsStatus: '審核完成',
+          reviewStatus: '審核完成',
         },
       },
-      isActive: query.approvalsStatus === '審核完成',
+      isActive: query.reviewStatus === '審核完成',
     },
   ];
 

@@ -538,7 +538,7 @@ export type TcreateLegacyContractDto = {
   /* 報價時段 */
   quoteValidity?: string | null;
   /* 報價日期 date*/
-  quoteDate?: Date | null;
+  quoteDate?: string | null;
   /* 工程名稱 */
   projectName: string;
   /* 客戶名稱 */
@@ -570,7 +570,7 @@ export type TcreateLegacyContractDto = {
   /* 交貨地點 */
   deliveryLocation: string;
   /* 交貨日期 date*/
-  deliveryDate: Date;
+  deliveryDate: string;
   /* 付款方式 */
   paymentMethods: TpaymentMethodDto[];
   //
@@ -702,6 +702,11 @@ export type TquotationContentDto = {
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
+  //審核相關
+  reviewSalesEmployee: TemployeeDto | null;
+  salesReviewedAt: string | null;
+  reviewSupervisorEmployee: TemployeeDto | null;
+  supervisorReviewedAt: string | null;
 };
 
 export type TquotationDto = {
@@ -723,8 +728,7 @@ export type TcreateQuotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
-  // discount: string; // 總折數
-  discount: number; // 總折數
+  discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   totalPrice: number; // 報價金額

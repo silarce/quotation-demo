@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm, Controller, useFormState } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
 
 // components
@@ -25,13 +25,10 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
-
-// option
-import { optionsCreator_quotationState, Toption } from 'js/utils/options/options';
-const optionQuotationState = optionsCreator_quotationState();
 
 // css
 import style from './quotation.module.scss';
@@ -43,7 +40,6 @@ import { AppContext } from 'pages/_app';
 // 假資料與fake api
 import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
 import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
 import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 
@@ -54,6 +50,7 @@ import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
 
+// api
 import {
   TquotationDto,
   TquotationContentDto,
@@ -61,8 +58,10 @@ import {
   useGetQuotation_id,
   apiPostQuotation,
   apiPatchQuotation,
+  apiQuotationSubmitReview,
+  apiQuotationReview,
+  apiQuotationunLock,
 } from 'js/api/api_quotation';
-import { set } from 'lodash';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -84,26 +83,39 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
-    id, //報價單id //若為新增報價單則為newQuotation
-    // isNewQuotationId, // 新增報價單的id // 若不是新增報價單則為undefined
+    id, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
   // ----------------------------------------------------------------
   const { userInfo } = useContext(AppContext);
-
+  const userId = userInfo?.employee?.id;
   // ----------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  // ---------------------------------------------------------
+  const [reviewSales, setReviewSales] = useState<TemployeeDto>();
+  const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
-  // const { register, control, reset, watch, setValue } = useForm<TcreateQuotationContentDto>();
-  // const { register, control, reset, watch, setValue } = useForm<TquotationContentDto>();
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
   const { data, update } = useGetQuotation_id(id as string);
 
+  let isReviewer = false;
+  const reviewSalesEmployeeId = data?.latestContent?.reviewSalesEmployee?.id;
+  const reviewSupervisorEmployeeId = data?.latestContent?.reviewSupervisorEmployee?.id;
+
+  if (userId) {
+    if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
+      isReviewer = true;
+    }
+  }
+
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
-      await update();
+      try {
+        setIsLoading(true);
+        await update();
+      } catch (error) {}
+
       setIsLoading(false);
     })();
   }, [id]);
@@ -160,11 +172,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setValue('contactNumber', v.contactNumber ?? '');
   };
 
-  // ---------------------------------------------------------
+  // --------------------------------------------------------------
 
-  const [empSelConfirmKey, setEmpSelConfirmKey] = useState<'manager' | 'supervisor' | 'inspector'>();
+  const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
+    'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor'
+  >();
 
-  const openEmpSel = (v: 'manager' | 'supervisor' | 'inspector') => {
+  const openEmpSel = (v: 'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor') => {
     setEmpSelConfirmKey(v);
     setEmployeeSelectorShow(true);
   };
@@ -174,56 +188,61 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setEmpSelConfirmKey(undefined);
   };
 
-  const changeManager = (v: TemployeeDto[]) => {
-    setValue('managerEmployee', v[0]);
-    onEmpSelCancel();
-  };
-
-  const changeSupervisor = (v: TemployeeDto[]) => {
-    setValue('supervisorEmployee', v[0]);
-    onEmpSelCancel();
-  };
-
-  const changeinspector = (v: TemployeeDto[]) => {
-    console.log(v);
-    onEmpSelCancel();
-  };
-
   const empSelProps = (() => {
     if (empSelConfirmKey === 'manager') {
       return {
         label: '請選擇經理',
-        onConfirm: changeManager,
         onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setValue('managerEmployee', v[0]);
+          onEmpSelCancel();
+        },
       };
     }
 
     if (empSelConfirmKey === 'supervisor') {
       return {
         label: '請選擇主管',
-        onConfirm: changeSupervisor,
         onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setValue('supervisorEmployee', v[0]);
+          onEmpSelCancel();
+        },
       };
     }
 
-    if (empSelConfirmKey === 'inspector') {
+    if (empSelConfirmKey === 'reviewSales') {
       return {
-        label: '請選擇審核者',
-        onConfirm: changeinspector,
+        label: '請選擇審核業務',
+        tip: '可不選，直接按確定',
         onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setReviewSales(v[0]);
+          onEmpSelCancel();
+          setTimeout(() => {
+            openEmpSel('reviewSupervisor');
+          }, 300);
+        },
+      };
+    }
+
+    if (empSelConfirmKey === 'reviewSupervisor') {
+      return {
+        label: '請選擇審核經理',
+        tip: '可不選，直接按確定',
+        onCancel: onEmpSelCancel,
+        onConfirm: async (v: TemployeeDto[]) => {
+          setReviewSupervisor(v[0]);
+          onEmpSelCancel();
+          reqSetReviewer({
+            reviewSales,
+            reviewSupervisor: v[0],
+          });
+        },
       };
     }
   })();
 
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-
-  // 正式接上api前先這樣處理，但是我已經忘記這是在處理什麼了.....
-  // let quotationData: Tquotation | undefined;
-  // if (typeof quotationId === "string" && quotationId !== "newQuotation") {
-  //   quotationData = fakeQuotationObjList[quotationId]
-  //   if (!quotationData) quotationData = undefined
-  // }
   // --------------------------------------------------------------------------
   // 是否可編輯
   const [allowEdit, setAllowEdit] = useState(false);
@@ -286,7 +305,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
-  const [quotationState, setQuotationState] = useState<Toption>({ value: '預算', label: '預算' });
 
   const [showMemoModal, setShowMemoModal] = useState(false);
 
@@ -300,7 +318,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setShowMemoModal(false);
 
     setTimeout(() => {
-      reqPost();
+      reqUpdateQuotation();
     }, 10);
   };
 
@@ -336,7 +354,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setQuotationState={(option) => {
             setValue('status', option.value as TquotationContentDto['status']);
           }}
-          // history={fakeQuotationStateHistory}
           history={history}
         />
       ),
@@ -357,17 +374,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   img: iconUpload.src,
     //   onClick: () => setShowPdf_part(true),
     // },
+    (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
+    (!!id || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    // { type: 'myButton', label: '送審', onClick: () => openEmpSel('inspector') },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
-  // --------------------------------------------------------------------------
-  // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  // if (quotationId !== "newQuotation" && !quotationData)
-  //   return <NoQuotation quotationId={quotationId as string} />
-  // if (quotationId !== "newQuotation")
-  //   return <NoQuotation quotationId={quotationId as string} />
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   if (!classQuotation) {
@@ -390,7 +402,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  const reqPost = async () => {
+  const reqUpdateQuotation = async () => {
     const data = watch();
 
     const body: TcreateQuotationContentDto = {
@@ -405,7 +417,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data.address ?? '',
       contactPerson: data.contactPerson ?? '',
       contactNumber: data.contactNumber ?? '',
-      discount: Number(data.discount ?? 0) ?? 100,
+      discount: `${Number(data.discount ?? 0)}` ?? '100',
       quantity: data.quantity ?? 0,
       editNotes: data.editNotes ?? '',
       totalPrice: data.totalPrice ?? 0,
@@ -439,6 +451,53 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     setIsLoading(false);
+  };
+
+  const reqSetReviewer = async ({
+    reviewSales,
+    reviewSupervisor,
+  }: {
+    reviewSales: TemployeeDto | undefined;
+    reviewSupervisor: TemployeeDto | undefined;
+  }) => {
+    if (!id) {
+      return;
+    }
+
+    const reviewSalesEmployeeId = reviewSales?.id || null;
+    const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(id, {
+        reviewSalesEmployeeId,
+        reviewSupervisorEmployeeId,
+      });
+      await update();
+    } catch (error) {
+      myAlert.err({ title: '更新審核人員失敗' });
+    } finally {
+      setReviewSales(undefined);
+      setReviewSupervisor(undefined);
+      setIsLoading(false);
+    }
+  };
+
+  // 現在只有admin可以呼叫這系列的api，所以無法測試
+  const reqReview = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationReview(id);
+      await update();
+    } catch (error) {
+      myAlert.err({ title: '審核失敗' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // --------------------------------------------------------------------------
@@ -483,6 +542,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
           /> */}
           {/* 簽名 */}
           <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
+          {/* 審核人員 */}
+          <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
+            <InputSel
+              caption="審核業務"
+              inputProps={{
+                props: {
+                  disabled: true,
+                  value:
+                    (data?.latestContent.reviewSalesEmployee?.chName ||
+                      data?.latestContent.reviewSalesEmployee?.enName) ??
+                    '',
+                },
+              }}
+            />
+            <InputSel
+              caption="審核主管"
+              inputProps={{
+                props: {
+                  disabled: true,
+                  value:
+                    (data?.latestContent.reviewSupervisorEmployee?.chName ||
+                      data?.latestContent.reviewSupervisorEmployee?.enName) ??
+                    '',
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
       <LoadingCover01 isLoading={isLoading} />
@@ -517,22 +603,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <EmployeeSelector
         showModal={employeeSelectorShow}
         label={empSelProps?.label}
+        tip={empSelProps?.tip}
         onConfirm={(v) => {
           empSelProps?.onConfirm(v);
         }}
-        onCancel={onEmpSelCancel}
+        onCancel={() => empSelProps?.onCancel()}
         selLimit={1}
       />
-      {/* <EmployeeSelector
-        showModal={employeeSelectorShow}
-        label="請選擇審核人員"
-        onConfirm={(arr) => {
-          setEmployeeSelectorShow(false);
-        }}
-        onCancel={() => {
-          setEmployeeSelectorShow(false);
-        }}
-      /> */}
     </div>
   );
 }
@@ -545,54 +622,3 @@ function TheQuotation({ router }: { router: NextRouter }) {
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
-const NoQuotation = ({ quotationId }: { quotationId: string }) => {
-  const router = useRouter();
-
-  const toBack = () => {
-    router.back();
-  };
-
-  return (
-    <div className={style.noQuotation}>
-      <span>沒有這個報價單ID</span>
-      <span>{quotationId}</span>
-      <button onClick={toBack}>回上一頁</button>
-    </div>
-  );
-};
-
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-
-const fakeQuotationStateHistory = [
-  {
-    state_from: '預算',
-    state_to: '投標',
-    isoString: moment('0111-02-03 05:11:05').toISOString(),
-  },
-  {
-    state_from: '預算',
-    state_to: '發包',
-    isoString: moment('0111-02-10 09:15:08').toISOString(),
-  },
-  {
-    state_from: '預算',
-    state_to: '發包',
-    isoString: moment('0111-03-05 15:01:46').toISOString(),
-  },
-  {
-    state_from: '預算',
-    state_to: '投標',
-    isoString: moment('0111-03-23 13:45:11').toISOString(),
-  },
-];
-
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-// 先把api client建立起來，然後建立幾筆資料
-
-// 新增報價單的時候要自動帶使用者的名字降去經辦人，而且不能再改

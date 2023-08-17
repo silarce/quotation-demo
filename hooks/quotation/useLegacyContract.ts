@@ -21,7 +21,6 @@ import {
 } from 'js/api/dtoTypes';
 
 import { checkIsNumberStr, clearThousandsSeparator } from 'js/utils/helpers/universal';
-import { CONFIG_FILES } from 'next/dist/shared/lib/constants';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
@@ -228,7 +227,7 @@ class Class_product {
   };
 
   calcVolume = () => {
-    return Decimal.mul(this.area || 0, 0.89)
+    return Decimal.mul(this.area || 0, 10.89)
       .toFixed(2)
       .toString();
   };
@@ -1064,8 +1063,9 @@ class Class_legacyContract {
     // if (!checkDateFormat(deliveryDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
     // }
+
     if (!quoteDate) {
-      myAlert.warning({ title: '請選擇報價日期' });
+      myAlert.warning({ title: '請選擇合約日期' });
 
       return false;
     }
@@ -1087,10 +1087,41 @@ class Class_legacyContract {
 
     legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition);
 
-    const quoteDate_Date = new Date(legacyContractCopy.quoteDate as string);
+    const quoteDate_Date = (() => {
+      if (!legacyContractCopy.quoteDate) {
+        return '';
+      }
+
+      const date = moment(legacyContractCopy.quoteDate as string);
+
+      if (date.isValid()) {
+        return date.toISOString();
+      } else {
+        return '';
+      }
+    })();
+
+    // const quoteDate_Date = legacyContractCopy.quoteDate
+    //   ? new Date(legacyContractCopy.quoteDate as string).toISOString()
+    //   : '';
     // = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
 
-    const deliveryDate_Date = new Date(legacyContractCopy.deliveryDate as string);
+    const deliveryDate_Date = (() => {
+      if (!legacyContractCopy.deliveryDate) {
+        return '';
+      }
+
+      const date = moment(legacyContractCopy.deliveryDate);
+
+      if (date.isValid()) {
+        return date.toISOString();
+      } else {
+        return '';
+      }
+    })();
+    // const deliveryDate_Date = legacyContractCopy.deliveryDate
+    //   ? new Date(legacyContractCopy.deliveryDate).toISOString()
+    //   : '';
     // = new Date(yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string)
 
     legacyContractCopy.discountRate = Decimal.div(legacyContractCopy.discountRate, 100).toString();
@@ -1148,6 +1179,9 @@ export {
 };
 
 // ==========================================================================
+
+// console.log(isNaN(new Date('1111-11-11').getTime()));
+// console.log(isNaN(new Date('aaaa').getTime()));
 
 type TprodInputCellType = {
   [key in keyof Pick<
@@ -1360,7 +1394,24 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
     total: 0,
     deliveryLocation: '',
     deliveryDate: '',
-    paymentMethods: [],
+    paymentMethods: [
+      {
+        milestone: '訂製同時付總金額',
+        totalPaymentRatio: '0',
+      },
+      {
+        milestone: '交貨同時付總金額',
+        totalPaymentRatio: '0',
+      },
+      {
+        milestone: '按裝同時付總金額',
+        totalPaymentRatio: '0',
+      },
+      {
+        milestone: '接電同時付總金額',
+        totalPaymentRatio: '0',
+      },
+    ],
     notes: [],
     quoteScopes: [],
     managerName: '',
