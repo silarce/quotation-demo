@@ -72,16 +72,9 @@ const doorTrack_normal = {
 const doorTrackLookup = {
   ...doorTrack_typhoonProtection,
   ...doorTrack_normal,
-};
+} as const;
 
 const optionsCre_doorTrack_typhoonProtection = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
-  // 下次看到這邊，沒問題就刪掉註解吧
-  // const optionArr = [
-  //   { value: 'sj302_75_30t', label: 'sj302_75_30t', icon: icon_sj302_75_30t.src },
-  //   { value: 'sJ302_90_30t', label: 'sJ302_90_30t', icon: icon_sJ302_90_30t.src },
-  //   { value: 'sJ302_95_30t', label: 'sJ302_95_30t', icon: icon_sJ302_95_30t.src },
-  //   { value: 'sJ302_95_45t', label: 'sJ302_95_45t', icon: icon_sJ302_95_45t.src },
-  // ];
   const optionArr = Object.values(doorTrack_typhoonProtection);
 
   if (emptyOption) {
@@ -92,49 +85,6 @@ const optionsCre_doorTrack_typhoonProtection = ({ emptyOption }: { emptyOption?:
 };
 
 const optionsCre_doorTrack_normal = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
-  // 下次看到這邊，沒問題就刪掉註解吧
-  // const optionArr = [
-  //   {
-  //     value: 'sJ120A_100_25_105_25',
-  //     label: 'sJ120A_100_25_105_25',
-  //     icon: icon_sJ120A_100_25_105_25.src,
-  //   },
-  //   {
-  //     value: 'sJ302_30',
-  //     label: 'sJ302_30',
-  //     icon: icon_sJ302_30.src,
-  //   },
-  //   {
-  //     value: 'sJ303A_100_25_25',
-  //     label: 'sJ303A_100_25_25',
-  //     icon: icon_sJ303A_100_25_25.src,
-  //   },
-  //   {
-  //     value: 'sJ303A_100_65_25',
-  //     label: 'sJ303A_100_65_25',
-  //     icon: icon_sJ303A_100_65_25.src,
-  //   },
-  //   {
-  //     value: 'sJ303S_85',
-  //     label: 'sJ303S_85',
-  //     icon: icon_sJ303S_85.src,
-  //   },
-  //   {
-  //     value: 'sJ305D_22',
-  //     label: 'sJ305D_22',
-  //     icon: icon_sJ305D_22.src,
-  //   },
-  //   {
-  //     value: 'sJ312_106_60t',
-  //     label: 'sJ312_106_60t',
-  //     icon: icon_sJ312_106_60t.src,
-  //   },
-  //   {
-  //     value: 'sJ312_150_90t',
-  //     label: 'sJ312_150_90t',
-  //     icon: icon_sJ312_150_90t.src,
-  //   },
-  // ];
   const optionArr = Object.values(doorTrack_normal);
 
   if (emptyOption) {
