@@ -252,12 +252,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
   const panel_noEditable: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: '匯出舊合約',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf(true),
-    // },
+    {
+      type: 'myButton',
+      label: '匯出舊合約',
+      img: iconUpload.src,
+      onClick: () => setShowPdf(true),
+    },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
     // { type: "myButton", label: "送審", onClick: () => alert("送審") },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
