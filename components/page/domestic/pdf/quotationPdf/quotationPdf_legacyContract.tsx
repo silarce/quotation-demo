@@ -176,7 +176,7 @@ export default function QuotationPdf({
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        doorRail: doorTrackLookup[prod.doorTrack].icon,
+        doorRail: doorTrackLookup[prod.doorTrack]?.icon,
         horsepower: prod.horsepower,
         openType: '',
         qty: prod.quantity,
