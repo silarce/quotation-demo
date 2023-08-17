@@ -1,7 +1,7 @@
 @use "styles/theme01" as *;
 
-$fontTitle: 30px;
-$fontInfo: 20px;
+$fontTitle: 40px;
+$fontInfo: 25px;
 $semiMaring: 0 8px;
 
 .semi {
@@ -29,8 +29,8 @@ $semiMaring: 0 8px;
 }
 // ======================================================================
 .pdf {
-  width: calc(595px * 2);
-  height: calc(842px * 2);
+  width: calc(595px * 2.7); // 595*2.7 = 1606
+  height: calc(842px * 2.7);
   padding: 60px 40px;
   // line-height:0.5
   &.spaceBetween {
@@ -47,7 +47,7 @@ $semiMaring: 0 8px;
   }
   > .contactInfo {
     display: grid;
-    grid-template-columns: 6fr 5fr;
+    grid-template-columns: 6fr 4fr;
     span {
       font-size: $fontInfo;
       line-height: 30px;
@@ -104,7 +104,7 @@ $semiMaring: 0 8px;
     min-height: 40.28px;
     span {
       margin: auto;
-      font-size: 16px;
+      font-size: 25px;
       font-weight: 500;
     }
   }
@@ -114,8 +114,7 @@ $semiMaring: 0 8px;
       margin: auto 5px auto;
     }
     span {
-      white-space: nowrap;
-      font-size: 16px;
+      font-size: 25px;
       font-weight: 400;
     }
     img {
@@ -136,7 +135,7 @@ $semiMaring: 0 8px;
 // ======================================================================
 .table_quoteTypeSum {
   @extend .table;
-  grid-template-columns: 300px 200px repeat(2, 1fr);
+  grid-template-columns: 300px 200px repeat(2,1fr);
 }
 // ======================================================================
 .total {
@@ -204,8 +203,7 @@ $semiMaring: 0 8px;
 // ======================================================================
 .other {
   display: grid;
-  // grid-template-columns: 685px 500px;
-  grid-template-columns: 6fr 5fr;
+  grid-template-columns: 685px 500px;
   justify-content: space-between;
   margin-top: 10px;
   h2 {
