@@ -149,9 +149,11 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+
       return {
         tradingLocation: deliveryLocation,
-        tradingDate: deliveryDate as string,
+        tradingDate: tradingDate,
         payWay,
       };
     })();
