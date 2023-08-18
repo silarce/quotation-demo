@@ -71,7 +71,7 @@ export default function ProductList_legacy({
                 {/*  */}
               </div>
               {theadIndex.map((key) => {
-                const { width, id, type, inputType } = prodCellConfig.cellConfig[key];
+                const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
                 const textCenter = centerReg.test(id) ? styleL.textCenter : '';
                 const theStyle = { width };
                 const stateValue = dataItem[key];
@@ -82,6 +82,7 @@ export default function ProductList_legacy({
                   disabled,
                   stateValue,
                   inputType,
+                  options,
                 });
 
                 return (
@@ -109,13 +110,15 @@ export default function ProductList_legacy({
     disabled,
     stateValue,
     inputType,
+    options,
   }: {
     dataItem: Class_product;
     key: Class_legacyContract['prodCellConfig']['keyList'][number];
-    type: 'input' | 'selectWithIcon' | 'checkbox';
+    type: 'input' | 'selectWithIcon' | 'checkbox' | 'select';
     disabled: boolean;
     stateValue: string | boolean | number;
     inputType?: string;
+    options?: Toption[];
   }) {
     switch (type) {
       case 'input': {
@@ -132,6 +135,28 @@ export default function ProductList_legacy({
               value: stateValue,
               onChange: onChange,
               inputType: inputType,
+            }}
+          />
+        );
+      }
+
+      case 'select': {
+        if (typeof stateValue === 'boolean') {
+          return null;
+        }
+
+        const onChange = (option: Toption | null) =>
+          (dataItem[key as keyof TprodSelectWithIconCellType] = option!.value);
+
+        return (
+          <InputSel
+            disabled={disabled}
+            selectProps={{
+              value: stateValue,
+              options: options ?? [],
+              onChange: onChange,
+              arrowType: 'black',
+              fontSize: '16px',
             }}
           />
         );

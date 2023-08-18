@@ -9,6 +9,7 @@ import { checkDateFormat } from 'js/tools/date/checkDate';
 // import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
+import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
 import {
   TlegacyContractDto,
@@ -21,6 +22,7 @@ import {
 } from 'js/api/dtoTypes';
 
 import { checkIsNumberStr, clearThousandsSeparator } from 'js/utils/helpers/universal';
+import { Toption } from 'js/utils/options/options';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
@@ -1189,8 +1191,8 @@ type TprodInputCellType = {
     | 'discountRate'
     | 'idNumber'
     | 'itemName'
-    | 'quoteType'
-    | 'doorType'
+    // | 'quoteType'
+    // | 'doorType'
     | 'length'
     | 'width'
     | 'height'
@@ -1212,7 +1214,11 @@ type TprodCheckboxCellType = {
   [key in keyof Pick<Class_product, 'bounceDoor' | 'typhoonProtection'>]: { type: 'checkbox' };
 };
 
-type TprodKeys = keyof (TprodInputCellType & TprodSelectWithIconCellType & TprodCheckboxCellType);
+type TprodSelect = {
+  [key in keyof Pick<Class_product, 'quoteType' | 'doorType'>]: { type: 'select'; options: Toption[] };
+};
+
+type TprodKeys = keyof (TprodInputCellType & TprodSelectWithIconCellType & TprodCheckboxCellType & TprodSelect);
 
 type TprodCellConfig = {
   keyList: TprodKeys[];
@@ -1223,10 +1229,12 @@ type TprodCellConfig = {
       width: string;
       // type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
       inputType?: HTMLInputTypeAttribute;
+      options?: Toption[];
     };
   } & TprodInputCellType &
     TprodSelectWithIconCellType &
-    TprodCheckboxCellType;
+    TprodCheckboxCellType &
+    TprodSelect;
 };
 
 function prodCellConfigCre(): TprodCellConfig {
@@ -1260,8 +1268,18 @@ function prodCellConfigCre(): TprodCellConfig {
       idNumber: { id: 'idNumber', label: '編號', width: '100px', type: 'input', inputType: 'number' },
       discountRate: { id: 'discountRate', label: '折數', width: '60px', type: 'input', inputType: 'number' },
       itemName: { id: 'itemName', label: '項目', width: '100px', type: 'input' },
-      quoteType: { id: 'quoteType', label: '報價別', width: '105px', type: 'input' },
-      doorType: { id: 'doorType', label: '門型', width: '100px', type: 'input' },
+      quoteType: {
+        id: 'quoteType',
+        label: '報價別',
+        width: '105px',
+        type: 'select',
+        options: [
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B' },
+          { value: 'c', label: 'C' },
+        ],
+      },
+      doorType: { id: 'doorType', label: '門型', width: '100px', type: 'select', options: optionsCreator_doorModel() },
       length: { id: 'length', label: 'L(m)', width: '60px', type: 'input', inputType: 'number' },
       width: { id: 'width', label: 'W(m)', width: '60px', type: 'input', inputType: 'number' },
       height: { id: 'height', label: 'h(m)', width: '60px', type: 'input', inputType: 'number' },
