@@ -159,7 +159,8 @@ const sidePathList: TsidePathList = {
         {
           label: '客戶列表',
           path: path01 + '/customer',
-          erpFeature: allPass,
+          // erpFeature: allPass,
+          erpFeature: 'allPass',
         },
         {
           label: '產品列表',
