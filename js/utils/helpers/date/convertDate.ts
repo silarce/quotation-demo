@@ -1,15 +1,27 @@
+import moment from 'moment';
+
 /**返回ISOString */
 export const convertDate_reduce1911 = (ISOString: string) => {
   if (!ISOString) {
     return ISOString;
   }
 
-  const dateTime = new Date(ISOString);
-  const year = dateTime.getFullYear();
-  const chYear = year - 1911;
-  dateTime.setFullYear(chYear);
+  const dateTime = moment(ISOString);
+
+  if (!dateTime.isValid()) {
+    return ISOString;
+  }
+
+  dateTime.subtract(1911, 'year');
 
   return dateTime.toISOString();
+
+  // const dateTime = new Date(ISOString);
+  // const year = dateTime.getFullYear();
+  // const chYear = year - 1911;
+  // dateTime.setFullYear(chYear);
+
+  // return dateTime.toISOString();
 };
 
 /**返回ISOString */
