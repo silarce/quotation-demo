@@ -22,6 +22,7 @@ import iconArrowBlack from 'public/image/icon/arrow_down.svg';
 import scss from '../inputSel.module.scss';
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
+export type { Toption };
 
 export type TselectProps<
   Option = Toption,
@@ -33,6 +34,8 @@ export type TselectProps<
   wrapperStyle?: React.CSSProperties;
   arrowType?: 'red' | 'black';
   fontClassName?: string;
+  /** 在inputSel那邊做預處理，將string轉為Toption，props.value有值的話會被蓋掉 */
+  easyValue?: string;
 };
 
 // ==============================================================================
