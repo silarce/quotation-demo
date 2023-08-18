@@ -221,9 +221,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return;
         }
 
-        console.log('quoteDate', postBody.quoteDate);
-        console.log('deliveryDate', postBody.deliveryDate);
-
         try {
           showRootLoading(true);
           const res = contractId
