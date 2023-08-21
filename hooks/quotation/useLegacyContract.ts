@@ -664,24 +664,26 @@ class Class_payInfo {
       v = '100';
     }
 
-    const discountRate = Decimal.div(v || 0, 100);
-    const subTotal: string = (() => {
-      let subTotal = new Decimal(0);
+    // const discountRate = Decimal.div(v || 0, 100);
+    // const subTotal: string = (() => {
+    //   let subTotal = new Decimal(0);
 
-      this._classProductArr.forEach((prod) => {
-        if (!prod.totalPrice) {
-          return;
-        }
+    //   this._classProductArr.forEach((prod) => {
+    //     if (!prod.totalPrice) {
+    //       return;
+    //     }
 
-        subTotal = subTotal.add(prod.totalPrice);
-      });
+    //     const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
 
-      return subTotal.mul(discountRate).toString();
-    })();
-    this.subTotal = subTotal;
+    //     subTotal = subTotal.add(totalPrice);
+    //   });
 
-    this._editAllProdDiscount(v || '0');
-    this._countSubTotal();
+    //   return subTotal.mul(discountRate).toString();
+    // })();
+    // this.subTotal = subTotal;
+
+    // this._editAllProdDiscount(v || '0');
+    // this._countSubTotal();
     this._legacyContract.discountRate = v || '0';
     this._reRender();
   }
@@ -943,29 +945,32 @@ class Class_legacyContract {
   classSignature;
   // ---------------------
 
+  // 需求變更 編輯折數與總折數時不再影響其他數值
   /**計算總折數 */
   countTotalDiscount = () => {
-    let totalDiscount = new Decimal(0);
-    this.classProductArr.forEach((prod) => {
-      const discountRate = prod.discountRate.replace(/,/g, '') || 0;
-      totalDiscount = Decimal.add(discountRate || 0, totalDiscount);
-    });
-    this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
+    // let totalDiscount = new Decimal(0);
+    // this.classProductArr.forEach((prod) => {
+    //   const discountRate = prod.discountRate.replace(/,/g, '') || 0;
+    //   totalDiscount = Decimal.add(discountRate || 0, totalDiscount);
+    // });
+    // this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
   };
+  // 需求變更 編輯折數與總折數時不再影響其他數值
   /**變更所有主產品的折數 */
   editAllProdDiscount = (v: string) => {
-    this.classProductArr.forEach((prod) => {
-      prod.discountRate_noLoop = v;
-    });
+    // this.classProductArr.forEach((prod) => {
+    //   prod.discountRate_noLoop = v;
+    // });
   };
 
   /**計算小計 */
   countSubTotal = () => {
     let subTotal = new Decimal(0);
     this.classProductArr.forEach((prod) => {
-      let totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
-      const discountRate = Decimal.div(prod.discountRate, 100);
-      totalPrice = Decimal.mul(totalPrice, discountRate).toString();
+      const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+      // 需求變更 編輯折數與總折數時不再影響其他數值
+      // const discountRate = Decimal.div(prod.discountRate || 0, 100);
+      // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
       subTotal = Decimal.add(totalPrice || 0, subTotal);
     });
     this.classAdditionArr.forEach((addi) => {
