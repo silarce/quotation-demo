@@ -9,12 +9,18 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
+import { optionsCreator_customerType } from 'js/utils/options/options';
+
 // css
 import style from './customerSelector.module.scss';
 
 // api
-import { TcustomerDto, TcustomerDto_TC, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
+import { TcustomerDto_TC, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
+// ====================================================================
 
+const customerTypeArr = optionsCreator_customerType({ emptyOption: true });
+
+// ====================================================================
 export default function CustomerSelector({
   showModal,
   onConfirm,
@@ -35,7 +41,7 @@ export default function CustomerSelector({
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto_TC[]>([]);
 
-  const [searchValue, setSearchValue] = useState<string | undefined>();
+  const [searchValue, setSearchValue] = useState<string[]>([]);
   const [pageObj, setPageObj] = useState({ page: -1 });
   const page = pageObj.page;
 
@@ -47,9 +53,10 @@ export default function CustomerSelector({
       sort: 'customerNumber',
       filter: {
         $or: {
-          customerNumber: { $contains: searchValue },
-          name: { $contains: searchValue },
+          customerNumber: { $contains: searchValue[1] },
+          name: { $contains: searchValue[1] },
         },
+        'types.name': { $contains: searchValue[0] },
       },
     };
   })();
@@ -83,15 +90,21 @@ export default function CustomerSelector({
       const newPageObj = { ...pageObj, page: -1 };
       setPageObj(newPageObj);
       setData(undefined);
-      setSearchValue(undefined);
+      setSearchValue([]);
 
       return;
     }
 
+    // const newPageObj = { ...pageObj, page: 1 };
+    // setPageObj(newPageObj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
+
+  useEffect(() => {
     const newPageObj = { ...pageObj, page: 1 };
     setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal]);
+  }, [searchValue]);
 
   useEffect(() => {
     if (page === -1) {
@@ -161,14 +174,24 @@ export default function CustomerSelector({
   };
 
   const onSearch = (v: string[]) => {
-    setSearchValue(v[0]);
+    setSearchValue(v);
   };
 
   // ==================================================
   const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
     {
+      selectProps: {
+        wrapperStyle: { width: '100px' },
+        props: {
+          options: customerTypeArr,
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
       inputProps: {
-        wrapperClassName: '',
         wrapperStyle: { width: '160px' },
         props: {
           placeholder: '搜尋關鍵字',
