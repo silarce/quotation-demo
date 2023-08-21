@@ -2,6 +2,8 @@
   position: relative;
   display: flex;
   flex-wrap: nowrap;
+  width: fit-content;
+  max-width: 100%;
   padding: 4px 12px;
   // gap: 20px;
   // > * {

@@ -12,47 +12,26 @@ import { IconSearch } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from './searchBar.module.scss';
 
-export type { TinputSelProps, TsearchProps };
-
 // ==================================================================
 type TreturnBody = {
   [key: `${number}`]: string;
 };
 
 // type TsearchProps = TinputSelProps | { pilarAttr: React.HTMLAttributes<HTMLDivElement> | undefined };
-type TsearchProps =
+type TinputSelProp_search =
   | Omit<
       TinputSelProps,
       'textareaProps' | 'timePickerProps' | 'timePickerProps_mui' | 'checkBoxProps' | 'inputSelBarProps'
     >
   | { pilarAttr: React.HTMLAttributes<HTMLDivElement> | undefined };
 
-// ==================================================================
-export default function SearchBar({
-  className,
-  disabled,
-  onChange,
-  onClick,
-  //
-  searchPropsArr: inputSelPropsArr,
-  //
-  caption,
-  captionClassName,
-  captionStyle,
-  captionSize = '16',
-  captionWeight = '400',
-  captionColor = 'sub',
-  //
-  showBaseline = 'always',
-  hrClassName,
-  hrStyle,
-}: {
+type TsearcbBarProps = {
   className?: string;
   disabled?: boolean;
-  onChange?: (v: TreturnBody) => void;
-  onClick?: (v: TreturnBody) => void;
+  onChange?: (v: string[]) => void;
+  onClick?: (v: string[]) => void;
   //
-  searchPropsArr: TsearchProps[];
+  inputSelPropsArr: TinputSelProp_search[];
   //
   caption?: string;
   captionClassName?: string;
@@ -65,7 +44,30 @@ export default function SearchBar({
   showBaseline?: 'invisible' | 'always' | 'auto';
   hrClassName?: string;
   hrStyle?: React.CSSProperties;
-}) {
+};
+
+export type { TsearcbBarProps, TinputSelProps, TinputSelProp_search };
+
+// ==================================================================
+export default function SearchBar({
+  className,
+  disabled,
+  onChange,
+  onClick,
+  //
+  inputSelPropsArr,
+  //
+  caption,
+  captionClassName,
+  captionStyle,
+  captionSize = '16',
+  captionWeight = '400',
+  captionColor = 'sub',
+  //
+  showBaseline = 'always',
+  hrClassName,
+  hrStyle,
+}: TsearcbBarProps) {
   const captionFontClassName = classNames(
     //
     `f${captionSize}`,
@@ -93,9 +95,14 @@ export default function SearchBar({
   const watch = useWatch({ control });
 
   useEffect(() => {
-    onChange?.(getValues());
+    onChange?.(Object.values(getValues()));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
+
+  // ------------------------------------------------------------------
+  const theClick = () => {
+    onClick?.(Object.values(getValues()));
+  };
 
   // ------------------------------------------------------------------
   return (
@@ -196,7 +203,7 @@ export default function SearchBar({
         })}
       </div>
 
-      {onClick && <IconSearch className={scss.btn} onClick={() => onClick && onClick(getValues())} />}
+      {onClick && <IconSearch className={scss.btn} onClick={theClick} />}
       {showBaseline !== 'invisible' && <hr className={classNames(hrClasses)} style={hrStyle} />}
     </div>
   );
