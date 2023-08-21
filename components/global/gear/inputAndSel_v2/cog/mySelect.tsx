@@ -35,7 +35,7 @@ export type TselectProps<
   arrowType?: 'red' | 'black';
   fontClassName?: string;
   /** 在inputSel那邊做預處理，將string轉為Toption，props.value有值的話會被蓋掉 */
-  easyValue?: string;
+  easyValue?: string | null;
 };
 
 // ==============================================================================
@@ -69,8 +69,9 @@ export default function MySelect<
           ...props?.components,
         }}
         unstyled={true}
-        menuPortalTarget={document.getElementById('__next')}
-        menuPosition={'fixed'}
+        // menuPortalTarget={document.getElementById('__next')}
+        // menuPortalTarget={document.getElementById('body')}
+        // menuPosition={'fixed'}
         isSearchable={false}
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         //

@@ -225,15 +225,19 @@ export default function InputSel({
 
       {selectProps &&
         (() => {
-          let easyValue: Toption | undefined = undefined;
+          let easyValue: Toption | undefined | null = undefined;
 
-          if (selectProps.easyValue) {
-            const options = selectProps.props?.options;
+          if (selectProps.easyValue !== undefined) {
+            if (selectProps.easyValue === null || selectProps.easyValue === '') {
+              easyValue = null;
+            } else {
+              const options = selectProps.props?.options;
 
-            easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
-              value: selectProps.easyValue,
-              label: selectProps.easyValue,
-            };
+              easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+                value: selectProps.easyValue,
+                label: selectProps.easyValue,
+              };
+            }
           }
 
           return (
