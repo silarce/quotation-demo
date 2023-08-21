@@ -3,7 +3,8 @@ import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 
 // global gear
-import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+// import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
@@ -180,22 +181,38 @@ export default function EmployeeSelector({
     setSelEmployeeArr([]);
   };
 
-  const onSearch = (v: string) => {
-    setSearchValue(v);
+  const onSearch = (v: string[]) => {
+    setSearchValue(v[0]);
   };
+
+  const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
+    {
+      inputProps: {
+        wrapperClassName: '',
+        wrapperStyle: { width: '160px' },
+        props: {
+          placeholder: '搜尋關鍵字',
+        },
+      },
+    },
+  ];
 
   // ==================================================
 
   return (
-    <ModalListSelectorWithSearch
+    <SelectorShell
       label={label ?? ''}
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={onSearch}
+      // onSearch={onSearch}
       width={rwd1023 ? '80vw' : '800px'}
       className={style.container}
       tip={tip}
+      searcbBarProps={{
+        inputSelPropsArr: inputSelPropsArr,
+        onClick: onSearch,
+      }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
         <div className={style.listContainer}>
@@ -226,6 +243,6 @@ export default function EmployeeSelector({
           })}
         </div>
       </LoadingCoverWrapper01>
-    </ModalListSelectorWithSearch>
+    </SelectorShell>
   );
 }
