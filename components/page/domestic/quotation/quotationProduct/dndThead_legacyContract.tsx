@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 // --------------------
 import {
   DndContext,
@@ -31,9 +32,11 @@ import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 export default function DndThead({
   allowMove,
   classQuotation,
+  isAppend,
 }: {
   classQuotation: Class_legacyContract;
   allowMove: boolean;
+  isAppend?: boolean;
 }) {
   const {
     prodCellConfig: prodCellConfig, // 格子的資訊(label, width這些)
@@ -49,7 +52,7 @@ export default function DndThead({
   return (
     <div className={styleL.thead}>
       {/*  */}
-      <div className={style.emptyBlock} />
+      <div className={classNames(style.emptyBlock, isAppend && style.append)} />
       {/*  */}
       <DndContext
         sensors={sensors}

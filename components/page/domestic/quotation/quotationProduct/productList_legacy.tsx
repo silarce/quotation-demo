@@ -1,16 +1,19 @@
+import { useState } from 'react';
+import classNames from 'classnames';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from './productList.module.scss';
-import styleL from '../local.module.scss';
+import scss from './productList.module.scss';
+import scss_l from '../local.module.scss';
 
 import { Toption } from 'js/utils/options/options';
 
@@ -28,51 +31,61 @@ import type {
 export default function ProductList_legacy({
   classQuotation,
   disabled,
+  isAppend,
 }: {
   classQuotation: Class_legacyContract;
   disabled: boolean;
+  isAppend?: boolean;
 }) {
+  // ---------------------------------------------------------------
   const { classProductArr, prodCellConfig, activeProd, delProd, copyProd } = classQuotation;
 
   const theadIndex = prodCellConfig.keyList;
-  // =======================================
+  // ---------------------------------------------------------------
+
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
 
-  // =======================================
+  // ---------------------------------------------------------------
+  const [targetIndex, setTargetIndex] = useState<`${number}`>();
+
+  const exchangeConfirm = (v: string) => {
+    if (!targetIndex) {
+      return;
+    }
+
+    classProductArr[targetIndex].addExchange(v);
+    setTargetIndex(undefined);
+  };
+
+  const onCancel = () => {
+    setTargetIndex(undefined);
+  };
+
+  // ---------------------------------------------------------------
   return (
-    <div className={style.container}>
+    <div className={scss.container}>
       {classProductArr.map((dataItem, pIndex) => {
+        const toSetTargetIndex = () => {
+          setTargetIndex(`${pIndex}`);
+        };
+
         return (
           <CellWithBar key={pIndex} isActive={activeProd === pIndex}>
-            <div className={style.row} onClick={() => (classQuotation.activeProd = pIndex)}>
-              <div className={style.buttonBox}>
-                <IconDelete01
-                  onClick={(e) => {
-                    e.stopPropagation();
-
-                    if (disabled) {
-                      return;
-                    }
-
-                    delProd(pIndex);
-                  }}
+            <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
+              {/*  */}
+              {!isAppend && (
+                <CopyDelBtnBox
+                  disabled={disabled}
+                  del={() => delProd(pIndex)}
+                  copy={() => copyProd(pIndex)}
+                  indexNum={pIndex + 1}
                 />
-                <IconCopy
-                  onClick={() => {
-                    if (disabled) {
-                      return;
-                    }
-
-                    copyProd(pIndex);
-                  }}
-                />
-                {/*  */}
-                <span>{pIndex + 1}</span>
-                {/*  */}
-              </div>
+              )}
+              {isAppend && <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} />}
+              {/*  */}
               {theadIndex.map((key) => {
                 const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
-                const textCenter = centerReg.test(id) ? styleL.textCenter : '';
+                const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
                 const theStyle = { width };
                 const stateValue = dataItem[key];
                 const TheCell = cellSwitcher({
@@ -86,7 +99,7 @@ export default function ProductList_legacy({
                 });
 
                 return (
-                  <div className={`${styleL.column} ${textCenter}`} key={key} style={theStyle}>
+                  <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
                     {TheCell}
                   </div>
                 );
@@ -97,9 +110,21 @@ export default function ProductList_legacy({
           </CellWithBar>
         );
       })}
+      <InputModal
+        visible={!!targetIndex}
+        title="請輸入變更數量"
+        tip={`上限 : ${targetIndex && classProductArr[targetIndex].remainQty}`}
+        onConfirm={(v) => {
+          exchangeConfirm?.(v);
+        }}
+        onCancel={onCancel}
+      />
     </div>
   ); // return
 
+  // ===========================================================
+  // ===========================================================
+  // ===========================================================
   // ===========================================================
   // ===========================================================
   // ===========================================================
@@ -126,11 +151,19 @@ export default function ProductList_legacy({
           return null;
         }
 
+        let showBaseline: 'auto' | 'invisible' = 'auto';
+
+        if (key === 'quotationNumber') {
+          disabled = true;
+          showBaseline = 'invisible';
+        }
+
         const onChange = (value: string) => (dataItem[key as keyof TprodInputCellType] = value);
 
         return (
           <InputSel
             disabled={disabled}
+            showBaseline={showBaseline}
             inputProps={{
               value: stateValue,
               onChange: onChange,
@@ -187,9 +220,9 @@ export default function ProductList_legacy({
               fontSize: '16px',
               customComponents: customComponents,
               selClassNames: {
-                singleValue: () => style.inputSelSingleValue,
-                placeholder: () => style.inputSelPlaceholder,
-                input: () => style.inputSelInput,
+                singleValue: () => scss.inputSelSingleValue,
+                placeholder: () => scss.inputSelPlaceholder,
+                input: () => scss.inputSelInput,
               },
             }}
           />
@@ -210,7 +243,7 @@ export default function ProductList_legacy({
         };
 
         return (
-          <div className={styleL.checkbox}>
+          <div className={scss_l.checkbox}>
             <Checkbox01 stateValue={stateValue} disabled={disabled} onClick={onClick} />
           </div>
         );
@@ -223,3 +256,57 @@ export default function ProductList_legacy({
 } //ProductList
 
 // ================================================
+
+const CopyDelBtnBox = ({
+  disabled,
+  del,
+  copy,
+  indexNum,
+}: {
+  disabled: boolean;
+  del: () => void;
+  copy: () => void;
+  indexNum: string | number;
+}) => {
+  return (
+    <div className={scss.buttonBox}>
+      <IconDelete01
+        onClick={(e) => {
+          e.stopPropagation();
+
+          if (disabled) {
+            return;
+          }
+
+          del();
+        }}
+      />
+      <IconCopy
+        onClick={() => {
+          if (disabled) {
+            return;
+          }
+
+          copy();
+        }}
+      />
+      <span>{indexNum}</span>
+    </div>
+  );
+};
+
+// --------------------------------------------------------
+
+const ResetChangeBtnBox = ({ toSetTargetIndex }: { toSetTargetIndex: () => void }) => {
+  return (
+    <div className={classNames(scss.buttonBox, scss.resetChange)}>
+      <button className={scss.btn}>還原</button>
+      <button className={scss.btn} onClick={toSetTargetIndex}>
+        變更
+      </button>
+      <span>1</span>
+    </div>
+  );
+};
+
+// --------------------------------------------------------

@@ -169,17 +169,16 @@ class Class_product {
     reRender: TreRender,
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto,
     countTotalDiscount: () => void,
-    countSubTotal: () => void
+    countSubTotal: () => void,
+    parentProd?: Class_product
   ) {
     this._reRender = reRender;
     this._product = legacyProduct;
-    const foo = legacyProduct;
 
     this._countTotalDiscount = countTotalDiscount;
     this._countSubTotal = countSubTotal;
 
     this._id = (() => {
-      // if ("id" in this._product) return this._product?.id
       if ('id' in legacyProduct) {
         return legacyProduct.id;
       }
@@ -192,12 +191,19 @@ class Class_product {
     this._width = this._product.width ? this._product.width.toString() : '';
     this._height = this._product.height ? this._product.height.toString() : '';
     this._thickness = this._product.thickness ? this._product.thickness.toString() : '';
+    //
     this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
+    this._remainQty = Number(this._quantity);
+    //
     this._unitPrice = this._product.unitPrice ? this._product.unitPrice.toString() : '';
     this._totalPrice = this._product.totalPrice ? this._product.totalPrice.toString() : '';
 
     this._discountRate =
       this._product.discountRate === '0' ? '' : Decimal.mul(this._product.discountRate || '0', 100).toString();
+
+    if (parentProd) {
+      this.parentProd = parentProd;
+    }
   } // constructor
 
   private _reRender;
@@ -214,6 +220,91 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
   private _discountRate;
+  //----------------------------------------------
+  private parentProd: Class_product | undefined = undefined;
+  private exchangeProdArr: Class_product[] | undefined = undefined;
+
+  addExchange = (v: string) => {
+    console.log(this.quantity, v);
+    // if (!this.exchangeProdArr) {
+    //   this.exchangeProdArr = [];
+    // }
+    // const copy = _.cloneDeep(this._product);
+    // copy.quantity = 0;
+    // this.exchangeProdArr.push(
+    //   new Class_product(
+    //     this._reRender,
+    //     this._product,
+    //     () => {},
+    //     () => {}
+    //   )
+    // );
+  };
+
+  //
+
+  // remainQty;
+  _remainQty;
+  get remainQty() {
+    return this._remainQty;
+  }
+
+  private _reduceQty = '0';
+  private _exchangeQty = '0';
+
+  countRemainQty() {
+    this._remainQty = Number(this._quantity) - Number(this._reduceQty) - Number(this._exchangeQty);
+  }
+
+  // 等api新增，先用假資料
+  private _quotationNumber = 'M-1120821-1';
+  get quotationNumber() {
+    return this._quotationNumber;
+  }
+  set quotationNumber(v) {}
+  //
+
+  // 追減
+  get reduceQty() {
+    return this._reduceQty;
+  }
+  set reduceQty(v) {
+    const nv = Number(v);
+
+    if (nv > this.remainQty) {
+      if (this.remainQty === 0) {
+        return;
+      }
+
+      v = String(this.remainQty);
+    }
+
+    this._remainQty = this.remainQty - Number(v);
+
+    this._reduceQty = v;
+    this.countRemainQty();
+    this._reRender();
+  }
+
+  // 變更
+  get exchangeQty() {
+    return this._exchangeQty;
+  }
+  set exchangeQty(v) {
+    this._exchangeQty = v;
+    this.countRemainQty();
+    this._reRender();
+  }
+
+  // 追減/變更金額
+  get reduceExchangePrice() {
+    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const reducePrice = Decimal.mul(qty, this._totalPrice || 0).toString();
+
+    return reducePrice;
+  }
+
+  //----------------------------------------------
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -228,6 +319,7 @@ class Class_product {
     return area;
   };
 
+  /**計算才數 */
   calcVolume = () => {
     return Decimal.mul(this.area || 0, 10.89)
       .toFixed(2)
@@ -1193,6 +1285,7 @@ export {
 type TprodInputCellType = {
   [key in keyof Pick<
     Class_product,
+    | 'quotationNumber'
     | 'discountRate'
     | 'idNumber'
     | 'itemName'
@@ -1247,6 +1340,7 @@ function prodCellConfigCre(): TprodCellConfig {
     // 這個會影響一開始的排列順序
     keyList: [
       // "idNumber",
+      'quotationNumber',
       'discountRate',
       'itemName',
       'quoteType',
@@ -1270,6 +1364,13 @@ function prodCellConfigCre(): TprodCellConfig {
     ],
     cellConfig: {
       // input
+      quotationNumber: {
+        id: 'quotationNumber',
+        label: '合約編號',
+        width: '100px',
+        type: 'input',
+        inputType: 'readyonly',
+      },
       idNumber: { id: 'idNumber', label: '編號', width: '100px', type: 'input', inputType: 'number' },
       discountRate: { id: 'discountRate', label: '折數', width: '60px', type: 'input', inputType: 'number' },
       itemName: { id: 'itemName', label: '項目', width: '100px', type: 'input' },

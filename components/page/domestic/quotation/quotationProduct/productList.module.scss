@@ -5,33 +5,65 @@
 }
 
 .row {
-  padding: 11px 0 11px 0;
-  white-space: nowrap;
-  width: fit-content;
-}
-.buttonBox {
-  display: inline-grid;
-  grid-template-columns: repeat(3, 20px);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
   gap: 16px;
-  width: 124px;
-  padding-left: 22px;
+  height: 66px;
+  padding: 11px 0 11px 0;
+  // width: fit-content;
+
+  .buttonBox {
+    // display: inline-grid;
+    // grid-template-columns: repeat(3, 20px);
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    width: 124px;
+    padding-left: 22px;
+
+    &.resetChange {
+      width: 170px;
+    }
+
+    > .btn {
+      padding: 0px 10px;
+      border: 1px solid theme("colors.border");
+      background: theme("colors.bgc01");
+      color: theme("colors.main");
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
 }
 
 .column {
   display: inline-block;
-  margin-left: 16px;
+  padding: 2px 3px;
+  // margin-left: 16px;
   vertical-align: bottom;
   > div,
   > label {
     padding: 0;
+    > span {
+      font-size: 16px;
+    }
   }
   label input,
   div input {
     font-size: 16px;
   }
+  .checkbox {
+    display: flex;
+    padding-bottom: 1px;
+  }
   &.textCenter {
-    input {
+    input,
+    div {
       text-align: center;
+    }
+    .checkbox {
+      justify-content: center;
     }
   }
 }

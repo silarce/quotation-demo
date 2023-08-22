@@ -1,10 +1,21 @@
 @use "styles/theme01" as *;
 
-
-
-
+// .thead {
+//   display: flex;
+//   flex-wrap: nowrap;
+//   gap: 16px;
+//   padding: 11px 0;
+//   background-color: $bgc01;
+//   z-index: 1;
+//   > * {
+//     flex: none;
+//   }
+// }
 
 .emptyBlock {
   display: inline-block;
   width: 124px;
+  &.append {
+    width: 170px;
+  }
 }
