@@ -24,7 +24,7 @@ export default function InputModal({
   title: string;
   tip?: string;
   placeholder?: string;
-  onConfirm: (value: string) => void;
+  onConfirm?: (value: string) => void;
   className?: string;
   onCancel?: () => void;
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
@@ -38,7 +38,7 @@ export default function InputModal({
   }, [visible]);
 
   const theOnConfirm = () => {
-    onConfirm(value);
+    onConfirm?.(value);
   };
 
   const theOnCancel = () => {
