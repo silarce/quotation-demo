@@ -52,7 +52,8 @@ export default function DndThead({
   return (
     <div className={styleL.thead}>
       {/*  */}
-      {!isExchange && <div className={classNames(style.emptyBlock, isAppend && style.append)} />}
+      {/* {!isExchange && <div className={classNames(style.emptyBlock, isAppend && style.append)} />} */}
+      <div className={classNames(style.emptyBlock, isAppend && style.append, isExchange && style.exchange)} />
       {/*  */}
       <DndContext
         sensors={sensors}

@@ -50,9 +50,9 @@ export default function QuotationExProd({
     <div className={scss.wrapper}>
       <div className={`${scss.container} ${borderRed} ${className}`}>
         <div className={styleL.header}>
-          <h2>主產品設定</h2>
+          <h2>變更 主產品設定</h2>
           <button className={(allowMove && styleL.active) || ''} onClick={() => setAllowMove((state) => !state)}>
-            {allowMove ? '確定排序' : '設定排序'}
+            {allowMove ? '確定標題排序' : '設定標題排序'}
           </button>
         </div>
         <div className={scss.main}>
