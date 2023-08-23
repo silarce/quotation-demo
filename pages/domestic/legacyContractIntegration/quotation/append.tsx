@@ -13,6 +13,7 @@ import QuotationProduction from 'components/page/domestic/quotation/legacyContra
 import QuotationAdditions from 'components/page/domestic/quotation/legacyContract/quotationAdditions_legacyContract';
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
 import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
+import QuotationExProd from 'components/page/domestic/quotation/legacyContract/quotationExProd_legacyContract';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -159,13 +160,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // console.log(classLegacyContract.postBody);
-  console.log(classLegacyContract.exchangeList);
-
-  // const exchangeArrArr = classLegacyContract.classProductArr.map((prod) => {
-  //   return prod.exchangeProdArr;
-  // });
-  // const exchangeArr = _.flatten(exchangeArrArr);
-  // console.log(exchangeArr);
+  // console.log(classLegacyContract.exchangeList);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -189,6 +184,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
           {/* 主產品設定 */}
           <QuotationProduction legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          {/*  */}
+          <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
+          {/*  */}
           {/* 其他設定 */}
           <QuotationAdditions legacyContract={classLegacyContract} disabled={true} />
           {/* 備註/報價範圍/付款資訊 */}

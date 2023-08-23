@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { useState } from 'react';
 import classNames from 'classnames';
 // global gear
@@ -10,7 +11,7 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-
+import iconMove from 'public/image/icon/move.svg';
 // css
 import scss from './productList.module.scss';
 import scss_l from '../local.module.scss';
@@ -29,79 +30,44 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ==========================================================
 // ==========================================================
-export default function ProductList_legacy({
+export default function ExProductList_legacy({
   classQuotation,
   disabled,
-  isAppend,
 }: {
   classQuotation: Class_legacyContract;
   disabled: boolean;
-  isAppend?: boolean;
 }) {
   // ---------------------------------------------------------------
-  const { classProductArr, prodCellConfig, activeProd, delProd, copyProd } = classQuotation;
+  const { exchangeList, prodCellConfig } = classQuotation;
+  const exChnageArr = Object.values(exchangeList);
 
-  const theadIndex = prodCellConfig.keyList;
+  // const theadIndex = prodCellConfig.keyList;
+  const theadIndex = classQuotation.exchangeKeyList;
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
 
   // ---------------------------------------------------------------
-  const [targetIndex, setTargetIndex] = useState<`${number}`>();
-
-  const exchangeConfirm = (v: string) => {
-    if (!targetIndex) {
-      return;
-    }
-
-    const ressult = classProductArr[targetIndex].addExchange(v);
-
-    if (ressult === false) {
-      myAlert.warning({ title: '超過上限' });
-    } else {
-      setTargetIndex(undefined);
-    }
-  };
-
-  const onCancel = () => {
-    setTargetIndex(undefined);
-  };
 
   // ---------------------------------------------------------------
   return (
     <div className={scss.container}>
-      {classProductArr.map((dataItem, pIndex) => {
-        const toSetTargetIndex = () => {
-          setTargetIndex(`${pIndex}`);
-        };
-
-        // if (dataItem.exchangeProdArr) {
-        //   console.log(dataItem.exchangeProdArr);
-        // }
+      {exChnageArr.map((item, pIndex) => {
+        const { prod, delSelf } = item;
 
         return (
-          <CellWithBar key={pIndex} isActive={activeProd === pIndex}>
+          <CellWithBar key={pIndex} isActive={false}>
             <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
               {/*  */}
-              {!isAppend && (
-                <CopyDelBtnBox
-                  disabled={disabled}
-                  del={() => delProd(pIndex)}
-                  copy={() => copyProd(pIndex)}
-                  indexNum={pIndex + 1}
-                />
-              )}
-              {isAppend && (
-                <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} clearExchange={dataItem.clearExchange} />
-              )}
+              <ControlBox delSelf={delSelf} index={pIndex + 1} />
               {/*  */}
               {theadIndex.map((key) => {
                 const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
                 const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
                 const theStyle = { width };
-                const stateValue = dataItem[key];
+                const stateValue = prod[key];
                 const TheCell = cellSwitcher({
-                  dataItem,
+                  dataItem: prod,
                   key,
                   type,
                   disabled,
@@ -115,23 +81,13 @@ export default function ProductList_legacy({
                     {TheCell}
                   </div>
                 );
-              })}
+              })}{' '}
               {/* column */}
-            </div>
+            </div>{' '}
             {/* row */}
           </CellWithBar>
         );
       })}
-      <InputModal
-        visible={!!targetIndex}
-        title="請輸入變更數量"
-        tip={`上限 : ${targetIndex && classProductArr[targetIndex].remainQty}`}
-        onConfirm={(v) => {
-          exchangeConfirm?.(v);
-        }}
-        onCancel={onCancel}
-        inputAttr={{ type: 'number', placeholder: '請輸入數量' }}
-      />
     </div>
   ); // return
 
@@ -270,64 +226,14 @@ export default function ProductList_legacy({
 
 // ================================================
 
-const CopyDelBtnBox = ({
-  disabled,
-  del,
-  copy,
-  indexNum,
-}: {
-  disabled: boolean;
-  del: () => void;
-  copy: () => void;
-  indexNum: string | number;
-}) => {
+const ControlBox = ({ delSelf, index }: { delSelf?: () => void; index: number | string }) => {
   return (
-    <div className={scss.buttonBox}>
-      <IconDelete01
-        onClick={(e) => {
-          e.stopPropagation();
-
-          if (disabled) {
-            return;
-          }
-
-          del();
-        }}
-      />
-      <IconCopy
-        onClick={() => {
-          if (disabled) {
-            return;
-          }
-
-          copy();
-        }}
-      />
-      <span>{indexNum}</span>
+    <div className={classNames(scss.buttonBox, scss.exchange)}>
+      <Image className={scss.move} src={iconMove} alt="move" />
+      <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
+        刪除
+      </button>
+      <span>{index}</span>
     </div>
   );
 };
-
-// --------------------------------------------------------
-
-const ResetChangeBtnBox = ({
-  toSetTargetIndex,
-  clearExchange,
-}: {
-  toSetTargetIndex: () => void;
-  clearExchange: () => void;
-}) => {
-  return (
-    <div className={classNames(scss.buttonBox, scss.resetChange)}>
-      <button className={scss.btn} onClick={clearExchange}>
-        還原
-      </button>
-      <button className={scss.btn} onClick={toSetTargetIndex}>
-        變更
-      </button>
-      <span>1</span>
-    </div>
-  );
-};
-
-// --------------------------------------------------------

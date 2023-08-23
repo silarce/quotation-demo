@@ -250,11 +250,12 @@ class Class_product {
     const nv = Number(v);
 
     if (nv > this.remainQty) {
-      if (this.remainQty === 0) {
-        return;
-      }
+      return;
+      // if (this.remainQty === 0) {
+      //   return;
+      // }
 
-      v = String(this.remainQty);
+      // v = String(this.remainQty);
     }
 
     this._reduceQty = v;
@@ -274,16 +275,11 @@ class Class_product {
 
     return qty;
   }
-  // set exchangeQty(v) {
-  //   this._exchangeQty = v;
-  //   this.countRemainQty();
-  //   this._reRender();
-  // }
 
   // 追減/變更金額
   get reduceExchangePrice() {
     const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
-    const reducePrice = Decimal.mul(qty, this._totalPrice || 0).toString();
+    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
 
     return reducePrice;
   }
@@ -305,7 +301,8 @@ class Class_product {
         this._reRender,
         copy,
         () => {},
-        () => {}
+        () => {},
+        this
       )
     );
     this._reRender();
@@ -520,6 +517,19 @@ class Class_product {
     return this._quantity;
   }
   set quantity(v) {
+    if (this.parentProd) {
+      const parentRemain = this.parentProd.remainQty;
+
+      if (Number(v) > parentRemain) {
+        return;
+        // if (parentRemain === 0) {
+        //   return;
+        // }
+
+        // v = String(parentRemain);
+      }
+    }
+
     this._quantity = v;
     v = parseInt(v || '0').toString();
     this._product.quantity = parseInt(v || '0');
@@ -1036,6 +1046,9 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
+    this._exchangeKeyList = _.cloneDeep(prodCellConfig.keyList);
+    this._exchangeKeyList = _.pull(this._exchangeKeyList, 'quotationNumber') as typeof prodCellConfig.keyList;
+
     this.additionCellConfig = additionCellConfig;
   } // constructor
 
@@ -1051,6 +1064,8 @@ class Class_legacyContract {
   classNotes;
   classQuoteScopes;
   classSignature;
+  // ---------------------
+  _exchangeKeyList;
   // ---------------------
 
   // 需求變更 編輯折數與總折數時不再影響其他數值
@@ -1102,6 +1117,14 @@ class Class_legacyContract {
   }
   set prodkeyList(v) {
     this.prodCellConfig.keyList = v;
+    this._reRender();
+  }
+
+  get exchangeKeyList() {
+    return this._exchangeKeyList;
+  }
+  set exchangeKeyList(v) {
+    this._exchangeKeyList = v;
     this._reRender();
   }
 
@@ -1259,19 +1282,64 @@ class Class_legacyContract {
   }
   // ---------------------
   // append
+
+  private _additionalExchangeArr: Class_product[] = [];
+  addAdditionalExchange = () => {
+    this._additionalExchangeArr.push(
+      new Class_product(
+        this._reRender,
+        emptyProdCre(),
+        () => {},
+        () => {}
+      )
+    );
+    this._reRender();
+  };
+
   get exchangeList() {
     const exchangeArrArr = this.classProductArr.map((cp) => {
       return cp.exchangeProdArr;
     });
 
-    const list: { [key: `${number}`]: Class_product } = {};
-    const exchangeArr = _.flatten(exchangeArrArr);
+    // const list: { [key: `${number}`]: Class_product } = {};
+    // const exchangeArr = [..._.flatten(exchangeArrArr), ...this._additionalExchangeArr];
+
+    type Tlist = {
+      [key: `${number}`]: {
+        prod: Class_product;
+        delSelf?: () => void;
+      };
+    };
+
+    const list: Tlist = {};
+
+    let exchangeArr = [..._.flatten(exchangeArrArr)];
+    exchangeArr = _.pull(exchangeArr, undefined);
     exchangeArr.forEach((prod, index) => {
       if (!prod) {
         return;
       }
 
-      list[`${index}`] = prod;
+      list[`${index}`] = {
+        prod,
+      };
+    });
+
+    const listLength = Object.keys(list).length;
+
+    this._additionalExchangeArr.forEach((prod, index) => {
+      if (!prod) {
+        return;
+      }
+
+      const theIndex = listLength + index;
+
+      list[`${theIndex}`] = {
+        prod,
+        delSelf: () => {
+          this._additionalExchangeArr.splice(index, 1);
+        },
+      };
     });
 
     return list;
@@ -1313,6 +1381,23 @@ export {
   useLegacyContract,
 };
 
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
 // ==========================================================================
 
 // console.log(isNaN(new Date('1111-11-11').getTime()));

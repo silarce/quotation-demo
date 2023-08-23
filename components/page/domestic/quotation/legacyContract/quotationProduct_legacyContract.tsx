@@ -1,3 +1,7 @@
+// 主產品設定
+// 主產品設定
+// 主產品設定
+
 import { useState } from 'react';
 import classNames from 'classnames';
 
@@ -36,6 +40,8 @@ export default function QuotationProduction({
   const borderRed = switch02 ? scss.borderRed : '';
 
   const classProductArr = legacyContract.classProductArr;
+
+  let exchangeTotal = 0;
 
   return (
     <div className={scss.wrapper}>
@@ -80,6 +86,8 @@ export default function QuotationProduction({
               <div className={classNames(scss.tbody)}>
                 {/* row1 */}
                 {classProductArr.map((prod, index) => {
+                  exchangeTotal += Number(prod.reduceExchangePrice);
+
                   return (
                     <ChangeListRow
                       key={index}
@@ -106,7 +114,7 @@ export default function QuotationProduction({
       {isAppend && (
         <div className={classNames(scss.total)}>
           <span>合計</span>
-          <span>{'-255,000'}</span>
+          <span>- {exchangeTotal.toLocaleString()}</span>
         </div>
       )}
 
@@ -127,7 +135,7 @@ const ChangeListRow = ({
   reduce: number | string;
   reduceOnChange: (v: string) => void;
   exchange: number | string;
-  changedMoney: number | string;
+  changedMoney: string;
 }) => {
   return (
     <div className={scss.row}>
@@ -144,7 +152,7 @@ const ChangeListRow = ({
         />
       </div>
       <span>- {exchange}</span>
-      <span>- {changedMoney}</span>
+      <span>- {Number(changedMoney).toLocaleString()}</span>
     </div>
   );
 };
