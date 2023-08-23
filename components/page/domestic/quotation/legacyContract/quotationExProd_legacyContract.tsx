@@ -73,7 +73,7 @@ export default function QuotationExProd({
       {/*  */}
       <div className={classNames(scss.total)}>
         <span>合計</span>
-        <span>- {totalPrice.toLocaleString()}</span>
+        <span>+ {totalPrice.toLocaleString()}</span>
       </div>
       {/* wrapper close*/}
     </div>
