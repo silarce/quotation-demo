@@ -25,6 +25,7 @@ import type {
   TprodSelectWithIconCellType,
   TprodCheckboxCellType,
 } from 'hooks/quotation/useLegacyContract';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ==========================================================
 // ==========================================================
@@ -53,8 +54,13 @@ export default function ProductList_legacy({
       return;
     }
 
-    classProductArr[targetIndex].addExchange(v);
-    setTargetIndex(undefined);
+    const ressult = classProductArr[targetIndex].addExchange(v);
+
+    if (ressult === false) {
+      myAlert.warning({ title: '超過上限' });
+    } else {
+      setTargetIndex(undefined);
+    }
   };
 
   const onCancel = () => {
@@ -69,6 +75,10 @@ export default function ProductList_legacy({
           setTargetIndex(`${pIndex}`);
         };
 
+        // if (dataItem.exchangeProdArr) {
+        //   console.log(dataItem.exchangeProdArr);
+        // }
+
         return (
           <CellWithBar key={pIndex} isActive={activeProd === pIndex}>
             <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
@@ -81,7 +91,9 @@ export default function ProductList_legacy({
                   indexNum={pIndex + 1}
                 />
               )}
-              {isAppend && <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} />}
+              {isAppend && (
+                <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} clearExchange={dataItem.clearExchange} />
+              )}
               {/*  */}
               {theadIndex.map((key) => {
                 const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
@@ -297,10 +309,18 @@ const CopyDelBtnBox = ({
 
 // --------------------------------------------------------
 
-const ResetChangeBtnBox = ({ toSetTargetIndex }: { toSetTargetIndex: () => void }) => {
+const ResetChangeBtnBox = ({
+  toSetTargetIndex,
+  clearExchange,
+}: {
+  toSetTargetIndex: () => void;
+  clearExchange: () => void;
+}) => {
   return (
     <div className={classNames(scss.buttonBox, scss.resetChange)}>
-      <button className={scss.btn}>還原</button>
+      <button className={scss.btn} onClick={clearExchange}>
+        還原
+      </button>
       <button className={scss.btn} onClick={toSetTargetIndex}>
         變更
       </button>

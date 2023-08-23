@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -158,6 +159,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // console.log(classLegacyContract.postBody);
+  console.log(classLegacyContract.exchangeList);
+
+  // const exchangeArrArr = classLegacyContract.classProductArr.map((prod) => {
+  //   return prod.exchangeProdArr;
+  // });
+  // const exchangeArr = _.flatten(exchangeArrArr);
+  // console.log(exchangeArr);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------

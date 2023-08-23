@@ -193,7 +193,6 @@ class Class_product {
     this._thickness = this._product.thickness ? this._product.thickness.toString() : '';
     //
     this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
-    this._remainQty = Number(this._quantity);
     //
     this._unitPrice = this._product.unitPrice ? this._product.unitPrice.toString() : '';
     this._totalPrice = this._product.totalPrice ? this._product.totalPrice.toString() : '';
@@ -221,40 +220,19 @@ class Class_product {
   private _totalPrice;
   private _discountRate;
   //----------------------------------------------
-  private parentProd: Class_product | undefined = undefined;
-  private exchangeProdArr: Class_product[] | undefined = undefined;
-
-  addExchange = (v: string) => {
-    console.log(this.quantity, v);
-    // if (!this.exchangeProdArr) {
-    //   this.exchangeProdArr = [];
-    // }
-    // const copy = _.cloneDeep(this._product);
-    // copy.quantity = 0;
-    // this.exchangeProdArr.push(
-    //   new Class_product(
-    //     this._reRender,
-    //     this._product,
-    //     () => {},
-    //     () => {}
-    //   )
-    // );
-  };
-
-  //
-
-  // remainQty;
-  _remainQty;
-  get remainQty() {
-    return this._remainQty;
-  }
-
   private _reduceQty = '0';
-  private _exchangeQty = '0';
-
-  countRemainQty() {
-    this._remainQty = Number(this._quantity) - Number(this._reduceQty) - Number(this._exchangeQty);
+  get remainQty() {
+    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
   }
+  private parentProd: Class_product | undefined = undefined;
+  private _exchangeProdArr: Class_product[] | undefined = undefined;
+  get exchangeProdArr() {
+    return this._exchangeProdArr;
+  }
+
+  // countRemainQty() {
+  //   this._remainQty = Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  // }
 
   // 等api新增，先用假資料
   private _quotationNumber = 'M-1120821-1';
@@ -279,22 +257,28 @@ class Class_product {
       v = String(this.remainQty);
     }
 
-    this._remainQty = this.remainQty - Number(v);
-
     this._reduceQty = v;
-    this.countRemainQty();
     this._reRender();
   }
 
   // 變更
   get exchangeQty() {
-    return this._exchangeQty;
+    if (!this._exchangeProdArr) {
+      return 0;
+    }
+
+    let qty = 0;
+    this._exchangeProdArr.forEach((item) => {
+      qty = qty + Number(item.quantity || 0);
+    });
+
+    return qty;
   }
-  set exchangeQty(v) {
-    this._exchangeQty = v;
-    this.countRemainQty();
-    this._reRender();
-  }
+  // set exchangeQty(v) {
+  //   this._exchangeQty = v;
+  //   this.countRemainQty();
+  //   this._reRender();
+  // }
 
   // 追減/變更金額
   get reduceExchangePrice() {
@@ -303,6 +287,38 @@ class Class_product {
 
     return reducePrice;
   }
+
+  // 新增變更項目
+  addExchange = (v: string) => {
+    if (Number(v) > this.remainQty) {
+      return false;
+    }
+
+    if (!this._exchangeProdArr) {
+      this._exchangeProdArr = [];
+    }
+
+    const copy = _.cloneDeep(this._product);
+    copy.quantity = Number(v);
+    this._exchangeProdArr.push(
+      new Class_product(
+        this._reRender,
+        copy,
+        () => {},
+        () => {}
+      )
+    );
+    this._reRender();
+
+    return true;
+  };
+
+  // 清空變更項目
+  clearExchange = () => {
+    this._exchangeProdArr = undefined;
+    this._reduceQty = '0';
+    this._reRender();
+  };
 
   //----------------------------------------------
 
@@ -1241,6 +1257,26 @@ class Class_legacyContract {
       deliveryDate: deliveryDate_Date,
     };
   }
+  // ---------------------
+  // append
+  get exchangeList() {
+    const exchangeArrArr = this.classProductArr.map((cp) => {
+      return cp.exchangeProdArr;
+    });
+
+    const list: { [key: `${number}`]: Class_product } = {};
+    const exchangeArr = _.flatten(exchangeArrArr);
+    exchangeArr.forEach((prod, index) => {
+      if (!prod) {
+        return;
+      }
+
+      list[`${index}`] = prod;
+    });
+
+    return list;
+  }
+
   // ---------------------
 } // Class_legacyContract
 
