@@ -94,10 +94,20 @@ export default function QuotationAdditions({
                 const { width, flex, type, inputType } = cellConfig[key];
                 const theStyle = { width, flex };
 
+                let showBaseline: 'auto' | 'invisible' = 'auto';
+
+                let theDisabled = disabled;
+
+                if (key === 'quotationNumber') {
+                  theDisabled = true;
+                  showBaseline = 'invisible';
+                }
+
                 return (
                   <div className={styleL.column} key={cIndex} style={theStyle}>
                     <InputSel
-                      disabled={disabled}
+                      disabled={theDisabled}
+                      showBaseline={showBaseline}
                       inputProps={{
                         value: part[key],
                         onChange: (v) => (part[key] = v),

@@ -644,6 +644,14 @@ class Class_addition {
   private _unitPrice;
   private _totalPrice;
 
+  // 等api新增，先用假資料
+  private _quotationNumber = 'M-1120821-1';
+  get quotationNumber() {
+    return this._quotationNumber;
+  }
+  set quotationNumber(v) {}
+  //
+
   get id() {
     if ('id' in this._addition) {
       return this._addition.id;
@@ -1530,7 +1538,10 @@ function prodCellConfigCre(): TprodCellConfig {
 // =============================================================
 
 type TaddtionInputCellType = {
-  [key in keyof Pick<Class_addition, 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'>]: {
+  [key in keyof Pick<
+    Class_addition,
+    'quotationNumber' | 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'
+  >]: {
     type: 'input';
   };
 };
@@ -1551,8 +1562,14 @@ type TadditionCellConfig = {
 
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
-    keyList: ['itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
+    keyList: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
     cellConfig: {
+      quotationNumber: {
+        label: '合約編號',
+        width: '100px',
+        type: 'input',
+        inputType: 'readyonly',
+      },
       itemName: { label: '項目', width: '60px', type: 'input' },
       content: { label: '內容', width: 'auto', flex: 'auto', type: 'input' },
       quantity: { label: '數量', width: '60px', type: 'input', inputType: 'number' },
