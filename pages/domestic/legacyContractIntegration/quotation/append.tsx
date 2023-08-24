@@ -185,10 +185,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
           {/* 主產品設定 */}
           <QuotationProduction legacyContract={classLegacyContract} disabled={true} isAppend={true} />
-          <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
-          {/*  */}
-          {/* 其他設定 */}
+          {/* 配件設定 */}
           <QuotationAdditions legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          {/* 變更 主產品 */}
+          <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
+          {/* 變更 配件設定 */}
           <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />

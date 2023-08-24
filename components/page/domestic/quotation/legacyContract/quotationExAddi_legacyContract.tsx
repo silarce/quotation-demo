@@ -45,12 +45,12 @@ export default function QuotationExAddi({
   // -------------------------------------------------------------------
   return (
     <div className={scss.wrapper}>
-      <div className={scss.container}>
+      <div className={classNames(scss.container, scss.exchange)}>
         <div className={styleL.header}>
           <h2>變更 配件設定</h2>
         </div>
 
-        <div className={scss.main}>
+        <div className={classNames(scss.main)}>
           <div className={scss.left}>
             {/* thead */}
             <div className={styleL.thead + ' ' + scss.thead}>
@@ -121,7 +121,7 @@ export default function QuotationExAddi({
           </div>
         </div>
       </div>
-      <div className={classNames(scss.total)}>
+      <div className={classNames(scss.total, scss.exchange)}>
         <span>合計</span>
         <span>+ {totalPrice.toLocaleString()}</span>
       </div>

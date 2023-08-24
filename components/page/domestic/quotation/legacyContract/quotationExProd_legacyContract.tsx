@@ -23,19 +23,15 @@ import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 export default function QuotationExProd({
   legacyContract,
   disabled,
-  switch02,
-  className = '',
+  className,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
-  switch02?: boolean;
   className?: string;
 }) {
   // dnd與資料相關的東西都在這裡面
 
   const [allowMove, setAllowMove] = useState(false);
-
-  const borderRed = switch02 ? scss.borderRed : '';
 
   const addAdditionalExchange = legacyContract.addExProd;
 
@@ -47,8 +43,9 @@ export default function QuotationExProd({
   });
 
   return (
-    <div className={scss.wrapper}>
-      <div className={`${scss.container} ${borderRed} ${className}`}>
+    <div className={classNames(scss.wrapper)}>
+      {/* <div className={`${scss.container} ${borderRed} ${className}`}> */}
+      <div className={classNames(scss.container, scss.exchange, className)}>
         <div className={styleL.header}>
           <h2>變更 主產品設定</h2>
           <button className={(allowMove && styleL.active) || ''} onClick={() => setAllowMove((state) => !state)}>
@@ -71,7 +68,7 @@ export default function QuotationExProd({
         {/* container close */}
       </div>
       {/*  */}
-      <div className={classNames(scss.total)}>
+      <div className={classNames(scss.total, scss.exchange)}>
         <span>合計</span>
         <span>+ {totalPrice.toLocaleString()}</span>
       </div>

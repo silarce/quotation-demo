@@ -9,6 +9,9 @@
 .container {
   padding: 0 4px;
   border: solid 1px $colorBorder01;
+  &.exchange {
+    border-color: red;
+  }
   .addBtn {
     width: fit-content;
     text-align: left;
@@ -127,6 +130,10 @@
   padding: 10px 42px;
   border: solid 1px theme("colors.border");
   border-top: 0;
+  &.exchange {
+    border-color: red;
+  }
+
   span {
     &:nth-of-type(1) {
       color: theme("colors.main");
