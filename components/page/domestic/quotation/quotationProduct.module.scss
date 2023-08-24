@@ -41,64 +41,6 @@
     background-color: theme("colors.bgc01");
     border-left: solid 5px white;
     z-index: 1;
-    .header {
-      position: sticky;
-      top: 0;
-      display: grid;
-      grid-template-columns: 60px 59px 48px 120px;
-      gap: 25px;
-      padding-left: 20px;
-      padding-right: 30px;
-      background-color: #e7e7e7;
-      border-bottom: solid 5px white;
-      > * {
-        margin: auto;
-        &:nth-last-of-type(1) {
-          margin-right: 0;
-        }
-      }
-    }
-    .tbody {
-      padding-left: 20px;
-      padding-right: 30px;
-      .row {
-        display: grid;
-        grid-template-columns: 60px 59px 48px 120px;
-        gap: 25px;
-        align-items: flex-end;
-        height: 66px;
-        padding: 11px 0 11px 0;
-        > * {
-          margin: auto;
-          margin-bottom: 0;
-          &:nth-last-of-type(1) {
-            margin-right: 0;
-          }
-        }
-
-        .inputBox {
-          display: flex;
-          flex-wrap: nowrap;
-          gap: 3px;
-          input {
-            width: 100%;
-            border: solid 1px theme("colors.border");
-            height: 25.14px;
-            // line-height: 25.14px;
-            text-align: center;
-          }
-          span {
-          }
-        }
-
-        span,
-        input {
-          color: #404040;
-          font-size: 16px;
-          font-weight: 400;
-        }
-      }
-    }
   }
 }
 
@@ -127,4 +69,7 @@
   text-align: left;
   background-color: transparent;
   border: none;
+}
+
+.exchangePanel {
 }

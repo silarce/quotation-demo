@@ -9,6 +9,8 @@ import classNames from 'classnames';
 import DndThead from '../quotationProduct/dndThead_legacyContract';
 import ProductList_legacy from '../quotationProduct/productList_legacy';
 
+import ExchangePanel, { ExchangeRow } from './exchangePanel/exchangePanel';
+
 // global gear
 import AddButton from 'components/global/gear/button/addButton';
 
@@ -66,44 +68,32 @@ export default function QuotationProduction({
             {!disabled && <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />}
           </div>
 
+          {/* 把right抽出為元件 */}
+          {/* 把right抽出為元件 */}
+          {/* 把right抽出為元件 */}
+          {/* 把right抽出為元件 */}
+          {/* 把right抽出為元件 */}
+          {/* 把right抽出為元件 */}
+
           {isAppend && (
-            <div className={scss.right}>
-              <div className={classNames(scss.header, styleL.thead)}>
-                <div className={classNames(styleL.theadCell)}>
-                  <span>原數量</span>
-                </div>
-                <div className={classNames(styleL.theadCell)}>
-                  <span>追減</span>
-                </div>
-                <div className={classNames(styleL.theadCell)}>
-                  <span>變更</span>
-                </div>
-                <div className={classNames(styleL.theadCell)}>
-                  <span>追減/變更金額</span>
-                </div>
-              </div>
+            <ExchangePanel>
+              {classProductArr.map((prod, index) => {
+                exchangeTotal += Number(prod.reduceExchangePrice);
 
-              <div className={classNames(scss.tbody)}>
-                {/* row1 */}
-                {classProductArr.map((prod, index) => {
-                  exchangeTotal += Number(prod.reduceExchangePrice);
-
-                  return (
-                    <ChangeListRow
-                      key={index}
-                      oriQty={prod.quantity}
-                      reduce={prod.reduceQty}
-                      reduceOnChange={(v) => {
-                        prod.reduceQty = v;
-                      }}
-                      exchange={prod.exchangeQty}
-                      changedMoney={prod.reduceExchangePrice}
-                    />
-                  );
-                })}
-                {/*  */}
-              </div>
-            </div>
+                return (
+                  <ExchangeRow
+                    key={index}
+                    oriQty={prod.quantity}
+                    reduce={prod.reduceQty}
+                    reduceOnChange={(v) => {
+                      prod.reduceQty = v;
+                    }}
+                    exchange={prod.exchangeQty}
+                    changedMoney={prod.reduceExchangePrice}
+                  />
+                );
+              })}
+            </ExchangePanel>
           )}
 
           {/* main close*/}
@@ -124,35 +114,3 @@ export default function QuotationProduction({
 }
 
 // ======================================================================
-const ChangeListRow = ({
-  oriQty,
-  reduce,
-  reduceOnChange,
-  exchange,
-  changedMoney,
-}: {
-  oriQty: number | string;
-  reduce: number | string;
-  reduceOnChange: (v: string) => void;
-  exchange: number | string;
-  changedMoney: string;
-}) => {
-  return (
-    <div className={scss.row}>
-      <span>{oriQty}</span>
-      <div className={scss.inputBox}>
-        <span>-</span>
-        <input
-          type="number"
-          value={reduce ?? ''}
-          onFocus={() => reduceOnChange('0')}
-          onChange={(e) => {
-            reduceOnChange(e.target.value);
-          }}
-        />
-      </div>
-      <span>- {exchange}</span>
-      <span>- {Number(changedMoney).toLocaleString()}</span>
-    </div>
-  );
-};

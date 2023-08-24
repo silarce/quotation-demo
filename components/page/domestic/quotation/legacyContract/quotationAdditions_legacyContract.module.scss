@@ -14,29 +14,17 @@
   }
 }
 
-// .listContainer {
-//   width: 100%;
-//   overflow: auto;
-//   max-height: 500px;
-//   .thead {
-//     position: sticky;
-//     top: 0;
-//     z-index: 1;
-//   }
-// }
-
-.scrollDiv {
+.main {
   width: 100%;
   overflow: auto;
   max-height: 463px;
-  .thead {
-    position: sticky;
-    top: 0;
-    display: flex;
-    width: 100%;
-    padding-left: 20px;
-    .delBtn {
-      width: 40px;
+  .left {
+    .thead {
+      position: sticky;
+      top: 0;
+      display: flex;
+      width: 100%;
+      padding-left: 20px;
     }
   }
   .row {
@@ -44,8 +32,18 @@
     width: 100%;
     padding-left: 20px;
     place-items: center;
-    .delBtn {
-      width: 40px;
+  }
+  .btnBox {
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 45px;
+    > * {
+      flex: none;
+    }
+    span {
+      font-weight: 400;
+      font-size: 16px;
     }
   }
 }
