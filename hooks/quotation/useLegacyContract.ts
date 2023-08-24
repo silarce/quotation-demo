@@ -296,6 +296,7 @@ class Class_product {
 
     const copy = _.cloneDeep(this._product);
     copy.quantity = Number(v);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
     this._exchangeProdArr.push(
       new Class_product(
         this._reRender,
@@ -722,6 +723,7 @@ class Class_addition {
 
     const copy = _.cloneDeep(this._addition);
     copy.quantity = Number(v);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
     this._exchangeAdditionArr.push(
       new Class_addition(
         this._reRender,
