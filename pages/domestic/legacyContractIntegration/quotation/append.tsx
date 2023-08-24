@@ -25,7 +25,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import iconUpload from 'public/image/icon/upload.svg';
 
 // css
-import style from './quotation.module.scss';
+import scss from './quotation.module.scss';
 // ========================================================================
 // ========================================================================
 // hook
@@ -172,7 +172,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <PageHeader02 tagList={tagList} panelList={panel} />
 
       <div>
-        <div className={style.quotation}>
+        <div className={scss.quotation}>
           {/* 基本資料 */}
           <QuotationProfile
             classLegacyContract={classLegacyContract}
@@ -180,8 +180,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={true}
           />
           {/*  */}
-          <div className={style.switchBar}>
-            <div className={style.active}>合約項目</div>
+          <div className={scss.switchBar}>
+            <div className={scss.active}>合約項目</div>
           </div>
           {/* 主產品設定 */}
           <QuotationProduction legacyContract={classLegacyContract} disabled={true} isAppend={true} />
@@ -191,6 +191,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
           {/* 變更 配件設定 */}
           <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />
+          {/*  */}
+          <div className={scss.exchangeTotal}>
+            <span>總合計</span>
+            <span>+ {classLegacyContract.exchangeTotal.toLocaleString()}</span>
+          </div>
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />
           {/* 簽名 */}

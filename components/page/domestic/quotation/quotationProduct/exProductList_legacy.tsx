@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { useState } from 'react';
 import classNames from 'classnames';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -7,10 +6,8 @@ import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
-import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
-import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
 // css
 import scss from './productList.module.scss';
@@ -26,7 +23,6 @@ import type {
   TprodSelectWithIconCellType,
   TprodCheckboxCellType,
 } from 'hooks/quotation/useLegacyContract';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ==========================================================
 // ==========================================================

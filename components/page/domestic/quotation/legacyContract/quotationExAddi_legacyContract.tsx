@@ -1,20 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import classNames from 'classnames';
-
-// components
-import ExchangePanel, { ExchangeRow } from './exchangePanel/exchangePanel';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import AddButton from 'components/global/gear/button/addButton';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { Class_legacyContract, Class_addition } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
 // icon
-import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
 
 // css
@@ -39,8 +34,6 @@ export default function QuotationExAddi({
   // -------------------------------------------------------------------
 
   const AddiExchangeArr = Object.values(addiExchangeList);
-
-  let totalPrice = 0;
 
   // -------------------------------------------------------------------
   return (
@@ -72,8 +65,6 @@ export default function QuotationExAddi({
             {AddiExchangeArr?.map((addi, pIndex) => {
               const classAddi = addi.addi;
               const delSelf = addi.delSelf;
-
-              totalPrice += Number(addi.addi.totalPrice.replaceAll(',', ''));
 
               return (
                 <CellWithBar
@@ -123,7 +114,7 @@ export default function QuotationExAddi({
       </div>
       <div className={classNames(scss.total, scss.exchange)}>
         <span>合計</span>
-        <span>+ {totalPrice.toLocaleString()}</span>
+        <span>+ {legacyContract.addiExTotal.toLocaleString()}</span>
       </div>
       {/* wrapper close */}
     </div>

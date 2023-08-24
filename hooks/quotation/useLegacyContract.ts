@@ -1511,6 +1511,30 @@ class Class_legacyContract {
     return list;
   }
 
+  // ________________________________
+  get prodExTotal() {
+    let totalPrice = 0;
+
+    Object.values(this.prodExchangeList).forEach((prod) => {
+      totalPrice += Number(prod.prod.totalPrice.replaceAll(',', ''));
+    });
+
+    return totalPrice;
+  }
+
+  get addiExTotal() {
+    let totalPrice = 0;
+    Object.values(this.addiExchangeList).forEach((addi) => {
+      totalPrice += Number(addi.addi.totalPrice.replaceAll(',', ''));
+    });
+
+    return totalPrice;
+  }
+
+  get exchangeTotal() {
+    return this.prodExTotal + this.addiExTotal;
+  }
+
   // -----------
 
   // ---------------------
