@@ -38,7 +38,7 @@ export default function ExProductList_legacy({
   disabled: boolean;
 }) {
   // ---------------------------------------------------------------
-  const { exchangeList, prodCellConfig } = classQuotation;
+  const { prodExchangeList: exchangeList, prodCellConfig } = classQuotation;
   const exChnageArr = Object.values(exchangeList);
 
   // const theadIndex = prodCellConfig.keyList;

@@ -14,6 +14,7 @@ import QuotationAdditions from 'components/page/domestic/quotation/legacyContrac
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
 import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
 import QuotationExProd from 'components/page/domestic/quotation/legacyContract/quotationExProd_legacyContract';
+import QuotationExAddi from 'components/page/domestic/quotation/legacyContract/quotationExAddi_legacyContract';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -184,11 +185,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
           {/* 主產品設定 */}
           <QuotationProduction legacyContract={classLegacyContract} disabled={true} isAppend={true} />
-          {/*  */}
           <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
           {/*  */}
           {/* 其他設定 */}
-          <QuotationAdditions legacyContract={classLegacyContract} disabled={true} />
+          <QuotationAdditions legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />
           {/* 簽名 */}

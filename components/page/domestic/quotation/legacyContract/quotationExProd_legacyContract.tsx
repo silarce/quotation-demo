@@ -37,11 +37,11 @@ export default function QuotationExProd({
 
   const borderRed = switch02 ? scss.borderRed : '';
 
-  const addAdditionalExchange = legacyContract.addAdditionalExchange;
+  const addAdditionalExchange = legacyContract.addExProd;
 
   let totalPrice = 0;
 
-  Object.values(legacyContract.exchangeList).forEach((prod) => {
+  Object.values(legacyContract.prodExchangeList).forEach((prod) => {
     // totalPrice += Number(prod.prod.totalPrice);
     totalPrice += Number(prod.prod.totalPrice.replaceAll(',', ''));
   });
