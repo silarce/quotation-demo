@@ -68,13 +68,6 @@ export default function QuotationProduction({
             {!disabled && <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />}
           </div>
 
-          {/* 把right抽出為元件 */}
-          {/* 把right抽出為元件 */}
-          {/* 把right抽出為元件 */}
-          {/* 把right抽出為元件 */}
-          {/* 把right抽出為元件 */}
-          {/* 把right抽出為元件 */}
-
           {isAppend && (
             <ExchangePanel>
               {classProductArr.map((prod, index) => {

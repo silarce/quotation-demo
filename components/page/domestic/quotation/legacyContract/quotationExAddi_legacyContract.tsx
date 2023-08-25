@@ -125,7 +125,7 @@ export default function QuotationExAddi({
 
 const ControlBox = ({ delSelf, index }: { delSelf?: () => void; index: number | string }) => {
   return (
-    <div className={classNames(scss.btnBox, scss.exchange)}>
+    <div className={classNames(scss.btnBox, scss.exchange, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" />
       <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
         刪除

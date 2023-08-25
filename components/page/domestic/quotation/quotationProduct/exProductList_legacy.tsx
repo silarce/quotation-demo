@@ -224,7 +224,7 @@ export default function ExProductList_legacy({
 
 const ControlBox = ({ delSelf, index }: { delSelf?: () => void; index: number | string }) => {
   return (
-    <div className={classNames(scss.buttonBox, scss.exchange)}>
+    <div className={classNames(scss.buttonBox, scss.exchange, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" />
       <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
         刪除

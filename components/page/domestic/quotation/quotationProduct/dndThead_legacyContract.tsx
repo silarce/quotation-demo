@@ -23,7 +23,6 @@ import TheadItem from './dndThead/theadItem';
 // css
 import style from './dndThead.module.scss';
 import styleL from '../local.module.scss';
-
 // type
 import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
@@ -52,7 +51,6 @@ export default function DndThead({
   return (
     <div className={styleL.thead}>
       {/*  */}
-      {/* {!isExchange && <div className={classNames(style.emptyBlock, isAppend && style.append)} />} */}
       <div className={classNames(style.emptyBlock, isAppend && style.append, isExchange && style.exchange)} />
       {/*  */}
       <DndContext

@@ -75,10 +75,6 @@ export default function ProductList_legacy({
           setTargetIndex(`${pIndex}`);
         };
 
-        // if (dataItem.exchangeProdArr) {
-        //   console.log(dataItem.exchangeProdArr);
-        // }
-
         return (
           <CellWithBar key={pIndex} isActive={activeProd === pIndex}>
             <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
@@ -282,7 +278,7 @@ const CopyDelBtnBox = ({
   indexNum: string | number;
 }) => {
   return (
-    <div className={scss.buttonBox}>
+    <div className={classNames(scss.buttonBox, 'chameleon')}>
       <IconDelete01
         onClick={(e) => {
           e.stopPropagation();
@@ -318,7 +314,7 @@ const ResetChangeBtnBox = ({
   clearExchange: () => void;
 }) => {
   return (
-    <div className={classNames(scss.buttonBox, scss.resetChange)}>
+    <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
       <button className={scss.btn} onClick={clearExchange}>
         還原
       </button>

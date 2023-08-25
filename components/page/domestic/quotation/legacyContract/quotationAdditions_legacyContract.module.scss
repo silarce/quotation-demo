@@ -7,16 +7,32 @@
 }
 
 .container {
+  // line-height: 0;
   padding: 0 4px;
   border: solid 1px $colorBorder01;
   &.exchange {
     border-color: red;
   }
   .addBtn {
-    width: fit-content;
+    position: sticky;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
     text-align: left;
-    background-color: transparent;
     border: none;
+    background-color: white;
+    // 為了把父元素lineheight造成的1px間隔蓋過去
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      height: 1px;
+      width: 100%;
+      background-color: white;
+    }
   }
 }
 
@@ -27,7 +43,7 @@
 
   width: 100%;
   overflow: auto;
-  max-height: 463px;
+  height: 471px;
   .left {
     .thead {
       position: sticky;
@@ -86,13 +102,13 @@
 }
 
 .btnBox {
-  // display: inline-grid;
-  // grid-template-columns: repeat(3, 20px);
+  // position: sticky;
+  // left: 0;
+
   display: inline-flex;
   flex-wrap: nowrap;
   gap: 12px;
   width: 45px;
-  // padding-left: 22px;
 
   &.resetChange {
     width: 140px;
