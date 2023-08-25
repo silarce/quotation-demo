@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import _ from 'lodash';
 import Image from 'next/image';
 import classNames from 'classnames';
@@ -108,6 +108,79 @@ export default function QuotationExAddi({
   }
 
   // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+
+  const ExchangeRow = useCallback(function ExchangeRow({
+    pIndex,
+    delSelf,
+    classAddi,
+    isMoving,
+    id,
+  }: {
+    pIndex: number;
+    delSelf?: () => void;
+    classAddi: Class_addition;
+    isMoving: boolean;
+    id: string;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id,
+    });
+
+    const itemStyle = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+        <CellWithBar
+          isActive={activeIndex === pIndex}
+          className={classNames(styleL.row, scss.row)}
+          onClick={() => {
+            setActiveIndex(pIndex);
+          }}
+        >
+          {/*  */}
+          <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
+          {/*  */}
+          {additionKeyindex.map((key, cIndex) => {
+            const { width, flex, type, inputType } = cellConfig[key];
+            const theStyle = { width, flex };
+
+            let showBaseline: 'auto' | 'invisible' = 'auto';
+
+            let theDisabled = disabled;
+
+            if (key === 'quotationNumber') {
+              theDisabled = true;
+              showBaseline = 'invisible';
+            }
+
+            return (
+              <div className={scss.column} key={cIndex} style={theStyle}>
+                <InputSel
+                  disabled={theDisabled}
+                  showBaseline={showBaseline}
+                  inputProps={{
+                    value: classAddi[key],
+                    onChange: (v) => (classAddi[key] = v),
+                    inputType: inputType,
+                  }}
+                />
+              </div>
+            );
+          })}
+        </CellWithBar>
+      </div>
+    );
+  },
+  []);
+
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
   return (
     <div className={scss.wrapper}>
       <div className={classNames(scss.container, scss.exchange)}>
@@ -181,72 +254,6 @@ export default function QuotationExAddi({
     </div>
   );
   // -----------------------------------
-
-  function ExchangeRow({
-    pIndex,
-    delSelf,
-    classAddi,
-    isMoving,
-    id,
-  }: {
-    pIndex: number;
-    delSelf?: () => void;
-    classAddi: Class_addition;
-    isMoving: boolean;
-    id: string;
-  }) {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-      id,
-    });
-
-    const itemStyle = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-
-    return (
-      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-        <CellWithBar
-          isActive={activeIndex === pIndex}
-          className={classNames(styleL.row, scss.row)}
-          onClick={() => {
-            setActiveIndex(pIndex);
-          }}
-        >
-          {/*  */}
-          <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
-          {/*  */}
-          {additionKeyindex.map((key, cIndex) => {
-            const { width, flex, type, inputType } = cellConfig[key];
-            const theStyle = { width, flex };
-
-            let showBaseline: 'auto' | 'invisible' = 'auto';
-
-            let theDisabled = disabled;
-
-            if (key === 'quotationNumber') {
-              theDisabled = true;
-              showBaseline = 'invisible';
-            }
-
-            return (
-              <div className={scss.column} key={cIndex} style={theStyle}>
-                <InputSel
-                  disabled={theDisabled}
-                  showBaseline={showBaseline}
-                  inputProps={{
-                    value: classAddi[key],
-                    onChange: (v) => (classAddi[key] = v),
-                    inputType: inputType,
-                  }}
-                />
-              </div>
-            );
-          })}
-        </CellWithBar>
-      </div>
-    );
-  }
 } // QuotationExAddi
 
 // =======================================================================
@@ -314,22 +321,3 @@ const ControlBox = ({
 //   })}
 // </CellWithBar>
 // </div>
-
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
-// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
-// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import _ from 'lodash';
 import Image from 'next/image';
 import classNames from 'classnames';
@@ -119,6 +119,78 @@ export default function ExProductList_legacy({
     setMovingId(id as string);
   }
 
+  // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
+
+  const ExchangeRow = useCallback(function ExchangeRow({
+    pIndex,
+    isActive,
+    isMoving,
+    delSelf,
+    prod,
+    id,
+  }: {
+    pIndex: number;
+    isActive: boolean;
+    isMoving: boolean;
+    delSelf?: () => void;
+    prod: Class_product;
+    id: string;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id,
+    });
+
+    const itemStyle = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+        <CellWithBar
+          isActive={isActive}
+          onClick={() => {
+            setActiveIndex(pIndex);
+          }}
+        >
+          <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
+            {/*  */}
+            <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
+            {/*  */}
+            {theadIndex.map((key) => {
+              const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
+              const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
+              const theStyle = { width };
+              const stateValue = prod[key];
+              const TheCell = cellSwitcher({
+                dataItem: prod,
+                key,
+                type,
+                disabled,
+                stateValue,
+                inputType,
+                options,
+              });
+
+              return (
+                <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
+                  {TheCell}
+                </div>
+              );
+            })}{' '}
+            {/* column */}
+          </div>{' '}
+          {/* row */}
+        </CellWithBar>
+      </div>
+    );
+  },
+  []);
+
+  // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   return (
     <div className={scss.container}>
@@ -296,70 +368,70 @@ export default function ExProductList_legacy({
   }
   // ------------------------
 
-  function ExchangeRow({
-    pIndex,
-    isActive,
-    isMoving,
-    delSelf,
-    prod,
-    id,
-  }: {
-    pIndex: number;
-    isActive: boolean;
-    isMoving: boolean;
-    delSelf?: () => void;
-    prod: Class_product;
-    id: string;
-  }) {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-      id,
-    });
+  // function ExchangeRow({
+  //   pIndex,
+  //   isActive,
+  //   isMoving,
+  //   delSelf,
+  //   prod,
+  //   id,
+  // }: {
+  //   pIndex: number;
+  //   isActive: boolean;
+  //   isMoving: boolean;
+  //   delSelf?: () => void;
+  //   prod: Class_product;
+  //   id: string;
+  // }) {
+  //   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  //     id,
+  //   });
 
-    const itemStyle = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
+  //   const itemStyle = {
+  //     transform: CSS.Transform.toString(transform),
+  //     transition,
+  //   };
 
-    return (
-      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-        <CellWithBar
-          isActive={isActive}
-          onClick={() => {
-            setActiveIndex(pIndex);
-          }}
-        >
-          <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
-            {/*  */}
-            <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
-            {/*  */}
-            {theadIndex.map((key) => {
-              const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
-              const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
-              const theStyle = { width };
-              const stateValue = prod[key];
-              const TheCell = cellSwitcher({
-                dataItem: prod,
-                key,
-                type,
-                disabled,
-                stateValue,
-                inputType,
-                options,
-              });
+  //   return (
+  //     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+  //       <CellWithBar
+  //         isActive={isActive}
+  //         onClick={() => {
+  //           setActiveIndex(pIndex);
+  //         }}
+  //       >
+  //         <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
+  //           {/*  */}
+  //           <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
+  //           {/*  */}
+  //           {theadIndex.map((key) => {
+  //             const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
+  //             const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
+  //             const theStyle = { width };
+  //             const stateValue = prod[key];
+  //             const TheCell = cellSwitcher({
+  //               dataItem: prod,
+  //               key,
+  //               type,
+  //               disabled,
+  //               stateValue,
+  //               inputType,
+  //               options,
+  //             });
 
-              return (
-                <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
-                  {TheCell}
-                </div>
-              );
-            })}{' '}
-            {/* column */}
-          </div>{' '}
-          {/* row */}
-        </CellWithBar>
-      </div>
-    );
-  }
+  //             return (
+  //               <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
+  //                 {TheCell}
+  //               </div>
+  //             );
+  //           })}{' '}
+  //           {/* column */}
+  //         </div>{' '}
+  //         {/* row */}
+  //       </CellWithBar>
+  //     </div>
+  //   );
+  // }
 } //ProductList
 
 // ================================================
