@@ -3,7 +3,7 @@ import classNames from 'classnames';
 // --------------------
 import {
   DndContext,
-  closestCenter,
+  // closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
@@ -13,6 +13,8 @@ import {
 } from '@dnd-kit/core';
 
 import { arrayMove, SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+
+import { restrictToHorizontalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 
 // import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
 // --------------------
@@ -54,8 +56,9 @@ export default function DndThead({
       <div className={classNames(style.emptyBlock, isAppend && style.append, isExchange && style.exchange)} />
       {/*  */}
       <DndContext
+        modifiers={[restrictToHorizontalAxis, restrictToWindowEdges]}
         sensors={sensors}
-        collisionDetection={closestCenter}
+        // collisionDetection={closestCenter}
         // modifiers={[restrictToHorizontalAxis]}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
