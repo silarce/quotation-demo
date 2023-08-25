@@ -9,6 +9,7 @@ import { checkDateFormat } from 'js/tools/date/checkDate';
 // import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
+import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
 import {
   TlegacyContractDto,
@@ -21,6 +22,7 @@ import {
 } from 'js/api/dtoTypes';
 
 import { checkIsNumberStr, clearThousandsSeparator } from 'js/utils/helpers/universal';
+import { Toption } from 'js/utils/options/options';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
@@ -167,17 +169,16 @@ class Class_product {
     reRender: TreRender,
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto,
     countTotalDiscount: () => void,
-    countSubTotal: () => void
+    countSubTotal: () => void,
+    parentProd?: Class_product
   ) {
     this._reRender = reRender;
     this._product = legacyProduct;
-    const foo = legacyProduct;
 
     this._countTotalDiscount = countTotalDiscount;
     this._countSubTotal = countSubTotal;
 
     this._id = (() => {
-      // if ("id" in this._product) return this._product?.id
       if ('id' in legacyProduct) {
         return legacyProduct.id;
       }
@@ -190,12 +191,18 @@ class Class_product {
     this._width = this._product.width ? this._product.width.toString() : '';
     this._height = this._product.height ? this._product.height.toString() : '';
     this._thickness = this._product.thickness ? this._product.thickness.toString() : '';
+    //
     this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
+    //
     this._unitPrice = this._product.unitPrice ? this._product.unitPrice.toString() : '';
     this._totalPrice = this._product.totalPrice ? this._product.totalPrice.toString() : '';
 
     this._discountRate =
       this._product.discountRate === '0' ? '' : Decimal.mul(this._product.discountRate || '0', 100).toString();
+
+    if (parentProd) {
+      this.parentProd = parentProd;
+    }
   } // constructor
 
   private _reRender;
@@ -212,6 +219,106 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
   private _discountRate;
+  //----------------------------------------------
+  private _reduceQty = '0';
+  get remainQty() {
+    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  }
+  private parentProd: Class_product | undefined = undefined;
+  private _exchangeProdArr: Class_product[] | undefined = undefined;
+  get exchangeProdArr() {
+    return this._exchangeProdArr;
+  }
+
+  // countRemainQty() {
+  //   this._remainQty = Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  // }
+
+  // 等api新增，先用假資料
+  private _quotationNumber = 'M-1120821-1';
+  get quotationNumber() {
+    return this._quotationNumber;
+  }
+  set quotationNumber(v) {}
+  //
+
+  // 追減
+  get reduceQty() {
+    return this._reduceQty;
+  }
+  set reduceQty(v) {
+    const nv = Number(v);
+
+    if (nv > this.remainQty + Number(this.reduceQty)) {
+      return;
+      // if (this.remainQty === 0) {
+      //   return;
+      // }
+
+      // v = String(this.remainQty);
+    }
+
+    this._reduceQty = v;
+    this._reRender();
+  }
+
+  // 變更
+  get exchangeQty() {
+    if (!this._exchangeProdArr) {
+      return 0;
+    }
+
+    let qty = 0;
+    this._exchangeProdArr.forEach((item) => {
+      qty = qty + Number(item.quantity || 0);
+    });
+
+    return qty;
+  }
+
+  // 追減/變更金額
+  get reduceExchangePrice() {
+    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
+
+    return reducePrice;
+  }
+
+  // 新增變更項目
+  addExchange = (v: string) => {
+    if (Number(v) > this.remainQty) {
+      return false;
+    }
+
+    if (!this._exchangeProdArr) {
+      this._exchangeProdArr = [];
+    }
+
+    const copy = _.cloneDeep(this._product);
+    copy.quantity = Number(v);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
+    this._exchangeProdArr.push(
+      new Class_product(
+        this._reRender,
+        copy,
+        () => {},
+        () => {},
+        this
+      )
+    );
+    this._reRender();
+
+    return true;
+  };
+
+  // 清空變更項目
+  clearExchange = () => {
+    this._exchangeProdArr = undefined;
+    this._reduceQty = '0';
+    this._reRender();
+  };
+
+  //----------------------------------------------
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -226,6 +333,7 @@ class Class_product {
     return area;
   };
 
+  /**計算才數 */
   calcVolume = () => {
     return Decimal.mul(this.area || 0, 10.89)
       .toFixed(2)
@@ -410,6 +518,19 @@ class Class_product {
     return this._quantity;
   }
   set quantity(v) {
+    if (this.parentProd) {
+      const parentRemain = this.parentProd.remainQty;
+
+      if (Number(v) > parentRemain) {
+        return;
+        // if (parentRemain === 0) {
+        //   return;
+        // }
+
+        // v = String(parentRemain);
+      }
+    }
+
     this._quantity = v;
     v = parseInt(v || '0').toString();
     this._product.quantity = parseInt(v || '0');
@@ -507,7 +628,8 @@ class Class_addition {
   constructor(
     reRender: TreRender,
     addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto,
-    countSubTotal: () => void
+    countSubTotal: () => void,
+    parentAddition?: Class_addition
   ) {
     this._reRender = reRender;
     this._addition = addition;
@@ -516,6 +638,10 @@ class Class_addition {
     this._quantity = addition.quantity ? addition.quantity.toString() : '';
     this._unitPrice = addition.unitPrice ? addition.unitPrice.toString() : '';
     this._totalPrice = addition.totalPrice ? addition.totalPrice.toString() : '';
+
+    if (parentAddition) {
+      this.parentAddition = parentAddition;
+    }
   } // constructor
   private _reRender;
   private _addition;
@@ -523,7 +649,104 @@ class Class_addition {
   private _quantity;
   private _unitPrice;
   private _totalPrice;
+  // -------------------------------
 
+  private _reduceQty = '0';
+  get remainQty() {
+    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  }
+  private parentAddition: Class_addition | undefined = undefined;
+  private _exchangeAdditionArr: Class_addition[] | undefined = undefined;
+  get exchangeAdditionArr() {
+    return this._exchangeAdditionArr;
+  }
+
+  //
+  // 等api新增，先用假資料
+  private _quotationNumber = 'M-1120821-1';
+  get quotationNumber() {
+    return this._quotationNumber;
+  }
+  set quotationNumber(v) {}
+  //
+  // 追減
+  get reduceQty() {
+    return this._reduceQty;
+  }
+  set reduceQty(v) {
+    const nv = Number(v);
+
+    if (nv > this.remainQty + Number(this.reduceQty)) {
+      return;
+      // if (this.remainQty === 0) {
+      //   return;
+      // }
+
+      // v = String(this.remainQty);
+    }
+
+    this._reduceQty = v;
+    this._reRender();
+  }
+
+  // 變更
+  get exchangeQty() {
+    if (!this._exchangeAdditionArr) {
+      return 0;
+    }
+
+    let qty = 0;
+    this._exchangeAdditionArr.forEach((item) => {
+      qty = qty + Number(item.quantity || 0);
+    });
+
+    return qty;
+  }
+
+  // 追減/變更金額
+  get reduceExchangePrice() {
+    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
+
+    return reducePrice;
+  }
+
+  // 新增變更項目
+  addExchange = (v: string) => {
+    if (Number(v) > this.remainQty) {
+      return false;
+    }
+
+    if (!this._exchangeAdditionArr) {
+      this._exchangeAdditionArr = [];
+    }
+
+    const copy = _.cloneDeep(this._addition);
+    copy.quantity = Number(v);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
+    this._exchangeAdditionArr.push(
+      new Class_addition(
+        this._reRender,
+        copy,
+        () => {},
+        //
+        this
+      )
+    );
+    this._reRender();
+
+    return true;
+  };
+
+  // 清空變更項目
+  clearExchange = () => {
+    this._exchangeAdditionArr = undefined;
+    this._reduceQty = '0';
+    this._reRender();
+  };
+
+  // ----------------------------------------------------
+  // ----------------------------------------------------
   get id() {
     if ('id' in this._addition) {
       return this._addition.id;
@@ -662,24 +885,26 @@ class Class_payInfo {
       v = '100';
     }
 
-    const discountRate = Decimal.div(v || 0, 100);
-    const subTotal: string = (() => {
-      let subTotal = new Decimal(0);
+    // const discountRate = Decimal.div(v || 0, 100);
+    // const subTotal: string = (() => {
+    //   let subTotal = new Decimal(0);
 
-      this._classProductArr.forEach((prod) => {
-        if (!prod.totalPrice) {
-          return;
-        }
+    //   this._classProductArr.forEach((prod) => {
+    //     if (!prod.totalPrice) {
+    //       return;
+    //     }
 
-        subTotal = subTotal.add(prod.totalPrice);
-      });
+    //     const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
 
-      return subTotal.mul(discountRate).toString();
-    })();
-    this.subTotal = subTotal;
+    //     subTotal = subTotal.add(totalPrice);
+    //   });
 
-    this._editAllProdDiscount(v || '0');
-    this._countSubTotal();
+    //   return subTotal.mul(discountRate).toString();
+    // })();
+    // this.subTotal = subTotal;
+
+    // this._editAllProdDiscount(v || '0');
+    // this._countSubTotal();
     this._legacyContract.discountRate = v || '0';
     this._reRender();
   }
@@ -924,6 +1149,9 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
+    this._exchangeKeyList = _.cloneDeep(prodCellConfig.keyList);
+    this._exchangeKeyList = _.pull(this._exchangeKeyList, 'quotationNumber') as typeof prodCellConfig.keyList;
+
     this.additionCellConfig = additionCellConfig;
   } // constructor
 
@@ -940,30 +1168,35 @@ class Class_legacyContract {
   classQuoteScopes;
   classSignature;
   // ---------------------
+  _exchangeKeyList;
+  // ---------------------
 
+  // 需求變更 編輯折數與總折數時不再影響其他數值
   /**計算總折數 */
   countTotalDiscount = () => {
-    let totalDiscount = new Decimal(0);
-    this.classProductArr.forEach((prod) => {
-      const discountRate = prod.discountRate.replace(/,/g, '') || 0;
-      totalDiscount = Decimal.add(discountRate || 0, totalDiscount);
-    });
-    this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
+    // let totalDiscount = new Decimal(0);
+    // this.classProductArr.forEach((prod) => {
+    //   const discountRate = prod.discountRate.replace(/,/g, '') || 0;
+    //   totalDiscount = Decimal.add(discountRate || 0, totalDiscount);
+    // });
+    // this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
   };
+  // 需求變更 編輯折數與總折數時不再影響其他數值
   /**變更所有主產品的折數 */
   editAllProdDiscount = (v: string) => {
-    this.classProductArr.forEach((prod) => {
-      prod.discountRate_noLoop = v;
-    });
+    // this.classProductArr.forEach((prod) => {
+    //   prod.discountRate_noLoop = v;
+    // });
   };
 
   /**計算小計 */
   countSubTotal = () => {
     let subTotal = new Decimal(0);
     this.classProductArr.forEach((prod) => {
-      let totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
-      const discountRate = Decimal.div(prod.discountRate, 100);
-      totalPrice = Decimal.mul(totalPrice, discountRate).toString();
+      const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+      // 需求變更 編輯折數與總折數時不再影響其他數值
+      // const discountRate = Decimal.div(prod.discountRate || 0, 100);
+      // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
       subTotal = Decimal.add(totalPrice || 0, subTotal);
     });
     this.classAdditionArr.forEach((addi) => {
@@ -987,6 +1220,14 @@ class Class_legacyContract {
   }
   set prodkeyList(v) {
     this.prodCellConfig.keyList = v;
+    this._reRender();
+  }
+
+  get exchangeKeyList() {
+    return this._exchangeKeyList;
+  }
+  set exchangeKeyList(v) {
+    this._exchangeKeyList = v;
     this._reRender();
   }
 
@@ -1064,11 +1305,11 @@ class Class_legacyContract {
     //   myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
     // }
 
-    if (!quoteDate) {
-      myAlert.warning({ title: '請選擇合約日期' });
+    // if (!quoteDate) {
+    //   myAlert.warning({ title: '請選擇合約日期' });
 
-      return false;
-    }
+    //   return false;
+    // }
 
     if (!deliveryDate) {
       myAlert.warning({ title: '請選擇交貨日期' });
@@ -1089,7 +1330,7 @@ class Class_legacyContract {
 
     const quoteDate_Date = (() => {
       if (!legacyContractCopy.quoteDate) {
-        return '';
+        return null;
       }
 
       const date = moment(legacyContractCopy.quoteDate as string);
@@ -1097,7 +1338,7 @@ class Class_legacyContract {
       if (date.isValid()) {
         return date.toISOString();
       } else {
-        return '';
+        return null;
       }
     })();
 
@@ -1138,10 +1379,166 @@ class Class_legacyContract {
       customerId,
       notes,
       quoteScopes,
-      quoteDate: quoteDate_Date,
+      quoteDate: quoteDate_Date || null,
       deliveryDate: deliveryDate_Date,
     };
   }
+  // -------------------
+  // 變更主產品設定
+  // appendProduction
+
+  private _prodAdditionalExchangeArr: Class_product[] = [];
+  addExProd = () => {
+    this._prodAdditionalExchangeArr.push(
+      new Class_product(
+        this._reRender,
+        emptyProdCre(),
+        () => {},
+        () => {}
+      )
+    );
+    this._reRender();
+  };
+  // 變更 主產品設定 的list object
+  get prodExchangeList() {
+    // 來源自主產品(classProduct)的陣列
+    const exchangeArrArr = this.classProductArr.map((cp) => {
+      return cp.exchangeProdArr;
+    });
+
+    // const list: { [key: `${number}`]: Class_product } = {};
+    // const exchangeArr = [..._.flatten(exchangeArrArr), ...this._additionalExchangeArr];
+
+    type TexchangeProdlist = {
+      [key: `${number}`]: {
+        prod: Class_product;
+        delSelf?: () => void;
+      };
+    };
+
+    const list: TexchangeProdlist = {};
+
+    let exchangeArr = [..._.flatten(exchangeArrArr)]; // 展開
+    exchangeArr = _.pull(exchangeArr, undefined); // 去掉undefined
+    // 把陣列裡的東西放進list
+    exchangeArr.forEach((prod, index) => {
+      if (!prod) {
+        return;
+      }
+
+      list[`${index}`] = {
+        prod,
+      };
+    });
+
+    // 把額外追加的主產品放進去
+    const listLength = Object.keys(list).length;
+    this._prodAdditionalExchangeArr.forEach((prod, index) => {
+      if (!prod) {
+        return;
+      }
+
+      const theIndex = listLength + index;
+
+      list[`${theIndex}`] = {
+        prod,
+        delSelf: () => {
+          this._prodAdditionalExchangeArr.splice(index, 1);
+          this._reRender();
+        },
+      };
+    });
+
+    return list;
+  }
+  // -----------
+
+  private _additionAdditionalExchangeArr: Class_addition[] = [];
+  addExAddi = () => {
+    this._additionAdditionalExchangeArr.push(
+      new Class_addition(
+        this._reRender,
+        emptyAdditionCre(),
+        () => {}
+        //
+      )
+    );
+    this._reRender();
+  };
+  // 變更 配件設定 的list object
+  get addiExchangeList() {
+    const exchangeArrArr = this.classAdditionArr.map((ca) => {
+      return ca.exchangeAdditionArr;
+    });
+
+    type TexchangeAddilist = {
+      [key: `${number}`]: {
+        addi: Class_addition;
+        delSelf?: () => void;
+      };
+    };
+
+    const list: TexchangeAddilist = {};
+
+    let exchangeArr = [..._.flatten(exchangeArrArr)]; // 展開
+    exchangeArr = _.pull(exchangeArr, undefined); // 去掉undefined
+    // 把陣列裡的東西放進list
+    exchangeArr.forEach((addi, index) => {
+      if (!addi) {
+        return;
+      }
+
+      list[`${index}`] = {
+        addi,
+      };
+    });
+
+    // 把額外的addition放進去
+    const listLength = Object.keys(list).length;
+    this._additionAdditionalExchangeArr.forEach((addi, index) => {
+      if (!addi) {
+        return;
+      }
+
+      const theIndex = listLength + index;
+      list[`${theIndex}`] = {
+        addi,
+        delSelf: () => {
+          this._additionAdditionalExchangeArr.splice(index, 1);
+          this._reRender();
+        },
+      };
+    });
+
+    return list;
+  }
+
+  // ________________________________
+  get prodExTotal() {
+    let totalPrice = 0;
+
+    Object.values(this.prodExchangeList).forEach((prod) => {
+      totalPrice += Number(prod.prod.totalPrice.replaceAll(',', ''));
+    });
+
+    return totalPrice;
+  }
+
+  get addiExTotal() {
+    let totalPrice = 0;
+    Object.values(this.addiExchangeList).forEach((addi) => {
+      totalPrice += Number(addi.addi.totalPrice.replaceAll(',', ''));
+    });
+
+    return totalPrice;
+  }
+
+  get exchangeTotal() {
+    return this.prodExTotal + this.addiExTotal;
+  }
+
+  // -----------
+
   // ---------------------
 } // Class_legacyContract
 
@@ -1179,6 +1576,23 @@ export {
 };
 
 // ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
 
 // console.log(isNaN(new Date('1111-11-11').getTime()));
 // console.log(isNaN(new Date('aaaa').getTime()));
@@ -1186,11 +1600,12 @@ export {
 type TprodInputCellType = {
   [key in keyof Pick<
     Class_product,
+    | 'quotationNumber'
     | 'discountRate'
     | 'idNumber'
     | 'itemName'
-    | 'quoteType'
-    | 'doorType'
+    // | 'quoteType'
+    // | 'doorType'
     | 'length'
     | 'width'
     | 'height'
@@ -1212,7 +1627,11 @@ type TprodCheckboxCellType = {
   [key in keyof Pick<Class_product, 'bounceDoor' | 'typhoonProtection'>]: { type: 'checkbox' };
 };
 
-type TprodKeys = keyof (TprodInputCellType & TprodSelectWithIconCellType & TprodCheckboxCellType);
+type TprodSelect = {
+  [key in keyof Pick<Class_product, 'quoteType' | 'doorType'>]: { type: 'select'; options: Toption[] };
+};
+
+type TprodKeys = keyof (TprodInputCellType & TprodSelectWithIconCellType & TprodCheckboxCellType & TprodSelect);
 
 type TprodCellConfig = {
   keyList: TprodKeys[];
@@ -1223,10 +1642,12 @@ type TprodCellConfig = {
       width: string;
       // type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
       inputType?: HTMLInputTypeAttribute;
+      options?: Toption[];
     };
   } & TprodInputCellType &
     TprodSelectWithIconCellType &
-    TprodCheckboxCellType;
+    TprodCheckboxCellType &
+    TprodSelect;
 };
 
 function prodCellConfigCre(): TprodCellConfig {
@@ -1234,6 +1655,7 @@ function prodCellConfigCre(): TprodCellConfig {
     // 這個會影響一開始的排列順序
     keyList: [
       // "idNumber",
+      'quotationNumber',
       'discountRate',
       'itemName',
       'quoteType',
@@ -1257,11 +1679,28 @@ function prodCellConfigCre(): TprodCellConfig {
     ],
     cellConfig: {
       // input
+      quotationNumber: {
+        id: 'quotationNumber',
+        label: '合約編號',
+        width: '100px',
+        type: 'input',
+        inputType: 'readyonly',
+      },
       idNumber: { id: 'idNumber', label: '編號', width: '100px', type: 'input', inputType: 'number' },
       discountRate: { id: 'discountRate', label: '折數', width: '60px', type: 'input', inputType: 'number' },
       itemName: { id: 'itemName', label: '項目', width: '100px', type: 'input' },
-      quoteType: { id: 'quoteType', label: '報價別', width: '105px', type: 'input' },
-      doorType: { id: 'doorType', label: '門型', width: '100px', type: 'input' },
+      quoteType: {
+        id: 'quoteType',
+        label: '報價別',
+        width: '105px',
+        type: 'select',
+        options: [
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B' },
+          { value: 'c', label: 'C' },
+        ],
+      },
+      doorType: { id: 'doorType', label: '門型', width: '100px', type: 'select', options: optionsCreator_doorModel() },
       length: { id: 'length', label: 'L(m)', width: '60px', type: 'input', inputType: 'number' },
       width: { id: 'width', label: 'W(m)', width: '60px', type: 'input', inputType: 'number' },
       height: { id: 'height', label: 'h(m)', width: '60px', type: 'input', inputType: 'number' },
@@ -1285,7 +1724,10 @@ function prodCellConfigCre(): TprodCellConfig {
 // =============================================================
 
 type TaddtionInputCellType = {
-  [key in keyof Pick<Class_addition, 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'>]: {
+  [key in keyof Pick<
+    Class_addition,
+    'quotationNumber' | 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'
+  >]: {
     type: 'input';
   };
 };
@@ -1306,10 +1748,17 @@ type TadditionCellConfig = {
 
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
-    keyList: ['itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
+    keyList: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
     cellConfig: {
+      quotationNumber: {
+        label: '合約編號',
+        width: '100px',
+        type: 'input',
+        inputType: 'readyonly',
+      },
       itemName: { label: '項目', width: '60px', type: 'input' },
-      content: { label: '內容', width: 'auto', flex: 'auto', type: 'input' },
+      // content: { label: '內容', width: 'auto', flex: 'auto', type: 'input' },
+      content: { label: '內容', width: '225px', flex: 'auto', type: 'input' },
       quantity: { label: '數量', width: '60px', type: 'input', inputType: 'number' },
       unitPrice: { label: '單價', width: '110px', type: 'input' },
       totalPrice: { label: '複價', width: '110px', type: 'input' },

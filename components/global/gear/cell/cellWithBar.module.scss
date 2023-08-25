@@ -2,8 +2,8 @@
 
 .container {
   position: relative;
-  min-width:100%;
-  width:fit-content;
+  min-width: 100%;
+  width: fit-content;
   padding: 0;
   margin: 0;
   &:hover {
@@ -11,11 +11,17 @@
     > .bar {
       background-color: $colorMain;
     }
+    :global(.chameleon) {
+      background-color: $hoverBgc01;
+    }
   }
   &.active {
     background-color: $chosenBgc01;
     > .bar {
       background-color: $colorActive01;
+    }
+    :global(.chameleon) {
+      background-color: $chosenBgc01;
     }
   }
 }
@@ -27,4 +33,5 @@
   transform: translateY(-50%);
   width: 3px;
   height: calc(100% - 4px);
+  z-index: 1;
 }

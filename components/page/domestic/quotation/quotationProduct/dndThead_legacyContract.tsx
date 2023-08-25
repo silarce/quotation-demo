@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 // --------------------
 import {
   DndContext,
@@ -22,7 +23,6 @@ import TheadItem from './dndThead/theadItem';
 // css
 import style from './dndThead.module.scss';
 import styleL from '../local.module.scss';
-
 // type
 import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 
@@ -31,14 +31,16 @@ import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
 export default function DndThead({
   allowMove,
   classQuotation,
+  isAppend,
+  isExchange,
 }: {
   classQuotation: Class_legacyContract;
   allowMove: boolean;
+  isAppend?: boolean;
+  isExchange?: boolean;
 }) {
-  const {
-    prodCellConfig: prodCellConfig, // 格子的資訊(label, width這些)
-    prodkeyList: theadIndex, // thead的目錄、排序
-  } = classQuotation;
+  const cellConfig = classQuotation.prodCellConfig.cellConfig;
+  const theadIndex = isExchange ? classQuotation.exchangeKeyList : classQuotation.prodkeyList;
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -49,7 +51,7 @@ export default function DndThead({
   return (
     <div className={styleL.thead}>
       {/*  */}
-      <div className={style.emptyBlock} />
+      <div className={classNames(style.emptyBlock, isAppend && style.append, isExchange && style.exchange)} />
       {/*  */}
       <DndContext
         sensors={sensors}
@@ -61,7 +63,7 @@ export default function DndThead({
         <SortableContext items={theadIndex} strategy={horizontalListSortingStrategy}>
           {theadIndex.map((key, index) => {
             // const theadInfo = prodCellConfig.cellConfig[key];
-            const theadInfo = prodCellConfig.cellConfig[key as keyof typeof prodCellConfig.cellConfig];
+            const theadInfo = cellConfig[key as keyof typeof cellConfig];
 
             return (
               // key必須是items裡的值
@@ -91,9 +93,14 @@ export default function DndThead({
     setIsMoving('');
 
     if (active.id !== over?.id) {
-      const oldIndex: number = theadIndex.indexOf(active.id as keyof typeof prodCellConfig.cellConfig);
-      const newIndex: number = theadIndex.indexOf(over?.id as keyof typeof prodCellConfig.cellConfig);
-      classQuotation.prodkeyList = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyList;
+      const oldIndex: number = theadIndex.indexOf(active.id as keyof typeof cellConfig);
+      const newIndex: number = theadIndex.indexOf(over?.id as keyof typeof cellConfig);
+
+      if (!isExchange) {
+        classQuotation.prodkeyList = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyList;
+      } else {
+        classQuotation.exchangeKeyList = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyList;
+      }
     }
   }
 

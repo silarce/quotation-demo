@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
 
 // global gear
-import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+// import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
@@ -16,6 +16,7 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 
 // api
 import { Tparams, TapiGetEmployeeParams, useEmployee } from 'js/api/api_employee';
+import { useDepartments } from 'js/api/api_department';
 
 import { AppContext } from 'pages/_app';
 
@@ -46,13 +47,13 @@ export default function EmployeeSelector({
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);
 
-  const [searchValue, setSearchValue] = useState<string | undefined>();
+  const [searchValue, setSearchValue] = useState<string[]>([]);
   const [pageObj, setPageObj] = useState({ page: -1 });
   const page = pageObj.page;
 
   const params: Tparams = (() => {
-    const allNum = /^\d+$/.test(searchValue ?? 'n');
-    const grade = allNum ? searchValue : undefined;
+    const allNum = /^\d+$/.test(searchValue[1] ?? 'n');
+    const grade = allNum ? searchValue[1] : undefined;
 
     return {
       page: page,
@@ -62,12 +63,14 @@ export default function EmployeeSelector({
       filter: {
         $or: {
           idNumber: {
-            $contains: searchValue,
+            $contains: searchValue[1],
           },
-          chName: { $contains: searchValue },
-          'jobs.name': { $contains: searchValue },
+          chName: { $contains: searchValue[1] },
+          'jobs.name': { $contains: searchValue[1] },
           'jobs.grade': { $eq: grade },
         },
+        'jobs.department.name': { $contains: searchValue[0] },
+
         ...customFilter,
       },
       ...customParams,
@@ -77,6 +80,9 @@ export default function EmployeeSelector({
   const { data, setData, update, update_infinite } = useEmployee(params);
   const employeeArr = data?.data || [];
   const meta = data?.meta;
+
+  //
+  const { data: departmentData, update: update_department } = useDepartments();
 
   const [viewRef, inView] = useInView();
 
@@ -103,15 +109,21 @@ export default function EmployeeSelector({
       const newPageObj = { ...pageObj, page: -1 };
       setPageObj(newPageObj);
       setData(undefined);
-      setSearchValue(undefined);
+      setSearchValue([]);
 
       return;
     }
 
+    // const newPageObj = { ...pageObj, page: 1 };
+    // setPageObj(newPageObj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
+
+  useEffect(() => {
     const newPageObj = { ...pageObj, page: 1 };
     setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal]);
+  }, [searchValue]);
 
   useEffect(() => {
     if (page === -1) {
@@ -142,6 +154,30 @@ export default function EmployeeSelector({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageObj]);
+
+  // ==================================================
+  useEffect(() => {
+    update_department();
+  }, []);
+
+  const optionArr = useMemo(() => {
+    if (!departmentData) {
+      return [];
+    }
+
+    const arr = departmentData.data.map((data) => {
+      return {
+        value: data.name,
+        label: data.name,
+      };
+    });
+    arr.unshift({
+      value: '',
+      label: '不拘',
+    });
+
+    return arr;
+  }, [departmentData]);
 
   // ==================================================
 
@@ -180,22 +216,46 @@ export default function EmployeeSelector({
     setSelEmployeeArr([]);
   };
 
-  const onSearch = (v: string) => {
+  const onSearch = (v: string[]) => {
     setSearchValue(v);
   };
+
+  const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
+    {
+      selectProps: {
+        wrapperStyle: { width: '100px' },
+        props: {
+          options: optionArr,
+          placeholder: '選擇部門',
+        },
+      },
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: '160px' },
+        props: {
+          placeholder: '搜尋關鍵字',
+        },
+      },
+    },
+  ];
 
   // ==================================================
 
   return (
-    <ModalListSelectorWithSearch
+    <SelectorShell
       label={label ?? ''}
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={onSearch}
+      // onSearch={onSearch}
       width={rwd1023 ? '80vw' : '800px'}
       className={style.container}
       tip={tip}
+      searcbBarProps={{
+        inputSelPropsArr: inputSelPropsArr,
+        onClick: onSearch,
+      }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
         <div className={style.listContainer}>
@@ -226,6 +286,6 @@ export default function EmployeeSelector({
           })}
         </div>
       </LoadingCoverWrapper01>
-    </ModalListSelectorWithSearch>
+    </SelectorShell>
   );
 }

@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+//
+import { customerTypesLookup } from 'config/lookupTable';
+
 // tool
 import { generateYearArray } from 'js/tools/date/generateYearArray';
 
@@ -327,6 +330,29 @@ export const optionsCreator_mealsCost = (): Toption[] => {
     { value: 'lunch', label: '午餐' },
     { value: 'dinner', label: '晚餐' },
   ];
+};
+
+export const optionsCreator_customerType = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
+  const optionArr = Object.keys(customerTypesLookup).map((key) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const label = customerTypesLookup[key];
+
+    if (!label) {
+      console.log('錯誤的key', key);
+    }
+
+    return {
+      value: key,
+      label: label ?? '錯誤的key',
+    };
+  });
+
+  if (emptyOption) {
+    optionArr.unshift({ value: '', label: '不拘' });
+  }
+
+  return optionArr;
 };
 
 // export const optionsCreator_ =

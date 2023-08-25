@@ -5,7 +5,7 @@ import classNames from 'classnames';
 // component
 import Input, { TinputProps } from './cog/input';
 import Textarea, { TtextareaProps } from './cog/textarea';
-import MySelect, { TselectProps } from './cog/mySelect';
+import MySelect, { TselectProps, Toption } from './cog/mySelect';
 import MyDatePicker, { TdatePickerProps } from './cog/myDatePicker';
 import MyTimePicker, { TtimePickerProps } from './cog/myTimePicker';
 import MyTimePicker_mui, { TtimePickerProps_mui } from './cog/myTimePicker_mui';
@@ -20,7 +20,19 @@ import scss from './inputSel.module.scss';
 
 type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
 
-export type { TinputSelProps, TselectProps, TinputProps, TcheckboxProps, TtextareaProps, TinputSelBarProps_reduce };
+export type {
+  TinputSelProps,
+  //
+  TselectProps,
+  TinputProps,
+  TcheckboxProps,
+  TtextareaProps,
+  TinputSelBarProps_reduce,
+  TdatePickerProps,
+  TtimePickerProps,
+  TtimePickerProps_mui,
+  TinputSelBarProps,
+};
 
 // =============================================================================
 
@@ -211,7 +223,50 @@ export default function InputSel({
         />
       )}
 
-      {selectProps && (
+      {selectProps &&
+        (() => {
+          let easyValue: Toption | undefined | null = undefined;
+
+          if (selectProps.easyValue !== undefined) {
+            if (selectProps.easyValue === null || selectProps.easyValue === '') {
+              easyValue = null;
+            } else {
+              const options = selectProps.props?.options;
+
+              easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+                value: selectProps.easyValue,
+                label: selectProps.easyValue,
+              };
+            }
+          }
+
+          return (
+            <MySelect
+              wrapperClassName={selectProps.wrapperClassName}
+              wrapperStyle={selectProps.wrapperStyle}
+              arrowType={selectProps.arrowType}
+              fontClassName={fontClassName}
+              props={{
+                isDisabled: disabled,
+                placeholder: `請輸入${caption ?? ''}`,
+                //
+                value: easyValue,
+                ...selectProps.props,
+                //
+                onFocus: (e) => {
+                  selectProps.props?.onFocus?.(e);
+                  setIsFocus(true);
+                },
+                onBlur: (e) => {
+                  selectProps.props?.onBlur?.(e);
+                  setIsFocus(false);
+                },
+              }}
+            />
+          );
+        })()}
+
+      {/* {selectProps && (
         <MySelect
           wrapperClassName={selectProps.wrapperClassName}
           wrapperStyle={selectProps.wrapperStyle}
@@ -233,7 +288,7 @@ export default function InputSel({
             },
           }}
         />
-      )}
+      )} */}
 
       {datePickerProps && (
         <MyDatePicker
