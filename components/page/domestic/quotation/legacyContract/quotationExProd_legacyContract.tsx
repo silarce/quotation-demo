@@ -35,12 +35,6 @@ export default function QuotationExProd({
 
   const addAdditionalExchange = legacyContract.addExProd;
 
-  // let totalPrice = 0;
-
-  // Object.values(legacyContract.prodExchangeList).forEach((prod) => {
-  //   totalPrice += Number(prod.prod.totalPrice.replaceAll(',', ''));
-  // });
-
   return (
     <div className={classNames(scss.wrapper)}>
       {/* <div className={`${scss.container} ${borderRed} ${className}`}> */}

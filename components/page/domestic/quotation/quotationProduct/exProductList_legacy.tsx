@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import classNames from 'classnames';
+import { useState } from 'react';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
@@ -44,6 +45,7 @@ export default function ExProductList_legacy({
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
 
   // ---------------------------------------------------------------
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   // ---------------------------------------------------------------
   return (
@@ -51,8 +53,10 @@ export default function ExProductList_legacy({
       {exChnageArr.map((item, pIndex) => {
         const { prod, delSelf } = item;
 
+        const isActive = pIndex === activeIndex;
+
         return (
-          <CellWithBar key={pIndex} isActive={false}>
+          <CellWithBar key={pIndex} isActive={isActive} onClick={() => setActiveIndex(pIndex)}>
             <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
               {/*  */}
               <ControlBox delSelf={delSelf} index={pIndex + 1} />

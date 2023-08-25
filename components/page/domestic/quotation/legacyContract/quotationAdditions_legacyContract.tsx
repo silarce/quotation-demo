@@ -25,12 +25,10 @@ export default function QuotationAdditions({
   legacyContract,
   disabled,
   isAppend,
-  isExchange,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
-  isExchange?: boolean;
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -97,10 +95,24 @@ export default function QuotationAdditions({
                 setTargetIndex(`${pIndex}`);
               };
 
+              let isActive = false;
+
+              if (isAppend) {
+                if (addi.reduceQty !== '0') {
+                  isActive = true;
+                }
+
+                if (addi.exchangeQty !== 0) {
+                  isActive = true;
+                }
+              } else {
+                isActive = activeIndex === pIndex;
+              }
+
               return (
                 <CellWithBar
                   key={pIndex}
-                  isActive={activeIndex === pIndex}
+                  isActive={isActive}
                   className={classNames(styleL.row, scss.row)}
                   onClick={() => {
                     setActiveIndex(pIndex);

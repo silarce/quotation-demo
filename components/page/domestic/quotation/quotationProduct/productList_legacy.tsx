@@ -75,8 +75,22 @@ export default function ProductList_legacy({
           setTargetIndex(`${pIndex}`);
         };
 
+        let isActive = false;
+
+        if (isAppend) {
+          if (dataItem.reduceQty !== '0') {
+            isActive = true;
+          }
+
+          if (dataItem.exchangeQty !== 0) {
+            isActive = true;
+          }
+        } else {
+          isActive = activeProd === pIndex;
+        }
+
         return (
-          <CellWithBar key={pIndex} isActive={activeProd === pIndex}>
+          <CellWithBar key={pIndex} isActive={isActive}>
             <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
               {/*  */}
               {!isAppend && (
