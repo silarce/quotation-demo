@@ -133,7 +133,15 @@ export default function ExProductList_legacy({
       >
         <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
           {dndKeyArr.map((key, pIndex) => {
-            const { prod, delSelf } = prodExchangeList[key];
+            // const { prod, delSelf } = prodExchangeList[key];
+            const obj = prodExchangeList[key];
+
+            if (!obj) {
+              return null;
+            }
+
+            const { prod, delSelf } = obj;
+
             const isActive = pIndex === activeIndex;
             const isMoving = movingId === key;
 
@@ -317,8 +325,7 @@ export default function ExProductList_legacy({
         <CellWithBar
           isActive={isActive}
           onClick={() => {
-            // 有bug
-            // setActiveIndex(pIndex);
+            setActiveIndex(pIndex);
           }}
         >
           <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>

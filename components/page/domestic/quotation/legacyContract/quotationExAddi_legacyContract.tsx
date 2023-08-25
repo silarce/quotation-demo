@@ -147,6 +147,10 @@ export default function QuotationExAddi({
                 {dndKeyArr?.map((key, pIndex) => {
                   const addi = addiExchangeList[key];
 
+                  if (!addi) {
+                    return null;
+                  }
+
                   const classAddi = addi.addi;
                   const delSelf = addi.delSelf;
                   const isMoving = movingId === key;
@@ -206,8 +210,7 @@ export default function QuotationExAddi({
           isActive={activeIndex === pIndex}
           className={classNames(styleL.row, scss.row)}
           onClick={() => {
-            // 有bug
-            // setActiveIndex(pIndex);
+            setActiveIndex(pIndex);
           }}
         >
           {/*  */}
@@ -311,3 +314,22 @@ const ControlBox = ({
 //   })}
 // </CellWithBar>
 // </div>
+
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
+// dnd元件會導致光是click在元件上點擊就觸發rerender，導致無法輸入
+// 或許應該要做一個是否可拖拉的狀態，不可拖拉時就換成非dnd元件
