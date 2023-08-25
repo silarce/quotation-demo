@@ -192,7 +192,7 @@ export default function QuotationExAddi({
           <div className={scss.left}>
             {/* thead */}
             <div className={styleL.thead + ' ' + scss.thead}>
-              <div className={classNames(scss.btnBox, scss.exchange)} />
+              <div className={classNames(scss.btnBox, scss.headEmpty, scss.exchange)} />
 
               {additionKeyindex.map((item, index) => {
                 const { label, flex, width } = cellConfig[item];

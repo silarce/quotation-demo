@@ -52,7 +52,9 @@ export default function QuotationExProd({
             </div>
 
             <ExProductList_legacy classQuotation={legacyContract as Class_legacyContract} disabled={disabled} />
-            <AddButton className={scss.addBtn} label="追加產品" onClick={addAdditionalExchange} />
+            <div className={scss.addBtnWrapper}>
+              <AddButton className={scss.addBtn} label="追加產品" onClick={addAdditionalExchange} />
+            </div>
           </div>
 
           {/* main close*/}
