@@ -2,6 +2,7 @@ import { useState, useEffect, HTMLInputTypeAttribute } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment from 'moment';
+import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { checkDateFormat } from 'js/tools/date/checkDate';
@@ -203,6 +204,8 @@ class Class_product {
     if (parentProd) {
       this.parentProd = parentProd;
     }
+
+    this.dndId = nanoid();
   } // constructor
 
   private _reRender;
@@ -219,6 +222,8 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
   private _discountRate;
+
+  readonly dndId;
   //----------------------------------------------
   private _reduceQty = '0';
   get remainQty() {
@@ -642,6 +647,8 @@ class Class_addition {
     if (parentAddition) {
       this.parentAddition = parentAddition;
     }
+
+    this.dndId = nanoid();
   } // constructor
   private _reRender;
   private _addition;
@@ -649,6 +656,8 @@ class Class_addition {
   private _quantity;
   private _unitPrice;
   private _totalPrice;
+
+  readonly dndId;
   // -------------------------------
 
   private _reduceQty = '0';
@@ -1410,7 +1419,7 @@ class Class_legacyContract {
     // const exchangeArr = [..._.flatten(exchangeArrArr), ...this._additionalExchangeArr];
 
     type TexchangeProdlist = {
-      [key: `${number}`]: {
+      [key: string]: {
         prod: Class_product;
         delSelf?: () => void;
       };
@@ -1426,21 +1435,18 @@ class Class_legacyContract {
         return;
       }
 
-      list[`${index}`] = {
+      list[prod.dndId] = {
         prod,
       };
     });
 
     // 把額外追加的主產品放進去
-    const listLength = Object.keys(list).length;
     this._prodAdditionalExchangeArr.forEach((prod, index) => {
       if (!prod) {
         return;
       }
 
-      const theIndex = listLength + index;
-
-      list[`${theIndex}`] = {
+      list[prod.dndId] = {
         prod,
         delSelf: () => {
           this._prodAdditionalExchangeArr.splice(index, 1);
@@ -1472,7 +1478,7 @@ class Class_legacyContract {
     });
 
     type TexchangeAddilist = {
-      [key: `${number}`]: {
+      [key: string]: {
         addi: Class_addition;
         delSelf?: () => void;
       };
@@ -1488,20 +1494,18 @@ class Class_legacyContract {
         return;
       }
 
-      list[`${index}`] = {
+      list[addi.dndId] = {
         addi,
       };
     });
 
     // 把額外的addition放進去
-    const listLength = Object.keys(list).length;
     this._additionAdditionalExchangeArr.forEach((addi, index) => {
       if (!addi) {
         return;
       }
 
-      const theIndex = listLength + index;
-      list[`${theIndex}`] = {
+      list[addi.dndId] = {
         addi,
         delSelf: () => {
           this._additionAdditionalExchangeArr.splice(index, 1);

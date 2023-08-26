@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import _ from 'lodash';
 import Image from 'next/image';
 import classNames from 'classnames';
 
@@ -7,7 +8,35 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import AddButton from 'components/global/gear/button/addButton';
 
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_addition, Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+
+// dnd
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragStartEvent,
+  DragEndEvent,
+  DraggableAttributes,
+} from '@dnd-kit/core';
+
+import {
+  arrayMove,
+  SortableContext,
+  // horizontalListSortingStrategy,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+
+import {
+  restrictToVerticalAxis,
+  //  restrictToHorizontalAxis, restrictToWindowEdges
+} from '@dnd-kit/modifiers';
+
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // icon
 import iconMove from 'public/image/icon/move.svg';
@@ -36,6 +65,122 @@ export default function QuotationExAddi({
   const AddiExchangeArr = Object.values(addiExchangeList);
 
   // -------------------------------------------------------------------
+
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const [movingId, setMovingId] = useState<string>();
+
+  const [dndKeyArr, setDndKeyArr] = useState<string[]>([]);
+
+  useEffect(() => {
+    const newArr = Object.keys(addiExchangeList);
+
+    if (newArr.length > dndKeyArr.length) {
+      const newKeyArr = _.difference(newArr, dndKeyArr);
+      setDndKeyArr([...dndKeyArr, ...newKeyArr]);
+    }
+
+    if (newArr.length < dndKeyArr.length) {
+      const delDndKey = _.difference(dndKeyArr, newArr)[0];
+      const delIndex = dndKeyArr.indexOf(delDndKey);
+      dndKeyArr.splice(delIndex, 1);
+      setDndKeyArr([...dndKeyArr]);
+    }
+  }, [AddiExchangeArr.length]);
+
+  const onDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+
+    if (active.id !== over?.id) {
+      const oldIndex = dndKeyArr.indexOf(active.id as string);
+      const newIndex = dndKeyArr.indexOf(over?.id as string);
+
+      const newKeyArr = arrayMove(dndKeyArr, oldIndex, newIndex);
+      setDndKeyArr(newKeyArr);
+    }
+
+    setMovingId(undefined);
+  };
+
+  function onDragStart(e: DragStartEvent) {
+    const { id } = e.active;
+    setMovingId(id as string);
+  }
+
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+
+  const ExchangeRow = useCallback(function ExchangeRow({
+    pIndex,
+    delSelf,
+    classAddi,
+    isMoving,
+    id,
+  }: {
+    pIndex: number;
+    delSelf?: () => void;
+    classAddi: Class_addition;
+    isMoving: boolean;
+    id: string;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id,
+    });
+
+    const itemStyle = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+        <CellWithBar
+          isActive={activeIndex === pIndex}
+          className={classNames(styleL.row, scss.row)}
+          onClick={() => {
+            setActiveIndex(pIndex);
+          }}
+        >
+          {/*  */}
+          <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
+          {/*  */}
+          {additionKeyindex.map((key, cIndex) => {
+            const { width, flex, type, inputType } = cellConfig[key];
+            const theStyle = { width, flex };
+
+            let showBaseline: 'auto' | 'invisible' = 'auto';
+
+            let theDisabled = disabled;
+
+            if (key === 'quotationNumber') {
+              theDisabled = true;
+              showBaseline = 'invisible';
+            }
+
+            return (
+              <div className={scss.column} key={cIndex} style={theStyle}>
+                <InputSel
+                  disabled={theDisabled}
+                  showBaseline={showBaseline}
+                  inputProps={{
+                    value: classAddi[key],
+                    onChange: (v) => (classAddi[key] = v),
+                    inputType: inputType,
+                  }}
+                />
+              </div>
+            );
+          })}
+        </CellWithBar>
+      </div>
+    );
+  },
+  []);
+
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
   return (
     <div className={scss.wrapper}>
       <div className={classNames(scss.container, scss.exchange)}>
@@ -47,7 +192,7 @@ export default function QuotationExAddi({
           <div className={scss.left}>
             {/* thead */}
             <div className={styleL.thead + ' ' + scss.thead}>
-              <div className={classNames(scss.btnBox, scss.exchange)} />
+              <div className={classNames(scss.btnBox, scss.headEmpty, scss.exchange)} />
 
               {additionKeyindex.map((item, index) => {
                 const { label, flex, width } = cellConfig[item];
@@ -62,52 +207,41 @@ export default function QuotationExAddi({
             </div>
 
             {/* tbody */}
-            {AddiExchangeArr?.map((addi, pIndex) => {
-              const classAddi = addi.addi;
-              const delSelf = addi.delSelf;
+            <DndContext
+              sensors={sensors}
+              modifiers={[
+                restrictToVerticalAxis,
+                // restrictToWindowEdges,
+              ]}
+              onDragEnd={onDragEnd}
+              onDragStart={onDragStart}
+            >
+              <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
+                {dndKeyArr?.map((key, pIndex) => {
+                  const addi = addiExchangeList[key];
 
-              return (
-                <CellWithBar
-                  key={pIndex}
-                  isActive={activeIndex === pIndex}
-                  className={classNames(styleL.row, scss.row)}
-                  onClick={() => {
-                    setActiveIndex(pIndex);
-                  }}
-                >
-                  {/*  */}
-                  <ControlBox delSelf={delSelf} index={pIndex + 1} />
-                  {/*  */}
-                  {additionKeyindex.map((key, cIndex) => {
-                    const { width, flex, type, inputType } = cellConfig[key];
-                    const theStyle = { width, flex };
+                  if (!addi) {
+                    return null;
+                  }
 
-                    let showBaseline: 'auto' | 'invisible' = 'auto';
+                  const classAddi = addi.addi;
+                  const delSelf = addi.delSelf;
+                  const isMoving = movingId === key;
 
-                    let theDisabled = disabled;
-
-                    if (key === 'quotationNumber') {
-                      theDisabled = true;
-                      showBaseline = 'invisible';
-                    }
-
-                    return (
-                      <div className={scss.column} key={cIndex} style={theStyle}>
-                        <InputSel
-                          disabled={theDisabled}
-                          showBaseline={showBaseline}
-                          inputProps={{
-                            value: classAddi[key],
-                            onChange: (v) => (classAddi[key] = v),
-                            inputType: inputType,
-                          }}
-                        />
-                      </div>
-                    );
-                  })}
-                </CellWithBar>
-              );
-            })}
+                  return (
+                    <ExchangeRow
+                      key={key}
+                      id={key}
+                      //
+                      classAddi={classAddi}
+                      pIndex={pIndex}
+                      delSelf={delSelf}
+                      isMoving={isMoving}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
             <AddButton className={scss.addBtn} label="追加配件" onClick={addExAddi} />
           </div>
         </div>
@@ -119,14 +253,26 @@ export default function QuotationExAddi({
       {/* wrapper close */}
     </div>
   );
-}
+  // -----------------------------------
+} // QuotationExAddi
 
 // =======================================================================
 
-const ControlBox = ({ delSelf, index }: { delSelf?: () => void; index: number | string }) => {
+const ControlBox = ({
+  delSelf,
+  index,
+  dndAttr,
+  dndListener,
+}: {
+  delSelf?: () => void;
+  index: number | string;
+
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+}) => {
   return (
     <div className={classNames(scss.btnBox, scss.exchange, 'chameleon')}>
-      <Image className={scss.move} src={iconMove} alt="move" />
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
         刪除
       </button>
@@ -134,3 +280,44 @@ const ControlBox = ({ delSelf, index }: { delSelf?: () => void; index: number | 
     </div>
   );
 };
+
+// <div key={pIndex}>
+// <CellWithBar
+//   isActive={activeIndex === pIndex}
+//   className={classNames(styleL.row, scss.row)}
+//   onClick={() => {
+//     setActiveIndex(pIndex);
+//   }}
+// >
+//   {/*  */}
+//   <ControlBox delSelf={delSelf} index={pIndex + 1} />
+//   {/*  */}
+//   {additionKeyindex.map((key, cIndex) => {
+//     const { width, flex, type, inputType } = cellConfig[key];
+//     const theStyle = { width, flex };
+
+//     let showBaseline: 'auto' | 'invisible' = 'auto';
+
+//     let theDisabled = disabled;
+
+//     if (key === 'quotationNumber') {
+//       theDisabled = true;
+//       showBaseline = 'invisible';
+//     }
+
+//     return (
+//       <div className={scss.column} key={cIndex} style={theStyle}>
+//         <InputSel
+//           disabled={theDisabled}
+//           showBaseline={showBaseline}
+//           inputProps={{
+//             value: classAddi[key],
+//             onChange: (v) => (classAddi[key] = v),
+//             inputType: inputType,
+//           }}
+//         />
+//       </div>
+//     );
+//   })}
+// </CellWithBar>
+// </div>

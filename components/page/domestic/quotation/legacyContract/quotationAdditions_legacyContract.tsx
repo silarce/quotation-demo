@@ -76,7 +76,7 @@ export default function QuotationAdditions({
           <div className={scss.left}>
             {/* thead */}
             <div className={styleL.thead + ' ' + scss.thead}>
-              <div className={classNames(scss.btnBox, isAppend && scss.resetChange)} />
+              <div className={classNames(scss.btnBox, scss.headEmpty, isAppend && scss.resetChange)} />
 
               {additionKeyindex.map((item, index) => {
                 const { label, flex, width } = cellConfig[item];
@@ -222,7 +222,7 @@ const ProdBtnBox = ({
   indexNumber: number | string;
 }) => {
   return (
-    <div className={scss.btnBox}>
+    <div className={classNames(scss.btnBox, 'chameleon')}>
       <div className={scss.delBtn}>
         <IconDelete01
           onClick={(e) => {
@@ -250,7 +250,7 @@ const ResetChangeBtnBox = ({
   clearExchange: () => void;
 }) => {
   return (
-    <div className={classNames(scss.btnBox, scss.resetChange)}>
+    <div className={classNames(scss.btnBox, scss.resetChange, 'chameleon')}>
       <button className={scss.btn} onClick={clearExchange}>
         還原
       </button>
