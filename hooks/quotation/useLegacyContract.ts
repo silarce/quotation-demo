@@ -1158,8 +1158,8 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
-    this._exchangeKeyArr = _.cloneDeep(prodCellConfig.keyArr);
-    this._exchangeKeyArr = _.pull(this._exchangeKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+    this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
 
     this.additionCellConfig = additionCellConfig;
   } // constructor
@@ -1177,7 +1177,7 @@ class Class_legacyContract {
   classQuoteScopes;
   classSignature;
   // ---------------------
-  _exchangeKeyArr;
+  _exProdKeyArr;
   // ---------------------
 
   // 需求變更 編輯折數與總折數時不再影響其他數值
@@ -1233,10 +1233,10 @@ class Class_legacyContract {
   }
 
   get exchangeKeyLArr() {
-    return this._exchangeKeyArr;
+    return this._exProdKeyArr;
   }
   set exchangeKeyLArr(v) {
-    this._exchangeKeyArr = v;
+    this._exProdKeyArr = v;
     this._reRender();
   }
 

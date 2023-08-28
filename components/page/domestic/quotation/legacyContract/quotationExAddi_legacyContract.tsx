@@ -58,7 +58,7 @@ export default function QuotationExAddi({
 
   const { addExAddi } = legacyContract;
 
-  const additionKeyindex = additionCellConfig.keyArr;
+  const additionKeyArr = additionCellConfig.keyArr;
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
 
@@ -145,7 +145,7 @@ export default function QuotationExAddi({
           {/*  */}
           <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
           {/*  */}
-          {additionKeyindex.map((key, cIndex) => {
+          {additionKeyArr.map((key, cIndex) => {
             const { width, flex, type, inputType } = cellConfig[key];
             const theStyle = { width, flex };
 
@@ -194,7 +194,7 @@ export default function QuotationExAddi({
             <div className={styleL.thead + ' ' + scss.thead}>
               <div className={classNames(scss.btnBox, scss.headEmpty, scss.exchange)} />
 
-              {additionKeyindex.map((item, index) => {
+              {additionKeyArr.map((item, index) => {
                 const { label, flex, width } = cellConfig[item];
                 const theStyle = { width, flex };
 
