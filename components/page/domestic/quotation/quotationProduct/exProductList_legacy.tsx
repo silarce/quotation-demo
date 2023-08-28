@@ -69,7 +69,7 @@ export default function ExProductList_legacy({
   const exChnageKeyArr = Object.keys(prodExchangeList);
 
   // const theadIndex = prodCellConfig.keyList;
-  const theadIndex = classQuotation.exchangeKeyLArr;
+  const theadIndex = classQuotation.exProdKeyLArr;
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;

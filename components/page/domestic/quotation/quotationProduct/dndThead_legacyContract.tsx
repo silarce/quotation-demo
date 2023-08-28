@@ -42,7 +42,12 @@ export default function DndThead({
   isExchange?: boolean;
 }) {
   const cellConfig = classQuotation.prodCellConfig.cellConfig;
-  const theadIndex = isExchange ? classQuotation.exchangeKeyLArr : classQuotation.prodkeyArr;
+  // const theadIndex = isExchange ? classQuotation.exProdKeyLArr : classQuotation.prodkeyArr;
+  const theadIndex = isExchange
+    ? classQuotation.exProdKeyLArr
+    : isAppend
+    ? classQuotation.prodkeyArr
+    : classQuotation.editProdKeyArr;
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -102,7 +107,7 @@ export default function DndThead({
       if (!isExchange) {
         classQuotation.prodkeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
       } else {
-        classQuotation.exchangeKeyLArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
+        classQuotation.exProdKeyLArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
       }
     }
   }

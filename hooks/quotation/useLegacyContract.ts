@@ -1158,14 +1158,24 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
+    // 原本想直接用_exProdKeyArr的，但考慮到之後業主會不會有有什麼需求...，還是另外做一個吧
+    // 編輯舊合約整合報價單時用的主產品設定keyArr
+    this._editProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._editProdKeyArr = _.pull(this._editProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+
     // 變更 主產品設定用的keyArr
     this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
     this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
 
     this.additionCellConfig = additionCellConfig;
+    // 編輯舊合約整合報價單時用的配件設定keyArr
+    this._editAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
+    this._editAddiKeyArr = _.pull(this._editAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
     // 變更 配件設定用的keyArr
     this._exAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
     this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
+
+    // constructor
   } // constructor
 
   private _legacyContract;
@@ -1181,6 +1191,8 @@ class Class_legacyContract {
   classQuoteScopes;
   classSignature;
   // ---------------------
+  _editProdKeyArr;
+  _editAddiKeyArr;
   _exProdKeyArr;
   _exAddiKeyArr;
   // ---------------------
@@ -1237,10 +1249,18 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  get exchangeKeyLArr() {
+  get editProdKeyArr() {
+    return this._editProdKeyArr;
+  }
+  set editProdKeyArr(v) {
+    this._editProdKeyArr = v;
+    this._reRender();
+  }
+
+  get exProdKeyLArr() {
     return this._exProdKeyArr;
   }
-  set exchangeKeyLArr(v) {
+  set exProdKeyLArr(v) {
     this._exProdKeyArr = v;
     this._reRender();
   }
@@ -1280,13 +1300,19 @@ class Class_legacyContract {
   };
 
   //
-
   get exAddiKeyArr() {
     return this._exAddiKeyArr;
   }
-
   set exAddiKeyArr(v) {
     this._exAddiKeyArr = v;
+    this._reRender();
+  }
+
+  get edtAddiKeyArr() {
+    return this._editAddiKeyArr;
+  }
+  set edtAddiKeyArr(v) {
+    this._editAddiKeyArr = v;
     this._reRender();
   }
 

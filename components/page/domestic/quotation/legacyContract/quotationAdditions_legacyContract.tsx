@@ -38,7 +38,9 @@ export default function QuotationAdditions({
 
   const { addAddition, delAddition } = legacyContract ?? {};
 
-  const additionKeyindex = additionCellConfig.keyArr;
+  // const additionKeyindex = additionCellConfig.keyArr;
+  const additionKeyindex = isAppend ? additionCellConfig.keyArr : legacyContract.edtAddiKeyArr;
+
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
   const [targetIndex, setTargetIndex] = useState<`${number}`>();

@@ -41,7 +41,8 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
   const { classProductArr, prodCellConfig, activeProd, delProd, copyProd } = classQuotation;
 
-  const theadIndex = prodCellConfig.keyArr;
+  // const theadIndex = prodCellConfig.keyArr;
+  const theadIndex = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
