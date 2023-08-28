@@ -4,35 +4,36 @@
   position: relative;
   min-width: 100%;
   width: fit-content;
-  padding: 0;
-  margin: 0;
+  // padding: 0;
+  // margin: 0;
   &:hover {
     background-color: $hoverBgc01;
-    > .bar {
-      background-color: $colorMain;
-    }
     :global(.chameleon) {
       background-color: $hoverBgc01;
+    }
+    &::after {
+      background-color: $colorMain;
     }
   }
   &.active {
     background-color: $chosenBgc01;
-    > .bar {
-      background-color: $colorActive01;
-    }
     :global(.chameleon) {
       background-color: $chosenBgc01;
     }
+    &::after {
+      background-color: $colorActive01;
+    }
   }
-}
-
-.bar {
-  position: absolute;
-  // position: sticky;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: calc(100% - 4px);
-  z-index: 1;
+  // 這是最左側的直立色塊
+  &::after {
+    content: "";
+    position: absolute;
+    // position: sticky;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: calc(100% - 4px);
+    z-index: 1;
+  }
 }
