@@ -65,7 +65,11 @@ export default function QuotationProduction({
               disabled={disabled}
               isAppend={isAppend}
             />
-            {!disabled && <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />}
+            {!disabled && (
+              <div className={classNames(scss.addBtnWrapper)}>
+                <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />
+              </div>
+            )}
           </div>
 
           {isAppend && (
