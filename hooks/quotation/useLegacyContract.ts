@@ -1158,8 +1158,8 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
-    this._exchangeKeyList = _.cloneDeep(prodCellConfig.keyList);
-    this._exchangeKeyList = _.pull(this._exchangeKeyList, 'quotationNumber') as typeof prodCellConfig.keyList;
+    this._exchangeKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._exchangeKeyArr = _.pull(this._exchangeKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
 
     this.additionCellConfig = additionCellConfig;
   } // constructor
@@ -1177,7 +1177,7 @@ class Class_legacyContract {
   classQuoteScopes;
   classSignature;
   // ---------------------
-  _exchangeKeyList;
+  _exchangeKeyArr;
   // ---------------------
 
   // 需求變更 編輯折數與總折數時不再影響其他數值
@@ -1224,19 +1224,19 @@ class Class_legacyContract {
   }
 
   // ---------------------
-  get prodkeyList() {
-    return this.prodCellConfig.keyList;
+  get prodkeyArr() {
+    return this.prodCellConfig.keyArr;
   }
-  set prodkeyList(v) {
-    this.prodCellConfig.keyList = v;
+  set prodkeyArr(v) {
+    this.prodCellConfig.keyArr = v;
     this._reRender();
   }
 
-  get exchangeKeyList() {
-    return this._exchangeKeyList;
+  get exchangeKeyLArr() {
+    return this._exchangeKeyArr;
   }
-  set exchangeKeyList(v) {
-    this._exchangeKeyList = v;
+  set exchangeKeyLArr(v) {
+    this._exchangeKeyArr = v;
     this._reRender();
   }
 
@@ -1638,7 +1638,7 @@ type TprodSelect = {
 type TprodKeys = keyof (TprodInputCellType & TprodSelectWithIconCellType & TprodCheckboxCellType & TprodSelect);
 
 type TprodCellConfig = {
-  keyList: TprodKeys[];
+  keyArr: TprodKeys[];
   cellConfig: {
     [key in TprodKeys]: {
       id: key;
@@ -1657,7 +1657,7 @@ type TprodCellConfig = {
 function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
-    keyList: [
+    keyArr: [
       // "idNumber",
       'quotationNumber',
       'discountRate',
@@ -1739,7 +1739,7 @@ type TaddtionInputCellType = {
 type TadditionKeys = keyof TaddtionInputCellType;
 
 type TadditionCellConfig = {
-  keyList: TadditionKeys[];
+  keyArr: TadditionKeys[];
   cellConfig: {
     [key in TadditionKeys]: {
       label: string;
@@ -1752,7 +1752,7 @@ type TadditionCellConfig = {
 
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
-    keyList: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
+    keyArr: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
     cellConfig: {
       quotationNumber: {
         label: '合約編號',

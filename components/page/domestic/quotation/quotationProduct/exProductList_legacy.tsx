@@ -69,7 +69,7 @@ export default function ExProductList_legacy({
   const exChnageKeyArr = Object.keys(prodExchangeList);
 
   // const theadIndex = prodCellConfig.keyList;
-  const theadIndex = classQuotation.exchangeKeyList;
+  const theadIndex = classQuotation.exchangeKeyLArr;
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
@@ -98,6 +98,7 @@ export default function ExProductList_legacy({
       dndKeyArr.splice(delIndex, 1);
       setDndKeyArr([...dndKeyArr]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exChnageKeyArr.length]);
 
   const onDragEnd = (e: DragEndEvent) => {
@@ -119,8 +120,6 @@ export default function ExProductList_legacy({
     setMovingId(id as string);
   }
 
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
   // ---------------------------------------------------------------
 
   const ExchangeRow = useCallback(function ExchangeRow({
@@ -189,8 +188,6 @@ export default function ExProductList_legacy({
   },
   []);
 
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   return (
     <div className={scss.container}>

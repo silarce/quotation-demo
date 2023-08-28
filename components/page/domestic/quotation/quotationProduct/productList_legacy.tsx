@@ -41,7 +41,7 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
   const { classProductArr, prodCellConfig, activeProd, delProd, copyProd } = classQuotation;
 
-  const theadIndex = prodCellConfig.keyList;
+  const theadIndex = prodCellConfig.keyArr;
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
@@ -161,7 +161,7 @@ export default function ProductList_legacy({
     options,
   }: {
     dataItem: Class_product;
-    key: Class_legacyContract['prodCellConfig']['keyList'][number];
+    key: Class_legacyContract['prodCellConfig']['keyArr'][number];
     type: 'input' | 'selectWithIcon' | 'checkbox' | 'select';
     disabled: boolean;
     stateValue: string | boolean | number;

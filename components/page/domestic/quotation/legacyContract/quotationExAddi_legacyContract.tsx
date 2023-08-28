@@ -58,7 +58,7 @@ export default function QuotationExAddi({
 
   const { addExAddi } = legacyContract;
 
-  const additionKeyindex = additionCellConfig.keyList;
+  const additionKeyindex = additionCellConfig.keyArr;
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
 
