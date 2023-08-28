@@ -248,7 +248,7 @@ export default function ExProductList_legacy({
     options,
   }: {
     dataItem: Class_product;
-    key: Class_legacyContract['prodCellConfig']['keyList'][number];
+    key: Class_legacyContract['prodCellConfig']['keyArr'][number];
     type: 'input' | 'selectWithIcon' | 'checkbox' | 'select';
     disabled: boolean;
     stateValue: string | boolean | number;
