@@ -1158,10 +1158,14 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
+    // 變更 主產品設定用的keyArr
     this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
     this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
 
     this.additionCellConfig = additionCellConfig;
+    // 變更 配件設定用的keyArr
+    this._exAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
+    this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
   } // constructor
 
   private _legacyContract;
@@ -1178,6 +1182,7 @@ class Class_legacyContract {
   classSignature;
   // ---------------------
   _exProdKeyArr;
+  _exAddiKeyArr;
   // ---------------------
 
   // 需求變更 編輯折數與總折數時不再影響其他數值
@@ -1273,6 +1278,17 @@ class Class_legacyContract {
     this.countTotalDiscount();
     this._reRender();
   };
+
+  //
+
+  get exAddiKeyArr() {
+    return this._exAddiKeyArr;
+  }
+
+  set exAddiKeyArr(v) {
+    this._exAddiKeyArr = v;
+    this._reRender();
+  }
 
   delAddition = (index: number) => {
     this.classAdditionArr.splice(index, 1);
