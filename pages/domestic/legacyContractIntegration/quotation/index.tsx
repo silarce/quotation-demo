@@ -249,18 +249,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
   const panel_noEditable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '追加追減',
-      onClick: () =>
-        router.push({
-          // target: '_blank', // 不能用
-          pathname: '/domestic/legacyContractIntegration/quotation/append',
-          query: {
-            contractId: router.query.contractId,
-          },
-        }),
-    },
+    !contractId
+      ? undefined
+      : {
+          type: 'myButton',
+          label: '追加追減',
+          onClick: () =>
+            router.push({
+              // target: '_blank', // 不能用
+              pathname: '/domestic/legacyContractIntegration/quotation/append',
+              query: {
+                contractId: router.query.contractId,
+              },
+            }),
+        },
     {
       type: 'myButton',
       label: '匯出舊合約',
