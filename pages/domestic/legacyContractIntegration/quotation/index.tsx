@@ -196,6 +196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   useEffect(() => {
     rewind();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit, legacyContract]);
 

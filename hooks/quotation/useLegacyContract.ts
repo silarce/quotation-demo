@@ -1139,9 +1139,14 @@ class Class_legacyContract {
     });
 
     /**額外項目 */
+    // this.classAdditionArr = this._legacyContract.additions.map(
+    //   (addition) => new Class_addition(reRender, addition, this.countSubTotal)
+    // );
+
     this.classAdditionArr = this._legacyContract.additions.map(
       (addition) => new Class_addition(reRender, addition, this.countSubTotal)
     );
+
     /**   付款資訊*/
     this.classPayInfo = new Class_payInfo(
       reRender,
@@ -1308,10 +1313,10 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  get edtAddiKeyArr() {
+  get editAddiKeyArr() {
     return this._editAddiKeyArr;
   }
-  set edtAddiKeyArr(v) {
+  set editAddiKeyArr(v) {
     this._editAddiKeyArr = v;
     this._reRender();
   }
@@ -1500,6 +1505,19 @@ class Class_legacyContract {
     return list;
   }
   // -----------
+
+  // 配件設定 的list object
+  get addiList() {
+    type Tlist = {
+      [key: string]: Class_addition;
+    };
+    const list: Tlist = {};
+    this.classAdditionArr.forEach((addi) => {
+      list[addi.dndId] = addi;
+    });
+
+    return list;
+  }
 
   private _additionAdditionalExchangeArr: Class_addition[] = [];
   addExAddi = () => {
