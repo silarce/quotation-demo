@@ -1362,11 +1362,11 @@ class Class_legacyContract {
     //   return false;
     // }
 
-    if (!deliveryDate) {
-      myAlert.warning({ title: '請選擇交貨日期' });
+    // if (!deliveryDate) {
+    //   myAlert.warning({ title: '請選擇交貨日期' });
 
-      return false;
-    }
+    //   return false;
+    // }
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
@@ -1431,7 +1431,7 @@ class Class_legacyContract {
       notes,
       quoteScopes,
       quoteDate: quoteDate_Date || null,
-      deliveryDate: deliveryDate_Date,
+      deliveryDate: deliveryDate_Date || null,
     };
   }
   // -------------------

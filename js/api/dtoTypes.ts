@@ -570,7 +570,7 @@ export type TcreateLegacyContractDto = {
   /* 交貨地點 */
   deliveryLocation: string;
   /* 交貨日期 date*/
-  deliveryDate: string;
+  deliveryDate: string | null;
   /* 付款方式 */
   paymentMethods: TpaymentMethodDto[];
   //
