@@ -57,11 +57,14 @@ export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): T
     { 產品: '水閘門', value: 'W5' as const, label: 'W5', name: '無框水閘門' },
     { 產品: '水閘門', value: 'W6' as const, label: 'W6', name: '溝渠式水閘門' },
     //
+    { 產品: '客製化', value: 'SP' as const, label: 'SP', name: '特殊大門' },
+    //
     // { 產品: '上折門', value: '無資料' as const, label: '無資料', name: '重型防颱捲門P:120' },
     // { 產品: '上折門', value: '無資料' as const, label: '無資料', name: '輕型' },
     // { 產品: '上折門', value: '無資料' as const, label: '無資料', name: '中型' },
     //
     // { 產品: '機庫門', value: '無資料' as const, label: '無資料', name: '柔性門' },
+    // { 產品: '機庫門', value: '無資料' as const, label: '無資料', name: '橫移式機庫門' },
   ];
 
   if (haveEmpty) {
