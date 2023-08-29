@@ -153,7 +153,15 @@ export default function QuotationAdditions({
               indexNumber={pIndex + 1}
             />
           )}
-          {isAppend && <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} clearExchange={addi.clearExchange} />}
+          {isAppend && (
+            <ResetChangeBtnBox
+              toSetTargetIndex={toSetTargetIndex}
+              clearExchange={addi.clearExchange}
+              indexNumber={pIndex + 1}
+              dndAttr={attributes}
+              dndListener={listeners}
+            />
+          )}
 
           {/*  */}
           {additionKeyindex.map((key, cIndex) => {
@@ -276,7 +284,13 @@ export default function QuotationAdditions({
           </div>
           {isAppend && (
             <ExchangePanel>
-              {classAdditionArr.map((addi, index) => {
+              {dndKeyArr.map((key, index) => {
+                const addi = addiList[key];
+
+                if (!addi) {
+                  return null;
+                }
+
                 exchangeTotal += Number(addi.reduceExchangePrice);
 
                 return (
@@ -360,19 +374,26 @@ const EditBtnBox = ({
 const ResetChangeBtnBox = ({
   toSetTargetIndex,
   clearExchange,
+  dndAttr,
+  dndListener,
+  indexNumber,
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  indexNumber: number | string;
 }) => {
   return (
     <div className={classNames(scss.btnBox, scss.resetChange, 'chameleon')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       <button className={scss.btn} onClick={clearExchange}>
         還原
       </button>
       <button className={scss.btn} onClick={toSetTargetIndex}>
         變更
       </button>
-      <span>1</span>
+      <span>{indexNumber}</span>
     </div>
   );
 };
