@@ -44,7 +44,7 @@ export default function DndThead({
   const cellConfig = classQuotation.prodCellConfig.cellConfig;
   // const theadIndex = isExchange ? classQuotation.exProdKeyLArr : classQuotation.prodkeyArr;
   const theadIndex = isExchange
-    ? classQuotation.exProdKeyLArr
+    ? classQuotation.exProdKeyArr
     : isAppend
     ? classQuotation.prodkeyArr
     : classQuotation.editProdKeyArr;
@@ -104,10 +104,13 @@ export default function DndThead({
       const oldIndex: number = theadIndex.indexOf(active.id as keyof typeof cellConfig);
       const newIndex: number = theadIndex.indexOf(over?.id as keyof typeof cellConfig);
 
-      if (!isExchange) {
+      if (isAppend) {
         classQuotation.prodkeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
+      } else if (isExchange) {
+        classQuotation.exProdKeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
+        console.log(classQuotation.exProdKeyArr);
       } else {
-        classQuotation.exProdKeyLArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
+        classQuotation.editProdKeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
       }
     }
   }

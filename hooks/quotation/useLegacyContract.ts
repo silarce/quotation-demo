@@ -1262,10 +1262,10 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  get exProdKeyLArr() {
+  get exProdKeyArr() {
     return this._exProdKeyArr;
   }
-  set exProdKeyLArr(v) {
+  set exProdKeyArr(v) {
     this._exProdKeyArr = v;
     this._reRender();
   }

@@ -69,7 +69,9 @@ export default function ExProductList_legacy({
   const exChnageKeyArr = Object.keys(prodExchangeList);
 
   // const theadIndex = prodCellConfig.keyList;
-  const theadIndex = classQuotation.exProdKeyLArr;
+  const theadIndexArr = classQuotation.exProdKeyArr;
+  type TtheadIndexArr = typeof theadIndexArr;
+
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
@@ -129,6 +131,7 @@ export default function ExProductList_legacy({
     delSelf,
     prod,
     id,
+    theadIndexArr,
   }: {
     pIndex: number;
     isActive: boolean;
@@ -136,6 +139,7 @@ export default function ExProductList_legacy({
     delSelf?: () => void;
     prod: Class_product;
     id: string;
+    theadIndexArr: TtheadIndexArr;
   }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id,
@@ -158,7 +162,7 @@ export default function ExProductList_legacy({
             {/*  */}
             <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
             {/*  */}
-            {theadIndex.map((key) => {
+            {theadIndexArr.map((key) => {
               const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
               const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
               const theStyle = { width };
@@ -224,6 +228,7 @@ export default function ExProductList_legacy({
                 isMoving={isMoving}
                 delSelf={delSelf}
                 prod={prod}
+                theadIndexArr={theadIndexArr}
               />
             );
           })}
