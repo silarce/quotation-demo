@@ -60,6 +60,7 @@ export default function QuotationExAddi({
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
     listKeyArr: Object.keys(addiExchangeList),
+    resetTrigger: legacyContract,
   });
 
   // -------------------------------------------------------------------
