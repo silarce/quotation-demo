@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import classNames from 'classnames';
+import Image from 'next/image';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
@@ -10,6 +11,7 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
+import iconMove from 'public/image/icon/move.svg';
 
 // css
 import scss from './productList.module.scss';
@@ -27,6 +29,22 @@ import type {
 } from 'hooks/quotation/useLegacyContract';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+// dnd
+import { useVerticalDnd } from '../hook/useVerticalDnd';
+import { DndContext, DraggableAttributes } from '@dnd-kit/core';
+import {
+  SortableContext,
+  // horizontalListSortingStrategy,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  restrictToVerticalAxis,
+  //  restrictToHorizontalAxis, restrictToWindowEdges
+} from '@dnd-kit/modifiers';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+
 // ==========================================================
 // ==========================================================
 export default function ProductList_legacy({
@@ -39,10 +57,13 @@ export default function ProductList_legacy({
   isAppend?: boolean;
 }) {
   // ---------------------------------------------------------------
-  const { classProductArr, prodCellConfig, activeProd, delProd, copyProd } = classQuotation;
+  const { classProductArr, prodCellConfig, activeProd, delProd, copyProd, prodList } = classQuotation;
 
-  // const theadIndex = prodCellConfig.keyArr;
-  const theadIndex = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
+  const theadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
+  type TtheadKeyArr = typeof theadKeyArr;
+
+  // console.log(prodList);
+
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
@@ -69,70 +90,157 @@ export default function ProductList_legacy({
   };
 
   // ---------------------------------------------------------------
+
+  const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
+    listKeyArr: Object.keys(prodList),
+    resetTrigger: classQuotation,
+  });
+
+  const DndRow = useCallback(function DndRow({
+    isActive,
+    pIndex,
+    delProd,
+    copyProd,
+    toSetTargetIndex,
+    prod,
+    theadKeyArr,
+    id,
+    isMoving,
+    disabled,
+  }: {
+    isActive: boolean;
+    pIndex: number;
+    delProd: () => void;
+    copyProd: () => void;
+    toSetTargetIndex: () => void;
+    prod: Class_product;
+    theadKeyArr: TtheadKeyArr;
+    id: string;
+    isMoving: boolean;
+    disabled: boolean;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id,
+    });
+
+    const itemStyle = {
+      transform: CSS.Transform.toString(transform),
+      // transition,
+    };
+
+    return (
+      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+        <CellWithBar isActive={isActive}>
+          <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
+            {/*  */}
+            {!isAppend && (
+              <CopyDelBtnBox
+                disabled={disabled}
+                del={() => delProd()}
+                copy={() => copyProd()}
+                indexNum={pIndex + 1}
+                dndAttr={attributes}
+                dndListener={listeners}
+              />
+            )}
+            {isAppend && <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} clearExchange={prod.clearExchange} />}
+            {/*  */}
+            {theadKeyArr.map((key) => {
+              const stateValue = prod[key];
+
+              if (!prod) {
+                return null;
+              }
+
+              const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
+              const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
+              const theStyle = { width };
+              const TheCell = cellSwitcher({
+                dataItem: prod,
+                key,
+                type,
+                disabled,
+                stateValue,
+                inputType,
+                options,
+              });
+
+              return (
+                <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
+                  {TheCell}
+                </div>
+              );
+            })}
+            {/* column */}
+          </div>
+          {/* row */}
+        </CellWithBar>
+      </div>
+    );
+  },
+  []);
+
+  // ---------------------------------------------------------------
   return (
     <div className={scss.container}>
-      {classProductArr.map((dataItem, pIndex) => {
-        const toSetTargetIndex = () => {
-          setTargetIndex(`${pIndex}`);
-        };
+      <DndContext
+        sensors={sensors}
+        modifiers={[
+          restrictToVerticalAxis,
+          // restrictToWindowEdges,
+        ]}
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+      >
+        <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
+          {dndKeyArr.map((key, pIndex) => {
+            if (!prodList[key]) {
+              return null;
+            }
 
-        let isActive = false;
+            const { prod, del, copy } = prodList[key];
 
-        if (isAppend) {
-          if (dataItem.reduceQty !== '0') {
-            isActive = true;
-          }
+            const isMoving = movingId === key;
 
-          if (dataItem.exchangeQty !== 0) {
-            isActive = true;
-          }
-        } else {
-          isActive = activeProd === pIndex;
-        }
+            const toSetTargetIndex = () => {
+              setTargetIndex(`${pIndex}`);
+            };
 
-        return (
-          <CellWithBar key={pIndex} isActive={isActive}>
-            <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
-              {/*  */}
-              {!isAppend && (
-                <CopyDelBtnBox
-                  disabled={disabled}
-                  del={() => delProd(pIndex)}
-                  copy={() => copyProd(pIndex)}
-                  indexNum={pIndex + 1}
-                />
-              )}
-              {isAppend && (
-                <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} clearExchange={dataItem.clearExchange} />
-              )}
-              {/*  */}
-              {theadIndex.map((key) => {
-                const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
-                const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
-                const theStyle = { width };
-                const stateValue = dataItem[key];
-                const TheCell = cellSwitcher({
-                  dataItem,
-                  key,
-                  type,
-                  disabled,
-                  stateValue,
-                  inputType,
-                  options,
-                });
+            let isActive = false;
 
-                return (
-                  <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
-                    {TheCell}
-                  </div>
-                );
-              })}
-              {/* column */}
-            </div>
-            {/* row */}
-          </CellWithBar>
-        );
-      })}
+            if (isAppend) {
+              if (prod.reduceQty !== '0') {
+                isActive = true;
+              }
+
+              if (prod.exchangeQty !== 0) {
+                isActive = true;
+              }
+            } else {
+              isActive = activeProd === pIndex;
+            }
+
+            return (
+              <DndRow
+                key={pIndex}
+                isActive={isActive}
+                pIndex={pIndex}
+                // del 跟 copy在這個情況好像不對
+                // 刪除或複製的對象會是?
+                delProd={del}
+                copyProd={copy}
+                toSetTargetIndex={toSetTargetIndex}
+                prod={prod}
+                theadKeyArr={theadKeyArr}
+                id={key}
+                isMoving={isMoving}
+                disabled={disabled}
+              />
+            );
+          })}
+        </SortableContext>
+      </DndContext>
+
       <InputModal
         visible={!!targetIndex}
         title="請輸入變更數量"
@@ -286,32 +394,36 @@ const CopyDelBtnBox = ({
   del,
   copy,
   indexNum,
+  dndAttr,
+  dndListener,
 }: {
   disabled: boolean;
   del: () => void;
   copy: () => void;
   indexNum: string | number;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, 'chameleon')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+
       <IconDelete01
+        className={scss.svgBtn}
         onClick={(e) => {
           e.stopPropagation();
 
-          if (disabled) {
-            return;
+          if (!disabled) {
+            del();
           }
-
-          del();
         }}
       />
       <IconCopy
+        className={scss.svgBtn}
         onClick={() => {
-          if (disabled) {
-            return;
+          if (!disabled) {
+            copy();
           }
-
-          copy();
         }}
       />
       <span>{indexNum}</span>

@@ -209,7 +209,7 @@ class Class_product {
   } // constructor
 
   private _reRender;
-  private _product;
+  _product;
   private _countTotalDiscount;
   private _countSubTotal;
   private _id;
@@ -1289,7 +1289,10 @@ class Class_legacyContract {
   copyProd = (index: number) => {
     const copy = _.cloneDeep(this.classProductArr[index]);
     copy.id = undefined;
-    this.classProductArr.push(copy);
+    // this.classProductArr.push(copy);
+    this.classProductArr.push(
+      new Class_product(this._reRender, copy._product, this.countTotalDiscount, this.countSubTotal)
+    );
     this.activeProd = index;
     this.countTotalDiscount();
     this.countSubTotal();
@@ -1440,9 +1443,35 @@ class Class_legacyContract {
     };
   }
   // -------------------
+  // 主產品設定list
+  get prodList() {
+    // type Tlist = {
+    //   [key: string]: Class_product;
+    // };
+    type Tlist = {
+      [key: string]: {
+        del: () => void;
+        copy: () => void;
+        prod: Class_product;
+      };
+    };
+
+    const list: Tlist = {};
+
+    this.classProductArr.forEach((prod, index) => {
+      list[prod.dndId] = {
+        del: () => this.delProd(index),
+        copy: () => this.copyProd(index),
+        prod,
+      };
+    });
+    // console.log(list);
+
+    return list;
+  }
+
   // 變更主產品設定
   // appendProduction
-
   private _prodAdditionalExchangeArr: Class_product[] = [];
   addExProd = () => {
     this._prodAdditionalExchangeArr.push(
@@ -1455,6 +1484,7 @@ class Class_legacyContract {
     );
     this._reRender();
   };
+
   // 變更 主產品設定 的list object
   get prodExchangeList() {
     // 來源自主產品(classProduct)的陣列
