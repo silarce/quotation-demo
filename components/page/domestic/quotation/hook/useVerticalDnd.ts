@@ -29,12 +29,21 @@ import {
 
 // import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
-const useVerticalDnd = (listKeyArr: string[]) => {
+// const useVerticalDnd = (listKeyArr: string[], resetTrigger?: any) => {
+const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; resetTrigger?: any }) => {
   const sensors = useSensors(useSensor(PointerSensor));
 
   const [movingId, setMovingId] = useState<string>();
 
   const [dndKeyArr, setDndKeyArr] = useState<string[]>([]);
+
+  const resetDndKeyArr = () => {
+    setDndKeyArr(listKeyArr);
+  };
+
+  useEffect(() => {
+    setDndKeyArr(listKeyArr);
+  }, [resetTrigger]);
 
   useEffect(() => {
     // const newArr = Object.keys(addiExchangeList);
@@ -78,6 +87,7 @@ const useVerticalDnd = (listKeyArr: string[]) => {
     movingId,
     onDragEnd,
     onDragStart,
+    resetDndKeyArr,
   };
 };
 
