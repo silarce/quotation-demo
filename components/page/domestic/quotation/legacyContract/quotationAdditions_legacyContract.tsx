@@ -25,18 +25,19 @@ import scss from './quotationAdditions_legacyContract.module.scss';
 
 // ==========================================================================
 // dnd
+import { useVerticalDnd } from '../hook/useVerticalDnd';
 import {
   DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragStartEvent,
-  DragEndEvent,
+  // PointerSensor,
+  // useSensor,
+  // useSensors,
+  // DragStartEvent,
+  // DragEndEvent,
   DraggableAttributes,
 } from '@dnd-kit/core';
 
 import {
-  arrayMove,
+  // arrayMove,
   SortableContext,
   // horizontalListSortingStrategy,
   verticalListSortingStrategy,
@@ -64,7 +65,7 @@ export default function QuotationAdditions({
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const { additionCellConfig: additionCellConfig } = legacyContract;
+  const { additionCellConfig: additionCellConfig, addiList } = legacyContract;
 
   const classAdditionArr = legacyContract.classAdditionArr;
 
@@ -100,53 +101,10 @@ export default function QuotationAdditions({
 
   // -------------------------------------------------------------------
 
-  const addiList = legacyContract.addiList;
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const [movingId, setMovingId] = useState<string>();
-
-  const [dndKeyArr, setDndKeyArr] = useState<string[]>([]);
-
-  useEffect(() => {
-    const newArr = Object.keys(addiList);
-
-    setDndKeyArr(newArr);
-  }, [legacyContract]);
-
-  useEffect(() => {
-    const newArr = Object.keys(addiList);
-
-    if (newArr.length > dndKeyArr.length) {
-      const newKeyArr = _.difference(newArr, dndKeyArr);
-      setDndKeyArr([...dndKeyArr, ...newKeyArr]);
-    }
-
-    if (newArr.length < dndKeyArr.length) {
-      const delDndKey = _.difference(dndKeyArr, newArr)[0];
-      const delIndex = dndKeyArr.indexOf(delDndKey);
-      dndKeyArr.splice(delIndex, 1);
-      setDndKeyArr([...dndKeyArr]);
-    }
-  }, [classAdditionArr.length]);
-
-  const onDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
-
-    if (active.id !== over?.id) {
-      const oldIndex = dndKeyArr.indexOf(active.id as string);
-      const newIndex = dndKeyArr.indexOf(over?.id as string);
-
-      const newKeyArr = arrayMove(dndKeyArr, oldIndex, newIndex);
-      setDndKeyArr(newKeyArr);
-    }
-
-    setMovingId(undefined);
-  };
-
-  function onDragStart(e: DragStartEvent) {
-    const { id } = e.active;
-    setMovingId(id as string);
-  }
+  const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
+    listKeyArr: Object.keys(addiList),
+    resetTrigger: legacyContract,
+  });
 
   const DndRow = useCallback(function DndRow({
     isActive,
