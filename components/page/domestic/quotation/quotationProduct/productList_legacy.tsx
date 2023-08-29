@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 // global gear
@@ -18,6 +18,9 @@ import scss from './productList.module.scss';
 import scss_l from '../local.module.scss';
 
 import { Toption } from 'js/utils/options/options';
+
+// dnd
+import { DragEndEvent } from '@dnd-kit/core';
 
 // ==========================================================
 // ==========================================================
@@ -51,18 +54,18 @@ export default function ProductList_legacy({
   classQuotation,
   disabled,
   isAppend,
+  onVerticalKeyChange,
 }: {
   classQuotation: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
+  onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
   // ---------------------------------------------------------------
-  const { classProductArr, prodCellConfig, activeProd, delProd, copyProd, prodList } = classQuotation;
+  const { classProductArr, prodCellConfig, activeProd, prodList } = classQuotation;
 
   const theadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
   type TtheadKeyArr = typeof theadKeyArr;
-
-  // console.log(prodList);
 
   // ---------------------------------------------------------------
 
@@ -95,6 +98,11 @@ export default function ProductList_legacy({
     listKeyArr: Object.keys(prodList),
     resetTrigger: classQuotation,
   });
+
+  useEffect(() => {
+    onVerticalKeyChange(dndKeyArr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dndKeyArr]);
 
   const DndRow = useCallback(function DndRow({
     isActive,
@@ -143,7 +151,15 @@ export default function ProductList_legacy({
                 dndListener={listeners}
               />
             )}
-            {isAppend && <ResetChangeBtnBox toSetTargetIndex={toSetTargetIndex} clearExchange={prod.clearExchange} />}
+            {isAppend && (
+              <ResetChangeBtnBox
+                toSetTargetIndex={toSetTargetIndex}
+                clearExchange={prod.clearExchange}
+                dndAttr={attributes}
+                dndListener={listeners}
+                indexNum={pIndex + 1}
+              />
+            )}
             {/*  */}
             {theadKeyArr.map((key) => {
               const stateValue = prod[key];
@@ -436,19 +452,26 @@ const CopyDelBtnBox = ({
 const ResetChangeBtnBox = ({
   toSetTargetIndex,
   clearExchange,
+  dndAttr,
+  dndListener,
+  indexNum,
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  indexNum: string | number;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       <button className={scss.btn} onClick={clearExchange}>
         還原
       </button>
       <button className={scss.btn} onClick={toSetTargetIndex}>
         變更
       </button>
-      <span>1</span>
+      <span>{indexNum}</span>
     </div>
   );
 };

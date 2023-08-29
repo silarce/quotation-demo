@@ -12,28 +12,7 @@ export default function ExchangePanel({ children }: { children: React.ReactNode 
     <div className={scss.exchangePanel}>
       <ExchangeThead />
 
-      <div className={classNames('pl-[20px] pr-[30px]')}>
-        {children}
-
-        {/* row1 */}
-        {/* {classProductArr.map((prod, index) => {
-          exchangeTotal += Number(prod.reduceExchangePrice);
-
-          return (
-            <ExchangeRow
-              key={index}
-              oriQty={prod.quantity}
-              reduce={prod.reduceQty}
-              reduceOnChange={(v) => {
-                prod.reduceQty = v;
-              }}
-              exchange={prod.exchangeQty}
-              changedMoney={prod.reduceExchangePrice}
-            />
-          );
-        })} */}
-        {/*  */}
-      </div>
+      <div className={classNames('pl-[20px] pr-[30px]')}>{children}</div>
     </div>
   );
 }

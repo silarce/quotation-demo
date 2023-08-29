@@ -71,6 +71,8 @@ const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; re
 
       const newKeyArr = arrayMove(dndKeyArr, oldIndex, newIndex);
       setDndKeyArr(newKeyArr);
+
+      return newKeyArr;
     }
 
     setMovingId(undefined);
