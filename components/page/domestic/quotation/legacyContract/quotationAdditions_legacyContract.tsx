@@ -101,8 +101,6 @@ export default function QuotationAdditions({
   // -------------------------------------------------------------------
 
   const addiList = legacyContract.addiList;
-  // console.log(addiList);
-
   const sensors = useSensors(useSensor(PointerSensor));
 
   const [movingId, setMovingId] = useState<string>();
@@ -150,18 +148,6 @@ export default function QuotationAdditions({
     setMovingId(id as string);
   }
 
-  /**
-   * 垂直拖拉的功能出來了
-   * 但是拖拉放置後會有回到原味的動畫，要怎麼處裡
-   * 垂直拖拉的功能出來了
-   * 但是拖拉放置後會有回到原味的動畫，要怎麼處裡
-   * 垂直拖拉的功能出來了
-   * 但是拖拉放置後會有回到原味的動畫，要怎麼處裡
-   * 垂直拖拉的功能出來了
-   * 但是拖拉放置後會有回到原味的動畫，要怎麼處裡
-   *
-   */
-
   const DndRow = useCallback(function DndRow({
     isActive,
     pIndex,
@@ -169,6 +155,7 @@ export default function QuotationAdditions({
     addi,
     disabled,
     id,
+    isMoving,
   }: {
     isActive: boolean;
     pIndex: number;
@@ -176,6 +163,7 @@ export default function QuotationAdditions({
     addi: Class_addition;
     disabled?: boolean;
     id: string;
+    isMoving: boolean;
   }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id,
@@ -183,11 +171,13 @@ export default function QuotationAdditions({
 
     const itemStyle = {
       transform: CSS.Transform.toString(transform),
-      transition,
+      //不知為何，會有回到原位的動畫(即使動畫結束後位置的確改變了)。乾脆把transition拿掉
+      // 連同其他地方的transition也拿掉
+      // transition
     };
 
     return (
-      <div style={itemStyle} ref={setNodeRef}>
+      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
         <CellWithBar
           isActive={isActive}
           className={classNames(styleL.row, scss.row)}
@@ -287,6 +277,8 @@ export default function QuotationAdditions({
                     return null;
                   }
 
+                  const isMoving = movingId === key;
+
                   const toSetTargetIndex = () => {
                     setTargetIndex(`${pIndex}`);
                   };
@@ -308,12 +300,14 @@ export default function QuotationAdditions({
                   return (
                     <DndRow
                       key={pIndex}
-                      isActive={isActive}
-                      pIndex={pIndex}
-                      toSetTargetIndex={toSetTargetIndex}
-                      addi={addi}
-                      disabled={disabled}
                       id={key}
+                      //
+                      addi={addi}
+                      pIndex={pIndex}
+                      isActive={isActive}
+                      toSetTargetIndex={toSetTargetIndex}
+                      disabled={disabled}
+                      isMoving={isMoving}
                     />
                   );
                 })}

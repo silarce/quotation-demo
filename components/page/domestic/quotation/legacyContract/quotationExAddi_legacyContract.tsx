@@ -130,7 +130,7 @@ export default function QuotationExAddi({
 
     const itemStyle = {
       transform: CSS.Transform.toString(transform),
-      transition,
+      // transition,
     };
 
     return (
