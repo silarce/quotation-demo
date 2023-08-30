@@ -41,9 +41,12 @@ export default function QuotationProduction({
 
   const borderRed = switch02 ? scss.borderRed : '';
 
-  const classProductArr = legacyContract.classProductArr;
+  const { prodList, classProductArr } = legacyContract;
 
   let exchangeTotal = 0;
+
+  const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+  // console.log(verticalKeyArr);
 
   return (
     <div className={scss.wrapper}>
@@ -64,13 +67,26 @@ export default function QuotationProduction({
               classQuotation={legacyContract as Class_legacyContract}
               disabled={disabled}
               isAppend={isAppend}
+              onVerticalKeyChange={(v) => {
+                setVerticalKeyArr(v);
+              }}
             />
-            {!disabled && <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />}
+            {!disabled && (
+              <div className={classNames(scss.addBtnWrapper)}>
+                <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />
+              </div>
+            )}
           </div>
 
           {isAppend && (
             <ExchangePanel>
-              {classProductArr.map((prod, index) => {
+              {verticalKeyArr.map((key, index) => {
+                const prod = prodList[key]?.prod;
+
+                if (!prod) {
+                  return null;
+                }
+
                 exchangeTotal += Number(prod.reduceExchangePrice);
 
                 return (

@@ -107,14 +107,15 @@
   z-index: 1;
   display: inline-flex;
   flex-wrap: nowrap;
+  align-items: flex-end;
   gap: 12px;
-  width: 65px;
+  width: 95px;
   padding-left: 20px;
-
   background-color: white;
 
   &.resetChange {
-    width: 160px;
+    // width: 160px;
+    width: 192px;
   }
   &.exchange {
     width: 160px;
@@ -137,6 +138,11 @@
       user-select: none;
     }
   }
+
+  .delBtn {
+    transform: translateY(-3px);
+  }
+
   > .move {
     cursor: pointer;
   }

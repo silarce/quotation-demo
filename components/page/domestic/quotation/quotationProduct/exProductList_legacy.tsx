@@ -10,18 +10,10 @@ import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
 
 // dnd
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragStartEvent,
-  DragEndEvent,
-  DraggableAttributes,
-} from '@dnd-kit/core';
+import { useVerticalDnd } from '../hook/useVerticalDnd';
+import { DndContext, DraggableAttributes } from '@dnd-kit/core';
 
 import {
-  arrayMove,
   SortableContext,
   // horizontalListSortingStrategy,
   verticalListSortingStrategy,
@@ -65,11 +57,9 @@ export default function ExProductList_legacy({
 }) {
   // ---------------------------------------------------------------
   const { prodExchangeList, prodCellConfig } = classQuotation;
-  // const exChnageArr = Object.values(prodExchangeList);
-  const exChnageKeyArr = Object.keys(prodExchangeList);
+  const theadIndexArr = classQuotation.exProdKeyArr;
+  type TtheadIndexArr = typeof theadIndexArr;
 
-  // const theadIndex = prodCellConfig.keyList;
-  const theadIndex = classQuotation.exchangeKeyList;
   // ---------------------------------------------------------------
 
   const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
@@ -79,48 +69,11 @@ export default function ExProductList_legacy({
 
   // ---------------------------------------------------------------
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
+    listKeyArr: Object.keys(prodExchangeList),
+    resetTrigger: classQuotation,
+  });
 
-  const [movingId, setMovingId] = useState<string>();
-  const [dndKeyArr, setDndKeyArr] = useState<string[]>([]);
-
-  useEffect(() => {
-    const newArr = Object.keys(prodExchangeList);
-
-    if (newArr.length > dndKeyArr.length) {
-      const newKeyArr = _.difference(newArr, dndKeyArr);
-      setDndKeyArr([...dndKeyArr, ...newKeyArr]);
-    }
-
-    if (newArr.length < dndKeyArr.length) {
-      const delDndKey = _.difference(dndKeyArr, newArr)[0];
-      const delIndex = dndKeyArr.indexOf(delDndKey);
-      dndKeyArr.splice(delIndex, 1);
-      setDndKeyArr([...dndKeyArr]);
-    }
-  }, [exChnageKeyArr.length]);
-
-  const onDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
-
-    if (active.id !== over?.id) {
-      const oldIndex = dndKeyArr.indexOf(active.id as string);
-      const newIndex = dndKeyArr.indexOf(over?.id as string);
-
-      const newKeyArr = arrayMove(dndKeyArr, oldIndex, newIndex);
-      setDndKeyArr(newKeyArr);
-    }
-
-    setMovingId(undefined);
-  };
-
-  function onDragStart(e: DragStartEvent) {
-    const { id } = e.active;
-    setMovingId(id as string);
-  }
-
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
   // ---------------------------------------------------------------
 
   const ExchangeRow = useCallback(function ExchangeRow({
@@ -130,6 +83,7 @@ export default function ExProductList_legacy({
     delSelf,
     prod,
     id,
+    theadIndexArr,
   }: {
     pIndex: number;
     isActive: boolean;
@@ -137,6 +91,7 @@ export default function ExProductList_legacy({
     delSelf?: () => void;
     prod: Class_product;
     id: string;
+    theadIndexArr: TtheadIndexArr;
   }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id,
@@ -159,7 +114,7 @@ export default function ExProductList_legacy({
             {/*  */}
             <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
             {/*  */}
-            {theadIndex.map((key) => {
+            {theadIndexArr.map((key) => {
               const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
               const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
               const theStyle = { width };
@@ -190,8 +145,6 @@ export default function ExProductList_legacy({
   []);
 
   // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
   return (
     <div className={scss.container}>
       <DndContext
@@ -205,7 +158,6 @@ export default function ExProductList_legacy({
       >
         <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
           {dndKeyArr.map((key, pIndex) => {
-            // const { prod, delSelf } = prodExchangeList[key];
             const obj = prodExchangeList[key];
 
             if (!obj) {
@@ -227,6 +179,7 @@ export default function ExProductList_legacy({
                 isMoving={isMoving}
                 delSelf={delSelf}
                 prod={prod}
+                theadIndexArr={theadIndexArr}
               />
             );
           })}
@@ -251,7 +204,7 @@ export default function ExProductList_legacy({
     options,
   }: {
     dataItem: Class_product;
-    key: Class_legacyContract['prodCellConfig']['keyList'][number];
+    key: Class_legacyContract['prodCellConfig']['keyArr'][number];
     type: 'input' | 'selectWithIcon' | 'checkbox' | 'select';
     disabled: boolean;
     stateValue: string | boolean | number;
@@ -367,71 +320,6 @@ export default function ExProductList_legacy({
     }
   }
   // ------------------------
-
-  // function ExchangeRow({
-  //   pIndex,
-  //   isActive,
-  //   isMoving,
-  //   delSelf,
-  //   prod,
-  //   id,
-  // }: {
-  //   pIndex: number;
-  //   isActive: boolean;
-  //   isMoving: boolean;
-  //   delSelf?: () => void;
-  //   prod: Class_product;
-  //   id: string;
-  // }) {
-  //   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-  //     id,
-  //   });
-
-  //   const itemStyle = {
-  //     transform: CSS.Transform.toString(transform),
-  //     transition,
-  //   };
-
-  //   return (
-  //     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-  //       <CellWithBar
-  //         isActive={isActive}
-  //         onClick={() => {
-  //           setActiveIndex(pIndex);
-  //         }}
-  //       >
-  //         <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
-  //           {/*  */}
-  //           <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
-  //           {/*  */}
-  //           {theadIndex.map((key) => {
-  //             const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
-  //             const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
-  //             const theStyle = { width };
-  //             const stateValue = prod[key];
-  //             const TheCell = cellSwitcher({
-  //               dataItem: prod,
-  //               key,
-  //               type,
-  //               disabled,
-  //               stateValue,
-  //               inputType,
-  //               options,
-  //             });
-
-  //             return (
-  //               <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
-  //                 {TheCell}
-  //               </div>
-  //             );
-  //           })}{' '}
-  //           {/* column */}
-  //         </div>{' '}
-  //         {/* row */}
-  //       </CellWithBar>
-  //     </div>
-  //   );
-  // }
 } //ProductList
 
 // ================================================
@@ -457,36 +345,3 @@ const ControlBox = ({
     </div>
   );
 };
-
-// <div key={pIndex}>
-//   <CellWithBar isActive={isActive} onClick={() => setActiveIndex(pIndex)}>
-//     <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
-//       {/*  */}
-//       <ControlBox delSelf={delSelf} index={pIndex + 1} />
-//       {/*  */}
-//       {theadIndex.map((key) => {
-//         const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
-//         const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
-//         const theStyle = { width };
-//         const stateValue = prod[key];
-//         const TheCell = cellSwitcher({
-//           dataItem: prod,
-//           key,
-//           type,
-//           disabled,
-//           stateValue,
-//           inputType,
-//           options,
-//         });
-
-//         return (
-//           <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
-//             {TheCell}
-//           </div>
-//         );
-//       })}{' '}
-//       {/* column */}
-//     </div>{' '}
-//     {/* row */}
-//   </CellWithBar>
-// </div>

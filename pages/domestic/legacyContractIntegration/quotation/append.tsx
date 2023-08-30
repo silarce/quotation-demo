@@ -18,11 +18,6 @@ import QuotationExAddi from 'components/page/domestic/quotation/legacyContract/q
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
-
-// icon
-import iconUpload from 'public/image/icon/upload.svg';
 
 // css
 import scss from './quotation.module.scss';

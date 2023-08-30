@@ -1,36 +1,30 @@
 import { ReactNode } from 'react';
+import classNames from 'classnames';
 
 // css
-import style from './cellWithBar.module.scss';
+import scss from './cellWithBar.module.scss';
 
 export default function CellWithBar({
   children,
   isActive,
   className,
-  element,
   onClick,
+  divAttr,
 }: {
   children: ReactNode;
   isActive?: boolean;
   className?: string;
-  element?: string;
   onClick?: () => void;
+  divAttr?: React.HTMLAttributes<HTMLDivElement>;
 }) {
-  const active = isActive ? style.active : '';
-
   return (
-    <>
-      {element === 'li' ? (
-        <li className={`${style.container} ${active} ${className}`} onClick={onClick}>
-          {children}
-          <div className={style.bar} />
-        </li>
-      ) : (
-        <div className={`${style.container} ${active} ${className}`} onClick={onClick}>
-          {children}
-          <div className={style.bar} />
-        </div>
-      )}
-    </>
+    <div
+      className={classNames(scss.container, isActive && scss.active, className)}
+      //
+      {...divAttr}
+      onClick={onClick}
+    >
+      {children}
+    </div>
   );
 }

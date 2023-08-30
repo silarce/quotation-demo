@@ -53,7 +53,8 @@
   align-items: flex-end;
   flex-wrap: nowrap;
   gap: 16px;
-  width: 124px;
+  // width: 124px;
+  width: 137px;
   height: 100%;
   padding-left: 22px;
   background-color: white;
@@ -71,12 +72,15 @@
   }
 
   &.resetChange {
-    width: 170px;
+    // width: 170px;
+    width: 206px;
   }
   &.exchange {
     width: 140px;
   }
-
+  > .svgBtn {
+    transform: translateY(-4px);
+  }
   > .btn {
     padding: 0px 10px;
     border: 1px solid theme("colors.border");

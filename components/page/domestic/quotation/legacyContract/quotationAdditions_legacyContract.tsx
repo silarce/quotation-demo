@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // components
 import ExchangePanel, { ExchangeRow } from './exchangePanel/exchangePanel';
@@ -12,15 +13,47 @@ import AddButton from 'components/global/gear/button/addButton';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract, Class_addition } from 'hooks/quotation/useLegacyContract';
 
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import iconMove from 'public/image/icon/move.svg';
 
 // css
 import styleL from '../local.module.scss';
 import scss from './quotationAdditions_legacyContract.module.scss';
 
+// ==========================================================================
+// dnd
+import { useVerticalDnd } from '../hook/useVerticalDnd';
+import {
+  DndContext,
+  // PointerSensor,
+  // useSensor,
+  // useSensors,
+  // DragStartEvent,
+  // DragEndEvent,
+  DraggableAttributes,
+} from '@dnd-kit/core';
+
+import {
+  // arrayMove,
+  SortableContext,
+  // horizontalListSortingStrategy,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+
+import {
+  restrictToVerticalAxis,
+  //  restrictToHorizontalAxis, restrictToWindowEdges
+} from '@dnd-kit/modifiers';
+
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+
+// ==========================================================================
 export default function QuotationAdditions({
   legacyContract,
   disabled,
@@ -32,13 +65,15 @@ export default function QuotationAdditions({
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const { additionCellConfig: additionCellConfig } = legacyContract;
+  const { additionCellConfig: additionCellConfig, addiList } = legacyContract;
 
   const classAdditionArr = legacyContract.classAdditionArr;
 
   const { addAddition, delAddition } = legacyContract ?? {};
 
-  const additionKeyindex = additionCellConfig.keyList;
+  // const additionKeyindex = additionCellConfig.keyArr;
+  const additionKeyindex = isAppend ? additionCellConfig.keyArr : legacyContract.editAddiKeyArr;
+
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
   const [targetIndex, setTargetIndex] = useState<`${number}`>();
@@ -65,6 +100,106 @@ export default function QuotationAdditions({
   let exchangeTotal = 0;
 
   // -------------------------------------------------------------------
+
+  const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
+    listKeyArr: Object.keys(addiList),
+    resetTrigger: legacyContract,
+  });
+
+  const DndRow = useCallback(function DndRow({
+    isActive,
+    pIndex,
+    toSetTargetIndex,
+    addi,
+    disabled,
+    id,
+    isMoving,
+  }: {
+    isActive: boolean;
+    pIndex: number;
+    toSetTargetIndex: () => void;
+    addi: Class_addition;
+    disabled?: boolean;
+    id: string;
+    isMoving: boolean;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id,
+    });
+
+    const itemStyle = {
+      transform: CSS.Transform.toString(transform),
+      //不知為何，會有回到原位的動畫(即使動畫結束後位置的確改變了)。乾脆把transition拿掉
+      // 連同其他地方的transition也拿掉
+      // transition
+    };
+
+    return (
+      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+        <CellWithBar
+          isActive={isActive}
+          className={classNames(styleL.row, scss.row)}
+          onClick={() => {
+            setActiveIndex(pIndex);
+          }}
+        >
+          {/*  */}
+          {!isAppend && (
+            <EditBtnBox
+              dndAttr={attributes}
+              dndListener={listeners}
+              disabled={disabled}
+              del={() => delAddition(pIndex)}
+              indexNumber={pIndex + 1}
+            />
+          )}
+          {isAppend && (
+            <ResetChangeBtnBox
+              toSetTargetIndex={toSetTargetIndex}
+              clearExchange={addi.clearExchange}
+              indexNumber={pIndex + 1}
+              dndAttr={attributes}
+              dndListener={listeners}
+            />
+          )}
+
+          {/*  */}
+          {additionKeyindex.map((key, cIndex) => {
+            const { width, flex, type, inputType } = cellConfig[key];
+            const theStyle = { width, flex };
+
+            let showBaseline: 'auto' | 'invisible' = 'auto';
+
+            let theDisabled = disabled;
+
+            if (key === 'quotationNumber') {
+              theDisabled = true;
+              showBaseline = 'invisible';
+            }
+
+            return (
+              <div className={scss.column} key={cIndex} style={theStyle}>
+                <InputSel
+                  disabled={theDisabled}
+                  showBaseline={showBaseline}
+                  inputProps={{
+                    value: addi[key],
+                    onChange: (v) => (addi[key] = v),
+                    inputType: inputType,
+                  }}
+                />
+              </div>
+            );
+          })}
+        </CellWithBar>
+      </div>
+    );
+  },
+  []);
+
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
+  // -------------------------------------------------------------------
   return (
     <div className={scss.wrapper}>
       <div className={scss.container}>
@@ -90,83 +225,72 @@ export default function QuotationAdditions({
               })}
             </div>
             {/* tbody */}
-            {classAdditionArr?.map((addi, pIndex) => {
-              const toSetTargetIndex = () => {
-                setTargetIndex(`${pIndex}`);
-              };
 
-              let isActive = false;
+            <DndContext
+              sensors={sensors}
+              modifiers={[
+                restrictToVerticalAxis,
+                // restrictToWindowEdges,
+              ]}
+              onDragEnd={onDragEnd}
+              onDragStart={onDragStart}
+            >
+              <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
+                {dndKeyArr?.map((key, pIndex) => {
+                  const addi = addiList[key];
 
-              if (isAppend) {
-                if (addi.reduceQty !== '0') {
-                  isActive = true;
-                }
+                  if (!addi) {
+                    return null;
+                  }
 
-                if (addi.exchangeQty !== 0) {
-                  isActive = true;
-                }
-              } else {
-                isActive = activeIndex === pIndex;
-              }
+                  const isMoving = movingId === key;
 
-              return (
-                <CellWithBar
-                  key={pIndex}
-                  isActive={isActive}
-                  className={classNames(styleL.row, scss.row)}
-                  onClick={() => {
-                    setActiveIndex(pIndex);
-                  }}
-                >
-                  {/*  */}
-                  {!isAppend && (
-                    <ProdBtnBox disabled={disabled} del={() => delAddition(pIndex)} indexNumber={pIndex + 1} />
-                  )}
-                  {isAppend && (
-                    <ResetChangeBtnBox
-                      // toSetTargetIndex={toSetTargetIndex}
-                      // clearExchange={dataItem.clearExchange}
-                      toSetTargetIndex={toSetTargetIndex}
-                      clearExchange={addi.clearExchange}
-                    />
-                  )}
+                  const toSetTargetIndex = () => {
+                    setTargetIndex(`${pIndex}`);
+                  };
 
-                  {/*  */}
-                  {additionKeyindex.map((key, cIndex) => {
-                    const { width, flex, type, inputType } = cellConfig[key];
-                    const theStyle = { width, flex };
+                  let isActive = false;
 
-                    let showBaseline: 'auto' | 'invisible' = 'auto';
-
-                    let theDisabled = disabled;
-
-                    if (key === 'quotationNumber') {
-                      theDisabled = true;
-                      showBaseline = 'invisible';
+                  if (isAppend) {
+                    if (addi.reduceQty !== '0') {
+                      isActive = true;
                     }
 
-                    return (
-                      <div className={scss.column} key={cIndex} style={theStyle}>
-                        <InputSel
-                          disabled={theDisabled}
-                          showBaseline={showBaseline}
-                          inputProps={{
-                            value: addi[key],
-                            onChange: (v) => (addi[key] = v),
-                            inputType: inputType,
-                          }}
-                        />
-                      </div>
-                    );
-                  })}
-                </CellWithBar>
-              );
-            })}
+                    if (addi.exchangeQty !== 0) {
+                      isActive = true;
+                    }
+                  } else {
+                    isActive = activeIndex === pIndex;
+                  }
+
+                  return (
+                    <DndRow
+                      key={pIndex}
+                      id={key}
+                      //
+                      addi={addi}
+                      pIndex={pIndex}
+                      isActive={isActive}
+                      toSetTargetIndex={toSetTargetIndex}
+                      disabled={disabled}
+                      isMoving={isMoving}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
+
             {!disabled && <AddButton className={scss.addBtn} label="新增項目" onClick={addAddition} />}
           </div>
           {isAppend && (
             <ExchangePanel>
-              {classAdditionArr.map((addi, index) => {
+              {dndKeyArr.map((key, index) => {
+                const addi = addiList[key];
+
+                if (!addi) {
+                  return null;
+                }
+
                 exchangeTotal += Number(addi.reduceExchangePrice);
 
                 return (
@@ -212,17 +336,22 @@ export default function QuotationAdditions({
 }
 
 // =======================================================================
-const ProdBtnBox = ({
+const EditBtnBox = ({
   disabled,
   del,
   indexNumber,
+  dndAttr,
+  dndListener,
 }: {
   disabled?: boolean;
   del: () => void;
   indexNumber: number | string;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
 }) => {
   return (
     <div className={classNames(scss.btnBox, 'chameleon')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       <div className={scss.delBtn}>
         <IconDelete01
           onClick={(e) => {
@@ -245,19 +374,26 @@ const ProdBtnBox = ({
 const ResetChangeBtnBox = ({
   toSetTargetIndex,
   clearExchange,
+  dndAttr,
+  dndListener,
+  indexNumber,
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  indexNumber: number | string;
 }) => {
   return (
     <div className={classNames(scss.btnBox, scss.resetChange, 'chameleon')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       <button className={scss.btn} onClick={clearExchange}>
         還原
       </button>
       <button className={scss.btn} onClick={toSetTargetIndex}>
         變更
       </button>
-      <span>1</span>
+      <span>{indexNumber}</span>
     </div>
   );
 };

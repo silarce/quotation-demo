@@ -209,7 +209,7 @@ class Class_product {
   } // constructor
 
   private _reRender;
-  private _product;
+  _product;
   private _countTotalDiscount;
   private _countSubTotal;
   private _id;
@@ -1139,9 +1139,14 @@ class Class_legacyContract {
     });
 
     /**額外項目 */
+    // this.classAdditionArr = this._legacyContract.additions.map(
+    //   (addition) => new Class_addition(reRender, addition, this.countSubTotal)
+    // );
+
     this.classAdditionArr = this._legacyContract.additions.map(
       (addition) => new Class_addition(reRender, addition, this.countSubTotal)
     );
+
     /**   付款資訊*/
     this.classPayInfo = new Class_payInfo(
       reRender,
@@ -1158,10 +1163,24 @@ class Class_legacyContract {
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     this.prodCellConfig = prodCellConfig;
-    this._exchangeKeyList = _.cloneDeep(prodCellConfig.keyList);
-    this._exchangeKeyList = _.pull(this._exchangeKeyList, 'quotationNumber') as typeof prodCellConfig.keyList;
+    // 原本想直接用_exProdKeyArr的，但考慮到之後業主會不會有有什麼需求...，還是另外做一個吧
+    // 編輯舊合約整合報價單時用的主產品設定keyArr
+    this._editProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._editProdKeyArr = _.pull(this._editProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+
+    // 變更 主產品設定用的keyArr
+    this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
 
     this.additionCellConfig = additionCellConfig;
+    // 編輯舊合約整合報價單時用的配件設定keyArr
+    this._editAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
+    this._editAddiKeyArr = _.pull(this._editAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
+    // 變更 配件設定用的keyArr
+    this._exAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
+    this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
+
+    // constructor
   } // constructor
 
   private _legacyContract;
@@ -1177,7 +1196,10 @@ class Class_legacyContract {
   classQuoteScopes;
   classSignature;
   // ---------------------
-  _exchangeKeyList;
+  _editProdKeyArr;
+  _editAddiKeyArr;
+  _exProdKeyArr;
+  _exAddiKeyArr;
   // ---------------------
 
   // 需求變更 編輯折數與總折數時不再影響其他數值
@@ -1224,19 +1246,27 @@ class Class_legacyContract {
   }
 
   // ---------------------
-  get prodkeyList() {
-    return this.prodCellConfig.keyList;
+  get prodkeyArr() {
+    return this.prodCellConfig.keyArr;
   }
-  set prodkeyList(v) {
-    this.prodCellConfig.keyList = v;
+  set prodkeyArr(v) {
+    this.prodCellConfig.keyArr = v;
     this._reRender();
   }
 
-  get exchangeKeyList() {
-    return this._exchangeKeyList;
+  get editProdKeyArr() {
+    return this._editProdKeyArr;
   }
-  set exchangeKeyList(v) {
-    this._exchangeKeyList = v;
+  set editProdKeyArr(v) {
+    this._editProdKeyArr = v;
+    this._reRender();
+  }
+
+  get exProdKeyArr() {
+    return this._exProdKeyArr;
+  }
+  set exProdKeyArr(v) {
+    this._exProdKeyArr = v;
     this._reRender();
   }
 
@@ -1259,7 +1289,10 @@ class Class_legacyContract {
   copyProd = (index: number) => {
     const copy = _.cloneDeep(this.classProductArr[index]);
     copy.id = undefined;
-    this.classProductArr.push(copy);
+    // this.classProductArr.push(copy);
+    this.classProductArr.push(
+      new Class_product(this._reRender, copy._product, this.countTotalDiscount, this.countSubTotal)
+    );
     this.activeProd = index;
     this.countTotalDiscount();
     this.countSubTotal();
@@ -1273,6 +1306,23 @@ class Class_legacyContract {
     this.countTotalDiscount();
     this._reRender();
   };
+
+  //
+  get exAddiKeyArr() {
+    return this._exAddiKeyArr;
+  }
+  set exAddiKeyArr(v) {
+    this._exAddiKeyArr = v;
+    this._reRender();
+  }
+
+  get editAddiKeyArr() {
+    return this._editAddiKeyArr;
+  }
+  set editAddiKeyArr(v) {
+    this._editAddiKeyArr = v;
+    this._reRender();
+  }
 
   delAddition = (index: number) => {
     this.classAdditionArr.splice(index, 1);
@@ -1320,11 +1370,11 @@ class Class_legacyContract {
     //   return false;
     // }
 
-    if (!deliveryDate) {
-      myAlert.warning({ title: '請選擇交貨日期' });
+    // if (!deliveryDate) {
+    //   myAlert.warning({ title: '請選擇交貨日期' });
 
-      return false;
-    }
+    //   return false;
+    // }
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
@@ -1389,13 +1439,39 @@ class Class_legacyContract {
       notes,
       quoteScopes,
       quoteDate: quoteDate_Date || null,
-      deliveryDate: deliveryDate_Date,
+      deliveryDate: deliveryDate_Date || null,
     };
   }
   // -------------------
+  // 主產品設定list
+  get prodList() {
+    // type Tlist = {
+    //   [key: string]: Class_product;
+    // };
+    type Tlist = {
+      [key: string]: {
+        del: () => void;
+        copy: () => void;
+        prod: Class_product;
+      };
+    };
+
+    const list: Tlist = {};
+
+    this.classProductArr.forEach((prod, index) => {
+      list[prod.dndId] = {
+        del: () => this.delProd(index),
+        copy: () => this.copyProd(index),
+        prod,
+      };
+    });
+    // console.log(list);
+
+    return list;
+  }
+
   // 變更主產品設定
   // appendProduction
-
   private _prodAdditionalExchangeArr: Class_product[] = [];
   addExProd = () => {
     this._prodAdditionalExchangeArr.push(
@@ -1408,6 +1484,7 @@ class Class_legacyContract {
     );
     this._reRender();
   };
+
   // 變更 主產品設定 的list object
   get prodExchangeList() {
     // 來源自主產品(classProduct)的陣列
@@ -1458,6 +1535,19 @@ class Class_legacyContract {
     return list;
   }
   // -----------
+
+  // 配件設定 的list object
+  get addiList() {
+    type Tlist = {
+      [key: string]: Class_addition;
+    };
+    const list: Tlist = {};
+    this.classAdditionArr.forEach((addi) => {
+      list[addi.dndId] = addi;
+    });
+
+    return list;
+  }
 
   private _additionAdditionalExchangeArr: Class_addition[] = [];
   addExAddi = () => {
@@ -1638,7 +1728,7 @@ type TprodSelect = {
 type TprodKeys = keyof (TprodInputCellType & TprodSelectWithIconCellType & TprodCheckboxCellType & TprodSelect);
 
 type TprodCellConfig = {
-  keyList: TprodKeys[];
+  keyArr: TprodKeys[];
   cellConfig: {
     [key in TprodKeys]: {
       id: key;
@@ -1657,7 +1747,7 @@ type TprodCellConfig = {
 function prodCellConfigCre(): TprodCellConfig {
   return {
     // 這個會影響一開始的排列順序
-    keyList: [
+    keyArr: [
       // "idNumber",
       'quotationNumber',
       'discountRate',
@@ -1739,7 +1829,7 @@ type TaddtionInputCellType = {
 type TadditionKeys = keyof TaddtionInputCellType;
 
 type TadditionCellConfig = {
-  keyList: TadditionKeys[];
+  keyArr: TadditionKeys[];
   cellConfig: {
     [key in TadditionKeys]: {
       label: string;
@@ -1752,7 +1842,7 @@ type TadditionCellConfig = {
 
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
-    keyList: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
+    keyArr: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
     cellConfig: {
       quotationNumber: {
         label: '合約編號',
