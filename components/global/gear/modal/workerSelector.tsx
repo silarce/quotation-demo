@@ -3,7 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 
 // global gear
-import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
@@ -16,6 +16,7 @@ import { Tparams } from 'js/api/dtoTypes';
 
 // api
 import { useApiGetDailyReportsWorkers, TdailyReportWokerDto } from 'js/api/api_dailyReport';
+// import { useDepartments } from 'js/api/api_department';
 
 import { AppContext } from 'pages/_app';
 
@@ -40,14 +41,20 @@ export default function WorkerSelector({
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TdailyReportWokerDto[]>([]);
 
-  const [searchValue, setSearchValue] = useState<string | undefined>();
+  const [searchValue, setSearchValue] = useState<{
+    department: string | undefined;
+    keyword: string | undefined;
+    grade: string | undefined;
+  }>({
+    department: undefined,
+    keyword: undefined,
+    grade: undefined,
+  });
+
   const [pageObj, setPageObj] = useState({ page: -1 });
   const page = pageObj.page;
 
   const params: Tparams = (() => {
-    const allNum = /^\d+$/.test(searchValue ?? 'n');
-    const grade = allNum ? searchValue : undefined;
-
     return {
       page: page,
       pageSize: 20,
@@ -55,11 +62,13 @@ export default function WorkerSelector({
       sort: 'idNumber',
       filter: {
         $or: {
-          idNumber: { $contains: searchValue },
-          chName: { $contains: searchValue },
-          'jobs.name': { $contains: searchValue },
-          'jobs.grade': { $eq: grade },
+          idNumber: searchValue.keyword,
+          chName: searchValue.keyword,
+          'jobs.name': searchValue.keyword,
         },
+        'jobs.grade': { $eq: searchValue.grade },
+        // get /daily-reports/workers 所以大概也不能過濾department
+        // 'jobs.department.name': { $eq: searchValue.department },
       },
     };
   })();
@@ -92,7 +101,11 @@ export default function WorkerSelector({
       const newPageObj = { ...pageObj, page: -1 };
       setPageObj(newPageObj);
       setRes(undefined);
-      setSearchValue(undefined);
+      setSearchValue({
+        department: undefined,
+        keyword: undefined,
+        grade: undefined,
+      });
 
       return;
     }
@@ -169,28 +182,116 @@ export default function WorkerSelector({
     setSelEmployeeArr([]);
   };
 
-  const onSearch = (v: string) => {
-    setSearchValue(v);
-  };
+  // ==================================================
+  // const { data: departmentData, update: update_department } = useDepartments();
 
+  // useEffect(() => {
+  //   update_department();
+  // }, []);
+
+  // const optionArr = useMemo(() => {
+  //   if (!departmentData) {
+  //     return [];
+  //   }
+
+  //   const arr = departmentData.data.map((data) => {
+  //     return {
+  //       value: data.name,
+  //       label: data.name,
+  //     };
+  //   });
+  //   arr.unshift({
+  //     value: '',
+  //     label: '不拘',
+  //   });
+
+  //   return arr;
+  // }, [departmentData]);
+
+  const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
+    // /daily-reports/workers 沒有提供department，無法filter department，
+    // 所以先拿掉
+    // {
+    //   selectProps: {
+    //     wrapperStyle: { width: '100px' },
+    //     props: {
+    //       // options: optionArr,
+    //       options: [
+    //         { value: '管理部', label: '管理部' },
+    //         { value: '營業部', label: '營業部' },
+    //         { value: '工務部', label: '工務部' },
+    //         { value: '會計部', label: '會計部' },
+    //         { value: '採購部', label: '採購部' },
+    //         { value: '倉管部', label: '倉管部' },
+    //         { value: '研發部', label: '研發部' },
+    //         { value: '人事部', label: '人事部' },
+    //         { value: '廠務部', label: '廠務部' },
+    //       ],
+    //       placeholder: '選擇部門',
+    //     },
+    //   },
+    // },
+    {
+      selectProps: {
+        wrapperStyle: { width: '80px' },
+        props: {
+          options: [
+            { value: '', label: '不拘' },
+            ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((num) => {
+              return { value: `${num}`, label: `${num}` };
+            }),
+          ],
+          placeholder: '選擇職等',
+        },
+      },
+    },
+    {
+      pilarAttr: undefined,
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: '160px' },
+        props: {
+          placeholder: '搜尋關鍵字',
+        },
+      },
+    },
+  ];
+
+  const onSearch = (arr: string[]) => {
+    // const department = arr[0] || undefined;
+    const grade = arr[0] || undefined;
+    const keyword = arr[1] || undefined;
+
+    setSearchValue({
+      department: undefined,
+      grade,
+      keyword,
+    });
+  };
   // ==================================================
 
   return (
-    <ModalListSelectorWithSearch
+    <SelectorShell
       label={label ?? ''}
+      className={style.container}
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={onSearch}
       width={rwd1023 ? '80vw' : '800px'}
-      className={style.container}
       tip={tip}
+      searcbBarProps={{
+        inputSelPropsArr: inputSelPropsArr,
+        onClick: onSearch,
+      }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
         <div className={style.listContainer}>
           {workerArr.map((emp, index, arr) => {
             const { idNumber, chName, jobs } = emp;
-            const { name, grade } = jobs?.[0] ?? {};
+
+            const theJob = _.maxBy(jobs, 'grade');
+            const { name, grade } = theJob ?? {};
 
             const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
 
@@ -215,6 +316,6 @@ export default function WorkerSelector({
           })}
         </div>
       </LoadingCoverWrapper01>
-    </ModalListSelectorWithSearch>
+    </SelectorShell>
   );
 }
