@@ -48,10 +48,10 @@ const optionArr_period = optionsCreator_dailyReportPeriod();
 // ==================================================
 export default function ReportTable({
   addDailyReportItem,
-  removeDailyReportItem,
-}: {
+}: // removeDailyReportItem,
+{
   addDailyReportItem: () => void;
-  removeDailyReportItem: (index: number) => void;
+  // removeDailyReportItem: (index: number) => void;
 }) {
   const router = useRouter();
   const isMine = router.query.isMine === 'true' ? true : false;
@@ -59,7 +59,8 @@ export default function ReportTable({
   const { reportInEdit, userInfo } = useContext(DailyReportContext);
   const { rwd1023 } = useContext(AppContext);
 
-  const classDailyReportItemArr = reportInEdit?.items;
+  // const classDailyReportItemArr = reportInEdit?.items;
+  const itemList = reportInEdit?.itemList;
 
   const { id, isEdit, prevDate, isReviewedByOther, isReviewCompleted, isReviewedByUser } = reportInEdit ?? {};
 
@@ -130,14 +131,14 @@ export default function ReportTable({
   };
 
   useEffect(() => {
-    if (classDailyReportItemArr === undefined) {
+    if (itemList === undefined) {
       return;
     }
 
     const now = moment();
     setMonthStart(now.clone().subtract(1, 'month').startOf('month').toISOString());
     setMonthEnd(now.clone().add(1, 'month').startOf('month').toISOString());
-  }, [classDailyReportItemArr]);
+  }, [itemList]);
 
   useEffect(() => {
     if (!monthStart || !monthEnd) {
@@ -230,7 +231,7 @@ export default function ReportTable({
   return (
     <Drawer
       className={scss.drawer}
-      visible={!!classDailyReportItemArr}
+      visible={!!itemList}
       // getContainer={false}
       getContainer={rwd1023 ? undefined : false}
       width={'100%'}
@@ -286,10 +287,9 @@ export default function ReportTable({
         </div>
         {/*  */}
         <div className={classNames(scss.tbody)}>
-          {classDailyReportItemArr?.map((theClass, rIndex) => {
-            {
-              /* {sortedClassDailyReportItemArr?.map((theClass, rIndex) => { */
-            }
+          {/* {classDailyReportItemArr?.map((theClass, rIndex) => { */}
+          {Object.values(itemList ?? {})?.map((theClass, rIndex) => {
+            const delSelf = theClass.delSelf;
 
             return (
               <div key={rIndex} className={classNames(scss.row)}>
@@ -641,7 +641,7 @@ export default function ReportTable({
 
                   //
                   if (key === 'remove') {
-                    const onClick = disabled ? undefined : () => removeDailyReportItem(rIndex);
+                    const onClick = disabled ? undefined : delSelf;
 
                     return (
                       <div

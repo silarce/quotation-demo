@@ -333,7 +333,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setReport,
     reNew_report,
     addReportItem: addDailyReportItem,
-    removeReportItem: removeDailyReportItem,
+    // removeReportItem: removeDailyReportItem,
     changeReviewToChecked,
     switchIsEdit,
     reportIsEdit: isReportEdit,
@@ -477,7 +477,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return myAlert.warning({ title: '請選擇日期' });
     }
 
-    const items = reportInEdit.items.map((item) => {
+    const items = Object.values(reportInEdit.itemList).map((item) => {
       const year = new Date(theDate).getFullYear();
       const month = new Date(theDate).getMonth();
       const th = new Date(theDate).getDate();
@@ -710,7 +710,6 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  // jsx
   return (
     <>
       <SubLayer
@@ -750,7 +749,10 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         )}
 
         <DailyReportContext.Provider value={dailyReportContextValue}>
-          <ReportTable addDailyReportItem={addDailyReportItem} removeDailyReportItem={removeDailyReportItem} />
+          <ReportTable
+            addDailyReportItem={addDailyReportItem}
+            //  removeDailyReportItem={removeDailyReportItem}
+          />
         </DailyReportContext.Provider>
 
         {/* mobile */}

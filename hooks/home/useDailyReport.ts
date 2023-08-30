@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import _ from 'lodash';
-
+import { nanoid } from 'nanoid';
 // type
 import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from 'js/api/dtoTypes';
 // api
@@ -12,7 +12,10 @@ import { TcreateDailyReportItemDto, TdailyReportDto } from 'js/api/api_dailyRepo
 type ThookEmptyReport = {
   id: string | undefined;
   date: string | null;
-  items: Class_reportItem[];
+  // items: Class_reportItem[];
+  itemList: {
+    [key: string]: Class_reportItem;
+  };
   isAllowToReview: boolean;
   isReviewedByOther: boolean;
   isReviewedByUser: boolean;
@@ -59,18 +62,31 @@ const emptyReportItem: TemptyReportItem = {
 
 /**不送dailyReportItem參數會自動送進emptyDailyReportItem */
 class Class_reportItem {
-  constructor(reRender: () => void, reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)) {
+  // constructor(reRender: () => void, reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)) {
+  constructor({
+    reRender,
+    reportItem = _.cloneDeep(emptyReportItem),
+    delSelf,
+  }: {
+    reRender: () => void;
+    reportItem?: TemptyReportItem;
+    delSelf: () => void;
+  }) {
     this._reRender = reRender;
     this._item = reportItem;
     this._stayLength = `${this._item.stayLength || 0}`;
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[];
     this._meals = (reportItem.meals || []) as TdailyReportItemDto['meals'];
+
+    this.delSelf = delSelf;
   } // constructor
   private _reRender;
   private _item;
   private _stayLength;
   private _workers;
   private _meals;
+
+  delSelf;
 
   get id() {
     if ('id' in this._item) {
@@ -249,7 +265,24 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
     id: undefined,
     // date: moment().toISOString(),
     date: null,
-    items: [new Class_reportItem(reRender)],
+    // items: [
+    //   new Class_reportItem({
+    //     reRender,
+    //     delSelf: () => {
+    //       report?.items.splice(1, 1);
+    //       reRender();
+    //     },
+    //   }),
+    // ],
+    itemList: {
+      firEmpty: new Class_reportItem({
+        reRender,
+        delSelf: () => {
+          delete report?.itemList?.firEmpty;
+          reRender();
+        },
+      }),
+    },
     isAllowToReview: false,
     isReviewedByOther: false,
     isReviewedByUser: false,
@@ -310,7 +343,34 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
       date: dailyReport.date,
-      items: sortedItems.map((item) => new Class_reportItem(reRender, item)),
+      // items: sortedItems.map(
+      //   (item, index) =>
+      //     new Class_reportItem({
+      //       reRender,
+      //       reportItem: item,
+      //       delSelf: () => {
+      //         theReport.items.splice(index, 1);
+      //         reRender();
+      //       },
+      //     })
+      // ),
+      itemList: (() => {
+        const list: ThookEmptyReport['itemList'] = {};
+
+        sortedItems.forEach((item) => {
+          const id = item.id || nanoid();
+          list[id] = new Class_reportItem({
+            reRender,
+            reportItem: item,
+            delSelf: () => {
+              delete list[id];
+              reRender();
+            },
+          });
+        });
+
+        return list;
+      })(),
       isAllowToReview,
       isReviewedByOther: isReviewedByOther,
       isReviewedByUser,
@@ -331,25 +391,40 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
         return report;
       }
 
-      const items = report.items;
-      items.push(new Class_reportItem(reRender));
+      // const items = report.items;
+      // items.push(
+      //   new Class_reportItem({
+      //     reRender,
+      //     delSelf: () => {
+      //       items.splice(items.length - 1, 1);
+      //     },
+      //   })
+      // );
+      const id = nanoid();
+      report.itemList[id] = new Class_reportItem({
+        reRender,
+        delSelf: () => {
+          delete report?.itemList[id];
+          reRender();
+        },
+      });
 
       return { ...report };
     });
   };
 
-  const removeReportItem = (index: number) => {
-    setReport((report) => {
-      if (!report) {
-        return report;
-      }
+  // const removeReportItem = (index: number) => {
+  //   setReport((report) => {
+  //     if (!report) {
+  //       return report;
+  //     }
 
-      const items = report.items;
-      items.splice(index, 1);
+  //     const items = report.items;
+  //     items.splice(index, 1);
 
-      return { ...report };
-    });
-  };
+  //     return { ...report };
+  //   });
+  // };
 
   //
   const changeReviewToChecked = (isReviewedByOther: boolean) => {
@@ -426,7 +501,7 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
     setReport,
     reNew_report,
     addReportItem,
-    removeReportItem,
+    // removeReportItem,
     changeReviewToChecked,
     switchIsEdit,
     changeReportDate,
