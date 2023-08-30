@@ -45,11 +45,7 @@ export default function WorkerSelector({
     department: string | undefined;
     keyword: string | undefined;
     grade: string | undefined;
-  }>({
-    department: undefined,
-    keyword: undefined,
-    grade: undefined,
-  });
+  }>();
 
   const [pageObj, setPageObj] = useState({ page: -1 });
   const page = pageObj.page;
@@ -62,11 +58,11 @@ export default function WorkerSelector({
       sort: 'idNumber',
       filter: {
         $or: {
-          idNumber: searchValue.keyword,
-          chName: searchValue.keyword,
-          'jobs.name': searchValue.keyword,
+          idNumber: searchValue?.keyword,
+          chName: searchValue?.keyword,
+          'jobs.name': searchValue?.keyword,
         },
-        'jobs.grade': { $eq: searchValue.grade },
+        'jobs.grade': { $eq: searchValue?.grade },
         // get /daily-reports/workers 所以大概也不能過濾department
         // 'jobs.department.name': { $eq: searchValue.department },
       },
@@ -101,11 +97,7 @@ export default function WorkerSelector({
       const newPageObj = { ...pageObj, page: -1 };
       setPageObj(newPageObj);
       setRes(undefined);
-      setSearchValue({
-        department: undefined,
-        keyword: undefined,
-        grade: undefined,
-      });
+      setSearchValue(undefined);
 
       return;
     }
