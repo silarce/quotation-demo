@@ -56,13 +56,22 @@ export default function ReportTable({
   const router = useRouter();
   const isMine = router.query.isMine === 'true' ? true : false;
 
-  const { reportInEdit, userInfo } = useContext(DailyReportContext);
+  const { reportInEdit, userInfo, reportItemKeyArr, setReportItemKeyArr } = useContext(DailyReportContext);
   const { rwd1023 } = useContext(AppContext);
 
   // const classDailyReportItemArr = reportInEdit?.items;
-  const itemList = reportInEdit?.itemList;
+  // const itemList = reportInEdit?.itemList;
 
-  const { id, isEdit, prevDate, isReviewedByOther, isReviewCompleted, isReviewedByUser } = reportInEdit ?? {};
+  const {
+    id,
+    isEdit,
+    prevDate,
+    isReviewedByOther,
+    isReviewCompleted,
+    isReviewedByUser,
+
+    itemList,
+  } = reportInEdit ?? {};
 
   const isReviewed = isReviewedByOther || isReviewCompleted || isReviewedByUser;
 
@@ -228,6 +237,8 @@ export default function ReportTable({
   // ------------------------------------------------
   // ------------------------------------------------
   // ------------------------------------------------
+  // console.log(itemKeyArr);
+
   return (
     <Drawer
       className={scss.drawer}
@@ -288,8 +299,16 @@ export default function ReportTable({
         {/*  */}
         <div className={classNames(scss.tbody)}>
           {/* {classDailyReportItemArr?.map((theClass, rIndex) => { */}
-          {Object.values(itemList ?? {})?.map((theClass, rIndex) => {
-            const delSelf = theClass.delSelf;
+          {/* {itemKeyArr?.map((key, rIndex) => { */}
+          {/* {Object.values(itemList ?? {})?.map((item, rIndex) => { */}
+          {reportItemKeyArr?.map((key, rIndex) => {
+            const item = itemList?.[key];
+
+            if (!item) {
+              return null;
+            }
+
+            const delSelf = item.delSelf;
 
             return (
               <div key={rIndex} className={classNames(scss.row)}>
@@ -338,13 +357,13 @@ export default function ReportTable({
                           placeholder={thePlaceholder}
                           selectProps={{
                             options: optionArr ?? [],
-                            value: theClass[key as TclassKeys] as string,
+                            value: item[key as TclassKeys] as string,
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             onChange: (v) => {
                               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                               // @ts-ignore
-                              theClass[key] = v!.value;
+                              item[key] = v!.value;
                             },
                             arrowType: 'black',
                             fontSize: '16px',
@@ -372,14 +391,14 @@ export default function ReportTable({
                           showBaseline="auto"
                           placeholder={thePlaceholder}
                           inputProps={{
-                            value: theClass[key as TclassKeys] as string,
+                            value: item[key as TclassKeys] as string,
                             inputType,
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             onChange: (v) => {
                               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                               // @ts-ignore
-                              theClass[key] = v;
+                              item[key] = v;
                             },
                             // className: scss.textarea,
                           }}
@@ -407,13 +426,13 @@ export default function ReportTable({
                           showBaseline="auto"
                           placeholder={thePlaceholder}
                           textareaProps={{
-                            value: theClass[key as TclassKeys] as string,
+                            value: item[key as TclassKeys] as string,
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             onChange: (v) => {
                               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                               // @ts-ignore
-                              theClass[key] = v;
+                              item[key] = v;
                             },
                             className: classNames(
                               scss.textarea,
@@ -463,12 +482,12 @@ export default function ReportTable({
                           showBaseline="auto"
                           placeholder={thePlaceholder}
                           timePickerProps={{
-                            value: theClass[key as TclassKeys] as string,
+                            value: item[key as TclassKeys] as string,
                             onChange02: (v) => {
                               const foo = v?.toISOString();
                               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                               // @ts-ignore
-                              theClass[key] = foo;
+                              item[key] = foo;
                               changeTrigger();
                             },
                             focusTrigger: focusTrigger,
@@ -479,14 +498,14 @@ export default function ReportTable({
                   }
 
                   if (eleType === 'modal' && key === 'workers') {
-                    const workersArr = theClass['workers'];
+                    const workersArr = item['workers'];
 
                     const onAdd = () => {
                       if (disabled) {
                         return;
                       }
 
-                      setActiveItem(theClass);
+                      setActiveItem(item);
                       toShowModal_worker();
                     };
 
@@ -510,7 +529,7 @@ export default function ReportTable({
                         )}
                         {workersArr?.map((worker, wIndex, arr) => {
                           const onRemove = () => {
-                            theClass.removeWorker(wIndex);
+                            item.removeWorker(wIndex);
                           };
 
                           const isLast = arr.length === wIndex + 1;
@@ -541,14 +560,14 @@ export default function ReportTable({
 
                   // ---------------------
                   if (eleType === 'modal' && key === 'meals') {
-                    const mealsArr = theClass['meals'];
+                    const mealsArr = item['meals'];
 
                     const onAdd = () => {
                       if (disabled) {
                         return;
                       }
 
-                      setActiveItem(theClass);
+                      setActiveItem(item);
                       toShowModal_meals();
                     };
 
@@ -572,7 +591,7 @@ export default function ReportTable({
                         )}
                         {mealsArr?.map((meals, wIndex, arr) => {
                           const onRemove = () => {
-                            theClass.removeMeals(wIndex);
+                            item.removeMeals(wIndex);
                           };
 
                           return (
@@ -601,14 +620,14 @@ export default function ReportTable({
 
                   //
                   if (eleType === 'modal' && key === 'licensePlate') {
-                    const licensePlate = theClass['licensePlate'];
+                    const licensePlate = item['licensePlate'];
 
                     const onAdd = () => {
                       if (disabled) {
                         return;
                       }
 
-                      setActiveItem(theClass);
+                      setActiveItem(item);
                       setShowModal_licensePlate(true);
                     };
 

@@ -93,6 +93,9 @@ type TdailyReportContext = {
   identity: Tidentity;
   doCheck: () => void;
   userInfo: TuserDto;
+  //
+  reportItemKeyArr: string[];
+  setReportItemKeyArr: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -338,6 +341,9 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     switchIsEdit,
     reportIsEdit: isReportEdit,
     changeReportDate,
+    //
+    reportItemKeyArr,
+    setReportItemKeyArr,
   } = useReport({ userInfo });
 
   const editReport = async (reportId: string, prevDate: string | undefined) => {
@@ -702,6 +708,9 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     identity,
     doCheck,
     userInfo,
+    //
+    reportItemKeyArr,
+    setReportItemKeyArr,
   };
 
   // ----------------------------------------------------------------------
@@ -1040,10 +1049,6 @@ const panelListCreator = ({
             return panelList_reporter_inEdit02;
           }
 
-          // if (reportInEdit.isReviewedByOther) {
-          //   return panelList_reporter_reviewed;
-          // }
-
           return panelList_reporter_inEdit01;
         } else if (reportInEdit.isAllowToReview) {
           return panelList_reviewer_inEdit_user;
@@ -1057,10 +1062,6 @@ const panelListCreator = ({
       if (!reportInEdit) {
         return panelList_reporter_notInEdit;
       } else {
-        // if (reportInEdit.isReviewedByOther) {
-        //   return panelList_reporter_reviewed;
-        // }
-
         if (isReportEdit) {
           return panelList_reporter_inEdit02;
         }
@@ -1068,44 +1069,6 @@ const panelListCreator = ({
         return panelList_reporter_inEdit01;
       }
     }
-
-    // if (identity === 'reviewer') {
-    //   if (!reportInEdit) {
-    //     return panelList_reporter_notInEdit;
-    //   } else {
-    //     if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-    //       if (isReportEdit) {
-    //         return panelList_reporter_inEdit02;
-    //       }
-
-    //       if (reportInEdit.isReviewedByOther) {
-    //         return panelList_reporter_reviewed;
-    //       }
-
-    //       return panelList_reporter_inEdit01;
-    //     } else if (reportInEdit.isAllowToReview) {
-    //       return panelList_reviewer_inEdit_user;
-    //     }
-
-    //     return [];
-    //   }
-    // }
-
-    // if (identity === 'reporter') {
-    //   if (!reportInEdit) {
-    //     return panelList_reporter_notInEdit;
-    //   } else {
-    //     if (reportInEdit.isReviewedByOther) {
-    //       return panelList_reporter_reviewed;
-    //     }
-
-    //     if (isReportEdit) {
-    //       return panelList_reporter_inEdit02;
-    //     }
-
-    //     return panelList_reporter_inEdit01;
-    //   }
-    // }
 
     return [];
   })();
