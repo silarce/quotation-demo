@@ -136,6 +136,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       itemKeyArr: _.cloneDeep(reportItemKeyArr),
     };
     setTempReportData({ ...tempReportData });
+
+    myAlert.success({ title: '儲存草稿成功' });
   };
 
   const getTempReport = () => {
@@ -156,6 +158,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
     setReport(_.cloneDeep(report));
     setReportItemKeyArr(_.cloneDeep(itemKeyArr));
+    myAlert.success({ title: '取得草稿成功' });
   };
 
   // ---------------------------------------------------------------------
@@ -1121,7 +1124,7 @@ const panelListCreator = ({
     },
     {
       type: 'myButton',
-      label: '草稿',
+      label: '取得草稿',
       onClick: getTempReport,
     },
     {
