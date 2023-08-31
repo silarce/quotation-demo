@@ -37,7 +37,13 @@ type TgetDailyReports = {
 const apiDailyReports = (customParams?: Tparams, controller?: AbortController) => {
   const api = `/daily-reports`;
   const params = {
-    populate: ['employee', 'reviewStatus.reviewerEmployee.jobs', 'isReviewCompleted'],
+    populate: [
+      //
+      'employee',
+      'reviewStatus.reviewerEmployee.jobs',
+      'isReviewCompleted',
+      'items.workers',
+    ],
     sort: 'date',
     order: 'DESC',
     ...customParams,

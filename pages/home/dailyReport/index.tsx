@@ -109,9 +109,11 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const searchQuery = {
     isUserReviewed: router.query.isUserReviewed || '全部',
     date: router.query.date || '',
+    keyWord: router.query.keyWord,
   } as {
     isUserReviewed: (typeof searchObj)['isUserReviewed'];
     date: string;
+    keyWord: string | undefined;
   };
 
   const isMine = router.query.isMine === undefined ? true : router.query.isMine === 'true' ? true : false;
@@ -157,12 +159,14 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const [searchObj, setSearchObj] = useState<{
     isUserReviewed: '全部' | '未檢視' | '已檢視';
     date: string;
-  }>({ isUserReviewed: '全部', date: '' });
+    keyWord: string | undefined;
+  }>({ isUserReviewed: '全部', date: '', keyWord: undefined });
 
   const searchObjToQuery = () => {
     setSearchObj({
       isUserReviewed: searchQuery.isUserReviewed,
       date: searchQuery.date,
+      keyWord: searchQuery.keyWord,
     });
   };
 
@@ -216,6 +220,34 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         },
         isReviewCompleted: { $eq: isReviewCompleted },
         date: { $eq: searchQuery?.date || undefined },
+        $or: {
+          'reviewStatus.reviewerEmployee.chName': { $contains: searchQuery.keyWord || undefined },
+          'reviewStatus.reviewerEmployee.enName': { $contains: searchQuery.keyWord || undefined },
+          'reviewStatus.reviewerEmployee.jobs.name': { $contains: searchQuery.keyWord || undefined },
+          // 不是數字會壞掉
+          // 'reviewStatus.reviewerEmployee.jobs.grade': { $contains: searchQuery.keyWord || undefined },
+          //
+          'employee.chName': { $contains: searchQuery.keyWord || undefined },
+          'employee.enName': { $contains: searchQuery.keyWord || undefined },
+          'employee.jobs.name': { $contains: searchQuery.keyWord || undefined },
+          // 不是數字會壞掉
+          // 'employee.jobs.grade': { $contains: searchQuery.keyWord || undefined },
+          //
+          // 'items.periodOfDay': { $contains: searchQuery.keyWord || undefined },
+          'items.customerName': { $contains: searchQuery.keyWord || undefined },
+          'items.contactName': { $contains: searchQuery.keyWord || undefined },
+          // 'items.order': { $contains: searchQuery.keyWord || undefined },
+          // 'items.meals': { $contains: searchQuery.keyWord || undefined },
+          'items.description': { $contains: searchQuery.keyWord || undefined },
+          // 'items.departureTime': { $contains: searchQuery.keyWord || undefined },
+          // 'items.arrivalTime': { $contains: searchQuery.keyWord || undefined },
+          // 'items.departureWorksiteTime': { $contains: searchQuery.keyWord || undefined },
+          'items.licensePlate': { $contains: searchQuery.keyWord || undefined },
+          // 'items.stayLength': { $contains: searchQuery.keyWord || undefined },
+          'items.workOrderNumber': { $contains: searchQuery.keyWord || undefined },
+          'items.workers.chName': { $contains: searchQuery.keyWord || undefined },
+          'items.workers.enName': { $contains: searchQuery.keyWord || undefined },
+        },
       },
     };
   })();
@@ -278,6 +310,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setSearchObj({
       isUserReviewed: (router.query.isUserReviewed ?? '全部') as (typeof searchObj)['isUserReviewed'],
       date: (router.query.date ?? '') as string,
+      keyWord: router.query.keyWord as string | undefined,
     });
     cancelEditNewDailyReport();
 
@@ -305,7 +338,14 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   useEffect(() => {
     toUpdateDailyReports();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery.isUserReviewed, searchQuery.date, isMine, isCalendar]);
+  }, [
+    searchQuery.isUserReviewed,
+    searchQuery.date,
+    searchQuery.keyWord,
+    //
+    isMine,
+    isCalendar,
+  ]);
 
   useEffect(() => {
     if (!dailyReportArr) {
@@ -322,6 +362,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setSearchObj({
       isUserReviewed: '全部',
       date: '',
+      keyWord: undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMine]);
@@ -611,11 +652,16 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setSearchObj((obj) => ({ ...obj, date: v }));
   };
 
+  const onChange_keyWord = (v: string) => {
+    setSearchObj((obj) => ({ ...obj, keyWord: v }));
+  };
+
   const doSearch = () => {
     router.push({
       query: {
         isUserReviewed: searchObj.isUserReviewed,
         date: searchObj.date,
+        keyWord: searchObj.keyWord,
         isMine,
         isCalendar,
       },
@@ -626,7 +672,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     <SearchBar
       inputSelPropsArr={[
         {
-          wrapperStyle: { width: '110px' },
+          wrapperStyle: { width: '60px' },
           selectProps: {
             easyValue: searchObj?.isUserReviewed,
             props: {
@@ -644,6 +690,18 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
               value: searchObj?.date ? moment(searchObj?.date) : null,
               onChange: (m) => {
                 onChange_date(m?.toISOString() || '');
+              },
+            },
+          },
+        },
+        {
+          wrapperStyle: { width: '75px' },
+          inputProps: {
+            props: {
+              value: searchObj?.keyWord ?? '',
+              placeholder: '關鍵字',
+              onChange: (e) => {
+                onChange_keyWord(e.target.value);
               },
             },
           },
