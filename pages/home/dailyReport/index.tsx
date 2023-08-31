@@ -26,6 +26,7 @@ import CheckButton from 'components/global/gear/button/checkButton';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import SearchBar from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
 
 // antd
 import { Badge } from 'antd';
@@ -206,8 +207,6 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       isReviewCompleted = undefined;
     }
 
-    const date = yearConversion_chToStandard(searchQuery?.date) || undefined;
-
     return {
       filter: {
         'employee.id': filterIsMine,
@@ -216,7 +215,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
           'reviewStatus.reviewerEmployee.id': { $eq: userId },
         },
         isReviewCompleted: { $eq: isReviewCompleted },
-        date: { $eq: date },
+        date: { $eq: searchQuery?.date || undefined },
       },
     };
   })();
@@ -558,62 +557,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  const onChange_isUserReviewed = (v: string) => {
-    setSearchObj((obj) => ({
-      ...obj,
-      isUserReviewed: v as (typeof searchObj)['isUserReviewed'],
-    }));
-  };
 
-  const onChange_date = (v: string) => {
-    setSearchObj((obj) => ({ ...obj, date: v }));
-  };
-
-  const searchTargetList = (() => {
-    const arr = [
-      {
-        options: reportedAtOptions,
-        width: '110px',
-        value: searchObj?.isUserReviewed,
-        onChange: onChange_isUserReviewed,
-      },
-      {
-        placeholder: '搜尋日期',
-        width: '80px',
-        value: searchObj?.date,
-        onChange: onChange_date,
-      },
-    ];
-
-    return arr;
-  })();
-
-  const doSearch: TdoSearch = () => {
-    if (searchObj.date) {
-      const date = yearConversion_chToStandard(searchObj.date);
-
-      if (!date) {
-        return myAlert.warning({ title: '搜尋時間格式錯誤', content: '例:101-01-01' });
-      }
-    }
-
-    router.push({
-      query: {
-        isUserReviewed: searchObj.isUserReviewed,
-        date: searchObj.date,
-        isMine,
-        isCalendar,
-      },
-    });
-  }; // doSearch
-
-  const searchGroup: TsearchGroup = {
-    searchTargetList,
-    doSearch,
-    controlled: true,
-  };
-
-  // ---------------------------
   const doCheck = async () => {
     if (reportInEdit?.isReviewedByUser === true) {
       return myAlert.warning({ title: '已檢視過' });
@@ -654,6 +598,61 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     }
   };
 
+  // -------------------------------
+
+  const onChange_isUserReviewed = (v: string) => {
+    setSearchObj((obj) => ({
+      ...obj,
+      isUserReviewed: v as (typeof searchObj)['isUserReviewed'],
+    }));
+  };
+
+  const onChange_date = (v: string) => {
+    setSearchObj((obj) => ({ ...obj, date: v }));
+  };
+
+  const doSearch = () => {
+    router.push({
+      query: {
+        isUserReviewed: searchObj.isUserReviewed,
+        date: searchObj.date,
+        isMine,
+        isCalendar,
+      },
+    });
+  }; // doSearch
+
+  const customSearchBar = (
+    <SearchBar
+      inputSelPropsArr={[
+        {
+          wrapperStyle: { width: '110px' },
+          selectProps: {
+            easyValue: searchObj?.isUserReviewed,
+            props: {
+              options: reportedAtOptions,
+              onChange: (option) => {
+                onChange_isUserReviewed(option!.value);
+              },
+            },
+          },
+        },
+        {
+          wrapperStyle: { width: '130px' },
+          datePickerProps: {
+            props: {
+              value: searchObj?.date ? moment(searchObj?.date) : null,
+              onChange: (m) => {
+                onChange_date(m?.toISOString() || '');
+              },
+            },
+          },
+        },
+      ]}
+      onClick={doSearch}
+    />
+  );
+
   const { panelList } = panelListCreator({
     reportInEdit,
     doCheck,
@@ -662,13 +661,13 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     dailyReportArr: dailyReportArr ?? [],
     isCalendar,
     router,
-    searchGroup,
     editRivewerPickArr,
     editReport_today,
     identity,
     isReportEdit,
     userInfo,
     dailyReport_calendar,
+    customSearchBar,
   });
 
   // ----------------------------------------------------------------------
@@ -772,7 +771,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         {/* mobile */}
         <SearchDrawer
           visible={showSearchDrawer}
-          onSearch={doSearch}
+          onSearch={doSearch} // 除了清空搜尋資料外似乎沒有作用
           onCancel={closeShowDrawer}
           searchObj={searchObj}
           onChange_isUserReviewed={onChange_isUserReviewed}
@@ -908,13 +907,14 @@ const panelListCreator = ({
   dailyReportArr,
   isCalendar,
   router,
-  searchGroup,
   editRivewerPickArr,
   editReport_today,
   identity,
   isReportEdit,
   userInfo,
   dailyReport_calendar,
+  //
+  customSearchBar,
 }: {
   reportInEdit: ThookEmptyReport | undefined;
   doCheck: () => void;
@@ -923,13 +923,14 @@ const panelListCreator = ({
   dailyReportArr: TdailyReportDto[] | undefined;
   isCalendar: boolean;
   router: NextRouter;
-  searchGroup: TsearchGroup;
   editRivewerPickArr: () => void;
   editReport_today: (prevDate: string) => void;
   identity: Tidentity;
   isReportEdit: boolean;
   userInfo: TuserDto;
   dailyReport_calendar: TdailyReportDto[] | undefined;
+  //
+  customSearchBar: JSX.Element;
 }) => {
   const listSwitchButton: TpanelList[number] = {
     type: 'myButton',
@@ -947,7 +948,9 @@ const panelListCreator = ({
 
   /**manager 檢視人員設定 */
   const panelList_manager_notInEdit: TpanelList = [
-    { searchGroup },
+    {
+      custom: customSearchBar,
+    },
     {
       type: 'myButton',
       label: '檢視人員設定',
@@ -958,7 +961,9 @@ const panelListCreator = ({
 
   /**reporter 新增回報 */
   const panelList_reporter_notInEdit: TpanelList = [
-    { searchGroup },
+    {
+      custom: customSearchBar,
+    },
     {
       type: 'myButton',
       label: '新增回報',
