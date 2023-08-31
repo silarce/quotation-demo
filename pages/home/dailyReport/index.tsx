@@ -131,12 +131,23 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     }
 
     const reportId = reportInEdit.id || 'new';
-    tempReportData[reportId] = {
+    //
+
+    // tempReportData[reportId] = {
+    //   report: _.cloneDeep(reportInEdit),
+    //   itemKeyArr: _.cloneDeep(reportItemKeyArr),
+    // };
+    // setTempReportData({ ...tempReportData });
+
+    const copy = _.cloneDeep(tempReportData);
+
+    copy[reportId] = {
       report: _.cloneDeep(reportInEdit),
       itemKeyArr: _.cloneDeep(reportItemKeyArr),
     };
-    setTempReportData({ ...tempReportData });
+    setTempReportData(copy);
 
+    //
     myAlert.success({ title: '儲存草稿成功' });
   };
 
