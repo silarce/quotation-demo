@@ -131,18 +131,18 @@ class Class_reportItem {
     return this._meals;
   }
 
-  addMeals = (v: TdailyReportItemDto['meals'][number]) => {
+  addMeals(v: TdailyReportItemDto['meals'][number]) {
     if (this._meals.includes(v)) {
       return;
     }
 
     this._meals.push(v);
     this._reRender();
-  };
-  removeMeals = (index: number) => {
+  }
+  removeMeals(index: number) {
     this._meals?.splice(index, 1);
     this._reRender();
-  };
+  }
 
   get description() {
     return this._item.description;
@@ -204,14 +204,16 @@ class Class_reportItem {
   get workers() {
     return this._workers;
   }
-  addWorker = (v: TdailyReportWokerDto) => {
-    this._workers.push(v);
+
+  addWorker(v: TdailyReportWokerDto[]) {
+    this._workers = [...this._workers, ...v];
     this._reRender();
-  };
-  removeWorker = (index: number) => {
+  }
+
+  removeWorker(index: number) {
     this._workers?.splice(index, 1);
     this._reRender();
-  };
+  }
 
   get postBody(): TcreateDailyReportItemDto {
     const workerIdArr = (() => {

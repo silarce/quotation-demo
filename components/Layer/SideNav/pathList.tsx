@@ -118,6 +118,17 @@ const sidePathList: TsidePathList = {
                 idNumber: ['EM-10902-01'], // 會計的帳號(只在正式環境中)
               },
             },
+            {
+              label: '審核設定',
+              path: path01 + '/reviewerSetting',
+              erpFeature: 'allPass',
+              // otherPermissions: {
+              //   grade: 14,
+              // },
+              exception: {
+                idNumber: ['EM-10902-01'], // 會計的帳號(只在正式環境中)
+              },
+            },
           ],
         },
       ],

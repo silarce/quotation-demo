@@ -131,11 +131,24 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     }
 
     const reportId = reportInEdit.id || 'new';
-    tempReportData[reportId] = {
+    //
+
+    // tempReportData[reportId] = {
+    //   report: _.cloneDeep(reportInEdit),
+    //   itemKeyArr: _.cloneDeep(reportItemKeyArr),
+    // };
+    // setTempReportData({ ...tempReportData });
+
+    const copy = _.cloneDeep(tempReportData);
+
+    copy[reportId] = {
       report: _.cloneDeep(reportInEdit),
       itemKeyArr: _.cloneDeep(reportItemKeyArr),
     };
-    setTempReportData({ ...tempReportData });
+    setTempReportData(copy);
+
+    //
+    myAlert.success({ title: '儲存草稿成功' });
   };
 
   const getTempReport = () => {
@@ -156,6 +169,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
     setReport(_.cloneDeep(report));
     setReportItemKeyArr(_.cloneDeep(itemKeyArr));
+    myAlert.success({ title: '取得草稿成功' });
   };
 
   // ---------------------------------------------------------------------
@@ -1121,7 +1135,7 @@ const panelListCreator = ({
     },
     {
       type: 'myButton',
-      label: '草稿',
+      label: '取得草稿',
       onClick: getTempReport,
     },
     {
