@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import _ from 'lodash';
-
+import _, { set } from 'lodash';
+import { nanoid } from 'nanoid';
 // type
 import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from 'js/api/dtoTypes';
 // api
@@ -12,7 +12,9 @@ import { TcreateDailyReportItemDto, TdailyReportDto } from 'js/api/api_dailyRepo
 type ThookEmptyReport = {
   id: string | undefined;
   date: string | null;
-  items: Class_reportItem[];
+  itemList: {
+    [key: string]: Class_reportItem;
+  };
   isAllowToReview: boolean;
   isReviewedByOther: boolean;
   isReviewedByUser: boolean;
@@ -59,18 +61,31 @@ const emptyReportItem: TemptyReportItem = {
 
 /**不送dailyReportItem參數會自動送進emptyDailyReportItem */
 class Class_reportItem {
-  constructor(reRender: () => void, reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)) {
+  // constructor(reRender: () => void, reportItem: TemptyReportItem = _.cloneDeep(emptyReportItem)) {
+  constructor({
+    reRender,
+    reportItem = _.cloneDeep(emptyReportItem),
+    delSelf,
+  }: {
+    reRender: () => void;
+    reportItem?: TemptyReportItem;
+    delSelf: () => void;
+  }) {
     this._reRender = reRender;
     this._item = reportItem;
     this._stayLength = `${this._item.stayLength || 0}`;
     this._workers = (reportItem.workers || []) as TdailyReportWokerDto[];
     this._meals = (reportItem.meals || []) as TdailyReportItemDto['meals'];
+
+    this.delSelf = delSelf;
   } // constructor
   private _reRender;
   private _item;
   private _stayLength;
   private _workers;
   private _meals;
+
+  delSelf;
 
   get id() {
     if ('id' in this._item) {
@@ -244,22 +259,60 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
   const [report, setReport] = useState<ThookEmptyReport>();
   const [reportTemp, setReportTemp] = useState<ThookEmptyReport>();
 
+  const [reportItemKeyArr, setReportItemKeyArr] = useState<string[]>([]);
+
   // ------------------------------------------------------------------
-  const emptyReportCre = (): ThookEmptyReport => ({
-    id: undefined,
-    // date: moment().toISOString(),
-    date: null,
-    items: [new Class_reportItem(reRender)],
-    isAllowToReview: false,
-    isReviewedByOther: false,
-    isReviewedByUser: false,
-    isReviewCompleted: false,
-    isUserIsViewer: false,
-    isEdit: true,
-    employeeId: undefined,
-    employeeChName: userInfo.employee?.chName || '',
-    prevDate: undefined,
-  }); // emptyReportCre
+  const emptyReportCre = (): ThookEmptyReport => {
+    const obj: ThookEmptyReport = {
+      id: undefined,
+      date: null,
+      itemList: {},
+      isAllowToReview: false,
+      isReviewedByOther: false,
+      isReviewedByUser: false,
+      isReviewCompleted: false,
+      isUserIsViewer: false,
+      isEdit: true,
+      employeeId: undefined,
+      employeeChName: userInfo.employee?.chName || '',
+      prevDate: undefined,
+    };
+
+    // obj.itemList.firEmpty = new Class_reportItem({
+    //   reRender,
+    //   delSelf: () => {
+    //     setReportItemKeyArr((arr) => {
+    //       const index = arr.indexOf('firEmpty');
+    //       arr.splice(index, 1);
+
+    //       return [...arr];
+    //     });
+
+    //     delete obj?.itemList?.firEmpty;
+    //     reRender();
+    //   },
+    // });
+    obj.itemList = {
+      firEmpty: new Class_reportItem({
+        reRender,
+        delSelf: () => {
+          setReportItemKeyArr((arr) => {
+            const index = arr.indexOf('firEmpty');
+            arr.splice(index, 1);
+
+            return [...arr];
+          });
+
+          delete obj?.itemList?.firEmpty;
+          reRender();
+        },
+      }),
+    };
+
+    setReportItemKeyArr(['firEmpty']);
+
+    return obj;
+  }; // emptyReportCre
 
   // 建立編輯日報表
   const reNew_report = ({
@@ -307,10 +360,38 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
 
     const sortedItems = _.sortBy(dailyReport.items, 'arrivalTime');
 
+    //
     const theReport: ThookEmptyReport = {
       id: dailyReport.id,
       date: dailyReport.date,
-      items: sortedItems.map((item) => new Class_reportItem(reRender, item)),
+      itemList: (() => {
+        const list: ThookEmptyReport['itemList'] = {};
+
+        const keyArr: string[] = [];
+        sortedItems.forEach((item) => {
+          const id = item.id || nanoid();
+          keyArr.push(id);
+          list[id] = new Class_reportItem({
+            reRender,
+            reportItem: item,
+
+            delSelf: () => {
+              setReportItemKeyArr((arr) => {
+                const index = arr.indexOf(id);
+                arr.splice(index, 1);
+
+                return [...arr];
+              });
+
+              delete list[id];
+              reRender();
+            },
+          });
+        });
+        setReportItemKeyArr(keyArr);
+
+        return list;
+      })(),
       isAllowToReview,
       isReviewedByOther: isReviewedByOther,
       isReviewedByUser,
@@ -320,32 +401,35 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       employeeId: dailyReport.employee?.id,
       employeeChName: dailyReport.employee?.chName,
       prevDate: prevDate,
+      //
     };
+
     setReport(theReport);
+
+    //
   }; // reNew_report
 
   //
   const addReportItem = () => {
+    const newItemid = nanoid();
+
     setReport((report) => {
       if (!report) {
         return report;
       }
 
-      const items = report.items;
-      items.push(new Class_reportItem(reRender));
+      report.itemList[newItemid] = new Class_reportItem({
+        reRender,
+        delSelf: () => {
+          delete report?.itemList[newItemid];
+          reRender();
+        },
+      });
+      setReportItemKeyArr((arr) => {
+        arr.push(newItemid);
 
-      return { ...report };
-    });
-  };
-
-  const removeReportItem = (index: number) => {
-    setReport((report) => {
-      if (!report) {
-        return report;
-      }
-
-      const items = report.items;
-      items.splice(index, 1);
+        return [...arr];
+      });
 
       return { ...report };
     });
@@ -426,11 +510,14 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
     setReport,
     reNew_report,
     addReportItem,
-    removeReportItem,
+    // removeReportItem,
     changeReviewToChecked,
     switchIsEdit,
     changeReportDate,
     reportIsEdit,
+    //
+    reportItemKeyArr,
+    setReportItemKeyArr,
   };
 };
 

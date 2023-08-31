@@ -26,6 +26,7 @@ import CheckButton from 'components/global/gear/button/checkButton';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import SearchBar from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
 
 // antd
 import { Badge } from 'antd';
@@ -34,7 +35,6 @@ import { Badge } from 'antd';
 import { Class_reportItem, useReport, ThookEmptyReport } from 'hooks/home/useDailyReport';
 
 // tool
-import { yearConversion_chToStandard } from 'js/tools/date/yearConversion_chToStandard';
 import { filterCre_nextAndPrevMonth } from 'js/utils/helpers/params/filterCreator';
 
 // icon
@@ -43,6 +43,7 @@ import iconMenu from 'public/image/icon/menu.svg';
 // api
 import {
   TdailyReportDto,
+  TcreateDailyReportItemDto,
   Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
@@ -58,7 +59,6 @@ import { TemployeeDto, useEmployee } from 'js/api/api_employee';
 
 // type
 import { TuserDto } from 'js/api/dtoTypes';
-import { TdoSearch, TsearchGroup } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // css
 import scss from './dailyReport.module.scss';
@@ -93,6 +93,9 @@ type TdailyReportContext = {
   identity: Tidentity;
   doCheck: () => void;
   userInfo: TuserDto;
+  //
+  reportItemKeyArr: string[];
+  setReportItemKeyArr: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -105,11 +108,58 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const searchQuery = {
     isUserReviewed: router.query.isUserReviewed || '全部',
     date: router.query.date || '',
+    keyWord: router.query.keyWord,
   } as {
     isUserReviewed: (typeof searchObj)['isUserReviewed'];
     date: string;
+    keyWord: string | undefined;
   };
 
+  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
+
+  const [tempReportData, setTempReportData] = useState<{
+    [key: string]: {
+      report: ThookEmptyReport;
+      itemKeyArr: string[];
+    };
+  }>({});
+
+  const saveTempReport = () => {
+    if (!reportInEdit) {
+      return;
+    }
+
+    const reportId = reportInEdit.id || 'new';
+    tempReportData[reportId] = {
+      report: _.cloneDeep(reportInEdit),
+      itemKeyArr: _.cloneDeep(reportItemKeyArr),
+    };
+    setTempReportData({ ...tempReportData });
+  };
+
+  const getTempReport = () => {
+    if (!reportInEdit) {
+      return;
+    }
+
+    const reportId = reportInEdit?.id || 'new';
+    const temp = tempReportData[reportId];
+
+    if (!temp) {
+      myAlert.info({ title: '該日報表無草稿' });
+
+      return;
+    }
+
+    const { report, itemKeyArr } = temp;
+
+    setReport(_.cloneDeep(report));
+    setReportItemKeyArr(_.cloneDeep(itemKeyArr));
+  };
+
+  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
   const isMine = router.query.isMine === undefined ? true : router.query.isMine === 'true' ? true : false;
   const isCalendar = router.query.isCalendar === 'true' ? true : false;
 
@@ -153,12 +203,14 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const [searchObj, setSearchObj] = useState<{
     isUserReviewed: '全部' | '未檢視' | '已檢視';
     date: string;
-  }>({ isUserReviewed: '全部', date: '' });
+    keyWord: string | undefined;
+  }>({ isUserReviewed: '全部', date: '', keyWord: undefined });
 
   const searchObjToQuery = () => {
     setSearchObj({
       isUserReviewed: searchQuery.isUserReviewed,
       date: searchQuery.date,
+      keyWord: searchQuery.keyWord,
     });
   };
 
@@ -203,8 +255,6 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       isReviewCompleted = undefined;
     }
 
-    const date = yearConversion_chToStandard(searchQuery?.date) || undefined;
-
     return {
       filter: {
         'employee.id': filterIsMine,
@@ -213,7 +263,35 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
           'reviewStatus.reviewerEmployee.id': { $eq: userId },
         },
         isReviewCompleted: { $eq: isReviewCompleted },
-        date: { $eq: date },
+        date: { $eq: searchQuery?.date || undefined },
+        $or: {
+          'reviewStatus.reviewerEmployee.chName': { $contains: searchQuery.keyWord || undefined },
+          'reviewStatus.reviewerEmployee.enName': { $contains: searchQuery.keyWord || undefined },
+          'reviewStatus.reviewerEmployee.jobs.name': { $contains: searchQuery.keyWord || undefined },
+          // 不是數字會壞掉
+          // 'reviewStatus.reviewerEmployee.jobs.grade': { $contains: searchQuery.keyWord || undefined },
+          //
+          'employee.chName': { $contains: searchQuery.keyWord || undefined },
+          'employee.enName': { $contains: searchQuery.keyWord || undefined },
+          'employee.jobs.name': { $contains: searchQuery.keyWord || undefined },
+          // 不是數字會壞掉
+          // 'employee.jobs.grade': { $contains: searchQuery.keyWord || undefined },
+          //
+          // 'items.periodOfDay': { $contains: searchQuery.keyWord || undefined },
+          'items.customerName': { $contains: searchQuery.keyWord || undefined },
+          'items.contactName': { $contains: searchQuery.keyWord || undefined },
+          // 'items.order': { $contains: searchQuery.keyWord || undefined },
+          // 'items.meals': { $contains: searchQuery.keyWord || undefined },
+          'items.description': { $contains: searchQuery.keyWord || undefined },
+          // 'items.departureTime': { $contains: searchQuery.keyWord || undefined },
+          // 'items.arrivalTime': { $contains: searchQuery.keyWord || undefined },
+          // 'items.departureWorksiteTime': { $contains: searchQuery.keyWord || undefined },
+          'items.licensePlate': { $contains: searchQuery.keyWord || undefined },
+          // 'items.stayLength': { $contains: searchQuery.keyWord || undefined },
+          'items.workOrderNumber': { $contains: searchQuery.keyWord || undefined },
+          'items.workers.chName': { $contains: searchQuery.keyWord || undefined },
+          'items.workers.enName': { $contains: searchQuery.keyWord || undefined },
+        },
       },
     };
   })();
@@ -276,6 +354,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setSearchObj({
       isUserReviewed: (router.query.isUserReviewed ?? '全部') as (typeof searchObj)['isUserReviewed'],
       date: (router.query.date ?? '') as string,
+      keyWord: router.query.keyWord as string | undefined,
     });
     cancelEditNewDailyReport();
 
@@ -303,7 +382,14 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   useEffect(() => {
     toUpdateDailyReports();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery.isUserReviewed, searchQuery.date, isMine, isCalendar]);
+  }, [
+    searchQuery.isUserReviewed,
+    searchQuery.date,
+    searchQuery.keyWord,
+    //
+    isMine,
+    isCalendar,
+  ]);
 
   useEffect(() => {
     if (!dailyReportArr) {
@@ -320,6 +406,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setSearchObj({
       isUserReviewed: '全部',
       date: '',
+      keyWord: undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMine]);
@@ -333,11 +420,14 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setReport,
     reNew_report,
     addReportItem: addDailyReportItem,
-    removeReportItem: removeDailyReportItem,
+    // removeReportItem: removeDailyReportItem,
     changeReviewToChecked,
     switchIsEdit,
     reportIsEdit: isReportEdit,
     changeReportDate,
+    //
+    reportItemKeyArr,
+    setReportItemKeyArr,
   } = useReport({ userInfo });
 
   const editReport = async (reportId: string, prevDate: string | undefined) => {
@@ -477,7 +567,12 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return myAlert.warning({ title: '請選擇日期' });
     }
 
-    const items = reportInEdit.items.map((item) => {
+    const arr = reportItemKeyArr.map((key) => {
+      return reportInEdit.itemList[key];
+    });
+
+    // const items = Object.values(reportInEdit.itemList).map((item) => {
+    const items = arr.map((item) => {
       const year = new Date(theDate).getFullYear();
       const month = new Date(theDate).getMonth();
       const th = new Date(theDate).getDate();
@@ -547,62 +642,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  const onChange_isUserReviewed = (v: string) => {
-    setSearchObj((obj) => ({
-      ...obj,
-      isUserReviewed: v as (typeof searchObj)['isUserReviewed'],
-    }));
-  };
 
-  const onChange_date = (v: string) => {
-    setSearchObj((obj) => ({ ...obj, date: v }));
-  };
-
-  const searchTargetList = (() => {
-    const arr = [
-      {
-        options: reportedAtOptions,
-        width: '110px',
-        value: searchObj?.isUserReviewed,
-        onChange: onChange_isUserReviewed,
-      },
-      {
-        placeholder: '搜尋日期',
-        width: '80px',
-        value: searchObj?.date,
-        onChange: onChange_date,
-      },
-    ];
-
-    return arr;
-  })();
-
-  const doSearch: TdoSearch = () => {
-    if (searchObj.date) {
-      const date = yearConversion_chToStandard(searchObj.date);
-
-      if (!date) {
-        return myAlert.warning({ title: '搜尋時間格式錯誤', content: '例:101-01-01' });
-      }
-    }
-
-    router.push({
-      query: {
-        isUserReviewed: searchObj.isUserReviewed,
-        date: searchObj.date,
-        isMine,
-        isCalendar,
-      },
-    });
-  }; // doSearch
-
-  const searchGroup: TsearchGroup = {
-    searchTargetList,
-    doSearch,
-    controlled: true,
-  };
-
-  // ---------------------------
   const doCheck = async () => {
     if (reportInEdit?.isReviewedByUser === true) {
       return myAlert.warning({ title: '已檢視過' });
@@ -643,6 +683,78 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     }
   };
 
+  // -------------------------------
+
+  const onChange_isUserReviewed = (v: string) => {
+    setSearchObj((obj) => ({
+      ...obj,
+      isUserReviewed: v as (typeof searchObj)['isUserReviewed'],
+    }));
+  };
+
+  const onChange_date = (v: string) => {
+    setSearchObj((obj) => ({ ...obj, date: v }));
+  };
+
+  const onChange_keyWord = (v: string) => {
+    setSearchObj((obj) => ({ ...obj, keyWord: v }));
+  };
+
+  const doSearch = () => {
+    router.push({
+      query: {
+        isUserReviewed: searchObj.isUserReviewed,
+        date: searchObj.date,
+        keyWord: searchObj.keyWord,
+        isMine,
+        isCalendar,
+      },
+    });
+  }; // doSearch
+
+  const customSearchBar = (
+    <SearchBar
+      inputSelPropsArr={[
+        {
+          wrapperStyle: { width: '60px' },
+          selectProps: {
+            easyValue: searchObj?.isUserReviewed,
+            props: {
+              options: reportedAtOptions,
+              onChange: (option) => {
+                onChange_isUserReviewed(option!.value);
+              },
+            },
+          },
+        },
+        {
+          wrapperStyle: { width: '130px' },
+          datePickerProps: {
+            props: {
+              value: searchObj?.date ? moment(searchObj?.date) : null,
+              onChange: (m) => {
+                onChange_date(m?.toISOString() || '');
+              },
+            },
+          },
+        },
+        {
+          wrapperStyle: { width: '75px' },
+          inputProps: {
+            props: {
+              value: searchObj?.keyWord ?? '',
+              placeholder: '關鍵字',
+              onChange: (e) => {
+                onChange_keyWord(e.target.value);
+              },
+            },
+          },
+        },
+      ]}
+      onClick={doSearch}
+    />
+  );
+
   const { panelList } = panelListCreator({
     reportInEdit,
     doCheck,
@@ -651,13 +763,15 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     dailyReportArr: dailyReportArr ?? [],
     isCalendar,
     router,
-    searchGroup,
     editRivewerPickArr,
     editReport_today,
     identity,
     isReportEdit,
     userInfo,
     dailyReport_calendar,
+    customSearchBar,
+    saveTempReport,
+    getTempReport,
   });
 
   // ----------------------------------------------------------------------
@@ -702,6 +816,9 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     identity,
     doCheck,
     userInfo,
+    //
+    reportItemKeyArr,
+    setReportItemKeyArr,
   };
 
   // ----------------------------------------------------------------------
@@ -749,13 +866,16 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         )}
 
         <DailyReportContext.Provider value={dailyReportContextValue}>
-          <ReportTable addDailyReportItem={addDailyReportItem} removeDailyReportItem={removeDailyReportItem} />
+          <ReportTable
+            addDailyReportItem={addDailyReportItem}
+            //  removeDailyReportItem={removeDailyReportItem}
+          />
         </DailyReportContext.Provider>
 
         {/* mobile */}
         <SearchDrawer
           visible={showSearchDrawer}
-          onSearch={doSearch}
+          onSearch={doSearch} // 除了清空搜尋資料外似乎沒有作用
           onCancel={closeShowDrawer}
           searchObj={searchObj}
           onChange_isUserReviewed={onChange_isUserReviewed}
@@ -891,13 +1011,16 @@ const panelListCreator = ({
   dailyReportArr,
   isCalendar,
   router,
-  searchGroup,
   editRivewerPickArr,
   editReport_today,
   identity,
   isReportEdit,
   userInfo,
   dailyReport_calendar,
+  //
+  customSearchBar,
+  saveTempReport,
+  getTempReport,
 }: {
   reportInEdit: ThookEmptyReport | undefined;
   doCheck: () => void;
@@ -906,13 +1029,16 @@ const panelListCreator = ({
   dailyReportArr: TdailyReportDto[] | undefined;
   isCalendar: boolean;
   router: NextRouter;
-  searchGroup: TsearchGroup;
   editRivewerPickArr: () => void;
   editReport_today: (prevDate: string) => void;
   identity: Tidentity;
   isReportEdit: boolean;
   userInfo: TuserDto;
   dailyReport_calendar: TdailyReportDto[] | undefined;
+  //
+  customSearchBar: JSX.Element;
+  saveTempReport: () => void;
+  getTempReport: () => void;
 }) => {
   const listSwitchButton: TpanelList[number] = {
     type: 'myButton',
@@ -930,7 +1056,9 @@ const panelListCreator = ({
 
   /**manager 檢視人員設定 */
   const panelList_manager_notInEdit: TpanelList = [
-    { searchGroup },
+    {
+      custom: customSearchBar,
+    },
     {
       type: 'myButton',
       label: '檢視人員設定',
@@ -941,7 +1069,9 @@ const panelListCreator = ({
 
   /**reporter 新增回報 */
   const panelList_reporter_notInEdit: TpanelList = [
-    { searchGroup },
+    {
+      custom: customSearchBar,
+    },
     {
       type: 'myButton',
       label: '新增回報',
@@ -984,6 +1114,16 @@ const panelListCreator = ({
 
   /**reporter 上傳 取消 */
   const panelList_reporter_inEdit02: TpanelList = [
+    {
+      type: 'myButton',
+      label: '儲存草稿',
+      onClick: saveTempReport,
+    },
+    {
+      type: 'myButton',
+      label: '草稿',
+      onClick: getTempReport,
+    },
     {
       type: 'redButton',
       label: '上傳',
@@ -1037,10 +1177,6 @@ const panelListCreator = ({
             return panelList_reporter_inEdit02;
           }
 
-          // if (reportInEdit.isReviewedByOther) {
-          //   return panelList_reporter_reviewed;
-          // }
-
           return panelList_reporter_inEdit01;
         } else if (reportInEdit.isAllowToReview) {
           return panelList_reviewer_inEdit_user;
@@ -1054,10 +1190,6 @@ const panelListCreator = ({
       if (!reportInEdit) {
         return panelList_reporter_notInEdit;
       } else {
-        // if (reportInEdit.isReviewedByOther) {
-        //   return panelList_reporter_reviewed;
-        // }
-
         if (isReportEdit) {
           return panelList_reporter_inEdit02;
         }
@@ -1065,44 +1197,6 @@ const panelListCreator = ({
         return panelList_reporter_inEdit01;
       }
     }
-
-    // if (identity === 'reviewer') {
-    //   if (!reportInEdit) {
-    //     return panelList_reporter_notInEdit;
-    //   } else {
-    //     if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-    //       if (isReportEdit) {
-    //         return panelList_reporter_inEdit02;
-    //       }
-
-    //       if (reportInEdit.isReviewedByOther) {
-    //         return panelList_reporter_reviewed;
-    //       }
-
-    //       return panelList_reporter_inEdit01;
-    //     } else if (reportInEdit.isAllowToReview) {
-    //       return panelList_reviewer_inEdit_user;
-    //     }
-
-    //     return [];
-    //   }
-    // }
-
-    // if (identity === 'reporter') {
-    //   if (!reportInEdit) {
-    //     return panelList_reporter_notInEdit;
-    //   } else {
-    //     if (reportInEdit.isReviewedByOther) {
-    //       return panelList_reporter_reviewed;
-    //     }
-
-    //     if (isReportEdit) {
-    //       return panelList_reporter_inEdit02;
-    //     }
-
-    //     return panelList_reporter_inEdit01;
-    //   }
-    // }
 
     return [];
   })();
