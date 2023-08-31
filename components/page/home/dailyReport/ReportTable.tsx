@@ -51,11 +51,17 @@ import {
   DraggableAttributes,
 } from '@dnd-kit/core';
 
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  // horizontalListSortingStrategy
+} from '@dnd-kit/sortable';
 
 import {
   restrictToVerticalAxis,
-  //  restrictToHorizontalAxis, restrictToWindowEdges
+  // restrictToHorizontalAxis,
+  // restrictToWindowEdges
 } from '@dnd-kit/modifiers';
 
 import { useSortable } from '@dnd-kit/sortable';
@@ -740,7 +746,7 @@ export default function ReportTable({
         {/*  */}
         <div className={classNames(scss.thead)}>
           {/*  */}
-          <div className={classNames(scss.cell, 'row-span-6')}></div>
+          <div className={classNames(scss.cell, scss.empty, 'row-span-6')}></div>
           {/*  */}
           {theHeaderKeyArr.map((key) => {
             let { headerClassName_mobile } = config[key] ?? {};

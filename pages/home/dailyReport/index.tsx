@@ -59,7 +59,6 @@ import { TemployeeDto, useEmployee } from 'js/api/api_employee';
 
 // type
 import { TuserDto } from 'js/api/dtoTypes';
-import { TdoSearch, TsearchGroup } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // css
 import scss from './dailyReport.module.scss';

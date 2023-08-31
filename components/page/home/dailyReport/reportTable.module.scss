@@ -103,6 +103,9 @@
         > span {
           white-space: nowrap;
         }
+        &.empty {
+          display: none;
+        }
         &.single {
           grid-column: span 1;
         }
@@ -174,6 +177,9 @@
       @screen laptop {
         grid-template-columns: repeat(2, 85px);
         grid-template-rows: unset;
+        .moveCell {
+          display: none;
+        }
         > .cell {
           width: auto;
           padding: 0px 15px;
@@ -187,6 +193,9 @@
           input,
           textarea {
             text-align: center;
+          }
+          &.moveCell {
+            display: none;
           }
           &.single {
             grid-column: span 1;
