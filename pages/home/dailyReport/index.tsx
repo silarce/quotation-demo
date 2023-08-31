@@ -483,7 +483,12 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return myAlert.warning({ title: '請選擇日期' });
     }
 
-    const items = Object.values(reportInEdit.itemList).map((item) => {
+    const arr = reportItemKeyArr.map((key) => {
+      return reportInEdit.itemList[key];
+    });
+
+    // const items = Object.values(reportInEdit.itemList).map((item) => {
+    const items = arr.map((item) => {
       const year = new Date(theDate).getFullYear();
       const month = new Date(theDate).getMonth();
       const th = new Date(theDate).getDate();
