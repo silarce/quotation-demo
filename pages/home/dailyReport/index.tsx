@@ -35,7 +35,6 @@ import { Badge } from 'antd';
 import { Class_reportItem, useReport, ThookEmptyReport } from 'hooks/home/useDailyReport';
 
 // tool
-import { yearConversion_chToStandard } from 'js/tools/date/yearConversion_chToStandard';
 import { filterCre_nextAndPrevMonth } from 'js/utils/helpers/params/filterCreator';
 
 // icon
@@ -44,6 +43,7 @@ import iconMenu from 'public/image/icon/menu.svg';
 // api
 import {
   TdailyReportDto,
+  TcreateDailyReportItemDto,
   Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
@@ -115,6 +115,51 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     keyWord: string | undefined;
   };
 
+  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
+
+  const [tempReportData, setTempReportData] = useState<{
+    [key: string]: {
+      report: ThookEmptyReport;
+      itemKeyArr: string[];
+    };
+  }>({});
+
+  const saveTempReport = () => {
+    if (!reportInEdit) {
+      return;
+    }
+
+    const reportId = reportInEdit.id || 'new';
+    tempReportData[reportId] = {
+      report: _.cloneDeep(reportInEdit),
+      itemKeyArr: _.cloneDeep(reportItemKeyArr),
+    };
+    setTempReportData({ ...tempReportData });
+  };
+
+  const getTempReport = () => {
+    if (!reportInEdit) {
+      return;
+    }
+
+    const reportId = reportInEdit?.id || 'new';
+    const temp = tempReportData[reportId];
+
+    if (!temp) {
+      myAlert.info({ title: '該日報表無草稿' });
+
+      return;
+    }
+
+    const { report, itemKeyArr } = temp;
+
+    setReport(_.cloneDeep(report));
+    setReportItemKeyArr(_.cloneDeep(itemKeyArr));
+  };
+
+  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
   const isMine = router.query.isMine === undefined ? true : router.query.isMine === 'true' ? true : false;
   const isCalendar = router.query.isCalendar === 'true' ? true : false;
 
@@ -725,6 +770,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     userInfo,
     dailyReport_calendar,
     customSearchBar,
+    saveTempReport,
+    getTempReport,
   });
 
   // ----------------------------------------------------------------------
@@ -972,6 +1019,8 @@ const panelListCreator = ({
   dailyReport_calendar,
   //
   customSearchBar,
+  saveTempReport,
+  getTempReport,
 }: {
   reportInEdit: ThookEmptyReport | undefined;
   doCheck: () => void;
@@ -988,6 +1037,8 @@ const panelListCreator = ({
   dailyReport_calendar: TdailyReportDto[] | undefined;
   //
   customSearchBar: JSX.Element;
+  saveTempReport: () => void;
+  getTempReport: () => void;
 }) => {
   const listSwitchButton: TpanelList[number] = {
     type: 'myButton',
@@ -1063,6 +1114,16 @@ const panelListCreator = ({
 
   /**reporter 上傳 取消 */
   const panelList_reporter_inEdit02: TpanelList = [
+    {
+      type: 'myButton',
+      label: '儲存草稿',
+      onClick: saveTempReport,
+    },
+    {
+      type: 'myButton',
+      label: '草稿',
+      onClick: getTempReport,
+    },
     {
       type: 'redButton',
       label: '上傳',
