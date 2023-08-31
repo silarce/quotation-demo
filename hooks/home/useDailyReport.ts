@@ -278,20 +278,37 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       prevDate: undefined,
     };
 
-    obj.itemList.firEmpty = new Class_reportItem({
-      reRender,
-      delSelf: () => {
-        setReportItemKeyArr((arr) => {
-          const index = arr.indexOf('firEmpty');
-          arr.splice(index, 1);
+    // obj.itemList.firEmpty = new Class_reportItem({
+    //   reRender,
+    //   delSelf: () => {
+    //     setReportItemKeyArr((arr) => {
+    //       const index = arr.indexOf('firEmpty');
+    //       arr.splice(index, 1);
 
-          return [...arr];
-        });
+    //       return [...arr];
+    //     });
 
-        delete obj?.itemList?.firEmpty;
-        reRender();
-      },
-    });
+    //     delete obj?.itemList?.firEmpty;
+    //     reRender();
+    //   },
+    // });
+    obj.itemList = {
+      firEmpty: new Class_reportItem({
+        reRender,
+        delSelf: () => {
+          setReportItemKeyArr((arr) => {
+            const index = arr.indexOf('firEmpty');
+            arr.splice(index, 1);
+
+            return [...arr];
+          });
+
+          delete obj?.itemList?.firEmpty;
+          reRender();
+        },
+      }),
+    };
+
     setReportItemKeyArr(['firEmpty']);
 
     return obj;

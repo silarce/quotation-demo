@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useMemo } from 'react';
+import { useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 
 import classNames from 'classnames';
@@ -34,10 +34,32 @@ import { TdailyReportItemDto, TdailyReportWokerDto } from 'js/api/dtoTypes';
 import { IconAddCircle, IconRemoveCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 import iconArrow from 'public/image/icon/arrow03_left.svg';
 import { IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
+import iconMove from 'public/image/icon/move.svg';
 
 // other
 import { AppContext } from 'pages/_app';
 import { DailyReportContext } from 'pages/home/dailyReport';
+
+// dnd
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragStartEvent,
+  DragEndEvent,
+  DraggableAttributes,
+} from '@dnd-kit/core';
+
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
+import {
+  restrictToVerticalAxis,
+  //  restrictToHorizontalAxis, restrictToWindowEdges
+} from '@dnd-kit/modifiers';
+
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 // ==================================================
 // 防抖
@@ -56,11 +78,14 @@ export default function ReportTable({
   const router = useRouter();
   const isMine = router.query.isMine === 'true' ? true : false;
 
-  const { reportInEdit, userInfo, reportItemKeyArr, setReportItemKeyArr } = useContext(DailyReportContext);
+  const {
+    reportInEdit,
+    userInfo,
+    //
+    reportItemKeyArr,
+    setReportItemKeyArr,
+  } = useContext(DailyReportContext);
   const { rwd1023 } = useContext(AppContext);
-
-  // const classDailyReportItemArr = reportInEdit?.items;
-  // const itemList = reportInEdit?.itemList;
 
   const {
     id,
@@ -233,11 +258,453 @@ export default function ReportTable({
   // ------------------------------------------------
   /**用來觸發目的地、離工地的focus */
   const [timeTrigger, setTimeTrigger] = useState({ rIndex: -1, key: '' });
+  // ------------------------------------------------
+  // dnd
+
+  const sensors = useSensors(useSensor(PointerSensor));
+  const [movingId, setMovingId] = useState<string>();
+
+  const onDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+
+    if (active.id !== over?.id) {
+      // 有bug，光是點一下就會移動
+      const oldIndex = reportItemKeyArr.indexOf(active.id as string);
+      const newIndex = reportItemKeyArr.indexOf(over?.id as string);
+
+      const newKeyArr = arrayMove(reportItemKeyArr, oldIndex, newIndex);
+      setReportItemKeyArr(newKeyArr);
+
+      return newKeyArr;
+    }
+
+    setMovingId(undefined);
+  };
+
+  function onDragStart(e: DragStartEvent) {
+    const { id } = e.active;
+    setMovingId(id as string);
+  }
 
   // ------------------------------------------------
   // ------------------------------------------------
   // ------------------------------------------------
-  // console.log(itemKeyArr);
+  // ------------------------------------------------
+  // ------------------------------------------------
+  // ------------------------------------------------
+
+  const Row = useCallback(function Row({
+    //
+    item,
+    rIndex,
+    delSelf,
+    disabledOri,
+    id,
+    isMoving,
+  }: {
+    item: Class_reportItem;
+    rIndex: number;
+    delSelf: () => void;
+    disabledOri: boolean;
+    id: string;
+    isMoving: boolean;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id,
+    });
+
+    const itemStyle = {
+      transform: CSS.Transform.toString(transform),
+      // transition,
+    };
+
+    return (
+      <div
+        className={classNames(scss.row, isMoving && scss.isMoving)} //
+        style={itemStyle}
+        ref={setNodeRef}
+      >
+        {/*  */}
+        <div className={classNames(scss.cell, scss.moveCell, 'row-span-3')}>
+          <Image src={iconMove} alt="" {...attributes} {...listeners} />
+        </div>
+        {/*  */}
+        {theBodyKeyArr.map((key, cIndex) => {
+          let { headerClassName_mobile, bodyClassName_mobile } = config[key] ?? {};
+          const {
+            eleType,
+            optionArr,
+            label,
+            inputType,
+            placeholder,
+            placeholder_mobile,
+            headerClassName,
+            bodyClassName,
+            suffix,
+          } = config[key] ?? {};
+
+          let disabled = disabledOri;
+
+          if (key === 'meals' || key === 'stayLength') {
+            disabled = !isEdit;
+          }
+
+          if (!rwd1023) {
+            headerClassName_mobile = undefined;
+            bodyClassName_mobile = undefined;
+          }
+
+          const thePlaceholder = rwd1023 ? placeholder_mobile || placeholder : placeholder;
+
+          if (eleType === 'select') {
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                <InputSel
+                  disabled={disabled}
+                  showBaseline="auto"
+                  placeholder={thePlaceholder}
+                  selectProps={{
+                    options: optionArr ?? [],
+                    value: item[key as TclassKeys] as string,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    onChange: (v) => {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      item[key] = v!.value;
+                    },
+                    arrowType: 'black',
+                    fontSize: '16px',
+                  }}
+                />
+              </div>
+            );
+          }
+
+          if (eleType === 'input') {
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                <InputSel
+                  className="inline-grid"
+                  disabled={disabled}
+                  showBaseline="auto"
+                  placeholder={thePlaceholder}
+                  inputProps={{
+                    value: item[key as TclassKeys] as string,
+                    inputType,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    onChange: (v) => {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      item[key] = v;
+                    },
+                    // className: scss.textarea,
+                  }}
+                />
+                {suffix && disabled && <span>{suffix}</span>}
+              </div>
+            );
+          }
+
+          if (eleType === 'textarea') {
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile,
+                  scss.textareaCell
+                )}
+              >
+                <InputSel
+                  disabled={disabled}
+                  showBaseline="auto"
+                  placeholder={thePlaceholder}
+                  textareaProps={{
+                    value: item[key as TclassKeys] as string,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    onChange: (v) => {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      item[key] = v;
+                    },
+                    className: classNames(
+                      scss.textarea,
+                      { [scss.customerName]: key === 'customerName' },
+                      { [scss.description]: key === 'description' }
+                    ),
+                    allowNewLineByUser: key === 'description',
+                    props: {
+                      maxLength: 600,
+                    },
+                  }}
+                />
+              </div>
+            );
+          }
+
+          if (eleType === 'timePicker') {
+            const focusTrigger = timeTrigger.rIndex === rIndex && timeTrigger.key === key;
+
+            const changeTrigger = () => {
+              let theKey = '';
+
+              if (key === 'departureTime') {
+                theKey = 'arrivalTime';
+              }
+
+              if (key === 'arrivalTime') {
+                theKey = 'departureWorksiteTime';
+              }
+
+              setTimeTrigger({ rIndex, key: theKey });
+            };
+
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                <InputSel
+                  disabled={disabled}
+                  showBaseline="auto"
+                  placeholder={thePlaceholder}
+                  timePickerProps={{
+                    value: item[key as TclassKeys] as string,
+                    onChange02: (v) => {
+                      const foo = v?.toISOString();
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      item[key] = foo;
+                      changeTrigger();
+                    },
+                    focusTrigger: focusTrigger,
+                  }}
+                />
+              </div>
+            );
+          }
+
+          if (eleType === 'modal' && key === 'workers') {
+            const workersArr = item['workers'];
+
+            const onAdd = () => {
+              if (disabled) {
+                return;
+              }
+
+              setActiveItem(item);
+              toShowModal_worker();
+            };
+
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  scss.workerCell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                {!workersArr[0] && !disabled && (
+                  <div className={scss.worker}>
+                    <span></span>
+                    <IconAddCircle className={scss.icon} onClick={onAdd} />
+                  </div>
+                )}
+                {workersArr?.map((worker, wIndex, arr) => {
+                  const onRemove = () => {
+                    item.removeWorker(wIndex);
+                  };
+
+                  const isLast = arr.length === wIndex + 1;
+
+                  return (
+                    <div key={wIndex} className={scss.worker}>
+                      <InputSel
+                        disabled={true}
+                        showBaseline={disabled ? 'invisible' : 'always'}
+                        inputProps={{
+                          value: worker.chName,
+                        }}
+                      />
+                      {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                    </div>
+                  );
+                })}
+
+                {workersArr[0] && !disabled && (
+                  <div className={scss.worker}>
+                    <span></span>
+                    <IconAddCircle className={scss.icon} onClick={onAdd} />
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // ---------------------
+          if (eleType === 'modal' && key === 'meals') {
+            const mealsArr = item['meals'];
+
+            const onAdd = () => {
+              if (disabled) {
+                return;
+              }
+
+              setActiveItem(item);
+              toShowModal_meals();
+            };
+
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  scss.workerCell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                {!mealsArr[0] && !disabled && (
+                  <div className={scss.worker}>
+                    <span></span>
+                    <IconAddCircle className={scss.icon} onClick={onAdd} />
+                  </div>
+                )}
+                {mealsArr?.map((meals, wIndex, arr) => {
+                  const onRemove = () => {
+                    item.removeMeals(wIndex);
+                  };
+
+                  return (
+                    <div key={wIndex} className={scss.worker}>
+                      <InputSel
+                        disabled={true}
+                        showBaseline={disabled ? 'invisible' : 'always'}
+                        inputProps={{
+                          value: mealsLookup[meals],
+                        }}
+                      />
+                      {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+                    </div>
+                  );
+                })}
+
+                {mealsArr[0] && !disabled && (
+                  <div className={scss.worker}>
+                    <span></span>
+                    <IconAddCircle className={scss.icon} onClick={onAdd} />
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          //
+          if (eleType === 'modal' && key === 'licensePlate') {
+            const licensePlate = item['licensePlate'];
+
+            const onAdd = () => {
+              if (disabled) {
+                return;
+              }
+
+              setActiveItem(item);
+              setShowModal_licensePlate(true);
+            };
+
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  scss.workerCell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                <div className={scss.worker}>
+                  <InputSel
+                    disabled={true}
+                    showBaseline={disabled ? 'invisible' : 'always'}
+                    placeholder={thePlaceholder}
+                    inputProps={{
+                      value: licensePlate ?? '',
+                    }}
+                  />
+                  {!disabled && <IconAddCircle className={scss.icon} onClick={onAdd} />}
+                </div>
+              </div>
+            );
+          }
+
+          //
+          if (key === 'remove') {
+            const onClick = disabled ? undefined : delSelf;
+
+            return (
+              <div
+                key={cIndex}
+                className={classNames(
+                  scss.cell,
+                  headerClassName,
+                  bodyClassName,
+                  headerClassName_mobile,
+                  bodyClassName_mobile
+                )}
+              >
+                {isMine && !disabled && <IconDelete01 onClick={onClick} />}
+              </div>
+            );
+          }
+        })}
+      </div>
+    );
+  }, []);
+
+  // ------------------------------------------------
+  // ------------------------------------------------
+  // ------------------------------------------------
+  // ------------------------------------------------
+  // ------------------------------------------------
+  // ------------------------------------------------
 
   return (
     <Drawer
@@ -272,6 +739,9 @@ export default function ReportTable({
         <div className={scss.roof} />
         {/*  */}
         <div className={classNames(scss.thead)}>
+          {/*  */}
+          <div className={classNames(scss.cell, 'row-span-6')}></div>
+          {/*  */}
           {theHeaderKeyArr.map((key) => {
             let { headerClassName_mobile } = config[key] ?? {};
             const { label, label_mobile, headerClassName } = config[key] ?? {};
@@ -298,389 +768,42 @@ export default function ReportTable({
         </div>
         {/*  */}
         <div className={classNames(scss.tbody)}>
-          {/* {classDailyReportItemArr?.map((theClass, rIndex) => { */}
-          {/* {itemKeyArr?.map((key, rIndex) => { */}
-          {/* {Object.values(itemList ?? {})?.map((item, rIndex) => { */}
-          {reportItemKeyArr?.map((key, rIndex) => {
-            const item = itemList?.[key];
+          <DndContext
+            sensors={sensors}
+            modifiers={[
+              restrictToVerticalAxis,
+              // restrictToWindowEdges,
+            ]}
+            onDragEnd={onDragEnd}
+            onDragStart={onDragStart}
+          >
+            <SortableContext items={reportItemKeyArr} strategy={verticalListSortingStrategy}>
+              {reportItemKeyArr?.map((key, rIndex) => {
+                const item = itemList?.[key];
 
-            if (!item) {
-              return null;
-            }
+                if (!item) {
+                  return null;
+                }
 
-            const delSelf = item.delSelf;
+                const delSelf = item.delSelf;
 
-            return (
-              <div key={rIndex} className={classNames(scss.row)}>
-                {theBodyKeyArr.map((key, cIndex) => {
-                  let { headerClassName_mobile, bodyClassName_mobile } = config[key] ?? {};
-                  const {
-                    eleType,
-                    optionArr,
-                    label,
-                    inputType,
-                    placeholder,
-                    placeholder_mobile,
-                    headerClassName,
-                    bodyClassName,
-                    suffix,
-                  } = config[key] ?? {};
+                const isMoving = key === movingId;
 
-                  let disabled = disabledOri;
+                return (
+                  <Row
+                    key={key}
+                    id={key}
+                    item={item}
+                    rIndex={rIndex}
+                    delSelf={delSelf}
+                    disabledOri={disabledOri}
+                    isMoving={isMoving}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
 
-                  if (key === 'meals' || key === 'stayLength') {
-                    disabled = !isEdit;
-                  }
-
-                  if (!rwd1023) {
-                    headerClassName_mobile = undefined;
-                    bodyClassName_mobile = undefined;
-                  }
-
-                  const thePlaceholder = rwd1023 ? placeholder_mobile || placeholder : placeholder;
-
-                  if (eleType === 'select') {
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        <InputSel
-                          disabled={disabled}
-                          showBaseline="auto"
-                          placeholder={thePlaceholder}
-                          selectProps={{
-                            options: optionArr ?? [],
-                            value: item[key as TclassKeys] as string,
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
-                            onChange: (v) => {
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              item[key] = v!.value;
-                            },
-                            arrowType: 'black',
-                            fontSize: '16px',
-                          }}
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (eleType === 'input') {
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        <InputSel
-                          className="inline-grid"
-                          disabled={disabled}
-                          showBaseline="auto"
-                          placeholder={thePlaceholder}
-                          inputProps={{
-                            value: item[key as TclassKeys] as string,
-                            inputType,
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
-                            onChange: (v) => {
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              item[key] = v;
-                            },
-                            // className: scss.textarea,
-                          }}
-                        />
-                        {suffix && disabled && <span>{suffix}</span>}
-                      </div>
-                    );
-                  }
-
-                  if (eleType === 'textarea') {
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile,
-                          scss.textareaCell
-                        )}
-                      >
-                        <InputSel
-                          disabled={disabled}
-                          showBaseline="auto"
-                          placeholder={thePlaceholder}
-                          textareaProps={{
-                            value: item[key as TclassKeys] as string,
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
-                            onChange: (v) => {
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              item[key] = v;
-                            },
-                            className: classNames(
-                              scss.textarea,
-                              { [scss.customerName]: key === 'customerName' },
-                              { [scss.description]: key === 'description' }
-                            ),
-                            allowNewLineByUser: key === 'description',
-                            props: {
-                              maxLength: 600,
-                            },
-                          }}
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (eleType === 'timePicker') {
-                    const focusTrigger = timeTrigger.rIndex === rIndex && timeTrigger.key === key;
-
-                    const changeTrigger = () => {
-                      let theKey = '';
-
-                      if (key === 'departureTime') {
-                        theKey = 'arrivalTime';
-                      }
-
-                      if (key === 'arrivalTime') {
-                        theKey = 'departureWorksiteTime';
-                      }
-
-                      setTimeTrigger({ rIndex, key: theKey });
-                    };
-
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        <InputSel
-                          disabled={disabled}
-                          showBaseline="auto"
-                          placeholder={thePlaceholder}
-                          timePickerProps={{
-                            value: item[key as TclassKeys] as string,
-                            onChange02: (v) => {
-                              const foo = v?.toISOString();
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              item[key] = foo;
-                              changeTrigger();
-                            },
-                            focusTrigger: focusTrigger,
-                          }}
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (eleType === 'modal' && key === 'workers') {
-                    const workersArr = item['workers'];
-
-                    const onAdd = () => {
-                      if (disabled) {
-                        return;
-                      }
-
-                      setActiveItem(item);
-                      toShowModal_worker();
-                    };
-
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          scss.workerCell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        {!workersArr[0] && !disabled && (
-                          <div className={scss.worker}>
-                            <span></span>
-                            <IconAddCircle className={scss.icon} onClick={onAdd} />
-                          </div>
-                        )}
-                        {workersArr?.map((worker, wIndex, arr) => {
-                          const onRemove = () => {
-                            item.removeWorker(wIndex);
-                          };
-
-                          const isLast = arr.length === wIndex + 1;
-
-                          return (
-                            <div key={wIndex} className={scss.worker}>
-                              <InputSel
-                                disabled={true}
-                                showBaseline={disabled ? 'invisible' : 'always'}
-                                inputProps={{
-                                  value: worker.chName,
-                                }}
-                              />
-                              {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            </div>
-                          );
-                        })}
-
-                        {workersArr[0] && !disabled && (
-                          <div className={scss.worker}>
-                            <span></span>
-                            <IconAddCircle className={scss.icon} onClick={onAdd} />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-
-                  // ---------------------
-                  if (eleType === 'modal' && key === 'meals') {
-                    const mealsArr = item['meals'];
-
-                    const onAdd = () => {
-                      if (disabled) {
-                        return;
-                      }
-
-                      setActiveItem(item);
-                      toShowModal_meals();
-                    };
-
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          scss.workerCell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        {!mealsArr[0] && !disabled && (
-                          <div className={scss.worker}>
-                            <span></span>
-                            <IconAddCircle className={scss.icon} onClick={onAdd} />
-                          </div>
-                        )}
-                        {mealsArr?.map((meals, wIndex, arr) => {
-                          const onRemove = () => {
-                            item.removeMeals(wIndex);
-                          };
-
-                          return (
-                            <div key={wIndex} className={scss.worker}>
-                              <InputSel
-                                disabled={true}
-                                showBaseline={disabled ? 'invisible' : 'always'}
-                                inputProps={{
-                                  value: mealsLookup[meals],
-                                }}
-                              />
-                              {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                            </div>
-                          );
-                        })}
-
-                        {mealsArr[0] && !disabled && (
-                          <div className={scss.worker}>
-                            <span></span>
-                            <IconAddCircle className={scss.icon} onClick={onAdd} />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-
-                  //
-                  if (eleType === 'modal' && key === 'licensePlate') {
-                    const licensePlate = item['licensePlate'];
-
-                    const onAdd = () => {
-                      if (disabled) {
-                        return;
-                      }
-
-                      setActiveItem(item);
-                      setShowModal_licensePlate(true);
-                    };
-
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          scss.workerCell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        <div className={scss.worker}>
-                          <InputSel
-                            disabled={true}
-                            showBaseline={disabled ? 'invisible' : 'always'}
-                            placeholder={thePlaceholder}
-                            inputProps={{
-                              value: licensePlate ?? '',
-                            }}
-                          />
-                          {!disabled && <IconAddCircle className={scss.icon} onClick={onAdd} />}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  //
-                  if (key === 'remove') {
-                    const onClick = disabled ? undefined : delSelf;
-
-                    return (
-                      <div
-                        key={cIndex}
-                        className={classNames(
-                          scss.cell,
-                          headerClassName,
-                          bodyClassName,
-                          headerClassName_mobile,
-                          bodyClassName_mobile
-                        )}
-                      >
-                        {isMine && !disabled && <IconDelete01 onClick={onClick} />}
-                      </div>
-                    );
-                  }
-                })}
-              </div>
-            );
-          })}
           {!disabledOri && (
             <MyButton label="新增回報" preImg="add" className={scss.newReportBtn} onClick={addDailyReportItem} />
           )}
