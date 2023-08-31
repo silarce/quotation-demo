@@ -10,7 +10,7 @@ import { checkDateFormat } from 'js/tools/date/checkDate';
 // import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
-import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
+import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
 
 import {
   TlegacyContractDto,
@@ -1788,11 +1788,7 @@ function prodCellConfigCre(): TprodCellConfig {
         label: '報價別',
         width: '105px',
         type: 'select',
-        options: [
-          { value: 'a', label: 'A' },
-          { value: 'b', label: 'B' },
-          { value: 'c', label: 'C' },
-        ],
+        options: optionsCreator_quoteType(),
       },
       doorType: { id: 'doorType', label: '門型', width: '100px', type: 'select', options: optionsCreator_doorModel() },
       length: { id: 'length', label: 'L(m)', width: '60px', type: 'input', inputType: 'number' },
