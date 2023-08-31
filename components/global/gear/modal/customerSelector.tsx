@@ -12,7 +12,7 @@ import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 import { optionsCreator_customerType } from 'js/utils/options/options';
 
 // css
-import style from './customerSelector.module.scss';
+import scss from './customerSelector.module.scss';
 
 // api
 import { TcustomerDto_TC, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
@@ -208,7 +208,7 @@ export default function CustomerSelector({
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       width={'800'}
-      className={style.container}
+      className={scss.container}
       tip={tip}
       searcbBarProps={{
         inputSelPropsArr: inputSelPropsArr,
@@ -216,7 +216,7 @@ export default function CustomerSelector({
       }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
-        <div className={style.listContainer}>
+        <div className={scss.listContainer}>
           {customerArr?.map((emp, index, arr) => {
             const { customerNumber, name } = emp;
 
@@ -231,8 +231,8 @@ export default function CustomerSelector({
             })();
 
             return (
-              <CellWithBar key={index} isActive={isActive}>
-                <div className={`${style.listItem}`} onClick={() => onClick(emp)} ref={theViewRef}>
+              <CellWithBar key={index} isActive={isActive} className={scss.rowWrapper}>
+                <div className={scss.listItem} onClick={() => onClick(emp)} ref={theViewRef}>
                   <span>{customerNumber}</span>
                   <span>{name}</span>
                 </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import classNames from 'classnames';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 
@@ -9,7 +10,7 @@ import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/ale
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from './employeeSelector.module.scss';
+import scss from './employeeSelector.module.scss';
 
 // type
 import { Tparams } from 'js/api/dtoTypes';
@@ -266,7 +267,7 @@ export default function WorkerSelector({
   return (
     <SelectorShell
       label={label ?? ''}
-      className={style.container}
+      className={scss.container}
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
@@ -278,7 +279,7 @@ export default function WorkerSelector({
       }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
-        <div className={style.listContainer}>
+        <div className={scss.listContainer}>
           {workerArr.map((emp, index, arr) => {
             const { idNumber, chName, jobs } = emp;
 
@@ -296,9 +297,9 @@ export default function WorkerSelector({
             })();
 
             return (
-              <CellWithBar key={index} isActive={isActive}>
-                <div className={style.row} onClick={() => onClick(emp)} ref={theViewRef}>
-                  <span className={style.idNumber}>{idNumber}</span>
+              <CellWithBar key={index} isActive={isActive} className={scss.rowWrapper}>
+                <div className={classNames(scss.row)} onClick={() => onClick(emp)} ref={theViewRef}>
+                  <span className={scss.idNumber}>{idNumber}</span>
                   <span>{chName}</span>
                   <span>{name}</span>
                   <span>{grade && `Level ${grade}`}</span>
