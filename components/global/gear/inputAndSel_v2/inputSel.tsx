@@ -227,6 +227,8 @@ export default function InputSel({
 
       {selectProps &&
         (() => {
+          const { dynaOptionsList, dynaOptionsKey, withIcon } = selectProps;
+
           let easyValue: Toption | undefined | null = undefined;
 
           if (selectProps.easyValue !== undefined) {
@@ -242,12 +244,18 @@ export default function InputSel({
             }
           }
 
-          const customComponents = selectProps.withIcon
+          const customComponents = withIcon
             ? {
                 Option: OptionWithIcon01,
                 SingleValue: SingleValueWithIcon01,
               }
             : undefined;
+
+          let dynyOptions: Toption[] | undefined = undefined;
+
+          if (dynaOptionsList && dynaOptionsKey) {
+            dynyOptions = dynaOptionsList[dynaOptionsKey];
+          }
 
           return (
             <MySelect
@@ -274,53 +282,11 @@ export default function InputSel({
                   ...customComponents,
                   ...selectProps.props?.components,
                 },
+                options: selectProps.props?.options || dynyOptions,
               }}
             />
           );
         })()}
-
-      {/* {selectProps &&
-        (() => {
-          let easyValue: Toption | undefined | null = undefined;
-
-          if (selectProps.easyValue !== undefined) {
-            if (selectProps.easyValue === null || selectProps.easyValue === '') {
-              easyValue = null;
-            } else {
-              const options = selectProps.props?.options;
-
-              easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
-                value: selectProps.easyValue,
-                label: selectProps.easyValue,
-              };
-            }
-          }
-
-          return (
-            <MySelect
-              wrapperClassName={selectProps.wrapperClassName}
-              wrapperStyle={selectProps.wrapperStyle}
-              arrowType={selectProps.arrowType}
-              fontClassName={fontClassName}
-              props={{
-                isDisabled: disabled,
-                placeholder: `請輸入${caption ?? ''}`,
-                //
-                value: easyValue,
-                ...selectProps.props,
-                //
-                onFocus: (e) => {
-                  selectProps.props?.onFocus?.(e);
-                  setIsFocus(true);
-                },
-                onBlur: (e) => {
-                  selectProps.props?.onBlur?.(e);
-                  setIsFocus(false);
-                },
-              }}
-            />
-          );
-        })()} */}
 
       {datePickerProps && (
         <MyDatePicker
