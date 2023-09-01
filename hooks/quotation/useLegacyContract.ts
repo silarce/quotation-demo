@@ -5,9 +5,8 @@ import moment from 'moment';
 import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { checkDateFormat } from 'js/tools/date/checkDate';
-// import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard"
-// import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
+
+import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
 import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
@@ -1669,6 +1668,8 @@ export {
   useLegacyContract,
 };
 
+export type { TprodCellConfig };
+
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
@@ -1733,16 +1734,16 @@ type TprodCellConfig = {
     [key in TprodKeys]: {
       id: key;
       label: string;
-      width: string;
+      // width: string;
       // type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
-      inputType?: HTMLInputTypeAttribute;
-      options?: Toption[];
+      // inputType?: HTMLInputTypeAttribute;
+      // options?: Toption[];
+      inputSelProps: TinputSelProps;
     };
-  } & TprodInputCellType &
-    TprodSelectWithIconCellType &
-    TprodCheckboxCellType &
-    TprodSelect;
+  };
 };
+
+// const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
 
 function prodCellConfigCre(): TprodCellConfig {
   return {
@@ -1776,37 +1777,254 @@ function prodCellConfigCre(): TprodCellConfig {
       quotationNumber: {
         id: 'quotationNumber',
         label: '合約編號',
-        width: '100px',
-        type: 'input',
-        inputType: 'readyonly',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {
+              readOnly: true,
+            },
+          },
+        },
       },
-      idNumber: { id: 'idNumber', label: '編號', width: '100px', type: 'input', inputType: 'number' },
-      discountRate: { id: 'discountRate', label: '折數', width: '60px', type: 'input', inputType: 'number' },
-      itemName: { id: 'itemName', label: '項目', width: '100px', type: 'input' },
+      idNumber: {
+        id: 'idNumber',
+        label: '編號',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      discountRate: {
+        id: 'discountRate',
+        label: '折數',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      itemName: {
+        id: 'itemName',
+        label: '項目',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
       quoteType: {
         id: 'quoteType',
         label: '報價別',
-        width: '105px',
-        type: 'select',
-        options: optionsCreator_quoteType(),
+        inputSelProps: {
+          wrapperStyle: { width: '105px' },
+          selectProps: {
+            props: {
+              options: optionsCreator_quoteType(),
+            },
+          },
+        },
       },
-      doorType: { id: 'doorType', label: '門型', width: '100px', type: 'select', options: optionsCreator_doorModel() },
-      length: { id: 'length', label: 'L(m)', width: '60px', type: 'input', inputType: 'number' },
-      width: { id: 'width', label: 'W(m)', width: '60px', type: 'input', inputType: 'number' },
-      height: { id: 'height', label: 'h(m)', width: '60px', type: 'input', inputType: 'number' },
-      thickness: { id: 'thickness', label: 'B(m)', width: '60px', type: 'input', inputType: 'number' },
-      area: { id: 'area', label: '面積', width: '60px', type: 'input' },
-      volume: { id: 'volume', label: '才數', width: '75px', type: 'input' },
-      material: { id: 'material', label: '材料', width: '120px', type: 'input' },
-      surface: { id: 'surface', label: '表面', width: '55px', type: 'input' },
-      doorTrack: { id: 'doorTrack', label: '門軌', width: '300px', type: 'selectWithIcon' },
-      horsepower: { id: 'horsepower', label: '馬力', width: '90px', type: 'input' },
-      quantity: { id: 'quantity', label: '數量', width: '55px', type: 'input', inputType: 'number' },
-      unitPrice: { id: 'unitPrice', label: '單價', width: '120px', type: 'input', inputType: 'text' },
-      totalPrice: { id: 'totalPrice', label: '複價', width: '140px', type: 'input', inputType: 'text' },
-      typhoonProtection: { id: 'typhoonProtection', label: '防颱', width: '60px', type: 'checkbox' },
-      bounceDoor: { id: 'bounceDoor', label: '彈射門', width: '60px', type: 'checkbox' },
-      notes: { id: 'notes', label: '備註', width: '90px', type: 'input' },
+      doorType: {
+        id: 'doorType',
+        label: '門型',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          selectProps: {
+            props: {
+              options: optionsCreator_doorModel(),
+            },
+          },
+        },
+      },
+      length: {
+        id: 'length',
+        label: 'L(m)',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      width: {
+        id: 'width',
+        label: 'W(m)',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      height: {
+        id: 'height',
+        label: 'h(m)',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      thickness: {
+        id: 'thickness',
+        label: 'B(m)',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      area: {
+        id: 'area',
+        label: '面積',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      volume: {
+        id: 'volume',
+        label: '才數',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      material: {
+        id: 'material',
+        label: '材料',
+        inputSelProps: {
+          wrapperStyle: { width: '120px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      surface: {
+        id: 'surface',
+        label: '表面',
+        inputSelProps: {
+          wrapperStyle: { width: '55px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      doorTrack: {
+        id: 'doorTrack',
+        label: '門軌',
+        inputSelProps: {
+          wrapperStyle: { width: '300px' },
+          selectProps: {
+            props: {},
+            withIcon: true,
+            dynaOptionsList: {
+              normal: optionsCre_doorTrack_normal(),
+              typhoonProtection: optionsCre_doorTrack_typhoonProtection(),
+            },
+          },
+        },
+      },
+      horsepower: {
+        id: 'horsepower',
+        label: '馬力',
+        inputSelProps: {
+          wrapperStyle: { width: '90px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      quantity: {
+        id: 'quantity',
+        label: '數量',
+        inputSelProps: {
+          wrapperStyle: { width: '55px' },
+          inputProps: {
+            props: { type: 'number' },
+          },
+        },
+      },
+      unitPrice: {
+        id: 'unitPrice',
+        label: '單價',
+        inputSelProps: {
+          wrapperStyle: { width: '120px' },
+          inputProps: {
+            props: {},
+          },
+        },
+        // inputType: 'text',
+      },
+      totalPrice: {
+        id: 'totalPrice',
+        label: '複價',
+        inputSelProps: {
+          wrapperStyle: { width: '140px' },
+          inputProps: {
+            props: {},
+          },
+        },
+        // inputType: 'text',
+      },
+      typhoonProtection: {
+        id: 'typhoonProtection',
+        label: '防颱',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          checkBoxProps: {
+            propsArr: [{ key: 'typhoonProtection' }],
+          },
+        },
+      },
+      bounceDoor: {
+        id: 'bounceDoor',
+        label: '彈射門',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          checkBoxProps: {
+            propsArr: [{ key: 'bounceDoor' }],
+          },
+        },
+      },
+      notes: {
+        id: 'notes',
+        label: '備註',
+        inputSelProps: {
+          wrapperStyle: { width: '90px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
     },
   };
 }

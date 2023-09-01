@@ -65,6 +65,7 @@ export default function MySelect<
   };
 
   // -------------------------------------------------------------------------
+
   return (
     <div className={classNames(scss.selectBox, wrapperClassName)} style={wrapperStyle}>
       <Select
@@ -74,9 +75,9 @@ export default function MySelect<
           ...props?.components,
         }}
         unstyled={true}
-        // menuPortalTarget={document.getElementById('__next')}
+        menuPortalTarget={document.getElementById('__next')}
         // menuPortalTarget={document.getElementById('body')}
-        // menuPosition={'fixed'}
+        menuPosition={'fixed'}
         isSearchable={false}
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         //

@@ -229,6 +229,16 @@ export default function InputSel({
         (() => {
           const { dynaOptionsList, dynaOptionsKey, withIcon } = selectProps;
 
+          let dynyOptions: Toption[] | undefined = undefined;
+
+          if (dynaOptionsList && dynaOptionsKey) {
+            dynyOptions = dynaOptionsList[dynaOptionsKey];
+
+            if (selectProps.props && !selectProps.props.options) {
+              selectProps.props.options = dynyOptions;
+            }
+          }
+
           let easyValue: Toption | undefined | null = undefined;
 
           if (selectProps.easyValue !== undefined) {
@@ -250,12 +260,6 @@ export default function InputSel({
                 SingleValue: SingleValueWithIcon01,
               }
             : undefined;
-
-          let dynyOptions: Toption[] | undefined = undefined;
-
-          if (dynaOptionsList && dynaOptionsKey) {
-            dynyOptions = dynaOptionsList[dynaOptionsKey];
-          }
 
           return (
             <MySelect

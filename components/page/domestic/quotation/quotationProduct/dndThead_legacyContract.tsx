@@ -71,7 +71,14 @@ export default function DndThead({
         <SortableContext items={theadIndex} strategy={horizontalListSortingStrategy}>
           {theadIndex.map((key, index) => {
             // const theadInfo = prodCellConfig.cellConfig[key];
-            const theadInfo = cellConfig[key as keyof typeof cellConfig];
+
+            const { id, label, inputSelProps } = cellConfig[key as keyof typeof cellConfig];
+
+            const theadInfo = {
+              id,
+              label,
+              width: `${inputSelProps?.wrapperStyle?.width}` ?? 'auto',
+            };
 
             return (
               // key必須是items裡的值
