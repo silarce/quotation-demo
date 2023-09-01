@@ -14,6 +14,8 @@ import InputSelBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
+import { OptionWithIcon01 } from './selectCustom/optionWithIcon';
+import { SingleValueWithIcon01 } from './selectCustom/singleValueWithIcon';
 
 // css
 import scss from './inputSel.module.scss';
@@ -240,6 +242,60 @@ export default function InputSel({
             }
           }
 
+          const customComponents = selectProps.withIcon
+            ? {
+                Option: OptionWithIcon01,
+                SingleValue: SingleValueWithIcon01,
+              }
+            : undefined;
+
+          return (
+            <MySelect
+              wrapperClassName={selectProps.wrapperClassName}
+              wrapperStyle={selectProps.wrapperStyle}
+              arrowType={selectProps.arrowType}
+              fontClassName={fontClassName}
+              props={{
+                isDisabled: disabled,
+                placeholder: `請輸入${caption ?? ''}`,
+                //
+                value: easyValue,
+                ...selectProps.props,
+                //
+                onFocus: (e) => {
+                  selectProps.props?.onFocus?.(e);
+                  setIsFocus(true);
+                },
+                onBlur: (e) => {
+                  selectProps.props?.onBlur?.(e);
+                  setIsFocus(false);
+                },
+                components: {
+                  ...customComponents,
+                  ...selectProps.props?.components,
+                },
+              }}
+            />
+          );
+        })()}
+
+      {/* {selectProps &&
+        (() => {
+          let easyValue: Toption | undefined | null = undefined;
+
+          if (selectProps.easyValue !== undefined) {
+            if (selectProps.easyValue === null || selectProps.easyValue === '') {
+              easyValue = null;
+            } else {
+              const options = selectProps.props?.options;
+
+              easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+                value: selectProps.easyValue,
+                label: selectProps.easyValue,
+              };
+            }
+          }
+
           return (
             <MySelect
               wrapperClassName={selectProps.wrapperClassName}
@@ -264,31 +320,7 @@ export default function InputSel({
               }}
             />
           );
-        })()}
-
-      {/* {selectProps && (
-        <MySelect
-          wrapperClassName={selectProps.wrapperClassName}
-          wrapperStyle={selectProps.wrapperStyle}
-          arrowType={selectProps.arrowType}
-          fontClassName={fontClassName}
-          props={{
-            isDisabled: disabled,
-            placeholder: `請輸入${caption ?? ''}`,
-            //
-            ...selectProps.props,
-            //
-            onFocus: (e) => {
-              selectProps.props?.onFocus?.(e);
-              setIsFocus(true);
-            },
-            onBlur: (e) => {
-              selectProps.props?.onBlur?.(e);
-              setIsFocus(false);
-            },
-          }}
-        />
-      )} */}
+        })()} */}
 
       {datePickerProps && (
         <MyDatePicker

@@ -36,6 +36,7 @@ export type TselectProps<
   fontClassName?: string;
   /** 在inputSel那邊做預處理，將string轉為Toption，props.value有值的話會被蓋掉 */
   easyValue?: string | null;
+  withIcon?: boolean;
 };
 
 // ==============================================================================

@@ -368,9 +368,9 @@ export default function ProductList_legacy({
               fontSize: '16px',
               customComponents: customComponents,
               selClassNames: {
-                singleValue: () => scss.inputSelSingleValue,
-                placeholder: () => scss.inputSelPlaceholder,
-                input: () => scss.inputSelInput,
+                // singleValue: () => scss.inputSelSingleValue,
+                // placeholder: () => scss.inputSelPlaceholder,
+                // input: () => scss.inputSelInput,
               },
             }}
           />
