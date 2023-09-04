@@ -1354,7 +1354,7 @@ class Class_legacyContract {
       return false;
     }
 
-    const { quoteDate, deliveryDate } = this._legacyContract;
+    // const { quoteDate, deliveryDate } = this._legacyContract;
 
     // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
@@ -1689,9 +1689,6 @@ export type { TprodCellConfig };
 // ==========================================================================
 // ==========================================================================
 
-// console.log(isNaN(new Date('1111-11-11').getTime()));
-// console.log(isNaN(new Date('aaaa').getTime()));
-
 type TprodInputCellType = {
   [key in keyof Pick<
     Class_product,
@@ -1734,16 +1731,11 @@ type TprodCellConfig = {
     [key in TprodKeys]: {
       id: key;
       label: string;
-      // width: string;
-      // type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
-      // inputType?: HTMLInputTypeAttribute;
-      // options?: Toption[];
+      theadItemClassName?: string;
       inputSelProps: TinputSelProps;
     };
   };
 };
-
-// const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
 
 function prodCellConfigCre(): TprodCellConfig {
   return {
@@ -1847,11 +1839,13 @@ function prodCellConfigCre(): TprodCellConfig {
       length: {
         id: 'length',
         label: 'L(m)',
+        theadItemClassName: 'text-center',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
               type: 'number',
+              className: 'text-center',
             },
           },
         },
@@ -1859,11 +1853,13 @@ function prodCellConfigCre(): TprodCellConfig {
       width: {
         id: 'width',
         label: 'W(m)',
+        theadItemClassName: 'text-center',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
               type: 'number',
+              className: 'text-center',
             },
           },
         },
@@ -1871,11 +1867,13 @@ function prodCellConfigCre(): TprodCellConfig {
       height: {
         id: 'height',
         label: 'h(m)',
+        theadItemClassName: 'text-center',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
               type: 'number',
+              className: 'text-center',
             },
           },
         },
@@ -1883,11 +1881,13 @@ function prodCellConfigCre(): TprodCellConfig {
       thickness: {
         id: 'thickness',
         label: 'B(m)',
+        theadItemClassName: 'text-center',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
               type: 'number',
+              className: 'text-center',
             },
           },
         },
@@ -1982,7 +1982,6 @@ function prodCellConfigCre(): TprodCellConfig {
             props: {},
           },
         },
-        // inputType: 'text',
       },
       totalPrice: {
         id: 'totalPrice',
@@ -1998,9 +1997,11 @@ function prodCellConfigCre(): TprodCellConfig {
       typhoonProtection: {
         id: 'typhoonProtection',
         label: '防颱',
+        theadItemClassName: 'text-center',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           checkBoxProps: {
+            wrapperStyle: { justifyContent: 'center' },
             propsArr: [{ key: 'typhoonProtection' }],
           },
         },
@@ -2008,9 +2009,11 @@ function prodCellConfigCre(): TprodCellConfig {
       bounceDoor: {
         id: 'bounceDoor',
         label: '彈射門',
+        theadItemClassName: 'text-center',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           checkBoxProps: {
+            wrapperStyle: { justifyContent: 'center' },
             propsArr: [{ key: 'bounceDoor' }],
           },
         },
@@ -2047,14 +2050,9 @@ type TadditionCellConfig = {
   cellConfig: {
     [key in TadditionKeys]: {
       readonly label: string;
-      // width: string;
-      // flex?: string;
-      // inputType?: HTMLInputTypeAttribute;
-      //
       inputSelPorps: TinputSelProps;
     };
   };
-  // & TaddtionInputCellType;
 };
 
 const additionCellConfigCre = (): TadditionCellConfig => {
@@ -2063,9 +2061,6 @@ const additionCellConfigCre = (): TadditionCellConfig => {
     cellConfig: {
       quotationNumber: {
         label: '合約編號',
-        // width: '100px',
-        // type: 'input',
-        // inputType: 'readyonly',
 
         inputSelPorps: {
           wrapperStyle: { width: '100px' },
@@ -2080,7 +2075,6 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       },
       itemName: {
         label: '項目',
-        // width: '60px', type: 'input'
         inputSelPorps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
@@ -2088,10 +2082,8 @@ const additionCellConfigCre = (): TadditionCellConfig => {
           },
         },
       },
-      // content: { label: '內容', width: 'auto', flex: 'auto', type: 'input' },
       content: {
         label: '內容',
-        //   width: '225px', flex: 'auto', type: 'input'
         inputSelPorps: {
           wrapperStyle: { width: '225px', flex: 'auto' },
           inputProps: {
@@ -2101,7 +2093,6 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       },
       quantity: {
         label: '數量',
-        //  width: '60px', type: 'input', inputType: 'number'
         inputSelPorps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
@@ -2111,7 +2102,6 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       },
       unitPrice: {
         label: '單價',
-        //  width: '110px', type: 'input'
         inputSelPorps: {
           wrapperStyle: { width: '100px' },
           inputProps: {
@@ -2121,7 +2111,6 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       },
       totalPrice: {
         label: '複價',
-        //   width: '110px', type: 'input'
         inputSelPorps: {
           wrapperStyle: { width: '110px' },
           inputProps: {
@@ -2131,7 +2120,6 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       },
       notes: {
         label: '備註',
-        // width: '170px', type: 'input'
         inputSelPorps: {
           wrapperStyle: { width: '170px' },
           inputProps: {

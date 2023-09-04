@@ -72,7 +72,7 @@ export default function DndThead({
           {theadIndex.map((key, index) => {
             // const theadInfo = prodCellConfig.cellConfig[key];
 
-            const { id, label, inputSelProps } = cellConfig[key as keyof typeof cellConfig];
+            const { id, label, inputSelProps, theadItemClassName } = cellConfig[key as keyof typeof cellConfig];
 
             const theadInfo = {
               id,
@@ -82,7 +82,13 @@ export default function DndThead({
 
             return (
               // key必須是items裡的值
-              <TheadItem key={key} theadInfo={theadInfo} allowMove={allowMove} isMoving={isMoving === key} />
+              <TheadItem
+                key={key}
+                className={theadItemClassName}
+                theadInfo={theadInfo}
+                allowMove={allowMove}
+                isMoving={isMoving === key}
+              />
             );
           })}
         </SortableContext>
@@ -115,7 +121,6 @@ export default function DndThead({
         classQuotation.prodkeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
       } else if (isExchange) {
         classQuotation.exProdKeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
-        console.log(classQuotation.exProdKeyArr);
       } else {
         classQuotation.editProdKeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.prodkeyArr;
       }
