@@ -382,14 +382,7 @@ function DndRow({
             }
 
             //____
-            return (
-              <div
-                key={key}
-                // className={scss.column}
-              >
-                <InputSel key={key} className={scss.column} disabled={disabled} {...inputSelProps} />
-              </div>
-            );
+            return <InputSel key={key} className={scss.column} disabled={disabled} {...inputSelProps} />;
           })}
           {/* column */}
         </div>

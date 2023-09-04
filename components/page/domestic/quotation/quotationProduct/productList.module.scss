@@ -19,7 +19,7 @@
   padding: 2px 3px;
   // margin-left: 16px;
   vertical-align: bottom;
-  z-index: -1;
+  // z-index: -1;
   > div,
   > label {
     padding: 0;
@@ -49,7 +49,7 @@
 .buttonBox {
   position: sticky;
   left: 0;
-  z-index: 0;
+  z-index: 1;
   display: inline-flex;
   align-items: flex-end;
   flex-wrap: nowrap;
