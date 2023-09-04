@@ -23,6 +23,7 @@ export type TcheckboxProps = {
   fontClassName?: string;
   onChange?: (v: string[]) => void;
   isRadio?: boolean;
+  disabled?: boolean;
   /**送進來的值必須是狀態，或是寫在hook外的值 */
   propsArr: TcheckBoxInfo[];
 };
@@ -36,6 +37,7 @@ export default function CheckBar({
   isRadio,
   onChange,
   propsArr,
+  disabled,
 }: TcheckboxProps) {
   const [arr, setArr] = useState<TcheckBoxInfo[]>(propsArr);
 
@@ -85,11 +87,12 @@ export default function CheckBar({
           >
             <Checkbox
               checked={value}
+              disabled={disabled}
               {...props}
               className={classNames(scss.antdCheck, props?.className)}
               onChange={onChange}
             >
-              <span className={classNames(fontClassName)}>{label}</span>
+              {label && <span className={classNames(fontClassName)}>{label}</span>}
             </Checkbox>
           </label>
         );

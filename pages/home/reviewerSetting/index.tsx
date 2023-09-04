@@ -12,12 +12,21 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import ReviewerSelector from 'components/global/gear/modal/reviewerSelector';
 
 // icon
 import { IconDelete01, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './index.module.scss';
+
+// api
+
+/**
+ * 新增回報人員 現在有api無法設定哪些人要回報
+ * 新增審核人員、新增檢視人員 承上，現在有api無法設定回報人員的審核人員、檢視人員
+ * 只能設定指定日報的審核人員、檢視人員
+ */
 
 export default function SetReviewer() {
   const [showModal, setShowModal] = useState(false);
@@ -71,7 +80,8 @@ export default function SetReviewer() {
           <Row02 showEmployeeSelector={showEmployeeSelector} />
         </div>
       </div>
-      <EmployeeSelector showModal={showModal} onConfirm={() => {}} onCancel={closeEmployeeSelector} />
+      {/* <EmployeeSelector showModal={showModal} onConfirm={() => {}} onCancel={closeEmployeeSelector} /> */}
+      <ReviewerSelector showModal={showModal} onCancel={closeEmployeeSelector} />
     </SubLayer>
   );
 }

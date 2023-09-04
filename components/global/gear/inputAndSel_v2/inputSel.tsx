@@ -14,6 +14,8 @@ import InputSelBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
+import { OptionWithIcon01 } from './selectCustom/optionWithIcon';
+import { SingleValueWithIcon01 } from './selectCustom/singleValueWithIcon';
 
 // css
 import scss from './inputSel.module.scss';
@@ -225,6 +227,18 @@ export default function InputSel({
 
       {selectProps &&
         (() => {
+          const { dynaOptionsList, dynaOptionsKey, withIcon } = selectProps;
+
+          let dynyOptions: Toption[] | undefined = undefined;
+
+          if (dynaOptionsList && dynaOptionsKey) {
+            dynyOptions = dynaOptionsList[dynaOptionsKey];
+
+            if (selectProps.props && !selectProps.props.options) {
+              selectProps.props.options = dynyOptions;
+            }
+          }
+
           let easyValue: Toption | undefined | null = undefined;
 
           if (selectProps.easyValue !== undefined) {
@@ -239,6 +253,13 @@ export default function InputSel({
               };
             }
           }
+
+          const customComponents = withIcon
+            ? {
+                Option: OptionWithIcon01,
+                SingleValue: SingleValueWithIcon01,
+              }
+            : undefined;
 
           return (
             <MySelect
@@ -261,34 +282,15 @@ export default function InputSel({
                   selectProps.props?.onBlur?.(e);
                   setIsFocus(false);
                 },
+                components: {
+                  ...customComponents,
+                  ...selectProps.props?.components,
+                },
+                options: selectProps.props?.options || dynyOptions,
               }}
             />
           );
         })()}
-
-      {/* {selectProps && (
-        <MySelect
-          wrapperClassName={selectProps.wrapperClassName}
-          wrapperStyle={selectProps.wrapperStyle}
-          arrowType={selectProps.arrowType}
-          fontClassName={fontClassName}
-          props={{
-            isDisabled: disabled,
-            placeholder: `請輸入${caption ?? ''}`,
-            //
-            ...selectProps.props,
-            //
-            onFocus: (e) => {
-              selectProps.props?.onFocus?.(e);
-              setIsFocus(true);
-            },
-            onBlur: (e) => {
-              selectProps.props?.onBlur?.(e);
-              setIsFocus(false);
-            },
-          }}
-        />
-      )} */}
 
       {datePickerProps && (
         <MyDatePicker
@@ -361,6 +363,7 @@ export default function InputSel({
           wrapperClassName={classNames(checkBoxProps.wrapperClassName)}
           wrapperStyle={checkBoxProps.wrapperStyle}
           fontClassName={fontClassName}
+          disabled={disabled}
           isRadio={checkBoxProps.isRadio}
           onChange={checkBoxProps.onChange}
           propsArr={checkBoxProps.propsArr}

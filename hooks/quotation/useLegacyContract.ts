@@ -5,9 +5,8 @@ import moment from 'moment';
 import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { checkDateFormat } from 'js/tools/date/checkDate';
-// import { yearConversion_chToStandard } from "js/tools/date/yearConversion_chToStandard"
-// import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh"
+
+import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
 import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
@@ -1355,7 +1354,7 @@ class Class_legacyContract {
       return false;
     }
 
-    const { quoteDate, deliveryDate } = this._legacyContract;
+    // const { quoteDate, deliveryDate } = this._legacyContract;
 
     // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
     //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
@@ -1669,27 +1668,26 @@ export {
   useLegacyContract,
 };
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
+export type { TprodCellConfig };
 
-// console.log(isNaN(new Date('1111-11-11').getTime()));
-// console.log(isNaN(new Date('aaaa').getTime()));
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
 
 type TprodInputCellType = {
   [key in keyof Pick<
@@ -1733,15 +1731,10 @@ type TprodCellConfig = {
     [key in TprodKeys]: {
       id: key;
       label: string;
-      width: string;
-      // type: "input" | "select" | "selectWithIcon" | "checkbox" | "readOnly"
-      inputType?: HTMLInputTypeAttribute;
-      options?: Toption[];
+      theadItemClassName?: string;
+      inputSelProps: TinputSelProps;
     };
-  } & TprodInputCellType &
-    TprodSelectWithIconCellType &
-    TprodCheckboxCellType &
-    TprodSelect;
+  };
 };
 
 function prodCellConfigCre(): TprodCellConfig {
@@ -1776,37 +1769,265 @@ function prodCellConfigCre(): TprodCellConfig {
       quotationNumber: {
         id: 'quotationNumber',
         label: '合約編號',
-        width: '100px',
-        type: 'input',
-        inputType: 'readyonly',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {
+              readOnly: true,
+            },
+          },
+        },
       },
-      idNumber: { id: 'idNumber', label: '編號', width: '100px', type: 'input', inputType: 'number' },
-      discountRate: { id: 'discountRate', label: '折數', width: '60px', type: 'input', inputType: 'number' },
-      itemName: { id: 'itemName', label: '項目', width: '100px', type: 'input' },
+      idNumber: {
+        id: 'idNumber',
+        label: '編號',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      discountRate: {
+        id: 'discountRate',
+        label: '折數',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      itemName: {
+        id: 'itemName',
+        label: '項目',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
       quoteType: {
         id: 'quoteType',
         label: '報價別',
-        width: '105px',
-        type: 'select',
-        options: optionsCreator_quoteType(),
+        inputSelProps: {
+          wrapperStyle: { width: '105px' },
+          selectProps: {
+            props: {
+              options: optionsCreator_quoteType(),
+            },
+          },
+        },
       },
-      doorType: { id: 'doorType', label: '門型', width: '100px', type: 'select', options: optionsCreator_doorModel() },
-      length: { id: 'length', label: 'L(m)', width: '60px', type: 'input', inputType: 'number' },
-      width: { id: 'width', label: 'W(m)', width: '60px', type: 'input', inputType: 'number' },
-      height: { id: 'height', label: 'h(m)', width: '60px', type: 'input', inputType: 'number' },
-      thickness: { id: 'thickness', label: 'B(m)', width: '60px', type: 'input', inputType: 'number' },
-      area: { id: 'area', label: '面積', width: '60px', type: 'input' },
-      volume: { id: 'volume', label: '才數', width: '75px', type: 'input' },
-      material: { id: 'material', label: '材料', width: '120px', type: 'input' },
-      surface: { id: 'surface', label: '表面', width: '55px', type: 'input' },
-      doorTrack: { id: 'doorTrack', label: '門軌', width: '300px', type: 'selectWithIcon' },
-      horsepower: { id: 'horsepower', label: '馬力', width: '90px', type: 'input' },
-      quantity: { id: 'quantity', label: '數量', width: '55px', type: 'input', inputType: 'number' },
-      unitPrice: { id: 'unitPrice', label: '單價', width: '120px', type: 'input', inputType: 'text' },
-      totalPrice: { id: 'totalPrice', label: '複價', width: '140px', type: 'input', inputType: 'text' },
-      typhoonProtection: { id: 'typhoonProtection', label: '防颱', width: '60px', type: 'checkbox' },
-      bounceDoor: { id: 'bounceDoor', label: '彈射門', width: '60px', type: 'checkbox' },
-      notes: { id: 'notes', label: '備註', width: '90px', type: 'input' },
+      doorType: {
+        id: 'doorType',
+        label: '門型',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          selectProps: {
+            props: {
+              options: optionsCreator_doorModel(),
+            },
+          },
+        },
+      },
+      length: {
+        id: 'length',
+        label: 'L(m)',
+        theadItemClassName: 'text-center',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+              className: 'text-center',
+            },
+          },
+        },
+      },
+      width: {
+        id: 'width',
+        label: 'W(m)',
+        theadItemClassName: 'text-center',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+              className: 'text-center',
+            },
+          },
+        },
+      },
+      height: {
+        id: 'height',
+        label: 'h(m)',
+        theadItemClassName: 'text-center',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+              className: 'text-center',
+            },
+          },
+        },
+      },
+      thickness: {
+        id: 'thickness',
+        label: 'B(m)',
+        theadItemClassName: 'text-center',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+              className: 'text-center',
+            },
+          },
+        },
+      },
+      area: {
+        id: 'area',
+        label: '面積',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      volume: {
+        id: 'volume',
+        label: '才數',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      material: {
+        id: 'material',
+        label: '材料',
+        inputSelProps: {
+          wrapperStyle: { width: '120px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      surface: {
+        id: 'surface',
+        label: '表面',
+        inputSelProps: {
+          wrapperStyle: { width: '55px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      doorTrack: {
+        id: 'doorTrack',
+        label: '門軌',
+        inputSelProps: {
+          wrapperStyle: { width: '300px' },
+          selectProps: {
+            props: {},
+            withIcon: true,
+            dynaOptionsList: {
+              normal: optionsCre_doorTrack_normal(),
+              typhoonProtection: optionsCre_doorTrack_typhoonProtection(),
+            },
+          },
+        },
+      },
+      horsepower: {
+        id: 'horsepower',
+        label: '馬力',
+        inputSelProps: {
+          wrapperStyle: { width: '90px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      quantity: {
+        id: 'quantity',
+        label: '數量',
+        inputSelProps: {
+          wrapperStyle: { width: '55px' },
+          inputProps: {
+            props: { type: 'number' },
+          },
+        },
+      },
+      unitPrice: {
+        id: 'unitPrice',
+        label: '單價',
+        inputSelProps: {
+          wrapperStyle: { width: '120px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      totalPrice: {
+        id: 'totalPrice',
+        label: '複價',
+        inputSelProps: {
+          wrapperStyle: { width: '140px' },
+          inputProps: {
+            props: {},
+          },
+        },
+        // inputType: 'text',
+      },
+      typhoonProtection: {
+        id: 'typhoonProtection',
+        label: '防颱',
+        theadItemClassName: 'text-center',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          checkBoxProps: {
+            wrapperStyle: { justifyContent: 'center' },
+            propsArr: [{ key: 'typhoonProtection' }],
+          },
+        },
+      },
+      bounceDoor: {
+        id: 'bounceDoor',
+        label: '彈射門',
+        theadItemClassName: 'text-center',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          checkBoxProps: {
+            wrapperStyle: { justifyContent: 'center' },
+            propsArr: [{ key: 'bounceDoor' }],
+          },
+        },
+      },
+      notes: {
+        id: 'notes',
+        label: '備註',
+        inputSelProps: {
+          wrapperStyle: { width: '90px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
     },
   };
 }
@@ -1828,12 +2049,10 @@ type TadditionCellConfig = {
   keyArr: TadditionKeys[];
   cellConfig: {
     [key in TadditionKeys]: {
-      label: string;
-      width: string;
-      flex?: string;
-      inputType?: HTMLInputTypeAttribute;
+      readonly label: string;
+      inputSelPorps: TinputSelProps;
     };
-  } & TaddtionInputCellType;
+  };
 };
 
 const additionCellConfigCre = (): TadditionCellConfig => {
@@ -1842,17 +2061,72 @@ const additionCellConfigCre = (): TadditionCellConfig => {
     cellConfig: {
       quotationNumber: {
         label: '合約編號',
-        width: '100px',
-        type: 'input',
-        inputType: 'readyonly',
+
+        inputSelPorps: {
+          wrapperStyle: { width: '100px' },
+          disabled: true,
+          showBaseline: 'invisible',
+          inputProps: {
+            props: {
+              readOnly: true,
+            },
+          },
+        },
       },
-      itemName: { label: '項目', width: '60px', type: 'input' },
-      // content: { label: '內容', width: 'auto', flex: 'auto', type: 'input' },
-      content: { label: '內容', width: '225px', flex: 'auto', type: 'input' },
-      quantity: { label: '數量', width: '60px', type: 'input', inputType: 'number' },
-      unitPrice: { label: '單價', width: '110px', type: 'input' },
-      totalPrice: { label: '複價', width: '110px', type: 'input' },
-      notes: { label: '備註', width: '170px', type: 'input' },
+      itemName: {
+        label: '項目',
+        inputSelPorps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      content: {
+        label: '內容',
+        inputSelPorps: {
+          wrapperStyle: { width: '225px', flex: 'auto' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      quantity: {
+        label: '數量',
+        inputSelPorps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: { type: 'number' },
+          },
+        },
+      },
+      unitPrice: {
+        label: '單價',
+        inputSelPorps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      totalPrice: {
+        label: '複價',
+        inputSelPorps: {
+          wrapperStyle: { width: '110px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      notes: {
+        label: '備註',
+        inputSelPorps: {
+          wrapperStyle: { width: '170px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
     },
   };
 };

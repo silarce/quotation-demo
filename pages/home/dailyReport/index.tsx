@@ -730,7 +730,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     <SearchBar
       inputSelPropsArr={[
         {
-          wrapperStyle: { width: '60px' },
+          wrapperStyle: { width: '70px' },
           selectProps: {
             easyValue: searchObj?.isUserReviewed,
             props: {
@@ -742,9 +742,10 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
           },
         },
         {
-          wrapperStyle: { width: '130px' },
+          wrapperStyle: { width: '100px' },
           datePickerProps: {
             props: {
+              placeholder: '101-01-01',
               value: searchObj?.date ? moment(searchObj?.date) : null,
               onChange: (m) => {
                 onChange_date(m?.toISOString() || '');
@@ -753,7 +754,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
           },
         },
         {
-          wrapperStyle: { width: '75px' },
+          wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
               value: searchObj?.keyWord ?? '',
@@ -1054,6 +1055,8 @@ const panelListCreator = ({
   saveTempReport: () => void;
   getTempReport: () => void;
 }) => {
+  const isReviewCompleted = reportInEdit?.isReviewCompleted;
+
   const listSwitchButton: TpanelList[number] = {
     type: 'myButton',
     label: isCalendar ? '列表' : '月曆',
@@ -1118,12 +1121,15 @@ const panelListCreator = ({
   ];
 
   /**reporter 編輯 */
+  const editBtn: TpanelList[number] = {
+    type: 'myButton',
+    label: '編輯',
+    onClick: switchIsEdit,
+  };
+
   const panelList_reporter_inEdit01: TpanelList = [
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: switchIsEdit,
-    },
+    //
+    isReviewCompleted ? undefined : editBtn,
   ];
 
   /**reporter 上傳 取消 */

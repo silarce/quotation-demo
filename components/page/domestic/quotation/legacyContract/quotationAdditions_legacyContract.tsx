@@ -8,7 +8,7 @@ import ExchangePanel, { ExchangeRow } from './exchangePanel/exchangePanel';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddButton from 'components/global/gear/button/addButton';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
@@ -165,30 +165,26 @@ export default function QuotationAdditions({
 
           {/*  */}
           {additionKeyindex.map((key, cIndex) => {
-            const { width, flex, type, inputType } = cellConfig[key];
-            const theStyle = { width, flex };
+            const inputSelPorps = _.cloneDeep(cellConfig[key].inputSelPorps);
 
-            let showBaseline: 'auto' | 'invisible' = 'auto';
-
-            let theDisabled = disabled;
-
-            if (key === 'quotationNumber') {
-              theDisabled = true;
-              showBaseline = 'invisible';
-            }
+            const inputProps: TinputProps = {
+              ...inputSelPorps.inputProps,
+              props: {
+                value: addi[key],
+                onChange: (e) => (addi[key] = e.target.value),
+                ...inputSelPorps?.inputProps?.props,
+              },
+            };
 
             return (
-              <div className={scss.column} key={cIndex} style={theStyle}>
-                <InputSel
-                  disabled={theDisabled}
-                  showBaseline={showBaseline}
-                  inputProps={{
-                    value: addi[key],
-                    onChange: (v) => (addi[key] = v),
-                    inputType: inputType,
-                  }}
-                />
-              </div>
+              <InputSel
+                key={cIndex}
+                className={scss.column}
+                disabled={disabled}
+                showBaseline="auto"
+                {...inputSelPorps}
+                inputProps={inputProps}
+              />
             );
           })}
         </CellWithBar>
@@ -214,8 +210,8 @@ export default function QuotationAdditions({
               <div className={classNames(scss.btnBox, scss.headEmpty, isAppend && scss.resetChange)} />
 
               {additionKeyindex.map((item, index) => {
-                const { label, flex, width } = cellConfig[item];
-                const theStyle = { width, flex };
+                const { label, inputSelPorps } = cellConfig[item];
+                const theStyle = inputSelPorps?.wrapperStyle;
 
                 return (
                   <div className={classNames(styleL.theadCell, 'relative')} key={index} style={theStyle}>

@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 // css
-import style from './theadItem.module.scss';
+// import style from './theadItem.module.scss';
 import styleL from '../../local.module.scss';
 
 interface TtheadItem {
@@ -17,10 +17,12 @@ export default function TheadItem({
   theadInfo,
   allowMove,
   isMoving,
+  className,
 }: {
   theadInfo: TtheadItem;
   allowMove?: boolean;
   isMoving?: boolean;
+  className?: string;
 }) {
   const { id, label, width } = theadInfo;
 
@@ -40,15 +42,13 @@ export default function TheadItem({
   };
 
   // ===========================================================
-  const lwhbReg = /L|W|H|B/;
 
   const styleAllowMove = allowMove ? styleL.allowMove : '';
   const styleIsMoving = isMoving ? styleL.isMoving : '';
-  const styleIsCentewr = lwhbReg.test(id) ? styleL.textCenter : '';
 
   return (
     <div
-      className={classNames(styleL.theadCell, styleAllowMove, styleIsMoving, styleIsCentewr, 'relative')}
+      className={classNames(styleL.theadCell, styleAllowMove, styleIsMoving, className, 'relative')}
       ref={setNodeRef}
       style={itemStyle}
       {...attributes}

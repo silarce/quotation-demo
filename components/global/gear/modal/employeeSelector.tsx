@@ -105,7 +105,7 @@ export default function EmployeeSelector({
   }, [inView]);
 
   useEffect(() => {
-    if (!showModal) {
+    if (showModal) {
       const newPageObj = { ...pageObj, page: -1 };
       setPageObj(newPageObj);
       setData(undefined);

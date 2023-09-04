@@ -5,7 +5,7 @@ import classNames from 'classnames';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
 
@@ -115,28 +115,63 @@ export default function ExProductList_legacy({
             <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
             {/*  */}
             {theadIndexArr.map((key) => {
-              const { width, id, type, inputType, options } = prodCellConfig.cellConfig[key];
-              const textCenter = centerReg.test(id) ? scss_l.textCenter : '';
-              const theStyle = { width };
+              if (!prod) {
+                return null;
+              }
+
               const stateValue = prod[key];
-              const TheCell = cellSwitcher({
-                dataItem: prod,
-                key,
-                type,
-                disabled,
-                stateValue,
-                inputType,
-                options,
-              });
+              const inputSelProps = _.cloneDeep(prodCellConfig.cellConfig[key].inputSelProps);
+              const { inputProps, selectProps, checkBoxProps } = inputSelProps;
+
+              //____
+              if (inputProps?.props) {
+                inputProps.props.value = stateValue as string;
+
+                inputProps.props.onChange = (e) => {
+                  (prod[key] as string) = e.target.value;
+                };
+              }
+
+              //____
+              if (selectProps) {
+                let dynyOptionsKey;
+
+                if (key === 'doorTrack') {
+                  dynyOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
+                }
+
+                selectProps.easyValue = stateValue as string;
+
+                selectProps.dynaOptionsKey = dynyOptionsKey;
+
+                if (selectProps.props) {
+                  selectProps.props.onChange = (option) => {
+                    (prod[key] as string) = option?.value ?? '';
+                  };
+                }
+              }
+
+              //____
+
+              if (checkBoxProps?.propsArr[0]) {
+                checkBoxProps.propsArr[0].value = stateValue as boolean;
+
+                checkBoxProps.onChange = (arr) => {
+                  (prod[key] as boolean) = !!arr[0];
+                };
+              }
 
               return (
-                <div className={`${scss.column} ${textCenter}`} key={key} style={theStyle}>
-                  {TheCell}
+                <div
+                  key={key}
+                  // className={scss.column}
+                >
+                  <InputSel key={key} className={scss.column} disabled={disabled} {...inputSelProps} />
                 </div>
               );
-            })}{' '}
+            })}
             {/* column */}
-          </div>{' '}
+          </div>
           {/* row */}
         </CellWithBar>
       </div>
@@ -194,132 +229,6 @@ export default function ExProductList_legacy({
   // ===========================================================
   // ===========================================================
   // ===========================================================
-  function cellSwitcher({
-    dataItem,
-    key,
-    type,
-    disabled,
-    stateValue,
-    inputType,
-    options,
-  }: {
-    dataItem: Class_product;
-    key: Class_legacyContract['prodCellConfig']['keyArr'][number];
-    type: 'input' | 'selectWithIcon' | 'checkbox' | 'select';
-    disabled: boolean;
-    stateValue: string | boolean | number;
-    inputType?: string;
-    options?: Toption[];
-  }) {
-    switch (type) {
-      case 'input': {
-        if (typeof stateValue !== 'string') {
-          return null;
-        }
-
-        let showBaseline: 'auto' | 'invisible' = 'auto';
-
-        if (key === 'quotationNumber') {
-          disabled = true;
-          showBaseline = 'invisible';
-        }
-
-        const onChange = (value: string) => (dataItem[key as keyof TprodInputCellType] = value);
-
-        return (
-          <InputSel
-            disabled={disabled}
-            showBaseline={showBaseline}
-            inputProps={{
-              value: stateValue,
-              onChange: onChange,
-              inputType: inputType,
-            }}
-          />
-        );
-      }
-
-      case 'select': {
-        if (typeof stateValue === 'boolean') {
-          return null;
-        }
-
-        const onChange = (option: Toption | null) =>
-          (dataItem[key as keyof TprodSelectWithIconCellType] = option!.value);
-
-        return (
-          <InputSel
-            disabled={disabled}
-            selectProps={{
-              value: stateValue,
-              options: options ?? [],
-              onChange: onChange,
-              arrowType: 'black',
-              fontSize: '16px',
-            }}
-          />
-        );
-      }
-
-      case 'selectWithIcon': {
-        if (typeof stateValue === 'boolean') {
-          return null;
-        }
-
-        const options: Toption[] = dataItem.options_doorTrack;
-
-        const onChange = (option: Toption | null) =>
-          (dataItem[key as keyof TprodSelectWithIconCellType] = option!.value);
-        const customComponents = {
-          Option: OptionWithIcon01,
-          SingleValue: SingleValueWithIcon01,
-        };
-
-        return (
-          <InputSel
-            disabled={disabled}
-            selectProps={{
-              value: stateValue,
-              options: options,
-              onChange: onChange,
-              arrowType: 'black',
-              fontSize: '16px',
-              customComponents: customComponents,
-              selClassNames: {
-                singleValue: () => scss.inputSelSingleValue,
-                placeholder: () => scss.inputSelPlaceholder,
-                input: () => scss.inputSelInput,
-              },
-            }}
-          />
-        );
-      }
-
-      case 'checkbox': {
-        if (typeof stateValue !== 'boolean') {
-          return null;
-        }
-
-        const onClick = () => {
-          if (disabled) {
-            return;
-          }
-
-          dataItem[key as keyof TprodCheckboxCellType] = !dataItem[key];
-        };
-
-        return (
-          <div className={scss_l.checkbox}>
-            <Checkbox01 stateValue={stateValue} disabled={disabled} onClick={onClick} />
-          </div>
-        );
-      }
-
-      default:
-        return null;
-    }
-  }
-  // ------------------------
 } //ProductList
 
 // ================================================

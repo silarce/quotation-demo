@@ -307,14 +307,26 @@ div.selControl {
       :global(.ant-checkbox-inner) {
         // width: 15px;
         // height: 15px;
-        border-color: $colorBorder01;
+        border-color: $colorMain;
+        background-color: transparent;
+        &::after {
+          border-color: $colorMain;
+        }
+      }
+      &:global(.ant-checkbox-disabled) {
+        :global(.ant-checkbox-inner) {
+          // 4版antd設了important，我也只能設mportant了;
+          border-color: $colorMain !important 
+        }
       }
     }
-    :global(.ant-checkbox-checked) {
-      :global(.ant-checkbox-inner) {
-        background-color: $colorMain;
-      }
-    }
+    // :global(.ant-checkbox):global(.ant-checkbox-checked) {
+    //   :global(.ant-checkbox-inner) {
+    //     // border-color: $colorMain;
+    //     // background-color: $colorMain;
+    //     // background-color: transparent;
+    //   }
+    // }
   } // antdCheck
 }
 

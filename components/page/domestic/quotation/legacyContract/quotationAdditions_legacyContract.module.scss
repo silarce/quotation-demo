@@ -1,6 +1,8 @@
 @use "styles/theme01" as *;
 
 .wrapper {
+  position: relative;
+  z-index: 1;
   width: calc(100% - (17px * 2));
   margin: auto;
   margin-top: 17px;
