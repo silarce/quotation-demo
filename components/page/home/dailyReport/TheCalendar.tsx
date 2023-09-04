@@ -77,7 +77,7 @@ export default function TheCalendar({
       let isReviewedByUser = false;
       let isAllowToReview = false;
 
-      reviewStatus.forEach((statu) => {
+      reviewStatus?.forEach((statu) => {
         const { type, reviewerEmployee, reviewedAt, reviewerEmployeeId } = statu;
         const reviewerId = reviewerEmployee?.id ?? null;
 
