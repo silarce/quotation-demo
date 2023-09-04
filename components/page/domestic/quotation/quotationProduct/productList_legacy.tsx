@@ -1,13 +1,12 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 import _ from 'lodash';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
-import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
-import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
+
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
@@ -16,23 +15,14 @@ import iconMove from 'public/image/icon/move.svg';
 
 // css
 import scss from './productList.module.scss';
-import scss_l from '../local.module.scss';
-
 // type
-import { Toption } from 'js/utils/options/options';
-import { TprodCellConfig } from 'hooks/quotation/useLegacyContract';
 
-// dnd
-import { DragEndEvent } from '@dnd-kit/core';
+import { TprodCellConfig } from 'hooks/quotation/useLegacyContract';
 
 // ==========================================================
 // ==========================================================
 import { Class_legacyContract, Class_product } from 'hooks/quotation/useLegacyContract';
-import type {
-  TprodInputCellType,
-  TprodSelectWithIconCellType,
-  TprodCheckboxCellType,
-} from 'hooks/quotation/useLegacyContract';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // dnd
@@ -325,7 +315,7 @@ function DndRow({
 
   return (
     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-      <CellWithBar isActive={isActive}>
+      <CellWithBar isActive={isActive} className="z-0">
         <div className={scss.row} onClick={onRowClick}>
           {/*  */}
           {!isAppend && (
