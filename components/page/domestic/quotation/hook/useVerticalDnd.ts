@@ -65,6 +65,8 @@ const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; re
   const onDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
 
+    setMovingId(undefined);
+
     if (active.id !== over?.id) {
       const oldIndex = dndKeyArr.indexOf(active.id as string);
       const newIndex = dndKeyArr.indexOf(over?.id as string);
@@ -74,8 +76,6 @@ const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; re
 
       return newKeyArr;
     }
-
-    setMovingId(undefined);
   };
 
   function onDragStart(e: DragStartEvent) {
