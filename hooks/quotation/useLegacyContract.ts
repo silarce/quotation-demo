@@ -2046,12 +2046,15 @@ type TadditionCellConfig = {
   keyArr: TadditionKeys[];
   cellConfig: {
     [key in TadditionKeys]: {
-      label: string;
-      width: string;
-      flex?: string;
-      inputType?: HTMLInputTypeAttribute;
+      readonly label: string;
+      // width: string;
+      // flex?: string;
+      // inputType?: HTMLInputTypeAttribute;
+      //
+      inputSelPorps: TinputSelProps;
     };
-  } & TaddtionInputCellType;
+  };
+  // & TaddtionInputCellType;
 };
 
 const additionCellConfigCre = (): TadditionCellConfig => {
@@ -2060,17 +2063,82 @@ const additionCellConfigCre = (): TadditionCellConfig => {
     cellConfig: {
       quotationNumber: {
         label: '合約編號',
-        width: '100px',
-        type: 'input',
-        inputType: 'readyonly',
+        // width: '100px',
+        // type: 'input',
+        // inputType: 'readyonly',
+
+        inputSelPorps: {
+          wrapperStyle: { width: '100px' },
+          disabled: true,
+          showBaseline: 'invisible',
+          inputProps: {
+            props: {
+              readOnly: true,
+            },
+          },
+        },
       },
-      itemName: { label: '項目', width: '60px', type: 'input' },
+      itemName: {
+        label: '項目',
+        // width: '60px', type: 'input'
+        inputSelPorps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
       // content: { label: '內容', width: 'auto', flex: 'auto', type: 'input' },
-      content: { label: '內容', width: '225px', flex: 'auto', type: 'input' },
-      quantity: { label: '數量', width: '60px', type: 'input', inputType: 'number' },
-      unitPrice: { label: '單價', width: '110px', type: 'input' },
-      totalPrice: { label: '複價', width: '110px', type: 'input' },
-      notes: { label: '備註', width: '170px', type: 'input' },
+      content: {
+        label: '內容',
+        //   width: '225px', flex: 'auto', type: 'input'
+        inputSelPorps: {
+          wrapperStyle: { width: '225px', flex: 'auto' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      quantity: {
+        label: '數量',
+        //  width: '60px', type: 'input', inputType: 'number'
+        inputSelPorps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: { type: 'number' },
+          },
+        },
+      },
+      unitPrice: {
+        label: '單價',
+        //  width: '110px', type: 'input'
+        inputSelPorps: {
+          wrapperStyle: { width: '100px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      totalPrice: {
+        label: '複價',
+        //   width: '110px', type: 'input'
+        inputSelPorps: {
+          wrapperStyle: { width: '110px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
+      notes: {
+        label: '備註',
+        // width: '170px', type: 'input'
+        inputSelPorps: {
+          wrapperStyle: { width: '170px' },
+          inputProps: {
+            props: {},
+          },
+        },
+      },
     },
   };
 };
