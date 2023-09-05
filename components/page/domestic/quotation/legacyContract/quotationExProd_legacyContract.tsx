@@ -33,11 +33,12 @@ export default function QuotationExProd({
 
   const [allowMove, setAllowMove] = useState(false);
 
-  const addAdditionalExchange = legacyContract.addExProd;
+  const addExtraExprod = () => {
+    legacyContract.addExtraExProd();
+  };
 
   return (
     <div className={classNames(scss.wrapper)}>
-      {/* <div className={`${scss.container} ${borderRed} ${className}`}> */}
       <div className={classNames(scss.container, scss.exchange, className)}>
         <div className={styleL.header}>
           <h2>變更 主產品設定</h2>
@@ -53,7 +54,7 @@ export default function QuotationExProd({
 
             <ExProductList_legacy classQuotation={legacyContract as Class_legacyContract} disabled={disabled} />
             <div className={scss.addBtnWrapper}>
-              <AddButton className={scss.addBtn} label="追加產品" onClick={addAdditionalExchange} />
+              <AddButton className={scss.addBtn} label="追加產品" onClick={addExtraExprod} />
             </div>
           </div>
 

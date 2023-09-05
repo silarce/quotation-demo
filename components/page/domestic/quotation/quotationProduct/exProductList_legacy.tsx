@@ -1,13 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import _ from 'lodash';
 import Image from 'next/image';
 import classNames from 'classnames';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
+
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
-import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';
@@ -33,18 +31,10 @@ import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import iconMove from 'public/image/icon/move.svg';
 // css
 import scss from './productList.module.scss';
-import scss_l from '../local.module.scss';
-
-import { Toption } from 'js/utils/options/options';
 
 // ==========================================================
 // ==========================================================
 import { Class_legacyContract, Class_product } from 'hooks/quotation/useLegacyContract';
-import type {
-  TprodInputCellType,
-  TprodSelectWithIconCellType,
-  TprodCheckboxCellType,
-} from 'hooks/quotation/useLegacyContract';
 
 // ==========================================================
 // ==========================================================
@@ -56,13 +46,13 @@ export default function ExProductList_legacy({
   disabled: boolean;
 }) {
   // ---------------------------------------------------------------
-  const { prodExchangeList, prodCellConfig } = classQuotation;
+  const {
+    prodCellConfig,
+    //
+    exProdList,
+  } = classQuotation;
   const theadIndexArr = classQuotation.exProdKeyArr;
   type TtheadIndexArr = typeof theadIndexArr;
-
-  // ---------------------------------------------------------------
-
-  const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
 
   // ---------------------------------------------------------------
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -70,7 +60,7 @@ export default function ExProductList_legacy({
   // ---------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(prodExchangeList),
+    listKeyArr: Object.keys(exProdList),
     resetTrigger: classQuotation,
   });
 
@@ -110,7 +100,7 @@ export default function ExProductList_legacy({
             setActiveIndex(pIndex);
           }}
         >
-          <div className={scss.row} onClick={() => (classQuotation.activeProd = pIndex)}>
+          <div className={scss.row}>
             {/*  */}
             <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
             {/*  */}
@@ -193,16 +183,22 @@ export default function ExProductList_legacy({
       >
         <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
           {dndKeyArr.map((key, pIndex) => {
-            const obj = prodExchangeList[key];
+            const exProd = exProdList[key];
 
-            if (!obj) {
+            if (!exProd) {
               return null;
             }
 
-            const { prod, delSelf } = obj;
-
             const isActive = pIndex === activeIndex;
             const isMoving = movingId === key;
+
+            const hasParent = exProd.hasParent;
+
+            const delSelf = !hasParent
+              ? () => {
+                  exProd.delSelf();
+                }
+              : undefined;
 
             return (
               <ExchangeRow
@@ -213,7 +209,8 @@ export default function ExProductList_legacy({
                 isActive={isActive}
                 isMoving={isMoving}
                 delSelf={delSelf}
-                prod={prod}
+                // delSelf={exProd.delSelf}
+                prod={exProd}
                 theadIndexArr={theadIndexArr}
               />
             );

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment from 'moment';
+import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -33,6 +34,19 @@ import { Class_signature } from './class_signature';
 
 type TreRender = () => void;
 
+type TprodList = {
+  [key: string]: Class_product;
+};
+
+type TprodKit = {
+  [key: string]: {
+    key: string;
+    prod: Class_product;
+    // delSelf: () => void;
+    copySelf: () => void;
+  };
+};
+
 // =======================================================================
 // =======================================================================
 // =======================================================================
@@ -61,10 +75,39 @@ class Class_legacyContract {
         legacyProduct: product,
         // countTotalDiscount: this.countTotalDiscount,
         countSubTotal: this.countSubTotal,
+        delSelf: () => {},
       });
     });
     // __________________________
     // __________________________
+
+    const prodList: TprodList = {};
+    sortedProdArr.forEach((prodData) => {
+      let key: string;
+
+      if ('id' in prodData) {
+        // 啊我都已經用'id' in prodData了，這邊也沒有紅線
+        // check的時候還是給我報型別錯誤
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        key = String(prodData.id as string);
+      } else {
+        key = 'new-' + nanoid();
+      }
+
+      const delSelf = () => {
+        delete this._prodList[key];
+      };
+
+      prodList[key] = new Class_product({
+        reRender: reRender,
+        legacyProduct: prodData,
+        countSubTotal: this.countSubTotal,
+        delSelf,
+      });
+    });
+
+    this._prodList = prodList;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -112,12 +155,21 @@ class Class_legacyContract {
     this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
 
     // constructor
+    // constructor
+    // constructor
+    // constructor
+    // constructor
   } // constructor
 
   private _legacyContract;
   private _reRender;
   /**用來判斷這是哪個class */
   identify = 'legacy' as const;
+
+  // ---------------------
+  private _prodList;
+  private _extraExProdList: TprodList = {};
+  // private _prodKeyArr;
   // ---------------------
   classBasicInfo;
   classProductArr;
@@ -176,15 +228,163 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  // ---------------------
-  get prodkeyArr() {
-    return this.prodCellConfig.keyArr;
+  // ------------------------------------------------------------
+  get prodList_2() {
+    return this._prodList;
   }
-  set prodkeyArr(v) {
-    this.prodCellConfig.keyArr = v;
+
+  // get prodKeyArr_2() {
+  //   return this._prodKeyArr;
+  // }
+
+  // set prodKeyArr_2(v) {
+  //   this._prodKeyArr = v;
+  //   this._reRender();
+  // }
+
+  // delProd_2(id: string) {
+  //   delete this._prodList[id];
+  //   // _.pull(this._prodKeyArr, id);
+
+  //   this._reRender();
+  // }
+
+  copyProd_2(id: string) {
+    const newId = 'new-' + nanoid();
+
+    const copy = _.cloneDeep(this._prodList[id]);
+
+    copy.id = undefined;
+
+    copy.delSelf = () => {
+      delete this._prodList[newId];
+    };
+
+    this._prodList[newId] = copy;
+    // this._prodKeyArr.push(newId);
+
     this._reRender();
   }
 
+  addProd_2 = () => {
+    const newId = 'new-' + nanoid();
+
+    const delSelf = () => {
+      delete this._prodList[newId];
+    };
+
+    const prod = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: emptyProdCre(),
+      countSubTotal: this.countSubTotal,
+      delSelf: delSelf,
+    });
+    this._prodList[newId] = prod;
+
+    this._reRender();
+  };
+
+  // get prodKitArr_2() {
+  //   return this._prodKeyArr.map((key) => {
+  //     const prod = this._prodList[key];
+
+  //     const delSelf = () => {
+  //       this.delProd_2(key);
+  //     };
+
+  //     const copySelf = () => {
+  //       this.copyProd_2(key);
+  //     };
+
+  //     return {
+  //       key,
+  //       prod,
+  //       delSelf,
+  //       copySelf,
+  //     };
+  //   });
+  // }
+
+  get prodKitList_2() {
+    const kitList: TprodKit = {};
+
+    Object.keys(this._prodList).forEach((key) => {
+      const prod = this._prodList[key];
+
+      const copySelf = () => {
+        this.copyProd_2(key);
+      };
+
+      kitList[key] = {
+        key,
+        prod,
+        copySelf,
+      };
+    });
+
+    return kitList;
+  }
+
+  // -----------------------
+
+  get extraExProdList() {
+    return this._extraExProdList;
+  }
+
+  addExtraExProd = () => {
+    const newId = 'new-' + nanoid();
+
+    const delSelf = () => {
+      delete this._extraExProdList[newId];
+    };
+
+    const prod = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: emptyProdCre(),
+      countSubTotal: this.countSubTotal,
+      delSelf: delSelf,
+    });
+
+    this._extraExProdList[newId] = prod;
+
+    this._reRender();
+  };
+
+  // -----------------------
+
+  get exProdList() {
+    type TexchangeProdlist = {
+      [key: string]: Class_product;
+    };
+
+    const list: TexchangeProdlist = {};
+
+    Object.values(this._prodList).forEach((prod) => {
+      const exchangeProdList = prod.exchangeProdList;
+      Object.keys(exchangeProdList).forEach((key) => {
+        list[key] = exchangeProdList[key];
+      });
+    });
+
+    Object.keys(this._extraExProdList).forEach((key) => {
+      list[key] = this._extraExProdList[key];
+    });
+
+    return list;
+  }
+
+  // ------------------------------------------------------------
+  // 這三組都是欄位的keyArr
+
+  // 追加追減 上面的主產品設定用的 有合約編號欄位
+  get appendProdkeyArr() {
+    return this.prodCellConfig.keyArr;
+  }
+  set appendProdkeyArr(v) {
+    this.prodCellConfig.keyArr = v;
+    this._reRender();
+  }
+  // 報價單 主產品設定用的 沒有合約編號欄位
   get editProdKeyArr() {
     return this._editProdKeyArr;
   }
@@ -192,7 +392,7 @@ class Class_legacyContract {
     this._editProdKeyArr = v;
     this._reRender();
   }
-
+  // 變更 主產品設定用的keyArr 沒有合約編號欄位
   get exProdKeyArr() {
     return this._exProdKeyArr;
   }
@@ -200,53 +400,6 @@ class Class_legacyContract {
     this._exProdKeyArr = v;
     this._reRender();
   }
-
-  private _activeProd = -1; // 被選中的mainProduct的index
-  get activeProd() {
-    return this._activeProd;
-  }
-  set activeProd(v) {
-    this._activeProd = v;
-    this._reRender();
-  }
-
-  delProd = (index: number) => {
-    this.classProductArr.splice(index, 1);
-    this.activeProd = -1;
-    // this.countTotalDiscount();
-    this.countSubTotal();
-    this._reRender();
-  };
-  copyProd = (index: number) => {
-    const copy = _.cloneDeep(this.classProductArr[index]);
-    copy.id = undefined;
-    // this.classProductArr.push(copy);
-    this.classProductArr.push(
-      new Class_product({
-        reRender: this._reRender,
-        legacyProduct: copy._product,
-        // countTotalDiscount: this.countTotalDiscount,
-        countSubTotal: this.countSubTotal,
-      })
-    );
-    this.activeProd = index;
-    // this.countTotalDiscount();
-    this.countSubTotal();
-    this._reRender();
-  };
-  addProd = () => {
-    this.classProductArr.push(
-      new Class_product({
-        reRender: this._reRender,
-        legacyProduct: emptyProdCre(),
-        // countTotalDiscount: this.countTotalDiscount,
-        countSubTotal: this.countSubTotal,
-      })
-    );
-    this._activeProd = this.classProductArr.length - 1;
-    // this.countTotalDiscount();
-    this._reRender();
-  };
 
   //
   get exAddiKeyArr() {
@@ -296,33 +449,11 @@ class Class_legacyContract {
       return false;
     }
 
-    // const { quoteDate, deliveryDate } = this._legacyContract;
-
-    // if (!checkDateFormat(quoteDate as string ?? "", "tw")) {
-    //   myAlert.warning({ title: "報價日期格式錯誤", content: "格式例:100-01-01" }); return false
-    // }
-    // if (!checkDateFormat(deliveryDate as string ?? "", "tw")) {
-    //   myAlert.warning({ title: "交貨日期格式錯誤", content: "格式例:100-01-01" }); return false
-    // }
-
-    // if (!quoteDate) {
-    //   myAlert.warning({ title: '請選擇合約日期' });
-
-    //   return false;
-    // }
-
-    // if (!deliveryDate) {
-    //   myAlert.warning({ title: '請選擇交貨日期' });
-
-    //   return false;
-    // }
-
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
-    legacyContractCopy.products = this.classProductArr.map((prod, index) => {
+    legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
       const thePost = prod.postProd;
 
-      // if(!thePost.idNumber) thePost.idNumber = index + 1
       return thePost;
     });
 
@@ -342,11 +473,6 @@ class Class_legacyContract {
       }
     })();
 
-    // const quoteDate_Date = legacyContractCopy.quoteDate
-    //   ? new Date(legacyContractCopy.quoteDate as string).toISOString()
-    //   : '';
-    // = new Date(yearConversion_chToStandard(legacyContractCopy.quoteDate as string) as string)
-
     const deliveryDate_Date = (() => {
       if (!legacyContractCopy.deliveryDate) {
         return '';
@@ -360,10 +486,6 @@ class Class_legacyContract {
         return '';
       }
     })();
-    // const deliveryDate_Date = legacyContractCopy.deliveryDate
-    //   ? new Date(legacyContractCopy.deliveryDate).toISOString()
-    //   : '';
-    // = new Date(yearConversion_chToStandard(legacyContractCopy.deliveryDate as string) as string)
 
     legacyContractCopy.discountRate = Decimal.div(legacyContractCopy.discountRate, 100).toString();
 
@@ -384,98 +506,6 @@ class Class_legacyContract {
     };
   }
   // -------------------
-  // 主產品設定list
-  get prodList() {
-    // type Tlist = {
-    //   [key: string]: Class_product;
-    // };
-    type Tlist = {
-      [key: string]: {
-        del: () => void;
-        copy: () => void;
-        prod: Class_product;
-      };
-    };
-
-    const list: Tlist = {};
-
-    this.classProductArr.forEach((prod, index) => {
-      list[prod.dndId] = {
-        del: () => this.delProd(index),
-        copy: () => this.copyProd(index),
-        prod,
-      };
-    });
-    // console.log(list);
-
-    return list;
-  }
-
-  // 變更主產品設定
-  // appendProduction
-  private _prodAdditionalExchangeArr: Class_product[] = [];
-  addExProd = () => {
-    this._prodAdditionalExchangeArr.push(
-      new Class_product({
-        reRender: this._reRender,
-        legacyProduct: emptyProdCre(),
-        // countTotalDiscount: () => {},
-        countSubTotal: () => {},
-      })
-    );
-    this._reRender();
-  };
-
-  // 變更 主產品設定 的list object
-  get prodExchangeList() {
-    // 來源自主產品(classProduct)的陣列
-    const exchangeArrArr = this.classProductArr.map((cp) => {
-      return cp.exchangeProdArr;
-    });
-
-    // const list: { [key: `${number}`]: Class_product } = {};
-    // const exchangeArr = [..._.flatten(exchangeArrArr), ...this._additionalExchangeArr];
-
-    type TexchangeProdlist = {
-      [key: string]: {
-        prod: Class_product;
-        delSelf?: () => void;
-      };
-    };
-
-    const list: TexchangeProdlist = {};
-
-    let exchangeArr = [..._.flatten(exchangeArrArr)]; // 展開
-    exchangeArr = _.pull(exchangeArr, undefined); // 去掉undefined
-    // 把陣列裡的東西放進list
-    exchangeArr.forEach((prod, index) => {
-      if (!prod) {
-        return;
-      }
-
-      list[prod.dndId] = {
-        prod,
-      };
-    });
-
-    // 把額外追加的主產品放進去
-    this._prodAdditionalExchangeArr.forEach((prod, index) => {
-      if (!prod) {
-        return;
-      }
-
-      list[prod.dndId] = {
-        prod,
-        delSelf: () => {
-          this._prodAdditionalExchangeArr.splice(index, 1);
-          this._reRender();
-        },
-      };
-    });
-
-    return list;
-  }
-  // -----------
 
   // 配件設定 的list object
   get addiList() {
@@ -552,8 +582,8 @@ class Class_legacyContract {
   get prodExTotal() {
     let totalPrice = 0;
 
-    Object.values(this.prodExchangeList).forEach((prod) => {
-      totalPrice += Number(prod.prod.totalPrice.replaceAll(',', ''));
+    Object.values(this.exProdList).forEach((prod) => {
+      totalPrice += Number(prod.totalPrice.replaceAll(',', ''));
     });
 
     return totalPrice;

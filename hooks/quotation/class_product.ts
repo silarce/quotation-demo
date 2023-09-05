@@ -25,12 +25,16 @@ class Class_product {
     // countTotalDiscount,
     countSubTotal,
     parentProd,
+    //
+    delSelf,
   }: {
     reRender: TreRender;
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto;
     // countTotalDiscount: () => void;
     countSubTotal: () => void;
     parentProd?: Class_product;
+    //
+    delSelf: () => void;
   }) {
     this._reRender = reRender;
     this._product = legacyProduct;
@@ -65,6 +69,11 @@ class Class_product {
     }
 
     this.dndId = nanoid();
+
+    this._delSelf = () => {
+      delSelf();
+      this._reRender();
+    };
   } // constructor
 
   private _reRender;
@@ -83,15 +92,37 @@ class Class_product {
   private _discountRate;
 
   readonly dndId;
+
+  private _delSelf;
+
+  //----------------------------------------------
+
+  get delSelf() {
+    return this._delSelf;
+  }
+  set delSelf(newDelSelf) {
+    this._delSelf = () => {
+      newDelSelf();
+      this._reRender();
+    };
+  }
+
   //----------------------------------------------
   private _reduceQty = '0';
   get remainQty() {
     return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
   }
   private parentProd: Class_product | undefined = undefined;
-  private _exchangeProdArr: Class_product[] | undefined = undefined;
-  get exchangeProdArr() {
-    return this._exchangeProdArr;
+  get hasParent() {
+    return !!this.parentProd;
+  }
+
+  private _exchangeProdList: {
+    [key in string]: Class_product;
+  } = {};
+
+  get exchangeProdList() {
+    return this._exchangeProdList;
   }
 
   // countRemainQty() {
@@ -106,7 +137,7 @@ class Class_product {
   set quotationNumber(v) {}
   //
 
-  // 追減
+  // 追減數量
   get reduceQty() {
     return this._reduceQty;
   }
@@ -115,25 +146,16 @@ class Class_product {
 
     if (nv > this.remainQty + Number(this.reduceQty)) {
       return;
-      // if (this.remainQty === 0) {
-      //   return;
-      // }
-
-      // v = String(this.remainQty);
     }
 
     this._reduceQty = v;
     this._reRender();
   }
 
-  // 變更
+  // 變更數量
   get exchangeQty() {
-    if (!this._exchangeProdArr) {
-      return 0;
-    }
-
     let qty = 0;
-    this._exchangeProdArr.forEach((item) => {
+    Object.values(this._exchangeProdList).forEach((item) => {
       qty = qty + Number(item.quantity || 0);
     });
 
@@ -148,36 +170,39 @@ class Class_product {
     return reducePrice;
   }
 
-  // 新增變更項目
-  addExchange = (v: string) => {
+  addExchange_2(v: string) {
     if (Number(v) > this.remainQty) {
       return false;
-    }
-
-    if (!this._exchangeProdArr) {
-      this._exchangeProdArr = [];
     }
 
     const copy = _.cloneDeep(this._product);
     copy.quantity = Number(v);
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
-    this._exchangeProdArr.push(
-      new Class_product({
-        reRender: this._reRender,
-        legacyProduct: copy,
-        // countTotalDiscount: () => {},
-        countSubTotal: () => {},
-        parentProd: this,
-      })
-    );
+
+    const exId = 'ex-' + nanoid();
+
+    const delSelf = () => {
+      delete this._exchangeProdList[exId];
+      this._reRender();
+    };
+
+    this._exchangeProdList[exId] = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: copy,
+      countSubTotal: () => {},
+      parentProd: this,
+      delSelf,
+    });
+
     this._reRender();
 
     return true;
-  };
+    //
+  }
 
   // 清空變更項目
   clearExchange = () => {
-    this._exchangeProdArr = undefined;
+    this._exchangeProdList = {};
     this._reduceQty = '0';
     this._reRender();
   };

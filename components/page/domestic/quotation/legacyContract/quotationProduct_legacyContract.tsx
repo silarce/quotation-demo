@@ -41,7 +41,7 @@ export default function QuotationProduction({
 
   const borderRed = switch02 ? scss.borderRed : '';
 
-  const { prodList, classProductArr } = legacyContract;
+  const { prodList_2, classProductArr, addProd_2 } = legacyContract;
 
   let exchangeTotal = 0;
 
@@ -73,7 +73,7 @@ export default function QuotationProduction({
             />
             {!disabled && (
               <div className={classNames(scss.addBtnWrapper)}>
-                <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd} />
+                <AddButton className={scss.addBtn} label="新增產品" onClick={legacyContract.addProd_2} />
               </div>
             )}
           </div>
@@ -81,7 +81,7 @@ export default function QuotationProduction({
           {isAppend && (
             <ExchangePanel>
               {verticalKeyArr.map((key, index) => {
-                const prod = prodList[key]?.prod;
+                const prod = prodList_2[key];
 
                 if (!prod) {
                   return null;
