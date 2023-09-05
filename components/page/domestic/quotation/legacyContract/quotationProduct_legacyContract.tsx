@@ -41,7 +41,7 @@ export default function QuotationProduction({
 
   const borderRed = switch02 ? scss.borderRed : '';
 
-  const { prodList_2, classProductArr, addProd_2 } = legacyContract;
+  const { prodList_2 } = legacyContract;
 
   let exchangeTotal = 0;
 

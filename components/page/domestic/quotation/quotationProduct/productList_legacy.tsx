@@ -60,17 +60,7 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
   const [activeKey, setActiveKey] = useState<string>();
   // ---------------------------------------------------------------
-  const {
-    classProductArr,
-    prodCellConfig,
-    // activeProd,
-    // prodList,
-    //
-    // editProdKeyArr,
-    //
-    prodList_2,
-    prodKitList_2,
-  } = classQuotation;
+  const { prodCellConfig, prodList_2, prodKitList_2 } = classQuotation;
 
   const theadKeyArr: TtheadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
 

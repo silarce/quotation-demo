@@ -47,6 +47,10 @@ type TprodKit = {
   };
 };
 
+type TadditionList = {
+  [key: string]: Class_addition;
+};
+
 // =======================================================================
 // =======================================================================
 // =======================================================================
@@ -69,15 +73,15 @@ class Class_legacyContract {
 
     const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
-    this.classProductArr = sortedProdArr.map((product) => {
-      return new Class_product({
-        reRender: reRender,
-        legacyProduct: product,
-        // countTotalDiscount: this.countTotalDiscount,
-        countSubTotal: this.countSubTotal,
-        delSelf: () => {},
-      });
-    });
+    // this.classProductArr = sortedProdArr.map((product) => {
+    //   return new Class_product({
+    //     reRender: reRender,
+    //     legacyProduct: product,
+    //     // countTotalDiscount: this.countTotalDiscount,
+    //     countSubTotal: this.countSubTotal,
+    //     delSelf: () => {},
+    //   });
+    // });
     // __________________________
     // __________________________
 
@@ -112,20 +116,54 @@ class Class_legacyContract {
     // --------------------------------------------------------------
     // --------------------------------------------------------------
 
-    /**額外項目 */
-    // this.classAdditionArr = this._legacyContract.additions.map(
-    //   (addition) => new Class_addition(reRender, addition, this.countSubTotal)
-    // );
-
+    /**配件設定 */
     this.classAdditionArr = this._legacyContract.additions.map(
-      (addition) => new Class_addition(reRender, addition, this.countSubTotal)
+      (addition) =>
+        new Class_addition({
+          reRender: reRender,
+          addition: addition,
+          countSubTotal: this.countSubTotal,
+          delSelf: () => {},
+        })
     );
+
+    const additionList: TadditionList = {};
+    this._legacyContract.additions.forEach((addi) => {
+      let key: string;
+
+      if ('id' in addi) {
+        // 啊我都已經用'id' in prodData了，這邊也沒有紅線
+        // check的時候還是給我報型別錯誤
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        key = String(addi.id as string);
+      } else {
+        key = 'new-' + nanoid();
+      }
+
+      const delSelf = () => {
+        delete this._additionList[key];
+      };
+
+      additionList[key] = new Class_addition({
+        reRender: reRender,
+        addition: addi,
+        countSubTotal: this.countSubTotal,
+        delSelf: delSelf,
+      });
+    });
+
+    this._additionList = additionList;
+
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
 
     /**   付款資訊*/
     this.classPayInfo = new Class_payInfo(
       reRender,
       this._legacyContract,
-      this.classProductArr,
+      // this.classProductArr,
+      Object.values(this._prodList),
       // this.editAllProdDiscount,
       this.countSubTotal
     );
@@ -171,8 +209,10 @@ class Class_legacyContract {
   private _extraExProdList: TprodList = {};
   // private _prodKeyArr;
   // ---------------------
+  private _additionList;
+  // ---------------------
   classBasicInfo;
-  classProductArr;
+  // classProductArr;
   classAdditionArr;
   classPayInfo;
   classNotes;
@@ -206,7 +246,7 @@ class Class_legacyContract {
   /**計算小計 */
   countSubTotal = () => {
     let subTotal = new Decimal(0);
-    this.classProductArr.forEach((prod) => {
+    Object.values(this._prodList).forEach((prod) => {
       const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
       // 需求變更 編輯折數與總折數時不再影響其他數值
       // const discountRate = Decimal.div(prod.discountRate || 0, 100);
@@ -231,6 +271,10 @@ class Class_legacyContract {
   // ------------------------------------------------------------
   get prodList_2() {
     return this._prodList;
+  }
+
+  get prodArr() {
+    return Object.values(this._prodList);
   }
 
   // get prodKeyArr_2() {
@@ -429,7 +473,14 @@ class Class_legacyContract {
     this._reRender();
   };
   addAddition = () => {
-    this.classAdditionArr.push(new Class_addition(this._reRender, emptyAdditionCre(), this.countSubTotal));
+    this.classAdditionArr.push(
+      new Class_addition({
+        reRender: this._reRender,
+        addition: emptyAdditionCre(),
+        countSubTotal: this.countSubTotal,
+        delSelf: () => {},
+      })
+    );
     this._reRender();
   };
 
@@ -523,12 +574,12 @@ class Class_legacyContract {
   private _additionAdditionalExchangeArr: Class_addition[] = [];
   addExAddi = () => {
     this._additionAdditionalExchangeArr.push(
-      new Class_addition(
-        this._reRender,
-        emptyAdditionCre(),
-        () => {}
-        //
-      )
+      new Class_addition({
+        reRender: this._reRender,
+        addition: emptyAdditionCre(),
+        countSubTotal: () => {},
+        delSelf: () => {},
+      })
     );
     this._reRender();
   };

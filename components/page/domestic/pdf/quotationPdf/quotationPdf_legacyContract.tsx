@@ -162,7 +162,7 @@ export default function QuotationPdf({
   })();
 
   const productArr: TtableProdList_series = (() => {
-    const classProdArr = classLegacyContract.classProductArr;
+    const classProdArr = classLegacyContract.prodArr;
 
     return classProdArr.map((prod) => {
       const size = `${prod.width || prod.length} X ${prod.height} + ${prod.thickness}`;
