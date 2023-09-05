@@ -14,7 +14,7 @@ class Class_payInfo {
     reRender: TreRender,
     legacyContract: TlegacyContractDto | TemptyLegacyContract,
     classProductArr: Class_product[],
-    editAllProdDiscount: (v: string) => void,
+    // editAllProdDiscount: (v: string) => void,
     countSubTotal: () => void
   ) {
     this._reRender = reRender;
@@ -24,7 +24,7 @@ class Class_payInfo {
       item.totalPaymentRatio = Decimal.mul(item.totalPaymentRatio || '0', 100).toString();
     });
     this._classProductArr = classProductArr;
-    this._editAllProdDiscount = editAllProdDiscount;
+    // this._editAllProdDiscount = editAllProdDiscount;
     this._countSubTotal = countSubTotal;
 
     this._subTotal = this._legacyContract.subTotal.toString();
@@ -34,7 +34,7 @@ class Class_payInfo {
   private _reRender;
   private _legacyContract;
   private _classProductArr;
-  private _editAllProdDiscount;
+  // private _editAllProdDiscount;
   private _countSubTotal;
   private _subTotal;
   private _salesTax;

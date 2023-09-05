@@ -19,17 +19,23 @@ import { Toption } from 'js/utils/options/options';
  * 單一個主產品
  */
 class Class_product {
-  constructor(
-    reRender: TreRender,
-    legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto,
-    countTotalDiscount: () => void,
-    countSubTotal: () => void,
-    parentProd?: Class_product
-  ) {
+  constructor({
+    reRender,
+    legacyProduct,
+    // countTotalDiscount,
+    countSubTotal,
+    parentProd,
+  }: {
+    reRender: TreRender;
+    legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto;
+    // countTotalDiscount: () => void;
+    countSubTotal: () => void;
+    parentProd?: Class_product;
+  }) {
     this._reRender = reRender;
     this._product = legacyProduct;
 
-    this._countTotalDiscount = countTotalDiscount;
+    // this._countTotalDiscount = countTotalDiscount;
     this._countSubTotal = countSubTotal;
 
     this._id = (() => {
@@ -63,7 +69,7 @@ class Class_product {
 
   private _reRender;
   _product;
-  private _countTotalDiscount;
+  // private _countTotalDiscount;
   private _countSubTotal;
   private _id;
   private _idNumber;
@@ -156,13 +162,13 @@ class Class_product {
     copy.quantity = Number(v);
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
     this._exchangeProdArr.push(
-      new Class_product(
-        this._reRender,
-        copy,
-        () => {},
-        () => {},
-        this
-      )
+      new Class_product({
+        reRender: this._reRender,
+        legacyProduct: copy,
+        // countTotalDiscount: () => {},
+        countSubTotal: () => {},
+        parentProd: this,
+      })
     );
     this._reRender();
 
@@ -233,7 +239,7 @@ class Class_product {
 
     this._discountRate = v;
     this._product.discountRate = Decimal.div(v || 0, 100).toString();
-    this._countTotalDiscount();
+    // this._countTotalDiscount();
     this._countSubTotal();
     this._reRender();
   }

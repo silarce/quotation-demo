@@ -50,11 +50,24 @@ class Class_legacyContract {
     /**  報價單基本資料*/
     this.classBasicInfo = new Class_basicInfo(reRender, this._legacyContract);
 
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+
     const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     this.classProductArr = sortedProdArr.map((product) => {
-      return new Class_product(reRender, product, this.countTotalDiscount, this.countSubTotal);
+      return new Class_product({
+        reRender: reRender,
+        legacyProduct: product,
+        // countTotalDiscount: this.countTotalDiscount,
+        countSubTotal: this.countSubTotal,
+      });
     });
+    // __________________________
+    // __________________________
+
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
 
     /**額外項目 */
     // this.classAdditionArr = this._legacyContract.additions.map(
@@ -70,7 +83,7 @@ class Class_legacyContract {
       reRender,
       this._legacyContract,
       this.classProductArr,
-      this.editAllProdDiscount,
+      // this.editAllProdDiscount,
       this.countSubTotal
     );
     /**  備註*/
@@ -122,21 +135,21 @@ class Class_legacyContract {
 
   // 需求變更 編輯折數與總折數時不再影響其他數值 // 先留著，免得哪天又要改回來
   /**計算總折數 */
-  countTotalDiscount = () => {
-    // let totalDiscount = new Decimal(0);
-    // this.classProductArr.forEach((prod) => {
-    //   const discountRate = prod.discountRate.replace(/,/g, '') || 0;
-    //   totalDiscount = Decimal.add(discountRate || 0, totalDiscount);
-    // });
-    // this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
-  };
+  // countTotalDiscount = () => {
+  // let totalDiscount = new Decimal(0);
+  // this.classProductArr.forEach((prod) => {
+  //   const discountRate = prod.discountRate.replace(/,/g, '') || 0;
+  //   totalDiscount = Decimal.add(discountRate || 0, totalDiscount);
+  // });
+  // this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
+  // };
   // 需求變更 編輯折數與總折數時不再影響其他數值 // 先留著，免得哪天又要改回來
   /**變更所有主產品的折數 */
-  editAllProdDiscount = (v: string) => {
-    // this.classProductArr.forEach((prod) => {
-    //   prod.discountRate_noLoop = v;
-    // });
-  };
+  // editAllProdDiscount = (v: string) => {
+  // this.classProductArr.forEach((prod) => {
+  //   prod.discountRate_noLoop = v;
+  // });
+  // };
 
   /**計算小計 */
   countSubTotal = () => {
@@ -200,7 +213,7 @@ class Class_legacyContract {
   delProd = (index: number) => {
     this.classProductArr.splice(index, 1);
     this.activeProd = -1;
-    this.countTotalDiscount();
+    // this.countTotalDiscount();
     this.countSubTotal();
     this._reRender();
   };
@@ -209,19 +222,29 @@ class Class_legacyContract {
     copy.id = undefined;
     // this.classProductArr.push(copy);
     this.classProductArr.push(
-      new Class_product(this._reRender, copy._product, this.countTotalDiscount, this.countSubTotal)
+      new Class_product({
+        reRender: this._reRender,
+        legacyProduct: copy._product,
+        // countTotalDiscount: this.countTotalDiscount,
+        countSubTotal: this.countSubTotal,
+      })
     );
     this.activeProd = index;
-    this.countTotalDiscount();
+    // this.countTotalDiscount();
     this.countSubTotal();
     this._reRender();
   };
   addProd = () => {
     this.classProductArr.push(
-      new Class_product(this._reRender, emptyProdCre(), this.countTotalDiscount, this.countSubTotal)
+      new Class_product({
+        reRender: this._reRender,
+        legacyProduct: emptyProdCre(),
+        // countTotalDiscount: this.countTotalDiscount,
+        countSubTotal: this.countSubTotal,
+      })
     );
     this._activeProd = this.classProductArr.length - 1;
-    this.countTotalDiscount();
+    // this.countTotalDiscount();
     this._reRender();
   };
 
@@ -393,12 +416,12 @@ class Class_legacyContract {
   private _prodAdditionalExchangeArr: Class_product[] = [];
   addExProd = () => {
     this._prodAdditionalExchangeArr.push(
-      new Class_product(
-        this._reRender,
-        emptyProdCre(),
-        () => {},
-        () => {}
-      )
+      new Class_product({
+        reRender: this._reRender,
+        legacyProduct: emptyProdCre(),
+        // countTotalDiscount: () => {},
+        countSubTotal: () => {},
+      })
     );
     this._reRender();
   };
@@ -733,7 +756,7 @@ countSubTotal 計算小計
 以下情況會呼叫特定函式
 變更主產品設定與其他設定的複價時 countSubTotal
 變更數量或單價時會自動計算、變更複價，所以也會呼叫 countSubTotal
-變更主產品設定的折數 countSubTotal countTotalDiscount
+變更主產品設定的折數 countSubTotal countTotalDiscountD
 變更總折數 先呼叫editAllProdDiscount再呼叫countSubTotal (必須照順序)
 
 新增產品 countTotalDiscount
