@@ -558,7 +558,7 @@ const useLegacyContract = (data: TlegacyContractDto | undefined) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
-  const checkData = () => {
+  const createClass = () => {
     return new Class_legacyContract(
       reRender,
       _.cloneDeep(data) ?? emptyLegacyContract(),
@@ -568,13 +568,13 @@ const useLegacyContract = (data: TlegacyContractDto | undefined) => {
   };
 
   // 回朔到修改前的狀態
-  const rewind = () => {
-    setClassLegacyContract(checkData());
+  const reset = () => {
+    setClassLegacyContract(createClass());
   };
 
-  const [classLegacyContract, setClassLegacyContract] = useState(checkData());
+  const [classLegacyContract, setClassLegacyContract] = useState(createClass());
 
-  return { classLegacyContract, rewind };
+  return { classLegacyContract, reset };
 };
 
 // ==========================================================================

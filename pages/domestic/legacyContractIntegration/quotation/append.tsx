@@ -61,7 +61,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
   // 這是class
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract);
+  const { classLegacyContract, reset } = useLegacyContract(legacyContract);
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
@@ -133,7 +133,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   useEffect(() => {
-    rewind();
+    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legacyContract]);
 
