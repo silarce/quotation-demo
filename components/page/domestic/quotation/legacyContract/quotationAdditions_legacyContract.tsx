@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -65,35 +65,36 @@ export default function QuotationAdditions({
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const { additionCellConfig: additionCellConfig, addiList } = legacyContract;
+  const {
+    additionCellConfig: additionCellConfig,
 
-  const classAdditionArr = legacyContract.classAdditionArr;
+    additionList,
+    addAddition_2,
+  } = legacyContract;
 
-  const { addAddition, delAddition } = legacyContract ?? {};
-
-  // const additionKeyindex = additionCellConfig.keyArr;
   const additionKeyindex = isAppend ? additionCellConfig.keyArr : legacyContract.editAddiKeyArr;
 
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
-  const [targetIndex, setTargetIndex] = useState<`${number}`>();
+
+  const [targetAddi, setTargetAddi] = useState<Class_addition>();
 
   const exchangeConfirm = (v: string) => {
-    if (!targetIndex) {
+    if (!targetAddi) {
       return;
     }
 
-    const ressult = classAdditionArr[targetIndex].addExchange(v);
+    const ressult = targetAddi.addExchange(v);
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });
     } else {
-      setTargetIndex(undefined);
+      setTargetAddi(undefined);
     }
   };
 
   const onCancel = () => {
-    setTargetIndex(undefined);
+    setTargetAddi(undefined);
   };
 
   // -------------------------------------------------------------------
@@ -102,14 +103,14 @@ export default function QuotationAdditions({
   // -------------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(addiList),
+    listKeyArr: Object.keys(additionList),
     resetTrigger: legacyContract,
   });
 
   const DndRow = useCallback(function DndRow({
     isActive,
     pIndex,
-    toSetTargetIndex,
+    toSetTarget,
     addi,
     disabled,
     id,
@@ -117,7 +118,7 @@ export default function QuotationAdditions({
   }: {
     isActive: boolean;
     pIndex: number;
-    toSetTargetIndex: () => void;
+    toSetTarget: () => void;
     addi: Class_addition;
     disabled?: boolean;
     id: string;
@@ -149,13 +150,15 @@ export default function QuotationAdditions({
               dndAttr={attributes}
               dndListener={listeners}
               disabled={disabled}
-              del={() => delAddition(pIndex)}
+              del={() => {
+                addi.delSelf();
+              }}
               indexNumber={pIndex + 1}
             />
           )}
           {isAppend && (
             <ResetChangeBtnBox
-              toSetTargetIndex={toSetTargetIndex}
+              toSetTargetIndex={toSetTarget}
               clearExchange={addi.clearExchange}
               indexNumber={pIndex + 1}
               dndAttr={attributes}
@@ -233,7 +236,7 @@ export default function QuotationAdditions({
             >
               <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
                 {dndKeyArr?.map((key, pIndex) => {
-                  const addi = addiList[key];
+                  const addi = additionList[key];
 
                   if (!addi) {
                     return null;
@@ -241,8 +244,8 @@ export default function QuotationAdditions({
 
                   const isMoving = movingId === key;
 
-                  const toSetTargetIndex = () => {
-                    setTargetIndex(`${pIndex}`);
+                  const toSetTarget = () => {
+                    setTargetAddi(addi);
                   };
 
                   let isActive = false;
@@ -267,7 +270,7 @@ export default function QuotationAdditions({
                       addi={addi}
                       pIndex={pIndex}
                       isActive={isActive}
-                      toSetTargetIndex={toSetTargetIndex}
+                      toSetTarget={toSetTarget}
                       disabled={disabled}
                       isMoving={isMoving}
                     />
@@ -276,12 +279,12 @@ export default function QuotationAdditions({
               </SortableContext>
             </DndContext>
 
-            {!disabled && <AddButton className={scss.addBtn} label="新增項目" onClick={addAddition} />}
+            {!disabled && <AddButton className={scss.addBtn} label="新增項目" onClick={addAddition_2} />}
           </div>
           {isAppend && (
             <ExchangePanel>
               {dndKeyArr.map((key, index) => {
-                const addi = addiList[key];
+                const addi = additionList[key];
 
                 if (!addi) {
                   return null;
@@ -316,9 +319,9 @@ export default function QuotationAdditions({
 
       {/*  */}
       <InputModal
-        visible={!!targetIndex}
+        visible={!!targetAddi}
         title="請輸入變更數量"
-        tip={`上限 : ${targetIndex && classAdditionArr[targetIndex].remainQty}`}
+        tip={`上限 : ${targetAddi && targetAddi.remainQty}`}
         onConfirm={(v) => {
           exchangeConfirm?.(v);
         }}
@@ -357,7 +360,7 @@ const EditBtnBox = ({
               return;
             }
 
-            del;
+            del();
           }}
         />
       </div>

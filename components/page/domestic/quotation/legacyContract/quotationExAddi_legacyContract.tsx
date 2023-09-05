@@ -51,16 +51,19 @@ export default function QuotationExAddi({
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const { additionCellConfig: additionCellConfig, addiExchangeList } = legacyContract;
+  const {
+    additionCellConfig: additionCellConfig,
 
-  const { addExAddi } = legacyContract;
+    exAddiList,
+    addExtraExAddi,
+  } = legacyContract;
 
   const additionKeyArr = legacyContract.exAddiKeyArr;
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(addiExchangeList),
+    listKeyArr: Object.keys(exAddiList),
     resetTrigger: legacyContract,
   });
 
@@ -171,14 +174,15 @@ export default function QuotationExAddi({
             >
               <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
                 {dndKeyArr?.map((key, pIndex) => {
-                  const addi = addiExchangeList[key];
+                  const addi = exAddiList[key];
 
                   if (!addi) {
                     return null;
                   }
 
-                  const classAddi = addi.addi;
-                  const delSelf = addi.delSelf;
+                  const hasParent = addi.hasParent;
+
+                  const delSelf = hasParent ? undefined : addi.delSelf;
                   const isMoving = movingId === key;
 
                   return (
@@ -186,7 +190,7 @@ export default function QuotationExAddi({
                       key={key}
                       id={key}
                       //
-                      classAddi={classAddi}
+                      classAddi={addi}
                       pIndex={pIndex}
                       delSelf={delSelf}
                       isMoving={isMoving}
@@ -195,7 +199,7 @@ export default function QuotationExAddi({
                 })}
               </SortableContext>
             </DndContext>
-            <AddButton className={scss.addBtn} label="追加配件" onClick={addExAddi} />
+            <AddButton className={scss.addBtn} label="追加配件" onClick={addExtraExAddi} />
           </div>
         </div>
       </div>

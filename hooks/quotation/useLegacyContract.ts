@@ -117,16 +117,6 @@ class Class_legacyContract {
     // --------------------------------------------------------------
 
     /**配件設定 */
-    this.classAdditionArr = this._legacyContract.additions.map(
-      (addition) =>
-        new Class_addition({
-          reRender: reRender,
-          addition: addition,
-          countSubTotal: this.countSubTotal,
-          delSelf: () => {},
-        })
-    );
-
     const additionList: TadditionList = {};
     this._legacyContract.additions.forEach((addi) => {
       let key: string;
@@ -210,10 +200,11 @@ class Class_legacyContract {
   // private _prodKeyArr;
   // ---------------------
   private _additionList;
+  private _extraExAddiList: TadditionList = {};
   // ---------------------
   classBasicInfo;
   // classProductArr;
-  classAdditionArr;
+  // classAdditionArr;
   classPayInfo;
   classNotes;
   classQuoteScopes;
@@ -253,7 +244,7 @@ class Class_legacyContract {
       // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
       subTotal = Decimal.add(totalPrice || 0, subTotal);
     });
-    this.classAdditionArr.forEach((addi) => {
+    this.additionArr.forEach((addi) => {
       const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
       subTotal = Decimal.add(totalPrice || 0, subTotal);
     });
@@ -294,27 +285,26 @@ class Class_legacyContract {
   // }
 
   copyProd_2(id: string) {
-    const newId = 'new-' + nanoid();
+    const key = 'new-' + nanoid();
 
     const copy = _.cloneDeep(this._prodList[id]);
 
     copy.id = undefined;
 
     copy.delSelf = () => {
-      delete this._prodList[newId];
+      delete this._prodList[key];
     };
 
-    this._prodList[newId] = copy;
-    // this._prodKeyArr.push(newId);
+    this._prodList[key] = copy;
 
     this._reRender();
   }
 
   addProd_2 = () => {
-    const newId = 'new-' + nanoid();
+    const key = 'new-' + nanoid();
 
     const delSelf = () => {
-      delete this._prodList[newId];
+      delete this._prodList[key];
     };
 
     const prod = new Class_product({
@@ -323,7 +313,7 @@ class Class_legacyContract {
       countSubTotal: this.countSubTotal,
       delSelf: delSelf,
     });
-    this._prodList[newId] = prod;
+    this._prodList[key] = prod;
 
     this._reRender();
   };
@@ -376,10 +366,10 @@ class Class_legacyContract {
   }
 
   addExtraExProd = () => {
-    const newId = 'new-' + nanoid();
+    const key = 'new-' + nanoid();
 
     const delSelf = () => {
-      delete this._extraExProdList[newId];
+      delete this._extraExProdList[key];
     };
 
     const prod = new Class_product({
@@ -389,7 +379,7 @@ class Class_legacyContract {
       delSelf: delSelf,
     });
 
-    this._extraExProdList[newId] = prod;
+    this._extraExProdList[key] = prod;
 
     this._reRender();
   };
@@ -445,7 +435,10 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  //
+  //------------------------------------------------------
+  //------------------------------------------------------
+  // 配件設定
+
   get exAddiKeyArr() {
     return this._exAddiKeyArr;
   }
@@ -462,27 +455,119 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  delAddition = (index: number) => {
-    this.classAdditionArr.splice(index, 1);
-    this.countSubTotal();
+  // _additionList
+
+  get additionList() {
+    return this._additionList;
+  }
+
+  get additionArr() {
+    return Object.values(this._additionList);
+  }
+
+  copyAddition_2 = (id: string) => {
+    const key = 'new-' + nanoid();
+
+    const copy = _.cloneDeep(this._additionList[id]);
+    copy.id = undefined;
+
+    copy.delSelf = () => {
+      delete this._additionList[key];
+    };
+
+    this._additionList[key] = copy;
+
     this._reRender();
   };
-  copyAddition = (index: number) => {
-    this.classAdditionArr.push(_.cloneDeep(this.classAdditionArr[index]));
-    this.countSubTotal();
+
+  addAddition_2 = () => {
+    const key = 'new-' + nanoid();
+
+    const delSelf = () => {
+      delete this._additionList[key];
+    };
+
+    const addi = new Class_addition({
+      reRender: this._reRender,
+      addition: emptyAdditionCre(),
+      countSubTotal: this.countSubTotal,
+      delSelf,
+    });
+
+    this._additionList[key] = addi;
+
     this._reRender();
   };
-  addAddition = () => {
-    this.classAdditionArr.push(
-      new Class_addition({
-        reRender: this._reRender,
-        addition: emptyAdditionCre(),
-        countSubTotal: this.countSubTotal,
-        delSelf: () => {},
-      })
-    );
+
+  // delAddition = (index: number) => {
+  //   this.classAdditionArr.splice(index, 1);
+  //   this.countSubTotal();
+  //   this._reRender();
+  // };
+  // copyAddition = (index: number) => {
+  //   this.classAdditionArr.push(_.cloneDeep(this.classAdditionArr[index]));
+  //   this.countSubTotal();
+  //   this._reRender();
+  // };
+  // addAddition = () => {
+  //   this.classAdditionArr.push(
+  //     new Class_addition({
+  //       reRender: this._reRender,
+  //       addition: emptyAdditionCre(),
+  //       countSubTotal: this.countSubTotal,
+  //       delSelf: () => {},
+  //     })
+  //   );
+  //   this._reRender();
+  // };
+
+  // ---------------------
+
+  get extraExAddiList() {
+    return this._extraExAddiList;
+  }
+
+  addExtraExAddi = () => {
+    const key = 'new-' + nanoid();
+
+    const delSelf = () => {
+      delete this._extraExAddiList[key];
+    };
+
+    const addi = new Class_addition({
+      reRender: this._reRender,
+      addition: emptyAdditionCre(),
+      countSubTotal: () => {},
+      delSelf,
+    });
+
+    this._extraExAddiList[key] = addi;
+
     this._reRender();
   };
+
+  // ---------------------
+
+  get exAddiList() {
+    type TexAddiList = {
+      [key: string]: Class_addition;
+    };
+
+    const list: TexAddiList = {};
+
+    Object.values(this._additionList).forEach((addi) => {
+      const exchangeAddiList = addi.exAddiList;
+      Object.keys(exchangeAddiList).forEach((key) => {
+        list[key] = exchangeAddiList[key];
+      });
+    });
+
+    Object.keys(this._extraExAddiList).forEach((key) => {
+      list[key] = this._extraExAddiList[key];
+    });
+
+    return list;
+  }
 
   // ---------------------
   prodCellConfig; // dnd head的狀態，也是資料分類目錄
@@ -508,7 +593,7 @@ class Class_legacyContract {
       return thePost;
     });
 
-    legacyContractCopy.additions = this.classAdditionArr.map((prod) => prod.postAddition);
+    legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 
     const quoteDate_Date = (() => {
       if (!legacyContractCopy.quoteDate) {
@@ -556,80 +641,8 @@ class Class_legacyContract {
       deliveryDate: deliveryDate_Date || null,
     };
   }
-  // -------------------
+  // ----------------------------------------------------
 
-  // 配件設定 的list object
-  get addiList() {
-    type Tlist = {
-      [key: string]: Class_addition;
-    };
-    const list: Tlist = {};
-    this.classAdditionArr.forEach((addi) => {
-      list[addi.dndId] = addi;
-    });
-
-    return list;
-  }
-
-  private _additionAdditionalExchangeArr: Class_addition[] = [];
-  addExAddi = () => {
-    this._additionAdditionalExchangeArr.push(
-      new Class_addition({
-        reRender: this._reRender,
-        addition: emptyAdditionCre(),
-        countSubTotal: () => {},
-        delSelf: () => {},
-      })
-    );
-    this._reRender();
-  };
-  // 變更 配件設定 的list object
-  get addiExchangeList() {
-    const exchangeArrArr = this.classAdditionArr.map((ca) => {
-      return ca.exchangeAdditionArr;
-    });
-
-    type TexchangeAddilist = {
-      [key: string]: {
-        addi: Class_addition;
-        delSelf?: () => void;
-      };
-    };
-
-    const list: TexchangeAddilist = {};
-
-    let exchangeArr = [..._.flatten(exchangeArrArr)]; // 展開
-    exchangeArr = _.pull(exchangeArr, undefined); // 去掉undefined
-    // 把陣列裡的東西放進list
-    exchangeArr.forEach((addi, index) => {
-      if (!addi) {
-        return;
-      }
-
-      list[addi.dndId] = {
-        addi,
-      };
-    });
-
-    // 把額外的addition放進去
-    this._additionAdditionalExchangeArr.forEach((addi, index) => {
-      if (!addi) {
-        return;
-      }
-
-      list[addi.dndId] = {
-        addi,
-        delSelf: () => {
-          this._additionAdditionalExchangeArr.splice(index, 1);
-          this._reRender();
-        },
-      };
-    });
-
-    return list;
-  }
-
-  // ________________________________
   get prodExTotal() {
     let totalPrice = 0;
 
@@ -642,8 +655,8 @@ class Class_legacyContract {
 
   get addiExTotal() {
     let totalPrice = 0;
-    Object.values(this.addiExchangeList).forEach((addi) => {
-      totalPrice += Number(addi.addi.totalPrice.replaceAll(',', ''));
+    Object.values(this.exAddiList).forEach((addi) => {
+      totalPrice += Number(addi.totalPrice.replaceAll(',', ''));
     });
 
     return totalPrice;

@@ -13,12 +13,27 @@ import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 // ===========================================================
 /**單一個addition */
 class Class_addition {
-  constructor(
-    reRender: TreRender,
-    addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto,
-    countSubTotal: () => void,
-    parentAddition?: Class_addition
-  ) {
+  constructor({
+    reRender,
+    addition,
+    countSubTotal,
+    parentAddition,
+    delSelf,
+  }: {
+    reRender: TreRender;
+    addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto;
+    countSubTotal: () => void;
+    parentAddition?: Class_addition;
+    delSelf: () => void;
+  }) {
+    this._id = (() => {
+      if ('id' in addition) {
+        return addition.id;
+      }
+
+      return undefined;
+    })();
+
     this._reRender = reRender;
     this._addition = addition;
     this._countSubTotal = countSubTotal;
@@ -28,10 +43,15 @@ class Class_addition {
     this._totalPrice = addition.totalPrice ? addition.totalPrice.toString() : '';
 
     if (parentAddition) {
-      this.parentAddition = parentAddition;
+      this._parentAddition = parentAddition;
     }
 
     this.dndId = nanoid();
+
+    this._delSelf = () => {
+      delSelf();
+      this._reRender();
+    };
   } // constructor
   private _reRender;
   private _addition;
@@ -41,16 +61,43 @@ class Class_addition {
   private _totalPrice;
 
   readonly dndId;
+
+  private _id;
+  private _delSelf;
+
+  // -------------------------------
+
+  get delSelf() {
+    return this._delSelf;
+  }
+  set delSelf(fun) {
+    this._delSelf = fun;
+    this._reRender();
+  }
+
   // -------------------------------
 
   private _reduceQty = '0';
   get remainQty() {
     return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
   }
-  private parentAddition: Class_addition | undefined = undefined;
-  private _exchangeAdditionArr: Class_addition[] | undefined = undefined;
-  get exchangeAdditionArr() {
-    return this._exchangeAdditionArr;
+  private _parentAddition: Class_addition | undefined = undefined;
+  get hasParent() {
+    return !!this._parentAddition;
+  }
+
+  //
+  // private _exchangeAdditionArr: Class_addition[] | undefined = undefined;
+  // get exchangeAdditionArr() {
+  //   return this._exchangeAdditionArr;
+  // }
+  //
+  private _exAddiList: { [key: string]: Class_addition } = {};
+  get exAddiList() {
+    return this._exAddiList;
+  }
+  get exAddiArr() {
+    return Object.values(this._exAddiList);
   }
 
   //
@@ -70,11 +117,6 @@ class Class_addition {
 
     if (nv > this.remainQty + Number(this.reduceQty)) {
       return;
-      // if (this.remainQty === 0) {
-      //   return;
-      // }
-
-      // v = String(this.remainQty);
     }
 
     this._reduceQty = v;
@@ -83,12 +125,20 @@ class Class_addition {
 
   // 變更
   get exchangeQty() {
-    if (!this._exchangeAdditionArr) {
+    // if (!this._exchangeAdditionArr) {
+    //   return 0;
+    // }
+
+    // let qty = 0;
+    // this._exchangeAdditionArr.forEach((item) => {
+    //   qty = qty + Number(item.quantity || 0);
+    // });
+    if (Object.keys(this._exAddiList).length === 0) {
       return 0;
     }
 
     let qty = 0;
-    this._exchangeAdditionArr.forEach((item) => {
+    this.exAddiArr.forEach((item) => {
       qty = qty + Number(item.quantity || 0);
     });
 
@@ -109,22 +159,29 @@ class Class_addition {
       return false;
     }
 
-    if (!this._exchangeAdditionArr) {
-      this._exchangeAdditionArr = [];
-    }
+    // if (!this._exchangeAdditionArr) {
+    //   this._exchangeAdditionArr = [];
+    // }
+
+    const exId = 'ex-' + nanoid();
 
     const copy = _.cloneDeep(this._addition);
     copy.quantity = Number(v);
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
-    this._exchangeAdditionArr.push(
-      new Class_addition(
-        this._reRender,
-        copy,
-        () => {},
-        //
-        this
-      )
-    );
+
+    const delSelf = () => {
+      delete this._exAddiList[exId];
+      this._reRender();
+    };
+
+    this._exAddiList[exId] = new Class_addition({
+      reRender: this._reRender,
+      addition: copy,
+      countSubTotal: () => {},
+      parentAddition: this,
+      delSelf,
+    });
+
     this._reRender();
 
     return true;
@@ -132,7 +189,7 @@ class Class_addition {
 
   // 清空變更項目
   clearExchange = () => {
-    this._exchangeAdditionArr = undefined;
+    this._exAddiList = {};
     this._reduceQty = '0';
     this._reRender();
   };
@@ -140,11 +197,11 @@ class Class_addition {
   // ----------------------------------------------------
   // ----------------------------------------------------
   get id() {
-    if ('id' in this._addition) {
-      return this._addition.id;
-    }
-
-    return undefined;
+    return this._id;
+  }
+  set id(v) {
+    this._id = v;
+    this._reRender();
   }
 
   get itemName() {
