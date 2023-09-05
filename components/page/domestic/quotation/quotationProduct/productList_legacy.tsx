@@ -382,7 +382,9 @@ function DndRow({
             }
 
             //____
-            return <InputSel key={key} className={scss.column} disabled={disabled} {...inputSelProps} />;
+            return (
+              <InputSel key={key} className={scss.column} disabled={disabled} showBaseline="auto" {...inputSelProps} />
+            );
           })}
           {/* column */}
         </div>
