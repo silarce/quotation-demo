@@ -378,6 +378,11 @@ export type TlegacyContractProductDto = {
   bounceDoor: boolean;
   /**備註 */
   notes: string;
+  //
+  /**批次 */
+  batch: number;
+  /**所屬批次編號 */
+  batchNumber: string;
 };
 
 /**舊合約額外項目 */
@@ -399,6 +404,11 @@ export type TlegacyContractAdditionDto = {
   totalPrice: number;
   /**備註 */
   notes: string;
+  //
+  /**批次 */
+  batch: number;
+  /**所屬批次編號 */
+  batchNumber: string;
 };
 
 /**舊合約 */
@@ -468,8 +478,12 @@ export type TlegacyContractDto = {
   //
   /**客戶 */
   customer: TcustomerDto;
+  //
+  /**最新批次 */ // 後端用的，前端用不到
+  latestBatch: number;
 };
 
+// 舊合約post主產品
 export type TcreateLegacyContractProductDto = {
   /**編號 */
   idNumber: number;
@@ -515,6 +529,11 @@ export type TcreateLegacyContractProductDto = {
   notes: string;
 };
 
+type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
+  batchNumber?: string;
+  id?: string;
+};
+
 export type TcreateLegacyContractAdditionDto = {
   /**項目名 */
   itemName: string;
@@ -528,6 +547,11 @@ export type TcreateLegacyContractAdditionDto = {
   totalPrice: number;
   /** 備註 */
   notes: string;
+};
+
+type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {
+  batchNumber?: string;
+  id?: string;
 };
 
 export type TcreateLegacyContractDto = {
@@ -592,10 +616,16 @@ export type TcreateLegacyContractDto = {
   additions: TcreateLegacyContractAdditionDto[];
 };
 
+// export type TupdateLegacyContractDto = Partial<
+//   Omit<TcreateLegacyContractDto, 'products' | 'additions'> & {
+//     products: Partial<TcreateLegacyContractProductDto>[];
+//     additions: Partial<TcreateLegacyContractAdditionDto>[];
+//   }
+// >;
 export type TupdateLegacyContractDto = Partial<
   Omit<TcreateLegacyContractDto, 'products' | 'additions'> & {
-    products: Partial<TcreateLegacyContractProductDto>[];
-    additions: Partial<TcreateLegacyContractAdditionDto>[];
+    products: TupdateLegacyContractProductDto[];
+    additions: TupdateLegacyContractAdditionDto[];
   }
 >;
 
