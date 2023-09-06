@@ -50,6 +50,7 @@ class Class_addition {
 
     this._delSelf = () => {
       delSelf();
+      this._countSubTotal();
       this._reRender();
     };
   } // constructor
@@ -70,9 +71,12 @@ class Class_addition {
   get delSelf() {
     return this._delSelf;
   }
-  set delSelf(fun) {
-    this._delSelf = fun;
-    this._reRender();
+  set delSelf(newDelSelf) {
+    this._delSelf = () => {
+      newDelSelf();
+      this._countSubTotal();
+      this._reRender();
+    };
   }
 
   // -------------------------------
@@ -120,6 +124,7 @@ class Class_addition {
     }
 
     this._reduceQty = v;
+    this._countSubTotal();
     this._reRender();
   }
 
@@ -171,16 +176,18 @@ class Class_addition {
 
     const delSelf = () => {
       delete this._exAddiList[exId];
-      this._reRender();
+      // this._reRender();
     };
 
     this._exAddiList[exId] = new Class_addition({
       reRender: this._reRender,
       addition: copy,
-      countSubTotal: () => {},
+      countSubTotal: this._countSubTotal,
       parentAddition: this,
       delSelf,
     });
+
+    this._countSubTotal();
 
     this._reRender();
 
@@ -191,6 +198,7 @@ class Class_addition {
   clearExchange = () => {
     this._exAddiList = {};
     this._reduceQty = '0';
+    this._countSubTotal();
     this._reRender();
   };
 

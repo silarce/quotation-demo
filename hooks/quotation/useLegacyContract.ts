@@ -235,19 +235,63 @@ class Class_legacyContract {
   // };
 
   /**計算小計 */
+  // countSubTotal = () => {
+  //   let subTotal = new Decimal(0);
+  //   Object.values(this._prodList).forEach((prod) => {
+  //     const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+  //     // 需求變更 編輯折數與總折數時不再影響其他數值
+  //     // const discountRate = Decimal.div(prod.discountRate || 0, 100);
+  //     // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
+  //     subTotal = Decimal.add(totalPrice || 0, subTotal);
+  //   });
+  //   this.additionArr.forEach((addi) => {
+  //     const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
+  //     subTotal = Decimal.add(totalPrice || 0, subTotal);
+  //   });
+  //   this.classPayInfo.subTotal = subTotal.toString();
+  // };
   countSubTotal = () => {
     let subTotal = new Decimal(0);
+    //
     Object.values(this._prodList).forEach((prod) => {
+      // 複價
       const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+      // 追減、變更金額
+      const reduceExchangePrice = prod.reduceExchangePrice.replace(/,/g, '') || 0;
+
       // 需求變更 編輯折數與總折數時不再影響其他數值
       // const discountRate = Decimal.div(prod.discountRate || 0, 100);
       // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
-      subTotal = Decimal.add(totalPrice || 0, subTotal);
+
+      subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
     });
+    //
     this.additionArr.forEach((addi) => {
       const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
-      subTotal = Decimal.add(totalPrice || 0, subTotal);
+      const reduceExchangePrice = addi.reduceExchangePrice.replace(/,/g, '') || 0;
+
+      subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
     });
+    //
+    Object.values(this.exProdList).forEach((prod) => {
+      // 複價
+      const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+      // 追減、變更金額
+      const reduceExchangePrice = prod.reduceExchangePrice.replace(/,/g, '') || 0;
+
+      subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
+    });
+    //
+
+    Object.values(this.exAddiList).forEach((addi) => {
+      const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
+      const reduceExchangePrice = addi.reduceExchangePrice.replace(/,/g, '') || 0;
+
+      subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
+    });
+
+    //
+
     this.classPayInfo.subTotal = subTotal.toString();
   };
 
@@ -499,28 +543,6 @@ class Class_legacyContract {
     this._reRender();
   };
 
-  // delAddition = (index: number) => {
-  //   this.classAdditionArr.splice(index, 1);
-  //   this.countSubTotal();
-  //   this._reRender();
-  // };
-  // copyAddition = (index: number) => {
-  //   this.classAdditionArr.push(_.cloneDeep(this.classAdditionArr[index]));
-  //   this.countSubTotal();
-  //   this._reRender();
-  // };
-  // addAddition = () => {
-  //   this.classAdditionArr.push(
-  //     new Class_addition({
-  //       reRender: this._reRender,
-  //       addition: emptyAdditionCre(),
-  //       countSubTotal: this.countSubTotal,
-  //       delSelf: () => {},
-  //     })
-  //   );
-  //   this._reRender();
-  // };
-
   // ---------------------
 
   get extraExAddiList() {
@@ -537,7 +559,7 @@ class Class_legacyContract {
     const addi = new Class_addition({
       reRender: this._reRender,
       addition: emptyAdditionCre(),
-      countSubTotal: () => {},
+      countSubTotal: this.countSubTotal,
       delSelf,
     });
 

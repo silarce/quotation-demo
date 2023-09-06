@@ -147,7 +147,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const panel: TpanelList = [
     { type: 'myButton', label: '取消', onClick: () => router.back() },
-    { type: 'myButton', label: '上傳', onClick: () => alert('test') },
+    {
+      type: 'myButton',
+      label: '上傳',
+      onClick: () => {
+        const postBody = classLegacyContract.postBody;
+
+        if (!postBody) {
+          return;
+        }
+
+        alert('製作中');
+
+        // console.log(postBody);
+
+        console.log('小計', postBody.subTotal);
+        console.log('營業稅', postBody.salesTax);
+        console.log('總計', postBody.total);
+
+        // console.log(postBody.products);
+        // console.log(postBody.additions);
+
+        //   return;
+      },
+    },
   ];
 
   // -----------------------------------------------------------------------

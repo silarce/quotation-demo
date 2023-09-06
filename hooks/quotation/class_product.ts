@@ -72,6 +72,7 @@ class Class_product {
 
     this._delSelf = () => {
       delSelf();
+      this._countSubTotal();
       this._reRender();
     };
   } // constructor
@@ -103,6 +104,7 @@ class Class_product {
   set delSelf(newDelSelf) {
     this._delSelf = () => {
       newDelSelf();
+      this._countSubTotal();
       this._reRender();
     };
   }
@@ -149,6 +151,7 @@ class Class_product {
     }
 
     this._reduceQty = v;
+    this._countSubTotal();
     this._reRender();
   }
 
@@ -183,16 +186,18 @@ class Class_product {
 
     const delSelf = () => {
       delete this._exchangeProdList[exId];
-      this._reRender();
+      // this._reRender();
     };
 
     this._exchangeProdList[exId] = new Class_product({
       reRender: this._reRender,
       legacyProduct: copy,
-      countSubTotal: () => {},
+      countSubTotal: this._countSubTotal,
       parentProd: this,
       delSelf,
     });
+
+    this._countSubTotal();
 
     this._reRender();
 
@@ -204,6 +209,7 @@ class Class_product {
   clearExchange = () => {
     this._exchangeProdList = {};
     this._reduceQty = '0';
+    this._countSubTotal();
     this._reRender();
   };
 
@@ -412,11 +418,6 @@ class Class_product {
 
       if (Number(v) > parentRemain) {
         return;
-        // if (parentRemain === 0) {
-        //   return;
-        // }
-
-        // v = String(parentRemain);
       }
     }
 

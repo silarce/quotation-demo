@@ -21,7 +21,7 @@ const ExchangeRow = ({
         <input
           type="number"
           value={reduce ?? ''}
-          onFocus={() => reduceOnChange('0')}
+          // onFocus={() => reduceOnChange('0')}
           onChange={(e) => {
             reduceOnChange(e.target.value);
           }}
