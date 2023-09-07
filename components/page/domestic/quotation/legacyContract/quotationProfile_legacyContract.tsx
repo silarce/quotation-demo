@@ -33,10 +33,12 @@ export default function QuotationProfile({
   classLegacyContract,
   classBasicInfo,
   disabled = false,
+  isAppend,
 }: {
   classLegacyContract: Class_legacyContract;
   classBasicInfo: Class_basicInfo;
   disabled: boolean;
+  isAppend?: boolean;
 }) {
   // =============================================
   const { customer } = classLegacyContract;
@@ -244,7 +246,8 @@ export default function QuotationProfile({
           isMustPreStyle="minimal"
           label="合約編號"
           showBaseline="auto"
-          disabled={disabled}
+          // disabled={isAppend || disabled}
+          disabled={isAppend ? false : disabled}
           inputProps={{
             value: contractNumber,
             onChange: (v) => {

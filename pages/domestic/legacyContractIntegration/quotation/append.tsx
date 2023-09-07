@@ -196,6 +196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classLegacyContract={classLegacyContract}
             classBasicInfo={classLegacyContract.classBasicInfo}
             disabled={true}
+            isAppend={true}
           />
           {/*  */}
           <div className={scss.switchBar}>
