@@ -182,6 +182,10 @@ class Class_product {
     copy.quantity = Number(v);
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
+    if ('id' in copy) {
+      copy.id = '';
+    }
+
     const exId = 'ex-' + nanoid();
 
     const delSelf = () => {

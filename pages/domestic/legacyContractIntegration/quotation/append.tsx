@@ -157,13 +157,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return;
         }
 
-        alert('製作中');
+        // console.log(classLegacyContract.exProdList);
+        // console.log(classLegacyContract.exAddiList);
+
+        // alert('製作中');
 
         // console.log(postBody);
 
-        console.log('小計', postBody.subTotal);
-        console.log('營業稅', postBody.salesTax);
-        console.log('總計', postBody.total);
+        // console.log('小計', postBody.subTotal);
+        // console.log('營業稅', postBody.salesTax);
+        // console.log('總計', postBody.total);
 
         // console.log(postBody.products);
         // console.log(postBody.additions);
@@ -177,9 +180,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (!classLegacyContract) {
     return null;
   }
-
-  // console.log(classLegacyContract.postBody);
-  // console.log(classLegacyContract.exchangeList);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------

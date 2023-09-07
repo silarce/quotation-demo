@@ -331,7 +331,7 @@ export type TpaymentMethodDto = {
 
 /**舊合約產品 */
 export type TlegacyContractProductDto = {
-  readonly id: string;
+  id: string;
   /**date */
   createdAt: string;
   /**date */
@@ -387,7 +387,7 @@ export type TlegacyContractProductDto = {
 
 /**舊合約額外項目 */
 export type TlegacyContractAdditionDto = {
-  readonly id: string;
+  id: string;
   /**date */
   createdAt: string;
   /**date */

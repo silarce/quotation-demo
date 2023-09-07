@@ -164,13 +164,14 @@ class Class_addition {
       return false;
     }
 
-    // if (!this._exchangeAdditionArr) {
-    //   this._exchangeAdditionArr = [];
-    // }
-
     const exId = 'ex-' + nanoid();
 
     const copy = _.cloneDeep(this._addition);
+
+    if ('id' in copy) {
+      copy.id = '';
+    }
+
     copy.quantity = Number(v);
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
