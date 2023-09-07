@@ -46,14 +46,20 @@ class Class_addition {
       this._parentAddition = parentAddition;
     }
 
-    this.dndId = nanoid();
-
     this._delSelf = () => {
       delSelf();
       this._countSubTotal();
       this._reRender();
     };
   } // constructor
+  // -------------------------------------------------
+  private _id;
+  private _delSelf;
+  private _parentAddition: Class_addition | undefined = undefined;
+
+  // 等api新增，先用假資料
+  private _quotationNumber = 'M-1120821-1';
+
   private _reRender;
   private _addition;
   private _countSubTotal;
@@ -61,12 +67,25 @@ class Class_addition {
   private _unitPrice;
   private _totalPrice;
 
-  readonly dndId;
+  private _exAddiList: { [key: string]: Class_addition } = {};
+  private _reduceQty = '0';
 
-  private _id;
-  private _delSelf;
+  // -------------------------------------------------
+  get id() {
+    return this._id;
+  }
+  set id(v) {
+    this._id = v;
+    this._reRender();
+  }
 
-  // -------------------------------
+  get hasParent() {
+    return !!this._parentAddition;
+  }
+  get quotationNumber() {
+    return this._quotationNumber; // 'M-1120821-1'
+  }
+  set quotationNumber(v) {}
 
   get delSelf() {
     return this._delSelf;
@@ -79,139 +98,8 @@ class Class_addition {
     };
   }
 
-  // -------------------------------
-
-  private _reduceQty = '0';
-  get remainQty() {
-    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
-  }
-  private _parentAddition: Class_addition | undefined = undefined;
-  get hasParent() {
-    return !!this._parentAddition;
-  }
-
-  //
-  // private _exchangeAdditionArr: Class_addition[] | undefined = undefined;
-  // get exchangeAdditionArr() {
-  //   return this._exchangeAdditionArr;
-  // }
-  //
-  private _exAddiList: { [key: string]: Class_addition } = {};
-  get exAddiList() {
-    return this._exAddiList;
-  }
-  get exAddiArr() {
-    return Object.values(this._exAddiList);
-  }
-
-  //
-  // 等api新增，先用假資料
-  private _quotationNumber = 'M-1120821-1';
-  get quotationNumber() {
-    return this._quotationNumber;
-  }
-  set quotationNumber(v) {}
-  //
-  // 追減
-  get reduceQty() {
-    return this._reduceQty;
-  }
-  set reduceQty(v) {
-    const nv = Number(v);
-
-    if (nv > this.remainQty + Number(this.reduceQty)) {
-      return;
-    }
-
-    this._reduceQty = v;
-    this._countSubTotal();
-    this._reRender();
-  }
-
-  // 變更
-  get exchangeQty() {
-    // if (!this._exchangeAdditionArr) {
-    //   return 0;
-    // }
-
-    // let qty = 0;
-    // this._exchangeAdditionArr.forEach((item) => {
-    //   qty = qty + Number(item.quantity || 0);
-    // });
-    if (Object.keys(this._exAddiList).length === 0) {
-      return 0;
-    }
-
-    let qty = 0;
-    this.exAddiArr.forEach((item) => {
-      qty = qty + Number(item.quantity || 0);
-    });
-
-    return qty;
-  }
-
-  // 追減/變更金額
-  get reduceExchangePrice() {
-    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
-    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
-
-    return reducePrice;
-  }
-
-  // 新增變更項目
-  addExchange = (v: string) => {
-    if (Number(v) > this.remainQty) {
-      return false;
-    }
-
-    const exId = 'ex-' + nanoid();
-
-    const copy = _.cloneDeep(this._addition);
-
-    if ('id' in copy) {
-      copy.id = '';
-    }
-
-    copy.quantity = Number(v);
-    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
-
-    const delSelf = () => {
-      delete this._exAddiList[exId];
-      // this._reRender();
-    };
-
-    this._exAddiList[exId] = new Class_addition({
-      reRender: this._reRender,
-      addition: copy,
-      countSubTotal: this._countSubTotal,
-      parentAddition: this,
-      delSelf,
-    });
-
-    this._countSubTotal();
-
-    this._reRender();
-
-    return true;
-  };
-
-  // 清空變更項目
-  clearExchange = () => {
-    this._exAddiList = {};
-    this._reduceQty = '0';
-    this._countSubTotal();
-    this._reRender();
-  };
-
   // ----------------------------------------------------
   // ----------------------------------------------------
-  get id() {
-    return this._id;
-  }
-  set id(v) {
-    this._id = v;
-    this._reRender();
-  }
 
   get itemName() {
     return this._addition.itemName;
@@ -284,6 +172,12 @@ class Class_addition {
     this._reRender();
   }
 
+  private _countTotalPrice = () => {
+    const quantity = clearThousandsSeparator(this.quantity);
+    const unitPrice = clearThousandsSeparator(this.unitPrice);
+    this.totalPrice = Decimal.mul(quantity, unitPrice).toString();
+  };
+
   get notes() {
     return this._addition.notes;
   }
@@ -292,15 +186,109 @@ class Class_addition {
     this._reRender();
   }
 
+  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------
+  // 變更的配件
+
+  get exAddiList() {
+    return this._exAddiList;
+  }
+  get exAddiArr() {
+    return Object.values(this._exAddiList);
+  }
+
+  get remainQty() {
+    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  }
+
+  // 追減
+  get reduceQty() {
+    return this._reduceQty;
+  }
+  set reduceQty(v) {
+    const nv = Number(v);
+
+    if (nv > this.remainQty + Number(this.reduceQty)) {
+      return;
+    }
+
+    this._reduceQty = v;
+    this._countSubTotal();
+    this._reRender();
+  }
+
+  // 變更
+  get exchangeQty() {
+    if (Object.keys(this._exAddiList).length === 0) {
+      return 0;
+    }
+
+    let qty = 0;
+    this.exAddiArr.forEach((item) => {
+      qty = qty + Number(item.quantity || 0);
+    });
+
+    return qty;
+  }
+
+  // 追減/變更金額
+  get reduceExchangePrice() {
+    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
+
+    return reducePrice;
+  }
+
+  // 新增變更項目
+  addExchange = (v: string) => {
+    if (Number(v) > this.remainQty) {
+      return false;
+    }
+
+    const exId = 'ex-' + nanoid();
+
+    const copy = _.cloneDeep(this._addition);
+
+    if ('id' in copy) {
+      copy.id = '';
+    }
+
+    copy.quantity = Number(v);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
+
+    const delSelf = () => {
+      delete this._exAddiList[exId];
+      // this._reRender();
+    };
+
+    this._exAddiList[exId] = new Class_addition({
+      reRender: this._reRender,
+      addition: copy,
+      countSubTotal: this._countSubTotal,
+      parentAddition: this,
+      delSelf,
+    });
+
+    this._countSubTotal();
+
+    this._reRender();
+
+    return true;
+  };
+
+  // 清空變更項目
+  clearExchange = () => {
+    this._exAddiList = {};
+    this._reduceQty = '0';
+    this._countSubTotal();
+    this._reRender();
+  };
+
+  // -----------------------------------------------------------------
+
   get postAddition() {
     return this._addition;
   }
-
-  private _countTotalPrice = () => {
-    const quantity = clearThousandsSeparator(this.quantity);
-    const unitPrice = clearThousandsSeparator(this.unitPrice);
-    this.totalPrice = Decimal.mul(quantity, unitPrice).toString();
-  };
 }
 
 // ==========================================================================
