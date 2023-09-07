@@ -92,7 +92,7 @@ export default function ProductList_legacy({
       return;
     }
 
-    const ressult = targetProd.addExchange_2(v);
+    const ressult = targetProd.addExchange(v);
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });

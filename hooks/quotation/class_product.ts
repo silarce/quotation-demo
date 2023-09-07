@@ -68,19 +68,21 @@ class Class_product {
       this.parentProd = parentProd;
     }
 
-    this.dndId = nanoid();
-
     this._delSelf = () => {
       delSelf();
       this._countSubTotal();
       this._reRender();
     };
   } // constructor
+  //----------------------------------------------
+
+  private parentProd: Class_product | undefined = undefined;
 
   private _reRender;
-  _product;
-  // private _countTotalDiscount;
+  private _delSelf;
   private _countSubTotal;
+
+  private _product;
   private _id;
   private _idNumber;
   private _length;
@@ -92,11 +94,25 @@ class Class_product {
   private _totalPrice;
   private _discountRate;
 
-  readonly dndId;
+  readonly options_doorTrack_normal = options_doorTrack_normal;
+  readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
-  private _delSelf;
+  private _reduceQty = '0';
+  private _exchangeProdList: {
+    [key in string]: Class_product;
+  } = {};
+  // 等api新增，先用假資料
+  private _quotationNumber = 'M-1120821-1';
 
   //----------------------------------------------
+  get quotationNumber() {
+    return this._quotationNumber; // 'M-1120821-1'
+  }
+  // set quotationNumber(v) {}
+
+  get hasParent() {
+    return !!this.parentProd;
+  }
 
   get delSelf() {
     return this._delSelf;
@@ -110,117 +126,6 @@ class Class_product {
   }
 
   //----------------------------------------------
-  private _reduceQty = '0';
-  get remainQty() {
-    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
-  }
-  private parentProd: Class_product | undefined = undefined;
-  get hasParent() {
-    return !!this.parentProd;
-  }
-
-  private _exchangeProdList: {
-    [key in string]: Class_product;
-  } = {};
-
-  get exchangeProdList() {
-    return this._exchangeProdList;
-  }
-
-  // countRemainQty() {
-  //   this._remainQty = Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
-  // }
-
-  // 等api新增，先用假資料
-  private _quotationNumber = 'M-1120821-1';
-  get quotationNumber() {
-    return this._quotationNumber;
-  }
-  set quotationNumber(v) {}
-  //
-
-  // 追減數量
-  get reduceQty() {
-    return this._reduceQty;
-  }
-  set reduceQty(v) {
-    const nv = Number(v);
-
-    if (nv > this.remainQty + Number(this.reduceQty)) {
-      return;
-    }
-
-    this._reduceQty = v;
-    this._countSubTotal();
-    this._reRender();
-  }
-
-  // 變更數量
-  get exchangeQty() {
-    let qty = 0;
-    Object.values(this._exchangeProdList).forEach((item) => {
-      qty = qty + Number(item.quantity || 0);
-    });
-
-    return qty;
-  }
-
-  // 追減/變更金額
-  get reduceExchangePrice() {
-    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
-    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
-
-    return reducePrice;
-  }
-
-  addExchange_2(v: string) {
-    if (Number(v) > this.remainQty) {
-      return false;
-    }
-
-    const copy = _.cloneDeep(this._product);
-    copy.quantity = Number(v);
-    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
-
-    if ('id' in copy) {
-      copy.id = '';
-    }
-
-    const exId = 'ex-' + nanoid();
-
-    const delSelf = () => {
-      delete this._exchangeProdList[exId];
-      // this._reRender();
-    };
-
-    this._exchangeProdList[exId] = new Class_product({
-      reRender: this._reRender,
-      legacyProduct: copy,
-      countSubTotal: this._countSubTotal,
-      parentProd: this,
-      delSelf,
-    });
-
-    this._countSubTotal();
-
-    this._reRender();
-
-    return true;
-    //
-  }
-
-  // 清空變更項目
-  clearExchange = () => {
-    this._exchangeProdList = {};
-    this._reduceQty = '0';
-    this._countSubTotal();
-    this._reRender();
-  };
-
-  //----------------------------------------------
-
-  readonly options_doorTrack_normal = options_doorTrack_normal;
-  readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
   calcArea = () => {
     const area = Decimal.add(this._height || '0', this._thickness || '0') // h+b
@@ -507,7 +412,99 @@ class Class_product {
     this._product.notes = v;
     this._reRender();
   }
+  // ----------------------------------------------
+  // ----------------------------------------------
+  // 追加追減
 
+  // 因變更而新增的prod
+  get exchangeProdList() {
+    return this._exchangeProdList;
+  }
+  //
+  get remainQty() {
+    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  }
+
+  // 追減數量
+  get reduceQty() {
+    return this._reduceQty;
+  }
+  set reduceQty(v) {
+    const nv = Number(v);
+
+    if (nv > this.remainQty + Number(this.reduceQty)) {
+      return;
+    }
+
+    this._reduceQty = v;
+    this._countSubTotal();
+    this._reRender();
+  }
+
+  // 變更數量
+  get exchangeQty() {
+    let qty = 0;
+    Object.values(this._exchangeProdList).forEach((item) => {
+      qty = qty + Number(item.quantity || 0);
+    });
+
+    return qty;
+  }
+
+  // 追減/變更金額
+  get reduceExchangePrice() {
+    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
+
+    return reducePrice;
+  }
+
+  // 新增變更的prod
+  addExchange(v: string) {
+    if (Number(v) > this.remainQty) {
+      return false;
+    }
+
+    const copy = _.cloneDeep(this._product);
+    copy.quantity = Number(v);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
+
+    if ('id' in copy) {
+      copy.id = '';
+    }
+
+    const exId = 'ex-' + nanoid();
+
+    const delSelf = () => {
+      delete this._exchangeProdList[exId];
+      // this._reRender();
+    };
+
+    this._exchangeProdList[exId] = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: copy,
+      countSubTotal: this._countSubTotal,
+      parentProd: this,
+      delSelf,
+    });
+
+    this._countSubTotal();
+
+    this._reRender();
+
+    return true;
+    //
+  }
+
+  // 清空變更prod
+  clearExchange = () => {
+    this._exchangeProdList = {};
+    this._reduceQty = '0';
+    this._countSubTotal();
+    this._reRender();
+  };
+
+  // -------------------------------------------------
   get postProd() {
     return {
       ...this._product,
