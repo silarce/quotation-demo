@@ -65,26 +65,14 @@ class Class_legacyContract {
   ) {
     this._legacyContract = legacyContract;
     this._reRender = reRender;
+
     /**  報價單基本資料*/
     this.classBasicInfo = new Class_basicInfo(reRender, this._legacyContract);
 
     // --------------------------------------------------------------
-    // --------------------------------------------------------------
 
     const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
-    // this.classProductArr = sortedProdArr.map((product) => {
-    //   return new Class_product({
-    //     reRender: reRender,
-    //     legacyProduct: product,
-    //     // countTotalDiscount: this.countTotalDiscount,
-    //     countSubTotal: this.countSubTotal,
-    //     delSelf: () => {},
-    //   });
-    // });
-    // __________________________
-    // __________________________
-
     const prodList: TprodList = {};
     sortedProdArr.forEach((prodData) => {
       let key: string;
@@ -110,8 +98,18 @@ class Class_legacyContract {
         delSelf,
       });
     });
-
+    //
     this._prodList = prodList;
+    //
+    this.prodCellConfig = prodCellConfig;
+    // 原本想直接用_exProdKeyArr的，但考慮到之後業主會不會有有什麼需求...，還是另外做一個吧
+    // 編輯舊合約整合報價單時用的主產品設定keyArr
+    this._editProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._editProdKeyArr = _.pull(this._editProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+
+    // 變更 主產品設定用的keyArr
+    this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
+    this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -142,12 +140,19 @@ class Class_legacyContract {
         delSelf: delSelf,
       });
     });
-
+    //
     this._additionList = additionList;
+    //
+    this.additionCellConfig = additionCellConfig;
+    // 編輯舊合約整合報價單時用的配件設定keyArr
+    this._editAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
+    this._editAddiKeyArr = _.pull(this._editAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
+    // 變更 配件設定用的keyArr
+    this._exAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
+    this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
-
     /**   付款資訊*/
     this.classPayInfo = new Class_payInfo(
       reRender,
@@ -157,33 +162,18 @@ class Class_legacyContract {
       // this.editAllProdDiscount,
       this.countSubTotal
     );
+
     /**  備註*/
     this.classNotes = new Class_listString(reRender, this._legacyContract.notes);
+
     /**  報價範圍*/
     this.classQuoteScopes = new Class_listString(reRender, this._legacyContract.quoteScopes);
+
     /**  簽名*/
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
-    this.prodCellConfig = prodCellConfig;
-    // 原本想直接用_exProdKeyArr的，但考慮到之後業主會不會有有什麼需求...，還是另外做一個吧
-    // 編輯舊合約整合報價單時用的主產品設定keyArr
-    this._editProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
-    this._editProdKeyArr = _.pull(this._editProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+    // -------------------------------------------------------------
 
-    // 變更 主產品設定用的keyArr
-    this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
-    this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
-
-    this.additionCellConfig = additionCellConfig;
-    // 編輯舊合約整合報價單時用的配件設定keyArr
-    this._editAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
-    this._editAddiKeyArr = _.pull(this._editAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
-    // 變更 配件設定用的keyArr
-    this._exAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
-    this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
-
-    // constructor
-    // constructor
     // constructor
     // constructor
     // constructor
@@ -191,32 +181,40 @@ class Class_legacyContract {
 
   private _legacyContract;
   private _reRender;
-  /**用來判斷這是哪個class */
-  identify = 'legacy' as const;
 
   // ---------------------
   private _prodList;
+  /**追加追減時按新增按鈕新增的prod */
   private _extraExProdList: TprodList = {};
-  // private _prodKeyArr;
+
+  private _editProdKeyArr;
+  private _exProdKeyArr;
   // ---------------------
   private _additionList;
+  /**追加追減時按新增按鈕新增的addi */
   private _extraExAddiList: TadditionList = {};
+
+  private _editAddiKeyArr;
+  private _exAddiKeyArr;
   // ---------------------
   classBasicInfo;
-  // classProductArr;
-  // classAdditionArr;
   classPayInfo;
   classNotes;
   classQuoteScopes;
   classSignature;
   // ---------------------
-  _editProdKeyArr;
-  _editAddiKeyArr;
-  _exProdKeyArr;
-  _exAddiKeyArr;
+  /**主產品 格子設定 包括欄位keyArr */
+  prodCellConfig;
+  /**配件 格子設定 包括欄位keyArr */
+  additionCellConfig;
   // ---------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // 先留著，免得哪天要改回來
+  // 先留著，免得哪天要改回來
+  // 先留著，免得哪天要改回來
 
-  // 需求變更 編輯折數與總折數時不再影響其他數值 // 先留著，免得哪天又要改回來
+  // 需求變更 編輯折數與總折數時不再影響其他數值
   /**計算總折數 */
   // countTotalDiscount = () => {
   // let totalDiscount = new Decimal(0);
@@ -226,7 +224,8 @@ class Class_legacyContract {
   // });
   // this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
   // };
-  // 需求變更 編輯折數與總折數時不再影響其他數值 // 先留著，免得哪天又要改回來
+
+  // 需求變更 編輯折數與總折數時不再影響其他數值
   /**變更所有主產品的折數 */
   // editAllProdDiscount = (v: string) => {
   // this.classProductArr.forEach((prod) => {
@@ -234,25 +233,13 @@ class Class_legacyContract {
   // });
   // };
 
-  /**計算小計 */
-  // countSubTotal = () => {
-  //   let subTotal = new Decimal(0);
-  //   Object.values(this._prodList).forEach((prod) => {
-  //     const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
-  //     // 需求變更 編輯折數與總折數時不再影響其他數值
-  //     // const discountRate = Decimal.div(prod.discountRate || 0, 100);
-  //     // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
-  //     subTotal = Decimal.add(totalPrice || 0, subTotal);
-  //   });
-  //   this.additionArr.forEach((addi) => {
-  //     const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
-  //     subTotal = Decimal.add(totalPrice || 0, subTotal);
-  //   });
-  //   this.classPayInfo.subTotal = subTotal.toString();
-  // };
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  /**計算小計，就是右下方的那個小計*/
   countSubTotal = () => {
     let subTotal = new Decimal(0);
-    //
+
+    //-------
     Object.values(this._prodList).forEach((prod) => {
       // 複價
       const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
@@ -265,14 +252,16 @@ class Class_legacyContract {
 
       subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
     });
-    //
+
+    //-------
     this.additionArr.forEach((addi) => {
       const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
       const reduceExchangePrice = addi.reduceExchangePrice.replace(/,/g, '') || 0;
 
       subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
     });
-    //
+
+    //-------
     Object.values(this.exProdList).forEach((prod) => {
       // 複價
       const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
@@ -281,8 +270,8 @@ class Class_legacyContract {
 
       subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
     });
-    //
 
+    //-------
     Object.values(this.exAddiList).forEach((addi) => {
       const totalPrice = addi.totalPrice.replace(/,/g, '') || 0;
       const reduceExchangePrice = addi.reduceExchangePrice.replace(/,/g, '') || 0;
@@ -294,17 +283,10 @@ class Class_legacyContract {
 
     this.classPayInfo.subTotal = subTotal.toString();
   };
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-  get customer() {
-    return this._legacyContract.customer;
-  }
-  set customer(v) {
-    this._legacyContract.customer = v;
-    this._reRender();
-  }
-
-  // ------------------------------------------------------------
-  get prodList_2() {
+  get prodList() {
     return this._prodList;
   }
 
@@ -328,7 +310,7 @@ class Class_legacyContract {
   //   this._reRender();
   // }
 
-  copyProd_2(id: string) {
+  copyProd(id: string) {
     const key = 'new-' + nanoid();
 
     const copy = _.cloneDeep(this._prodList[id]);
@@ -344,7 +326,7 @@ class Class_legacyContract {
     this._reRender();
   }
 
-  addProd_2 = () => {
+  addProd = () => {
     const key = 'new-' + nanoid();
 
     const delSelf = () => {
@@ -390,7 +372,7 @@ class Class_legacyContract {
       const prod = this._prodList[key];
 
       const copySelf = () => {
-        this.copyProd_2(key);
+        this.copyProd(key);
       };
 
       kitList[key] = {
@@ -405,6 +387,7 @@ class Class_legacyContract {
 
   // -----------------------
 
+  // 追加追減 按新增按鈕新增的prod
   get extraExProdList() {
     return this._extraExProdList;
   }
@@ -428,8 +411,7 @@ class Class_legacyContract {
     this._reRender();
   };
 
-  // -----------------------
-
+  /**變更主產品 主產品按變更按紐新增的主產品加上 extraExProdList*/
   get exProdList() {
     type TexchangeProdlist = {
       [key: string]: Class_product;
@@ -451,23 +433,43 @@ class Class_legacyContract {
     return list;
   }
 
-  // ------------------------------------------------------------
-  // 這三組都是欄位的keyArr
+  // prod減少的金額合計
+  get prodSubPriceTotal() {
+    let total = 0;
+    this.prodArr.forEach((prod) => {
+      total = total + Number(prod.reduceExchangePrice);
+    });
 
-  // 追加追減 上面的主產品設定用的 有合約編號欄位
-  get appendProdkeyArr() {
-    return this.prodCellConfig.keyArr;
+    return total;
   }
-  set appendProdkeyArr(v) {
-    this.prodCellConfig.keyArr = v;
-    this._reRender();
+
+  //
+  get prodExTotal() {
+    let totalPrice = 0;
+
+    Object.values(this.exProdList).forEach((prod) => {
+      totalPrice += Number(prod.totalPrice.replaceAll(',', ''));
+    });
+
+    return totalPrice;
   }
+  //
+  // 這三組都是水平欄位的keyArr
+
   // 報價單 主產品設定用的 沒有合約編號欄位
   get editProdKeyArr() {
     return this._editProdKeyArr;
   }
   set editProdKeyArr(v) {
     this._editProdKeyArr = v;
+    this._reRender();
+  }
+  // 追加追減 上面的主產品設定用的 有合約編號欄位
+  get appendProdkeyArr() {
+    return this.prodCellConfig.keyArr;
+  }
+  set appendProdkeyArr(v) {
+    this.prodCellConfig.keyArr = v;
     this._reRender();
   }
   // 變更 主產品設定用的keyArr 沒有合約編號欄位
@@ -479,27 +481,12 @@ class Class_legacyContract {
     this._reRender();
   }
 
+  //
+
+  //------------------------------------------------------
   //------------------------------------------------------
   //------------------------------------------------------
   // 配件設定
-
-  get exAddiKeyArr() {
-    return this._exAddiKeyArr;
-  }
-  set exAddiKeyArr(v) {
-    this._exAddiKeyArr = v;
-    this._reRender();
-  }
-
-  get editAddiKeyArr() {
-    return this._editAddiKeyArr;
-  }
-  set editAddiKeyArr(v) {
-    this._editAddiKeyArr = v;
-    this._reRender();
-  }
-
-  // _additionList
 
   get additionList() {
     return this._additionList;
@@ -509,7 +496,7 @@ class Class_legacyContract {
     return Object.values(this._additionList);
   }
 
-  copyAddition_2 = (id: string) => {
+  copyAddition = (id: string) => {
     const key = 'new-' + nanoid();
 
     const copy = _.cloneDeep(this._additionList[id]);
@@ -524,7 +511,7 @@ class Class_legacyContract {
     this._reRender();
   };
 
-  addAddition_2 = () => {
+  addAddition = () => {
     const key = 'new-' + nanoid();
 
     const delSelf = () => {
@@ -543,8 +530,7 @@ class Class_legacyContract {
     this._reRender();
   };
 
-  // ---------------------
-
+  /**追加追減時按新增按鈕新增的addi */
   get extraExAddiList() {
     return this._extraExAddiList;
   }
@@ -568,8 +554,7 @@ class Class_legacyContract {
     this._reRender();
   };
 
-  // ---------------------
-
+  /**按變更按紐新增的addi加上 extraExAddiList*/
   get exAddiList() {
     type TexAddiList = {
       [key: string]: Class_addition;
@@ -591,10 +576,62 @@ class Class_legacyContract {
     return list;
   }
 
-  // ---------------------
-  prodCellConfig; // dnd head的狀態，也是資料分類目錄
-  additionCellConfig;
-  // ---------------------
+  get addiSubPriceTotal() {
+    let total = 0;
+    this.additionArr.forEach((addi) => {
+      total = total + Number(addi.reduceExchangePrice);
+    });
+
+    return total;
+  }
+
+  get addiExTotal() {
+    let totalPrice = 0;
+    Object.values(this.exAddiList).forEach((addi) => {
+      totalPrice += Number(addi.totalPrice.replaceAll(',', ''));
+    });
+
+    return totalPrice;
+  }
+
+  // 水平欄位的keyArr
+  get editAddiKeyArr() {
+    return this._editAddiKeyArr;
+  }
+  set editAddiKeyArr(v) {
+    this._editAddiKeyArr = v;
+    this._reRender();
+  }
+  /**追加追減 變更配件用的 */
+  get exAddiKeyArr() {
+    return this._exAddiKeyArr;
+  }
+  set exAddiKeyArr(v) {
+    this._exAddiKeyArr = v;
+    this._reRender();
+  }
+
+  // ---------------------------------------------------------------
+
+  /**下方粉紅色總合計 */
+  get exchangeTotal() {
+    let total = this.prodExTotal + this.addiExTotal - this.prodSubPriceTotal - this.addiSubPriceTotal;
+    const operator = total >= 0 ? '+' : '-';
+
+    total = Math.abs(total);
+
+    return `${operator} ${total.toLocaleString()}`;
+  }
+  // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
+
+  get customer() {
+    return this._legacyContract.customer;
+  }
+  set customer(v) {
+    this._legacyContract.customer = v;
+    this._reRender();
+  }
 
   get postBody(): TcreateLegacyContractDto | false {
     const customerId = (() => {
@@ -663,35 +700,16 @@ class Class_legacyContract {
       deliveryDate: deliveryDate_Date || null,
     };
   }
-  // ----------------------------------------------------
-
-  get prodExTotal() {
-    let totalPrice = 0;
-
-    Object.values(this.exProdList).forEach((prod) => {
-      totalPrice += Number(prod.totalPrice.replaceAll(',', ''));
-    });
-
-    return totalPrice;
-  }
-
-  get addiExTotal() {
-    let totalPrice = 0;
-    Object.values(this.exAddiList).forEach((addi) => {
-      totalPrice += Number(addi.totalPrice.replaceAll(',', ''));
-    });
-
-    return totalPrice;
-  }
-
-  get exchangeTotal() {
-    return this.prodExTotal + this.addiExTotal;
-  }
-
-  // -----------
 
   // ---------------------
 } // Class_legacyContract
+
+// 追加追減的總合計有一些東西沒算到
+// 追加追減的總合計有一些東西沒算到
+// 追加追減的總合計有一些東西沒算到
+// 追加追減的總合計有一些東西沒算到
+// 追加追減的總合計有一些東西沒算到
+// 追加追減的總合計有一些東西沒算到
 
 const useLegacyContract = (data: TlegacyContractDto | undefined) => {
   const [render, setRender] = useState(0);

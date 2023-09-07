@@ -65,12 +65,7 @@ export default function QuotationAdditions({
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const {
-    additionCellConfig: additionCellConfig,
-
-    additionList,
-    addAddition_2,
-  } = legacyContract;
+  const { additionCellConfig, additionList, addAddition, addiSubPriceTotal } = legacyContract;
 
   const additionKeyindex = isAppend ? additionCellConfig.keyArr : legacyContract.editAddiKeyArr;
 
@@ -98,103 +93,103 @@ export default function QuotationAdditions({
   };
 
   // -------------------------------------------------------------------
-  let exchangeTotal = 0;
-
-  // -------------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
     listKeyArr: Object.keys(additionList),
     resetTrigger: legacyContract,
   });
 
-  const DndRow = useCallback(function DndRow({
-    isActive,
-    pIndex,
-    toSetTarget,
-    addi,
-    disabled,
-    id,
-    isMoving,
-  }: {
-    isActive: boolean;
-    pIndex: number;
-    toSetTarget: () => void;
-    addi: Class_addition;
-    disabled?: boolean;
-    id: string;
-    isMoving: boolean;
-  }) {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const DndRow = useCallback(
+    function DndRow({
+      isActive,
+      pIndex,
+      toSetTarget,
+      addi,
+      disabled,
       id,
-    });
+      isMoving,
+    }: {
+      isActive: boolean;
+      pIndex: number;
+      toSetTarget: () => void;
+      addi: Class_addition;
+      disabled?: boolean;
+      id: string;
+      isMoving: boolean;
+    }) {
+      const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+        id,
+      });
 
-    const itemStyle = {
-      transform: CSS.Transform.toString(transform),
-      //不知為何，會有回到原位的動畫(即使動畫結束後位置的確改變了)。乾脆把transition拿掉
-      // 連同其他地方的transition也拿掉
-      // transition
-    };
+      const itemStyle = {
+        transform: CSS.Transform.toString(transform),
+        //不知為何，會有回到原位的動畫(即使動畫結束後位置的確改變了)。乾脆把transition拿掉
+        // 連同其他地方的transition也拿掉
+        // transition
+      };
 
-    return (
-      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-        <CellWithBar
-          isActive={isActive}
-          className={classNames(styleL.row, scss.row)}
-          onClick={() => {
-            setActiveIndex(pIndex);
-          }}
-        >
-          {/*  */}
-          {!isAppend && (
-            <EditBtnBox
-              dndAttr={attributes}
-              dndListener={listeners}
-              disabled={disabled}
-              del={() => {
-                addi.delSelf();
-              }}
-              indexNumber={pIndex + 1}
-            />
-          )}
-          {isAppend && (
-            <ResetChangeBtnBox
-              toSetTargetIndex={toSetTarget}
-              clearExchange={addi.clearExchange}
-              indexNumber={pIndex + 1}
-              dndAttr={attributes}
-              dndListener={listeners}
-            />
-          )}
-
-          {/*  */}
-          {additionKeyindex.map((key, cIndex) => {
-            const inputSelPorps = _.cloneDeep(cellConfig[key].inputSelPorps);
-
-            const inputProps: TinputProps = {
-              ...inputSelPorps.inputProps,
-              props: {
-                value: addi[key],
-                onChange: (e) => (addi[key] = e.target.value),
-                ...inputSelPorps?.inputProps?.props,
-              },
-            };
-
-            return (
-              <InputSel
-                key={cIndex}
-                className={scss.column}
+      return (
+        <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+          <CellWithBar
+            isActive={isActive}
+            className={classNames(styleL.row, scss.row)}
+            onClick={() => {
+              setActiveIndex(pIndex);
+            }}
+          >
+            {/*  */}
+            {!isAppend && (
+              <EditBtnBox
+                dndAttr={attributes}
+                dndListener={listeners}
                 disabled={disabled}
-                showBaseline="auto"
-                {...inputSelPorps}
-                inputProps={inputProps}
+                del={() => {
+                  addi.delSelf();
+                }}
+                indexNumber={pIndex + 1}
               />
-            );
-          })}
-        </CellWithBar>
-      </div>
-    );
-  },
-  []);
+            )}
+            {isAppend && (
+              <ResetChangeBtnBox
+                toSetTargetIndex={toSetTarget}
+                clearExchange={addi.clearExchange}
+                indexNumber={pIndex + 1}
+                dndAttr={attributes}
+                dndListener={listeners}
+              />
+            )}
+
+            {/*  */}
+            {additionKeyindex.map((key, cIndex) => {
+              const inputSelPorps = _.cloneDeep(cellConfig[key].inputSelPorps);
+
+              const inputProps: TinputProps = {
+                ...inputSelPorps.inputProps,
+                props: {
+                  value: addi[key],
+                  onChange: (e) => (addi[key] = e.target.value),
+                  ...inputSelPorps?.inputProps?.props,
+                },
+              };
+
+              return (
+                <InputSel
+                  key={cIndex}
+                  className={scss.column}
+                  disabled={disabled}
+                  showBaseline="auto"
+                  {...inputSelPorps}
+                  inputProps={inputProps}
+                />
+              );
+            })}
+          </CellWithBar>
+        </div>
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   // -------------------------------------------------------------------
   // -------------------------------------------------------------------
@@ -279,7 +274,7 @@ export default function QuotationAdditions({
               </SortableContext>
             </DndContext>
 
-            {!disabled && <AddButton className={scss.addBtn} label="新增項目" onClick={addAddition_2} />}
+            {!disabled && <AddButton className={scss.addBtn} label="新增項目" onClick={addAddition} />}
           </div>
           {isAppend && (
             <ExchangePanel>
@@ -289,8 +284,6 @@ export default function QuotationAdditions({
                 if (!addi) {
                   return null;
                 }
-
-                exchangeTotal += Number(addi.reduceExchangePrice);
 
                 return (
                   <ExchangeRow
@@ -314,7 +307,7 @@ export default function QuotationAdditions({
       </div>
       <div className={classNames(scss.total)}>
         <span>合計</span>
-        <span>- {exchangeTotal.toLocaleString()}</span>
+        <span>- {addiSubPriceTotal.toLocaleString()}</span>
       </div>
 
       {/*  */}

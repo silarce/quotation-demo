@@ -41,18 +41,19 @@ export default function DndThead({
   isAppend?: boolean;
   isExchange?: boolean;
 }) {
-  const cellConfig = classQuotation.prodCellConfig.cellConfig;
-  // const theadIndex = isExchange ? classQuotation.exProdKeyLArr : classQuotation.prodkeyArr;
   const theadIndex = isExchange
     ? classQuotation.exProdKeyArr
     : isAppend
     ? classQuotation.appendProdkeyArr
     : classQuotation.editProdKeyArr;
+  // =======================================================
+
+  const [isMoving, setIsMoving] = useState('');
+  // =======================================================
+  const cellConfig = classQuotation.prodCellConfig.cellConfig;
+  // const theadIndex = isExchange ? classQuotation.exProdKeyLArr : classQuotation.prodkeyArr;
 
   const sensors = useSensors(useSensor(PointerSensor));
-
-  // =======================================================
-  const [isMoving, setIsMoving] = useState('');
 
   // =======================================================
   return (
@@ -118,11 +119,23 @@ export default function DndThead({
       const newIndex: number = theadIndex.indexOf(over?.id as keyof typeof cellConfig);
 
       if (isAppend) {
-        classQuotation.appendProdkeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.appendProdkeyArr;
+        classQuotation.appendProdkeyArr = arrayMove(
+          theadIndex,
+          oldIndex,
+          newIndex
+        ) as typeof classQuotation.appendProdkeyArr;
       } else if (isExchange) {
-        classQuotation.exProdKeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.appendProdkeyArr;
+        classQuotation.exProdKeyArr = arrayMove(
+          theadIndex,
+          oldIndex,
+          newIndex
+        ) as typeof classQuotation.appendProdkeyArr;
       } else {
-        classQuotation.editProdKeyArr = arrayMove(theadIndex, oldIndex, newIndex) as typeof classQuotation.appendProdkeyArr;
+        classQuotation.editProdKeyArr = arrayMove(
+          theadIndex,
+          oldIndex,
+          newIndex
+        ) as typeof classQuotation.appendProdkeyArr;
       }
     }
   }

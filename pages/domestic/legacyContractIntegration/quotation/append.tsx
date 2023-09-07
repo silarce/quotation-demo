@@ -213,7 +213,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/*  */}
           <div className={scss.exchangeTotal}>
             <span>總合計</span>
-            <span>+ {classLegacyContract.exchangeTotal.toLocaleString()}</span>
+            <span>{classLegacyContract.exchangeTotal}</span>
           </div>
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />
