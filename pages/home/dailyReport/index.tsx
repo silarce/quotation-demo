@@ -16,34 +16,30 @@ import ReporterList from 'components/page/home/dailyReport/ReporterList';
 import SetReportEmpModal from 'components/page/home/dailyReport/SetReportEmpModal';
 import ReviewerAndExaminerSelector from 'components/page/home/dailyReport/ReviewerAndExaminerSelector';
 import ReportTable from 'components/page/home/dailyReport/ReportTable';
-import TagCarousel from 'components/page/home/dailyReport/TagCarousel';
+import TabCarousel from 'components/page/home/dailyReport/TabCarousel';
+import { panelListCreator } from 'components/page/home/dailyReport/utils/panelListCreator';
 
-// mobile
+// mobile component
 import SearchDrawer from 'components/page/home/dailyReport/SearchDrawer';
 
 // gear
-import CheckButton from 'components/global/gear/button/checkButton';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SearchBar from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
 
-// antd
-import { Badge } from 'antd';
-
 // hook
 import { Class_reportItem, useReport, ThookEmptyReport } from 'hooks/home/useDailyReport';
 
-// tool
+// utils
 import { filterCre_nextAndPrevMonth } from 'js/utils/helpers/params/filterCreator';
+/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
+import { formatRiewerPickArr } from 'components/page/home/dailyReport/utils/formatRiewerPickArr';
 
-// icon
-import iconFourCube from 'public/image/icon/fourCube.svg';
-import iconMenu from 'public/image/icon/menu.svg';
 // api
 import {
-  TdailyReportDto,
-  TcreateDailyReportItemDto,
+  // TdailyReportDto,
+  // TcreateDailyReportItemDto,
   Tparams,
   useApiDailyReports,
   useApiDailyReports_reviewers,
@@ -64,7 +60,7 @@ import { TuserDto } from 'js/api/dtoTypes';
 import scss from './dailyReport.module.scss';
 
 // =====================================================================
-export type Ttag = {
+export type Ttab = {
   reportId: string;
   employeeId: string;
   name: string;
@@ -101,23 +97,39 @@ type TdailyReportContext = {
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const DailyReportContext = createContext<TdailyReportContext>(null!);
 
+export type { Tidentity };
+
 // =====================================================================
 export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ---------------------------------------------------------------------
+
   const userId = userInfo.employee?.id ?? '';
   const router = useRouter();
+  const query = router.query;
+
   const searchQuery = {
-    isUserReviewed: router.query.isUserReviewed || '全部',
-    date: router.query.date || '',
-    keyWord: router.query.keyWord,
+    isUserReviewed: query.isUserReviewed || '全部',
+    date: query.date || '',
+    keyWord: query.keyWord,
   } as {
     isUserReviewed: (typeof searchObj)['isUserReviewed'];
     date: string;
     keyWord: string | undefined;
   };
-
-  // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------
 
+  let isMine = false;
+
+  if (query.isMine === undefined || query.isMine === 'true') {
+    isMine = true;
+  }
+
+  const isCalendar = query.isCalendar === 'true' ? true : false;
+  // ---------------------------------------------------------------------
+
+  // 草稿功能
   const [tempReportData, setTempReportData] = useState<{
     [key: string]: {
       report: ThookEmptyReport;
@@ -174,10 +186,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
   // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------
-  const isMine = router.query.isMine === undefined ? true : router.query.isMine === 'true' ? true : false;
-  const isCalendar = router.query.isCalendar === 'true' ? true : false;
 
-  const [isLoading, setIsLoading] = useState(false);
   // -----------------------------------------------------------
   /**權限 */
   const [identity, setIdentity] = useState<Tidentity>();
@@ -208,8 +217,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // 每個日報上傳前要選reviewer，這是那個modal的開關
   const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false);
 
-  // 日報表tagArr，送進TagCarousel
-  const [tagArr, setTagArr] = useState<Ttag[]>([]);
+  // 日報表tabArr，送進TabCarousel
+  const [tabArr, setTabArr] = useState<Ttab[]>([]);
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -465,37 +474,37 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   };
 
   // ----------------------------------------------------------------------
-  // TagCarousel
-  const addTag = async (tag: Ttag) => {
+  // TabCarousel
+  const addTab = async (tab: Ttab) => {
     if (identity === 'reporter') {
-      if (userInfo.employee?.id !== tag.employeeId) {
+      if (userInfo.employee?.id !== tab.employeeId) {
         return myAlert.warning({ title: '只能編輯自己的日報表' });
       }
     }
 
-    await editReport(tag.reportId, tag.prevDate);
+    await editReport(tab.reportId, tab.prevDate);
 
-    if (tagArr.some((theTag) => theTag.reportId === tag.reportId)) {
+    if (tabArr.some((theTab) => theTab.reportId === tab.reportId)) {
       return;
     }
 
-    setTagArr((arr) => {
+    setTabArr((arr) => {
       const newArr = _.cloneDeep(arr);
-      newArr.push(tag);
+      newArr.push(tab);
 
       return newArr;
     });
   };
 
-  const removeTag = (index: number, tagReportId: string) => {
-    setTagArr((arr) => {
+  const removeTab = (index: number, tabReportId: string) => {
+    setTabArr((arr) => {
       const newArr = _.cloneDeep(arr);
       newArr.splice(index, 1);
 
       return newArr;
     });
 
-    if (tagReportId === reportInEdit?.id) {
+    if (tabReportId === reportInEdit?.id) {
       cancelEditNewDailyReport();
     }
   };
@@ -721,7 +730,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         date: searchObj.date,
         keyWord: searchObj.keyWord,
         isMine,
-        isCalendar,
+        isCalendar: isCalendar ? 'true' : undefined,
       },
     });
   }; // doSearch
@@ -789,18 +798,16 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     getTempReport,
   });
 
-  // ----------------------------------------------------------------------
   const customeLeft = [
-    <TagCarousel
+    <TabCarousel
       key="1"
-      tagArr={tagArr}
+      tabArr={tabArr}
       editReport={editReport}
-      removeTag={removeTag}
+      removeTab={removeTab}
       activeId={reportInEdit?.id ?? ''}
     />,
   ];
 
-  // ----------------------------------------------------------------------
   const leftTagOnClick = () => {
     cancelEditNewDailyReport();
   };
@@ -850,7 +857,6 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       >
         {/*  */}
         <PageHeader02
-          // key={+isMine}
           tag="日報表"
           tagClassName={classNames(scss.pageHeaderTag, scss.plus, scss.pplus)}
           tagOnClick={leftTagOnClick}
@@ -869,12 +875,12 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         />
 
         {/*  */}
-        {!isCalendar && <ReporterList dailyReportArr={dailyReportArr ?? []} addTag={addTag} viewRef={viewRef} />}
+        {!isCalendar && <ReporterList dailyReportArr={dailyReportArr ?? []} addTab={addTab} viewRef={viewRef} />}
         {isCalendar && (
           <TheCalendar
             isMine={isMine}
             userInfo={userInfo}
-            addTag={addTag}
+            addTab={addTab}
             dailyReportArr={dailyReport_calendar ?? []}
             update_calendar={update_calendar}
           />
@@ -927,6 +933,9 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 // ===================================================================
 // ===================================================================
 // ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
 const reqApiDailyReports_id = async (reportId: string) => {
   try {
     showRootLoading(true);
@@ -964,270 +973,6 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
   return false;
 };
 
-// ==========================================================================
+// ===================================================================
 
-/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-const formatRiewerPickArr = ({
-  dailyReports_ReportersArr,
-  employeeArr,
-}: {
-  dailyReports_ReportersArr: TemployeeDto[];
-  employeeArr: TemployeeDto[] | undefined;
-}) => {
-  if (!dailyReports_ReportersArr || !employeeArr) {
-    return [];
-  }
-
-  const result = employeeArr.map((item) => {
-    const match = dailyReports_ReportersArr.find((x) => x.id === item.id);
-    const shouldReport = match ? true : false;
-    const theJobs = (() => {
-      if (item.jobs) {
-        return _.sortBy(item.jobs, 'grade');
-      } else {
-        return [];
-      }
-    })();
-
-    const obj = {
-      id: item.id,
-      chName: item.chName,
-      idNumber: item.idNumber,
-      job: theJobs[0]?.name ?? '',
-      grade: theJobs[0]?.grade ?? '',
-      shouldReport,
-      isHaveUser: !!item.user,
-    };
-
-    return obj;
-  });
-
-  return result;
-};
-
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-
-const panelListCreator = ({
-  reportInEdit,
-  doCheck,
-  switchIsEdit,
-  setShowReviewerForReportModal,
-  dailyReportArr,
-  isCalendar,
-  router,
-  editRivewerPickArr,
-  editReport_today,
-  identity,
-  isReportEdit,
-  userInfo,
-  dailyReport_calendar,
-  //
-  customSearchBar,
-  saveTempReport,
-  getTempReport,
-}: {
-  reportInEdit: ThookEmptyReport | undefined;
-  doCheck: () => void;
-  switchIsEdit: () => void;
-  setShowReviewerForReportModal: (v: boolean) => void;
-  dailyReportArr: TdailyReportDto[] | undefined;
-  isCalendar: boolean;
-  router: NextRouter;
-  editRivewerPickArr: () => void;
-  editReport_today: (prevDate: string) => void;
-  identity: Tidentity;
-  isReportEdit: boolean;
-  userInfo: TuserDto;
-  dailyReport_calendar: TdailyReportDto[] | undefined;
-  //
-  customSearchBar: JSX.Element;
-  saveTempReport: () => void;
-  getTempReport: () => void;
-}) => {
-  const isReviewCompleted = reportInEdit?.isReviewCompleted;
-
-  const listSwitchButton: TpanelList[number] = {
-    type: 'myButton',
-    label: isCalendar ? '列表' : '月曆',
-    onClick: () => {
-      router.push({
-        query: {
-          ...router.query,
-          isCalendar: isCalendar ? 'false' : 'true',
-        },
-      });
-    },
-    img: isCalendar ? iconMenu.src : iconFourCube.src,
-  };
-
-  /**manager 檢視人員設定 */
-  const panelList_manager_notInEdit: TpanelList = [
-    {
-      custom: customSearchBar,
-    },
-    {
-      type: 'myButton',
-      label: '檢視人員設定',
-      onClick: editRivewerPickArr,
-    },
-    listSwitchButton,
-  ];
-
-  /**reporter 新增回報 */
-  const panelList_reporter_notInEdit: TpanelList = [
-    {
-      custom: customSearchBar,
-    },
-    {
-      type: 'myButton',
-      label: '新增回報',
-      onClick: () => {
-        if (isCalendar && dailyReport_calendar) {
-          editReport_today(dailyReport_calendar?.[0]?.date);
-        }
-
-        if (!isCalendar && dailyReportArr) {
-          editReport_today(dailyReportArr?.[0]?.date);
-        }
-      },
-    },
-    listSwitchButton,
-  ];
-
-  /**reviewer 已讀/未讀 isReviewedByUser */
-  const panelList_reviewer_inEdit_user: TpanelList = [
-    {
-      custom: (
-        <CheckButton
-          // checkLabel="已讀"
-          checkLabel="已讀"
-          uncheckLable="未讀"
-          value={!!reportInEdit?.isReviewedByUser}
-          onClick={doCheck}
-        />
-      ),
-    },
-  ];
-
-  /**reporter 編輯 */
-  const editBtn: TpanelList[number] = {
-    type: 'myButton',
-    label: '編輯',
-    onClick: switchIsEdit,
-  };
-
-  const panelList_reporter_inEdit01: TpanelList = [
-    //
-    isReviewCompleted ? undefined : editBtn,
-  ];
-
-  /**reporter 上傳 取消 */
-  const panelList_reporter_inEdit02: TpanelList = [
-    {
-      type: 'myButton',
-      label: '儲存草稿',
-      onClick: saveTempReport,
-    },
-    {
-      type: 'myButton',
-      label: '取得草稿',
-      onClick: getTempReport,
-    },
-    {
-      type: 'redButton',
-      label: '上傳',
-      onClick: () => {
-        if (!reportInEdit?.date) {
-          return myAlert.warning({ title: '請選擇日期' });
-        }
-
-        setShowReviewerForReportModal(true);
-      },
-    },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: switchIsEdit,
-    },
-  ];
-
-  const panelList_reporter_reviewed: TpanelList = [
-    {
-      custom: <Badge className={scss.antdBadge02} color="auto" text="已檢視" />,
-    },
-  ];
-
-  if (reportInEdit?.isReviewedByOther) {
-    panelList_reporter_inEdit01.push(panelList_reporter_reviewed[0]);
-    panelList_reporter_inEdit02.push(panelList_reporter_reviewed[0]);
-  }
-
-  const panelList = (() => {
-    if (reportInEdit?.isUserIsViewer) {
-      return [];
-    }
-
-    if (identity === 'manager') {
-      if (!reportInEdit) {
-        return panelList_manager_notInEdit;
-      } else if (reportInEdit.isAllowToReview) {
-        return panelList_reviewer_inEdit_user;
-      } else {
-        return [];
-      }
-    }
-
-    if (identity === 'reviewer') {
-      if (!reportInEdit) {
-        return panelList_reporter_notInEdit;
-      } else {
-        if (!reportInEdit?.employeeId || reportInEdit?.employeeId === userInfo?.employee?.id) {
-          if (isReportEdit) {
-            return panelList_reporter_inEdit02;
-          }
-
-          return panelList_reporter_inEdit01;
-        } else if (reportInEdit.isAllowToReview) {
-          return panelList_reviewer_inEdit_user;
-        }
-
-        return [];
-      }
-    }
-
-    if (identity === 'reporter') {
-      if (!reportInEdit) {
-        return panelList_reporter_notInEdit;
-      } else {
-        if (isReportEdit) {
-          return panelList_reporter_inEdit02;
-        }
-
-        return panelList_reporter_inEdit01;
-      }
-    }
-
-    return [];
-  })();
-
-  return {
-    panelList_manager_notInEdit,
-    panelList_reporter_notInEdit,
-    panelList_reviewer_inEdit_user,
-    panelList_reporter_inEdit01,
-    panelList_reporter_inEdit02,
-    panelList_reporter_reviewed,
-    panelList,
-  };
-};
+// 草稿功能

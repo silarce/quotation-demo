@@ -14,20 +14,20 @@ import iconArrowRight from 'public/image/icon/arrow_right.svg';
 import iconRmove from 'public/image/icon/remove03.svg';
 
 // css
-import scss from './tagCarousel.module.scss';
+import scss from './tabCarousel.module.scss';
 
 // type
-import { Ttag } from 'pages/home/dailyReport';
+import { Ttab } from 'pages/home/dailyReport';
 
-export default function TagCarousel({
-  tagArr,
+export default function TabCarousel({
+  tabArr,
   editReport,
-  removeTag,
+  removeTab,
   activeId,
 }: {
-  tagArr: Ttag[];
+  tabArr: Ttab[];
   editReport: (reportId: string, prevReportDate: string) => void;
-  removeTag: (index: number, tagReportId: string) => void;
+  removeTab: (index: number, tabReportId: string) => void;
   activeId: string;
 }) {
   const sliderRef = useRef<Slider>(null);
@@ -37,8 +37,8 @@ export default function TagCarousel({
       return;
     }
 
-    const activeIndex = tagArr.findIndex((tag) => {
-      return tag.reportId === activeId;
+    const activeIndex = tabArr.findIndex((tab) => {
+      return tab.reportId === activeId;
     });
     sliderRef.current.slickGoTo(activeIndex);
   };
@@ -62,8 +62,8 @@ export default function TagCarousel({
         prevArrow={<PrevArrow />}
         nextArrow={<NextArrow />}
       >
-        {tagArr.map((tag, index) => {
-          const { name, date, reportId, employeeId, prevDate: prevReportDate } = tag;
+        {tabArr.map((tab, index) => {
+          const { name, date, reportId, employeeId, prevDate: prevReportDate } = tab;
 
           return (
             <div key={index} onClick={() => editReport(reportId, prevReportDate)}>
@@ -75,7 +75,7 @@ export default function TagCarousel({
                   className={scss.removeBtn}
                   onClick={(e) => {
                     e.stopPropagation();
-                    removeTag(index, reportId);
+                    removeTab(index, reportId);
                   }}
                 />
                 <hr />
