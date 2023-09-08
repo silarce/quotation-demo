@@ -223,10 +223,12 @@ export default function EmployeeSelector({
   const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
     {
       selectProps: {
-        wrapperStyle: { width: '100px' },
+        wrapperStyle: { width: '120px' },
         props: {
           options: optionArr,
           placeholder: '選擇部門',
+          menuPortalTarget: undefined,
+          isLoading: !departmentData,
         },
       },
     },

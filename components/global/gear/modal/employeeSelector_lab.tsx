@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
-import { useInView } from 'react-intersection-observer';
 
 // global gear
-// import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
@@ -94,7 +92,8 @@ export default function EmployeeSelector({
     }
 
     update_department();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
 
   const optionArr = useMemo(() => {
     if (!departmentData) {
@@ -159,10 +158,12 @@ export default function EmployeeSelector({
   const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
     {
       selectProps: {
-        wrapperStyle: { width: '100px' },
+        wrapperStyle: { width: '120px' },
         props: {
           options: optionArr,
           placeholder: '選擇部門',
+          menuPortalTarget: undefined,
+          isLoading: !departmentData,
         },
       },
     },

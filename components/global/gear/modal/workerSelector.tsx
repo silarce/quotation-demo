@@ -235,6 +235,7 @@ export default function WorkerSelector({
             }),
           ],
           placeholder: '選擇職等',
+          menuPortalTarget: undefined,
         },
       },
     },

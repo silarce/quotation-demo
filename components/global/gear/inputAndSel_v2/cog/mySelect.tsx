@@ -76,7 +76,7 @@ export default function MySelect<
         }}
         unstyled={true}
         menuPortalTarget={document.getElementById('__next')}
-        // menuPortalTarget={document.getElementById('body')}
+        // menuPortalTarget={document.getElementsByTagName('body')[0]}
         menuPosition={'fixed'}
         isSearchable={false}
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
