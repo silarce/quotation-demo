@@ -130,59 +130,59 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // ---------------------------------------------------------------------
 
   // 草稿功能
-  const [tempReportData, setTempReportData] = useState<{
-    [key: string]: {
-      report: ThookEmptyReport;
-      itemKeyArr: string[];
-    };
-  }>({});
+  // const [draftReportData, setDraftReportData] = useState<{
+  //   [key: string]: {
+  //     report: ThookEmptyReport;
+  //     itemKeyArr: string[];
+  //   };
+  // }>({});
 
-  const saveTempReport = () => {
-    if (!reportInEdit) {
-      return;
-    }
+  // const saveDraftReport = () => {
+  //   if (!reportInEdit) {
+  //     return;
+  //   }
 
-    const reportId = reportInEdit.id || 'new';
-    //
+  //   const reportId = reportInEdit.id || 'new';
+  //   //
 
-    // tempReportData[reportId] = {
-    //   report: _.cloneDeep(reportInEdit),
-    //   itemKeyArr: _.cloneDeep(reportItemKeyArr),
-    // };
-    // setTempReportData({ ...tempReportData });
+  //   // tempReportData[reportId] = {
+  //   //   report: _.cloneDeep(reportInEdit),
+  //   //   itemKeyArr: _.cloneDeep(reportItemKeyArr),
+  //   // };
+  //   // setTempReportData({ ...tempReportData });
 
-    const copy = _.cloneDeep(tempReportData);
+  //   const copy = _.cloneDeep(draftReportData);
 
-    copy[reportId] = {
-      report: _.cloneDeep(reportInEdit),
-      itemKeyArr: _.cloneDeep(reportItemKeyArr),
-    };
-    setTempReportData(copy);
+  //   copy[reportId] = {
+  //     report: _.cloneDeep(reportInEdit),
+  //     itemKeyArr: _.cloneDeep(reportItemKeyArr),
+  //   };
+  //   setDraftReportData(copy);
 
-    //
-    myAlert.success({ title: '儲存草稿成功' });
-  };
+  //   //
+  //   myAlert.success({ title: '儲存草稿成功' });
+  // };
 
-  const getTempReport = () => {
-    if (!reportInEdit) {
-      return;
-    }
+  // const getDraftReport = () => {
+  //   if (!reportInEdit) {
+  //     return;
+  //   }
 
-    const reportId = reportInEdit?.id || 'new';
-    const temp = tempReportData[reportId];
+  //   const reportId = reportInEdit?.id || 'new';
+  //   const draft = draftReportData[reportId];
 
-    if (!temp) {
-      myAlert.info({ title: '該日報表無草稿' });
+  //   if (!draft) {
+  //     myAlert.info({ title: '該日報表無草稿' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const { report, itemKeyArr } = temp;
+  //   const { report, itemKeyArr } = draft;
 
-    setReport(_.cloneDeep(report));
-    setReportItemKeyArr(_.cloneDeep(itemKeyArr));
-    myAlert.success({ title: '取得草稿成功' });
-  };
+  //   setReport(_.cloneDeep(report));
+  //   setReportItemKeyArr(_.cloneDeep(itemKeyArr));
+  //   myAlert.success({ title: '取得草稿成功' });
+  // };
 
   // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------
@@ -472,6 +472,15 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const cancelEditNewDailyReport = () => {
     setReport(undefined);
   };
+
+  // ----------------------------------------------------------------------
+  // 草稿功能
+  const { saveDraftReport, getDraftReport } = useDraft({
+    reportInEdit,
+    reportItemKeyArr,
+    setReport,
+    setReportItemKeyArr,
+  });
 
   // ----------------------------------------------------------------------
   // TabCarousel
@@ -794,8 +803,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     userInfo,
     dailyReport_calendar,
     customSearchBar,
-    saveTempReport,
-    getTempReport,
+    saveTempReport: saveDraftReport,
+    getTempReport: getDraftReport,
   });
 
   const customeLeft = [
@@ -842,6 +851,10 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     reportItemKeyArr,
     setReportItemKeyArr,
   };
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -976,3 +989,67 @@ const checkIsSubordinate = (userInfo: TuserDto) => {
 // ===================================================================
 
 // 草稿功能
+const useDraft = ({
+  reportInEdit,
+  reportItemKeyArr,
+  setReport,
+  setReportItemKeyArr,
+}: {
+  reportInEdit: ThookEmptyReport | undefined;
+  reportItemKeyArr: string[];
+  setReport: React.Dispatch<React.SetStateAction<ThookEmptyReport | undefined>>;
+  setReportItemKeyArr: React.Dispatch<React.SetStateAction<string[]>>;
+}) => {
+  const [draftReportData, setDraftReportData] = useState<{
+    [key: string]: {
+      report: ThookEmptyReport;
+      itemKeyArr: string[];
+    };
+  }>({});
+
+  const saveDraftReport = () => {
+    if (!reportInEdit) {
+      return;
+    }
+
+    const reportId = reportInEdit.id || 'new';
+
+    const copy = _.cloneDeep(draftReportData);
+
+    copy[reportId] = {
+      report: _.cloneDeep(reportInEdit),
+      itemKeyArr: _.cloneDeep(reportItemKeyArr),
+    };
+    setDraftReportData(copy);
+
+    //
+    myAlert.success({ title: '儲存草稿成功' });
+  };
+
+  const getDraftReport = () => {
+    if (!reportInEdit) {
+      return;
+    }
+
+    const reportId = reportInEdit?.id || 'new';
+    const draft = draftReportData[reportId];
+
+    if (!draft) {
+      myAlert.info({ title: '該日報表無草稿' });
+
+      return;
+    }
+
+    const { report, itemKeyArr } = draft;
+
+    setReport(_.cloneDeep(report));
+    setReportItemKeyArr(_.cloneDeep(itemKeyArr));
+    myAlert.success({ title: '取得草稿成功' });
+  };
+
+  return {
+    draftReportData,
+    saveDraftReport,
+    getDraftReport,
+  };
+};
