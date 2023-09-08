@@ -240,7 +240,7 @@ import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-export const useEmployee_lab = ({ customParams }: { customParams?: Tparams }) => {
+export const useEmployee_infinite = ({ customParams }: { customParams?: Tparams }) => {
   /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
   const [resetCount, setResetCount] = useState(0);
   const [isLoadingPage1, setIsLoadingPage1] = useState(false);

@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
-import { useInView } from 'react-intersection-observer';
 
 // global gear
-// import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
@@ -15,7 +13,7 @@ import style from './employeeSelector.module.scss';
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 // api
-import { Tparams, TapiGetEmployeeParams, useEmployee } from 'js/api/api_employee';
+import { Tparams, useEmployee_infinite } from 'js/api/api_employee';
 import { useDepartments } from 'js/api/api_department';
 
 import { AppContext } from 'pages/_app';
@@ -42,21 +40,17 @@ export default function EmployeeSelector({
   customFilter?: Tparams['filter'];
 }) {
   const { rwd1023 } = useContext(AppContext);
-  const [isLoading, setIsLoading] = useState(false);
 
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
-  const [pageObj, setPageObj] = useState({ page: -1 });
-  const page = pageObj.page;
 
   const params: Tparams = (() => {
     const allNum = /^\d+$/.test(searchValue[1] ?? 'n');
     const grade = allNum ? searchValue[1] : undefined;
 
     return {
-      page: page,
       pageSize: 20,
       populate: ['jobs.department'],
       sort: 'idNumber',
@@ -77,88 +71,30 @@ export default function EmployeeSelector({
     };
   })();
 
-  const { data, setData, update, update_infinite } = useEmployee(params);
-  const employeeArr = data?.data || [];
-  const meta = data?.meta;
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useEmployee_infinite({ customParams: params });
 
   //
   const { data: departmentData, update: update_department } = useDepartments();
-
-  const [viewRef, inView] = useInView();
 
   useEffect(() => {
     if (!showModal) {
       return;
     }
 
-    if (!inView) {
-      return;
-    }
-
-    if (!meta?.hasNextPage) {
-      return;
-    }
-
-    const newPageObj = { ...pageObj, page: pageObj.page + 1 };
-    setPageObj(newPageObj);
+    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
+  }, [searchValue, showModal]);
 
   useEffect(() => {
-    if (showModal) {
-      const newPageObj = { ...pageObj, page: -1 };
-      setPageObj(newPageObj);
-      setData(undefined);
+    if (!showModal) {
       setSearchValue([]);
 
       return;
     }
 
-    // const newPageObj = { ...pageObj, page: 1 };
-    // setPageObj(newPageObj);
+    update_department();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
-
-  useEffect(() => {
-    const newPageObj = { ...pageObj, page: 1 };
-    setPageObj(newPageObj);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue]);
-
-  useEffect(() => {
-    if (page === -1) {
-      return;
-    }
-
-    if (page === 1) {
-      setData(undefined);
-
-      (async () => {
-        try {
-          setIsLoading(true);
-          await update();
-        } catch (error) {
-          myAlert.err({ title: '取得人員資料失敗' });
-        }
-
-        setIsLoading(false);
-      })();
-    } else {
-      (async () => {
-        try {
-          await update_infinite();
-        } catch (error) {
-          myAlert.err({ title: '取得人員資料失敗' });
-        }
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageObj]);
-
-  // ==================================================
-  useEffect(() => {
-    update_department();
-  }, []);
 
   const optionArr = useMemo(() => {
     if (!departmentData) {
@@ -259,9 +195,9 @@ export default function EmployeeSelector({
         onClick: onSearch,
       }}
     >
-      <LoadingCoverWrapper01 isLoading={isLoading}>
+      <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={style.listContainer}>
-          {employeeArr.map((emp, index, arr) => {
+          {dataArr.map((emp, index, arr) => {
             const { idNumber, chName, jobs } = emp;
             const { name, grade, department } = jobs?.[0] ?? {};
 
@@ -269,7 +205,7 @@ export default function EmployeeSelector({
 
             const theViewRef = (() => {
               if (arr.length - 11 === index) {
-                return viewRef;
+                return viewRef_bottom;
               }
 
               return undefined;
