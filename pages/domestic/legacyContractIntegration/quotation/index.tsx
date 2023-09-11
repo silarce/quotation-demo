@@ -226,6 +226,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return;
         }
 
+        if (!postBody.contactNumber) {
+          return myAlert.warning({ title: '請輸入合約編號' });
+        }
+
+        if (!postBody.projectName) {
+          return myAlert.warning({ title: '請輸入工程名稱' });
+        }
+
+        // if (!postBody.customerId) {
+        //   return myAlert.warning({ title: '請選擇客戶' });
+        // }
+
+        const { projectCity, projectDistrict, projectAddress } = postBody;
+
+        if (!projectCity && !projectDistrict && !projectAddress) {
+          return myAlert.warning({ title: '請輸入地址' });
+        }
+
         try {
           showRootLoading(true);
           const res = contractId

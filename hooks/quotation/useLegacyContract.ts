@@ -648,7 +648,7 @@ class Class_legacyContract {
     })();
 
     if (!customerId) {
-      myAlert.warning({ title: '沒有選擇客戶' });
+      myAlert.warning({ title: '請選擇客戶' });
 
       return false;
     }
@@ -753,13 +753,6 @@ class Class_legacyContract {
 
   // ---------------------
 } // Class_legacyContract
-
-// 追加追減的總合計有一些東西沒算到
-// 追加追減的總合計有一些東西沒算到
-// 追加追減的總合計有一些東西沒算到
-// 追加追減的總合計有一些東西沒算到
-// 追加追減的總合計有一些東西沒算到
-// 追加追減的總合計有一些東西沒算到
 
 const useLegacyContract = (data: TlegacyContractDto | undefined) => {
   const [render, setRender] = useState(0);
