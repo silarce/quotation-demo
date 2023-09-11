@@ -530,7 +530,7 @@ export type TcreateLegacyContractProductDto = {
 };
 
 type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
-  batchNumber?: string;
+  // batchNumber?: string;
   id?: string;
 };
 
@@ -550,7 +550,7 @@ export type TcreateLegacyContractAdditionDto = {
 };
 
 type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {
-  batchNumber?: string;
+  // batchNumber?: string;
   id?: string;
 };
 
@@ -629,6 +629,14 @@ export type TupdateLegacyContractDto = Partial<
   }
 >;
 
+export type TmodifyLegacyContractDto = {
+  products: TupdateLegacyContractProductDto[];
+  additions: TupdateLegacyContractAdditionDto[];
+  batchNumber: string;
+};
+
+// ==========================================================================
+// ==========================================================================
 // ==========================================================================
 // work-sheet
 

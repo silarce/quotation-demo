@@ -15,6 +15,7 @@ import {
   TupdateLegacyContractDto,
   TpageMetaDto,
   TfileDto,
+  TmodifyLegacyContractDto,
 } from './dtoTypes';
 
 export { domain };
@@ -202,6 +203,40 @@ export const apiDelLegacyContracts_id_attachments = (contractId: string, fileId:
 
   return axi
     .delete(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// ==========================================================================
+
+export const apiPatchLegacyContracts_id_modify = ({
+  id,
+  body,
+}: //
+{
+  id: string;
+  body: TmodifyLegacyContractDto;
+}) => {
+  const api = `/legacy-contracts/${id}/modify`;
+
+  return axi
+    .patch<void>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPatchLegacyContracts_id_updateBatchNumber = ({
+  id,
+  body,
+}: //
+{
+  id: string;
+  body: { batchNumber: string };
+}) => {
+  const api = `/legacy-contracts/${id}/update-batch-number`;
+
+  return axi
+    .patch<TlegacyContractDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
