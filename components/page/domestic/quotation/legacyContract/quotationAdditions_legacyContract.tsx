@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -65,133 +65,131 @@ export default function QuotationAdditions({
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const { additionCellConfig: additionCellConfig, addiList } = legacyContract;
+  const { additionCellConfig, additionList, addAddition, addiSubPriceTotal } = legacyContract;
 
-  const classAdditionArr = legacyContract.classAdditionArr;
-
-  const { addAddition, delAddition } = legacyContract ?? {};
-
-  // const additionKeyindex = additionCellConfig.keyArr;
   const additionKeyindex = isAppend ? additionCellConfig.keyArr : legacyContract.editAddiKeyArr;
 
   const cellConfig = additionCellConfig.cellConfig;
   // -------------------------------------------------------------------
-  const [targetIndex, setTargetIndex] = useState<`${number}`>();
+
+  const [targetAddi, setTargetAddi] = useState<Class_addition>();
 
   const exchangeConfirm = (v: string) => {
-    if (!targetIndex) {
+    if (!targetAddi) {
       return;
     }
 
-    const ressult = classAdditionArr[targetIndex].addExchange(v);
+    const ressult = targetAddi.addExchange(v);
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });
     } else {
-      setTargetIndex(undefined);
+      setTargetAddi(undefined);
     }
   };
 
   const onCancel = () => {
-    setTargetIndex(undefined);
+    setTargetAddi(undefined);
   };
-
-  // -------------------------------------------------------------------
-  let exchangeTotal = 0;
 
   // -------------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(addiList),
+    listKeyArr: Object.keys(additionList),
     resetTrigger: legacyContract,
   });
 
-  const DndRow = useCallback(function DndRow({
-    isActive,
-    pIndex,
-    toSetTargetIndex,
-    addi,
-    disabled,
-    id,
-    isMoving,
-  }: {
-    isActive: boolean;
-    pIndex: number;
-    toSetTargetIndex: () => void;
-    addi: Class_addition;
-    disabled?: boolean;
-    id: string;
-    isMoving: boolean;
-  }) {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const DndRow = useCallback(
+    function DndRow({
+      isActive,
+      pIndex,
+      toSetTarget,
+      addi,
+      disabled,
       id,
-    });
+      isMoving,
+    }: {
+      isActive: boolean;
+      pIndex: number;
+      toSetTarget: () => void;
+      addi: Class_addition;
+      disabled?: boolean;
+      id: string;
+      isMoving: boolean;
+    }) {
+      const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+        id,
+      });
 
-    const itemStyle = {
-      transform: CSS.Transform.toString(transform),
-      //不知為何，會有回到原位的動畫(即使動畫結束後位置的確改變了)。乾脆把transition拿掉
-      // 連同其他地方的transition也拿掉
-      // transition
-    };
+      const itemStyle = {
+        transform: CSS.Transform.toString(transform),
+        //不知為何，會有回到原位的動畫(即使動畫結束後位置的確改變了)。乾脆把transition拿掉
+        // 連同其他地方的transition也拿掉
+        // transition
+      };
 
-    return (
-      <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-        <CellWithBar
-          isActive={isActive}
-          className={classNames(styleL.row, scss.row)}
-          onClick={() => {
-            setActiveIndex(pIndex);
-          }}
-        >
-          {/*  */}
-          {!isAppend && (
-            <EditBtnBox
-              dndAttr={attributes}
-              dndListener={listeners}
-              disabled={disabled}
-              del={() => delAddition(pIndex)}
-              indexNumber={pIndex + 1}
-            />
-          )}
-          {isAppend && (
-            <ResetChangeBtnBox
-              toSetTargetIndex={toSetTargetIndex}
-              clearExchange={addi.clearExchange}
-              indexNumber={pIndex + 1}
-              dndAttr={attributes}
-              dndListener={listeners}
-            />
-          )}
-
-          {/*  */}
-          {additionKeyindex.map((key, cIndex) => {
-            const inputSelPorps = _.cloneDeep(cellConfig[key].inputSelPorps);
-
-            const inputProps: TinputProps = {
-              ...inputSelPorps.inputProps,
-              props: {
-                value: addi[key],
-                onChange: (e) => (addi[key] = e.target.value),
-                ...inputSelPorps?.inputProps?.props,
-              },
-            };
-
-            return (
-              <InputSel
-                key={cIndex}
-                className={scss.column}
+      return (
+        <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+          <CellWithBar
+            isActive={isActive}
+            className={classNames(styleL.row, scss.row)}
+            onClick={() => {
+              setActiveIndex(pIndex);
+            }}
+          >
+            {/*  */}
+            {!isAppend && (
+              <EditBtnBox
+                dndAttr={attributes}
+                dndListener={listeners}
                 disabled={disabled}
-                showBaseline="auto"
-                {...inputSelPorps}
-                inputProps={inputProps}
+                del={() => {
+                  addi.delSelf();
+                }}
+                indexNumber={pIndex + 1}
               />
-            );
-          })}
-        </CellWithBar>
-      </div>
-    );
-  },
-  []);
+            )}
+            {isAppend && (
+              <ResetChangeBtnBox
+                toSetTargetIndex={toSetTarget}
+                clearExchange={addi.clearExchange}
+                indexNumber={pIndex + 1}
+                dndAttr={attributes}
+                dndListener={listeners}
+              />
+            )}
+
+            {/*  */}
+            {additionKeyindex.map((key, cIndex) => {
+              const inputSelPorps = _.cloneDeep(cellConfig[key].inputSelPorps);
+
+              const inputProps: TinputProps = {
+                ...inputSelPorps.inputProps,
+                props: {
+                  value: addi[key],
+                  onChange: (e) => (addi[key] = e.target.value),
+                  ...inputSelPorps?.inputProps?.props,
+                },
+              };
+
+              return (
+                <InputSel
+                  key={cIndex}
+                  className={scss.column}
+                  disabled={disabled}
+                  showBaseline="auto"
+                  {...inputSelPorps}
+                  inputProps={inputProps}
+                />
+              );
+            })}
+          </CellWithBar>
+        </div>
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   // -------------------------------------------------------------------
   // -------------------------------------------------------------------
@@ -233,7 +231,7 @@ export default function QuotationAdditions({
             >
               <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
                 {dndKeyArr?.map((key, pIndex) => {
-                  const addi = addiList[key];
+                  const addi = additionList[key];
 
                   if (!addi) {
                     return null;
@@ -241,8 +239,8 @@ export default function QuotationAdditions({
 
                   const isMoving = movingId === key;
 
-                  const toSetTargetIndex = () => {
-                    setTargetIndex(`${pIndex}`);
+                  const toSetTarget = () => {
+                    setTargetAddi(addi);
                   };
 
                   let isActive = false;
@@ -267,7 +265,7 @@ export default function QuotationAdditions({
                       addi={addi}
                       pIndex={pIndex}
                       isActive={isActive}
-                      toSetTargetIndex={toSetTargetIndex}
+                      toSetTarget={toSetTarget}
                       disabled={disabled}
                       isMoving={isMoving}
                     />
@@ -281,13 +279,11 @@ export default function QuotationAdditions({
           {isAppend && (
             <ExchangePanel>
               {dndKeyArr.map((key, index) => {
-                const addi = addiList[key];
+                const addi = additionList[key];
 
                 if (!addi) {
                   return null;
                 }
-
-                exchangeTotal += Number(addi.reduceExchangePrice);
 
                 return (
                   <ExchangeRow
@@ -311,14 +307,14 @@ export default function QuotationAdditions({
       </div>
       <div className={classNames(scss.total)}>
         <span>合計</span>
-        <span>- {exchangeTotal.toLocaleString()}</span>
+        <span>- {addiSubPriceTotal.toLocaleString()}</span>
       </div>
 
       {/*  */}
       <InputModal
-        visible={!!targetIndex}
+        visible={!!targetAddi}
         title="請輸入變更數量"
-        tip={`上限 : ${targetIndex && classAdditionArr[targetIndex].remainQty}`}
+        tip={`上限 : ${targetAddi && targetAddi.remainQty}`}
         onConfirm={(v) => {
           exchangeConfirm?.(v);
         }}
@@ -357,7 +353,7 @@ const EditBtnBox = ({
               return;
             }
 
-            del;
+            del();
           }}
         />
       </div>

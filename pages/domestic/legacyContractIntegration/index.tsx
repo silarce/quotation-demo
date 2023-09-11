@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 import moment from 'moment';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -12,6 +13,10 @@ import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 import Thead01 from 'components/page/domestic/ui/table01/Thead01';
 import TbodyItem01, { TBodyItemContent } from 'components/page/domestic/ui/table01/TbodyItem01';
 
+// antd
+import { Collapse } from 'antd';
+const { Panel } = Collapse;
+
 // option
 import { optionsCreator_doorType, Toption } from 'js/utils/options/options';
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -20,15 +25,20 @@ const optionsCounty = optionsCreator_county();
 optionsDoorType.unshift({ value: '', label: '不拘' });
 optionsCounty.unshift({ value: '', label: '不拘' });
 
+// icon
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from './legacyContract.module.scss';
 // ==================================================================
 
 // api
-import { Tparams, useLegacyContracts } from 'js/api/api_legacy-contract';
+import { Tparams, useLegacyContracts, TlegacyContractDto } from 'js/api/api_legacy-contract';
 
 export default function LegacyContractIntegration() {
   const router = useRouter();
+
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const [viewRef, inView] = useInView();
 
@@ -51,7 +61,7 @@ export default function LegacyContractIntegration() {
   const params: Tparams = {
     page: page,
     pageSize: 7,
-    populate: ['products'],
+    populate: ['products', 'additions'],
     filter,
     sort: 'quoteDate',
     order: 'DESC',
@@ -173,83 +183,140 @@ export default function LegacyContractIntegration() {
     },
   ];
 
+  // -----------------------------------------------------------------------
+  const changeActive = (panelIndex: string | string[]) => {
+    const activeIndex = parseInt(panelIndex as string);
+    setActiveIndex(activeIndex);
+  };
+  // -----------------------------------------------------------------------
+
   return (
     <SubLayer>
       <PageHeader02 tag="舊合約" panelList={panelList} />
       <div className={scss.main}>
         <Thead01 />
         <div>
-          {legacyContractsArr?.map((item, index, arr) => {
-            const discountRate = (() => {
-              const discountRate = Math.round(parseFloat(item.discountRate) * 100);
+          {/*  */}
+          <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
+            {legacyContractsArr?.map((item, index, arr) => {
+              const discountRate = (() => {
+                const discountRate = Math.round(parseFloat(item.discountRate) * 100);
 
-              return discountRate.toString() + '%';
-            })();
+                return discountRate.toString() + '%';
+              })();
 
-            const tempDoorQty = (() => {
-              let qty = 0;
-              item.products.forEach((prod) => {
-                qty = qty + prod.quantity;
-              });
+              const tempDoorQty = (() => {
+                let qty = 0;
+                item.products.forEach((prod) => {
+                  qty = qty + prod.quantity;
+                });
 
-              return qty;
-            })();
+                return qty;
+              })();
 
-            const basicInfo = {
-              quotationId: item.contractNumber,
-              constructionName: item.projectName,
-              /**承辦人 */
-              undertaker: item.operatorName,
-              totalDiscount: discountRate,
-              tempDoorQty: tempDoorQty,
-              tempBudgetAmount: item.total,
-              // date: item.quoteDate,
-              date: moment(item.quoteDate).format('YYYY-MM-DD'),
-              constructionCounty: item.projectCity,
-            };
-            const clientData = {
-              name: item.customerName,
-              contact: [
-                {
-                  name: item.contactPerson,
-                  phone: item.contactNumber,
-                },
-              ],
-            };
-            // const projectData = { basicInfo, clientData };
-            const quotationContent: TBodyItemContent = {
-              quotationNumber: item.contractNumber, // 合約編號
-              quotationDate: moment(item.quoteDate).format('YYYY-MM-DD'), //報價日期
-              projectName: item.projectName /**工程名稱 */,
-              county: item.projectCity /**工地位置縣市 */,
-              contactPerson: item.contactPerson /**聯絡人 */,
-              contactNumber: item.contactNumber /**聯絡電話 */,
-              discount: discountRate /**折扣率 */,
-              quantity: tempDoorQty /**產品 數量 計算來的*/,
-              totalPrice: item.total /**總計 */,
-              customerName: item.customerName /**客戶名稱 */,
-              agentEmployeeName: item.operatorName /**經辦人 */,
-            };
+              // const projectData = { basicInfo, clientData };
+              const quotationContent: TBodyItemContent = {
+                quotationNumber: item.contractNumber, // 合約編號
+                quotationDate: moment(item.quoteDate).format('YYYY-MM-DD'), //報價日期
+                projectName: item.projectName /**工程名稱 */,
+                county: item.projectCity /**工地位置縣市 */,
+                contactPerson: item.contactPerson /**聯絡人 */,
+                contactNumber: item.contactNumber /**聯絡電話 */,
+                discount: discountRate /**折扣率 */,
+                quantity: tempDoorQty /**產品 數量 計算來的*/,
+                totalPrice: item.total /**總計 */,
+                customerName: item.customerName /**客戶名稱 */,
+                agentEmployeeName: item.operatorName /**經辦人 */,
+              };
 
-            const href = {
-              pathname: '/domestic/legacyContractIntegration/quotation/',
-              query: { contractId: item.id },
-            };
+              const href = {
+                pathname: '/domestic/legacyContractIntegration/quotation/',
+                query: { contractId: item.id },
+              };
 
-            return (
-              <div key={index} ref={arr.length - 3 === index ? viewRef : undefined}>
-                <TbodyItem01
-                  quotationContent={quotationContent}
-                  isActive={false}
-                  openQuotation={() => {
-                    router.push(href);
-                  }}
-                />
-              </div>
-            );
-          })}
+              const isActive = activeIndex === index;
+
+              return (
+                <Panel
+                  key={index}
+                  className={scss.panel}
+                  header={
+                    <div ref={arr.length - 3 === index ? viewRef : undefined}>
+                      <TbodyItem01
+                        quotationContent={quotationContent}
+                        isActive={isActive}
+                        openQuotation={() => {
+                          router.push(href);
+                        }}
+                      />
+                    </div>
+                  }
+                >
+                  {isActive && <AppendList contract={item} />}
+                </Panel>
+              );
+            })}
+          </Collapse>
+          {/*  */}
         </div>
       </div>
     </SubLayer>
   );
 }
+
+// ===========================================================================
+
+const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
+  const { products, additions, id } = contract;
+
+  const batchNumberList: {
+    [key: string]: {
+      batchNumber: string;
+      batch: number;
+      createdAt: string;
+    };
+  } = {};
+
+  products?.forEach((prod) => {
+    const batch = prod.batch;
+    batchNumberList[batch] = {
+      batchNumber: prod.batchNumber,
+      batch: prod.batch,
+      createdAt: prod.createdAt,
+    };
+  });
+  additions?.forEach((addi) => {
+    const batch = addi.batch;
+    batchNumberList[batch] = {
+      batchNumber: addi.batchNumber,
+      batch: addi.batch,
+      createdAt: addi.createdAt,
+    };
+  });
+
+  delete batchNumberList['0'];
+
+  return (
+    <div className={scss.appendList}>
+      {Object.values(batchNumberList).map((item, index) => {
+        const href = {
+          pathname: '/domestic/legacyContractIntegration/quotation/append',
+          query: { contractId: id, batch: item.batch },
+        };
+
+        return (
+          <Fragment key={index}>
+            <span>{item.batch}</span>
+            <span>{item.batchNumber}</span>
+            <span>{moment(item.createdAt).format('YYYY-MM-DD')}</span>
+            <Link href={href}>
+              <IconDetail className={scss.linkBtn} />
+            </Link>
+          </Fragment>
+        );
+      })}
+
+      {Object.keys(batchNumberList).length === 0 && <span className={scss.noAppend}>無追加追減紀錄</span>}
+    </div>
+  );
+};

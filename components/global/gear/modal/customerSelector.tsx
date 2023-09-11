@@ -184,6 +184,7 @@ export default function CustomerSelector({
         wrapperStyle: { width: '100px' },
         props: {
           options: customerTypeArr,
+          menuPortalTarget: undefined,
         },
       },
     },

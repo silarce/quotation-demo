@@ -58,39 +58,57 @@ export default function ProductList_legacy({
   onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
   // ---------------------------------------------------------------
-  const { classProductArr, prodCellConfig, activeProd, prodList } = classQuotation;
+  const [activeKey, setActiveKey] = useState<string>();
+  // ---------------------------------------------------------------
+  const { prodCellConfig, prodList: prodList_2, prodKitList_2 } = classQuotation;
 
   const theadKeyArr: TtheadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
 
   // ---------------------------------------------------------------
+  // const [targetIndex, setTargetIndex] = useState<`${number}`>();
 
-  // const centerReg = /L|W|h|B|typhoonProof|ejectionDoor/;
+  // const exchangeConfirm = (v: string) => {
+  //   if (!targetIndex) {
+  //     return;
+  //   }
 
-  // ---------------------------------------------------------------
-  const [targetIndex, setTargetIndex] = useState<`${number}`>();
+  //   const ressult = classProductArr[targetIndex].addExchange(v);
 
-  const exchangeConfirm = (v: string) => {
-    if (!targetIndex) {
+  //   if (ressult === false) {
+  //     myAlert.warning({ title: '超過上限' });
+  //   } else {
+  //     setTargetIndex(undefined);
+  //   }
+  // };
+
+  // const onCancel = () => {
+  //   setTargetIndex(undefined);
+  // };
+
+  const [targetProd, setTargetProd] = useState<Class_product | undefined>();
+
+  const exchangeConfirm_2 = (v: string) => {
+    if (!targetProd) {
       return;
     }
 
-    const ressult = classProductArr[targetIndex].addExchange(v);
+    const ressult = targetProd.addExchange(v);
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });
     } else {
-      setTargetIndex(undefined);
+      setTargetProd(undefined);
     }
   };
 
-  const onCancel = () => {
-    setTargetIndex(undefined);
+  const onCancel_2 = () => {
+    setTargetProd(undefined);
   };
 
   // ---------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(prodList),
+    listKeyArr: Object.keys(prodList_2),
     resetTrigger: classQuotation,
   });
 
@@ -98,12 +116,6 @@ export default function ProductList_legacy({
     onVerticalKeyChange(dndKeyArr);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dndKeyArr]);
-
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
-  // ---------------------------------------------------------------
 
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
@@ -125,16 +137,24 @@ export default function ProductList_legacy({
       >
         <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
           {dndKeyArr.map((key, pIndex) => {
-            if (!prodList[key]) {
+            if (!prodKitList_2[key]) {
               return null;
             }
 
-            const { prod, del, copy } = prodList[key];
+            const {
+              prod,
+              //  delSelf,
+              copySelf,
+            } = prodKitList_2[key];
 
             const isMoving = movingId === key;
 
-            const toSetTargetIndex = () => {
-              setTargetIndex(`${pIndex}`);
+            // const toSetTargetIndex = () => {
+            //   setTargetIndex(`${pIndex}`);
+            // };
+
+            const toSetTargeProd = () => {
+              setTargetProd(prod);
             };
 
             let isActive = false;
@@ -148,19 +168,22 @@ export default function ProductList_legacy({
                 isActive = true;
               }
             } else {
-              isActive = activeProd === pIndex;
+              isActive = activeKey === key;
             }
 
             return (
               <DndRow
                 key={key}
                 isActive={isActive}
+                // isActive={false}
                 pIndex={pIndex}
                 // del 跟 copy在這個情況好像不對
                 // 刪除或複製的對象會是?
-                delProd={del}
-                copyProd={copy}
-                toSetTargetIndex={toSetTargetIndex}
+                delProd={() => {
+                  prod.delSelf();
+                }}
+                copyProd={copySelf}
+                toSetTargeProd={toSetTargeProd}
                 prod={prod}
                 theadKeyArr={theadKeyArr}
                 id={key}
@@ -168,7 +191,7 @@ export default function ProductList_legacy({
                 disabled={disabled}
                 //
                 onRowClick={() => {
-                  classQuotation.activeProd = pIndex;
+                  setActiveKey(key);
                 }}
                 isAppend={isAppend}
                 prodCellConfig={prodCellConfig}
@@ -179,13 +202,13 @@ export default function ProductList_legacy({
       </DndContext>
 
       <InputModal
-        visible={!!targetIndex}
+        visible={!!targetProd}
         title="請輸入變更數量"
-        tip={`上限 : ${targetIndex && classProductArr[targetIndex].remainQty}`}
+        tip={`上限 : ${targetProd && targetProd.remainQty}`}
         onConfirm={(v) => {
-          exchangeConfirm?.(v);
+          exchangeConfirm_2(v);
         }}
-        onCancel={onCancel}
+        onCancel={onCancel_2}
         inputAttr={{ type: 'number', placeholder: '請輸入數量' }}
       />
     </div>
@@ -278,7 +301,7 @@ function DndRow({
   pIndex,
   delProd,
   copyProd,
-  toSetTargetIndex,
+  toSetTargeProd,
   prod,
   theadKeyArr,
   id,
@@ -293,7 +316,7 @@ function DndRow({
   pIndex: number;
   delProd: () => void;
   copyProd: () => void;
-  toSetTargetIndex: () => void;
+  toSetTargeProd: () => void;
   prod: Class_product;
   theadKeyArr: TtheadKeyArr;
   id: string;
@@ -330,7 +353,7 @@ function DndRow({
           )}
           {isAppend && (
             <ResetChangeBtnBox
-              toSetTargetIndex={toSetTargetIndex}
+              toSetTargetIndex={toSetTargeProd}
               clearExchange={prod.clearExchange}
               dndAttr={attributes}
               dndListener={listeners}
@@ -382,7 +405,9 @@ function DndRow({
             }
 
             //____
-            return <InputSel key={key} className={scss.column} disabled={disabled} {...inputSelProps} />;
+            return (
+              <InputSel key={key} className={scss.column} disabled={disabled} showBaseline="auto" {...inputSelProps} />
+            );
           })}
           {/* column */}
         </div>

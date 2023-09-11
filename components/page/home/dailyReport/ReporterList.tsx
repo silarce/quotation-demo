@@ -15,18 +15,18 @@ import scss from './reporterList.module.scss';
 // type
 import { TdailyReportDto } from 'js/api/api_dailyReport';
 import { TdailyReportReviewStatusDto } from 'js/api/dtoTypes';
-import { Ttag } from 'pages/home/dailyReport';
+import { Ttab } from 'pages/home/dailyReport';
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 type TgroupReport = { date: string; reportArr: TdailyReportDto[] };
 
 export default function ReporterList({
   dailyReportArr,
-  addTag,
+  addTab,
   viewRef,
 }: {
   dailyReportArr: TdailyReportDto[];
-  addTag: (employee: Ttag) => void;
+  addTab: (employee: Ttab) => void;
   viewRef: (node?: Element | null | undefined) => void;
 }) {
   const groupReportArr = useMemo(() => {
@@ -74,7 +74,7 @@ export default function ReporterList({
               const { chName, id: employeeId } = employee;
               const twDate = moment(convertDate_reduce1911(date)).format('y-MM-DD');
 
-              const tag: Ttag = {
+              const tab: Ttab = {
                 reportId,
                 employeeId,
                 name: chName,
@@ -111,7 +111,7 @@ export default function ReporterList({
                   key={rIndex}
                   className={classNames(scss.row)}
                   onClick={() => {
-                    addTag(tag);
+                    addTab(tab);
                   }}
                 >
                   <div ref={ref} className={classNames(scss.chName, 'w-[120px]')}>

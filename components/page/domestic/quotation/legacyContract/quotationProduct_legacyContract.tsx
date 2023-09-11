@@ -41,9 +41,7 @@ export default function QuotationProduction({
 
   const borderRed = switch02 ? scss.borderRed : '';
 
-  const { prodList, classProductArr } = legacyContract;
-
-  let exchangeTotal = 0;
+  const { prodList: prodList_2, prodSubPriceTotal } = legacyContract;
 
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
   // console.log(verticalKeyArr);
@@ -81,13 +79,11 @@ export default function QuotationProduction({
           {isAppend && (
             <ExchangePanel>
               {verticalKeyArr.map((key, index) => {
-                const prod = prodList[key]?.prod;
+                const prod = prodList_2[key];
 
                 if (!prod) {
                   return null;
                 }
-
-                exchangeTotal += Number(prod.reduceExchangePrice);
 
                 return (
                   <ExchangeRow
@@ -113,7 +109,7 @@ export default function QuotationProduction({
       {isAppend && (
         <div className={classNames(scss.total)}>
           <span>合計</span>
-          <span>- {exchangeTotal.toLocaleString()}</span>
+          <span>- {prodSubPriceTotal.toLocaleString()}</span>
         </div>
       )}
 

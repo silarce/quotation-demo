@@ -73,7 +73,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
   // 這是class
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract);
+  const { classLegacyContract, reset } = useLegacyContract({ contract: legacyContract, batch: 0 });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
@@ -199,7 +199,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    rewind();
+    reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit, legacyContract]);
@@ -224,6 +224,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         if (!postBody) {
           return;
+        }
+
+        if (!postBody.contractNumber) {
+          return myAlert.warning({ title: '請輸入合約編號' });
+        }
+
+        if (!postBody.projectName) {
+          return myAlert.warning({ title: '請輸入工程名稱' });
+        }
+
+        // if (!postBody.customerId) {
+        //   return myAlert.warning({ title: '請選擇客戶' });
+        // }
+
+        const { projectCity, projectDistrict, projectAddress } = postBody;
+
+        if (!projectCity && !projectDistrict && !projectAddress) {
+          return myAlert.warning({ title: '請輸入地址' });
         }
 
         try {
@@ -265,6 +283,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               pathname: '/domestic/legacyContractIntegration/quotation/append',
               query: {
                 contractId: router.query.contractId,
+                batch: legacyContract?.latestBatch,
               },
             }),
         },
@@ -276,7 +295,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
     // { type: "myButton", label: "送審", onClick: () => alert("送審") },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        // router.back()
+        router.push({
+          pathname: '/domestic/legacyContractIntegration',
+        });
+      },
+    },
   ];
 
   // -----------------------------------------------------------------------
