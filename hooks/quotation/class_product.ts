@@ -98,6 +98,7 @@ class Class_product {
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
   private _reduceQty = '0';
+  // 因變更而新增的prod
   private _exchangeProdList: {
     [key in string]: Class_product;
   } = {};
@@ -508,7 +509,24 @@ class Class_product {
   get postProd() {
     return {
       ...this._product,
-      id: this.id,
+      id: this.id || undefined,
+    };
+  }
+
+  get appendProd() {
+    // const hasExchange = Object.keys(this._exchangeProdList).length > 0;
+    const hasExchange = this.remainQty !== Number(this._quantity);
+
+    if (!hasExchange) {
+      return null;
+    }
+
+    const copy = _.cloneDeep(this._product);
+    copy.quantity = Number(this.remainQty);
+
+    return {
+      ...copy,
+      id: this.id || undefined,
     };
   }
 }

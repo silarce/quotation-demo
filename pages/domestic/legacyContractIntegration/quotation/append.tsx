@@ -28,7 +28,11 @@ import { useLegacyContract } from 'hooks/quotation/useLegacyContract';
 // ========================================================================
 // ========================================================================
 // api
-import { useLegacyContract_id, useLegacyContracts_id_attachments } from 'js/api/api_legacy-contract';
+import {
+  useLegacyContract_id,
+  useLegacyContracts_id_attachments,
+  apiPatchLegacyContracts_id_modify,
+} from 'js/api/api_legacy-contract';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
@@ -151,9 +155,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '上傳',
       onClick: () => {
-        const postBody = classLegacyContract.postBody;
+        const appendBody = classLegacyContract.appendBody;
 
-        if (!postBody) {
+        if (!appendBody) {
           return;
         }
 
@@ -162,7 +166,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         // alert('製作中');
 
-        // console.log(postBody);
+        console.log(appendBody);
 
         // console.log('小計', postBody.subTotal);
         // console.log('營業稅', postBody.salesTax);
@@ -170,6 +174,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         // console.log(postBody.products);
         // console.log(postBody.additions);
+
+        const id = legacyContract?.id;
+
+        if (!id) {
+          return;
+        }
+
+        try {
+          apiPatchLegacyContracts_id_modify({
+            id,
+            body: appendBody,
+          });
+        } catch (error) {}
 
         //   return;
       },

@@ -12,6 +12,9 @@ import {
   TcreateLegacyContractProductDto,
   TcreateLegacyContractAdditionDto,
   TcustomerDto,
+  TlegacyContractProductDto,
+  TupdateLegacyContractProductDto,
+  TupdateLegacyContractAdditionDto,
 } from 'js/api/dtoTypes';
 
 // =======================================================================
@@ -70,6 +73,12 @@ class Class_legacyContract {
     this.classBasicInfo = new Class_basicInfo(reRender, this._legacyContract);
 
     // --------------------------------------------------------------
+
+    this._legacyContract.products = this._legacyContract.products.filter((prod) => {
+      if ('batch' in prod && 'latestBatch' in this._legacyContract) {
+        return prod.batch === this._legacyContract.latestBatch;
+      }
+    });
 
     const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
@@ -698,6 +707,47 @@ class Class_legacyContract {
       quoteScopes,
       quoteDate: quoteDate_Date || null,
       deliveryDate: deliveryDate_Date || null,
+    };
+  }
+
+  get appendBody() {
+    // const legacyContractCopy = _.cloneDeep(this._legacyContract);
+    //
+    // ______________________
+    const appendProd: TupdateLegacyContractProductDto[] = [];
+
+    Object.values(this._prodList).forEach((prod, index) => {
+      const body = prod.appendProd;
+
+      if (body) {
+        appendProd.push(body);
+      }
+    });
+
+    Object.values(this.exProdList).forEach((prod, index) => {
+      appendProd.push(prod.postProd);
+    });
+    // ______________________
+
+    const appendAddition: TupdateLegacyContractAdditionDto[] = [];
+
+    Object.values(this._additionList).forEach((addi) => {
+      const body = addi.appendAddition;
+
+      if (body) {
+        appendAddition.push(body);
+      }
+    });
+
+    Object.values(this.exAddiList).forEach((addi) => {
+      appendAddition.push(addi.postAddition);
+    });
+
+    //
+    return {
+      products: appendProd,
+      additions: appendAddition,
+      batchNumber: this.classBasicInfo.contractNumber,
     };
   }
 

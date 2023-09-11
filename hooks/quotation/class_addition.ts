@@ -289,6 +289,19 @@ class Class_addition {
   get postAddition() {
     return this._addition;
   }
+
+  get appendAddition() {
+    const hasExchange = this.remainQty !== Number(this._quantity);
+
+    if (!hasExchange) {
+      return null;
+    }
+
+    const copy = _.cloneDeep(this._addition);
+    copy.quantity = this.remainQty;
+
+    return copy;
+  }
 }
 
 // ==========================================================================

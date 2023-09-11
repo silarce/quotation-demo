@@ -529,7 +529,7 @@ export type TcreateLegacyContractProductDto = {
   notes: string;
 };
 
-type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
+export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
   // batchNumber?: string;
   id?: string;
 };
@@ -549,7 +549,7 @@ export type TcreateLegacyContractAdditionDto = {
   notes: string;
 };
 
-type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {
+export type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {
   // batchNumber?: string;
   id?: string;
 };
