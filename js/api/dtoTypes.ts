@@ -630,8 +630,8 @@ export type TupdateLegacyContractDto = Partial<
 >;
 
 export type TmodifyLegacyContractDto = {
-  products: TupdateLegacyContractProductDto[];
-  additions: TupdateLegacyContractAdditionDto[];
+  products?: TupdateLegacyContractProductDto[];
+  additions?: TupdateLegacyContractAdditionDto[];
   batchNumber: string;
 };
 

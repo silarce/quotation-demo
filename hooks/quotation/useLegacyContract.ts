@@ -74,12 +74,6 @@ class Class_legacyContract {
 
     // --------------------------------------------------------------
 
-    this._legacyContract.products = this._legacyContract.products.filter((prod) => {
-      if ('batch' in prod && 'latestBatch' in this._legacyContract) {
-        return prod.batch === this._legacyContract.latestBatch;
-      }
-    });
-
     const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     const prodList: TprodList = {};
@@ -643,6 +637,8 @@ class Class_legacyContract {
   }
 
   get postBody(): TcreateLegacyContractDto | false {
+    console.log(this._legacyContract);
+
     const customerId = (() => {
       return this._legacyContract.customer?.id;
     })();
@@ -714,36 +710,43 @@ class Class_legacyContract {
     // const legacyContractCopy = _.cloneDeep(this._legacyContract);
     //
     // ______________________
-    const appendProd: TupdateLegacyContractProductDto[] = [];
+    let appendProd: TupdateLegacyContractProductDto[] | undefined = [];
 
     Object.values(this._prodList).forEach((prod, index) => {
       const body = prod.appendProd;
 
       if (body) {
-        appendProd.push(body);
+        appendProd!.push(body);
       }
     });
 
     Object.values(this.exProdList).forEach((prod, index) => {
-      appendProd.push(prod.postProd);
+      appendProd!.push(prod.postProd);
     });
     // ______________________
 
-    const appendAddition: TupdateLegacyContractAdditionDto[] = [];
+    let appendAddition: TupdateLegacyContractAdditionDto[] | undefined = [];
 
     Object.values(this._additionList).forEach((addi) => {
       const body = addi.appendAddition;
 
       if (body) {
-        appendAddition.push(body);
+        appendAddition!.push(body);
       }
     });
 
     Object.values(this.exAddiList).forEach((addi) => {
-      appendAddition.push(addi.postAddition);
+      appendAddition!.push(addi.postAddition);
     });
 
-    //
+    if (appendProd.length === 0) {
+      appendProd = undefined;
+    }
+
+    if (appendAddition.length === 0) {
+      appendAddition = undefined;
+    }
+
     return {
       products: appendProd,
       additions: appendAddition,
@@ -754,14 +757,30 @@ class Class_legacyContract {
   // ---------------------
 } // Class_legacyContract
 
-const useLegacyContract = (data: TlegacyContractDto | undefined) => {
+const useLegacyContract = ({ contract, batch }: { contract: TlegacyContractDto | undefined; batch: number }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
   const createClass = () => {
+    const copy = contract;
+
+    if (copy) {
+      copy.products = copy.products.filter((prod) => {
+        if ('batch' in prod) {
+          return prod.batch === batch;
+        }
+      });
+
+      copy.additions = copy.additions.filter((addi) => {
+        if ('batch' in addi) {
+          return addi.batch === batch;
+        }
+      });
+    }
+
     return new Class_legacyContract(
       reRender,
-      _.cloneDeep(data) ?? emptyLegacyContract(),
+      _.cloneDeep(copy) ?? emptyLegacyContract(),
       prodCellConfigCre(),
       additionCellConfigCre()
     );

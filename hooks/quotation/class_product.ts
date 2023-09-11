@@ -64,6 +64,14 @@ class Class_product {
     this._discountRate =
       this._product.discountRate === '0' ? '' : Decimal.mul(this._product.discountRate || '0', 100).toString();
 
+    if ('batchNumber' in this._product) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this._batchNumber = this._product.batchNumber;
+    } else {
+      this._batchNumber = 'new';
+    }
+
     if (parentProd) {
       this.parentProd = parentProd;
     }
@@ -103,13 +111,13 @@ class Class_product {
     [key in string]: Class_product;
   } = {};
   // 等api新增，先用假資料
-  private _quotationNumber = 'M-1120821-1';
+  private _batchNumber;
 
   //----------------------------------------------
-  get quotationNumber() {
-    return this._quotationNumber; // 'M-1120821-1'
+  get batchNumber() {
+    return this._batchNumber; // 'M-1120821-1'
   }
-  // set quotationNumber(v) {}
+  // set batchNumber(v) {}
 
   get hasParent() {
     return !!this.parentProd;
@@ -324,9 +332,9 @@ class Class_product {
   }
   set quantity(v) {
     if (this.parentProd) {
-      const parentRemain = this.parentProd.remainQty;
+      const remain = this.parentProd.remainQty + Number(this._quantity);
 
-      if (Number(v) > parentRemain) {
+      if (Number(v) > remain) {
         return;
       }
     }
@@ -471,6 +479,8 @@ class Class_product {
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
     if ('id' in copy) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       copy.id = '';
     }
 
@@ -537,7 +547,7 @@ class Class_product {
 type TprodInputCellType = {
   [key in keyof Pick<
     Class_product,
-    | 'quotationNumber'
+    | 'batchNumber'
     | 'discountRate'
     | 'idNumber'
     | 'itemName'
@@ -587,7 +597,7 @@ function prodCellConfigCre(): TprodCellConfig {
     // 這個會影響一開始的排列順序
     keyArr: [
       // "idNumber",
-      'quotationNumber',
+      'batchNumber',
       'discountRate',
       'itemName',
       'quoteType',
@@ -611,8 +621,8 @@ function prodCellConfigCre(): TprodCellConfig {
     ],
     cellConfig: {
       // input
-      quotationNumber: {
-        id: 'quotationNumber',
+      batchNumber: {
+        id: 'batchNumber',
         label: '合約編號',
         inputSelProps: {
           wrapperStyle: { width: '100px' },

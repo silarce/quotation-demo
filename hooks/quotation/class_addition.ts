@@ -42,6 +42,14 @@ class Class_addition {
     this._unitPrice = addition.unitPrice ? addition.unitPrice.toString() : '';
     this._totalPrice = addition.totalPrice ? addition.totalPrice.toString() : '';
 
+    if ('batchNumber' in this._addition) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this._batchNumber = this._addition.batchNumber;
+    } else {
+      this._batchNumber = 'new';
+    }
+
     if (parentAddition) {
       this._parentAddition = parentAddition;
     }
@@ -58,7 +66,7 @@ class Class_addition {
   private _parentAddition: Class_addition | undefined = undefined;
 
   // 等api新增，先用假資料
-  private _quotationNumber = 'M-1120821-1';
+  private _batchNumber;
 
   private _reRender;
   private _addition;
@@ -82,10 +90,10 @@ class Class_addition {
   get hasParent() {
     return !!this._parentAddition;
   }
-  get quotationNumber() {
-    return this._quotationNumber; // 'M-1120821-1'
+  get batchNumber() {
+    return this._batchNumber; // 'M-1120821-1'
   }
-  set quotationNumber(v) {}
+  set batchNumber(v) {}
 
   get delSelf() {
     return this._delSelf;
@@ -125,6 +133,14 @@ class Class_addition {
     return this._quantity;
   }
   set quantity(v) {
+    if (this._parentAddition) {
+      const parentRemain = this._parentAddition.remainQty + Number(this._quantity);
+
+      if (Number(v) > parentRemain) {
+        return;
+      }
+    }
+
     this._quantity = v;
     v = parseInt(v || '0').toString();
     this._addition.quantity = parseInt(v || '0');
@@ -250,6 +266,8 @@ class Class_addition {
     const copy = _.cloneDeep(this._addition);
 
     if ('id' in copy) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       copy.id = '';
     }
 
@@ -287,7 +305,10 @@ class Class_addition {
   // -----------------------------------------------------------------
 
   get postAddition() {
-    return this._addition;
+    return {
+      ...this._addition,
+      id: this.id || undefined,
+    };
   }
 
   get appendAddition() {
@@ -300,7 +321,10 @@ class Class_addition {
     const copy = _.cloneDeep(this._addition);
     copy.quantity = this.remainQty;
 
-    return copy;
+    return {
+      ...copy,
+      id: this.id || undefined,
+    };
   }
 }
 
@@ -311,7 +335,7 @@ class Class_addition {
 type TaddtionInputCellType = {
   [key in keyof Pick<
     Class_addition,
-    'quotationNumber' | 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'
+    'batchNumber' | 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'
   >]: {
     type: 'input';
   };
@@ -331,9 +355,9 @@ type TadditionCellConfig = {
 
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
-    keyArr: ['quotationNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
+    keyArr: ['batchNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
     cellConfig: {
-      quotationNumber: {
+      batchNumber: {
         label: '合約編號',
 
         inputSelPorps: {

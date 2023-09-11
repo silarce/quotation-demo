@@ -301,8 +301,7 @@ const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
       {Object.values(batchNumberList).map((item, index) => {
         const href = {
           pathname: '/domestic/legacyContractIntegration/quotation/append',
-          query: { contractId: id },
-          batch: item.batch,
+          query: { contractId: id, batch: item.batch },
         };
 
         return (

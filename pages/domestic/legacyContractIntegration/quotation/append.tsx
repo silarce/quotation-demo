@@ -18,6 +18,8 @@ import QuotationExAddi from 'components/page/domestic/quotation/legacyContract/q
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './quotation.module.scss';
@@ -55,8 +57,7 @@ export default function Quotation() {
 function TheQuotation({ router }: { router: NextRouter }) {
   /**合約id，若為undefined就逮代表為新增合約 */
   const contractId = router.query.contractId as string | undefined;
-
-  // --------------------------------------------------------------------------
+  const batch = (router.query.batch as `${number}` | undefined) || '0';
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
@@ -65,9 +66,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
   // 這是class
-  const { classLegacyContract, reset } = useLegacyContract(legacyContract);
+  const { classLegacyContract, reset } = useLegacyContract({
+    //
+    contract: legacyContract,
+    batch: Number(batch),
+  });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
+
+  const isLatestBatch = legacyContract?.latestBatch === Number(batch);
 
   // --------------------------------------------------------------------------
   // 其實不會用到，但是有一個元件必須要送進去
@@ -104,7 +111,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       await Promise.all([updateLegacyContract(), updateAttachments()]);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId]);
+  }, [contractId, batch]);
 
   // --------------------------------------------------------------------------
 
@@ -149,48 +156,73 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
+  const uploadPanel: TpanelList[number] = {
+    type: 'myButton',
+    label: '上傳',
+    onClick: async () => {
+      const appendBody = classLegacyContract.appendBody;
+
+      if (!appendBody) {
+        return;
+      }
+
+      // console.log(classLegacyContract.exProdList);
+      // console.log(classLegacyContract.exAddiList);
+
+      // console.log(appendBody);
+
+      // console.log('小計', postBody.subTotal);
+      // console.log('營業稅', postBody.salesTax);
+      // console.log('總計', postBody.total);
+
+      // console.log(postBody.products);
+      // console.log(postBody.additions);
+
+      const id = legacyContract?.id;
+
+      if (!id) {
+        return;
+      }
+
+      try {
+        showRootLoading(true);
+        const res = await apiPatchLegacyContracts_id_modify({
+          id,
+          body: appendBody,
+        });
+        myAlert.success({ title: '上傳完成' });
+        router.push({
+          pathname: '/domestic/legacyContractIntegration/quotation',
+          query: {
+            contractId: contractId,
+            batch: Number(batch) + 1,
+          },
+        });
+      } catch (error) {
+        myAlert.err({ title: '上傳失敗' });
+      } finally {
+        showRootLoading(false);
+      }
+    },
+  };
+
   const panel: TpanelList = [
-    { type: 'myButton', label: '取消', onClick: () => router.back() },
+    //
     {
       type: 'myButton',
-      label: '上傳',
+      label: '取消',
       onClick: () => {
-        const appendBody = classLegacyContract.appendBody;
-
-        if (!appendBody) {
-          return;
-        }
-
-        // console.log(classLegacyContract.exProdList);
-        // console.log(classLegacyContract.exAddiList);
-
-        // alert('製作中');
-
-        console.log(appendBody);
-
-        // console.log('小計', postBody.subTotal);
-        // console.log('營業稅', postBody.salesTax);
-        // console.log('總計', postBody.total);
-
-        // console.log(postBody.products);
-        // console.log(postBody.additions);
-
-        const id = legacyContract?.id;
-
-        if (!id) {
-          return;
-        }
-
-        try {
-          apiPatchLegacyContracts_id_modify({
-            id,
-            body: appendBody,
-          });
-        } catch (error) {}
-
-        //   return;
+        //
+        // router.back();
+        router.push({
+          pathname: '/domestic/legacyContractIntegration/quotation',
+          query: {
+            contractId: contractId,
+          },
+        });
       },
     },
+    isLatestBatch ? uploadPanel : undefined,
   ];
 
   // -----------------------------------------------------------------------

@@ -73,7 +73,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
   // 這是class
-  const { classLegacyContract, reset } = useLegacyContract(legacyContract);
+  const { classLegacyContract, reset } = useLegacyContract({ contract: legacyContract, batch: 0 });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
@@ -226,7 +226,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return;
         }
 
-        if (!postBody.contactNumber) {
+        if (!postBody.contractNumber) {
           return myAlert.warning({ title: '請輸入合約編號' });
         }
 
@@ -283,6 +283,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               pathname: '/domestic/legacyContractIntegration/quotation/append',
               query: {
                 contractId: router.query.contractId,
+                batch: legacyContract?.latestBatch,
               },
             }),
         },
@@ -294,7 +295,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
     // { type: "myButton", label: "送審", onClick: () => alert("送審") },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        // router.back()
+        router.push({
+          pathname: '/domestic/legacyContractIntegration',
+        });
+      },
+    },
   ];
 
   // -----------------------------------------------------------------------
