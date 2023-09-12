@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 import moment from 'moment';
-import { useInView } from 'react-intersection-observer';
+
 import Link from 'next/link';
 
 // layer
@@ -36,14 +36,17 @@ import scss from './legacyContract.module.scss';
 // ==================================================================
 
 // api
-import { Tparams, useLegacyContracts, TlegacyContractDto } from 'js/api/api_legacy-contract';
+import {
+  Tparams,
+  useLegacyContracts,
+  TlegacyContractDto,
+  useLegacyContract_infinite,
+} from 'js/api/api_legacy-contract';
 
 export default function LegacyContractIntegration() {
   const router = useRouter();
 
   const [activeIndex, setActiveIndex] = useState(-1);
-
-  const [viewRef, inView] = useInView();
 
   // -----------------------------------------------------------------------
 
@@ -52,7 +55,6 @@ export default function LegacyContractIntegration() {
   const [searchObj, setSearchObj] = useState<TsearchObj>();
 
   // -----------------------------------------------------------------------
-  const [page, setPage] = useState(1);
 
   const filter = {
     'products.doorType': { $eq: searchObj?.doorType },
@@ -62,47 +64,26 @@ export default function LegacyContractIntegration() {
   };
 
   const params: Tparams = {
-    page: page,
-    pageSize: 7,
+    // page: page,
+    pageSize: 10,
     populate: ['products', 'additions'],
     filter,
     sort: 'quoteDate',
     order: 'DESC',
   };
 
-  const { legacyContractsArr, legacyContractsMeta, updateLegacyContracts, updateLegacyContracts_infinite } =
-    useLegacyContracts(params);
+  const { dataArr, viewRef_bottom, isLoadingPage1, isLoading, reset } = useLegacyContract_infinite({
+    customParams: params,
+  });
 
   useEffect(() => {
     if (!searchObj) {
       return;
     }
 
-    (async () => await updateLegacyContracts())();
+    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchObj]);
-
-  useEffect(() => {
-    if (!inView) {
-      return;
-    }
-
-    if (page === 1) {
-      return;
-    }
-
-    (async () => await updateLegacyContracts_infinite())();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
-  useEffect(() => {
-    if (!legacyContractsMeta?.hasNextPage || !inView) {
-      return;
-    }
-
-    setPage((page) => ++page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
 
   // -----------------------------------------------------------------------
 
@@ -161,7 +142,6 @@ export default function LegacyContractIntegration() {
       }
     });
 
-    setPage(1);
     router.push({
       query,
     });
@@ -201,7 +181,7 @@ export default function LegacyContractIntegration() {
         <div>
           {/*  */}
           <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
-            {legacyContractsArr?.map((item, index, arr) => {
+            {dataArr?.map((item, index, arr) => {
               const discountRate = (() => {
                 const discountRate = Math.round(parseFloat(item.discountRate) * 100);
 
@@ -249,7 +229,7 @@ export default function LegacyContractIntegration() {
                   key={index}
                   className={scss.panel}
                   header={
-                    <div ref={arr.length - 3 === index ? viewRef : undefined}>
+                    <div ref={arr.length - 3 === index ? viewRef_bottom : undefined}>
                       <TbodyItem01
                         quotationContent={quotationContent}
                         isActive={isActive}
