@@ -1,28 +1,30 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
-import _ from 'lodash';
 import moment from 'moment';
-
 import Link from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
+
 // component
 import Thead01 from 'components/page/domestic/ui/table01/Thead01';
 import TbodyItem01, { TBodyItemContent } from 'components/page/domestic/ui/table01/TbodyItem01';
+
+// gear
+import SearchBar, { TsearcbBarProps } from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
 
 // antd
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 // option
-import { optionsCreator_doorType, Toption } from 'js/utils/options/options';
+// import { optionsCreator_doorType } from 'js/utils/options/options';
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-const optionsDoorType = optionsCreator_doorType();
+import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
+const optionsDoorType = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
-optionsDoorType.unshift({ value: '', label: '不拘' });
+
 optionsCounty.unshift({ value: '', label: '不拘' });
 
 // icon
@@ -33,16 +35,11 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './legacyContract.module.scss';
-// ==================================================================
 
 // api
-import {
-  Tparams,
-  useLegacyContracts,
-  TlegacyContractDto,
-  useLegacyContract_infinite,
-} from 'js/api/api_legacy-contract';
+import { Tparams, TlegacyContractDto, useLegacyContract_infinite } from 'js/api/api_legacy-contract';
 
+// ==================================================================
 export default function LegacyContractIntegration() {
   const router = useRouter();
 
@@ -50,17 +47,11 @@ export default function LegacyContractIntegration() {
 
   // -----------------------------------------------------------------------
 
-  // 搜尋用的 //這個資料不會render在畫面上
-  // render在畫面上的是PageHeader02元件裡的狀態
-  const [searchObj, setSearchObj] = useState<TsearchObj>();
-
-  // -----------------------------------------------------------------------
-
   const filter = {
-    'products.doorType': { $eq: searchObj?.doorType },
-    projectCity: { $eq: searchObj?.projectCity },
-    customerName: { $contains: searchObj?.customerName },
-    projectName: { $contains: searchObj?.projectName },
+    'products.doorType': { $eq: router.query.doorType },
+    projectCity: { $eq: router.query.projectCity },
+    customerName: { $contains: router.query.customerName },
+    projectName: { $contains: router.query.projectName },
   };
 
   const params: Tparams = {
@@ -77,83 +68,87 @@ export default function LegacyContractIntegration() {
   });
 
   useEffect(() => {
-    if (!searchObj) {
-      return;
-    }
-
     reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchObj]);
-
-  // -----------------------------------------------------------------------
-
-  useEffect(() => {
-    const { doorType, projectCity, customerName, projectName } = router.query as Record<string, string | undefined>;
-    setSearchObj({
-      doorType: doorType ?? '',
-      projectCity: projectCity ?? '',
-      customerName: customerName ?? '',
-      projectName: projectName ?? '',
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.query]);
+  }, [
+    //
+    router.query.doorType,
+    router.query.projectCity,
+    router.query.customerName,
+    router.query.projectName,
+  ]);
 
   // --------------------------------------------------------------------
 
-  const searchTargetList = [
-    {
-      stateValue: optionsDoorType[0],
-      options: optionsDoorType,
-      placeholder: '選擇門型',
-      width: '100px',
-    },
-    {
-      stateValue: optionsCounty[0],
-      options: optionsCounty,
-      placeholder: '選擇地區',
-      width: '80px',
-    },
-    {
-      stateValue: '',
-      placeholder: '請輸入客戶名稱',
-    },
-    {
-      stateValue: '',
-      placeholder: '請輸入專案名稱',
-    },
-  ];
+  // SearchBar
+  const searchBarProps: TsearcbBarProps = {
+    inputSelPropsArr: [
+      //
+      {
+        wrapperStyle: { width: '100px' },
+        selectProps: {
+          easyDefaultValue: (router.query.doorType as string) || null,
+          props: {
+            options: optionsDoorType,
+            placeholder: '選擇門型',
+          },
+        },
+      },
+      {
+        wrapperStyle: { width: '100px' },
+        selectProps: {
+          easyDefaultValue: (router.query.projectCity as string) || null,
+          props: {
+            options: optionsCounty,
+            placeholder: '選擇地區',
+          },
+        },
+      },
+      {
+        pilarAttr: undefined,
+      },
+      {
+        wrapperStyle: { width: '150px' },
+        inputProps: {
+          props: {
+            defaultValue: router.query.customerName || '',
+            placeholder: '請輸入客戶名稱',
+          },
+        },
+      },
+      {
+        pilarAttr: undefined,
+      },
+      {
+        wrapperStyle: { width: '150px' },
+        inputProps: {
+          props: {
+            defaultValue: router.query.projectName || '',
+            placeholder: '請輸入專案名稱',
+          },
+        },
+      },
+      //
+    ],
+    onClick: (arr) => {
+      const [doorType, projectCity, customerName, projectName] = arr;
 
-  const doSearch = (valueArr: (string | Toption | null)[]) => {
-    const [doorTypeOption, projectCityOption, customerName, projectName] = valueArr;
-    const query = _.cloneDeep(router.query);
-    const params = [
-      { key: 'doorType', value: (doorTypeOption as Toption).value },
-      { key: 'projectCity', value: (projectCityOption as Toption).value },
-      { key: 'customerName', value: customerName as string },
-      { key: 'projectName', value: projectName as string },
-    ];
-    params.forEach(({ key, value }) => {
-      value = value.trim();
-
-      if (value) {
-        query[key] = value;
-      } else {
-        delete query[key];
-      }
-    });
-
-    router.push({
-      query,
-    });
+      router.push({
+        query: {
+          ...router.query,
+          doorType: doorType || undefined,
+          projectCity: projectCity || undefined,
+          customerName: customerName || undefined,
+          projectName: projectName || undefined,
+        },
+      });
+    },
   };
 
   // -------------------------------------------------------
   const panelList: TpanelList = [
     {
-      searchGroup: {
-        searchTargetList,
-        doSearch,
-      },
+      custom: <SearchBar {...searchBarProps} key={router.asPath} />,
     },
     {
       type: 'addButton',
@@ -201,7 +196,6 @@ export default function LegacyContractIntegration() {
                 ? moment(convertDate_reduce1911(item.quoteDate)).format('yy-MM-DD')
                 : '無日期';
 
-              // const projectData = { basicInfo, clientData };
               const quotationContent: TBodyItemContent = {
                 quotationNumber: item.contractNumber, // 合約編號
 
@@ -240,8 +234,6 @@ export default function LegacyContractIntegration() {
                     </div>
                   }
                 >
-                  {/* {isActive && <AppendList contract={item} />} */}
-
                   <AppendList contract={item} />
                 </Panel>
               );
@@ -286,58 +278,3 @@ const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
     </div>
   );
 };
-
-// const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
-//   const { products, additions, id, attachBatchNumbers } = contract;
-
-//   const batchNumberList: {
-//     [key: string]: {
-//       batchNumber: string;
-//       batch: number;
-//       createdAt: string;
-//     };
-//   } = {};
-
-//   products?.forEach((prod) => {
-//     const batch = prod.batch;
-//     batchNumberList[batch] = {
-//       batchNumber: prod.batchNumber,
-//       batch: prod.batch,
-//       createdAt: prod.createdAt,
-//     };
-//   });
-//   additions?.forEach((addi) => {
-//     const batch = addi.batch;
-//     batchNumberList[batch] = {
-//       batchNumber: addi.batchNumber,
-//       batch: addi.batch,
-//       createdAt: addi.createdAt,
-//     };
-//   });
-
-//   delete batchNumberList['0'];
-
-//   return (
-//     <div className={scss.appendList}>
-//       {Object.values(batchNumberList).map((item, index) => {
-//         const href = {
-//           pathname: '/domestic/legacyContractIntegration/quotation/append',
-//           query: { contractId: id, batch: item.batch },
-//         };
-
-//         return (
-//           <Fragment key={index}>
-//             <span>{item.batch}</span>
-//             <span>{item.batchNumber}</span>
-//             <span>{moment(item.createdAt).format('YYYY-MM-DD')}</span>
-//             <Link href={href}>
-//               <IconDetail className={scss.linkBtn} />
-//             </Link>
-//           </Fragment>
-//         );
-//       })}
-
-//       {Object.keys(batchNumberList).length === 0 && <span className={scss.noAppend}>無追加追減紀錄</span>}
-//     </div>
-//   );
-// };
