@@ -479,8 +479,10 @@ export type TlegacyContractDto = {
   /**客戶 */
   customer: TcustomerDto;
   //
-  /**最新批次 */ // 後端用的，前端用不到
+  /**最新批次 */
   latestBatch: number;
+  /**附屬合約編號 */
+  attachBatchNumbers: string[];
 };
 
 // 舊合約post主產品

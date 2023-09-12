@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment from 'moment';
@@ -64,7 +64,8 @@ class Class_legacyContract {
     reRender: TreRender,
     legacyContract: (TlegacyContractDto | TemptyLegacyContract) & { customer?: TcustomerDto | undefined },
     prodCellConfig: TprodCellConfig,
-    additionCellConfig: TadditionCellConfig
+    additionCellConfig: TadditionCellConfig,
+    isAppend = false
   ) {
     this._legacyContract = legacyContract;
     this._reRender = reRender;
@@ -108,11 +109,11 @@ class Class_legacyContract {
     // 原本想直接用_exProdKeyArr的，但考慮到之後業主會不會有有什麼需求...，還是另外做一個吧
     // 編輯舊合約整合報價單時用的主產品設定keyArr
     this._editProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
-    this._editProdKeyArr = _.pull(this._editProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+    this._editProdKeyArr = _.pull(this._editProdKeyArr, 'batchNumber') as typeof prodCellConfig.keyArr;
 
     // 變更 主產品設定用的keyArr
     this._exProdKeyArr = _.cloneDeep(prodCellConfig.keyArr);
-    this._exProdKeyArr = _.pull(this._exProdKeyArr, 'quotationNumber') as typeof prodCellConfig.keyArr;
+    this._exProdKeyArr = _.pull(this._exProdKeyArr, 'batchNumber') as typeof prodCellConfig.keyArr;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -149,10 +150,10 @@ class Class_legacyContract {
     this.additionCellConfig = additionCellConfig;
     // 編輯舊合約整合報價單時用的配件設定keyArr
     this._editAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
-    this._editAddiKeyArr = _.pull(this._editAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
+    this._editAddiKeyArr = _.pull(this._editAddiKeyArr, 'batchNumber') as typeof additionCellConfig.keyArr;
     // 變更 配件設定用的keyArr
     this._exAddiKeyArr = _.cloneDeep(additionCellConfig.keyArr);
-    this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'quotationNumber') as typeof additionCellConfig.keyArr;
+    this._exAddiKeyArr = _.pull(this._exAddiKeyArr, 'batchNumber') as typeof additionCellConfig.keyArr;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -175,6 +176,10 @@ class Class_legacyContract {
     /**  簽名*/
     this.classSignature = new Class_signature(reRender, this._legacyContract);
 
+    // -------------------------------------------------------------
+    // if (isAppend) {
+    //   this.countSubTotal();
+    // }
     // -------------------------------------------------------------
 
     // constructor
@@ -637,8 +642,6 @@ class Class_legacyContract {
   }
 
   get postBody(): TcreateLegacyContractDto | false {
-    console.log(this._legacyContract);
-
     const customerId = (() => {
       return this._legacyContract.customer?.id;
     })();
@@ -757,7 +760,34 @@ class Class_legacyContract {
   // ---------------------
 } // Class_legacyContract
 
-const useLegacyContract = ({ contract, batch }: { contract: TlegacyContractDto | undefined; batch: number }) => {
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+
+const useLegacyContract = ({
+  contract,
+  batch,
+  isAppend,
+}: {
+  contract: TlegacyContractDto | undefined;
+  batch: number;
+  isAppend?: boolean;
+}) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
@@ -782,7 +812,8 @@ const useLegacyContract = ({ contract, batch }: { contract: TlegacyContractDto |
       reRender,
       _.cloneDeep(copy) ?? emptyLegacyContract(),
       prodCellConfigCre(),
-      additionCellConfigCre()
+      additionCellConfigCre(),
+      isAppend
     );
   };
 
@@ -792,6 +823,12 @@ const useLegacyContract = ({ contract, batch }: { contract: TlegacyContractDto |
   };
 
   const [classLegacyContract, setClassLegacyContract] = useState(createClass());
+
+  useEffect(() => {
+    if (classLegacyContract && isAppend) {
+      classLegacyContract.countSubTotal();
+    }
+  }, [classLegacyContract]);
 
   return { classLegacyContract, reset };
 };
@@ -814,8 +851,6 @@ const useLegacyContract = ({ contract, batch }: { contract: TlegacyContractDto |
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
-
-// ===================================================================
 
 const emptyProdCre = (): TcreateLegacyContractProductDto => {
   return {

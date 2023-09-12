@@ -683,7 +683,7 @@ function prodCellConfigCre(): TprodCellConfig {
         id: 'doorType',
         label: '門型',
         inputSelProps: {
-          wrapperStyle: { width: '100px' },
+          wrapperStyle: { width: '120px' },
           selectProps: {
             props: {
               options: optionsCreator_doorModel(),
@@ -777,9 +777,7 @@ function prodCellConfigCre(): TprodCellConfig {
         inputSelProps: {
           wrapperStyle: { width: '120px' },
           inputProps: {
-            props: {
-              type: 'number',
-            },
+            props: {},
           },
         },
       },

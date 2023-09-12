@@ -63,7 +63,7 @@ export default function TbodyItem01({
     agentEmployeeName,
   } = quotationContent;
 
-  const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
+  // const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
 
   // const approvalsStatus = '待審核 '; // 之後api會再補這個狀態資料
 
@@ -84,7 +84,7 @@ export default function TbodyItem01({
       </div>
 
       <div className={scss.row02}>
-        <span>{date}</span>
+        <span>{quotationDate}</span>
         <div className={scss.place}>
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconPlace.src} alt="place" />

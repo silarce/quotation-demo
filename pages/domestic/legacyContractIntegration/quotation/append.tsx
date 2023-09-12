@@ -65,11 +65,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
+
+  if (legacyContract) {
+    legacyContract.contractNumber = '';
+  }
+
   // 這是class
   const { classLegacyContract, reset } = useLegacyContract({
     //
     contract: legacyContract,
     batch: Number(batch),
+    isAppend: true,
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
@@ -166,24 +172,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return;
       }
 
-      // console.log(classLegacyContract.exProdList);
-      // console.log(classLegacyContract.exAddiList);
-
-      // console.log(appendBody);
-
-      // console.log('小計', postBody.subTotal);
-      // console.log('營業稅', postBody.salesTax);
-      // console.log('總計', postBody.total);
-
-      // console.log(postBody.products);
-      // console.log(postBody.additions);
-
       const id = legacyContract?.id;
 
       if (!id) {
         return;
       }
 
+      if (!appendBody.batchNumber) {
+        return myAlert.warning({ title: '請輸入追加追減合約編號', content: '右上方的合約編號欄位' });
+      }
+
+      //
       try {
         showRootLoading(true);
         const res = await apiPatchLegacyContracts_id_modify({
@@ -192,10 +191,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
         myAlert.success({ title: '上傳完成' });
         router.push({
-          pathname: '/domestic/legacyContractIntegration/quotation',
+          pathname: '/domestic/legacyContractIntegration/quotation/append',
           query: {
             contractId: contractId,
-            batch: Number(batch) + 1,
+            batch: res.latestBatch,
           },
         });
       } catch (error) {
@@ -203,6 +202,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       } finally {
         showRootLoading(false);
       }
+      //
     },
   };
 
@@ -246,19 +246,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classBasicInfo={classLegacyContract.classBasicInfo}
             disabled={true}
             isAppend={true}
+            isLatestBatch={isLatestBatch}
           />
           {/*  */}
           <div className={scss.switchBar}>
             <div className={scss.active}>合約項目</div>
           </div>
           {/* 主產品設定 */}
-          <QuotationProduction legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          <QuotationProduction
+            legacyContract={classLegacyContract}
+            disabled={true}
+            isAppend={true}
+            isLatestBatch={isLatestBatch}
+          />
           {/* 配件設定 */}
-          <QuotationAdditions legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          <QuotationAdditions
+            legacyContract={classLegacyContract}
+            disabled={true}
+            isAppend={true}
+            isLatestBatch={isLatestBatch}
+          />
           {/* 變更 主產品 */}
-          <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
+          {isLatestBatch && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
           {/* 變更 配件設定 */}
-          <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />
+          {isLatestBatch && <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />}
           {/*  */}
           <div className={scss.exchangeTotal}>
             <span>總合計</span>

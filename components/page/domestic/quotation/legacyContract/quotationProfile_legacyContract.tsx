@@ -34,11 +34,13 @@ export default function QuotationProfile({
   classBasicInfo,
   disabled = false,
   isAppend,
+  isLatestBatch,
 }: {
   classLegacyContract: Class_legacyContract;
   classBasicInfo: Class_basicInfo;
   disabled: boolean;
   isAppend?: boolean;
+  isLatestBatch?: boolean;
 }) {
   // =============================================
   const { customer } = classLegacyContract;
@@ -127,6 +129,17 @@ export default function QuotationProfile({
     classBasicInfo.contactNumber = customer.contacts?.[0]?.phone ?? '';
     classBasicInfo.faxNumber = customer.fax;
   };
+
+  // ==============================================
+  let isContractNumberDisabled = disabled;
+
+  if (isAppend) {
+    if (isLatestBatch) {
+      isContractNumberDisabled = false;
+    } else {
+      isContractNumberDisabled = true;
+    }
+  }
 
   // ==============================================
 
@@ -247,7 +260,8 @@ export default function QuotationProfile({
           label="合約編號"
           showBaseline="auto"
           // disabled={isAppend || disabled}
-          disabled={isAppend ? false : disabled}
+          // disabled={ isAppend ? false : disabled}
+          disabled={isContractNumberDisabled}
           inputProps={{
             value: contractNumber,
             onChange: (v) => {
