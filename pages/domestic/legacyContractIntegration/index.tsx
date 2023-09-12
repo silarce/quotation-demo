@@ -260,7 +260,9 @@ export default function LegacyContractIntegration() {
                     </div>
                   }
                 >
-                  {isActive && <AppendList contract={item} />}
+                  {/* {isActive && <AppendList contract={item} />} */}
+
+                  <AppendList contract={item} />
                 </Panel>
               );
             })}
@@ -275,48 +277,24 @@ export default function LegacyContractIntegration() {
 // ===========================================================================
 
 const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
-  const { products, additions, id } = contract;
-
-  const batchNumberList: {
-    [key: string]: {
-      batchNumber: string;
-      batch: number;
-      createdAt: string;
-    };
-  } = {};
-
-  products?.forEach((prod) => {
-    const batch = prod.batch;
-    batchNumberList[batch] = {
-      batchNumber: prod.batchNumber,
-      batch: prod.batch,
-      createdAt: prod.createdAt,
-    };
-  });
-  additions?.forEach((addi) => {
-    const batch = addi.batch;
-    batchNumberList[batch] = {
-      batchNumber: addi.batchNumber,
-      batch: addi.batch,
-      createdAt: addi.createdAt,
-    };
-  });
-
-  delete batchNumberList['0'];
+  const { id, attachBatchNumbers } = contract;
 
   return (
     <div className={scss.appendList}>
-      {Object.values(batchNumberList).map((item, index) => {
+      {attachBatchNumbers.map((batchNumber, index) => {
+        if (index === 0) {
+          return null;
+        }
+
         const href = {
           pathname: '/domestic/legacyContractIntegration/quotation/append',
-          query: { contractId: id, batch: item.batch },
+          query: { contractId: id, batch: index },
         };
 
         return (
           <Fragment key={index}>
-            <span>{item.batch}</span>
-            <span>{item.batchNumber}</span>
-            <span>{moment(item.createdAt).format('YYYY-MM-DD')}</span>
+            {/* <span>{index}</span> */}
+            <span>{batchNumber}</span>
             <Link href={href}>
               <IconDetail className={scss.linkBtn} />
             </Link>
@@ -324,7 +302,62 @@ const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
         );
       })}
 
-      {Object.keys(batchNumberList).length === 0 && <span className={scss.noAppend}>無追加追減紀錄</span>}
+      {Object.keys(attachBatchNumbers).length === 1 && <span className={scss.noAppend}>無追加追減紀錄</span>}
     </div>
   );
 };
+
+// const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
+//   const { products, additions, id, attachBatchNumbers } = contract;
+
+//   const batchNumberList: {
+//     [key: string]: {
+//       batchNumber: string;
+//       batch: number;
+//       createdAt: string;
+//     };
+//   } = {};
+
+//   products?.forEach((prod) => {
+//     const batch = prod.batch;
+//     batchNumberList[batch] = {
+//       batchNumber: prod.batchNumber,
+//       batch: prod.batch,
+//       createdAt: prod.createdAt,
+//     };
+//   });
+//   additions?.forEach((addi) => {
+//     const batch = addi.batch;
+//     batchNumberList[batch] = {
+//       batchNumber: addi.batchNumber,
+//       batch: addi.batch,
+//       createdAt: addi.createdAt,
+//     };
+//   });
+
+//   delete batchNumberList['0'];
+
+//   return (
+//     <div className={scss.appendList}>
+//       {Object.values(batchNumberList).map((item, index) => {
+//         const href = {
+//           pathname: '/domestic/legacyContractIntegration/quotation/append',
+//           query: { contractId: id, batch: item.batch },
+//         };
+
+//         return (
+//           <Fragment key={index}>
+//             <span>{item.batch}</span>
+//             <span>{item.batchNumber}</span>
+//             <span>{moment(item.createdAt).format('YYYY-MM-DD')}</span>
+//             <Link href={href}>
+//               <IconDetail className={scss.linkBtn} />
+//             </Link>
+//           </Fragment>
+//         );
+//       })}
+
+//       {Object.keys(batchNumberList).length === 0 && <span className={scss.noAppend}>無追加追減紀錄</span>}
+//     </div>
+//   );
+// };
