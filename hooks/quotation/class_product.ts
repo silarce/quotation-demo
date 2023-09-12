@@ -777,9 +777,7 @@ function prodCellConfigCre(): TprodCellConfig {
         inputSelProps: {
           wrapperStyle: { width: '120px' },
           inputProps: {
-            props: {
-              type: 'number',
-            },
+            props: {},
           },
         },
       },
