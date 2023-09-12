@@ -28,6 +28,9 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+
 // css
 import scss from './legacyContract.module.scss';
 // ==================================================================
@@ -214,10 +217,15 @@ export default function LegacyContractIntegration() {
                 return qty;
               })();
 
+              const dateStr = item.quoteDate
+                ? moment(convertDate_reduce1911(item.quoteDate)).format('yy-MM-DD')
+                : '無日期';
+
               // const projectData = { basicInfo, clientData };
               const quotationContent: TBodyItemContent = {
                 quotationNumber: item.contractNumber, // 合約編號
-                quotationDate: moment(item.quoteDate).format('YYYY-MM-DD'), //報價日期
+
+                quotationDate: dateStr, //報價日期
                 projectName: item.projectName /**工程名稱 */,
                 county: item.projectCity /**工地位置縣市 */,
                 contactPerson: item.contactPerson /**聯絡人 */,
