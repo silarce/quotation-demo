@@ -59,6 +59,9 @@ export default function Quotation() {
   return <TheQuotation router={router} />;
 }
 
+// =====================================================================
+// =====================================================================
+// =====================================================================
 function TheQuotation({ router }: { router: NextRouter }) {
   /**合約id，若為undefined就逮代表為新增合約 */
   const contractId = router.query.contractId as string | undefined;
@@ -72,6 +75,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
+  const latestBatch = legacyContract?.latestBatch;
+
   // 這是class
   const { classLegacyContract, reset } = useLegacyContract({ contract: legacyContract, batch: 0 });
 
@@ -271,6 +276,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
+
+  const editBtn: TpanelList[number] =
+    latestBatch === 0
+      ? {
+          type: 'myButton',
+          label: '編輯',
+          onClick: () => setAllowEdit(true),
+        }
+      : undefined;
+
   const panel_noEditable: TpanelList = [
     !contractId
       ? undefined
@@ -283,7 +298,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               pathname: '/domestic/legacyContractIntegration/quotation/append',
               query: {
                 contractId: router.query.contractId,
-                batch: legacyContract?.latestBatch,
+                batch: latestBatch,
               },
             }),
         },
@@ -293,8 +308,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       img: iconUpload.src,
       onClick: () => setShowPdf(true),
     },
-    { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    // { type: "myButton", label: "送審", onClick: () => alert("送審") },
+
+    editBtn,
+
     {
       type: 'myButton',
       label: '返回',
