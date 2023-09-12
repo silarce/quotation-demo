@@ -58,10 +58,12 @@ export default function QuotationAdditions({
   legacyContract,
   disabled,
   isAppend,
+  isLatestBatch,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
+  isLatestBatch?: boolean;
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -108,6 +110,7 @@ export default function QuotationAdditions({
       disabled,
       id,
       isMoving,
+      isLatestBatch,
     }: {
       isActive: boolean;
       pIndex: number;
@@ -116,6 +119,7 @@ export default function QuotationAdditions({
       disabled?: boolean;
       id: string;
       isMoving: boolean;
+      isLatestBatch: boolean | undefined;
     }) {
       const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
         id,
@@ -156,6 +160,7 @@ export default function QuotationAdditions({
                 indexNumber={pIndex + 1}
                 dndAttr={attributes}
                 dndListener={listeners}
+                isLatestBatch={isLatestBatch}
               />
             )}
 
@@ -268,6 +273,7 @@ export default function QuotationAdditions({
                       toSetTarget={toSetTarget}
                       disabled={disabled}
                       isMoving={isMoving}
+                      isLatestBatch={isLatestBatch}
                     />
                   );
                 })}
@@ -276,7 +282,7 @@ export default function QuotationAdditions({
 
             {!disabled && <AddButton className={scss.addBtn} label="新增項目" onClick={addAddition} />}
           </div>
-          {isAppend && (
+          {isAppend && isLatestBatch && (
             <ExchangePanel>
               {dndKeyArr.map((key, index) => {
                 const addi = additionList[key];
@@ -369,20 +375,22 @@ const ResetChangeBtnBox = ({
   dndAttr,
   dndListener,
   indexNumber,
+  isLatestBatch,
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNumber: number | string;
+  isLatestBatch: boolean | undefined;
 }) => {
   return (
     <div className={classNames(scss.btnBox, scss.resetChange, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <button className={scss.btn} onClick={clearExchange}>
+      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
         還原
       </button>
-      <button className={scss.btn} onClick={toSetTargetIndex}>
+      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
         變更
       </button>
       <span>{indexNumber}</span>

@@ -50,11 +50,13 @@ export default function ProductList_legacy({
   classQuotation,
   disabled,
   isAppend,
+  isLatestBatch,
   onVerticalKeyChange,
 }: {
   classQuotation: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
+  isLatestBatch?: boolean;
   onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
   // ---------------------------------------------------------------
@@ -65,25 +67,6 @@ export default function ProductList_legacy({
   const theadKeyArr: TtheadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
 
   // ---------------------------------------------------------------
-  // const [targetIndex, setTargetIndex] = useState<`${number}`>();
-
-  // const exchangeConfirm = (v: string) => {
-  //   if (!targetIndex) {
-  //     return;
-  //   }
-
-  //   const ressult = classProductArr[targetIndex].addExchange(v);
-
-  //   if (ressult === false) {
-  //     myAlert.warning({ title: '超過上限' });
-  //   } else {
-  //     setTargetIndex(undefined);
-  //   }
-  // };
-
-  // const onCancel = () => {
-  //   setTargetIndex(undefined);
-  // };
 
   const [targetProd, setTargetProd] = useState<Class_product | undefined>();
 
@@ -195,6 +178,8 @@ export default function ProductList_legacy({
                 }}
                 isAppend={isAppend}
                 prodCellConfig={prodCellConfig}
+                //
+                isLatestBatch={isLatestBatch}
               />
             );
           })}
@@ -274,20 +259,22 @@ const ResetChangeBtnBox = ({
   dndAttr,
   dndListener,
   indexNum,
+  isLatestBatch,
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNum: string | number;
+  isLatestBatch?: boolean;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <button className={scss.btn} onClick={clearExchange}>
+      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
         還原
       </button>
-      <button className={scss.btn} onClick={toSetTargetIndex}>
+      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
         變更
       </button>
       <span>{indexNum}</span>
@@ -311,6 +298,8 @@ function DndRow({
   onRowClick,
   isAppend,
   prodCellConfig,
+  //
+  isLatestBatch,
 }: {
   isActive: boolean;
   pIndex: number;
@@ -326,6 +315,8 @@ function DndRow({
   onRowClick: () => void; // () => (classQuotation.activeProd = pIndex)
   isAppend?: boolean;
   prodCellConfig: TprodCellConfig;
+  //
+  isLatestBatch?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id,
@@ -358,6 +349,7 @@ function DndRow({
               dndAttr={attributes}
               dndListener={listeners}
               indexNum={pIndex + 1}
+              isLatestBatch={isLatestBatch}
             />
           )}
           {/*  */}

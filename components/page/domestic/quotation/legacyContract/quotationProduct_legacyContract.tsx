@@ -27,12 +27,14 @@ export default function QuotationProduction({
   switch02,
   className = '',
   isAppend,
+  isLatestBatch,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
   switch02?: boolean;
   className?: string;
   isAppend?: boolean;
+  isLatestBatch?: boolean;
 }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
@@ -65,6 +67,7 @@ export default function QuotationProduction({
               classQuotation={legacyContract as Class_legacyContract}
               disabled={disabled}
               isAppend={isAppend}
+              isLatestBatch={isLatestBatch}
               onVerticalKeyChange={(v) => {
                 setVerticalKeyArr(v);
               }}
@@ -76,7 +79,7 @@ export default function QuotationProduction({
             )}
           </div>
 
-          {isAppend && (
+          {isAppend && isLatestBatch && (
             <ExchangePanel>
               {verticalKeyArr.map((key, index) => {
                 const prod = prodList_2[key];

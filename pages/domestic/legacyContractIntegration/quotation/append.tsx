@@ -81,6 +81,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const isLatestBatch = legacyContract?.latestBatch === Number(batch);
 
+  console.log(isLatestBatch);
+
   // --------------------------------------------------------------------------
   // 其實不會用到，但是有一個元件必須要送進去
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
@@ -245,19 +247,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classBasicInfo={classLegacyContract.classBasicInfo}
             disabled={true}
             isAppend={true}
+            isLatestBatch={isLatestBatch}
           />
           {/*  */}
           <div className={scss.switchBar}>
             <div className={scss.active}>合約項目</div>
           </div>
           {/* 主產品設定 */}
-          <QuotationProduction legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          <QuotationProduction
+            legacyContract={classLegacyContract}
+            disabled={true}
+            isAppend={true}
+            isLatestBatch={isLatestBatch}
+          />
           {/* 配件設定 */}
-          <QuotationAdditions legacyContract={classLegacyContract} disabled={true} isAppend={true} />
+          <QuotationAdditions
+            legacyContract={classLegacyContract}
+            disabled={true}
+            isAppend={true}
+            isLatestBatch={isLatestBatch}
+          />
           {/* 變更 主產品 */}
-          <QuotationExProd legacyContract={classLegacyContract} disabled={false} />
+          {isLatestBatch && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
           {/* 變更 配件設定 */}
-          <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />
+          {isLatestBatch && <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />}
           {/*  */}
           <div className={scss.exchangeTotal}>
             <span>總合計</span>

@@ -277,14 +277,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
 
-  const editBtn: TpanelList[number] =
-    latestBatch === 0
-      ? {
-          type: 'myButton',
-          label: '編輯',
-          onClick: () => setAllowEdit(true),
-        }
-      : undefined;
+  const editBtn: TpanelList[number] = !latestBatch
+    ? {
+        type: 'myButton',
+        label: '編輯',
+        onClick: () => setAllowEdit(true),
+      }
+    : undefined;
 
   const panel_noEditable: TpanelList = [
     !contractId
