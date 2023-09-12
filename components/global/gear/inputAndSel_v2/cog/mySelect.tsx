@@ -37,6 +37,7 @@ export type TselectProps<
   // 下面幾項是在inputSel做處理的東西，不會在這邊使用，型別寫在這邊只是因為方便
   /** 將string轉為Toption，props.value有值的話會被蓋掉 */
   easyValue?: string | null;
+  easyDefaultValue?: string | null;
   withIcon?: boolean;
   dynaOptionsList?: { [key: string]: Toption[] };
   dynaOptionsKey?: string;
