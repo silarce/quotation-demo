@@ -75,13 +75,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     contract: legacyContract,
     batch: Number(batch),
+    isAppend: true,
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
   const isLatestBatch = legacyContract?.latestBatch === Number(batch);
-
-  console.log(isLatestBatch);
 
   // --------------------------------------------------------------------------
   // 其實不會用到，但是有一個元件必須要送進去
@@ -180,7 +179,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
 
       if (!appendBody.batchNumber) {
-        myAlert.warning({ title: '請輸入追加追減合約編號', content: '右上方的合約編號欄位' });
+        return myAlert.warning({ title: '請輸入追加追減合約編號', content: '右上方的合約編號欄位' });
       }
 
       //
