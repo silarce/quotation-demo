@@ -220,7 +220,10 @@ export const apiPatchLegacyContracts_id_modify = ({
   const api = `/legacy-contracts/${id}/modify`;
 
   return axi
-    .patch<void>(api, body)
+    .patch<{
+      latestBatch: number;
+      // 其他property用不到，省略
+    }>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

@@ -65,6 +65,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
+
+  if (legacyContract) {
+    legacyContract.contractNumber = '';
+  }
+
   // 這是class
   const { classLegacyContract, reset } = useLegacyContract({
     //
@@ -166,24 +171,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return;
       }
 
-      // console.log(classLegacyContract.exProdList);
-      // console.log(classLegacyContract.exAddiList);
-
-      // console.log(appendBody);
-
-      // console.log('小計', postBody.subTotal);
-      // console.log('營業稅', postBody.salesTax);
-      // console.log('總計', postBody.total);
-
-      // console.log(postBody.products);
-      // console.log(postBody.additions);
-
       const id = legacyContract?.id;
 
       if (!id) {
         return;
       }
 
+      if (!appendBody.batchNumber) {
+        myAlert.warning({ title: '請輸入追加追減合約編號', content: '右上方的合約編號欄位' });
+      }
+
+      //
       try {
         showRootLoading(true);
         const res = await apiPatchLegacyContracts_id_modify({
@@ -192,10 +190,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
         myAlert.success({ title: '上傳完成' });
         router.push({
-          pathname: '/domestic/legacyContractIntegration/quotation',
+          pathname: '/domestic/legacyContractIntegration/quotation/append',
           query: {
             contractId: contractId,
-            batch: Number(batch) + 1,
+            batch: res.latestBatch,
           },
         });
       } catch (error) {
@@ -203,6 +201,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       } finally {
         showRootLoading(false);
       }
+      //
     },
   };
 
