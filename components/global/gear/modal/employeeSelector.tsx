@@ -32,6 +32,7 @@ export default function EmployeeSelector({
   customFilter,
   defaultEmpArr,
   exceptEmpArr,
+  isCancelOnConfirm = true,
 }: {
   showModal: boolean;
   onConfirm: (v: TemployeeDto[]) => void;
@@ -43,6 +44,7 @@ export default function EmployeeSelector({
   customFilter?: Tparams['filter'];
   defaultEmpArr?: TemployeeDto[];
   exceptEmpArr?: { id: string }[];
+  isCancelOnConfirm?: boolean;
 }) {
   const { rwd1023 } = useContext(AppContext);
 
@@ -88,17 +90,19 @@ export default function EmployeeSelector({
 
     reset();
 
-    if (defaultEmpArr) {
-      setSelEmployeeArr(defaultEmpArr);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, showModal]);
 
   useEffect(() => {
     if (!showModal) {
+      setSelEmployeeArr([]);
       setSearchValue([]);
 
       return;
+    }
+
+    if (defaultEmpArr) {
+      setSelEmployeeArr(defaultEmpArr);
     }
 
     update_department();
@@ -149,11 +153,14 @@ export default function EmployeeSelector({
 
   const theOnConfirm = () => {
     if (!selEmployeeArr) {
-      return ModalInfo('請選擇公司');
+      return ModalInfo('請選擇人員');
     }
 
     onConfirm(selEmployeeArr);
-    theOnCancel();
+
+    if (isCancelOnConfirm) {
+      theOnCancel();
+    }
   };
 
   const theOnCancel = () => {
