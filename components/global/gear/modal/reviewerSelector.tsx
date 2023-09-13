@@ -77,6 +77,11 @@ export default function ReviewerSelector({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
+
+  useEffect(() => {
+    setSelEmployeeArr([]);
+  }, [searchValue]);
+
   // ==================================================
 
   const onClick = (newEmp: TemployeeDto) => {
