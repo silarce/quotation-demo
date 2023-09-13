@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import { nanoid } from 'nanoid';
 // type
 import { TdailyReportItemDto, TuserDto, TdailyReportWokerDto } from 'js/api/dtoTypes';
@@ -120,11 +120,11 @@ class Class_reportItem {
   }
 
   get order() {
-    if ('order' in this._item) {
-      return this._item.order;
-    }
+    return this._item.order;
+  }
 
-    return undefined;
+  set order(v) {
+    this._item.order = v;
   }
 
   get meals() {
@@ -237,6 +237,7 @@ class Class_reportItem {
     })();
 
     return {
+      order: this.order, // 這個order會在發api請求時調整
       periodOfDay: this.periodOfDay || 'AM',
       customerName: this.customerName,
       contactName: this.contactName,
@@ -360,7 +361,7 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       }
     });
 
-    const sortedItems = _.sortBy(dailyReport.items, 'arrivalTime');
+    const sortedItems = _.sortBy(dailyReport.items, 'order');
 
     //
     const theReport: ThookEmptyReport = {

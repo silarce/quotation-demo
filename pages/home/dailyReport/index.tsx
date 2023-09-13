@@ -79,7 +79,7 @@ type TdailyReportContext = {
   reportInEdit: ThookEmptyReport | undefined;
   isReportEdit: boolean;
   switchIsEdit: () => void;
-  setShowReviewerForReportModal: (v: boolean) => void;
+  // setShowReviewerForReportModal: (v: boolean) => void;
   cancelEditNewDailyReport: () => void;
   changeReportDate: (v: string) => void;
   identity: Tidentity;
@@ -146,7 +146,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const [reviewersPickArr, setReviewersPickArr] = useState<Parameters<typeof SetReportEmpModal>[0]['dataArr']>();
 
   // 每個日報上傳前要選reviewer，這是那個modal的開關
-  const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false);
+  // const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false);
 
   // 日報表tabArr，送進TabCarousel
   const [tabArr, setTabArr] = useState<Ttab[]>([]);
@@ -493,17 +493,17 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // 更新日報表
 
   /**發出更新日報表請求 (上傳 按鈕)*/
-  const reqApiPatchDailyReports_my = async (reviewerArr: TemployeeDto[], examinerArr: TemployeeDto[]) => {
+  const reqApiPatchDailyReports_my = async () => {
     if (!reportInEdit) {
       return;
     }
 
-    if (reviewerArr.length === 0) {
-      return myAlert.warning({ title: '請選擇檢視人員' });
-    }
+    // if (reviewerArr.length === 0) {
+    //   return myAlert.warning({ title: '請選擇檢視人員' });
+    // }
 
-    const reviewerIds = reviewerArr.map((emp) => emp.id);
-    const examinerIds = examinerArr.map((emp) => emp.id);
+    // const reviewerIds = reviewerArr.map((emp) => emp.id);
+    // const examinerIds = examinerArr.map((emp) => emp.id);
 
     const theDate = reportInEdit.date;
 
@@ -515,7 +515,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return reportInEdit.itemList[key];
     });
 
-    const items = arr.map((item) => {
+    const items = arr.map((item, index) => {
       const year = new Date(theDate).getFullYear();
       const month = new Date(theDate).getMonth();
       const th = new Date(theDate).getDate();
@@ -530,6 +530,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       };
 
       const postBody = item.postBody;
+      postBody.order = index;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       postBody.arrivalTime = setDateToReportDate(postBody.arrivalTime!);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -579,7 +580,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       showRootLoading(false);
     }
 
-    setShowReviewerForReportModal(false);
+    // setShowReviewerForReportModal(false);
   };
   // __________________________________________
 
@@ -686,7 +687,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     reportInEdit,
     doCheck,
     switchIsEdit,
-    setShowReviewerForReportModal,
+    // setShowReviewerForReportModal,
+    reqApiPatchDailyReports_my,
     dailyReportArr: dailyReportArr ?? [],
     isCalendar,
     router,
@@ -708,7 +710,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     reportInEdit,
     isReportEdit,
     switchIsEdit,
-    setShowReviewerForReportModal,
+    // setShowReviewerForReportModal,
     cancelEditNewDailyReport,
     changeReportDate,
     identity,
@@ -791,13 +793,13 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       />
 
       {/* 上傳前選擇兩種人員 */}
-      <ReviewerAndExaminerSelector
+      {/* <ReviewerAndExaminerSelector
         visible={showReviewerForReportModal}
         onConfirm={reqApiPatchDailyReports_my}
         onCancel={() => setShowReviewerForReportModal(false)}
         userId={userInfo.employee?.id}
         lastStatus={dailyReportArr?.[0]?.reviewStatus || []}
-      />
+      /> */}
     </>
   );
 }

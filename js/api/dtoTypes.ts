@@ -218,7 +218,7 @@ export type TerpFeatureDto = {
 export type TdailyReportItemDto = {
   readonly id: string;
   // 用於設定item的排序
-  readonly order: number;
+  order: number;
   readonly createdAt: string; // date
   readonly updatedAt: string; //date
   periodOfDay: 'AM' | 'PM' | null;
