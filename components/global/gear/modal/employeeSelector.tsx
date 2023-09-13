@@ -42,7 +42,7 @@ export default function EmployeeSelector({
   customParams?: Tparams;
   customFilter?: Tparams['filter'];
   defaultEmpArr?: TemployeeDto[];
-  exceptEmpArr?: TemployeeDto[];
+  exceptEmpArr?: { id: string }[];
 }) {
   const { rwd1023 } = useContext(AppContext);
 
