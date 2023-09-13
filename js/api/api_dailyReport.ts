@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
+import _, { set } from 'lodash';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi } from './_axiosCreator';
 
@@ -15,6 +16,7 @@ import {
   TaccountingReportDto,
   Tparams,
   TdailyReportItemDto,
+  TreviewerPresets,
 } from './dtoTypes';
 
 export type {
@@ -402,5 +404,196 @@ export const useApiAccountReports = (date: string) => {
     accountingReport: res,
     setAccountReports: setRes,
     updateAccountReports: update,
+  };
+};
+
+// ==============================================================
+export type TcreateDailyReportReviewerPresetDto = {
+  reportEmployeeIds: string[]; //回報人員
+  reviewerEmployeeIds: string[]; // 審核人員
+  examinerEmployeeIds: string[]; //檢視人員
+};
+
+export const apiPatchReviewerPresets = (body: TcreateDailyReportReviewerPresetDto) => {
+  const api = '/daily-reports/reviewer-presets';
+
+  // res的型別為DailyReportReviewerPreset，目前用不到，先不管
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiGetReviewerPresets = (params?: Tparams) => {
+  const api = '/daily-reports/reviewer-presets';
+
+  return axi
+    .get<{
+      data: TreviewerPresets[];
+      meta: TpageMetaDto;
+    }>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export type TreporterPreset = {
+  reporter: TemployeeDto;
+  reviewer: TemployeeDto[];
+  examiner: TemployeeDto[];
+};
+
+export type TreporterPresetList = {
+  [key: string]: TreporterPreset;
+};
+
+export const useApiGetReviewerPresets = ({ customParams }: { customParams?: Tparams }) => {
+  /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
+  const [resetCount, setResetCount] = useState(0);
+  const [isLoadingPage1, setIsLoadingPage1] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
+  const [viewRef_top, inView_top] = useInView();
+  const [viewRef_bottom, inView_bottom] = useInView();
+  // ----------------------------------------------------------------
+  const [reporterList, setReporterList] = useState<TreporterPresetList>({});
+  // ----------------------------------------------------------------
+  const [dataList, setDataList] = useState<{ [key: `${number}`]: TreviewerPresets[] }>({});
+
+  const [page, setPage] = useState<number>();
+  const [meta, setMeta] = useState<TpageMetaDto>();
+  const [hasNextPage, setHasNextPage] = useState<boolean>();
+
+  // ----------------------------------------------------------------
+  const defaultParams = {
+    page,
+    pageSize: 50,
+    sort: 'reportEmployeeId',
+    populate: ['reportEmployee.jobs.department', 'reviewerEmployee'],
+  };
+  // ----------------------------------------------------------------
+
+  const update = async (dynaParams?: Tparams) => {
+    const params = {
+      ...defaultParams,
+      ...customParams,
+      ...dynaParams,
+    };
+
+    try {
+      if (page === 1) {
+        setIsLoadingPage1(true);
+      }
+
+      setIsloading(true);
+
+      const res = await apiGetReviewerPresets(params);
+
+      if (res) {
+        setDataList((list) => {
+          list[`${res.meta.page}`] = res.data;
+
+          return { ...list };
+        });
+        setMeta(res.meta);
+        setHasNextPage(res.meta.hasNextPage);
+        //_________________________________
+        //_________________________________
+        const newReporterList = { ...reporterList };
+
+        res.data.forEach((item) => {
+          const reporterId = item.reportEmployeeId;
+          const reporter = item.reportEmployee;
+          const type = item.type;
+
+          if (!newReporterList[reporterId]) {
+            newReporterList[reporterId] = {
+              reporter,
+              reviewer: [],
+              examiner: [],
+            };
+          }
+
+          if (type === 'reviewer') {
+            newReporterList[reporterId].reviewer.push(item.reviewerEmployee);
+          }
+
+          if (type === 'examiner') {
+            newReporterList[reporterId].examiner.push(item.reviewerEmployee);
+          }
+        });
+
+        setReporterList(newReporterList);
+      } // if close
+
+      return res;
+      //
+    } catch (error) {
+      myAlert.err({ title: '取得資料失敗' });
+      console.log(error);
+    } finally {
+      setIsloading(false);
+      setIsLoadingPage1(false);
+    }
+  };
+
+  const nextPage = () => {
+    if (hasNextPage === false || !page) {
+      return;
+    }
+
+    setPage((page) => (page ? page + 1 : page));
+  };
+
+  // -----------------------------------------------
+  const init = () => {
+    setDataList({});
+    setReporterList({});
+    setPage(undefined);
+    setHasNextPage(undefined);
+    setResetCount(0);
+  };
+
+  const reset = () => {
+    setDataList({});
+    setReporterList({});
+    setPage(1);
+    setHasNextPage(true);
+    setResetCount((count) => ++count);
+  };
+
+  // -----------------------------------------------
+  useEffect(() => {
+    if (!page) {
+      return;
+    }
+
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, resetCount]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (inView_bottom) {
+      nextPage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView_bottom, isLoading]);
+  // -----------------------------------------------
+
+  return {
+    dataList,
+    dataArr: _.flatten(Object.values(dataList)),
+    viewRef_top,
+    viewRef_bottom,
+    isLoadingPage1,
+    isLoading,
+    meta,
+    init,
+    reset,
+    //
+    reporterList,
+    reporterArr: Object.values(reporterList),
   };
 };

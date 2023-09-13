@@ -217,7 +217,8 @@ export type TerpFeatureDto = {
 // }
 export type TdailyReportItemDto = {
   readonly id: string;
-  readonly order: number;
+  // 用於設定item的排序
+  order: number;
   readonly createdAt: string; // date
   readonly updatedAt: string; //date
   periodOfDay: 'AM' | 'PM' | null;
@@ -267,6 +268,8 @@ export type TsetReportersDto = {
 };
 
 export type TcreateDailyReportItemDto = {
+  // 帶id代表修改舊有的item，沒id就是新增item
+  id?: string;
   periodOfDay: 'AM' | 'PM';
   customerName: string;
   contactName: string;
@@ -281,11 +284,13 @@ export type TcreateDailyReportItemDto = {
   stayLength: number; // 基本上是 1|0
   workerIds: string[] | null;
   workOrderNumber: string;
+  // 用於設定item的排序
+  order: number;
 };
 
 export type TupdateDailyReportDto = {
-  reviewerIds: string[];
-  examinerIds: string[];
+  // reviewerIds: string[];
+  // examinerIds: string[];
   items: TcreateDailyReportItemDto[];
 };
 
@@ -314,6 +319,17 @@ export type TaccountingReportDto = {
   employeeId: string;
   employeeName: string | null;
   statistic: TaccountingReportStatistic[];
+};
+
+export type TreviewerPresets = {
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+  reportEmployee: TemployeeDto;
+  reportEmployeeId: string;
+  reviewerEmployee: TemployeeDto;
+  reviewerEmployeeId: string;
+  type: 'reviewer' | 'examiner';
 };
 
 // =======================================================

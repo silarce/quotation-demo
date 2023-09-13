@@ -40,6 +40,12 @@
     line-height: 19px;
     color: $colorText;
   }
+
+  &.except {
+    background-color: #ddd;
+    cursor: auto;
+  }
+
   @screen laptop {
     grid-template-columns: 100px 100px 70px;
     gap: 0px 60px;

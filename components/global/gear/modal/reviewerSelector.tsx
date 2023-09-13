@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import classNames from 'classnames';
 import _ from 'lodash';
 
 // global gear
@@ -8,7 +9,7 @@ import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/ale
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from './employeeSelector.module.scss';
+import scss from './employeeSelector.module.scss';
 
 // api
 import { TemployeeDto, useApiDailyReports_reviewers } from 'js/api/api_dailyReport';
@@ -24,8 +25,9 @@ export default function ReviewerSelector({
   label,
   tip,
   selLimit,
-  cancelOnConfirm = true,
-  exceptIdArr,
+  defaultEmpArr,
+  exceptEmpArr,
+  isCancelOnConfirm = true,
 }: {
   showModal?: boolean;
   onConfirm?: (v: TemployeeDto[]) => void;
@@ -33,8 +35,9 @@ export default function ReviewerSelector({
   label?: string;
   tip?: React.ReactNode;
   selLimit?: 1;
-  cancelOnConfirm?: boolean;
-  exceptIdArr?: string[];
+  defaultEmpArr?: TemployeeDto[];
+  exceptEmpArr?: { id: string }[];
+  isCancelOnConfirm?: boolean;
 }) {
   const { rwd1023 } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,20 +53,35 @@ export default function ReviewerSelector({
 
   // ==================================================
   useEffect(() => {
-    if (showModal) {
-      (async () => {
-        setIsLoading(true);
+    if (!showModal) {
+      setSelEmployeeArr([]);
+      setSearchValue(undefined);
 
-        try {
-          await updateReviewersArr();
-        } catch (error) {
-          myAlert.err({ title: '取得檢視人員失敗' });
-        }
-
-        setIsLoading(false);
-      })();
+      return;
     }
+
+    (async () => {
+      setIsLoading(true);
+
+      try {
+        await updateReviewersArr();
+      } catch (error) {
+        myAlert.err({ title: '取得人員失敗' });
+      }
+
+      setIsLoading(false);
+    })();
+
+    if (defaultEmpArr) {
+      setSelEmployeeArr(defaultEmpArr);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
+
+  useEffect(() => {
+    setSelEmployeeArr([]);
+  }, [searchValue]);
+
   // ==================================================
 
   const onClick = (newEmp: TemployeeDto) => {
@@ -93,7 +111,10 @@ export default function ReviewerSelector({
     }
 
     onConfirm?.(selEmployeeArr);
-    cancelOnConfirm && theOnCancel();
+
+    if (isCancelOnConfirm) {
+      theOnCancel();
+    }
   };
 
   const theOnCancel = () => {
@@ -126,7 +147,7 @@ export default function ReviewerSelector({
       onCancel={theOnCancel}
       // onSearch={onSearch}
       width={rwd1023 ? '80vw' : '800px'}
-      className={style.container}
+      className={scss.container}
       tip={tip}
       searcbBarProps={{
         inputSelPropsArr: inputSelPropsArr,
@@ -134,15 +155,11 @@ export default function ReviewerSelector({
       }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
-        <div className={style.listContainer}>
+        <div className={scss.listContainer}>
           {reviewersArr.map((emp, index) => {
             const { id, idNumber, chName, jobs } = emp;
 
-            if (exceptIdArr) {
-              if (exceptIdArr.includes(id)) {
-                return null;
-              }
-            }
+            const isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
 
             const jobNameArr = jobs?.map((job) => job.name);
             const job = _.maxBy(jobs, 'grade');
@@ -167,8 +184,8 @@ export default function ReviewerSelector({
 
             return (
               <CellWithBar key={index} isActive={isActive}>
-                <div className={style.row} onClick={() => onClick(emp)}>
-                  <span className={style.idNumber}>{idNumber}</span>
+                <div className={classNames(scss.row, isExcept && scss.except)} onClick={() => onClick(emp)}>
+                  <span className={scss.idNumber}>{idNumber}</span>
                   <span>{chName}</span>
                   <span>{name ? `${department?.name} / ${name}` : ''}</span>
                   <span>{grade && `Level ${grade}`}</span>

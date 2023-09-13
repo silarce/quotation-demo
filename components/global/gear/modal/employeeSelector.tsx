@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
+import classNames from 'classnames';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -7,7 +8,7 @@ import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals'
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from './employeeSelector.module.scss';
+import scss from './employeeSelector.module.scss';
 
 // type
 import { TemployeeDto } from 'js/api/dtoTypes';
@@ -29,6 +30,9 @@ export default function EmployeeSelector({
   selLimit,
   customParams,
   customFilter,
+  defaultEmpArr,
+  exceptEmpArr,
+  isCancelOnConfirm = true,
 }: {
   showModal: boolean;
   onConfirm: (v: TemployeeDto[]) => void;
@@ -38,6 +42,9 @@ export default function EmployeeSelector({
   selLimit?: 1;
   customParams?: Tparams;
   customFilter?: Tparams['filter'];
+  defaultEmpArr?: TemployeeDto[];
+  exceptEmpArr?: { id: string }[];
+  isCancelOnConfirm?: boolean;
 }) {
   const { rwd1023 } = useContext(AppContext);
 
@@ -81,15 +88,22 @@ export default function EmployeeSelector({
       return;
     }
 
+    setSelEmployeeArr([]);
     reset();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, showModal]);
 
   useEffect(() => {
     if (!showModal) {
+      setSelEmployeeArr([]);
       setSearchValue([]);
 
       return;
+    }
+
+    if (defaultEmpArr) {
+      setSelEmployeeArr(defaultEmpArr);
     }
 
     update_department();
@@ -140,11 +154,14 @@ export default function EmployeeSelector({
 
   const theOnConfirm = () => {
     if (!selEmployeeArr) {
-      return ModalInfo('請選擇公司');
+      return ModalInfo('請選擇人員');
     }
 
     onConfirm(selEmployeeArr);
-    theOnCancel();
+
+    if (isCancelOnConfirm) {
+      theOnCancel();
+    }
   };
 
   const theOnCancel = () => {
@@ -188,7 +205,7 @@ export default function EmployeeSelector({
       onCancel={theOnCancel}
       // onSearch={onSearch}
       width={rwd1023 ? '80vw' : '800px'}
-      className={style.container}
+      className={scss.container}
       tip={tip}
       searcbBarProps={{
         inputSelPropsArr: inputSelPropsArr,
@@ -196,7 +213,7 @@ export default function EmployeeSelector({
       }}
     >
       <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
-        <div className={style.listContainer}>
+        <div className={scss.listContainer}>
           {dataArr.map((emp, index, arr) => {
             const { idNumber, chName, jobs } = emp;
             const { name, grade, department } = jobs?.[0] ?? {};
@@ -211,10 +228,14 @@ export default function EmployeeSelector({
               return undefined;
             })();
 
+            const isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+
+            const theOnClick = isExcept ? undefined : () => onClick(emp);
+
             return (
               <CellWithBar key={index} isActive={isActive}>
-                <div className={style.row} onClick={() => onClick(emp)} ref={theViewRef}>
-                  <span className={style.idNumber}>{idNumber}</span>
+                <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={theViewRef}>
+                  <span className={scss.idNumber}>{idNumber}</span>
                   <span>{chName}</span>
                   <span>{name ? `${department?.name} / ${name}` : ''}</span>
                   <span>{grade && `Level ${grade}`}</span>

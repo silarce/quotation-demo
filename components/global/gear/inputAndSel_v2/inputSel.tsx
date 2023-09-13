@@ -240,6 +240,7 @@ export default function InputSel({
           }
 
           let easyValue: Toption | undefined | null = undefined;
+          let easyDefaultValue: Toption | undefined | null = undefined;
 
           if (selectProps.easyValue !== undefined) {
             if (selectProps.easyValue === null || selectProps.easyValue === '') {
@@ -250,6 +251,19 @@ export default function InputSel({
               easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
                 value: selectProps.easyValue,
                 label: selectProps.easyValue,
+              };
+            }
+          }
+
+          if (selectProps.easyDefaultValue !== undefined) {
+            if (selectProps.easyDefaultValue === null || selectProps.easyDefaultValue === '') {
+              easyDefaultValue = null;
+            } else {
+              const options = selectProps.props?.options;
+
+              easyDefaultValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+                value: selectProps.easyDefaultValue,
+                label: selectProps.easyDefaultValue,
               };
             }
           }
@@ -272,6 +286,7 @@ export default function InputSel({
                 placeholder: `請輸入${caption ?? ''}`,
                 //
                 value: easyValue,
+                defaultValue: easyDefaultValue,
                 ...selectProps.props,
                 //
                 onFocus: (e) => {

@@ -32,7 +32,8 @@ const panelListCreator = ({
   reportInEdit,
   doCheck,
   switchIsEdit,
-  setShowReviewerForReportModal,
+  // setShowReviewerForReportModal,
+  reqApiPatchDailyReports_my,
   dailyReportArr,
   isCalendar,
   router,
@@ -50,7 +51,8 @@ const panelListCreator = ({
   reportInEdit: ThookEmptyReport | undefined;
   doCheck: () => void;
   switchIsEdit: () => void;
-  setShowReviewerForReportModal: (v: boolean) => void;
+  // setShowReviewerForReportModal: (v: boolean) => void;
+  reqApiPatchDailyReports_my: () => void;
   dailyReportArr: TdailyReportDto[] | undefined;
   isCalendar: boolean;
   router: NextRouter;
@@ -162,7 +164,8 @@ const panelListCreator = ({
           return myAlert.warning({ title: '請選擇日期' });
         }
 
-        setShowReviewerForReportModal(true);
+        reqApiPatchDailyReports_my();
+        // setShowReviewerForReportModal(true);
       },
     },
     {
