@@ -1252,8 +1252,13 @@ const Panel = () => {
 };
 
 const TitlePanel = () => {
-  const { reportInEdit, cancelEditNewDailyReport, isReportEdit, setShowReviewerForReportModal } =
-    useContext(DailyReportContext);
+  const {
+    reportInEdit,
+    cancelEditNewDailyReport,
+    isReportEdit,
+    // setShowReviewerForReportModal
+    reqApiPatchDailyReports_my,
+  } = useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
   let date = moment(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
 
@@ -1272,7 +1277,13 @@ const TitlePanel = () => {
         </span>
       </div>
       {isReportEdit && (
-        <div className={classNames(scss.right)} onClick={() => setShowReviewerForReportModal(true)}>
+        <div
+          className={classNames(scss.right)}
+          onClick={() => {
+            reqApiPatchDailyReports_my();
+            // setShowReviewerForReportModal(true)
+          }}
+        >
           <IconCheck02 />
         </div>
       )}

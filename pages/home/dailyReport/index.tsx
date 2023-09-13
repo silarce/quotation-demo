@@ -80,6 +80,7 @@ type TdailyReportContext = {
   isReportEdit: boolean;
   switchIsEdit: () => void;
   // setShowReviewerForReportModal: (v: boolean) => void;
+  reqApiPatchDailyReports_my: () => void;
   cancelEditNewDailyReport: () => void;
   changeReportDate: (v: string) => void;
   identity: Tidentity;
@@ -711,6 +712,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     isReportEdit,
     switchIsEdit,
     // setShowReviewerForReportModal,
+    reqApiPatchDailyReports_my,
     cancelEditNewDailyReport,
     changeReportDate,
     identity,
