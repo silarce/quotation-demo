@@ -465,7 +465,7 @@ export const useApiGetReviewerPresets = ({ customParams }: { customParams?: Tpar
   // ----------------------------------------------------------------
   const defaultParams = {
     page,
-    pageSize: 100,
+    pageSize: 50,
     sort: 'reportEmployeeId',
     populate: ['reportEmployee.jobs.department', 'reviewerEmployee'],
   };

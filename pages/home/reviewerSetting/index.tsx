@@ -28,7 +28,6 @@ import {
   apiPatchReviewerPresets,
   useApiGetReviewerPresets,
 } from 'js/api/api_dailyReport';
-import { fi } from 'date-fns/locale';
 
 // ===================================================================
 
@@ -64,7 +63,12 @@ export default function SetReviewer() {
     },
   };
 
-  const { reporterArr, isLoading: dataIsLoading, reset } = useApiGetReviewerPresets({ customParams: params });
+  const {
+    reporterArr,
+    isLoadingPage1: dataIsLoading,
+    viewRef_bottom,
+    reset,
+  } = useApiGetReviewerPresets({ customParams: params });
 
   useEffect(() => {
     reset();
@@ -332,14 +336,17 @@ export default function SetReviewer() {
           {reporterArr.map((reporterPreset, index) => {
             // const key = reporterPreset.reporter.id;
 
+            const ref = reporterArr.length - 4 === index ? viewRef_bottom : undefined;
+
             return (
-              <Row02
-                key={index}
-                reporterPreset={reporterPreset}
-                openPresetReviewersSelector={() => openPresetReviewersSelector(reporterPreset)}
-                openPresetExaminersSelector={() => openPresetExaminersSelector(reporterPreset)}
-                deleteReporter={() => deleteReporter(reporterPreset.reporter.id)}
-              />
+              <div key={index} ref={ref}>
+                <Row02
+                  reporterPreset={reporterPreset}
+                  openPresetReviewersSelector={() => openPresetReviewersSelector(reporterPreset)}
+                  openPresetExaminersSelector={() => openPresetExaminersSelector(reporterPreset)}
+                  deleteReporter={() => deleteReporter(reporterPreset.reporter.id)}
+                />
+              </div>
             );
           })}
 
@@ -425,29 +432,6 @@ const Thead = () => {
       </div>
       <div></div>
     </div>
-  );
-};
-
-const Row = ({ showEmployeeSelector }: { showEmployeeSelector: () => void }) => {
-  return (
-    <CellWithBar className={scss.row}>
-      <div>
-        <span>王小明</span>
-      </div>
-      <div>
-        <MyButton_v2 onClick={showEmployeeSelector} preImg="add" label="新增審核人員" />
-      </div>
-      <div>
-        <MyButton_v2 onClick={showEmployeeSelector} preImg="add" label="新增檢視人員" />
-      </div>
-      <div>
-        <IconDelete01
-          onClick={() => {
-            myAlert.confirm({ title: '確定刪除?' });
-          }}
-        />
-      </div>
-    </CellWithBar>
   );
 };
 
