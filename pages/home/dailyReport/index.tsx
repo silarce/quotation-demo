@@ -545,8 +545,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       await apiPatchDailyReports_my({
         date: moment(theDate).format('YYYY-MM-DD'),
         body: {
-          reviewerIds,
-          examinerIds,
+          // reviewerIds,
+          // examinerIds,
           items,
         },
       });

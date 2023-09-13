@@ -404,3 +404,20 @@ export const useApiAccountReports = (date: string) => {
     updateAccountReports: update,
   };
 };
+
+// ==============================================================
+type TcreateDailyReportReviewerPresetDto = {
+  reportEmployeeIds: string[];
+  reviewerEmployeeIds: string[];
+  examinerEmployeeIds: string[];
+};
+
+export const apiPatchReviewerPresets = (body: TcreateDailyReportReviewerPresetDto) => {
+  const api = '/daily-reports/reviewer-presets';
+
+  // res的型別為DailyReportReviewerPreset，目前用不到，先不管
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
