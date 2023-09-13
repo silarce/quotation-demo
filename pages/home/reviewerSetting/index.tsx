@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import _ from 'lodash';
 import classNames from 'classnames';
 
 // layer
@@ -10,7 +10,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import SearchBar from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
+import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import ReviewerSelector from 'components/global/gear/modal/reviewerSelector';
 
@@ -22,22 +22,108 @@ import scss from './index.module.scss';
 
 // api
 
-/**
- * 新增回報人員 現在有api無法設定哪些人要回報
- * 新增審核人員、新增檢視人員 承上，現在有api無法設定回報人員的審核人員、檢視人員
- * 只能設定指定日報的審核人員、檢視人員
- */
+import { apiPatchReviewerPresets, TcreateDailyReportReviewerPresetDto } from 'js/api/api_dailyReport';
+
+// ===================================================================
+
+type TreviewerPresets = {
+  report: TemployeeDto[];
+  reviewer: TemployeeDto[];
+  examiner: TemployeeDto[];
+};
+
+const creEmployeeReviewerPresets = () => ({
+  report: [],
+  reviewer: [],
+  examiner: [],
+});
+
+// ===================================================================
 
 export default function SetReviewer() {
-  const [showModal, setShowModal] = useState(false);
+  const [reviewerPresets, setReviewerPresets] = useState<TreviewerPresets>(creEmployeeReviewerPresets());
 
-  const showEmployeeSelector = () => {
-    setShowModal(true);
+  const [showReporterSelector, setShowReportSelector] = useState(false); //回報人員
+  const [showReviewerSelector, setShowReviewerSelector] = useState(false); // 審核人員
+  const [showExaminerSelector, setShowExaminerSelector] = useState(false); // 檢視人員
+
+  const clearReviewerPresets = () => {
+    setReviewerPresets(creEmployeeReviewerPresets());
   };
 
-  const closeEmployeeSelector = () => {
-    setShowModal(false);
+  //
+  const onReporterConfirm = (arr: TemployeeDto[]) => {
+    setReviewerPresets((state) => {
+      state.report = arr;
+
+      return { ...state };
+    });
+    setShowReviewerSelector(true);
+    setShowReportSelector(false);
   };
+
+  const onReporterCancel = () => {
+    setShowReportSelector(false);
+    clearReviewerPresets();
+  };
+
+  //
+  const onReviewerConfirm = (arr: TemployeeDto[]) => {
+    setReviewerPresets((state) => {
+      state.reviewer = arr;
+
+      return { ...state };
+    });
+    setShowReviewerSelector(false);
+    setShowExaminerSelector(true);
+  };
+
+  const onReviewerCancel = () => {
+    setShowReviewerSelector(false);
+    clearReviewerPresets();
+  };
+
+  //
+  const onExaminerConfirm = (arr: TemployeeDto[]) => {
+    setReviewerPresets((state) => {
+      state.examiner = arr;
+
+      return { ...state };
+    });
+    setTimeout(() => {
+      reqNewReporter();
+      clearReviewerPresets();
+    }, 100);
+  };
+
+  const onExaminerCancel = () => {
+    setShowExaminerSelector(false);
+    clearReviewerPresets();
+  };
+
+  // ----------------------------------------------------
+
+  const reqNewReporter = async () => {
+    const body: TcreateDailyReportReviewerPresetDto = {
+      reportEmployeeIds: [],
+      reviewerEmployeeIds: [],
+      examinerEmployeeIds: [],
+    };
+
+    body.reportEmployeeIds = reviewerPresets.report.map((emp) => emp.id);
+    body.reviewerEmployeeIds = reviewerPresets.reviewer.map((emp) => emp.id);
+    body.examinerEmployeeIds = reviewerPresets.examiner.map((emp) => emp.id);
+
+    try {
+      await apiPatchReviewerPresets(body);
+    } catch (error) {}
+  };
+
+  // ----------------------------------------------------
+
+  // const [target, setTarget] = useState();
+
+  // const onSelTargetViewer = (target: any, type: 'reviewer' | 'examiner') => {};
 
   // ----------------------------------------------------
   const panelList: TpanelList = [
@@ -61,7 +147,7 @@ export default function SetReviewer() {
     {
       type: 'addButton',
       label: '新增回報人員',
-      onClick: showEmployeeSelector,
+      onClick: () => setShowReportSelector(true),
     },
   ];
 
@@ -71,17 +157,52 @@ export default function SetReviewer() {
       <div className={scss.main}>
         <Thead />
         <div>
-          <Row showEmployeeSelector={showEmployeeSelector} />
-          <Row02 showEmployeeSelector={showEmployeeSelector} />
-          <Row02 showEmployeeSelector={showEmployeeSelector} />
-          <Row02 showEmployeeSelector={showEmployeeSelector} />
-          <Row02 showEmployeeSelector={showEmployeeSelector} />
-          <Row02 showEmployeeSelector={showEmployeeSelector} />
-          <Row02 showEmployeeSelector={showEmployeeSelector} />
+          <Row showEmployeeSelector={() => {}} />
+          <Row02 showEmployeeSelector={() => {}} />
+          <Row02 showEmployeeSelector={() => {}} />
+          <Row02 showEmployeeSelector={() => {}} />
+          <Row02 showEmployeeSelector={() => {}} />
+          <Row02 showEmployeeSelector={() => {}} />
+          <Row02 showEmployeeSelector={() => {}} />
         </div>
       </div>
-      {/* <EmployeeSelector showModal={showModal} onConfirm={() => {}} onCancel={closeEmployeeSelector} /> */}
-      <ReviewerSelector showModal={showModal} onCancel={closeEmployeeSelector} />
+      <EmployeeSelector
+        showModal={showReporterSelector}
+        tip="請選擇回報人員，可複選"
+        onConfirm={onReporterConfirm}
+        onCancel={onReporterCancel}
+        isCancelOnConfirm={false}
+      />
+      <ReviewerSelector
+        showModal={showReviewerSelector}
+        tip="請選擇審核人員，可複選。反灰者為已被選為回報人員或檢視人員者"
+        onConfirm={onReviewerConfirm}
+        onCancel={onReviewerCancel}
+        exceptEmpArr={[...reviewerPresets.report, ...reviewerPresets.examiner]}
+        isCancelOnConfirm={false}
+      />
+      <ReviewerSelector
+        showModal={showExaminerSelector}
+        tip="請選擇檢視人員，可複選。反灰者為已被選為回報人員或審核人員者"
+        onConfirm={onExaminerConfirm}
+        onCancel={onExaminerCancel}
+        exceptEmpArr={[...reviewerPresets.report, ...reviewerPresets.reviewer]}
+      />
+      {/*  */}
+      <ReviewerSelector
+        showModal={false}
+        tip="請選擇審核人員，可複選。反灰者為已被選為回報人員或檢視人員者"
+        onConfirm={() => {}}
+        onCancel={() => {}}
+        exceptEmpArr={undefined}
+      />
+      <ReviewerSelector
+        showModal={false}
+        tip="請選擇檢視人員，可複選。反灰者為已被選為回報人員或審核人員者"
+        onConfirm={() => {}}
+        onCancel={() => {}}
+        exceptEmpArr={undefined}
+      />
     </SubLayer>
   );
 }

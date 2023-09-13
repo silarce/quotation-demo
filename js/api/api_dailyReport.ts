@@ -406,10 +406,10 @@ export const useApiAccountReports = (date: string) => {
 };
 
 // ==============================================================
-type TcreateDailyReportReviewerPresetDto = {
-  reportEmployeeIds: string[];
-  reviewerEmployeeIds: string[];
-  examinerEmployeeIds: string[];
+export type TcreateDailyReportReviewerPresetDto = {
+  reportEmployeeIds: string[]; //回報人員
+  reviewerEmployeeIds: string[]; // 審核人員
+  examinerEmployeeIds: string[]; //檢視人員
 };
 
 export const apiPatchReviewerPresets = (body: TcreateDailyReportReviewerPresetDto) => {
