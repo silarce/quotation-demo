@@ -321,6 +321,17 @@ export type TaccountingReportDto = {
   statistic: TaccountingReportStatistic[];
 };
 
+export type TreviewerPresets = {
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+  reportEmployee: TemployeeDto;
+  reportEmployeeId: string;
+  reviewerEmployee: TemployeeDto;
+  reviewerEmployeeId: string;
+  type: 'reviewer' | 'examiner';
+};
+
 // =======================================================
 // =======================================================
 // =======================================================
