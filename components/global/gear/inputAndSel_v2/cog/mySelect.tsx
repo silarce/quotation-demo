@@ -22,6 +22,7 @@ import iconArrowBlack from 'public/image/icon/arrow_down.svg';
 import scss from '../inputSel.module.scss';
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
+export type { Toption };
 
 export type TselectProps<
   Option = Toption,
@@ -33,6 +34,14 @@ export type TselectProps<
   wrapperStyle?: React.CSSProperties;
   arrowType?: 'red' | 'black';
   fontClassName?: string;
+  // 下面幾項是在inputSel做處理的東西，不會在這邊使用，型別寫在這邊只是因為方便
+  /** 將string轉為Toption，props.value有值的話會被蓋掉 */
+  easyValue?: string | null;
+  easyDefaultValue?: string | null;
+  withIcon?: boolean;
+  dynaOptionsList?: { [key: string]: Toption[] };
+  dynaOptionsKey?: string;
+  //
 };
 
 // ==============================================================================
@@ -57,6 +66,7 @@ export default function MySelect<
   };
 
   // -------------------------------------------------------------------------
+
   return (
     <div className={classNames(scss.selectBox, wrapperClassName)} style={wrapperStyle}>
       <Select
@@ -67,6 +77,7 @@ export default function MySelect<
         }}
         unstyled={true}
         menuPortalTarget={document.getElementById('__next')}
+        // menuPortalTarget={document.getElementsByTagName('body')[0]}
         menuPosition={'fixed'}
         isSearchable={false}
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen

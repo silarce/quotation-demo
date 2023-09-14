@@ -1,0 +1,11 @@
+@use "styles/theme01" as *;
+
+.singleValue {
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > img {
+    margin-right: 6px;
+  }
+}

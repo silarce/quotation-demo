@@ -36,7 +36,7 @@ export default function Edit() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   // ------------------------------------------------------
-  const { data, setData, update } = useCustomersById((router.query.id as string) || '', params);
+  const { data, setData, update } = useCustomersById(router.query.id as string, params);
 
   // 原本的客戶全稱
   const [nameOri, setNameOri] = useState<string>();
@@ -55,10 +55,10 @@ export default function Edit() {
       try {
         const res = await update();
 
-        if (res.contacts.length === 0) {
+        if (res?.contacts.length === 0) {
           setData({
             ...res,
-            contacts: [{ name: '', phone: '' }],
+            contacts: [{ name: '', phone: '' } as { name: string; phone: string; id: string }],
           });
         }
 

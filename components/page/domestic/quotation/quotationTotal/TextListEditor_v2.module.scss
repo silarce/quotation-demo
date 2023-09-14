@@ -1,17 +1,32 @@
 @use "styles/theme01" as *;
 
 .listContainer {
-  > p {
-    font-weight: 400;
-    font-size: 18px;
-    color: $colorMain;
-    margin: 0;
+  .labelBox {
+    display: flex;
+    align-items: center;
     margin-bottom: 15px;
     margin-top: 28px;
+    > p {
+      font-weight: 400;
+      font-size: 18px;
+      color: $colorMain;
+      margin: 0;
+    }
+    > svg {
+      position: relative;
+      top: 2px;
+      height: 20px;
+      path {
+        stroke: blue;
+      }
+      &:hover {
+        fill: rgb(196, 211, 240);
+      }
+    }
   }
 
   // 裡面裝了兩個span 一個svg
-  > div {
+  > div:not(:nth-of-type(1)) {
     display: grid;
     grid-template-columns: 16px fit-content(100%) auto;
     // height: 25px;

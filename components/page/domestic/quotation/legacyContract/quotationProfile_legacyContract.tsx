@@ -33,10 +33,14 @@ export default function QuotationProfile({
   classLegacyContract,
   classBasicInfo,
   disabled = false,
+  isAppend,
+  isLatestBatch,
 }: {
   classLegacyContract: Class_legacyContract;
   classBasicInfo: Class_basicInfo;
   disabled: boolean;
+  isAppend?: boolean;
+  isLatestBatch?: boolean;
 }) {
   // =============================================
   const { customer } = classLegacyContract;
@@ -62,10 +66,10 @@ export default function QuotationProfile({
   // ==============================================
   // 客戶資料
   const theClientData = [
-    { label: '聯絡人', placeholder: '尚未選擇', value: contactPerson },
-    { label: '聯絡電話', placeholder: '尚未選擇', value: contactNumber },
-    { label: '傳真號碼', placeholder: '尚未選擇', value: faxNumber },
-  ];
+    { key: 'contactPerson', label: '聯絡人', placeholder: undefined, value: contactPerson },
+    { key: 'contactNumber', label: '聯絡電話', placeholder: undefined, value: contactNumber },
+    { key: 'faxNumber', label: '傳真號碼', placeholder: undefined, value: faxNumber },
+  ] as const;
 
   // ==============================================
   const clearClient = () => {
@@ -127,6 +131,17 @@ export default function QuotationProfile({
   };
 
   // ==============================================
+  let isContractNumberDisabled = disabled;
+
+  if (isAppend) {
+    if (isLatestBatch) {
+      isContractNumberDisabled = false;
+    } else {
+      isContractNumberDisabled = true;
+    }
+  }
+
+  // ==============================================
 
   return (
     <div className={scss.container}>
@@ -172,7 +187,7 @@ export default function QuotationProfile({
           <div>
             {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
             {theClientData.map((item, index) => {
-              const { label, value, placeholder } = item;
+              const { key, label, value, placeholder } = item;
 
               return (
                 <InputSel
@@ -180,12 +195,16 @@ export default function QuotationProfile({
                   label={label}
                   placeholder={placeholder}
                   captionClassName={scss.input02}
-                  disabled={true}
-                  showBaseline="invisible"
+                  // disabled={true}
+                  disabled={disabled}
+                  showBaseline="auto"
                   {...{ ...inputStyle }}
                   inputProps={{
                     value: value ?? '',
-                    onChange: () => {},
+                    // onChange: () => {},
+                    onChange: (v) => {
+                      classBasicInfo[key] = v;
+                    },
                   }}
                 />
               );
@@ -240,7 +259,9 @@ export default function QuotationProfile({
           isMustPreStyle="minimal"
           label="合約編號"
           showBaseline="auto"
-          disabled={disabled}
+          // disabled={isAppend || disabled}
+          // disabled={ isAppend ? false : disabled}
+          disabled={isContractNumberDisabled}
           inputProps={{
             value: contractNumber,
             onChange: (v) => {
@@ -256,7 +277,7 @@ export default function QuotationProfile({
             value: quoteValidity ?? "",
             onChange: (v) => { classBasicInfo.quoteValidity = v }
           }} /> */}
-        <InputSel
+        {/* <InputSel
           label="合約日期"
           showBaseline="auto"
           disabled={disabled}
@@ -267,7 +288,7 @@ export default function QuotationProfile({
               classBasicInfo.quoteDate = moment?.toISOString();
             },
           }}
-        />
+        /> */}
       </div>
 
       {/* modal */}

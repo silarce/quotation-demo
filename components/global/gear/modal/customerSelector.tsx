@@ -3,17 +3,24 @@ import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 
 // global gear
-import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+// import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
+import { optionsCreator_customerType } from 'js/utils/options/options';
+
 // css
-import style from './customerSelector.module.scss';
+import scss from './customerSelector.module.scss';
 
 // api
-import { TcustomerDto, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
+import { TcustomerDto_TC, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
+// ====================================================================
 
+const customerTypeArr = optionsCreator_customerType({ emptyOption: true });
+
+// ====================================================================
 export default function CustomerSelector({
   showModal,
   onConfirm,
@@ -23,7 +30,7 @@ export default function CustomerSelector({
   selLimit,
 }: {
   showModal: boolean;
-  onConfirm: (v: TcustomerDto[]) => void;
+  onConfirm: (v: TcustomerDto_TC[]) => void;
   onCancel: () => void;
   label?: string;
   tip?: React.ReactNode;
@@ -32,9 +39,9 @@ export default function CustomerSelector({
   const [isLoading, setIsLoading] = useState(false);
 
   // 被選的資料
-  const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto[]>([]);
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto_TC[]>([]);
 
-  const [searchValue, setSearchValue] = useState<string | undefined>();
+  const [searchValue, setSearchValue] = useState<string[]>([]);
   const [pageObj, setPageObj] = useState({ page: -1 });
   const page = pageObj.page;
 
@@ -46,14 +53,17 @@ export default function CustomerSelector({
       sort: 'customerNumber',
       filter: {
         $or: {
-          customerNumber: { $contains: searchValue },
-          name: { $contains: searchValue },
+          customerNumber: { $contains: searchValue[1] },
+          name: { $contains: searchValue[1] },
         },
+        'types.name': { $contains: searchValue[0] },
       },
     };
   })();
 
-  const { data: customerArr, meta, setData, update, update_infinite } = useCustomers(params);
+  const res = useCustomers(params);
+  const { meta, setData, update, update_infinite } = res;
+  const customerArr = res?.data as TcustomerDto_TC[] | undefined;
 
   const [viewRef, inView] = useInView();
 
@@ -80,15 +90,21 @@ export default function CustomerSelector({
       const newPageObj = { ...pageObj, page: -1 };
       setPageObj(newPageObj);
       setData(undefined);
-      setSearchValue(undefined);
+      setSearchValue([]);
 
       return;
     }
 
+    // const newPageObj = { ...pageObj, page: 1 };
+    // setPageObj(newPageObj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
+
+  useEffect(() => {
     const newPageObj = { ...pageObj, page: 1 };
     setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal]);
+  }, [searchValue]);
 
   useEffect(() => {
     if (page === -1) {
@@ -122,7 +138,7 @@ export default function CustomerSelector({
 
   // ==================================================
 
-  const onClick = (newEmp: TcustomerDto) => {
+  const onClick = (newEmp: TcustomerDto_TC) => {
     const newArr = [...selEmployeeArr];
 
     if (selLimit === 1) {
@@ -157,25 +173,51 @@ export default function CustomerSelector({
     setSelEmployeeArr([]);
   };
 
-  const onSearch = (v: string) => {
+  const onSearch = (v: string[]) => {
     setSearchValue(v);
   };
 
   // ==================================================
+  const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
+    {
+      selectProps: {
+        wrapperStyle: { width: '100px' },
+        props: {
+          options: customerTypeArr,
+          menuPortalTarget: undefined,
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: '160px' },
+        props: {
+          placeholder: '搜尋關鍵字',
+        },
+      },
+    },
+  ];
+  // ==================================================
 
   return (
-    <ModalListSelectorWithSearch
+    <SelectorShell
       label={label ?? ''}
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={onSearch}
       width={'800'}
-      className={style.container}
+      className={scss.container}
       tip={tip}
+      searcbBarProps={{
+        inputSelPropsArr: inputSelPropsArr,
+        onClick: onSearch,
+      }}
     >
       <LoadingCoverWrapper01 isLoading={isLoading}>
-        <div className={style.listContainer}>
+        <div className={scss.listContainer}>
           {customerArr?.map((emp, index, arr) => {
             const { customerNumber, name } = emp;
 
@@ -190,8 +232,8 @@ export default function CustomerSelector({
             })();
 
             return (
-              <CellWithBar key={index} isActive={isActive}>
-                <div className={`${style.listItem}`} onClick={() => onClick(emp)} ref={theViewRef}>
+              <CellWithBar key={index} isActive={isActive} className={scss.rowWrapper}>
+                <div className={scss.listItem} onClick={() => onClick(emp)} ref={theViewRef}>
                   <span>{customerNumber}</span>
                   <span>{name}</span>
                 </div>
@@ -200,6 +242,6 @@ export default function CustomerSelector({
           })}
         </div>
       </LoadingCoverWrapper01>
-    </ModalListSelectorWithSearch>
+    </SelectorShell>
   );
 }

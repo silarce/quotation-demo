@@ -118,6 +118,17 @@ const sidePathList: TsidePathList = {
                 idNumber: ['EM-10902-01'], // 會計的帳號(只在正式環境中)
               },
             },
+            {
+              label: '審核設定',
+              path: path01 + '/reviewerSetting',
+              erpFeature: 'allPass',
+              // otherPermissions: {
+              //   grade: 14,
+              // },
+              exception: {
+                idNumber: ['EM-10902-01'], // 會計的帳號(只在正式環境中)
+              },
+            },
           ],
         },
       ],
@@ -159,7 +170,8 @@ const sidePathList: TsidePathList = {
         {
           label: '客戶列表',
           path: path01 + '/customer',
-          erpFeature: allPass,
+          // erpFeature: allPass,
+          erpFeature: 'allPass',
         },
         {
           label: '產品列表',
@@ -193,19 +205,43 @@ const sidePathList: TsidePathList = {
           list: [
             {
               label: '預算',
-              path: path01 + '/budget',
-              erpFeature: devPass,
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Budget',
+              },
+              erpFeature: [legacyContractIntegration],
             },
             {
               label: '投標',
-              path: path01 + '/tender',
-              erpFeature: devPass,
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Bidding',
+              },
+              erpFeature: [legacyContractIntegration],
             },
             {
               label: '發包',
-              path: path01 + '/outsourcing',
-              erpFeature: devPass,
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Contracting',
+              },
+              erpFeature: [legacyContractIntegration],
             },
+            // {
+            //   label: '預算',
+            //   path: path01 + '/budget',
+            //   erpFeature: 'allPass',
+            // },
+            // {
+            //   label: '投標',
+            //   path: path01 + '/tender',
+            //   erpFeature: 'allPass',
+            // },
+            // {
+            //   label: '發包',
+            //   path: path01 + '/outsourcing',
+            //   erpFeature: 'allPass',
+            // },
             {
               label: '合約',
               path: path01 + '/contract',

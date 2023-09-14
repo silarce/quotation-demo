@@ -1,6 +1,7 @@
 import { MouseEvent } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
+import moment from 'moment';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -13,84 +14,81 @@ import iconLongArrow from 'public/image/icon/longArrow.svg';
 // css
 import scss from './tbodyItem01.module.scss';
 
-// =================================================================
-// type
-type Tdata = {
-  basicInfo: {
-    quotationId: string;
-    constructionName: string;
-    /**承辦人 */
-    undertaker: string;
-    totalDiscount: string | number;
-    tempDoorQty: string | number;
-    tempBudgetAmount: string | number;
-    date: string;
-    constructionCounty: string;
-  };
-  clientData: {
-    name: string;
-    contact: { name: string; phone: string }[];
-  };
+import { TquotationContentDto } from 'js/api/api_quotation';
+import { TcustomerDto, TemployeeDto } from 'js/api/dtoTypes';
+
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+
+// =============================================================================
+type TBodyItemContent = {
+  quotationNumber: string;
+  quotationDate: string;
+  projectName: string;
+  county: string;
+  contactPerson: string;
+  contactNumber: string;
+  discount: string;
+  quantity: number;
+  totalPrice: number;
+  customerName: string;
+  agentEmployeeName: string;
 };
+
+export type { TBodyItemContent };
 
 // =============================================================================
 export default function TbodyItem01({
-  projectData: projectData,
+  quotationContent,
   isActive,
   openQuotation,
   approvalsStatus,
 }: {
-  // projectData: TprojectSimple
-  projectData: Tdata;
+  quotationContent: TBodyItemContent;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
   approvalsStatus?: string;
 }) {
   const {
-    quotationId,
-    constructionName: projectName,
-    undertaker,
-    totalDiscount: discount,
-    tempDoorQty: doorQty,
-    tempBudgetAmount: budgetAmount,
-    date,
-    constructionCounty: country,
-  } = projectData.basicInfo;
-  const clientData = projectData.clientData;
+    quotationNumber,
+    quotationDate,
+    projectName,
+    county,
+    contactPerson,
+    contactNumber,
+    discount,
+    quantity,
+    totalPrice,
+    customerName,
+    agentEmployeeName,
+  } = quotationContent;
 
-  const { name: clientName, contact } = clientData;
-  const { name: contactName, phone: contactPhone } = contact[0];
+  // const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
 
-  let formatedBudgetAmount: string | number = budgetAmount;
-
-  if (typeof formatedBudgetAmount === 'string') {
-    formatedBudgetAmount = parseFloat(formatedBudgetAmount);
-  }
-
-  formatedBudgetAmount = formatedBudgetAmount.toLocaleString();
+  // const approvalsStatus = '待審核 '; // 之後api會再補這個狀態資料
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive}>
       <div className={scss.row01}>
-        <span>{quotationId}</span>
-        <span className={scss.clientName}>{clientName}</span>
-        <span>{contactName}</span>
-        <span>{contactPhone}</span>
-        <span>{undertaker}</span>
+        <span>{quotationNumber}</span>
+        <span className={scss.clientName}>{customerName}</span>
+        <span>{contactPerson}</span>
+        <span>{contactNumber}</span>
+        <span>{agentEmployeeName}</span>
         <span>{discount}</span>
-        <span>{doorQty}</span>
-        <span>{formatedBudgetAmount}</span>
+        <span>{quantity}</span>
+        <span>{totalPrice.toLocaleString()}</span>
         <div>
           <IconDetail onClick={openQuotation} />
         </div>
       </div>
 
       <div className={scss.row02}>
-        <span>{date}</span>
+        <span>{quotationDate}</span>
         <div className={scss.place}>
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconPlace.src} alt="place" />
-          <span className={scss.country}>{country}</span>
+          <span className={scss.country}>{county}</span>
         </div>
         <span>{projectName}</span>
         <div></div>

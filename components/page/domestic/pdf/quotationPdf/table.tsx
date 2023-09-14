@@ -57,12 +57,12 @@ export default function Table({ productList }: { productList: TtableProdList }) 
           const subClass = ' ' + style[align ?? ''];
 
           if (key === 'doorRail') {
-            const imgSrc = optionsDoorRail.find((item) => item.value === value)?.icon;
+            // const imgSrc = optionsDoorRail.find((item) => item.value === value)?.icon;
 
             return (
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imgSrc} alt="" />
+                <img src={value} alt="" />
               </div>
             );
           }
@@ -142,29 +142,29 @@ const indexKeys: TindexKeys[] = [
 const config: Tconfig = {
   category: {
     label: '項目',
-    width: '130px',
+    width: '104px',
   },
   size: {
     label: '尺寸(單位:cm)',
-    width: '210px',
+    width: '130px',
   },
   doorType: {
     label: '門型',
-    width: '150px',
+    width: '94px',
   },
   material: {
     label: '材料',
-    width: '140px',
+    width: '124px',
     align: 'center',
   },
   thickness: {
     label: '厚度',
-    width: '80px',
+    width: '60px',
     align: 'center',
   },
   surface: {
     label: '表面',
-    width: '80px',
+    width: '60px',
     align: 'center',
   },
   doorRail: {
@@ -174,22 +174,22 @@ const config: Tconfig = {
   },
   horsepower: {
     label: '馬力',
-    width: '110px',
+    width: '95px',
     align: 'right',
   },
   openType: {
     label: '開閉方式',
-    width: '80px',
+    width: '40px',
     align: 'center',
   },
   qty: {
     label: '數量',
-    width: '70px',
+    width: '40px',
     align: 'right',
   },
   unitPrice: {
     label: '單價',
-    width: '100%',
+    width: '85px',
     align: 'right',
   },
   priceTotal: {
@@ -199,7 +199,7 @@ const config: Tconfig = {
   },
   memo: {
     label: '備註',
-    width: '80px',
+    width: '95px',
     align: 'center',
   },
 };

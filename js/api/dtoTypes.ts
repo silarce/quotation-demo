@@ -111,7 +111,7 @@ export type TcustomerDto = {
   invoiceDistrict: string;
   invoiceAddress: string;
   contacts?: Tcontact[];
-  types?: {
+  types: {
     //客戶類型
     id: string;
     createdAt: string;
@@ -217,7 +217,8 @@ export type TerpFeatureDto = {
 // }
 export type TdailyReportItemDto = {
   readonly id: string;
-  readonly order: number;
+  // 用於設定item的排序
+  order: number;
   readonly createdAt: string; // date
   readonly updatedAt: string; //date
   periodOfDay: 'AM' | 'PM' | null;
@@ -267,6 +268,8 @@ export type TsetReportersDto = {
 };
 
 export type TcreateDailyReportItemDto = {
+  // 帶id代表修改舊有的item，沒id就是新增item
+  id?: string;
   periodOfDay: 'AM' | 'PM';
   customerName: string;
   contactName: string;
@@ -281,11 +284,13 @@ export type TcreateDailyReportItemDto = {
   stayLength: number; // 基本上是 1|0
   workerIds: string[] | null;
   workOrderNumber: string;
+  // 用於設定item的排序
+  order: number;
 };
 
 export type TupdateDailyReportDto = {
-  reviewerIds: string[];
-  examinerIds: string[];
+  // reviewerIds: string[];
+  // examinerIds: string[];
   items: TcreateDailyReportItemDto[];
 };
 
@@ -316,6 +321,17 @@ export type TaccountingReportDto = {
   statistic: TaccountingReportStatistic[];
 };
 
+export type TreviewerPresets = {
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+  reportEmployee: TemployeeDto;
+  reportEmployeeId: string;
+  reviewerEmployee: TemployeeDto;
+  reviewerEmployeeId: string;
+  type: 'reviewer' | 'examiner';
+};
+
 // =======================================================
 // =======================================================
 // =======================================================
@@ -331,7 +347,7 @@ export type TpaymentMethodDto = {
 
 /**舊合約產品 */
 export type TlegacyContractProductDto = {
-  readonly id: string;
+  id: string;
   /**date */
   createdAt: string;
   /**date */
@@ -378,11 +394,16 @@ export type TlegacyContractProductDto = {
   bounceDoor: boolean;
   /**備註 */
   notes: string;
+  //
+  /**批次 */
+  batch: number;
+  /**所屬批次編號 */
+  batchNumber: string;
 };
 
 /**舊合約額外項目 */
 export type TlegacyContractAdditionDto = {
-  readonly id: string;
+  id: string;
   /**date */
   createdAt: string;
   /**date */
@@ -399,6 +420,11 @@ export type TlegacyContractAdditionDto = {
   totalPrice: number;
   /**備註 */
   notes: string;
+  //
+  /**批次 */
+  batch: number;
+  /**所屬批次編號 */
+  batchNumber: string;
 };
 
 /**舊合約 */
@@ -468,8 +494,14 @@ export type TlegacyContractDto = {
   //
   /**客戶 */
   customer: TcustomerDto;
+  //
+  /**最新批次 */
+  latestBatch: number;
+  /**附屬合約編號 */
+  attachBatchNumbers: string[];
 };
 
+// 舊合約post主產品
 export type TcreateLegacyContractProductDto = {
   /**編號 */
   idNumber: number;
@@ -515,6 +547,11 @@ export type TcreateLegacyContractProductDto = {
   notes: string;
 };
 
+export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
+  // batchNumber?: string;
+  id?: string;
+};
+
 export type TcreateLegacyContractAdditionDto = {
   /**項目名 */
   itemName: string;
@@ -530,6 +567,11 @@ export type TcreateLegacyContractAdditionDto = {
   notes: string;
 };
 
+export type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {
+  // batchNumber?: string;
+  id?: string;
+};
+
 export type TcreateLegacyContractDto = {
   /* 客戶ID */
   customerId: string;
@@ -538,7 +580,7 @@ export type TcreateLegacyContractDto = {
   /* 報價時段 */
   quoteValidity?: string | null;
   /* 報價日期 date*/
-  quoteDate?: Date | null;
+  quoteDate?: string | null;
   /* 工程名稱 */
   projectName: string;
   /* 客戶名稱 */
@@ -570,7 +612,7 @@ export type TcreateLegacyContractDto = {
   /* 交貨地點 */
   deliveryLocation: string;
   /* 交貨日期 date*/
-  deliveryDate: Date;
+  deliveryDate: string | null;
   /* 付款方式 */
   paymentMethods: TpaymentMethodDto[];
   //
@@ -592,13 +634,27 @@ export type TcreateLegacyContractDto = {
   additions: TcreateLegacyContractAdditionDto[];
 };
 
+// export type TupdateLegacyContractDto = Partial<
+//   Omit<TcreateLegacyContractDto, 'products' | 'additions'> & {
+//     products: Partial<TcreateLegacyContractProductDto>[];
+//     additions: Partial<TcreateLegacyContractAdditionDto>[];
+//   }
+// >;
 export type TupdateLegacyContractDto = Partial<
   Omit<TcreateLegacyContractDto, 'products' | 'additions'> & {
-    products: Partial<TcreateLegacyContractProductDto>[];
-    additions: Partial<TcreateLegacyContractAdditionDto>[];
+    products: TupdateLegacyContractProductDto[];
+    additions: TupdateLegacyContractAdditionDto[];
   }
 >;
 
+export type TmodifyLegacyContractDto = {
+  products?: TupdateLegacyContractProductDto[];
+  additions?: TupdateLegacyContractAdditionDto[];
+  batchNumber: string;
+};
+
+// ==========================================================================
+// ==========================================================================
 // ==========================================================================
 // work-sheet
 
@@ -646,27 +702,6 @@ export type TquotationRangeDto = {
 
 // ==========================================================================
 
-export type TcreateQuotationContentDto = {
-  quotationNumber: string; // 報價單編號
-  version: number; // 版本號
-  quotationDate: Date; // 報價日期
-  validityPeriod: string; // 報價時效
-  customerId: string; // 客戶ID
-  projectName: string; // 工程名稱
-  county: string; // 縣市
-  district: string; // 區
-  contactPerson: string; //  聯絡人
-  contactNumber: string; //  聯絡電話
-  projectManager: string; // 承辦人
-  discount: number; // 總折數
-  quantity: string; // 樘數
-  editNotes: string; // 編輯備註
-  status: 'Budget' | 'bidding' | 'Contracting'; // 報價單狀態
-  managerId: string; // 經理ID
-  supervisorId: string; // 主管ID
-  agentId: string; // 經辦人ID
-};
-
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
@@ -694,4 +729,67 @@ export type TupdateDepartmentJobDto = {
   code?: string;
   id: string;
   jobs: TcreateDepartmentJobDto[];
+};
+
+// ==========================================================================
+
+// quotation
+// add comment
+export type TquotationContentDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  version: number;
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string; // 剩餘地址
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  discount: string; // 總折數
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  totalPrice: number; // 報價金額
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  customer: TcustomerDto;
+  managerEmployee: TemployeeDto | null;
+  supervisorEmployee: TemployeeDto | null;
+  agentEmployee: TemployeeDto;
+  //審核相關
+  reviewSalesEmployee: TemployeeDto | null;
+  salesReviewedAt: string | null;
+  reviewSupervisorEmployee: TemployeeDto | null;
+  supervisorReviewedAt: string | null;
+};
+
+export type TquotationDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  latestContent: TquotationContentDto;
+  contents: TquotationContentDto[];
+};
+
+export type TcreateQuotationContentDto = {
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  customerId: string; // 客戶ID
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string; // 剩餘地址
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  totalPrice: number; // 報價金額
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  managerId?: string | undefined | null; // 經理ID
+  supervisorId?: string | undefined | null; // 主管ID
+  agentId: string; // 經辦人ID
 };

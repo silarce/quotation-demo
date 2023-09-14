@@ -11,14 +11,17 @@ import QuotationProfile from 'components/page/domestic/quotation/legacyContract/
 import QuotationProduction from 'components/page/domestic/quotation/legacyContract/quotationProduct_legacyContract';
 import QuotationAdditions from 'components/page/domestic/quotation/legacyContract/quotationAdditions_legacyContract';
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
-import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
+import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
 
-// import QuotationPdf from "components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract"
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+
+// icon
+import iconUpload from 'public/image/icon/upload.svg';
 
 // css
 import style from './quotation.module.scss';
@@ -56,6 +59,9 @@ export default function Quotation() {
   return <TheQuotation router={router} />;
 }
 
+// =====================================================================
+// =====================================================================
+// =====================================================================
 function TheQuotation({ router }: { router: NextRouter }) {
   /**合約id，若為undefined就逮代表為新增合約 */
   const contractId = router.query.contractId as string | undefined;
@@ -69,8 +75,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
+  const latestBatch = legacyContract?.latestBatch;
+
   // 這是class
-  const { classLegacyContract, rewind } = useLegacyContract(legacyContract);
+  const { classLegacyContract, reset } = useLegacyContract({ contract: legacyContract, batch: 0 });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
@@ -155,37 +163,54 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const classSignature = classLegacyContract.classSignature;
-  const signatureArr = [
+  const signatureArr: { label: string; inputProps: TinputProps }[] = [
     {
       label: '經理',
-      signature: classSignature.managerName,
-      onChange: (v: string) => {
-        classSignature.managerName = v;
+      inputProps: {
+        props: {
+          value: classSignature.managerName,
+          onChange: (e) => {
+            classSignature.managerName = e.target.value;
+          },
+        },
       },
     },
     {
       label: '主管',
-      signature: classSignature.supervisorName,
-      onChange: (v: string) => {
-        classSignature.supervisorName = v;
+      inputProps: {
+        props: {
+          value: classSignature.supervisorName,
+          onChange: (e) => {
+            classSignature.supervisorName = e.target.value;
+          },
+        },
       },
     },
     {
       label: '經辦',
-      signature: classSignature.operatorName,
-      onChange: (v: string) => {
-        classSignature.operatorName = v;
+      inputProps: {
+        props: {
+          value: classSignature.operatorName,
+          onChange: (e) => {
+            classSignature.operatorName = e.target.value;
+          },
+        },
       },
     },
   ];
 
   useEffect(() => {
-    rewind();
+    if (allowEdit) {
+      return;
+    }
+
+    reset();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allowEdit, legacyContract]);
 
   // -----------------------------------------------------------------------
-  // const [showPdf, setShowPdf] = useState(false)
+  const [showPdf, setShowPdf] = useState(false);
   // -----------------------------------------------------------------------
   const tagList: TtagList = [
     {
@@ -204,6 +229,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         if (!postBody) {
           return;
+        }
+
+        if (!postBody.contractNumber) {
+          return myAlert.warning({ title: '請輸入合約編號' });
+        }
+
+        if (!postBody.projectName) {
+          return myAlert.warning({ title: '請輸入工程名稱' });
+        }
+
+        // if (!postBody.customerId) {
+        //   return myAlert.warning({ title: '請選擇客戶' });
+        // }
+
+        const { projectCity, projectDistrict, projectAddress } = postBody;
+
+        if (!projectCity && !projectDistrict && !projectAddress) {
+          return myAlert.warning({ title: '請輸入地址' });
         }
 
         try {
@@ -233,14 +276,50 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
   ];
+
+  const editBtn: TpanelList[number] = !latestBatch
+    ? {
+        type: 'myButton',
+        label: '編輯',
+        onClick: () => setAllowEdit(true),
+      }
+    : undefined;
+
   const panel_noEditable: TpanelList = [
-    // {
-    //   type: "myButton", label: "匯出舊合約", img: iconUpload.src,
-    //   onClick: () => setShowPdf(true)
-    // },
-    { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
-    // { type: "myButton", label: "送審", onClick: () => alert("送審") },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    !contractId
+      ? undefined
+      : {
+          type: 'myButton',
+          label: '追加追減',
+          onClick: () =>
+            router.push({
+              // target: '_blank', // 不能用
+              pathname: '/domestic/legacyContractIntegration/quotation/append',
+              query: {
+                contractId: router.query.contractId,
+                batch: latestBatch,
+              },
+            }),
+        },
+    {
+      type: 'myButton',
+      label: '匯出舊合約',
+      img: iconUpload.src,
+      onClick: () => setShowPdf(true),
+    },
+
+    editBtn,
+
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        // router.back()
+        router.push({
+          pathname: '/domestic/legacyContractIntegration',
+        });
+      },
+    },
   ];
 
   // -----------------------------------------------------------------------
@@ -271,7 +350,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <div className={style.active}>合約項目</div>
           </div>
           {/* 主產品設定 */}
-          <QuotationProduction legacyContract={classLegacyContract} disabled={!allowEdit} />
+          <QuotationProduction legacyContract={classLegacyContract} disabled={!allowEdit} isAppend={false} />
           {/* 其他設定 */}
           <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 備註/報價範圍/付款資訊 */}
@@ -280,10 +359,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
         </div>
       </div>
-      {/* <QuotationPdf
+      <QuotationPdf
         isVisable={showPdf}
-        onCancel={() => { setShowPdf(false) }}
-        classLegacyContract={classLegacyContract} /> */}
+        onCancel={() => {
+          setShowPdf(false);
+        }}
+        classLegacyContract={classLegacyContract}
+      />
     </SubLayer>
   );
 }

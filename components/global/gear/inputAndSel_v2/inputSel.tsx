@@ -5,7 +5,7 @@ import classNames from 'classnames';
 // component
 import Input, { TinputProps } from './cog/input';
 import Textarea, { TtextareaProps } from './cog/textarea';
-import MySelect, { TselectProps } from './cog/mySelect';
+import MySelect, { TselectProps, Toption } from './cog/mySelect';
 import MyDatePicker, { TdatePickerProps } from './cog/myDatePicker';
 import MyTimePicker, { TtimePickerProps } from './cog/myTimePicker';
 import MyTimePicker_mui, { TtimePickerProps_mui } from './cog/myTimePicker_mui';
@@ -14,13 +14,27 @@ import InputSelBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
+import { OptionWithIcon01 } from './selectCustom/optionWithIcon';
+import { SingleValueWithIcon01 } from './selectCustom/singleValueWithIcon';
 
 // css
 import scss from './inputSel.module.scss';
 
 type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
 
-export type { TinputSelProps, TselectProps, TinputProps, TtextareaProps, TinputSelBarProps_reduce };
+export type {
+  TinputSelProps,
+  //
+  TselectProps,
+  TinputProps,
+  TcheckboxProps,
+  TtextareaProps,
+  TinputSelBarProps_reduce,
+  TdatePickerProps,
+  TtimePickerProps,
+  TtimePickerProps_mui,
+  TinputSelBarProps,
+};
 
 // =============================================================================
 
@@ -142,10 +156,10 @@ export default function InputSel({
 
   return (
     <label
-      className={classNames(scss.label, className)}
+      className={classNames(scss.label, className, 'w-full')}
       style={wrapperStyle}
       onClick={(e) => {
-        if (inputSelBarProps) {
+        if (inputSelBarProps || checkBoxProps) {
           e.preventDefault();
         }
       }}
@@ -169,18 +183,18 @@ export default function InputSel({
         <Input
           wrapperClassName={classNames(fontClassName, inputProps.wrapperClassName)}
           wrapperStyle={inputProps.wrapperStyle}
-          inputAttr={{
+          props={{
             disabled,
             placeholder: `請輸入${caption ?? ''}`,
             //
-            ...inputProps.inputAttr,
+            ...inputProps.props,
             //
             onFocus: (e) => {
-              inputProps.inputAttr?.onFocus?.(e);
+              inputProps.props?.onFocus?.(e);
               setIsFocus(true);
             },
             onBlur: (e) => {
-              inputProps.inputAttr?.onBlur?.(e);
+              inputProps.props?.onBlur?.(e);
               setIsFocus(false);
             },
           }}
@@ -211,29 +225,87 @@ export default function InputSel({
         />
       )}
 
-      {selectProps && (
-        <MySelect
-          wrapperClassName={selectProps.wrapperClassName}
-          wrapperStyle={selectProps.wrapperStyle}
-          arrowType={selectProps.arrowType}
-          fontClassName={fontClassName}
-          props={{
-            isDisabled: disabled,
-            placeholder: `請輸入${caption ?? ''}`,
-            //
-            ...selectProps.props,
-            //
-            onFocus: (e) => {
-              selectProps.props?.onFocus?.(e);
-              setIsFocus(true);
-            },
-            onBlur: (e) => {
-              selectProps.props?.onBlur?.(e);
-              setIsFocus(false);
-            },
-          }}
-        />
-      )}
+      {selectProps &&
+        (() => {
+          const { dynaOptionsList, dynaOptionsKey, withIcon } = selectProps;
+
+          let dynyOptions: Toption[] | undefined = undefined;
+
+          if (dynaOptionsList && dynaOptionsKey) {
+            dynyOptions = dynaOptionsList[dynaOptionsKey];
+
+            if (selectProps.props && !selectProps.props.options) {
+              selectProps.props.options = dynyOptions;
+            }
+          }
+
+          let easyValue: Toption | undefined | null = undefined;
+          let easyDefaultValue: Toption | undefined | null = undefined;
+
+          if (selectProps.easyValue !== undefined) {
+            if (selectProps.easyValue === null || selectProps.easyValue === '') {
+              easyValue = null;
+            } else {
+              const options = selectProps.props?.options;
+
+              easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+                value: selectProps.easyValue,
+                label: selectProps.easyValue,
+              };
+            }
+          }
+
+          if (selectProps.easyDefaultValue !== undefined) {
+            if (selectProps.easyDefaultValue === null || selectProps.easyDefaultValue === '') {
+              easyDefaultValue = null;
+            } else {
+              const options = selectProps.props?.options;
+
+              easyDefaultValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+                value: selectProps.easyDefaultValue,
+                label: selectProps.easyDefaultValue,
+              };
+            }
+          }
+
+          const customComponents = withIcon
+            ? {
+                Option: OptionWithIcon01,
+                SingleValue: SingleValueWithIcon01,
+              }
+            : undefined;
+
+          return (
+            <MySelect
+              wrapperClassName={selectProps.wrapperClassName}
+              wrapperStyle={selectProps.wrapperStyle}
+              arrowType={selectProps.arrowType}
+              fontClassName={fontClassName}
+              props={{
+                isDisabled: disabled,
+                placeholder: `請輸入${caption ?? ''}`,
+                //
+                value: easyValue,
+                defaultValue: easyDefaultValue,
+                ...selectProps.props,
+                //
+                onFocus: (e) => {
+                  selectProps.props?.onFocus?.(e);
+                  setIsFocus(true);
+                },
+                onBlur: (e) => {
+                  selectProps.props?.onBlur?.(e);
+                  setIsFocus(false);
+                },
+                components: {
+                  ...customComponents,
+                  ...selectProps.props?.components,
+                },
+                options: selectProps.props?.options || dynyOptions,
+              }}
+            />
+          );
+        })()}
 
       {datePickerProps && (
         <MyDatePicker
@@ -306,9 +378,10 @@ export default function InputSel({
           wrapperClassName={classNames(checkBoxProps.wrapperClassName)}
           wrapperStyle={checkBoxProps.wrapperStyle}
           fontClassName={fontClassName}
+          disabled={disabled}
           isRadio={checkBoxProps.isRadio}
           onChange={checkBoxProps.onChange}
-          checkBoxArr={checkBoxProps.checkBoxArr}
+          propsArr={checkBoxProps.propsArr}
         />
       )}
 

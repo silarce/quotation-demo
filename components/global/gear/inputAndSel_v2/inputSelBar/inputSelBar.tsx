@@ -54,16 +54,16 @@ const InputSelBar = ({
               key={index}
               {...itemProps}
               wrapperClassName={classNames(fontClassName, itemProps?.wrapperClassName)}
-              inputAttr={{
+              props={{
                 disabled,
-                ...itemProps?.inputAttr,
+                ...itemProps?.props,
                 onFocus: (e) => {
                   onFocus && onFocus(e);
-                  itemProps?.inputAttr?.onFocus?.(e);
+                  itemProps?.props?.onFocus?.(e);
                 },
                 onBlur: (e) => {
                   onBlur && onBlur(e);
-                  itemProps?.inputAttr?.onBlur?.(e);
+                  itemProps?.props?.onBlur?.(e);
                 },
               }}
             />

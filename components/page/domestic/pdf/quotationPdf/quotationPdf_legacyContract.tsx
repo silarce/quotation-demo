@@ -1,10 +1,9 @@
 import React, { useState, useRef, Fragment } from 'react';
+import moment from 'moment';
+import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
 import Decimal from 'decimal.js';
-
-import _ from 'lodash';
 
 // component
 import Header from './header';
@@ -19,6 +18,9 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 
 // antd
 import Modal from 'antd/lib/modal/Modal';
+
+// config
+import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
 
 // css
 import scss from './quotationPdf.module.scss';
@@ -105,13 +107,15 @@ export default function QuotationPdf({
       projectAddress,
     } = classBasicInfo;
 
+    const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+
     return {
       quotationId: contractNumber,
       clientName: customerName,
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: (quoteDate as string) ?? '',
+      builtDate: dateString,
       projectAddress: projectCity + projectDistrict + projectAddress,
     };
   })();
@@ -145,9 +149,11 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+
       return {
         tradingLocation: deliveryLocation,
-        tradingDate: deliveryDate as string,
+        tradingDate: tradingDate,
         payWay,
       };
     })();
@@ -156,19 +162,21 @@ export default function QuotationPdf({
   })();
 
   const productArr: TtableProdList_series = (() => {
-    const classProdArr = classLegacyContract.classProductArr;
+    const classProdArr = classLegacyContract.prodArr;
 
     return classProdArr.map((prod) => {
       const size = `${prod.width || prod.length} X ${prod.height} + ${prod.thickness}`;
 
       return {
-        category: prod.idNumber,
+        category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
         thickness: prod.thickness,
         surface: prod.surface,
-        doorRail: prod.doorTrack,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        doorRail: doorTrackLookup[prod.doorTrack]?.icon,
         horsepower: prod.horsepower,
         openType: '',
         qty: prod.quantity,
@@ -333,10 +341,10 @@ const PdfTypeB = ({
 
     quoteTypeSumObj[key].qtySum = quoteTypeSumObj[key].qtySum + parseInt(qty);
     quoteTypeSumObj[key].unitPriceSum = new Decimal(quoteTypeSumObj[key].unitPriceSum)
-      .plus(unitPrice.replace(',', ''))
+      .plus(unitPrice.replaceAll(',', ''))
       .toNumber();
     quoteTypeSumObj[key].priceTotleSum = new Decimal(quoteTypeSumObj[key].priceTotleSum)
-      .plus(priceTotal.replace(',', ''))
+      .plus(priceTotal.replaceAll(',', ''))
       .toNumber();
   });
   const quoteTypeSumArr = Object.values(quoteTypeSumObj);

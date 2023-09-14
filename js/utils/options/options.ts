@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+//
+import { customerTypesLookup } from 'config/lookupTable';
+
 // tool
 import { generateYearArray } from 'js/tools/date/generateYearArray';
 
@@ -220,9 +223,9 @@ export const optionsCreator_horsepower = (): Toption[] => [
 ];
 // 報價單狀態
 export const optionsCreator_quotationState = (): Toption[] => [
-  { value: '預算', label: '預算' },
-  { value: '投標', label: '投標' },
-  { value: '發包', label: '發包' },
+  { value: 'Budget', label: '預算' },
+  { value: 'Bidding', label: '投標' },
+  { value: 'Contracting', label: '發包' },
 ];
 
 export const optionsCreator_month = ({
@@ -327,6 +330,29 @@ export const optionsCreator_mealsCost = (): Toption[] => {
     { value: 'lunch', label: '午餐' },
     { value: 'dinner', label: '晚餐' },
   ];
+};
+
+export const optionsCreator_customerType = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
+  const optionArr = Object.keys(customerTypesLookup).map((key) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const label = customerTypesLookup[key];
+
+    if (!label) {
+      console.log('錯誤的key', key);
+    }
+
+    return {
+      value: key,
+      label: label ?? '錯誤的key',
+    };
+  });
+
+  if (emptyOption) {
+    optionArr.unshift({ value: '', label: '不拘' });
+  }
+
+  return optionArr;
 };
 
 // export const optionsCreator_ =
