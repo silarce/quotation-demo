@@ -220,6 +220,9 @@ export default function EmployeeSelector({
             exceptEmpArr={exceptEmpArr}
             onClick={onClick}
           />
+
+          {selEmployeeArr.length !== 0 && <div className={scss.divider} />}
+
           <RowArr
             empArr={dataArr}
             selEmployeeArr={selEmployeeArr}

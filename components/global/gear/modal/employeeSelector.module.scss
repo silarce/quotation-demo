@@ -17,6 +17,10 @@
 .listContainer {
   height: 350px;
   padding: 0 1px;
+  .divider {
+    height: 5px;
+    background-color: gray;
+  }
 }
 .rowWrapper {
   &:nth-last-of-type(1) {
