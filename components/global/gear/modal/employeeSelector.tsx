@@ -30,9 +30,11 @@ export default function EmployeeSelector({
   selLimit,
   customParams,
   customFilter,
+  customPopulate,
   defaultEmpArr,
   exceptEmpArr,
   isCancelOnConfirm = true,
+  exceptEmpCheck,
 }: {
   showModal: boolean;
   onConfirm: (v: TemployeeDto[]) => void;
@@ -42,9 +44,11 @@ export default function EmployeeSelector({
   selLimit?: 1;
   customParams?: Tparams;
   customFilter?: Tparams['filter'];
+  customPopulate?: Tparams['populate'];
   defaultEmpArr?: TemployeeDto[];
   exceptEmpArr?: { id: string }[];
   isCancelOnConfirm?: boolean;
+  exceptEmpCheck?: (emp: TemployeeDto) => boolean;
 }) {
   const { rwd1023 } = useContext(AppContext);
 
@@ -59,7 +63,7 @@ export default function EmployeeSelector({
 
     return {
       pageSize: 20,
-      populate: ['jobs.department'],
+      populate: ['jobs.department', ...(customPopulate ?? [])],
       sort: 'idNumber',
       filter: {
         $or: {
@@ -219,6 +223,7 @@ export default function EmployeeSelector({
             selEmployeeArr={selEmployeeArr}
             exceptEmpArr={exceptEmpArr}
             onClick={onClick}
+            exceptEmpCheck={exceptEmpCheck}
           />
 
           {selEmployeeArr.length !== 0 && <div className={scss.divider} />}
@@ -230,6 +235,7 @@ export default function EmployeeSelector({
             exceptEmpArr={exceptEmpArr}
             onClick={onClick}
             // skipArr={defaultEmpArr}
+            exceptEmpCheck={exceptEmpCheck}
           />
           {/*  */}
         </div>
@@ -247,6 +253,7 @@ const RowArr = ({
   viewRef_bottom,
   exceptEmpArr,
   onClick,
+  exceptEmpCheck,
 }: {
   empArr: TemployeeDto[];
   selEmployeeArr: TemployeeDto[];
@@ -254,6 +261,7 @@ const RowArr = ({
   onClick: (v: TemployeeDto) => void;
   exceptEmpArr?: { id: string }[];
   viewRef_bottom?: (node?: Element | null | undefined) => void;
+  exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
 }) => {
   return (
     <>
@@ -270,7 +278,11 @@ const RowArr = ({
         })();
 
         const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
-        const isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+        let isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+
+        if (!isExcept && exceptEmpCheck) {
+          isExcept = exceptEmpCheck(emp);
+        }
         // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
 
         const theOnClick = isExcept ? undefined : () => onClick(emp);
