@@ -214,37 +214,79 @@ export default function EmployeeSelector({
     >
       <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={scss.listContainer}>
-          {dataArr.map((emp, index, arr) => {
-            const { idNumber, chName, jobs } = emp;
-            const { name, grade, department } = jobs?.[0] ?? {};
-
-            const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
-
-            const theViewRef = (() => {
-              if (arr.length - 11 === index) {
-                return viewRef_bottom;
-              }
-
-              return undefined;
-            })();
-
-            const isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
-
-            const theOnClick = isExcept ? undefined : () => onClick(emp);
-
-            return (
-              <CellWithBar key={index} isActive={isActive}>
-                <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={theViewRef}>
-                  <span className={scss.idNumber}>{idNumber}</span>
-                  <span>{chName}</span>
-                  <span>{name ? `${department?.name} / ${name}` : ''}</span>
-                  <span>{grade && `Level ${grade}`}</span>
-                </div>
-              </CellWithBar>
-            );
-          })}
+          <RowArr
+            empArr={defaultEmpArr ?? []}
+            selEmployeeArr={selEmployeeArr}
+            exceptEmpArr={exceptEmpArr}
+            onClick={onClick}
+          />
+          <RowArr
+            empArr={dataArr}
+            selEmployeeArr={selEmployeeArr}
+            viewRef_bottom={viewRef_bottom}
+            exceptEmpArr={exceptEmpArr}
+            onClick={onClick}
+            skipArr={defaultEmpArr}
+          />
+          {/*  */}
         </div>
       </LoadingCoverWrapper01>
     </SelectorShell>
   );
 }
+
+// =========================================================
+
+const RowArr = ({
+  empArr,
+  selEmployeeArr,
+  skipArr,
+  viewRef_bottom,
+  exceptEmpArr,
+  onClick,
+}: {
+  empArr: TemployeeDto[];
+  selEmployeeArr: TemployeeDto[];
+  skipArr?: TemployeeDto[];
+  onClick: (v: TemployeeDto) => void;
+  exceptEmpArr?: { id: string }[];
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
+}) => {
+  return (
+    <>
+      {empArr.map((emp, index, arr) => {
+        const { idNumber, chName, jobs } = emp;
+        const { name, grade, department } = jobs?.[0] ?? {};
+
+        const theViewRef = (() => {
+          if (arr.length - 11 === index) {
+            return viewRef_bottom;
+          }
+
+          return undefined;
+        })();
+
+        const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
+        const isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+        const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
+
+        const theOnClick = isExcept ? undefined : () => onClick(emp);
+
+        if (isSkinp) {
+          return <div key={index} className="skip" ref={theViewRef}></div>;
+        }
+
+        return (
+          <CellWithBar key={index} isActive={isActive}>
+            <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={theViewRef}>
+              <span className={scss.idNumber}>{idNumber}</span>
+              <span>{chName}</span>
+              <span>{name ? `${department?.name} / ${name}` : ''}</span>
+              <span>{grade && `Level ${grade}`}</span>
+            </div>
+          </CellWithBar>
+        );
+      })}
+    </>
+  );
+};
