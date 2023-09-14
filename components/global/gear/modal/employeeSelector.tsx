@@ -88,7 +88,7 @@ export default function EmployeeSelector({
       return;
     }
 
-    setSelEmployeeArr([]);
+    // setSelEmployeeArr([]);
     reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -215,7 +215,7 @@ export default function EmployeeSelector({
       <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={scss.listContainer}>
           <RowArr
-            empArr={defaultEmpArr ?? []}
+            empArr={selEmployeeArr ?? []}
             selEmployeeArr={selEmployeeArr}
             exceptEmpArr={exceptEmpArr}
             onClick={onClick}
@@ -226,7 +226,7 @@ export default function EmployeeSelector({
             viewRef_bottom={viewRef_bottom}
             exceptEmpArr={exceptEmpArr}
             onClick={onClick}
-            skipArr={defaultEmpArr}
+            // skipArr={defaultEmpArr}
           />
           {/*  */}
         </div>
@@ -240,14 +240,14 @@ export default function EmployeeSelector({
 const RowArr = ({
   empArr,
   selEmployeeArr,
-  skipArr,
+  // skipArr,
   viewRef_bottom,
   exceptEmpArr,
   onClick,
 }: {
   empArr: TemployeeDto[];
   selEmployeeArr: TemployeeDto[];
-  skipArr?: TemployeeDto[];
+  // skipArr?: TemployeeDto[];
   onClick: (v: TemployeeDto) => void;
   exceptEmpArr?: { id: string }[];
   viewRef_bottom?: (node?: Element | null | undefined) => void;
@@ -268,13 +268,13 @@ const RowArr = ({
 
         const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
         const isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
-        const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
+        // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
 
         const theOnClick = isExcept ? undefined : () => onClick(emp);
 
-        if (isSkinp) {
-          return <div key={index} className="skip" ref={theViewRef}></div>;
-        }
+        // if (isSkinp) {
+        //   return <div key={index} className="skip" ref={theViewRef}></div>;
+        // }
 
         return (
           <CellWithBar key={index} isActive={isActive}>
