@@ -38,8 +38,8 @@ import { AppContext } from 'pages/_app';
 // ------------------------------------------------------------------
 
 // 假資料與fake api
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 import { useQuotation } from 'hooks/quotation/useQuotation';
+import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
 import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 

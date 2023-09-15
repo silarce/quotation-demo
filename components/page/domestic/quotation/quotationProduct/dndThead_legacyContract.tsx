@@ -26,7 +26,7 @@ import TheadItem from './dndThead/theadItem';
 import style from './dndThead.module.scss';
 import styleL from '../local.module.scss';
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 // =========================================================
 // =========================================================

@@ -28,7 +28,7 @@ import style from './quotation.module.scss';
 // ========================================================================
 // ========================================================================
 // hook
-import { useLegacyContract } from 'hooks/quotation/useLegacyContract';
+import { useLegacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 // ========================================================================
 // ========================================================================
 // api
