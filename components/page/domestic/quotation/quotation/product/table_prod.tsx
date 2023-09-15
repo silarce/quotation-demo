@@ -3,27 +3,34 @@ import classNames from 'classnames';
 
 // components
 import DndThead from '../DndThead';
+import Tbody_prod from './tbody_prod';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { TcellConfig, TprodKey } from 'hooks/quotation/useProduct';
+import { TcellConfig, TprodKey, TproductList } from 'hooks/quotation/useProduct';
 
 import scss from './table_prod.module.scss';
 import scss_p from '../public.module.scss';
 
 export default function Table_prod({
   disabled,
+  prodList,
   prodCellConfig,
   prodKeyArr,
   changeProdKeyArr,
+  addProd,
 }: {
   disabled: boolean;
+  prodList: TproductList;
   prodCellConfig: TcellConfig;
-  prodKeyArr: string[];
+  prodKeyArr: TprodKey[];
   changeProdKeyArr: (arr: TprodKey[]) => void;
+  addProd: () => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
+
+  // console.log(prodList);
 
   return (
     <div className={scss_p.tableContainer}>
@@ -42,7 +49,7 @@ export default function Table_prod({
               cellConfigList={prodCellConfig}
               allowMove={allowMove}
               resetTrigger={prodKeyArr.length}
-              emptyBlockWidth="auto"
+              emptyBlockWidth="137px"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as TprodKey[];
                 changeProdKeyArr(keyArr);
@@ -59,9 +66,12 @@ export default function Table_prod({
               setVerticalKeyArr(v);
             }}
           /> */}
+
+          <Tbody_prod disabled={disabled} prodList={prodList} prodKeyArr={prodKeyArr} prodCellConfig={prodCellConfig} />
+
           {!disabled && (
             <div className={classNames(scss_p.addBtnWrapper)}>
-              <MyButton_v2 className={scss_p.addBtn} label="新增產品" onClick={undefined} />
+              <MyButton_v2 className={scss_p.addBtn} label="新增產品" onClick={addProd} />
             </div>
           )}
         </div>

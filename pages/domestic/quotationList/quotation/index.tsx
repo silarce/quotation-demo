@@ -99,7 +99,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
   // 是否可編輯
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
   const {
     id, //報價單id //若為新增報價單則為undefined
@@ -542,9 +542,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
           <Table_prod
             disabled={disabled}
+            prodList={productList}
             prodCellConfig={prodCellConfig}
             prodKeyArr={prodKeyArr}
             changeProdKeyArr={changeProdKeyArr}
+            addProd={addProd}
           />
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
@@ -563,8 +565,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
             getFakeQuotaRange={getFakeQuotaRange}
             disabled={!allowEdit}
           /> */}
+
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
+          {/*  */}
+          {/*  */}
+          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
+          {/*  */}
+          {/*  */}
+
           {/* 審核人員 */}
           <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
             <InputSel

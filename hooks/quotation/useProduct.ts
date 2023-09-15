@@ -30,15 +30,18 @@ type TproductList = {
 
 // =======================================================================
 const useProductList = () => {
-  const [render, serRender] = useState(0);
-  const reRender: TreRender = () => serRender(render + 1);
+  const [render, setRender] = useState(0);
+  const reRender: TreRender = () => setRender((state) => ++state);
 
-  // ---------------------------------------------------------Z
+  // 之後要記得做計算小計功能
+  // 之後要記得做計算小計功能
+  // 之後要記得做計算小計功能
+  // 之後要記得做計算小計功能
+
+  // ---------------------------------------------------------
   // product
   const [prodKeyArr, setProdKeyArr] = useState<TprodKey[]>([]);
   const [productList, setProductList] = useState<TproductList>({});
-
-  console.log(prodKeyArr);
 
   const changeProdKeyArr = (v: TprodKey[]) => {
     setProdKeyArr(v);
@@ -51,22 +54,21 @@ const useProductList = () => {
   };
 
   const copySelf = (copyKey: string) => {
-    const copy = { ...productList };
-    const newKey = String(Object.keys(copy).length);
+    const newKey = String(Object.keys(productList).length);
     alert('未完成');
     reRender();
   };
 
   const addProd = () => {
-    const copy = { ...productList };
-    const newKey = String(Object.keys(copy).length);
+    const newKey = String(Object.keys(productList).length);
     const classProd = new Class_product({
       reRender,
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
     });
-    copy[newKey] = classProd;
-    setProductList(copy);
+    productList[newKey] = classProd;
+    reRender();
+    // setProductList(copy);
   };
 
   useEffect(() => {
@@ -96,5 +98,5 @@ const useProductList = () => {
   };
 };
 
-export { useProductList };
-export type { TreRender, TcellConfig, TprodKey };
+export { useProductList, prodCellConfig };
+export type { TreRender, TcellConfig, TprodKey, Class_product, TproductList };

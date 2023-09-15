@@ -47,24 +47,78 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
 
+  readonly options_doorTrack_normal = options_doorTrack_normal;
+  readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+
+  // ---------------------------------------------------------
+
+  get options_doorTrack() {
+    if (this.typhoonProtection) {
+      return this.options_doorTrack_typhoonProtection;
+    } else {
+      return this.options_doorTrack_normal;
+    }
+  }
+
+  private countTotalPrice() {
+    const quantity = this.quantity.replace(/,/g, '') || 0;
+    const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
+    const total = Decimal.mul(quantity, unitPrice).toString();
+    this.totalPrice = total;
+  }
+
+  private calcArea = () => {
+    const area = Decimal.add(this._prodData.height || '0', this._prodData.thickness || '0') // h+b
+      /** "0"被視為true，所以用型別為number的值來計算 */
+      .mul(this._prodData.width || this._prodData.length || '0') // *w or *h
+      .toFixed(2)
+      .toString();
+
+    return area;
+  };
+
+  /**計算才數 */
+  private calcVolume = () => {
+    return Decimal.mul(this.area || 0, 10.89)
+      .toFixed(2)
+      .toString();
+  };
+
   // ---------------------------------------------------------
 
   get discountRate() {
     return this._prodData.discountRate;
   }
   set discountRate(v) {
-    this._prodData.discountRate = v;
+    if ((v as string) === '') {
+      v = '0';
+    }
+
+    if (Number(v) > 100) {
+      v = '100';
+    }
+
+    if (v.split('.')[1]?.length > 2) {
+      return;
+    }
+
+    this._prodData.discountRate = `${Number(v)}`;
     this.reRender();
   }
-
+  // set discountRate_noLoop(v) {}
+  //
   get itemName() {
     return this._prodData.itemName;
   }
   set itemName(v) {
+    if (v.length >= 11) {
+      v = v.slice(0, 10);
+    }
+
     this._prodData.itemName = v;
     this.reRender();
   }
-
+  //
   get quoteType() {
     return this._prodData.quoteType;
   }
@@ -72,7 +126,7 @@ class Class_product {
     this._prodData.quoteType = v;
     this.reRender();
   }
-
+  //
   get doorType() {
     return this._prodData.doorType;
   }
@@ -81,47 +135,56 @@ class Class_product {
     this._prodData.doorType = v;
     this.reRender();
   }
-
+  //
   get length() {
     return this._prodData.length;
   }
   set length(v) {
     this._prodData.length = v;
+    this._prodData.width = '0';
+    this.area = this.calcArea();
     this.reRender();
   }
-
+  //
   get width() {
     return this._prodData.width;
   }
   set width(v) {
     this._prodData.width = v;
+    this._prodData.length = '0';
+    this.area = this.calcArea();
     this.reRender();
   }
-
+  //
   get height() {
     return this._prodData.height;
   }
   set height(v) {
     this._prodData.height = v;
+    this.area = this.calcArea();
     this.reRender();
   }
-
+  //
+  /**B(m) */
   get thickness() {
     return this._prodData.thickness;
   }
   set thickness(v) {
     this._prodData.thickness = v;
+    this.area = this.calcArea();
     this.reRender();
   }
-
+  //
   get area() {
     return this._prodData.area;
   }
   set area(v) {
     this._prodData.area = v;
+    this.volume = this.calcVolume();
     this.reRender();
   }
-
+  //
+  /** 才數*/
   get volume() {
     return this._prodData.volume;
   }
@@ -129,7 +192,7 @@ class Class_product {
     this._prodData.volume = v;
     this.reRender();
   }
-
+  //
   get material() {
     return this._prodData.material;
   }
@@ -137,7 +200,7 @@ class Class_product {
     this._prodData.material = v;
     this.reRender();
   }
-
+  //
   get surface() {
     return this._prodData.surface;
   }
@@ -168,22 +231,46 @@ class Class_product {
   set quantity(v) {
     this._prodData.quantity = Number(v);
     this._quantity = v;
+    this.countTotalPrice();
     this.reRender();
   }
 
   get unitPrice() {
-    return this._unitPrice;
+    if (!this._unitPrice) {
+      return '';
+    }
+
+    return Number(this._unitPrice).toLocaleString();
   }
   set unitPrice(v) {
+    v = v.replace(/,/g, '');
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+
+    if (!numberRegex.test(v)) {
+      return;
+    }
+
     this._prodData.unitPrice = Number(v);
     this._unitPrice = v;
+    this.countTotalPrice();
     this.reRender();
   }
 
   get totalPrice() {
-    return this._totalPrice;
+    if (!this._totalPrice) {
+      return '';
+    }
+
+    return Number(this._totalPrice).toLocaleString();
   }
   set totalPrice(v) {
+    v = v.replace(/,/g, '');
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+
+    if (!numberRegex.test(v)) {
+      return;
+    }
+
     this._prodData.totalPrice = Number(v);
     this._totalPrice = v;
     this.reRender();
@@ -194,6 +281,7 @@ class Class_product {
   }
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
+    this._prodData.doorTrack = '';
     this.reRender();
   }
 
@@ -212,6 +300,8 @@ class Class_product {
     this._prodData.notes = v;
     this.reRender();
   }
+
+  //-----------------------------------------
 } // Class_product close
 
 // ===========================================================
@@ -497,7 +587,24 @@ const prodCellConfig: TprodCellConfig = {
       },
     },
   },
+  //
 };
+
+/**
+ *
+ * 馬達廠商
+ * 電壓
+ * 馬達支撐架
+ * 底座類型
+ * 馬達鎖盒
+ * 門軌厚度
+ * 捲軸規格
+ * 門軌消音條
+ * 一體式捲箱
+ * 捲箱厚度
+ * 開閉方式
+ *
+ */
 
 const emptyProdOri: () => Tprod = () => {
   return {
