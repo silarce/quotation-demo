@@ -42,7 +42,7 @@ export default function Table_prod({
               cellConfigList={prodCellConfig}
               allowMove={allowMove}
               resetTrigger={prodKeyArr.length}
-              emptyBlockWidth="100px"
+              emptyBlockWidth="auto"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as TprodKey[];
                 changeProdKeyArr(keyArr);

@@ -101,12 +101,11 @@ export default function DndThead({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
+        <DragOverlay dropAnimation={null} />
         <SortableContext items={dndKeyArr} strategy={horizontalListSortingStrategy}>
           {dndKeyArr.map((key, index) => {
             // const theadInfo = prodCellConfig.cellConfig[key];
-
             const { label, inputSelProps, theadItemClassName } = cellConfigList[key];
-
             const theadInfo = {
               id: key,
               label,
@@ -160,7 +159,7 @@ function TheadItem({
     // }
   });
 
-  const itemStyle = {
+  const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     width,
@@ -171,7 +170,6 @@ function TheadItem({
   return (
     <div
       className={classNames(
-        //
         scss_p.theadCell,
         allowMove && scss_p.allowMove,
         isMoving && scss_p.isMoving,
@@ -179,7 +177,7 @@ function TheadItem({
         'relative'
       )}
       ref={setNodeRef}
-      style={itemStyle}
+      style={style}
       {...attributes}
       {...listeners}
     >
