@@ -34,7 +34,7 @@ import scss from './erpFuncPermissions.module.scss';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // config
-import { hrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
+import { useHrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // =============================================================================
@@ -142,7 +142,7 @@ export default function ErpFuncPermissions() {
   // --------------------------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader02 linkList={hrManageLinkArr} />
+      <PageHeader02 linkList={useHrManageLinkArr()} />
 
       <div className={scss.body}>
         {erpArr.map((erp) => {

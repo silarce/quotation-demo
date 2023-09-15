@@ -31,7 +31,7 @@ import {
 import { TemployeeDto } from 'js/api/api_employee';
 
 // config
-import { hrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
+import { useHrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
 
 // ==========================================================================
 export default function HrManage() {
@@ -130,7 +130,7 @@ export default function HrManage() {
   // --------------------------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader02 linkList={hrManageLinkArr} />
+      <PageHeader02 linkList={useHrManageLinkArr()} />
 
       <div className={scss.body}>
         {dataArr.map((item, index) => {
