@@ -12,7 +12,7 @@ import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/
 import style from './payInfo.module.scss';
 
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 export default function PayInfo_legacy({
   legacyContract,

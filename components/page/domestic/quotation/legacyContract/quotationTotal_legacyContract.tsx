@@ -6,7 +6,7 @@ import Appendix from '../quotationTotal/appendix_legacy_noReview';
 // css
 import style from '../quotationTotal.module.scss';
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 

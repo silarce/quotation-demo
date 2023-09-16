@@ -29,6 +29,9 @@ import {
   useApiGetReviewerPresets,
 } from 'js/api/api_dailyReport';
 
+// config
+import { useHrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
+
 // ===================================================================
 
 type TreviewerPresets = {
@@ -329,7 +332,7 @@ export default function SetReviewer() {
 
   return (
     <SubLayer isLoading_subLayer={dataIsLoading || isLoading}>
-      <PageHeader02 tag="審核設定" panelList={panelList} />
+      <PageHeader02 linkList={useHrManageLinkArr()} panelList={panelList} />
       <div className={scss.main}>
         <Thead />
         <div>

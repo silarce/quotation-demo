@@ -17,11 +17,11 @@ import iconMove from 'public/image/icon/move.svg';
 import scss from './productList.module.scss';
 // type
 
-import { TprodCellConfig } from 'hooks/quotation/useLegacyContract';
+import { TprodCellConfig } from 'hooks/quotation/legacy/useLegacyContract';
 
 // ==========================================================
 // ==========================================================
-import { Class_legacyContract, Class_product } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract, Class_product } from 'hooks/quotation/legacy/useLegacyContract';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 

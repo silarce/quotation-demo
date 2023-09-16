@@ -34,7 +34,7 @@ import scss from './productList.module.scss';
 
 // ==========================================================
 // ==========================================================
-import { Class_legacyContract, Class_product } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract, Class_product } from 'hooks/quotation/legacy/useLegacyContract';
 
 // ==========================================================
 // ==========================================================
