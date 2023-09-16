@@ -795,6 +795,11 @@ export type TcreateQuotationContentDto = {
 };
 
 // ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
 
 export type TdoorMaterialDto = {
   id: string;
@@ -805,16 +810,17 @@ export type TdoorMaterialDto = {
 };
 
 export type TdoorModelInfoDto = {
+  // 從name來看，get /products/door/modelsu取得的陣列應該會有7個item，但實際上只有兩個?
   name: 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
-  density: number;
+  density: number; // 密度?
   guideRails: {
     imgSrc: string;
-    opening: string;
+    opening: string; // 印象中好像跟圖片中的開口有關??
     thickness: string;
-    withHook: string | null;
+    withHook: string | null; // 防颱勾?
   }[];
   thickness: string;
-  slatMaterials: TdoorMaterialDto[];
+  slatMaterials: TdoorMaterialDto[]; // 支板材質?
 };
 
 export type TdoorGeneralSpecsMotorBoxPropertyDto = {
@@ -970,12 +976,12 @@ export type TdoorHeadBoxDto = {
 };
 
 export type TdoorComponentListDto = {
-  slats: TdoorSlatDto[];
-  bottomBars: TdoorBottomBarDto[];
-  guideRails: TdoorGuideRailDto[];
-  sidePlates: TdoorSidePlateDto[];
-  rollers: TdoorRollerDto[];
-  motors: TdoorMotorDto[];
-  motorAccessories: TdoorMotorAccessoriesDto[];
-  headBoxes: TdoorHeadBoxDto[];
+  slats: TdoorSlatDto[]; // 支版
+  bottomBars: TdoorBottomBarDto[]; // 底座
+  guideRails: TdoorGuideRailDto[]; // 門軌?
+  sidePlates: TdoorSidePlateDto[]; // ??
+  rollers: TdoorRollerDto[]; // 卷軸
+  motors: TdoorMotorDto[]; // 馬達
+  motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件?
+  headBoxes: TdoorHeadBoxDto[]; // 捲箱
 };

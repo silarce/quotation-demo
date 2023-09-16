@@ -427,8 +427,9 @@ const prodCellConfig: TprodCellConfig = {
       },
     },
   },
+  /**全寬 在product系列api的key為WG */
   width: {
-    label: 'W(m)',
+    label: 'W(m)', // 全寬
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
