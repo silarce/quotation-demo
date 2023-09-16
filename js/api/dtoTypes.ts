@@ -793,3 +793,189 @@ export type TcreateQuotationContentDto = {
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
 };
+
+// ========================================================================
+
+export type TdoorMaterialDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  code: string; //材質代號
+  name: string; //材質名稱
+};
+
+export type TdoorModelInfoDto = {
+  name: 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+  density: number;
+  guideRails: {
+    imgSrc: string;
+    opening: string;
+    thickness: string;
+    withHook: string | null;
+  }[];
+  thickness: string;
+  slatMaterials: TdoorMaterialDto[];
+};
+
+export type TdoorGeneralSpecsMotorBoxPropertyDto = {
+  boxB: number;
+  boxD: number;
+};
+export type TdoorGeneralSpecsMotorBoxDto = {
+  default: TdoorGeneralSpecsMotorBoxPropertyDto;
+  大同: TdoorGeneralSpecsMotorBoxPropertyDto;
+  東元: TdoorGeneralSpecsMotorBoxPropertyDto;
+};
+
+export type TdoorGeneralSpecsMotorDto = {
+  box: TdoorGeneralSpecsMotorBoxDto;
+  hp: string;
+};
+
+export type TdoorGeneralSpecsDto = {
+  bearingHousingSize: number;
+  bearingHousingTotalLength: number;
+  bearingInnerDiameter: string;
+  bearingName: string;
+  defaultMotorIndex: number;
+  density: number;
+  diameter: number;
+  gapA: number;
+  gapC: number;
+  motors: TdoorGeneralSpecsMotorDto[];
+  sprocketWheelModel: string;
+  sprocketWheelTeethNumber: string;
+  thickness: string;
+  weight: number;
+};
+
+export type TdoorSlatDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  isAntiTyphoon: boolean;
+};
+
+export type TdoorBottomBarDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  isAntiTyphoon: boolean;
+  isWaterProof: boolean;
+  hasAluminumBarrier: boolean; // 鋁障感
+};
+
+export type TdoorGuideRailDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  thickness: string | null;
+  inAntiTyphoon: boolean;
+  /**消音條 */
+  hasSilencingStrip: boolean; // 消音條
+};
+
+export type TdoorSidePlateDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  bearingType: string | null; // 軸承
+  gearNumber: string | null; // 鍊齒輪番號
+  /**一體式捲箱 */
+  isIntegrated: boolean | null; // 一體式捲箱
+  motorVendor: string | null; // 馬達廠商
+  maxDoorWeight: number | null; // 最大門重量(kg)
+  minDoorWeight: number | null; // 最小門重量(kg)
+};
+
+export type TdoorRollerDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  /**直徑(inch) */
+  diameter: string; // 直徑(inch)
+};
+
+export type TdoorMotorDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  horsePower: string; // 馬力數
+  gearNumber: string; // 鍊齒輪番號
+  motorVendor: string | null; // 馬達廠商
+  phase: number | null; // 相位
+  /**電壓(V) */
+  voltage: number | null; // 電壓(V)
+  /**荷重(kg) */
+  loadWeight: number | null; // 荷重(kg)
+  hasSupportStand: string | null; // 有腳
+};
+
+export type TdoorMotorAccessoriesDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  /**鍊條排數 */
+  chains: number; // 鍊條排數
+  /**軸承 */
+  bearingType: string; // 軸承
+};
+
+export type TdoorHeadBoxDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+  thickness: string; // 厚度
+  /**一體式捲箱 */
+  isIntegrated: boolean; // 一體式捲箱
+};
+
+export type TdoorComponentListDto = {
+  slats: TdoorSlatDto[];
+  bottomBars: TdoorBottomBarDto[];
+  guideRails: TdoorGuideRailDto[];
+  sidePlates: TdoorSidePlateDto[];
+  rollers: TdoorRollerDto[];
+  motors: TdoorMotorDto[];
+  motorAccessories: TdoorMotorAccessoriesDto[];
+  headBoxes: TdoorHeadBoxDto[];
+};
