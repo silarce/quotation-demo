@@ -300,6 +300,97 @@ class Class_product {
     this._prodData.notes = v;
     this.reRender();
   }
+  //
+  //
+  //
+  get motorVendor() {
+    return this._prodData.motorVendor;
+  }
+  set motorVendor(v) {
+    this._prodData.motorVendor = v;
+    this.reRender();
+  }
+  //
+  get voltage() {
+    return this._prodData.voltage;
+  }
+  set voltage(v) {
+    this._prodData.voltage = v;
+    this.reRender();
+  }
+  //
+  get hasSupportStand() {
+    return this._prodData.hasSupportStand;
+  }
+  set hasSupportStand(v) {
+    this._prodData.hasSupportStand = v;
+    this.reRender();
+  }
+  //
+  get bottomBar() {
+    return this._prodData.bottomBar;
+  }
+  set bottomBar(v) {
+    this._prodData.bottomBar = v;
+    this.reRender();
+  }
+  //
+  get lockBox() {
+    return this._prodData.lockBox;
+  }
+  set lockBox(v) {
+    this._prodData.lockBox = v;
+    this.reRender();
+  }
+  //
+  get railThick() {
+    return this._prodData.railThick;
+  }
+  set railThick(v) {
+    this._prodData.railThick = v;
+    this.reRender();
+  }
+  //
+  get rollerType() {
+    return this._prodData.rollerType;
+  }
+  set rollerType(v) {
+    this._prodData.rollerType = v;
+    this.reRender();
+  }
+  //
+  get hasSilencingStrip() {
+    return this._prodData.hasSilencingStrip;
+  }
+  set hasSilencingStrip(v) {
+    this._prodData.hasSilencingStrip = v;
+    this.reRender();
+  }
+  //
+  get isIntegrated() {
+    return this._prodData.isIntegrated;
+  }
+  set isIntegrated(v) {
+    this._prodData.isIntegrated = v;
+    this.reRender();
+  }
+  //
+  get headBoxThick() {
+    return this._prodData.headBoxThick;
+  }
+  set headBoxThick(v) {
+    this._prodData.headBoxThick = v;
+    this.reRender();
+  }
+  //
+  get openWay() {
+    return this._prodData.openWay;
+  }
+  set openWay(v) {
+    this._prodData.openWay = v;
+    this.reRender();
+  }
+  //
 
   //-----------------------------------------
 } // Class_product close
@@ -334,6 +425,18 @@ type Tprod = {
   typhoonProtection: boolean;
   bounceDoor: boolean;
   notes: string;
+  //
+  motorVendor: string; // 馬達廠商
+  voltage: string; // 電壓
+  hasSupportStand: boolean; // 馬達支撐架
+  bottomBar: string; // 底座類型
+  lockBox: string; // 馬達鎖盒
+  railThick: string; // 門軌厚度
+  rollerType: string; // 捲軸規格
+  hasSilencingStrip: boolean; // 門軌消音條
+  isIntegrated: boolean; // 一體式捲箱
+  headBoxThick: string; // 捲箱厚度
+  openWay: string; // 開閉方式
 };
 
 type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -360,6 +463,18 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'typhoonProtection',
     'bounceDoor',
     'notes',
+    //
+    'motorVendor', // 馬達廠商
+    'voltage', // 電壓
+    'hasSupportStand', // 馬達支撐架
+    'bottomBar', // 底座類型
+    'lockBox', // 馬達鎖盒
+    'railThick', // 門軌厚度
+    'rollerType', // 捲軸規格
+    'hasSilencingStrip', // 門軌消音條
+    'isIntegrated', // 一體式捲箱
+    'headBoxThick', // 捲箱厚度
+    'openWay', // 開閉方式
   ];
 };
 
@@ -589,7 +704,154 @@ const prodCellConfig: TprodCellConfig = {
     },
   },
   //
-};
+  //
+  //
+  motorVendor: {
+    label: '馬達廠商',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '東元', label: '東元' },
+            { value: '大同', label: '大同' },
+          ],
+        },
+      },
+    },
+  },
+  voltage: {
+    label: '電壓',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '220V', label: '220V' },
+            { value: '380V', label: '380V' },
+          ],
+        },
+      },
+    },
+  },
+  hasSupportStand: {
+    label: '馬達支撐架',
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      checkBoxProps: {
+        wrapperStyle: { justifyContent: 'center' },
+        propsArr: [{ key: 'hasSupportStand' }],
+      },
+    },
+  },
+  bottomBar: {
+    label: '底座類型',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: 'none', label: '無' },
+            { value: '鋁障感型', label: '鋁障感型' },
+            { value: '止水型', label: '止水型' },
+          ],
+        },
+      },
+    },
+  },
+  lockBox: {
+    label: '馬達鎖盒',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '外露', label: '外露' },
+            { value: '防盜', label: '防盜' },
+          ],
+        },
+      },
+    },
+  },
+  railThick: {
+    label: '門軌厚度',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            // { value: '1.0T', label: '1.0T' },
+            // { value: '3.0T', label: '3.0T' },
+            // { value: '4.5T', label: '4.5T' },
+            { value: 'api給', label: 'api給' },
+          ],
+        },
+      },
+    },
+  },
+  rollerType: {
+    label: '捲軸規格',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '無凸', label: '無凸' },
+            { value: '雙凸', label: '雙凸' },
+          ],
+        },
+      },
+    },
+  },
+  hasSilencingStrip: {
+    label: '門軌消音條',
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      checkBoxProps: {
+        wrapperStyle: { justifyContent: 'center' },
+        propsArr: [{ key: 'hasSilencingStrip' }],
+      },
+    },
+  },
+  isIntegrated: {
+    label: '一體式捲箱',
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      checkBoxProps: {
+        wrapperStyle: { justifyContent: 'center' },
+        propsArr: [{ key: 'isIntegrated' }],
+      },
+    },
+  },
+  headBoxThick: {
+    label: '捲箱厚度',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            // { value: '0.8T', label: '0.8T' },
+            { value: 'api給', label: 'api給' },
+          ],
+        },
+      },
+    },
+  },
+  openWay: {
+    label: '開閉方式',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [{ value: '電動', label: '電動' }],
+        },
+      },
+    },
+  },
+}; // prodCellConfig close
 
 /**
  *
@@ -629,6 +891,18 @@ const emptyProdOri: () => Tprod = () => {
     typhoonProtection: false,
     bounceDoor: false,
     notes: '',
+    //
+    motorVendor: '',
+    voltage: '',
+    hasSupportStand: false,
+    bottomBar: '',
+    lockBox: '',
+    railThick: '',
+    rollerType: '',
+    hasSilencingStrip: false,
+    isIntegrated: false,
+    headBoxThick: '',
+    openWay: '',
   };
 };
 
