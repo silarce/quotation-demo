@@ -70,6 +70,10 @@ import {
 import { useProductList } from 'hooks/quotation/useProduct';
 
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -94,6 +98,211 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
   const { productList, prodCellConfig, prodKeyArr, addProd, changeProdKeyArr } = useProductList();
+
+  const [summary, setSummary] = useState<{
+    discountRate: string;
+    subTotal: string;
+    salesTax: string;
+    total: string;
+    deliveryLocation: string;
+    deliveryDate: string;
+    // paymentMethod: { label: string; value: string }[];
+  }>({
+    discountRate: '',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    deliveryLocation: '',
+    deliveryDate: '',
+    // paymentMethod: [],
+  });
+
+  // 嚴格模式逼我把anno跟qr從summary跟paymentMethod移出來
+  // 嚴格模式下add跟delete會執行兩次，
+  // 從summary移出來就不會有問題
+  // 莫名其妙
+  const [anno, setAnnotation] = useState<string[]>([]);
+  const [qr, setQr] = useState<string[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState<{ label: string; value: string }[]>([]);
+
+  const control_anno: TsummaryControl = {
+    stringArr: anno,
+    editString: (index, v) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy[index] = v;
+
+        return copy;
+      });
+    },
+    addString: (v: string) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy.push(v);
+
+        return copy;
+      });
+    },
+    delString: (index: number) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy.splice(index, 1);
+
+        return copy;
+      });
+    },
+    addStrArr: (vArr: string[]) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy.push(...vArr);
+
+        return copy;
+      });
+    },
+  };
+
+  const control_qr: TsummaryControl = {
+    stringArr: qr,
+    editString: (index, v) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy[index] = v;
+
+        return copy;
+      });
+    },
+    addString: (v: string) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy.push(v);
+
+        return copy;
+      });
+    },
+    delString: (index: number) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy.splice(index, 1);
+
+        return copy;
+      });
+    },
+    addStrArr: (vArr: string[]) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy.push(...vArr);
+
+        return copy;
+      });
+    },
+  };
+
+  const payInfoControl: TpayInfoControl = {
+    payment: {
+      discountRate: {
+        value: summary.discountRate,
+        onChange: (v) => {
+          setSummary((state) => {
+            const copy = { ...state };
+            copy.discountRate = v;
+
+            return copy;
+          });
+        },
+      },
+      subTotal: {
+        value: summary.subTotal,
+        onChange: (v) => {
+          setSummary((state) => {
+            const copy = { ...state };
+            copy.subTotal = v;
+
+            return copy;
+          });
+        },
+      },
+      salesTax: {
+        value: summary.salesTax,
+        onChange: (v) => {
+          const copy = { ...summary };
+          copy.salesTax = v;
+          setSummary(copy);
+        },
+      },
+      total: {
+        value: summary.total,
+        onChange: (v) => {
+          const copy = { ...summary };
+          copy.total = v;
+          setSummary(copy);
+        },
+      },
+    },
+
+    delivery: {
+      deliveryLocation: {
+        value: summary.deliveryLocation,
+        onChange: (v) => {
+          setSummary((state) => {
+            const copy = { ...state };
+            copy.deliveryLocation = v;
+
+            return copy;
+          });
+        },
+      },
+      deliveryDate: {
+        value: summary.deliveryDate,
+        onChange: (v) => {
+          setSummary((state) => {
+            const copy = { ...state };
+            copy.deliveryDate = v;
+
+            return copy;
+          });
+        },
+      },
+    },
+    paymentMethod: {
+      arr: paymentMethod.map((item, index) => {
+        const { label, value } = item;
+
+        const onChange = (v: string) => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy[index].value = v;
+
+            return copy;
+          });
+        };
+
+        const delSelf = () => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy.splice(index, 1);
+
+            return copy;
+          });
+        };
+
+        return {
+          label,
+          value,
+          onChange,
+          delSelf,
+        };
+        //
+      }),
+      addMethod: (v) => {
+        setPaymentMethod((state) => {
+          const copy = [...state];
+          copy.push({ label: v, value: '' });
+
+          return copy;
+        });
+      },
+    },
+  };
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -559,17 +768,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* <QuotationAdditions disabled={!allowEdit} /> */}
 
           {/* 備註/報價範圍/付款資訊 */}
-          {/* <QuotationTotal
-            classQuotation={classQuotation}
-            getFakeMemo={getFakeMemo}
-            getFakeQuotaRange={getFakeQuotaRange}
-            disabled={!allowEdit}
-          /> */}
+
+          <Summary
+            disabled={disabled}
+            payInfoControl={payInfoControl}
+            control_anno={control_anno}
+            control_qr={control_qr}
+          />
 
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
+          <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
           {/*  */}
           {/*  */}
 

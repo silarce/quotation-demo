@@ -1,0 +1,119 @@
+@use "styles/theme01" as *;
+
+.container {
+  width: 341px;
+  min-height: 496px;
+  padding: 20px 25px;
+  border: solid 1px $colorBorder01;
+  &.legacy {
+    width: 400px;
+  }
+}
+
+.payBox {
+  margin-bottom: 20px;
+  > div {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    margin-top: 14px;
+    &:nth-of-type(1) {
+      margin-top: 0;
+    }
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      &:nth-of-type(1) {
+        color: $colorMain;
+      }
+    }
+  }
+  > .avgDiscount {
+    > div {
+      > input {
+        color: $colorMain;
+        font-weight: 400;
+        font-size: 16px;
+        text-align: right;
+        border-bottom: solid 1px $colorMain;
+      }
+      > span {
+        display: inline-block;
+        color: $colorMain;
+        font-weight: 400;
+        font-size: 16px;
+        width: 15px;
+      }
+    }
+  }
+}
+
+.grayHr {
+  border-color: $colorBorder01;
+  margin: 0;
+}
+
+.inputBox01 {
+  margin-top: 15px;
+  > span {
+    font-weight: 400;
+    font-size: 16px;
+    color: $colorMain;
+  }
+  > label {
+    padding: 13px 0 12px 0;
+  }
+  .datePicker {
+    width: 100%;
+  }
+}
+
+.payMethodContainer {
+  margin-top: 20px;
+  > span {
+    display: block;
+    font-weight: 400;
+    font-size: 16px;
+    color: $colorMain;
+    margin-bottom: 12px;
+  }
+  .btn {
+    width: 16px;
+  }
+}
+
+.inputBox02 {
+  display: grid;
+  grid-template-columns: 155px auto fit-content(100%);
+  margin-top: 7px;
+  &.legacy {
+    grid-template-columns: min-content 220px auto fit-content(100%);
+    .label {
+      margin-left: 6px;
+    }
+  }
+
+  > * {
+    margin: auto;
+    margin-left: 0;
+  }
+
+  > label {
+    padding: unset;
+    input {
+      text-align: center;
+      font-size: 16px;
+    }
+  }
+
+  > span {
+    font-weight: 400;
+    font-size: 16px;
+    &:nth-of-type(1) {
+      margin-right: 8px;
+    }
+    &:nth-of-type(2) {
+      margin-left: 6px;
+    }
+  }
+}

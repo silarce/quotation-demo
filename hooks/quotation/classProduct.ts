@@ -853,22 +853,6 @@ const prodCellConfig: TprodCellConfig = {
   },
 }; // prodCellConfig close
 
-/**
- *
- * 馬達廠商
- * 電壓
- * 馬達支撐架
- * 底座類型
- * 馬達鎖盒
- * 門軌厚度
- * 捲軸規格
- * 門軌消音條
- * 一體式捲箱
- * 捲箱厚度
- * 開閉方式
- *
- */
-
 const emptyProdOri: () => Tprod = () => {
   return {
     discountRate: '100',
