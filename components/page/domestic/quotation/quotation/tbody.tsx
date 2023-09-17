@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 import _ from 'lodash';
@@ -6,22 +5,20 @@ import _ from 'lodash';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
 
 // css
-// import scss from './productList.module.scss';
-// import scss from './tbody_prod.module.scss';
-import scss_p from '../public.module.scss';
+
+import scss from './tbody.module.scss';
 
 // type
-import type { Class_product, TproductList, TprodKey, TcellConfig } from 'hooks/quotation/useProduct';
+import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // dnd
-import { useVerticalDnd } from '../../hook/useVerticalDnd';
+import { useVerticalDnd } from '../hook/useVerticalDnd';
 import { DndContext, DraggableAttributes } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -37,31 +34,40 @@ import { CSS } from '@dnd-kit/utilities';
 import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // ==========================================================
+type Titem = {
+  [key: string]: any;
+  delSelf: () => void;
+  copySelf: () => void;
+};
+
+type TitemList = {
+  [key: string]: Titem;
+};
+
+type TcellConfig = {
+  [key in string]: {
+    label: string;
+    theadItemClassName?: string;
+    inputSelProps: TinputSelProps;
+  };
+};
 
 // ==========================================================
-export default function Tbody_prod({
+export default function Tbody({
   disabled,
-  prodList,
-  prodKeyArr,
+  rowList,
+  keyArr,
   prodCellConfig,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
-  prodList: TproductList;
-  prodKeyArr: TprodKey[];
+  // prodList: TproductList;
+  rowList: TitemList;
+  keyArr: string[];
   prodCellConfig: TcellConfig;
 
   // onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
-  // ---------------------------------------------------------------
-
-  // ---------------------------------------------------------------
-  // const { prodCellConfig, prodList: prodList_2, prodKitList_2 } = classQuotation;
-
-  // const theadKeyArr: TtheadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
-
-  // ---------------------------------------------------------------
-
   // ---------------------------------------------------------------
 
   const {
@@ -71,7 +77,7 @@ export default function Tbody_prod({
     onDragEnd,
     onDragStart,
   } = useVerticalDnd({
-    listKeyArr: Object.keys(prodList),
+    listKeyArr: Object.keys(rowList),
     // resetTrigger: classQuotation,
   });
 
@@ -88,7 +94,7 @@ export default function Tbody_prod({
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   return (
-    <div className={scss_p.container}>
+    <div>
       <DndContext
         sensors={sensors}
         modifiers={[
@@ -100,11 +106,11 @@ export default function Tbody_prod({
       >
         <SortableContext items={vDndKeyArr} strategy={verticalListSortingStrategy}>
           {vDndKeyArr.map((key, pIndex) => {
-            if (!prodList[key]) {
+            if (!rowList[key]) {
               return null;
             }
 
-            const prod = prodList[key];
+            const prod = rowList[key];
 
             const isMoving = movingId === key;
 
@@ -114,8 +120,8 @@ export default function Tbody_prod({
                 id={key}
                 // isActive={false}
                 pIndex={pIndex}
-                prod={prod}
-                prodKeyArr={prodKeyArr}
+                item={prod}
+                keyArr={keyArr}
                 isMoving={isMoving}
                 disabled={disabled}
                 //
@@ -156,11 +162,11 @@ const CopyDelBtnBox = ({
   dndListener: SyntheticListenerMap | undefined;
 }) => {
   return (
-    <div className={classNames(scss_p.buttonBox, 'chameleon', 'w-[137px]')}>
-      <Image className={scss_p.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[137px]')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
 
       <IconDelete01
-        className={scss_p.svgBtn}
+        className={scss.svgBtn}
         onClick={(e) => {
           e.stopPropagation();
 
@@ -170,7 +176,7 @@ const CopyDelBtnBox = ({
         }}
       />
       <IconCopy
-        className={scss_p.svgBtn}
+        className={scss.svgBtn}
         onClick={() => {
           if (!disabled) {
             copy();
@@ -186,8 +192,8 @@ const CopyDelBtnBox = ({
 function DndRow({
   id,
   pIndex,
-  prod,
-  prodKeyArr,
+  item,
+  keyArr: keyArr,
   isMoving,
   disabled,
   // onRowClick,
@@ -195,8 +201,10 @@ function DndRow({
 }: {
   id: string;
   pIndex: number;
-  prod: Class_product;
-  prodKeyArr: TprodKey[];
+  // prod: Class_product;
+  item: Titem;
+  // prodKeyArr: TprodKey[];
+  keyArr: string[];
   isMoving: boolean;
   disabled: boolean;
   //
@@ -217,23 +225,23 @@ function DndRow({
   return (
     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
       <CellWithBar isActive={false} className="z-0">
-        <div className={scss_p.row} onClick={undefined}>
+        <div className={scss.row} onClick={undefined}>
           {/*  */}
           <CopyDelBtnBox
             disabled={disabled}
-            del={prod.delSelf}
-            copy={prod.copySelf}
+            del={item.delSelf}
+            copy={item.copySelf}
             indexNum={pIndex + 1}
             dndAttr={attributes}
             dndListener={listeners}
           />
           {/*  */}
-          {prodKeyArr.map((key) => {
-            if (!prod) {
+          {keyArr.map((key) => {
+            if (!item) {
               return null;
             }
 
-            const stateValue = prod[key];
+            const stateValue = item[key];
             const inputSelProps = _.cloneDeep(prodCellConfig[key].inputSelProps);
             const { inputProps, selectProps, checkBoxProps } = inputSelProps;
 
@@ -242,21 +250,21 @@ function DndRow({
               inputProps.props.value = stateValue as string;
 
               inputProps.props.onChange = (e) => {
-                (prod[key] as string) = e.target.value;
+                (item[key] as string) = e.target.value;
               };
             }
 
             //____
             if (selectProps) {
               if (key === 'doorTrack') {
-                selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
+                selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
               }
 
               selectProps.easyValue = stateValue as string;
 
               if (selectProps.props) {
                 selectProps.props.onChange = (option) => {
-                  (prod[key] as string) = option?.value ?? '';
+                  (item[key] as string) = option?.value ?? '';
                 };
               }
             }
@@ -267,19 +275,13 @@ function DndRow({
               checkBoxProps.propsArr[0].value = stateValue as boolean;
 
               checkBoxProps.onChange = (arr) => {
-                (prod[key] as boolean) = !!arr[0];
+                (item[key] as boolean) = !!arr[0];
               };
             }
 
             //____
             return (
-              <InputSel
-                key={key}
-                className={scss_p.column}
-                disabled={disabled}
-                showBaseline="auto"
-                {...inputSelProps}
-              />
+              <InputSel key={key} className={scss.column} disabled={disabled} showBaseline="auto" {...inputSelProps} />
             );
           })}
           {/* column */}
@@ -289,3 +291,5 @@ function DndRow({
     </div>
   );
 }
+
+export type { Titem, TitemList, TcellConfig };

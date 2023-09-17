@@ -11,18 +11,9 @@ import {} from 'js/api/dtoTypes';
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
 
-import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 // =======================================================================
 
 type TreRender = () => void;
-
-type TcellConfig = {
-  [key in string]: {
-    label: string;
-    theadItemClassName?: string;
-    inputSelProps: TinputSelProps;
-  };
-};
 
 type TproductList = {
   [key: string]: Class_product;
@@ -99,4 +90,4 @@ const useProductList = () => {
 };
 
 export { useProductList, prodCellConfig };
-export type { TreRender, TcellConfig, TprodKey, Class_product, TproductList };
+export type { TreRender, TprodKey, Class_product, TproductList };
