@@ -797,12 +797,26 @@ function prodCellConfigCre(): TprodCellConfig {
         inputSelProps: {
           wrapperStyle: { width: '300px' },
           selectProps: {
-            props: {},
             withIcon: true,
+            creOptionWithIconProps: {
+              imgProps: {
+                style: {
+                  height: '40px',
+                },
+              },
+            },
+            creSingleValueWithIconProps: {
+              imgProps: {
+                style: {
+                  height: '40px',
+                },
+              },
+            },
             dynaOptionsList: {
               normal: optionsCre_doorTrack_normal(),
               typhoonProtection: optionsCre_doorTrack_typhoonProtection(),
             },
+            props: {},
           },
         },
       },
