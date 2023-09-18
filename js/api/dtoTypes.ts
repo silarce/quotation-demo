@@ -810,14 +810,15 @@ export type TdoorMaterialDto = {
 };
 
 export type TdoorModelInfoDto = {
-  // 從name來看，get /products/door/modelsu取得的陣列應該會有7個item，但實際上只有兩個?
+  // 從name來看，get /products/door/models取得的陣列應該會有7個item，但實際上只有兩個?
+  // 因為現在業主給的資料只有'SJ-302'跟'SJ-312'
   name: 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
   density: number; // 密度?
   guideRails: {
     imgSrc: string;
     opening: string; // 印象中好像跟圖片中的開口有關??
     thickness: string;
-    withHook: string | null; // 防颱勾?
+    withHook: boolean | null; // 防颱勾?
   }[];
   thickness: string;
   slatMaterials: TdoorMaterialDto[]; // 支板材質?
@@ -864,6 +865,7 @@ export type TdoorSlatDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   isAntiTyphoon: boolean;
 };
 
@@ -876,6 +878,7 @@ export type TdoorBottomBarDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   isAntiTyphoon: boolean;
   isWaterProof: boolean;
   hasAluminumBarrier: boolean; // 鋁障感
@@ -890,8 +893,9 @@ export type TdoorGuideRailDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   thickness: string | null;
-  inAntiTyphoon: boolean;
+  isAntiTyphoon: boolean;
   /**消音條 */
   hasSilencingStrip: boolean; // 消音條
 };
@@ -905,6 +909,7 @@ export type TdoorSidePlateDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   bearingType: string | null; // 軸承
   gearNumber: string | null; // 鍊齒輪番號
   /**一體式捲箱 */
@@ -923,6 +928,7 @@ export type TdoorRollerDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   /**直徑(inch) */
   diameter: string; // 直徑(inch)
 };
@@ -936,6 +942,7 @@ export type TdoorMotorDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   horsePower: string; // 馬力數
   gearNumber: string; // 鍊齒輪番號
   motorVendor: string | null; // 馬達廠商
@@ -944,7 +951,7 @@ export type TdoorMotorDto = {
   voltage: number | null; // 電壓(V)
   /**荷重(kg) */
   loadWeight: number | null; // 荷重(kg)
-  hasSupportStand: string | null; // 有腳
+  hasSupportStand: string | null; // 有腳 // 馬達支撐架
 };
 
 export type TdoorMotorAccessoriesDto = {
@@ -955,6 +962,7 @@ export type TdoorMotorAccessoriesDto = {
   code: string; // 編號
   specialSpec: string | null; // 特殊規格
   price: number | null;
+
   /**鍊條排數 */
   chains: number; // 鍊條排數
   /**軸承 */
@@ -970,6 +978,7 @@ export type TdoorHeadBoxDto = {
   specialSpec: string | null; // 特殊規格
   price: number | null;
   name: string;
+
   thickness: string; // 厚度
   /**一體式捲箱 */
   isIntegrated: boolean; // 一體式捲箱

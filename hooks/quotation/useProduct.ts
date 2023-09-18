@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment from 'moment';
@@ -7,9 +7,12 @@ import { nanoid } from 'nanoid';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {} from 'js/api/dtoTypes';
+// api
+import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
+import { acceKeyArrOri, TacceKey } from './classAccessory';
 
 // =======================================================================
 
@@ -23,6 +26,36 @@ type TproductList = {
 const useProductList = () => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
+  // ---------------------------------------------------------
+
+  const { res: doorModelArr, update: updateDoorModelArr } = useApiGetProdDoorModels();
+
+  const doorModelList = useMemo(() => {
+    if (!doorModelArr) {
+      return undefined;
+    }
+
+    const list: { [key: string]: TdoorModelInfoDto } = {};
+
+    doorModelArr.forEach((item, index) => {
+      const key = item.name;
+      list[key] = item;
+    });
+
+    return Object.freeze(list);
+  }, [doorModelArr]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        updateDoorModelArr();
+      } catch (error) {
+        myAlert.err({ title: '取得門型列表失敗' });
+      }
+    })();
+  }, []);
+
+  // ---------------------------------------------------------
 
   // 之後要記得做計算小計功能
   // 之後要記得做計算小計功能
@@ -51,11 +84,17 @@ const useProductList = () => {
   };
 
   const addProd = () => {
+    if (!doorModelList) {
+      return myAlert.info({ title: '尚未取得門型資料' });
+    }
+
     const newKey = String(Object.keys(productList).length);
     const classProd = new Class_product({
       reRender,
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
+      //
+      doorModelList,
     });
     productList[newKey] = classProd;
     reRender();
@@ -70,8 +109,18 @@ const useProductList = () => {
         return prodkeyArrOri();
       }
 
-      return JSON.parse(jsonStr) as TprodKey[];
+      const localArr = JSON.parse(jsonStr) as TprodKey[];
+
+      if (
+        _.difference(localArr, prodkeyArrOri()).length !== 0 ||
+        _.difference(prodkeyArrOri(), localArr).length !== 0
+      ) {
+        return prodkeyArrOri();
+      } else {
+        return localArr;
+      }
     })();
+
     setProdKeyArr(prodKeyArr);
   }, []);
 

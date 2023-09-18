@@ -16,6 +16,7 @@ import scss from './tbody.module.scss';
 
 // type
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import type { Toption } from 'js/utils/options/options';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';
@@ -36,8 +37,8 @@ import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 // ==========================================================
 type Titem = {
   [key: string]: any;
-  delSelf: () => void;
-  copySelf: () => void;
+  delSelf?: () => void;
+  copySelf?: () => void;
 };
 
 type TitemList = {
@@ -155,8 +156,8 @@ const CopyDelBtnBox = ({
   dndListener,
 }: {
   disabled: boolean;
-  del: () => void;
-  copy: () => void;
+  del?: () => void;
+  copy?: () => void;
   indexNum: string | number;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
@@ -171,7 +172,7 @@ const CopyDelBtnBox = ({
           e.stopPropagation();
 
           if (!disabled) {
-            del();
+            del && del();
           }
         }}
       />
@@ -179,7 +180,7 @@ const CopyDelBtnBox = ({
         className={scss.svgBtn}
         onClick={() => {
           if (!disabled) {
-            copy();
+            copy && copy();
           }
         }}
       />
@@ -242,7 +243,9 @@ function DndRow({
             }
 
             const stateValue = item[key];
+            // !!!
             const inputSelProps = _.cloneDeep(prodCellConfig[key].inputSelProps);
+            // !!!
             const { inputProps, selectProps, checkBoxProps } = inputSelProps;
 
             //____
@@ -256,15 +259,20 @@ function DndRow({
 
             //____
             if (selectProps) {
-              if (key === 'doorTrack') {
-                selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
-              }
+              // if (key === 'doorTrack') {
+              //   selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
+              // }
+              const options = item[`options_${key}`] as Toption[] | undefined;
 
               selectProps.easyValue = stateValue as string;
 
               if (selectProps.props) {
-                selectProps.props.onChange = (option) => {
-                  (item[key] as string) = option?.value ?? '';
+                selectProps.props = {
+                  options,
+                  ...selectProps.props,
+                  onChange: (option) => {
+                    (item[key] as string) = option?.value ?? '';
+                  },
                 };
               }
             }
@@ -281,7 +289,9 @@ function DndRow({
 
             //____
             return (
-              <InputSel key={key} className={scss.column} disabled={disabled} showBaseline="auto" {...inputSelProps} />
+              <div key={key} className={scss.column} style={{ width: inputSelProps.wrapperStyle?.width }}>
+                <InputSel disabled={disabled} showBaseline="auto" {...inputSelProps} />
+              </div>
             );
           })}
           {/* column */}

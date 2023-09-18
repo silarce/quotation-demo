@@ -9,39 +9,67 @@ const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
 
 // ===========================================================
-import { TlegacyContractProductDto, TcreateLegacyContractProductDto } from 'js/api/dtoTypes';
-
-import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import { Toption } from 'js/utils/options/options';
+// child class
+import { Class_accessory, Taccessory } from './classAccessory';
+// =============================================================================
+// type
+import type { TlegacyContractProductDto, TcreateLegacyContractProductDto } from 'js/api/dtoTypes';
 import type { TreRender } from './useProduct';
+import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
+import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import type { Toption } from 'js/utils/options/options';
+import type { TdoorModelInfoDto } from 'js/api/api_product';
 
+// =============================================================================
 class Class_product {
   constructor({
-    //
     reRender,
     prodData = emptyProdOri(),
+    accessoryDataArr = [],
     delSelf,
     copySelf,
+    // from api
+    doorModelList,
   }: {
     reRender: TreRender;
     prodData?: Tprod;
+    accessoryDataArr?: Taccessory[];
     delSelf: () => void;
     copySelf: () => void;
+    // from api
+    doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
     this.reRender = reRender;
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+    // from api
+    this._doorModelList = doorModelList;
     //
     this._quantity = String(this._prodData.quantity);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
+    //
+    // ___________________________________________________________
+    accessoryDataArr.forEach((data, index) => {
+      const id = index;
+
+      // this._acceList[`${id}`] = new Class_accessory({
+      //   reRender,
+      //   delSelf,
+      //   // copySelf,
+      // });
+    });
+    // ___________________________________________________________
   } //  constructor close
 
   private reRender;
   readonly delSelf;
   readonly copySelf;
-
+  // from api
+  // 門型資料
+  private _doorModelList;
+  //
   private _prodData;
   private _quantity;
   private _unitPrice;
@@ -49,15 +77,70 @@ class Class_product {
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  // ---------------------------------------------------------
+  _acceList: { [key: string]: Taccessory } = {};
+  get acceList() {
+    return this._acceList;
+  }
 
   // ---------------------------------------------------------
 
+  /**門型 options */
+  get options_doorModel() {
+    return Object.values(this._doorModelList).map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+  }
+
+  /**門軌 options */
   get options_doorTrack() {
-    if (this.typhoonProtection) {
-      return this.options_doorTrack_typhoonProtection;
-    } else {
-      return this.options_doorTrack_normal;
+    const doorModel = this._doorModelList[this.doorModel];
+
+    if (!doorModel) {
+      return undefined;
     }
+
+    const arr = doorModel.guideRails.map((item) => {
+      const imgSrc = item.imgSrc;
+      const withHook = item.withHook;
+
+      const option = {
+        value: imgSrc,
+        label: imgSrc,
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+      };
+
+      if (withHook === null || withHook === this.typhoonProtection) {
+        return option;
+      }
+
+      return undefined;
+    });
+
+    _.pull(arr, undefined);
+
+    return arr;
+  } // options_doorTrack
+
+  /**門片材質 主產品設定的材質 */
+  get options_material() {
+    const doorModel = this._doorModelList[this.doorModel];
+
+    if (!doorModel) {
+      return undefined;
+    }
+
+    const arr = doorModel.slatMaterials.map((item) => {
+      return {
+        value: item.id,
+        label: item.name,
+      };
+    });
+
+    return arr;
   }
 
   private countTotalPrice() {
@@ -127,12 +210,12 @@ class Class_product {
     this.reRender();
   }
   //
-  get doorType() {
-    return this._prodData.doorType;
+  get doorModel() {
+    return this._prodData.doorModel;
   }
 
-  set doorType(v) {
-    this._prodData.doorType = v;
+  set doorModel(v) {
+    this._prodData.doorModel = v;
     this.reRender();
   }
   //
@@ -408,7 +491,7 @@ type Tprod = {
   discountRate: `${number}`;
   itemName: string;
   quoteType: string;
-  doorType: string;
+  doorModel: string;
   length: string; // L(m)
   width: string; // W(m)
   height: string; //h(m)
@@ -446,7 +529,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'discountRate',
     'itemName',
     'quoteType',
-    'doorType',
+    'doorModel',
     'length',
     'width',
     'height',
@@ -478,15 +561,15 @@ const prodkeyArrOri: () => TprodKey[] = () => {
   ];
 };
 
-type TprodCellConfig = {
-  [key in string]: {
-    label: string;
-    theadItemClassName?: string;
-    inputSelProps: TinputSelProps;
-  };
-};
+// type TprodCellConfig = {
+//   [key in string]: {
+//     label: string;
+//     theadItemClassName?: string;
+//     inputSelProps: TinputSelProps;
+//   };
+// };
 
-const prodCellConfig: TprodCellConfig = {
+const prodCellConfig: TcellConfig = {
   discountRate: {
     label: '折數',
     inputSelProps: {
@@ -518,13 +601,13 @@ const prodCellConfig: TprodCellConfig = {
       },
     },
   },
-  doorType: {
+  doorModel: {
     label: '門型',
     inputSelProps: {
       wrapperStyle: { width: '120px' },
       selectProps: {
         props: {
-          options: optionsCreator_doorModel(),
+          // options: optionsCreator_doorModel(),
         },
       },
     },
@@ -608,7 +691,7 @@ const prodCellConfig: TprodCellConfig = {
     label: '材料',
     inputSelProps: {
       wrapperStyle: { width: '120px' },
-      inputProps: {
+      selectProps: {
         props: {},
       },
     },
@@ -627,12 +710,22 @@ const prodCellConfig: TprodCellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '300px' },
       selectProps: {
-        props: {},
         withIcon: true,
-        dynaOptionsList: {
-          normal: optionsCre_doorTrack_normal(),
-          typhoonProtection: optionsCre_doorTrack_typhoonProtection(),
+        creOptionWithIconProps: {
+          imgProps: {
+            style: { height: '40px' },
+          },
         },
+        creSingleValueWithIconProps: {
+          imgProps: {
+            style: { height: '40px' },
+          },
+        },
+        props: {},
+        // dynaOptionsList: {
+        //   normal: optionsCre_doorTrack_normal(),
+        //   typhoonProtection: optionsCre_doorTrack_typhoonProtection(),
+        // },
       },
     },
   },
@@ -858,7 +951,7 @@ const emptyProdOri: () => Tprod = () => {
     discountRate: '100',
     itemName: '',
     quoteType: '',
-    doorType: '',
+    doorModel: '',
     length: '',
     width: '',
     height: '',
@@ -894,4 +987,4 @@ const emptyProdOri: () => Tprod = () => {
 // ===========================================================
 // ===========================================================
 export { Class_product, prodkeyArrOri, prodCellConfig };
-export type { Tprod, TprodKey, TprodCellConfig };
+export type { Tprod, TprodKey, TcellConfig };

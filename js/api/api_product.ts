@@ -25,6 +25,8 @@ import type {
 //   return `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/${path}`;
 // };
 
+export type { TdoorModelInfoDto };
+
 export const apiGetAssets = async (path: string) => {
   const api = `/products/assets/${path}`;
 
@@ -62,12 +64,12 @@ export const useApiGetProdDoorModels = () => {
   };
 };
 
-export const apiGetProdCalcGeneralSpec = async (params: {
+type TpcgsPrams = {
   modelName: TdoorModelInfoDto['name'];
   fullHeight: number;
-  fullWidth?: number;
-  WG?: number;
-}) => {
+} & ({ fullWidth: number } | { WG: number });
+
+export const apiGetProdCalcGeneralSpec = async (params: TpcgsPrams) => {
   const api = '/products/door/calc-general-spec';
 
   return axi
