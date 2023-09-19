@@ -16,7 +16,11 @@ import { Class_accessory, Taccessory } from './classAccessory';
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
 // =============================================================================
 // type
-import type { TlegacyContractProductDto, TcreateLegacyContractProductDto } from 'js/api/dtoTypes';
+import type {
+  TlegacyContractProductDto,
+  TcreateLegacyContractProductDto,
+  TdoorComponentListDto,
+} from 'js/api/dtoTypes';
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -53,19 +57,17 @@ class Class_product {
     this._quantity = String(this._prodData.quantity);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
-    const motorVendor = this._prodData.motorVendor;
-    this._motorVendor = motorVendor ? { value: motorVendor, label: motorVendor } : null;
+
     //
     // ___________________________________________________________
-    accessoryDataArr.forEach((data, index) => {
-      const id = index;
-
-      // this._acceList[`${id}`] = new Class_accessory({
-      //   reRender,
-      //   delSelf,
-      //   // copySelf,
-      // });
-    });
+    // accessoryDataArr.forEach((data, index) => {
+    // const id = index;
+    // this._acceList[`${id}`] = new Class_accessory({
+    //   reRender,
+    //   delSelf,
+    //   // copySelf,
+    // });
+    // });
     // ___________________________________________________________
   } //  constructor close
 
@@ -76,8 +78,7 @@ class Class_product {
   // 門型資料
   private _doorModelList;
   private _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
-  private _motorVendor: Toption | null;
-  private _boxB: number | undefined;
+  // private _boxB: number | undefined;
   //
   private _prodData;
   private _quantity;
@@ -87,9 +88,32 @@ class Class_product {
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
   // ---------------------------------------------------------
-  _acceList: { [key: string]: Taccessory } = {};
-  get acceList() {
-    return this._acceList;
+  // _acceList: { [key: string]: Taccessory } = {};
+  // get acceList() {
+  //   return this._acceList;
+  // }
+
+  AcceList: { [key: string]: Class_accessory } = {};
+
+  creAcceList(dataList: { [key in keyof TdoorComponentListDto]: Taccessory | undefined }) {
+    const keyArr = Object.keys(dataList) as (keyof TdoorComponentListDto)[];
+    const list: { [key: string]: Class_accessory } = {};
+
+    keyArr.forEach((key) => {
+      const acce = dataList[key];
+
+      if (!acce) {
+        return;
+      }
+
+      const theClass = new Class_accessory({
+        reRender: this.reRender,
+        data: acce,
+      });
+    });
+
+    this.AcceList = list;
+    this.reRender();
   }
 
   // ---------------------------------------------------------
@@ -108,13 +132,29 @@ class Class_product {
         return;
       }
 
-      const res = await apiGetProdCalcGeneralSpec({
-        modelName: this.doorModel as TpcgsPrams['modelName'],
-        fullHeight: Number(this.height),
-        // 要再跟後端或經理確認什麼是全寬
-        fullWidth: Number(this.length), //  全寬
-        WG: Number(this.width), // 全寬扣除機械縫
-      });
+      const body = (() => {
+        let fullWidth: number | undefined;
+        let WG: number | undefined;
+
+        if (Number(this.length)) {
+          fullWidth = Number(this.length) * 1000;
+        } else if (Number(this.width)) {
+          WG = Number(this.width) * 1000;
+        }
+
+        return {
+          modelName: this.doorModel as TpcgsPrams['modelName'],
+          fullHeight: Number(this.height) * 1000,
+          fullWidth,
+          WG,
+        };
+      })();
+
+      if (!body.fullWidth && !body.WG) {
+        return;
+      }
+
+      const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
 
       if (!res) {
         return;
@@ -131,24 +171,23 @@ class Class_product {
       // ________________________
       // 設定boxB與thickness
       // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
+      // !!!!!!! 跟經理確認thickness跟B(m)是什麼 !!!!!!!!!
       const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-      this._boxB = boxB;
-      this.thickness = String(boxB || '');
+      this.B = String(boxB);
+      this.thickness = res.thickness;
 
       // ________________________
       // 設定馬達廠商
       if (defaultMotorBox) {
-        if (defaultMotorBox.default) {
-          this.motorVendor = creOption_teco();
-        } else if (defaultMotorBox.東元) {
-          this.motorVendor = creOption_teco();
+        if (defaultMotorBox.東元) {
+          this.motorVendor = '東元';
+          this.B = String(defaultMotorBox.東元.boxB);
         } else if (defaultMotorBox.大同) {
-          this.motorVendor = creOption_datong();
-        } else {
-          this.motorVendor = null;
+          this.motorVendor = '大同';
+          this.B = String(defaultMotorBox.大同.boxB);
+        } else if (defaultMotorBox.default) {
+          this.B = String(defaultMotorBox.default.boxB);
         }
-      } else {
-        this.motorVendor = null;
       }
 
       // ________________________
@@ -177,6 +216,7 @@ class Class_product {
     }, 500);
   } // calcGeneralSpec
 
+  // ________________________
   req_getProdAvailableComponents() {
     const req = async () => {
       const rollerDiameter = this._doorGeneralSpecs?.diameter;
@@ -195,6 +235,18 @@ class Class_product {
       if (!res) {
         return;
       }
+
+      // 接著要過濾
+      // slats
+      // bottomBars
+      // guideRails
+      // sidePlates
+      // rollers
+      // motors
+      // motorAccessories
+      // headBoxes
+
+      const slats = res.slats;
 
       this.reRender();
     }; // req
@@ -290,43 +342,28 @@ class Class_product {
     });
   }
 
-  get options_motorVendor() {
+  private toSetDefaultBoxB() {
     if (!this._doorGeneralSpecs) {
-      return undefined;
+      return;
     }
 
-    const defaultMotorIndex = this._doorGeneralSpecs.defaultMotorIndex;
-    const defaultMotor = this._doorGeneralSpecs.motors[defaultMotorIndex];
+    const motorArr = this._doorGeneralSpecs.motors;
+    const hp = this.horsepower;
+    const vendor = this.motorVendor as '東元' | '大同' | '';
+    const defaultMotor = motorArr[this._doorGeneralSpecs.defaultMotorIndex];
+    const defaultHP = defaultMotor.hp;
     const box = defaultMotor.box;
 
-    if (!box) {
-      return undefined;
+    if (hp !== defaultHP || !vendor || !box) {
+      return;
     }
 
-    if (box.default) {
-      return [creOption_teco(), creOption_datong()];
+    const boxB = box[vendor]?.boxB || box.default?.boxB;
+
+    if (boxB) {
+      this.B = String(boxB);
     }
-
-    if (box.東元) {
-      return [creOption_teco()];
-    }
-
-    if (box.大同) {
-      return [creOption_datong()];
-    }
-
-    // const motorOption = this._doorGeneralSpecs.motors.find((item) => {
-    //   item.hp === this.horsepower;
-    // });
-    // if (!motorOption) {
-    //   return undefined;
-    // }
-
-    //
-    //
-    //
-    //
-  } // options_motorVendor
+  }
 
   private countTotalPrice() {
     const quantity = this.quantity.replace(/,/g, '') || 0;
@@ -405,7 +442,7 @@ class Class_product {
     this.req_getProdAvailableComponents();
     this.reRender();
   }
-  //
+  /**全寬 */
   get length() {
     return this._prodData.length;
   }
@@ -416,7 +453,7 @@ class Class_product {
     this.req_calcGeneralSpec();
     this.reRender();
   }
-  //
+  /**WG */
   get width() {
     return this._prodData.width;
   }
@@ -438,15 +475,28 @@ class Class_product {
     this.reRender();
   }
   //
+  // !!!!!!! 跟經理確認thickness跟B(m)是什麼 !!!!!!!!!
   /**B(m) */
+  get B() {
+    return this._prodData.B;
+  }
+  set B(v) {
+    this._prodData.B = v;
+    this.area = this.calcArea();
+    this.reRender();
+  }
+  /**門片厚度 */
   get thickness() {
     return this._prodData.thickness;
   }
   set thickness(v) {
     this._prodData.thickness = v;
-    this.area = this.calcArea();
+    // this.area = this.calcArea();
     this.reRender();
   }
+
+  // !!!!!!! 跟經理確認thickness跟B(m)是什麼 !!!!!!!!!
+
   //
   get area() {
     return this._prodData.area;
@@ -495,6 +545,7 @@ class Class_product {
   }
   set horsepower(v) {
     this._prodData.horsepower = v;
+    this.toSetDefaultBoxB();
     this.reRender();
   }
 
@@ -580,17 +631,11 @@ class Class_product {
   //----------------------------------------------------------
 
   get motorVendor() {
-    return this._motorVendor;
+    return this._prodData.motorVendor;
   }
-  set motorVendor(v: Toption | null) {
-    this._motorVendor = v;
-
-    // if (v?.boxB) {
-    //   this.thickness = v.boxB;
-    // }
-    this.thickness = String(this._boxB ?? '');
-
-    this._prodData.motorVendor = v?.value || '';
+  set motorVendor(v) {
+    this._prodData.motorVendor = v;
+    this.toSetDefaultBoxB();
     this.reRender();
   }
   //
@@ -695,7 +740,8 @@ type Tprod = {
   length: string; // L(m)
   width: string; // W(m)
   height: string; //h(m)
-  thickness: string; // B(m)
+  B: string; // B(m)
+  thickness: string; // B(m)? 門片厚度?
   area: string; // 面積
   volume: string; // 才數
   material: string;
@@ -733,6 +779,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'length',
     'width',
     'height',
+    'B',
     'thickness',
     'area',
     'volume',
@@ -813,7 +860,7 @@ const prodCellConfig: TcellConfig = {
     },
   },
   length: {
-    label: 'L(m)',
+    label: 'L(m)', // 全寬
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
@@ -825,9 +872,8 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  /**全寬 在product系列api的key為WG */
   width: {
-    label: 'W(m)', // 全寬 // 好像不對，跟api的描述不符 // 是全寬扣除機械縫?
+    label: 'W(m)', // WG
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
@@ -852,7 +898,9 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  thickness: {
+
+  // 後端說B(m)是boxB
+  B: {
     label: 'B(m)',
     theadItemClassName: 'text-center',
     inputSelProps: {
@@ -865,6 +913,24 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
+  // 那thickness是什麼? 門片厚度?
+  thickness: {
+    // label: 'B(m)', 不確定
+    label: '門片厚度',
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+          type: 'number',
+          className: 'text-center',
+        },
+      },
+    },
+  },
+
   area: {
     label: '面積',
     inputSelProps: {
@@ -1001,7 +1067,7 @@ const prodCellConfig: TcellConfig = {
   //
   motorVendor: {
     label: '馬達廠商',
-    isOptionValue: true,
+    // isOptionValue: true,
     inputSelProps: {
       wrapperStyle: { width: '90px' },
       selectProps: {
@@ -1156,6 +1222,7 @@ const emptyProdOri: () => Tprod = () => {
     length: '',
     width: '',
     height: '',
+    B: '',
     thickness: '',
     area: '',
     volume: '',
@@ -1184,18 +1251,272 @@ const emptyProdOri: () => Tprod = () => {
   };
 };
 
-const creOption_teco: () => Toption = () => {
-  return {
-    value: '東元',
-    label: '東元',
+// slats
+// bottomBars
+// guideRails
+// sidePlates
+// rollers
+// motors
+// motorAccessories
+// headBoxes
+
+const filter_slats = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['slats'];
+  filterParams: {
+    isAntiTyphoon: boolean;
   };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    return data.isAntiTyphoon === filterParams.isAntiTyphoon;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
 };
 
-const creOption_datong: () => Toption = () => {
-  return {
-    value: '大同',
-    label: '大同',
+const filter_bottomBars = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['bottomBars'];
+  filterParams: {
+    isAntiTyphoon: boolean;
+    isWaterProof: boolean;
+    hasAluminumBarrier: boolean;
   };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+      isPass = false;
+    } else if (data.isWaterProof !== filterParams.isWaterProof) {
+      isPass = false;
+    } else if (data.hasAluminumBarrier !== filterParams.hasAluminumBarrier) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
+};
+
+const filter_guideRails = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['guideRails'];
+  filterParams: {
+    thickness: string; // 要怎麼判斷? 大於小於等於? 主產品的thickness是不是應該固定?
+    isAntiTyphoon: boolean;
+    /**消音條 */
+    hasSilencingStrip: boolean; // 消音條
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.thickness && data.thickness !== filterParams.thickness) {
+      isPass = false;
+    } else if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+      isPass = false;
+    } else if (data.hasSilencingStrip !== filterParams.hasSilencingStrip) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
+};
+
+const filter_sidePlates = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['sidePlates'];
+  filterParams: {
+    bearingType: string; // 軸承
+    gearNumber: string; // 鍊齒輪番號
+    /**一體式捲箱 */
+    isIntegrated: boolean; // 一體式捲箱
+    motorVendor: string; // 馬達廠商
+    weight: number;
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.bearingType !== filterParams.bearingType) {
+      isPass = false;
+    } else if (data.gearNumber && data.gearNumber !== filterParams.gearNumber) {
+      isPass = false;
+    } else if (data.isIntegrated && data.isIntegrated !== filterParams.isIntegrated) {
+      isPass = false;
+    } else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
+      isPass = false;
+    } else if (data.maxDoorWeight && data.maxDoorWeight < filterParams.weight) {
+      isPass = false;
+    } else if (data.minDoorWeight && data.minDoorWeight > filterParams.weight) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
+};
+
+const filter_rollers = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['rollers'];
+  filterParams: {
+    diameter: string;
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.diameter !== filterParams.diameter) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
+};
+
+const filter_motors = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['motors'];
+  filterParams: {
+    horsePower: string; // 馬力數
+    gearNumber: string; // 鍊齒輪番號
+    motorVendor: string; // 馬達廠商
+    phase: number; // 相位
+    /**電壓(V) */
+    voltage: number; // 電壓(V)
+    /**荷重(kg) */
+    loadWeight: number; // 荷重(kg)
+    hasSupportStand: string; // 有腳 // 馬達支撐架
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.horsePower !== filterParams.horsePower) {
+      isPass = false;
+    } else if (data.gearNumber !== filterParams.gearNumber) {
+      isPass = false;
+    } else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
+      isPass = false;
+    } else if (data.phase && data.phase !== filterParams.phase) {
+      isPass = false;
+    } else if (data.voltage && data.voltage !== filterParams.voltage) {
+      isPass = false;
+    } else if (data.loadWeight && data.loadWeight !== filterParams.loadWeight) {
+      isPass = false;
+    } else if (data.hasSupportStand && data.hasSupportStand !== filterParams.hasSupportStand) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
+};
+
+const filter_motorAccessories = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['motorAccessories'];
+  filterParams: {
+    /**鍊條排數 */
+    chains: number; // 鍊條排數
+    /**軸承 */
+    bearingType: string; // 軸承
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.chains !== filterParams.chains) {
+      isPass = false;
+    } else if (data.bearingType !== filterParams.bearingType) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
+};
+
+const filter_headBoxes = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['headBoxes'];
+  filterParams: {
+    thickness: string; // 厚度
+    /**一體式捲箱 */
+    isIntegrated: boolean; // 一體式捲箱
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let isPass = true;
+
+    if (data.thickness !== filterParams.thickness) {
+      isPass = false;
+    } else if (data.isIntegrated !== filterParams.isIntegrated) {
+      isPass = false;
+    }
+
+    return isPass;
+  });
+
+  if (filteredArr[0]) {
+    return filteredArr[0];
+  } else {
+    return null;
+  }
 };
 
 // ===========================================================
