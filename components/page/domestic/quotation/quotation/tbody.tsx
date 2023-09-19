@@ -48,6 +48,7 @@ type TitemList = {
 type TcellConfig = {
   [key in string]: {
     label: string;
+    isOptionValue?: boolean;
     theadItemClassName?: string;
     inputSelProps: TinputSelProps;
   };
@@ -259,22 +260,37 @@ function DndRow({
 
             //____
             if (selectProps) {
+              if (!selectProps.props) {
+                selectProps.props = {};
+              }
+
+              const isOptionValue = prodCellConfig[key].isOptionValue;
+
               // if (key === 'doorTrack') {
               //   selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
               // }
               const options = item[`options_${key}`] as Toption[] | undefined;
 
-              selectProps.easyValue = stateValue as string;
+              // ___________________
 
-              if (selectProps.props) {
-                selectProps.props = {
-                  options,
-                  ...selectProps.props,
-                  onChange: (option) => {
-                    (item[key] as string) = option?.value ?? '';
-                  },
-                };
+              if (isOptionValue) {
+                selectProps.props.value = stateValue;
+              } else {
+                selectProps.easyValue = stateValue as string;
               }
+              // ___________________
+
+              selectProps.props = {
+                options,
+                ...selectProps.props,
+                onChange: (option) => {
+                  if (isOptionValue) {
+                    item[key] = option;
+                  } else {
+                    item[key] = option?.value ?? '';
+                  }
+                },
+              };
             }
 
             //____

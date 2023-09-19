@@ -12,6 +12,9 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 // child class
 import { Class_accessory, Taccessory } from './classAccessory';
 // =============================================================================
+// api
+import { apiGetProdCalcGeneralSpec } from 'js/api/api_product';
+// =============================================================================
 // type
 import type { TlegacyContractProductDto, TcreateLegacyContractProductDto } from 'js/api/dtoTypes';
 import type { TreRender } from './useProduct';
@@ -19,6 +22,7 @@ import type { TcellConfig } from 'components/page/domestic/quotation/quotation/t
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
 import type { TdoorModelInfoDto } from 'js/api/api_product';
+import type { TpcgsPrams, TdoorGeneralSpecsDto } from 'js/api/api_product';
 
 // =============================================================================
 class Class_product {
@@ -49,6 +53,8 @@ class Class_product {
     this._quantity = String(this._prodData.quantity);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
+    const motorVendor = this._prodData.motorVendor;
+    this._motorVendor = motorVendor ? { value: motorVendor, label: motorVendor } : null;
     //
     // ___________________________________________________________
     accessoryDataArr.forEach((data, index) => {
@@ -69,6 +75,9 @@ class Class_product {
   // from api
   // 門型資料
   private _doorModelList;
+  private _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
+  private _motorVendor: Toption | null;
+  private _boxB: number | undefined;
   //
   private _prodData;
   private _quantity;
@@ -81,6 +90,80 @@ class Class_product {
   _acceList: { [key: string]: Taccessory } = {};
   get acceList() {
     return this._acceList;
+  }
+
+  // ---------------------------------------------------------
+
+  req_calcGeneralSpec() {
+    const req = async () => {
+      if (!this.doorModel || !this.height) {
+        return;
+      }
+
+      if (!this.length && !this.width) {
+        return;
+      }
+
+      const res = await apiGetProdCalcGeneralSpec({
+        modelName: this.doorModel as TpcgsPrams['modelName'],
+        fullHeight: Number(this.height),
+        // 要再跟後端或經理確認什麼是全寬
+        fullWidth: Number(this.length), //  全寬
+        WG: Number(this.width), // 全寬扣除機械縫
+      });
+
+      if (!res) {
+        return;
+      }
+
+      this._doorGeneralSpecs = res;
+      //
+      const defaultMotorIndex = res.defaultMotorIndex;
+      const defaultMotor = res.motors[defaultMotorIndex];
+      const defaultMotorBox = defaultMotor.box;
+      // ________________________
+      // 設定馬力
+      this.horsepower = defaultMotor.hp;
+
+      // ________________________
+      // 設定boxB與thickness
+      // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
+
+      const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+
+      this._boxB = boxB;
+      this.thickness = String(boxB || '');
+
+      // ________________________
+      // 設定馬達廠商
+      if (defaultMotorBox) {
+        if (defaultMotorBox.default) {
+          this.motorVendor = creOption_teco();
+        }
+
+        if (defaultMotorBox.東元) {
+          this.motorVendor = creOption_teco();
+        }
+
+        if (defaultMotorBox.大同) {
+          this.motorVendor = creOption_datong();
+        }
+      } else {
+        this.motorVendor = null;
+      }
+
+      // ________________________
+
+      this.reRender();
+    }; // req
+
+    req();
+  } // calcGeneralSpec
+
+  // ---------------------------------------------------------
+
+  get weight() {
+    return this._doorGeneralSpecs?.weight;
   }
 
   // ---------------------------------------------------------
@@ -142,6 +225,60 @@ class Class_product {
 
     return arr;
   }
+
+  /**馬力 */
+  get options_horsepower() {
+    if (!this._doorGeneralSpecs) {
+      return undefined;
+    }
+
+    const motorArr = this._doorGeneralSpecs.motors;
+
+    return motorArr.map((item) => {
+      return {
+        value: item.hp,
+        label: item.hp,
+      };
+    });
+  }
+
+  get options_motorVendor() {
+    if (!this._doorGeneralSpecs) {
+      return undefined;
+    }
+
+    const defaultMotorIndex = this._doorGeneralSpecs.defaultMotorIndex;
+    const defaultMotor = this._doorGeneralSpecs.motors[defaultMotorIndex];
+    const box = defaultMotor.box;
+
+    if (!box) {
+      return undefined;
+    }
+
+    if (box.default) {
+      return [creOption_teco(), creOption_datong()];
+    }
+
+    if (box.東元) {
+      return [creOption_teco()];
+    }
+
+    if (box.大同) {
+      return [creOption_datong()];
+    }
+
+    // const motorOption = this._doorGeneralSpecs.motors.find((item) => {
+    //   item.hp === this.horsepower;
+    // });
+    // if (!motorOption) {
+    //   return undefined;
+    // }
+
+    //
+    //
+    //
+    //
+  } // options_motorVendor
 
   private countTotalPrice() {
     const quantity = this.quantity.replace(/,/g, '') || 0;
@@ -216,6 +353,7 @@ class Class_product {
 
   set doorModel(v) {
     this._prodData.doorModel = v;
+    this.req_calcGeneralSpec();
     this.reRender();
   }
   //
@@ -226,6 +364,7 @@ class Class_product {
     this._prodData.length = v;
     this._prodData.width = '0';
     this.area = this.calcArea();
+    this.req_calcGeneralSpec();
     this.reRender();
   }
   //
@@ -236,6 +375,7 @@ class Class_product {
     this._prodData.width = v;
     this._prodData.length = '0';
     this.area = this.calcArea();
+    this.req_calcGeneralSpec();
     this.reRender();
   }
   //
@@ -245,6 +385,7 @@ class Class_product {
   set height(v) {
     this._prodData.height = v;
     this.area = this.calcArea();
+    this.req_calcGeneralSpec();
     this.reRender();
   }
   //
@@ -383,14 +524,23 @@ class Class_product {
     this._prodData.notes = v;
     this.reRender();
   }
-  //
-  //
-  //
+
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+
   get motorVendor() {
-    return this._prodData.motorVendor;
+    return this._motorVendor;
   }
-  set motorVendor(v) {
-    this._prodData.motorVendor = v;
+  set motorVendor(v: Toption | null) {
+    this._motorVendor = v;
+
+    // if (v?.boxB) {
+    //   this.thickness = v.boxB;
+    // }
+    this.thickness = String(this._boxB ?? '');
+
+    this._prodData.motorVendor = v?.value || '';
     this.reRender();
   }
   //
@@ -627,7 +777,7 @@ const prodCellConfig: TcellConfig = {
   },
   /**全寬 在product系列api的key為WG */
   width: {
-    label: 'W(m)', // 全寬
+    label: 'W(m)', // 全寬 // 好像不對，跟api的描述不符 // 是全寬扣除機械縫?
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
@@ -733,7 +883,7 @@ const prodCellConfig: TcellConfig = {
     label: '馬力',
     inputSelProps: {
       wrapperStyle: { width: '90px' },
-      inputProps: {
+      selectProps: {
         props: {},
       },
     },
@@ -801,6 +951,7 @@ const prodCellConfig: TcellConfig = {
   //
   motorVendor: {
     label: '馬達廠商',
+    isOptionValue: true,
     inputSelProps: {
       wrapperStyle: { width: '90px' },
       selectProps: {
@@ -980,6 +1131,20 @@ const emptyProdOri: () => Tprod = () => {
     isIntegrated: false,
     headBoxThick: '',
     openWay: '',
+  };
+};
+
+const creOption_teco: () => Toption = () => {
+  return {
+    value: '東元',
+    label: '東元',
+  };
+};
+
+const creOption_datong: () => Toption = () => {
+  return {
+    value: '大同',
+    label: '大同',
   };
 };
 

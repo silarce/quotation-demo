@@ -25,7 +25,8 @@ import type {
 //   return `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/${path}`;
 // };
 
-export type { TdoorModelInfoDto };
+export type { TdoorModelInfoDto, TpcgsPrams, TdoorGeneralSpecsDto };
+// =======================================================================
 
 export const apiGetAssets = async (path: string) => {
   const api = `/products/assets/${path}`;

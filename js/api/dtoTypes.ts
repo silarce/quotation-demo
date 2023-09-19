@@ -829,13 +829,13 @@ export type TdoorGeneralSpecsMotorBoxPropertyDto = {
   boxD: number;
 };
 export type TdoorGeneralSpecsMotorBoxDto = {
-  default: TdoorGeneralSpecsMotorBoxPropertyDto;
-  大同: TdoorGeneralSpecsMotorBoxPropertyDto;
-  東元: TdoorGeneralSpecsMotorBoxPropertyDto;
+  default?: TdoorGeneralSpecsMotorBoxPropertyDto;
+  大同?: TdoorGeneralSpecsMotorBoxPropertyDto;
+  東元?: TdoorGeneralSpecsMotorBoxPropertyDto;
 };
 
 export type TdoorGeneralSpecsMotorDto = {
-  box: TdoorGeneralSpecsMotorBoxDto;
+  box?: TdoorGeneralSpecsMotorBoxDto;
   hp: string;
 };
 
