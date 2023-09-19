@@ -13,8 +13,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // component
 import TheCalendar from 'components/page/home/dailyReport/TheCalendar';
 import ReporterList from 'components/page/home/dailyReport/ReporterList';
-import SetReportEmpModal from 'components/page/home/dailyReport/SetReportEmpModal';
-import ReviewerAndExaminerSelector from 'components/page/home/dailyReport/ReviewerAndExaminerSelector';
+// 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
+// import ReviewerAndExaminerSelector from 'components/page/home/dailyReport/ReviewerAndExaminerSelector';
 import ReportTable from 'components/page/home/dailyReport/ReportTable';
 import TabCarousel from 'components/page/home/dailyReport/TabCarousel';
 import { panelListCreator } from 'components/page/home/dailyReport/utils/panelListCreator';
@@ -27,14 +27,13 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SearchBar from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
+import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // hook
 import { Class_reportItem, useReport, ThookEmptyReport } from 'hooks/home/useDailyReport';
 
 // utils
 import { filterCre_nextAndPrevMonth } from 'js/utils/helpers/params/filterCreator';
-/** 將員工列表變成可以被SetReportEmpModal使用的樣子*/
-import { formatRiewerPickArr } from 'components/page/home/dailyReport/utils/formatRiewerPickArr';
 
 // api
 import {
@@ -50,8 +49,6 @@ import {
   apiPatchDailyReports_reviewers,
   apiIsReviewer,
 } from 'js/api/api_dailyReport';
-
-import { TemployeeDto, useEmployee } from 'js/api/api_employee';
 
 // type
 import { TuserDto } from 'js/api/dtoTypes';
@@ -79,6 +76,8 @@ type TdailyReportContext = {
   reportInEdit: ThookEmptyReport | undefined;
   isReportEdit: boolean;
   switchIsEdit: () => void;
+  // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
+  // 連同下面的setShowReviewerForReportModal都砍掉
   // setShowReviewerForReportModal: (v: boolean) => void;
   reqApiPatchDailyReports_my: () => void;
   cancelEditNewDailyReport: () => void;
@@ -144,8 +143,9 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const isCalendar = query.isCalendar === 'true' ? true : false;
   // ---------------------------------------------------------------------
   // 送進 檢視人員設定 SetReportEmpModal的arr
-  const [reviewersPickArr, setReviewersPickArr] = useState<Parameters<typeof SetReportEmpModal>[0]['dataArr']>();
+  const [reviewersArr, setReviewersArr] = useState<TemployeeDto[]>();
 
+  // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
   // 每個日報上傳前要選reviewer，這是那個modal的開關
   // const [showReviewerForReportModal, setShowReviewerForReportModal] = useState(false);
 
@@ -198,7 +198,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
   const params_calendar = {
     ...params,
-    pageSize: 999,
+    pageSize: 9999,
   };
 
   // ---------------------------------------------------------------
@@ -237,12 +237,6 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
   // 取得所有檢視人員
   const { updateReviewersArr: updateReviewersArr } = useApiDailyReports_reviewers();
-
-  const { update: updateEmployeeArr } = useEmployee({
-    pageSize: 999999,
-    populate: ['jobs', 'user'],
-    sort: 'idNumber',
-  });
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -408,23 +402,16 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
   //**開啟回報人員設定面板 */
   const editRivewerPickArr = async () => {
-    const resArr = await Promise.all([
-      updateReviewersArr(), // 取得所有檢視人員
-      updateEmployeeArr(), // 取得所有人員
-    ]);
+    const res = await updateReviewersArr();
 
-    const reviewersArr = resArr[0];
-    const employeeArr = resArr[1].data;
-    const reviewersPickArr = formatRiewerPickArr({
-      dailyReports_ReportersArr: reviewersArr,
-      employeeArr,
-    });
-    setReviewersPickArr(reviewersPickArr);
+    if (res) {
+      setReviewersArr(res);
+    }
   };
 
   /**關閉回報人員設定面板 */
   const cancelSetRivewerModal = () => {
-    setReviewersPickArr(undefined);
+    setReviewersArr(undefined);
   };
 
   // ----------------------------------------------------------------------
@@ -499,10 +486,10 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return;
     }
 
+    // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
     // if (reviewerArr.length === 0) {
     //   return myAlert.warning({ title: '請選擇檢視人員' });
     // }
-
     // const reviewerIds = reviewerArr.map((emp) => emp.id);
     // const examinerIds = examinerArr.map((emp) => emp.id);
 
@@ -547,6 +534,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       await apiPatchDailyReports_my({
         date: moment(theDate).format('YYYY-MM-DD'),
         body: {
+          // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
           // reviewerIds,
           // examinerIds,
           items,
@@ -586,20 +574,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   // __________________________________________
 
   /**發出設定檢視人員apiReq */
-  const reqApiPatchDailyReports_viewers = async (employeeArr: Parameters<typeof SetReportEmpModal>[0]['dataArr']) => {
-    const shouldReportEmpArr: typeof employeeArr = [];
-    employeeArr.forEach((employee) => {
-      if (employee.shouldReport) {
-        shouldReportEmpArr.push(employee);
-      }
-    });
-    const isPass = !shouldReportEmpArr.some((emp) => emp.isHaveUser === false);
-
-    if (!isPass) {
-      return myAlert.warning({ title: '名單錯誤', content: '只能選擇有ERP操作權限的人員' });
-    }
-
-    const employeeIds = shouldReportEmpArr.map((emp) => emp.id);
+  const reqApiPatchDailyReports_viewers = async (employeeArr: TemployeeDto[]) => {
+    const employeeIds = employeeArr.map((emp) => emp.id);
 
     try {
       showRootLoading(true);
@@ -785,15 +761,25 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         {/*  */}
       </SubLayer>
 
-      <SetReportEmpModal
-        visible={!!reviewersPickArr}
+      <EmployeeSelector
+        //
+        showModal={!!reviewersArr}
         onConfirm={reqApiPatchDailyReports_viewers}
         onCancel={cancelSetRivewerModal}
-        dataArr={reviewersPickArr ?? []}
-        label="檢視人員設定"
-        tip="可複選"
+        defaultEmpArr={reviewersArr}
+        customPopulate={['user']}
+        exceptEmpCheck={(emp) => {
+          const isDefault = reviewersArr?.some((reviewer) => reviewer.id === emp.id);
+
+          if (isDefault) {
+            return false;
+          }
+
+          return !emp.user;
+        }}
       />
 
+      {/* // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧 */}
       {/* 上傳前選擇兩種人員 */}
       {/* <ReviewerAndExaminerSelector
         visible={showReviewerForReportModal}

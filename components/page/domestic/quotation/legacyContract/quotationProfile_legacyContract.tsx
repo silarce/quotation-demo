@@ -11,7 +11,7 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from '../quotationProfile.module.scss';
 
-import { Class_basicInfo, Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_basicInfo, Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 import { Toption } from 'js/utils/options/countryAndDistrict';
 
 // type

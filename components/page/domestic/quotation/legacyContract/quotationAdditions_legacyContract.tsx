@@ -13,7 +13,7 @@ import AddButton from 'components/global/gear/button/addButton';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
-import { Class_legacyContract, Class_addition } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract, Class_addition } from 'hooks/quotation/legacy/useLegacyContract';
 
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';

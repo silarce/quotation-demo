@@ -38,7 +38,7 @@ import scss from './erpCtrlPermissions.module.scss';
 import { AxiosError } from 'axios';
 
 // config
-import { hrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
+import { useHrManageLinkArr } from 'components/page/setting/hrManage/hrManageLinkArr';
 
 // ==========================================================================
 export default function ErpCtrlPermissions() {
@@ -270,12 +270,12 @@ export default function ErpCtrlPermissions() {
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
       options: options_departments,
-      width: '104px',
-      placeholder: '請選擇部門',
+      width: '70px',
+      placeholder: '部門',
     },
     {
-      width: '134px',
-      placeholder: '請輸入搜尋內容',
+      width: '90px',
+      placeholder: '搜尋內容',
     },
   ];
 
@@ -318,7 +318,7 @@ export default function ErpCtrlPermissions() {
   return (
     <SubLayer>
       <div className={scss.header}>
-        <PageHeader02 linkList={hrManageLinkArr} panelList={panelList} />
+        <PageHeader02 linkList={useHrManageLinkArr()} panelList={panelList} />
       </div>
 
       <div>

@@ -24,7 +24,7 @@ import Modal from 'antd/lib/modal/Modal';
 import scss from './quotationPdf.module.scss';
 
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 type TtableProdList_series = (TtableProdList[number] & { series: string })[];
 

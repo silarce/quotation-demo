@@ -19,7 +19,7 @@ import scss from '../quotationProduct.module.scss';
 import styleL from '../local.module.scss';
 
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 export default function QuotationProduction({
   legacyContract,

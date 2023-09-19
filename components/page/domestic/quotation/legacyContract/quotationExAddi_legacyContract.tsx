@@ -8,7 +8,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddButton from 'components/global/gear/button/addButton';
 
-import { Class_addition, Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_addition, Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';

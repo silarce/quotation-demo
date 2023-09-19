@@ -38,8 +38,8 @@ import { AppContext } from 'pages/_app';
 // ------------------------------------------------------------------
 
 // 假資料與fake api
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 import { useQuotation } from 'hooks/quotation/useQuotation';
+import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
 import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 
@@ -66,6 +66,14 @@ import {
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
+
+import { useProductList } from 'hooks/quotation/useProduct';
+
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
 export default function Quotation() {
   const router = useRouter();
   const isReady = router.isReady;
@@ -82,6 +90,17 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  const { productList, prodCellConfig, prodKeyArr, addProd, changeProdKeyArr } = useProductList();
+
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // 是否可編輯
+  const [disabled, setDisabled] = useState(true);
+  // -----------------------------------------------------
   const {
     id, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
@@ -244,8 +263,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   })();
 
   // --------------------------------------------------------------------------
-  // 是否可編輯
-  const [allowEdit, setAllowEdit] = useState(false);
+
   // ---------------------------------------------------------
   const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
 
@@ -290,7 +308,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   useEffect(() => {
     reNewClassQuotation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowEdit]);
+  }, [disabled]);
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -359,7 +377,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ),
     },
     { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
-    { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
+    { type: 'myButton', label: '取消', onClick: () => setDisabled(true) },
   ];
   const panel_noEditable: TpanelList = [
     // {
@@ -376,7 +394,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // },
     (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!id || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
-    { type: 'myButton', label: '編輯', onClick: () => setAllowEdit(true) },
+    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -445,7 +463,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       }
 
-      setAllowEdit(false);
+      setDisabled(true);
     } catch (error) {
       console.log(error);
     }
@@ -505,14 +523,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   return (
     <div className={classNames(style.container, 'relative')}>
-      <PageHeader02 tagList={tagList} panelList={allowEdit ? panel_editable : panel_noEditable} />
+      <PageHeader02 tagList={tagList} panelList={!disabled ? panel_editable : panel_noEditable} />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
             profile={data?.latestContent}
-            disabled={!allowEdit}
+            disabled={disabled}
             onProfileChange={onProfileChange}
           />
 
@@ -522,7 +540,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           {/* 主產品設定 */}
           {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
-
+          <Table_prod
+            disabled={disabled}
+            prodList={productList}
+            prodCellConfig={prodCellConfig}
+            prodKeyArr={prodKeyArr}
+            changeProdKeyArr={changeProdKeyArr}
+            addProd={addProd}
+          />
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
             {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
@@ -540,8 +565,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
             getFakeQuotaRange={getFakeQuotaRange}
             disabled={!allowEdit}
           /> */}
+
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
+          {/*  */}
+          {/*  */}
+          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
+          {/*  */}
+          {/*  */}
+
           {/* 審核人員 */}
           <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
             <InputSel
