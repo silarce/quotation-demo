@@ -61,6 +61,7 @@ export default function WorkerSelector({
         $or: {
           idNumber: { $eq: searchValue?.keyword },
           chName: { $contains: searchValue?.keyword },
+          enName: { $contains: searchValue?.keyword },
           'jobs.name': { $eq: searchValue?.keyword },
         },
         'jobs.grade': { $eq: searchValue?.grade },
