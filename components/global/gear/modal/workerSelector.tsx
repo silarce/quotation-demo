@@ -59,9 +59,9 @@ export default function WorkerSelector({
       sort: 'idNumber',
       filter: {
         $or: {
-          idNumber: searchValue?.keyword,
-          chName: searchValue?.keyword,
-          'jobs.name': searchValue?.keyword,
+          idNumber: { $eq: searchValue?.keyword },
+          chName: { $contains: searchValue?.keyword },
+          'jobs.name': { $eq: searchValue?.keyword },
         },
         'jobs.grade': { $eq: searchValue?.grade },
         // get /daily-reports/workers 所以大概也不能過濾department
@@ -226,7 +226,7 @@ export default function WorkerSelector({
     // },
     {
       selectProps: {
-        wrapperStyle: { width: '80px' },
+        wrapperStyle: { width: '100px' },
         props: {
           options: [
             { value: '', label: '不拘' },
