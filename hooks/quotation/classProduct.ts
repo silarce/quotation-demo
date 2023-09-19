@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
 
@@ -13,7 +13,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 import { Class_accessory, Taccessory } from './classAccessory';
 // =============================================================================
 // api
-import { apiGetProdCalcGeneralSpec } from 'js/api/api_product';
+import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
 // =============================================================================
 // type
 import type { TlegacyContractProductDto, TcreateLegacyContractProductDto } from 'js/api/dtoTypes';
@@ -22,7 +22,7 @@ import type { TcellConfig } from 'components/page/domestic/quotation/quotation/t
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
 import type { TdoorModelInfoDto } from 'js/api/api_product';
-import type { TpcgsPrams, TdoorGeneralSpecsDto } from 'js/api/api_product';
+import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_product';
 
 // =============================================================================
 class Class_product {
@@ -94,6 +94,10 @@ class Class_product {
 
   // ---------------------------------------------------------
 
+  // 防抖
+  cgsTimeout: NodeJS.Timeout | null = null;
+  pacTimeout: NodeJS.Timeout | null = null;
+
   req_calcGeneralSpec() {
     const req = async () => {
       if (!this.doorModel || !this.height) {
@@ -116,7 +120,6 @@ class Class_product {
         return;
       }
 
-      this._doorGeneralSpecs = res;
       //
       const defaultMotorIndex = res.defaultMotorIndex;
       const defaultMotor = res.motors[defaultMotorIndex];
@@ -128,9 +131,7 @@ class Class_product {
       // ________________________
       // 設定boxB與thickness
       // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
-
       const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-
       this._boxB = boxB;
       this.thickness = String(boxB || '');
 
@@ -139,14 +140,12 @@ class Class_product {
       if (defaultMotorBox) {
         if (defaultMotorBox.default) {
           this.motorVendor = creOption_teco();
-        }
-
-        if (defaultMotorBox.東元) {
+        } else if (defaultMotorBox.東元) {
           this.motorVendor = creOption_teco();
-        }
-
-        if (defaultMotorBox.大同) {
+        } else if (defaultMotorBox.大同) {
           this.motorVendor = creOption_datong();
+        } else {
+          this.motorVendor = null;
         }
       } else {
         this.motorVendor = null;
@@ -154,11 +153,60 @@ class Class_product {
 
       // ________________________
 
+      // getProdAvailableComponent用的weight與rollerDiameter來自doorGeneralSpecs
+      if (
+        //
+        this._doorGeneralSpecs?.weight !== res.weight ||
+        this._doorGeneralSpecs?.diameter !== res.diameter
+      ) {
+        this._doorGeneralSpecs = res;
+        this.req_getProdAvailableComponents();
+      } else {
+        this._doorGeneralSpecs = res;
+      }
+
       this.reRender();
     }; // req
 
-    req();
+    if (this.cgsTimeout) {
+      clearTimeout(this.cgsTimeout);
+    }
+
+    this.cgsTimeout = setTimeout(() => {
+      req();
+    }, 500);
   } // calcGeneralSpec
+
+  req_getProdAvailableComponents() {
+    const req = async () => {
+      const rollerDiameter = this._doorGeneralSpecs?.diameter;
+
+      if (!this.doorModel || !this.weight || !rollerDiameter) {
+        return;
+      }
+
+      const res = await apiGetProdAvailableComponents({
+        modelName: this.doorModel as TpacParams['modelName'],
+        weight: this.weight,
+        isAntiTyphoon: this.typhoonProtection,
+        rollerDiameter: rollerDiameter,
+      });
+
+      if (!res) {
+        return;
+      }
+
+      this.reRender();
+    }; // req
+
+    if (this.pacTimeout) {
+      clearTimeout(this.pacTimeout);
+    }
+
+    setTimeout(() => {
+      req();
+    }, 500);
+  } //  req_getProdAvailableComponents
 
   // ---------------------------------------------------------
 
@@ -354,6 +402,7 @@ class Class_product {
   set doorModel(v) {
     this._prodData.doorModel = v;
     this.req_calcGeneralSpec();
+    this.req_getProdAvailableComponents();
     this.reRender();
   }
   //
@@ -506,6 +555,7 @@ class Class_product {
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
+    this.req_getProdAvailableComponents();
     this.reRender();
   }
 

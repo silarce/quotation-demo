@@ -25,7 +25,7 @@ import type {
 //   return `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/${path}`;
 // };
 
-export type { TdoorModelInfoDto, TpcgsPrams, TdoorGeneralSpecsDto };
+export type { TdoorModelInfoDto, TpcgsPrams, TdoorGeneralSpecsDto, TpacParams };
 // =======================================================================
 
 export const apiGetAssets = async (path: string) => {
@@ -79,12 +79,14 @@ export const apiGetProdCalcGeneralSpec = async (params: TpcgsPrams) => {
     .catch((err) => Promise.reject(err.message));
 };
 
-export const apiGetProdAvailableComponents = async (params: {
+type TpacParams = {
   modelName: TdoorModelInfoDto['name'];
   weight: number;
   isAntiTyphoon: boolean;
   rollerDiameter: number;
-}) => {
+};
+
+export const apiGetProdAvailableComponents = async (params: TpacParams) => {
   const api = '/products/door/available-components';
 
   return axi
