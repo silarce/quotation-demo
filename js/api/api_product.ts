@@ -68,7 +68,16 @@ export const useApiGetProdDoorModels = () => {
 type TpcgsPrams = {
   modelName: TdoorModelInfoDto['name'];
   fullHeight: number;
-} & ({ fullWidth: number } | { WG: number });
+} & (
+  | {
+      fullWidth: number;
+      WG?: undefined;
+    }
+  | {
+      fullWidth?: undefined;
+      WG: number;
+    }
+);
 
 export const apiGetProdCalcGeneralSpec = async (params: TpcgsPrams) => {
   const api = '/products/door/calc-general-spec';

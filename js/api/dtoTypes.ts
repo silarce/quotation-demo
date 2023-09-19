@@ -951,7 +951,7 @@ export type TdoorMotorDto = {
   voltage: number | null; // 電壓(V)
   /**荷重(kg) */
   loadWeight: number | null; // 荷重(kg)
-  hasSupportStand: string | null; // 有腳 // 馬達支撐架
+  hasSupportStand: boolean | null; // 有腳 // 馬達支撐架
 };
 
 export type TdoorMotorAccessoriesDto = {

@@ -58,6 +58,21 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    // ----------------------------------------------------
+    /**
+     * 這些都要從TdoorComponentListDto抽出資料作為下拉式選單的選項
+     * gearNumber
+     * 捲箱厚度
+     * 門軌厚度
+     *
+     * 這些可能也要
+     * phase
+     * voltage
+     * motorVendor
+     *
+     */
+    // ----------------------------------------------------
+
     //
     // ___________________________________________________________
     // accessoryDataArr.forEach((data, index) => {
@@ -246,7 +261,64 @@ class Class_product {
       // motorAccessories
       // headBoxes
 
-      const slats = res.slats;
+      // const slats = res.slats;
+      const slats = filter_slats({
+        //
+        dataArr: res.slats,
+        filterParams: { isAntiTyphoon: this.typhoonProtection },
+      });
+
+      const bottomBars = filter_bottomBars({
+        dataArr: res.bottomBars,
+        filterParams: {
+          isAntiTyphoon: this.typhoonProtection,
+          isWaterProof: this.bottomBar === '止水型',
+          hasAluminumBarrier: this.bottomBar === '鋁障感型',
+        },
+      });
+
+      const guideRails = filter_guideRails({
+        dataArr: res.guideRails,
+        filterParams: {
+          isAntiTyphoon: this.typhoonProtection,
+          thickness: this.thickness,
+          hasSilencingStrip: this.hasSilencingStrip,
+        },
+      });
+
+      const sidePlates = filter_sidePlates({
+        dataArr: res.sidePlates,
+        filterParams: {
+          bearingType: this._doorGeneralSpecs?.bearingName,
+          // gearNumber: this., // gearNumber 在TdoorGeneralSpecsDto.motors裡面
+          // 結果我還是必須要要從TdoorGeneralSpecsDto.motors過濾馬達資料出來
+          isIntegrated: this.isIntegrated,
+          motorVendor: this.motorVendor,
+          weight: this.weight,
+        },
+      });
+
+      const rollers = filter_rollers({
+        dataArr: res.rollers,
+        filterParams: {
+          diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
+        },
+      });
+
+      const motors = filter_motors({
+        dataArr: res.motors,
+        filterParams: {
+          horsePower: this.horsepower,
+          // gearNumber: this.,
+          motorVendor: this.motorVendor,
+          phase: Number(this.phase),
+          voltage: Number(this.voltage),
+          loadWeight: this.weight,
+          hasSupportStand: this.hasSupportStand,
+        },
+      });
+
+      // 明天繼續做filter_motorAccessories跟filter_headBoxes
 
       this.reRender();
     }; // req
@@ -647,6 +719,16 @@ class Class_product {
     this.reRender();
   }
   //
+
+  get phase() {
+    return this._prodData.phase;
+  }
+  set phase(v) {
+    this._prodData.phase = v;
+    this.reRender();
+  }
+
+  //
   get hasSupportStand() {
     return this._prodData.hasSupportStand;
   }
@@ -757,6 +839,7 @@ type Tprod = {
   //
   motorVendor: string; // 馬達廠商
   voltage: string; // 電壓
+  phase: string; // 相數
   hasSupportStand: boolean; // 馬達支撐架
   bottomBar: string; // 底座類型
   lockBox: string; // 馬達鎖盒
@@ -796,6 +879,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     //
     'motorVendor', // 馬達廠商
     'voltage', // 電壓
+    'phase', // 相數
     'hasSupportStand', // 馬達支撐架
     'bottomBar', // 底座類型
     'lockBox', // 馬達鎖盒
@@ -1094,6 +1178,20 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
+  phase: {
+    label: '相數',
+    inputSelProps: {
+      wrapperStyle: { width: '90px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '單相', label: '單相' },
+            { value: '雙相', label: '雙相' },
+          ],
+        },
+      },
+    },
+  },
   hasSupportStand: {
     label: '馬達支撐架',
     theadItemClassName: 'text-center',
@@ -1239,6 +1337,7 @@ const emptyProdOri: () => Tprod = () => {
     //
     motorVendor: '',
     voltage: '',
+    phase: '',
     hasSupportStand: false,
     bottomBar: '',
     lockBox: '',
@@ -1251,6 +1350,10 @@ const emptyProdOri: () => Tprod = () => {
   };
 };
 
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 // slats
 // bottomBars
 // guideRails
@@ -1351,8 +1454,8 @@ const filter_sidePlates = ({
 }: {
   dataArr: TdoorComponentListDto['sidePlates'];
   filterParams: {
-    bearingType: string; // 軸承
-    gearNumber: string; // 鍊齒輪番號
+    bearingType?: string; // 軸承 // doorGeneralSpecs沒有，型別暫時暫時加上?
+    gearNumber?: string; // 鍊齒輪番號 // doorGeneralSpecs沒有，型別暫時加上?
     /**一體式捲箱 */
     isIntegrated: boolean; // 一體式捲箱
     motorVendor: string; // 馬達廠商
@@ -1363,9 +1466,9 @@ const filter_sidePlates = ({
     let isPass = true;
 
     if (data.bearingType !== filterParams.bearingType) {
-      isPass = false;
+      // isPass = false;
     } else if (data.gearNumber && data.gearNumber !== filterParams.gearNumber) {
-      isPass = false;
+      // isPass = false;
     } else if (data.isIntegrated && data.isIntegrated !== filterParams.isIntegrated) {
       isPass = false;
     } else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
@@ -1419,14 +1522,14 @@ const filter_motors = ({
   dataArr: TdoorComponentListDto['motors'];
   filterParams: {
     horsePower: string; // 馬力數
-    gearNumber: string; // 鍊齒輪番號
+    // gearNumber: string; // 鍊齒輪番號 // 掠過
     motorVendor: string; // 馬達廠商
     phase: number; // 相位
     /**電壓(V) */
     voltage: number; // 電壓(V)
     /**荷重(kg) */
     loadWeight: number; // 荷重(kg)
-    hasSupportStand: string; // 有腳 // 馬達支撐架
+    hasSupportStand: boolean; // 有腳 // 馬達支撐架
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
@@ -1434,9 +1537,11 @@ const filter_motors = ({
 
     if (data.horsePower !== filterParams.horsePower) {
       isPass = false;
-    } else if (data.gearNumber !== filterParams.gearNumber) {
-      isPass = false;
-    } else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
+    }
+    // else if (data.gearNumber !== filterParams.gearNumber) {
+    //   isPass = false;
+    // }
+    else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
       isPass = false;
     } else if (data.phase && data.phase !== filterParams.phase) {
       isPass = false;
