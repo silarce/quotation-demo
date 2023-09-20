@@ -875,6 +875,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
+      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      */}
+      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      */}
       {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => {
@@ -882,6 +888,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         classQuotation={classQuotation}
       /> */}
+      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      */}
+      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      */}
 
       {/*  */}
       {/* <QuotationPdf_part
