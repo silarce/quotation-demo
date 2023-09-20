@@ -55,6 +55,7 @@ class Class_product {
     this._doorModelList = doorModelList;
     //
     this._quantity = String(this._prodData.quantity);
+    this._listPrice = String(this._prodData.listPrice);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
@@ -98,6 +99,7 @@ class Class_product {
   //
   private _prodData;
   private _quantity;
+  private _listPrice;
   private _unitPrice;
   private _totalPrice;
 
@@ -390,6 +392,13 @@ class Class_product {
     }
   }
 
+  private countPrice() {
+    const listPrice = this.listPrice.replace(/,/g, '') || '0';
+    const discountRate = this.discountRate || '0';
+
+    this.unitPrice = Decimal.mul(listPrice, Decimal.div(discountRate, 100)).toString();
+  }
+
   private countTotalPrice() {
     const quantity = this.quantity.replace(/,/g, '') || 0;
     const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
@@ -586,6 +595,7 @@ class Class_product {
     }
 
     this._prodData.discountRate = `${Number(v)}`;
+    this.countPrice();
     this.reRender();
   }
   // set discountRate_noLoop(v) {}
@@ -734,6 +744,27 @@ class Class_product {
     this._prodData.quantity = Number(v);
     this._quantity = v;
     this.countTotalPrice();
+    this.reRender();
+  }
+
+  get listPrice() {
+    if (!this._listPrice) {
+      return '';
+    }
+
+    return Number(this._listPrice).toLocaleString();
+  }
+  set listPrice(v) {
+    v = v.replace(/,/g, '');
+    const numberRegex = /^(\d+(\.\d+)?|)$/;
+
+    if (!numberRegex.test(v)) {
+      return;
+    }
+
+    this._prodData.listPrice = Number(v);
+    this._listPrice = v;
+    this.countPrice();
     this.reRender();
   }
 
@@ -937,6 +968,7 @@ type Tprod = {
   doorTrack: string;
   horsepower: string;
   quantity: number;
+  listPrice: number;
   unitPrice: number;
   totalPrice: number;
   typhoonProtection: boolean;
@@ -977,6 +1009,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'doorTrack',
     'horsepower',
     'quantity',
+    'listPrice',
     'unitPrice',
     'totalPrice',
     'typhoonProtection',
@@ -1203,8 +1236,9 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  unitPrice: {
-    label: '單價',
+
+  listPrice: {
+    label: '牌價',
     inputSelProps: {
       wrapperStyle: { width: '120px' },
       inputProps: {
@@ -1212,12 +1246,27 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
+  unitPrice: {
+    label: '單價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '120px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
   totalPrice: {
     label: '複價',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '140px' },
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
       },
     },
   },
@@ -1435,6 +1484,7 @@ const emptyProdOri: () => Tprod = () => {
     doorTrack: '',
     horsepower: '',
     quantity: 0,
+    listPrice: 0,
     unitPrice: 0,
     totalPrice: 0,
     typhoonProtection: false,
@@ -1736,3 +1786,14 @@ const filter_headBoxes = ({
 // ===========================================================
 export { Class_product, prodkeyArrOri, prodCellConfig };
 export type { Tprod, TprodKey, TcellConfig };
+
+// 折數
+// 牌價 就是原價格
+// 單價 === 折數*牌價
+// 複價 === 單價*數量
+// 小計 ===所有主產品複價的總和
+// 營業稅=== 小計 * 0.05
+// 總計 === 小計 + 營業稅
+
+// 每個主產品的折數都不會總折數
+// 是獨立的
