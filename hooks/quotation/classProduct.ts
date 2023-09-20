@@ -423,9 +423,13 @@ class Class_product {
   }
 
   private calcArea = () => {
-    const area = Decimal.add(this._prodData.height || '0', this._prodData.thickness || '0') // h+b
-      /** "0"被視為true，所以用型別為number的值來計算 */
-      .mul(this._prodData.width || this._prodData.length || '0') // *w or *h
+    const h = Number(this._prodData.height || 0);
+    const b = Number(this._prodData.B || 0);
+    const w = Number(this._prodData.width || 0);
+    const l = Number(this._prodData.length || 0);
+
+    const area = Decimal.add(h, b) // h+b
+      .mul(w || l)
       .toFixed(2)
       .toString();
 
