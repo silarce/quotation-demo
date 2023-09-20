@@ -202,7 +202,6 @@ class Class_product {
       // ________________________
       // 設定boxB與thickness
       // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
-      // !!!!!!! 跟經理確認thickness跟B(m)是什麼 !!!!!!!!!
       const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
       this.B = String(boxB);
       this.thickness = res.thickness;
@@ -683,7 +682,7 @@ class Class_product {
     this.reRender();
   }
   //
-  // !!!!!!! 跟經理確認thickness跟B(m)是什麼 !!!!!!!!!
+
   /**B(m) */
   get B() {
     return this._prodData.B;
@@ -693,17 +692,15 @@ class Class_product {
     this.area = this.calcArea();
     this.reRender();
   }
+
   /**門片厚度 */
   get thickness() {
     return this._prodData.thickness;
   }
   set thickness(v) {
     this._prodData.thickness = v;
-    // this.area = this.calcArea();
     this.reRender();
   }
-
-  // !!!!!!! 跟經理確認thickness跟B(m)是什麼 !!!!!!!!!
 
   //
   get area() {
@@ -1010,7 +1007,7 @@ type Tprod = {
   width: string; // W(m)
   height: string; //h(m)
   B: string; // B(m)
-  thickness: string; // B(m)? 門片厚度?
+  thickness: string; // 門片厚度?
   area: string; // 面積
   volume: string; // 才數
   material: string;
@@ -1173,7 +1170,6 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-
   // 後端說B(m)是boxB
   B: {
     label: 'B(m)',
@@ -1188,9 +1184,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  // 那thickness是什麼? 門片厚度?
   thickness: {
-    // label: 'B(m)', 不確定
     label: '門片厚度',
     theadItemClassName: 'text-center',
     inputSelProps: {
@@ -1205,7 +1199,6 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-
   area: {
     label: '面積',
     inputSelProps: {
@@ -1640,7 +1633,7 @@ const filter_guideRails = ({
 }: {
   dataArr: TdoorComponentListDto['guideRails'];
   filterParams: {
-    thickness: string; // 要怎麼判斷? 大於小於等於? 主產品的thickness是不是應該固定?
+    thickness: string; // 判定為!==
     isAntiTyphoon: boolean;
     /**消音條 */
     hasSilencingStrip: boolean; // 消音條
