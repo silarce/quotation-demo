@@ -62,6 +62,7 @@ class Class_product {
     //
     this._quantity = String(this._prodData.quantity);
     this._listPrice = String(this._prodData.listPrice);
+    this._listPriceTotal = String(this._prodData.listPriceTotal);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
@@ -108,6 +109,7 @@ class Class_product {
   private _prodData;
   private _quantity;
   private _listPrice;
+  private _listPriceTotal;
   private _unitPrice;
   private _totalPrice;
 
@@ -398,6 +400,12 @@ class Class_product {
     if (boxB) {
       this.B = String(boxB);
     }
+  }
+
+  private countListPriceTotal() {
+    const listPriceTotal = Decimal.mul(this._prodData.listPrice, this.quantity).toString();
+    this._listPriceTotal = listPriceTotal;
+    this._prodData.listPriceTotal = Number(listPriceTotal);
   }
 
   private countPrice() {
@@ -751,6 +759,7 @@ class Class_product {
   set quantity(v) {
     this._prodData.quantity = Number(v);
     this._quantity = v;
+    this.countListPriceTotal();
     this.countTotalPrice();
     this.reRender();
   }
@@ -772,6 +781,28 @@ class Class_product {
 
     this._prodData.listPrice = Number(v);
     this._listPrice = v;
+    this.countListPriceTotal();
+    this.countPrice();
+    this.reRender();
+  }
+
+  get listPriceTotal() {
+    if (!this._listPriceTotal) {
+      return '';
+    }
+
+    return Number(this._listPriceTotal).toLocaleString();
+  }
+  set listPriceTotal(v) {
+    // v = v.replace(/,/g, '');
+    // const numberRegex = /^(\d+(\.\d+)?|)$/;
+
+    // if (!numberRegex.test(v)) {
+    //   return;
+    // }
+
+    this._prodData.listPriceTotal = Number(v);
+    this._listPriceTotal = v;
     this.countPrice();
     this.reRender();
   }
@@ -984,6 +1015,7 @@ type Tprod = {
   horsepower: string;
   quantity: number;
   listPrice: number;
+  listPriceTotal: number;
   unitPrice: number;
   totalPrice: number;
   typhoonProtection: boolean;
@@ -1025,6 +1057,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'horsepower',
     'quantity',
     'listPrice',
+    'listPriceTotal',
     'unitPrice',
     'totalPrice',
     'typhoonProtection',
@@ -1251,13 +1284,23 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-
   listPrice: {
     label: '牌價',
     inputSelProps: {
       wrapperStyle: { width: '120px' },
       inputProps: {
         props: {},
+      },
+    },
+  },
+  listPriceTotal: {
+    label: '牌價複價',
+    inputSelProps: {
+      wrapperStyle: { width: '120px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
       },
     },
   },
@@ -1500,6 +1543,7 @@ const emptyProdOri: () => Tprod = () => {
     horsepower: '',
     quantity: 0,
     listPrice: 0,
+    listPriceTotal: 0,
     unitPrice: 0,
     totalPrice: 0,
     typhoonProtection: false,
