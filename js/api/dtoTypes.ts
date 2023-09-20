@@ -763,6 +763,26 @@ export type TquotationContentDto = {
   salesReviewedAt: string | null;
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
+  //
+  // 預期會加進來的property
+  /**備註 */
+  annotation: string[];
+  /**報價範圍 */
+  quoteScopes: string[];
+  // /**折扣率(0.0 - 1.0 */
+  // discountRate: string;
+  // /**小計 */
+  // subTotal: number;
+  // /**營業稅 */
+  // salesTax: number;
+  // /**總計 */
+  // total: number;
+  // /**交貨地點 */
+  // deliveryLocation: string;
+  // /**交貨日期 date*/
+  // deliveryDate: string;
+  // /**付款方式 */
+  // paymentMethods: TpaymentMethodDto[];
 };
 
 export type TquotationDto = {
@@ -792,6 +812,26 @@ export type TcreateQuotationContentDto = {
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
+  //
+  // 預期會加進來的property
+  /**備註 */
+  annotation: string[];
+  /**報價範圍 */
+  quoteScopes: string[];
+  // /**折扣率(0.0 - 1.0 */
+  // discountRate: string;
+  // /**小計 */
+  // subTotal: number;
+  // /**營業稅 */
+  // salesTax: number;
+  // /**總計 */
+  // total: number;
+  // /**交貨地點 */
+  // deliveryLocation: string;
+  // /**交貨日期 date*/
+  // deliveryDate: string;
+  // /**付款方式 */
+  // paymentMethods: TpaymentMethodDto[];
 };
 
 // ========================================================================
@@ -917,6 +957,8 @@ export type TdoorSidePlateDto = {
   motorVendor: string | null; // 馬達廠商
   maxDoorWeight: number | null; // 最大門重量(kg)
   minDoorWeight: number | null; // 最小門重量(kg)
+
+  // 需要有表面
 };
 
 export type TdoorRollerDto = {
@@ -988,7 +1030,7 @@ export type TdoorComponentListDto = {
   slats: TdoorSlatDto[]; // 支版
   bottomBars: TdoorBottomBarDto[]; // 底座
   guideRails: TdoorGuideRailDto[]; // 門軌?
-  sidePlates: TdoorSidePlateDto[]; // ??
+  sidePlates: TdoorSidePlateDto[]; // 門片?
   rollers: TdoorRollerDto[]; // 卷軸
   motors: TdoorMotorDto[]; // 馬達
   motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件?

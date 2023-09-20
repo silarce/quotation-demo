@@ -94,7 +94,20 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
+  const {
+    id, //報價單id //若為新增報價單則為undefined
+  } = router.query as { id: string | undefined };
+  const { userInfo } = useContext(AppContext);
+  const userId = userInfo?.employee?.id;
   // -----------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
+  // 是否可編輯
+  const [disabled, setDisabled] = useState(true);
+  // -----------------------------------------------------
+  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  // -----------------------------------------------------
+  // 資料
+  const { data, update } = useGetQuotation_id(id as string);
   // -----------------------------------------------------
   // -----------------------------------------------------
   const { productList, prodCellConfig, prodKeyArr, addProd, changeProdKeyArr } = useProductList();
@@ -123,6 +136,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 莫名其妙
   const [anno, setAnnotation] = useState<string[]>([]);
   const [qr, setQr] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    // 實際上api還沒給annotation跟quoteScopes
+    setAnnotation(data.latestContent.annotation ?? []);
+    setQr(data.latestContent.quoteScopes ?? []);
+  }, [data]);
+
   const [paymentMethod, setPaymentMethod] = useState<{ label: string; value: string }[]>([]);
 
   const control_anno: TsummaryControl = {
@@ -307,25 +331,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
-  // 是否可編輯
-  const [disabled, setDisabled] = useState(true);
-  // -----------------------------------------------------
-  const {
-    id, //報價單id //若為新增報價單則為undefined
-  } = router.query as { id: string | undefined };
+
   // ----------------------------------------------------------------
-  const { userInfo } = useContext(AppContext);
-  const userId = userInfo?.employee?.id;
+
   // ----------------------------------------------------------------
-  const [isLoading, setIsLoading] = useState(false);
-  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+
   // ---------------------------------------------------------
   const [reviewSales, setReviewSales] = useState<TemployeeDto>();
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
-  const { data, update } = useGetQuotation_id(id as string);
+  // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
   const reviewSalesEmployeeId = data?.latestContent?.reviewSalesEmployee?.id;
@@ -655,6 +672,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // 目前只有admin可以呼叫這系列的api，但是agentId必須送，暫時先這樣處理
       agentId: data.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
       //
+      //
+      // api更新後會新增的東西，但還沒有
+      annotation: anno,
+      quoteScopes: qr,
     };
 
     try {
