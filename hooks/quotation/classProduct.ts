@@ -403,7 +403,7 @@ class Class_product {
   }
 
   private countListPriceTotal() {
-    const listPriceTotal = Decimal.mul(this._prodData.listPrice, this.quantity).toString();
+    const listPriceTotal = Decimal.mul(this._prodData.listPrice || 0, this.quantity || 0).toString();
     this._listPriceTotal = listPriceTotal;
     this._prodData.listPriceTotal = Number(listPriceTotal);
   }
