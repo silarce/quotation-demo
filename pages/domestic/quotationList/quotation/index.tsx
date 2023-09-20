@@ -4,6 +4,7 @@ import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
 import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // components
 import QuotationProfile, { TprofileReturnBody } from 'components/page/domestic/quotation/quotationProfile';
@@ -110,7 +111,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const { data, update } = useGetQuotation_id(id as string);
   // -----------------------------------------------------
   // -----------------------------------------------------
-  const { productList, prodCellConfig, prodKeyArr, addProd, changeProdKeyArr } = useProductList();
+  const {
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    addProd,
+    changeProdKeyArr,
+    subTotal: prodSubTotal,
+  } = useProductList();
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -121,7 +129,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     deliveryDate: string;
     // paymentMethod: { label: string; value: string }[];
   }>({
-    discountRate: '',
+    discountRate: '100',
     subTotal: '',
     salesTax: '',
     total: '',
@@ -221,44 +229,70 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   };
 
+  const payInfoValue = (() => {
+    const discountRate = new Decimal(summary.discountRate || 0).div(100);
+
+    const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+    const tax = Decimal.mul(subTotal || 0, 0.05);
+    const total = Decimal.add(subTotal || 0, tax || 0);
+
+    const subTotalStr = Number(subTotal.toFixed(2)).toLocaleString();
+    const taxStr = Number(tax.toFixed(2)).toLocaleString();
+    const totalStr = Number(total.toFixed(2)).toLocaleString();
+
+    return {
+      subTotal: subTotalStr,
+      tax: taxStr,
+      total: totalStr,
+    };
+  })();
+
   const payInfoControl: TpayInfoControl = {
     payment: {
       discountRate: {
-        value: summary.discountRate,
-        onChange: (v) => {
-          setSummary((state) => {
-            const copy = { ...state };
-            copy.discountRate = v;
+        inputAttr: {
+          disabled: disabled,
+          value: summary.discountRate,
+          onChange: (e) => {
+            let v = e.target.value;
+            setSummary((state) => {
+              const copy = { ...state };
 
-            return copy;
-          });
+              if ((v as string) === '') {
+                v = '0';
+              }
+
+              if (Number(v) > 100) {
+                v = '100';
+              }
+
+              if (v.split('.')[1]?.length > 2) {
+                return copy;
+              }
+
+              copy.discountRate = v;
+
+              return copy;
+            });
+          },
         },
       },
       subTotal: {
-        value: summary.subTotal,
-        onChange: (v) => {
-          setSummary((state) => {
-            const copy = { ...state };
-            copy.subTotal = v;
-
-            return copy;
-          });
+        inputAttr: {
+          disabled: true,
+          value: payInfoValue.subTotal,
         },
       },
       salesTax: {
-        value: summary.salesTax,
-        onChange: (v) => {
-          const copy = { ...summary };
-          copy.salesTax = v;
-          setSummary(copy);
+        inputAttr: {
+          disabled: true,
+          value: payInfoValue.tax,
         },
       },
       total: {
-        value: summary.total,
-        onChange: (v) => {
-          const copy = { ...summary };
-          copy.total = v;
-          setSummary(copy);
+        inputAttr: {
+          disabled: true,
+          value: payInfoValue.total,
         },
       },
     },
@@ -328,15 +362,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   };
 
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-
   // ----------------------------------------------------------------
 
   // ----------------------------------------------------------------
 
-  // ---------------------------------------------------------
   const [reviewSales, setReviewSales] = useState<TemployeeDto>();
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
 
@@ -747,6 +776,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
     }
   };
+
+  // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------

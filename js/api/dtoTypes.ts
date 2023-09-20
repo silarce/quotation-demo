@@ -1027,10 +1027,10 @@ export type TdoorHeadBoxDto = {
 };
 
 export type TdoorComponentListDto = {
-  slats: TdoorSlatDto[]; // 支版
+  slats: TdoorSlatDto[]; // 門片
   bottomBars: TdoorBottomBarDto[]; // 底座
   guideRails: TdoorGuideRailDto[]; // 門軌?
-  sidePlates: TdoorSidePlateDto[]; // 門片?
+  sidePlates: TdoorSidePlateDto[]; // 支板
   rollers: TdoorRollerDto[]; // 卷軸
   motors: TdoorMotorDto[]; // 馬達
   motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件?

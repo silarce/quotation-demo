@@ -36,6 +36,9 @@
         font-size: 16px;
         text-align: right;
         border-bottom: solid 1px $colorMain;
+        &.noBaseLine {
+          border-bottom-color: transparent;
+        }
       }
       > span {
         display: inline-block;

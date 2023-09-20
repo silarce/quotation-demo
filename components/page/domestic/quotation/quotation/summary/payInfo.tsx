@@ -12,33 +12,25 @@ import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/
 // css
 import scss from './payInfo.module.scss';
 
+type TinputCell = {
+  inputAttr: React.InputHTMLAttributes<HTMLInputElement>;
+};
+
 export type Tcontrol = {
   payment: {
-    discountRate: {
-      value: string;
-      onChange: (v: string) => void;
-    };
-    subTotal: {
-      value: string;
-      onChange: (v: string) => void;
-    };
-    salesTax: {
-      value: string;
-      onChange: (v: string) => void;
-    };
-    total: {
-      value: string;
-      onChange: (v: string) => void;
-    };
+    discountRate: TinputCell;
+    subTotal: TinputCell;
+    salesTax: TinputCell;
+    total: TinputCell;
   };
   delivery: {
     deliveryLocation: {
       value: string;
-      onChange: (v: string) => void;
+      onChange?: (v: string) => void;
     };
     deliveryDate: {
       value: string;
-      onChange: (v: string) => void;
+      onChange?: (v: string) => void;
     };
   };
   paymentMethod: {
@@ -75,10 +67,15 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
           <div>
             <input
               type="number"
-              className="bg-transparent"
-              value={payment.discountRate.value}
-              onChange={(e) => payment.discountRate.onChange(e.target.value)}
-              disabled={disabled}
+              className={classNames(
+                //
+                'bg-transparent',
+                payment.discountRate.inputAttr.disabled && scss.noBaseLine
+              )}
+              {...payment.discountRate.inputAttr}
+              // value={payment.discountRate.value}
+              // onChange={(e) => payment.discountRate.onChange?.(e.target.value)}
+              // disabled={disabled}
             />
             <span>%</span>
           </div>
@@ -96,9 +93,15 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
               <div>
                 <input
                   type="text"
-                  className="bg-transparent"
-                  value={payment[key].value}
-                  onChange={(e) => payment[key].onChange(e.target.value)}
+                  // className="bg-transparent"
+                  className={classNames(
+                    //
+                    'bg-transparent',
+                    payment[key].inputAttr.disabled && scss.noBaseLine
+                  )}
+                  {...payment[key].inputAttr}
+                  // value={payment[key].value}
+                  // onChange={(e) => payment[key].onChange?.(e.target.value)}
                   disabled={disabled}
                 />
                 <span></span>
@@ -118,7 +121,7 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
               props: {
                 value: delivery.deliveryLocation.value,
                 onChange: (v) => {
-                  delivery.deliveryLocation.onChange(v.target.value);
+                  delivery.deliveryLocation.onChange?.(v.target.value);
                 },
 
                 placeholder: '請輸入交貨地址',
@@ -140,7 +143,7 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
                 value: delivery.deliveryDate.value ? moment(delivery.deliveryDate.value) : null,
                 onChange: (date_m) => {
                   const isoString = date_m?.toISOString() || '';
-                  delivery.deliveryDate.onChange(isoString);
+                  delivery.deliveryDate.onChange?.(isoString);
                 },
               },
             }}

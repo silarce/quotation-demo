@@ -67,6 +67,8 @@ const useProductList = () => {
   const [prodKeyArr, setProdKeyArr] = useState<TprodKey[]>([]);
   const [productList, setProductList] = useState<TproductList>({});
 
+  const [subTotal, setSubTotal] = useState('');
+
   const changeProdKeyArr = (v: TprodKey[]) => {
     setProdKeyArr(v);
     localStorage.setItem('domestic/quotation_prodKeyArr', JSON.stringify(v));
@@ -94,11 +96,23 @@ const useProductList = () => {
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
       //
+      calcProdSubTotalPrice,
+      //
       doorModelList,
     });
     productList[newKey] = classProd;
     reRender();
     // setProductList(copy);
+  };
+
+  const calcProdSubTotalPrice = () => {
+    let subTotal = new Decimal(0);
+
+    Object.values(productList).forEach((prod) => {
+      subTotal = subTotal.add(prod.totalPrice_num);
+    });
+
+    setSubTotal(subTotal.toString());
   };
 
   useEffect(() => {
@@ -134,6 +148,8 @@ const useProductList = () => {
     prodKeyArr,
     addProd,
     changeProdKeyArr,
+    //
+    subTotal,
     //
   };
 };

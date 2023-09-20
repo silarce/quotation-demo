@@ -36,6 +36,8 @@ class Class_product {
     accessoryDataArr = [],
     delSelf,
     copySelf,
+    //
+    calcProdSubTotalPrice,
     // from api
     doorModelList,
   }: {
@@ -44,6 +46,8 @@ class Class_product {
     accessoryDataArr?: Taccessory[];
     delSelf: () => void;
     copySelf: () => void;
+    //
+    calcProdSubTotalPrice: () => void;
     // from api
     doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
@@ -51,6 +55,8 @@ class Class_product {
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+    //
+    this._calcProdSubTotalPrice = calcProdSubTotalPrice;
     // from api
     this._doorModelList = doorModelList;
     //
@@ -90,6 +96,8 @@ class Class_product {
   private reRender;
   readonly delSelf;
   readonly copySelf;
+  //
+  readonly _calcProdSubTotalPrice;
   // from api
   // 門型資料
   private _doorModelList;
@@ -796,6 +804,7 @@ class Class_product {
 
     return Number(this._totalPrice).toLocaleString();
   }
+
   set totalPrice(v) {
     v = v.replace(/,/g, '');
     const numberRegex = /^(\d+(\.\d+)?|)$/;
@@ -806,7 +815,13 @@ class Class_product {
 
     this._prodData.totalPrice = Number(v);
     this._totalPrice = v;
+    this._calcProdSubTotalPrice();
     this.reRender();
+  }
+
+  // 計算總小計用的
+  get totalPrice_num() {
+    return Number(this._totalPrice);
   }
 
   get typhoonProtection() {
