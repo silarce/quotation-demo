@@ -220,49 +220,49 @@ type Taccessory = {
   isAntiTyphoon?: boolean;
 
   // TdoorSidePlateDto  TdoorMotorDto
-  gearNumber: string | null; // 鍊齒輪番號
-  motorVendor: string | null; // 馬達廠商
+  gearNumber?: string | null; // 鍊齒輪番號
+  motorVendor?: string | null; // 馬達廠商
 
   // TdoorSidePlateDto  TdoorMotorAccessoriesDto
-  bearingType: string | null; // 軸承
+  bearingType?: string | null; // 軸承
 
   // TdoorGuideRailDto TdoorMotorAccessoriesDto
-  thickness: string | null; // 厚度
+  thickness?: string | null; // 厚度
 
   // TdoorSidePlateDto TdoorMotorAccessoriesDto
-  isIntegrated: boolean | null; // 一體式捲箱
+  isIntegrated?: boolean | null; // 一體式捲箱
 
   // ----------------------------------------------
   // TdoorBottomBarDto
-  isWaterProof: boolean;
-  hasAluminumBarrier: boolean;
+  isWaterProof?: boolean;
+  hasAluminumBarrier?: boolean;
 
   // TdoorGuideRailDto
   /**消音條 */
-  hasSilencingStrip: boolean; // 消音條
+  hasSilencingStrip?: boolean; // 消音條
 
   //TdoorSidePlateDto
   /**一體式捲箱 */
-  maxDoorWeight: number | null; // 最大門重量(kg)
-  minDoorWeight: number | null; // 最小門重量(kg)
+  maxDoorWeight?: number | null; // 最大門重量(kg)
+  minDoorWeight?: number | null; // 最小門重量(kg)
 
   // TdoorRollerDto
   /**直徑(inch) */
-  diameter: string; // 直徑(inch)
+  diameter?: string; // 直徑(inch)
 
   // TdoorMotorDto
-  horsePower: string; // 馬力數
-  phase: number | null; // 相位
+  horsePower?: string; // 馬力數
+  phase?: number | null; // 相位
   /**電壓(V) */
-  voltage: number | null; // 電壓(V)
+  voltage?: number | null; // 電壓(V)
   /**荷重(kg) */
-  loadWeight: number | null; // 荷重(kg)
-  hasSupportStand: string | null; // 有腳
+  loadWeight?: number | null; // 荷重(kg)
+  hasSupportStand?: boolean | null; // 有腳
 
   // TdoorMotorAccessoriesDto
   // 沒有name
   /**鍊條排數 */
-  chains: number; // 鍊條排數
+  chains?: number; // 鍊條排數
 
   // TdoorMotorAccessoriesDto
   // 兩個property，都是共有property
