@@ -1,4 +1,13 @@
-import _, { set } from 'lodash';
+/**
+ *
+ * retrieveOptions 下拉式選單產生器
+ * Class_product
+ * creAcceList
+ * 下拉式選單的選項
+ *
+ */
+
+import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
 
@@ -459,13 +468,14 @@ class Class_product {
       // rollers,
       motors,
       // motorAccessories,
-      // headBoxes,
+      headBoxes,
     } = this._availableComponents;
 
     const horsePowerList: { [key: string]: Toption } = {};
     const motorVendorList: { [key: string]: Toption } = {};
     const phaseList: { [key: string]: Toption } = {};
     const voltageList: { [key: string]: Toption } = {};
+    const headBoxThickList: { [key: string]: Toption } = {};
 
     motors.forEach((item) => {
       const { horsePower, motorVendor, phase, voltage } = item;
@@ -499,6 +509,17 @@ class Class_product {
       }
     });
 
+    headBoxes.forEach((item) => {
+      const { thickness } = item;
+
+      if (thickness) {
+        headBoxThickList[thickness] = {
+          value: String(thickness),
+          label: String(thickness),
+        };
+      }
+    });
+
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
     } else {
@@ -522,6 +543,12 @@ class Class_product {
     } else {
       this.options_voltage = undefined;
     }
+
+    if (Object.keys(headBoxThickList).length > 0) {
+      this.options_headBoxThick = Object.values(headBoxThickList);
+    } else {
+      this.options_headBoxThick = undefined;
+    }
   } // retrieveOptions
   // ---------------------------------------------------------
   // 下拉式選單的選項
@@ -531,6 +558,7 @@ class Class_product {
   options_motorVendor: Toption[] | undefined = undefined;
   options_phase: Toption[] | undefined = undefined;
   options_voltage: Toption[] | undefined = undefined;
+  options_headBoxThick: Toption[] | undefined = undefined;
 
   /**門型 options */
   get options_doorModel() {
@@ -1499,12 +1527,7 @@ const prodCellConfig: TcellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '90px' },
       selectProps: {
-        props: {
-          options: [
-            // { value: '0.8T', label: '0.8T' },
-            { value: 'api給', label: 'api給' },
-          ],
-        },
+        props: {},
       },
     },
   },
