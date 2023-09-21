@@ -6,16 +6,20 @@ class Class_accessory {
     //
     reRender,
     data,
+    acceName,
   }: {
     reRender: TreRender;
     data: Taccessory;
+    acceName: string;
   }) {
     this.reRender = reRender;
     this._data = data;
+    this.acceName = acceName;
   } // constructor
 
   private reRender;
   private _data;
+  readonly acceName;
   // ---------------------------------------------------------
   get doorModelName() {
     return this._data.doorModelName;
@@ -274,55 +278,61 @@ type Taccessory = {
 type TacceKey = string;
 
 const acceKeyArrOri: () => TacceKey[] = () => {
-  return [];
+  return ['acceName', 'code', 'price'];
 };
 
-const acceCellConfig: TcellConfig = {};
+const acceCellConfig: TcellConfig = {
+  acceName: {
+    label: '種類名稱',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  code: {
+    label: 'code',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  price: {
+    label: '價格',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+};
 
 // ===========================================================
 
+const acceNameLookup = {
+  slats: '門片',
+  bottomBars: '底座',
+  guideRails: '門軌',
+  sidePlates: '支板',
+  rollers: '卷軸',
+  motors: '馬達',
+  motorAccessories: '馬達配件',
+  headBoxes: '捲箱',
+};
+
 // ===========================================================
-export { Class_accessory, acceKeyArrOri, acceCellConfig };
+export { Class_accessory, acceKeyArrOri, acceCellConfig, acceNameLookup };
 export type { Taccessory, TacceKey };
-
-/**
- * get /products/door/models
- * 報價別下拉式選單用這個api給的name，其他都不要給人選
- * 下面這兩個是下拉式選單的選項
- * guideRails.withHook, 這是防颱勾 true必須有防颱才能選 false就是必須非防颱 null就是都可以
- * slatMaterials 這是門片材質(英文的意思不要管)
- *
- *
- * /products/door/calc-general-spec
- * 會用到的似乎只有weight與motors
- * defaultMotorIndex的意思是系統算出來最合適的馬達的index
- *
- * motors.box 裡面有default 東元 大同 如果只有default，那就是東元跟大同都可以，我自己隨便預設一個
- * 如果同時有東元與大同我自己隨便預設一個
- * 如果只有東元或只有大同，那就是東元或大同
- * motors.box..boxB就是 B(m)
- * 基本上只有defaultMotorIndex指定的motors.box會有boxB
- * boxD用不到先不管
- *
- * diameter就是卷軸直徑
- * 作為/products/door/available-components 的rollerDiameter引數
- *
- *
- *
- * /products/door/available-components
- * slats就是門片
- * botomBar底座
- *
- * sidePlates 這是支版
- * 軸承跟齒輪先跳過不判定
- *
- * motors.loadWeight 門重不可以大於這個值
- * phase與voltage 如果可以讓使用者選擇就要檢查
- * gearNumber先不管，理論上馬達的gearNumber要跟支版的gearNumber一樣
- *
- * bearingType對應calc-general-spec的bearing name
- *
- *
- *
- *
- */

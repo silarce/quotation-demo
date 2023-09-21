@@ -8,33 +8,33 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { Class_product, TprodKey, TproductList } from 'hooks/quotation/useProduct';
+import { TacceKey, TacceList } from 'hooks/quotation/useProduct';
 
 import scss from '../table.module.scss';
 
-export default function Table_prod({
+export default function Table_acce({
   disabled,
-  prodList,
-  prodCellConfig,
-  prodKeyArr,
-  changeProdKeyArr,
-  addProd,
-  setTargetProd,
-}: {
+  acceList,
+  acceCellConfig,
+  acceKeyArr,
+  changeAcceKeyArr,
+}: // addProd,
+// setTargetProd,
+{
   disabled: boolean;
-  prodList: TproductList;
-  prodCellConfig: TcellConfig;
-  prodKeyArr: TprodKey[];
-  changeProdKeyArr: (arr: TprodKey[]) => void;
-  addProd: () => void;
-  setTargetProd: (v: Class_product) => void;
+  acceList: TacceList | undefined;
+  acceCellConfig: TcellConfig;
+  acceKeyArr: TacceKey[];
+  changeAcceKeyArr: (arr: TacceKey[]) => void;
+  // addProd: () => void;
+  // setTargetProd: (v: Class_product) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
   return (
     <div className={scss.tableContainer}>
       <div className={scss.header}>
-        <h2>主產品設定</h2>
+        <h2>材料/配件設定</h2>
         <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>
           {allowMove ? '確定排序' : '設定排序'}
         </button>
@@ -44,33 +44,35 @@ export default function Table_prod({
         <div className={scss.listContainer}>
           <div className={scss.theadContainer}>
             <DndThead
-              keyArr={prodKeyArr}
-              cellConfigList={prodCellConfig}
+              keyArr={acceKeyArr}
+              cellConfigList={acceCellConfig}
               allowMove={allowMove}
-              resetTrigger={prodKeyArr.length}
+              resetTrigger={acceKeyArr.length}
               emptyBlockWidth="137px"
               onDragEndCallback={(dndKeyArr) => {
-                const keyArr = dndKeyArr as TprodKey[];
-                changeProdKeyArr(keyArr);
+                const keyArr = dndKeyArr as TacceKey[];
+                changeAcceKeyArr(keyArr);
               }}
             />
           </div>
 
-          <Tbody
-            disabled={disabled}
-            rowList={prodList}
-            keyArr={prodKeyArr}
-            prodCellConfig={prodCellConfig}
-            onRowClick={(obj) => {
-              setTargetProd(obj.item as Class_product);
-            }}
-          />
+          {acceList && (
+            <Tbody
+              disabled={disabled}
+              rowList={acceList}
+              keyArr={acceKeyArr}
+              prodCellConfig={acceCellConfig}
+              onRowClick={(obj) => {
+                // setTargetProd(obj.item as Class_product);
+              }}
+            />
+          )}
 
-          {!disabled && (
+          {/* {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
               <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={addProd} />
             </div>
-          )}
+          )} */}
         </div>
       </div>
       {/*  */}

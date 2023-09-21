@@ -42,7 +42,7 @@ type Titem = {
 };
 
 type TitemList = {
-  [key: string]: Titem;
+  [key: string]: Titem | null;
 };
 
 type TcellConfig = {
@@ -60,6 +60,7 @@ export default function Tbody({
   rowList,
   keyArr,
   prodCellConfig,
+  onRowClick,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -67,7 +68,7 @@ export default function Tbody({
   rowList: TitemList;
   keyArr: string[];
   prodCellConfig: TcellConfig;
-
+  onRowClick: (onj: { item: Titem }) => void;
   // onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
   // ---------------------------------------------------------------
@@ -112,9 +113,13 @@ export default function Tbody({
               return null;
             }
 
-            const prod = rowList[key];
+            const item = rowList[key];
 
             const isMoving = movingId === key;
+
+            if (!item) {
+              return <NoItem key={key} id={key} isMoving={isMoving} />;
+            }
 
             return (
               <DndRow
@@ -122,14 +127,18 @@ export default function Tbody({
                 id={key}
                 // isActive={false}
                 pIndex={pIndex}
-                item={prod}
+                item={item}
                 keyArr={keyArr}
                 isMoving={isMoving}
                 disabled={disabled}
                 //
-
                 prodCellConfig={prodCellConfig}
                 //
+                onRowClick={() => {
+                  onRowClick({
+                    item: item,
+                  });
+                }}
               />
             );
           })}
@@ -191,6 +200,37 @@ const CopyDelBtnBox = ({
 };
 
 // --------------------------------------------------------
+
+const NoItem = ({
+  id,
+
+  isMoving,
+}: {
+  id: string;
+  isMoving: boolean;
+
+  //
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id,
+  });
+
+  const itemStyle = {
+    transform: CSS.Transform.toString(transform),
+    // transition,
+  };
+
+  return (
+    <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+      <CellWithBar isActive={false} className="z-0">
+        <div className={scss.row} onClick={undefined}></div>
+        {/* row */}
+      </CellWithBar>
+    </div>
+  );
+};
+
+// --------------------------------------------------------
 function DndRow({
   id,
   pIndex,
@@ -198,7 +238,7 @@ function DndRow({
   keyArr: keyArr,
   isMoving,
   disabled,
-  // onRowClick,
+  onRowClick,
   prodCellConfig,
 }: {
   id: string;
@@ -210,7 +250,7 @@ function DndRow({
   isMoving: boolean;
   disabled: boolean;
   //
-  // onRowClick: () => void; // () => (classQuotation.activeProd = pIndex)
+  onRowClick?: () => void;
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   //
@@ -225,7 +265,7 @@ function DndRow({
   };
 
   return (
-    <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+    <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
       <CellWithBar isActive={false} className="z-0">
         <div className={scss.row} onClick={undefined}>
           {/*  */}

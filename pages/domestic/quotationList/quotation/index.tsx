@@ -50,6 +50,8 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -71,9 +73,8 @@ import {
   apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
-import { useProductList } from 'hooks/quotation/useProduct';
+import { Class_product, useProductList } from 'hooks/quotation/useProduct';
 
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Summary, {
   TsummaryControl,
   TpayInfoControl,
@@ -116,6 +117,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 資料
   const { data, update } = useGetQuotation_id(quotationId as string);
   // -----------------------------------------------------
+
+  const [targetProd, setTargetProd] = useState<Class_product>();
+
+  console.log(targetProd);
+  // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -150,12 +156,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
     setFileInfoArr([...newImgInfoArr]);
-  };
-
-  const appendixParams = {
-    fileInfoArr,
-    removeFileInfo,
-    toSetFileInfo,
   };
 
   const uploadAttachment = async (quotationId: string) => {
@@ -193,6 +193,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo,
+    toSetFileInfo,
+  };
+
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -204,6 +210,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     addProd,
     changeProdKeyArr,
     subTotal: prodSubTotal,
+    //
+    acceKeyArr,
+    acceCellConfig,
   } = useProductList();
 
   const [summary, setSummary] = useState<{
@@ -897,7 +906,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
             prodKeyArr={prodKeyArr}
             changeProdKeyArr={changeProdKeyArr}
             addProd={addProd}
+            setTargetProd={setTargetProd}
           />
+
+          <Table_acce
+            disabled={disabled}
+            acceList={targetProd?.AcceList}
+            acceCellConfig={acceCellConfig}
+            acceKeyArr={acceKeyArr}
+            changeAcceKeyArr={() => {}}
+          />
+
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
             {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}

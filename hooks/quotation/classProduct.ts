@@ -2,6 +2,7 @@
  *
  * retrieveOptions 下拉式選單產生器
  * Class_product
+ * AcceList
  * creAcceList
  * 下拉式選單的選項
  *
@@ -19,7 +20,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 
 // ===========================================================
 // child class
-import { Class_accessory, Taccessory } from './classAccessory';
+import { Class_accessory, Taccessory, acceNameLookup } from './classAccessory';
 // =============================================================================
 // api
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
@@ -147,12 +148,13 @@ class Class_product {
       const theClass = new Class_accessory({
         reRender: this.reRender,
         data: acce,
+        acceName: acceNameLookup[key],
       });
-
-      return theClass;
+      list[key] = theClass;
     });
 
     this.AcceList = list as { [key in keyof TdoorComponentListDto]: Class_accessory | null };
+
     this.reRender();
   }
 
@@ -277,6 +279,7 @@ class Class_product {
 
       this._availableComponents = res;
       this.retrieveOptions();
+      this.retrieveCreProdAcce();
 
       this.reRender();
     }; // req
@@ -373,15 +376,19 @@ class Class_product {
       },
     });
 
+    // 為了測試，先隨便帶資料
+    // 為了測試，先隨便帶資料
+    // 為了測試，先隨便帶資料
+    // 為了測試，先隨便帶資料
     this.creAcceList({
-      slats,
-      bottomBars,
-      guideRails,
-      motors,
-      sidePlates,
-      rollers,
-      motorAccessories,
-      headBoxes,
+      slats: availableComponents.slats[0],
+      bottomBars: availableComponents.bottomBars[0],
+      guideRails: availableComponents.guideRails[0],
+      motors: availableComponents.motors[0],
+      sidePlates: availableComponents.sidePlates[0],
+      rollers: availableComponents.rollers[0],
+      motorAccessories: availableComponents.motorAccessories[0],
+      headBoxes: availableComponents.headBoxes[0],
     });
   } // retrieveProdComponent
 

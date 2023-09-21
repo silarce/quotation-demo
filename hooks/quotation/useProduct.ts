@@ -12,7 +12,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
-import { acceKeyArrOri, TacceKey } from './classAccessory';
+import { TacceKey, Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
 
 // =======================================================================
 
@@ -20,6 +20,10 @@ type TreRender = () => void;
 
 type TproductList = {
   [key: string]: Class_product;
+};
+
+type TacceList = {
+  [key: string]: Class_accessory | null;
 };
 
 // =======================================================================
@@ -151,32 +155,24 @@ const useProductList = () => {
     //
     subTotal,
     //
+    acceKeyArr: acceKeyArrOri(),
+    acceCellConfig,
+    //
   };
 };
 
 export { useProductList, prodCellConfig };
-export type { TreRender, TprodKey, Class_product, TproductList };
-
-// 明天把 get /products/door/calc-general-spec串接上去
-// 取得的資料要記錄在class_product裡面
-// motors與weight是要顯示出來的資料
-// 其他的資料會在取得 get /products/door/available-components 用於過濾判斷
-// 明天把 get /products/door/calc-general-spec串接上去
-// 取得的資料要記錄在class_product裡面
-// motors與weight是要顯示出來的資料
-// 其他的資料會在取得 get /products/door/available-components 用於過濾判斷
-// 明天把 get /products/door/calc-general-spec串接上去
-// 取得的資料要記錄在class_product裡面
-// motors與weight是要顯示出來的資料
-// 其他的資料會在取得 get /products/door/available-components 用於過濾判斷
-// 明天把 get /products/door/calc-general-spec串接上去
-// 取得的資料要記錄在class_product裡面
-// motors與weight是要顯示出來的資料
-// 其他的資料會在取得 get /products/door/available-components 用於過濾判斷
-// 明天把 get /products/door/calc-general-spec串接上去
-// 取得的資料要記錄在class_product裡面
-// motors與weight是要顯示出來的資料
-// 其他的資料會在取得 get /products/door/available-components 用於過濾判斷
+export type {
+  TreRender,
+  //
+  Class_product,
+  TprodKey,
+  TproductList,
+  //
+  Class_accessory,
+  TacceKey,
+  TacceList,
+};
 
 /**
  * get /products/door/models
