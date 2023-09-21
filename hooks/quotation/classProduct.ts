@@ -215,7 +215,8 @@ class Class_product {
       // 設定boxB與thickness
       // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
       const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-      this.B = String(boxB);
+      // this.B = String(boxB);
+      this.B = boxB ? String(boxB / 1000) : '';
       this.thickness = res.thickness;
 
       // ________________________
@@ -223,12 +224,12 @@ class Class_product {
       if (defaultMotorBox) {
         if (defaultMotorBox.東元) {
           this.motorVendor = '東元';
-          this.B = String(defaultMotorBox.東元.boxB);
+          this.B = String(defaultMotorBox.東元.boxB / 1000);
         } else if (defaultMotorBox.大同) {
           this.motorVendor = '大同';
-          this.B = String(defaultMotorBox.大同.boxB);
+          this.B = String(defaultMotorBox.大同.boxB / 1000);
         } else if (defaultMotorBox.default) {
-          this.B = String(defaultMotorBox.default.boxB);
+          this.B = String(defaultMotorBox.default.boxB / 1000);
         }
       }
 
@@ -418,7 +419,7 @@ class Class_product {
     const boxB = box[vendor]?.boxB || box.default?.boxB;
 
     if (boxB) {
-      this.B = String(boxB);
+      this.B = String(boxB / 1000);
     }
   }
 
