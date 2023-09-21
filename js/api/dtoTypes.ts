@@ -734,7 +734,120 @@ export type TupdateDepartmentJobDto = {
 // ==========================================================================
 // quotation model
 // quotation
-// add comment
+
+export type TquotationContentOtherDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  item: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  notes: string;
+};
+
+// /**選配設定 */
+// export type ToptionsDto = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   codeName: string; //代號
+//   name: string; //名稱
+//   unit: string; // 單位
+//   quantity: number; // 數量
+//   unitPrice: number; // 單價
+//   totalPrice: number; // 複價
+//   price: number; // 牌價
+//   dualPrice: number; // 牌價複價
+// };
+
+export type quotationProductDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  /**折數 */
+  discount: string;
+  // 項目名
+  itemName: string;
+  // 報價別
+  quoteType: string;
+  // 門型
+  doorType: string;
+  // L(m)
+  length: string;
+  // W(m)
+  width: string;
+  // h(m)
+  height: string;
+  // B(m)
+  boxB: string;
+  // 面積
+  area: string;
+  // 才數
+  volume: string;
+  // 材料
+  material: string;
+  // 表面
+  surface: string;
+  // 門軌
+  doorTrack: string;
+  // 馬力
+  horsepower: string;
+  // 馬達廠商
+  motor: string;
+  // 電壓
+  voltage: number;
+  // 馬達支撐架
+  motorSupport: string;
+  // 底座類型
+  bottomBar: string;
+  // 馬達鎖盒
+  motorLockBox: string;
+  // 門軌厚度
+  doorTrackThick: number;
+  // 捲軸規格
+  rollerSpec: string;
+  // 門軌消音條
+  doorTrackSilencerStrip: boolean;
+  // 一體式捲箱
+  onePieceRollUpBox: boolean;
+  // 捲箱厚度
+  rollUpBoxThick: number;
+  // 數量
+  quantity: number;
+  // 單價
+  unitPrice: number;
+  // 牌價
+  price: number;
+  // 牌價複價
+  dualPrice: number;
+  // 複價
+  totalPrice: number;
+  // // 防颱
+  // typhoonProtection: boolean;
+  // 彈射門
+  bounceDoor: boolean;
+  // 關閉方式
+  close: string;
+  // 備註
+  notes: string;
+  // 選配設定
+  options: {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    codeName: string; //代號
+    name: string; //名稱
+    unit: string; // 單位
+    quantity: number; // 數量
+    unitPrice: number; // 單價
+    totalPrice: number; // 複價
+    price: number; // 牌價
+    dualPrice: number; // 牌價複價
+  };
+};
+
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
@@ -750,8 +863,6 @@ export type TquotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
-
-  discount: string; // 總折數
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   totalPrice: number; // 報價金額
@@ -765,25 +876,31 @@ export type TquotationContentDto = {
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
   //
-  // 預期會加進來的property
   /**備註 */
-  annotation: string[];
+  annotations: string[] | null;
   /**報價範圍 */
-  quoteScopes: string[];
-  // /**折扣率(0.0 - 1.0 */
-  // discountRate: string;
-  // /**小計 */
-  // subTotal: number;
-  // /**營業稅 */
-  // salesTax: number;
-  // /**總計 */
-  // total: number;
-  // /**交貨地點 */
-  // deliveryLocation: string;
-  // /**交貨日期 date*/
-  // deliveryDate: string;
-  // /**付款方式 */
-  // paymentMethods: TpaymentMethodDto[];
+  quotationRanges: string[] | null;
+
+  faxNumber: string; // 傳真號碼
+  trackProgress: string; // 追蹤狀態
+  projectProgress: string; //工地進度
+  productsOrder: string[]; // 裡面裝的是product的id
+  /** 總折數*/
+  discount: string;
+  /**小計 */
+  subTotal: number;
+  /**營業稅 */
+  salesTax: number;
+  /**總計 */
+  total: number;
+  /**交貨地點 */
+  deliveryLocation: string;
+  /**交貨日期 date*/
+  deliveryDate: string;
+  /**付款方式 */
+  paymentMethods: TpaymentMethodDto[];
+
+  others: TquotationContentOtherDto[];
 };
 
 export type TquotationDto = {
@@ -793,6 +910,86 @@ export type TquotationDto = {
   quotationNumber: string;
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
+};
+
+export type TcreateQuotationProductDto = {
+  /**折數 */
+  discount: string;
+  // 項目名
+  itemName: string;
+  // 報價別
+  quoteType: string;
+  // 門型
+  doorType: string;
+  // L(m)
+  length: string;
+  // W(m)
+  width: string;
+  // h(m)
+  height: string;
+  // B(m)
+  boxB: string;
+  // 面積
+  area: string;
+  // 才數
+  volume: string;
+  // 材料
+  material: string;
+  // 表面
+  surface: string;
+  // 門軌
+  doorTrack: string;
+  // 馬力
+  horsepower: string;
+  // 馬達廠商
+  motor: string;
+  // 電壓
+  voltage: number;
+  // 馬達支撐架
+  motorSupport: string;
+  // 底座類型
+  bottomBar: string;
+  // 馬達鎖盒
+  motorLockBox: string;
+  // 門軌厚度
+  doorTrackThick: number;
+  // 捲軸規格
+  rollerSpec: string;
+  // 門軌消音條
+  doorTrackSilencerStrip: boolean;
+  // 一體式捲箱
+  onePieceRollUpBox: boolean;
+  // 捲箱厚度
+  rollUpBoxThick: number;
+  // 數量
+  quantity: number;
+  // 單價
+  unitPrice: number;
+  // 牌價
+  price: number;
+  // 牌價複價
+  dualPrice: number;
+  // 複價
+  totalPrice: number;
+  // 防颱
+  typhoonProtection: boolean;
+  // 彈射門
+  bounceDoor: boolean;
+  // 關閉方式
+  close: string;
+  // 備註
+  notes: string;
+  // 選配設定
+  options: {
+    codeName: string; //代號
+    name: string; //名稱
+    unit: string; // 單位
+    quantity: number; // 數量
+    unitPrice: number; // 單價
+    totalPrice: number; // 複價
+    price: number; // 牌價
+    dualPrice: number; // 牌價複價
+  };
 };
 
 export type TcreateQuotationContentDto = {
@@ -805,7 +1002,7 @@ export type TcreateQuotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
-  discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
+
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   totalPrice: number; // 報價金額
@@ -819,20 +1016,22 @@ export type TcreateQuotationContentDto = {
   annotation: string[];
   /**報價範圍 */
   quoteScopes: string[];
-  // /**折扣率(0.0 - 1.0 */
-  // discountRate: string;
-  // /**小計 */
-  // subTotal: number;
-  // /**營業稅 */
-  // salesTax: number;
-  // /**總計 */
-  // total: number;
-  // /**交貨地點 */
-  // deliveryLocation: string;
-  // /**交貨日期 date*/
-  // deliveryDate: string;
-  // /**付款方式 */
-  // paymentMethods: TpaymentMethodDto[];
+
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+  // 備註列表
+  annotations: string[];
+  // 報價範圍
+  quotationRanges: string;
+  discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
+  subTotal: number;
+  salesTax: number;
+  total: number;
+  deliveryLocation: string;
+  // 交貨日期
+  deliveryDate: string;
+  paymentMethods: TpaymentMethodDto[];
 };
 
 // ========================================================================
@@ -1037,3 +1236,12 @@ export type TdoorComponentListDto = {
   motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件
   headBoxes: TdoorHeadBoxDto[]; // 捲箱
 };
+
+/**
+ *
+ * 相數
+ * 防颱 typhoonProtection，CreateQuotationProductDto有 QuotationProductDto沒有
+ * 門片厚度
+ *
+ *
+ */
