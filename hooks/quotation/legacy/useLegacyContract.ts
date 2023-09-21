@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment from 'moment';
@@ -791,17 +791,54 @@ const useLegacyContract = ({
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
-  const createClass = () => {
-    const copy = contract;
+  const copyContract = _.cloneDeep(contract);
 
-    if (copy) {
-      copy.products = copy.products.filter((prod) => {
+  const { lastBatchProductArr, lastBatchAddiArr, lastBatchTotal } = useMemo(() => {
+    const copyContract = _.cloneDeep(contract);
+
+    const lastBatchProductArr =
+      copyContract?.products.filter((prod) => {
+        if ('batch' in prod) {
+          return prod.batch === batch;
+        }
+      }) ?? [];
+
+    const lastBatchAddiArr =
+      copyContract?.additions.filter((addi) => {
+        if ('batch' in addi) {
+          return addi.batch === batch;
+        }
+      }) ?? [];
+
+    let lastBatchTotal = new Decimal(0);
+
+    lastBatchProductArr.forEach((prod) => {
+      lastBatchTotal = lastBatchTotal.add(prod.totalPrice);
+    });
+
+    lastBatchAddiArr.forEach((addi) => {
+      lastBatchTotal = lastBatchTotal.add(addi.totalPrice);
+    });
+
+    return {
+      lastBatchProductArr,
+      lastBatchAddiArr,
+      lastBatchTotal: lastBatchTotal.toNumber(),
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
+
+  const createClass = () => {
+    if (copyContract) {
+      // 在這邊就把prod與addi依batch過濾了
+      copyContract.products = copyContract.products.filter((prod) => {
         if ('batch' in prod) {
           return prod.batch === batch;
         }
       });
 
-      copy.additions = copy.additions.filter((addi) => {
+      copyContract.additions = copyContract.additions.filter((addi) => {
         if ('batch' in addi) {
           return addi.batch === batch;
         }
@@ -810,7 +847,7 @@ const useLegacyContract = ({
 
     return new Class_legacyContract(
       reRender,
-      _.cloneDeep(copy) ?? emptyLegacyContract(),
+      _.cloneDeep(copyContract) ?? emptyLegacyContract(),
       prodCellConfigCre(),
       additionCellConfigCre(),
       isAppend
