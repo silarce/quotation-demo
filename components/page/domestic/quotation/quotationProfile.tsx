@@ -74,12 +74,11 @@ type TreturnBody = {
   contactNumber: string;
   address?: string; // 剩餘地址
   // api還沒上的資料
-  trackingStatus?: string; // 追蹤狀態
-  siteProgress?: string; // 工地進度
+  trackProgress?: string; // 追蹤狀態
+  projectProgress?: string; // 工地進度
 };
 
-type TprofileReturnBody = Omit<TreturnBody, 'trackingStatus' | 'siteProgress'>;
-export type { TprofileReturnBody };
+export type { TreturnBody };
 
 // =================================================================
 export default function QuotationProfile({

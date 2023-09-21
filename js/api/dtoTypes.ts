@@ -865,7 +865,6 @@ export type TquotationContentDto = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  totalPrice: number; // 報價金額
   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
@@ -901,6 +900,7 @@ export type TquotationContentDto = {
   paymentMethods: TpaymentMethodDto[];
 
   others: TquotationContentOtherDto[];
+  products: quotationProductDto[];
 };
 
 export type TquotationDto = {
@@ -1005,25 +1005,18 @@ export type TcreateQuotationContentDto = {
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  totalPrice: number; // 報價金額
   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
   //
-  // 預期會加進來的property
-  /**備註 */
-  annotation: string[];
-  /**報價範圍 */
-  quoteScopes: string[];
-
   faxNumber: string;
   trackProgress: string;
   projectProgress: string;
   // 備註列表
   annotations: string[];
   // 報價範圍
-  quotationRanges: string;
+  quotationRanges: string[];
   discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
   subTotal: number;
   salesTax: number;
@@ -1032,6 +1025,9 @@ export type TcreateQuotationContentDto = {
   // 交貨日期
   deliveryDate: string;
   paymentMethods: TpaymentMethodDto[];
+
+  others: TquotationContentOtherDto[];
+  products: TcreateQuotationProductDto[];
 };
 
 // ========================================================================

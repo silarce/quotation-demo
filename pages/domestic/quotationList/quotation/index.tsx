@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 
 // components
-import QuotationProfile, { TprofileReturnBody } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
 import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
 import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
@@ -120,7 +120,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [targetProd, setTargetProd] = useState<Class_product>();
 
-  console.log(targetProd);
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -222,7 +221,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     total: string;
     deliveryLocation: string;
     deliveryDate: string;
-    // paymentMethod: { label: string; value: string }[];
   }>({
     discountRate: '100',
     subTotal: '',
@@ -230,27 +228,64 @@ function TheQuotation({ router }: { router: NextRouter }) {
     total: '',
     deliveryLocation: '',
     deliveryDate: '',
-    // paymentMethod: [],
   });
 
-  // 嚴格模式逼我把anno跟qr從summary跟paymentMethod移出來
-  // 嚴格模式下add跟delete會執行兩次，
-  // 從summary移出來就不會有問題
-  // 莫名其妙
   const [anno, setAnnotation] = useState<string[]>([]);
   const [qr, setQr] = useState<string[]>([]);
+
+  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
     if (!data) {
       return;
     }
 
-    // 實際上api還沒給annotation跟quoteScopes
-    setAnnotation(data.latestContent.annotation ?? []);
-    setQr(data.latestContent.quoteScopes ?? []);
+    const {
+      //
+      discount,
+      subTotal,
+      salesTax,
+      total,
+      deliveryLocation,
+      deliveryDate,
+      paymentMethods,
+      annotations,
+      quotationRanges,
+    } = data.latestContent;
+
+    setAnnotation(annotations ?? []);
+    setQr(quotationRanges ?? []);
+    setPaymentMethod(paymentMethods);
+
+    setSummary({
+      discountRate: discount,
+      subTotal: String(subTotal),
+      salesTax: String(salesTax),
+      total: String(total),
+      deliveryLocation,
+      deliveryDate,
+    });
   }, [data]);
 
-  const [paymentMethod, setPaymentMethod] = useState<{ label: string; value: string }[]>([]);
+  useEffect(() => {
+    const { subTotal, salesTax, total } = countPayInfoValue({
+      discount: summary.discountRate,
+      prodSubTotal: prodSubTotal,
+    });
+
+    setSummary((state) => {
+      return {
+        ...state,
+        subTotal,
+        salesTax,
+        total,
+      };
+    });
+  }, [summary.discountRate, prodSubTotal]);
+
+  //
+  //
+  //
 
   const control_anno: TsummaryControl = {
     stringArr: anno,
@@ -324,24 +359,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   };
 
-  const payInfoValue = (() => {
-    const discountRate = new Decimal(summary.discountRate || 0).div(100);
-
-    const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
-    const tax = Decimal.mul(subTotal || 0, 0.05);
-    const total = Decimal.add(subTotal || 0, tax || 0);
-
-    const subTotalStr = Number(subTotal.toFixed(2)).toLocaleString();
-    const taxStr = Number(tax.toFixed(2)).toLocaleString();
-    const totalStr = Number(total.toFixed(2)).toLocaleString();
-
-    return {
-      subTotal: subTotalStr,
-      tax: taxStr,
-      total: totalStr,
-    };
-  })();
-
+  // ----------------------------------------------------------------------
   const payInfoControl: TpayInfoControl = {
     payment: {
       discountRate: {
@@ -375,19 +393,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       subTotal: {
         inputAttr: {
           disabled: true,
-          value: payInfoValue.subTotal,
+          value: summary.subTotal,
         },
       },
       salesTax: {
         inputAttr: {
           disabled: true,
-          value: payInfoValue.tax,
+          value: summary.salesTax,
         },
       },
       total: {
         inputAttr: {
           disabled: true,
-          value: payInfoValue.total,
+          value: summary.total,
         },
       },
     },
@@ -418,12 +436,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     paymentMethod: {
       arr: paymentMethod.map((item, index) => {
-        const { label, value } = item;
+        const { milestone, totalPaymentRatio } = item;
 
         const onChange = (v: string) => {
           setPaymentMethod((state) => {
             const copy = [...state];
-            copy[index].value = v;
+            copy[index].totalPaymentRatio = v;
 
             return copy;
           });
@@ -439,8 +457,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         };
 
         return {
-          label,
-          value,
+          label: milestone,
+          value: totalPaymentRatio,
           onChange,
           delSelf,
         };
@@ -449,7 +467,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       addMethod: (v) => {
         setPaymentMethod((state) => {
           const copy = [...state];
-          copy.push({ label: v, value: '' });
+          copy.push({ milestone: v, totalPaymentRatio: '' });
 
           return copy;
         });
@@ -518,19 +536,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
       discount: latestContent?.discount,
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
-      totalPrice: latestContent?.totalPrice,
       status: latestContent?.status ?? 'Budget',
-      // managerId: lContent.managerEmployee?.id,
-      // supervisorId: lContent.suervisorEmployee?.id,
-      // agentId: lContent.agentEmployee?.id,
       managerEmployee: latestContent?.managerEmployee,
       supervisorEmployee: latestContent?.supervisorEmployee,
-      // agentEmployee: lContent.agentEmployee,
+      //
+      //
       agentEmployee: agentEmployee,
+      //
+      //
+      trackProgress: latestContent?.trackProgress,
+      projectProgress: latestContent?.projectProgress,
     });
   }, [data]);
 
-  const onProfileChange = (v: Partial<TprofileReturnBody>) => {
+  const onProfileChange = (v: Partial<TreturnBody>) => {
     setValue('validityPeriod', v.validityPeriod ?? '');
     setValue('customer', v.customer);
     setValue('projectName', v.projectName ?? '');
@@ -539,6 +558,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setValue('address', v.address ?? '');
     setValue('contactPerson', v.contactPerson ?? '');
     setValue('contactNumber', v.contactNumber ?? '');
+    setValue('trackProgress', v.trackProgress ?? '');
+    setValue('projectProgress', v.projectProgress ?? '');
   };
 
   // --------------------------------------------------------------
@@ -768,35 +789,47 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async () => {
-    const data = watch();
+    const data_watch = watch();
 
     const body: TcreateQuotationContentDto = {
-      quotationDate: data.quotationDate ?? '',
-      validityPeriod: data.validityPeriod ?? '',
+      quotationDate: data_watch.quotationDate ?? '',
+      validityPeriod: data_watch.validityPeriod ?? '',
       //
-      customerId: data.customer?.id ?? '',
+      customerId: data_watch.customer?.id ?? '',
       //
-      projectName: data.projectName ?? '',
-      county: data.county ?? '',
-      district: data.district ?? '',
-      address: data.address ?? '',
-      contactPerson: data.contactPerson ?? '',
-      contactNumber: data.contactNumber ?? '',
-      discount: `${Number(data.discount ?? 0)}` ?? '100',
-      quantity: data.quantity ?? 0,
-      editNotes: data.editNotes ?? '',
-      totalPrice: data.totalPrice ?? 0,
-      status: data.status ?? 'Budget',
-      managerId: data.managerEmployee?.id ?? null,
-      supervisorId: data.supervisorEmployee?.id ?? null,
+      projectName: data_watch.projectName ?? '',
+      county: data_watch.county ?? '',
+      district: data_watch.district ?? '',
+      address: data_watch.address ?? '',
+      contactPerson: data_watch.contactPerson ?? '',
+      contactNumber: data_watch.contactNumber ?? '',
+      quantity: data_watch.quantity ?? 0,
+      editNotes: data_watch.editNotes ?? '',
+      status: data_watch.status ?? 'Budget',
+      managerId: data_watch.managerEmployee?.id ?? null,
+      supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
       // 目前只有admin可以呼叫這系列的api，但是agentId必須送，暫時先這樣處理
-      agentId: data.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
+      agentId: data_watch.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
       //
       //
-      // api更新後會新增的東西，但還沒有
-      annotation: anno,
-      quoteScopes: qr,
+      annotations: anno,
+      quotationRanges: qr,
+      //
+      //
+      faxNumber: data_watch.customer?.fax ?? '',
+      trackProgress: data_watch.trackProgress ?? '',
+      projectProgress: data_watch.projectProgress ?? '',
+
+      discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
+      subTotal: Number(summary.subTotal),
+      salesTax: Number(summary.salesTax),
+      total: Number(summary.total),
+      deliveryLocation: summary.deliveryLocation,
+      deliveryDate: summary.deliveryDate,
+      paymentMethods: paymentMethod,
+      //
+      //
     };
 
     try {
@@ -1064,3 +1097,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
+
+const countPayInfoValue = ({
+  discount,
+  //
+  prodSubTotal,
+}: {
+  discount: string | number;
+  prodSubTotal: string | number;
+}) => {
+  const discountRate = new Decimal(discount || 0).div(100);
+
+  const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+  const tax = Decimal.mul(subTotal || 0, 0.05);
+  const total = Decimal.add(subTotal || 0, tax || 0);
+
+  const subTotalStr = Number(subTotal.toFixed(2)).toLocaleString();
+  const taxStr = Number(tax.toFixed(2)).toLocaleString();
+  const totalStr = Number(total.toFixed(2)).toLocaleString();
+
+  return {
+    subTotal: subTotalStr,
+    salesTax: taxStr,
+    total: totalStr,
+  };
+};
