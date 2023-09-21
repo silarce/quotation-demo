@@ -1787,7 +1787,13 @@ const filter_motors = ({
   const filteredArr = dataArr.filter((data) => {
     let isPass = true;
 
-    if (data.horsePower !== filterParams.horsePower) {
+    let horsePoswer = filterParams.horsePower;
+
+    if (horsePoswer === '1 1/2HP') {
+      horsePoswer = '1.5HP';
+    }
+
+    if (data.horsePower !== horsePoswer) {
       isPass = false;
     }
     // else if (data.gearNumber !== filterParams.gearNumber) {
