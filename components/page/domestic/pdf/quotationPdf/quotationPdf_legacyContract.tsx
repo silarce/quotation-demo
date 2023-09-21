@@ -124,14 +124,18 @@ export default function QuotationPdf({
   const totalPram = (() => {
     const memoArr = classLegacyContract.classNotes.stringArr;
 
-    const subTotal = classLegacyContract.classPayInfo.subTotal;
-    const businessTax = classLegacyContract.classPayInfo.salesTax;
-    const total = classLegacyContract.classPayInfo.total;
+    let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
+    let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
+    let total: string | number = classLegacyContract.classPayInfo.total;
+
+    subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
     const settlement = {
-      subTotal: parseFloat(subTotal), //小計
-      businessTax: parseFloat(businessTax), //營業稅
-      total: parseFloat(total), // 統計
+      subTotal, //小計
+      businessTax, //營業稅
+      total, // 統計
     };
 
     return { memoArr, settlement };
@@ -165,14 +169,19 @@ export default function QuotationPdf({
     const classProdArr = classLegacyContract.prodArr;
 
     return classProdArr.map((prod) => {
-      const size = `${prod.width || prod.length} X ${prod.height} + ${prod.thickness}`;
+      const lw = (Number(prod.width) || Number(prod.length)) * 100;
+      const h = Number(prod.height) * 100;
+      const b = Number(prod.thickness) * 100;
+
+      const size = `${lw} X ${h} + ${b}`;
 
       return {
         category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
-        thickness: prod.thickness,
+        // thickness: prod.thickness,
+        thickness: 'n',
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
