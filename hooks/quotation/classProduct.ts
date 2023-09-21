@@ -318,7 +318,7 @@ class Class_product {
       dataArr: availableComponents.guideRails,
       filterParams: {
         isAntiTyphoon: this.typhoonProtection,
-        thickness: this.thickness,
+        thickness: this.railThick,
         hasSilencingStrip: this.hasSilencingStrip,
       },
     });
@@ -367,7 +367,7 @@ class Class_product {
     const headBoxes: Taccessory | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
-        thickness: this.thickness, // 厚度
+        thickness: this.headBoxThick, // 厚度
         /**一體式捲箱 */
         isIntegrated: this.isIntegrated, // 一體式捲箱
       },
@@ -463,7 +463,7 @@ class Class_product {
       //
       // slats,
       // bottomBars,
-      // guideRails,
+      guideRails,
       // sidePlates,
       // rollers,
       motors,
@@ -476,6 +476,7 @@ class Class_product {
     const phaseList: { [key: string]: Toption } = {};
     const voltageList: { [key: string]: Toption } = {};
     const headBoxThickList: { [key: string]: Toption } = {};
+    const railThickList: { [key: string]: Toption } = {};
 
     motors.forEach((item) => {
       const { horsePower, motorVendor, phase, voltage } = item;
@@ -520,6 +521,17 @@ class Class_product {
       }
     });
 
+    guideRails.forEach((item) => {
+      const { thickness } = item;
+
+      if (thickness) {
+        railThickList[thickness] = {
+          value: String(thickness),
+          label: String(thickness),
+        };
+      }
+    });
+
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
     } else {
@@ -549,6 +561,10 @@ class Class_product {
     } else {
       this.options_headBoxThick = undefined;
     }
+
+    if (Object.keys(railThickList).length > 0) {
+      this.options_railThick = Object.values(railThickList);
+    }
   } // retrieveOptions
   // ---------------------------------------------------------
   // 下拉式選單的選項
@@ -559,6 +575,7 @@ class Class_product {
   options_phase: Toption[] | undefined = undefined;
   options_voltage: Toption[] | undefined = undefined;
   options_headBoxThick: Toption[] | undefined = undefined;
+  options_railThick: Toption[] | undefined = undefined;
 
   /**門型 options */
   get options_doorModel() {
@@ -1476,12 +1493,12 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          options: [
-            // { value: '1.0T', label: '1.0T' },
-            // { value: '3.0T', label: '3.0T' },
-            // { value: '4.5T', label: '4.5T' },
-            { value: 'api給', label: 'api給' },
-          ],
+          // options: [
+          //   // { value: '1.0T', label: '1.0T' },
+          //   // { value: '3.0T', label: '3.0T' },
+          //   // { value: '4.5T', label: '4.5T' },
+          //   // { value: 'api給', label: 'api給' },
+          // ],
         },
       },
     },
