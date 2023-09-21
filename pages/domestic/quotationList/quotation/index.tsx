@@ -984,15 +984,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
-      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
       另外在PDF裡面 "1 1/2HP"要改成1.5HP
       有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
-      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
       另外在PDF裡面 "1 1/2HP"要改成1.5HP
       有沒有更大的數?
+
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
       {/* <QuotationPdf
         isVisable={showPdf}
@@ -1001,15 +1011,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         classQuotation={classQuotation}
       /> */}
-      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
       另外在PDF裡面 "1 1/2HP"要改成1.5HP
       有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
-      {/* 注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
       另外在PDF裡面 "1 1/2HP"要改成1.5HP
       有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
 
       {/*  */}

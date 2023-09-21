@@ -1,26 +1,38 @@
 import type { TreRender } from './useProduct';
 import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 
+import { TdoorComponentListDto } from 'js/api/dtoTypes';
+
+// ===========================================================
 class Class_accessory {
   constructor({
     //
     reRender,
     data,
-    acceName,
+    key,
   }: {
     reRender: TreRender;
     data: Taccessory;
-    acceName: string;
+    key: keyof TdoorComponentListDto;
   }) {
     this.reRender = reRender;
     this._data = data;
-    this.acceName = acceName;
+    this.key = key;
   } // constructor
 
   private reRender;
   private _data;
-  readonly acceName;
+  readonly key;
   // ---------------------------------------------------------
+  get acceName() {
+    return acceNameLookup[this.key];
+  }
+
+  get desc() {
+    return acceDescLookUp[this.key](this);
+  }
+
+  // -------------------------------------------1--------------
   get doorModelName() {
     return this._data.doorModelName;
   }
@@ -278,7 +290,7 @@ type Taccessory = {
 type TacceKey = string;
 
 const acceKeyArrOri: () => TacceKey[] = () => {
-  return ['acceName', 'code', 'price'];
+  return ['acceName', 'name', 'desc', 'price'];
 };
 
 const acceCellConfig: TcellConfig = {
@@ -306,6 +318,31 @@ const acceCellConfig: TcellConfig = {
       },
     },
   },
+  name: {
+    label: '名稱',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  desc: {
+    label: '說明',
+    inputSelProps: {
+      wrapperStyle: { width: '700px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          placeholder: '沒有符合的材料配件或此材料配件無資料',
+          disabled: true,
+        },
+      },
+    },
+  },
   price: {
     label: '價格',
     inputSelProps: {
@@ -322,7 +359,157 @@ const acceCellConfig: TcellConfig = {
 
 // ===========================================================
 
-const acceNameLookup = {
+const notConformAcce = {
+  id: '',
+  createdAt: '',
+  updatedAt: '',
+  doorModelName: '',
+  code: '沒有符合規格的產品',
+  specialSpec: '---',
+  price: '---',
+};
+
+const creDesc_slats = (classAcce: Class_accessory) => {
+  const { isAntiTyphoon } = classAcce;
+  const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
+
+  return `${desc_isAntiTyphoon} `;
+};
+
+const creDesc_bottomBars = (classAcce: Class_accessory) => {
+  const { isAntiTyphoon, isWaterProof, hasAluminumBarrier } = classAcce;
+
+  const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
+  const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
+  const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
+
+  return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
+};
+
+const creDesc_guideRails = (classAcce: Class_accessory) => {
+  const { hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
+  const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
+  const desc_hasSilencingStrip = confomtTree.hasSilencingStrip[`${hasSilencingStrip}`];
+
+  return `厚度${thickness} ${desc_isAntiTyphoon} ${desc_hasSilencingStrip}`;
+};
+
+const creDesc_sidePlates = (classAcce: Class_accessory) => {
+  const {
+    //
+    bearingType,
+    gearNumber,
+    isIntegrated,
+    maxDoorWeight,
+    minDoorWeight,
+    motorVendor,
+  } = classAcce;
+
+  const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
+
+  return `${desc_isIntegrated} 馬達供應商:${motorVendor ?? '無資料'} 軸承:${bearingType ?? '無資料'} 齒輪編號:${
+    gearNumber ?? '無資料'
+  } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
+};
+
+const creDesc_rollers = (classAcce: Class_accessory) => {
+  const { diameter } = classAcce;
+
+  return `直徑:${diameter ?? '無資料'}`;
+};
+
+const creDesc_motors = (classAcce: Class_accessory) => {
+  const {
+    //
+    gearNumber,
+    hasSupportStand,
+    horsePower,
+    loadWeight,
+    motorVendor,
+    phase,
+    voltage,
+  } = classAcce;
+
+  const thePhase = phase as 1 | 3 | undefined | null;
+
+  const desc_gearNumber = `齒輪編號:${gearNumber ?? '無資料'}`;
+  const desc_hasSupportStand = confomtTree.hasSupportStand[`${hasSupportStand}`];
+  const desc_horsepower = `馬力:${horsePower ?? '無資料'}`;
+  const desc_loadWeight = `荷重:${loadWeight ?? '無資料'}`;
+  const desc_motorVendor = `馬達供應商:${motorVendor ?? '無資料'}`;
+  const desc_phase = `相位:${confomtTree.phase[`${thePhase}`]}`;
+  const desc_voltage = `電壓:${voltage ?? '無資料'}V`;
+
+  return `${desc_motorVendor} ${desc_horsepower} ${desc_voltage} ${desc_phase} ${desc_loadWeight} ${desc_hasSupportStand} ${desc_gearNumber}`;
+};
+
+const creDesc_motorAccessories = (classAcce: Class_accessory) => {
+  const { bearingType, chains } = classAcce;
+
+  const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
+  const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
+
+  return `${desc_bearingType} ${desc_chains}`;
+};
+
+const creDesc_headBoxes = (classAcce: Class_accessory) => {
+  const { isIntegrated, thickness } = classAcce;
+
+  const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
+  const desc_thickness = `厚度:${thickness ?? '無資料'}`;
+
+  return `${desc_isIntegrated} ${desc_thickness}`;
+};
+
+const confomtTree = {
+  //
+  isAntiTyphoon: {
+    true: '防颱',
+    false: '不防颱',
+    undefined: '',
+    null: '',
+  },
+  isWaterProof: {
+    true: '防水',
+    false: '不防水',
+    undefined: '',
+    null: '',
+  },
+  hasAluminumBarrier: {
+    true: '附鋁障感',
+    false: '無鋁障感',
+    undefined: '',
+    null: '',
+  },
+  hasSilencingStrip: {
+    true: '有靜音條',
+    false: '無靜音條',
+    undefined: '',
+    null: '',
+  },
+  isIntegrated: {
+    true: '一體式捲箱',
+    false: '非一體式捲箱',
+    undefined: '',
+    null: '',
+  },
+  hasSupportStand: {
+    true: '有腳架',
+    false: '無腳架',
+    undefined: '',
+    null: '',
+  },
+  phase: {
+    '1': '單相',
+    '3': '三相',
+    undefined: '',
+    null: '',
+  },
+
+  //
+};
+
+const acceNameLookup: { [key in keyof TdoorComponentListDto]: string } = {
   slats: '門片',
   bottomBars: '底座',
   guideRails: '門軌',
@@ -331,6 +518,17 @@ const acceNameLookup = {
   motors: '馬達',
   motorAccessories: '馬達配件',
   headBoxes: '捲箱',
+};
+
+const acceDescLookUp = {
+  slats: creDesc_slats,
+  bottomBars: creDesc_bottomBars,
+  guideRails: creDesc_guideRails,
+  sidePlates: creDesc_sidePlates,
+  rollers: creDesc_rollers,
+  motors: creDesc_motors,
+  motorAccessories: creDesc_motorAccessories,
+  headBoxes: creDesc_headBoxes,
 };
 
 // ===========================================================

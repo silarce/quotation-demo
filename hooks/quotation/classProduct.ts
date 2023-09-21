@@ -3,6 +3,7 @@
  * retrieveOptions 下拉式選單產生器
  * Class_product
  * AcceList
+ * retrieveCreProdAcce
  * creAcceList
  * 下拉式選單的選項
  *
@@ -148,7 +149,7 @@ class Class_product {
       const theClass = new Class_accessory({
         reRender: this.reRender,
         data: acce,
-        acceName: acceNameLookup[key],
+        key: key,
       });
       list[key] = theClass;
     });
@@ -376,6 +377,9 @@ class Class_product {
       },
     });
 
+    // 變更設計，如果是null，不要帶null進去，
+    // 要帶標明為無資料Taccessory進去
+
     // 為了測試，先隨便帶資料
     // 為了測試，先隨便帶資料
     // 為了測試，先隨便帶資料
@@ -385,6 +389,7 @@ class Class_product {
       bottomBars: availableComponents.bottomBars[0],
       guideRails: availableComponents.guideRails[0],
       motors: availableComponents.motors[0],
+      // motors: null,
       sidePlates: availableComponents.sidePlates[0],
       rollers: availableComponents.rollers[0],
       motorAccessories: availableComponents.motorAccessories[0],
