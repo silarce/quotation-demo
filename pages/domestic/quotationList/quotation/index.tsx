@@ -27,6 +27,7 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -41,8 +42,10 @@ import { AppContext } from 'pages/_app';
 // 假資料與fake api
 import { useQuotation } from 'hooks/quotation/useQuotation';
 import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
-import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
-import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
+
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -62,11 +65,11 @@ import {
   apiQuotationSubmitReview,
   apiQuotationReview,
   apiQuotationunLock,
+  //
+  useQuotation_id_attachments,
+  apiPostQuotation_id_attachments,
+  apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
-
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
 
 import { useProductList } from 'hooks/quotation/useProduct';
 
@@ -75,6 +78,9 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
+
+// type
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -96,7 +102,7 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
-    id, //報價單id //若為新增報價單則為undefined
+    id: quotationId, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
@@ -108,7 +114,87 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
   // -----------------------------------------------------
   // 資料
-  const { data, update } = useGetQuotation_id(id as string);
+  const { data, update } = useGetQuotation_id(quotationId as string);
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(quotationId);
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+
+  useEffect(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}file/download/${item.id}`,
+        isNew: false,
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
+
+  const removeFileInfo = (index: number) => {
+    fileInfoArr[index].willDelete = true;
+    setFileInfoArr([...fileInfoArr]);
+    // removeFile(index)
+  };
+
+  const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
+    setFileInfoArr([...newImgInfoArr]);
+  };
+
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo,
+    toSetFileInfo,
+  };
+
+  const uploadAttachment = async (quotationId: string) => {
+    // 移除附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew } = info;
+
+      if (!fileId || !willDelete || isNew) {
+        continue;
+      }
+
+      try {
+        await apiDelQuotation_id_attachments(quotationId, fileId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // 上傳附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew, file } = info;
+
+      if (fileId || !file || willDelete || !isNew) {
+        continue;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        await apiPostQuotation_id_attachments(quotationId, formData);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  // -----------------------------------------------------
+  // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
   const {
@@ -387,19 +473,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     (async () => {
       try {
         setIsLoading(true);
-        await update();
+        await Promise.all([update(), updateAttachments()]);
       } catch (error) {}
 
       setIsLoading(false);
     })();
-  }, [id]);
+  }, [quotationId]);
 
   useEffect(() => {
     const latestContent = data?.latestContent;
 
     let agentEmployee;
 
-    if (!id) {
+    if (!quotationId) {
       agentEmployee = userInfo?.employee;
     } else {
       agentEmployee = latestContent?.agentEmployee;
@@ -557,9 +643,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
-  const getFakeMemo = fakeApi_memo.get;
-  const getFakeQuotaRange = fakeApi_quoteRange.get;
-
   useEffect(() => {
     reNewClassQuotation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -597,7 +680,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: id ? `報價編號 ${data?.latestContent.quotationNumber || ''}` : '新報價單',
+      label: quotationId ? `報價編號 ${data?.latestContent.quotationNumber || ''}` : '新報價單',
       onClick: () => {},
     },
   ];
@@ -648,7 +731,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   onClick: () => setShowPdf_part(true),
     // },
     (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!id || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -710,11 +793,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
     try {
       setIsLoading(true);
 
-      if (id) {
-        await apiPatchQuotation(body, id);
-        await update();
+      if (quotationId) {
+        const res = await apiPatchQuotation(body, quotationId);
+        showRootLoading(true, '正在更新附件');
+        await uploadAttachment(res.id);
+
+        await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
+        showRootLoading(true, '正在更新附件');
+        await uploadAttachment(res.id);
         router.push({
           query: {
             id: res.id,
@@ -730,6 +818,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setIsLoading(false);
   };
 
+  // --------------------------------------------
   const reqSetReviewer = async ({
     reviewSales,
     reviewSupervisor,
@@ -737,7 +826,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reviewSales: TemployeeDto | undefined;
     reviewSupervisor: TemployeeDto | undefined;
   }) => {
-    if (!id) {
+    if (!quotationId) {
       return;
     }
 
@@ -746,7 +835,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiQuotationSubmitReview(id, {
+      await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
         reviewSupervisorEmployeeId,
       });
@@ -762,13 +851,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // 現在只有admin可以呼叫這系列的api，所以無法測試
   const reqReview = async () => {
-    if (!id) {
+    if (!quotationId) {
       return;
     }
 
     try {
       setIsLoading(true);
-      await apiQuotationReview(id);
+      await apiQuotationReview(quotationId);
       await update();
     } catch (error) {
       myAlert.err({ title: '審核失敗' });
@@ -826,6 +915,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             payInfoControl={payInfoControl}
             control_anno={control_anno}
             control_qr={control_qr}
+            appendixParams={appendixParams}
           />
 
           {/* 簽名 */}

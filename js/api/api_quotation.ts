@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
-import { axi } from './_axiosCreator';
+import { axi, domain } from './_axiosCreator';
 
 // type
 import type {
@@ -10,6 +10,7 @@ import type {
   TquotationContentDto,
   TquotationDto,
   TcreateQuotationContentDto,
+  TfileDto,
 } from './dtoTypes';
 
 export type {
@@ -158,6 +159,62 @@ export const apiQuotationunLock = (id: string) => {
 
   return axi
     .patch<undefined>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// ================================================================
+
+/**取得報價單附件 */
+export const apiGetQuotation_id_attachments = (id: string) => {
+  const api = `/quotation/${id}/attachments`;
+
+  return axi
+    .get(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useQuotation_id_attachments = (id: string | undefined) => {
+  const [res, setRes] = useState<TfileDto[]>();
+
+  const update = async () => {
+    if (!id) {
+      return undefined;
+    }
+
+    const res = (await apiGetQuotation_id_attachments(id)) as TfileDto[];
+
+    if (res) {
+      setRes(res);
+    }
+
+    return res;
+  };
+
+  return {
+    attachments: res,
+    updateAttachments: update,
+    domain,
+  };
+};
+
+/**上傳報價單附件 */
+export const apiPostQuotation_id_attachments = (id: string, body: FormData) => {
+  const api = `/quotation/${id}/attachments`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**移除報價單附件 */
+export const apiDelQuotation_id_attachments = (id: string, fileId: string) => {
+  const api = `/quotation/${id}/attachments/${fileId}`;
+
+  return axi
+    .delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

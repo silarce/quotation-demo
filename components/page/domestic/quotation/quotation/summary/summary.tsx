@@ -2,12 +2,13 @@ import { useState } from 'react';
 // component
 import TextListEditor_v2 from '../../quotationTotal/TextListEditor_v2';
 import PayInfo, { Tcontrol as TpayInfoControl } from './payInfo';
-// import Appendix from '../quotationTotal/appendix_legacy_noReview';
+import Appendix from '../../quotationTotal/appendix_legacy_noReview';
+
 // css
 import scss from './summary.module.scss';
 // type
 
-// import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // gear
 import WorkSheetSelector from 'components/global/gear/modal/workSheetSelector';
@@ -25,7 +26,7 @@ type Tcontrol = {
 
 export default function Summary({
   // legacyContract,
-  // appendixParams,
+  appendixParams,
   disabled = false,
   payInfoControl,
   control_anno,
@@ -38,11 +39,11 @@ export default function Summary({
   control_qr: Tcontrol;
 
   // 等api可已上傳附件時再做appendixParams
-  // appendixParams: {
-  //   fileInfoArr: TfileInfo[];
-  //   removeFileInfo: (index: number) => void;
-  //   toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void;
-  // };
+  appendixParams: {
+    fileInfoArr: TfileInfo[];
+    removeFileInfo: (index: number) => void;
+    toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void;
+  };
 }) {
   const [show_anno, setShow_anno] = useState(false);
   const [show_qr, setShow_qr] = useState(false);
@@ -101,7 +102,7 @@ export default function Summary({
       <div className={scss.block02}>
         <div>
           <TextListEditor_v2 stringObj={quoteRangeObj} label="報價範圍" disabled={disabled} />
-          {/* <Appendix disabled={disabled} appendixParams={appendixParams} /> */}
+          <Appendix disabled={disabled} appendixParams={appendixParams} />
         </div>
         <PayInfo disabled={disabled} control={payInfoControl} />
       </div>
