@@ -981,7 +981,7 @@ export type TcreateQuotationProductDto = {
     totalPrice: number; // 複價
     price: number; // 牌價
     dualPrice: number; // 牌價複價
-  };
+  }[];
 };
 
 export type TcreateQuotationContentDto = {
