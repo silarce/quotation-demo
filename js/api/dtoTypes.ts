@@ -747,6 +747,8 @@ export type TquotationContentOtherDto = {
   notes: string;
 };
 
+export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
+
 // /**選配設定 */
 // export type ToptionsDto = {
 //   id: string;
@@ -1026,7 +1028,7 @@ export type TcreateQuotationContentDto = {
   deliveryDate: string;
   paymentMethods: TpaymentMethodDto[];
 
-  others: TquotationContentOtherDto[];
+  others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
 };
 

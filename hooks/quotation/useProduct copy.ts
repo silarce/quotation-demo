@@ -6,16 +6,14 @@ import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+import {} from 'js/api/dtoTypes';
 // api
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { TacceKey, Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
-import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
-
-// type
-import { TcreateQuotationContentOtherDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
+import { Class_other, othersCellConfig, othersKeyArrOri } from './classOthers';
 
 // =======================================================================
 
@@ -29,12 +27,8 @@ type TacceList = {
   [key: string]: Class_accessory | null;
 };
 
-type TothersList = {
-  [key: string]: Class_other;
-};
-
 // =======================================================================
-const useProductList = ({ others }: { others: TquotationContentOtherDto[] | undefined }) => {
+const useProductList = () => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
   // ---------------------------------------------------------
@@ -143,83 +137,8 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
   }, []);
 
   // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  const [acceKeyArr, setAcceKeyArr] = useState<TacceKey[]>(acceKeyArrOri());
-
-  const changeAcceKeyArr = (v: TacceKey[]) => {
-    setAcceKeyArr(v);
-  };
-
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
   // 其他設定 other
 
-  const [othersKeyArr, setOthersKeyArr] = useState<TothersKey[]>(othersKeyArrOri());
-  const [othersList, setOthersList] = useState<TothersList>({});
-
-  useEffect(() => {
-    if (others) {
-      const list: TothersList = {};
-
-      others.forEach((item, index) => {
-        const key = `${item.id}`;
-        list[key] = new Class_other({
-          reRender,
-          data: item,
-          delSelf: () => delSelf_other(key),
-          copySelf: () => copySelf_others(key),
-        });
-      });
-
-      setOthersList(list);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [others]);
-
-  const changeOthersKeyArr = (v: TothersKey[]) => {
-    setOthersKeyArr(v);
-  };
-
-  const delSelf_other = (key: string) => {
-    delete othersList[key];
-    reRender();
-  };
-
-  const copySelf_others = (key: string) => {
-    const newKey = `new-${nanoid()}`;
-    const bodyCopy = _.cloneDeep(othersList[key].body);
-
-    othersList[newKey] = new Class_other({
-      reRender,
-      data: bodyCopy,
-      delSelf: () => delSelf_other(newKey),
-      copySelf: () => copySelf_others(newKey),
-    });
-
-    reRender();
-  };
-
-  const addOthers = () => {
-    const newKey = `new-${nanoid()}`;
-
-    othersList[newKey] = new Class_other({
-      reRender,
-      delSelf: () => delSelf_other(newKey),
-      copySelf: () => copySelf_others(newKey),
-    });
-
-    reRender();
-  };
-
-  const getOthersPostBodyArr: () => TcreateQuotationContentOtherDto[] = () => {
-    return Object.values(othersList).map((item) => {
-      return item.body;
-    });
-  };
-
-  // ---------------------------------------------------------
   // ---------------------------------------------------------
 
   return {
@@ -233,16 +152,9 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
     //
     subTotal,
     //
-    acceKeyArr,
+    acceKeyArr: acceKeyArrOri(),
     acceCellConfig,
-    changeAcceKeyArr,
     //
-    othersKeyArr,
-    othersList,
-    othersCellConfig,
-    changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
   };
 };
 
@@ -257,10 +169,6 @@ export type {
   Class_accessory,
   TacceKey,
   TacceList,
-  //
-  Class_other,
-  TothersKey,
-  TothersList,
 };
 
 /**

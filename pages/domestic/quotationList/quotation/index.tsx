@@ -1,3 +1,14 @@
+// 常用變數目錄
+/**
+ * useProductList
+ * reqUpdateQuotation
+ * useGetQuotation_id
+ *
+ */
+// =============================================================
+// =============================================================
+// =============================================================
+
 // 報價單
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
@@ -52,6 +63,7 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -212,7 +224,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     acceKeyArr,
     acceCellConfig,
-  } = useProductList();
+    changeAcceKeyArr,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+  } = useProductList({ others: data?.latestContent.others });
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -830,6 +850,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       //
       //
+      products: [],
+      others: getOthersPostBodyArr(),
     };
 
     try {
@@ -947,7 +969,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
             acceList={targetProd?.AcceList}
             acceCellConfig={acceCellConfig}
             acceKeyArr={acceKeyArr}
-            changeAcceKeyArr={() => {}}
+            changeAcceKeyArr={changeAcceKeyArr}
+          />
+
+          <Table_others
+            disabled={disabled}
+            list={othersList}
+            cellConfig={othersCellConfig}
+            keyArr={othersKeyArr}
+            changeKeyArr={changeOthersKeyArr}
+            add={addOthers}
           />
 
           <div className={style.redWrapper}>
