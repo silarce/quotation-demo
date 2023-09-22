@@ -119,9 +119,9 @@ export default function QuotationPdf({
     const total = classQuotation.total;
 
     const settlement = {
-      subTotal: parseFloat(subTotal), //小計
-      businessTax: parseFloat(businessTax), //營業稅
-      total: parseFloat(total), // 統計
+      subTotal: Number(subTotal).toLocaleString(undefined, { maximumFractionDigits: 2 }), //小計
+      businessTax: Number(businessTax).toLocaleString(undefined, { maximumFractionDigits: 2 }), //營業稅
+      total: Number(total).toLocaleString(undefined, { maximumFractionDigits: 2 }), // 統計
     };
 
     return { memoArr, settlement };
