@@ -802,12 +802,8 @@ export type quotationProductDto = {
   motor: string;
   // 電壓
   voltage: number;
-
-  // !!!
   // 馬達支撐架
-  motorSupport: string;
-  // !!!
-
+  motorSupport: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -942,7 +938,7 @@ export type TcreateQuotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  motorSupport: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
