@@ -13,6 +13,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { TacceKey, Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
 import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
+import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
 
 // type
 import { TcreateQuotationContentOtherDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
@@ -27,6 +28,10 @@ type TproductList = {
 
 type TacceList = {
   [key: string]: Class_accessory | null;
+};
+
+type ToptionsList = {
+  [key: string]: Class_options;
 };
 
 type TothersList = {
@@ -154,6 +159,15 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+  const [optionsKeyArr, setOptionsKeyArr] = useState<ToptionsKey[]>(optionsKeyArrOri());
+
+  const changeOptionsKeyArr = (v: ToptionsKey[]) => {
+    setOptionsKeyArr(v);
+  };
+
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
   // 其他設定 other
 
   const [othersKeyArr, setOthersKeyArr] = useState<TothersKey[]>(othersKeyArrOri());
@@ -237,6 +251,10 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
     acceCellConfig,
     changeAcceKeyArr,
     //
+    optionsKeyArr,
+    changeOptionsKeyArr,
+    optionsCellConfig,
+    //
     othersKeyArr,
     othersList,
     othersCellConfig,
@@ -257,6 +275,9 @@ export type {
   Class_accessory,
   TacceKey,
   TacceList,
+  //
+  ToptionsKey,
+  ToptionsList,
   //
   Class_other,
   TothersKey,

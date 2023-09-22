@@ -22,6 +22,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 // ===========================================================
 // child class
 import { Class_accessory, Taccessory, acceNameLookup } from './classAccessory';
+import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
@@ -31,6 +32,7 @@ import type {
   TlegacyContractProductDto,
   TcreateLegacyContractProductDto,
   TdoorComponentListDto,
+  TquotationProductOptionDto,
 } from 'js/api/dtoTypes';
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
@@ -44,7 +46,7 @@ class Class_product {
   constructor({
     reRender,
     prodData = emptyProdOri(),
-    accessoryDataArr = [],
+    // accessoryDataArr = [],
     delSelf,
     copySelf,
     //
@@ -54,7 +56,8 @@ class Class_product {
   }: {
     reRender: TreRender;
     prodData?: Tprod;
-    accessoryDataArr?: Taccessory[];
+    // accessoryDataArr?: Taccessory[];
+    // optionDataArr?: Toptions[];
     delSelf: () => void;
     copySelf: () => void;
     //
@@ -77,23 +80,7 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
-    // ----------------------------------------------------
-    /**
-     * 這些都要從TdoorComponentListDto抽出資料作為下拉式選單的選項
-     * gearNumber
-     * 捲箱厚度
-     * 門軌厚度
-     *
-     * 這些可能也要
-     * phase
-     * voltage
-     * motorVendor
-     *
-     */
-    // ----------------------------------------------------
-
-    //
-    // ___________________________________________________________
+    // __________________________________________________________;
     // accessoryDataArr.forEach((data, index) => {
     // const id = index;
     // this._acceList[`${id}`] = new Class_accessory({
@@ -102,6 +89,11 @@ class Class_product {
     //   // copySelf,
     // });
     // });
+
+    // ___________________________________________________________
+    // 建立選配設定
+    this.createOptionsList();
+
     // ___________________________________________________________
   } //  constructor close
 
@@ -126,6 +118,8 @@ class Class_product {
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
   // ---------------------------------------------------------
   // _acceList: { [key: string]: Taccessory } = {};
   // get acceList() {
@@ -159,6 +153,62 @@ class Class_product {
     this.reRender();
   }
 
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+
+  optionsList: { [key: string]: Class_options } = {};
+
+  delOption(key: string) {
+    delete this.optionsList[key];
+    this.reRender();
+  }
+
+  copyOption(copyKey: string) {
+    const newKey = `new-${nanoid()}`;
+    const copyData = _.cloneDeep(this.optionsList[copyKey].body);
+
+    this.optionsList[newKey] = new Class_options({
+      reRender: this.reRender,
+      data: copyData,
+      delSelf: () => this.delOption(newKey),
+      copySelf: () => this.copyOption(newKey),
+    });
+
+    this.reRender();
+  }
+
+  addOption() {
+    console.log(this.optionsList);
+    const newKey = `new-${nanoid()}`;
+    this.optionsList[newKey] = new Class_options({
+      reRender: this.reRender,
+      delSelf: () => this.delOption(newKey),
+      copySelf: () => this.copyOption(newKey),
+    });
+
+    this.reRender();
+  }
+
+  createOptionsList() {
+    const optionArr = this._prodData.options;
+    const list: { [key: string]: Class_options } = {};
+
+    optionArr.forEach((item) => {
+      const key = item.id;
+      list[key] = new Class_options({
+        reRender: this.reRender,
+        data: item,
+        delSelf: () => this.delOption(key),
+        copySelf: () => this.copyOption(key),
+      });
+    });
+    this.optionsList = list;
+    this.reRender();
+  }
+
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
   // ---------------------------------------------------------
 
   // 防抖
@@ -1093,6 +1143,8 @@ type Tprod = {
   isIntegrated: boolean; // 一體式捲箱
   headBoxThick: string; // 捲箱厚度
   openWay: string; // 開閉方式
+  //
+  options: TquotationProductOptionDto[];
 };
 
 type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -1612,6 +1664,8 @@ const emptyProdOri: () => Tprod = () => {
     isIntegrated: false,
     headBoxThick: '',
     openWay: '',
+    //
+    options: [],
   };
 };
 

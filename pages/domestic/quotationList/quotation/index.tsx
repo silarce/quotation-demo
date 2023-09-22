@@ -63,6 +63,7 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
+import Table_options from 'components/page/domestic/quotation/quotation/product/table_options';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // config
@@ -225,6 +226,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     acceKeyArr,
     acceCellConfig,
     changeAcceKeyArr,
+    //
+    optionsKeyArr,
+    changeOptionsKeyArr,
+    optionsCellConfig,
     //
     othersKeyArr,
     othersList,
@@ -931,6 +936,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // --------------------------------------------------------------------------
+  console.log(targetProd);
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -970,6 +976,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
             acceCellConfig={acceCellConfig}
             acceKeyArr={acceKeyArr}
             changeAcceKeyArr={changeAcceKeyArr}
+          />
+
+          <Table_options
+            disabled={disabled}
+            list={targetProd?.optionsList}
+            cellConfig={optionsCellConfig}
+            keyArr={optionsKeyArr}
+            changeKeyArr={changeOptionsKeyArr}
+            add={targetProd?.addOption}
           />
 
           <Table_others

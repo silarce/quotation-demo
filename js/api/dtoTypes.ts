@@ -749,20 +749,22 @@ export type TquotationContentOtherDto = {
 
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 
-// /**選配設定 */
-// export type ToptionsDto = {
-//   id: string;
-//   createdAt: string;
-//   updatedAt: string;
-//   codeName: string; //代號
-//   name: string; //名稱
-//   unit: string; // 單位
-//   quantity: number; // 數量
-//   unitPrice: number; // 單價
-//   totalPrice: number; // 複價
-//   price: number; // 牌價
-//   dualPrice: number; // 牌價複價
-// };
+/**選配設定 */ // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
+export type TquotationProductOptionDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  codeName: string; //代號
+  name: string; //名稱
+  unit: string; // 單位
+  quantity: number; // 數量
+  unitPrice: number; // 單價
+  totalPrice: number; // 複價
+  price: number; // 牌價
+  dualPrice: number; // 牌價複價
+};
+// 但是後端有建立這個型別
+export type TcreateQuotationProductOptionDto = Omit<TquotationProductOptionDto, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type quotationProductDto = {
   id: string;
@@ -835,19 +837,7 @@ export type quotationProductDto = {
   // 備註
   notes: string;
   // 選配設定
-  options: {
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    codeName: string; //代號
-    name: string; //名稱
-    unit: string; // 單位
-    quantity: number; // 數量
-    unitPrice: number; // 單價
-    totalPrice: number; // 複價
-    price: number; // 牌價
-    dualPrice: number; // 牌價複價
-  };
+  options: TquotationProductOptionDto[];
 };
 
 export type TquotationContentDto = {
