@@ -223,7 +223,7 @@ class Class_product {
 
   req_calcGeneralSpec() {
     const req = async () => {
-      if (!this.doorModel || !this.height) {
+      if (!this.doorType || !this.height) {
         return;
       }
 
@@ -242,7 +242,7 @@ class Class_product {
         }
 
         return {
-          modelName: this.doorModel as TpcgsPrams['modelName'],
+          modelName: this.doorType as TpcgsPrams['modelName'],
           height: Number(this.height) * 1000,
           isAntiTyphoon: this.typhoonProtection,
           fullWidth,
@@ -273,20 +273,20 @@ class Class_product {
       // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
       const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
       // this.B = String(boxB);
-      this.B = boxB ? String(boxB / 1000) : '';
+      this.boxB = boxB ? String(boxB / 1000) : '';
       this.thickness = res.thickness;
 
       // ________________________
       // 設定馬達廠商
       if (defaultMotorBox) {
         if (defaultMotorBox.東元) {
-          this.motorVendor = '東元';
-          this.B = String(defaultMotorBox.東元.boxB / 1000);
+          this.motor = '東元';
+          this.boxB = String(defaultMotorBox.東元.boxB / 1000);
         } else if (defaultMotorBox.大同) {
-          this.motorVendor = '大同';
-          this.B = String(defaultMotorBox.大同.boxB / 1000);
+          this.motor = '大同';
+          this.boxB = String(defaultMotorBox.大同.boxB / 1000);
         } else if (defaultMotorBox.default) {
-          this.B = String(defaultMotorBox.default.boxB / 1000);
+          this.boxB = String(defaultMotorBox.default.boxB / 1000);
         }
       }
 
@@ -321,12 +321,12 @@ class Class_product {
     const req = async () => {
       const rollerDiameter = this._doorGeneralSpecs?.diameter;
 
-      if (!this.doorModel || !this.weight || !rollerDiameter) {
+      if (!this.doorType || !this.weight || !rollerDiameter) {
         return;
       }
 
       const res = await apiGetProdAvailableComponents({
-        modelName: this.doorModel as TpacParams['modelName'],
+        modelName: this.doorType as TpacParams['modelName'],
         weight: this.weight,
         isAntiTyphoon: this.typhoonProtection,
         rollerDiameter: rollerDiameter,
@@ -380,8 +380,8 @@ class Class_product {
       dataArr: availableComponents.guideRails,
       filterParams: {
         isAntiTyphoon: this.typhoonProtection,
-        thickness: this.railThick,
-        hasSilencingStrip: this.hasSilencingStrip,
+        thickness: this.doorTrackThick,
+        hasSilencingStrip: this.doorTrackSilencerStrip,
       },
     });
 
@@ -390,11 +390,11 @@ class Class_product {
       filterParams: {
         horsePower: this.horsepower,
         // gearNumber: this., // DuST說先略過
-        motorVendor: this.motorVendor,
+        motorVendor: this.motor,
         phase: Number(this.phase),
         voltage: Number(this.voltage),
         loadWeight: this.weight,
-        hasSupportStand: this.hasSupportStand,
+        hasSupportStand: this.motorSupport,
       },
     });
 
@@ -403,8 +403,8 @@ class Class_product {
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName, // 從doorGeneralSpecs取得
         gearNumber: motors?.gearNumber, // 從上面的motor取得
-        isIntegrated: this.isIntegrated,
-        motorVendor: this.motorVendor,
+        isIntegrated: this.onePieceRollUpBox,
+        motorVendor: this.motor,
         weight: this.weight,
       },
     });
@@ -429,9 +429,9 @@ class Class_product {
     const headBoxes: Taccessory | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
-        thickness: this.headBoxThick, // 厚度
+        thickness: this.rollUpBoxThick, // 厚度
         /**一體式捲箱 */
-        isIntegrated: this.isIntegrated, // 一體式捲箱
+        isIntegrated: this.onePieceRollUpBox, // 一體式捲箱
       },
     });
 
@@ -464,7 +464,7 @@ class Class_product {
 
     const motorArr = this._doorGeneralSpecs.motors;
     const hp = this.horsepower;
-    const vendor = this.motorVendor as '東元' | '大同' | '';
+    const vendor = this.motor as '東元' | '大同' | '';
     const defaultMotor = motorArr[this._doorGeneralSpecs.defaultMotorIndex];
     const defaultHP = defaultMotor.hp;
     const box = defaultMotor.box;
@@ -476,7 +476,7 @@ class Class_product {
     const boxB = box[vendor]?.boxB || box.default?.boxB;
 
     if (boxB) {
-      this.B = String(boxB / 1000);
+      this.boxB = String(boxB / 1000);
     }
   }
 
@@ -562,7 +562,7 @@ class Class_product {
 
   private calcArea = () => {
     const h = Number(this._prodData.height || 0);
-    const b = Number(this._prodData.B || 0);
+    const b = Number(this._prodData.boxB || 0);
     const w = Number(this._prodData.width || 0);
     const l = Number(this._prodData.length || 0);
 
@@ -669,9 +669,9 @@ class Class_product {
     }
 
     if (Object.keys(motorVendorList).length > 0) {
-      this.options_motorVendor = Object.values(motorVendorList);
+      this.options_motor = Object.values(motorVendorList);
     } else {
-      this.options_motorVendor = undefined;
+      this.options_motor = undefined;
     }
 
     if (Object.keys(phaseList).length > 0) {
@@ -687,28 +687,31 @@ class Class_product {
     }
 
     if (Object.keys(headBoxThickList).length > 0) {
-      this.options_headBoxThick = Object.values(headBoxThickList);
+      this.options_rollUpBoxThick = Object.values(headBoxThickList);
     } else {
-      this.options_headBoxThick = undefined;
+      this.options_rollUpBoxThick = undefined;
     }
 
     if (Object.keys(railThickList).length > 0) {
-      this.options_railThick = Object.values(railThickList);
+      this.options_doorTrackThick = Object.values(railThickList);
     }
   } // retrieveOptions
   // ---------------------------------------------------------
   // 下拉式選單的選項
 
+  // !!! options_xxx 後綴很重要 !!!
+  // 這個xxx要與key吻合，在tbody才能取得options_xxx
+
   // 這幾個會經由執行retrieveOptions()來設定
   options_horsepower: Toption[] | undefined = undefined;
-  options_motorVendor: Toption[] | undefined = undefined;
+  options_motor: Toption[] | undefined = undefined;
   options_phase: Toption[] | undefined = undefined;
   options_voltage: Toption[] | undefined = undefined;
-  options_headBoxThick: Toption[] | undefined = undefined;
-  options_railThick: Toption[] | undefined = undefined;
+  options_rollUpBoxThick: Toption[] | undefined = undefined;
+  options_doorTrackThick: Toption[] | undefined = undefined;
 
   /**門型 options */
-  get options_doorModel() {
+  get options_doorType() {
     return Object.values(this._doorModelList).map((item) => {
       return {
         value: item.name,
@@ -719,7 +722,7 @@ class Class_product {
 
   /**門片材質 主產品設定的材質 */
   get options_material() {
-    const doorModel = this._doorModelList[this.doorModel];
+    const doorModel = this._doorModelList[this.doorType];
 
     if (!doorModel) {
       return undefined;
@@ -737,7 +740,7 @@ class Class_product {
 
   /**門軌 options */
   get options_doorTrack() {
-    const doorModel = this._doorModelList[this.doorModel];
+    const doorModel = this._doorModelList[this.doorType];
 
     if (!doorModel) {
       return undefined;
@@ -772,10 +775,10 @@ class Class_product {
   }
   // ---------------------------------------------------------
 
-  get discountRate() {
-    return this._prodData.discountRate;
+  get discount() {
+    return this._prodData.discount;
   }
-  set discountRate(v) {
+  set discount(v) {
     if ((v as string) === '') {
       v = '0';
     }
@@ -788,7 +791,7 @@ class Class_product {
       return;
     }
 
-    this._prodData.discountRate = `${Number(v)}`;
+    this._prodData.discount = `${Number(v)}`;
 
     // 因為折數改變了，所以選配設定的價格要重新計算
     Object.values(this.optionsList).forEach((item, index, arr) => {
@@ -821,12 +824,12 @@ class Class_product {
     this.reRender();
   }
   //
-  get doorModel() {
-    return this._prodData.doorModel;
+  get doorType() {
+    return this._prodData.doorType;
   }
 
-  set doorModel(v) {
-    this._prodData.doorModel = v;
+  set doorType(v) {
+    this._prodData.doorType = v;
     this.req_calcGeneralSpec();
     this.req_getProdAvailableComponents();
     this.reRender();
@@ -866,11 +869,11 @@ class Class_product {
   //
 
   /**B(m) */
-  get B() {
-    return this._prodData.B;
+  get boxB() {
+    return this._prodData.boxB;
   }
-  set B(v) {
-    this._prodData.B = v;
+  set boxB(v) {
+    this._prodData.boxB = v;
     this.area = this.calcArea();
     this.reRender();
   }
@@ -1073,11 +1076,11 @@ class Class_product {
   //----------------------------------------------------------
   //----------------------------------------------------------
 
-  get motorVendor() {
-    return this._prodData.motorVendor;
+  get motor() {
+    return this._prodData.motor;
   }
-  set motorVendor(v) {
-    this._prodData.motorVendor = v;
+  set motor(v) {
+    this._prodData.motor = v;
     this.toSetDefaultBoxB();
     this.reRender();
   }
@@ -1100,11 +1103,11 @@ class Class_product {
   }
 
   //
-  get hasSupportStand() {
-    return this._prodData.hasSupportStand;
+  get motorSupport() {
+    return this._prodData.motorSupport;
   }
-  set hasSupportStand(v) {
-    this._prodData.hasSupportStand = v;
+  set motorSupport(v) {
+    this._prodData.motorSupport = v;
     this.reRender();
   }
   //
@@ -1116,59 +1119,59 @@ class Class_product {
     this.reRender();
   }
   //
-  get lockBox() {
-    return this._prodData.lockBox;
+  get motorLockBox() {
+    return this._prodData.motorLockBox;
   }
-  set lockBox(v) {
-    this._prodData.lockBox = v;
+  set motorLockBox(v) {
+    this._prodData.motorLockBox = v;
     this.reRender();
   }
   //
-  get railThick() {
-    return this._prodData.railThick;
+  get doorTrackThick() {
+    return this._prodData.doorTrackThick;
   }
-  set railThick(v) {
-    this._prodData.railThick = v;
+  set doorTrackThick(v) {
+    this._prodData.doorTrackThick = v;
     this.reRender();
   }
   //
-  get rollerType() {
-    return this._prodData.rollerType;
+  get rollerSpec() {
+    return this._prodData.rollerSpec;
   }
-  set rollerType(v) {
-    this._prodData.rollerType = v;
+  set rollerSpec(v) {
+    this._prodData.rollerSpec = v;
     this.reRender();
   }
   //
-  get hasSilencingStrip() {
-    return this._prodData.hasSilencingStrip;
+  get doorTrackSilencerStrip() {
+    return this._prodData.doorTrackSilencerStrip;
   }
-  set hasSilencingStrip(v) {
-    this._prodData.hasSilencingStrip = v;
+  set doorTrackSilencerStrip(v) {
+    this._prodData.doorTrackSilencerStrip = v;
     this.reRender();
   }
   //
-  get isIntegrated() {
-    return this._prodData.isIntegrated;
+  get onePieceRollUpBox() {
+    return this._prodData.onePieceRollUpBox;
   }
-  set isIntegrated(v) {
-    this._prodData.isIntegrated = v;
+  set onePieceRollUpBox(v) {
+    this._prodData.onePieceRollUpBox = v;
     this.reRender();
   }
   //
-  get headBoxThick() {
-    return this._prodData.headBoxThick;
+  get rollUpBoxThick() {
+    return this._prodData.rollUpBoxThick;
   }
-  set headBoxThick(v) {
-    this._prodData.headBoxThick = v;
+  set rollUpBoxThick(v) {
+    this._prodData.rollUpBoxThick = v;
     this.reRender();
   }
   //
-  get openWay() {
-    return this._prodData.openWay;
+  get close() {
+    return this._prodData.close;
   }
-  set openWay(v) {
-    this._prodData.openWay = v;
+  set close(v) {
+    this._prodData.close = v;
     this.reRender();
   }
   //
@@ -1194,15 +1197,15 @@ class Class_product {
 
 type Tprod = {
   id?: string;
-  order?: string;
-  discountRate: `${number}`;
+  // order?: string;
+  discount: `${number}`;
   itemName: string;
   quoteType: string;
-  doorModel: string;
+  doorType: string;
   length: string; // L(m)
   width: string; // W(m)
   height: string; //h(m)
-  B: string; // B(m)
+  boxB: string; // B(m)
   thickness: string; // 門片厚度?
   area: string; // 面積
   volume: string; // 才數
@@ -1219,18 +1222,18 @@ type Tprod = {
   bounceDoor: boolean;
   notes: string;
   //
-  motorVendor: string; // 馬達廠商
+  motor: string; // 馬達廠商
   voltage: string; // 電壓
   phase: string; // 相數
-  hasSupportStand: boolean; // 馬達支撐架
+  motorSupport: boolean; // 馬達支撐架
   bottomBar: string; // 底座類型
-  lockBox: string; // 馬達鎖盒
-  railThick: string; // 門軌厚度
-  rollerType: string; // 捲軸規格
-  hasSilencingStrip: boolean; // 門軌消音條
-  isIntegrated: boolean; // 一體式捲箱
-  headBoxThick: string; // 捲箱厚度
-  openWay: string; // 開閉方式
+  motorLockBox: string; // 馬達鎖盒
+  doorTrackThick: string; // 門軌厚度
+  rollerSpec: string; // 捲軸規格
+  doorTrackSilencerStrip: boolean; // 門軌消音條
+  onePieceRollUpBox: boolean; // 一體式捲箱
+  rollUpBoxThick: string; // 捲箱厚度
+  close: string; // 開閉方式
   //
   options: TquotationProductOptionDto[];
 };
@@ -1239,14 +1242,14 @@ type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
 
 const prodkeyArrOri: () => TprodKey[] = () => {
   return [
-    'discountRate',
+    'discount',
     'itemName',
     'quoteType',
-    'doorModel',
+    'doorType',
     'length',
     'width',
     'height',
-    'B',
+    'boxB',
     'thickness',
     'area',
     'volume',
@@ -1263,18 +1266,18 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'bounceDoor',
     'notes',
     //
-    'motorVendor', // 馬達廠商
+    'motor', // 馬達廠商
     'voltage', // 電壓
     'phase', // 相數
-    'hasSupportStand', // 馬達支撐架
+    'motorSupport', // 馬達支撐架
     'bottomBar', // 底座類型
-    'lockBox', // 馬達鎖盒
-    'railThick', // 門軌厚度
-    'rollerType', // 捲軸規格
-    'hasSilencingStrip', // 門軌消音條
-    'isIntegrated', // 一體式捲箱
-    'headBoxThick', // 捲箱厚度
-    'openWay', // 開閉方式
+    'motorLockBox', // 馬達鎖盒
+    'doorTrackThick', // 門軌厚度
+    'rollerSpec', // 捲軸規格
+    'doorTrackSilencerStrip', // 門軌消音條
+    'onePieceRollUpBox', // 一體式捲箱
+    'rollUpBoxThick', // 捲箱厚度
+    'close', // 開閉方式
   ];
 };
 
@@ -1287,7 +1290,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
 // };
 
 const prodCellConfig: TcellConfig = {
-  discountRate: {
+  discount: {
     label: '折數',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
@@ -1318,7 +1321,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  doorModel: {
+  doorType: {
     label: '門型',
     inputSelProps: {
       wrapperStyle: { width: '120px' },
@@ -1369,7 +1372,7 @@ const prodCellConfig: TcellConfig = {
     },
   },
   // 後端說B(m)是boxB
-  B: {
+  boxB: {
     label: 'B(m)',
     theadItemClassName: 'text-center',
     inputSelProps: {
@@ -1561,7 +1564,7 @@ const prodCellConfig: TcellConfig = {
   //
   //
   //
-  motorVendor: {
+  motor: {
     label: '馬達廠商',
     // isOptionValue: true,
     inputSelProps: {
@@ -1604,14 +1607,14 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  hasSupportStand: {
+  motorSupport: {
     label: '馬達支撐架',
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
         wrapperStyle: { justifyContent: 'center' },
-        propsArr: [{ key: 'hasSupportStand' }],
+        propsArr: [{ key: 'motorSupport' }],
       },
     },
   },
@@ -1630,7 +1633,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  lockBox: {
+  motorLockBox: {
     label: '馬達鎖盒',
     inputSelProps: {
       wrapperStyle: { width: '90px' },
@@ -1644,7 +1647,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  railThick: {
+  doorTrackThick: {
     label: '門軌厚度',
     inputSelProps: {
       wrapperStyle: { width: '90px' },
@@ -1660,7 +1663,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  rollerType: {
+  rollerSpec: {
     label: '捲軸規格',
     inputSelProps: {
       wrapperStyle: { width: '90px' },
@@ -1674,29 +1677,29 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  hasSilencingStrip: {
+  doorTrackSilencerStrip: {
     label: '門軌消音條',
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
         wrapperStyle: { justifyContent: 'center' },
-        propsArr: [{ key: 'hasSilencingStrip' }],
+        propsArr: [{ key: 'doorTrackSilencerStrip' }],
       },
     },
   },
-  isIntegrated: {
+  onePieceRollUpBox: {
     label: '一體式捲箱',
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
         wrapperStyle: { justifyContent: 'center' },
-        propsArr: [{ key: 'isIntegrated' }],
+        propsArr: [{ key: 'onePieceRollUpBox' }],
       },
     },
   },
-  headBoxThick: {
+  rollUpBoxThick: {
     label: '捲箱厚度',
     inputSelProps: {
       wrapperStyle: { width: '90px' },
@@ -1705,7 +1708,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  openWay: {
+  close: {
     label: '開閉方式',
     inputSelProps: {
       wrapperStyle: { width: '90px' },
@@ -1720,14 +1723,14 @@ const prodCellConfig: TcellConfig = {
 
 const emptyProdOri: () => Tprod = () => {
   return {
-    discountRate: '100',
+    discount: '100',
     itemName: '',
     quoteType: '',
-    doorModel: '',
+    doorType: '',
     length: '',
     width: '',
     height: '',
-    B: '',
+    boxB: '',
     thickness: '',
     area: '',
     volume: '',
@@ -1744,18 +1747,18 @@ const emptyProdOri: () => Tprod = () => {
     bounceDoor: false,
     notes: '',
     //
-    motorVendor: '',
+    motor: '',
     voltage: '',
     phase: '',
-    hasSupportStand: false,
+    motorSupport: false,
     bottomBar: '',
-    lockBox: '',
-    railThick: '',
-    rollerType: '',
-    hasSilencingStrip: false,
-    isIntegrated: false,
-    headBoxThick: '',
-    openWay: '',
+    motorLockBox: '',
+    doorTrackThick: '',
+    rollerSpec: '',
+    doorTrackSilencerStrip: false,
+    onePieceRollUpBox: false,
+    rollUpBoxThick: '',
+    close: '',
     //
     options: [],
   };

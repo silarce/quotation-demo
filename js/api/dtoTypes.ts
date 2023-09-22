@@ -802,8 +802,12 @@ export type quotationProductDto = {
   motor: string;
   // 電壓
   voltage: number;
+
+  // !!!
   // 馬達支撐架
   motorSupport: string;
+  // !!!
+
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -829,7 +833,7 @@ export type quotationProductDto = {
   // 複價
   totalPrice: number;
   // // 防颱
-  // typhoonProtection: boolean;
+  typhoonProtection: boolean;
   // 彈射門
   bounceDoor: boolean;
   // 關閉方式

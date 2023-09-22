@@ -50,14 +50,14 @@ class Class_options {
     toCalcOptionsAllprice = true,
   }: //
   { toCalcOptionsAllprice?: boolean } = {}) {
-    const discountRate = new Decimal(this._prod.discountRate).div(100);
+    const discount = new Decimal(this._prod.discount).div(100);
 
     const price = this.price;
     const quantity = this.quantity;
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
-    const unitPrice = new Decimal(price).mul(discountRate);
+    const unitPrice = new Decimal(price).mul(discount);
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
