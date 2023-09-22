@@ -359,7 +359,7 @@ const acceCellConfig: TcellConfig = {
 
 // ===========================================================
 
-const notConformAcce = {
+const creNotConformAcce = () => ({
   id: '',
   createdAt: '',
   updatedAt: '',
@@ -367,7 +367,7 @@ const notConformAcce = {
   code: '沒有符合規格的產品',
   specialSpec: '---',
   price: '---',
-};
+});
 
 const creDesc_slats = (classAcce: Class_accessory) => {
   const { isAntiTyphoon } = classAcce;
@@ -540,5 +540,5 @@ const acceDescLookUp = {
 };
 
 // ===========================================================
-export { Class_accessory, acceKeyArrOri, acceCellConfig, acceNameLookup };
+export { Class_accessory, acceKeyArrOri, acceCellConfig, acceNameLookup, creNotConformAcce };
 export type { Taccessory, TacceKey };

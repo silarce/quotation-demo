@@ -21,7 +21,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 
 // ===========================================================
 // child class
-import { Class_accessory, Taccessory, acceNameLookup } from './classAccessory';
+import { Class_accessory, Taccessory, acceNameLookup, creNotConformAcce } from './classAccessory';
 import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
@@ -379,8 +379,8 @@ class Class_product {
     const guideRails: Taccessory | null = filter_guideRails({
       dataArr: availableComponents.guideRails,
       filterParams: {
+        // thickness: String(this.doorTrackThick),
         isAntiTyphoon: this.typhoonProtection,
-        thickness: this.doorTrackThick,
         hasSilencingStrip: this.doorTrackSilencerStrip,
       },
     });
@@ -393,7 +393,7 @@ class Class_product {
         motorVendor: this.motor,
         phase: Number(this.phase),
         voltage: Number(this.voltage),
-        loadWeight: this.weight,
+        weight: this.weight,
         hasSupportStand: this.motorSupport,
       },
     });
@@ -401,8 +401,8 @@ class Class_product {
     const sidePlates: Taccessory | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
-        bearingType: this._doorGeneralSpecs?.bearingName, // 從doorGeneralSpecs取得
-        gearNumber: motors?.gearNumber, // 從上面的motor取得
+        bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
+        gearNumber: motors?.gearNumber ?? '', // 從上面的motor取得
         isIntegrated: this.onePieceRollUpBox,
         motorVendor: this.motor,
         weight: this.weight,
@@ -429,7 +429,7 @@ class Class_product {
     const headBoxes: Taccessory | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
-        thickness: this.rollUpBoxThick, // 厚度
+        thickness: this.rollUpBoxThick, // 捲箱厚度
         /**一體式捲箱 */
         isIntegrated: this.onePieceRollUpBox, // 一體式捲箱
       },
@@ -438,20 +438,15 @@ class Class_product {
     // 變更設計，如果是null，不要帶null進去，
     // 要帶標明為無資料Taccessory進去
 
-    // 為了測試，先隨便帶資料
-    // 為了測試，先隨便帶資料
-    // 為了測試，先隨便帶資料
-    // 為了測試，先隨便帶資料
     this.creAcceList({
-      slats: availableComponents.slats[0],
-      bottomBars: availableComponents.bottomBars[0],
-      guideRails: availableComponents.guideRails[0],
-      motors: availableComponents.motors[0],
-      // motors: null,
-      sidePlates: availableComponents.sidePlates[0],
-      rollers: availableComponents.rollers[0],
-      motorAccessories: availableComponents.motorAccessories[0],
-      headBoxes: availableComponents.headBoxes[0],
+      slats: slats || creNotConformAcce(),
+      bottomBars: bottomBars || creNotConformAcce(),
+      guideRails: guideRails || creNotConformAcce(),
+      motors: motors || creNotConformAcce(),
+      sidePlates: sidePlates || creNotConformAcce(),
+      rollers: rollers || creNotConformAcce(),
+      motorAccessories: motorAccessories || creNotConformAcce(),
+      headBoxes: headBoxes || creNotConformAcce(),
     });
   } // retrieveProdComponent
 
@@ -1088,8 +1083,8 @@ class Class_product {
   get voltage() {
     return this._prodData.voltage;
   }
-  set voltage(v) {
-    this._prodData.voltage = v;
+  set voltage(str) {
+    this._prodData.voltage = str;
     this.reRender();
   }
   //
@@ -1130,8 +1125,8 @@ class Class_product {
   get doorTrackThick() {
     return this._prodData.doorTrackThick;
   }
-  set doorTrackThick(v) {
-    this._prodData.doorTrackThick = v;
+  set doorTrackThick(str) {
+    this._prodData.doorTrackThick = str;
     this.reRender();
   }
   //
@@ -1790,11 +1785,7 @@ const filter_slats = ({
     return data.isAntiTyphoon === filterParams.isAntiTyphoon;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_bottomBars = ({
@@ -1809,24 +1800,18 @@ const filter_bottomBars = ({
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
     if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
-      isPass = false;
+      return false;
     } else if (data.isWaterProof !== filterParams.isWaterProof) {
-      isPass = false;
+      return false;
     } else if (data.hasAluminumBarrier !== filterParams.hasAluminumBarrier) {
-      isPass = false;
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_guideRails = ({
@@ -1835,31 +1820,26 @@ const filter_guideRails = ({
 }: {
   dataArr: TdoorComponentListDto['guideRails'];
   filterParams: {
-    thickness: string; // 判定為!==
+    // thickness: string; // 不用過濾
     isAntiTyphoon: boolean;
     /**消音條 */
     hasSilencingStrip: boolean; // 消音條
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
-    if (data.thickness && data.thickness !== filterParams.thickness) {
-      isPass = false;
-    } else if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
-      isPass = false;
+    // if (data.thickness && data.thickness !== filterParams.thickness) {
+    // isPass = false;
+    // } else
+    if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+      return false;
     } else if (data.hasSilencingStrip !== filterParams.hasSilencingStrip) {
-      isPass = false;
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_sidePlates = ({
@@ -1868,39 +1848,33 @@ const filter_sidePlates = ({
 }: {
   dataArr: TdoorComponentListDto['sidePlates'];
   filterParams: {
-    bearingType?: string; // 軸承
-    gearNumber?: string | null; // 鍊齒輪番號
+    bearingType: string; // 軸承
+    gearNumber: string; // 鍊齒輪番號
     /**一體式捲箱 */
     isIntegrated: boolean; // 一體式捲箱
     motorVendor: string; // 馬達廠商
-    weight: number;
+    weight: number; // /products/door/calc-general-spec給的weight
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
-    if (data.bearingType !== filterParams.bearingType) {
-      isPass = false;
-    } else if (data.gearNumber && data.gearNumber !== filterParams.gearNumber) {
-      isPass = false;
-    } else if (data.isIntegrated && data.isIntegrated !== filterParams.isIntegrated) {
-      isPass = false;
-    } else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
-      isPass = false;
-    } else if (data.maxDoorWeight && data.maxDoorWeight < filterParams.weight) {
-      isPass = false;
-    } else if (data.minDoorWeight && data.minDoorWeight > filterParams.weight) {
-      isPass = false;
+    if (data.bearingType !== null && data.bearingType !== filterParams.bearingType) {
+      return false;
+    } else if (data.gearNumber !== null && data.gearNumber !== filterParams.gearNumber) {
+      return false;
+    } else if (data.isIntegrated !== null && data.isIntegrated !== filterParams.isIntegrated) {
+      return false;
+    } else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+      return false;
+    } else if (data.maxDoorWeight !== null && data.maxDoorWeight < filterParams.weight) {
+      return false;
+    } else if (data.minDoorWeight !== null && data.minDoorWeight >= filterParams.weight) {
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_rollers = ({
@@ -1913,20 +1887,14 @@ const filter_rollers = ({
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
     if (data.diameter !== filterParams.diameter) {
-      isPass = false;
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_motors = ({
@@ -1942,45 +1910,44 @@ const filter_motors = ({
     /**電壓(V) */
     voltage: number; // 電壓(V)
     /**荷重(kg) */
-    loadWeight: number; // 荷重(kg)
+    weight: number; // 荷重(kg) 用weight來比
     hasSupportStand: boolean; // 有腳 // 馬達支撐架
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
     let horsePoswer = filterParams.horsePower;
+    let d_horsePower = data.horsePower;
 
     if (horsePoswer === '1 1/2HP') {
       horsePoswer = '1.5HP';
     }
 
-    if (data.horsePower !== horsePoswer) {
-      isPass = false;
+    if (d_horsePower === '1 1/2HP') {
+      d_horsePower = '1.5HP';
+    }
+
+    if (d_horsePower !== horsePoswer) {
+      return false;
     }
     // else if (data.gearNumber !== filterParams.gearNumber) {
     //   isPass = false;
     // }
-    else if (data.motorVendor && data.motorVendor !== filterParams.motorVendor) {
-      isPass = false;
-    } else if (data.phase && data.phase !== filterParams.phase) {
-      isPass = false;
-    } else if (data.voltage && data.voltage !== filterParams.voltage) {
-      isPass = false;
-    } else if (data.loadWeight && data.loadWeight !== filterParams.loadWeight) {
-      isPass = false;
-    } else if (data.hasSupportStand && data.hasSupportStand !== filterParams.hasSupportStand) {
-      isPass = false;
+    else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+      return false;
+    } else if (data.phase !== null && data.phase !== filterParams.phase) {
+      return false;
+    } else if (data.voltage !== null && data.voltage !== filterParams.voltage) {
+      return false;
+    } else if (data.loadWeight !== null && data.loadWeight < filterParams.weight) {
+      return false;
+    } else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_motorAccessories = ({
@@ -1990,29 +1957,23 @@ const filter_motorAccessories = ({
   dataArr: TdoorComponentListDto['motorAccessories'];
   filterParams: {
     /**鍊條排數 */
-    // chains: number; // 鍊條排數 // 不知道從哪裡取得這個資料 // 先略過
+    // chains: number; // 鍊條排數 // 用sprocketWheelChains 過濾
     /**軸承 */
     bearingType: string; // 軸承
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
     // if (data.chains !== filterParams.chains) {
     //   isPass = false;
     // } else
     if (data.bearingType !== filterParams.bearingType) {
-      isPass = false;
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 const filter_headBoxes = ({
@@ -2021,28 +1982,22 @@ const filter_headBoxes = ({
 }: {
   dataArr: TdoorComponentListDto['headBoxes'];
   filterParams: {
-    thickness: string; // 厚度
+    thickness: string; // 厚度 // 主產品設定裡的捲箱厚度
     /**一體式捲箱 */
     isIntegrated: boolean; // 一體式捲箱
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    let isPass = true;
-
     if (data.thickness !== filterParams.thickness) {
-      isPass = false;
+      return false;
     } else if (data.isIntegrated !== filterParams.isIntegrated) {
-      isPass = false;
+      return false;
     }
 
-    return isPass;
+    return true;
   });
 
-  if (filteredArr[0]) {
-    return filteredArr[0];
-  } else {
-    return null;
-  }
+  return filteredArr[0] || null;
 };
 
 // ===========================================================
@@ -2061,3 +2016,56 @@ export type { Tprod, TprodKey, TcellConfig };
 
 // 每個主產品的折數都不會總折數
 // 是獨立的
+
+/**
+ 
+不鏽鋼材質表面：
+2B
+HL
+BA
+NO.4
+ 
+非不鏽鋼材質就不能選表面
+
+
+只有門片有重量
+資料來自/products/door/calc-general-spec
+
+
+材料配件設定
+第一個代號不需要，拿掉
+
+主產品設定裡的材質應該是指門片材質
+
+送給後端，從後端收到的 長度相關的單位 都是mm
+包過 L W h B
+所以要再自己換算
+
+
+過濾材料配件時，如果條件是null就表示不限制
+
+要有烤漆欄位
+除了馬達跟配件都要有
+用checkBox表示
+
+
+主產品設定的材質是指門片材質
+變更主產品的材質時，材料配件設定裡面的材質也要跟著變
+如果沒有對應的材質，就用SST#304
+支板 捲軸 馬達 馬達配件 的材質是固定
+
+主產品設定裡的表面更動時，連帶更動材料配件設定的表面
+材料配件設定的材質選項來自 /products/door/models
+
+
+ */
+
+// ## 材質規則
+
+// - 底座: 鍍鋅鋼板, 高耐鍍鋅鋼板, SST#304, SST#316
+// - 門軌: 鍍鋅鋼板, 高耐鍍鋅鋼板, SST#304, SST#316
+// - 機械箱: 鍍鋅鋼板, 高耐鍍鋅鋼板, SST#304, SST#316
+// - 支板: 黑鐵
+// - 捲軸: 黑鐵
+// - 馬達: 黑鐵
+// - 馬達配件: 其他

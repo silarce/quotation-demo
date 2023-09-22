@@ -96,6 +96,8 @@ import Summary, {
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
+import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
+
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -816,11 +818,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    const foo = Object.values(productList);
-    const bar = foo.map((item) => {
-      return item.body;
+    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item) => {
+      return {
+        ...item.body,
+        rollUpBoxThick: Number(item.rollUpBoxThick),
+        voltage: Number(item.voltage),
+        doorTrackThick: Number(item.doorTrackThick),
+      };
     });
-    console.log(bar);
 
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
@@ -861,34 +866,35 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       //
       //
-      products: [],
+
+      products: prodArr,
       others: getOthersPostBodyArr(),
     };
 
-    // try {
-    //   setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    //   if (quotationId) {
-    //     const res = await apiPatchQuotation(body, quotationId);
-    //     showRootLoading(true, '正在更新附件');
-    //     await uploadAttachment(res.id);
+      if (quotationId) {
+        const res = await apiPatchQuotation(body, quotationId);
+        showRootLoading(true, '正在更新附件');
+        await uploadAttachment(res.id);
 
-    //     await Promise.all([update(), updateAttachments()]);
-    //   } else {
-    //     const res = await apiPostQuotation(body);
-    //     showRootLoading(true, '正在更新附件');
-    //     await uploadAttachment(res.id);
-    //     router.push({
-    //       query: {
-    //         id: res.id,
-    //       },
-    //     });
-    //   }
+        await Promise.all([update(), updateAttachments()]);
+      } else {
+        const res = await apiPostQuotation(body);
+        showRootLoading(true, '正在更新附件');
+        await uploadAttachment(res.id);
+        router.push({
+          query: {
+            id: res.id,
+          },
+        });
+      }
 
-    //   setDisabled(true);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+      setDisabled(true);
+    } catch (error) {
+      console.log(error);
+    }
 
     setIsLoading(false);
   };
@@ -951,15 +957,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          {/* <QuotationProfile //
+          <QuotationProfile //
             profile={data?.latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
-          /> */}
+          />
 
-          {/* <div className={style.switchBar}>
+          <div className={style.switchBar}>
             <div className={style.active}>報價項目</div>
-          </div> */}
+          </div>
 
           {/* 主產品設定 */}
           <Table_prod
@@ -972,14 +978,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
             setTargetProd={setTargetProd}
           />
           {/* api還沒好 */}
-          {/* 
+
           <Table_acce
             disabled={disabled}
             acceList={targetProd?.AcceList}
             acceCellConfig={acceCellConfig}
             acceKeyArr={acceKeyArr}
             changeAcceKeyArr={changeAcceKeyArr}
-          /> */}
+          />
 
           <Table_options
             disabled={disabled}
