@@ -96,11 +96,12 @@ type TpcdsPrams = {
   B: number;
 };
 
+/**似乎是api還沒做好，目前只會回傳門片數量 */
 export const apiGetProdCalcDetailSpec = async (params: TpcdsPrams) => {
   const api = '/products/door/calc-detail-spec';
 
   return axi
-    .get<TdoorGeneralSpecsDto>(api, { params })
+    .get<{ slatCount: number }>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };

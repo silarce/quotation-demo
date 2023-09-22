@@ -971,14 +971,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
             addProd={addProd}
             setTargetProd={setTargetProd}
           />
-
+          {/* api還沒好 */}
+          {/* 
           <Table_acce
             disabled={disabled}
             acceList={targetProd?.AcceList}
             acceCellConfig={acceCellConfig}
             acceKeyArr={acceKeyArr}
             changeAcceKeyArr={changeAcceKeyArr}
-          />
+          /> */}
 
           <Table_options
             disabled={disabled}

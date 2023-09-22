@@ -9,7 +9,8 @@ import type { Toption } from 'js/utils/options/options';
 
 // type
 import { TcreateQuotationProductOptionDto } from 'js/api/dtoTypes';
-import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descriptors/border-radius';
+
+import { Class_product } from './classProduct';
 
 // =======================================================================
 class Class_options {
@@ -19,22 +20,57 @@ class Class_options {
     data = emptyOptionsOri(),
     delSelf,
     copySelf,
+    // calcOptionsAllprice,
+    prod,
   }: {
     reRender: TreRender;
     data?: Toptions;
     delSelf: () => void;
     copySelf: () => void;
+    // calcOptionsAllprice: () => void;
+    prod: Class_product;
   }) {
     this.reRender = reRender;
     this._data = data;
+    this._prod = prod;
+
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+    // this.calcOptionsAllprice = calcOptionsAllprice;
   } // constructor
 
   private reRender;
   private _data;
+  private _prod;
   readonly delSelf;
   readonly copySelf;
+  // readonly calcOptionsAllprice;
+
+  calcAllPrice({
+    toCalcOptionsAllprice = true,
+  }: //
+  { toCalcOptionsAllprice?: boolean } = {}) {
+    const discountRate = new Decimal(this._prod.discountRate).div(100);
+
+    const price = this.price;
+    const quantity = this.quantity;
+    // 牌價複價
+    const dualPrice = new Decimal(price).mul(quantity);
+    // 單價
+    const unitPrice = new Decimal(price).mul(discountRate);
+    // 複價
+    const totalPrice = new Decimal(unitPrice).mul(quantity);
+
+    this._data.dualPrice = dualPrice.toNumber();
+    this._data.unitPrice = unitPrice.toNumber();
+    this._data.totalPrice = totalPrice.toNumber();
+
+    if (toCalcOptionsAllprice) {
+      this._prod.calcOptionsAllprice();
+    }
+
+    this.reRender();
+  }
 
   get codeName() {
     return this._data.codeName;
@@ -65,30 +101,17 @@ class Class_options {
   }
   set quantity(v) {
     this._data.quantity = v;
-    this.reRender();
-  }
-
-  get unitPrice() {
-    return this._data.unitPrice;
-  }
-  set unitPrice(v) {
-    this._data.unitPrice = v;
-    this.reRender();
-  }
-
-  get totalPrice() {
-    return this._data.totalPrice;
-  }
-  set totalPrice(v) {
-    this._data.totalPrice = v;
+    this.calcAllPrice();
     this.reRender();
   }
 
   get price() {
-    return this._data.price;
+    return String(this._data.price);
   }
-  set price(v) {
-    this._data.price = v;
+  set price(str) {
+    const num = Number(str);
+    this._data.price = num;
+    this.calcAllPrice();
     this.reRender();
   }
 
@@ -96,7 +119,21 @@ class Class_options {
     return this._data.dualPrice;
   }
   set dualPrice(v) {
-    this._data.dualPrice = v;
+    this.reRender();
+  }
+
+  get unitPrice() {
+    return String(this._data.unitPrice);
+  }
+  set unitPrice(str) {
+    this.reRender();
+  }
+
+  get totalPrice() {
+    return String(this._data.totalPrice);
+  }
+  set totalPrice(str) {
+    // this._data.totalPrice = num;
     this.reRender();
   }
 
@@ -124,7 +161,17 @@ type Toptions = {
 type ToptionsKey = Exclude<keyof Toptions, 'id'>;
 
 const optionsKeyArrOri: () => ToptionsKey[] = () => {
-  return ['codeName', 'name', 'unit', 'quantity', 'unitPrice', 'totalPrice', 'price', 'dualPrice'];
+  return [
+    //
+    'codeName',
+    'name',
+    'unit',
+    'quantity',
+    'price',
+    'dualPrice',
+    'unitPrice',
+    'totalPrice',
+  ];
 };
 
 const optionsCellConfig: TcellConfig = {
@@ -164,24 +211,6 @@ const optionsCellConfig: TcellConfig = {
       },
     },
   },
-  unitPrice: {
-    label: '單價',
-    inputSelProps: {
-      wrapperStyle: { width: '60px' },
-      inputProps: {
-        props: {},
-      },
-    },
-  },
-  totalPrice: {
-    label: '複價',
-    inputSelProps: {
-      wrapperStyle: { width: '60px' },
-      inputProps: {
-        props: {},
-      },
-    },
-  },
   price: {
     label: '牌價',
     inputSelProps: {
@@ -194,9 +223,36 @@ const optionsCellConfig: TcellConfig = {
   dualPrice: {
     label: '牌價複價',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '100px' },
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  unitPrice: {
+    label: '單價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '60px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  totalPrice: {
+    label: '複價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '60px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
       },
     },
   },

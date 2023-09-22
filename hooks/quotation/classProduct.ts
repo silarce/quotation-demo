@@ -75,8 +75,8 @@ class Class_product {
     this._doorModelList = doorModelList;
     //
     this._quantity = String(this._prodData.quantity);
-    this._listPrice = String(this._prodData.listPrice);
-    this._listPriceTotal = String(this._prodData.listPriceTotal);
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
@@ -92,7 +92,7 @@ class Class_product {
 
     // ___________________________________________________________
     // 建立選配設定
-    // this.createOptionsList();
+    this.createOptionsList();
 
     // ___________________________________________________________
   } //  constructor close
@@ -111,8 +111,8 @@ class Class_product {
   //
   private _prodData;
   private _quantity;
-  private _listPrice;
-  private _listPriceTotal;
+  private _price;
+  private _dualPrice;
   private _unitPrice;
   private _totalPrice;
 
@@ -156,6 +156,7 @@ class Class_product {
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+  // 選配設定
 
   optionsList: { [key: string]: Class_options } = {};
 
@@ -173,6 +174,8 @@ class Class_product {
       data: copyData,
       delSelf: () => this.delOption(newKey),
       copySelf: () => this.copyOption(newKey),
+      // calcOptionsAllprice: this.calcOptionsAllprice,
+      prod: this,
     });
 
     this.reRender();
@@ -184,6 +187,8 @@ class Class_product {
       reRender: this.reRender,
       delSelf: () => this.delOption(newKey),
       copySelf: () => this.copyOption(newKey),
+      // calcOptionsAllprice: this.calcOptionsAllprice,
+      prod: this,
     });
 
     this.reRender();
@@ -200,6 +205,8 @@ class Class_product {
         data: item,
         delSelf: () => this.delOption(key),
         copySelf: () => this.copyOption(key),
+        // calcOptionsAllprice: this.calcOptionsAllprice,
+        prod: this,
       });
     });
     this.optionsList = list;
@@ -473,25 +480,85 @@ class Class_product {
     }
   }
 
-  private countListPriceTotal() {
-    const listPriceTotal = Decimal.mul(this._prodData.listPrice || 0, this.quantity || 0).toString();
-    this._listPriceTotal = listPriceTotal;
-    this._prodData.listPriceTotal = Number(listPriceTotal);
+  // private countDualPrice() {
+  //   const dualPrice = Decimal.mul(this._prodData.price || 0, this.quantity || 0).toString();
+  //   this._dualPrice = dualPrice;
+  //   this._prodData.dualPrice = Number(dualPrice);
+  // }
+
+  // private countPrice() {
+  //   const price = this.price.replace(/,/g, '') || '0';
+  //   const discountRate = this.discountRate || '0';
+
+  //   this.unitPrice = Decimal.mul(price, Decimal.div(discountRate, 100)).toString();
+  // }
+
+  // private countTotalPrice() {
+  //   const quantity = this.quantity.replace(/,/g, '') || 0;
+  //   const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
+  //   const total = Decimal.mul(quantity, unitPrice).toString();
+  //   this.totalPrice = total;
+  // }
+
+  private optionsAllPrice = {
+    price: 0,
+    dualPrice: 0,
+    unitPrice: 0,
+    totalPrice: 0,
+  };
+
+  private acceAllPrice = {
+    price: 0,
+    dualPrice: 0,
+    unitPrice: 0,
+    totalPrice: 0,
+  };
+
+  /**計算prod所有的價格 */
+  private calcProdAllprice() {
+    // 牌價 為材料配件設定與選配設定的 牌價複價 總和
+    const price = new Decimal(this.acceAllPrice.dualPrice || 0).add(this.optionsAllPrice.dualPrice || 0);
+    // 單價 為材料配件設定與選配設定的 複價 總和
+    const unitPrice = new Decimal(this.acceAllPrice.totalPrice || 0).add(this.optionsAllPrice.totalPrice || 0);
+
+    const dualPrice = price.mul(this.quantity || 0).toNumber();
+    const totalPrice = unitPrice.mul(this.quantity || 0).toNumber();
+
+    this.price = price.toNumber().toString();
+    this.dualPrice = dualPrice.toString();
+    this.unitPrice = unitPrice.toNumber().toString();
+    this.totalPrice = totalPrice.toString();
+    this._calcProdSubTotalPrice();
+    this.reRender();
   }
 
-  private countPrice() {
-    const listPrice = this.listPrice.replace(/,/g, '') || '0';
-    const discountRate = this.discountRate || '0';
+  /**計算options所有的價格 */
+  calcOptionsAllprice() {
+    let d_price = new Decimal(0);
+    let d_dualPrice = new Decimal(0);
+    let d_unitPrice = new Decimal(0);
+    let d_totalPrice = new Decimal(0);
 
-    this.unitPrice = Decimal.mul(listPrice, Decimal.div(discountRate, 100)).toString();
-  }
+    const optionsArr = Object.values(this.optionsList);
 
-  private countTotalPrice() {
-    const quantity = this.quantity.replace(/,/g, '') || 0;
-    const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
-    const total = Decimal.mul(quantity, unitPrice).toString();
-    this.totalPrice = total;
-  }
+    optionsArr.forEach((item) => {
+      const { price, dualPrice, unitPrice, totalPrice } = item;
+
+      d_price = d_price.add(price || 0);
+      d_dualPrice = d_dualPrice.add(dualPrice || 0);
+      d_unitPrice = d_unitPrice.add(unitPrice || 0);
+      d_totalPrice = d_totalPrice.add(totalPrice || 0);
+
+      this.optionsAllPrice = {
+        price: d_price.toNumber(),
+        dualPrice: d_dualPrice.toNumber(),
+        unitPrice: d_unitPrice.toNumber(),
+        totalPrice: d_totalPrice.toNumber(),
+      };
+    });
+
+    this.calcProdAllprice();
+  } // calcOptionsAllprice
 
   private calcArea = () => {
     const h = Number(this._prodData.height || 0);
@@ -722,7 +789,14 @@ class Class_product {
     }
 
     this._prodData.discountRate = `${Number(v)}`;
-    this.countPrice();
+
+    // 因為折數改變了，所以選配設定的價格要重新計算
+    Object.values(this.optionsList).forEach((item, index, arr) => {
+      item.calcAllPrice({
+        toCalcOptionsAllprice: arr.length - 1 === index,
+      });
+    });
+    //
     this.reRender();
   }
   // set discountRate_noLoop(v) {}
@@ -868,19 +942,21 @@ class Class_product {
   set quantity(v) {
     this._prodData.quantity = Number(v);
     this._quantity = v;
-    this.countListPriceTotal();
-    this.countTotalPrice();
+    // this.countDualPrice();
+    // this.countTotalPrice();
+    this.calcProdAllprice();
     this.reRender();
   }
 
-  get listPrice() {
-    if (!this._listPrice) {
+  // 牌價
+  get price() {
+    if (!this._price) {
       return '';
     }
 
-    return Number(this._listPrice).toLocaleString();
+    return Number(this._price).toLocaleString();
   }
-  set listPrice(v) {
+  set price(v) {
     v = v.replace(/,/g, '');
     const numberRegex = /^(\d+(\.\d+)?|)$/;
 
@@ -888,21 +964,22 @@ class Class_product {
       return;
     }
 
-    this._prodData.listPrice = Number(v);
-    this._listPrice = v;
-    this.countListPriceTotal();
-    this.countPrice();
+    this._prodData.price = Number(v);
+    this._price = v;
+    // this.countDualPrice();
+    // this.countPrice();
     this.reRender();
   }
 
-  get listPriceTotal() {
-    if (!this._listPriceTotal) {
+  // 牌價複價
+  get dualPrice() {
+    if (!this._dualPrice) {
       return '';
     }
 
-    return Number(this._listPriceTotal).toLocaleString();
+    return Number(this._dualPrice).toLocaleString();
   }
-  set listPriceTotal(v) {
+  set dualPrice(v) {
     // v = v.replace(/,/g, '');
     // const numberRegex = /^(\d+(\.\d+)?|)$/;
 
@@ -910,12 +987,13 @@ class Class_product {
     //   return;
     // }
 
-    this._prodData.listPriceTotal = Number(v);
-    this._listPriceTotal = v;
-    this.countPrice();
+    this._prodData.dualPrice = Number(v);
+    this._dualPrice = v;
+    // this.countPrice();
     this.reRender();
   }
 
+  // 單價
   get unitPrice() {
     if (!this._unitPrice) {
       return '';
@@ -933,10 +1011,11 @@ class Class_product {
 
     this._prodData.unitPrice = Number(v);
     this._unitPrice = v;
-    this.countTotalPrice();
+    // this.countTotalPrice();
     this.reRender();
   }
 
+  // 複價
   get totalPrice() {
     if (!this._totalPrice) {
       return '';
@@ -955,7 +1034,7 @@ class Class_product {
 
     this._prodData.totalPrice = Number(v);
     this._totalPrice = v;
-    this._calcProdSubTotalPrice();
+    // this._calcProdSubTotalPrice();
     this.reRender();
   }
 
@@ -1132,8 +1211,8 @@ type Tprod = {
   doorTrack: string;
   horsepower: string;
   quantity: number;
-  listPrice: number;
-  listPriceTotal: number;
+  price: number;
+  dualPrice: number;
   unitPrice: number;
   totalPrice: number;
   typhoonProtection: boolean;
@@ -1176,10 +1255,10 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'doorTrack',
     'horsepower',
     'quantity',
-    'listPrice',
-    'listPriceTotal',
-    'unitPrice',
-    'totalPrice',
+    'price', // 牌價
+    'dualPrice', // 牌價複價
+    'unitPrice', //單價
+    'totalPrice', // 複價
     'typhoonProtection',
     'bounceDoor',
     'notes',
@@ -1400,18 +1479,22 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  listPrice: {
+  price: {
     label: '牌價',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '120px' },
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
       },
     },
   },
-  listPriceTotal: {
+  dualPrice: {
     label: '牌價複價',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '120px' },
       inputProps: {
         props: {
@@ -1653,8 +1736,8 @@ const emptyProdOri: () => Tprod = () => {
     doorTrack: '',
     horsepower: '',
     quantity: 0,
-    listPrice: 0,
-    listPriceTotal: 0,
+    price: 0,
+    dualPrice: 0,
     unitPrice: 0,
     totalPrice: 0,
     typhoonProtection: false,
