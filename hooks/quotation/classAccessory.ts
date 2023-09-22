@@ -337,7 +337,7 @@ const acceCellConfig: TcellConfig = {
       showBaseline: 'invisible',
       inputProps: {
         props: {
-          placeholder: '沒有符合的材料配件或此材料配件無資料',
+          placeholder: '',
           disabled: true,
         },
       },
@@ -373,7 +373,8 @@ const creDesc_slats = (classAcce: Class_accessory) => {
   const { isAntiTyphoon } = classAcce;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
 
-  return `${desc_isAntiTyphoon} `;
+  // return `${desc_isAntiTyphoon} `;
+  return ``;
 };
 
 const creDesc_bottomBars = (classAcce: Class_accessory) => {
@@ -383,20 +384,23 @@ const creDesc_bottomBars = (classAcce: Class_accessory) => {
   const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
   const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
 
-  return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
+  // return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
+  return ``;
 };
 
 const creDesc_guideRails = (classAcce: Class_accessory) => {
-  const { hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
+  const { name, hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
   const desc_hasSilencingStrip = confomtTree.hasSilencingStrip[`${hasSilencingStrip}`];
 
-  return `厚度${thickness} ${desc_isAntiTyphoon} ${desc_hasSilencingStrip}`;
+  // return `厚度${thickness} ${desc_isAntiTyphoon} ${desc_hasSilencingStrip}`;
+  return `${name} 厚度${thickness}`;
 };
 
 const creDesc_sidePlates = (classAcce: Class_accessory) => {
   const {
     //
+    name,
     bearingType,
     gearNumber,
     isIntegrated,
@@ -407,9 +411,10 @@ const creDesc_sidePlates = (classAcce: Class_accessory) => {
 
   const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
 
-  return `${desc_isIntegrated} 馬達供應商:${motorVendor ?? '無資料'} 軸承:${bearingType ?? '無資料'} 齒輪編號:${
-    gearNumber ?? '無資料'
-  } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
+  // return `${desc_isIntegrated} 馬達供應商:${motorVendor ?? '無資料'} 軸承:${bearingType ?? '無資料'} 齒輪編號:${
+  //   gearNumber ?? '無資料'
+  // } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
+  return `${name} `;
 };
 
 const creDesc_rollers = (classAcce: Class_accessory) => {
@@ -440,25 +445,28 @@ const creDesc_motors = (classAcce: Class_accessory) => {
   const desc_phase = `相位:${confomtTree.phase[`${thePhase}`]}`;
   const desc_voltage = `電壓:${voltage ?? '無資料'}V`;
 
-  return `${desc_motorVendor} ${desc_horsepower} ${desc_voltage} ${desc_phase} ${desc_loadWeight} ${desc_hasSupportStand} ${desc_gearNumber}`;
+  // return `${desc_motorVendor} ${desc_horsepower} ${desc_voltage} ${desc_phase} ${desc_loadWeight} ${desc_hasSupportStand} ${desc_gearNumber}`;
+  return `${desc_phase} ${desc_voltage} ${desc_horsepower}`;
 };
 
 const creDesc_motorAccessories = (classAcce: Class_accessory) => {
-  const { bearingType, chains } = classAcce;
+  const { name, bearingType, chains } = classAcce;
 
   const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
   const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
 
-  return `${desc_bearingType} ${desc_chains}`;
+  // return `${desc_bearingType} ${desc_chains}`;
+  return `${name}`;
 };
 
 const creDesc_headBoxes = (classAcce: Class_accessory) => {
-  const { isIntegrated, thickness } = classAcce;
+  const { name, isIntegrated, thickness } = classAcce;
 
   const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
   const desc_thickness = `厚度:${thickness ?? '無資料'}`;
 
-  return `${desc_isIntegrated} ${desc_thickness}`;
+  // return `${desc_isIntegrated} ${desc_thickness}`;
+  return `${name} ${desc_thickness}`;
 };
 
 const confomtTree = {
