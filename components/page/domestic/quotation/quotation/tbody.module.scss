@@ -39,6 +39,10 @@
     }
   }
 }
+.hidden {
+  opacity: 0;
+  user-select: none;
+}
 
 .buttonBox {
   position: sticky;

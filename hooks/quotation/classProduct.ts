@@ -21,7 +21,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 
 // ===========================================================
 // child class
-import { Class_accessory, Taccessory, acceNameLookup, creNotConformAcce } from './classAccessory';
+import { Class_accessory, Taccessory, creNotConformAcce } from './classAccessory';
 import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
@@ -105,7 +105,7 @@ class Class_product {
   // from api
   // 門型資料
   private _doorModelList;
-  private _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
+  _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
   private _availableComponents: TdoorComponentListDto | undefined;
   // private _boxB: number | undefined;
   //
@@ -126,7 +126,7 @@ class Class_product {
   //   return this._acceList;
   // }
 
-  AcceList: { [key in keyof TdoorComponentListDto]: Class_accessory | null } | undefined;
+  acceList: { [key in keyof TdoorComponentListDto]: Class_accessory | null } | undefined;
 
   creAcceList(dataList: { [key in keyof TdoorComponentListDto]: Taccessory | undefined | null }) {
     const keyArr = Object.keys(dataList) as (keyof TdoorComponentListDto)[];
@@ -144,11 +144,12 @@ class Class_product {
         reRender: this.reRender,
         data: acce,
         key: key,
+        prod: this,
       });
       list[key] = theClass;
     });
 
-    this.AcceList = list as { [key in keyof TdoorComponentListDto]: Class_accessory | null };
+    this.acceList = list as { [key in keyof TdoorComponentListDto]: Class_accessory | null };
 
     this.reRender();
   }
@@ -420,7 +421,7 @@ class Class_product {
       dataArr: availableComponents.motorAccessories,
       filterParams: {
         /**鍊條排數 */
-        // chains: 0, // 鍊條排數 // 不知道從哪裡取得這個資料
+        chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
         /**軸承 */ // 從doorGeneralSpecs取資料
         bearingType: this._doorGeneralSpecs?.bearingName || '',
       },
@@ -448,6 +449,8 @@ class Class_product {
       motorAccessories: motorAccessories || creNotConformAcce(),
       headBoxes: headBoxes || creNotConformAcce(),
     });
+    this.calcAcceAllPrice();
+    this.calcProdAllprice();
   } // retrieveProdComponent
 
   // ---------------------------------------------------------
@@ -554,6 +557,36 @@ class Class_product {
 
     this.calcProdAllprice();
   } // calcOptionsAllprice
+
+  calcAcceAllPrice() {
+    let d_price = new Decimal(0);
+    let d_dualPrice = new Decimal(0);
+    let d_unitPrice = new Decimal(0);
+    let d_totalPrice = new Decimal(0);
+
+    const acceListArr = Object.values(this.acceList ?? {});
+
+    acceListArr.forEach((item) => {
+      if (!item) {
+        return;
+      }
+
+      const { price, dualPrice, unitPrice, totalPrice } = item;
+
+      d_price = d_price.add(price || 0);
+      d_dualPrice = d_dualPrice.add(dualPrice || 0);
+      d_unitPrice = d_unitPrice.add(unitPrice || 0);
+      d_totalPrice = d_totalPrice.add(totalPrice || 0);
+
+      this.acceAllPrice = {
+        price: d_price.toNumber(),
+        dualPrice: d_dualPrice.toNumber(),
+        unitPrice: d_unitPrice.toNumber(),
+        totalPrice: d_totalPrice.toNumber(),
+      };
+    });
+    this.calcProdAllprice();
+  } // calcAcceAllPrice
 
   private calcArea = () => {
     const h = Number(this._prodData.height || 0);
@@ -725,7 +758,7 @@ class Class_product {
 
     const arr = doorModel.slatMaterials.map((item) => {
       return {
-        value: item.id,
+        value: item.name,
         label: item.name,
       };
     });
@@ -762,6 +795,24 @@ class Class_product {
 
     return arr;
   } // options_doorTrack
+
+  /**表面 */
+  get options_surface() {
+    console.log(this.material);
+    const isSST = checkIsSST(this.material);
+
+    if (isSST) {
+      return [
+        { value: '2B', label: '2B' },
+        { value: 'HL', label: 'HL' },
+        { value: 'BA', label: 'BA' },
+        { value: 'NO.4', label: 'NO.4' },
+      ];
+    }
+
+    return undefined;
+  }
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // 來自_doorGeneralSpecs
@@ -794,6 +845,14 @@ class Class_product {
         toCalcOptionsAllprice: arr.length - 1 === index,
       });
     });
+    Object.values(this.acceList ?? {}).forEach((item, index, arr) => {
+      if (item) {
+        item.calcAllPrice({
+          toCalcAcceAllprice: arr.length - 1 === index,
+        });
+      }
+    });
+
     //
     this.reRender();
   }
@@ -905,6 +964,18 @@ class Class_product {
     return this._prodData.material;
   }
   set material(v) {
+    const isSST = checkIsSST(v);
+
+    if (!isSST) {
+      this.surface = '';
+    }
+
+    Object.values(this.acceList || {}).forEach((acce) => {
+      if (acce) {
+        acce.changeFindedMaterial(v);
+      }
+    });
+
     this._prodData.material = v;
     this.reRender();
   }
@@ -1047,7 +1118,7 @@ class Class_product {
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
-    this.req_getProdAvailableComponents();
+    this.req_calcGeneralSpec();
     this.reRender();
   }
 
@@ -1322,7 +1393,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '120px' },
       selectProps: {
         props: {
-          // options: optionsCreator_doorModel(),
+          // options由api取得
         },
       },
     },
@@ -1420,18 +1491,22 @@ const prodCellConfig: TcellConfig = {
   material: {
     label: '材料',
     inputSelProps: {
-      wrapperStyle: { width: '120px' },
+      wrapperStyle: { width: '150px' },
       selectProps: {
-        props: {},
+        props: {
+          // options由api取得
+        },
       },
     },
   },
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '55px' },
-      inputProps: {
-        props: {},
+      wrapperStyle: { width: '80px' },
+      selectProps: {
+        props: {
+          // options 寫在class裡面
+        },
       },
     },
   },
@@ -1451,11 +1526,9 @@ const prodCellConfig: TcellConfig = {
             style: { height: '40px' },
           },
         },
-        props: {},
-        // dynaOptionsList: {
-        //   normal: optionsCre_doorTrack_normal(),
-        //   typhoonProtection: optionsCre_doorTrack_typhoonProtection(),
-        // },
+        props: {
+          // options由api取得
+        },
       },
     },
   },
@@ -1464,7 +1537,9 @@ const prodCellConfig: TcellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '90px' },
       selectProps: {
-        props: {},
+        props: {
+          // options由api取得
+        },
       },
     },
   },
@@ -1566,10 +1641,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          // options: [
-          //   { value: '東元', label: '東元' },
-          //   { value: '大同', label: '大同' },
-          // ],
+          // options由api取得
         },
       },
     },
@@ -1580,10 +1652,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          // options: [
-          //   { value: '220V', label: '220V' },
-          //   { value: '380V', label: '380V' },
-          // ],
+          // options由api取得
         },
       },
     },
@@ -1594,10 +1663,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          // options: [
-          //   { value: '單相', label: '單相' },
-          //   { value: '雙相', label: '雙相' },
-          // ],
+          // options由api取得
         },
       },
     },
@@ -1648,12 +1714,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          // options: [
-          //   // { value: '1.0T', label: '1.0T' },
-          //   // { value: '3.0T', label: '3.0T' },
-          //   // { value: '4.5T', label: '4.5T' },
-          //   // { value: 'api給', label: 'api給' },
-          // ],
+          // options由api取得
         },
       },
     },
@@ -1699,7 +1760,9 @@ const prodCellConfig: TcellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '90px' },
       selectProps: {
-        props: {},
+        props: {
+          // options由api取得
+        },
       },
     },
   },
@@ -1733,7 +1796,7 @@ const emptyProdOri: () => Tprod = () => {
     surface: '',
     doorTrack: '',
     horsepower: '',
-    quantity: 0,
+    quantity: 1,
     price: 0,
     dualPrice: 0,
     unitPrice: 0,
@@ -1957,7 +2020,7 @@ const filter_motorAccessories = ({
   dataArr: TdoorComponentListDto['motorAccessories'];
   filterParams: {
     /**鍊條排數 */
-    // chains: number; // 鍊條排數 // 用sprocketWheelChains 過濾
+    chains: number; // 鍊條排數
     /**軸承 */
     bearingType: string; // 軸承
   };
@@ -2001,9 +2064,22 @@ const filter_headBoxes = ({
 };
 
 // ===========================================================
+
+const checkIsSST = (material: string) => {
+  return material.startsWith('SST#');
+};
+
+const creOptions_surface: () => Toption[] = () => [
+  { value: '2B', label: '2B' },
+  { value: 'HL', label: 'HL' },
+  { value: 'BA', label: 'BA' },
+  { value: 'NO.4', label: 'NO.4' },
+];
+
 // ===========================================================
 // ===========================================================
-export { Class_product, prodkeyArrOri, prodCellConfig };
+// ===========================================================
+export { Class_product, prodkeyArrOri, prodCellConfig, checkIsSST, creOptions_surface };
 export type { Tprod, TprodKey, TcellConfig };
 
 // 折數

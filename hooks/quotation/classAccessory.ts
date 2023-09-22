@@ -1,7 +1,12 @@
+import Decimal from 'decimal.js';
+
 import type { TreRender } from './useProduct';
 import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 
 import { TdoorComponentListDto } from 'js/api/dtoTypes';
+import { Toption } from 'js/utils/options/options';
+
+import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
 // ===========================================================
 class Class_accessory {
@@ -10,26 +15,108 @@ class Class_accessory {
     reRender,
     data,
     key,
+    prod,
   }: {
     reRender: TreRender;
     data: Taccessory;
     key: keyof TdoorComponentListDto;
+    prod: Class_product;
   }) {
     this.reRender = reRender;
+    this._prod = prod;
     this._data = data;
     this.key = key;
+
+    if (key === 'sidePlates' || key === 'rollers' || key === 'motors' || key === 'motorAccessories') {
+      this._material = acceLookUp[key].options[0].value;
+    }
+
+    this.calcAllPrice();
   } // constructor
 
   private reRender;
+  private _prod;
   private _data;
   readonly key;
+  //
+  //
+  private _material: undefined | string = undefined;
+  private _surface: undefined | string = undefined;
+  private _quantity = 1;
+  private _dualPrice = 0;
+  private _unitPrice = 0;
+  private _totalPrice = 0;
+
+  // ---------------------------------------------------------
+
+  changeFindedMaterial = (v: string) => {
+    const value = findOptionValue({
+      options: this.options_material ?? [],
+      value: v,
+    });
+
+    if (value) {
+      this.material = value;
+    }
+  };
+
+  calcAllPrice({
+    toCalcAcceAllprice = true,
+  }: //
+  { toCalcAcceAllprice?: boolean } = {}) {
+    const discount = new Decimal(this._prod.discount).div(100);
+
+    const price = this.price || 0;
+    const quantity = this._quantity || 0;
+    // 牌價複價
+    const dualPrice = new Decimal(price).mul(quantity);
+    // 單價
+    const unitPrice = new Decimal(price).mul(discount);
+    // 複價
+    const totalPrice = new Decimal(unitPrice).mul(quantity);
+
+    this._dualPrice = dualPrice.toNumber();
+    this._unitPrice = unitPrice.toNumber();
+    this._totalPrice = totalPrice.toNumber();
+
+    if (toCalcAcceAllprice) {
+      this._prod.calcAcceAllPrice();
+    }
+
+    this.reRender();
+  }
+
+  // ---------------------------------------------------------
+
+  get hiddenKeyArr() {
+    return acceLookUp[this.key].hiddenKeyArr;
+  }
+
+  // ---------------------------------------------------------
+
+  get options_material() {
+    if (this.key === 'slats') {
+      return this._prod.options_material;
+    }
+
+    return acceLookUp[this.key].options;
+  }
+
+  get options_surface() {
+    if (checkIsSST(this.material ?? '')) {
+      return creOptions_surface();
+    }
+
+    return undefined;
+  }
+
   // ---------------------------------------------------------
   get acceName() {
-    return acceNameLookup[this.key];
+    return acceLookUp[this.key].typeName;
   }
 
   get desc() {
-    return acceDescLookUp[this.key](this);
+    return acceLookUp[this.key].creDesc(this);
   }
 
   // -------------------------------------------1--------------
@@ -60,18 +147,18 @@ class Class_accessory {
   get price() {
     return this._data.price;
   }
-  set price(v) {
-    this._data.price = v;
-    this.reRender();
-  }
+  // set price(v) {
+  //   this._data.price = v;
+  //   this.reRender();
+  // }
 
   get name() {
     return this._data.name;
   }
-  set name(v) {
-    this._data.name = v;
-    this.reRender();
-  }
+  // set name(v) {
+  //   this._data.name = v;
+  //   this.reRender();
+  // }
 
   get isAntiTyphoon() {
     return this._data.isAntiTyphoon;
@@ -216,6 +303,54 @@ class Class_accessory {
     this._data.chains = v;
     this.reRender();
   }
+  // --------------------------------------------------
+  // --------------------------------------------------
+  // 不來自於Taccessory
+
+  get material() {
+    return this._material;
+  }
+  set material(v) {
+    if (!checkIsSST(v ?? '')) {
+      this._surface = '';
+    }
+
+    this._material = v;
+    this.reRender();
+  }
+
+  get surface() {
+    return this._surface;
+  }
+  set surface(v) {
+    this._surface = v;
+    this.reRender();
+  }
+
+  get density() {
+    return this._prod._doorGeneralSpecs?.density;
+  }
+
+  get quantity() {
+    return String(this._quantity);
+  }
+  set quantity(str) {
+    this._quantity = Number(str);
+    this.calcAllPrice();
+    this.reRender();
+  }
+
+  get dualPrice() {
+    return String(this._dualPrice);
+  }
+
+  get unitPrice() {
+    return String(this._unitPrice);
+  }
+
+  get totalPrice() {
+    return String(this._totalPrice);
+  }
 } // Class_accessory
 
 // ===========================================================
@@ -287,10 +422,24 @@ type Taccessory = {
 }; //  Taccessory
 
 // type TacceKey = keyof Taccessory;
+
 type TacceKey = string;
 
 const acceKeyArrOri: () => TacceKey[] = () => {
-  return ['acceName', 'name', 'desc', 'price'];
+  return [
+    'acceName',
+    'name',
+    'material',
+    'surface',
+    'density',
+    'desc',
+
+    'quantity',
+    'price',
+    'dualPrice',
+    'unitPrice',
+    'totalPrice',
+  ];
 };
 
 const acceCellConfig: TcellConfig = {
@@ -325,26 +474,36 @@ const acceCellConfig: TcellConfig = {
       showBaseline: 'invisible',
       inputProps: {
         props: {
-          disabled: true,
-        },
-      },
-    },
-  },
-  desc: {
-    label: '說明',
-    inputSelProps: {
-      wrapperStyle: { width: '700px' },
-      showBaseline: 'invisible',
-      inputProps: {
-        props: {
           placeholder: '',
           disabled: true,
         },
       },
     },
   },
-  price: {
-    label: '價格',
+  material: {
+    label: '材料',
+    inputSelProps: {
+      wrapperStyle: { width: '150px' },
+      selectProps: {
+        props: {
+          // options 不同種類有不同的選項，寫在class裡面
+        },
+      },
+    },
+  },
+  surface: {
+    label: '表面',
+    inputSelProps: {
+      wrapperStyle: { width: '80px' },
+      selectProps: {
+        props: {
+          // options 寫在class裡面
+        },
+      },
+    },
+  },
+  density: {
+    label: '重量基重',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       showBaseline: 'invisible',
@@ -355,9 +514,81 @@ const acceCellConfig: TcellConfig = {
       },
     },
   },
+  desc: {
+    label: '說明',
+    inputSelProps: {
+      wrapperStyle: { width: '500px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          placeholder: '',
+          disabled: true,
+        },
+      },
+    },
+  },
+  quantity: {
+    label: '數量',
+    inputSelProps: {
+      wrapperStyle: { width: '55px' },
+      inputProps: {
+        props: { type: 'number' },
+      },
+    },
+  },
+  price: {
+    label: '牌價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '120px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  dualPrice: {
+    label: '牌價複價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '120px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  unitPrice: {
+    label: '單價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '120px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  totalPrice: {
+    label: '複價',
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '140px' },
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
 };
 
-// ===========================================================
+// ============================================================================================
+// ============================================================================================
+// ============================================================================================
 
 const creNotConformAcce = () => ({
   id: '',
@@ -366,7 +597,7 @@ const creNotConformAcce = () => ({
   doorModelName: '',
   code: '沒有符合規格的產品',
   specialSpec: '---',
-  price: '---',
+  price: 0,
 });
 
 const creDesc_slats = (classAcce: Class_accessory) => {
@@ -517,28 +748,85 @@ const confomtTree = {
   //
 };
 
-const acceNameLookup: { [key in keyof TdoorComponentListDto]: string } = {
-  slats: '門片',
-  bottomBars: '底座',
-  guideRails: '門軌',
-  sidePlates: '支板',
-  rollers: '卷軸',
-  motors: '馬達',
-  motorAccessories: '馬達配件',
-  headBoxes: '捲箱',
+type Tkit = {
+  typeName: string;
+  creDesc: (classAcce: Class_accessory) => string;
+  options: Toption[];
+  hiddenKeyArr: string[];
 };
 
-const acceDescLookUp = {
-  slats: creDesc_slats,
-  bottomBars: creDesc_bottomBars,
-  guideRails: creDesc_guideRails,
-  sidePlates: creDesc_sidePlates,
-  rollers: creDesc_rollers,
-  motors: creDesc_motors,
-  motorAccessories: creDesc_motorAccessories,
-  headBoxes: creDesc_headBoxes,
+const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
+  slats: {
+    typeName: '門片',
+    creDesc: creDesc_slats,
+    options: [],
+    hiddenKeyArr: [],
+  },
+  bottomBars: {
+    typeName: '底座',
+    creDesc: creDesc_bottomBars,
+    options: [
+      { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
+      { value: 'SST#304', label: 'SST#304' },
+      { value: 'SST#316', label: 'SST#316' },
+    ],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+  guideRails: {
+    typeName: '門軌',
+    creDesc: creDesc_guideRails,
+    options: [
+      { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
+      { value: 'SST#304', label: 'SST#304' },
+      { value: 'SST#316', label: 'SST#316' },
+    ],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+  sidePlates: {
+    typeName: '支板',
+    creDesc: creDesc_sidePlates,
+    options: [{ value: '黑鐵', label: '黑鐵' }],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+  rollers: {
+    typeName: '捲軸',
+    creDesc: creDesc_rollers,
+    options: [{ value: '黑鐵', label: '黑鐵' }],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+  motors: {
+    typeName: '馬達',
+    creDesc: creDesc_motors,
+    options: [{ value: '黑鐵', label: '黑鐵' }],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+  motorAccessories: {
+    typeName: '馬達配件',
+    creDesc: creDesc_motorAccessories,
+    options: [{ value: '其他', label: '其他' }],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+  headBoxes: {
+    typeName: '捲箱',
+    creDesc: creDesc_headBoxes,
+    options: [
+      { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
+      { value: 'SST#304', label: 'SST#304' },
+      { value: 'SST#316', label: 'SST#316' },
+    ],
+    hiddenKeyArr: ['surface', 'density'],
+  },
+};
+
+const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {
+  const option = options.find((option) => option.value === value);
+
+  return option?.value;
 };
 
 // ===========================================================
-export { Class_accessory, acceKeyArrOri, acceCellConfig, acceNameLookup, creNotConformAcce };
+export { Class_accessory, acceKeyArrOri, acceCellConfig, creNotConformAcce };
 export type { Taccessory, TacceKey };

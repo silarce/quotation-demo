@@ -981,7 +981,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           <Table_acce
             disabled={disabled}
-            acceList={targetProd?.AcceList}
+            acceList={targetProd?.acceList}
             acceCellConfig={acceCellConfig}
             acceKeyArr={acceKeyArr}
             changeAcceKeyArr={changeAcceKeyArr}

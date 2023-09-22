@@ -1080,6 +1080,7 @@ export type TdoorGeneralSpecsDto = {
   motors: TdoorGeneralSpecsMotorDto[];
   sprocketWheelModel: string;
   sprocketWheelTeethNumber: string;
+  sprocketWheelChains: number;
   thickness: string;
   weight: number;
   slatLength: number; // 門片長度

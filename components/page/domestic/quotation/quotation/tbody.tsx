@@ -287,6 +287,9 @@ function DndRow({
               return null;
             }
 
+            const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
+            const isHidden = hiddenKeyArr?.includes(key);
+
             const stateValue = item[key];
             // !!!
             const inputSelProps = _.cloneDeep(prodCellConfig[key].inputSelProps);
@@ -349,7 +352,11 @@ function DndRow({
 
             //____
             return (
-              <div key={key} className={scss.column} style={{ width: inputSelProps.wrapperStyle?.width }}>
+              <div
+                key={key}
+                className={classNames(scss.column, isHidden && scss.hidden)}
+                style={{ width: inputSelProps.wrapperStyle?.width }}
+              >
                 <InputSel disabled={disabled} showBaseline="auto" {...inputSelProps} />
               </div>
             );
