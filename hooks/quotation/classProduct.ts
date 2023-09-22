@@ -236,7 +236,8 @@ class Class_product {
 
         return {
           modelName: this.doorModel as TpcgsPrams['modelName'],
-          fullHeight: Number(this.height) * 1000,
+          height: Number(this.height) * 1000,
+          isAntiTyphoon: this.typhoonProtection,
           fullWidth,
           WG,
         };

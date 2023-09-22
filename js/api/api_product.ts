@@ -65,9 +65,11 @@ export const useApiGetProdDoorModels = () => {
   };
 };
 
+// =======================================================================
 type TpcgsPrams = {
   modelName: TdoorModelInfoDto['name'];
-  fullHeight: number;
+  height: number;
+  isAntiTyphoon: boolean;
 } & (
   | {
       fullWidth: number;
@@ -87,6 +89,23 @@ export const apiGetProdCalcGeneralSpec = async (params: TpcgsPrams) => {
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
+
+type TpcdsPrams = {
+  modelName: TdoorModelInfoDto['name'];
+  height: number;
+  B: number;
+};
+
+export const apiGetProdCalcDetailSpec = async (params: TpcdsPrams) => {
+  const api = '/products/door/calc-detail-spec';
+
+  return axi
+    .get<TdoorGeneralSpecsDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+// =======================================================================
 
 type TpacParams = {
   modelName: TdoorModelInfoDto['name'];

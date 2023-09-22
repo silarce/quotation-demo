@@ -1068,13 +1068,13 @@ export type TdoorGeneralSpecsMotorDto = {
 };
 
 export type TdoorGeneralSpecsDto = {
-  bearingHousingSize: number;
-  bearingHousingTotalLength: number;
+  bearingHousingSize: number; // 軸承座寸法
+  bearingHousingTotalLength: number; // 軸承座總長(=捲軸長度)
   bearingInnerDiameter: string;
-  bearingName: string;
+  bearingName: string; // 軸承
   defaultMotorIndex: number;
-  density: number;
-  diameter: number;
+  density: number; // 密度
+  diameter: number; // 捲軸直徑
   gapA: number;
   gapC: number;
   motors: TdoorGeneralSpecsMotorDto[];
@@ -1082,6 +1082,9 @@ export type TdoorGeneralSpecsDto = {
   sprocketWheelTeethNumber: string;
   thickness: string;
   weight: number;
+  slatLength: number; // 門片長度
+  guideRailLength: number; // 門軌長度
+  headBoxLength: number; //  捲箱長度
 };
 
 export type TdoorSlatDto = {
@@ -1224,12 +1227,3 @@ export type TdoorComponentListDto = {
   motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件
   headBoxes: TdoorHeadBoxDto[]; // 捲箱
 };
-
-/**
- *
- * 相數
- * 防颱 typhoonProtection，CreateQuotationProductDto有 QuotationProductDto沒有
- * 門片厚度
- *
- *
- */
