@@ -816,6 +816,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
+    const foo = Object.values(productList);
+    const bar = foo.map((item) => {
+      return item.body;
+    });
+    console.log(bar);
+
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
       validityPeriod: data_watch.validityPeriod ?? '',
@@ -859,30 +865,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
       others: getOthersPostBodyArr(),
     };
 
-    try {
-      setIsLoading(true);
+    // try {
+    //   setIsLoading(true);
 
-      if (quotationId) {
-        const res = await apiPatchQuotation(body, quotationId);
-        showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
+    //   if (quotationId) {
+    //     const res = await apiPatchQuotation(body, quotationId);
+    //     showRootLoading(true, '正在更新附件');
+    //     await uploadAttachment(res.id);
 
-        await Promise.all([update(), updateAttachments()]);
-      } else {
-        const res = await apiPostQuotation(body);
-        showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
-        router.push({
-          query: {
-            id: res.id,
-          },
-        });
-      }
+    //     await Promise.all([update(), updateAttachments()]);
+    //   } else {
+    //     const res = await apiPostQuotation(body);
+    //     showRootLoading(true, '正在更新附件');
+    //     await uploadAttachment(res.id);
+    //     router.push({
+    //       query: {
+    //         id: res.id,
+    //       },
+    //     });
+    //   }
 
-      setDisabled(true);
-    } catch (error) {
-      console.log(error);
-    }
+    //   setDisabled(true);
+    // } catch (error) {
+    //   console.log(error);
+    // }
 
     setIsLoading(false);
   };
@@ -936,9 +942,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // --------------------------------------------------------------------------
-  console.log(targetProd);
-
-  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   return (
@@ -948,18 +951,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile //
+          {/* <QuotationProfile //
             profile={data?.latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
-          />
+          /> */}
 
-          <div className={style.switchBar}>
+          {/* <div className={style.switchBar}>
             <div className={style.active}>報價項目</div>
-          </div>
+          </div> */}
 
           {/* 主產品設定 */}
-          {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
           <Table_prod
             disabled={disabled}
             prodList={productList}
@@ -984,7 +986,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             cellConfig={optionsCellConfig}
             keyArr={optionsKeyArr}
             changeKeyArr={changeOptionsKeyArr}
-            add={targetProd?.addOption}
+            add={() => {
+              targetProd?.addOption();
+            }}
           />
 
           <Table_others

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import classNames from 'classnames';
 import Image from 'next/image';
 import _ from 'lodash';
@@ -68,10 +70,11 @@ export default function Tbody({
   rowList: TitemList;
   keyArr: string[];
   prodCellConfig: TcellConfig;
-  onRowClick: (onj: { item: Titem }) => void;
-  // onVerticalKeyChange: (newKeyArr: string[]) => void;
+  onRowClick?: (onj: { item: Titem }) => void;
 }) {
   // ---------------------------------------------------------------
+
+  const [activeKey, setActiveKey] = useState('');
 
   const {
     sensors,
@@ -81,7 +84,7 @@ export default function Tbody({
     onDragStart,
   } = useVerticalDnd({
     listKeyArr: Object.keys(rowList),
-    // resetTrigger: classQuotation,
+    resetTrigger: rowList,
   });
 
   // useEffect(() => {
@@ -125,7 +128,7 @@ export default function Tbody({
               <DndRow
                 key={key}
                 id={key}
-                // isActive={false}
+                isActive={activeKey === key}
                 pIndex={pIndex}
                 item={item}
                 keyArr={keyArr}
@@ -135,9 +138,8 @@ export default function Tbody({
                 prodCellConfig={prodCellConfig}
                 //
                 onRowClick={() => {
-                  onRowClick({
-                    item: item,
-                  });
+                  setActiveKey(key);
+                  onRowClick && onRowClick({ item: item });
                 }}
               />
             );
@@ -240,6 +242,7 @@ function DndRow({
   disabled,
   onRowClick,
   prodCellConfig,
+  isActive,
 }: {
   id: string;
   pIndex: number;
@@ -253,6 +256,7 @@ function DndRow({
   onRowClick?: () => void;
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
+  isActive?: boolean;
   //
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -266,7 +270,7 @@ function DndRow({
 
   return (
     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
-      <CellWithBar isActive={false} className="z-0">
+      <CellWithBar isActive={isActive} className="z-0">
         <div className={scss.row} onClick={undefined}>
           {/*  */}
           <CopyDelBtnBox

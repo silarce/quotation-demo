@@ -66,13 +66,7 @@ export default function Table_options({
           {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
               {/* <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={add} /> */}
-              <MyButton_v2
-                className={scss.addBtn}
-                label="新增產品"
-                onClick={() => {
-                  console.log(add);
-                }}
-              />
+              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={add} />
             </div>
           )}
         </div>

@@ -92,7 +92,7 @@ class Class_product {
 
     // ___________________________________________________________
     // 建立選配設定
-    this.createOptionsList();
+    // this.createOptionsList();
 
     // ___________________________________________________________
   } //  constructor close
@@ -179,7 +179,6 @@ class Class_product {
   }
 
   addOption() {
-    console.log(this.optionsList);
     const newKey = `new-${nanoid()}`;
     this.optionsList[newKey] = new Class_options({
       reRender: this.reRender,
@@ -1093,6 +1092,15 @@ class Class_product {
     this.reRender();
   }
   //
+
+  get body() {
+    const options = Object.values(this.optionsList).map((item) => item.body);
+
+    return {
+      ...this._prodData,
+      options,
+    };
+  }
 
   //-----------------------------------------
 } // Class_product close

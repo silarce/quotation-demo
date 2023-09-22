@@ -194,7 +194,7 @@ const optionsCellConfig: TcellConfig = {
   dualPrice: {
     label: '牌價複價',
     inputSelProps: {
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '100px' },
       inputProps: {
         props: {},
       },
