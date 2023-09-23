@@ -900,7 +900,7 @@ const calcDefaultValue = ({
   b: number; // 單位為m
 }) => {
   const hb = h + b;
-  const wl = w | l;
+  const wl = w || l;
 
   if (key === 'slats') {
     return new Decimal(wl).mul(hb).toFixed(2); // m2

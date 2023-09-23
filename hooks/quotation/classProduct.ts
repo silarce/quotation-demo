@@ -7,6 +7,7 @@
  * creAcceList
  * 下拉式選單的選項
  *
+ * req_getProdAvailableComponents
  */
 
 import _ from 'lodash';
@@ -107,6 +108,7 @@ class Class_product {
   private _doorModelList;
   _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
   private _availableComponents: TdoorComponentListDto | undefined;
+  private _thickness = '';
   // private _boxB: number | undefined;
   //
   private _prodData;
@@ -218,7 +220,7 @@ class Class_product {
   cgsTimeout: NodeJS.Timeout | null = null;
   pacTimeout: NodeJS.Timeout | null = null;
 
-  req_calcGeneralSpec() {
+  req_calcGeneralSpec({ isAntiTyphoonChange = false }: { isAntiTyphoonChange?: boolean } = {}) {
     const req = async () => {
       if (!this.doorType || !this.height) {
         return;
@@ -291,13 +293,17 @@ class Class_product {
 
       // getProdAvailableComponent用的weight與rollerDiameter來自doorGeneralSpecs
       if (
-        //
+        // 先判斷跟原本的是否一樣
         this._doorGeneralSpecs?.weight !== res.weight ||
         this._doorGeneralSpecs?.diameter !== res.diameter
       ) {
         this._doorGeneralSpecs = res;
         this.req_getProdAvailableComponents();
       } else {
+        if (isAntiTyphoonChange) {
+          this.req_getProdAvailableComponents();
+        }
+
         this._doorGeneralSpecs = res;
       }
 
@@ -929,10 +935,10 @@ class Class_product {
 
   /**門片厚度 */
   get thickness() {
-    return this._prodData.thickness;
+    return this._thickness;
   }
   set thickness(v) {
-    this._prodData.thickness = v;
+    this._thickness = v;
     this.reRender();
   }
 
@@ -1115,7 +1121,7 @@ class Class_product {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
     // this.retrieveCreProdAcce();
-    this.req_calcGeneralSpec();
+    this.req_calcGeneralSpec({ isAntiTyphoonChange: true });
     this.reRender();
   }
 
@@ -1159,10 +1165,10 @@ class Class_product {
   //
 
   get phase() {
-    return this._prodData.phase;
+    return String(this._prodData.phase);
   }
-  set phase(v) {
-    this._prodData.phase = v;
+  set phase(str) {
+    this._prodData.phase = Number(str);
     this.retrieveCreProdAcce();
     this.reRender();
   }
@@ -1252,6 +1258,11 @@ class Class_product {
     return {
       ...this._prodData,
       options,
+      // 送去後端要轉為要從m轉為mm
+      width: String(Number(this._prodData.width) * 1000),
+      length: String(Number(this._prodData.length) * 1000),
+      height: String(Number(this._prodData.height) * 1000),
+      boxB: String(Number(this._prodData.width) * 1000),
     };
   }
 
@@ -1268,7 +1279,8 @@ class Class_product {
 type Tprod = {
   id?: string;
   // order?: string;
-  discount: `${number}`;
+  // discount: `${number}`;
+  discount: string;
   itemName: string;
   quoteType: string;
   doorType: string;
@@ -1276,7 +1288,7 @@ type Tprod = {
   width: string; // W(m)
   height: string; //h(m)
   boxB: string; // B(m)
-  thickness: string; // 門片厚度?
+  // thickness: string; // 門片厚度?
   area: string; // 面積
   volume: string; // 才數
   material: string;
@@ -1294,7 +1306,7 @@ type Tprod = {
   //
   motor: string; // 馬達廠商
   voltage: string; // 電壓
-  phase: string; // 相數
+  phase: number; // 相數
   motorSupport: boolean; // 馬達支撐架
   bottomBar: string; // 底座類型
   motorLockBox: string; // 馬達鎖盒
@@ -1308,7 +1320,8 @@ type Tprod = {
   options: TquotationProductOptionDto[];
 };
 
-type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
+// type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
+type TprodKey = string;
 
 const prodkeyArrOri: () => TprodKey[] = () => {
   return [
@@ -1793,7 +1806,7 @@ const emptyProdOri: () => Tprod = () => {
     width: '',
     height: '',
     boxB: '',
-    thickness: '',
+    // thickness: '',
     area: '',
     volume: '',
     material: '',
@@ -1811,7 +1824,7 @@ const emptyProdOri: () => Tprod = () => {
     //
     motor: '',
     voltage: '',
-    phase: '',
+    phase: 1,
     motorSupport: false,
     bottomBar: '',
     motorLockBox: '',

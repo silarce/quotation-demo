@@ -778,13 +778,13 @@ export type quotationProductDto = {
   quoteType: string;
   // 門型
   doorType: string;
-  // L(m)
+  // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   length: string;
-  // W(m)
+  // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   width: string;
-  // h(m)
+  // h(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   height: string;
-  // B(m)
+  // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   boxB: string;
   // 面積
   area: string;
@@ -803,7 +803,7 @@ export type quotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: boolean;
+  motorSupport: string;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -938,7 +938,7 @@ export type TcreateQuotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: boolean;
+  motorSupport: string;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -1180,7 +1180,7 @@ export type TdoorMotorDto = {
   horsePower: string; // 馬力數
   gearNumber: string; // 鍊齒輪番號
   motorVendor: string | null; // 馬達廠商
-  phase: number | null; // 相位
+  phase: number | null; // 相數
   /**電壓(V) */
   voltage: number | null; // 電壓(V)
   /**荷重(kg) */
