@@ -36,6 +36,8 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewSupervisorEmployee',
+      'latestContent.products.quantity',
+      'latestContent.products.options',
     ],
     ...params,
   };
@@ -72,13 +74,16 @@ export const apiGetQuotation_Id = async (id: string) => {
   const params = {
     populate: [
       'contents',
-      'latestContent.products.options',
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',
       'latestContent.managerEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewSupervisorEmployee',
+
+      'latestContent.products.options', // 沒有用
+      // 'latestContent.products.quantity', // 沒有用
+      // 'latestContent.products.items', // 沒有用
     ],
   };
 

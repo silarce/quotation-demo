@@ -11,6 +11,7 @@ import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 import scss from './classAccessory.module.scss';
 
 import { TgenerateDoorProductBomDto_ComponentInfo } from 'js/api/api_product';
+import { TaccessoryKey } from './useProduct';
 
 // ===========================================================
 class Class_accessory {
@@ -23,7 +24,7 @@ class Class_accessory {
   }: {
     reRender: TreRender;
     data: Taccessory;
-    key: keyof TdoorComponentListDto;
+    key: TaccessoryKey;
     prod: Class_product;
   }) {
     this.reRender = reRender;
@@ -31,7 +32,7 @@ class Class_accessory {
     this._data = data;
     this.key = key;
 
-    if (key === 'sidePlates' || key === 'rollers' || key === 'motors' || key === 'motorAccessories') {
+    if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
       this._material = acceLookUp[key].options[0].value;
     }
 
@@ -60,16 +61,14 @@ class Class_accessory {
   private _dualPrice = 0;
   private _unitPrice = 0;
   private _totalPrice = 0;
+  //
+  //
+  codeNumber = '';
 
   // ---------------------------------------------------------
 
   changeFindedMaterial = (v: string) => {
-    if (
-      this.key === 'sidePlates' ||
-      this.key === 'rollers' ||
-      this.key === 'motors' ||
-      this.key === 'motorAccessories'
-    ) {
+    if (this.key === 'sidePlate' || this.key === 'roller' || this.key === 'motor' || this.key === 'motorAccessories') {
       return;
     }
 
@@ -120,7 +119,7 @@ class Class_accessory {
   get componentInfo() {
     const info: TgenerateDoorProductBomDto_ComponentInfo = {
       id: this._data.id,
-      material: this._material ?? '',
+      material: this._material ?? '', // 注意，api不接受空字串
       materialSurface: this._surface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
       isPainted: this._isPainted,
     };
@@ -131,7 +130,7 @@ class Class_accessory {
   // ---------------------------------------------------------
 
   get options_material() {
-    if (this.key === 'slats') {
+    if (this.key === 'slat') {
       return this._prod.options_material;
     }
 
@@ -472,9 +471,7 @@ type Taccessory = {
 
 // type TacceKey = keyof Taccessory;
 
-type TacceKey = string;
-
-const acceKeyArrOri: () => TacceKey[] = () => {
+const acceKeyArrOri: () => string[] = () => {
   return [
     'acceName',
     'name',
@@ -840,8 +837,8 @@ type Tkit = {
 // motorAccessories // 馬達配件
 // headBoxes // 捲箱
 
-const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
-  slats: {
+const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
+  slat: {
     typeName: '門片',
     creDesc: creDesc_slats,
     options: [],
@@ -852,7 +849,7 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
       </span>
     ),
   },
-  bottomBars: {
+  bottomBar: {
     typeName: '底座',
     creDesc: creDesc_bottomBars,
     options: [
@@ -864,7 +861,7 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
-  guideRails: {
+  guideRail: {
     typeName: '門軌',
     creDesc: creDesc_guideRails,
     options: [
@@ -876,20 +873,20 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
-  sidePlates: {
+  sidePlate: {
     typeName: '支板',
     creDesc: creDesc_sidePlates,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
   },
-  rollers: {
+  roller: {
     typeName: '捲軸',
     creDesc: creDesc_rollers,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
-  motors: {
+  motor: {
     typeName: '馬達',
     creDesc: creDesc_motors,
     options: [{ value: '黑鐵', label: '黑鐵' }],
@@ -903,7 +900,7 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
     hiddenKeyArr: ['surface', 'density'],
     unit: '組',
   },
-  headBoxes: {
+  headBox: {
     typeName: '捲箱',
     creDesc: creDesc_headBoxes,
     options: [
@@ -965,4 +962,4 @@ const calcDefaultValue = ({
 
 // ===========================================================
 export { Class_accessory, acceKeyArrOri, acceCellConfig, creNotConformAcce };
-export type { Taccessory, TacceKey };
+export type { Taccessory };

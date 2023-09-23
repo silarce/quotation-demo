@@ -837,7 +837,7 @@ export type quotationProductDto = {
   // 備註
   notes: string;
   // 選配設定
-  options: TquotationProductOptionDto[];
+  options?: TquotationProductOptionDto[] | undefined;
 };
 
 export type TquotationContentDto = {

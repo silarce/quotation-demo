@@ -8,7 +8,7 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { TacceKey, TacceList } from 'hooks/quotation/useProduct';
+import { TacceList } from 'hooks/quotation/useProduct';
 
 import scss from '../table.module.scss';
 
@@ -24,8 +24,8 @@ export default function Table_acce({
   disabled: boolean;
   acceList: TacceList | undefined;
   acceCellConfig: TcellConfig;
-  acceKeyArr: TacceKey[];
-  changeAcceKeyArr: (arr: TacceKey[]) => void;
+  acceKeyArr: string[];
+  changeAcceKeyArr: (arr: string[]) => void;
   // addProd: () => void;
   // setTargetProd: (v: Class_product) => void;
 }) {
@@ -50,7 +50,7 @@ export default function Table_acce({
               resetTrigger={acceKeyArr.length}
               emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
-                const keyArr = dndKeyArr as TacceKey[];
+                const keyArr = dndKeyArr as string[];
                 changeAcceKeyArr(keyArr);
               }}
             />

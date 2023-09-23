@@ -11,7 +11,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
-import { TacceKey, Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
+import { Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
 import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
 import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
 
@@ -22,12 +22,22 @@ import { TcreateQuotationContentOtherDto, quotationProductDto, TquotationContent
 
 type TreRender = () => void;
 
+type TaccessoryKey =
+  | 'slat'
+  | 'bottomBar'
+  | 'guideRail'
+  | 'sidePlate'
+  | 'roller'
+  | 'motor'
+  | 'motorAccessories'
+  | 'headBox';
+
 type TproductList = {
   [key: string]: Class_product;
 };
 
 type TacceList = {
-  [key: string]: Class_accessory | null;
+  [key in TaccessoryKey]: Class_accessory;
 };
 
 type ToptionsList = {
@@ -41,16 +51,16 @@ type TothersList = {
 // =======================================================================
 
 /**
- productsOrder使用構想
- productsOrder是一個字串陣列，預想中會放進prod的id作為排序的依據
- 所以我可以將productsOrder送到table_prod.tbody的useVerticalDnd作為預設值
- 並取得dndKeyArr作為新的productsOrder
+productsOrder使用構想
+productsOrder是一個字串陣列，預想中會放進prod的id作為排序的依據
+所以我可以將productsOrder送到table_prod.tbody的useVerticalDnd作為預設值
+並取得dndKeyArr作為新的productsOrder
 
- 問題
- 新增的prod沒有id，使用者若新增了prod並排序，更新的productsOrder裡會是我用nanoid產生的key
- 無法於下次使用
- 
- Gina說之後會在product裡新增order這個property作為排序使用
+問題
+新增的prod沒有id，使用者若新增了prod並排序，更新的productsOrder裡會是我用nanoid產生的key
+無法於下次使用
+
+Gina說之後會在product裡新增order這個property作為排序使用
  */
 
 // =======================================================================
@@ -113,9 +123,6 @@ const useProductList = ({
   }, [resetTrigger, doorModelList]);
 
   const createProdList = () => {
-    console.log(productArr);
-    console.log(doorModelList);
-
     if (!productArr || !doorModelList) {
       return;
     }
@@ -137,6 +144,12 @@ const useProductList = ({
         length: String(Number(prod.length) / 1000),
         height: String(Number(prod.height) / 1000),
         boxB: String(Number(prod.width) / 1000),
+        options: prod.options ?? [],
+        // !!! 後端實際上沒有送quantity !!!
+        // !!! 後端實際上沒有送quantity !!!
+        quantity: prod.quantity ?? 1,
+        // !!! 後端實際上沒有送quantity !!!
+        // !!! 後端實際上沒有送quantity !!!
       };
 
       list[key] = new Class_product({
@@ -149,6 +162,8 @@ const useProductList = ({
         doorModelList,
       });
     });
+
+    setProductList(list);
   };
 
   //
@@ -233,9 +248,9 @@ const useProductList = ({
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  const [acceKeyArr, setAcceKeyArr] = useState<TacceKey[]>(acceKeyArrOri());
+  const [acceKeyArr, setAcceKeyArr] = useState<string[]>(acceKeyArrOri());
 
-  const changeAcceKeyArr = (v: TacceKey[]) => {
+  const changeAcceKeyArr = (v: string[]) => {
     setAcceKeyArr(v);
   };
 
@@ -364,7 +379,7 @@ export type {
   TproductList,
   //
   Class_accessory,
-  TacceKey,
+  TaccessoryKey,
   TacceList,
   //
   ToptionsKey,

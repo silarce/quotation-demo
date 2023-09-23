@@ -35,8 +35,10 @@ import type {
   TcreateLegacyContractProductDto,
   TdoorComponentListDto,
   TquotationProductOptionDto,
+  TgenerateDoorProductBomDto_DoorSpec,
+  TgenerateDoorProductBomDto_ComponentInfo,
 } from 'js/api/dtoTypes';
-import type { TreRender } from './useProduct';
+import type { TreRender, TaccessoryKey } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
@@ -125,10 +127,10 @@ class Class_product {
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 
-  acceList: { [key in keyof TdoorComponentListDto]: Class_accessory | null } | undefined;
+  acceList: { [key in TaccessoryKey]: Class_accessory } | undefined;
 
-  creAcceList(dataList: { [key in keyof TdoorComponentListDto]: Taccessory | undefined | null }) {
-    const keyArr = Object.keys(dataList) as (keyof TdoorComponentListDto)[];
+  creAcceList(dataList: { [key in TaccessoryKey]: Taccessory }) {
+    const keyArr = Object.keys(dataList) as TaccessoryKey[];
 
     const list: { [key: string]: Class_accessory } = {};
 
@@ -148,7 +150,7 @@ class Class_product {
       list[key] = theClass;
     });
 
-    this.acceList = list as { [key in keyof TdoorComponentListDto]: Class_accessory | null };
+    this.acceList = list as { [key in TaccessoryKey]: Class_accessory };
 
     this.reRender();
   }
@@ -220,6 +222,7 @@ class Class_product {
   // 防抖
   cgsTimeout: NodeJS.Timeout | null = null;
   pacTimeout: NodeJS.Timeout | null = null;
+  pgpbTimeout: NodeJS.Timeout | null = null;
 
   req_calcGeneralSpec({ isAntiTyphoonChange = false }: { isAntiTyphoonChange?: boolean } = {}) {
     const req = async () => {
@@ -356,6 +359,82 @@ class Class_product {
     }, 500);
   } //  req_getProdAvailableComponents
 
+  // apiPostProdGenerateDoorProductBom
+  reqProdGenerateDoorProductBom() {
+    const req = async () => {
+      const acceList = this.acceList;
+
+      if (!acceList || !this._doorGeneralSpecs || !acceList.motor.gearNumber) {
+        return;
+      }
+
+      const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
+        modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
+        weight: this.weight ?? -1,
+        height: Number(this.height) * 1000,
+        B: Number(this.boxB) * 1000,
+        D: 0,
+        slatLength: this._doorGeneralSpecs.slatLength,
+        guideRailLength: this._doorGeneralSpecs.guideRailLength,
+        rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
+        headBoxLength: this._doorGeneralSpecs.headBoxLength,
+        isAntiTyphoon: this.typhoonProtection,
+        rollerDiameter: this._doorGeneralSpecs.diameter,
+        bearingType: this._doorGeneralSpecs.bearingName,
+        gearNumber: acceList.motor?.gearNumber,
+        chains: this._doorGeneralSpecs.sprocketWheelChains,
+      };
+
+      const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
+
+      let haveNull = false;
+
+      Object.values(acceList).forEach((item) => {
+        if (!item) {
+          return (haveNull = true);
+        }
+
+        const key = item.key;
+        const { id, material, materialSurface, isPainted } = item.componentInfo;
+
+        if (!material || !id) {
+          haveNull = true;
+        }
+
+        generateBomObj_empty[key] = {
+          id,
+          material,
+          materialSurface,
+          isPainted,
+        };
+      });
+
+      if (haveNull) {
+        return;
+      }
+
+      const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
+
+      const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
+
+      if (res) {
+        const keyArr = Object.keys(res) as (keyof typeof res)[];
+        keyArr.forEach((key) => {
+          const item = res[key];
+          acceList[key].codeNumber = item.number;
+        });
+      }
+    }; //  req
+
+    if (this.pgpbTimeout) {
+      clearTimeout(this.pgpbTimeout);
+    }
+
+    setTimeout(() => {
+      req();
+    }, 500);
+  } // reqProdGenerateDoorProductBom
+
   // ---------------------------------------------------------
 
   retrieveCreProdAcce() {
@@ -365,13 +444,13 @@ class Class_product {
 
     const availableComponents = this._availableComponents;
 
-    const slats = filter_slats({
+    const slat: Taccessory | null = filter_slats({
       //
       dataArr: availableComponents.slats,
       filterParams: { isAntiTyphoon: this.typhoonProtection },
     });
 
-    const bottomBars: Taccessory | null = filter_bottomBars({
+    const bottomBar: Taccessory | null = filter_bottomBars({
       dataArr: availableComponents.bottomBars,
       filterParams: {
         isAntiTyphoon: this.typhoonProtection,
@@ -380,7 +459,7 @@ class Class_product {
       },
     });
 
-    const guideRails: Taccessory | null = filter_guideRails({
+    const guideRail: Taccessory | null = filter_guideRails({
       dataArr: availableComponents.guideRails,
       filterParams: {
         // thickness: String(this.doorTrackThick),
@@ -389,7 +468,7 @@ class Class_product {
       },
     });
 
-    const motors: Taccessory | null = filter_motors({
+    const motor: Taccessory | null = filter_motors({
       dataArr: availableComponents.motors,
       filterParams: {
         horsePower: this.horsepower,
@@ -402,18 +481,18 @@ class Class_product {
       },
     });
 
-    const sidePlates: Taccessory | null = filter_sidePlates({
+    const sidePlate: Taccessory | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
-        gearNumber: motors?.gearNumber ?? '', // 從上面的motor取得
+        gearNumber: motor?.gearNumber ?? '', // 從上面的motor取得
         isIntegrated: this.onePieceRollUpBox,
         motorVendor: this.motor,
         weight: this.weight,
       },
     });
 
-    const rollers: Taccessory | null = filter_rollers({
+    const roller: Taccessory | null = filter_rollers({
       dataArr: availableComponents.rollers,
       filterParams: {
         diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
@@ -430,7 +509,7 @@ class Class_product {
       },
     });
 
-    const headBoxes: Taccessory | null = filter_headBoxes({
+    const headBox: Taccessory | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
         thickness: this.rollUpBoxThick, // 捲箱厚度
@@ -443,14 +522,14 @@ class Class_product {
     // 要帶標明為無資料Taccessory進去
 
     this.creAcceList({
-      slats: slats || creNotConformAcce(),
-      bottomBars: bottomBars || creNotConformAcce(),
-      guideRails: guideRails || creNotConformAcce(),
-      motors: motors || creNotConformAcce(),
-      sidePlates: sidePlates || creNotConformAcce(),
-      rollers: rollers || creNotConformAcce(),
+      slat: slat || creNotConformAcce(),
+      bottomBar: bottomBar || creNotConformAcce(),
+      guideRail: guideRail || creNotConformAcce(),
+      motor: motor || creNotConformAcce(),
+      sidePlate: sidePlate || creNotConformAcce(),
+      roller: roller || creNotConformAcce(),
       motorAccessories: motorAccessories || creNotConformAcce(),
-      headBoxes: headBoxes || creNotConformAcce(),
+      headBox: headBox || creNotConformAcce(),
     });
     this.calcAcceAllPrice();
     this.calcProdAllprice();
@@ -540,9 +619,9 @@ class Class_product {
     let d_unitPrice = new Decimal(0);
     let d_totalPrice = new Decimal(0);
 
-    const optionsArr = Object.values(this.optionsList);
+    const optionsArr = Object.values(this.optionsList ?? {});
 
-    optionsArr.forEach((item) => {
+    optionsArr?.forEach((item) => {
       const { price, dualPrice, unitPrice, totalPrice } = item;
 
       d_price = d_price.add(price || 0);
