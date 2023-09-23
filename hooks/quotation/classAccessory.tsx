@@ -33,6 +33,14 @@ class Class_accessory {
       this._material = acceLookUp[key].options[0].value;
     }
 
+    this._quantity = calcDefaultValue({
+      key,
+      w: Number(prod.width),
+      l: Number(prod.length),
+      h: Number(prod.height),
+      b: Number(prod.boxB),
+    });
+
     this.calcAllPrice();
   } // constructor
 
@@ -44,7 +52,7 @@ class Class_accessory {
   //
   private _material: undefined | string = undefined;
   private _surface: undefined | string = undefined;
-  private _quantity = 1;
+  private _quantity = '';
   private _dualPrice = 0;
   private _unitPrice = 0;
   private _totalPrice = 0;
@@ -80,7 +88,7 @@ class Class_accessory {
     const discount = new Decimal(this._prod.discount).div(100);
 
     const price = this.price || 0;
-    const quantity = this._quantity || 0;
+    const quantity = Number(this._quantity || 0);
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -345,10 +353,10 @@ class Class_accessory {
   }
 
   get quantity() {
-    return String(this._quantity);
+    return this._quantity;
   }
   set quantity(str) {
-    this._quantity = Number(str);
+    this._quantity = str;
     this.calcAllPrice();
     this.reRender();
   }
@@ -785,6 +793,15 @@ type Tkit = {
   unit?: React.ReactNode;
 };
 
+// slats // 門片
+// bottomBars // 底座
+// guideRails // 門軌
+// sidePlates // 支板
+// rollers // 捲軸
+// motors // 馬達
+// motorAccessories // 馬達配件
+// headBoxes // 捲箱
+
 const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
   slats: {
     typeName: '門片',
@@ -866,6 +883,46 @@ const findOptionValue = ({ options, value }: { options: Toption[]; value: string
   const option = options.find((option) => option.value === value);
 
   return option?.value;
+};
+
+const calcDefaultValue = ({
+  //
+  key,
+  w,
+  l,
+  h,
+  b,
+}: {
+  key: string;
+  w: number; // 單位為m
+  l: number; // 單位為m
+  h: number; // 單位為m
+  b: number; // 單位為m
+}) => {
+  const hb = h + b;
+  const wl = w | l;
+
+  if (key === 'slats') {
+    return new Decimal(wl).mul(hb).toFixed(2); // m2
+  }
+
+  if (key === 'bottomBars' || key === 'rollers' || key === 'headBoxes') {
+    return wl.toFixed(2); // M
+  }
+
+  if (key === 'guideRails') {
+    return h.toFixed(2); // M
+  }
+
+  if (key === 'motors' || key === 'motorAccessories') {
+    return '1.00';
+  }
+
+  return '';
+
+  // sidePlates // 沒有在表格裡面
+
+  // motors motorAccessories
 };
 
 // ===========================================================
