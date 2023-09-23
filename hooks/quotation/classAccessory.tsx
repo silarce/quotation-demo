@@ -96,9 +96,9 @@ class Class_accessory {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._dualPrice = dualPrice.toNumber();
-    this._unitPrice = unitPrice.toNumber();
-    this._totalPrice = totalPrice.toNumber();
+    this._dualPrice = dualPrice.ceil().toNumber();
+    this._unitPrice = unitPrice.ceil().toNumber();
+    this._totalPrice = totalPrice.ceil().toNumber();
 
     if (toCalcAcceAllprice) {
       this._prod.calcAcceAllPrice();

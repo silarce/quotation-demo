@@ -524,10 +524,10 @@ class Class_product {
     const dualPrice = price.mul(this.quantity || 0).toNumber();
     const totalPrice = unitPrice.mul(this.quantity || 0).toNumber();
 
-    this.price = price.toNumber().toString();
-    this.dualPrice = dualPrice.toString();
-    this.unitPrice = unitPrice.toNumber().toString();
-    this.totalPrice = totalPrice.toString();
+    this.price = price.ceil().toString();
+    this.dualPrice = Math.ceil(dualPrice).toString();
+    this.unitPrice = unitPrice.ceil().toString();
+    this.totalPrice = Math.ceil(totalPrice).toString();
     this._calcProdSubTotalPrice();
     this.reRender();
   }
@@ -550,10 +550,10 @@ class Class_product {
       d_totalPrice = d_totalPrice.add(totalPrice || 0);
 
       this.optionsAllPrice = {
-        price: d_price.toNumber(),
-        dualPrice: d_dualPrice.toNumber(),
-        unitPrice: d_unitPrice.toNumber(),
-        totalPrice: d_totalPrice.toNumber(),
+        price: d_price.ceil().toNumber(),
+        dualPrice: d_dualPrice.ceil().toNumber(),
+        unitPrice: d_unitPrice.ceil().toNumber(),
+        totalPrice: d_totalPrice.ceil().toNumber(),
       };
     });
 
@@ -581,10 +581,10 @@ class Class_product {
       d_totalPrice = d_totalPrice.add(totalPrice || 0);
 
       this.acceAllPrice = {
-        price: d_price.toNumber(),
-        dualPrice: d_dualPrice.toNumber(),
-        unitPrice: d_unitPrice.toNumber(),
-        totalPrice: d_totalPrice.toNumber(),
+        price: d_price.ceil().toNumber(),
+        dualPrice: d_dualPrice.ceil().toNumber(),
+        unitPrice: d_unitPrice.ceil().toNumber(),
+        totalPrice: d_totalPrice.ceil().toNumber(),
       };
     });
     this.calcProdAllprice();

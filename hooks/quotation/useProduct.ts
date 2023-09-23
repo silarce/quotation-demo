@@ -178,7 +178,7 @@ const useProductList = ({
       subTotal = subTotal.add(item.totalPrice);
     });
 
-    setSubTotal(subTotal.toString());
+    setSubTotal(subTotal.ceil().toString());
   };
 
   useEffect(() => {
