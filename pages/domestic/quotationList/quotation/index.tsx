@@ -131,7 +131,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
   // -----------------------------------------------------
   // 資料
-  const { data, update } = useGetQuotation_id(quotationId as string);
+  const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   // -----------------------------------------------------
 
   const [targetProd, setTargetProd] = useState<Class_product>();
@@ -241,8 +241,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     addOthers,
     getOthersPostBodyArr,
   } = useProductList({
-    productArr: data?.latestContent.products,
-    others: data?.latestContent.others,
+    productArr: quotationData?.latestContent.products,
+    others: quotationData?.latestContent.others,
+    resetTrigger: quotationData,
   });
 
   const [summary, setSummary] = useState<{
@@ -267,7 +268,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
-    if (!data) {
+    if (!quotationData) {
       return;
     }
 
@@ -282,7 +283,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods,
       annotations,
       quotationRanges,
-    } = data.latestContent;
+    } = quotationData.latestContent;
 
     setAnnotation(annotations ?? []);
     setQr(quotationRanges ?? []);
@@ -296,7 +297,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation,
       deliveryDate,
     });
-  }, [data]);
+  }, [quotationData]);
 
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
@@ -518,8 +519,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
-  const reviewSalesEmployeeId = data?.latestContent?.reviewSalesEmployee?.id;
-  const reviewSupervisorEmployeeId = data?.latestContent?.reviewSupervisorEmployee?.id;
+  const reviewSalesEmployeeId = quotationData?.latestContent?.reviewSalesEmployee?.id;
+  const reviewSupervisorEmployeeId = quotationData?.latestContent?.reviewSupervisorEmployee?.id;
 
   if (userId) {
     if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
@@ -539,7 +540,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [quotationId]);
 
   useEffect(() => {
-    const latestContent = data?.latestContent;
+    const latestContent = quotationData?.latestContent;
 
     let agentEmployee;
 
@@ -578,7 +579,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: latestContent?.trackProgress,
       projectProgress: latestContent?.projectProgress,
     });
-  }, [data]);
+  }, [quotationData]);
 
   const onProfileChange = (v: Partial<TreturnBody>) => {
     setValue('validityPeriod', v.validityPeriod ?? '');
@@ -741,13 +742,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: quotationId ? `報價編號 ${data?.latestContent.quotationNumber || ''}` : '新報價單',
+      label: quotationId ? `報價編號 ${quotationData?.latestContent.quotationNumber || ''}` : '新報價單',
       onClick: () => {},
     },
   ];
 
   const history = useMemo(() => {
-    const content = data?.contents ?? [];
+    const content = quotationData?.contents ?? [];
 
     return content.map((item, index, arr) => {
       const { status, quotationDate } = item;
@@ -759,7 +760,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isoString: moment(quotationDate).toISOString(),
       };
     });
-  }, [data]);
+  }, [quotationData]);
 
   // optionQuotationState
   const panel_editable: TpanelList = [
@@ -967,7 +968,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
-            profile={data?.latestContent}
+            profile={quotationData?.latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
           />
@@ -1051,8 +1052,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 props: {
                   disabled: true,
                   value:
-                    (data?.latestContent.reviewSalesEmployee?.chName ||
-                      data?.latestContent.reviewSalesEmployee?.enName) ??
+                    (quotationData?.latestContent.reviewSalesEmployee?.chName ||
+                      quotationData?.latestContent.reviewSalesEmployee?.enName) ??
                     '',
                 },
               }}
@@ -1063,8 +1064,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 props: {
                   disabled: true,
                   value:
-                    (data?.latestContent.reviewSupervisorEmployee?.chName ||
-                      data?.latestContent.reviewSupervisorEmployee?.enName) ??
+                    (quotationData?.latestContent.reviewSupervisorEmployee?.chName ||
+                      quotationData?.latestContent.reviewSupervisorEmployee?.enName) ??
                     '',
                 },
               }}

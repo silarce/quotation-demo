@@ -42,9 +42,11 @@ type TothersList = {
 const useProductList = ({
   productArr,
   others,
+  resetTrigger,
 }: {
   productArr: quotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
+  resetTrigger: any;
 }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
@@ -90,6 +92,10 @@ const useProductList = ({
   // productArr
 
   useEffect(() => {
+    createProdList();
+  }, [resetTrigger, doorModelList]);
+
+  const createProdList = () => {
     if (!productArr || !doorModelList) {
       return;
     }
@@ -123,7 +129,7 @@ const useProductList = ({
         doorModelList,
       });
     });
-  }, [productArr, doorModelList]);
+  };
 
   //
   //
@@ -231,6 +237,11 @@ const useProductList = ({
   const [othersList, setOthersList] = useState<TothersList>({});
 
   useEffect(() => {
+    createOthersList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetTrigger]);
+
+  const createOthersList = () => {
     if (others) {
       const list: TothersList = {};
 
@@ -247,8 +258,7 @@ const useProductList = ({
 
       setOthersList(list);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [others]);
+  };
 
   const changeOthersKeyArr = (v: TothersKey[]) => {
     setOthersKeyArr(v);
@@ -294,6 +304,7 @@ const useProductList = ({
   };
 
   // ---------------------------------------------------------
+
   // ---------------------------------------------------------
 
   return {
