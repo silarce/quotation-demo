@@ -72,7 +72,7 @@ export const apiGetQuotation_Id = async (id: string) => {
   const params = {
     populate: [
       'contents',
-      // 'latestContent.products',
+      // 'latestContent.products', // 現在會500錯誤，暫時先不要送
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',

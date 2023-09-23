@@ -39,13 +39,30 @@ type TothersList = {
 };
 
 // =======================================================================
+
+/**
+ productsOrder使用構想
+ productsOrder是一個字串陣列，預想中會放進prod的id作為排序的依據
+ 所以我可以將productsOrder送到table_prod.tbody的useVerticalDnd作為預設值
+ 並取得dndKeyArr作為新的productsOrder
+
+ 問題
+ 新增的prod沒有id，使用者若新增了prod並排序，更新的productsOrder裡會是我用nanoid產生的key
+ 無法於下次使用
+ 
+ Gina說之後會在product裡新增order這個property作為排序使用
+ */
+
+// =======================================================================
 const useProductList = ({
   productArr,
   others,
+  productsOrder,
   resetTrigger,
 }: {
   productArr: quotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
+  productsOrder: string[] | undefined;
   resetTrigger: any;
 }) => {
   const [render, setRender] = useState(0);

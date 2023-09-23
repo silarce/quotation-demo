@@ -243,6 +243,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useProductList({
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
+    productsOrder: quotationData?.latestContent.productsOrder,
     resetTrigger: quotationData,
   });
 
