@@ -50,7 +50,7 @@ class Class_product {
     delSelf,
     copySelf,
     //
-    calcProdSubTotalPrice,
+    calcSubTotalPrice: calcProdSubTotalPrice,
     // from api
     doorModelList,
   }: {
@@ -61,7 +61,7 @@ class Class_product {
     delSelf: () => void;
     copySelf: () => void;
     //
-    calcProdSubTotalPrice: () => void;
+    calcSubTotalPrice: () => void;
     // from api
     doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
@@ -2145,3 +2145,11 @@ NO.4
 // - 捲軸: 黑鐵
 // - 馬達: 黑鐵
 // - 馬達配件: 其他
+
+/**
+
+主產品的材料改變後 下面沒有相應的材料話就帶入SST304
+
+
+
+ */

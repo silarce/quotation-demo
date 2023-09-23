@@ -64,7 +64,7 @@ export default function Table_others({
 
           {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
-              <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={add} />
+              <MyButton_v2 className={scss.addBtn} label="新增其他" onClick={add} />
             </div>
           )}
         </div>

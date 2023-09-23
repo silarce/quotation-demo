@@ -105,7 +105,7 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
       //
-      calcProdSubTotalPrice,
+      calcSubTotalPrice,
       //
       doorModelList,
     });
@@ -114,11 +114,14 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
     // setProductList(copy);
   };
 
-  const calcProdSubTotalPrice = () => {
+  const calcSubTotalPrice = () => {
     let subTotal = new Decimal(0);
 
     Object.values(productList).forEach((prod) => {
       subTotal = subTotal.add(prod.totalPrice_num);
+    });
+    Object.values(othersList).forEach((item) => {
+      subTotal = subTotal.add(item.totalPrice);
     });
 
     setSubTotal(subTotal.toString());
@@ -184,6 +187,7 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
           data: item,
           delSelf: () => delSelf_other(key),
           copySelf: () => copySelf_others(key),
+          calcSubTotalPrice,
         });
       });
 
@@ -210,6 +214,7 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
       data: bodyCopy,
       delSelf: () => delSelf_other(newKey),
       copySelf: () => copySelf_others(newKey),
+      calcSubTotalPrice,
     });
 
     reRender();
@@ -222,6 +227,7 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
       reRender,
       delSelf: () => delSelf_other(newKey),
       copySelf: () => copySelf_others(newKey),
+      calcSubTotalPrice,
     });
 
     reRender();

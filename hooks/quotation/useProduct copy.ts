@@ -94,7 +94,7 @@ const useProductList = () => {
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
       //
-      calcProdSubTotalPrice,
+      calcSubTotalPrice: calcProdSubTotalPrice,
       //
       doorModelList,
     });

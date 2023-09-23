@@ -18,22 +18,39 @@ class Class_other {
     data = emptyOthersOri(),
     delSelf,
     copySelf,
+    calcSubTotalPrice,
   }: {
     reRender: TreRender;
     data?: Tothers;
     delSelf: () => void;
     copySelf: () => void;
+    calcSubTotalPrice: () => void;
   }) {
     this.reRender = reRender;
     this._data = data;
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+    this.calcSubTotalPrice = calcSubTotalPrice;
   } // constructor
 
   private reRender;
   private _data;
   readonly delSelf;
   readonly copySelf;
+  readonly calcSubTotalPrice;
+
+  // ---------------------------------------------------------
+
+  calcAllPrice() {
+    const qty = this._data.quantity || 0;
+    const unitPrice = this._data.unitPrice || 0;
+    const totalPrice = new Decimal(qty).mul(unitPrice).toNumber();
+    this._data.totalPrice = totalPrice;
+    this.calcSubTotalPrice();
+    this.reRender();
+  }
+
+  // ---------------------------------------------------------
 
   get item() {
     return this._data.item;
@@ -56,6 +73,7 @@ class Class_other {
   }
   set quantity(v) {
     this._data.quantity = v;
+    this.calcAllPrice();
     this.reRender();
   }
 
@@ -64,16 +82,17 @@ class Class_other {
   }
   set unitPrice(v) {
     this._data.unitPrice = v;
+    this.calcAllPrice();
     this.reRender();
   }
 
   get totalPrice() {
     return this._data.totalPrice;
   }
-  set totalPrice(v) {
-    this._data.totalPrice = v;
-    this.reRender();
-  }
+  // set totalPrice(v) {
+  //   this._data.totalPrice = v;
+  //   this.reRender();
+  // }
 
   get notes() {
     return this._data.notes;
@@ -153,8 +172,10 @@ const othersCellConfig: TcellConfig = {
     label: '複價',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       inputProps: {
         props: {
+          disabled: true,
           type: 'number',
         },
       },
@@ -163,7 +184,7 @@ const othersCellConfig: TcellConfig = {
   notes: {
     label: '備註',
     inputSelProps: {
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '300px' },
       inputProps: {
         props: {},
       },
