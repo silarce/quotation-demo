@@ -16,7 +16,7 @@ import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, em
 import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
 
 // type
-import { TcreateQuotationContentOtherDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
+import { TcreateQuotationContentOtherDto, quotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
 
 // =======================================================================
 
@@ -39,7 +39,13 @@ type TothersList = {
 };
 
 // =======================================================================
-const useProductList = ({ others }: { others: TquotationContentOtherDto[] | undefined }) => {
+const useProductList = ({
+  productArr,
+  others,
+}: {
+  productArr: quotationProductDto[] | undefined;
+  others: TquotationContentOtherDto[] | undefined;
+}) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
   // ---------------------------------------------------------
@@ -75,8 +81,53 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
   // product
   const [prodKeyArr, setProdKeyArr] = useState<TprodKey[]>([]);
   const [productList, setProductList] = useState<TproductList>({});
-
   const [subTotal, setSubTotal] = useState('');
+
+  //
+  //
+  //
+  // productsOrder
+  // productArr
+
+  useEffect(() => {
+    if (!productArr || !doorModelList) {
+      return;
+    }
+
+    const list: TproductList = {};
+
+    productArr.forEach((prod) => {
+      const key = `${prod.id}`;
+
+      const prodData: Tprod = {
+        ...prod,
+        phase: 1,
+        voltage: String(prod.voltage),
+        motorSupport: !!Number(prod.motorSupport || '0'),
+        doorTrackThick: String(prod.doorTrackThick),
+        rollUpBoxThick: String(prod.rollUpBoxThick),
+        // 取得時是mm，要轉成m
+        width: String(Number(prod.width) / 1000),
+        length: String(Number(prod.length) / 1000),
+        height: String(Number(prod.height) / 1000),
+        boxB: String(Number(prod.width) / 1000),
+      };
+
+      list[key] = new Class_product({
+        reRender,
+        prodData,
+        delSelf: () => delSelf(key),
+        copySelf: () => copySelf(key),
+
+        calcSubTotalPrice,
+        doorModelList,
+      });
+    });
+  }, [productArr, doorModelList]);
+
+  //
+  //
+  //
 
   const changeProdKeyArr = (v: TprodKey[]) => {
     setProdKeyArr(v);

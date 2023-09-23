@@ -239,7 +239,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     changeOthersKeyArr,
     addOthers,
     getOthersPostBodyArr,
-  } = useProductList({ others: data?.latestContent.others });
+  } = useProductList({
+    productArr: data?.latestContent.products,
+    others: data?.latestContent.others,
+  });
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -824,6 +827,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         rollUpBoxThick: Number(item.rollUpBoxThick),
         voltage: Number(item.voltage),
         doorTrackThick: Number(item.doorTrackThick),
+        motorSupport: String(+item.motorSupport),
       };
     });
 
@@ -858,9 +862,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: data_watch.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
-      subTotal: Number(summary.subTotal),
-      salesTax: Number(summary.salesTax),
-      total: Number(summary.total),
+      subTotal: Number(summary.subTotal.replaceAll(',', '')),
+      salesTax: Number(summary.salesTax.replaceAll(',', '')),
+      total: Number(summary.total.replaceAll(',', '')),
       deliveryLocation: summary.deliveryLocation,
       deliveryDate: summary.deliveryDate,
       paymentMethods: paymentMethod,
