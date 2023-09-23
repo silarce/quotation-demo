@@ -85,12 +85,15 @@ const useProductList = ({ others }: { others: TquotationContentOtherDto[] | unde
 
   const delSelf = (key: string) => {
     delete productList[key];
+    calcSubTotalPrice();
     reRender();
   };
 
   const copySelf = (copyKey: string) => {
     const newKey = String(Object.keys(productList).length);
-    alert('未完成');
+    const copy = _.cloneDeep(productList[copyKey]);
+    productList[newKey] = copy;
+    calcSubTotalPrice();
     reRender();
   };
 
