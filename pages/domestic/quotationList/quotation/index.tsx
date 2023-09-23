@@ -3,6 +3,7 @@
  * useProductList
  * reqUpdateQuotation
  * useGetQuotation_id
+ * fileInfoArr
  *
  */
 // =============================================================
@@ -154,7 +155,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         fileId: item.id,
         fileType,
         fileName: item.name,
-        fileSrc: `${domain}file/download/${item.id}`,
+        fileSrc: `${domain}/file/download/${item.id}`,
         isNew: false,
       };
     });
@@ -881,7 +882,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (quotationId) {
         const res = await apiPatchQuotation(body, quotationId);
         showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
+        // res跟api文件不一樣，現在沒時間修正
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await uploadAttachment(res.quotation.id);
 
         await Promise.all([update(), updateAttachments()]);
       } else {

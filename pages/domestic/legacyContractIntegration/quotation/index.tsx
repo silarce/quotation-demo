@@ -94,7 +94,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         fileId: item.id,
         fileType,
         fileName: item.name,
-        fileSrc: `${domain}file/download/${item.id}`,
+        fileSrc: `${domain}/file/download/${item.id}`,
         isNew: false,
       };
     });
