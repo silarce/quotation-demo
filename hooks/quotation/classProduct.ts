@@ -27,6 +27,7 @@ import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
+import { apiPostProdGenerateDoorProductBom, TgenerateDoorProductBomDto } from 'js/api/api_product';
 // =============================================================================
 // type
 import type {
@@ -197,7 +198,7 @@ class Class_product {
     const optionArr = this._prodData.options;
     const list: { [key: string]: Class_options } = {};
 
-    optionArr.forEach((item) => {
+    optionArr?.forEach((item) => {
       const key = item.id;
       list[key] = new Class_options({
         reRender: this.reRender,
@@ -1263,6 +1264,15 @@ class Class_product {
       length: String(Number(this._prodData.length) * 1000),
       height: String(Number(this._prodData.height) * 1000),
       boxB: String(Number(this._prodData.width) * 1000),
+      components: [
+        {
+          type: 'slatType',
+          number: 'string',
+          componentId: 'string',
+          rawData: 'string',
+          bom: 'string',
+        },
+      ],
     };
   }
 

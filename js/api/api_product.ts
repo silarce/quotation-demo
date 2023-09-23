@@ -19,13 +19,29 @@ import type {
   // TdoorMotorAccessoriesDto,
   // TdoorHeadBoxDto,
   TdoorComponentListDto,
+  TgenerateDoorProductBomDto_ComponentInfo,
+  TgenerateDoorProductBomDto_DoorSpec,
+  TgenerateDoorProductBomDto,
+  TdoorBomDto_Component,
+  TdoorProductBomDto,
 } from './dtoTypes';
 
 // const apiGetAssets = (path: string) => {
 //   return `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/${path}`;
 // };
 
-export type { TdoorModelInfoDto, TpcgsPrams, TdoorGeneralSpecsDto, TpacParams };
+export type {
+  TdoorModelInfoDto,
+  TpcgsPrams,
+  TdoorGeneralSpecsDto,
+  TpacParams,
+  TdoorComponentListDto,
+  TgenerateDoorProductBomDto_ComponentInfo,
+  TgenerateDoorProductBomDto_DoorSpec,
+  TgenerateDoorProductBomDto,
+  TdoorBomDto_Component,
+  TdoorProductBomDto,
+};
 // =======================================================================
 
 export const apiGetAssets = async (path: string) => {
@@ -120,6 +136,17 @@ export const apiGetProdAvailableComponents = async (params: TpacParams) => {
 
   return axi
     .get<TdoorComponentListDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+// =======================================================================
+
+export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomDto) => {
+  const api = '/products/door/generate-door-product-bom';
+
+  return axi
+    .post<TdoorProductBomDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };

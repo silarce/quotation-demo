@@ -10,6 +10,8 @@ import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
 import scss from './classAccessory.module.scss';
 
+import { TgenerateDoorProductBomDto_ComponentInfo } from 'js/api/api_product';
+
 // ===========================================================
 class Class_accessory {
   constructor({
@@ -52,6 +54,8 @@ class Class_accessory {
   //
   private _material: undefined | string = undefined;
   private _surface: undefined | string = undefined;
+  private _isPainted = false;
+
   private _quantity = '';
   private _dualPrice = 0;
   private _unitPrice = 0;
@@ -111,6 +115,17 @@ class Class_accessory {
 
   get hiddenKeyArr() {
     return acceLookUp[this.key].hiddenKeyArr;
+  }
+
+  get componentInfo() {
+    const info: TgenerateDoorProductBomDto_ComponentInfo = {
+      id: this._data.id,
+      material: this._material ?? '',
+      materialSurface: this._surface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
+      isPainted: this._isPainted,
+    };
+
+    return info;
   }
 
   // ---------------------------------------------------------
@@ -348,6 +363,15 @@ class Class_accessory {
     this.reRender();
   }
 
+  get isPainted() {
+    return this._isPainted;
+  }
+
+  set isPainted(v) {
+    this._isPainted = v;
+    this.reRender();
+  }
+
   get density() {
     return this._prod._doorGeneralSpecs?.density;
   }
@@ -457,6 +481,8 @@ const acceKeyArrOri: () => TacceKey[] = () => {
     'material',
     'surface',
     'density',
+    'isPainted',
+
     'desc',
 
     'unit',
@@ -538,6 +564,17 @@ const acceCellConfig: TcellConfig = {
         props: {
           disabled: true,
         },
+      },
+    },
+  },
+  isPainted: {
+    label: '烤漆',
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '40px' },
+      checkBoxProps: {
+        wrapperStyle: { justifyContent: 'center' },
+        propsArr: [{ key: 'isPainted' }],
       },
     },
   },
@@ -632,7 +669,8 @@ const creNotConformAcce = () => ({
   createdAt: '',
   updatedAt: '',
   doorModelName: '',
-  code: '沒有符合規格的產品',
+  // code: '沒有符合規格的產品',
+  desc: '沒有符合規格的產品',
   specialSpec: '---',
   price: 0,
 });

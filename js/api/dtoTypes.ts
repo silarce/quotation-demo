@@ -1028,6 +1028,7 @@ export type TcreateQuotationContentDto = {
 // ========================================================================
 // ========================================================================
 // ========================================================================
+type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
 
 export type TdoorMaterialDto = {
   id: string;
@@ -1038,9 +1039,9 @@ export type TdoorMaterialDto = {
 };
 
 export type TdoorModelInfoDto = {
-  // 從name來看，get /products/door/models取得的陣列應該會有7個item，但實際上只有兩個?
-  // 因為現在業主給的資料只有'SJ-302'跟'SJ-312'
-  name: 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+  // 從name來看，get /products/door/models取得的陣列應該會有7個item，但實際上只一個?
+  // 因為DuST還在做
+  name: TdoorModelName;
   density: number; // 密度?
   guideRails: {
     imgSrc: string;
@@ -1227,4 +1228,56 @@ export type TdoorComponentListDto = {
   motors: TdoorMotorDto[]; // 馬達
   motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件
   headBoxes: TdoorHeadBoxDto[]; // 捲箱
+};
+
+export type TgenerateDoorProductBomDto_ComponentInfo = {
+  id: string;
+  material: string; // 材質
+  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4'; // 表面處理
+  isPainted: boolean; // 烤漆
+};
+
+export type TgenerateDoorProductBomDto_DoorSpec = {
+  modelName: TdoorModelName;
+  weight: number;
+  height: number;
+  B: number;
+  D: number;
+  slatLength: number;
+  guideRailLength: number;
+  rollerLength: number;
+  headBoxLength: number;
+  isAntiTyphoon: boolean;
+  rollerDiameter: number;
+  bearingType: string;
+  gearNumber: string;
+  chains: number;
+};
+
+export type TgenerateDoorProductBomDto = {
+  doorSpec: TgenerateDoorProductBomDto_DoorSpec;
+  slat: TgenerateDoorProductBomDto_ComponentInfo;
+  bottomBar: TgenerateDoorProductBomDto_ComponentInfo;
+  guideRail: TgenerateDoorProductBomDto_ComponentInfo;
+  sidePlate: TgenerateDoorProductBomDto_ComponentInfo;
+  roller: TgenerateDoorProductBomDto_ComponentInfo;
+  motor: TgenerateDoorProductBomDto_ComponentInfo;
+  motorAccessories: TgenerateDoorProductBomDto_ComponentInfo;
+  headBox: TgenerateDoorProductBomDto_ComponentInfo;
+};
+
+export type TdoorBomDto_Component = {
+  id: string;
+  number: string;
+};
+
+export type TdoorProductBomDto = {
+  slat: TdoorBomDto_Component;
+  bottomBar: TdoorBomDto_Component;
+  guideRail: TdoorBomDto_Component;
+  sidePlate: TdoorBomDto_Component;
+  roller: TdoorBomDto_Component;
+  motor: TdoorBomDto_Component;
+  motorAccessories: TdoorBomDto_Component;
+  headBox: TdoorBomDto_Component;
 };

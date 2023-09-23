@@ -873,9 +873,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       //
       //
-
       products: prodArr,
       others: getOthersPostBodyArr(),
+      //
+      //
     };
 
     try {

@@ -113,6 +113,9 @@ const useProductList = ({
   }, [resetTrigger, doorModelList]);
 
   const createProdList = () => {
+    console.log(productArr);
+    console.log(doorModelList);
+
     if (!productArr || !doorModelList) {
       return;
     }
