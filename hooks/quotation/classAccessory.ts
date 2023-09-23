@@ -50,6 +50,15 @@ class Class_accessory {
   // ---------------------------------------------------------
 
   changeFindedMaterial = (v: string) => {
+    if (
+      this.key === 'sidePlates' ||
+      this.key === 'rollers' ||
+      this.key === 'motors' ||
+      this.key === 'motorAccessories'
+    ) {
+      return;
+    }
+
     const value = findOptionValue({
       options: this.options_material ?? [],
       value: v,
@@ -57,6 +66,8 @@ class Class_accessory {
 
     if (value) {
       this.material = value;
+    } else {
+      this.material = 'SST#304';
     }
   };
 
