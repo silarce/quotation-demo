@@ -52,6 +52,7 @@ type TcellConfig = {
     label: string;
     isOptionValue?: boolean;
     theadItemClassName?: string;
+    isSuffixOnly?: boolean;
     inputSelProps: TinputSelProps;
   };
 };
@@ -291,10 +292,21 @@ function DndRow({
             const isHidden = hiddenKeyArr?.includes(key);
 
             const stateValue = item[key];
-            // !!!
-            const inputSelProps = _.cloneDeep(prodCellConfig[key].inputSelProps);
-            // !!!
+
+            const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
             const { inputProps, selectProps, checkBoxProps } = inputSelProps;
+
+            if (isSuffixOnly) {
+              return (
+                <div
+                  key={key}
+                  className={classNames(scss.column, isHidden && scss.hidden)}
+                  style={{ width: inputSelProps.wrapperStyle?.width }}
+                >
+                  <InputSel disabled={disabled} suffix={stateValue} suffixClassName="m-auto" {...inputSelProps} />
+                </div>
+              );
+            }
 
             //____
             if (inputProps?.props) {
@@ -357,7 +369,17 @@ function DndRow({
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
               >
-                <InputSel disabled={disabled} showBaseline="auto" {...inputSelProps} />
+                <InputSel
+                  disabled={disabled}
+                  showBaseline="auto"
+                  {...inputSelProps}
+                  //
+                  // suffix={
+                  //   <span>
+                  //     m <sup>2</sup>
+                  //   </span>
+                  // }
+                />
               </div>
             );
           })}

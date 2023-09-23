@@ -8,6 +8,8 @@ import { Toption } from 'js/utils/options/options';
 
 import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
+import scss from './classAccessory.module.scss';
+
 // ===========================================================
 class Class_accessory {
   constructor({
@@ -362,6 +364,10 @@ class Class_accessory {
   get totalPrice() {
     return String(this._totalPrice);
   }
+
+  get unit() {
+    return acceLookUp[this.key].unit;
+  }
 } // Class_accessory
 
 // ===========================================================
@@ -444,6 +450,8 @@ const acceKeyArrOri: () => TacceKey[] = () => {
     'surface',
     'density',
     'desc',
+
+    'unit',
 
     'quantity',
     'price',
@@ -593,6 +601,16 @@ const acceCellConfig: TcellConfig = {
           disabled: true,
         },
       },
+    },
+  },
+  unit: {
+    label: '單位',
+    theadItemClassName: 'text-center',
+    isSuffixOnly: true,
+    inputSelProps: {
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '60px' },
+      suffixClassName: scss.suffix,
     },
   },
 };
@@ -764,6 +782,7 @@ type Tkit = {
   creDesc: (classAcce: Class_accessory) => string;
   options: Toption[];
   hiddenKeyArr: string[];
+  unit?: React.ReactNode;
 };
 
 const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
@@ -772,6 +791,11 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
+    unit: (
+      <span>
+        m<sup>2</sup>
+      </span>
+    ),
   },
   bottomBars: {
     typeName: '底座',
@@ -783,6 +807,7 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
       { value: 'SST#316', label: 'SST#316' },
     ],
     hiddenKeyArr: ['surface', 'density'],
+    unit: 'M',
   },
   guideRails: {
     typeName: '門軌',
@@ -794,6 +819,7 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
       { value: 'SST#316', label: 'SST#316' },
     ],
     hiddenKeyArr: ['surface', 'density'],
+    unit: 'M',
   },
   sidePlates: {
     typeName: '支板',
@@ -806,18 +832,21 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
     creDesc: creDesc_rollers,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
+    unit: 'M',
   },
   motors: {
     typeName: '馬達',
     creDesc: creDesc_motors,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
+    unit: '組',
   },
   motorAccessories: {
     typeName: '馬達配件',
     creDesc: creDesc_motorAccessories,
     options: [{ value: '其他', label: '其他' }],
     hiddenKeyArr: ['surface', 'density'],
+    unit: '組',
   },
   headBoxes: {
     typeName: '捲箱',
@@ -829,6 +858,7 @@ const acceLookUp: { [key in keyof TdoorComponentListDto]: Tkit } = {
       { value: 'SST#316', label: 'SST#316' },
     ],
     hiddenKeyArr: ['surface', 'density'],
+    unit: 'M',
   },
 };
 

@@ -74,7 +74,8 @@ type TinputSelProps = {
   isMustPreStyle?: 'minimal';
   mustTipClassName?: string;
   //
-  suffix?: string;
+  // suffix?: string;
+  suffix?: React.ReactNode;
   suffixClassName?: string;
 };
 
