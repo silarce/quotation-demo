@@ -48,7 +48,7 @@ export default function Table_acce({
               cellConfigList={acceCellConfig}
               allowMove={allowMove}
               resetTrigger={acceKeyArr.length}
-              emptyBlockWidth="137px"
+              emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as TacceKey[];
                 changeAcceKeyArr(keyArr);
@@ -65,6 +65,7 @@ export default function Table_acce({
               onRowClick={(obj) => {
                 // setTargetProd(obj.item as Class_product);
               }}
+              panelBox="easyBox"
             />
           )}
 

@@ -64,6 +64,7 @@ export default function Tbody({
   keyArr,
   prodCellConfig,
   onRowClick,
+  panelBox,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -72,6 +73,7 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (onj: { item: Titem }) => void;
+  panelBox?: 'copyDelBtnBox' | 'easyBox';
 }) {
   // ---------------------------------------------------------------
 
@@ -135,6 +137,7 @@ export default function Tbody({
                 keyArr={keyArr}
                 isMoving={isMoving}
                 disabled={disabled}
+                panelBox={panelBox}
                 //
                 prodCellConfig={prodCellConfig}
                 //
@@ -202,6 +205,23 @@ const CopyDelBtnBox = ({
   );
 };
 
+const EasyBox = ({
+  indexNum,
+  dndAttr,
+  dndListener,
+}: {
+  indexNum: string | number;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+}) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+      <span>{indexNum}</span>
+    </div>
+  );
+};
+
 // --------------------------------------------------------
 
 const NoItem = ({
@@ -244,6 +264,7 @@ function DndRow({
   onRowClick,
   prodCellConfig,
   isActive,
+  panelBox = 'copyDelBtnBox',
 }: {
   id: string;
   pIndex: number;
@@ -258,6 +279,7 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
+  panelBox?: 'copyDelBtnBox' | 'easyBox';
   //
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -274,14 +296,18 @@ function DndRow({
       <CellWithBar isActive={isActive} className="z-0">
         <div className={scss.row} onClick={undefined}>
           {/*  */}
-          <CopyDelBtnBox
-            disabled={disabled}
-            del={item.delSelf}
-            copy={item.copySelf}
-            indexNum={pIndex + 1}
-            dndAttr={attributes}
-            dndListener={listeners}
-          />
+          {panelBox === 'copyDelBtnBox' && (
+            <CopyDelBtnBox
+              disabled={disabled}
+              del={item.delSelf}
+              copy={item.copySelf}
+              indexNum={pIndex + 1}
+              dndAttr={attributes}
+              dndListener={listeners}
+            />
+          )}
+          {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+
           {/*  */}
           {keyArr.map((key) => {
             if (!item) {
@@ -369,17 +395,7 @@ function DndRow({
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
               >
-                <InputSel
-                  disabled={disabled}
-                  showBaseline="auto"
-                  {...inputSelProps}
-                  //
-                  // suffix={
-                  //   <span>
-                  //     m <sup>2</sup>
-                  //   </span>
-                  // }
-                />
+                <InputSel disabled={disabled} showBaseline="auto" {...inputSelProps} />
               </div>
             );
           })}
