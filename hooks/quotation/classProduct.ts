@@ -121,10 +121,6 @@ class Class_product {
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  // _acceList: { [key: string]: Taccessory } = {};
-  // get acceList() {
-  //   return this._acceList;
-  // }
 
   acceList: { [key in keyof TdoorComponentListDto]: Class_accessory | null } | undefined;
 
@@ -798,7 +794,6 @@ class Class_product {
 
   /**表面 */
   get options_surface() {
-    console.log(this.material);
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
@@ -1002,6 +997,7 @@ class Class_product {
   set horsepower(v) {
     this._prodData.horsepower = v;
     this.toSetDefaultBoxB();
+    this.retrieveCreProdAcce();
     this.reRender();
   }
 
@@ -1118,6 +1114,7 @@ class Class_product {
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
+    // this.retrieveCreProdAcce();
     this.req_calcGeneralSpec();
     this.reRender();
   }
@@ -1148,6 +1145,7 @@ class Class_product {
   set motor(v) {
     this._prodData.motor = v;
     this.toSetDefaultBoxB();
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1165,6 +1163,7 @@ class Class_product {
   }
   set phase(v) {
     this._prodData.phase = v;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
 
@@ -1174,6 +1173,7 @@ class Class_product {
   }
   set motorSupport(v) {
     this._prodData.motorSupport = v;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1182,6 +1182,7 @@ class Class_product {
   }
   set bottomBar(v) {
     this._prodData.bottomBar = v;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1214,6 +1215,7 @@ class Class_product {
   }
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1222,6 +1224,7 @@ class Class_product {
   }
   set onePieceRollUpBox(v) {
     this._prodData.onePieceRollUpBox = v;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1230,6 +1233,7 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1969,7 +1973,7 @@ const filter_motors = ({
     horsePower: string; // 馬力數
     // gearNumber: string; // 鍊齒輪番號 // DuST說先略過
     motorVendor: string; // 馬達廠商
-    phase: number; // 相位
+    phase: number; // 相數
     /**電壓(V) */
     voltage: number; // 電壓(V)
     /**荷重(kg) */

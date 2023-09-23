@@ -298,7 +298,7 @@ function DndRow({
 
             //____
             if (inputProps?.props) {
-              inputProps.props.value = stateValue as string;
+              inputProps.props.value = (stateValue as string) ?? '';
 
               inputProps.props.onChange = (e) => {
                 (item[key] as string) = e.target.value;
@@ -321,9 +321,9 @@ function DndRow({
               // ___________________
 
               if (isOptionValue) {
-                selectProps.props.value = stateValue;
+                selectProps.props.value = stateValue || null;
               } else {
-                selectProps.easyValue = stateValue as string;
+                selectProps.easyValue = (stateValue as string) ?? '';
               }
               // ___________________
 
@@ -343,7 +343,7 @@ function DndRow({
             //____
 
             if (checkBoxProps?.propsArr[0]) {
-              checkBoxProps.propsArr[0].value = stateValue as boolean;
+              checkBoxProps.propsArr[0].value = !!stateValue as boolean;
 
               checkBoxProps.onChange = (arr) => {
                 (item[key] as boolean) = !!arr[0];
