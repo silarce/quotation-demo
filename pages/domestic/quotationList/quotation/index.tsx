@@ -898,9 +898,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setDisabled(true);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
+      showRootLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // --------------------------------------------
@@ -981,8 +982,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             addProd={addProd}
             setTargetProd={setTargetProd}
           />
-          {/* api還沒好 */}
 
+          {/* api還沒好 */}
           <Table_acce
             disabled={disabled}
             acceList={targetProd?.acceList}

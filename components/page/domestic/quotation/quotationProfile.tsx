@@ -46,9 +46,12 @@ type TquotationProfile = {
   projectName: string; // 工程名稱
   county: string; // 縣市
   district: string; // 區
+  address: string;
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
   customer: TcustomerDto;
+  trackProgress: string;
+  projectProgress: string;
 };
 
 type TformBody = {
@@ -61,8 +64,8 @@ type TformBody = {
   contactNumber: string;
   // api還沒上的資料
   address?: string; // 剩餘地址
-  trackingStatus?: string; // 追蹤狀態
-  siteProgress?: string; // 工地進度
+  trackProgress?: string; // 追蹤狀態
+  projectProgress?: string; // 工地進度
 };
 type TreturnBody = {
   validityPeriod: string;
@@ -114,9 +117,12 @@ export default function QuotationProfile({
     projectName,
     county,
     district,
+    address,
     contactPerson,
     contactNumber,
     customer,
+    trackProgress,
+    projectProgress,
   } = profile ?? {};
   // ----------------------------------------------------------------
 
@@ -157,10 +163,10 @@ export default function QuotationProfile({
       district,
       contactPerson,
       contactNumber,
-      address: '',
+      address,
       // api還沒上的資料
-      trackingStatus: '',
-      siteProgress: '',
+      trackProgress,
+      projectProgress,
     });
     setCustomer(customerOri);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -311,7 +317,7 @@ export default function QuotationProfile({
               {...inputSelProps}
               inputProps={{
                 props: {
-                  ...register('trackingStatus'),
+                  ...register('trackProgress'),
                 },
               }}
             />
@@ -324,7 +330,7 @@ export default function QuotationProfile({
               {...inputSelProps}
               inputProps={{
                 props: {
-                  ...register('siteProgress'),
+                  ...register('projectProgress'),
                 },
               }}
             />
