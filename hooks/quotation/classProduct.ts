@@ -8,6 +8,7 @@
  * 下拉式選單的選項
  *
  * req_getProdAvailableComponents
+ * reqProdGenerateDoorProductBom
  */
 
 import _ from 'lodash';
@@ -84,6 +85,8 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this.findBDoptions();
+
     // __________________________________________________________;
     // accessoryDataArr.forEach((data, index) => {
     // const id = index;
@@ -120,6 +123,8 @@ class Class_product {
   private _dualPrice;
   private _unitPrice;
   private _totalPrice;
+
+  private _boxD = '';
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -275,8 +280,6 @@ class Class_product {
       // 設定boxB與thickness
       // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
       const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-      // this.B = String(boxB);
-      this.boxB = boxB ? String(boxB / 1000) : '';
       this.thickness = res.thickness;
 
       // ________________________
@@ -291,7 +294,11 @@ class Class_product {
         } else if (defaultMotorBox.default) {
           this.boxB = String(defaultMotorBox.default.boxB / 1000);
         }
+      } else {
+        this.boxB = boxB ? String(boxB / 1000) : '';
       }
+
+      this.findBDoptions();
 
       // ________________________
 
@@ -359,7 +366,18 @@ class Class_product {
     }, 500);
   } //  req_getProdAvailableComponents
 
-  // apiPostProdGenerateDoorProductBom
+  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
+  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
+  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
+  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
+  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
+  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
+  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
+  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
+  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
+  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
+
+  /**取得材料配件 */
   reqProdGenerateDoorProductBom() {
     const req = async () => {
       const acceList = this.acceList;
@@ -381,6 +399,12 @@ class Class_product {
         isAntiTyphoon: this.typhoonProtection,
         rollerDiameter: this._doorGeneralSpecs.diameter,
         bearingType: this._doorGeneralSpecs.bearingName,
+        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
         gearNumber: acceList.motor?.gearNumber,
         chains: this._doorGeneralSpecs.sprocketWheelChains,
       };
@@ -699,17 +723,7 @@ class Class_product {
       return;
     }
 
-    const {
-      //
-      // slats,
-      // bottomBars,
-      guideRails,
-      // sidePlates,
-      // rollers,
-      motors,
-      // motorAccessories,
-      headBoxes,
-    } = this._availableComponents;
+    const { guideRails, motors, headBoxes } = this._availableComponents;
 
     const horsePowerList: { [key: string]: Toption } = {};
     const motorVendorList: { [key: string]: Toption } = {};
@@ -806,6 +820,32 @@ class Class_product {
       this.options_doorTrackThick = Object.values(railThickList);
     }
   } // retrieveOptions
+
+  findBDoptions() {
+    if (this._prodData.doorType) {
+      const BDList = pairBD[this._prodData.doorType]?.BtoD;
+      const DBList = pairBD[this._prodData.doorType]?.DtoB;
+
+      if (BDList) {
+        this.options_boxB = Object.keys(BDList).map((key) => {
+          return {
+            value: key,
+            label: key,
+          };
+        });
+      }
+
+      if (DBList) {
+        this.options_boxD = Object.keys(DBList).map((key) => {
+          return {
+            value: key,
+            label: key,
+          };
+        });
+      }
+    }
+  }
+
   // ---------------------------------------------------------
   // 下拉式選單的選項
 
@@ -819,6 +859,9 @@ class Class_product {
   options_voltage: Toption[] | undefined = undefined;
   options_rollUpBoxThick: Toption[] | undefined = undefined;
   options_doorTrackThick: Toption[] | undefined = undefined;
+  //
+  options_boxB: Toption[] | undefined = undefined;
+  options_boxD: Toption[] | undefined = undefined;
 
   /**門型 options */
   get options_doorType() {
@@ -965,8 +1008,11 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
+
     this.req_calcGeneralSpec();
     this.req_getProdAvailableComponents();
+    this.reqProdGenerateDoorProductBom();
+
     this.reRender();
   }
   /**全寬 */
@@ -1001,7 +1047,6 @@ class Class_product {
     this.req_calcGeneralSpec();
     this.reRender();
   }
-  //
 
   /**B(m) */
   get boxB() {
@@ -1009,6 +1054,18 @@ class Class_product {
   }
   set boxB(v) {
     this._prodData.boxB = v;
+    this._boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this.area = this.calcArea();
+    this.reRender();
+  }
+
+  /**D(m) */
+  get boxD() {
+    return this._boxD;
+  }
+  set boxD(v) {
+    this._boxD = v;
+    this._prodData.boxB = pairBD[this._prodData.doorType]?.DtoB[v] ?? '';
     this.area = this.calcArea();
     this.reRender();
   }
@@ -1422,6 +1479,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'width',
     'height',
     'boxB',
+    'boxD',
     'thickness',
     'area',
     'volume',
@@ -1544,16 +1602,34 @@ const prodCellConfig: TcellConfig = {
     },
   },
   // 後端說B(m)是boxB
+  // boxB: {
+  //   label: 'B(m)',
+  //   theadItemClassName: 'text-center',
+  //   inputSelProps: {
+  //     wrapperStyle: { width: '60px' },
+  //     inputProps: {
+  //       props: {
+  //         type: 'number',
+  //         className: 'text-center',
+  //       },
+  //     },
+  //   },
+  // },
   boxB: {
     label: 'B(m)',
-    theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '60px' },
-      inputProps: {
-        props: {
-          type: 'number',
-          className: 'text-center',
-        },
+      wrapperStyle: { width: '80px' },
+      selectProps: {
+        props: {},
+      },
+    },
+  },
+  boxD: {
+    label: 'D(m)',
+    inputSelProps: {
+      wrapperStyle: { width: '80px' },
+      selectProps: {
+        props: {},
       },
     },
   },
@@ -2181,6 +2257,41 @@ const creOptions_surface: () => Toption[] = () => [
   { value: 'BA', label: 'BA' },
   { value: 'NO.4', label: 'NO.4' },
 ];
+
+// 理論上不會有undefined，但現在情況混亂，先加上去吧
+type TpariBD = {
+  [key: string]:
+    | {
+        BtoD: {
+          [key: string]: string | undefined;
+        };
+        DtoB: {
+          [key: string]: string | undefined;
+        };
+      }
+    | undefined;
+};
+// 單位為m
+const pairBD: TpariBD = {
+  'SJ-302': {
+    BtoD: {
+      '0.35': '0.56',
+      '0.40': '0.60',
+      '0.45': '0.65',
+      '0.50': '0.75',
+      '0.55': '0.80',
+      '0.60': '0.90',
+    },
+    DtoB: {
+      '0.56': '0.35',
+      '0.60': '0.40',
+      '0.65': '0.45',
+      '0.75': '0.50',
+      '0.80': '0.55',
+      '0.90': '0.60',
+    },
+  },
+};
 
 // ===========================================================
 // ===========================================================
