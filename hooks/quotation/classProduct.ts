@@ -434,7 +434,17 @@ setTImeout(()=>{
 
 明天再想吧
 
-
+目前有四個呼叫api的方法
+為每個方法設一個變數(暫且叫他們shouldCall)，用來判定是否應該被呼叫
+寫一個方法(叫callAll)，會根據這些變數，依序決定是否呼叫api
+callAll會有防抖設定
+編輯各個值的時候，會將對應shouldCall變更為true
+並呼叫callAll
+如果使用者在編輯A後立刻再編輯B，
+因為防抖，只會設定對應的shouldCall為true並重置計時器
+最後再timeout後呼叫這個方法，就會依序呼叫api
+同時設置呼叫時設定disabled
+這樣就能避免重複呼叫而浪費效能或取得錯誤的值
 
          */
 
