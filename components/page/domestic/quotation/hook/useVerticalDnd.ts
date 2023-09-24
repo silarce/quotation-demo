@@ -42,10 +42,6 @@ const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; re
   };
 
   useEffect(() => {
-    setDndKeyArr(listKeyArr);
-  }, [resetTrigger]);
-
-  useEffect(() => {
     // const newArr = Object.keys(addiExchangeList);
     const newArr = listKeyArr;
 
@@ -61,6 +57,10 @@ const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; re
       setDndKeyArr([...dndKeyArr]);
     }
   }, [listKeyArr.length]);
+
+  useEffect(() => {
+    setDndKeyArr(listKeyArr);
+  }, [resetTrigger]);
 
   const onDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;

@@ -1,7 +1,6 @@
 import { MouseEvent } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
-import moment from 'moment';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -13,12 +12,6 @@ import iconLongArrow from 'public/image/icon/longArrow.svg';
 
 // css
 import scss from './tbodyItem01.module.scss';
-
-import { TquotationContentDto } from 'js/api/api_quotation';
-import { TcustomerDto, TemployeeDto } from 'js/api/dtoTypes';
-
-// utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // =============================================================================
 type TBodyItemContent = {

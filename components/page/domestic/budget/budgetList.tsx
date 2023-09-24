@@ -65,6 +65,7 @@ export default function BudgetList({
               customerName: quotation.latestContent.customer.name,
               agentEmployeeName:
                 quotation.latestContent.agentEmployee.chName || quotation.latestContent.agentEmployee.enName,
+              totalPrice: quotation.latestContent.total,
             };
 
             return (

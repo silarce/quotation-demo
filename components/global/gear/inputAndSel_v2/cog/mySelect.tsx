@@ -14,6 +14,8 @@ import Select, {
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
 // type
 import type { Toption } from 'js/utils/options/options';
+import { TcreOptionWithIconProps } from '../selectCustom/creOptionWithIcon';
+import { TcreSingleValueWithIconProps } from '../selectCustom/creSingleValueWithIcon';
 
 // icon
 import iconArrowRed from 'public/image/icon/arrow_down_red.svg';
@@ -38,9 +40,13 @@ export type TselectProps<
   /** 將string轉為Toption，props.value有值的話會被蓋掉 */
   easyValue?: string | null;
   easyDefaultValue?: string | null;
+  /**若為true props.options應該要有 icon property，值為圖片的位置*/
   withIcon?: boolean;
   dynaOptionsList?: { [key: string]: Toption[] };
   dynaOptionsKey?: string;
+  // 帶icon的select用的
+  creOptionWithIconProps?: TcreOptionWithIconProps;
+  creSingleValueWithIconProps?: TcreSingleValueWithIconProps;
   //
 };
 
