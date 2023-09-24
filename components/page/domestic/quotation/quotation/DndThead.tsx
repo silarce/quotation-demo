@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
 // css
-import scss from './dndThead.module.scss';
+import scss from './DndThead.module.scss';
 
 // --------------------
 import {
