@@ -410,66 +410,33 @@ class Class_product {
         // 寫法像這樣
         // async foo (){}
         // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
+        /**
+        因為使用者可能會在防抖結束前就編輯了另一個需要呼叫api的property
+        或許可以把防抖id設為每個setter一個
+        然後在呼叫req鍊
+        每次呼叫req鍊就要clear所有的防抖id
+
+setTImeout(()=>{
+  clearTimeout(防抖id_a);
+  clearTimeout(防抖id_b);
+  clearTimeout(防抖id_c);
+  // 類推
+  const reqChan = async ()=>{  }
+},500)
+
+如果每次呼叫就要清掉所有的防抖id，那為什麼不設三個req方法的防抖id就好了
+跟一開始一樣
+
+決定了
+呼叫reqA就一定會接著呼叫reqB與reqC，並清除所有的防抖id
+呼叫reqB就一定會接著呼叫reqC，並清除B跟C的防抖id
+呼叫reqC就一定會清除C的防抖id
+
+明天再想吧
+
+
+
+         */
 
         gearNumber: acceList.motor?.gearNumber,
         chains: this._doorGeneralSpecs.sprocketWheelChains,
