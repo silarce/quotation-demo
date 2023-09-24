@@ -1,12 +1,25 @@
+// 常用變數目錄
+/**
+ * useProductList
+ * reqUpdateQuotation
+ * useGetQuotation_id
+ * fileInfoArr
+ *
+ */
+// =============================================================
+// =============================================================
+// =============================================================
+
 // 報價單
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
 import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // components
-import QuotationProfile, { TprofileReturnBody } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
 import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
 import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
@@ -26,6 +39,7 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -40,12 +54,18 @@ import { AppContext } from 'pages/_app';
 // 假資料與fake api
 import { useQuotation } from 'hooks/quotation/useQuotation';
 import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
-import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
-import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
+
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
+import Table_options from 'components/page/domestic/quotation/quotation/product/table_options';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -61,15 +81,23 @@ import {
   apiQuotationSubmitReview,
   apiQuotationReview,
   apiQuotationunLock,
+  //
+  useQuotation_id_attachments,
+  apiPostQuotation_id_attachments,
+  apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
+import { Class_product, useProductList } from 'hooks/quotation/useProduct';
 
-import { useProductList } from 'hooks/quotation/useProduct';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
 
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+// type
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+
+import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -90,37 +118,410 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
+  const {
+    id: quotationId, //報價單id //若為新增報價單則為undefined
+  } = router.query as { id: string | undefined };
+  const { userInfo } = useContext(AppContext);
+  const userId = userInfo?.employee?.id;
   // -----------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
+  // 是否可編輯
+  const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
+  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
   // -----------------------------------------------------
-  const { productList, prodCellConfig, prodKeyArr, addProd, changeProdKeyArr } = useProductList();
+  // 資料
+  const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  // -----------------------------------------------------
+
+  const [targetProd, setTargetProd] = useState<Class_product>();
 
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
-  // 是否可編輯
-  const [disabled, setDisabled] = useState(true);
+  // -----------------------------------------------------
+
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(quotationId);
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+
+  useEffect(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}/file/download/${item.id}`,
+        isNew: false,
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
+
+  const removeFileInfo = (index: number) => {
+    fileInfoArr[index].willDelete = true;
+    setFileInfoArr([...fileInfoArr]);
+    // removeFile(index)
+  };
+
+  const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
+    setFileInfoArr([...newImgInfoArr]);
+  };
+
+  const uploadAttachment = async (quotationId: string) => {
+    // 移除附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew } = info;
+
+      if (!fileId || !willDelete || isNew) {
+        continue;
+      }
+
+      try {
+        await apiDelQuotation_id_attachments(quotationId, fileId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // 上傳附件
+    for (const info of fileInfoArr) {
+      const { fileId, willDelete, isNew, file } = info;
+
+      if (fileId || !file || willDelete || !isNew) {
+        continue;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        await apiPostQuotation_id_attachments(quotationId, formData);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo,
+    toSetFileInfo,
+  };
+
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
   // -----------------------------------------------------
   const {
-    id, //報價單id //若為新增報價單則為undefined
-  } = router.query as { id: string | undefined };
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    addProd,
+    changeProdKeyArr,
+    subTotal: prodSubTotal,
+    //
+    acceKeyArr,
+    acceCellConfig,
+    changeAcceKeyArr,
+    //
+    optionsKeyArr,
+    changeOptionsKeyArr,
+    optionsCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+  } = useProductList({
+    productArr: quotationData?.latestContent.products,
+    others: quotationData?.latestContent.others,
+    productsOrder: quotationData?.latestContent.productsOrder,
+    resetTrigger: quotationData,
+  });
+
+  const [summary, setSummary] = useState<{
+    discountRate: string;
+    subTotal: string;
+    salesTax: string;
+    total: string;
+    deliveryLocation: string;
+    deliveryDate: string;
+  }>({
+    discountRate: '100',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    deliveryLocation: '',
+    deliveryDate: '',
+  });
+
+  const [anno, setAnnotation] = useState<string[]>([]);
+  const [qr, setQr] = useState<string[]>([]);
+
+  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
+
+  useEffect(() => {
+    if (!quotationData) {
+      return;
+    }
+
+    const {
+      //
+      discount,
+      subTotal,
+      salesTax,
+      total,
+      deliveryLocation,
+      deliveryDate,
+      paymentMethods,
+      annotations,
+      quotationRanges,
+    } = quotationData.latestContent;
+
+    setAnnotation(annotations ?? []);
+    setQr(quotationRanges ?? []);
+    setPaymentMethod(paymentMethods);
+
+    setSummary({
+      discountRate: discount,
+      subTotal: String(subTotal),
+      salesTax: String(salesTax),
+      total: String(total),
+      deliveryLocation,
+      deliveryDate,
+    });
+  }, [quotationData]);
+
+  useEffect(() => {
+    const { subTotal, salesTax, total } = countPayInfoValue({
+      discount: summary.discountRate,
+      prodSubTotal: prodSubTotal,
+    });
+
+    setSummary((state) => {
+      return {
+        ...state,
+        subTotal,
+        salesTax,
+        total,
+      };
+    });
+  }, [summary.discountRate, prodSubTotal]);
+
+  //
+  //
+  //
+
+  const control_anno: TsummaryControl = {
+    stringArr: anno,
+    editString: (index, v) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy[index] = v;
+
+        return copy;
+      });
+    },
+    addString: (v: string) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy.push(v);
+
+        return copy;
+      });
+    },
+    delString: (index: number) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy.splice(index, 1);
+
+        return copy;
+      });
+    },
+    addStrArr: (vArr: string[]) => {
+      setAnnotation((state) => {
+        const copy = [...state];
+        copy.push(...vArr);
+
+        return copy;
+      });
+    },
+  };
+
+  const control_qr: TsummaryControl = {
+    stringArr: qr,
+    editString: (index, v) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy[index] = v;
+
+        return copy;
+      });
+    },
+    addString: (v: string) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy.push(v);
+
+        return copy;
+      });
+    },
+    delString: (index: number) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy.splice(index, 1);
+
+        return copy;
+      });
+    },
+    addStrArr: (vArr: string[]) => {
+      setQr((state) => {
+        const copy = [...state];
+        copy.push(...vArr);
+
+        return copy;
+      });
+    },
+  };
+
+  // ----------------------------------------------------------------------
+  const payInfoControl: TpayInfoControl = {
+    payment: {
+      discountRate: {
+        inputAttr: {
+          disabled: disabled,
+          value: summary.discountRate,
+          onChange: (e) => {
+            let v = e.target.value;
+            setSummary((state) => {
+              const copy = { ...state };
+
+              if ((v as string) === '') {
+                v = '0';
+              }
+
+              if (Number(v) > 100) {
+                v = '100';
+              }
+
+              if (v.split('.')[1]?.length > 2) {
+                return copy;
+              }
+
+              copy.discountRate = v;
+
+              return copy;
+            });
+          },
+        },
+      },
+      subTotal: {
+        inputAttr: {
+          disabled: true,
+          value: summary.subTotal,
+        },
+      },
+      salesTax: {
+        inputAttr: {
+          disabled: true,
+          value: summary.salesTax,
+        },
+      },
+      total: {
+        inputAttr: {
+          disabled: true,
+          value: summary.total,
+        },
+      },
+    },
+
+    delivery: {
+      deliveryLocation: {
+        value: summary.deliveryLocation,
+        onChange: (v) => {
+          setSummary((state) => {
+            const copy = { ...state };
+            copy.deliveryLocation = v;
+
+            return copy;
+          });
+        },
+      },
+      deliveryDate: {
+        value: summary.deliveryDate,
+        onChange: (v) => {
+          setSummary((state) => {
+            const copy = { ...state };
+            copy.deliveryDate = v;
+
+            return copy;
+          });
+        },
+      },
+    },
+    paymentMethod: {
+      arr: paymentMethod.map((item, index) => {
+        const { milestone, totalPaymentRatio } = item;
+
+        const onChange = (v: string) => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy[index].totalPaymentRatio = v;
+
+            return copy;
+          });
+        };
+
+        const delSelf = () => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy.splice(index, 1);
+
+            return copy;
+          });
+        };
+
+        return {
+          label: milestone,
+          value: totalPaymentRatio,
+          onChange,
+          delSelf,
+        };
+        //
+      }),
+      addMethod: (v) => {
+        setPaymentMethod((state) => {
+          const copy = [...state];
+          copy.push({ milestone: v, totalPaymentRatio: '' });
+
+          return copy;
+        });
+      },
+    },
+  };
+
   // ----------------------------------------------------------------
-  const { userInfo } = useContext(AppContext);
-  const userId = userInfo?.employee?.id;
+
   // ----------------------------------------------------------------
-  const [isLoading, setIsLoading] = useState(false);
-  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
-  // ---------------------------------------------------------
+
   const [reviewSales, setReviewSales] = useState<TemployeeDto>();
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
-  const { data, update } = useGetQuotation_id(id as string);
+  // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
-  const reviewSalesEmployeeId = data?.latestContent?.reviewSalesEmployee?.id;
-  const reviewSupervisorEmployeeId = data?.latestContent?.reviewSupervisorEmployee?.id;
+  const reviewSalesEmployeeId = quotationData?.latestContent?.reviewSalesEmployee?.id;
+  const reviewSupervisorEmployeeId = quotationData?.latestContent?.reviewSupervisorEmployee?.id;
 
   if (userId) {
     if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
@@ -132,19 +533,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     (async () => {
       try {
         setIsLoading(true);
-        await update();
+        await Promise.all([update(), updateAttachments()]);
       } catch (error) {}
 
       setIsLoading(false);
     })();
-  }, [id]);
+  }, [quotationId]);
 
   useEffect(() => {
-    const latestContent = data?.latestContent;
+    const latestContent = quotationData?.latestContent;
 
     let agentEmployee;
 
-    if (!id) {
+    if (!quotationId) {
       agentEmployee = userInfo?.employee;
     } else {
       agentEmployee = latestContent?.agentEmployee;
@@ -168,19 +569,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
       discount: latestContent?.discount,
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
-      totalPrice: latestContent?.totalPrice,
       status: latestContent?.status ?? 'Budget',
-      // managerId: lContent.managerEmployee?.id,
-      // supervisorId: lContent.suervisorEmployee?.id,
-      // agentId: lContent.agentEmployee?.id,
       managerEmployee: latestContent?.managerEmployee,
       supervisorEmployee: latestContent?.supervisorEmployee,
-      // agentEmployee: lContent.agentEmployee,
+      //
+      //
       agentEmployee: agentEmployee,
+      //
+      //
+      trackProgress: latestContent?.trackProgress,
+      projectProgress: latestContent?.projectProgress,
     });
-  }, [data]);
+  }, [quotationData]);
 
-  const onProfileChange = (v: Partial<TprofileReturnBody>) => {
+  const onProfileChange = (v: Partial<TreturnBody>) => {
     setValue('validityPeriod', v.validityPeriod ?? '');
     setValue('customer', v.customer);
     setValue('projectName', v.projectName ?? '');
@@ -189,6 +591,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setValue('address', v.address ?? '');
     setValue('contactPerson', v.contactPerson ?? '');
     setValue('contactNumber', v.contactNumber ?? '');
+    setValue('trackProgress', v.trackProgress ?? '');
+    setValue('projectProgress', v.projectProgress ?? '');
   };
 
   // --------------------------------------------------------------
@@ -302,9 +706,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
-  const getFakeMemo = fakeApi_memo.get;
-  const getFakeQuotaRange = fakeApi_quoteRange.get;
-
   useEffect(() => {
     reNewClassQuotation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -342,13 +743,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: id ? `報價編號 ${data?.latestContent.quotationNumber || ''}` : '新報價單',
+      label: quotationId ? `報價編號 ${quotationData?.latestContent.quotationNumber || ''}` : '新報價單',
       onClick: () => {},
     },
   ];
 
   const history = useMemo(() => {
-    const content = data?.contents ?? [];
+    const content = quotationData?.contents ?? [];
 
     return content.map((item, index, arr) => {
       const { status, quotationDate } = item;
@@ -360,7 +761,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isoString: moment(quotationDate).toISOString(),
       };
     });
-  }, [data]);
+  }, [quotationData]);
 
   // optionQuotationState
   const panel_editable: TpanelList = [
@@ -393,7 +794,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   onClick: () => setShowPdf_part(true),
     // },
     (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!id || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -421,41 +822,79 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async () => {
-    const data = watch();
+    const data_watch = watch();
+
+    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item) => {
+      return {
+        ...item.body,
+        rollUpBoxThick: Number(item.rollUpBoxThick),
+        voltage: Number(item.voltage),
+        doorTrackThick: Number(item.doorTrackThick),
+        motorSupport: String(+item.motorSupport),
+      };
+    });
 
     const body: TcreateQuotationContentDto = {
-      quotationDate: data.quotationDate ?? '',
-      validityPeriod: data.validityPeriod ?? '',
+      quotationDate: data_watch.quotationDate ?? '',
+      validityPeriod: data_watch.validityPeriod ?? '',
       //
-      customerId: data.customer?.id ?? '',
+      customerId: data_watch.customer?.id ?? '',
       //
-      projectName: data.projectName ?? '',
-      county: data.county ?? '',
-      district: data.district ?? '',
-      address: data.address ?? '',
-      contactPerson: data.contactPerson ?? '',
-      contactNumber: data.contactNumber ?? '',
-      discount: `${Number(data.discount ?? 0)}` ?? '100',
-      quantity: data.quantity ?? 0,
-      editNotes: data.editNotes ?? '',
-      totalPrice: data.totalPrice ?? 0,
-      status: data.status ?? 'Budget',
-      managerId: data.managerEmployee?.id ?? null,
-      supervisorId: data.supervisorEmployee?.id ?? null,
+      projectName: data_watch.projectName ?? '',
+      county: data_watch.county ?? '',
+      district: data_watch.district ?? '',
+      address: data_watch.address ?? '',
+      contactPerson: data_watch.contactPerson ?? '',
+      contactNumber: data_watch.contactNumber ?? '',
+      quantity: data_watch.quantity ?? 0,
+      editNotes: data_watch.editNotes ?? '',
+      status: data_watch.status ?? 'Budget',
+      managerId: data_watch.managerEmployee?.id ?? null,
+      supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
       // 目前只有admin可以呼叫這系列的api，但是agentId必須送，暫時先這樣處理
-      agentId: data.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
+      agentId: data_watch.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
+      //
+      //
+      annotations: anno,
+      quotationRanges: qr,
+      //
+      //
+      faxNumber: data_watch.customer?.fax ?? '',
+      trackProgress: data_watch.trackProgress ?? '',
+      projectProgress: data_watch.projectProgress ?? '',
+
+      discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
+      subTotal: Number(summary.subTotal.replaceAll(',', '')),
+      salesTax: Number(summary.salesTax.replaceAll(',', '')),
+      total: Number(summary.total.replaceAll(',', '')),
+      deliveryLocation: summary.deliveryLocation,
+      deliveryDate: summary.deliveryDate,
+      paymentMethods: paymentMethod,
+      //
+      //
+      products: prodArr,
+      others: getOthersPostBodyArr(),
+      //
       //
     };
 
     try {
       setIsLoading(true);
 
-      if (id) {
-        await apiPatchQuotation(body, id);
-        await update();
+      if (quotationId) {
+        const res = await apiPatchQuotation(body, quotationId);
+        showRootLoading(true, '正在更新附件');
+        // res跟api文件不一樣，現在沒時間修正
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await uploadAttachment(res.quotation.id);
+
+        await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
+        showRootLoading(true, '正在更新附件');
+        await uploadAttachment(res.id);
         router.push({
           query: {
             id: res.id,
@@ -466,11 +905,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setDisabled(true);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
+      showRootLoading(false);
     }
-
-    setIsLoading(false);
   };
 
+  // --------------------------------------------
   const reqSetReviewer = async ({
     reviewSales,
     reviewSupervisor,
@@ -478,7 +919,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reviewSales: TemployeeDto | undefined;
     reviewSupervisor: TemployeeDto | undefined;
   }) => {
-    if (!id) {
+    if (!quotationId) {
       return;
     }
 
@@ -487,7 +928,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiQuotationSubmitReview(id, {
+      await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
         reviewSupervisorEmployeeId,
       });
@@ -503,13 +944,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // 現在只有admin可以呼叫這系列的api，所以無法測試
   const reqReview = async () => {
-    if (!id) {
+    if (!quotationId) {
       return;
     }
 
     try {
       setIsLoading(true);
-      await apiQuotationReview(id);
+      await apiQuotationReview(quotationId);
       await update();
     } catch (error) {
       myAlert.err({ title: '審核失敗' });
@@ -529,7 +970,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
-            profile={data?.latestContent}
+            profile={quotationData?.latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
           />
@@ -539,7 +980,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/* 主產品設定 */}
-          {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
           <Table_prod
             disabled={disabled}
             prodList={productList}
@@ -547,7 +987,38 @@ function TheQuotation({ router }: { router: NextRouter }) {
             prodKeyArr={prodKeyArr}
             changeProdKeyArr={changeProdKeyArr}
             addProd={addProd}
+            setTargetProd={setTargetProd}
           />
+
+          {/* api還沒好 */}
+          <Table_acce
+            disabled={disabled}
+            acceList={targetProd?.acceList}
+            acceCellConfig={acceCellConfig}
+            acceKeyArr={acceKeyArr}
+            changeAcceKeyArr={changeAcceKeyArr}
+          />
+
+          <Table_options
+            disabled={disabled}
+            list={targetProd?.optionsList}
+            cellConfig={optionsCellConfig}
+            keyArr={optionsKeyArr}
+            changeKeyArr={changeOptionsKeyArr}
+            add={() => {
+              targetProd?.addOption();
+            }}
+          />
+
+          <Table_others
+            disabled={disabled}
+            list={othersList}
+            cellConfig={othersCellConfig}
+            keyArr={othersKeyArr}
+            changeKeyArr={changeOthersKeyArr}
+            add={addOthers}
+          />
+
           <div className={style.redWrapper}>
             {/* 材料配件設定 */}
             {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
@@ -559,17 +1030,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* <QuotationAdditions disabled={!allowEdit} /> */}
 
           {/* 備註/報價範圍/付款資訊 */}
-          {/* <QuotationTotal
-            classQuotation={classQuotation}
-            getFakeMemo={getFakeMemo}
-            getFakeQuotaRange={getFakeQuotaRange}
-            disabled={!allowEdit}
-          /> */}
+
+          <Summary
+            disabled={disabled}
+            payInfoControl={payInfoControl}
+            control_anno={control_anno}
+            control_qr={control_qr}
+            appendixParams={appendixParams}
+          />
 
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
+          <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
           {/*  */}
           {/*  */}
 
@@ -581,8 +1054,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 props: {
                   disabled: true,
                   value:
-                    (data?.latestContent.reviewSalesEmployee?.chName ||
-                      data?.latestContent.reviewSalesEmployee?.enName) ??
+                    (quotationData?.latestContent.reviewSalesEmployee?.chName ||
+                      quotationData?.latestContent.reviewSalesEmployee?.enName) ??
                     '',
                 },
               }}
@@ -593,8 +1066,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 props: {
                   disabled: true,
                   value:
-                    (data?.latestContent.reviewSupervisorEmployee?.chName ||
-                      data?.latestContent.reviewSupervisorEmployee?.enName) ??
+                    (quotationData?.latestContent.reviewSupervisorEmployee?.chName ||
+                      quotationData?.latestContent.reviewSupervisorEmployee?.enName) ??
                     '',
                 },
               }}
@@ -613,6 +1086,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      */}
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      */}
       {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => {
@@ -620,6 +1113,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         classQuotation={classQuotation}
       /> */}
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      */}
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      */}
 
       {/*  */}
       {/* <QuotationPdf_part
@@ -653,3 +1166,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
+
+const countPayInfoValue = ({
+  discount,
+  //
+  prodSubTotal,
+}: {
+  discount: string | number;
+  prodSubTotal: string | number;
+}) => {
+  const discountRate = new Decimal(discount || 0).div(100);
+
+  const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+  const tax = Decimal.mul(subTotal || 0, 0.05);
+  const total = Decimal.add(subTotal || 0, tax || 0);
+
+  const subTotalStr = subTotal.ceil().toLocaleString();
+  const taxStr = tax.ceil().toLocaleString();
+  const totalStr = total.ceil().toLocaleString();
+
+  return {
+    subTotal: subTotalStr,
+    salesTax: taxStr,
+    total: totalStr,
+  };
+};

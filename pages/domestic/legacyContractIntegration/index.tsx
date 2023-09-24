@@ -183,14 +183,12 @@ export default function LegacyContractIntegration() {
                 return discountRate.toString() + '%';
               })();
 
-              const tempDoorQty = (() => {
-                let qty = 0;
-                item.products.forEach((prod) => {
-                  qty = qty + prod.quantity;
-                });
-
-                return qty;
-              })();
+              let doorQty = 0;
+              item.products.forEach((prod) => {
+                if (prod.batch === 0) {
+                  doorQty = doorQty + prod.quantity;
+                }
+              });
 
               const dateStr = item.quoteDate
                 ? moment(convertDate_reduce1911(item.quoteDate)).format('yy-MM-DD')
@@ -205,7 +203,7 @@ export default function LegacyContractIntegration() {
                 contactPerson: item.contactPerson /**聯絡人 */,
                 contactNumber: item.contactNumber /**聯絡電話 */,
                 discount: discountRate /**折扣率 */,
-                quantity: tempDoorQty /**產品 數量 計算來的*/,
+                quantity: doorQty /**產品 數量 計算來的*/,
                 totalPrice: item.total /**總計 */,
                 customerName: item.customerName /**客戶名稱 */,
                 agentEmployeeName: item.operatorName /**經辦人 */,

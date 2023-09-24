@@ -1,0 +1,11 @@
+.container {
+  padding: 0 49px;
+  margin-top: 50px;
+}
+
+.block02 {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: space-between;
+  gap: 50px;
+}

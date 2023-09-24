@@ -14,8 +14,8 @@ import InputSelBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
-import { OptionWithIcon01 } from './selectCustom/optionWithIcon';
-import { SingleValueWithIcon01 } from './selectCustom/singleValueWithIcon';
+import { creOptionWithIcon } from './selectCustom/creOptionWithIcon';
+import { creSingleValueWithIcon } from './selectCustom/creSingleValueWithIcon';
 
 // css
 import scss from './inputSel.module.scss';
@@ -74,7 +74,8 @@ type TinputSelProps = {
   isMustPreStyle?: 'minimal';
   mustTipClassName?: string;
   //
-  suffix?: string;
+  // suffix?: string;
+  suffix?: React.ReactNode;
   suffixClassName?: string;
 };
 
@@ -227,7 +228,14 @@ export default function InputSel({
 
       {selectProps &&
         (() => {
-          const { dynaOptionsList, dynaOptionsKey, withIcon } = selectProps;
+          const {
+            //
+            dynaOptionsList,
+            dynaOptionsKey,
+            withIcon,
+            creOptionWithIconProps,
+            creSingleValueWithIconProps,
+          } = selectProps;
 
           let dynyOptions: Toption[] | undefined = undefined;
 
@@ -270,8 +278,11 @@ export default function InputSel({
 
           const customComponents = withIcon
             ? {
-                Option: OptionWithIcon01,
-                SingleValue: SingleValueWithIcon01,
+                // Option: OptionWithIcon01,
+                // SingleValue: SingleValueWithIcon01,
+                // 這兩個是HOC，不這樣做會型別錯誤
+                Option: creOptionWithIcon(creOptionWithIconProps),
+                SingleValue: creSingleValueWithIcon(creSingleValueWithIconProps),
               }
             : undefined;
 

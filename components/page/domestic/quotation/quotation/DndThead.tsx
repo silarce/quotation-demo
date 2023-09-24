@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
 // css
-import scss_p from './public.module.scss';
+import scss from './dndThead.module.scss';
 
 // --------------------
 import {
@@ -24,18 +24,10 @@ import { arrayMove, SortableContext, horizontalListSortingStrategy } from '@dnd-
 import { restrictToHorizontalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 
 // ==================================================================
-import { TcellConfig } from 'hooks/quotation/useProduct';
+
+import { TcellConfig } from './tbody';
 
 // ==================================================================
-// type TcellConfigList = {
-//   [key: string]: {
-//     label: string;
-//     theadItemClassName: string;
-//     inputSelProps: {
-//       wrapperStyle: { width: string };
-//     };
-//   };
-// };
 
 export default function DndThead({
   allowMove,
@@ -89,9 +81,9 @@ export default function DndThead({
 
   // ------------------------------------------------------------------
   return (
-    <div className={scss_p.thead}>
+    <div className={scss.thead}>
       {/*  */}
-      <div className={classNames(scss_p.emptyBlock)} style={{ width: emptyBlockWidth }} />
+      <div className={classNames(scss.emptyBlock)} style={{ width: emptyBlockWidth }} />
       {/*  */}
       <DndContext
         modifiers={[restrictToHorizontalAxis, restrictToWindowEdges]}
@@ -170,9 +162,9 @@ function TheadItem({
   return (
     <div
       className={classNames(
-        scss_p.theadCell,
-        allowMove && scss_p.allowMove,
-        isMoving && scss_p.isMoving,
+        scss.theadCell,
+        allowMove && scss.allowMove,
+        isMoving && scss.isMoving,
         className,
         'relative'
       )}
