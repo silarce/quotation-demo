@@ -405,6 +405,72 @@ class Class_product {
         // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
         // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
         // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+        //把req系列的方法改為async
+        // 寫法像這樣
+        // async foo (){}
+        // 然後重新思考設計呼叫鍊
+
         gearNumber: acceList.motor?.gearNumber,
         chains: this._doorGeneralSpecs.sprocketWheelChains,
       };
