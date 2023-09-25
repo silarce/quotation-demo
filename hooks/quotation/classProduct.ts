@@ -178,6 +178,10 @@ class Class_product {
         data: acce,
         key: key,
         prod: this,
+        callReqGetCodeNumber: () => {
+          this.shouldCall_pgpb = true;
+          this.callAllReq();
+        },
       });
       list[key] = theClass;
     });
@@ -452,7 +456,7 @@ class Class_product {
       generateBomObj_empty[key] = {
         id,
         material,
-        materialSurface,
+        materialSurface: materialSurface || undefined,
         isPainted,
       };
     });
@@ -470,18 +474,12 @@ class Class_product {
       keyArr.forEach((key) => {
         const item = res[key];
         acceList[key].codeNumber = item.number;
+        acceList[key].componentId = item.id;
       });
     }
   } // reqProdGenerateDoorProductBom
 
   async reqChain() {
-    // shouldCall_cgs
-    // shouldCall_pac
-    // shouldCall_pgpb
-    //  req_calcGeneralSpec
-    //  req_getProdAvailableComponents
-    //  reqProdGenerateDoorProductBom
-
     if (this.shouldCall_cgs) {
       await this.req_calcGeneralSpec();
     }
@@ -617,10 +615,8 @@ class Class_product {
       headBox: headBox || creEmptyAcce(),
     });
 
-    if (!isGearNumberChanged) {
-      this.shouldCall_pgpb = true;
-      this.callAllReq();
-    }
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
 
     this.calcAcceAllPrice();
     this.calcProdAllprice();
@@ -652,26 +648,6 @@ class Class_product {
       this.boxB = String(boxB / 1000);
     }
   }
-
-  // private countDualPrice() {
-  //   const dualPrice = Decimal.mul(this._prodData.price || 0, this.quantity || 0).toString();
-  //   this._dualPrice = dualPrice;
-  //   this._prodData.dualPrice = Number(dualPrice);
-  // }
-
-  // private countPrice() {
-  //   const price = this.price.replace(/,/g, '') || '0';
-  //   const discountRate = this.discountRate || '0';
-
-  //   this.unitPrice = Decimal.mul(price, Decimal.div(discountRate, 100)).toString();
-  // }
-
-  // private countTotalPrice() {
-  //   const quantity = this.quantity.replace(/,/g, '') || 0;
-  //   const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
-  //   const total = Decimal.mul(quantity, unitPrice).toString();
-  //   this.totalPrice = total;
-  // }
 
   private optionsAllPrice = {
     price: 0,

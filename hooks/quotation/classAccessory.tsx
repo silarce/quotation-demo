@@ -18,21 +18,24 @@ import { TaccessoryKey } from './useProduct';
 // ===========================================================
 class Class_accessory {
   constructor({
-    //
     reRender,
     data,
     key,
     prod,
+    callReqGetCodeNumber,
   }: {
     reRender: TreRender;
     data: Taccessory;
     key: TaccessoryKey;
     prod: Class_product;
+    callReqGetCodeNumber: () => void;
   }) {
     this.reRender = reRender;
     this._prod = prod;
     this._acce = data;
     this.key = key;
+
+    this.callReqGetCodeNumber = callReqGetCodeNumber;
 
     if (!this._acce.material) {
       if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
@@ -57,6 +60,7 @@ class Class_accessory {
   private _prod;
   private _acce;
   readonly key;
+  readonly callReqGetCodeNumber;
   //
   //
   // private _material: undefined | string = undefined;
@@ -69,7 +73,6 @@ class Class_accessory {
   private _totalPrice = 0;
   //
   //
-  codeNumber = '';
 
   // ---------------------------------------------------------
 
@@ -361,6 +364,7 @@ class Class_accessory {
     }
 
     this._acce.material = v;
+    this.callReqGetCodeNumber();
     this.reRender();
   }
 
@@ -369,6 +373,7 @@ class Class_accessory {
   }
   set surface(v) {
     this._acce.materialSurface = v;
+    this.callReqGetCodeNumber();
     this.reRender();
   }
 
@@ -378,6 +383,7 @@ class Class_accessory {
 
   set isPainted(v) {
     this._acce.isPainted = v;
+    this.callReqGetCodeNumber();
     this.reRender();
   }
 
@@ -391,6 +397,22 @@ class Class_accessory {
   set quantity(str) {
     this._acce.quantity = str;
     this.calcAllPrice();
+    this.reRender();
+  }
+
+  get codeNumber() {
+    return this._acce.number ?? '';
+  }
+  set codeNumber(v) {
+    this._acce.number = v;
+    this.reRender();
+  }
+
+  get componentId() {
+    return this._acce.componentId ?? '';
+  }
+  set componentId(v) {
+    this._acce.componentId = v;
     this.reRender();
   }
 
@@ -419,8 +441,8 @@ class Class_accessory {
       price: this._acce.price ?? 0,
       quantity: this._acce.quantity ?? '0',
       // 下面這幾個先跳過
-      number: '',
-      componentId: '',
+      number: this.codeNumber ?? '',
+      componentId: this.componentId ?? '',
       rawData: '',
       bom: '',
       // order: '', //在外面處理
