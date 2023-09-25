@@ -229,6 +229,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     acceKeyArr,
     acceCellConfig,
     changeAcceKeyArr,
+    acceVKeyArr,
     //
     optionsKeyArr,
     changeOptionsKeyArr,
@@ -997,6 +998,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             acceCellConfig={acceCellConfig}
             acceKeyArr={acceKeyArr}
             changeAcceKeyArr={changeAcceKeyArr}
+            defalutVKeyArr={acceVKeyArr}
           />
 
           <Table_options

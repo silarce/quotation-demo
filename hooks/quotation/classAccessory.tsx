@@ -839,7 +839,7 @@ type Tkit = {
 
 const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   slat: {
-    typeName: '門片',
+    typeName: '捲門片',
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
@@ -887,7 +887,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
     unit: 'M',
   },
   motor: {
-    typeName: '馬達',
+    typeName: '馬達機',
     creDesc: creDesc_motors,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -901,7 +901,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
     unit: '組',
   },
   headBox: {
-    typeName: '捲箱',
+    typeName: '門箱',
     creDesc: creDesc_headBoxes,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },

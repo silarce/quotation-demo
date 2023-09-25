@@ -18,6 +18,7 @@ export default function Table_acce({
   acceCellConfig,
   acceKeyArr,
   changeAcceKeyArr,
+  defalutVKeyArr,
 }: // addProd,
 // setTargetProd,
 {
@@ -26,6 +27,7 @@ export default function Table_acce({
   acceCellConfig: TcellConfig;
   acceKeyArr: string[];
   changeAcceKeyArr: (arr: string[]) => void;
+  defalutVKeyArr: string[];
   // addProd: () => void;
   // setTargetProd: (v: Class_product) => void;
 }) {
@@ -73,6 +75,7 @@ export default function Table_acce({
                 // setTargetProd(obj.item as Class_product);
               }}
               panelBox="acceBox"
+              defalutVKeyArr={defalutVKeyArr}
             />
           )}
 

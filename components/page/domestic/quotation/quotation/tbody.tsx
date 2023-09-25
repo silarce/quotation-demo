@@ -22,6 +22,7 @@ import type { Toption } from 'js/utils/options/options';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';
+
 import { DndContext, DraggableAttributes } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -65,6 +66,7 @@ export default function Tbody({
   prodCellConfig,
   onRowClick,
   panelBox,
+  defalutVKeyArr,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -74,6 +76,7 @@ export default function Tbody({
   prodCellConfig: TcellConfig;
   onRowClick?: (onj: { item: Titem }) => void;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
+  defalutVKeyArr?: string[];
 }) {
   // ---------------------------------------------------------------
 
@@ -86,7 +89,7 @@ export default function Tbody({
     onDragEnd,
     onDragStart,
   } = useVerticalDnd({
-    listKeyArr: Object.keys(rowList),
+    listKeyArr: defalutVKeyArr || Object.keys(rowList),
     resetTrigger: rowList,
   });
 
@@ -145,6 +148,7 @@ export default function Tbody({
                   setActiveKey(key);
                   onRowClick && onRowClick({ item: item });
                 }}
+                defalutVKeyArr={defalutVKeyArr}
               />
             );
           })}
@@ -279,6 +283,7 @@ function DndRow({
   pIndex,
   item,
   keyArr: keyArr,
+  defalutVKeyArr,
   isMoving,
   disabled,
   onRowClick,
@@ -292,6 +297,7 @@ function DndRow({
   item: Titem;
   // prodKeyArr: TprodKey[];
   keyArr: string[];
+  defalutVKeyArr?: string[];
   isMoving: boolean;
   disabled: boolean;
   //

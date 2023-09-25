@@ -249,6 +249,16 @@ const useProductList = ({
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   const [acceKeyArr, setAcceKeyArr] = useState<string[]>(acceKeyArrOri());
+  const [acceVKeyArr, setacceVKeyArr] = useState<string[]>([
+    'slat',
+    'roller',
+    'headBox',
+    'bottomBar',
+    'guideRail',
+    'motor',
+    'motorAccessories',
+    'sidePlate',
+  ]);
 
   const changeAcceKeyArr = (v: string[]) => {
     setAcceKeyArr(v);
@@ -354,6 +364,7 @@ const useProductList = ({
     subTotal,
     //
     acceKeyArr,
+    acceVKeyArr,
     acceCellConfig,
     changeAcceKeyArr,
     //
