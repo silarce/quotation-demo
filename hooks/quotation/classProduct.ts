@@ -241,6 +241,34 @@ class Class_product {
     this.reRender();
   }
 
+  resetProd() {
+    const empty = emptyProdOri();
+
+    const prod: Tprod = {
+      ...empty,
+      doorType: this.doorType,
+      length: this.length,
+      width: this.width,
+      height: this.height,
+      area: this.area,
+    };
+
+    this._prodData = prod;
+    this._doorGeneralSpecs = undefined;
+
+    this._availableComponents = undefined;
+    this._thickness = '';
+    this._defaultBoxB = '';
+    this._boxD = '';
+
+    this._quantity = String(this._prodData.quantity);
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
+    this._unitPrice = String(this._prodData.unitPrice);
+    this._totalPrice = String(this._prodData.totalPrice);
+    this.findBDoptions();
+  } // resetProd
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -1029,7 +1057,12 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
+    this.resetProd();
 
+    // 這個呼叫鍊有問題，要記得改
+    // 這個呼叫鍊有問題，要記得改
+    // 這個呼叫鍊有問題，要記得改
+    // 這個呼叫鍊有問題，要記得改
     this.req_calcGeneralSpec();
     this.req_getProdAvailableComponents();
     this.reqProdGenerateDoorProductBom();
@@ -1044,6 +1077,7 @@ class Class_product {
     this._prodData.length = v;
     this._prodData.width = '0';
     this.area = this.calcArea();
+    this.resetProd();
     this.req_calcGeneralSpec();
     this.reRender();
   }
@@ -1055,6 +1089,7 @@ class Class_product {
     this._prodData.width = v;
     this._prodData.length = '0';
     this.area = this.calcArea();
+    this.resetProd();
     this.req_calcGeneralSpec();
     this.reRender();
   }
@@ -1065,6 +1100,7 @@ class Class_product {
   set height(v) {
     this._prodData.height = v;
     this.area = this.calcArea();
+    this.resetProd();
     this.req_calcGeneralSpec();
     this.reRender();
   }
