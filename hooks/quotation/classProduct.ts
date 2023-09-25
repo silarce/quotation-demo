@@ -24,7 +24,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 
 // ===========================================================
 // child class
-import { Class_accessory, Taccessory, creNotConformAcce } from './classAccessory';
+import { Class_accessory, Taccessory, creEmptyAcce, acceTypeLookUp } from './classAccessory';
 import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
@@ -39,7 +39,11 @@ import type {
   TquotationProductOptionDto,
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto_ComponentInfo,
+  TcreateQuotationProductOptionDto,
+  TcreateQuotationProductComponentsDto,
+  TquotationProductComponentsDto,
 } from 'js/api/dtoTypes';
+
 import type { TreRender, TaccessoryKey } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -90,14 +94,21 @@ class Class_product {
     this.findBDoptions();
 
     // __________________________________________________________;
-    // accessoryDataArr.forEach((data, index) => {
-    // const id = index;
-    // this._acceList[`${id}`] = new Class_accessory({
-    //   reRender,
-    //   delSelf,
-    //   // copySelf,
-    // });
-    // });
+
+    // 建立材料配件
+
+    const accePreList: Partial<{ [key in TaccessoryKey]: Taccessory }> = {};
+    this._prodData.components.forEach((item) => {
+      const key = acceTypeLookUp[item.type];
+      accePreList[key] = {
+        ...item,
+        doorModelName: key,
+        code: '',
+        specialSpec: '',
+      };
+    });
+
+    this.creAcceList(accePreList as { [key in TaccessoryKey]: Taccessory });
 
     // ___________________________________________________________
     // 建立選配設定
@@ -157,10 +168,6 @@ class Class_product {
 
     keyArr.forEach((key) => {
       const acce = dataList[key];
-
-      if (key === 'motor') {
-        console.log(acce);
-      }
 
       if (!acce) {
         return null;
@@ -600,14 +607,14 @@ class Class_product {
     const isGearNumberChanged = this.acceList?.motor?.gearNumber !== motor?.gearNumber;
 
     this.creAcceList({
-      slat: slat || creNotConformAcce(),
-      bottomBar: bottomBar || creNotConformAcce(),
-      guideRail: guideRail || creNotConformAcce(),
-      motor: motor || creNotConformAcce(),
-      sidePlate: sidePlate || creNotConformAcce(),
-      roller: roller || creNotConformAcce(),
-      motorAccessories: motorAccessories || creNotConformAcce(),
-      headBox: headBox || creNotConformAcce(),
+      slat: slat || creEmptyAcce(),
+      bottomBar: bottomBar || creEmptyAcce(),
+      guideRail: guideRail || creEmptyAcce(),
+      motor: motor || creEmptyAcce(),
+      sidePlate: sidePlate || creEmptyAcce(),
+      roller: roller || creEmptyAcce(),
+      motorAccessories: motorAccessories || creEmptyAcce(),
+      headBox: headBox || creEmptyAcce(),
     });
 
     if (!isGearNumberChanged) {
@@ -1487,7 +1494,20 @@ class Class_product {
   //
 
   get body() {
-    const options = Object.values(this.optionsList).map((item) => item.body);
+    // const options = Object.values(this.optionsList).map((item) => item.body);
+    const options: TcreateQuotationProductOptionDto[] = Object.values(this.optionsList).map((item, index) => {
+      return { ...item.body, order: index };
+    });
+
+    const components: TcreateQuotationProductComponentsDto[] = Object.values(this.acceList ?? {}).map((acce, index) => {
+      const body = acce.body;
+
+      return {
+        ...body,
+        order: index,
+        type: body.type as TcreateQuotationProductComponentsDto['type'],
+      };
+    });
 
     return {
       ...this._prodData,
@@ -1497,15 +1517,8 @@ class Class_product {
       length: String(Number(this._prodData.length) * 1000),
       height: String(Number(this._prodData.height) * 1000),
       boxB: String(Number(this._prodData.width) * 1000),
-      components: [
-        {
-          type: 'slatType',
-          number: 'string',
-          componentId: 'string',
-          rawData: 'string',
-          bom: 'string',
-        },
-      ],
+
+      components: components,
     };
   }
 
@@ -1561,6 +1574,7 @@ type Tprod = {
   close: string; // 開閉方式
   //
   options: TquotationProductOptionDto[];
+  components: TquotationProductComponentsDto[];
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -2098,6 +2112,7 @@ const emptyProdOri: () => Tprod = () => {
     close: '',
     //
     options: [],
+    components: [],
   };
 };
 

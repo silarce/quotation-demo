@@ -31,35 +31,39 @@ class Class_accessory {
   }) {
     this.reRender = reRender;
     this._prod = prod;
-    this._data = data;
+    this._acce = data;
     this.key = key;
 
-    if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
-      this._material = acceLookUp[key].options[0].value;
+    if (!this._acce.material) {
+      if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
+        this._acce.material = acceLookUp[key].options[0].value;
+      }
     }
 
-    this._quantity = calcDefaultValue({
-      key,
-      w: Number(prod.width),
-      l: Number(prod.length),
-      h: Number(prod.height),
-      b: Number(prod.boxB),
-    });
+    if (!this._acce.quantity) {
+      this._acce.quantity = calcDefaultValue({
+        key,
+        w: Number(prod.width),
+        l: Number(prod.length),
+        h: Number(prod.height),
+        b: Number(prod.boxB),
+      });
+    }
 
     this.calcAllPrice();
   } // constructor
 
   private reRender;
   private _prod;
-  private _data;
+  private _acce;
   readonly key;
   //
   //
-  private _material: undefined | string = undefined;
-  private _surface: undefined | string = undefined;
-  private _isPainted = false;
+  // private _material: undefined | string = undefined;
+  // private _surface: undefined | string = undefined;
+  // private _isPainted = false;
 
-  private _quantity = '';
+  // private _quantity = '';
   private _dualPrice = 0;
   private _unitPrice = 0;
   private _totalPrice = 0;
@@ -93,7 +97,7 @@ class Class_accessory {
     const discount = new Decimal(this._prod.discount).div(100);
 
     const price = this.price || 0;
-    const quantity = Number(this._quantity || 0);
+    const quantity = Number(this._acce.quantity || 0);
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -120,10 +124,10 @@ class Class_accessory {
 
   get componentInfo() {
     const info: TgenerateDoorProductBomDto_ComponentInfo = {
-      id: this._data.id,
-      material: this._material ?? '', // 注意，api不接受空字串
-      materialSurface: this._surface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
-      isPainted: this._isPainted,
+      id: this._acce.id,
+      material: this._acce.material ?? '', // 注意，api不接受空字串
+      materialSurface: this._acce.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
+      isPainted: !!this._acce.isPainted,
     };
 
     return info;
@@ -153,7 +157,7 @@ class Class_accessory {
   }
 
   get desc() {
-    if (!this._data.id) {
+    if (!this._acce.id) {
       return '沒有符合規格的產品';
     }
 
@@ -162,31 +166,31 @@ class Class_accessory {
 
   // -------------------------------------------1--------------
   get doorModelName() {
-    return this._data.doorModelName;
+    return this._acce.doorModelName;
   }
   set doorModelName(v) {
-    this._data.doorModelName = v;
+    this._acce.doorModelName = v;
     this.reRender();
   }
 
   get code() {
-    return this._data.code;
+    return this._acce.code;
   }
   set code(v) {
-    this._data.code = v;
+    this._acce.code = v;
     this.reRender();
   }
 
   get specialSpec() {
-    return this._data.specialSpec;
+    return this._acce.specialSpec;
   }
   set specialSpec(v) {
-    this._data.specialSpec = v;
+    this._acce.specialSpec = v;
     this.reRender();
   }
 
   get price() {
-    return this._data.price;
+    return this._acce.price;
   }
   // set price(v) {
   //   this._data.price = v;
@@ -194,7 +198,7 @@ class Class_accessory {
   // }
 
   get name() {
-    return this._data.name;
+    return this._acce.name;
   }
   // set name(v) {
   //   this._data.name = v;
@@ -202,146 +206,146 @@ class Class_accessory {
   // }
 
   get isAntiTyphoon() {
-    return this._data.isAntiTyphoon;
+    return this._acce.isAntiTyphoon;
   }
   set isAntiTyphoon(v) {
-    this._data.isAntiTyphoon = v;
+    this._acce.isAntiTyphoon = v;
     this.reRender();
   }
 
   get gearNumber() {
-    return this._data.gearNumber;
+    return this._acce.gearNumber;
   }
   set gearNumber(v) {
-    this._data.gearNumber = v;
+    this._acce.gearNumber = v;
     this.reRender();
   }
 
   get motorVendor() {
-    return this._data.motorVendor;
+    return this._acce.motorVendor;
   }
   set motorVendor(v) {
-    this._data.motorVendor = v;
+    this._acce.motorVendor = v;
     this.reRender();
   }
 
   get bearingType() {
-    return this._data.bearingType;
+    return this._acce.bearingType;
   }
   set bearingType(v) {
-    this._data.bearingType = v;
+    this._acce.bearingType = v;
     this.reRender();
   }
 
   get thickness() {
-    return this._data.thickness;
+    return this._acce.thickness;
   }
   set thickness(v) {
-    this._data.thickness = v;
+    this._acce.thickness = v;
     this.reRender();
   }
 
   get isIntegrated() {
-    return this._data.isIntegrated;
+    return this._acce.isIntegrated;
   }
   set isIntegrated(v) {
-    this._data.isIntegrated = v;
+    this._acce.isIntegrated = v;
     this.reRender();
   }
 
   get isWaterProof() {
-    return this._data.isWaterProof;
+    return this._acce.isWaterProof;
   }
   set isWaterProof(v) {
-    this._data.isWaterProof = v;
+    this._acce.isWaterProof = v;
     this.reRender();
   }
 
   get hasAluminumBarrier() {
-    return this._data.hasAluminumBarrier;
+    return this._acce.hasAluminumBarrier;
   }
   set hasAluminumBarrier(v) {
-    this._data.hasAluminumBarrier = v;
+    this._acce.hasAluminumBarrier = v;
     this.reRender();
   }
 
   get hasSilencingStrip() {
-    return this._data.hasSilencingStrip;
+    return this._acce.hasSilencingStrip;
   }
   set hasSilencingStrip(v) {
-    this._data.hasSilencingStrip = v;
+    this._acce.hasSilencingStrip = v;
     this.reRender();
   }
 
   get maxDoorWeight() {
-    return this._data.maxDoorWeight;
+    return this._acce.maxDoorWeight;
   }
   set maxDoorWeight(v) {
-    this._data.maxDoorWeight = v;
+    this._acce.maxDoorWeight = v;
     this.reRender();
   }
 
   get minDoorWeight() {
-    return this._data.minDoorWeight;
+    return this._acce.minDoorWeight;
   }
   set minDoorWeight(v) {
-    this._data.minDoorWeight = v;
+    this._acce.minDoorWeight = v;
     this.reRender();
   }
 
   get diameter() {
-    return this._data.diameter;
+    return this._acce.diameter;
   }
   set diameter(v) {
-    this._data.diameter = v;
+    this._acce.diameter = v;
     this.reRender();
   }
 
   get horsePower() {
-    return this._data.horsePower;
+    return this._acce.horsePower;
   }
   set horsePower(v) {
-    this._data.horsePower = v;
+    this._acce.horsePower = v;
     this.reRender();
   }
 
   get phase() {
-    return this._data.phase;
+    return this._acce.phase;
   }
   set phase(v) {
-    this._data.phase = v;
+    this._acce.phase = v;
     this.reRender();
   }
 
   get voltage() {
-    return this._data.voltage;
+    return this._acce.voltage;
   }
   set voltage(v) {
-    this._data.voltage = v;
+    this._acce.voltage = v;
     this.reRender();
   }
 
   get loadWeight() {
-    return this._data.loadWeight;
+    return this._acce.loadWeight;
   }
   set loadWeight(v) {
-    this._data.loadWeight = v;
+    this._acce.loadWeight = v;
     this.reRender();
   }
 
   get hasSupportStand() {
-    return this._data.hasSupportStand;
+    return this._acce.hasSupportStand;
   }
   set hasSupportStand(v) {
-    this._data.hasSupportStand = v;
+    this._acce.hasSupportStand = v;
     this.reRender();
   }
 
   get chains() {
-    return this._data.chains;
+    return this._acce.chains;
   }
   set chains(v) {
-    this._data.chains = v;
+    this._acce.chains = v;
     this.reRender();
   }
   // --------------------------------------------------
@@ -349,31 +353,31 @@ class Class_accessory {
   // 不來自於Taccessory
 
   get material() {
-    return this._material;
+    return this._acce.material ?? '';
   }
   set material(v) {
     if (!checkIsSST(v ?? '')) {
-      this._surface = '';
+      this._acce.materialSurface = '';
     }
 
-    this._material = v;
+    this._acce.material = v;
     this.reRender();
   }
 
   get surface() {
-    return this._surface;
+    return this._acce.materialSurface;
   }
   set surface(v) {
-    this._surface = v;
+    this._acce.materialSurface = v;
     this.reRender();
   }
 
   get isPainted() {
-    return this._isPainted;
+    return this._acce.isPainted;
   }
 
   set isPainted(v) {
-    this._isPainted = v;
+    this._acce.isPainted = v;
     this.reRender();
   }
 
@@ -382,10 +386,10 @@ class Class_accessory {
   }
 
   get quantity() {
-    return this._quantity;
+    return this._acce.quantity ?? '';
   }
   set quantity(str) {
-    this._quantity = str;
+    this._acce.quantity = str;
     this.calcAllPrice();
     this.reRender();
   }
@@ -405,6 +409,23 @@ class Class_accessory {
   get unit() {
     return acceLookUp[this.key].unit;
   }
+
+  get body() {
+    return {
+      type: acceLookUp[this.key].type,
+      material: this._acce.material ?? '',
+      materialSurface: this._acce.materialSurface ?? '',
+      isPainted: this._acce.isPainted ?? false,
+      price: this._acce.price ?? 0,
+      quantity: this._acce.quantity ?? '0',
+      // 下面這幾個先跳過
+      number: '',
+      componentId: '',
+      rawData: '',
+      bom: '',
+      // order: '', //在外面處理
+    };
+  }
 } // Class_accessory
 
 // ===========================================================
@@ -416,7 +437,6 @@ type Taccessory = {
   doorModelName: string; // 門型名稱
   code: string; // 編號
   specialSpec: string | null; // 特殊規格
-  price: number | null;
   name?: string; // TdoorMotorAccessoriesDto沒有name
 
   // ----------------------------------------------
@@ -473,6 +493,18 @@ type Taccessory = {
   // 兩個property，都是共有property
   //
   //
+
+  // 以下這些來自TcreateQuotationProductComponentsDto
+  material?: string;
+  materialSurface?: string;
+  isPainted?: boolean;
+  price?: number | null;
+  quantity?: string;
+  number?: string;
+  componentId?: string;
+  rawData?: string;
+  bom?: string;
+  order?: number;
 }; //  Taccessory
 
 // type TacceKey = keyof Taccessory;
@@ -679,17 +711,6 @@ const acceCellConfig: TcellConfig = {
 // ============================================================================================
 // ============================================================================================
 
-const creNotConformAcce = () => ({
-  id: '',
-  createdAt: '',
-  updatedAt: '',
-  doorModelName: '',
-  // code: '沒有符合規格的產品',
-  desc: '沒有符合規格的產品',
-  specialSpec: '---',
-  price: 0,
-});
-
 const creDesc_slats = (classAcce: Class_accessory) => {
   const { isAntiTyphoon, material, surface, thickness, name } = classAcce;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
@@ -855,6 +876,8 @@ const confomtTree = {
 
 type Tkit = {
   typeName: string;
+  // type是api要收的東西
+  type: 'slatType' | 'bottomBar' | 'guideRail' | 'sidePlateType' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
   creDesc: (classAcce: Class_accessory) => string;
   options: Toption[];
   hiddenKeyArr: string[];
@@ -864,6 +887,7 @@ type Tkit = {
 const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   slat: {
     typeName: '捲門片',
+    type: 'slatType',
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
@@ -875,6 +899,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   bottomBar: {
     typeName: '底座',
+    type: 'bottomBar',
     creDesc: creDesc_bottomBars,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
@@ -887,6 +912,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   guideRail: {
     typeName: '門軌',
+    type: 'guideRail',
     creDesc: creDesc_guideRails,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
@@ -899,12 +925,14 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   sidePlate: {
     typeName: '支板',
+    type: 'sidePlateType',
     creDesc: creDesc_sidePlates,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
   },
   roller: {
     typeName: '捲軸',
+    type: 'roller',
     creDesc: creDesc_rollers,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -912,6 +940,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   motor: {
     typeName: '馬達機',
+    type: 'motor',
     creDesc: creDesc_motors,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -919,6 +948,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   motorAccessories: {
     typeName: '馬達配件',
+    type: 'motorAccessories',
     creDesc: creDesc_motorAccessories,
     options: [{ value: '其他', label: '其他' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -926,6 +956,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   headBox: {
     typeName: '門箱',
+    type: 'headBox',
     creDesc: creDesc_headBoxes,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
@@ -937,6 +968,17 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
     unit: 'M',
   },
 };
+
+const acceTypeLookUp = {
+  slatType: 'slat',
+  bottomBar: 'bottomBar',
+  guideRail: 'guideRail',
+  sidePlateType: 'sidePlate',
+  roller: 'roller',
+  motor: 'motor',
+  motorAccessories: 'motorAccessories',
+  headBox: 'headBox',
+} as const;
 
 const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {
   const option = options.find((option) => option.value === value);
@@ -984,6 +1026,22 @@ const calcDefaultValue = ({
   // motors motorAccessories
 };
 
+const creEmptyAcce: () => Taccessory = () => ({
+  id: '',
+  createdAt: '',
+  updatedAt: '',
+  doorModelName: '',
+  code: '',
+  desc: '',
+  specialSpec: '---',
+
+  material: '',
+  materialSurface: '',
+  isPainted: false,
+  price: 0,
+  quantity: '',
+});
+
 // ===========================================================
-export { Class_accessory, acceKeyArrOri, acceCellConfig, creNotConformAcce };
+export { Class_accessory, acceKeyArrOri, acceCellConfig, creEmptyAcce, acceTypeLookUp };
 export type { Taccessory };

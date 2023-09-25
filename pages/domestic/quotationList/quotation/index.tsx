@@ -825,13 +825,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item) => {
+    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item, index) => {
       return {
         ...item.body,
         rollUpBoxThick: Number(item.rollUpBoxThick),
         voltage: Number(item.voltage),
         doorTrackThick: Number(item.doorTrackThick),
         motorSupport: String(+item.motorSupport),
+        //
+        quantity: String(item.quantity),
+        materialSurface: item.surface ?? '',
+        isPainted: false,
+        order: index,
       };
     });
 

@@ -144,12 +144,12 @@ const useProductList = ({
         length: String(Number(prod.length) / 1000),
         height: String(Number(prod.height) / 1000),
         boxB: String(Number(prod.width) / 1000),
-        options: prod.options ?? [],
-        // !!! 後端實際上沒有送quantity !!!
-        // !!! 後端實際上沒有送quantity !!!
-        quantity: prod.quantity ?? 1,
-        // !!! 後端實際上沒有送quantity !!!
-        // !!! 後端實際上沒有送quantity !!!
+        // options: prod.options ?? [],
+
+        quantity: prod.items.length,
+        // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
+        options: prod.items[0].options ?? [],
+        components: prod.items[0].components ?? [],
       };
 
       list[key] = new Class_product({
