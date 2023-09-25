@@ -1405,6 +1405,7 @@ class Class_product {
   }
   set voltage(str) {
     this._prodData.voltage = str;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -2217,6 +2218,14 @@ const filter_sidePlates = ({
     weight: number; // /products/door/calc-general-spec給的weight
   };
 }) => {
+  // console.log('bearingType', filterParams.bearingType);
+  // console.log('gearNumber', filterParams.gearNumber);
+  // console.log('isIntegrated', filterParams.isIntegrated);
+  // console.log('motorVendor', filterParams.motorVendor);
+  // console.log('weight', filterParams.weight);
+  // console.log('----------------------------------------------------');
+  // ---------------------------------------
+
   const filteredArr = dataArr.filter((data) => {
     if (data.bearingType !== null && data.bearingType !== filterParams.bearingType) {
       return false;
@@ -2275,6 +2284,14 @@ const filter_motors = ({
     hasSupportStand: boolean; // 有腳 // 馬達支撐架
   };
 }) => {
+  console.log('horsePower', filterParams.horsePower);
+  console.log('motorVendor', filterParams.motorVendor);
+  console.log('phase', filterParams.phase);
+  console.log('voltage', filterParams.voltage);
+  console.log('weight', filterParams.weight);
+  console.log('hasSupportStand', filterParams.hasSupportStand);
+  console.log('----------------------------------------------------');
+
   const filteredArr = dataArr.filter((data) => {
     let horsePoswer = filterParams.horsePower;
     let d_horsePower = data.horsePower;
