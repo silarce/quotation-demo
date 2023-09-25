@@ -937,19 +937,19 @@ const calcDefaultValue = ({
   const hb = h + b;
   const wl = w || l;
 
-  if (key === 'slats') {
+  if (key === 'slat') {
     return new Decimal(wl).mul(hb).toFixed(2); // m2
   }
 
-  if (key === 'bottomBars' || key === 'rollers' || key === 'headBoxes') {
+  if (key === 'bottomBar' || key === 'roller' || key === 'headBox') {
     return wl.toFixed(2); // M
   }
 
-  if (key === 'guideRails') {
+  if (key === 'guideRail') {
     return h.toFixed(2); // M
   }
 
-  if (key === 'motors' || key === 'motorAccessories') {
+  if (key === 'motor' || key === 'motorAccessories') {
     return '1.00';
   }
 
