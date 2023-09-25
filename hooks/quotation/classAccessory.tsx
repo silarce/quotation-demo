@@ -153,6 +153,10 @@ class Class_accessory {
   }
 
   get desc() {
+    if (!this._data.id) {
+      return '沒有符合規格的產品';
+    }
+
     return acceLookUp[this.key].creDesc(this);
   }
 
@@ -476,6 +480,7 @@ type Taccessory = {
 const acceKeyArrOri: () => string[] = () => {
   return [
     // 'acceName',
+    'codeNumber',
     'desc',
     // 'name',
     'material',
@@ -508,6 +513,18 @@ const acceCellConfig: TcellConfig = {
   },
   code: {
     label: 'code',
+    inputSelProps: {
+      wrapperStyle: { width: '100px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  codeNumber: {
+    label: '代號',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       showBaseline: 'invisible',

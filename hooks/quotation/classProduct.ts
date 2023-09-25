@@ -134,20 +134,15 @@ class Class_product {
   // ---------------------------------------------------------
   // req呼叫控制
   // 防抖
-  cgsTimeout: NodeJS.Timeout | null = null;
-  pacTimeout: NodeJS.Timeout | null = null;
-  pgpbTimeout: NodeJS.Timeout | null = null;
+  // cgsTimeout: NodeJS.Timeout | null = null;
+  // pacTimeout: NodeJS.Timeout | null = null;
+  // pgpbTimeout: NodeJS.Timeout | null = null;
 
   callAllTimeoutId: NodeJS.Timeout | null = null;
 
   shouldCall_cgs = false; //req_calcGeneralSpec
   shouldCall_pac = false; //req_getProdAvailableComponents
   shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
-
-  // api呼叫控制，剛開始做。先去修改別的東西
-  // api呼叫控制，剛開始做。先去修改別的東西
-  // api呼叫控制，剛開始做。先去修改別的東西
-  // api呼叫控制，剛開始做。先去修改別的東西
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -162,6 +157,10 @@ class Class_product {
 
     keyArr.forEach((key) => {
       const acce = dataList[key];
+
+      if (key === 'motor') {
+        console.log(acce);
+      }
 
       if (!acce) {
         return null;
@@ -272,242 +271,248 @@ class Class_product {
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-
-  async req_calcGeneralSpec({ isAntiTyphoonChange = false }: { isAntiTyphoonChange?: boolean } = {}) {
-    const req = async () => {
-      if (!this.doorType || !this.height) {
-        return;
-      }
-
-      if (!this.length && !this.width) {
-        return;
-      }
-
-      const body = (() => {
-        let fullWidth: number | undefined;
-        let WG: number | undefined;
-
-        if (Number(this.length)) {
-          fullWidth = Number(this.length) * 1000;
-        } else if (Number(this.width)) {
-          WG = Number(this.width) * 1000;
-        }
-
-        return {
-          modelName: this.doorType as TpcgsPrams['modelName'],
-          height: Number(this.height) * 1000,
-          isAntiTyphoon: this.typhoonProtection,
-          fullWidth,
-          WG,
-        };
-      })();
-
-      if (!body.fullWidth && !body.WG) {
-        return;
-      }
-
-      const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
-
-      if (!res) {
-        return;
-      }
-
-      //
-      const defaultMotorIndex = res.defaultMotorIndex;
-      const defaultMotor = res.motors[defaultMotorIndex];
-      const defaultMotorBox = defaultMotor.box;
-      // ________________________
-      // 設定馬力
-      this.horsepower = defaultMotor.hp;
-
-      // ________________________
-      // 設定boxB與thickness
-      // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
-      const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-      this.thickness = res.thickness;
-
-      // ________________________
-      // 設定馬達廠商
-      if (defaultMotorBox) {
-        if (defaultMotorBox.東元) {
-          this.motor = '東元';
-          this.boxB = String(defaultMotorBox.東元.boxB / 1000);
-        } else if (defaultMotorBox.大同) {
-          this.motor = '大同';
-          this.boxB = String(defaultMotorBox.大同.boxB / 1000);
-        } else if (defaultMotorBox.default) {
-          this.boxB = String(defaultMotorBox.default.boxB / 1000);
-        }
-      } else {
-        this.boxB = boxB ? String(boxB / 1000) : '';
-      }
-
-      this._defaultBoxB = this.boxB;
-
-      this.findBDoptions();
-      this.options_boxB?.unshift({
-        value: 'auto',
-        label: '自動計算',
-      });
-
-      // _defaultBoxB
-
-      // ________________________
-
-      // getProdAvailableComponent用的weight與rollerDiameter來自doorGeneralSpecs
-      if (
-        // 先判斷跟原本的是否一樣
-        this._doorGeneralSpecs?.weight !== res.weight ||
-        this._doorGeneralSpecs?.diameter !== res.diameter
-      ) {
-        this._doorGeneralSpecs = res;
-        this.req_getProdAvailableComponents();
-      } else {
-        if (isAntiTyphoonChange) {
-          this.req_getProdAvailableComponents();
-        }
-
-        this._doorGeneralSpecs = res;
-      }
-
-      this.reRender();
-    }; // req
-
-    if (this.cgsTimeout) {
-      clearTimeout(this.cgsTimeout);
+  // api請求
+  // this.shouldCall_cgs
+  async req_calcGeneralSpec() {
+    if (!this.doorType || !this.height) {
+      return false;
     }
 
-    this.cgsTimeout = setTimeout(() => {
-      req();
-    }, 500);
+    if (!this.length && !this.width) {
+      return false;
+    }
+
+    const body = (() => {
+      let fullWidth: number | undefined;
+      let WG: number | undefined;
+
+      if (Number(this.length)) {
+        fullWidth = Number(this.length) * 1000;
+      } else if (Number(this.width)) {
+        WG = Number(this.width) * 1000;
+      }
+
+      return {
+        modelName: this.doorType as TpcgsPrams['modelName'],
+        height: Number(this.height) * 1000,
+        isAntiTyphoon: this.typhoonProtection,
+        fullWidth,
+        WG,
+      };
+    })();
+
+    if (!body.fullWidth && !body.WG) {
+      return false;
+    }
+
+    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+
+    if (!res) {
+      return false;
+    }
+
+    //
+    const defaultMotorIndex = res.defaultMotorIndex;
+    const defaultMotor = res.motors[defaultMotorIndex];
+    const defaultMotorBox = defaultMotor.box;
+    // ________________________
+    // 設定馬力
+    this.horsepower = defaultMotor.hp;
+
+    // ________________________
+    // 設定boxB與thickness
+    // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
+    const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+    this.thickness = res.thickness;
+
+    // ________________________
+    // 設定馬達廠商
+    if (defaultMotorBox) {
+      if (defaultMotorBox.東元) {
+        this.motor = '東元';
+        this.boxB = String(defaultMotorBox.東元.boxB / 1000);
+      } else if (defaultMotorBox.大同) {
+        this.motor = '大同';
+        this.boxB = String(defaultMotorBox.大同.boxB / 1000);
+      } else if (defaultMotorBox.default) {
+        this.boxB = String(defaultMotorBox.default.boxB / 1000);
+      }
+    } else {
+      this.boxB = boxB ? String(boxB / 1000) : '';
+    }
+
+    this._defaultBoxB = this.boxB;
+
+    this.findBDoptions();
+    this.options_boxB?.unshift({
+      value: 'auto',
+      label: '自動計算',
+    });
+
+    // 先判斷跟原本的是否一樣
+    if (
+      this._doorGeneralSpecs?.weight !== res.weight ||
+      this._doorGeneralSpecs?.diameter !== res.diameter
+      //
+    ) {
+      this.shouldCall_pac = true;
+    }
+
+    if (
+      this._doorGeneralSpecs?.diameter !== res.diameter ||
+      this._doorGeneralSpecs?.slatLength !== res.slatLength ||
+      this._doorGeneralSpecs?.guideRailLength !== res.guideRailLength ||
+      this._doorGeneralSpecs?.bearingHousingTotalLength !== res.bearingHousingTotalLength ||
+      this._doorGeneralSpecs?.headBoxLength !== res.headBoxLength ||
+      this._doorGeneralSpecs?.bearingName !== res.bearingName ||
+      this._doorGeneralSpecs?.sprocketWheelChains !== res.sprocketWheelChains
+    ) {
+      this.shouldCall_pgpb = true;
+    }
+
+    this._doorGeneralSpecs = res;
   } // calcGeneralSpec
 
   // ________________________
-  req_getProdAvailableComponents() {
-    const req = async () => {
-      const rollerDiameter = this._doorGeneralSpecs?.diameter;
+  // this.shouldCall_pac
+  async req_getProdAvailableComponents() {
+    const rollerDiameter = this._doorGeneralSpecs?.diameter;
 
-      if (!this.doorType || !this.weight || !rollerDiameter) {
-        return;
-      }
-
-      const res = await apiGetProdAvailableComponents({
-        modelName: this.doorType as TpacParams['modelName'],
-        weight: this.weight,
-        isAntiTyphoon: this.typhoonProtection,
-        rollerDiameter: rollerDiameter,
-      });
-
-      if (!res) {
-        return;
-      }
-
-      this._availableComponents = res;
-      this.retrieveOptions();
-      this.retrieveCreProdAcce();
-
-      this.reRender();
-    }; // req
-
-    if (this.pacTimeout) {
-      clearTimeout(this.pacTimeout);
+    if (!this.doorType || !this.weight || !rollerDiameter) {
+      return false;
     }
 
-    setTimeout(() => {
-      req();
-    }, 500);
+    const res = await apiGetProdAvailableComponents({
+      modelName: this.doorType as TpacParams['modelName'],
+      weight: this.weight,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: rollerDiameter,
+    });
+
+    if (!res) {
+      return false;
+    }
+
+    this._availableComponents = res;
+
+    this.retrieveOptions();
+    this.retrieveCreProdAcce();
   } //  req_getProdAvailableComponents
 
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-
+  // this.shouldCall_pgpb
   /**取得材料配件 */
-  reqProdGenerateDoorProductBom() {
-    const req = async () => {
-      const acceList = this.acceList;
+  async reqProdGenerateDoorProductBom() {
+    const acceList = this.acceList;
 
-      if (!acceList || !this._doorGeneralSpecs || !acceList.motor.gearNumber) {
-        return;
-      }
-
-      const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
-        modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
-        weight: this.weight ?? -1,
-        height: Number(this.height) * 1000,
-        B: Number(this.boxB) * 1000,
-        D: 0,
-        slatLength: this._doorGeneralSpecs.slatLength,
-        guideRailLength: this._doorGeneralSpecs.guideRailLength,
-        rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
-        headBoxLength: this._doorGeneralSpecs.headBoxLength,
-        isAntiTyphoon: this.typhoonProtection,
-        rollerDiameter: this._doorGeneralSpecs.diameter,
-        bearingType: this._doorGeneralSpecs.bearingName,
-
-        gearNumber: acceList.motor?.gearNumber,
-        chains: this._doorGeneralSpecs.sprocketWheelChains,
-      };
-
-      const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
-
-      let haveNull = false;
-
-      Object.values(acceList).forEach((item) => {
-        if (!item) {
-          return (haveNull = true);
-        }
-
-        const key = item.key;
-        const { id, material, materialSurface, isPainted } = item.componentInfo;
-
-        if (!material || !id) {
-          haveNull = true;
-        }
-
-        generateBomObj_empty[key] = {
-          id,
-          material,
-          materialSurface,
-          isPainted,
-        };
-      });
-
-      if (haveNull) {
-        return;
-      }
-
-      const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
-
-      const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
-
-      if (res) {
-        const keyArr = Object.keys(res) as (keyof typeof res)[];
-        keyArr.forEach((key) => {
-          const item = res[key];
-          acceList[key].codeNumber = item.number;
-        });
-      }
-    }; //  req
-
-    if (this.pgpbTimeout) {
-      clearTimeout(this.pgpbTimeout);
+    if (!acceList || !this._doorGeneralSpecs || !acceList.motor.gearNumber) {
+      return;
     }
 
-    setTimeout(() => {
-      req();
-    }, 500);
+    const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
+      modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
+      weight: this.weight ?? -1,
+      height: Number(this.height) * 1000,
+      B: Number(this.boxB) * 1000,
+      D: Number(this.boxD) * 1000,
+      slatLength: this._doorGeneralSpecs.slatLength,
+      guideRailLength: this._doorGeneralSpecs.guideRailLength,
+      rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
+      headBoxLength: this._doorGeneralSpecs.headBoxLength,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: this._doorGeneralSpecs.diameter,
+      bearingType: this._doorGeneralSpecs.bearingName,
+
+      gearNumber: acceList.motor?.gearNumber,
+      chains: this._doorGeneralSpecs.sprocketWheelChains,
+    };
+
+    const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
+
+    let haveNull = false;
+
+    Object.values(acceList).forEach((item) => {
+      if (!item) {
+        return (haveNull = true);
+      }
+
+      const key = item.key;
+      const { id, material, materialSurface, isPainted } = item.componentInfo;
+
+      if (!material || !id) {
+        haveNull = true;
+      }
+
+      generateBomObj_empty[key] = {
+        id,
+        material,
+        materialSurface,
+        isPainted,
+      };
+    });
+
+    if (haveNull) {
+      return;
+    }
+
+    const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
+
+    const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
+
+    if (res) {
+      const keyArr = Object.keys(res) as (keyof typeof res)[];
+      keyArr.forEach((key) => {
+        const item = res[key];
+        acceList[key].codeNumber = item.number;
+      });
+    }
   } // reqProdGenerateDoorProductBom
 
+  async reqChain() {
+    // shouldCall_cgs
+    // shouldCall_pac
+    // shouldCall_pgpb
+    //  req_calcGeneralSpec
+    //  req_getProdAvailableComponents
+    //  reqProdGenerateDoorProductBom
+
+    if (this.shouldCall_cgs) {
+      await this.req_calcGeneralSpec();
+    }
+
+    if (this.shouldCall_cgs) {
+      await this.req_getProdAvailableComponents();
+    }
+
+    if (this.shouldCall_pgpb) {
+      await this.reqProdGenerateDoorProductBom();
+    }
+
+    this.shouldCall_cgs = false;
+    this.shouldCall_pac = false;
+    this.shouldCall_pgpb = false;
+
+    this.reRender();
+  }
+
+  // 注意 retrieveProdComponent裡面也有呼叫 callAllReq
+  callAllReq() {
+    if (this.callAllTimeoutId) {
+      clearTimeout(this.callAllTimeoutId);
+    }
+
+    this.callAllTimeoutId = setTimeout(() => {
+      this.reqChain();
+    }, 500);
+  }
+
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
   // ---------------------------------------------------------
 
+  // 裡面有呼叫cllAllReq的機制
+  // 裡面有呼叫cllAllReq的機制
+  // 裡面有呼叫cllAllReq的機制
   retrieveCreProdAcce() {
     if (!this._availableComponents || !this.weight) {
       return;
@@ -592,6 +597,8 @@ class Class_product {
     // 變更設計，如果是null，不要帶null進去，
     // 要帶標明為無資料Taccessory進去
 
+    const isGearNumberChanged = this.acceList?.motor?.gearNumber !== motor?.gearNumber;
+
     this.creAcceList({
       slat: slat || creNotConformAcce(),
       bottomBar: bottomBar || creNotConformAcce(),
@@ -602,8 +609,16 @@ class Class_product {
       motorAccessories: motorAccessories || creNotConformAcce(),
       headBox: headBox || creNotConformAcce(),
     });
+
+    if (!isGearNumberChanged) {
+      this.shouldCall_pgpb = true;
+      this.callAllReq();
+    }
+
     this.calcAcceAllPrice();
     this.calcProdAllprice();
+
+    return { isGearNumberChanged };
   } // retrieveProdComponent
 
   // ---------------------------------------------------------
@@ -1060,13 +1075,10 @@ class Class_product {
     this._prodData.doorType = v;
     this.resetProd();
 
-    // 這個呼叫鍊有問題，要記得改
-    // 這個呼叫鍊有問題，要記得改
-    // 這個呼叫鍊有問題，要記得改
-    // 這個呼叫鍊有問題，要記得改
-    this.req_calcGeneralSpec();
-    this.req_getProdAvailableComponents();
-    this.reqProdGenerateDoorProductBom();
+    this.shouldCall_cgs = true;
+    this.shouldCall_pac = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
 
     this.reRender();
   }
@@ -1079,7 +1091,10 @@ class Class_product {
     this._prodData.width = '0';
     this.area = this.calcArea();
     this.resetProd();
-    this.req_calcGeneralSpec();
+
+    this.shouldCall_cgs = true;
+    this.callAllReq();
+
     this.reRender();
   }
   /**WG */
@@ -1091,7 +1106,10 @@ class Class_product {
     this._prodData.length = '0';
     this.area = this.calcArea();
     this.resetProd();
-    this.req_calcGeneralSpec();
+
+    this.shouldCall_cgs = true;
+    this.callAllReq();
+
     this.reRender();
   }
   //
@@ -1102,7 +1120,11 @@ class Class_product {
     this._prodData.height = v;
     this.area = this.calcArea();
     this.resetProd();
-    this.req_calcGeneralSpec();
+
+    this.shouldCall_cgs = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1119,6 +1141,10 @@ class Class_product {
 
     this._boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
+
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1130,6 +1156,10 @@ class Class_product {
     this._boxD = v;
     this._prodData.boxB = pairBD[this._prodData.doorType]?.DtoB[v] ?? '';
     this.area = this.calcArea();
+
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1320,8 +1350,12 @@ class Class_product {
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
-    // this.retrieveCreProdAcce();
-    this.req_calcGeneralSpec({ isAntiTyphoonChange: true });
+
+    this.shouldCall_cgs = true;
+    this.shouldCall_pac = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
