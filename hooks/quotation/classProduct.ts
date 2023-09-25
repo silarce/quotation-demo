@@ -7,6 +7,7 @@
  * creAcceList
  * 下拉式選單的選項
  *
+ * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
  */
@@ -77,6 +78,7 @@ class Class_product {
     //
     this._calcProdSubTotalPrice = calcProdSubTotalPrice;
     // from api
+    // 來自/products/door/models // 在useProduct取得 // 目前只有用來生成下拉式選單的樣子
     this._doorModelList = doorModelList;
     //
     this._quantity = String(this._prodData.quantity);
@@ -128,6 +130,24 @@ class Class_product {
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  // ---------------------------------------------------------
+  // req呼叫控制
+  // 防抖
+  cgsTimeout: NodeJS.Timeout | null = null;
+  pacTimeout: NodeJS.Timeout | null = null;
+  pgpbTimeout: NodeJS.Timeout | null = null;
+
+  callAllTimeoutId: NodeJS.Timeout | null = null;
+
+  shouldCall_cgs = false; //req_calcGeneralSpec
+  shouldCall_pac = false; //req_getProdAvailableComponents
+  shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
+
+  // api呼叫控制，剛開始做。先去修改別的東西
+  // api呼叫控制，剛開始做。先去修改別的東西
+  // api呼叫控制，剛開始做。先去修改別的東西
+  // api呼叫控制，剛開始做。先去修改別的東西
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -224,12 +244,7 @@ class Class_product {
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 
-  // 防抖
-  cgsTimeout: NodeJS.Timeout | null = null;
-  pacTimeout: NodeJS.Timeout | null = null;
-  pgpbTimeout: NodeJS.Timeout | null = null;
-
-  req_calcGeneralSpec({ isAntiTyphoonChange = false }: { isAntiTyphoonChange?: boolean } = {}) {
+  async req_calcGeneralSpec({ isAntiTyphoonChange = false }: { isAntiTyphoonChange?: boolean } = {}) {
     const req = async () => {
       if (!this.doorType || !this.height) {
         return;
@@ -399,54 +414,6 @@ class Class_product {
         isAntiTyphoon: this.typhoonProtection,
         rollerDiameter: this._doorGeneralSpecs.diameter,
         bearingType: this._doorGeneralSpecs.bearingName,
-        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        /**
-        因為使用者可能會在防抖結束前就編輯了另一個需要呼叫api的property
-        或許可以把防抖id設為每個setter一個
-        然後在呼叫req鍊
-        每次呼叫req鍊就要clear所有的防抖id
-
-setTImeout(()=>{
-  clearTimeout(防抖id_a);
-  clearTimeout(防抖id_b);
-  clearTimeout(防抖id_c);
-  // 類推
-  const reqChan = async ()=>{  }
-},500)
-
-如果每次呼叫就要清掉所有的防抖id，那為什麼不設三個req方法的防抖id就好了
-跟一開始一樣
-
-決定了
-呼叫reqA就一定會接著呼叫reqB與reqC，並清除所有的防抖id
-呼叫reqB就一定會接著呼叫reqC，並清除B跟C的防抖id
-呼叫reqC就一定會清除C的防抖id
-
-明天再想吧
-
-目前有四個呼叫api的方法
-為每個方法設一個變數(暫且叫他們shouldCall)，用來判定是否應該被呼叫
-寫一個方法(叫callAll)，會根據這些變數，依序決定是否呼叫api
-callAll會有防抖設定
-編輯各個值的時候，會將對應shouldCall變更為true
-並呼叫callAll
-如果使用者在編輯A後立刻再編輯B，
-因為防抖，只會設定對應的shouldCall為true並重置計時器
-最後再timeout後呼叫這個方法，就會依序呼叫api
-同時設置呼叫時設定disabled
-這樣就能避免重複呼叫而浪費效能或取得錯誤的值
-
-         */
 
         gearNumber: acceList.motor?.gearNumber,
         chains: this._doorGeneralSpecs.sprocketWheelChains,
@@ -2413,3 +2380,52 @@ NO.4
 
 
  */
+
+// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+
+//把req系列的方法改為async
+// 寫法像這樣
+// async foo (){}
+// 然後重新思考設計呼叫鍊
+/**
+        因為使用者可能會在防抖結束前就編輯了另一個需要呼叫api的property
+        或許可以把防抖id設為每個setter一個
+        然後在呼叫req鍊
+        每次呼叫req鍊就要clear所有的防抖id
+
+setTImeout(()=>{
+  clearTimeout(防抖id_a);
+  clearTimeout(防抖id_b);
+  clearTimeout(防抖id_c);
+  // 類推
+  const reqChan = async ()=>{  }
+},500)
+
+如果每次呼叫就要清掉所有的防抖id，那為什麼不設三個req方法的防抖id就好了
+跟一開始一樣
+
+決定了
+呼叫reqA就一定會接著呼叫reqB與reqC，並清除所有的防抖id
+呼叫reqB就一定會接著呼叫reqC，並清除B跟C的防抖id
+呼叫reqC就一定會清除C的防抖id
+
+明天再想吧
+
+目前有四個呼叫api的方法
+為每個方法設一個變數(暫且叫他們shouldCall)，用來判定是否應該被呼叫
+寫一個方法(叫callAll)，會根據這些變數，依序決定是否呼叫api
+callAll會有防抖設定
+編輯各個值的時候，會將對應shouldCall變更為true
+並呼叫callAll
+如果使用者在編輯A後立刻再編輯B，
+因為防抖，只會設定對應的shouldCall為true並重置計時器
+最後再timeout後呼叫這個方法，就會依序呼叫api
+同時設置呼叫時設定disabled
+這樣就能避免重複呼叫而浪費效能或取得錯誤的值
+
+         */
