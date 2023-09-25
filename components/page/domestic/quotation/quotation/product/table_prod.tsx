@@ -20,6 +20,8 @@ export default function Table_prod({
   changeProdKeyArr,
   addProd,
   setTargetProd,
+  defalutVKeyArr,
+  onVKeyChange,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -28,6 +30,8 @@ export default function Table_prod({
   changeProdKeyArr: (arr: TprodKey[]) => void;
   addProd: () => void;
   setTargetProd: (v: Class_product) => void;
+  defalutVKeyArr: string[] | undefined;
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -64,6 +68,8 @@ export default function Table_prod({
             onRowClick={(obj) => {
               setTargetProd(obj.item as Class_product);
             }}
+            defalutVKeyArr={defalutVKeyArr}
+            onVKeyChange={onVKeyChange}
           />
 
           {!disabled && (

@@ -67,6 +67,7 @@ export default function Tbody({
   onRowClick,
   panelBox,
   defalutVKeyArr,
+  onVKeyChange,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -77,6 +78,7 @@ export default function Tbody({
   onRowClick?: (onj: { item: Titem }) => void;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
   defalutVKeyArr?: string[];
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
 }) {
   // ---------------------------------------------------------------
 
@@ -105,6 +107,7 @@ export default function Tbody({
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
+  // onVKeyChange
   return (
     <div>
       <DndContext
@@ -113,7 +116,11 @@ export default function Tbody({
           restrictToVerticalAxis,
           // restrictToWindowEdges,
         ]}
-        onDragEnd={onDragEnd}
+        // onDragEnd={onDragEnd}
+        onDragEnd={(e) => {
+          const newKeyArr = onDragEnd(e);
+          onVKeyChange?.(newKeyArr);
+        }}
         onDragStart={onDragStart}
       >
         <SortableContext items={vDndKeyArr} strategy={verticalListSortingStrategy}>

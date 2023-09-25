@@ -874,6 +874,7 @@ export type quotationProductDto = {
   // components: TquotationProductComponentsDto[] | undefined;
   // // 數量
   // quantity: number;
+  order: number;
   items: {
     components: TquotationProductComponentsDto[];
     options: TquotationProductOptionDto[];
@@ -1065,6 +1066,7 @@ export type TcreateQuotationContentDto = {
 
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
+  productsOrder: string[] | null;
 };
 
 // ========================================================================

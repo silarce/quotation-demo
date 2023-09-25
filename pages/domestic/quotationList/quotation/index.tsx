@@ -222,6 +222,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productList,
     prodCellConfig,
     prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
     addProd,
     changeProdKeyArr,
     subTotal: prodSubTotal,
@@ -825,20 +827,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item, index) => {
-      return {
-        ...item.body,
-        rollUpBoxThick: Number(item.rollUpBoxThick),
-        voltage: Number(item.voltage),
-        doorTrackThick: Number(item.doorTrackThick),
-        motorSupport: String(+item.motorSupport),
-        //
-        quantity: String(item.quantity),
-        materialSurface: item.surface ?? '',
-        isPainted: false,
-        order: index,
-      };
-    });
+    const prodArr: TcreateQuotationProductDto[] | undefined =
+      prodVKeyArr?.map((key, index) => {
+        const prod = productList[key];
+
+        return {
+          ...prod.body,
+          rollUpBoxThick: Number(prod.rollUpBoxThick),
+          voltage: Number(prod.voltage),
+          doorTrackThick: Number(prod.doorTrackThick),
+          motorSupport: String(+prod.motorSupport),
+          //
+          quantity: String(prod.quantity),
+          materialSurface: prod.surface ?? '',
+          isPainted: false,
+          order: index,
+        };
+      }) ?? [];
 
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
@@ -881,6 +886,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       products: prodArr,
       others: getOthersPostBodyArr(),
+      productsOrder: prodVKeyArr ?? null,
       //
       //
     };
@@ -994,6 +1000,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             changeProdKeyArr={changeProdKeyArr}
             addProd={addProd}
             setTargetProd={setTargetProd}
+            defalutVKeyArr={prodVKeyArr}
+            onVKeyChange={setProdVKeyArr}
           />
 
           {/* api還沒好 */}

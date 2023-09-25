@@ -111,6 +111,7 @@ const useProductList = ({
   const [prodKeyArr, setProdKeyArr] = useState<TprodKey[]>([]);
   const [productList, setProductList] = useState<TproductList>({});
   const [subTotal, setSubTotal] = useState('');
+  const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
   //
   //
@@ -120,6 +121,7 @@ const useProductList = ({
 
   useEffect(() => {
     createProdList();
+    setProdVKeyArr(productsOrder);
   }, [resetTrigger, doorModelList]);
 
   const createProdList = () => {
@@ -130,7 +132,7 @@ const useProductList = ({
     const list: TproductList = {};
 
     productArr.forEach((prod) => {
-      const key = `${prod.id}`;
+      const key = `${prod.order}`;
 
       const prodData: Tprod = {
         ...prod,
@@ -194,7 +196,7 @@ const useProductList = ({
       return myAlert.info({ title: '尚未取得門型資料' });
     }
 
-    const newKey = String(Object.keys(productList).length);
+    const newKey = nanoid();
     const classProd = new Class_product({
       reRender,
       delSelf: () => delSelf(newKey),
@@ -358,6 +360,8 @@ const useProductList = ({
     productList,
     prodCellConfig,
     prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
     addProd,
     changeProdKeyArr,
     //
