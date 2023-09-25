@@ -951,7 +951,11 @@ class Class_product {
       return undefined;
     }
 
-    const arr = doorModel.slatMaterials.map((item) => {
+    const slatMaterials = doorModel.slatMaterials;
+    const order = ['鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
+    const orderedArr = _.orderBy(slatMaterials, (item) => order.indexOf(item.name));
+
+    const arr = orderedArr.map((item) => {
       return {
         value: item.name,
         label: item.name,
