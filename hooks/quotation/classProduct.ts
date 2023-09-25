@@ -314,6 +314,10 @@ class Class_product {
       }
 
       this.findBDoptions();
+      this.options_boxB?.unshift({
+        value: boxB ? String(boxB / 1000) : '',
+        label: '自動計算',
+      });
 
       // ________________________
 
@@ -1630,7 +1634,7 @@ const prodCellConfig: TcellConfig = {
   boxB: {
     label: 'B(m)',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '120px' },
       selectProps: {
         props: {},
       },
