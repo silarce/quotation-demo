@@ -1,3 +1,5 @@
+// 相數符號 ∮
+
 import Decimal from 'decimal.js';
 
 import type { TreRender } from './useProduct';
@@ -474,13 +476,12 @@ type Taccessory = {
 const acceKeyArrOri: () => string[] = () => {
   return [
     // 'acceName',
-    'name',
+    'desc',
+    // 'name',
     'material',
     'surface',
     'density',
     'isPainted',
-
-    'desc',
 
     'unit',
 
@@ -494,7 +495,7 @@ const acceKeyArrOri: () => string[] = () => {
 
 const acceCellConfig: TcellConfig = {
   acceName: {
-    label: '種類名稱',
+    label: '名稱',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       showBaseline: 'invisible',
@@ -568,7 +569,7 @@ const acceCellConfig: TcellConfig = {
     label: '烤漆',
     theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '40px' },
+      wrapperStyle: { width: '45px' },
       checkBoxProps: {
         wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'isPainted' }],
@@ -578,7 +579,7 @@ const acceCellConfig: TcellConfig = {
   desc: {
     label: '說明',
     inputSelProps: {
-      wrapperStyle: { width: '500px' },
+      wrapperStyle: { width: '200px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -601,7 +602,7 @@ const acceCellConfig: TcellConfig = {
     label: '牌價',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '120px' },
+      wrapperStyle: { width: '80px' },
       inputProps: {
         props: {
           disabled: true,
@@ -625,7 +626,7 @@ const acceCellConfig: TcellConfig = {
     label: '單價',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '120px' },
+      wrapperStyle: { width: '80px' },
       inputProps: {
         props: {
           disabled: true,
@@ -637,7 +638,7 @@ const acceCellConfig: TcellConfig = {
     label: '複價',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '140px' },
+      wrapperStyle: { width: '120px' },
       inputProps: {
         props: {
           disabled: true,
@@ -673,11 +674,11 @@ const creNotConformAcce = () => ({
 });
 
 const creDesc_slats = (classAcce: Class_accessory) => {
-  const { isAntiTyphoon } = classAcce;
+  const { isAntiTyphoon, material, surface, thickness, name } = classAcce;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
 
   // return `${desc_isAntiTyphoon} `;
-  return ``;
+  return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };
 
 const creDesc_bottomBars = (classAcce: Class_accessory) => {
@@ -688,16 +689,18 @@ const creDesc_bottomBars = (classAcce: Class_accessory) => {
   const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
 
   // return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
+  // 50*50*4T 錏 後端沒有給類似格式的的資料
   return ``;
 };
 
 const creDesc_guideRails = (classAcce: Class_accessory) => {
-  const { name, hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
+  const { name, material, hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
   const desc_hasSilencingStrip = confomtTree.hasSilencingStrip[`${hasSilencingStrip}`];
 
   // return `厚度${thickness} ${desc_isAntiTyphoon} ${desc_hasSilencingStrip}`;
-  return `${name} 厚度${thickness}`;
+  // return `${name} 厚度${thickness}`;
+  return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };
 
 const creDesc_sidePlates = (classAcce: Class_accessory) => {
@@ -717,13 +720,14 @@ const creDesc_sidePlates = (classAcce: Class_accessory) => {
   // return `${desc_isIntegrated} 馬達供應商:${motorVendor ?? '無資料'} 軸承:${bearingType ?? '無資料'} 齒輪編號:${
   //   gearNumber ?? '無資料'
   // } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
-  return `${name} `;
+  return `${name ?? ''} `;
 };
 
 const creDesc_rollers = (classAcce: Class_accessory) => {
   const { diameter } = classAcce;
 
-  return `直徑:${diameter ?? '無資料'}`;
+  // return `直徑:${diameter ?? '無資料'}`;
+  return `∮${diameter ?? ''}`;
 };
 
 const creDesc_motors = (classAcce: Class_accessory) => {
@@ -740,13 +744,21 @@ const creDesc_motors = (classAcce: Class_accessory) => {
 
   const thePhase = phase as 1 | 3 | undefined | null;
 
-  const desc_gearNumber = `齒輪編號:${gearNumber ?? '無資料'}`;
+  // const desc_gearNumber = `齒輪編號:${gearNumber ?? '無資料'}`;
+  // const desc_hasSupportStand = confomtTree.hasSupportStand[`${hasSupportStand}`];
+  // const desc_horsepower = `馬力:${horsePower ?? '無資料'}`;
+  // const desc_loadWeight = `荷重:${loadWeight ?? '無資料'}`;
+  // const desc_motorVendor = `馬達供應商:${motorVendor ?? '無資料'}`;
+  // const desc_phase = `相數:${confomtTree.phase[`${thePhase}`]}`;
+  // const desc_voltage = `電壓:${voltage ?? '無資料'}V`;
+  // ---
+  const desc_gearNumber = `${gearNumber ?? ''}`;
   const desc_hasSupportStand = confomtTree.hasSupportStand[`${hasSupportStand}`];
-  const desc_horsepower = `馬力:${horsePower ?? '無資料'}`;
-  const desc_loadWeight = `荷重:${loadWeight ?? '無資料'}`;
-  const desc_motorVendor = `馬達供應商:${motorVendor ?? '無資料'}`;
-  const desc_phase = `相位:${confomtTree.phase[`${thePhase}`]}`;
-  const desc_voltage = `電壓:${voltage ?? '無資料'}V`;
+  const desc_horsepower = `${horsePower ?? ''}`;
+  const desc_loadWeight = `${loadWeight ?? ''}`;
+  const desc_motorVendor = `${motorVendor ?? ''}`;
+  const desc_phase = `${confomtTree.phase[`${thePhase}`]}∮`;
+  const desc_voltage = voltage ? `${voltage}V` : '';
 
   // return `${desc_motorVendor} ${desc_horsepower} ${desc_voltage} ${desc_phase} ${desc_loadWeight} ${desc_hasSupportStand} ${desc_gearNumber}`;
   return `${desc_phase} ${desc_voltage} ${desc_horsepower}`;
@@ -755,21 +767,25 @@ const creDesc_motors = (classAcce: Class_accessory) => {
 const creDesc_motorAccessories = (classAcce: Class_accessory) => {
   const { name, bearingType, chains } = classAcce;
 
-  const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
-  const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
+  // const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
+  // const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
+  const desc_bearingType = `${bearingType ?? ''}`;
+  const desc_chains = `${chains ?? ''}`;
 
   // return `${desc_bearingType} ${desc_chains}`;
-  return `${name}`;
+  return `${name ?? ''}`;
 };
 
 const creDesc_headBoxes = (classAcce: Class_accessory) => {
-  const { name, isIntegrated, thickness } = classAcce;
+  const { name, material, isIntegrated, thickness } = classAcce;
 
+  // const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
+  // const desc_thickness = `厚度:${thickness ?? '無資料'}`;
   const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
-  const desc_thickness = `厚度:${thickness ?? '無資料'}`;
+  const desc_thickness = `${thickness ?? ''}`;
 
   // return `${desc_isIntegrated} ${desc_thickness}`;
-  return `${name} ${desc_thickness}`;
+  return `${name ?? ''} ${material ?? ''} ${desc_thickness}`;
 };
 
 const confomtTree = {
@@ -811,8 +827,8 @@ const confomtTree = {
     null: '',
   },
   phase: {
-    '1': '單相',
-    '3': '三相',
+    '1': '1',
+    '3': '3',
     undefined: '',
     null: '',
   },
@@ -827,15 +843,6 @@ type Tkit = {
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
 };
-
-// slats // 門片
-// bottomBars // 底座
-// guideRails // 門軌
-// sidePlates // 支板
-// rollers // 捲軸
-// motors // 馬達
-// motorAccessories // 馬達配件
-// headBoxes // 捲箱
 
 const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   slat: {
@@ -854,9 +861,9 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
     creDesc: creDesc_bottomBars,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
       { value: 'SST#304', label: 'SST#304' },
       { value: 'SST#316', label: 'SST#316' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
     ],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
@@ -866,9 +873,9 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
     creDesc: creDesc_guideRails,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
       { value: 'SST#304', label: 'SST#304' },
       { value: 'SST#316', label: 'SST#316' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
     ],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
@@ -905,9 +912,9 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
     creDesc: creDesc_headBoxes,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
       { value: 'SST#304', label: 'SST#304' },
       { value: 'SST#316', label: 'SST#316' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
     ],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',

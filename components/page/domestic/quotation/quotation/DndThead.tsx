@@ -90,11 +90,8 @@ export default function DndThead({
       {emptyBlockWidth && <div className={classNames(scss.emptyBlock)} style={{ width: emptyBlockWidth }} />}
 
       {acceBoxWidth && (
-        <div
-          className={classNames(scss.emptyBlock, scss.theadCell, 'relative text-right')}
-          style={{ width: acceBoxWidth }}
-        >
-          <span className="text-right">{cellConfigList.acceName?.label}</span>
+        <div className={classNames(scss.emptyBlock, scss.theadCell)} style={{ width: acceBoxWidth }}>
+          <span className="inline-block ml-12">{cellConfigList.acceName?.label}</span>
         </div>
       )}
 
