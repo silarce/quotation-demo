@@ -44,7 +44,7 @@ class Class_accessory {
     }
 
     if (!this._acce.quantity) {
-      this._acce.quantity = calcDefaultValue({
+      this._acce.quantity = calcDefaultQuantity({
         key,
         w: Number(prod.width),
         l: Number(prod.length),
@@ -436,10 +436,10 @@ class Class_accessory {
     return {
       type: acceLookUp[this.key].type,
       material: this._acce.material ?? '',
-      materialSurface: this._acce.materialSurface ?? '',
+      materialSurface: this._acce.materialSurface || undefined,
       isPainted: this._acce.isPainted ?? false,
       price: this._acce.price ?? 0,
-      quantity: this._acce.quantity ?? '0',
+      quantity: Number(this._acce.quantity) ?? 0,
       // 下面這幾個先跳過
       number: this.codeNumber ?? '',
       componentId: this.componentId ?? '',
@@ -1008,7 +1008,7 @@ const findOptionValue = ({ options, value }: { options: Toption[]; value: string
   return option?.value;
 };
 
-const calcDefaultValue = ({
+const calcDefaultQuantity = ({
   //
   key,
   w,
@@ -1041,7 +1041,7 @@ const calcDefaultValue = ({
     return '1.00';
   }
 
-  return '';
+  return '1.00';
 
   // sidePlates // 沒有在表格裡面
 

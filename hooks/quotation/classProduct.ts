@@ -105,6 +105,8 @@ class Class_product {
         doorModelName: key,
         code: '',
         specialSpec: '',
+        materialSurface: item.materialSurface || '',
+        quantity: String(item.quantity || 0),
       };
     });
 
@@ -138,7 +140,7 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
 
-  private _boxD = '';
+  // private _boxD = '';
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -269,7 +271,7 @@ class Class_product {
     this._availableComponents = undefined;
     this._thickness = '';
     this._defaultBoxB = '';
-    this._boxD = '';
+    // this._boxD = '';
 
     this._quantity = String(this._prodData.quantity);
     this._price = String(this._prodData.price);
@@ -424,7 +426,7 @@ class Class_product {
       weight: this.weight ?? -1,
       height: Number(this.height) * 1000,
       B: Number(this.boxB) * 1000,
-      D: Number(this.boxD) * 1000,
+      D: Number(this._prodData.boxD) * 1000,
       slatLength: this._doorGeneralSpecs.slatLength,
       guideRailLength: this._doorGeneralSpecs.guideRailLength,
       rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
@@ -1126,7 +1128,7 @@ class Class_product {
 
     this._prodData.boxB = v;
 
-    this._boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this._prodData.boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -1137,10 +1139,10 @@ class Class_product {
 
   /**D(m) */
   get boxD() {
-    return this._boxD;
+    return this._prodData.boxD;
   }
   set boxD(v) {
-    this._boxD = v;
+    this._prodData.boxD = v;
     this._prodData.boxB = pairBD[this._prodData.doorType]?.DtoB[v] ?? '';
     this.area = this.calcArea();
 
@@ -1497,7 +1499,8 @@ class Class_product {
       width: String(Number(this._prodData.width) * 1000),
       length: String(Number(this._prodData.length) * 1000),
       height: String(Number(this._prodData.height) * 1000),
-      boxB: String(Number(this._prodData.width) * 1000),
+      boxB: String(Number(this._prodData.boxB) * 1000),
+      boxD: String(Number(this._prodData.boxD) * 1000),
 
       components: components,
     };
@@ -1556,6 +1559,7 @@ type Tprod = {
   //
   options: TquotationProductOptionDto[];
   components: TquotationProductComponentsDto[];
+  boxD: string;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -2094,6 +2098,7 @@ const emptyProdOri: () => Tprod = () => {
     //
     options: [],
     components: [],
+    boxD: '',
   };
 };
 
@@ -2260,14 +2265,6 @@ const filter_motors = ({
     hasSupportStand: boolean; // 有腳 // 馬達支撐架
   };
 }) => {
-  console.log('horsePower', filterParams.horsePower);
-  console.log('motorVendor', filterParams.motorVendor);
-  console.log('phase', filterParams.phase);
-  console.log('voltage', filterParams.voltage);
-  console.log('weight', filterParams.weight);
-  console.log('hasSupportStand', filterParams.hasSupportStand);
-  console.log('----------------------------------------------------');
-
   const filteredArr = dataArr.filter((data) => {
     let horsePoswer = filterParams.horsePower;
     let d_horsePower = data.horsePower;

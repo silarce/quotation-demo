@@ -827,10 +827,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    const prodArr: TcreateQuotationProductDto[] | undefined =
-      prodVKeyArr?.map((key, index) => {
-        const prod = productList[key];
+    // const prodArr: TcreateQuotationProductDto[] | undefined =
+    //   prodVKeyArr?.map((key, index) => {
+    //     const prod = productList[key];
 
+    //     return {
+    //       ...prod.body,
+    //       rollUpBoxThick: Number(prod.rollUpBoxThick),
+    //       voltage: Number(prod.voltage),
+    //       doorTrackThick: Number(prod.doorTrackThick),
+    //       motorSupport: String(+prod.motorSupport),
+    //       //
+    //       quantity: String(prod.quantity),
+    //       materialSurface: prod.surface ?? '',
+    //       isPainted: false,
+    //       order: index,
+    //     };
+    //   }) ?? [];
+    const prodArr: TcreateQuotationProductDto[] | undefined =
+      Object.values(productList).map((prod, index) => {
         return {
           ...prod.body,
           rollUpBoxThick: Number(prod.rollUpBoxThick),
@@ -1000,8 +1015,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             changeProdKeyArr={changeProdKeyArr}
             addProd={addProd}
             setTargetProd={setTargetProd}
-            defalutVKeyArr={prodVKeyArr}
-            onVKeyChange={setProdVKeyArr}
+            // defalutVKeyArr={prodVKeyArr}
+            // onVKeyChange={setProdVKeyArr}
           />
 
           {/* api還沒好 */}

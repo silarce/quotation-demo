@@ -30,7 +30,7 @@ export default function Table_prod({
   changeProdKeyArr: (arr: TprodKey[]) => void;
   addProd: () => void;
   setTargetProd: (v: Class_product) => void;
-  defalutVKeyArr: string[] | undefined;
+  defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);

@@ -788,10 +788,10 @@ export type TquotationProductComponentsDto = {
   rawData: string;
   bom: string;
   material: string;
-  materialSurface: string;
+  materialSurface: string | null | undefined;
   isPainted: boolean;
   price: number;
-  quantity: string;
+  quantity: number;
   order: number;
 };
 // 但是後端有建立這個型別
@@ -820,6 +820,7 @@ export type quotationProductDto = {
   height: string;
   // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   boxB: string;
+  boxD: string;
   // 面積
   area: string;
   // 才數
@@ -963,6 +964,7 @@ export type TcreateQuotationProductDto = {
   height: string;
   // B(m)
   boxB: string;
+  boxD: string;
   // 面積
   area: string;
   // 才數
@@ -1280,7 +1282,7 @@ export type TdoorComponentListDto = {
 export type TgenerateDoorProductBomDto_ComponentInfo = {
   id: string;
   material: string; // 材質
-  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4'; // 表面處理
+  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | null; // 表面處理
   isPainted: boolean; // 烤漆
 };
 
