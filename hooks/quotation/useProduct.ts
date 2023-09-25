@@ -77,6 +77,25 @@ const useProductList = ({
 }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+  // setIsLoading被送進classProduct裡面了
+
   // ---------------------------------------------------------
 
   const { res: doorModelArr, update: updateDoorModelArr } = useApiGetProdDoorModels();
@@ -156,6 +175,7 @@ const useProductList = ({
 
       list[key] = new Class_product({
         reRender,
+        setIsLoading,
         prodData,
         delSelf: () => delSelf(key),
         copySelf: () => copySelf(key),
@@ -199,6 +219,7 @@ const useProductList = ({
     const newKey = nanoid();
     const classProd = new Class_product({
       reRender,
+      setIsLoading,
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
       //
@@ -356,6 +377,7 @@ const useProductList = ({
 
   return {
     reRender,
+    isLoading,
     //
     productList,
     prodCellConfig,

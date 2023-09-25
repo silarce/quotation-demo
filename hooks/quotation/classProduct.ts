@@ -55,6 +55,7 @@ import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_pr
 class Class_product {
   constructor({
     reRender,
+    setIsLoading,
     prodData = emptyProdOri(),
     // accessoryDataArr = [],
     delSelf,
@@ -65,6 +66,7 @@ class Class_product {
     doorModelList,
   }: {
     reRender: TreRender;
+    setIsLoading: (isLoading: boolean) => void;
     prodData?: Tprod;
     // accessoryDataArr?: Taccessory[];
     // optionDataArr?: Toptions[];
@@ -76,6 +78,7 @@ class Class_product {
     doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
     this.reRender = reRender;
+    this.setIsLoading = setIsLoading;
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
     this.copySelf = copySelf;
@@ -120,6 +123,7 @@ class Class_product {
   } //  constructor close
 
   private reRender;
+  readonly setIsLoading;
   readonly delSelf;
   readonly copySelf;
   //
@@ -482,16 +486,23 @@ class Class_product {
   } // reqProdGenerateDoorProductBom
 
   async reqChain() {
-    if (this.shouldCall_cgs) {
-      await this.req_calcGeneralSpec();
-    }
+    try {
+      this.setIsLoading(true);
 
-    if (this.shouldCall_cgs) {
-      await this.req_getProdAvailableComponents();
-    }
+      if (this.shouldCall_cgs) {
+        await this.req_calcGeneralSpec();
+      }
 
-    if (this.shouldCall_pgpb) {
-      await this.reqProdGenerateDoorProductBom();
+      if (this.shouldCall_cgs) {
+        await this.req_getProdAvailableComponents();
+      }
+
+      if (this.shouldCall_pgpb) {
+        await this.reqProdGenerateDoorProductBom();
+      }
+    } catch (error) {
+    } finally {
+      this.setIsLoading(false);
     }
 
     this.shouldCall_cgs = false;
