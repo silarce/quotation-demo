@@ -36,6 +36,7 @@ export default function DndThead({
   onDragEndCallback,
   resetTrigger,
   emptyBlockWidth,
+  acceBoxWidth,
 }: {
   allowMove: boolean;
   keyArr: string[];
@@ -43,7 +44,8 @@ export default function DndThead({
   onDragEndCallback?: (dndKeyArr: string[]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   resetTrigger?: any;
-  emptyBlockWidth: string;
+  emptyBlockWidth?: string;
+  acceBoxWidth?: string;
 }) {
   const [movingKey, setMovingKey] = useState<string>();
   const [dndKeyArr, setDndKeyArr] = useState<string[]>([]);
@@ -80,10 +82,22 @@ export default function DndThead({
   };
 
   // ------------------------------------------------------------------
+
+  // ------------------------------------------------------------------
   return (
     <div className={scss.thead}>
       {/*  */}
-      <div className={classNames(scss.emptyBlock)} style={{ width: emptyBlockWidth }} />
+      {emptyBlockWidth && <div className={classNames(scss.emptyBlock)} style={{ width: emptyBlockWidth }} />}
+
+      {acceBoxWidth && (
+        <div
+          className={classNames(scss.emptyBlock, scss.theadCell, 'relative text-right')}
+          style={{ width: acceBoxWidth }}
+        >
+          <span className="text-right">{cellConfigList.acceName?.label}</span>
+        </div>
+      )}
+
       {/*  */}
       <DndContext
         modifiers={[restrictToHorizontalAxis, restrictToWindowEdges]}

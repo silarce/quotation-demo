@@ -73,7 +73,7 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (onj: { item: Titem }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
 }) {
   // ---------------------------------------------------------------
 
@@ -222,6 +222,26 @@ const EasyBox = ({
   );
 };
 
+const AcceBox = ({
+  indexNum,
+  dndAttr,
+  dndListener,
+  acceName,
+}: {
+  indexNum: string | number;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  acceName: string;
+}) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[120px]')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+      {/* <span>{indexNum}</span> */}
+      <span>{acceName}</span>
+    </div>
+  );
+};
+
 // --------------------------------------------------------
 
 const NoItem = ({
@@ -279,7 +299,7 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
   //
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -307,6 +327,9 @@ function DndRow({
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+          {panelBox === 'acceBox' && (
+            <AcceBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} acceName={item.acceName} />
+          )}
 
           {/*  */}
           {keyArr.map((key) => {

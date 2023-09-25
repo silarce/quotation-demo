@@ -43,16 +43,23 @@ export default function Table_acce({
       <div className={scss.main}>
         <div className={scss.listContainer}>
           <div className={scss.theadContainer}>
+            {/*  */}
+            {/*  */}
+
+            {/*  */}
+            {/*  */}
+
             <DndThead
               keyArr={acceKeyArr}
               cellConfigList={acceCellConfig}
               allowMove={allowMove}
               resetTrigger={acceKeyArr.length}
-              emptyBlockWidth="80px"
+              // emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as string[];
                 changeAcceKeyArr(keyArr);
               }}
+              acceBoxWidth="120px"
             />
           </div>
 
@@ -65,7 +72,7 @@ export default function Table_acce({
               onRowClick={(obj) => {
                 // setTargetProd(obj.item as Class_product);
               }}
-              panelBox="easyBox"
+              panelBox="acceBox"
             />
           )}
 

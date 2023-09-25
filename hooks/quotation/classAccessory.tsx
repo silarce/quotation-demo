@@ -473,7 +473,7 @@ type Taccessory = {
 
 const acceKeyArrOri: () => string[] = () => {
   return [
-    'acceName',
+    // 'acceName',
     'name',
     'material',
     'surface',
