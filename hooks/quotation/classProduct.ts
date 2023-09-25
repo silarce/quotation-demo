@@ -799,7 +799,8 @@ class Class_product {
       if (phase) {
         phaseList[phase] = {
           value: String(phase),
-          label: phase === 1 ? '單相' : phase === 3 ? '三相' : '未知資料',
+          // label: phase === 1 ? '單相' : phase === 3 ? '三相' : '未知資料',
+          label: phase === 1 ? '1' : phase === 3 ? '3' : '未知資料',
         };
       }
 
