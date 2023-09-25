@@ -117,6 +117,7 @@ class Class_product {
   _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
   private _availableComponents: TdoorComponentListDto | undefined;
   private _thickness = '';
+  private _defaultBoxB = '';
   // private _boxB: number | undefined;
   //
   private _prodData;
@@ -313,11 +314,15 @@ class Class_product {
         this.boxB = boxB ? String(boxB / 1000) : '';
       }
 
+      this._defaultBoxB = this.boxB;
+
       this.findBDoptions();
       this.options_boxB?.unshift({
-        value: boxB ? String(boxB / 1000) : '',
+        value: 'auto',
         label: '自動計算',
       });
+
+      // _defaultBoxB
 
       // ________________________
 
@@ -1069,7 +1074,12 @@ class Class_product {
     return this._prodData.boxB;
   }
   set boxB(v) {
+    if (v === 'auto') {
+      v = this._defaultBoxB;
+    }
+
     this._prodData.boxB = v;
+
     this._boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
     this.reRender();
