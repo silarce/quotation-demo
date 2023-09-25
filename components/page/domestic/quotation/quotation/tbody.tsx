@@ -22,6 +22,7 @@ import type { Toption } from 'js/utils/options/options';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';
+
 import { DndContext, DraggableAttributes } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -65,6 +66,7 @@ export default function Tbody({
   prodCellConfig,
   onRowClick,
   panelBox,
+  defalutVKeyArr,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -73,7 +75,8 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (onj: { item: Titem }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
+  defalutVKeyArr?: string[];
 }) {
   // ---------------------------------------------------------------
 
@@ -86,7 +89,7 @@ export default function Tbody({
     onDragEnd,
     onDragStart,
   } = useVerticalDnd({
-    listKeyArr: Object.keys(rowList),
+    listKeyArr: defalutVKeyArr || Object.keys(rowList),
     resetTrigger: rowList,
   });
 
@@ -145,6 +148,7 @@ export default function Tbody({
                   setActiveKey(key);
                   onRowClick && onRowClick({ item: item });
                 }}
+                defalutVKeyArr={defalutVKeyArr}
               />
             );
           })}
@@ -222,6 +226,26 @@ const EasyBox = ({
   );
 };
 
+const AcceBox = ({
+  indexNum,
+  dndAttr,
+  dndListener,
+  acceName,
+}: {
+  indexNum: string | number;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  acceName: string;
+}) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[120px]')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+      {/* <span>{indexNum}</span> */}
+      <span>{acceName}</span>
+    </div>
+  );
+};
+
 // --------------------------------------------------------
 
 const NoItem = ({
@@ -259,6 +283,7 @@ function DndRow({
   pIndex,
   item,
   keyArr: keyArr,
+  defalutVKeyArr,
   isMoving,
   disabled,
   onRowClick,
@@ -272,6 +297,7 @@ function DndRow({
   item: Titem;
   // prodKeyArr: TprodKey[];
   keyArr: string[];
+  defalutVKeyArr?: string[];
   isMoving: boolean;
   disabled: boolean;
   //
@@ -279,7 +305,7 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
   //
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -307,6 +333,9 @@ function DndRow({
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+          {panelBox === 'acceBox' && (
+            <AcceBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} acceName={item.acceName} />
+          )}
 
           {/*  */}
           {keyArr.map((key) => {

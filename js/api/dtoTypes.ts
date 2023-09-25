@@ -750,6 +750,7 @@ export type TquotationContentOtherDto = {
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 
 /**選配設定 */ // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
+// CreateQuotationProductOptionDto
 export type TquotationProductOptionDto = {
   id: string;
   createdAt: string;
@@ -762,9 +763,42 @@ export type TquotationProductOptionDto = {
   totalPrice: number; // 複價
   price: number; // 牌價
   dualPrice: number; // 牌價複價
+  order: number;
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductOptionDto = Omit<TquotationProductOptionDto, 'id' | 'createdAt' | 'updatedAt'>;
+
+// 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
+export type TquotationProductComponentsDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  type:
+    | 'slatType'
+    | 'bottomBar'
+    //
+    | 'guideRail'
+    | 'sidePlateType'
+    | 'roller'
+    | 'motor'
+    | 'motorAccessories'
+    | 'headBox';
+  number: string;
+  componentId: string;
+  rawData: string;
+  bom: string;
+  material: string;
+  materialSurface: string;
+  isPainted: boolean;
+  price: number;
+  quantity: string;
+  order: number;
+};
+// 但是後端有建立這個型別
+export type TcreateQuotationProductComponentsDto = Omit<
+  TquotationProductComponentsDto,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 export type quotationProductDto = {
   id: string;
@@ -818,8 +852,6 @@ export type quotationProductDto = {
   onePieceRollUpBox: boolean;
   // 捲箱厚度
   rollUpBoxThick: number;
-  // 數量
-  quantity: number;
   // 單價
   unitPrice: number;
   // 牌價
@@ -836,8 +868,17 @@ export type quotationProductDto = {
   close: string;
   // 備註
   notes: string;
-  // 選配設定
-  options?: TquotationProductOptionDto[] | undefined;
+  // // 選配設定
+  // options?: TquotationProductOptionDto[] | undefined;
+  // // 材料配件
+  // components: TquotationProductComponentsDto[] | undefined;
+  // // 數量
+  // quantity: number;
+  items: {
+    components: TquotationProductComponentsDto[];
+    options: TquotationProductOptionDto[];
+    // 還有其他很多有的沒有的，用不到，以後有空再補上
+  }[];
 };
 
 export type TquotationContentDto = {
@@ -954,7 +995,7 @@ export type TcreateQuotationProductDto = {
   // 捲箱厚度
   rollUpBoxThick: number;
   // 數量
-  quantity: number;
+  quantity: string;
   // 單價
   unitPrice: number;
   // 牌價
@@ -982,6 +1023,10 @@ export type TcreateQuotationProductDto = {
     price: number; // 牌價
     dualPrice: number; // 牌價複價
   }[];
+  //
+  materialSurface: string;
+  isPainted: boolean;
+  order: number;
 };
 
 export type TcreateQuotationContentDto = {

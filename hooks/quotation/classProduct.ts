@@ -7,6 +7,7 @@
  * creAcceList
  * 下拉式選單的選項
  *
+ * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
  */
@@ -23,7 +24,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 
 // ===========================================================
 // child class
-import { Class_accessory, Taccessory, creNotConformAcce } from './classAccessory';
+import { Class_accessory, Taccessory, creEmptyAcce, acceTypeLookUp } from './classAccessory';
 import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
@@ -38,7 +39,11 @@ import type {
   TquotationProductOptionDto,
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto_ComponentInfo,
+  TcreateQuotationProductOptionDto,
+  TcreateQuotationProductComponentsDto,
+  TquotationProductComponentsDto,
 } from 'js/api/dtoTypes';
+
 import type { TreRender, TaccessoryKey } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -77,6 +82,7 @@ class Class_product {
     //
     this._calcProdSubTotalPrice = calcProdSubTotalPrice;
     // from api
+    // 來自/products/door/models // 在useProduct取得 // 目前只有用來生成下拉式選單的樣子
     this._doorModelList = doorModelList;
     //
     this._quantity = String(this._prodData.quantity);
@@ -88,14 +94,21 @@ class Class_product {
     this.findBDoptions();
 
     // __________________________________________________________;
-    // accessoryDataArr.forEach((data, index) => {
-    // const id = index;
-    // this._acceList[`${id}`] = new Class_accessory({
-    //   reRender,
-    //   delSelf,
-    //   // copySelf,
-    // });
-    // });
+
+    // 建立材料配件
+
+    const accePreList: Partial<{ [key in TaccessoryKey]: Taccessory }> = {};
+    this._prodData.components.forEach((item) => {
+      const key = acceTypeLookUp[item.type];
+      accePreList[key] = {
+        ...item,
+        doorModelName: key,
+        code: '',
+        specialSpec: '',
+      };
+    });
+
+    this.creAcceList(accePreList as { [key in TaccessoryKey]: Taccessory });
 
     // ___________________________________________________________
     // 建立選配設定
@@ -115,6 +128,7 @@ class Class_product {
   _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
   private _availableComponents: TdoorComponentListDto | undefined;
   private _thickness = '';
+  private _defaultBoxB = '';
   // private _boxB: number | undefined;
   //
   private _prodData;
@@ -128,6 +142,19 @@ class Class_product {
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  // ---------------------------------------------------------
+  // req呼叫控制
+  // 防抖
+  // cgsTimeout: NodeJS.Timeout | null = null;
+  // pacTimeout: NodeJS.Timeout | null = null;
+  // pgpbTimeout: NodeJS.Timeout | null = null;
+
+  callAllTimeoutId: NodeJS.Timeout | null = null;
+
+  shouldCall_cgs = false; //req_calcGeneralSpec
+  shouldCall_pac = false; //req_getProdAvailableComponents
+  shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -220,280 +247,279 @@ class Class_product {
     this.reRender();
   }
 
+  resetProd() {
+    const empty = emptyProdOri();
+
+    const prod: Tprod = {
+      ...empty,
+      doorType: this.doorType,
+      length: this.length,
+      width: this.width,
+      height: this.height,
+      area: this.area,
+    };
+
+    this._prodData = prod;
+    this._doorGeneralSpecs = undefined;
+
+    this._availableComponents = undefined;
+    this._thickness = '';
+    this._defaultBoxB = '';
+    this._boxD = '';
+
+    this._quantity = String(this._prodData.quantity);
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
+    this._unitPrice = String(this._prodData.unitPrice);
+    this._totalPrice = String(this._prodData.totalPrice);
+    this.findBDoptions();
+  } // resetProd
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-
-  // 防抖
-  cgsTimeout: NodeJS.Timeout | null = null;
-  pacTimeout: NodeJS.Timeout | null = null;
-  pgpbTimeout: NodeJS.Timeout | null = null;
-
-  req_calcGeneralSpec({ isAntiTyphoonChange = false }: { isAntiTyphoonChange?: boolean } = {}) {
-    const req = async () => {
-      if (!this.doorType || !this.height) {
-        return;
-      }
-
-      if (!this.length && !this.width) {
-        return;
-      }
-
-      const body = (() => {
-        let fullWidth: number | undefined;
-        let WG: number | undefined;
-
-        if (Number(this.length)) {
-          fullWidth = Number(this.length) * 1000;
-        } else if (Number(this.width)) {
-          WG = Number(this.width) * 1000;
-        }
-
-        return {
-          modelName: this.doorType as TpcgsPrams['modelName'],
-          height: Number(this.height) * 1000,
-          isAntiTyphoon: this.typhoonProtection,
-          fullWidth,
-          WG,
-        };
-      })();
-
-      if (!body.fullWidth && !body.WG) {
-        return;
-      }
-
-      const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
-
-      if (!res) {
-        return;
-      }
-
-      //
-      const defaultMotorIndex = res.defaultMotorIndex;
-      const defaultMotor = res.motors[defaultMotorIndex];
-      const defaultMotorBox = defaultMotor.box;
-      // ________________________
-      // 設定馬力
-      this.horsepower = defaultMotor.hp;
-
-      // ________________________
-      // 設定boxB與thickness
-      // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
-      const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-      this.thickness = res.thickness;
-
-      // ________________________
-      // 設定馬達廠商
-      if (defaultMotorBox) {
-        if (defaultMotorBox.東元) {
-          this.motor = '東元';
-          this.boxB = String(defaultMotorBox.東元.boxB / 1000);
-        } else if (defaultMotorBox.大同) {
-          this.motor = '大同';
-          this.boxB = String(defaultMotorBox.大同.boxB / 1000);
-        } else if (defaultMotorBox.default) {
-          this.boxB = String(defaultMotorBox.default.boxB / 1000);
-        }
-      } else {
-        this.boxB = boxB ? String(boxB / 1000) : '';
-      }
-
-      this.findBDoptions();
-
-      // ________________________
-
-      // getProdAvailableComponent用的weight與rollerDiameter來自doorGeneralSpecs
-      if (
-        // 先判斷跟原本的是否一樣
-        this._doorGeneralSpecs?.weight !== res.weight ||
-        this._doorGeneralSpecs?.diameter !== res.diameter
-      ) {
-        this._doorGeneralSpecs = res;
-        this.req_getProdAvailableComponents();
-      } else {
-        if (isAntiTyphoonChange) {
-          this.req_getProdAvailableComponents();
-        }
-
-        this._doorGeneralSpecs = res;
-      }
-
-      this.reRender();
-    }; // req
-
-    if (this.cgsTimeout) {
-      clearTimeout(this.cgsTimeout);
+  // api請求
+  // this.shouldCall_cgs
+  async req_calcGeneralSpec() {
+    if (!this.doorType || !this.height) {
+      return false;
     }
 
-    this.cgsTimeout = setTimeout(() => {
-      req();
-    }, 500);
+    if (!this.length && !this.width) {
+      return false;
+    }
+
+    const body = (() => {
+      let fullWidth: number | undefined;
+      let WG: number | undefined;
+
+      if (Number(this.length)) {
+        fullWidth = Number(this.length) * 1000;
+      } else if (Number(this.width)) {
+        WG = Number(this.width) * 1000;
+      }
+
+      return {
+        modelName: this.doorType as TpcgsPrams['modelName'],
+        height: Number(this.height) * 1000,
+        isAntiTyphoon: this.typhoonProtection,
+        fullWidth,
+        WG,
+      };
+    })();
+
+    if (!body.fullWidth && !body.WG) {
+      return false;
+    }
+
+    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+
+    if (!res) {
+      return false;
+    }
+
+    //
+    const defaultMotorIndex = res.defaultMotorIndex;
+    const defaultMotor = res.motors[defaultMotorIndex];
+    const defaultMotorBox = defaultMotor.box;
+    // ________________________
+    // 設定馬力
+    this.horsepower = defaultMotor.hp;
+
+    // ________________________
+    // 設定boxB與thickness
+    // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
+    const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+    this.thickness = res.thickness;
+
+    // ________________________
+    // 設定馬達廠商
+    if (defaultMotorBox) {
+      if (defaultMotorBox.東元) {
+        this.motor = '東元';
+        this.boxB = String(defaultMotorBox.東元.boxB / 1000);
+      } else if (defaultMotorBox.大同) {
+        this.motor = '大同';
+        this.boxB = String(defaultMotorBox.大同.boxB / 1000);
+      } else if (defaultMotorBox.default) {
+        this.boxB = String(defaultMotorBox.default.boxB / 1000);
+      }
+    } else {
+      this.boxB = boxB ? String(boxB / 1000) : '';
+    }
+
+    this._defaultBoxB = this.boxB;
+
+    this.findBDoptions();
+    this.options_boxB?.unshift({
+      value: 'auto',
+      label: '自動計算',
+    });
+
+    // 先判斷跟原本的是否一樣
+    if (
+      this._doorGeneralSpecs?.weight !== res.weight ||
+      this._doorGeneralSpecs?.diameter !== res.diameter
+      //
+    ) {
+      this.shouldCall_pac = true;
+    }
+
+    if (
+      this._doorGeneralSpecs?.diameter !== res.diameter ||
+      this._doorGeneralSpecs?.slatLength !== res.slatLength ||
+      this._doorGeneralSpecs?.guideRailLength !== res.guideRailLength ||
+      this._doorGeneralSpecs?.bearingHousingTotalLength !== res.bearingHousingTotalLength ||
+      this._doorGeneralSpecs?.headBoxLength !== res.headBoxLength ||
+      this._doorGeneralSpecs?.bearingName !== res.bearingName ||
+      this._doorGeneralSpecs?.sprocketWheelChains !== res.sprocketWheelChains
+    ) {
+      this.shouldCall_pgpb = true;
+    }
+
+    this._doorGeneralSpecs = res;
   } // calcGeneralSpec
 
   // ________________________
-  req_getProdAvailableComponents() {
-    const req = async () => {
-      const rollerDiameter = this._doorGeneralSpecs?.diameter;
+  // this.shouldCall_pac
+  async req_getProdAvailableComponents() {
+    const rollerDiameter = this._doorGeneralSpecs?.diameter;
 
-      if (!this.doorType || !this.weight || !rollerDiameter) {
-        return;
-      }
-
-      const res = await apiGetProdAvailableComponents({
-        modelName: this.doorType as TpacParams['modelName'],
-        weight: this.weight,
-        isAntiTyphoon: this.typhoonProtection,
-        rollerDiameter: rollerDiameter,
-      });
-
-      if (!res) {
-        return;
-      }
-
-      this._availableComponents = res;
-      this.retrieveOptions();
-      this.retrieveCreProdAcce();
-
-      this.reRender();
-    }; // req
-
-    if (this.pacTimeout) {
-      clearTimeout(this.pacTimeout);
+    if (!this.doorType || !this.weight || !rollerDiameter) {
+      return false;
     }
 
-    setTimeout(() => {
-      req();
-    }, 500);
+    const res = await apiGetProdAvailableComponents({
+      modelName: this.doorType as TpacParams['modelName'],
+      weight: this.weight,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: rollerDiameter,
+    });
+
+    if (!res) {
+      return false;
+    }
+
+    this._availableComponents = res;
+
+    this.retrieveOptions();
+    this.retrieveCreProdAcce();
   } //  req_getProdAvailableComponents
 
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-  // 接著設置哪些property改變時要呼叫 reqProdGenerateDoorProductBom
-  // 考慮為req_calcGeneralSpec放一個，使可以控制是否自動呼叫req_getProdAvailableComponents
-
+  // this.shouldCall_pgpb
   /**取得材料配件 */
-  reqProdGenerateDoorProductBom() {
-    const req = async () => {
-      const acceList = this.acceList;
+  async reqProdGenerateDoorProductBom() {
+    const acceList = this.acceList;
 
-      if (!acceList || !this._doorGeneralSpecs || !acceList.motor.gearNumber) {
-        return;
-      }
-
-      const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
-        modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
-        weight: this.weight ?? -1,
-        height: Number(this.height) * 1000,
-        B: Number(this.boxB) * 1000,
-        D: 0,
-        slatLength: this._doorGeneralSpecs.slatLength,
-        guideRailLength: this._doorGeneralSpecs.guideRailLength,
-        rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
-        headBoxLength: this._doorGeneralSpecs.headBoxLength,
-        isAntiTyphoon: this.typhoonProtection,
-        rollerDiameter: this._doorGeneralSpecs.diameter,
-        bearingType: this._doorGeneralSpecs.bearingName,
-        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-        // acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-        // 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-
-        //把req系列的方法改為async
-        // 寫法像這樣
-        // async foo (){}
-        // 然後重新思考設計呼叫鍊
-        /**
-        因為使用者可能會在防抖結束前就編輯了另一個需要呼叫api的property
-        或許可以把防抖id設為每個setter一個
-        然後在呼叫req鍊
-        每次呼叫req鍊就要clear所有的防抖id
-
-setTImeout(()=>{
-  clearTimeout(防抖id_a);
-  clearTimeout(防抖id_b);
-  clearTimeout(防抖id_c);
-  // 類推
-  const reqChan = async ()=>{  }
-},500)
-
-如果每次呼叫就要清掉所有的防抖id，那為什麼不設三個req方法的防抖id就好了
-跟一開始一樣
-
-決定了
-呼叫reqA就一定會接著呼叫reqB與reqC，並清除所有的防抖id
-呼叫reqB就一定會接著呼叫reqC，並清除B跟C的防抖id
-呼叫reqC就一定會清除C的防抖id
-
-明天再想吧
-
-
-
-         */
-
-        gearNumber: acceList.motor?.gearNumber,
-        chains: this._doorGeneralSpecs.sprocketWheelChains,
-      };
-
-      const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
-
-      let haveNull = false;
-
-      Object.values(acceList).forEach((item) => {
-        if (!item) {
-          return (haveNull = true);
-        }
-
-        const key = item.key;
-        const { id, material, materialSurface, isPainted } = item.componentInfo;
-
-        if (!material || !id) {
-          haveNull = true;
-        }
-
-        generateBomObj_empty[key] = {
-          id,
-          material,
-          materialSurface,
-          isPainted,
-        };
-      });
-
-      if (haveNull) {
-        return;
-      }
-
-      const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
-
-      const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
-
-      if (res) {
-        const keyArr = Object.keys(res) as (keyof typeof res)[];
-        keyArr.forEach((key) => {
-          const item = res[key];
-          acceList[key].codeNumber = item.number;
-        });
-      }
-    }; //  req
-
-    if (this.pgpbTimeout) {
-      clearTimeout(this.pgpbTimeout);
+    if (!acceList || !this._doorGeneralSpecs || !acceList.motor.gearNumber) {
+      return;
     }
 
-    setTimeout(() => {
-      req();
-    }, 500);
+    const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
+      modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
+      weight: this.weight ?? -1,
+      height: Number(this.height) * 1000,
+      B: Number(this.boxB) * 1000,
+      D: Number(this.boxD) * 1000,
+      slatLength: this._doorGeneralSpecs.slatLength,
+      guideRailLength: this._doorGeneralSpecs.guideRailLength,
+      rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
+      headBoxLength: this._doorGeneralSpecs.headBoxLength,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: this._doorGeneralSpecs.diameter,
+      bearingType: this._doorGeneralSpecs.bearingName,
+
+      gearNumber: acceList.motor?.gearNumber,
+      chains: this._doorGeneralSpecs.sprocketWheelChains,
+    };
+
+    const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
+
+    let haveNull = false;
+
+    Object.values(acceList).forEach((item) => {
+      if (!item) {
+        return (haveNull = true);
+      }
+
+      const key = item.key;
+      const { id, material, materialSurface, isPainted } = item.componentInfo;
+
+      if (!material || !id) {
+        haveNull = true;
+      }
+
+      generateBomObj_empty[key] = {
+        id,
+        material,
+        materialSurface,
+        isPainted,
+      };
+    });
+
+    if (haveNull) {
+      return;
+    }
+
+    const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
+
+    const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
+
+    if (res) {
+      const keyArr = Object.keys(res) as (keyof typeof res)[];
+      keyArr.forEach((key) => {
+        const item = res[key];
+        acceList[key].codeNumber = item.number;
+      });
+    }
   } // reqProdGenerateDoorProductBom
 
+  async reqChain() {
+    // shouldCall_cgs
+    // shouldCall_pac
+    // shouldCall_pgpb
+    //  req_calcGeneralSpec
+    //  req_getProdAvailableComponents
+    //  reqProdGenerateDoorProductBom
+
+    if (this.shouldCall_cgs) {
+      await this.req_calcGeneralSpec();
+    }
+
+    if (this.shouldCall_cgs) {
+      await this.req_getProdAvailableComponents();
+    }
+
+    if (this.shouldCall_pgpb) {
+      await this.reqProdGenerateDoorProductBom();
+    }
+
+    this.shouldCall_cgs = false;
+    this.shouldCall_pac = false;
+    this.shouldCall_pgpb = false;
+
+    this.reRender();
+  }
+
+  // 注意 retrieveProdComponent裡面也有呼叫 callAllReq
+  callAllReq() {
+    if (this.callAllTimeoutId) {
+      clearTimeout(this.callAllTimeoutId);
+    }
+
+    this.callAllTimeoutId = setTimeout(() => {
+      this.reqChain();
+    }, 500);
+  }
+
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
   // ---------------------------------------------------------
 
+  // 裡面有呼叫cllAllReq的機制
+  // 裡面有呼叫cllAllReq的機制
+  // 裡面有呼叫cllAllReq的機制
   retrieveCreProdAcce() {
     if (!this._availableComponents || !this.weight) {
       return;
@@ -578,18 +604,28 @@ setTImeout(()=>{
     // 變更設計，如果是null，不要帶null進去，
     // 要帶標明為無資料Taccessory進去
 
+    const isGearNumberChanged = this.acceList?.motor?.gearNumber !== motor?.gearNumber;
+
     this.creAcceList({
-      slat: slat || creNotConformAcce(),
-      bottomBar: bottomBar || creNotConformAcce(),
-      guideRail: guideRail || creNotConformAcce(),
-      motor: motor || creNotConformAcce(),
-      sidePlate: sidePlate || creNotConformAcce(),
-      roller: roller || creNotConformAcce(),
-      motorAccessories: motorAccessories || creNotConformAcce(),
-      headBox: headBox || creNotConformAcce(),
+      slat: slat || creEmptyAcce(),
+      bottomBar: bottomBar || creEmptyAcce(),
+      guideRail: guideRail || creEmptyAcce(),
+      motor: motor || creEmptyAcce(),
+      sidePlate: sidePlate || creEmptyAcce(),
+      roller: roller || creEmptyAcce(),
+      motorAccessories: motorAccessories || creEmptyAcce(),
+      headBox: headBox || creEmptyAcce(),
     });
+
+    if (!isGearNumberChanged) {
+      this.shouldCall_pgpb = true;
+      this.callAllReq();
+    }
+
     this.calcAcceAllPrice();
     this.calcProdAllprice();
+
+    return { isGearNumberChanged };
   } // retrieveProdComponent
 
   // ---------------------------------------------------------
@@ -785,7 +821,8 @@ setTImeout(()=>{
       if (phase) {
         phaseList[phase] = {
           value: String(phase),
-          label: phase === 1 ? '單相' : phase === 3 ? '三相' : '未知資料',
+          // label: phase === 1 ? '單相' : phase === 3 ? '三相' : '未知資料',
+          label: phase === 1 ? '1' : phase === 3 ? '3' : '未知資料',
         };
       }
 
@@ -914,7 +951,11 @@ setTImeout(()=>{
       return undefined;
     }
 
-    const arr = doorModel.slatMaterials.map((item) => {
+    const slatMaterials = doorModel.slatMaterials;
+    const order = ['鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
+    const orderedArr = _.orderBy(slatMaterials, (item) => order.indexOf(item.name));
+
+    const arr = orderedArr.map((item) => {
       return {
         value: item.name,
         label: item.name,
@@ -939,7 +980,9 @@ setTImeout(()=>{
       const option = {
         value: imgSrc,
         label: imgSrc,
-        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+        // 在後端那邊會多出一個 / 符號，暫時先把這邊的/拿掉處理
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}products/assets/door-track/${imgSrc}`,
+        // icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
       };
 
       if (withHook === null || withHook === this.typhoonProtection) {
@@ -1041,10 +1084,12 @@ setTImeout(()=>{
 
   set doorType(v) {
     this._prodData.doorType = v;
+    this.resetProd();
 
-    this.req_calcGeneralSpec();
-    this.req_getProdAvailableComponents();
-    this.reqProdGenerateDoorProductBom();
+    this.shouldCall_cgs = true;
+    this.shouldCall_pac = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
 
     this.reRender();
   }
@@ -1056,7 +1101,11 @@ setTImeout(()=>{
     this._prodData.length = v;
     this._prodData.width = '0';
     this.area = this.calcArea();
-    this.req_calcGeneralSpec();
+    this.resetProd();
+
+    this.shouldCall_cgs = true;
+    this.callAllReq();
+
     this.reRender();
   }
   /**WG */
@@ -1067,7 +1116,11 @@ setTImeout(()=>{
     this._prodData.width = v;
     this._prodData.length = '0';
     this.area = this.calcArea();
-    this.req_calcGeneralSpec();
+    this.resetProd();
+
+    this.shouldCall_cgs = true;
+    this.callAllReq();
+
     this.reRender();
   }
   //
@@ -1077,7 +1130,12 @@ setTImeout(()=>{
   set height(v) {
     this._prodData.height = v;
     this.area = this.calcArea();
-    this.req_calcGeneralSpec();
+    this.resetProd();
+
+    this.shouldCall_cgs = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1086,9 +1144,18 @@ setTImeout(()=>{
     return this._prodData.boxB;
   }
   set boxB(v) {
+    if (v === 'auto') {
+      v = this._defaultBoxB;
+    }
+
     this._prodData.boxB = v;
+
     this._boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
+
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1100,6 +1167,10 @@ setTImeout(()=>{
     this._boxD = v;
     this._prodData.boxB = pairBD[this._prodData.doorType]?.DtoB[v] ?? '';
     this.area = this.calcArea();
+
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1290,8 +1361,12 @@ setTImeout(()=>{
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
-    // this.retrieveCreProdAcce();
-    this.req_calcGeneralSpec({ isAntiTyphoonChange: true });
+
+    this.shouldCall_cgs = true;
+    this.shouldCall_pac = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+
     this.reRender();
   }
 
@@ -1330,6 +1405,7 @@ setTImeout(()=>{
   }
   set voltage(str) {
     this._prodData.voltage = str;
+    this.retrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1423,7 +1499,20 @@ setTImeout(()=>{
   //
 
   get body() {
-    const options = Object.values(this.optionsList).map((item) => item.body);
+    // const options = Object.values(this.optionsList).map((item) => item.body);
+    const options: TcreateQuotationProductOptionDto[] = Object.values(this.optionsList).map((item, index) => {
+      return { ...item.body, order: index };
+    });
+
+    const components: TcreateQuotationProductComponentsDto[] = Object.values(this.acceList ?? {}).map((acce, index) => {
+      const body = acce.body;
+
+      return {
+        ...body,
+        order: index,
+        type: body.type as TcreateQuotationProductComponentsDto['type'],
+      };
+    });
 
     return {
       ...this._prodData,
@@ -1433,15 +1522,8 @@ setTImeout(()=>{
       length: String(Number(this._prodData.length) * 1000),
       height: String(Number(this._prodData.height) * 1000),
       boxB: String(Number(this._prodData.width) * 1000),
-      components: [
-        {
-          type: 'slatType',
-          number: 'string',
-          componentId: 'string',
-          rawData: 'string',
-          bom: 'string',
-        },
-      ],
+
+      components: components,
     };
   }
 
@@ -1497,6 +1579,7 @@ type Tprod = {
   close: string; // 開閉方式
   //
   options: TquotationProductOptionDto[];
+  components: TquotationProductComponentsDto[];
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -1512,7 +1595,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'width',
     'height',
     'boxB',
-    'boxD',
+    // 'boxD',
     'thickness',
     'area',
     'volume',
@@ -1651,7 +1734,7 @@ const prodCellConfig: TcellConfig = {
   boxB: {
     label: 'B(m)',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '120px' },
       selectProps: {
         props: {},
       },
@@ -2034,6 +2117,7 @@ const emptyProdOri: () => Tprod = () => {
     close: '',
     //
     options: [],
+    components: [],
   };
 };
 
@@ -2134,6 +2218,14 @@ const filter_sidePlates = ({
     weight: number; // /products/door/calc-general-spec給的weight
   };
 }) => {
+  // console.log('bearingType', filterParams.bearingType);
+  // console.log('gearNumber', filterParams.gearNumber);
+  // console.log('isIntegrated', filterParams.isIntegrated);
+  // console.log('motorVendor', filterParams.motorVendor);
+  // console.log('weight', filterParams.weight);
+  // console.log('----------------------------------------------------');
+  // ---------------------------------------
+
   const filteredArr = dataArr.filter((data) => {
     if (data.bearingType !== null && data.bearingType !== filterParams.bearingType) {
       return false;
@@ -2192,6 +2284,14 @@ const filter_motors = ({
     hasSupportStand: boolean; // 有腳 // 馬達支撐架
   };
 }) => {
+  console.log('horsePower', filterParams.horsePower);
+  console.log('motorVendor', filterParams.motorVendor);
+  console.log('phase', filterParams.phase);
+  console.log('voltage', filterParams.voltage);
+  console.log('weight', filterParams.weight);
+  console.log('hasSupportStand', filterParams.hasSupportStand);
+  console.log('----------------------------------------------------');
+
   const filteredArr = dataArr.filter((data) => {
     let horsePoswer = filterParams.horsePower;
     let d_horsePower = data.horsePower;
@@ -2403,3 +2503,52 @@ NO.4
 
 
  */
+
+// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
+// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
+
+//把req系列的方法改為async
+// 寫法像這樣
+// async foo (){}
+// 然後重新思考設計呼叫鍊
+/**
+        因為使用者可能會在防抖結束前就編輯了另一個需要呼叫api的property
+        或許可以把防抖id設為每個setter一個
+        然後在呼叫req鍊
+        每次呼叫req鍊就要clear所有的防抖id
+
+setTImeout(()=>{
+  clearTimeout(防抖id_a);
+  clearTimeout(防抖id_b);
+  clearTimeout(防抖id_c);
+  // 類推
+  const reqChan = async ()=>{  }
+},500)
+
+如果每次呼叫就要清掉所有的防抖id，那為什麼不設三個req方法的防抖id就好了
+跟一開始一樣
+
+決定了
+呼叫reqA就一定會接著呼叫reqB與reqC，並清除所有的防抖id
+呼叫reqB就一定會接著呼叫reqC，並清除B跟C的防抖id
+呼叫reqC就一定會清除C的防抖id
+
+明天再想吧
+
+目前有四個呼叫api的方法
+為每個方法設一個變數(暫且叫他們shouldCall)，用來判定是否應該被呼叫
+寫一個方法(叫callAll)，會根據這些變數，依序決定是否呼叫api
+callAll會有防抖設定
+編輯各個值的時候，會將對應shouldCall變更為true
+並呼叫callAll
+如果使用者在編輯A後立刻再編輯B，
+因為防抖，只會設定對應的shouldCall為true並重置計時器
+最後再timeout後呼叫這個方法，就會依序呼叫api
+同時設置呼叫時設定disabled
+這樣就能避免重複呼叫而浪費效能或取得錯誤的值
+
+         */
