@@ -230,8 +230,8 @@ export default function QuotationProfile({
 
     setCustomer(v[0]);
     setValue('customerId', v[0].id);
-    setValue('contactPerson', v[0].contacts[0].name);
-    setValue('contactNumber', v[0].contacts[0].phone);
+    setValue('contactPerson', v[0].contacts[0]?.name ?? '');
+    setValue('contactNumber', v[0].contacts[0]?.phone ?? '');
   };
 
   const clearClient = () => {
