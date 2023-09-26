@@ -1022,7 +1022,7 @@ class Class_product {
         value: imgSrc,
         label: imgSrc,
         // 在後端那邊會多出一個 / 符號，暫時先把這邊的/拿掉處理
-        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}products/assets/door-track/${imgSrc}`,
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
         // icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
       };
 
