@@ -304,8 +304,8 @@ const useProductList = ({
         list[key] = new Class_other({
           reRender,
           data: item,
-          delSelf: () => delSelf_other(key),
-          copySelf: () => copySelf_others(key),
+          delSelf: () => delSelf_other(list, key),
+          copySelf: () => copySelf_others(list, key),
           calcSubTotalPrice,
         });
       });
@@ -318,23 +318,22 @@ const useProductList = ({
     setOthersKeyArr(v);
   };
 
-  const delSelf_other = (key: string) => {
-    delete othersList[key];
+  const delSelf_other = (list: TothersList, key: string) => {
+    delete list[key];
     reRender();
   };
 
-  const copySelf_others = (key: string) => {
+  const copySelf_others = (list: TothersList, key: string) => {
     const newKey = `new-${nanoid()}`;
-    const bodyCopy = _.cloneDeep(othersList[key].body);
+    const bodyCopy = _.cloneDeep(list[key].body);
 
-    othersList[newKey] = new Class_other({
+    list[newKey] = new Class_other({
       reRender,
       data: bodyCopy,
-      delSelf: () => delSelf_other(newKey),
-      copySelf: () => copySelf_others(newKey),
+      delSelf: () => delSelf_other(list, newKey),
+      copySelf: () => copySelf_others(list, newKey),
       calcSubTotalPrice,
     });
-
     reRender();
   };
 
@@ -343,8 +342,8 @@ const useProductList = ({
 
     othersList[newKey] = new Class_other({
       reRender,
-      delSelf: () => delSelf_other(newKey),
-      copySelf: () => copySelf_others(newKey),
+      delSelf: () => delSelf_other(othersList, newKey),
+      copySelf: () => copySelf_others(othersList, newKey),
       calcSubTotalPrice,
     });
 
