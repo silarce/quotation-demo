@@ -154,15 +154,14 @@ class Class_product {
   // ---------------------------------------------------------
   // req呼叫控制
   // 防抖
-  // cgsTimeout: NodeJS.Timeout | null = null;
-  // pacTimeout: NodeJS.Timeout | null = null;
-  // pgpbTimeout: NodeJS.Timeout | null = null;
-
   callAllTimeoutId: NodeJS.Timeout | null = null;
 
   shouldCall_cgs = false; //req_calcGeneralSpec
   shouldCall_pac = false; //req_getProdAvailableComponents
   shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
+
+  // 其他防抖
+  timeoutId_retrieveCreProdAcce: NodeJS.Timeout | null = null;
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -285,6 +284,8 @@ class Class_product {
     this._dualPrice = String(this._prodData.dualPrice);
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
+
+    this.takeDefaultDynaValue();
     this.findBDoptions();
   } // resetProd
 
@@ -416,7 +417,7 @@ class Class_product {
     this._availableComponents = res;
 
     this.retrieveOptions();
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
@@ -506,6 +507,7 @@ class Class_product {
     } catch (error) {
     } finally {
       this.isLoading = false;
+      this.takeDefaultDynaValue();
     }
 
     this.shouldCall_cgs = false;
@@ -637,8 +639,31 @@ class Class_product {
     this.calcAcceAllPrice();
     this.calcProdAllprice();
 
+    this.reRender();
+
     return { isGearNumberChanged };
   } // retrieveProdComponent
+
+  callRetrieveCreProdAcce() {
+    if (this.timeoutId_retrieveCreProdAcce) {
+      clearTimeout(this.timeoutId_retrieveCreProdAcce);
+    }
+
+    this.timeoutId_retrieveCreProdAcce = setTimeout(() => {
+      this.retrieveCreProdAcce();
+    }, 50);
+  }
+
+  takeDefaultDynaValue() {
+    this.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
+    this.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
+    this.motor = this.options_motor?.[0].value ?? '';
+    this.horsepower = this.options_horsepower?.[0].value ?? '';
+    this.phase = this.options_phase?.[0].value ?? '';
+    this.voltage = this.options_voltage?.[0].value ?? '';
+
+    this.callRetrieveCreProdAcce(); // 應該可以不用放這個
+  }
 
   // ---------------------------------------------------------
 
@@ -874,12 +899,17 @@ class Class_product {
 
     if (Object.keys(headBoxThickList).length > 0) {
       this.options_rollUpBoxThick = Object.values(headBoxThickList);
+
+      const defalultValue = this.options_rollUpBoxThick[0].value;
+      this.rollUpBoxThick = defalultValue;
     } else {
       this.options_rollUpBoxThick = undefined;
     }
 
     if (Object.keys(railThickList).length > 0) {
       this.options_doorTrackThick = Object.values(railThickList);
+      const defalultValue = this.options_doorTrackThick[0].value;
+      this.doorTrackThick = defalultValue;
     }
   } // retrieveOptions
 
@@ -1236,7 +1266,7 @@ class Class_product {
   set horsepower(v) {
     this._prodData.horsepower = v;
     this.toSetDefaultBoxB();
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
 
@@ -1388,7 +1418,7 @@ class Class_product {
   set motor(v) {
     this._prodData.motor = v;
     this.toSetDefaultBoxB();
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1397,7 +1427,7 @@ class Class_product {
   }
   set voltage(str) {
     this._prodData.voltage = str;
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1407,7 +1437,7 @@ class Class_product {
   }
   set phase(str) {
     this._prodData.phase = Number(str);
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
 
@@ -1417,7 +1447,7 @@ class Class_product {
   }
   set motorSupport(v) {
     this._prodData.motorSupport = v;
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1426,7 +1456,7 @@ class Class_product {
   }
   set bottomBar(v) {
     this._prodData.bottomBar = v;
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1443,6 +1473,7 @@ class Class_product {
   }
   set doorTrackThick(str) {
     this._prodData.doorTrackThick = str;
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1459,7 +1490,7 @@ class Class_product {
   }
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1468,7 +1499,7 @@ class Class_product {
   }
   set onePieceRollUpBox(v) {
     this._prodData.onePieceRollUpBox = v;
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -1477,7 +1508,7 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
-    this.retrieveCreProdAcce();
+    this.callRetrieveCreProdAcce();
     this.reRender();
   }
   //
@@ -2065,14 +2096,17 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          options: [{ value: '電動', label: '電動' }],
+          options: [
+            { value: '電動', label: '電動' },
+            { value: '手動', label: '手動' },
+          ],
         },
       },
     },
   },
 }; // prodCellConfig close
 
-const emptyProdOri: () => Tprod = () => {
+const emptyProdOri = (): Tprod => {
   return {
     discount: '100',
     itemName: '',
@@ -2103,12 +2137,12 @@ const emptyProdOri: () => Tprod = () => {
     phase: 1,
     motorSupport: false,
     bottomBar: '',
-    motorLockBox: '',
-    doorTrackThick: '',
-    rollerSpec: '',
+    motorLockBox: '外露',
+    doorTrackThick: '', // 門軌厚度
+    rollerSpec: '無凸',
     doorTrackSilencerStrip: false,
     onePieceRollUpBox: false,
-    rollUpBoxThick: '',
+    rollUpBoxThick: '', // 捲箱厚度
     close: '',
     //
     options: [],
