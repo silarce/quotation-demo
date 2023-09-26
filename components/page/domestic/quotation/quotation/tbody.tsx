@@ -96,6 +96,9 @@ export default function Tbody({
     resetTrigger: rowList,
   });
 
+  // console.log(rowList);
+  // console.log(vDndKeyArr);
+
   // useEffect(() => {
   //   onVerticalKeyChange(dndKeyArr);
   //   // eslint-disable-next-line react-hooks/exhaustive-deps

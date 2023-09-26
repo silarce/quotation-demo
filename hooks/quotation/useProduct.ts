@@ -117,18 +117,6 @@ const useProductList = ({
       return;
     }
 
-    // const orderArr = productArr.map((item) => {
-    //   return item.order;
-    // });
-
-    // const isEqual = _.isEqual(_.sortBy(orderArr), _.sortBy(productsOrder));
-
-    // if (isEqual) {
-    //   setProdVKeyArr(productsOrder);
-    // } else {
-    //   setProdVKeyArr(undefined);
-    // }
-
     createProdList();
   }, [resetTrigger, doorModelList]);
 
@@ -138,7 +126,6 @@ const useProductList = ({
     }
 
     const sortedProdArr = _.sortBy(productArr, 'order');
-
     const list: TproductList = {};
 
     // 每次上傳前會將prod的order依照當時的排序重新設定
@@ -174,8 +161,8 @@ const useProductList = ({
       list[key] = new Class_product({
         reRender,
         prodData,
-        delSelf: () => delSelf(key),
-        copySelf: () => copySelf(key),
+        delSelf: () => delSelf_prod(list, key),
+        copySelf: () => copySelf_prod(list, key),
 
         calcSubTotalPrice,
         doorModelList,
@@ -188,33 +175,27 @@ const useProductList = ({
   };
 
   //
-  //
-  //
 
   const changeProdKeyArr = (v: TprodKey[]) => {
     setProdKeyArr(v);
     localStorage.setItem('domestic/quotation_prodKeyArr', JSON.stringify(v));
   };
 
-  const delSelf = (key: string) => {
-    delete productList[key];
+  const delSelf_prod = (list: TproductList, key: string) => {
+    delete list[key];
     calcSubTotalPrice();
-
-    setProdVKeyArr((arr) => {
-      if (!arr) {
-        return undefined;
-      }
-
-      arr?.splice(arr.indexOf(key), 1);
-    });
-
     reRender();
   };
 
-  const copySelf = (copyKey: string) => {
-    const newKey = String(Object.keys(productList).length);
-    const copy = _.cloneDeep(productList[copyKey]);
-    productList[newKey] = copy;
+  const copySelf_prod = (list: TproductList, copyKey: string) => {
+    const newKey = nanoid();
+    const copy = _.cloneDeep(list[copyKey]);
+
+    copy.delSelf = () => delSelf_prod(list, newKey);
+    copy.copySelf = () => copySelf_prod(list, newKey);
+    copy.clearId();
+
+    list[newKey] = copy;
     calcSubTotalPrice();
     reRender();
   };
@@ -227,26 +208,14 @@ const useProductList = ({
     const newKey = nanoid();
     const classProd = new Class_product({
       reRender,
-
-      delSelf: () => delSelf(newKey),
-      copySelf: () => copySelf(newKey),
-      //
+      delSelf: () => delSelf_prod(productList, newKey),
+      copySelf: () => copySelf_prod(productList, newKey),
       calcSubTotalPrice,
-      //
       doorModelList,
     });
     productList[newKey] = classProd;
 
-    setProdVKeyArr((arr) => {
-      if (!arr) {
-        return [newKey];
-      }
-
-      return [...arr, newKey];
-    });
-
     reRender();
-    // setProductList(copy);
   };
 
   const calcSubTotalPrice = () => {
