@@ -845,9 +845,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     // prodVKeyArr
 
+    let prodQty = 0;
+
     const prodArr: TcreateQuotationProductDto[] =
       prodVKeyArr?.map((key, index) => {
         const prod = productList[key];
+        const quantity = Number(prod.quantity);
+
+        prodQty = prodQty + quantity;
 
         return {
           ...prod.body,
@@ -856,14 +861,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
           doorTrackThick: Number(prod.doorTrackThick),
           motorSupport: String(+prod.motorSupport),
           //
-          quantity: Number(prod.quantity),
+          quantity: quantity,
           materialSurface: prod.surface ?? '',
           isPainted: false,
           order: index,
         };
       }) ?? [];
-
-    console.log(prodArr);
 
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
@@ -877,7 +880,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data_watch.address ?? '',
       contactPerson: data_watch.contactPerson ?? '',
       contactNumber: data_watch.contactNumber ?? '',
-      quantity: data_watch.quantity ?? 0,
+      quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
       managerId: data_watch.managerEmployee?.id ?? null,
@@ -911,36 +914,38 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
     };
 
-    try {
-      setIsLoading(true);
+    console.log(body);
 
-      if (quotationId) {
-        const res = await apiPatchQuotation(body, quotationId);
-        showRootLoading(true, '正在更新附件');
-        // res跟api文件不一樣，現在沒時間修正
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        await uploadAttachment(res.quotation.id);
+    // try {
+    //   setIsLoading(true);
 
-        await Promise.all([update(), updateAttachments()]);
-      } else {
-        const res = await apiPostQuotation(body);
-        showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
-        router.push({
-          query: {
-            id: res.id,
-          },
-        });
-      }
+    //   if (quotationId) {
+    //     const res = await apiPatchQuotation(body, quotationId);
+    //     showRootLoading(true, '正在更新附件');
+    //     // res跟api文件不一樣，現在沒時間修正
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     await uploadAttachment(res.quotation.id);
 
-      setDisabled(true);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-      showRootLoading(false);
-    }
+    //     await Promise.all([update(), updateAttachments()]);
+    //   } else {
+    //     const res = await apiPostQuotation(body);
+    //     showRootLoading(true, '正在更新附件');
+    //     await uploadAttachment(res.id);
+    //     router.push({
+    //       query: {
+    //         id: res.id,
+    //       },
+    //     });
+    //   }
+
+    //   setDisabled(true);
+    // } catch (error) {
+    //   console.log(error);
+    // } finally {
+    //   setIsLoading(false);
+    //   showRootLoading(false);
+    // }
     //
   }; // reqUpdateQuotation
 
