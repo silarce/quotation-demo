@@ -1038,6 +1038,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
               add={() => {
                 targetProd?.addOption();
               }}
+              defalutVKeyArr={targetProd?.optionsVKeyArr}
+              onVKeyChange={(keyArr) => {
+                if (targetProd) {
+                  targetProd.optionsVKeyArr = keyArr;
+                }
+              }}
             />
           </div>
 

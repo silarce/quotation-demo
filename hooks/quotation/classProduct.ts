@@ -5,6 +5,8 @@
  * AcceList
  * retrieveCreProdAcce
  * creAcceList
+ * createOptionsList
+ *
  * 下拉式選單的選項
  *
  * req_calcGeneralSpec
@@ -250,13 +252,20 @@ class Class_product {
     this.reRender();
   }
 
+  optionsVKeyArr: string[] | undefined;
+
   createOptionsList() {
     // const optionArr = this._prodData.options;
-    const optionArr = this._prodData.options;
+    const optionArr = _.sortBy(this._prodData.options, 'order');
     const list: { [key: string]: Class_options } = {};
 
     optionArr?.forEach((item) => {
-      const key = item.id;
+      let key = item.order !== undefined ? `${item.order}` : nanoid();
+
+      if (key in list) {
+        key = nanoid();
+      }
+
       list[key] = new Class_options({
         reRender: this.reRender,
         data: item,
@@ -1551,10 +1560,21 @@ class Class_product {
   //
 
   get body() {
-    const options: TcreateQuotationProductOptionDto[] = Object.values(this.optionsList).map((item, index) => {
-      return { ...item.body, order: index };
-    });
+    //
+    if (!this.optionsVKeyArr) {
+      this.optionsVKeyArr = [];
+    }
 
+    const checkOptionsKey = Object.keys(this.optionsList).every((key) => this.optionsVKeyArr!.includes(key));
+    const arrForCreate = checkOptionsKey ? this.optionsVKeyArr : Object.keys(this.optionsList);
+
+    const options: TcreateQuotationProductOptionDto[] =
+      arrForCreate?.map((key, index) => {
+        const item = this.optionsList[key];
+
+        return { ...item.body, order: index };
+      }) ?? [];
+    //
     const components: TcreateQuotationProductComponentsDto[] = Object.values(this.acceList ?? {}).map((acce, index) => {
       const body = acce.body;
 
@@ -2285,14 +2305,6 @@ const filter_sidePlates = ({
     weight: number; // /products/door/calc-general-spec給的weight
   };
 }) => {
-  // console.log('bearingType', filterParams.bearingType);
-  // console.log('gearNumber', filterParams.gearNumber);
-  // console.log('isIntegrated', filterParams.isIntegrated);
-  // console.log('motorVendor', filterParams.motorVendor);
-  // console.log('weight', filterParams.weight);
-  // console.log('----------------------------------------------------');
-  // ---------------------------------------
-
   const filteredArr = dataArr.filter((data) => {
     if (data.bearingType !== null && data.bearingType !== filterParams.bearingType) {
       return false;

@@ -19,6 +19,8 @@ export default function Table_options({
   keyArr,
   changeKeyArr,
   add,
+  defalutVKeyArr,
+  onVKeyChange,
 }: {
   disabled: boolean;
   list: ToptionsList | undefined;
@@ -26,6 +28,8 @@ export default function Table_options({
   keyArr: ToptionsKey[];
   changeKeyArr: (arr: ToptionsKey[]) => void;
   add?: () => void;
+  defalutVKeyArr?: string[] | undefined;
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -60,6 +64,8 @@ export default function Table_options({
               keyArr={keyArr}
               prodCellConfig={cellConfig}
               onRowClick={(obj) => {}}
+              defalutVKeyArr={defalutVKeyArr}
+              onVKeyChange={onVKeyChange}
             />
           )}
 
