@@ -1016,26 +1016,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
             onProfileChange={onProfileChange}
           />
 
-          <div className={style.switchBar}>
-            <div className={style.active}>報價項目</div>
+          <div className={classNames(style.switchBar)}>
+            <div>報價項目</div>
           </div>
 
-          {/* 主產品設定 */}
-          <Table_prod
-            disabled={disabled}
-            prodList={productList}
-            prodCellConfig={prodCellConfig}
-            prodKeyArr={prodKeyArr}
-            changeProdKeyArr={changeProdKeyArr}
-            addProd={addProd}
-            setTargetProd={setTargetProd}
-            defalutVKeyArr={prodVKeyArr}
-            onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-          />
+          <div className={style.tableWrapper}>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={disabled}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd}
+              setTargetProd={setTargetProd}
+              defalutVKeyArr={prodVKeyArr}
+              onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+            />
 
-          <div className={style.redWrapper}>
             {/* 材料配件設定 */}
-            <div className="relative">
+            <div className="relative mt-[14px]">
               <Table_acce
                 disabled={disabled}
                 acceList={targetProd?.acceList}
@@ -1046,7 +1046,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
               />
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>
-            <hr />
+          </div>
+
+          <div className={style.redWrapper}>
             {/* 選配設定 */}
             <Table_options
               disabled={disabled}
@@ -1059,17 +1061,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
               }}
             />
           </div>
-          {/* 其他設定 */}
 
-          <Table_others
-            disabled={disabled}
-            list={othersList}
-            cellConfig={othersCellConfig}
-            keyArr={othersKeyArr}
-            changeKeyArr={changeOthersKeyArr}
-            add={addOthers}
-          />
-
+          <div className={style.tableWrapper}>
+            {/* 其他設定 */}
+            <Table_others
+              disabled={disabled}
+              list={othersList}
+              cellConfig={othersCellConfig}
+              keyArr={othersKeyArr}
+              changeKeyArr={changeOthersKeyArr}
+              add={addOthers}
+            />
+          </div>
           {/* 備註/報價範圍/付款資訊 */}
 
           <Summary
