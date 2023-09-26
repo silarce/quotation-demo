@@ -11,7 +11,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
-import { Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
+import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
 import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
 import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
 
@@ -22,7 +22,7 @@ import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationConten
 
 type TreRender = () => void;
 
-type TaccessoryKey =
+type TcomponentKey =
   | 'slat'
   | 'bottomBar'
   | 'guideRail'
@@ -36,8 +36,8 @@ type TproductList = {
   [key: string]: Class_product;
 };
 
-type TacceList = {
-  [key in TaccessoryKey]: Class_accessory;
+type TcomList = {
+  [key in TcomponentKey]: Class_component;
 };
 
 type ToptionsList = {
@@ -242,8 +242,8 @@ const useProductList = ({
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  const [acceKeyArr, setAcceKeyArr] = useState<string[]>(acceKeyArrOri());
-  const [acceVKeyArr, setacceVKeyArr] = useState<string[]>([
+  const [comKeyArr, setComKeyArr] = useState<string[]>(comKeyArrOri());
+  const [comVKeyArr, setComVKeyArr] = useState<string[]>([
     'slat',
     'roller',
     'headBox',
@@ -254,8 +254,8 @@ const useProductList = ({
     'sidePlate',
   ]);
 
-  const changeAcceKeyArr = (v: string[]) => {
-    setAcceKeyArr(v);
+  const changeComKeyArr = (v: string[]) => {
+    setComKeyArr(v);
   };
 
   // ---------------------------------------------------------
@@ -358,10 +358,10 @@ const useProductList = ({
     //
     subTotal,
     //
-    acceKeyArr,
-    acceVKeyArr,
-    acceCellConfig,
-    changeAcceKeyArr,
+    comKeyArr,
+    comVKeyArr,
+    comCellConfig,
+    changeComKeyArr,
     //
     optionsKeyArr,
     changeOptionsKeyArr,
@@ -384,9 +384,9 @@ export type {
   TprodKey,
   TproductList,
   //
-  Class_accessory,
-  TaccessoryKey,
-  TacceList,
+  Class_component as Class_component,
+  TcomponentKey,
+  TcomList,
   //
   ToptionsKey,
   ToptionsList,

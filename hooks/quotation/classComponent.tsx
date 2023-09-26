@@ -10,13 +10,13 @@ import { Toption } from 'js/utils/options/options';
 
 import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
-import scss from './classAccessory.module.scss';
+import scss from './classComponent.module.scss';
 
 import { TgenerateDoorProductBomDto_ComponentInfo } from 'js/api/api_product';
-import { TaccessoryKey } from './useProduct';
+import { TcomponentKey } from './useProduct';
 
 // ===========================================================
-class Class_accessory {
+class Class_component {
   constructor({
     reRender,
     data,
@@ -25,26 +25,26 @@ class Class_accessory {
     callReqGetCodeNumber,
   }: {
     reRender: TreRender;
-    data: Taccessory;
-    key: TaccessoryKey;
+    data: Tcomponent;
+    key: TcomponentKey;
     prod: Class_product;
     callReqGetCodeNumber: () => void;
   }) {
     this.reRender = reRender;
     this._prod = prod;
-    this._acce = data;
+    this._com = data;
     this.key = key;
 
     this.callReqGetCodeNumber = callReqGetCodeNumber;
 
-    if (!this._acce.material) {
+    if (!this._com.material) {
       if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
-        this._acce.material = acceLookUp[key].options[0].value;
+        this._com.material = comLookUp[key].options[0].value;
       }
     }
 
-    if (!this._acce.quantity) {
-      this._acce.quantity = calcDefaultQuantity({
+    if (!this._com.quantity) {
+      this._com.quantity = calcDefaultQuantity({
         key,
         w: Number(prod.width),
         l: Number(prod.length),
@@ -58,7 +58,7 @@ class Class_accessory {
 
   private reRender;
   private _prod;
-  private _acce;
+  private _com;
   readonly key;
   readonly callReqGetCodeNumber;
   //
@@ -94,13 +94,13 @@ class Class_accessory {
   };
 
   calcAllPrice({
-    toCalcAcceAllprice = true,
+    toCalcComAllprice = true,
   }: //
-  { toCalcAcceAllprice?: boolean } = {}) {
+  { toCalcComAllprice?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
 
     const price = this.price || 0;
-    const quantity = Number(this._acce.quantity || 0);
+    const quantity = Number(this._com.quantity || 0);
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -112,8 +112,8 @@ class Class_accessory {
     this._unitPrice = unitPrice.ceil().toNumber();
     this._totalPrice = totalPrice.ceil().toNumber();
 
-    if (toCalcAcceAllprice) {
-      this._prod.calcAcceAllPrice();
+    if (toCalcComAllprice) {
+      this._prod.calcComAllPrice();
     }
 
     this.reRender();
@@ -122,15 +122,15 @@ class Class_accessory {
   // ---------------------------------------------------------
 
   get hiddenKeyArr() {
-    return acceLookUp[this.key].hiddenKeyArr;
+    return comLookUp[this.key].hiddenKeyArr;
   }
 
   get componentInfo() {
     const info: TgenerateDoorProductBomDto_ComponentInfo = {
-      id: this._acce.id,
-      material: this._acce.material ?? '', // 注意，api不接受空字串
-      materialSurface: this._acce.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
-      isPainted: !!this._acce.isPainted,
+      id: this._com.id,
+      material: this._com.material ?? '', // 注意，api不接受空字串
+      materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
+      isPainted: !!this._com.isPainted,
     };
 
     return info;
@@ -143,7 +143,7 @@ class Class_accessory {
       return this._prod.options_material;
     }
 
-    return acceLookUp[this.key].options;
+    return comLookUp[this.key].options;
   }
 
   get options_surface() {
@@ -155,45 +155,45 @@ class Class_accessory {
   }
 
   // ---------------------------------------------------------
-  get acceName() {
-    return acceLookUp[this.key].typeName;
+  get comName() {
+    return comLookUp[this.key].typeName;
   }
 
   get desc() {
-    if (!this._acce.id) {
+    if (!this._com.id) {
       return '沒有符合規格的產品';
     }
 
-    return acceLookUp[this.key].creDesc(this);
+    return comLookUp[this.key].creDesc(this);
   }
 
   // -------------------------------------------1--------------
   get doorModelName() {
-    return this._acce.doorModelName;
+    return this._com.doorModelName;
   }
   set doorModelName(v) {
-    this._acce.doorModelName = v;
+    this._com.doorModelName = v;
     this.reRender();
   }
 
   get code() {
-    return this._acce.code;
+    return this._com.code;
   }
   set code(v) {
-    this._acce.code = v;
+    this._com.code = v;
     this.reRender();
   }
 
   get specialSpec() {
-    return this._acce.specialSpec;
+    return this._com.specialSpec;
   }
   set specialSpec(v) {
-    this._acce.specialSpec = v;
+    this._com.specialSpec = v;
     this.reRender();
   }
 
   get price() {
-    return this._acce.price;
+    return this._com.price;
   }
   // set price(v) {
   //   this._data.price = v;
@@ -201,7 +201,7 @@ class Class_accessory {
   // }
 
   get name() {
-    return this._acce.name;
+    return this._com.name;
   }
   // set name(v) {
   //   this._data.name = v;
@@ -209,180 +209,180 @@ class Class_accessory {
   // }
 
   get isAntiTyphoon() {
-    return this._acce.isAntiTyphoon;
+    return this._com.isAntiTyphoon;
   }
   set isAntiTyphoon(v) {
-    this._acce.isAntiTyphoon = v;
+    this._com.isAntiTyphoon = v;
     this.reRender();
   }
 
   get gearNumber() {
-    return this._acce.gearNumber;
+    return this._com.gearNumber;
   }
   set gearNumber(v) {
-    this._acce.gearNumber = v;
+    this._com.gearNumber = v;
     this.reRender();
   }
 
   get motorVendor() {
-    return this._acce.motorVendor;
+    return this._com.motorVendor;
   }
   set motorVendor(v) {
-    this._acce.motorVendor = v;
+    this._com.motorVendor = v;
     this.reRender();
   }
 
   get bearingType() {
-    return this._acce.bearingType;
+    return this._com.bearingType;
   }
   set bearingType(v) {
-    this._acce.bearingType = v;
+    this._com.bearingType = v;
     this.reRender();
   }
 
   get thickness() {
-    return this._acce.thickness;
+    return this._com.thickness;
   }
   set thickness(v) {
-    this._acce.thickness = v;
+    this._com.thickness = v;
     this.reRender();
   }
 
   get isIntegrated() {
-    return this._acce.isIntegrated;
+    return this._com.isIntegrated;
   }
   set isIntegrated(v) {
-    this._acce.isIntegrated = v;
+    this._com.isIntegrated = v;
     this.reRender();
   }
 
   get isWaterProof() {
-    return this._acce.isWaterProof;
+    return this._com.isWaterProof;
   }
   set isWaterProof(v) {
-    this._acce.isWaterProof = v;
+    this._com.isWaterProof = v;
     this.reRender();
   }
 
   get hasAluminumBarrier() {
-    return this._acce.hasAluminumBarrier;
+    return this._com.hasAluminumBarrier;
   }
   set hasAluminumBarrier(v) {
-    this._acce.hasAluminumBarrier = v;
+    this._com.hasAluminumBarrier = v;
     this.reRender();
   }
 
   get hasSilencingStrip() {
-    return this._acce.hasSilencingStrip;
+    return this._com.hasSilencingStrip;
   }
   set hasSilencingStrip(v) {
-    this._acce.hasSilencingStrip = v;
+    this._com.hasSilencingStrip = v;
     this.reRender();
   }
 
   get maxDoorWeight() {
-    return this._acce.maxDoorWeight;
+    return this._com.maxDoorWeight;
   }
   set maxDoorWeight(v) {
-    this._acce.maxDoorWeight = v;
+    this._com.maxDoorWeight = v;
     this.reRender();
   }
 
   get minDoorWeight() {
-    return this._acce.minDoorWeight;
+    return this._com.minDoorWeight;
   }
   set minDoorWeight(v) {
-    this._acce.minDoorWeight = v;
+    this._com.minDoorWeight = v;
     this.reRender();
   }
 
   get diameter() {
-    return this._acce.diameter;
+    return this._com.diameter;
   }
   set diameter(v) {
-    this._acce.diameter = v;
+    this._com.diameter = v;
     this.reRender();
   }
 
   get horsePower() {
-    return this._acce.horsePower;
+    return this._com.horsePower;
   }
   set horsePower(v) {
-    this._acce.horsePower = v;
+    this._com.horsePower = v;
     this.reRender();
   }
 
   get phase() {
-    return this._acce.phase;
+    return this._com.phase;
   }
   set phase(v) {
-    this._acce.phase = v;
+    this._com.phase = v;
     this.reRender();
   }
 
   get voltage() {
-    return this._acce.voltage;
+    return this._com.voltage;
   }
   set voltage(v) {
-    this._acce.voltage = v;
+    this._com.voltage = v;
     this.reRender();
   }
 
   get loadWeight() {
-    return this._acce.loadWeight;
+    return this._com.loadWeight;
   }
   set loadWeight(v) {
-    this._acce.loadWeight = v;
+    this._com.loadWeight = v;
     this.reRender();
   }
 
   get hasSupportStand() {
-    return this._acce.hasSupportStand;
+    return this._com.hasSupportStand;
   }
   set hasSupportStand(v) {
-    this._acce.hasSupportStand = v;
+    this._com.hasSupportStand = v;
     this.reRender();
   }
 
   get chains() {
-    return this._acce.chains;
+    return this._com.chains;
   }
   set chains(v) {
-    this._acce.chains = v;
+    this._com.chains = v;
     this.reRender();
   }
   // --------------------------------------------------
   // --------------------------------------------------
-  // 不來自於Taccessory
+  // 不來自於Tcomponent
 
   get material() {
-    return this._acce.material ?? '';
+    return this._com.material ?? '';
   }
   set material(v) {
     if (!checkIsSST(v ?? '')) {
-      this._acce.materialSurface = '';
+      this._com.materialSurface = '';
     }
 
-    this._acce.material = v;
+    this._com.material = v;
     this.callReqGetCodeNumber();
     this.reRender();
   }
 
   get surface() {
-    return this._acce.materialSurface;
+    return this._com.materialSurface;
   }
   set surface(v) {
-    this._acce.materialSurface = v;
+    this._com.materialSurface = v;
     this.callReqGetCodeNumber();
     this.reRender();
   }
 
   get isPainted() {
-    return this._acce.isPainted;
+    return this._com.isPainted;
   }
 
   set isPainted(v) {
-    this._acce.isPainted = v;
+    this._com.isPainted = v;
     this.callReqGetCodeNumber();
     this.reRender();
   }
@@ -392,27 +392,27 @@ class Class_accessory {
   }
 
   get quantity() {
-    return this._acce.quantity ?? '';
+    return this._com.quantity ?? '';
   }
   set quantity(str) {
-    this._acce.quantity = str;
+    this._com.quantity = str;
     this.calcAllPrice();
     this.reRender();
   }
 
   get codeNumber() {
-    return this._acce.number ?? '';
+    return this._com.number ?? '';
   }
   set codeNumber(v) {
-    this._acce.number = v;
+    this._com.number = v;
     this.reRender();
   }
 
   get componentId() {
-    return this._acce.componentId ?? '';
+    return this._com.componentId ?? '';
   }
   set componentId(v) {
-    this._acce.componentId = v;
+    this._com.componentId = v;
     this.reRender();
   }
 
@@ -429,17 +429,17 @@ class Class_accessory {
   }
 
   get unit() {
-    return acceLookUp[this.key].unit;
+    return comLookUp[this.key].unit;
   }
 
   get body() {
     return {
-      type: acceLookUp[this.key].type,
-      material: this._acce.material ?? '',
-      materialSurface: this._acce.materialSurface || undefined,
-      isPainted: this._acce.isPainted ?? false,
-      price: this._acce.price ?? 0,
-      quantity: Number(this._acce.quantity) ?? 0,
+      type: comLookUp[this.key].type,
+      material: this._com.material ?? '',
+      materialSurface: this._com.materialSurface || undefined,
+      isPainted: this._com.isPainted ?? false,
+      price: this._com.price ?? 0,
+      quantity: Number(this._com.quantity) ?? 0,
       // 下面這幾個先跳過
       number: this.codeNumber ?? '',
       componentId: this.componentId ?? '',
@@ -448,11 +448,11 @@ class Class_accessory {
       // order: '', //在外面處理
     };
   }
-} // Class_accessory
+} // Class_component
 
 // ===========================================================
 
-type Taccessory = {
+type Tcomponent = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -531,7 +531,7 @@ type Taccessory = {
 
 // type TacceKey = keyof Taccessory;
 
-const acceKeyArrOri: () => string[] = () => {
+const comKeyArrOri: () => string[] = () => {
   return [
     // 'acceName',
     'codeNumber',
@@ -552,8 +552,8 @@ const acceKeyArrOri: () => string[] = () => {
   ];
 };
 
-const acceCellConfig: TcellConfig = {
-  acceName: {
+const comCellConfig: TcellConfig = {
+  comName: {
     label: '名稱',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
@@ -733,16 +733,16 @@ const acceCellConfig: TcellConfig = {
 // ============================================================================================
 // ============================================================================================
 
-const creDesc_slats = (classAcce: Class_accessory) => {
-  const { isAntiTyphoon, material, surface, thickness, name } = classAcce;
+const creDesc_slats = (classCom: Class_component) => {
+  const { isAntiTyphoon, material, surface, thickness, name } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
 
   // return `${desc_isAntiTyphoon} `;
   return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };
 
-const creDesc_bottomBars = (classAcce: Class_accessory) => {
-  const { isAntiTyphoon, isWaterProof, hasAluminumBarrier } = classAcce;
+const creDesc_bottomBars = (classCom: Class_component) => {
+  const { isAntiTyphoon, isWaterProof, hasAluminumBarrier } = classCom;
 
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
   const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
@@ -753,8 +753,8 @@ const creDesc_bottomBars = (classAcce: Class_accessory) => {
   return ``;
 };
 
-const creDesc_guideRails = (classAcce: Class_accessory) => {
-  const { name, material, hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
+const creDesc_guideRails = (classCom: Class_component) => {
+  const { name, material, hasSilencingStrip, isAntiTyphoon, thickness } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
   const desc_hasSilencingStrip = confomtTree.hasSilencingStrip[`${hasSilencingStrip}`];
 
@@ -763,7 +763,7 @@ const creDesc_guideRails = (classAcce: Class_accessory) => {
   return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };
 
-const creDesc_sidePlates = (classAcce: Class_accessory) => {
+const creDesc_sidePlates = (classCom: Class_component) => {
   const {
     //
     name,
@@ -773,7 +773,7 @@ const creDesc_sidePlates = (classAcce: Class_accessory) => {
     maxDoorWeight,
     minDoorWeight,
     motorVendor,
-  } = classAcce;
+  } = classCom;
 
   const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
 
@@ -783,14 +783,14 @@ const creDesc_sidePlates = (classAcce: Class_accessory) => {
   return `${name ?? ''} `;
 };
 
-const creDesc_rollers = (classAcce: Class_accessory) => {
-  const { diameter } = classAcce;
+const creDesc_rollers = (classCom: Class_component) => {
+  const { diameter } = classCom;
 
   // return `直徑:${diameter ?? '無資料'}`;
   return `∮${diameter ?? ''}`;
 };
 
-const creDesc_motors = (classAcce: Class_accessory) => {
+const creDesc_motors = (classCom: Class_component) => {
   const {
     //
     gearNumber,
@@ -800,7 +800,7 @@ const creDesc_motors = (classAcce: Class_accessory) => {
     motorVendor,
     phase,
     voltage,
-  } = classAcce;
+  } = classCom;
 
   const thePhase = phase as 1 | 3 | undefined | null;
 
@@ -824,8 +824,8 @@ const creDesc_motors = (classAcce: Class_accessory) => {
   return `${desc_phase} ${desc_voltage} ${desc_horsepower}`;
 };
 
-const creDesc_motorAccessories = (classAcce: Class_accessory) => {
-  const { name, bearingType, chains } = classAcce;
+const creDesc_motorComponent = (classCom: Class_component) => {
+  const { name, bearingType, chains } = classCom;
 
   // const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
   // const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
@@ -836,8 +836,8 @@ const creDesc_motorAccessories = (classAcce: Class_accessory) => {
   return `${name ?? ''}`;
 };
 
-const creDesc_headBoxes = (classAcce: Class_accessory) => {
-  const { name, material, isIntegrated, thickness } = classAcce;
+const creDesc_headBoxes = (classCom: Class_component) => {
+  const { name, material, isIntegrated, thickness } = classCom;
 
   // const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
   // const desc_thickness = `厚度:${thickness ?? '無資料'}`;
@@ -900,13 +900,13 @@ type Tkit = {
   typeName: string;
   // type是api要收的東西
   type: 'slatType' | 'bottomBar' | 'guideRail' | 'sidePlateType' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
-  creDesc: (classAcce: Class_accessory) => string;
+  creDesc: (classCom: Class_component) => string;
   options: Toption[];
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
 };
 
-const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
+const comLookUp: { [key in TcomponentKey]: Tkit } = {
   slat: {
     typeName: '捲門片',
     type: 'slatType',
@@ -971,7 +971,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   motorAccessories: {
     typeName: '馬達配件',
     type: 'motorAccessories',
-    creDesc: creDesc_motorAccessories,
+    creDesc: creDesc_motorComponent,
     options: [{ value: '其他', label: '其他' }],
     hiddenKeyArr: ['surface', 'density'],
     unit: '組',
@@ -991,7 +991,7 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
 };
 
-const acceTypeLookUp = {
+const comTypeLookUp = {
   slatType: 'slat',
   bottomBar: 'bottomBar',
   guideRail: 'guideRail',
@@ -1048,7 +1048,7 @@ const calcDefaultQuantity = ({
   // motors motorAccessories
 };
 
-const creEmptyAcce: () => Taccessory = () => ({
+const creEmptyCom: () => Tcomponent = () => ({
   id: '',
   createdAt: '',
   updatedAt: '',
@@ -1065,5 +1065,5 @@ const creEmptyAcce: () => Taccessory = () => ({
 });
 
 // ===========================================================
-export { Class_accessory, acceKeyArrOri, acceCellConfig, creEmptyAcce, acceTypeLookUp };
-export type { Taccessory };
+export { Class_component, comKeyArrOri, comCellConfig, creEmptyCom, comTypeLookUp };
+export type { Tcomponent };

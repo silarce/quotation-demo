@@ -36,7 +36,7 @@ export default function DndThead({
   onDragEndCallback,
   resetTrigger,
   emptyBlockWidth,
-  acceBoxWidth,
+  comBoxWidth,
 }: {
   allowMove: boolean;
   keyArr: string[];
@@ -45,7 +45,7 @@ export default function DndThead({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   resetTrigger?: any;
   emptyBlockWidth?: string;
-  acceBoxWidth?: string;
+  comBoxWidth?: string;
 }) {
   const [movingKey, setMovingKey] = useState<string>();
   const [dndKeyArr, setDndKeyArr] = useState<string[]>([]);
@@ -89,9 +89,9 @@ export default function DndThead({
       {/*  */}
       {emptyBlockWidth && <div className={classNames(scss.emptyBlock)} style={{ width: emptyBlockWidth }} />}
 
-      {acceBoxWidth && (
-        <div className={classNames(scss.emptyBlock, scss.theadCell)} style={{ width: acceBoxWidth }}>
-          <span className="inline-block ml-12">{cellConfigList.acceName?.label}</span>
+      {comBoxWidth && (
+        <div className={classNames(scss.emptyBlock, scss.theadCell)} style={{ width: comBoxWidth }}>
+          <span className="inline-block ml-12">{cellConfigList.comName?.label}</span>
         </div>
       )}
 

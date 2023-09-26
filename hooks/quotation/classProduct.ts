@@ -26,7 +26,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 
 // ===========================================================
 // child class
-import { Class_accessory, Taccessory, creEmptyAcce, acceTypeLookUp } from './classAccessory';
+import { Class_component, Tcomponent, creEmptyCom, comTypeLookUp } from './classComponent';
 import { Class_options, Toptions } from './classOptions';
 // =============================================================================
 // api
@@ -47,7 +47,7 @@ import type {
   TquotationProductDto,
 } from 'js/api/dtoTypes';
 
-import type { TreRender, TaccessoryKey } from './useProduct';
+import type { TreRender, TcomponentKey } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
@@ -109,10 +109,10 @@ class Class_product {
 
     // 建立材料配件
 
-    const accePreList: Partial<{ [key in TaccessoryKey]: Taccessory }> = {};
+    const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
     this._prodData.components.forEach((item) => {
-      const key = acceTypeLookUp[item.type];
-      accePreList[key] = {
+      const key = comTypeLookUp[item.type];
+      comPreList[key] = {
         ...item,
         doorModelName: key,
         code: '',
@@ -122,7 +122,7 @@ class Class_product {
       };
     });
 
-    this.creAcceList(accePreList as { [key in TaccessoryKey]: Taccessory });
+    this.creComList(comPreList as { [key in TcomponentKey]: Tcomponent });
 
     // ___________________________________________________________
     // 建立選配設定
@@ -173,29 +173,29 @@ class Class_product {
   shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
 
   // 其他防抖
-  timeoutId_retrieveCreProdAcce: NodeJS.Timeout | null = null;
+  timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 
-  acceList: { [key in TaccessoryKey]: Class_accessory } | undefined;
+  comList: { [key in TcomponentKey]: Class_component } | undefined;
 
-  creAcceList(dataList: { [key in TaccessoryKey]: Taccessory }) {
-    const keyArr = Object.keys(dataList) as TaccessoryKey[];
+  creComList(dataList: { [key in TcomponentKey]: Tcomponent }) {
+    const keyArr = Object.keys(dataList) as TcomponentKey[];
 
-    const list: { [key: string]: Class_accessory } = {};
+    const list: { [key: string]: Class_component } = {};
 
     keyArr.forEach((key) => {
-      const acce = dataList[key];
+      const com = dataList[key];
 
-      if (!acce) {
+      if (!com) {
         return null;
       }
 
-      const theClass = new Class_accessory({
+      const theClass = new Class_component({
         reRender: this.reRender,
-        data: acce,
+        data: com,
         key: key,
         prod: this,
         callReqGetCodeNumber: () => {
@@ -206,7 +206,7 @@ class Class_product {
       list[key] = theClass;
     });
 
-    this.acceList = list as { [key in TaccessoryKey]: Class_accessory };
+    this.comList = list as { [key in TcomponentKey]: Class_component };
 
     this.reRender();
   }
@@ -437,15 +437,15 @@ class Class_product {
     this._availableComponents = res;
 
     this.retrieveOptions();
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
   /**取得材料配件 */
   async reqProdGenerateDoorProductBom() {
-    const acceList = this.acceList;
+    const comList = this.comList;
 
-    if (!acceList || !this._doorGeneralSpecs || !acceList.motor.gearNumber) {
+    if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
       return;
     }
 
@@ -463,7 +463,7 @@ class Class_product {
       rollerDiameter: this._doorGeneralSpecs.diameter,
       bearingType: this._doorGeneralSpecs.bearingName,
 
-      gearNumber: acceList.motor?.gearNumber,
+      gearNumber: comList.motor?.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
     };
 
@@ -471,7 +471,7 @@ class Class_product {
 
     let haveNull = false;
 
-    Object.values(acceList).forEach((item) => {
+    Object.values(comList).forEach((item) => {
       if (!item) {
         return (haveNull = true);
       }
@@ -503,8 +503,8 @@ class Class_product {
       const keyArr = Object.keys(res) as (keyof typeof res)[];
       keyArr.forEach((key) => {
         const item = res[key];
-        acceList[key].codeNumber = item.number;
-        acceList[key].componentId = item.id;
+        comList[key].codeNumber = item.number;
+        comList[key].componentId = item.id;
       });
     }
   } // reqProdGenerateDoorProductBom
@@ -556,20 +556,20 @@ class Class_product {
   // 裡面有呼叫callAllReq的機制
   // 裡面有呼叫callAllReq的機制
   // 裡面有呼叫callAllReq的機制
-  retrieveCreProdAcce() {
+  retrieveCreProdCom() {
     if (!this._availableComponents || !this.weight) {
       return;
     }
 
     const availableComponents = this._availableComponents;
 
-    const slat: Taccessory | null = filter_slats({
+    const slat: Tcomponent | null = filter_slats({
       //
       dataArr: availableComponents.slats,
       filterParams: { isAntiTyphoon: this.typhoonProtection },
     });
 
-    const bottomBar: Taccessory | null = filter_bottomBars({
+    const bottomBar: Tcomponent | null = filter_bottomBars({
       dataArr: availableComponents.bottomBars,
       filterParams: {
         isAntiTyphoon: this.typhoonProtection,
@@ -578,7 +578,7 @@ class Class_product {
       },
     });
 
-    const guideRail: Taccessory | null = filter_guideRails({
+    const guideRail: Tcomponent | null = filter_guideRails({
       dataArr: availableComponents.guideRails,
       filterParams: {
         // thickness: String(this.doorTrackThick),
@@ -587,7 +587,7 @@ class Class_product {
       },
     });
 
-    const motor: Taccessory | null = filter_motors({
+    const motor: Tcomponent | null = filter_motors({
       dataArr: availableComponents.motors,
       filterParams: {
         horsePower: this.horsepower,
@@ -600,7 +600,7 @@ class Class_product {
       },
     });
 
-    const sidePlate: Taccessory | null = filter_sidePlates({
+    const sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
@@ -611,14 +611,14 @@ class Class_product {
       },
     });
 
-    const roller: Taccessory | null = filter_rollers({
+    const roller: Tcomponent | null = filter_rollers({
       dataArr: availableComponents.rollers,
       filterParams: {
         diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
       },
     });
 
-    const motorAccessories: Taccessory | null = filter_motorAccessories({
+    const motorAccessories: Tcomponent | null = filter_motorAccessories({
       dataArr: availableComponents.motorAccessories,
       filterParams: {
         /**鍊條排數 */
@@ -628,7 +628,7 @@ class Class_product {
       },
     });
 
-    const headBox: Taccessory | null = filter_headBoxes({
+    const headBox: Tcomponent | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
         thickness: this.rollUpBoxThick, // 捲箱厚度
@@ -637,26 +637,23 @@ class Class_product {
       },
     });
 
-    // 變更設計，如果是null，不要帶null進去，
-    // 要帶標明為無資料Taccessory進去
+    const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
 
-    const isGearNumberChanged = this.acceList?.motor?.gearNumber !== motor?.gearNumber;
-
-    this.creAcceList({
-      slat: slat || creEmptyAcce(),
-      bottomBar: bottomBar || creEmptyAcce(),
-      guideRail: guideRail || creEmptyAcce(),
-      motor: motor || creEmptyAcce(),
-      sidePlate: sidePlate || creEmptyAcce(),
-      roller: roller || creEmptyAcce(),
-      motorAccessories: motorAccessories || creEmptyAcce(),
-      headBox: headBox || creEmptyAcce(),
+    this.creComList({
+      slat: slat || creEmptyCom(),
+      bottomBar: bottomBar || creEmptyCom(),
+      guideRail: guideRail || creEmptyCom(),
+      motor: motor || creEmptyCom(),
+      sidePlate: sidePlate || creEmptyCom(),
+      roller: roller || creEmptyCom(),
+      motorAccessories: motorAccessories || creEmptyCom(),
+      headBox: headBox || creEmptyCom(),
     });
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
 
-    this.calcAcceAllPrice();
+    this.calcComAllPrice();
     this.calcProdAllprice();
 
     this.reRender();
@@ -664,13 +661,13 @@ class Class_product {
     return { isGearNumberChanged };
   } // retrieveProdComponent
 
-  callRetrieveCreProdAcce() {
-    if (this.timeoutId_retrieveCreProdAcce) {
-      clearTimeout(this.timeoutId_retrieveCreProdAcce);
+  callRetrieveCreProdCom() {
+    if (this.timeoutId_retrieveCreProdCom) {
+      clearTimeout(this.timeoutId_retrieveCreProdCom);
     }
 
-    this.timeoutId_retrieveCreProdAcce = setTimeout(() => {
-      this.retrieveCreProdAcce();
+    this.timeoutId_retrieveCreProdCom = setTimeout(() => {
+      this.retrieveCreProdCom();
     }, 100);
   }
 
@@ -683,7 +680,7 @@ class Class_product {
       this._prodData.horsepower = this.options_horsepower?.[0].value ?? '';
       this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
       this._prodData.voltage = this.options_voltage?.[0].value ?? '';
-      this.callRetrieveCreProdAcce();
+      this.callRetrieveCreProdCom();
     };
 
     if (
@@ -730,7 +727,7 @@ class Class_product {
     totalPrice: 0,
   };
 
-  private acceAllPrice = {
+  private comAllPrice = {
     price: 0,
     dualPrice: 0,
     unitPrice: 0,
@@ -740,9 +737,9 @@ class Class_product {
   /**計算prod所有的價格 */
   private calcProdAllprice() {
     // 牌價 為材料配件設定與選配設定的 牌價複價 總和
-    const price = new Decimal(this.acceAllPrice.dualPrice || 0).add(this.optionsAllPrice.dualPrice || 0);
+    const price = new Decimal(this.comAllPrice.dualPrice || 0).add(this.optionsAllPrice.dualPrice || 0);
     // 單價 為材料配件設定與選配設定的 複價 總和
-    const unitPrice = new Decimal(this.acceAllPrice.totalPrice || 0).add(this.optionsAllPrice.totalPrice || 0);
+    const unitPrice = new Decimal(this.comAllPrice.totalPrice || 0).add(this.optionsAllPrice.totalPrice || 0);
 
     const dualPrice = price.mul(this.quantity || 0).toNumber();
     const totalPrice = unitPrice.mul(this.quantity || 0).toNumber();
@@ -783,15 +780,15 @@ class Class_product {
     this.calcProdAllprice();
   } // calcOptionsAllprice
 
-  calcAcceAllPrice() {
+  calcComAllPrice() {
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
     let d_unitPrice = new Decimal(0);
     let d_totalPrice = new Decimal(0);
 
-    const acceListArr = Object.values(this.acceList ?? {});
+    const comListArr = Object.values(this.comList ?? {});
 
-    acceListArr.forEach((item) => {
+    comListArr.forEach((item) => {
       if (!item) {
         return;
       }
@@ -803,7 +800,7 @@ class Class_product {
       d_unitPrice = d_unitPrice.add(unitPrice || 0);
       d_totalPrice = d_totalPrice.add(totalPrice || 0);
 
-      this.acceAllPrice = {
+      this.comAllPrice = {
         price: d_price.ceil().toNumber(),
         dualPrice: d_dualPrice.ceil().toNumber(),
         unitPrice: d_unitPrice.ceil().toNumber(),
@@ -811,7 +808,7 @@ class Class_product {
       };
     });
     this.calcProdAllprice();
-  } // calcAcceAllPrice
+  } // calcComAllPrice
 
   private calcArea = () => {
     const h = Number(this._prodData.height || 0);
@@ -1095,10 +1092,10 @@ class Class_product {
         toCalcOptionsAllprice: arr.length - 1 === index,
       });
     });
-    Object.values(this.acceList ?? {}).forEach((item, index, arr) => {
+    Object.values(this.comList ?? {}).forEach((item, index, arr) => {
       if (item) {
         item.calcAllPrice({
-          toCalcAcceAllprice: arr.length - 1 === index,
+          toCalcComAllprice: arr.length - 1 === index,
         });
       }
     });
@@ -1304,7 +1301,7 @@ class Class_product {
   set horsepower(v) {
     this._prodData.horsepower = v;
     this.toSetDefaultBoxB();
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
 
@@ -1456,7 +1453,7 @@ class Class_product {
   set motor(v) {
     this._prodData.motor = v;
     this.toSetDefaultBoxB();
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1465,7 +1462,7 @@ class Class_product {
   }
   set voltage(str) {
     this._prodData.voltage = str;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1475,7 +1472,7 @@ class Class_product {
   }
   set phase(str) {
     this._prodData.phase = Number(str);
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
 
@@ -1485,7 +1482,7 @@ class Class_product {
   }
   set motorSupport(v) {
     this._prodData.motorSupport = v;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1494,7 +1491,7 @@ class Class_product {
   }
   set bottomBar(v) {
     this._prodData.bottomBar = v;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1511,7 +1508,7 @@ class Class_product {
   }
   set doorTrackThick(str) {
     this._prodData.doorTrackThick = str;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1528,7 +1525,7 @@ class Class_product {
   }
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1537,7 +1534,7 @@ class Class_product {
   }
   set onePieceRollUpBox(v) {
     this._prodData.onePieceRollUpBox = v;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1546,7 +1543,7 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
-    this.callRetrieveCreProdAcce();
+    this.callRetrieveCreProdCom();
     this.reRender();
   }
   //
@@ -1575,8 +1572,8 @@ class Class_product {
         return { ...item.body, order: index };
       }) ?? [];
     //
-    const components: TcreateQuotationProductComponentsDto[] = Object.values(this.acceList ?? {}).map((acce, index) => {
-      const body = acce.body;
+    const components: TcreateQuotationProductComponentsDto[] = Object.values(this.comList ?? {}).map((com, index) => {
+      const body = com.body;
 
       return {
         ...body,
@@ -2572,54 +2569,4 @@ NO.4
 主產品的材料改變後 下面沒有相應的材料話就帶入SST304
 
 
-
  */
-
-// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-// acceList.motor.gearNumber為參數，意味著呼叫req_getProdAvailableComponents後
-// 若acceList.motor?.gearNumber就要自動呼叫reqProdGenerateDoorProductBom
-
-//把req系列的方法改為async
-// 寫法像這樣
-// async foo (){}
-// 然後重新思考設計呼叫鍊
-/**
-        因為使用者可能會在防抖結束前就編輯了另一個需要呼叫api的property
-        或許可以把防抖id設為每個setter一個
-        然後在呼叫req鍊
-        每次呼叫req鍊就要clear所有的防抖id
-
-setTImeout(()=>{
-  clearTimeout(防抖id_a);
-  clearTimeout(防抖id_b);
-  clearTimeout(防抖id_c);
-  // 類推
-  const reqChan = async ()=>{  }
-},500)
-
-如果每次呼叫就要清掉所有的防抖id，那為什麼不設三個req方法的防抖id就好了
-跟一開始一樣
-
-決定了
-呼叫reqA就一定會接著呼叫reqB與reqC，並清除所有的防抖id
-呼叫reqB就一定會接著呼叫reqC，並清除B跟C的防抖id
-呼叫reqC就一定會清除C的防抖id
-
-明天再想吧
-
-目前有四個呼叫api的方法
-為每個方法設一個變數(暫且叫他們shouldCall)，用來判定是否應該被呼叫
-寫一個方法(叫callAll)，會根據這些變數，依序決定是否呼叫api
-callAll會有防抖設定
-編輯各個值的時候，會將對應shouldCall變更為true
-並呼叫callAll
-如果使用者在編輯A後立刻再編輯B，
-因為防抖，只會設定對應的shouldCall為true並重置計時器
-最後再timeout後呼叫這個方法，就會依序呼叫api
-同時設置呼叫時設定disabled
-這樣就能避免重複呼叫而浪費效能或取得錯誤的值
-
-         */

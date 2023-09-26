@@ -64,7 +64,7 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_options from 'components/page/domestic/quotation/quotation/product/table_options';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
@@ -229,10 +229,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     changeProdKeyArr,
     subTotal: prodSubTotal,
     //
-    acceKeyArr,
-    acceCellConfig,
-    changeAcceKeyArr,
-    acceVKeyArr,
+    comKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    comVKeyArr,
     //
     optionsKeyArr,
     changeOptionsKeyArr,
@@ -1015,13 +1015,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
-              <Table_acce
+              <Table_com
                 disabled={disabled}
-                acceList={targetProd?.acceList}
-                acceCellConfig={acceCellConfig}
-                acceKeyArr={acceKeyArr}
-                changeAcceKeyArr={changeAcceKeyArr}
-                defalutVKeyArr={acceVKeyArr}
+                comList={targetProd?.comList}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={changeComKeyArr}
+                defalutVKeyArr={comVKeyArr}
               />
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>
