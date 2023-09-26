@@ -150,3 +150,12 @@ export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomD
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
+
+export const apiPostProdAccessories = (params: { modelName: string }) => {
+  const api = '/products/door/accessories';
+
+  return axi
+    .get(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
