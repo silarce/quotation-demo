@@ -828,9 +828,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const data_watch = watch();
 
     // const prodArr: TcreateQuotationProductDto[] | undefined =
-    //   prodVKeyArr?.map((key, index) => {
-    //     const prod = productList[key];
-
+    //   Object.values(productList).map((prod, index) => {
     //     return {
     //       ...prod.body,
     //       rollUpBoxThick: Number(prod.rollUpBoxThick),
@@ -838,14 +836,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //       doorTrackThick: Number(prod.doorTrackThick),
     //       motorSupport: String(+prod.motorSupport),
     //       //
-    //       quantity: String(prod.quantity),
+    //       quantity: Number(prod.quantity),
     //       materialSurface: prod.surface ?? '',
     //       isPainted: false,
     //       order: index,
     //     };
     //   }) ?? [];
-    const prodArr: TcreateQuotationProductDto[] | undefined =
-      Object.values(productList).map((prod, index) => {
+
+    // prodVKeyArr
+
+    const prodArr: TcreateQuotationProductDto[] =
+      prodVKeyArr?.map((key, index) => {
+        const prod = productList[key];
+
         return {
           ...prod.body,
           rollUpBoxThick: Number(prod.rollUpBoxThick),
@@ -853,12 +856,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
           doorTrackThick: Number(prod.doorTrackThick),
           motorSupport: String(+prod.motorSupport),
           //
-          quantity: String(prod.quantity),
+          quantity: Number(prod.quantity),
           materialSurface: prod.surface ?? '',
           isPainted: false,
           order: index,
         };
       }) ?? [];
+
+    console.log(prodArr);
 
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
@@ -936,7 +941,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-  };
+    //
+  }; // reqUpdateQuotation
 
   // --------------------------------------------
   const reqSetReviewer = async ({
@@ -1015,11 +1021,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             changeProdKeyArr={changeProdKeyArr}
             addProd={addProd}
             setTargetProd={setTargetProd}
-            // defalutVKeyArr={prodVKeyArr}
-            // onVKeyChange={setProdVKeyArr}
+            defalutVKeyArr={prodVKeyArr}
+            onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
           />
 
-          {/* api還沒好 */}
           <Table_acce
             disabled={disabled}
             acceList={targetProd?.acceList}

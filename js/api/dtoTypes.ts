@@ -813,14 +813,14 @@ export type quotationProductDto = {
   // 門型
   doorType: string;
   // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  length: string;
+  length: number;
   // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  width: string;
+  width: number;
   // h(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  height: string;
+  height: number;
   // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  boxB: string;
-  boxD: string;
+  boxB: number;
+  boxD: number;
   // 面積
   area: string;
   // 才數
@@ -957,14 +957,14 @@ export type TcreateQuotationProductDto = {
   // 門型
   doorType: string;
   // L(m)
-  length: string;
+  length: number;
   // W(m)
-  width: string;
+  width: number;
   // h(m)
-  height: string;
+  height: number;
   // B(m)
-  boxB: string;
-  boxD: string;
+  boxB: number;
+  boxD: number;
   // 面積
   area: string;
   // 才數
@@ -998,7 +998,7 @@ export type TcreateQuotationProductDto = {
   // 捲箱厚度
   rollUpBoxThick: number;
   // 數量
-  quantity: string;
+  quantity: number;
   // 單價
   unitPrice: number;
   // 牌價
@@ -1026,6 +1026,7 @@ export type TcreateQuotationProductDto = {
     price: number; // 牌價
     dualPrice: number; // 牌價複價
   }[];
+  components: TcreateQuotationProductComponentsDto[];
   //
   materialSurface: string;
   isPainted: boolean;

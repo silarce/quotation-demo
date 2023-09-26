@@ -55,7 +55,7 @@ import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_pr
 class Class_product {
   constructor({
     reRender,
-    setIsLoading,
+    // setIsLoading,
     prodData = emptyProdOri(),
     // accessoryDataArr = [],
     delSelf,
@@ -66,7 +66,7 @@ class Class_product {
     doorModelList,
   }: {
     reRender: TreRender;
-    setIsLoading: (isLoading: boolean) => void;
+    // setIsLoading: (isLoading: boolean) => void;
     prodData?: Tprod;
     // accessoryDataArr?: Taccessory[];
     // optionDataArr?: Toptions[];
@@ -78,10 +78,11 @@ class Class_product {
     doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
     this.reRender = reRender;
-    this.setIsLoading = setIsLoading;
+    // this.setIsLoading = setIsLoading;
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+
     //
     this._calcProdSubTotalPrice = calcProdSubTotalPrice;
     // from api
@@ -123,9 +124,11 @@ class Class_product {
   } //  constructor close
 
   private reRender;
-  readonly setIsLoading;
+  // readonly setIsLoading;
   readonly delSelf;
   readonly copySelf;
+  //
+  isLoading = false;
   //
   readonly _calcProdSubTotalPrice;
   // from api
@@ -487,7 +490,7 @@ class Class_product {
 
   async reqChain() {
     try {
-      this.setIsLoading(true);
+      this.isLoading = true;
 
       if (this.shouldCall_cgs) {
         await this.req_calcGeneralSpec();
@@ -502,7 +505,7 @@ class Class_product {
       }
     } catch (error) {
     } finally {
-      this.setIsLoading(false);
+      this.isLoading = false;
     }
 
     this.shouldCall_cgs = false;
@@ -520,7 +523,7 @@ class Class_product {
 
     this.callAllTimeoutId = setTimeout(() => {
       this.reqChain();
-    }, 500);
+    }, 300);
   }
 
   // ---------------------------------------------------------
@@ -528,9 +531,9 @@ class Class_product {
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 
-  // 裡面有呼叫cllAllReq的機制
-  // 裡面有呼叫cllAllReq的機制
-  // 裡面有呼叫cllAllReq的機制
+  // 裡面有呼叫callAllReq的機制
+  // 裡面有呼叫callAllReq的機制
+  // 裡面有呼叫callAllReq的機制
   retrieveCreProdAcce() {
     if (!this._availableComponents || !this.weight) {
       return;
@@ -1507,11 +1510,12 @@ class Class_product {
       ...this._prodData,
       options,
       // 送去後端要轉為要從m轉為mm
-      width: String(Number(this._prodData.width) * 1000),
-      length: String(Number(this._prodData.length) * 1000),
-      height: String(Number(this._prodData.height) * 1000),
-      boxB: String(Number(this._prodData.boxB) * 1000),
-      boxD: String(Number(this._prodData.boxD) * 1000),
+      width: Number(this._prodData.width) * 1000,
+      length: Number(this._prodData.length) * 1000,
+      height: Number(this._prodData.height) * 1000,
+      boxB: Number(this._prodData.boxB) * 1000,
+      boxD: Number(this._prodData.boxD) * 1000,
+      quantity: Number(this._prodData.quantity),
 
       components: components,
     };

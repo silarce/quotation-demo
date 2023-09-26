@@ -7,6 +7,7 @@ import _ from 'lodash';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
@@ -84,6 +85,8 @@ export default function Tbody({
 
   const [activeKey, setActiveKey] = useState('');
 
+  // console.log(defalutVKeyArr);
+
   const {
     sensors,
     dndKeyArr: vDndKeyArr,
@@ -92,6 +95,7 @@ export default function Tbody({
     onDragStart,
   } = useVerticalDnd({
     listKeyArr: defalutVKeyArr || Object.keys(rowList),
+    // listKeyArr: Object.keys(rowList),
     resetTrigger: rowList,
   });
 
@@ -326,6 +330,7 @@ function DndRow({
 
   return (
     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
+      <LoadingCover01 isLoading={item?.isLoading} />
       <CellWithBar isActive={isActive} className="z-0">
         <div className={scss.row} onClick={undefined}>
           {/*  */}

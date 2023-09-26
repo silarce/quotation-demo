@@ -77,24 +77,6 @@ const useProductList = ({
 }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
-  // setIsLoading被送進classProduct裡面了
 
   // ---------------------------------------------------------
 
@@ -132,15 +114,24 @@ const useProductList = ({
   const [subTotal, setSubTotal] = useState('');
   const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
-  //
-  //
-  //
-  // productsOrder
-  // productArr
-
   useEffect(() => {
+    if (!productArr || !doorModelList) {
+      return;
+    }
+
+    const orderArr = productArr.map((item) => {
+      return item.order;
+    });
+
+    const isEqual = _.isEqual(_.sortBy(orderArr), _.sortBy(productsOrder));
+
+    if (isEqual) {
+      setProdVKeyArr(productsOrder);
+    } else {
+      setProdVKeyArr(undefined);
+    }
+
     createProdList();
-    setProdVKeyArr(productsOrder);
   }, [resetTrigger, doorModelList]);
 
   const createProdList = () => {
@@ -151,7 +142,7 @@ const useProductList = ({
     const list: TproductList = {};
 
     productArr.forEach((prod) => {
-      const key = `${prod.order}`;
+      const key = prod.order ? `${prod.order}` : nanoid();
 
       const prodData: Tprod = {
         ...prod,
@@ -165,6 +156,7 @@ const useProductList = ({
         length: String(Number(prod.length) / 1000),
         height: String(Number(prod.height) / 1000),
         boxB: String(Number(prod.width) / 1000),
+        boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
         quantity: prod.items.length,
@@ -175,7 +167,6 @@ const useProductList = ({
 
       list[key] = new Class_product({
         reRender,
-        setIsLoading,
         prodData,
         delSelf: () => delSelf(key),
         copySelf: () => copySelf(key),
@@ -200,6 +191,15 @@ const useProductList = ({
   const delSelf = (key: string) => {
     delete productList[key];
     calcSubTotalPrice();
+
+    setProdVKeyArr((arr) => {
+      if (!arr) {
+        return undefined;
+      }
+
+      arr?.splice(arr.indexOf(key), 1);
+    });
+
     reRender();
   };
 
@@ -219,7 +219,7 @@ const useProductList = ({
     const newKey = nanoid();
     const classProd = new Class_product({
       reRender,
-      setIsLoading,
+
       delSelf: () => delSelf(newKey),
       copySelf: () => copySelf(newKey),
       //
@@ -228,6 +228,15 @@ const useProductList = ({
       doorModelList,
     });
     productList[newKey] = classProd;
+
+    setProdVKeyArr((arr) => {
+      if (!arr) {
+        return [newKey];
+      }
+
+      return [...arr, newKey];
+    });
+
     reRender();
     // setProductList(copy);
   };
@@ -377,7 +386,6 @@ const useProductList = ({
 
   return {
     reRender,
-    isLoading,
     //
     productList,
     prodCellConfig,
