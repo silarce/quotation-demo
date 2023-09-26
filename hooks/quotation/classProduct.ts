@@ -251,6 +251,7 @@ class Class_product {
   }
 
   createOptionsList() {
+    // const optionArr = this._prodData.options;
     const optionArr = this._prodData.options;
     const list: { [key: string]: Class_options } = {};
 

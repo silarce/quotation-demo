@@ -94,6 +94,7 @@ export default function Tbody({
   } = useVerticalDnd({
     listKeyArr: defalutVKeyArr || Object.keys(rowList),
     resetTrigger: rowList,
+    onKeyChange: onVKeyChange,
   });
 
   // console.log(rowList);
@@ -121,10 +122,7 @@ export default function Tbody({
           // restrictToWindowEdges,
         ]}
         // onDragEnd={onDragEnd}
-        onDragEnd={(e) => {
-          const newKeyArr = onDragEnd(e);
-          onVKeyChange?.(newKeyArr);
-        }}
+        onDragEnd={(e) => onDragEnd(e)}
         onDragStart={onDragStart}
       >
         <SortableContext items={vDndKeyArr} strategy={verticalListSortingStrategy}>

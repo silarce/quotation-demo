@@ -841,14 +841,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         const preBody = {
           ...prod.body,
           order: index,
-          // rollUpBoxThick: Number(prod.rollUpBoxThick),
-          // voltage: Number(prod.voltage),
-          // doorTrackThick: Number(prod.doorTrackThick),
-          // doorTrackThick: 1,
-          // motorSupport: prod.motorSupport,
-          // quantity: quantity,
-          // materialSurface: prod.surface ?? '',
-          // isPainted: false,
         };
 
         const isEqual = _.isEqual(originProd, preBody);
@@ -905,8 +897,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       //
     };
-
-    console.log(body);
 
     try {
       setIsLoading(true);

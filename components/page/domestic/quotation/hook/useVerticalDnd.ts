@@ -30,7 +30,16 @@ import {
 // import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // const useVerticalDnd = (listKeyArr: string[], resetTrigger?: any) => {
-const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; resetTrigger?: any }) => {
+const useVerticalDnd = ({
+  listKeyArr,
+  resetTrigger,
+  onKeyChange,
+}: {
+  listKeyArr: string[];
+  resetTrigger?: any;
+
+  onKeyChange?: (keyArr: string[]) => void;
+}) => {
   const sensors = useSensors(useSensor(PointerSensor));
 
   const [movingId, setMovingId] = useState<string>();
@@ -56,11 +65,18 @@ const useVerticalDnd = ({ listKeyArr, resetTrigger }: { listKeyArr: string[]; re
       dndKeyArr.splice(delIndex, 1);
       setDndKeyArr([...dndKeyArr]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listKeyArr.length]);
 
   useEffect(() => {
     setDndKeyArr(listKeyArr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetTrigger]);
+
+  useEffect(() => {
+    onKeyChange && onKeyChange(dndKeyArr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dndKeyArr]);
 
   const onDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
