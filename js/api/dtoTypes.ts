@@ -800,7 +800,7 @@ export type TcreateQuotationProductComponentsDto = Omit<
   'id' | 'createdAt' | 'updatedAt'
 >;
 
-export type quotationProductDto = {
+export type TquotationProductDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -838,7 +838,7 @@ export type quotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  motorSupport: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -918,7 +918,7 @@ export type TquotationContentDto = {
   faxNumber: string; // 傳真號碼
   trackProgress: string; // 追蹤狀態
   projectProgress: string; //工地進度
-  productsOrder: string[]; // 裡面裝的是product的id
+  productsOrder?: string[]; // 已棄用
   /** 總折數*/
   discount: string;
   /**小計 */
@@ -935,7 +935,7 @@ export type TquotationContentDto = {
   paymentMethods: TpaymentMethodDto[];
 
   others: TquotationContentOtherDto[];
-  products: quotationProductDto[];
+  products: TquotationProductDto[];
 };
 
 export type TquotationDto = {
@@ -982,7 +982,7 @@ export type TcreateQuotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  motorSupport: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -1069,7 +1069,7 @@ export type TcreateQuotationContentDto = {
 
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
-  productsOrder: string[] | null;
+  productsOrder?: string[] | null; // 已棄用
 };
 
 // ========================================================================

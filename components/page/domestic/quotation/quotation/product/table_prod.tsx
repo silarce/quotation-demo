@@ -69,7 +69,7 @@ export default function Table_prod({
             onRowClick={(obj) => {
               setTargetProd(obj.item as Class_product);
             }}
-            defalutVKeyArr={defalutVKeyArr}
+            // defalutVKeyArr={defalutVKeyArr}
             onVKeyChange={onVKeyChange}
           />
 

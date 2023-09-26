@@ -17,6 +17,7 @@ import moment from 'moment';
 import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
@@ -246,7 +247,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useProductList({
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
-    productsOrder: quotationData?.latestContent.productsOrder,
     resetTrigger: quotationData,
   });
 
@@ -827,48 +827,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    // const prodArr: TcreateQuotationProductDto[] | undefined =
-    //   Object.values(productList).map((prod, index) => {
-    //     return {
-    //       ...prod.body,
-    //       rollUpBoxThick: Number(prod.rollUpBoxThick),
-    //       voltage: Number(prod.voltage),
-    //       doorTrackThick: Number(prod.doorTrackThick),
-    //       motorSupport: String(+prod.motorSupport),
-    //       //
-    //       quantity: Number(prod.quantity),
-    //       materialSurface: prod.surface ?? '',
-    //       isPainted: false,
-    //       order: index,
-    //     };
-    //   }) ?? [];
-
-    // prodVKeyArr
-
     let prodQty = 0;
-    const vKeyArr: string[] = [];
 
+    // prodVKeyArr 會在每一次垂直拖拉時更新
     const prodArr: TcreateQuotationProductDto[] =
       prodVKeyArr?.map((key, index) => {
         const prod = productList[key];
         const quantity = Number(prod.quantity);
+        const originProd = prod.originProd;
 
         prodQty = prodQty + quantity;
-        vKeyArr.push(String(index));
 
-        return {
+        const preBody = {
           ...prod.body,
-          rollUpBoxThick: Number(prod.rollUpBoxThick),
-          voltage: Number(prod.voltage),
-          // doorTrackThick: Number(prod.doorTrackThick),
-          doorTrackThick: 1,
-          motorSupport: String(+prod.motorSupport),
-          //
-          quantity: quantity,
-          materialSurface: prod.surface ?? '',
-          isPainted: false,
           order: index,
+          // rollUpBoxThick: Number(prod.rollUpBoxThick),
+          // voltage: Number(prod.voltage),
+          // doorTrackThick: Number(prod.doorTrackThick),
+          // doorTrackThick: 1,
+          // motorSupport: prod.motorSupport,
+          // quantity: quantity,
+          // materialSurface: prod.surface ?? '',
+          // isPainted: false,
         };
+
+        const isEqual = _.isEqual(originProd, preBody);
+
+        if (!isEqual) {
+          preBody.id = undefined;
+        }
+
+        return preBody;
       }) ?? [];
 
     const body: TcreateQuotationContentDto = {
@@ -912,7 +901,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       products: prodArr,
       others: getOthersPostBodyArr(),
-      productsOrder: null,
+      // productsOrder: null,
       //
       //
     };
@@ -1030,7 +1019,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               changeProdKeyArr={changeProdKeyArr}
               addProd={addProd}
               setTargetProd={setTargetProd}
-              defalutVKeyArr={prodVKeyArr}
+              // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
             />
 

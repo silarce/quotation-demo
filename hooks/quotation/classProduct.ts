@@ -42,6 +42,7 @@ import type {
   TcreateQuotationProductOptionDto,
   TcreateQuotationProductComponentsDto,
   TquotationProductComponentsDto,
+  TquotationProductDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TaccessoryKey } from './useProduct';
@@ -64,6 +65,8 @@ class Class_product {
     calcSubTotalPrice: calcProdSubTotalPrice,
     // from api
     doorModelList,
+    //
+    originProd,
   }: {
     reRender: TreRender;
     // setIsLoading: (isLoading: boolean) => void;
@@ -76,12 +79,15 @@ class Class_product {
     calcSubTotalPrice: () => void;
     // from api
     doorModelList: { [key: string]: TdoorModelInfoDto };
+    originProd?: TquotationProductDto;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+
+    this.originProd = originProd;
 
     //
     this._calcProdSubTotalPrice = calcProdSubTotalPrice;
@@ -127,6 +133,10 @@ class Class_product {
   // readonly setIsLoading;
   readonly delSelf;
   readonly copySelf;
+  //
+  // !!!!!
+  readonly originProd;
+  // !!!!!
   //
   isLoading = false;
   //
@@ -1530,7 +1540,6 @@ class Class_product {
   //
 
   get body() {
-    // const options = Object.values(this.optionsList).map((item) => item.body);
     const options: TcreateQuotationProductOptionDto[] = Object.values(this.optionsList).map((item, index) => {
       return { ...item.body, order: index };
     });
@@ -1555,6 +1564,15 @@ class Class_product {
       boxB: Number(this._prodData.boxB) * 1000,
       boxD: Number(this._prodData.boxD) * 1000,
       quantity: Number(this._prodData.quantity),
+      //
+      rollUpBoxThick: Number(this._prodData.rollUpBoxThick),
+      voltage: Number(this._prodData.voltage),
+      // doorTrackThick: Number(prod.doorTrackThick),
+      doorTrackThick: 1,
+      motorSupport: this._prodData.motorSupport,
+      //
+      materialSurface: this._prodData.surface ?? '',
+      isPainted: false,
 
       components: components,
     };

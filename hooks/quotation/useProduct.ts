@@ -16,7 +16,7 @@ import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, em
 import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
 
 // type
-import { TcreateQuotationContentOtherDto, quotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
+import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
 
 // =======================================================================
 
@@ -67,12 +67,10 @@ Gina說之後會在product裡新增order這個property作為排序使用
 const useProductList = ({
   productArr,
   others,
-  productsOrder,
   resetTrigger,
 }: {
-  productArr: quotationProductDto[] | undefined;
+  productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
-  productsOrder: string[] | undefined;
   resetTrigger: any;
 }) => {
   const [render, setRender] = useState(0);
@@ -119,17 +117,17 @@ const useProductList = ({
       return;
     }
 
-    const orderArr = productArr.map((item) => {
-      return item.order;
-    });
+    // const orderArr = productArr.map((item) => {
+    //   return item.order;
+    // });
 
-    const isEqual = _.isEqual(_.sortBy(orderArr), _.sortBy(productsOrder));
+    // const isEqual = _.isEqual(_.sortBy(orderArr), _.sortBy(productsOrder));
 
-    if (isEqual) {
-      setProdVKeyArr(productsOrder);
-    } else {
-      setProdVKeyArr(undefined);
-    }
+    // if (isEqual) {
+    //   setProdVKeyArr(productsOrder);
+    // } else {
+    //   setProdVKeyArr(undefined);
+    // }
 
     createProdList();
   }, [resetTrigger, doorModelList]);
@@ -139,16 +137,24 @@ const useProductList = ({
       return;
     }
 
+    const sortedProdArr = _.sortBy(productArr, 'order');
+
     const list: TproductList = {};
 
-    productArr.forEach((prod) => {
-      const key = prod.order ? `${prod.order}` : nanoid();
+    // 每次上傳前會將prod的order依照當時的排序重新設定
+    // 所以理論上order不會重複
+    sortedProdArr.forEach((prod) => {
+      let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+      if (key in list) {
+        key = nanoid();
+      }
 
       const prodData: Tprod = {
         ...prod,
         phase: 1,
         voltage: String(prod.voltage),
-        motorSupport: !!Number(prod.motorSupport || '0'),
+        motorSupport: prod.motorSupport,
         doorTrackThick: String(prod.doorTrackThick),
         rollUpBoxThick: String(prod.rollUpBoxThick),
         // 取得時是mm，要轉成m
@@ -159,10 +165,10 @@ const useProductList = ({
         boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
-        quantity: prod.items.length,
+        quantity: prod.items?.length ?? 0,
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-        options: prod.items[0].options ?? [],
-        components: prod.items[0].components ?? [],
+        options: prod.items?.[0].options ?? [],
+        components: prod.items?.[0].components ?? [],
       };
 
       list[key] = new Class_product({
@@ -173,6 +179,8 @@ const useProductList = ({
 
         calcSubTotalPrice,
         doorModelList,
+
+        originProd: prod,
       });
     });
 
