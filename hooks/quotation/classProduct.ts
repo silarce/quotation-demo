@@ -651,18 +651,31 @@ class Class_product {
 
     this.timeoutId_retrieveCreProdAcce = setTimeout(() => {
       this.retrieveCreProdAcce();
-    }, 50);
+    }, 100);
   }
 
   takeDefaultDynaValue() {
-    this.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
-    this.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
-    this.motor = this.options_motor?.[0].value ?? '';
-    this.horsepower = this.options_horsepower?.[0].value ?? '';
-    this.phase = this.options_phase?.[0].value ?? '';
-    this.voltage = this.options_voltage?.[0].value ?? '';
+    // 做比對，如果值都一樣就不執行下面的程式
+    const call = () => {
+      this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
+      this._prodData.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
+      this._prodData.motor = this.options_motor?.[0].value ?? '';
+      this._prodData.horsepower = this.options_horsepower?.[0].value ?? '';
+      this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
+      this._prodData.voltage = this.options_voltage?.[0].value ?? '';
+      this.callRetrieveCreProdAcce();
+    };
 
-    this.callRetrieveCreProdAcce(); // 應該可以不用放這個
+    if (
+      this._prodData.doorTrackThick !== this.options_doorTrackThick?.[0].value ||
+      this._prodData.rollUpBoxThick !== this.options_rollUpBoxThick?.[0].value ||
+      this._prodData.motor !== this.options_motor?.[0].value ||
+      this._prodData.horsepower !== this.options_horsepower?.[0].value ||
+      this._prodData.phase !== Number(this.options_phase?.[0].value) ||
+      this._prodData.voltage !== this.options_voltage?.[0].value
+    ) {
+      call();
+    }
   }
 
   // ---------------------------------------------------------
@@ -899,17 +912,12 @@ class Class_product {
 
     if (Object.keys(headBoxThickList).length > 0) {
       this.options_rollUpBoxThick = Object.values(headBoxThickList);
-
-      const defalultValue = this.options_rollUpBoxThick[0].value;
-      this.rollUpBoxThick = defalultValue;
     } else {
       this.options_rollUpBoxThick = undefined;
     }
 
     if (Object.keys(railThickList).length > 0) {
       this.options_doorTrackThick = Object.values(railThickList);
-      const defalultValue = this.options_doorTrackThick[0].value;
-      this.doorTrackThick = defalultValue;
     }
   } // retrieveOptions
 
@@ -1234,11 +1242,11 @@ class Class_product {
       this.surface = '';
     }
 
-    Object.values(this.acceList || {}).forEach((acce) => {
-      if (acce) {
-        acce.changeFindedMaterial(v);
-      }
-    });
+    // Object.values(this.acceList || {}).forEach((acce) => {
+    //   if (acce) {
+    //     acce.changeFindedMaterial(v);
+    //   }
+    // });
 
     this._prodData.material = v;
     this.reRender();
