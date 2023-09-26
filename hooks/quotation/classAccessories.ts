@@ -5,10 +5,9 @@ import { nanoid } from 'nanoid';
 // type
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
-import type { Toption } from 'js/utils/options/options';
 
 // type
-import { TcreateQuotationProductOptionDto } from 'js/api/dtoTypes';
+import { TcreateQuotationProductAccessoriesDto } from 'js/api/dtoTypes';
 
 import { Class_product } from './classProduct';
 

@@ -749,8 +749,7 @@ export type TquotationContentOtherDto = {
 
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 
-/**選配設定 */ // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
-// CreateQuotationProductOptionDto
+/**選配設定 */
 export type TquotationProductAccessoriesDto = {
   id: string;
   createdAt: string;
@@ -766,7 +765,10 @@ export type TquotationProductAccessoriesDto = {
   order: number;
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductOptionDto = Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateQuotationProductAccessoriesDto = Omit<
+  TquotationProductAccessoriesDto,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 export type TquotationProductComponentsDto = {
@@ -1328,4 +1330,16 @@ export type TdoorProductBomDto = {
   motor: TdoorBomDto_Component;
   motorAccessories: TdoorBomDto_Component;
   headBox: TdoorBomDto_Component;
+};
+
+export type TdoorAccessoryDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: TdoorModelName;
+  name: string;
+  unit: string | null;
+  referenceSpec: string | null;
+  cost: number | null;
+  price: number | null;
 };

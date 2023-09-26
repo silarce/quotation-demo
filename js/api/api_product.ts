@@ -24,6 +24,7 @@ import type {
   TgenerateDoorProductBomDto,
   TdoorBomDto_Component,
   TdoorProductBomDto,
+  TdoorAccessoryDto,
 } from './dtoTypes';
 
 // const apiGetAssets = (path: string) => {
@@ -155,7 +156,7 @@ export const apiPostProdAccessories = (params: { modelName: string }) => {
   const api = '/products/door/accessories';
 
   return axi
-    .get(api, { params })
+    .get<TdoorAccessoryDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };

@@ -41,7 +41,7 @@ import type {
   TquotationProductAccessoriesDto,
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto_ComponentInfo,
-  TcreateQuotationProductOptionDto,
+  TcreateQuotationProductAccessoriesDto,
   TcreateQuotationProductComponentsDto,
   TquotationProductComponentsDto,
   TquotationProductDto,
@@ -1565,7 +1565,7 @@ class Class_product {
     const checkOptionsKey = Object.keys(this.accessoriesList).every((key) => this.accessoriesVKeyArr!.includes(key));
     const arrForCreate = checkOptionsKey ? this.accessoriesVKeyArr : Object.keys(this.accessoriesList);
 
-    const accessories: TcreateQuotationProductOptionDto[] =
+    const accessories: TcreateQuotationProductAccessoriesDto[] =
       arrForCreate?.map((key, index) => {
         const item = this.accessoriesList[key];
 
