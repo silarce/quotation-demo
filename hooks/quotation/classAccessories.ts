@@ -13,18 +13,18 @@ import { TcreateQuotationProductOptionDto } from 'js/api/dtoTypes';
 import { Class_product } from './classProduct';
 
 // =======================================================================
-class Class_options {
+class Class_accessories {
   constructor({
     //
     reRender,
-    data = emptyOptionsOri(),
+    data = emptyAccessoriesOri(),
     delSelf,
     copySelf,
     // calcOptionsAllprice,
     prod,
   }: {
     reRender: TreRender;
-    data?: Toptions;
+    data?: Taccessories;
     delSelf: () => void;
     copySelf: () => void;
     // calcOptionsAllprice: () => void;
@@ -47,9 +47,9 @@ class Class_options {
   // readonly calcOptionsAllprice;
 
   calcAllPrice({
-    toCalcOptionsAllprice = true,
+    toCalcAccessoriesAllprice: toCalcAccessoriesAllprice = true,
   }: //
-  { toCalcOptionsAllprice?: boolean } = {}) {
+  { toCalcAccessoriesAllprice?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
 
     const price = this.price;
@@ -65,8 +65,8 @@ class Class_options {
     this._data.unitPrice = unitPrice.toNumber();
     this._data.totalPrice = totalPrice.toNumber();
 
-    if (toCalcOptionsAllprice) {
-      this._prod.calcOptionsAllprice();
+    if (toCalcAccessoriesAllprice) {
+      this._prod.calcAccessoriesAllprice();
     }
 
     this.reRender();
@@ -142,11 +142,11 @@ class Class_options {
   get body() {
     return this._data;
   }
-} // Class_options  close
+} // Class_accessories  close
 
 // ============================================================================
 
-type Toptions = {
+type Taccessories = {
   id?: string;
   codeName: string;
   name: string;
@@ -158,9 +158,9 @@ type Toptions = {
   dualPrice: number;
 };
 
-type ToptionsKey = Exclude<keyof Toptions, 'id'>;
+type TaccessoriesKey = Exclude<keyof Taccessories, 'id'>;
 
-const optionsKeyArrOri: () => ToptionsKey[] = () => {
+const accessoriesKeyArrOri: () => TaccessoriesKey[] = () => {
   return [
     //
     'codeName',
@@ -174,7 +174,7 @@ const optionsKeyArrOri: () => ToptionsKey[] = () => {
   ];
 };
 
-const optionsCellConfig: TcellConfig = {
+const accessoriesCellConfig: TcellConfig = {
   codeName: {
     label: '代號',
     inputSelProps: {
@@ -259,7 +259,7 @@ const optionsCellConfig: TcellConfig = {
 };
 
 // ============================================================================
-const emptyOptionsOri: () => Toptions = () => {
+const emptyAccessoriesOri: () => Taccessories = () => {
   return {
     codeName: '',
     name: '',
@@ -273,5 +273,5 @@ const emptyOptionsOri: () => Toptions = () => {
 };
 
 // ============================================================================
-export type { Toptions, ToptionsKey };
-export { Class_options, optionsCellConfig, optionsKeyArrOri, emptyOptionsOri };
+export type { Taccessories, TaccessoriesKey };
+export { Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri, emptyAccessoriesOri };

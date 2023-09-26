@@ -65,7 +65,7 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-import Table_options from 'components/page/domestic/quotation/quotation/product/table_options';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // config
@@ -234,9 +234,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     changeComKeyArr,
     comVKeyArr,
     //
-    optionsKeyArr,
-    changeOptionsKeyArr,
-    optionsCellConfig,
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
     //
     othersKeyArr,
     othersList,
@@ -1029,19 +1029,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           <div className={style.redWrapper}>
             {/* 選配設定 */}
-            <Table_options
+            <Table_accessories
               disabled={disabled}
-              list={targetProd?.optionsList}
-              cellConfig={optionsCellConfig}
-              keyArr={optionsKeyArr}
-              changeKeyArr={changeOptionsKeyArr}
+              list={targetProd?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={changeAccessoriesKeyArr}
               add={() => {
                 targetProd?.addOption();
               }}
-              defalutVKeyArr={targetProd?.optionsVKeyArr}
+              defalutVKeyArr={targetProd?.accessoriesVKeyArr}
               onVKeyChange={(keyArr) => {
                 if (targetProd) {
-                  targetProd.optionsVKeyArr = keyArr;
+                  targetProd.accessoriesVKeyArr = keyArr;
                 }
               }}
             />

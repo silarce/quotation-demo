@@ -8,11 +8,11 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { Class_other, ToptionsKey, ToptionsList } from 'hooks/quotation/useProduct';
+import { Class_other, TaccessoriesKey, TaccessoriesList } from 'hooks/quotation/useProduct';
 
 import scss from '../table.module.scss';
 
-export default function Table_options({
+export default function Table_accessories({
   disabled,
   list,
   cellConfig,
@@ -23,10 +23,10 @@ export default function Table_options({
   onVKeyChange,
 }: {
   disabled: boolean;
-  list: ToptionsList | undefined;
+  list: TaccessoriesList | undefined;
   cellConfig: TcellConfig;
-  keyArr: ToptionsKey[];
-  changeKeyArr: (arr: ToptionsKey[]) => void;
+  keyArr: TaccessoriesKey[];
+  changeKeyArr: (arr: TaccessoriesKey[]) => void;
   add?: () => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
@@ -52,7 +52,7 @@ export default function Table_options({
               resetTrigger={keyArr.length}
               emptyBlockWidth="137px"
               onDragEndCallback={(dndKeyArr) => {
-                const keyArr = dndKeyArr as ToptionsKey[];
+                const keyArr = dndKeyArr as TaccessoriesKey[];
                 changeKeyArr(keyArr);
               }}
             />

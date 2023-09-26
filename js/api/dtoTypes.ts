@@ -751,7 +751,7 @@ export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'i
 
 /**選配設定 */ // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 // CreateQuotationProductOptionDto
-export type TquotationProductOptionDto = {
+export type TquotationProductAccessoriesDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -766,7 +766,7 @@ export type TquotationProductOptionDto = {
   order: number;
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductOptionDto = Omit<TquotationProductOptionDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateQuotationProductOptionDto = Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'>;
 
 // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 export type TquotationProductComponentsDto = {
@@ -869,16 +869,13 @@ export type TquotationProductDto = {
   close: string;
   // 備註
   notes: string;
-  // // 選配設定
-  // options?: TquotationProductOptionDto[] | undefined;
-  // // 材料配件
-  // components: TquotationProductComponentsDto[] | undefined;
-  // // 數量
-  // quantity: number;
+
   order: number;
   items: {
+    // // 材料配件
     components: TquotationProductComponentsDto[];
-    options: TquotationProductOptionDto[];
+    // // 選配設定
+    accessories: TquotationProductAccessoriesDto[];
     // 還有其他很多有的沒有的，用不到，以後有空再補上
   }[];
 };
@@ -1016,7 +1013,7 @@ export type TcreateQuotationProductDto = {
   // 備註
   notes: string;
   // 選配設定
-  options: {
+  accessories: {
     codeName: string; //代號
     name: string; //名稱
     unit: string; // 單位
@@ -1025,6 +1022,7 @@ export type TcreateQuotationProductDto = {
     totalPrice: number; // 複價
     price: number; // 牌價
     dualPrice: number; // 牌價複價
+    order: number;
   }[];
   components: TcreateQuotationProductComponentsDto[];
   //

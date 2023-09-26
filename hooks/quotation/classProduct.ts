@@ -27,7 +27,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 // ===========================================================
 // child class
 import { Class_component, Tcomponent, creEmptyCom, comTypeLookUp } from './classComponent';
-import { Class_options, Toptions } from './classOptions';
+import { Class_accessories, Taccessories } from './classAccessories';
 // =============================================================================
 // api
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
@@ -38,7 +38,7 @@ import type {
   TlegacyContractProductDto,
   TcreateLegacyContractProductDto,
   TdoorComponentListDto,
-  TquotationProductOptionDto,
+  TquotationProductAccessoriesDto,
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto_ComponentInfo,
   TcreateQuotationProductOptionDto,
@@ -126,7 +126,7 @@ class Class_product {
 
     // ___________________________________________________________
     // 建立選配設定
-    this.createOptionsList();
+    this.createAccessoriesList();
 
     // ___________________________________________________________
   } //  constructor close
@@ -216,18 +216,18 @@ class Class_product {
   // ---------------------------------------------------------
   // 選配設定
 
-  optionsList: { [key: string]: Class_options } = {};
+  accessoriesList: { [key: string]: Class_accessories } = {};
 
   delOption(key: string) {
-    delete this.optionsList[key];
+    delete this.accessoriesList[key];
     this.reRender();
   }
 
   copyOption(copyKey: string) {
     const newKey = `new-${nanoid()}`;
-    const copyData = _.cloneDeep(this.optionsList[copyKey].body);
+    const copyData = _.cloneDeep(this.accessoriesList[copyKey].body);
 
-    this.optionsList[newKey] = new Class_options({
+    this.accessoriesList[newKey] = new Class_accessories({
       reRender: this.reRender,
       data: copyData,
       delSelf: () => this.delOption(newKey),
@@ -241,7 +241,7 @@ class Class_product {
 
   addOption() {
     const newKey = `new-${nanoid()}`;
-    this.optionsList[newKey] = new Class_options({
+    this.accessoriesList[newKey] = new Class_accessories({
       reRender: this.reRender,
       delSelf: () => this.delOption(newKey),
       copySelf: () => this.copyOption(newKey),
@@ -252,12 +252,12 @@ class Class_product {
     this.reRender();
   }
 
-  optionsVKeyArr: string[] | undefined;
+  accessoriesVKeyArr: string[] | undefined;
 
-  createOptionsList() {
+  createAccessoriesList() {
     // const optionArr = this._prodData.options;
-    const optionArr = _.sortBy(this._prodData.options, 'order');
-    const list: { [key: string]: Class_options } = {};
+    const optionArr = _.sortBy(this._prodData.accessories, 'order');
+    const list: { [key: string]: Class_accessories } = {};
 
     optionArr?.forEach((item) => {
       let key = item.order !== undefined ? `${item.order}` : nanoid();
@@ -266,7 +266,7 @@ class Class_product {
         key = nanoid();
       }
 
-      list[key] = new Class_options({
+      list[key] = new Class_accessories({
         reRender: this.reRender,
         data: item,
         delSelf: () => this.delOption(key),
@@ -275,7 +275,7 @@ class Class_product {
         prod: this,
       });
     });
-    this.optionsList = list;
+    this.accessoriesList = list;
     this.reRender();
   }
 
@@ -753,13 +753,13 @@ class Class_product {
   }
 
   /**計算options所有的價格 */
-  calcOptionsAllprice() {
+  calcAccessoriesAllprice() {
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
     let d_unitPrice = new Decimal(0);
     let d_totalPrice = new Decimal(0);
 
-    const optionsArr = Object.values(this.optionsList ?? {});
+    const optionsArr = Object.values(this.accessoriesList ?? {});
 
     optionsArr?.forEach((item) => {
       const { price, dualPrice, unitPrice, totalPrice } = item;
@@ -1087,9 +1087,9 @@ class Class_product {
     this._prodData.discount = `${Number(v)}`;
 
     // 因為折數改變了，所以選配設定的價格要重新計算
-    Object.values(this.optionsList).forEach((item, index, arr) => {
+    Object.values(this.accessoriesList).forEach((item, index, arr) => {
       item.calcAllPrice({
-        toCalcOptionsAllprice: arr.length - 1 === index,
+        toCalcAccessoriesAllprice: arr.length - 1 === index,
       });
     });
     Object.values(this.comList ?? {}).forEach((item, index, arr) => {
@@ -1558,16 +1558,16 @@ class Class_product {
 
   get body() {
     //
-    if (!this.optionsVKeyArr) {
-      this.optionsVKeyArr = [];
+    if (!this.accessoriesVKeyArr) {
+      this.accessoriesVKeyArr = [];
     }
 
-    const checkOptionsKey = Object.keys(this.optionsList).every((key) => this.optionsVKeyArr!.includes(key));
-    const arrForCreate = checkOptionsKey ? this.optionsVKeyArr : Object.keys(this.optionsList);
+    const checkOptionsKey = Object.keys(this.accessoriesList).every((key) => this.accessoriesVKeyArr!.includes(key));
+    const arrForCreate = checkOptionsKey ? this.accessoriesVKeyArr : Object.keys(this.accessoriesList);
 
-    const options: TcreateQuotationProductOptionDto[] =
+    const accessories: TcreateQuotationProductOptionDto[] =
       arrForCreate?.map((key, index) => {
-        const item = this.optionsList[key];
+        const item = this.accessoriesList[key];
 
         return { ...item.body, order: index };
       }) ?? [];
@@ -1584,7 +1584,6 @@ class Class_product {
 
     return {
       ...this._prodData,
-      options,
       // 送去後端要轉為要從m轉為mm
       width: Number(this._prodData.width) * 1000,
       length: Number(this._prodData.length) * 1000,
@@ -1602,6 +1601,7 @@ class Class_product {
       materialSurface: this._prodData.surface ?? '',
       isPainted: false,
 
+      accessories,
       components: components,
     };
   }
@@ -1657,7 +1657,7 @@ type Tprod = {
   rollUpBoxThick: string; // 捲箱厚度
   close: string; // 開閉方式
   //
-  options: TquotationProductOptionDto[];
+  accessories: TquotationProductAccessoriesDto[];
   components: TquotationProductComponentsDto[];
   boxD: string;
 };
@@ -2199,7 +2199,7 @@ const emptyProdOri = (): Tprod => {
     rollUpBoxThick: '', // 捲箱厚度
     close: '',
     //
-    options: [],
+    accessories: [],
     components: [],
     boxD: '',
   };

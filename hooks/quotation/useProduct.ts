@@ -13,7 +13,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
 import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
-import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
+import { TaccessoriesKey, Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 
 // type
 import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
@@ -40,8 +40,8 @@ type TcomList = {
   [key in TcomponentKey]: Class_component;
 };
 
-type ToptionsList = {
-  [key: string]: Class_options;
+type TaccessoriesList = {
+  [key: string]: Class_accessories;
 };
 
 type TothersList = {
@@ -139,7 +139,7 @@ const useProductList = ({
 
         quantity: prod.items?.length ?? 0,
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-        options: prod.items?.[0].options ?? [],
+        accessories: prod.items?.[0].accessories ?? [],
         components: prod.items?.[0].components ?? [],
       };
 
@@ -261,10 +261,10 @@ const useProductList = ({
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  const [optionsKeyArr, setOptionsKeyArr] = useState<ToptionsKey[]>(optionsKeyArrOri());
+  const [accessoriesKeyArr, setAccessoriesKeyArr] = useState<TaccessoriesKey[]>(accessoriesKeyArrOri());
 
-  const changeOptionsKeyArr = (v: ToptionsKey[]) => {
-    setOptionsKeyArr(v);
+  const changeAccessoriesKeyArr = (v: TaccessoriesKey[]) => {
+    setAccessoriesKeyArr(v);
   };
 
   // ---------------------------------------------------------
@@ -363,9 +363,9 @@ const useProductList = ({
     comCellConfig,
     changeComKeyArr,
     //
-    optionsKeyArr,
-    changeOptionsKeyArr,
-    optionsCellConfig,
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
     //
     othersKeyArr,
     othersList,
@@ -384,12 +384,12 @@ export type {
   TprodKey,
   TproductList,
   //
-  Class_component as Class_component,
+  Class_component,
   TcomponentKey,
   TcomList,
   //
-  ToptionsKey,
-  ToptionsList,
+  TaccessoriesKey,
+  TaccessoriesList,
   //
   Class_other,
   TothersKey,
