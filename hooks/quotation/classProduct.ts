@@ -1594,15 +1594,15 @@ class Class_product {
       //
       rollUpBoxThick: Number(this._prodData.rollUpBoxThick),
       voltage: Number(this._prodData.voltage),
-      // doorTrackThick: Number(prod.doorTrackThick),
-      doorTrackThick: 1,
+      doorTrackThick: Number(this._prodData.doorTrackThick),
+      // doorTrackThick: 1,
       motorSupport: this._prodData.motorSupport,
       //
       materialSurface: this._prodData.surface ?? '',
       isPainted: false,
 
-      accessories,
-      components: components,
+      components,
+      accessories: [],
     };
   }
 
