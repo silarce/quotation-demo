@@ -1033,28 +1033,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
             onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
           />
 
-          <div className="relative">
-            <Table_acce
+          <div className={style.redWrapper}>
+            {/* 材料配件設定 */}
+            <div className="relative">
+              <Table_acce
+                disabled={disabled}
+                acceList={targetProd?.acceList}
+                acceCellConfig={acceCellConfig}
+                acceKeyArr={acceKeyArr}
+                changeAcceKeyArr={changeAcceKeyArr}
+                defalutVKeyArr={acceVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+            <hr />
+            {/* 選配設定 */}
+            <Table_options
               disabled={disabled}
-              acceList={targetProd?.acceList}
-              acceCellConfig={acceCellConfig}
-              acceKeyArr={acceKeyArr}
-              changeAcceKeyArr={changeAcceKeyArr}
-              defalutVKeyArr={acceVKeyArr}
+              list={targetProd?.optionsList}
+              cellConfig={optionsCellConfig}
+              keyArr={optionsKeyArr}
+              changeKeyArr={changeOptionsKeyArr}
+              add={() => {
+                targetProd?.addOption();
+              }}
             />
-            <LoadingCover01 isLoading={targetProd?.isLoading} />
           </div>
-
-          <Table_options
-            disabled={disabled}
-            list={targetProd?.optionsList}
-            cellConfig={optionsCellConfig}
-            keyArr={optionsKeyArr}
-            changeKeyArr={changeOptionsKeyArr}
-            add={() => {
-              targetProd?.addOption();
-            }}
-          />
+          {/* 其他設定 */}
 
           <Table_others
             disabled={disabled}
@@ -1064,16 +1069,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
             changeKeyArr={changeOthersKeyArr}
             add={addOthers}
           />
-
-          <div className={style.redWrapper}>
-            {/* 材料配件設定 */}
-            {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
-            <hr />
-            {/* 選配設定 */}
-            {/* <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} /> */}
-          </div>
-          {/* 其他設定 */}
-          {/* <QuotationAdditions disabled={!allowEdit} /> */}
 
           {/* 備註/報價範圍/付款資訊 */}
 
