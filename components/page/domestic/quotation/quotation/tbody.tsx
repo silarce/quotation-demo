@@ -85,8 +85,6 @@ export default function Tbody({
 
   const [activeKey, setActiveKey] = useState('');
 
-  // console.log(defalutVKeyArr);
-
   const {
     sensors,
     dndKeyArr: vDndKeyArr,
@@ -95,7 +93,6 @@ export default function Tbody({
     onDragStart,
   } = useVerticalDnd({
     listKeyArr: defalutVKeyArr || Object.keys(rowList),
-    // listKeyArr: Object.keys(rowList),
     resetTrigger: rowList,
   });
 

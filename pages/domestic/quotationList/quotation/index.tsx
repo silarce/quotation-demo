@@ -1033,14 +1033,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
             onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
           />
 
-          <Table_acce
-            disabled={disabled}
-            acceList={targetProd?.acceList}
-            acceCellConfig={acceCellConfig}
-            acceKeyArr={acceKeyArr}
-            changeAcceKeyArr={changeAcceKeyArr}
-            defalutVKeyArr={acceVKeyArr}
-          />
+          <div className="relative">
+            <Table_acce
+              disabled={disabled}
+              acceList={targetProd?.acceList}
+              acceCellConfig={acceCellConfig}
+              acceKeyArr={acceKeyArr}
+              changeAcceKeyArr={changeAcceKeyArr}
+              defalutVKeyArr={acceVKeyArr}
+            />
+            <LoadingCover01 isLoading={targetProd?.isLoading} />
+          </div>
 
           <Table_options
             disabled={disabled}

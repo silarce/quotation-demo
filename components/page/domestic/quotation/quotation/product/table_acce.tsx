@@ -64,7 +64,6 @@ export default function Table_acce({
               acceBoxWidth="120px"
             />
           </div>
-
           {acceList && (
             <Tbody
               disabled={disabled}
