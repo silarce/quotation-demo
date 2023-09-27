@@ -69,6 +69,7 @@ export default function Tbody({
   panelBox,
   defalutVKeyArr,
   onVKeyChange,
+  rowHeight,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -80,6 +81,7 @@ export default function Tbody({
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
+  rowHeight?: 'h106';
 }) {
   // ---------------------------------------------------------------
 
@@ -158,6 +160,7 @@ export default function Tbody({
                   onRowClick && onRowClick({ item: item });
                 }}
                 defalutVKeyArr={defalutVKeyArr}
+                rowHeight={rowHeight}
               />
             );
           })}
@@ -299,6 +302,7 @@ function DndRow({
   prodCellConfig,
   isActive,
   panelBox = 'copyDelBtnBox',
+  rowHeight,
 }: {
   id: string;
   pIndex: number;
@@ -315,6 +319,7 @@ function DndRow({
   prodCellConfig: TcellConfig;
   isActive?: boolean;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  rowHeight?: 'h106';
   //
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -330,7 +335,7 @@ function DndRow({
     <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
       <LoadingCover01 isLoading={item?.isLoading} />
       <CellWithBar isActive={isActive} className="z-0">
-        <div className={scss.row} onClick={undefined}>
+        <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
           {/*  */}
           {panelBox === 'copyDelBtnBox' && (
             <CopyDelBtnBox

@@ -23,6 +23,7 @@ export default function Table_prod({
   setTargetProd,
   defalutVKeyArr,
   onVKeyChange,
+  rowHeight,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -33,6 +34,7 @@ export default function Table_prod({
   setTargetProd: (v: Class_product) => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
+  rowHeight?: 'h106';
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -71,6 +73,7 @@ export default function Table_prod({
             }}
             // defalutVKeyArr={defalutVKeyArr}
             onVKeyChange={onVKeyChange}
+            rowHeight={rowHeight}
           />
 
           {!disabled && (

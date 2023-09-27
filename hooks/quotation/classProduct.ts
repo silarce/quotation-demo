@@ -1891,17 +1891,19 @@ const prodCellConfig: TcellConfig = {
   doorTrack: {
     label: '門軌',
     inputSelProps: {
-      wrapperStyle: { width: '300px' },
+      wrapperStyle: { width: '130px' },
       selectProps: {
         withIcon: true,
         creOptionWithIconProps: {
+          showLabel: false,
           imgProps: {
-            style: { height: '40px' },
+            style: { height: '80px' },
           },
         },
         creSingleValueWithIconProps: {
+          showLabel: false,
           imgProps: {
-            style: { height: '40px' },
+            style: { height: '80px' },
           },
         },
         props: {

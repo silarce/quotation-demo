@@ -1013,6 +1013,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               setTargetProd={setTargetProd}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              rowHeight="h106"
             />
 
             {/* 材料配件設定 */}
