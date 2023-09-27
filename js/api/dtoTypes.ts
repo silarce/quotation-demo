@@ -888,6 +888,7 @@ export type TquotationContentDto = {
   updateAt: string;
   quotationNumber: string;
   version: number;
+
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
   customer: TcustomerDto;
@@ -1032,6 +1033,29 @@ export type TcreateQuotationProductDto = {
   isPainted: boolean;
   order: number;
 };
+
+// type TupdateQuotationContentDto = {
+//   quotationDate: string; // 報價日期
+//   validityPeriod: string; // 報價時效
+//   customerId: string;
+//   projectName: string; // 工程名稱
+//   county: string; // 縣市
+//   district: string; // 區
+//   address: string; // 剩餘地址
+//   contactPerson: string; //  聯絡人
+//   contactNumber: string; //  聯絡電話
+//   faxNumber: string; // 傳真號碼
+//   trackProgress: string; // 追蹤狀態
+//   projectProgress: string; //工地進度
+//   quantity: number; // 樘數
+//   editNotes: string; // 編輯備註
+//   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+//   /**備註 */
+//   annotations: string[] | null;
+//   /**報價範圍 */
+//   quotationRanges: string[] | null;
+//   managerId: string | null;
+// };
 
 export type TcreateQuotationContentDto = {
   quotationDate: string; // 報價日期

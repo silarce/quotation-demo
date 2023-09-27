@@ -8,8 +8,11 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { Class_other, TaccessoriesKey, TaccessoriesList } from 'hooks/quotation/useProduct';
+import AccessorySelector from 'components/global/gear/modal/accessorySelector';
 
+// type
+import { TaccessoriesKey, TaccessoriesList } from 'hooks/quotation/useProduct';
+// css
 import scss from '../table.module.scss';
 
 export default function Table_accessories({
@@ -21,6 +24,7 @@ export default function Table_accessories({
   add,
   defalutVKeyArr,
   onVKeyChange,
+  doorModel,
 }: {
   disabled: boolean;
   list: TaccessoriesList | undefined;
@@ -30,6 +34,7 @@ export default function Table_accessories({
   add?: () => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
+  doorModel: string | undefined;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -78,6 +83,7 @@ export default function Table_accessories({
         </div>
       </div>
       {/*  */}
+      <AccessorySelector showModal={false} onConfirm={() => {}} onCancel={() => {}} modelName={doorModel} />
     </div>
   );
 }

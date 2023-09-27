@@ -42,6 +42,7 @@ export type {
   TgenerateDoorProductBomDto,
   TdoorBomDto_Component,
   TdoorProductBomDto,
+  TdoorAccessoryDto,
 };
 // =======================================================================
 
@@ -152,11 +153,11 @@ export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomD
     .catch((err) => Promise.reject(err.message));
 };
 
-export const apiPostProdAccessories = (params: { modelName: string }) => {
+export const apiGetProdAccessories = (params: { modelName: string }) => {
   const api = '/products/door/accessories';
 
   return axi
-    .get<TdoorAccessoryDto>(api, { params })
+    .get<TdoorAccessoryDto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };

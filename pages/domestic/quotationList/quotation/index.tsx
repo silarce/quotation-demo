@@ -133,6 +133,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  const lasttestContentId = quotationData?.latestContent.id;
   // -----------------------------------------------------
 
   const [targetProd, setTargetProd] = useState<Class_product>();
@@ -142,7 +143,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
 
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(quotationId);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lasttestContentId);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -174,7 +175,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setFileInfoArr([...newImgInfoArr]);
   };
 
-  const uploadAttachment = async (quotationId: string) => {
+  const uploadAttachment = async (newContentId: string) => {
     // 移除附件
     for (const info of fileInfoArr) {
       const { fileId, willDelete, isNew } = info;
@@ -184,7 +185,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
 
       try {
-        await apiDelQuotation_id_attachments(quotationId, fileId);
+        await apiDelQuotation_id_attachments(newContentId, fileId);
       } catch (error) {
         console.log(error);
       }
@@ -202,7 +203,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       formData.append('file', file);
 
       try {
-        await apiPostQuotation_id_attachments(quotationId, formData);
+        await apiPostQuotation_id_attachments(newContentId, formData);
       } catch (error) {
         console.log(error);
       }
@@ -907,13 +908,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         // res跟api文件不一樣，現在沒時間修正
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await uploadAttachment(res.quotation.id);
+
+        await uploadAttachment(res.latestContent.id);
 
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
         showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
+        await uploadAttachment(res.latestContent.id);
         router.push({
           query: {
             id: res.id,
@@ -1044,6 +1046,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   targetProd.accessoriesVKeyArr = keyArr;
                 }
               }}
+              doorModel={targetProd?.doorType}
             />
           </div>
 
