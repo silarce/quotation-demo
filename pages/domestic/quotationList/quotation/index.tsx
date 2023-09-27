@@ -1038,9 +1038,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
               cellConfig={accessoriesCellConfig}
               keyArr={accessoriesKeyArr}
               changeKeyArr={changeAccessoriesKeyArr}
-              add={() => {
-                targetProd?.addOption();
-              }}
+              // add={() => {
+              //   targetProd?.addAcce();
+              // }}
               defalutVKeyArr={targetProd?.accessoriesVKeyArr}
               onVKeyChange={(keyArr) => {
                 if (targetProd) {
@@ -1048,6 +1048,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 }
               }}
               doorModel={targetProd?.doorType}
+              onSelectorConfirm={(arr) => {
+                if (targetProd) {
+                  targetProd.addAcce(arr);
+                }
+              }}
             />
           </div>
 

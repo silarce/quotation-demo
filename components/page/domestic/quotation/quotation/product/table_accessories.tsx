@@ -8,7 +8,7 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import AccessorySelector from 'components/global/gear/modal/accessorySelector';
+import AccessorySelector, { TdoorAccessoryDto } from 'components/global/gear/modal/accessorySelector';
 
 // type
 import { TaccessoriesKey, TaccessoriesList } from 'hooks/quotation/useProduct';
@@ -21,21 +21,23 @@ export default function Table_accessories({
   cellConfig,
   keyArr,
   changeKeyArr,
-  add,
   defalutVKeyArr,
   onVKeyChange,
   doorModel,
+  onSelectorConfirm,
 }: {
   disabled: boolean;
   list: TaccessoriesList | undefined;
   cellConfig: TcellConfig;
   keyArr: TaccessoriesKey[];
   changeKeyArr: (arr: TaccessoriesKey[]) => void;
-  add?: () => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   doorModel: string | undefined;
+  onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
 }) {
+  const [showSelector, setShowSelector] = useState(false);
+
   const [allowMove, setAllowMove] = useState(false);
 
   return (
@@ -69,21 +71,26 @@ export default function Table_accessories({
               keyArr={keyArr}
               prodCellConfig={cellConfig}
               onRowClick={(obj) => {}}
-              defalutVKeyArr={defalutVKeyArr}
-              onVKeyChange={onVKeyChange}
+              // defalutVKeyArr={defalutVKeyArr}
+              // onVKeyChange={onVKeyChange}
             />
           )}
 
           {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
               {/* <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={add} /> */}
-              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={add} />
+              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={() => setShowSelector(true)} />
             </div>
           )}
         </div>
       </div>
       {/*  */}
-      <AccessorySelector showModal={false} onConfirm={() => {}} onCancel={() => {}} modelName={doorModel} />
+      <AccessorySelector
+        showModal={!!doorModel && showSelector}
+        modelName={doorModel}
+        onConfirm={onSelectorConfirm}
+        onCancel={() => setShowSelector(false)}
+      />
     </div>
   );
 }

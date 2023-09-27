@@ -1102,7 +1102,7 @@ export type TcreateQuotationContentDto = {
 // ========================================================================
 // ========================================================================
 // ========================================================================
-type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+export type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
 
 export type TdoorMaterialDto = {
   id: string;

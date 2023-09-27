@@ -2,16 +2,12 @@
 
 .container {
   :global(.ant-modal-content) {
-    width: 800px;
+    width: 950px;
     height: fit-content;
     padding: 19px 30px;
     padding-top: 19px;
   }
-  &.w-1200 {
-    :global(.ant-modal-content) {
-      width: 1200px;
-    }
-  }
+
   // @screen laptop {
   //   :global(.ant-modal-content) {
   //     width: 80vw;
@@ -34,10 +30,10 @@
 }
 .row {
   display: grid;
-  grid-template-columns: 100px auto 70px 70px;
+  grid-template-columns: 70px auto 70px;
   height: 54px;
   padding: 0 46px;
-  gap: 60px;
+  gap: 30px;
   border-bottom: solid 1px $colorBorder01;
   cursor: pointer;
 

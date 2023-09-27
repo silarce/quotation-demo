@@ -166,8 +166,8 @@ export default function AccessorySelector({
       onCancel={theOnCancel}
       // onSearch={onSearch}
       // width={rwd1023 ? '80vw' : '1200px'}
-      width={'1200px'}
-      className={classNames(scss.container, scss['w-1200'])}
+      width={'950px'}
+      className={classNames(scss.container)}
       tip={tip}
       // searcbBarProps={{
       //   inputSelPropsArr: inputSelPropsArr,
@@ -250,7 +250,7 @@ const RowArr = ({
             >
               <span className={scss.idNumber}>{doorModelName}</span>
               <span>{name}</span>
-              <span>{cost}</span>
+              {/* <span>{cost}</span> */}
               <span>{price}</span>
             </div>
           </CellWithBar>

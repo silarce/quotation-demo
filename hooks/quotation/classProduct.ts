@@ -4,8 +4,9 @@
  * Class_product
  * AcceList
  * retrieveCreProdAcce
- * creAcceList
  * createOptionsList
+ * creAcceList
+ * accessoriesList
  *
  * 下拉式選單的選項
  *
@@ -59,6 +60,7 @@ import type {
   TcreateQuotationProductComponentsDto,
   TquotationProductComponentsDto,
   TquotationProductDto,
+  TdoorAccessoryDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -140,7 +142,7 @@ class Class_product {
 
     // ___________________________________________________________
     // 建立選配設定
-    this.createAccessoriesList();
+    this.createAcceList();
 
     // ___________________________________________________________
   } //  constructor close
@@ -232,20 +234,20 @@ class Class_product {
 
   accessoriesList: { [key: string]: Class_accessories } = {};
 
-  delOption(key: string) {
+  delAcce(key: string) {
     delete this.accessoriesList[key];
     this.reRender();
   }
 
-  copyOption(copyKey: string) {
+  copyAcce(copyKey: string) {
     const newKey = `new-${nanoid()}`;
     const copyData = _.cloneDeep(this.accessoriesList[copyKey].body);
 
     this.accessoriesList[newKey] = new Class_accessories({
       reRender: this.reRender,
       data: copyData,
-      delSelf: () => this.delOption(newKey),
-      copySelf: () => this.copyOption(newKey),
+      delSelf: () => this.delAcce(newKey),
+      copySelf: () => this.copyAcce(newKey),
       // calcOptionsAllprice: this.calcOptionsAllprice,
       prod: this,
     });
@@ -253,14 +255,30 @@ class Class_product {
     this.reRender();
   }
 
-  addOption() {
-    const newKey = `new-${nanoid()}`;
-    this.accessoriesList[newKey] = new Class_accessories({
-      reRender: this.reRender,
-      delSelf: () => this.delOption(newKey),
-      copySelf: () => this.copyOption(newKey),
-      // calcOptionsAllprice: this.calcOptionsAllprice,
-      prod: this,
+  addAcce(acceDataArr: TdoorAccessoryDto[]) {
+    acceDataArr.forEach((acceData) => {
+      const newKey = `new-${nanoid()}`;
+      const acceClassData: Taccessories = {
+        codeName: '',
+        name: acceData.name,
+        unit: acceData.unit ?? '',
+        quantity: 1,
+        price: acceData.price ?? 0,
+        totalPrice: 0,
+        unitPrice: 0,
+        dualPrice: 0,
+        //
+        referenceSpec: acceData.referenceSpec,
+      };
+
+      this.accessoriesList[newKey] = new Class_accessories({
+        reRender: this.reRender,
+        data: acceClassData,
+        delSelf: () => this.delAcce(newKey),
+        copySelf: () => this.copyAcce(newKey),
+        // calcOptionsAllprice: this.calcOptionsAllprice,
+        prod: this,
+      });
     });
 
     this.reRender();
@@ -268,7 +286,7 @@ class Class_product {
 
   accessoriesVKeyArr: string[] | undefined;
 
-  createAccessoriesList() {
+  createAcceList() {
     // const optionArr = this._prodData.options;
     const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
@@ -283,8 +301,8 @@ class Class_product {
       list[key] = new Class_accessories({
         reRender: this.reRender,
         data: item,
-        delSelf: () => this.delOption(key),
-        copySelf: () => this.copyOption(key),
+        delSelf: () => this.delAcce(key),
+        copySelf: () => this.copyAcce(key),
         // calcOptionsAllprice: this.calcOptionsAllprice,
         prod: this,
       });
@@ -294,6 +312,9 @@ class Class_product {
   }
 
   resetProd() {
+    // FIXME 直接使用 emptyProdOri會把不該清空的一起清空;
+    // 應該個別處理
+
     const empty = emptyProdOri();
 
     const prod: Tprod = {
@@ -734,13 +755,15 @@ class Class_product {
     }
   }
 
-  private optionsAllPrice = {
+  // 選配 金額總和
+  private AcceAllPrice = {
     price: 0,
     dualPrice: 0,
     unitPrice: 0,
     totalPrice: 0,
   };
 
+  // 材料配件 金額總和
   private comAllPrice = {
     price: 0,
     dualPrice: 0,
@@ -751,9 +774,9 @@ class Class_product {
   /**計算prod所有的價格 */
   private calcProdAllprice() {
     // 牌價 為材料配件設定與選配設定的 牌價複價 總和
-    const price = new Decimal(this.comAllPrice.dualPrice || 0).add(this.optionsAllPrice.dualPrice || 0);
+    const price = new Decimal(this.comAllPrice.dualPrice || 0).add(this.AcceAllPrice.dualPrice || 0);
     // 單價 為材料配件設定與選配設定的 複價 總和
-    const unitPrice = new Decimal(this.comAllPrice.totalPrice || 0).add(this.optionsAllPrice.totalPrice || 0);
+    const unitPrice = new Decimal(this.comAllPrice.totalPrice || 0).add(this.AcceAllPrice.totalPrice || 0);
 
     const dualPrice = price.mul(this.quantity || 0).toNumber();
     const totalPrice = unitPrice.mul(this.quantity || 0).toNumber();
@@ -783,7 +806,7 @@ class Class_product {
       d_unitPrice = d_unitPrice.add(unitPrice || 0);
       d_totalPrice = d_totalPrice.add(totalPrice || 0);
 
-      this.optionsAllPrice = {
+      this.AcceAllPrice = {
         price: d_price.ceil().toNumber(),
         dualPrice: d_dualPrice.ceil().toNumber(),
         unitPrice: d_unitPrice.ceil().toNumber(),
@@ -792,7 +815,7 @@ class Class_product {
     });
 
     this.calcProdAllprice();
-  } // calcOptionsAllprice
+  } // calcAccessoriesAllprice
 
   calcComAllPrice() {
     let d_price = new Decimal(0);
@@ -837,6 +860,16 @@ class Class_product {
 
     return area;
   };
+
+  /**使所有選配計算並變更自己的price */
+  calcChangeAccePrice() {
+    Object.values(this.accessoriesList)?.forEach((acce) => {
+      acce.calcPrice();
+    });
+    // acce裡有機制會呼叫prod的calcAccessoriesAllprice
+    // 接著就會呼叫calcProdAllprice
+    // this.calcProdAllprice();
+  }
 
   /**計算才數 */
   private calcVolume = () => {
@@ -1172,7 +1205,10 @@ class Class_product {
     this._prodData.length = v;
     this._prodData.width = '0';
     this.area = this.calcArea();
+
     this.resetProd();
+
+    this.calcChangeAccePrice();
 
     this.shouldCall_cgs = true;
     this.callAllReq();
@@ -1187,6 +1223,9 @@ class Class_product {
     this._prodData.width = v;
     this._prodData.length = '0';
     this.area = this.calcArea();
+
+    this.calcChangeAccePrice();
+
     this.resetProd();
 
     this.shouldCall_cgs = true;
@@ -1194,6 +1233,7 @@ class Class_product {
 
     this.reRender();
   }
+
   //
   get height() {
     return this._prodData.height;
