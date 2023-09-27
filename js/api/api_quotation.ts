@@ -81,7 +81,7 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewSupervisorEmployee',
 
-      'latestContent.products.items.options',
+      'latestContent.products.items.accessories',
       'latestContent.products.items.components',
       'latestContent.others',
     ],

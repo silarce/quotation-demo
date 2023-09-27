@@ -1,4 +1,4 @@
-/**
+/**creAcceList
  *
  * retrieveOptions 下拉式選單產生器
  * Class_product
@@ -7,6 +7,7 @@
  * createOptionsList
  * creAcceList
  * accessoriesList
+ * takeDefaultDynaValue
  *
  * 下拉式選單的選項
  *
@@ -57,7 +58,7 @@ import type {
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto_ComponentInfo,
   TcreateQuotationProductAccessoriesDto,
-  TcreateQuotationProductComponentsDto,
+  TcreateQuotationProductComponentDto,
   TquotationProductComponentsDto,
   TquotationProductDto,
   TdoorAccessoryDto,
@@ -142,7 +143,7 @@ class Class_product {
 
     // ___________________________________________________________
     // 建立選配設定
-    this.createAcceList();
+    this.creAcceList();
 
     // ___________________________________________________________
   } //  constructor close
@@ -211,7 +212,7 @@ class Class_product {
 
       const theClass = new Class_component({
         reRender: this.reRender,
-        data: com,
+        data: _.cloneDeep(com),
         key: key,
         prod: this,
         callReqGetCodeNumber: () => {
@@ -236,6 +237,7 @@ class Class_product {
 
   delAcce(key: string) {
     delete this.accessoriesList[key];
+    this.calcAccessoriesAllprice();
     this.reRender();
   }
 
@@ -248,13 +250,14 @@ class Class_product {
       data: copyData,
       delSelf: () => this.delAcce(newKey),
       copySelf: () => this.copyAcce(newKey),
-      // calcOptionsAllprice: this.calcOptionsAllprice,
       prod: this,
     });
 
+    this.calcAccessoriesAllprice();
     this.reRender();
   }
 
+  /**acceDataArr會來自選擇器 */
   addAcce(acceDataArr: TdoorAccessoryDto[]) {
     acceDataArr.forEach((acceData) => {
       const newKey = `new-${nanoid()}`;
@@ -269,6 +272,7 @@ class Class_product {
         dualPrice: 0,
         //
         referenceSpec: acceData.referenceSpec,
+        originalPrice: acceData.price ?? 0,
       };
 
       this.accessoriesList[newKey] = new Class_accessories({
@@ -281,12 +285,13 @@ class Class_product {
       });
     });
 
+    this.calcAccessoriesAllprice();
     this.reRender();
   }
 
   accessoriesVKeyArr: string[] | undefined;
 
-  createAcceList() {
+  creAcceList() {
     // const optionArr = this._prodData.options;
     const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
@@ -300,7 +305,8 @@ class Class_product {
 
       list[key] = new Class_accessories({
         reRender: this.reRender,
-        data: item,
+        // data: item,
+        data: _.cloneDeep(item),
         delSelf: () => this.delAcce(key),
         copySelf: () => this.copyAcce(key),
         // calcOptionsAllprice: this.calcOptionsAllprice,
@@ -311,10 +317,7 @@ class Class_product {
     this.reRender();
   }
 
-  resetProd() {
-    // FIXME 直接使用 emptyProdOri會把不該清空的一起清空;
-    // 應該個別處理
-
+  clearProd() {
     const empty = emptyProdOri();
 
     const prod: Tprod = {
@@ -327,12 +330,10 @@ class Class_product {
     };
 
     this._prodData = prod;
-    this._doorGeneralSpecs = undefined;
 
-    this._availableComponents = undefined;
-    this._thickness = '';
+    this._prodData.boxB = '';
     this._defaultBoxB = '';
-    // this._boxD = '';
+    this._thickness = '';
 
     this._quantity = String(this._prodData.quantity);
     this._price = String(this._prodData.price);
@@ -340,8 +341,14 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
-    this.takeDefaultDynaValue();
-    this.findBDoptions();
+    this._doorGeneralSpecs = undefined;
+    this._availableComponents = undefined;
+
+    this.options_boxB = undefined;
+    this.options_boxD = undefined;
+
+    // this.takeDefaultDynaValue();
+    // this.findBDoptions();
   } // resetProd
 
   // ---------------------------------------------------------
@@ -707,7 +714,6 @@ class Class_product {
   }
 
   takeDefaultDynaValue() {
-    // 做比對，如果值都一樣就不執行下面的程式
     const call = () => {
       this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
       this._prodData.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
@@ -718,6 +724,7 @@ class Class_product {
       this.callRetrieveCreProdCom();
     };
 
+    // 做比對，如果值都一樣就不執行call
     if (
       this._prodData.doorTrackThick !== this.options_doorTrackThick?.[0].value ||
       this._prodData.rollUpBoxThick !== this.options_rollUpBoxThick?.[0].value ||
@@ -796,9 +803,9 @@ class Class_product {
     let d_unitPrice = new Decimal(0);
     let d_totalPrice = new Decimal(0);
 
-    const optionsArr = Object.values(this.accessoriesList ?? {});
+    const acceArr = Object.values(this.accessoriesList ?? {});
 
-    optionsArr?.forEach((item) => {
+    acceArr?.forEach((item) => {
       const { price, dualPrice, unitPrice, totalPrice } = item;
 
       d_price = d_price.add(price || 0);
@@ -861,7 +868,7 @@ class Class_product {
     return area;
   };
 
-  /**使所有選配計算並變更自己的price */
+  /**所有acce執行calcPrice */
   calcChangeAccePrice() {
     Object.values(this.accessoriesList)?.forEach((acce) => {
       acce.calcPrice();
@@ -1188,7 +1195,7 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
-    this.resetProd();
+    this.clearProd();
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -1206,7 +1213,7 @@ class Class_product {
     this._prodData.width = '0';
     this.area = this.calcArea();
 
-    this.resetProd();
+    this.clearProd();
 
     this.calcChangeAccePrice();
 
@@ -1226,7 +1233,7 @@ class Class_product {
 
     this.calcChangeAccePrice();
 
-    this.resetProd();
+    this.clearProd();
 
     this.shouldCall_cgs = true;
     this.callAllReq();
@@ -1241,7 +1248,7 @@ class Class_product {
   set height(v) {
     this._prodData.height = v;
     this.area = this.calcArea();
-    this.resetProd();
+    this.clearProd();
 
     this.shouldCall_cgs = true;
     this.shouldCall_pgpb = true;
@@ -1293,15 +1300,6 @@ class Class_product {
     this.reRender();
   }
 
-  /**門片厚度 */
-  get thickness() {
-    return this._thickness;
-  }
-  set thickness(v) {
-    this._thickness = v;
-    this.reRender();
-  }
-
   //
   get area() {
     return this._prodData.area;
@@ -1331,11 +1329,11 @@ class Class_product {
       this.surface = '';
     }
 
-    // Object.values(this.acceList || {}).forEach((acce) => {
-    //   if (acce) {
-    //     acce.changeFindedMaterial(v);
-    //   }
-    // });
+    Object.values(this.comList || {}).forEach((com) => {
+      if (com) {
+        com.changeFindedMaterial(v);
+      }
+    });
 
     this._prodData.material = v;
     this.reRender();
@@ -1387,6 +1385,7 @@ class Class_product {
 
     return Number(this._price).toLocaleString();
   }
+
   set price(v) {
     v = v.replace(/,/g, '');
     const numberRegex = /^(\d+(\.\d+)?|)$/;
@@ -1618,6 +1617,15 @@ class Class_product {
   }
   //
 
+  /**門片厚度 */ // api 沒有
+  get thickness() {
+    return this._thickness;
+  }
+  set thickness(v) {
+    this._thickness = v;
+    this.reRender();
+  }
+
   get body() {
     //
     if (!this.accessoriesVKeyArr) {
@@ -1634,13 +1642,13 @@ class Class_product {
         return { ...item.body, order: index };
       }) ?? [];
     //
-    const components: TcreateQuotationProductComponentsDto[] = Object.values(this.comList ?? {}).map((com, index) => {
+    const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
       const body = com.body;
 
       return {
         ...body,
         order: index,
-        type: body.type as TcreateQuotationProductComponentsDto['type'],
+        type: body.type as TcreateQuotationProductComponentDto['type'],
       };
     });
 
@@ -1664,7 +1672,7 @@ class Class_product {
       isPainted: false,
 
       components,
-      accessories: [],
+      accessories: accessories,
     };
   }
 

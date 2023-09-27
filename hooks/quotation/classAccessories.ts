@@ -41,7 +41,6 @@ class Class_accessories {
     this.copySelf = copySelf;
 
     this.calcPrice();
-    this.calcAllPrice();
     // this.calcOptionsAllprice = calcOptionsAllprice;
   } // constructor
 
@@ -53,13 +52,11 @@ class Class_accessories {
   // readonly calcOptionsAllprice;
 
   calcPrice() {
-    const price = this._acceData.price;
+    const originalPrice = this._acceData.originalPrice ?? 0;
+    let price = this._acceData.price ?? 0;
+
     const referenceSpec = this._acceData.referenceSpec;
     let mulNumber = 1;
-
-    if (!referenceSpec) {
-      return;
-    }
 
     // length跟width互斥，length為0的時候 price為0?
     if (referenceSpec === 'fullWidth') {
@@ -67,26 +64,21 @@ class Class_accessories {
       const w = Number(this._prod.width);
       mulNumber = l || w;
     }
-    // 現在只確定有fullWidth
-    // else if (referenceSpec === 'WG') {
-    //   mulNumber = Number(this._prod.width);
-    // } else if (referenceSpec === 'height ') {
-    //   mulNumber = Number(this._prod.height);
-    // }
 
-    // this.price = new Decimal(price).mul(mulNumber).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 });
-    this.price = new Decimal(price).mul(mulNumber).toString();
-    this.calcAllPrice();
-    this.reRender();
+    price = new Decimal(originalPrice).mul(mulNumber).toNumber();
+
+    if (price !== this._acceData.price) {
+      this.price = String(price); // will call calcAllPrice
+    }
   }
 
   calcAllPrice({
     toCalcAccessoriesAllprice: toCalcAccessoriesAllprice = true,
   }: { toCalcAccessoriesAllprice?: boolean } = {}) {
+    const price = this._acceData.price;
     const discount = new Decimal(this._prod.discount).div(100);
 
-    const price = this.price;
-    const quantity = this.quantity;
+    const quantity = this.quantity || 0;
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -136,6 +128,11 @@ class Class_accessories {
     this._acceData.quantity = v;
     this.calcAllPrice();
     this.reRender();
+  }
+
+  set originalPrice(v: number) {
+    this._acceData.originalPrice = v;
+    this.calcPrice();
   }
 
   get price() {
@@ -191,7 +188,8 @@ type Taccessories = {
   unitPrice: number; // 單價
   dualPrice: number; // 牌價複價
   //
-  referenceSpec?: string | null;
+  referenceSpec: string | null;
+  originalPrice?: number;
 };
 
 type TaccessoriesKey = Exclude<keyof Taccessories, 'id'>;
@@ -317,6 +315,7 @@ const emptyAccessoriesOri: () => Taccessories = () => {
     totalPrice: 0,
     price: 0,
     dualPrice: 0,
+    referenceSpec: null,
   };
 };
 

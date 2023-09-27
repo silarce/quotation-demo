@@ -763,6 +763,10 @@ export type TquotationProductAccessoriesDto = {
   price: number; // 牌價
   dualPrice: number; // 牌價複價
   order: number;
+  //
+  referenceSpec: string | null;
+  // originalPrice: number;
+  originalPrice?: number | undefined;
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductAccessoriesDto = Omit<
@@ -797,7 +801,7 @@ export type TquotationProductComponentsDto = {
   order: number;
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductComponentsDto = Omit<
+export type TcreateQuotationProductComponentDto = Omit<
   TquotationProductComponentsDto,
   'id' | 'createdAt' | 'updatedAt'
 >;
@@ -1027,7 +1031,7 @@ export type TcreateQuotationProductDto = {
     dualPrice: number; // 牌價複價
     order: number;
   }[];
-  components: TcreateQuotationProductComponentsDto[];
+  components: TcreateQuotationProductComponentDto[];
   //
   materialSurface: string;
   isPainted: boolean;
