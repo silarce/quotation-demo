@@ -640,6 +640,7 @@ const comCellConfig: TcellConfig = {
     label: '烤漆',
     theadItemClassName: 'text-center',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '45px' },
       checkBoxProps: {
         wrapperStyle: { justifyContent: 'center' },

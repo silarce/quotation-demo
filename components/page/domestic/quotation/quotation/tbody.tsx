@@ -430,6 +430,11 @@ function DndRow({
               checkBoxProps.onChange = (arr) => {
                 (item[key] as boolean) = !!arr[0];
               };
+
+              inputSelProps.wrapperStyle = {
+                justifyContent: 'center',
+                ...inputSelProps.wrapperStyle,
+              };
             }
 
             //____

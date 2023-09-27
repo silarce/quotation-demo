@@ -272,8 +272,8 @@ const prodCellConfig: TcellConfig = {
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       checkBoxProps: {
-        wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'typhoonProtection' }],
       },
     },
@@ -282,9 +282,9 @@ const prodCellConfig: TcellConfig = {
     label: '彈射門',
     theadItemClassName: 'text-center',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '60px' },
       checkBoxProps: {
-        wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'bounceDoor' }],
       },
     },
@@ -339,9 +339,9 @@ const prodCellConfig: TcellConfig = {
     label: '馬達支撐架',
     theadItemClassName: 'text-center',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
-        wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'motorSupport' }],
       },
     },
@@ -404,9 +404,9 @@ const prodCellConfig: TcellConfig = {
     label: '門軌消音條',
     theadItemClassName: 'text-center',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
-        wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'doorTrackSilencerStrip' }],
       },
     },
@@ -415,9 +415,9 @@ const prodCellConfig: TcellConfig = {
     label: '一體式捲箱',
     theadItemClassName: 'text-center',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
-        wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'onePieceRollUpBox' }],
       },
     },
