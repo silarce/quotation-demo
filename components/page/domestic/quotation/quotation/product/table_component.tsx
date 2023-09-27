@@ -8,25 +8,25 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { TacceList } from 'hooks/quotation/useProduct';
+import { TcomList } from 'hooks/quotation/useProduct';
 
 import scss from '../table.module.scss';
 
 export default function Table_acce({
   disabled,
-  acceList,
-  acceCellConfig,
-  acceKeyArr,
-  changeAcceKeyArr,
+  comList,
+  comCellConfig,
+  comKeyArr: comKeyArr,
+  changeComKeyArr: changeComKeyArr,
   defalutVKeyArr,
 }: // addProd,
 // setTargetProd,
 {
   disabled: boolean;
-  acceList: TacceList | undefined;
-  acceCellConfig: TcellConfig;
-  acceKeyArr: string[];
-  changeAcceKeyArr: (arr: string[]) => void;
+  comList: TcomList | undefined;
+  comCellConfig: TcellConfig;
+  comKeyArr: string[];
+  changeComKeyArr: (arr: string[]) => void;
   defalutVKeyArr: string[];
   // addProd: () => void;
   // setTargetProd: (v: Class_product) => void;
@@ -52,29 +52,28 @@ export default function Table_acce({
             {/*  */}
 
             <DndThead
-              keyArr={acceKeyArr}
-              cellConfigList={acceCellConfig}
+              keyArr={comKeyArr}
+              cellConfigList={comCellConfig}
               allowMove={allowMove}
-              resetTrigger={acceKeyArr.length}
+              resetTrigger={comKeyArr.length}
               // emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as string[];
-                changeAcceKeyArr(keyArr);
+                changeComKeyArr(keyArr);
               }}
-              acceBoxWidth="120px"
+              comBoxWidth="120px"
             />
           </div>
-
-          {acceList && (
+          {comList && (
             <Tbody
               disabled={disabled}
-              rowList={acceList}
-              keyArr={acceKeyArr}
-              prodCellConfig={acceCellConfig}
+              rowList={comList}
+              keyArr={comKeyArr}
+              prodCellConfig={comCellConfig}
               onRowClick={(obj) => {
                 // setTargetProd(obj.item as Class_product);
               }}
-              panelBox="acceBox"
+              panelBox="comBox"
               defalutVKeyArr={defalutVKeyArr}
             />
           )}

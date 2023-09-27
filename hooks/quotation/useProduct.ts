@@ -11,18 +11,18 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
 import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
-import { Class_accessory, acceKeyArrOri, acceCellConfig } from './classAccessory';
+import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
 import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
-import { ToptionsKey, Class_options, optionsCellConfig, optionsKeyArrOri } from './classOptions';
+import { TaccessoriesKey, Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 
 // type
-import { TcreateQuotationContentOtherDto, quotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
+import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
 
 // =======================================================================
 
 type TreRender = () => void;
 
-type TaccessoryKey =
+type TcomponentKey =
   | 'slat'
   | 'bottomBar'
   | 'guideRail'
@@ -36,12 +36,12 @@ type TproductList = {
   [key: string]: Class_product;
 };
 
-type TacceList = {
-  [key in TaccessoryKey]: Class_accessory;
+type TcomList = {
+  [key in TcomponentKey]: Class_component;
 };
 
-type ToptionsList = {
-  [key: string]: Class_options;
+type TaccessoriesList = {
+  [key: string]: Class_accessories;
 };
 
 type TothersList = {
@@ -49,34 +49,18 @@ type TothersList = {
 };
 
 // =======================================================================
-
-/**
-productsOrder使用構想
-productsOrder是一個字串陣列，預想中會放進prod的id作為排序的依據
-所以我可以將productsOrder送到table_prod.tbody的useVerticalDnd作為預設值
-並取得dndKeyArr作為新的productsOrder
-
-問題
-新增的prod沒有id，使用者若新增了prod並排序，更新的productsOrder裡會是我用nanoid產生的key
-無法於下次使用
-
-Gina說之後會在product裡新增order這個property作為排序使用
- */
-
-// =======================================================================
 const useProductList = ({
   productArr,
   others,
-  productsOrder,
   resetTrigger,
 }: {
-  productArr: quotationProductDto[] | undefined;
+  productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
-  productsOrder: string[] | undefined;
   resetTrigger: any;
 }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => ++state);
+
   // ---------------------------------------------------------
 
   const { res: doorModelArr, update: updateDoorModelArr } = useApiGetProdDoorModels();
@@ -111,14 +95,13 @@ const useProductList = ({
   const [prodKeyArr, setProdKeyArr] = useState<TprodKey[]>([]);
   const [productList, setProductList] = useState<TproductList>({});
   const [subTotal, setSubTotal] = useState('');
-
-  //
-  //
-  //
-  // productsOrder
-  // productArr
+  const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
   useEffect(() => {
+    if (!productArr || !doorModelList) {
+      return;
+    }
+
     createProdList();
   }, [resetTrigger, doorModelList]);
 
@@ -127,16 +110,23 @@ const useProductList = ({
       return;
     }
 
+    const sortedProdArr = _.sortBy(productArr, 'order');
     const list: TproductList = {};
 
-    productArr.forEach((prod) => {
-      const key = `${prod.id}`;
+    // 每次上傳前會將prod的order依照當時的排序重新設定
+    // 所以理論上order不會重複
+    sortedProdArr.forEach((prod) => {
+      let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+      if (key in list) {
+        key = nanoid();
+      }
 
       const prodData: Tprod = {
         ...prod,
         phase: 1,
         voltage: String(prod.voltage),
-        motorSupport: !!Number(prod.motorSupport || '0'),
+        motorSupport: prod.motorSupport,
         doorTrackThick: String(prod.doorTrackThick),
         rollUpBoxThick: String(prod.rollUpBoxThick),
         // 取得時是mm，要轉成m
@@ -144,22 +134,25 @@ const useProductList = ({
         length: String(Number(prod.length) / 1000),
         height: String(Number(prod.height) / 1000),
         boxB: String(Number(prod.width) / 1000),
+        boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
-        quantity: prod.items.length,
+        quantity: prod.items?.length ?? 0,
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-        options: prod.items[0].options ?? [],
-        components: prod.items[0].components ?? [],
+        accessories: prod.items?.[0].accessories ?? [],
+        components: prod.items?.[0].components ?? [],
       };
 
       list[key] = new Class_product({
         reRender,
         prodData,
-        delSelf: () => delSelf(key),
-        copySelf: () => copySelf(key),
+        delSelf: () => delSelf_prod(list, key),
+        copySelf: () => copySelf_prod(list, key),
 
         calcSubTotalPrice,
         doorModelList,
+
+        originProd: prod,
       });
     });
 
@@ -167,24 +160,27 @@ const useProductList = ({
   };
 
   //
-  //
-  //
 
   const changeProdKeyArr = (v: TprodKey[]) => {
     setProdKeyArr(v);
     localStorage.setItem('domestic/quotation_prodKeyArr', JSON.stringify(v));
   };
 
-  const delSelf = (key: string) => {
-    delete productList[key];
+  const delSelf_prod = (list: TproductList, key: string) => {
+    delete list[key];
     calcSubTotalPrice();
     reRender();
   };
 
-  const copySelf = (copyKey: string) => {
-    const newKey = String(Object.keys(productList).length);
-    const copy = _.cloneDeep(productList[copyKey]);
-    productList[newKey] = copy;
+  const copySelf_prod = (list: TproductList, copyKey: string) => {
+    const newKey = nanoid();
+    const copy = _.cloneDeep(list[copyKey]);
+
+    copy.delSelf = () => delSelf_prod(list, newKey);
+    copy.copySelf = () => copySelf_prod(list, newKey);
+    copy.clearId();
+
+    list[newKey] = copy;
     calcSubTotalPrice();
     reRender();
   };
@@ -194,19 +190,17 @@ const useProductList = ({
       return myAlert.info({ title: '尚未取得門型資料' });
     }
 
-    const newKey = String(Object.keys(productList).length);
+    const newKey = nanoid();
     const classProd = new Class_product({
       reRender,
-      delSelf: () => delSelf(newKey),
-      copySelf: () => copySelf(newKey),
-      //
+      delSelf: () => delSelf_prod(productList, newKey),
+      copySelf: () => copySelf_prod(productList, newKey),
       calcSubTotalPrice,
-      //
       doorModelList,
     });
     productList[newKey] = classProd;
+
     reRender();
-    // setProductList(copy);
   };
 
   const calcSubTotalPrice = () => {
@@ -248,8 +242,8 @@ const useProductList = ({
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  const [acceKeyArr, setAcceKeyArr] = useState<string[]>(acceKeyArrOri());
-  const [acceVKeyArr, setacceVKeyArr] = useState<string[]>([
+  const [comKeyArr, setComKeyArr] = useState<string[]>(comKeyArrOri());
+  const [comVKeyArr, setComVKeyArr] = useState<string[]>([
     'slat',
     'roller',
     'headBox',
@@ -260,17 +254,17 @@ const useProductList = ({
     'sidePlate',
   ]);
 
-  const changeAcceKeyArr = (v: string[]) => {
-    setAcceKeyArr(v);
+  const changeComKeyArr = (v: string[]) => {
+    setComKeyArr(v);
   };
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  const [optionsKeyArr, setOptionsKeyArr] = useState<ToptionsKey[]>(optionsKeyArrOri());
+  const [accessoriesKeyArr, setAccessoriesKeyArr] = useState<TaccessoriesKey[]>(accessoriesKeyArrOri());
 
-  const changeOptionsKeyArr = (v: ToptionsKey[]) => {
-    setOptionsKeyArr(v);
+  const changeAccessoriesKeyArr = (v: TaccessoriesKey[]) => {
+    setAccessoriesKeyArr(v);
   };
 
   // ---------------------------------------------------------
@@ -295,8 +289,8 @@ const useProductList = ({
         list[key] = new Class_other({
           reRender,
           data: item,
-          delSelf: () => delSelf_other(key),
-          copySelf: () => copySelf_others(key),
+          delSelf: () => delSelf_other(list, key),
+          copySelf: () => copySelf_others(list, key),
           calcSubTotalPrice,
         });
       });
@@ -309,23 +303,22 @@ const useProductList = ({
     setOthersKeyArr(v);
   };
 
-  const delSelf_other = (key: string) => {
-    delete othersList[key];
+  const delSelf_other = (list: TothersList, key: string) => {
+    delete list[key];
     reRender();
   };
 
-  const copySelf_others = (key: string) => {
+  const copySelf_others = (list: TothersList, key: string) => {
     const newKey = `new-${nanoid()}`;
-    const bodyCopy = _.cloneDeep(othersList[key].body);
+    const bodyCopy = _.cloneDeep(list[key].body);
 
-    othersList[newKey] = new Class_other({
+    list[newKey] = new Class_other({
       reRender,
       data: bodyCopy,
-      delSelf: () => delSelf_other(newKey),
-      copySelf: () => copySelf_others(newKey),
+      delSelf: () => delSelf_other(list, newKey),
+      copySelf: () => copySelf_others(list, newKey),
       calcSubTotalPrice,
     });
-
     reRender();
   };
 
@@ -334,8 +327,8 @@ const useProductList = ({
 
     othersList[newKey] = new Class_other({
       reRender,
-      delSelf: () => delSelf_other(newKey),
-      copySelf: () => copySelf_others(newKey),
+      delSelf: () => delSelf_other(othersList, newKey),
+      copySelf: () => copySelf_others(othersList, newKey),
       calcSubTotalPrice,
     });
 
@@ -358,19 +351,21 @@ const useProductList = ({
     productList,
     prodCellConfig,
     prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
     addProd,
     changeProdKeyArr,
     //
     subTotal,
     //
-    acceKeyArr,
-    acceVKeyArr,
-    acceCellConfig,
-    changeAcceKeyArr,
+    comKeyArr,
+    comVKeyArr,
+    comCellConfig,
+    changeComKeyArr,
     //
-    optionsKeyArr,
-    changeOptionsKeyArr,
-    optionsCellConfig,
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
     //
     othersKeyArr,
     othersList,
@@ -389,12 +384,12 @@ export type {
   TprodKey,
   TproductList,
   //
-  Class_accessory,
-  TaccessoryKey,
-  TacceList,
+  Class_component,
+  TcomponentKey,
+  TcomList,
   //
-  ToptionsKey,
-  ToptionsList,
+  TaccessoriesKey,
+  TaccessoriesList,
   //
   Class_other,
   TothersKey,

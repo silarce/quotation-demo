@@ -17,6 +17,7 @@ import moment from 'moment';
 import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
@@ -63,8 +64,8 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
-import Table_options from 'components/page/domestic/quotation/quotation/product/table_options';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // config
@@ -132,6 +133,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  const lasttestContentId = quotationData?.latestContent.id;
   // -----------------------------------------------------
 
   const [targetProd, setTargetProd] = useState<Class_product>();
@@ -141,7 +143,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
 
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(quotationId);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lasttestContentId);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -173,7 +175,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setFileInfoArr([...newImgInfoArr]);
   };
 
-  const uploadAttachment = async (quotationId: string) => {
+  const uploadAttachment = async (newContentId: string) => {
     // 移除附件
     for (const info of fileInfoArr) {
       const { fileId, willDelete, isNew } = info;
@@ -183,7 +185,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
 
       try {
-        await apiDelQuotation_id_attachments(quotationId, fileId);
+        await apiDelQuotation_id_attachments(newContentId, fileId);
       } catch (error) {
         console.log(error);
       }
@@ -201,7 +203,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       formData.append('file', file);
 
       try {
-        await apiPostQuotation_id_attachments(quotationId, formData);
+        await apiPostQuotation_id_attachments(newContentId, formData);
       } catch (error) {
         console.log(error);
       }
@@ -222,18 +224,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productList,
     prodCellConfig,
     prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
     addProd,
     changeProdKeyArr,
     subTotal: prodSubTotal,
     //
-    acceKeyArr,
-    acceCellConfig,
-    changeAcceKeyArr,
-    acceVKeyArr,
+    comKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    comVKeyArr,
     //
-    optionsKeyArr,
-    changeOptionsKeyArr,
-    optionsCellConfig,
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
     //
     othersKeyArr,
     othersList,
@@ -244,7 +248,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useProductList({
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
-    productsOrder: quotationData?.latestContent.productsOrder,
     resetTrigger: quotationData,
   });
 
@@ -825,20 +828,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item, index) => {
-      return {
-        ...item.body,
-        rollUpBoxThick: Number(item.rollUpBoxThick),
-        voltage: Number(item.voltage),
-        doorTrackThick: Number(item.doorTrackThick),
-        motorSupport: String(+item.motorSupport),
-        //
-        quantity: String(item.quantity),
-        materialSurface: item.surface ?? '',
-        isPainted: false,
-        order: index,
-      };
-    });
+    let prodQty = 0;
+
+    // prodVKeyArr 會在每一次垂直拖拉時更新
+    const prodArr: TcreateQuotationProductDto[] =
+      prodVKeyArr?.map((key, index) => {
+        const prod = productList[key];
+        const quantity = Number(prod.quantity);
+        const originProd = prod.originProd;
+
+        prodQty = prodQty + quantity;
+
+        const preBody = {
+          ...prod.body,
+          order: index,
+        };
+
+        const isEqual = _.isEqual(originProd, preBody);
+
+        if (!isEqual) {
+          preBody.id = undefined;
+        }
+
+        return preBody;
+      }) ?? [];
 
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
@@ -852,7 +865,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data_watch.address ?? '',
       contactPerson: data_watch.contactPerson ?? '',
       contactNumber: data_watch.contactNumber ?? '',
-      quantity: data_watch.quantity ?? 0,
+      quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
       managerId: data_watch.managerEmployee?.id ?? null,
@@ -881,6 +894,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       products: prodArr,
       others: getOthersPostBodyArr(),
+      // productsOrder: null,
       //
       //
     };
@@ -894,13 +908,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         // res跟api文件不一樣，現在沒時間修正
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await uploadAttachment(res.quotation.id);
+
+        await uploadAttachment(res.latestContent.id);
 
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
         showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
+        await uploadAttachment(res.latestContent.id);
         router.push({
           query: {
             id: res.id,
@@ -915,7 +930,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-  };
+    //
+  }; // reqUpdateQuotation
 
   // --------------------------------------------
   const reqSetReviewer = async ({
@@ -981,61 +997,76 @@ function TheQuotation({ router }: { router: NextRouter }) {
             onProfileChange={onProfileChange}
           />
 
-          <div className={style.switchBar}>
-            <div className={style.active}>報價項目</div>
+          <div className={classNames(style.switchBar)}>
+            <div>報價項目</div>
           </div>
 
-          {/* 主產品設定 */}
-          <Table_prod
-            disabled={disabled}
-            prodList={productList}
-            prodCellConfig={prodCellConfig}
-            prodKeyArr={prodKeyArr}
-            changeProdKeyArr={changeProdKeyArr}
-            addProd={addProd}
-            setTargetProd={setTargetProd}
-          />
+          <div className={style.tableWrapper}>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={disabled}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd}
+              setTargetProd={setTargetProd}
+              // defalutVKeyArr={prodVKeyArr}
+              onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              rowHeight="h106"
+            />
 
-          {/* api還沒好 */}
-          <Table_acce
-            disabled={disabled}
-            acceList={targetProd?.acceList}
-            acceCellConfig={acceCellConfig}
-            acceKeyArr={acceKeyArr}
-            changeAcceKeyArr={changeAcceKeyArr}
-            defalutVKeyArr={acceVKeyArr}
-          />
-
-          <Table_options
-            disabled={disabled}
-            list={targetProd?.optionsList}
-            cellConfig={optionsCellConfig}
-            keyArr={optionsKeyArr}
-            changeKeyArr={changeOptionsKeyArr}
-            add={() => {
-              targetProd?.addOption();
-            }}
-          />
-
-          <Table_others
-            disabled={disabled}
-            list={othersList}
-            cellConfig={othersCellConfig}
-            keyArr={othersKeyArr}
-            changeKeyArr={changeOthersKeyArr}
-            add={addOthers}
-          />
+            {/* 材料配件設定 */}
+            <div className="relative mt-[14px]">
+              <Table_com
+                disabled={disabled}
+                comList={targetProd?.comList}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={changeComKeyArr}
+                defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+          </div>
 
           <div className={style.redWrapper}>
-            {/* 材料配件設定 */}
-            {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
-            <hr />
             {/* 選配設定 */}
-            {/* <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} /> */}
+            <Table_accessories
+              disabled={disabled}
+              list={targetProd?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={changeAccessoriesKeyArr}
+              // add={() => {
+              //   targetProd?.addAcce();
+              // }}
+              defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+              onVKeyChange={(keyArr) => {
+                if (targetProd) {
+                  targetProd.accessoriesVKeyArr = keyArr;
+                }
+              }}
+              doorModel={targetProd?.doorType}
+              onSelectorConfirm={(arr) => {
+                if (targetProd) {
+                  targetProd.addAcce(arr);
+                }
+              }}
+            />
           </div>
-          {/* 其他設定 */}
-          {/* <QuotationAdditions disabled={!allowEdit} /> */}
 
+          <div className={style.tableWrapper}>
+            {/* 其他設定 */}
+            <Table_others
+              disabled={disabled}
+              list={othersList}
+              cellConfig={othersCellConfig}
+              keyArr={othersKeyArr}
+              changeKeyArr={changeOthersKeyArr}
+              add={addOthers}
+            />
+          </div>
           {/* 備註/報價範圍/付款資訊 */}
 
           <Summary

@@ -3,9 +3,12 @@
   flex-wrap: nowrap;
   align-items: flex-end;
   gap: 16px;
-  height: 66px;
+  // height: 66px;
   padding: 11px 0 11px 0;
   // width: fit-content;
+  &.h106 {
+    height: 106px;
+  }
 }
 
 .column {

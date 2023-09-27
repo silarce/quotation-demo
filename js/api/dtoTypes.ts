@@ -749,9 +749,8 @@ export type TquotationContentOtherDto = {
 
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 
-/**選配設定 */ // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
-// CreateQuotationProductOptionDto
-export type TquotationProductOptionDto = {
+/**選配設定 */
+export type TquotationProductAccessoriesDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -764,9 +763,16 @@ export type TquotationProductOptionDto = {
   price: number; // 牌價
   dualPrice: number; // 牌價複價
   order: number;
+  //
+  referenceSpec: string | null;
+  // originalPrice: number;
+  originalPrice?: number | undefined;
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductOptionDto = Omit<TquotationProductOptionDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateQuotationProductAccessoriesDto = Omit<
+  TquotationProductAccessoriesDto,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 export type TquotationProductComponentsDto = {
@@ -788,19 +794,19 @@ export type TquotationProductComponentsDto = {
   rawData: string;
   bom: string;
   material: string;
-  materialSurface: string;
+  materialSurface: string | null | undefined;
   isPainted: boolean;
   price: number;
-  quantity: string;
+  quantity: number;
   order: number;
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductComponentsDto = Omit<
+export type TcreateQuotationProductComponentDto = Omit<
   TquotationProductComponentsDto,
   'id' | 'createdAt' | 'updatedAt'
 >;
 
-export type quotationProductDto = {
+export type TquotationProductDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -813,13 +819,14 @@ export type quotationProductDto = {
   // 門型
   doorType: string;
   // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  length: string;
+  length: number;
   // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  width: string;
+  width: number;
   // h(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  height: string;
+  height: number;
   // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  boxB: string;
+  boxB: number;
+  boxD: number;
   // 面積
   area: string;
   // 才數
@@ -837,7 +844,7 @@ export type quotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  motorSupport: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -868,15 +875,13 @@ export type quotationProductDto = {
   close: string;
   // 備註
   notes: string;
-  // // 選配設定
-  // options?: TquotationProductOptionDto[] | undefined;
-  // // 材料配件
-  // components: TquotationProductComponentsDto[] | undefined;
-  // // 數量
-  // quantity: number;
+
+  order: number;
   items: {
+    // // 材料配件
     components: TquotationProductComponentsDto[];
-    options: TquotationProductOptionDto[];
+    // // 選配設定
+    accessories: TquotationProductAccessoriesDto[];
     // 還有其他很多有的沒有的，用不到，以後有空再補上
   }[];
 };
@@ -887,6 +892,7 @@ export type TquotationContentDto = {
   updateAt: string;
   quotationNumber: string;
   version: number;
+
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
   customer: TcustomerDto;
@@ -916,7 +922,7 @@ export type TquotationContentDto = {
   faxNumber: string; // 傳真號碼
   trackProgress: string; // 追蹤狀態
   projectProgress: string; //工地進度
-  productsOrder: string[]; // 裡面裝的是product的id
+  productsOrder?: string[]; // 已棄用
   /** 總折數*/
   discount: string;
   /**小計 */
@@ -933,7 +939,7 @@ export type TquotationContentDto = {
   paymentMethods: TpaymentMethodDto[];
 
   others: TquotationContentOtherDto[];
-  products: quotationProductDto[];
+  products: TquotationProductDto[];
 };
 
 export type TquotationDto = {
@@ -955,13 +961,14 @@ export type TcreateQuotationProductDto = {
   // 門型
   doorType: string;
   // L(m)
-  length: string;
+  length: number;
   // W(m)
-  width: string;
+  width: number;
   // h(m)
-  height: string;
+  height: number;
   // B(m)
-  boxB: string;
+  boxB: number;
+  boxD: number;
   // 面積
   area: string;
   // 才數
@@ -979,7 +986,7 @@ export type TcreateQuotationProductDto = {
   // 電壓
   voltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  motorSupport: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
@@ -995,7 +1002,7 @@ export type TcreateQuotationProductDto = {
   // 捲箱厚度
   rollUpBoxThick: number;
   // 數量
-  quantity: string;
+  quantity: number;
   // 單價
   unitPrice: number;
   // 牌價
@@ -1013,7 +1020,7 @@ export type TcreateQuotationProductDto = {
   // 備註
   notes: string;
   // 選配設定
-  options: {
+  accessories: {
     codeName: string; //代號
     name: string; //名稱
     unit: string; // 單位
@@ -1022,12 +1029,37 @@ export type TcreateQuotationProductDto = {
     totalPrice: number; // 複價
     price: number; // 牌價
     dualPrice: number; // 牌價複價
+    order: number;
   }[];
+  components: TcreateQuotationProductComponentDto[];
   //
   materialSurface: string;
   isPainted: boolean;
   order: number;
 };
+
+// type TupdateQuotationContentDto = {
+//   quotationDate: string; // 報價日期
+//   validityPeriod: string; // 報價時效
+//   customerId: string;
+//   projectName: string; // 工程名稱
+//   county: string; // 縣市
+//   district: string; // 區
+//   address: string; // 剩餘地址
+//   contactPerson: string; //  聯絡人
+//   contactNumber: string; //  聯絡電話
+//   faxNumber: string; // 傳真號碼
+//   trackProgress: string; // 追蹤狀態
+//   projectProgress: string; //工地進度
+//   quantity: number; // 樘數
+//   editNotes: string; // 編輯備註
+//   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+//   /**備註 */
+//   annotations: string[] | null;
+//   /**報價範圍 */
+//   quotationRanges: string[] | null;
+//   managerId: string | null;
+// };
 
 export type TcreateQuotationContentDto = {
   quotationDate: string; // 報價日期
@@ -1065,6 +1097,7 @@ export type TcreateQuotationContentDto = {
 
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
+  productsOrder?: string[] | null; // 已棄用
 };
 
 // ========================================================================
@@ -1073,7 +1106,7 @@ export type TcreateQuotationContentDto = {
 // ========================================================================
 // ========================================================================
 // ========================================================================
-type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+export type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
 
 export type TdoorMaterialDto = {
   id: string;
@@ -1278,7 +1311,7 @@ export type TdoorComponentListDto = {
 export type TgenerateDoorProductBomDto_ComponentInfo = {
   id: string;
   material: string; // 材質
-  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4'; // 表面處理
+  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | null; // 表面處理
   isPainted: boolean; // 烤漆
 };
 
@@ -1325,4 +1358,16 @@ export type TdoorProductBomDto = {
   motor: TdoorBomDto_Component;
   motorAccessories: TdoorBomDto_Component;
   headBox: TdoorBomDto_Component;
+};
+
+export type TdoorAccessoryDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: TdoorModelName;
+  name: string;
+  unit: string | null;
+  referenceSpec: string | null;
+  cost: number | null;
+  price: number | null;
 };

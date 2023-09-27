@@ -11,6 +11,7 @@
   width: calc(100% - 6px);
   margin: auto;
   margin-top: 35px;
+  margin-bottom: 40px;
   text-align: center;
   background-color: $bgc01;
 
@@ -31,6 +32,13 @@
   }
 }
 
+.tableWrapper {
+  width: calc(100% - 34px);
+  padding: 0 3px;
+  margin: auto;
+  margin-top: 11px;
+}
+
 .redWrapper {
   width: calc(100% - 34px);
   padding: 0 3px;
@@ -44,7 +52,6 @@
   }
 }
 // ===============================================
-
 
 // ===============================================
 // OldQuotationProduction

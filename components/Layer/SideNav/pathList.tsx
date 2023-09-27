@@ -69,13 +69,14 @@ const erpFeaturesLookup = {
   // HRAuthoritySetup: "c02998a7-ee2f-4ce7-9f96-4af2740d50f4",
   HRAuthoritySetup: '人事權限建立',
   legacyContractIntegration: '舊合約',
+  domestic: '營業部國內工程',
 } as const;
 
-const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration } = erpFeaturesLookup;
+const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic } = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
 /** allPass 至少有一個權限就pass */
-const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration];
+const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic];
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
 const devPass: TtopPathListConfig['erpFeature'] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ??
@@ -205,7 +206,7 @@ const sidePathList: TsidePathList = {
         {
           label: '報價',
           // erpFeature: devPass,
-          erpFeature: [legacyContractIntegration],
+          erpFeature: [domestic],
           list: [
             {
               label: '預算',
@@ -213,7 +214,7 @@ const sidePathList: TsidePathList = {
               query: {
                 status: 'Budget',
               },
-              erpFeature: [legacyContractIntegration],
+              erpFeature: [domestic],
             },
             {
               label: '投標',
@@ -221,7 +222,7 @@ const sidePathList: TsidePathList = {
               query: {
                 status: 'Bidding',
               },
-              erpFeature: [legacyContractIntegration],
+              erpFeature: [domestic],
             },
             {
               label: '發包',
@@ -229,28 +230,14 @@ const sidePathList: TsidePathList = {
               query: {
                 status: 'Contracting',
               },
-              erpFeature: [legacyContractIntegration],
+              erpFeature: [domestic],
             },
-            // {
-            //   label: '預算',
-            //   path: path01 + '/budget',
-            //   erpFeature: 'allPass',
-            // },
-            // {
-            //   label: '投標',
-            //   path: path01 + '/tender',
-            //   erpFeature: 'allPass',
-            // },
-            // {
-            //   label: '發包',
-            //   path: path01 + '/outsourcing',
-            //   erpFeature: 'allPass',
-            // },
             {
               label: '合約',
               path: path01 + '/contract',
-              erpFeature: devPass,
+              erpFeature: [domestic],
             },
+
             {
               label: '查詢報價單',
               path: path01 + '/queryQuotation',
@@ -494,7 +481,8 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/domestic'].path01 + '/legacyContractIntegration',
     },
-    erpFeature: 'allPass',
+    // erpFeature: 'allPass',
+    erpFeature: [domestic, legacyContractIntegration],
   },
   {
     icon: icon_foreign,

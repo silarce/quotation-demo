@@ -7,6 +7,7 @@ import Tbody, { TcellConfig } from '../tbody';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 import { Class_product, TprodKey, TproductList } from 'hooks/quotation/useProduct';
 
@@ -20,6 +21,9 @@ export default function Table_prod({
   changeProdKeyArr,
   addProd,
   setTargetProd,
+  defalutVKeyArr,
+  onVKeyChange,
+  rowHeight,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -28,6 +32,9 @@ export default function Table_prod({
   changeProdKeyArr: (arr: TprodKey[]) => void;
   addProd: () => void;
   setTargetProd: (v: Class_product) => void;
+  defalutVKeyArr?: string[] | undefined;
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
+  rowHeight?: 'h106';
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -64,6 +71,9 @@ export default function Table_prod({
             onRowClick={(obj) => {
               setTargetProd(obj.item as Class_product);
             }}
+            // defalutVKeyArr={defalutVKeyArr}
+            onVKeyChange={onVKeyChange}
+            rowHeight={rowHeight}
           />
 
           {!disabled && (

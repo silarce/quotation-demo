@@ -7,6 +7,7 @@ import _ from 'lodash';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
@@ -67,6 +68,8 @@ export default function Tbody({
   onRowClick,
   panelBox,
   defalutVKeyArr,
+  onVKeyChange,
+  rowHeight,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -75,8 +78,10 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (onj: { item: Titem }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   defalutVKeyArr?: string[];
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
+  rowHeight?: 'h106';
 }) {
   // ---------------------------------------------------------------
 
@@ -91,7 +96,11 @@ export default function Tbody({
   } = useVerticalDnd({
     listKeyArr: defalutVKeyArr || Object.keys(rowList),
     resetTrigger: rowList,
+    onKeyChange: onVKeyChange,
   });
+
+  // console.log(rowList);
+  // console.log(vDndKeyArr);
 
   // useEffect(() => {
   //   onVerticalKeyChange(dndKeyArr);
@@ -105,6 +114,7 @@ export default function Tbody({
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
+  // onVKeyChange
   return (
     <div>
       <DndContext
@@ -113,7 +123,8 @@ export default function Tbody({
           restrictToVerticalAxis,
           // restrictToWindowEdges,
         ]}
-        onDragEnd={onDragEnd}
+        // onDragEnd={onDragEnd}
+        onDragEnd={(e) => onDragEnd(e)}
         onDragStart={onDragStart}
       >
         <SortableContext items={vDndKeyArr} strategy={verticalListSortingStrategy}>
@@ -149,6 +160,7 @@ export default function Tbody({
                   onRowClick && onRowClick({ item: item });
                 }}
                 defalutVKeyArr={defalutVKeyArr}
+                rowHeight={rowHeight}
               />
             );
           })}
@@ -226,22 +238,22 @@ const EasyBox = ({
   );
 };
 
-const AcceBox = ({
+const ComBox = ({
   indexNum,
   dndAttr,
   dndListener,
-  acceName,
+  comName,
 }: {
   indexNum: string | number;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
-  acceName: string;
+  comName: string;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[120px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       {/* <span>{indexNum}</span> */}
-      <span>{acceName}</span>
+      <span>{comName}</span>
     </div>
   );
 };
@@ -290,6 +302,7 @@ function DndRow({
   prodCellConfig,
   isActive,
   panelBox = 'copyDelBtnBox',
+  rowHeight,
 }: {
   id: string;
   pIndex: number;
@@ -305,7 +318,8 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'acceBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  rowHeight?: 'h106';
   //
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -318,9 +332,10 @@ function DndRow({
   };
 
   return (
-    <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
+    <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+      <LoadingCover01 isLoading={item?.isLoading} />
       <CellWithBar isActive={isActive} className="z-0">
-        <div className={scss.row} onClick={undefined}>
+        <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
           {/*  */}
           {panelBox === 'copyDelBtnBox' && (
             <CopyDelBtnBox
@@ -333,8 +348,8 @@ function DndRow({
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
-          {panelBox === 'acceBox' && (
-            <AcceBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} acceName={item.acceName} />
+          {panelBox === 'comBox' && (
+            <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
           )}
 
           {/*  */}

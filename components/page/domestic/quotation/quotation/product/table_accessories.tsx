@@ -8,25 +8,36 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { Class_other, ToptionsKey, ToptionsList } from 'hooks/quotation/useProduct';
+import AccessorySelector, { TdoorAccessoryDto } from 'components/global/gear/modal/accessorySelector';
 
+// type
+import { TaccessoriesKey, TaccessoriesList } from 'hooks/quotation/useProduct';
+// css
 import scss from '../table.module.scss';
 
-export default function Table_options({
+export default function Table_accessories({
   disabled,
   list,
   cellConfig,
   keyArr,
   changeKeyArr,
-  add,
+  defalutVKeyArr,
+  onVKeyChange,
+  doorModel,
+  onSelectorConfirm,
 }: {
   disabled: boolean;
-  list: ToptionsList | undefined;
+  list: TaccessoriesList | undefined;
   cellConfig: TcellConfig;
-  keyArr: ToptionsKey[];
-  changeKeyArr: (arr: ToptionsKey[]) => void;
-  add?: () => void;
+  keyArr: TaccessoriesKey[];
+  changeKeyArr: (arr: TaccessoriesKey[]) => void;
+  defalutVKeyArr?: string[] | undefined;
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
+  doorModel: string | undefined;
+  onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
 }) {
+  const [showSelector, setShowSelector] = useState(false);
+
   const [allowMove, setAllowMove] = useState(false);
 
   return (
@@ -48,7 +59,7 @@ export default function Table_options({
               resetTrigger={keyArr.length}
               emptyBlockWidth="137px"
               onDragEndCallback={(dndKeyArr) => {
-                const keyArr = dndKeyArr as ToptionsKey[];
+                const keyArr = dndKeyArr as TaccessoriesKey[];
                 changeKeyArr(keyArr);
               }}
             />
@@ -60,18 +71,26 @@ export default function Table_options({
               keyArr={keyArr}
               prodCellConfig={cellConfig}
               onRowClick={(obj) => {}}
+              // defalutVKeyArr={defalutVKeyArr}
+              // onVKeyChange={onVKeyChange}
             />
           )}
 
           {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
               {/* <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={add} /> */}
-              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={add} />
+              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={() => setShowSelector(true)} />
             </div>
           )}
         </div>
       </div>
       {/*  */}
+      <AccessorySelector
+        showModal={!!doorModel && showSelector}
+        modelName={doorModel}
+        onConfirm={onSelectorConfirm}
+        onCancel={() => setShowSelector(false)}
+      />
     </div>
   );
 }

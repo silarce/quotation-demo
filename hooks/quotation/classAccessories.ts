@@ -5,55 +5,80 @@ import { nanoid } from 'nanoid';
 // type
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
-import type { Toption } from 'js/utils/options/options';
 
 // type
-import { TcreateQuotationProductOptionDto } from 'js/api/dtoTypes';
+import {
+  TcreateQuotationProductAccessoriesDto,
+  TquotationProductAccessoriesDto,
+  TdoorAccessoryDto,
+} from 'js/api/dtoTypes';
 
 import { Class_product } from './classProduct';
 
 // =======================================================================
-class Class_options {
+class Class_accessories {
   constructor({
     //
     reRender,
-    data = emptyOptionsOri(),
+    data = emptyAccessoriesOri(),
     delSelf,
     copySelf,
     // calcOptionsAllprice,
     prod,
   }: {
     reRender: TreRender;
-    data?: Toptions;
+    data?: Taccessories;
     delSelf: () => void;
     copySelf: () => void;
     // calcOptionsAllprice: () => void;
     prod: Class_product;
   }) {
     this.reRender = reRender;
-    this._data = data;
+    this._acceData = data;
     this._prod = prod;
 
     this.delSelf = delSelf;
     this.copySelf = copySelf;
+
+    this.calcPrice();
     // this.calcOptionsAllprice = calcOptionsAllprice;
   } // constructor
 
   private reRender;
-  private _data;
+  private _acceData;
   private _prod;
   readonly delSelf;
   readonly copySelf;
   // readonly calcOptionsAllprice;
 
+  calcPrice() {
+    const originalPrice = this._acceData.originalPrice ?? 0;
+    let price = this._acceData.price ?? 0;
+
+    const referenceSpec = this._acceData.referenceSpec;
+    let mulNumber = 1;
+
+    // length跟width互斥，length為0的時候 price為0?
+    if (referenceSpec === 'fullWidth') {
+      const l = Number(this._prod.length);
+      const w = Number(this._prod.width);
+      mulNumber = l || w;
+    }
+
+    price = new Decimal(originalPrice).mul(mulNumber).toNumber();
+
+    if (price !== this._acceData.price) {
+      this.price = String(price); // will call calcAllPrice
+    }
+  }
+
   calcAllPrice({
-    toCalcOptionsAllprice = true,
-  }: //
-  { toCalcOptionsAllprice?: boolean } = {}) {
+    toCalcAccessoriesAllprice: toCalcAccessoriesAllprice = true,
+  }: { toCalcAccessoriesAllprice?: boolean } = {}) {
+    const price = this._acceData.price;
     const discount = new Decimal(this._prod.discount).div(100);
 
-    const price = this.price;
-    const quantity = this.quantity;
+    const quantity = this.quantity || 0;
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -61,76 +86,81 @@ class Class_options {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._data.dualPrice = dualPrice.toNumber();
-    this._data.unitPrice = unitPrice.toNumber();
-    this._data.totalPrice = totalPrice.toNumber();
+    this._acceData.dualPrice = dualPrice.toNumber();
+    this._acceData.unitPrice = unitPrice.toNumber();
+    this._acceData.totalPrice = totalPrice.toNumber();
 
-    if (toCalcOptionsAllprice) {
-      this._prod.calcOptionsAllprice();
+    if (toCalcAccessoriesAllprice) {
+      this._prod.calcAccessoriesAllprice();
     }
 
     this.reRender();
   }
 
   get codeName() {
-    return this._data.codeName;
+    return this._acceData.codeName;
   }
   set codeName(v) {
-    this._data.codeName = v;
+    this._acceData.codeName = v;
     this.reRender();
   }
 
   get name() {
-    return this._data.name;
+    return this._acceData.name;
   }
   set name(v) {
-    this._data.name = v;
+    this._acceData.name = v;
     this.reRender();
   }
 
   get unit() {
-    return this._data.unit;
+    return this._acceData.unit;
   }
   set unit(v) {
-    this._data.unit = v;
+    this._acceData.unit = v;
     this.reRender();
   }
 
   get quantity() {
-    return this._data.quantity;
+    return this._acceData.quantity;
   }
   set quantity(v) {
-    this._data.quantity = v;
+    this._acceData.quantity = v;
     this.calcAllPrice();
     this.reRender();
   }
 
+  set originalPrice(v: number) {
+    this._acceData.originalPrice = v;
+    this.calcPrice();
+  }
+
   get price() {
-    return String(this._data.price);
+    return String(this._acceData.price);
   }
   set price(str) {
     const num = Number(str);
-    this._data.price = num;
+    this._acceData.price = num;
     this.calcAllPrice();
     this.reRender();
   }
 
   get dualPrice() {
-    return this._data.dualPrice;
+    return this._acceData.dualPrice;
   }
   set dualPrice(v) {
     this.reRender();
   }
 
   get unitPrice() {
-    return String(this._data.unitPrice);
+    return String(this._acceData.unitPrice);
   }
   set unitPrice(str) {
     this.reRender();
   }
 
   get totalPrice() {
-    return String(this._data.totalPrice);
+    return String(this._acceData.totalPrice);
   }
   set totalPrice(str) {
     // this._data.totalPrice = num;
@@ -140,30 +170,34 @@ class Class_options {
   // ---------------------------------------------------------
 
   get body() {
-    return this._data;
+    return this._acceData;
   }
-} // Class_options  close
+} // Class_accessories  close
 
 // ============================================================================
 
-type Toptions = {
+type Taccessories = {
   id?: string;
-  codeName: string;
-  name: string;
-  unit: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  price: number;
-  dualPrice: number;
+
+  codeName: string; //代號
+  name: string; //名稱
+  unit: string; // 單位
+  quantity: number; // 數量
+  price: number; // 牌價
+  totalPrice: number; // 複價
+  unitPrice: number; // 單價
+  dualPrice: number; // 牌價複價
+  //
+  referenceSpec: string | null;
+  originalPrice?: number;
 };
 
-type ToptionsKey = Exclude<keyof Toptions, 'id'>;
+type TaccessoriesKey = Exclude<keyof Taccessories, 'id'>;
 
-const optionsKeyArrOri: () => ToptionsKey[] = () => {
+const accessoriesKeyArrOri: () => TaccessoriesKey[] = () => {
   return [
     //
-    'codeName',
+    // 'codeName',
     'name',
     'unit',
     'quantity',
@@ -174,22 +208,28 @@ const optionsKeyArrOri: () => ToptionsKey[] = () => {
   ];
 };
 
-const optionsCellConfig: TcellConfig = {
+const accessoriesCellConfig: TcellConfig = {
   codeName: {
     label: '代號',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
       },
     },
   },
   name: {
     label: '名稱',
     inputSelProps: {
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '550px' },
+      showBaseline: 'invisible',
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
       },
     },
   },
@@ -197,15 +237,18 @@ const optionsCellConfig: TcellConfig = {
     label: '單位',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
       },
     },
   },
   quantity: {
     label: '數量',
     inputSelProps: {
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '40px' },
       inputProps: {
         props: {},
       },
@@ -215,8 +258,11 @@ const optionsCellConfig: TcellConfig = {
     label: '牌價',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       inputProps: {
-        props: {},
+        props: {
+          disabled: true,
+        },
       },
     },
   },
@@ -259,7 +305,7 @@ const optionsCellConfig: TcellConfig = {
 };
 
 // ============================================================================
-const emptyOptionsOri: () => Toptions = () => {
+const emptyAccessoriesOri: () => Taccessories = () => {
   return {
     codeName: '',
     name: '',
@@ -269,9 +315,10 @@ const emptyOptionsOri: () => Toptions = () => {
     totalPrice: 0,
     price: 0,
     dualPrice: 0,
+    referenceSpec: null,
   };
 };
 
 // ============================================================================
-export type { Toptions, ToptionsKey };
-export { Class_options, optionsCellConfig, optionsKeyArrOri, emptyOptionsOri };
+export type { Taccessories, TaccessoriesKey };
+export { Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri, emptyAccessoriesOri };

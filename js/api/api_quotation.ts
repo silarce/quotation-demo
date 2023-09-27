@@ -81,9 +81,9 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewSupervisorEmployee',
 
-      'latestContent.products.options', // 沒有用
-      // 'latestContent.products.quantity', // 沒有用
-      // 'latestContent.products.items', // 沒有用
+      'latestContent.products.items.accessories',
+      'latestContent.products.items.components',
+      'latestContent.others',
     ],
   };
 
