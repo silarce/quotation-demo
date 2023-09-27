@@ -899,6 +899,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
     };
 
+    if (!body.customerId) {
+      return myAlert.warning({ title: '請選擇客戶' });
+    }
+
+    if (!body.deliveryDate) {
+      return myAlert.warning({ title: '請選擇交貨日期' });
+    }
+
     try {
       setIsLoading(true);
 
