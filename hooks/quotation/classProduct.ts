@@ -371,15 +371,15 @@ class Class_product {
     if (defaultMotorBox) {
       if (defaultMotorBox.東元) {
         this.motor = '東元';
-        this.boxB = String(defaultMotorBox.東元.boxB / 1000);
+        this.boxB_noCall = String(defaultMotorBox.東元.boxB / 1000);
       } else if (defaultMotorBox.大同) {
         this.motor = '大同';
-        this.boxB = String(defaultMotorBox.大同.boxB / 1000);
+        this.boxB_noCall = String(defaultMotorBox.大同.boxB / 1000);
       } else if (defaultMotorBox.default) {
-        this.boxB = String(defaultMotorBox.default.boxB / 1000);
+        this.boxB_noCall = String(defaultMotorBox.default.boxB / 1000);
       }
     } else {
-      this.boxB = boxB ? String(boxB / 1000) : '';
+      this.boxB_noCall = boxB ? String(boxB / 1000) : '';
     }
 
     this._defaultBoxB = this.boxB;
@@ -1213,6 +1213,14 @@ class Class_product {
     this.shouldCall_pgpb = true;
     this.callAllReq();
 
+    this.reRender();
+  }
+
+  set boxB_noCall(v: string) {
+    this._prodData.boxB = v;
+
+    this._prodData.boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this.area = this.calcArea();
     this.reRender();
   }
 
