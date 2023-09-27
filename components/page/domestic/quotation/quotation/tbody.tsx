@@ -332,7 +332,7 @@ function DndRow({
   };
 
   return (
-    <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
+    <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
       <LoadingCover01 isLoading={item?.isLoading} />
       <CellWithBar isActive={isActive} className="z-0">
         <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
