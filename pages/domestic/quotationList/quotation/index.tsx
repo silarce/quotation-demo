@@ -32,6 +32,7 @@ import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
+import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -1200,6 +1201,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onCancel={() => empSelProps?.onCancel()}
         selLimit={1}
       />
+      <ContractReviewForm />
     </div>
   );
 }
