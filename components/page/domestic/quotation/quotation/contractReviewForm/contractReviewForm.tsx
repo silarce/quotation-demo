@@ -51,7 +51,7 @@ export default function ContractReviewForm() {
   return (
     <Modal
       className={scss.modal}
-      visible={true}
+      visible={false}
       closable={false}
       centered={true}
       destroyOnClose={true}
