@@ -296,6 +296,7 @@ const useProductList = ({
       });
 
       setOthersList(list);
+      reRender();
     }
   };
 
