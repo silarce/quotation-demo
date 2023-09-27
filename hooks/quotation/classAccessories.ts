@@ -67,9 +67,7 @@ class Class_accessories {
 
     price = new Decimal(originalPrice).mul(mulNumber).toNumber();
 
-    if (price !== this._acceData.price) {
-      this.price = String(price); // will call calcAllPrice
-    }
+    this.price = String(price); // will call calcAllPrice
   }
 
   calcAllPrice({
