@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
+import { useForm, useFormState } from 'react-hook-form';
 
 // antd
 import { Modal } from 'antd';
@@ -19,17 +20,8 @@ import { Tparams, TemployeeDto, useEmployee_infinite } from 'js/api/api_employee
 // css
 import scss from './contractReviewForm.module.scss';
 
-type TrowContent = {
-  one: string;
-  two: string;
-  three: string;
-};
-
-const emptyPayMethodOri = (): TrowContent => ({
-  one: '',
-  two: '',
-  three: '',
-});
+// type
+import { TcontractReviewForm } from 'js/api/dtoTypes';
 
 // ============================================================================
 export default function ContractReviewForm({
@@ -47,9 +39,11 @@ export default function ContractReviewForm({
 }) {
   // ----------------------------------------------------------------------------
 
-  const { payMethodList, addMethod, resetMethodList, getMethodBodyArr } = usePayMethod({
+  const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
     contractPrice,
   });
+
+  const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
 
   // ----------------------------------------------------------------------------
   // 被選的employee
@@ -64,7 +58,12 @@ export default function ContractReviewForm({
     },
   };
 
-  const { dataArr: empArr, viewRef_bottom, isLoadingPage1, reset } = useEmployee_infinite({ customParams: params });
+  const {
+    dataArr: empArr,
+    viewRef_bottom,
+    isLoadingPage1,
+    reset: resetEmp,
+  } = useEmployee_infinite({ customParams: params });
 
   useEffect(() => {
     if (!showModal) {
@@ -74,7 +73,7 @@ export default function ContractReviewForm({
     }
 
     resetMethodList();
-    reset();
+    resetEmp();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
@@ -148,16 +147,25 @@ export default function ContractReviewForm({
           <div>1</div>
           <div>
             <span>註明請款日</span>
-            <InputBox boxStyle={{ width: '100px' }} inputAttr={{ className: 'text-center' }} />
+            <InputBox
+              boxStyle={{ width: '100px' }}
+              inputAttr={{ ...register('askForPaymentDate'), className: 'text-center' }}
+            />
             <span>，放款日</span>
-            <InputBox boxStyle={{ width: '100px' }} inputAttr={{ className: 'text-center' }} />
+            <InputBox
+              boxStyle={{ width: '100px' }}
+              inputAttr={{
+                ...register('disbursementDate'),
+                className: 'text-center',
+              }}
+            />
           </div>
           {/*  */}
           <div>2</div>
           <div className={scss.item2}>
             <div>
               <span>確定請款比例</span>
-              <InputBox />
+              <InputBox inputAttr={{ className: 'pl-4', value: allPercentStr, disabled: true }} />
             </div>
             <div className={scss.payMethodContainer}>
               {Object.values(payMethodList).map((item, index, arr) => {
@@ -202,61 +210,103 @@ export default function ContractReviewForm({
           <div>3</div>
           <div className="flex">
             <span>合理的放款票期</span>
-            <InputBox className="flex-auto" />
+            <InputBox className="flex-auto" inputAttr={{ ...register('paymentTenor') }} />
           </div>
           {/*  */}
           <div>4</div>
           <div>
-            <RadioContainer label={'是否出具履約保證票'} labelClassName="mr-[48px]" />
+            <RadioContainer
+              label={'是否出具履約保證票'}
+              labelClassName="mr-[48px]"
+              onChange={(v) => {
+                setValue('performanceBond', v);
+              }}
+            />
             <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
           </div>
           {/*  */}
           <div>5</div>
           <div>
-            <RadioContainer label={'是否可請訂金款'} labelClassName="mr-[75px]" />
+            <RadioContainer
+              label={'是否可請訂金款'}
+              labelClassName="mr-[75px]"
+              onChange={(v) => {
+                setValue('depositPayment', v);
+              }}
+            />
           </div>
           {/*  */}
           <div>6</div>
           <div className="flex">
-            合理的保固期 <InputBox boxStyle={{ width: '60px' }} inputAttr={{ className: 'text-center' }} />
+            合理的保固期{' '}
+            <InputBox
+              boxStyle={{ width: '60px' }}
+              inputAttr={{ ...register('warrantyPeriod'), className: 'text-center' }}
+            />
             <span>年，備註</span>
-            <InputBox className="flex-auto" />
+            <InputBox className="flex-auto" inputAttr={{ ...register('note') }} />
           </div>
           {/*  */}
           <div>7</div>
           <div>
-            <RadioContainer label={'是否出具保固票或保固金'} labelClassName="mr-[48px]" />
+            <RadioContainer
+              label={'是否出具保固票或保固金'}
+              labelClassName="mr-[48px]"
+              onChange={(v) => {
+                setValue('warrantyPayment', v);
+              }}
+            />
           </div>
           {/*  */}
           <div>8</div>
           <div>
             <div>
-              <RadioContainer label={'是否註明收足90%出具防火證明、出廠證明'} labelClassName="mr-[48px]" />
+              <RadioContainer
+                label={'是否註明收足90%出具防火證明、出廠證明'}
+                labelClassName="mr-[48px]"
+                onChange={(v) => {
+                  setValue('fireproofCertificate', v);
+                }}
+              />
             </div>
           </div>
           {/*  */}
           <div>9</div>
           <div>
             <div>
-              <RadioContainer label={'是否註明收足100%出具保固書'} labelClassName="mr-[48px]" />
+              <RadioContainer
+                label={'是否註明收足100%出具保固書'}
+                labelClassName="mr-[48px]"
+                onChange={(v) => {
+                  setValue('warranty', v);
+                }}
+              />
             </div>
           </div>
           {/*  */}
           <div>10</div>
           <div>
             <div>
-              <RadioContainer label={'請按裝款時是否需配合工地試車'} labelClassName="mr-[48px]" />
+              <RadioContainer
+                label={'請按裝款時是否需配合工地試車'}
+                labelClassName="mr-[48px]"
+                onChange={(v) => {
+                  setValue('testDrive', v);
+                }}
+              />
             </div>
           </div>
           {/*  */}
           <div>11</div>
           <div>
             <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
+            <br />
+            <div className={scss.textaraeBox}>
+              <textarea className="w-full resize-none" placeholder="請輸入" {...register('debitItem')} />
+            </div>
           </div>
           {/*  */}
         </div>
-
-        <hr className={scss.hr} />
 
         <div className={scss.footer}>
           <div>
@@ -441,15 +491,17 @@ const RadioContainer = ({
   label,
   className,
   labelClassName,
+  onChange,
 }: {
   label: string;
   className?: string;
   labelClassName?: string;
+  onChange: (v: boolean) => void;
 }) => {
   return (
     <div className={classNames(className)}>
       <span className={classNames('inline-block', labelClassName)}>{label}</span>
-      <Radio.Group>
+      <Radio.Group onChange={(e) => onChange(e.target.value)}>
         <Radio value={true}>是</Radio>
         <Radio value={false}>否</Radio>
       </Radio.Group>
@@ -658,10 +710,22 @@ const usePayMethod = ({ contractPrice }: { contractPrice: number }) => {
     return arr;
   };
 
+  let allPercentStr = '';
+  Object.values(payMethodList).forEach((item, index, arr) => {
+    if (item.percent) {
+      allPercentStr = allPercentStr + item.percent + '%';
+
+      if (index !== arr.length - 1) {
+        allPercentStr = allPercentStr + ',';
+      }
+    }
+  });
+
   return {
     payMethodList,
     addMethod,
     resetMethodList,
     getMethodBodyArr,
+    allPercentStr,
   };
 }; // usePayMethod

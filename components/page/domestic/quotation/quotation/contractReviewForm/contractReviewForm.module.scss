@@ -91,13 +91,6 @@
   }
 }
 
-.hr {
-  border-color: black;
-  margin: 20px;
-  margin-top: 33px;
-  margin-bottom: 36px;
-}
-
 .footer {
   display: grid;
   grid-template-columns: fit-content(100%) 1fr;
@@ -156,4 +149,13 @@
   gap: 24px;
   margin: auto;
   margin-top: 30px;
+}
+
+.textaraeBox {
+  border-bottom: solid 1px black;
+  margin-bottom: 36px;
+  > textarea {
+    height: 100px;
+    margin-top: 5px;
+  }
 }

@@ -1740,6 +1740,21 @@ type Tprod = {
   boxD: string;
 };
 
+// TODO 新增欄位
+/**
+ 底座角鐵 BottomBarAngleIron
+鍍鋅 50*50*4T
+高耐鍍鋅鋼板 50*50*3T
+不鏽鋼#304 50*50*3T
+不鏽鋼#316 50*50*3T
+
+底座板 BottomBarPlate
+鍍鋅 1.5T
+高耐鍍鋅鋼板 1.5T
+不鏽鋼#304 1.5T
+不鏽鋼#316 1.5T
+ */
+
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
 type TprodKey = string;
 
