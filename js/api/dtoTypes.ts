@@ -875,8 +875,11 @@ export type TquotationProductDto = {
   close: string;
   // 備註
   notes: string;
-
   order: number;
+
+  bottomBarAngleIron: string; // 底座角鐵
+  bottomBarPlate: string; // 底座板
+
   items: {
     // // 材料配件
     components: TquotationProductComponentsDto[];
@@ -1036,6 +1039,8 @@ export type TcreateQuotationProductDto = {
   materialSurface: string;
   isPainted: boolean;
   order: number;
+  bottomBarAngleIron: string; // 底座角鐵
+  bottomBarPlate: string; // 底座板
 };
 
 // type TupdateQuotationContentDto = {

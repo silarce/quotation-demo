@@ -1641,6 +1641,23 @@ class Class_product {
     this._prodData.close = v;
     this.reRender();
   }
+
+  get bottomBarAngleIron() {
+    return this._prodData.bottomBarAngleIron;
+  }
+  set bottomBarAngleIron(v) {
+    this._prodData.bottomBarAngleIron = v;
+    this.reRender();
+  }
+
+  get bottomBarPlate() {
+    return this._prodData.bottomBarPlate;
+  }
+  set bottomBarPlate(v) {
+    this._prodData.bottomBarPlate = v;
+    this.reRender();
+  }
+
   //
 
   /**門片厚度 */ // api 沒有
@@ -1761,17 +1778,20 @@ type Tprod = {
   accessories: TquotationProductAccessoriesDto[];
   components: TquotationProductComponentsDto[];
   boxD: string;
+  //
+  bottomBarAngleIron: string;
+  bottomBarPlate: string;
 };
 
 // TODO 新增欄位
 /**
- 底座角鐵 BottomBarAngleIron
+底座角鐵 bottomBarAngleIron
 鍍鋅 50*50*4T
 高耐鍍鋅鋼板 50*50*3T
 不鏽鋼#304 50*50*3T
 不鏽鋼#316 50*50*3T
 
-底座板 BottomBarPlate
+底座板 bottomBarPlate
 鍍鋅 1.5T
 高耐鍍鋅鋼板 1.5T
 不鏽鋼#304 1.5T
@@ -1820,6 +1840,8 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
+    'bottomBarAngleIron', // 底座角鐵
+    'bottomBarPlate', // 底座板
   ];
 };
 
@@ -1865,6 +1887,9 @@ const emptyProdOri = (): Tprod => {
     accessories: [],
     components: [],
     boxD: '',
+    //
+    bottomBarAngleIron: '',
+    bottomBarPlate: '',
   };
 };
 

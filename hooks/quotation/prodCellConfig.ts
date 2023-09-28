@@ -447,6 +447,38 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
+  bottomBarAngleIron: {
+    label: '底座角鐵',
+    inputSelProps: {
+      wrapperStyle: { width: '150px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
+            { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
+            { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T' },
+            { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T' },
+          ],
+        },
+      },
+    },
+  },
+  bottomBarPlate: {
+    label: '底座板',
+    inputSelProps: {
+      wrapperStyle: { width: '150px' },
+      selectProps: {
+        props: {
+          options: [
+            { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
+            { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
+            { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T' },
+            { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T' },
+          ],
+        },
+      },
+    },
+  },
 }; // prodCellConfig close
 
 export { prodCellConfig };
