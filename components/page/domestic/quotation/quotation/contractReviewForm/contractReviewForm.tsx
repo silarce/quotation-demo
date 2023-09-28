@@ -72,6 +72,7 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
   useEffect(() => {
     if (!showModal) {
       setSelEmployeeArr([]);
+      setPayMethodArr([emptyPayMethodOri()]);
 
       return;
     }
@@ -81,6 +82,7 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
+  // ------------------------------------------------------------------
   const onClick = (newEmp: TemployeeDto) => {
     const newArr = [...selEmployeeArr];
 
@@ -133,6 +135,7 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
       destroyOnClose={true}
       footer={null}
       width="800px"
+      onCancel={onCancel}
     >
       <div className={scss.container}>
         <p className={scss.title}>合約審核表</p>
@@ -162,15 +165,16 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
             <div className={scss.payMethodContainer}>
               {payMethodArr.map((payMethod, index, arr) => {
                 const isLast = index === arr.length - 1;
-                const theAdd = !isLast || index === 0 ? add : undefined;
-                const theDel = isLast && index !== 0 ? () => del(index) : undefined;
+
+                // const theDel = isLast && index !== 0 ? () => del(index) : undefined;
+                const theDel = arr.length > 1 ? () => del(index) : undefined;
 
                 return (
                   <Row
                     //
                     key={index}
                     rowContent={payMethod}
-                    onAdd={theAdd}
+                    onAdd={add}
                     onDel={theDel}
                     edit={edit}
                     index={index}
@@ -259,7 +263,7 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
 
         <div className={scss.btnBox}>
           <MyButton_v2 label="確定" theme="danger" onClick={onConfirm} px="px44" />
-          <MyButton_v2 label="取消" onClick={onConfirm} px="px44" />
+          <MyButton_v2 label="取消" onClick={onCancel} px="px44" />
         </div>
 
         {/*  */}
@@ -353,9 +357,8 @@ const Row = ({
           }}
         />
       </div>
-      {/* TODO要同時顯示新增與移除 */}
       <div>
-        {onAdd && <IconAdd attr={{ onClick: onAdd }} />}
+        <IconAdd attr={{ onClick: onAdd }} />
         {onDel && <IconDel attr={{ onClick: onDel }} />}
       </div>
     </div>

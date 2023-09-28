@@ -80,6 +80,10 @@
       margin-right: 6px;
     }
     > div:nth-of-type(2) {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+      width: 42px;
       > svg {
         cursor: pointer;
       }
