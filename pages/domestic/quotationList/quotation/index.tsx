@@ -576,8 +576,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
       status: latestContent?.status ?? 'Budget',
-      managerEmployee: latestContent?.managerEmployee,
-      supervisorEmployee: latestContent?.supervisorEmployee,
+      // managerEmployee: latestContent?.managerEmployee,
+      // supervisorEmployee: latestContent?.supervisorEmployee,
+      // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
+      managerEmployee: latestContent?.reviewSupervisorEmployee,
+      supervisorEmployee: latestContent?.reviewSalesEmployee,
       //
       //
       agentEmployee: agentEmployee,
@@ -683,10 +686,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經理',
       inputProps: {
         props: {
-          value: watch('managerEmployee')?.chName ?? '',
-          onClick: () => {
-            openEmpSel('manager');
-          },
+          value: (watch('managerEmployee')?.chName || watch('managerEmployee')?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
+          // onClick: () => {
+          //   openEmpSel('manager');
+          // },
+        },
+      },
+    },
+    // TODO待api更新，要放入工務主管
+    {
+      label: '工務主管',
+      inputProps: {
+        props: {
+          // value: watch('supervisorEmployee')?.chName ?? '',
+          value: '',
+          placeholder: '尚未選擇',
+          disabled: true,
         },
       },
     },
@@ -694,10 +711,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '主管',
       inputProps: {
         props: {
-          value: watch('supervisorEmployee')?.chName ?? '',
-          onClick: () => {
-            openEmpSel('supervisor');
-          },
+          value: (watch('supervisorEmployee')?.chName || watch('supervisorEmployee')?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
         },
       },
     },
@@ -706,7 +722,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       inputProps: {
         props: {
           value: watch('agentEmployee')?.chName ?? '',
-          onChange: () => {},
+          disabled: true,
         },
       },
     },
@@ -880,6 +896,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
+
       managerId: data_watch.managerEmployee?.id ?? null,
       supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
@@ -1102,34 +1119,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
           {/*  */}
           {/*  */}
-
-          {/* 審核人員 */}
-          <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
-            <InputSel
-              caption="審核業務"
-              inputProps={{
-                props: {
-                  disabled: true,
-                  value:
-                    (quotationData?.latestContent.reviewSalesEmployee?.chName ||
-                      quotationData?.latestContent.reviewSalesEmployee?.enName) ??
-                    '',
-                },
-              }}
-            />
-            <InputSel
-              caption="審核主管"
-              inputProps={{
-                props: {
-                  disabled: true,
-                  value:
-                    (quotationData?.latestContent.reviewSupervisorEmployee?.chName ||
-                      quotationData?.latestContent.reviewSupervisorEmployee?.enName) ??
-                    '',
-                },
-              }}
-            />
-          </div>
         </div>
       </div>
       <LoadingCover01 isLoading={isLoading} />
