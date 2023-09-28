@@ -99,7 +99,42 @@ const Row03 = ({ approvalsStatus }: { approvalsStatus: string }) => {
     <div className={scss.row03}>
       <div className={classNames(scss.step, scss.success)}>
         <div className={classNames(scss.spot)} />
-        <span>Tommy</span>
+        <span>經辦的name</span>
+      </div>
+
+      <Image src={iconLongArrow} alt="to" />
+
+      <div
+        className={classNames(
+          scss.step,
+          { [scss.success]: approvalsStatus === '審核完成' },
+          { [scss.notSuccess]: '審核中' === '審核中' }
+        )}
+      >
+        <div className={classNames(scss.spot, scss.success)} />
+        <span>主管的name</span>
+      </div>
+      <Image src={iconLongArrow} alt="to" />
+      <div
+        className={classNames(
+          scss.step,
+          { [scss.success]: approvalsStatus === '審核完成' },
+          { [scss.notSuccess]: approvalsStatus === '審核中' }
+        )}
+      >
+        <div className={classNames(scss.spot, scss.success)} />
+        <span>{name}</span>
+      </div>
+      <Image src={iconLongArrow} alt="to" />
+      <div
+        className={classNames(
+          scss.step,
+          { [scss.success]: approvalsStatus === '審核完成' },
+          { [scss.notSuccess]: approvalsStatus === '審核中' }
+        )}
+      >
+        <div className={classNames(scss.spot, scss.success)} />
+        <span>{name}</span>
       </div>
       <Image src={iconLongArrow} alt="to" />
       <div
