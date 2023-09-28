@@ -1,12 +1,12 @@
 @use "styles/theme01" as *;
 
 .container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 35px;
   padding: 0 50px;
   margin-top: 120px;
   > div {
+    flex: 1;
     > span {
       font-weight: 400;
       font-size: 18px;
