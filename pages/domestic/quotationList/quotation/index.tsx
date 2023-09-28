@@ -861,6 +861,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return preBody;
       }) ?? [];
 
+    if (!data_watch.agentEmployee?.id) {
+      return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
+    }
+
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
       validityPeriod: data_watch.validityPeriod ?? '',
@@ -879,8 +883,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       managerId: data_watch.managerEmployee?.id ?? null,
       supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
-      // 目前只有admin可以呼叫這系列的api，但是agentId必須送，暫時先這樣處理
-      agentId: data_watch.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
+      agentId: data_watch.agentEmployee?.id,
       //
       //
       annotations: anno,
