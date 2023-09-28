@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
+import { nanoid } from 'nanoid';
+import Decimal from 'decimal.js';
 
 // antd
 import { Modal } from 'antd';
@@ -34,38 +37,22 @@ export default function ContractReviewForm({
   close,
   contractIdNumber,
   contractName,
+  contractPrice,
 }: {
   showModal: boolean;
   close: () => void;
   contractIdNumber: string;
   contractName: string;
+  contractPrice: number;
 }) {
-  const [payMethodArr, setPayMethodArr] = useState<TrowContent[]>([emptyPayMethodOri()]);
+  // ----------------------------------------------------------------------------
 
-  const add = () => {
-    setPayMethodArr((state) => [...state, emptyPayMethodOri()]);
-  };
-
-  const del = (index: number) => {
-    setPayMethodArr((state) => {
-      const newState = [...state];
-      newState.splice(index, 1);
-
-      return newState;
-    });
-  };
-
-  const edit = ({ index, key, value }: { index: number; key: keyof TrowContent; value: string }) => {
-    setPayMethodArr((state) => {
-      const newState = [...state];
-      newState[index][key] = value;
-
-      return newState;
-    });
-  };
+  const { payMethodList, addMethod, resetMethodList, getMethodBodyArr } = usePayMethod({
+    contractPrice,
+  });
 
   // ----------------------------------------------------------------------------
-  // 被選的資料
+  // 被選的employee
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);
 
   const params = {
@@ -82,11 +69,11 @@ export default function ContractReviewForm({
   useEffect(() => {
     if (!showModal) {
       setSelEmployeeArr([]);
-      setPayMethodArr([emptyPayMethodOri()]);
 
       return;
     }
 
+    resetMethodList();
     reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,21 +160,39 @@ export default function ContractReviewForm({
               <InputBox />
             </div>
             <div className={scss.payMethodContainer}>
-              {payMethodArr.map((payMethod, index, arr) => {
-                const isLast = index === arr.length - 1;
-
-                // const theDel = isLast && index !== 0 ? () => del(index) : undefined;
-                const theDel = arr.length > 1 ? () => del(index) : undefined;
+              {Object.values(payMethodList).map((item, index, arr) => {
+                const onDel = arr.length > 1 ? item.delSelf : undefined;
 
                 return (
                   <Row
-                    //
                     key={index}
-                    rowContent={payMethod}
-                    onAdd={add}
-                    onDel={theDel}
-                    edit={edit}
-                    index={index}
+                    onAdd={addMethod}
+                    onDel={onDel}
+                    serialNumber={index + 1}
+                    title={{
+                      value: item.title,
+                      onChange: (e) => {
+                        item.title = e.target.value;
+                      },
+                    }}
+                    percent={{
+                      value: item.percent,
+                      onChange: (e) => {
+                        item.percent = e.target.value;
+                      },
+                    }}
+                    price={{
+                      value: item.price,
+                      // onChange: (e) => {
+                      //   item.price = e.target.value;
+                      // },
+                    }}
+                    note={{
+                      value: item.note,
+                      onChange: (e) => {
+                        item.note = e.target.value;
+                      },
+                    }}
                   />
                 );
               })}
@@ -312,59 +317,70 @@ const InputBox = ({
 };
 
 const Row = ({
-  rowContent,
+  serialNumber,
   onAdd,
   onDel,
-  edit,
-  index,
+  title,
+  percent,
+  price,
+  note,
 }: {
-  rowContent: TrowContent;
+  serialNumber: number;
   onAdd?: () => void;
   onDel?: () => void;
-  edit: ({ index, key, value }: { index: number; key: keyof TrowContent; value: string }) => void;
-  index: number;
+  title: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  percent: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  price: {
+    value: string;
+    // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  note: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
 }) => {
   return (
     <div className={scss.payMethod}>
       <div>
         <InputBox
-          prefix={`${index + 1}.`}
+          prefix={`${serialNumber}.`}
           inputAttr={{
-            value: rowContent.one,
-            onChange: (e) => {
-              edit({
-                index,
-                key: 'one',
-                value: e.target.value,
-              });
-            },
+            value: title.value,
+            onChange: title.onChange,
+            placeholder: '請輸入標題',
           }}
         />
         <InputBox
           suffix="%"
           inputAttr={{
-            value: rowContent.two,
+            value: percent.value,
+            onChange: percent.onChange,
+            type: 'number',
+            placeholder: '請輸入比例',
+          }}
+        />
+        <InputBox
+          prefix="$"
+          inputAttr={{
             className: 'text-center',
-            onChange: (e) => {
-              edit({
-                index,
-                key: 'two',
-                value: e.target.value,
-              });
-            },
+            value: price.value,
+            // onChange: price.onChange,
+            type: 'number',
+            disabled: true,
           }}
         />
         <InputBox
           prefix="備註 :"
           inputAttr={{
-            value: rowContent.three,
-            onChange: (e) => {
-              edit({
-                index,
-                key: 'three',
-                value: e.target.value,
-              });
-            },
+            value: note.value,
+            onChange: note.onChange,
+            placeholder: '請輸入備註',
           }}
         />
       </div>
@@ -500,3 +516,152 @@ const RowArr = ({
     </>
   );
 };
+
+// ============================================================================
+
+type TpayMethod = {
+  title: string;
+  percent: string;
+  price: string;
+  note: string;
+};
+
+const creEmptyMethod = () => {
+  return {
+    title: '',
+    percent: '',
+    price: '',
+    note: '',
+  };
+};
+
+class Class_payMethod {
+  constructor({
+    //
+    reRender,
+    payMethod,
+    contractPrice,
+    delSelf,
+  }: {
+    reRender: () => void;
+    payMethod: TpayMethod;
+    contractPrice: number;
+    delSelf: () => void;
+  }) {
+    this.reRender = reRender;
+    this._payMethod = _.cloneDeep(payMethod);
+    this.contractPrice = contractPrice;
+
+    this.delSelf = delSelf;
+  } // constructor
+
+  readonly reRender;
+  readonly delSelf;
+  private _payMethod;
+  readonly contractPrice;
+
+  get title() {
+    return this._payMethod.title;
+  }
+  set title(v) {
+    this._payMethod.title = v;
+    this.reRender();
+  }
+
+  get percent() {
+    return this._payMethod.percent;
+  }
+  set percent(str) {
+    const num = Number(str || 0);
+    this._payMethod.percent = str;
+    this._payMethod.price = new Decimal(this.contractPrice).mul(num).div(100).toString();
+    this.reRender();
+  }
+
+  get price() {
+    return this._payMethod.price;
+  }
+  // set price(v) {
+  //   this._payMethod.price = v;
+  //   this.reRender();
+  // }
+
+  get note() {
+    return this._payMethod.note;
+  }
+  set note(v) {
+    this._payMethod.note = v;
+    this.reRender();
+  }
+
+  get body() {
+    return {
+      title: this.title,
+      percent: this.percent,
+      price: this.price,
+      note: this.note,
+    };
+  }
+}
+
+type TpayMethodList = {
+  [key: string]: Class_payMethod;
+};
+
+const usePayMethod = ({ contractPrice }: { contractPrice: number }) => {
+  const [render, setRender] = useState(0);
+  const [payMethodList, setPayMethodList] = useState<TpayMethodList>({});
+
+  const reRender = () => {
+    setRender((state) => state + 1);
+  };
+
+  const creDelMethod = (list: TpayMethodList) => {
+    return (key: string) => {
+      delete list[key];
+      reRender();
+    };
+  };
+
+  const addMethod = () => {
+    const newKey = nanoid();
+    payMethodList[newKey] = new Class_payMethod({
+      reRender,
+      payMethod: creEmptyMethod(),
+      delSelf: () => creDelMethod(payMethodList)(newKey),
+      contractPrice,
+    });
+    reRender();
+  };
+
+  const resetMethodList = () => {
+    const newKey = nanoid();
+    const newList: TpayMethodList = {};
+
+    newList[newKey] = new Class_payMethod({
+      reRender,
+      payMethod: creEmptyMethod(),
+      delSelf: () => creDelMethod(newList)(newKey),
+      contractPrice,
+    });
+
+    setPayMethodList(newList);
+  };
+
+  useEffect(() => {
+    resetMethodList();
+  }, []);
+
+  const getMethodBodyArr = () => {
+    const arr = Object.values(payMethodList).map((item) => item.body);
+
+    return arr;
+  };
+
+  return {
+    payMethodList,
+    addMethod,
+    resetMethodList,
+    getMethodBodyArr,
+  };
+}; // usePayMethod

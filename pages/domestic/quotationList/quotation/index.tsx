@@ -230,7 +230,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setProdVKeyArr,
     addProd,
     changeProdKeyArr,
-    subTotal: prodSubTotal,
     //
     comKeyArr,
     comCellConfig,
@@ -247,6 +246,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     changeOthersKeyArr,
     addOthers,
     getOthersPostBodyArr,
+    //
+    subTotal: quotationProdSubTotal,
+    //
   } = useProductList({
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
@@ -309,7 +311,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
-      prodSubTotal: prodSubTotal,
+      prodSubTotal: quotationProdSubTotal,
     });
 
     setSummary((state) => {
@@ -320,7 +322,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
-  }, [summary.discountRate, prodSubTotal]);
+  }, [summary.discountRate, quotationProdSubTotal]);
 
   //
   //
@@ -1205,6 +1207,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
+        contractPrice={Number(summary.total.replaceAll(',', ''))}
       />
     </div>
   );

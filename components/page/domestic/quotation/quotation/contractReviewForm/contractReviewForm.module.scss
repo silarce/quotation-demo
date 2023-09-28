@@ -75,7 +75,7 @@
     grid-template-columns: auto fit-content(100%);
     > div:nth-of-type(1) {
       display: grid;
-      grid-template-columns: auto 100px 233px;
+      grid-template-columns: auto 100px 100px 233px;
       gap: 16px;
       margin-right: 6px;
     }
