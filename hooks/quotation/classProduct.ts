@@ -1,4 +1,4 @@
-/**creAcceList
+/**
  *
  * retrieveOptions 下拉式選單產生器
  * Class_product
@@ -142,7 +142,11 @@ class Class_product {
       };
     });
 
-    this.creComList(comPreList as { [key in TcomponentKey]: Tcomponent });
+    // this.creComList(comPreList as { [key in TcomponentKey]: Tcomponent });
+    this.creComList({
+      dataList: comPreList as { [key in TcomponentKey]: Tcomponent },
+      isNew: false,
+    });
 
     // ___________________________________________________________
     // 建立選配設定
@@ -201,7 +205,7 @@ class Class_product {
 
   comList: { [key in TcomponentKey]: Class_component } | undefined;
 
-  creComList(dataList: { [key in TcomponentKey]: Tcomponent }) {
+  creComList({ dataList, isNew = true }: { dataList: { [key in TcomponentKey]: Tcomponent }; isNew?: boolean }) {
     const keyArr = Object.keys(dataList) as TcomponentKey[];
 
     const list: { [key: string]: Class_component } = {};
@@ -222,7 +226,7 @@ class Class_product {
           this.shouldCall_pgpb = true;
           this.callAllReq();
         },
-        isNew: false,
+        isNew: isNew,
       });
       list[key] = theClass;
     });
@@ -698,15 +702,27 @@ class Class_product {
     // TODO get /products/door/available-components取得的金額不是正確的金額
     // 正確的金額之後會補在 post /products/door/generate-door-product-bom
     this.creComList({
-      slat: slat || creEmptyCom(),
-      bottomBar: bottomBar || creEmptyCom(),
-      guideRail: guideRail || creEmptyCom(),
-      motor: motor || creEmptyCom(),
-      sidePlate: sidePlate || creEmptyCom(),
-      roller: roller || creEmptyCom(),
-      motorAccessories: motorAccessories || creEmptyCom(),
-      headBox: headBox || creEmptyCom(),
+      dataList: {
+        slat: slat || creEmptyCom(),
+        bottomBar: bottomBar || creEmptyCom(),
+        guideRail: guideRail || creEmptyCom(),
+        motor: motor || creEmptyCom(),
+        sidePlate: sidePlate || creEmptyCom(),
+        roller: roller || creEmptyCom(),
+        motorAccessories: motorAccessories || creEmptyCom(),
+        headBox: headBox || creEmptyCom(),
+      },
     });
+    // this.creComList({
+    //   slat: slat || creEmptyCom(),
+    //   bottomBar: bottomBar || creEmptyCom(),
+    //   guideRail: guideRail || creEmptyCom(),
+    //   motor: motor || creEmptyCom(),
+    //   sidePlate: sidePlate || creEmptyCom(),
+    //   roller: roller || creEmptyCom(),
+    //   motorAccessories: motorAccessories || creEmptyCom(),
+    //   headBox: headBox || creEmptyCom(),
+    // });
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
