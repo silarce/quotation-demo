@@ -138,8 +138,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const lasttestContentId = quotationData?.latestContent.id;
   // -----------------------------------------------------
 
-  const [targetProd, setTargetProd] = useState<Class_product>();
-
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -255,6 +253,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     others: quotationData?.latestContent.others,
     resetTrigger: quotationData,
   });
+
+  // const [targetProd, setTargetProd] = useState<Class_product>();
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -813,7 +815,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => {
         setDisabled(true);
         resetClass();
-        setTargetProd(undefined);
+        setTargetProdKey('n');
       },
     },
   ];
@@ -1058,7 +1060,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               prodKeyArr={prodKeyArr}
               changeProdKeyArr={changeProdKeyArr}
               addProd={addProd}
-              setTargetProd={setTargetProd}
+              setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"

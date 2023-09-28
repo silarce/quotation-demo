@@ -77,7 +77,7 @@ export default function Tbody({
   rowList: TitemList;
   keyArr: string[];
   prodCellConfig: TcellConfig;
-  onRowClick?: (onj: { item: Titem }) => void;
+  onRowClick?: (obj: { item: Titem; key: string }) => void;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
@@ -157,7 +157,7 @@ export default function Tbody({
                 //
                 onRowClick={() => {
                   setActiveKey(key);
-                  onRowClick && onRowClick({ item: item });
+                  onRowClick && onRowClick({ item: item, key });
                 }}
                 defalutVKeyArr={defalutVKeyArr}
                 rowHeight={rowHeight}
