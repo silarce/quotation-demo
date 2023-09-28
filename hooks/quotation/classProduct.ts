@@ -327,13 +327,13 @@ class Class_product {
       width: this.width,
       height: this.height,
       area: this.area,
+      quantity: this._prodData.quantity,
+      price: this._prodData.price,
+      dualPrice: this._prodData.dualPrice,
+      unitPrice: this._prodData.unitPrice,
+      totalPrice: this._prodData.totalPrice,
+      discount: this._prodData.discount,
     };
-
-    this._prodData = prod;
-
-    this._prodData.boxB = '';
-    this._defaultBoxB = '';
-    this._thickness = '';
 
     this._quantity = String(this._prodData.quantity);
     this._price = String(this._prodData.price);
@@ -341,8 +341,15 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this._prodData = prod;
+
+    this.comList = undefined;
     this._doorGeneralSpecs = undefined;
     this._availableComponents = undefined;
+
+    this._prodData.boxB = '';
+    this._defaultBoxB = '';
+    this._thickness = '';
 
     this.options_boxB = undefined;
     this.options_boxD = undefined;

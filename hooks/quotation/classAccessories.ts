@@ -51,7 +51,6 @@ class Class_accessories {
   readonly copySelf;
   // readonly calcOptionsAllprice;
 
-  // TODO: 檢查折數對這邊的金額有沒有效果
   calcPrice() {
     const originalPrice = this._acceData.originalPrice ?? 0;
     let price = this._acceData.price ?? 0;
