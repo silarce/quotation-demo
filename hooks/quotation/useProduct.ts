@@ -109,10 +109,6 @@ const useProductList = ({
   const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
   useEffect(() => {
-    if (!productArr || !doorModelList) {
-      return;
-    }
-
     createProdList();
   }, [resetTrigger, doorModelList]);
 
@@ -121,7 +117,9 @@ const useProductList = ({
       return;
     }
 
-    const sortedProdArr = _.sortBy(productArr, 'order');
+    const copyArr = _.cloneDeep(productArr);
+
+    const sortedProdArr = _.sortBy(copyArr, 'order');
     const list: TproductList = {};
 
     // 每次上傳前會將prod的order依照當時的排序重新設定
@@ -328,8 +326,9 @@ const useProductList = ({
   const createOthersList = () => {
     if (others) {
       const list: TothersList = {};
+      const copyArr = _.cloneDeep(others);
 
-      others.forEach((item, index) => {
+      copyArr.forEach((item, index) => {
         const key = `${item.id}`;
         list[key] = new Class_other({
           reRender,
@@ -388,6 +387,13 @@ const useProductList = ({
   };
 
   // ---------------------------------------------------------
+
+  const reset = () => {
+    createProdList();
+    createOthersList();
+  };
+
+  // ---------------------------------------------------------
   // 沒時間，先用簡單的作法
   useEffect(() => {
     Object.values(productList).forEach((prod) => {
@@ -407,6 +413,7 @@ const useProductList = ({
 
   return {
     reRender,
+    reset,
     //
     productList,
     prodCellConfig,

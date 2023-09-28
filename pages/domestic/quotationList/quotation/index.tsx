@@ -248,6 +248,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     getOthersPostBodyArr,
     //
     subTotal: quotationProdSubTotal,
+    reset: resetClass,
     //
   } = useProductList({
     productArr: quotationData?.latestContent.products,
@@ -806,7 +807,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ),
     },
     { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
-    { type: 'myButton', label: '取消', onClick: () => setDisabled(true) },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+        resetClass();
+        setTargetProd(undefined);
+      },
+    },
   ];
   const panel_noEditable: TpanelList = [
     // {
