@@ -755,16 +755,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   const history = useMemo(() => {
-    const content = quotationData?.contents ?? [];
+    let content = quotationData?.contents ?? [];
+
+    if (content) {
+      content = _.sortBy(content, (item) => item.createdAt);
+    }
 
     return content.map((item, index, arr) => {
-      const { status, quotationDate } = item;
+      const { status, quotationDate, createdAt } = item;
       const preStatus = arr[index - 1]?.status;
 
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(quotationDate).toISOString(),
+        isoString: moment(createdAt).toISOString(),
       };
     });
   }, [quotationData]);
