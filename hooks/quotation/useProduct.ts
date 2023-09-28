@@ -388,7 +388,21 @@ const useProductList = ({
   };
 
   // ---------------------------------------------------------
+  // 沒時間，先用簡單的作法
+  useEffect(() => {
+    Object.values(productList).forEach((prod) => {
+      prod.calcSubTotalPrice = calcSubTotalPrice;
+    });
 
+    Object.values(othersList).forEach((others) => {
+      others.calcSubTotalPrice = calcSubTotalPrice;
+    });
+  }, [productList, othersList]);
+
+  // ---------------------------------------------------------
+  // TODO這裡的參照很亂，要找時間整理
+  // 在執行createProdList與createOthersList時，calcSubTotalPric中list的參照不是新的list
+  // 不過已經在上面簡單的處理了，但可以的話程式還是要整理一下
   // ---------------------------------------------------------
 
   return {

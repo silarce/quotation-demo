@@ -25,6 +25,7 @@ class Class_accessories {
     copySelf,
     // calcOptionsAllprice,
     prod,
+    isNew = true,
   }: {
     reRender: TreRender;
     data?: Taccessories;
@@ -32,6 +33,7 @@ class Class_accessories {
     copySelf: () => void;
     // calcOptionsAllprice: () => void;
     prod: Class_product;
+    isNew?: boolean;
   }) {
     this.reRender = reRender;
     this._acceData = data;
@@ -40,7 +42,10 @@ class Class_accessories {
     this.delSelf = delSelf;
     this.copySelf = copySelf;
 
-    this.calcPrice();
+    if (isNew) {
+      this.calcPrice();
+    }
+
     // this.calcOptionsAllprice = calcOptionsAllprice;
   } // constructor
 

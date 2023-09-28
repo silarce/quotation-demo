@@ -23,12 +23,14 @@ class Class_component {
     key,
     prod,
     callReqGetCodeNumber,
+    isNew = true,
   }: {
     reRender: TreRender;
     data: Tcomponent;
     key: TcomponentKey;
     prod: Class_product;
     callReqGetCodeNumber: () => void;
+    isNew?: boolean;
   }) {
     this.reRender = reRender;
     this._prod = prod;
@@ -53,7 +55,9 @@ class Class_component {
       });
     }
 
-    this.calcAllPrice();
+    if (isNew) {
+      this.calcAllPrice();
+    }
   } // constructor
 
   private reRender;

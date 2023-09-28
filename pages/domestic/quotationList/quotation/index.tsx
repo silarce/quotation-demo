@@ -854,6 +854,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
+    // 總樘數
     let prodQty = 0;
 
     // prodVKeyArr 會在每一次垂直拖拉時更新
