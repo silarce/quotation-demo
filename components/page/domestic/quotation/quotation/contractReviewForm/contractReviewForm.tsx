@@ -29,7 +29,17 @@ const emptyPayMethodOri = (): TrowContent => ({
 });
 
 // ============================================================================
-export default function ContractReviewForm({ showModal, close }: { showModal: boolean; close: () => void }) {
+export default function ContractReviewForm({
+  showModal,
+  close,
+  contractIdNumber,
+  contractName,
+}: {
+  showModal: boolean;
+  close: () => void;
+  contractIdNumber: string;
+  contractName: string;
+}) {
   const [payMethodArr, setPayMethodArr] = useState<TrowContent[]>([emptyPayMethodOri()]);
 
   const add = () => {
@@ -142,18 +152,18 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
         {/*  */}
         <div className={scss.subTitle}>
           <span>合約編號</span>
-          <span>S-110211-06</span>
+          <span>{contractIdNumber}</span>
           <span>工程名稱</span>
-          <span>台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程</span>
+          <span>{contractName}</span>
         </div>
         {/*  */}
         <div className={scss.list}>
           <div>1</div>
           <div>
             <span>註明請款日</span>
-            <InputBox boxStyle={{ width: '100px' }} />
+            <InputBox boxStyle={{ width: '100px' }} inputAttr={{ className: 'text-center' }} />
             <span>，放款日</span>
-            <InputBox boxStyle={{ width: '100px' }} />
+            <InputBox boxStyle={{ width: '100px' }} inputAttr={{ className: 'text-center' }} />
           </div>
           {/*  */}
           <div>2</div>
@@ -203,7 +213,7 @@ export default function ContractReviewForm({ showModal, close }: { showModal: bo
           {/*  */}
           <div>6</div>
           <div className="flex">
-            合理的保固期 <InputBox boxStyle={{ width: '100px' }} />
+            合理的保固期 <InputBox boxStyle={{ width: '60px' }} inputAttr={{ className: 'text-center' }} />
             <span>年，備註</span>
             <InputBox className="flex-auto" />
           </div>
@@ -334,6 +344,7 @@ const Row = ({
           suffix="%"
           inputAttr={{
             value: rowContent.two,
+            className: 'text-center',
             onChange: (e) => {
               edit({
                 index,

@@ -1204,7 +1204,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onCancel={() => empSelProps?.onCancel()}
         selLimit={1}
       />
-      <ContractReviewForm showModal={revieweFormShow} close={() => setReviewFormShow(false)} />
+      <ContractReviewForm
+        showModal={revieweFormShow}
+        close={() => setReviewFormShow(false)}
+        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
+        contractName={quotationData?.latestContent.projectName ?? ''}
+      />
     </div>
   );
 }
