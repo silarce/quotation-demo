@@ -680,7 +680,8 @@ class Class_product {
     });
 
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
-
+    // TODO get /products/door/available-components取得的金額不是正確的金額
+    // 正確的金額之後會補在 post /products/door/generate-door-product-bom
     this.creComList({
       slat: slat || creEmptyCom(),
       bottomBar: bottomBar || creEmptyCom(),

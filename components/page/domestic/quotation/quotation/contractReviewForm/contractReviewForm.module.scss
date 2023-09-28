@@ -65,12 +65,12 @@
   }
 }
 
-.rowContainer {
+.payMethodContainer {
   display: grid;
   gap: 15px;
   margin-top: 15px;
 
-  .row {
+  .payMethod {
     display: grid;
     grid-template-columns: auto fit-content(100%);
     > div:nth-of-type(1) {
@@ -80,6 +80,76 @@
       margin-right: 6px;
     }
     > div:nth-of-type(2) {
+      > svg {
+        cursor: pointer;
+      }
     }
   }
+}
+
+.hr {
+  border-color: black;
+  margin: 20px;
+  margin-top: 33px;
+  margin-bottom: 36px;
+}
+
+.footer {
+  display: grid;
+  grid-template-columns: fit-content(100%) 1fr;
+  gap: 12px;
+  padding: 25px;
+  background-color: theme("colors.bgc01");
+  > span {
+    color: theme("colors.main");
+    font-size: 18px;
+    font-weight: 400;
+  }
+}
+
+.table {
+  width: 560px;
+  height: 350px;
+  overflow: auto;
+  padding: 0 3px;
+  margin: auto;
+  border: solid 1px theme("colors.border");
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 16px 46px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr 70px;
+  height: 54px;
+  padding: 0 20px;
+  gap: 30px;
+  border-bottom: solid 1px theme("colors.border");
+  cursor: pointer;
+
+  > span {
+    margin: auto;
+    margin-left: 0;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    color: theme("colors.text");
+  }
+
+  &.except {
+    background-color: #ddd;
+    cursor: auto;
+  }
+}
+
+.btnBox {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: auto;
+  margin-top: 30px;
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
 // antd
@@ -6,6 +6,12 @@ import { Modal } from 'antd';
 import { Radio } from 'antd';
 // gear
 // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel.tsx';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
+// api
+import { Tparams, TemployeeDto, useEmployee_infinite } from 'js/api/api_employee';
 
 // css
 import scss from './contractReviewForm.module.scss';
@@ -16,22 +22,22 @@ type TrowContent = {
   three: string;
 };
 
-const emptyRowContentOri = (): TrowContent => ({
+const emptyPayMethodOri = (): TrowContent => ({
   one: '',
   two: '',
   three: '',
 });
 
 // ============================================================================
-export default function ContractReviewForm() {
-  const [rowContent, setRowContent] = useState<TrowContent[]>([emptyRowContentOri()]);
+export default function ContractReviewForm({ showModal, close }: { showModal: boolean; close: () => void }) {
+  const [payMethodArr, setPayMethodArr] = useState<TrowContent[]>([emptyPayMethodOri()]);
 
   const add = () => {
-    setRowContent((state) => [...state, emptyRowContentOri()]);
+    setPayMethodArr((state) => [...state, emptyPayMethodOri()]);
   };
 
   const del = (index: number) => {
-    setRowContent((state) => {
+    setPayMethodArr((state) => {
       const newState = [...state];
       newState.splice(index, 1);
 
@@ -40,7 +46,7 @@ export default function ContractReviewForm() {
   };
 
   const edit = ({ index, key, value }: { index: number; key: keyof TrowContent; value: string }) => {
-    setRowContent((state) => {
+    setPayMethodArr((state) => {
       const newState = [...state];
       newState[index][key] = value;
 
@@ -48,10 +54,80 @@ export default function ContractReviewForm() {
     });
   };
 
+  // ----------------------------------------------------------------------------
+  // 被選的資料
+  const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);
+
+  const params = {
+    pageSize: 20,
+    populate: ['jobs.department'],
+    sort: 'idNumber',
+    filter: {
+      'jobs.department.name': { $eq: '工務部' },
+    },
+  };
+
+  const { dataArr: empArr, viewRef_bottom, isLoadingPage1, reset } = useEmployee_infinite({ customParams: params });
+
+  useEffect(() => {
+    if (!showModal) {
+      setSelEmployeeArr([]);
+
+      return;
+    }
+
+    reset();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
+
+  const onClick = (newEmp: TemployeeDto) => {
+    const newArr = [...selEmployeeArr];
+
+    // if (selLimit === 1) {
+    //   newArr[0] = newEmp;
+    //   setSelEmployeeArr(newArr);
+
+    //   return;
+    // }
+
+    const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id);
+
+    if (theIndex > -1) {
+      newArr.splice(theIndex, 1);
+    } else {
+      newArr.push(newEmp);
+    }
+
+    setSelEmployeeArr(newArr);
+  };
+
+  const onConfirm = () => {
+    if (!selEmployeeArr) {
+      return myAlert.info({ title: "'請選擇人員'" });
+    }
+
+    close();
+
+    // onConfirm(selEmployeeArr);
+
+    // if (isCancelOnConfirm) {
+    //   theOnCancel();
+    // }
+  };
+
+  const onCancel = () => {
+    // onCancel();
+    // setSelEmployeeArr([]);
+    close();
+  };
+
+  // ----------------------------------------------------------------------------
+
   return (
     <Modal
       className={scss.modal}
-      visible={false}
+      visible={showModal}
       closable={false}
       centered={true}
       destroyOnClose={true}
@@ -83,8 +159,8 @@ export default function ContractReviewForm() {
               <span>確定請款比例</span>
               <InputBox />
             </div>
-            <div className={scss.rowContainer}>
-              {rowContent.map((row, index, arr) => {
+            <div className={scss.payMethodContainer}>
+              {payMethodArr.map((payMethod, index, arr) => {
                 const isLast = index === arr.length - 1;
                 const theAdd = !isLast || index === 0 ? add : undefined;
                 const theDel = isLast && index !== 0 ? () => del(index) : undefined;
@@ -93,7 +169,7 @@ export default function ContractReviewForm() {
                   <Row
                     //
                     key={index}
-                    rowContent={row}
+                    rowContent={payMethod}
                     onAdd={theAdd}
                     onDel={theDel}
                     edit={edit}
@@ -161,7 +237,9 @@ export default function ContractReviewForm() {
           {/*  */}
         </div>
 
-        <div>
+        <hr className={scss.hr} />
+
+        <div className={scss.footer}>
           <div>
             <IconCaution />
           </div>
@@ -171,6 +249,18 @@ export default function ContractReviewForm() {
             </span>
           </div>
         </div>
+        {/*  */}
+        <div className="mt-9">
+          <p className="text-main text-[18px] text-center mb-[18px]">請選擇送審人員</p>
+          <div className={scss.table}>
+            <RowArr empArr={empArr} selEmployeeArr={selEmployeeArr} viewRef_bottom={viewRef_bottom} onClick={onClick} />
+          </div>
+        </div>
+
+        <div className={scss.btnBox}>
+          <MyButton_v2 label="確定" theme="danger" onClick={onConfirm} px="px44" />
+          <MyButton_v2 label="取消" onClick={onConfirm} px="px44" />
+        </div>
 
         {/*  */}
       </div>
@@ -178,6 +268,13 @@ export default function ContractReviewForm() {
   );
 }
 
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
 const InputBox = ({
   prefix,
   suffix,
@@ -214,7 +311,7 @@ const Row = ({
   index: number;
 }) => {
   return (
-    <div className={scss.row}>
+    <div className={scss.payMethod}>
       <div>
         <InputBox
           prefix={`${index + 1}.`}
@@ -256,6 +353,7 @@ const Row = ({
           }}
         />
       </div>
+      {/* TODO要同時顯示新增與移除 */}
       <div>
         {onAdd && <IconAdd attr={{ onClick: onAdd }} />}
         {onDel && <IconDel attr={{ onClick: onDel }} />}
@@ -326,5 +424,65 @@ const RadioContainer = ({
         <Radio value={false}>否</Radio>
       </Radio.Group>
     </div>
+  );
+};
+
+const RowArr = ({
+  empArr,
+  selEmployeeArr,
+  // skipArr,
+  viewRef_bottom,
+  // exceptEmpArr,
+  onClick,
+}: // exceptEmpCheck,
+{
+  empArr: TemployeeDto[];
+  selEmployeeArr: TemployeeDto[];
+  // skipArr?: TemployeeDto[];
+  onClick: (v: TemployeeDto) => void;
+  // exceptEmpArr?: { id: string }[];
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
+  // exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
+}) => {
+  return (
+    <>
+      {empArr.map((emp, index, arr) => {
+        const { idNumber, chName, jobs } = emp;
+        const { name, grade, department } = jobs?.[0] ?? {};
+
+        const theViewRef = (() => {
+          if (arr.length - 11 === index) {
+            return viewRef_bottom;
+          }
+
+          return undefined;
+        })();
+
+        const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
+        // let isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+
+        // if (!isExcept && exceptEmpCheck) {
+        //   isExcept = exceptEmpCheck(emp);
+        // }
+        // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
+
+        // const theOnClick = isExcept ? undefined : () => onClick(emp);
+
+        // if (isSkinp) {
+        //   return <div key={index} className="skip" ref={theViewRef}></div>;
+        // }
+
+        return (
+          <CellWithBar key={index} isActive={isActive}>
+            <div className={classNames(scss.row)} onClick={() => onClick(emp)} ref={theViewRef}>
+              <span className={scss.idNumber}>{idNumber}</span>
+              <span>{chName}</span>
+              <span>{name ? `${department?.name} / ${name}` : ''}</span>
+              <span>{grade && `Level ${grade}`}</span>
+            </div>
+          </CellWithBar>
+        );
+      })}
+    </>
   );
 };

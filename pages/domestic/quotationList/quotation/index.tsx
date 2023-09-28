@@ -131,6 +131,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  const [revieweFormShow, setReviewFormShow] = useState(false);
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
@@ -798,8 +799,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   img: iconUpload.src,
     //   onClick: () => setShowPdf_part(true),
     // },
+
     (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -1201,7 +1204,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         onCancel={() => empSelProps?.onCancel()}
         selLimit={1}
       />
-      <ContractReviewForm />
+      <ContractReviewForm showModal={revieweFormShow} close={() => setReviewFormShow(false)} />
     </div>
   );
 }

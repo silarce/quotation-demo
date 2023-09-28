@@ -333,6 +333,7 @@ function DndRow({
 
   return (
     <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+      {/* TODO 改善loading cover的spin，使spin變小 */}
       <LoadingCover01 isLoading={item?.isLoading} />
       <CellWithBar isActive={isActive} className="z-0">
         <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
