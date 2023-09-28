@@ -37,7 +37,7 @@ class Class_other {
   private _data;
   readonly delSelf;
   readonly copySelf;
-  readonly calcSubTotalPrice;
+  calcSubTotalPrice;
 
   // ---------------------------------------------------------
 

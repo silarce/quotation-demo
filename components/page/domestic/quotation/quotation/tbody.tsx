@@ -77,7 +77,7 @@ export default function Tbody({
   rowList: TitemList;
   keyArr: string[];
   prodCellConfig: TcellConfig;
-  onRowClick?: (onj: { item: Titem }) => void;
+  onRowClick?: (obj: { item: Titem; key: string }) => void;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
@@ -157,7 +157,7 @@ export default function Tbody({
                 //
                 onRowClick={() => {
                   setActiveKey(key);
-                  onRowClick && onRowClick({ item: item });
+                  onRowClick && onRowClick({ item: item, key });
                 }}
                 defalutVKeyArr={defalutVKeyArr}
                 rowHeight={rowHeight}
@@ -333,7 +333,7 @@ function DndRow({
 
   return (
     <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
-      <LoadingCover01 isLoading={item?.isLoading} />
+      <LoadingCover01 isLoading={item?.isLoading} size={40} />
       <CellWithBar isActive={isActive} className="z-0">
         <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
           {/*  */}
@@ -429,6 +429,11 @@ function DndRow({
 
               checkBoxProps.onChange = (arr) => {
                 (item[key] as boolean) = !!arr[0];
+              };
+
+              inputSelProps.wrapperStyle = {
+                justifyContent: 'center',
+                ...inputSelProps.wrapperStyle,
               };
             }
 

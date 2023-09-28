@@ -31,7 +31,7 @@ export default function Table_prod({
   prodKeyArr: TprodKey[];
   changeProdKeyArr: (arr: TprodKey[]) => void;
   addProd: () => void;
-  setTargetProd: (v: Class_product) => void;
+  setTargetProd: (key: string) => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h106';
@@ -69,7 +69,7 @@ export default function Table_prod({
             keyArr={prodKeyArr}
             prodCellConfig={prodCellConfig}
             onRowClick={(obj) => {
-              setTargetProd(obj.item as Class_product);
+              setTargetProd(obj.key);
             }}
             // defalutVKeyArr={defalutVKeyArr}
             onVKeyChange={onVKeyChange}

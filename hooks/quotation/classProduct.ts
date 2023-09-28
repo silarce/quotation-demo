@@ -81,7 +81,7 @@ class Class_product {
     delSelf,
     copySelf,
     //
-    calcSubTotalPrice: calcProdSubTotalPrice,
+    calcSubTotalPrice,
     // from api
     doorModelList,
     //
@@ -109,12 +109,15 @@ class Class_product {
     this.originProd = originProd;
 
     //
-    this._calcProdSubTotalPrice = calcProdSubTotalPrice;
+
+    this.calcSubTotalPrice = calcSubTotalPrice;
+
     // from api
     // 來自/products/door/models // 在useProduct取得 // 目前只有用來生成下拉式選單的樣子
     this._doorModelList = doorModelList;
     //
     this._quantity = String(this._prodData.quantity);
+
     this._price = String(this._prodData.price);
     this._dualPrice = String(this._prodData.dualPrice);
     this._unitPrice = String(this._prodData.unitPrice);
@@ -159,7 +162,7 @@ class Class_product {
   //
   isLoading = false;
   //
-  readonly _calcProdSubTotalPrice;
+  calcSubTotalPrice;
   // from api
   // 門型資料
   private _doorModelList;
@@ -219,12 +222,15 @@ class Class_product {
           this.shouldCall_pgpb = true;
           this.callAllReq();
         },
+        isNew: false,
       });
       list[key] = theClass;
     });
 
     this.comList = list as { [key in TcomponentKey]: Class_component };
-
+    this.calcComAllPrice({
+      toCalcProdAllprice: false,
+    });
     this.reRender();
   }
 
@@ -311,9 +317,11 @@ class Class_product {
         copySelf: () => this.copyAcce(key),
         // calcOptionsAllprice: this.calcOptionsAllprice,
         prod: this,
+        isNew: false,
       });
     });
     this.accessoriesList = list;
+    this.calcAccessoriesAllprice({ toCalcProdAllprice: false });
     this.reRender();
   }
 
@@ -327,13 +335,13 @@ class Class_product {
       width: this.width,
       height: this.height,
       area: this.area,
+      quantity: this._prodData.quantity,
+      price: this._prodData.price,
+      dualPrice: this._prodData.dualPrice,
+      unitPrice: this._prodData.unitPrice,
+      totalPrice: this._prodData.totalPrice,
+      discount: this._prodData.discount,
     };
-
-    this._prodData = prod;
-
-    this._prodData.boxB = '';
-    this._defaultBoxB = '';
-    this._thickness = '';
 
     this._quantity = String(this._prodData.quantity);
     this._price = String(this._prodData.price);
@@ -341,8 +349,15 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this._prodData = prod;
+
+    this.comList = undefined;
     this._doorGeneralSpecs = undefined;
     this._availableComponents = undefined;
+
+    this._prodData.boxB = '';
+    this._defaultBoxB = '';
+    this._thickness = '';
 
     this.options_boxB = undefined;
     this.options_boxD = undefined;
@@ -680,7 +695,8 @@ class Class_product {
     });
 
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
-
+    // TODO get /products/door/available-components取得的金額不是正確的金額
+    // 正確的金額之後會補在 post /products/door/generate-door-product-bom
     this.creComList({
       slat: slat || creEmptyCom(),
       bottomBar: bottomBar || creEmptyCom(),
@@ -782,6 +798,7 @@ class Class_product {
   private calcProdAllprice() {
     // 牌價 為材料配件設定與選配設定的 牌價複價 總和
     const price = new Decimal(this.comAllPrice.dualPrice || 0).add(this.AcceAllPrice.dualPrice || 0);
+
     // 單價 為材料配件設定與選配設定的 複價 總和
     const unitPrice = new Decimal(this.comAllPrice.totalPrice || 0).add(this.AcceAllPrice.totalPrice || 0);
 
@@ -792,12 +809,12 @@ class Class_product {
     this.dualPrice = Math.ceil(dualPrice).toString();
     this.unitPrice = unitPrice.ceil().toString();
     this.totalPrice = Math.ceil(totalPrice).toString();
-    this._calcProdSubTotalPrice();
+    this.calcSubTotalPrice();
     this.reRender();
   }
 
   /**計算options所有的價格 */
-  calcAccessoriesAllprice() {
+  calcAccessoriesAllprice({ toCalcProdAllprice = true }: { toCalcProdAllprice?: boolean } = {}) {
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
     let d_unitPrice = new Decimal(0);
@@ -821,10 +838,12 @@ class Class_product {
       };
     });
 
-    this.calcProdAllprice();
+    if (toCalcProdAllprice) {
+      this.calcProdAllprice();
+    }
   } // calcAccessoriesAllprice
 
-  calcComAllPrice() {
+  calcComAllPrice({ toCalcProdAllprice = true }: { toCalcProdAllprice?: boolean } = {}) {
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
     let d_unitPrice = new Decimal(0);
@@ -851,7 +870,10 @@ class Class_product {
         totalPrice: d_totalPrice.ceil().toNumber(),
       };
     });
-    this.calcProdAllprice();
+
+    if (toCalcProdAllprice) {
+      this.calcProdAllprice();
+    }
   } // calcComAllPrice
 
   private calcArea = () => {
@@ -1379,6 +1401,9 @@ class Class_product {
 
   // 牌價
   get price() {
+    // console.log(this._price);
+    // console.log(this._prodData.price);
+
     if (!this._price) {
       return '';
     }
@@ -1388,11 +1413,6 @@ class Class_product {
 
   set price(v) {
     v = v.replace(/,/g, '');
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
-
-    if (!numberRegex.test(v)) {
-      return;
-    }
 
     this._prodData.price = Number(v);
     this._price = v;
@@ -1433,11 +1453,6 @@ class Class_product {
   }
   set unitPrice(v) {
     v = v.replace(/,/g, '');
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
-
-    if (!numberRegex.test(v)) {
-      return;
-    }
 
     this._prodData.unitPrice = Number(v);
     this._unitPrice = v;
@@ -1456,11 +1471,6 @@ class Class_product {
 
   set totalPrice(v) {
     v = v.replace(/,/g, '');
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
-
-    if (!numberRegex.test(v)) {
-      return;
-    }
 
     this._prodData.totalPrice = Number(v);
     this._totalPrice = v;
@@ -1670,7 +1680,12 @@ class Class_product {
       //
       materialSurface: this._prodData.surface ?? '',
       isPainted: false,
-
+      //
+      price: Number(this._price),
+      dualPrice: Number(this._dualPrice),
+      unitPrice: Number(this._unitPrice),
+      totalPrice: Number(this._totalPrice),
+      //
       components,
       accessories: accessories,
     };
@@ -1731,6 +1746,21 @@ type Tprod = {
   components: TquotationProductComponentsDto[];
   boxD: string;
 };
+
+// TODO 新增欄位
+/**
+ 底座角鐵 BottomBarAngleIron
+鍍鋅 50*50*4T
+高耐鍍鋅鋼板 50*50*3T
+不鏽鋼#304 50*50*3T
+不鏽鋼#316 50*50*3T
+
+底座板 BottomBarPlate
+鍍鋅 1.5T
+高耐鍍鋅鋼板 1.5T
+不鏽鋼#304 1.5T
+不鏽鋼#316 1.5T
+ */
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
 type TprodKey = string;

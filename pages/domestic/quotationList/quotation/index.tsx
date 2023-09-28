@@ -32,6 +32,7 @@ import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
+import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -130,13 +131,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  const [revieweFormShow, setReviewFormShow] = useState(false);
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   const lasttestContentId = quotationData?.latestContent.id;
   // -----------------------------------------------------
-
-  const [targetProd, setTargetProd] = useState<Class_product>();
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -228,7 +228,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setProdVKeyArr,
     addProd,
     changeProdKeyArr,
-    subTotal: prodSubTotal,
     //
     comKeyArr,
     comCellConfig,
@@ -245,11 +244,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     changeOthersKeyArr,
     addOthers,
     getOthersPostBodyArr,
+    //
+    subTotal: quotationProdSubTotal,
+    reset: resetClass,
+    //
   } = useProductList({
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
     resetTrigger: quotationData,
   });
+
+  // const [targetProd, setTargetProd] = useState<Class_product>();
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -307,7 +314,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
-      prodSubTotal: prodSubTotal,
+      prodSubTotal: quotationProdSubTotal,
     });
 
     setSummary((state) => {
@@ -318,7 +325,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
-  }, [summary.discountRate, prodSubTotal]);
+  }, [summary.discountRate, quotationProdSubTotal]);
 
   //
   //
@@ -574,8 +581,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
       status: latestContent?.status ?? 'Budget',
-      managerEmployee: latestContent?.managerEmployee,
-      supervisorEmployee: latestContent?.supervisorEmployee,
+      // managerEmployee: latestContent?.managerEmployee,
+      // supervisorEmployee: latestContent?.supervisorEmployee,
+      // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
+      managerEmployee: latestContent?.reviewSupervisorEmployee,
+      supervisorEmployee: latestContent?.reviewSalesEmployee,
       //
       //
       agentEmployee: agentEmployee,
@@ -681,10 +691,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經理',
       inputProps: {
         props: {
-          value: watch('managerEmployee')?.chName ?? '',
-          onClick: () => {
-            openEmpSel('manager');
-          },
+          value: (watch('managerEmployee')?.chName || watch('managerEmployee')?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
+          // onClick: () => {
+          //   openEmpSel('manager');
+          // },
+        },
+      },
+    },
+    // TODO待api更新，要放入工務主管
+    {
+      label: '工務主管',
+      inputProps: {
+        props: {
+          // value: watch('supervisorEmployee')?.chName ?? '',
+          value: '',
+          placeholder: '尚未選擇',
+          disabled: true,
         },
       },
     },
@@ -692,10 +716,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '主管',
       inputProps: {
         props: {
-          value: watch('supervisorEmployee')?.chName ?? '',
-          onClick: () => {
-            openEmpSel('supervisor');
-          },
+          value: (watch('supervisorEmployee')?.chName || watch('supervisorEmployee')?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
         },
       },
     },
@@ -704,7 +727,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       inputProps: {
         props: {
           value: watch('agentEmployee')?.chName ?? '',
-          onChange: () => {},
+          disabled: true,
         },
       },
     },
@@ -753,16 +776,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   const history = useMemo(() => {
-    const content = quotationData?.contents ?? [];
+    let content = quotationData?.contents ?? [];
+
+    if (content) {
+      content = _.sortBy(content, (item) => item.createdAt);
+    }
 
     return content.map((item, index, arr) => {
-      const { status, quotationDate } = item;
+      const { status, quotationDate, createdAt } = item;
       const preStatus = arr[index - 1]?.status;
 
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(quotationDate).toISOString(),
+        isoString: moment(createdAt).toISOString(),
       };
     });
   }, [quotationData]);
@@ -782,7 +809,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ),
     },
     { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
-    { type: 'myButton', label: '取消', onClick: () => setDisabled(true) },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+        resetClass();
+        setTargetProdKey('n');
+      },
+    },
   ];
   const panel_noEditable: TpanelList = [
     // {
@@ -797,8 +832,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   img: iconUpload.src,
     //   onClick: () => setShowPdf_part(true),
     // },
+
     (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -828,6 +865,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
+    // 總樘數
     let prodQty = 0;
 
     // prodVKeyArr 會在每一次垂直拖拉時更新
@@ -853,6 +891,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return preBody;
       }) ?? [];
 
+    if (!data_watch.agentEmployee?.id) {
+      return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
+    }
+
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
       validityPeriod: data_watch.validityPeriod ?? '',
@@ -868,11 +910,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
+
       managerId: data_watch.managerEmployee?.id ?? null,
       supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
-      // 目前只有admin可以呼叫這系列的api，但是agentId必須送，暫時先這樣處理
-      agentId: data_watch.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
+      agentId: data_watch.agentEmployee?.id,
       //
       //
       annotations: anno,
@@ -898,6 +940,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       //
     };
+
+    if (!body.customerId) {
+      return myAlert.warning({ title: '請選擇客戶' });
+    }
+
+    if (!body.deliveryDate) {
+      return myAlert.warning({ title: '請選擇交貨日期' });
+    }
 
     try {
       setIsLoading(true);
@@ -1010,7 +1060,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               prodKeyArr={prodKeyArr}
               changeProdKeyArr={changeProdKeyArr}
               addProd={addProd}
-              setTargetProd={setTargetProd}
+              setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"
@@ -1083,34 +1133,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
           {/*  */}
           {/*  */}
-
-          {/* 審核人員 */}
-          <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
-            <InputSel
-              caption="審核業務"
-              inputProps={{
-                props: {
-                  disabled: true,
-                  value:
-                    (quotationData?.latestContent.reviewSalesEmployee?.chName ||
-                      quotationData?.latestContent.reviewSalesEmployee?.enName) ??
-                    '',
-                },
-              }}
-            />
-            <InputSel
-              caption="審核主管"
-              inputProps={{
-                props: {
-                  disabled: true,
-                  value:
-                    (quotationData?.latestContent.reviewSupervisorEmployee?.chName ||
-                      quotationData?.latestContent.reviewSupervisorEmployee?.enName) ??
-                    '',
-                },
-              }}
-            />
-          </div>
         </div>
       </div>
       <LoadingCover01 isLoading={isLoading} />
@@ -1191,6 +1213,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         onCancel={() => empSelProps?.onCancel()}
         selLimit={1}
+      />
+      <ContractReviewForm
+        showModal={revieweFormShow}
+        close={() => setReviewFormShow(false)}
+        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
+        contractName={quotationData?.latestContent.projectName ?? ''}
+        contractPrice={Number(summary.total.replaceAll(',', ''))}
       />
     </div>
   );
