@@ -61,16 +61,12 @@ const useProductList = ({
   const [render, setRender] = useState(0);
 
   const reRender: TreRender = () => setRender((state) => ++state);
-  // const reRender: TreRender = () => {
-  //   setProductList((state) => ({ ...state }));
-  //   setOthersList((state) => ({ ...state }));
 
-  //   setProdKeyArr((state) => [...state]);
-  //   setProdVKeyArr((state) => (state ? [...state] : undefined));
-  //   setComKeyArr((state) => [...state]);
-  //   setAccessoriesKeyArr((state) => [...state]);
-  //   setOthersKeyArr((state) => [...state]);
-  // };
+  const [calcTrigger, setCalcTrigger] = useState(0);
+
+  const callCalcSubTotal = () => {
+    setCalcTrigger((state) => ++state);
+  };
 
   // ---------------------------------------------------------
 
@@ -157,10 +153,8 @@ const useProductList = ({
         prodData,
         delSelf: () => delSelf_prod(list, key),
         copySelf: () => copySelf_prod(list, key),
-
-        calcSubTotalPrice,
+        callCalcSubTotal,
         doorModelList,
-
         originProd: prod,
       });
     });
@@ -177,20 +171,29 @@ const useProductList = ({
 
   const delSelf_prod = (list: TproductList, key: string) => {
     delete list[key];
-    calcSubTotalPrice();
+    callCalcSubTotal();
     reRender();
   };
 
   const copySelf_prod = (list: TproductList, copyKey: string) => {
-    const newKey = nanoid();
-    const copy = _.cloneDeep(list[copyKey]);
+    if (!doorModelList) {
+      return myAlert.info({ title: '尚未取得門型資料' });
+    }
 
+    const newKey = nanoid();
+
+    const copy = _.cloneDeep(list[copyKey]);
     copy.delSelf = () => delSelf_prod(list, newKey);
     copy.copySelf = () => copySelf_prod(list, newKey);
     copy.clearId();
 
+    Object.values(copy.accessoriesList).forEach((acce) => {
+      acce.reNewMethod();
+    });
+
     list[newKey] = copy;
-    calcSubTotalPrice();
+
+    callCalcSubTotal();
     reRender();
   };
 
@@ -204,60 +207,14 @@ const useProductList = ({
       reRender,
       delSelf: () => delSelf_prod(productList, newKey),
       copySelf: () => copySelf_prod(productList, newKey),
-      calcSubTotalPrice,
+      callCalcSubTotal,
+      // calcSubTotalPrice,
       doorModelList,
     });
     productList[newKey] = classProd;
 
     reRender();
   };
-
-  // TODO!!!!!!因為很重要所有重複五次!!!!!
-  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
-  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
-  // 還有其他設定的金額有沒有被算進小計中
-  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
-  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
-  // 還有其他設定的金額有沒有被算進小計中
-  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
-  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
-  // 還有其他設定的金額有沒有被算進小計中
-  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
-  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
-  // 還有其他設定的金額有沒有被算進小計中
-  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
-  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
-  // 還有其他設定的金額有沒有被算進小計中
-  // TODO!!!!!!因為很重要所有重複五次!!!!!
-
-  // FIXME因為list參照錯誤的問題，使的計算出錯誤的值
-  const calcSubTotalPrice = () => {
-    let subTotal = new Decimal(0);
-
-    Object.values(productList).forEach((prod) => {
-      subTotal = subTotal.add(prod.totalPrice_num);
-    });
-    Object.values(othersList).forEach((item) => {
-      subTotal = subTotal.add(item.totalPrice);
-    });
-
-    setSubTotal(subTotal.ceil().toString());
-  };
-
-  // const creCalcSubTotalPrice = ({ prodList, othersList }: { prodList: TproductList; othersList: TothersList }) => {
-  //   return () => {
-  //     let subTotal = new Decimal(0);
-
-  //     Object.values(prodList).forEach((prod) => {
-  //       subTotal = subTotal.add(prod.totalPrice_num);
-  //     });
-  //     Object.values(othersList).forEach((item) => {
-  //       subTotal = subTotal.add(item.totalPrice);
-  //     });
-
-  //     setSubTotal(subTotal.ceil().toString());
-  //   };
-  // };
 
   useEffect(() => {
     const prodKeyArr = (() => {
@@ -335,7 +292,7 @@ const useProductList = ({
           data: item,
           delSelf: () => delSelf_other(list, key),
           copySelf: () => copySelf_others(list, key),
-          calcSubTotalPrice,
+          callCalcSubTotal,
         });
       });
 
@@ -350,6 +307,7 @@ const useProductList = ({
 
   const delSelf_other = (list: TothersList, key: string) => {
     delete list[key];
+    callCalcSubTotal();
     reRender();
   };
 
@@ -362,8 +320,9 @@ const useProductList = ({
       data: bodyCopy,
       delSelf: () => delSelf_other(list, newKey),
       copySelf: () => copySelf_others(list, newKey),
-      calcSubTotalPrice,
+      callCalcSubTotal,
     });
+    callCalcSubTotal();
     reRender();
   };
 
@@ -374,7 +333,7 @@ const useProductList = ({
       reRender,
       delSelf: () => delSelf_other(othersList, newKey),
       copySelf: () => copySelf_others(othersList, newKey),
-      calcSubTotalPrice,
+      callCalcSubTotal,
     });
 
     reRender();
@@ -387,29 +346,50 @@ const useProductList = ({
   };
 
   // ---------------------------------------------------------
+  // TODO!!!!!!因為很重要所以重複五次!!!!!
+  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
+  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
+  // 還有其他設定的金額有沒有被算進小計中
+  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
+  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
+  // 還有其他設定的金額有沒有被算進小計中
+  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
+  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
+  // 還有其他設定的金額有沒有被算進小計中
+  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
+  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
+  // 還有其他設定的金額有沒有被算進小計中
+  // TODO報價單完成後，必須再次驗證計算出來的金額是否正確
+  // 包括主產品、材料配件、選配設定的金額，且有沒有正確地受到折數影響
+  // 還有其他設定的金額有沒有被算進小計中
+  // TODO!!!!!!因為很重要所以重複五次!!!!!
+
+  /**計算報價單小計，由calcTrigger觸發 */
+  const calcSubTotalPrice = () => {
+    let subTotal = new Decimal(0);
+
+    Object.values(productList).forEach((prod) => {
+      subTotal = subTotal.add(prod.totalPrice_num);
+    });
+    Object.values(othersList).forEach((item) => {
+      subTotal = subTotal.add(item.totalPrice);
+    });
+
+    setSubTotal(subTotal.ceil().toString());
+  };
+
+  useEffect(() => {
+    if (calcTrigger) {
+      calcSubTotalPrice();
+    }
+  }, [calcTrigger]);
+
+  // ---------------------------------------------------------
 
   const reset = () => {
     createProdList();
     createOthersList();
   };
-
-  // ---------------------------------------------------------
-  // 沒時間，先用簡單的作法
-  useEffect(() => {
-    Object.values(productList).forEach((prod) => {
-      prod.calcSubTotalPrice = calcSubTotalPrice;
-    });
-
-    Object.values(othersList).forEach((others) => {
-      others.calcSubTotalPrice = calcSubTotalPrice;
-    });
-  }, [productList, othersList]);
-
-  // ---------------------------------------------------------
-  // TODO這裡的參照很亂，要找時間整理
-  // 在執行createProdList與createOthersList時，calcSubTotalPric中list的參照不是新的list
-  // 不過已經在上面簡單的處理了，但可以的話程式還是要整理一下
-  // ---------------------------------------------------------
 
   return {
     reRender,
@@ -500,7 +480,12 @@ export type {
  *
  * bearingType對應calc-general-spec的bearing name
  *
- *
- *
- *
+ */
+
+/**
+目前用於計算價格的方法
+useProducts
+calcSubTotalPrice 計算productlist與otehrs totalPrice的總和`
+這個方法會送到Class_prod與Class_otehrs，於需要時呼叫
+
  */

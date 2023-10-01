@@ -13,31 +13,33 @@ import { TcreateQuotationContentOtherDto } from 'js/api/dtoTypes';
 // =======================================================================
 class Class_other {
   constructor({
-    //
     reRender,
     data = emptyOthersOri(),
     delSelf,
     copySelf,
-    calcSubTotalPrice,
-  }: {
+    callCalcSubTotal,
+  }: // calcSubTotalPrice,
+  {
     reRender: TreRender;
     data?: Tothers;
     delSelf: () => void;
     copySelf: () => void;
-    calcSubTotalPrice: () => void;
+    callCalcSubTotal: () => void;
   }) {
     this.reRender = reRender;
     this._data = data;
     this.delSelf = delSelf;
     this.copySelf = copySelf;
-    this.calcSubTotalPrice = calcSubTotalPrice;
+    // this.calcSubTotalPrice = calcSubTotalPrice;
+    this.callCalcSubTotal = callCalcSubTotal;
   } // constructor
 
   private reRender;
   private _data;
   readonly delSelf;
   readonly copySelf;
-  calcSubTotalPrice;
+  callCalcSubTotal;
+  // calcSubTotalPrice;
 
   // ---------------------------------------------------------
 
@@ -46,7 +48,8 @@ class Class_other {
     const unitPrice = this._data.unitPrice || 0;
     const totalPrice = new Decimal(qty).mul(unitPrice).toNumber();
     this._data.totalPrice = totalPrice;
-    this.calcSubTotalPrice();
+
+    this.callCalcSubTotal();
     this.reRender();
   }
 

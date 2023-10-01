@@ -22,22 +22,18 @@ class Class_component {
     data,
     key,
     prod,
-    callReqGetCodeNumber,
     isNew = true,
   }: {
     reRender: TreRender;
     data: Tcomponent;
     key: TcomponentKey;
     prod: Class_product;
-    callReqGetCodeNumber: () => void;
     isNew?: boolean;
   }) {
     this.reRender = reRender;
     this._prod = prod;
     this._com = data;
     this.key = key;
-
-    this.callReqGetCodeNumber = callReqGetCodeNumber;
 
     if (!this._com.material) {
       if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
@@ -46,6 +42,7 @@ class Class_component {
     }
 
     if (!this._com.quantity) {
+      // 不同的材料配件會用不同的值為預設數量
       this._com.quantity = calcDefaultQuantity({
         key,
         w: Number(prod.width),
@@ -56,15 +53,24 @@ class Class_component {
     }
 
     if (isNew) {
-      this.calcAllPrice();
+      setTimeout(() => {
+        this.calcAllPrice();
+      }, 0);
+    } else {
+      this.calcAllPrice({ shouldCallProdAllPrice: false });
     }
-  } // constructor
+
+    // =constructor
+  } // =constructor
 
   private reRender;
   private _prod;
   private _com;
   readonly key;
-  readonly callReqGetCodeNumber;
+  readonly callReqGetCodeNumber = () => {
+    this._prod.shouldCall_pgpb = true;
+    this._prod.callAllReq();
+  };
   //
   //
   // private _material: undefined | string = undefined;
@@ -98,13 +104,15 @@ class Class_component {
   };
 
   calcAllPrice({
-    toCalcComAllprice = true,
-  }: //
-  { toCalcComAllprice?: boolean } = {}) {
+    shouldCallProdAllPrice = true,
+  }: {
+    shouldCallProdAllPrice?: boolean;
+  } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
 
-    const price = this.price || 0;
     const quantity = Number(this._com.quantity || 0);
+
+    const price = this.price || 0;
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -116,9 +124,7 @@ class Class_component {
     this._unitPrice = unitPrice.ceil().toNumber();
     this._totalPrice = totalPrice.ceil().toNumber();
 
-    if (toCalcComAllprice) {
-      this._prod.calcComAllPrice();
-    }
+    this._prod.calcProdAllprice_timeout();
 
     this.reRender();
   }
@@ -1013,6 +1019,7 @@ const findOptionValue = ({ options, value }: { options: Toption[]; value: string
   return option?.value;
 };
 
+/**取得預設數量 */
 const calcDefaultQuantity = ({
   //
   key,
