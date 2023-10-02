@@ -951,6 +951,8 @@ export type TquotationContentDto = {
 
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];
+
+  verifyForm: TquotationVerifyFormDto;
 };
 
 export type TquotationDto = {

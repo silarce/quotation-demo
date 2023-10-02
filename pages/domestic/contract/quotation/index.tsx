@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
+import _ from 'lodash';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile';
+// import QuotationProfile, { TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
 import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
 import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
@@ -13,6 +15,8 @@ import QuotationProdChangingRecord from 'components/page/domestic/quotation/quot
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
+//
+
 // antd
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
@@ -50,6 +54,21 @@ import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 // =============================================================
 // =============================================================
 // =============================================================
+
+import { useGetQuotation_id } from 'js/api/api_quotation';
+
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+
+import { prodCellConfig } from 'hooks/quotation/prodCellConfig';
+
+import { useProductList } from 'hooks/quotation/useProduct';
+
+// =============================================================
+// =============================================================
+// =============================================================
 export default function Quotation() {
   const router = useRouter();
   const isReady = router.isReady;
@@ -66,6 +85,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const {
     quotationId, //報價單id
   } = router.query;
+
+  // =========================================================
+
+  const { data, update } = useGetQuotation_id(quotationId as string | undefined);
+
+  useEffect(() => {
+    update();
+  }, [quotationId]);
 
   // =========================================================
   // 正式接上api前先這樣處理
@@ -221,6 +248,89 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
   // =========================================================
+  const latestcontent = data?.latestContent;
+  const firstContent = (_.sortBy(data?.contents, 'createdAt') ?? [])[0];
+
+  // latest
+  const {
+    reRender,
+    reset,
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
+    addProd,
+    changeProdKeyArr,
+    //
+    subTotal,
+    //
+    comKeyArr,
+    comVKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    //
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+  } = useProductList({
+    productArr: latestcontent?.products ?? [],
+    others: [],
+    resetTrigger: undefined,
+  }); // latest
+
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
+
+  // -----------------------------------------------------------------
+  const {
+    reRender: reRender_fist,
+    reset: reset_fist,
+    //
+    productList: productList_first,
+    prodCellConfig: prodCellConfig_first,
+    prodKeyArr: prodKeyArr_first,
+    prodVKeyArr: prodVKeyArr_first,
+    setProdVKeyArr: setProdVKeyArr_first,
+    addProd: addProd_first,
+    changeProdKeyArr: changeProdKeyArr_first,
+    //
+    subTotal: subTotal_first,
+    //
+    comKeyArr: comKeyArr_first,
+    comVKeyArr: comVKeyArr_first,
+    comCellConfig: comCellConfig_first,
+    changeComKeyArr: changeComKeyArr_first,
+    //
+    accessoriesKeyArr: accessoriesKeyArr_first,
+    changeAccessoriesKeyArr: changeAccessoriesKeyArr_first,
+    accessoriesCellConfig: accessoriesCellConfig_first,
+    //
+    othersKeyArr: othersKeyArr_first,
+    othersList: othersList_first,
+    othersCellConfig: othersCellConfig_first,
+    changeOthersKeyArr: changeOthersKeyArr_first,
+    addOthers: addOthers_first,
+    getOthersPostBodyArr: getOthersPostBodyArr_first,
+  } = useProductList({
+    productArr: firstContent?.products ?? [],
+    others: [],
+    resetTrigger: undefined,
+  }); // latest
+
+  // -----------------------------------------------------------------
+  // =========================================================
+  // =========================================================
+  // =========================================================
+  // =========================================================
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
   // if (quotationId !== "newQuotation" && !quotationData)
   if (!classQuotation) {
@@ -240,6 +350,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   })();
 
   // =========================================================
+
   // =========================================================
   return (
     <div className={style.container}>
@@ -248,11 +359,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 報價單基本資料 */}
-          {/* <QuotationProfile
-            classBasicInfo={classQuotation.classBasicInfo}
-            fakeClientList={fakeClientList}
-            disabled={!allowEdit}
-          /> */}
+          <QuotationProfile profile={latestcontent} disabled={true} onProfileChange={() => {}} />
 
           {/* switch01 */}
           <div className={style.switchBar}>
@@ -270,15 +377,62 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {switch01 || switch02 ? (
             <>
               {/* 主產品設定 */}
-              <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} />
+              {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
+              <Table_prod
+                disabled={true}
+                prodList={productList}
+                prodCellConfig={prodCellConfig}
+                prodKeyArr={prodKeyArr}
+                changeProdKeyArr={changeProdKeyArr}
+                addProd={() => {}}
+                setTargetProd={setTargetProdKey}
+              />
               {/* 原報價項目 */}
-              {switch02 && <OldQuotationProduction classQuotation={classQuotation} />}
+              {/* {switch02 && <OldQuotationProduction classQuotation={classQuotation} />} */}
+              {switch02 && (
+                <Table_prod
+                  disabled={true}
+                  prodList={productList_first}
+                  prodCellConfig={prodCellConfig_first}
+                  prodKeyArr={prodKeyArr_first}
+                  changeProdKeyArr={changeProdKeyArr}
+                  addProd={() => {}}
+                  setTargetProd={setTargetProdKey}
+                />
+              )}
               <div className={style.redWrapper}>
                 {/* 材料配件設定 */}
-                <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} />
+                {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
+                <Table_com
+                  disabled={true}
+                  comList={targetProd?.comList}
+                  comCellConfig={comCellConfig}
+                  comKeyArr={comKeyArr}
+                  changeComKeyArr={changeComKeyArr}
+                  defalutVKeyArr={comVKeyArr}
+                />
                 <hr />
                 {/* 選配設定 */}
-                <QuotationAccessory activeRow={prodState.activeRow} />
+                {/* <QuotationAccessory activeRow={prodState.activeRow} /> */}
+                <Table_accessories
+                  disabled={true}
+                  list={targetProd?.accessoriesList}
+                  cellConfig={accessoriesCellConfig}
+                  keyArr={accessoriesKeyArr}
+                  changeKeyArr={changeAccessoriesKeyArr}
+                  defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+                  onVKeyChange={(keyArr) => {
+                    if (targetProd) {
+                      targetProd.accessoriesVKeyArr = keyArr;
+                    }
+                  }}
+                  doorModel={targetProd?.doorType}
+                  onSelectorConfirm={(arr) => {
+                    if (targetProd) {
+                      targetProd.addAcce(arr);
+                    }
+                  }}
+                />
               </div>
             </>
           ) : (
@@ -380,11 +534,4 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
   );
 };
 
-// =========================================================
-
-// 追加追減項目紀錄的style不對
-// 追加追減項目紀錄的style不對
-// 追加追減項目紀錄的style不對
-// 追加追減項目紀錄的style不對
-// 追加追減項目紀錄的style不對
-// 追加追減項目紀錄的style不對
+// ======================================================================

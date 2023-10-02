@@ -61,10 +61,6 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
-
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';

@@ -18,6 +18,8 @@ type Tcontract = {
   attn: string;
 };
 
+export type { Tcontract };
+
 export default function ListHeader01({
   className = '',
   contract,
