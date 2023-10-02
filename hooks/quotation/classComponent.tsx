@@ -442,6 +442,10 @@ class Class_component {
     return comLookUp[this.key].unit;
   }
 
+  set bom(v: object[]) {
+    this._com.bom = v;
+  }
+
   get body() {
     return {
       type: comLookUp[this.key].type,
@@ -453,8 +457,8 @@ class Class_component {
       // 下面這幾個先跳過
       number: this.codeNumber ?? '',
       componentId: this.componentId ?? '',
-      rawData: '',
-      bom: '',
+      rawData: {},
+      bom: this._com.bom,
       // order: '', //在外面處理
     };
   }
@@ -470,6 +474,9 @@ type Tcomponent = {
   code: string; // 編號
   specialSpec: string | null; // 特殊規格
   name?: string; // TdoorMotorAccessoriesDto沒有name
+
+  bom?: object[];
+  rawData?: object;
 
   // ----------------------------------------------
   // 這邊是共有的property
@@ -534,8 +541,7 @@ type Tcomponent = {
   quantity?: string;
   number?: string;
   componentId?: string;
-  rawData?: string;
-  bom?: string;
+
   order?: number;
 }; //  Taccessory
 
@@ -1074,6 +1080,7 @@ const creEmptyCom: () => Tcomponent = () => ({
   isPainted: false,
   price: 0,
   quantity: '',
+  bom: [],
 });
 
 // ===========================================================

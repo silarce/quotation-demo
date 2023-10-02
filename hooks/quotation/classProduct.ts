@@ -576,6 +576,7 @@ class Class_product {
         comList[key].codeNumber = item.number;
         comList[key].componentId = item.id;
         comList[key].price = item.price;
+        comList[key].bom = item.bom;
         comList[key].calcAllPrice();
       });
     }
@@ -1692,6 +1693,7 @@ class Class_product {
         ...body,
         order: index,
         type: body.type as TcreateQuotationProductComponentDto['type'],
+        quantity: String(body.quantity),
       };
     });
 

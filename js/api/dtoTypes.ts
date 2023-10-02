@@ -791,16 +791,16 @@ export type TquotationProductComponentsDto = {
     | 'headBox';
   number: string;
   componentId: string;
-  rawData: string;
+  rawData: object;
   /**
-   從TdoorBomDto_Component取得的bom要直接送進來這個bom
+  從TdoorBomDto_Component取得的bom要直接送進來這個bom
    */
   bom: any; // 前端不會直接用到，先直接設object
   material: string;
   materialSurface: string | null | undefined;
   isPainted: boolean;
   price: number;
-  quantity: number;
+  quantity: string;
   order: number;
 };
 // 但是後端有建立這個型別
@@ -1361,7 +1361,7 @@ export type TgenerateDoorProductBomDto = {
 export type TdoorBomDto_Component = {
   id: string;
   number: string;
-  bom: object; // 前端不會直接用到，先直接設object
+  bom: object[]; // 前端不會直接用到，先直接設object
   price: number;
 };
 
