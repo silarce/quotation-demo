@@ -1,6 +1,4 @@
 import { MouseEvent } from 'react';
-import classNames from 'classnames';
-import Image from 'next/image';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -8,7 +6,6 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // icon
 import iconPlace from 'public/image/icon/place.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
-import iconLongArrow from 'public/image/icon/longArrow.svg';
 
 // css
 import scss from './tbodyItem01.module.scss';
@@ -35,12 +32,14 @@ export default function TbodyItem01({
   quotationContent,
   isActive,
   openQuotation,
-  approvalsStatus,
-}: {
+  children,
+}: // approvalsStatus,
+{
   quotationContent: TBodyItemContent;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
-  approvalsStatus?: string;
+  children?: React.ReactNode;
+  // approvalsStatus?: string;
 }) {
   const {
     quotationNumber,
@@ -86,67 +85,7 @@ export default function TbodyItem01({
         <span>{projectName}</span>
         <div></div>
       </div>
-      {approvalsStatus && <Row03 approvalsStatus={approvalsStatus} />}
+      {children}
     </CellWithBar>
   );
 }
-
-// =========================================================
-const Row03 = ({ approvalsStatus }: { approvalsStatus: string }) => {
-  const name = approvalsStatus === '待審核' ? '尚未選擇' : 'Andy';
-
-  return (
-    <div className={scss.row03}>
-      <div className={classNames(scss.step, scss.success)}>
-        <div className={classNames(scss.spot)} />
-        <span>經辦的name</span>
-      </div>
-
-      <Image src={iconLongArrow} alt="to" />
-
-      <div
-        className={classNames(
-          scss.step,
-          { [scss.success]: approvalsStatus === '審核完成' },
-          { [scss.notSuccess]: '審核中' === '審核中' }
-        )}
-      >
-        <div className={classNames(scss.spot, scss.success)} />
-        <span>主管的name</span>
-      </div>
-      <Image src={iconLongArrow} alt="to" />
-      <div
-        className={classNames(
-          scss.step,
-          { [scss.success]: approvalsStatus === '審核完成' },
-          { [scss.notSuccess]: approvalsStatus === '審核中' }
-        )}
-      >
-        <div className={classNames(scss.spot, scss.success)} />
-        <span>{name}</span>
-      </div>
-      <Image src={iconLongArrow} alt="to" />
-      <div
-        className={classNames(
-          scss.step,
-          { [scss.success]: approvalsStatus === '審核完成' },
-          { [scss.notSuccess]: approvalsStatus === '審核中' }
-        )}
-      >
-        <div className={classNames(scss.spot, scss.success)} />
-        <span>{name}</span>
-      </div>
-      <Image src={iconLongArrow} alt="to" />
-      <div
-        className={classNames(
-          scss.step,
-          { [scss.success]: approvalsStatus === '審核完成' },
-          { [scss.notSuccess]: approvalsStatus === '審核中' }
-        )}
-      >
-        <div className={classNames(scss.spot, scss.success)} />
-        <span>{name}</span>
-      </div>
-    </div>
-  );
-};
