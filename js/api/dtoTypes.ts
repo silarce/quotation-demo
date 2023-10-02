@@ -943,6 +943,8 @@ export type TquotationContentDto = {
   deliveryDate: string;
   /**付款方式 */
   paymentMethods: TpaymentMethodDto[];
+  toSalesAt: string | null;
+  toSupervisorAt: string | null;
 
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];

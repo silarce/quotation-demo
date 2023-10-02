@@ -138,6 +138,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   const lastestContentId = quotationData?.latestContent.id;
+  const latestContent = quotationData?.latestContent;
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -538,10 +539,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let isSupervisor = false;
   let isManager = false;
 
-  const reviewSalesEmployeeId = quotationData?.latestContent?.reviewSalesEmployee?.id;
-  const reviewWorkDirectorEmployeeId = quotationData?.latestContent?.reviewWorkDirectorEmployee?.id;
-  const reviewSupervisorEmployeeId = quotationData?.latestContent?.reviewSupervisorEmployee?.id;
-  const reviewManagerEmployeeId = quotationData?.latestContent?.reviewManagerEmployee?.id;
+  const reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
+  const reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
+  const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
+  const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
   if (userId) {
     if (userId === reviewSalesEmployeeId) {
@@ -732,7 +733,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經理',
       inputProps: {
         props: {
-          value: (watch('managerEmployee')?.chName || watch('managerEmployee')?.enName) ?? '',
+          // value: (watch('managerEmployee')?.chName || watch('managerEmployee')?.enName) ?? '',
+          value: (latestContent?.reviewManagerEmployee?.chName || latestContent?.reviewManagerEmployee?.enName) ?? '',
           placeholder: '尚未選擇',
           disabled: true,
           // onClick: () => {
@@ -747,7 +749,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       inputProps: {
         props: {
           // value: watch('supervisorEmployee')?.chName ?? '',
-          value: '',
+          value:
+            (latestContent?.reviewWorkDirectorEmployee?.chName || latestContent?.reviewWorkDirectorEmployee?.enName) ??
+            '',
           placeholder: '尚未選擇',
           disabled: true,
         },
@@ -757,7 +761,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '主管',
       inputProps: {
         props: {
-          value: (watch('supervisorEmployee')?.chName || watch('supervisorEmployee')?.enName) ?? '',
+          // value: (watch('supervisorEmployee')?.chName || watch('supervisorEmployee')?.enName) ?? '',
+          value:
+            (latestContent?.reviewSupervisorEmployee?.chName || latestContent?.reviewSupervisorEmployee?.enName) ?? '',
           placeholder: '尚未選擇',
           disabled: true,
         },
@@ -767,7 +773,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經辦',
       inputProps: {
         props: {
-          value: watch('agentEmployee')?.chName ?? '',
+          // value: watch('agentEmployee')?.chName ?? '',
+          value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
           disabled: true,
         },
       },
