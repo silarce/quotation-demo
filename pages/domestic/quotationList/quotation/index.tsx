@@ -31,7 +31,7 @@ import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quo
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
+
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
@@ -42,6 +42,7 @@ import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/emp
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -131,13 +132,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
-  const [revieweFormShow, setReviewFormShow] = useState(false);
+  const [reviewFormShow, setReviewFormShow] = useState(false);
+  const [reviewModalShow, setReviewModalShow] = useState(false);
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   const lastestContentId = quotationData?.latestContent.id;
   // -----------------------------------------------------
-
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -524,6 +525,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ----------------------------------------------------------------
 
   const [reviewSales, setReviewSales] = useState<TemployeeDto>();
+  const [workDirector, setWorkDirector] = useState<TemployeeDto>();
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
@@ -531,11 +533,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
+  let isSales = false;
+  let isWorkDirector = false;
+  let isSupervisor = false;
+  let isManager = false;
+
   const reviewSalesEmployeeId = quotationData?.latestContent?.reviewSalesEmployee?.id;
+  const reviewWorkDirectorEmployeeId = quotationData?.latestContent?.reviewWorkDirectorEmployee?.id;
   const reviewSupervisorEmployeeId = quotationData?.latestContent?.reviewSupervisorEmployee?.id;
+  const reviewManagerEmployeeId = quotationData?.latestContent?.reviewManagerEmployee?.id;
 
   if (userId) {
-    if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
+    if (userId === reviewSalesEmployeeId) {
+      isSales = true;
+      isReviewer = true;
+    }
+
+    if (userId === reviewWorkDirectorEmployeeId) {
+      isWorkDirector = true;
+      isReviewer = true;
+    }
+
+    if (userId === reviewSupervisorEmployeeId) {
+      isSupervisor = true;
+      isReviewer = true;
+    }
+
+    if (userId === reviewManagerEmployeeId) {
+      isManager = true;
       isReviewer = true;
     }
   }
@@ -612,10 +637,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------
 
   const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
-    'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor'
+    'manager' | 'supervisor' | 'reviewSales' | 'workDirector' | 'reviewSupervisor'
   >();
 
-  const openEmpSel = (v: 'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor') => {
+  const openEmpSel = (v: 'manager' | 'supervisor' | 'reviewSales' | 'workDirector' | 'reviewSupervisor') => {
     setEmpSelConfirmKey(v);
     setEmployeeSelectorShow(true);
   };
@@ -657,6 +682,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setReviewSales(v[0]);
           onEmpSelCancel();
           setTimeout(() => {
+            openEmpSel('workDirector');
+          }, 300);
+        },
+      };
+    }
+
+    if (empSelConfirmKey === 'workDirector') {
+      return {
+        label: '請選擇工務主管',
+        tip: '可不選，直接按確定',
+        onCancel: onEmpSelCancel,
+        onConfirm: (v: TemployeeDto[]) => {
+          setWorkDirector(v[0]);
+          onEmpSelCancel();
+          setTimeout(() => {
             openEmpSel('reviewSupervisor');
           }, 300);
         },
@@ -673,6 +713,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           onEmpSelCancel();
           reqSetReviewer({
             reviewSales,
+            workDirector,
             reviewSupervisor: v[0],
           });
         },
@@ -833,7 +874,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   onClick: () => setShowPdf_part(true),
     // },
 
-    (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
+    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
+    (!!isReviewer || null) && {
+      type: 'myButton',
+      label: '審核',
+      onClick: () => setReviewModalShow(true),
+    },
     (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
     { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
@@ -986,22 +1032,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------
   const reqSetReviewer = async ({
     reviewSales,
+    workDirector,
     reviewSupervisor,
   }: {
     reviewSales: TemployeeDto | undefined;
     reviewSupervisor: TemployeeDto | undefined;
+    workDirector: TemployeeDto | undefined;
   }) => {
     if (!quotationId) {
       return;
     }
 
     const reviewSalesEmployeeId = reviewSales?.id || null;
+    const reviewWorkDirectorEmployeeId = workDirector?.id || null;
     const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
 
     try {
       setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
+        reviewWorkDirectorEmployeeId,
         reviewSupervisorEmployeeId,
       });
       await update();
@@ -1015,17 +1065,31 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // 現在只有admin可以呼叫這系列的api，所以無法測試
-  const reqReview = async () => {
-    if (!quotationId) {
+  const reqReview = async (isPass: boolean) => {
+    if (!quotationId || !isReviewer) {
       return;
     }
 
+    const body = {
+      reviewSalesEmployeeId: isSales ? userId : null,
+      reviewSupervisorEmployeeId: isWorkDirector ? userId : null,
+      reviewWorkDirectorEmployeeId: isSupervisor ? userId : null,
+      reviewManagerEmployeeId: isManager ? userId : null,
+      reviewResult: isPass,
+    };
+
     try {
       setIsLoading(true);
-      await apiQuotationReview(quotationId);
+
+      try {
+        await apiQuotationReview({ id: quotationId, body });
+      } catch (error) {
+        myAlert.err({ title: '審核發生錯誤' });
+        console.log(error);
+      }
+
       await update();
     } catch (error) {
-      myAlert.err({ title: '審核失敗' });
     } finally {
       setIsLoading(false);
     }
@@ -1215,12 +1279,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
         selLimit={1}
       />
       <ContractReviewForm
-        showModal={revieweFormShow}
+        showModal={reviewFormShow}
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
+      />
+      <ThreeButtonModal
+        visible={reviewModalShow}
+        text={'是否通過審核?'}
+        onCancel={() => setReviewModalShow(false)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reqReview(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reqReview(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setReviewModalShow(false),
+          },
+        ]}
       />
     </div>
   );

@@ -914,9 +914,12 @@ export type TquotationContentDto = {
   //審核相關
   reviewSalesEmployee: TemployeeDto | null;
   salesReviewedAt: string | null;
+  reviewWorkDirectorEmployee: TemployeeDto | null;
+  workDirectorReviewedAt: string | null;
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
-  //
+  reviewManagerEmployee: TemployeeDto | null;
+  managerReviewedAt: string | null;
   /**備註 */
   annotations: string[] | null;
   /**報價範圍 */
@@ -1419,4 +1422,18 @@ export type TcontractReviewForm = {
   debitItem: string;
   // 合約審核表審核主管(工務部主管)
   workDirectorId: string;
+};
+
+export type TreviewQuotationContentDto = {
+  reviewSalesEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewWorkDirectorEmployeeId?: string | null;
+  reviewManagerEmployeeId?: string | null;
+  reviewResult: boolean;
+};
+
+export type TsubmitReviewQotuationContentDto = {
+  reviewSalesEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewWorkDirectorEmployeeId?: string | null;
 };
