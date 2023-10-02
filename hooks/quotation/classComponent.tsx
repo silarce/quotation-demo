@@ -916,7 +916,7 @@ const confomtTree = {
 type Tkit = {
   typeName: string;
   // type是api要收的東西
-  type: 'slatType' | 'bottomBar' | 'guideRail' | 'sidePlateType' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
+  type: 'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
   creDesc: (classCom: Class_component) => string;
   options: Toption[];
   hiddenKeyArr: string[];
@@ -926,7 +926,7 @@ type Tkit = {
 const comLookUp: { [key in TcomponentKey]: Tkit } = {
   slat: {
     typeName: '捲門片',
-    type: 'slatType',
+    type: 'slat',
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
@@ -964,7 +964,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
   },
   sidePlate: {
     typeName: '支板',
-    type: 'sidePlateType',
+    type: 'sidePlate',
     creDesc: creDesc_sidePlates,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -1009,10 +1009,10 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
 };
 
 const comTypeLookUp = {
-  slatType: 'slat',
+  slat: 'slat',
   bottomBar: 'bottomBar',
   guideRail: 'guideRail',
-  sidePlateType: 'sidePlate',
+  sidePlate: 'sidePlate',
   roller: 'roller',
   motor: 'motor',
   motorAccessories: 'motorAccessories',

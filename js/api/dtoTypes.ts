@@ -780,11 +780,11 @@ export type TquotationProductComponentsDto = {
   createdAt: string;
   updatedAt: string;
   type:
-    | 'slatType'
+    | 'slat'
     | 'bottomBar'
     //
     | 'guideRail'
-    | 'sidePlateType'
+    | 'sidePlate'
     | 'roller'
     | 'motor'
     | 'motorAccessories'
