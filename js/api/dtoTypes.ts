@@ -960,6 +960,7 @@ export type TquotationDto = {
   quotationNumber: string;
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
+  attachedToContract: TquotationContentDto & { verifyForm: TquotationVerifyFormDto };
 };
 
 export type TcreateQuotationProductDto = {
@@ -1401,7 +1402,41 @@ export type TpaymentRatioDto = {
   note: string;
 };
 
-export type TcontractReviewForm = {
+export type TquotationVerifyFormDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  //  請款日期
+  askForPaymentDate: string;
+  //  放款日期
+  disbursementDate: string;
+  //  請款比例
+  paymentRatio: TpaymentRatioDto[];
+  //  合理放款票期
+  paymentTenor: string;
+  //  履約保證票
+  performanceBond: boolean;
+  //  可否請款訂金
+  depositPayment: boolean;
+  //  保固期(年)
+  warrantyPeriod: number;
+  //  備註
+  note: string;
+  //  保固金或保固票
+  warrantyPayment: boolean;
+  //  防火證明
+  fireproofCertificate: boolean;
+  //  保固書
+  warranty: boolean;
+  //  是否需配合工地試車
+  testDrive: boolean;
+  //  扣款項目、比例、金額
+  debitItem: string;
+  // 合約審核表審核主管(工務部主管)
+  workDirectorId: string;
+};
+
+export type TcreateQuotationVerifyFormDto = {
   //  請款日期
   askForPaymentDate: string;
   //  放款日期

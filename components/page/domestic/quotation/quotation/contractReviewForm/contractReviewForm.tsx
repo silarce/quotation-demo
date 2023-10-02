@@ -22,7 +22,7 @@ import { apiSubmitContracting } from 'js/api/api_quotation';
 import scss from './contractReviewForm.module.scss';
 
 // type
-import { TpaymentRatioDto, TcontractReviewForm } from 'js/api/dtoTypes';
+import { TpaymentRatioDto, TcreateQuotationVerifyFormDto } from 'js/api/dtoTypes';
 
 // ============================================================================
 export default function ContractReviewForm({
@@ -47,7 +47,8 @@ export default function ContractReviewForm({
   });
 
   // const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
-  const { register, control, reset, watch, setValue } = useForm<Omit<TcontractReviewForm, 'TpaymentRatioDto'>>();
+  const { register, control, reset, watch, setValue } =
+    useForm<Omit<TcreateQuotationVerifyFormDto, 'TpaymentRatioDto'>>();
 
   // ----------------------------------------------------------------------------
   // 被選的employee
@@ -119,7 +120,7 @@ export default function ContractReviewForm({
 
     const preBody = watch();
 
-    const body: TcontractReviewForm = {
+    const body: TcreateQuotationVerifyFormDto = {
       // ...preBody,
       paymentRatio: Object.values(payMethodList).map((item) => item.body),
       workDirectorId: selEmployeeArr[0].id,
