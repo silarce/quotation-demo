@@ -14,6 +14,7 @@ import type {
   TcreateQuotationVerifyFormDto,
   TreviewQuotationContentDto,
   TsubmitReviewQotuationContentDto,
+  TquotationContractDto,
 } from './dtoTypes';
 
 export type {
@@ -125,32 +126,36 @@ export const useGetQuotation_id = (id: string | undefined) => {
   };
 };
 
-// ==================================================================
+// ================================================================
+type TgetContracts = {
+  data: TquotationContractDto[];
+  meta: TpageMetaDto;
+};
+
 export const apiGetContract = async (params?: Tparams) => {
   const api = '/quotation/contracts';
 
   params = {
     populate: [
-      'contents',
-      'latestContent.customer',
-      'latestContent.agentEmployee',
-      'latestContent.reviewSalesEmployee',
-      'latestContent.reviewWorkDirectorEmployee',
-      'latestContent.reviewSupervisorEmployee',
-      'latestContent.products.quantity',
-      'latestContent.products.options',
+      'content.customer',
+      'content.agentEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.products.quantity',
+      'content.products.options',
     ],
     ...params,
   };
 
   return axi
-    .get<TgetQuotation>(api, { params })
+    .get<TgetContracts>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
 
 export const useGetContract = (customParams?: Tparams) => {
-  const [res, setRes] = useState<TgetQuotation>();
+  const [res, setRes] = useState<TgetContracts>();
 
   const update = async () => {
     const newRes = await apiGetContract(customParams);
@@ -170,34 +175,43 @@ export const useGetContract = (customParams?: Tparams) => {
 };
 
 export const apiGetContract_Id = async (contractId: string) => {
-  const api = `/quotation/contract/${contractId}`;
+  const api = `/quotation/contracts/${contractId}`;
 
   const params = {
     populate: [
-      'contents',
-      'latestContent.customer',
-      'latestContent.agentEmployee',
-      'latestContent.supervisorEmployee',
-      'latestContent.managerEmployee',
+      // 'contents',
+      'content.customer',
+      'content.agentEmployee',
+      'content.supervisorEmployee',
+      'content.managerEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.products.items.accessories',
+      'content.products.items.components',
+      'content.others',
 
-      'latestContent.reviewSalesEmployee',
-      'latestContent.reviewWorkDirectorEmployee',
-      'latestContent.reviewSupervisorEmployee',
-
-      'latestContent.products.items.accessories',
-      'latestContent.products.items.components',
-      'latestContent.others',
+      'rootContract.content.customer',
+      'rootContract.content.agentEmployee',
+      'rootContract.content.supervisorEmployee',
+      'rootContract.content.managerEmployee',
+      'rootContract.content.reviewSalesEmployee',
+      'rootContract.content.reviewWorkDirectorEmployee',
+      'rootContract.content.reviewSupervisorEmployee',
+      'rootContract.content.products.items.accessories',
+      'rootContract.content.products.items.components',
+      'rootContract.content.others',
     ],
   };
 
   return axi
-    .get<TquotationDto>(api, { params })
+    .get<TquotationContractDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
 
 export const useGetContract_id = (id: string | undefined) => {
-  const [res, setRes] = useState<TquotationDto>();
+  const [res, setRes] = useState<TquotationContractDto>();
 
   const update = async () => {
     if (!id) {

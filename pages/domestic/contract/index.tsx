@@ -124,18 +124,18 @@ export default function Contract() {
   });
 
   const contractList: Tcontract[] =
-    data?.map((item, index) => {
-      const lastestcontent = item.latestContent;
+    data?.map((item) => {
+      const content = item.content;
 
       return {
-        quotationId: lastestcontent.id,
-        clientName: lastestcontent.customer.name,
-        quotationName: lastestcontent.projectName,
-        discount: lastestcontent.discount,
-        priceTotal: String(lastestcontent.total),
-        contactPerson: lastestcontent.contactPerson,
-        contactPhone: lastestcontent.contactNumber,
-        attn: lastestcontent.agentEmployee.chName,
+        quotationId: item.id,
+        clientName: content.customer.name,
+        quotationName: content.projectName,
+        discount: item.discount,
+        priceTotal: String(item.total),
+        contactPerson: content.contactPerson,
+        contactPhone: content.contactNumber,
+        attn: content.agentEmployee.chName,
       };
     }) ?? [];
 
@@ -145,7 +145,7 @@ export default function Contract() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <ContractList contractList={contractList_old} />
+        <ContractList contractList={contractList} />
       </div>
     </div>
   );

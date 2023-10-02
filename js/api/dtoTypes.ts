@@ -1116,6 +1116,27 @@ export type TcreateQuotationContentDto = {
   productsOrder?: string[] | null; // 已棄用
 };
 
+export type TquotationContractDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  annotations: string[] | null;
+  quotationRanges: string[] | null;
+  discount: string;
+  subTotal: number;
+  salesTax: number;
+  total: number;
+  deliveryLocation: string;
+  deliveryDate: string | null; // date
+  paymentMethods: TpaymentMethodDto[];
+  verifyForm: TquotationVerifyFormDto;
+  quotation: TquotationDto;
+  content: TquotationContentDto;
+  rootContract: TquotationContractDto; // 源合約
+  attachedToContract: TquotationContractDto; // 上一份追加減合約
+  attachedContract: TquotationContractDto; // 下一份追加減合約
+};
+
 // ========================================================================
 // ========================================================================
 // ========================================================================

@@ -55,7 +55,7 @@ import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 // =============================================================
 // =============================================================
 
-import { useGetQuotation_id } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
@@ -88,7 +88,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data, update } = useGetQuotation_id(quotationId as string | undefined);
+  const { data, update } = useGetContract_id(quotationId as string | undefined);
+
+  console.log(data);
 
   useEffect(() => {
     update();
@@ -248,8 +250,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
   // =========================================================
-  const latestcontent = data?.latestContent;
-  const firstContent = (_.sortBy(data?.contents, 'createdAt') ?? [])[0];
+
+  const content = data?.content;
+  const rootContent = data?.rootContract.content;
 
   // latest
   const {
@@ -282,7 +285,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     addOthers,
     getOthersPostBodyArr,
   } = useProductList({
-    productArr: latestcontent?.products ?? [],
+    productArr: content?.products ?? [],
     others: [],
     resetTrigger: undefined,
   }); // latest
@@ -321,7 +324,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     addOthers: addOthers_first,
     getOthersPostBodyArr: getOthersPostBodyArr_first,
   } = useProductList({
-    productArr: firstContent?.products ?? [],
+    productArr: rootContent?.products ?? [],
     others: [],
     resetTrigger: undefined,
   }); // latest
@@ -359,7 +362,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 報價單基本資料 */}
-          <QuotationProfile profile={latestcontent} disabled={true} onProfileChange={() => {}} />
+          <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
 
           {/* switch01 */}
           <div className={style.switchBar}>
