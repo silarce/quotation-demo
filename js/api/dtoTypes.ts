@@ -792,7 +792,10 @@ export type TquotationProductComponentsDto = {
   number: string;
   componentId: string;
   rawData: string;
-  bom: string;
+  /**
+   從TdoorBomDto_Component取得的bom要直接送進來這個bom
+   */
+  bom: any; // 前端不會直接用到，先直接設object
   material: string;
   materialSurface: string | null | undefined;
   isPainted: boolean;
@@ -1340,6 +1343,7 @@ export type TgenerateDoorProductBomDto_DoorSpec = {
   bearingType: string;
   gearNumber: string;
   chains: number;
+  fullWidth: number;
 };
 
 export type TgenerateDoorProductBomDto = {
@@ -1357,6 +1361,8 @@ export type TgenerateDoorProductBomDto = {
 export type TdoorBomDto_Component = {
   id: string;
   number: string;
+  bom: object; // 前端不會直接用到，先直接設object
+  price: number;
 };
 
 export type TdoorProductBomDto = {

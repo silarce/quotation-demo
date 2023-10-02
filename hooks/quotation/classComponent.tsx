@@ -205,10 +205,10 @@ class Class_component {
   get price() {
     return this._com.price;
   }
-  // set price(v) {
-  //   this._data.price = v;
-  //   this.reRender();
-  // }
+  set price(v) {
+    this._com.price = v;
+    this.reRender();
+  }
 
   get name() {
     return this._com.name;

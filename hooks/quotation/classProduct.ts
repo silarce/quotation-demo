@@ -514,6 +514,9 @@ class Class_product {
       return;
     }
 
+    const fullWidth =
+      Number(this.length) || Number(this.width) + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
+
     const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
       modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
       weight: this.weight ?? -1,
@@ -530,6 +533,8 @@ class Class_product {
 
       gearNumber: comList.motor?.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
+
+      fullWidth,
     };
 
     const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
@@ -570,6 +575,8 @@ class Class_product {
         const item = res[key];
         comList[key].codeNumber = item.number;
         comList[key].componentId = item.id;
+        comList[key].price = item.price;
+        comList[key].calcAllPrice();
       });
     }
   } // reqProdGenerateDoorProductBom
@@ -706,17 +713,22 @@ class Class_product {
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
     // TODO get /products/door/available-components取得的金額不是正確的金額
     // 正確的金額之後會補在 post /products/door/generate-door-product-bom
+    const dataList = {
+      slat: slat || creEmptyCom(),
+      bottomBar: bottomBar || creEmptyCom(),
+      guideRail: guideRail || creEmptyCom(),
+      motor: motor || creEmptyCom(),
+      sidePlate: sidePlate || creEmptyCom(),
+      roller: roller || creEmptyCom(),
+      motorAccessories: motorAccessories || creEmptyCom(),
+      headBox: headBox || creEmptyCom(),
+    };
+    Object.values(dataList).forEach((item) => {
+      item.price = 0;
+    });
+
     this.creComList({
-      dataList: {
-        slat: slat || creEmptyCom(),
-        bottomBar: bottomBar || creEmptyCom(),
-        guideRail: guideRail || creEmptyCom(),
-        motor: motor || creEmptyCom(),
-        sidePlate: sidePlate || creEmptyCom(),
-        roller: roller || creEmptyCom(),
-        motorAccessories: motorAccessories || creEmptyCom(),
-        headBox: headBox || creEmptyCom(),
-      },
+      dataList,
     });
     // this.creComList({
     //   slat: slat || creEmptyCom(),
