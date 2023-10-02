@@ -1380,29 +1380,25 @@ export type TdoorAccessoryDto = {
 // =========================================================================
 
 export type TpaymentRatioDto = {
-  // @ApiProperty({ description: '階段' })
-  // @IsString()
+  // '階段'
   level: string;
-  // @ApiProperty({ example: '0.35', description: '比例(0.0 - 1.0)' })
-  // @IsNumberString()
-  paymentRatio: `${number}`;
-  // @ApiProperty({ description: '金額' })
-  // @IsNumberString()
+  // example: '0.35', description: '比例(0.0 - 1.0)'
+  paymentRatio: string;
+  // 金額
   price: string;
-  // @ApiProperty({ description: '備註' })
-  // @IsString()
+  // 備註
   note: string;
 };
 
 export type TcontractReviewForm = {
   //  請款日期
-  askForPaymentDate: Date;
+  askForPaymentDate: string;
   //  放款日期
-  disbursementDate: Date;
+  disbursementDate: string;
   //  請款比例
   paymentRatio: TpaymentRatioDto[];
   //  合理放款票期
-  paymentTenor: Date;
+  paymentTenor: string;
   //  履約保證票
   performanceBond: boolean;
   //  可否請款訂金
@@ -1421,4 +1417,6 @@ export type TcontractReviewForm = {
   testDrive: boolean;
   //  扣款項目、比例、金額
   debitItem: string;
+  // 合約審核表審核主管(工務部主管)
+  workDirectorId: string;
 };

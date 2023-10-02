@@ -9,19 +9,20 @@ import { useForm, useFormState } from 'react-hook-form';
 import { Modal } from 'antd';
 import { Radio } from 'antd';
 // gear
-// import InputSel from 'components/global/gear/inputAndSel_v2/inputSel.tsx';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { Tparams, TemployeeDto, useEmployee_infinite } from 'js/api/api_employee';
+import { apiSubmitContracting } from 'js/api/api_quotation';
 
 // css
 import scss from './contractReviewForm.module.scss';
 
 // type
-import { TcontractReviewForm } from 'js/api/dtoTypes';
+import { TpaymentRatioDto, TcontractReviewForm } from 'js/api/dtoTypes';
 
 // ============================================================================
 export default function ContractReviewForm({
@@ -30,12 +31,14 @@ export default function ContractReviewForm({
   contractIdNumber,
   contractName,
   contractPrice,
+  lastestContentId,
 }: {
   showModal: boolean;
   close: () => void;
   contractIdNumber: string;
   contractName: string;
   contractPrice: number;
+  lastestContentId: string | undefined;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -43,7 +46,8 @@ export default function ContractReviewForm({
     contractPrice,
   });
 
-  const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
+  // const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
+  const { register, control, reset, watch, setValue } = useForm<Omit<TcontractReviewForm, 'TpaymentRatioDto'>>();
 
   // ----------------------------------------------------------------------------
   // 被選的employee
@@ -72,6 +76,7 @@ export default function ContractReviewForm({
       return;
     }
 
+    reset();
     resetMethodList();
     resetEmp();
 
@@ -82,6 +87,9 @@ export default function ContractReviewForm({
   const onClick = (newEmp: TemployeeDto) => {
     const newArr = [...selEmployeeArr];
 
+    newArr[0] = newEmp;
+    setSelEmployeeArr(newArr);
+
     // if (selLimit === 1) {
     //   newArr[0] = newEmp;
     //   setSelEmployeeArr(newArr);
@@ -89,29 +97,60 @@ export default function ContractReviewForm({
     //   return;
     // }
 
-    const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id);
+    // const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id);
 
-    if (theIndex > -1) {
-      newArr.splice(theIndex, 1);
-    } else {
-      newArr.push(newEmp);
-    }
+    // if (theIndex > -1) {
+    //   newArr.splice(theIndex, 1);
+    // } else {
+    //   newArr.push(newEmp);
+    // }
 
-    setSelEmployeeArr(newArr);
+    // setSelEmployeeArr(newArr);
   };
 
-  const onConfirm = () => {
-    if (!selEmployeeArr) {
+  const onConfirm = async () => {
+    if (!lastestContentId) {
+      return;
+    }
+
+    if (!selEmployeeArr[0]) {
       return myAlert.info({ title: "'請選擇人員'" });
     }
 
+    const preBody = watch();
+
+    const body: TcontractReviewForm = {
+      // ...preBody,
+      paymentRatio: Object.values(payMethodList).map((item) => item.body),
+      workDirectorId: selEmployeeArr[0].id,
+      //
+      askForPaymentDate: preBody.askForPaymentDate,
+      disbursementDate: preBody.disbursementDate,
+      paymentTenor: preBody.paymentTenor,
+      performanceBond: preBody.performanceBond,
+      depositPayment: preBody.depositPayment,
+      warrantyPeriod: preBody.warrantyPeriod,
+      note: preBody.note,
+      warrantyPayment: preBody.warrantyPayment,
+      fireproofCertificate: preBody.fireproofCertificate,
+      warranty: preBody.warranty,
+      testDrive: preBody.testDrive,
+      debitItem: preBody.debitItem,
+    };
+
+    const haveEmpty = !_.isEmpty(body);
+
+    if (haveEmpty) {
+      return myAlert.warning({ title: '請填寫所有欄位' });
+    }
+
+    try {
+      await apiSubmitContracting({ contentId: lastestContentId, body });
+    } catch (error) {
+      myAlert.err({ title: '送審失敗' });
+    }
+
     close();
-
-    // onConfirm(selEmployeeArr);
-
-    // if (isCancelOnConfirm) {
-    //   theOnCancel();
-    // }
   };
 
   const onCancel = () => {
@@ -147,16 +186,25 @@ export default function ContractReviewForm({
           <div>1</div>
           <div>
             <span>註明請款日</span>
-            <InputBox
-              boxStyle={{ width: '100px' }}
-              inputAttr={{ ...register('askForPaymentDate'), className: 'text-center' }}
+            <InputSel
+              className={scss.datePicker}
+              datePickerProps={{
+                props: {
+                  onChange: (md) => {
+                    setValue('askForPaymentDate', md?.toISOString() ?? '');
+                  },
+                },
+              }}
             />
             <span>，放款日</span>
-            <InputBox
-              boxStyle={{ width: '100px' }}
-              inputAttr={{
-                ...register('disbursementDate'),
-                className: 'text-center',
+            <InputSel
+              className={scss.datePicker}
+              datePickerProps={{
+                props: {
+                  onChange: (md) => {
+                    setValue('disbursementDate', md?.toISOString() ?? '');
+                  },
+                },
               }}
             />
           </div>
@@ -646,10 +694,10 @@ class Class_payMethod {
     this.reRender();
   }
 
-  get body() {
+  get body(): TpaymentRatioDto {
     return {
-      title: this.title,
-      percent: this.percent,
+      level: this.title,
+      paymentRatio: this.percent,
       price: this.price,
       note: this.note,
     };

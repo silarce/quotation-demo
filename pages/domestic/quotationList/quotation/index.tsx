@@ -135,7 +135,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
-  const lasttestContentId = quotationData?.latestContent.id;
+  const lastestContentId = quotationData?.latestContent.id;
   // -----------------------------------------------------
 
   // -----------------------------------------------------
@@ -143,7 +143,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
 
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lasttestContentId);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lastestContentId);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -1220,6 +1220,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
+        lastestContentId={lastestContentId}
       />
     </div>
   );

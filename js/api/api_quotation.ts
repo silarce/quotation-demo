@@ -11,6 +11,7 @@ import type {
   TquotationDto,
   TcreateQuotationContentDto,
   TfileDto,
+  TcontractReviewForm,
 } from './dtoTypes';
 
 export type {
@@ -19,6 +20,7 @@ export type {
   TquotationContentDto,
   TquotationDto,
   TcreateQuotationContentDto,
+  TcontractReviewForm,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -224,3 +226,12 @@ export const apiDelQuotation_id_attachments = (id: string, fileId: string) => {
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+export function apiSubmitContracting({ contentId, body }: { contentId: string; body: TcontractReviewForm }) {
+  const api = `/quotation/${contentId}/submit-contracting`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+}
