@@ -43,6 +43,8 @@ export default function Budget() {
     $and: {
       'latestContent.reviewSalesEmployee': { $null: true },
       'latestContent.reviewSupervisorEmployee': { $null: true },
+      'latestContent.reviewWorkDirectorEmployee': { $null: true },
+      'latestContent.reviewManagerEmployee': { $null: true },
     },
   };
 
@@ -51,14 +53,18 @@ export default function Budget() {
     $or: {
       'latestContent.reviewSalesEmployee': { $notNull: true },
       'latestContent.reviewSupervisorEmployee': { $notNull: true },
+      'latestContent.reviewWorkDirectorEmployee': { $notNull: true },
+      'latestContent.reviewManagerEmployee': { $notNull: true },
     },
   };
 
   // 已審核
   const reviewStatusFilter_reviewed = {
-    $or: {
+    $and: {
       'latestContent.salesReviewedAt': { $notNull: true },
       'latestContent.supervisorReviewedAt': { $notNull: true },
+      'latestContent.workDirectorReviewedAt': { $notNull: true },
+      'latestContent.managerReviewedAt': { $notNull: true },
     },
   };
 
