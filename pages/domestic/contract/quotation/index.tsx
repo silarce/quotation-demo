@@ -489,7 +489,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </>
           ) : (
             // 追加/追減項目
-            <QuotationProdChangingRecord subContract={data?.subContracts} />
+            <QuotationProdChangingRecord subContract={data?.subContracts} rootContractTotal={rootContent?.total ?? 0} />
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}

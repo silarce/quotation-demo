@@ -136,6 +136,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const lastestContentId = quotationData?.latestContent.id;
   const latestContent = quotationData?.latestContent;
   const status = latestContent?.status;
+  const verifyForm = latestContent?.verifyForm;
+
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -541,6 +543,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
   const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
+  const salesReviewedAt = latestContent?.salesReviewedAt;
+  const supervisorReviewedAt = latestContent?.supervisorReviewedAt;
+  const workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
+  const managerReviewedAt = latestContent?.managerReviewedAt;
+
   if (userId) {
     if (userId === reviewSalesEmployeeId) {
       isSales = true;
@@ -548,18 +555,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     if (userId === reviewWorkDirectorEmployeeId) {
-      isWorkDirector = true;
-      isReviewer = true;
+      if (salesReviewedAt) {
+        isWorkDirector = true;
+        isReviewer = true;
+      }
     }
 
     if (userId === reviewSupervisorEmployeeId) {
-      isSupervisor = true;
-      isReviewer = true;
+      if (salesReviewedAt && workDirectorReviewedAt) {
+        isSupervisor = true;
+        isReviewer = true;
+      }
     }
 
     if (userId === reviewManagerEmployeeId) {
-      isManager = true;
-      isReviewer = true;
+      if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+        isManager = true;
+        isReviewer = true;
+      }
     }
   }
 
@@ -651,18 +664,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const empSelLookup = {
     reviewSales: {
       label: '請選擇審核業務',
-      tip: '可不選，直接按確定',
+      // tip: '可不選，直接按確定',
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewSales(v[0]);
-        reqSetReviewer({
-          reviewSales: v[0],
-        });
+        setTimeout(() => {
+          openEmpSel('reviewSupervisor');
+        }, 300);
       },
     },
     reviewSupervisor: {
-      label: '請選擇審核經理',
-      tip: '可不選，直接按確定',
+      label: '請選擇業務主管',
+      // tip: '可不選，直接按確定',
       onCancel: onEmpSelCancel,
       onConfirm: async (v: TemployeeDto[]) => {
         setReviewSupervisor(v[0]);
@@ -673,15 +686,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
     reviewWorkDirector: {
-      label: '請選擇工務主管',
-      tip: '可不選，直接按確定',
+      label: '請選擇應收帳款',
+      // tip: '可不選，直接按確定',
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewWorkDirector(v[0]);
         onEmpSelCancel();
         reqSetReviewer({
-          reviewWorkDirector,
-          reviewSupervisor: v[0],
+          reviewSales,
+          reviewSupervisor,
+          reviewWorkDirector: v[0],
         });
       },
     },
@@ -710,9 +724,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
       },
     },
-    // TODO待api更新，要放入工務主管
     {
-      label: '工務主管',
+      label: '應收帳款',
       inputProps: {
         props: {
           value:
@@ -725,7 +738,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
 
     {
-      label: '主管',
+      label: '業務主管',
       inputProps: {
         props: {
           value:
@@ -1085,6 +1098,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } catch (error) {
     } finally {
       setIsLoading(false);
+      setReviewModalShow(false);
     }
   };
 
@@ -1264,13 +1278,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <EmployeeSelector
         showModal={employeeSelectorShow}
         label={empSelLookup[empSelConfirmKey]?.label}
-        tip={empSelLookup[empSelConfirmKey]?.tip}
+        // tip={empSelLookup[empSelConfirmKey]?.tip}
         onConfirm={(v) => {
           empSelLookup[empSelConfirmKey]?.onConfirm(v);
         }}
         onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
         selLimit={1}
       />
+      {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
         close={() => setReviewFormShow(false)}
@@ -1278,6 +1293,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         contractName={quotationData?.latestContent.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
+        verifyForm={verifyForm}
+        onConfirm={() => update()}
       />
       <ThreeButtonModal
         visible={reviewModalShow}

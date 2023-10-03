@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 
 // layer
@@ -13,6 +13,8 @@ import BudgeList from 'components/page/domestic/budget/budgetList';
 
 // css
 import scss from './index.module.scss';
+
+import { AppContext } from 'pages/_app';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -31,30 +33,42 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // ===========================================
 // ===========================================
 
-export default function Budget() {
+export default function QuotationList() {
   const router = useRouter();
   const { county, customerName, projectName, status, reviewStatus } = router.query as { [key: string]: string };
+
+  const { userInfo } = useContext(AppContext);
+  const userId = userInfo?.employee?.id;
+
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
-  // 未審核
 
+  /**
+grade14以上的帳號理論上只會有一個
+
+我要怎麼知道user的哪個身分?是經辦或是主管或其他的身分?
+ */
+
+  // 未審核
   const reviewStatusFilter_noReview = {
+    'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
     $and: {
-      'latestContent.reviewSalesEmployee': { $null: true },
-      'latestContent.reviewSupervisorEmployee': { $null: true },
-      'latestContent.reviewWorkDirectorEmployee': { $null: true },
-      'latestContent.reviewManagerEmployee': { $null: true },
+      'latestContent.reviewSalesEmployee.id': { $null: true },
+      'latestContent.reviewSupervisorEmployee.id': { $null: true },
+      'latestContent.reviewWorkDirectorEmployee.id': { $null: true },
+      'latestContent.reviewManagerEmployee.id': { $null: true },
     },
   };
 
   //審核中
   const reviewStatusFilter_inReview = {
     $or: {
-      'latestContent.reviewSalesEmployee': { $notNull: true },
-      'latestContent.reviewSupervisorEmployee': { $notNull: true },
-      'latestContent.reviewWorkDirectorEmployee': { $notNull: true },
-      'latestContent.reviewManagerEmployee': { $notNull: true },
+      'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
+      'latestContent.reviewSalesEmployee.id': { $eq: userId },
+      'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+      'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+      'latestContent.reviewManagerEmployee.id': { $eq: userId },
     },
   };
 
@@ -66,12 +80,19 @@ export default function Budget() {
       'latestContent.workDirectorReviewedAt': { $notNull: true },
       'latestContent.managerReviewedAt': { $notNull: true },
     },
+    $or: {
+      'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
+      'latestContent.reviewSalesEmployee.id': { $eq: userId },
+      'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+      'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+      'latestContent.reviewManagerEmployee.id': { $eq: userId },
+    },
   };
 
   const reviewStatusFilter =
-    reviewStatus === '審核中'
+    reviewStatus === 'Bidding'
       ? reviewStatusFilter_inReview
-      : reviewStatus === '審核完成'
+      : reviewStatus === 'Contracting'
       ? reviewStatusFilter_reviewed
       : reviewStatusFilter_noReview; // 待審核
 
@@ -80,16 +101,16 @@ export default function Budget() {
       'latestContent.status': {
         $eq: status,
       },
-      'latestContent.projectName': {
-        $contains: projectName || undefined,
+      'latestContent.county': {
+        $contains: county || undefined,
       },
       'latestContent.customer.name': {
         $contains: customerName || undefined,
       },
-      'latestContent.county': {
-        $contains: county || undefined,
+      'latestContent.projectName': {
+        $contains: projectName || undefined,
       },
-      // ...reviewStatusFilter,
+      ...reviewStatusFilter,
     },
   };
 
@@ -201,10 +222,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          reviewStatus: '待審核',
+          reviewStatus: 'Budget',
         },
       },
-      isActive: !query.reviewStatus || query.reviewStatus === '待審核',
+      isActive: !query.reviewStatus || query.reviewStatus === 'Budget',
     },
     {
       label: '審核中',
@@ -212,10 +233,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          reviewStatus: '審核中',
+          reviewStatus: 'Bidding',
         },
       },
-      isActive: query.reviewStatus === '審核中',
+      isActive: query.reviewStatus === 'Bidding',
     },
     {
       label: '審核完成',
@@ -223,10 +244,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          reviewStatus: '審核完成',
+          reviewStatus: 'Contracting',
         },
       },
-      isActive: query.reviewStatus === '審核完成',
+      isActive: query.reviewStatus === 'Contracting',
     },
   ];
 

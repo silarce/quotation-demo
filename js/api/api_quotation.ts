@@ -94,6 +94,7 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.products.items.accessories',
       'latestContent.products.items.components',
       'latestContent.others',
+      'latestContent.verifyForm',
     ],
   };
 
@@ -204,6 +205,7 @@ export const apiGetContract_Id = async (contractId: string) => {
 
       'attachedToContract',
       'attachedContract',
+      'subContracts.content.products',
     ],
   };
 
@@ -270,7 +272,7 @@ export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuot
   const api = `/quotation/${id}/review`;
 
   return axi
-    .patch<undefined>(api, { body })
+    .patch<undefined>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

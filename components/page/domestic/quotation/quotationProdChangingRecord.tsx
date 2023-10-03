@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import moment from 'moment';
+import _ from 'lodash';
+
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // antd
 import { Collapse } from 'antd';
@@ -35,24 +38,16 @@ import {
 
 const { Panel } = Collapse;
 
-// export default function QuotationProdChangingRecord({
-//   prodChangingRecord,
-// }: {
-//   prodChangingRecord: TchangeRecord | undefined;
-// }) {
-//   if (!prodChangingRecord) {
-//     return null;
-//   }
-
-//   return <TheQuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />;
-// }
-
 // =====================================================
 export default function TheQuotationProdChangingRecord({
   subContract,
+  rootContractTotal,
 }: {
   subContract: TquotationContractDto[] | undefined;
+  rootContractTotal: number;
 }) {
+  subContract = _.sortBy(subContract, 'version');
+
   // const { list, quotationId } = prodChangingRecord;
   // const quotationIdKeyList = Object.keys(list);
 
@@ -77,6 +72,7 @@ export default function TheQuotationProdChangingRecord({
           );
         })}
       </div>
+      {/*  */}
       <Collapse
         expandIcon={() => <></>}
         accordion={true}
@@ -84,28 +80,34 @@ export default function TheQuotationProdChangingRecord({
         className={style.collapse}
         onChange={changeActive}
       >
-        {subContract?.map((item, index) => {
+        {subContract?.map((item, index, arr) => {
           const content = item.content;
-          const prodArr = content.products;
+          const preContent = arr[index - 1];
 
-          const isActive = activeIndex === index;
+          const contentTotal = content?.total ?? 0;
+          const preContentTotal = index === 0 ? rootContractTotal : preContent?.content.total ?? 0;
+
+          // rootContractTotal
 
           const record = {
             quotationId: content.quotationNumber,
-            date: moment(content.quotationDate).format('yy-MM-DD'),
-            priceChange: '-10000',
+            date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
+            priceChange: `${preContentTotal - contentTotal}`,
             remark: content.editNotes,
             // product: prodArr,
           };
 
-          // return (
-          //   <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
-          //     <CollapseBody record={record} />
-          //   </Panel>
-          // );
+          const isActive = activeIndex === index;
+
+          // 不是直接把content.products送進去，要與前一份contract作比較
+          // 要找出多了什麼，少了什麼
+          // 我要怎麼比較?
+          const contentProdArr = content.products;
+          const preContentProdArr = preContent?.content.products;
+
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
-              <ProdRow prodArr={prodArr} />
+              <ProdRow prodArr={contentProdArr} />
             </Panel>
           );
         })}

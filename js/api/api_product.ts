@@ -144,6 +144,7 @@ export const apiGetProdAvailableComponents = async (params: TpacParams) => {
 
 // =======================================================================
 
+// FIXME 20231002 必須要再提供兩個參數bottomBarAngleIron bottomBarPlate
 export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomDto) => {
   const api = '/products/door/generate-door-product-bom';
 
