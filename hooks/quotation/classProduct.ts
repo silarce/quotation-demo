@@ -1677,19 +1677,24 @@ class Class_product {
     this.reRender();
   }
 
+  /**底座角鐵 */
   get bottomBarAngleIron() {
     return this._prodData.bottomBarAngleIron;
   }
   set bottomBarAngleIron(v) {
     this._prodData.bottomBarAngleIron = v;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
     this.reRender();
   }
-
+  /**底座版 */
   get bottomBarPlate() {
     return this._prodData.bottomBarPlate;
   }
   set bottomBarPlate(v) {
     this._prodData.bottomBarPlate = v;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
     this.reRender();
   }
 
