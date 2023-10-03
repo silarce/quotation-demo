@@ -530,11 +530,12 @@ class Class_product {
       isAntiTyphoon: this.typhoonProtection,
       rollerDiameter: this._doorGeneralSpecs.diameter,
       bearingType: this._doorGeneralSpecs.bearingName,
-
       gearNumber: comList.motor?.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
-
       fullWidth,
+
+      bottomBarAngleIron: this.bottomBarAngleIron,
+      bottomBarPlate: this.bottomBarPlate,
     };
 
     const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };

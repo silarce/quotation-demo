@@ -1370,6 +1370,9 @@ export type TgenerateDoorProductBomDto_DoorSpec = {
   gearNumber: string;
   chains: number;
   fullWidth: number;
+
+  bottomBarAngleIron: string;
+  bottomBarPlate: string;
 };
 
 export type TgenerateDoorProductBomDto = {
