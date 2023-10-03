@@ -20,6 +20,7 @@
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
+import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -416,9 +417,14 @@ class Class_product {
       return false;
     }
 
-    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+    let res: TdoorGeneralSpecsDto;
 
-    if (!res) {
+    try {
+      res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
       return false;
     }
 
@@ -495,23 +501,25 @@ class Class_product {
       return false;
     }
 
-    const res = await apiGetProdAvailableComponents({
-      modelName: this.doorType as TpacParams['modelName'],
-      weight: this.weight,
-      isAntiTyphoon: this.typhoonProtection,
-      rollerDiameter: rollerDiameter,
-    });
+    try {
+      const res = await apiGetProdAvailableComponents({
+        modelName: this.doorType as TpacParams['modelName'],
+        weight: this.weight,
+        isAntiTyphoon: this.typhoonProtection,
+        rollerDiameter: rollerDiameter,
+      });
+      this._availableComponents = res;
 
-    if (!res) {
+      this.retrieveOptions();
+      this.callRetrieveCreProdCom();
+
+      return true;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
+
       return false;
     }
-
-    this._availableComponents = res;
-
-    this.retrieveOptions();
-    this.callRetrieveCreProdCom();
-
-    return true;
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
@@ -596,7 +604,8 @@ class Class_product {
 
       return true;
     } catch (error) {
-      myAlert.err({ title: '取得材料配件失敗' });
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '取得bom資料失敗', content: err.response?.data.message });
     }
   } // reqProdGenerateDoorProductBom
 
