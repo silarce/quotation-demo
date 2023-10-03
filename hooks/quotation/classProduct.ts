@@ -1784,22 +1784,9 @@ type Tprod = {
   //
   bottomBarAngleIron: string;
   bottomBarPlate: string;
+  //
+  // 用來辨識至追加追減
 };
-
-// TODO 新增欄位
-/**
-底座角鐵 bottomBarAngleIron
-鍍鋅 50*50*4T
-高耐鍍鋅鋼板 50*50*3T
-不鏽鋼#304 50*50*3T
-不鏽鋼#316 50*50*3T
-
-底座板 bottomBarPlate
-鍍鋅 1.5T
-高耐鍍鋅鋼板 1.5T
-不鏽鋼#304 1.5T
-不鏽鋼#316 1.5T
- */
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
 type TprodKey = string;
@@ -1900,8 +1887,6 @@ const emptyProdOri = (): Tprod => {
 // ======================================================================
 // ======================================================================
 // ======================================================================
-
-// ===========================================================
 
 const checkIsSST = (material: string) => {
   return material.startsWith('SST#');

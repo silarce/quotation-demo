@@ -25,7 +25,7 @@ const prodCellConfig = prodCellConfigOri();
 
 // ===================================================================
 // ===================================================================
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
 import {
   TcreateQuotationContentOtherDto,
@@ -149,77 +149,6 @@ const PanelHeader = ({ record, isActive }: { record: TchangeListItem; isActive: 
 };
 
 // =======================================================
-// const CollapseBody = ({ record }: { record: TchangeListItem }) => {
-//   const { product } = record;
-
-//   const { keyList, cellConfig } = prodCellConfig;
-
-//   return (
-//     <div>
-//       <div className={style.panelBodyHeader}>
-//         <span></span>
-//         <span></span>
-//         {keyList.map((key, index) => {
-//           const { label, width } = cellConfig[key];
-//           const theStyle = { width };
-
-//           return (
-//             <div className={style.column} key={index} style={theStyle}>
-//               <span>{label}</span>
-//             </div>
-//           );
-//         })}
-//       </div>
-
-//       {/*  */}
-//       {product.map((item, index) => {
-//         const { action } = item;
-//         const classAction = action === 'add' ? style.add : action === 'remove' ? style.remove : '';
-
-//         return (
-//           <div key={index} className={style.panelBodyBody}>
-//             <span className={`${style.action} ${classAction}`}></span>
-//             <span>{index + 1}</span>
-//             {keyList.map((key, index) => {
-//               const { width, type } = cellConfig[key];
-//               const value = item[key];
-//               const theStyle = { width };
-
-//               if (type === 'checkbox') {
-//                 return (
-//                   <div className={`${style.column} text-center`} key={index} style={theStyle}>
-//                     <Checkbox01 stateValue={value as boolean} cursor="auto" />
-//                   </div>
-//                 );
-//               }
-
-//               if (type === 'selectWithIcon') {
-//                 const { label, icon } = value as {
-//                   label: string;
-//                   icon: string;
-//                 };
-
-//                 return (
-//                   <div className={style.column} key={index} style={theStyle}>
-//                     {/*  eslint-disable-next-line @next/next/no-img-element */}
-//                     <img src={icon} alt="" />
-//                     <span>{label}</span>
-//                   </div>
-//                 );
-//               }
-
-//               return (
-//                 <div className={style.column} key={index} style={theStyle}>
-//                   <span>{value as string}</span>
-//                 </div>
-//               );
-//             })}
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// };
 
 // =======================================================
 // =======================================================
@@ -306,6 +235,9 @@ const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) =
         changeProdKeyArr={changeProdKeyArr}
         addProd={() => {}}
         setTargetProd={() => {}}
+        panelBox="easyBox"
+        emptyBlockWidth="80px"
+        rowHeight={'h106'}
       />
     </div>
   );

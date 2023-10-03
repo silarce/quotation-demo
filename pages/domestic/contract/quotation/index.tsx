@@ -25,19 +25,11 @@ const { Panel } = Collapse;
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
-// hook
-
-import useProduct from 'components/page/domestic/quotation/hook/useProduct';
-
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
 
 // css
 import style from './quotation.module.scss';
-
-// fakeData type
-import { Tquotation, fakeQuotationObjListOri } from 'fakeDatabase/domestic/quotation/fakeQuotationList';
-import { fakeProdChangingRecordList } from 'fakeDatabase/domestic/quotation/fakeChangeProductRecord';
 
 // =============================================================
 // =============================================================
@@ -45,17 +37,20 @@ import { fakeProdChangingRecordList } from 'fakeDatabase/domestic/quotation/fake
 
 import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
 
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
-import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+// import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+// import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Table_prod from 'components/page/domestic/contract/table/table_prod';
+import Table_com from 'components/page/domestic/contract/table/table_component';
+import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
+import Table_others from 'components/page/domestic/contract/table/table_others';
+
 import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
-
-import { prodCellConfig } from 'hooks/quotation/prodCellConfig';
 
 import { useProductList } from 'hooks/quotation/useProduct';
 
@@ -109,15 +104,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  // =========================================================
-  // 追加追減項目
-  const prodChangingRecord = useMemo(() => {
-    if (typeof quotationId === 'string') {
-      return fakeProdChangingRecordList[quotationId];
-    }
-  }, [quotationId]);
-  // =========================================================
-
   const tagList: TtagList = [
     {
       label: `報價編號 ${quotationId}`,
@@ -132,18 +118,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '追加追減報價單',
       onClick: () => setSwitch02(() => true),
     },
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => setShowPdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出材料/配件',
-      img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
-    },
+    // TODO 要記得把這個功能再做出來
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出材料/配件',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf_part(true),
+    // },
     { type: 'myButton', label: '送審', onClick: () => alert('送審') },
     {
       type: 'myButton',
@@ -443,13 +430,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 setTargetProd={setTargetProdKey}
                 panelBox="easyBox"
                 emptyBlockWidth="80px"
+                rowHeight={'h106'}
               />
               {/* 原報價項目 */}
 
               {switch02 && <OldQuotationProduction rootContent={rootContent} />}
+              <br />
               <div className={style.redWrapper}>
                 {/* 材料配件設定 */}
-
                 <Table_com
                   disabled={true}
                   comList={targetProd?.comList}
@@ -460,6 +448,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 />
                 <hr />
                 {/* 選配設定 */}
+                <br />
                 <Table_accessories
                   disabled={true}
                   list={targetProd?.accessoriesList}
@@ -477,6 +466,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   panelBox="easyBox"
                   emptyBlockWidth="80px"
                 />
+                <br />
+                {/* 其他設定 */}
                 <Table_others
                   disabled={true}
                   list={othersList}
