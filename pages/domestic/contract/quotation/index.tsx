@@ -10,7 +10,7 @@ import QuotationProduction from 'components/page/domestic/quotation/quotationPro
 import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
 import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
 import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
-import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
+// import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
@@ -55,16 +55,25 @@ import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
 // =============================================================
 // =============================================================
 
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
 
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
+import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 
 import { prodCellConfig } from 'hooks/quotation/prodCellConfig';
 
 import { useProductList } from 'hooks/quotation/useProduct';
+
+import type { TquotationContentDto } from 'js/api/api_quotation';
+
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // =============================================================
 // =============================================================
@@ -90,8 +99,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { data, update } = useGetContract_id(quotationId as string | undefined);
 
-  console.log(data);
-
   useEffect(() => {
     update();
   }, [quotationId]);
@@ -103,57 +110,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // 是否可編輯
   const [allowEdit, setAllowEdit] = useState(quotationId === 'newQuotation' ? true : false);
-  // =========================================================
-  // =========================================================
-  // =========================================================
-  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
-
-  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
-  const fakeClientList = fakeApi_client.get();
-  const classSignature = classQuotation?.classSignature;
-  const signatureArr = [
-    {
-      label: '經理',
-      signature: classSignature?.manager ?? '',
-      onChange: (v: string) => {
-        if (classSignature) {
-          classSignature.manager = v;
-        }
-      },
-    },
-    {
-      label: '主管',
-      signature: classSignature?.director ?? '',
-      onChange: (v: string) => {
-        if (classSignature) {
-          classSignature.director = v;
-        }
-      },
-    },
-    {
-      label: '經辦',
-      signature: classSignature?.attn ?? '',
-      onChange: (v: string) => {
-        if (classSignature) {
-          classSignature.attn = v;
-        }
-      },
-    },
-  ];
-
-  const getFakeMemo = fakeApi_memo.get;
-  const getFakeQuotaRange = fakeApi_quoteRange.get;
-
-  useEffect(() => {
-    reNewClassQuotation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowEdit]);
-
-  // ======================================================
-  // ======================================================
-  // ======================================================
   const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
+
   // ======================================================
 
   // 合約項目 追加/追減項目的開關
@@ -165,8 +124,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [switch02, setSwitch02] = useState(false);
 
   // =========================================================
-  // 主產品資料
-  const prodState = useProduct(quotationData?.productList, !allowEdit);
 
   // =========================================================
   // 追加追減項目
@@ -287,47 +244,156 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useProductList({
     productArr: content?.products ?? [],
     others: [],
-    resetTrigger: undefined,
+    resetTrigger: content?.products,
   }); // latest
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
 
   // -----------------------------------------------------------------
-  const {
-    reRender: reRender_fist,
-    reset: reset_fist,
-    //
-    productList: productList_first,
-    prodCellConfig: prodCellConfig_first,
-    prodKeyArr: prodKeyArr_first,
-    prodVKeyArr: prodVKeyArr_first,
-    setProdVKeyArr: setProdVKeyArr_first,
-    addProd: addProd_first,
-    changeProdKeyArr: changeProdKeyArr_first,
-    //
-    subTotal: subTotal_first,
-    //
-    comKeyArr: comKeyArr_first,
-    comVKeyArr: comVKeyArr_first,
-    comCellConfig: comCellConfig_first,
-    changeComKeyArr: changeComKeyArr_first,
-    //
-    accessoriesKeyArr: accessoriesKeyArr_first,
-    changeAccessoriesKeyArr: changeAccessoriesKeyArr_first,
-    accessoriesCellConfig: accessoriesCellConfig_first,
-    //
-    othersKeyArr: othersKeyArr_first,
-    othersList: othersList_first,
-    othersCellConfig: othersCellConfig_first,
-    changeOthersKeyArr: changeOthersKeyArr_first,
-    addOthers: addOthers_first,
-    getOthersPostBodyArr: getOthersPostBodyArr_first,
-  } = useProductList({
-    productArr: rootContent?.products ?? [],
-    others: [],
-    resetTrigger: undefined,
-  }); // latest
+  const control_anno: TsummaryControl = {
+    stringArr: data?.annotations ?? [],
+    editString: (index, v) => {},
+    addString: (v: string) => {},
+    delString: (index: number) => {},
+    addStrArr: (vArr: string[]) => {},
+  };
+
+  const control_qr: TsummaryControl = {
+    stringArr: data?.quotationRanges ?? [],
+    editString: (index, v) => {},
+    addString: (v: string) => {},
+    delString: (index: number) => {},
+    addStrArr: (vArr: string[]) => {},
+  };
+
+  const payInfoControl: TpayInfoControl = {
+    payment: {
+      discountRate: {
+        inputAttr: {
+          disabled: true,
+          value: data?.discount ?? '',
+          onChange: (e) => {},
+        },
+      },
+      subTotal: {
+        inputAttr: {
+          disabled: true,
+          value: data?.subTotal ?? '',
+        },
+      },
+      salesTax: {
+        inputAttr: {
+          disabled: true,
+          value: data?.salesTax ?? '',
+        },
+      },
+      total: {
+        inputAttr: {
+          disabled: true,
+          value: data?.total ?? '',
+        },
+      },
+    },
+
+    delivery: {
+      deliveryLocation: {
+        value: data?.deliveryLocation ?? '',
+        onChange: (v) => {},
+      },
+      deliveryDate: {
+        value: data?.deliveryDate ?? '',
+        onChange: (v) => {},
+      },
+    },
+    paymentMethod: {
+      arr:
+        data?.paymentMethods.map((item, index) => {
+          const { milestone, totalPaymentRatio } = item;
+
+          return {
+            label: milestone,
+            value: totalPaymentRatio,
+            onChange: () => {},
+            delSelf: () => {},
+          };
+          //
+        }) ?? [],
+      addMethod: (v) => {},
+    },
+  };
+
+  const signatureArr = [
+    {
+      label: '總經理',
+      inputProps: {
+        props: {
+          value: content?.reviewManagerEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '工務主管',
+      inputProps: {
+        props: {
+          value: content?.reviewWorkDirectorEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '主管',
+      inputProps: {
+        props: {
+          value: content?.reviewSupervisorEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '業務',
+      inputProps: {
+        props: {
+          value: content?.reviewSalesEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '經辦',
+      inputProps: {
+        props: {
+          value: content?.agentEmployee?.chName ?? '',
+        },
+      },
+    },
+  ];
+
+  // 附件
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+
+  useEffect(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}/file/download/${item.id}`,
+        isNew: false,
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
+
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo: () => {},
+    toSetFileInfo: () => {},
+  };
 
   // -----------------------------------------------------------------
   // =========================================================
@@ -336,21 +402,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
   // if (quotationId !== "newQuotation" && !quotationData)
-  if (!classQuotation) {
-    return <NoQuotation quotationId={quotationId as string} />;
-  }
+  // if (!classQuotation) {
+  //   return <NoQuotation quotationId={quotationId as string} />;
+  // }
 
   // =========================================================
-  const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
-      return {
-        ...mp.allData,
-        part: mp.partArr.map((part) => part.allData),
-      };
-    });
 
-    return theArr;
-  })();
+  // TODO: 暫時先註解
+  // const quotationPdf_part_mainProductArr = (() => {
+  //   const theArr = classQuotation.mainProductArr.map((mp) => {
+  //     return {
+  //       ...mp.allData,
+  //       part: mp.partArr.map((part) => part.allData),
+  //     };
+  //   });
+
+  //   return theArr;
+  // })();
 
   // =========================================================
 
@@ -389,20 +457,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 changeProdKeyArr={changeProdKeyArr}
                 addProd={() => {}}
                 setTargetProd={setTargetProdKey}
+                panelBox="easyBox"
+                emptyBlockWidth="80px"
               />
               {/* 原報價項目 */}
               {/* {switch02 && <OldQuotationProduction classQuotation={classQuotation} />} */}
-              {switch02 && (
-                <Table_prod
-                  disabled={true}
-                  prodList={productList_first}
-                  prodCellConfig={prodCellConfig_first}
-                  prodKeyArr={prodKeyArr_first}
-                  changeProdKeyArr={changeProdKeyArr}
-                  addProd={() => {}}
-                  setTargetProd={setTargetProdKey}
-                />
-              )}
+              {switch02 && <OldQuotationProduction rootContent={rootContent} />}
               <div className={style.redWrapper}>
                 {/* 材料配件設定 */}
                 {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
@@ -430,11 +490,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
                     }
                   }}
                   doorModel={targetProd?.doorType}
-                  onSelectorConfirm={(arr) => {
-                    if (targetProd) {
-                      targetProd.addAcce(arr);
-                    }
-                  }}
+                  onSelectorConfirm={(arr) => {}}
+                  panelBox="easyBox"
+                  emptyBlockWidth="80px"
                 />
               </div>
             </>
@@ -446,64 +504,114 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
           {switch02 && <QuotationRecord prodChangingRecord={prodChangingRecord} />}
 
-          {/* 備註/報價範圍/付款資訊 */}
-          <QuotationTotal
-            classQuotation={classQuotation}
-            getFakeMemo={getFakeMemo}
-            getFakeQuotaRange={getFakeQuotaRange}
-            disabled={!allowEdit}
+          <Summary
+            disabled={true}
+            payInfoControl={payInfoControl}
+            control_anno={control_anno}
+            control_qr={control_qr}
+            appendixParams={appendixParams}
           />
+
           {/* 簽名 */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} /> */}
+          <QuotationSinature signatureArr={signatureArr} disabled={true} />
         </div>
       </div>
-      <QuotationPdf
+      {/* TODO 暫時先註解 */}
+      {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => {
           setShowPdf(false);
         }}
         classQuotation={classQuotation}
-      />
-
-      <QuotationPdf_part
+      /> */}
+      {/* TODO 暫時先註解 */}
+      {/* <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => {
           setShowPdf_part(false);
         }}
         mainProductArr={quotationPdf_part_mainProductArr}
         quotationId={classQuotation.quotationId}
-      />
+      /> */}
     </div>
   );
 }
 
 // ===============================================================
+// 應該用不到了
+// const NoQuotation = ({ quotationId }: { quotationId: string }) => {
+//   const router = useRouter();
 
-const NoQuotation = ({ quotationId }: { quotationId: string }) => {
-  const router = useRouter();
+//   const toBack = () => {
+//     router.back();
+//   };
 
-  const toBack = () => {
-    router.back();
-  };
-
-  return (
-    <div className={style.noQuotation}>
-      <span>沒有這個報價單ID</span>
-      <span>{quotationId}</span>
-      <button onClick={toBack}>回上一頁</button>
-    </div>
-  );
-};
+//   return (
+//     <div className={style.noQuotation}>
+//       <span>沒有這個報價單ID</span>
+//       <span>{quotationId}</span>
+//       <button onClick={toBack}>回上一頁</button>
+//     </div>
+//   );
+// };
 
 // =========================================================
 
 const OldQuotationProduction = ({
-  classQuotation,
+  // prodList,
+  // prodCellConfig,
+  // prodKeyArr,
+  // changeProdKeyArr,
+  // setTargetProd,
+  rootContent,
 }: {
-  classQuotation: Parameters<typeof QuotationProduction>[0]['classQuotation'];
+  // prodList: Parameters<typeof Table_prod>[0]['prodList'];
+  // prodCellConfig: Parameters<typeof Table_prod>[0]['prodCellConfig'];
+  // prodKeyArr: Parameters<typeof Table_prod>[0]['prodKeyArr'];
+  // changeProdKeyArr: Parameters<typeof Table_prod>[0]['changeProdKeyArr'];
+  // setTargetProd: Parameters<typeof Table_prod>[0]['setTargetProd'];
+  rootContent: TquotationContentDto | undefined;
 }) => {
   const [isActive, setIsActive] = useState(false);
   const panelSwitch = () => setIsActive(!isActive);
+
+  const {
+    reRender,
+    reset,
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
+    addProd,
+    changeProdKeyArr,
+    //
+    subTotal,
+    //
+    comKeyArr,
+    comVKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    //
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+  } = useProductList({
+    productArr: rootContent?.products ?? [],
+    others: [],
+    resetTrigger: rootContent?.products,
+  });
+
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
 
   return (
     <Collapse
@@ -513,10 +621,44 @@ const OldQuotationProduction = ({
       activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
     >
       <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
-        {/* <QuotationProduction
-          className={style.quotationProduction}
-          mainProductArr={productStates} /> */}
-        <QuotationProduction className={style.quotationProduction} classQuotation={classQuotation} disabled={true} />
+        <Table_prod
+          disabled={true}
+          prodList={productList}
+          prodCellConfig={prodCellConfig}
+          prodKeyArr={prodKeyArr}
+          changeProdKeyArr={changeProdKeyArr}
+          addProd={() => {}}
+          setTargetProd={setTargetProdKey}
+        />
+
+        {/* <Table_com
+          disabled={true}
+          comList={targetProd?.comList}
+          comCellConfig={comCellConfig}
+          comKeyArr={comKeyArr}
+          changeComKeyArr={changeComKeyArr}
+          defalutVKeyArr={comVKeyArr}
+        /> */}
+
+        {/* <Table_accessories
+          disabled={true}
+          list={targetProd?.accessoriesList}
+          cellConfig={accessoriesCellConfig}
+          keyArr={accessoriesKeyArr}
+          changeKeyArr={changeAccessoriesKeyArr}
+          defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+          onVKeyChange={(keyArr) => {
+            if (targetProd) {
+              targetProd.accessoriesVKeyArr = keyArr;
+            }
+          }}
+          doorModel={targetProd?.doorType}
+          onSelectorConfirm={(arr) => {
+            if (targetProd) {
+              targetProd.addAcce(arr);
+            }
+          }}
+        /> */}
       </Panel>
     </Collapse>
   );
@@ -538,3 +680,28 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 };
 
 // ======================================================================
+
+// const OldQuotationProduction = ({
+//   classQuotation,
+// }: {
+//   classQuotation: Parameters<typeof QuotationProduction>[0]['classQuotation'];
+// }) => {
+//   const [isActive, setIsActive] = useState(false);
+//   const panelSwitch = () => setIsActive(!isActive);
+
+//   return (
+//     <Collapse
+//       className={`${style.oldQuotationProduction}`}
+//       expandIcon={() => <></>}
+//       accordion={false}
+//       activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
+//     >
+//       <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
+//         {/* <QuotationProduction
+//           className={style.quotationProduction}
+//           mainProductArr={productStates} /> */}
+//         {/* <QuotationProduction className={style.quotationProduction} classQuotation={classQuotation} disabled={true} /> */}
+//       </Panel>
+//     </Collapse>
+//   );
+// };

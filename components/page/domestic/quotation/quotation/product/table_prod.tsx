@@ -24,6 +24,9 @@ export default function Table_prod({
   defalutVKeyArr,
   onVKeyChange,
   rowHeight,
+  //
+  panelBox,
+  emptyBlockWidth,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -35,6 +38,9 @@ export default function Table_prod({
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h106';
+  //
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  emptyBlockWidth?: string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -55,7 +61,7 @@ export default function Table_prod({
               cellConfigList={prodCellConfig}
               allowMove={allowMove}
               resetTrigger={prodKeyArr.length}
-              emptyBlockWidth="137px"
+              emptyBlockWidth={emptyBlockWidth || '137px'}
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as TprodKey[];
                 changeProdKeyArr(keyArr);
@@ -74,6 +80,7 @@ export default function Table_prod({
             // defalutVKeyArr={defalutVKeyArr}
             onVKeyChange={onVKeyChange}
             rowHeight={rowHeight}
+            panelBox={panelBox}
           />
 
           {!disabled && (

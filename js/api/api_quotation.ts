@@ -201,6 +201,9 @@ export const apiGetContract_Id = async (contractId: string) => {
       'rootContract.content.products.items.accessories',
       'rootContract.content.products.items.components',
       'rootContract.content.others',
+
+      'attachedToContract',
+      'attachedContract',
     ],
   };
 
