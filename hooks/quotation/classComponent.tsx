@@ -100,6 +100,10 @@ class Class_component {
       this.material = value;
     } else {
       this.material = 'SST#304';
+
+      if (this.options_surface) {
+        this.surface = this.options_surface[0].value;
+      }
     }
   };
 
@@ -374,6 +378,11 @@ class Class_component {
     }
 
     this._com.material = v;
+
+    if (!this.surface && this.options_surface) {
+      this.surface = this.options_surface[0].value;
+    }
+
     this.callReqGetCodeNumber();
     this.reRender();
   }
@@ -600,6 +609,7 @@ const comCellConfig: TcellConfig = {
       showBaseline: 'invisible',
       inputProps: {
         props: {
+          placeholder: '讀取中',
           disabled: true,
         },
       },
@@ -1019,6 +1029,7 @@ const comTypeLookUp = {
   headBox: 'headBox',
 } as const;
 
+/**用來確定指定的value是否存在options裡面 */
 const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {
   const option = options.find((option) => option.value === value);
 

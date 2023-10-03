@@ -352,6 +352,8 @@ class Class_product {
       unitPrice: this._prodData.unitPrice,
       totalPrice: this._prodData.totalPrice,
       discount: this._prodData.discount,
+      itemName: this._prodData.itemName,
+      quoteType: this._prodData.quoteType,
     };
 
     this._quantity = String(this._prodData.quantity);
@@ -480,6 +482,8 @@ class Class_product {
     }
 
     this._doorGeneralSpecs = res;
+
+    return true;
   } // calcGeneralSpec
 
   // ________________________
@@ -506,6 +510,8 @@ class Class_product {
 
     this.retrieveOptions();
     this.callRetrieveCreProdCom();
+
+    return true;
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
@@ -514,7 +520,7 @@ class Class_product {
     const comList = this.comList;
 
     if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
-      return;
+      return false;
     }
 
     const fullWidth =
@@ -547,7 +553,9 @@ class Class_product {
 
     Object.values(comList).forEach((item) => {
       if (!item) {
-        return (haveNull = true);
+        haveNull = true;
+
+        return false;
       }
 
       const key = item.key;
@@ -566,7 +574,7 @@ class Class_product {
     });
 
     if (haveNull) {
-      return;
+      return false;
     }
 
     const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
@@ -585,31 +593,40 @@ class Class_product {
           comList[key].calcAllPrice();
         });
       }
+
+      return true;
     } catch (error) {
       myAlert.err({ title: '取得材料配件失敗' });
     }
   } // reqProdGenerateDoorProductBom
 
   async reqChain() {
+    let res1: boolean | undefined;
+    let res2: boolean | undefined;
+    let res3: boolean | undefined;
+
     try {
       this.isLoading = true;
       this.reRender();
 
       if (this.shouldCall_cgs) {
-        await this.req_calcGeneralSpec();
+        res1 = await this.req_calcGeneralSpec();
       }
 
       if (this.shouldCall_cgs) {
-        await this.req_getProdAvailableComponents();
+        res2 = await this.req_getProdAvailableComponents();
       }
 
       if (this.shouldCall_pgpb) {
-        await this.reqProdGenerateDoorProductBom();
+        res3 = await this.reqProdGenerateDoorProductBom();
       }
     } catch (error) {
     } finally {
       this.isLoading = false;
-      this.takeDefaultDynaValue();
+
+      if (res1 || res2 || res3) {
+        this.takeDefaultDynaValue();
+      }
     }
 
     this.shouldCall_cgs = false;

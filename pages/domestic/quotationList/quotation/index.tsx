@@ -529,7 +529,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
-  const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
+  const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
@@ -762,7 +762,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經辦',
       inputProps: {
         props: {
-          value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+          // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+          value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
           disabled: true,
         },
       },
@@ -887,7 +888,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       },
     },
-    { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
+    // status
+    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
+    (() => {
+      if (status === 'Contracting') {
+        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+      } else {
+        return null;
+      }
+    })(),
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
