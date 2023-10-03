@@ -130,15 +130,15 @@ const useProductList = ({
       const prodData: Tprod = {
         ...prod,
         phase: 1,
-        voltage: String(prod.voltage),
-        motorSupport: prod.motorSupport,
-        doorTrackThick: String(prod.doorTrackThick),
-        rollUpBoxThick: String(prod.rollUpBoxThick),
+        voltage: String(prod.motorVoltage),
+        motorSupport: prod.hasMotorSupportStand,
+        doorTrackThick: String(prod.guideRailThickness),
+        rollUpBoxThick: String(prod.headBoxThickness),
         // 取得時是mm，要轉成m
-        width: String(Number(prod.width) / 1000),
-        length: String(Number(prod.length) / 1000),
+        width: String(Number(prod.WG) / 1000),
+        length: String(Number(prod.fullWidth) / 1000),
         height: String(Number(prod.height) / 1000),
-        boxB: String(Number(prod.width) / 1000),
+        boxB: String(Number(prod.WG) / 1000),
         boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
