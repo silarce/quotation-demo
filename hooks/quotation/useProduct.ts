@@ -10,9 +10,9 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // class
-import { Tprod, TprodKey, Class_product, prodkeyArrOri, prodCellConfig } from './classProduct';
+import { Class_product, Tprod, TprodKey, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
-import { Tothers, TothersKey, Class_other, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
+import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
 import { TaccessoriesKey, Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 
 // type
