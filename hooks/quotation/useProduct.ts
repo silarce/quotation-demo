@@ -129,7 +129,7 @@ const useProductList = ({
 
       const prodData: Tprod = {
         ...prod,
-        phase: 1,
+        phase: prod.motorPhase,
         voltage: String(prod.motorVoltage),
         motorSupport: prod.hasMotorSupportStand,
         doorTrackThick: String(prod.guideRailThickness),
@@ -146,6 +146,17 @@ const useProductList = ({
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
         accessories: prod.items?.[0].accessories ?? [],
         components: prod.items?.[0].components ?? [],
+        //
+
+        doorType: prod.doorModelName,
+        material: prod.materialName,
+        surface: prod.materialSurface,
+        close: prod.closingType,
+        doorTrack: prod.guideRail,
+        typhoonProtection: prod.isAntiTyphoon,
+        motor: prod.motorVendor,
+        doorTrackSilencerStrip: prod.hasSilencingStrip,
+        onePieceRollUpBox: prod.isIntegratedHeadBox,
       };
 
       list[key] = new Class_product({

@@ -65,6 +65,7 @@ import type {
   TquotationProductComponentsDto,
   TquotationProductDto,
   TdoorAccessoryDto,
+  TcreateQuotationProductDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -1704,23 +1705,36 @@ class Class_product {
       };
     });
 
-    return {
+    const body: TcreateQuotationProductDto & { id: string | undefined } = {
       ...this._prodData,
+      id: this._prodData.id,
+      doorModelName: this.doorType,
+      materialName: this.material,
+      materialSurface: this.surface,
+      guideRail: this.doorTrack,
+      motorVendor: this.motor,
+      guideRailThickness: Number(this.doorTrackThick),
+      hasSilencingStrip: this.doorTrackSilencerStrip,
+      isIntegratedHeadBox: this.onePieceRollUpBox,
+      isAntiTyphoon: this.typhoonProtection,
+      closingType: this.close,
+      motorPhase: Number(this.phase),
+
       // 送去後端要轉為要從m轉為mm
-      width: Number(this._prodData.width) * 1000,
-      length: Number(this._prodData.length) * 1000,
+      WG: Number(this._prodData.width) * 1000,
+      fullWidth: Number(this._prodData.length) * 1000,
       height: Number(this._prodData.height) * 1000,
       boxB: Number(this._prodData.boxB) * 1000,
       boxD: Number(this._prodData.boxD) * 1000,
       quantity: Number(this._prodData.quantity),
       //
-      rollUpBoxThick: Number(this._prodData.rollUpBoxThick),
-      voltage: Number(this._prodData.voltage),
-      doorTrackThick: Number(this._prodData.doorTrackThick),
+      headBoxThickness: Number(this._prodData.rollUpBoxThick),
+      motorVoltage: Number(this._prodData.voltage),
+      // doorTrackThick: Number(this._prodData.doorTrackThick),
       // doorTrackThick: 1,
-      motorSupport: this._prodData.motorSupport,
+      hasMotorSupportStand: this._prodData.motorSupport,
       //
-      materialSurface: this._prodData.surface ?? '',
+      // materialSurface: this._prodData.surface ?? '',
       isPainted: false,
       //
       price: Number(this._price),
@@ -1730,7 +1744,10 @@ class Class_product {
       //
       components,
       accessories: accessories,
+      order: 0,
     };
+
+    return body;
   }
 
   //-----------------------------------------

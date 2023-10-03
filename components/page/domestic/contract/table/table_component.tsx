@@ -54,7 +54,6 @@ export default function Table_acce({
             <DndThead
               keyArr={comKeyArr}
               cellConfigList={comCellConfig}
-              allowMove={allowMove}
               resetTrigger={comKeyArr.length}
               // emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
@@ -74,7 +73,6 @@ export default function Table_acce({
                 // setTargetProd(obj.item as Class_product);
               }}
               panelBox="comBox"
-              defalutVKeyArr={defalutVKeyArr}
             />
           )}
 

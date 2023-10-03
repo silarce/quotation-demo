@@ -59,7 +59,6 @@ export default function Table_accessories({
             <DndThead
               keyArr={keyArr}
               cellConfigList={cellConfig}
-              allowMove={allowMove}
               resetTrigger={keyArr.length}
               emptyBlockWidth={emptyBlockWidth || '137px'}
               onDragEndCallback={(dndKeyArr) => {

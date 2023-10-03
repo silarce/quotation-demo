@@ -44,7 +44,6 @@ export default function Table_others({
             <DndThead
               keyArr={keyArr}
               cellConfigList={cellConfig}
-              allowMove={allowMove}
               resetTrigger={keyArr.length}
               emptyBlockWidth="137px"
               onDragEndCallback={(dndKeyArr) => {

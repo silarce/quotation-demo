@@ -997,7 +997,7 @@ export type TcreateQuotationProductDto = {
   // 表面
   materialSurface: string;
   // 門軌
-  doorTrack: string;
+  guideRail: string;
   // 馬力
   horsepower: string;
   // 馬達廠商

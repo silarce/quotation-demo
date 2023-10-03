@@ -924,6 +924,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const prodArr: TcreateQuotationProductDto[] =
       prodVKeyArr?.map((key, index) => {
         const prod = productList[key];
+
         const quantity = Number(prod.quantity);
         const originProd = prod.originProd;
 
