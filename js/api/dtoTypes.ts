@@ -1135,6 +1135,8 @@ export type TquotationContractDto = {
   rootContract: TquotationContractDto; // 源合約
   attachedToContract: TquotationContractDto; // 上一份追加減合約
   attachedContract: TquotationContractDto; // 下一份追加減合約
+  //
+  subContracts: TquotationContractDto[];
 };
 
 // ========================================================================

@@ -39,18 +39,6 @@ import style from './quotation.module.scss';
 import { Tquotation, fakeQuotationObjListOri } from 'fakeDatabase/domestic/quotation/fakeQuotationList';
 import { fakeProdChangingRecordList } from 'fakeDatabase/domestic/quotation/fakeChangeProductRecord';
 
-// 生成假資料
-const fakeQuotationObjList = fakeQuotationObjListOri();
-
-// =============================================================
-// =============================================================
-// =============================================================
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
-import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
-import { fakeApi_memo } from 'fakeDatabase/fakeAPI/fakeMemoApi';
-import { fakeApi_quoteRange } from 'fakeDatabase/fakeAPI/fakeQuoteRangeApi';
-
 // =============================================================
 // =============================================================
 // =============================================================
@@ -102,10 +90,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   useEffect(() => {
     update();
   }, [quotationId]);
-
-  // =========================================================
-  // 正式接上api前先這樣處理
-  const quotationData: Tquotation | undefined = fakeQuotationObjList[quotationId as string];
 
   // =========================================================
   // 是否可編輯
@@ -243,7 +227,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     getOthersPostBodyArr,
   } = useProductList({
     productArr: content?.products ?? [],
-    others: [],
+    others: content?.others ?? [],
     resetTrigger: content?.products,
   }); // latest
 
@@ -461,11 +445,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 emptyBlockWidth="80px"
               />
               {/* 原報價項目 */}
-              {/* {switch02 && <OldQuotationProduction classQuotation={classQuotation} />} */}
+
               {switch02 && <OldQuotationProduction rootContent={rootContent} />}
               <div className={style.redWrapper}>
                 {/* 材料配件設定 */}
-                {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
+
                 <Table_com
                   disabled={true}
                   comList={targetProd?.comList}
@@ -476,7 +460,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 />
                 <hr />
                 {/* 選配設定 */}
-                {/* <QuotationAccessory activeRow={prodState.activeRow} /> */}
                 <Table_accessories
                   disabled={true}
                   list={targetProd?.accessoriesList}
@@ -494,15 +477,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   panelBox="easyBox"
                   emptyBlockWidth="80px"
                 />
+                <Table_others
+                  disabled={true}
+                  list={othersList}
+                  cellConfig={othersCellConfig}
+                  keyArr={othersKeyArr}
+                  changeKeyArr={() => {}}
+                  add={() => {}}
+                />
               </div>
             </>
           ) : (
             // 追加/追減項目
-            <QuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />
+            <QuotationProdChangingRecord subContract={data?.subContracts} />
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && <QuotationRecord prodChangingRecord={prodChangingRecord} />}
+          {switch02 && (
+            <QuotationRecord
+              // prodChangingRecord={prodChangingRecord}
+              subContract={data?.subContracts}
+            />
+          )}
 
           <Summary
             disabled={true}
