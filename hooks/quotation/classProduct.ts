@@ -21,6 +21,8 @@ import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
@@ -568,18 +570,22 @@ class Class_product {
 
     const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
 
-    const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
+    try {
+      const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
 
-    if (res) {
-      const keyArr = Object.keys(res) as (keyof typeof res)[];
-      keyArr.forEach((key) => {
-        const item = res[key];
-        comList[key].codeNumber = item.number;
-        comList[key].componentId = item.id;
-        comList[key].price = item.price;
-        comList[key].bom = item.bom;
-        comList[key].calcAllPrice();
-      });
+      if (res) {
+        const keyArr = Object.keys(res) as (keyof typeof res)[];
+        keyArr.forEach((key) => {
+          const item = res[key];
+          comList[key].codeNumber = item.number;
+          comList[key].componentId = item.id;
+          comList[key].price = item.price;
+          comList[key].bom = item.bom;
+          comList[key].calcAllPrice();
+        });
+      }
+    } catch (error) {
+      myAlert.err({ title: '取得材料配件失敗' });
     }
   } // reqProdGenerateDoorProductBom
 
