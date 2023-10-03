@@ -35,7 +35,11 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 export default function QuotationList() {
   const router = useRouter();
-  const { county, customerName, projectName, status, reviewStatus } = router.query as { [key: string]: string };
+  const { county, customerName, projectName, reviewStatus } = router.query as { [key: string]: string };
+  //   Budget
+  // Bidding
+  // Contracting
+  const status = router.query.status as 'Budget' | 'Bidding' | 'Contracting';
 
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
@@ -198,7 +202,8 @@ grade14以上的帳號理論上只會有一個
 
   return (
     <SubLayer>
-      <PageHeader02 tag="預算" panelList={panelList} />
+      {/* <PageHeader02 tag="預算" panelList={panelList} /> */}
+      <PageHeader02 tag={statusLookup[status] ?? '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
@@ -256,4 +261,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
       <PageHeader02 linkList={linkList} />
     </div>
   );
+};
+
+const statusLookup = {
+  Budget: '預算',
+  Bidding: '投標',
+  Contracting: '發包',
 };
