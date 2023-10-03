@@ -11,6 +11,10 @@ import type {
   TquotationDto,
   TcreateQuotationContentDto,
   TfileDto,
+  TcreateQuotationVerifyFormDto,
+  TreviewQuotationContentDto,
+  TsubmitReviewQotuationContentDto,
+  TquotationContractDto,
 } from './dtoTypes';
 
 export type {
@@ -19,6 +23,9 @@ export type {
   TquotationContentDto,
   TquotationDto,
   TcreateQuotationContentDto,
+  TcreateQuotationVerifyFormDto as TcontractReviewForm,
+  TreviewQuotationContentDto,
+  TsubmitReviewQotuationContentDto,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -35,6 +42,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
+      'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewSupervisorEmployee',
       'latestContent.products.quantity',
       'latestContent.products.options',
@@ -78,12 +86,15 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',
       'latestContent.managerEmployee',
+
       'latestContent.reviewSalesEmployee',
+      'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewSupervisorEmployee',
 
       'latestContent.products.items.accessories',
       'latestContent.products.items.components',
       'latestContent.others',
+      'latestContent.verifyForm',
     ],
   };
 
@@ -116,6 +127,118 @@ export const useGetQuotation_id = (id: string | undefined) => {
   };
 };
 
+// ================================================================
+type TgetContracts = {
+  data: TquotationContractDto[];
+  meta: TpageMetaDto;
+};
+
+export const apiGetContract = async (params?: Tparams) => {
+  const api = '/quotation/contracts';
+
+  params = {
+    populate: [
+      'content.customer',
+      'content.agentEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.products.quantity',
+      'content.products.options',
+    ],
+    ...params,
+  };
+
+  return axi
+    .get<TgetContracts>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetContract = (customParams?: Tparams) => {
+  const [res, setRes] = useState<TgetContracts>();
+
+  const update = async () => {
+    const newRes = await apiGetContract(customParams);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
+};
+
+export const apiGetContract_Id = async (contractId: string) => {
+  const api = `/quotation/contracts/${contractId}`;
+
+  const params = {
+    populate: [
+      // 'contents',
+      'content.customer',
+      'content.agentEmployee',
+      'content.supervisorEmployee',
+      'content.managerEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.products.items.accessories',
+      'content.products.items.components',
+      'content.others',
+
+      'rootContract.content.customer',
+      'rootContract.content.agentEmployee',
+      'rootContract.content.supervisorEmployee',
+      'rootContract.content.managerEmployee',
+      'rootContract.content.reviewSalesEmployee',
+      'rootContract.content.reviewWorkDirectorEmployee',
+      'rootContract.content.reviewSupervisorEmployee',
+      'rootContract.content.products.items.accessories',
+      'rootContract.content.products.items.components',
+      'rootContract.content.others',
+
+      'attachedToContract',
+      'attachedContract',
+      'subContracts.content.products',
+    ],
+  };
+
+  return axi
+    .get<TquotationContractDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetContract_id = (id: string | undefined) => {
+  const [res, setRes] = useState<TquotationContractDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetContract_Id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+// ==================================================================
 export const apiPostQuotation = (body: TcreateQuotationContentDto) => {
   const api = '/quotation';
 
@@ -135,14 +258,8 @@ export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) 
 };
 
 // 設定報價單審核人員
-export const apiQuotationSubmitReview = (
-  id: string,
-  body: {
-    reviewSalesEmployeeId: string | null;
-    reviewSupervisorEmployeeId: string | null;
-  }
-) => {
-  const api = `/quotation/${id}/submit-review`;
+export const apiQuotationSubmitReview = (id: string, body: TsubmitReviewQotuationContentDto) => {
+  const api = `/quotation/${id}/submit`;
 
   return axi
     .patch<undefined>(api, body)
@@ -151,14 +268,24 @@ export const apiQuotationSubmitReview = (
 };
 
 // 審核該報價單
-export const apiQuotationReview = (id: string) => {
+export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuotationContentDto }) => {
   const api = `/quotation/${id}/review`;
 
   return axi
-    .patch<undefined>(api)
+    .patch<undefined>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+/**送審 合約審核表 */
+export function apiSubmitContracting({ contentId, body }: { contentId: string; body: TcreateQuotationVerifyFormDto }) {
+  const api = `/quotation/${contentId}/submit-contracting`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+}
 
 export const apiQuotationunLock = (id: string) => {
   const api = `/quotation/${id}/unLock`;

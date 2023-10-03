@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-import ContractList from 'components/page/domestic/contract/contractList';
+import ContractList, { Tcontract } from 'components/page/domestic/contract/contractList';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -21,6 +21,9 @@ import style from './contract.module.scss';
 // fake
 import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 
+//
+import { useGetContract } from 'js/api/api_quotation';
+
 // ===========================================
 // 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
@@ -29,6 +32,12 @@ import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleA
 // 合約列表單個項目展開裡的內容是追加追減項目
 export default function Contract() {
   const router = useRouter();
+
+  const { data, update } = useGetContract();
+
+  useEffect(() => {
+    update();
+  }, []);
 
   // ===================================================
 
@@ -97,7 +106,7 @@ export default function Contract() {
   ];
 
   // ===================================================
-  const contractList = projectArr.map((item) => {
+  const contractList_old = projectArr.map((item) => {
     const { quotationId, constructionName } = item.basicInfo;
     const { name: clientName, contact } = item.clientData;
     const { attn } = item.signature;
@@ -113,6 +122,22 @@ export default function Contract() {
       attn: attn,
     };
   });
+
+  const contractList: Tcontract[] =
+    data?.map((item) => {
+      const content = item.content;
+
+      return {
+        quotationId: content.quotationNumber,
+        clientName: content.customer.name,
+        quotationName: content.projectName,
+        discount: item.discount,
+        priceTotal: String(item.total),
+        contactPerson: content.contactPerson,
+        contactPhone: content.contactNumber,
+        attn: content.agentEmployee.chName,
+      };
+    }) ?? [];
 
   return (
     <div className={style.container}>

@@ -22,22 +22,18 @@ class Class_component {
     data,
     key,
     prod,
-    callReqGetCodeNumber,
     isNew = true,
   }: {
     reRender: TreRender;
     data: Tcomponent;
     key: TcomponentKey;
     prod: Class_product;
-    callReqGetCodeNumber: () => void;
     isNew?: boolean;
   }) {
     this.reRender = reRender;
     this._prod = prod;
     this._com = data;
     this.key = key;
-
-    this.callReqGetCodeNumber = callReqGetCodeNumber;
 
     if (!this._com.material) {
       if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
@@ -46,6 +42,7 @@ class Class_component {
     }
 
     if (!this._com.quantity) {
+      // 不同的材料配件會用不同的值為預設數量
       this._com.quantity = calcDefaultQuantity({
         key,
         w: Number(prod.width),
@@ -56,15 +53,24 @@ class Class_component {
     }
 
     if (isNew) {
-      this.calcAllPrice();
+      setTimeout(() => {
+        this.calcAllPrice();
+      }, 0);
+    } else {
+      this.calcAllPrice({ shouldCallProdAllPrice: false });
     }
-  } // constructor
+
+    // =constructor
+  } // =constructor
 
   private reRender;
   private _prod;
   private _com;
   readonly key;
-  readonly callReqGetCodeNumber;
+  readonly callReqGetCodeNumber = () => {
+    this._prod.shouldCall_pgpb = true;
+    this._prod.callAllReq();
+  };
   //
   //
   // private _material: undefined | string = undefined;
@@ -98,13 +104,15 @@ class Class_component {
   };
 
   calcAllPrice({
-    toCalcComAllprice = true,
-  }: //
-  { toCalcComAllprice?: boolean } = {}) {
+    shouldCallProdAllPrice = true,
+  }: {
+    shouldCallProdAllPrice?: boolean;
+  } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
 
-    const price = this.price || 0;
     const quantity = Number(this._com.quantity || 0);
+
+    const price = this.price || 0;
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -116,9 +124,7 @@ class Class_component {
     this._unitPrice = unitPrice.ceil().toNumber();
     this._totalPrice = totalPrice.ceil().toNumber();
 
-    if (toCalcComAllprice) {
-      this._prod.calcComAllPrice();
-    }
+    this._prod.calcProdAllprice_timeout();
 
     this.reRender();
   }
@@ -199,10 +205,10 @@ class Class_component {
   get price() {
     return this._com.price;
   }
-  // set price(v) {
-  //   this._data.price = v;
-  //   this.reRender();
-  // }
+  set price(v) {
+    this._com.price = v;
+    this.reRender();
+  }
 
   get name() {
     return this._com.name;
@@ -436,6 +442,10 @@ class Class_component {
     return comLookUp[this.key].unit;
   }
 
+  set bom(v: object[]) {
+    this._com.bom = v;
+  }
+
   get body() {
     return {
       type: comLookUp[this.key].type,
@@ -447,8 +457,8 @@ class Class_component {
       // 下面這幾個先跳過
       number: this.codeNumber ?? '',
       componentId: this.componentId ?? '',
-      rawData: '',
-      bom: '',
+      rawData: {},
+      bom: this._com.bom,
       // order: '', //在外面處理
     };
   }
@@ -464,6 +474,9 @@ type Tcomponent = {
   code: string; // 編號
   specialSpec: string | null; // 特殊規格
   name?: string; // TdoorMotorAccessoriesDto沒有name
+
+  bom?: object[];
+  rawData?: object;
 
   // ----------------------------------------------
   // 這邊是共有的property
@@ -528,8 +541,7 @@ type Tcomponent = {
   quantity?: string;
   number?: string;
   componentId?: string;
-  rawData?: string;
-  bom?: string;
+
   order?: number;
 }; //  Taccessory
 
@@ -904,7 +916,7 @@ const confomtTree = {
 type Tkit = {
   typeName: string;
   // type是api要收的東西
-  type: 'slatType' | 'bottomBar' | 'guideRail' | 'sidePlateType' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
+  type: 'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
   creDesc: (classCom: Class_component) => string;
   options: Toption[];
   hiddenKeyArr: string[];
@@ -914,7 +926,7 @@ type Tkit = {
 const comLookUp: { [key in TcomponentKey]: Tkit } = {
   slat: {
     typeName: '捲門片',
-    type: 'slatType',
+    type: 'slat',
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
@@ -952,7 +964,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
   },
   sidePlate: {
     typeName: '支板',
-    type: 'sidePlateType',
+    type: 'sidePlate',
     creDesc: creDesc_sidePlates,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -997,10 +1009,10 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
 };
 
 const comTypeLookUp = {
-  slatType: 'slat',
+  slat: 'slat',
   bottomBar: 'bottomBar',
   guideRail: 'guideRail',
-  sidePlateType: 'sidePlate',
+  sidePlate: 'sidePlate',
   roller: 'roller',
   motor: 'motor',
   motorAccessories: 'motorAccessories',
@@ -1013,6 +1025,7 @@ const findOptionValue = ({ options, value }: { options: Toption[]; value: string
   return option?.value;
 };
 
+/**取得預設數量 */
 const calcDefaultQuantity = ({
   //
   key,
@@ -1067,6 +1080,7 @@ const creEmptyCom: () => Tcomponent = () => ({
   isPainted: false,
   price: 0,
   quantity: '',
+  bom: [],
 });
 
 // ===========================================================

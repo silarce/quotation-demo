@@ -243,16 +243,16 @@ const sidePathList: TsidePathList = {
               path: path01 + '/queryQuotation',
               erpFeature: devPass,
             },
-            {
-              label: '歷史紀錄',
-              path: path01 + '/history',
-              erpFeature: devPass,
-            },
-            {
-              label: '報表',
-              path: path01 + '/report',
-              erpFeature: devPass,
-            },
+            // {
+            //   label: '歷史紀錄',
+            //   path: path01 + '/history',
+            //   erpFeature: devPass,
+            // },
+            // {
+            //   label: '報表',
+            //   path: path01 + '/report',
+            //   erpFeature: devPass,
+            // },
             {
               label: '舊合約整合',
               path: path01 + '/legacyContractIntegration',

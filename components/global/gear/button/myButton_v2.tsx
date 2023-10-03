@@ -2,7 +2,7 @@ import { MouseEventHandler } from 'react';
 
 import classNames from 'classnames';
 
-import { Button } from 'antd';
+import { Button, ButtonProps } from 'antd';
 
 // icon
 import iconAdd from 'public/image/icon/add.svg';
@@ -12,6 +12,24 @@ import iconArrow02_right from 'public/image/icon/arrow02_right.svg';
 import iconUpload from 'public/image/icon/upload.svg';
 
 import scss from './myButton_v2.module.scss';
+
+type TmyBtn = {
+  label?: string;
+  img?: string;
+  preImg?: keyof typeof preImgList;
+  px?: 'px22' | 'px44' | 'px2227';
+  theme?: 'danger' | 'transparent' | undefined;
+  // https://4x.ant.design/components/button-cn/#
+  onClick?: MouseEventHandler<HTMLElement> | undefined;
+  className?: string;
+  isLoading?: boolean;
+  disabled?: boolean;
+  href?: string;
+  target?: string;
+  buttonProps?: ButtonProps;
+};
+
+export type { TmyBtn };
 
 export default function MyButton_v2({
   label,
@@ -25,26 +43,15 @@ export default function MyButton_v2({
   disabled,
   href,
   target,
-}: {
-  label?: string;
-  img?: string;
-  preImg?: keyof typeof preImgList;
-  px?: 'px22' | 'px44' | 'px2227';
-  theme?: 'danger' | 'transparent' | undefined;
-  // https://4x.ant.design/components/button-cn/#
-  onClick?: MouseEventHandler<HTMLElement> | undefined;
-  className?: string;
-  isLoading?: boolean;
-  disabled?: boolean;
-  href?: string;
-  target?: string;
-}) {
+  buttonProps,
+}: TmyBtn) {
   if (!img && preImg) {
     img = preImgList[preImg].src;
   }
 
   return (
     <Button
+      {...buttonProps}
       className={classNames(scss.button, theme && scss[theme], px && scss[px], className)}
       onClick={onClick}
       loading={isLoading}

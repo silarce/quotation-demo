@@ -31,7 +31,7 @@ import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quo
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
+
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
@@ -42,6 +42,7 @@ import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/emp
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -56,10 +57,6 @@ import { AppContext } from 'pages/_app';
 // 假資料與fake api
 import { useQuotation } from 'hooks/quotation/useQuotation';
 import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
-
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -89,7 +86,7 @@ import {
   apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
-import { Class_product, useProductList } from 'hooks/quotation/useProduct';
+import { useProductList } from 'hooks/quotation/useProduct';
 
 import Summary, {
   TsummaryControl,
@@ -131,19 +128,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
-  const [revieweFormShow, setReviewFormShow] = useState(false);
+  const [reviewFormShow, setReviewFormShow] = useState(false);
+  const [reviewModalShow, setReviewModalShow] = useState(false);
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
-  const lasttestContentId = quotationData?.latestContent.id;
-  // -----------------------------------------------------
+  const lastestContentId = quotationData?.latestContent.id;
+  const latestContent = quotationData?.latestContent;
+  const status = latestContent?.status;
+  const verifyForm = latestContent?.verifyForm;
 
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
+  // -----------------------------------------------------
 
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lasttestContentId);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lastestContentId);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -525,18 +526,53 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [reviewSales, setReviewSales] = useState<TemployeeDto>();
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
+  const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
-  const reviewSalesEmployeeId = quotationData?.latestContent?.reviewSalesEmployee?.id;
-  const reviewSupervisorEmployeeId = quotationData?.latestContent?.reviewSupervisorEmployee?.id;
+  let isSales = false;
+  let isWorkDirector = false;
+  let isSupervisor = false;
+  let isManager = false;
+
+  const reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
+  const reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
+  const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
+  const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
+
+  const salesReviewedAt = latestContent?.salesReviewedAt;
+  const supervisorReviewedAt = latestContent?.supervisorReviewedAt;
+  const workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
+  const managerReviewedAt = latestContent?.managerReviewedAt;
 
   if (userId) {
-    if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
+    if (userId === reviewSalesEmployeeId) {
+      isSales = true;
       isReviewer = true;
+    }
+
+    if (userId === reviewWorkDirectorEmployeeId) {
+      if (salesReviewedAt) {
+        isWorkDirector = true;
+        isReviewer = true;
+      }
+    }
+
+    if (userId === reviewSupervisorEmployeeId) {
+      if (salesReviewedAt && workDirectorReviewedAt) {
+        isSupervisor = true;
+        isReviewer = true;
+      }
+    }
+
+    if (userId === reviewManagerEmployeeId) {
+      if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+        isManager = true;
+        isReviewer = true;
+      }
     }
   }
 
@@ -612,73 +648,64 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------
 
   const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
-    'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor'
-  >();
+    'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector' | 'undefined'
+  >('undefined');
 
-  const openEmpSel = (v: 'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor') => {
+  const openEmpSel = (v: 'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector') => {
     setEmpSelConfirmKey(v);
     setEmployeeSelectorShow(true);
   };
 
   const onEmpSelCancel = () => {
     setEmployeeSelectorShow(false);
-    setEmpSelConfirmKey(undefined);
+    setEmpSelConfirmKey('undefined');
   };
 
-  const empSelProps = (() => {
-    if (empSelConfirmKey === 'manager') {
-      return {
-        label: '請選擇經理',
-        onCancel: onEmpSelCancel,
-        onConfirm: (v: TemployeeDto[]) => {
-          setValue('managerEmployee', v[0]);
-          onEmpSelCancel();
-        },
-      };
-    }
-
-    if (empSelConfirmKey === 'supervisor') {
-      return {
-        label: '請選擇主管',
-        onCancel: onEmpSelCancel,
-        onConfirm: (v: TemployeeDto[]) => {
-          setValue('supervisorEmployee', v[0]);
-          onEmpSelCancel();
-        },
-      };
-    }
-
-    if (empSelConfirmKey === 'reviewSales') {
-      return {
-        label: '請選擇審核業務',
-        tip: '可不選，直接按確定',
-        onCancel: onEmpSelCancel,
-        onConfirm: (v: TemployeeDto[]) => {
-          setReviewSales(v[0]);
-          onEmpSelCancel();
-          setTimeout(() => {
-            openEmpSel('reviewSupervisor');
-          }, 300);
-        },
-      };
-    }
-
-    if (empSelConfirmKey === 'reviewSupervisor') {
-      return {
-        label: '請選擇審核經理',
-        tip: '可不選，直接按確定',
-        onCancel: onEmpSelCancel,
-        onConfirm: async (v: TemployeeDto[]) => {
-          setReviewSupervisor(v[0]);
-          onEmpSelCancel();
-          reqSetReviewer({
-            reviewSales,
-            reviewSupervisor: v[0],
-          });
-        },
-      };
-    }
-  })();
+  const empSelLookup = {
+    reviewSales: {
+      label: '請選擇審核業務',
+      // tip: '可不選，直接按確定',
+      onCancel: onEmpSelCancel,
+      onConfirm: (v: TemployeeDto[]) => {
+        setReviewSales(v[0]);
+        setTimeout(() => {
+          openEmpSel('reviewSupervisor');
+        }, 300);
+      },
+    },
+    reviewSupervisor: {
+      label: '請選擇業務主管',
+      // tip: '可不選，直接按確定',
+      onCancel: onEmpSelCancel,
+      onConfirm: async (v: TemployeeDto[]) => {
+        setReviewSupervisor(v[0]);
+        onEmpSelCancel();
+        setTimeout(() => {
+          openEmpSel('reviewWorkDirector');
+        }, 300);
+      },
+    },
+    reviewWorkDirector: {
+      label: '請選擇應收帳款',
+      // tip: '可不選，直接按確定',
+      onCancel: onEmpSelCancel,
+      onConfirm: (v: TemployeeDto[]) => {
+        setReviewWorkDirector(v[0]);
+        onEmpSelCancel();
+        reqSetReviewer({
+          reviewSales,
+          reviewSupervisor,
+          reviewWorkDirector: v[0],
+        });
+      },
+    },
+    undefined: {
+      label: '',
+      tip: '',
+      onCancel: () => {},
+      onConfirm: () => {},
+    },
+  };
 
   // --------------------------------------------------------------------------
 
@@ -688,35 +715,44 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
   const signatureArr: TsignatureProps[] = [
     {
-      label: '經理',
+      label: '總經理',
       inputProps: {
         props: {
-          value: (watch('managerEmployee')?.chName || watch('managerEmployee')?.enName) ?? '',
-          placeholder: '尚未選擇',
-          disabled: true,
-          // onClick: () => {
-          //   openEmpSel('manager');
-          // },
-        },
-      },
-    },
-    // TODO待api更新，要放入工務主管
-    {
-      label: '工務主管',
-      inputProps: {
-        props: {
-          // value: watch('supervisorEmployee')?.chName ?? '',
-          value: '',
+          value: (latestContent?.reviewManagerEmployee?.chName || latestContent?.reviewManagerEmployee?.enName) ?? '',
           placeholder: '尚未選擇',
           disabled: true,
         },
       },
     },
     {
-      label: '主管',
+      label: '應收帳款',
       inputProps: {
         props: {
-          value: (watch('supervisorEmployee')?.chName || watch('supervisorEmployee')?.enName) ?? '',
+          value:
+            (latestContent?.reviewWorkDirectorEmployee?.chName || latestContent?.reviewWorkDirectorEmployee?.enName) ??
+            '',
+          placeholder: '尚未選擇',
+          disabled: true,
+        },
+      },
+    },
+
+    {
+      label: '業務主管',
+      inputProps: {
+        props: {
+          value:
+            (latestContent?.reviewSupervisorEmployee?.chName || latestContent?.reviewSupervisorEmployee?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
+        },
+      },
+    },
+    {
+      label: '業務',
+      inputProps: {
+        props: {
+          value: (latestContent?.reviewSalesEmployee?.chName || latestContent?.reviewSalesEmployee?.enName) ?? '',
           placeholder: '尚未選擇',
           disabled: true,
         },
@@ -726,7 +762,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經辦',
       inputProps: {
         props: {
-          value: watch('agentEmployee')?.chName ?? '',
+          value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
           disabled: true,
         },
       },
@@ -833,8 +869,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   onClick: () => setShowPdf_part(true),
     // },
 
-    (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
+    (!!isReviewer || null) && {
+      type: 'myButton',
+      label: '審核',
+      onClick: () => setReviewModalShow(true),
+    },
+    // (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    (!!quotationId || null) && {
+      type: 'myButton',
+      label: '送審',
+      onClick: () => {
+        if (status === 'Budget' || status === 'Bidding') {
+          openEmpSel('reviewSales');
+        } else {
+          openEmpSel('reviewSupervisor');
+        }
+      },
+    },
     { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
@@ -986,22 +1038,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------
   const reqSetReviewer = async ({
     reviewSales,
+    reviewWorkDirector,
     reviewSupervisor,
   }: {
-    reviewSales: TemployeeDto | undefined;
-    reviewSupervisor: TemployeeDto | undefined;
+    reviewSales?: TemployeeDto | undefined;
+    reviewSupervisor?: TemployeeDto | undefined;
+    reviewWorkDirector?: TemployeeDto | undefined;
   }) => {
     if (!quotationId) {
       return;
     }
 
     const reviewSalesEmployeeId = reviewSales?.id || null;
+    const reviewWorkDirectorEmployeeId = reviewWorkDirector?.id || null;
     const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
 
     try {
       setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
+        reviewWorkDirectorEmployeeId,
         reviewSupervisorEmployeeId,
       });
       await update();
@@ -1015,19 +1071,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // 現在只有admin可以呼叫這系列的api，所以無法測試
-  const reqReview = async () => {
-    if (!quotationId) {
+  const reqReview = async (isPass: boolean) => {
+    if (!quotationId || !isReviewer) {
       return;
     }
 
+    const body = {
+      reviewSalesEmployeeId: isSales ? userId : null,
+      reviewSupervisorEmployeeId: isWorkDirector ? userId : null,
+      reviewWorkDirectorEmployeeId: isSupervisor ? userId : null,
+      reviewManagerEmployeeId: isManager ? userId : null,
+      reviewResult: isPass,
+    };
+
     try {
       setIsLoading(true);
-      await apiQuotationReview(quotationId);
+
+      try {
+        await apiQuotationReview({ id: quotationId, body });
+      } catch (error) {
+        myAlert.err({ title: '審核發生錯誤' });
+        console.log(error);
+      }
+
       await update();
     } catch (error) {
-      myAlert.err({ title: '審核失敗' });
     } finally {
       setIsLoading(false);
+      setReviewModalShow(false);
     }
   };
 
@@ -1206,20 +1277,45 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {/*  */}
       <EmployeeSelector
         showModal={employeeSelectorShow}
-        label={empSelProps?.label}
-        tip={empSelProps?.tip}
+        label={empSelLookup[empSelConfirmKey]?.label}
+        // tip={empSelLookup[empSelConfirmKey]?.tip}
         onConfirm={(v) => {
-          empSelProps?.onConfirm(v);
+          empSelLookup[empSelConfirmKey]?.onConfirm(v);
         }}
-        onCancel={() => empSelProps?.onCancel()}
+        onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
         selLimit={1}
       />
+      {/* 合約審核表 */}
       <ContractReviewForm
-        showModal={revieweFormShow}
+        showModal={reviewFormShow}
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
+        lastestContentId={lastestContentId}
+        verifyForm={verifyForm}
+        onConfirm={() => update()}
+      />
+      <ThreeButtonModal
+        visible={reviewModalShow}
+        text={'是否通過審核?'}
+        onCancel={() => setReviewModalShow(false)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reqReview(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reqReview(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setReviewModalShow(false),
+          },
+        ]}
       />
     </div>
   );

@@ -4,24 +4,26 @@ import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
 import { useForm, useFormState } from 'react-hook-form';
+import moment from 'moment';
 
 // antd
 import { Modal } from 'antd';
 import { Radio } from 'antd';
 // gear
-// import InputSel from 'components/global/gear/inputAndSel_v2/inputSel.tsx';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { Tparams, TemployeeDto, useEmployee_infinite } from 'js/api/api_employee';
+import { apiSubmitContracting } from 'js/api/api_quotation';
 
 // css
 import scss from './contractReviewForm.module.scss';
 
 // type
-import { TcontractReviewForm } from 'js/api/dtoTypes';
+import { TpaymentRatioDto, TcreateQuotationVerifyFormDto, TquotationVerifyFormDto } from 'js/api/dtoTypes';
 
 // ============================================================================
 export default function ContractReviewForm({
@@ -30,12 +32,18 @@ export default function ContractReviewForm({
   contractIdNumber,
   contractName,
   contractPrice,
+  lastestContentId,
+  verifyForm,
+  onConfirm,
 }: {
   showModal: boolean;
   close: () => void;
   contractIdNumber: string;
   contractName: string;
   contractPrice: number;
+  lastestContentId: string | undefined;
+  verifyForm: TquotationVerifyFormDto | undefined;
+  onConfirm?: () => void;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -43,11 +51,15 @@ export default function ContractReviewForm({
     contractPrice,
   });
 
-  const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
+  // const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
+  const { register, control, reset, watch, setValue, getValues } =
+    useForm<Omit<TcreateQuotationVerifyFormDto, 'TpaymentRatioDto'>>();
+
+  const watchData = watch();
 
   // ----------------------------------------------------------------------------
   // 被選的employee
-  const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);
+  const [selEmployeeIdArr, setSelEmployeeIdArr] = useState<string[]>([]);
 
   const params = {
     pageSize: 20,
@@ -67,20 +79,58 @@ export default function ContractReviewForm({
 
   useEffect(() => {
     if (!showModal) {
-      setSelEmployeeArr([]);
+      setSelEmployeeIdArr([]);
 
       return;
     }
 
-    resetMethodList();
+    // verifyForm
+
+    console.log(verifyForm);
+
+    if (verifyForm) {
+      reset({
+        askForPaymentDate: verifyForm.askForPaymentDate,
+        disbursementDate: verifyForm.disbursementDate,
+        // paymentRatio: verifyForm.paymentRatio,
+        paymentTenor: verifyForm.paymentTenor,
+        performanceBond: verifyForm.performanceBond,
+        depositPayment: verifyForm.depositPayment,
+        warrantyPeriod: verifyForm.warrantyPeriod,
+        note: verifyForm.note,
+        warrantyPayment: verifyForm.warrantyPayment,
+        fireproofCertificate: verifyForm.fireproofCertificate,
+        warranty: verifyForm.warranty,
+        testDrive: verifyForm.testDrive,
+        debitItem: verifyForm.debitItem,
+        // workDirectorId: verifyForm.workDirectorId,
+      });
+    } else {
+      reset();
+    }
+
+    setSelEmployeeIdArr([verifyForm?.workDirectorId ?? '']);
     resetEmp();
+
+    const methodArr = verifyForm?.paymentRatio.map((item) => {
+      return {
+        title: item.level,
+        percent: item.paymentRatio,
+        price: item.price,
+        note: item.note,
+      };
+    });
+
+    resetMethodList({ defaultPayMethodArr: methodArr });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
   // ------------------------------------------------------------------
   const onClick = (newEmp: TemployeeDto) => {
-    const newArr = [...selEmployeeArr];
+    // const newArr = [...selEmployeeIdArr];
+
+    setSelEmployeeIdArr([newEmp.id]);
 
     // if (selLimit === 1) {
     //   newArr[0] = newEmp;
@@ -89,29 +139,61 @@ export default function ContractReviewForm({
     //   return;
     // }
 
-    const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id);
+    // const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id);
 
-    if (theIndex > -1) {
-      newArr.splice(theIndex, 1);
-    } else {
-      newArr.push(newEmp);
-    }
+    // if (theIndex > -1) {
+    //   newArr.splice(theIndex, 1);
+    // } else {
+    //   newArr.push(newEmp);
+    // }
 
-    setSelEmployeeArr(newArr);
+    // setSelEmployeeArr(newArr);
   };
 
-  const onConfirm = () => {
-    if (!selEmployeeArr) {
+  const theOnConfirm = async () => {
+    if (!lastestContentId) {
+      return;
+    }
+
+    if (!selEmployeeIdArr[0]) {
       return myAlert.info({ title: "'請選擇人員'" });
     }
 
+    const preBody = watch();
+
+    const body: TcreateQuotationVerifyFormDto = {
+      // ...preBody,
+      paymentRatio: Object.values(payMethodList).map((item) => item.body),
+      workDirectorId: selEmployeeIdArr[0],
+      //
+      askForPaymentDate: preBody.askForPaymentDate,
+      disbursementDate: preBody.disbursementDate,
+      paymentTenor: preBody.paymentTenor,
+      performanceBond: preBody.performanceBond,
+      depositPayment: preBody.depositPayment,
+      warrantyPeriod: preBody.warrantyPeriod,
+      note: preBody.note,
+      warrantyPayment: preBody.warrantyPayment,
+      fireproofCertificate: preBody.fireproofCertificate,
+      warranty: preBody.warranty,
+      testDrive: preBody.testDrive,
+      debitItem: preBody.debitItem,
+    };
+
+    const haveEmpty = _.isEmpty(body);
+
+    if (haveEmpty) {
+      return myAlert.warning({ title: '請填寫所有欄位' });
+    }
+
+    try {
+      await apiSubmitContracting({ contentId: lastestContentId, body });
+    } catch (error) {
+      myAlert.err({ title: '送審失敗' });
+    }
+
     close();
-
-    // onConfirm(selEmployeeArr);
-
-    // if (isCancelOnConfirm) {
-    //   theOnCancel();
-    // }
+    onConfirm && onConfirm();
   };
 
   const onCancel = () => {
@@ -147,16 +229,27 @@ export default function ContractReviewForm({
           <div>1</div>
           <div>
             <span>註明請款日</span>
-            <InputBox
-              boxStyle={{ width: '100px' }}
-              inputAttr={{ ...register('askForPaymentDate'), className: 'text-center' }}
+            <InputSel
+              className={scss.datePicker}
+              datePickerProps={{
+                props: {
+                  value: moment(watchData.askForPaymentDate),
+                  onChange: (md) => {
+                    setValue('askForPaymentDate', md?.toISOString() ?? '');
+                  },
+                },
+              }}
             />
             <span>，放款日</span>
-            <InputBox
-              boxStyle={{ width: '100px' }}
-              inputAttr={{
-                ...register('disbursementDate'),
-                className: 'text-center',
+            <InputSel
+              className={scss.datePicker}
+              datePickerProps={{
+                props: {
+                  value: moment(watchData.disbursementDate),
+                  onChange: (md) => {
+                    setValue('disbursementDate', md?.toISOString() ?? '');
+                  },
+                },
               }}
             />
           </div>
@@ -210,7 +303,18 @@ export default function ContractReviewForm({
           <div>3</div>
           <div className="flex">
             <span>合理的放款票期</span>
-            <InputBox className="flex-auto" inputAttr={{ ...register('paymentTenor') }} />
+            {/* <InputBox className="flex-auto" inputAttr={{ ...register('paymentTenor') }} /> */}
+            <InputSel
+              className={scss.datePicker}
+              datePickerProps={{
+                props: {
+                  value: moment(watchData.paymentTenor),
+                  onChange: (md) => {
+                    setValue('paymentTenor', md?.toISOString() ?? '');
+                  },
+                },
+              }}
+            />
           </div>
           {/*  */}
           <div>4</div>
@@ -218,6 +322,7 @@ export default function ContractReviewForm({
             <RadioContainer
               label={'是否出具履約保證票'}
               labelClassName="mr-[48px]"
+              value={watchData.performanceBond}
               onChange={(v) => {
                 setValue('performanceBond', v);
               }}
@@ -230,6 +335,7 @@ export default function ContractReviewForm({
             <RadioContainer
               label={'是否可請訂金款'}
               labelClassName="mr-[75px]"
+              value={watchData.depositPayment}
               onChange={(v) => {
                 setValue('depositPayment', v);
               }}
@@ -252,6 +358,7 @@ export default function ContractReviewForm({
             <RadioContainer
               label={'是否出具保固票或保固金'}
               labelClassName="mr-[48px]"
+              value={watchData.warrantyPayment}
               onChange={(v) => {
                 setValue('warrantyPayment', v);
               }}
@@ -264,6 +371,7 @@ export default function ContractReviewForm({
               <RadioContainer
                 label={'是否註明收足90%出具防火證明、出廠證明'}
                 labelClassName="mr-[48px]"
+                value={watchData.fireproofCertificate}
                 onChange={(v) => {
                   setValue('fireproofCertificate', v);
                 }}
@@ -277,6 +385,7 @@ export default function ContractReviewForm({
               <RadioContainer
                 label={'是否註明收足100%出具保固書'}
                 labelClassName="mr-[48px]"
+                value={watchData.warranty}
                 onChange={(v) => {
                   setValue('warranty', v);
                 }}
@@ -290,6 +399,7 @@ export default function ContractReviewForm({
               <RadioContainer
                 label={'請按裝款時是否需配合工地試車'}
                 labelClassName="mr-[48px]"
+                value={watchData.testDrive}
                 onChange={(v) => {
                   setValue('testDrive', v);
                 }}
@@ -319,15 +429,21 @@ export default function ContractReviewForm({
           </div>
         </div>
         {/*  */}
+        {/* 不需要了`,api更新後要拿掉 */}
         <div className="mt-9">
           <p className="text-main text-[18px] text-center mb-[18px]">請選擇送審人員</p>
           <div className={scss.table}>
-            <RowArr empArr={empArr} selEmployeeArr={selEmployeeArr} viewRef_bottom={viewRef_bottom} onClick={onClick} />
+            <RowArr
+              empArr={empArr}
+              selEmployeeIdArr={selEmployeeIdArr}
+              viewRef_bottom={viewRef_bottom}
+              onClick={onClick}
+            />
           </div>
         </div>
 
         <div className={scss.btnBox}>
-          <MyButton_v2 label="確定" theme="danger" onClick={onConfirm} px="px44" />
+          <MyButton_v2 label="確定" theme="danger" onClick={theOnConfirm} px="px44" />
           <MyButton_v2 label="取消" onClick={onCancel} px="px44" />
         </div>
 
@@ -491,17 +607,19 @@ const RadioContainer = ({
   label,
   className,
   labelClassName,
+  value,
   onChange,
 }: {
   label: string;
   className?: string;
   labelClassName?: string;
+  value: boolean;
   onChange: (v: boolean) => void;
 }) => {
   return (
     <div className={classNames(className)}>
       <span className={classNames('inline-block', labelClassName)}>{label}</span>
-      <Radio.Group onChange={(e) => onChange(e.target.value)}>
+      <Radio.Group onChange={(e) => onChange(e.target.value)} value={value}>
         <Radio value={true}>是</Radio>
         <Radio value={false}>否</Radio>
       </Radio.Group>
@@ -511,7 +629,7 @@ const RadioContainer = ({
 
 const RowArr = ({
   empArr,
-  selEmployeeArr,
+  selEmployeeIdArr,
   // skipArr,
   viewRef_bottom,
   // exceptEmpArr,
@@ -519,7 +637,7 @@ const RowArr = ({
 }: // exceptEmpCheck,
 {
   empArr: TemployeeDto[];
-  selEmployeeArr: TemployeeDto[];
+  selEmployeeIdArr: string[];
   // skipArr?: TemployeeDto[];
   onClick: (v: TemployeeDto) => void;
   // exceptEmpArr?: { id: string }[];
@@ -540,19 +658,7 @@ const RowArr = ({
           return undefined;
         })();
 
-        const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
-        // let isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
-
-        // if (!isExcept && exceptEmpCheck) {
-        //   isExcept = exceptEmpCheck(emp);
-        // }
-        // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
-
-        // const theOnClick = isExcept ? undefined : () => onClick(emp);
-
-        // if (isSkinp) {
-        //   return <div key={index} className="skip" ref={theViewRef}></div>;
-        // }
+        const isActive = selEmployeeIdArr.some((selEmpId) => selEmpId === emp.id);
 
         return (
           <CellWithBar key={index} isActive={isActive}>
@@ -646,10 +752,10 @@ class Class_payMethod {
     this.reRender();
   }
 
-  get body() {
+  get body(): TpaymentRatioDto {
     return {
-      title: this.title,
-      percent: this.percent,
+      level: this.title,
+      paymentRatio: this.percent,
       price: this.price,
       note: this.note,
     };
@@ -686,16 +792,28 @@ const usePayMethod = ({ contractPrice }: { contractPrice: number }) => {
     reRender();
   };
 
-  const resetMethodList = () => {
-    const newKey = nanoid();
+  const resetMethodList = ({ defaultPayMethodArr }: { defaultPayMethodArr?: TpayMethod[] } = {}) => {
     const newList: TpayMethodList = {};
 
-    newList[newKey] = new Class_payMethod({
-      reRender,
-      payMethod: creEmptyMethod(),
-      delSelf: () => creDelMethod(newList)(newKey),
-      contractPrice,
-    });
+    if (defaultPayMethodArr) {
+      defaultPayMethodArr.forEach((item) => {
+        const newKey = nanoid();
+        newList[newKey] = new Class_payMethod({
+          reRender,
+          payMethod: item,
+          delSelf: () => creDelMethod(newList)(newKey),
+          contractPrice,
+        });
+      });
+    } else {
+      const newKey = nanoid();
+      newList[newKey] = new Class_payMethod({
+        reRender,
+        payMethod: creEmptyMethod(),
+        delSelf: () => creDelMethod(newList)(newKey),
+        contractPrice,
+      });
+    }
 
     setPayMethodList(newList);
   };

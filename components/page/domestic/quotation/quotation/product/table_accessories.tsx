@@ -7,7 +7,7 @@ import Tbody, { TcellConfig } from '../tbody';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import AccessorySelector, { TdoorAccessoryDto } from 'components/global/gear/modal/accessorySelector';
 
 // type
@@ -25,6 +25,8 @@ export default function Table_accessories({
   onVKeyChange,
   doorModel,
   onSelectorConfirm,
+  panelBox,
+  emptyBlockWidth,
 }: {
   disabled: boolean;
   list: TaccessoriesList | undefined;
@@ -35,6 +37,8 @@ export default function Table_accessories({
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   doorModel: string | undefined;
   onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  emptyBlockWidth?: string;
 }) {
   const [showSelector, setShowSelector] = useState(false);
 
@@ -57,7 +61,7 @@ export default function Table_accessories({
               cellConfigList={cellConfig}
               allowMove={allowMove}
               resetTrigger={keyArr.length}
-              emptyBlockWidth="137px"
+              emptyBlockWidth={emptyBlockWidth || '137px'}
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as TaccessoriesKey[];
                 changeKeyArr(keyArr);
@@ -73,20 +77,30 @@ export default function Table_accessories({
               onRowClick={(obj) => {}}
               // defalutVKeyArr={defalutVKeyArr}
               // onVKeyChange={onVKeyChange}
+              panelBox={panelBox}
             />
           )}
 
           {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
-              {/* <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={add} /> */}
-              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={() => setShowSelector(true)} />
+              <MyButton_v2
+                className={scss.addBtn}
+                label="新增選配"
+                onClick={() => {
+                  if (!doorModel) {
+                    return myAlert.info({ title: '請先選擇主產品與主產品門型' });
+                  }
+
+                  setShowSelector(true);
+                }}
+              />
             </div>
           )}
         </div>
       </div>
       {/*  */}
       <AccessorySelector
-        showModal={!!doorModel && showSelector}
+        showModal={showSelector}
         modelName={doorModel}
         onConfirm={onSelectorConfirm}
         onCancel={() => setShowSelector(false)}

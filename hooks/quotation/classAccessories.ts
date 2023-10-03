@@ -21,40 +21,59 @@ class Class_accessories {
     //
     reRender,
     data = emptyAccessoriesOri(),
-    delSelf,
-    copySelf,
+    // delSelf,
+    // copySelf,
     // calcOptionsAllprice,
     prod,
     isNew = true,
+    key,
   }: {
     reRender: TreRender;
     data?: Taccessories;
-    delSelf: () => void;
-    copySelf: () => void;
+    // delSelf: () => void;
+    // copySelf: () => void;
     // calcOptionsAllprice: () => void;
     prod: Class_product;
     isNew?: boolean;
+    key: string;
   }) {
     this.reRender = reRender;
     this._acceData = data;
     this._prod = prod;
+    this.key = key;
 
-    this.delSelf = delSelf;
-    this.copySelf = copySelf;
+    // this.delSelf = delSelf;
+    // this.copySelf = copySelf;
+
+    this.delSelf = () => prod.delAcce(key);
+    this.copySelf = () => prod.copyAcce(key);
 
     if (isNew) {
-      this.calcPrice();
+      setTimeout(() => {
+        this.calcPrice();
+      }, 0);
     }
 
     // this.calcOptionsAllprice = calcOptionsAllprice;
-  } // constructor
+    // =constructor=============================
+  } // =constructor=============================
 
   private reRender;
   private _acceData;
+  readonly key;
   private _prod;
-  readonly delSelf;
-  readonly copySelf;
+  delSelf: () => void;
+  copySelf: () => void;
   // readonly calcOptionsAllprice;
+
+  // --------------------------------------------------------------------
+
+  reNewMethod() {
+    this.delSelf = () => this._prod.delAcce(this.key);
+    this.copySelf = () => this._prod.copyAcce(this.key);
+  }
+
+  // --------------------------------------------------------------------
 
   calcPrice() {
     const originalPrice = this._acceData.originalPrice ?? 0;
@@ -75,27 +94,23 @@ class Class_accessories {
     this.price = String(price); // will call calcAllPrice
   }
 
-  calcAllPrice({
-    toCalcAccessoriesAllprice: toCalcAccessoriesAllprice = true,
-  }: { toCalcAccessoriesAllprice?: boolean } = {}) {
+  calcAllPrice() {
     const price = this._acceData.price;
     const discount = new Decimal(this._prod.discount).div(100);
 
     const quantity = this.quantity || 0;
-    // 牌價複價
+    // 牌價複價;
     const dualPrice = new Decimal(price).mul(quantity);
-    // 單價
+    // 單價;
     const unitPrice = new Decimal(price).mul(discount);
-    // 複價
+    // 複價;
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
     this._acceData.dualPrice = dualPrice.toNumber();
     this._acceData.unitPrice = unitPrice.toNumber();
     this._acceData.totalPrice = totalPrice.toNumber();
 
-    if (toCalcAccessoriesAllprice) {
-      this._prod.calcAccessoriesAllprice();
-    }
+    this._prod.calcProdAllprice_timeout();
 
     this.reRender();
   }

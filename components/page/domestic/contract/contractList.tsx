@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 // components
 import ListTop01 from '../local/list/list01/listTop01';
-import ListHeader01 from '../local/list/list01/listHeader01';
+import ListHeader01, { Tcontract } from '../local/list/list01/listHeader01';
 import ListBody01 from '../local/list/list01/listBody01';
 
 // antd
@@ -15,13 +15,11 @@ import style from './contractList.module.scss';
 // type
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
+export type { Tcontract };
+
 const { Panel } = Collapse;
 
-export default function ContractList({
-  contractList,
-}: {
-  contractList: Parameters<typeof ListHeader01>[0]['contract'][];
-}) {
+export default function ContractList({ contractList }: { contractList: Tcontract[] }) {
   const router = useRouter();
 
   // 點擊變粉紅色用

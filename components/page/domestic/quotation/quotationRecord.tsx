@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import moment from 'moment';
 
 // antd
 import { Collapse } from 'antd';
@@ -20,17 +21,32 @@ import style from './quotationRecord.module.scss';
 // config
 import { prodCellConfigOri } from './hook/useProduct';
 
-export default function QuotationRecord({ prodChangingRecord }: { prodChangingRecord: TchangeRecord | undefined }) {
-  const { list } = prodChangingRecord ?? { list: {} };
-  const recordKeyList = Object.keys(list);
+// ===================================================================
+import {
+  TcreateQuotationContentOtherDto,
+  TquotationProductDto,
+  TquotationContentOtherDto,
+  TquotationContractDto,
+} from 'js/api/dtoTypes';
+// ===================================================================
 
-  const { keyList: prodKeyList, cellConfig } = prodCellConfigOri();
+export default function QuotationRecord({
+  // prodChangingRecord,
+  subContract,
+}: {
+  // prodChangingRecord: TchangeRecord | undefined;
+  subContract: TquotationContractDto[] | undefined;
+}) {
+  // const { list } = prodChangingRecord ?? { list: {} };
+  // const recordKeyList = Object.keys(list);
+
+  // const { keyList: prodKeyList, cellConfig } = prodCellConfigOri();
 
   // ======================================================
   const [activePanel, setActivePanel] = useState<number[]>([]);
 
   const activeAllPanel = () => {
-    const activeArr = recordKeyList.map((item, index) => index);
+    const activeArr = subContract?.map((item, index) => index) ?? [];
 
     if (activePanel.length === activeArr.length) {
       setActivePanel([]);
@@ -39,7 +55,7 @@ export default function QuotationRecord({ prodChangingRecord }: { prodChangingRe
     }
   };
 
-  const isPanelAllActive = activePanel.length === recordKeyList.length;
+  const isPanelAllActive = activePanel.length === subContract?.length;
 
   // ======================================================
   return (
@@ -70,9 +86,11 @@ export default function QuotationRecord({ prodChangingRecord }: { prodChangingRe
           accordion={false}
           activeKey={activePanel}
         >
-          {recordKeyList.map((key, index) => {
-            const changeInfo = list[key];
-            const { product } = changeInfo;
+          {subContract?.map((item, index) => {
+            // const changeInfo = list[key];
+            // const { product } = changeInfo;
+
+            const content = item.content;
 
             const activeIndex = activePanel.findIndex((item) => item === index);
             const isActive = activeIndex === -1 ? false : true;
@@ -87,6 +105,13 @@ export default function QuotationRecord({ prodChangingRecord }: { prodChangingRe
               }
             };
 
+            const changeInfo = {
+              quotationId: content.quotationNumber,
+              date: moment(content.quotationDate).format('yy-MM-DD'),
+              priceChange: '-10000',
+              remark: content.editNotes,
+            };
+
             return (
               <Panel
                 key={index}
@@ -99,8 +124,8 @@ export default function QuotationRecord({ prodChangingRecord }: { prodChangingRe
                 }
               >
                 <div className={style.prodContainer}>
-                  <Thead />
-                  <Tbody product={product} />
+                  {/* <Thead />
+                  <Tbody product={product} /> */}
                 </div>
               </Panel>
             );
@@ -108,15 +133,22 @@ export default function QuotationRecord({ prodChangingRecord }: { prodChangingRe
         </Collapse>
       </div>
 
-      {!prodChangingRecord && (
+      {/* {!prodChangingRecord && (
         <div className={style.noRecord}>
           <span>無追加/追減項目紀錄</span>
         </div>
-      )}
+      )} */}
     </div>
   ); // return
 
   // ======================================================
+  interface TchangeListItem {
+    quotationId: string; // 編號
+    date: string; // 日期
+    priceChange: number | string; // 追加追減項目
+    remark: string; // 備註
+  }
+
   function RecordInfo({
     changeInfo,
     panelSwitch,
@@ -126,102 +158,102 @@ export default function QuotationRecord({ prodChangingRecord }: { prodChangingRe
     panelSwitch: () => void;
     isActive: boolean;
   }) {
-    const { id, date, priceChange, remark } = changeInfo;
+    const { quotationId, date, priceChange, remark } = changeInfo;
 
     // 在金額數字前面加上 "+$" 或 "-$" 字串
     // replace的部分是加進千分位
-    const formatedPriceChange =
-      priceChange > 0
-        ? `+$${priceChange}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-        : `-$${-priceChange}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    // const formatedPriceChange =
+    //   priceChange > 0
+    //     ? `+$${priceChange}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    //     : `-$${-priceChange}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
     return (
       <div className={style.recordInfo}>
-        <span>{id}</span>
+        <span>{quotationId}</span>
         <span /> {/* 直線 */}
         <span>{date}</span>
-        <span>{formatedPriceChange}</span>
+        <span>{quotationId}</span>
         <span>{remark}</span>
       </div>
     );
   } // RecordInfo
 
-  function Thead() {
-    return (
-      <div className={style.thead}>
-        <span></span>
-        <span></span>
-        {prodKeyList.map((key, index) => {
-          const { id, label, width, type } = cellConfig[key];
-          const theStyle = { width };
-          const styleCenter = type === 'checkbox' ? 'text-center' : '';
-          const className = `${style.column} ${styleCenter}`;
+  // function Thead() {
+  //   return (
+  //     <div className={style.thead}>
+  //       <span></span>
+  //       <span></span>
+  //       {prodKeyList.map((key, index) => {
+  //         const { id, label, width, type } = cellConfig[key];
+  //         const theStyle = { width };
+  //         const styleCenter = type === 'checkbox' ? 'text-center' : '';
+  //         const className = `${style.column} ${styleCenter}`;
 
-          return (
-            <div className={className} key={index} style={theStyle}>
-              <span>{label}</span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  } // Thead
+  //         return (
+  //           <div className={className} key={index} style={theStyle}>
+  //             <span>{label}</span>
+  //           </div>
+  //         );
+  //       })}
+  //     </div>
+  //   );
+  // } // Thead
 
-  function Tbody({ product }: { product: TrecordProduct[] }) {
-    return (
-      <>
-        {
-          product.map((item, index) => {
-            const { action } = item;
-            const classAction = action === 'add' ? style.add : action === 'remove' ? style.remove : '';
+  // function Tbody({ product }: { product: TrecordProduct[] }) {
+  //   return (
+  //     <>
+  //       {
+  //         product.map((item, index) => {
+  //           const { action } = item;
+  //           const classAction = action === 'add' ? style.add : action === 'remove' ? style.remove : '';
 
-            return (
-              <div key={index} className={style.tbody}>
-                <span className={`${style.action} ${classAction}`}></span>
-                <span>{index + 1}</span>
-                {
-                  prodKeyList.map((key, index) => {
-                    const { width, type } = cellConfig[key];
-                    const value = item[key];
-                    const theStyle = { width };
+  //           return (
+  //             <div key={index} className={style.tbody}>
+  //               <span className={`${style.action} ${classAction}`}></span>
+  //               <span>{index + 1}</span>
+  //               {
+  //                 prodKeyList.map((key, index) => {
+  //                   const { width, type } = cellConfig[key];
+  //                   const value = item[key];
+  //                   const theStyle = { width };
 
-                    if (type === 'selectWithIcon') {
-                      const { label, icon } = value as {
-                        label: string;
-                        icon: string;
-                      };
+  //                   if (type === 'selectWithIcon') {
+  //                     const { label, icon } = value as {
+  //                       label: string;
+  //                       icon: string;
+  //                     };
 
-                      return (
-                        <div className={style.column} key={index} style={theStyle}>
-                          {/*  eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={icon} alt="" />
-                          <span>{label}</span>
-                        </div>
-                      );
-                    }
+  //                     return (
+  //                       <div className={style.column} key={index} style={theStyle}>
+  //                         {/*  eslint-disable-next-line @next/next/no-img-element */}
+  //                         <img src={icon} alt="" />
+  //                         <span>{label}</span>
+  //                       </div>
+  //                     );
+  //                   }
 
-                    if (type === 'checkbox') {
-                      return (
-                        <div className={`${style.column} text-center`} key={index} style={theStyle}>
-                          <Checkbox01 stateValue={value as boolean} cursor="auto" />
-                        </div>
-                      );
-                    }
+  //                   if (type === 'checkbox') {
+  //                     return (
+  //                       <div className={`${style.column} text-center`} key={index} style={theStyle}>
+  //                         <Checkbox01 stateValue={value as boolean} cursor="auto" />
+  //                       </div>
+  //                     );
+  //                   }
 
-                    return (
-                      <div className={style.column} key={index} style={theStyle}>
-                        <span>{value as string}</span>
-                      </div>
-                    );
-                  }) /* prodKeyList */
-                }
-              </div>
-            );
-          }) /* product */
-        }
-      </>
-    );
-  } // Tbody
+  //                   return (
+  //                     <div className={style.column} key={index} style={theStyle}>
+  //                       <span>{value as string}</span>
+  //                     </div>
+  //                   );
+  //                 }) /* prodKeyList */
+  //               }
+  //             </div>
+  //           );
+  //         }) /* product */
+  //       }
+  //     </>
+  //   );
+  // } // Tbody
 } // QuotationRecord
 
 // ================================================================

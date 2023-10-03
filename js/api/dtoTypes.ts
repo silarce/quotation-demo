@@ -780,24 +780,27 @@ export type TquotationProductComponentsDto = {
   createdAt: string;
   updatedAt: string;
   type:
-    | 'slatType'
+    | 'slat'
     | 'bottomBar'
     //
     | 'guideRail'
-    | 'sidePlateType'
+    | 'sidePlate'
     | 'roller'
     | 'motor'
     | 'motorAccessories'
     | 'headBox';
   number: string;
   componentId: string;
-  rawData: string;
-  bom: string;
+  rawData: object;
+  /**
+  從TdoorBomDto_Component取得的bom要直接送進來這個bom
+   */
+  bom: any; // 前端不會直接用到，先直接設object
   material: string;
   materialSurface: string | null | undefined;
   isPainted: boolean;
   price: number;
-  quantity: number;
+  quantity: string;
   order: number;
 };
 // 但是後端有建立這個型別
@@ -875,8 +878,11 @@ export type TquotationProductDto = {
   close: string;
   // 備註
   notes: string;
-
   order: number;
+
+  bottomBarAngleIron: string; // 底座角鐵
+  bottomBarPlate: string; // 底座板
+
   items: {
     // // 材料配件
     components: TquotationProductComponentsDto[];
@@ -911,9 +917,12 @@ export type TquotationContentDto = {
   //審核相關
   reviewSalesEmployee: TemployeeDto | null;
   salesReviewedAt: string | null;
+  reviewWorkDirectorEmployee: TemployeeDto | null;
+  workDirectorReviewedAt: string | null;
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
-  //
+  reviewManagerEmployee: TemployeeDto | null;
+  managerReviewedAt: string | null;
   /**備註 */
   annotations: string[] | null;
   /**報價範圍 */
@@ -937,9 +946,13 @@ export type TquotationContentDto = {
   deliveryDate: string;
   /**付款方式 */
   paymentMethods: TpaymentMethodDto[];
+  toSalesAt: string | null;
+  toSupervisorAt: string | null;
 
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];
+
+  verifyForm: TquotationVerifyFormDto;
 };
 
 export type TquotationDto = {
@@ -949,6 +962,7 @@ export type TquotationDto = {
   quotationNumber: string;
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
+  attachedToContract: TquotationContentDto & { verifyForm: TquotationVerifyFormDto };
 };
 
 export type TcreateQuotationProductDto = {
@@ -1036,6 +1050,8 @@ export type TcreateQuotationProductDto = {
   materialSurface: string;
   isPainted: boolean;
   order: number;
+  bottomBarAngleIron: string; // 底座角鐵
+  bottomBarPlate: string; // 底座板
 };
 
 // type TupdateQuotationContentDto = {
@@ -1098,6 +1114,29 @@ export type TcreateQuotationContentDto = {
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
   productsOrder?: string[] | null; // 已棄用
+};
+
+export type TquotationContractDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  annotations: string[] | null;
+  quotationRanges: string[] | null;
+  discount: string;
+  subTotal: number;
+  salesTax: number;
+  total: number;
+  deliveryLocation: string;
+  deliveryDate: string | null; // date
+  paymentMethods: TpaymentMethodDto[];
+  verifyForm: TquotationVerifyFormDto;
+  quotation: TquotationDto;
+  content: TquotationContentDto;
+  rootContract: TquotationContractDto; // 源合約
+  attachedToContract: TquotationContractDto; // 上一份追加減合約
+  attachedContract: TquotationContractDto; // 下一份追加減合約
+  //
+  subContracts: TquotationContractDto[];
 };
 
 // ========================================================================
@@ -1330,6 +1369,7 @@ export type TgenerateDoorProductBomDto_DoorSpec = {
   bearingType: string;
   gearNumber: string;
   chains: number;
+  fullWidth: number;
 };
 
 export type TgenerateDoorProductBomDto = {
@@ -1347,6 +1387,8 @@ export type TgenerateDoorProductBomDto = {
 export type TdoorBomDto_Component = {
   id: string;
   number: string;
+  bom: object[]; // 前端不會直接用到，先直接設object
+  price: number;
 };
 
 export type TdoorProductBomDto = {
@@ -1375,29 +1417,28 @@ export type TdoorAccessoryDto = {
 // =========================================================================
 
 export type TpaymentRatioDto = {
-  // @ApiProperty({ description: '階段' })
-  // @IsString()
+  // '階段'
   level: string;
-  // @ApiProperty({ example: '0.35', description: '比例(0.0 - 1.0)' })
-  // @IsNumberString()
-  paymentRatio: `${number}`;
-  // @ApiProperty({ description: '金額' })
-  // @IsNumberString()
+  // example: '0.35', description: '比例(0.0 - 1.0)'
+  paymentRatio: string;
+  // 金額
   price: string;
-  // @ApiProperty({ description: '備註' })
-  // @IsString()
+  // 備註
   note: string;
 };
 
-export type TcontractReviewForm = {
+export type TquotationVerifyFormDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
   //  請款日期
-  askForPaymentDate: Date;
+  askForPaymentDate: string;
   //  放款日期
-  disbursementDate: Date;
+  disbursementDate: string;
   //  請款比例
   paymentRatio: TpaymentRatioDto[];
   //  合理放款票期
-  paymentTenor: Date;
+  paymentTenor: string;
   //  履約保證票
   performanceBond: boolean;
   //  可否請款訂金
@@ -1416,4 +1457,51 @@ export type TcontractReviewForm = {
   testDrive: boolean;
   //  扣款項目、比例、金額
   debitItem: string;
+  // 合約審核表審核主管(工務部主管)
+  workDirectorId: string;
+};
+
+export type TcreateQuotationVerifyFormDto = {
+  //  請款日期
+  askForPaymentDate: string;
+  //  放款日期
+  disbursementDate: string;
+  //  請款比例
+  paymentRatio: TpaymentRatioDto[];
+  //  合理放款票期
+  paymentTenor: string;
+  //  履約保證票
+  performanceBond: boolean;
+  //  可否請款訂金
+  depositPayment: boolean;
+  //  保固期(年)
+  warrantyPeriod: number;
+  //  備註
+  note: string;
+  //  保固金或保固票
+  warrantyPayment: boolean;
+  //  防火證明
+  fireproofCertificate: boolean;
+  //  保固書
+  warranty: boolean;
+  //  是否需配合工地試車
+  testDrive: boolean;
+  //  扣款項目、比例、金額
+  debitItem: string;
+  // 合約審核表審核主管(工務部主管)
+  workDirectorId: string;
+};
+
+export type TreviewQuotationContentDto = {
+  reviewSalesEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewWorkDirectorEmployeeId?: string | null;
+  reviewManagerEmployeeId?: string | null;
+  reviewResult: boolean;
+};
+
+export type TsubmitReviewQotuationContentDto = {
+  reviewSalesEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewWorkDirectorEmployeeId?: string | null;
 };
