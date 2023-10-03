@@ -884,12 +884,15 @@ export type TquotationProductDto = {
   bottomBarPlate: string; // 底座板
 
   items: {
-    // // 材料配件
+    // 材料配件
     components: TquotationProductComponentsDto[];
-    // // 選配設定
+    // 選配設定
     accessories: TquotationProductAccessoriesDto[];
-    // 還有其他很多有的沒有的，用不到，以後有空再補上
+    // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
   }[];
+
+  attachedToProductId?: string | null;
+  attachedToProduct?: TquotationProductDto | null;
 };
 
 export type TquotationContentDto = {
