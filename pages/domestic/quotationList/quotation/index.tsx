@@ -562,7 +562,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     if (userId === reviewWorkDirectorEmployeeId) {
-      if (salesReviewedAt && reviewSupervisorEmployeeId) {
+      if (salesReviewedAt && supervisorReviewedAt) {
         isWorkDirector = true;
         isReviewer = true;
       }
