@@ -216,7 +216,14 @@ export default function QuotationList() {
       <LoadingCover01 isLoading={isLoading} />
       <ContractSelector
         showModal={contractSelectShow}
-        onConfirm={() => {}}
+        onConfirm={(v) => {
+          router.push({
+            pathname: '/domestic/contract/attachContract',
+            query: {
+              contractId: v[0].id,
+            },
+          });
+        }}
         onCancel={() => setContractSelectShow(false)}
       />
     </SubLayer>
