@@ -126,7 +126,7 @@ export default function AttachContract() {
           });
 
           const body: TcreateModifyQuotationDto = {
-            ...data.content,
+            // ...data.content,
             products: attachProdArr,
           };
 

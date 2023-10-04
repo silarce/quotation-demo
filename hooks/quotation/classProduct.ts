@@ -1956,6 +1956,10 @@ class Class_product {
       order: 0,
     };
 
+    if ('items' in body) {
+      delete body.items;
+    }
+
     return body;
   }
 
