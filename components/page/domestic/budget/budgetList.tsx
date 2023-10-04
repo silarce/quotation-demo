@@ -88,19 +88,19 @@ export default function BudgetList({
                 isReviewed: true,
               },
               {
-                jobName: '主管',
+                jobName: '業務',
                 name: reviewSalesEmployee?.chName ?? '',
                 isReviewed: reviewSalesEmployee ? !!salesReviewedAt : undefined,
               },
               {
-                jobName: '工務主管',
-                name: reviewWorkDirectorEmployee?.chName ?? '',
-                isReviewed: reviewWorkDirectorEmployee ? !!workDirectorReviewedAt : undefined,
-              },
-              {
-                jobName: '經理',
+                jobName: '業務主管',
                 name: reviewSupervisorEmployee?.chName ?? '',
                 isReviewed: reviewSupervisorEmployee ? !!supervisorReviewedAt : undefined,
+              },
+              {
+                jobName: '應收帳款',
+                name: reviewWorkDirectorEmployee?.chName ?? '',
+                isReviewed: reviewWorkDirectorEmployee ? !!workDirectorReviewedAt : undefined,
               },
               {
                 jobName: '總經理',

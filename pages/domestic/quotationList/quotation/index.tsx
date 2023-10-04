@@ -554,16 +554,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       isReviewer = true;
     }
 
-    if (userId === reviewWorkDirectorEmployeeId) {
+    if (userId === reviewSupervisorEmployeeId) {
       if (salesReviewedAt) {
-        isWorkDirector = true;
+        isSupervisor = true;
         isReviewer = true;
       }
     }
 
-    if (userId === reviewSupervisorEmployeeId) {
-      if (salesReviewedAt && workDirectorReviewedAt) {
-        isSupervisor = true;
+    if (userId === reviewWorkDirectorEmployeeId) {
+      if (salesReviewedAt && reviewSupervisorEmployeeId) {
+        isWorkDirector = true;
         isReviewer = true;
       }
     }
@@ -881,11 +881,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '送審',
       onClick: () => {
-        if (status === 'Budget' || status === 'Bidding') {
-          openEmpSel('reviewSales');
-        } else {
-          openEmpSel('reviewSupervisor');
-        }
+        openEmpSel('reviewSales');
       },
     },
     // status
@@ -1011,6 +1007,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return myAlert.warning({ title: '請選擇交貨日期' });
     }
 
+    let hasSurface = true;
+    body.products.forEach((item) => {
+      if (!item.materialSurface) {
+        hasSurface = false;
+      }
+    });
+
+    if (!hasSurface) {
+      return myAlert.warning({ title: '所有主產品必須選擇表面' });
+    }
+
     try {
       setIsLoading(true);
 
@@ -1088,8 +1095,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
-      reviewSupervisorEmployeeId: isWorkDirector ? userId : null,
-      reviewWorkDirectorEmployeeId: isSupervisor ? userId : null,
+      reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+      reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
       reviewResult: isPass,
     };

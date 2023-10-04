@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useRouter, NextRouter } from 'next/router';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -42,7 +43,9 @@ export default function QuotationList() {
   const status = router.query.status as 'Budget' | 'Bidding' | 'Contracting';
 
   const { userInfo } = useContext(AppContext);
-  const userId = userInfo?.employee?.id;
+  const userEmp = userInfo?.employee;
+  const userId = userEmp?.id;
+  const userGrade = _.sortBy(userEmp?.jobs, 'grade').reverse()[0].grade;
 
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
@@ -65,16 +68,18 @@ grade14以上的帳號理論上只會有一個
     },
   };
 
-  //審核中
-  const reviewStatusFilter_inReview = {
+  const filter_isReivewer = {
     $or: {
       'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
       'latestContent.reviewSalesEmployee.id': { $eq: userId },
       'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
       'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-      'latestContent.reviewManagerEmployee.id': { $eq: userId },
+      // 'latestContent.reviewManagerEmployee.id': { $eq: userId },
     },
   };
+
+  //審核中
+  const reviewStatusFilter_inReview = userGrade < 14 ? filter_isReivewer : undefined;
 
   // 已審核
   const reviewStatusFilter_reviewed = {
@@ -84,13 +89,7 @@ grade14以上的帳號理論上只會有一個
       'latestContent.workDirectorReviewedAt': { $notNull: true },
       'latestContent.managerReviewedAt': { $notNull: true },
     },
-    $or: {
-      'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
-      'latestContent.reviewSalesEmployee.id': { $eq: userId },
-      'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-      'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-      'latestContent.reviewManagerEmployee.id': { $eq: userId },
-    },
+    $or: userGrade < 14 ? filter_isReivewer : undefined,
   };
 
   const reviewStatusFilter =

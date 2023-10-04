@@ -466,7 +466,7 @@ class Class_component {
       // 下面這幾個先跳過
       number: this.codeNumber ?? '',
       componentId: this.componentId ?? '',
-      rawData: {},
+      rawData: { foo: 'foo' },
       bom: this._com.bom,
       // order: '', //在外面處理
     };
