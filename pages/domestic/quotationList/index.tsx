@@ -8,6 +8,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import ContractSelector from 'components/global/gear/modal/contractSelector';
 
 // components
 import BudgeList from 'components/page/domestic/budget/budgetList';
@@ -37,7 +38,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 export default function QuotationList() {
   const router = useRouter();
   const { county, customerName, projectName, reviewStatus } = router.query as { [key: string]: string };
-  //   Budget
+  // Budget
   // Bidding
   // Contracting
   const status = router.query.status as 'Budget' | 'Bidding' | 'Contracting';
@@ -47,15 +48,11 @@ export default function QuotationList() {
   const userId = userEmp?.id;
   const userGrade = _.sortBy(userEmp?.jobs, 'grade').reverse()[0].grade;
 
+  const [contractSelectShow, setContractSelectShow] = useState(false);
+
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
-
-  /**
-grade14以上的帳號理論上只會有一個
-
-我要怎麼知道user的哪個身分?是經辦或是主管或其他的身分?
- */
 
   // 未審核
   const reviewStatusFilter_noReview = {
@@ -184,8 +181,17 @@ grade14以上的帳號理論上只會有一個
 
   // ----------------------------------------------------------
 
+  const attatchBtn = {
+    type: 'myButton',
+    label: '追加追減',
+    onClick: () => {
+      setContractSelectShow(true);
+    },
+  } as const;
+
   const panelList: TpanelList = [
     { searchGroup },
+    status === 'Contracting' ? attatchBtn : null,
     {
       type: 'addButton',
       label: '新增報價單',
@@ -208,6 +214,11 @@ grade14以上的帳號理論上只會有一個
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
       </div>
       <LoadingCover01 isLoading={isLoading} />
+      <ContractSelector
+        showModal={contractSelectShow}
+        onConfirm={() => {}}
+        onCancel={() => setContractSelectShow(false)}
+      />
     </SubLayer>
   );
 }
