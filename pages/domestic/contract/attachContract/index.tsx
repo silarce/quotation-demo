@@ -21,7 +21,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { useGetContract_id_forAttach } from 'js/api/api_quotation';
+import { useGetContract_id_forAttach, apiQuotationModify, TcreateModifyQuotationDto } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -69,6 +69,7 @@ export default function AttachContract() {
     reset: resetClass,
     //
     attachProdList,
+    addProd_attach,
   } = useProductList({
     productArr: data?.content.products,
     others: data?.content.others,
@@ -115,6 +116,26 @@ export default function AttachContract() {
         //
         try {
           showRootLoading(true);
+
+          if (!data || !attachProdList || !contractId) {
+            return;
+          }
+
+          const attachProdArr = Object.values(attachProdList).map((prod) => {
+            return prod.body;
+          });
+
+          const body: TcreateModifyQuotationDto = {
+            ...data.content,
+            products: attachProdArr,
+          };
+
+          try {
+            await apiQuotationModify(contractId, body);
+          } catch (error) {}
+
+          //
+          //
         } catch (error) {
           myAlert.err({ title: '上傳失敗' });
         } finally {
@@ -225,7 +246,7 @@ export default function AttachContract() {
           <br />
           <br />
           <Table_prod
-            disabled={true}
+            disabled={false}
             prodList={attachProdList}
             prodCellConfig={prodCellConfig}
             prodKeyArr={prodKeyArr}
@@ -233,7 +254,7 @@ export default function AttachContract() {
             // addProd={addProd}
             // setTargetProd={setTargetProdKey}
             changeProdKeyArr={() => {}}
-            addProd={() => {}}
+            addProd={addProd_attach}
             setTargetProd={setTargetProdKey_attach}
             // defalutVKeyArr={prodVKeyArr}
             // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
@@ -247,12 +268,33 @@ export default function AttachContract() {
           <br />
           <br />
           <Table_com
-            disabled={true}
+            disabled={false}
             comList={targetProd_attach?.comList}
             comCellConfig={comCellConfig}
             comKeyArr={comKeyArr}
             changeComKeyArr={() => {}}
             defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
+          />
+
+          <br />
+          <br />
+
+          <Table_accessories
+            disabled={false}
+            list={targetProd_attach?.accessoriesList}
+            cellConfig={accessoriesCellConfig}
+            keyArr={accessoriesKeyArr}
+            changeKeyArr={() => {}}
+            // defalutVKeyArr={}
+            // onVKeyChange={}
+            doorModel={targetProd_attach?.doorType}
+            onSelectorConfirm={(arr) => {
+              if (targetProd_attach) {
+                targetProd_attach.addAcce(arr);
+              }
+            }}
+            // panelBox={}
+            // emptyBlockWidth={}
           />
 
           {/*  */}

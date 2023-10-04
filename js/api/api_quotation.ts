@@ -17,6 +17,7 @@ import type {
   TreviewQuotationContentDto,
   TsubmitReviewQotuationContentDto,
   TquotationContractDto,
+  TcreateModifyQuotationDto,
 } from './dtoTypes';
 
 export type {
@@ -29,6 +30,7 @@ export type {
   TreviewQuotationContentDto,
   TsubmitReviewQotuationContentDto,
   TquotationContractDto,
+  TcreateModifyQuotationDto,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -542,6 +544,17 @@ export const apiDelQuotation_id_attachments = (id: string, fileId: string) => {
 
   return axi
     .delete(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// ================================================================
+
+export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotationDto) => {
+  const api = `/quotation/${contractId}/modify`;
+
+  return axi
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
