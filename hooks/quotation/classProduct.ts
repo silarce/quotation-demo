@@ -767,6 +767,7 @@ class Class_product {
     this.creComList({
       dataList,
     });
+    this.material = this.material;
     // this.creComList({
     //   slat: slat || creEmptyCom(),
     //   bottomBar: bottomBar || creEmptyCom(),
