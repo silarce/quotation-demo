@@ -46,7 +46,7 @@ export default function QuotationList() {
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
   const userId = userEmp?.id;
-  const userGrade = _.sortBy(userEmp?.jobs, 'grade').reverse()[0].grade;
+  const userGrade = _.sortBy(userEmp?.jobs, 'grade')?.reverse()[0]?.grade;
 
   const [contractSelectShow, setContractSelectShow] = useState(false);
 
