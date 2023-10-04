@@ -4,6 +4,9 @@ import classNames from 'classnames';
 // components
 import DndThead from '../DndThead';
 import Tbody, { TcellConfig } from '../tbody';
+import ExchangePanel, {
+  ExchangeRow,
+} from 'components/page/domestic/quotation/legacyContract/exchangePanel/exchangePanel';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -27,6 +30,8 @@ export default function Table_prod({
   //
   panelBox,
   emptyBlockWidth,
+  //
+  isAttach,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -41,8 +46,13 @@ export default function Table_prod({
   //
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   emptyBlockWidth?: string;
+  isAttach?: boolean; // 追加追減介面
 }) {
   const [allowMove, setAllowMove] = useState(false);
+
+  // -----------------------------------------------------------------------
+  const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+  // -----------------------------------------------------------------------
 
   return (
     <div className={scss.tableContainer}>
@@ -56,40 +66,80 @@ export default function Table_prod({
       {/*  */}
       <div className={scss.main}>
         <div className={scss.listContainer}>
-          <div className={scss.theadContainer}>
-            <DndThead
-              keyArr={prodKeyArr}
-              cellConfigList={prodCellConfig}
-              allowMove={allowMove}
-              resetTrigger={prodKeyArr.length}
-              emptyBlockWidth={emptyBlockWidth || '137px'}
-              onDragEndCallback={(dndKeyArr) => {
-                const keyArr = dndKeyArr as TprodKey[];
-                changeProdKeyArr(keyArr);
-              }}
-            />
-          </div>
+          {/*  */}
 
-          <Tbody
-            disabled={disabled}
-            rowList={prodList}
-            keyArr={prodKeyArr}
-            prodCellConfig={prodCellConfig}
-            onRowClick={(obj) => {
-              setTargetProd(obj.key);
-            }}
-            // defalutVKeyArr={defalutVKeyArr}
-            onVKeyChange={onVKeyChange}
-            rowHeight={rowHeight}
-            panelBox={panelBox}
-          />
-
-          {!disabled && (
-            <div className={classNames(scss.addBtnWrapper)}>
-              <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={addProd} />
+          <div className={scss.left}>
+            <div className={scss.theadContainer}>
+              <DndThead
+                keyArr={prodKeyArr}
+                cellConfigList={prodCellConfig}
+                allowMove={allowMove}
+                resetTrigger={prodKeyArr.length}
+                emptyBlockWidth={emptyBlockWidth || '137px'}
+                onDragEndCallback={(dndKeyArr) => {
+                  const keyArr = dndKeyArr as TprodKey[];
+                  changeProdKeyArr(keyArr);
+                }}
+              />
             </div>
-          )}
+
+            <Tbody
+              disabled={disabled}
+              rowList={prodList}
+              keyArr={prodKeyArr}
+              prodCellConfig={prodCellConfig}
+              onRowClick={(obj) => {
+                setTargetProd(obj.key);
+              }}
+              // defalutVKeyArr={defalutVKeyArr}
+              // onVKeyChange={onVKeyChange}
+              onVKeyChange={(arr) => {
+                if (!arr) {
+                  return;
+                }
+
+                onVKeyChange && onVKeyChange(arr);
+                setVerticalKeyArr(arr);
+              }}
+              rowHeight={rowHeight}
+              panelBox={panelBox}
+            />
+
+            {!disabled && (
+              <div className={classNames(scss.addBtnWrapper)}>
+                <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={addProd} />
+              </div>
+            )}
+          </div>
+          {/* listContainer close */}
         </div>
+        {isAttach && (
+          <ExchangePanel>
+            {verticalKeyArr.map((key, index) => {
+              const prod = prodList[key];
+
+              if (!prod) {
+                return null;
+              }
+
+              return (
+                <ExchangeRow
+                  key={index}
+                  style={{ height: '106px' }}
+                  oriQty={prod.quantity}
+                  reduce={prod.reduceQty}
+                  reduceOnChange={(v) => {
+                    prod.reduceQty = v;
+                  }}
+                  exchange={prod.exchangeQty}
+                  changedMoney={prod.reduceExchangePrice}
+                />
+              );
+            })}
+          </ExchangePanel>
+        )}
+
+        {/* main close */}
       </div>
       {/*  */}
     </div>

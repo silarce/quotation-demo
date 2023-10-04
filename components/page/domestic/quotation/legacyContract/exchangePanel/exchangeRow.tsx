@@ -6,15 +6,17 @@ const ExchangeRow = ({
   reduceOnChange,
   exchange,
   changedMoney,
+  style,
 }: {
   oriQty: number | string;
   reduce: number | string;
   reduceOnChange: (v: string) => void;
   exchange: number | string;
   changedMoney: string;
+  style?: React.CSSProperties;
 }) => {
   return (
-    <div className={scss.row}>
+    <div className={scss.row} style={style}>
       <span>{oriQty}</span>
       <div className={scss.inputBox}>
         <span>-</span>
