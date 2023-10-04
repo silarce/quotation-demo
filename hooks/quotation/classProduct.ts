@@ -597,8 +597,9 @@ class Class_product {
           const item = res[key];
           comList[key].codeNumber = item.number;
           comList[key].componentId = item.id;
-          comList[key].price = item.price;
+          comList[key].price = item.unitPrice; // 這是牌價，不是單價
           comList[key].bom = item.bom;
+          comList[key].quantity = String(item.quantity);
           comList[key].calcAllPrice();
         });
       }
@@ -1386,6 +1387,11 @@ class Class_product {
   }
   set area(v) {
     this._prodData.area = v;
+
+    if (this.comList) {
+      this.comList.slat.quantity = v;
+    }
+
     this.volume = this.calcVolume();
     this.reRender();
   }
@@ -1718,6 +1724,10 @@ class Class_product {
     this.reRender();
   }
 
+  get attachedToProductId() {
+    return this._prodData.attachedToProductId;
+  }
+
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
@@ -1774,7 +1784,7 @@ class Class_product {
     }
 
     const copy = _.cloneDeep(this.body_Tprod);
-    // copy.quantity = Number(v);
+    copy.quantity = Number(v);
     // copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
     // if ('id' in copy) {
@@ -1812,6 +1822,15 @@ class Class_product {
     return true;
     //
   }
+
+  // 清空變更prod
+  clearAttach = () => {
+    console.log('foo');
+    this._exchangeProdList = {};
+    this._reduceQty = '0';
+    // this._countSubTotal();
+    this.reRender();
+  };
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
@@ -1866,7 +1885,7 @@ class Class_product {
   }
 
   get body() {
-    // //
+    //
     // if (!this.accessoriesVKeyArr) {
     //   this.accessoriesVKeyArr = [];
     // }
@@ -2047,6 +2066,7 @@ type Tprod = {
   bottomBarPlate: string;
   //
   // 用來辨識至追加追減
+  attachedToProductId?: string | null;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;

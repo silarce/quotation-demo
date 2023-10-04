@@ -103,7 +103,7 @@ export default function TheQuotationProdChangingRecord({
           // 要找出多了什麼，少了什麼
           // 我要怎麼比較?
           const contentProdArr = content.products;
-          const preContentProdArr = preContent?.content.products;
+          // const preContentProdArr = preContent?.content.products;
 
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
@@ -235,9 +235,9 @@ const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) =
         changeProdKeyArr={changeProdKeyArr}
         addProd={() => {}}
         setTargetProd={() => {}}
-        panelBox="easyBox"
         emptyBlockWidth="80px"
         rowHeight={'h106'}
+        panelBox="stateBox"
       />
     </div>
   );

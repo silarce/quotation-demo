@@ -11,6 +11,8 @@ import ExchangePanel, {
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { Class_product, TprodKey, TproductList } from 'hooks/quotation/useProduct';
 
@@ -32,7 +34,9 @@ export default function Table_prod({
   emptyBlockWidth,
   //
   isAttach,
-}: {
+  targetProd,
+}: // targetProd,
+{
   disabled: boolean;
   prodList: TproductList;
   prodCellConfig: TcellConfig;
@@ -44,14 +48,37 @@ export default function Table_prod({
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h106';
   //
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   emptyBlockWidth?: string;
   isAttach?: boolean; // 追加追減介面
+  targetProd?: Class_product | undefined;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
   // -----------------------------------------------------------------------
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+  // -----------------------------------------------------------------------
+
+  const [showInputModal, setShowInputModal] = useState(false);
+
+  const exchangeConfirm_2 = (v: string) => {
+    if (!targetProd) {
+      return;
+    }
+
+    const ressult = targetProd.addExchange(v);
+
+    if (ressult === false) {
+      myAlert.warning({ title: '超過上限' });
+    } else {
+      setShowInputModal(false);
+    }
+  };
+
+  const onCancel_2 = () => {
+    setShowInputModal(false);
+  };
+
   // -----------------------------------------------------------------------
 
   return (
@@ -103,6 +130,9 @@ export default function Table_prod({
               }}
               rowHeight={rowHeight}
               panelBox={panelBox}
+              showAttatchModal={() => {
+                setShowInputModal(true);
+              }}
             />
 
             {!disabled && (
@@ -142,6 +172,16 @@ export default function Table_prod({
         {/* main close */}
       </div>
       {/*  */}
+      <InputModal
+        visible={!!showInputModal}
+        title="請輸入變更數量"
+        tip={`上限 : ${targetProd && targetProd.remainQty}`}
+        onConfirm={(v) => {
+          exchangeConfirm_2(v);
+        }}
+        onCancel={onCancel_2}
+        inputAttr={{ type: 'number', placeholder: '請輸入數量' }}
+      />
     </div>
   );
 }

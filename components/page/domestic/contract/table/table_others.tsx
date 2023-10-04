@@ -45,7 +45,7 @@ export default function Table_others({
               keyArr={keyArr}
               cellConfigList={cellConfig}
               resetTrigger={keyArr.length}
-              emptyBlockWidth="137px"
+              emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as TothersKey[];
                 changeKeyArr(keyArr);

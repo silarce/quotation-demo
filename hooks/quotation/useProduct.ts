@@ -396,11 +396,27 @@ const useProductList = ({
   }, [calcTrigger]);
 
   // ---------------------------------------------------------
-
+  /**回到編輯前的狀態，就是以一開始取得的資料重新建立list */
   const reset = () => {
     createProdList();
     createOthersList();
   };
+  // ---------------------------------------------------------
+
+  const attachProdList = (() => {
+    const list: { [key: string]: Class_product } = {};
+
+    Object.values(productList).forEach((prod, index) => {
+      Object.values(prod.exchangeProdList).forEach((item) => {
+        const newId = nanoid();
+        list[newId] = item;
+      });
+    });
+
+    return list;
+  })();
+
+  // ---------------------------------------------------------
 
   return {
     reRender,
@@ -431,6 +447,8 @@ const useProductList = ({
     changeOthersKeyArr,
     addOthers,
     getOthersPostBodyArr,
+    //
+    attachProdList,
   };
 };
 

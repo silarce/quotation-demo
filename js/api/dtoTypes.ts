@@ -1399,7 +1399,8 @@ export type TdoorBomDto_Component = {
   id: string;
   number: string;
   bom: object[]; // 前端不會直接用到，先直接設object
-  price: number;
+  unitPrice: number;
+  quantity: number;
 };
 
 export type TdoorProductBomDto = {

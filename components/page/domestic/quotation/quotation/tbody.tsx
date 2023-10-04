@@ -12,7 +12,8 @@ import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
-
+import iconReset from 'public/image/icon/reset.svg';
+import iconChange from 'public/image/icon/change.svg';
 // css
 
 import scss from './tbody.module.scss';
@@ -43,6 +44,7 @@ type Titem = {
   [key: string]: any;
   delSelf?: () => void;
   copySelf?: () => void;
+  clearAttach?: () => void;
 };
 
 type TitemList = {
@@ -70,6 +72,7 @@ export default function Tbody({
   defalutVKeyArr,
   onVKeyChange,
   rowHeight,
+  showAttatchModal,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -78,10 +81,11 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (obj: { item: Titem; key: string }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h106';
+  showAttatchModal?: () => void;
 }) {
   // ---------------------------------------------------------------
 
@@ -161,6 +165,8 @@ export default function Tbody({
                 }}
                 defalutVKeyArr={defalutVKeyArr}
                 rowHeight={rowHeight}
+                showAttatchModal={showAttatchModal}
+                clearAttach={item.clearAttach}
               />
             );
           })}
@@ -258,6 +264,49 @@ const ComBox = ({
   );
 };
 
+const ResetChangeBtnBox = ({
+  toSetTargetIndex,
+  clearExchange,
+  dndAttr,
+  dndListener,
+  indexNum,
+  isLatestBatch,
+}: {
+  toSetTargetIndex: undefined | (() => void);
+  clearExchange: undefined | (() => void);
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  indexNum: string | number;
+  isLatestBatch?: boolean;
+}) => {
+  return (
+    <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
+      <Image className={scss.iconBtn} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+
+      <Image
+        src={iconReset}
+        alt="還原"
+        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        onClick={clearExchange}
+      />
+      <Image
+        src={iconChange}
+        alt="變更"
+        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        onClick={toSetTargetIndex}
+      />
+
+      {/* <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
+        還原
+      </button>
+      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
+        變更
+      </button> */}
+      <span>{indexNum}</span>
+    </div>
+  );
+};
+
 // --------------------------------------------------------
 
 const NoItem = ({
@@ -303,6 +352,8 @@ function DndRow({
   isActive,
   panelBox = 'copyDelBtnBox',
   rowHeight,
+  showAttatchModal,
+  clearAttach,
 }: {
   id: string;
   pIndex: number;
@@ -318,9 +369,10 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   rowHeight?: 'h106';
-  //
+  showAttatchModal?: () => void;
+  clearAttach?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id,
@@ -350,6 +402,17 @@ function DndRow({
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
           {panelBox === 'comBox' && (
             <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
+          )}
+
+          {panelBox === 'resetChangeBox' && (
+            <ResetChangeBtnBox
+              toSetTargetIndex={showAttatchModal}
+              clearExchange={clearAttach}
+              dndAttr={attributes}
+              dndListener={listeners}
+              indexNum={pIndex}
+              isLatestBatch={true}
+            />
           )}
 
           {/*  */}

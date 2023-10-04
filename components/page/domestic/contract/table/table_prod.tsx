@@ -39,7 +39,7 @@ export default function Table_prod({
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h106';
   //
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  panelBox?: 'stateBox' | 'easyBox';
   emptyBlockWidth?: string;
 }) {
   const [allowMove, setAllowMove] = useState(false);

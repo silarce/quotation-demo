@@ -21,7 +21,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id_forAttach } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -34,53 +34,52 @@ export default function AttachContract() {
   const contractId = router.query.contractId as string | undefined;
 
   // ----------------------------------------------------
-  const { data, update } = useGetContract_id(contractId);
+  const { data, update } = useGetContract_id_forAttach(contractId);
   useEffect(() => {
     update();
   }, [contractId]);
 
-  console.log(data);
-
   // ------------------------------------------------------------------
-  // const {
-  //   productList,
-  //   prodCellConfig,
-  //   prodKeyArr,
-  //   prodVKeyArr,
-  //   setProdVKeyArr,
-  //   addProd,
-  //   changeProdKeyArr,
-  //   //
-  //   comKeyArr,
-  //   comCellConfig,
-  //   changeComKeyArr,
-  //   comVKeyArr,
-  //   //
-  //   accessoriesKeyArr,
-  //   changeAccessoriesKeyArr,
-  //   accessoriesCellConfig,
-  //   //
-  //   othersKeyArr,
-  //   othersList,
-  //   othersCellConfig,
-  //   changeOthersKeyArr,
-  //   addOthers,
-  //   getOthersPostBodyArr,
-  //   //
-  //   subTotal: quotationProdSubTotal,
-  //   reset: resetClass,
-  //   //
-  // } = useProductList({
-  //   productArr: quotationData?.latestContent.products,
-  //   others: quotationData?.latestContent.others,
-  //   resetTrigger: quotationData,
-  // });
+  const {
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
+    addProd,
+    changeProdKeyArr,
+    //
+    comKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    comVKeyArr,
+    //
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+    //
+    subTotal: quotationProdSubTotal,
+    reset: resetClass,
+    //
+    attachProdList,
+  } = useProductList({
+    productArr: data?.content.products,
+    others: data?.content.others,
+    resetTrigger: data,
+  });
 
-  // const [targetProdKey, setTargetProdKey] = useState<string>('n');
-  // const targetProd = productList[targetProdKey];
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
 
-  // const [targetProdKey_chilrden, setTargetProdKey_children] = useState<string>('n');
-  // const targetProd_children = productList_children[targetProdKey];
+  const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
+  const targetProd_attach = attachProdList[targetProdKey_attach];
 
   // ------------------------------------------------------------------
 
@@ -156,7 +155,7 @@ export default function AttachContract() {
 
           <div className={scss.tableWrapper}>
             {/* 主產品設定 */}
-            {/* <Table_prod
+            <Table_prod
               disabled={true}
               prodList={productList}
               prodCellConfig={prodCellConfig}
@@ -167,8 +166,94 @@ export default function AttachContract() {
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"
-            /> */}
+              isAttach={true}
+              panelBox="resetChangeBox"
+              targetProd={targetProd}
+            />
+            <br />
+            <br />
+            <Table_com
+              disabled={true}
+              comList={targetProd?.comList}
+              comCellConfig={comCellConfig}
+              comKeyArr={comKeyArr}
+              changeComKeyArr={changeComKeyArr}
+              defalutVKeyArr={comVKeyArr}
+            />
+            <br />
+            <br />
+            <Table_accessories
+              disabled={true}
+              list={targetProd?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={changeAccessoriesKeyArr}
+              // defalutVKeyArr={}
+              // onVKeyChange={}
+              doorModel={targetProd?.doorType}
+              onSelectorConfirm={() => {}}
+              // panelBox={}
+              // emptyBlockWidth={}
+            />
+            <br />
+            <br />
+            <div className={scss.tableWrapper}>
+              {/* 其他設定 */}
+              <Table_others
+                disabled={true}
+                list={othersList}
+                cellConfig={othersCellConfig}
+                keyArr={othersKeyArr}
+                changeKeyArr={changeOthersKeyArr}
+                add={() => {}}
+              />
+            </div>
           </div>
+          {/*  */}
+          {/*  */}
+          {/*  */}
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <Table_prod
+            disabled={true}
+            prodList={attachProdList}
+            prodCellConfig={prodCellConfig}
+            prodKeyArr={prodKeyArr}
+            // changeProdKeyArr={changeProdKeyArr}
+            // addProd={addProd}
+            // setTargetProd={setTargetProdKey}
+            changeProdKeyArr={() => {}}
+            addProd={() => {}}
+            setTargetProd={setTargetProdKey_attach}
+            // defalutVKeyArr={prodVKeyArr}
+            // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+            onVKeyChange={(keyArr) => {}}
+            rowHeight="h106"
+            // isAttach={true}
+            // panelBox="resetChangeBox"
+            // targetProd={targetProd}
+          />
+
+          <br />
+          <br />
+          <Table_com
+            disabled={true}
+            comList={targetProd_attach?.comList}
+            comCellConfig={comCellConfig}
+            comKeyArr={comKeyArr}
+            changeComKeyArr={() => {}}
+            defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
+          />
 
           {/*  */}
         </div>

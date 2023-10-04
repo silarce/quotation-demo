@@ -75,20 +75,20 @@ export default function Quotation() {
 // ===========================================================
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
-    quotationId, //報價單id
+    id, //報價單id
   } = router.query;
 
   // =========================================================
 
-  const { data, update } = useGetContract_id(quotationId as string | undefined);
+  const { data, update } = useGetContract_id(id as string | undefined);
 
   useEffect(() => {
     update();
-  }, [quotationId]);
+  }, [id]);
 
   // =========================================================
   // 是否可編輯
-  const [allowEdit, setAllowEdit] = useState(quotationId === 'newQuotation' ? true : false);
+  const [allowEdit, setAllowEdit] = useState(id === 'newQuotation' ? true : false);
   const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
 
@@ -106,10 +106,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${quotationId}`,
-      onClick: () => alert(quotationId),
+      label: `報價編號 ${data?.content.quotationNumber}`,
+      onClick: () => {},
     },
-    { label: '工程聯絡單', onClick: () => alert('工程聯絡單') },
+    { label: '工程聯絡單', onClick: () => {} },
   ];
 
   const panel_quotation01: TpanelList = [
@@ -154,12 +154,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   const panel_quotation03: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => alert('匯出單價分析'),
-    },
+    // TODO 要記得把這個功能再做出來
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => alert('匯出單價分析'),
+    // },
     {
       type: 'redButton',
       label: '上傳',
@@ -484,12 +485,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && (
-            <QuotationRecord
-              // prodChangingRecord={prodChangingRecord}
-              subContract={data?.subContracts}
-            />
-          )}
+          {switch02 && <QuotationRecord subContract={data?.subContracts} rootContractTotal={rootContent?.total ?? 0} />}
 
           <Summary
             disabled={true}
