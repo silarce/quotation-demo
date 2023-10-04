@@ -123,11 +123,12 @@ export default function Contract() {
     };
   });
 
-  const contractList: Tcontract[] =
+  const contractList =
     data?.map((item) => {
       const content = item.content;
 
       return {
+        id: item.id,
         quotationId: content.quotationNumber,
         clientName: content.customer.name,
         quotationName: content.projectName,

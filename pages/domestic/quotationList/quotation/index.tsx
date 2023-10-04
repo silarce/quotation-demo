@@ -529,7 +529,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
-  const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
+  const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
@@ -554,16 +554,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       isReviewer = true;
     }
 
-    if (userId === reviewWorkDirectorEmployeeId) {
+    if (userId === reviewSupervisorEmployeeId) {
       if (salesReviewedAt) {
-        isWorkDirector = true;
+        isSupervisor = true;
         isReviewer = true;
       }
     }
 
-    if (userId === reviewSupervisorEmployeeId) {
-      if (salesReviewedAt && workDirectorReviewedAt) {
-        isSupervisor = true;
+    if (userId === reviewWorkDirectorEmployeeId) {
+      if (salesReviewedAt && reviewSupervisorEmployeeId) {
+        isWorkDirector = true;
         isReviewer = true;
       }
     }
@@ -762,7 +762,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經辦',
       inputProps: {
         props: {
-          value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+          // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+          value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
           disabled: true,
         },
       },
@@ -880,14 +881,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '送審',
       onClick: () => {
-        if (status === 'Budget' || status === 'Bidding') {
-          openEmpSel('reviewSales');
-        } else {
-          openEmpSel('reviewSupervisor');
-        }
+        openEmpSel('reviewSales');
       },
     },
-    { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
+    // status
+    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
+    (() => {
+      if (status === 'Contracting') {
+        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+      } else {
+        return null;
+      }
+    })(),
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -924,6 +929,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const prodArr: TcreateQuotationProductDto[] =
       prodVKeyArr?.map((key, index) => {
         const prod = productList[key];
+
         const quantity = Number(prod.quantity);
         const originProd = prod.originProd;
 
@@ -999,6 +1005,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     if (!body.deliveryDate) {
       return myAlert.warning({ title: '請選擇交貨日期' });
+    }
+
+    let hasSurface = true;
+    body.products.forEach((item) => {
+      if (!item.materialSurface) {
+        hasSurface = false;
+      }
+    });
+
+    if (!hasSurface) {
+      return myAlert.warning({ title: '所有主產品必須選擇表面' });
     }
 
     try {
@@ -1078,8 +1095,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
-      reviewSupervisorEmployeeId: isWorkDirector ? userId : null,
-      reviewWorkDirectorEmployeeId: isSupervisor ? userId : null,
+      reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+      reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
       reviewResult: isPass,
     };

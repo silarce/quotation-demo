@@ -20,6 +20,9 @@
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
+import { AxiosError } from 'axios';
+
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
 
@@ -63,6 +66,7 @@ import type {
   TquotationProductComponentsDto,
   TquotationProductDto,
   TdoorAccessoryDto,
+  TcreateQuotationProductDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -349,6 +353,8 @@ class Class_product {
       unitPrice: this._prodData.unitPrice,
       totalPrice: this._prodData.totalPrice,
       discount: this._prodData.discount,
+      itemName: this._prodData.itemName,
+      quoteType: this._prodData.quoteType,
     };
 
     this._quantity = String(this._prodData.quantity);
@@ -411,9 +417,14 @@ class Class_product {
       return false;
     }
 
-    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+    let res: TdoorGeneralSpecsDto;
 
-    if (!res) {
+    try {
+      res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
       return false;
     }
 
@@ -477,6 +488,8 @@ class Class_product {
     }
 
     this._doorGeneralSpecs = res;
+
+    return true;
   } // calcGeneralSpec
 
   // ________________________
@@ -488,21 +501,25 @@ class Class_product {
       return false;
     }
 
-    const res = await apiGetProdAvailableComponents({
-      modelName: this.doorType as TpacParams['modelName'],
-      weight: this.weight,
-      isAntiTyphoon: this.typhoonProtection,
-      rollerDiameter: rollerDiameter,
-    });
+    try {
+      const res = await apiGetProdAvailableComponents({
+        modelName: this.doorType as TpacParams['modelName'],
+        weight: this.weight,
+        isAntiTyphoon: this.typhoonProtection,
+        rollerDiameter: rollerDiameter,
+      });
+      this._availableComponents = res;
 
-    if (!res) {
+      this.retrieveOptions();
+      this.callRetrieveCreProdCom();
+
+      return true;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
+
       return false;
     }
-
-    this._availableComponents = res;
-
-    this.retrieveOptions();
-    this.callRetrieveCreProdCom();
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
@@ -511,7 +528,7 @@ class Class_product {
     const comList = this.comList;
 
     if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
-      return;
+      return false;
     }
 
     const fullWidth =
@@ -544,7 +561,9 @@ class Class_product {
 
     Object.values(comList).forEach((item) => {
       if (!item) {
-        return (haveNull = true);
+        haveNull = true;
+
+        return false;
       }
 
       const key = item.key;
@@ -563,46 +582,60 @@ class Class_product {
     });
 
     if (haveNull) {
-      return;
+      return false;
     }
 
     const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
 
-    const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
+    try {
+      const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
 
-    if (res) {
-      const keyArr = Object.keys(res) as (keyof typeof res)[];
-      keyArr.forEach((key) => {
-        const item = res[key];
-        comList[key].codeNumber = item.number;
-        comList[key].componentId = item.id;
-        comList[key].price = item.price;
-        comList[key].bom = item.bom;
-        comList[key].calcAllPrice();
-      });
+      if (res) {
+        const keyArr = Object.keys(res) as (keyof typeof res)[];
+        keyArr.forEach((key) => {
+          const item = res[key];
+          comList[key].codeNumber = item.number;
+          comList[key].componentId = item.id;
+          comList[key].price = item.price;
+          comList[key].bom = item.bom;
+          comList[key].calcAllPrice();
+        });
+      }
+
+      return true;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '取得bom資料失敗', content: err.response?.data.message });
     }
   } // reqProdGenerateDoorProductBom
 
   async reqChain() {
+    let res1: boolean | undefined;
+    let res2: boolean | undefined;
+    let res3: boolean | undefined;
+
     try {
       this.isLoading = true;
       this.reRender();
 
       if (this.shouldCall_cgs) {
-        await this.req_calcGeneralSpec();
+        res1 = await this.req_calcGeneralSpec();
       }
 
       if (this.shouldCall_cgs) {
-        await this.req_getProdAvailableComponents();
+        res2 = await this.req_getProdAvailableComponents();
       }
 
       if (this.shouldCall_pgpb) {
-        await this.reqProdGenerateDoorProductBom();
+        res3 = await this.reqProdGenerateDoorProductBom();
       }
     } catch (error) {
     } finally {
       this.isLoading = false;
-      this.takeDefaultDynaValue();
+
+      if (res1 || res2 || res3) {
+        this.takeDefaultDynaValue();
+      }
     }
 
     this.shouldCall_cgs = false;
@@ -1644,19 +1677,24 @@ class Class_product {
     this.reRender();
   }
 
+  /**底座角鐵 */
   get bottomBarAngleIron() {
     return this._prodData.bottomBarAngleIron;
   }
   set bottomBarAngleIron(v) {
     this._prodData.bottomBarAngleIron = v;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
     this.reRender();
   }
-
+  /**底座版 */
   get bottomBarPlate() {
     return this._prodData.bottomBarPlate;
   }
   set bottomBarPlate(v) {
     this._prodData.bottomBarPlate = v;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
     this.reRender();
   }
 
@@ -1698,23 +1736,36 @@ class Class_product {
       };
     });
 
-    return {
+    const body: TcreateQuotationProductDto & { id: string | undefined } = {
       ...this._prodData,
+      id: this._prodData.id,
+      doorModelName: this.doorType,
+      materialName: this.material,
+      materialSurface: this.surface,
+      guideRail: this.doorTrack,
+      motorVendor: this.motor,
+      guideRailThickness: Number(this.doorTrackThick),
+      hasSilencingStrip: this.doorTrackSilencerStrip,
+      isIntegratedHeadBox: this.onePieceRollUpBox,
+      isAntiTyphoon: this.typhoonProtection,
+      closingType: this.close,
+      motorPhase: Number(this.phase),
+
       // 送去後端要轉為要從m轉為mm
-      width: Number(this._prodData.width) * 1000,
-      length: Number(this._prodData.length) * 1000,
+      WG: Number(this._prodData.width) * 1000,
+      fullWidth: Number(this._prodData.length) * 1000,
       height: Number(this._prodData.height) * 1000,
       boxB: Number(this._prodData.boxB) * 1000,
       boxD: Number(this._prodData.boxD) * 1000,
       quantity: Number(this._prodData.quantity),
       //
-      rollUpBoxThick: Number(this._prodData.rollUpBoxThick),
-      voltage: Number(this._prodData.voltage),
-      doorTrackThick: Number(this._prodData.doorTrackThick),
+      headBoxThickness: Number(this._prodData.rollUpBoxThick),
+      motorVoltage: Number(this._prodData.voltage),
+      // doorTrackThick: Number(this._prodData.doorTrackThick),
       // doorTrackThick: 1,
-      motorSupport: this._prodData.motorSupport,
+      hasMotorSupportStand: this._prodData.motorSupport,
       //
-      materialSurface: this._prodData.surface ?? '',
+      // materialSurface: this._prodData.surface ?? '',
       isPainted: false,
       //
       price: Number(this._price),
@@ -1724,7 +1775,10 @@ class Class_product {
       //
       components,
       accessories: accessories,
+      order: 0,
     };
+
+    return body;
   }
 
   //-----------------------------------------
@@ -1784,22 +1838,9 @@ type Tprod = {
   //
   bottomBarAngleIron: string;
   bottomBarPlate: string;
+  //
+  // 用來辨識至追加追減
 };
-
-// TODO 新增欄位
-/**
-底座角鐵 bottomBarAngleIron
-鍍鋅 50*50*4T
-高耐鍍鋅鋼板 50*50*3T
-不鏽鋼#304 50*50*3T
-不鏽鋼#316 50*50*3T
-
-底座板 bottomBarPlate
-鍍鋅 1.5T
-高耐鍍鋅鋼板 1.5T
-不鏽鋼#304 1.5T
-不鏽鋼#316 1.5T
- */
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
 type TprodKey = string;
@@ -1900,8 +1941,6 @@ const emptyProdOri = (): Tprod => {
 // ======================================================================
 // ======================================================================
 // ======================================================================
-
-// ===========================================================
 
 const checkIsSST = (material: string) => {
   return material.startsWith('SST#');

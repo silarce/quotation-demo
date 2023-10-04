@@ -19,7 +19,7 @@ export type { Tcontract };
 
 const { Panel } = Collapse;
 
-export default function ContractList({ contractList }: { contractList: Tcontract[] }) {
+export default function ContractList({ contractList }: { contractList: (Tcontract & { id: string })[] }) {
   const router = useRouter();
 
   // 點擊變粉紅色用
@@ -36,7 +36,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
       <ListTop01 />
       <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
         {contractList.map((item, index) => {
-          const { quotationId } = item;
+          const { quotationId, id } = item;
           const isActive = activeIndex === index;
 
           const onClick = (e: MouseEvent) => {
@@ -44,7 +44,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
             const isContract = true;
             router.push({
               pathname: `/domestic/contract/quotation`,
-              query: { quotationId, isContract },
+              query: { id, isContract },
             });
           };
 

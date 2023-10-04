@@ -1,0 +1,65 @@
+@use "styles/theme01" as *;
+
+.container {
+  :global(.ant-modal-content) {
+    width: 800px;
+    height: fit-content;
+    padding: 19px 30px;
+    padding-top: 19px;
+  }
+  @screen laptop {
+    :global(.ant-modal-content) {
+      width: 80vw;
+      height: 80vh;
+    }
+  }
+}
+.listContainer {
+  height: 350px;
+  padding: 0 1px;
+  .divider {
+    height: 5px;
+    background-color: gray;
+  }
+}
+.rowWrapper {
+  &:nth-last-of-type(1) {
+    border: none;
+  }
+}
+.row {
+  display: grid;
+  grid-template-columns: 120px auto;
+  // height: 54px;
+  padding: 17px 30px;
+  gap: 16px 26px;
+  border-bottom: solid 1px $colorBorder01;
+  cursor: pointer;
+
+  span {
+    margin: auto;
+    margin-left: 0;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    color: $colorText;
+  }
+
+  &.except {
+    background-color: #ddd;
+    cursor: auto;
+  }
+
+  .left {
+    display: grid;
+    gap: 15px;
+  }
+  .right {
+    display: grid;
+    grid-template-columns: 60px auto;
+    gap: 15px;
+    > span:nth-of-type(1) {
+      grid-column: span 2;
+    }
+  }
+}

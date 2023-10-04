@@ -129,16 +129,16 @@ const useProductList = ({
 
       const prodData: Tprod = {
         ...prod,
-        phase: 1,
-        voltage: String(prod.voltage),
-        motorSupport: prod.motorSupport,
-        doorTrackThick: String(prod.doorTrackThick),
-        rollUpBoxThick: String(prod.rollUpBoxThick),
+        phase: prod.motorPhase,
+        voltage: String(prod.motorVoltage),
+        motorSupport: prod.hasMotorSupportStand,
+        doorTrackThick: String(prod.guideRailThickness),
+        rollUpBoxThick: String(prod.headBoxThickness),
         // 取得時是mm，要轉成m
-        width: String(Number(prod.width) / 1000),
-        length: String(Number(prod.length) / 1000),
+        width: String(Number(prod.WG) / 1000),
+        length: String(Number(prod.fullWidth) / 1000),
         height: String(Number(prod.height) / 1000),
-        boxB: String(Number(prod.width) / 1000),
+        boxB: String(Number(prod.WG) / 1000),
         boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
@@ -146,6 +146,17 @@ const useProductList = ({
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
         accessories: prod.items?.[0].accessories ?? [],
         components: prod.items?.[0].components ?? [],
+        //
+
+        doorType: prod.doorModelName,
+        material: prod.materialName,
+        surface: prod.materialSurface,
+        close: prod.closingType,
+        doorTrack: prod.guideRail,
+        typhoonProtection: prod.isAntiTyphoon,
+        motor: prod.motorVendor,
+        doorTrackSilencerStrip: prod.hasSilencingStrip,
+        onePieceRollUpBox: prod.isIntegratedHeadBox,
       };
 
       list[key] = new Class_product({

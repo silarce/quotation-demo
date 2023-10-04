@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import _ from 'lodash';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
 
@@ -26,6 +28,7 @@ export type {
   TcreateQuotationVerifyFormDto as TcontractReviewForm,
   TreviewQuotationContentDto,
   TsubmitReviewQotuationContentDto,
+  TquotationContractDto,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -136,18 +139,18 @@ type TgetContracts = {
 export const apiGetContract = async (params?: Tparams) => {
   const api = '/quotation/contracts';
 
-  params = {
-    populate: [
-      'content.customer',
-      'content.agentEmployee',
-      'content.reviewSalesEmployee',
-      'content.reviewWorkDirectorEmployee',
-      'content.reviewSupervisorEmployee',
-      'content.products.quantity',
-      'content.products.options',
-    ],
-    ...params,
-  };
+  // params = {
+  //   ...params,
+  //   populate: [
+  //     'content.customer',
+  //     'content.agentEmployee',
+  //     'content.reviewSalesEmployee',
+  //     'content.reviewWorkDirectorEmployee',
+  //     'content.reviewSupervisorEmployee',
+  //     'content.products.quantity',
+  //     'content.products.options',
+  //   ],
+  // };
 
   return axi
     .get<TgetContracts>(api, { params })
@@ -158,8 +161,21 @@ export const apiGetContract = async (params?: Tparams) => {
 export const useGetContract = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetContracts>();
 
+  const params: Tparams = {
+    populate: [
+      'content.customer',
+      'content.agentEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.products.quantity',
+      'content.products.options',
+    ],
+    ...customParams,
+  };
+
   const update = async () => {
-    const newRes = await apiGetContract(customParams);
+    const newRes = await apiGetContract(params);
 
     if (newRes) {
       setRes(newRes);
@@ -172,6 +188,130 @@ export const useGetContract = (customParams?: Tparams) => {
     data: res?.data,
     meta: res?.meta,
     update,
+  };
+};
+
+export const useContract_infinite = ({ customParams }: { customParams?: Tparams }) => {
+  /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
+  const [resetCount, setResetCount] = useState(0);
+  const [isLoadingPage1, setIsLoadingPage1] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
+  const [viewRef_top, inView_top] = useInView();
+  const [viewRef_bottom, inView_bottom] = useInView();
+  // ----------------------------------------------------------------
+  const [dataList, setDataList] = useState<{ [key: `${number}`]: TquotationContractDto[] }>({});
+
+  const [page, setPage] = useState<number>();
+  const [meta, setMeta] = useState<TpageMetaDto>();
+  const [hasNextPage, setHasNextPage] = useState<boolean>();
+
+  // ----------------------------------------------------------------
+  const defaultParams = {
+    page,
+    populate: [
+      'content.customer',
+      'content.agentEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.products.quantity',
+      'content.products.options',
+    ],
+  };
+  // ----------------------------------------------------------------
+
+  const update = async (dynaParams?: Tparams) => {
+    const params = {
+      ...defaultParams,
+      ...customParams,
+      ...dynaParams,
+    };
+
+    try {
+      if (page === 1) {
+        setIsLoadingPage1(true);
+      }
+
+      setIsloading(true);
+
+      const res = await apiGetContract(params);
+
+      if (res) {
+        setDataList((list) => {
+          list[`${res.meta.page}`] = res.data;
+
+          return { ...list };
+        });
+        setMeta(res.meta);
+        setHasNextPage(res.meta.hasNextPage);
+      }
+
+      return res;
+      //
+    } catch (error) {
+      myAlert.err({ title: '取得合約資料失敗' });
+      console.log(error);
+    } finally {
+      setIsloading(false);
+      setIsLoadingPage1(false);
+    }
+  };
+
+  const nextPage = () => {
+    if (hasNextPage === false || !page) {
+      return;
+    }
+
+    setPage((page) => (page ? page + 1 : page));
+  };
+
+  // -----------------------------------------------
+  const init = () => {
+    setDataList({});
+    setPage(undefined);
+    setHasNextPage(undefined);
+    setResetCount(0);
+  };
+
+  const reset = () => {
+    setDataList({});
+    setPage(1);
+    setHasNextPage(true);
+    setResetCount((count) => ++count);
+  };
+
+  // -----------------------------------------------
+  useEffect(() => {
+    if (!page) {
+      return;
+    }
+
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, resetCount]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (inView_bottom) {
+      nextPage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView_bottom, isLoading]);
+  // -----------------------------------------------
+
+  return {
+    dataList,
+    dataArr: _.flatten(Object.values(dataList)),
+    viewRef_top,
+    viewRef_bottom,
+    isLoadingPage1,
+    isLoading,
+    meta,
+    init,
+    reset,
   };
 };
 

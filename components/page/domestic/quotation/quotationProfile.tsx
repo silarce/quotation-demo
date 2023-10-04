@@ -81,7 +81,7 @@ type TreturnBody = {
   projectProgress?: string; // 工地進度
 };
 
-export type { TreturnBody };
+export type { TreturnBody, TquotationProfile };
 
 // =================================================================
 export default function QuotationProfile({

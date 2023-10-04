@@ -820,11 +820,11 @@ export type TquotationProductDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorType: string;
+  doorModelName: string;
   // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  length: number;
+  fullWidth: number;
   // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  width: number;
+  WG: number;
   // h(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   height: number;
   // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
@@ -835,33 +835,33 @@ export type TquotationProductDto = {
   // 才數
   volume: string;
   // 材料
-  material: string;
+  materialName: string;
   // 表面
-  surface: string;
+  materialSurface: string;
   // 門軌
-  doorTrack: string;
+  guideRail: string;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motor: string;
+  motorVendor: string;
   // 電壓
-  voltage: number;
+  motorVoltage: number;
   // 馬達支撐架
-  motorSupport: boolean;
+  hasMotorSupportStand: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
-  doorTrackThick: number;
+  guideRailThickness: number;
   // 捲軸規格
   rollerSpec: string;
   // 門軌消音條
-  doorTrackSilencerStrip: boolean;
+  hasSilencingStrip: boolean;
   // 一體式捲箱
-  onePieceRollUpBox: boolean;
+  isIntegratedHeadBox: boolean;
   // 捲箱厚度
-  rollUpBoxThick: number;
+  headBoxThickness: number;
   // 單價
   unitPrice: number;
   // 牌價
@@ -871,25 +871,30 @@ export type TquotationProductDto = {
   // 複價
   totalPrice: number;
   // // 防颱
-  typhoonProtection: boolean;
+  isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
   // 關閉方式
-  close: string;
+  closingType: string;
   // 備註
   notes: string;
   order: number;
+
+  motorPhase: number;
 
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
 
   items: {
-    // // 材料配件
+    // 材料配件
     components: TquotationProductComponentsDto[];
-    // // 選配設定
+    // 選配設定
     accessories: TquotationProductAccessoriesDto[];
-    // 還有其他很多有的沒有的，用不到，以後有空再補上
+    // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
   }[];
+
+  attachedToProductId?: string | null;
+  attachedToProduct?: TquotationProductDto | null;
 };
 
 export type TquotationContentDto = {
@@ -973,11 +978,11 @@ export type TcreateQuotationProductDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorType: string;
+  doorModelName: string;
   // L(m)
-  length: number;
+  fullWidth: number;
   // W(m)
-  width: number;
+  WG: number;
   // h(m)
   height: number;
   // B(m)
@@ -988,33 +993,33 @@ export type TcreateQuotationProductDto = {
   // 才數
   volume: string;
   // 材料
-  material: string;
+  materialName: string;
   // 表面
-  surface: string;
+  materialSurface: string;
   // 門軌
-  doorTrack: string;
+  guideRail: string;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motor: string;
+  motorVendor: string;
   // 電壓
-  voltage: number;
+  motorVoltage: number;
   // 馬達支撐架
-  motorSupport: boolean;
+  hasMotorSupportStand: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
-  doorTrackThick: number;
+  guideRailThickness: number;
   // 捲軸規格
   rollerSpec: string;
   // 門軌消音條
-  doorTrackSilencerStrip: boolean;
+  hasSilencingStrip: boolean;
   // 一體式捲箱
-  onePieceRollUpBox: boolean;
+  isIntegratedHeadBox: boolean;
   // 捲箱厚度
-  rollUpBoxThick: number;
+  headBoxThickness: number;
   // 數量
   quantity: number;
   // 單價
@@ -1026,13 +1031,16 @@ export type TcreateQuotationProductDto = {
   // 複價
   totalPrice: number;
   // 防颱
-  typhoonProtection: boolean;
+  isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
   // 關閉方式
-  close: string;
+  closingType: string;
   // 備註
   notes: string;
+
+  motorPhase: number;
+
   // 選配設定
   accessories: {
     codeName: string; //代號
@@ -1047,7 +1055,7 @@ export type TcreateQuotationProductDto = {
   }[];
   components: TcreateQuotationProductComponentDto[];
   //
-  materialSurface: string;
+  // materialSurface: string;
   isPainted: boolean;
   order: number;
   bottomBarAngleIron: string; // 底座角鐵
