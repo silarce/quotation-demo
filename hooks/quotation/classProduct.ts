@@ -1723,6 +1723,10 @@ class Class_product {
     this.reRender();
   }
 
+  get attachedToProductId() {
+    return this._prodData.attachedToProductId;
+  }
+
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
@@ -1871,7 +1875,7 @@ class Class_product {
   }
 
   get body() {
-    // //
+    //
     // if (!this.accessoriesVKeyArr) {
     //   this.accessoriesVKeyArr = [];
     // }
@@ -2052,6 +2056,7 @@ type Tprod = {
   bottomBarPlate: string;
   //
   // 用來辨識至追加追減
+  attachedToProductId?: string | null;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;

@@ -55,8 +55,7 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (obj: { item: Titem; key: string }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
-
+  panelBox?: 'stateBox' | 'easyBox';
   rowHeight?: 'h106';
 }) {
   // ---------------------------------------------------------------
@@ -80,8 +79,6 @@ export default function Tbody({
 
         const item = rowList[key];
 
-        const state = 'div';
-
         if (!item) {
           return <NoItem key={key} />;
         }
@@ -104,7 +101,6 @@ export default function Tbody({
               onRowClick && onRowClick({ item: item, key });
             }}
             rowHeight={rowHeight}
-            state={state}
           />
         );
       })}
@@ -121,10 +117,18 @@ export default function Tbody({
 
 // ================================================
 
-const EasyBox = ({ indexNum, state }: { indexNum: string | number; state: 'add' | 'div' }) => {
+const easyBox = ({ indexNum }: { indexNum: string | number }) => {
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
-      <div className={classNames(scss.circle, state && scss[state])} />
+      <span>{indexNum}</span>
+    </div>
+  );
+};
+
+const StateBox = ({ indexNum, state }: { indexNum: string | number; state: 'add' | 'div' | undefined }) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
+      <div className={classNames(scss.circle, state && scss[state ?? ''])} />
       <span>{indexNum}</span>
     </div>
   );
@@ -153,10 +157,10 @@ function DndRow({
   onRowClick,
   prodCellConfig,
   isActive,
-  panelBox = 'copyDelBtnBox',
+  panelBox = 'easyBox',
   rowHeight,
-  state,
-}: {
+}: // state,
+{
   id: string;
   pIndex: number;
   item: Titem;
@@ -167,18 +171,22 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  panelBox?: 'stateBox' | 'easyBox';
   rowHeight?: 'h106';
-  state: 'add' | 'div';
+  // state: 'add' | 'div';
   //
 }) {
+  const state = item.attachedToProductId ? 'add' : item.attachedToProductId === null ? 'div' : undefined;
+
   return (
     <div onClick={onRowClick} className={classNames('relative')}>
       <LoadingCover01 isLoading={item?.isLoading} size={40} />
       <CellWithBar isActive={isActive} className="z-0">
         <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
           {/*  */}
-          <EasyBox indexNum={pIndex + 1} state={state} />
+
+          {panelBox === 'easyBox' && easyBox({ indexNum: pIndex + 1 })}
+          {panelBox === 'stateBox' && <StateBox indexNum={pIndex + 1} state={state} />}
 
           {/*  */}
           {keyArr.map((key) => {

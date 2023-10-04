@@ -75,20 +75,20 @@ export default function Quotation() {
 // ===========================================================
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
-    quotationId, //報價單id
+    id, //報價單id
   } = router.query;
 
   // =========================================================
 
-  const { data, update } = useGetContract_id(quotationId as string | undefined);
+  const { data, update } = useGetContract_id(id as string | undefined);
 
   useEffect(() => {
     update();
-  }, [quotationId]);
+  }, [id]);
 
   // =========================================================
   // 是否可編輯
-  const [allowEdit, setAllowEdit] = useState(quotationId === 'newQuotation' ? true : false);
+  const [allowEdit, setAllowEdit] = useState(id === 'newQuotation' ? true : false);
   const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
 
@@ -106,8 +106,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${quotationId}`,
-      onClick: () => alert(quotationId),
+      label: `報價編號 ${id}`,
+      onClick: () => alert(id),
     },
     { label: '工程聯絡單', onClick: () => alert('工程聯絡單') },
   ];
