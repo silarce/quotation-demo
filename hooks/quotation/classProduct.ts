@@ -550,7 +550,7 @@ class Class_product {
       bearingType: this._doorGeneralSpecs.bearingName,
       gearNumber: comList.motor?.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
-      fullWidth,
+      fullWidth: fullWidth * 1000,
 
       bottomBarAngleIron: this.bottomBarAngleIron,
       bottomBarPlate: this.bottomBarPlate,
@@ -2139,8 +2139,8 @@ const emptyProdOri = (): Tprod => {
     components: [],
     boxD: '',
     //
-    bottomBarAngleIron: '',
-    bottomBarPlate: '',
+    bottomBarAngleIron: '鍍鋅 50*50*4T', // 來自prodCellConfig
+    bottomBarPlate: '鍍鋅 1.5T', // 來自prodCellConfig
   };
 };
 
