@@ -597,8 +597,9 @@ class Class_product {
           const item = res[key];
           comList[key].codeNumber = item.number;
           comList[key].componentId = item.id;
-          comList[key].price = item.price;
+          comList[key].price = item.unitPrice; // 這是牌價，不是單價
           comList[key].bom = item.bom;
+          comList[key].quantity = String(item.quantity);
           comList[key].calcAllPrice();
         });
       }
