@@ -403,14 +403,43 @@ const useProductList = ({
   };
   // ---------------------------------------------------------
 
+  const [productList_attach, setProductList_attach] = useState<TproductList>({});
+
+  console.log(productList_attach);
+
+  const addProd_attach = () => {
+    if (!doorModelList) {
+      return myAlert.info({ title: '尚未取得門型資料' });
+    }
+
+    const newKey = nanoid();
+    const classProd = new Class_product({
+      reRender,
+      delSelf: () => delSelf_prod(productList_attach, newKey),
+      copySelf: () => copySelf_prod(productList_attach, newKey),
+      callCalcSubTotal,
+      doorModelList,
+    });
+    productList_attach[newKey] = classProd;
+
+    reRender();
+  };
+
+  // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
+  // 以後最好還是做成狀態較好
   const attachProdList = (() => {
     const list: { [key: string]: Class_product } = {};
 
     Object.values(productList).forEach((prod, index) => {
       Object.values(prod.exchangeProdList).forEach((item) => {
-        const newId = nanoid();
+        const newId = item.attachId;
         list[newId] = item;
       });
+    });
+
+    Object.values(productList_attach).forEach((item) => {
+      const newId = item.attachId;
+      list[newId] = item;
     });
 
     return list;
@@ -449,6 +478,7 @@ const useProductList = ({
     getOthersPostBodyArr,
     //
     attachProdList,
+    addProd_attach,
   };
 };
 

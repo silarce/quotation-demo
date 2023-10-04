@@ -1734,6 +1734,8 @@ class Class_product {
 
   // 追加追減
 
+  readonly attachId = 'attach-' + nanoid();
+
   // 因變更而新增的prod
   get exchangeProdList() {
     return this._exchangeProdList;
@@ -1797,7 +1799,7 @@ class Class_product {
 
     const delSelf = () => {
       delete this._exchangeProdList[exId];
-      // this._reRender();
+      this.reRender();
     };
 
     // const copySelf = () => {
@@ -1953,6 +1955,10 @@ class Class_product {
       accessories: this.acceBodyArr,
       order: 0,
     };
+
+    if ('items' in body) {
+      delete body.items;
+    }
 
     return body;
   }
