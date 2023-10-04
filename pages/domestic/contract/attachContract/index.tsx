@@ -68,17 +68,18 @@ export default function AttachContract() {
     subTotal: quotationProdSubTotal,
     reset: resetClass,
     //
+    attachProdList,
   } = useProductList({
     productArr: data?.content.products,
     others: data?.content.others,
     resetTrigger: data,
   });
 
-  // const [targetProdKey, setTargetProdKey] = useState<string>('n');
-  // const targetProd = productList[targetProdKey];
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
 
-  // const [targetProdKey_chilrden, setTargetProdKey_children] = useState<string>('n');
-  // const targetProd_children = productList_children[targetProdKey];
+  const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
+  const targetProd_attach = attachProdList[targetProdKey_attach];
 
   // ------------------------------------------------------------------
 
@@ -161,13 +162,98 @@ export default function AttachContract() {
               prodKeyArr={prodKeyArr}
               changeProdKeyArr={changeProdKeyArr}
               addProd={addProd}
-              setTargetProd={() => {}}
+              setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"
               isAttach={true}
+              panelBox="resetChangeBox"
+              targetProd={targetProd}
             />
+            <br />
+            <br />
+            <Table_com
+              disabled={true}
+              comList={targetProd?.comList}
+              comCellConfig={comCellConfig}
+              comKeyArr={comKeyArr}
+              changeComKeyArr={changeComKeyArr}
+              defalutVKeyArr={comVKeyArr}
+            />
+            <br />
+            <br />
+            <Table_accessories
+              disabled={true}
+              list={targetProd?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={changeAccessoriesKeyArr}
+              // defalutVKeyArr={}
+              // onVKeyChange={}
+              doorModel={targetProd?.doorType}
+              onSelectorConfirm={() => {}}
+              // panelBox={}
+              // emptyBlockWidth={}
+            />
+            <br />
+            <br />
+            <div className={scss.tableWrapper}>
+              {/* 其他設定 */}
+              <Table_others
+                disabled={true}
+                list={othersList}
+                cellConfig={othersCellConfig}
+                keyArr={othersKeyArr}
+                changeKeyArr={changeOthersKeyArr}
+                add={() => {}}
+              />
+            </div>
           </div>
+          {/*  */}
+          {/*  */}
+          {/*  */}
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <Table_prod
+            disabled={true}
+            prodList={attachProdList}
+            prodCellConfig={prodCellConfig}
+            prodKeyArr={prodKeyArr}
+            // changeProdKeyArr={changeProdKeyArr}
+            // addProd={addProd}
+            // setTargetProd={setTargetProdKey}
+            changeProdKeyArr={() => {}}
+            addProd={() => {}}
+            setTargetProd={setTargetProdKey_attach}
+            // defalutVKeyArr={prodVKeyArr}
+            // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+            onVKeyChange={(keyArr) => {}}
+            rowHeight="h106"
+            // isAttach={true}
+            // panelBox="resetChangeBox"
+            // targetProd={targetProd}
+          />
+
+          <br />
+          <br />
+          <Table_com
+            disabled={true}
+            comList={targetProd_attach?.comList}
+            comCellConfig={comCellConfig}
+            comKeyArr={comKeyArr}
+            changeComKeyArr={() => {}}
+            defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
+          />
 
           {/*  */}
         </div>

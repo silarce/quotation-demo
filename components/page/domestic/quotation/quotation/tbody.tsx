@@ -44,6 +44,7 @@ type Titem = {
   [key: string]: any;
   delSelf?: () => void;
   copySelf?: () => void;
+  clearAttach?: () => void;
 };
 
 type TitemList = {
@@ -71,6 +72,7 @@ export default function Tbody({
   defalutVKeyArr,
   onVKeyChange,
   rowHeight,
+  showAttatchModal,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -83,6 +85,7 @@ export default function Tbody({
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h106';
+  showAttatchModal?: () => void;
 }) {
   // ---------------------------------------------------------------
 
@@ -162,6 +165,8 @@ export default function Tbody({
                 }}
                 defalutVKeyArr={defalutVKeyArr}
                 rowHeight={rowHeight}
+                showAttatchModal={showAttatchModal}
+                clearAttach={item.clearAttach}
               />
             );
           })}
@@ -267,8 +272,8 @@ const ResetChangeBtnBox = ({
   indexNum,
   isLatestBatch,
 }: {
-  toSetTargetIndex: () => void;
-  clearExchange: () => void;
+  toSetTargetIndex: undefined | (() => void);
+  clearExchange: undefined | (() => void);
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNum: string | number;
@@ -347,6 +352,8 @@ function DndRow({
   isActive,
   panelBox = 'copyDelBtnBox',
   rowHeight,
+  showAttatchModal,
+  clearAttach,
 }: {
   id: string;
   pIndex: number;
@@ -364,7 +371,8 @@ function DndRow({
   isActive?: boolean;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   rowHeight?: 'h106';
-  //
+  showAttatchModal?: () => void;
+  clearAttach?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id,
@@ -395,15 +403,17 @@ function DndRow({
           {panelBox === 'comBox' && (
             <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
           )}
-          {/* 
-          {panelBox === 'resetChangeBox' && <ResetChangeBtnBox 
-          toSetTargetIndex
-          clearExchange
-          dndAttr
-          dndListener
-          indexNum
-          isLatestBatch
-          />} */}
+
+          {panelBox === 'resetChangeBox' && (
+            <ResetChangeBtnBox
+              toSetTargetIndex={showAttatchModal}
+              clearExchange={clearAttach}
+              dndAttr={attributes}
+              dndListener={listeners}
+              indexNum={pIndex}
+              isLatestBatch={true}
+            />
+          )}
 
           {/*  */}
           {keyArr.map((key) => {

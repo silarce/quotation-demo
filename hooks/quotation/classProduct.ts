@@ -1784,7 +1784,7 @@ class Class_product {
     }
 
     const copy = _.cloneDeep(this.body_Tprod);
-    // copy.quantity = Number(v);
+    copy.quantity = Number(v);
     // copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
     // if ('id' in copy) {
@@ -1822,6 +1822,15 @@ class Class_product {
     return true;
     //
   }
+
+  // 清空變更prod
+  clearAttach = () => {
+    console.log('foo');
+    this._exchangeProdList = {};
+    this._reduceQty = '0';
+    // this._countSubTotal();
+    this.reRender();
+  };
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
