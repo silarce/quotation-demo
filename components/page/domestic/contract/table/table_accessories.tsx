@@ -37,7 +37,7 @@ export default function Table_accessories({
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   doorModel: string | undefined;
   onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
+  panelBox?: 'easyBox' | 'stateBox';
   emptyBlockWidth?: string;
 }) {
   const [showSelector, setShowSelector] = useState(false);

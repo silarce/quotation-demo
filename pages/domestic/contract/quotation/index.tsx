@@ -154,12 +154,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   const panel_quotation03: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => alert('匯出單價分析'),
-    },
+    // TODO 要記得把這個功能再做出來
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => alert('匯出單價分析'),
+    // },
     {
       type: 'redButton',
       label: '上傳',
@@ -484,12 +485,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && (
-            <QuotationRecord
-              // prodChangingRecord={prodChangingRecord}
-              subContract={data?.subContracts}
-            />
-          )}
+          {switch02 && <QuotationRecord subContract={data?.subContracts} rootContractTotal={rootContent?.total ?? 0} />}
 
           <Summary
             disabled={true}

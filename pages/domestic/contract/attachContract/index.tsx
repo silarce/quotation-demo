@@ -21,7 +21,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id_forAttach } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -34,47 +34,45 @@ export default function AttachContract() {
   const contractId = router.query.contractId as string | undefined;
 
   // ----------------------------------------------------
-  const { data, update } = useGetContract_id(contractId);
+  const { data, update } = useGetContract_id_forAttach(contractId);
   useEffect(() => {
     update();
   }, [contractId]);
 
-  console.log(data);
-
   // ------------------------------------------------------------------
-  // const {
-  //   productList,
-  //   prodCellConfig,
-  //   prodKeyArr,
-  //   prodVKeyArr,
-  //   setProdVKeyArr,
-  //   addProd,
-  //   changeProdKeyArr,
-  //   //
-  //   comKeyArr,
-  //   comCellConfig,
-  //   changeComKeyArr,
-  //   comVKeyArr,
-  //   //
-  //   accessoriesKeyArr,
-  //   changeAccessoriesKeyArr,
-  //   accessoriesCellConfig,
-  //   //
-  //   othersKeyArr,
-  //   othersList,
-  //   othersCellConfig,
-  //   changeOthersKeyArr,
-  //   addOthers,
-  //   getOthersPostBodyArr,
-  //   //
-  //   subTotal: quotationProdSubTotal,
-  //   reset: resetClass,
-  //   //
-  // } = useProductList({
-  //   productArr: quotationData?.latestContent.products,
-  //   others: quotationData?.latestContent.others,
-  //   resetTrigger: quotationData,
-  // });
+  const {
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
+    addProd,
+    changeProdKeyArr,
+    //
+    comKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    comVKeyArr,
+    //
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+    //
+    subTotal: quotationProdSubTotal,
+    reset: resetClass,
+    //
+  } = useProductList({
+    productArr: data?.content.products,
+    others: data?.content.others,
+    resetTrigger: data,
+  });
 
   // const [targetProdKey, setTargetProdKey] = useState<string>('n');
   // const targetProd = productList[targetProdKey];
@@ -156,18 +154,19 @@ export default function AttachContract() {
 
           <div className={scss.tableWrapper}>
             {/* 主產品設定 */}
-            {/* <Table_prod
+            <Table_prod
               disabled={true}
               prodList={productList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
               changeProdKeyArr={changeProdKeyArr}
               addProd={addProd}
-              setTargetProd={setTargetProdKey}
+              setTargetProd={() => {}}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"
-            /> */}
+              isAttach={true}
+            />
           </div>
 
           {/*  */}

@@ -55,12 +55,12 @@ export default function Table_acce({
               keyArr={comKeyArr}
               cellConfigList={comCellConfig}
               resetTrigger={comKeyArr.length}
-              // emptyBlockWidth="80px"
+              emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
                 const keyArr = dndKeyArr as string[];
                 changeComKeyArr(keyArr);
               }}
-              comBoxWidth="120px"
+              // comBoxWidth="120px"
             />
           </div>
           {comList && (
@@ -72,7 +72,7 @@ export default function Table_acce({
               onRowClick={(obj) => {
                 // setTargetProd(obj.item as Class_product);
               }}
-              panelBox="comBox"
+              // panelBox="comBox"
             />
           )}
 
