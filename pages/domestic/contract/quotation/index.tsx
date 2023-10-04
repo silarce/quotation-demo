@@ -106,10 +106,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${id}`,
-      onClick: () => alert(id),
+      label: `報價編號 ${data?.content.quotationNumber}`,
+      onClick: () => {},
     },
-    { label: '工程聯絡單', onClick: () => alert('工程聯絡單') },
+    { label: '工程聯絡單', onClick: () => {} },
   ];
 
   const panel_quotation01: TpanelList = [
