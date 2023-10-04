@@ -8,20 +8,20 @@ const { Panel } = Collapse;
 // global gear
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
-// type
-import {
-  TchangeListItem,
-  TchangeRecord,
-  TrecordProduct,
-} from 'fakeDatabase/domestic/quotation/fakeChangeProductRecord';
 
 // css
 import style from './quotationRecord.module.scss';
 
-// config
-import { prodCellConfigOri } from './hook/useProduct';
-
 // ===================================================================
+// import {
+//   TcreateQuotationContentOtherDto,
+//   TquotationProductDto,
+//   TquotationContentOtherDto,
+//   TquotationContractDto,
+// } from 'js/api/dtoTypes';
+
+import Table_prod from 'components/page/domestic/contract/table/table_prod';
+import { useProductList } from 'hooks/quotation/useProduct';
 import {
   TcreateQuotationContentOtherDto,
   TquotationProductDto,
@@ -126,6 +126,7 @@ export default function QuotationRecord({
                 <div className={style.prodContainer}>
                   {/* <Thead />
                   <Tbody product={product} /> */}
+                  <ProdRow prodArr={content.products} />
                 </div>
               </Panel>
             );
@@ -259,3 +260,57 @@ export default function QuotationRecord({
 // ================================================================
 // ================================================================
 // ================================================================
+
+const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
+  const {
+    reRender,
+    reset,
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
+    addProd,
+    changeProdKeyArr,
+    //
+    subTotal,
+    //
+    comKeyArr,
+    comVKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    //
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+  } = useProductList({
+    productArr: prodArr ?? [],
+    others: [],
+    resetTrigger: prodArr,
+  });
+
+  return (
+    <div>
+      <Table_prod
+        disabled={true}
+        prodList={productList}
+        prodCellConfig={prodCellConfig}
+        prodKeyArr={prodKeyArr}
+        changeProdKeyArr={changeProdKeyArr}
+        addProd={() => {}}
+        setTargetProd={() => {}}
+        emptyBlockWidth="80px"
+        rowHeight={'h106'}
+        panelBox="stateBox"
+      />
+    </div>
+  );
+};
