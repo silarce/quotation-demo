@@ -1386,6 +1386,11 @@ class Class_product {
   }
   set area(v) {
     this._prodData.area = v;
+
+    if (this.comList) {
+      this.comList.slat.quantity = v;
+    }
+
     this.volume = this.calcVolume();
     this.reRender();
   }
