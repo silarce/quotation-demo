@@ -80,33 +80,26 @@ import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_pr
 class Class_product {
   constructor({
     reRender,
-    // setIsLoading,
     prodData = emptyProdOri(),
-    // accessoryDataArr = [],
     delSelf,
     copySelf,
-    //
     callCalcSubTotal,
-    // calcSubTotalPrice,
     // from api
     doorModelList,
-    //
     originProd,
+    //
+    parentProd,
   }: {
     reRender: TreRender;
-    // setIsLoading: (isLoading: boolean) => void;
     prodData?: Tprod;
-    // accessoryDataArr?: Taccessory[];
-    // optionDataArr?: Toptions[];
     delSelf: () => void;
     copySelf: () => void;
-    //
     callCalcSubTotal: () => void;
-    //
-    // calcSubTotalPrice: () => void;
     // from api
     doorModelList: { [key: string]: TdoorModelInfoDto };
     originProd?: TquotationProductDto;
+    //
+    parentProd?: Class_product;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -116,10 +109,6 @@ class Class_product {
     this.callCalcSubTotal = callCalcSubTotal;
 
     this.originProd = originProd;
-
-    //
-
-    // this.calcSubTotalPrice = calcSubTotalPrice;
 
     // from api
     // 來自/products/door/models // 在useProduct取得 // 目前只有用來生成下拉式選單的樣子
@@ -190,10 +179,22 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
 
-  // private _boxD = '';
-
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+
+  // ---------------------------------------------------------
+  // 追加追減用的
+  private parentProd: Class_product | undefined = undefined;
+
+  private _reduceQty = '0';
+  private _exchangeProdList: {
+    [key in string]: Class_product;
+  } = {};
+
+  get hasParent() {
+    return !!this.parentProd;
+  }
+
   // ---------------------------------------------------------
 
   // 材料配件 金額總和
@@ -549,7 +550,7 @@ class Class_product {
       bearingType: this._doorGeneralSpecs.bearingName,
       gearNumber: comList.motor?.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
-      fullWidth,
+      fullWidth: fullWidth * 1000,
 
       bottomBarAngleIron: this.bottomBarAngleIron,
       bottomBarPlate: this.bottomBarPlate,
@@ -1448,6 +1449,14 @@ class Class_product {
     return this._quantity;
   }
   set quantity(v) {
+    if (this.parentProd) {
+      const remain = this.parentProd.remainQty + Number(this._quantity);
+
+      if (Number(v) > remain) {
+        return;
+      }
+    }
+
     this._prodData.quantity = Number(v);
     this._quantity = v;
 
@@ -1700,7 +1709,7 @@ class Class_product {
 
   //
 
-  /**門片厚度 */ // api 沒有
+  /**門片厚度 */ //TODO api 沒有門片厚度 //好像有了?待確認
   get thickness() {
     return this._thickness;
   }
@@ -1709,7 +1718,135 @@ class Class_product {
     this.reRender();
   }
 
-  get body() {
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+
+  // 追加追減
+
+  // 因變更而新增的prod
+  get exchangeProdList() {
+    return this._exchangeProdList;
+  }
+
+  get remainQty() {
+    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+  }
+
+  // 追減數量
+  get reduceQty() {
+    return this._reduceQty;
+  }
+  set reduceQty(v) {
+    const nv = Number(v);
+
+    if (nv > this.remainQty + Number(this.reduceQty)) {
+      return;
+    }
+
+    this._reduceQty = v;
+    this.calcProdAllprice_timeout();
+    this.reRender();
+  }
+
+  // 變更數量
+  get exchangeQty() {
+    let qty = 0;
+    Object.values(this._exchangeProdList).forEach((item) => {
+      qty = qty + Number(item.quantity || 0);
+    });
+
+    return qty;
+  }
+
+  // 追減/變更金額
+  get reduceExchangePrice() {
+    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
+
+    return reducePrice;
+  }
+
+  // 新增變更的prod
+  addExchange(v: string) {
+    if (Number(v) > this.remainQty) {
+      return false;
+    }
+
+    const copy = _.cloneDeep(this.body_Tprod);
+    // copy.quantity = Number(v);
+    // copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
+
+    // if ('id' in copy) {
+    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //   // @ts-ignore
+    //   copy.id = '';
+    // }
+
+    const exId = 'ex-' + nanoid();
+
+    const delSelf = () => {
+      delete this._exchangeProdList[exId];
+      // this._reRender();
+    };
+
+    // const copySelf = () => {
+    //   const copyBody = this._exchangeProdList[exId].body_Tprod;
+
+    // };
+
+    this._exchangeProdList[exId] = new Class_product({
+      reRender: this.reRender,
+      prodData: copy,
+      delSelf,
+      copySelf: () => {},
+      callCalcSubTotal: () => {},
+      doorModelList: this._doorModelList,
+      parentProd: this,
+    });
+
+    // this._countSubTotal();
+
+    this.reRender();
+
+    return true;
+    //
+  }
+
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+
+  // get comBodyArr() {
+  //   const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
+  //     const body = com.body;
+
+  //     return {
+  //       ...body,
+  //       order: index,
+  //       type: body.type as TcreateQuotationProductComponentDto['type'],
+  //       quantity: String(body.quantity),
+  //     };
+  //   });
+
+  //   return components;
+  // }
+  get comBodyArr() {
+    const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
+      const body = com.body;
+
+      return {
+        ...body,
+        order: index,
+        type: body.type as TcreateQuotationProductComponentDto['type'],
+        quantity: String(body.quantity),
+      };
+    });
+
+    return components;
+  }
+
+  get acceBodyArr() {
     //
     if (!this.accessoriesVKeyArr) {
       this.accessoriesVKeyArr = [];
@@ -1724,17 +1861,37 @@ class Class_product {
 
         return { ...item.body, order: index };
       }) ?? [];
-    //
-    const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
-      const body = com.body;
 
-      return {
-        ...body,
-        order: index,
-        type: body.type as TcreateQuotationProductComponentDto['type'],
-        quantity: String(body.quantity),
-      };
-    });
+    return accessories;
+  }
+
+  get body() {
+    // //
+    // if (!this.accessoriesVKeyArr) {
+    //   this.accessoriesVKeyArr = [];
+    // }
+
+    // const checkOptionsKey = Object.keys(this.accessoriesList).every((key) => this.accessoriesVKeyArr!.includes(key));
+    // const arrForCreate = checkOptionsKey ? this.accessoriesVKeyArr : Object.keys(this.accessoriesList);
+
+    // const accessories: TcreateQuotationProductAccessoriesDto[] =
+    //   arrForCreate?.map((key, index) => {
+    //     const item = this.accessoriesList[key];
+
+    //     return { ...item.body, order: index };
+    //   }) ?? [];
+    // //
+
+    // const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
+    //   const body = com.body;
+
+    //   return {
+    //     ...body,
+    //     order: index,
+    //     type: body.type as TcreateQuotationProductComponentDto['type'],
+    //     quantity: String(body.quantity),
+    //   };
+    // });
 
     const body: TcreateQuotationProductDto & { id: string | undefined } = {
       ...this._prodData,
@@ -1773,9 +1930,55 @@ class Class_product {
       unitPrice: Number(this._unitPrice),
       totalPrice: Number(this._totalPrice),
       //
-      components,
-      accessories: accessories,
+      components: this.comBodyArr,
+      accessories: this.acceBodyArr,
       order: 0,
+    };
+
+    return body;
+  }
+
+  get body_Tprod() {
+    const body: Tprod = {
+      ...this._prodData,
+      id: this._prodData.id,
+      // doorModelName: this.doorType,
+      // materialName: this.material,
+      // materialSurface: this.surface,
+      // guideRail: this.doorTrack,
+      // motorVendor: this.motor,
+      // guideRailThickness: Number(this.doorTrackThick),
+      // hasSilencingStrip: this.doorTrackSilencerStrip,
+      // isIntegratedHeadBox: this.onePieceRollUpBox,
+      // isAntiTyphoon: this.typhoonProtection,
+      // closingType: this.close,
+      // motorPhase: Number(this.phase),
+
+      // 送去後端要轉為要從m轉為mm
+      // WG: Number(this._prodData.width) * 1000,
+      // fullWidth: Number(this._prodData.length) * 1000,
+      // height: Number(this._prodData.height) * 1000,
+      // boxB: Number(this._prodData.boxB) * 1000,
+      // boxD: Number(this._prodData.boxD) * 1000,
+      quantity: Number(this._prodData.quantity),
+      //
+      // headBoxThickness: Number(this._prodData.rollUpBoxThick),
+      // motorVoltage: Number(this._prodData.voltage),
+      // doorTrackThick: Number(this._prodData.doorTrackThick),
+      // doorTrackThick: 1,
+      // hasMotorSupportStand: this._prodData.motorSupport,
+      //
+      // materialSurface: this._prodData.surface ?? '',
+      // isPainted: false,
+      //
+      price: Number(this._price),
+      dualPrice: Number(this._dualPrice),
+      unitPrice: Number(this._unitPrice),
+      totalPrice: Number(this._totalPrice),
+      //
+      components: this.comBodyArr,
+      accessories: this.acceBodyArr,
+      // order: 0,
     };
 
     return body;
@@ -1832,8 +2035,12 @@ type Tprod = {
   rollUpBoxThick: string; // 捲箱厚度
   close: string; // 開閉方式
   //
-  accessories: TquotationProductAccessoriesDto[];
-  components: TquotationProductComponentsDto[];
+  // accessories: TcreateQuotationProductAccessoriesDto[];
+  // components: TcreateQuotationProductComponentDto[];
+  // accessories: TquotationProductAccessoriesDto[];
+  // components: TquotationProductComponentsDto[];
+  accessories: (Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  components: (Omit<TquotationProductComponentsDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
   boxD: string;
   //
   bottomBarAngleIron: string;
@@ -1932,8 +2139,8 @@ const emptyProdOri = (): Tprod => {
     components: [],
     boxD: '',
     //
-    bottomBarAngleIron: '',
-    bottomBarPlate: '',
+    bottomBarAngleIron: '鍍鋅 50*50*4T', // 來自prodCellConfig
+    bottomBarPlate: '鍍鋅 1.5T', // 來自prodCellConfig
   };
 };
 

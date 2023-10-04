@@ -10,16 +10,23 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
 import QuotationProfile, { TreturnBody, TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+// api
 import { useGetContract_id } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
+
+import { useProductList } from 'hooks/quotation/useProduct';
 
 // ===========================================================================
 export default function AttachContract() {
@@ -34,21 +41,46 @@ export default function AttachContract() {
 
   console.log(data);
 
-  // const profile: TquotationProfile = {
-  //   id: '',
-  //   quotationNumber: '',
-  //   quotationDate: '',
-  //   validityPeriod: '',
-  //   projectName: '',
-  //   county: '',
-  //   district: '',
-  //   address: '',
-  //   contactPerson: '',
-  //   contactNumber: '',
-  //   customer: '',
-  //   trackProgress: '',
-  //   projectProgress: '',
-  // };
+  // ------------------------------------------------------------------
+  // const {
+  //   productList,
+  //   prodCellConfig,
+  //   prodKeyArr,
+  //   prodVKeyArr,
+  //   setProdVKeyArr,
+  //   addProd,
+  //   changeProdKeyArr,
+  //   //
+  //   comKeyArr,
+  //   comCellConfig,
+  //   changeComKeyArr,
+  //   comVKeyArr,
+  //   //
+  //   accessoriesKeyArr,
+  //   changeAccessoriesKeyArr,
+  //   accessoriesCellConfig,
+  //   //
+  //   othersKeyArr,
+  //   othersList,
+  //   othersCellConfig,
+  //   changeOthersKeyArr,
+  //   addOthers,
+  //   getOthersPostBodyArr,
+  //   //
+  //   subTotal: quotationProdSubTotal,
+  //   reset: resetClass,
+  //   //
+  // } = useProductList({
+  //   productArr: quotationData?.latestContent.products,
+  //   others: quotationData?.latestContent.others,
+  //   resetTrigger: quotationData,
+  // });
+
+  // const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  // const targetProd = productList[targetProdKey];
+
+  // const [targetProdKey_chilrden, setTargetProdKey_children] = useState<string>('n');
+  // const targetProd_children = productList_children[targetProdKey];
 
   // ------------------------------------------------------------------
 
@@ -121,6 +153,22 @@ export default function AttachContract() {
             <div>合約項目</div>
           </div>
           {/*  */}
+
+          <div className={scss.tableWrapper}>
+            {/* 主產品設定 */}
+            {/* <Table_prod
+              disabled={true}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd}
+              setTargetProd={setTargetProdKey}
+              // defalutVKeyArr={prodVKeyArr}
+              onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              rowHeight="h106"
+            /> */}
+          </div>
 
           {/*  */}
         </div>

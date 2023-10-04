@@ -141,7 +141,7 @@ class Class_component {
 
   get componentInfo() {
     const info: TgenerateDoorProductBomDto_ComponentInfo = {
-      id: this._com.id,
+      id: this._com.id ?? '',
       material: this._com.material ?? '', // 注意，api不接受空字串
       materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
       isPainted: !!this._com.isPainted,
@@ -476,9 +476,9 @@ class Class_component {
 // ===========================================================
 
 type Tcomponent = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
   doorModelName: string; // 門型名稱
   code: string; // 編號
   specialSpec: string | null; // 特殊規格
