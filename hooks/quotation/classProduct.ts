@@ -1735,7 +1735,7 @@ class Class_product {
 
   // 追加追減
 
-  readonly attachId = 'attach-' + nanoid();
+  attachId = 'attach-' + nanoid();
 
   // 因變更而新增的prod
   get exchangeProdList() {

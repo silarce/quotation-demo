@@ -197,6 +197,7 @@ const useProductList = ({
     copy.delSelf = () => delSelf_prod(list, newKey);
     copy.copySelf = () => copySelf_prod(list, newKey);
     copy.clearId();
+    copy.attachId = newKey;
 
     Object.values(copy.accessoriesList).forEach((acce) => {
       acce.reNewMethod();
@@ -427,27 +428,20 @@ const useProductList = ({
     reRender();
   };
 
+  // ---------------------------------------------------------
   // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
   // 以後最好還是做成狀態較好
-  const attachProdList = (() => {
-    const list: { [key: string]: Class_product } = {};
-
-    Object.values(productList).forEach((prod, index) => {
-      Object.values(prod.exchangeProdList).forEach((item) => {
-        const newId = item.attachId;
-        list[newId] = item;
-      });
-    });
-
-    Object.values(productList_attach).forEach((item) => {
+  const attachProdList: { [key: string]: Class_product } = {};
+  Object.values(productList).forEach((prod, index) => {
+    Object.values(prod.exchangeProdList).forEach((item) => {
       const newId = item.attachId;
-      list[newId] = item;
+      attachProdList[newId] = item;
     });
-
-    return list;
-  })();
-
-  // console.log(attachProdList);
+  });
+  Object.values(productList_attach).forEach((item, index) => {
+    const newId = item.attachId;
+    attachProdList[newId] = item;
+  });
 
   // ---------------------------------------------------------
 
@@ -481,7 +475,8 @@ const useProductList = ({
     addOthers,
     getOthersPostBodyArr,
     //
-    attachProdList,
+    // attachProdList,
+    attachProdList: productList_attach,
     addProd_attach,
   };
 };
