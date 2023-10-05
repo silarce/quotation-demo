@@ -1554,8 +1554,6 @@ export type TcreateQuotationVerifyFormDto = {
   testDrive: boolean;
   //  扣款項目、比例、金額
   debitItem: string;
-  // 合約審核表審核主管(工務部主管)
-  workDirectorId: string;
 };
 
 export type TreviewQuotationContentDto = {
