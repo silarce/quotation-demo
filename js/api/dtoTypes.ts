@@ -1081,19 +1081,19 @@ export type TcreateQuotationProductDto = {
 
   // 門片厚度
   thickness: string;
-  // 配電箱牌價;
+  // 配電箱 牌價;
   distributionBoxPrice: number;
-  // 配電箱單價;
+  // 配電箱 單價;
   distributionBoxUnitPrice: number;
-  // 安裝費牌價;
+  // 安裝費 牌價;
   installationFeePrice: number;
-  // 安裝費牌價複價;
+  // 安裝費 牌價複價;
   installationFeeDualPrice: number;
-  // 安裝費數量;
+  // 安裝費 數量;
   installationFeeQuantity: number;
-  // 安裝費單價;
+  // 安裝費 單價;
   installationFeeUnitPrice: number;
-  // 安裝費複價;
+  // 安裝費 複價;
   installationFeeTotalPrice: number;
 };
 
@@ -1151,7 +1151,7 @@ export type TcreateQuotationContentDto = {
   total: number;
   deliveryLocation: string;
   // 交貨日期
-  deliveryDate: string;
+  deliveryDate: string | null;
   paymentMethods: TpaymentMethodDto[];
 
   others: TcreateQuotationContentOtherDto[];

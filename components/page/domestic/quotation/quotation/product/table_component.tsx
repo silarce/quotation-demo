@@ -8,7 +8,7 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { TcomList } from 'hooks/quotation/useProduct';
+import { TcomList, TsubComList } from 'hooks/quotation/useProduct';
 
 import scss from '../table.module.scss';
 
@@ -23,11 +23,12 @@ export default function Table_acce({
 // setTargetProd,
 {
   disabled: boolean;
-  comList: TcomList | undefined;
+  // comList: TcomList | TsubComList | undefined;
+  comList: (TcomList & TsubComList) | TcomList | TsubComList | undefined;
   comCellConfig: TcellConfig;
   comKeyArr: string[];
   changeComKeyArr: (arr: string[]) => void;
-  defalutVKeyArr: string[];
+  defalutVKeyArr?: string[];
   // addProd: () => void;
   // setTargetProd: (v: Class_product) => void;
 }) {

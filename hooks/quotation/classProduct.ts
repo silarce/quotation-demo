@@ -33,6 +33,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 // child class
 import { Class_component, Tcomponent, creEmptyCom, comTypeLookUp } from './classComponent';
 import { Class_accessories, Taccessories } from './classAccessories';
+import { Class_SubCom, TSubCom } from './classSubCom';
 // =============================================================================
 // api
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
@@ -151,6 +152,8 @@ class Class_product {
     // ___________________________________________________________
     // 建立選配設定
     this.creAcceList();
+    //建立 配電箱與按裝費
+    this.creSubComList();
     // ___________________________________________________________
     // = constructor close ===========================================================
   } // = constructor close ===========================================================
@@ -342,6 +345,44 @@ class Class_product {
     this.accessoriesList = list;
     this.reRender();
   }
+  //
+
+  subComList: { [key: string]: Class_SubCom } = {};
+
+  creSubComList() {
+    // 配電箱
+    const distributionBox = new Class_SubCom({
+      reRender: this.reRender,
+      data: {
+        price: this._prodData.distributionBoxPrice,
+        unitPrice: this._prodData.distributionBoxUnitPrice,
+        dualPrice: this._prodData.distributionBoxPrice,
+        totalPrice: this._prodData.distributionBoxUnitPrice,
+        quantity: 1,
+        comName: '配電箱及按鈕開關',
+      },
+      prod: this,
+    });
+
+    // 安裝費
+    const installationFee = new Class_SubCom({
+      reRender: this.reRender,
+      data: {
+        price: this._prodData.installationFeePrice,
+        unitPrice: this._prodData.installationFeeUnitPrice,
+        dualPrice: this._prodData.installationFeeDualPrice,
+        totalPrice: this._prodData.installationFeeTotalPrice,
+        quantity: this._prodData.installationFeeQuantity,
+        comName: '按裝及製造費用',
+      },
+      prod: this,
+    });
+
+    this.subComList = { distributionBox, installationFee };
+    this.reRender();
+  } // creSubComList
+
+  // ---------------------
 
   clearProd() {
     const empty = emptyProdOri();
@@ -925,8 +966,39 @@ class Class_product {
     let d_totalPrice = new Decimal(0);
 
     const comListArr = Object.values(this.comList ?? {});
+    const subComListArr = Object.values(this.subComList ?? {});
+    const arr = [...comListArr, ...subComListArr];
 
-    comListArr.forEach((item) => {
+    arr.forEach((item) => {
+      if (!item) {
+        return;
+      }
+
+      const { price, dualPrice, unitPrice, totalPrice } = item;
+
+      d_price = d_price.add(price || 0);
+      d_dualPrice = d_dualPrice.add(dualPrice || 0);
+      d_unitPrice = d_unitPrice.add(unitPrice || 0);
+      d_totalPrice = d_totalPrice.add(totalPrice || 0);
+    });
+
+    this.comAllPrice = {
+      price: d_price.ceil().toNumber(),
+      dualPrice: d_dualPrice.ceil().toNumber(),
+      unitPrice: d_unitPrice.ceil().toNumber(),
+      totalPrice: d_totalPrice.ceil().toNumber(),
+    };
+  } // calcComAllPrice
+
+  calcSubComAllPrice() {
+    let d_price = new Decimal(0);
+    let d_dualPrice = new Decimal(0);
+    let d_unitPrice = new Decimal(0);
+    let d_totalPrice = new Decimal(0);
+
+    const subComListArr = Object.values(this.subComList ?? {});
+
+    subComListArr.forEach((item) => {
       if (!item) {
         return;
       }
@@ -1237,6 +1309,11 @@ class Class_product {
         item.calcAllPrice();
       }
     });
+    Object.values(this.subComList ?? {}).forEach((item, index, arr) => {
+      if (item) {
+        item.calcAllPrice();
+      }
+    });
 
     Object.values(this.accessoriesList).forEach((item, index, arr) => {
       item.calcAllPrice();
@@ -1394,8 +1471,12 @@ class Class_product {
   set area(v) {
     this._prodData.area = v;
 
-    if (this.comList) {
+    if (this.comList?.slat) {
       this.comList.slat.quantity = v;
+    }
+
+    if (this.subComList?.installationFee) {
+      this.subComList.installationFee.quantity = v;
     }
 
     this.volume = this.calcVolume();
@@ -1945,7 +2026,15 @@ class Class_product {
       accessories: this.acceBodyArr,
       order: 0,
       //
-      thickness: Number(this.thickness || 0),
+      thickness: this.thickness || '',
+
+      distributionBoxPrice: Number(this.subComList.distributionBox.price),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
+      installationFeePrice: Number(this.subComList.installationFee.price),
+      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
+      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
+      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
+      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
     };
 
     if ('items' in body) {
@@ -1998,6 +2087,13 @@ class Class_product {
       components: this.comBodyArr,
       accessories: this.acceBodyArr,
       // order: 0,
+      distributionBoxPrice: Number(this.subComList.distributionBox.price),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
+      installationFeePrice: Number(this.subComList.installationFee.price),
+      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
+      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
+      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
+      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
     };
 
     return body;
@@ -2067,6 +2163,20 @@ type Tprod = {
   //
   // 用來辨識至追加追減
   attachedToProductId?: string | null;
+  //
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -2161,6 +2271,22 @@ const emptyProdOri = (): Tprod => {
     //
     bottomBarAngleIron: '鍍鋅 50*50*4T', // 來自prodCellConfig
     bottomBarPlate: '鍍鋅 1.5T', // 來自prodCellConfig
+    //
+
+    // 配電箱 牌價;
+    distributionBoxPrice: 5940,
+    // 配電箱 單價;
+    distributionBoxUnitPrice: 5940,
+    // 安裝費 牌價;
+    installationFeePrice: 1800,
+    // 安裝費 牌價複價;
+    installationFeeDualPrice: 1800,
+    // 安裝費 數量;
+    installationFeeQuantity: 0,
+    // 安裝費 單價;
+    installationFeeUnitPrice: 1800,
+    // 安裝費 複價;
+    installationFeeTotalPrice: 1800,
   };
 };
 

@@ -12,6 +12,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 // class
 import { Class_product, Tprod, TprodKey, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
+import { Class_SubCom } from './classSubCom';
 import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
 import { TaccessoriesKey, Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 
@@ -38,6 +39,9 @@ type TproductList = {
 
 type TcomList = {
   [key in TcomponentKey]: Class_component;
+};
+type TsubComList = {
+  [key in TcomponentKey]: Class_SubCom;
 };
 
 type TaccessoriesList = {
@@ -511,6 +515,8 @@ export type {
   Class_component,
   TcomponentKey,
   TcomList,
+  //
+  TsubComList,
   //
   TaccessoriesKey,
   TaccessoriesList,

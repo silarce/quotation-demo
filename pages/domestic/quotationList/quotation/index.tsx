@@ -1009,7 +1009,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     if (!body.deliveryDate) {
-      return myAlert.warning({ title: '請選擇交貨日期' });
+      body.deliveryDate = null;
     }
 
     let hasSurface = true;
@@ -1054,6 +1054,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
+
     //
   }; // reqUpdateQuotation
 
@@ -1167,11 +1168,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <div className="relative mt-[14px]">
               <Table_com
                 disabled={disabled}
-                comList={targetProd?.comList}
+                // comList={targetProd?.comList}
+
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
                 comCellConfig={comCellConfig}
                 comKeyArr={comKeyArr}
-                changeComKeyArr={changeComKeyArr}
-                defalutVKeyArr={comVKeyArr}
+                changeComKeyArr={() => {}}
+                // defalutVKeyArr={comVKeyArr}
               />
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>

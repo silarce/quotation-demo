@@ -272,6 +272,18 @@ export default function AttachContract() {
         total: total_calced,
       };
 
+      let hasSurface = true;
+
+      body.products?.forEach((item) => {
+        if (!item.materialSurface) {
+          hasSurface = false;
+        }
+      });
+
+      if (!hasSurface) {
+        return myAlert.warning({ title: '所有主產品必須選擇表面' });
+      }
+
       try {
         await apiQuotationModify(contractId, body);
       } catch (error) {}
