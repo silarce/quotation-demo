@@ -1,4 +1,3 @@
-// 舊合約
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
@@ -29,6 +28,7 @@ import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
 import { useProductList } from 'hooks/quotation/useProduct';
 
 // ===========================================================================
+// 合約 追加追減介面
 export default function AttachContract() {
   const router = useRouter();
   const contractId = router.query.contractId as string | undefined;
@@ -121,13 +121,18 @@ export default function AttachContract() {
             return;
           }
 
+          const content = _.cloneDeep(data.content);
+
           const attachProdArr = Object.values(attachProdList).map((prod) => {
             return prod.body;
           });
 
           const body: TcreateModifyQuotationDto = {
-            // ...data.content,
+            ...content,
             products: attachProdArr,
+            agentId: content.agentEmployee?.id,
+            managerId: content.managerEmployee?.id,
+            supervisorId: content.supervisorEmployee?.id,
           };
 
           try {
@@ -256,7 +261,7 @@ export default function AttachContract() {
             changeProdKeyArr={() => {}}
             addProd={addProd_attach}
             setTargetProd={setTargetProdKey_attach}
-            // defalutVKeyArr={prodVKeyArr}
+            defalutVKeyArr={Object.keys(attachProdList)}
             // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
             onVKeyChange={(keyArr) => {}}
             rowHeight="h106"
