@@ -13,6 +13,11 @@ import Table_prod from 'components/page/domestic/quotation/quotation/product/tab
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
+import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -21,11 +26,14 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useGetContract_id_forAttach, apiQuotationModify, TcreateModifyQuotationDto } from 'js/api/api_quotation';
+import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
 
 import { useProductList } from 'hooks/quotation/useProduct';
+
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // ===========================================================================
 // 合約 追加追減介面
@@ -38,6 +46,8 @@ export default function AttachContract() {
   useEffect(() => {
     update();
   }, [contractId]);
+
+  const content = data?.content;
 
   // ------------------------------------------------------------------
   const {
@@ -84,28 +94,158 @@ export default function AttachContract() {
 
   // ------------------------------------------------------------------
 
+  const control_anno: TsummaryControl = {
+    stringArr: data?.annotations ?? [],
+    editString: (index, v) => {},
+    addString: (v: string) => {},
+    delString: (index: number) => {},
+    addStrArr: (vArr: string[]) => {},
+  };
+
+  const control_qr: TsummaryControl = {
+    stringArr: data?.quotationRanges ?? [],
+    editString: (index, v) => {},
+    addString: (v: string) => {},
+    delString: (index: number) => {},
+    addStrArr: (vArr: string[]) => {},
+  };
+
+  const payInfoControl: TpayInfoControl = {
+    payment: {
+      discountRate: {
+        inputAttr: {
+          disabled: true,
+          value: data?.discount ?? '',
+          onChange: (e) => {},
+        },
+      },
+      subTotal: {
+        inputAttr: {
+          disabled: true,
+          value: data?.subTotal ?? '',
+        },
+      },
+      salesTax: {
+        inputAttr: {
+          disabled: true,
+          value: data?.salesTax ?? '',
+        },
+      },
+      total: {
+        inputAttr: {
+          disabled: true,
+          value: data?.total ?? '',
+        },
+      },
+    },
+
+    delivery: {
+      deliveryLocation: {
+        value: data?.deliveryLocation ?? '',
+        onChange: (v) => {},
+      },
+      deliveryDate: {
+        value: data?.deliveryDate ?? '',
+        onChange: (v) => {},
+      },
+    },
+    paymentMethod: {
+      arr:
+        data?.paymentMethods.map((item, index) => {
+          const { milestone, totalPaymentRatio } = item;
+
+          return {
+            label: milestone,
+            value: totalPaymentRatio,
+            onChange: () => {},
+            delSelf: () => {},
+          };
+          //
+        }) ?? [],
+      addMethod: (v) => {},
+    },
+  };
+
+  const signatureArr = [
+    {
+      label: '總經理',
+      inputProps: {
+        props: {
+          value: content?.reviewManagerEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '工務主管',
+      inputProps: {
+        props: {
+          value: content?.reviewWorkDirectorEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '主管',
+      inputProps: {
+        props: {
+          value: content?.reviewSupervisorEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '業務',
+      inputProps: {
+        props: {
+          value: content?.reviewSalesEmployee?.chName ?? '',
+        },
+      },
+    },
+    {
+      label: '經辦',
+      inputProps: {
+        props: {
+          value: content?.agentEmployee?.chName ?? '',
+        },
+      },
+    },
+  ];
+
+  // 附件
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+
+  useEffect(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}/file/download/${item.id}`,
+        isNew: false,
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
+
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo: () => {},
+    toSetFileInfo: () => {},
+  };
+
+  // ------------------------------------------------------------------
+
   const tagList: TtagList = [
     {
       label: `合約編號 ${'foo'}`,
       onClick: () => {},
     },
   ];
-
-  const uploadPanel: TpanelList[number] = {
-    type: 'myButton',
-    label: '上傳',
-    onClick: async () => {
-      //
-      try {
-        showRootLoading(true);
-      } catch (error) {
-        myAlert.err({ title: '上傳失敗' });
-      } finally {
-        showRootLoading(false);
-      }
-      //
-    },
-  };
 
   const panel: TpanelList = [
     //
@@ -304,6 +444,18 @@ export default function AttachContract() {
 
           {/*  */}
         </div>
+        {/*  */}
+        {/*  */}
+        <Summary
+          disabled={true}
+          payInfoControl={payInfoControl}
+          control_anno={control_anno}
+          control_qr={control_qr}
+          appendixParams={appendixParams}
+        />
+
+        {/* 簽名 */}
+        <QuotationSinature signatureArr={signatureArr} disabled={true} />
       </div>
     </SubLayer>
   );
