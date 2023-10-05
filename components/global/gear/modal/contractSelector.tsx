@@ -28,7 +28,7 @@ export default function ContractSelector({
   onCancel,
   label,
   tip,
-  selLimit,
+  selLimit = 1,
   customParams,
   customFilter,
   customPopulate,
