@@ -61,6 +61,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
         },
       };
     }) ?? [];
+  memoArr.shift();
 
   // ----------------------------------------------------------
   return (
