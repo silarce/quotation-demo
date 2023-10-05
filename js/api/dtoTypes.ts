@@ -885,8 +885,6 @@ export type TquotationProductDto = {
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
 
-  thickness?: number;
-
   items: {
     // 材料配件
     components: TquotationProductComponentsDto[];
@@ -897,6 +895,24 @@ export type TquotationProductDto = {
 
   attachedToProductId?: string | null;
   attachedToProduct?: TquotationProductDto | null;
+
+  quantity: number;
+  // 門片厚度
+  thickness: string;
+  // 配電箱牌價;
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
 };
 
 export type TquotationContentDto = {
@@ -1043,8 +1059,6 @@ export type TcreateQuotationProductDto = {
 
   motorPhase: number;
 
-  thickness: number;
-
   // 選配設定
   accessories: {
     codeName: string; //代號
@@ -1064,6 +1078,23 @@ export type TcreateQuotationProductDto = {
   order: number;
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
+
+  // 門片厚度
+  thickness: string;
+  // 配電箱牌價;
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
 };
 
 // type TupdateQuotationContentDto = {
