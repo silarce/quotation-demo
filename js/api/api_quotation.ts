@@ -18,6 +18,7 @@ import type {
   TsubmitReviewQotuationContentDto,
   TquotationContractDto,
   TcreateModifyQuotationDto,
+  TquotationProductDto,
 } from './dtoTypes';
 
 export type {
@@ -31,6 +32,7 @@ export type {
   TsubmitReviewQotuationContentDto,
   TquotationContractDto,
   TcreateModifyQuotationDto,
+  TquotationProductDto,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -491,6 +493,15 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
     data: res,
     update,
   };
+};
+
+export const apiGetQuotationProducts = async (productId: string) => {
+  const api = `/quotation/products/${productId}`;
+
+  return axi
+    .post<TquotationProductDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
 };
 
 // ==================================================================

@@ -266,6 +266,26 @@ class Class_product {
     this.reRender();
   }
 
+  creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentsDto[] }) {
+    const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
+    componentsArr.forEach((item) => {
+      const key = comTypeLookUp[item.type];
+      comPreList[key] = {
+        ...item,
+        doorModelName: key,
+        code: '',
+        specialSpec: '',
+        materialSurface: item.materialSurface || '',
+        quantity: String(item.quantity || 0),
+      };
+    });
+
+    this.creComList({
+      dataList: comPreList as { [key in TcomponentKey]: Tcomponent },
+      isNew: false,
+    });
+  }
+
   // ---------------------------------------------------------
 
   // 選配設定
@@ -329,6 +349,29 @@ class Class_product {
 
     optionArr?.forEach((item) => {
       let key = item.order !== undefined ? `${item.order}` : nanoid();
+
+      if (key in list) {
+        key = nanoid();
+      }
+
+      list[key] = new Class_accessories({
+        reRender: this.reRender,
+        data: _.cloneDeep(item),
+        prod: this,
+        isNew: false,
+        key: key,
+      });
+    });
+    this.accessoriesList = list;
+    this.reRender();
+  }
+
+  creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoriesDto[] }) {
+    // const optionArr = _.sortBy(this._prodData.accessories, 'order');
+    const list: { [key: string]: Class_accessories } = {};
+
+    acceArr?.forEach((item) => {
+      let key = nanoid();
 
       if (key in list) {
         key = nanoid();
@@ -1332,6 +1375,10 @@ class Class_product {
   // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------
+
+  get id() {
+    return this._prodData.id;
+  }
 
   get itemName() {
     return this._prodData.itemName;

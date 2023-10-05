@@ -56,7 +56,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
           pathname: '/domestic/contract/quotation',
           query: {
             id: item.id,
-            vision: item.version,
+            version: item.version,
           },
         },
       };
@@ -82,7 +82,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
             e.stopPropagation();
             router.push({
               pathname: `/domestic/contract/quotation`,
-              query: { id, vision: 1 },
+              query: { id, version: 1 },
             });
           };
 
@@ -92,7 +92,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
               className={style.panel}
               header={<ListHeader01 contract={item} onClick={onClick} isActive={isActive} />}
             >
-              {fakeListBody.length > 0 ? <ListBody01 memoList={memoArr} /> : <span>無備註</span>}
+              <ListBody01 memoList={memoArr} />
             </Panel>
           );
         })}
@@ -100,21 +100,3 @@ export default function ContractList({ contractList }: { contractList: Tcontract
     </div>
   );
 }
-
-const fakeListBody = [
-  {
-    memoId: 'N-1110101-05',
-    memoDate: '111-01-01',
-    memoContent: '備註備註備註備註',
-  },
-  {
-    memoId: 'N-1110101-05',
-    memoDate: '111-01-01',
-    memoContent: '備註備註備註備註',
-  },
-  {
-    memoId: 'N-1110101-05',
-    memoDate: '111-01-01',
-    memoContent: '備註備註備註備註',
-  },
-];
