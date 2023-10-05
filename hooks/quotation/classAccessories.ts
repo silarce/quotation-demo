@@ -76,22 +76,19 @@ class Class_accessories {
   // --------------------------------------------------------------------
 
   calcPrice() {
-    const originalPrice = this._acceData.originalPrice ?? 0;
-    let price = this._acceData.price ?? 0;
-
     const referenceSpec = this._acceData.referenceSpec;
-    let mulNumber = 1;
 
     // length跟width互斥，length為0的時候 price為0?
     if (referenceSpec === 'fullWidth') {
       const l = Number(this._prod.length);
       const w = Number(this._prod.width);
-      mulNumber = l || w;
+      this.quantity = l || w;
+      this.unit = 'M';
+    } else {
+      this.unit = '組';
     }
 
-    price = new Decimal(originalPrice).mul(mulNumber).toNumber();
-
-    this.price = String(price); // will call calcAllPrice
+    this.price = String(this._acceData.originalPrice); // will call calcAllPrice
   }
 
   calcAllPrice() {
