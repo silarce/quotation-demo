@@ -98,8 +98,13 @@ export default function AttachContract() {
   // FIXME 變更與追加後計算的金額有誤
   const subTotal_ori = data?.subTotal ?? 0;
   const subTotal_calced = subTotal_ori + attachTotal;
-  const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05).toFixed(2));
+  const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
+
+  // const subTotal_ori = data?.subTotal ?? 0;
+  // const subTotal_calced = subTotal_ori + attachTotal;
+  // const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05));
+  // const total_calced = subTotal_calced + salesTax_calced;
 
   const control_anno: TsummaryControl = {
     stringArr: data?.annotations ?? [],
@@ -286,6 +291,7 @@ export default function AttachContract() {
 
       try {
         await apiQuotationModify(contractId, body);
+        router.back();
       } catch (error) {}
 
       //
@@ -318,13 +324,7 @@ export default function AttachContract() {
       label: '取消',
       onClick: () => {
         //
-        // router.back();
-        router.push({
-          pathname: '/domestic/legacyContractIntegration/quotation',
-          query: {
-            contractId: contractId,
-          },
-        });
+        router.back();
       },
     },
   ];

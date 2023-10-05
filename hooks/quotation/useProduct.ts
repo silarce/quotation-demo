@@ -430,7 +430,6 @@ const useProductList = ({
       reRender,
       delSelf: () => delSelf_prod(productList_attach, newKey),
       copySelf: () => {
-        // FIXME 複製無效，應該是productList_attach的參照錯誤
         copySelf_prod(productList_attach, newKey);
       },
       callCalcSubTotal,

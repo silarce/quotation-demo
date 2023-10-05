@@ -885,7 +885,7 @@ export type TquotationProductDto = {
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
 
-  items: {
+  items?: {
     // 材料配件
     components: TquotationProductComponentsDto[];
     // 選配設定
@@ -1175,9 +1175,10 @@ export type TquotationContractDto = {
   verifyForm: TquotationVerifyFormDto;
   quotation: TquotationDto;
   content: TquotationContentDto;
-  rootContract: TquotationContractDto; // 源合約
-  attachedToContract: TquotationContractDto; // 上一份追加減合約
-  attachedContract: TquotationContractDto; // 下一份追加減合約
+  rootContract?: TquotationContractDto; // 源合約
+  // attachedToContract: TquotationContractDto; // 上一份追加減合約
+  // attachedContract: TquotationContractDto; // 下一份追加減合約
+  version: number;
   //
   subContracts: TquotationContractDto[];
 };

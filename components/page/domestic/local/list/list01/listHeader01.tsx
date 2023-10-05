@@ -4,10 +4,8 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 import style from './listHeader01.module.scss';
 
-// type
-import { TfakeContractSimple } from 'fakeDatabase/domestic/contractCombinder';
-
 type Tcontract = {
+  id: string;
   quotationId: string;
   clientName: string;
   quotationName: string;

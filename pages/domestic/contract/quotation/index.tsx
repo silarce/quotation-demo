@@ -6,10 +6,10 @@ import _ from 'lodash';
 // components
 // import QuotationProfile, { TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
+// import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
+// import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
+// import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
+// import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 // import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
@@ -25,9 +25,6 @@ const { Panel } = Collapse;
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
-// icon
-import iconUpload from 'public/image/icon/upload.svg';
-
 // css
 import style from './quotation.module.scss';
 
@@ -35,7 +32,7 @@ import style from './quotation.module.scss';
 // =============================================================
 // =============================================================
 
-import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
+import { useGetContract_id_noItems, useQuotation_id_attachments, apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
@@ -76,11 +73,15 @@ export default function Quotation() {
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
     id, //報價單id
-  } = router.query;
+    version,
+  } = router.query as {
+    id: string | undefined;
+    version: string | undefined;
+  };
 
   // =========================================================
 
-  const { data, update } = useGetContract_id(id as string | undefined);
+  const { data, update } = useGetContract_id_noItems(id as string | undefined);
 
   useEffect(() => {
     update();
@@ -131,12 +132,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   img: iconUpload.src,
     //   onClick: () => setShowPdf_part(true),
     // },
-    { type: 'myButton', label: '送審', onClick: () => alert('送審') },
-    {
-      type: 'myButton',
-      label: `編輯`,
-      onClick: () => setAllowEdit((state) => true),
-    },
+    // { type: 'myButton', label: '送審', onClick: () => alert('送審') },
+    // {
+    //   type: 'myButton',
+    //   label: `編輯`,
+    //   onClick: () => setAllowEdit((state) => true),
+    // },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -161,11 +162,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //   img: iconUpload.src,
     //   onClick: () => alert('匯出單價分析'),
     // },
-    {
-      type: 'redButton',
-      label: '上傳',
-      onClick: () => alert('上傳'),
-    },
+    // {
+    //   type: 'redButton',
+    //   label: '上傳',
+    //   onClick: () => alert('上傳'),
+    // },
     {
       type: 'myButton',
       label: '取消',
@@ -181,7 +182,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
 
   const content = data?.content;
-  const rootContent = data?.rootContract.content;
+  // const rootContent = data?.rootContract.content;
+  const rootContent = data?.subContracts[0]?.content;
+  const subContracts = data?.subContracts.filter((item) => {
+    item.version <= Number(version ?? 0);
+  });
 
   // latest
   const {
@@ -221,6 +226,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
+
+  useEffect(() => {
+    (async () => {
+      if (targetProd?.id) {
+        try {
+          const res = await apiGetQuotationProducts(targetProd.id);
+          const componentsArr = res.items?.[0].components ?? [];
+          const acceArr = res.items?.[0].accessories ?? [];
+          // creComList_dyna
+
+          targetProd.creComList_dyna({ componentsArr: componentsArr });
+          targetProd.creAcceList_dyna({ acceArr });
+        } catch (error) {}
+      }
+    })();
+
+    // apiGetQuotationProducts
+  }, [targetProd]);
 
   // -----------------------------------------------------------------
   const control_anno: TsummaryControl = {
@@ -481,11 +504,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </>
           ) : (
             // 追加/追減項目
-            <QuotationProdChangingRecord subContract={data?.subContracts} rootContractTotal={rootContent?.total ?? 0} />
+            <QuotationProdChangingRecord subContract={subContracts} rootContractTotal={rootContent?.total ?? 0} />
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && <QuotationRecord subContract={data?.subContracts} rootContractTotal={rootContent?.total ?? 0} />}
+          {switch02 && <QuotationRecord subContract={subContracts} rootContractTotal={rootContent?.total ?? 0} />}
 
           <Summary
             disabled={true}

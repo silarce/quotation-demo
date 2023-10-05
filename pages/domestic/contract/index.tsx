@@ -33,7 +33,13 @@ import { useGetContract } from 'js/api/api_quotation';
 export default function Contract() {
   const router = useRouter();
 
-  const { data, update } = useGetContract();
+  const params = {
+    filter: {
+      version: { $eq: 1 },
+    },
+  };
+
+  const { data, update } = useGetContract(params);
 
   useEffect(() => {
     update();

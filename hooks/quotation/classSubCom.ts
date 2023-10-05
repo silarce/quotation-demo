@@ -60,6 +60,10 @@ class Class_SubCom {
 
   // ----------------------------------------------------------------
 
+  get hiddenKeyArr() {
+    return ['isPainted', 'desc', 'density', 'code', 'material', 'surface', 'codeNumber'];
+  }
+
   get comName() {
     return this._data.comName;
   }

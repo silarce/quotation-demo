@@ -1107,7 +1107,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewResult: isPass,
     };
 
-    if (!verifyForm) {
+    if (status === 'Contracting' && !verifyForm) {
       return myAlert.warning({ title: '請先送出合約審核表' });
     }
 
