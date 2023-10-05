@@ -259,7 +259,7 @@ const ComBox = ({
   comName: string;
 }) => {
   return (
-    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[120px]')}>
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[180px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
       {/* <span>{indexNum}</span> */}
       <span>{comName}</span>
@@ -423,6 +423,9 @@ function DndRow({
           {keyArr.map((key) => {
             if (!item) {
               return null;
+            }
+
+            if ([`hidden_${key}`]) {
             }
 
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;

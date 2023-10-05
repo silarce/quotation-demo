@@ -62,7 +62,7 @@ export default function Table_acce({
                 const keyArr = dndKeyArr as string[];
                 changeComKeyArr(keyArr);
               }}
-              comBoxWidth="120px"
+              comBoxWidth="180px"
             />
           </div>
           {comList && (
