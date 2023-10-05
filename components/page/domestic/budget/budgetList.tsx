@@ -110,10 +110,10 @@ export default function BudgetList({
             ];
 
             const recordArr = contents.map((item) => {
-              const { deliveryDate, editNotes, discount, quantity, total } = item;
+              const { createdAt, editNotes, discount, quantity, total } = item;
 
               return {
-                date: moment(convertDate_reduce1911(deliveryDate)).format('yy-MM-DD'),
+                date: moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD'),
                 editNotes,
                 discount,
                 doorQty: String(quantity),
