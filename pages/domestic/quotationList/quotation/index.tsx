@@ -882,10 +882,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '送審',
       onClick: () => {
-        if (!verifyForm) {
-          return myAlert.warning({ title: '請先送出合約審核表' });
-        }
-
         openEmpSel('reviewSales');
       },
     },
