@@ -121,6 +121,8 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this.parentProd = parentProd;
+
     this.findBDoptions();
 
     // __________________________________________________________;
@@ -158,10 +160,13 @@ class Class_product {
   delSelf;
   copySelf;
   readonly callCalcSubTotal;
+
   //  用來比對是否有變動用的
   readonly originProd;
   //  用來比對是否有變動用的
+
   isLoading = false;
+
   //
   // from api
   // 門型資料
@@ -1788,13 +1793,6 @@ class Class_product {
 
     const copy = _.cloneDeep(this.body_Tprod);
     copy.quantity = Number(v);
-    // copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
-
-    // if ('id' in copy) {
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-ignore
-    //   copy.id = '';
-    // }
 
     const exId = 'ex-' + nanoid();
 
@@ -1802,11 +1800,6 @@ class Class_product {
       delete this._exchangeProdList[exId];
       this.reRender();
     };
-
-    // const copySelf = () => {
-    //   const copyBody = this._exchangeProdList[exId].body_Tprod;
-
-    // };
 
     this._exchangeProdList[exId] = new Class_product({
       reRender: this.reRender,
@@ -1818,8 +1811,6 @@ class Class_product {
       parentProd: this,
     });
 
-    // this._countSubTotal();
-
     this.reRender();
 
     return true;
@@ -1828,10 +1819,8 @@ class Class_product {
 
   // 清空變更prod
   clearAttach = () => {
-    console.log('foo');
     this._exchangeProdList = {};
     this._reduceQty = '0';
-    // this._countSubTotal();
     this.reRender();
   };
 

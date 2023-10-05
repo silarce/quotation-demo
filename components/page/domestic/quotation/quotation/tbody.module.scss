@@ -75,6 +75,11 @@
 
   > .svgBtn {
     transform: translateY(-4px);
+    &.hidden {
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+    }
   }
   > .btn {
     padding: 0px 10px;

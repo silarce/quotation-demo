@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -80,6 +80,7 @@ export default function AttachContract() {
     //
     attachProdList,
     addProd_attach,
+    attachTotal,
   } = useProductList({
     productArr: data?.content.products,
     others: data?.content.others,
@@ -93,6 +94,12 @@ export default function AttachContract() {
   const targetProd_attach = attachProdList[targetProdKey_attach];
 
   // ------------------------------------------------------------------
+
+  // FIXME 變更與追加後計算的金額有誤
+  const subTotal_ori = data?.subTotal ?? 0;
+  const subTotal_calced = subTotal_ori + attachTotal;
+  const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05).toFixed(2));
+  const total_calced = subTotal_calced + salesTax_calced;
 
   const control_anno: TsummaryControl = {
     stringArr: data?.annotations ?? [],
@@ -122,19 +129,19 @@ export default function AttachContract() {
       subTotal: {
         inputAttr: {
           disabled: true,
-          value: data?.subTotal ?? '',
+          value: subTotal_calced,
         },
       },
       salesTax: {
         inputAttr: {
           disabled: true,
-          value: data?.salesTax ?? '',
+          value: salesTax_calced,
         },
       },
       total: {
         inputAttr: {
           disabled: true,
-          value: data?.total ?? '',
+          value: total_calced,
         },
       },
     },
@@ -240,6 +247,46 @@ export default function AttachContract() {
 
   // ------------------------------------------------------------------
 
+  const reqModify = async () => {
+    try {
+      showRootLoading(true);
+
+      if (!data || !attachProdList || !contractId) {
+        return;
+      }
+
+      const content = _.cloneDeep(data.content);
+
+      const attachProdArr = Object.values(attachProdList).map((prod) => {
+        return prod.body;
+      });
+
+      const body: TcreateModifyQuotationDto = {
+        ...content,
+        products: attachProdArr,
+        agentId: content.agentEmployee?.id,
+        managerId: content.managerEmployee?.id,
+        supervisorId: content.supervisorEmployee?.id,
+        subTotal: subTotal_calced,
+        salesTax: salesTax_calced,
+        total: total_calced,
+      };
+
+      try {
+        await apiQuotationModify(contractId, body);
+      } catch (error) {}
+
+      //
+      //
+    } catch (error) {
+      myAlert.err({ title: '上傳失敗' });
+    } finally {
+      showRootLoading(false);
+    }
+  };
+
+  // ------------------------------------------------------------------
+
   const tagList: TtagList = [
     {
       label: `合約編號 ${'foo'}`,
@@ -252,42 +299,7 @@ export default function AttachContract() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: async () => {
-        //
-        try {
-          showRootLoading(true);
-
-          if (!data || !attachProdList || !contractId) {
-            return;
-          }
-
-          const content = _.cloneDeep(data.content);
-
-          const attachProdArr = Object.values(attachProdList).map((prod) => {
-            return prod.body;
-          });
-
-          const body: TcreateModifyQuotationDto = {
-            ...content,
-            products: attachProdArr,
-            agentId: content.agentEmployee?.id,
-            managerId: content.managerEmployee?.id,
-            supervisorId: content.supervisorEmployee?.id,
-          };
-
-          try {
-            await apiQuotationModify(contractId, body);
-          } catch (error) {}
-
-          //
-          //
-        } catch (error) {
-          myAlert.err({ title: '上傳失敗' });
-        } finally {
-          showRootLoading(false);
-        }
-        //
-      },
+      onClick: reqModify,
     },
     {
       type: 'myButton',

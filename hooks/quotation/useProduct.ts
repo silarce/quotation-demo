@@ -187,7 +187,7 @@ const useProductList = ({
     reRender();
   };
 
-  const copySelf_prod = (list: TproductList, copyKey: string) => {
+  const copySelf_prod = (list: TproductList, copyKey: string, shouldKeepId?: boolean) => {
     if (!doorModelList) {
       return myAlert.info({ title: '尚未取得門型資料' });
     }
@@ -197,7 +197,11 @@ const useProductList = ({
     const copy = _.cloneDeep(list[copyKey]);
     copy.delSelf = () => delSelf_prod(list, newKey);
     copy.copySelf = () => copySelf_prod(list, newKey);
-    copy.clearId();
+
+    if (!shouldKeepId) {
+      copy.clearId();
+    }
+
     copy.attachId = newKey;
 
     Object.values(copy.accessoriesList).forEach((acce) => {
@@ -406,6 +410,10 @@ const useProductList = ({
   };
   // ---------------------------------------------------------
 
+  // 追加追減
+  // 追加追減
+  // 追加追減
+
   const [productList_attach, setProductList_attach] = useState<TproductList>({});
 
   const addProd_attach = () => {
@@ -429,7 +437,6 @@ const useProductList = ({
     reRender();
   };
 
-  // ---------------------------------------------------------
   // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
   // 以後最好還是做成狀態較好
   const attachProdList: { [key: string]: Class_product } = {};
@@ -442,6 +449,16 @@ const useProductList = ({
   Object.values(productList_attach).forEach((item, index) => {
     const newId = item.attachId;
     attachProdList[newId] = item;
+  });
+
+  //
+  let attachTotal = 0;
+  Object.values(productList).forEach((prod) => {
+    attachTotal = attachTotal - Number(prod.reduceExchangePrice);
+  });
+
+  Object.values(attachProdList).forEach((prod) => {
+    attachTotal = attachTotal + Number(prod.totalPrice_num);
   });
 
   // ---------------------------------------------------------
@@ -476,9 +493,10 @@ const useProductList = ({
     addOthers,
     getOthersPostBodyArr,
     //
-    // attachProdList,
-    attachProdList: productList_attach,
+    attachProdList,
+    // attachProdList: productList_attach,
     addProd_attach,
+    attachTotal,
   };
 };
 
