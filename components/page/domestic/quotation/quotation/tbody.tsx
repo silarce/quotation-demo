@@ -98,7 +98,8 @@ export default function Tbody({
     onDragEnd,
     onDragStart,
   } = useVerticalDnd({
-    listKeyArr: defalutVKeyArr || Object.keys(rowList),
+    // listKeyArr: defalutVKeyArr || Object.keys(rowList),
+    listKeyArr: Object.keys(rowList),
     resetTrigger: rowList,
     onKeyChange: onVKeyChange,
   });
