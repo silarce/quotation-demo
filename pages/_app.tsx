@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import _ from 'lodash';
 
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
@@ -42,6 +43,7 @@ type AppPropsWithLayout = AppProps & {
 type TappContext = {
   rwd1023: boolean;
   userInfo: TuserDto | undefined;
+  userGrade: number;
 };
 
 export const AppContext = createContext<TappContext>(null!);
@@ -57,6 +59,15 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
   const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
+
+  // const userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+  let userGrade = 0;
+
+  if (userInfo && !userInfo.employee) {
+    userGrade = 16;
+  } else if (userInfo && userInfo.employee) {
+    userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+  }
 
   useEffect(() => {
     (async () => {
@@ -100,6 +111,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const appContextValue = {
     rwd1023,
     userInfo,
+    userGrade,
   };
 
   // -----------------------------------------------------------------------
