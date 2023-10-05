@@ -138,7 +138,7 @@ const useProductList = ({
         width: String(Number(prod.WG) / 1000),
         length: String(Number(prod.fullWidth) / 1000),
         height: String(Number(prod.height) / 1000),
-        boxB: String(Number(prod.WG) / 1000),
+        boxB: String(Number(prod.boxB) / 1000),
         boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
