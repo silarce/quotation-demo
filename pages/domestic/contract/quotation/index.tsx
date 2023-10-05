@@ -35,7 +35,7 @@ import style from './quotation.module.scss';
 // =============================================================
 // =============================================================
 
-import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
+import { useGetContract_id_noItems, useQuotation_id_attachments } from 'js/api/api_quotation';
 
 // import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
@@ -80,7 +80,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data, update } = useGetContract_id(id as string | undefined);
+  const { data, update } = useGetContract_id_noItems(id as string | undefined);
 
   useEffect(() => {
     update();

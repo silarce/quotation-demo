@@ -382,6 +382,63 @@ export const useGetContract_id = (id: string | undefined) => {
   };
 };
 
+export const useGetContract_id_noItems = (id: string | undefined) => {
+  const params: Tparams = {
+    populate: [
+      // 'contents',
+      'content.customer',
+      'content.agentEmployee',
+      'content.supervisorEmployee',
+      'content.managerEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      // 'content.products.items.accessories',
+      // 'content.products.items.components',
+      'content.others',
+
+      // 'rootContract.content.customer',
+      // 'rootContract.content.agentEmployee',
+      // 'rootContract.content.supervisorEmployee',
+      // 'rootContract.content.managerEmployee',
+      // 'rootContract.content.reviewSalesEmployee',
+      // 'rootContract.content.reviewWorkDirectorEmployee',
+      // 'rootContract.content.reviewSupervisorEmployee',
+      // 'rootContract.content.others',
+      // 'rootContract.content.products.items.accessories',
+      // 'rootContract.content.products.items.components',
+
+      // 'attachedToContract',
+      // 'attachedContract',
+      'subContracts.content.products',
+
+      'products',
+    ],
+  };
+
+  const [res, setRes] = useState<TquotationContractDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetContract_Id(id, params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+    clear: () => setRes(undefined),
+  };
+};
+
 export const useGetContract_id_forAttach = (id: string | undefined) => {
   const params: Tparams = {
     populate: [
