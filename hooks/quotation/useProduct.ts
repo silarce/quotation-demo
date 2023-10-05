@@ -205,6 +205,7 @@ const useProductList = ({
     list[newKey] = copy;
 
     callCalcSubTotal();
+
     reRender();
   };
 
@@ -405,8 +406,6 @@ const useProductList = ({
 
   const [productList_attach, setProductList_attach] = useState<TproductList>({});
 
-  console.log(productList_attach);
-
   const addProd_attach = () => {
     if (!doorModelList) {
       return myAlert.info({ title: '尚未取得門型資料' });
@@ -416,7 +415,10 @@ const useProductList = ({
     const classProd = new Class_product({
       reRender,
       delSelf: () => delSelf_prod(productList_attach, newKey),
-      copySelf: () => copySelf_prod(productList_attach, newKey),
+      copySelf: () => {
+        // FIXME 複製無效，應該是productList_attach的參照錯誤
+        copySelf_prod(productList_attach, newKey);
+      },
       callCalcSubTotal,
       doorModelList,
     });
@@ -444,6 +446,8 @@ const useProductList = ({
 
     return list;
   })();
+
+  // console.log(attachProdList);
 
   // ---------------------------------------------------------
 
