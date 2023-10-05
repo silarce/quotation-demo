@@ -168,7 +168,7 @@ class Class_product {
   private _doorModelList;
   _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
   private _availableComponents: TdoorComponentListDto | undefined;
-  private _thickness = '';
+
   private _defaultBoxB = '';
   // private _boxB: number | undefined;
   //
@@ -372,7 +372,7 @@ class Class_product {
 
     this._prodData.boxB = '';
     this._defaultBoxB = '';
-    this._thickness = '';
+    this._prodData.thickness = '';
 
     this.options_boxB = undefined;
     this.options_boxD = undefined;
@@ -1718,10 +1718,10 @@ class Class_product {
 
   /**門片厚度 */ //TODO api 沒有門片厚度 //好像有了?待確認
   get thickness() {
-    return this._thickness;
+    return this._prodData.thickness;
   }
   set thickness(v) {
-    this._thickness = v;
+    this._prodData.thickness = v;
     this.reRender();
   }
 
@@ -1955,6 +1955,8 @@ class Class_product {
       components: this.comBodyArr,
       accessories: this.acceBodyArr,
       order: 0,
+      //
+      thickness: Number(this.thickness || 0),
     };
 
     if ('items' in body) {
@@ -2034,7 +2036,7 @@ type Tprod = {
   width: string; // W(m)
   height: string; //h(m)
   boxB: string; // B(m)
-  // thickness: string; // 門片厚度?
+  thickness: string; // 門片厚度?
   area: string; // 面積
   volume: string; // 才數
   material: string;
@@ -2135,7 +2137,7 @@ const emptyProdOri = (): Tprod => {
     width: '',
     height: '',
     boxB: '',
-    // thickness: '',
+    thickness: '',
     area: '',
     volume: '',
     material: '',

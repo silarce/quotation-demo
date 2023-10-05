@@ -157,6 +157,7 @@ const useProductList = ({
         motor: prod.motorVendor,
         doorTrackSilencerStrip: prod.hasSilencingStrip,
         onePieceRollUpBox: prod.isIntegratedHeadBox,
+        thickness: String(prod.thickness ?? ''),
       };
 
       list[key] = new Class_product({

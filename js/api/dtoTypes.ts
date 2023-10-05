@@ -885,6 +885,8 @@ export type TquotationProductDto = {
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
 
+  thickness?: number;
+
   items: {
     // 材料配件
     components: TquotationProductComponentsDto[];
@@ -1040,6 +1042,8 @@ export type TcreateQuotationProductDto = {
   notes: string;
 
   motorPhase: number;
+
+  thickness: number;
 
   // 選配設定
   accessories: {
