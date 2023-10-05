@@ -100,7 +100,7 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
                     payment[key].inputAttr.disabled && scss.noBaseLine
                   )}
                   {...payment[key].inputAttr}
-                  // value={payment[key].value}
+                  value={payment[key].inputAttr.value?.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                   // onChange={(e) => payment[key].onChange?.(e.target.value)}
                   disabled={disabled}
                 />

@@ -98,7 +98,8 @@ export default function Tbody({
     onDragEnd,
     onDragStart,
   } = useVerticalDnd({
-    listKeyArr: defalutVKeyArr || Object.keys(rowList),
+    // listKeyArr: defalutVKeyArr || Object.keys(rowList),
+    listKeyArr: Object.keys(rowList),
     resetTrigger: rowList,
     onKeyChange: onVKeyChange,
   });
@@ -192,6 +193,7 @@ const CopyDelBtnBox = ({
   indexNum,
   dndAttr,
   dndListener,
+  hiddenDelCopy,
 }: {
   disabled: boolean;
   del?: () => void;
@@ -199,13 +201,14 @@ const CopyDelBtnBox = ({
   indexNum: string | number;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
+  hiddenDelCopy?: boolean;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[137px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
 
       <IconDelete01
-        className={scss.svgBtn}
+        className={classNames(scss.svgBtn, hiddenDelCopy && scss.hidden)}
         onClick={(e) => {
           e.stopPropagation();
 
@@ -215,7 +218,7 @@ const CopyDelBtnBox = ({
         }}
       />
       <IconCopy
-        className={scss.svgBtn}
+        className={classNames(scss.svgBtn, hiddenDelCopy && scss.hidden)}
         onClick={() => {
           if (!disabled) {
             copy && copy();
@@ -397,6 +400,7 @@ function DndRow({
               indexNum={pIndex + 1}
               dndAttr={attributes}
               dndListener={listeners}
+              hiddenDelCopy={item.parentProd}
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}

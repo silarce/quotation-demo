@@ -120,8 +120,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, userGrade } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
@@ -568,7 +569,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    if (userId === reviewManagerEmployeeId) {
+    if (userGrade >= 14) {
       if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
@@ -881,6 +882,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '送審',
       onClick: () => {
+        if (!verifyForm) {
+          return myAlert.warning({ title: '請先送出合約審核表' });
+        }
+
         openEmpSel('reviewSales');
       },
     },
@@ -1004,7 +1009,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     if (!body.deliveryDate) {
-      return myAlert.warning({ title: '請選擇交貨日期' });
+      body.deliveryDate = null;
     }
 
     let hasSurface = true;
@@ -1049,6 +1054,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
+
     //
   }; // reqUpdateQuotation
 
@@ -1100,6 +1106,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewManagerEmployeeId: isManager ? userId : null,
       reviewResult: isPass,
     };
+
+    if (!verifyForm) {
+      return myAlert.warning({ title: '請先送出合約審核表' });
+    }
 
     try {
       setIsLoading(true);
@@ -1158,11 +1168,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <div className="relative mt-[14px]">
               <Table_com
                 disabled={disabled}
-                comList={targetProd?.comList}
+                // comList={targetProd?.comList}
+
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
                 comCellConfig={comCellConfig}
                 comKeyArr={comKeyArr}
-                changeComKeyArr={changeComKeyArr}
-                defalutVKeyArr={comVKeyArr}
+                changeComKeyArr={() => {}}
+                // defalutVKeyArr={comVKeyArr}
               />
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>

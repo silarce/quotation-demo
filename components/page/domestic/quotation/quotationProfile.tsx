@@ -212,6 +212,8 @@ export default function QuotationProfile({
     address: {
       props: {
         disabled,
+        // style: { height: 30 },
+        className: 'overflow-hidden',
         ...register('address'),
       },
     },
@@ -259,6 +261,8 @@ export default function QuotationProfile({
           textareaProps={{
             props: {
               ...register('projectName'),
+              className: 'overflow-hidden',
+              // style: { height: '40px' },
             },
           }}
         />
@@ -277,6 +281,8 @@ export default function QuotationProfile({
                   props: {
                     placeholder: undefined,
                     value: data_customer?.name ?? '',
+                    className: 'overflow-hidden',
+                    // style: { height: 30 },
                   },
                 }}
               />

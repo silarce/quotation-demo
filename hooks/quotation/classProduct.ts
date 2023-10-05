@@ -33,6 +33,7 @@ const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtecti
 // child class
 import { Class_component, Tcomponent, creEmptyCom, comTypeLookUp } from './classComponent';
 import { Class_accessories, Taccessories } from './classAccessories';
+import { Class_SubCom, TSubCom } from './classSubCom';
 // =============================================================================
 // api
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
@@ -121,6 +122,8 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this.parentProd = parentProd;
+
     this.findBDoptions();
 
     // __________________________________________________________;
@@ -149,6 +152,8 @@ class Class_product {
     // ___________________________________________________________
     // 建立選配設定
     this.creAcceList();
+    //建立 配電箱與按裝費
+    this.creSubComList();
     // ___________________________________________________________
     // = constructor close ===========================================================
   } // = constructor close ===========================================================
@@ -158,17 +163,20 @@ class Class_product {
   delSelf;
   copySelf;
   readonly callCalcSubTotal;
+
   //  用來比對是否有變動用的
   readonly originProd;
   //  用來比對是否有變動用的
+
   isLoading = false;
+
   //
   // from api
   // 門型資料
   private _doorModelList;
   _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
   private _availableComponents: TdoorComponentListDto | undefined;
-  private _thickness = '';
+
   private _defaultBoxB = '';
   // private _boxB: number | undefined;
   //
@@ -337,6 +345,44 @@ class Class_product {
     this.accessoriesList = list;
     this.reRender();
   }
+  //
+
+  subComList: { [key: string]: Class_SubCom } = {};
+
+  creSubComList() {
+    // 配電箱
+    const distributionBox = new Class_SubCom({
+      reRender: this.reRender,
+      data: {
+        price: this._prodData.distributionBoxPrice,
+        unitPrice: this._prodData.distributionBoxUnitPrice,
+        dualPrice: this._prodData.distributionBoxPrice,
+        totalPrice: this._prodData.distributionBoxUnitPrice,
+        quantity: 1,
+        comName: '配電箱及按鈕開關',
+      },
+      prod: this,
+    });
+
+    // 安裝費
+    const installationFee = new Class_SubCom({
+      reRender: this.reRender,
+      data: {
+        price: this._prodData.installationFeePrice,
+        unitPrice: this._prodData.installationFeeUnitPrice,
+        dualPrice: this._prodData.installationFeeDualPrice,
+        totalPrice: this._prodData.installationFeeTotalPrice,
+        quantity: this._prodData.installationFeeQuantity,
+        comName: '按裝及製造費用',
+      },
+      prod: this,
+    });
+
+    this.subComList = { distributionBox, installationFee };
+    this.reRender();
+  } // creSubComList
+
+  // ---------------------
 
   clearProd() {
     const empty = emptyProdOri();
@@ -372,7 +418,7 @@ class Class_product {
 
     this._prodData.boxB = '';
     this._defaultBoxB = '';
-    this._thickness = '';
+    this._prodData.thickness = '';
 
     this.options_boxB = undefined;
     this.options_boxD = undefined;
@@ -767,6 +813,7 @@ class Class_product {
     this.creComList({
       dataList,
     });
+    this.material = this.material;
     // this.creComList({
     //   slat: slat || creEmptyCom(),
     //   bottomBar: bottomBar || creEmptyCom(),
@@ -919,8 +966,39 @@ class Class_product {
     let d_totalPrice = new Decimal(0);
 
     const comListArr = Object.values(this.comList ?? {});
+    const subComListArr = Object.values(this.subComList ?? {});
+    const arr = [...comListArr, ...subComListArr];
 
-    comListArr.forEach((item) => {
+    arr.forEach((item) => {
+      if (!item) {
+        return;
+      }
+
+      const { price, dualPrice, unitPrice, totalPrice } = item;
+
+      d_price = d_price.add(price || 0);
+      d_dualPrice = d_dualPrice.add(dualPrice || 0);
+      d_unitPrice = d_unitPrice.add(unitPrice || 0);
+      d_totalPrice = d_totalPrice.add(totalPrice || 0);
+    });
+
+    this.comAllPrice = {
+      price: d_price.ceil().toNumber(),
+      dualPrice: d_dualPrice.ceil().toNumber(),
+      unitPrice: d_unitPrice.ceil().toNumber(),
+      totalPrice: d_totalPrice.ceil().toNumber(),
+    };
+  } // calcComAllPrice
+
+  calcSubComAllPrice() {
+    let d_price = new Decimal(0);
+    let d_dualPrice = new Decimal(0);
+    let d_unitPrice = new Decimal(0);
+    let d_totalPrice = new Decimal(0);
+
+    const subComListArr = Object.values(this.subComList ?? {});
+
+    subComListArr.forEach((item) => {
       if (!item) {
         return;
       }
@@ -1231,6 +1309,11 @@ class Class_product {
         item.calcAllPrice();
       }
     });
+    Object.values(this.subComList ?? {}).forEach((item, index, arr) => {
+      if (item) {
+        item.calcAllPrice();
+      }
+    });
 
     Object.values(this.accessoriesList).forEach((item, index, arr) => {
       item.calcAllPrice();
@@ -1388,8 +1471,12 @@ class Class_product {
   set area(v) {
     this._prodData.area = v;
 
-    if (this.comList) {
+    if (this.comList?.slat) {
       this.comList.slat.quantity = v;
+    }
+
+    if (this.subComList?.installationFee) {
+      this.subComList.installationFee.quantity = v;
     }
 
     this.volume = this.calcVolume();
@@ -1717,10 +1804,10 @@ class Class_product {
 
   /**門片厚度 */ //TODO api 沒有門片厚度 //好像有了?待確認
   get thickness() {
-    return this._thickness;
+    return this._prodData.thickness;
   }
   set thickness(v) {
-    this._thickness = v;
+    this._prodData.thickness = v;
     this.reRender();
   }
 
@@ -1734,7 +1821,7 @@ class Class_product {
 
   // 追加追減
 
-  readonly attachId = 'attach-' + nanoid();
+  attachId = 'attach-' + nanoid();
 
   // 因變更而新增的prod
   get exchangeProdList() {
@@ -1787,13 +1874,6 @@ class Class_product {
 
     const copy = _.cloneDeep(this.body_Tprod);
     copy.quantity = Number(v);
-    // copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
-
-    // if ('id' in copy) {
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-ignore
-    //   copy.id = '';
-    // }
 
     const exId = 'ex-' + nanoid();
 
@@ -1801,11 +1881,6 @@ class Class_product {
       delete this._exchangeProdList[exId];
       this.reRender();
     };
-
-    // const copySelf = () => {
-    //   const copyBody = this._exchangeProdList[exId].body_Tprod;
-
-    // };
 
     this._exchangeProdList[exId] = new Class_product({
       reRender: this.reRender,
@@ -1817,8 +1892,6 @@ class Class_product {
       parentProd: this,
     });
 
-    // this._countSubTotal();
-
     this.reRender();
 
     return true;
@@ -1827,10 +1900,8 @@ class Class_product {
 
   // 清空變更prod
   clearAttach = () => {
-    console.log('foo');
     this._exchangeProdList = {};
     this._reduceQty = '0';
-    // this._countSubTotal();
     this.reRender();
   };
 
@@ -1954,6 +2025,16 @@ class Class_product {
       components: this.comBodyArr,
       accessories: this.acceBodyArr,
       order: 0,
+      //
+      thickness: this.thickness || '',
+
+      distributionBoxPrice: Number(this.subComList.distributionBox.price),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
+      installationFeePrice: Number(this.subComList.installationFee.price),
+      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
+      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
+      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
+      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
     };
 
     if ('items' in body) {
@@ -2006,6 +2087,13 @@ class Class_product {
       components: this.comBodyArr,
       accessories: this.acceBodyArr,
       // order: 0,
+      distributionBoxPrice: Number(this.subComList.distributionBox.price),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
+      installationFeePrice: Number(this.subComList.installationFee.price),
+      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
+      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
+      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
+      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
     };
 
     return body;
@@ -2033,7 +2121,7 @@ type Tprod = {
   width: string; // W(m)
   height: string; //h(m)
   boxB: string; // B(m)
-  // thickness: string; // 門片厚度?
+  thickness: string; // 門片厚度?
   area: string; // 面積
   volume: string; // 才數
   material: string;
@@ -2075,6 +2163,20 @@ type Tprod = {
   //
   // 用來辨識至追加追減
   attachedToProductId?: string | null;
+  //
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -2134,7 +2236,7 @@ const emptyProdOri = (): Tprod => {
     width: '',
     height: '',
     boxB: '',
-    // thickness: '',
+    thickness: '',
     area: '',
     volume: '',
     material: '',
@@ -2169,6 +2271,22 @@ const emptyProdOri = (): Tprod => {
     //
     bottomBarAngleIron: '鍍鋅 50*50*4T', // 來自prodCellConfig
     bottomBarPlate: '鍍鋅 1.5T', // 來自prodCellConfig
+    //
+
+    // 配電箱 牌價;
+    distributionBoxPrice: 5940,
+    // 配電箱 單價;
+    distributionBoxUnitPrice: 5940,
+    // 安裝費 牌價;
+    installationFeePrice: 1800,
+    // 安裝費 牌價複價;
+    installationFeeDualPrice: 1800,
+    // 安裝費 數量;
+    installationFeeQuantity: 0,
+    // 安裝費 單價;
+    installationFeeUnitPrice: 1800,
+    // 安裝費 複價;
+    installationFeeTotalPrice: 1800,
   };
 };
 

@@ -12,6 +12,7 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 // class
 import { Class_product, Tprod, TprodKey, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
+import { Class_SubCom } from './classSubCom';
 import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
 import { TaccessoriesKey, Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 
@@ -38,6 +39,9 @@ type TproductList = {
 
 type TcomList = {
   [key in TcomponentKey]: Class_component;
+};
+type TsubComList = {
+  [key in TcomponentKey]: Class_SubCom;
 };
 
 type TaccessoriesList = {
@@ -138,7 +142,7 @@ const useProductList = ({
         width: String(Number(prod.WG) / 1000),
         length: String(Number(prod.fullWidth) / 1000),
         height: String(Number(prod.height) / 1000),
-        boxB: String(Number(prod.WG) / 1000),
+        boxB: String(Number(prod.boxB) / 1000),
         boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
@@ -157,6 +161,7 @@ const useProductList = ({
         motor: prod.motorVendor,
         doorTrackSilencerStrip: prod.hasSilencingStrip,
         onePieceRollUpBox: prod.isIntegratedHeadBox,
+        thickness: String(prod.thickness ?? ''),
       };
 
       list[key] = new Class_product({
@@ -186,7 +191,7 @@ const useProductList = ({
     reRender();
   };
 
-  const copySelf_prod = (list: TproductList, copyKey: string) => {
+  const copySelf_prod = (list: TproductList, copyKey: string, shouldKeepId?: boolean) => {
     if (!doorModelList) {
       return myAlert.info({ title: '尚未取得門型資料' });
     }
@@ -196,7 +201,12 @@ const useProductList = ({
     const copy = _.cloneDeep(list[copyKey]);
     copy.delSelf = () => delSelf_prod(list, newKey);
     copy.copySelf = () => copySelf_prod(list, newKey);
-    copy.clearId();
+
+    if (!shouldKeepId) {
+      copy.clearId();
+    }
+
+    copy.attachId = newKey;
 
     Object.values(copy.accessoriesList).forEach((acce) => {
       acce.reNewMethod();
@@ -205,6 +215,7 @@ const useProductList = ({
     list[newKey] = copy;
 
     callCalcSubTotal();
+
     reRender();
   };
 
@@ -403,9 +414,11 @@ const useProductList = ({
   };
   // ---------------------------------------------------------
 
-  const [productList_attach, setProductList_attach] = useState<TproductList>({});
+  // 追加追減
+  // 追加追減
+  // 追加追減
 
-  console.log(productList_attach);
+  const [productList_attach, setProductList_attach] = useState<TproductList>({});
 
   const addProd_attach = () => {
     if (!doorModelList) {
@@ -416,7 +429,10 @@ const useProductList = ({
     const classProd = new Class_product({
       reRender,
       delSelf: () => delSelf_prod(productList_attach, newKey),
-      copySelf: () => copySelf_prod(productList_attach, newKey),
+      copySelf: () => {
+        // FIXME 複製無效，應該是productList_attach的參照錯誤
+        copySelf_prod(productList_attach, newKey);
+      },
       callCalcSubTotal,
       doorModelList,
     });
@@ -427,23 +443,27 @@ const useProductList = ({
 
   // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
   // 以後最好還是做成狀態較好
-  const attachProdList = (() => {
-    const list: { [key: string]: Class_product } = {};
-
-    Object.values(productList).forEach((prod, index) => {
-      Object.values(prod.exchangeProdList).forEach((item) => {
-        const newId = item.attachId;
-        list[newId] = item;
-      });
-    });
-
-    Object.values(productList_attach).forEach((item) => {
+  const attachProdList: { [key: string]: Class_product } = {};
+  Object.values(productList).forEach((prod, index) => {
+    Object.values(prod.exchangeProdList).forEach((item) => {
       const newId = item.attachId;
-      list[newId] = item;
+      attachProdList[newId] = item;
     });
+  });
+  Object.values(productList_attach).forEach((item, index) => {
+    const newId = item.attachId;
+    attachProdList[newId] = item;
+  });
 
-    return list;
-  })();
+  //
+  let attachTotal = 0;
+  Object.values(productList).forEach((prod) => {
+    attachTotal = attachTotal - Number(prod.reduceExchangePrice);
+  });
+
+  Object.values(attachProdList).forEach((prod) => {
+    attachTotal = attachTotal + Number(prod.totalPrice_num);
+  });
 
   // ---------------------------------------------------------
 
@@ -478,7 +498,9 @@ const useProductList = ({
     getOthersPostBodyArr,
     //
     attachProdList,
+    // attachProdList: productList_attach,
     addProd_attach,
+    attachTotal,
   };
 };
 
@@ -493,6 +515,8 @@ export type {
   Class_component,
   TcomponentKey,
   TcomList,
+  //
+  TsubComList,
   //
   TaccessoriesKey,
   TaccessoriesList,

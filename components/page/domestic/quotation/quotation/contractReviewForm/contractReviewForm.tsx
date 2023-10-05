@@ -86,8 +86,6 @@ export default function ContractReviewForm({
 
     // verifyForm
 
-    console.log(verifyForm);
-
     if (verifyForm) {
       reset({
         askForPaymentDate: verifyForm.askForPaymentDate,
@@ -106,7 +104,20 @@ export default function ContractReviewForm({
         // workDirectorId: verifyForm.workDirectorId,
       });
     } else {
-      reset();
+      reset({
+        askForPaymentDate: undefined,
+        disbursementDate: undefined,
+        paymentTenor: undefined,
+        performanceBond: undefined,
+        depositPayment: undefined,
+        warrantyPeriod: undefined,
+        note: undefined,
+        warrantyPayment: undefined,
+        fireproofCertificate: undefined,
+        warranty: undefined,
+        testDrive: undefined,
+        debitItem: undefined,
+      });
     }
 
     setSelEmployeeIdArr([verifyForm?.workDirectorId ?? '']);
@@ -155,16 +166,11 @@ export default function ContractReviewForm({
       return;
     }
 
-    if (!selEmployeeIdArr[0]) {
-      return myAlert.info({ title: "'請選擇人員'" });
-    }
-
     const preBody = watch();
 
     const body: TcreateQuotationVerifyFormDto = {
       // ...preBody,
       paymentRatio: Object.values(payMethodList).map((item) => item.body),
-      workDirectorId: selEmployeeIdArr[0],
       //
       askForPaymentDate: preBody.askForPaymentDate,
       disbursementDate: preBody.disbursementDate,
@@ -180,7 +186,7 @@ export default function ContractReviewForm({
       debitItem: preBody.debitItem,
     };
 
-    const haveEmpty = _.isEmpty(body);
+    const haveEmpty = _.some(body, (value) => value === null || value === undefined || value === '');
 
     if (haveEmpty) {
       return myAlert.warning({ title: '請填寫所有欄位' });
@@ -233,7 +239,7 @@ export default function ContractReviewForm({
               className={scss.datePicker}
               datePickerProps={{
                 props: {
-                  value: moment(watchData.askForPaymentDate),
+                  value: watchData.askForPaymentDate ? moment(watchData.askForPaymentDate) : null,
                   onChange: (md) => {
                     setValue('askForPaymentDate', md?.toISOString() ?? '');
                   },
@@ -245,7 +251,7 @@ export default function ContractReviewForm({
               className={scss.datePicker}
               datePickerProps={{
                 props: {
-                  value: moment(watchData.disbursementDate),
+                  value: watchData.disbursementDate ? moment(watchData.disbursementDate) : null,
                   onChange: (md) => {
                     setValue('disbursementDate', md?.toISOString() ?? '');
                   },
@@ -308,7 +314,7 @@ export default function ContractReviewForm({
               className={scss.datePicker}
               datePickerProps={{
                 props: {
-                  value: moment(watchData.paymentTenor),
+                  value: watchData.paymentTenor ? moment(watchData.paymentTenor) : null,
                   onChange: (md) => {
                     setValue('paymentTenor', md?.toISOString() ?? '');
                   },
@@ -430,7 +436,7 @@ export default function ContractReviewForm({
         </div>
         {/*  */}
         {/* 不需要了`,api更新後要拿掉 */}
-        <div className="mt-9">
+        {/* <div className="mt-9">
           <p className="text-main text-[18px] text-center mb-[18px]">請選擇送審人員</p>
           <div className={scss.table}>
             <RowArr
@@ -440,7 +446,7 @@ export default function ContractReviewForm({
               onClick={onClick}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className={scss.btnBox}>
           <MyButton_v2 label="確定" theme="danger" onClick={theOnConfirm} px="px44" />

@@ -101,7 +101,7 @@ const prodCellConfig: TcellConfig = {
   boxB: {
     label: 'B(m)',
     inputSelProps: {
-      wrapperStyle: { width: '120px' },
+      wrapperStyle: { width: '90px' },
       selectProps: {
         props: {},
       },
@@ -120,7 +120,7 @@ const prodCellConfig: TcellConfig = {
     label: '門片厚度',
     theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '100px' },
+      wrapperStyle: { width: '80px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -135,8 +135,10 @@ const prodCellConfig: TcellConfig = {
     label: '面積',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       inputProps: {
         props: {
+          disabled: true,
           type: 'number',
         },
       },
@@ -146,8 +148,10 @@ const prodCellConfig: TcellConfig = {
     label: '才數',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
       inputProps: {
         props: {
+          disabled: true,
           type: 'number',
         },
       },

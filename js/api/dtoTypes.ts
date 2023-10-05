@@ -895,6 +895,24 @@ export type TquotationProductDto = {
 
   attachedToProductId?: string | null;
   attachedToProduct?: TquotationProductDto | null;
+
+  quantity: number;
+  // 門片厚度
+  thickness: string;
+  // 配電箱牌價;
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
 };
 
 export type TquotationContentDto = {
@@ -1060,6 +1078,23 @@ export type TcreateQuotationProductDto = {
   order: number;
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
+
+  // 門片厚度
+  thickness: string;
+  // 配電箱 牌價;
+  distributionBoxPrice: number;
+  // 配電箱 單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費 牌價;
+  installationFeePrice: number;
+  // 安裝費 牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費 數量;
+  installationFeeQuantity: number;
+  // 安裝費 單價;
+  installationFeeUnitPrice: number;
+  // 安裝費 複價;
+  installationFeeTotalPrice: number;
 };
 
 // type TupdateQuotationContentDto = {
@@ -1116,7 +1151,7 @@ export type TcreateQuotationContentDto = {
   total: number;
   deliveryLocation: string;
   // 交貨日期
-  deliveryDate: string;
+  deliveryDate: string | null;
   paymentMethods: TpaymentMethodDto[];
 
   others: TcreateQuotationContentOtherDto[];
@@ -1554,8 +1589,6 @@ export type TcreateQuotationVerifyFormDto = {
   testDrive: boolean;
   //  扣款項目、比例、金額
   debitItem: string;
-  // 合約審核表審核主管(工務部主管)
-  workDirectorId: string;
 };
 
 export type TreviewQuotationContentDto = {
