@@ -129,25 +129,9 @@ class Class_product {
     // __________________________________________________________;
 
     // 建立材料配件
-
-    const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
-    this._prodData.components.forEach((item) => {
-      const key = comTypeLookUp[item.type];
-      comPreList[key] = {
-        ...item,
-        doorModelName: key,
-        code: '',
-        specialSpec: '',
-        materialSurface: item.materialSurface || '',
-        quantity: String(item.quantity || 0),
-        desc: item.desc || '',
-        density: item.density || '0',
-      };
-    });
-
-    // this.creComList(comPreList as { [key in TcomponentKey]: Tcomponent });
+    const sortedComList = sortComponent(this._prodData.components);
     this.creComList({
-      dataList: comPreList as { [key in TcomponentKey]: Tcomponent },
+      dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
       isNew: false,
     });
 
@@ -848,13 +832,13 @@ class Class_product {
     // 正確的金額之後會補在 post /products/door/generate-door-product-bom
     const dataList = {
       slat: slat || creEmptyCom(),
+      roller: roller || creEmptyCom(),
+      headBox: headBox || creEmptyCom(),
       bottomBar: bottomBar || creEmptyCom(),
       guideRail: guideRail || creEmptyCom(),
       motor: motor || creEmptyCom(),
       sidePlate: sidePlate || creEmptyCom(),
-      roller: roller || creEmptyCom(),
       motorAccessories: motorAccessories || creEmptyCom(),
-      headBox: headBox || creEmptyCom(),
     };
     Object.values(dataList).forEach((item) => {
       item.price = 0;
@@ -2428,6 +2412,43 @@ const pairBD: TpariBD = {
       '0.90': '0.60',
     },
   },
+};
+
+const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
+  const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
+
+  const typeArr = [
+    'slat',
+    'roller',
+    'headBox',
+    'bottomBar',
+    'guideRail',
+    'motor',
+    'sidePlate',
+    'motorAccessories',
+  ] as const;
+
+  comArr.forEach((item) => {
+    const key = comTypeLookUp[item.type];
+    comPreList[key] = {
+      ...item,
+      doorModelName: key,
+      code: '',
+      specialSpec: '',
+      materialSurface: item.materialSurface || '',
+      quantity: String(item.quantity || 0),
+      desc: item.desc || '',
+      density: item.density || '0',
+    };
+  });
+
+  const list: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
+
+  typeArr.forEach((key) => {
+    list[key] = comPreList[key];
+  });
+
+  return list;
 };
 
 // ===========================================================
