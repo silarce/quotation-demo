@@ -1563,6 +1563,39 @@ class Class_product {
     });
 
     this._prodData.material = v;
+
+    // FIXME 應急處置，應該要去prodCellConfig取資料才對
+    const bottomBarAngleIronOptions = [
+      { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
+      { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
+      { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T' },
+      { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T' },
+    ];
+
+    const bottomBarPlateOptions = [
+      { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
+      { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
+      { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T' },
+      { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T' },
+    ];
+
+    if (v.includes('鍍鋅')) {
+      this.bottomBarAngleIron = bottomBarAngleIronOptions[0].value;
+      this.bottomBarPlate = bottomBarPlateOptions[0].value;
+    } else if (v.includes('高耐鍍鋅鋼板')) {
+      this.bottomBarAngleIron = bottomBarAngleIronOptions[1].value;
+      this.bottomBarPlate = bottomBarPlateOptions[1].value;
+    } else if (v.includes('304')) {
+      this.bottomBarAngleIron = bottomBarAngleIronOptions[2].value;
+      this.bottomBarPlate = bottomBarPlateOptions[2].value;
+    } else if (v.includes('316')) {
+      this.bottomBarAngleIron = bottomBarAngleIronOptions[3].value;
+      this.bottomBarPlate = bottomBarPlateOptions[3].value;
+    } else {
+      this.bottomBarAngleIron = bottomBarAngleIronOptions[0].value;
+      this.bottomBarPlate = bottomBarPlateOptions[0].value;
+    }
+
     this.reRender();
   }
   //
