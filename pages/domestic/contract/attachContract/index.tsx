@@ -307,7 +307,7 @@ export default function AttachContract() {
 
   const tagList: TtagList = [
     {
-      label: `合約編號 ${'foo'}`,
+      label: `合約編號 ${content?.quotationNumber}`,
       onClick: () => {},
     },
   ];
