@@ -55,6 +55,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.managerReviewedAt',
       'latestContent.products.quantity',
       'latestContent.products.options',
+      'attachedToContract',
     ],
     ...params,
   };
