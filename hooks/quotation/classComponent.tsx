@@ -469,6 +469,9 @@ class Class_component {
       rawData: { foo: 'foo' },
       bom: this._com.bom,
       // order: '', //在外面處理
+
+      desc: null,
+      density: null,
     };
   }
 } // Class_component

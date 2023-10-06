@@ -28,8 +28,13 @@ import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 // import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
-import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
+// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
+
+import QuotationPdf_part, {
+  TmainProduct,
+  Tpart,
+} from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
@@ -867,18 +872,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
   const panel_noEditable: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: '匯出報價單',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf(true),
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '匯出材料/配件',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf_part(true),
-    // },
+    {
+      type: 'myButton',
+      label: '匯出報價單',
+      img: iconUpload.src,
+      onClick: () => setShowPdf(true),
+    },
+    {
+      type: 'myButton',
+      label: '匯出材料/配件',
+      img: iconUpload.src,
+      onClick: () => setShowPdf_part(true),
+    },
 
     // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!isReviewer || null) && {
@@ -1137,6 +1142,43 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+
+  const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
+    const lw = Number(prod.length || 0) || Number(prod.width || 0) * 100;
+    const h = Number(prod.height || 0) * 100;
+    const b = Number(prod.boxB || 0) * 100;
+
+    const size = `${lw} X ${h} + ${b}`;
+
+    // const foo = prod.comList;
+
+    const componentArr = Object.values(prod.comList ?? {});
+
+    const part: Tpart[] = componentArr.map((com) => {
+      return {
+        partName: com.comName,
+        material: com.material,
+        unit: com.unit,
+        qty: com.quantity,
+        price: String(com.price || 0),
+        totalPrice: com.totalPrice,
+      };
+    });
+
+    return {
+      category: prod.itemName,
+      material: prod.material,
+      surface: prod.surface,
+      doorType: prod.doorType,
+      size: size,
+      priceTotal: prod.totalPrice,
+      part: part,
+    };
+  });
+
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   return (
     <div className={classNames(style.container, 'relative')}>
       <PageHeader02 tagList={tagList} panelList={!disabled ? panel_editable : panel_noEditable} />
@@ -1274,13 +1316,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
       關於支板
       只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
-      {/* <QuotationPdf
-        isVisable={showPdf}
-        onCancel={() => {
-          setShowPdf(false);
-        }}
-        classQuotation={classQuotation}
-      /> */}
+
+      {latestContent && (
+        <QuotationPdf
+          isVisable={showPdf}
+          onCancel={() => {
+            setShowPdf(false);
+          }}
+          productArr_f={Object.values(productList)}
+          basicInfo={latestContent}
+          noteArr={anno}
+          qrArr={qr}
+        />
+      )}
+
       {/* 
       注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
@@ -1303,14 +1352,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       */}
 
       {/*  */}
-      {/* <QuotationPdf_part
+      <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => {
           setShowPdf_part(false);
         }}
-        mainProductArr={quotationPdf_part_mainProductArr}
-        quotationId={classQuotation.quotationId}
-      /> */}
+        mainProductArr={pdfPartProps}
+        quotationId={latestContent?.quotationNumber ?? ''}
+      />
       {/*  */}
       <EmployeeSelector
         showModal={employeeSelectorShow}

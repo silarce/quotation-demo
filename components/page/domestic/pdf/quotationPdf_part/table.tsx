@@ -59,7 +59,8 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
 type Tpart = {
   partName: string;
   material: string;
-  unit: string;
+  // unit: string;
+  unit: React.ReactNode;
   qty: string;
   price: string;
   totalPrice: string;
