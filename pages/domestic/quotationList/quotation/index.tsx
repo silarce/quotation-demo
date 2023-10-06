@@ -669,9 +669,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewSales(v[0]);
-        setTimeout(() => {
-          openEmpSel('reviewSupervisor');
-        }, 300);
+
+        if (status === 'Contracting') {
+          setTimeout(() => {
+            openEmpSel('reviewSupervisor');
+          }, 300);
+        } else {
+          reqSetReviewer({
+            reviewSales: v[0],
+            reviewSupervisor,
+            reviewWorkDirector,
+          });
+        }
       },
     },
     reviewSupervisor: {
