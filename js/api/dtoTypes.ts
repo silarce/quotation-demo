@@ -802,6 +802,9 @@ export type TquotationProductComponentsDto = {
   price: number;
   quantity: string;
   order: number;
+
+  desc: string | null;
+  density: string | null;
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductComponentDto = Omit<

@@ -133,6 +133,11 @@ class Class_component {
     this.reRender();
   }
 
+  renewDescDensity() {
+    this.desc = comLookUp[this.key].creDesc(this);
+    this.density = String(this._prod._doorGeneralSpecs?.density || 0);
+  }
+
   // ---------------------------------------------------------
 
   get hiddenKeyArr() {
@@ -174,11 +179,26 @@ class Class_component {
   }
 
   get desc() {
-    if (!this._com.id) {
-      return '沒有符合規格的產品';
-    }
+    // if (!this._com.id) {
+    //   return '沒有符合規格的產品';
+    // }
 
-    return comLookUp[this.key].creDesc(this);
+    // return comLookUp[this.key].creDesc(this);
+    return this._com.desc;
+  }
+
+  set desc(v) {
+    this._com.desc = v;
+    this.reRender();
+  }
+
+  get density() {
+    return this._com.density;
+    // return this._prod._doorGeneralSpecs?.density;
+  }
+  set density(v) {
+    this._com.density = v;
+    this.reRender();
   }
 
   // -------------------------------------------1--------------
@@ -406,10 +426,6 @@ class Class_component {
     this.reRender();
   }
 
-  get density() {
-    return this._prod._doorGeneralSpecs?.density;
-  }
-
   get quantity() {
     return this._com.quantity ?? '';
   }
@@ -469,6 +485,9 @@ class Class_component {
       rawData: { foo: 'foo' },
       bom: this._com.bom,
       // order: '', //在外面處理
+
+      desc: this.desc,
+      density: this.density,
     };
   }
 } // Class_component
@@ -486,6 +505,8 @@ type Tcomponent = {
 
   bom?: object[];
   rawData?: object;
+  density?: string;
+  desc?: string;
 
   // ----------------------------------------------
   // 這邊是共有的property
@@ -605,7 +626,7 @@ const comCellConfig: TcellConfig = {
   codeNumber: {
     label: '代號',
     inputSelProps: {
-      wrapperStyle: { width: '100px' },
+      wrapperStyle: { width: '110px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -642,7 +663,7 @@ const comCellConfig: TcellConfig = {
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '65px' },
       selectProps: {
         props: {
           // options 寫在class裡面
@@ -653,7 +674,7 @@ const comCellConfig: TcellConfig = {
   density: {
     label: '重量基重',
     inputSelProps: {
-      wrapperStyle: { width: '100px' },
+      wrapperStyle: { width: '80px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -1092,6 +1113,7 @@ const creEmptyCom: () => Tcomponent = () => ({
   price: 0,
   quantity: '',
   bom: [],
+  density: '',
 });
 
 // ===========================================================

@@ -238,7 +238,8 @@ const infoConfig: TinfoConfig = {
 type Tpart = {
   partName: string;
   material: string;
-  unit: string;
+  // unit: string;
+  unit: React.ReactNode;
   qty: string;
   price: string;
   totalPrice: string;
@@ -307,3 +308,5 @@ const config: Tconfig = {
     },
   },
 };
+
+export type { TmainProduct, Tpart };
