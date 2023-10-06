@@ -256,8 +256,6 @@ export default function QuotationPdf({
 
       const size = `${lw} X ${h} + ${b}`;
 
-      console.log(prod.doorTrack);
-
       return {
         category: prod.itemName,
         size,

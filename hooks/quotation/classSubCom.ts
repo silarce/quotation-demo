@@ -11,6 +11,7 @@ type TSubCom = {
   totalPrice: number;
   quantity: number;
   comName: string;
+  unit: string;
 };
 
 class Class_SubCom {
@@ -104,6 +105,11 @@ class Class_SubCom {
   get totalPrice() {
     return `${this._data.totalPrice}`;
   }
+
+  get unit() {
+    return this._data.unit;
+  }
+
   // set totalPrice(v) {
   //   this._data.totalPrice = Number(v);
   //   this.reRender();

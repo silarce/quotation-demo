@@ -140,6 +140,8 @@ class Class_product {
         specialSpec: '',
         materialSurface: item.materialSurface || '',
         quantity: String(item.quantity || 0),
+        desc: item.desc || '',
+        density: item.density || '0',
       };
     });
 
@@ -277,6 +279,8 @@ class Class_product {
         specialSpec: '',
         materialSurface: item.materialSurface || '',
         quantity: String(item.quantity || 0),
+        desc: item.desc || '',
+        density: item.density || '0',
       };
     });
 
@@ -403,6 +407,7 @@ class Class_product {
         totalPrice: this._prodData.distributionBoxUnitPrice,
         quantity: 1,
         comName: '配電箱及按鈕開關',
+        unit: '組',
       },
       prod: this,
     });
@@ -417,6 +422,7 @@ class Class_product {
         totalPrice: this._prodData.installationFeeTotalPrice,
         quantity: this._prodData.installationFeeQuantity,
         comName: '按裝及製造費用',
+        unit: 'M',
       },
       prod: this,
     });
@@ -690,6 +696,7 @@ class Class_product {
           comList[key].bom = item.bom;
           comList[key].quantity = String(item.quantity);
           comList[key].calcAllPrice();
+          comList[key].renewDescDensity();
         });
       }
 
@@ -1979,6 +1986,8 @@ class Class_product {
         order: index,
         type: body.type as TcreateQuotationProductComponentDto['type'],
         quantity: String(body.quantity),
+        density: String(body.density),
+        desc: body.desc || '',
       };
     });
 
