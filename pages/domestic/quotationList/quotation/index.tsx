@@ -1431,9 +1431,9 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
-  const subTotalStr = subTotal.ceil().toLocaleString();
-  const taxStr = tax.ceil().toLocaleString();
-  const totalStr = total.ceil().toLocaleString();
+  const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
+  const taxStr = Number(tax.toFixed(0)).toLocaleString();
+  const totalStr = Number(total.toFixed(0)).toLocaleString();
 
   return {
     subTotal: subTotalStr,

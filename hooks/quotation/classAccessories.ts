@@ -104,9 +104,13 @@ class Class_accessories {
     // 複價;
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._acceData.dualPrice = dualPrice.toNumber();
-    this._acceData.unitPrice = unitPrice.toNumber();
-    this._acceData.totalPrice = totalPrice.toNumber();
+    // this._acceData.dualPrice = dualPrice.toNumber();
+    // this._acceData.unitPrice = unitPrice.toNumber();
+    // this._acceData.totalPrice = totalPrice.toNumber();
+
+    this._acceData.dualPrice = Number(dualPrice.toFixed(0));
+    this._acceData.unitPrice = Number(unitPrice.toFixed(0));
+    this._acceData.totalPrice = Number(totalPrice.toFixed(0));
 
     this._prod.calcProdAllprice_timeout();
 

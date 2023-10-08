@@ -58,7 +58,7 @@ class Class_component {
         this.calcAllPrice();
       }, 0);
     } else {
-      this.calcAllPrice({ shouldCallProdAllPrice: false });
+      this.calcAllPrice();
     }
 
     // =constructor
@@ -108,11 +108,7 @@ class Class_component {
     }
   };
 
-  calcAllPrice({
-    shouldCallProdAllPrice = true,
-  }: {
-    shouldCallProdAllPrice?: boolean;
-  } = {}) {
+  calcAllPrice() {
     const discount = new Decimal(this._prod.discount).div(100);
 
     const quantity = Number(this._com.quantity || 0);
@@ -125,9 +121,9 @@ class Class_component {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._dualPrice = dualPrice.ceil().toNumber();
-    this._unitPrice = unitPrice.ceil().toNumber();
-    this._totalPrice = totalPrice.ceil().toNumber();
+    this._dualPrice = Number(dualPrice.toFixed(0));
+    this._unitPrice = Number(unitPrice.toFixed(0));
+    this._totalPrice = Number(totalPrice.toFixed(0));
 
     this._prod.calcProdAllprice_timeout();
 

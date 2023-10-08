@@ -50,9 +50,9 @@ class Class_SubCom {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._data.dualPrice = dualPrice.ceil().toNumber();
-    this._data.unitPrice = unitPrice.ceil().toNumber();
-    this._data.totalPrice = totalPrice.ceil().toNumber();
+    this._data.dualPrice = Number(dualPrice.toFixed(0));
+    this._data.unitPrice = Number(unitPrice.toFixed(0));
+    this._data.totalPrice = Number(totalPrice.toFixed(0));
 
     this._prod.calcProdAllprice_timeout();
 
