@@ -231,6 +231,10 @@ class Class_component {
     this.reRender();
   }
 
+  get price_locale() {
+    return this._com.price?.toLocaleString();
+  }
+
   get name() {
     return this._com.name;
   }
@@ -452,12 +456,22 @@ class Class_component {
     return String(this._dualPrice);
   }
 
+  get dualPrice_locale() {
+    return this._dualPrice.toLocaleString();
+  }
+
   get unitPrice() {
     return String(this._unitPrice);
+  }
+  get unitPrice_locale() {
+    return this._unitPrice.toLocaleString();
   }
 
   get totalPrice() {
     return String(this._totalPrice);
+  }
+  get totalPrice_locale() {
+    return this._totalPrice.toLocaleString();
   }
 
   get unit() {
@@ -573,7 +587,7 @@ type Tcomponent = {
 }; //  Taccessory
 
 // type TacceKey = keyof Taccessory;
-
+// w Class_SubCom也會使用這邊的設定，所以這邊有更改的話Class_SubCom那邊也要處理Z
 const comKeyArrOri: () => string[] = () => {
   return [
     // 'acceName',
@@ -588,13 +602,19 @@ const comKeyArrOri: () => string[] = () => {
     'unit',
 
     'quantity',
-    'price',
-    'dualPrice',
-    'unitPrice',
-    'totalPrice',
+
+    // 'price',
+    // 'dualPrice',
+    // 'unitPrice',
+    // 'totalPrice',
+    'price_locale',
+    'dualPrice_locale',
+    'unitPrice_locale',
+    'totalPrice_locale',
   ];
 };
 
+// w Class_SubCom也會使用這邊的設定，所以這邊有更改的話Class_SubCom那邊也要處理Z
 const comCellConfig: TcellConfig = {
   comName: {
     label: '名稱',
@@ -714,7 +734,19 @@ const comCellConfig: TcellConfig = {
       },
     },
   },
-  price: {
+  // // price: {
+  // //   label: '牌價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '80px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  price_locale: {
     label: '牌價',
     inputSelProps: {
       showBaseline: 'invisible',
@@ -726,7 +758,19 @@ const comCellConfig: TcellConfig = {
       },
     },
   },
-  dualPrice: {
+  // // dualPrice: {
+  // //   label: '牌價複價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '120px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  dualPrice_locale: {
     label: '牌價複價',
     inputSelProps: {
       showBaseline: 'invisible',
@@ -738,7 +782,19 @@ const comCellConfig: TcellConfig = {
       },
     },
   },
-  unitPrice: {
+  // // unitPrice: {
+  // //   label: '單價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '80px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  unitPrice_locale: {
     label: '單價',
     inputSelProps: {
       showBaseline: 'invisible',
@@ -750,7 +806,19 @@ const comCellConfig: TcellConfig = {
       },
     },
   },
-  totalPrice: {
+  // // totalPrice: {
+  // //   label: '複價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '120px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  totalPrice_locale: {
     label: '複價',
     inputSelProps: {
       showBaseline: 'invisible',
