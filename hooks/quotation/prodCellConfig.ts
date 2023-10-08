@@ -457,6 +457,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '150px' },
       selectProps: {
         props: {
+          // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
           options: [
             { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
             { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
@@ -473,6 +474,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '150px' },
       selectProps: {
         props: {
+          // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
           options: [
             { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
             { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
