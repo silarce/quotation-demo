@@ -84,20 +84,6 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  // 後端說B(m)是boxB
-  // boxB: {
-  //   label: 'B(m)',
-  //   theadItemClassName: 'text-center',
-  //   inputSelProps: {
-  //     wrapperStyle: { width: '60px' },
-  //     inputProps: {
-  //       props: {
-  //         type: 'number',
-  //         className: 'text-center',
-  //       },
-  //     },
-  //   },
-  // },
   boxB: {
     label: 'B(m)',
     inputSelProps: {

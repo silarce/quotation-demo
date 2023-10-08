@@ -2202,21 +2202,22 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'typhoonProtection',
     'bounceDoor',
     'notes',
-    //
-    'motor', // 馬達廠商
-    'voltage', // 電壓
-    'phase', // 相數
-    'motorSupport', // 馬達支撐架
-    'bottomBar', // 底座類型
-    'motorLockBox', // 馬達鎖盒
-    'doorTrackThick', // 門軌厚度
-    'rollerSpec', // 捲軸規格
+
+    // 經理說這些要隱藏，不要顯示出來
+    // 'motor', // 馬達廠商
+    // 'voltage', // 電壓
+    // 'phase', // 相數
+    // 'motorSupport', // 馬達支撐架
+    // 'bottomBar', // 底座類型
+    // 'motorLockBox', // 馬達鎖盒
+    // 'doorTrackThick', // 門軌厚度
+    // 'rollerSpec', // 捲軸規格
     'doorTrackSilencerStrip', // 門軌消音條
-    'onePieceRollUpBox', // 一體式捲箱
+    // 'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
-    'bottomBarAngleIron', // 底座角鐵
-    'bottomBarPlate', // 底座板
+    // 'bottomBarAngleIron', // 底座角鐵
+    // 'bottomBarPlate', // 底座板
   ];
 };
 
