@@ -443,6 +443,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
+          // classProduct.ts 的emptyProdOri有用到options
           options: [
             { value: '電動', label: '電動' },
             { value: '手動', label: '手動' },

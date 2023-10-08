@@ -2257,7 +2257,7 @@ const emptyProdOri = (): Tprod => {
     doorTrackSilencerStrip: false,
     onePieceRollUpBox: false,
     rollUpBoxThick: '', // 捲箱厚度
-    close: '',
+    close: (prodCellConfig.close.inputSelProps.selectProps!.props!.options![0] as Toption).value,
     //
     accessories: [],
     components: [],
