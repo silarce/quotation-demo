@@ -45,7 +45,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  length: {
+  fullWidth: {
     label: 'L(m)', // 全寬
     theadItemClassName: 'text-center',
     inputSelProps: {
@@ -58,7 +58,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  width: {
+  WG: {
     label: 'W(m)', // WG
     theadItemClassName: 'text-center',
     inputSelProps: {

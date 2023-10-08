@@ -80,8 +80,9 @@ class Class_accessories {
 
     // length跟width互斥，length為0的時候 price為0?
     if (referenceSpec === 'fullWidth') {
-      const l = Number(this._prod.length);
-      const w = Number(this._prod.width);
+      const l = Number(this._prod.fullWidth);
+      // const w = Number(this._prod.WG);
+      const w = 0;
       this.quantity = l || w;
       this.unit = 'M';
     } else {

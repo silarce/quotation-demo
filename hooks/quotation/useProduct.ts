@@ -139,8 +139,8 @@ const useProductList = ({
         doorTrackThick: String(prod.guideRailThickness),
         rollUpBoxThick: String(prod.headBoxThickness),
         // 取得時是mm，要轉成m
-        width: String(Number(prod.WG) / 1000),
-        length: String(Number(prod.fullWidth) / 1000),
+        WG: String(Number(prod.WG) / 1000),
+        fullWidth: String(Number(prod.fullWidth) / 1000),
         height: String(Number(prod.height) / 1000),
         boxB: String(Number(prod.boxB) / 1000),
         boxD: String(Number(prod.boxD) / 1000),

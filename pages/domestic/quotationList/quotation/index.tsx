@@ -1144,7 +1144,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
-    const lw = Number(prod.length || 0) || Number(prod.width || 0) * 100;
+    // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
+    const lw = Number(prod.fullWidth || 0) * 100;
     const h = Number(prod.height || 0) * 100;
     const b = Number(prod.boxB || 0) * 100;
 

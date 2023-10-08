@@ -423,8 +423,8 @@ class Class_product {
     const prod: Tprod = {
       ...empty,
       doorType: this.doorType,
-      length: this.length,
-      width: this.width,
+      fullWidth: this.fullWidth,
+      WG: this.WG,
       height: this.height,
       area: this.area,
       quantity: this._prodData.quantity,
@@ -470,26 +470,31 @@ class Class_product {
       return false;
     }
 
-    if (!this.length && !this.width) {
+    if (
+      !this.fullWidth
+      // && !this.WG
+    ) {
       return false;
     }
 
     const body = (() => {
-      let fullWidth: number | undefined;
-      let WG: number | undefined;
+      // let fullWidth: number | undefined;
+      // let WG: number | undefined;
 
-      if (Number(this.length)) {
-        fullWidth = Number(this.length) * 1000;
-      } else if (Number(this.width)) {
-        WG = Number(this.width) * 1000;
-      }
+      const fullWidth = Number(this.fullWidth || 0) * 1000;
+
+      // if (Number(this.fullWidth)) {
+      //   fullWidth = Number(this.fullWidth) * 1000;
+      // } else if (Number(this.WG)) {
+      //   WG = Number(this.WG) * 1000;
+      // }
 
       return {
         modelName: this.doorType as TpcgsPrams['modelName'],
         height: Number(this.height) * 1000,
         isAntiTyphoon: this.typhoonProtection,
         fullWidth,
-        WG,
+        WG: undefined,
       };
     })();
 
@@ -611,8 +616,8 @@ class Class_product {
       return false;
     }
 
-    const fullWidth =
-      Number(this.length) || Number(this.width) + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
+    const fullWidth = Number(this.fullWidth || 0) + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
+    // Number(this.fullWidth) || Number(this.WG) + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
 
     const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
       modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
@@ -1056,8 +1061,9 @@ class Class_product {
   private calcArea = () => {
     const h = Number(this._prodData.height || 0);
     const b = Number(this._prodData.boxB || 0);
-    const w = Number(this._prodData.width || 0);
-    const l = Number(this._prodData.length || 0);
+    // const w = Number(this._prodData.WG || 0);
+    const w = 0;
+    const l = Number(this._prodData.fullWidth || 0);
 
     const area = Decimal.add(h, b) // h+b
       .mul(w || l)
@@ -1407,12 +1413,12 @@ class Class_product {
     this.reRender();
   }
   /**全寬 */
-  get length() {
-    return this._prodData.length;
+  get fullWidth() {
+    return this._prodData.fullWidth;
   }
-  set length(v) {
-    this._prodData.length = v;
-    this._prodData.width = '0';
+  set fullWidth(v) {
+    this._prodData.fullWidth = v;
+    // this._prodData.WG = '0';
     this.area = this.calcArea();
 
     this.clearProd();
@@ -1424,13 +1430,35 @@ class Class_product {
 
     this.reRender();
   }
+
   /**WG */
-  get width() {
-    return this._prodData.width;
+  get WG() {
+    return this._prodData.WG;
   }
-  set width(v) {
-    this._prodData.width = v;
-    this._prodData.length = '0';
+
+  set WG(v) {
+    /**
+  20231006
+  業主說fullWidth與WG不再互斥，可以同時存在
+  經理說所有用fullWidth或WG計算的地方，都改成只用fullWidth計算
+  為了避免未來又要改回來，把被改動的地方記錄了下來
+  
+  原本會用到WG的地方
+  req_calcGeneralSpec
+  reqProdGenerateDoorProductBom
+  calcArea
+  
+  Class_component 的calcDefaultQuantity
+  Class_accessories的calcPrice
+
+  quotationPdf_new的productArr
+
+  pages\domestic\quotationList\quotation\index.tsx
+  的pdfPartProps
+   */
+
+    this._prodData.WG = v;
+    // this._prodData.fullWidth = '0';
     this.area = this.calcArea();
 
     this.calcChangeAccePrice();
@@ -2023,8 +2051,8 @@ class Class_product {
       motorPhase: Number(this.phase),
 
       // 送去後端要轉為要從m轉為mm
-      WG: Number(this._prodData.width) * 1000,
-      fullWidth: Number(this._prodData.length) * 1000,
+      WG: Number(this._prodData.WG) * 1000,
+      fullWidth: Number(this._prodData.fullWidth) * 1000,
       height: Number(this._prodData.height) * 1000,
       boxB: Number(this._prodData.boxB) * 1000,
       boxD: Number(this._prodData.boxD) * 1000,
@@ -2111,8 +2139,10 @@ type Tprod = {
   itemName: string;
   quoteType: string;
   doorType: string;
-  length: string; // L(m)
-  width: string; // W(m)
+
+  fullWidth: string; // L(m)
+  WG: string; // W(m)
+
   height: string; //h(m)
   boxB: string; // B(m)
   thickness: string; // 門片厚度?
@@ -2182,8 +2212,10 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'itemName',
     'quoteType',
     'doorType',
-    'length',
-    'width',
+
+    'fullWidth',
+    'WG',
+
     'height',
     'boxB',
     // 'boxD',
@@ -2227,8 +2259,10 @@ const emptyProdOri = (): Tprod => {
     itemName: '',
     quoteType: '',
     doorType: '',
-    length: '',
-    width: '',
+
+    fullWidth: '',
+    WG: '',
+
     height: '',
     boxB: '',
     thickness: '',

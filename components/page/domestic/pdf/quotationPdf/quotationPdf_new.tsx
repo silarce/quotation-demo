@@ -19,38 +19,20 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 // antd
 import Modal from 'antd/lib/modal/Modal';
 
-// config
-import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
-
 // css
 import scss from './quotationPdf.module.scss';
 
 // type
 import { Class_product } from 'hooks/quotation/classProduct';
 
-import {
-  TquotationDto,
-  TquotationContentDto,
-  TcreateQuotationContentDto,
-  useGetQuotation_id,
-  apiPostQuotation,
-  apiPatchQuotation,
-  apiQuotationSubmitReview,
-  apiQuotationReview,
-  apiQuotationunLock,
-  //
-  useQuotation_id_attachments,
-  apiPostQuotation_id_attachments,
-  apiDelQuotation_id_attachments,
-} from 'js/api/api_quotation';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
+import { TquotationContentDto } from 'js/api/api_quotation';
 
 type TtableProdList_series = (TtableProdList[number] & { series: string })[];
 
 export default function QuotationPdf({
   isVisable,
   onCancel,
-  // classLegacyContract,
+
   productArr_f,
   basicInfo,
   noteArr,
@@ -62,11 +44,7 @@ export default function QuotationPdf({
   basicInfo: TquotationContentDto;
   noteArr: string[];
   qrArr: string[];
-  // classLegacyContract: Class_legacyContract;
 }) {
-  // const { classBasicInfo } = classLegacyContract;
-
-  // const { contractNumber } = classBasicInfo;
   const { quotationNumber } = basicInfo;
 
   const {
@@ -143,17 +121,6 @@ export default function QuotationPdf({
   // ----------------------------------------------------------------------------
   // profile
   const profilePram: Tprofile = (() => {
-    // const {
-    //   customerName,
-    //   contactPerson,
-    //   contactNumber,
-    //   faxNumber,
-    //   quoteDate,
-    //   projectCity,
-    //   projectDistrict,
-    //   projectAddress,
-    // } = classBasicInfo;
-
     const customerName = customer.name;
 
     const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
@@ -197,14 +164,11 @@ export default function QuotationPdf({
     const attn = agentName;
 
     const payInfo = (() => {
-      // const { deliveryLocation, deliveryDate, paymentMethods } = classLegacyContract.classPayInfo;
-
       const payWay = paymentMethods.map((item) => ({
         label: item.milestone,
         value: item.totalPaymentRatio,
       }));
 
-      // const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
       const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
 
       return {
@@ -217,40 +181,10 @@ export default function QuotationPdf({
     return { quoteRangeArr, payInfo: payInfo!, attn };
   })();
 
-  // const productArr: TtableProdList_series = (() => {
-  //   const classProdArr = classLegacyContract.prodArr;
-
-  //   return classProdArr.map((prod) => {
-  //     const lw = (Number(prod.width) || Number(prod.length)) * 100;
-  //     const h = Number(prod.height) * 100;
-  //     const b = Number(prod.thickness) * 100;
-
-  //     const size = `${lw} X ${h} + ${b}`;
-
-  //     return {
-  //       category: prod.itemName,
-  //       size,
-  //       doorType: prod.doorType,
-  //       material: prod.material,
-  //       // thickness: prod.thickness,
-  //       thickness: 'n',
-  //       surface: prod.surface,
-  //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //       // @ts-ignore
-  //       doorRail: doorTrackLookup[prod.doorTrack]?.icon,
-  //       horsepower: prod.horsepower,
-  //       openType: '',
-  //       qty: prod.quantity,
-  //       unitPrice: prod.unitPrice,
-  //       priceTotal: prod.totalPrice,
-  //       memo: prod.notes,
-  //       series: prod.itemName,
-  //     };
-  //   });
-  // })();
   const productArr: TtableProdList_series = (() => {
     return productArr_f.map((prod) => {
-      const lw = (Number(prod.width) || Number(prod.length)) * 100;
+      // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
+      const lw = Number(prod.fullWidth || 0) * 100;
       const h = Number(prod.height) * 100;
       const b = Number(prod.thickness) * 100;
 
@@ -262,14 +196,10 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         thickness: prod.thickness,
-        // thickness: 'n',
         surface: prod.surface,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // doorRail: prod.doorTrack,
+        // doorRail 要收圖片路徑
         doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
         horsepower: prod.horsepower,
-        // openType: '',
         openType: prod.close,
         qty: prod.quantity,
         unitPrice: prod.unitPrice,

@@ -45,8 +45,9 @@ class Class_component {
       // 不同的材料配件會用不同的值為預設數量
       this._com.quantity = calcDefaultQuantity({
         key,
-        w: Number(prod.width),
-        l: Number(prod.length),
+        // w: Number(prod.WG),
+        w: 0,
+        l: Number(prod.fullWidth),
         h: Number(prod.height),
         b: Number(prod.boxB),
       });
@@ -1073,7 +1074,7 @@ const calcDefaultQuantity = ({
   b: number; // 單位為m
 }) => {
   const hb = h + b;
-  const wl = w || l;
+  const wl = l || w;
 
   if (key === 'slat') {
     return new Decimal(wl).mul(hb).toFixed(2); // m2
