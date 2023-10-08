@@ -162,6 +162,7 @@ const useProductList = ({
         doorTrackSilencerStrip: prod.hasSilencingStrip,
         onePieceRollUpBox: prod.isIntegratedHeadBox,
         thickness: String(prod.thickness ?? ''),
+        bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
       };
 
       list[key] = new Class_product({

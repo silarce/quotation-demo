@@ -2108,6 +2108,8 @@ class Class_product {
       installationFeeQuantity: Number(this.subComList.installationFee.quantity),
       installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
       installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
+
+      bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
     };
 
     if ('items' in body) {
@@ -2167,6 +2169,7 @@ class Class_product {
       installationFeeQuantity: Number(this.subComList.installationFee.quantity),
       installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
       installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
+      bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
     };
 
     return body;
@@ -2329,7 +2332,7 @@ const emptyProdOri = (): Tprod => {
     voltage: '',
     phase: 1,
     motorSupport: false,
-    bottomBar: '',
+    bottomBar: 'none',
     motorLockBox: '外露',
     doorTrackThick: '', // 門軌厚度
     rollerSpec: '無凸',
