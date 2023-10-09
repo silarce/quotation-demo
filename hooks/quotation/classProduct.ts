@@ -90,6 +90,8 @@ class Class_product {
     originProd,
     //
     parentProd,
+    //
+    onDoorTypeChange,
   }: {
     reRender: TreRender;
     prodData?: Tprod;
@@ -101,6 +103,8 @@ class Class_product {
     originProd?: TquotationProductDto;
     //
     parentProd?: Class_product;
+    //
+    onDoorTypeChange?: (obj: { oldDoorType: string; newDoorType: string }) => void;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -108,6 +112,7 @@ class Class_product {
     this.delSelf = delSelf;
     this.copySelf = copySelf;
     this.callCalcSubTotal = callCalcSubTotal;
+    this.onDoorTypeChange = onDoorTypeChange;
 
     this.originProd = originProd;
 
@@ -149,6 +154,7 @@ class Class_product {
   delSelf;
   copySelf;
   readonly callCalcSubTotal;
+  readonly onDoorTypeChange;
 
   //  用來比對是否有變動用的
   readonly originProd;
@@ -1402,6 +1408,8 @@ class Class_product {
   }
 
   set doorType(v) {
+    const oldDoorType = this._prodData.doorType;
+
     this._prodData.doorType = v;
     this.clearProd();
 
@@ -1409,6 +1417,8 @@ class Class_product {
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
     this.callAllReq();
+    // onDoorTypeChange必須放在賦值之後再執行
+    this.onDoorTypeChange?.({ oldDoorType, newDoorType: v });
 
     this.reRender();
   }

@@ -8,6 +8,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
+import { apiGetAnnotation, apiGetQuotationRanges } from 'js/api/api_workSheet';
 
 // class
 import { Class_product, Tprod, TprodKey, prodkeyArrOri, prodCellConfig } from './classProduct';
@@ -57,10 +58,17 @@ const useProductList = ({
   productArr,
   others,
   resetTrigger,
+  onDoorTypeChange,
 }: {
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
   resetTrigger: any;
+  onDoorTypeChange?: (obj: {
+    annoShouldRemove: string[] | undefined;
+    qrShouldRemove: string[] | undefined;
+    annoArr: string[] | undefined;
+    qrArr: string[] | undefined;
+  }) => void;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -173,6 +181,7 @@ const useProductList = ({
         callCalcSubTotal,
         doorModelList,
         originProd: prod,
+        onDoorTypeChange: onClassDoorTypeChange,
       });
     });
 
@@ -233,6 +242,7 @@ const useProductList = ({
       callCalcSubTotal,
       // calcSubTotalPrice,
       doorModelList,
+      onDoorTypeChange: onClassDoorTypeChange,
     });
     productList[newKey] = classProd;
 
@@ -435,6 +445,7 @@ const useProductList = ({
       },
       callCalcSubTotal,
       doorModelList,
+      onDoorTypeChange: onClassDoorTypeChange,
     });
     productList_attach[newKey] = classProd;
 
@@ -464,6 +475,71 @@ const useProductList = ({
   Object.values(attachProdList).forEach((prod) => {
     attachTotal = attachTotal + Number(prod.totalPrice_num);
   });
+
+  // ---------------------------------------------------------
+
+  type TannoList = { [key: string]: string[] };
+
+  const [annoList, setAnnoList] = useState<TannoList>({});
+  const [qrList, setQrList] = useState<TannoList>({});
+
+  // 似乎是成功了，明天繼續做qr的部分
+  // 我忘了如果使用者變更了anno的話怎麼辦
+  // 每次編輯doorType都要呼叫api，不檢查是否之前有呼叫過
+  // 然橫送進onDoorTypeChange
+  // 在onDoorTypeChange，做法跟annoShouldRemove一樣，移除舊有的，然後放入新的
+
+  const onClassDoorTypeChange = async ({
+    //
+    oldDoorType,
+    newDoorType,
+  }: {
+    oldDoorType: string;
+    newDoorType: string;
+  }) => {
+    if (!onDoorTypeChange) {
+      return;
+    }
+
+    const annoList_copy = { ...annoList };
+    const qrList_copy = { ...qrList };
+    const typeNameList: { [key: string]: string } = {};
+
+    let annoShouldRemove;
+    let qrShouldRemove;
+
+    Object.values(productList).forEach((prod) => {
+      if (prod.doorType) {
+        typeNameList[prod.doorType] = prod.doorType;
+      }
+    });
+
+    const typeNameArr = Object.keys(typeNameList);
+
+    if (!typeNameArr.includes(oldDoorType)) {
+      annoShouldRemove = annoList_copy[oldDoorType];
+      delete annoList_copy[oldDoorType];
+      qrShouldRemove = qrList_copy[oldDoorType];
+      delete qrList_copy[oldDoorType];
+    }
+
+    const newAnnoArr = await getAnno({ doorModelName: newDoorType });
+    const newQrArr = await getQr({ doorModelName: newDoorType });
+    annoList_copy[newDoorType!] = newAnnoArr ?? [];
+    qrList_copy[newDoorType!] = newQrArr ?? [];
+
+    setAnnoList(annoList_copy);
+    setQrList(qrList_copy);
+
+    onDoorTypeChange({
+      annoShouldRemove,
+      qrShouldRemove,
+      annoArr: newAnnoArr,
+      qrArr: newQrArr,
+    });
+
+    //
+  };
 
   // ---------------------------------------------------------
 
@@ -502,6 +578,65 @@ const useProductList = ({
     addProd_attach,
     attachTotal,
   };
+};
+
+const getAnno = async ({ doorModelName }: { doorModelName: string | undefined }) => {
+  const params = {
+    pageSize: 9999,
+    filter: {
+      doorModelName: {
+        $eq: doorModelName,
+      },
+    },
+  };
+
+  if (!doorModelName) {
+    return undefined;
+  }
+
+  try {
+    // const res = await apiGetQuotationRanges(params);
+    const res = await apiGetAnnotation(params);
+
+    if (res) {
+      const arr = res.data.map((item) => item.description);
+
+      return arr;
+    }
+  } catch (error) {
+    myAlert.err({ title: '取得備註失敗' });
+
+    return undefined;
+  }
+};
+
+const getQr = async ({ doorModelName }: { doorModelName: string | undefined }) => {
+  const params = {
+    pageSize: 9999,
+    filter: {
+      doorModelName: {
+        $eq: doorModelName,
+      },
+    },
+  };
+
+  if (!doorModelName) {
+    return undefined;
+  }
+
+  try {
+    const res = await apiGetQuotationRanges(params);
+
+    if (res) {
+      const arr = res.data.map((item) => item.description);
+
+      return arr;
+    }
+  } catch (error) {
+    myAlert.err({ title: '取得備註失敗' });
+
+    return undefined;
+  }
 };
 
 export { useProductList, prodCellConfig };

@@ -137,6 +137,85 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
   // -----------------------------------------------------
+
+  const [anno, setAnnotation] = useState<string[]>([]);
+  const [qr, setQr] = useState<string[]>([]);
+
+  const onDoorTypeChange = ({
+    annoShouldRemove,
+    annoArr,
+    qrShouldRemove,
+    qrArr,
+  }: {
+    annoShouldRemove: string[] | undefined;
+    annoArr: string[] | undefined;
+    qrShouldRemove: string[] | undefined;
+    qrArr: string[] | undefined;
+  }) => {
+    setAnnotation((anno) => {
+      let annoCopy = [...anno];
+
+      // 把應該被移除拿掉
+      if (annoShouldRemove) {
+        annoShouldRemove.forEach((asmStr) => {
+          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            annoCopy.splice(delIndex, 1);
+          }
+        });
+      }
+
+      // 先把重複的拿掉，再把新的放進去
+      if (annoArr) {
+        annoArr.forEach((asmStr) => {
+          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            annoCopy.splice(delIndex, 1);
+          }
+        });
+
+        annoCopy = [...annoCopy, ...annoArr];
+      }
+
+      return annoCopy;
+    });
+
+    setQr((qr) => {
+      let qrCopy = [...qr];
+
+      // 把應該被移除拿掉
+      if (qrShouldRemove) {
+        qrShouldRemove.forEach((asmStr) => {
+          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            qrCopy.splice(delIndex, 1);
+          }
+        });
+      }
+
+      // 先把重複的拿掉，再把新的放進去
+      if (qrArr) {
+        qrArr.forEach((asmStr) => {
+          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            qrCopy.splice(delIndex, 1);
+          }
+        });
+
+        qrCopy = [...qrCopy, ...qrArr];
+      }
+
+      return qrCopy;
+    });
+
+    // setAnnotation(annoCopy);
+  };
+
+  // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   const lastestContentId = quotationData?.latestContent.id;
@@ -259,6 +338,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
     resetTrigger: quotationData,
+    onDoorTypeChange: onDoorTypeChange,
   });
 
   // const [targetProd, setTargetProd] = useState<Class_product>();
@@ -280,9 +360,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     deliveryLocation: '',
     deliveryDate: '',
   });
-
-  const [anno, setAnnotation] = useState<string[]>([]);
-  const [qr, setQr] = useState<string[]>([]);
 
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
