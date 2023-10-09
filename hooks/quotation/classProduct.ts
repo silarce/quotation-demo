@@ -848,8 +848,8 @@ class Class_product {
       bottomBar: bottomBar || creEmptyCom(),
       guideRail: guideRail || creEmptyCom(),
       motor: motor || creEmptyCom(),
-      sidePlate: sidePlate || creEmptyCom(),
       motorAccessories: motorAccessories || creEmptyCom(),
+      sidePlate: sidePlate || creEmptyCom(),
     };
     Object.values(dataList).forEach((item) => {
       item.price = 0;
@@ -2383,6 +2383,7 @@ const pairBD: TpariBD = {
 const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
   const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
 
+  // 至邊改順序的話記得retrieveCreProdCom裡面的也要改
   const typeArr = [
     'slat',
     'roller',
@@ -2390,8 +2391,8 @@ const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
     'bottomBar',
     'guideRail',
     'motor',
-    'sidePlate',
     'motorAccessories',
+    'sidePlate',
   ] as const;
 
   comArr.forEach((item) => {
