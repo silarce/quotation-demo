@@ -52,7 +52,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
 
         return indexKeys.map((key, cIndex) => {
           const value = data[key];
-          const { width, align } = config[key];
+          const { width, align, suffix } = config[key];
           const theStyle = { width };
           const subClass = ' ' + style[align ?? ''];
 
@@ -69,7 +69,10 @@ export default function Table({ productList }: { productList: TtableProdList }) 
 
           return (
             <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
-              <span>{value}</span>
+              <span>
+                {value}
+                {suffix}
+              </span>
             </div>
           );
         });
@@ -120,6 +123,7 @@ type Tconfig = {
     label: string;
     width: string;
     align?: 'center' | 'right';
+    suffix?: string;
   };
 };
 
@@ -186,6 +190,7 @@ const config: Tconfig = {
     label: '數量',
     width: '40px',
     align: 'right',
+    suffix: '樘',
   },
   unitPrice: {
     label: '單價',
