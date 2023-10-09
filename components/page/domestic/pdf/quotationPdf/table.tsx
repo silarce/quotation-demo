@@ -146,7 +146,7 @@ const indexKeys: TindexKeys[] = [
 const config: Tconfig = {
   category: {
     label: '項目',
-    width: '104px',
+    width: '80px',
   },
   size: {
     label: '尺寸(單位:cm)',
@@ -163,12 +163,12 @@ const config: Tconfig = {
   },
   thickness: {
     label: '厚度',
-    width: '60px',
+    width: '50px',
     align: 'center',
   },
   surface: {
     label: '表面',
-    width: '60px',
+    width: '50px',
     align: 'center',
   },
   doorRail: {
@@ -188,13 +188,13 @@ const config: Tconfig = {
   },
   qty: {
     label: '數量',
-    width: '40px',
+    width: '60px',
     align: 'right',
     suffix: '樘',
   },
   unitPrice: {
     label: '單價',
-    width: '85px',
+    width: '100%',
     align: 'right',
   },
   priceTotal: {
