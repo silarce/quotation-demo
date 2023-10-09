@@ -46,55 +46,117 @@ export default function QuotationList() {
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
   const userId = userEmp?.id;
-  const userGrade = _.sortBy(userEmp?.jobs, 'grade')?.reverse()[0]?.grade;
 
   const [contractSelectShow, setContractSelectShow] = useState(false);
 
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
+  //
+  // agent 經辦
+  // reviewSales 業務
+  // reviewSupervisor 業務主管
+  // reviewWorkDirector 應收帳款
+  // reviewManager 總經理
 
   // 未審核
-  const reviewStatusFilter_noReview = {
-    'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
-    $and: {
-      'latestContent.reviewSalesEmployee.id': { $null: true },
-      'latestContent.reviewSupervisorEmployee.id': { $null: true },
-      'latestContent.reviewWorkDirectorEmployee.id': { $null: true },
-      'latestContent.reviewManagerEmployee.id': { $null: true },
-    },
-  };
+  const foo = (() => {
+    if (!reviewStatus || reviewStatus === '待審核') {
+      return {
+        // 使用者為經辦
+        'latestContent.agentEmployee.id': { $eq: userId },
+        // 還沒送審給任一階段審核者
+        $and: {
+          'latestContent.toSalesAt': { $null: true },
+          'latestContent.toSupervisorAt': { $null: true },
+          'latestContent.toWorkDirectorAt': { $null: true },
+          'latestContent.toManagerAt': { $null: true },
+        },
+      };
+    }
 
-  const filter_isReivewer = {
-    $or: {
-      'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
-      'latestContent.reviewSalesEmployee.id': { $eq: userId },
-      'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-      'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-      // 'latestContent.reviewManagerEmployee.id': { $eq: userId },
-    },
-  };
+    // _____________________________________________
+    if (reviewStatus === '審核中') {
+      return {
+        // 同時滿足兩個條件
+        $and: {
+          // 1 使用者為經辦或任一階段的審核者
+          '1': {
+            $or: {
+              'latestContent.agentEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesEmployee.id': { $eq: userId },
+              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+              'latestContent.reviewManagerEmployee.id': { $eq: userId },
+            },
+          },
+          // 2 報價單被任一個審核者審核過
+          '2': {
+            $or: {
+              'latestContent.toSalesAt': { $notNull: true },
+              'latestContent.toSupervisorAt': { $notNull: true },
+              'latestContent.toWorkDirectorAt': { $notNull: true },
+              'latestContent.toManagerAt': { $notNull: true },
+            },
+          },
+        },
+      };
+    }
 
-  //審核中
-  const reviewStatusFilter_inReview = userGrade < 14 ? filter_isReivewer : undefined;
+    // _____________________________________________
+    if (reviewStatus === '審核完成') {
+      // 如果在預算或投標階段
+      if (status === 'Budget' || status === 'Bidding') {
+        return {
+          $and: {
+            // 1 使用者為經辦或任一階段的審核者
+            '1': {
+              $or: {
+                'latestContent.agentEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesEmployee.id': { $eq: userId },
+                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+                'latestContent.reviewManagerEmployee.id': { $eq: userId },
+              },
+            },
+            // 2 報價單被業務審核過
+            '2': {
+              $and: {
+                'latestContent.toSalesAt': { $notNull: true },
+              },
+            },
+          },
+        };
+      }
 
-  // 已審核
-  const reviewStatusFilter_reviewed = {
-    $and: {
-      'latestContent.salesReviewedAt': { $notNull: true },
-      'latestContent.supervisorReviewedAt': { $notNull: true },
-      'latestContent.workDirectorReviewedAt': { $notNull: true },
-      'latestContent.managerReviewedAt': { $notNull: true },
-    },
-    $or: userGrade < 14 ? filter_isReivewer : undefined,
-  };
+      return {
+        $and: {
+          // 1 使用者為經辦或任一階段的審核者
+          '1': {
+            $or: {
+              'latestContent.agentEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesEmployee.id': { $eq: userId },
+              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+              'latestContent.reviewManagerEmployee.id': { $eq: userId },
+            },
+          },
+          // 2 報價單被所有審核者審核過
+          '2': {
+            $and: {
+              'latestContent.toSalesAt': { $notNull: true },
+              'latestContent.toSupervisorAt': { $notNull: true },
+              'latestContent.toWorkDirectorAt': { $notNull: true },
+              'latestContent.toManagerAt': { $notNull: true },
+            },
+          },
+        },
+      };
+    }
 
-  const reviewStatusFilter =
-    reviewStatus === 'Bidding'
-      ? reviewStatusFilter_inReview
-      : reviewStatus === 'Contracting'
-      ? reviewStatusFilter_reviewed
-      : reviewStatusFilter_noReview; // 待審核
+    // _____________________________________________
+    return {};
+  })();
 
   const params = {
     filter: {
@@ -110,7 +172,8 @@ export default function QuotationList() {
       'latestContent.projectName': {
         $contains: projectName || undefined,
       },
-      ...reviewStatusFilter,
+      // ...reviewStatusFilter,
+      ...foo,
     },
   };
 
@@ -244,10 +307,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          reviewStatus: 'Budget',
+          reviewStatus: '待審核',
         },
       },
-      isActive: !query.reviewStatus || query.reviewStatus === 'Budget',
+      isActive: !query.reviewStatus || query.reviewStatus === '待審核',
     },
     {
       label: '審核中',
@@ -255,10 +318,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          reviewStatus: 'Bidding',
+          reviewStatus: '審核中',
         },
       },
-      isActive: query.reviewStatus === 'Bidding',
+      isActive: query.reviewStatus === '審核中',
     },
     {
       label: '審核完成',
@@ -266,10 +329,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
         pathname: '',
         query: {
           ...query,
-          reviewStatus: 'Contracting',
+          reviewStatus: '審核完成',
         },
       },
-      isActive: query.reviewStatus === 'Contracting',
+      isActive: query.reviewStatus === '審核完成',
     },
   ];
 
@@ -285,3 +348,44 @@ const statusLookup = {
   Bidding: '投標',
   Contracting: '發包',
 };
+
+// const reviewStatusFilter_noReview = {
+//   'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
+//   $and: {
+//     'latestContent.reviewSalesEmployee.id': { $null: true },
+//     'latestContent.reviewSupervisorEmployee.id': { $null: true },
+//     'latestContent.reviewWorkDirectorEmployee.id': { $null: true },
+//     'latestContent.reviewManagerEmployee.id': { $null: true },
+//   },
+// };
+
+// const filter_isReivewer = {
+//   $or: {
+//     'latestContent.agentEmployee.id': { $eq: userId }, // 使用者創建的報價單才會出現
+//     'latestContent.reviewSalesEmployee.id': { $eq: userId },
+//     'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+//     'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+//     // 'latestContent.reviewManagerEmployee.id': { $eq: userId },
+//   },
+// };
+
+// //審核中
+// const reviewStatusFilter_inReview = userGrade < 14 ? filter_isReivewer : undefined;
+
+// // 已審核
+// const reviewStatusFilter_reviewed = {
+//   $and: {
+//     'latestContent.salesReviewedAt': { $notNull: true },
+//     'latestContent.supervisorReviewedAt': { $notNull: true },
+//     'latestContent.workDirectorReviewedAt': { $notNull: true },
+//     'latestContent.managerReviewedAt': { $notNull: true },
+//   },
+//   $or: userGrade < 14 ? filter_isReivewer : undefined,
+// };
+
+// const reviewStatusFilter =
+//   reviewStatus === '審核中'
+//     ? reviewStatusFilter_inReview
+//     : reviewStatus === '審核完成'
+//     ? reviewStatusFilter_reviewed
+//     : reviewStatusFilter_noReview; // 待審核

@@ -64,6 +64,8 @@ export default function BudgetList({
               });
             };
 
+            const status = latestContent.status;
+
             const quotationContent: TBodyItemContent = {
               ...latestContent,
               customerName: latestContent.customer.name,
@@ -108,6 +110,13 @@ export default function BudgetList({
                 isReviewed: reviewManagerEmployee ? !!managerReviewedAt : undefined,
               },
             ];
+
+            // 在預算與投標階段，只要顯示到業務
+            if (status === 'Budget' || status === 'Bidding') {
+              reviewStatuArr.pop();
+              reviewStatuArr.pop();
+              reviewStatuArr.pop();
+            }
 
             const recordArr = contents.map((item) => {
               const { createdAt, editNotes, discount, quantity, total } = item;
