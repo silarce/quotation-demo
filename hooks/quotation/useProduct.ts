@@ -154,7 +154,8 @@ const useProductList = ({
         boxD: String(Number(prod.boxD) / 1000),
         // options: prod.options ?? [],
 
-        quantity: prod.items?.length ?? 0,
+        // quantity: prod.items?.length ?? 0,
+        // quantity: prod.quantity ?? 0,
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
         accessories: prod.items?.[0].accessories ?? [],
         components: prod.items?.[0].components ?? [],
