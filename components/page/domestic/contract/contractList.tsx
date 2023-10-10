@@ -55,7 +55,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
         href: {
           pathname: '/domestic/contract/quotation',
           query: {
-            id: item.id,
+            id: subContracts[0].id,
             version: item.version,
           },
         },

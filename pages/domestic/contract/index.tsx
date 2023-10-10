@@ -18,9 +18,6 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 // css
 import style from './contract.module.scss';
 
-// fake
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
-
 //
 import { useGetContract } from 'js/api/api_quotation';
 
@@ -45,19 +42,7 @@ export default function Contract() {
     update();
   }, []);
 
-  // ===================================================
-
-  // 資料
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple });
-  const projectArr = projectSimple.wrapper.get({
-    filter: {
-      county: router.query.county as string,
-      clientName: router.query.clientName as string,
-      constructionName: router.query.projectName as string,
-    },
-  });
-  // ---------------------------------------------------
-  // panelList
+  // --------------------------------------------------
 
   const searchTargetList = [
     {
@@ -112,22 +97,6 @@ export default function Contract() {
   ];
 
   // ===================================================
-  const contractList_old = projectArr.map((item) => {
-    const { quotationId, constructionName } = item.basicInfo;
-    const { name: clientName, contact } = item.clientData;
-    const { attn } = item.signature;
-
-    return {
-      quotationId: quotationId,
-      clientName: clientName,
-      quotationName: constructionName,
-      discount: '99.99',
-      priceTotal: '999999',
-      contactPerson: contact[0].name,
-      contactPhone: contact[0].phone,
-      attn: attn,
-    };
-  });
 
   const contractList =
     data?.map((item) => {
