@@ -59,7 +59,7 @@ export default function QuotationList() {
   // reviewWorkDirector 應收帳款
   // reviewManager 總經理
 
-  // 未審核
+  // 待審核
   const foo = (() => {
     if (!reviewStatus || reviewStatus === '待審核') {
       return {
@@ -133,10 +133,10 @@ export default function QuotationList() {
           // 3 報價單有任一審核者沒有審核過
           '3': {
             $or: {
-              'latestContent.salesReviewedAt': { $notNull: true },
-              'latestContent.supervisorReviewedAt': { $notNull: true },
-              'latestContent.workDirectorReviewedAt': { $notNull: true },
-              'latestContent.managerReviewedAt': { $notNull: true },
+              'latestContent.salesReviewedAt': { $null: true },
+              'latestContent.supervisorReviewedAt': { $null: true },
+              'latestContent.workDirectorReviewedAt': { $null: true },
+              'latestContent.managerReviewedAt': { $null: true },
             },
           },
         },
