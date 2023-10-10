@@ -122,7 +122,7 @@ export default function QuotationList() {
             // 2 報價單被業務審核過
             '2': {
               $and: {
-                'latestContent.toSalesAt': { $notNull: true },
+                'latestContent.salesReviewedAt': { $notNull: true },
               },
             },
           },
@@ -144,10 +144,10 @@ export default function QuotationList() {
           // 2 報價單被所有審核者審核過
           '2': {
             $and: {
-              'latestContent.toSalesAt': { $notNull: true },
-              'latestContent.toSupervisorAt': { $notNull: true },
-              'latestContent.toWorkDirectorAt': { $notNull: true },
-              'latestContent.toManagerAt': { $notNull: true },
+              'latestContent.salesReviewedAt': { $notNull: true },
+              'latestContent.supervisorReviewedAt': { $notNull: true },
+              'latestContent.workDirectorReviewedAt': { $notNull: true },
+              'latestContent.managerReviewedAt': { $notNull: true },
             },
           },
         },
