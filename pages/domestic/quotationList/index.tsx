@@ -96,18 +96,12 @@ export default function QuotationList() {
             '2': {
               $or: {
                 'latestContent.toSalesAt': { $notNull: true },
-                // 'latestContent.toSupervisorAt': { $notNull: true },
-                // 'latestContent.toWorkDirectorAt': { $notNull: true },
-                // 'latestContent.toManagerAt': { $notNull: true },
               },
             },
             // 3 報價單沒有被審核業務審核過
             '3': {
               $and: {
                 'latestContent.salesReviewedAt': { $null: true },
-                // 'latestContent.supervisorReviewedAt': { $null: true },
-                // 'latestContent.workDirectorReviewedAt': { $null: true },
-                // 'latestContent.managerReviewedAt': { $null: true },
               },
             },
           },
@@ -136,13 +130,13 @@ export default function QuotationList() {
               'latestContent.toManagerAt': { $notNull: true },
             },
           },
-          // 3 報價單沒有被所有審核者審核過
+          // 3 報價單有任一審核者沒有審核過
           '3': {
-            $and: {
-              'latestContent.salesReviewedAt': { $null: true },
-              'latestContent.supervisorReviewedAt': { $null: true },
-              'latestContent.workDirectorReviewedAt': { $null: true },
-              'latestContent.managerReviewedAt': { $null: true },
+            $or: {
+              'latestContent.salesReviewedAt': { $notNull: true },
+              'latestContent.supervisorReviewedAt': { $notNull: true },
+              'latestContent.workDirectorReviewedAt': { $notNull: true },
+              'latestContent.managerReviewedAt': { $notNull: true },
             },
           },
         },
