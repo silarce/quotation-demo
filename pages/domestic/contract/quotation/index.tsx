@@ -181,12 +181,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
 
-  const content = data?.content;
-  // const rootContent = data?.rootContract.content;
+  // const content = data?.content;
+  const content = (() => {
+    if (version === '1') {
+      return data?.content;
+    } else if (version) {
+      const version_num = Number(version) - 1;
+
+      return data?.subContracts[version_num]?.content;
+    }
+  })();
   const rootContent = data?.subContracts[0]?.content;
+
   const subContracts = data?.subContracts.filter((item) => {
-    item.version <= Number(version ?? 0);
+    if (version === '1') {
+      return true;
+    } else {
+      return item.version <= Number(version ?? 0);
+    }
   });
+  // 總是把根合約的資料拿掉
+  subContracts?.shift();
 
   // latest
   const {
@@ -711,3 +726,17 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 //     </Collapse>
 //   );
 // };
+
+/**
+合約項目
+選中合約版本的contnet
+可以用url的version判斷
+version===1 是根合約
+version>1 是子合約
+
+如果是根合約，追加追減項目就取得所有的subContract
+如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
+
+原報價項目，就是根合約的content
+
+ */
