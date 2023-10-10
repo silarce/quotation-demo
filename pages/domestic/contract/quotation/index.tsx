@@ -597,34 +597,34 @@ const OldQuotationProduction = ({
   const panelSwitch = () => setIsActive(!isActive);
 
   const {
-    reRender,
-    reset,
+    // reRender,
+    // reset,
     //
     productList,
     prodCellConfig,
     prodKeyArr,
-    prodVKeyArr,
-    setProdVKeyArr,
-    addProd,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
     changeProdKeyArr,
     //
-    subTotal,
+    // subTotal,
     //
-    comKeyArr,
-    comVKeyArr,
-    comCellConfig,
-    changeComKeyArr,
+    // comKeyArr,
+    // comVKeyArr,
+    // comCellConfig,
+    // changeComKeyArr,
     //
-    accessoriesKeyArr,
-    changeAccessoriesKeyArr,
-    accessoriesCellConfig,
+    // accessoriesKeyArr,
+    // changeAccessoriesKeyArr,
+    // accessoriesCellConfig,
     //
-    othersKeyArr,
-    othersList,
-    othersCellConfig,
-    changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
+    // othersKeyArr,
+    // othersList,
+    // othersCellConfig,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
   } = useProductList({
     productArr: rootContent?.products ?? [],
     others: [],
