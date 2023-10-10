@@ -77,6 +77,43 @@ export default function QuotationList() {
 
     // _____________________________________________
     if (reviewStatus === '審核中') {
+      // 如果在預算或投標階段
+      if (status === 'Budget' || status === 'Bidding') {
+        return {
+          // 同時滿足兩個條件
+          $and: {
+            // 1 使用者為經辦或任一階段的審核者
+            '1': {
+              $or: {
+                'latestContent.agentEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesEmployee.id': { $eq: userId },
+                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+                'latestContent.reviewManagerEmployee.id': { $eq: userId },
+              },
+            },
+            // 2 報價單已送審審核業務
+            '2': {
+              $or: {
+                'latestContent.toSalesAt': { $notNull: true },
+                // 'latestContent.toSupervisorAt': { $notNull: true },
+                // 'latestContent.toWorkDirectorAt': { $notNull: true },
+                // 'latestContent.toManagerAt': { $notNull: true },
+              },
+            },
+            // 3 報價單沒有被審核業務審核過
+            '3': {
+              $and: {
+                'latestContent.salesReviewedAt': { $null: true },
+                // 'latestContent.supervisorReviewedAt': { $null: true },
+                // 'latestContent.workDirectorReviewedAt': { $null: true },
+                // 'latestContent.managerReviewedAt': { $null: true },
+              },
+            },
+          },
+        };
+      }
+
       return {
         // 同時滿足兩個條件
         $and: {
@@ -90,13 +127,22 @@ export default function QuotationList() {
               'latestContent.reviewManagerEmployee.id': { $eq: userId },
             },
           },
-          // 2 報價單被任一個審核者審核過
+          // 2 報價單已送審給任一階段的審核者
           '2': {
             $or: {
               'latestContent.toSalesAt': { $notNull: true },
               'latestContent.toSupervisorAt': { $notNull: true },
               'latestContent.toWorkDirectorAt': { $notNull: true },
               'latestContent.toManagerAt': { $notNull: true },
+            },
+          },
+          // 3 報價單沒有被所有審核者審核過
+          '3': {
+            $and: {
+              'latestContent.salesReviewedAt': { $null: true },
+              'latestContent.supervisorReviewedAt': { $null: true },
+              'latestContent.workDirectorReviewedAt': { $null: true },
+              'latestContent.managerReviewedAt': { $null: true },
             },
           },
         },
