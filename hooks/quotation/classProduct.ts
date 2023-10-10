@@ -953,6 +953,16 @@ class Class_product {
     }, 100);
   }
 
+  calcProdAllprice_simple() {
+    const price = new Decimal(this._prodData.price);
+    const qty = this._prodData.quantity;
+    const discount = Number(this._prodData.discount || '0');
+
+    this.dualPrice = price.mul(qty).toString();
+    this.unitPrice = price.mul(discount).div(100).toString();
+    this.totalPrice = price.mul(qty).mul(discount).div(100).toString();
+  }
+
   /**計算prod所有的價格 */
   private calcProdAllprice() {
     this.calcAccessoriesAllprice();
@@ -1670,6 +1680,10 @@ class Class_product {
 
     this._prodData.price = Number(v);
     this._price = v;
+
+    this.calcProdAllprice_simple();
+    this.callCalcSubTotal();
+
     this.reRender();
   }
 
@@ -1682,16 +1696,8 @@ class Class_product {
     return Number(this._dualPrice).toLocaleString();
   }
   set dualPrice(v) {
-    // v = v.replace(/,/g, '');
-    // const numberRegex = /^(\d+(\.\d+)?|)$/;
-
-    // if (!numberRegex.test(v)) {
-    //   return;
-    // }
-
     this._prodData.dualPrice = Number(v);
     this._dualPrice = v;
-    // this.countPrice();
     this.reRender();
   }
 

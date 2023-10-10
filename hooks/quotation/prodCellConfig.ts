@@ -212,11 +212,11 @@ const prodCellConfig: TcellConfig = {
   price: {
     label: '牌價',
     inputSelProps: {
-      showBaseline: 'invisible',
+      // showBaseline: 'invisible',
       wrapperStyle: { width: '120px' },
       inputProps: {
         props: {
-          disabled: true,
+          // disabled: true,
         },
       },
     },

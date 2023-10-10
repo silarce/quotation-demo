@@ -163,6 +163,13 @@ class Class_accessories {
   get price_locale() {
     return this._acceData.price.toLocaleString();
   }
+  set price_locale(v) {
+    v = v ?? '0';
+    v = v.replace(/,/g, '');
+    this._acceData.price = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
 
   get dualPrice() {
     return this._acceData.dualPrice;
@@ -303,10 +310,10 @@ const accessoriesCellConfig: TcellConfig = {
     label: '牌價',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
-      showBaseline: 'invisible',
+      // showBaseline: 'invisible',
       inputProps: {
         props: {
-          disabled: true,
+          // disabled: true,
         },
       },
     },

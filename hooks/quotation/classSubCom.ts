@@ -84,6 +84,13 @@ class Class_SubCom {
   get price_locale() {
     return this._data.price.toLocaleString();
   }
+  set price_locale(v) {
+    v = v ?? '0';
+    v = v.replace(/,/g, '');
+    this._data.price = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
   // set price(v) {
   //   this._data.price = Number(v);
   //   this.reRender();

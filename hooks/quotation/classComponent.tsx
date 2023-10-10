@@ -234,6 +234,13 @@ class Class_component {
   get price_locale() {
     return this._com.price?.toLocaleString();
   }
+  set price_locale(v) {
+    v = v ?? '0';
+    v = v.replace(/,/g, '');
+    this._com.price = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
 
   get name() {
     return this._com.name;
@@ -749,11 +756,11 @@ const comCellConfig: TcellConfig = {
   price_locale: {
     label: '牌價',
     inputSelProps: {
-      showBaseline: 'invisible',
+      // showBaseline: 'invisible',
       wrapperStyle: { width: '80px' },
       inputProps: {
         props: {
-          disabled: true,
+          // disabled: true,
         },
       },
     },
