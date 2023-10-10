@@ -4,6 +4,7 @@
  * reqUpdateQuotation
  * useGetQuotation_id
  * fileInfoArr
+ * reqReview 送審
  *
  */
 // =============================================================
@@ -635,23 +636,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     if (userId === reviewSalesEmployeeId) {
       isSales = true;
       isReviewer = true;
-    }
-
-    if (userId === reviewSupervisorEmployeeId) {
+    } else if (userId === reviewSupervisorEmployeeId) {
       if (salesReviewedAt) {
         isSupervisor = true;
         isReviewer = true;
       }
-    }
-
-    if (userId === reviewWorkDirectorEmployeeId) {
+    } else if (userId === reviewWorkDirectorEmployeeId) {
       if (salesReviewedAt && supervisorReviewedAt) {
         isWorkDirector = true;
         isReviewer = true;
       }
     }
-
-    if (userGrade >= 14) {
+    //  else if (userGrade >= 14) {
+    else if (userId === reviewManagerEmployeeId) {
       if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
