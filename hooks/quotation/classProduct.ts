@@ -2136,6 +2136,22 @@ class Class_product {
     return body;
   }
 
+  get isAttachDiv() {
+    if (this.reduceQty || this.exchangeQty) {
+      return true;
+    }
+
+    return false;
+  }
+
+  get body_attachDiv() {
+    const body = this.body;
+    const divQty = Number(this.reduceQty) + this.exchangeQty;
+    body.quantity = body.quantity - divQty;
+
+    return body;
+  }
+
   //-----------------------------------------
 } // Class_product close
 

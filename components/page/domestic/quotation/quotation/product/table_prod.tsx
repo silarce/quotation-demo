@@ -35,7 +35,7 @@ export default function Table_prod({
   //
   targetProd,
   isAttach,
-  attachDivTotal,
+  attachTotal,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -52,7 +52,7 @@ export default function Table_prod({
   emptyBlockWidth?: string;
   targetProd?: Class_product | undefined;
   isAttach?: boolean; // 追加追減介面
-  attachDivTotal?: number | string;
+  attachTotal?: number | string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -172,11 +172,11 @@ export default function Table_prod({
 
         {/* main close */}
       </div>
-      {isAttach && (
+      {attachTotal !== undefined && (
         <div className={classNames(scss.total)}>
           <span>合計</span>
           {/* <span>- {prodSubPriceTotal.toLocaleString()}</span> */}
-          <span>{attachDivTotal}</span>
+          <span>{attachTotal}</span>
         </div>
       )}
 

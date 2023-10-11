@@ -1,3 +1,5 @@
+// reqModify
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
@@ -25,7 +27,12 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { useGetContract_id_forAttach, apiQuotationModify, TcreateModifyQuotationDto } from 'js/api/api_quotation';
+import {
+  useGetContract_id_forAttach,
+  apiQuotationModify,
+  TcreateModifyQuotationDto,
+  TcreateQuotationProductDto,
+} from 'js/api/api_quotation';
 import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
 
 // css
@@ -54,15 +61,15 @@ export default function AttachContract() {
     productList,
     prodCellConfig,
     prodKeyArr,
-    prodVKeyArr,
+    // prodVKeyArr,
     setProdVKeyArr,
     addProd,
     changeProdKeyArr,
     //
     comKeyArr,
     comCellConfig,
-    changeComKeyArr,
-    comVKeyArr,
+    // changeComKeyArr,
+    // comVKeyArr,
     //
     accessoriesKeyArr,
     changeAccessoriesKeyArr,
@@ -72,16 +79,17 @@ export default function AttachContract() {
     othersList,
     othersCellConfig,
     changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
-    //
-    subTotal: quotationProdSubTotal,
-    reset: resetClass,
+    // addOthers,
+    // getOthersPostBodyArr,
+    // //
+    // subTotal: quotationProdSubTotal,
+    // reset: resetClass,
     //
     attachProdList,
     addProd_attach,
-    attachTotal,
+    attachAddTotal,
     attachDivTotal,
+    attachTotal,
   } = useProductList({
     productArr: data?.content.products,
     others: data?.content.others,
@@ -96,8 +104,8 @@ export default function AttachContract() {
 
   // ------------------------------------------------------------------
 
-  const subTotal_ori = data?.subTotal ?? 0;
-  const subTotal_calced = subTotal_ori + attachTotal;
+  const subTotal_ori = attachTotal ?? 0;
+  const subTotal_calced = subTotal_ori;
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
 
@@ -257,13 +265,28 @@ export default function AttachContract() {
 
       const content = _.cloneDeep(data.content);
 
+      //
+      const divProdArr = (() => {
+        const arr = Object.values(productList).map((item) => {
+          if (item.isAttachDiv) {
+            return item.body_attachDiv;
+          }
+
+          return undefined;
+        });
+
+        return arr.filter((item) => !!item) as (TcreateQuotationProductDto & {
+          id: string | undefined;
+        })[];
+      })();
+
       const attachProdArr = Object.values(attachProdList).map((prod) => {
         return prod.body;
       });
 
       const body: TcreateModifyQuotationDto = {
         ...content,
-        products: attachProdArr,
+        products: [...divProdArr, ...attachProdArr],
         agentId: content.agentEmployee?.id,
         managerId: content.managerEmployee?.id,
         supervisorId: content.supervisorEmployee?.id,
@@ -355,19 +378,22 @@ export default function AttachContract() {
               isAttach={true}
               panelBox="resetChangeBox"
               targetProd={targetProd}
-              // attachDivTotal={attachDivTotal}
-              attachDivTotal={attachDivTotal.toLocaleString()}
+              attachTotal={attachDivTotal.toLocaleString()}
             />
 
             <br />
             <br />
             <Table_com
               disabled={true}
-              comList={targetProd?.comList}
+              // comList={targetProd?.comList}
+              // FIXME 之後要把型別處理好
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
               comCellConfig={comCellConfig}
               comKeyArr={comKeyArr}
-              changeComKeyArr={changeComKeyArr}
-              defalutVKeyArr={comVKeyArr}
+              changeComKeyArr={() => {}}
+              // defalutVKeyArr={comVKeyArr}
             />
             <br />
             <br />
@@ -431,17 +457,22 @@ export default function AttachContract() {
             // isAttach={true}
             // panelBox="resetChangeBox"
             // targetProd={targetProd}
+            attachTotal={attachAddTotal}
           />
 
           <br />
           <br />
           <Table_com
             disabled={false}
-            comList={targetProd_attach?.comList}
+            // FIXME 之後要把型別處理好
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            // comList={targetProd_attach?.comList}
+            comList={{ ...targetProd_attach?.comList, ...targetProd_attach?.subComList }}
             comCellConfig={comCellConfig}
             comKeyArr={comKeyArr}
             changeComKeyArr={() => {}}
-            defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
+            // defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
           />
 
           <br />

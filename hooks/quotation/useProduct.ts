@@ -467,20 +467,25 @@ const useProductList = ({
     attachProdList[newId] = item;
   });
 
-  //
-  let attachTotal = 0;
-  Object.values(productList).forEach((prod) => {
-    attachTotal = attachTotal - Number(prod.reduceExchangePrice);
-  });
+  /**追加總金額 */
+  let attachAddTotal = 0;
+  // Object.values(productList).forEach((prod) => {
+  //   attachAddTotal = attachAddTotal - Number(prod.reduceExchangePrice);
+  // });
 
   Object.values(attachProdList).forEach((prod) => {
-    attachTotal = attachTotal + Number(prod.totalPrice_num);
+    attachAddTotal = attachAddTotal + Number(prod.totalPrice_num);
   });
 
   let attachDivTotal = 0;
   Object.values(productList).forEach((item) => {
     attachDivTotal = attachDivTotal - Number(item.reduceExchangePrice);
   });
+
+  // console.log('attachAddTotal', attachAddTotal);
+  // console.log('attachDivTotal', attachDivTotal);
+
+  const attachTotal = attachAddTotal + attachDivTotal;
 
   // 追加追減close
   // ---------------------------------------------------------
@@ -583,9 +588,12 @@ const useProductList = ({
     attachProdList,
     // attachProdList: productList_attach,
     addProd_attach,
-    attachTotal,
+    /**追加總金額 */
+    attachAddTotal,
     /**追減總金額 */
     attachDivTotal,
+    /**追加追減總金額 */
+    attachTotal,
   };
 };
 
