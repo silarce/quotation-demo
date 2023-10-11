@@ -33,10 +33,10 @@ export default function Table_prod({
   panelBox,
   emptyBlockWidth,
   //
-  isAttach,
   targetProd,
-}: // targetProd,
-{
+  isAttach,
+  attachDivTotal,
+}: {
   disabled: boolean;
   prodList: TproductList;
   prodCellConfig: TcellConfig;
@@ -50,8 +50,9 @@ export default function Table_prod({
   //
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   emptyBlockWidth?: string;
-  isAttach?: boolean; // 追加追減介面
   targetProd?: Class_product | undefined;
+  isAttach?: boolean; // 追加追減介面
+  attachDivTotal?: number | string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -171,6 +172,14 @@ export default function Table_prod({
 
         {/* main close */}
       </div>
+      {isAttach && (
+        <div className={classNames(scss.total)}>
+          <span>合計</span>
+          {/* <span>- {prodSubPriceTotal.toLocaleString()}</span> */}
+          <span>{attachDivTotal}</span>
+        </div>
+      )}
+
       {/*  */}
       <InputModal
         visible={!!showInputModal}

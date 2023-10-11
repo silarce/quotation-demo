@@ -81,6 +81,7 @@ export default function AttachContract() {
     attachProdList,
     addProd_attach,
     attachTotal,
+    attachDivTotal,
   } = useProductList({
     productArr: data?.content.products,
     others: data?.content.others,
@@ -339,6 +340,7 @@ export default function AttachContract() {
 
           <div className={scss.tableWrapper}>
             {/* 主產品設定 */}
+
             <Table_prod
               disabled={true}
               prodList={productList}
@@ -353,7 +355,10 @@ export default function AttachContract() {
               isAttach={true}
               panelBox="resetChangeBox"
               targetProd={targetProd}
+              // attachDivTotal={attachDivTotal}
+              attachDivTotal={attachDivTotal.toLocaleString()}
             />
+
             <br />
             <br />
             <Table_com

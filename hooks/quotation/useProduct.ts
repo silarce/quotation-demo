@@ -477,6 +477,12 @@ const useProductList = ({
     attachTotal = attachTotal + Number(prod.totalPrice_num);
   });
 
+  let attachDivTotal = 0;
+  Object.values(productList).forEach((item) => {
+    attachDivTotal = attachDivTotal - Number(item.reduceExchangePrice);
+  });
+
+  // 追加追減close
   // ---------------------------------------------------------
 
   type TannoList = { [key: string]: string[] };
@@ -578,6 +584,8 @@ const useProductList = ({
     // attachProdList: productList_attach,
     addProd_attach,
     attachTotal,
+    /**追減總金額 */
+    attachDivTotal,
   };
 };
 

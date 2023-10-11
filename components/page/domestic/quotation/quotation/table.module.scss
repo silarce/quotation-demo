@@ -48,6 +48,29 @@
     }
   } //main
 
+  .total {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    padding: 10px 42px;
+    border: solid 1px theme("colors.border");
+    border-top: 0;
+    &.exchange {
+      border-color: #ea1833;
+    }
+    span {
+      &:nth-of-type(1) {
+        color: theme("colors.main");
+        font-size: 16px;
+        font-weight: 600;
+      }
+      &:nth-of-type(2) {
+        font-size: 16px;
+        font-weight: 400;
+      }
+    }
+  }
+
   .addBtnWrapper {
     width: 100%;
     position: sticky;
