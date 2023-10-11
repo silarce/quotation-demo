@@ -419,7 +419,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
 
       // 'attachedToContract',
       // 'attachedContract',
-      'subContracts.content.products',
+      'subContracts.content.products.rootProdductId',
 
       'products',
     ],

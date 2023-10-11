@@ -193,30 +193,31 @@ function TheQuotation({ router }: { router: NextRouter }) {
   })();
   const rootContent = data?.subContracts[0]?.content;
 
-  const subContracts = data?.subContracts.filter((item) => {
+  let subContracts = data?.subContracts.filter((item) => {
     if (version === '1') {
       return true;
     } else {
       return item.version <= Number(version ?? 0);
     }
   });
+  subContracts = _.sortBy(subContracts, 'version');
   // 總是把根合約的資料拿掉
   subContracts?.shift();
 
   // latest
   const {
-    reRender,
-    reset,
+    // reRender,
+    // reset,
     //
     productList,
     prodCellConfig,
     prodKeyArr,
-    prodVKeyArr,
-    setProdVKeyArr,
-    addProd,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
     changeProdKeyArr,
     //
-    subTotal,
+    // subTotal,
     //
     comKeyArr,
     comVKeyArr,
@@ -230,9 +231,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     othersKeyArr,
     othersList,
     othersCellConfig,
-    changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
   } = useProductList({
     productArr: content?.products ?? [],
     others: content?.others ?? [],
@@ -263,18 +264,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------
   const control_anno: TsummaryControl = {
     stringArr: data?.annotations ?? [],
-    editString: (index, v) => {},
-    addString: (v: string) => {},
-    delString: (index: number) => {},
-    addStrArr: (vArr: string[]) => {},
+    editString: () => {},
+    addString: () => {},
+    delString: () => {},
+    addStrArr: () => {},
   };
 
   const control_qr: TsummaryControl = {
     stringArr: data?.quotationRanges ?? [],
-    editString: (index, v) => {},
-    addString: (v: string) => {},
-    delString: (index: number) => {},
-    addStrArr: (vArr: string[]) => {},
+    editString: () => {},
+    addString: () => {},
+    delString: () => {},
+    addStrArr: () => {},
   };
 
   const payInfoControl: TpayInfoControl = {
@@ -283,7 +284,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         inputAttr: {
           disabled: true,
           value: data?.discount ?? '',
-          onChange: (e) => {},
+          onChange: () => {},
         },
       },
       subTotal: {
@@ -309,16 +310,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
     delivery: {
       deliveryLocation: {
         value: data?.deliveryLocation ?? '',
-        onChange: (v) => {},
+        onChange: () => {},
       },
       deliveryDate: {
         value: data?.deliveryDate ?? '',
-        onChange: (v) => {},
+        onChange: () => {},
       },
     },
     paymentMethod: {
       arr:
-        data?.paymentMethods.map((item, index) => {
+        data?.paymentMethods.map((item) => {
           const { milestone, totalPaymentRatio } = item;
 
           return {
@@ -329,7 +330,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           };
           //
         }) ?? [],
-      addMethod: (v) => {},
+      addMethod: () => {},
     },
   };
 
@@ -738,5 +739,15 @@ version>1 是子合約
 如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
 
 原報價項目，就是根合約的content
+
+ */
+
+/**
+要問Gina的問題
+product的rootProdductId已經可以用了嗎
+是不是新增加的資料才會有?
+
+409的問題解決了嗎?
+能夠做追減了嗎?
 
  */
