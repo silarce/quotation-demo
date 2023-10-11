@@ -145,6 +145,11 @@ class Class_product {
     this.creAcceList();
     //建立 配電箱與按裝費
     this.creSubComList();
+
+    // ___________________________________________________________
+    if (this._prodData.reduceQty) {
+      this.reduceQty = String(this._prodData.reduceQty);
+    }
     // ___________________________________________________________
     // = constructor close ===========================================================
   } // = constructor close ===========================================================
@@ -2232,6 +2237,9 @@ type Tprod = {
   installationFeeUnitPrice: number;
   // 安裝費複價;
   installationFeeTotalPrice: number;
+
+  //
+  reduceQty?: number;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;

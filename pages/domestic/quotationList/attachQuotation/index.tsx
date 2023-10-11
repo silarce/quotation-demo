@@ -22,10 +22,10 @@ import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
+// import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
+// import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
+// import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
+// import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 // import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
@@ -60,9 +60,9 @@ import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
 
-// 假資料與fake api
-import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
+// // 假資料與fake api
+// import { useQuotation } from 'hooks/quotation/useQuotation';
+// import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -102,7 +102,7 @@ import Summary, {
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
-import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
+import { TcreateQuotationProductDto, TquotationProductDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -223,9 +223,40 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const latestContent = quotationData?.latestContent;
   const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
-  const attachedToContract = quotationData?.attachedToContract;
 
-  const isAttach = attachedToContract ? true : undefined;
+  const isAttach = true;
+
+  const attachProdArr = useMemo(() => {
+    const latestContent = quotationData?.latestContent;
+    const attachedToContract = quotationData?.attachedToContract;
+
+    const list: { [key: string]: TquotationProductDto } = {};
+
+    // 合約原本的主產品
+    const contractProdArr = attachedToContract?.products;
+    // 可能帶有attachedToProductId
+    const contentProdArr = latestContent?.products;
+
+    contractProdArr?.forEach((prod) => {
+      list[prod.id] = prod;
+    });
+
+    contentProdArr?.forEach((prod) => {
+      if (prod.attachedToProductId) {
+        const oriQty = list?.[prod.attachedToProductId].quantity;
+
+        if (oriQty !== undefined) {
+          prod.reduceQty = oriQty - prod.quantity;
+        }
+
+        list[prod.attachedToProductId] = prod;
+      } else {
+        list[prod.id] = prod;
+      }
+    });
+
+    return Object.values(list) ?? [];
+  }, [quotationData]);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -321,8 +352,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     comKeyArr,
     comCellConfig,
-    changeComKeyArr,
-    comVKeyArr,
+    // changeComKeyArr,
+    // comVKeyArr,
     //
     accessoriesKeyArr,
     changeAccessoriesKeyArr,
@@ -339,9 +370,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reset: resetClass,
     //
   } = useProductList({
-    productArr: quotationData?.latestContent.products,
+    productArr: attachProdArr,
     others: quotationData?.latestContent.others,
-    resetTrigger: quotationData,
+    resetTrigger: attachProdArr,
     onDoorTypeChange: onDoorTypeChange,
   });
 
@@ -802,9 +833,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   // ---------------------------------------------------------
-  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
 
-  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
   const signatureArr: TsignatureProps[] = [
     {
       label: '總經理',
@@ -861,11 +890,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
   ];
-
-  useEffect(() => {
-    reNewClassQuotation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -976,8 +1000,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         openEmpSel('reviewSales');
       },
     },
-    // status
-    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
     (() => {
       if (status === 'Contracting') {
         return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
@@ -985,27 +1007,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return null;
       }
     })(),
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  if (!classQuotation) {
-    return null;
-  }
-
-  // --------------------------------------------------------------------------
-  const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
-      return {
-        ...mp.allData,
-        part: mp.partArr.map((part) => part.allData),
-      };
-    });
-
-    return theArr;
-  })();
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
