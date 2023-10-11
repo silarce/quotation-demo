@@ -233,9 +233,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const list: { [key: string]: TquotationProductDto } = {};
 
     // 合約原本的主產品
-    const contractProdArr = attachedToContract?.products;
+    const contractProdArr = attachedToContract?.content.products;
+
     // 可能帶有attachedToProductId
     const contentProdArr = latestContent?.products;
+
+    console.log(contractProdArr);
+    console.log(contentProdArr);
+
+    /*
+    
+    畫面下面要在放另外一組table
+    用來放追加的主產品
+
+    上面的主產品，放attachedToContract裡面的主產品
+    不過要reduceQty設為與對應attachedToProductId的主產品的數量相同
+
+    如果要做成可以編輯，
+    就要把contentProdArr中有attachedToProductId
+    送到contractProdArr相對應attachedToProductId的主產品(class型態)裡面
+
+    以變更新增的主產品不可以編輯數量
+    
+    */
 
     contractProdArr?.forEach((prod) => {
       list[prod.id] = prod;
@@ -243,7 +263,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     contentProdArr?.forEach((prod) => {
       if (prod.attachedToProductId) {
-        const oriQty = list?.[prod.attachedToProductId].quantity;
+        const oriQty = list?.[prod.attachedToProductId]?.quantity;
 
         if (oriQty !== undefined) {
           prod.reduceQty = oriQty - prod.quantity;

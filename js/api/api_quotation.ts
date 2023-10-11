@@ -108,8 +108,7 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.others',
       'latestContent.verifyForm',
 
-      'attachedToContract.products.items.accessories',
-      'attachedToContract.products.items.components',
+      'attachedToContract.content.products',
     ],
   };
 
@@ -403,8 +402,8 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       'content.reviewSupervisorEmployee',
 
       'content.products',
-      'content.products.items.accessories',
-      'content.products.items.components',
+      // 'content.products.items.accessories',
+      // 'content.products.items.components',
       'content.others',
 
       // 'rootContract.content.customer',
@@ -503,11 +502,12 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
   };
 };
 
+/**取得主產品資料 */
 export const apiGetQuotationProducts = async (productId: string) => {
   const api = `/quotation/products/${productId}`;
 
   return axi
-    .post<TquotationProductDto>(api)
+    .get<TquotationProductDto>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
