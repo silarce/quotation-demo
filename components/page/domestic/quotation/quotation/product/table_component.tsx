@@ -19,6 +19,7 @@ export default function Table_acce({
   comKeyArr: comKeyArr,
   changeComKeyArr: changeComKeyArr,
   defalutVKeyArr,
+  isRedBorder,
 }: // addProd,
 // setTargetProd,
 {
@@ -31,11 +32,12 @@ export default function Table_acce({
   defalutVKeyArr?: string[];
   // addProd: () => void;
   // setTargetProd: (v: Class_product) => void;
+  isRedBorder?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
   return (
-    <div className={scss.tableContainer}>
+    <div className={classNames(scss.tableContainer, isRedBorder && scss.redBorder)}>
       <div className={scss.header}>
         <h2>材料/配件設定</h2>
         <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>

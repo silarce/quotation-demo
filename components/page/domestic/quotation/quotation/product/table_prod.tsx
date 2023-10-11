@@ -36,6 +36,7 @@ export default function Table_prod({
   targetProd,
   isAttach,
   attachTotal,
+  isRedBorder,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -53,6 +54,7 @@ export default function Table_prod({
   targetProd?: Class_product | undefined;
   isAttach?: boolean; // 追加追減介面
   attachTotal?: number | string;
+  isRedBorder?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -83,7 +85,7 @@ export default function Table_prod({
   // -----------------------------------------------------------------------
 
   return (
-    <div className={scss.tableContainer}>
+    <div className={classNames(scss.tableContainer, isRedBorder && scss.redBorder)}>
       <div className={scss.header}>
         <h2>主產品設定</h2>
         <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>
