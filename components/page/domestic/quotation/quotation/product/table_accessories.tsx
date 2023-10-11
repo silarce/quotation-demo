@@ -27,6 +27,7 @@ export default function Table_accessories({
   onSelectorConfirm,
   panelBox,
   emptyBlockWidth,
+  isRedBorder,
 }: {
   disabled: boolean;
   list: TaccessoriesList | undefined;
@@ -39,13 +40,14 @@ export default function Table_accessories({
   onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   emptyBlockWidth?: string;
+  isRedBorder?: boolean;
 }) {
   const [showSelector, setShowSelector] = useState(false);
 
   const [allowMove, setAllowMove] = useState(false);
 
   return (
-    <div className={scss.tableContainer}>
+    <div className={classNames(scss.tableContainer, isRedBorder && scss.redBorder)}>
       <div className={scss.header}>
         <h2>選配設定</h2>
         <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>

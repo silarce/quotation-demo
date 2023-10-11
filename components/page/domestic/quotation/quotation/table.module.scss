@@ -4,6 +4,9 @@
   padding: 0 4px;
   border: solid 1px $colorBorder01;
   position: relative;
+  &.redBorder {
+    border-color: red;
+  }
 
   .header {
     padding: 18px 28px;
@@ -53,8 +56,9 @@
     justify-content: flex-end;
     gap: 20px;
     padding: 10px 42px;
-    border: solid 1px theme("colors.border");
-    border-top: 0;
+    // border: solid 1px theme("colors.border");
+    border-top: solid 1px theme("colors.border");
+
     &.exchange {
       border-color: #ea1833;
     }

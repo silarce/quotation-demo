@@ -412,89 +412,81 @@ export default function AttachContract() {
             />
             <br />
             <br />
-            <div className={scss.tableWrapper}>
-              {/* 其他設定 */}
-              <Table_others
-                disabled={true}
-                list={othersList}
-                cellConfig={othersCellConfig}
-                keyArr={othersKeyArr}
-                changeKeyArr={changeOthersKeyArr}
-                add={() => {}}
-              />
-            </div>
+            {/* 其他設定 */}
+            <Table_others
+              disabled={true}
+              list={othersList}
+              cellConfig={othersCellConfig}
+              keyArr={othersKeyArr}
+              changeKeyArr={changeOthersKeyArr}
+              add={() => {}}
+            />
           </div>
           {/*  */}
           {/*  */}
           {/*  */}
           <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <Table_prod
-            disabled={false}
-            prodList={attachProdList}
-            prodCellConfig={prodCellConfig}
-            prodKeyArr={prodKeyArr}
-            // changeProdKeyArr={changeProdKeyArr}
-            // addProd={addProd}
-            // setTargetProd={setTargetProdKey}
-            changeProdKeyArr={() => {}}
-            addProd={addProd_attach}
-            setTargetProd={setTargetProdKey_attach}
-            defalutVKeyArr={Object.keys(attachProdList)}
-            // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-            onVKeyChange={(keyArr) => {}}
-            rowHeight="h106"
-            // isAttach={true}
-            // panelBox="resetChangeBox"
-            // targetProd={targetProd}
-            attachTotal={attachAddTotal}
-          />
+          <div className={scss.tableWrapper}>
+            <Table_prod
+              disabled={false}
+              prodList={attachProdList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              // changeProdKeyArr={changeProdKeyArr}
+              // addProd={addProd}
+              // setTargetProd={setTargetProdKey}
+              changeProdKeyArr={() => {}}
+              addProd={addProd_attach}
+              setTargetProd={setTargetProdKey_attach}
+              defalutVKeyArr={Object.keys(attachProdList)}
+              // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              onVKeyChange={(keyArr) => {}}
+              rowHeight="h106"
+              // isAttach={true}
+              // panelBox="resetChangeBox"
+              // targetProd={targetProd}
+              attachTotal={attachAddTotal}
+              isRedBorder={true}
+            />
 
-          <br />
-          <br />
-          <Table_com
-            disabled={false}
-            // FIXME 之後要把型別處理好
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            // comList={targetProd_attach?.comList}
-            comList={{ ...targetProd_attach?.comList, ...targetProd_attach?.subComList }}
-            comCellConfig={comCellConfig}
-            comKeyArr={comKeyArr}
-            changeComKeyArr={() => {}}
-            // defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
-          />
+            <br />
+            <br />
+            <Table_com
+              disabled={false}
+              // FIXME 之後要把型別處理好
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              // comList={targetProd_attach?.comList}
+              comList={{ ...targetProd_attach?.comList, ...targetProd_attach?.subComList }}
+              comCellConfig={comCellConfig}
+              comKeyArr={comKeyArr}
+              changeComKeyArr={() => {}}
+              // defalutVKeyArr={Object.keys(targetProd_attach?.comList ?? {})}
+              isRedBorder={true}
+            />
 
-          <br />
-          <br />
+            <br />
+            <br />
 
-          <Table_accessories
-            disabled={false}
-            list={targetProd_attach?.accessoriesList}
-            cellConfig={accessoriesCellConfig}
-            keyArr={accessoriesKeyArr}
-            changeKeyArr={() => {}}
-            // defalutVKeyArr={}
-            // onVKeyChange={}
-            doorModel={targetProd_attach?.doorType}
-            onSelectorConfirm={(arr) => {
-              if (targetProd_attach) {
-                targetProd_attach.addAcce(arr);
-              }
-            }}
-            // panelBox={}
-            // emptyBlockWidth={}
-          />
+            <Table_accessories
+              disabled={false}
+              list={targetProd_attach?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={() => {}}
+              // defalutVKeyArr={}
+              // onVKeyChange={}
+              doorModel={targetProd_attach?.doorType}
+              onSelectorConfirm={(arr) => {
+                if (targetProd_attach) {
+                  targetProd_attach.addAcce(arr);
+                }
+              }}
+              // panelBox={}
+              // emptyBlockWidth={}
+              isRedBorder={true}
+            />
+          </div>
 
           {/*  */}
         </div>
