@@ -92,6 +92,7 @@ class Class_product {
     parentProd,
     //
     onDoorTypeChange,
+    disabled_quantity,
   }: {
     reRender: TreRender;
     prodData?: Tprod;
@@ -105,6 +106,7 @@ class Class_product {
     parentProd?: Class_product;
     //
     onDoorTypeChange?: (obj: { oldDoorType: string; newDoorType: string }) => void;
+    disabled_quantity?: boolean;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -130,6 +132,8 @@ class Class_product {
     this.parentProd = parentProd;
 
     this.findBDoptions();
+
+    this.disabled_quantity = disabled_quantity;
 
     // __________________________________________________________;
 
@@ -164,6 +168,7 @@ class Class_product {
   //  用來比對是否有變動用的
   readonly originProd;
   //  用來比對是否有變動用的
+  readonly disabled_quantity;
 
   isLoading = false;
 
@@ -1999,6 +2004,7 @@ class Class_product {
       callCalcSubTotal: () => {},
       doorModelList: this._doorModelList,
       parentProd: this,
+      disabled_quantity: true,
     });
 
     this.reRender();
