@@ -126,6 +126,8 @@ const easyBox = ({ indexNum }: { indexNum: string | number }) => {
 };
 
 const StateBox = ({ indexNum, state }: { indexNum: string | number; state: 'add' | 'div' | undefined }) => {
+  console.log(state);
+
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
       <div className={classNames(scss.circle, state && scss[state ?? ''])} />
@@ -176,7 +178,7 @@ function DndRow({
   // state: 'add' | 'div';
   //
 }) {
-  const state = item.attachedToProductId ? 'add' : item.attachedToProductId === null ? 'div' : undefined;
+  const state = item.attachedToProductId ? 'div' : item.attachedToProductId === null ? 'add' : undefined;
 
   return (
     <div onClick={onRowClick} className={classNames('relative')}>

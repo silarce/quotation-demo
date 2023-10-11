@@ -479,7 +479,10 @@ const topPathList: TtopPathListConfig[] = [
     subLabel: '-國內工程',
     path01: sidePathList['/domestic'].path01,
     href: {
-      pathname: sidePathList['/domestic'].path01 + '/legacyContractIntegration',
+      pathname: sidePathList['/domestic'].path01 + '/quotationList',
+      query: {
+        status: 'Budget',
+      },
     },
     // erpFeature: 'allPass',
     erpFeature: [domestic, legacyContractIntegration],

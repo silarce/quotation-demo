@@ -940,15 +940,24 @@ export type TquotationContentDto = {
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
+
   //審核相關
   reviewSalesEmployee: TemployeeDto | null;
   salesReviewedAt: string | null;
-  reviewWorkDirectorEmployee: TemployeeDto | null;
-  workDirectorReviewedAt: string | null;
+  toSalesAt: string | null; // date
+
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
+  toSupervisorAt: string | null; // date
+
+  reviewWorkDirectorEmployee: TemployeeDto | null;
+  workDirectorReviewedAt: string | null;
+  toWorkDirectorAt: string | null; // date
+
   reviewManagerEmployee: TemployeeDto | null;
   managerReviewedAt: string | null;
+  toManagerAt: string | null; // date
+
   /**備註 */
   annotations: string[] | null;
   /**報價範圍 */
@@ -972,8 +981,6 @@ export type TquotationContentDto = {
   deliveryDate: string;
   /**付款方式 */
   paymentMethods: TpaymentMethodDto[];
-  toSalesAt: string | null;
-  toSupervisorAt: string | null;
 
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];

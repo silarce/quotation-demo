@@ -80,8 +80,9 @@ class Class_accessories {
 
     // length跟width互斥，length為0的時候 price為0?
     if (referenceSpec === 'fullWidth') {
-      const l = Number(this._prod.length);
-      const w = Number(this._prod.width);
+      const l = Number(this._prod.fullWidth);
+      // const w = Number(this._prod.WG);
+      const w = 0;
       this.quantity = l || w;
       this.unit = 'M';
     } else {
@@ -103,9 +104,9 @@ class Class_accessories {
     // 複價;
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._acceData.dualPrice = dualPrice.toNumber();
-    this._acceData.unitPrice = unitPrice.toNumber();
-    this._acceData.totalPrice = totalPrice.toNumber();
+    this._acceData.dualPrice = Number(dualPrice.toFixed(0));
+    this._acceData.unitPrice = Number(unitPrice.toFixed(0));
+    this._acceData.totalPrice = Number(totalPrice.toFixed(0));
 
     this._prod.calcProdAllprice_timeout();
 
@@ -159,12 +160,25 @@ class Class_accessories {
     this.calcAllPrice();
     this.reRender();
   }
+  get price_locale() {
+    return this._acceData.price.toLocaleString();
+  }
+  set price_locale(v) {
+    v = v ?? '0';
+    v = v.replace(/,/g, '');
+    this._acceData.price = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
 
   get dualPrice() {
     return this._acceData.dualPrice;
   }
   set dualPrice(v) {
     this.reRender();
+  }
+  get dualPrice_locale() {
+    return this._acceData.dualPrice.toLocaleString();
   }
 
   get unitPrice() {
@@ -173,6 +187,9 @@ class Class_accessories {
   set unitPrice(str) {
     this.reRender();
   }
+  get unitPrice_locale() {
+    return this._acceData.unitPrice.toLocaleString();
+  }
 
   get totalPrice() {
     return String(this._acceData.totalPrice);
@@ -180,6 +197,9 @@ class Class_accessories {
   set totalPrice(str) {
     // this._data.totalPrice = num;
     this.reRender();
+  }
+  get totalPrice_locale() {
+    return this._acceData.totalPrice.toLocaleString();
   }
 
   // ---------------------------------------------------------
@@ -207,7 +227,8 @@ type Taccessories = {
   originalPrice?: number;
 };
 
-type TaccessoriesKey = Exclude<keyof Taccessories, 'id'>;
+// type TaccessoriesKey = Exclude<keyof Taccessories, 'id'>;
+type TaccessoriesKey = string;
 
 const accessoriesKeyArrOri: () => TaccessoriesKey[] = () => {
   return [
@@ -216,10 +237,14 @@ const accessoriesKeyArrOri: () => TaccessoriesKey[] = () => {
     'name',
     'unit',
     'quantity',
-    'price',
-    'dualPrice',
-    'unitPrice',
-    'totalPrice',
+    // 'price',
+    // 'dualPrice',
+    // 'unitPrice',
+    // 'totalPrice',
+    'price_locale',
+    'dualPrice_locale',
+    'unitPrice_locale',
+    'totalPrice_locale',
   ];
 };
 
@@ -263,25 +288,49 @@ const accessoriesCellConfig: TcellConfig = {
   quantity: {
     label: '數量',
     inputSelProps: {
-      wrapperStyle: { width: '40px' },
+      wrapperStyle: { width: '60px' },
       inputProps: {
         props: {},
       },
     },
   },
-  price: {
+  // // price: {
+  // //   label: '牌價',
+  // //   inputSelProps: {
+  // //     wrapperStyle: { width: '60px' },
+  // //     showBaseline: 'invisible',
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  price_locale: {
     label: '牌價',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
-      showBaseline: 'invisible',
+      // showBaseline: 'invisible',
       inputProps: {
         props: {
-          disabled: true,
+          // disabled: true,
         },
       },
     },
   },
-  dualPrice: {
+  // // dualPrice: {
+  // // label: '牌價複價',
+  // // inputSelProps: {
+  // // showBaseline: 'invisible',
+  // // wrapperStyle: { width: '100px' },
+  // // inputProps: {
+  // // props: {
+  // // disabled: true,
+  // // },
+  // // },
+  // // },
+  // // },
+  dualPrice_locale: {
     label: '牌價複價',
     inputSelProps: {
       showBaseline: 'invisible',
@@ -293,7 +342,19 @@ const accessoriesCellConfig: TcellConfig = {
       },
     },
   },
-  unitPrice: {
+  // // unitPrice: {
+  // //   label: '單價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '60px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  unitPrice_locale: {
     label: '單價',
     inputSelProps: {
       showBaseline: 'invisible',
@@ -305,7 +366,19 @@ const accessoriesCellConfig: TcellConfig = {
       },
     },
   },
-  totalPrice: {
+  // // totalPrice: {
+  // //   label: '複價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '60px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  totalPrice_locale: {
     label: '複價',
     inputSelProps: {
       showBaseline: 'invisible',

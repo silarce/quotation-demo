@@ -4,6 +4,7 @@
  * reqUpdateQuotation
  * useGetQuotation_id
  * fileInfoArr
+ * reqReview 送審
  *
  */
 // =============================================================
@@ -137,6 +138,85 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
   // -----------------------------------------------------
+
+  const [anno, setAnnotation] = useState<string[]>([]);
+  const [qr, setQr] = useState<string[]>([]);
+
+  const onDoorTypeChange = ({
+    annoShouldRemove,
+    annoArr,
+    qrShouldRemove,
+    qrArr,
+  }: {
+    annoShouldRemove: string[] | undefined;
+    annoArr: string[] | undefined;
+    qrShouldRemove: string[] | undefined;
+    qrArr: string[] | undefined;
+  }) => {
+    setAnnotation((anno) => {
+      let annoCopy = [...anno];
+
+      // 把應該被移除拿掉
+      if (annoShouldRemove) {
+        annoShouldRemove.forEach((asmStr) => {
+          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            annoCopy.splice(delIndex, 1);
+          }
+        });
+      }
+
+      // 先把重複的拿掉，再把新的放進去
+      if (annoArr) {
+        annoArr.forEach((asmStr) => {
+          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            annoCopy.splice(delIndex, 1);
+          }
+        });
+
+        annoCopy = [...annoCopy, ...annoArr];
+      }
+
+      return annoCopy;
+    });
+
+    setQr((qr) => {
+      let qrCopy = [...qr];
+
+      // 把應該被移除拿掉
+      if (qrShouldRemove) {
+        qrShouldRemove.forEach((asmStr) => {
+          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            qrCopy.splice(delIndex, 1);
+          }
+        });
+      }
+
+      // 先把重複的拿掉，再把新的放進去
+      if (qrArr) {
+        qrArr.forEach((asmStr) => {
+          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            qrCopy.splice(delIndex, 1);
+          }
+        });
+
+        qrCopy = [...qrCopy, ...qrArr];
+      }
+
+      return qrCopy;
+    });
+
+    // setAnnotation(annoCopy);
+  };
+
+  // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   const lastestContentId = quotationData?.latestContent.id;
@@ -259,6 +339,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
     resetTrigger: quotationData,
+    onDoorTypeChange: onDoorTypeChange,
   });
 
   // const [targetProd, setTargetProd] = useState<Class_product>();
@@ -280,9 +361,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     deliveryLocation: '',
     deliveryDate: '',
   });
-
-  const [anno, setAnnotation] = useState<string[]>([]);
-  const [qr, setQr] = useState<string[]>([]);
 
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
@@ -558,23 +636,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     if (userId === reviewSalesEmployeeId) {
       isSales = true;
       isReviewer = true;
-    }
-
-    if (userId === reviewSupervisorEmployeeId) {
+    } else if (userId === reviewSupervisorEmployeeId) {
       if (salesReviewedAt) {
         isSupervisor = true;
         isReviewer = true;
       }
-    }
-
-    if (userId === reviewWorkDirectorEmployeeId) {
+    } else if (userId === reviewWorkDirectorEmployeeId) {
       if (salesReviewedAt && supervisorReviewedAt) {
         isWorkDirector = true;
         isReviewer = true;
       }
     }
-
-    if (userGrade >= 14) {
+    //  else if (userGrade >= 14) {
+    else if (userId === reviewManagerEmployeeId) {
       if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
@@ -1144,7 +1218,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
-    const lw = Number(prod.length || 0) || Number(prod.width || 0) * 100;
+    // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
+    const lw = Number(prod.fullWidth || 0) * 100;
     const h = Number(prod.height || 0) * 100;
     const b = Number(prod.boxB || 0) * 100;
 
@@ -1430,9 +1505,9 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
-  const subTotalStr = subTotal.ceil().toLocaleString();
-  const taxStr = tax.ceil().toLocaleString();
-  const totalStr = total.ceil().toLocaleString();
+  const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
+  const taxStr = Number(tax.toFixed(0)).toLocaleString();
+  const totalStr = Number(total.toFixed(0)).toLocaleString();
 
   return {
     subTotal: subTotalStr,

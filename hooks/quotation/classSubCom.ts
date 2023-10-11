@@ -50,9 +50,9 @@ class Class_SubCom {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._data.dualPrice = dualPrice.ceil().toNumber();
-    this._data.unitPrice = unitPrice.ceil().toNumber();
-    this._data.totalPrice = totalPrice.ceil().toNumber();
+    this._data.dualPrice = Number(dualPrice.toFixed(0));
+    this._data.unitPrice = Number(unitPrice.toFixed(0));
+    this._data.totalPrice = Number(totalPrice.toFixed(0));
 
     this._prod.calcProdAllprice_timeout();
 
@@ -81,6 +81,16 @@ class Class_SubCom {
   get price() {
     return `${this._data.price}`;
   }
+  get price_locale() {
+    return this._data.price.toLocaleString();
+  }
+  set price_locale(v) {
+    v = v ?? '0';
+    v = v.replace(/,/g, '');
+    this._data.price = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
   // set price(v) {
   //   this._data.price = Number(v);
   //   this.reRender();
@@ -88,6 +98,9 @@ class Class_SubCom {
 
   get unitPrice() {
     return `${this._data.unitPrice}`;
+  }
+  get unitPrice_locale() {
+    return this._data.unitPrice.toLocaleString();
   }
   // set unitPrice(v) {
   //   this._data.unitPrice = Number(v);
@@ -97,6 +110,9 @@ class Class_SubCom {
   get dualPrice() {
     return `${this._data.dualPrice}`;
   }
+  get dualPrice_locale() {
+    return this._data.dualPrice.toLocaleString();
+  }
   // set dualPrice(v) {
   //   this._data.dualPrice = Number(v);
   //   this.reRender();
@@ -104,6 +120,9 @@ class Class_SubCom {
 
   get totalPrice() {
     return `${this._data.totalPrice}`;
+  }
+  get totalPrice_locale() {
+    return this._data.totalPrice.toLocaleString();
   }
 
   get unit() {

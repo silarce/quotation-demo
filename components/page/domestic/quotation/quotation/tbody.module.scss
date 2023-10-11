@@ -45,6 +45,9 @@
 .hidden {
   opacity: 0;
   user-select: none;
+  > * {
+    display: none;
+  }
 }
 
 .buttonBox {

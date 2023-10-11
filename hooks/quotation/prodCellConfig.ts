@@ -45,7 +45,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  length: {
+  fullWidth: {
     label: 'L(m)', // 全寬
     theadItemClassName: 'text-center',
     inputSelProps: {
@@ -58,7 +58,7 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  width: {
+  WG: {
     label: 'W(m)', // WG
     theadItemClassName: 'text-center',
     inputSelProps: {
@@ -84,20 +84,6 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  // 後端說B(m)是boxB
-  // boxB: {
-  //   label: 'B(m)',
-  //   theadItemClassName: 'text-center',
-  //   inputSelProps: {
-  //     wrapperStyle: { width: '60px' },
-  //     inputProps: {
-  //       props: {
-  //         type: 'number',
-  //         className: 'text-center',
-  //       },
-  //     },
-  //   },
-  // },
   boxB: {
     label: 'B(m)',
     inputSelProps: {
@@ -226,11 +212,11 @@ const prodCellConfig: TcellConfig = {
   price: {
     label: '牌價',
     inputSelProps: {
-      showBaseline: 'invisible',
+      // showBaseline: 'invisible',
       wrapperStyle: { width: '120px' },
       inputProps: {
         props: {
-          disabled: true,
+          // disabled: true,
         },
       },
     },
@@ -443,6 +429,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
+          // classProduct.ts 的emptyProdOri有用到options
           options: [
             { value: '電動', label: '電動' },
             { value: '手動', label: '手動' },
@@ -457,6 +444,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '150px' },
       selectProps: {
         props: {
+          // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
           options: [
             { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
             { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
@@ -473,6 +461,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '150px' },
       selectProps: {
         props: {
+          // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
           options: [
             { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
             { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },

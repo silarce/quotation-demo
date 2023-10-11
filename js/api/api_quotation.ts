@@ -55,6 +55,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.managerReviewedAt',
       'latestContent.products.quantity',
       'latestContent.products.options',
+      'attachedToContract',
     ],
     ...params,
   };
@@ -397,8 +398,8 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       'content.reviewSupervisorEmployee',
 
       'content.products',
-      // 'content.products.items.accessories',
-      // 'content.products.items.components',
+      'content.products.items.accessories',
+      'content.products.items.components',
       'content.others',
 
       // 'rootContract.content.customer',

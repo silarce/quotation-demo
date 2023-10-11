@@ -95,16 +95,10 @@ export default function AttachContract() {
 
   // ------------------------------------------------------------------
 
-  // FIXME 變更與追加後計算的金額有誤
   const subTotal_ori = data?.subTotal ?? 0;
   const subTotal_calced = subTotal_ori + attachTotal;
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
-
-  // const subTotal_ori = data?.subTotal ?? 0;
-  // const subTotal_calced = subTotal_ori + attachTotal;
-  // const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05));
-  // const total_calced = subTotal_calced + salesTax_calced;
 
   const control_anno: TsummaryControl = {
     stringArr: data?.annotations ?? [],
@@ -307,7 +301,7 @@ export default function AttachContract() {
 
   const tagList: TtagList = [
     {
-      label: `合約編號 ${'foo'}`,
+      label: `合約編號 ${content?.quotationNumber}`,
       onClick: () => {},
     },
   ];
@@ -484,3 +478,41 @@ export default function AttachContract() {
     </SubLayer>
   );
 }
+
+/**
+
+追加追減流程
+在發包列表選擇合約，開始該合約的追加追減
+page url
+/domestic/contract/attachContract?contractId=uuid
+在這個介面可以設定、編輯要 追加追減 的主產品
+然後把 追加的主產品 還有 計入追加追減主產品後的 小計、營業稅、總計 送去給後端
+所以要怎麼把追減的部分交給後端?
+Gina說product裡面帶id，之後這個product就會有attachedToProductId
+可以用這個來判斷是不是追減的產品
+跟其他追加的產品同樣放在products這個property裡?
+這樣是不是怪怪的? products裡面可以放虛(追減)的資料嗎
+在追加追減後新增的報價單，我要怎麼呈現追減的資料?
+
+
+我覺得追加追減這樣處理應該會比較直觀且簡單
+在追加追減時，送給後端所有還存在的主產品
+就是包括原本的主產品，還有追加的主產品
+
+請後端在CreateModifyQuotationDto設一個property，只要可以存字串就好了
+由前端這裡紀錄該次追加追減的資料，轉成JSON後送給後端紀錄，這樣後端應該也不用加開資料表
+
+於是在追加追減比較表的追加追減項目的部分，我可以直接用這個property來呈現追加追減紀錄
+合約項目的部分也可以直接取content的products，
+而不用分析比較sunContract裡的資料，找出哪些是該呈現的哪些是不該呈現的
+
+
+
+其他問題
+追加追減介面一開始呈現的資料，是根合約，還是最新版的合約?
+是最新版的合約的合約的話，是應該只呈現追加的主產品，還是應該呈現所有還存在的主產品?
+
+以追加追減程序新增的報價單，是否可以被編輯?
+
+
+ */
