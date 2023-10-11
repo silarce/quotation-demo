@@ -898,6 +898,7 @@ export type TquotationProductDto = {
 
   attachedToProductId?: string | null;
   attachedToProduct?: TquotationProductDto | null;
+  rootProdductId?: string | null;
 
   quantity: number;
   // 門片厚度
