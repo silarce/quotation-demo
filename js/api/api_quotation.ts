@@ -101,6 +101,7 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewManagerEmployee',
 
       'latestContent.products.items.accessories',
       'latestContent.products.items.components',
