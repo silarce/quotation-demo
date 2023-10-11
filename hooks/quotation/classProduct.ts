@@ -2142,7 +2142,7 @@ class Class_product {
   }
 
   get isAttachDiv() {
-    if (this.reduceQty || this.exchangeQty) {
+    if (Number(this.reduceQty) || this.exchangeQty) {
       return true;
     }
 
