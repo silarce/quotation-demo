@@ -996,7 +996,7 @@ export type TquotationDto = {
   quotationNumber: string;
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
-  attachedToContract: TquotationContentDto & { verifyForm: TquotationVerifyFormDto };
+  attachedToContract?: TquotationContentDto & { verifyForm: TquotationVerifyFormDto };
 };
 
 export type TcreateQuotationProductDto = {
