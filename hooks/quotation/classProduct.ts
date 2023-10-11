@@ -622,8 +622,7 @@ class Class_product {
       return false;
     }
 
-    const fullWidth = Number(this.fullWidth || 0) + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
-    // Number(this.fullWidth) || Number(this.WG) + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
+    const fullWidth = Number(this.fullWidth || 0) * 1000 + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
 
     const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
       modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
@@ -640,7 +639,7 @@ class Class_product {
       bearingType: this._doorGeneralSpecs.bearingName,
       gearNumber: comList.motor?.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
-      fullWidth: fullWidth * 1000,
+      fullWidth: fullWidth,
 
       bottomBarAngleIron: this.bottomBarAngleIron,
       bottomBarPlate: this.bottomBarPlate,
@@ -2133,6 +2132,22 @@ class Class_product {
       installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
       installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
     };
+
+    return body;
+  }
+
+  get isAttachDiv() {
+    if (this.reduceQty || this.exchangeQty) {
+      return true;
+    }
+
+    return false;
+  }
+
+  get body_attachDiv() {
+    const body = this.body;
+    const divQty = Number(this.reduceQty) + this.exchangeQty;
+    body.quantity = body.quantity - divQty;
 
     return body;
   }

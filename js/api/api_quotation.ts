@@ -33,6 +33,7 @@ export type {
   TquotationContractDto,
   TcreateModifyQuotationDto,
   TquotationProductDto,
+  TcreateQuotationProductDto,
 } from './dtoTypes';
 
 type TgetQuotation = {
