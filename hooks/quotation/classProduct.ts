@@ -148,7 +148,7 @@ class Class_product {
     // 建立選配設定
     this.creAcceList();
     //建立 配電箱與按裝費
-    this.creSubComList();
+    this.creSubComList({ isNew: false });
 
     // ___________________________________________________________
     if (this._prodData.reduceQty) {
@@ -396,7 +396,7 @@ class Class_product {
 
   subComList: { [key: string]: Class_SubCom } = {};
 
-  creSubComList() {
+  creSubComList({ isNew = true }: { isNew?: boolean } = {}) {
     // 配電箱
     const distributionBox = new Class_SubCom({
       reRender: this.reRender,
@@ -410,6 +410,7 @@ class Class_product {
         unit: '組',
       },
       prod: this,
+      isNew,
     });
 
     // 安裝費
@@ -425,6 +426,7 @@ class Class_product {
         unit: 'M',
       },
       prod: this,
+      isNew,
     });
 
     this.subComList = { distributionBox, installationFee };

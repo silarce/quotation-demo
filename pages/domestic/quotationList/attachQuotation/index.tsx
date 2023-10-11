@@ -226,11 +226,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const isAttach = true;
 
-  const attachProdArr = useMemo(() => {
+  const { contractArr, contentArr, contentProdList } = useMemo(() => {
     const latestContent = quotationData?.latestContent;
     const attachedToContract = quotationData?.attachedToContract;
-
-    const list: { [key: string]: TquotationProductDto } = {};
 
     // 合約原本的主產品
     const contractProdArr = attachedToContract?.content.products;
@@ -238,44 +236,32 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // 可能帶有attachedToProductId
     const contentProdArr = latestContent?.products;
 
-    console.log(contractProdArr);
-    console.log(contentProdArr);
-
-    /*
-    
-    畫面下面要在放另外一組table
-    用來放追加的主產品
-
-    上面的主產品，放attachedToContract裡面的主產品
-    不過要reduceQty設為與對應attachedToProductId的主產品的數量相同
-
-    如果要做成可以編輯，
-    就要把contentProdArr中有attachedToProductId
-    送到contractProdArr相對應attachedToProductId的主產品(class型態)裡面
-
-    以變更新增的主產品不可以編輯數量
-    
-    */
+    const contractProdList: { [key: string]: TquotationProductDto } = {};
+    const contentProdList: { [key: string]: TquotationProductDto } = {};
 
     contractProdArr?.forEach((prod) => {
-      list[prod.id] = prod;
+      contractProdList[prod.id] = prod;
     });
 
     contentProdArr?.forEach((prod) => {
       if (prod.attachedToProductId) {
-        const oriQty = list?.[prod.attachedToProductId]?.quantity;
+        const oriQty = contractProdList?.[prod.attachedToProductId]?.quantity;
 
         if (oriQty !== undefined) {
           prod.reduceQty = oriQty - prod.quantity;
         }
 
-        list[prod.attachedToProductId] = prod;
+        // contractProdList[prod.attachedToProductId] = prod;
       } else {
-        list[prod.id] = prod;
+        contentProdList[prod.id] = prod;
       }
     });
 
-    return Object.values(list) ?? [];
+    return {
+      contractArr: Object.values(contractProdList),
+      contentArr: Object.values(contentProdList),
+      contentProdList,
+    };
   }, [quotationData]);
 
   // -----------------------------------------------------
@@ -361,6 +347,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
+
   const {
     productList,
     prodCellConfig,
@@ -389,17 +376,40 @@ function TheQuotation({ router }: { router: NextRouter }) {
     subTotal: quotationProdSubTotal,
     reset: resetClass,
     //
+    attachProdList,
+    addProd_attach,
   } = useProductList({
-    productArr: attachProdArr,
+    productArr: contractArr,
     others: quotationData?.latestContent.others,
-    resetTrigger: attachProdArr,
+    resetTrigger: contractArr,
     onDoorTypeChange: onDoorTypeChange,
+    productArr_attach: contentArr,
   });
 
-  // const [targetProd, setTargetProd] = useState<Class_product>();
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
 
+  const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
+  const targetProd_attach = attachProdList[targetProdKey_attach];
+
+  useEffect(() => {
+    if (!productList) {
+      return;
+    }
+
+    Object.values(productList).forEach((prod) => {
+      const childContent = prod.id ? contentProdList[prod.id] : undefined;
+      const qty = childContent?.quantity ? childContent?.quantity : undefined;
+
+      if (qty !== undefined) {
+        prod.reduceQty = String(Number(prod.quantity) - qty);
+      }
+    });
+  }, [productList]);
+
+  // -------------------------------------------------------
+  // -------------------------------------------------------
+  // -------------------------------------------------------
   const [summary, setSummary] = useState<{
     discountRate: string;
     subTotal: string;
@@ -1027,7 +1037,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return null;
       }
     })(),
-    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -1052,7 +1062,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         prodQty = prodQty + quantity;
 
         const preBody = {
-          ...prod.body,
+          // ...prod.body,
+          ...prod.body_attachDiv,
           order: index,
         };
 
@@ -1064,6 +1075,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         return preBody;
       }) ?? [];
+
+    const attachProdArr = Object.values(attachProdList).map((prod) => {
+      return prod.body;
+    });
 
     if (!data_watch.agentEmployee?.id) {
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
@@ -1108,7 +1123,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       //
       //
-      products: prodArr,
+      products: [...prodArr, ...attachProdArr],
       others: getOthersPostBodyArr(),
       // productsOrder: null,
       //
@@ -1371,7 +1386,44 @@ function TheQuotation({ router }: { router: NextRouter }) {
             />
           </div>
           {/* 備註/報價範圍/付款資訊 */}
+          {/*  */}
 
+          <div className={style.tableWrapper}>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={isAttach ? true : disabled}
+              prodList={attachProdList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd_attach}
+              setTargetProd={setTargetProdKey_attach}
+              // defalutVKeyArr={prodVKeyArr}
+              // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              onVKeyChange={() => {}}
+              rowHeight="h106"
+            />
+
+            {/* 材料配件設定 */}
+            <div className="relative mt-[14px]">
+              <Table_com
+                disabled={disabled}
+                // comList={targetProd?.comList}
+
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                comList={{ ...targetProd_attach?.comList, ...targetProd_attach?.subComList }}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={() => {}}
+                // defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+          </div>
+
+          {/*  */}
           <Summary
             disabled={disabled}
             payInfoControl={payInfoControl}

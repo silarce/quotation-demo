@@ -59,6 +59,7 @@ const useProductList = ({
   others,
   resetTrigger,
   onDoorTypeChange,
+  productArr_attach,
 }: {
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
@@ -69,6 +70,7 @@ const useProductList = ({
     annoArr: string[] | undefined;
     qrArr: string[] | undefined;
   }) => void;
+  productArr_attach?: TquotationProductDto[] | undefined;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -453,6 +455,82 @@ const useProductList = ({
     reRender();
   };
 
+  useEffect(() => {
+    if (productArr_attach && doorModelList) {
+      const list: TproductList = {};
+
+      productArr_attach.forEach((prod) => {
+        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+        if (key in list) {
+          key = nanoid();
+        }
+
+        const prodData: Tprod = {
+          ...prod,
+          phase: prod.motorPhase,
+          voltage: String(prod.motorVoltage),
+          motorSupport: prod.hasMotorSupportStand,
+          doorTrackThick: String(prod.guideRailThickness),
+          rollUpBoxThick: String(prod.headBoxThickness),
+          // 取得時是mm，要轉成m
+          WG: String(Number(prod.WG) / 1000),
+          fullWidth: String(Number(prod.fullWidth) / 1000),
+          height: String(Number(prod.height) / 1000),
+          boxB: String(Number(prod.boxB) / 1000),
+          boxD: String(Number(prod.boxD) / 1000),
+          // options: prod.options ?? [],
+
+          // quantity: prod.items?.length ?? 0,
+          // quantity: prod.quantity ?? 0,
+          // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
+          accessories: prod.items?.[0].accessories ?? [],
+          components: prod.items?.[0].components ?? [],
+          //
+
+          doorType: prod.doorModelName,
+          material: prod.materialName,
+          surface: prod.materialSurface,
+          close: prod.closingType,
+          doorTrack: prod.guideRail,
+          typhoonProtection: prod.isAntiTyphoon,
+          motor: prod.motorVendor,
+          doorTrackSilencerStrip: prod.hasSilencingStrip,
+          onePieceRollUpBox: prod.isIntegratedHeadBox,
+          thickness: String(prod.thickness ?? ''),
+          bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
+        };
+
+        // const newKey = nanoid();
+        // const classProd = new Class_product({
+        //   reRender,
+        //   prodData: prodData,
+        //   delSelf: () => delSelf_prod(productList_attach, newKey),
+        //   copySelf: () => {
+        //     copySelf_prod(productList_attach, newKey);
+        //   },
+        //   callCalcSubTotal,
+        //   doorModelList,
+        //   onDoorTypeChange: onClassDoorTypeChange,
+        // });
+
+        list[key] = new Class_product({
+          reRender,
+          prodData,
+          delSelf: () => delSelf_prod(list, key),
+          copySelf: () => copySelf_prod(list, key),
+          callCalcSubTotal,
+          doorModelList,
+          originProd: prod,
+          onDoorTypeChange: onClassDoorTypeChange,
+          disabled_quantity: true,
+        });
+      });
+
+      setProductList_attach(list);
+    }
+  }, [productArr_attach]);
+
   // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
   // 以後最好還是做成狀態較好
   const attachProdList: { [key: string]: Class_product } = {};
@@ -481,9 +559,6 @@ const useProductList = ({
   Object.values(productList).forEach((item) => {
     attachDivTotal = attachDivTotal - Number(item.reduceExchangePrice);
   });
-
-  // console.log('attachAddTotal', attachAddTotal);
-  // console.log('attachDivTotal', attachDivTotal);
 
   const attachTotal = attachAddTotal + attachDivTotal;
 
