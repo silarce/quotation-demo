@@ -134,13 +134,13 @@ export default function QuotationRecord({
             // const preContentProdArr = preContent?.content.products;
 
             contentProdArr.forEach((prod) => {
-              if (!prod.rootProdductId) {
+              if (!prod.rootProductId) {
                 rootProdList[prod.id] = _.cloneDeep(prod);
               } else {
-                const rootQty = rootProdList[prod.rootProdductId].quantity;
+                const rootQty = rootProdList[prod.rootProductId].quantity;
                 const copy = _.cloneDeep(prod);
                 copy.quantity = rootQty - prod.quantity;
-                rootProdList[prod.rootProdductId] = prod;
+                rootProdList[prod.rootProductId] = prod;
                 prod = copy;
               }
             });

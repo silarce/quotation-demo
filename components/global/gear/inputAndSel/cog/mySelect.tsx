@@ -137,7 +137,9 @@ export default function MySelect<
         ref={selectRef as any} // 實在是不知道怎麼設這個型別
         isSearchable={isSearchable ?? false}
         openMenuOnFocus={openMenuOnFocus}
+        // ---------這樣比較好找-----------------------------------------------
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
+        // ---------這樣比較好找-----------------------------------------------
         classNames={{
           container: (state) => classNames(scss.selContainer, selClassNames?.container?.(state)),
           control: (state) => classNames(scss.selControl, selClassNames?.control?.(state)),

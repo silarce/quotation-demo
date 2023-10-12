@@ -8,7 +8,13 @@ const { Panel } = Collapse;
 import scss from './filterPanel.module.scss';
 
 // type
-import type { TprodClassOptions, TdoorTypeOptions, TpartOptions, TfilterCtrl } from 'pages/setting/productList';
+import type {
+  TcheckOption,
+  // TprodClassOptions,
+  // TdoorTypeOptions,
+  // TpartOptions,
+  TfilterCtrl,
+} from 'pages/setting/productList';
 
 // =============================================================================
 export default function FilterPanel({
@@ -17,12 +23,15 @@ export default function FilterPanel({
   partOptions,
   filterCtrl,
 }: {
-  prodClassOptions: TprodClassOptions;
-  doorTypeOptions: TdoorTypeOptions;
-  partOptions: TpartOptions;
+  // prodClassOptions: TprodClassOptions;
+  // doorTypeOptions: TdoorTypeOptions;
+  // partOptions: TpartOptions;
+  prodClassOptions: TcheckOption[];
+  doorTypeOptions: TcheckOption[];
+  partOptions: TcheckOption[];
   filterCtrl: TfilterCtrl;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const switchPanel = () => setIsOpen(!isOpen);
 

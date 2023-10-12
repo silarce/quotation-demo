@@ -1,0 +1,50 @@
+@use "styles/theme01" as *;
+
+.container {
+  margin-left: 57px;
+  .title {
+    font-size: 20px;
+    color: $colorMain;
+    margin-bottom: 25px;
+  }
+}
+
+.checkGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 25px 0;
+
+  :global(.ant-checkbox-wrapper) {
+    > span {
+      font-size: 18px;
+    }
+    &:global(.ant-checkbox-wrapper-disabled) {
+      > span {
+        color: $colorSub;
+      }
+    }
+  }
+
+  :global(.ant-checkbox) {
+    top: 1px;
+    :global(.ant-checkbox-inner) {
+      // width: 15px;
+      // height: 15px;
+      border-color: $colorBorder01;
+    }
+  }
+
+  :global(.ant-checkbox-checked) {
+    :global(.ant-checkbox-inner) {
+      background-color: $colorMain;
+    }
+  }
+
+  :global(.ant-checkbox-disabled) {
+    :global(.ant-checkbox-inner) {
+      &::after {
+        border-color: #fff;
+      }
+    }
+  }
+}

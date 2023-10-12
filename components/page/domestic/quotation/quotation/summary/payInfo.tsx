@@ -38,6 +38,7 @@ export type Tcontrol = {
       label: string;
       value: string;
       onChange: (v: string) => void;
+      onChangeMilestone?: (v: string) => void;
       delSelf: (index: number) => void;
     }[];
     addMethod: (v: string) => void;
@@ -153,13 +154,20 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
         <div className={classNames(scss.payMethodContainer, 'relative')}>
           <span>付款辦法</span>
           {paymentMethod.arr.map((item, index) => {
-            const { label, value, onChange, delSelf } = item;
+            const { label, value, onChange, onChangeMilestone, delSelf } = item;
 
             return (
               <div key={index} className={classNames(scss.inputBox02, scss.legacy)}>
                 <IconRemoveCircle className={scss.btn} onClick={() => delSelf(index)} />
                 <span className={scss.label}>
-                  {index + 1}.{label}
+                  {/* {index + 1}.{label} */}
+                  {index + 1}.
+                  <input
+                    type="text"
+                    value={label ?? ''}
+                    onChange={(e) => onChangeMilestone?.(e.target.value)}
+                    disabled={disabled}
+                  />
                 </span>
                 <InputSel
                   disabled={disabled}

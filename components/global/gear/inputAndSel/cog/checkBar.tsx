@@ -22,23 +22,24 @@ type TcheckProps = {
   propsList: {
     [key: string]: {
       value: boolean;
-      label: string;
+      label?: string;
       disabled?: boolean;
       className?: string;
       style?: CSSProperties;
     };
   };
-  onChange: (v: Tcheck) => void;
+  onChange?: (v: Tcheck) => void;
   checkStyle?: CSSProperties;
   isRadio?: boolean;
+  toAside?: 'left';
 };
 
 type Tcheck = { [key: string]: boolean };
 
 export type { TcheckProps };
 
-export default function CheckBar({ checkProps }: { checkProps: TcheckProps }) {
-  const { propsList, onChange, checkStyle, isRadio } = checkProps;
+export default function CheckBar({ checkProps, disabled }: { checkProps: TcheckProps; disabled?: boolean }) {
+  const { propsList, onChange, checkStyle, isRadio, toAside: textAlign } = checkProps;
 
   const [checkList, setCheckList] = useState<Tcheck>({});
 
@@ -53,18 +54,23 @@ export default function CheckBar({ checkProps }: { checkProps: TcheckProps }) {
     });
     setCheckList(list);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [propsList]);
+  }, []);
+  // 如果要做成外控制會造成無限循環，有空時要修改
+  // }, [propsList])
 
+  // 如果要做成外控制會造成無限循環，有空時要修改
   useEffect(() => {
-    onChange(checkList);
+    if (onChange) {
+      onChange(checkList);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkList]);
 
   return (
-    <div className={classNames(scss.checkBar)}>
+    <div className={classNames(scss.checkBar, { [scss[`aside${textAlign}`]]: textAlign })}>
       {keyArr.map((key) => {
         const value = checkList[key];
-        const { label, disabled, className, style } = propsList[key];
+        const { label, disabled: disabled_item, className, style } = propsList[key];
 
         const onChange = (v: boolean) => {
           const copy = { ...checkList };
@@ -79,14 +85,20 @@ export default function CheckBar({ checkProps }: { checkProps: TcheckProps }) {
           setCheckList(copy);
         };
 
+        const theDisabled = disabled_item !== undefined ? disabled_item : disabled;
+
         return (
-          <label key={key} style={{ ...checkStyle, ...style }} className={classNames(scss.wrapper, className)}>
-            <span>{label}</span>
+          <label
+            key={key}
+            style={{ ...checkStyle, ...style }}
+            className={classNames(scss.wrapper, { [scss[`aside${textAlign}`]]: textAlign }, className)}
+          >
+            {label && <span>{label}</span>}
             <Checkbox
               className={classNames(scss.antdCheck)}
               checked={value}
               onChange={(e) => onChange(e.target.checked)}
-              disabled={disabled}
+              disabled={theDisabled}
             />
           </label>
         );

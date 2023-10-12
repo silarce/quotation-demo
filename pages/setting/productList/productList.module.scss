@@ -1,6 +1,18 @@
 @use "styles/theme01" as *;
-@use "styles/layout" as *;
 
-.mainContainer {
+.subLayer {
+  overflow: hidden !important;
+}
+
+.wrapper {
   padding: 4px;
+  height: 100%;
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
+}
+
+.main {
+  margin-top: 4px;
+  height: 100%;
+  overflow: hidden;
 }

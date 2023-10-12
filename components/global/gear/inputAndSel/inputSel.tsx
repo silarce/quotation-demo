@@ -18,7 +18,8 @@ import MustTip_simple from '../other/mustTip_simple';
 // css
 import scss from './inputSel.module.scss';
 
-export type { TselectProps, TinputProps };
+// export type { TselectProps, TinputProps };
+export type { TinputProps, TselectProps, TtextareaProps, TdatePickerProps, TtimePickerProps, TcheckProps };
 
 // =============================================================================
 
@@ -195,6 +196,14 @@ export default function InputSel({
           placeholder={placeholder}
           disabled={disabled}
         />
+      )}
+
+      {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />}
+
+      {checkProps && <CheckBar checkProps={checkProps} disabled={disabled} />}
+
+      {showBaseline !== 'invisible' && (
+        <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
       )}
 
       {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />}

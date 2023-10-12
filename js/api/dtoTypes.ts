@@ -873,7 +873,7 @@ export type TquotationProductDto = {
   dualPrice: number;
   // 複價
   totalPrice: number;
-  // // 防颱
+  // 防颱
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
@@ -917,7 +917,7 @@ export type TquotationProductDto = {
   attachedToProductId?: string | null;
   attachedToProduct?: TquotationProductDto | null;
   // api實際上還沒加上去
-  rootProdductId?: string | null;
+  rootProductId: string;
 
   // 前端用的，後端沒有
   // 只是為了方便才寫在這邊
