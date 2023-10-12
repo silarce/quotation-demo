@@ -368,36 +368,47 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
-    if (!quotationData) {
-      return;
+    if (quotationData) {
+      const {
+        //
+        discount,
+        subTotal,
+        salesTax,
+        total,
+        deliveryLocation,
+        deliveryDate,
+        paymentMethods,
+        annotations,
+        quotationRanges,
+      } = quotationData.latestContent;
+
+      setAnnotation(annotations ?? []);
+      setQr(quotationRanges ?? []);
+      setPaymentMethod(paymentMethods);
+
+      setSummary({
+        discountRate: discount,
+        subTotal: String(subTotal),
+        salesTax: String(salesTax),
+        total: String(total),
+        deliveryLocation,
+        deliveryDate,
+      });
+    } else {
+      setAnnotation([]);
+      setQr([]);
+      setPaymentMethod([]);
+
+      setSummary({
+        discountRate: '',
+        subTotal: '',
+        salesTax: '',
+        total: 'String(total)',
+        deliveryLocation: '',
+        deliveryDate: '',
+      });
     }
-
-    const {
-      //
-      discount,
-      subTotal,
-      salesTax,
-      total,
-      deliveryLocation,
-      deliveryDate,
-      paymentMethods,
-      annotations,
-      quotationRanges,
-    } = quotationData.latestContent;
-
-    setAnnotation(annotations ?? []);
-    setQr(quotationRanges ?? []);
-    setPaymentMethod(paymentMethods);
-
-    setSummary({
-      discountRate: discount,
-      subTotal: String(subTotal),
-      salesTax: String(salesTax),
-      total: String(total),
-      deliveryLocation,
-      deliveryDate,
-    });
-  }, [quotationData]);
+  }, [quotationData, disabled]);
 
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
@@ -570,6 +581,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       arr: paymentMethod.map((item, index) => {
         const { milestone, totalPaymentRatio } = item;
 
+        const onChangeMilestone = (v: string) => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy[index].milestone = v;
+
+            return copy;
+          });
+        };
+
         const onChange = (v: string) => {
           setPaymentMethod((state) => {
             const copy = [...state];
@@ -592,6 +612,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           label: milestone,
           value: totalPaymentRatio,
           onChange,
+          onChangeMilestone,
           delSelf,
         };
         //
@@ -865,6 +886,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   useEffect(() => {
     reNewClassQuotation();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
 
