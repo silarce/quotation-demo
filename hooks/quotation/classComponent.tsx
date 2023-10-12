@@ -58,7 +58,7 @@ class Class_component {
         this.calcAllPrice();
       }, 0);
     } else {
-      // this.calcAllPrice();
+      this.calcAllPrice({ calcProdTotal: false });
     }
 
     // =constructor
@@ -108,7 +108,7 @@ class Class_component {
     }
   };
 
-  calcAllPrice() {
+  calcAllPrice({ calcProdTotal = true }: { calcProdTotal?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
 
     const quantity = Number(this._com.quantity || 0);
@@ -125,7 +125,9 @@ class Class_component {
     this._unitPrice = Number(unitPrice.toFixed(0));
     this._totalPrice = Number(totalPrice.toFixed(0));
 
-    this._prod.calcProdAllprice_timeout();
+    if (calcProdTotal) {
+      this._prod.calcProdAllprice_timeout();
+    }
 
     this.reRender();
   }
