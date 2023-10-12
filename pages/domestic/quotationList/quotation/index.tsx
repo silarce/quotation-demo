@@ -400,7 +400,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setPaymentMethod([]);
 
       setSummary({
-        discountRate: '',
+        discountRate: '100',
         subTotal: '',
         salesTax: '',
         total: '',
