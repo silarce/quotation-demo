@@ -1,0 +1,47 @@
+@use "styles/theme01" as *;
+
+.profile {
+  display: grid;
+  grid-template-columns: auto fit-content(100%);
+  gap: 58px;
+  margin: 35px 42px;
+  .left {
+    .top {
+      display: grid;
+      gap: 15px;
+      margin-bottom: 21px;
+    }
+
+    hr {
+      border-color: $colorBorder01;
+      // margin: 21px 0;
+    }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr;
+      gap: 15px 50px;
+      justify-content: space-between;
+      margin-top: 21px;
+    }
+  }
+  .right {
+    display: grid;
+    gap: 15px;
+    width: 400px;
+    padding: 20px 24px;
+    background-color: $bgc01;
+  }
+}
+
+.inputSel {
+  > div {
+    span {
+      font-size: 18px;
+      font-weight: 400;
+    }
+  }
+  input {
+    font-size: 18px;
+  }
+}

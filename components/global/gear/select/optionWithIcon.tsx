@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 import { components } from 'react-select';
 
 import { OptionProps } from 'react-select';
@@ -22,7 +24,7 @@ export function OptionWithIcon01(
   const { label, icon } = data;
 
   return (
-    <Option {...props} className={style.option}>
+    <Option {...props} className={classNames(style.option, className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {icon && <img src={icon} alt="iconImg" />}
       {showLabel && <span>{label}</span>}
