@@ -403,7 +403,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         discountRate: '',
         subTotal: '',
         salesTax: '',
-        total: 'String(total)',
+        total: '',
         deliveryLocation: '',
         deliveryDate: '',
       });
