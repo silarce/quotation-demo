@@ -665,7 +665,7 @@ export type TannotationDto = {
   /**類別 */
   category: string;
   /**門型 */
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
   type: 'normal' | 'anti-typhoon';
   /**內容 */
@@ -674,14 +674,14 @@ export type TannotationDto = {
 
 export type TcreateAnnotationDto = {
   category: string;
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   type: 'normal' | 'anti-typhoon';
   description: string;
 };
 
 export type TcreateQuotationRangeDto = {
   category: string;
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   type: 'normal' | 'anti-typhoon';
   description: string;
 };
@@ -693,7 +693,7 @@ export type TquotationRangeDto = {
   /**類別 */
   category: string;
   /**門型 */
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
   type: 'normal' | 'anti-typhoon';
   /**內容 */

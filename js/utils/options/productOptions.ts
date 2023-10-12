@@ -74,6 +74,26 @@ export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): T
   return arr;
 };
 
+/**後端可以接收的門型 */
+export const optionsCreator_doorModel_2 = (props: { haveEmpty?: boolean } = {}): Toption[] => {
+  const { haveEmpty } = props;
+  const arr = [
+    { value: 'SJ-302', label: 'SJ-302' },
+    // { value: 'SJ-312', label: 'SJ-312' },
+    // { value: 'SJ-305D', label: 'SJ-305D' },
+    // { value: 'SJ-303A', label: 'SJ-303A' },
+    // { value: 'SJ-303AS', label: 'SJ-303AS' },
+    // { value: 'SJ-120A', label: 'SJ-120A' },
+    // { value: 'SJ-303S', label: 'SJ-303S' },
+  ];
+
+  if (haveEmpty) {
+    addEmpty(arr);
+  }
+
+  return arr;
+};
+
 // 門的形式
 export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;

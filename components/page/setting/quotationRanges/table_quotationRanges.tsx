@@ -13,7 +13,7 @@ import scss from './table_quotationRanges.module.scss';
 // options
 import {
   optionsCreator_category,
-  optionsCreator_doorModel,
+  optionsCreator_doorModel_2,
   optionsCreator_doorForm,
 } from 'js/utils/options/productOptions';
 
@@ -30,7 +30,7 @@ import { TuseClassQuotationRange } from 'pages/setting/quotationRanges';
 
 // =======================================================================
 const optionArr_category = optionsCreator_category();
-const optionArr_doorModel = optionsCreator_doorModel();
+const optionArr_doorModel = optionsCreator_doorModel_2();
 const optionArr_doorForm = optionsCreator_doorForm();
 
 // =======================================================================
