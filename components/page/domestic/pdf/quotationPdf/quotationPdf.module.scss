@@ -10,6 +10,9 @@ $semiMaring: 0 8px;
 
 // ant-modal
 .quotationPdf {
+  * {
+    font-family: Microsoft JhengHei;
+  }
   :global(.ant-modal-content) {
   }
   :global(.ant-modal-body) {

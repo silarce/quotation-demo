@@ -150,7 +150,7 @@ const config: Tconfig = {
   },
   size: {
     label: '尺寸(單位:cm)',
-    width: '130px',
+    width: '140px',
   },
   doorType: {
     label: '門型',
