@@ -1,6 +1,7 @@
 // reqModify
+// apiGetQuotationProducts
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 import classNames from 'classnames';
@@ -32,8 +33,9 @@ import {
   apiQuotationModify,
   TcreateModifyQuotationDto,
   TcreateQuotationProductDto,
+  TquotationProductDto,
 } from 'js/api/api_quotation';
-import { useGetContract_id, useQuotation_id_attachments } from 'js/api/api_quotation';
+import { useGetContract_id, useQuotation_id_attachments, apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -54,7 +56,39 @@ export default function AttachContract() {
     update();
   }, [contractId]);
 
-  const content = data?.content;
+  // const content = data?.content;
+
+  const formatedContent = useMemo(() => {
+    if (!data) {
+      return undefined;
+    }
+
+    const content_copy = _.cloneDeep(data.content);
+
+    const subContracts = data.subContracts;
+    const list: { [key: string]: TquotationProductDto } = {};
+
+    let subTotal = 0;
+    let salesTax = 0;
+    let total = 0;
+
+    subContracts.forEach((contract) => {
+      subTotal += contract.content.subTotal;
+      salesTax += contract.content.salesTax;
+      total += contract.content.total;
+      const prodArr = contract.content.products;
+      prodArr.forEach((prod) => {
+        list[prod.rootProductId] = prod;
+      });
+    });
+
+    content_copy.products = Object.values(list);
+    content_copy.subTotal = subTotal;
+    content_copy.salesTax = salesTax;
+    content_copy.total = total;
+
+    return content_copy;
+  }, [data]);
 
   // ------------------------------------------------------------------
   const {
@@ -91,8 +125,8 @@ export default function AttachContract() {
     attachDivTotal,
     attachTotal,
   } = useProductList({
-    productArr: data?.content.products,
-    others: data?.content.others,
+    productArr: formatedContent?.products,
+    others: formatedContent?.others,
     resetTrigger: data,
   });
 
@@ -101,6 +135,27 @@ export default function AttachContract() {
 
   const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
   const targetProd_attach = attachProdList[targetProdKey_attach];
+
+  useEffect(() => {
+    (async () => {
+      if (targetProd?.id) {
+        try {
+          targetProd.isLoading_getProd = true;
+          const res = await apiGetQuotationProducts(targetProd.id);
+          const componentsArr = res.items?.[0].components ?? [];
+          const acceArr = res.items?.[0].accessories ?? [];
+
+          targetProd.creComList_dyna({ componentsArr: componentsArr });
+          targetProd.creAcceList_dyna({ acceArr });
+        } catch (error) {
+        } finally {
+          targetProd.isLoading_getProd = false;
+        }
+      }
+    })();
+
+    // apiGetQuotationProducts
+  }, [targetProd]);
 
   // ------------------------------------------------------------------
 
@@ -111,18 +166,18 @@ export default function AttachContract() {
 
   const control_anno: TsummaryControl = {
     stringArr: data?.annotations ?? [],
-    editString: (index, v) => {},
-    addString: (v: string) => {},
-    delString: (index: number) => {},
-    addStrArr: (vArr: string[]) => {},
+    editString: () => {},
+    addString: () => {},
+    delString: () => {},
+    addStrArr: () => {},
   };
 
   const control_qr: TsummaryControl = {
     stringArr: data?.quotationRanges ?? [],
-    editString: (index, v) => {},
-    addString: (v: string) => {},
-    delString: (index: number) => {},
-    addStrArr: (vArr: string[]) => {},
+    editString: () => {},
+    addString: () => {},
+    delString: () => {},
+    addStrArr: () => {},
   };
 
   const payInfoControl: TpayInfoControl = {
@@ -131,7 +186,7 @@ export default function AttachContract() {
         inputAttr: {
           disabled: true,
           value: data?.discount ?? '',
-          onChange: (e) => {},
+          onChange: () => {},
         },
       },
       subTotal: {
@@ -157,16 +212,16 @@ export default function AttachContract() {
     delivery: {
       deliveryLocation: {
         value: data?.deliveryLocation ?? '',
-        onChange: (v) => {},
+        onChange: () => {},
       },
       deliveryDate: {
         value: data?.deliveryDate ?? '',
-        onChange: (v) => {},
+        onChange: () => {},
       },
     },
     paymentMethod: {
       arr:
-        data?.paymentMethods.map((item, index) => {
+        data?.paymentMethods.map((item) => {
           const { milestone, totalPaymentRatio } = item;
 
           return {
@@ -177,7 +232,7 @@ export default function AttachContract() {
           };
           //
         }) ?? [],
-      addMethod: (v) => {},
+      addMethod: () => {},
     },
   };
 
@@ -186,7 +241,7 @@ export default function AttachContract() {
       label: '總經理',
       inputProps: {
         props: {
-          value: content?.reviewManagerEmployee?.chName ?? '',
+          value: formatedContent?.reviewManagerEmployee?.chName ?? '',
         },
       },
     },
@@ -194,7 +249,7 @@ export default function AttachContract() {
       label: '工務主管',
       inputProps: {
         props: {
-          value: content?.reviewWorkDirectorEmployee?.chName ?? '',
+          value: formatedContent?.reviewWorkDirectorEmployee?.chName ?? '',
         },
       },
     },
@@ -202,7 +257,7 @@ export default function AttachContract() {
       label: '主管',
       inputProps: {
         props: {
-          value: content?.reviewSupervisorEmployee?.chName ?? '',
+          value: formatedContent?.reviewSupervisorEmployee?.chName ?? '',
         },
       },
     },
@@ -210,7 +265,7 @@ export default function AttachContract() {
       label: '業務',
       inputProps: {
         props: {
-          value: content?.reviewSalesEmployee?.chName ?? '',
+          value: formatedContent?.reviewSalesEmployee?.chName ?? '',
         },
       },
     },
@@ -218,14 +273,14 @@ export default function AttachContract() {
       label: '經辦',
       inputProps: {
         props: {
-          value: content?.agentEmployee?.chName ?? '',
+          value: formatedContent?.agentEmployee?.chName ?? '',
         },
       },
     },
   ];
 
   // 附件
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(formatedContent?.id);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -265,7 +320,8 @@ export default function AttachContract() {
 
       const content = _.cloneDeep(data.content);
 
-      //
+      // 追減，要送給後端的是追減後的資料
+      // 原本五個，追減兩個，送給後端的要是三個
       const divProdArr = (() => {
         const arr = Object.values(productList).map((item) => {
           if (item.isAttachDiv) {
@@ -293,6 +349,9 @@ export default function AttachContract() {
         subTotal: subTotal_calced,
         salesTax: salesTax_calced,
         total: total_calced,
+
+        // TODO 總樘數也要更新
+        // quantity: 999,
       };
 
       let hasSurface = true;
@@ -325,7 +384,7 @@ export default function AttachContract() {
 
   const tagList: TtagList = [
     {
-      label: `合約編號 ${content?.quotationNumber}`,
+      label: `合約編號 ${formatedContent?.quotationNumber}`,
       onClick: () => {},
     },
   ];
@@ -440,7 +499,7 @@ export default function AttachContract() {
               setTargetProd={setTargetProdKey_attach}
               defalutVKeyArr={Object.keys(attachProdList)}
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              onVKeyChange={(keyArr) => {}}
+              onVKeyChange={() => {}}
               rowHeight="h106"
               // isAttach={true}
               // panelBox="resetChangeBox"

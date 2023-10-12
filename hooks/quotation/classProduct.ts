@@ -171,6 +171,7 @@ class Class_product {
   readonly disabled_quantity;
 
   isLoading = false;
+  isLoading_getProd = false;
 
   //
   // from api
@@ -267,7 +268,7 @@ class Class_product {
     // });
     this.reRender();
   }
-
+  /**配合apiGetQuotationProducts使用 */
   creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentsDto[] }) {
     const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
     componentsArr.forEach((item) => {
@@ -369,7 +370,7 @@ class Class_product {
     this.accessoriesList = list;
     this.reRender();
   }
-
+  /**配合apiGetQuotationProducts使用 */
   creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoriesDto[] }) {
     // const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
@@ -1986,6 +1987,10 @@ class Class_product {
   addExchange(v: string) {
     if (Number(v) > this.remainQty) {
       return false;
+    }
+
+    if (this.isLoading_getProd) {
+      return 'isLoading_getProd';
     }
 
     const copy = _.cloneDeep(this.body_Tprod);

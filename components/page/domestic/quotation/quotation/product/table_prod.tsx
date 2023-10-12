@@ -73,6 +73,8 @@ export default function Table_prod({
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });
+    } else if (ressult === 'isLoading_getProd') {
+      myAlert.warning({ title: '正在取得產品資料' });
     } else {
       setShowInputModal(false);
     }

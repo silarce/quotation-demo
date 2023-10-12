@@ -1,3 +1,5 @@
+// apiGetQuotationProducts
+
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
@@ -105,6 +107,7 @@ export const apiGetQuotation_Id = async (id: string) => {
 
       'latestContent.products.items.accessories',
       'latestContent.products.items.components',
+      'latestContent.products.items.rootProdductId',
       'latestContent.others',
       'latestContent.verifyForm',
 
@@ -476,7 +479,7 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
 
       // 'attachedToContract',
       // 'attachedContract',
-      // 'subContracts.content.products',
+      'subContracts.content.products.rootProdductId',
     ],
   };
 
