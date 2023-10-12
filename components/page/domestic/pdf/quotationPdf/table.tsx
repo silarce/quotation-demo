@@ -36,7 +36,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
             <span>
               {label === '開閉方式' ? (
                 <>
-                  <span>開閉</span> <br />
+                  <span>開閉</span>
                   <span>方式</span>
                 </>
               ) : (
@@ -178,12 +178,12 @@ const config: Tconfig = {
   },
   horsepower: {
     label: '馬力',
-    width: '95px',
+    width: '75px',
     align: 'right',
   },
   openType: {
     label: '開閉方式',
-    width: '40px',
+    width: '75px',
     align: 'center',
   },
   qty: {
@@ -204,7 +204,7 @@ const config: Tconfig = {
   },
   memo: {
     label: '備註',
-    width: '95px',
+    width: '60px',
     align: 'center',
   },
 };
