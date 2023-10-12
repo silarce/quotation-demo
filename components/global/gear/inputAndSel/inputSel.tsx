@@ -199,16 +199,10 @@ export default function InputSel({
       )}
 
       {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />}
+      {/* {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />} */}
 
       {checkProps && <CheckBar checkProps={checkProps} disabled={disabled} />}
-
-      {showBaseline !== 'invisible' && (
-        <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
-      )}
-
-      {timePickerProps_mui && <MyTimePicker_mui timePickerProps_mui={timePickerProps_mui} />}
-
-      {checkProps && <CheckBar checkProps={checkProps} />}
+      {/* {checkProps && <CheckBar checkProps={checkProps} />} */}
 
       {suffix && (
         <div className={classNames(scss.suffix, suffixClassName)}>
@@ -216,6 +210,9 @@ export default function InputSel({
         </div>
       )}
 
+      {/* {showBaseline !== 'invisible' && (
+        <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
+      )} */}
       {showBaseline !== 'invisible' && (
         <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
       )}
