@@ -14,6 +14,7 @@ import scss from './classComponent.module.scss';
 
 import { TgenerateDoorProductBomDto_ComponentInfo } from 'js/api/api_product';
 import { TcomponentKey } from './useProduct';
+import { prodCellConfig } from './prodCellConfig';
 
 // ===========================================================
 class Class_component {
@@ -414,6 +415,11 @@ class Class_component {
     }
 
     this.callReqGetCodeNumber();
+
+    if (this.key === 'bottomBar') {
+      this.desc = creDesc_bottomBars(this);
+    }
+
     this.reRender();
   }
 
@@ -864,15 +870,35 @@ const creDesc_slats = (classCom: Class_component) => {
 };
 
 const creDesc_bottomBars = (classCom: Class_component) => {
-  const { isAntiTyphoon, isWaterProof, hasAluminumBarrier } = classCom;
+  const {
+    // isAntiTyphoon,    isWaterProof,      hasAluminumBarrier ,
+    material,
+  } = classCom;
 
-  const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
-  const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
-  const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
+  const bottomBarAngleIron_options = prodCellConfig.bottomBarAngleIron.inputSelProps.selectProps!.props!
+    .options! as Toption[];
+
+  let desc = '';
+
+  if (material.includes('鍍鋅')) {
+    desc = bottomBarAngleIron_options[0].value;
+  } else if (material.includes('高耐鍍鋅鋼板')) {
+    desc = bottomBarAngleIron_options[1].value;
+  } else if (material.includes('304')) {
+    desc = bottomBarAngleIron_options[2].value;
+  } else if (material.includes('316')) {
+    desc = bottomBarAngleIron_options[3].value;
+  } else {
+    desc = bottomBarAngleIron_options[2].value;
+  }
+
+  // const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
+  // const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
+  // const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
 
   // return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
   // 50*50*4T 錏 後端沒有給類似格式的的資料
-  return ``;
+  return `${desc}`;
 };
 
 const creDesc_guideRails = (classCom: Class_component) => {
