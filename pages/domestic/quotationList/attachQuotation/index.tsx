@@ -248,7 +248,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         const oriQty = contractProdList?.[prod.attachedToProductId]?.quantity;
 
         if (oriQty !== undefined) {
-          prod.reduceQty = oriQty - prod.quantity;
+          // prod.reduceQty = oriQty - prod.quantity;
+          if (contractProdList?.[prod.attachedToProductId]) {
+            contractProdList[prod.attachedToProductId].reduceQty = oriQty - prod.quantity;
+          }
         }
 
         // contractProdList[prod.attachedToProductId] = prod;
