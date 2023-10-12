@@ -1283,6 +1283,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         qty: com.quantity,
         price: String(com.price || 0),
         totalPrice: com.totalPrice,
+        desc: com.desc ?? '',
       };
     });
 
