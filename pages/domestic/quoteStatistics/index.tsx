@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -17,30 +18,36 @@ const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
 
-// type
-type TserchObj = {
+type Tquery = {
   year: string | undefined;
   month: string | undefined;
   region: string | undefined;
+  keyWord: string | undefined;
 };
 
 // ==================================================================
 export default function QuoteStatistics() {
-  const [serchObj, setSearchObj] = useState<TserchObj>({
-    year: undefined,
-    month: undefined,
-    region: undefined,
-  });
+  const router = useRouter();
+  const { year, month, region } = router.query as Tquery;
+
+  const params = {
+    filter: {},
+  };
 
   // ------------------------------------------------------------------
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
-        value: serchObj.year,
+        value: year,
         options: yearOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            setSearchObj((obj) => ({ ...obj, year: option.value }));
+            router.push({
+              query: {
+                ...router.query,
+                year: option.value,
+              },
+            });
           }
         },
       },
@@ -49,11 +56,16 @@ export default function QuoteStatistics() {
     },
     {
       selectProps: {
-        value: serchObj.month,
+        value: month,
         options: monthOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            setSearchObj((obj) => ({ ...obj, month: option.value }));
+            router.push({
+              query: {
+                ...router.query,
+                month: option.value,
+              },
+            });
           }
         },
       },
@@ -62,11 +74,16 @@ export default function QuoteStatistics() {
     },
     {
       selectProps: {
-        value: serchObj.region,
+        value: region,
         options: regionOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            setSearchObj((obj) => ({ ...obj, region: option.value }));
+            router.push({
+              query: {
+                ...router.query,
+                region: option.value,
+              },
+            });
           }
         },
       },
@@ -82,7 +99,17 @@ export default function QuoteStatistics() {
     {
       type: 'inputSearch',
       placeholder: '輸入搜尋內容',
-      onClick: () => {},
+      /**
+      要搜尋的欄位有 編號 工程名稱 客戶 聯絡人 連絡電話
+       */
+      onClick: (str) => {
+        router.push({
+          query: {
+            ...router.query,
+            keyWord: str,
+          },
+        });
+      },
     },
   ];
   // ------------------------------------------------------------------

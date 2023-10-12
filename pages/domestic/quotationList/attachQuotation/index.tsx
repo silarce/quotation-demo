@@ -22,10 +22,10 @@ import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
+// import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
+// import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
+// import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
+// import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 // import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
@@ -60,9 +60,9 @@ import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
 
-// 假資料與fake api
-import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
+// // 假資料與fake api
+// import { useQuotation } from 'hooks/quotation/useQuotation';
+// import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -102,7 +102,7 @@ import Summary, {
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
-import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
+import { TcreateQuotationProductDto, TquotationProductDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -223,9 +223,46 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const latestContent = quotationData?.latestContent;
   const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
-  const attachedToContract = quotationData?.attachedToContract;
 
-  const isAttach = attachedToContract ? true : undefined;
+  const isAttach = true;
+
+  const { contractArr, contentArr, contentProdList } = useMemo(() => {
+    const latestContent = quotationData?.latestContent;
+    const attachedToContract = quotationData?.attachedToContract;
+
+    // 合約原本的主產品
+    const contractProdArr = attachedToContract?.content.products;
+
+    // 可能帶有attachedToProductId
+    const contentProdArr = latestContent?.products;
+
+    const contractProdList: { [key: string]: TquotationProductDto } = {};
+    const contentProdList: { [key: string]: TquotationProductDto } = {};
+
+    contractProdArr?.forEach((prod) => {
+      contractProdList[prod.id] = prod;
+    });
+
+    contentProdArr?.forEach((prod) => {
+      if (prod.attachedToProductId) {
+        const oriQty = contractProdList?.[prod.attachedToProductId]?.quantity;
+
+        if (oriQty !== undefined) {
+          prod.reduceQty = oriQty - prod.quantity;
+        }
+
+        // contractProdList[prod.attachedToProductId] = prod;
+      } else {
+        contentProdList[prod.id] = prod;
+      }
+    });
+
+    return {
+      contractArr: Object.values(contractProdList),
+      contentArr: Object.values(contentProdList),
+      contentProdList,
+    };
+  }, [quotationData]);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -310,6 +347,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
+
   const {
     productList,
     prodCellConfig,
@@ -321,8 +359,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     comKeyArr,
     comCellConfig,
-    changeComKeyArr,
-    comVKeyArr,
+    // changeComKeyArr,
+    // comVKeyArr,
     //
     accessoriesKeyArr,
     changeAccessoriesKeyArr,
@@ -338,17 +376,40 @@ function TheQuotation({ router }: { router: NextRouter }) {
     subTotal: quotationProdSubTotal,
     reset: resetClass,
     //
+    attachProdList,
+    addProd_attach,
   } = useProductList({
-    productArr: quotationData?.latestContent.products,
+    productArr: contractArr,
     others: quotationData?.latestContent.others,
-    resetTrigger: quotationData,
+    resetTrigger: contractArr,
     onDoorTypeChange: onDoorTypeChange,
+    productArr_attach: contentArr,
   });
 
-  // const [targetProd, setTargetProd] = useState<Class_product>();
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
 
+  const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
+  const targetProd_attach = attachProdList[targetProdKey_attach];
+
+  useEffect(() => {
+    if (!productList) {
+      return;
+    }
+
+    Object.values(productList).forEach((prod) => {
+      const childContent = prod.id ? contentProdList[prod.id] : undefined;
+      const qty = childContent?.quantity ? childContent?.quantity : undefined;
+
+      if (qty !== undefined) {
+        prod.reduceQty = String(Number(prod.quantity) - qty);
+      }
+    });
+  }, [productList]);
+
+  // -------------------------------------------------------
+  // -------------------------------------------------------
+  // -------------------------------------------------------
   const [summary, setSummary] = useState<{
     discountRate: string;
     subTotal: string;
@@ -803,9 +864,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   // ---------------------------------------------------------
-  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
 
-  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
   const signatureArr: TsignatureProps[] = [
     {
       label: '總經理',
@@ -862,11 +921,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
   ];
-
-  useEffect(() => {
-    reNewClassQuotation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -977,8 +1031,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         openEmpSel('reviewSales');
       },
     },
-    // status
-    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
     (() => {
       if (status === 'Contracting') {
         return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
@@ -989,24 +1041,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  if (!classQuotation) {
-    return null;
-  }
-
-  // --------------------------------------------------------------------------
-  const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
-      return {
-        ...mp.allData,
-        part: mp.partArr.map((part) => part.allData),
-      };
-    });
-
-    return theArr;
-  })();
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -1029,7 +1063,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         prodQty = prodQty + quantity;
 
         const preBody = {
-          ...prod.body,
+          // ...prod.body,
+          ...prod.body_attachDiv,
           order: index,
         };
 
@@ -1041,6 +1076,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         return preBody;
       }) ?? [];
+
+    const attachProdArr = Object.values(attachProdList).map((prod) => {
+      return prod.body;
+    });
 
     if (!data_watch.agentEmployee?.id) {
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
@@ -1085,7 +1124,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       //
       //
-      products: prodArr,
+      products: [...prodArr, ...attachProdArr],
       others: getOthersPostBodyArr(),
       // productsOrder: null,
       //
@@ -1348,7 +1387,44 @@ function TheQuotation({ router }: { router: NextRouter }) {
             />
           </div>
           {/* 備註/報價範圍/付款資訊 */}
+          {/*  */}
 
+          <div className={style.tableWrapper}>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={isAttach ? true : disabled}
+              prodList={attachProdList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd_attach}
+              setTargetProd={setTargetProdKey_attach}
+              // defalutVKeyArr={prodVKeyArr}
+              // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              onVKeyChange={() => {}}
+              rowHeight="h106"
+            />
+
+            {/* 材料配件設定 */}
+            <div className="relative mt-[14px]">
+              <Table_com
+                disabled={disabled}
+                // comList={targetProd?.comList}
+
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                comList={{ ...targetProd_attach?.comList, ...targetProd_attach?.subComList }}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={() => {}}
+                // defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+          </div>
+
+          {/*  */}
           <Summary
             disabled={disabled}
             payInfoControl={payInfoControl}

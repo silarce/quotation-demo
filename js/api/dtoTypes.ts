@@ -896,10 +896,6 @@ export type TquotationProductDto = {
     // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
   }[];
 
-  attachedToProductId?: string | null;
-  attachedToProduct?: TquotationProductDto | null;
-  rootProdductId?: string | null;
-
   quantity: number;
   // 門片厚度
   thickness: string;
@@ -917,9 +913,18 @@ export type TquotationProductDto = {
   installationFeeUnitPrice: number;
   // 安裝費複價;
   installationFeeTotalPrice: number;
+
+  attachedToProductId?: string | null;
+  attachedToProduct?: TquotationProductDto | null;
+  // api實際上還沒加上去
+  rootProdductId?: string | null;
+
+  // 前端用的，後端沒有
+  // 只是為了方便才寫在這邊
+  reduceQty?: number;
 };
 
-export type TquotationContentDto = {
+type TquotationContentDto_foo = {
   id: string;
   createdAt: string;
   updateAt: string;
@@ -988,6 +993,81 @@ export type TquotationContentDto = {
 
   verifyForm: TquotationVerifyFormDto;
 };
+export type TquotationContentDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  version: number;
+
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  customer: TcustomerDto;
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string; // 剩餘地址
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  managerEmployee: TemployeeDto | null;
+  supervisorEmployee: TemployeeDto | null;
+  agentEmployee: TemployeeDto;
+
+  //審核相關
+  reviewSalesEmployee: TemployeeDto | null;
+  salesReviewedAt: string | null;
+  toSalesAt: string | null; // date
+
+  reviewSupervisorEmployee: TemployeeDto | null;
+  supervisorReviewedAt: string | null;
+  toSupervisorAt: string | null; // date
+
+  reviewWorkDirectorEmployee: TemployeeDto | null;
+  workDirectorReviewedAt: string | null;
+  toWorkDirectorAt: string | null; // date
+
+  reviewManagerEmployee: TemployeeDto | null;
+  managerReviewedAt: string | null;
+  toManagerAt: string | null; // date
+
+  /**備註 */
+  annotations: string[] | null;
+  /**報價範圍 */
+  quotationRanges: string[] | null;
+
+  faxNumber: string; // 傳真號碼
+  trackProgress: string; // 追蹤狀態
+  projectProgress: string; //工地進度
+  productsOrder?: string[]; // 已棄用
+  /** 總折數*/
+  discount: string;
+  /**小計 */
+  subTotal: number;
+  /**營業稅 */
+  salesTax: number;
+  /**總計 */
+  total: number;
+  /**交貨地點 */
+  deliveryLocation: string;
+  /**交貨日期 date*/
+  deliveryDate: string;
+  /**付款方式 */
+  paymentMethods: TpaymentMethodDto[];
+
+  others: TquotationContentOtherDto[];
+  products: TquotationProductDto[];
+
+  verifyForm: TquotationVerifyFormDto;
+
+  // api文件上沒寫但應該會有的東西
+  // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
+  // rootContract?: TquotationContractDto;
+  // 為了避免check壞掉，暫時先這樣
+  rootContract?: TquotationContentDto_foo;
+};
 
 export type TquotationDto = {
   id: string;
@@ -996,7 +1076,7 @@ export type TquotationDto = {
   quotationNumber: string;
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
-  attachedToContract: TquotationContentDto & { verifyForm: TquotationVerifyFormDto };
+  attachedToContract?: TquotationContractDto;
 };
 
 export type TcreateQuotationProductDto = {
@@ -1186,9 +1266,9 @@ export type TquotationContractDto = {
   verifyForm: TquotationVerifyFormDto;
   quotation: TquotationDto;
   content: TquotationContentDto;
-  rootContract?: TquotationContractDto; // 源合約
   // attachedToContract: TquotationContractDto; // 上一份追加減合約
   // attachedContract: TquotationContractDto; // 下一份追加減合約
+  rootContract?: TquotationContractDto; // 源合約
   version: number;
   //
   subContracts: TquotationContractDto[];

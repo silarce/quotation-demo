@@ -13,16 +13,6 @@ import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
 // css
 import style from 'components/page/domestic/quotation/quotationProdChangingRecord.module.scss';
 
-// type
-import type {
-  TchangeRecord,
-  // TchangeListItem
-} from 'fakeDatabase/domestic/quotation/fakeChangeProductRecord';
-
-// config
-import { prodCellConfigOri } from './hook/useProduct';
-const prodCellConfig = prodCellConfigOri();
-
 // ===================================================================
 // ===================================================================
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
@@ -59,6 +49,12 @@ export default function TheQuotationProdChangingRecord({
     setActiveIndex(activeIndex);
   };
 
+  // ----------------------------------------------------------
+
+  const rootProdList: { [key: string]: TquotationProductDto } = {};
+
+  // ----------------------------------------------------------
+
   return (
     <div className={style.container}>
       <div className={`${style.row} ${style.outHeader}`}>
@@ -82,28 +78,36 @@ export default function TheQuotationProdChangingRecord({
       >
         {subContract?.map((item, index, arr) => {
           const content = item.content;
-          const preContent = arr[index - 1];
-
+          // const preContent = arr[index - 1];
           const contentTotal = content?.total ?? 0;
-          const preContentTotal = index === 0 ? rootContractTotal : preContent?.content.total ?? 0;
-
+          // const preContentTotal = index === 0 ? rootContractTotal : preContent?.content.total ?? 0;
           // rootContractTotal
 
           const record = {
             quotationId: content.quotationNumber,
             date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
-            priceChange: `${preContentTotal - contentTotal}`,
+            // priceChange: `${preContentTotal - contentTotal}`,
+            priceChange: `${contentTotal}`,
             remark: content.editNotes,
             // product: prodArr,
           };
 
           const isActive = activeIndex === index;
 
-          // 不是直接把content.products送進去，要與前一份contract作比較
-          // 要找出多了什麼，少了什麼
-          // 我要怎麼比較?
-          const contentProdArr = content.products;
+          const contentProdArr = _.cloneDeep(content.products);
           // const preContentProdArr = preContent?.content.products;
+
+          contentProdArr.forEach((prod) => {
+            if (!prod.rootProdductId) {
+              rootProdList[prod.id] = _.cloneDeep(prod);
+            } else {
+              const rootQty = rootProdList[prod.rootProdductId].quantity;
+              const copy = _.cloneDeep(prod);
+              copy.quantity = rootQty - prod.quantity;
+              rootProdList[prod.rootProdductId] = prod;
+              prod = copy;
+            }
+          });
 
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
@@ -191,34 +195,34 @@ const theadConfigList: TtheadConfigList = {
 
 const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
   const {
-    reRender,
-    reset,
+    // reRender,
+    // reset,
     //
     productList,
     prodCellConfig,
     prodKeyArr,
-    prodVKeyArr,
-    setProdVKeyArr,
-    addProd,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
     changeProdKeyArr,
     //
-    subTotal,
+    // subTotal,
     //
-    comKeyArr,
-    comVKeyArr,
-    comCellConfig,
-    changeComKeyArr,
+    // comKeyArr,
+    // comVKeyArr,
+    // comCellConfig,
+    // changeComKeyArr,
     //
-    accessoriesKeyArr,
-    changeAccessoriesKeyArr,
-    accessoriesCellConfig,
+    // accessoriesKeyArr,
+    // changeAccessoriesKeyArr,
+    // accessoriesCellConfig,
     //
-    othersKeyArr,
-    othersList,
-    othersCellConfig,
-    changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
+    // othersKeyArr,
+    // othersList,
+    // othersCellConfig,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
   } = useProductList({
     productArr: prodArr ?? [],
     others: [],

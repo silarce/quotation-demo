@@ -92,6 +92,7 @@ class Class_product {
     parentProd,
     //
     onDoorTypeChange,
+    disabled_quantity,
   }: {
     reRender: TreRender;
     prodData?: Tprod;
@@ -105,6 +106,7 @@ class Class_product {
     parentProd?: Class_product;
     //
     onDoorTypeChange?: (obj: { oldDoorType: string; newDoorType: string }) => void;
+    disabled_quantity?: boolean;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -131,6 +133,8 @@ class Class_product {
 
     this.findBDoptions();
 
+    this.disabled_quantity = disabled_quantity;
+
     // __________________________________________________________;
 
     // 建立材料配件
@@ -144,7 +148,12 @@ class Class_product {
     // 建立選配設定
     this.creAcceList();
     //建立 配電箱與按裝費
-    this.creSubComList();
+    this.creSubComList({ isNew: false });
+
+    // ___________________________________________________________
+    if (this._prodData.reduceQty) {
+      this.reduceQty = String(this._prodData.reduceQty);
+    }
     // ___________________________________________________________
     // = constructor close ===========================================================
   } // = constructor close ===========================================================
@@ -159,6 +168,7 @@ class Class_product {
   //  用來比對是否有變動用的
   readonly originProd;
   //  用來比對是否有變動用的
+  readonly disabled_quantity;
 
   isLoading = false;
 
@@ -386,7 +396,7 @@ class Class_product {
 
   subComList: { [key: string]: Class_SubCom } = {};
 
-  creSubComList() {
+  creSubComList({ isNew = true }: { isNew?: boolean } = {}) {
     // 配電箱
     const distributionBox = new Class_SubCom({
       reRender: this.reRender,
@@ -400,6 +410,7 @@ class Class_product {
         unit: '組',
       },
       prod: this,
+      isNew,
     });
 
     // 安裝費
@@ -415,6 +426,7 @@ class Class_product {
         unit: 'M',
       },
       prod: this,
+      isNew,
     });
 
     this.subComList = { distributionBox, installationFee };
@@ -1994,6 +2006,7 @@ class Class_product {
       callCalcSubTotal: () => {},
       doorModelList: this._doorModelList,
       parentProd: this,
+      disabled_quantity: true,
     });
 
     this.reRender();
@@ -2137,7 +2150,7 @@ class Class_product {
   }
 
   get isAttachDiv() {
-    if (this.reduceQty || this.exchangeQty) {
+    if (Number(this.reduceQty) || this.exchangeQty) {
       return true;
     }
 
@@ -2232,6 +2245,9 @@ type Tprod = {
   installationFeeUnitPrice: number;
   // 安裝費複價;
   installationFeeTotalPrice: number;
+
+  //
+  reduceQty?: number;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;

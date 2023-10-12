@@ -52,16 +52,24 @@ export default function BudgetList({
       <budgetListContext.Provider value={{ status: 'Budget' }}>
         <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
           {quotationArr?.map((quotation, index) => {
-            const { id, latestContent, contents } = quotation;
+            const { id, latestContent, contents, attachedToContract } = quotation;
 
             const isActive = activeIndex === index;
 
             const openQuotation = (e: MouseEvent) => {
               e.stopPropagation();
-              router.push({
-                pathname: `/domestic/quotationList/quotation`,
-                query: { id },
-              });
+
+              if (attachedToContract) {
+                router.push({
+                  pathname: `/domestic/quotationList/attachQuotation`,
+                  query: { id },
+                });
+              } else {
+                router.push({
+                  pathname: `/domestic/quotationList/quotation`,
+                  query: { id },
+                });
+              }
             };
 
             const status = latestContent.status;
@@ -135,7 +143,12 @@ export default function BudgetList({
                 key={index}
                 className={scss.panel}
                 header={
-                  <TbodyItem01 quotationContent={quotationContent} isActive={isActive} openQuotation={openQuotation}>
+                  <TbodyItem01
+                    //
+                    quotationContent={quotationContent}
+                    isActive={isActive}
+                    openQuotation={openQuotation}
+                  >
                     <ReviewChain reviewStatuArr={reviewStatuArr} />
                   </TbodyItem01>
                 }

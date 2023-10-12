@@ -58,7 +58,7 @@ class Class_component {
         this.calcAllPrice();
       }, 0);
     } else {
-      this.calcAllPrice();
+      // this.calcAllPrice();
     }
 
     // =constructor

@@ -425,7 +425,10 @@ function DndRow({
               return null;
             }
 
-            if ([`hidden_${key}`]) {
+            let theDisabled = disabled;
+
+            if (key === 'quantity') {
+              item.disabled_quantity ? (theDisabled = true) : undefined;
             }
 
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
@@ -443,7 +446,7 @@ function DndRow({
                   className={classNames(scss.column, isHidden && scss.hidden)}
                   style={{ width: inputSelProps.wrapperStyle?.width }}
                 >
-                  <InputSel disabled={disabled} suffix={stateValue} suffixClassName="m-auto" {...inputSelProps} />
+                  <InputSel disabled={theDisabled} suffix={stateValue} suffixClassName="m-auto" {...inputSelProps} />
                 </div>
               );
             }
@@ -514,7 +517,7 @@ function DndRow({
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
               >
-                <InputSel disabled={disabled} showBaseline="auto" {...inputSelProps} />
+                <InputSel disabled={theDisabled} showBaseline="auto" {...inputSelProps} />
               </div>
             );
           })}

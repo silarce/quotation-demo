@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import moment from 'moment';
+import _ from 'lodash';
 
 // antd
 import { Collapse } from 'antd';
@@ -59,7 +60,12 @@ export default function QuotationRecord({
 
   const isPanelAllActive = activePanel.length === subContract?.length;
 
-  // ======================================================
+  // ----------------------------------------------------------
+
+  const rootProdList: { [key: string]: TquotationProductDto } = {};
+
+  // ----------------------------------------------------------
+
   return (
     <div className={style.container}>
       <div className={style.title}>
@@ -93,7 +99,7 @@ export default function QuotationRecord({
             // const { product } = changeInfo;
 
             const content = item.content;
-            const lastcontent = arr[index - 1];
+            // const lastcontent = arr[index - 1];
 
             const activeIndex = activePanel.findIndex((item) => item === index);
             const isActive = activeIndex === -1 ? false : true;
@@ -108,20 +114,36 @@ export default function QuotationRecord({
               }
             };
 
-            let priceChange = 0;
+            // let priceChange = 0;
 
-            if (index === 0) {
-              priceChange = content.total - rootContractTotal;
-            } else {
-              priceChange = content.total - lastcontent.total;
-            }
+            // if (index === 0) {
+            //   priceChange = content.total - rootContractTotal;
+            // } else {
+            //   priceChange = content.total - lastcontent.total;
+            // }
 
             const changeInfo = {
               quotationId: content.quotationNumber,
               date: moment(content.quotationDate).format('yy-MM-DD'),
-              priceChange: priceChange,
+              // priceChange: priceChange,
+              priceChange: content.total,
               remark: content.editNotes,
             };
+
+            const contentProdArr = _.cloneDeep(content.products);
+            // const preContentProdArr = preContent?.content.products;
+
+            contentProdArr.forEach((prod) => {
+              if (!prod.rootProdductId) {
+                rootProdList[prod.id] = _.cloneDeep(prod);
+              } else {
+                const rootQty = rootProdList[prod.rootProdductId].quantity;
+                const copy = _.cloneDeep(prod);
+                copy.quantity = rootQty - prod.quantity;
+                rootProdList[prod.rootProdductId] = prod;
+                prod = copy;
+              }
+            });
 
             return (
               <Panel
@@ -137,7 +159,7 @@ export default function QuotationRecord({
                 <div className={style.prodContainer}>
                   {/* <Thead />
                   <Tbody product={product} /> */}
-                  <ProdRow prodArr={content.products} />
+                  <ProdRow prodArr={contentProdArr} />
                 </div>
               </Panel>
             );

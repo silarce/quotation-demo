@@ -20,17 +20,21 @@ class Class_SubCom {
     reRender,
     data,
     prod,
+    isNew = true,
   }: // prod,
   {
     reRender: TreRender;
     data: TSubCom;
     prod: Class_product;
+    isNew?: boolean;
   }) {
     this.reRender = reRender;
     this._data = data;
     this._prod = prod;
 
-    this.calcAllPrice();
+    if (isNew) {
+      this.calcAllPrice();
+    }
   } // =constructor
 
   readonly reRender;
