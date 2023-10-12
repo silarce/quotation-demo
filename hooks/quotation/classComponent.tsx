@@ -967,7 +967,7 @@ const creDesc_headBoxes = (classCom: Class_component) => {
   const desc_thickness = `${thickness ?? ''}`;
 
   // return `${desc_isIntegrated} ${desc_thickness}`;
-  return `${name ?? ''} ${material ?? ''} ${desc_thickness}`;
+  return `${name ?? ''} ${material ?? ''}`;
 };
 
 const confomtTree = {

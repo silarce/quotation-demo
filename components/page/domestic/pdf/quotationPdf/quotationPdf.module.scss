@@ -10,17 +10,9 @@ $semiMaring: 0 8px;
 
 // ant-modal
 .quotationPdf {
-  // background-color: #ddd;
-  // padding: 0;
   :global(.ant-modal-content) {
-    // width: fit-content;
-    // margin: auto;
   }
   :global(.ant-modal-body) {
-    // width: 595.28px;
-    // height: 841.89px;
-    // width: calc(595px * 2.7); // 595*2.7 = 1606
-    // height: calc(842px * 2.7);
     padding: 0;
   }
   .hr {

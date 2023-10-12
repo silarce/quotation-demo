@@ -1252,8 +1252,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const size = `${lw} X ${h} + ${b}`;
 
     // const foo = prod.comList;
+    const list = { ...prod.comList, ...prod.subComList };
+    delete list['sidePlate'];
 
-    const componentArr = Object.values(prod.comList ?? {});
+    const componentArr = Object.values(list ?? {});
 
     const part: Tpart[] = componentArr.map((com) => {
       return {
@@ -1261,8 +1263,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         material: com.material,
         unit: com.unit,
         qty: com.quantity,
-        price: String(com.price || 0),
-        totalPrice: com.totalPrice,
+        price: Number(com.price || 0).toLocaleString(),
+        desc: com.desc ?? '',
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
       };
     });
 
@@ -1272,7 +1275,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      priceTotal: prod.totalPrice,
+      priceTotal: Number(prod.totalPrice || 0).toLocaleString(),
       part: part,
     };
   });
