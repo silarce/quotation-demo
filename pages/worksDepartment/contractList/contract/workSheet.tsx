@@ -94,8 +94,8 @@ export default function WorkSheet() {
                 </div>
               );
             })}
-          </div>{' '}
-          {/* left */}
+          </div>
+          {/* left close */}
           <div className={scss.right}>
             <WorkSheetProduct control={control} fakeWorkSheet_ori={fakeWorkSheet_ori} disabled={disabled} />
 
