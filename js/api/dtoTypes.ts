@@ -1339,6 +1339,15 @@ export type TquotationAccouting = {
   customername: string;
 };
 
+export type TquotationAccouting_years = {
+  year: number;
+  // month: number;
+  // 這是前端設的，後端是設為number
+  month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  totalsum: string;
+  company_location: string;
+};
+
 // ========================================================================
 // ========================================================================
 // ========================================================================

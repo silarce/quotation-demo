@@ -22,6 +22,7 @@ import type {
   TcreateModifyQuotationDto,
   TquotationProductDto,
   TquotationAccouting,
+  TquotationAccouting_years,
 } from './dtoTypes';
 
 export type {
@@ -38,6 +39,7 @@ export type {
   TquotationProductDto,
   TcreateQuotationProductDto,
   TquotationAccouting,
+  TquotationAccouting_years,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -644,6 +646,7 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
 
 // ================================================================
 
+/**報價統計表 */
 export const apiQuotationAccounting = (params: {
   year: number;
   month: number;
@@ -676,6 +679,35 @@ export const useQuotationAccounting = (params: {
     };
 
     const newRes = await apiQuotationAccounting(okParams);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+/**年度業績統計表 */
+export const apiQuotationAccounting_years = () => {
+  const api = '/quotation/accounting/years';
+
+  return axi
+    .get<TquotationAccouting_years[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useQuotationAccounting_years = () => {
+  const [res, setRes] = useState<TquotationAccouting_years[]>();
+
+  const update = async () => {
+    const newRes = await apiQuotationAccounting_years();
 
     if (newRes) {
       setRes(newRes);
