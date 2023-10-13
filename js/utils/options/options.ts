@@ -274,10 +274,10 @@ export const optionsCreator_month = ({
 
 export const optionsCreator_region = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
   const optionArr = [
-    { value: '北部', label: '北部' },
-    { value: '中部', label: '中部' },
-    { value: '南部', label: '南部' },
-    { value: '東部', label: '東部' },
+    { value: 'northern', label: '北部' },
+    { value: 'central', label: '中部' },
+    { value: 'southern', label: '南部' },
+    { value: 'eastern', label: '東部' },
   ];
 
   if (emptyOption) {

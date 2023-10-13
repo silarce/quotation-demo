@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -12,6 +13,9 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
+// api
+import { useQuotationAccounting } from 'js/api/api_quotation';
+
 // option
 import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
@@ -21,7 +25,7 @@ const yearOptionArr = optionsCreator_year();
 type Tquery = {
   year: string | undefined;
   month: string | undefined;
-  region: string | undefined;
+  region: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
   keyWord: string | undefined;
 };
 
@@ -30,9 +34,61 @@ export default function QuoteStatistics() {
   const router = useRouter();
   const { year, month, region } = router.query as Tquery;
 
-  const params = {
-    filter: {},
-  };
+  const { data, update } = useQuotationAccounting({
+    year: year ? Number(year) : undefined,
+    month: month ? Number(month) : undefined,
+    area: region,
+  });
+
+  useEffect(() => {
+    update();
+  }, [year, month, region]);
+
+  const { formatedDataArr, listPriceTotal, bearPriceTotal, percent } = useMemo(() => {
+    if (!data) {
+      return {
+        formatedDataArr: [],
+        listPriceTotal: '0',
+        bearPriceTotal: '0',
+        percent: '0',
+      };
+    }
+
+    let listPriceTotal = 0;
+    let bearPriceTotal = 0;
+    let percent = new Decimal(0);
+
+    const arr: Tdata[] = data.map((item) => {
+      listPriceTotal += Number(item.pricesum || 0);
+      bearPriceTotal += Number(item.totalsum || 0);
+      percent = percent.add(999);
+
+      return {
+        idNumber: item.quotation_number,
+        designDepartment: '設計單位',
+        constructionName: item.project_name,
+        customer: [
+          {
+            customerName: item.customername,
+            contactPerson: item.contactperson,
+            contactPhone: item.contactnumber,
+            listPrice: item.pricesum,
+            bearPrice: item.totalsum,
+            percent: '999%',
+          },
+        ],
+      };
+    });
+
+    const percent_locale = percent.div(arr.length).toNumber().toLocaleString();
+
+    return {
+      formatedDataArr: arr,
+      listPriceTotal: listPriceTotal.toLocaleString(),
+      bearPriceTotal: bearPriceTotal.toLocaleString(),
+      percent: percent_locale,
+    };
+  }, [data]);
 
   // ------------------------------------------------------------------
   const selectPropsArr: TselectPropsArr = [
@@ -117,8 +173,14 @@ export default function QuoteStatistics() {
   return (
     <SubLayer>
       <PageHeader02 tag="報價統計表" customeLeft={customeLeft} panelList={panelList} />
-
-      <Table fakeDataArr={fakeDataArr} />
+      <Table
+        dataArr={formatedDataArr}
+        totalInfo={{
+          listPrice: listPriceTotal,
+          bearPrice: bearPriceTotal,
+          percent: percent,
+        }}
+      />
     </SubLayer>
   );
 }
@@ -129,7 +191,7 @@ export default function QuoteStatistics() {
 // ===================================================================
 // ===================================================================
 
-export type TfakeData = {
+export type Tdata = {
   idNumber: string;
   designDepartment: string;
   constructionName: string;
@@ -141,57 +203,4 @@ export type TfakeData = {
     bearPrice: string;
     percent: string;
   }[];
-  // listPrice: string
-  // bearPrice: string
-  // percent: string
 };
-
-const fakeDataOri01 = (): TfakeData => ({
-  idNumber: 'M-2222202',
-  designDepartment: '賴文魁 三久',
-  constructionName: '台中市台中地區農會四民辦事處新建工程',
-  customer: [
-    {
-      customerName: '昭雄營造',
-      contactPerson: '王小明副理',
-      contactPhone: '0987654321',
-      listPrice: '1,373,614',
-      bearPrice: '841,913',
-      percent: '60%',
-    },
-  ],
-});
-const fakeDataOri02 = (): TfakeData => ({
-  idNumber: 'M-2222202',
-  designDepartment: '賴文魁 三久',
-  constructionName: '台中市台中地區農會四民辦事處新建工程',
-  customer: [
-    {
-      customerName: '昭雄營造',
-      contactPerson: '王小明副理',
-      contactPhone: '0987654321',
-      listPrice: '1,373,614',
-      bearPrice: '841,913',
-      percent: '60%',
-    },
-    {
-      customerName: '勇立興建築',
-      contactPerson: '王小明副理',
-      contactPhone: '0987654321',
-      listPrice: '1,373',
-      bearPrice: '841',
-      percent: '40%',
-    },
-  ],
-});
-
-const fakeDataArr = [
-  fakeDataOri01(),
-  fakeDataOri02(),
-  fakeDataOri01(),
-  fakeDataOri02(),
-  fakeDataOri01(),
-  fakeDataOri02(),
-];
-
-// ---------------------------------------------------------------

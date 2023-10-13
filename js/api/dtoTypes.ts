@@ -1330,8 +1330,8 @@ export type TcreateModifyQuotationDto = {
 
 export type TquotationAccouting = {
   quotetype: string;
-  totalsum: string;
-  pricesum: string;
+  totalsum: string; // 牌價複價
+  pricesum: string; // 單價複價
   quotation_number: string;
   project_name: string;
   contactnumber: string;

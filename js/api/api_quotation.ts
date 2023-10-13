@@ -644,7 +644,11 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
 
 // ================================================================
 
-export const apiQuotationAccounting = (params: { year: string; month: string; area: string }) => {
+export const apiQuotationAccounting = (params: {
+  year: number;
+  month: number;
+  area: 'northern' | 'central' | 'southern' | 'eastern';
+}) => {
   const api = '/quotation/accounting';
 
   return axi
@@ -653,11 +657,25 @@ export const apiQuotationAccounting = (params: { year: string; month: string; ar
     .catch((err) => Promise.reject(err));
 };
 
-export const useQuotationAccounting = (params: { year: string; month: string; area: string }) => {
+export const useQuotationAccounting = (params: {
+  year: number | undefined;
+  month: number | undefined;
+  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
+}) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
 
   const update = async () => {
-    const newRes = await apiQuotationAccounting(params);
+    if (!params.year || !params.month || !params.area) {
+      return;
+    }
+
+    const okParams = {
+      year: params.year,
+      month: params.month,
+      area: params.area,
+    };
+
+    const newRes = await apiQuotationAccounting(okParams);
 
     if (newRes) {
       setRes(newRes);
