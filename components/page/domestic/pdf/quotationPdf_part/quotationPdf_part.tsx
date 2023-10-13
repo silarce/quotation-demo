@@ -190,6 +190,8 @@ export default function QuotationPdf_part({
             {index !== 0 && <hr className={scss.hr} />}
             <Header />
             {chunk.map((prod, index) => {
+              console.log(prod);
+
               return (
                 <div className={scss.part} key={index}>
                   <Info prodAllData={prod} quotationId={quotationId} />
@@ -238,6 +240,7 @@ const infoConfig: TinfoConfig = {
 type Tpart = {
   partName: string;
   material: string;
+  desc: string;
   // unit: string;
   unit: React.ReactNode;
   qty: string;
@@ -245,7 +248,7 @@ type Tpart = {
   totalPrice: string;
 };
 
-type TkeyIndex = 'partName' | 'material' | 'unit' | 'qty' | 'price' | 'totalPrice';
+type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string;
@@ -257,7 +260,7 @@ type Tconfig = {
   };
 };
 
-const keyIndex: TkeyIndex[] = ['partName', 'material', 'unit', 'qty', 'price', 'totalPrice'];
+const keyIndex: TkeyIndex[] = ['partName', 'desc', 'unit', 'qty', 'price', 'totalPrice'];
 
 const config: Tconfig = {
   partName: {
@@ -266,8 +269,15 @@ const config: Tconfig = {
       width: '300px',
     },
   },
-  material: {
-    label: '材質',
+  // material: {
+  //   label: '材質',
+  //   style: {
+  //     width: 'auto',
+  //     flex: '1',
+  //   },
+  // },
+  desc: {
+    label: '說明',
     style: {
       width: 'auto',
       flex: '1',

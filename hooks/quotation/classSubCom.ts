@@ -12,6 +12,7 @@ type TSubCom = {
   quantity: number;
   comName: string;
   unit: string;
+  desc: string;
 };
 
 class Class_SubCom {
@@ -66,7 +67,7 @@ class Class_SubCom {
   // ----------------------------------------------------------------
 
   get hiddenKeyArr() {
-    return ['isPainted', 'desc', 'density', 'code', 'material', 'surface', 'codeNumber'];
+    return ['isPainted', 'density', 'code', 'material', 'surface', 'codeNumber'];
   }
 
   get comName() {
@@ -131,6 +132,10 @@ class Class_SubCom {
 
   get unit() {
     return this._data.unit;
+  }
+
+  get desc() {
+    return this._data.desc;
   }
 
   // set totalPrice(v) {

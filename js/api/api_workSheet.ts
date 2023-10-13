@@ -25,7 +25,7 @@ type TgetQuotataionRanges = {
   meta: TpageMetaDto;
 };
 
-export type { Tparams, TgetAnnotation, TgetQuotataionRanges };
+export type { Tparams, TgetAnnotation, TgetQuotataionRanges, TcreateAnnotationDto, TcreateQuotationRangeDto };
 
 // ==========================================================================
 // ==========================================================================

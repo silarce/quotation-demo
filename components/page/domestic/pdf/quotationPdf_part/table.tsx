@@ -58,7 +58,7 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
 
 type Tpart = {
   partName: string;
-  material: string;
+  desc: string;
   // unit: string;
   unit: React.ReactNode;
   qty: string;
@@ -66,7 +66,7 @@ type Tpart = {
   totalPrice: string;
 };
 
-type TkeyIndex = 'partName' | 'material' | 'unit' | 'qty' | 'price' | 'totalPrice';
+type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string;
@@ -78,17 +78,24 @@ type Tconfig = {
   };
 };
 
-const keyIndex: TkeyIndex[] = ['partName', 'material', 'unit', 'qty', 'price', 'totalPrice'];
+const keyIndex: TkeyIndex[] = ['partName', 'desc', 'unit', 'qty', 'price', 'totalPrice'];
 
 const config: Tconfig = {
   partName: {
     label: '名稱',
     style: {
-      width: '300px',
+      width: '160px',
     },
   },
-  material: {
-    label: '材質',
+  // material: {
+  //   label: '材質',
+  //   style: {
+  //     width: 'auto',
+  //     flex: '1',
+  //   },
+  // },
+  desc: {
+    label: '說明',
     style: {
       width: 'auto',
       flex: '1',
@@ -103,7 +110,7 @@ const config: Tconfig = {
   qty: {
     label: '數量',
     style: {
-      width: '100px',
+      width: '80px',
       textAlign: 'right',
     },
   },
