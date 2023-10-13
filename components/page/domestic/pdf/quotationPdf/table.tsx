@@ -1,5 +1,6 @@
 // css
 import style from './quotationPdf.module.scss';
+import Image from 'next/image';
 
 // option
 import { optionsCreator_doorRail } from 'js/utils/options/options';
@@ -63,6 +64,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
                 <img src={value} alt="" />
+                {/* <Image src={value} alt="" width={50} height={50} /> */}
               </div>
             );
           }

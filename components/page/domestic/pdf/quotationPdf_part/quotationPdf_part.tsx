@@ -190,8 +190,6 @@ export default function QuotationPdf_part({
             {index !== 0 && <hr className={scss.hr} />}
             <Header />
             {chunk.map((prod, index) => {
-              console.log(prod);
-
               return (
                 <div className={scss.part} key={index}>
                   <Info prodAllData={prod} quotationId={quotationId} />

@@ -1254,15 +1254,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // const foo = prod.comList;
     const list = { ...prod.comList, ...prod.subComList };
     delete list['sidePlate'];
+    delete list['motorAccessories'];
 
     const componentArr = Object.values(list ?? {});
 
+    let totalPrice = 0;
+
     const part: Tpart[] = componentArr.map((com) => {
+      totalPrice += Number(com.totalPrice || 0);
+
       return {
         partName: com.comName,
         material: com.material,
         unit: com.unit,
-        qty: com.quantity,
+        qty: Number(com.quantity).toFixed(2),
         price: Number(com.price || 0).toLocaleString(),
         desc: com.desc ?? '',
         totalPrice: Number(com.totalPrice || 0).toLocaleString(),
@@ -1275,8 +1280,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      priceTotal: Number(prod.totalPrice || 0).toLocaleString(),
       part: part,
+      priceTotal: totalPrice.toLocaleString(),
     };
   });
 

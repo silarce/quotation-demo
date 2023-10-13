@@ -25,7 +25,7 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
           return (
             <div className={scss.row} key={pIndex}>
               <div style={{ width: '90px' }}>
-                <span>{pIndex}</span>
+                <span>{pIndex + 1}</span>
               </div>
               {keyIndex.map((key, cIndex) => {
                 const { style } = config[key];
