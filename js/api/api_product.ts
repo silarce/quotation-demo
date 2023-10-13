@@ -47,7 +47,7 @@ export type {
 // =======================================================================
 
 export const apiGetAssets = async (path: string) => {
-  const api = `/products/assets/${path}`;
+  const api = `/products/assets/door-track/${path}`;
 
   return axi
     .get(api)
