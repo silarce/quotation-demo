@@ -1328,6 +1328,17 @@ export type TcreateModifyQuotationDto = {
   others?: TcreateQuotationContentOtherDto[];
 };
 
+export type TquotationAccouting = {
+  quotetype: string;
+  totalsum: string;
+  pricesum: string;
+  quotation_number: string;
+  project_name: string;
+  contactnumber: string;
+  contactperson: string;
+  customername: string;
+};
+
 // ========================================================================
 // ========================================================================
 // ========================================================================

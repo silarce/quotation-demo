@@ -21,6 +21,7 @@ import type {
   TquotationContractDto,
   TcreateModifyQuotationDto,
   TquotationProductDto,
+  TquotationAccouting,
 } from './dtoTypes';
 
 export type {
@@ -36,6 +37,7 @@ export type {
   TcreateModifyQuotationDto,
   TquotationProductDto,
   TcreateQuotationProductDto,
+  TquotationAccouting,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -638,4 +640,34 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
     .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// ================================================================
+
+export const apiQuotationAccounting = (params: { year: string; month: string; area: string }) => {
+  const api = '/quotation/accounting';
+
+  return axi
+    .get<TquotationAccouting[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useQuotationAccounting = (params: { year: string; month: string; area: string }) => {
+  const [res, setRes] = useState<TquotationAccouting[]>();
+
+  const update = async () => {
+    const newRes = await apiQuotationAccounting(params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
 };
