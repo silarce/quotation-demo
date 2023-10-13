@@ -70,13 +70,14 @@ const erpFeaturesLookup = {
   HRAuthoritySetup: '人事權限建立',
   legacyContractIntegration: '舊合約',
   domestic: '營業部國內工程',
+  statisticsTable: '統計表',
 } as const;
 
-const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic } = erpFeaturesLookup;
+const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic, statisticsTable } = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
 /** allPass 至少有一個權限就pass */
-const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic];
+const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic, statisticsTable];
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
 // const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
@@ -284,7 +285,7 @@ const sidePathList: TsidePathList = {
         },
         {
           label: '統計表',
-          erpFeature: devPass,
+          erpFeature: [statisticsTable],
           list: [
             {
               label: '報價統計表',
@@ -493,7 +494,7 @@ const topPathList: TtopPathListConfig[] = [
       },
     },
     // erpFeature: 'allPass',
-    erpFeature: [domestic, legacyContractIntegration],
+    erpFeature: [domestic, legacyContractIntegration, statisticsTable],
   },
   {
     icon: icon_foreign,
