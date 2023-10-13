@@ -98,12 +98,11 @@ export default function QuotationPdf({
       }
 
       const image = await html2canvas(
-        item,
-        // FIXME 似乎是因為套件發出取得圖片的請求時，沒有帶上cookie，所以會被擋下來
-        {
-          useCORS: true,
-          allowTaint: true,
-        }
+        item
+        // ,{
+        //   useCORS: true,
+        //   allowTaint: true,
+        // }
       ).then((canvas) => {
         const image = canvas.toDataURL('image/JPEG');
 
@@ -228,6 +227,7 @@ export default function QuotationPdf({
       closable={false}
       centered={true}
       width={'fit-content'}
+      destroyOnClose={true}
     >
       <div className={scss.panel}>
         <div className={scss.left}>

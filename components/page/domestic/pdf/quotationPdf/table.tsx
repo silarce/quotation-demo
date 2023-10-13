@@ -23,31 +23,28 @@ export type TtableProdList = {
 }[];
 
 export default function Table({ productList }: { productList: TtableProdList }) {
-  const [svgList, setSvgList] = useState<{ [key: string]: string }>({});
+  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined }>({});
 
-  const getSvg = async ({ fileName, index }: { fileName: string; index: number }) => {
-    if (svgList[index]) {
+  const getSvg = async ({ fileName }: { fileName: string }) => {
+    if (!!svgList[fileName]) {
       return;
     }
 
     try {
-      setSvgList((list) => ({
-        ...list,
-        [index]: 'isLoading',
-      }));
+      svgList[fileName] = 'isLoading';
 
       const svg = await apiGetAssets(fileName);
 
       if (svg) {
         setSvgList((list) => ({
           ...list,
-          [index]: svg,
+          [fileName]: svg,
         }));
       }
     } catch (error) {
       setSvgList((list) => ({
         ...list,
-        [index]: undefined,
+        [fileName]: undefined,
       }));
     }
   };
@@ -87,13 +84,13 @@ export default function Table({ productList }: { productList: TtableProdList }) 
             const arr = value.split('/');
             const fileName = arr[arr.length - 1];
 
-            getSvg({ fileName: fileName, index: rIndex });
+            getSvg({ fileName: fileName });
 
             return (
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
                 {/* <img src={value} alt="" /> */}
-                <div dangerouslySetInnerHTML={{ __html: svgList[`${rIndex}`] }} />
+                <div dangerouslySetInnerHTML={{ __html: svgList[`${fileName}`] ?? '' }} />
               </div>
             );
           }
@@ -128,10 +125,6 @@ export default function Table({ productList }: { productList: TtableProdList }) 
   );
 }
 
-// =============================================================================
-/* 產品資料中有厚度的資料
-但是不會出現在主產品設定中讓使用者編輯
-*/
 // =============================================================================
 
 type TindexKeys =
