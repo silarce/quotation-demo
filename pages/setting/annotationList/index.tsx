@@ -57,6 +57,7 @@ export default function MemoList() {
   });
 
   const params: Tparams = {
+    sort: 'updatedAt',
     filter: {
       category: { $eq: filter.category },
       doorModelName: { $eq: filter.doorModelName },

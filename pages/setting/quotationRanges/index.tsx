@@ -57,6 +57,7 @@ export default function QuotationRanges() {
   });
 
   const params: Tparams = {
+    sort: 'updatedAt',
     filter: {
       category: { $eq: filter.category },
       doorModelName: { $eq: filter.doorModelName },
