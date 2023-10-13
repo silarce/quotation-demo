@@ -23,6 +23,7 @@ import type {
   TquotationProductDto,
   TquotationAccouting,
   TquotationAccouting_years,
+  TquotationAccouting_area,
 } from './dtoTypes';
 
 export type {
@@ -40,6 +41,7 @@ export type {
   TcreateQuotationProductDto,
   TquotationAccouting,
   TquotationAccouting_years,
+  TquotationAccouting_area,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -708,6 +710,35 @@ export const useQuotationAccounting_years = () => {
 
   const update = async () => {
     const newRes = await apiQuotationAccounting_years();
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+/**全區業績統計表 */
+export const apiQuotationAccounting_area = () => {
+  const api = '/quotation/accounting/area';
+
+  return axi
+    .get<TquotationAccouting_area[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useQuotationAccounting_area = () => {
+  const [res, setRes] = useState<TquotationAccouting_area[]>();
+
+  const update = async () => {
+    const newRes = await apiQuotationAccounting_area();
 
     if (newRes) {
       setRes(newRes);

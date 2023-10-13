@@ -1348,6 +1348,17 @@ export type TquotationAccouting_years = {
   company_location: string;
 };
 
+// 全區業績統計表
+export type TquotationAccouting_area = {
+  quotetype: string;
+  year: number;
+  month: number;
+  county: string;
+  totalsum: string; // 牌價複價
+  pricesum: string; // 單價複價
+  percentage: number; // 百分比
+};
+
 // ========================================================================
 // ========================================================================
 // ========================================================================
