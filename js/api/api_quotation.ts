@@ -652,7 +652,7 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
 export const apiQuotationAccounting = (params: {
   year: number;
   month: number;
-  area: 'northern' | 'central' | 'southern' | 'eastern';
+  area: 'northern' | 'central' | 'southern' | 'eastern' | 'all';
 }) => {
   const api = '/quotation/accounting';
 
@@ -665,9 +665,11 @@ export const apiQuotationAccounting = (params: {
 export const useQuotationAccounting = (params: {
   year: number | undefined;
   month: number | undefined;
-  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
+  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
+
+  console.log(params.area);
 
   const update = async () => {
     if (!params.year || !params.month || !params.area) {
