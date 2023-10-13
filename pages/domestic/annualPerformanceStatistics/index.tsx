@@ -1,4 +1,4 @@
-import { useMemo, Fragment } from 'react';
+import { useEffect, useMemo, Fragment } from 'react';
 
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -13,14 +13,29 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 import scss from './annualPerformanceStatistics.module.scss';
 
+// api
+import { useQuotationAccounting_years } from 'js/api/api_quotation';
+
 export default function AnnualPerformanceStatistics() {
   // const fakeData: Tfoo = {};
   // const companyKeyArr = Object.keys(fakeData);
 
+  const { data, update } = useQuotationAccounting_years();
+
+  useEffect(() => {
+    update();
+  }, []);
+
   const list = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
     const list: Partial<Tlist> = {};
-    fakeDataArr.forEach((data) => {
-      const { year, month, totalSum, company_location } = data;
+    data.forEach((data) => {
+      const { totalsum, company_location } = data;
+      const year = data.year.toString();
+      const month = data.month.toString() as (typeof monthArr)[number];
 
       if (list[company_location] === undefined) {
         list[company_location] = {};
@@ -33,22 +48,45 @@ export default function AnnualPerformanceStatistics() {
 
       list[company_location]![year].companyName = companyNameLookup[company_location] ?? '查無分公司';
 
-      list[company_location]![year][`${month}`] = totalSum;
+      list[company_location]![year][month] = totalsum;
 
-      if (month === 12) {
-        let inTotal = 0;
-        monthArr.forEach((month) => {
-          const totalSum = Number(list[company_location]![year][month]);
-          inTotal += totalSum;
-          list[company_location]![year][month] = totalSum.toLocaleString();
-        });
-        list[company_location]![year].inTotal = inTotal.toLocaleString();
-        list[company_location]![year].成長率 = '成長率';
+      // 統計表給的不一定齊全，可能沒有12月，而且12月在陣列中也不見得會在1月後面
+      // 所以這個部份不能用
+      // if (month === '12') {
+      //   let inTotal = 0;
+      //   monthArr.forEach((month) => {
+      //     const totalSum = Number(list[company_location]![year][month]);
+      //     inTotal += totalSum;
+      //     list[company_location]![year][month] = totalSum.toLocaleString();
+      //   });
+      //   list[company_location]![year].inTotal = inTotal.toLocaleString();
+      //   list[company_location]![year].成長率 = '成長率';
+      // }
+    });
+
+    Object.values(list).forEach((item_c) => {
+      if (!item_c) {
+        return;
       }
+
+      Object.values(item_c).forEach((item_y) => {
+        let inTotal = 0;
+
+        const keyArr = Object.keys(item_y) as (keyof typeof item_y)[];
+        keyArr.forEach((key) => {
+          if (Number(key) >= 1) {
+            const value_num = Number(item_y[key]);
+            inTotal += value_num;
+            item_y[key] = value_num.toLocaleString();
+          }
+        });
+        item_y.inTotal = inTotal.toLocaleString();
+        item_y.成長率 = '成長率';
+      });
     });
 
     return list as Tlist;
-  }, []);
+  }, [data]);
 
   // --------------------------------------------------------------------
   const panelList: TpanelList = [
