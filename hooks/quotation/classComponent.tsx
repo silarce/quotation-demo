@@ -865,6 +865,8 @@ const creDesc_slats = (classCom: Class_component) => {
   const { isAntiTyphoon, material, surface, thickness, name } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
 
+  console.log(thickness);
+
   // return `${desc_isAntiTyphoon} `;
   return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };
@@ -908,7 +910,7 @@ const creDesc_guideRails = (classCom: Class_component) => {
 
   // return `厚度${thickness} ${desc_isAntiTyphoon} ${desc_hasSilencingStrip}`;
   // return `${name} 厚度${thickness}`;
-  return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
+  return `${name ?? ''} ${material ?? ''} `;
 };
 
 const creDesc_sidePlates = (classCom: Class_component) => {

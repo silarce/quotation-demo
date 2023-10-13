@@ -869,6 +869,9 @@ class Class_product {
       item.price = 0;
     });
 
+    // api沒有給門片的厚度，直接取主產品的厚度嗎?
+    dataList.slat.thickness = this.thickness;
+
     this.creComList({
       dataList,
     });
