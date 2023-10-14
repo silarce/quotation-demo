@@ -385,7 +385,7 @@ version>1 是子合約
       label: '總經理',
       inputProps: {
         props: {
-          value: content?.reviewManagerEmployee?.chName ?? '',
+          value: data?.content?.reviewManagerEmployee?.chName ?? '',
         },
       },
     },
@@ -393,7 +393,7 @@ version>1 是子合約
       label: '工務主管',
       inputProps: {
         props: {
-          value: content?.reviewWorkDirectorEmployee?.chName ?? '',
+          value: data?.content?.reviewWorkDirectorEmployee?.chName ?? '',
         },
       },
     },
@@ -401,7 +401,7 @@ version>1 是子合約
       label: '主管',
       inputProps: {
         props: {
-          value: content?.reviewSupervisorEmployee?.chName ?? '',
+          value: data?.content?.reviewSupervisorEmployee?.chName ?? '',
         },
       },
     },
@@ -409,7 +409,7 @@ version>1 是子合約
       label: '業務',
       inputProps: {
         props: {
-          value: content?.reviewSalesEmployee?.chName ?? '',
+          value: data?.content?.reviewSalesEmployee?.chName ?? '',
         },
       },
     },
@@ -417,7 +417,7 @@ version>1 是子合約
       label: '經辦',
       inputProps: {
         props: {
-          value: content?.agentEmployee?.chName ?? '',
+          value: data?.content?.agentEmployee?.chName ?? '',
         },
       },
     },
