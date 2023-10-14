@@ -409,6 +409,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       'content.reviewSalesEmployee',
       'content.reviewWorkDirectorEmployee',
       'content.reviewSupervisorEmployee',
+      'content.reviewManagerEmployee',
 
       'content.products',
       // 'content.products.items.accessories',
