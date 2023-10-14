@@ -2036,6 +2036,7 @@ class Class_product {
     await this.getComAndAcce();
 
     const copy = _.cloneDeep(this.body_Tprod);
+    copy.id = undefined;
     copy.quantity = Number(v);
     copy.dualPrice = new Decimal(copy.quantity).mul(copy.price).toNumber();
     copy.totalPrice = new Decimal(copy.quantity).mul(copy.unitPrice).toNumber();
