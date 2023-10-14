@@ -37,6 +37,7 @@ export default function Table_prod({
   isAttach,
   attachTotal,
   isRedBorder,
+  exchangeDiabled,
 }: {
   disabled: boolean;
   prodList: TproductList;
@@ -55,6 +56,7 @@ export default function Table_prod({
   isAttach?: boolean; // 追加追減介面
   attachTotal?: number | string;
   isRedBorder?: boolean;
+  exchangeDiabled?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -159,6 +161,7 @@ export default function Table_prod({
 
               return (
                 <ExchangeRow
+                  disabled={exchangeDiabled}
                   key={index}
                   style={{ height: '106px' }}
                   oriQty={prod.quantity}

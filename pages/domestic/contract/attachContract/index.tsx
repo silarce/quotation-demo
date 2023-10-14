@@ -410,6 +410,7 @@ export default function AttachContract() {
 
             <Table_prod
               disabled={true}
+              exchangeDiabled={false}
               prodList={productList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
@@ -473,6 +474,7 @@ export default function AttachContract() {
           <div className={scss.tableWrapper}>
             <Table_prod
               disabled={false}
+              exchangeDiabled={true}
               prodList={attachProdList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}

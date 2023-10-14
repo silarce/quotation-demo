@@ -1322,6 +1322,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             {/* 主產品設定 */}
             <Table_prod
               disabled={isAttach ? true : disabled}
+              exchangeDiabled={disabled}
               prodList={productList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
@@ -1397,6 +1398,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             {/* 主產品設定 */}
             <Table_prod
               disabled={isAttach ? true : disabled}
+              // exchangeDiabled={disabled}
               prodList={attachProdList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
