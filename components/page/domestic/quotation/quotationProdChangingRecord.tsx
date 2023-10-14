@@ -78,34 +78,30 @@ export default function TheQuotationProdChangingRecord({
       >
         {subContract?.map((item, index, arr) => {
           const content = item.content;
-          // const preContent = arr[index - 1];
+
           const contentTotal = content?.total ?? 0;
-          // const preContentTotal = index === 0 ? rootContractTotal : preContent?.content.total ?? 0;
-          // rootContractTotal
 
           const record = {
             quotationId: content.quotationNumber,
             date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
-            // priceChange: `${preContentTotal - contentTotal}`,
             priceChange: `${contentTotal}`,
             remark: content.editNotes,
-            // product: prodArr,
           };
 
           const isActive = activeIndex === index;
 
           const contentProdArr = _.cloneDeep(content.products);
-          // const preContentProdArr = preContent?.content.products;
 
-          contentProdArr.forEach((prod) => {
-            if (!prod.rootProductId) {
-              rootProdList[prod.id] = _.cloneDeep(prod);
+          contentProdArr.forEach((prod, index) => {
+            if (!rootProdList[prod.rootProductId]) {
+              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
             } else {
               const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
               const copy = _.cloneDeep(prod);
-              copy.quantity = rootQty - prod.quantity;
-              rootProdList[prod.rootProductId] = prod;
-              prod = copy;
+              copy.quantity = rootQty - copy.quantity;
+              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+              // 替換掉原本的
+              contentProdArr[index] = copy;
             }
           });
 

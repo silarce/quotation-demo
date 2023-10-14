@@ -1,3 +1,9 @@
+// 追加/追減項目
+// QuotationProdChangingRecord
+
+// 展開版本的追加追減紀錄 (在很下面)
+// QuotationRecord
+
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
@@ -201,8 +207,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   });
   subContracts = _.sortBy(subContracts, 'version');
-  // 總是把根合約的資料拿掉
-  subContracts?.shift();
+
+  // // 總是把根合約的資料拿掉
+  // subContracts?.shift();
 
   // latest
   const {

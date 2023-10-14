@@ -95,11 +95,7 @@ export default function QuotationRecord({
           activeKey={activePanel}
         >
           {subContract?.map((item, index, arr) => {
-            // const changeInfo = list[key];
-            // const { product } = changeInfo;
-
             const content = item.content;
-            // const lastcontent = arr[index - 1];
 
             const activeIndex = activePanel.findIndex((item) => item === index);
             const isActive = activeIndex === -1 ? false : true;
@@ -114,14 +110,6 @@ export default function QuotationRecord({
               }
             };
 
-            // let priceChange = 0;
-
-            // if (index === 0) {
-            //   priceChange = content.total - rootContractTotal;
-            // } else {
-            //   priceChange = content.total - lastcontent.total;
-            // }
-
             const changeInfo = {
               quotationId: content.quotationNumber,
               date: moment(content.quotationDate).format('yy-MM-DD'),
@@ -131,17 +119,17 @@ export default function QuotationRecord({
             };
 
             const contentProdArr = _.cloneDeep(content.products);
-            // const preContentProdArr = preContent?.content.products;
 
-            contentProdArr.forEach((prod) => {
-              if (!prod.rootProductId) {
-                rootProdList[prod.id] = _.cloneDeep(prod);
+            contentProdArr.forEach((prod, index) => {
+              if (!rootProdList[prod.rootProductId]) {
+                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
               } else {
-                const rootQty = rootProdList[prod.rootProductId].quantity;
+                const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
                 const copy = _.cloneDeep(prod);
-                copy.quantity = rootQty - prod.quantity;
-                rootProdList[prod.rootProductId] = prod;
-                prod = copy;
+                copy.quantity = rootQty - copy.quantity;
+                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+                // 替換掉原本的
+                contentProdArr[index] = copy;
               }
             });
 
