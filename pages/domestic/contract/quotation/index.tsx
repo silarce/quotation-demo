@@ -184,9 +184,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const panelList = allowEdit ? panel_quotation02 : switch02 ? panel_quotation03 : panel_quotation01;
 
   // =========================================================
-  // =========================================================
-  // =========================================================
-  // =========================================================
+
+  /**
+合約項目
+選中合約版本的contnet
+可以用url的version判斷
+version===1 是根合約
+version>1 是子合約
+
+如果是根合約，追加追減項目就取得所有的subContract
+如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
+
+原報價項目，就是根合約的content
+ */
 
   const { content, rootContent, subContracts, totalInfo } = useMemo(() => {
     if (!data) {
@@ -556,11 +566,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </>
           ) : (
             // 追加/追減項目
-            <QuotationProdChangingRecord subContract={subContracts} rootContractTotal={rootContent?.total ?? 0} />
+            <QuotationProdChangingRecord subContract={subContracts} />
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && <QuotationRecord subContract={subContracts} rootContractTotal={rootContent?.total ?? 0} />}
+          {switch02 && <QuotationRecord subContract={subContracts} />}
 
           <Summary
             disabled={true}
@@ -738,42 +748,3 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 };
 
 // ======================================================================
-
-// const OldQuotationProduction = ({
-//   classQuotation,
-// }: {
-//   classQuotation: Parameters<typeof QuotationProduction>[0]['classQuotation'];
-// }) => {
-//   const [isActive, setIsActive] = useState(false);
-//   const panelSwitch = () => setIsActive(!isActive);
-
-//   return (
-//     <Collapse
-//       className={`${style.oldQuotationProduction}`}
-//       expandIcon={() => <></>}
-//       accordion={false}
-//       activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
-//     >
-//       <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
-//         {/* <QuotationProduction
-//           className={style.quotationProduction}
-//           mainProductArr={productStates} /> */}
-//         {/* <QuotationProduction className={style.quotationProduction} classQuotation={classQuotation} disabled={true} /> */}
-//       </Panel>
-//     </Collapse>
-//   );
-// };
-
-/**
-合約項目
-選中合約版本的contnet
-可以用url的version判斷
-version===1 是根合約
-version>1 是子合約
-
-如果是根合約，追加追減項目就取得所有的subContract
-如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
-
-原報價項目，就是根合約的content
-
- */

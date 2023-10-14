@@ -9,7 +9,7 @@ import { Collapse } from 'antd';
 
 // glogal gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
+
 // css
 import style from 'components/page/domestic/quotation/quotationProdChangingRecord.module.scss';
 
@@ -17,12 +17,7 @@ import style from 'components/page/domestic/quotation/quotationProdChangingRecor
 // ===================================================================
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
-import {
-  TcreateQuotationContentOtherDto,
-  TquotationProductDto,
-  TquotationContentOtherDto,
-  TquotationContractDto,
-} from 'js/api/dtoTypes';
+import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
 // ===================================================================
 // ===================================================================
 
@@ -31,15 +26,10 @@ const { Panel } = Collapse;
 // =====================================================
 export default function TheQuotationProdChangingRecord({
   subContract,
-  rootContractTotal,
 }: {
   subContract: TquotationContractDto[] | undefined;
-  rootContractTotal: number;
 }) {
   subContract = _.sortBy(subContract, 'version');
-
-  // const { list, quotationId } = prodChangingRecord;
-  // const quotationIdKeyList = Object.keys(list);
 
   // 點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);

@@ -8,43 +8,21 @@ const { Panel } = Collapse;
 
 // global gear
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
+
+// helper
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // css
 import style from './quotationRecord.module.scss';
 
 // ===================================================================
-// import {
-//   TcreateQuotationContentOtherDto,
-//   TquotationProductDto,
-//   TquotationContentOtherDto,
-//   TquotationContractDto,
-// } from 'js/api/dtoTypes';
 
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
-import {
-  TcreateQuotationContentOtherDto,
-  TquotationProductDto,
-  TquotationContentOtherDto,
-  TquotationContractDto,
-} from 'js/api/dtoTypes';
+import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
 // ===================================================================
 
-export default function QuotationRecord({
-  // prodChangingRecord,
-  subContract,
-  rootContractTotal,
-}: {
-  // prodChangingRecord: TchangeRecord | undefined;
-  subContract: TquotationContractDto[] | undefined;
-  rootContractTotal: number;
-}) {
-  // const { list } = prodChangingRecord ?? { list: {} };
-  // const recordKeyList = Object.keys(list);
-
-  // const { keyList: prodKeyList, cellConfig } = prodCellConfigOri();
-
+export default function QuotationRecord({ subContract }: { subContract: TquotationContractDto[] | undefined }) {
   // ======================================================
   const [activePanel, setActivePanel] = useState<number[]>([]);
 
@@ -112,8 +90,7 @@ export default function QuotationRecord({
 
             const changeInfo = {
               quotationId: content.quotationNumber,
-              date: moment(content.quotationDate).format('yy-MM-DD'),
-              // priceChange: priceChange,
+              date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
               priceChange: content.total,
               remark: content.editNotes,
             };
@@ -207,34 +184,34 @@ export default function QuotationRecord({
 
 const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
   const {
-    reRender,
-    reset,
+    // reRender,
+    // reset,
     //
     productList,
     prodCellConfig,
     prodKeyArr,
-    prodVKeyArr,
-    setProdVKeyArr,
-    addProd,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
     changeProdKeyArr,
     //
-    subTotal,
+    // subTotal,
     //
-    comKeyArr,
-    comVKeyArr,
-    comCellConfig,
-    changeComKeyArr,
+    // comKeyArr,
+    // comVKeyArr,
+    // comCellConfig,
+    // changeComKeyArr,
     //
-    accessoriesKeyArr,
-    changeAccessoriesKeyArr,
-    accessoriesCellConfig,
+    // accessoriesKeyArr,
+    // changeAccessoriesKeyArr,
+    // accessoriesCellConfig,
     //
-    othersKeyArr,
-    othersList,
-    othersCellConfig,
-    changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
+    // othersKeyArr,
+    // othersList,
+    // othersCellConfig,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
   } = useProductList({
     productArr: prodArr ?? [],
     others: [],
