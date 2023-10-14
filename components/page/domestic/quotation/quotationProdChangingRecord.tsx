@@ -101,7 +101,7 @@ export default function TheQuotationProdChangingRecord({
             if (!prod.rootProductId) {
               rootProdList[prod.id] = _.cloneDeep(prod);
             } else {
-              const rootQty = rootProdList[prod.rootProductId].quantity;
+              const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
               const copy = _.cloneDeep(prod);
               copy.quantity = rootQty - prod.quantity;
               rootProdList[prod.rootProductId] = prod;
