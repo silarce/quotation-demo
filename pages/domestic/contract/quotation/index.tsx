@@ -8,6 +8,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
 import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 // components
 // import QuotationProfile, { TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
@@ -187,31 +188,59 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
   // =========================================================
 
-  // const content = data?.content;
-  const content = (() => {
-    if (version === '1') {
-      return data?.content;
-    } else if (version) {
-      const version_num = Number(version) - 1;
-
-      return data?.subContracts[version_num]?.content;
+  const { content, rootContent, subContracts, totalInfo } = useMemo(() => {
+    if (!data) {
+      return {};
     }
-  })();
-  const rootContent = data?.subContracts[0]?.content;
 
-  let subContracts = data?.subContracts.filter((item) => {
-    if (version === '1') {
-      return true;
-    } else {
-      return item.version <= Number(version ?? 0);
-    }
-  });
-  subContracts = _.sortBy(subContracts, 'version');
+    let subContracts = data.subContracts.filter((item) => {
+      if (version === '1') {
+        return true;
+      } else {
+        return item.version <= Number(version ?? 0);
+      }
+    });
 
-  // // 總是把根合約的資料拿掉
-  // subContracts?.shift();
+    subContracts = _.sortBy(subContracts, 'version');
 
-  // latest
+    const rootContent = subContracts[0]?.content;
+
+    const content = (() => {
+      if (version === '1') {
+        return data?.content;
+      } else if (version) {
+        const index = Number(version) - 1;
+        const contract = subContracts[index];
+
+        return contract?.content;
+      }
+    })();
+
+    let subTotal = new Decimal(0);
+    let salesTax = new Decimal(0);
+    let total = new Decimal(0);
+
+    subContracts.forEach((item) => {
+      subTotal = subTotal.plus(item.subTotal);
+      salesTax = salesTax.plus(item.salesTax);
+      total = total.plus(item.total);
+    });
+
+    const totalInfo = {
+      subTotal: subTotal.toNumber(),
+      salesTax: salesTax.toNumber(),
+      total: total.toNumber(),
+    };
+
+    return {
+      content,
+      rootContent,
+      subContracts,
+      totalInfo,
+    };
+  }, [data, version]);
+
+  // 合約項目
   const {
     // reRender,
     // reset,
@@ -245,7 +274,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productArr: content?.products ?? [],
     others: content?.others ?? [],
     resetTrigger: content?.products,
-  }); // latest
+  }); // 合約項目
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
@@ -297,19 +326,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       subTotal: {
         inputAttr: {
           disabled: true,
-          value: data?.subTotal ?? '',
+          value: totalInfo?.subTotal ?? '',
         },
       },
       salesTax: {
         inputAttr: {
           disabled: true,
-          value: data?.salesTax ?? '',
+          value: totalInfo?.salesTax ?? '',
         },
       },
       total: {
         inputAttr: {
           disabled: true,
-          value: data?.total ?? '',
+          value: totalInfo?.total ?? '',
         },
       },
     },
@@ -746,15 +775,5 @@ version>1 是子合約
 如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
 
 原報價項目，就是根合約的content
-
- */
-
-/**
-要問Gina的問題
-product的rootProdductId已經可以用了嗎
-是不是新增加的資料才會有?
-
-409的問題解決了嗎?
-能夠做追減了嗎?
 
  */
