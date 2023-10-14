@@ -2037,6 +2037,8 @@ class Class_product {
 
     const copy = _.cloneDeep(this.body_Tprod);
     copy.quantity = Number(v);
+    copy.dualPrice = new Decimal(copy.quantity).mul(copy.price).toNumber();
+    copy.totalPrice = new Decimal(copy.quantity).mul(copy.unitPrice).toNumber();
 
     const exId = 'ex-' + nanoid();
 
