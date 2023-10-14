@@ -2112,9 +2112,11 @@ class Class_product {
   }
 
   get body() {
+    const copy = _.cloneDeep(this._prodData);
+
     const body: TcreateQuotationProductDto & { id: string | undefined } = {
-      ...this._prodData,
-      id: this._prodData.id,
+      ...copy,
+      id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
       materialSurface: this.surface,
@@ -2174,9 +2176,10 @@ class Class_product {
   }
 
   get body_Tprod() {
+    const copy = _.cloneDeep(this._prodData);
     const body: Tprod = {
-      ...this._prodData,
-      id: this._prodData.id,
+      ...copy,
+      id: copy.id,
       quantity: Number(this._prodData.quantity),
       price: Number(this._price),
       dualPrice: Number(this._dualPrice),
@@ -2210,6 +2213,8 @@ class Class_product {
     const body = this.body;
     const divQty = Number(this.reduceQty) + this.exchangeQty;
     body.quantity = body.quantity - divQty;
+    body.dualPrice = new Decimal(body.quantity).mul(body.price).toNumber();
+    body.totalPrice = new Decimal(body.quantity).mul(body.unitPrice).toNumber();
 
     return body;
   }
