@@ -64,12 +64,12 @@ export default function Table_prod({
 
   const [showInputModal, setShowInputModal] = useState(false);
 
-  const exchangeConfirm_2 = (v: string) => {
+  const exchangeConfirm_2 = async (v: string) => {
     if (!targetProd) {
       return;
     }
 
-    const ressult = targetProd.addExchange(v);
+    const ressult = await targetProd.addExchange(v);
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });

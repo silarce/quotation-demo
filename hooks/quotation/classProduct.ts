@@ -2024,7 +2024,7 @@ class Class_product {
   }
 
   // 新增變更的prod
-  addExchange(v: string) {
+  async addExchange(v: string) {
     if (Number(v) > this.remainQty) {
       return false;
     }
@@ -2032,6 +2032,8 @@ class Class_product {
     if (this.isLoading_getProd) {
       return 'isLoading_getProd';
     }
+
+    await this.getComAndAcce();
 
     const copy = _.cloneDeep(this.body_Tprod);
     copy.quantity = Number(v);
