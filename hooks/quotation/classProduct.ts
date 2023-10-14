@@ -36,8 +36,15 @@ import { Class_accessories, Taccessories } from './classAccessories';
 import { Class_SubCom, TSubCom } from './classSubCom';
 // =============================================================================
 // api
-import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
-import { apiPostProdGenerateDoorProductBom, TgenerateDoorProductBomDto } from 'js/api/api_product';
+import {
+  apiGetProdCalcGeneralSpec,
+  apiGetProdAvailableComponents,
+  apiPostProdGenerateDoorProductBom,
+  TgenerateDoorProductBomDto,
+} from 'js/api/api_product';
+
+import { apiGetQuotationProducts } from 'js/api/api_quotation';
+
 // =============================================================================
 // utils
 import {
@@ -204,6 +211,26 @@ class Class_product {
 
   get hasParent() {
     return !!this.parentProd;
+  }
+
+  // ---------------------------------------------------------
+
+  async getComAndAcce() {
+    if (this.comList?.slat) {
+      return;
+    }
+
+    this.isLoading_getProd = true;
+    const { components, accessories } = await reqGetComAndAcce(this.id);
+    this.isLoading_getProd = false;
+
+    if (components) {
+      this.creComList_dyna({ componentsArr: components });
+    }
+
+    if (accessories) {
+      this.creAcceList_dyna({ acceArr: accessories });
+    }
   }
 
   // ---------------------------------------------------------
@@ -1966,8 +1993,16 @@ class Class_product {
     }
 
     this._reduceQty = v;
-    this.calcProdAllprice_timeout();
     this.reRender();
+
+    const asyncCall = async () => {
+      await this.getComAndAcce();
+
+      this.calcProdAllprice_timeout();
+      this.reRender();
+    };
+
+    asyncCall();
   }
 
   // 變更數量
@@ -2463,6 +2498,22 @@ const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
   });
 
   return list;
+};
+
+const reqGetComAndAcce = async (id: string | undefined) => {
+  if (!id) {
+    return {};
+  }
+
+  const res = await apiGetQuotationProducts(id);
+
+  if (res?.items) {
+    const { components, accessories } = res.items[0];
+
+    return { components, accessories };
+  } else {
+    return {};
+  }
 };
 
 // ===========================================================

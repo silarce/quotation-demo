@@ -34,8 +34,10 @@ import {
   TcreateModifyQuotationDto,
   TcreateQuotationProductDto,
   TquotationProductDto,
+  useGetContract_id,
+  useQuotation_id_attachments,
+  apiGetQuotationProducts,
 } from 'js/api/api_quotation';
-import { useGetContract_id, useQuotation_id_attachments, apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -137,24 +139,7 @@ export default function AttachContract() {
   const targetProd_attach = attachProdList[targetProdKey_attach];
 
   useEffect(() => {
-    (async () => {
-      if (targetProd?.id) {
-        try {
-          targetProd.isLoading_getProd = true;
-          const res = await apiGetQuotationProducts(targetProd.id);
-          const componentsArr = res.items?.[0].components ?? [];
-          const acceArr = res.items?.[0].accessories ?? [];
-
-          targetProd.creComList_dyna({ componentsArr: componentsArr });
-          targetProd.creAcceList_dyna({ acceArr });
-        } catch (error) {
-        } finally {
-          targetProd.isLoading_getProd = false;
-        }
-      }
-    })();
-
-    // apiGetQuotationProducts
+    targetProd?.getComAndAcce();
   }, [targetProd]);
 
   // ------------------------------------------------------------------
