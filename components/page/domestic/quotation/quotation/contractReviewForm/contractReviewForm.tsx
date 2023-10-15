@@ -169,27 +169,48 @@ export default function ContractReviewForm({
     const preBody = watch();
 
     const body: TcreateQuotationVerifyFormDto = {
-      // ...preBody,
+      // array
       paymentRatio: Object.values(payMethodList).map((item) => item.body),
-      //
+      // date
       askForPaymentDate: preBody.askForPaymentDate,
       disbursementDate: preBody.disbursementDate,
       paymentTenor: preBody.paymentTenor,
+      // boolean
       performanceBond: preBody.performanceBond,
       depositPayment: preBody.depositPayment,
-      warrantyPeriod: preBody.warrantyPeriod,
-      note: preBody.note,
       warrantyPayment: preBody.warrantyPayment,
       fireproofCertificate: preBody.fireproofCertificate,
       warranty: preBody.warranty,
       testDrive: preBody.testDrive,
-      debitItem: preBody.debitItem,
+      // string
+      warrantyPeriod: preBody.warrantyPeriod ?? '',
+      note: preBody.note ?? '',
+      debitItem: preBody.debitItem ?? '',
+      //
     };
 
-    const haveEmpty = _.some(body, (value) => value === null || value === undefined || value === '');
+    let isPaymentOk = true;
+    body.paymentRatio.forEach((item) => {
+      const { level, paymentRatio, price, note } = item;
 
-    if (haveEmpty) {
-      return myAlert.warning({ title: '請填寫所有欄位' });
+      if (!level || !paymentRatio || !price || !note) {
+        isPaymentOk = false;
+      }
+    });
+
+    if (!body.askForPaymentDate || !body.disbursementDate || !body.paymentTenor) {
+      return myAlert.warning({ title: '請填寫所有日期' });
+    } else if (
+      body.performanceBond === undefined ||
+      body.depositPayment === undefined ||
+      body.warrantyPayment === undefined ||
+      body.fireproofCertificate === undefined ||
+      body.warranty === undefined ||
+      body.testDrive === undefined
+    ) {
+      return myAlert.warning({ title: '請填寫所有二選一選項' });
+    } else if (!isPaymentOk) {
+      return myAlert.warning({ title: '請確實設定請款比例' });
     }
 
     try {
