@@ -334,9 +334,6 @@ export default function AttachContract() {
         subTotal: subTotal_calced,
         salesTax: salesTax_calced,
         total: total_calced,
-
-        // TODO 總樘數也要更新
-        // quantity: 999,
       };
 
       let hasSurface = true;
@@ -355,8 +352,6 @@ export default function AttachContract() {
         await apiQuotationModify(contractId, body);
         router.back();
       } catch (error) {}
-
-      //
       //
     } catch (error) {
       myAlert.err({ title: '上傳失敗' });

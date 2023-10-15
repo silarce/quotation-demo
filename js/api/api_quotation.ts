@@ -118,6 +118,8 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.verifyForm',
 
       'attachedToContract.content.products',
+      'attachedToContract.subContracts.content.products',
+      // 'subContracts.content.products',
     ],
   };
 

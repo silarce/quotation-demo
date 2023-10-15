@@ -15,21 +15,14 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm, useFormState } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-// import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-// import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-// import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-// import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
-// import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
-// import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
-// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
 
 import QuotationPdf_part, {
@@ -46,7 +39,6 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
@@ -57,12 +49,6 @@ import iconUpload from 'public/image/icon/upload.svg';
 import style from './quotation.module.scss';
 
 import { AppContext } from 'pages/_app';
-
-// ------------------------------------------------------------------
-
-// // 假資料與fake api
-// import { useQuotation } from 'hooks/quotation/useQuotation';
-// import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -227,36 +213,49 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const isAttach = true;
 
   const { contractArr, contentArr, contentProdList } = useMemo(() => {
-    const latestContent = quotationData?.latestContent;
-    const attachedToContract = quotationData?.attachedToContract;
+    if (!quotationData) {
+      return {};
+    }
 
-    // 合約原本的主產品
-    const contractProdArr = attachedToContract?.content.products;
+    const latestContent = quotationData.latestContent;
+    const attachedToContract = quotationData.attachedToContract;
+    const subContracts = attachedToContract?.subContracts;
 
-    // 可能帶有attachedToProductId
-    const contentProdArr = latestContent?.products;
+    // 主合約與所有子合約的主產品，迭代後的列表
+    const latestVersionProductList: { [key: string]: TquotationProductDto } = {};
 
-    const contractProdList: { [key: string]: TquotationProductDto } = {};
-    const contentProdList: { [key: string]: TquotationProductDto } = {};
-
-    contractProdArr?.forEach((prod) => {
-      contractProdList[prod.id] = prod;
+    subContracts?.forEach((item) => {
+      const prod = item.content.products;
+      prod.forEach((item) => {
+        latestVersionProductList[item.rootProductId] = item;
+      });
     });
 
-    contentProdArr?.forEach((prod) => {
-      if (prod.attachedToProductId) {
-        const oriQty = contractProdList?.[prod.attachedToProductId]?.quantity;
+    /**
+latestVersionProductList為所有主產品迭代後的結果
+latestContentProdArr為這次追加追減的主產品
+有rootProductId的prod代表是追減而來的主產品，簡稱追減主產品
+將 latestVersionProductList[追減主產品.rootProductId].quantity
+減掉 追減主產品.quantity 即可得到 追減主產品的reduceQty
 
-        if (oriQty !== undefined) {
-          // prod.reduceQty = oriQty - prod.quantity;
-          if (contractProdList?.[prod.attachedToProductId]) {
-            contractProdList[prod.attachedToProductId].reduceQty = oriQty - prod.quantity;
-          }
-        }
+    */
 
-        // contractProdList[prod.attachedToProductId] = prod;
+    const latestContentProdArr = latestContent?.products;
+
+    // 上面的，被追減的主產品
+    const contractProdList: { [key: string]: TquotationProductDto } = {};
+    // 下面的，追加的主產品
+    const contentProdList: { [key: string]: TquotationProductDto } = {};
+
+    latestContentProdArr?.forEach((prod) => {
+      const { rootProductId, quantity } = prod;
+
+      if (latestVersionProductList[rootProductId]) {
+        const latestVersionQty = latestVersionProductList[rootProductId].quantity;
+        contractProdList[rootProductId] = _.cloneDeep(latestVersionProductList[rootProductId]);
+        contractProdList[rootProductId].reduceQty = latestVersionQty - quantity;
       } else {
-        contentProdList[prod.id] = prod;
+        contentProdList[rootProductId] = prod;
       }
     });
 
@@ -401,7 +400,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     Object.values(productList).forEach((prod) => {
-      const childContent = prod.id ? contentProdList[prod.id] : undefined;
+      const childContent = prod.id ? contentProdList?.[prod.id] : undefined;
       const qty = childContent?.quantity ? childContent?.quantity : undefined;
 
       if (qty !== undefined) {
