@@ -1009,18 +1009,18 @@ latestContentProdArr為這次追加追減的主產品
     },
   ];
   const panel_noEditable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => setShowPdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出材料/配件',
-      img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出材料/配件',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf_part(true),
+    // },
 
     // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!isReviewer || null) && {
@@ -1043,7 +1043,7 @@ latestContentProdArr為這次追加追減的主產品
         return null;
       }
     })(),
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
