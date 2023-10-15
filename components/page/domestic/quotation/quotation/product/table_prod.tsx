@@ -20,6 +20,8 @@ import scss from '../table.module.scss';
 
 export default function Table_prod({
   disabled,
+  disabled_plus,
+  disabledExceptionArr,
   prodList,
   prodCellConfig,
   prodKeyArr,
@@ -40,6 +42,8 @@ export default function Table_prod({
   exchangeDiabled,
 }: {
   disabled: boolean;
+  disabled_plus?: boolean;
+  disabledExceptionArr?: string[];
   prodList: TproductList;
   prodCellConfig: TcellConfig;
   prodKeyArr: TprodKey[];
@@ -119,6 +123,8 @@ export default function Table_prod({
 
             <Tbody
               disabled={disabled}
+              disabled_plus={disabled_plus}
+              disabledExceptionArr={disabledExceptionArr}
               rowList={prodList}
               keyArr={prodKeyArr}
               prodCellConfig={prodCellConfig}
