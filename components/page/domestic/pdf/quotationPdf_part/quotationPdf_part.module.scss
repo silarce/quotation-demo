@@ -1,9 +1,14 @@
 @use "styles/theme01" as *;
 
-$fontTitle: 40px;
-$fontInfo: 25px;
-$fontPart: 25px;
+$fontTitle: 30px;
+$fontInfo: 20px;
+$fontPart: 20px;
 $semiMaring: 0 8px;
+
+// * {
+//   // font-family: Microsoft JhengHei;
+//   font-family: noto sans tc;
+// }
 
 .semi {
   margin: $semiMaring;
@@ -11,17 +16,14 @@ $semiMaring: 0 8px;
 
 // ant-modal
 .quotationPdf {
-  // background-color: #ddd;
-  // padding: 0;
+  * {
+    font-family: Microsoft JhengHei;
+    color: black;
+  }
+
   :global(.ant-modal-content) {
-    // width: fit-content;
-    // margin: auto;
   }
   :global(.ant-modal-body) {
-    // width: 595.28px;
-    // height: 841.89px;
-    // width: calc(595px * 2.7); // 595*2.7 = 1606
-    // height: calc(842px * 2.7);
     padding: 0;
   }
   .hr {
@@ -30,8 +32,8 @@ $semiMaring: 0 8px;
 }
 // ======================================================================
 .pdf {
-  width: calc(595px * 2.7); // 595*2.7 = 1606
-  height: calc(842px * 2.7);
+  width: calc(595px * 2); // 595*2.7 = 1606
+  height: calc(842px * 2);
   padding: 60px 40px;
   // line-height:0.5
   &.typeB {
@@ -48,7 +50,7 @@ $semiMaring: 0 8px;
   }
   > .contactInfo {
     display: grid;
-    grid-template-columns: 6fr 4fr;
+    grid-template-columns: 6fr 5fr;
     span {
       font-size: $fontInfo;
       line-height: 30px;

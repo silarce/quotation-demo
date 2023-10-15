@@ -7,11 +7,13 @@ import _ from 'lodash';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
-
+import iconReset from 'public/image/icon/reset.svg';
+import iconChange from 'public/image/icon/change.svg';
 // css
 
 import scss from './tbody.module.scss';
@@ -22,6 +24,7 @@ import type { Toption } from 'js/utils/options/options';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';
+
 import { DndContext, DraggableAttributes } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -41,6 +44,7 @@ type Titem = {
   [key: string]: any;
   delSelf?: () => void;
   copySelf?: () => void;
+  clearAttach?: () => void;
 };
 
 type TitemList = {
@@ -60,20 +64,32 @@ type TcellConfig = {
 // ==========================================================
 export default function Tbody({
   disabled,
+  disabled_plus,
+  disabledExceptionArr,
   rowList,
   keyArr,
   prodCellConfig,
   onRowClick,
   panelBox,
+  defalutVKeyArr,
+  onVKeyChange,
+  rowHeight,
+  showAttatchModal,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
+  disabled_plus?: boolean;
+  disabledExceptionArr?: string[];
   // prodList: TproductList;
   rowList: TitemList;
   keyArr: string[];
   prodCellConfig: TcellConfig;
-  onRowClick?: (onj: { item: Titem }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox';
+  onRowClick?: (obj: { item: Titem; key: string }) => void;
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  defalutVKeyArr?: string[];
+  onVKeyChange?: (keyArr: string[] | undefined) => void;
+  rowHeight?: 'h106';
+  showAttatchModal?: () => void;
 }) {
   // ---------------------------------------------------------------
 
@@ -86,9 +102,14 @@ export default function Tbody({
     onDragEnd,
     onDragStart,
   } = useVerticalDnd({
+    // listKeyArr: defalutVKeyArr || Object.keys(rowList),
     listKeyArr: Object.keys(rowList),
     resetTrigger: rowList,
+    onKeyChange: onVKeyChange,
   });
+
+  // console.log(rowList);
+  // console.log(vDndKeyArr);
 
   // useEffect(() => {
   //   onVerticalKeyChange(dndKeyArr);
@@ -102,6 +123,7 @@ export default function Tbody({
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
+  // onVKeyChange
   return (
     <div>
       <DndContext
@@ -110,7 +132,8 @@ export default function Tbody({
           restrictToVerticalAxis,
           // restrictToWindowEdges,
         ]}
-        onDragEnd={onDragEnd}
+        // onDragEnd={onDragEnd}
+        onDragEnd={(e) => onDragEnd(e)}
         onDragStart={onDragStart}
       >
         <SortableContext items={vDndKeyArr} strategy={verticalListSortingStrategy}>
@@ -137,14 +160,20 @@ export default function Tbody({
                 keyArr={keyArr}
                 isMoving={isMoving}
                 disabled={disabled}
+                disabled_plus={disabled_plus}
+                disabledExceptionArr={disabledExceptionArr}
                 panelBox={panelBox}
                 //
                 prodCellConfig={prodCellConfig}
                 //
                 onRowClick={() => {
                   setActiveKey(key);
-                  onRowClick && onRowClick({ item: item });
+                  onRowClick && onRowClick({ item: item, key });
                 }}
+                defalutVKeyArr={defalutVKeyArr}
+                rowHeight={rowHeight}
+                showAttatchModal={showAttatchModal}
+                clearAttach={item.clearAttach}
               />
             );
           })}
@@ -170,6 +199,7 @@ const CopyDelBtnBox = ({
   indexNum,
   dndAttr,
   dndListener,
+  hiddenDelCopy,
 }: {
   disabled: boolean;
   del?: () => void;
@@ -177,13 +207,14 @@ const CopyDelBtnBox = ({
   indexNum: string | number;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
+  hiddenDelCopy?: boolean;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[137px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
 
       <IconDelete01
-        className={scss.svgBtn}
+        className={classNames(scss.svgBtn, hiddenDelCopy && scss.hidden)}
         onClick={(e) => {
           e.stopPropagation();
 
@@ -193,7 +224,7 @@ const CopyDelBtnBox = ({
         }}
       />
       <IconCopy
-        className={scss.svgBtn}
+        className={classNames(scss.svgBtn, hiddenDelCopy && scss.hidden)}
         onClick={() => {
           if (!disabled) {
             copy && copy();
@@ -217,6 +248,69 @@ const EasyBox = ({
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+      <span>{indexNum}</span>
+    </div>
+  );
+};
+
+const ComBox = ({
+  indexNum,
+  dndAttr,
+  dndListener,
+  comName,
+}: {
+  indexNum: string | number;
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  comName: string;
+}) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[180px]')}>
+      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+      {/* <span>{indexNum}</span> */}
+      <span>{comName}</span>
+    </div>
+  );
+};
+
+const ResetChangeBtnBox = ({
+  toSetTargetIndex,
+  clearExchange,
+  dndAttr,
+  dndListener,
+  indexNum,
+  isLatestBatch,
+}: {
+  toSetTargetIndex: undefined | (() => void);
+  clearExchange: undefined | (() => void);
+  dndAttr: DraggableAttributes;
+  dndListener: SyntheticListenerMap | undefined;
+  indexNum: string | number;
+  isLatestBatch?: boolean;
+}) => {
+  return (
+    <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
+      <Image className={scss.iconBtn} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+
+      <Image
+        src={iconReset}
+        alt="還原"
+        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        onClick={clearExchange}
+      />
+      <Image
+        src={iconChange}
+        alt="變更"
+        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        onClick={toSetTargetIndex}
+      />
+
+      {/* <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
+        還原
+      </button>
+      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
+        變更
+      </button> */}
       <span>{indexNum}</span>
     </div>
   );
@@ -259,12 +353,20 @@ function DndRow({
   pIndex,
   item,
   keyArr: keyArr,
+  defalutVKeyArr,
   isMoving,
+  //
   disabled,
+  disabled_plus,
+  disabledExceptionArr,
+  //
   onRowClick,
   prodCellConfig,
   isActive,
   panelBox = 'copyDelBtnBox',
+  rowHeight,
+  showAttatchModal,
+  clearAttach,
 }: {
   id: string;
   pIndex: number;
@@ -272,15 +374,21 @@ function DndRow({
   item: Titem;
   // prodKeyArr: TprodKey[];
   keyArr: string[];
+  defalutVKeyArr?: string[];
   isMoving: boolean;
+  //
   disabled: boolean;
+  disabled_plus?: boolean;
+  disabledExceptionArr?: string[];
   //
   onRowClick?: () => void;
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox';
-  //
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  rowHeight?: 'h106';
+  showAttatchModal?: () => void;
+  clearAttach?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id,
@@ -292,9 +400,10 @@ function DndRow({
   };
 
   return (
-    <div style={itemStyle} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')} onClick={onRowClick}>
+    <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+      <LoadingCover01 isLoading={item?.isLoading} size={40} />
       <CellWithBar isActive={isActive} className="z-0">
-        <div className={scss.row} onClick={undefined}>
+        <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
           {/*  */}
           {panelBox === 'copyDelBtnBox' && (
             <CopyDelBtnBox
@@ -304,14 +413,48 @@ function DndRow({
               indexNum={pIndex + 1}
               dndAttr={attributes}
               dndListener={listeners}
+              hiddenDelCopy={item.parentProd}
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+          {panelBox === 'comBox' && (
+            <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
+          )}
+
+          {panelBox === 'resetChangeBox' && (
+            <ResetChangeBtnBox
+              toSetTargetIndex={showAttatchModal}
+              clearExchange={clearAttach}
+              dndAttr={attributes}
+              dndListener={listeners}
+              indexNum={pIndex}
+              isLatestBatch={true}
+            />
+          )}
 
           {/*  */}
           {keyArr.map((key) => {
             if (!item) {
               return null;
+            }
+
+            let theDisabled = disabled;
+
+            if (key === 'quantity') {
+              // item.disabled_quantity === true ? (theDisabled = true) : undefined;
+              item.disabled_quantity === true
+                ? (theDisabled = true)
+                : item.disabled_quantity === false
+                ? (theDisabled = false)
+                : undefined;
+            }
+
+            if (disabledExceptionArr?.includes(key)) {
+              theDisabled = false;
+            }
+
+            if (disabled_plus) {
+              theDisabled = true;
             }
 
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
@@ -329,7 +472,7 @@ function DndRow({
                   className={classNames(scss.column, isHidden && scss.hidden)}
                   style={{ width: inputSelProps.wrapperStyle?.width }}
                 >
-                  <InputSel disabled={disabled} suffix={stateValue} suffixClassName="m-auto" {...inputSelProps} />
+                  <InputSel disabled={theDisabled} suffix={stateValue} suffixClassName="m-auto" {...inputSelProps} />
                 </div>
               );
             }
@@ -386,6 +529,11 @@ function DndRow({
               checkBoxProps.onChange = (arr) => {
                 (item[key] as boolean) = !!arr[0];
               };
+
+              inputSelProps.wrapperStyle = {
+                justifyContent: 'center',
+                ...inputSelProps.wrapperStyle,
+              };
             }
 
             //____
@@ -395,7 +543,7 @@ function DndRow({
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
               >
-                <InputSel disabled={disabled} showBaseline="auto" {...inputSelProps} />
+                <InputSel disabled={theDisabled} showBaseline="auto" {...inputSelProps} />
               </div>
             );
           })}

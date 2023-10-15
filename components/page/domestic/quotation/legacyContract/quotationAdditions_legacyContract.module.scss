@@ -118,7 +118,8 @@
 
   &.resetChange {
     // width: 160px;
-    width: 192px;
+    // width: 192px;
+    width: 140px;
   }
   &.exchange {
     width: 160px;
@@ -146,8 +147,11 @@
     transform: translateY(-3px);
   }
 
-  > .move {
+  > .iconBtn {
     cursor: pointer;
+    &.littleBtn {
+      transform: translateY(-5px);
+    }
   }
   span {
     font-weight: 400;

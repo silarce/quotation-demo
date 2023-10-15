@@ -1,3 +1,5 @@
+// 相數符號 ∮
+
 import Decimal from 'decimal.js';
 
 import type { TreRender } from './useProduct';
@@ -8,62 +10,81 @@ import { Toption } from 'js/utils/options/options';
 
 import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
-import scss from './classAccessory.module.scss';
+import scss from './classComponent.module.scss';
 
 import { TgenerateDoorProductBomDto_ComponentInfo } from 'js/api/api_product';
-import { TaccessoryKey } from './useProduct';
+import { TcomponentKey } from './useProduct';
+import { prodCellConfig } from './prodCellConfig';
 
 // ===========================================================
-class Class_accessory {
+class Class_component {
   constructor({
-    //
     reRender,
     data,
     key,
     prod,
+    isNew = true,
   }: {
     reRender: TreRender;
-    data: Taccessory;
-    key: TaccessoryKey;
+    data: Tcomponent;
+    key: TcomponentKey;
     prod: Class_product;
+    isNew?: boolean;
   }) {
     this.reRender = reRender;
     this._prod = prod;
-    this._data = data;
+    this._com = data;
     this.key = key;
 
-    if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
-      this._material = acceLookUp[key].options[0].value;
+    if (!this._com.material) {
+      if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
+        this._com.material = comLookUp[key].options[0].value;
+      }
     }
 
-    this._quantity = calcDefaultValue({
-      key,
-      w: Number(prod.width),
-      l: Number(prod.length),
-      h: Number(prod.height),
-      b: Number(prod.boxB),
-    });
+    if (!this._com.quantity) {
+      // 不同的材料配件會用不同的值為預設數量
+      this._com.quantity = calcDefaultQuantity({
+        key,
+        // w: Number(prod.WG),
+        w: 0,
+        l: Number(prod.fullWidth),
+        h: Number(prod.height),
+        b: Number(prod.boxB),
+      });
+    }
 
-    this.calcAllPrice();
-  } // constructor
+    if (isNew) {
+      setTimeout(() => {
+        this.calcAllPrice();
+      }, 0);
+    } else {
+      this.calcAllPrice({ calcProdTotal: false });
+    }
+
+    // =constructor
+  } // =constructor
 
   private reRender;
   private _prod;
-  private _data;
+  private _com;
   readonly key;
+  readonly callReqGetCodeNumber = () => {
+    this._prod.shouldCall_pgpb = true;
+    this._prod.callAllReq();
+  };
   //
   //
-  private _material: undefined | string = undefined;
-  private _surface: undefined | string = undefined;
-  private _isPainted = false;
+  // private _material: undefined | string = undefined;
+  // private _surface: undefined | string = undefined;
+  // private _isPainted = false;
 
-  private _quantity = '';
+  // private _quantity = '';
   private _dualPrice = 0;
   private _unitPrice = 0;
   private _totalPrice = 0;
   //
   //
-  codeNumber = '';
 
   // ---------------------------------------------------------
 
@@ -81,17 +102,19 @@ class Class_accessory {
       this.material = value;
     } else {
       this.material = 'SST#304';
+
+      if (this.options_surface) {
+        this.surface = this.options_surface[0].value;
+      }
     }
   };
 
-  calcAllPrice({
-    toCalcAcceAllprice = true,
-  }: //
-  { toCalcAcceAllprice?: boolean } = {}) {
+  calcAllPrice({ calcProdTotal = true }: { calcProdTotal?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
 
+    const quantity = Number(this._com.quantity || 0);
+
     const price = this.price || 0;
-    const quantity = Number(this._quantity || 0);
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
@@ -99,29 +122,34 @@ class Class_accessory {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._dualPrice = dualPrice.ceil().toNumber();
-    this._unitPrice = unitPrice.ceil().toNumber();
-    this._totalPrice = totalPrice.ceil().toNumber();
+    this._dualPrice = Number(dualPrice.toFixed(0));
+    this._unitPrice = Number(unitPrice.toFixed(0));
+    this._totalPrice = Number(totalPrice.toFixed(0));
 
-    if (toCalcAcceAllprice) {
-      this._prod.calcAcceAllPrice();
+    if (calcProdTotal) {
+      this._prod.calcProdAllprice_timeout();
     }
 
     this.reRender();
   }
 
+  renewDescDensity() {
+    this.desc = comLookUp[this.key].creDesc(this);
+    this.density = String(this._prod._doorGeneralSpecs?.density || 0);
+  }
+
   // ---------------------------------------------------------
 
   get hiddenKeyArr() {
-    return acceLookUp[this.key].hiddenKeyArr;
+    return comLookUp[this.key].hiddenKeyArr;
   }
 
   get componentInfo() {
     const info: TgenerateDoorProductBomDto_ComponentInfo = {
-      id: this._data.id,
-      material: this._material ?? '', // 注意，api不接受空字串
-      materialSurface: this._surface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
-      isPainted: this._isPainted,
+      id: this._com.id ?? '',
+      material: this._com.material ?? '', // 注意，api不接受空字串
+      materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
+      isPainted: !!this._com.isPainted,
     };
 
     return info;
@@ -134,7 +162,7 @@ class Class_accessory {
       return this._prod.options_material;
     }
 
-    return acceLookUp[this.key].options;
+    return comLookUp[this.key].options;
   }
 
   get options_surface() {
@@ -146,49 +174,79 @@ class Class_accessory {
   }
 
   // ---------------------------------------------------------
-  get acceName() {
-    return acceLookUp[this.key].typeName;
+  get comName() {
+    return comLookUp[this.key].typeName;
   }
 
   get desc() {
-    return acceLookUp[this.key].creDesc(this);
+    // if (!this._com.id) {
+    //   return '沒有符合規格的產品';
+    // }
+
+    // return comLookUp[this.key].creDesc(this);
+    return this._com.desc;
+  }
+
+  set desc(v) {
+    this._com.desc = v;
+    this.reRender();
+  }
+
+  get density() {
+    return this._com.density;
+    // return this._prod._doorGeneralSpecs?.density;
+  }
+  set density(v) {
+    this._com.density = v;
+    this.reRender();
   }
 
   // -------------------------------------------1--------------
   get doorModelName() {
-    return this._data.doorModelName;
+    return this._com.doorModelName;
   }
   set doorModelName(v) {
-    this._data.doorModelName = v;
+    this._com.doorModelName = v;
     this.reRender();
   }
 
   get code() {
-    return this._data.code;
+    return this._com.code;
   }
   set code(v) {
-    this._data.code = v;
+    this._com.code = v;
     this.reRender();
   }
 
   get specialSpec() {
-    return this._data.specialSpec;
+    return this._com.specialSpec;
   }
   set specialSpec(v) {
-    this._data.specialSpec = v;
+    this._com.specialSpec = v;
     this.reRender();
   }
 
   get price() {
-    return this._data.price;
+    return this._com.price;
   }
-  // set price(v) {
-  //   this._data.price = v;
-  //   this.reRender();
-  // }
+  set price(v) {
+    this._com.price = v;
+    this.reRender();
+  }
+
+  get price_locale() {
+    return this._com.price?.toLocaleString();
+  }
+  set price_locale(v) {
+    v = v ?? '0';
+    v = v.replace(/,/g, '');
+    this._com.price = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
 
   get name() {
-    return this._data.name;
+    return this._com.name;
   }
   // set name(v) {
   //   this._data.name = v;
@@ -196,191 +254,216 @@ class Class_accessory {
   // }
 
   get isAntiTyphoon() {
-    return this._data.isAntiTyphoon;
+    return this._com.isAntiTyphoon;
   }
   set isAntiTyphoon(v) {
-    this._data.isAntiTyphoon = v;
+    this._com.isAntiTyphoon = v;
     this.reRender();
   }
 
   get gearNumber() {
-    return this._data.gearNumber;
+    return this._com.gearNumber;
   }
   set gearNumber(v) {
-    this._data.gearNumber = v;
+    this._com.gearNumber = v;
     this.reRender();
   }
 
   get motorVendor() {
-    return this._data.motorVendor;
+    return this._com.motorVendor;
   }
   set motorVendor(v) {
-    this._data.motorVendor = v;
+    this._com.motorVendor = v;
     this.reRender();
   }
 
   get bearingType() {
-    return this._data.bearingType;
+    return this._com.bearingType;
   }
   set bearingType(v) {
-    this._data.bearingType = v;
+    this._com.bearingType = v;
     this.reRender();
   }
 
   get thickness() {
-    return this._data.thickness;
+    return this._com.thickness;
   }
   set thickness(v) {
-    this._data.thickness = v;
+    this._com.thickness = v;
     this.reRender();
   }
 
   get isIntegrated() {
-    return this._data.isIntegrated;
+    return this._com.isIntegrated;
   }
   set isIntegrated(v) {
-    this._data.isIntegrated = v;
+    this._com.isIntegrated = v;
     this.reRender();
   }
 
   get isWaterProof() {
-    return this._data.isWaterProof;
+    return this._com.isWaterProof;
   }
   set isWaterProof(v) {
-    this._data.isWaterProof = v;
+    this._com.isWaterProof = v;
     this.reRender();
   }
 
   get hasAluminumBarrier() {
-    return this._data.hasAluminumBarrier;
+    return this._com.hasAluminumBarrier;
   }
   set hasAluminumBarrier(v) {
-    this._data.hasAluminumBarrier = v;
+    this._com.hasAluminumBarrier = v;
     this.reRender();
   }
 
   get hasSilencingStrip() {
-    return this._data.hasSilencingStrip;
+    return this._com.hasSilencingStrip;
   }
   set hasSilencingStrip(v) {
-    this._data.hasSilencingStrip = v;
+    this._com.hasSilencingStrip = v;
     this.reRender();
   }
 
   get maxDoorWeight() {
-    return this._data.maxDoorWeight;
+    return this._com.maxDoorWeight;
   }
   set maxDoorWeight(v) {
-    this._data.maxDoorWeight = v;
+    this._com.maxDoorWeight = v;
     this.reRender();
   }
 
   get minDoorWeight() {
-    return this._data.minDoorWeight;
+    return this._com.minDoorWeight;
   }
   set minDoorWeight(v) {
-    this._data.minDoorWeight = v;
+    this._com.minDoorWeight = v;
     this.reRender();
   }
 
   get diameter() {
-    return this._data.diameter;
+    return this._com.diameter;
   }
   set diameter(v) {
-    this._data.diameter = v;
+    this._com.diameter = v;
     this.reRender();
   }
 
   get horsePower() {
-    return this._data.horsePower;
+    return this._com.horsePower;
   }
   set horsePower(v) {
-    this._data.horsePower = v;
+    this._com.horsePower = v;
     this.reRender();
   }
 
   get phase() {
-    return this._data.phase;
+    return this._com.phase;
   }
   set phase(v) {
-    this._data.phase = v;
+    this._com.phase = v;
     this.reRender();
   }
 
   get voltage() {
-    return this._data.voltage;
+    return this._com.voltage;
   }
   set voltage(v) {
-    this._data.voltage = v;
+    this._com.voltage = v;
     this.reRender();
   }
 
   get loadWeight() {
-    return this._data.loadWeight;
+    return this._com.loadWeight;
   }
   set loadWeight(v) {
-    this._data.loadWeight = v;
+    this._com.loadWeight = v;
     this.reRender();
   }
 
   get hasSupportStand() {
-    return this._data.hasSupportStand;
+    return this._com.hasSupportStand;
   }
   set hasSupportStand(v) {
-    this._data.hasSupportStand = v;
+    this._com.hasSupportStand = v;
     this.reRender();
   }
 
   get chains() {
-    return this._data.chains;
+    return this._com.chains;
   }
   set chains(v) {
-    this._data.chains = v;
+    this._com.chains = v;
     this.reRender();
   }
   // --------------------------------------------------
   // --------------------------------------------------
-  // 不來自於Taccessory
+  // 不來自於Tcomponent
 
   get material() {
-    return this._material;
+    return this._com.material ?? '';
   }
   set material(v) {
     if (!checkIsSST(v ?? '')) {
-      this._surface = '';
+      this._com.materialSurface = '';
     }
 
-    this._material = v;
+    this._com.material = v;
+
+    if (!this.surface && this.options_surface) {
+      this.surface = this.options_surface[0].value;
+    }
+
+    this.callReqGetCodeNumber();
+
+    if (this.key === 'bottomBar') {
+      this.desc = creDesc_bottomBars(this);
+    }
+
     this.reRender();
   }
 
   get surface() {
-    return this._surface;
+    return this._com.materialSurface;
   }
   set surface(v) {
-    this._surface = v;
+    this._com.materialSurface = v;
+    this.callReqGetCodeNumber();
     this.reRender();
   }
 
   get isPainted() {
-    return this._isPainted;
+    return this._com.isPainted;
   }
 
   set isPainted(v) {
-    this._isPainted = v;
+    this._com.isPainted = v;
+    this.callReqGetCodeNumber();
     this.reRender();
   }
 
-  get density() {
-    return this._prod._doorGeneralSpecs?.density;
-  }
-
   get quantity() {
-    return this._quantity;
+    return this._com.quantity ?? '';
   }
   set quantity(str) {
-    this._quantity = str;
+    this._com.quantity = str;
     this.calcAllPrice();
+    this.reRender();
+  }
+
+  get codeNumber() {
+    return this._com.number ?? '';
+  }
+  set codeNumber(v) {
+    this._com.number = v;
+    this.reRender();
+  }
+
+  get componentId() {
+    return this._com.componentId ?? '';
+  }
+  set componentId(v) {
+    this._com.componentId = v;
     this.reRender();
   }
 
@@ -388,30 +471,68 @@ class Class_accessory {
     return String(this._dualPrice);
   }
 
+  get dualPrice_locale() {
+    return this._dualPrice.toLocaleString();
+  }
+
   get unitPrice() {
     return String(this._unitPrice);
+  }
+  get unitPrice_locale() {
+    return this._unitPrice.toLocaleString();
   }
 
   get totalPrice() {
     return String(this._totalPrice);
   }
+  get totalPrice_locale() {
+    return this._totalPrice.toLocaleString();
+  }
 
   get unit() {
-    return acceLookUp[this.key].unit;
+    return comLookUp[this.key].unit;
   }
-} // Class_accessory
+
+  set bom(v: object[]) {
+    this._com.bom = v;
+  }
+
+  get body() {
+    return {
+      type: comLookUp[this.key].type,
+      material: this._com.material ?? '',
+      materialSurface: this._com.materialSurface || undefined,
+      isPainted: this._com.isPainted ?? false,
+      price: this._com.price ?? 0,
+      quantity: Number(this._com.quantity) ?? 0,
+      // 下面這幾個先跳過
+      number: this.codeNumber ?? '',
+      componentId: this.componentId ?? '',
+      rawData: { foo: 'foo' },
+      bom: this._com.bom,
+      // order: '', //在外面處理
+
+      desc: this.desc,
+      density: this.density,
+    };
+  }
+} // Class_component
 
 // ===========================================================
 
-type Taccessory = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
+type Tcomponent = {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
   doorModelName: string; // 門型名稱
   code: string; // 編號
   specialSpec: string | null; // 特殊規格
-  price: number | null;
   name?: string; // TdoorMotorAccessoriesDto沒有name
+
+  bom?: object[];
+  rawData?: object;
+  density?: string;
+  desc?: string;
 
   // ----------------------------------------------
   // 這邊是共有的property
@@ -467,34 +588,51 @@ type Taccessory = {
   // 兩個property，都是共有property
   //
   //
+
+  // 以下這些來自TcreateQuotationProductComponentsDto
+  material?: string;
+  materialSurface?: string;
+  isPainted?: boolean;
+  price?: number | null;
+  quantity?: string;
+  number?: string;
+  componentId?: string;
+
+  order?: number;
 }; //  Taccessory
 
 // type TacceKey = keyof Taccessory;
-
-const acceKeyArrOri: () => string[] = () => {
+// w Class_SubCom也會使用這邊的設定，所以這邊有更改的話Class_SubCom那邊也要處理Z
+const comKeyArrOri: () => string[] = () => {
   return [
-    'acceName',
-    'name',
+    // 'acceName',
+    'codeNumber',
+    'desc',
+    // 'name',
     'material',
     'surface',
     'density',
     'isPainted',
 
-    'desc',
-
     'unit',
 
     'quantity',
-    'price',
-    'dualPrice',
-    'unitPrice',
-    'totalPrice',
+
+    // 'price',
+    // 'dualPrice',
+    // 'unitPrice',
+    // 'totalPrice',
+    'price_locale',
+    'dualPrice_locale',
+    'unitPrice_locale',
+    'totalPrice_locale',
   ];
 };
 
-const acceCellConfig: TcellConfig = {
-  acceName: {
-    label: '種類名稱',
+// w Class_SubCom也會使用這邊的設定，所以這邊有更改的話Class_SubCom那邊也要處理Z
+const comCellConfig: TcellConfig = {
+  comName: {
+    label: '名稱',
     inputSelProps: {
       wrapperStyle: { width: '100px' },
       showBaseline: 'invisible',
@@ -512,6 +650,19 @@ const acceCellConfig: TcellConfig = {
       showBaseline: 'invisible',
       inputProps: {
         props: {
+          disabled: true,
+        },
+      },
+    },
+  },
+  codeNumber: {
+    label: '代號',
+    inputSelProps: {
+      wrapperStyle: { width: '110px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          placeholder: '讀取中',
           disabled: true,
         },
       },
@@ -544,7 +695,7 @@ const acceCellConfig: TcellConfig = {
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '65px' },
       selectProps: {
         props: {
           // options 寫在class裡面
@@ -555,7 +706,7 @@ const acceCellConfig: TcellConfig = {
   density: {
     label: '重量基重',
     inputSelProps: {
-      wrapperStyle: { width: '100px' },
+      wrapperStyle: { width: '80px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -568,7 +719,8 @@ const acceCellConfig: TcellConfig = {
     label: '烤漆',
     theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '40px' },
+      showBaseline: 'invisible',
+      wrapperStyle: { width: '45px' },
       checkBoxProps: {
         wrapperStyle: { justifyContent: 'center' },
         propsArr: [{ key: 'isPainted' }],
@@ -578,7 +730,7 @@ const acceCellConfig: TcellConfig = {
   desc: {
     label: '說明',
     inputSelProps: {
-      wrapperStyle: { width: '500px' },
+      wrapperStyle: { width: '200px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -597,19 +749,43 @@ const acceCellConfig: TcellConfig = {
       },
     },
   },
-  price: {
+  // // price: {
+  // //   label: '牌價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '80px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  price_locale: {
     label: '牌價',
     inputSelProps: {
-      showBaseline: 'invisible',
-      wrapperStyle: { width: '120px' },
+      // showBaseline: 'invisible',
+      wrapperStyle: { width: '80px' },
       inputProps: {
         props: {
-          disabled: true,
+          // disabled: true,
         },
       },
     },
   },
-  dualPrice: {
+  // // dualPrice: {
+  // //   label: '牌價複價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '120px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  dualPrice_locale: {
     label: '牌價複價',
     inputSelProps: {
       showBaseline: 'invisible',
@@ -621,11 +797,23 @@ const acceCellConfig: TcellConfig = {
       },
     },
   },
-  unitPrice: {
+  // // unitPrice: {
+  // //   label: '單價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '80px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  unitPrice_locale: {
     label: '單價',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '120px' },
+      wrapperStyle: { width: '80px' },
       inputProps: {
         props: {
           disabled: true,
@@ -633,11 +821,23 @@ const acceCellConfig: TcellConfig = {
       },
     },
   },
-  totalPrice: {
+  // // totalPrice: {
+  // //   label: '複價',
+  // //   inputSelProps: {
+  // //     showBaseline: 'invisible',
+  // //     wrapperStyle: { width: '120px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  totalPrice_locale: {
     label: '複價',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '140px' },
+      wrapperStyle: { width: '120px' },
       inputProps: {
         props: {
           disabled: true,
@@ -661,46 +861,59 @@ const acceCellConfig: TcellConfig = {
 // ============================================================================================
 // ============================================================================================
 
-const creNotConformAcce = () => ({
-  id: '',
-  createdAt: '',
-  updatedAt: '',
-  doorModelName: '',
-  // code: '沒有符合規格的產品',
-  desc: '沒有符合規格的產品',
-  specialSpec: '---',
-  price: 0,
-});
-
-const creDesc_slats = (classAcce: Class_accessory) => {
-  const { isAntiTyphoon } = classAcce;
+const creDesc_slats = (classCom: Class_component) => {
+  const { isAntiTyphoon, material, surface, thickness, name } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
+
+  console.log(thickness);
 
   // return `${desc_isAntiTyphoon} `;
-  return ``;
+  return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };
 
-const creDesc_bottomBars = (classAcce: Class_accessory) => {
-  const { isAntiTyphoon, isWaterProof, hasAluminumBarrier } = classAcce;
+const creDesc_bottomBars = (classCom: Class_component) => {
+  const {
+    // isAntiTyphoon,    isWaterProof,      hasAluminumBarrier ,
+    material,
+  } = classCom;
 
-  const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
-  const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
-  const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
+  const bottomBarAngleIron_options = prodCellConfig.bottomBarAngleIron.inputSelProps.selectProps!.props!
+    .options! as Toption[];
+
+  let desc = '';
+
+  if (material.includes('鍍鋅')) {
+    desc = bottomBarAngleIron_options[0].value;
+  } else if (material.includes('高耐鍍鋅鋼板')) {
+    desc = bottomBarAngleIron_options[1].value;
+  } else if (material.includes('304')) {
+    desc = bottomBarAngleIron_options[2].value;
+  } else if (material.includes('316')) {
+    desc = bottomBarAngleIron_options[3].value;
+  } else {
+    desc = bottomBarAngleIron_options[2].value;
+  }
+
+  // const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
+  // const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
+  // const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
 
   // return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
-  return ``;
+  // 50*50*4T 錏 後端沒有給類似格式的的資料
+  return `${desc}`;
 };
 
-const creDesc_guideRails = (classAcce: Class_accessory) => {
-  const { name, hasSilencingStrip, isAntiTyphoon, thickness } = classAcce;
+const creDesc_guideRails = (classCom: Class_component) => {
+  const { name, material, hasSilencingStrip, isAntiTyphoon, thickness } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
   const desc_hasSilencingStrip = confomtTree.hasSilencingStrip[`${hasSilencingStrip}`];
 
   // return `厚度${thickness} ${desc_isAntiTyphoon} ${desc_hasSilencingStrip}`;
-  return `${name} 厚度${thickness}`;
+  // return `${name} 厚度${thickness}`;
+  return `${name ?? ''} ${material ?? ''} `;
 };
 
-const creDesc_sidePlates = (classAcce: Class_accessory) => {
+const creDesc_sidePlates = (classCom: Class_component) => {
   const {
     //
     name,
@@ -710,23 +923,24 @@ const creDesc_sidePlates = (classAcce: Class_accessory) => {
     maxDoorWeight,
     minDoorWeight,
     motorVendor,
-  } = classAcce;
+  } = classCom;
 
   const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
 
   // return `${desc_isIntegrated} 馬達供應商:${motorVendor ?? '無資料'} 軸承:${bearingType ?? '無資料'} 齒輪編號:${
   //   gearNumber ?? '無資料'
   // } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
-  return `${name} `;
+  return `${name ?? ''} `;
 };
 
-const creDesc_rollers = (classAcce: Class_accessory) => {
-  const { diameter } = classAcce;
+const creDesc_rollers = (classCom: Class_component) => {
+  const { diameter } = classCom;
 
-  return `直徑:${diameter ?? '無資料'}`;
+  // return `直徑:${diameter ?? '無資料'}`;
+  return `∮${diameter ?? ''}`;
 };
 
-const creDesc_motors = (classAcce: Class_accessory) => {
+const creDesc_motors = (classCom: Class_component) => {
   const {
     //
     gearNumber,
@@ -736,40 +950,52 @@ const creDesc_motors = (classAcce: Class_accessory) => {
     motorVendor,
     phase,
     voltage,
-  } = classAcce;
+  } = classCom;
 
   const thePhase = phase as 1 | 3 | undefined | null;
 
-  const desc_gearNumber = `齒輪編號:${gearNumber ?? '無資料'}`;
+  // const desc_gearNumber = `齒輪編號:${gearNumber ?? '無資料'}`;
+  // const desc_hasSupportStand = confomtTree.hasSupportStand[`${hasSupportStand}`];
+  // const desc_horsepower = `馬力:${horsePower ?? '無資料'}`;
+  // const desc_loadWeight = `荷重:${loadWeight ?? '無資料'}`;
+  // const desc_motorVendor = `馬達供應商:${motorVendor ?? '無資料'}`;
+  // const desc_phase = `相數:${confomtTree.phase[`${thePhase}`]}`;
+  // const desc_voltage = `電壓:${voltage ?? '無資料'}V`;
+  // ---
+  const desc_gearNumber = `${gearNumber ?? ''}`;
   const desc_hasSupportStand = confomtTree.hasSupportStand[`${hasSupportStand}`];
-  const desc_horsepower = `馬力:${horsePower ?? '無資料'}`;
-  const desc_loadWeight = `荷重:${loadWeight ?? '無資料'}`;
-  const desc_motorVendor = `馬達供應商:${motorVendor ?? '無資料'}`;
-  const desc_phase = `相位:${confomtTree.phase[`${thePhase}`]}`;
-  const desc_voltage = `電壓:${voltage ?? '無資料'}V`;
+  const desc_horsepower = `${horsePower ?? ''}`;
+  const desc_loadWeight = `${loadWeight ?? ''}`;
+  const desc_motorVendor = `${motorVendor ?? ''}`;
+  const desc_phase = `${confomtTree.phase[`${thePhase}`]}∮`;
+  const desc_voltage = voltage ? `${voltage}V` : '';
 
   // return `${desc_motorVendor} ${desc_horsepower} ${desc_voltage} ${desc_phase} ${desc_loadWeight} ${desc_hasSupportStand} ${desc_gearNumber}`;
   return `${desc_phase} ${desc_voltage} ${desc_horsepower}`;
 };
 
-const creDesc_motorAccessories = (classAcce: Class_accessory) => {
-  const { name, bearingType, chains } = classAcce;
+const creDesc_motorComponent = (classCom: Class_component) => {
+  const { name, bearingType, chains } = classCom;
 
-  const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
-  const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
+  // const desc_bearingType = `軸承編號:${bearingType ?? '無資料'}`;
+  // const desc_chains = `鍊條數量:${chains ?? '無資料'}`;
+  const desc_bearingType = `${bearingType ?? ''}`;
+  const desc_chains = `${chains ?? ''}`;
 
   // return `${desc_bearingType} ${desc_chains}`;
-  return `${name}`;
+  return `${name ?? ''}`;
 };
 
-const creDesc_headBoxes = (classAcce: Class_accessory) => {
-  const { name, isIntegrated, thickness } = classAcce;
+const creDesc_headBoxes = (classCom: Class_component) => {
+  const { name, material, isIntegrated, thickness } = classCom;
 
+  // const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
+  // const desc_thickness = `厚度:${thickness ?? '無資料'}`;
   const desc_isIntegrated = confomtTree.isIntegrated[`${isIntegrated}`];
-  const desc_thickness = `厚度:${thickness ?? '無資料'}`;
+  const desc_thickness = `${thickness ?? ''}`;
 
   // return `${desc_isIntegrated} ${desc_thickness}`;
-  return `${name} ${desc_thickness}`;
+  return `${name ?? ''} ${material ?? ''}`;
 };
 
 const confomtTree = {
@@ -811,8 +1037,8 @@ const confomtTree = {
     null: '',
   },
   phase: {
-    '1': '單相',
-    '3': '三相',
+    '1': '1',
+    '3': '3',
     undefined: '',
     null: '',
   },
@@ -822,24 +1048,18 @@ const confomtTree = {
 
 type Tkit = {
   typeName: string;
-  creDesc: (classAcce: Class_accessory) => string;
+  // type是api要收的東西
+  type: 'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
+  creDesc: (classCom: Class_component) => string;
   options: Toption[];
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
 };
 
-// slats // 門片
-// bottomBars // 底座
-// guideRails // 門軌
-// sidePlates // 支板
-// rollers // 捲軸
-// motors // 馬達
-// motorAccessories // 馬達配件
-// headBoxes // 捲箱
-
-const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
+const comLookUp: { [key in TcomponentKey]: Tkit } = {
   slat: {
-    typeName: '門片',
+    typeName: '捲門片',
+    type: 'slat',
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
@@ -851,43 +1071,48 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   bottomBar: {
     typeName: '底座',
+    type: 'bottomBar',
     creDesc: creDesc_bottomBars,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
       { value: 'SST#304', label: 'SST#304' },
       { value: 'SST#316', label: 'SST#316' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
     ],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
   guideRail: {
     typeName: '門軌',
+    type: 'guideRail',
     creDesc: creDesc_guideRails,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
       { value: 'SST#304', label: 'SST#304' },
       { value: 'SST#316', label: 'SST#316' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
     ],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
   sidePlate: {
     typeName: '支板',
+    type: 'sidePlate',
     creDesc: creDesc_sidePlates,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
   },
   roller: {
     typeName: '捲軸',
+    type: 'roller',
     creDesc: creDesc_rollers,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
   motor: {
-    typeName: '馬達',
+    typeName: '馬達機',
+    type: 'motor',
     creDesc: creDesc_motors,
     options: [{ value: '黑鐵', label: '黑鐵' }],
     hiddenKeyArr: ['surface', 'density'],
@@ -895,32 +1120,47 @@ const acceLookUp: { [key in TaccessoryKey]: Tkit } = {
   },
   motorAccessories: {
     typeName: '馬達配件',
-    creDesc: creDesc_motorAccessories,
+    type: 'motorAccessories',
+    creDesc: creDesc_motorComponent,
     options: [{ value: '其他', label: '其他' }],
     hiddenKeyArr: ['surface', 'density'],
     unit: '組',
   },
   headBox: {
-    typeName: '捲箱',
+    typeName: '門箱',
+    type: 'headBox',
     creDesc: creDesc_headBoxes,
     options: [
       { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
       { value: 'SST#304', label: 'SST#304' },
       { value: 'SST#316', label: 'SST#316' },
+      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
     ],
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
 };
 
+const comTypeLookUp = {
+  slat: 'slat',
+  bottomBar: 'bottomBar',
+  guideRail: 'guideRail',
+  sidePlate: 'sidePlate',
+  roller: 'roller',
+  motor: 'motor',
+  motorAccessories: 'motorAccessories',
+  headBox: 'headBox',
+} as const;
+
+/**用來確定指定的value是否存在options裡面 */
 const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {
   const option = options.find((option) => option.value === value);
 
   return option?.value;
 };
 
-const calcDefaultValue = ({
+/**取得預設數量 */
+const calcDefaultQuantity = ({
   //
   key,
   w,
@@ -935,31 +1175,49 @@ const calcDefaultValue = ({
   b: number; // 單位為m
 }) => {
   const hb = h + b;
-  const wl = w || l;
+  const wl = l || w;
 
-  if (key === 'slats') {
+  if (key === 'slat') {
     return new Decimal(wl).mul(hb).toFixed(2); // m2
   }
 
-  if (key === 'bottomBars' || key === 'rollers' || key === 'headBoxes') {
+  if (key === 'bottomBar' || key === 'roller' || key === 'headBox') {
     return wl.toFixed(2); // M
   }
 
-  if (key === 'guideRails') {
+  if (key === 'guideRail') {
     return h.toFixed(2); // M
   }
 
-  if (key === 'motors' || key === 'motorAccessories') {
+  if (key === 'motor' || key === 'motorAccessories') {
     return '1.00';
   }
 
-  return '';
+  return '1.00';
 
   // sidePlates // 沒有在表格裡面
 
   // motors motorAccessories
 };
 
+const creEmptyCom: () => Tcomponent = () => ({
+  id: '',
+  createdAt: '',
+  updatedAt: '',
+  doorModelName: '',
+  code: '',
+  desc: '',
+  specialSpec: '---',
+
+  material: '',
+  materialSurface: '',
+  isPainted: false,
+  price: 0,
+  quantity: '',
+  bom: [],
+  density: '',
+});
+
 // ===========================================================
-export { Class_accessory, acceKeyArrOri, acceCellConfig, creNotConformAcce };
-export type { Taccessory };
+export { Class_component, comKeyArrOri, comCellConfig, creEmptyCom, comTypeLookUp };
+export type { Tcomponent };

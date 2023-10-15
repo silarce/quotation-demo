@@ -13,31 +13,33 @@ import { TcreateQuotationContentOtherDto } from 'js/api/dtoTypes';
 // =======================================================================
 class Class_other {
   constructor({
-    //
     reRender,
     data = emptyOthersOri(),
     delSelf,
     copySelf,
-    calcSubTotalPrice,
-  }: {
+    callCalcSubTotal,
+  }: // calcSubTotalPrice,
+  {
     reRender: TreRender;
     data?: Tothers;
     delSelf: () => void;
     copySelf: () => void;
-    calcSubTotalPrice: () => void;
+    callCalcSubTotal: () => void;
   }) {
     this.reRender = reRender;
     this._data = data;
     this.delSelf = delSelf;
     this.copySelf = copySelf;
-    this.calcSubTotalPrice = calcSubTotalPrice;
+    // this.calcSubTotalPrice = calcSubTotalPrice;
+    this.callCalcSubTotal = callCalcSubTotal;
   } // constructor
 
   private reRender;
   private _data;
   readonly delSelf;
   readonly copySelf;
-  readonly calcSubTotalPrice;
+  callCalcSubTotal;
+  // calcSubTotalPrice;
 
   // ---------------------------------------------------------
 
@@ -46,7 +48,8 @@ class Class_other {
     const unitPrice = this._data.unitPrice || 0;
     const totalPrice = new Decimal(qty).mul(unitPrice).toNumber();
     this._data.totalPrice = totalPrice;
-    this.calcSubTotalPrice();
+
+    this.callCalcSubTotal();
     this.reRender();
   }
 
@@ -85,6 +88,16 @@ class Class_other {
     this.calcAllPrice();
     this.reRender();
   }
+  get unitPrice_locale() {
+    return this._data.unitPrice.toLocaleString();
+  }
+  set unitPrice_locale(v) {
+    v = v.replace(/,/g, '');
+
+    this._data.unitPrice = Number(v);
+    this.calcAllPrice();
+    this.reRender();
+  }
 
   get totalPrice() {
     return this._data.totalPrice;
@@ -93,6 +106,9 @@ class Class_other {
   //   this._data.totalPrice = v;
   //   this.reRender();
   // }
+  get totalPrice_locale() {
+    return this._data.totalPrice.toLocaleString();
+  }
 
   get notes() {
     return this._data.notes;
@@ -121,10 +137,20 @@ type Tothers = {
   notes: string;
 };
 
-type TothersKey = Exclude<keyof Tothers, 'id'>;
+// type TothersKey = Exclude<keyof Tothers, 'id'>;
+type TothersKey = string;
 
 const othersKeyArrOri: () => TothersKey[] = () => {
-  return ['item', 'description', 'quantity', 'unitPrice', 'totalPrice', 'notes'];
+  return [
+    'item',
+    'description',
+    'quantity',
+    //  'unitPrice',
+    //  'totalPrice',
+    'unitPrice_locale',
+    'totalPrice_locale',
+    'notes',
+  ];
 };
 
 const othersCellConfig: TcellConfig = {
@@ -157,18 +183,40 @@ const othersCellConfig: TcellConfig = {
       },
     },
   },
-  unitPrice: {
+  // // unitPrice: {
+  // //   label: '單價',
+  // //   inputSelProps: {
+  // //     wrapperStyle: { width: '60px' },
+  // //     inputProps: {
+  // //       props: {
+  // //         type: 'number',
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  // // totalPrice: {
+  // //   label: '複價',
+  // //   inputSelProps: {
+  // //     wrapperStyle: { width: '60px' },
+  // //     showBaseline: 'invisible',
+  // //     inputProps: {
+  // //       props: {
+  // //         disabled: true,
+  // //         type: 'number',
+  // //       },
+  // //     },
+  // //   },
+  // // },
+  unitPrice_locale: {
     label: '單價',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
       inputProps: {
-        props: {
-          type: 'number',
-        },
+        props: {},
       },
     },
   },
-  totalPrice: {
+  totalPrice_locale: {
     label: '複價',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
@@ -176,7 +224,6 @@ const othersCellConfig: TcellConfig = {
       inputProps: {
         props: {
           disabled: true,
-          type: 'number',
         },
       },
     },

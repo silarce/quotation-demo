@@ -4,6 +4,7 @@
  * reqUpdateQuotation
  * useGetQuotation_id
  * fileInfoArr
+ * reqReview 送審
  *
  */
 // =============================================================
@@ -17,6 +18,7 @@ import moment from 'moment';
 import { useForm, useFormState } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
@@ -27,10 +29,16 @@ import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 // import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
-import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
+// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
+
+import QuotationPdf_part, {
+  TmainProduct,
+  Tpart,
+} from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import QuotationAdditions from 'components/page/domestic/quotation/quotationAdditions';
+
+import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -40,6 +48,7 @@ import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/emp
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -58,13 +67,9 @@ import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
-
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_acce from 'components/page/domestic/quotation/quotation/product/table_acce';
-import Table_options from 'components/page/domestic/quotation/quotation/product/table_options';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // config
@@ -87,7 +92,7 @@ import {
   apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
-import { Class_product, useProductList } from 'hooks/quotation/useProduct';
+import { useProductList } from 'hooks/quotation/useProduct';
 
 import Summary, {
   TsummaryControl,
@@ -121,27 +126,114 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, userGrade } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
   const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
   const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  const [reviewFormShow, setReviewFormShow] = useState(false);
+  const [reviewModalShow, setReviewModalShow] = useState(false);
+  // -----------------------------------------------------
+
+  const [anno, setAnnotation] = useState<string[]>([]);
+  const [qr, setQr] = useState<string[]>([]);
+
+  const onDoorTypeChange = ({
+    annoShouldRemove,
+    annoArr,
+    qrShouldRemove,
+    qrArr,
+  }: {
+    annoShouldRemove: string[] | undefined;
+    annoArr: string[] | undefined;
+    qrShouldRemove: string[] | undefined;
+    qrArr: string[] | undefined;
+  }) => {
+    setAnnotation((anno) => {
+      let annoCopy = [...anno];
+
+      // 把應該被移除拿掉
+      if (annoShouldRemove) {
+        annoShouldRemove.forEach((asmStr) => {
+          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            annoCopy.splice(delIndex, 1);
+          }
+        });
+      }
+
+      // 先把重複的拿掉，再把新的放進去
+      if (annoArr) {
+        annoArr.forEach((asmStr) => {
+          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            annoCopy.splice(delIndex, 1);
+          }
+        });
+
+        annoCopy = [...annoCopy, ...annoArr];
+      }
+
+      return annoCopy;
+    });
+
+    setQr((qr) => {
+      let qrCopy = [...qr];
+
+      // 把應該被移除拿掉
+      if (qrShouldRemove) {
+        qrShouldRemove.forEach((asmStr) => {
+          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            qrCopy.splice(delIndex, 1);
+          }
+        });
+      }
+
+      // 先把重複的拿掉，再把新的放進去
+      if (qrArr) {
+        qrArr.forEach((asmStr) => {
+          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+          if (delIndex > -1) {
+            qrCopy.splice(delIndex, 1);
+          }
+        });
+
+        qrCopy = [...qrCopy, ...qrArr];
+      }
+
+      return qrCopy;
+    });
+
+    // setAnnotation(annoCopy);
+  };
+
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  const lastestContentId = quotationData?.latestContent.id;
+  const latestContent = quotationData?.latestContent;
+  const status = latestContent?.status;
+  const verifyForm = latestContent?.verifyForm;
+  const attachedToContract = quotationData?.attachedToContract;
+
+  const isAttach = attachedToContract ? true : undefined;
+
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+  // -----------------------------------------------------
   // -----------------------------------------------------
 
-  const [targetProd, setTargetProd] = useState<Class_product>();
-
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(quotationId);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lastestContentId);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -173,7 +265,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setFileInfoArr([...newImgInfoArr]);
   };
 
-  const uploadAttachment = async (quotationId: string) => {
+  const uploadAttachment = async (newContentId: string) => {
     // 移除附件
     for (const info of fileInfoArr) {
       const { fileId, willDelete, isNew } = info;
@@ -183,7 +275,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
 
       try {
-        await apiDelQuotation_id_attachments(quotationId, fileId);
+        await apiDelQuotation_id_attachments(newContentId, fileId);
       } catch (error) {
         console.log(error);
       }
@@ -201,7 +293,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       formData.append('file', file);
 
       try {
-        await apiPostQuotation_id_attachments(quotationId, formData);
+        await apiPostQuotation_id_attachments(newContentId, formData);
       } catch (error) {
         console.log(error);
       }
@@ -222,17 +314,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productList,
     prodCellConfig,
     prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
     addProd,
     changeProdKeyArr,
-    subTotal: prodSubTotal,
     //
-    acceKeyArr,
-    acceCellConfig,
-    changeAcceKeyArr,
+    comKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    comVKeyArr,
     //
-    optionsKeyArr,
-    changeOptionsKeyArr,
-    optionsCellConfig,
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
     //
     othersKeyArr,
     othersList,
@@ -240,12 +334,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     changeOthersKeyArr,
     addOthers,
     getOthersPostBodyArr,
+    //
+    subTotal: quotationProdSubTotal,
+    reset: resetClass,
+    //
   } = useProductList({
     productArr: quotationData?.latestContent.products,
     others: quotationData?.latestContent.others,
-    productsOrder: quotationData?.latestContent.productsOrder,
     resetTrigger: quotationData,
+    onDoorTypeChange: onDoorTypeChange,
   });
+
+  // const [targetProd, setTargetProd] = useState<Class_product>();
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -263,47 +365,55 @@ function TheQuotation({ router }: { router: NextRouter }) {
     deliveryDate: '',
   });
 
-  const [anno, setAnnotation] = useState<string[]>([]);
-  const [qr, setQr] = useState<string[]>([]);
-
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
-    if (!quotationData) {
-      return;
+    if (quotationData) {
+      const {
+        //
+        discount,
+        subTotal,
+        salesTax,
+        total,
+        deliveryLocation,
+        deliveryDate,
+        paymentMethods,
+        annotations,
+        quotationRanges,
+      } = quotationData.latestContent;
+
+      setAnnotation(annotations ?? []);
+      setQr(quotationRanges ?? []);
+      setPaymentMethod(paymentMethods);
+
+      setSummary({
+        discountRate: discount,
+        subTotal: String(subTotal),
+        salesTax: String(salesTax),
+        total: String(total),
+        deliveryLocation,
+        deliveryDate,
+      });
+    } else {
+      setAnnotation([]);
+      setQr([]);
+      setPaymentMethod([]);
+
+      setSummary({
+        discountRate: '100',
+        subTotal: '',
+        salesTax: '',
+        total: '',
+        deliveryLocation: '',
+        deliveryDate: '',
+      });
     }
-
-    const {
-      //
-      discount,
-      subTotal,
-      salesTax,
-      total,
-      deliveryLocation,
-      deliveryDate,
-      paymentMethods,
-      annotations,
-      quotationRanges,
-    } = quotationData.latestContent;
-
-    setAnnotation(annotations ?? []);
-    setQr(quotationRanges ?? []);
-    setPaymentMethod(paymentMethods);
-
-    setSummary({
-      discountRate: discount,
-      subTotal: String(subTotal),
-      salesTax: String(salesTax),
-      total: String(total),
-      deliveryLocation,
-      deliveryDate,
-    });
-  }, [quotationData]);
+  }, [quotationData, disabled]);
 
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
-      prodSubTotal: prodSubTotal,
+      prodSubTotal: quotationProdSubTotal,
     });
 
     setSummary((state) => {
@@ -314,7 +424,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
-  }, [summary.discountRate, prodSubTotal]);
+  }, [summary.discountRate, quotationProdSubTotal]);
 
   //
   //
@@ -471,6 +581,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       arr: paymentMethod.map((item, index) => {
         const { milestone, totalPaymentRatio } = item;
 
+        const onChangeMilestone = (v: string) => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy[index].milestone = v;
+
+            return copy;
+          });
+        };
+
         const onChange = (v: string) => {
           setPaymentMethod((state) => {
             const copy = [...state];
@@ -493,6 +612,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           label: milestone,
           value: totalPaymentRatio,
           onChange,
+          onChangeMilestone,
           delSelf,
         };
         //
@@ -514,18 +634,50 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [reviewSales, setReviewSales] = useState<TemployeeDto>();
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
+  const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
   // ---------------------------------------------------------
-  const { register, control, reset, watch, setValue } = useForm<Partial<TquotationContentDto>>();
+  const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
-  const reviewSalesEmployeeId = quotationData?.latestContent?.reviewSalesEmployee?.id;
-  const reviewSupervisorEmployeeId = quotationData?.latestContent?.reviewSupervisorEmployee?.id;
+  let isSales = false;
+  let isWorkDirector = false;
+  let isSupervisor = false;
+  let isManager = false;
+
+  const reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
+  const reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
+  const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
+  const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
+
+  const salesReviewedAt = latestContent?.salesReviewedAt;
+  const supervisorReviewedAt = latestContent?.supervisorReviewedAt;
+  const workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
+  const managerReviewedAt = latestContent?.managerReviewedAt;
 
   if (userId) {
-    if (userId === reviewSalesEmployeeId || userId === reviewSupervisorEmployeeId) {
+    if (userId === reviewSalesEmployeeId) {
+      isSales = true;
       isReviewer = true;
+    } else if (userId === reviewSupervisorEmployeeId) {
+      if (salesReviewedAt) {
+        isSupervisor = true;
+        isReviewer = true;
+      }
+    } else if (userId === reviewWorkDirectorEmployeeId) {
+      if (salesReviewedAt && supervisorReviewedAt) {
+        isWorkDirector = true;
+        isReviewer = true;
+      }
+    }
+    //  else if (userGrade >= 14) {
+    // else if (userId === reviewManagerEmployeeId) {
+    else if (userId === reviewManagerEmployeeId || userId === '01f55698-49bb-4501-b432-1157a5109554') {
+      if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+        isManager = true;
+        isReviewer = true;
+      }
     }
   }
 
@@ -570,8 +722,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
       status: latestContent?.status ?? 'Budget',
-      managerEmployee: latestContent?.managerEmployee,
-      supervisorEmployee: latestContent?.supervisorEmployee,
+      // managerEmployee: latestContent?.managerEmployee,
+      // supervisorEmployee: latestContent?.supervisorEmployee,
+      // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
+      managerEmployee: latestContent?.reviewSupervisorEmployee,
+      supervisorEmployee: latestContent?.reviewSalesEmployee,
       //
       //
       agentEmployee: agentEmployee,
@@ -598,73 +753,73 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------
 
   const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
-    'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor'
-  >();
+    'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector' | 'undefined'
+  >('undefined');
 
-  const openEmpSel = (v: 'manager' | 'supervisor' | 'reviewSales' | 'reviewSupervisor') => {
+  const openEmpSel = (v: 'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector') => {
     setEmpSelConfirmKey(v);
     setEmployeeSelectorShow(true);
   };
 
   const onEmpSelCancel = () => {
     setEmployeeSelectorShow(false);
-    setEmpSelConfirmKey(undefined);
+    setEmpSelConfirmKey('undefined');
   };
 
-  const empSelProps = (() => {
-    if (empSelConfirmKey === 'manager') {
-      return {
-        label: '請選擇經理',
-        onCancel: onEmpSelCancel,
-        onConfirm: (v: TemployeeDto[]) => {
-          setValue('managerEmployee', v[0]);
-          onEmpSelCancel();
-        },
-      };
-    }
+  const empSelLookup = {
+    reviewSales: {
+      label: '請選擇審核業務',
+      // tip: '可不選，直接按確定',
+      onCancel: onEmpSelCancel,
+      onConfirm: (v: TemployeeDto[]) => {
+        setReviewSales(v[0]);
 
-    if (empSelConfirmKey === 'supervisor') {
-      return {
-        label: '請選擇主管',
-        onCancel: onEmpSelCancel,
-        onConfirm: (v: TemployeeDto[]) => {
-          setValue('supervisorEmployee', v[0]);
-          onEmpSelCancel();
-        },
-      };
-    }
-
-    if (empSelConfirmKey === 'reviewSales') {
-      return {
-        label: '請選擇審核業務',
-        tip: '可不選，直接按確定',
-        onCancel: onEmpSelCancel,
-        onConfirm: (v: TemployeeDto[]) => {
-          setReviewSales(v[0]);
-          onEmpSelCancel();
+        if (status === 'Contracting') {
           setTimeout(() => {
             openEmpSel('reviewSupervisor');
           }, 300);
-        },
-      };
-    }
-
-    if (empSelConfirmKey === 'reviewSupervisor') {
-      return {
-        label: '請選擇審核經理',
-        tip: '可不選，直接按確定',
-        onCancel: onEmpSelCancel,
-        onConfirm: async (v: TemployeeDto[]) => {
-          setReviewSupervisor(v[0]);
-          onEmpSelCancel();
+        } else {
           reqSetReviewer({
-            reviewSales,
-            reviewSupervisor: v[0],
+            reviewSales: v[0],
+            reviewSupervisor,
+            reviewWorkDirector,
           });
-        },
-      };
-    }
-  })();
+        }
+      },
+    },
+    reviewSupervisor: {
+      label: '請選擇業務主管',
+      // tip: '可不選，直接按確定',
+      onCancel: onEmpSelCancel,
+      onConfirm: async (v: TemployeeDto[]) => {
+        setReviewSupervisor(v[0]);
+        onEmpSelCancel();
+        setTimeout(() => {
+          openEmpSel('reviewWorkDirector');
+        }, 300);
+      },
+    },
+    reviewWorkDirector: {
+      label: '請選擇應收帳款',
+      // tip: '可不選，直接按確定',
+      onCancel: onEmpSelCancel,
+      onConfirm: (v: TemployeeDto[]) => {
+        setReviewWorkDirector(v[0]);
+        onEmpSelCancel();
+        reqSetReviewer({
+          reviewSales,
+          reviewSupervisor,
+          reviewWorkDirector: v[0],
+        });
+      },
+    },
+    undefined: {
+      label: '',
+      tip: '',
+      onCancel: () => {},
+      onConfirm: () => {},
+    },
+  };
 
   // --------------------------------------------------------------------------
 
@@ -674,24 +829,46 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
   const signatureArr: TsignatureProps[] = [
     {
-      label: '經理',
+      label: '總經理',
       inputProps: {
         props: {
-          value: watch('managerEmployee')?.chName ?? '',
-          onClick: () => {
-            openEmpSel('manager');
-          },
+          value: (latestContent?.reviewManagerEmployee?.chName || latestContent?.reviewManagerEmployee?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
         },
       },
     },
     {
-      label: '主管',
+      label: '應收帳款',
       inputProps: {
         props: {
-          value: watch('supervisorEmployee')?.chName ?? '',
-          onClick: () => {
-            openEmpSel('supervisor');
-          },
+          value:
+            (latestContent?.reviewWorkDirectorEmployee?.chName || latestContent?.reviewWorkDirectorEmployee?.enName) ??
+            '',
+          placeholder: '尚未選擇',
+          disabled: true,
+        },
+      },
+    },
+
+    {
+      label: '業務主管',
+      inputProps: {
+        props: {
+          value:
+            (latestContent?.reviewSupervisorEmployee?.chName || latestContent?.reviewSupervisorEmployee?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
+        },
+      },
+    },
+    {
+      label: '業務',
+      inputProps: {
+        props: {
+          value: (latestContent?.reviewSalesEmployee?.chName || latestContent?.reviewSalesEmployee?.enName) ?? '',
+          placeholder: '尚未選擇',
+          disabled: true,
         },
       },
     },
@@ -699,8 +876,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經辦',
       inputProps: {
         props: {
-          value: watch('agentEmployee')?.chName ?? '',
-          onChange: () => {},
+          // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+          value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
+          disabled: true,
         },
       },
     },
@@ -708,6 +886,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   useEffect(() => {
     reNewClassQuotation();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
 
@@ -749,16 +928,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   const history = useMemo(() => {
-    const content = quotationData?.contents ?? [];
+    let content = quotationData?.contents ?? [];
+
+    if (content) {
+      content = _.sortBy(content, (item) => item.createdAt);
+    }
 
     return content.map((item, index, arr) => {
-      const { status, quotationDate } = item;
+      const { status, quotationDate, createdAt } = item;
       const preStatus = arr[index - 1]?.status;
 
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(quotationDate).toISOString(),
+        isoString: moment(createdAt).toISOString(),
       };
     });
   }, [quotationData]);
@@ -778,23 +961,53 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ),
     },
     { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
-    { type: 'myButton', label: '取消', onClick: () => setDisabled(true) },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+        resetClass();
+        setTargetProdKey('n');
+      },
+    },
   ];
   const panel_noEditable: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: '匯出報價單',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf(true),
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '匯出材料/配件',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf_part(true),
-    // },
-    (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    {
+      type: 'myButton',
+      label: '匯出報價單',
+      img: iconUpload.src,
+      onClick: () => setShowPdf(true),
+    },
+    {
+      type: 'myButton',
+      label: '匯出材料/配件',
+      img: iconUpload.src,
+      onClick: () => setShowPdf_part(true),
+    },
+
+    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
+    (!!isReviewer || null) && {
+      type: 'myButton',
+      label: '審核',
+      onClick: () => setReviewModalShow(true),
+    },
+    // (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
+    (!!quotationId || null) && {
+      type: 'myButton',
+      label: '送審',
+      onClick: () => {
+        openEmpSel('reviewSales');
+      },
+    },
+    // status
+    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
+    (() => {
+      if (status === 'Contracting') {
+        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+      } else {
+        return null;
+      }
+    })(),
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -824,15 +1037,36 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
 
-    const prodArr: TcreateQuotationProductDto[] = Object.values(productList).map((item) => {
-      return {
-        ...item.body,
-        rollUpBoxThick: Number(item.rollUpBoxThick),
-        voltage: Number(item.voltage),
-        doorTrackThick: Number(item.doorTrackThick),
-        motorSupport: String(+item.motorSupport),
-      };
-    });
+    // 總樘數
+    let prodQty = 0;
+
+    // prodVKeyArr 會在每一次垂直拖拉時更新
+    const prodArr: TcreateQuotationProductDto[] =
+      prodVKeyArr?.map((key, index) => {
+        const prod = productList[key];
+
+        const quantity = Number(prod.quantity);
+        const originProd = prod.originProd;
+
+        prodQty = prodQty + quantity;
+
+        const preBody = {
+          ...prod.body,
+          order: index,
+        };
+
+        const isEqual = _.isEqual(originProd, preBody);
+
+        if (!isEqual) {
+          preBody.id = undefined;
+        }
+
+        return preBody;
+      }) ?? [];
+
+    if (!data_watch.agentEmployee?.id) {
+      return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
+    }
 
     const body: TcreateQuotationContentDto = {
       quotationDate: data_watch.quotationDate ?? '',
@@ -846,14 +1080,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data_watch.address ?? '',
       contactPerson: data_watch.contactPerson ?? '',
       contactNumber: data_watch.contactNumber ?? '',
-      quantity: data_watch.quantity ?? 0,
+      quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
+
       managerId: data_watch.managerEmployee?.id ?? null,
       supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
-      // 目前只有admin可以呼叫這系列的api，但是agentId必須送，暫時先這樣處理
-      agentId: data_watch.agentEmployee?.id ?? '16f60f1c-8005-4c59-81ac-f3006bc2fc2a',
+      agentId: data_watch.agentEmployee?.id,
       //
       //
       annotations: anno,
@@ -875,9 +1109,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       products: prodArr,
       others: getOthersPostBodyArr(),
+      // productsOrder: null,
       //
       //
     };
+
+    if (!body.customerId) {
+      return myAlert.warning({ title: '請選擇客戶' });
+    }
+
+    if (!body.deliveryDate) {
+      body.deliveryDate = null;
+    }
+
+    let hasSurface = true;
+    body.products.forEach((item) => {
+      if (!item.materialSurface) {
+        hasSurface = false;
+      }
+    });
+
+    if (!hasSurface) {
+      return myAlert.warning({ title: '所有主產品必須選擇表面' });
+    }
 
     try {
       setIsLoading(true);
@@ -888,13 +1142,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         // res跟api文件不一樣，現在沒時間修正
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await uploadAttachment(res.quotation.id);
+
+        await uploadAttachment(res.latestContent.id);
 
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
         showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.id);
+        await uploadAttachment(res.latestContent.id);
         router.push({
           query: {
             id: res.id,
@@ -909,27 +1164,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-  };
+
+    //
+  }; // reqUpdateQuotation
 
   // --------------------------------------------
   const reqSetReviewer = async ({
     reviewSales,
+    reviewWorkDirector,
     reviewSupervisor,
   }: {
-    reviewSales: TemployeeDto | undefined;
-    reviewSupervisor: TemployeeDto | undefined;
+    reviewSales?: TemployeeDto | undefined;
+    reviewSupervisor?: TemployeeDto | undefined;
+    reviewWorkDirector?: TemployeeDto | undefined;
   }) => {
     if (!quotationId) {
       return;
     }
 
     const reviewSalesEmployeeId = reviewSales?.id || null;
+    const reviewWorkDirectorEmployeeId = reviewWorkDirector?.id || null;
     const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
 
     try {
       setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
+        reviewWorkDirectorEmployeeId,
         reviewSupervisorEmployeeId,
       });
       await update();
@@ -943,21 +1204,95 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // 現在只有admin可以呼叫這系列的api，所以無法測試
-  const reqReview = async () => {
-    if (!quotationId) {
+  const reqReview = async (isPass: boolean) => {
+    if (!quotationId || !isReviewer) {
       return;
+    }
+
+    // 沒有用，後端設定成必須一個一個審
+    // const body = {
+    //   reviewSalesEmployeeId: '5e1c9259-1d31-4121-b160-3fdfdccb401e',
+    //   reviewSupervisorEmployeeId: '06dc8d70-485d-4ac9-aa31-5bf568c13d61',
+    //   reviewWorkDirectorEmployeeId: '3480f17e-07d8-42b1-ad52-cfb0de9c6049',
+    //   reviewManagerEmployeeId: '01f55698-49bb-4501-b432-1157a5109554',
+    //   reviewResult: isPass,
+    // };
+
+    const body = {
+      reviewSalesEmployeeId: isSales ? userId : null,
+      reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+      reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
+      reviewManagerEmployeeId: isManager ? userId : null,
+      reviewResult: isPass,
+    };
+
+    if (status === 'Contracting' && !verifyForm) {
+      return myAlert.warning({ title: '請先送出合約審核表' });
     }
 
     try {
       setIsLoading(true);
-      await apiQuotationReview(quotationId);
+
+      try {
+        await apiQuotationReview({ id: quotationId, body });
+      } catch (error) {
+        myAlert.err({ title: '審核發生錯誤' });
+        console.log(error);
+      }
+
       await update();
     } catch (error) {
-      myAlert.err({ title: '審核失敗' });
     } finally {
       setIsLoading(false);
+      setReviewModalShow(false);
     }
   };
+
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+
+  const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
+    // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
+    const lw = Number(prod.fullWidth || 0) * 100;
+    const h = Number(prod.height || 0) * 100;
+    const b = Number(prod.boxB || 0) * 100;
+
+    const size = `${lw} X ${h} + ${b}`;
+
+    // const foo = prod.comList;
+    const list = { ...prod.comList, ...prod.subComList };
+    delete list['sidePlate'];
+    delete list['motorAccessories'];
+
+    const componentArr = Object.values(list ?? {});
+
+    let totalPrice = 0;
+
+    const part: Tpart[] = componentArr.map((com) => {
+      totalPrice += Number(com.totalPrice || 0);
+
+      return {
+        partName: com.comName,
+        material: com.material,
+        unit: com.unit,
+        qty: Number(com.quantity).toFixed(2),
+        price: Number(com.price || 0).toLocaleString(),
+        desc: com.desc ?? '',
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+      };
+    });
+
+    return {
+      category: prod.itemName,
+      material: prod.material,
+      surface: prod.surface,
+      doorType: prod.doorType,
+      size: size,
+      part: part,
+      priceTotal: totalPrice.toLocaleString(),
+    };
+  });
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -975,60 +1310,82 @@ function TheQuotation({ router }: { router: NextRouter }) {
             onProfileChange={onProfileChange}
           />
 
-          <div className={style.switchBar}>
-            <div className={style.active}>報價項目</div>
+          <div className={classNames(style.switchBar)}>
+            <div>報價項目</div>
           </div>
 
-          {/* 主產品設定 */}
-          <Table_prod
-            disabled={disabled}
-            prodList={productList}
-            prodCellConfig={prodCellConfig}
-            prodKeyArr={prodKeyArr}
-            changeProdKeyArr={changeProdKeyArr}
-            addProd={addProd}
-            setTargetProd={setTargetProd}
-          />
+          <div className={style.tableWrapper}>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={isAttach ? true : disabled}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd}
+              setTargetProd={setTargetProdKey}
+              // defalutVKeyArr={prodVKeyArr}
+              onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              rowHeight="h106"
+              isAttach={isAttach}
+            />
 
-          {/* api還沒好 */}
-          <Table_acce
-            disabled={disabled}
-            acceList={targetProd?.acceList}
-            acceCellConfig={acceCellConfig}
-            acceKeyArr={acceKeyArr}
-            changeAcceKeyArr={changeAcceKeyArr}
-          />
+            {/* 材料配件設定 */}
+            <div className="relative mt-[14px]">
+              <Table_com
+                disabled={disabled}
+                // comList={targetProd?.comList}
 
-          <Table_options
-            disabled={disabled}
-            list={targetProd?.optionsList}
-            cellConfig={optionsCellConfig}
-            keyArr={optionsKeyArr}
-            changeKeyArr={changeOptionsKeyArr}
-            add={() => {
-              targetProd?.addOption();
-            }}
-          />
-
-          <Table_others
-            disabled={disabled}
-            list={othersList}
-            cellConfig={othersCellConfig}
-            keyArr={othersKeyArr}
-            changeKeyArr={changeOthersKeyArr}
-            add={addOthers}
-          />
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={() => {}}
+                // defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+          </div>
 
           <div className={style.redWrapper}>
-            {/* 材料配件設定 */}
-            {/* <QuotationComponent classQuotation={classQuotation} disabled={!allowEdit} /> */}
-            <hr />
             {/* 選配設定 */}
-            {/* <QuotationAccessory activeRow={classQuotation.activeMainProd} disabled={!allowEdit} /> */}
+            <Table_accessories
+              disabled={disabled}
+              list={targetProd?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={changeAccessoriesKeyArr}
+              // add={() => {
+              //   targetProd?.addAcce();
+              // }}
+              defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+              onVKeyChange={(keyArr) => {
+                if (targetProd) {
+                  targetProd.accessoriesVKeyArr = keyArr;
+                }
+              }}
+              doorModel={targetProd?.doorType}
+              onSelectorConfirm={(arr) => {
+                if (targetProd) {
+                  targetProd.addAcce(arr);
+                }
+              }}
+            />
           </div>
-          {/* 其他設定 */}
-          {/* <QuotationAdditions disabled={!allowEdit} /> */}
 
+          <div className={style.tableWrapper}>
+            {/* 其他設定 */}
+            <Table_others
+              disabled={disabled}
+              list={othersList}
+              cellConfig={othersCellConfig}
+              keyArr={othersKeyArr}
+              changeKeyArr={changeOthersKeyArr}
+              add={addOthers}
+            />
+          </div>
           {/* 備註/報價範圍/付款資訊 */}
 
           <Summary
@@ -1045,34 +1402,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
           {/*  */}
           {/*  */}
-
-          {/* 審核人員 */}
-          <div className="mt-10 grid grid-cols-3 gap-[30px] px-[50px]">
-            <InputSel
-              caption="審核業務"
-              inputProps={{
-                props: {
-                  disabled: true,
-                  value:
-                    (quotationData?.latestContent.reviewSalesEmployee?.chName ||
-                      quotationData?.latestContent.reviewSalesEmployee?.enName) ??
-                    '',
-                },
-              }}
-            />
-            <InputSel
-              caption="審核主管"
-              inputProps={{
-                props: {
-                  disabled: true,
-                  value:
-                    (quotationData?.latestContent.reviewSupervisorEmployee?.chName ||
-                      quotationData?.latestContent.reviewSupervisorEmployee?.enName) ??
-                    '',
-                },
-              }}
-            />
-          </div>
         </div>
       </div>
       <LoadingCover01 isLoading={isLoading} />
@@ -1106,13 +1435,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
       關於支板
       只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
-      {/* <QuotationPdf
-        isVisable={showPdf}
-        onCancel={() => {
-          setShowPdf(false);
-        }}
-        classQuotation={classQuotation}
-      /> */}
+
+      {latestContent && (
+        <QuotationPdf
+          isVisable={showPdf}
+          onCancel={() => {
+            setShowPdf(false);
+          }}
+          productArr_f={Object.values(productList)}
+          basicInfo={latestContent}
+          noteArr={anno}
+          qrArr={qr}
+        />
+      )}
+
       {/* 
       注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
@@ -1135,24 +1471,56 @@ function TheQuotation({ router }: { router: NextRouter }) {
       */}
 
       {/*  */}
-      {/* <QuotationPdf_part
+      <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => {
           setShowPdf_part(false);
         }}
-        mainProductArr={quotationPdf_part_mainProductArr}
-        quotationId={classQuotation.quotationId}
-      /> */}
+        mainProductArr={pdfPartProps}
+        quotationId={latestContent?.quotationNumber ?? ''}
+      />
       {/*  */}
       <EmployeeSelector
         showModal={employeeSelectorShow}
-        label={empSelProps?.label}
-        tip={empSelProps?.tip}
+        label={empSelLookup[empSelConfirmKey]?.label}
+        // tip={empSelLookup[empSelConfirmKey]?.tip}
         onConfirm={(v) => {
-          empSelProps?.onConfirm(v);
+          empSelLookup[empSelConfirmKey]?.onConfirm(v);
         }}
-        onCancel={() => empSelProps?.onCancel()}
+        onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
         selLimit={1}
+      />
+      {/* 合約審核表 */}
+      <ContractReviewForm
+        showModal={reviewFormShow}
+        close={() => setReviewFormShow(false)}
+        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
+        contractName={quotationData?.latestContent.projectName ?? ''}
+        contractPrice={Number(summary.total.replaceAll(',', ''))}
+        lastestContentId={lastestContentId}
+        verifyForm={verifyForm}
+        onConfirm={() => update()}
+      />
+      <ThreeButtonModal
+        visible={reviewModalShow}
+        text={'是否通過審核?'}
+        onCancel={() => setReviewModalShow(false)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reqReview(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reqReview(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setReviewModalShow(false),
+          },
+        ]}
       />
     </div>
   );
@@ -1181,9 +1549,9 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
-  const subTotalStr = subTotal.ceil().toLocaleString();
-  const taxStr = tax.ceil().toLocaleString();
-  const totalStr = total.ceil().toLocaleString();
+  const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
+  const taxStr = Number(tax.toFixed(0)).toLocaleString();
+  const totalStr = Number(total.toFixed(0)).toLocaleString();
 
   return {
     subTotal: subTotalStr,

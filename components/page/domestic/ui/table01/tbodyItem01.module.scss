@@ -34,49 +34,4 @@ div.panelHeader {
       }
     }
   }
-
-  .row03 {
-    display: flex;
-    gap: 14px;
-    margin-top: 19px;
-    > .step {
-      padding: 6px 16px 6px 13px;
-      background-color: $bgc01;
-      width: fit-content;
-      border-radius: 17px;
-      > * {
-        display: inline-block;
-        vertical-align: middle;
-      }
-      > .spot {
-        width: 6px;
-        height: 6px;
-        margin-right: 10px;
-        background-color: $colorBorder01;
-        border-radius: 50%;
-      }
-      > span {
-        font-size: 16px;
-        font-weight: 400;
-        color: $colorBorder01;
-      }
-
-      &.success {
-        .spot {
-          background-color: greenyellow;
-        }
-        span {
-          color: $colorMain;
-        }
-      }
-      &.notSuccess {
-        .spot {
-          background-color: #ea1833;
-        }
-        span {
-          color: $colorMain;
-        }
-      }
-    }
-  } // row03
 } // div.panelHeader

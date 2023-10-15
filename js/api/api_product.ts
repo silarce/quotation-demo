@@ -24,6 +24,7 @@ import type {
   TgenerateDoorProductBomDto,
   TdoorBomDto_Component,
   TdoorProductBomDto,
+  TdoorAccessoryDto,
 } from './dtoTypes';
 
 // const apiGetAssets = (path: string) => {
@@ -41,16 +42,17 @@ export type {
   TgenerateDoorProductBomDto,
   TdoorBomDto_Component,
   TdoorProductBomDto,
+  TdoorAccessoryDto,
 };
 // =======================================================================
 
 export const apiGetAssets = async (path: string) => {
-  const api = `/products/assets/${path}`;
+  const api = `/products/assets/door-track/${path}`;
 
   return axi
     .get(api)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 export const apiGetProdDoorModels = async () => {
@@ -59,7 +61,7 @@ export const apiGetProdDoorModels = async () => {
   return axi
     .get<TdoorModelInfoDto[]>(api)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 export const useApiGetProdDoorModels = () => {
@@ -103,7 +105,7 @@ export const apiGetProdCalcGeneralSpec = async (params: TpcgsPrams) => {
   return axi
     .get<TdoorGeneralSpecsDto>(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 type TpcdsPrams = {
@@ -119,7 +121,7 @@ export const apiGetProdCalcDetailSpec = async (params: TpcdsPrams) => {
   return axi
     .get<{ slatCount: number }>(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 // =======================================================================
@@ -137,16 +139,26 @@ export const apiGetProdAvailableComponents = async (params: TpacParams) => {
   return axi
     .get<TdoorComponentListDto>(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 // =======================================================================
 
+// FIXME 20231002 必須要再提供兩個參數bottomBarAngleIron bottomBarPlate
 export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomDto) => {
   const api = '/products/door/generate-door-product-bom';
 
   return axi
     .post<TdoorProductBomDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiGetProdAccessories = (params: { modelName: string }) => {
+  const api = '/products/door/accessories';
+
+  return axi
+    .get<TdoorAccessoryDto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
 };

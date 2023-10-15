@@ -25,13 +25,13 @@ type TgetQuotataionRanges = {
   meta: TpageMetaDto;
 };
 
-export type { Tparams, TgetAnnotation, TgetQuotataionRanges };
+export type { Tparams, TgetAnnotation, TgetQuotataionRanges, TcreateAnnotationDto, TcreateQuotationRangeDto };
 
 // ==========================================================================
 // ==========================================================================
 // ==========================================================================
 
-const apiGetAnnotation = (params?: Tparams) => {
+export const apiGetAnnotation = (params?: Tparams) => {
   const api = '/work-sheet/presets/annotations';
 
   return axi
@@ -109,12 +109,12 @@ export const apiDeleteAnnotation = ({ id }: { id: string }) => {
 
 // =====================================================================
 
-const apiGetQuotationRanges = (params?: Tparams) => {
+export const apiGetQuotationRanges = (params?: Tparams) => {
   const api = '/work-sheet/presets/quotation-ranges';
 
   return axi
-    .get(api, { params })
-    .then(({ data }) => data as TgetQuotataionRanges)
+    .get<TgetQuotataionRanges>(api, { params })
+    .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 

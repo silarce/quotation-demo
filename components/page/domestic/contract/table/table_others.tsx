@@ -2,17 +2,17 @@ import { useState } from 'react';
 import classNames from 'classnames';
 
 // components
-import DndThead from '../DndThead';
-import Tbody, { TcellConfig } from '../tbody';
+import DndThead from './DndThead';
+import Tbody, { TcellConfig } from './tbody';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { Class_other, ToptionsKey, ToptionsList } from 'hooks/quotation/useProduct';
+import { Class_other, TothersKey, TothersList } from 'hooks/quotation/useProduct';
 
-import scss from '../table.module.scss';
+import scss from './table.module.scss';
 
-export default function Table_options({
+export default function Table_others({
   disabled,
   list,
   cellConfig,
@@ -21,18 +21,18 @@ export default function Table_options({
   add,
 }: {
   disabled: boolean;
-  list: ToptionsList | undefined;
+  list: TothersList;
   cellConfig: TcellConfig;
-  keyArr: ToptionsKey[];
-  changeKeyArr: (arr: ToptionsKey[]) => void;
-  add?: () => void;
+  keyArr: TothersKey[];
+  changeKeyArr: (arr: TothersKey[]) => void;
+  add: () => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
   return (
     <div className={scss.tableContainer}>
       <div className={scss.header}>
-        <h2>選配設定</h2>
+        <h2>其他設定</h2>
         <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>
           {allowMove ? '確定排序' : '設定排序'}
         </button>
@@ -44,29 +44,26 @@ export default function Table_options({
             <DndThead
               keyArr={keyArr}
               cellConfigList={cellConfig}
-              allowMove={allowMove}
               resetTrigger={keyArr.length}
-              emptyBlockWidth="137px"
+              emptyBlockWidth="80px"
               onDragEndCallback={(dndKeyArr) => {
-                const keyArr = dndKeyArr as ToptionsKey[];
+                const keyArr = dndKeyArr as TothersKey[];
                 changeKeyArr(keyArr);
               }}
             />
           </div>
-          {list && (
-            <Tbody
-              disabled={disabled}
-              rowList={list}
-              keyArr={keyArr}
-              prodCellConfig={cellConfig}
-              onRowClick={(obj) => {}}
-            />
-          )}
+
+          <Tbody
+            disabled={disabled}
+            rowList={list}
+            keyArr={keyArr}
+            prodCellConfig={cellConfig}
+            onRowClick={(obj) => {}}
+          />
 
           {!disabled && (
             <div className={classNames(scss.addBtnWrapper)}>
-              {/* <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={add} /> */}
-              <MyButton_v2 className={scss.addBtn} label="新增選配" onClick={add} />
+              <MyButton_v2 className={scss.addBtn} label="新增其他" onClick={add} />
             </div>
           )}
         </div>

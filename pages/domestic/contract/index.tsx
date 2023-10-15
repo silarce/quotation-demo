@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-import ContractList from 'components/page/domestic/contract/contractList';
+import ContractList, { Tcontract } from 'components/page/domestic/contract/contractList';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -18,8 +18,8 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 // css
 import style from './contract.module.scss';
 
-// fake
-import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
+//
+import { useGetContract } from 'js/api/api_quotation';
 
 // ===========================================
 // 合約列表單個項目展開裡的內容是追加追減項目
@@ -30,19 +30,19 @@ import { fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleA
 export default function Contract() {
   const router = useRouter();
 
-  // ===================================================
-
-  // 資料
-  const [projectSimple, setProjectSimple] = useState({ wrapper: fakeApi_projectSimple });
-  const projectArr = projectSimple.wrapper.get({
+  const params = {
     filter: {
-      county: router.query.county as string,
-      clientName: router.query.clientName as string,
-      constructionName: router.query.projectName as string,
+      version: { $eq: 1 },
     },
-  });
-  // ---------------------------------------------------
-  // panelList
+  };
+
+  const { data, update } = useGetContract(params);
+
+  useEffect(() => {
+    update();
+  }, []);
+
+  // --------------------------------------------------
 
   const searchTargetList = [
     {
@@ -97,22 +97,23 @@ export default function Contract() {
   ];
 
   // ===================================================
-  const contractList = projectArr.map((item) => {
-    const { quotationId, constructionName } = item.basicInfo;
-    const { name: clientName, contact } = item.clientData;
-    const { attn } = item.signature;
 
-    return {
-      quotationId: quotationId,
-      clientName: clientName,
-      quotationName: constructionName,
-      discount: '99.99',
-      priceTotal: '999999',
-      contactPerson: contact[0].name,
-      contactPhone: contact[0].phone,
-      attn: attn,
-    };
-  });
+  const contractList =
+    data?.map((item) => {
+      const content = item.content;
+
+      return {
+        id: item.id,
+        quotationId: content.quotationNumber,
+        clientName: content.customer.name,
+        quotationName: content.projectName,
+        discount: item.discount,
+        priceTotal: String(item.total),
+        contactPerson: content.contactPerson,
+        contactPhone: content.contactNumber,
+        attn: content.agentEmployee.chName,
+      };
+    }) ?? [];
 
   return (
     <div className={style.container}>

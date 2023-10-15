@@ -1,39 +1,35 @@
 import { useState } from 'react';
+import moment from 'moment';
+import _ from 'lodash';
+
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // antd
 import { Collapse } from 'antd';
 
 // glogal gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
+
 // css
 import style from 'components/page/domestic/quotation/quotationProdChangingRecord.module.scss';
 
-// type
-import type { TchangeRecord, TchangeListItem } from 'fakeDatabase/domestic/quotation/fakeChangeProductRecord';
-
-// config
-import { prodCellConfigOri } from './hook/useProduct';
-const prodCellConfig = prodCellConfigOri();
+// ===================================================================
+// ===================================================================
+import Table_prod from 'components/page/domestic/contract/table/table_prod';
+import { useProductList } from 'hooks/quotation/useProduct';
+import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
+// ===================================================================
+// ===================================================================
 
 const { Panel } = Collapse;
 
-export default function QuotationProdChangingRecord({
-  prodChangingRecord,
-}: {
-  prodChangingRecord: TchangeRecord | undefined;
-}) {
-  if (!prodChangingRecord) {
-    return null;
-  }
-
-  return <TheQuotationProdChangingRecord prodChangingRecord={prodChangingRecord} />;
-}
-
 // =====================================================
-export function TheQuotationProdChangingRecord({ prodChangingRecord }: { prodChangingRecord: TchangeRecord }) {
-  const { list, quotationId } = prodChangingRecord;
-  const quotationIdKeyList = Object.keys(list);
+export default function TheQuotationProdChangingRecord({
+  subContract,
+}: {
+  subContract: TquotationContractDto[] | undefined;
+}) {
+  subContract = _.sortBy(subContract, 'version');
 
   // 點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -42,6 +38,12 @@ export function TheQuotationProdChangingRecord({ prodChangingRecord }: { prodCha
     const activeIndex = parseInt(panelIndex as string);
     setActiveIndex(activeIndex);
   };
+
+  // ----------------------------------------------------------
+
+  const rootProdList: { [key: string]: TquotationProductDto } = {};
+
+  // ----------------------------------------------------------
 
   return (
     <div className={style.container}>
@@ -56,6 +58,7 @@ export function TheQuotationProdChangingRecord({ prodChangingRecord }: { prodCha
           );
         })}
       </div>
+      {/*  */}
       <Collapse
         expandIcon={() => <></>}
         accordion={true}
@@ -63,13 +66,43 @@ export function TheQuotationProdChangingRecord({ prodChangingRecord }: { prodCha
         className={style.collapse}
         onChange={changeActive}
       >
-        {quotationIdKeyList.map((key, index) => {
-          const record = list[key];
+        {subContract?.map((item, index) => {
+          const content = item.content;
+
+          const contentTotal = content?.total ?? 0;
+
+          const record = {
+            quotationId: content.quotationNumber,
+            date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
+            priceChange: `${contentTotal}`,
+            remark: content.editNotes,
+          };
+
           const isActive = activeIndex === index;
+
+          const contentProdArr = _.cloneDeep(content.products);
+
+          contentProdArr.forEach((prod, index) => {
+            if (!rootProdList[prod.rootProductId]) {
+              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+            } else {
+              const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
+              const copy = _.cloneDeep(prod);
+              copy.quantity = rootQty - copy.quantity;
+              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+              // 替換掉原本的
+              contentProdArr[index] = copy;
+            }
+          });
+
+          // 上面的演算法必須執行，所以 return null放在下面
+          if (index === 0) {
+            return null;
+          }
 
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
-              <CollapseBody record={record} />
+              <ProdRow prodArr={contentProdArr} />
             </Panel>
           );
         })}
@@ -81,106 +114,36 @@ export function TheQuotationProdChangingRecord({ prodChangingRecord }: { prodCha
 // =======================================================
 // =======================================================
 // =======================================================
+type TchangeListItem = {
+  quotationId: string; // 編號
+  date: string; // 日期
+  priceChange: number | string; // 追加追減價格
+  remark: string; // 備註
+  // product: TrecordProduct[];
+};
 
 const PanelHeader = ({ record, isActive }: { record: TchangeListItem; isActive: boolean }) => {
   return (
     <CellWithBar isActive={isActive}>
       <div className={style.panelHeader}>
-        {theadIndex.map((key, index) => {
-          let value = record[key];
-
-          if (key === 'priceChange') {
-            // -value是為了把負號拿掉
-            if (typeof value === 'string') {
-              value = parseFloat(value);
-            }
-
-            value = value < 0 ? `-$${-value}` : `+$${value}`;
-          }
-
-          return (
-            <div className={style.column} key={index}>
-              <span>{value}</span>
-            </div>
-          );
-        })}
+        <div className={style.column}>
+          <span>{record.quotationId}</span>
+        </div>
+        <div className={style.column}>
+          <span>{record.date}</span>
+        </div>
+        <div className={style.column}>
+          <span>{record.priceChange}</span>
+        </div>
+        <div className={style.column}>
+          <span>{record.remark}</span>
+        </div>
       </div>
     </CellWithBar>
   );
 };
 
 // =======================================================
-const CollapseBody = ({ record }: { record: TchangeListItem }) => {
-  const { product } = record;
-
-  const { keyList, cellConfig } = prodCellConfig;
-
-  return (
-    <div>
-      <div className={style.panelBodyHeader}>
-        <span></span>
-        <span></span>
-        {keyList.map((key, index) => {
-          const { label, width } = cellConfig[key];
-          const theStyle = { width };
-
-          return (
-            <div className={style.column} key={index} style={theStyle}>
-              <span>{label}</span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/*  */}
-      {product.map((item, index) => {
-        const { action } = item;
-        const classAction = action === 'add' ? style.add : action === 'remove' ? style.remove : '';
-
-        return (
-          <div key={index} className={style.panelBodyBody}>
-            <span className={`${style.action} ${classAction}`}></span>
-            <span>{index + 1}</span>
-            {keyList.map((key, index) => {
-              const { width, type } = cellConfig[key];
-              const value = item[key];
-              const theStyle = { width };
-
-              if (type === 'checkbox') {
-                return (
-                  <div className={`${style.column} text-center`} key={index} style={theStyle}>
-                    <Checkbox01 stateValue={value as boolean} cursor="auto" />
-                  </div>
-                );
-              }
-
-              if (type === 'selectWithIcon') {
-                const { label, icon } = value as {
-                  label: string;
-                  icon: string;
-                };
-
-                return (
-                  <div className={style.column} key={index} style={theStyle}>
-                    {/*  eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={icon} alt="" />
-                    <span>{label}</span>
-                  </div>
-                );
-              }
-
-              return (
-                <div className={style.column} key={index} style={theStyle}>
-                  <span>{value as string}</span>
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 // =======================================================
 // =======================================================
@@ -219,4 +182,58 @@ const theadConfigList: TtheadConfigList = {
     // width: "auto",
   },
 };
-// =======================================================
+// ===================================================================
+
+const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
+  const {
+    // reRender,
+    // reset,
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
+    changeProdKeyArr,
+    //
+    // subTotal,
+    //
+    // comKeyArr,
+    // comVKeyArr,
+    // comCellConfig,
+    // changeComKeyArr,
+    //
+    // accessoriesKeyArr,
+    // changeAccessoriesKeyArr,
+    // accessoriesCellConfig,
+    //
+    // othersKeyArr,
+    // othersList,
+    // othersCellConfig,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
+  } = useProductList({
+    productArr: prodArr ?? [],
+    others: [],
+    resetTrigger: prodArr,
+  });
+
+  return (
+    <div>
+      <Table_prod
+        disabled={true}
+        prodList={productList}
+        prodCellConfig={prodCellConfig}
+        prodKeyArr={prodKeyArr}
+        changeProdKeyArr={changeProdKeyArr}
+        addProd={() => {}}
+        setTargetProd={() => {}}
+        emptyBlockWidth="80px"
+        rowHeight={'h106'}
+        panelBox="stateBox"
+      />
+    </div>
+  );
+};

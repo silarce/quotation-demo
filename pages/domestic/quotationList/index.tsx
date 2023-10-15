@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter, NextRouter } from 'next/router';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -7,12 +8,15 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import ContractSelector from 'components/global/gear/modal/contractSelector';
 
 // components
 import BudgeList from 'components/page/domestic/budget/budgetList';
 
 // css
 import scss from './index.module.scss';
+
+import { AppContext } from 'pages/_app';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -31,59 +35,185 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // ===========================================
 // ===========================================
 
-export default function Budget() {
+export default function QuotationList() {
   const router = useRouter();
-  const { county, customerName, projectName, status, reviewStatus } = router.query as { [key: string]: string };
+  const { county, customerName, projectName, reviewStatus } = router.query as { [key: string]: string };
+  // Budget
+  // Bidding
+  // Contracting
+  const status = router.query.status as 'Budget' | 'Bidding' | 'Contracting';
+
+  const { userInfo } = useContext(AppContext);
+  const userEmp = userInfo?.employee;
+  const userId = userEmp?.id;
+
+  const [contractSelectShow, setContractSelectShow] = useState(false);
+
   // ----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
-  // 未審核
+  //
+  // agent 經辦
+  // reviewSales 業務
+  // reviewSupervisor 業務主管
+  // reviewWorkDirector 應收帳款
+  // reviewManager 總經理
 
-  const reviewStatusFilter_noReview = {
-    $and: {
-      'latestContent.reviewSalesEmployee': { $null: true },
-      'latestContent.reviewSupervisorEmployee': { $null: true },
-    },
-  };
+  // 待審核
+  const foo = (() => {
+    if (!reviewStatus || reviewStatus === '待審核') {
+      return {
+        // 使用者為經辦
+        'latestContent.agentEmployee.id': { $eq: userId },
+        // 還沒送審給任一階段審核者
+        $and: {
+          'latestContent.toSalesAt': { $null: true },
+          'latestContent.toSupervisorAt': { $null: true },
+          'latestContent.toWorkDirectorAt': { $null: true },
+          'latestContent.toManagerAt': { $null: true },
+        },
+      };
+    }
 
-  //審核中
-  const reviewStatusFilter_inReview = {
-    $or: {
-      'latestContent.reviewSalesEmployee': { $notNull: true },
-      'latestContent.reviewSupervisorEmployee': { $notNull: true },
-    },
-  };
+    // _____________________________________________
+    if (reviewStatus === '審核中') {
+      // 如果在預算或投標階段
+      if (status === 'Budget' || status === 'Bidding') {
+        return {
+          // 同時滿足兩個條件
+          $and: {
+            // 1 使用者為經辦或任一階段的審核者
+            '1': {
+              $or: {
+                'latestContent.agentEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesEmployee.id': { $eq: userId },
+                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+                'latestContent.reviewManagerEmployee.id': { $eq: userId },
+              },
+            },
+            // 2 報價單已送審審核業務
+            '2': {
+              $or: {
+                'latestContent.toSalesAt': { $notNull: true },
+              },
+            },
+            // 3 報價單沒有被審核業務審核過
+            '3': {
+              $and: {
+                'latestContent.salesReviewedAt': { $null: true },
+              },
+            },
+          },
+        };
+      }
 
-  // 已審核
-  const reviewStatusFilter_reviewed = {
-    $or: {
-      'latestContent.salesReviewedAt': { $notNull: true },
-      'latestContent.supervisorReviewedAt': { $notNull: true },
-    },
-  };
+      return {
+        // 同時滿足兩個條件
+        $and: {
+          // 1 使用者為經辦或任一階段的審核者
+          '1': {
+            $or: {
+              'latestContent.agentEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesEmployee.id': { $eq: userId },
+              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+              'latestContent.reviewManagerEmployee.id': { $eq: userId },
+            },
+          },
+          // 2 報價單已送審給任一階段的審核者
+          '2': {
+            $or: {
+              'latestContent.toSalesAt': { $notNull: true },
+              'latestContent.toSupervisorAt': { $notNull: true },
+              'latestContent.toWorkDirectorAt': { $notNull: true },
+              'latestContent.toManagerAt': { $notNull: true },
+            },
+          },
+          // 3 報價單有任一審核者沒有審核過
+          '3': {
+            $or: {
+              'latestContent.salesReviewedAt': { $null: true },
+              'latestContent.supervisorReviewedAt': { $null: true },
+              'latestContent.workDirectorReviewedAt': { $null: true },
+              'latestContent.managerReviewedAt': { $null: true },
+            },
+          },
+        },
+      };
+    }
 
-  const reviewStatusFilter =
-    reviewStatus === '審核中'
-      ? reviewStatusFilter_inReview
-      : reviewStatus === '審核完成'
-      ? reviewStatusFilter_reviewed
-      : reviewStatusFilter_noReview; // 待審核
+    // _____________________________________________
+    if (reviewStatus === '審核完成') {
+      // 如果在預算或投標階段
+      if (status === 'Budget' || status === 'Bidding') {
+        return {
+          $and: {
+            // 1 使用者為經辦或任一階段的審核者
+            '1': {
+              $or: {
+                'latestContent.agentEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesEmployee.id': { $eq: userId },
+                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+                'latestContent.reviewManagerEmployee.id': { $eq: userId },
+              },
+            },
+            // 2 報價單被業務審核過
+            '2': {
+              $and: {
+                'latestContent.salesReviewedAt': { $notNull: true },
+              },
+            },
+          },
+        };
+      }
+
+      return {
+        $and: {
+          // 1 使用者為經辦或任一階段的審核者
+          '1': {
+            $or: {
+              'latestContent.agentEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesEmployee.id': { $eq: userId },
+              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+              'latestContent.reviewManagerEmployee.id': { $eq: userId },
+            },
+          },
+          // 2 報價單被所有審核者審核過
+          '2': {
+            $and: {
+              'latestContent.salesReviewedAt': { $notNull: true },
+              'latestContent.supervisorReviewedAt': { $notNull: true },
+              'latestContent.workDirectorReviewedAt': { $notNull: true },
+              'latestContent.managerReviewedAt': { $notNull: true },
+            },
+          },
+        },
+      };
+    }
+
+    // _____________________________________________
+    return {};
+  })();
 
   const params = {
     filter: {
       'latestContent.status': {
         $eq: status,
       },
-      'latestContent.projectName': {
-        $contains: projectName || undefined,
+      'latestContent.county': {
+        $contains: county || undefined,
       },
       'latestContent.customer.name': {
         $contains: customerName || undefined,
       },
-      'latestContent.county': {
-        $contains: county || undefined,
+      'latestContent.projectName': {
+        $contains: projectName || undefined,
       },
       // ...reviewStatusFilter,
+      ...foo,
     },
   };
 
@@ -154,8 +284,17 @@ export default function Budget() {
 
   // ----------------------------------------------------------
 
+  const attatchBtn = {
+    type: 'myButton',
+    label: '追加追減',
+    onClick: () => {
+      setContractSelectShow(true);
+    },
+  } as const;
+
   const panelList: TpanelList = [
     { searchGroup },
+    status === 'Contracting' ? attatchBtn : null,
     {
       type: 'addButton',
       label: '新增報價單',
@@ -171,12 +310,25 @@ export default function Budget() {
 
   return (
     <SubLayer>
-      <PageHeader02 tag="預算" panelList={panelList} />
+      {/* <PageHeader02 tag="預算" panelList={panelList} /> */}
+      <PageHeader02 tag={statusLookup[status] ?? '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
       </div>
       <LoadingCover01 isLoading={isLoading} />
+      <ContractSelector
+        showModal={contractSelectShow}
+        onConfirm={(v) => {
+          router.push({
+            pathname: '/domestic/contract/attachContract',
+            query: {
+              contractId: v[0].id,
+            },
+          });
+        }}
+        onCancel={() => setContractSelectShow(false)}
+      />
     </SubLayer>
   );
 }
@@ -229,4 +381,10 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
       <PageHeader02 linkList={linkList} />
     </div>
   );
+};
+
+const statusLookup = {
+  Budget: '預算',
+  Bidding: '投標',
+  Contracting: '發包',
 };

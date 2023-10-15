@@ -18,6 +18,7 @@ import scss from './quotationRanges.module.scss';
 
 // api
 import {
+  TcreateQuotationRangeDto,
   useGetQuotationRanges_v2,
   apiPostQuotationRanges,
   apiPatchQuotationRanges,
@@ -32,13 +33,13 @@ import { Tparams } from 'js/api/dtoTypes';
 import {
   Toption,
   optionsCreator_category,
-  optionsCreator_doorModel,
+  optionsCreator_doorModel_2,
   optionsCreator_doorForm,
 } from 'js/utils/options/productOptions';
 
 // ==========================================================================
 const optionsCategory = optionsCreator_category({ haveEmpty: true });
-const optionsDoorModel = optionsCreator_doorModel({ haveEmpty: true });
+const optionsDoorModel = optionsCreator_doorModel_2({ haveEmpty: true });
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true });
 
 type Tfilter = Partial<Pick<TquotationRangeDto, 'category' | 'doorModelName' | 'type' | 'description'>>;
@@ -56,6 +57,7 @@ export default function QuotationRanges() {
   });
 
   const params: Tparams = {
+    sort: 'updatedAt',
     filter: {
       category: { $eq: filter.category },
       doorModelName: { $eq: filter.doorModelName },
@@ -98,7 +100,12 @@ export default function QuotationRanges() {
       }
 
       id = classId;
-      body = { category, doorModelName, type, description };
+      body = {
+        category,
+        doorModelName: doorModelName as TcreateQuotationRangeDto['doorModelName'],
+        type: type as TcreateQuotationRangeDto['type'],
+        description,
+      };
     }
 
     try {
@@ -150,7 +157,7 @@ export default function QuotationRanges() {
 
   const doSearch: TsearchGroup['doSearch'] = (arr) => {
     const category = (arr[0] as Toption).value;
-    const doorModelName = (arr[1] as Toption).value;
+    const doorModelName = (arr[1] as Toption).value as Tfilter['doorModelName'];
     const type = (arr[2] as Toption).value as Tfilter['type'];
     const description = arr[3] as string;
     setFilter({ category, doorModelName, type, description });
@@ -165,7 +172,7 @@ export default function QuotationRanges() {
     { searchGroup },
     {
       type: 'addButton',
-      label: '新增備註',
+      label: '新增報價範圍',
       onClick: newClassRange,
     },
   ];
@@ -173,7 +180,7 @@ export default function QuotationRanges() {
   // ------------------------------------------------------------------------
   return (
     <SubLayer className={scss.container} bodyClassName={classNames(scss.subLayer, scss.plus)}>
-      <PageHeader02 tag="備註列表" panelList={panelList} />
+      <PageHeader02 tag="報價範圍列表" panelList={panelList} />
       <Table_quotationRanges
         quotationRangeArr={quotationRangeArr}
         hookPack={hookPack}

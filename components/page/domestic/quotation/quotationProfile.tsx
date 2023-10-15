@@ -81,7 +81,7 @@ type TreturnBody = {
   projectProgress?: string; // 工地進度
 };
 
-export type { TreturnBody };
+export type { TreturnBody, TquotationProfile };
 
 // =================================================================
 export default function QuotationProfile({
@@ -212,6 +212,8 @@ export default function QuotationProfile({
     address: {
       props: {
         disabled,
+        // style: { height: 30 },
+        className: 'overflow-hidden',
         ...register('address'),
       },
     },
@@ -230,8 +232,8 @@ export default function QuotationProfile({
 
     setCustomer(v[0]);
     setValue('customerId', v[0].id);
-    setValue('contactPerson', v[0].contacts[0].name);
-    setValue('contactNumber', v[0].contacts[0].phone);
+    setValue('contactPerson', v[0].contacts[0]?.name ?? '');
+    setValue('contactNumber', v[0].contacts[0]?.phone ?? '');
   };
 
   const clearClient = () => {
@@ -259,6 +261,8 @@ export default function QuotationProfile({
           textareaProps={{
             props: {
               ...register('projectName'),
+              className: 'overflow-hidden',
+              // style: { height: '40px' },
             },
           }}
         />
@@ -277,6 +281,8 @@ export default function QuotationProfile({
                   props: {
                     placeholder: undefined,
                     value: data_customer?.name ?? '',
+                    className: 'overflow-hidden',
+                    // style: { height: 30 },
                   },
                 }}
               />

@@ -238,13 +238,15 @@ const infoConfig: TinfoConfig = {
 type Tpart = {
   partName: string;
   material: string;
-  unit: string;
+  desc: string;
+  // unit: string;
+  unit: React.ReactNode;
   qty: string;
   price: string;
   totalPrice: string;
 };
 
-type TkeyIndex = 'partName' | 'material' | 'unit' | 'qty' | 'price' | 'totalPrice';
+type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string;
@@ -256,7 +258,7 @@ type Tconfig = {
   };
 };
 
-const keyIndex: TkeyIndex[] = ['partName', 'material', 'unit', 'qty', 'price', 'totalPrice'];
+const keyIndex: TkeyIndex[] = ['partName', 'desc', 'unit', 'qty', 'price', 'totalPrice'];
 
 const config: Tconfig = {
   partName: {
@@ -265,8 +267,15 @@ const config: Tconfig = {
       width: '300px',
     },
   },
-  material: {
-    label: '材質',
+  // material: {
+  //   label: '材質',
+  //   style: {
+  //     width: 'auto',
+  //     flex: '1',
+  //   },
+  // },
+  desc: {
+    label: '說明',
     style: {
       width: 'auto',
       flex: '1',
@@ -307,3 +316,5 @@ const config: Tconfig = {
     },
   },
 };
+
+export type { TmainProduct, Tpart };

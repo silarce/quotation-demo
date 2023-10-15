@@ -10,17 +10,13 @@ $semiMaring: 0 8px;
 
 // ant-modal
 .quotationPdf {
-  // background-color: #ddd;
-  // padding: 0;
+  * {
+    font-family: Microsoft JhengHei;
+    color: black;
+  }
   :global(.ant-modal-content) {
-    // width: fit-content;
-    // margin: auto;
   }
   :global(.ant-modal-body) {
-    // width: 595.28px;
-    // height: 841.89px;
-    // width: calc(595px * 2.7); // 595*2.7 = 1606
-    // height: calc(842px * 2.7);
     padding: 0;
   }
   .hr {
@@ -121,6 +117,9 @@ $semiMaring: 0 8px;
     img {
       width: 30px;
     }
+    svg {
+      width: 30px;
+    }
     &.center {
       > * {
         margin: auto;
@@ -145,7 +144,7 @@ $semiMaring: 0 8px;
   .remark {
     display: grid;
     grid-template-columns: 80px auto;
-    min-height: 350px;
+    min-height: 200px;
     padding: 0 20px;
     margin-bottom: 50px;
     .semi {
@@ -157,6 +156,10 @@ $semiMaring: 0 8px;
     li {
       display: grid;
       grid-template-columns: 35px auto;
+      > span {
+        font-size: 18px;
+        line-height: 24px;
+      }
     }
   } // remark
 
@@ -221,20 +224,28 @@ $semiMaring: 0 8px;
     ol {
       margin-left: 50px;
       list-style-type: decimal;
+      > li {
+        font-size: 16px;
+        line-height: 20px;
+      }
     }
   }
 
   .address,
   .date {
     display: grid;
-    grid-template-columns: 170px auto;
+    grid-template-columns: 145px auto;
+    > h2 {
+      margin: auto;
+      margin-top: 0;
+      margin-left: 0;
+    }
     > div {
-      margin-top: 7px;
     }
   }
   .address {
     > div {
-      height: 94.27px;
+      height: 85px;
     }
   }
 
@@ -244,12 +255,14 @@ $semiMaring: 0 8px;
       margin-left: 50px;
       list-style-type: decimal;
       li {
+        display: grid;
+        grid-template-columns: 180px 80px min-content;
         h2 {
           display: inline-block;
         }
         h2:nth-of-type(2) {
           display: inline-block;
-          width: 100px;
+          // width: 100px;
           text-align: center;
           border-bottom: solid 1px black;
         }

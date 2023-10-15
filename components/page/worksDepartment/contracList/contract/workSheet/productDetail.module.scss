@@ -1,0 +1,73 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+
+  gap: 30px;
+  margin-left: 57px;
+  > p {
+    margin-top: 20px;
+    margin-bottom: 27px;
+    // margin-left: 57px;
+    color: $colorMain;
+    font-size: 20px;
+    // grid的span佔兩格
+    grid-column: span 2;
+  }
+  .left,
+  .right {
+    display: grid;
+    gap: 50px;
+    > .item {
+      > .list {
+        display: grid;
+        gap: 15px;
+      }
+      .sutTitle {
+        margin-bottom: 20px;
+        color: $colorMain;
+        font-size: 18px;
+        font-weight: 700;
+        > span {
+          margin-left: 20px;
+          color: $colorActive01;
+          font-size: 13px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  .left {
+    // margin-left: 57px;
+  }
+  .right {
+    
+  }
+}
+
+.inputSel_big {
+  > * {
+    margin: auto;
+    margin-left: 0;
+  }
+}
+
+.selSingleValue {
+  text-align: center;
+}
+
+.selSingleValue_custom {
+  img {
+    // width: 60px;
+    height: 114px;
+  }
+}
+
+.selOption_custom {
+  img {
+    // width: 60px;
+    height: 75px;
+  }
+}

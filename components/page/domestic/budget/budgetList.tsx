@@ -1,15 +1,19 @@
 import { useState, MouseEvent, createContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // components
 import Thead01 from '../ui/table01/Thead01';
 import TbodyItem01, { TBodyItemContent } from '../ui/table01/TbodyItem01';
+import ReviewChain from '../ui/table01/reviewChain';
 import PanelBody from './budgetList/tableBody';
 // antd
 import { Collapse } from 'antd';
 // css
-import style from './budgetList.module.scss';
+import scss from './budgetList.module.scss';
+
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // ===========================================
 import { TquotationDto } from 'js/api/api_quotation';
@@ -42,52 +46,120 @@ export default function BudgetList({
   };
 
   return (
-    <div className={classNames(style.container, className)}>
+    <div className={classNames(scss.container, className)}>
       <Thead01 />
 
-      <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
-        <budgetListContext.Provider value={{ status: 'Budget' }}>
+      <budgetListContext.Provider value={{ status: 'Budget' }}>
+        <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
           {quotationArr?.map((quotation, index) => {
-            const { id, latestContent } = quotation;
+            const { id, latestContent, contents, attachedToContract } = quotation;
 
             const isActive = activeIndex === index;
 
             const openQuotation = (e: MouseEvent) => {
               e.stopPropagation();
-              router.push({
-                pathname: `/domestic/quotationList/quotation`,
-                query: { id },
-              });
+
+              if (attachedToContract) {
+                router.push({
+                  pathname: `/domestic/quotationList/attachQuotation`,
+                  query: { id },
+                });
+              } else {
+                router.push({
+                  pathname: `/domestic/quotationList/quotation`,
+                  query: { id },
+                });
+              }
             };
 
+            const status = latestContent.status;
+
             const quotationContent: TBodyItemContent = {
-              ...quotation.latestContent,
-              customerName: quotation.latestContent.customer.name,
-              agentEmployeeName:
-                quotation.latestContent.agentEmployee.chName || quotation.latestContent.agentEmployee.enName,
-              totalPrice: quotation.latestContent.total,
+              ...latestContent,
+              customerName: latestContent.customer.name,
+              agentEmployeeName: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
+              totalPrice: latestContent.total,
             };
+
+            const {
+              reviewSalesEmployee,
+              salesReviewedAt,
+              reviewSupervisorEmployee,
+              supervisorReviewedAt,
+              reviewWorkDirectorEmployee,
+              workDirectorReviewedAt,
+              reviewManagerEmployee,
+              managerReviewedAt,
+            } = latestContent;
+            const reviewStatuArr = [
+              {
+                jobName: '經辦',
+                name: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
+                isReviewed: true,
+              },
+              {
+                jobName: '業務',
+                name: reviewSalesEmployee?.chName ?? '',
+                isReviewed: reviewSalesEmployee ? !!salesReviewedAt : undefined,
+              },
+              {
+                jobName: '業務主管',
+                name: reviewSupervisorEmployee?.chName ?? '',
+                isReviewed: reviewSupervisorEmployee ? !!supervisorReviewedAt : undefined,
+              },
+              {
+                jobName: '應收帳款',
+                name: reviewWorkDirectorEmployee?.chName ?? '',
+                isReviewed: reviewWorkDirectorEmployee ? !!workDirectorReviewedAt : undefined,
+              },
+              {
+                jobName: '總經理',
+                name: reviewManagerEmployee?.chName ?? '',
+                isReviewed: reviewManagerEmployee ? !!managerReviewedAt : undefined,
+              },
+            ];
+
+            // 在預算與投標階段，只要顯示到業務
+            if (status === 'Budget' || status === 'Bidding') {
+              reviewStatuArr.pop();
+              reviewStatuArr.pop();
+              reviewStatuArr.pop();
+            }
+
+            const recordArr = contents.map((item) => {
+              const { createdAt, editNotes, discount, quantity, total } = item;
+
+              return {
+                date: moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD'),
+                editNotes,
+                discount,
+                doorQty: String(quantity),
+                total: total.toLocaleString(),
+              };
+            });
 
             return (
               <Panel
                 key={index}
-                className={style.panel}
+                className={scss.panel}
                 header={
                   <TbodyItem01
+                    //
                     quotationContent={quotationContent}
                     isActive={isActive}
                     openQuotation={openQuotation}
-                    approvalsStatus="待審核"
-                  />
+                  >
+                    <ReviewChain reviewStatuArr={reviewStatuArr} />
+                  </TbodyItem01>
                 }
               >
                 {/* 等api補資料再作 */}
-                {/* <PanelBody projectSimpleRecord={tempRecord} openQuotation={openQuotation} /> */}
+                <PanelBody recordArr={recordArr} />
               </Panel>
             );
           })}
-        </budgetListContext.Provider>
-      </Collapse>
+        </Collapse>
+      </budgetListContext.Provider>
     </div>
   );
 }

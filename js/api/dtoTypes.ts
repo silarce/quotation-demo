@@ -665,7 +665,7 @@ export type TannotationDto = {
   /**類別 */
   category: string;
   /**門型 */
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
   type: 'normal' | 'anti-typhoon';
   /**內容 */
@@ -674,14 +674,14 @@ export type TannotationDto = {
 
 export type TcreateAnnotationDto = {
   category: string;
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   type: 'normal' | 'anti-typhoon';
   description: string;
 };
 
 export type TcreateQuotationRangeDto = {
   category: string;
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   type: 'normal' | 'anti-typhoon';
   description: string;
 };
@@ -693,7 +693,7 @@ export type TquotationRangeDto = {
   /**類別 */
   category: string;
   /**門型 */
-  doorModelName: string;
+  doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
   type: 'normal' | 'anti-typhoon';
   /**內容 */
@@ -749,8 +749,8 @@ export type TquotationContentOtherDto = {
 
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 
-/**選配設定 */ // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
-export type TquotationProductOptionDto = {
+/**選配設定 */
+export type TquotationProductAccessoriesDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -762,11 +762,57 @@ export type TquotationProductOptionDto = {
   totalPrice: number; // 複價
   price: number; // 牌價
   dualPrice: number; // 牌價複價
+  order: number;
+  //
+  referenceSpec: string | null;
+  // originalPrice: number;
+  originalPrice?: number | undefined;
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductOptionDto = Omit<TquotationProductOptionDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateQuotationProductAccessoriesDto = Omit<
+  TquotationProductAccessoriesDto,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
-export type quotationProductDto = {
+// 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
+export type TquotationProductComponentsDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  type:
+    | 'slat'
+    | 'bottomBar'
+    //
+    | 'guideRail'
+    | 'sidePlate'
+    | 'roller'
+    | 'motor'
+    | 'motorAccessories'
+    | 'headBox';
+  number: string;
+  componentId: string;
+  rawData: object;
+  /**
+  從TdoorBomDto_Component取得的bom要直接送進來這個bom
+   */
+  bom: any; // 前端不會直接用到，先直接設object
+  material: string;
+  materialSurface: string | null | undefined;
+  isPainted: boolean;
+  price: number;
+  quantity: string;
+  order: number;
+
+  desc: string | null;
+  density: string | null;
+};
+// 但是後端有建立這個型別
+export type TcreateQuotationProductComponentDto = Omit<
+  TquotationProductComponentsDto,
+  'id' | 'createdAt' | 'updatedAt'
+>;
+
+export type TquotationProductDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -777,49 +823,48 @@ export type quotationProductDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorType: string;
+  doorModelName: string;
   // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  length: string;
+  fullWidth: number;
   // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  width: string;
+  WG: number;
   // h(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  height: string;
+  height: number;
   // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
-  boxB: string;
+  boxB: number;
+  boxD: number;
   // 面積
   area: string;
   // 才數
   volume: string;
   // 材料
-  material: string;
+  materialName: string;
   // 表面
-  surface: string;
+  materialSurface: string;
   // 門軌
-  doorTrack: string;
+  guideRail: string;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motor: string;
+  motorVendor: string;
   // 電壓
-  voltage: number;
+  motorVoltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  hasMotorSupportStand: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
-  doorTrackThick: number;
+  guideRailThickness: number;
   // 捲軸規格
   rollerSpec: string;
   // 門軌消音條
-  doorTrackSilencerStrip: boolean;
+  hasSilencingStrip: boolean;
   // 一體式捲箱
-  onePieceRollUpBox: boolean;
+  isIntegratedHeadBox: boolean;
   // 捲箱厚度
-  rollUpBoxThick: number;
-  // 數量
-  quantity: number;
+  headBoxThickness: number;
   // 單價
   unitPrice: number;
   // 牌價
@@ -828,24 +873,64 @@ export type quotationProductDto = {
   dualPrice: number;
   // 複價
   totalPrice: number;
-  // // 防颱
-  typhoonProtection: boolean;
+  // 防颱
+  isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
   // 關閉方式
-  close: string;
+  closingType: string;
   // 備註
   notes: string;
-  // 選配設定
-  options?: TquotationProductOptionDto[] | undefined;
+  order: number;
+
+  motorPhase: number;
+
+  bottomBarAngleIron: string; // 底座角鐵
+  bottomBarPlate: string; // 底座板
+
+  items?: {
+    // 材料配件
+    components: TquotationProductComponentsDto[];
+    // 選配設定
+    accessories: TquotationProductAccessoriesDto[];
+    // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
+  }[];
+
+  quantity: number;
+  // 門片厚度
+  thickness: string;
+  // 配電箱牌價;
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
+
+  attachedToProductId?: string | null;
+  attachedToProduct?: TquotationProductDto | null;
+  // api實際上還沒加上去
+  rootProductId: string;
+
+  // 前端用的，後端沒有
+  // 只是為了方便才寫在這邊
+  reduceQty?: number;
 };
 
-export type TquotationContentDto = {
+type TquotationContentDto_foo = {
   id: string;
   createdAt: string;
   updateAt: string;
   quotationNumber: string;
   version: number;
+
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
   customer: TcustomerDto;
@@ -861,12 +946,24 @@ export type TquotationContentDto = {
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
+
   //審核相關
   reviewSalesEmployee: TemployeeDto | null;
   salesReviewedAt: string | null;
+  toSalesAt: string | null; // date
+
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
-  //
+  toSupervisorAt: string | null; // date
+
+  reviewWorkDirectorEmployee: TemployeeDto | null;
+  workDirectorReviewedAt: string | null;
+  toWorkDirectorAt: string | null; // date
+
+  reviewManagerEmployee: TemployeeDto | null;
+  managerReviewedAt: string | null;
+  toManagerAt: string | null; // date
+
   /**備註 */
   annotations: string[] | null;
   /**報價範圍 */
@@ -875,7 +972,7 @@ export type TquotationContentDto = {
   faxNumber: string; // 傳真號碼
   trackProgress: string; // 追蹤狀態
   projectProgress: string; //工地進度
-  productsOrder: string[]; // 裡面裝的是product的id
+  productsOrder?: string[]; // 已棄用
   /** 總折數*/
   discount: string;
   /**小計 */
@@ -892,7 +989,84 @@ export type TquotationContentDto = {
   paymentMethods: TpaymentMethodDto[];
 
   others: TquotationContentOtherDto[];
-  products: quotationProductDto[];
+  products: TquotationProductDto[];
+
+  verifyForm: TquotationVerifyFormDto;
+};
+export type TquotationContentDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  quotationNumber: string;
+  version: number;
+
+  quotationDate: string; // 報價日期
+  validityPeriod: string; // 報價時效
+  customer: TcustomerDto;
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string; // 剩餘地址
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  quantity: number; // 樘數
+  editNotes: string; // 編輯備註
+  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  managerEmployee: TemployeeDto | null;
+  supervisorEmployee: TemployeeDto | null;
+  agentEmployee: TemployeeDto;
+
+  //審核相關
+  reviewSalesEmployee: TemployeeDto | null;
+  salesReviewedAt: string | null;
+  toSalesAt: string | null; // date
+
+  reviewSupervisorEmployee: TemployeeDto | null;
+  supervisorReviewedAt: string | null;
+  toSupervisorAt: string | null; // date
+
+  reviewWorkDirectorEmployee: TemployeeDto | null;
+  workDirectorReviewedAt: string | null;
+  toWorkDirectorAt: string | null; // date
+
+  reviewManagerEmployee: TemployeeDto | null;
+  managerReviewedAt: string | null;
+  toManagerAt: string | null; // date
+
+  /**備註 */
+  annotations: string[] | null;
+  /**報價範圍 */
+  quotationRanges: string[] | null;
+
+  faxNumber: string; // 傳真號碼
+  trackProgress: string; // 追蹤狀態
+  projectProgress: string; //工地進度
+  productsOrder?: string[]; // 已棄用
+  /** 總折數*/
+  discount: string;
+  /**小計 */
+  subTotal: number;
+  /**營業稅 */
+  salesTax: number;
+  /**總計 */
+  total: number;
+  /**交貨地點 */
+  deliveryLocation: string;
+  /**交貨日期 date*/
+  deliveryDate: string;
+  /**付款方式 */
+  paymentMethods: TpaymentMethodDto[];
+
+  others: TquotationContentOtherDto[];
+  products: TquotationProductDto[];
+
+  verifyForm: TquotationVerifyFormDto;
+
+  // api文件上沒寫但應該會有的東西
+  // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
+  // rootContract?: TquotationContractDto;
+  // 為了避免check壞掉，暫時先這樣
+  rootContract?: TquotationContentDto_foo;
 };
 
 export type TquotationDto = {
@@ -902,6 +1076,7 @@ export type TquotationDto = {
   quotationNumber: string;
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
+  attachedToContract?: TquotationContractDto;
 };
 
 export type TcreateQuotationProductDto = {
@@ -912,47 +1087,48 @@ export type TcreateQuotationProductDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorType: string;
+  doorModelName: string;
   // L(m)
-  length: string;
+  fullWidth: number;
   // W(m)
-  width: string;
+  WG: number;
   // h(m)
-  height: string;
+  height: number;
   // B(m)
-  boxB: string;
+  boxB: number;
+  boxD: number;
   // 面積
   area: string;
   // 才數
   volume: string;
   // 材料
-  material: string;
+  materialName: string;
   // 表面
-  surface: string;
+  materialSurface: string;
   // 門軌
-  doorTrack: string;
+  guideRail: string;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motor: string;
+  motorVendor: string;
   // 電壓
-  voltage: number;
+  motorVoltage: number;
   // 馬達支撐架
-  motorSupport: string;
+  hasMotorSupportStand: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
-  doorTrackThick: number;
+  guideRailThickness: number;
   // 捲軸規格
   rollerSpec: string;
   // 門軌消音條
-  doorTrackSilencerStrip: boolean;
+  hasSilencingStrip: boolean;
   // 一體式捲箱
-  onePieceRollUpBox: boolean;
+  isIntegratedHeadBox: boolean;
   // 捲箱厚度
-  rollUpBoxThick: number;
+  headBoxThickness: number;
   // 數量
   quantity: number;
   // 單價
@@ -964,15 +1140,18 @@ export type TcreateQuotationProductDto = {
   // 複價
   totalPrice: number;
   // 防颱
-  typhoonProtection: boolean;
+  isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
   // 關閉方式
-  close: string;
+  closingType: string;
   // 備註
   notes: string;
+
+  motorPhase: number;
+
   // 選配設定
-  options: {
+  accessories: {
     codeName: string; //代號
     name: string; //名稱
     unit: string; // 單位
@@ -981,8 +1160,56 @@ export type TcreateQuotationProductDto = {
     totalPrice: number; // 複價
     price: number; // 牌價
     dualPrice: number; // 牌價複價
+    order: number;
   }[];
+  components: TcreateQuotationProductComponentDto[];
+  //
+  // materialSurface: string;
+  isPainted: boolean;
+  order: number;
+  bottomBarAngleIron: string; // 底座角鐵
+  bottomBarPlate: string; // 底座板
+
+  // 門片厚度
+  thickness: string;
+  // 配電箱 牌價;
+  distributionBoxPrice: number;
+  // 配電箱 單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費 牌價;
+  installationFeePrice: number;
+  // 安裝費 牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費 數量;
+  installationFeeQuantity: number;
+  // 安裝費 單價;
+  installationFeeUnitPrice: number;
+  // 安裝費 複價;
+  installationFeeTotalPrice: number;
 };
+
+// type TupdateQuotationContentDto = {
+//   quotationDate: string; // 報價日期
+//   validityPeriod: string; // 報價時效
+//   customerId: string;
+//   projectName: string; // 工程名稱
+//   county: string; // 縣市
+//   district: string; // 區
+//   address: string; // 剩餘地址
+//   contactPerson: string; //  聯絡人
+//   contactNumber: string; //  聯絡電話
+//   faxNumber: string; // 傳真號碼
+//   trackProgress: string; // 追蹤狀態
+//   projectProgress: string; //工地進度
+//   quantity: number; // 樘數
+//   editNotes: string; // 編輯備註
+//   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+//   /**備註 */
+//   annotations: string[] | null;
+//   /**報價範圍 */
+//   quotationRanges: string[] | null;
+//   managerId: string | null;
+// };
 
 export type TcreateQuotationContentDto = {
   quotationDate: string; // 報價日期
@@ -1015,11 +1242,121 @@ export type TcreateQuotationContentDto = {
   total: number;
   deliveryLocation: string;
   // 交貨日期
-  deliveryDate: string;
+  deliveryDate: string | null;
   paymentMethods: TpaymentMethodDto[];
 
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
+  productsOrder?: string[] | null; // 已棄用
+};
+
+export type TquotationContractDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  annotations: string[] | null;
+  quotationRanges: string[] | null;
+  discount: string;
+  subTotal: number;
+  salesTax: number;
+  total: number;
+  deliveryLocation: string;
+  deliveryDate: string | null; // date
+  paymentMethods: TpaymentMethodDto[];
+  verifyForm: TquotationVerifyFormDto;
+  quotation: TquotationDto;
+  content: TquotationContentDto;
+  // attachedToContract: TquotationContractDto; // 上一份追加減合約
+  // attachedContract: TquotationContractDto; // 下一份追加減合約
+  rootContract?: TquotationContractDto; // 源合約
+  version: number;
+  //
+  subContracts: TquotationContractDto[];
+};
+
+export type TcreateModifyQuotationDto = {
+  // 報價日期
+  quotationDate?: string;
+  // 報價時效
+  validityPeriod?: string;
+  // 客戶 ID
+  customerId?: string;
+  // 工程名稱
+  projectName?: string;
+  // 縣市
+  county?: string;
+  // 區
+  district?: string;
+  // 詳細地址
+  address?: string;
+  // 聯絡人
+  contactPerson?: string;
+  // 聯絡電話
+  contactNumber?: string;
+  // 傳真電話
+  faxNumber?: string;
+  // 追蹤進度
+  trackProgress?: string;
+  // 工地進度
+  projectProgress?: string;
+  // 樘數
+  quantity?: number;
+  // 編輯備註
+  editNotes?: string;
+  annotations?: string[] | null;
+  quotationRanges?: string[] | null;
+  // 經理
+  managerId?: string | null;
+  // 主管
+  supervisorId?: string | null;
+  // 經辦人
+  agentId?: string;
+  // 總折數
+  discount?: string;
+  // 小計
+  subTotal?: number;
+  // 營業稅
+  salesTax?: number;
+  // 總計
+  total?: number;
+  // 交貨地點
+  deliveryLocation?: string;
+  // 交貨日期
+  deliveryDate?: string | null;
+  paymentMethods?: TpaymentMethodDto[];
+  products?: TcreateQuotationProductDto[];
+  others?: TcreateQuotationContentOtherDto[];
+};
+
+export type TquotationAccouting = {
+  quotetype: string;
+  totalsum: string; // 牌價複價
+  pricesum: string; // 單價複價
+  quotation_number: string;
+  project_name: string;
+  contactnumber: string;
+  contactperson: string;
+  customername: string;
+};
+
+export type TquotationAccouting_years = {
+  year: number;
+  // month: number;
+  // 這是前端設的，後端是設為number
+  month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  totalsum: string;
+  company_location: string;
+};
+
+// 全區業績統計表
+export type TquotationAccouting_area = {
+  quotetype: string;
+  year: number;
+  month: number;
+  county: string;
+  totalsum: string; // 牌價複價
+  pricesum: string; // 單價複價
+  percentage: number; // 百分比
 };
 
 // ========================================================================
@@ -1028,7 +1365,7 @@ export type TcreateQuotationContentDto = {
 // ========================================================================
 // ========================================================================
 // ========================================================================
-type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+export type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
 
 export type TdoorMaterialDto = {
   id: string;
@@ -1233,7 +1570,7 @@ export type TdoorComponentListDto = {
 export type TgenerateDoorProductBomDto_ComponentInfo = {
   id: string;
   material: string; // 材質
-  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4'; // 表面處理
+  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | null; // 表面處理
   isPainted: boolean; // 烤漆
 };
 
@@ -1252,6 +1589,10 @@ export type TgenerateDoorProductBomDto_DoorSpec = {
   bearingType: string;
   gearNumber: string;
   chains: number;
+  fullWidth: number;
+
+  bottomBarAngleIron: string;
+  bottomBarPlate: string;
 };
 
 export type TgenerateDoorProductBomDto = {
@@ -1269,6 +1610,9 @@ export type TgenerateDoorProductBomDto = {
 export type TdoorBomDto_Component = {
   id: string;
   number: string;
+  bom: object[]; // 前端不會直接用到，先直接設object
+  unitPrice: number;
+  quantity: number;
 };
 
 export type TdoorProductBomDto = {
@@ -1280,4 +1624,106 @@ export type TdoorProductBomDto = {
   motor: TdoorBomDto_Component;
   motorAccessories: TdoorBomDto_Component;
   headBox: TdoorBomDto_Component;
+};
+
+export type TdoorAccessoryDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: TdoorModelName;
+  name: string;
+  unit: string | null;
+  referenceSpec: string | null;
+  cost: number | null;
+  price: number | null;
+};
+
+// =========================================================================
+
+export type TpaymentRatioDto = {
+  // '階段'
+  level: string;
+  // example: '0.35', description: '比例(0.0 - 1.0)'
+  paymentRatio: string;
+  // 金額
+  price: string;
+  // 備註
+  note: string;
+};
+
+export type TquotationVerifyFormDto = {
+  id: string;
+  createdAt: string;
+  updateAt: string;
+  //  請款日期
+  askForPaymentDate: string;
+  //  放款日期
+  disbursementDate: string;
+  //  請款比例
+  paymentRatio: TpaymentRatioDto[];
+  //  合理放款票期
+  paymentTenor: string;
+  //  履約保證票
+  performanceBond: boolean;
+  //  可否請款訂金
+  depositPayment: boolean;
+  //  保固期(年)
+  warrantyPeriod: number;
+  //  備註
+  note: string;
+  //  保固金或保固票
+  warrantyPayment: boolean;
+  //  防火證明
+  fireproofCertificate: boolean;
+  //  保固書
+  warranty: boolean;
+  //  是否需配合工地試車
+  testDrive: boolean;
+  //  扣款項目、比例、金額
+  debitItem: string;
+  // 合約審核表審核主管(工務部主管)
+  workDirectorId: string;
+};
+
+export type TcreateQuotationVerifyFormDto = {
+  //  請款日期
+  askForPaymentDate: string;
+  //  放款日期
+  disbursementDate: string;
+  //  請款比例
+  paymentRatio: TpaymentRatioDto[];
+  //  合理放款票期
+  paymentTenor: string;
+  //  履約保證票
+  performanceBond: boolean;
+  //  可否請款訂金
+  depositPayment: boolean;
+  //  保固期(年)
+  warrantyPeriod: number;
+  //  備註
+  note: string;
+  //  保固金或保固票
+  warrantyPayment: boolean;
+  //  防火證明
+  fireproofCertificate: boolean;
+  //  保固書
+  warranty: boolean;
+  //  是否需配合工地試車
+  testDrive: boolean;
+  //  扣款項目、比例、金額
+  debitItem: string;
+};
+
+export type TreviewQuotationContentDto = {
+  reviewSalesEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewWorkDirectorEmployeeId?: string | null;
+  reviewManagerEmployeeId?: string | null;
+  reviewResult: boolean;
+};
+
+export type TsubmitReviewQotuationContentDto = {
+  reviewSalesEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewWorkDirectorEmployeeId?: string | null;
 };

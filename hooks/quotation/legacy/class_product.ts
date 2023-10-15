@@ -110,7 +110,7 @@ class Class_product {
   private _exchangeProdList: {
     [key in string]: Class_product;
   } = {};
-  // 等api新增，先用假資料
+  // 等api新增，先用假資料 // TODO 這個已經完工了，假資料?
   private _batchNumber;
 
   //----------------------------------------------

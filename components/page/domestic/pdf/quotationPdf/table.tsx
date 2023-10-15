@@ -1,12 +1,10 @@
+import { useState } from 'react';
+
 // css
 import style from './quotationPdf.module.scss';
 
-// option
-import { optionsCreator_doorRail } from 'js/utils/options/options';
-const optionsDoorRail = optionsCreator_doorRail();
-
-// type
-// import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
+// api
+import { apiGetAssets } from 'js/api/api_product';
 
 export type TtableProdList = {
   category: string;
@@ -25,6 +23,32 @@ export type TtableProdList = {
 }[];
 
 export default function Table({ productList }: { productList: TtableProdList }) {
+  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined }>({});
+
+  const getSvg = async ({ fileName }: { fileName: string }) => {
+    if (!!svgList[fileName]) {
+      return;
+    }
+
+    try {
+      svgList[fileName] = 'isLoading';
+
+      const svg = await apiGetAssets(fileName);
+
+      if (svg) {
+        setSvgList((list) => ({
+          ...list,
+          [fileName]: svg,
+        }));
+      }
+    } catch (error) {
+      setSvgList((list) => ({
+        ...list,
+        [fileName]: undefined,
+      }));
+    }
+  };
+
   return (
     <div className={style.table}>
       {indexKeys.map((key, index) => {
@@ -36,7 +60,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
             <span>
               {label === '開閉方式' ? (
                 <>
-                  <span>開閉</span> <br />
+                  <span>開閉</span>
                   <span>方式</span>
                 </>
               ) : (
@@ -52,24 +76,31 @@ export default function Table({ productList }: { productList: TtableProdList }) 
 
         return indexKeys.map((key, cIndex) => {
           const value = data[key];
-          const { width, align } = config[key];
+          const { width, align, suffix } = config[key];
           const theStyle = { width };
           const subClass = ' ' + style[align ?? ''];
 
           if (key === 'doorRail') {
-            // const imgSrc = optionsDoorRail.find((item) => item.value === value)?.icon;
+            const arr = value.split('/');
+            const fileName = arr[arr.length - 1];
+
+            getSvg({ fileName: fileName });
 
             return (
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
-                <img src={value} alt="" />
+                {/* <img src={value} alt="" /> */}
+                <div dangerouslySetInnerHTML={{ __html: svgList[`${fileName}`] ?? '' }} />
               </div>
             );
           }
 
           return (
             <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
-              <span>{value}</span>
+              <span>
+                {value}
+                {suffix}
+              </span>
             </div>
           );
         });
@@ -95,10 +126,6 @@ export default function Table({ productList }: { productList: TtableProdList }) 
 }
 
 // =============================================================================
-/* 產品資料中有厚度的資料
-但是不會出現在主產品設定中讓使用者編輯
-*/
-// =============================================================================
 
 type TindexKeys =
   | 'category'
@@ -120,6 +147,7 @@ type Tconfig = {
     label: string;
     width: string;
     align?: 'center' | 'right';
+    suffix?: string;
   };
 };
 
@@ -142,11 +170,11 @@ const indexKeys: TindexKeys[] = [
 const config: Tconfig = {
   category: {
     label: '項目',
-    width: '104px',
+    width: '80px',
   },
   size: {
     label: '尺寸(單位:cm)',
-    width: '130px',
+    width: '140px',
   },
   doorType: {
     label: '門型',
@@ -159,12 +187,12 @@ const config: Tconfig = {
   },
   thickness: {
     label: '厚度',
-    width: '60px',
+    width: '50px',
     align: 'center',
   },
   surface: {
     label: '表面',
-    width: '60px',
+    width: '50px',
     align: 'center',
   },
   doorRail: {
@@ -174,22 +202,23 @@ const config: Tconfig = {
   },
   horsepower: {
     label: '馬力',
-    width: '95px',
+    width: '75px',
     align: 'right',
   },
   openType: {
     label: '開閉方式',
-    width: '40px',
+    width: '75px',
     align: 'center',
   },
   qty: {
     label: '數量',
-    width: '40px',
+    width: '60px',
     align: 'right',
+    suffix: '樘',
   },
   unitPrice: {
     label: '單價',
-    width: '85px',
+    width: '100%',
     align: 'right',
   },
   priceTotal: {
@@ -199,7 +228,7 @@ const config: Tconfig = {
   },
   memo: {
     label: '備註',
-    width: '95px',
+    width: '60px',
     align: 'center',
   },
 };

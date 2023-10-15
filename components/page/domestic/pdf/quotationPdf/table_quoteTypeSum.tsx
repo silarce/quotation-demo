@@ -35,13 +35,16 @@ export default function Table_quoteTypeSum({ quoteTypeSumArr }: { quoteTypeSumAr
       {quoteTypeSumArr.map((row) => {
         return indexKeys.map((key, cIndex) => {
           const value = row[key];
-          const { width, align } = config[key];
+          const { width, align, suffix } = config[key];
           const theStyle = { width };
           const subClass = ' ' + style[align ?? ''];
 
           return (
             <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
-              <span>{value.toLocaleString()}</span>
+              <span>
+                {value.toLocaleString()}
+                {suffix}
+              </span>
             </div>
           );
         });
@@ -59,6 +62,7 @@ type Tconfig = {
     label: string;
     width: string;
     align?: 'center' | 'right';
+    suffix?: string;
   };
 };
 
@@ -72,6 +76,7 @@ const config: Tconfig = {
   qtySum: {
     label: '樘數',
     width: 'auto',
+    suffix: '樘',
   },
   unitPriceSum: {
     label: '總單價金額',

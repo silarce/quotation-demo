@@ -17,7 +17,13 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import scss from './annotationList.module.scss';
 
 // api
-import { useGetAnnotation_v2, apiPostAnnotation, apiPatchAnnotation, apiDeleteAnnotation } from 'js/api/api_workSheet';
+import {
+  TcreateAnnotationDto,
+  useGetAnnotation_v2,
+  apiPostAnnotation,
+  apiPatchAnnotation,
+  apiDeleteAnnotation,
+} from 'js/api/api_workSheet';
 
 // type
 import { TannotationDto } from 'js/api/dtoTypes';
@@ -27,13 +33,13 @@ import { Tparams } from 'js/api/dtoTypes';
 import {
   Toption,
   optionsCreator_category,
-  optionsCreator_doorModel,
+  optionsCreator_doorModel_2,
   optionsCreator_doorForm,
 } from 'js/utils/options/productOptions';
 
 // ==========================================================================
 const optionsCategory = optionsCreator_category({ haveEmpty: true });
-const optionsDoorModel = optionsCreator_doorModel({ haveEmpty: true });
+const optionsDoorModel = optionsCreator_doorModel_2({ haveEmpty: true });
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true });
 
 type Tfilter = Partial<Pick<TannotationDto, 'category' | 'doorModelName' | 'type' | 'description'>>;
@@ -51,6 +57,7 @@ export default function MemoList() {
   });
 
   const params: Tparams = {
+    sort: 'updatedAt',
     filter: {
       category: { $eq: filter.category },
       doorModelName: { $eq: filter.doorModelName },
@@ -93,7 +100,14 @@ export default function MemoList() {
       }
 
       id = classId;
-      body = { category, doorModelName, type, description };
+
+      body = {
+        //
+        category,
+        doorModelName: doorModelName as TcreateAnnotationDto['doorModelName'],
+        type: type as TcreateAnnotationDto['type'],
+        description,
+      };
     }
 
     try {
@@ -145,7 +159,7 @@ export default function MemoList() {
 
   const doSearch: TsearchGroup['doSearch'] = (arr) => {
     const category = (arr[0] as Toption).value;
-    const doorModelName = (arr[1] as Toption).value;
+    const doorModelName = (arr[1] as Toption).value as TannotationDto['doorModelName'];
     const type = (arr[2] as Toption).value as Tfilter['type'];
     const description = arr[3] as string;
     setFilter({ category, doorModelName, type, description });
@@ -194,6 +208,7 @@ export class Class_annotation {
     annotation?: {
       id: string | undefined;
       category: string | undefined;
+      // doorModelName: TcreateAnnotationDto['doorModelName'] | undefined;
       doorModelName: string | undefined;
       type: string | undefined;
       description: string;
@@ -248,8 +263,8 @@ export class Class_annotation {
   get apiBody() {
     return {
       category: this.category ?? '',
-      doorModelName: this.doorModelName ?? '',
-      type: this.type as 'normal' | 'anti-typhoon' | '',
+      doorModelName: this.doorModelName,
+      type: this.type,
       description: this.description ?? '',
     };
   }

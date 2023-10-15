@@ -12,6 +12,8 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
+import iconReset from 'public/image/icon/reset.svg';
+import iconChange from 'public/image/icon/change.svg';
 
 // css
 import scss from './productList.module.scss';
@@ -270,13 +272,27 @@ const ResetChangeBtnBox = ({
 }) => {
   return (
     <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
-      <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
+      <Image className={scss.iconBtn} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+
+      <Image
+        src={iconReset}
+        alt="還原"
+        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        onClick={clearExchange}
+      />
+      <Image
+        src={iconChange}
+        alt="變更"
+        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        onClick={toSetTargetIndex}
+      />
+
+      {/* <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
         還原
       </button>
       <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
         變更
-      </button>
+      </button> */}
       <span>{indexNum}</span>
     </div>
   );

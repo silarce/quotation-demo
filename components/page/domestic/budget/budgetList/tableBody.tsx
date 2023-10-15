@@ -11,36 +11,36 @@ import style from '../budgetList.module.scss';
 import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
 type TprojectSimpleRecord = ReturnType<Class_fakeApi_projectSimple['get']>[0]['tempRecord'];
 
+type Trecord = {
+  date: string;
+  editNotes: string;
+  discount: string;
+  doorQty: string;
+  total: string;
+};
+
 export default function PanelBody({
-  projectSimpleRecord: projectRecord,
-  openQuotation,
-}: {
-  projectSimpleRecord: TprojectSimpleRecord;
-  openQuotation: (e: MouseEvent) => void;
+  recordArr,
+}: // openQuotation,
+{
+  recordArr: Trecord[];
+  // openQuotation: (e: MouseEvent) => void;
 }) {
   return (
     <div className={style.panelBody}>
-      {projectRecord.map((item, index) => {
-        const { date, Remark, discount, doorQty, budgetAmount } = item;
-
-        let formatedBudgetAmount: string | number = budgetAmount;
-
-        if (typeof formatedBudgetAmount === 'string') {
-          formatedBudgetAmount = parseFloat(formatedBudgetAmount);
-        }
-
-        formatedBudgetAmount = formatedBudgetAmount.toLocaleString();
+      {recordArr.map((item, index) => {
+        const { date, editNotes, discount, doorQty, total } = item;
 
         return (
           <CellWithBar className={style.detailRow} key={index}>
             <span>{date}</span>
-            <span>{Remark}</span>
+            <span>{editNotes}</span>
             <span>{discount}</span>
             <span>{doorQty}</span>
-            <span>{formatedBudgetAmount}</span>
-            <div>
+            <span>{total}</span>
+            {/* <div>
               <IconDetail onClick={openQuotation} />
-            </div>
+            </div> */}
           </CellWithBar>
         );
       })}

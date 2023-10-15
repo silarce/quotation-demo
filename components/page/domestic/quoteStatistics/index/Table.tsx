@@ -1,4 +1,4 @@
-import { TfakeData } from 'pages/domestic/quoteStatistics';
+import { Tdata } from 'pages/domestic/quoteStatistics';
 import classNames from 'classnames';
 
 // gear
@@ -7,12 +7,22 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // css
 import scss from './quoteStatistics.module.scss';
 
-export default function Table({ fakeDataArr }: { fakeDataArr: TfakeData[] }) {
+export default function Table({
+  dataArr,
+  totalInfo,
+}: {
+  dataArr: Tdata[];
+  totalInfo: {
+    listPrice: string;
+    bearPrice: string;
+    percent: string;
+  };
+}) {
   return (
     <div className={classNames(scss.table)}>
       <Thead />
-      <Tbody dataArr={fakeDataArr} />
-      <Tfoot />
+      <Tbody dataArr={dataArr} />
+      <Tfoot totalInfo={totalInfo} />
     </div>
   );
 }
@@ -84,7 +94,7 @@ const Thead = () => {
 };
 
 // =======================================================================
-const Tbody = ({ dataArr }: { dataArr: TfakeData[] }) => {
+const Tbody = ({ dataArr }: { dataArr: Tdata[] }) => {
   return (
     <div className={scss.tbody}>
       {dataArr.map((data, index) => {
@@ -142,7 +152,15 @@ const Tbody = ({ dataArr }: { dataArr: TfakeData[] }) => {
 };
 // =======================================================================
 
-const Tfoot = () => {
+const Tfoot = ({
+  totalInfo,
+}: {
+  totalInfo: {
+    listPrice: string;
+    bearPrice: string;
+    percent: string;
+  };
+}) => {
   return (
     <div className={classNames(scss.row, scss.tfoot)}>
       <div className={classNames(scss.group, scss.group01)}>
@@ -158,7 +176,7 @@ const Tfoot = () => {
       <div className={classNames(scss.group, scss.group03)}>
         {group03Keys.map((key, index) => {
           const { label, width } = colConfig[key];
-          const value = fakeTotal[key];
+          const value = totalInfo[key];
 
           return (
             <div key={index} style={{ width }}>
@@ -195,7 +213,7 @@ const Info = ({
 // =======================================================================
 // =======================================================================
 // =======================================================================
-type TconfigKey = Exclude<keyof TfakeData | keyof TfakeData['customer'][number], 'customer'>;
+type TconfigKey = Exclude<keyof Tdata | keyof Tdata['customer'][number], 'customer'>;
 
 type Tconfig = {
   [key in TconfigKey]: {
@@ -269,10 +287,4 @@ const colConfig: Tconfig = {
     width: '138px',
     color: 'black',
   },
-};
-
-const fakeTotal = {
-  listPrice: '1,373,614',
-  bearPrice: '841,913',
-  percent: '60%',
 };
