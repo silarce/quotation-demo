@@ -1055,37 +1055,49 @@ latestContentProdArr為這次追加追減的主產品
     const data_watch = watch();
 
     // 總樘數
-    let prodQty = 0;
+    const prodQty = 0;
 
-    // prodVKeyArr 會在每一次垂直拖拉時更新
-    const prodArr: TcreateQuotationProductDto[] =
-      prodVKeyArr?.map((key, index) => {
-        const prod = productList[key];
+    // ---------------------------------------------------------
 
-        const quantity = Number(prod.quantity);
-        const originProd = prod.originProd;
+    // 要送給後端的是quanity扣掉reduceQty後的prod
+    const divProdArr = (() => {
+      const arr = Object.values(productList).map((item) => {
+        // 這個page的主產品介面，新增與複製都被鎖住了，所以不需要判斷isAttachDiv
+        return item.body_attachDiv;
 
-        prodQty = prodQty + quantity;
+        // if (item.isAttachDiv) {
+        //   return item.body_attachDiv;
+        //   // return item.body;
+        // }
+        // return undefined;
+      });
 
-        const preBody = {
-          // ...prod.body,
-          ...prod.body_attachDiv,
-          order: index,
-        };
-
-        const isEqual = _.isEqual(originProd, preBody);
-
-        if (!isEqual) {
-          preBody.id = undefined;
-        }
-
-        return preBody;
-      }) ?? [];
+      return arr.filter((item) => !!item) as (TcreateQuotationProductDto & {
+        id: string | undefined;
+      })[];
+    })();
 
     const attachProdArr = Object.values(attachProdList).map((prod) => {
       return prod.body;
     });
 
+    /**
+      FIXME 有id的話後端不收
+      {"message":"欲更新的product不可帶Id","error":"Bad Request","statusCode":400}
+      所以把id拿掉
+      但是更新後的資料，
+      原本的attachedToProductId變成null
+      rootProductId也變成新的prod的id
+      追減追蹤鍊斷掉了
+     */
+    let products = [...divProdArr, ...attachProdArr];
+    products = products.map((item) => {
+      item.id = undefined;
+
+      return item;
+    });
+
+    // ---------------------------------------------------------
     if (!data_watch.agentEmployee?.id) {
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
     }
@@ -1129,7 +1141,8 @@ latestContentProdArr為這次追加追減的主產品
       paymentMethods: paymentMethod,
       //
       //
-      products: [...prodArr, ...attachProdArr],
+      // products: [...prodArr, ...attachProdArr],
+      products: products,
       others: getOthersPostBodyArr(),
       // productsOrder: null,
       //
@@ -1161,12 +1174,7 @@ latestContentProdArr為這次追加追減的主產品
       if (quotationId) {
         const res = await apiPatchQuotation(body, quotationId);
         showRootLoading(true, '正在更新附件');
-        // res跟api文件不一樣，現在沒時間修正
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-
         await uploadAttachment(res.latestContent.id);
-
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
@@ -1186,8 +1194,6 @@ latestContentProdArr為這次追加追減的主產品
       setIsLoading(false);
       showRootLoading(false);
     }
-
-    //
   }; // reqUpdateQuotation
 
   // --------------------------------------------
@@ -1338,7 +1344,7 @@ latestContentProdArr為這次追加追減的主產品
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
               <Table_com
-                disabled={disabled}
+                disabled={true}
                 // comList={targetProd?.comList}
 
                 // FIXME 之後要把型別處理好
@@ -1357,7 +1363,7 @@ latestContentProdArr為這次追加追減的主產品
           <div className={style.redWrapper}>
             {/* 選配設定 */}
             <Table_accessories
-              disabled={disabled}
+              disabled={true}
               list={targetProd?.accessoriesList}
               cellConfig={accessoriesCellConfig}
               keyArr={accessoriesKeyArr}
@@ -1383,7 +1389,7 @@ latestContentProdArr為這次追加追減的主產品
           <div className={style.tableWrapper}>
             {/* 其他設定 */}
             <Table_others
-              disabled={disabled}
+              disabled={true}
               list={othersList}
               cellConfig={othersCellConfig}
               keyArr={othersKeyArr}
@@ -1398,6 +1404,8 @@ latestContentProdArr為這次追加追減的主產品
             {/* 主產品設定 */}
             <Table_prod
               disabled={isAttach ? true : disabled}
+              disabled_plus={disabled}
+              disabledExceptionArr={['quantity']}
               // exchangeDiabled={disabled}
               prodList={attachProdList}
               prodCellConfig={prodCellConfig}
@@ -1415,7 +1423,7 @@ latestContentProdArr為這次追加追減的主產品
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
               <Table_com
-                disabled={disabled}
+                disabled={true}
                 // comList={targetProd?.comList}
 
                 // FIXME 之後要把型別處理好
@@ -1426,6 +1434,28 @@ latestContentProdArr為這次追加追減的主產品
                 comKeyArr={comKeyArr}
                 changeComKeyArr={() => {}}
                 // defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+
+            <div className="relative mt-[14px]">
+              <Table_accessories
+                disabled={true}
+                list={targetProd_attach?.accessoriesList}
+                cellConfig={accessoriesCellConfig}
+                keyArr={accessoriesKeyArr}
+                changeKeyArr={() => {}}
+                // defalutVKeyArr={}
+                // onVKeyChange={}
+                doorModel={targetProd_attach?.doorType}
+                onSelectorConfirm={(arr) => {
+                  if (targetProd_attach) {
+                    targetProd_attach.addAcce(arr);
+                  }
+                }}
+                // panelBox={}
+                // emptyBlockWidth={}
+                isRedBorder={true}
               />
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>

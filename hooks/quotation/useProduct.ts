@@ -501,19 +501,6 @@ const useProductList = ({
           bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
         };
 
-        // const newKey = nanoid();
-        // const classProd = new Class_product({
-        //   reRender,
-        //   prodData: prodData,
-        //   delSelf: () => delSelf_prod(productList_attach, newKey),
-        //   copySelf: () => {
-        //     copySelf_prod(productList_attach, newKey);
-        //   },
-        //   callCalcSubTotal,
-        //   doorModelList,
-        //   onDoorTypeChange: onClassDoorTypeChange,
-        // });
-
         list[key] = new Class_product({
           reRender,
           prodData,
