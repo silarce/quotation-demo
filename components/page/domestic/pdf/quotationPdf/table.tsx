@@ -1,13 +1,10 @@
+import { useState } from 'react';
+
 // css
 import style from './quotationPdf.module.scss';
-import Image from 'next/image';
 
-// option
-import { optionsCreator_doorRail } from 'js/utils/options/options';
-const optionsDoorRail = optionsCreator_doorRail();
-
-// type
-// import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
+// api
+import { apiGetAssets } from 'js/api/api_product';
 
 export type TtableProdList = {
   category: string;
@@ -26,6 +23,32 @@ export type TtableProdList = {
 }[];
 
 export default function Table({ productList }: { productList: TtableProdList }) {
+  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined }>({});
+
+  const getSvg = async ({ fileName }: { fileName: string }) => {
+    if (!!svgList[fileName]) {
+      return;
+    }
+
+    try {
+      svgList[fileName] = 'isLoading';
+
+      const svg = await apiGetAssets(fileName);
+
+      if (svg) {
+        setSvgList((list) => ({
+          ...list,
+          [fileName]: svg,
+        }));
+      }
+    } catch (error) {
+      setSvgList((list) => ({
+        ...list,
+        [fileName]: undefined,
+      }));
+    }
+  };
+
   return (
     <div className={style.table}>
       {indexKeys.map((key, index) => {
@@ -58,13 +81,16 @@ export default function Table({ productList }: { productList: TtableProdList }) 
           const subClass = ' ' + style[align ?? ''];
 
           if (key === 'doorRail') {
-            // const imgSrc = optionsDoorRail.find((item) => item.value === value)?.icon;
+            const arr = value.split('/');
+            const fileName = arr[arr.length - 1];
+
+            getSvg({ fileName: fileName });
 
             return (
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
-                <img src={value} alt="" />
-                {/* <Image src={value} alt="" width={50} height={50} /> */}
+                {/* <img src={value} alt="" /> */}
+                <div dangerouslySetInnerHTML={{ __html: svgList[`${fileName}`] ?? '' }} />
               </div>
             );
           }
@@ -99,10 +125,6 @@ export default function Table({ productList }: { productList: TtableProdList }) 
   );
 }
 
-// =============================================================================
-/* 產品資料中有厚度的資料
-但是不會出現在主產品設定中讓使用者編輯
-*/
 // =============================================================================
 
 type TindexKeys =

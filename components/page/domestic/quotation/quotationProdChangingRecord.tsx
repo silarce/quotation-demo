@@ -9,7 +9,7 @@ import { Collapse } from 'antd';
 
 // glogal gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
+
 // css
 import style from 'components/page/domestic/quotation/quotationProdChangingRecord.module.scss';
 
@@ -17,12 +17,7 @@ import style from 'components/page/domestic/quotation/quotationProdChangingRecor
 // ===================================================================
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
-import {
-  TcreateQuotationContentOtherDto,
-  TquotationProductDto,
-  TquotationContentOtherDto,
-  TquotationContractDto,
-} from 'js/api/dtoTypes';
+import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
 // ===================================================================
 // ===================================================================
 
@@ -31,15 +26,10 @@ const { Panel } = Collapse;
 // =====================================================
 export default function TheQuotationProdChangingRecord({
   subContract,
-  rootContractTotal,
 }: {
   subContract: TquotationContractDto[] | undefined;
-  rootContractTotal: number;
 }) {
   subContract = _.sortBy(subContract, 'version');
-
-  // const { list, quotationId } = prodChangingRecord;
-  // const quotationIdKeyList = Object.keys(list);
 
   // 點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -76,38 +66,39 @@ export default function TheQuotationProdChangingRecord({
         className={style.collapse}
         onChange={changeActive}
       >
-        {subContract?.map((item, index, arr) => {
+        {subContract?.map((item, index) => {
           const content = item.content;
-          // const preContent = arr[index - 1];
+
           const contentTotal = content?.total ?? 0;
-          // const preContentTotal = index === 0 ? rootContractTotal : preContent?.content.total ?? 0;
-          // rootContractTotal
 
           const record = {
             quotationId: content.quotationNumber,
             date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
-            // priceChange: `${preContentTotal - contentTotal}`,
             priceChange: `${contentTotal}`,
             remark: content.editNotes,
-            // product: prodArr,
           };
 
           const isActive = activeIndex === index;
 
           const contentProdArr = _.cloneDeep(content.products);
-          // const preContentProdArr = preContent?.content.products;
 
-          contentProdArr.forEach((prod) => {
-            if (!prod.rootProductId) {
-              rootProdList[prod.id] = _.cloneDeep(prod);
+          contentProdArr.forEach((prod, index) => {
+            if (!rootProdList[prod.rootProductId]) {
+              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
             } else {
-              const rootQty = rootProdList[prod.rootProductId].quantity;
+              const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
               const copy = _.cloneDeep(prod);
-              copy.quantity = rootQty - prod.quantity;
-              rootProdList[prod.rootProductId] = prod;
-              prod = copy;
+              copy.quantity = rootQty - copy.quantity;
+              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+              // 替換掉原本的
+              contentProdArr[index] = copy;
             }
           });
+
+          // 上面的演算法必須執行，所以 return null放在下面
+          if (index === 0) {
+            return null;
+          }
 
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>

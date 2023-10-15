@@ -23,6 +23,7 @@ import type {
   TquotationProductDto,
   TquotationAccouting,
   TquotationAccouting_years,
+  TquotationAccouting_area,
 } from './dtoTypes';
 
 export type {
@@ -40,6 +41,7 @@ export type {
   TcreateQuotationProductDto,
   TquotationAccouting,
   TquotationAccouting_years,
+  TquotationAccouting_area,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -116,6 +118,8 @@ export const apiGetQuotation_Id = async (id: string) => {
       'latestContent.verifyForm',
 
       'attachedToContract.content.products',
+      'attachedToContract.subContracts.content.products',
+      // 'subContracts.content.products',
     ],
   };
 
@@ -407,6 +411,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       'content.reviewSalesEmployee',
       'content.reviewWorkDirectorEmployee',
       'content.reviewSupervisorEmployee',
+      'content.reviewManagerEmployee',
 
       'content.products',
       // 'content.products.items.accessories',
@@ -427,6 +432,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'attachedToContract',
       // 'attachedContract',
       'subContracts.content.products.rootProdductId',
+      'subContracts.content.customer',
 
       'products',
     ],
@@ -650,7 +656,7 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
 export const apiQuotationAccounting = (params: {
   year: number;
   month: number;
-  area: 'northern' | 'central' | 'southern' | 'eastern';
+  area: 'northern' | 'central' | 'southern' | 'eastern' | 'all';
 }) => {
   const api = '/quotation/accounting';
 
@@ -663,9 +669,11 @@ export const apiQuotationAccounting = (params: {
 export const useQuotationAccounting = (params: {
   year: number | undefined;
   month: number | undefined;
-  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
+  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
+
+  console.log(params.area);
 
   const update = async () => {
     if (!params.year || !params.month || !params.area) {
@@ -708,6 +716,35 @@ export const useQuotationAccounting_years = () => {
 
   const update = async () => {
     const newRes = await apiQuotationAccounting_years();
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+/**全區業績統計表 */
+export const apiQuotationAccounting_area = () => {
+  const api = '/quotation/accounting/area';
+
+  return axi
+    .get<TquotationAccouting_area[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useQuotationAccounting_area = () => {
+  const [res, setRes] = useState<TquotationAccouting_area[]>();
+
+  const update = async () => {
+    const newRes = await apiQuotationAccounting_area();
 
     if (newRes) {
       setRes(newRes);

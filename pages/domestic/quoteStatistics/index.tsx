@@ -37,12 +37,26 @@ export default function QuoteStatistics() {
   const { data, update } = useQuotationAccounting({
     year: year ? Number(year) : undefined,
     month: month ? Number(month) : undefined,
-    area: region,
+    area: region || 'all',
   });
 
   useEffect(() => {
     update();
   }, [year, month, region]);
+
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month || now.getMonth() + 1;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+        region: region,
+      },
+    });
+  }, []);
 
   const { formatedDataArr, listPriceTotal, bearPriceTotal, percent } = useMemo(() => {
     if (!data) {

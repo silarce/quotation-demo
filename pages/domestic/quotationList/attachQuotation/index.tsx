@@ -15,21 +15,14 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm, useFormState } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-// import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-// import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-// import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-// import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
-// import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
-// import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
-// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
 
 import QuotationPdf_part, {
@@ -46,7 +39,6 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
@@ -57,12 +49,6 @@ import iconUpload from 'public/image/icon/upload.svg';
 import style from './quotation.module.scss';
 
 import { AppContext } from 'pages/_app';
-
-// ------------------------------------------------------------------
-
-// // 假資料與fake api
-// import { useQuotation } from 'hooks/quotation/useQuotation';
-// import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -227,36 +213,49 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const isAttach = true;
 
   const { contractArr, contentArr, contentProdList } = useMemo(() => {
-    const latestContent = quotationData?.latestContent;
-    const attachedToContract = quotationData?.attachedToContract;
+    if (!quotationData) {
+      return {};
+    }
 
-    // 合約原本的主產品
-    const contractProdArr = attachedToContract?.content.products;
+    const latestContent = quotationData.latestContent;
+    const attachedToContract = quotationData.attachedToContract;
+    const subContracts = attachedToContract?.subContracts;
 
-    // 可能帶有attachedToProductId
-    const contentProdArr = latestContent?.products;
+    // 主合約與所有子合約的主產品，迭代後的列表
+    const latestVersionProductList: { [key: string]: TquotationProductDto } = {};
 
-    const contractProdList: { [key: string]: TquotationProductDto } = {};
-    const contentProdList: { [key: string]: TquotationProductDto } = {};
-
-    contractProdArr?.forEach((prod) => {
-      contractProdList[prod.id] = prod;
+    subContracts?.forEach((item) => {
+      const prod = item.content.products;
+      prod.forEach((item) => {
+        latestVersionProductList[item.rootProductId] = item;
+      });
     });
 
-    contentProdArr?.forEach((prod) => {
-      if (prod.attachedToProductId) {
-        const oriQty = contractProdList?.[prod.attachedToProductId]?.quantity;
+    /**
+latestVersionProductList為所有主產品迭代後的結果
+latestContentProdArr為這次追加追減的主產品
+有rootProductId的prod代表是追減而來的主產品，簡稱追減主產品
+將 latestVersionProductList[追減主產品.rootProductId].quantity
+減掉 追減主產品.quantity 即可得到 追減主產品的reduceQty
 
-        if (oriQty !== undefined) {
-          // prod.reduceQty = oriQty - prod.quantity;
-          if (contractProdList?.[prod.attachedToProductId]) {
-            contractProdList[prod.attachedToProductId].reduceQty = oriQty - prod.quantity;
-          }
-        }
+    */
 
-        // contractProdList[prod.attachedToProductId] = prod;
+    const latestContentProdArr = latestContent?.products;
+
+    // 上面的，被追減的主產品
+    const contractProdList: { [key: string]: TquotationProductDto } = {};
+    // 下面的，追加的主產品
+    const contentProdList: { [key: string]: TquotationProductDto } = {};
+
+    latestContentProdArr?.forEach((prod) => {
+      const { rootProductId, quantity } = prod;
+
+      if (latestVersionProductList[rootProductId]) {
+        const latestVersionQty = latestVersionProductList[rootProductId].quantity;
+        contractProdList[rootProductId] = _.cloneDeep(latestVersionProductList[rootProductId]);
+        contractProdList[rootProductId].reduceQty = latestVersionQty - quantity;
       } else {
-        contentProdList[prod.id] = prod;
+        contentProdList[rootProductId] = prod;
       }
     });
 
@@ -376,11 +375,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
     addOthers,
     getOthersPostBodyArr,
     //
-    subTotal: quotationProdSubTotal,
+    // subTotal: quotationProdSubTotal,
     reset: resetClass,
     //
     attachProdList,
     addProd_attach,
+    attachAddTotal,
+    attachDivTotal,
+    attachTotal,
   } = useProductList({
     productArr: contractArr,
     others: quotationData?.latestContent.others,
@@ -401,7 +403,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     Object.values(productList).forEach((prod) => {
-      const childContent = prod.id ? contentProdList[prod.id] : undefined;
+      const childContent = prod.id ? contentProdList?.[prod.id] : undefined;
       const qty = childContent?.quantity ? childContent?.quantity : undefined;
 
       if (qty !== undefined) {
@@ -466,7 +468,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
-      prodSubTotal: quotationProdSubTotal,
+      prodSubTotal: attachTotal,
     });
 
     setSummary((state) => {
@@ -477,7 +479,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
-  }, [summary.discountRate, quotationProdSubTotal]);
+  }, [summary.discountRate, attachTotal]);
 
   //
   //
@@ -1007,18 +1009,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
   const panel_noEditable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => setShowPdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出材料/配件',
-      img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出材料/配件',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf_part(true),
+    // },
 
     // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!isReviewer || null) && {
@@ -1041,7 +1043,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return null;
       }
     })(),
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -1053,37 +1055,49 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const data_watch = watch();
 
     // 總樘數
-    let prodQty = 0;
+    const prodQty = 0;
 
-    // prodVKeyArr 會在每一次垂直拖拉時更新
-    const prodArr: TcreateQuotationProductDto[] =
-      prodVKeyArr?.map((key, index) => {
-        const prod = productList[key];
+    // ---------------------------------------------------------
 
-        const quantity = Number(prod.quantity);
-        const originProd = prod.originProd;
+    // 要送給後端的是quanity扣掉reduceQty後的prod
+    const divProdArr = (() => {
+      const arr = Object.values(productList).map((item) => {
+        // 這個page的主產品介面，新增與複製都被鎖住了，所以不需要判斷isAttachDiv
+        return item.body_attachDiv;
 
-        prodQty = prodQty + quantity;
+        // if (item.isAttachDiv) {
+        //   return item.body_attachDiv;
+        //   // return item.body;
+        // }
+        // return undefined;
+      });
 
-        const preBody = {
-          // ...prod.body,
-          ...prod.body_attachDiv,
-          order: index,
-        };
-
-        const isEqual = _.isEqual(originProd, preBody);
-
-        if (!isEqual) {
-          preBody.id = undefined;
-        }
-
-        return preBody;
-      }) ?? [];
+      return arr.filter((item) => !!item) as (TcreateQuotationProductDto & {
+        id: string | undefined;
+      })[];
+    })();
 
     const attachProdArr = Object.values(attachProdList).map((prod) => {
       return prod.body;
     });
 
+    /**
+      FIXME 有id的話後端不收
+      {"message":"欲更新的product不可帶Id","error":"Bad Request","statusCode":400}
+      所以把id拿掉
+      但是更新後的資料，
+      原本的attachedToProductId變成null
+      rootProductId也變成新的prod的id
+      追減追蹤鍊斷掉了
+     */
+    let products = [...divProdArr, ...attachProdArr];
+    products = products.map((item) => {
+      item.id = undefined;
+
+      return item;
+    });
+
+    // ---------------------------------------------------------
     if (!data_watch.agentEmployee?.id) {
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
     }
@@ -1127,7 +1141,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       //
       //
-      products: [...prodArr, ...attachProdArr],
+      // products: [...prodArr, ...attachProdArr],
+      products: products,
       others: getOthersPostBodyArr(),
       // productsOrder: null,
       //
@@ -1159,12 +1174,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (quotationId) {
         const res = await apiPatchQuotation(body, quotationId);
         showRootLoading(true, '正在更新附件');
-        // res跟api文件不一樣，現在沒時間修正
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-
         await uploadAttachment(res.latestContent.id);
-
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
@@ -1184,8 +1194,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-
-    //
   }; // reqUpdateQuotation
 
   // --------------------------------------------
@@ -1223,7 +1231,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
-  // 現在只有admin可以呼叫這系列的api，所以無法測試
   const reqReview = async (isPass: boolean) => {
     if (!quotationId || !isReviewer) {
       return;
@@ -1270,8 +1277,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const b = Number(prod.boxB || 0) * 100;
 
     const size = `${lw} X ${h} + ${b}`;
-
-    // const foo = prod.comList;
 
     const componentArr = Object.values(prod.comList ?? {});
 
@@ -1322,6 +1327,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             {/* 主產品設定 */}
             <Table_prod
               disabled={isAttach ? true : disabled}
+              exchangeDiabled={disabled}
               prodList={productList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
@@ -1332,12 +1338,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"
               isAttach={isAttach}
+              attachTotal={attachDivTotal}
             />
 
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
               <Table_com
-                disabled={disabled}
+                disabled={true}
                 // comList={targetProd?.comList}
 
                 // FIXME 之後要把型別處理好
@@ -1356,7 +1363,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <div className={style.redWrapper}>
             {/* 選配設定 */}
             <Table_accessories
-              disabled={disabled}
+              disabled={true}
               list={targetProd?.accessoriesList}
               cellConfig={accessoriesCellConfig}
               keyArr={accessoriesKeyArr}
@@ -1382,7 +1389,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <div className={style.tableWrapper}>
             {/* 其他設定 */}
             <Table_others
-              disabled={disabled}
+              disabled={true}
               list={othersList}
               cellConfig={othersCellConfig}
               keyArr={othersKeyArr}
@@ -1397,6 +1404,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
             {/* 主產品設定 */}
             <Table_prod
               disabled={isAttach ? true : disabled}
+              disabled_plus={disabled}
+              disabledExceptionArr={['quantity']}
+              // exchangeDiabled={disabled}
               prodList={attachProdList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
@@ -1407,12 +1417,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               onVKeyChange={() => {}}
               rowHeight="h106"
+              attachTotal={attachAddTotal}
             />
 
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
               <Table_com
-                disabled={disabled}
+                disabled={true}
                 // comList={targetProd?.comList}
 
                 // FIXME 之後要把型別處理好
@@ -1423,6 +1434,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 comKeyArr={comKeyArr}
                 changeComKeyArr={() => {}}
                 // defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+
+            <div className="relative mt-[14px]">
+              <Table_accessories
+                disabled={true}
+                list={targetProd_attach?.accessoriesList}
+                cellConfig={accessoriesCellConfig}
+                keyArr={accessoriesKeyArr}
+                changeKeyArr={() => {}}
+                // defalutVKeyArr={}
+                // onVKeyChange={}
+                doorModel={targetProd_attach?.doorType}
+                onSelectorConfirm={(arr) => {
+                  if (targetProd_attach) {
+                    targetProd_attach.addAcce(arr);
+                  }
+                }}
+                // panelBox={}
+                // emptyBlockWidth={}
+                isRedBorder={true}
               />
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>

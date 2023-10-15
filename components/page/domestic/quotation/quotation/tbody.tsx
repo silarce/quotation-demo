@@ -64,6 +64,8 @@ type TcellConfig = {
 // ==========================================================
 export default function Tbody({
   disabled,
+  disabled_plus,
+  disabledExceptionArr,
   rowList,
   keyArr,
   prodCellConfig,
@@ -76,6 +78,8 @@ export default function Tbody({
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
+  disabled_plus?: boolean;
+  disabledExceptionArr?: string[];
   // prodList: TproductList;
   rowList: TitemList;
   keyArr: string[];
@@ -156,6 +160,8 @@ export default function Tbody({
                 keyArr={keyArr}
                 isMoving={isMoving}
                 disabled={disabled}
+                disabled_plus={disabled_plus}
+                disabledExceptionArr={disabledExceptionArr}
                 panelBox={panelBox}
                 //
                 prodCellConfig={prodCellConfig}
@@ -349,7 +355,11 @@ function DndRow({
   keyArr: keyArr,
   defalutVKeyArr,
   isMoving,
+  //
   disabled,
+  disabled_plus,
+  disabledExceptionArr,
+  //
   onRowClick,
   prodCellConfig,
   isActive,
@@ -366,7 +376,10 @@ function DndRow({
   keyArr: string[];
   defalutVKeyArr?: string[];
   isMoving: boolean;
+  //
   disabled: boolean;
+  disabled_plus?: boolean;
+  disabledExceptionArr?: string[];
   //
   onRowClick?: () => void;
   isAppend?: boolean;
@@ -428,7 +441,20 @@ function DndRow({
             let theDisabled = disabled;
 
             if (key === 'quantity') {
-              item.disabled_quantity ? (theDisabled = true) : undefined;
+              // item.disabled_quantity === true ? (theDisabled = true) : undefined;
+              item.disabled_quantity === true
+                ? (theDisabled = true)
+                : item.disabled_quantity === false
+                ? (theDisabled = false)
+                : undefined;
+            }
+
+            if (disabledExceptionArr?.includes(key)) {
+              theDisabled = false;
+            }
+
+            if (disabled_plus) {
+              theDisabled = true;
             }
 
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;

@@ -36,8 +36,15 @@ import { Class_accessories, Taccessories } from './classAccessories';
 import { Class_SubCom, TSubCom } from './classSubCom';
 // =============================================================================
 // api
-import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
-import { apiPostProdGenerateDoorProductBom, TgenerateDoorProductBomDto } from 'js/api/api_product';
+import {
+  apiGetProdCalcGeneralSpec,
+  apiGetProdAvailableComponents,
+  apiPostProdGenerateDoorProductBom,
+  TgenerateDoorProductBomDto,
+} from 'js/api/api_product';
+
+import { apiGetQuotationProducts } from 'js/api/api_quotation';
+
 // =============================================================================
 // utils
 import {
@@ -204,6 +211,26 @@ class Class_product {
 
   get hasParent() {
     return !!this.parentProd;
+  }
+
+  // ---------------------------------------------------------
+
+  async getComAndAcce() {
+    if (this.comList?.slat) {
+      return;
+    }
+
+    this.isLoading_getProd = true;
+    const { components, accessories } = await reqGetComAndAcce(this.id);
+    this.isLoading_getProd = false;
+
+    if (components) {
+      this.creComList_dyna({ componentsArr: components });
+    }
+
+    if (accessories) {
+      this.creAcceList_dyna({ acceArr: accessories });
+    }
   }
 
   // ---------------------------------------------------------
@@ -1966,8 +1993,16 @@ class Class_product {
     }
 
     this._reduceQty = v;
-    this.calcProdAllprice_timeout();
     this.reRender();
+
+    const asyncCall = async () => {
+      await this.getComAndAcce();
+
+      this.calcProdAllprice_timeout();
+      this.reRender();
+    };
+
+    asyncCall();
   }
 
   // 變更數量
@@ -1989,7 +2024,7 @@ class Class_product {
   }
 
   // 新增變更的prod
-  addExchange(v: string) {
+  async addExchange(v: string) {
     if (Number(v) > this.remainQty) {
       return false;
     }
@@ -1998,8 +2033,13 @@ class Class_product {
       return 'isLoading_getProd';
     }
 
+    await this.getComAndAcce();
+
     const copy = _.cloneDeep(this.body_Tprod);
+    copy.id = undefined;
     copy.quantity = Number(v);
+    copy.dualPrice = new Decimal(copy.quantity).mul(copy.price).toNumber();
+    copy.totalPrice = new Decimal(copy.quantity).mul(copy.unitPrice).toNumber();
 
     const exId = 'ex-' + nanoid();
 
@@ -2073,9 +2113,11 @@ class Class_product {
   }
 
   get body() {
+    const copy = _.cloneDeep(this._prodData);
+
     const body: TcreateQuotationProductDto & { id: string | undefined } = {
-      ...this._prodData,
-      id: this._prodData.id,
+      ...copy,
+      id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
       materialSurface: this.surface,
@@ -2135,9 +2177,10 @@ class Class_product {
   }
 
   get body_Tprod() {
+    const copy = _.cloneDeep(this._prodData);
     const body: Tprod = {
-      ...this._prodData,
-      id: this._prodData.id,
+      ...copy,
+      id: copy.id,
       quantity: Number(this._prodData.quantity),
       price: Number(this._price),
       dualPrice: Number(this._dualPrice),
@@ -2171,6 +2214,8 @@ class Class_product {
     const body = this.body;
     const divQty = Number(this.reduceQty) + this.exchangeQty;
     body.quantity = body.quantity - divQty;
+    body.dualPrice = new Decimal(body.quantity).mul(body.price).toNumber();
+    body.totalPrice = new Decimal(body.quantity).mul(body.unitPrice).toNumber();
 
     return body;
   }
@@ -2463,6 +2508,22 @@ const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
   });
 
   return list;
+};
+
+const reqGetComAndAcce = async (id: string | undefined) => {
+  if (!id) {
+    return {};
+  }
+
+  const res = await apiGetQuotationProducts(id);
+
+  if (res?.items) {
+    const { components, accessories } = res.items[0];
+
+    return { components, accessories };
+  } else {
+    return {};
+  }
 };
 
 // ===========================================================

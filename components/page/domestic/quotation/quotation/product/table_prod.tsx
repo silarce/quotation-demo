@@ -20,6 +20,8 @@ import scss from '../table.module.scss';
 
 export default function Table_prod({
   disabled,
+  disabled_plus,
+  disabledExceptionArr,
   prodList,
   prodCellConfig,
   prodKeyArr,
@@ -37,8 +39,11 @@ export default function Table_prod({
   isAttach,
   attachTotal,
   isRedBorder,
+  exchangeDiabled,
 }: {
   disabled: boolean;
+  disabled_plus?: boolean;
+  disabledExceptionArr?: string[];
   prodList: TproductList;
   prodCellConfig: TcellConfig;
   prodKeyArr: TprodKey[];
@@ -55,6 +60,7 @@ export default function Table_prod({
   isAttach?: boolean; // 追加追減介面
   attachTotal?: number | string;
   isRedBorder?: boolean;
+  exchangeDiabled?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -64,12 +70,12 @@ export default function Table_prod({
 
   const [showInputModal, setShowInputModal] = useState(false);
 
-  const exchangeConfirm_2 = (v: string) => {
+  const exchangeConfirm_2 = async (v: string) => {
     if (!targetProd) {
       return;
     }
 
-    const ressult = targetProd.addExchange(v);
+    const ressult = await targetProd.addExchange(v);
 
     if (ressult === false) {
       myAlert.warning({ title: '超過上限' });
@@ -117,6 +123,8 @@ export default function Table_prod({
 
             <Tbody
               disabled={disabled}
+              disabled_plus={disabled_plus}
+              disabledExceptionArr={disabledExceptionArr}
               rowList={prodList}
               keyArr={prodKeyArr}
               prodCellConfig={prodCellConfig}
@@ -159,6 +167,7 @@ export default function Table_prod({
 
               return (
                 <ExchangeRow
+                  disabled={exchangeDiabled}
                   key={index}
                   style={{ height: '106px' }}
                   oriQty={prod.quantity}

@@ -1,7 +1,14 @@
+// 追加/追減項目
+// QuotationProdChangingRecord
+
+// 展開版本的追加追減紀錄 (在很下面)
+// QuotationRecord
+
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
 import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 // components
 // import QuotationProfile, { TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
@@ -177,34 +184,73 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const panelList = allowEdit ? panel_quotation02 : switch02 ? panel_quotation03 : panel_quotation01;
 
   // =========================================================
-  // =========================================================
-  // =========================================================
-  // =========================================================
 
-  // const content = data?.content;
-  const content = (() => {
-    if (version === '1') {
-      return data?.content;
-    } else if (version) {
-      const version_num = Number(version) - 1;
+  /**
+合約項目
+選中合約版本的contnet
+可以用url的version判斷
+version===1 是根合約
+version>1 是子合約
 
-      return data?.subContracts[version_num]?.content;
+如果是根合約，追加追減項目就取得所有的subContract
+如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
+
+原報價項目，就是根合約的content
+ */
+
+  const { content, rootContent, subContracts, totalInfo } = useMemo(() => {
+    if (!data) {
+      return {};
     }
-  })();
-  const rootContent = data?.subContracts[0]?.content;
 
-  let subContracts = data?.subContracts.filter((item) => {
-    if (version === '1') {
-      return true;
-    } else {
-      return item.version <= Number(version ?? 0);
-    }
-  });
-  subContracts = _.sortBy(subContracts, 'version');
-  // 總是把根合約的資料拿掉
-  subContracts?.shift();
+    let subContracts = data.subContracts.filter((item) => {
+      if (version === '1') {
+        return true;
+      } else {
+        return item.version <= Number(version ?? 0);
+      }
+    });
 
-  // latest
+    subContracts = _.sortBy(subContracts, 'version');
+
+    const rootContent = subContracts[0]?.content;
+
+    const content = (() => {
+      if (version === '1') {
+        return data?.content;
+      } else if (version) {
+        const index = Number(version) - 1;
+        const contract = subContracts[index];
+
+        return contract?.content;
+      }
+    })();
+
+    let subTotal = new Decimal(0);
+    let salesTax = new Decimal(0);
+    let total = new Decimal(0);
+
+    subContracts.forEach((item) => {
+      subTotal = subTotal.plus(item.subTotal);
+      salesTax = salesTax.plus(item.salesTax);
+      total = total.plus(item.total);
+    });
+
+    const totalInfo = {
+      subTotal: subTotal.toNumber(),
+      salesTax: salesTax.toNumber(),
+      total: total.toNumber(),
+    };
+
+    return {
+      content,
+      rootContent,
+      subContracts,
+      totalInfo,
+    };
+  }, [data, version]);
+
+  // 合約項目
   const {
     // reRender,
     // reset,
@@ -238,7 +284,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productArr: content?.products ?? [],
     others: content?.others ?? [],
     resetTrigger: content?.products,
-  }); // latest
+  }); // 合約項目
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
@@ -290,19 +336,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       subTotal: {
         inputAttr: {
           disabled: true,
-          value: data?.subTotal ?? '',
+          value: totalInfo?.subTotal ?? '',
         },
       },
       salesTax: {
         inputAttr: {
           disabled: true,
-          value: data?.salesTax ?? '',
+          value: totalInfo?.salesTax ?? '',
         },
       },
       total: {
         inputAttr: {
           disabled: true,
-          value: data?.total ?? '',
+          value: totalInfo?.total ?? '',
         },
       },
     },
@@ -339,7 +385,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '總經理',
       inputProps: {
         props: {
-          value: content?.reviewManagerEmployee?.chName ?? '',
+          value: data?.content?.reviewManagerEmployee?.chName ?? '',
         },
       },
     },
@@ -347,7 +393,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '工務主管',
       inputProps: {
         props: {
-          value: content?.reviewWorkDirectorEmployee?.chName ?? '',
+          value: data?.content?.reviewWorkDirectorEmployee?.chName ?? '',
         },
       },
     },
@@ -355,7 +401,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '主管',
       inputProps: {
         props: {
-          value: content?.reviewSupervisorEmployee?.chName ?? '',
+          value: data?.content?.reviewSupervisorEmployee?.chName ?? '',
         },
       },
     },
@@ -363,7 +409,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '業務',
       inputProps: {
         props: {
-          value: content?.reviewSalesEmployee?.chName ?? '',
+          value: data?.content?.reviewSalesEmployee?.chName ?? '',
         },
       },
     },
@@ -371,7 +417,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '經辦',
       inputProps: {
         props: {
-          value: content?.agentEmployee?.chName ?? '',
+          value: data?.content?.agentEmployee?.chName ?? '',
         },
       },
     },
@@ -520,11 +566,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </>
           ) : (
             // 追加/追減項目
-            <QuotationProdChangingRecord subContract={subContracts} rootContractTotal={rootContent?.total ?? 0} />
+            <QuotationProdChangingRecord subContract={subContracts} />
           )}
 
           {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && <QuotationRecord subContract={subContracts} rootContractTotal={rootContent?.total ?? 0} />}
+          {switch02 && <QuotationRecord subContract={subContracts} />}
 
           <Summary
             disabled={true}
@@ -702,52 +748,3 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 };
 
 // ======================================================================
-
-// const OldQuotationProduction = ({
-//   classQuotation,
-// }: {
-//   classQuotation: Parameters<typeof QuotationProduction>[0]['classQuotation'];
-// }) => {
-//   const [isActive, setIsActive] = useState(false);
-//   const panelSwitch = () => setIsActive(!isActive);
-
-//   return (
-//     <Collapse
-//       className={`${style.oldQuotationProduction}`}
-//       expandIcon={() => <></>}
-//       accordion={false}
-//       activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
-//     >
-//       <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
-//         {/* <QuotationProduction
-//           className={style.quotationProduction}
-//           mainProductArr={productStates} /> */}
-//         {/* <QuotationProduction className={style.quotationProduction} classQuotation={classQuotation} disabled={true} /> */}
-//       </Panel>
-//     </Collapse>
-//   );
-// };
-
-/**
-合約項目
-選中合約版本的contnet
-可以用url的version判斷
-version===1 是根合約
-version>1 是子合約
-
-如果是根合約，追加追減項目就取得所有的subContract
-如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
-
-原報價項目，就是根合約的content
-
- */
-
-/**
-要問Gina的問題
-product的rootProdductId已經可以用了嗎
-是不是新增加的資料才會有?
-
-409的問題解決了嗎?
-能夠做追減了嗎?
-
- */

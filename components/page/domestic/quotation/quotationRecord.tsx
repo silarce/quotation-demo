@@ -8,43 +8,21 @@ const { Panel } = Collapse;
 
 // global gear
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
-import Checkbox01 from 'components/global/gear/checkbox/checkbox01';
+
+// helper
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // css
 import style from './quotationRecord.module.scss';
 
 // ===================================================================
-// import {
-//   TcreateQuotationContentOtherDto,
-//   TquotationProductDto,
-//   TquotationContentOtherDto,
-//   TquotationContractDto,
-// } from 'js/api/dtoTypes';
 
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
-import {
-  TcreateQuotationContentOtherDto,
-  TquotationProductDto,
-  TquotationContentOtherDto,
-  TquotationContractDto,
-} from 'js/api/dtoTypes';
+import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
 // ===================================================================
 
-export default function QuotationRecord({
-  // prodChangingRecord,
-  subContract,
-  rootContractTotal,
-}: {
-  // prodChangingRecord: TchangeRecord | undefined;
-  subContract: TquotationContractDto[] | undefined;
-  rootContractTotal: number;
-}) {
-  // const { list } = prodChangingRecord ?? { list: {} };
-  // const recordKeyList = Object.keys(list);
-
-  // const { keyList: prodKeyList, cellConfig } = prodCellConfigOri();
-
+export default function QuotationRecord({ subContract }: { subContract: TquotationContractDto[] | undefined }) {
   // ======================================================
   const [activePanel, setActivePanel] = useState<number[]>([]);
 
@@ -94,12 +72,8 @@ export default function QuotationRecord({
           accordion={false}
           activeKey={activePanel}
         >
-          {subContract?.map((item, index, arr) => {
-            // const changeInfo = list[key];
-            // const { product } = changeInfo;
-
+          {subContract?.map((item, index) => {
             const content = item.content;
-            // const lastcontent = arr[index - 1];
 
             const activeIndex = activePanel.findIndex((item) => item === index);
             const isActive = activeIndex === -1 ? false : true;
@@ -114,36 +88,32 @@ export default function QuotationRecord({
               }
             };
 
-            // let priceChange = 0;
-
-            // if (index === 0) {
-            //   priceChange = content.total - rootContractTotal;
-            // } else {
-            //   priceChange = content.total - lastcontent.total;
-            // }
-
             const changeInfo = {
               quotationId: content.quotationNumber,
-              date: moment(content.quotationDate).format('yy-MM-DD'),
-              // priceChange: priceChange,
+              date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
               priceChange: content.total,
               remark: content.editNotes,
             };
 
             const contentProdArr = _.cloneDeep(content.products);
-            // const preContentProdArr = preContent?.content.products;
 
-            contentProdArr.forEach((prod) => {
-              if (!prod.rootProductId) {
-                rootProdList[prod.id] = _.cloneDeep(prod);
+            contentProdArr.forEach((prod, index) => {
+              if (!rootProdList[prod.rootProductId]) {
+                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
               } else {
-                const rootQty = rootProdList[prod.rootProductId].quantity;
+                const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
                 const copy = _.cloneDeep(prod);
-                copy.quantity = rootQty - prod.quantity;
-                rootProdList[prod.rootProductId] = prod;
-                prod = copy;
+                copy.quantity = rootQty - copy.quantity;
+                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+                // 替換掉原本的
+                contentProdArr[index] = copy;
               }
             });
+
+            // 上面的演算法必須執行，所以 return null放在下面
+            if (index === 0) {
+              return null;
+            }
 
             return (
               <Panel
@@ -219,34 +189,34 @@ export default function QuotationRecord({
 
 const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
   const {
-    reRender,
-    reset,
+    // reRender,
+    // reset,
     //
     productList,
     prodCellConfig,
     prodKeyArr,
-    prodVKeyArr,
-    setProdVKeyArr,
-    addProd,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
     changeProdKeyArr,
     //
-    subTotal,
+    // subTotal,
     //
-    comKeyArr,
-    comVKeyArr,
-    comCellConfig,
-    changeComKeyArr,
+    // comKeyArr,
+    // comVKeyArr,
+    // comCellConfig,
+    // changeComKeyArr,
     //
-    accessoriesKeyArr,
-    changeAccessoriesKeyArr,
-    accessoriesCellConfig,
+    // accessoriesKeyArr,
+    // changeAccessoriesKeyArr,
+    // accessoriesCellConfig,
     //
-    othersKeyArr,
-    othersList,
-    othersCellConfig,
-    changeOthersKeyArr,
-    addOthers,
-    getOthersPostBodyArr,
+    // othersKeyArr,
+    // othersList,
+    // othersCellConfig,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
   } = useProductList({
     productArr: prodArr ?? [],
     others: [],

@@ -7,6 +7,7 @@ const ExchangeRow = ({
   exchange,
   changedMoney,
   style,
+  disabled,
 }: {
   oriQty: number | string;
   reduce: number | string;
@@ -14,6 +15,7 @@ const ExchangeRow = ({
   exchange: number | string;
   changedMoney: string;
   style?: React.CSSProperties;
+  disabled?: boolean;
 }) => {
   return (
     <div className={scss.row} style={style}>
@@ -21,6 +23,7 @@ const ExchangeRow = ({
       <div className={scss.inputBox}>
         <span>-</span>
         <input
+          disabled={disabled}
           type="number"
           value={reduce ?? ''}
           // onFocus={() => reduceOnChange('0')}
