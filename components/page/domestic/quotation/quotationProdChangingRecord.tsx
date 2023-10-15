@@ -66,7 +66,7 @@ export default function TheQuotationProdChangingRecord({
         className={style.collapse}
         onChange={changeActive}
       >
-        {subContract?.map((item, index, arr) => {
+        {subContract?.map((item, index) => {
           const content = item.content;
 
           const contentTotal = content?.total ?? 0;
@@ -94,6 +94,11 @@ export default function TheQuotationProdChangingRecord({
               contentProdArr[index] = copy;
             }
           });
+
+          // 上面的演算法必須執行，所以 return null放在下面
+          if (index === 0) {
+            return null;
+          }
 
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
