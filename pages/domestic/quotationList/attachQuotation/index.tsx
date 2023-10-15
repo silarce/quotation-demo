@@ -375,11 +375,14 @@ latestContentProdArr為這次追加追減的主產品
     addOthers,
     getOthersPostBodyArr,
     //
-    subTotal: quotationProdSubTotal,
+    // subTotal: quotationProdSubTotal,
     reset: resetClass,
     //
     attachProdList,
     addProd_attach,
+    attachAddTotal,
+    attachDivTotal,
+    attachTotal,
   } = useProductList({
     productArr: contractArr,
     others: quotationData?.latestContent.others,
@@ -465,7 +468,7 @@ latestContentProdArr為這次追加追減的主產品
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
-      prodSubTotal: quotationProdSubTotal,
+      prodSubTotal: attachTotal,
     });
 
     setSummary((state) => {
@@ -476,7 +479,7 @@ latestContentProdArr為這次追加追減的主產品
         total,
       };
     });
-  }, [summary.discountRate, quotationProdSubTotal]);
+  }, [summary.discountRate, attachTotal]);
 
   //
   //
@@ -1222,7 +1225,6 @@ latestContentProdArr為這次追加追減的主產品
     }
   };
 
-  // 現在只有admin可以呼叫這系列的api，所以無法測試
   const reqReview = async (isPass: boolean) => {
     if (!quotationId || !isReviewer) {
       return;
@@ -1269,8 +1271,6 @@ latestContentProdArr為這次追加追減的主產品
     const b = Number(prod.boxB || 0) * 100;
 
     const size = `${lw} X ${h} + ${b}`;
-
-    // const foo = prod.comList;
 
     const componentArr = Object.values(prod.comList ?? {});
 
@@ -1332,6 +1332,7 @@ latestContentProdArr為這次追加追減的主產品
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h106"
               isAttach={isAttach}
+              attachTotal={attachDivTotal}
             />
 
             {/* 材料配件設定 */}
@@ -1408,6 +1409,7 @@ latestContentProdArr為這次追加追減的主產品
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               onVKeyChange={() => {}}
               rowHeight="h106"
+              attachTotal={attachAddTotal}
             />
 
             {/* 材料配件設定 */}
