@@ -1752,9 +1752,11 @@ export type TengineeringContactDto = {
   projectNumber: string;
   /**工程編號 */
   engineeringNumber: string;
+  /**承包商 */
   contractor: string;
   /**負責人 */
   principal: string;
+  /**公司電話 */
   contactNumber: string;
   faxNumber: string;
   /**備註列表 */
@@ -1767,27 +1769,27 @@ export type TengineeringContactDto = {
 
 export type TupdateEngineeringContactDto = {
   /**合約編號 */
-  contractNumber: string;
+  contractNumber?: string;
   /**請款狀態 */
-  paymentStatus: string;
-  projectName: string;
+  paymentStatus?: string;
+  projectName?: string;
   /**工程內容 */
-  projectContent: string;
-  county: string;
-  district: string;
-  address: string;
+  projectContent?: string;
+  county?: string;
+  district?: string;
+  address?: string;
   /**工程負責人 */
-  projectPerson: string;
+  projectPerson?: string;
   /**工程負責人聯絡電話 */
-  projectPersonNumber: string;
-  faxNumber: string;
+  projectPersonNumber?: string;
+  faxNumber?: string;
   /**備註列表 */
-  annotaion: string[] | null;
+  annotaion?: string[] | null;
   /**工地電話 */
-  projectNumber: string;
+  projectNumber?: string;
 };
 
 export type TcreateEngineeringContactDto = {
-  quotationId: string | null; // 報價單ID
-  contractId: string | null; // 合約ID
+  quotationId?: string | null; // 報價單ID
+  contractId?: string | null; // 合約ID
 };

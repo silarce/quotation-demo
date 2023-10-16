@@ -21,7 +21,7 @@ type TinputSelProps_noProps = Omit<
   | 'inputSelBarProps'
 >;
 
-export type TaddressProps = {
+type TaddressProps = {
   county: TselectProps<Toption>;
   district: TselectProps<Toption>;
   address: TtextareaProps;
@@ -29,6 +29,9 @@ export type TaddressProps = {
   showDistrict?: boolean;
 };
 
+export type { TinputSelProps_noProps, TaddressProps };
+
+// ==============================================================================
 export default function AddressBar({
   inputSelProps,
   addressProps,

@@ -29,17 +29,19 @@ type TgetEngineeringContact = {
   meta: TpageMetaDto;
 };
 
+/**data裡只會有一筆資料 */
 export const apiGetEngineeringContact = async (contractId: string) => {
   const api = `/engineering/engineering-contact/${contractId}`;
 
   return axi
-    .get<TgetEngineeringContact>(api)
+    .get<TengineeringContactDto>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
+/**data裡只會有一筆資料 */
 export const useGetEngineeringContact = (contractId: string) => {
-  const [res, setRes] = useState<TgetEngineeringContact>();
+  const [res, setRes] = useState<TengineeringContactDto>();
 
   const update = async () => {
     const newRes = await apiGetEngineeringContact(contractId);
@@ -52,8 +54,7 @@ export const useGetEngineeringContact = (contractId: string) => {
   };
 
   return {
-    data: res?.data,
-    meta: res?.meta,
+    data: res,
     update,
   };
 };
@@ -63,7 +64,7 @@ export const apiPatchEngineeringContact = async (id: string, body: TupdateEngine
   const api = `/engineering/engineering-contact/${id}`;
 
   return axi
-    .patch(api, { body })
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -73,7 +74,7 @@ export const apiPostEngineeringContact = async (body: TcreateEngineeringContactD
   const api = `/engineering/engineering-contact`;
 
   return axi
-    .post<TengineeringContactDto>(api, { body })
+    .post<TengineeringContactDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
