@@ -1727,3 +1727,67 @@ export type TsubmitReviewQotuationContentDto = {
   reviewSupervisorEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
 };
+
+// =========================================================================
+
+export type TengineeringContactDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractNumber: string;
+  /**請款狀態 */
+  paymentStatus: string;
+  projectName: string;
+  /**工程內容 */
+  projectContent: string;
+  county: string;
+  district: string;
+  address: string;
+  /**工程負責人 */
+  projectPerson: string;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber: string;
+  projectFaxNumber: string;
+  /**工地電話 */
+  projectNumber: string;
+  /**工程編號 */
+  engineeringNumber: string;
+  contractor: string;
+  /**負責人 */
+  principal: string;
+  contactNumber: string;
+  faxNumber: string;
+  /**備註列表 */
+  annotations: string[] | null;
+  contractId?: string | null;
+  contract?: TquotationContractDto | null;
+  quotationId?: string | null;
+  quotation?: TquotationDto | null;
+};
+
+export type TupdateEngineeringContactDto = {
+  /**合約編號 */
+  contractNumber: string;
+  /**請款狀態 */
+  paymentStatus: string;
+  projectName: string;
+  /**工程內容 */
+  projectContent: string;
+  county: string;
+  district: string;
+  address: string;
+  /**工程負責人 */
+  projectPerson: string;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber: string;
+  faxNumber: string;
+  /**備註列表 */
+  annotaion: string[] | null;
+  /**工地電話 */
+  projectNumber: string;
+};
+
+export type TcreateEngineeringContactDto = {
+  quotationId: string | null; // 報價單ID
+  contractId: string | null; // 合約ID
+};
