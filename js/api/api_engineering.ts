@@ -14,6 +14,8 @@ import type {
   TengineeringContactDto,
   TupdateEngineeringContactDto,
   TcreateEngineeringContactDto,
+  TdispatchingDto,
+  TcreateDispatchingDto,
 } from './dtoTypes';
 
 export type {
@@ -22,14 +24,11 @@ export type {
   TengineeringContactDto,
   TupdateEngineeringContactDto,
   TcreateEngineeringContactDto,
+  TdispatchingDto,
+  TcreateDispatchingDto,
 } from './dtoTypes';
 
-type TgetEngineeringContact = {
-  data: TengineeringContactDto[];
-  meta: TpageMetaDto;
-};
-
-/**data裡只會有一筆資料 */
+// ========================================================================
 export const apiGetEngineeringContact = async (contractId: string) => {
   const api = `/engineering/engineering-contact/${contractId}`;
 
@@ -39,7 +38,6 @@ export const apiGetEngineeringContact = async (contractId: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-/**data裡只會有一筆資料 */
 export const useGetEngineeringContact = (contractId: string) => {
   const [res, setRes] = useState<TengineeringContactDto>();
 
@@ -75,6 +73,54 @@ export const apiPostEngineeringContact = async (body: TcreateEngineeringContactD
 
   return axi
     .post<TengineeringContactDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// ------------------------------------------------------------------------
+
+type TgetDispatchingList = {
+  data: TdispatchingDto[];
+  meta: TpageMetaDto;
+};
+
+/**取得派工單列表 */
+export const apiGetEngineeringDispatchingList = async (params?: Tparams) => {
+  const api = '/engineering/dispatching-list';
+
+  return axi
+    .get<TgetDispatchingList>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**取得派工單列表 */
+export const useGetEngineeringDispatchingList = (params?: Tparams) => {
+  const [res, setRes] = useState<TgetDispatchingList>();
+
+  const update = async () => {
+    const newRes = await apiGetEngineeringDispatchingList(params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
+};
+
+/**新增派工單 */
+export const apiPostEngineeringDispatching = async (body: TcreateDispatchingDto) => {
+  const api = '/engineering/dispatching';
+
+  return axi
+    .post<TdispatchingDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

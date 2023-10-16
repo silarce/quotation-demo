@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 import { useRouter } from 'next/router';
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -5,41 +6,26 @@ import InputSel from 'components/global/gear/inputAndSel/inputSel';
 // css
 import style from './dispatchList.module.scss';
 
-type Tprofile01 = {
-  projectName: string;
-  contractor: string;
-  contact: string;
-  contactNumber: string;
-  allAddress: string;
+// fake
+import type { Tprofile } from 'pages/worksDepartment/contractList/contract/dispatchList';
+import type { TdispatchEmpty } from 'pages/worksDepartment/contractList/contract/dispatchList/add';
 
-  projectNumber: string;
-  badgeNumber: string;
-};
-
-type Tprofile02 = {
-  dispatchDate: string;
-  workerName: string;
-  finalContact: string;
-};
-
-export type { Tprofile01, Tprofile02 };
-
-// ============================================================================
 export default function Profile({
-  profile01,
-  onProfile01Change,
+  profile,
+  setProfile,
   profile02,
-  onProfile02Change,
+  setProfile02,
 }: {
-  profile01: Tprofile01 | undefined;
-  onProfile01Change: (key: keyof Tprofile01, v: string) => void;
-  profile02?: Tprofile02;
-  onProfile02Change?: (key: keyof Tprofile02, v: string) => void;
+  profile: Partial<Tprofile>;
+  setProfile: Dispatch<SetStateAction<Partial<Tprofile>>>;
+  profile02?: TdispatchEmpty;
+  setProfile02?: Dispatch<SetStateAction<TdispatchEmpty>>;
 }) {
   // ------------------------------------------------
   const router = useRouter();
   const isAdd = router.route.split('/').pop() === 'add';
   // ------------------------------------------------
+  const { 派工日期, 工務人員, 完工聯絡人 } = profile02 ?? {};
 
   return (
     <div className={style.profile}>
@@ -48,10 +34,14 @@ export default function Profile({
         {profile02 && (
           <InputSel
             className={`${style.input02}`}
-            datePickerProps={{
-              value: profile02.dispatchDate ?? '',
-              onChange02: (m) => {
-                onProfile02Change?.('dispatchDate', m?.toISOString() ?? '');
+            inputProps={{
+              value: 派工日期 ?? '',
+              onChange: (v: string) => {
+                setProfile02!((data) => {
+                  data.派工日期 = v;
+
+                  return { ...data };
+                });
               },
             }}
             label={'派工日期'}
@@ -64,11 +54,15 @@ export default function Profile({
         )}
 
         {indexKeys01.map((key, index) => {
-          const value = profile01?.[key] ?? '';
+          const value = profile[key] ?? '';
           const { label, labelWidth } = config[key];
 
           const onChange = (v: string) => {
-            onProfile01Change(key, v);
+            setProfile((data) => {
+              data[key] = v;
+
+              return { ...data };
+            });
           };
 
           return (
@@ -90,20 +84,24 @@ export default function Profile({
       {/* right */}
       <div className={style.right}>
         {indexKeys02.map((key, index) => {
-          const value = profile01?.[key] ?? '';
+          const value = profile[key] ?? '';
           const { label, labelWidth } = config[key];
 
           const onChange = (v: string) => {
-            onProfile01Change(key, v);
+            setProfile((data) => {
+              data[key] = v;
+
+              return { ...data };
+            });
           };
 
           let styleShowUnderline = '';
 
-          if (key === 'projectNumber') {
+          if (key === '工程編號') {
             styleShowUnderline = style.showUnderline;
           }
 
-          if (key === 'badgeNumber' && !isAdd) {
+          if (key === '管制卡編號' && !isAdd) {
             styleShowUnderline = style.showUnderline;
           }
 
@@ -132,7 +130,11 @@ export default function Profile({
           const { label, labelWidth } = config[key];
 
           const onChange = (v: string) => {
-            onProfile02Change?.(key, v);
+            setProfile((data) => {
+              profile02[key] = v;
+
+              return { ...data };
+            });
           };
 
           return (
@@ -153,13 +155,13 @@ export default function Profile({
 }
 // ============================================================
 
-type TindexKey01 = keyof Pick<Tprofile01, 'projectName' | 'contractor' | 'contact' | 'contactNumber' | 'allAddress'>;
-type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber' | 'badgeNumber'>;
-type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
+type TindexKey01 = keyof Pick<Tprofile, '工程名稱' | '承包商' | '聯絡人' | '工地電話' | '工程地點'>;
+type TindexKey02 = keyof Pick<Tprofile, '工程編號' | '管制卡編號'>;
+type TindexKey03 = keyof Pick<TdispatchEmpty, '工務人員' | '完工聯絡人'>;
 
-const indexKeys01: TindexKey01[] = ['projectName', 'contractor', 'contact', 'contactNumber', 'allAddress'];
-const indexKeys02: TindexKey02[] = ['projectNumber', 'badgeNumber'];
-const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
+const indexKeys01: TindexKey01[] = ['工程名稱', '承包商', '聯絡人', '工地電話', '工程地點'];
+const indexKeys02: TindexKey02[] = ['工程編號', '管制卡編號'];
+const indexKeys03: TindexKey03[] = ['工務人員', '完工聯絡人'];
 
 type Tconfig<keys extends string> = {
   [key in keys]: {
@@ -169,41 +171,41 @@ type Tconfig<keys extends string> = {
 };
 
 const config: Tconfig<TindexKey01 | TindexKey02 | TindexKey03> = {
-  projectName: {
+  工程名稱: {
     label: '工程名稱',
     labelWidth: '80px',
   },
-  contractor: {
+  承包商: {
     label: '承包商',
     labelWidth: '80px',
   },
-  contact: {
+  聯絡人: {
     label: '聯絡人',
     labelWidth: '80px',
   },
-  contactNumber: {
+  工地電話: {
     label: '工地電話',
     labelWidth: '80px',
   },
-  allAddress: {
+  工程地點: {
     label: '工程地點',
     labelWidth: '80px',
   },
   // TindexKey02
-  projectNumber: {
+  工程編號: {
     label: '工程編號',
     labelWidth: '100px',
   },
-  badgeNumber: {
+  管制卡編號: {
     label: '管制卡編號',
     labelWidth: '100px',
   },
   // TindexKey03
-  workerName: {
+  工務人員: {
     label: '工務人員',
     labelWidth: '100px',
   },
-  finalContact: {
+  完工聯絡人: {
     label: '完工聯絡人',
     labelWidth: '100px',
   },
