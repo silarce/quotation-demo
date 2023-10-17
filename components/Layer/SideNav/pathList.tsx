@@ -196,12 +196,12 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
-        {
-          label: '客戶列表',
-          path: path01 + '/customer',
-          // erpFeature: allPass,
-          erpFeature: 'allPass',
-        },
+        // {
+        //   label: '客戶列表',
+        //   path: path01 + '/customer',
+        //   // erpFeature: allPass,
+        //   erpFeature: 'allPass',
+        // },
         {
           label: '產品列表',
           path: path01 + '/productList',
@@ -332,6 +332,12 @@ const sidePathList: TsidePathList = {
               erpFeature: [statisticsTable],
             },
           ],
+        },
+        {
+          label: '客戶列表',
+          path: path01 + '/customer',
+          // erpFeature: allPass,
+          erpFeature: 'allPass',
         },
         {
           label: '備註列表',

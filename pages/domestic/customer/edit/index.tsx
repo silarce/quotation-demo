@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import EditCustomer from 'components/page/setting/customer/editCustomer/editCustomer';
+import EditCustomer from 'components/page/domestic/customer/editCustomer/editCustomer';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
