@@ -167,17 +167,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       }
 
-      // 先把重複的拿掉，再把新的放進去
+      // 把新的放進去，並拿掉重複的值
       if (annoArr) {
-        annoArr.forEach((asmStr) => {
-          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+        // annoArr.forEach((asmStr) => {
+        //   const delIndex = annoCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            annoCopy.splice(delIndex, 1);
-          }
-        });
+        //   if (delIndex > -1) {
+        //     annoCopy.splice(delIndex, 1);
+        //   }
+        // });
 
         annoCopy = [...annoCopy, ...annoArr];
+        annoCopy = [...new Set(annoCopy)];
       }
 
       return annoCopy;
@@ -197,17 +198,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       }
 
-      // 先把重複的拿掉，再把新的放進去
+      // 把新的放進去，並拿掉重複的值
       if (qrArr) {
-        qrArr.forEach((asmStr) => {
-          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+        // qrArr.forEach((asmStr) => {
+        //   const delIndex = qrCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            qrCopy.splice(delIndex, 1);
-          }
-        });
+        //   if (delIndex > -1) {
+        //     qrCopy.splice(delIndex, 1);
+        //   }
+        // });
 
         qrCopy = [...qrCopy, ...qrArr];
+        qrCopy = [...new Set(qrCopy)];
       }
 
       return qrCopy;
