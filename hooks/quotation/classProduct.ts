@@ -112,7 +112,7 @@ class Class_product {
     //
     parentProd?: Class_product;
     //
-    onDoorTypeChange?: (obj: { oldDoorType: string; newDoorType: string }) => void;
+    onDoorTypeChange?: (obj: { newDoorType: string; newIsAntiTyphoon: boolean }) => void;
     disabled_quantity?: boolean;
   }) {
     this.reRender = reRender;
@@ -1462,8 +1462,6 @@ class Class_product {
   }
 
   set doorType(v) {
-    const oldDoorType = this._prodData.doorType;
-
     this._prodData.doorType = v;
     this.clearProd();
 
@@ -1472,7 +1470,7 @@ class Class_product {
     this.shouldCall_pgpb = true;
     this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
-    this.onDoorTypeChange?.({ oldDoorType, newDoorType: v });
+    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
     this.reRender();
   }
@@ -1796,7 +1794,8 @@ class Class_product {
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
     this.callAllReq();
-
+    // onDoorTypeChange必須放在賦值之後再執行
+    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
     this.reRender();
   }
 
