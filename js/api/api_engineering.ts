@@ -304,3 +304,13 @@ export const apiPostElectronicSupplies = async (body: TcreateElectronicSuppliesD
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+/**更新送電備品表 */
+export const apiPatchElectronicSupplies = async (id: string, body: TupdateElectronicSuppliesDto) => {
+  const api = `/engineering/electronic-supplies/${id}`;
+
+  return axi
+    .patch<TelectronicSuppliesDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};

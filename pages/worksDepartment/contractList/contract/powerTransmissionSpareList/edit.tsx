@@ -21,7 +21,13 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
-import { apiPostElectronicSupplies, TcreateElectronicSuppliesDto } from 'js/api/api_engineering';
+import {
+  apiPostElectronicSupplies,
+  apiPatchElectronicSupplies,
+  TcreateElectronicSuppliesDto,
+  TupdateElectronicSuppliesDto,
+  TelectronicSuppliesDto,
+} from 'js/api/api_engineering';
 
 // css
 import style from './powerTransmissionSpareList.module.scss';
@@ -77,9 +83,12 @@ type Tsheet = {
 };
 
 // =================================================================
-export default function Add() {
+export default function Edit() {
   const router = useRouter();
-  const { contractId } = router.query as { contractId: string };
+  const { contractId, electronicSuppliesId } = router.query as {
+    contractId: string;
+    electronicSuppliesId: string | undefined;
+  };
 
   const [disabled, setDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -384,7 +393,7 @@ export default function Add() {
   // ----------------------------------------------------
 
   const reqPost = async () => {
-    // const body: TcreateElectronicSuppliesDto = {
+    // const body: TcreateElectronicSuppliesDto|TupdateElectronicSuppliesDto = {
     //   ...profile,
     //   materialHandlerId: employeeList.materialHandler?.id ?? '',
     //   ingredientTechnicianId: employeeList.ingredientTechnician?.id ?? '',
@@ -393,7 +402,24 @@ export default function Add() {
 
     try {
       setIsLoading(true);
-      // const res = await apiPostElectronicSupplies(body);
+
+      if (electronicSuppliesId) {
+        //
+        // const res = await apiPatchElectronicSupplies(body);
+        // if (res) {
+        //   update_electronicSupplies();
+        // }
+      } else {
+        // const res = await apiPostElectronicSupplies(body);
+        // if (res) {
+        //   router.push({
+        //     query: {
+        //       ...router.query,
+        //       electronicSuppliesId: res.id,
+        //     },
+        //   });
+        // }
+      }
     } catch (error) {
       myAlert.err({ title: '新增送電備品表失敗' });
     } finally {
@@ -402,13 +428,11 @@ export default function Add() {
   };
 
   // ----------------------------------------------------
-  const panelList: TpanelList = [
+  const panelList01: TpanelList = [
     {
       type: 'redButton',
       label: '建立',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: () => reqPost,
     },
     {
       type: 'myButton',
@@ -416,6 +440,20 @@ export default function Add() {
       onClick: () => router.back(),
     },
   ];
+  const panelList02: TpanelList = [
+    {
+      type: 'redButton',
+      label: '更新',
+      onClick: () => reqPost,
+    },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
+    },
+  ];
+
+  const panelList = electronicSuppliesId ? panelList02 : panelList01;
 
   // ----------------------------------------------------
 

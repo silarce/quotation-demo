@@ -69,7 +69,7 @@ export default function PowerTransmissionSpareList() {
       label: '建立料單',
       onClick: () =>
         router.push({
-          pathname: `${router.pathname}/add`,
+          pathname: `${router.pathname}/edit`,
           query: { ...router.query },
         }),
     },
@@ -100,7 +100,7 @@ export default function PowerTransmissionSpareList() {
               pathname: `${router.pathname}/edit`,
               query: {
                 ...router.query,
-                id,
+                electronicSuppliesId: id,
               },
             };
             const onClick = () => router.push(href);
