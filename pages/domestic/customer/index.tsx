@@ -5,7 +5,7 @@ import { NextRouter, useRouter } from 'next/router';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import CustomerList from 'components/page/setting/customer/customerList';
+import CustomerList from 'components/page/domestic/customer/customerList';
 
 // antd
 import { Pagination } from 'antd';
@@ -170,7 +170,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
       const searchOther = (valueArr[2] as Toption).value;
       const searchOtherValue = valueArr[3] as string;
       router.push({
-        pathname: '/setting/customer',
+        pathname: '/domestic/customer',
         query: {
           searchTypes,
           searchCounty,
@@ -218,7 +218,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
     {
       type: 'addButton',
       label: '新增客戶資料',
-      onClick: () => router.push('/setting/customer/add'),
+      onClick: () => router.push('/domestic/customer/add'),
     },
   ];
 

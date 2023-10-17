@@ -7,7 +7,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // component
-import Table_annotation from 'components/page/setting/annotationList/table_annotation';
+import Table_annotation from 'components/page/domestic/annotationList/table_annotation';
 
 // glogal gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -131,9 +131,9 @@ export default function MemoList() {
       clearAnno();
     } catch (err) {
       myAlert.err({ title: '上傳失敗' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // ------------------------------------------------------------------------

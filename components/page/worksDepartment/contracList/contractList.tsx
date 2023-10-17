@@ -42,8 +42,6 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
     update();
   }, [contractId]);
 
-  console.log('contract', contract);
-
   // ------------------------------------------------------------------
 
   // panelHeader點擊變粉紅色用
@@ -55,7 +53,7 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
     const activeIndex = Number(panelIndex);
     setActiveIndex(activeIndex);
 
-    const contractId = contractArr[Number(panelIndex)].contractId;
+    const contractId = contractArr[Number(panelIndex)]?.contractId;
     setContractId(contractId);
     clear();
   };

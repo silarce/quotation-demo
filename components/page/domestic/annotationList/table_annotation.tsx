@@ -28,8 +28,8 @@ import {
   // TcreateAnnotationDto
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
-import { Class_annotation } from 'pages/setting/annotationList';
-import { TuseClassAnnotation } from 'pages/setting/annotationList';
+import { Class_annotation } from 'pages/domestic/annotationList';
+import { TuseClassAnnotation } from 'pages/domestic/annotationList';
 
 // =======================================================================
 const optionArr_category = optionsCreator_category();

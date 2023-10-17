@@ -75,7 +75,7 @@ export default function WorkContactDoc() {
   // ---------------------------------------------------------------------------
 
   /**data裡只會有一筆資料 */
-  const { data: engineeringContact, update } = useGetEngineeringContact('e298fbc5-78e3-4bfc-a6ff-53c2bbfae83a');
+  const { data: engineeringContact, update } = useGetEngineeringContact(contractId);
   // const engineeringContact = data;
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function WorkContactDoc() {
       try {
         await update();
       } catch (error) {
-        myAlert.err({ title: '取得工程聯絡單失敗' });
+        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
       }
     })();
   }, [contractId]);
@@ -401,7 +401,7 @@ export default function WorkContactDoc() {
   // ----------------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} />
+      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
         <div>

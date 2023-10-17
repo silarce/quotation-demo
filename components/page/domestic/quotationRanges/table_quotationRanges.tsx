@@ -25,8 +25,8 @@ import iconCross from 'public/image/icon/cross_thin.svg';
 // type
 import { TquotationRangeDto, TcreateQuotationRangeDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
-import { Class_quotationRange } from 'pages/setting/quotationRanges';
-import { TuseClassQuotationRange } from 'pages/setting/quotationRanges';
+import { Class_quotationRange } from 'pages/domestic/quotationRanges';
+import { TuseClassQuotationRange } from 'pages/domestic/quotationRanges';
 
 // =======================================================================
 const optionArr_category = optionsCreator_category();
