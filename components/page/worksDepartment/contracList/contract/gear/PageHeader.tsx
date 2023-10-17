@@ -10,9 +10,11 @@ export type { TpanelList };
 export default function PageHeader({
   tagCallback,
   panelList,
+  contractNumber = '未取得',
 }: {
   tagCallback?: (contractId: string) => string;
   panelList?: TpanelList;
+  contractNumber?: string;
 }) {
   const router = useRouter();
   const isReady = router.isReady;
@@ -23,7 +25,7 @@ export default function PageHeader({
 
   const { contractId } = router.query;
 
-  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號${contractId}`;
+  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號 ${contractNumber}`;
 
   const pathHead = `/worksDepartment/contractList/contract`;
   const linkList = [
