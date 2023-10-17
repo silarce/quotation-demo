@@ -9,7 +9,8 @@
   border-bottom-color: transparent;
   > button,
   > div,
-  > a {
+  > a,
+  .fakeA {
     flex: auto;
     position: relative;
     display: inline-flex;

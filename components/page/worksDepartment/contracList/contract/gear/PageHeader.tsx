@@ -38,6 +38,7 @@ export default function PageHeader({
     },
     {
       label: '工作表',
+      disabled: true,
       href: {
         pathname: `${pathHead}/workSheet`,
         query: { contractId },
@@ -45,6 +46,7 @@ export default function PageHeader({
     },
     {
       label: '出庫單',
+      disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
         query: { contractId },
@@ -52,6 +54,7 @@ export default function PageHeader({
     },
     {
       label: '應收帳款明細',
+      disabled: true,
       href: {
         pathname: `${pathHead}/accountsReceivableDetails`,
         query: { contractId },
@@ -73,6 +76,7 @@ export default function PageHeader({
     },
     {
       label: '調(退)貨單列表',
+      disabled: true,
       href: {
         pathname: `${pathHead}/listOfDeliveryOrders`,
         query: { contractId },
@@ -80,6 +84,7 @@ export default function PageHeader({
     },
     {
       label: '備忘錄',
+      disabled: true,
       href: {
         pathname: `${pathHead}/memorandum`,
         query: { contractId },
