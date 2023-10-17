@@ -4,7 +4,7 @@
  * reqUpdateQuotation
  * useGetQuotation_id
  * fileInfoArr
- * reqReview 送審
+ * reqReview 審核
  *
  */
 // =============================================================
@@ -681,6 +681,16 @@ latestContentProdArr為這次追加追減的主產品
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
   const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
+  useEffect(() => {
+    if (!latestContent) {
+      return;
+    }
+
+    setReviewSales(latestContent.reviewSalesEmployee || undefined);
+    setReviewSupervisor(latestContent.reviewSupervisorEmployee || undefined);
+    setReviewWorkDirector(latestContent.reviewWorkDirectorEmployee || undefined);
+  }, [latestContent]);
+
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
@@ -815,6 +825,7 @@ latestContentProdArr為這次追加追減的主產品
     reviewSales: {
       label: '請選擇審核業務',
       // tip: '可不選，直接按確定',
+      employee: reviewSales,
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewSales(v[0]);
@@ -835,6 +846,7 @@ latestContentProdArr為這次追加追減的主產品
     reviewSupervisor: {
       label: '請選擇業務主管',
       // tip: '可不選，直接按確定',
+      employee: reviewSupervisor,
       onCancel: onEmpSelCancel,
       onConfirm: async (v: TemployeeDto[]) => {
         setReviewSupervisor(v[0]);
@@ -847,6 +859,7 @@ latestContentProdArr為這次追加追減的主產品
     reviewWorkDirector: {
       label: '請選擇應收帳款',
       // tip: '可不選，直接按確定',
+      employee: reviewWorkDirector,
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewWorkDirector(v[0]);
@@ -861,6 +874,7 @@ latestContentProdArr為這次追加追減的主產品
     undefined: {
       label: '',
       tip: '',
+      employee: undefined,
       onCancel: () => {},
       onConfirm: () => {},
     },
@@ -1563,6 +1577,9 @@ latestContentProdArr為這次追加追減的主產品
         }}
         onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
         selLimit={1}
+        defaultEmpArr={
+          empSelLookup[empSelConfirmKey]?.employee ? [empSelLookup[empSelConfirmKey].employee!] : undefined
+        }
       />
       {/* 合約審核表 */}
       <ContractReviewForm
