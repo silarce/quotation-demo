@@ -71,13 +71,32 @@ const erpFeaturesLookup = {
   legacyContractIntegration: '舊合約',
   domestic: '營業部國內工程',
   statisticsTable: '統計表',
+  worksDepartment: '工務部',
+  accountsReceivable: '工務部',
 } as const;
 
-const { BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic, statisticsTable } = erpFeaturesLookup;
+const {
+  //
+  BasicDataCreation,
+  HRAuthoritySetup,
+  legacyContractIntegration,
+  domestic,
+  statisticsTable,
+  worksDepartment,
+  accountsReceivable,
+} = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
 /** allPass 至少有一個權限就pass */
-const allPass = [BasicDataCreation, HRAuthoritySetup, legacyContractIntegration, domestic, statisticsTable];
+const allPass = [
+  BasicDataCreation,
+  HRAuthoritySetup,
+  legacyContractIntegration,
+  domestic,
+  statisticsTable,
+  worksDepartment,
+  accountsReceivable,
+];
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
 // const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
@@ -148,32 +167,32 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: '基本資料建立',
-          // erpFeature: [BasicDataCreation, HRAuthoritySetup],
-          erpFeature: allPass,
+          erpFeature: [BasicDataCreation, HRAuthoritySetup],
+          // erpFeature: allPass,
           list: [
             {
               label: '公司資料',
               path: path01 + '/company-info',
-              // erpFeature: [BasicDataCreation],
-              erpFeature: allPass,
+              erpFeature: [BasicDataCreation],
+              // erpFeature: allPass,
             },
             {
               label: '公司職等職稱',
               path: path01 + '/departments',
-              // erpFeature: [BasicDataCreation],
-              erpFeature: allPass,
+              erpFeature: [BasicDataCreation],
+              // erpFeature: allPass,
             },
             {
               label: '人員資料',
               path: path01 + '/employees',
-              // erpFeature: [BasicDataCreation],
-              erpFeature: allPass,
+              erpFeature: [BasicDataCreation],
+              // erpFeature: allPass,
             },
             {
               label: '人事權限管理',
               path: path01 + '/hrManage/erpCtrlPermissions',
-              // erpFeature: [HRAuthoritySetup],
-              erpFeature: allPass,
+              erpFeature: [HRAuthoritySetup],
+              // erpFeature: allPass,
             },
           ],
         },
@@ -192,13 +211,13 @@ const sidePathList: TsidePathList = {
           label: '備註列表',
           path: path01 + '/annotationList',
           // erpFeature: [BasicDataCreation],
-          erpFeature: allPass,
+          erpFeature: [domestic],
         },
         {
           label: '報價範圍列表',
           path: path01 + '/quotationRanges',
           // erpFeature: [BasicDataCreation],
-          erpFeature: allPass,
+          erpFeature: [domestic],
         },
       ],
     };
@@ -260,13 +279,13 @@ const sidePathList: TsidePathList = {
             //   path: path01 + '/report',
             //   erpFeature: devPass,
             // },
-            {
-              label: '舊合約整合',
-              path: path01 + '/legacyContractIntegration',
-              // erpFeature: [legacyContractIntegration],
-              erpFeature: allPass,
-            },
           ],
+        },
+        {
+          label: '舊合約整合',
+          path: path01 + '/legacyContractIntegration',
+          erpFeature: [legacyContractIntegration],
+          // erpFeature: allPass,
         },
         {
           label: '查詢工作表',
@@ -290,27 +309,27 @@ const sidePathList: TsidePathList = {
             {
               label: '報價統計表',
               path: path01 + '/quoteStatistics',
-              erpFeature: devPass,
+              erpFeature: [statisticsTable],
             },
             {
               label: '個人業績統計表',
               path: path01 + '/personalPerformanceStatistics',
-              erpFeature: devPass,
+              erpFeature: [statisticsTable],
             },
             {
               label: '全區業績統計表',
               path: path01 + '/regionalPerformanceStatistics',
-              erpFeature: devPass,
+              erpFeature: [statisticsTable],
             },
             {
               label: '追加工程統計表',
               path: path01 + '/additionalEngineeringStatistics',
-              erpFeature: devPass,
+              erpFeature: [statisticsTable],
             },
             {
               label: '年度業績統計表',
               path: path01 + '/annualPerformanceStatistics',
-              erpFeature: devPass,
+              erpFeature: [statisticsTable],
             },
           ],
         },
@@ -368,7 +387,7 @@ const sidePathList: TsidePathList = {
         {
           label: '合約',
           path: path01 + '/contractList',
-          erpFeature: devPass,
+          erpFeature: [worksDepartment],
         },
         {
           label: '新增派工單',
@@ -449,7 +468,7 @@ const sidePathList: TsidePathList = {
             {
               label: '應收帳款明細',
               path: path01 + '/accountsReceivableDetails',
-              erpFeature: devPass,
+              erpFeature: [accountsReceivable],
             },
           ],
         },
@@ -496,16 +515,16 @@ const topPathList: TtopPathListConfig[] = [
     // erpFeature: 'allPass',
     erpFeature: [domestic, legacyContractIntegration, statisticsTable],
   },
-  {
-    icon: icon_foreign,
-    label: '營業部',
-    subLabel: '-國外工程',
-    path01: sidePathList['/foreign'].path01,
-    href: {
-      pathname: sidePathList['/foreign'].path01 + '',
-    },
-    erpFeature: devPass,
-  },
+  // {
+  //   icon: icon_foreign,
+  //   label: '營業部',
+  //   subLabel: '-國外工程',
+  //   path01: sidePathList['/foreign'].path01,
+  //   href: {
+  //     pathname: sidePathList['/foreign'].path01 + '',
+  //   },
+  //   erpFeature: devPass,
+  // },
   {
     icon: icon_project,
     label: '工務部',
