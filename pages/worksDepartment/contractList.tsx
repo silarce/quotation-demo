@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // global gear
@@ -6,35 +6,30 @@ import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/Pa
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
-import ContractList from 'components/page/worksDepartment/contracList/contractList';
+import ContractList, { Tcontract } from 'components/page/worksDepartment/contracList/contractList';
 
 // css
 import style from './contractList.module.scss';
 
-// fakeData
-import { fakeBudgetListGroup } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+// api
+import { useContract_infinite } from 'js/api/api_quotation';
+
 // type
 import { Toption } from 'js/utils/options/options';
 
 // ===========================================
 
 export default function WdContractList() {
-  const router = useRouter();
-  const { fakeBudgetList } = fakeBudgetListGroup;
+  // ===================================================
+
+  const { dataList, dataArr, viewRef_top, viewRef_bottom, isLoadingPage1, isLoading, meta, init, reset } =
+    useContract_infinite({});
+
+  useEffect(() => {
+    reset();
+  }, []);
 
   // ===================================================
-  // 搜尋用的
-  const [searchObj, setSearchObj] = useState<TsearchObj>({
-    doorType: '',
-    country: '',
-    clientName: '',
-    projectName: '',
-  });
-
-  const [doorType, setDoorType] = useState(doorTypeOptions[0]);
-  const [country, setCountry] = useState(countryOptions[0]);
-  const [clientName, setClientName] = useState('');
-  const [projectName, setProjectName] = useState('');
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
@@ -74,13 +69,6 @@ export default function WdContractList() {
     const country = (vArr[1] as Toption).value;
     const clientName = vArr[2] as string;
     const projectName = vArr[3] as string;
-
-    setSearchObj({
-      doorType: doorType,
-      country: country,
-      clientName: clientName,
-      projectName: projectName,
-    });
   };
 
   const searchGroup = {
@@ -93,13 +81,36 @@ export default function WdContractList() {
 
   // ===================================================
 
+  const contractArr: Tcontract[] = dataArr.map((item) => {
+    const { content } = item;
+
+    const foo: Tcontract = {
+      contractId: item.id,
+      quotationNumber: content.quotationNumber,
+      customerName: content.customer.name,
+      contactName: content.contactPerson,
+      contactNumber: content.contactNumber,
+      agentName: content.agentEmployee.chName,
+      discount: content.discount,
+      doorQty: String(content.quantity),
+      totalPrice: content.total.toLocaleString(),
+      date: content.quotationDate,
+      county: content.county,
+      projectName: content.projectName,
+    };
+
+    return foo;
+  });
+
+  // ===================================================
+
   return (
     <div className={style.container}>
       {/* header panel */}
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
-        <ContractList contractList={fakeBudgetList} searchObj={searchObj} />
+        <ContractList contractArr={contractArr} />
       </div>
     </div>
   );

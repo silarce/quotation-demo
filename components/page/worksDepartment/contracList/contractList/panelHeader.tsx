@@ -10,20 +10,45 @@ import style from '../contractList.module.scss';
 import iconPlace from 'public/image/icon/place.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-//  type
-import { Tbudget } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+type TtheadInfo = {
+  quotationNumber: string;
+  customerName: string;
+  contactName: string;
+  contactNumber: string;
+  agentName: string;
+  discount: string;
+  doorQty: string;
+  totalPrice: string;
+  date: string;
+  county: string;
+  projectName: string;
+};
 
+// ===============================================================
+export type { TtheadInfo };
+
+// ===============================================================
 export default function PanelHeader({
   contract,
   isActive,
   openQuotation,
 }: {
-  contract: Tbudget;
+  contract: TtheadInfo;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
 }) {
-  const { quotationId, clientName, contactName, contactPhone, undertaker, discount, doorQty, budgetAmount } = contract;
-  const { date, country, projectName } = contract;
+  const {
+    //
+    quotationNumber: quotationId,
+    customerName: clientName,
+    contactName,
+    contactNumber: contactPhone,
+    agentName: undertaker,
+    discount,
+    doorQty,
+    totalPrice: budgetAmount,
+  } = contract;
+  const { date, county: country, projectName } = contract;
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive}>

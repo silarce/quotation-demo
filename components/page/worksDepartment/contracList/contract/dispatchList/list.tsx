@@ -1,21 +1,19 @@
 // global
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
-
 // css
 import style from './dispatchList.module.scss';
 
-// fake
-import { TfakeDispatch } from 'pages/worksDepartment/contractList/contract/dispatchList';
+type Tdispatch_simple = {
+  dispatchDate: string;
+  workerName: string;
+  tasks: string;
+};
 
-export default function List({
-  list,
-  setList,
-}: {
-  list: TfakeDispatch[];
-  setList: Dispatch<SetStateAction<TfakeDispatch[]>>;
-}) {
+export type { Tdispatch_simple };
+// ===========================================================
+
+export default function List({ list }: { list: Tdispatch_simple[] }) {
   return (
     <div className={style.list}>
       <div className={style.thead}>
@@ -52,9 +50,9 @@ export default function List({
 
 // ==================================================
 
-type TindexKey01 = keyof Pick<TfakeDispatch, '日期' | '工務人員' | '辦理事項'>;
+type TindexKey01 = keyof Pick<Tdispatch_simple, 'dispatchDate' | 'workerName' | 'tasks'>;
 
-const indexKeys01: TindexKey01[] = ['日期', '工務人員', '辦理事項'];
+const indexKeys01: TindexKey01[] = ['dispatchDate', 'workerName', 'tasks'];
 
 type Tconfig<keys extends string> = {
   [key in keys]: {
@@ -63,13 +61,13 @@ type Tconfig<keys extends string> = {
 };
 
 const config01: Tconfig<TindexKey01> = {
-  日期: {
+  dispatchDate: {
     label: '日期',
   },
-  工務人員: {
+  workerName: {
     label: '工務人員',
   },
-  辦理事項: {
+  tasks: {
     label: '辦理事項',
   },
 };

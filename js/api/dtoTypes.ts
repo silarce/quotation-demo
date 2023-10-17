@@ -1727,3 +1727,150 @@ export type TsubmitReviewQotuationContentDto = {
   reviewSupervisorEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
 };
+
+// =========================================================================
+
+// engineering
+
+export type TengineeringContactDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractNumber: string;
+  /**請款狀態 */
+  paymentStatus: string;
+  projectName: string;
+  /**工程內容 */
+  projectContent: string;
+  county: string;
+  district: string;
+  address: string;
+  /**工程負責人 */
+  projectPerson: string;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber: string;
+  projectFaxNumber: string;
+  /**工地電話 */
+  projectNumber: string;
+  /**工程編號 */
+  engineeringNumber: string;
+  /**承包商 */
+  contractor: string;
+  /**負責人 */
+  principal: string;
+  /**公司電話 */
+  contactNumber: string;
+  faxNumber: string;
+  /**備註列表 */
+  annotations: string[] | null;
+  contractId?: string | null;
+  contract?: TquotationContractDto | null;
+  quotationId?: string | null;
+  quotation?: TquotationDto | null;
+};
+
+export type TupdateEngineeringContactDto = {
+  /**合約編號 */
+  contractNumber?: string;
+  /**請款狀態 */
+  paymentStatus?: string;
+  projectName?: string;
+  /**工程內容 */
+  projectContent?: string;
+  county?: string;
+  district?: string;
+  address?: string;
+  /**工程負責人 */
+  projectPerson?: string;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber?: string;
+  faxNumber?: string;
+  /**備註列表 */
+  annotaion?: string[] | null;
+  /**工地電話 */
+  projectNumber?: string;
+};
+
+export type TcreateEngineeringContactDto = {
+  quotationId?: string | null; // 報價單ID
+  contractId?: string | null; // 合約ID
+};
+
+export type TdispatchingDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 派工日期
+  dispatchDate: string;
+  // 工程名稱
+  projectName: string;
+  // 承包商;
+  contractor: string;
+  // 聯絡人;
+  // 未來會改為contact
+  content: string;
+  // 工地電話;
+  contactNumber: string;
+  // 工程縣市;
+  county: string;
+  // 工程區;
+  district: string;
+  // 工程詳細地址;
+  address: string;
+  // 工程編號;
+  projectNumber: string;
+  // 管制卡編號;
+  badgeNumber: string;
+  // 工務人員;
+  workerName: string;
+  // 完工聯絡人;
+  finalContact: string;
+  // 辦理事項;
+  tasks: string;
+  // 派工批價方式;
+  pricingMethod: string;
+  // 備註下次注意事項;
+  note: string | null;
+  // 所屬合約Id;
+  contractId: string | null;
+  contract: TquotationContractDto | null;
+  quotationId: string | null;
+  quotation?: TquotationDto | null;
+};
+
+export type TcreateDispatchingDto = {
+  // 合約id
+  contractId: string;
+  // 派工日期;
+  dispatchDate: string;
+  // 工程名稱;
+  projectName: string;
+  // 承包商;
+  contractor: string;
+  // 聯絡人;
+  // 未來會改為contact
+  // contact: string;
+  content: string;
+  // 工地電話;
+  contactNumber: string;
+  // 工程縣市;
+  county: string;
+  // 工程區;
+  district: string;
+  // 工程詳細地址;
+  address: string;
+  // 工程編號;
+  projectNumber: string;
+  // 管制卡編號;
+  badgeNumber: string;
+  // 工務人員
+  workerName: string;
+  // 完工聯絡人
+  finalContact: string;
+  // 辦理事項
+  tasks: string;
+  // 派工批價方式
+  pricingMethod: string;
+  // 備註下次注意事項
+  note: string | null;
+};

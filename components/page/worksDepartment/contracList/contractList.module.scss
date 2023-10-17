@@ -82,6 +82,7 @@ div.panelHeader {
 }
 
 div.panelBody {
+  min-height: 82px;
   .detailRow {
     display: grid;
     grid-template-columns: 110px auto 65px 28px 85px 20px;
