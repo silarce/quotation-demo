@@ -5,9 +5,8 @@ import { useRouter } from 'next/router';
 // css
 import style from './powerTransmissionSpareList.module.scss';
 
-export default function Sheet({ editable }: { editable: boolean }) {
+export default function Sheet({ editable, isAdd }: { editable: boolean; isAdd?: boolean }) {
   const router = useRouter();
-  const isAdd = router.route.split('/').pop() === 'add';
 
   return (
     <div className={style.sheet}>
@@ -57,7 +56,6 @@ export default function Sheet({ editable }: { editable: boolean }) {
                 if (type === 'subCell') {
                   const { label, subKeys, subConfig } = c3Config[c2Key].config[c3Key];
                   const rSpan = subKeys!.length;
-                  console.log(rSpan);
 
                   return (
                     <Fragment key={c3Index}>
@@ -265,8 +263,8 @@ const c3Config: {
         subKeys: ['a', 'b', 'c', 'd', 'e', 'f'],
         subConfig: {
           a: { label: '3HP 馬達控制箱（380V）' },
-          b: { label: '3HP 馬達控制箱（380V）' },
-          c: { label: '2HP 馬達控制箱（220V）' },
+          b: { label: '2HP 馬達控制箱（380V）' },
+          c: { label: '3HP 馬達控制箱（220V）' },
           d: { label: '2HP 馬達控制箱（220V）' },
           e: { label: '彈射門控制箱' },
           f: { label: '紅外線控制盤（含面板）' },

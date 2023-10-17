@@ -66,7 +66,7 @@ export default function Edit() {
 
       <div className={`${style.mainContainer}`}>
         <div className={style.powerTransmissionSpareList}>
-          <Profile data={profile} setData={setProfile} editable={editable} />
+          <Profile data={profile} setData={setProfile} disabled={editable} />
           <Sheet editable={editable} />
           <Signature signature={signature} setSignature={setSignature} editable={editable} />
         </div>

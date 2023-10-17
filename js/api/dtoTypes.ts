@@ -1944,7 +1944,16 @@ export type TelectronicSuppliesDto = {
 
 export type TcreateElectronicSuppliesDto = Omit<
   TelectronicSuppliesDto,
-  'id' | 'createdAt' | 'updatedAt' | 'contractId' | 'contract' | 'quotationId' | 'quotation'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'contractId'
+  | 'contract'
+  | 'quotationId'
+  | 'quotation'
+  | 'materialHandler'
+  | 'ingredientTechnician'
+  | 'formCompleter'
 >;
 
 export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
