@@ -207,18 +207,18 @@ const sidePathList: TsidePathList = {
           path: path01 + '/productList',
           erpFeature: devPass,
         },
-        {
-          label: '備註列表',
-          path: path01 + '/annotationList',
-          // erpFeature: [BasicDataCreation],
-          erpFeature: [domestic],
-        },
-        {
-          label: '報價範圍列表',
-          path: path01 + '/quotationRanges',
-          // erpFeature: [BasicDataCreation],
-          erpFeature: [domestic],
-        },
+        // {
+        //   label: '備註列表',
+        //   path: path01 + '/annotationList',
+        //   // erpFeature: [BasicDataCreation],
+        //   erpFeature: [domestic],
+        // },
+        // {
+        //   label: '報價範圍列表',
+        //   path: path01 + '/quotationRanges',
+        //   // erpFeature: [BasicDataCreation],
+        //   erpFeature: [domestic],
+        // },
       ],
     };
   })(),
@@ -332,6 +332,18 @@ const sidePathList: TsidePathList = {
               erpFeature: [statisticsTable],
             },
           ],
+        },
+        {
+          label: '備註列表',
+          path: path01 + '/annotationList',
+          // erpFeature: [BasicDataCreation],
+          erpFeature: [domestic],
+        },
+        {
+          label: '報價範圍列表',
+          path: path01 + '/quotationRanges',
+          // erpFeature: [BasicDataCreation],
+          erpFeature: [domestic],
         },
       ],
     };
