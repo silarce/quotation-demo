@@ -35,12 +35,12 @@ export default function Signature({
   controll,
   // signature,
   // setSignature,
-  editable,
+  disabled,
 }: {
   controll: Tcontroll;
   // signature: Partial<Tsignature>;
   // setSignature: Dispatch<SetStateAction<Partial<Tsignature>>>;
-  editable: boolean;
+  disabled?: boolean;
 }) {
   const [showMaterialHandler, setShowMaterialHandler] = useState(false);
   const [showiIngredientTechnician, setShowIngredientTechnician] = useState(false);
@@ -71,7 +71,7 @@ export default function Signature({
                 value,
               }}
               placeholder={placeholder}
-              disabled={true}
+              disabled={disabled}
               showBaseline="auto"
             />
           </div>

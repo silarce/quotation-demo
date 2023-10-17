@@ -294,3 +294,13 @@ export const useElectronicSupplies_infinite = ({ customParams }: { customParams?
     reset,
   };
 };
+
+/**新增送電備品表 */
+export const apiPostElectronicSupplies = async (body: TcreateElectronicSuppliesDto) => {
+  const api = '/engineering/electronic-supplies';
+
+  return axi
+    .post<TelectronicSuppliesDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
