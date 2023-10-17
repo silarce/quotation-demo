@@ -140,13 +140,43 @@ type TgetElectronicSupplies = {
 };
 
 /**取得送電備品列表 */
-export const apiGetElectronicSupplies = async (params: Tparams) => {
+export const apiGetElectronicSupplies = async (params?: Tparams) => {
   const api = `/engineering/electronic-supplies`;
 
   return axi
     .get<TgetElectronicSupplies>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+export const useGetElectronicSupplies = (customParams?: Tparams) => {
+  const [res, setRes] = useState<TgetElectronicSupplies>();
+
+  const params = {
+    populate: [
+      'contractId',
+      //  'contract',
+      'quotationId',
+      //  'quotation'
+    ],
+    ...customParams,
+  };
+
+  const update = async () => {
+    const newRes = await apiGetElectronicSupplies(params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
 };
 
 export const useElectronicSupplies_infinite = ({ customParams }: { customParams?: Tparams } = {}) => {
@@ -166,7 +196,7 @@ export const useElectronicSupplies_infinite = ({ customParams }: { customParams?
   // ----------------------------------------------------------------
   const defaultParams = {
     page,
-    // populate: [],
+    populate: ['contract'],
   };
   // ----------------------------------------------------------------
 
