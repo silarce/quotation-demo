@@ -15,6 +15,10 @@
  * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
+ * 
+
+  WG === fullWidth-gapA-gapC
+
  */
 
 import _ from 'lodash';
@@ -560,6 +564,10 @@ class Class_product {
 
       return false;
     }
+
+    // 計算出WG
+
+    this._prodData.WG = String((Number(this._prodData.fullWidth) * 1000 - res.gapA - res.gapC) / 1000);
 
     //
     const defaultMotorIndex = res.defaultMotorIndex;
@@ -1521,14 +1529,30 @@ class Class_product {
 
     this._prodData.WG = v;
     // this._prodData.fullWidth = '0';
-    this.area = this.calcArea();
+    // this.area = this.calcArea();
 
-    this.calcChangeAccePrice();
+    // this.calcChangeAccePrice();
 
-    this.clearProd();
+    // this.clearProd();
 
-    this.shouldCall_cgs = true;
-    this.callAllReq();
+    // this.shouldCall_cgs = true;
+    // this.callAllReq();
+
+    const callReq = async () => {
+      const fullWidth = await calcFullwidthWithWG({
+        body: {
+          modelName: this.doorType as TpcgsPrams['modelName'],
+          height: Number(this.height) * 1000,
+          isAntiTyphoon: this.typhoonProtection,
+          WG: Number(this.WG) * 1000,
+        },
+      });
+
+      this._prodData.fullWidth = String(fullWidth / 1000);
+      this.reRender();
+    };
+
+    callReq();
 
     this.reRender();
   }
@@ -2523,6 +2547,44 @@ const reqGetComAndAcce = async (id: string | undefined) => {
   } else {
     return {};
   }
+};
+
+const calcFullwidthWithWG = async ({
+  body,
+}: {
+  body: {
+    modelName: TpcgsPrams['modelName'];
+    height: number; // 單位為mm
+    isAntiTyphoon: boolean;
+    // fullWidth?:undefined
+    WG: number; // 單位為mm
+  };
+}) => {
+  try {
+    const res = await apiGetProdCalcGeneralSpec(body);
+    const { gapA, gapC } = res;
+
+    const fullWidth = gapA + gapC + body.WG;
+
+    return fullWidth;
+  } catch (error) {
+    return 0;
+  }
+};
+
+const calcLW = ({ fullWidth, WG }: { fullWidth?: number; WG?: number }) => {
+  if (fullWidth) {
+    WG = WG ?? 0;
+  }
+
+  if (WG) {
+    fullWidth = fullWidth ?? 0;
+  }
+
+  return {
+    fullWidth,
+    WG,
+  };
 };
 
 // ===========================================================
