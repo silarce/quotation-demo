@@ -131,9 +131,9 @@ export default function MemoList() {
       clearAnno();
     } catch (err) {
       myAlert.err({ title: '上傳失敗' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // ------------------------------------------------------------------------

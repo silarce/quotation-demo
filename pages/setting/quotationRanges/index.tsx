@@ -129,9 +129,9 @@ export default function QuotationRanges() {
       clearRange();
     } catch (err) {
       myAlert.err({ title: '上傳失敗' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // ------------------------------------------------------------------------
