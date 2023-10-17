@@ -24,6 +24,9 @@
       > .input02:nth-last-of-type(1) {
         grid-column: span 2;
       }
+      > label:nth-last-of-type(1) {
+        grid-column: span 2;
+      }
     }
   }
   .rightBlock {

@@ -552,58 +552,35 @@ const useProductList = ({
   // 追加追減close
   // ---------------------------------------------------------
 
-  type TannoList = { [key: string]: string[] };
-
-  const [annoList, setAnnoList] = useState<TannoList>({});
-  const [qrList, setQrList] = useState<TannoList>({});
-
-  // 似乎是成功了，明天繼續做qr的部分
-  // 我忘了如果使用者變更了anno的話怎麼辦
-  // 每次編輯doorType都要呼叫api，不檢查是否之前有呼叫過
-  // 然橫送進onDoorTypeChange
-  // 在onDoorTypeChange，做法跟annoShouldRemove一樣，移除舊有的，然後放入新的
+  const [annoArr, setAnnoArr] = useState<string[]>([]);
+  const [qrArr, setQrArr] = useState<string[]>([]);
 
   const onClassDoorTypeChange = async ({
     //
-    oldDoorType,
+    // oldDoorType,
     newDoorType,
+    // oldIsAntiTyphoon,
+    newIsAntiTyphoon,
   }: {
-    oldDoorType: string;
+    // oldDoorType: string;
     newDoorType: string;
+    // oldIsAntiTyphoon: boolean;
+    newIsAntiTyphoon: boolean;
   }) => {
     if (!onDoorTypeChange) {
       return;
     }
 
-    const annoList_copy = { ...annoList };
-    const qrList_copy = { ...qrList };
-    const typeNameList: { [key: string]: string } = {};
+    const type = newIsAntiTyphoon ? 'anti-typhoon' : 'normal';
 
-    let annoShouldRemove;
-    let qrShouldRemove;
+    const annoShouldRemove = [...annoArr];
+    const qrShouldRemove = [...qrArr];
 
-    Object.values(productList).forEach((prod) => {
-      if (prod.doorType) {
-        typeNameList[prod.doorType] = prod.doorType;
-      }
-    });
+    const newAnnoArr = (await getAnno({ doorModelName: newDoorType, type })) ?? [];
+    const newQrArr = (await getQr({ doorModelName: newDoorType, type })) ?? [];
 
-    const typeNameArr = Object.keys(typeNameList);
-
-    if (!typeNameArr.includes(oldDoorType)) {
-      annoShouldRemove = annoList_copy[oldDoorType];
-      delete annoList_copy[oldDoorType];
-      qrShouldRemove = qrList_copy[oldDoorType];
-      delete qrList_copy[oldDoorType];
-    }
-
-    const newAnnoArr = await getAnno({ doorModelName: newDoorType });
-    const newQrArr = await getQr({ doorModelName: newDoorType });
-    annoList_copy[newDoorType!] = newAnnoArr ?? [];
-    qrList_copy[newDoorType!] = newQrArr ?? [];
-
-    setAnnoList(annoList_copy);
-    setQrList(qrList_copy);
+    setAnnoArr(newAnnoArr);
+    setQrArr(newQrArr);
 
     onDoorTypeChange({
       annoShouldRemove,
@@ -659,12 +636,22 @@ const useProductList = ({
   };
 };
 
-const getAnno = async ({ doorModelName }: { doorModelName: string | undefined }) => {
+const getAnno = async ({
+  //
+  doorModelName,
+  type,
+}: {
+  doorModelName: string | undefined;
+  type: string | undefined;
+}) => {
   const params = {
     pageSize: 9999,
     filter: {
       doorModelName: {
         $eq: doorModelName,
+      },
+      type: {
+        $eq: type,
       },
     },
   };
@@ -689,12 +676,22 @@ const getAnno = async ({ doorModelName }: { doorModelName: string | undefined })
   }
 };
 
-const getQr = async ({ doorModelName }: { doorModelName: string | undefined }) => {
+const getQr = async ({
+  //
+  doorModelName,
+  type,
+}: {
+  doorModelName: string | undefined;
+  type: string | undefined;
+}) => {
   const params = {
     pageSize: 9999,
     filter: {
       doorModelName: {
         $eq: doorModelName,
+      },
+      type: {
+        $eq: type,
       },
     },
   };

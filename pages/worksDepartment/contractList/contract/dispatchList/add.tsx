@@ -1,37 +1,186 @@
 // 新增派工單
-
-import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+
+// layout
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-import Profile from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
-import EditDispatch from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
+import Profile, {
+  Tprofile01,
+  Tprofile02,
+} from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
+import EditDispatch, {
+  Tcontroll as Tcontroll_EeditDispatch,
+} from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
+
+// gear
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+// api
+import { apiPostEngineeringDispatching, TcreateDispatchingDto } from 'js/api/api_engineering';
+
 // css
-import style from './dispatchList.module.scss';
+import scss from './dispatchList.module.scss';
 
 export default function AddDispatchList() {
-  const [isReady, setIsReady] = useState(false);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   // ---------------------------------------------------------
-  const [profile, setProfile] = useState<Partial<TfakeProfile>>({});
-  const [profile02, setProfile02] = useState<TdispatchEmpty>(fakeProfile02EmptyOri());
+  const [profile01, setProfile01] = useState<Tprofile01>();
+  const [profile02, setProfile02] = useState<Tprofile02>();
+
+  const onProfile01Change = (key: keyof Tprofile01, v: string) => {
+    if (!profile01) {
+      return;
+    }
+
+    const newProfile = { ...profile01 };
+    newProfile[key] = v;
+    setProfile01(newProfile);
+  };
+
+  const onProfile02Change = (key: keyof Tprofile02, v: string) => {
+    if (!profile02) {
+      return;
+    }
+
+    const newProfile = { ...profile02 };
+    newProfile[key] = v;
+    setProfile02(newProfile);
+  };
+
+  // ---------------------------------------------------------
+
+  const [editDispatch, setEditDispatch] = useState<{
+    tasks: string;
+    note: string;
+    pricingMethod: string;
+  }>();
+
+  const controll_editDispatch: Tcontroll_EeditDispatch = {
+    tasks: {
+      value: editDispatch?.tasks ?? '',
+      onChange: (v: string) => {
+        console.log(v);
+
+        setEditDispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.tasks = v;
+
+          return { ...data };
+        });
+      },
+    },
+    note: {
+      value: editDispatch?.note ?? '',
+      onChange: (v: string) => {
+        setEditDispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.note = v;
+
+          return { ...data };
+        });
+      },
+    },
+    pricingMethod: {
+      value: editDispatch?.pricingMethod ?? '',
+      subValue: (() => {
+        // 修理費用
+        const value = editDispatch?.pricingMethod ?? '';
+        let subValue = '';
+
+        if (value.includes('修理費用')) {
+          subValue = value.split('修理費用').pop() ?? '';
+        }
+
+        return subValue;
+      })(),
+      onChange: (v: string) => {
+        setEditDispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.pricingMethod = v;
+
+          return { ...data };
+        });
+      },
+    },
+  };
+
+  // ---------------------------------------------------------
 
   useEffect(() => {
-    setProfile(fakeProfileOri((router.query.contractId as string) ?? ''));
-    setProfile02(fakeProfile02EmptyOri());
-    setIsReady(true);
+    setProfile01({
+      projectName: '測試',
+      contractor: '測試',
+      contact: '測試',
+      contactNumber: '04-12345678',
+      allAddress: '測試',
+      projectNumber: '測試',
+      badgeNumber: '',
+    });
+    setProfile02({
+      dispatchDate: '',
+      workerName: '',
+      finalContact: '',
+    });
+    setEditDispatch({
+      tasks: '',
+      note: '',
+      pricingMethod: '',
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ---------------------------------------------------------
+
+  const reqPost = async () => {
+    if (!profile01 || !profile02 || !editDispatch) {
+      return;
+    }
+
+    const body: TcreateDispatchingDto = {
+      // 合約id
+      contractId: 'e298fbc5-78e3-4bfc-a6ff-53c2bbfae83a',
+      ...profile01,
+      ...profile02,
+      ...editDispatch,
+      county: '臺中市',
+      district: '大安區',
+      address: '小馬路',
+      content: profile01.contact,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPostEngineeringDispatching(body);
+      myAlert.success({ title: '新增派工單成功' });
+      router.back();
+    } catch (error) {
+      myAlert.err({ title: '新增派工單失敗' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // ---------------------------------------------------------
   const panelList: TpanelList = [
     {
       type: 'redButton',
       label: '建立',
-      onClick: () => {
-        alert('建立派工單會在串接api後製作');
-      },
+      onClick: reqPost,
     },
     {
       type: 'myButton',
@@ -41,59 +190,23 @@ export default function AddDispatchList() {
   ];
 
   // ---------------------------------------------------------
-  if (!isReady) {
-    return null;
-  }
 
   // ---------------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} />
-      <div className={style.mainContainer}>
-        <div className={style.add}>
-          {profile && (
-            <Profile profile={profile} setProfile={setProfile} profile02={profile02} setProfile02={setProfile02} />
-          )}
+      <div>
+        <div className={scss.add}>
+          <Profile
+            profile01={profile01}
+            onProfile01Change={onProfile01Change}
+            profile02={profile02}
+            onProfile02Change={onProfile02Change}
+          />
           <hr />
-          <EditDispatch />
+          <EditDispatch controll={controll_editDispatch} />
         </div>
       </div>
-    </div>
+    </SubLayer>
   );
 }
-
-// =========================================================
-// 假資料，為了開發方便容易辨識，
-// 暫時先用中文變數
-export type TfakeProfile = {
-  工程名稱: string;
-  承包商: string;
-  聯絡人: string;
-  工地電話: string;
-  工程地點: string;
-  工程編號: string;
-  管制卡編號: string;
-};
-
-const fakeProfileOri = (工程編號: string): TfakeProfile => ({
-  工程名稱: '台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程',
-  承包商: '創典科技A有限公司',
-  聯絡人: '林先生',
-  工地電話: '04-1234567',
-  工程地點: '臺中市梧棲區經二路27號',
-  工程編號: 工程編號,
-  管制卡編號: '',
-});
-// =====================================
-
-export type TdispatchEmpty = {
-  派工日期: string;
-  工務人員: string;
-  完工聯絡人: string;
-};
-
-const fakeProfile02EmptyOri = (): TdispatchEmpty => ({
-  派工日期: '',
-  工務人員: '',
-  完工聯絡人: '',
-});

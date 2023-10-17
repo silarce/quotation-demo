@@ -10,9 +10,11 @@ export type { TpanelList };
 export default function PageHeader({
   tagCallback,
   panelList,
+  contractNumber = '未取得',
 }: {
   tagCallback?: (contractId: string) => string;
   panelList?: TpanelList;
+  contractNumber?: string;
 }) {
   const router = useRouter();
   const isReady = router.isReady;
@@ -23,7 +25,7 @@ export default function PageHeader({
 
   const { contractId } = router.query;
 
-  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號${contractId}`;
+  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號 ${contractNumber}`;
 
   const pathHead = `/worksDepartment/contractList/contract`;
   const linkList = [
@@ -36,6 +38,7 @@ export default function PageHeader({
     },
     {
       label: '工作表',
+      disabled: true,
       href: {
         pathname: `${pathHead}/workSheet`,
         query: { contractId },
@@ -43,6 +46,7 @@ export default function PageHeader({
     },
     {
       label: '出庫單',
+      disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
         query: { contractId },
@@ -50,6 +54,7 @@ export default function PageHeader({
     },
     {
       label: '應收帳款明細',
+      disabled: true,
       href: {
         pathname: `${pathHead}/accountsReceivableDetails`,
         query: { contractId },
@@ -71,6 +76,7 @@ export default function PageHeader({
     },
     {
       label: '調(退)貨單列表',
+      disabled: true,
       href: {
         pathname: `${pathHead}/listOfDeliveryOrders`,
         query: { contractId },
@@ -78,6 +84,7 @@ export default function PageHeader({
     },
     {
       label: '備忘錄',
+      disabled: true,
       href: {
         pathname: `${pathHead}/memorandum`,
         query: { contractId },

@@ -6,18 +6,23 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import style from '../contractList.module.scss';
 
-//  type
-import { TbudgetDetail } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
+type Tdetail = {
+  date: string;
+  describe: string;
+  discount: string;
+  doorQty: string;
+  contractAmount: string;
+  onIconClick: () => void;
+};
 
-export default function PanelBody({ contractDetail }: { contractDetail: TbudgetDetail[] }) {
-  const onClick = () => {
-    alert('目前無功能');
-  };
+export type { Tdetail };
 
+// =======================================================================
+export default function PanelBody({ contractDetailArr }: { contractDetailArr: Tdetail[] }) {
   return (
     <div className={style.panelBody}>
-      {contractDetail.map((item, index) => {
-        const { date, describe, discount, doorQty, contractAmount } = item;
+      {contractDetailArr.map((item, index) => {
+        const { date, describe, discount, doorQty, contractAmount, onIconClick } = item;
 
         return (
           <CellWithBar className={style.detailRow} key={index}>
@@ -27,7 +32,7 @@ export default function PanelBody({ contractDetail }: { contractDetail: TbudgetD
             <span>{doorQty}</span>
             <span>{contractAmount}</span>
             <div>
-              <IconDetail onClick={onClick} />
+              <IconDetail onClick={onIconClick} />
             </div>
           </CellWithBar>
         );

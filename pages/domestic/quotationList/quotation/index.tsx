@@ -4,7 +4,7 @@
  * reqUpdateQuotation
  * useGetQuotation_id
  * fileInfoArr
- * reqReview 送審
+ * reqReview 審核
  *
  */
 // =============================================================
@@ -167,17 +167,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       }
 
-      // 先把重複的拿掉，再把新的放進去
+      // 把新的放進去，並拿掉重複的值
       if (annoArr) {
-        annoArr.forEach((asmStr) => {
-          const delIndex = annoCopy.findIndex((str) => asmStr === str);
-
-          if (delIndex > -1) {
-            annoCopy.splice(delIndex, 1);
-          }
-        });
-
         annoCopy = [...annoCopy, ...annoArr];
+        annoCopy = [...new Set(annoCopy)];
       }
 
       return annoCopy;
@@ -197,17 +190,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       }
 
-      // 先把重複的拿掉，再把新的放進去
+      // 把新的放進去，並拿掉重複的值
       if (qrArr) {
-        qrArr.forEach((asmStr) => {
-          const delIndex = qrCopy.findIndex((str) => asmStr === str);
-
-          if (delIndex > -1) {
-            qrCopy.splice(delIndex, 1);
-          }
-        });
-
         qrCopy = [...qrCopy, ...qrArr];
+        qrCopy = [...new Set(qrCopy)];
       }
 
       return qrCopy;
@@ -636,6 +622,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
   const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
+  useEffect(() => {
+    if (!latestContent) {
+      return;
+    }
+
+    setReviewSales(latestContent.reviewSalesEmployee || undefined);
+    setReviewSupervisor(latestContent.reviewSupervisorEmployee || undefined);
+    setReviewWorkDirector(latestContent.reviewWorkDirectorEmployee || undefined);
+  }, [latestContent]);
+
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
@@ -769,7 +765,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const empSelLookup = {
     reviewSales: {
       label: '請選擇審核業務',
-      // tip: '可不選，直接按確定',
+      // tip: '可不選，直接按確定',\
+      employee: reviewSales,
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewSales(v[0]);
@@ -790,6 +787,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reviewSupervisor: {
       label: '請選擇業務主管',
       // tip: '可不選，直接按確定',
+      employee: reviewSupervisor,
       onCancel: onEmpSelCancel,
       onConfirm: async (v: TemployeeDto[]) => {
         setReviewSupervisor(v[0]);
@@ -802,6 +800,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reviewWorkDirector: {
       label: '請選擇應收帳款',
       // tip: '可不選，直接按確定',
+      employee: reviewWorkDirector,
       onCancel: onEmpSelCancel,
       onConfirm: (v: TemployeeDto[]) => {
         setReviewWorkDirector(v[0]);
@@ -816,6 +815,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     undefined: {
       label: '',
       tip: '',
+      employee: undefined,
       onCancel: () => {},
       onConfirm: () => {},
     },
@@ -823,7 +823,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  // ---------------------------------------------------------
   const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
 
   const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
@@ -1489,6 +1488,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
         selLimit={1}
+        defaultEmpArr={
+          empSelLookup[empSelConfirmKey]?.employee ? [empSelLookup[empSelConfirmKey].employee!] : undefined
+        }
       />
       {/* 合約審核表 */}
       <ContractReviewForm

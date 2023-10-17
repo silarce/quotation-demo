@@ -1,6 +1,7 @@
 import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import classNames from 'classnames';
 
 // type
 import { UrlObject } from 'url';
@@ -17,6 +18,7 @@ interface Ttag {
 interface Tlink {
   label: string;
   href: string | UrlObject;
+  disabled?: boolean;
 }
 
 export default function PageHeaderFlex01({
@@ -79,7 +81,7 @@ export default function PageHeaderFlex01({
     return (
       <>
         {linkList.map((config, index) => {
-          const { label, href } = config;
+          const { label, href, disabled } = config;
           let hrefPathname: string;
 
           if (typeof href === 'string') {
@@ -89,10 +91,21 @@ export default function PageHeaderFlex01({
           }
 
           const reg = new RegExp(`^${hrefPathname}`);
-          const isActive = reg.test(router.pathname) ? style.active : '';
+          const isActive = reg.test(router.pathname);
+
+          console.log(disabled);
+
+          if (disabled) {
+            return (
+              <span className={style.fakeA} key={index}>
+                <span>{label}</span>
+                <hr className={style.bottomBar} />
+              </span>
+            );
+          }
 
           return (
-            <Link className={isActive} href={href} key={index}>
+            <Link className={classNames(isActive && style.active)} href={href} key={index}>
               <span>{label}</span>
               <hr className={style.bottomBar} />
             </Link>

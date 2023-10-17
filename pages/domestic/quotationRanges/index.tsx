@@ -7,7 +7,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // component
-import Table_quotationRanges from 'components/page/setting/quotationRanges/table_quotationRanges';
+import Table_quotationRanges from 'components/page/domestic/quotationRanges/table_quotationRanges';
 
 // glogal gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -129,9 +129,9 @@ export default function QuotationRanges() {
       clearRange();
     } catch (err) {
       myAlert.err({ title: '上傳失敗' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // ------------------------------------------------------------------------

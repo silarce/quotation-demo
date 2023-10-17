@@ -1727,3 +1727,224 @@ export type TsubmitReviewQotuationContentDto = {
   reviewSupervisorEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
 };
+
+// =========================================================================
+
+// engineering
+
+export type TengineeringContactDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractNumber: string;
+  /**請款狀態 */
+  paymentStatus: string;
+  projectName: string;
+  /**工程內容 */
+  projectContent: string;
+  county: string;
+  district: string;
+  address: string;
+  /**工程負責人 */
+  projectPerson: string;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber: string;
+  projectFaxNumber: string;
+  /**工地電話 */
+  projectNumber: string;
+  /**工程編號 */
+  engineeringNumber: string;
+  /**承包商 */
+  contractor: string;
+  /**負責人 */
+  principal: string;
+  /**公司電話 */
+  contactNumber: string;
+  faxNumber: string;
+  /**備註列表 */
+  annotations: string[] | null;
+  contractId?: string | null;
+  contract?: TquotationContractDto | null;
+  quotationId?: string | null;
+  quotation?: TquotationDto | null;
+};
+
+export type TupdateEngineeringContactDto = {
+  /**合約編號 */
+  contractNumber?: string;
+  /**請款狀態 */
+  paymentStatus?: string;
+  projectName?: string;
+  /**工程內容 */
+  projectContent?: string;
+  county?: string;
+  district?: string;
+  address?: string;
+  /**工程負責人 */
+  projectPerson?: string;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber?: string;
+  faxNumber?: string;
+  /**備註列表 */
+  annotaion?: string[] | null;
+  /**工地電話 */
+  projectNumber?: string;
+};
+
+export type TcreateEngineeringContactDto = {
+  quotationId?: string | null; // 報價單ID
+  contractId?: string | null; // 合約ID
+};
+
+export type TdispatchingDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 派工日期
+  dispatchDate: string;
+  // 工程名稱
+  projectName: string;
+  // 承包商;
+  contractor: string;
+  // 聯絡人;
+  // 未來會改為contact
+  content: string;
+  // 工地電話;
+  contactNumber: string;
+  // 工程縣市;
+  county: string;
+  // 工程區;
+  district: string;
+  // 工程詳細地址;
+  address: string;
+  // 工程編號;
+  projectNumber: string;
+  // 管制卡編號;
+  badgeNumber: string;
+  // 工務人員;
+  workerName: string;
+  // 完工聯絡人;
+  finalContact: string;
+  // 辦理事項;
+  tasks: string;
+  // 派工批價方式;
+  pricingMethod: string;
+  // 備註下次注意事項;
+  note: string | null;
+  // 所屬合約Id;
+  contractId: string | null;
+  contract: TquotationContractDto | null;
+  quotationId: string | null;
+  quotation?: TquotationDto | null;
+};
+
+export type TcreateDispatchingDto = {
+  // 合約id
+  contractId: string;
+  // 派工日期;
+  dispatchDate: string;
+  // 工程名稱;
+  projectName: string;
+  // 承包商;
+  contractor: string;
+  // 聯絡人;
+  // 未來會改為contact
+  // contact: string;
+  content: string;
+  // 工地電話;
+  contactNumber: string;
+  // 工程縣市;
+  county: string;
+  // 工程區;
+  district: string;
+  // 工程詳細地址;
+  address: string;
+  // 工程編號;
+  projectNumber: string;
+  // 管制卡編號;
+  badgeNumber: string;
+  // 工務人員
+  workerName: string;
+  // 完工聯絡人
+  finalContact: string;
+  // 辦理事項
+  tasks: string;
+  // 派工批價方式
+  pricingMethod: string;
+  // 備註下次注意事項
+  note: string | null;
+};
+
+export type TelectronicSuppliesDto = {
+  id: string;
+  createdAt: string; // date
+  updatedAt: string; // date
+  // 填表日期
+  dispatchDate: string; //date
+  // 需要日期
+  requirementsDate: string; //date
+  // 工程編號
+  projectNumber: string;
+  // 工程名稱
+  projectName: string;
+  // 鎻盒種類
+  latchBox: string;
+  // 鎻盒數量
+  latchBoxQuantity: number;
+  // 鎖匙種類
+  key: string;
+  // 鎖匙數量
+  keyQuantity: number;
+  // 壓扣種類
+  latch: string;
+  // 壓扣數量
+  latchQuantity: number;
+  // 控制箱/盤種類
+  controlBox: string;
+  // 控制箱/盤數量
+  controlBoxQuantity: number;
+  // 消防備品種類
+  firefightingSupplies: string;
+  // 消防備品數量
+  firefightingSuppliesQuantity: number;
+  // 板門配件種類
+  doorAccessories: string;
+  // 板門配件數量
+  doorAccessoriesQuantity: number;
+  // 主機種類
+  host: string;
+  // 主機數量
+  hostQuantity: number;
+  // 紅外線種類
+  infrared: string;
+  // 紅外線數量
+  infraredQuantity: number;
+  // 防颱配件種類
+  antiTyphoonSupplies: string;
+  // 防颱配件數量
+  antiTyphoonSuppliesQuantity: number;
+  // 備料人員Id
+  materialHandlerId: string;
+  // 備料人員
+  materialHandler: TemployeeDto;
+  // 配料人員ID
+  ingredientTechnicianId: string;
+  // 配料人員
+  ingredientTechnician: TemployeeDto;
+  //填表人員ID
+  formCompleterId: string;
+  // 填表人員
+  formCompleter: TemployeeDto;
+
+  contractId: string;
+  contract: TquotationContractDto;
+  quotationId: string;
+  quotation: TquotationDto;
+};
+
+export type TcreateElectronicSuppliesDto = Omit<
+  TelectronicSuppliesDto,
+  'id' | 'createdAt' | 'updatedAt' | 'contractId' | 'contract' | 'quotationId' | 'quotation'
+>;
+
+export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;

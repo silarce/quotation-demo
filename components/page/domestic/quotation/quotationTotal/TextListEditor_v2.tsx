@@ -9,18 +9,23 @@ import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/
 // css
 import scss from './TextListEditor_v2.module.scss';
 
+type TstringObj = {
+  stringArr: string[];
+  editString: (index: number, v: string) => void;
+  delString: (index: number) => void;
+  showSelector: () => void;
+  addString: (v: string) => void;
+};
+
+export type { TstringObj };
+
+// ================================================================
 export default function TextListEditor_v2({
   stringObj,
   label,
   disabled,
 }: {
-  stringObj: {
-    stringArr: string[];
-    editString: (index: number, v: string) => void;
-    delString: (index: number) => void;
-    showSelector: () => void;
-    addString: (v: string) => void;
-  };
+  stringObj: TstringObj;
   label: string;
   disabled: boolean;
 }) {
