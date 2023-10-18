@@ -83,17 +83,18 @@ export default function Table({ productList }: { productList: TtableProdList }) 
           if (key === 'doorRail') {
             let svgString;
             let src;
-            console.log(value);
 
-            if (value.startsWith('/_next')) {
-              src = value;
-            } else {
-              const arr = value.split('/');
-              const fileName = arr[arr.length - 1];
+            if (value) {
+              if (value.startsWith('/_next')) {
+                src = value;
+              } else {
+                const arr = value.split('/');
+                const fileName = arr[arr.length - 1];
 
-              getSvg({ fileName: fileName });
+                getSvg({ fileName: fileName });
 
-              svgString = svgList[`${fileName}`] ?? '';
+                svgString = svgList[`${fileName}`] ?? '';
+              }
             }
 
             return (
