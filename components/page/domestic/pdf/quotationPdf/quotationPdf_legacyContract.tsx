@@ -181,7 +181,7 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: 'n',
+        thickness: prod.thickness,
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
