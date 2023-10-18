@@ -2,7 +2,7 @@
 // 工程聯絡單
 // 工程聯絡單
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layout
@@ -15,7 +15,7 @@ import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import WorkProject from 'components/page/worksDepartment/contracList/contract/workContactDoc/workProject';
-import Remark from 'components/page/worksDepartment/contracList/contract/workContactDoc/remark';
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -32,12 +32,20 @@ import {
   TengineeringContactDto,
 } from 'js/api/api_engineering';
 
+import {
+  TquotationProductDto,
+  //
+  useGetContract_id_noItems,
+} from 'js/api/api_quotation';
+
+// hook
+import { useProductList } from 'hooks/quotation/useProduct';
+
 // css
 import scss from './workContactDoc.module.scss';
 
 // type
 import { TgetAnnotation } from 'js/api/api_workSheet';
-import { set } from 'lodash';
 
 // ============================================================================
 type Tquery = {
@@ -73,15 +81,50 @@ export default function WorkContactDoc() {
   const [showAnnoSelector, setShowAnnoSelector] = useState(false);
 
   // ---------------------------------------------------------------------------
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+
+  const productArr = useMemo(() => {
+    const list: { [key: string]: TquotationProductDto } = {};
+    contract?.subContracts.forEach((contract) => {
+      const prodArr = contract.content.products;
+
+      prodArr.forEach((prod) => {
+        list[prod.rootProductId] = prod;
+      });
+    });
+
+    return Object.values(list);
+  }, [contract]);
+
+  const {
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    changeProdKeyArr,
+  } = useProductList({
+    productArr: productArr,
+    others: [],
+    resetTrigger: productArr,
+  });
+
+  // ---------------------------------------------------------------------------
 
   /**data裡只會有一筆資料 */
-  const { data: engineeringContact, update } = useGetEngineeringContact(contractId);
-  // const engineeringContact = data;
+  const { data: engineeringContact, update: update_engineeringContact } = useGetEngineeringContact(contractId);
 
   useEffect(() => {
     (async () => {
       try {
-        await update();
+        await update_contract();
+      } catch (error) {
+        myAlert.err({ title: '取得合約資料失敗' });
+      }
+    })();
+
+    (async () => {
+      try {
+        await update_engineeringContact();
       } catch (error) {
         myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
       }
@@ -372,7 +415,7 @@ export default function WorkContactDoc() {
     try {
       setIsLoading(true);
       await apiPatchEngineeringContact(engineeringContact.id, body);
-      await update();
+      await update_engineeringContact();
       setDisabled(true);
     } catch (error) {
       myAlert.err({ title: '更新工程聯絡單失敗' });
@@ -406,7 +449,16 @@ export default function WorkContactDoc() {
       <div>
         <div>
           <Profile controll={controll} disabled={disabled} />
-          <WorkProject />
+          {/* <WorkProject /> */}
+          <Table_prod
+            disabled={true}
+            prodList={productList}
+            prodCellConfig={prodCellConfig}
+            prodKeyArr={prodKeyArr}
+            changeProdKeyArr={changeProdKeyArr}
+            addProd={() => {}}
+            setTargetProd={() => {}}
+          />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
             <TextListEditor_v2 label={'備註'} disabled={disabled} stringObj={control_anno} />
@@ -425,29 +477,3 @@ export default function WorkContactDoc() {
     </SubLayer>
   );
 }
-// ===========================================================
-// ===========================================================
-// ===========================================================
-
-// const fakeData: TengineeringContactDto = {
-//   id: '',
-//   createdAt: '',
-//   updatedAt: '',
-//   contractNumber: 'test',
-//   paymentStatus: 'test',
-//   projectName: 'test',
-//   projectContent: 'test',
-//   county: '臺中市',
-//   district: '大安區',
-//   address: '路路路路路路',
-//   projectPerson: 'test',
-//   projectPersonNumber: 'test',
-//   projectFaxNumber: 'test',
-//   projectNumber: 'test',
-//   engineeringNumber: 'test',
-//   contractor: 'test',
-//   principal: 'test',
-//   contactNumber: 'test',
-//   faxNumber: 'test',
-//   annotations: [],
-// };

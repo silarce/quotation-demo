@@ -68,34 +68,34 @@
 }
 
 // ==========================================================
-.remark {
-  margin: 55px 80px 95px 17px;
-  margin-top: 55px;
-  .title {
-    font-weight: 400;
-    font-size: 18px;
-    color: $colorMain;
-    margin: 0;
-    margin-bottom: 15px;
-  }
-  .ul {
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: 8px;
-    > li {
-      display: grid;
-      grid-template-columns: 20px auto;
-      gap: 6px;
-      > span {
-        font-weight: 400;
-        font-size: 16px;
-        &:nth-of-type(1) {
-          margin: auto;
-          margin-top: 0;
-        }
-      }
-    }
-  }
-}
+// .remark {
+//   margin: 55px 80px 95px 17px;
+//   margin-top: 55px;
+//   .title {
+//     font-weight: 400;
+//     font-size: 18px;
+//     color: $colorMain;
+//     margin: 0;
+//     margin-bottom: 15px;
+//   }
+//   .ul {
+//     padding: 0;
+//     margin: 0;
+//     display: grid;
+//     gap: 8px;
+//     > li {
+//       display: grid;
+//       grid-template-columns: 20px auto;
+//       gap: 6px;
+//       > span {
+//         font-weight: 400;
+//         font-size: 16px;
+//         &:nth-of-type(1) {
+//           margin: auto;
+//           margin-top: 0;
+//         }
+//       }
+//     }
+//   }
+// }
 // ==========================================================
