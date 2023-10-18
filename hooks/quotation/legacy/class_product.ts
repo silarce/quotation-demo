@@ -266,7 +266,6 @@ class Class_product {
     this._reRender();
   }
 
-  /** 這個就是B */
   get boxB() {
     return this._boxB;
   }
@@ -538,7 +537,8 @@ class Class_product {
     return {
       ...this._product,
       id: this.id || undefined,
-      closingType: this.closingType || '',
+      closingType: this._product.closingType ?? '',
+      boxB: this._product.boxB ?? 0,
     };
   }
 
@@ -557,6 +557,8 @@ class Class_product {
     return {
       ...copy,
       id: this.id || undefined,
+      closingType: copy.closingType ?? '',
+      boxB: copy.boxB ?? 0,
     };
   }
 }
