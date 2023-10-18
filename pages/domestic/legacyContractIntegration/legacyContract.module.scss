@@ -21,7 +21,7 @@
 .appendList {
   display: grid;
   // grid-template-columns: 50px 110px 90px auto;
-  grid-template-columns: 110px auto;
+  grid-template-columns: 110px 150px auto;
   gap: 16px 25px;
   padding: 23px 30px;
   background-color: theme("colors.bgc01");

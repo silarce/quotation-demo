@@ -499,6 +499,12 @@ export type TlegacyContractDto = {
   latestBatch: number;
   /**附屬合約編號 */
   attachBatchNumbers: string[];
+  priceRecord: {
+    discountRate: string; // 總折數
+    subTotal: string; //小計
+    salesTax: number; // 營業稅
+    total: number; // 總計
+  };
 };
 
 // 舊合約post主產品
