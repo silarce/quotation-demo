@@ -412,8 +412,11 @@ const additionCellConfigCre = (): TadditionCellConfig => {
         label: '複價',
         inputSelPorps: {
           wrapperStyle: { width: '110px' },
+          showBaseline: 'invisible',
           inputProps: {
-            props: {},
+            props: {
+              disabled: true,
+            },
           },
         },
       },
