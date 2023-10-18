@@ -533,6 +533,7 @@ class Class_product {
 
     const copy = _.cloneDeep(this._product);
     copy.quantity = Number(this.remainQty);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
     return {
       ...copy,
