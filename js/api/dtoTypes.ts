@@ -369,7 +369,7 @@ export type TlegacyContractProductDto = {
   /**h(m) */
   height: number;
   /**B(m) */
-  thickness: number;
+  boxB: number;
   /**面積 */
   area: string;
   /**才數 */
@@ -394,6 +394,8 @@ export type TlegacyContractProductDto = {
   bounceDoor: boolean;
   /**備註 */
   notes: string;
+  /**厚度 */
+  thickness: string;
   //
   /**批次 */
   batch: number;
@@ -526,7 +528,7 @@ export type TcreateLegacyContractProductDto = {
   /** h(m) */
   height: number;
   /** B(m) */
-  thickness: number;
+  boxB: number;
   /** 面積 */
   area: string;
   /** 才數 */
@@ -551,6 +553,8 @@ export type TcreateLegacyContractProductDto = {
   bounceDoor: boolean;
   /** 備註 */
   notes: string;
+  /**厚度 */
+  thickness: string;
 };
 
 export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
