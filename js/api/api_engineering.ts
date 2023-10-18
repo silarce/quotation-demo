@@ -5,7 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { axi, domain } from './_axiosCreator';
+import { axi } from './_axiosCreator';
 
 // type
 import type {
@@ -128,12 +128,55 @@ export const useGetEngineeringDispatchingList = (params?: Tparams) => {
   };
 };
 
+/**以 id 取得派工單 DisPatching */
+export const apiGetEngineeringDispatching_id = async (id: string) => {
+  const api = `/engineering/dispatching/${id}`;
+
+  return axi
+    .get<TdispatchingDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetEngineeringDispatching_id = (id: string | undefined) => {
+  const [res, setRes] = useState<TdispatchingDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetEngineeringDispatching_id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
 /**新增派工單 */
 export const apiPostEngineeringDispatching = async (body: TcreateDispatchingDto) => {
   const api = '/engineering/dispatching';
 
   return axi
     .post<TdispatchingDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**更新派工單 */
+export const apiPatchEngineeringDispatching = async (id: string, body: TcreateDispatchingDto) => {
+  const api = `/engineering/dispatching/${id}`;
+
+  return axi
+    .patch<TdispatchingDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

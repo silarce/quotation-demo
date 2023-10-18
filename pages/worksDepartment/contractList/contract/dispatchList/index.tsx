@@ -28,7 +28,7 @@ export default function DispatchList() {
   const { contractId } = router.query as { contractId: string };
   // ----------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
 
   // FIXME 現在後端似乎不會記錄contractId
   const params: Tparams = {
@@ -58,36 +58,41 @@ export default function DispatchList() {
   };
 
   useEffect(() => {
-    if (data_contract) {
+    if (contract) {
+      const dispatching = dispatchingArr?.[0];
+
       setProfile01(() => {
         const {
           projectName,
-          contactPerson,
+          // contactPerson,
           contactNumber,
-          quotationNumber,
+          // quotationNumber,
 
           county,
           district,
           address,
-        } = data_contract.content;
+        } = contract.content;
 
         const allAddress = `${county}${district}${address}`;
 
         return {
           projectName: projectName,
-          contractor: '',
-          contact: contactPerson,
+          contractor: dispatching?.contractor ?? '',
+          // contact: contactPerson,
+          // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
+          // contact: dispatching?.contact,
+          contact: dispatching?.content ?? '',
           contactNumber: contactNumber,
           allAddress,
           //
-          projectNumber: '',
-          badgeNumber: '',
+          projectNumber: dispatching?.projectNumber ?? '',
+          badgeNumber: dispatching?.badgeNumber ?? '',
         };
       });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data_contract]);
+  }, [contract]);
 
   // ----------------------------------------------------
   // dispatchingArr
@@ -97,6 +102,13 @@ export default function DispatchList() {
         dispatchDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
         workerName: item.workerName,
         tasks: item.tasks,
+        href: {
+          pathname: `${router.pathname}/edit`,
+          query: {
+            ...router.query,
+            dispatchingId: item.id,
+          },
+        },
       };
     }) ?? [];
 
@@ -107,8 +119,10 @@ export default function DispatchList() {
       label: '新增派工單',
       onClick: () =>
         router.push({
-          pathname: `${router.pathname}/add`,
-          query: { ...router.query },
+          pathname: `${router.pathname}/edit`,
+          query: {
+            ...router.query,
+          },
         }),
     },
   ];
@@ -116,12 +130,12 @@ export default function DispatchList() {
   // ----------------------------------------------------------
   return (
     <div className={style.container}>
-      <PageHeader panelList={panelList} />
+      <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
 
       <div className={style.mainContainer}>
         {/*  */}
         <div className={style.dispatchList}>
-          <Profile profile01={profile01} onProfile01Change={onProfile01Change} />
+          <Profile profile01={profile01} onProfile01Change={onProfile01Change} disabled={true} />
           <List list={dispatch_simpleArr} />
         </div>
         {/*  */}
@@ -141,26 +155,3 @@ const creEmptyProfile = (): Tprofile01 => ({
   projectNumber: '',
   badgeNumber: '',
 });
-
-const fakeListOri = (): Tdispatch_simple[] => [
-  {
-    dispatchDate: '100-01-01',
-    workerName: '王先生小文',
-    tasks: `辦理事項`,
-  },
-  {
-    dispatchDate: '100-01-02',
-    workerName: '王先生',
-    tasks: `辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項`,
-  },
-  {
-    dispatchDate: '100-01-05',
-    workerName: '王先生',
-    tasks: `辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項`,
-  },
-  {
-    dispatchDate: '100-11-01',
-    workerName: '王先生大文',
-    tasks: `辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項辦理事項`,
-  },
-];

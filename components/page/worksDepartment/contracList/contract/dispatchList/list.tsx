@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 // global
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
@@ -8,6 +10,7 @@ type Tdispatch_simple = {
   dispatchDate: string;
   workerName: string;
   tasks: string;
+  href: Parameters<typeof Link>[0]['href'];
 };
 
 export type { Tdispatch_simple };
@@ -31,15 +34,17 @@ export default function List({ list }: { list: Tdispatch_simple[] }) {
         {list.map((item, index) => {
           return (
             <CellWithBar className={style.row} key={index}>
-              {indexKeys01.map((key, index) => {
-                const value = item[key];
+              <Link href={item.href}>
+                {indexKeys01.map((key, index) => {
+                  const value = item[key];
 
-                return (
-                  <div key={index}>
-                    <span>{value}</span>
-                  </div>
-                );
-              })}
+                  return (
+                    <div key={index}>
+                      <span>{value}</span>
+                    </div>
+                  );
+                })}
+              </Link>
             </CellWithBar>
           );
         })}

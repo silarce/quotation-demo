@@ -39,6 +39,7 @@ export default function Profile({
   onProfile02Change,
   profile03,
   onProfile03Change,
+  disabled,
 }: {
   profile01: Tprofile01 | undefined;
   onProfile01Change: (key: keyof Tprofile01, v: string) => void;
@@ -46,10 +47,10 @@ export default function Profile({
   onProfile02Change?: (key: keyof Tprofile02, v: string) => void;
   profile03?: Tprofile03;
   onProfile03Change?: (key: keyof Tprofile03, v: TemployeeDto) => void;
+  disabled?: boolean;
 }) {
   // ------------------------------------------------
-  const router = useRouter();
-  const isAdd = router.route.split('/').pop() === 'add';
+
   // ------------------------------------------------
 
   const [showSelector, setShowSelector] = useState(false);
@@ -62,6 +63,7 @@ export default function Profile({
       <div className={style.left}>
         {profile02 && (
           <InputSel
+            disabled={disabled}
             className={`${style.input02}`}
             datePickerProps={{
               value: profile02.dispatchDate ?? '',
@@ -80,7 +82,7 @@ export default function Profile({
 
         {indexKeys01.map((key, index) => {
           const value = profile01?.[key] ?? '';
-          const { label, labelWidth, disabled, showBaseline } = config[key];
+          const { label, labelWidth, disabled: disabled_2, showBaseline } = config[key];
 
           const onChange = (v: string) => {
             onProfile01Change(key, v);
@@ -95,7 +97,7 @@ export default function Profile({
               captionWidth={labelWidth}
               captionColor="main"
               gap={'24px'}
-              disabled={disabled}
+              disabled={disabled || disabled_2}
               // showBaseline="invisible"
               showBaseline={showBaseline ?? 'invisible'}
             />
@@ -130,6 +132,7 @@ export default function Profile({
             <InputSel
               className={className}
               key={index}
+              disabled={disabled}
               inputProps={{ value, onChange }}
               label={label}
               captionWidth={labelWidth}
@@ -141,39 +144,47 @@ export default function Profile({
         })}
         {/*  */}
 
-        <div
-          onClick={() => {
-            setShowSelector(true);
-          }}
-        >
+        {profile03 && (
+          <div
+            onClick={() => {
+              if (!disabled) {
+                setShowSelector(true);
+              }
+            }}
+          >
+            <InputSel
+              disabled={disabled}
+              className={`${style.input02}`}
+              inputProps={{
+                value: profile03?.workerName?.chName ?? '',
+                // onChange: (v) => {
+                //   onProfile02Change?.('workerName', v);
+                // },
+              }}
+              label={'工務人員'}
+              captionWidth={'100px'}
+              captionColor="main"
+              gap={'24px'}
+            />
+          </div>
+        )}
+
+        {profile02 && (
           <InputSel
             className={`${style.input02}`}
+            disabled={disabled}
             inputProps={{
-              value: profile03?.workerName?.chName ?? '',
-              // onChange: (v) => {
-              //   onProfile02Change?.('workerName', v);
-              // },
+              value: profile02?.finalContact ?? '',
+              onChange: (v) => {
+                onProfile02Change?.('finalContact', v);
+              },
             }}
-            label={'工務人員'}
+            label={'完工聯絡人'}
             captionWidth={'100px'}
             captionColor="main"
             gap={'24px'}
           />
-        </div>
-
-        <InputSel
-          className={`${style.input02}`}
-          inputProps={{
-            value: profile02?.finalContact ?? '',
-            onChange: (v) => {
-              onProfile02Change?.('finalContact', v);
-            },
-          }}
-          label={'完工聯絡人'}
-          captionWidth={'100px'}
-          captionColor="main"
-          gap={'24px'}
-        />
+        )}
       </div>
 
       <EmployeeSelector
@@ -224,7 +235,7 @@ const config: Tconfig<
   contact: {
     label: '聯絡人',
     labelWidth: '80px',
-    disabled: true,
+    showBaseline: 'auto',
   },
   contactNumber: {
     label: '工地電話',

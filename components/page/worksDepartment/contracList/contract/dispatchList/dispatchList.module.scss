@@ -32,7 +32,7 @@
   border: solid 1px $colorBorder01;
   margin: 35px 17px 0;
   .thead,
-  .row {
+  .row > a {
     display: grid;
     grid-template-columns: 100px 100px auto;
     gap: 22px;
