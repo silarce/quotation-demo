@@ -82,8 +82,8 @@ class Class_legacyContract {
       let key: string;
 
       if ('id' in prodData) {
-        // 啊我都已經用'id' in prodData了，這邊也沒有紅線
-        // check的時候還是給我報型別錯誤
+        // 已經用'id' in prodData了，這邊也沒有紅線
+        // check的時候還是會報型別錯誤
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         key = String(prodData.id as string);
@@ -750,10 +750,19 @@ class Class_legacyContract {
       appendAddition = undefined;
     }
 
+    const payPrice = this.classPayInfo.payPrice;
+    const priceRecord = {
+      discountRate: new Decimal(payPrice.discountRate).div(100).toFixed(2),
+      subTotal: String(payPrice.subTotal),
+      salesTax: payPrice.salesTax,
+      total: payPrice.total,
+    };
+
     return {
       products: appendProd,
       additions: appendAddition,
       batchNumber: this.classBasicInfo.contractNumber,
+      priceRecord,
     };
   }
 
@@ -843,6 +852,11 @@ const useLegacyContract = ({
           return addi.batch === batch;
         }
       });
+
+      // 追加追減的合約沒有contractNumber，因此從attachBatchNumbers取得
+      if (!copyContract.contractNumber && batch > 0) {
+        copyContract.contractNumber = copyContract.attachBatchNumbers[batch];
+      }
     }
 
     return new Class_legacyContract(
