@@ -251,12 +251,23 @@ const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
     id,
     attachBatchNumbers,
     products,
+    additions,
     // priceRecord
   } = contract;
 
   const pricelist: { [key: string]: number } = {};
 
   products.forEach((item) => {
+    const { batch, totalPrice } = item;
+
+    if (!pricelist[`${batch}`]) {
+      pricelist[`${batch}`] = 0;
+    }
+
+    pricelist[`${batch}`] = pricelist[`${batch}`] + totalPrice;
+  });
+
+  additions.forEach((item) => {
     const { batch, totalPrice } = item;
 
     if (!pricelist[`${batch}`]) {
