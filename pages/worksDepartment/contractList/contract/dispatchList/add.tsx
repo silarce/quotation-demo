@@ -10,6 +10,7 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import Profile, {
   Tprofile01,
   Tprofile02,
+  Tprofile03,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
 import EditDispatch, {
   Tcontroll as Tcontroll_EeditDispatch,
@@ -20,17 +21,28 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { apiPostEngineeringDispatching, TcreateDispatchingDto } from 'js/api/api_engineering';
-
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { TemployeeDto } from 'js/api/dtoTypes';
 // css
 import scss from './dispatchList.module.scss';
 
 export default function AddDispatchList() {
   const router = useRouter();
+  const { contractId } = router.query as { contractId: string };
+
   const [isLoading, setIsLoading] = useState(false);
 
   // ---------------------------------------------------------
+
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  useEffect(() => {
+    update_contract();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId]);
+  // ---------------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>();
   const [profile02, setProfile02] = useState<Tprofile02>();
+  const [profile03, setProfile03] = useState<Tprofile03>();
 
   const onProfile01Change = (key: keyof Tprofile01, v: string) => {
     if (!profile01) {
@@ -52,6 +64,16 @@ export default function AddDispatchList() {
     setProfile02(newProfile);
   };
 
+  const onProfile03Change = (key: keyof Tprofile03, v: TemployeeDto) => {
+    if (!profile03) {
+      return;
+    }
+
+    const newProfile = { ...profile03 };
+    newProfile[key] = v;
+    setProfile03(newProfile);
+  };
+
   // ---------------------------------------------------------
 
   const [editDispatch, setEditDispatch] = useState<{
@@ -64,8 +86,6 @@ export default function AddDispatchList() {
     tasks: {
       value: editDispatch?.tasks ?? '',
       onChange: (v: string) => {
-        console.log(v);
-
         setEditDispatch((data) => {
           if (!data) {
             return data;
@@ -121,19 +141,36 @@ export default function AddDispatchList() {
   // ---------------------------------------------------------
 
   useEffect(() => {
+    const {
+      projectName,
+      contactPerson,
+      contactNumber,
+      quotationNumber,
+
+      county,
+      district,
+      address,
+    } = contract?.content ?? {};
+
+    const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
+
     setProfile01({
-      projectName: '測試',
-      contractor: '測試',
-      contact: '測試',
-      contactNumber: '04-12345678',
-      allAddress: '測試',
-      projectNumber: '測試',
+      projectName: projectName ?? '',
+      contractor: '',
+      contact: contactPerson ?? '',
+      contactNumber: contactNumber ?? '',
+      allAddress,
+      //
+      projectNumber: '',
       badgeNumber: '',
     });
     setProfile02({
       dispatchDate: '',
-      workerName: '',
+      // workerName: '',
       finalContact: '',
+    });
+    setProfile03({
+      workerName: undefined,
     });
     setEditDispatch({
       tasks: '',
@@ -142,7 +179,7 @@ export default function AddDispatchList() {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [contract]);
 
   // ---------------------------------------------------------
 
@@ -151,9 +188,13 @@ export default function AddDispatchList() {
       return;
     }
 
+    if (!contractId) {
+      return myAlert.info({ title: '沒有合約ID' });
+    }
+
     const body: TcreateDispatchingDto = {
       // 合約id
-      contractId: 'e298fbc5-78e3-4bfc-a6ff-53c2bbfae83a',
+      contractId,
       ...profile01,
       ...profile02,
       ...editDispatch,
@@ -161,6 +202,7 @@ export default function AddDispatchList() {
       district: '大安區',
       address: '小馬路',
       content: profile01.contact,
+      workerName: profile03?.workerName?.chName ?? '',
     };
 
     try {
@@ -202,6 +244,8 @@ export default function AddDispatchList() {
             onProfile01Change={onProfile01Change}
             profile02={profile02}
             onProfile02Change={onProfile02Change}
+            profile03={profile03}
+            onProfile03Change={onProfile03Change}
           />
           <hr />
           <EditDispatch controll={controll_editDispatch} />

@@ -12,7 +12,8 @@ import Profile, { Tprofile01 } from 'components/page/worksDepartment/contracList
 import List, { Tdispatch_simple } from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
 
 // api
-import { useGetEngineeringDispatchingList, apiPostEngineeringDispatching } from 'js/api/api_engineering';
+import { Tparams, useGetEngineeringDispatchingList, apiPostEngineeringDispatching } from 'js/api/api_engineering';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // helper
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
@@ -21,20 +22,30 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import style from './dispatchList.module.scss';
 
 // ==============================================================
+
 export default function DispatchList() {
-  const [isReady, setIsReady] = useState(false);
   const router = useRouter();
+  const { contractId } = router.query as { contractId: string };
   // ----------------------------------------------------
 
-  const { data: dispatchingArr, update } = useGetEngineeringDispatchingList();
+  const { data: data_contract, update: update_contract } = useGetContract_id_noItems(contractId);
+
+  // FIXME 現在後端似乎不會記錄contractId
+  const params: Tparams = {
+    // filter: {
+    //   contractId: { $eq: contractId },
+    // },
+  };
+
+  const { data: dispatchingArr, update } = useGetEngineeringDispatchingList(params);
 
   useEffect(() => {
     update();
+    update_contract();
   }, []);
 
   // ----------------------------------------------------
-  // const [data, setData] = useState<TfakeData>()
-  const [profile01, setProfile01] = useState<Tprofile01>();
+  const [profile01, setProfile01] = useState<Tprofile01>(creEmptyProfile());
 
   const onProfile01Change = (key: keyof Tprofile01, v: string) => {
     if (!profile01) {
@@ -47,10 +58,36 @@ export default function DispatchList() {
   };
 
   useEffect(() => {
-    setProfile01(fakeProfileOri());
-    setIsReady(true);
+    if (data_contract) {
+      setProfile01(() => {
+        const {
+          projectName,
+          contactPerson,
+          contactNumber,
+          quotationNumber,
+
+          county,
+          district,
+          address,
+        } = data_contract.content;
+
+        const allAddress = `${county}${district}${address}`;
+
+        return {
+          projectName: projectName,
+          contractor: '',
+          contact: contactPerson,
+          contactNumber: contactNumber,
+          allAddress,
+          //
+          projectNumber: '',
+          badgeNumber: '',
+        };
+      });
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data_contract]);
 
   // ----------------------------------------------------
   // dispatchingArr
@@ -76,10 +113,6 @@ export default function DispatchList() {
     },
   ];
 
-  if (!isReady) {
-    return null;
-  }
-
   // ----------------------------------------------------------
   return (
     <div className={style.container}>
@@ -99,14 +132,14 @@ export default function DispatchList() {
 
 // =============================================
 
-const fakeProfileOri = (): Tprofile01 => ({
-  projectName: '台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程',
-  contractor: '創典科技A有限公司',
-  contact: '林先生',
-  contactNumber: '04-1234567',
-  allAddress: '臺中市梧棲區經二路27號',
-  projectNumber: '工程編號',
-  badgeNumber: '管制卡編號',
+const creEmptyProfile = (): Tprofile01 => ({
+  projectName: '',
+  contractor: '',
+  contact: '',
+  contactNumber: '',
+  allAddress: '',
+  projectNumber: '',
+  badgeNumber: '',
 });
 
 const fakeListOri = (): Tdispatch_simple[] => [
