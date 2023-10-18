@@ -1957,3 +1957,36 @@ export type TcreateElectronicSuppliesDto = Omit<
 >;
 
 export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
+
+export type TexchangeDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  dispatchDate: string; // date
+  requirementsDate: string; // date
+  projectNumber: string;
+  projectName: string;
+  goodsName: string;
+  goodsSpec: string;
+  goodsQuantity: number;
+  reason: string;
+  accountingId: string;
+  accounting: TemployeeDto;
+  warehouseEmployeeId: string;
+  warehouseEmployee: TemployeeDto;
+  factoryEmployeeId: string;
+  factoryEmployee: TemployeeDto;
+  supervisorId: string;
+  supervisor: TemployeeDto;
+  formCompleterId: string;
+  formCompleter: TemployeeDto;
+  contractId: string | null;
+  contract: TquotationContractDto | null;
+  // quotationId: string | null;
+  // quotation: TquotationDto | null;
+};
+
+export type TcreateExchgangeDto = Omit<
+  TexchangeDto,
+  'id' | 'createdAt' | 'updatedAt' | 'warehouseEmployee' | 'factoryEmployee' | 'supervisor' | 'formCompleter'
+>;

@@ -19,6 +19,8 @@ import type {
   TelectronicSuppliesDto,
   TcreateElectronicSuppliesDto,
   TupdateElectronicSuppliesDto,
+  TexchangeDto,
+  TcreateExchgangeDto,
 } from './dtoTypes';
 
 export type {
@@ -32,9 +34,13 @@ export type {
   TelectronicSuppliesDto,
   TcreateElectronicSuppliesDto,
   TupdateElectronicSuppliesDto,
+  TexchangeDto,
+  TcreateExchgangeDto,
 } from './dtoTypes';
 
 // ========================================================================
+
+/**以合約id取得工程聯絡單 */
 export const apiGetEngineeringContact = async (contractId: string) => {
   const api = `/engineering/engineering-contact/${contractId}`;
 
@@ -44,6 +50,7 @@ export const apiGetEngineeringContact = async (contractId: string) => {
     .catch((err) => Promise.reject(err));
 };
 
+/**以合約id取得工程聯絡單 */
 export const useGetEngineeringContact = (contractId: string) => {
   const [res, setRes] = useState<TengineeringContactDto>();
 
@@ -314,3 +321,89 @@ export const apiPatchElectronicSupplies = async (id: string, body: TupdateElectr
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+// ------------------------------------------------------------------------
+// 調退貨單
+
+type TgetEngineeringExchanges = {
+  data: TexchangeDto[];
+  meta: TpageMetaDto;
+};
+
+/**取得調退貨單列表 */
+export const apiGetEngineeringExchanges = async (params?: Tparams) => {
+  const api = `/engineering/exchanges`;
+
+  return axi
+    .get<TgetEngineeringExchanges>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**取得調退貨單列表 */
+export const useGetEngineeringExchanges = (customParams?: Tparams) => {
+  const [res, setRes] = useState<TgetEngineeringExchanges>();
+
+  const params = {
+    populate: [
+      'contractId',
+      //  'contract',
+      // 'quotationId',
+      //  'quotation'
+    ],
+    ...customParams,
+  };
+
+  const update = async () => {
+    const newRes = await apiGetEngineeringExchanges(params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
+};
+
+export const apiGetEngineeringExchanges_id = async (id: string) => {
+  const api = `/engineering/exchanges/${id}`;
+
+  return axi
+    .get<TexchangeDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetEngineeringExchanges_id = (id: string) => {
+  const [res, setRes] = useState<TexchangeDto>();
+
+  const update = async () => {
+    const newRes = await apiGetEngineeringExchanges_id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+// export const apiPostEngineeringContact = async (body: TcreateEngineeringContactDto) => {
+//   const api = `/engineering/engineering-contact`;
+
+//   return axi
+//     .post<TengineeringContactDto>(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
