@@ -651,6 +651,12 @@ export type TmodifyLegacyContractDto = {
   products?: TupdateLegacyContractProductDto[];
   additions?: TupdateLegacyContractAdditionDto[];
   batchNumber: string;
+  priceRecord: {
+    discountRate: string; // 總折數
+    subTotal: string; //小計
+    salesTax: number; // 營業稅
+    total: number; // 總計
+  };
 };
 
 // ==========================================================================
