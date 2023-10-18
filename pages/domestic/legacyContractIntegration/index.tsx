@@ -190,8 +190,8 @@ export default function LegacyContractIntegration() {
                 }
               });
 
-              const dateStr = item.quoteDate
-                ? moment(convertDate_reduce1911(item.quoteDate)).format('yy-MM-DD')
+              const dateStr = item.createdAt
+                ? moment(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
                 : '無日期';
 
               const quotationContent: TBodyItemContent = {
