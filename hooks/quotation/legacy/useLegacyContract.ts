@@ -927,6 +927,7 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
     typhoonProtection: false,
     bounceDoor: false,
     notes: '',
+    closingType: '',
   };
 };
 

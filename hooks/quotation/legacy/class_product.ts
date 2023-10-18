@@ -430,6 +430,15 @@ class Class_product {
     this._product.notes = v;
     this._reRender();
   }
+
+  get closingType() {
+    return this._product.closingType;
+  }
+
+  set closingType(v) {
+    this._product.closingType = v;
+    this._reRender();
+  }
   // ----------------------------------------------
   // ----------------------------------------------
   // 追加追減
@@ -529,6 +538,7 @@ class Class_product {
     return {
       ...this._product,
       id: this.id || undefined,
+      closingType: this.closingType || '',
     };
   }
 
@@ -577,6 +587,7 @@ type TprodInputCellType = {
     | 'unitPrice'
     | 'totalPrice'
     | 'notes'
+    | 'closingType'
   >]: { type: 'input' };
 };
 
@@ -630,6 +641,7 @@ function prodCellConfigCre(): TprodCellConfig {
       'totalPrice',
       'notes',
       'bounceDoor',
+      'closingType',
     ],
     cellConfig: {
       // input
@@ -919,6 +931,21 @@ function prodCellConfigCre(): TprodCellConfig {
           wrapperStyle: { width: '90px' },
           inputProps: {
             props: {},
+          },
+        },
+      },
+      closingType: {
+        id: 'closingType',
+        label: '開閉方式',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          selectProps: {
+            props: {
+              options: [
+                { value: '電動', label: '電動' },
+                { value: '手動', label: '手動' },
+              ],
+            },
           },
         },
       },

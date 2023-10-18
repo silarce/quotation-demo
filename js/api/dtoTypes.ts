@@ -396,6 +396,8 @@ export type TlegacyContractProductDto = {
   notes: string;
   /**厚度 */
   thickness: string;
+  /**開閉方式 */
+  closingType: string;
   //
   /**批次 */
   batch: number;
@@ -555,6 +557,8 @@ export type TcreateLegacyContractProductDto = {
   notes: string;
   /**厚度 */
   thickness: string;
+  /**開閉方式 */
+  closingType: string;
 };
 
 export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
@@ -893,7 +897,7 @@ export type TquotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
-  // 關閉方式
+  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
   notes: string;
@@ -1159,7 +1163,7 @@ export type TcreateQuotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
-  // 關閉方式
+  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
   notes: string;
