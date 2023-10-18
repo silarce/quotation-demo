@@ -855,8 +855,11 @@ function prodCellConfigCre(): TprodCellConfig {
         label: '複價',
         inputSelProps: {
           wrapperStyle: { width: '140px' },
+          showBaseline: 'invisible',
           inputProps: {
-            props: {},
+            props: {
+              disabled: true,
+            },
           },
         },
         // inputType: 'text',
