@@ -169,7 +169,7 @@ export default function LegacyContractIntegration() {
   // -----------------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoadingPage1}>
       <PageHeader02 tag="舊合約" panelList={panelList} />
       <div className={scss.main}>
         <Thead01 />

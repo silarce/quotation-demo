@@ -118,7 +118,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([updateLegacyContract(), updateAttachments()]);
+      try {
+        setIsLoading(true);
+        await Promise.all([updateLegacyContract(), updateAttachments()]);
+      } catch (error) {
+        myAlert.err({ title: '取得舊合約失敗' });
+      } finally {
+        setIsLoading(false);
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, batch]);
