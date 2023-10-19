@@ -77,7 +77,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // 這是class
-  const { classLegacyContract, reset } = useLegacyContract({
+  const { classLegacyContract, reset, difference_prod, difference_addi } = useLegacyContract({
     //
     contract: legacyContract,
     batch: Number(batch),
@@ -269,6 +269,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={true}
             isAppend={true}
             isAppending={isAppending}
+            difference_prod={difference_prod}
           />
           {/* 配件設定 */}
           <QuotationAdditions
@@ -276,6 +277,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             disabled={true}
             isAppend={true}
             isAppending={isAppending}
+            difference_addi={difference_addi}
           />
           {/* 變更 主產品 */}
           {isAppending && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
@@ -284,7 +286,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/*  */}
           <div className={scss.exchangeTotal}>
             <span>總合計</span>
-            <span>{classLegacyContract.exchangeTotal}</span>
+            {/* <span>{classLegacyContract.exchangeTotal}</span> */}
+            <span>
+              {(() => {
+                if (isAppending) {
+                  return classLegacyContract.exchangeTotal;
+                } else {
+                  const difference = difference_prod + difference_addi;
+                  const mark = difference >= 0 ? '+' : '';
+
+                  return `${mark} ${difference.toLocaleString()}`;
+                }
+              })()}
+            </span>
           </div>
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />

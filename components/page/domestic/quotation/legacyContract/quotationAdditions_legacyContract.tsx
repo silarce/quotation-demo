@@ -61,11 +61,13 @@ export default function QuotationAdditions({
   disabled,
   isAppend,
   isAppending,
+  difference_addi = 0,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
   isAppending?: boolean;
+  difference_addi?: number;
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -314,9 +316,20 @@ export default function QuotationAdditions({
 
         {/* container close */}
       </div>
+      {/* difference_addi */}
       <div className={classNames(scss.total)}>
         <span>合計</span>
-        <span>- {addiSubPriceTotal.toLocaleString()}</span>
+        <span>
+          {(() => {
+            if (isAppending) {
+              return `- ${addiSubPriceTotal.toLocaleString()}`;
+            } else {
+              const mark = difference_addi >= 0 ? '+' : '';
+
+              return `${mark} ${difference_addi.toLocaleString()}`;
+            }
+          })()}
+        </span>
       </div>
 
       {/*  */}

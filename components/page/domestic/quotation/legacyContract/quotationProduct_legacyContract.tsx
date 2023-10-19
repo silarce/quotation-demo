@@ -28,6 +28,7 @@ export default function QuotationProduction({
   className = '',
   isAppend,
   isAppending,
+  difference_prod = 0,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
@@ -35,6 +36,7 @@ export default function QuotationProduction({
   className?: string;
   isAppend?: boolean;
   isAppending?: boolean;
+  difference_prod?: number;
 }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
@@ -109,10 +111,21 @@ export default function QuotationProduction({
         {/*  */}
         {/* container close */}
       </div>
+      {/* difference_prod */}
       {isAppend && (
         <div className={classNames(scss.total)}>
           <span>合計</span>
-          <span>- {prodSubPriceTotal.toLocaleString()}</span>
+          <span>
+            {(() => {
+              if (isAppending) {
+                return `- ${prodSubPriceTotal.toLocaleString()}`;
+              } else {
+                const mark = difference_prod >= 0 ? '+' : '';
+
+                return `${mark} ${difference_prod.toLocaleString()}`;
+              }
+            })()}
+          </span>
         </div>
       )}
 
