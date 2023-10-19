@@ -1982,24 +1982,24 @@ export type TexchangeDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  dispatchDate: string; // date
-  requirementsDate: string; // date
+  dispatchDate: string; // date // 填表日期
+  requirementsDate: string; // date // 需要日期
   projectNumber: string;
   projectName: string;
-  goodsName: string;
-  goodsSpec: string;
-  goodsQuantity: number;
-  reason: string;
+  goodsName: string; // 物品名稱
+  goodsSpec: string; // 材質規格
+  goodsQuantity: number; // 數量
+  reason: string; //調貨理由
   accountingId: string;
-  accounting: TemployeeDto;
+  accounting: TemployeeDto; // 會計
   warehouseEmployeeId: string;
-  warehouseEmployee: TemployeeDto;
+  warehouseEmployee: TemployeeDto; // 倉庫人員
   factoryEmployeeId: string;
-  factoryEmployee: TemployeeDto;
+  factoryEmployee: TemployeeDto; // 廠務人員
   supervisorId: string;
-  supervisor: TemployeeDto;
+  supervisor: TemployeeDto; //單位主管
   formCompleterId: string;
-  formCompleter: TemployeeDto;
+  formCompleter: TemployeeDto; // 填表人員
   contractId: string | null;
   contract: TquotationContractDto | null;
   // quotationId: string | null;
@@ -2008,5 +2008,14 @@ export type TexchangeDto = {
 
 export type TcreateExchgangeDto = Omit<
   TexchangeDto,
-  'id' | 'createdAt' | 'updatedAt' | 'warehouseEmployee' | 'factoryEmployee' | 'supervisor' | 'formCompleter'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'accounting'
+  | 'warehouseEmployee'
+  | 'factoryEmployee'
+  | 'supervisor'
+  | 'formCompleter'
+  // | 'contractId'
+  | 'contract'
 >;

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // component
@@ -6,15 +6,15 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import Profile from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/profile';
 import EditTransfer from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/editTransfer';
 import IconEdit from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/iconEdit';
-import Signature from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/signature';
+import Signature from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/signature_old';
 
 // css
-import style from './listOfDeliveryOrders.module.scss';
+import style from '../listOfDeliveryOrders.module.scss';
 
 export default function Edit() {
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
-  const [editable, setEditable] = useState(true);
+  const [editable, setEditable] = useState(false);
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Partial<Tprofile>>({});
   const [transferList, setTransferList] = useState<Ttransfer[]>([]);
@@ -32,7 +32,7 @@ export default function Edit() {
 
   const init = () => {
     setProfile(fakeProfileOri());
-    // setTransferList(fakeTransferListOri())
+    setTransferList(fakeTransferListOri());
     setSignature(fakeSignatureOri());
   };
 
@@ -43,22 +43,27 @@ export default function Edit() {
 
   // ----------------------------------------------------
   const tagCallback = (contractId: string) => {
-    return `新增調(退)貨單 ${contractId}`;
+    return `調(退)貨單 ${contractId}`;
   };
 
   const panelList: TpanelList = [
     {
-      type: 'redButton',
-      label: '儲存',
+      type: editable ? 'redButton' : 'myButton',
+      label: editable ? '取消' : '編輯',
       onClick: () => {
-        alert('test');
+        if (editable) {
+          init();
+          setEditable(false);
+        } else {
+          setEditable(true);
+        }
       },
     },
-    // {
-    //   type: "exportButton",
-    //   label: "匯出調(退)貨憑單",
-    //   onClick: () => alert("test")
-    // },
+    {
+      type: 'exportButton',
+      label: '匯出調(退)貨憑單',
+      onClick: () => alert('test'),
+    },
     {
       type: 'myButton',
       label: '返回',
@@ -83,7 +88,7 @@ export default function Edit() {
             setTransferList={setTransferList}
             addTransfer={addTransfer}
             delTransfer={delTransfer}
-            editable={editable}
+            disabled={editable}
           />
           <IconEdit />
           <Signature signature={signature} setSignature={setSignature} editable={editable} />
@@ -105,10 +110,10 @@ export type Tprofile = {
 
 const fakeProfileOri = (): Tprofile => ({
   // id: "111001",
-  projectId: '',
+  projectId: 'M-1102112',
   projectName: '台中港加工處理區-宇隆科技廠房增建工程A',
-  neededDate: '',
-  applyDate: '',
+  neededDate: '111-02-02',
+  applyDate: '111-02-02',
 });
 
 // ===========================================================
@@ -153,7 +158,7 @@ export type Tsignature = {
 const fakeSignatureOri = (): Tsignature => ({
   會計: '',
   倉庫: '',
-  廠務主管: '',
-  單位主管: '',
-  填表: '',
+  廠務主管: '林曉雯',
+  單位主管: '林曉雯',
+  填表: '林曉雯',
 });
