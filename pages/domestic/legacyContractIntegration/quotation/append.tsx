@@ -194,6 +194,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           body: appendBody,
         });
         myAlert.success({ title: '上傳完成' });
+
+        showRootLoading(false);
         router.push({
           pathname: '/domestic/legacyContractIntegration/quotation/append',
           query: {
