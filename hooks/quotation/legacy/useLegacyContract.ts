@@ -334,27 +334,6 @@ class Class_legacyContract {
     this._reRender();
   };
 
-  // get prodKitArr_2() {
-  //   return this._prodKeyArr.map((key) => {
-  //     const prod = this._prodList[key];
-
-  //     const delSelf = () => {
-  //       this.delProd_2(key);
-  //     };
-
-  //     const copySelf = () => {
-  //       this.copyProd_2(key);
-  //     };
-
-  //     return {
-  //       key,
-  //       prod,
-  //       delSelf,
-  //       copySelf,
-  //     };
-  //   });
-  // }
-
   get prodKitList_2() {
     const kitList: TprodKit = {};
 
@@ -443,7 +422,7 @@ class Class_legacyContract {
 
     return totalPrice;
   }
-  //
+  //--------------------------------------------
   // 這三組都是水平欄位的keyArr
 
   // 報價單 主產品設定用的 沒有合約編號欄位
@@ -858,25 +837,62 @@ const useLegacyContract = ({
     }
   }, [classLegacyContract]);
 
-  return { classLegacyContract, reset };
+  // -----------------------------------------------------------------
+  const { difference_prod, difference_addi } = useMemo(() => {
+    if (!contract) {
+      return {
+        difference_prod: 0,
+        difference_addi: 0,
+      };
+    }
+
+    const prodList_batch: { [key: string]: number } = {
+      [`${batch - 1}`]: 0,
+      [`${batch}`]: 0,
+    };
+
+    contract.products.forEach((prod) => {
+      if (prod.batch === batch - 1) {
+        prodList_batch[`${batch - 1}`] += prod.totalPrice;
+      }
+
+      if (prod.batch === batch) {
+        prodList_batch[`${batch}`] += prod.totalPrice;
+      }
+    });
+
+    const difference_prod = prodList_batch[`${batch}`] - prodList_batch[`${batch - 1}`];
+
+    const addiList_batch: { [key: string]: number } = {
+      [`${batch - 1}`]: 0,
+      [`${batch}`]: 0,
+    };
+
+    contract.additions.forEach((addi) => {
+      if (addi.batch === batch - 1) {
+        addiList_batch[`${batch - 1}`] += addi.totalPrice;
+      }
+
+      if (addi.batch === batch) {
+        addiList_batch[`${batch}`] += addi.totalPrice;
+      }
+    });
+
+    const difference_addi = addiList_batch[`${batch}`] - addiList_batch[`${batch - 1}`];
+
+    return {
+      difference_prod,
+      difference_addi,
+    };
+
+    //
+  }, [contract]);
+
+  // -----------------------------------------------------------------
+
+  return { classLegacyContract, reset, difference_prod, difference_addi };
 };
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
 // ==========================================================================
 // ==========================================================================
 
