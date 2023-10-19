@@ -20,7 +20,7 @@ import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+// import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
@@ -62,6 +62,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const batch = (router.query.batch as `${number}` | undefined) || '0';
 
   const [showPdf, setShowPdf] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
@@ -188,14 +189,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       //
       try {
-        showRootLoading(true);
+        setIsLoading(true);
         const res = await apiPatchLegacyContracts_id_modify({
           id,
           body: appendBody,
         });
         myAlert.success({ title: '上傳完成' });
-
-        showRootLoading(false);
         router.push({
           pathname: '/domestic/legacyContractIntegration/quotation/append',
           query: {
@@ -206,7 +205,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       } catch (error) {
         myAlert.err({ title: '上傳失敗' });
       } finally {
-        showRootLoading(false);
+        setIsLoading(false);
       }
       //
     },
@@ -248,7 +247,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tagList={tagList} panelList={panel} />
 
       <div>
