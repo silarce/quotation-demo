@@ -4,7 +4,8 @@ import { Dispatch, SetStateAction } from 'react';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // css
-import style from './powerTransmissionSpareList.module.scss';
+// import style from './powerTransmissionSpareList.module.scss';
+import style from './profile.module.scss';
 
 // fake
 // import type { Tprofile } from 'pages/worksDepartment/contractList/contract/powerTransmissionSpareList/edit';

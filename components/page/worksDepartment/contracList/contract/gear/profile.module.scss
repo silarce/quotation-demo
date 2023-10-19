@@ -1,0 +1,16 @@
+.profile {
+  display: grid;
+  height: fit-content;
+  margin: 40px 50px 0;
+  grid-template-columns: repeat(2, fit-content(100%));
+  gap: 18px 105px;
+  .input02 {
+    padding: 0;
+    > span {
+      color: theme("colors.main");
+    }
+    > hr {
+      border-color: theme("colors.border");
+    }
+  }
+}
