@@ -297,6 +297,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               query: {
                 contractId: router.query.contractId,
                 batch: latestBatch,
+                isAppending: 'true',
               },
             }),
         },

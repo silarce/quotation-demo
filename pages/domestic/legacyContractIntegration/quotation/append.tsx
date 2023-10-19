@@ -57,8 +57,9 @@ export default function Quotation() {
 }
 
 function TheQuotation({ router }: { router: NextRouter }) {
-  /**合約id，若為undefined就逮代表為新增合約 */
-  const contractId = router.query.contractId as string | undefined;
+  const { contractId } = router.query as { [key: string]: string | undefined };
+  const isAppending = (router.query.isAppending as string | undefined) === 'true';
+
   const batch = (router.query.batch as `${number}` | undefined) || '0';
 
   const [showPdf, setShowPdf] = useState(false);
@@ -84,8 +85,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
-
-  const isLatestBatch = legacyContract?.latestBatch === Number(batch);
 
   // --------------------------------------------------------------------------
   // 其實不會用到，但是有一個元件必須要送進去
@@ -234,7 +233,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       },
     },
-    isLatestBatch ? uploadPanel : undefined,
+    isAppending ? uploadPanel : undefined,
   ];
 
   // -----------------------------------------------------------------------
@@ -258,7 +257,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classBasicInfo={classLegacyContract.classBasicInfo}
             disabled={true}
             isAppend={true}
-            isLatestBatch={isLatestBatch}
+            isAppending={!!isAppending}
           />
           {/*  */}
           <div className={scss.switchBar}>
@@ -269,19 +268,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
             legacyContract={classLegacyContract}
             disabled={true}
             isAppend={true}
-            isLatestBatch={isLatestBatch}
+            isAppending={isAppending}
           />
           {/* 配件設定 */}
           <QuotationAdditions
             legacyContract={classLegacyContract}
             disabled={true}
             isAppend={true}
-            isLatestBatch={isLatestBatch}
+            isAppending={isAppending}
           />
           {/* 變更 主產品 */}
-          {isLatestBatch && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
+          {isAppending && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
           {/* 變更 配件設定 */}
-          {isLatestBatch && <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />}
+          {isAppending && <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />}
           {/*  */}
           <div className={scss.exchangeTotal}>
             <span>總合計</span>
