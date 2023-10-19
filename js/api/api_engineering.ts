@@ -21,6 +21,7 @@ import type {
   TupdateElectronicSuppliesDto,
   TexchangeDto,
   TcreateExchgangeDto,
+  TcreateElectronicSuppliesRecordDto,
 } from './dtoTypes';
 
 export type {
@@ -36,6 +37,7 @@ export type {
   TupdateElectronicSuppliesDto,
   TexchangeDto,
   TcreateExchgangeDto,
+  TcreateElectronicSuppliesRecordDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -342,6 +344,38 @@ export const useElectronicSupplies_infinite = ({ customParams }: { customParams?
     meta,
     init,
     reset,
+  };
+};
+
+export const apiGetElectronicSupplies_id = async (id: string) => {
+  const api = `/engineering/electronic-supplies/${id}`;
+
+  return axi
+    .get<TelectronicSuppliesDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetElectronicSupplies_id = (id: string | undefined) => {
+  const [res, setRes] = useState<TelectronicSuppliesDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetElectronicSupplies_id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
   };
 };
 

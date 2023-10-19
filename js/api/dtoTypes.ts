@@ -1895,6 +1895,13 @@ export type TcreateDispatchingDto = {
   note: string | null;
 };
 
+export type TcreateElectronicSuppliesRecordDto = {
+  doorType: string;
+  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+  category: string;
+  quantity: string;
+};
+
 export type TelectronicSuppliesDto = {
   id: string;
   createdAt: string; // date
@@ -1907,42 +1914,47 @@ export type TelectronicSuppliesDto = {
   projectNumber: string;
   // 工程名稱
   projectName: string;
-  // 鎻盒種類
-  latchBox: string;
-  // 鎻盒數量
-  latchBoxQuantity: number;
-  // 鎖匙種類
-  key: string;
-  // 鎖匙數量
-  keyQuantity: number;
-  // 壓扣種類
-  latch: string;
-  // 壓扣數量
-  latchQuantity: number;
-  // 控制箱/盤種類
-  controlBox: string;
-  // 控制箱/盤數量
-  controlBoxQuantity: number;
-  // 消防備品種類
-  firefightingSupplies: string;
-  // 消防備品數量
-  firefightingSuppliesQuantity: number;
-  // 板門配件種類
-  doorAccessories: string;
-  // 板門配件數量
-  doorAccessoriesQuantity: number;
-  // 主機種類
-  host: string;
-  // 主機數量
-  hostQuantity: number;
-  // 紅外線種類
-  infrared: string;
-  // 紅外線數量
-  infraredQuantity: number;
-  // 防颱配件種類
-  antiTyphoonSupplies: string;
-  // 防颱配件數量
-  antiTyphoonSuppliesQuantity: number;
+
+  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+  others: string;
+
+  // // 鎻盒種類
+  // latchBox: string;
+  // // 鎻盒數量
+  // latchBoxQuantity: number;
+  // // 鎖匙種類
+  // key: string;
+  // // 鎖匙數量
+  // keyQuantity: number;
+  // // 壓扣種類
+  // latch: string;
+  // // 壓扣數量
+  // latchQuantity: number;
+  // // 控制箱/盤種類
+  // controlBox: string;
+  // // 控制箱/盤數量
+  // controlBoxQuantity: number;
+  // // 消防備品種類
+  // firefightingSupplies: string;
+  // // 消防備品數量
+  // firefightingSuppliesQuantity: number;
+  // // 板門配件種類
+  // doorAccessories: string;
+  // // 板門配件數量
+  // doorAccessoriesQuantity: number;
+  // // 主機種類
+  // host: string;
+  // // 主機數量
+  // hostQuantity: number;
+  // // 紅外線種類
+  // infrared: string;
+  // // 紅外線數量
+  // infraredQuantity: number;
+  // // 防颱配件種類
+  // antiTyphoonSupplies: string;
+  // // 防颱配件數量
+  // antiTyphoonSuppliesQuantity: number;
+
   // 備料人員Id
   materialHandlerId: string;
   // 備料人員
