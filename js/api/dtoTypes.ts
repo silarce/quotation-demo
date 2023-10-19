@@ -363,13 +363,13 @@ export type TlegacyContractProductDto = {
   /**門型 */
   doorType: string;
   /**L(m) */
-  length: number;
+  length: string;
   /**W(m) */
-  width: number;
+  width: string;
   /**h(m) */
-  height: number;
+  height: string;
   /**B(m) */
-  boxB: number;
+  boxB: string;
   /**面積 */
   area: string;
   /**才數 */
@@ -524,13 +524,13 @@ export type TcreateLegacyContractProductDto = {
   /** 門型 */
   doorType: string;
   /** L(m) */
-  length: number;
+  length: string;
   /** W(m) */
-  width: number;
+  width: string;
   /** h(m) */
-  height: number;
+  height: string;
   /** B(m) */
-  boxB: number;
+  boxB: string;
   /** 面積 */
   area: string;
   /** 才數 */

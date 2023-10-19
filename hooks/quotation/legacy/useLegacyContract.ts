@@ -55,10 +55,6 @@ type TadditionList = {
 };
 
 // =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
 class Class_legacyContract {
   constructor(
     reRender: TreRender,
@@ -75,7 +71,7 @@ class Class_legacyContract {
 
     // --------------------------------------------------------------
 
-    const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
+    const sortedProdArr = _.sortBy(this._legacyContract.products, 'createdAt');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     const prodList: TprodList = {};
     sortedProdArr.forEach((prodData) => {
@@ -301,22 +297,6 @@ class Class_legacyContract {
   get prodArr() {
     return Object.values(this._prodList);
   }
-
-  // get prodKeyArr_2() {
-  //   return this._prodKeyArr;
-  // }
-
-  // set prodKeyArr_2(v) {
-  //   this._prodKeyArr = v;
-  //   this._reRender();
-  // }
-
-  // delProd_2(id: string) {
-  //   delete this._prodList[id];
-  //   // _.pull(this._prodKeyArr, id);
-
-  //   this._reRender();
-  // }
 
   copyProd(id: string) {
     const key = 'new-' + nanoid();
@@ -656,11 +636,23 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
+    let haveQty0 = false;
+
     legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
       const thePost = prod.postProd;
 
+      if (!prod.postProd.quantity) {
+        haveQty0 = true;
+      }
+
       return thePost;
     });
+
+    if (haveQty0) {
+      myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
+
+      return false;
+    }
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 
@@ -895,10 +887,10 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
     itemName: '',
     quoteType: '',
     doorType: '',
-    length: 0,
-    width: 0,
-    height: 0,
-    boxB: 0,
+    length: '0',
+    width: '0',
+    height: '0',
+    boxB: '0',
     area: '',
     volume: '',
     thickness: '',
