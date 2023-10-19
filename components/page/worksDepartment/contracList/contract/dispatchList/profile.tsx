@@ -26,7 +26,7 @@ type Tprofile02 = {
 };
 
 type Tprofile03 = {
-  workerName: TemployeeDto | undefined;
+  workerEmployee: TemployeeDto | undefined;
 };
 
 export type { Tprofile01, Tprofile02, Tprofile03 };
@@ -156,7 +156,7 @@ export default function Profile({
               disabled={disabled}
               className={`${style.input02}`}
               inputProps={{
-                value: profile03?.workerName?.chName ?? '',
+                value: profile03?.workerEmployee?.chName ?? '',
                 // onChange: (v) => {
                 //   onProfile02Change?.('workerName', v);
                 // },
@@ -190,7 +190,7 @@ export default function Profile({
       <EmployeeSelector
         showModal={showSelector}
         onConfirm={(arr) => {
-          onProfile03Change?.('workerName', arr[0]);
+          onProfile03Change?.('workerEmployee', arr[0]);
         }}
         onCancel={() => {
           setShowSelector(false);

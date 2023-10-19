@@ -1841,8 +1841,10 @@ export type TdispatchingDto = {
   projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
-  // 工務人員;
-  workerName: string;
+  // 工務人員ID
+  workerId: string;
+  // 工務人員
+  workerEmployee: TemployeeDto;
   // 完工聯絡人;
   finalContact: string;
   // 辦理事項;
@@ -1883,8 +1885,8 @@ export type TcreateDispatchingDto = {
   projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
-  // 工務人員
-  workerName: string;
+  // 工務人員ID
+  workerId: string;
   // 完工聯絡人
   finalContact: string;
   // 辦理事項

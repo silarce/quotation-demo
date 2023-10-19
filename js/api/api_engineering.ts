@@ -110,8 +110,13 @@ export const apiGetEngineeringDispatchingList = async (params?: Tparams) => {
 };
 
 /**取得派工單列表 */
-export const useGetEngineeringDispatchingList = (params?: Tparams) => {
+export const useGetEngineeringDispatchingList = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetDispatchingList>();
+
+  const params = {
+    populate: ['workerEmployee'],
+    ...customParams,
+  };
 
   const update = async () => {
     const newRes = await apiGetEngineeringDispatchingList(params);

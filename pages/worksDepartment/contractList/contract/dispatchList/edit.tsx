@@ -186,7 +186,7 @@ export default function EditDispatchList() {
       badgeNumber,
       dispatchDate,
       finalContact,
-      workerName,
+      workerEmployee,
       tasks,
       note,
       pricingMethod,
@@ -209,7 +209,7 @@ export default function EditDispatchList() {
       finalContact: finalContact ?? '',
     });
     setProfile03({
-      workerName: undefined,
+      workerEmployee: workerEmployee,
     });
     setEditDispatch({
       tasks: tasks ?? '',
@@ -231,6 +231,10 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '沒有合約ID' });
     }
 
+    if (!profile02.dispatchDate) {
+      return myAlert.info({ title: '請選擇派工日期' });
+    }
+
     const body: TcreateDispatchingDto = {
       // 合約id
       contractId,
@@ -241,7 +245,7 @@ export default function EditDispatchList() {
       district: '大安區',
       address: '小馬路',
       content: profile01.contact,
-      workerName: profile03?.workerName?.chName ?? '',
+      workerId: profile03?.workerEmployee?.id ?? '',
     };
 
     try {

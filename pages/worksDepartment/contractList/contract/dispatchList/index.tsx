@@ -100,7 +100,7 @@ export default function DispatchList() {
     dispatchingArr?.map((item) => {
       return {
         dispatchDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
-        workerName: item.workerName,
+        workerName: item.workerEmployee?.chName || item.workerEmployee?.enName || '',
         tasks: item.tasks,
         href: {
           pathname: `${router.pathname}/edit`,
