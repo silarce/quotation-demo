@@ -52,13 +52,13 @@ export default function ProductList_legacy({
   classQuotation,
   disabled,
   isAppend,
-  isLatestBatch,
+  isAppending,
   onVerticalKeyChange,
 }: {
   classQuotation: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
-  isLatestBatch?: boolean;
+  isAppending?: boolean;
   onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
   // ---------------------------------------------------------------
@@ -181,7 +181,7 @@ export default function ProductList_legacy({
                 isAppend={isAppend}
                 prodCellConfig={prodCellConfig}
                 //
-                isLatestBatch={isLatestBatch}
+                isAppending={isAppending}
               />
             );
           })}
@@ -261,14 +261,14 @@ const ResetChangeBtnBox = ({
   dndAttr,
   dndListener,
   indexNum,
-  isLatestBatch,
+  isAppending,
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNum: string | number;
-  isLatestBatch?: boolean;
+  isAppending?: boolean;
 }) => {
   return (
     <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
@@ -277,20 +277,20 @@ const ResetChangeBtnBox = ({
       <Image
         src={iconReset}
         alt="還原"
-        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        className={classNames(scss.iconBtn, scss.littleBtn, !isAppending && scss.hidden)}
         onClick={clearExchange}
       />
       <Image
         src={iconChange}
         alt="變更"
-        className={classNames(scss.iconBtn, scss.littleBtn, !isLatestBatch && scss.hidden)}
+        className={classNames(scss.iconBtn, scss.littleBtn, !isAppending && scss.hidden)}
         onClick={toSetTargetIndex}
       />
 
-      {/* <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={clearExchange}>
+      {/* <button className={classNames(scss.btn, !isAppending && scss.hidden)} onClick={clearExchange}>
         還原
       </button>
-      <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
+      <button className={classNames(scss.btn, !isAppending && scss.hidden)} onClick={toSetTargetIndex}>
         變更
       </button> */}
       <span>{indexNum}</span>
@@ -315,7 +315,7 @@ function DndRow({
   isAppend,
   prodCellConfig,
   //
-  isLatestBatch,
+  isAppending,
 }: {
   isActive: boolean;
   pIndex: number;
@@ -332,7 +332,7 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TprodCellConfig;
   //
-  isLatestBatch?: boolean;
+  isAppending?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id,
@@ -365,7 +365,7 @@ function DndRow({
               dndAttr={attributes}
               dndListener={listeners}
               indexNum={pIndex + 1}
-              isLatestBatch={isLatestBatch}
+              isAppending={isAppending}
             />
           )}
           {/*  */}

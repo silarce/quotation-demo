@@ -25,7 +25,7 @@ export default function Profile({
   const { quotationId, clientName, contactPerson, contactPhone, fax, builtDate, projectAddress } = profileData;
 
   const [year, month, day] = builtDate.split('-');
-  const date = `${year}年${month}月${day}日`;
+  const date = builtDate ? `${year}年${month}月${day}日` : '未定';
 
   return (
     <div className={style.profile}>

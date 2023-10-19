@@ -107,7 +107,8 @@ export default function QuotationPdf({
       projectAddress,
     } = classBasicInfo;
 
-    const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+    // const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
     return {
       quotationId: contractNumber,
@@ -153,7 +154,7 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
       return {
         tradingLocation: deliveryLocation,
@@ -169,9 +170,9 @@ export default function QuotationPdf({
     const classProdArr = classLegacyContract.prodArr;
 
     return classProdArr.map((prod) => {
-      const lw = (Number(prod.width) || Number(prod.length)) * 100;
-      const h = Number(prod.height) * 100;
-      const b = Number(prod.boxB) * 100;
+      const lw = new Decimal(Number(prod.width || 0) || Number(prod.length || 0)).mul(100).toString();
+      const h = new Decimal(Number(prod.height || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod.boxB || 0)).mul(100).toString();
 
       const size = `${lw} X ${h} + ${b}`;
 
@@ -187,7 +188,7 @@ export default function QuotationPdf({
         // @ts-ignore
         doorRail: doorTrackLookup[prod.doorTrack]?.icon,
         horsepower: prod.horsepower,
-        openType: '',
+        openType: prod.closingType,
         qty: prod.quantity,
         unitPrice: prod.unitPrice,
         priceTotal: prod.totalPrice,

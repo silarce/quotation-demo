@@ -236,9 +236,9 @@ class Class_product {
   }
   set length(v) {
     this._length = v;
-    this._product.length = parseFloat(v || '0');
+    this._product.length = v || '0';
     this._width = '0';
-    this._product.width = 0;
+    this._product.width = '0';
 
     this.area = this.calcArea();
     this._reRender();
@@ -249,9 +249,9 @@ class Class_product {
   }
   set width(v) {
     this._width = v;
-    this._product.width = parseFloat(v || '0');
+    this._product.width = v || '0';
     this._length = '0';
-    this._product.length = 0;
+    this._product.length = '0';
     this.area = this.calcArea();
     this._reRender();
   }
@@ -261,7 +261,7 @@ class Class_product {
   }
   set height(v) {
     this._height = v;
-    this._product.height = parseFloat(v || '0');
+    this._product.height = v || '0';
     this.area = this.calcArea();
     this._reRender();
   }
@@ -271,7 +271,7 @@ class Class_product {
   }
   set boxB(v) {
     this._boxB = v;
-    this._product.boxB = parseFloat(v || '0');
+    this._product.boxB = v || '0';
     this.area = this.calcArea();
     this._reRender();
   }
@@ -534,11 +534,16 @@ class Class_product {
 
   // -------------------------------------------------
   get postProd() {
+    // 那四個property要轉NUMBER
     return {
       ...this._product,
       id: this.id || undefined,
       closingType: this._product.closingType ?? '',
-      boxB: this._product.boxB ?? 0,
+      boxB: this.boxB || '0',
+      width: this.width || '0',
+      length: this.length || '0',
+      height: this.height || '0',
+      thickness: this.thickness || '0',
     };
   }
 
@@ -558,7 +563,11 @@ class Class_product {
       ...copy,
       id: this.id || undefined,
       closingType: copy.closingType ?? '',
-      boxB: copy.boxB ?? 0,
+      boxB: this.boxB || '0',
+      width: this.width || '0',
+      length: this.length || '0',
+      height: this.height || '0',
+      thickness: this.thickness || '0',
     };
   }
 }

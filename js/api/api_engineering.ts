@@ -390,7 +390,7 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   const params = {
     populate: [
       'contractId',
-      //  'contract',
+      'contract',
       // 'quotationId',
       //  'quotation'
     ],
@@ -414,8 +414,9 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   };
 };
 
+/**以id取得調退貨單 */
 export const apiGetEngineeringExchanges_id = async (id: string) => {
-  const api = `/engineering/exchanges/${id}`;
+  const api = `/engineering/exchange/${id}`;
 
   return axi
     .get<TexchangeDto>(api)
@@ -423,10 +424,15 @@ export const apiGetEngineeringExchanges_id = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetEngineeringExchanges_id = (id: string) => {
+/**以id取得調退貨單 */
+export const useGetEngineeringExchanges_id = (id: string | undefined) => {
   const [res, setRes] = useState<TexchangeDto>();
 
   const update = async () => {
+    if (!id) {
+      return;
+    }
+
     const newRes = await apiGetEngineeringExchanges_id(id);
 
     if (newRes) {
@@ -442,11 +448,20 @@ export const useGetEngineeringExchanges_id = (id: string) => {
   };
 };
 
-// export const apiPostEngineeringContact = async (body: TcreateEngineeringContactDto) => {
-//   const api = `/engineering/engineering-contact`;
+export const apiPostEngineeringExchange = async (body: TcreateExchgangeDto) => {
+  const api = `/engineering/exchange`;
 
-//   return axi
-//     .post<TengineeringContactDto>(api, body)
-//     .then(({ data }) => data)
-//     .catch((err) => Promise.reject(err));
-// };
+  return axi
+    .post<TexchangeDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchgangeDto) => {
+  const api = `/engineering/exchange/${id}`;
+
+  return axi
+    .patch<TexchangeDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};

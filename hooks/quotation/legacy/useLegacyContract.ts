@@ -55,10 +55,6 @@ type TadditionList = {
 };
 
 // =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
 class Class_legacyContract {
   constructor(
     reRender: TreRender,
@@ -75,7 +71,7 @@ class Class_legacyContract {
 
     // --------------------------------------------------------------
 
-    const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
+    const sortedProdArr = _.sortBy(this._legacyContract.products, 'createdAt');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     const prodList: TprodList = {};
     sortedProdArr.forEach((prodData) => {
@@ -302,22 +298,6 @@ class Class_legacyContract {
     return Object.values(this._prodList);
   }
 
-  // get prodKeyArr_2() {
-  //   return this._prodKeyArr;
-  // }
-
-  // set prodKeyArr_2(v) {
-  //   this._prodKeyArr = v;
-  //   this._reRender();
-  // }
-
-  // delProd_2(id: string) {
-  //   delete this._prodList[id];
-  //   // _.pull(this._prodKeyArr, id);
-
-  //   this._reRender();
-  // }
-
   copyProd(id: string) {
     const key = 'new-' + nanoid();
 
@@ -330,6 +310,8 @@ class Class_legacyContract {
     };
 
     this._prodList[key] = copy;
+
+    this.countSubTotal();
 
     this._reRender();
   }
@@ -351,27 +333,6 @@ class Class_legacyContract {
 
     this._reRender();
   };
-
-  // get prodKitArr_2() {
-  //   return this._prodKeyArr.map((key) => {
-  //     const prod = this._prodList[key];
-
-  //     const delSelf = () => {
-  //       this.delProd_2(key);
-  //     };
-
-  //     const copySelf = () => {
-  //       this.copyProd_2(key);
-  //     };
-
-  //     return {
-  //       key,
-  //       prod,
-  //       delSelf,
-  //       copySelf,
-  //     };
-  //   });
-  // }
 
   get prodKitList_2() {
     const kitList: TprodKit = {};
@@ -461,7 +422,7 @@ class Class_legacyContract {
 
     return totalPrice;
   }
-  //
+  //--------------------------------------------
   // 這三組都是水平欄位的keyArr
 
   // 報價單 主產品設定用的 沒有合約編號欄位
@@ -654,11 +615,23 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
+    let haveQty0 = false;
+
     legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
       const thePost = prod.postProd;
 
+      if (!prod.postProd.quantity) {
+        haveQty0 = true;
+      }
+
       return thePost;
     });
+
+    if (haveQty0) {
+      myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
+
+      return false;
+    }
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 
@@ -770,23 +743,6 @@ class Class_legacyContract {
 } // Class_legacyContract
 
 // ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
 
 const useLegacyContract = ({
   contract,
@@ -881,25 +837,62 @@ const useLegacyContract = ({
     }
   }, [classLegacyContract]);
 
-  return { classLegacyContract, reset };
+  // -----------------------------------------------------------------
+  const { difference_prod, difference_addi } = useMemo(() => {
+    if (!contract) {
+      return {
+        difference_prod: 0,
+        difference_addi: 0,
+      };
+    }
+
+    const prodList_batch: { [key: string]: number } = {
+      [`${batch - 1}`]: 0,
+      [`${batch}`]: 0,
+    };
+
+    contract.products.forEach((prod) => {
+      if (prod.batch === batch - 1) {
+        prodList_batch[`${batch - 1}`] += prod.totalPrice;
+      }
+
+      if (prod.batch === batch) {
+        prodList_batch[`${batch}`] += prod.totalPrice;
+      }
+    });
+
+    const difference_prod = prodList_batch[`${batch}`] - prodList_batch[`${batch - 1}`];
+
+    const addiList_batch: { [key: string]: number } = {
+      [`${batch - 1}`]: 0,
+      [`${batch}`]: 0,
+    };
+
+    contract.additions.forEach((addi) => {
+      if (addi.batch === batch - 1) {
+        addiList_batch[`${batch - 1}`] += addi.totalPrice;
+      }
+
+      if (addi.batch === batch) {
+        addiList_batch[`${batch}`] += addi.totalPrice;
+      }
+    });
+
+    const difference_addi = addiList_batch[`${batch}`] - addiList_batch[`${batch - 1}`];
+
+    return {
+      difference_prod,
+      difference_addi,
+    };
+
+    //
+  }, [contract]);
+
+  // -----------------------------------------------------------------
+
+  return { classLegacyContract, reset, difference_prod, difference_addi };
 };
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
 // ==========================================================================
 // ==========================================================================
 
@@ -910,10 +903,10 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
     itemName: '',
     quoteType: '',
     doorType: '',
-    length: 0,
-    width: 0,
-    height: 0,
-    boxB: 0,
+    length: '0',
+    width: '0',
+    height: '0',
+    boxB: '0',
     area: '',
     volume: '',
     thickness: '',

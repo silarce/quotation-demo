@@ -23,7 +23,8 @@ export default function PageHeader({
     return null;
   }
 
-  const { contractId } = router.query;
+  const { contractId, version } = router.query;
+  const query = router.query;
 
   const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號 ${contractNumber}`;
 
@@ -33,7 +34,7 @@ export default function PageHeader({
       label: '工程聯絡單',
       href: {
         pathname: `${pathHead}/workContactDoc`,
-        query: { contractId },
+        query,
       },
     },
     {
@@ -41,7 +42,7 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/workSheet`,
-        query: { contractId },
+        query,
       },
     },
     {
@@ -49,7 +50,7 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
-        query: { contractId },
+        query,
       },
     },
     {
@@ -57,29 +58,29 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/accountsReceivableDetails`,
-        query: { contractId },
+        query,
       },
     },
     {
       label: '派工單列表',
       href: {
         pathname: `${pathHead}/dispatchList`,
-        query: { contractId },
+        query,
       },
     },
     {
       label: '送電備品列表',
       href: {
         pathname: `${pathHead}/powerTransmissionSpareList`,
-        query: { contractId },
+        query,
       },
     },
     {
       label: '調(退)貨單列表',
-      disabled: true,
+      // disabled: true,
       href: {
         pathname: `${pathHead}/listOfDeliveryOrders`,
-        query: { contractId },
+        query,
       },
     },
     {
@@ -87,7 +88,7 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/memorandum`,
-        query: { contractId },
+        query,
       },
     },
   ];

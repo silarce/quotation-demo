@@ -8,7 +8,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import Profile, {
   Tcontroll as Tcontroll_profile,
-} from 'components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/profile';
+} from 'components/page/worksDepartment/contracList/contract/gear/profile';
 import Sheet, {
   Tcontroll as Tcontroll_sheet,
 } from 'components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/sheet';
