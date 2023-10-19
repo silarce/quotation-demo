@@ -16,6 +16,8 @@ import QuotationSinature, { TinputProps } from 'components/page/domestic/quotati
 import QuotationExProd from 'components/page/domestic/quotation/legacyContract/quotationExProd_legacyContract';
 import QuotationExAddi from 'components/page/domestic/quotation/legacyContract/quotationExAddi_legacyContract';
 
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
+
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -59,9 +61,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const contractId = router.query.contractId as string | undefined;
   const batch = (router.query.batch as `${number}` | undefined) || '0';
 
+  const [showPdf, setShowPdf] = useState(false);
+
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
-    populate: ['customer', 'products', 'additions'],
+    populate: ['customer', 'products', 'additions', 'priceRecord'],
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
@@ -210,6 +214,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     {
       type: 'myButton',
+      label: '匯出報價單',
+      onClick: () => {
+        setShowPdf(true);
+      },
+    },
+    {
+      type: 'myButton',
       label: '取消',
       onClick: () => {
         //
@@ -281,6 +292,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={true} />
         </div>
       </div>
+      <QuotationPdf
+        isVisable={showPdf}
+        onCancel={() => {
+          setShowPdf(false);
+        }}
+        classLegacyContract={classLegacyContract}
+      />
     </SubLayer>
   );
 }

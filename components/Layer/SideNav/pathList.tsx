@@ -516,8 +516,8 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/setting'].path01 + '/company-info',
     },
-    // erpFeature: [BasicDataCreation, HRAuthoritySetup],
-    erpFeature: allPass,
+    erpFeature: [BasicDataCreation, HRAuthoritySetup],
+    // erpFeature: allPass,
   },
   {
     icon: icon_domestic,
@@ -550,7 +550,7 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/worksDepartment'].path01 + '/contractList',
     },
-    erpFeature: devPass,
+    erpFeature: [accountsReceivable],
   },
 ];
 

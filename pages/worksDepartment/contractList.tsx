@@ -12,63 +12,86 @@ import ContractList, { Tcontract } from 'components/page/worksDepartment/contrac
 import style from './contractList.module.scss';
 
 // api
-import { useContract_infinite } from 'js/api/api_quotation';
+import { useContract_infinite, Tparams } from 'js/api/api_quotation';
 
 // type
 import { Toption } from 'js/utils/options/options';
 
+// option
+import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
+
+// ===========================================
+const optionDoorModel = optionsCreator_doorModel_2({ haveEmpty: true });
+const optionsCounty = optionsCreator_county();
+optionsCounty.unshift({ value: '', label: '不拘' });
 // ===========================================
 
+type Tquery = {
+  doorType: string | undefined;
+  county: string | undefined;
+  customerName: string | undefined;
+  projectName: string | undefined;
+};
+
 export default function WdContractList() {
-  // ===================================================
+  const router = useRouter();
+  const { doorType, county, customerName, projectName } = router.query as Tquery;
+
+  const params: Tparams = {
+    filter: {
+      'content.product.doorModelName': { $eq: doorType },
+      'content.county': { $eq: customerName },
+      'content.customer.name': { $contains: customerName },
+      'content.projectName': { $contains: projectName },
+    },
+  };
 
   const { dataList, dataArr, viewRef_top, viewRef_bottom, isLoadingPage1, isLoading, meta, init, reset } =
-    useContract_infinite({});
+    useContract_infinite({ customParams: params });
 
   useEffect(() => {
     reset();
-  }, []);
+  }, [doorType, county, customerName, projectName]);
 
   // ===================================================
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
-      // stateValue: doorType,
-      options: doorTypeOptions,
+      defaultValue: doorType ?? '',
+      options: optionDoorModel,
       placeholder: '選擇門型',
       width: '90px',
-      // onChange: (option: Toption | null) => {
-      //   if (!option) return
-      //   setDoorType(option)
-      // }
     },
     {
-      // stateValue: country,
-      options: countryOptions,
+      defaultValue: county ?? '',
+      options: optionsCounty,
       placeholder: '選擇地區',
       width: '80px',
-      // onChange: (option: Toption | null) => {
-      //   if (!option) return
-      //   setCountry(option)
-      // }
     },
     {
-      // stateValue: clientName,
+      defaultValue: customerName ?? '',
       placeholder: '請輸入客戶名稱',
-      // onChange: (e: ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)
     },
     {
-      // stateValue: projectName,
+      defaultValue: projectName ?? '',
       placeholder: '請輸入專案名稱',
-      // onChange: (e: ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)
     },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
     const doorType = (vArr[0] as Toption).value;
-    const country = (vArr[1] as Toption).value;
-    const clientName = vArr[2] as string;
+    const county = (vArr[1] as Toption).value;
+    const customerName = vArr[2] as string;
     const projectName = vArr[3] as string;
+    router.push({
+      query: {
+        doorType,
+        county,
+        customerName,
+        projectName,
+      },
+    });
   };
 
   const searchGroup = {
@@ -115,28 +138,3 @@ export default function WdContractList() {
     </div>
   );
 }
-
-// ==========================================================
-// ==========================================================
-// ==========================================================
-const doorTypeOptions: Toption[] = [
-  { value: '', label: '不拘' },
-  { value: 'SJ-30287', label: 'SJ-30287' },
-  { value: 'SJ-302', label: 'SJ-302' },
-  { value: '門型一', label: '門型一' },
-  { value: '門型二', label: '門型二' },
-  { value: '門型三', label: '門型三' },
-];
-const countryOptions: Toption[] = [
-  { value: '', label: '不拘' },
-  { value: '台北市', label: '台北市' },
-  { value: '新北市', label: '新北市' },
-  { value: '基隆縣', label: '基隆縣' },
-  { value: '桃園市', label: '桃園市' },
-  { value: '新竹縣', label: '新竹縣' },
-  { value: '新竹市', label: '新竹市' },
-  { value: '苗栗縣', label: '苗栗縣' },
-  { value: '台中市', label: '台中市' },
-];
-
-// ==========================================================

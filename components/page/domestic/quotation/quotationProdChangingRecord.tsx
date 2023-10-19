@@ -69,7 +69,7 @@ export default function TheQuotationProdChangingRecord({
         {subContract?.map((item, index) => {
           const content = item.content;
 
-          const contentTotal = content?.total ?? 0;
+          const contentTotal = content?.subTotal ?? 0;
 
           const record = {
             quotationId: content.quotationNumber,

@@ -54,7 +54,7 @@ class Class_product {
     this._length = this._product.length ? this._product.length.toString() : '';
     this._width = this._product.width ? this._product.width.toString() : '';
     this._height = this._product.height ? this._product.height.toString() : '';
-    this._thickness = this._product.thickness ? this._product.thickness.toString() : '';
+    this._boxB = this._product.boxB ? this._product.boxB.toString() : '';
     //
     this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
     //
@@ -96,7 +96,7 @@ class Class_product {
   private _length;
   private _width;
   private _height;
-  private _thickness;
+  private _boxB;
   private _quantity;
   private _unitPrice;
   private _totalPrice;
@@ -137,7 +137,7 @@ class Class_product {
   //----------------------------------------------
 
   calcArea = () => {
-    const area = Decimal.add(this._height || '0', this._thickness || '0') // h+b
+    const area = Decimal.add(this._height || '0', this._boxB || '0') // h+b
       /** "0"被視為true，所以用型別為number的值來計算 */
       .mul(this._product.width || this._product.length || '0') // *w or *h
       .toFixed(2)
@@ -266,13 +266,12 @@ class Class_product {
     this._reRender();
   }
 
-  /** 這個就是B */
-  get thickness() {
-    return this._thickness;
+  get boxB() {
+    return this._boxB;
   }
-  set thickness(v) {
-    this._thickness = v;
-    this._product.thickness = parseFloat(v || '0');
+  set boxB(v) {
+    this._boxB = v;
+    this._product.boxB = parseFloat(v || '0');
     this.area = this.calcArea();
     this._reRender();
   }
@@ -292,6 +291,15 @@ class Class_product {
   }
   set volume(v) {
     this._product.volume = v;
+    this._reRender();
+  }
+
+  /**厚度 */
+  get thickness() {
+    return this._product.thickness;
+  }
+  set thickness(v) {
+    this._product.thickness = v;
     this._reRender();
   }
 
@@ -421,6 +429,15 @@ class Class_product {
     this._product.notes = v;
     this._reRender();
   }
+
+  get closingType() {
+    return this._product.closingType;
+  }
+
+  set closingType(v) {
+    this._product.closingType = v;
+    this._reRender();
+  }
   // ----------------------------------------------
   // ----------------------------------------------
   // 追加追減
@@ -520,6 +537,8 @@ class Class_product {
     return {
       ...this._product,
       id: this.id || undefined,
+      closingType: this._product.closingType ?? '',
+      boxB: this._product.boxB ?? 0,
     };
   }
 
@@ -533,10 +552,13 @@ class Class_product {
 
     const copy = _.cloneDeep(this._product);
     copy.quantity = Number(this.remainQty);
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
     return {
       ...copy,
       id: this.id || undefined,
+      closingType: copy.closingType ?? '',
+      boxB: copy.boxB ?? 0,
     };
   }
 }
@@ -556,9 +578,10 @@ type TprodInputCellType = {
     | 'length'
     | 'width'
     | 'height'
-    | 'thickness'
+    | 'boxB'
     | 'area'
     | 'volume'
+    | 'thickness'
     | 'material'
     | 'surface'
     | 'horsepower'
@@ -566,6 +589,7 @@ type TprodInputCellType = {
     | 'unitPrice'
     | 'totalPrice'
     | 'notes'
+    | 'closingType'
   >]: { type: 'input' };
 };
 
@@ -604,9 +628,10 @@ function prodCellConfigCre(): TprodCellConfig {
       'length',
       'width',
       'height',
-      'thickness',
+      'boxB',
       'area',
       'volume',
+      'thickness',
       'doorType',
       'material',
       'surface',
@@ -618,6 +643,7 @@ function prodCellConfigCre(): TprodCellConfig {
       'totalPrice',
       'notes',
       'bounceDoor',
+      'closingType',
     ],
     cellConfig: {
       // input
@@ -733,8 +759,8 @@ function prodCellConfigCre(): TprodCellConfig {
           },
         },
       },
-      thickness: {
-        id: 'thickness',
+      boxB: {
+        id: 'boxB',
         label: 'B(m)',
         theadItemClassName: 'text-center',
         inputSelProps: {
@@ -762,6 +788,18 @@ function prodCellConfigCre(): TprodCellConfig {
       volume: {
         id: 'volume',
         label: '才數',
+        inputSelProps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {
+              type: 'number',
+            },
+          },
+        },
+      },
+      thickness: {
+        id: 'thickness',
+        label: '厚度',
         inputSelProps: {
           wrapperStyle: { width: '60px' },
           inputProps: {
@@ -855,8 +893,11 @@ function prodCellConfigCre(): TprodCellConfig {
         label: '複價',
         inputSelProps: {
           wrapperStyle: { width: '140px' },
+          showBaseline: 'invisible',
           inputProps: {
-            props: {},
+            props: {
+              disabled: true,
+            },
           },
         },
         // inputType: 'text',
@@ -892,6 +933,21 @@ function prodCellConfigCre(): TprodCellConfig {
           wrapperStyle: { width: '90px' },
           inputProps: {
             props: {},
+          },
+        },
+      },
+      closingType: {
+        id: 'closingType',
+        label: '開閉方式',
+        inputSelProps: {
+          wrapperStyle: { width: '100px' },
+          selectProps: {
+            props: {
+              options: [
+                { value: '電動', label: '電動' },
+                { value: '手動', label: '手動' },
+              ],
+            },
           },
         },
       },

@@ -249,27 +249,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return myAlert.warning({ title: '請輸入地址' });
         }
 
-        try {
-          showRootLoading(true);
-          const res = contractId
-            ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
-            : await apiPostLegacyContracts(classLegacyContract.postBody);
+        console.log(classLegacyContract.postBody);
 
-          showRootLoading(true, '正在更新附件');
-          await uploadAttachment(res.id);
+        // try {
+        //   showRootLoading(true);
+        //   const res = contractId
+        //     ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
+        //     : await apiPostLegacyContracts(classLegacyContract.postBody);
 
-          if (contractId) {
-            await Promise.all([updateLegacyContract(), updateAttachments()]);
-          } else {
-            router.push({ query: { contractId: res.id } });
-          }
+        //   showRootLoading(true, '正在更新附件');
+        //   await uploadAttachment(res.id);
 
-          myAlert.success({ title: '上傳完成' });
-        } catch {
-          myAlert.err({ title: '上傳失敗' });
-        } finally {
-          showRootLoading(false);
-        }
+        //   if (contractId) {
+        //     await Promise.all([updateLegacyContract(), updateAttachments()]);
+        //   } else {
+        //     router.push({ query: { contractId: res.id } });
+        //   }
+
+        //   myAlert.success({ title: '上傳完成' });
+        // } catch {
+        //   myAlert.err({ title: '上傳失敗' });
+        // } finally {
+        //   showRootLoading(false);
+        // }
 
         setAllowEdit(false);
       },

@@ -49,26 +49,6 @@ class Class_payInfo {
       v = '100';
     }
 
-    // const discountRate = Decimal.div(v || 0, 100);
-    // const subTotal: string = (() => {
-    //   let subTotal = new Decimal(0);
-
-    //   this._classProductArr.forEach((prod) => {
-    //     if (!prod.totalPrice) {
-    //       return;
-    //     }
-
-    //     const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
-
-    //     subTotal = subTotal.add(totalPrice);
-    //   });
-
-    //   return subTotal.mul(discountRate).toString();
-    // })();
-    // this.subTotal = subTotal;
-
-    // this._editAllProdDiscount(v || '0');
-    // this._countSubTotal();
     this._legacyContract.discountRate = v || '0';
     this._reRender();
   }
@@ -188,6 +168,16 @@ class Class_payInfo {
   get paymentMethods() {
     return this._legacyContract.paymentMethods;
   }
+
+  get payPrice() {
+    return {
+      discountRate: this._legacyContract.discountRate,
+      subTotal: this._legacyContract.subTotal,
+      salesTax: this._legacyContract.salesTax,
+      total: this._legacyContract.total,
+    };
+  }
+
   editPayMethod = (index: number, v: string) => {
     this._legacyContract.paymentMethods[index].totalPaymentRatio = v;
     this._reRender();

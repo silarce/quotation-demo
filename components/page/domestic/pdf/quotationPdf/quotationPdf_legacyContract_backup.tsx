@@ -159,14 +159,14 @@ export default function QuotationPdf({
     const classProdArr = classLegacyContract.prodArr;
 
     return classProdArr.map((prod) => {
-      const size = `${prod.width || prod.length} X ${prod.height} + ${prod.thickness}`;
+      const size = `${prod.width || prod.length} X ${prod.height} + ${prod.boxB}`;
 
       return {
         category: prod.idNumber,
         size,
         doorType: prod.doorType,
         material: prod.material,
-        thickness: prod.thickness,
+        thickness: prod.boxB,
         surface: prod.surface,
         doorRail: prod.doorTrack,
         horsepower: prod.horsepower,

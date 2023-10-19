@@ -51,7 +51,8 @@ export default function ContractList({ contractList }: { contractList: Tcontract
       return {
         memoId: item.content.quotationNumber,
         memoDate: moment(item.content.createdAt).format('YYYY-MM-DD'),
-        memoContent: item.content.editNotes,
+        // memoContent: item.content.editNotes,
+        memoContent: '',
         href: {
           pathname: '/domestic/contract/quotation',
           query: {

@@ -369,7 +369,7 @@ export type TlegacyContractProductDto = {
   /**h(m) */
   height: number;
   /**B(m) */
-  thickness: number;
+  boxB: number;
   /**面積 */
   area: string;
   /**才數 */
@@ -394,6 +394,10 @@ export type TlegacyContractProductDto = {
   bounceDoor: boolean;
   /**備註 */
   notes: string;
+  /**厚度 */
+  thickness: string;
+  /**開閉方式 */
+  closingType: string;
   //
   /**批次 */
   batch: number;
@@ -499,6 +503,12 @@ export type TlegacyContractDto = {
   latestBatch: number;
   /**附屬合約編號 */
   attachBatchNumbers: string[];
+  priceRecord: {
+    discountRate: string; // 總折數
+    subTotal: string; //小計
+    salesTax: number; // 營業稅
+    total: number; // 總計
+  };
 };
 
 // 舊合約post主產品
@@ -520,7 +530,7 @@ export type TcreateLegacyContractProductDto = {
   /** h(m) */
   height: number;
   /** B(m) */
-  thickness: number;
+  boxB: number;
   /** 面積 */
   area: string;
   /** 才數 */
@@ -545,6 +555,10 @@ export type TcreateLegacyContractProductDto = {
   bounceDoor: boolean;
   /** 備註 */
   notes: string;
+  /**厚度 */
+  thickness: string;
+  /**開閉方式 */
+  closingType: string;
 };
 
 export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
@@ -651,6 +665,12 @@ export type TmodifyLegacyContractDto = {
   products?: TupdateLegacyContractProductDto[];
   additions?: TupdateLegacyContractAdditionDto[];
   batchNumber: string;
+  priceRecord: {
+    discountRate: string; // 總折數
+    subTotal: string; //小計
+    salesTax: number; // 營業稅
+    total: number; // 總計
+  };
 };
 
 // ==========================================================================
@@ -877,7 +897,7 @@ export type TquotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
-  // 關閉方式
+  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
   notes: string;
@@ -1143,7 +1163,7 @@ export type TcreateQuotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
-  // 關閉方式
+  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
   notes: string;
@@ -1944,7 +1964,49 @@ export type TelectronicSuppliesDto = {
 
 export type TcreateElectronicSuppliesDto = Omit<
   TelectronicSuppliesDto,
-  'id' | 'createdAt' | 'updatedAt' | 'contractId' | 'contract' | 'quotationId' | 'quotation'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'contractId'
+  | 'contract'
+  | 'quotationId'
+  | 'quotation'
+  | 'materialHandler'
+  | 'ingredientTechnician'
+  | 'formCompleter'
 >;
 
 export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
+
+export type TexchangeDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  dispatchDate: string; // date
+  requirementsDate: string; // date
+  projectNumber: string;
+  projectName: string;
+  goodsName: string;
+  goodsSpec: string;
+  goodsQuantity: number;
+  reason: string;
+  accountingId: string;
+  accounting: TemployeeDto;
+  warehouseEmployeeId: string;
+  warehouseEmployee: TemployeeDto;
+  factoryEmployeeId: string;
+  factoryEmployee: TemployeeDto;
+  supervisorId: string;
+  supervisor: TemployeeDto;
+  formCompleterId: string;
+  formCompleter: TemployeeDto;
+  contractId: string | null;
+  contract: TquotationContractDto | null;
+  // quotationId: string | null;
+  // quotation: TquotationDto | null;
+};
+
+export type TcreateExchgangeDto = Omit<
+  TexchangeDto,
+  'id' | 'createdAt' | 'updatedAt' | 'warehouseEmployee' | 'factoryEmployee' | 'supervisor' | 'formCompleter'
+>;

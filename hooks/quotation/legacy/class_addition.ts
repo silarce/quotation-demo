@@ -320,6 +320,7 @@ class Class_addition {
 
     const copy = _.cloneDeep(this._addition);
     copy.quantity = this.remainQty;
+    copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
     return {
       ...copy,
@@ -411,8 +412,11 @@ const additionCellConfigCre = (): TadditionCellConfig => {
         label: '複價',
         inputSelPorps: {
           wrapperStyle: { width: '110px' },
+          showBaseline: 'invisible',
           inputProps: {
-            props: {},
+            props: {
+              disabled: true,
+            },
           },
         },
       },

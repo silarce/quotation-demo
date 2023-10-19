@@ -2,7 +2,7 @@
 // 調(退)貨單列表
 // 調(退)貨單列表
 
-import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // global gear

@@ -57,7 +57,7 @@ export default function LegacyContractIntegration() {
   const params: Tparams = {
     // page: page,
     pageSize: 10,
-    populate: ['products', 'additions'],
+    populate: ['products', 'additions', 'priceRecord'],
     filter,
     sort: 'quoteDate',
     order: 'DESC',
@@ -190,8 +190,8 @@ export default function LegacyContractIntegration() {
                 }
               });
 
-              const dateStr = item.quoteDate
-                ? moment(convertDate_reduce1911(item.quoteDate)).format('yy-MM-DD')
+              const dateStr = item.createdAt
+                ? moment(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
                 : '無日期';
 
               const quotationContent: TBodyItemContent = {
@@ -247,7 +247,35 @@ export default function LegacyContractIntegration() {
 // ===========================================================================
 
 const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
-  const { id, attachBatchNumbers } = contract;
+  const {
+    id,
+    attachBatchNumbers,
+    products,
+    additions,
+    // priceRecord
+  } = contract;
+
+  const pricelist: { [key: string]: number } = {};
+
+  products.forEach((item) => {
+    const { batch, totalPrice } = item;
+
+    if (!pricelist[`${batch}`]) {
+      pricelist[`${batch}`] = 0;
+    }
+
+    pricelist[`${batch}`] = pricelist[`${batch}`] + totalPrice;
+  });
+
+  additions.forEach((item) => {
+    const { batch, totalPrice } = item;
+
+    if (!pricelist[`${batch}`]) {
+      pricelist[`${batch}`] = 0;
+    }
+
+    pricelist[`${batch}`] = pricelist[`${batch}`] + totalPrice;
+  });
 
   return (
     <div className={scss.appendList}>
@@ -255,6 +283,9 @@ const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
         if (index === 0) {
           return null;
         }
+
+        const lastBatchPrice = pricelist[`${index - 1}`] ?? 0;
+        const price = pricelist[index] - lastBatchPrice;
 
         const href = {
           pathname: '/domestic/legacyContractIntegration/quotation/append',
@@ -265,6 +296,7 @@ const AppendList = ({ contract }: { contract: TlegacyContractDto }) => {
           <Fragment key={index}>
             {/* <span>{index}</span> */}
             <span>{batchNumber}</span>
+            <span>{price}</span>
             <Link href={href}>
               <IconDetail className={scss.linkBtn} />
             </Link>

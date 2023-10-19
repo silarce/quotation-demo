@@ -171,7 +171,7 @@ export default function QuotationPdf({
     return classProdArr.map((prod) => {
       const lw = (Number(prod.width) || Number(prod.length)) * 100;
       const h = Number(prod.height) * 100;
-      const b = Number(prod.thickness) * 100;
+      const b = Number(prod.boxB) * 100;
 
       const size = `${lw} X ${h} + ${b}`;
 
@@ -181,7 +181,7 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: 'n',
+        thickness: prod.thickness,
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

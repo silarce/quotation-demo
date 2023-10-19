@@ -93,8 +93,6 @@ export default function PageHeaderFlex01({
           const reg = new RegExp(`^${hrefPathname}`);
           const isActive = reg.test(router.pathname);
 
-          console.log(disabled);
-
           if (disabled) {
             return (
               <span className={style.fakeA} key={index}>

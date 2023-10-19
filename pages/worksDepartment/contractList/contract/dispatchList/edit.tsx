@@ -10,6 +10,7 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import Profile, {
   Tprofile01,
   Tprofile02,
+  Tprofile03,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
 import EditDispatch, {
   Tcontroll as Tcontroll_EeditDispatch,
@@ -19,18 +20,50 @@ import EditDispatch, {
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { apiPostEngineeringDispatching, TcreateDispatchingDto } from 'js/api/api_engineering';
-
+import {
+  TcreateDispatchingDto,
+  apiPostEngineeringDispatching,
+  apiPatchEngineeringDispatching,
+  useGetEngineeringDispatching_id,
+} from 'js/api/api_engineering';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { TemployeeDto } from 'js/api/dtoTypes';
 // css
 import scss from './dispatchList.module.scss';
 
-export default function AddDispatchList() {
+export default function EditDispatchList() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { contractId, dispatchingId } = router.query as { contractId: string; dispatchingId: string | undefined };
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  const theDiasbled = !dispatchingId ? false : disabled;
+
+  // ---------------------------------------------------------
+
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+
+  const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
+
+  useEffect(() => {
+    try {
+      update_contract();
+    } catch (error) {
+      myAlert.err({ title: '取得合約失敗' });
+    }
+
+    try {
+      update_dispatching();
+    } catch (error) {
+      myAlert.err({ title: '取得派工單失敗' });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId]);
   // ---------------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>();
   const [profile02, setProfile02] = useState<Tprofile02>();
+  const [profile03, setProfile03] = useState<Tprofile03>();
 
   const onProfile01Change = (key: keyof Tprofile01, v: string) => {
     if (!profile01) {
@@ -52,6 +85,16 @@ export default function AddDispatchList() {
     setProfile02(newProfile);
   };
 
+  const onProfile03Change = (key: keyof Tprofile03, v: TemployeeDto) => {
+    if (!profile03) {
+      return;
+    }
+
+    const newProfile = { ...profile03 };
+    newProfile[key] = v;
+    setProfile03(newProfile);
+  };
+
   // ---------------------------------------------------------
 
   const [editDispatch, setEditDispatch] = useState<{
@@ -64,8 +107,6 @@ export default function AddDispatchList() {
     tasks: {
       value: editDispatch?.tasks ?? '',
       onChange: (v: string) => {
-        console.log(v);
-
         setEditDispatch((data) => {
           if (!data) {
             return data;
@@ -121,28 +162,63 @@ export default function AddDispatchList() {
   // ---------------------------------------------------------
 
   useEffect(() => {
+    if (!disabled) {
+      return;
+    }
+
+    const {
+      projectName,
+      contactPerson,
+      contactNumber,
+      quotationNumber,
+
+      county,
+      district,
+      address,
+    } = contract?.content ?? {};
+
+    const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
+
+    const {
+      content,
+      contractor,
+      projectNumber,
+      badgeNumber,
+      dispatchDate,
+      finalContact,
+      workerName,
+      tasks,
+      note,
+      pricingMethod,
+    } = dispatching ?? {};
+
     setProfile01({
-      projectName: '測試',
-      contractor: '測試',
-      contact: '測試',
-      contactNumber: '04-12345678',
-      allAddress: '測試',
-      projectNumber: '測試',
-      badgeNumber: '',
+      projectName: projectName ?? '',
+      contractor: contractor ?? '',
+      // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
+      // contact: '',
+      contact: content ?? '',
+      contactNumber: contactNumber ?? '',
+      allAddress,
+      //
+      projectNumber: projectNumber ?? '',
+      badgeNumber: badgeNumber ?? '',
     });
     setProfile02({
-      dispatchDate: '',
-      workerName: '',
-      finalContact: '',
+      dispatchDate: dispatchDate ?? '',
+      finalContact: finalContact ?? '',
+    });
+    setProfile03({
+      workerName: undefined,
     });
     setEditDispatch({
-      tasks: '',
-      note: '',
-      pricingMethod: '',
+      tasks: tasks ?? '',
+      note: note ?? '',
+      pricingMethod: pricingMethod ?? '',
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [contract, dispatching, disabled]);
 
   // ---------------------------------------------------------
 
@@ -151,9 +227,13 @@ export default function AddDispatchList() {
       return;
     }
 
+    if (!contractId) {
+      return myAlert.info({ title: '沒有合約ID' });
+    }
+
     const body: TcreateDispatchingDto = {
       // 合約id
-      contractId: 'e298fbc5-78e3-4bfc-a6ff-53c2bbfae83a',
+      contractId,
       ...profile01,
       ...profile02,
       ...editDispatch,
@@ -161,11 +241,18 @@ export default function AddDispatchList() {
       district: '大安區',
       address: '小馬路',
       content: profile01.contact,
+      workerName: profile03?.workerName?.chName ?? '',
     };
 
     try {
       setIsLoading(true);
-      await apiPostEngineeringDispatching(body);
+
+      if (dispatchingId) {
+        await apiPatchEngineeringDispatching(dispatchingId, body);
+      } else {
+        await apiPostEngineeringDispatching(body);
+      }
+
       myAlert.success({ title: '新增派工單成功' });
       router.back();
     } catch (error) {
@@ -176,7 +263,7 @@ export default function AddDispatchList() {
   };
 
   // ---------------------------------------------------------
-  const panelList: TpanelList = [
+  const panelList01: TpanelList = [
     {
       type: 'redButton',
       label: '建立',
@@ -188,23 +275,52 @@ export default function AddDispatchList() {
       onClick: () => router.back(),
     },
   ];
+  const panelList02: TpanelList = [
+    {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => setDisabled(false),
+    },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
+    },
+  ];
+  const panelList03: TpanelList = [
+    {
+      type: 'redButton',
+      label: '更新',
+      onClick: reqPost,
+    },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => setDisabled(true),
+    },
+  ];
+
+  const panelList = !dispatchingId ? panelList01 : disabled ? panelList02 : panelList03;
 
   // ---------------------------------------------------------
 
   // ---------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} />
+      <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
       <div>
         <div className={scss.add}>
           <Profile
+            disabled={theDiasbled}
             profile01={profile01}
             onProfile01Change={onProfile01Change}
             profile02={profile02}
             onProfile02Change={onProfile02Change}
+            profile03={profile03}
+            onProfile03Change={onProfile03Change}
           />
           <hr />
-          <EditDispatch controll={controll_editDispatch} />
+          <EditDispatch controll={controll_editDispatch} disabled={theDiasbled} />
         </div>
       </div>
     </SubLayer>
