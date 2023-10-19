@@ -136,24 +136,29 @@ export const useGetEngineeringDispatchingList = (customParams?: Tparams) => {
 };
 
 /**以 id 取得派工單 DisPatching */
-export const apiGetEngineeringDispatching_id = async (id: string) => {
+export const apiGetEngineeringDispatching_id = async (id: string, params: Tparams) => {
   const api = `/engineering/dispatching/${id}`;
 
   return axi
-    .get<TdispatchingDto>(api)
+    .get<TdispatchingDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetEngineeringDispatching_id = (id: string | undefined) => {
+export const useGetEngineeringDispatching_id = (id: string | undefined, customeParams?: Tparams) => {
   const [res, setRes] = useState<TdispatchingDto>();
+
+  const params = {
+    populate: ['workerEmployee'],
+    ...customeParams,
+  };
 
   const update = async () => {
     if (!id) {
       return;
     }
 
-    const newRes = await apiGetEngineeringDispatching_id(id);
+    const newRes = await apiGetEngineeringDispatching_id(id, params);
 
     if (newRes) {
       setRes(newRes);

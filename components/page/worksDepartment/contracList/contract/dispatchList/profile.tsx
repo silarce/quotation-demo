@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 
-import { useRouter } from 'next/router';
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
@@ -64,8 +64,10 @@ export default function Profile({
         {profile02 && (
           <InputSel
             disabled={disabled}
-            className={`${style.input02}`}
+            // className={`${style.input02}`}
+            className={classNames(style.input02)}
             datePickerProps={{
+              datePickerClassName: style.datePicker,
               value: profile02.dispatchDate ?? '',
               onChange02: (m) => {
                 onProfile02Change?.('dispatchDate', m?.toISOString() ?? '');

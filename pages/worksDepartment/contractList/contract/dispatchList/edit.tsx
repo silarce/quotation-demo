@@ -253,11 +253,12 @@ export default function EditDispatchList() {
 
       if (dispatchingId) {
         await apiPatchEngineeringDispatching(dispatchingId, body);
+        myAlert.success({ title: '更新派工單成功' });
       } else {
         await apiPostEngineeringDispatching(body);
+        myAlert.success({ title: '新增派工單成功' });
       }
 
-      myAlert.success({ title: '新增派工單成功' });
       router.back();
     } catch (error) {
       myAlert.err({ title: '新增派工單失敗' });
