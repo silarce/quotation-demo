@@ -22,10 +22,7 @@ import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
+
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 // import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
@@ -37,7 +34,6 @@ import QuotationPdf_part, {
   Tpart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
@@ -59,10 +55,6 @@ import style from './quotation.module.scss';
 import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
-
-// 假資料與fake api
-import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -823,9 +815,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
-
-  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
   const signatureArr: TsignatureProps[] = [
     {
       label: '總經理',
@@ -882,17 +871,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
   ];
-
-  useEffect(() => {
-    reNewClassQuotation();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
-
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
 
   // --------------------------------------------------------------------------
 
@@ -1010,24 +988,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  if (!classQuotation) {
-    return null;
-  }
-
-  // --------------------------------------------------------------------------
-  const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
-      return {
-        ...mp.allData,
-        part: mp.partArr.map((part) => part.allData),
-      };
-    });
-
-    return theArr;
-  })();
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------

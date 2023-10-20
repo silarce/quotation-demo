@@ -20,8 +20,8 @@ import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotatio
 // import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
-import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
+// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
+// import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 //
 
 // antd
