@@ -17,7 +17,7 @@
     .row {
       display: flex;
       gap: 63px;
-      height: 53px;
+      min-height: 53px;
       padding-left: 45px;
       padding-right: 20px;
       border-top: solid 1px $colorBorder01;
@@ -34,6 +34,7 @@
     margin: auto;
     margin-left: 0;
     margin-right: 0;
+    flex: none;
     > span {
       font-weight: 400;
       font-size: 14px;
@@ -41,10 +42,12 @@
     }
 
     &.departmentInfo {
-      display: grid;
-      grid-template-columns: auto auto;
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 13px;
+      margin-bottom: 13px;
       justify-content: flex-start;
-      gap: 35px;
+      gap: 10px 35px;
     }
   }
 }
