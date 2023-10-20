@@ -15,7 +15,13 @@ import { optionsCreator_customerType } from 'js/utils/options/options';
 import scss from './customerSelector.module.scss';
 
 // api
-import { TcustomerDto_TC, TapiGetCustomersParams, useCustomers } from 'js/api/api_customer';
+import {
+  TcustomerDto_TC,
+  TcustomerDto,
+  TapiGetCustomersParams,
+  useCustomers,
+  useGetCustomers_infinite,
+} from 'js/api/api_customer';
 // ====================================================================
 
 const customerTypeArr = optionsCreator_customerType({ emptyOption: true });
@@ -42,12 +48,9 @@ export default function CustomerSelector({
   const [selEmployeeArr, setSelEmployeeArr] = useState<TcustomerDto_TC[]>([]);
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
-  const [pageObj, setPageObj] = useState({ page: -1 });
-  const page = pageObj.page;
 
   const params: TapiGetCustomersParams = (() => {
     return {
-      page: page,
       pageSize: 20,
       populate: ['contacts', 'types'],
       sort: 'customerNumber',
@@ -61,80 +64,29 @@ export default function CustomerSelector({
     };
   })();
 
-  const res = useCustomers(params);
-  const { meta, setData, update, update_infinite } = res;
-  const customerArr = res?.data as TcustomerDto_TC[] | undefined;
-
-  const [viewRef, inView] = useInView();
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useGetCustomers_infinite({ customParams: params });
 
   useEffect(() => {
     if (!showModal) {
+      setSelEmployeeArr([]);
+
       return;
     }
 
-    if (!inView) {
-      return;
-    }
+    reset();
 
-    if (!meta?.hasNextPage) {
-      return;
-    }
-
-    const newPageObj = { ...pageObj, page: pageObj.page + 1 };
-    setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
+  }, [searchValue, showModal]);
 
   useEffect(() => {
     if (!showModal) {
-      const newPageObj = { ...pageObj, page: -1 };
-      setPageObj(newPageObj);
-      setData(undefined);
       setSearchValue([]);
 
       return;
     }
 
-    // const newPageObj = { ...pageObj, page: 1 };
-    // setPageObj(newPageObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
-
-  useEffect(() => {
-    const newPageObj = { ...pageObj, page: 1 };
-    setPageObj(newPageObj);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue]);
-
-  useEffect(() => {
-    if (page === -1) {
-      return;
-    }
-
-    if (page === 1) {
-      setData(undefined);
-
-      (async () => {
-        try {
-          setIsLoading(true);
-          await update();
-        } catch (error) {
-          myAlert.err({ title: '取得客戶資料失敗' });
-        }
-
-        setIsLoading(false);
-      })();
-    } else {
-      (async () => {
-        try {
-          await update_infinite();
-        } catch (error) {
-          myAlert.err({ title: '取得客戶資料失敗' });
-        }
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageObj]);
 
   // ==================================================
 
@@ -160,7 +112,7 @@ export default function CustomerSelector({
   };
 
   const theOnConfirm = () => {
-    if (!selEmployeeArr) {
+    if (!selEmployeeArr || selEmployeeArr.length === 0) {
       return ModalInfo('請選擇客戶');
     }
 
@@ -216,16 +168,16 @@ export default function CustomerSelector({
         onClick: onSearch,
       }}
     >
-      <LoadingCoverWrapper01 isLoading={isLoading}>
+      <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={scss.listContainer}>
-          {customerArr?.map((emp, index, arr) => {
-            const { customerNumber, name } = emp;
+          {dataArr?.map((customer, index, arr) => {
+            const { customerNumber, name } = customer;
 
-            const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
+            const isActive = selEmployeeArr.some((selEmp) => selEmp.id === customer.id);
 
             const theViewRef = (() => {
               if (arr.length - 11 === index) {
-                return viewRef;
+                return viewRef_bottom;
               }
 
               return undefined;
@@ -233,7 +185,7 @@ export default function CustomerSelector({
 
             return (
               <CellWithBar key={index} isActive={isActive} className={scss.rowWrapper}>
-                <div className={scss.listItem} onClick={() => onClick(emp)} ref={theViewRef}>
+                <div className={scss.listItem} onClick={() => onClick(customer as TcustomerDto_TC)} ref={theViewRef}>
                   <span>{customerNumber}</span>
                   <span>{name}</span>
                 </div>

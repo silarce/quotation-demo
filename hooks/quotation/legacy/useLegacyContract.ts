@@ -287,6 +287,34 @@ class Class_legacyContract {
 
     this.classPayInfo.subTotal = subTotal.toString();
   };
+
+  countProdTotal() {
+    let subTotal = new Decimal(0);
+
+    //-------
+    Object.values(this._prodList).forEach((prod) => {
+      // 複價
+      const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+      // 追減、變更金額
+      const reduceExchangePrice = prod.reduceExchangePrice.replace(/,/g, '') || 0;
+
+      // 需求變更 編輯折數與總折數時不再影響其他數值
+      // const discountRate = Decimal.div(prod.discountRate || 0, 100);
+      // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
+
+      subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
+    });
+
+    const salesTax = Number(Decimal.mul(subTotal, 0.05).toFixed(0));
+    const total = Decimal.add(salesTax, subTotal).toNumber();
+
+    return {
+      subTotal: subTotal.toNumber(),
+      salesTax: salesTax,
+      total: total,
+    };
+  }
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
@@ -615,23 +643,23 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
-    let haveQty0 = false;
+    // let haveQty0 = false;
 
     legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
       const thePost = prod.postProd;
 
-      if (!prod.postProd.quantity) {
-        haveQty0 = true;
-      }
+      // if (!prod.postProd.quantity) {
+      //   haveQty0 = true;
+      // }
 
       return thePost;
     });
 
-    if (haveQty0) {
-      myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
+    // if (haveQty0) {
+    //   myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
 
-      return false;
-    }
+    //   return false;
+    // }
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 

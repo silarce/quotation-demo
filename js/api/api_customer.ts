@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import _ from 'lodash';
 
 import { axi } from './_axiosCreator';
 
 // config
 import { customerTypesLookup } from 'config/lookupTable';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 // type
-import type { TcustomerDto, TcustomerDto_Populate, TpageMetaDto, Tcontact } from './dtoTypes';
+import type { Tparams, TcustomerDto, TcustomerDto_Populate, TpageMetaDto, Tcontact } from './dtoTypes';
 
 /**
  * "types"、"contacts"為必須
  */
 type TcustomerDto_TC = TcustomerDto_Populate<['types', 'contacts']>;
 
-export type { TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts };
+export type { Tparams, TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts };
 // ===============================================================
 export { customerTypesLookup };
 // ===============================================================
@@ -91,13 +94,13 @@ export type TpostCustomer = {
 // ============================================================
 // 取得客戶列表
 
-const apiGetCustomers = (params?: TapiGetCustomersParams) => {
+const apiGetCustomers = (params?: Tparams) => {
   const api = '/customers';
 
   return axi
     .get(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 export const useCustomers = (params?: TapiGetCustomersParams) => {
@@ -133,6 +136,123 @@ export const useCustomers = (params?: TapiGetCustomersParams) => {
     setData: setRes,
     update,
     update_infinite,
+  };
+};
+
+export const useGetCustomers_infinite = ({ customParams }: { customParams?: Tparams } = {}) => {
+  /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
+  const [resetCount, setResetCount] = useState(0);
+  const [isLoadingPage1, setIsLoadingPage1] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
+  const [viewRef_top, inView_top] = useInView();
+  const [viewRef_bottom, inView_bottom] = useInView();
+  // ----------------------------------------------------------------
+  const [dataList, setDataList] = useState<{ [key: `${number}`]: TcustomerDto[] }>({});
+
+  const [page, setPage] = useState<number>();
+  const [meta, setMeta] = useState<TpageMetaDto>();
+  const [hasNextPage, setHasNextPage] = useState<boolean>();
+
+  // ----------------------------------------------------------------
+  const defaultParams = {
+    page,
+    populate: ['contract'],
+  };
+  // ----------------------------------------------------------------
+
+  const update = async (dynaParams?: Tparams) => {
+    const params = {
+      ...defaultParams,
+      ...customParams,
+      ...dynaParams,
+    };
+
+    try {
+      if (page === 1) {
+        setIsLoadingPage1(true);
+      }
+
+      setIsloading(true);
+
+      const res = await apiGetCustomers(params);
+
+      if (res) {
+        setDataList((list) => {
+          list[`${res.meta.page}`] = res.data;
+
+          return { ...list };
+        });
+        setMeta(res.meta);
+        setHasNextPage(res.meta.hasNextPage);
+      }
+
+      return res;
+      //
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得列表失敗', content: err?.message });
+      console.log(error);
+    } finally {
+      setIsloading(false);
+      setIsLoadingPage1(false);
+    }
+  };
+
+  const nextPage = () => {
+    if (hasNextPage === false || !page) {
+      return;
+    }
+
+    setPage((page) => (page ? page + 1 : page));
+  };
+
+  // -----------------------------------------------
+  const init = () => {
+    setDataList({});
+    setPage(undefined);
+    setHasNextPage(undefined);
+    setResetCount(0);
+  };
+
+  const reset = () => {
+    setDataList({});
+    setPage(1);
+    setHasNextPage(true);
+    setResetCount((count) => ++count);
+  };
+
+  // -----------------------------------------------
+  useEffect(() => {
+    if (!page) {
+      return;
+    }
+
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, resetCount]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (inView_bottom) {
+      nextPage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView_bottom, isLoading]);
+  // -----------------------------------------------
+
+  return {
+    dataList,
+    dataArr: _.flatten(Object.values(dataList)),
+    viewRef_top,
+    viewRef_bottom,
+    isLoadingPage1,
+    isLoading,
+    meta,
+    init,
+    reset,
   };
 };
 
