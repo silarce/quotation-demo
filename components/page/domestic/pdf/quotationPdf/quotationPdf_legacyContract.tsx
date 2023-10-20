@@ -125,18 +125,23 @@ export default function QuotationPdf({
   const totalPram = (() => {
     const memoArr = classLegacyContract.classNotes.stringArr;
 
-    let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
-    let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
-    let total: string | number = classLegacyContract.classPayInfo.total;
+    // let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
+    // let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
+    // let total: string | number = classLegacyContract.classPayInfo.total;
+    // subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-    subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const { subTotal, salesTax: businessTax, total } = classLegacyContract.countProdTotal();
+
+    const theSubTotal = subTotal.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const theBusinessTax = businessTax.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const theTotal = total.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
     const settlement = {
-      subTotal, //小計
-      businessTax, //營業稅
-      total, // 統計
+      subTotal: theSubTotal, //小計
+      businessTax: theBusinessTax, //營業稅
+      total: theTotal, // 統計
     };
 
     return { memoArr, settlement };
