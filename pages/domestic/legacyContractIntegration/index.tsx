@@ -63,9 +63,9 @@ export default function LegacyContractIntegration() {
     pageSize: 5,
     populate: ['products', 'additions', 'priceRecord'],
     filter,
-    sort: 'updatedAt',
-    order: 'DESC',
-    // order: 'ASC',
+    sort: 'contractNumber',
+    // order: 'DESC',
+    order: 'ASC',
   };
 
   const { dataArr, viewRef_bottom, isLoadingPage1, isLoading, reset } = useLegacyContract_infinite({
@@ -215,7 +215,7 @@ export default function LegacyContractIntegration() {
               const quotationContent: TBodyItemContent = {
                 quotationNumber: item.contractNumber, // 合約編號
 
-                quotationDate: dateStr, //報價日期
+                quotationDate: dateStr, //建立日期
                 projectName: item.projectName /**工程名稱 */,
                 county: item.projectCity /**工地位置縣市 */,
                 contactPerson: item.contactPerson /**聯絡人 */,
