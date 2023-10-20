@@ -194,7 +194,7 @@ export default function QuotationPdf({
       const h = Number(prod.height) * 100;
       const b = Number(prod.thickness) * 100;
 
-      const size = `${lw} X ${h} + ${b}`;
+      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
       return {
         category: prod.itemName,
