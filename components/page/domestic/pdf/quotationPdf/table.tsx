@@ -30,23 +30,23 @@ export default function Table({ productList }: { productList: TtableProdList }) 
       return;
     }
 
-    try {
-      svgList[fileName] = 'isLoading';
+    // try {
+    //   svgList[fileName] = 'isLoading';
 
-      const svg = await apiGetAssets(fileName);
+    //   const svg = await apiGetAssets(fileName);
 
-      if (svg) {
-        setSvgList((list) => ({
-          ...list,
-          [fileName]: svg,
-        }));
-      }
-    } catch (error) {
-      setSvgList((list) => ({
-        ...list,
-        [fileName]: undefined,
-      }));
-    }
+    //   if (svg) {
+    //     setSvgList((list) => ({
+    //       ...list,
+    //       [fileName]: svg,
+    //     }));
+    //   }
+    // } catch (error) {
+    //   setSvgList((list) => ({
+    //     ...list,
+    //     [fileName]: undefined,
+    //   }));
+    // }
   };
 
   return (
@@ -81,16 +81,27 @@ export default function Table({ productList }: { productList: TtableProdList }) 
           const subClass = ' ' + style[align ?? ''];
 
           if (key === 'doorRail') {
-            const arr = value.split('/');
-            const fileName = arr[arr.length - 1];
+            let svgString;
+            let src;
 
-            getSvg({ fileName: fileName });
+            if (value) {
+              if (value.startsWith('/_next')) {
+                src = value;
+              } else {
+                const arr = value.split('/');
+                const fileName = arr[arr.length - 1];
+
+                getSvg({ fileName: fileName });
+
+                svgString = svgList[`${fileName}`] ?? '';
+              }
+            }
 
             return (
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
-                {/* <img src={value} alt="" /> */}
-                <div dangerouslySetInnerHTML={{ __html: svgList[`${fileName}`] ?? '' }} />
+                {src && <img src={src} alt="" />}
+                {svgString !== undefined && <div dangerouslySetInnerHTML={{ __html: svgString }} />}
               </div>
             );
           }

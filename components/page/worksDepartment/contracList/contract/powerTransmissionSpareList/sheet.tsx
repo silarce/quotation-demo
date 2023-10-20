@@ -1,14 +1,159 @@
 import styled from '@emotion/styled';
 import React, { Fragment } from 'react';
-import { useRouter } from 'next/router';
 
 // css
 import style from './powerTransmissionSpareList.module.scss';
 
-export default function Sheet({ editable }: { editable: boolean }) {
-  const router = useRouter();
-  const isAdd = router.route.split('/').pop() === 'add';
+// ==================================================================
+type Tcontroll = {
+  [key: string]:
+    | {
+        value: string;
+        onChange: (qty: string, c2Key: string) => void;
+      }
+    | undefined;
 
+  智慧型: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  面板式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  埋入式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  外露式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  電子式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  防爆式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  鎖號: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  特殊鎖號: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  三點式一般: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  三點式遮煙: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  '3HP馬達控制箱380v': {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  '2HP馬達控制箱380v': {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  '3HP馬達控制箱220v': {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  '2HP馬達控制箱220v': {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  彈射門控制箱: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  紅外線控制盤: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  煙感器: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  中繼器: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  門弓器: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  平推鎖: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  電磁扣: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  遙控器加障感器: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  遙控器: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  障感器: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  大門用主機: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  對照式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  反射式: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  防颱鎖固: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  防颱中柱: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+  //
+  其他: {
+    value: string;
+    onChange: (qty: string, c2Key: string) => void;
+  };
+};
+
+export type { Tcontroll };
+
+// ==================================================================
+export default function Sheet({
+  editable,
+  isAdd,
+  controll,
+}: {
+  editable: boolean;
+  isAdd?: boolean;
+  controll: Tcontroll;
+}) {
   return (
     <div className={style.sheet}>
       <div className={style.thead}>
@@ -45,10 +190,19 @@ export default function Sheet({ editable }: { editable: boolean }) {
                 const { label, rSpan, cSpan, type, defaultValue } = c3Config[c2Key].config[c3Key];
 
                 if (c2Key === '其他') {
+                  const { value, onChange } = controll[c2Key] ?? {};
+
                   return (
                     <Fragment key={c3Index}>
                       <Cother {...{ rSpan, cSpan }}>
-                        <textarea placeholder="其他..." disabled={!editable} />
+                        <textarea
+                          placeholder="其他..."
+                          disabled={!editable}
+                          value={value ?? ''}
+                          onChange={(e) => {
+                            onChange(e.target.value, c2Key);
+                          }}
+                        />
                       </Cother>
                     </Fragment>
                   );
@@ -57,7 +211,6 @@ export default function Sheet({ editable }: { editable: boolean }) {
                 if (type === 'subCell') {
                   const { label, subKeys, subConfig } = c3Config[c2Key].config[c3Key];
                   const rSpan = subKeys!.length;
-                  console.log(rSpan);
 
                   return (
                     <Fragment key={c3Index}>
@@ -78,9 +231,19 @@ export default function Sheet({ editable }: { editable: boolean }) {
                         </div>
                       </SubCell>
                       {subKeys!.map((key, subIndex) => {
+                        const { value, onChange } = controll[key] ?? {};
+
                         return (
                           <C4 key={subIndex} editable={editable}>
-                            <input type="text" defaultValue={isAdd ? '' : defaultValue} disabled={!editable} />
+                            <input
+                              type="number"
+                              // defaultValue={isAdd ? '' : defaultValue}
+                              disabled={!editable}
+                              value={value ?? ''}
+                              onChange={(e) => {
+                                onChange?.(e.target.value, c2Key);
+                              }}
+                            />
                           </C4>
                         );
                       })}
@@ -88,13 +251,23 @@ export default function Sheet({ editable }: { editable: boolean }) {
                   );
                 }
 
+                const { value, onChange } = controll[c3Key] ?? {};
+
                 return (
                   <Fragment key={c3Index}>
                     <C3>
                       <span>{label}</span>
                     </C3>
                     <C4 editable={editable}>
-                      <input type="text" defaultValue={isAdd ? '' : defaultValue} disabled={!editable} />
+                      <input
+                        type="number"
+                        // defaultValue={isAdd ? '' : defaultValue}
+                        disabled={!editable}
+                        value={value ?? ''}
+                        onChange={(e) => {
+                          onChange?.(e.target.value, c2Key);
+                        }}
+                      />
                     </C4>
                   </Fragment>
                 );
@@ -232,28 +405,28 @@ const c3Config: {
   };
 } = {
   鎖盒: {
-    indexKeys: ['a', 'b', 'c', 'd', 'e', 'f'],
+    indexKeys: ['智慧型', '面板式', '埋入式', '外露式', '電子式', '防爆式'],
     config: {
-      a: { label: '智慧型', defaultValue: '1' },
-      b: { label: '面板式', defaultValue: '3' },
-      c: { label: '埋入式', defaultValue: '' },
-      d: { label: '外露式', defaultValue: '2' },
-      e: { label: '電子式', defaultValue: '1' },
-      f: { label: '防爆式', defaultValue: '1' },
+      智慧型: { label: '智慧型', defaultValue: '1' },
+      面板式: { label: '面板式', defaultValue: '3' },
+      埋入式: { label: '埋入式', defaultValue: '' },
+      外露式: { label: '外露式', defaultValue: '2' },
+      電子式: { label: '電子式', defaultValue: '1' },
+      防爆式: { label: '防爆式', defaultValue: '1' },
     },
   },
   鎖匙: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['鎖號', '特殊鎖號'],
     config: {
-      a: { label: '鎖號', defaultValue: '1' },
-      b: { label: '特殊鎖號', defaultValue: '2' },
+      鎖號: { label: '鎖號', defaultValue: '1' },
+      特殊鎖號: { label: '特殊鎖號', defaultValue: '2' },
     },
   },
   押扣: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['三點式一般', '三點式遮煙'],
     config: {
-      a: { label: '三點式（一般）' },
-      b: { label: '三點式（遮煙）' },
+      三點式一般: { label: '三點式（一般）' },
+      三點式遮煙: { label: '三點式（遮煙）' },
     },
   },
   控制箱盤: {
@@ -262,60 +435,67 @@ const c3Config: {
       a: {
         label: '捲門/水閘門',
         type: 'subCell',
-        subKeys: ['a', 'b', 'c', 'd', 'e', 'f'],
+        subKeys: [
+          '三HP馬達控制箱380',
+          '二HP馬達控制箱380',
+          '三HP馬達控制箱220',
+          '二HP馬達控制箱220',
+          '彈射門控制箱',
+          '紅外線控制盤',
+        ],
         subConfig: {
-          a: { label: '3HP 馬達控制箱（380V）' },
-          b: { label: '3HP 馬達控制箱（380V）' },
-          c: { label: '2HP 馬達控制箱（220V）' },
-          d: { label: '2HP 馬達控制箱（220V）' },
-          e: { label: '彈射門控制箱' },
-          f: { label: '紅外線控制盤（含面板）' },
+          三HP馬達控制箱380: { label: '3HP 馬達控制箱（380V）' },
+          二HP馬達控制箱380: { label: '2HP 馬達控制箱（380V）' },
+          三HP馬達控制箱220: { label: '3HP 馬達控制箱（220V）' },
+          二HP馬達控制箱220: { label: '2HP 馬達控制箱（220V）' },
+          彈射門控制箱: { label: '彈射門控制箱' },
+          紅外線控制盤: { label: '紅外線控制盤（含面板）' },
         },
       },
     },
   },
   消防備品: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['煙感器', '中繼器'],
     config: {
-      a: { label: '煙感器' },
-      b: { label: '中繼器' },
+      煙感器: { label: '煙感器' },
+      中繼器: { label: '中繼器' },
     },
   },
   板門配件: {
-    indexKeys: ['a', 'b', 'c'],
+    indexKeys: ['門弓器', '平推鎖', '電磁扣'],
     config: {
-      a: { label: '門弓器', defaultValue: '3' },
-      b: { label: '平推鎖' },
-      c: { label: '電磁扣', defaultValue: '5' },
+      門弓器: { label: '門弓器', defaultValue: '3' },
+      平推鎖: { label: '平推鎖' },
+      電磁扣: { label: '電磁扣', defaultValue: '5' },
     },
   },
   主機: {
-    indexKeys: ['a', 'b', 'c', 'd'],
+    indexKeys: ['遙控器加障感器', '遙控器', '障感器', '大門用主機'],
     config: {
-      a: { label: '遙控器（1:2）+障感器' },
-      b: { label: '遙控器（1:2）' },
-      c: { label: '障感器' },
-      d: { label: '大門用主機' },
+      遙控器加障感器: { label: '遙控器（1:2）+障感器' },
+      遙控器: { label: '遙控器（1:2）' },
+      障感器: { label: '障感器' },
+      大門用主機: { label: '大門用主機' },
     },
   },
   紅外線: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['對照式', '反射式'],
     config: {
-      a: { label: '對照式' },
-      b: { label: '反射式' },
+      對照式: { label: '對照式' },
+      反射式: { label: '反射式' },
     },
   },
   防颱配件: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['防颱鎖固', '防颱中柱'],
     config: {
-      a: { label: '防颱鎖固', defaultValue: '8' },
-      b: { label: '防颱中柱' },
+      防颱鎖固: { label: '防颱鎖固', defaultValue: '8' },
+      防颱中柱: { label: '防颱中柱' },
     },
   },
   其他: {
-    indexKeys: ['a'],
+    indexKeys: ['其他'],
     config: {
-      a: {
+      其他: {
         rSpan: 3,
         cSpan: 2,
         type: 'textarea',

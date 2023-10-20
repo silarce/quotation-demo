@@ -49,26 +49,6 @@ class Class_payInfo {
       v = '100';
     }
 
-    // const discountRate = Decimal.div(v || 0, 100);
-    // const subTotal: string = (() => {
-    //   let subTotal = new Decimal(0);
-
-    //   this._classProductArr.forEach((prod) => {
-    //     if (!prod.totalPrice) {
-    //       return;
-    //     }
-
-    //     const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
-
-    //     subTotal = subTotal.add(totalPrice);
-    //   });
-
-    //   return subTotal.mul(discountRate).toString();
-    // })();
-    // this.subTotal = subTotal;
-
-    // this._editAllProdDiscount(v || '0');
-    // this._countSubTotal();
     this._legacyContract.discountRate = v || '0';
     this._reRender();
   }
@@ -102,7 +82,7 @@ class Class_payInfo {
       return '';
     }
 
-    return parseFloat(this._subTotal).toLocaleString();
+    return Number(this._subTotal).toLocaleString();
   }
   set subTotal(v) {
     v = v.replace(/,/g, '');
@@ -113,7 +93,7 @@ class Class_payInfo {
       return;
     }
 
-    const salesTax = Decimal.mul(v || 0, 0.05).toString();
+    const salesTax = Decimal.mul(v || 0, 0.05).toFixed(0);
     const total = Decimal.add(salesTax, v || 0).toString();
     this._subTotal = v;
     this._legacyContract.subTotal = parseFloat(v || '0');
@@ -128,7 +108,7 @@ class Class_payInfo {
       return '';
     }
 
-    return parseFloat(this._salesTax).toLocaleString();
+    return Number(this._salesTax).toLocaleString();
   }
   set salesTax(v) {
     v = v.replace(/,/g, '');
@@ -140,7 +120,7 @@ class Class_payInfo {
     }
 
     this._salesTax = v;
-    this._legacyContract.salesTax = parseFloat(v || '0');
+    this._legacyContract.salesTax = Number(v || '0');
     this._reRender();
   }
   /**總計 */
@@ -149,7 +129,7 @@ class Class_payInfo {
       return '';
     }
 
-    return parseFloat(this._total).toLocaleString();
+    return Number(this._total).toLocaleString();
   }
   set total(v) {
     v = v.replace(/,/g, '');
@@ -163,7 +143,7 @@ class Class_payInfo {
     v = new Decimal(v || 0).toDecimalPlaces(0).toString();
 
     this._total = v; // 必須可以接受空字串""
-    this._legacyContract.total = parseFloat(v || '0'); // 必須是number
+    this._legacyContract.total = Number(v || '0'); // 必須是number
     // this._total = v; // 必須可以接受空字串""
     // this._legacyContract.total = parseFloat(v || "0");// 必須是num
     this._reRender();
@@ -188,6 +168,16 @@ class Class_payInfo {
   get paymentMethods() {
     return this._legacyContract.paymentMethods;
   }
+
+  get payPrice() {
+    return {
+      discountRate: this._legacyContract.discountRate,
+      subTotal: this._legacyContract.subTotal,
+      salesTax: this._legacyContract.salesTax,
+      total: this._legacyContract.total,
+    };
+  }
+
   editPayMethod = (index: number, v: string) => {
     this._legacyContract.paymentMethods[index].totalPaymentRatio = v;
     this._reRender();

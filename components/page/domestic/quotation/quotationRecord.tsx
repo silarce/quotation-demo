@@ -91,7 +91,7 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
             const changeInfo = {
               quotationId: content.quotationNumber,
               date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
-              priceChange: content.total,
+              priceChange: content.subTotal,
               remark: content.editNotes,
             };
 

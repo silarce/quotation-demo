@@ -27,14 +27,16 @@ export default function QuotationProduction({
   switch02,
   className = '',
   isAppend,
-  isLatestBatch,
+  isAppending,
+  difference_prod = 0,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
   switch02?: boolean;
   className?: string;
   isAppend?: boolean;
-  isLatestBatch?: boolean;
+  isAppending?: boolean;
+  difference_prod?: number;
 }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
@@ -67,7 +69,7 @@ export default function QuotationProduction({
               classQuotation={legacyContract as Class_legacyContract}
               disabled={disabled}
               isAppend={isAppend}
-              isLatestBatch={isLatestBatch}
+              isAppending={isAppending}
               onVerticalKeyChange={(v) => {
                 setVerticalKeyArr(v);
               }}
@@ -79,7 +81,7 @@ export default function QuotationProduction({
             )}
           </div>
 
-          {isAppend && isLatestBatch && (
+          {isAppend && isAppending && (
             <ExchangePanel>
               {verticalKeyArr.map((key, index) => {
                 const prod = prodList_2[key];
@@ -109,10 +111,21 @@ export default function QuotationProduction({
         {/*  */}
         {/* container close */}
       </div>
+      {/* difference_prod */}
       {isAppend && (
         <div className={classNames(scss.total)}>
           <span>合計</span>
-          <span>- {prodSubPriceTotal.toLocaleString()}</span>
+          <span>
+            {(() => {
+              if (isAppending) {
+                return `- ${prodSubPriceTotal.toLocaleString()}`;
+              } else {
+                const mark = difference_prod >= 0 ? '+' : '';
+
+                return `${mark} ${difference_prod.toLocaleString()}`;
+              }
+            })()}
+          </span>
         </div>
       )}
 

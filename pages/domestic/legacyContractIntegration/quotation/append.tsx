@@ -16,9 +16,11 @@ import QuotationSinature, { TinputProps } from 'components/page/domestic/quotati
 import QuotationExProd from 'components/page/domestic/quotation/legacyContract/quotationExProd_legacyContract';
 import QuotationExAddi from 'components/page/domestic/quotation/legacyContract/quotationExAddi_legacyContract';
 
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
+
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+// import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
@@ -55,13 +57,17 @@ export default function Quotation() {
 }
 
 function TheQuotation({ router }: { router: NextRouter }) {
-  /**合約id，若為undefined就逮代表為新增合約 */
-  const contractId = router.query.contractId as string | undefined;
+  const { contractId } = router.query as { [key: string]: string | undefined };
+  const isAppending = (router.query.isAppending as string | undefined) === 'true';
+
   const batch = (router.query.batch as `${number}` | undefined) || '0';
+
+  const [showPdf, setShowPdf] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
-    populate: ['customer', 'products', 'additions'],
+    populate: ['customer', 'products', 'additions', 'priceRecord'],
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
@@ -71,7 +77,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // 這是class
-  const { classLegacyContract, reset } = useLegacyContract({
+  const { classLegacyContract, reset, difference_prod, difference_addi } = useLegacyContract({
     //
     contract: legacyContract,
     batch: Number(batch),
@@ -79,8 +85,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
-
-  const isLatestBatch = legacyContract?.latestBatch === Number(batch);
 
   // --------------------------------------------------------------------------
   // 其實不會用到，但是有一個元件必須要送進去
@@ -114,7 +118,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([updateLegacyContract(), updateAttachments()]);
+      try {
+        setIsLoading(true);
+        await Promise.all([updateLegacyContract(), updateAttachments()]);
+      } catch (error) {
+        myAlert.err({ title: '取得舊合約失敗' });
+      } finally {
+        setIsLoading(false);
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, batch]);
@@ -184,7 +195,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       //
       try {
-        showRootLoading(true);
+        setIsLoading(true);
         const res = await apiPatchLegacyContracts_id_modify({
           id,
           body: appendBody,
@@ -200,7 +211,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       } catch (error) {
         myAlert.err({ title: '上傳失敗' });
       } finally {
-        showRootLoading(false);
+        setIsLoading(false);
       }
       //
     },
@@ -208,6 +219,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const panel: TpanelList = [
     //
+    {
+      type: 'myButton',
+      label: '匯出報價單',
+      onClick: () => {
+        setShowPdf(true);
+      },
+    },
     {
       type: 'myButton',
       label: '取消',
@@ -222,7 +240,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       },
     },
-    isLatestBatch ? uploadPanel : undefined,
+    isAppending ? uploadPanel : undefined,
   ];
 
   // -----------------------------------------------------------------------
@@ -235,7 +253,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tagList={tagList} panelList={panel} />
 
       <div>
@@ -246,7 +264,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classBasicInfo={classLegacyContract.classBasicInfo}
             disabled={true}
             isAppend={true}
-            isLatestBatch={isLatestBatch}
+            isAppending={!!isAppending}
           />
           {/*  */}
           <div className={scss.switchBar}>
@@ -257,23 +275,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
             legacyContract={classLegacyContract}
             disabled={true}
             isAppend={true}
-            isLatestBatch={isLatestBatch}
+            isAppending={isAppending}
+            difference_prod={difference_prod}
           />
           {/* 配件設定 */}
           <QuotationAdditions
             legacyContract={classLegacyContract}
             disabled={true}
             isAppend={true}
-            isLatestBatch={isLatestBatch}
+            isAppending={isAppending}
+            difference_addi={difference_addi}
           />
           {/* 變更 主產品 */}
-          {isLatestBatch && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
+          {isAppending && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
           {/* 變更 配件設定 */}
-          {isLatestBatch && <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />}
+          {isAppending && <QuotationExAddi legacyContract={classLegacyContract} disabled={false} />}
           {/*  */}
           <div className={scss.exchangeTotal}>
             <span>總合計</span>
-            <span>{classLegacyContract.exchangeTotal}</span>
+            {/* <span>{classLegacyContract.exchangeTotal}</span> */}
+            <span>
+              {(() => {
+                if (isAppending) {
+                  return classLegacyContract.exchangeTotal;
+                } else {
+                  const difference = difference_prod + difference_addi;
+                  const mark = difference >= 0 ? '+' : '';
+
+                  return `${mark} ${difference.toLocaleString()}`;
+                }
+              })()}
+            </span>
           </div>
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />
@@ -281,6 +313,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature signatureArr={signatureArr} disabled={true} />
         </div>
       </div>
+      <QuotationPdf
+        isVisable={showPdf}
+        onCancel={() => {
+          setShowPdf(false);
+        }}
+        classLegacyContract={classLegacyContract}
+      />
     </SubLayer>
   );
 }

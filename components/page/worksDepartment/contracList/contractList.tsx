@@ -66,7 +66,8 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
 
       const foo: Tdetail = {
         date: content.quotationDate,
-        describe: content.editNotes,
+        // describe: content.editNotes,
+        describe: '',
         discount: content.discount,
         doorQty: String(content.quantity),
         contractAmount: content.total.toLocaleString(),

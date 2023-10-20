@@ -363,13 +363,13 @@ export type TlegacyContractProductDto = {
   /**門型 */
   doorType: string;
   /**L(m) */
-  length: number;
+  length: string;
   /**W(m) */
-  width: number;
+  width: string;
   /**h(m) */
-  height: number;
+  height: string;
   /**B(m) */
-  thickness: number;
+  boxB: string;
   /**面積 */
   area: string;
   /**才數 */
@@ -394,6 +394,10 @@ export type TlegacyContractProductDto = {
   bounceDoor: boolean;
   /**備註 */
   notes: string;
+  /**厚度 */
+  thickness: string;
+  /**開閉方式 */
+  closingType: string;
   //
   /**批次 */
   batch: number;
@@ -499,6 +503,12 @@ export type TlegacyContractDto = {
   latestBatch: number;
   /**附屬合約編號 */
   attachBatchNumbers: string[];
+  priceRecord: {
+    discountRate: string; // 總折數
+    subTotal: string; //小計
+    salesTax: number; // 營業稅
+    total: number; // 總計
+  };
 };
 
 // 舊合約post主產品
@@ -514,13 +524,13 @@ export type TcreateLegacyContractProductDto = {
   /** 門型 */
   doorType: string;
   /** L(m) */
-  length: number;
+  length: string;
   /** W(m) */
-  width: number;
+  width: string;
   /** h(m) */
-  height: number;
+  height: string;
   /** B(m) */
-  thickness: number;
+  boxB: string;
   /** 面積 */
   area: string;
   /** 才數 */
@@ -545,6 +555,10 @@ export type TcreateLegacyContractProductDto = {
   bounceDoor: boolean;
   /** 備註 */
   notes: string;
+  /**厚度 */
+  thickness: string;
+  /**開閉方式 */
+  closingType: string;
 };
 
 export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
@@ -651,6 +665,12 @@ export type TmodifyLegacyContractDto = {
   products?: TupdateLegacyContractProductDto[];
   additions?: TupdateLegacyContractAdditionDto[];
   batchNumber: string;
+  priceRecord: {
+    discountRate: string; // 總折數
+    subTotal: string; //小計
+    salesTax: number; // 營業稅
+    total: number; // 總計
+  };
 };
 
 // ==========================================================================
@@ -877,7 +897,7 @@ export type TquotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
-  // 關閉方式
+  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
   notes: string;
@@ -1143,7 +1163,7 @@ export type TcreateQuotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
-  // 關閉方式
+  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
   notes: string;
@@ -1821,8 +1841,10 @@ export type TdispatchingDto = {
   projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
-  // 工務人員;
-  workerName: string;
+  // 工務人員ID
+  workerId: string;
+  // 工務人員
+  workerEmployee: TemployeeDto;
   // 完工聯絡人;
   finalContact: string;
   // 辦理事項;
@@ -1863,8 +1885,8 @@ export type TcreateDispatchingDto = {
   projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
-  // 工務人員
-  workerName: string;
+  // 工務人員ID
+  workerId: string;
   // 完工聯絡人
   finalContact: string;
   // 辦理事項
@@ -1873,6 +1895,13 @@ export type TcreateDispatchingDto = {
   pricingMethod: string;
   // 備註下次注意事項
   note: string | null;
+};
+
+export type TcreateElectronicSuppliesRecordDto = {
+  doorType: string;
+  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+  category: string;
+  quantity: string;
 };
 
 export type TelectronicSuppliesDto = {
@@ -1887,42 +1916,47 @@ export type TelectronicSuppliesDto = {
   projectNumber: string;
   // 工程名稱
   projectName: string;
-  // 鎻盒種類
-  latchBox: string;
-  // 鎻盒數量
-  latchBoxQuantity: number;
-  // 鎖匙種類
-  key: string;
-  // 鎖匙數量
-  keyQuantity: number;
-  // 壓扣種類
-  latch: string;
-  // 壓扣數量
-  latchQuantity: number;
-  // 控制箱/盤種類
-  controlBox: string;
-  // 控制箱/盤數量
-  controlBoxQuantity: number;
-  // 消防備品種類
-  firefightingSupplies: string;
-  // 消防備品數量
-  firefightingSuppliesQuantity: number;
-  // 板門配件種類
-  doorAccessories: string;
-  // 板門配件數量
-  doorAccessoriesQuantity: number;
-  // 主機種類
-  host: string;
-  // 主機數量
-  hostQuantity: number;
-  // 紅外線種類
-  infrared: string;
-  // 紅外線數量
-  infraredQuantity: number;
-  // 防颱配件種類
-  antiTyphoonSupplies: string;
-  // 防颱配件數量
-  antiTyphoonSuppliesQuantity: number;
+
+  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+  others: string;
+
+  // // 鎻盒種類
+  // latchBox: string;
+  // // 鎻盒數量
+  // latchBoxQuantity: number;
+  // // 鎖匙種類
+  // key: string;
+  // // 鎖匙數量
+  // keyQuantity: number;
+  // // 壓扣種類
+  // latch: string;
+  // // 壓扣數量
+  // latchQuantity: number;
+  // // 控制箱/盤種類
+  // controlBox: string;
+  // // 控制箱/盤數量
+  // controlBoxQuantity: number;
+  // // 消防備品種類
+  // firefightingSupplies: string;
+  // // 消防備品數量
+  // firefightingSuppliesQuantity: number;
+  // // 板門配件種類
+  // doorAccessories: string;
+  // // 板門配件數量
+  // doorAccessoriesQuantity: number;
+  // // 主機種類
+  // host: string;
+  // // 主機數量
+  // hostQuantity: number;
+  // // 紅外線種類
+  // infrared: string;
+  // // 紅外線數量
+  // infraredQuantity: number;
+  // // 防颱配件種類
+  // antiTyphoonSupplies: string;
+  // // 防颱配件數量
+  // antiTyphoonSuppliesQuantity: number;
+
   // 備料人員Id
   materialHandlerId: string;
   // 備料人員
@@ -1944,7 +1978,58 @@ export type TelectronicSuppliesDto = {
 
 export type TcreateElectronicSuppliesDto = Omit<
   TelectronicSuppliesDto,
-  'id' | 'createdAt' | 'updatedAt' | 'contractId' | 'contract' | 'quotationId' | 'quotation'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'contractId'
+  | 'contract'
+  | 'quotationId'
+  | 'quotation'
+  | 'materialHandler'
+  | 'ingredientTechnician'
+  | 'formCompleter'
 >;
 
 export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
+
+export type TexchangeDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  dispatchDate: string; // date // 填表日期
+  requirementsDate: string; // date // 需要日期
+  projectNumber: string;
+  projectName: string;
+  goodsName: string; // 物品名稱
+  goodsSpec: string; // 材質規格
+  goodsQuantity: number; // 數量
+  reason: string; //調貨理由
+  accountingId: string;
+  accounting: TemployeeDto; // 會計
+  warehouseEmployeeId: string;
+  warehouseEmployee: TemployeeDto; // 倉庫人員
+  factoryEmployeeId: string;
+  factoryEmployee: TemployeeDto; // 廠務人員
+  supervisorId: string;
+  supervisor: TemployeeDto; //單位主管
+  formCompleterId: string;
+  formCompleter: TemployeeDto; // 填表人員
+  contractId: string | null;
+  contract: TquotationContractDto | null;
+  // quotationId: string | null;
+  // quotation: TquotationDto | null;
+};
+
+export type TcreateExchgangeDto = Omit<
+  TexchangeDto,
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'accounting'
+  | 'warehouseEmployee'
+  | 'factoryEmployee'
+  | 'supervisor'
+  | 'formCompleter'
+  // | 'contractId'
+  | 'contract'
+>;

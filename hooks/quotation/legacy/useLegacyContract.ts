@@ -55,10 +55,6 @@ type TadditionList = {
 };
 
 // =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
 class Class_legacyContract {
   constructor(
     reRender: TreRender,
@@ -75,15 +71,15 @@ class Class_legacyContract {
 
     // --------------------------------------------------------------
 
-    const sortedProdArr = _.sortBy(this._legacyContract.products, 'idNumber');
+    const sortedProdArr = _.sortBy(this._legacyContract.products, 'createdAt');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     const prodList: TprodList = {};
     sortedProdArr.forEach((prodData) => {
       let key: string;
 
       if ('id' in prodData) {
-        // 啊我都已經用'id' in prodData了，這邊也沒有紅線
-        // check的時候還是給我報型別錯誤
+        // 已經用'id' in prodData了，這邊也沒有紅線
+        // check的時候還是會報型別錯誤
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         key = String(prodData.id as string);
@@ -291,6 +287,34 @@ class Class_legacyContract {
 
     this.classPayInfo.subTotal = subTotal.toString();
   };
+
+  countProdTotal() {
+    let subTotal = new Decimal(0);
+
+    //-------
+    Object.values(this._prodList).forEach((prod) => {
+      // 複價
+      const totalPrice = prod.totalPrice.replace(/,/g, '') || 0;
+      // 追減、變更金額
+      const reduceExchangePrice = prod.reduceExchangePrice.replace(/,/g, '') || 0;
+
+      // 需求變更 編輯折數與總折數時不再影響其他數值
+      // const discountRate = Decimal.div(prod.discountRate || 0, 100);
+      // totalPrice = Decimal.mul(totalPrice, discountRate).toString();
+
+      subTotal = subTotal.add(totalPrice).sub(reduceExchangePrice);
+    });
+
+    const salesTax = Number(Decimal.mul(subTotal, 0.05).toFixed(0));
+    const total = Decimal.add(salesTax, subTotal).toNumber();
+
+    return {
+      subTotal: subTotal.toNumber(),
+      salesTax: salesTax,
+      total: total,
+    };
+  }
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
@@ -301,22 +325,6 @@ class Class_legacyContract {
   get prodArr() {
     return Object.values(this._prodList);
   }
-
-  // get prodKeyArr_2() {
-  //   return this._prodKeyArr;
-  // }
-
-  // set prodKeyArr_2(v) {
-  //   this._prodKeyArr = v;
-  //   this._reRender();
-  // }
-
-  // delProd_2(id: string) {
-  //   delete this._prodList[id];
-  //   // _.pull(this._prodKeyArr, id);
-
-  //   this._reRender();
-  // }
 
   copyProd(id: string) {
     const key = 'new-' + nanoid();
@@ -330,6 +338,8 @@ class Class_legacyContract {
     };
 
     this._prodList[key] = copy;
+
+    this.countSubTotal();
 
     this._reRender();
   }
@@ -351,27 +361,6 @@ class Class_legacyContract {
 
     this._reRender();
   };
-
-  // get prodKitArr_2() {
-  //   return this._prodKeyArr.map((key) => {
-  //     const prod = this._prodList[key];
-
-  //     const delSelf = () => {
-  //       this.delProd_2(key);
-  //     };
-
-  //     const copySelf = () => {
-  //       this.copyProd_2(key);
-  //     };
-
-  //     return {
-  //       key,
-  //       prod,
-  //       delSelf,
-  //       copySelf,
-  //     };
-  //   });
-  // }
 
   get prodKitList_2() {
     const kitList: TprodKit = {};
@@ -461,7 +450,7 @@ class Class_legacyContract {
 
     return totalPrice;
   }
-  //
+  //--------------------------------------------
   // 這三組都是水平欄位的keyArr
 
   // 報價單 主產品設定用的 沒有合約編號欄位
@@ -654,11 +643,23 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
+    let haveQty0 = false;
+
     legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
       const thePost = prod.postProd;
 
+      if (!prod.postProd.quantity) {
+        haveQty0 = true;
+      }
+
       return thePost;
     });
+
+    if (haveQty0) {
+      myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
+
+      return false;
+    }
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 
@@ -750,33 +751,25 @@ class Class_legacyContract {
       appendAddition = undefined;
     }
 
+    const payPrice = this.classPayInfo.payPrice;
+    const priceRecord = {
+      discountRate: new Decimal(payPrice.discountRate).div(100).toFixed(2),
+      subTotal: String(payPrice.subTotal),
+      salesTax: payPrice.salesTax,
+      total: payPrice.total,
+    };
+
     return {
       products: appendProd,
       additions: appendAddition,
       batchNumber: this.classBasicInfo.contractNumber,
+      priceRecord,
     };
   }
 
   // ---------------------
 } // Class_legacyContract
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
 // ==========================================================================
 
 const useLegacyContract = ({
@@ -843,6 +836,11 @@ const useLegacyContract = ({
           return addi.batch === batch;
         }
       });
+
+      // 追加追減的合約沒有contractNumber，因此從attachBatchNumbers取得
+      if (!copyContract.contractNumber && batch > 0) {
+        copyContract.contractNumber = copyContract.attachBatchNumbers[batch];
+      }
     }
 
     return new Class_legacyContract(
@@ -867,25 +865,62 @@ const useLegacyContract = ({
     }
   }, [classLegacyContract]);
 
-  return { classLegacyContract, reset };
+  // -----------------------------------------------------------------
+  const { difference_prod, difference_addi } = useMemo(() => {
+    if (!contract) {
+      return {
+        difference_prod: 0,
+        difference_addi: 0,
+      };
+    }
+
+    const prodList_batch: { [key: string]: number } = {
+      [`${batch - 1}`]: 0,
+      [`${batch}`]: 0,
+    };
+
+    contract.products.forEach((prod) => {
+      if (prod.batch === batch - 1) {
+        prodList_batch[`${batch - 1}`] += prod.totalPrice;
+      }
+
+      if (prod.batch === batch) {
+        prodList_batch[`${batch}`] += prod.totalPrice;
+      }
+    });
+
+    const difference_prod = prodList_batch[`${batch}`] - prodList_batch[`${batch - 1}`];
+
+    const addiList_batch: { [key: string]: number } = {
+      [`${batch - 1}`]: 0,
+      [`${batch}`]: 0,
+    };
+
+    contract.additions.forEach((addi) => {
+      if (addi.batch === batch - 1) {
+        addiList_batch[`${batch - 1}`] += addi.totalPrice;
+      }
+
+      if (addi.batch === batch) {
+        addiList_batch[`${batch}`] += addi.totalPrice;
+      }
+    });
+
+    const difference_addi = addiList_batch[`${batch}`] - addiList_batch[`${batch - 1}`];
+
+    return {
+      difference_prod,
+      difference_addi,
+    };
+
+    //
+  }, [contract]);
+
+  // -----------------------------------------------------------------
+
+  return { classLegacyContract, reset, difference_prod, difference_addi };
 };
 
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
-// ==========================================================================
 // ==========================================================================
 // ==========================================================================
 
@@ -896,12 +931,13 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
     itemName: '',
     quoteType: '',
     doorType: '',
-    length: 0,
-    width: 0,
-    height: 0,
-    thickness: 0,
+    length: '0',
+    width: '0',
+    height: '0',
+    boxB: '0',
     area: '',
     volume: '',
+    thickness: '',
     material: '',
     surface: '',
     doorTrack: '',
@@ -912,6 +948,7 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
     typhoonProtection: false,
     bounceDoor: false,
     notes: '',
+    closingType: '',
   };
 };
 

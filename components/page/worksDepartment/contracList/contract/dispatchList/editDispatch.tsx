@@ -29,7 +29,7 @@ type Tcontroll = {
 export type { Tcontroll, TpricingMethodControll };
 
 // ----------------------------------------------------------
-export default function EditDispatch({ controll }: { controll: Tcontroll }) {
+export default function EditDispatch({ controll, disabled }: { controll: Tcontroll; disabled?: boolean }) {
   const { tasks, note, pricingMethod } = controll;
 
   const [batchInput, setBatchInput] = useState('');
@@ -59,6 +59,7 @@ export default function EditDispatch({ controll }: { controll: Tcontroll }) {
           <span>辦理事項</span>
         </div>
         <textarea
+          disabled={disabled}
           className={style.textarea}
           placeholder="請輸入辦理事項"
           value={tasks.value}
@@ -71,7 +72,7 @@ export default function EditDispatch({ controll }: { controll: Tcontroll }) {
         <div className={style.subTitle}>
           <span>派工批價</span>
         </div>
-        <Radio.Group className={style.radioGroup} onChange={onChange} value={pricingMethod.value}>
+        <Radio.Group disabled={disabled} className={style.radioGroup} onChange={onChange} value={pricingMethod.value}>
           <Radio value={'合約內'}>合約內</Radio>
           <Radio value={'合約辦理追加'}>合約辦理追加</Radio>
           <Radio value={`修理費用${batchInput}`}>
@@ -80,15 +81,19 @@ export default function EditDispatch({ controll }: { controll: Tcontroll }) {
               htmlFor="batchInput"
               onClick={() => {
                 // setBatchType(`修理費用${batchInput}`);
-                pricingMethod.onChange(`修理費用${batchInput}`);
+                if (!disabled) {
+                  pricingMethod.onChange(`修理費用${batchInput}`);
+                }
               }}
             >
               <span>修理費用</span>
               <input
+                disabled={disabled}
                 id="batchInput"
                 type="text"
                 autoComplete="off"
                 ref={refInput}
+                value={pricingMethod.subValue ?? ''}
                 onChange={(e) => {
                   setBatchInput(e.target.value);
                   pricingMethod.onChange(`修理費用${e.target.value}`);
@@ -108,6 +113,7 @@ export default function EditDispatch({ controll }: { controll: Tcontroll }) {
         </div>
       </div>
       <textarea
+        disabled={disabled}
         className={style.textarea}
         placeholder="請輸入備註"
         value={note.value}

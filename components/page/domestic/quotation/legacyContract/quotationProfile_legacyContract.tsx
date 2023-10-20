@@ -34,13 +34,13 @@ export default function QuotationProfile({
   classBasicInfo,
   disabled = false,
   isAppend,
-  isLatestBatch,
+  isAppending,
 }: {
   classLegacyContract: Class_legacyContract;
   classBasicInfo: Class_basicInfo;
   disabled: boolean;
   isAppend?: boolean;
-  isLatestBatch?: boolean;
+  isAppending?: boolean;
 }) {
   // =============================================
   const { customer } = classLegacyContract;
@@ -134,7 +134,7 @@ export default function QuotationProfile({
   let isContractNumberDisabled = disabled;
 
   if (isAppend) {
-    if (isLatestBatch) {
+    if (isAppending) {
       isContractNumberDisabled = false;
     } else {
       isContractNumberDisabled = true;

@@ -18,7 +18,7 @@ import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+// import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -43,6 +43,7 @@ import {
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+import { fi } from 'date-fns/locale';
 
 // ========================================================================
 // ========================================================================
@@ -68,6 +69,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
@@ -155,7 +157,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([updateLegacyContract(), updateAttachments()]);
+      try {
+        setIsLoading(true);
+        await Promise.all([updateLegacyContract(), updateAttachments()]);
+      } catch (error) {
+        myAlert.err({ title: '取得舊合約失敗' });
+      } finally {
+        setIsLoading(false);
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId]);
@@ -250,12 +259,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
 
         try {
-          showRootLoading(true);
+          setIsLoading(true);
           const res = contractId
             ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
             : await apiPostLegacyContracts(classLegacyContract.postBody);
 
-          showRootLoading(true, '正在更新附件');
           await uploadAttachment(res.id);
 
           if (contractId) {
@@ -265,13 +273,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
           }
 
           myAlert.success({ title: '上傳完成' });
+          setAllowEdit(false);
         } catch {
           myAlert.err({ title: '上傳失敗' });
         } finally {
-          showRootLoading(false);
+          setIsLoading(false);
         }
-
-        setAllowEdit(false);
       },
     },
     { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
@@ -298,6 +305,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               query: {
                 contractId: router.query.contractId,
                 batch: latestBatch,
+                isAppending: 'true',
               },
             }),
         },
@@ -334,7 +342,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tagList={tagList} panelList={allowEdit ? panel_editable : panel_noEditable} />
 
       <div>

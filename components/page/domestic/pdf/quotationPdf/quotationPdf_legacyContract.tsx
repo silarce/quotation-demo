@@ -107,7 +107,8 @@ export default function QuotationPdf({
       projectAddress,
     } = classBasicInfo;
 
-    const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+    // const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
     return {
       quotationId: contractNumber,
@@ -124,18 +125,23 @@ export default function QuotationPdf({
   const totalPram = (() => {
     const memoArr = classLegacyContract.classNotes.stringArr;
 
-    let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
-    let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
-    let total: string | number = classLegacyContract.classPayInfo.total;
+    // let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
+    // let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
+    // let total: string | number = classLegacyContract.classPayInfo.total;
+    // subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-    subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const { subTotal, salesTax: businessTax, total } = classLegacyContract.countProdTotal();
+
+    const theSubTotal = subTotal.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const theBusinessTax = businessTax.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const theTotal = total.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
     const settlement = {
-      subTotal, //小計
-      businessTax, //營業稅
-      total, // 統計
+      subTotal: theSubTotal, //小計
+      businessTax: theBusinessTax, //營業稅
+      total: theTotal, // 統計
     };
 
     return { memoArr, settlement };
@@ -153,7 +159,7 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
       return {
         tradingLocation: deliveryLocation,
@@ -169,9 +175,9 @@ export default function QuotationPdf({
     const classProdArr = classLegacyContract.prodArr;
 
     return classProdArr.map((prod) => {
-      const lw = (Number(prod.width) || Number(prod.length)) * 100;
-      const h = Number(prod.height) * 100;
-      const b = Number(prod.thickness) * 100;
+      const lw = new Decimal(Number(prod.width || 0) || Number(prod.length || 0)).mul(100).toString();
+      const h = new Decimal(Number(prod.height || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod.boxB || 0)).mul(100).toString();
 
       const size = `${lw} X ${h} + ${b}`;
 
@@ -181,13 +187,13 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: 'n',
+        thickness: prod.thickness,
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         doorRail: doorTrackLookup[prod.doorTrack]?.icon,
         horsepower: prod.horsepower,
-        openType: '',
+        openType: prod.closingType,
         qty: prod.quantity,
         unitPrice: prod.unitPrice,
         priceTotal: prod.totalPrice,
