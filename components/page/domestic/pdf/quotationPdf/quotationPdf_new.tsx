@@ -64,6 +64,7 @@ export default function QuotationPdf({
     deliveryDate,
     deliveryLocation,
     paymentMethods,
+    validityPeriod,
   } = basicInfo;
 
   const agentName = agentEmployee.chName;
@@ -139,6 +140,7 @@ export default function QuotationPdf({
       fax: faxNumber ?? '',
       builtDate: dateString,
       projectAddress: county + district + address,
+      validityPeriod: validityPeriod,
     };
   })();
   // -------------------------------

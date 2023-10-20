@@ -118,6 +118,7 @@ export default function QuotationPdf({
       fax: faxNumber ?? '',
       builtDate: dateString,
       projectAddress: projectCity + projectDistrict + projectAddress,
+      validityPeriod: '--',
     };
   })();
   // -------------------------------
