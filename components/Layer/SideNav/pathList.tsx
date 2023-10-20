@@ -40,18 +40,31 @@ type TsidePathConfig = {
   }[];
 };
 
+type Thref = {
+  pathname: string;
+  query?: {
+    [key: string]: string;
+  };
+};
+
 type TtopPathListConfig = {
   icon: string;
   label: string;
   subLabel?: string;
   path01: string;
-  href: {
-    pathname: string;
-    query?: {
-      [key: string]: string;
-    };
-  };
 
+  // href: {
+  //   pathname: string;
+  //   query?: {
+  //     [key: string]: string;
+  //   };
+  // };
+  href: Thref;
+  //
+  hrefList?: {
+    [key: string]: Thref;
+  };
+  //
   erpFeature: ErpFeaturesValues[] | 'allPass';
 };
 
@@ -72,8 +85,16 @@ const erpFeaturesLookup = {
   domestic: '營業部國內工程',
   statisticsTable: '統計表',
   worksDepartment: '工務部',
-  accountsReceivable: '工務部',
+  accountsReceivable: '應收帳款',
 } as const;
+
+const swappedErpFeaturesLookup: { [key: string]: string } = {};
+
+for (const key in erpFeaturesLookup) {
+  const theKey = key as keyof typeof erpFeaturesLookup;
+  const value = erpFeaturesLookup[theKey];
+  swappedErpFeaturesLookup[value] = key;
+}
 
 const {
   //
@@ -530,6 +551,21 @@ const topPathList: TtopPathListConfig[] = [
         status: 'Budget',
       },
     },
+    hrefList: {
+      domestic: {
+        pathname: sidePathList['/domestic'].path01 + '/quotationList',
+        query: {
+          status: 'Budget',
+        },
+      },
+      legacyContractIntegration: {
+        pathname: sidePathList['/domestic'].path01 + '/legacyContractIntegration',
+      },
+      statisticsTable: {
+        pathname: sidePathList['/domestic'].path01 + '/legacyContractIntegration',
+      },
+    },
+
     // erpFeature: 'allPass',
     erpFeature: [domestic, legacyContractIntegration, statisticsTable],
   },
@@ -555,7 +591,9 @@ const topPathList: TtopPathListConfig[] = [
 ];
 
 export default sidePathList;
-export { topPathList };
+export { topPathList, erpFeaturesLookup, swappedErpFeaturesLookup };
+
+export type { TtopPathListConfig };
 
 // =========================================================
 // TsidePathConfig範例
