@@ -93,6 +93,7 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
                 type="text"
                 autoComplete="off"
                 ref={refInput}
+                value={pricingMethod.subValue ?? ''}
                 onChange={(e) => {
                   setBatchInput(e.target.value);
                   pricingMethod.onChange(`修理費用${e.target.value}`);

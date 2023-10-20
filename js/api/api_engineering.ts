@@ -21,6 +21,7 @@ import type {
   TupdateElectronicSuppliesDto,
   TexchangeDto,
   TcreateExchgangeDto,
+  TcreateElectronicSuppliesRecordDto,
 } from './dtoTypes';
 
 export type {
@@ -36,6 +37,7 @@ export type {
   TupdateElectronicSuppliesDto,
   TexchangeDto,
   TcreateExchgangeDto,
+  TcreateElectronicSuppliesRecordDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -108,8 +110,13 @@ export const apiGetEngineeringDispatchingList = async (params?: Tparams) => {
 };
 
 /**取得派工單列表 */
-export const useGetEngineeringDispatchingList = (params?: Tparams) => {
+export const useGetEngineeringDispatchingList = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetDispatchingList>();
+
+  const params = {
+    populate: ['workerEmployee'],
+    ...customParams,
+  };
 
   const update = async () => {
     const newRes = await apiGetEngineeringDispatchingList(params);
@@ -129,24 +136,29 @@ export const useGetEngineeringDispatchingList = (params?: Tparams) => {
 };
 
 /**以 id 取得派工單 DisPatching */
-export const apiGetEngineeringDispatching_id = async (id: string) => {
+export const apiGetEngineeringDispatching_id = async (id: string, params: Tparams) => {
   const api = `/engineering/dispatching/${id}`;
 
   return axi
-    .get<TdispatchingDto>(api)
+    .get<TdispatchingDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetEngineeringDispatching_id = (id: string | undefined) => {
+export const useGetEngineeringDispatching_id = (id: string | undefined, customeParams?: Tparams) => {
   const [res, setRes] = useState<TdispatchingDto>();
+
+  const params = {
+    populate: ['workerEmployee'],
+    ...customeParams,
+  };
 
   const update = async () => {
     if (!id) {
       return;
     }
 
-    const newRes = await apiGetEngineeringDispatching_id(id);
+    const newRes = await apiGetEngineeringDispatching_id(id, params);
 
     if (newRes) {
       setRes(newRes);
@@ -342,6 +354,38 @@ export const useElectronicSupplies_infinite = ({ customParams }: { customParams?
     meta,
     init,
     reset,
+  };
+};
+
+export const apiGetElectronicSupplies_id = async (id: string) => {
+  const api = `/engineering/electronic-supplies/${id}`;
+
+  return axi
+    .get<TelectronicSuppliesDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetElectronicSupplies_id = (id: string | undefined) => {
+  const [res, setRes] = useState<TelectronicSuppliesDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetElectronicSupplies_id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
   };
 };
 
