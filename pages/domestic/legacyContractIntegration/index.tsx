@@ -56,11 +56,13 @@ export default function LegacyContractIntegration() {
 
   const params: Tparams = {
     // page: page,
-    pageSize: 10,
+    // pageSize: 10,
+    pageSize: 5,
     populate: ['products', 'additions', 'priceRecord'],
     filter,
-    sort: 'quoteDate',
-    order: 'DESC',
+    sort: 'createdAt',
+    // order: 'DESC',
+    order: 'ASC',
   };
 
   const { dataArr, viewRef_bottom, isLoadingPage1, isLoading, reset } = useLegacyContract_infinite({
@@ -221,7 +223,10 @@ export default function LegacyContractIntegration() {
                   key={index}
                   className={scss.panel}
                   header={
-                    <div ref={arr.length - 3 === index ? viewRef_bottom : undefined}>
+                    <div
+                      //  ref={arr.length - 3 === index ? viewRef_bottom : undefined}
+                      ref={arr.length - 2 === index ? viewRef_bottom : undefined}
+                    >
                       <TbodyItem01
                         quotationContent={quotationContent}
                         isActive={isActive}
