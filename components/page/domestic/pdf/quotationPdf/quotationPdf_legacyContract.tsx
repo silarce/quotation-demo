@@ -133,11 +133,11 @@ export default function QuotationPdf({
     // businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
     // total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-    const { subTotal, salesTax: businessTax, total } = classLegacyContract.countProdTotal();
+    const { subTotal, salesTax: businessTax, total } = classLegacyContract?.countProdTotal() ?? {};
 
-    const theSubTotal = subTotal.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const theBusinessTax = businessTax.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const theTotal = total.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const theSubTotal = subTotal?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
+    const theBusinessTax = businessTax?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
+    const theTotal = total?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
 
     const settlement = {
       subTotal: theSubTotal, //小計
