@@ -66,24 +66,27 @@ export default function CustomerSelector({
 
   const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useGetCustomers_infinite({ customParams: params });
 
-  // const res = useCustomers(params);
-  // const { meta, setData, update, update_infinite } = res;
-  // const customerArr = res?.data as TcustomerDto_TC[] | undefined;
-
-  // const [viewRef, inView] = useInView();
   useEffect(() => {
     if (!showModal) {
       setSelEmployeeArr([]);
+
+      return;
+    }
+
+    reset();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue, showModal]);
+
+  useEffect(() => {
+    if (!showModal) {
       setSearchValue([]);
 
       return;
     }
 
-    // setSelEmployeeArr([]);
-    reset();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal]);
+  }, [showModal]);
 
   // ==================================================
 
@@ -165,7 +168,7 @@ export default function CustomerSelector({
         onClick: onSearch,
       }}
     >
-      <LoadingCoverWrapper01 isLoading={isLoading}>
+      <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={scss.listContainer}>
           {dataArr?.map((customer, index, arr) => {
             const { customerNumber, name } = customer;
