@@ -40,6 +40,9 @@ import scss from './legacyContract.module.scss';
 import { Tparams, TlegacyContractDto, useLegacyContract_infinite } from 'js/api/api_legacy-contract';
 
 // ==================================================================
+let timeoutId: NodeJS.Timeout;
+
+// ==================================================================
 export default function LegacyContractIntegration() {
   const router = useRouter();
 
@@ -68,6 +71,7 @@ export default function LegacyContractIntegration() {
   const { dataArr, viewRef_bottom, isLoadingPage1, isLoading, reset } = useLegacyContract_infinite({
     customParams: params,
   });
+  const [shouldShowIsLoading, setIsShowIsLoading] = useState(false);
 
   useEffect(() => {
     reset();
@@ -79,6 +83,17 @@ export default function LegacyContractIntegration() {
     router.query.customerName,
     router.query.projectName,
   ]);
+
+  useEffect(() => {
+    if (isLoading) {
+      setIsShowIsLoading(false);
+    }
+
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      setIsShowIsLoading(true);
+    }, 2000);
+  }, [isLoading]);
 
   // --------------------------------------------------------------------
 
@@ -171,7 +186,8 @@ export default function LegacyContractIntegration() {
   // -----------------------------------------------------------------------
 
   return (
-    <SubLayer isLoading_subLayer={isLoadingPage1}>
+    // <SubLayer isLoading_subLayer={isLoadingPage1}>
+    <SubLayer isLoading_subLayer={isLoadingPage1 || (shouldShowIsLoading && isLoading)}>
       <PageHeader02 tag="舊合約" panelList={panelList} />
       <div className={scss.main}>
         <Thead01 />
