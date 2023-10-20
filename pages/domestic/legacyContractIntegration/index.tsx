@@ -60,9 +60,9 @@ export default function LegacyContractIntegration() {
     pageSize: 5,
     populate: ['products', 'additions', 'priceRecord'],
     filter,
-    sort: 'createdAt',
-    // order: 'DESC',
-    order: 'ASC',
+    sort: 'updatedAt',
+    order: 'DESC',
+    // order: 'ASC',
   };
 
   const { dataArr, viewRef_bottom, isLoadingPage1, isLoading, reset } = useLegacyContract_infinite({
