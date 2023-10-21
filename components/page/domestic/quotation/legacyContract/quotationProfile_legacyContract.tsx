@@ -177,6 +177,9 @@ export default function QuotationProfile({
                 textareaProps={{
                   value: customerName ?? '',
                   onChange: () => {},
+                  props: {
+                    className: 'overflow-hidden',
+                  },
                 }}
               />
               {!customerName && <button onClick={openModal}>請選擇客戶</button>}
