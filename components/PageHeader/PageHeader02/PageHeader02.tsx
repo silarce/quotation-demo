@@ -67,6 +67,6 @@ export default function PageHeader02({
   );
 } // PageHeader02
 
-export type { TpanelList, TtagList, TsearchObj, TsearchGroup, Toption };
+export type { TpanelList, TtagList, Tlink, TsearchObj, TsearchGroup, Toption };
 
 // ===========================================================
