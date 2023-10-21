@@ -23,7 +23,7 @@ import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 // global gear
-import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList, TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // css
@@ -379,37 +379,57 @@ version>1 是子合約
   const tagList: TtagList = [
     {
       label: `報價編號 ${data?.content.quotationNumber}`,
-      onClick: () => {},
     },
-    { label: '工程聯絡單', onClick: () => {} },
+  ];
+  const linkArr: Tlink[] = [
+    {
+      label: '工程聯絡單',
+      linkProps: {
+        href: {
+          pathname: '/worksDepartment/contractList/contract/workContactDoc',
+          query: {
+            // TODO 等可以取得工程聯絡單的id後，要把工程聯絡單的id補上
+            contractId: id,
+            version: '1',
+          },
+        },
+        target: '_blank',
+        // onClick: (e) => {
+        //   e.preventDefault();
+        // },
+      },
+    },
   ];
 
   const panel_quotation01: TpanelList = [
-    {
-      type: 'myButton',
-      label: '新增工程聯絡單',
-      onClick: async () => {
-        let isOk = true;
+    (() =>
+      version === '1'
+        ? {
+            type: 'myButton',
+            label: '新增工程聯絡單',
+            onClick: async () => {
+              let isOk = true;
 
-        try {
-          setIsLoading(true);
-          await apiPostEngineeringContact({ contractId: id });
-          myAlert.success({ title: '新增工程聯絡單成功' });
-        } catch (error) {
-          const err = error as Error;
-          isOk = false;
-          myAlert.err({ title: '新增工程聯絡單失敗', content: err.message });
-        } finally {
-          setIsLoading(false);
-        }
+              try {
+                setIsLoading(true);
+                await apiPostEngineeringContact({ contractId: id });
+                myAlert.success({ title: '新增工程聯絡單成功' });
+              } catch (error) {
+                const err = error as Error;
+                isOk = false;
+                myAlert.err({ title: '新增工程聯絡單失敗', content: err.message });
+              } finally {
+                setIsLoading(false);
+              }
 
-        if (!isOk) {
-          return;
-        }
+              if (!isOk) {
+                return;
+              }
 
-        update();
-      },
-    },
+              update();
+            },
+          }
+        : null)(),
     {
       type: 'myButton',
       label: '追加追減報價單',
@@ -432,7 +452,7 @@ version>1 是子合約
 
   return (
     <SubLayer>
-      <PageHeader02 tagList={tagList} panelList={panelList} />
+      <PageHeader02 tagList={tagList} panelList={panelList} linkList={linkArr} />
       {/*  */}
       <div>
         <div className={style.quotation}>
