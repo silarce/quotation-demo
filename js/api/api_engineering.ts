@@ -42,9 +42,9 @@ export type {
 
 // ========================================================================
 
-/**以合約id取得工程聯絡單 */
-export const apiGetEngineeringContact = async (contractId: string) => {
-  const api = `/engineering/engineering-contact/${contractId}`;
+/**以id取得工程聯絡單 */
+export const apiGetEngineeringContact = async (id: string) => {
+  const api = `/engineering/engineering-contact/${id}`;
 
   return axi
     .get<TengineeringContactDto>(api)
@@ -52,12 +52,12 @@ export const apiGetEngineeringContact = async (contractId: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-/**以合約id取得工程聯絡單 */
-export const useGetEngineeringContact = (contractId: string) => {
+/**以id取得工程聯絡單 */
+export const useGetEngineeringContact = (id: string) => {
   const [res, setRes] = useState<TengineeringContactDto>();
 
   const update = async () => {
-    const newRes = await apiGetEngineeringContact(contractId);
+    const newRes = await apiGetEngineeringContact(id);
 
     if (newRes) {
       setRes(newRes);
