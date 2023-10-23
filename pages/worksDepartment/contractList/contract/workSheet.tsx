@@ -1,6 +1,8 @@
+// 工作表
+
 import { useState, useEffect, useMemo } from 'react';
-// import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import _ from 'lodash';
+import { useRouter } from 'next/router';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
@@ -26,6 +28,10 @@ import WorkSheetProductDetail02, {
 // import InputSel from 'components/global/gear/inputAndSel/inputSel';
 // import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 // import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
+
+// api
+
+import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // css
 import scss from './workSheet.module.scss';
@@ -111,9 +117,19 @@ type Tdetail = {
 
 // ====================================================================
 export default function WorkSheet() {
+  const router = useRouter();
+  const { contractId } = router.query as { contractId: string | undefined };
+
   const [disabled, setDisabled] = useState(true);
 
   const [activeCard, setActiveCard] = useState(-1);
+
+  // -------------------------------------------------------------------------
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+
+  useEffect(() => {
+    update_contract();
+  }, []);
 
   // -------------------------------------------------------------------------
 
@@ -155,6 +171,46 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
+  useEffect(() => {
+    if (!contract) {
+      return;
+    }
+
+    const { projectName: projectName_contract, county, district, address } = contract.content;
+
+    const {
+      projectName,
+      projectContent,
+      /**工地電話 */
+      projectNumber,
+      /**工地傳真 */
+      projectFaxNumber,
+      /**工程負責人 */
+      projectPerson,
+      /**工程負責人聯絡電話 */
+      projectPersonNumber,
+    } = creEmptyProfile();
+
+    setProfile({
+      projectName: projectName || projectName_contract,
+      projectContent,
+      projectNumber,
+      projectFaxNumber,
+      projectPerson,
+      projectPersonNumber,
+      allAddress: `${county}${district}${address}`,
+      engineeringNumber: '999',
+      contractor: '999',
+      principal: '999',
+      contactNumber: '999',
+      faxNumber: '999',
+    });
+
+    //
+  }, [contract]);
+
+  // -------------------------------------------------------------------------
+
   // TODO 串接上api後，要放入取得的資料
   // useEffect(() => {
   //   setOldProduct({
@@ -193,7 +249,7 @@ export default function WorkSheet() {
   // };
 
   // -------------------------------------------------------------------------
-  // changeProfile
+  // -------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {
     projectName: {
       value: profile.projectName,
