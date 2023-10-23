@@ -25,8 +25,8 @@ import {
   apiPostElectronicSupplies,
   apiPatchElectronicSupplies,
   TcreateElectronicSuppliesDto,
-  TupdateElectronicSuppliesDto,
-  TelectronicSuppliesDto,
+  // TupdateElectronicSuppliesDto,
+  // TelectronicSuppliesDto,
   TcreateElectronicSuppliesRecordDto,
   useGetElectronicSupplies_id,
 } from 'js/api/api_engineering';
@@ -478,10 +478,23 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const reqPost = async () => {
+    if (employeeList.materialHandler?.id) {
+      return myAlert.info({ title: '請選擇備料人員' });
+    } else if (employeeList.ingredientTechnician?.id) {
+      return myAlert.info({ title: '請選擇配料人員' });
+    } else if (employeeList.formCompleter?.id) {
+      return myAlert.info({ title: '請選擇填表人員' });
+    } else if (!profile.dispatchDate) {
+      return myAlert.info({ title: '請選擇派工日期' });
+    } else if (!profile.requirementsDate) {
+      return myAlert.info({ title: '請選擇需求日期' });
+    }
+
     const electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[] = [];
     Object.values(sheet).forEach((item) => {
       if (item) {
         electronicSuppliesRecords.push({
+          // TODO 目前寫死為SJ-302，需要確認doorType怎麼決定
           doorType: 'SJ-302',
           itemName: item.itemName as TcreateElectronicSuppliesRecordDto['itemName'],
           category: item.category,
