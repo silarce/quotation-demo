@@ -39,7 +39,7 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 
 // =================================================================
 type Tprofile = {
-  engineeringNumber: string;
+  projectNumber: string;
   projectName: string;
   requirementsDate: string;
   dispatchDate: string;
@@ -108,8 +108,8 @@ export default function Edit() {
 
   useEffect(() => {
     update();
-    // 等api更新上去才能用
-    // update_electronicSupplies();
+    update_electronicSupplies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId]);
 
   // ----------------------------------------------------
@@ -141,7 +141,7 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const [sheet, setSheet] = useState<Tsheet>({});
-  const [sheet_else, setSheet_else] = useState<Tsheet_else>({ others: '' });
+  // const [sheet_else, setSheet_else] = useState<Tsheet_else>({ others: '' });
 
   const changeSheet = ({
     //
@@ -165,20 +165,20 @@ export default function Edit() {
     });
   };
 
-  const changeSheet_else = (key: keyof Tsheet_else, v: string) => {
-    setSheet_else((state) => {
-      return {
-        ...state,
-        [key]: v,
-      };
-    });
-  };
+  // const changeSheet_else = (key: keyof Tsheet_else, v: string) => {
+  //   setSheet_else((state) => {
+  //     return {
+  //       ...state,
+  //       [key]: v,
+  //     };
+  //   });
+  // };
 
   // ---------------------------------------------------------------------
 
   useEffect(() => {
     const {
-      engineeringNumber: engineeringNumber,
+      projectNumber: engineeringNumber,
       projectName,
       requirementsDate,
       dispatchDate,
@@ -191,7 +191,7 @@ export default function Edit() {
     const projectName_contract = contract?.content.projectName ?? '';
 
     setProfile({
-      engineeringNumber: engineeringNumber ?? '',
+      projectNumber: engineeringNumber ?? '',
       projectName: projectName ?? projectName_contract ?? '',
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
@@ -214,10 +214,10 @@ export default function Edit() {
 
     setSheet(sheet);
 
-    setSheet_else({
-      // others: electronicSupplies?.others ?? '',
-      others: '',
-    });
+    // setSheet_else({
+    //   // others: electronicSupplies?.others ?? '',
+    //   others: '',
+    // });
   }, [contract, electronicSupplies]);
 
   // ---------------------------------------------------------------------
@@ -406,9 +406,18 @@ export default function Edit() {
     },
     //
     其他: {
-      value: sheet_else.others ?? '',
+      value: sheet.other?.category ?? '',
       onChange: (v) => {
-        changeSheet_else('others', v);
+        setSheet((state) => {
+          return {
+            ...state,
+            other: {
+              itemName: '其他',
+              category: v,
+              quantity: '0',
+            },
+          };
+        });
       },
     },
     //
@@ -417,10 +426,10 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const control_profile: Tcontroll_profile = {
-    engineeringNumber: {
-      value: profile.engineeringNumber,
+    projectNumber: {
+      value: profile.projectNumber,
       onChange: (v) => {
-        changeProfile('engineeringNumber', v);
+        changeProfile('projectNumber', v);
       },
     },
     projectName: {
@@ -478,11 +487,11 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const reqPost = async () => {
-    if (employeeList.materialHandler?.id) {
+    if (!employeeList.materialHandler?.id) {
       return myAlert.info({ title: '請選擇備料人員' });
-    } else if (employeeList.ingredientTechnician?.id) {
+    } else if (!employeeList.ingredientTechnician?.id) {
       return myAlert.info({ title: '請選擇配料人員' });
-    } else if (employeeList.formCompleter?.id) {
+    } else if (!employeeList.formCompleter?.id) {
       return myAlert.info({ title: '請選擇填表人員' });
     } else if (!profile.dispatchDate) {
       return myAlert.info({ title: '請選擇派工日期' });
@@ -510,6 +519,8 @@ export default function Edit() {
       ingredientTechnicianId: employeeList.ingredientTechnician?.id ?? '',
       formCompleterId: employeeList.formCompleter?.id ?? '',
       electronicSuppliesRecords,
+      projectNumber: profile.projectNumber,
+      contractId: contractId,
     };
 
     try {
@@ -529,7 +540,9 @@ export default function Edit() {
         }
       }
     } catch (error) {
-      myAlert.err({ title: '新增送電備品表失敗' });
+      const err = error as Error;
+      console.log(err);
+      myAlert.err({ title: '新增送電備品表失敗', content: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -594,7 +607,7 @@ export default function Edit() {
 // ===========================================================
 
 const cre_emptyProfile = () => ({
-  engineeringNumber: '',
+  projectNumber: '',
   projectName: '未取得工程名稱',
   requirementsDate: '',
   dispatchDate: '',

@@ -181,7 +181,7 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const controll_profile: Tcontroll_profile = {
-    engineeringNumber: {
+    projectNumber: {
       value: profile.engineeringNumber,
       onChange: (v: string) => changeProfile('engineeringNumber', v),
     },

@@ -364,8 +364,19 @@ export const useElectronicSupplies_infinite = ({ customParams }: { customParams?
 export const apiGetElectronicSupplies_id = async (id: string) => {
   const api = `/engineering/electronic-supplies/${id}`;
 
+  const params = {
+    populate: [
+      'contractId',
+      //  'contract',
+      'electronicSuppliesRecords',
+      'materialHandler',
+      'ingredientTechnician',
+      'formCompleter',
+    ],
+  };
+
   return axi
-    .get<TelectronicSuppliesDto>(api)
+    .get<TelectronicSuppliesDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
