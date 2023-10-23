@@ -1916,7 +1916,7 @@ export type TelectronicSuppliesDto = {
   projectName: string;
 
   electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
-  others: string;
+  // others: string;
 
   // // 鎻盒種類
   // latchBox: string;

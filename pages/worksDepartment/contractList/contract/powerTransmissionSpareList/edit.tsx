@@ -215,7 +215,8 @@ export default function Edit() {
     setSheet(sheet);
 
     setSheet_else({
-      others: electronicSupplies?.others ?? '',
+      // others: electronicSupplies?.others ?? '',
+      others: '',
     });
   }, [contract, electronicSupplies]);
 
@@ -286,6 +287,7 @@ export default function Edit() {
     '3HP馬達控制箱380v': {
       value: sheet['3HP馬達控制箱380v']?.quantity ?? '',
       onChange: (quantity, itemName) => {
+        console.log('foo');
         changeSheet({ key: '3HP馬達控制箱380v', quantity, itemName });
       },
     },
@@ -488,7 +490,8 @@ export default function Edit() {
       }
     });
 
-    const body: TcreateElectronicSuppliesDto | TupdateElectronicSuppliesDto = {
+    // const body: TcreateElectronicSuppliesDto | TupdateElectronicSuppliesDto = {
+    const body: TcreateElectronicSuppliesDto = {
       ...profile,
       materialHandlerId: employeeList.materialHandler?.id ?? '',
       ingredientTechnicianId: employeeList.ingredientTechnician?.id ?? '',
@@ -500,21 +503,17 @@ export default function Edit() {
       setIsLoading(true);
 
       if (electronicSuppliesId) {
-        //
-        // const res = await apiPatchElectronicSupplies(body);
-        // if (res) {
-        //   update_electronicSupplies();
-        // }
+        const res = await apiPatchElectronicSupplies(electronicSuppliesId, body);
+
+        if (res) {
+          update_electronicSupplies();
+        }
       } else {
-        // const res = await apiPostElectronicSupplies(body);
-        // if (res) {
-        //   router.push({
-        //     query: {
-        //       ...router.query,
-        //       electronicSuppliesId: res.id,
-        //     },
-        //   });
-        // }
+        const res = await apiPostElectronicSupplies(body);
+
+        if (res) {
+          update_electronicSupplies();
+        }
       }
     } catch (error) {
       myAlert.err({ title: '新增送電備品表失敗' });
@@ -528,7 +527,7 @@ export default function Edit() {
     {
       type: 'redButton',
       label: '建立',
-      onClick: () => reqPost,
+      onClick: reqPost,
     },
     {
       type: 'myButton',
@@ -540,7 +539,7 @@ export default function Edit() {
     {
       type: 'redButton',
       label: '更新',
-      onClick: () => reqPost,
+      onClick: reqPost,
     },
     {
       type: 'myButton',
