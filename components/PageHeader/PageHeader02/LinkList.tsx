@@ -34,8 +34,6 @@ export default function LinkList({ linkList, pathname }: { linkList: Tlink[]; pa
           }
         }
 
-        console.log(isActive);
-
         return (
           <Link
             key={index}
