@@ -9,10 +9,10 @@ import moment from 'moment';
 // component
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import Profile, { Tprofile01 } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
-import List, { Tdispatch_simple } from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
+import List from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
 
 // api
-import { Tparams, useGetEngineeringDispatchingList, apiPostEngineeringDispatching } from 'js/api/api_engineering';
+import { Tparams, useGetEngineeringDispatchingList } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // helper
@@ -30,11 +30,10 @@ export default function DispatchList() {
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
 
-  // FIXME 現在後端似乎不會記錄contractId
   const params: Tparams = {
-    // filter: {
-    //   contractId: { $eq: contractId },
-    // },
+    filter: {
+      contractId: { $eq: contractId },
+    },
   };
 
   const { data: dispatchingArr, update } = useGetEngineeringDispatchingList(params);
@@ -78,10 +77,8 @@ export default function DispatchList() {
         return {
           projectName: projectName,
           contractor: dispatching?.contractor ?? '',
-          // contact: contactPerson,
           // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
-          // contact: dispatching?.contact,
-          contact: dispatching?.content ?? '',
+          contact: dispatching?.contact ?? '',
           projectNumber: contactNumber,
           allAddress,
           //

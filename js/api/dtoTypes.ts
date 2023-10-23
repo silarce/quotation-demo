@@ -1828,8 +1828,7 @@ export type TdispatchingDto = {
   // 承包商;
   contractor: string;
   // 聯絡人;
-  // 未來會改為contact
-  content: string;
+  contact: string;
   // 工地電話;
   projectNumber: string;
   // 工程縣市;
@@ -1871,9 +1870,7 @@ export type TcreateDispatchingDto = {
   // 承包商;
   contractor: string;
   // 聯絡人;
-  // 未來會改為contact
-  // contact: string;
-  content: string;
+  contact: string;
   // 工地電話;
   projectNumber: string;
   // 工程縣市;

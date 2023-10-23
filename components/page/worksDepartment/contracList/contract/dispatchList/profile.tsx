@@ -14,7 +14,6 @@ type Tprofile01 = {
   contact: string;
   projectNumber: string;
   allAddress: string;
-
   engineeringNumber: string;
   badgeNumber: string;
 };
@@ -191,6 +190,7 @@ export default function Profile({
 
       <EmployeeSelector
         showModal={showSelector}
+        selLimit={1}
         onConfirm={(arr) => {
           onProfile03Change?.('workerEmployee', arr[0]);
         }}
