@@ -122,7 +122,7 @@ export default function WorkSheet() {
 
   const [disabled, setDisabled] = useState(true);
 
-  const [activeCard, setActiveCard] = useState(-1);
+  const [targetProd, setTargetProd] = useState<TquotationProductDto>();
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -130,6 +130,22 @@ export default function WorkSheet() {
   useEffect(() => {
     update_contract();
   }, []);
+
+  const productList = useMemo(() => {
+    const list: { [key: string]: TquotationProductDto } = {};
+
+    if (!contract) {
+      return list;
+    }
+
+    contract.subContracts.forEach((item) => {
+      item.content.products.forEach((prod) => {
+        list[prod.rootProductId] = prod;
+      });
+    });
+
+    return list;
+  }, [contract]);
 
   // -------------------------------------------------------------------------
 
@@ -248,6 +264,7 @@ export default function WorkSheet() {
   //   console.log(data);
   // };
 
+  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {
@@ -638,6 +655,8 @@ export default function WorkSheet() {
   };
 
   // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
     {
       type: 'myButton',
@@ -664,6 +683,7 @@ export default function WorkSheet() {
   ];
 
   const panelList = disabled ? panelList_allow : panelList_notAllow;
+  // -----------------------------------------------------------------
 
   return (
     <SubLayer>
@@ -675,14 +695,20 @@ export default function WorkSheet() {
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
-            {[0, 1, 2, 3, 4, 5, 6].map((key, index) => {
-              const onClick = () => setActiveCard(key);
-              const isActive = key === activeCard;
+            {Object.keys(productList).map((key) => {
+              const prod = productList[key];
+              const { rootProductId, itemName, doorModelName, quantity } = prod;
+
+              const onClick = () => {
+                setTargetProd(prod);
+              };
+
+              const isActive = rootProductId === targetProd?.rootProductId;
 
               const control = {
-                itemName: 'D-SD1-1',
-                doorType: 'SJ-302',
-                qty: '999',
+                itemName,
+                doorType: doorModelName,
+                qty: String(quantity),
               };
 
               return (
