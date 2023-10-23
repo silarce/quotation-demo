@@ -30,6 +30,7 @@ import {
   apiPostEngineeringExchange,
   apiPatchEngineeringExchange,
 } from 'js/api/api_engineering';
+import { set } from 'lodash';
 
 // -----------------------------------------------------------
 type Tprofile = {
@@ -175,7 +176,7 @@ export default function Edit() {
     setTransferArr([]);
     //
     //
-  }, [contract, exchange]);
+  }, [contract, exchange, disabled]);
 
   // ----------------------------------------------------
 
@@ -272,6 +273,7 @@ export default function Edit() {
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
+        setDisabled(true);
       } else {
         const res = await apiPostEngineeringExchange(body);
         router.push({
@@ -302,7 +304,14 @@ export default function Edit() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/listOfDeliveryOrders',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
 
@@ -317,7 +326,14 @@ export default function Edit() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/listOfDeliveryOrders',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
   const panelList_edit02: TpanelList = [
