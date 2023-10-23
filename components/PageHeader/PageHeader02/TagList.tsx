@@ -5,7 +5,7 @@ import scss from './pageHeader02.module.scss';
 
 export interface Ttag {
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 export type TtagList = Ttag[];
 
@@ -29,7 +29,7 @@ export default function TagList({
         const { label, onClick } = item;
 
         const theOnClick = () => {
-          onClick();
+          onClick?.();
           setActive(index);
         };
 

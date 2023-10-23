@@ -22,6 +22,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import {
   TcreateDispatchingDto,
+  TdispatchingDto,
   apiPostEngineeringDispatching,
   apiPatchEngineeringDispatching,
   useGetEngineeringDispatching_id,
@@ -46,20 +47,31 @@ export default function EditDispatchList() {
   const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
 
   useEffect(() => {
-    try {
-      update_contract();
-    } catch (error) {
-      myAlert.err({ title: '取得合約失敗' });
-    }
+    (async () => {
+      try {
+        setIsLoading(true);
 
-    try {
-      update_dispatching();
-    } catch (error) {
-      myAlert.err({ title: '取得派工單失敗' });
-    }
+        if (!contract) {
+          await update_contract();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+      }
+
+      try {
+        await update_dispatching();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得派工單失敗', content: err.message });
+      } finally {
+        setIsLoading(false);
+      }
+    })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId]);
+  }, [contractId, dispatchingId]);
+
   // ---------------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>();
   const [profile02, setProfile02] = useState<Tprofile02>();
@@ -180,9 +192,9 @@ export default function EditDispatchList() {
     const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
 
     const {
-      content,
+      contact,
       contractor,
-      projectNumber,
+      engineeringNumber: engineeringNumber,
       badgeNumber,
       dispatchDate,
       finalContact,
@@ -190,6 +202,7 @@ export default function EditDispatchList() {
       tasks,
       note,
       pricingMethod,
+      projectNumber,
     } = dispatching ?? {};
 
     setProfile01({
@@ -197,11 +210,11 @@ export default function EditDispatchList() {
       contractor: contractor ?? '',
       // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
       // contact: '',
-      contact: content ?? '',
-      contactNumber: contactNumber ?? '',
+      contact: contact ?? '',
+      projectNumber: (projectNumber || contactNumber) ?? '',
       allAddress,
       //
-      projectNumber: projectNumber ?? '',
+      engineeringNumber: engineeringNumber ?? '',
       badgeNumber: badgeNumber ?? '',
     });
     setProfile02({
@@ -241,25 +254,34 @@ export default function EditDispatchList() {
       ...profile01,
       ...profile02,
       ...editDispatch,
-      county: '臺中市',
-      district: '大安區',
-      address: '小馬路',
-      content: profile01.contact,
+      county: contract?.content.county ?? '',
+      district: contract?.content.district ?? '',
+      address: contract?.content.address ?? '',
+      // contact: profile01.contact,
       workerId: profile03?.workerEmployee?.id ?? '',
     };
 
     try {
       setIsLoading(true);
 
+      let res: TdispatchingDto;
+
       if (dispatchingId) {
-        await apiPatchEngineeringDispatching(dispatchingId, body);
+        res = await apiPatchEngineeringDispatching(dispatchingId, body);
         myAlert.success({ title: '更新派工單成功' });
       } else {
-        await apiPostEngineeringDispatching(body);
+        res = await apiPostEngineeringDispatching(body);
         myAlert.success({ title: '新增派工單成功' });
       }
 
-      router.back();
+      if (res) {
+        router.push({
+          query: {
+            ...router.query,
+            dispatchingId: res.id,
+          },
+        });
+      }
     } catch (error) {
       myAlert.err({ title: '新增派工單失敗' });
     } finally {

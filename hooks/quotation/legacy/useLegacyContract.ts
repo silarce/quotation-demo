@@ -643,23 +643,23 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
-    let haveQty0 = false;
+    // let haveQty0 = false;
 
     legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
       const thePost = prod.postProd;
 
-      if (!prod.postProd.quantity) {
-        haveQty0 = true;
-      }
+      // if (!prod.postProd.quantity) {
+      //   haveQty0 = true;
+      // }
 
       return thePost;
     });
 
-    if (haveQty0) {
-      myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
+    // if (haveQty0) {
+    //   myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
 
-      return false;
-    }
+    //   return false;
+    // }
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 

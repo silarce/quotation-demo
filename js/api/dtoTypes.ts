@@ -1292,6 +1292,7 @@ export type TquotationContractDto = {
   version: number;
   //
   subContracts: TquotationContractDto[];
+  engineeringContactId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
@@ -1827,10 +1828,9 @@ export type TdispatchingDto = {
   // 承包商;
   contractor: string;
   // 聯絡人;
-  // 未來會改為contact
-  content: string;
+  contact: string;
   // 工地電話;
-  contactNumber: string;
+  projectNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1838,7 +1838,7 @@ export type TdispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  projectNumber: string;
+  engineeringNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1870,11 +1870,9 @@ export type TcreateDispatchingDto = {
   // 承包商;
   contractor: string;
   // 聯絡人;
-  // 未來會改為contact
-  // contact: string;
-  content: string;
+  contact: string;
   // 工地電話;
-  contactNumber: string;
+  projectNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1882,7 +1880,7 @@ export type TcreateDispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  projectNumber: string;
+  engineeringNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1913,7 +1911,7 @@ export type TelectronicSuppliesDto = {
   // 需要日期
   requirementsDate: string; //date
   // 工程編號
-  projectNumber: string;
+  engineeringNumber: string;
   // 工程名稱
   projectName: string;
 
@@ -1998,7 +1996,7 @@ export type TexchangeDto = {
   updatedAt: string;
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
-  projectNumber: string;
+  engineeringNumber: string; // 工程編號
   projectName: string;
   goodsName: string; // 物品名稱
   goodsSpec: string; // 材質規格

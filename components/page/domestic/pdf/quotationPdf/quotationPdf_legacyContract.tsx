@@ -118,6 +118,7 @@ export default function QuotationPdf({
       fax: faxNumber ?? '',
       builtDate: dateString,
       projectAddress: projectCity + projectDistrict + projectAddress,
+      validityPeriod: '--',
     };
   })();
   // -------------------------------
@@ -132,11 +133,11 @@ export default function QuotationPdf({
     // businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
     // total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-    const { subTotal, salesTax: businessTax, total } = classLegacyContract.countProdTotal();
+    const { subTotal, salesTax: businessTax, total } = classLegacyContract?.countProdTotal() ?? {};
 
-    const theSubTotal = subTotal.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const theBusinessTax = businessTax.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const theTotal = total.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const theSubTotal = subTotal?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
+    const theBusinessTax = businessTax?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
+    const theTotal = total?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
 
     const settlement = {
       subTotal: theSubTotal, //小計
@@ -177,9 +178,9 @@ export default function QuotationPdf({
     return classProdArr.map((prod) => {
       const lw = new Decimal(Number(prod.width || 0) || Number(prod.length || 0)).mul(100).toString();
       const h = new Decimal(Number(prod.height || 0)).mul(100).toString();
-      const b = new Decimal(Number(prod.boxB || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod.boxB || 0)).mul(100).toNumber();
 
-      const size = `${lw} X ${h} + ${b}`;
+      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
       return {
         category: prod.itemName,
@@ -187,7 +188,7 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: prod.thickness,
+        thickness: prod.thickness === '0' ? '' : prod.thickness,
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

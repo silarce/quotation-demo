@@ -91,7 +91,7 @@ export default function ListOfDeliveryOrders() {
               //
               // contractNumber,
               contract,
-              projectNumber,
+              engineeringNumber: projectNumber,
               projectName,
               requirementsDate,
               dispatchDate,

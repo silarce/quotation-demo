@@ -1,0 +1,212 @@
+import classNames from 'classnames';
+
+// gear
+import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
+import scss from './workSheetProductOutline.module.scss';
+
+// ==================================================================
+
+type oldProductOutline = {
+  itemName: string;
+  doorType: string;
+  fullWidth: string;
+  height: string;
+  boxB: string;
+  quantity: string;
+  material: string;
+  isAntiTyphoon: boolean;
+};
+
+type TcontrolItem = {
+  value: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
+};
+
+type Tcontrol = {
+  itemName: TcontrolItem;
+  doorType: TcontrolItem;
+  fullWidth: TcontrolItem;
+  height: TcontrolItem;
+  boxB: TcontrolItem;
+  quantity: TcontrolItem;
+  material: TcontrolItem;
+  isAntiTyphoon: {
+    value: boolean;
+    onChange?: (value: boolean) => void;
+    disabled?: boolean;
+  };
+};
+
+export type { Tcontrol as Tcontrol_productOutline };
+
+// ==================================================================
+
+export default function WorkSheetProductOutline({
+  control,
+  oldProductOutline,
+  onCalcClick,
+  disabled,
+}: {
+  control: Tcontrol;
+  oldProductOutline: oldProductOutline;
+  disabled: boolean;
+  onCalcClick: () => void;
+}) {
+  return (
+    <div className={scss.container}>
+      <div className={scss.left}>
+        <p>合約產品項目：</p>
+        <div className={scss.list}>
+          {configArr.map((item) => {
+            const { key, label, className } = item;
+
+            return (
+              <InputSel
+                key={key}
+                className={classNames(scss.inputSel, className)}
+                label={label}
+                inputProps={{
+                  value: oldProductOutline[key],
+                }}
+                captionColor="main"
+                captionWidth={captionWidth}
+                disabled={true}
+                showBaseline="always"
+              />
+            );
+          })}
+          <InputSel
+            className={classNames(scss.inputSel)}
+            label={'防颱'}
+            width="fit-content"
+            checkProps={{
+              propsList: { isAntiTyphoon: { value: oldProductOutline['isAntiTyphoon'] } },
+              toAside: 'left',
+            }}
+            captionColor="main"
+            captionWidth={captionWidth}
+            disabled={disabled}
+            showBaseline="always"
+          />
+        </div>
+      </div>{' '}
+      {/* left */}
+      <hr />
+      <div className={scss.right}>
+        <p>調整過後項目：</p>
+        <div className={scss.list}>
+          {configArr.map((item) => {
+            const { key, label, className, placeholder } = item;
+
+            return (
+              <InputSel
+                key={key}
+                className={classNames(scss.inputSel, className)}
+                label={label}
+                captionColor="main"
+                captionWidth={captionWidth}
+                disabled={disabled || control[key].disabled}
+                showBaseline="always"
+                inputProps={{
+                  value: control[key].value,
+                  onChange: (v) => {
+                    control[key].onChange?.(v);
+                  },
+                }}
+              />
+            );
+          })}
+
+          <InputSel
+            className={classNames(scss.inputSel)}
+            label={'防颱'}
+            width="fit-content"
+            checkProps={{
+              propsList: {
+                isAntiTyphoon: {
+                  value: control.isAntiTyphoon.value,
+                },
+              },
+              toAside: 'left',
+              onChange: (obj) => {
+                let value = false;
+
+                if (obj.isAntiTyphoon) {
+                  value = true;
+                }
+
+                control.isAntiTyphoon.onChange?.(value);
+              },
+            }}
+            captionColor="main"
+            captionWidth={captionWidth}
+            disabled={disabled}
+            showBaseline="always"
+          />
+        </div>
+      </div>{' '}
+      {/* right */}
+      <div className={scss.btn}>
+        <MyButton_v2 label="計算" preImg="upload" onClick={onCalcClick} />
+      </div>
+    </div>
+  );
+}
+
+// ==================================================================
+const captionWidth = '100px';
+
+// type Tconfig = {
+//   key: keyof Tcontroll;
+//   label: string;
+//   placeholder?: string;
+//   className?: string;
+// };
+
+const configArr = [
+  {
+    key: 'itemName',
+    label: '項目',
+    placeholder: undefined,
+    className: undefined,
+  },
+  {
+    key: 'doorType',
+    label: '門型',
+    placeholder: undefined,
+    className: undefined,
+  },
+  {
+    key: 'fullWidth',
+    label: '全寬(L)',
+    placeholder: '請輸入全寬',
+    className: undefined,
+  },
+  {
+    key: 'height',
+    label: '淨高(h)',
+    placeholder: '請輸入淨高',
+    className: undefined,
+  },
+  {
+    key: 'boxB',
+    label: '捲箱高(B)',
+    placeholder: '請輸入捲箱高',
+    className: undefined,
+  },
+  {
+    key: 'quantity',
+    label: '數量',
+    placeholder: undefined,
+    className: undefined,
+  },
+  {
+    key: 'material',
+    label: '材質',
+    placeholder: undefined,
+    className: undefined,
+  },
+] as const;

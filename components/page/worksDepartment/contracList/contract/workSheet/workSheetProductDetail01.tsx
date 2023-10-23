@@ -1,35 +1,92 @@
-import { useMemo } from 'react';
-
-import { Control, Controller } from 'react-hook-form';
 import classNames from 'classnames';
-import _ from 'lodash';
 
 // gear
 import InputSel, { TselectProps, TcheckProps } from 'components/global/gear/inputAndSel/inputSel';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
 
-import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-
-import scss from './productDetail.module.scss';
+import scss from './workSheetProductDetail01.module.scss';
 // other
 import { Toption } from 'js/utils/options/options';
 import { optionsCre_doorTrack_normal } from 'js/utils/options/doorTrackOptions';
-// fake
-import { TfakeworkSheet } from 'pages/worksDepartment/contractList/contract/workSheet';
+
+// ============================================================================
+
+type TcontrolItem = {
+  value: string;
+  onChange: (v: string) => void;
+};
+
+type Tcontrol = {
+  reel: {
+    [key: string]: TcontrolItem | undefined;
+    size: TcontrolItem;
+    hasConvex: TcontrolItem;
+  };
+  reelBox: {
+    [key: string]: TcontrolItem | undefined;
+    material: TcontrolItem;
+    thickness: TcontrolItem;
+    surface: TcontrolItem;
+    front: TcontrolItem;
+    hasConvex: TcontrolItem;
+    type: TcontrolItem;
+  };
+  base: {
+    [key: string]: TcontrolItem | undefined;
+    material: TcontrolItem;
+    angleMaterial: TcontrolItem;
+    baseMaterial: TcontrolItem;
+    type: TcontrolItem;
+    surface: TcontrolItem;
+  };
+  support: {
+    [key: string]: TcontrolItem | undefined;
+    bearing: TcontrolItem;
+    chain: TcontrolItem;
+  };
+  //
+  doorPiece: {
+    [key: string]: TcontrolItem | undefined;
+    material: TcontrolItem;
+    surface: TcontrolItem;
+  };
+  motor: {
+    [key: string]: TcontrolItem | undefined;
+    horsepower: TcontrolItem;
+    manufacturer: TcontrolItem;
+    powerSupply: TcontrolItem;
+    voltage: TcontrolItem;
+    support: TcontrolItem;
+    chainType: TcontrolItem;
+    lockBox: TcontrolItem;
+  };
+  doorTrack: {
+    [key: string]: TcontrolItem | undefined;
+    material: TcontrolItem;
+    thickness: TcontrolItem;
+    surface: TcontrolItem;
+    silencer: TcontrolItem;
+    doorTrackType: TcontrolItem;
+    doorTrackName: TcontrolItem;
+  };
+};
+
+export type { Tcontrol as Tcontrol_detail };
 
 // ============================================================================
 const option_doorTrack_normal = optionsCre_doorTrack_normal();
 
 // ============================================================================
-export default function WorkSheetProductDetail({
+export default function WorkSheetProductDetail01({
   control,
-  fakeWorkSheet_ori,
+  supportTip,
   disabled,
 }: {
-  control: Control<TfakeworkSheet, any>;
-  fakeWorkSheet_ori: TfakeworkSheet;
+  control: Tcontrol;
+  supportTip: string;
   disabled: boolean;
 }) {
   return (
@@ -37,172 +94,180 @@ export default function WorkSheetProductDetail({
       <p>設定產品細部規格：</p>
       <div className={scss.left}>
         {configArr_left.map((item) => {
-          const { key: pKey, label, list } = item;
+          const { pKey: pKey, label, arr: list } = item;
 
-          return <Item key={pKey} pKey={pKey} label={label} list={list} control={control} disabled={disabled} />;
+          return (
+            <Item
+              key={pKey}
+              pKey={pKey}
+              label_p={label}
+              arr={list}
+              control={control}
+              disabled={disabled}
+              supportTip={supportTip}
+            />
+          );
         })}
       </div>{' '}
       {/* left */}
       <div className={scss.right}>
         {configArr_right.map((item) => {
-          const { key: pKey, label, list } = item;
+          const { pKey: pKey, label, arr: list } = item;
 
-          return <Item key={pKey} pKey={pKey} label={label} list={list} control={control} disabled={disabled} />;
+          return <Item key={pKey} pKey={pKey} label_p={label} arr={list} control={control} disabled={disabled} />;
         })}
-      </div>{' '}
+      </div>
       {/* right */}
     </div>
   );
 }
 
 // ==================================================================
-// ==================================================================
-// ==================================================================
-// ==================================================================
-// ==================================================================
-// ==================================================================
 
 const Item = ({
   pKey,
-  label,
-  list,
+  label_p: label_p,
+  arr,
   control,
   disabled,
+  supportTip,
 }: {
-  pKey: string;
-  label: string;
-  list: Tconfig['list'];
-  control: Control<TfakeworkSheet, any>;
+  // pKey: string;
+  pKey: Tconfig['pKey'];
+  label_p: string;
+  arr: Tconfig['arr'];
+  // control: Control<TfakeworkSheet, any>;
+  control: Tcontrol;
   disabled: boolean;
+  supportTip?: string;
 }) => {
   return (
     <div className={scss.item}>
       <p className={scss.sutTitle}>
-        {label}
-        {pKey === 'support' && <span>馬達荷重(max:500,min:600),馬力數:2Hp</span>}
+        {label_p}
+        {pKey === 'support' && <span>{supportTip}</span>}
       </p>
       <div className={scss.list}>
-        {list.map((item) => {
-          const { key: cKey, module, label, placeholder, className, options, checkBarPropsListCre } = item;
+        {arr.map((item) => {
+          const { cKey: cKey, module, label: label_c, placeholder, className, options, checkBarPropsListCre } = item;
+
+          if (!control[pKey][cKey]) {
+            myAlert.err({ title: '開發者提示，Tcontrol的key與config不相符', content: `pKey:${pKey} cKey:${cKey}` });
+
+            return null;
+          }
+
+          const { value, onChange } = control[pKey][cKey]!;
+
+          let selectProps: TselectProps | undefined = undefined;
+          let checkProps: TcheckProps | undefined = undefined;
+
+          // console.log(label, label_c, value);
+
+          if (module === 'select') {
+            selectProps = {
+              value: value as string,
+              onChange: (v) => {
+                onChange(v?.value ?? '');
+              },
+              options: options ?? [],
+              selClassNames: {
+                singleValue: (state) => {
+                  return scss.selSingleValue;
+                },
+                option: (state) => {
+                  return scss.selSingleValue;
+                },
+              },
+              arrowType: 'black',
+            };
+
+            if (cKey === 'doorTrackName') {
+              selectProps = {
+                ...selectProps,
+                onChange: (v) => {
+                  onChange(v?.value ?? '');
+                },
+                customComponents: {
+                  Option: (props) =>
+                    OptionWithIcon01(props, {
+                      showLabel: false,
+                      className: scss.selOption_custom,
+                    }),
+                  SingleValue: (props) =>
+                    SingleValueWithIcon01(props, {
+                      showLabel: false,
+                      className: scss.selSingleValue_custom,
+                    }),
+                },
+              };
+            }
+          } //   if (module === "select")
+
+          if (module === 'checkBar') {
+            const checkBarPropsList = checkBarPropsListCre!();
+
+            // if (value === false && 'false' in checkBarPropsList) {
+            //   checkBarPropsList['false'].value = true;
+            // }
+
+            // if (value === true && 'true' in checkBarPropsList) {
+            //   checkBarPropsList['true'].value = true;
+            // }
+
+            const objArr = Object.values(checkBarPropsList);
+
+            if (objArr[objArr.length - 3]) {
+              objArr[objArr.length - 3].style = { width: '45px' };
+            }
+
+            if (objArr[objArr.length - 2]) {
+              objArr[objArr.length - 2].style = { width: '100px' };
+            }
+
+            if (objArr[objArr.length - 1]) {
+              objArr[objArr.length - 1].style = { width: '80px' };
+            }
+
+            checkProps = {
+              propsList: {
+                ...checkBarPropsList,
+              },
+              isRadio: true,
+              onChange: (list) => {
+                const keyArr = Object.keys(list);
+                let value: string | boolean = '';
+                keyArr.forEach((key) => {
+                  if (list[key]) {
+                    value = key;
+                  }
+                });
+                onChange(value);
+
+                // if (value === 'false') {
+                //   value = false;
+                // }
+
+                // if (value === 'true') {
+                //   value = true;
+                // }
+
+                // console.log(value);
+              },
+            };
+          }
 
           return (
-            <Controller
+            <InputSel
               key={cKey}
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              name={`${pKey}.${cKey}`}
-              control={control}
-              render={({ field }) => {
-                let selectProps: TselectProps | undefined = undefined;
-                let checkProps: TcheckProps | undefined = undefined;
-
-                const { value, onChange } = field;
-
-                if (module === 'select') {
-                  selectProps = {
-                    value: value as string,
-                    onChange: (v) => {
-                      onChange(v?.value);
-                    },
-                    options: options ?? [],
-                    selClassNames: {
-                      singleValue: (state) => {
-                        return scss.selSingleValue;
-                      },
-                      option: (state) => {
-                        return scss.selSingleValue;
-                      },
-                    },
-                    arrowType: 'black',
-                  };
-
-                  if (cKey === 'doorTrackName') {
-                    selectProps = {
-                      ...selectProps,
-                      onChange: (v) => {
-                        onChange(v?.value);
-                      },
-                      customComponents: {
-                        Option: (props) =>
-                          OptionWithIcon01(props, {
-                            showLabel: false,
-                            className: scss.selOption_custom,
-                          }),
-                        SingleValue: (props) =>
-                          SingleValueWithIcon01(props, {
-                            showLabel: false,
-                            className: scss.selSingleValue_custom,
-                          }),
-                      },
-                    };
-                  }
-                } //   if (module === "select")
-
-                if (module === 'checkBar') {
-                  const checkBarPropsList = checkBarPropsListCre!();
-
-                  if (value === false && 'false' in checkBarPropsList) {
-                    checkBarPropsList['false'].value = true;
-                  }
-
-                  if (value === true && 'true' in checkBarPropsList) {
-                    checkBarPropsList['true'].value = true;
-                  }
-
-                  const objArr = Object.values(checkBarPropsList);
-
-                  if (objArr[objArr.length - 3]) {
-                    objArr[objArr.length - 3].style = { width: '45px' };
-                  }
-
-                  if (objArr[objArr.length - 2]) {
-                    objArr[objArr.length - 2].style = { width: '100px' };
-                  }
-
-                  if (objArr[objArr.length - 1]) {
-                    objArr[objArr.length - 1].style = { width: '80px' };
-                  }
-
-                  checkProps = {
-                    propsList: {
-                      ...checkBarPropsList,
-                    },
-                    isRadio: true,
-                    onChange: (arr) => {
-                      const keyArr = Object.keys(arr);
-                      let value: string | boolean = '';
-                      keyArr.forEach((key) => {
-                        if (arr[key]) {
-                          value = key;
-                        }
-                      });
-
-                      if (value === 'false') {
-                        value = false;
-                      }
-
-                      if (value === 'true') {
-                        value = true;
-                      }
-
-                      field.onChange(value);
-                    },
-                  };
-                } //  if (module === "checkBar")
-
-                return (
-                  <InputSel
-                    className={classNames({ [scss.inputSel_big]: cKey === 'doorTrackName' }, className)}
-                    label={label}
-                    selectProps={selectProps}
-                    checkProps={checkProps}
-                    captionColor="main"
-                    captionWidth={captionWidth}
-                    disabled={disabled}
-                    showBaseline="always"
-                  />
-                );
-              }}
+              className={classNames({ [scss.inputSel_big]: cKey === 'doorTrackName' }, className)}
+              label={label_c}
+              selectProps={selectProps}
+              checkProps={checkProps}
+              captionColor="main"
+              captionWidth={captionWidth}
+              disabled={disabled}
+              showBaseline="always"
             />
           );
         })}
@@ -279,8 +344,8 @@ const fakeOption_voltage: Toption[] = [
 
 // --------------------------------
 const checkBarPropsList_boolean = (): TcheckProps['propsList'] => ({
-  false: { value: false, label: '無' },
-  true: { value: false, label: '有' },
+  無: { value: false, label: '無' },
+  有: { value: false, label: '有' },
 });
 
 const checkBarPropsListCre_surface = (): TcheckProps['propsList'] => ({
@@ -316,10 +381,12 @@ const checkBarPropsListCre_doorTrackType = (): TcheckProps['propsList'] => ({
 });
 
 type Tconfig = {
-  readonly key: string;
+  // readonly pKey: string;
+  readonly pKey: keyof Tcontrol;
   readonly label: string;
-  readonly list: {
-    readonly key: string;
+  readonly arr: {
+    readonly cKey: string;
+    // readonly cKey: keyof Tcontroll[keyof Tcontroll];
     readonly module: 'select' | 'checkBar';
     readonly label: string;
     readonly placeholder: string | undefined;
@@ -331,11 +398,11 @@ type Tconfig = {
 
 const configArr_left: Tconfig[] = [
   {
-    key: 'reel',
+    pKey: 'reel',
     label: '捲軸',
-    list: [
+    arr: [
       {
-        key: 'size',
+        cKey: 'size',
         module: 'select',
         label: '尺寸',
         placeholder: undefined,
@@ -344,7 +411,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'hasConvex',
+        cKey: 'hasConvex',
         module: 'checkBar',
         label: '有無凸',
         placeholder: undefined,
@@ -355,11 +422,11 @@ const configArr_left: Tconfig[] = [
     ],
   },
   {
-    key: 'reelBox',
+    pKey: 'reelBox',
     label: '捲箱',
-    list: [
+    arr: [
       {
-        key: 'material',
+        cKey: 'material',
         module: 'select',
         label: '材質',
         placeholder: undefined,
@@ -368,7 +435,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'thickness',
+        cKey: 'thickness',
         module: 'select',
         label: '厚度',
         placeholder: undefined,
@@ -377,7 +444,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'surface',
+        cKey: 'surface',
         module: 'checkBar',
         label: '表面',
         placeholder: undefined,
@@ -386,7 +453,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsListCre_surface,
       },
       {
-        key: 'front',
+        cKey: 'front',
         module: 'checkBar',
         label: '正面',
         placeholder: undefined,
@@ -395,7 +462,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsListCre_front,
       },
       {
-        key: 'hasConvex',
+        cKey: 'hasConvex',
         module: 'checkBar',
         label: '有無凸',
         placeholder: undefined,
@@ -404,7 +471,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsList_boolean,
       },
       {
-        key: 'type',
+        cKey: 'type',
         module: 'select',
         label: '捲相型式',
         placeholder: undefined,
@@ -415,11 +482,11 @@ const configArr_left: Tconfig[] = [
     ],
   },
   {
-    key: 'base',
+    pKey: 'base',
     label: '底座',
-    list: [
+    arr: [
       {
-        key: 'material',
+        cKey: 'material',
         module: 'select',
         label: '材質',
         placeholder: undefined,
@@ -428,7 +495,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'angleMaterial',
+        cKey: 'angleMaterial',
         module: 'select',
         label: '角鐵材質',
         placeholder: undefined,
@@ -437,7 +504,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'baseMaterial',
+        cKey: 'baseMaterial',
         module: 'select',
         label: '底座板材質',
         placeholder: undefined,
@@ -446,7 +513,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'type',
+        cKey: 'type',
         module: 'checkBar',
         label: '型式',
         placeholder: undefined,
@@ -455,7 +522,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsListCre_bastType,
       },
       {
-        key: 'surface',
+        cKey: 'surface',
         module: 'checkBar',
         label: '表面',
         placeholder: undefined,
@@ -466,11 +533,11 @@ const configArr_left: Tconfig[] = [
     ],
   },
   {
-    key: 'support',
+    pKey: 'support',
     label: '支版',
-    list: [
+    arr: [
       {
-        key: 'bearing',
+        cKey: 'bearing',
         module: 'select',
         label: '軸承',
         placeholder: undefined,
@@ -479,7 +546,7 @@ const configArr_left: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'chain',
+        cKey: 'chain',
         module: 'select',
         label: '鏈條',
         placeholder: undefined,
@@ -493,11 +560,11 @@ const configArr_left: Tconfig[] = [
 
 const configArr_right: Tconfig[] = [
   {
-    key: 'doorPiece',
+    pKey: 'doorPiece',
     label: '門片',
-    list: [
+    arr: [
       {
-        key: 'material',
+        cKey: 'material',
         module: 'select',
         label: '材質',
         placeholder: undefined,
@@ -506,7 +573,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'surface',
+        cKey: 'surface',
         module: 'checkBar',
         label: '表面',
         placeholder: undefined,
@@ -517,11 +584,11 @@ const configArr_right: Tconfig[] = [
     ],
   },
   {
-    key: 'motor',
+    pKey: 'motor',
     label: '電動機',
-    list: [
+    arr: [
       {
-        key: 'horsepower',
+        cKey: 'horsepower',
         module: 'select',
         label: '馬力數',
         placeholder: undefined,
@@ -530,7 +597,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'manufacturer',
+        cKey: 'manufacturer',
         module: 'select',
         label: '廠商',
         placeholder: undefined,
@@ -539,7 +606,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'powerSupply',
+        cKey: 'powerSupply',
         module: 'select',
         label: '電供',
         placeholder: undefined,
@@ -548,7 +615,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'voltage',
+        cKey: 'voltage',
         module: 'select',
         label: '電壓',
         placeholder: undefined,
@@ -557,7 +624,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'support',
+        cKey: 'support',
         module: 'checkBar',
         label: '支撐架',
         placeholder: undefined,
@@ -566,7 +633,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsList_boolean,
       },
       {
-        key: 'chainType',
+        cKey: 'chainType',
         module: 'checkBar',
         label: '鏈條型式',
         placeholder: undefined,
@@ -575,7 +642,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsListCre_chainType,
       },
       {
-        key: 'lockBox',
+        cKey: 'lockBox',
         module: 'checkBar',
         label: '鎖盒',
         placeholder: undefined,
@@ -586,11 +653,11 @@ const configArr_right: Tconfig[] = [
     ],
   },
   {
-    key: 'doorTrack',
+    pKey: 'doorTrack',
     label: '門軌',
-    list: [
+    arr: [
       {
-        key: 'material',
+        cKey: 'material',
         module: 'select',
         label: '材質',
         placeholder: undefined,
@@ -599,7 +666,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'thickness',
+        cKey: 'thickness',
         module: 'select',
         label: '厚度',
         placeholder: undefined,
@@ -608,7 +675,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: undefined,
       },
       {
-        key: 'surface',
+        cKey: 'surface',
         module: 'checkBar',
         label: '表面',
         placeholder: undefined,
@@ -617,7 +684,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsListCre_surface,
       },
       {
-        key: 'silencer',
+        cKey: 'silencer',
         module: 'checkBar',
         label: '消音條',
         placeholder: undefined,
@@ -626,7 +693,7 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsList_boolean,
       },
       {
-        key: 'doorTrackType',
+        cKey: 'doorTrackType',
         module: 'checkBar',
         label: '型式',
         placeholder: undefined,
@@ -635,11 +702,11 @@ const configArr_right: Tconfig[] = [
         checkBarPropsListCre: checkBarPropsListCre_doorTrackType,
       },
       {
-        key: 'doorTrackName',
+        cKey: 'doorTrackName',
         module: 'select',
         label: '型式',
         placeholder: undefined,
-        className: undefined,
+        className: scss.doorTrackName,
         options: option_doorTrack_normal,
         checkBarPropsListCre: undefined,
       },

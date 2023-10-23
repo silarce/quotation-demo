@@ -132,6 +132,7 @@ export default function AddressBar({
         wrapperClassName: classNames(scss.addressWrapper, address.wrapperClassName),
         props: {
           placeholder: '請輸入剩餘地址',
+          className: 'overflow-hidden',
           ...address.props,
         },
         // wrapperStyle: { width: 'auto', flex: 'auto' },

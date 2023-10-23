@@ -23,7 +23,7 @@ import style from './employees.module.scss';
 export default function Employees() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+
   // ====================================================
   const [params, setParams] = useState<TapiGetEmployeeParams>({
     order: 'ASC',
@@ -89,7 +89,6 @@ export default function Employees() {
     (async () => {
       setIsLoading(true);
       await update();
-      setIsReady(true);
       setIsLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

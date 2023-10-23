@@ -82,6 +82,7 @@ export default function WorkContactDoc() {
 
   // ---------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
 
   const productArr = useMemo(() => {
     const list: { [key: string]: TquotationProductDto } = {};
@@ -111,7 +112,8 @@ export default function WorkContactDoc() {
   // ---------------------------------------------------------------------------
 
   /**data裡只會有一筆資料 */
-  const { data: engineeringContact, update: update_engineeringContact } = useGetEngineeringContact(contractId);
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
   useEffect(() => {
     (async () => {

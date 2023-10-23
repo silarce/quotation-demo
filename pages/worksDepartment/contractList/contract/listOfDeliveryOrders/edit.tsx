@@ -36,7 +36,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // -----------------------------------------------------------
 type Tprofile = {
-  projectNumber: string;
+  engineeringNumber: string;
   projectName: string;
   requirementsDate: string;
   dispatchDate: string;
@@ -137,7 +137,7 @@ export default function Edit() {
     const { projectName: projectName_contract } = contract?.content ?? {};
     const {
       projectName,
-      projectNumber,
+      engineeringNumber,
       requirementsDate,
       dispatchDate,
       //
@@ -149,7 +149,7 @@ export default function Edit() {
     } = exchange ?? {};
 
     setProfile({
-      projectNumber: projectNumber ?? '',
+      engineeringNumber: engineeringNumber ?? '',
       projectName: (projectName || projectName_contract) ?? '',
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
@@ -172,9 +172,9 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const controll_profile: Tcontroll_profile = {
-    projectNumber: {
-      value: profile.projectNumber,
-      onChange: (v: string) => changeProfile('projectNumber', v),
+    engineeringNumber: {
+      value: profile.engineeringNumber,
+      onChange: (v: string) => changeProfile('engineeringNumber', v),
     },
     projectName: {
       value: profile.projectName,
@@ -352,7 +352,7 @@ export default function Edit() {
 // ===========================================================
 
 const emptyProfileOri = (): Tprofile => ({
-  projectNumber: '',
+  engineeringNumber: '',
   projectName: '',
   requirementsDate: '',
   dispatchDate: '',

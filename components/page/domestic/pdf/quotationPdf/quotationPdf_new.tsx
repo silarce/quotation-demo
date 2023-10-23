@@ -64,6 +64,7 @@ export default function QuotationPdf({
     deliveryDate,
     deliveryLocation,
     paymentMethods,
+    validityPeriod,
   } = basicInfo;
 
   const agentName = agentEmployee.chName;
@@ -139,6 +140,7 @@ export default function QuotationPdf({
       fax: faxNumber ?? '',
       builtDate: dateString,
       projectAddress: county + district + address,
+      validityPeriod: validityPeriod,
     };
   })();
   // -------------------------------
@@ -194,14 +196,15 @@ export default function QuotationPdf({
       const h = Number(prod.height) * 100;
       const b = Number(prod.thickness) * 100;
 
-      const size = `${lw} X ${h} + ${b}`;
+      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
       return {
         category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
-        thickness: prod.thickness,
+        // thickness: prod.thickness,
+        thickness: prod.thickness === '0' ? '' : prod.thickness,
         surface: prod.surface,
         // doorRail 要收圖片路徑
         doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,

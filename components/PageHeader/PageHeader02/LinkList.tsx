@@ -4,17 +4,16 @@ import Link from 'next/link';
 // css
 import scss from './pageHeader02.module.scss';
 
-type Thref = React.ComponentProps<typeof Link>['href'];
-
 export interface Tlink {
+  linkProps?: React.ComponentProps<typeof Link>;
   label: string;
-  href: Thref;
   isActive?: boolean;
+  // linkProps: LinkProps;
+  // href: React.ComponentProps<typeof Link>['href'];
 }
 
 /**
  * 如果linkList的item沒有isActive，會用pathname判斷是否isActive
- * 有了isActive參數後pathname好像多餘了
  */
 export default function LinkList({ linkList, pathname }: { linkList: Tlink[]; pathname?: string }) {
   if (!linkList[0]) {
@@ -24,24 +23,24 @@ export default function LinkList({ linkList, pathname }: { linkList: Tlink[]; pa
   return (
     <>
       {linkList.map((config, index) => {
-        const { label, href, isActive } = config;
-
-        let classActive: string | undefined;
-
-        if (isActive) {
-          classActive = scss.active;
-        }
-
-        if (isActive === false) {
-          classActive = undefined;
-        }
+        const { label, linkProps } = config;
+        let { isActive } = config;
 
         if (isActive === undefined) {
-          classActive = href === pathname ? scss.active : undefined;
+          if (typeof linkProps?.href === 'string') {
+            isActive = linkProps?.href === pathname;
+          } else {
+            isActive = linkProps?.href.pathname === pathname;
+          }
         }
 
         return (
-          <Link className={classNames(classActive)} href={href} key={index}>
+          <Link
+            key={index}
+            className={classNames(isActive && scss.active, linkProps?.className)}
+            {...linkProps}
+            href={linkProps?.href || {}}
+          >
             <span>{label}</span>
             <hr className={scss.bottomBar} />
           </Link>

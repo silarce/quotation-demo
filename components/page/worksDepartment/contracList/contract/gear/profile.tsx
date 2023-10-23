@@ -1,30 +1,11 @@
-import { Dispatch, SetStateAction } from 'react';
-
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // css
-// import style from './powerTransmissionSpareList.module.scss';
 import style from './profile.module.scss';
 
-// fake
-// import type { Tprofile } from 'pages/worksDepartment/contractList/contract/powerTransmissionSpareList/edit';
-
-// type Tprofile = {
-//   projectNumber: string;
-//   projectName: string;
-//   requirementsDate: string; // 需要日期
-//   dispatchDate: string; // 填表日期
-// };
-// type Tprofile = {
-//   projectNumber: string;
-//   projectName: string;
-//   requirementsDate: string; // 需要日期
-//   dispatchDate: string; // 填表日期
-// };
-
 type Tcontroll = {
-  projectNumber: {
+  engineeringNumber: {
     value: string;
     onChange: (v: string) => void;
     disabled?: boolean;
@@ -46,21 +27,10 @@ type Tcontroll = {
   };
 };
 
-// -----------------------------------------------------------
 export type { Tcontroll };
 // -----------------------------------------------------------
 
-export default function Profile({
-  // data,
-  // setData,
-  disabled,
-  controll,
-}: {
-  // data: Partial<Tprofile>;
-  // setData: Dispatch<SetStateAction<Partial<Tprofile>>>;
-  disabled: boolean;
-  controll: Tcontroll;
-}) {
+export default function Profile({ disabled, controll }: { disabled: boolean; controll: Tcontroll }) {
   return (
     <div className={style.profile}>
       {indexKeys.map((key, index) => {
@@ -69,15 +39,6 @@ export default function Profile({
 
         // -----
         if (type === 'date') {
-          // const onChange = (dateString: string) => {
-          //   const value = dateString;
-          //   setData((data) => {
-          //     data[key] = value;
-
-          //     return { ...data };
-          //   });
-          // };
-
           return (
             <InputSel
               className={style.input02}
@@ -98,15 +59,6 @@ export default function Profile({
             />
           );
         }
-
-        // -----
-        // const onChange = (v: string) => {
-        //   setData((data) => {
-        //     data[key] = v;
-
-        //     return { ...data };
-        //   });
-        // };
 
         const showBaseline = key === 'projectName' ? 'invisible' : 'always';
 
@@ -136,7 +88,7 @@ export default function Profile({
 
 type TindexKeys = keyof Tcontroll;
 
-const indexKeys: TindexKeys[] = ['dispatchDate', 'projectNumber', 'requirementsDate', 'projectName'];
+const indexKeys: TindexKeys[] = ['dispatchDate', 'engineeringNumber', 'requirementsDate', 'projectName'];
 
 const config: {
   [key in TindexKeys]: {
@@ -144,7 +96,7 @@ const config: {
     type?: 'date';
   };
 } = {
-  projectNumber: {
+  engineeringNumber: {
     label: '工程編號',
   },
   projectName: {

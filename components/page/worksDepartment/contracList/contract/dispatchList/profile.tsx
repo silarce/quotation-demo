@@ -12,10 +12,9 @@ type Tprofile01 = {
   projectName: string;
   contractor: string;
   contact: string;
-  contactNumber: string;
-  allAddress: string;
-
   projectNumber: string;
+  allAddress: string;
+  engineeringNumber: string;
   badgeNumber: string;
 };
 
@@ -191,6 +190,7 @@ export default function Profile({
 
       <EmployeeSelector
         showModal={showSelector}
+        selLimit={1}
         onConfirm={(arr) => {
           onProfile03Change?.('workerEmployee', arr[0]);
         }}
@@ -203,12 +203,12 @@ export default function Profile({
 }
 // ============================================================
 
-type TindexKey01 = keyof Pick<Tprofile01, 'projectName' | 'contractor' | 'contact' | 'contactNumber' | 'allAddress'>;
-type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber' | 'badgeNumber'>;
+type TindexKey01 = keyof Pick<Tprofile01, 'projectName' | 'contractor' | 'contact' | 'projectNumber' | 'allAddress'>;
+type TindexKey02 = keyof Pick<Tprofile01, 'engineeringNumber' | 'badgeNumber'>;
 // type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
 
-const indexKeys01: TindexKey01[] = ['projectName', 'contractor', 'contact', 'contactNumber', 'allAddress'];
-const indexKeys02: TindexKey02[] = ['projectNumber', 'badgeNumber'];
+const indexKeys01: TindexKey01[] = ['projectName', 'contractor', 'contact', 'projectNumber', 'allAddress'];
+const indexKeys02: TindexKey02[] = ['engineeringNumber', 'badgeNumber'];
 // const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
 
 type Tconfig<keys extends string> = {
@@ -239,7 +239,7 @@ const config: Tconfig<
     labelWidth: '80px',
     showBaseline: 'auto',
   },
-  contactNumber: {
+  projectNumber: {
     label: '工地電話',
     labelWidth: '80px',
     disabled: true,
@@ -250,7 +250,7 @@ const config: Tconfig<
     disabled: true,
   },
   // TindexKey02
-  projectNumber: {
+  engineeringNumber: {
     label: '工程編號',
     labelWidth: '100px',
   },

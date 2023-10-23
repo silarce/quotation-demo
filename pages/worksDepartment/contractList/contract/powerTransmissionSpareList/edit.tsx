@@ -39,7 +39,7 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 
 // =================================================================
 type Tprofile = {
-  projectNumber: string;
+  engineeringNumber: string;
   projectName: string;
   requirementsDate: string;
   dispatchDate: string;
@@ -178,7 +178,7 @@ export default function Edit() {
 
   useEffect(() => {
     const {
-      projectNumber,
+      engineeringNumber: engineeringNumber,
       projectName,
       requirementsDate,
       dispatchDate,
@@ -191,7 +191,7 @@ export default function Edit() {
     const projectName_contract = contract?.content.projectName ?? '';
 
     setProfile({
-      projectNumber: projectNumber ?? '',
+      engineeringNumber: engineeringNumber ?? '',
       projectName: projectName ?? projectName_contract ?? '',
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
@@ -415,10 +415,10 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const control_profile: Tcontroll_profile = {
-    projectNumber: {
-      value: profile.projectNumber,
+    engineeringNumber: {
+      value: profile.engineeringNumber,
       onChange: (v) => {
-        changeProfile('projectNumber', v);
+        changeProfile('engineeringNumber', v);
       },
     },
     projectName: {
@@ -571,7 +571,7 @@ export default function Edit() {
 // ===========================================================
 
 const cre_emptyProfile = () => ({
-  projectNumber: '',
+  engineeringNumber: '',
   projectName: '未取得工程名稱',
   requirementsDate: '',
   dispatchDate: '',
