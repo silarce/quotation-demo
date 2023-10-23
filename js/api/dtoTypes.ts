@@ -1827,10 +1827,10 @@ export type TdispatchingDto = {
   projectName: string;
   // 承包商;
   contractor: string;
-  // 聯絡人;
-  contact: string;
+  // 承包商聯絡人;
+  contractorContactPerson: string;
   // 工地電話;
-  projectNumber: string;
+  constructionSiteContactNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1846,7 +1846,7 @@ export type TdispatchingDto = {
   // 工務人員
   workerEmployee: TemployeeDto;
   // 完工聯絡人;
-  finalContact: string;
+  finalContactPerson: string;
   // 辦理事項;
   tasks: string;
   // 派工批價方式;
@@ -1869,10 +1869,10 @@ export type TcreateDispatchingDto = {
   projectName: string;
   // 承包商;
   contractor: string;
-  // 聯絡人;
-  contact: string;
+  // 承包商聯絡人;
+  contractorContactPerson: string;
   // 工地電話;
-  projectNumber: string;
+  constructionSiteContactNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1886,7 +1886,7 @@ export type TcreateDispatchingDto = {
   // 工務人員ID
   workerId: string;
   // 完工聯絡人
-  finalContact: string;
+  finalContactPerson: string;
   // 辦理事項
   tasks: string;
   // 派工批價方式

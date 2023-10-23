@@ -192,17 +192,17 @@ export default function EditDispatchList() {
     const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
 
     const {
-      contact,
+      contractorContactPerson: contact,
       contractor,
       engineeringNumber: engineeringNumber,
       badgeNumber,
       dispatchDate,
-      finalContact,
+      finalContactPerson: finalContact,
       workerEmployee,
       tasks,
       note,
       pricingMethod,
-      projectNumber,
+      constructionSiteContactNumber: projectNumber,
     } = dispatching ?? {};
 
     setProfile01({
@@ -210,8 +210,8 @@ export default function EditDispatchList() {
       contractor: contractor ?? '',
       // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
       // contact: '',
-      contact: contact ?? '',
-      projectNumber: (projectNumber || contactNumber) ?? '',
+      contractorContactPerson: contact ?? '',
+      constructionSiteContactNumber: (projectNumber || contactNumber) ?? '',
       allAddress,
       //
       engineeringNumber: engineeringNumber ?? '',
@@ -219,7 +219,7 @@ export default function EditDispatchList() {
     });
     setProfile02({
       dispatchDate: dispatchDate ?? '',
-      finalContact: finalContact ?? '',
+      finalContactPerson: finalContact ?? '',
     });
     setProfile03({
       workerEmployee: workerEmployee,
