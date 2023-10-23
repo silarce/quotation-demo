@@ -318,6 +318,7 @@ export default function ErpCtrlPermissions() {
   return (
     <SubLayer>
       <div className={scss.header}>
+        {/* <PageHeader02 linkList={useHrManageLinkArr()} panelList={panelList} /> */}
         <PageHeader02 linkList={useHrManageLinkArr()} panelList={panelList} />
       </div>
 
