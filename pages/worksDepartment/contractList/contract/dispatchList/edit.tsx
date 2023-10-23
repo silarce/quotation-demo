@@ -248,6 +248,10 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '請選擇派工日期' });
     }
 
+    if (!profile03?.workerEmployee?.id) {
+      return myAlert.info({ title: '請選擇公務人員' });
+    }
+
     const body: TcreateDispatchingDto = {
       // 合約id
       contractId,
@@ -283,7 +287,8 @@ export default function EditDispatchList() {
         });
       }
     } catch (error) {
-      myAlert.err({ title: '新增派工單失敗' });
+      const err = error as Error;
+      myAlert.err({ title: '新增派工單失敗', content: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -299,7 +304,15 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '取消',
-      onClick: () => router.back(),
+      // onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/dispatchList',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
   const panelList02: TpanelList = [
@@ -311,7 +324,14 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/dispatchList',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
   const panelList03: TpanelList = [
