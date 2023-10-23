@@ -1973,9 +1973,9 @@ export type TexchangeDto = {
   updatedAt: string;
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
-  engineeringNumber: string; // 工程編號
+  projectNumber: string; // 工程編號
   projectName: string;
-  exchangeRecord: TexchangeRecordDto[];
+  exchangeRecords: TexchangeRecordDto[];
   accountingId: string;
   accounting: TemployeeDto; // 會計
   warehouseEmployeeId: string;
@@ -1995,9 +1995,9 @@ export type TexchangeDto = {
 export type TcreateExchgangeDto = {
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
-  engineeringNumber: string; // 工程編號
+  projectNumber: string; // 工程編號
   projectName: string;
-  exchangeRecord: TcreateExchangeRecordDto[];
+  exchangeRecords: TcreateExchangeRecordDto[];
   accountingId: string;
   warehouseEmployeeId: string;
   factoryEmployeeId: string;

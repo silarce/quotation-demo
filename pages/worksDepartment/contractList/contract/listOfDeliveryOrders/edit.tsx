@@ -30,11 +30,10 @@ import {
   apiPostEngineeringExchange,
   apiPatchEngineeringExchange,
 } from 'js/api/api_engineering';
-import { set } from 'lodash';
 
 // -----------------------------------------------------------
 type Tprofile = {
-  engineeringNumber: string;
+  projectNumber: string;
   projectName: string;
   requirementsDate: string;
   dispatchDate: string;
@@ -146,7 +145,7 @@ export default function Edit() {
     const { projectName: projectName_contract } = contract?.content ?? {};
     const {
       projectName,
-      engineeringNumber,
+      projectNumber: engineeringNumber,
       requirementsDate,
       dispatchDate,
       //
@@ -158,7 +157,7 @@ export default function Edit() {
     } = exchange ?? {};
 
     setProfile({
-      engineeringNumber: engineeringNumber ?? '',
+      projectNumber: engineeringNumber ?? '',
       projectName: (projectName || projectName_contract) ?? '',
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
@@ -172,9 +171,7 @@ export default function Edit() {
       formCompleter,
     });
 
-    // TODO 等候端更新api後要把資料放進去
-    setTransferArr([]);
-    //
+    setTransferArr(exchange?.exchangeRecords ?? []);
     //
   }, [contract, exchange, disabled]);
 
@@ -182,8 +179,8 @@ export default function Edit() {
 
   const controll_profile: Tcontroll_profile = {
     projectNumber: {
-      value: profile.engineeringNumber,
-      onChange: (v: string) => changeProfile('engineeringNumber', v),
+      value: profile.projectNumber,
+      onChange: (v: string) => changeProfile('projectNumber', v),
     },
     projectName: {
       value: profile.projectName,
@@ -259,7 +256,7 @@ export default function Edit() {
   const reqPost = async () => {
     const body: TcreateExchgangeDto = {
       ...profile,
-      exchangeRecord: transferArr,
+      exchangeRecords: transferArr,
       accountingId: signature.accounting?.id ?? '',
       warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
       factoryEmployeeId: signature.factoryEmployee?.id ?? '',
@@ -289,7 +286,7 @@ export default function Edit() {
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
-        setDisabled(true);
+        update_exchange();
       } else {
         const res = await apiPostEngineeringExchange(body);
         router.push({
@@ -302,6 +299,7 @@ export default function Edit() {
       myAlert.err({ title: '更新調(退)貨單失敗' });
     } finally {
       setIsLoading(false);
+      setDisabled(true);
     }
   };
 
@@ -388,7 +386,7 @@ export default function Edit() {
 // ===========================================================
 
 const emptyProfileOri = (): Tprofile => ({
-  engineeringNumber: '',
+  projectNumber: '',
   projectName: '',
   requirementsDate: '',
   dispatchDate: '',

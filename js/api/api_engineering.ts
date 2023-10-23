@@ -479,7 +479,7 @@ export const apiGetEngineeringExchanges_id = async (id: string) => {
   const api = `/engineering/exchange/${id}`;
 
   const params = {
-    populate: ['exchangeRecord', 'accounting', 'warehouseEmployee', 'factoryEmployee', 'supervisor', 'formCompleter'],
+    populate: ['exchangeRecords', 'accounting', 'warehouseEmployee', 'factoryEmployee', 'supervisor', 'formCompleter'],
   };
 
   return axi
