@@ -532,7 +532,13 @@ export default function Edit() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      // onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/powerTransmissionSpareList',
+          query: { contractId },
+        });
+      },
     },
   ];
   const panelList02: TpanelList = [
@@ -544,7 +550,12 @@ export default function Edit() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/powerTransmissionSpareList',
+          query: { contractId },
+        });
+      },
     },
   ];
 
