@@ -53,10 +53,14 @@ export const apiGetEngineeringContact = async (id: string) => {
 };
 
 /**以id取得工程聯絡單 */
-export const useGetEngineeringContact = (id: string) => {
+export const useGetEngineeringContact = (id: string | undefined | null) => {
   const [res, setRes] = useState<TengineeringContactDto>();
 
   const update = async () => {
+    if (!id) {
+      return;
+    }
+
     const newRes = await apiGetEngineeringContact(id);
 
     if (newRes) {

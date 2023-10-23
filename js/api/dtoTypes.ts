@@ -1292,6 +1292,7 @@ export type TquotationContractDto = {
   version: number;
   //
   subContracts: TquotationContractDto[];
+  engineeringContactId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
