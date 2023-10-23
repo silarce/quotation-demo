@@ -11,8 +11,8 @@ import style from './dispatchList.module.scss';
 type Tprofile01 = {
   projectName: string;
   contractor: string;
-  contact: string;
-  projectNumber: string;
+  contractorContactPerson: string;
+  constructionSiteContactNumber: string;
   allAddress: string;
   engineeringNumber: string;
   badgeNumber: string;
@@ -21,7 +21,7 @@ type Tprofile01 = {
 type Tprofile02 = {
   dispatchDate: string;
   // workerName: string;
-  finalContact: string;
+  finalContactPerson: string;
 };
 
 type Tprofile03 = {
@@ -175,9 +175,9 @@ export default function Profile({
             className={`${style.input02}`}
             disabled={disabled}
             inputProps={{
-              value: profile02?.finalContact ?? '',
+              value: profile02?.finalContactPerson ?? '',
               onChange: (v) => {
-                onProfile02Change?.('finalContact', v);
+                onProfile02Change?.('finalContactPerson', v);
               },
             }}
             label={'完工聯絡人'}
@@ -203,11 +203,20 @@ export default function Profile({
 }
 // ============================================================
 
-type TindexKey01 = keyof Pick<Tprofile01, 'projectName' | 'contractor' | 'contact' | 'projectNumber' | 'allAddress'>;
+type TindexKey01 = keyof Pick<
+  Tprofile01,
+  'projectName' | 'contractor' | 'contractorContactPerson' | 'constructionSiteContactNumber' | 'allAddress'
+>;
 type TindexKey02 = keyof Pick<Tprofile01, 'engineeringNumber' | 'badgeNumber'>;
 // type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
 
-const indexKeys01: TindexKey01[] = ['projectName', 'contractor', 'contact', 'projectNumber', 'allAddress'];
+const indexKeys01: TindexKey01[] = [
+  'projectName',
+  'contractor',
+  'contractorContactPerson',
+  'constructionSiteContactNumber',
+  'allAddress',
+];
 const indexKeys02: TindexKey02[] = ['engineeringNumber', 'badgeNumber'];
 // const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
 
@@ -234,12 +243,12 @@ const config: Tconfig<
     labelWidth: '80px',
     showBaseline: 'auto',
   },
-  contact: {
+  contractorContactPerson: {
     label: '聯絡人',
     labelWidth: '80px',
     showBaseline: 'auto',
   },
-  projectNumber: {
+  constructionSiteContactNumber: {
     label: '工地電話',
     labelWidth: '80px',
     disabled: true,

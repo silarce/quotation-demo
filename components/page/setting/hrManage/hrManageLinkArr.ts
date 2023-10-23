@@ -3,10 +3,7 @@ import _ from 'lodash';
 
 import { LayerCtx } from 'components/Layer/Layer';
 
-type TarrItem = {
-  label: string;
-  href: string;
-};
+import { Tlink } from 'components/PageHeader/PageHeader02/LinkList';
 
 export const useHrManageLinkArr = () => {
   const { userErpFeature, userInfo } = useContext(LayerCtx);
@@ -22,22 +19,30 @@ export const useHrManageLinkArr = () => {
     href: '/setting/hrManage/dailyReporterSetting',
   };
 
-  let arr: TarrItem[] = [];
+  let arr: Tlink[] = [];
 
   const arr1 = [
     {
       label: 'ERP操作權限',
-      href: '/setting/hrManage/erpCtrlPermissions',
+      linkProps: {
+        href: '/setting/hrManage/erpCtrlPermissions',
+      },
     },
     {
       label: 'ERP功能權限',
-      href: '/setting/hrManage/erpFuncPermissions',
+      linkProps: {
+        href: '/setting/hrManage/erpFuncPermissions',
+      },
     },
     {
       label: '人事權限管理',
-      href: '/setting/hrManage',
+      linkProps: {
+        href: '/setting/hrManage',
+      },
     },
   ];
+
+  // ==============================================
 
   const isHr = userErpFeature.some((feat) => {
     return feat.name === '人事權限建立';

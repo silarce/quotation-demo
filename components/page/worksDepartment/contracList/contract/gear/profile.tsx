@@ -5,7 +5,7 @@ import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import style from './profile.module.scss';
 
 type Tcontroll = {
-  engineeringNumber: {
+  projectNumber: {
     value: string;
     onChange: (v: string) => void;
     disabled?: boolean;
@@ -88,7 +88,7 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
 
 type TindexKeys = keyof Tcontroll;
 
-const indexKeys: TindexKeys[] = ['dispatchDate', 'engineeringNumber', 'requirementsDate', 'projectName'];
+const indexKeys: TindexKeys[] = ['dispatchDate', 'projectNumber', 'requirementsDate', 'projectName'];
 
 const config: {
   [key in TindexKeys]: {
@@ -96,7 +96,7 @@ const config: {
     type?: 'date';
   };
 } = {
-  engineeringNumber: {
+  projectNumber: {
     label: '工程編號',
   },
   projectName: {

@@ -55,7 +55,7 @@ export default function PowerTransmissionSpareList() {
       return {
         id: item.id,
         quotationNumber: contract?.content.quotationNumber ?? '',
-        projectNumber: item.engineeringNumber,
+        projectNumber: item.projectNumber,
         projectName: item.projectName,
         neededDate: moment(convertDate_reduce1911(item.requirementsDate)).format('yy-MM-DD') || '',
         applyDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD') || '',
@@ -95,7 +95,7 @@ export default function PowerTransmissionSpareList() {
 
         <div className={style.tbody}>
           {fooArr.map((rowData, rowIndex) => {
-            const id = rowData.quotationNumber;
+            const id = rowData.id;
             const href = {
               pathname: `${router.pathname}/edit`,
               query: {

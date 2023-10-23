@@ -364,8 +364,19 @@ export const useElectronicSupplies_infinite = ({ customParams }: { customParams?
 export const apiGetElectronicSupplies_id = async (id: string) => {
   const api = `/engineering/electronic-supplies/${id}`;
 
+  const params = {
+    populate: [
+      'contractId',
+      //  'contract',
+      'electronicSuppliesRecords',
+      'materialHandler',
+      'ingredientTechnician',
+      'formCompleter',
+    ],
+  };
+
   return axi
-    .get<TelectronicSuppliesDto>(api)
+    .get<TelectronicSuppliesDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -438,7 +449,8 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   const params = {
     populate: [
       'contractId',
-      'contract',
+      'contract.content',
+      'exchangeRecord',
       // 'quotationId',
       //  'quotation'
     ],
@@ -466,8 +478,12 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
 export const apiGetEngineeringExchanges_id = async (id: string) => {
   const api = `/engineering/exchange/${id}`;
 
+  const params = {
+    populate: ['exchangeRecords', 'accounting', 'warehouseEmployee', 'factoryEmployee', 'supervisor', 'formCompleter'],
+  };
+
   return axi
-    .get<TexchangeDto>(api)
+    .get<TexchangeDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

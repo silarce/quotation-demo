@@ -1827,10 +1827,10 @@ export type TdispatchingDto = {
   projectName: string;
   // 承包商;
   contractor: string;
-  // 聯絡人;
-  contact: string;
+  // 承包商聯絡人;
+  contractorContactPerson: string;
   // 工地電話;
-  projectNumber: string;
+  constructionSiteContactNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1846,7 +1846,7 @@ export type TdispatchingDto = {
   // 工務人員
   workerEmployee: TemployeeDto;
   // 完工聯絡人;
-  finalContact: string;
+  finalContactPerson: string;
   // 辦理事項;
   tasks: string;
   // 派工批價方式;
@@ -1869,10 +1869,10 @@ export type TcreateDispatchingDto = {
   projectName: string;
   // 承包商;
   contractor: string;
-  // 聯絡人;
-  contact: string;
+  // 承包商聯絡人;
+  contractorContactPerson: string;
   // 工地電話;
-  projectNumber: string;
+  constructionSiteContactNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1886,7 +1886,7 @@ export type TcreateDispatchingDto = {
   // 工務人員ID
   workerId: string;
   // 完工聯絡人
-  finalContact: string;
+  finalContactPerson: string;
   // 辦理事項
   tasks: string;
   // 派工批價方式
@@ -1911,49 +1911,13 @@ export type TelectronicSuppliesDto = {
   // 需要日期
   requirementsDate: string; //date
   // 工程編號
-  engineeringNumber: string;
+  // engineeringNumber: string;
+  projectNumber: string;
   // 工程名稱
   projectName: string;
 
   electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
-  others: string;
-
-  // // 鎻盒種類
-  // latchBox: string;
-  // // 鎻盒數量
-  // latchBoxQuantity: number;
-  // // 鎖匙種類
-  // key: string;
-  // // 鎖匙數量
-  // keyQuantity: number;
-  // // 壓扣種類
-  // latch: string;
-  // // 壓扣數量
-  // latchQuantity: number;
-  // // 控制箱/盤種類
-  // controlBox: string;
-  // // 控制箱/盤數量
-  // controlBoxQuantity: number;
-  // // 消防備品種類
-  // firefightingSupplies: string;
-  // // 消防備品數量
-  // firefightingSuppliesQuantity: number;
-  // // 板門配件種類
-  // doorAccessories: string;
-  // // 板門配件數量
-  // doorAccessoriesQuantity: number;
-  // // 主機種類
-  // host: string;
-  // // 主機數量
-  // hostQuantity: number;
-  // // 紅外線種類
-  // infrared: string;
-  // // 紅外線數量
-  // infraredQuantity: number;
-  // // 防颱配件種類
-  // antiTyphoonSupplies: string;
-  // // 防颱配件數量
-  // antiTyphoonSuppliesQuantity: number;
+  // others: string;
 
   // 備料人員Id
   materialHandlerId: string;
@@ -1968,10 +1932,12 @@ export type TelectronicSuppliesDto = {
   // 填表人員
   formCompleter: TemployeeDto;
 
-  contractId: string;
-  contract: TquotationContractDto;
-  quotationId: string;
-  quotation: TquotationDto;
+  contractId?: string;
+  contract?: TquotationContractDto;
+  legacyContractId?: string;
+  legacyContract?: TlegacyContractDto;
+  // quotationId: string;
+  // quotation: TquotationDto;
 };
 
 export type TcreateElectronicSuppliesDto = Omit<
@@ -1979,9 +1945,8 @@ export type TcreateElectronicSuppliesDto = Omit<
   | 'id'
   | 'createdAt'
   | 'updatedAt'
-  | 'contractId'
   | 'contract'
-  | 'quotationId'
+  | 'legacyContract'
   | 'quotation'
   | 'materialHandler'
   | 'ingredientTechnician'
@@ -1990,18 +1955,27 @@ export type TcreateElectronicSuppliesDto = Omit<
 
 export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
 
+export type TexchangeRecordDto = {
+  id: string;
+  createdAt: string; // date
+  updatedAt: string; // date
+  goodsName: string;
+  goodsSpec: string;
+  goodsQuantity: number;
+  reason: string;
+};
+
+export type TcreateExchangeRecordDto = Omit<TexchangeRecordDto, 'id' | 'createdAt' | 'updatedAt'>;
+
 export type TexchangeDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
-  engineeringNumber: string; // 工程編號
+  projectNumber: string; // 工程編號
   projectName: string;
-  goodsName: string; // 物品名稱
-  goodsSpec: string; // 材質規格
-  goodsQuantity: number; // 數量
-  reason: string; //調貨理由
+  exchangeRecords: TexchangeRecordDto[];
   accountingId: string;
   accounting: TemployeeDto; // 會計
   warehouseEmployeeId: string;
@@ -2014,20 +1988,21 @@ export type TexchangeDto = {
   formCompleter: TemployeeDto; // 填表人員
   contractId: string | null;
   contract: TquotationContractDto | null;
-  // quotationId: string | null;
-  // quotation: TquotationDto | null;
+  legacyContractId: string | null;
+  legacyContract: TlegacyContractDto | null;
 };
 
-export type TcreateExchgangeDto = Omit<
-  TexchangeDto,
-  | 'id'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'accounting'
-  | 'warehouseEmployee'
-  | 'factoryEmployee'
-  | 'supervisor'
-  | 'formCompleter'
-  // | 'contractId'
-  | 'contract'
->;
+export type TcreateExchgangeDto = {
+  dispatchDate: string; // date // 填表日期
+  requirementsDate: string; // date // 需要日期
+  projectNumber: string; // 工程編號
+  projectName: string;
+  exchangeRecords: TcreateExchangeRecordDto[];
+  accountingId: string;
+  warehouseEmployeeId: string;
+  factoryEmployeeId: string;
+  supervisorId: string;
+  formCompleterId: string;
+  contractId?: string | null;
+  legacyContractId?: string | null;
+};

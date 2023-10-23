@@ -192,17 +192,17 @@ export default function EditDispatchList() {
     const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
 
     const {
-      contact,
+      contractorContactPerson: contact,
       contractor,
       engineeringNumber: engineeringNumber,
       badgeNumber,
       dispatchDate,
-      finalContact,
+      finalContactPerson: finalContact,
       workerEmployee,
       tasks,
       note,
       pricingMethod,
-      projectNumber,
+      constructionSiteContactNumber: projectNumber,
     } = dispatching ?? {};
 
     setProfile01({
@@ -210,8 +210,8 @@ export default function EditDispatchList() {
       contractor: contractor ?? '',
       // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
       // contact: '',
-      contact: contact ?? '',
-      projectNumber: (projectNumber || contactNumber) ?? '',
+      contractorContactPerson: contact ?? '',
+      constructionSiteContactNumber: (projectNumber || contactNumber) ?? '',
       allAddress,
       //
       engineeringNumber: engineeringNumber ?? '',
@@ -219,7 +219,7 @@ export default function EditDispatchList() {
     });
     setProfile02({
       dispatchDate: dispatchDate ?? '',
-      finalContact: finalContact ?? '',
+      finalContactPerson: finalContact ?? '',
     });
     setProfile03({
       workerEmployee: workerEmployee,
@@ -246,6 +246,10 @@ export default function EditDispatchList() {
 
     if (!profile02.dispatchDate) {
       return myAlert.info({ title: '請選擇派工日期' });
+    }
+
+    if (!profile03?.workerEmployee?.id) {
+      return myAlert.info({ title: '請選擇公務人員' });
     }
 
     const body: TcreateDispatchingDto = {
@@ -283,7 +287,8 @@ export default function EditDispatchList() {
         });
       }
     } catch (error) {
-      myAlert.err({ title: '新增派工單失敗' });
+      const err = error as Error;
+      myAlert.err({ title: '新增派工單失敗', content: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -299,7 +304,15 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '取消',
-      onClick: () => router.back(),
+      // onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/dispatchList',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
   const panelList02: TpanelList = [
@@ -311,7 +324,14 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/dispatchList',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
   const panelList03: TpanelList = [
