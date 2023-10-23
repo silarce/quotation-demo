@@ -82,7 +82,7 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
                 {indexKeys.map((key, index) => {
                   const { value, onChange } = item[key];
 
-                  const { type, width, marginRight, flex, options, center } = config[key];
+                  const { type, width, marginRight, flex, options, center, inputType } = config[key];
                   const theStyle = { width, marginRight, flex };
 
                   const onChangeInput = (v: string) => {
@@ -99,12 +99,24 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
 
                   return (
                     <div className={className} key={index} style={theStyle}>
-                      {type === 'input' && (
+                      {type === 'textarea' && (
                         <InputSel
                           textareaProps={{
                             value,
                             onChange: onChangeInput,
                             className: style.input,
+                          }}
+                          placeholder=""
+                          disabled={disabled}
+                        />
+                      )}
+                      {type === 'input' && (
+                        <InputSel
+                          inputProps={{
+                            value,
+                            onChange: onChangeInput,
+                            className: style.input,
+                            inputType: inputType,
                           }}
                           placeholder=""
                           disabled={disabled}
@@ -154,12 +166,13 @@ const indexKeys: TindexKeys[] = ['goodsName', 'goodsSpec', 'goodsQuantity', 'rea
 const config: {
   [key in TindexKeys]: {
     label: string;
-    type: string;
+    type: 'input' | 'select' | 'textarea';
     width: string;
     marginRight: string;
     flex?: string;
     options?: Toption[];
     center?: boolean;
+    inputType?: 'number';
   };
 } = {
   goodsName: {
@@ -181,10 +194,11 @@ const config: {
     width: '45px',
     marginRight: '22px',
     center: true,
+    inputType: 'number',
   },
   reason: {
     label: '調貨理由',
-    type: 'input',
+    type: 'textarea',
     width: 'auto',
     marginRight: '0px',
     flex: 'auto',
