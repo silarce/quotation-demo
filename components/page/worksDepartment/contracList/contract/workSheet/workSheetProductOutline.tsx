@@ -4,11 +4,11 @@ import classNames from 'classnames';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import scss from './product.module.scss';
+import scss from './workSheetProductOutline.module.scss';
 
 // ==================================================================
 
-type oldProduct = {
+type oldProductOutline = {
   itemName: string;
   doorType: string;
   fullWidth: string;
@@ -40,18 +40,18 @@ type Tcontrol = {
   };
 };
 
-export type { Tcontrol as Tcontrol_product };
+export type { Tcontrol as Tcontrol_productOutline };
 
 // ==================================================================
 
-export default function WorkSheetProduct({
+export default function WorkSheetProductOutline({
   control,
-  oldProduct,
+  oldProductOutline,
   onCalcClick,
   disabled,
 }: {
   control: Tcontrol;
-  oldProduct: oldProduct;
+  oldProductOutline: oldProductOutline;
   disabled: boolean;
   onCalcClick: () => void;
 }) {
@@ -69,7 +69,7 @@ export default function WorkSheetProduct({
                 className={classNames(scss.inputSel, className)}
                 label={label}
                 inputProps={{
-                  value: oldProduct[key],
+                  value: oldProductOutline[key],
                 }}
                 captionColor="main"
                 captionWidth={captionWidth}
@@ -83,7 +83,7 @@ export default function WorkSheetProduct({
             label={'防颱'}
             width="fit-content"
             checkProps={{
-              propsList: { isAntiTyphoon: { value: oldProduct['isAntiTyphoon'] } },
+              propsList: { isAntiTyphoon: { value: oldProductOutline['isAntiTyphoon'] } },
               toAside: 'left',
             }}
             captionColor="main"

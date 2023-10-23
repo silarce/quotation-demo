@@ -7,7 +7,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
 import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
 
-import scss from './productDetail.module.scss';
+import scss from './workSheetProductDetail01.module.scss';
 // other
 import { Toption } from 'js/utils/options/options';
 import { optionsCre_doorTrack_normal } from 'js/utils/options/doorTrackOptions';
@@ -80,7 +80,7 @@ export type { Tcontrol as Tcontrol_detail };
 const option_doorTrack_normal = optionsCre_doorTrack_normal();
 
 // ============================================================================
-export default function WorkSheetProductDetail({
+export default function WorkSheetProductDetail01({
   control,
   supportTip,
   disabled,

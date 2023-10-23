@@ -2,7 +2,7 @@ import classNames from 'classnames';
 
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
-import scss from './profile.module.scss';
+import scss from './workSheetProfile.module.scss';
 
 type TcontolItem = {
   value: string;

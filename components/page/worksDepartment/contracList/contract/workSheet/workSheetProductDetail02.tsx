@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 // import { optionsCre_doorTrack_normal } from 'js/utils/options/doorTrackOptions';
 
-import scss from './productDatail02.module.scss';
+import scss from './workSheetProductDetail02.module.scss';
 
 // ====================================================================
 
@@ -137,8 +137,6 @@ export default function WorkSheetProductDetail02({ control }: { control: Tcontro
     { value: control.base.底座開口, label: '底座開口' },
   ];
 
-  // console.log(watch("doorTrack.material"))
-
   return (
     <div className={scss.container}>
       <p>設定產品細部規格：</p>
@@ -162,11 +160,6 @@ export default function WorkSheetProductDetail02({ control }: { control: Tcontro
   );
 }
 
-// ====================================================================
-// ====================================================================
-// ====================================================================
-// ====================================================================
-// ====================================================================
 // ====================================================================
 
 const Item = ({

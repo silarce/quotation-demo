@@ -2,7 +2,7 @@ import classNames from 'classnames';
 
 import Image, { StaticImageData } from 'next/image';
 
-import scss from './card.module.scss';
+import scss from './workSheetProdCard.module.scss';
 
 // =================================================================
 
@@ -13,7 +13,7 @@ type Tcontrol = {
 };
 
 // =================================================================
-export default function WorkSheetCard({
+export default function WorkSheetProdCard({
   control,
   img,
   isActive,

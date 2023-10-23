@@ -2,7 +2,7 @@
 import { Checkbox } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 
-import scss from './optional.module.scss';
+import scss from './workSheetOptional.module.scss';
 
 export default function WorkSheetOptional({
   value,

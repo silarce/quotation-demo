@@ -11,18 +11,18 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // component
 import WorkSheetProfile, {
   Tcontrol_profile,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/profile';
-import WorkSheetCard from 'components/page/worksDepartment/contracList/contract/workSheet/card';
-import WorkSheetProduct, {
-  Tcontrol_product,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/product';
-import WorkSheetProductDetail, {
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
+import WorkSheetProdCard from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
+import WorkSheetProductOutline, {
+  Tcontrol_productOutline,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
+import WorkSheetProductDetail01, {
   Tcontrol_detail,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/productDatail';
-import WorkSheetOptional from 'components/page/worksDepartment/contracList/contract/workSheet/optional';
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
+import WorkSheetOptional from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
 import WorkSheetProductDetail02, {
   Tcontrol_detail02,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/productDatail02';
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 
 // gear
 // import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -56,7 +56,7 @@ type Tprofile = {
   faxNumber: string;
 };
 
-type Tproduct = {
+type TproductOutline = {
   itemName: string;
   doorType: string;
   fullWidth: string;
@@ -140,11 +140,11 @@ export default function WorkSheet() {
   };
 
   // ______________________________________________________________
-  const [oldProduct, setOldProduct] = useState<Tproduct>(creEmptyProduct());
-  const [product, setProdcut] = useState<Tproduct>(creEmptyProduct());
+  const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
+  const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
 
-  const changeProduct = (key: keyof Tproduct, value: string | boolean) => {
-    setProdcut((state) => ({ ...state, [key]: value }));
+  const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
+    setProdcutOutline((state) => ({ ...state, [key]: value }));
   };
 
   // ______________________________________________________________
@@ -327,51 +327,51 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
-  const control_product: Tcontrol_product = {
+  const control_product: Tcontrol_productOutline = {
     itemName: {
-      value: product.itemName,
+      value: productOutline.itemName,
       onChange: (v) => {
         changeProduct('itemName', v);
       },
     },
     doorType: {
-      value: product.doorType,
+      value: productOutline.doorType,
       onChange: (v) => {
         changeProduct('doorType', v);
       },
     },
     fullWidth: {
-      value: product.fullWidth,
+      value: productOutline.fullWidth,
       onChange: (v) => {
         changeProduct('fullWidth', v);
       },
     },
     height: {
-      value: product.height,
+      value: productOutline.height,
       onChange: (v) => {
         changeProduct('height', v);
       },
     },
     boxB: {
-      value: product.boxB,
+      value: productOutline.boxB,
       onChange: (v) => {
         changeProduct('boxB', v);
       },
     },
     quantity: {
-      value: product.quantity,
+      value: productOutline.quantity,
       onChange: (v) => {
         changeProduct('quantity', v);
       },
     },
     material: {
-      value: product.material,
+      value: productOutline.material,
       onChange: (v) => {
         changeProduct('material', v);
       },
     },
     isAntiTyphoon: {
-      value: product.isAntiTyphoon,
+      value: productOutline.isAntiTyphoon,
       onChange: (v) => {
         changeProduct('isAntiTyphoon', v);
       },
@@ -687,7 +687,7 @@ export default function WorkSheet() {
 
               return (
                 <div key={key} onClick={onClick}>
-                  <WorkSheetCard control={control} isActive={isActive} img={imgIdk} />
+                  <WorkSheetProdCard control={control} isActive={isActive} img={imgIdk} />
                 </div>
               );
             })}
@@ -695,15 +695,15 @@ export default function WorkSheet() {
 
           {/* right */}
           <div className={scss.right}>
-            <WorkSheetProduct
+            <WorkSheetProductOutline
               control={control_product}
-              oldProduct={oldProduct}
+              oldProductOutline={oldProductOutline}
               onCalcClick={onCalcClick}
               disabled={disabled}
             />
 
             <hr />
-            <WorkSheetProductDetail
+            <WorkSheetProductDetail01
               control={control_detail}
               disabled={disabled}
               supportTip={`馬達荷重(max:${999},min:${999}),馬力數:${99}Hp`}
@@ -1022,7 +1022,7 @@ const creEmptyProfile = (): Tprofile => ({
   faxNumber: '',
 });
 
-const creEmptyProduct = (): Tproduct => ({
+const creEmptyProductOutline = (): TproductOutline => ({
   itemName: '',
   doorType: '',
   fullWidth: '',
