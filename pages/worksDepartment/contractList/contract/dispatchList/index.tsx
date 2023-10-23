@@ -82,7 +82,7 @@ export default function DispatchList() {
           // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
           // contact: dispatching?.contact,
           contact: dispatching?.content ?? '',
-          contactNumber: contactNumber,
+          projectNumber: contactNumber,
           allAddress,
           //
           engineeringNumber: dispatching?.engineeringNumber ?? '',
@@ -150,7 +150,7 @@ const creEmptyProfile = (): Tprofile01 => ({
   projectName: '',
   contractor: '',
   contact: '',
-  contactNumber: '',
+  projectNumber: '',
   allAddress: '',
   engineeringNumber: '',
   badgeNumber: '',

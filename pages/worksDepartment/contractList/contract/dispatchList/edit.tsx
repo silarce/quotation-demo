@@ -190,6 +190,7 @@ export default function EditDispatchList() {
       tasks,
       note,
       pricingMethod,
+      projectNumber,
     } = dispatching ?? {};
 
     setProfile01({
@@ -198,7 +199,7 @@ export default function EditDispatchList() {
       // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
       // contact: '',
       contact: content ?? '',
-      contactNumber: contactNumber ?? '',
+      projectNumber: (projectNumber || contactNumber) ?? '',
       allAddress,
       //
       engineeringNumber: engineeringNumber ?? '',

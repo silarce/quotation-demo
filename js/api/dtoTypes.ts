@@ -1830,7 +1830,7 @@ export type TdispatchingDto = {
   // 未來會改為contact
   content: string;
   // 工地電話;
-  contactNumber: string;
+  projectNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
@@ -1874,7 +1874,7 @@ export type TcreateDispatchingDto = {
   // contact: string;
   content: string;
   // 工地電話;
-  contactNumber: string;
+  projectNumber: string;
   // 工程縣市;
   county: string;
   // 工程區;
