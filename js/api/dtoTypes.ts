@@ -1838,7 +1838,7 @@ export type TdispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  projectNumber: string;
+  engineeringNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1882,7 +1882,7 @@ export type TcreateDispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  projectNumber: string;
+  engineeringNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1913,7 +1913,7 @@ export type TelectronicSuppliesDto = {
   // 需要日期
   requirementsDate: string; //date
   // 工程編號
-  projectNumber: string;
+  engineeringNumber: string;
   // 工程名稱
   projectName: string;
 
@@ -1998,7 +1998,7 @@ export type TexchangeDto = {
   updatedAt: string;
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
-  projectNumber: string;
+  engineeringNumber: string; // 工程編號
   projectName: string;
   goodsName: string; // 物品名稱
   goodsSpec: string; // 材質規格

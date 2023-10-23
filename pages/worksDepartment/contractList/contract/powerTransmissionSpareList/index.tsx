@@ -55,7 +55,7 @@ export default function PowerTransmissionSpareList() {
       return {
         id: item.id,
         quotationNumber: contract?.content.quotationNumber ?? '',
-        projectNumber: item.projectNumber,
+        projectNumber: item.engineeringNumber,
         projectName: item.projectName,
         neededDate: moment(convertDate_reduce1911(item.requirementsDate)).format('yy-MM-DD') || '',
         applyDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD') || '',

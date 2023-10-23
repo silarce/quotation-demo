@@ -182,7 +182,7 @@ export default function EditDispatchList() {
     const {
       content,
       contractor,
-      projectNumber,
+      engineeringNumber: engineeringNumber,
       badgeNumber,
       dispatchDate,
       finalContact,
@@ -201,7 +201,7 @@ export default function EditDispatchList() {
       contactNumber: contactNumber ?? '',
       allAddress,
       //
-      projectNumber: projectNumber ?? '',
+      engineeringNumber: engineeringNumber ?? '',
       badgeNumber: badgeNumber ?? '',
     });
     setProfile02({
