@@ -268,6 +268,22 @@ export default function Edit() {
       contractId: contractId,
     };
 
+    if (!body.accountingId) {
+      return myAlert.info({ title: '請選擇會計' });
+    } else if (!body.warehouseEmployeeId) {
+      return myAlert.info({ title: '請選擇倉庫人員' });
+    } else if (!body.factoryEmployeeId) {
+      return myAlert.info({ title: '請選擇廠務人員' });
+    } else if (!body.supervisorId) {
+      return myAlert.info({ title: '請選擇單位主管' });
+    } else if (!body.formCompleterId) {
+      return myAlert.info({ title: '請選擇填表人員' });
+    } else if (!body.dispatchDate) {
+      return myAlert.info({ title: '請選擇派工日期' });
+    } else if (!body.requirementsDate) {
+      return myAlert.info({ title: '請選擇需求日期' });
+    }
+
     try {
       setIsLoading(true);
 
