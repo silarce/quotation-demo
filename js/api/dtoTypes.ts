@@ -1990,6 +1990,18 @@ export type TcreateElectronicSuppliesDto = Omit<
 
 export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
 
+export type TexchangeRecordDto = {
+  id: string;
+  createdAt: string; // date
+  updatedAt: string; // date
+  goodsName: string;
+  goodsSpec: string;
+  goodsQuantity: number;
+  reason: string;
+};
+
+export type TcreateExchangeRecordDto = Omit<TexchangeRecordDto, 'id' | 'createdAt' | 'updatedAt'>;
+
 export type TexchangeDto = {
   id: string;
   createdAt: string;
@@ -1998,10 +2010,7 @@ export type TexchangeDto = {
   requirementsDate: string; // date // 需要日期
   engineeringNumber: string; // 工程編號
   projectName: string;
-  goodsName: string; // 物品名稱
-  goodsSpec: string; // 材質規格
-  goodsQuantity: number; // 數量
-  reason: string; //調貨理由
+  exchangeRecord: TexchangeRecordDto[];
   accountingId: string;
   accounting: TemployeeDto; // 會計
   warehouseEmployeeId: string;
@@ -2014,20 +2023,21 @@ export type TexchangeDto = {
   formCompleter: TemployeeDto; // 填表人員
   contractId: string | null;
   contract: TquotationContractDto | null;
-  // quotationId: string | null;
-  // quotation: TquotationDto | null;
+  legacyContractId: string | null;
+  legacyContract: TlegacyContractDto | null;
 };
 
-export type TcreateExchgangeDto = Omit<
-  TexchangeDto,
-  | 'id'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'accounting'
-  | 'warehouseEmployee'
-  | 'factoryEmployee'
-  | 'supervisor'
-  | 'formCompleter'
-  // | 'contractId'
-  | 'contract'
->;
+export type TcreateExchgangeDto = {
+  dispatchDate: string; // date // 填表日期
+  requirementsDate: string; // date // 需要日期
+  engineeringNumber: string; // 工程編號
+  projectName: string;
+  exchangeRecord: TcreateExchangeRecordDto[];
+  accountingId: string;
+  warehouseEmployeeId: string;
+  factoryEmployeeId: string;
+  supervisorId: string;
+  formCompleterId: string;
+  contractId?: string | null;
+  legacyContractId?: string | null;
+};
