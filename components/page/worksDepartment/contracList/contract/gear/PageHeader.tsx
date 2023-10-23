@@ -39,7 +39,7 @@ export default function PageHeader({
     },
     {
       label: '工作表',
-      // disabled: true,
+      disabled: true,
       href: {
         pathname: `${pathHead}/workSheet`,
         query,
@@ -47,7 +47,7 @@ export default function PageHeader({
     },
     {
       label: '出庫單',
-      // disabled: true,
+      disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
         query,
