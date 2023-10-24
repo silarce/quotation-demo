@@ -270,18 +270,19 @@ export default function EditDispatchList() {
       if (dispatchingId) {
         res = await apiPatchEngineeringDispatching(dispatchingId, body);
         myAlert.success({ title: '更新派工單成功' });
+        await update_dispatching();
       } else {
         res = await apiPostEngineeringDispatching(body);
         myAlert.success({ title: '新增派工單成功' });
-      }
 
-      if (res) {
-        router.push({
-          query: {
-            ...router.query,
-            dispatchingId: res.id,
-          },
-        });
+        if (res) {
+          router.push({
+            query: {
+              ...router.query,
+              dispatchingId: res.id,
+            },
+          });
+        }
       }
 
       setDisabled(true);
