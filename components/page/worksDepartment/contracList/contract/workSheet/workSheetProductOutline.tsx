@@ -8,7 +8,7 @@ import scss from './workSheetProductOutline.module.scss';
 
 // ==================================================================
 
-type oldProductOutline = {
+type ToldProductOutline = {
   itemName: string;
   doorType: string;
   fullWidth: string;
@@ -40,7 +40,7 @@ type Tcontrol = {
   };
 };
 
-export type { Tcontrol as Tcontrol_productOutline };
+export type { Tcontrol as Tcontrol_productOutline, ToldProductOutline };
 
 // ==================================================================
 
@@ -51,7 +51,7 @@ export default function WorkSheetProductOutline({
   disabled,
 }: {
   control: Tcontrol;
-  oldProductOutline: oldProductOutline;
+  oldProductOutline: ToldProductOutline;
   disabled: boolean;
   onCalcClick: () => void;
 }) {
@@ -99,7 +99,7 @@ export default function WorkSheetProductOutline({
         <p>調整過後項目：</p>
         <div className={scss.list}>
           {configArr.map((item) => {
-            const { key, label, className, placeholder } = item;
+            const { key, label, className, placeholder, inputType } = item;
 
             return (
               <InputSel
@@ -115,6 +115,7 @@ export default function WorkSheetProductOutline({
                   onChange: (v) => {
                     control[key].onChange?.(v);
                   },
+                  inputType: inputType,
                 }}
               />
             );
@@ -160,10 +161,12 @@ export default function WorkSheetProductOutline({
 const captionWidth = '100px';
 
 // type Tconfig = {
-//   key: keyof Tcontroll;
+//   // key: keyof Tcontroll;
+//   key: string;
 //   label: string;
 //   placeholder?: string;
 //   className?: string;
+//   inputType?: 'number';
 // };
 
 const configArr = [
@@ -172,41 +175,48 @@ const configArr = [
     label: '項目',
     placeholder: undefined,
     className: undefined,
+    inputType: undefined,
   },
   {
     key: 'doorType',
     label: '門型',
     placeholder: undefined,
     className: undefined,
+    inputType: undefined,
   },
   {
     key: 'fullWidth',
     label: '全寬(L)',
     placeholder: '請輸入全寬',
     className: undefined,
+    inputType: 'number',
   },
   {
     key: 'height',
     label: '淨高(h)',
     placeholder: '請輸入淨高',
     className: undefined,
+    inputType: 'number',
   },
   {
     key: 'boxB',
     label: '捲箱高(B)',
     placeholder: '請輸入捲箱高',
     className: undefined,
+    inputType: 'number',
   },
   {
     key: 'quantity',
     label: '數量',
     placeholder: undefined,
     className: undefined,
+    inputType: 'number',
   },
   {
     key: 'material',
     label: '材質',
     placeholder: undefined,
     className: undefined,
+    inputType: undefined,
   },
 ] as const;

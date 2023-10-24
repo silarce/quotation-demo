@@ -15,6 +15,7 @@ import WorkSheetProfile, {
 import WorkSheetProdCard from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
 import WorkSheetProductOutline, {
   Tcontrol_productOutline,
+  ToldProductOutline,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
 import WorkSheetProductDetail01, {
   Tcontrol_detail,
@@ -30,8 +31,10 @@ import WorkSheetProductDetail02, {
 // import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
 
 // api
-
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+
+// hook
+import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
 
 // css
 import scss from './workSheet.module.scss';
@@ -148,6 +151,19 @@ export default function WorkSheet() {
   }, [contract]);
 
   // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+
+  const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
+
+  const { sheetList } = useWorkSheet({ productList: productList ?? {} });
+
+  // console.log(productList);
+  // console.log(sheetList);
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
 
   const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
 
@@ -156,7 +172,7 @@ export default function WorkSheet() {
   };
 
   // ______________________________________________________________
-  const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
+  // const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
   const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
 
   const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
@@ -344,53 +360,82 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
+  const oldProductOutline = {
+    itemName: targetSheet?.itemName ?? '',
+    doorType: targetSheet?.doorModelName ?? '',
+    fullWidth: targetSheet?.fullWidth ?? '',
+    height: targetSheet?.height ?? '',
+    boxB: targetSheet?.boxB ?? '',
+    quantity: targetSheet?.quantity ?? '',
+    material: targetSheet?.materialName ?? '',
+    isAntiTyphoon: !!targetSheet?.isAntiTyphoon,
+  };
+
+  // -------------------------------------------------------------------------
+
   const control_product: Tcontrol_productOutline = {
     itemName: {
-      value: productOutline.itemName,
+      value: targetSheet?.itemName ?? '',
       onChange: (v) => {
-        changeProduct('itemName', v);
+        if (targetSheet) {
+          targetSheet.itemName = v;
+        }
       },
     },
     doorType: {
-      value: productOutline.doorType,
+      value: targetSheet?.doorModelName ?? '',
       onChange: (v) => {
-        changeProduct('doorType', v);
+        if (targetSheet) {
+          targetSheet.doorModelName = v;
+        }
       },
     },
     fullWidth: {
-      value: productOutline.fullWidth,
+      value: targetSheet?.fullWidth ?? '',
       onChange: (v) => {
-        changeProduct('fullWidth', v);
+        if (targetSheet) {
+          targetSheet.fullWidth = v;
+        }
       },
     },
     height: {
-      value: productOutline.height,
+      value: targetSheet?.height ?? '',
       onChange: (v) => {
-        changeProduct('height', v);
+        if (targetSheet) {
+          targetSheet.height = v;
+        }
       },
     },
     boxB: {
-      value: productOutline.boxB,
+      value: targetSheet?.boxB ?? '',
       onChange: (v) => {
-        changeProduct('boxB', v);
+        if (targetSheet) {
+          targetSheet.boxB = v;
+        }
       },
     },
     quantity: {
-      value: productOutline.quantity,
+      value: targetSheet?.quantity ?? '',
       onChange: (v) => {
-        changeProduct('quantity', v);
+        if (targetSheet) {
+          targetSheet.quantity = v;
+        }
       },
     },
     material: {
-      value: productOutline.material,
+      value: targetSheet?.materialName ?? '',
       onChange: (v) => {
-        changeProduct('material', v);
+        if (targetSheet) {
+          targetSheet.materialName = v;
+        }
       },
     },
     isAntiTyphoon: {
-      value: productOutline.isAntiTyphoon,
+      value: !!targetSheet?.isAntiTyphoon,
       onChange: (v) => {
-        changeProduct('isAntiTyphoon', v);
+        if (targetSheet) {
+          targetSheet.isAntiTyphoon = v;
+        }
       },
     },
   };
@@ -695,15 +740,15 @@ export default function WorkSheet() {
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
-            {Object.keys(productList).map((key) => {
-              const prod = productList[key];
-              const { rootProductId, itemName, doorModelName, quantity } = prod;
+            {Object.keys(sheetList).map((key) => {
+              const sheet = sheetList[key];
+              const { itemName, doorModelName, quantity } = sheet;
 
               const onClick = () => {
-                setTargetProd(prod);
+                setTargetSheet(sheet);
               };
 
-              const isActive = rootProductId === targetProd?.rootProductId;
+              const isActive = key === targetSheet?.rootProductId;
 
               const control = {
                 itemName,
