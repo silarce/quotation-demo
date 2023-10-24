@@ -29,6 +29,7 @@ import {
   // TelectronicSuppliesDto,
   TcreateElectronicSuppliesRecordDto,
   useGetElectronicSupplies_id,
+  useGetEngineeringContact,
 } from 'js/api/api_engineering';
 
 // css
@@ -106,6 +107,10 @@ export default function Edit() {
 
   // ----------------------------------------------------
   const { data: contract, update } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
   const { data: electronicSupplies, update: update_electronicSupplies } =
     useGetElectronicSupplies_id(electronicSuppliesId);
 
@@ -114,6 +119,9 @@ export default function Edit() {
     update_electronicSupplies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, electronicSuppliesId]);
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Tprofile>(cre_emptyProfile());
@@ -136,10 +144,11 @@ export default function Edit() {
     setProfile((state) => {
       return {
         ...state,
-        projectName: contract?.content.projectName ?? '',
+        projectName: engineeringContact?.projectName ?? '',
+        projectNumber: engineeringContact?.projectNumber ?? '',
       };
     });
-  }, [contract]);
+  }, [engineeringContact]);
 
   // ----------------------------------------------------
 
@@ -431,6 +440,8 @@ export default function Edit() {
       onChange: (v) => {
         changeProfile('projectNumber', v);
       },
+      disabled: true,
+      showBaseline: 'invisible',
     },
     projectName: {
       value: profile.projectName,
@@ -438,6 +449,7 @@ export default function Edit() {
         changeProfile('projectName', v);
       },
       disabled: true,
+      showBaseline: 'invisible',
     },
     requirementsDate: {
       value: profile.requirementsDate,

@@ -9,21 +9,25 @@ type Tcontroll = {
     value: string;
     onChange: (v: string) => void;
     disabled?: boolean;
+    showBaseline?: 'invisible' | 'always';
   };
   projectName: {
     value: string;
     onChange: (v: string) => void;
     disabled?: boolean;
+    showBaseline?: 'invisible' | 'always';
   };
   requirementsDate: {
     value: string;
     onChange: (v: string) => void;
     disabled?: boolean;
+    showBaseline?: 'invisible' | 'always';
   };
   dispatchDate: {
     value: string;
     onChange: (v: string) => void;
     disabled?: boolean;
+    showBaseline?: 'invisible' | 'always';
   };
 };
 
@@ -35,7 +39,7 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
     <div className={style.profile}>
       {indexKeys.map((key, index) => {
         const { label, type } = config[key];
-        const { value, onChange, disabled: disabled_single } = controll[key];
+        const { value, onChange, disabled: disabled_single, showBaseline } = controll[key];
 
         // -----
         if (type === 'date') {
@@ -59,8 +63,6 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
             />
           );
         }
-
-        const showBaseline = key === 'projectName' ? 'invisible' : 'always';
 
         return (
           <InputSel
