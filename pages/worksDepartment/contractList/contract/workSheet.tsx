@@ -32,6 +32,7 @@ import WorkSheetProductDetail02, {
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetEngineeringContact } from 'js/api/api_engineering';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
@@ -125,10 +126,11 @@ export default function WorkSheet() {
 
   const [disabled, setDisabled] = useState(true);
 
-  const [targetProd, setTargetProd] = useState<TquotationProductDto>();
-
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
   useEffect(() => {
     update_contract();
@@ -149,6 +151,10 @@ export default function WorkSheet() {
 
     return list;
   }, [contract]);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -204,42 +210,60 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   useEffect(() => {
-    if (!contract) {
+    if (!engineeringContact) {
       return;
     }
 
-    const { projectName: projectName_contract, county, district, address } = contract.content;
-
     const {
+      //
       projectName,
       projectContent,
-      /**工地電話 */
       projectNumber,
-      /**工地傳真 */
-      projectFaxNumber,
-      /**工程負責人 */
-      projectPerson,
-      /**工程負責人聯絡電話 */
-      projectPersonNumber,
-    } = creEmptyProfile();
+      projectPrincipal,
+      constructionSitePrincipalContactNumber,
+      constructionSiteFaxNumber,
+      constructionSiteContactNumber,
+      contractor,
+      contractorPrincipal,
+      contractorContactNumber,
+      contractorFaxNumber,
+
+      //
+      county,
+      district,
+      address,
+    } = engineeringContact;
+
+    // const {
+    //   // projectName,
+    //   projectContent,
+    //   /**工地電話 */
+    //   projectNumber,
+    //   /**工地傳真 */
+    //   projectFaxNumber,
+    //   /**工程負責人 */
+    //   projectPerson,
+    //   /**工程負責人聯絡電話 */
+    //   projectPersonNumber,
+    // } = creEmptyProfile();
 
     setProfile({
-      projectName: projectName || projectName_contract,
+      projectName: projectName,
       projectContent,
-      projectNumber,
-      projectFaxNumber,
-      projectPerson,
-      projectPersonNumber,
+      projectNumber: constructionSiteContactNumber,
+      projectFaxNumber: constructionSiteFaxNumber,
+      projectPerson: projectPrincipal,
+      projectPersonNumber: constructionSitePrincipalContactNumber,
       allAddress: `${county}${district}${address}`,
-      engineeringNumber: '999',
-      contractor: '999',
-      principal: '999',
-      contactNumber: '999',
-      faxNumber: '999',
+      engineeringNumber: projectNumber,
+      contractor: contractor,
+      principal: contractorPrincipal,
+      contactNumber: contractorContactNumber,
+      faxNumber: contractorFaxNumber,
     });
 
     //
-  }, [contract]);
+  }, [engineeringContact]);
 
   // -------------------------------------------------------------------------
 
