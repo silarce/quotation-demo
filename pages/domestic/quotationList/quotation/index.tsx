@@ -706,6 +706,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: latestContent?.address,
       contactPerson: latestContent?.contactPerson,
       contactNumber: latestContent?.contactNumber,
+      faxNumber: latestContent?.faxNumber,
       discount: latestContent?.discount,
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
@@ -734,6 +735,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setValue('address', v.address ?? '');
     setValue('contactPerson', v.contactPerson ?? '');
     setValue('contactNumber', v.contactNumber ?? '');
+    setValue('faxNumber', v.faxNumber ?? '');
     setValue('trackProgress', v.trackProgress ?? '');
     setValue('projectProgress', v.projectProgress ?? '');
   };
@@ -1039,6 +1041,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data_watch.address ?? '',
       contactPerson: data_watch.contactPerson ?? '',
       contactNumber: data_watch.contactNumber ?? '',
+      faxNumber: data_watch.faxNumber ?? '',
       quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
@@ -1053,7 +1056,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quotationRanges: qr,
       //
       //
-      faxNumber: data_watch.customer?.fax ?? '',
+      // faxNumber: data_watch.customer?.fax ?? '',
       trackProgress: data_watch.trackProgress ?? '',
       projectProgress: data_watch.projectProgress ?? '',
 

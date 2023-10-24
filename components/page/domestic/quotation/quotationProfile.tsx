@@ -49,6 +49,7 @@ type TquotationProfile = {
   address: string;
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
+  faxNumber: string; // 傳真號碼
   customer: TcustomerDto;
   trackProgress: string;
   projectProgress: string;
@@ -60,12 +61,12 @@ type TformBody = {
   projectName: string;
   county: string;
   district: string;
+  address: string; // 剩餘地址
   contactPerson: string;
   contactNumber: string;
-  // api還沒上的資料
-  address?: string; // 剩餘地址
-  trackProgress?: string; // 追蹤狀態
-  projectProgress?: string; // 工地進度
+  faxNumber: string;
+  trackProgress: string; // 追蹤狀態
+  projectProgress: string; // 工地進度
 };
 type TreturnBody = {
   validityPeriod: string;
@@ -75,6 +76,7 @@ type TreturnBody = {
   district: string;
   contactPerson: string;
   contactNumber: string;
+  faxNumber: string;
   address?: string; // 剩餘地址
   // api還沒上的資料
   trackProgress?: string; // 追蹤狀態
@@ -120,6 +122,7 @@ export default function QuotationProfile({
     address,
     contactPerson,
     contactNumber,
+    faxNumber,
     customer,
     trackProgress,
     projectProgress,
@@ -163,6 +166,7 @@ export default function QuotationProfile({
       district,
       contactPerson,
       contactNumber,
+      faxNumber,
       address,
       // api還沒上的資料
       trackProgress,
@@ -175,10 +179,10 @@ export default function QuotationProfile({
   // ----------------------------------------------------------------
   // 客戶資料
   const theClientData = [
-    { label: '聯絡人', placeholder: '尚未選擇', value: watch('contactPerson') },
-    { label: '聯絡電話', placeholder: '尚未選擇', value: watch('contactNumber') },
-    { label: '傳真號碼', placeholder: '尚未選擇', value: data_customer?.fax },
-  ];
+    { key: 'contactPerson', label: '聯絡人', placeholder: '尚未選擇', value: watch('contactPerson') },
+    { key: 'contactNumber', label: '聯絡電話', placeholder: '尚未選擇', value: watch('contactNumber') },
+    { key: 'faxNumber', label: '傳真號碼', placeholder: '尚未選擇', value: watch('faxNumber') },
+  ] as const;
 
   // 工程地點
   const addressProps: TaddressProps = {
@@ -230,10 +234,18 @@ export default function QuotationProfile({
       return;
     }
 
+    const contact = v[0].contacts[0];
+    const name = contact?.name ?? '';
+    const phone = contact?.phone ?? '';
+
+    const contactPerson = `${name} ${phone}`;
+
     setCustomer(v[0]);
     setValue('customerId', v[0].id);
-    setValue('contactPerson', v[0].contacts[0]?.name ?? '');
+    // setValue('contactPerson', v[0].contacts[0]?.name ?? '');
+    setValue('contactPerson', contactPerson);
     setValue('contactNumber', v[0].contacts[0]?.phone ?? '');
+    setValue('faxNumber', v[0].fax ?? '');
   };
 
   const clearClient = () => {
@@ -292,22 +304,23 @@ export default function QuotationProfile({
           </div>
 
           <div>
-            {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
+            {/* 聯絡人，連絡電話，傳真號碼 */}
             {theClientData.map((item, index) => {
-              const { label, value, placeholder } = item;
+              const { key, label, value, placeholder } = item;
 
               return (
                 <InputSel
                   key={index}
                   caption={label}
                   captionClassName={scss.input02}
-                  disabled={true}
-                  showBaseline="invisible"
+                  // disabled={true}
+                  showBaseline="auto"
+                  disabled={disabled}
                   {...inputSelProps}
                   inputProps={{
                     props: {
                       placeholder: placeholder,
-                      value: value ?? '',
+                      ...register(key),
                     },
                   }}
                 />
