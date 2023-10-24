@@ -19,13 +19,19 @@ const useWorkSheet = ({ productList }: { productList: { [key: string]: Tquotatio
 
   // ------------------------------------------------------------
 
-  const reset = () => {
+  const reset = async () => {
     const list: TsheetList = {};
     Object.keys(productList).forEach((key) => {
       const prod = productList[key];
       list[key] = new Class_workSheet({ forceUpdate, prod });
     });
     setSheetList(list);
+
+    const arr = Object.values(list);
+
+    for (const classSheet of arr) {
+      await classSheet.getWholeProduct();
+    }
   };
 
   // ------------------------------------------------------------

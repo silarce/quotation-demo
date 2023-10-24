@@ -1,3 +1,8 @@
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+// api
+import { apiGetQuotationProducts } from 'js/api/api_quotation';
+
 // type
 import { TquotationProductDto } from 'js/api/dtoTypes';
 
@@ -18,6 +23,26 @@ class Class_workSheet {
 
   private _prod;
   private forceUpdate;
+
+  // ---------------------------------------------------------------------
+
+  getWholeProduct() {
+    const req = async () => {
+      try {
+        const res = await apiGetQuotationProducts(this._prod.id);
+
+        if (res) {
+          this._prod = res;
+          this.forceUpdate();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得產品資料失敗', content: err.message });
+      }
+    };
+
+    return req();
+  }
 
   // ---------------------------------------------------------------------
 
