@@ -113,7 +113,7 @@ export default function Edit() {
     update();
     update_electronicSupplies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId]);
+  }, [contractId, electronicSuppliesId]);
 
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Tprofile>(cre_emptyProfile());
