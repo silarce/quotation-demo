@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -172,7 +173,9 @@ export default function Edit() {
       formCompleter,
     });
 
-    setTransferArr(exchange?.exchangeRecords ?? []);
+    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
+    setTransferArr(recoreds);
+
     //
   }, [contract, exchange, disabled]);
 
@@ -282,28 +285,26 @@ export default function Edit() {
       return myAlert.info({ title: '請選擇需求日期' });
     }
 
-    console.log(body);
+    try {
+      setIsLoading(true);
 
-    // try {
-    //   setIsLoading(true);
+      if (exchangeId) {
+        await apiPatchEngineeringExchange(exchangeId, body);
+        update_exchange();
+      } else {
+        const res = await apiPostEngineeringExchange(body);
+        router.push({
+          query: { ...router.query, exchangeId: res.id },
+        });
+      }
 
-    //   if (exchangeId) {
-    //     await apiPatchEngineeringExchange(exchangeId, body);
-    //     update_exchange();
-    //   } else {
-    //     const res = await apiPostEngineeringExchange(body);
-    //     router.push({
-    //       query: { ...router.query, exchangeId: res.id },
-    //     });
-    //   }
-
-    //   myAlert.success({ title: '更新調(退)貨單成功' });
-    // } catch (error) {
-    //   myAlert.err({ title: '更新調(退)貨單失敗' });
-    // } finally {
-    //   setIsLoading(false);
-    //   setDisabled(true);
-    // }
+      myAlert.success({ title: '更新調(退)貨單成功' });
+    } catch (error) {
+      myAlert.err({ title: '更新調(退)貨單失敗' });
+    } finally {
+      setIsLoading(false);
+      setDisabled(true);
+    }
   };
 
   // ----------------------------------------------------
