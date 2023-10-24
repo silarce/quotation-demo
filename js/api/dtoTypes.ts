@@ -1758,6 +1758,7 @@ export type TengineeringContactDto = {
   createdAt: string;
   updatedAt: string;
   contractNumber: string;
+
   /**請款狀態 */
   paymentStatus: string;
   projectName: string;
@@ -1767,23 +1768,25 @@ export type TengineeringContactDto = {
   district: string;
   address: string;
   /**工程負責人 */
-  projectPerson: string;
+  projectPrincipal: string;
   /**工程負責人聯絡電話 */
-  projectPersonNumber: string;
-  projectFaxNumber: string;
+  constructionSitePrincipalContactNumber: string;
+  /**工地傳真 */
+  constructionSiteFaxNumber: string;
   /**工地電話 */
-  projectNumber: string;
+  constructionSiteContactNumber: string;
   /**工程編號 */
-  engineeringNumber: string;
+  projectNumber: string;
   /**承包商 */
   contractor: string;
-  /**負責人 */
-  principal: string;
-  /**公司電話 */
-  contactNumber: string;
-  faxNumber: string;
+  /**承包商負責人 */
+  contractorPrincipal: string;
+  /**承包商公司電話 */
+  contractorContactNumber: string;
+  contractorFaxNumber: string;
   /**備註列表 */
   annotations: string[] | null;
+  //
   contractId?: string | null;
   contract?: TquotationContractDto | null;
   quotationId?: string | null;
@@ -1795,6 +1798,7 @@ export type TupdateEngineeringContactDto = {
   contractNumber?: string;
   /**請款狀態 */
   paymentStatus?: string;
+  /**工程名稱 */
   projectName?: string;
   /**工程內容 */
   projectContent?: string;
@@ -1802,14 +1806,25 @@ export type TupdateEngineeringContactDto = {
   district?: string;
   address?: string;
   /**工程負責人 */
-  projectPerson?: string;
+  projectPrincipal?: string;
   /**工程負責人聯絡電話 */
-  projectPersonNumber?: string;
-  faxNumber?: string;
-  /**備註列表 */
-  annotaion?: string[] | null;
+  constructionSitePrincipalContactNumber?: string;
+  constructionSiteFaxNumber?: string;
   /**工地電話 */
-  projectNumber?: string;
+  constructionSiteContactNumber?: string;
+  /**工程編號 */
+  projectNumber: string;
+  /**承包商 */
+  contractor: string;
+  /**承包商負責人 */
+  contractorPrincipal: string;
+  /**承包商公司電話 */
+  contractorContactNumber: string;
+  /**承包商公司傳真 */
+  contractorFaxNumber: string;
+
+  /**備註列表 */
+  annotations?: string[] | null;
 };
 
 export type TcreateEngineeringContactDto = {
