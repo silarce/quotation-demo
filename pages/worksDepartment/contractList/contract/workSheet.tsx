@@ -162,7 +162,7 @@ export default function WorkSheet() {
 
   const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
 
-  const { sheetList } = useWorkSheet({ productList: productList ?? {} });
+  const { sheetList, reset } = useWorkSheet({ productList: productList ?? {} });
 
   // console.log(productList);
   // console.log(sheetList);
@@ -179,11 +179,11 @@ export default function WorkSheet() {
 
   // ______________________________________________________________
   // const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
-  const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
+  // const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
 
-  const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
-    setProdcutOutline((state) => ({ ...state, [key]: value }));
-  };
+  // const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
+  //   setProdcutOutline((state) => ({ ...state, [key]: value }));
+  // };
 
   // ______________________________________________________________
 
@@ -234,19 +234,6 @@ export default function WorkSheet() {
       address,
     } = engineeringContact;
 
-    // const {
-    //   // projectName,
-    //   projectContent,
-    //   /**工地電話 */
-    //   projectNumber,
-    //   /**工地傳真 */
-    //   projectFaxNumber,
-    //   /**工程負責人 */
-    //   projectPerson,
-    //   /**工程負責人聯絡電話 */
-    //   projectPersonNumber,
-    // } = creEmptyProfile();
-
     setProfile({
       projectName: projectName,
       projectContent,
@@ -265,46 +252,12 @@ export default function WorkSheet() {
     //
   }, [engineeringContact]);
 
-  // -------------------------------------------------------------------------
+  useEffect(() => {
+    if (disabled) {
+      reset();
+    }
+  }, [disabled, productList]);
 
-  // TODO 串接上api後，要放入取得的資料
-  // useEffect(() => {
-  //   setOldProduct({
-  //     itemName: sheet.itemName,
-  //     doorType: sheet.doorType,
-  //     fullWidth: sheet.fullWidth,
-  //     height: sheet.height,
-  //     boxB: sheet.boxB,
-  //     quantity: sheet.quantity,
-  //     material: sheet.material,
-  //     isAntiTyphoon: sheet.isAntiTyphoon,
-  //   });
-  // }, [sheet]);
-  // -------------------------------------------------------------------------
-  // const { control, handleSubmit, watch, setValue } = useForm({ defaultValues: fakeWorkSheet });
-
-  // const fakeWorkSheet_ori = useMemo(() => {
-  //   const copy = _.cloneDeep(watch());
-  //   const keyArr = ['itemName', 'doorType', 'length', 'height', 'thickness', 'quantity', 'material'] as const;
-
-  //   keyArr.forEach((key) => {
-  //     setValue(key, '');
-  //   });
-  //   setValue('typhoonProtection', true);
-
-  //   return copy;
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  // // console.log(watch())
-  // // console.log(watch("doorType"))
-
-  // const onSubmit: SubmitHandler<TfakeworkSheet> = (data) => {
-  //   // alert(JSON.stringify(data));
-  //   console.log(data);
-  // };
-
-  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {

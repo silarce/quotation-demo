@@ -17,16 +17,19 @@ const useWorkSheet = ({ productList }: { productList: { [key: string]: Tquotatio
   const [sheetList, setSheetList] = useState<TsheetList>({});
   const forceUpdate = useCallback(() => setSheetList((state) => ({ ...state })), []);
 
-  useEffect(() => {
+  // ------------------------------------------------------------
+
+  const reset = () => {
     const list: TsheetList = {};
     Object.keys(productList).forEach((key) => {
       const prod = productList[key];
       list[key] = new Class_workSheet({ forceUpdate, prod });
     });
     setSheetList(list);
-  }, [productList]);
+  };
 
-  return { sheetList };
+  // ------------------------------------------------------------
+  return { sheetList, reset };
 };
 
 export { useWorkSheet };
