@@ -205,6 +205,8 @@ export default function Edit() {
           category: item.category,
           quantity: item.quantity,
         };
+
+        return;
       }
 
       sheet[item.category] = {
@@ -498,6 +500,8 @@ export default function Edit() {
     }
 
     const electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[] = [];
+
+    console.log(sheet);
 
     Object.values(sheet).forEach((item) => {
       if (item) {
