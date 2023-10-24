@@ -1984,7 +1984,13 @@ export type TexchangeRecordDto = {
   reason: string;
 };
 
-export type TcreateExchangeRecordDto = Omit<TexchangeRecordDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateExchangeRecordDto = {
+  id?: string;
+  goodsName: string;
+  goodsSpec: string;
+  goodsQuantity: number;
+  reason: string;
+};
 
 export type TexchangeDto = {
   id: string;

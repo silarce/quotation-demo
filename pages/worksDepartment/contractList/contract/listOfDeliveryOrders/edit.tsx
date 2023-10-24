@@ -48,6 +48,7 @@ type Tsignature = {
 };
 
 type Ttransfer = {
+  id?: string;
   goodsName: string;
   goodsSpec: string;
   goodsQuantity: number;
@@ -281,26 +282,28 @@ export default function Edit() {
       return myAlert.info({ title: '請選擇需求日期' });
     }
 
-    try {
-      setIsLoading(true);
+    console.log(body);
 
-      if (exchangeId) {
-        await apiPatchEngineeringExchange(exchangeId, body);
-        update_exchange();
-      } else {
-        const res = await apiPostEngineeringExchange(body);
-        router.push({
-          query: { ...router.query, exchangeId: res.id },
-        });
-      }
+    // try {
+    //   setIsLoading(true);
 
-      myAlert.success({ title: '更新調(退)貨單成功' });
-    } catch (error) {
-      myAlert.err({ title: '更新調(退)貨單失敗' });
-    } finally {
-      setIsLoading(false);
-      setDisabled(true);
-    }
+    //   if (exchangeId) {
+    //     await apiPatchEngineeringExchange(exchangeId, body);
+    //     update_exchange();
+    //   } else {
+    //     const res = await apiPostEngineeringExchange(body);
+    //     router.push({
+    //       query: { ...router.query, exchangeId: res.id },
+    //     });
+    //   }
+
+    //   myAlert.success({ title: '更新調(退)貨單成功' });
+    // } catch (error) {
+    //   myAlert.err({ title: '更新調(退)貨單失敗' });
+    // } finally {
+    //   setIsLoading(false);
+    //   setDisabled(true);
+    // }
   };
 
   // ----------------------------------------------------

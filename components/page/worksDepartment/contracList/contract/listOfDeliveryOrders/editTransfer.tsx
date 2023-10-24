@@ -144,13 +144,15 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
           );
         })}
         {/* 新增項目 */}
-        <div className={style.row}>
-          <div className={style.addIcon} onClick={controll.add}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={addIcon.src} alt="" />
-            <span>新增項目</span>
+        {!disabled && (
+          <div className={style.row}>
+            <div className={style.addIcon} onClick={controll.add}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={addIcon.src} alt="" />
+              <span>新增項目</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
       {/* tbody */}
     </div>
