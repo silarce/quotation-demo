@@ -405,6 +405,11 @@ export type TlegacyContractProductDto = {
   batchNumber: string;
 };
 
+export type TlegacyContractProductItemDto = Omit<TlegacyContractProductDto, 'batch' | 'batchNumber' | 'quantity'> & {
+  productId: string;
+  product: TlegacyContractProductDto;
+};
+
 /**舊合約額外項目 */
 export type TlegacyContractAdditionDto = {
   id: string;
@@ -936,12 +941,34 @@ export type TquotationProductDto = {
 
   attachedToProductId?: string | null;
   attachedToProduct?: TquotationProductDto | null;
-  // api實際上還沒加上去
+
   rootProductId: string;
 
   // 前端用的，後端沒有
   // 只是為了方便才寫在這邊
   reduceQty?: number;
+};
+
+type TquotationProductItemDto = Omit<
+  TquotationProductDto,
+  | 'order'
+  | 'items'
+  | 'distributionBoxPrice'
+  | 'distributionBoxUnitPrice'
+  | 'installationFeePrice'
+  | 'installationFeeDualPrice'
+  | 'installationFeeQuantity'
+  | 'installationFeeUnitPrice'
+  | 'installationFeeTotalPrice'
+  | 'attachedToProductId'
+  | 'attachedToProduct'
+  | 'rootProductId'
+  | 'reduceQty'
+  | 'quantity'
+> & {
+  components: TquotationProductComponentsDto[];
+  accessories: TquotationProductAccessoriesDto[];
+  product: TquotationProductDto;
 };
 
 type TquotationContentDto_foo = {
@@ -1207,29 +1234,6 @@ export type TcreateQuotationProductDto = {
   // 安裝費 複價;
   installationFeeTotalPrice: number;
 };
-
-// type TupdateQuotationContentDto = {
-//   quotationDate: string; // 報價日期
-//   validityPeriod: string; // 報價時效
-//   customerId: string;
-//   projectName: string; // 工程名稱
-//   county: string; // 縣市
-//   district: string; // 區
-//   address: string; // 剩餘地址
-//   contactPerson: string; //  聯絡人
-//   contactNumber: string; //  聯絡電話
-//   faxNumber: string; // 傳真號碼
-//   trackProgress: string; // 追蹤狀態
-//   projectProgress: string; //工地進度
-//   quantity: number; // 樘數
-//   editNotes: string; // 編輯備註
-//   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
-//   /**備註 */
-//   annotations: string[] | null;
-//   /**報價範圍 */
-//   quotationRanges: string[] | null;
-//   managerId: string | null;
-// };
 
 export type TcreateQuotationContentDto = {
   quotationDate: string; // 報價日期
@@ -2045,4 +2049,16 @@ export type TcreateExchgangeDto = {
   formCompleterId: string;
   contractId?: string | null;
   legacyContractId?: string | null;
+};
+
+export type TworkSheetDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractProductItems: TquotationProductItemDto[];
+  legacyProductItems: TlegacyContractProductItemDto[];
+  contractId: string | null;
+  contract?: TquotationContentDto;
+  legacyContractId: string | null;
+  legacyContract?: TlegacyContractDto;
 };
