@@ -180,10 +180,9 @@ export default function EditDispatchList() {
 
     const {
       projectName,
-      contactPerson,
+      // contactPerson,
       contactNumber,
-      quotationNumber,
-
+      // quotationNumber,
       county,
       district,
       address,
@@ -194,7 +193,7 @@ export default function EditDispatchList() {
     const {
       contractorContactPerson: contact,
       contractor,
-      engineeringNumber: engineeringNumber,
+      projectNumber: engineeringNumber,
       badgeNumber,
       dispatchDate,
       finalContactPerson: finalContact,
@@ -209,12 +208,11 @@ export default function EditDispatchList() {
       projectName: projectName ?? '',
       contractor: contractor ?? '',
       // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
-      // contact: '',
       contractorContactPerson: contact ?? '',
       constructionSiteContactNumber: (projectNumber || contactNumber) ?? '',
       allAddress,
       //
-      engineeringNumber: engineeringNumber ?? '',
+      projectNumber: engineeringNumber ?? '',
       badgeNumber: badgeNumber ?? '',
     });
     setProfile02({
@@ -261,7 +259,6 @@ export default function EditDispatchList() {
       county: contract?.content.county ?? '',
       district: contract?.content.district ?? '',
       address: contract?.content.address ?? '',
-      // contact: profile01.contact,
       workerId: profile03?.workerEmployee?.id ?? '',
     };
 
@@ -286,6 +283,8 @@ export default function EditDispatchList() {
           },
         });
       }
+
+      setDisabled(true);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增派工單失敗', content: err.message });

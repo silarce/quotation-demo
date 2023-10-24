@@ -82,7 +82,7 @@ export default function DispatchList() {
           constructionSiteContactNumber: contactNumber,
           allAddress,
           //
-          engineeringNumber: dispatching?.engineeringNumber ?? '',
+          projectNumber: dispatching?.projectNumber ?? '',
           badgeNumber: dispatching?.badgeNumber ?? '',
         };
       });
@@ -149,6 +149,6 @@ const creEmptyProfile = (): Tprofile01 => ({
   contractorContactPerson: '',
   constructionSiteContactNumber: '',
   allAddress: '',
-  engineeringNumber: '',
+  projectNumber: '',
   badgeNumber: '',
 });

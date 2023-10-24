@@ -14,7 +14,7 @@ type Tprofile01 = {
   contractorContactPerson: string;
   constructionSiteContactNumber: string;
   allAddress: string;
-  engineeringNumber: string;
+  projectNumber: string;
   badgeNumber: string;
 };
 
@@ -207,7 +207,7 @@ type TindexKey01 = keyof Pick<
   Tprofile01,
   'projectName' | 'contractor' | 'contractorContactPerson' | 'constructionSiteContactNumber' | 'allAddress'
 >;
-type TindexKey02 = keyof Pick<Tprofile01, 'engineeringNumber' | 'badgeNumber'>;
+type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber' | 'badgeNumber'>;
 // type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
 
 const indexKeys01: TindexKey01[] = [
@@ -217,7 +217,7 @@ const indexKeys01: TindexKey01[] = [
   'constructionSiteContactNumber',
   'allAddress',
 ];
-const indexKeys02: TindexKey02[] = ['engineeringNumber', 'badgeNumber'];
+const indexKeys02: TindexKey02[] = ['projectNumber', 'badgeNumber'];
 // const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
 
 type Tconfig<keys extends string> = {
@@ -259,7 +259,7 @@ const config: Tconfig<
     disabled: true,
   },
   // TindexKey02
-  engineeringNumber: {
+  projectNumber: {
     label: '工程編號',
     labelWidth: '100px',
   },
