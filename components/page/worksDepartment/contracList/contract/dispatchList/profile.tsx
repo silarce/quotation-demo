@@ -241,7 +241,8 @@ const config: Tconfig<
   contractor: {
     label: '承包商',
     labelWidth: '80px',
-    showBaseline: 'auto',
+    // showBaseline: 'auto',
+    disabled: true,
   },
   contractorContactPerson: {
     label: '聯絡人',

@@ -26,6 +26,7 @@ import {
   apiPostEngineeringDispatching,
   apiPatchEngineeringDispatching,
   useGetEngineeringDispatching_id,
+  useGetEngineeringContact,
 } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TemployeeDto } from 'js/api/dtoTypes';
@@ -43,6 +44,9 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
   const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
 
@@ -71,6 +75,10 @@ export default function EditDispatchList() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, dispatchingId]);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // ---------------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>();
@@ -174,25 +182,28 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
 
   useEffect(() => {
-    if (!disabled) {
+    if (!disabled || !engineeringContact) {
       return;
     }
 
     const {
       projectName,
       // contactPerson,
-      contactNumber,
+      projectNumber,
+      contractor,
+      constructionSitePrincipalContactNumber,
       // quotationNumber,
+
       county,
       district,
       address,
-    } = contract?.content ?? {};
+    } = engineeringContact;
 
     const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
 
     const {
-      contractorContactPerson: contact,
-      contractor,
+      contractorContactPerson,
+      // contractor,
       projectNumber: engineeringNumber,
       badgeNumber,
       dispatchDate,
@@ -201,18 +212,18 @@ export default function EditDispatchList() {
       tasks,
       note,
       pricingMethod,
-      constructionSiteContactNumber: projectNumber,
+      // constructionSiteContactNumber: projectNumber,
     } = dispatching ?? {};
 
     setProfile01({
       projectName: projectName ?? '',
       contractor: contractor ?? '',
-      // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
-      contractorContactPerson: contact ?? '',
-      constructionSiteContactNumber: (projectNumber || contactNumber) ?? '',
+      // 這是承包商的聯絡人
+      contractorContactPerson: contractorContactPerson ?? '',
+      constructionSiteContactNumber: constructionSitePrincipalContactNumber ?? '',
       allAddress,
       //
-      projectNumber: engineeringNumber ?? '',
+      projectNumber: projectNumber ?? '',
       badgeNumber: badgeNumber ?? '',
     });
     setProfile02({
@@ -229,7 +240,7 @@ export default function EditDispatchList() {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract, dispatching, disabled]);
+  }, [engineeringContact, dispatching, disabled]);
 
   // ---------------------------------------------------------
 
