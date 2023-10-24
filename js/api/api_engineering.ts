@@ -419,7 +419,7 @@ export const apiPatchElectronicSupplies = async (id: string, body: TupdateElectr
   const api = `/engineering/electronic-supplies/${id}`;
 
   return axi
-    .patch<TelectronicSuppliesDto>(api, body)
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

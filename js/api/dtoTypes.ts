@@ -1838,7 +1838,7 @@ export type TdispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  engineeringNumber: string;
+  projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1880,7 +1880,7 @@ export type TcreateDispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  engineeringNumber: string;
+  projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1895,12 +1895,26 @@ export type TcreateDispatchingDto = {
   note: string | null;
 };
 
-export type TcreateElectronicSuppliesRecordDto = {
+export type TelectronicSuppliesRecordDto = {
+  id: string;
+  electronicSuppliesId: string; // 前端用不到
+  createdAt: string;
+  updatedAt: string;
   doorType: string;
   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
   category: string;
   quantity: string;
 };
+
+export type TcreateElectronicSuppliesRecordDto = {
+  id?: string; // 後端沒有，前端為了方便加上去的
+  doorType: string;
+  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+  category: string;
+  quantity: string;
+};
+
+export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
 
 export type TelectronicSuppliesDto = {
   id: string;
@@ -1916,7 +1930,7 @@ export type TelectronicSuppliesDto = {
   // 工程名稱
   projectName: string;
 
-  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+  electronicSuppliesRecords: TelectronicSuppliesRecordDto[];
   // others: string;
 
   // 備料人員Id
@@ -1951,9 +1965,14 @@ export type TcreateElectronicSuppliesDto = Omit<
   | 'materialHandler'
   | 'ingredientTechnician'
   | 'formCompleter'
->;
+  | 'electronicSuppliesRecords'
+> & {
+  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+};
 
-export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
+export type TupdateElectronicSuppliesDto = Omit<Partial<TcreateElectronicSuppliesDto>, 'electronicSuppliesRecords'> & {
+  electronicSuppliesRecords: TupdateElectronicSuppliesRecordDto[];
+};
 
 export type TexchangeRecordDto = {
   id: string;
