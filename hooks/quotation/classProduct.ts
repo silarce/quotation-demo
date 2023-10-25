@@ -1149,11 +1149,11 @@ class Class_product {
   }
 
   /**計算才數 */
-  private calcVolume = () => {
+  private calcVolume() {
     return Decimal.mul(this.area || 0, 10.89)
       .toFixed(2)
       .toString();
-  };
+  }
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -2089,11 +2089,11 @@ class Class_product {
   }
 
   // 清空變更prod
-  clearAttach = () => {
+  clearAttach() {
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.reRender();
-  };
+  }
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
