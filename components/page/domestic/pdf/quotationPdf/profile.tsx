@@ -27,7 +27,7 @@ export default function Profile({
     profileData;
 
   const [year, month, day] = builtDate.split('-');
-  const date = builtDate ? `${year}年${month}月${day}日` : '未定';
+  const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '未定';
 
   return (
     <div className={style.profile}>
@@ -93,7 +93,7 @@ export default function Profile({
       </div>
 
       <div className={style.address}>
-        <span>工程名稱地點</span>
+        <span>工程地點</span>
         <span className={style.semi}>:</span>
         <span>{projectAddress}</span>
       </div>

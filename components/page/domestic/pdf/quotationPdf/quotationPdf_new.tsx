@@ -130,6 +130,7 @@ export default function QuotationPdf({
   const profilePram: Tprofile = (() => {
     const customerName = customer.name;
 
+    // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
     const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
@@ -138,7 +139,7 @@ export default function QuotationPdf({
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: dateString,
+      builtDate: dateString, // 報價日期
       projectAddress: county + district + address,
       validityPeriod: validityPeriod,
     };
