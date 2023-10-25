@@ -22,6 +22,8 @@ import type {
   TexchangeDto,
   TcreateExchgangeDto,
   TcreateElectronicSuppliesRecordDto,
+  TworkSheetDto,
+  TcreateWorkSheetDto,
 } from './dtoTypes';
 
 export type {
@@ -526,6 +528,50 @@ export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchg
 
   return axi
     .patch<TexchangeDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// =============================================================================
+// 工作表
+
+export const apiGetWorkSheet = (id: string) => {
+  const api = `/engineering/worksheet/${id}`;
+
+  return axi
+    .get<TworkSheetDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetWorkSheet = (id: string | undefined) => {
+  const [res, setRes] = useState<TworkSheetDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const res = await apiGetWorkSheet(id);
+
+    if (res) {
+      setRes(res);
+    }
+
+    return res;
+  };
+
+  return {
+    workSheet: res,
+    update_workSheet: update,
+  };
+};
+
+export const apiPostWorkSheet = ({ body }: { body: TcreateWorkSheetDto }) => {
+  const api = '/engineering/worksheet';
+
+  return axi
+    .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
