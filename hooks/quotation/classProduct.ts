@@ -518,6 +518,39 @@ class Class_product {
     // this.findBDoptions();
   } // resetProd
 
+  clearProd_all() {
+    const empty = emptyProdOri();
+
+    const prod: Tprod = {
+      ...empty,
+      doorType: this.doorType,
+      quoteType: this._prodData.quoteType,
+      itemName: this._prodData.itemName,
+    };
+
+    this._prodData = prod;
+
+    this._quantity = String(this._prodData.quantity);
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
+    this._unitPrice = String(this._prodData.unitPrice);
+    this._totalPrice = String(this._prodData.totalPrice);
+
+    this.comList = undefined;
+    this.accessoriesList = {};
+    this._doorGeneralSpecs = undefined;
+    this._availableComponents = undefined;
+
+    this._prodData.boxB = '';
+    this._defaultBoxB = '';
+    this._prodData.thickness = '';
+
+    this.options_boxB = undefined;
+    this.options_boxD = undefined;
+
+    this.creSubComList();
+  }
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -1477,7 +1510,7 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
-    this.clearProd();
+    this.clearProd_all();
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
