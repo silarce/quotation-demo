@@ -26,13 +26,11 @@ import WorkSheetProductDetail02, {
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 
 // gear
-// import InputSel from 'components/global/gear/inputAndSel/inputSel';
-// import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
-// import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { useGetEngineeringContact } from 'js/api/api_engineering';
+import { useGetEngineeringContact, useGetWorkSheet } from 'js/api/api_engineering';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
@@ -124,16 +122,28 @@ export default function WorkSheet() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
+  const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
-  const engineeringContactId = contract?.engineeringContactId;
+  // const engineeringContactId = contract?.engineeringContactId;
+  const { engineeringContactId, worksheetId } = contract ?? {};
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
+  const { workSheet, update_workSheet } = useGetWorkSheet(worksheetId);
 
   useEffect(() => {
-    update_contract();
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   const productList = useMemo(() => {
@@ -153,8 +163,19 @@ export default function WorkSheet() {
   }, [contract]);
 
   useEffect(() => {
-    update_engineeringContact();
-  }, [engineeringContactId]);
+    (async () => {
+      try {
+        const res01 = update_engineeringContact();
+        const res02 = update_workSheet();
+        await Promise.all([res01, res02]);
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -708,7 +729,7 @@ export default function WorkSheet() {
   // -----------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} />
 
       <form>

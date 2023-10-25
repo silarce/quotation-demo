@@ -63,13 +63,20 @@ export const useGetEngineeringContact = (id: string | undefined | null) => {
       return;
     }
 
-    const newRes = await apiGetEngineeringContact(id);
+    try {
+      const newRes = await apiGetEngineeringContact(id);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得工程聯絡單失敗', content: err.message });
+
+      return;
     }
-
-    return newRes;
   };
 
   return {
@@ -538,13 +545,20 @@ export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchg
 export const apiGetWorkSheet = (id: string) => {
   const api = `/engineering/worksheet/${id}`;
 
+  const params = {
+    populate: [
+      'contractProductItems',
+      //  'legacyProductItems'
+    ],
+  };
+
   return axi
-    .get<TworkSheetDto>(api)
+    .get<TworkSheetDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetWorkSheet = (id: string | undefined) => {
+export const useGetWorkSheet = (id: string | undefined | null) => {
   const [res, setRes] = useState<TworkSheetDto>();
 
   const update = async () => {
@@ -552,13 +566,20 @@ export const useGetWorkSheet = (id: string | undefined) => {
       return;
     }
 
-    const res = await apiGetWorkSheet(id);
+    try {
+      const res = await apiGetWorkSheet(id);
 
-    if (res) {
-      setRes(res);
+      if (res) {
+        setRes(res);
+      }
+
+      return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得工作表失敗', content: err.message });
+
+      return;
     }
-
-    return res;
   };
 
   return {
