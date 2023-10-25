@@ -2062,3 +2062,8 @@ export type TworkSheetDto = {
   legacyContractId: string | null;
   legacyContract?: TlegacyContractDto;
 };
+
+export type TcreateWorkSheetDto = {
+  contractId: string | null;
+  legacyContractId: string | null;
+};

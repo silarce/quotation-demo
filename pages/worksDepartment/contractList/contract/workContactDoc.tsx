@@ -421,7 +421,10 @@ export default function WorkContactDoc() {
 
   // ----------------------------------------------------------------------------
 
-  const panelList_01: TpanelList = [{ type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }];
+  const panelList_01: TpanelList = [
+    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    { type: 'myButton', label: '產生工作表', onClick: () => {} },
+  ];
   const panelList_02: TpanelList = [
     { type: 'redButton', label: '上傳', onClick: reqPatch },
     {
