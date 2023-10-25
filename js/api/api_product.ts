@@ -114,7 +114,6 @@ type TpcdsPrams = {
   B: number;
 };
 
-/**似乎是api還沒做好，目前只會回傳門片數量 */
 export const apiGetProdCalcDetailSpec = async (params: TpcdsPrams) => {
   const api = '/products/door/calc-detail-spec';
 
@@ -144,7 +143,6 @@ export const apiGetProdAvailableComponents = async (params: TpacParams) => {
 
 // =======================================================================
 
-// FIXME 20231002 必須要再提供兩個參數bottomBarAngleIron bottomBarPlate
 export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomDto) => {
   const api = '/products/door/generate-door-product-bom';
 

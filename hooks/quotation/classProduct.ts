@@ -487,6 +487,12 @@ class Class_product {
       discount: this._prodData.discount,
       itemName: this._prodData.itemName,
       quoteType: this._prodData.quoteType,
+      //
+      material: this._prodData.material,
+      surface: this._prodData.surface,
+      doorTrack: this._prodData.doorTrack,
+      typhoonProtection: this._prodData.typhoonProtection,
+      notes: this._prodData.notes,
     };
 
     this._quantity = String(this._prodData.quantity);
