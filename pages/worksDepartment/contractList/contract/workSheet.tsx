@@ -41,6 +41,8 @@ import scss from './workSheet.module.scss';
 // image
 import imgIdk from 'public/image/fake/idk01.png';
 
+import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+
 // ====================================================================
 
 type Tprofile = {
@@ -161,7 +163,34 @@ export default function WorkSheet() {
 
     return list;
   }, [contract]);
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  const foo = useMemo(() => {
+    /**
+送給後端的item必須要有id，
 
+要將同一類的所有id，以arr的形式紀錄，就叫itemIdArr好了，然後送進class裡面
+未來要分堆的時候，就切割itemIdArr，送到另一堆的class就可以了
+
+送給後端時，依照itemIdArr的length產生item，並把id放進去
+
+送給後端時，只可以送有更改過的prod
+用useWorkSheet裡的changedList配合forceUpdate紀錄
+
+
+
+
+ */
+
+    const list: { [key: string]: TquotationProductItemDto } = {};
+
+    // console.log(workSheet);
+  }, [workSheet]);
+
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  // --------------------------------------------------------
   useEffect(() => {
     (async () => {
       try {
@@ -358,15 +387,16 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
+  // TODO 記得要改成真的舊資料，乾脆記錄到class裡面好了
   const oldProductOutline = {
-    itemName: targetSheet?.itemName ?? '',
-    doorType: targetSheet?.doorModelName ?? '',
-    fullWidth: targetSheet?.fullWidth ?? '',
-    height: targetSheet?.height ?? '',
-    boxB: targetSheet?.boxB ?? '',
+    itemName: targetSheet?.oldProd.itemName ?? '',
+    doorType: targetSheet?.oldProd.doorModelName ?? '',
+    fullWidth: targetSheet?.oldProd.fullWidth ?? '',
+    height: targetSheet?.oldProd.height ?? '',
+    boxB: targetSheet?.oldProd.boxB ?? '',
     quantity: targetSheet?.quantity ?? '',
-    material: targetSheet?.materialName ?? '',
-    isAntiTyphoon: !!targetSheet?.isAntiTyphoon,
+    material: targetSheet?.oldProd.materialName ?? '',
+    isAntiTyphoon: !!targetSheet?.oldProd.isAntiTyphoon,
   };
 
   // -------------------------------------------------------------------------
@@ -414,11 +444,11 @@ export default function WorkSheet() {
     },
     quantity: {
       value: targetSheet?.quantity ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.quantity = v;
-        }
-      },
+      // onChange: (v) => {
+      //   if (targetSheet) {
+      //     targetSheet.quantity = v;
+      //   }
+      // },
     },
     material: {
       value: targetSheet?.materialName ?? '',

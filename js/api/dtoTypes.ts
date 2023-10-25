@@ -949,7 +949,7 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
-type TquotationProductItemDto = Omit<
+export type TquotationProductItemDto = Omit<
   TquotationProductDto,
   | 'order'
   | 'items'

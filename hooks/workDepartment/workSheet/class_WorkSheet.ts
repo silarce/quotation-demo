@@ -1,54 +1,67 @@
+import _ from 'lodash';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // type
-import { TquotationProductDto } from 'js/api/dtoTypes';
+import { TquotationProductDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 
 class Class_workSheet {
   constructor({
     forceUpdate,
     prod,
+    itemIdArr, // itemIdArr裝的是被這個class代表的item的id，
+    // 未來若分堆需求，oldProd可能會要是未被修改的資料
+    // 這樣可以取父prod的oldProd放進來，prod則是父prod的資料
+    oldProd = _.cloneDeep(prod),
   }: {
     //
     forceUpdate: () => void;
-    prod: TquotationProductDto;
+    prod: TquotationProductItemDto;
+    itemIdArr: string[];
+    oldProd?: TquotationProductItemDto;
   }) {
     this.forceUpdate = forceUpdate;
-    this._prod = prod;
+    this._prod = _.cloneDeep(prod);
+    this.oldProd = oldProd;
+    this.itemIdArr = itemIdArr;
   } //  constructor close
 
   // ---------------------------------------------------------------------
 
   private _prod;
   private forceUpdate;
+  private itemIdArr;
+  readonly oldProd;
 
   // ---------------------------------------------------------------------
 
-  getWholeProduct() {
-    const req = async () => {
-      try {
-        const res = await apiGetQuotationProducts(this._prod.id);
+  // getWholeProduct() {
+  //   const req = async () => {
+  //     try {
+  //       const res = await apiGetQuotationProducts(this._prod.id);
 
-        if (res) {
-          this._prod = res;
-          this.forceUpdate();
-        }
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得產品資料失敗', content: err.message });
-      }
-    };
+  //       if (res) {
+  //         this._prod = res;
+  //         this.forceUpdate();
+  //       }
+  //     } catch (error) {
+  //       const err = error as Error;
+  //       myAlert.err({ title: '取得產品資料失敗', content: err.message });
+  //     }
+  //   };
 
-    return req();
-  }
+  //   return req();
+  // }
 
   // ---------------------------------------------------------------------
 
-  get rootProductId() {
-    return this._prod.rootProductId;
-  }
+  // get rootProductId() {
+  //   return this._prod.rootProductId;
+  // }
+
   //
   //
   get itemName() {
@@ -92,12 +105,12 @@ class Class_workSheet {
   }
 
   get quantity() {
-    return String(this._prod.quantity);
+    return String(this.itemIdArr.length);
   }
-  set quantity(str) {
-    this._prod.quantity = Number(str);
-    this.forceUpdate();
-  }
+  // set quantity(str) {
+  //   this._prod.quantity = Number(str);
+  //   this.forceUpdate();
+  // }
 
   get materialName() {
     return this._prod.materialName;

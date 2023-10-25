@@ -1,21 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 import { Class_workSheet } from './class_WorkSheet';
 
 // type
-import { TquotationProductDto } from 'js/api/dtoTypes';
+import {
+  //  TquotationProductDto ,
+  TquotationProductItemDto,
+} from 'js/api/dtoTypes';
 
 // =====================================================================
 
 type TsheetList = { [key: string]: Class_workSheet };
 
 // =====================================================================
-const useWorkSheet = ({ productList }: { productList: { [key: string]: TquotationProductDto } }) => {
+const useWorkSheet = ({ productList }: { productList: { [key: string]: TquotationProductItemDto } }) => {
   // const [, updateState] = useState({});
   // const forceUpdate = useCallback(() => updateState({}), []);
   const [sheetList, setSheetList] = useState<TsheetList>({});
   const forceUpdate = useCallback(() => setSheetList((state) => ({ ...state })), []);
+
+  const [changedList, setChangedList] = useState<TsheetList>({});
 
   // ------------------------------------------------------------
 
@@ -23,15 +29,21 @@ const useWorkSheet = ({ productList }: { productList: { [key: string]: Tquotatio
     const list: TsheetList = {};
     Object.keys(productList).forEach((key) => {
       const prod = productList[key];
-      list[key] = new Class_workSheet({ forceUpdate, prod });
+      list[key] = new Class_workSheet({
+        forceUpdate: () => {
+          forceUpdate();
+          setChangedList((state) => ({ ...state, [key]: list[key] }));
+        },
+        prod,
+        itemIdArr: [],
+      });
     });
     setSheetList(list);
 
-    const arr = Object.values(list);
-
-    for (const classSheet of arr) {
-      await classSheet.getWholeProduct();
-    }
+    // const arr = Object.values(list);
+    // for (const classSheet of arr) {
+    //   await classSheet.getWholeProduct();
+    // }
   };
 
   // ------------------------------------------------------------
