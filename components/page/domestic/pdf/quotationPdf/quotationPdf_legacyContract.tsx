@@ -105,6 +105,7 @@ export default function QuotationPdf({
       projectCity,
       projectDistrict,
       projectAddress,
+      projectName,
     } = classBasicInfo;
 
     // const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
@@ -118,6 +119,7 @@ export default function QuotationPdf({
       fax: faxNumber ?? '',
       builtDate: dateString,
       projectAddress: projectCity + projectDistrict + projectAddress,
+      projectName,
       validityPeriod: '--',
     };
   })();
