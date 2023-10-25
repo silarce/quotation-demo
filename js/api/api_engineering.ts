@@ -547,7 +547,9 @@ export const apiGetWorkSheet = (id: string) => {
 
   const params = {
     populate: [
-      'contractProductItems',
+      'contractProductItems.product',
+      'contractProductItems.components',
+      'contractProductItems.accessories',
       //  'legacyProductItems'
     ],
   };
