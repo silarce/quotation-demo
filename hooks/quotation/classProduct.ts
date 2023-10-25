@@ -1126,7 +1126,7 @@ class Class_product {
     };
   } // calcComAllPrice
 
-  private calcArea = () => {
+  private calcArea() {
     const h = Number(this._prodData.height || 0);
     const b = Number(this._prodData.boxB || 0);
     // const w = Number(this._prodData.WG || 0);
@@ -1139,7 +1139,7 @@ class Class_product {
       .toString();
 
     return area;
-  };
+  }
 
   /**所有acce執行calcPrice */
   calcChangeAccePrice() {
