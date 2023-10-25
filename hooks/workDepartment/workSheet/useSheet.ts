@@ -15,24 +15,24 @@ import {
 type TsheetList = { [key: string]: Class_workSheet };
 
 // =====================================================================
-const useWorkSheet = ({ productList }: { productList: { [key: string]: TquotationProductItemDto } }) => {
+const useWorkSheet = ({ itemTokenList }: { itemTokenList: { [key: string]: TquotationProductItemDto } }) => {
   // const [, updateState] = useState({});
   // const forceUpdate = useCallback(() => updateState({}), []);
   const [sheetList, setSheetList] = useState<TsheetList>({});
   const forceUpdate = useCallback(() => setSheetList((state) => ({ ...state })), []);
 
-  const [changedList, setChangedList] = useState<TsheetList>({});
+  const [changedSheetList, setChangedSheetList] = useState<TsheetList>({});
 
   // ------------------------------------------------------------
 
   const reset = async () => {
     const list: TsheetList = {};
-    Object.keys(productList).forEach((key) => {
-      const prod = productList[key];
+    Object.keys(itemTokenList).forEach((key) => {
+      const prod = itemTokenList[key];
       list[key] = new Class_workSheet({
         forceUpdate: () => {
           forceUpdate();
-          setChangedList((state) => ({ ...state, [key]: list[key] }));
+          setChangedSheetList((state) => ({ ...state, [key]: list[key] }));
         },
         prod,
         itemIdArr: [],
@@ -47,7 +47,7 @@ const useWorkSheet = ({ productList }: { productList: { [key: string]: Tquotatio
   };
 
   // ------------------------------------------------------------
-  return { sheetList, reset };
+  return { sheetList, changedSheetList, reset };
 };
 
 export { useWorkSheet };

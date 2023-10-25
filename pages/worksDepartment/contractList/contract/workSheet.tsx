@@ -165,7 +165,7 @@ export default function WorkSheet() {
   }, [contract]);
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const foo = useMemo(() => {
+  const { itemTokenList, itemIdArrList } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -177,12 +177,31 @@ export default function WorkSheet() {
 送給後端時，只可以送有更改過的prod
 用useWorkSheet裡的changedList配合forceUpdate紀錄
 
-
-
-
  */
+    if (!workSheet?.contractProductItems) {
+      return {};
+    }
 
-    const list: { [key: string]: TquotationProductItemDto } = {};
+    const contractProductItems = workSheet.contractProductItems;
+
+    const itemTokenList: { [key: string]: TquotationProductItemDto } = {};
+    const itemIdArrList: { [key: string]: string[] } = {};
+
+    contractProductItems.forEach((item) => {
+      const productId = item.productId;
+      itemTokenList[productId] = item;
+
+      if (!itemIdArrList[productId]) {
+        itemIdArrList[productId] = [];
+      }
+
+      itemIdArrList[productId].push(item.id);
+    });
+
+    return {
+      itemTokenList,
+      itemIdArrList,
+    };
 
     // console.log(workSheet);
   }, [workSheet]);
@@ -212,7 +231,7 @@ export default function WorkSheet() {
 
   const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
 
-  const { sheetList, reset } = useWorkSheet({ productList: productList ?? {} });
+  const { sheetList, reset } = useWorkSheet({ itemTokenList: itemTokenList ?? {} });
 
   // console.log(productList);
   // console.log(sheetList);
@@ -387,13 +406,12 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
-  // TODO 記得要改成真的舊資料，乾脆記錄到class裡面好了
   const oldProductOutline = {
     itemName: targetSheet?.oldProd.itemName ?? '',
     doorType: targetSheet?.oldProd.doorModelName ?? '',
-    fullWidth: targetSheet?.oldProd.fullWidth ?? '',
-    height: targetSheet?.oldProd.height ?? '',
-    boxB: targetSheet?.oldProd.boxB ?? '',
+    fullWidth: String(targetSheet?.oldProd.fullWidth ?? ''),
+    height: String(targetSheet?.oldProd.height ?? ''),
+    boxB: String(targetSheet?.oldProd.boxB ?? ''),
     quantity: targetSheet?.quantity ?? '',
     material: targetSheet?.oldProd.materialName ?? '',
     isAntiTyphoon: !!targetSheet?.oldProd.isAntiTyphoon,
@@ -776,7 +794,7 @@ export default function WorkSheet() {
                 setTargetSheet(sheet);
               };
 
-              const isActive = key === targetSheet?.rootProductId;
+              const isActive = key === targetSheet?.productId;
 
               const control = {
                 itemName,

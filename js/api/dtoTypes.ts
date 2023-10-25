@@ -969,6 +969,7 @@ export type TquotationProductItemDto = Omit<
   components: TquotationProductComponentsDto[];
   accessories: TquotationProductAccessoriesDto[];
   product: TquotationProductDto;
+  productId: string;
 };
 
 type TquotationContentDto_foo = {
