@@ -11,6 +11,7 @@ export type Tprofile = {
   fax: string;
   builtDate: string;
   projectAddress: string;
+  projectName: string;
   validityPeriod: string;
 };
 
@@ -23,8 +24,17 @@ export default function Profile({
   index: number;
   pageCount: number;
 }) {
-  const { quotationId, clientName, contactPerson, contactPhone, fax, builtDate, projectAddress, validityPeriod } =
-    profileData;
+  const {
+    quotationId,
+    clientName,
+    contactPerson,
+    contactPhone,
+    fax,
+    builtDate,
+    projectAddress,
+    validityPeriod,
+    projectName,
+  } = profileData;
 
   const [year, month, day] = builtDate.split('-');
   const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '未定';
@@ -92,6 +102,11 @@ export default function Profile({
         </div>
       </div>
 
+      <div className={style.address}>
+        <span>工程名稱</span>
+        <span className={style.semi}>:</span>
+        <span>{projectName}</span>
+      </div>
       <div className={style.address}>
         <span>工程地點</span>
         <span className={style.semi}>:</span>

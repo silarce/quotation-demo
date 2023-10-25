@@ -49,6 +49,7 @@ export default function QuotationPdf({
 
   const {
     // customerName,
+    projectName,
     customer,
     contactPerson,
     contactNumber,
@@ -141,6 +142,7 @@ export default function QuotationPdf({
       fax: faxNumber ?? '',
       builtDate: dateString, // 報價日期
       projectAddress: county + district + address,
+      projectName: projectName,
       validityPeriod: validityPeriod,
     };
   })();
