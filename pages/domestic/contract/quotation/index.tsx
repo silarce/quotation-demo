@@ -23,7 +23,7 @@ import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 // global gear
-import PageHeader02, { TtagList, TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // css
@@ -85,6 +85,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // =========================================================
 
   const { data, update } = useGetContract_id_noItems(id as string | undefined);
+  const engineeringContactId = data?.engineeringContactId;
 
   useEffect(() => {
     update();
@@ -381,29 +382,28 @@ version>1 是子合約
       label: `報價編號 ${data?.content.quotationNumber}`,
     },
   ];
-  const linkArr: Tlink[] = [
-    {
-      label: '工程聯絡單',
-      linkProps: {
-        href: {
-          pathname: '/worksDepartment/contractList/contract/workContactDoc',
-          query: {
-            // TODO 等可以取得工程聯絡單的id後，要把工程聯絡單的id補上
-            contractId: id,
-            version: '1',
+  const linkArr: TlinkArr = [
+    engineeringContactId
+      ? {
+          label: '工程聯絡單',
+          linkProps: {
+            href: {
+              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              query: {
+                contractId: id,
+                engineeringContactId,
+                version: '1',
+              },
+            },
+            target: '_blank',
           },
-        },
-        target: '_blank',
-        // onClick: (e) => {
-        //   e.preventDefault();
-        // },
-      },
-    },
+        }
+      : null,
   ];
 
   const panel_quotation01: TpanelList = [
     (() =>
-      version === '1'
+      version === '1' && !engineeringContactId
         ? {
             type: 'myButton',
             label: '新增工程聯絡單',
@@ -422,11 +422,9 @@ version>1 是子合約
                 setIsLoading(false);
               }
 
-              if (!isOk) {
-                return;
+              if (isOk) {
+                update();
               }
-
-              update();
             },
           }
         : null)(),
@@ -451,7 +449,7 @@ version>1 是子合約
   // -----------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tagList={tagList} panelList={panelList} linkList={linkArr} />
       {/*  */}
       <div>
