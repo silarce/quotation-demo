@@ -1297,6 +1297,7 @@ export type TquotationContractDto = {
   //
   subContracts: TquotationContractDto[];
   engineeringContactId: string | null;
+  worksheetId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {

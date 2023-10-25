@@ -14,7 +14,6 @@ import PageHeader from 'components/page/worksDepartment/contracList/contract/gea
 import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
-import WorkProject from 'components/page/worksDepartment/contracList/contract/workContactDoc/workProject';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 
 // gear
@@ -27,7 +26,6 @@ import TextListEditor_v2, {
 // api
 import {
   TupdateEngineeringContactDto,
-  TengineeringContactDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
@@ -47,7 +45,6 @@ import scss from './workContactDoc.module.scss';
 
 // type
 import { TgetAnnotation } from 'js/api/api_workSheet';
-import { set } from 'lodash';
 
 // ============================================================================
 type Tquery = {
@@ -440,9 +437,8 @@ export default function WorkContactDoc() {
   };
 
   // ----------------------------------------------------------------------------
-
   const panelList_01: TpanelList = [
-    { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
+    contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
   ];
   const panelList_02: TpanelList = [
