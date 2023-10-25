@@ -30,8 +30,6 @@ export default function LinkList({
   return (
     <>
       {linkList.map((config, index) => {
-        console.log(config);
-
         if (!config) {
           return null;
         }
