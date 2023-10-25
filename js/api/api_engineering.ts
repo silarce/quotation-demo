@@ -567,7 +567,7 @@ export const useGetWorkSheet = (id: string | undefined) => {
   };
 };
 
-export const apiPostWorkSheet = ({ body }: { body: TcreateWorkSheetDto }) => {
+export const apiPostWorkSheet = (body: TcreateWorkSheetDto) => {
   const api = '/engineering/worksheet';
 
   return axi

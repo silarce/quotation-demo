@@ -26,10 +26,11 @@ import TextListEditor_v2, {
 
 // api
 import {
-  useGetEngineeringContact,
-  apiPatchEngineeringContact,
   TupdateEngineeringContactDto,
   TengineeringContactDto,
+  useGetEngineeringContact,
+  apiPatchEngineeringContact,
+  apiPostWorkSheet,
 } from 'js/api/api_engineering';
 
 import {
@@ -46,6 +47,7 @@ import scss from './workContactDoc.module.scss';
 
 // type
 import { TgetAnnotation } from 'js/api/api_workSheet';
+import { set } from 'lodash';
 
 // ============================================================================
 type Tquery = {
@@ -419,11 +421,29 @@ export default function WorkContactDoc() {
     }
   };
 
+  const reqCreateWorkSheet = async () => {
+    if (!contractId) {
+      return myAlert.info({ title: '無合約id', content: '請回到工務部合約列表再次選擇合約' });
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPostWorkSheet({ contractId });
+      myAlert.success({ title: '產生工作表成功' });
+    } catch (error) {
+      const err = error as Error;
+
+      myAlert.info({ title: '產生工作表失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // ----------------------------------------------------------------------------
 
   const panelList_01: TpanelList = [
+    { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
-    { type: 'myButton', label: '產生工作表', onClick: () => {} },
   ];
   const panelList_02: TpanelList = [
     { type: 'redButton', label: '上傳', onClick: reqPatch },
