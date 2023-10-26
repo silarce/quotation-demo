@@ -156,7 +156,7 @@ class Class_workSheet {
   // 捲軸
 
   // TODO 尺寸
-  _com_roller_size = '999';
+  private _com_roller_size = '999';
   get com_roller_size() {
     // return this.comList.roller.size;
     return this._com_roller_size;
@@ -168,7 +168,7 @@ class Class_workSheet {
   // TODO 有無凸
   // 介面為無/有
   // 但是主產品為無凸/雙凸 // rollerSpec
-  _com_roller_spec = false;
+  private _com_roller_spec = false;
   get com_roller_spec() {
     // return this.comList.roller.spec;
     return this._com_roller_spec;
@@ -210,7 +210,7 @@ class Class_workSheet {
   }
 
   // TODO 正面
-  _com_headBox_front = '無';
+  private _com_headBox_front = '無';
   get com_headBox_front() {
     // return this.comList.headBox.front;
     return this._com_headBox_front;
@@ -221,7 +221,7 @@ class Class_workSheet {
   }
 
   // TODO 有無凸
-  _com_headBox_spec = '無';
+  private _com_headBox_spec = '無';
   get com_headBox_spec() {
     // return this.comList.headBox.spec;
     return this._com_headBox_spec;
@@ -232,7 +232,7 @@ class Class_workSheet {
   }
 
   // TODO 捲箱型式 在主產品是boolean
-  _com_headBox_type = '捲箱999';
+  private _com_headBox_type = '捲箱999';
   get com_headBox_type() {
     // return this.comList.headBox.type;
     return this._com_headBox_type;
@@ -283,7 +283,7 @@ class Class_workSheet {
   }
 
   // TODO 表面
-  _com_bottomBar_surface = '無';
+  private _com_bottomBar_surface = '無';
   get com_bottomBar_surface() {
     // return this.comList.bottomBar.surface;
     return this._com_bottomBar_surface;
@@ -301,7 +301,7 @@ class Class_workSheet {
   }
 
   // TODO 軸承
-  _com_sidePlate_bearing = '9999#';
+  private _com_sidePlate_bearing = '9999#';
   get com_sidePlate_bearing() {
     // return this.comList.sidePlate.bearing;
     return this._com_sidePlate_bearing;
@@ -312,7 +312,7 @@ class Class_workSheet {
   }
 
   // TODO 鍊條
-  _com_sidePlate_chain = '999#';
+  private _com_sidePlate_chain = '999#';
   get com_sidePlate_chain() {
     // return this.comList.sidePlate.chain;
     return this._com_sidePlate_chain;
@@ -323,6 +323,160 @@ class Class_workSheet {
   }
 
   // --------------------------------------------------------------
+
+  // 門片 slat
+
+  // 材質
+  get com_slat_material() {
+    return this.comList.slat.material;
+  }
+  set com_slat_material(str) {
+    this.comList.slat.material = str;
+    this.forceUpdate();
+  }
+
+  // 表面
+  get com_slat_surface() {
+    return this.comList.slat.materialSurface;
+  }
+  set com_slat_surface(str) {
+    this.comList.slat.materialSurface = str;
+    this.forceUpdate();
+  }
+
+  // --------------------------------------------------------------
+
+  // 電動機 motor
+
+  // 馬力數
+  get horsepower() {
+    return this._prod.horsepower;
+  }
+  set horsepower(str) {
+    this._prod.horsepower = str;
+    this.forceUpdate();
+  }
+  //廠商
+  get motorVendor() {
+    return this._prod.motorVendor;
+  }
+  set motorVendor(str) {
+    this._prod.motorVendor = str;
+    this.forceUpdate();
+  }
+
+  // 電供
+  get motorPhase() {
+    return this._prod.motorPhase;
+  }
+  set motorPhase(str) {
+    this._prod.motorPhase = str;
+    this.forceUpdate();
+  }
+
+  // 電壓
+  get motorVoltage() {
+    return this._prod.motorVoltage;
+  }
+  set motorVoltage(str) {
+    this._prod.motorVoltage = str;
+    this.forceUpdate();
+  }
+
+  // 支撐架
+  get hasMotorSupportStand() {
+    return this._prod.hasMotorSupportStand;
+  }
+  set hasMotorSupportStand(str) {
+    this._prod.hasMotorSupportStand = str;
+    this.forceUpdate();
+  }
+
+  // TODO 鍊條型式
+  private _com_motor_chain = false;
+  get com_motor_chain() {
+    // return this.comList.motor.chain;
+    return this._com_motor_chain;
+  }
+  set com_motor_chain(bool) {
+    this._com_motor_chain = bool;
+    this.forceUpdate();
+  }
+
+  // 鎖盒
+  get motorLockBox() {
+    return this._prod.motorLockBox;
+  }
+  set motorLockBox(str) {
+    this._prod.motorLockBox = str;
+    this.forceUpdate();
+  }
+
+  // --------------------------------------------------------------
+
+  // 門軌 guideRail
+
+  // 材質
+  get com_guideRail_material() {
+    return this.comList.guideRail.material;
+  }
+  set com_guideRail_material(str) {
+    this.comList.guideRail.material = str;
+    this.forceUpdate();
+  }
+
+  // 厚度
+
+  get guideRailThickness() {
+    return this._prod.guideRailThickness;
+  }
+  set guideRailThickness(str) {
+    this._prod.guideRailThickness = str;
+    this.forceUpdate();
+  }
+
+  // TODO 表面
+  private _com_guideRail_surface = '無';
+  get com_guideRail_surface() {
+    // return this.comList.guideRail.surface;
+    return this._com_guideRail_surface;
+  }
+  set com_guideRail_surface(str) {
+    this._com_guideRail_surface = str;
+    this.forceUpdate();
+  }
+
+  // 消音條
+  get hasSilencingStrip() {
+    return this._prod.hasSilencingStrip;
+  }
+  set hasSilencingStrip(str) {
+    this._prod.hasSilencingStrip = str;
+    this.forceUpdate();
+  }
+
+  // TODO 型式
+  private _com_guideRail_type = '直';
+  get com_guideRail_type() {
+    // return this.comList.guideRail.type;
+    return this._com_guideRail_type;
+  }
+  set com_guideRail_type(str) {
+    this._com_guideRail_type = str;
+    this.forceUpdate();
+  }
+
+  // 型式02
+  get guideRail() {
+    return this._prod.guideRail;
+  }
+  set guideRail(str) {
+    this._prod.guideRail = str;
+    this.forceUpdate();
+  }
+
+  // --------------------------------------------------------------
+
   //
 } // Class_workSheet close
 

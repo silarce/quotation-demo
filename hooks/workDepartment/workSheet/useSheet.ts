@@ -15,7 +15,13 @@ import {
 type TsheetList = { [key: string]: Class_workSheet };
 
 // =====================================================================
-const useWorkSheet = ({ itemTokenList }: { itemTokenList: { [key: string]: TquotationProductItemDto } }) => {
+const useWorkSheet = ({
+  itemTokenList,
+  itemIdArrList,
+}: {
+  itemTokenList: { [key: string]: TquotationProductItemDto };
+  itemIdArrList: { [key: string]: string[] };
+}) => {
   // const [, updateState] = useState({});
   // const forceUpdate = useCallback(() => updateState({}), []);
   const [sheetList, setSheetList] = useState<TsheetList>({});
@@ -35,7 +41,7 @@ const useWorkSheet = ({ itemTokenList }: { itemTokenList: { [key: string]: Tquot
           setChangedSheetList((state) => ({ ...state, [key]: list[key] }));
         },
         prod,
-        itemIdArr: [],
+        itemIdArr: itemIdArrList[key],
       });
     });
     setSheetList(list);

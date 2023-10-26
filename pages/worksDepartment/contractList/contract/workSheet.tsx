@@ -163,6 +163,7 @@ export default function WorkSheet() {
 
     return list;
   }, [contract]);
+
   // --------------------------------------------------------
   // --------------------------------------------------------
   const { itemTokenList, itemIdArrList } = useMemo(() => {
@@ -206,6 +207,11 @@ export default function WorkSheet() {
     // console.log(workSheet);
   }, [workSheet]);
 
+  // console.log('productList', productList);
+  // console.log('itemIdArrList', itemIdArrList);
+  // console.log('itemTokenList', itemTokenList);
+  // console.log('----------------------------------------------');
+
   // --------------------------------------------------------
   // --------------------------------------------------------
   // --------------------------------------------------------
@@ -231,7 +237,10 @@ export default function WorkSheet() {
 
   const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
 
-  const { sheetList, reset } = useWorkSheet({ itemTokenList: itemTokenList ?? {} });
+  const { sheetList, reset } = useWorkSheet({
+    itemTokenList: itemTokenList ?? {},
+    itemIdArrList: itemIdArrList ?? {},
+  });
 
   // console.log(productList);
   // console.log(sheetList);
@@ -325,7 +334,7 @@ export default function WorkSheet() {
     if (disabled) {
       reset();
     }
-  }, [disabled, productList]);
+  }, [disabled, itemTokenList]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -467,6 +476,7 @@ export default function WorkSheet() {
       //     targetSheet.quantity = v;
       //   }
       // },
+      disabled: true,
     },
     material: {
       value: targetSheet?.materialName ?? '',
@@ -492,18 +502,37 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
+  // console.log('=================================================');
+  // console.log('targetSheet', targetSheet?.productId, targetSheet?.com_roller_spec);
+
   const control_detail: Tcontrol_detail = {
     reel: {
       size: {
-        value: detail.reel.size,
+        value: targetSheet?.com_roller_size ?? '',
         onChange: (v) => {
-          changeDetail('reel', 'size', v);
+          if (targetSheet) {
+            targetSheet.com_roller_size = v;
+          }
         },
       },
       hasConvex: {
-        value: detail.reel.hasConvex,
+        value: (() => {
+          const spec = targetSheet?.com_roller_spec;
+
+          if (!spec) {
+            return 'no';
+          } else {
+            return 'yes';
+          }
+        })(),
         onChange: (v) => {
-          changeDetail('reel', 'hasConvex', v);
+          if (targetSheet) {
+            if (v === 'no') {
+              targetSheet.com_roller_spec = false;
+            } else if (v === 'yes') {
+              targetSheet.com_roller_spec = true;
+            }
+          }
         },
       },
     },

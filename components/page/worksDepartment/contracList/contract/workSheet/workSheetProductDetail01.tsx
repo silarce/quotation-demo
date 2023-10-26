@@ -17,6 +17,7 @@ import { optionsCre_doorTrack_normal } from 'js/utils/options/doorTrackOptions';
 type TcontrolItem = {
   value: string;
   onChange: (v: string) => void;
+  disabled?: boolean;
 };
 
 type Tcontrol = {
@@ -157,7 +158,13 @@ const Item = ({
             return null;
           }
 
-          const { value, onChange } = control[pKey][cKey]!;
+          const { value, onChange, disabled: disabled_control } = control[pKey][cKey]!;
+
+          // if (cKey === 'hasConvex') {
+          //   console.log(cKey);
+          //   console.log(value);
+          //   console.log(onChange);
+          // }
 
           let selectProps: TselectProps | undefined = undefined;
           let checkProps: TcheckProps | undefined = undefined;
@@ -207,6 +214,15 @@ const Item = ({
           if (module === 'checkBar') {
             const checkBarPropsList = checkBarPropsListCre!();
 
+            if (checkBarPropsList[value]) {
+              checkBarPropsList[value].value = true;
+            }
+
+            // if (pKey === 'reel' && cKey === 'hasConvex') {
+            //   console.log('control', checkBarPropsList);
+            //   console.log('control', value);
+            // }
+
             // if (value === false && 'false' in checkBarPropsList) {
             //   checkBarPropsList['false'].value = true;
             // }
@@ -236,13 +252,14 @@ const Item = ({
               isRadio: true,
               onChange: (list) => {
                 const keyArr = Object.keys(list);
-                let value: string | boolean = '';
+                let theValue = '';
                 keyArr.forEach((key) => {
                   if (list[key]) {
-                    value = key;
+                    theValue = key;
                   }
                 });
-                onChange(value);
+                // console.log(value);
+                onChange(theValue);
 
                 // if (value === 'false') {
                 //   value = false;
@@ -257,6 +274,13 @@ const Item = ({
             };
           }
 
+          if (pKey === 'reel' && cKey === 'hasConvex') {
+            // console.log('control', checkBarPropsList);
+            // console.log('control', value);
+            console.log(checkProps);
+          }
+          // console.log(checkProps);
+
           return (
             <InputSel
               key={cKey}
@@ -266,7 +290,7 @@ const Item = ({
               checkProps={checkProps}
               captionColor="main"
               captionWidth={captionWidth}
-              disabled={disabled}
+              disabled={disabled_control || disabled}
               showBaseline="always"
             />
           );
@@ -344,8 +368,8 @@ const fakeOption_voltage: Toption[] = [
 
 // --------------------------------
 const checkBarPropsList_boolean = (): TcheckProps['propsList'] => ({
-  無: { value: false, label: '無' },
-  有: { value: false, label: '有' },
+  no: { value: false, label: '無' },
+  yes: { value: false, label: '有' },
 });
 
 const checkBarPropsListCre_surface = (): TcheckProps['propsList'] => ({
