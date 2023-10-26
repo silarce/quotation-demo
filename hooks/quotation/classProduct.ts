@@ -29,9 +29,11 @@ import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
+import { optionsCreator_surface } from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
+const options_surface = optionsCreator_surface();
 
 // ===========================================================
 // child class
@@ -1412,12 +1414,13 @@ class Class_product {
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      return [
-        { value: '2B', label: '2B' },
-        { value: 'HL', label: 'HL' },
-        { value: 'BA', label: 'BA' },
-        { value: 'NO.4', label: 'NO.4' },
-      ];
+      // return [
+      //   { value: '2B', label: '2B' },
+      //   { value: 'HL', label: 'HL' },
+      //   { value: 'BA', label: 'BA' },
+      //   { value: 'NO.4', label: 'NO.4' },
+      // ];
+      return options_surface;
     }
 
     return undefined;

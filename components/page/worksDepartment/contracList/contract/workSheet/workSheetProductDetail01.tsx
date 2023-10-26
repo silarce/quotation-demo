@@ -18,6 +18,10 @@ type TcontrolItem = {
   value: string;
   onChange: (v: string) => void;
   disabled?: boolean;
+  forbidden?: boolean;
+  icon?: string;
+  optionArr?: Toption[];
+  checkBarOptionArr?: { key: string; label: string }[];
 };
 
 type Tcontrol = {
@@ -158,14 +162,22 @@ const Item = ({
             return null;
           }
 
-          const { value, onChange, disabled: disabled_control } = control[pKey][cKey]!;
+          const {
+            //
+            value,
+            onChange,
+            disabled: disabled_control,
+            forbidden,
+            icon,
+            checkBarOptionArr,
+          } = control[pKey][cKey]!;
 
           let selectProps: TselectProps | undefined = undefined;
           let checkProps: TcheckProps | undefined = undefined;
 
           if (module === 'select') {
             selectProps = {
-              value: value as string,
+              value: value,
               onChange: (v) => {
                 onChange(v?.value ?? '');
               },
@@ -182,6 +194,12 @@ const Item = ({
             };
 
             if (cKey === 'doorTrackName') {
+              selectProps.value = {
+                value: value,
+                label: value,
+                icon,
+              };
+
               selectProps = {
                 ...selectProps,
                 onChange: (v) => {
@@ -204,7 +222,14 @@ const Item = ({
           } //   if (module === "select")
 
           if (module === 'checkBar') {
-            const checkBarPropsList = checkBarPropsListCre!();
+            // const checkBarPropsList = checkBarPropsListCre!();
+            const checkBarPropsList = (() => {
+              if (checkBarOptionArr) {
+                return createCheckBarPropsList(checkBarOptionArr);
+              } else {
+                return checkBarPropsListCre!();
+              }
+            })();
 
             if (checkBarPropsList[value]) {
               checkBarPropsList[value].value = true;
@@ -256,13 +281,18 @@ const Item = ({
           return (
             <InputSel
               key={cKey}
-              className={classNames({ [scss.inputSel_big]: cKey === 'doorTrackName' }, className)}
+              className={classNames(
+                //
+                cKey === 'doorTrackName' && scss.inputSel_big,
+                forbidden && scss.forbidden,
+                className
+              )}
               label={label_c}
               selectProps={selectProps}
               checkProps={checkProps}
               captionColor="main"
               captionWidth={captionWidth}
-              disabled={disabled_control || disabled}
+              disabled={forbidden || disabled_control || disabled}
               showBaseline="always"
             />
           );
@@ -339,6 +369,24 @@ const fakeOption_voltage: Toption[] = [
 ];
 
 // --------------------------------
+
+const createCheckBarPropsList = (arr: { key: string; label: string }[]): TcheckProps['propsList'] => {
+  const obj: TcheckProps['propsList'] = {};
+
+  arr.forEach((item) => {
+    obj[item.key] = {
+      value: false,
+      label: item.label,
+    };
+  });
+
+  return obj;
+};
+
+// const undefinedCheckBarPropsList = {
+//   _undefined: { value: false, label: 'undefined' },
+// };
+
 const checkBarPropsList_boolean = (): TcheckProps['propsList'] => ({
   no: { value: false, label: '無' },
   yes: { value: false, label: '有' },

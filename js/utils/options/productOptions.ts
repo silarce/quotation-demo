@@ -191,6 +191,15 @@ export const optionsCreator_bottomBarPlate = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_surface = createOptionsCreator({
+  optionsArr: [
+    { value: '2B', label: '2B' },
+    { value: 'HL', label: 'HL' },
+    { value: 'BA', label: 'BA' },
+    { value: 'NO.4', label: 'NO.4' },
+  ],
+});
+
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
 //   const { haveEmpty } = props;
 //   const arr = [{ value: 'foooo' as const, label: 'fooooo' }];

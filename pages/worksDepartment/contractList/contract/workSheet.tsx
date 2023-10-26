@@ -443,6 +443,20 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
+  /*
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+接下來把options放到control裡面
+
+*/
+
   const control_product: Tcontrol_productOutline = {
     itemName: {
       value: targetSheet?.itemName ?? '',
@@ -527,6 +541,7 @@ export default function WorkSheet() {
             targetSheet.com_roller_size = v;
           }
         },
+        forbidden: true,
       },
       hasConvex: {
         value: (() => {
@@ -818,6 +833,7 @@ export default function WorkSheet() {
             targetSheet.guideRail = v;
           }
         },
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
       },
     },
   };
@@ -890,8 +906,6 @@ export default function WorkSheet() {
       }
     },
   };
-
-  console.log(targetSheet?.acceNameArr);
 
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
