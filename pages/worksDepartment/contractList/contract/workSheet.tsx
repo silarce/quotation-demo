@@ -587,6 +587,7 @@ export default function WorkSheet() {
             targetSheet.com_headBox_front = v;
           }
         },
+        forbidden: true,
       },
       hasConvex: {
         value: targetSheet?.com_headBox_spec ?? '',
@@ -604,6 +605,7 @@ export default function WorkSheet() {
             targetSheet.com_headBox_type = v;
           }
         },
+        forbidden: true,
       },
     },
     // ______________________________________________________________
@@ -664,6 +666,7 @@ export default function WorkSheet() {
             targetSheet.com_sidePlate_bearing = v;
           }
         },
+        forbidden: true,
       },
       chain: {
         value: targetSheet?.com_sidePlate_chain ?? '',
@@ -672,6 +675,7 @@ export default function WorkSheet() {
             targetSheet.com_sidePlate_chain = v;
           }
         },
+        forbidden: true,
       },
     },
     // _____________________________________________________
@@ -757,6 +761,7 @@ export default function WorkSheet() {
             targetSheet.com_motor_chainType = v;
           }
         },
+        forbidden: true,
       },
       lockBox: {
         value: targetSheet?.motorLockBox ?? '',
@@ -822,6 +827,7 @@ export default function WorkSheet() {
             targetSheet.com_guideRail_type = v;
           }
         },
+        forbidden: true,
       },
       doorTrackName: {
         value: targetSheet?.guideRail ?? '',
