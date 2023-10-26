@@ -160,16 +160,8 @@ const Item = ({
 
           const { value, onChange, disabled: disabled_control } = control[pKey][cKey]!;
 
-          // if (cKey === 'hasConvex') {
-          //   console.log(cKey);
-          //   console.log(value);
-          //   console.log(onChange);
-          // }
-
           let selectProps: TselectProps | undefined = undefined;
           let checkProps: TcheckProps | undefined = undefined;
-
-          // console.log(label, label_c, value);
 
           if (module === 'select') {
             selectProps = {
@@ -218,19 +210,6 @@ const Item = ({
               checkBarPropsList[value].value = true;
             }
 
-            // if (pKey === 'reel' && cKey === 'hasConvex') {
-            //   console.log('control', checkBarPropsList);
-            //   console.log('control', value);
-            // }
-
-            // if (value === false && 'false' in checkBarPropsList) {
-            //   checkBarPropsList['false'].value = true;
-            // }
-
-            // if (value === true && 'true' in checkBarPropsList) {
-            //   checkBarPropsList['true'].value = true;
-            // }
-
             const objArr = Object.values(checkBarPropsList);
 
             if (objArr[objArr.length - 3]) {
@@ -273,13 +252,6 @@ const Item = ({
               },
             };
           }
-
-          if (pKey === 'reel' && cKey === 'hasConvex') {
-            // console.log('control', checkBarPropsList);
-            // console.log('control', value);
-            console.log(checkProps);
-          }
-          // console.log(checkProps);
 
           return (
             <InputSel

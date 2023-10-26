@@ -191,7 +191,10 @@ export default function WorkSheet() {
 
     contractProductItems.forEach((item) => {
       const productId = item.productId;
-      itemTokenList[productId] = item;
+
+      if (!itemTokenList[productId]) {
+        itemTokenList[productId] = item;
+      }
 
       if (!itemIdArrList[productId]) {
         itemIdArrList[productId] = [];
@@ -213,9 +216,6 @@ export default function WorkSheet() {
   // console.log('itemTokenList', itemTokenList);
   // console.log('----------------------------------------------');
 
-  // --------------------------------------------------------
-  // --------------------------------------------------------
-  // --------------------------------------------------------
   // --------------------------------------------------------
   useEffect(() => {
     (async () => {
@@ -266,21 +266,21 @@ export default function WorkSheet() {
 
   // ______________________________________________________________
 
-  const [detail, setDetail] = useState<Tdetail>(creEmptyDetail());
+  // const [detail, setDetail] = useState<Tdetail>(creEmptyDetail());
 
-  function changeDetail<TpKey extends keyof Tdetail, TcKey extends keyof Tdetail[TpKey]>(
-    pKey: TpKey,
-    cKey: TcKey,
-    value: Tdetail[TpKey][TcKey]
-  ) {
-    setDetail((state) => {
-      const copy = { ...state };
+  // function changeDetail<TpKey extends keyof Tdetail, TcKey extends keyof Tdetail[TpKey]>(
+  //   pKey: TpKey,
+  //   cKey: TcKey,
+  //   value: Tdetail[TpKey][TcKey]
+  // ) {
+  //   setDetail((state) => {
+  //     const copy = { ...state };
 
-      copy[pKey][cKey] = value;
+  //     copy[pKey][cKey] = value;
 
-      return copy;
-    });
-  }
+  //     return copy;
+  //   });
+  // }
 
   // -------------------------------------------------------------------------
 
@@ -998,64 +998,64 @@ const creEmptyProfile = (): Tprofile => ({
   faxNumber: '',
 });
 
-const creEmptyProductOutline = (): TproductOutline => ({
-  itemName: '',
-  doorType: '',
-  fullWidth: '',
-  height: '',
-  boxB: '',
-  quantity: '',
-  material: '',
-  isAntiTyphoon: false,
-});
+// const creEmptyProductOutline = (): TproductOutline => ({
+//   itemName: '',
+//   doorType: '',
+//   fullWidth: '',
+//   height: '',
+//   boxB: '',
+//   quantity: '',
+//   material: '',
+//   isAntiTyphoon: false,
+// });
 
-const creEmptyDetail = (): Tdetail => ({
-  reel: {
-    size: '',
-    hasConvex: '',
-  },
-  reelBox: {
-    material: '',
-    thickness: '456',
-    surface: '',
-    front: '',
-    hasConvex: '',
-    type: '',
-  },
-  base: {
-    material: '',
-    angleMaterial: '',
-    baseMaterial: '',
-    type: '',
-    surface: '',
-  },
-  support: {
-    bearing: '',
-    chain: '',
-  },
-  //
-  doorPiece: {
-    material: '',
-    surface: '',
-  },
-  motor: {
-    horsepower: '',
-    manufacturer: '',
-    powerSupply: '',
-    voltage: '',
-    support: '',
-    chainType: '',
-    lockBox: '',
-  },
-  doorTrack: {
-    material: '',
-    thickness: '',
-    surface: '',
-    silencer: '',
-    doorTrackType: '',
-    doorTrackName: '',
-  },
-});
+// const creEmptyDetail = (): Tdetail => ({
+//   reel: {
+//     size: '',
+//     hasConvex: '',
+//   },
+//   reelBox: {
+//     material: '',
+//     thickness: '456',
+//     surface: '',
+//     front: '',
+//     hasConvex: '',
+//     type: '',
+//   },
+//   base: {
+//     material: '',
+//     angleMaterial: '',
+//     baseMaterial: '',
+//     type: '',
+//     surface: '',
+//   },
+//   support: {
+//     bearing: '',
+//     chain: '',
+//   },
+//   //
+//   doorPiece: {
+//     material: '',
+//     surface: '',
+//   },
+//   motor: {
+//     horsepower: '',
+//     manufacturer: '',
+//     powerSupply: '',
+//     voltage: '',
+//     support: '',
+//     chainType: '',
+//     lockBox: '',
+//   },
+//   doorTrack: {
+//     material: '',
+//     thickness: '',
+//     surface: '',
+//     silencer: '',
+//     doorTrackType: '',
+//     doorTrackName: '',
+//   },
+// });
 
 console.log(
   JSON.parse(`{
