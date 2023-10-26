@@ -180,11 +180,12 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
+      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
         tradingLocation: deliveryLocation,
-        tradingDate: tradingDate,
+        tradingDate: tradingDate, // 交貨日期
         payWay,
       };
     })();
