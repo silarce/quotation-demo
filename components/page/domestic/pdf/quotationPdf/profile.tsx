@@ -102,12 +102,12 @@ export default function Profile({
         </div>
       </div>
 
-      <div className={style.address}>
+      <div className={style.info}>
         <span>工程名稱</span>
         <span className={style.semi}>:</span>
         <span>{projectName}</span>
       </div>
-      <div className={style.address}>
+      <div className={style.info}>
         <span>工程地點</span>
         <span className={style.semi}>:</span>
         <span>{projectAddress}</span>
