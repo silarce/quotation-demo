@@ -70,6 +70,9 @@ $semiMaring: 0 8px;
     .customer {
       display: grid;
       grid-template-columns: 1fr 1.2fr;
+      > div {
+        height: 42px;
+      }
       > div:nth-of-type(1),
       div:nth-of-type(2) {
         grid-column: span 2;
@@ -79,10 +82,15 @@ $semiMaring: 0 8px;
   .info {
     display: grid;
     grid-template-columns: 100px fit-content(100%) auto;
+    // height: 42px;
     .flexSpan {
       display: flex;
       justify-content: space-between;
     }
+  }
+  .info2 {
+    @extend .info;
+    height: 42px;
   }
 }
 // ======================================================================
