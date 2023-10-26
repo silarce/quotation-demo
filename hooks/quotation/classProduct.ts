@@ -1764,10 +1764,21 @@ class Class_product {
       }
     }
 
+    const originallyIsZero = this._quantity === '0';
+
     this._prodData.quantity = Number(v);
     this._quantity = v;
 
     this.calcProdAllprice_timeout();
+
+    if (originallyIsZero) {
+      // 呼叫callAllReq後就會再自動算金額了
+      this.shouldCall_cgs = true;
+      this.shouldCall_pac = true;
+      this.shouldCall_pgpb = true;
+      this.callAllReq();
+    }
+
     this.reRender();
   }
 
