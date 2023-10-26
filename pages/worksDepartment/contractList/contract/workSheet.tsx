@@ -44,6 +44,19 @@ import scss from './workSheet.module.scss';
 // image
 import imgIdk from 'public/image/fake/idk01.png';
 
+// options
+import {
+  Toption,
+  optionsCreator_bottomBar,
+  optionsCreator_motorLockBox,
+  optionsCreator_rollerSpec,
+  optionsCreator_closingType,
+  optionsCreator_bottomBarAngleIron,
+  optionsCreator_bottomBarPlate,
+  optionsCreator_surface,
+} from 'js/utils/options/productOptions';
+
+// type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 // ====================================================================
@@ -443,20 +456,6 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
-  /*
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-接下來把options放到control裡面
-
-*/
-
   const control_product: Tcontrol_productOutline = {
     itemName: {
       value: targetSheet?.itemName ?? '',
@@ -562,6 +561,7 @@ export default function WorkSheet() {
             }
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
       },
     },
     // ______________________________________________________________
@@ -590,6 +590,7 @@ export default function WorkSheet() {
             targetSheet.com_headBox_surface = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
       front: {
         value: targetSheet?.com_headBox_front ?? '',
@@ -606,6 +607,7 @@ export default function WorkSheet() {
             targetSheet.com_headBox_spec = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
       },
       type: {
         value: targetSheet?.com_headBox_type ?? '',
@@ -634,6 +636,7 @@ export default function WorkSheet() {
             targetSheet.bottomBarAngleIron = v;
           }
         },
+        optionArr: optionsCreator_bottomBarAngleIron(),
       },
       baseMaterial: {
         value: targetSheet?.bottomBarPlate ?? '',
@@ -642,6 +645,7 @@ export default function WorkSheet() {
             targetSheet.bottomBarPlate = v;
           }
         },
+        optionArr: optionsCreator_bottomBarPlate(),
       },
       type: {
         value: targetSheet?.bottomBar ?? '',
@@ -650,6 +654,7 @@ export default function WorkSheet() {
             targetSheet.bottomBar = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
       },
       surface: {
         value: targetSheet?.com_bottomBar_surface ?? '',
@@ -658,6 +663,7 @@ export default function WorkSheet() {
             targetSheet.com_bottomBar_surface = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
     },
     // _________________________________________________
@@ -699,6 +705,7 @@ export default function WorkSheet() {
             targetSheet.com_slat_surface = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
     },
     // _____________________________________________________________
@@ -770,6 +777,7 @@ export default function WorkSheet() {
             targetSheet.motorLockBox = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_motorLockBox() }),
       },
     },
     // ________________________________________________________________
@@ -797,6 +805,7 @@ export default function WorkSheet() {
             targetSheet.com_guideRail_surface = v;
           }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
       silencer: {
         value: (() => {
@@ -1011,20 +1020,13 @@ export default function WorkSheet() {
 
 // ===========================================================================
 
-// const othersOptions = [
-//   { value: '門楣', label: '門楣' },
-//   { value: '防颱底座鎖固', label: '防颱底座鎖固' },
-//   { value: 'UL 熔金體', label: 'UL 熔金體' },
-//   { value: '智慧型密碼開關', label: '智慧型密碼開關' },
-//   { value: '遙控器(1:2)', label: '遙控器(1:2)' },
-//   { value: '防颱活動中柱(滑軌)', label: '防颱活動中柱(滑軌)' },
-//   { value: '颱風活動中柱(可拆式)', label: '颱風活動中柱(可拆式)' },
-//   { value: '防爆裝置', label: '防爆裝置' },
-//   { value: '手動關閉裝置', label: '手動關閉裝置' },
-//   { value: 'UPS', label: 'UPS' },
-//   { value: '煙感+中繼器', label: '煙感+中繼器' },
-//   { value: '彈射門', label: '彈射門' },
-// ];
+const creCheckBarOptionArr = ({ optionArr }: { optionArr: Toption[] }) => {
+  const arr = optionArr.map((item) => {
+    return { key: item.value, label: item.label };
+  });
+
+  return arr;
+};
 
 // ============================================================================
 
