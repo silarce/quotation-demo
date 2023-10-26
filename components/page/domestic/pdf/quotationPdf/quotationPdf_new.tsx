@@ -310,7 +310,7 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />
