@@ -200,16 +200,13 @@ class Class_workSheet {
     this._com_roller_size = str;
     this.forceUpdate();
   }
-  // TODO 有無凸
-  // 介面為無/有
-  // 但是主產品為無凸/雙凸 // rollerSpec
-  private _com_roller_spec = false;
-  get com_roller_spec() {
-    // return this.comList.roller.spec;
-    return this._com_roller_spec;
+
+  // private _com_roller_spec = false;
+  get rollerSpec() {
+    return this._prod.rollerSpec;
   }
-  set com_roller_spec(bool) {
-    this._com_roller_spec = bool;
+  set rollerSpec(str) {
+    this._prod.rollerSpec = str;
     this.forceUpdate();
   }
 

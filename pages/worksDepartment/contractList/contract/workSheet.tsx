@@ -543,22 +543,10 @@ export default function WorkSheet() {
         forbidden: true,
       },
       hasConvex: {
-        value: (() => {
-          const spec = targetSheet?.com_roller_spec;
-
-          if (!spec) {
-            return 'no';
-          } else {
-            return 'yes';
-          }
-        })(),
+        value: targetSheet?.rollerSpec ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            if (v === 'no') {
-              targetSheet.com_roller_spec = false;
-            } else if (v === 'yes') {
-              targetSheet.com_roller_spec = true;
-            }
+            targetSheet.rollerSpec = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
