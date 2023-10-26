@@ -38,23 +38,39 @@ type Tcheck = { [key: string]: boolean };
 
 export type { TcheckProps };
 
-export default function CheckBar({ checkProps, disabled }: { checkProps: TcheckProps; disabled?: boolean }) {
-  const { propsList, onChange, checkStyle, isRadio, toAside: textAlign } = checkProps;
+export default function CheckBar({
+  //
+  checkProps,
+  disabled,
+}: {
+  checkProps: TcheckProps;
+  disabled?: boolean;
+}) {
+  const {
+    //
+    propsList,
+    onChange,
+    checkStyle,
+    isRadio,
+    toAside: textAlign,
+  } = checkProps;
 
   const [checkList, setCheckList] = useState<Tcheck>({});
 
-  const keyArr = useMemo(() => {
-    return Object.keys(propsList);
-  }, [propsList]);
+  // const keyArr = useMemo(() => {
+  //   return Object.keys(propsList);
+  // }, [propsList]);
 
-  useEffect(() => {
-    const list: Tcheck = {};
-    keyArr.forEach((key) => {
-      list[key] = propsList[key].value;
-    });
-    setCheckList(list);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const keyArr = Object.keys(propsList);
+
+  // useEffect(() => {
+  //   const list: Tcheck = {};
+  //   keyArr.forEach((key) => {
+  //     list[key] = propsList[key].value;
+  //   });
+  //   setCheckList(list);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
   // 如果要做成外控制會造成無限循環，有空時要修改
   // }, [propsList])
 
@@ -69,8 +85,8 @@ export default function CheckBar({ checkProps, disabled }: { checkProps: TcheckP
   return (
     <div className={classNames(scss.checkBar, { [scss[`aside${textAlign}`]]: textAlign })}>
       {keyArr.map((key) => {
-        const value = checkList[key];
-        const { label, disabled: disabled_item, className, style } = propsList[key];
+        // const value = checkList[key];
+        const { value, label, disabled: disabled_item, className, style } = propsList[key];
 
         const onChange = (v: boolean) => {
           const copy = { ...checkList };

@@ -193,10 +193,10 @@ class Class_workSheet {
 
   // 厚度
   get headBoxThickness() {
-    return this._prod.headBoxThickness;
+    return String(this._prod.headBoxThickness);
   }
   set headBoxThickness(str) {
-    this._prod.headBoxThickness = str;
+    this._prod.headBoxThickness = Number(str);
     this.forceUpdate();
   }
 
@@ -367,19 +367,19 @@ class Class_workSheet {
 
   // 電供
   get motorPhase() {
-    return this._prod.motorPhase;
+    return String(this._prod.motorPhase);
   }
   set motorPhase(str) {
-    this._prod.motorPhase = str;
+    this._prod.motorPhase = Number(str);
     this.forceUpdate();
   }
 
   // 電壓
   get motorVoltage() {
-    return this._prod.motorVoltage;
+    return String(this._prod.motorVoltage);
   }
   set motorVoltage(str) {
-    this._prod.motorVoltage = str;
+    this._prod.motorVoltage = Number(str);
     this.forceUpdate();
   }
 
@@ -393,13 +393,13 @@ class Class_workSheet {
   }
 
   // TODO 鍊條型式
-  private _com_motor_chain = false;
-  get com_motor_chain() {
+  private _com_motor_chainType = '';
+  get com_motor_chainType() {
     // return this.comList.motor.chain;
-    return this._com_motor_chain;
+    return this._com_motor_chainType;
   }
-  set com_motor_chain(bool) {
-    this._com_motor_chain = bool;
+  set com_motor_chainType(str) {
+    this._com_motor_chainType = str;
     this.forceUpdate();
   }
 
@@ -428,10 +428,10 @@ class Class_workSheet {
   // 厚度
 
   get guideRailThickness() {
-    return this._prod.guideRailThickness;
+    return String(this._prod.guideRailThickness);
   }
   set guideRailThickness(str) {
-    this._prod.guideRailThickness = str;
+    this._prod.guideRailThickness = Number(str);
     this.forceUpdate();
   }
 
@@ -456,7 +456,7 @@ class Class_workSheet {
   }
 
   // TODO 型式
-  private _com_guideRail_type = '直';
+  private _com_guideRail_type = '';
   get com_guideRail_type() {
     // return this.comList.guideRail.type;
     return this._com_guideRail_type;

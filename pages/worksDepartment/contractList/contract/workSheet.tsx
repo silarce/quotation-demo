@@ -1,6 +1,7 @@
 // 工作表
 
 import { useState, useEffect, useMemo } from 'react';
+import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 
@@ -502,10 +503,8 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
-  // console.log('=================================================');
-  // console.log('targetSheet', targetSheet?.productId, targetSheet?.com_roller_spec);
-
   const control_detail: Tcontrol_detail = {
+    // 捲軸
     reel: {
       size: {
         value: targetSheet?.com_roller_size ?? '',
@@ -536,183 +535,274 @@ export default function WorkSheet() {
         },
       },
     },
+    // ______________________________________________________________
+    // 捲箱
     reelBox: {
       material: {
-        value: detail.reelBox.material,
+        value: targetSheet?.com_headBox_material ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_material = v;
+          }
         },
       },
       thickness: {
-        value: detail.reelBox.thickness,
+        value: targetSheet?.headBoxThickness ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'thickness', v);
+          if (targetSheet) {
+            targetSheet.headBoxThickness = v;
+          }
         },
       },
       surface: {
-        value: detail.reelBox.surface,
+        value: targetSheet?.com_headBox_surface ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_surface = v;
+          }
         },
       },
       front: {
-        value: detail.reelBox.front,
+        value: targetSheet?.com_headBox_front ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'front', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_front = v;
+          }
         },
       },
       hasConvex: {
-        value: detail.reelBox.hasConvex,
+        value: targetSheet?.com_headBox_spec ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'hasConvex', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_spec = v;
+          }
         },
       },
       type: {
-        value: detail.reelBox.type,
+        value: targetSheet?.com_headBox_type ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'type', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_type = v;
+          }
         },
       },
     },
+    // ______________________________________________________________
+    // 底座
     base: {
       material: {
-        value: detail.base.material,
+        value: targetSheet?.com_bottomBar_material ?? '',
         onChange: (v) => {
-          changeDetail('base', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_bottomBar_material = v;
+          }
         },
       },
       angleMaterial: {
-        value: detail.base.angleMaterial,
+        value: targetSheet?.bottomBarAngleIron ?? '',
         onChange: (v) => {
-          changeDetail('base', 'angleMaterial', v);
+          if (targetSheet) {
+            targetSheet.bottomBarAngleIron = v;
+          }
         },
       },
       baseMaterial: {
-        value: detail.base.baseMaterial,
+        value: targetSheet?.bottomBarPlate ?? '',
         onChange: (v) => {
-          changeDetail('base', 'baseMaterial', v);
+          if (targetSheet) {
+            targetSheet.bottomBarPlate = v;
+          }
         },
       },
       type: {
-        value: detail.base.type,
+        value: targetSheet?.bottomBar ?? '',
         onChange: (v) => {
-          changeDetail('base', 'type', v);
+          if (targetSheet) {
+            targetSheet.bottomBar = v;
+          }
         },
       },
       surface: {
-        value: detail.base.surface,
+        value: targetSheet?.com_bottomBar_surface ?? '',
         onChange: (v) => {
-          changeDetail('base', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_bottomBar_surface = v;
+          }
         },
       },
     },
+    // _________________________________________________
+    // 支板
     support: {
       bearing: {
-        value: detail.support.bearing,
+        value: targetSheet?.com_sidePlate_bearing ?? '',
         onChange: (v) => {
-          changeDetail('support', 'bearing', v);
+          if (targetSheet) {
+            targetSheet.com_sidePlate_bearing = v;
+          }
         },
       },
       chain: {
-        value: detail.support.chain,
+        value: targetSheet?.com_sidePlate_chain ?? '',
         onChange: (v) => {
-          changeDetail('support', 'chain', v);
+          if (targetSheet) {
+            targetSheet.com_sidePlate_chain = v;
+          }
         },
       },
     },
+    // _____________________________________________________
+    // 門片
+
     doorPiece: {
       material: {
-        value: detail.doorPiece.material,
+        value: targetSheet?.com_slat_material ?? '',
         onChange: (v) => {
-          changeDetail('doorPiece', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_slat_material = v;
+          }
         },
       },
       surface: {
-        value: detail.doorPiece.surface,
+        value: targetSheet?.com_slat_surface ?? '',
         onChange: (v) => {
-          changeDetail('doorPiece', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_slat_surface = v;
+          }
         },
       },
     },
+    // _____________________________________________________________
     motor: {
       horsepower: {
-        value: detail.motor.horsepower,
+        value: targetSheet?.horsepower ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'horsepower', v);
+          if (targetSheet) {
+            targetSheet.horsepower = v;
+          }
         },
       },
       manufacturer: {
-        value: detail.motor.manufacturer,
+        value: targetSheet?.motorVendor ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'manufacturer', v);
+          if (targetSheet) {
+            targetSheet.motorVendor = v;
+          }
         },
       },
       powerSupply: {
-        value: detail.motor.powerSupply,
+        value: targetSheet?.motorPhase ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'powerSupply', v);
+          if (targetSheet) {
+            targetSheet.motorPhase = v;
+          }
         },
       },
       voltage: {
-        value: detail.motor.voltage,
+        value: targetSheet?.motorVoltage ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'voltage', v);
+          if (targetSheet) {
+            targetSheet.motorVoltage = v;
+          }
         },
       },
       support: {
-        value: detail.motor.support,
+        value: (() => {
+          const spec = targetSheet?.hasMotorSupportStand;
+
+          if (!spec) {
+            return 'no';
+          } else {
+            return 'yes';
+          }
+        })(),
         onChange: (v) => {
-          changeDetail('motor', 'support', v);
+          if (targetSheet) {
+            if (v === 'no') {
+              targetSheet.hasMotorSupportStand = false;
+            } else if (v === 'yes') {
+              targetSheet.hasMotorSupportStand = true;
+            }
+          }
         },
       },
       chainType: {
-        value: detail.motor.chainType,
+        value: targetSheet?.com_motor_chainType ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'chainType', v);
+          if (targetSheet) {
+            targetSheet.com_motor_chainType = v;
+          }
         },
       },
       lockBox: {
-        value: detail.motor.lockBox,
+        value: targetSheet?.motorLockBox ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'lockBox', v);
+          if (targetSheet) {
+            targetSheet.motorLockBox = v;
+          }
         },
       },
     },
+    // ________________________________________________________________
     doorTrack: {
       material: {
-        value: detail.doorTrack.material,
+        value: targetSheet?.com_guideRail_material ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_guideRail_material = v;
+          }
         },
       },
       thickness: {
-        value: detail.doorTrack.thickness,
+        value: targetSheet?.guideRailThickness ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'thickness', v);
+          if (targetSheet) {
+            targetSheet.guideRailThickness = v;
+          }
         },
       },
       surface: {
-        value: detail.doorTrack.surface,
+        value: targetSheet?.com_guideRail_surface ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_guideRail_surface = v;
+          }
         },
       },
       silencer: {
-        value: detail.doorTrack.silencer,
+        value: (() => {
+          const spec = targetSheet?.hasSilencingStrip;
+
+          if (!spec) {
+            return 'no';
+          } else {
+            return 'yes';
+          }
+        })(),
         onChange: (v) => {
-          changeDetail('doorTrack', 'silencer', v);
+          if (targetSheet) {
+            if (v === 'no') {
+              targetSheet.hasSilencingStrip = false;
+            } else if (v === 'yes') {
+              targetSheet.hasSilencingStrip = true;
+            }
+          }
         },
       },
       doorTrackType: {
-        value: detail.doorTrack.doorTrackType,
+        value: targetSheet?.com_guideRail_type ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'doorTrackType', v);
+          if (targetSheet) {
+            targetSheet.com_guideRail_type = v;
+          }
         },
       },
       doorTrackName: {
-        value: detail.doorTrack.doorTrackName,
+        value: targetSheet?.guideRail ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'doorTrackName', v);
+          if (targetSheet) {
+            targetSheet.guideRail = v;
+          }
         },
       },
     },
@@ -840,7 +930,8 @@ export default function WorkSheet() {
           </div>
 
           {/* right */}
-          <div className={scss.right}>
+          {/* targetSheet */}
+          <div className={classNames(scss.right, !targetSheet && 'hidden')}>
             <WorkSheetProductOutline
               control={control_product}
               oldProductOutline={oldProductOutline}
@@ -1226,3 +1317,55 @@ const creEmptyDetail = (): Tdetail => ({
     doorTrackName: '',
   },
 });
+
+console.log(
+  JSON.parse(`{
+  "contractProductItem":                {
+            "id": "1fa79772-a846-46af-9ba2-0d67ada04585",
+            "createdAt": "2023-10-26T02:05:55.107Z",
+            "updatedAt": "2023-10-26T02:08:40.117Z",
+            "createdBy": "4ab9a27a-1fcb-437a-9cdf-f239e768930e",
+            "updatedBy": "4ab9a27a-1fcb-437a-9cdf-f239e768930e",
+            "deletedBy": null,
+            "itemNumber": "S-1121026-02undefined0101",
+            "itemName": "測試update第1次",
+            "discount": "100",
+            "quoteType": "捲門",
+            "doorModelName": "SJ-302",
+            "fullWidth": 3000,
+            "WG": 50000,
+            "height": 55000,
+            "boxB": 0,
+            "area": "165.00",
+            "volume": "",
+            "materialName": "SST#304",
+            "materialSurface": "HL",
+            "guideRail": "SJ302_30.svg",
+            "horsepower": "",
+            "motorVendor": "",
+            "motorVoltage": 0,
+            "hasMotorSupportStand": false,
+            "bottomBar": "",
+            "motorLockBox": "外露",
+            "guideRailThickness": "0",
+            "rollerSpec": "無凸",
+            "hasSilencingStrip": false,
+            "isIntegratedHeadBox": false,
+            "headBoxThickness": "0",
+            "unitPrice": 302940,
+            "totalPrice": 302940,
+            "price": 302940,
+            "dualPrice": 302940,
+            "isAntiTyphoon": false,
+            "bounceDoor": true,
+            "closingType": "電動",
+            "notes": "",
+            "motorPhase": 1,
+            "bottomBarAngleIron": "不鏽鋼#304 50*50*3T",
+            "bottomBarPlate": "不鏽鋼#304 1.5T",
+            "productId": "1f534566-4d0d-45e6-bbc7-4dfce1fda512",
+            "worksheetId": "844fb786-1a65-4008-a40c-2bd4b5b6d64b",
+            "others": null
+        }
+}`)
+);
