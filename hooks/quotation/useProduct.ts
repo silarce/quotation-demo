@@ -159,8 +159,8 @@ const useProductList = ({
         // quantity: prod.items?.length ?? 0,
         // quantity: prod.quantity ?? 0,
         // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-        accessories: prod.items?.[0].accessories ?? [],
-        components: prod.items?.[0].components ?? [],
+        accessories: prod.items?.[0]?.accessories ?? [],
+        components: prod.items?.[0]?.components ?? [],
         //
 
         doorType: prod.doorModelName,
