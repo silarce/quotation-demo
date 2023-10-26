@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -100,6 +101,15 @@ class Class_workSheet {
   set fullWidth(str) {
     this._prod.fullWidth = Number(str);
     this.forceUpdate();
+  }
+
+  get WG() {
+    return String(this._prod.WG);
+  }
+
+  get BD() {
+    // TODO item裡沒有boxD，已回報給後端
+    return new Decimal(this._prod.boxB).mul(this._prod.boxD ?? 0).toString();
   }
 
   get height() {
@@ -342,6 +352,11 @@ class Class_workSheet {
   set com_slat_surface(str) {
     this.comList.slat.materialSurface = str;
     this.forceUpdate();
+  }
+
+  // 門片厚度
+  get thickness() {
+    return String(this._prod.thickness);
   }
 
   // --------------------------------------------------------------

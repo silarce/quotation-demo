@@ -812,45 +812,45 @@ export default function WorkSheet() {
 
   const control_detail02: Tcontrol_detail02 = {
     size01: {
-      doorType: '999',
-      fullWidth: '999',
-      淨高: '999',
-      WG: '999',
+      doorType: targetSheet?.doorModelName ?? '',
+      fullWidth: targetSheet?.fullWidth ?? '',
+      淨高: targetSheet?.height ?? '',
+      WG: targetSheet?.WG ?? '',
       gapA: '999',
       gapC: '999',
-      支板尺寸: '999',
+      支板尺寸: targetSheet?.BD ?? '',
       捲門全高: '999',
     },
     size02: {
-      捲軸尺寸: '999',
+      捲軸尺寸: '是指捲軸的數量嗎?',
       軸徑: '999',
       軸承: '999',
-      總長: '999',
+      總長: '是指捲軸的數量嗎?',
       寸法: '999',
     },
     rollBox: {
       角鐵數量: '999',
       捲箱角鐵尺寸: '999',
-      捲箱資訊: '999',
+      捲箱資訊: '是指一體式捲箱嗎?',
     },
     doorPiece: {
-      門片材質: '999',
-      門片厚度: '999',
+      門片材質: targetSheet?.com_slat_material ?? '',
+      門片厚度: targetSheet?.thickness ?? '',
       門片長度: '999',
       捲片支數: '999',
-      防颱勾: '999',
+      防颱勾: '是否是指主產品的"防颱"?',
     },
     motor: {
-      vendor: '999',
-      電供: '999',
-      馬力: '999',
+      vendor: targetSheet?.motorVendor ?? '',
+      電供: (targetSheet?.motorPhase ?? '') + '相',
+      馬力: targetSheet?.horsepower ?? '',
     },
     doorTrack: {
-      門軌材質: '999',
+      門軌材質: targetSheet?.com_guideRail_material ?? '',
       門軌長度: '999',
       門軌形式: {
-        value: '999',
-        img: '999',
+        value: targetSheet?.guideRail ?? '',
+        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
       },
     },
     chainCog: {
@@ -859,13 +859,11 @@ export default function WorkSheet() {
       孔徑: '999',
     },
     base: {
-      底座材質: '999',
+      底座材質: targetSheet?.com_bottomBar_material ?? '',
       底座開口: '999',
     },
   };
 
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
     {
@@ -965,265 +963,6 @@ export default function WorkSheet() {
     </SubLayer>
   );
 }
-
-// ====================================================================
-
-// export type TfakeworkSheet = {
-//   // profile right
-//   /**工程編號 */
-//   projectNumber: string;
-//   /**承包商 */
-//   contractor: string;
-//   /**負責人 */
-//   principal: string;
-//   /**公司電話 */
-//   companyPhone: string;
-//   /**公司傳真 */
-//   companyFax: string;
-
-//   // profile left
-//   /**工程名稱 */
-//   projectName: string;
-//   /**工程內容 */
-//   projectDesc: string;
-//   /**工地電話 */
-//   constructionSiteNumber: string;
-//   /**工地傳真 */
-//   constructionSiteFax: string;
-//   /**工地位置縣市 */
-//   projectCity: string;
-//   /**工地位置地區 */
-//   projectDistrict: string;
-//   /**工地位置地址 */
-//   projectAddress: string;
-//   /**工程負責人 */
-//   projectPrincipal: string;
-//   /**工程負責人電話 */
-//   projectPrincipalPhone: string;
-
-//   // 合約產品項目
-//   /**項目 */
-//   itemName: string;
-//   /**門型 */
-//   doorType: string;
-//   /**全寬(L) */
-//   length: string;
-//   /**淨高(h) */
-//   height: string;
-//   /**捲箱高(B) */
-//   thickness: string;
-//   /**數量 */
-//   quantity: string;
-//   /**材質 */
-//   material: string;
-//   /**防颱 */
-//   typhoonProtection: boolean;
-
-//   // 產品細部規格
-//   // 卷軸
-//   reel: {
-//     /**尺寸 */
-//     size: string;
-//     /**有無凸 */
-//     hasConvex: boolean;
-//   };
-//   // 捲箱
-//   reelBox: {
-//     /**材質 */
-//     material: string;
-//     /**厚度 */
-//     thickness: string;
-//     /**表面 */
-//     surface: string;
-//     /**正面 */
-//     front: string;
-//     /**有無凸 */
-//     hasConvex: boolean;
-//     /**捲箱型式 */
-//     type: string;
-//   };
-//   // 底座
-//   base: {
-//     /**材質 */
-//     material: string;
-//     /**角鐵材質 */
-//     angleMaterial: string;
-//     /**底座板材質 */
-//     baseMaterial: string;
-//     /**型式 */
-//     type: string;
-//     /**表面 */
-//     surface: string;
-//   };
-//   // 支版
-//   support: {
-//     /**軸承 */
-//     bearing: string;
-//     /**鏈條 */
-//     chain: string;
-//   };
-//   // 門片
-//   doorPiece: {
-//     /**材質 */
-//     material: string;
-//     /**表面 */
-//     surface: string;
-//   };
-//   // 電動機
-//   motor: {
-//     /** 馬力數*/
-//     horsepower: string;
-//     /** 廠商*/
-//     manufacturer: string;
-//     /** 電供*/
-//     powerSupply: string;
-//     /** 電壓*/
-//     voltage: string;
-//     /** 支撐架*/
-//     support: boolean;
-//     /** 鏈條型式*/
-//     chainType: string;
-//     /** 鎖盒*/
-//     lockBox: string;
-//   };
-//   // 門軌
-//   doorTrack: {
-//     /** 材質*/
-//     material: string;
-//     /** 厚度*/
-//     thickness: string;
-//     /** 表面*/
-//     surface: string;
-//     /** 消音條*/
-//     silencer: boolean;
-//     /** 型式*/
-//     doorTrackType: string;
-//     /** 型式2*/
-//     doorTrackName: string;
-//   };
-// };
-
-// const fakeWorkSheet: TfakeworkSheet = {
-//   // profile的資料不應該編輯，之後要把profile的資料從抽出另外處理
-//   // profile right
-//   projectNumber: 'M-1101201',
-//   contractor: '創典科技A有限公司',
-//   principal: '李先生',
-//   companyPhone: '04-1234567',
-//   companyFax: '04-1234567',
-
-//   // profile left
-//   projectName: '台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程',
-//   projectDesc: '捲門＋大門工程',
-//   constructionSiteNumber: '04-1234567',
-//   constructionSiteFax: '04-1234567',
-//   projectCity: '台中市',
-//   projectDistrict: '梧棲區',
-//   projectAddress: '經二路27號',
-//   projectPrincipal: '王先生',
-//   projectPrincipalPhone: '0987654321',
-//   //
-//   // 合約產品項目
-//   /**項目 */
-//   itemName: 'D-SD1-1',
-//   /**門型 */
-//   doorType: 'SJ-302',
-//   /**全寬(L) */
-//   length: '5.25',
-//   /**淨高(h) */
-//   height: '4.87',
-//   /**捲箱高(B) */
-//   thickness: '5.50',
-//   /**數量 */
-//   quantity: '12',
-//   /**材質 */
-//   material: '不鏽鋼304#',
-//   /**防颱 */
-//   typhoonProtection: true,
-
-//   // 產品細部規格
-//   // 捲軸
-//   reel: {
-//     /**尺寸 */
-//     size: '5',
-//     /**有無凸 */
-//     hasConvex: true,
-//   },
-//   // 捲箱
-//   reelBox: {
-//     /**材質 */
-//     material: 'SST 304# (2B 霧面)',
-//     /**厚度 */
-//     thickness: '0.8',
-//     /**表面 */
-//     surface: '氟烤',
-//     /**正面 */
-//     front: '正乳白',
-//     /**有無凸 */
-//     hasConvex: true,
-//     /**捲箱型式 */
-//     type: '捲箱+機箱',
-//   },
-//   // 底座
-//   base: {
-//     /**材質 */
-//     material: 'SST 304# (2B 霧面)',
-//     /**角鐵材質 */
-//     angleMaterial: 'SST 304# (2B 霧面)',
-//     /**底座板材質 */
-//     baseMaterial: 'SST 304# (2B 霧面)',
-//     /**型式 */
-//     type: '止水型',
-//     /**表面 */
-//     surface: '氟烤',
-//   },
-//   // 支版
-//   support: {
-//     /**軸承 */
-//     bearing: '6208#',
-//     /**鏈條 */
-//     chain: '640#',
-//   },
-//   // 門片
-//   doorPiece: {
-//     /**材質 */
-//     material: 'SST 304# (2B 霧面)',
-//     /**表面 */
-//     surface: '氟烤',
-//   },
-//   // 電動機
-//   motor: {
-//     /** 馬力數*/
-//     horsepower: '1/2HP',
-//     /** 廠商*/
-//     manufacturer: '大同',
-//     /** 電供*/
-//     powerSupply: '單相',
-//     /** 電壓*/
-//     voltage: '220V',
-//     /** 支撐架*/
-//     support: true,
-//     /** 鏈條型式*/
-//     chainType: '雙排',
-//     /** 鎖盒*/
-//     lockBox: '防盜式',
-//   },
-//   // 門軌
-//   doorTrack: {
-//     /** 材質*/
-//     material: 'SST 304# (2B 霧面)',
-//     /** 厚度*/
-//     thickness: '1.5T',
-//     /** 表面*/
-//     surface: '氟烤',
-//     /** 消音條*/
-//     silencer: true,
-//     /** 型式*/
-//     doorTrackType: '彎',
-//     /** 型式2*/
-//     doorTrackName: 'sJ302_30',
-//   },
-// };
 
 // ===========================================================================
 
