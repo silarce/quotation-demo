@@ -961,7 +961,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '匯出材料/配件',
       img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
+      onClick: () => {
+        const prodArr = quotationData?.latestContent.products;
+        let isOk = true;
+        prodArr?.forEach((prod) => {
+          if (prod.quantity === 0) {
+            isOk = false;
+          }
+        });
+
+        if (!isOk) {
+          return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
+        }
+
+        setShowPdf_part(true);
+      },
     },
 
     // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
