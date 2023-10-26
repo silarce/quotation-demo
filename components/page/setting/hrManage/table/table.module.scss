@@ -30,11 +30,12 @@
     .row {
       display: flex;
       gap: 30px;
-      height: 53px;
+      min-height: 53px;
       padding-left: 34px;
       padding-right: 20px;
       border-bottom: solid 1px $colorBorder01;
       .column {
+        flex: none;
         > span {
           font-size: 16px;
           color: $colorText;
@@ -56,10 +57,13 @@
     }
 
     &.departmentInfo {
-      display: grid;
-      grid-template-columns: auto auto;
+      display: flex;
+      flex-wrap: wrap;
       justify-content: flex-start;
-      gap: 35px;
+      align-items: center;
+      gap: 10px 35px;
+      margin-top: 5px;
+      margin-bottom: 5px;
     }
     .btnRemove {
       width: 18px;

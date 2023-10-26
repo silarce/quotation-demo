@@ -10,26 +10,20 @@ import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 
+// layout
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+
 // components
-// import QuotationProfile, { TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-// import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-// import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-// import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-// import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
-// import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
+import QuotationProfile from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
-import QuotationPdf_part from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
-//
 
 // antd
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 // global gear
-import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // css
@@ -39,12 +33,11 @@ import style from './quotation.module.scss';
 // =============================================================
 // =============================================================
 
+// api
 import { useGetContract_id_noItems, useQuotation_id_attachments, apiGetQuotationProducts } from 'js/api/api_quotation';
+import { apiPostEngineeringContact } from 'js/api/api_engineering';
 
-// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-// import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-// import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
-// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+// component
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import Table_com from 'components/page/domestic/contract/table/table_component';
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
@@ -54,13 +47,14 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
-import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
+import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
 import { useProductList } from 'hooks/quotation/useProduct';
 
 import type { TquotationContentDto } from 'js/api/api_quotation';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // =============================================================
 // =============================================================
@@ -86,102 +80,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
     version: string | undefined;
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   // =========================================================
 
   const { data, update } = useGetContract_id_noItems(id as string | undefined);
+  const engineeringContactId = data?.engineeringContactId;
 
   useEffect(() => {
     update();
   }, [id]);
 
   // =========================================================
-  // 是否可編輯
-  const [allowEdit, setAllowEdit] = useState(id === 'newQuotation' ? true : false);
-  const [showPdf, setShowPdf] = useState(false);
-  const [showPdf_part, setShowPdf_part] = useState(false);
 
-  // ======================================================
-
-  // 合約項目 追加/追減項目的開關
-  // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
-  const [switch01, setSwitch01] = useState(true);
-
-  // 展開版本追加追減紀錄的開關
-  // 按鈕是panelList的"追加追減報價單"
-  const [switch02, setSwitch02] = useState(false);
-
-  // =========================================================
-
-  const tagList: TtagList = [
-    {
-      label: `報價編號 ${data?.content.quotationNumber}`,
-      onClick: () => {},
-    },
-    { label: '工程聯絡單', onClick: () => {} },
-  ];
-
-  const panel_quotation01: TpanelList = [
-    {
-      type: 'myButton',
-      label: '追加追減報價單',
-      onClick: () => setSwitch02(() => true),
-    },
-    // TODO 要記得把這個功能再做出來
-    // {
-    //   type: 'myButton',
-    //   label: '匯出報價單',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf(true),
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '匯出材料/配件',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf_part(true),
-    // },
-    // { type: 'myButton', label: '送審', onClick: () => alert('送審') },
-    // {
-    //   type: 'myButton',
-    //   label: `編輯`,
-    //   onClick: () => setAllowEdit((state) => true),
-    // },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
-  ];
-
-  const panel_quotation02: TpanelList = [
-    {
-      type: 'redButton',
-      label: '上傳',
-      onClick: () => alert('上傳'),
-    },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => setAllowEdit(() => false),
-    },
-  ];
-
-  const panel_quotation03: TpanelList = [
-    // TODO 要記得把這個功能再做出來
-    // {
-    //   type: 'myButton',
-    //   label: '匯出報價單',
-    //   img: iconUpload.src,
-    //   onClick: () => alert('匯出單價分析'),
-    // },
-    // {
-    //   type: 'redButton',
-    //   label: '上傳',
-    //   onClick: () => alert('上傳'),
-    // },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => setSwitch02(() => false),
-    },
-  ];
-
-  const panelList = allowEdit ? panel_quotation02 : switch02 ? panel_quotation03 : panel_quotation01;
+  // const [showPdf, setShowPdf] = useState(false);
+  // const [showPdf_part, setShowPdf_part] = useState(false);
 
   // =========================================================
 
@@ -453,38 +366,93 @@ version>1 是子合約
   };
 
   // -----------------------------------------------------------------
-  // =========================================================
-  // =========================================================
-  // =========================================================
-  // =========================================================
-  // 如果報價單編號錯誤(找不到這筆報價單)，就return NoQuotation
-  // if (quotationId !== "newQuotation" && !quotationData)
-  // if (!classQuotation) {
-  //   return <NoQuotation quotationId={quotationId as string} />;
-  // }
+
+  // 合約項目 追加/追減項目的開關
+  // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
+  const [switch01, setSwitch01] = useState(true);
+
+  // 展開版本追加追減紀錄的開關
+  // 按鈕是panelList的"追加追減報價單"
+  const [switch02, setSwitch02] = useState(false);
 
   // =========================================================
 
-  // TODO: 暫時先註解
-  // const quotationPdf_part_mainProductArr = (() => {
-  //   const theArr = classQuotation.mainProductArr.map((mp) => {
-  //     return {
-  //       ...mp.allData,
-  //       part: mp.partArr.map((part) => part.allData),
-  //     };
-  //   });
+  const tagList: TtagList = [
+    {
+      label: `報價編號 ${data?.content.quotationNumber}`,
+    },
+  ];
+  const linkArr: TlinkArr = [
+    engineeringContactId
+      ? {
+          label: '工程聯絡單',
+          linkProps: {
+            href: {
+              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              query: {
+                contractId: id,
+                engineeringContactId,
+                version: '1',
+              },
+            },
+            target: '_blank',
+          },
+        }
+      : null,
+  ];
 
-  //   return theArr;
-  // })();
+  const panel_quotation01: TpanelList = [
+    (() =>
+      version === '1' && !engineeringContactId
+        ? {
+            type: 'myButton',
+            label: '新增工程聯絡單',
+            onClick: async () => {
+              let isOk = true;
 
-  // =========================================================
+              try {
+                setIsLoading(true);
+                await apiPostEngineeringContact({ contractId: id });
+                myAlert.success({ title: '新增工程聯絡單成功' });
+              } catch (error) {
+                const err = error as Error;
+                isOk = false;
+                myAlert.err({ title: '新增工程聯絡單失敗', content: err.message });
+              } finally {
+                setIsLoading(false);
+              }
 
-  // =========================================================
+              if (isOk) {
+                update();
+              }
+            },
+          }
+        : null)(),
+    {
+      type: 'myButton',
+      label: '追加追減報價單',
+      onClick: () => setSwitch02(() => true),
+    },
+    { type: 'myButton', label: '返回', onClick: () => router.back() },
+  ];
+
+  const panel_quotation03: TpanelList = [
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => setSwitch02(() => false),
+    },
+  ];
+
+  const panelList = switch02 ? panel_quotation03 : panel_quotation01;
+
+  // -----------------------------------------------------------------
+
   return (
-    <div className={style.container}>
-      <PageHeader02 tagList={tagList} panelList={panelList} />
+    <SubLayer isLoading_all={isLoading}>
+      <PageHeader02 tagList={tagList} panelList={panelList} linkList={linkArr} />
       {/*  */}
-      <div className={style.mainContainer}>
+      <div>
         <div className={style.quotation}>
           {/* 報價單基本資料 */}
           <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
@@ -505,7 +473,6 @@ version>1 是子合約
           {switch01 || switch02 ? (
             <>
               {/* 主產品設定 */}
-              {/* <QuotationProduction classQuotation={classQuotation} disabled={!allowEdit} /> */}
               <Table_prod
                 disabled={true}
                 prodList={productList}
@@ -584,44 +551,9 @@ version>1 是子合約
           <QuotationSinature signatureArr={signatureArr} disabled={true} />
         </div>
       </div>
-      {/* TODO 暫時先註解 */}
-      {/* <QuotationPdf
-        isVisable={showPdf}
-        onCancel={() => {
-          setShowPdf(false);
-        }}
-        classQuotation={classQuotation}
-      /> */}
-      {/* TODO 暫時先註解 */}
-      {/* <QuotationPdf_part
-        isVisable={showPdf_part}
-        onCancel={() => {
-          setShowPdf_part(false);
-        }}
-        mainProductArr={quotationPdf_part_mainProductArr}
-        quotationId={classQuotation.quotationId}
-      /> */}
-    </div>
+    </SubLayer>
   );
 }
-
-// ===============================================================
-// 應該用不到了
-// const NoQuotation = ({ quotationId }: { quotationId: string }) => {
-//   const router = useRouter();
-
-//   const toBack = () => {
-//     router.back();
-//   };
-
-//   return (
-//     <div className={style.noQuotation}>
-//       <span>沒有這個報價單ID</span>
-//       <span>{quotationId}</span>
-//       <button onClick={toBack}>回上一頁</button>
-//     </div>
-//   );
-// };
 
 // =========================================================
 

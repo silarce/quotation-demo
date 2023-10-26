@@ -1,4 +1,31 @@
 // 舊合約
+// 舊合約
+// 舊合約
+
+/**
+關於垂直排序記錄功能
+現在後端沒有紀錄order
+前端也沒有做在Class_legacyContract裡做紀錄
+
+現在的垂直排序是因應臨時需求做出來的
+只有很簡單的在QuotationProduction.ProductList_legacy裡面
+使用useVerticalDnd做垂直排序
+
+之後要做這樣的功能的話
+預期後端會在product裡面放order
+前端再用order排序prodcut
+建立prodList的時候以order為key
+如果有重複的order，就用nanoid代替
+再用prodList建立prodKeyArr
+
+然後把prodList送進useVerticalDnd
+useVerticalDnd的onChange用來改變prodKeyArr
+prodKeyArr用來map 主產品列表、與exchangePanel(追加追減面板)與pdf
+
+上傳前，先用prodKeyArr.forEach，依序改變prodList的order就可以了
+
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
@@ -70,6 +97,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   const [allowEdit, setAllowEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+  console.log(verticalKeyArr);
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
@@ -358,7 +388,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
             <div className={style.active}>合約項目</div>
           </div>
           {/* 主產品設定 */}
-          <QuotationProduction legacyContract={classLegacyContract} disabled={!allowEdit} isAppend={false} />
+          <QuotationProduction
+            legacyContract={classLegacyContract}
+            disabled={!allowEdit}
+            isAppend={false}
+            control_vKeyArr={{
+              vKeyArr: verticalKeyArr,
+              onChange: setVerticalKeyArr,
+            }}
+          />
           {/* 其他設定 */}
           <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
           {/* 備註/報價範圍/付款資訊 */}
@@ -373,6 +411,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setShowPdf(false);
         }}
         classLegacyContract={classLegacyContract}
+        verticalKeyArr={verticalKeyArr}
       />
     </SubLayer>
   );

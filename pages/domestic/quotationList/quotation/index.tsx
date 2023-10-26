@@ -22,10 +22,7 @@ import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationProduction from 'components/page/domestic/quotation/quotationProduct';
-import QuotationComponent from 'components/page/domestic/quotation/quotationComponent';
-import QuotationAccessory from 'components/page/domestic/quotation/quotationAccessory';
-import QuotationTotal from 'components/page/domestic/quotation/quotationTotal';
+
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 // import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
 // import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
@@ -37,7 +34,6 @@ import QuotationPdf_part, {
   Tpart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 // global gear
@@ -59,10 +55,6 @@ import style from './quotation.module.scss';
 import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
-
-// 假資料與fake api
-import { useQuotation } from 'hooks/quotation/useQuotation';
-import { fakeApi_quotation_creator } from 'fakeDatabase/fakeAPI/fakeQuotationApi';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -714,6 +706,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: latestContent?.address,
       contactPerson: latestContent?.contactPerson,
       contactNumber: latestContent?.contactNumber,
+      faxNumber: latestContent?.faxNumber,
       discount: latestContent?.discount,
       quantity: latestContent?.quantity,
       editNotes: latestContent?.editNotes,
@@ -742,6 +735,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setValue('address', v.address ?? '');
     setValue('contactPerson', v.contactPerson ?? '');
     setValue('contactNumber', v.contactNumber ?? '');
+    setValue('faxNumber', v.faxNumber ?? '');
     setValue('trackProgress', v.trackProgress ?? '');
     setValue('projectProgress', v.projectProgress ?? '');
   };
@@ -823,9 +817,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  const fakeApiQuotaion = fakeApi_quotation_creator(router.query.quotationId as string);
-
-  const { classQuotation, reNew: reNewClassQuotation } = useQuotation(fakeApiQuotaion?.get());
   const signatureArr: TsignatureProps[] = [
     {
       label: '總經理',
@@ -882,17 +873,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
   ];
-
-  useEffect(() => {
-    reNewClassQuotation();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
-
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
 
   // --------------------------------------------------------------------------
 
@@ -981,7 +961,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '匯出材料/配件',
       img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
+      onClick: () => {
+        const prodArr = quotationData?.latestContent.products;
+        let isOk = true;
+        prodArr?.forEach((prod) => {
+          if (prod.quantity === 0) {
+            isOk = false;
+          }
+        });
+
+        if (!isOk) {
+          return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
+        }
+
+        setShowPdf_part(true);
+      },
     },
 
     // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
@@ -1010,24 +1004,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  if (!classQuotation) {
-    return null;
-  }
-
-  // --------------------------------------------------------------------------
-  const quotationPdf_part_mainProductArr = (() => {
-    const theArr = classQuotation.mainProductArr.map((mp) => {
-      return {
-        ...mp.allData,
-        part: mp.partArr.map((part) => part.allData),
-      };
-    });
-
-    return theArr;
-  })();
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -1079,6 +1055,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: data_watch.address ?? '',
       contactPerson: data_watch.contactPerson ?? '',
       contactNumber: data_watch.contactNumber ?? '',
+      faxNumber: data_watch.faxNumber ?? '',
       quantity: prodQty ?? 0,
       editNotes: data_watch.editNotes ?? '',
       status: data_watch.status ?? 'Budget',
@@ -1093,7 +1070,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quotationRanges: qr,
       //
       //
-      faxNumber: data_watch.customer?.fax ?? '',
+      // faxNumber: data_watch.customer?.fax ?? '',
       trackProgress: data_watch.trackProgress ?? '',
       projectProgress: data_watch.projectProgress ?? '',
 

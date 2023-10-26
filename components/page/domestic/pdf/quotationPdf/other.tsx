@@ -27,6 +27,7 @@ export default function Other({
   } = payInfo;
 
   const [year, month, day] = tradingDate.split('-');
+  console.log(tradingDate);
 
   return (
     <div className={style.other}>
@@ -49,7 +50,7 @@ export default function Other({
         <div className={style.date}>
           <h2>三、交貨日期 : </h2>
           <div>
-            <span>{(tradingDate && `民國${year}年${month}月${day}日`) || '未定'}</span>
+            <span>{tradingDate !== 'Invalid date' ? `民國${year}年${month}月${day}日` : '未定'}</span>
           </div>
         </div>
 

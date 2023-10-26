@@ -84,6 +84,7 @@ export default function Signature({
         }}
         onCancel={() => setShowMaterialHandler(false)}
         defaultEmpArr={controll.materialHandler.employee ? [controll.materialHandler.employee] : undefined}
+        selLimit={1}
       />
       <EmployeeSelector
         showModal={showiIngredientTechnician}
@@ -92,6 +93,7 @@ export default function Signature({
         }}
         onCancel={() => setShowIngredientTechnician(false)}
         defaultEmpArr={controll.ingredientTechnician.employee ? [controll.ingredientTechnician.employee] : undefined}
+        selLimit={1}
       />
       <EmployeeSelector
         showModal={showFormCompleter}
@@ -100,6 +102,7 @@ export default function Signature({
         }}
         onCancel={() => setShowFormCompleter(false)}
         defaultEmpArr={controll.formCompleter.employee ? [controll.formCompleter.employee] : undefined}
+        selLimit={1}
       />
     </div>
   );

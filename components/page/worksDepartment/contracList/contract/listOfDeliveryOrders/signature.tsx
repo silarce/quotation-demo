@@ -75,6 +75,7 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
         }}
         onCancel={() => setTargetControllKey(undefined)}
         defaultEmpArr={targetControll?.employee ? [targetControll.employee] : undefined}
+        selLimit={1}
       />
     </div>
   );

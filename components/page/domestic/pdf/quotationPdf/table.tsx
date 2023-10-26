@@ -110,7 +110,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
             <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
               <span>
                 {value}
-                {suffix}
+                {value && suffix}
               </span>
             </div>
           );
@@ -214,7 +214,7 @@ const config: Tconfig = {
   horsepower: {
     label: '馬力',
     width: '75px',
-    align: 'right',
+    align: 'center',
   },
   openType: {
     label: '開閉方式',
@@ -224,7 +224,7 @@ const config: Tconfig = {
   qty: {
     label: '數量',
     width: '60px',
-    align: 'right',
+    align: 'center',
     suffix: '樘',
   },
   unitPrice: {

@@ -141,6 +141,9 @@ export default function InputSelBar_address({
         value: address || '',
         onChange: onChangeAddress,
         className: `${scss.address} ${scss.addressPlus}`,
+        props: {
+          className: 'overflow-hidden',
+        },
       },
     },
   ];

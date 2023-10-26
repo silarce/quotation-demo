@@ -29,6 +29,7 @@ export default function QuotationProduction({
   isAppend,
   isAppending,
   difference_prod = 0,
+  control_vKeyArr,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
@@ -37,6 +38,10 @@ export default function QuotationProduction({
   isAppend?: boolean;
   isAppending?: boolean;
   difference_prod?: number;
+  control_vKeyArr: {
+    vKeyArr: string[];
+    onChange: (v: string[]) => void;
+  };
 }) {
   // dnd與資料相關的東西都在這裡面
   // const productStates = useProduct()
@@ -47,8 +52,7 @@ export default function QuotationProduction({
 
   const { prodList: prodList_2, prodSubPriceTotal } = legacyContract;
 
-  const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
-  // console.log(verticalKeyArr);
+  // const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
 
   return (
     <div className={scss.wrapper}>
@@ -71,7 +75,7 @@ export default function QuotationProduction({
               isAppend={isAppend}
               isAppending={isAppending}
               onVerticalKeyChange={(v) => {
-                setVerticalKeyArr(v);
+                control_vKeyArr.onChange(v);
               }}
             />
             {!disabled && (
@@ -83,7 +87,7 @@ export default function QuotationProduction({
 
           {isAppend && isAppending && (
             <ExchangePanel>
-              {verticalKeyArr.map((key, index) => {
+              {control_vKeyArr.vKeyArr.map((key, index) => {
                 const prod = prodList_2[key];
 
                 if (!prod) {

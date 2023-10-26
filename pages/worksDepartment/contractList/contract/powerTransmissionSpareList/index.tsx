@@ -95,7 +95,7 @@ export default function PowerTransmissionSpareList() {
 
         <div className={style.tbody}>
           {fooArr.map((rowData, rowIndex) => {
-            const id = rowData.quotationNumber;
+            const id = rowData.id;
             const href = {
               pathname: `${router.pathname}/edit`,
               query: {

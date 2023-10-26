@@ -123,10 +123,16 @@ export default function QuotationProfile({
 
   const onConfirmClient = (customerArr: TcustomerDto[]) => {
     const customer = customerArr[0];
+
+    const contact = customer.contacts;
+    const contactPerson = contact?.[0]?.name ?? '';
+    const contactNumber = contact?.[0]?.phone ?? '';
+    const theContactPerson = `${contactPerson} ${contactNumber}`;
+
     classLegacyContract.customer = customer;
     classBasicInfo.customerName = customer.name;
-    classBasicInfo.contactPerson = customer.contacts?.[0]?.name ?? '';
-    classBasicInfo.contactNumber = customer.contacts?.[0]?.phone ?? '';
+    classBasicInfo.contactPerson = theContactPerson;
+    classBasicInfo.contactNumber = contactNumber;
     classBasicInfo.faxNumber = customer.fax;
   };
 
@@ -177,6 +183,9 @@ export default function QuotationProfile({
                 textareaProps={{
                   value: customerName ?? '',
                   onChange: () => {},
+                  props: {
+                    className: 'overflow-hidden',
+                  },
                 }}
               />
               {!customerName && <button onClick={openModal}>請選擇客戶</button>}

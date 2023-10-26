@@ -9,10 +9,10 @@ import moment from 'moment';
 // component
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import Profile, { Tprofile01 } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
-import List, { Tdispatch_simple } from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
+import List from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
 
 // api
-import { Tparams, useGetEngineeringDispatchingList, apiPostEngineeringDispatching } from 'js/api/api_engineering';
+import { Tparams, useGetEngineeringContact, useGetEngineeringDispatchingList } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // helper
@@ -29,12 +29,14 @@ export default function DispatchList() {
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
-  // FIXME 現在後端似乎不會記錄contractId
   const params: Tparams = {
-    // filter: {
-    //   contractId: { $eq: contractId },
-    // },
+    filter: {
+      contractId: { $eq: contractId },
+    },
   };
 
   const { data: dispatchingArr, update } = useGetEngineeringDispatchingList(params);
@@ -43,6 +45,12 @@ export default function DispatchList() {
     update();
     update_contract();
   }, []);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
+
+  console.log(engineeringContact);
 
   // ----------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>(creEmptyProfile());
@@ -58,41 +66,41 @@ export default function DispatchList() {
   };
 
   useEffect(() => {
-    if (contract) {
+    if (engineeringContact) {
       const dispatching = dispatchingArr?.[0];
 
       setProfile01(() => {
         const {
           projectName,
           // contactPerson,
-          contactNumber,
+          projectNumber,
+          contractor,
+          constructionSitePrincipalContactNumber,
           // quotationNumber,
 
           county,
           district,
           address,
-        } = contract.content;
+        } = engineeringContact;
 
         const allAddress = `${county}${district}${address}`;
 
         return {
           projectName: projectName,
-          contractor: dispatching?.contractor ?? '',
-          // contact: contactPerson,
-          // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
-          // contact: dispatching?.contact,
-          contact: dispatching?.content ?? '',
-          contactNumber: contactNumber,
+          contractor: contractor ?? '',
+          // 這是承包商的聯絡人
+          contractorContactPerson: dispatching?.contractorContactPerson ?? '',
+          constructionSiteContactNumber: constructionSitePrincipalContactNumber,
           allAddress,
           //
-          projectNumber: dispatching?.projectNumber ?? '',
+          projectNumber: projectNumber ?? '',
           badgeNumber: dispatching?.badgeNumber ?? '',
         };
       });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
+  }, [engineeringContact]);
 
   // ----------------------------------------------------
   // dispatchingArr
@@ -149,8 +157,8 @@ export default function DispatchList() {
 const creEmptyProfile = (): Tprofile01 => ({
   projectName: '',
   contractor: '',
-  contact: '',
-  contactNumber: '',
+  contractorContactPerson: '',
+  constructionSiteContactNumber: '',
   allAddress: '',
   projectNumber: '',
   badgeNumber: '',

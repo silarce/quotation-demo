@@ -1,5 +1,6 @@
-import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -15,11 +16,12 @@ import Signature, {
   Tcontroll as Tcontroll_signature,
   TemployeeDto,
 } from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/signature';
-
-// gear
 import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/gear/profile';
+
+// gear
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
@@ -28,11 +30,8 @@ import {
   useGetEngineeringExchanges_id,
   apiPostEngineeringExchange,
   apiPatchEngineeringExchange,
+  useGetEngineeringContact,
 } from 'js/api/api_engineering';
-
-// css
-import style from './listOfDeliveryOrders.module.scss';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // -----------------------------------------------------------
 type Tprofile = {
@@ -51,9 +50,10 @@ type Tsignature = {
 };
 
 type Ttransfer = {
+  id?: string;
   goodsName: string;
   goodsSpec: string;
-  goodsQuantity: string;
+  goodsQuantity: number;
   reason: string;
 };
 
@@ -63,27 +63,40 @@ export default function Edit() {
   const { contractId, exchangeId } = router.query as { contractId: string; exchangeId: string | undefined };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(!!exchangeId);
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
-  const { data: exchange, update: update_exchange } = useGetEngineeringExchanges_id(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
+  const { data: exchange, update: update_exchange } = useGetEngineeringExchanges_id(exchangeId);
 
   useEffect(() => {
     (async () => {
       try {
+        setIsLoading(true);
         await update_contract();
       } catch (error) {
-        myAlert.err({ title: '取得合約失敗' });
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
       }
 
-      // try {
-      //   await update_exchange();
-      // } catch (error) {
-      //   myAlert.err({ title: '取得調(退)貨單失敗' });
-      // }
+      try {
+        await update_exchange();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得調(退)貨單失敗', content: err.message });
+      }
+
+      setIsLoading(false);
     })();
-  }, [contractId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId, exchangeId]);
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Tprofile>(emptyProfileOri());
@@ -125,7 +138,12 @@ export default function Edit() {
   const changeTransfer = (index: number, key: keyof Ttransfer, v: string) => {
     setTransferArr((transferList) => {
       const newTransferList = [...transferList];
-      newTransferList[index][key] = v;
+
+      if (key === 'goodsQuantity') {
+        newTransferList[index][key] = Number(v);
+      } else {
+        newTransferList[index][key] = v;
+      }
 
       return newTransferList;
     });
@@ -134,10 +152,10 @@ export default function Edit() {
   // ----------------------------------------------------
 
   useEffect(() => {
-    const { projectName: projectName_contract } = contract?.content ?? {};
+    const { projectName, projectNumber } = engineeringContact ?? {};
     const {
-      projectName,
-      projectNumber,
+      // projectName,
+      // projectNumber: engineeringNumber,
       requirementsDate,
       dispatchDate,
       //
@@ -150,7 +168,7 @@ export default function Edit() {
 
     setProfile({
       projectNumber: projectNumber ?? '',
-      projectName: (projectName || projectName_contract) ?? '',
+      projectName: projectName ?? '',
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
     });
@@ -163,11 +181,11 @@ export default function Edit() {
       formCompleter,
     });
 
-    // TODO 等候端更新api後要把資料放進去
-    setTransferArr([]);
+    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
+    setTransferArr(recoreds);
+
     //
-    //
-  }, [contract, exchange]);
+  }, [engineeringContact, exchange, disabled]);
 
   // ----------------------------------------------------
 
@@ -175,11 +193,14 @@ export default function Edit() {
     projectNumber: {
       value: profile.projectNumber,
       onChange: (v: string) => changeProfile('projectNumber', v),
+      disabled: true,
+      showBaseline: 'invisible',
     },
     projectName: {
       value: profile.projectName,
       onChange: (v: string) => changeProfile('projectName', v),
       disabled: true,
+      showBaseline: 'invisible',
     },
     requirementsDate: {
       value: profile.requirementsDate,
@@ -229,7 +250,7 @@ export default function Edit() {
         onChange: (v: string) => changeTransfer(index, 'goodsSpec', v),
       },
       goodsQuantity: {
-        value: item.goodsQuantity,
+        value: String(item.goodsQuantity),
         onChange: (v: string) => changeTransfer(index, 'goodsQuantity', v),
       },
       reason: {
@@ -250,12 +271,7 @@ export default function Edit() {
   const reqPost = async () => {
     const body: TcreateExchgangeDto = {
       ...profile,
-      // TODO 等api更新後要調整
-      goodsName: '',
-      goodsSpec: '',
-      goodsQuantity: 0,
-      reason: '',
-      //
+      exchangeRecords: transferArr,
       accountingId: signature.accounting?.id ?? '',
       warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
       factoryEmployeeId: signature.factoryEmployee?.id ?? '',
@@ -264,18 +280,41 @@ export default function Edit() {
       contractId: contractId,
     };
 
+    if (!body.accountingId) {
+      return myAlert.info({ title: '請選擇會計' });
+    } else if (!body.warehouseEmployeeId) {
+      return myAlert.info({ title: '請選擇倉庫人員' });
+    } else if (!body.factoryEmployeeId) {
+      return myAlert.info({ title: '請選擇廠務人員' });
+    } else if (!body.supervisorId) {
+      return myAlert.info({ title: '請選擇單位主管' });
+    } else if (!body.formCompleterId) {
+      return myAlert.info({ title: '請選擇填表人員' });
+    } else if (!body.dispatchDate) {
+      return myAlert.info({ title: '請選擇派工日期' });
+    } else if (!body.requirementsDate) {
+      return myAlert.info({ title: '請選擇需求日期' });
+    }
+
     try {
       setIsLoading(true);
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
+        update_exchange();
       } else {
-        await apiPostEngineeringExchange(body);
+        const res = await apiPostEngineeringExchange(body);
+        router.push({
+          query: { ...router.query, exchangeId: res.id },
+        });
       }
+
+      myAlert.success({ title: '更新調(退)貨單成功' });
     } catch (error) {
       myAlert.err({ title: '更新調(退)貨單失敗' });
     } finally {
       setIsLoading(false);
+      setDisabled(true);
     }
   };
 
@@ -289,14 +328,19 @@ export default function Edit() {
     {
       type: 'redButton',
       label: '儲存',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: reqPost,
     },
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/listOfDeliveryOrders',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
 
@@ -311,16 +355,21 @@ export default function Edit() {
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => router.back(),
+      onClick: () => {
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/listOfDeliveryOrders',
+          query: {
+            contractId,
+          },
+        });
+      },
     },
   ];
   const panelList_edit02: TpanelList = [
     {
       type: 'redButton',
       label: '儲存',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: reqPost,
     },
     {
       type: 'myButton',
@@ -369,6 +418,6 @@ const emptySignature = () => ({
 const emptyTransferOri = (): Ttransfer => ({
   goodsName: '',
   goodsSpec: '',
-  goodsQuantity: '',
+  goodsQuantity: 1,
   reason: '',
 });

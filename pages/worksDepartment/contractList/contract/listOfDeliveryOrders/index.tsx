@@ -2,7 +2,7 @@
 // 調(退)貨單列表
 // 調(退)貨單列表
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
@@ -14,7 +14,6 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 
 // api
 import {
-  TexchangeDto,
   Tparams,
   //
   useGetEngineeringExchanges,
@@ -45,8 +44,9 @@ export default function ListOfDeliveryOrders() {
   const { data: exchangeArr, update: update_exchange } = useGetEngineeringExchanges(customParams);
 
   useEffect(() => {
-    // update_exchange();
+    update_exchange();
     update_contract();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId]);
 
   // ----------------------------------------------------
@@ -63,8 +63,6 @@ export default function ListOfDeliveryOrders() {
         }),
     },
   ];
-
-  // ----------------------------------------------------
 
   // ----------------------------------------------------
   return (
@@ -91,7 +89,7 @@ export default function ListOfDeliveryOrders() {
               //
               // contractNumber,
               contract,
-              projectNumber,
+              projectNumber: projectNumber,
               projectName,
               requirementsDate,
               dispatchDate,
@@ -125,38 +123,6 @@ export default function ListOfDeliveryOrders() {
               </CellWithBar>
             );
           })}
-          {/*  */}
-          {/* {data.map((rowData, rowIndex) => {
-            const id = rowData.contractNumber;
-            const href = {
-              pathname: `${router.pathname}/edit`,
-              query: { ...router.query, id },
-            };
-            const onClick = () => router.push(href);
-
-            const rowItem: TrowItem = {
-              contractNumber: '',
-              projectNumber: '',
-              projectName: '',
-              neededDate: '',
-              applyDate: '',
-            };
-
-            return (
-              <CellWithBar className={style.row} key={rowIndex} onClick={onClick}>
-                {indexKeys.map((key, index) => {
-                  const value = rowData[key];
-
-                  return (
-                    <div key={index}>
-                      <span>{value}</span>
-                    </div>
-                  );
-                })}
-              </CellWithBar>
-            );
-          })} */}
-          {/*  */}
         </div>
       </div>
     </div>
@@ -197,19 +163,4 @@ const config: {
   dispatchDate: {
     label: '填表日期',
   },
-};
-
-const fakeDataListOri = (): TrowItem[] => {
-  const dataOri = () => ({
-    contractNumber: '111001',
-    projectNumber: 'M-1102112',
-    projectName: '台中港加工處理區-宇隆科技廠房增建工程A',
-    requirementsDate: '111-02-02',
-    dispatchDate: '111-02-02',
-  });
-  const arr = new Array(30).fill(undefined).map((item, index, arr) => {
-    return (arr[index] = dataOri());
-  });
-
-  return arr;
 };

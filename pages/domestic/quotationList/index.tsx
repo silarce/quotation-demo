@@ -6,7 +6,7 @@ import _ from 'lodash';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
-import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import ContractSelector from 'components/global/gear/modal/contractSelector';
 
@@ -310,7 +310,6 @@ export default function QuotationList() {
 
   return (
     <SubLayer>
-      {/* <PageHeader02 tag="預算" panelList={panelList} /> */}
       <PageHeader02 tag={statusLookup[status] ?? '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
@@ -334,42 +333,45 @@ export default function QuotationList() {
 }
 
 // ========================================================
-// ========================================================
-// ========================================================
-// ========================================================
 
 const ApprovalsBar = ({ router }: { router: NextRouter }) => {
   const query = router.query;
-  const linkList = [
+  const linkList: Tlink[] = [
     {
       label: '待審核',
-      href: {
-        pathname: '',
-        query: {
-          ...query,
-          reviewStatus: '待審核',
+      linkProps: {
+        href: {
+          pathname: '',
+          query: {
+            ...query,
+            reviewStatus: '待審核',
+          },
         },
       },
       isActive: !query.reviewStatus || query.reviewStatus === '待審核',
     },
     {
       label: '審核中',
-      href: {
-        pathname: '',
-        query: {
-          ...query,
-          reviewStatus: '審核中',
+      linkProps: {
+        href: {
+          pathname: '',
+          query: {
+            ...query,
+            reviewStatus: '審核中',
+          },
         },
       },
       isActive: query.reviewStatus === '審核中',
     },
     {
       label: '審核完成',
-      href: {
-        pathname: '',
-        query: {
-          ...query,
-          reviewStatus: '審核完成',
+      linkProps: {
+        href: {
+          pathname: '',
+          query: {
+            ...query,
+            reviewStatus: '審核完成',
+          },
         },
       },
       isActive: query.reviewStatus === '審核完成',

@@ -49,6 +49,7 @@ export default function QuotationPdf({
 
   const {
     // customerName,
+    projectName,
     customer,
     contactPerson,
     contactNumber,
@@ -64,6 +65,7 @@ export default function QuotationPdf({
     deliveryDate,
     deliveryLocation,
     paymentMethods,
+    validityPeriod,
   } = basicInfo;
 
   const agentName = agentEmployee.chName;
@@ -129,6 +131,7 @@ export default function QuotationPdf({
   const profilePram: Tprofile = (() => {
     const customerName = customer.name;
 
+    // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
     const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
@@ -137,8 +140,10 @@ export default function QuotationPdf({
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: dateString,
+      builtDate: dateString, // 報價日期
       projectAddress: county + district + address,
+      projectName: projectName,
+      validityPeriod: validityPeriod,
     };
   })();
   // -------------------------------
@@ -175,11 +180,12 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
+      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
         tradingLocation: deliveryLocation,
-        tradingDate: tradingDate,
+        tradingDate: tradingDate, // 交貨日期
         payWay,
       };
     })();
@@ -194,14 +200,15 @@ export default function QuotationPdf({
       const h = Number(prod.height) * 100;
       const b = Number(prod.thickness) * 100;
 
-      const size = `${lw} X ${h} + ${b}`;
+      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
       return {
         category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
-        thickness: prod.thickness,
+        // thickness: prod.thickness,
+        thickness: prod.thickness === '0' ? '' : prod.thickness,
         surface: prod.surface,
         // doorRail 要收圖片路徑
         doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
@@ -303,7 +310,7 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />

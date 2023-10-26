@@ -14,7 +14,6 @@ import PageHeader from 'components/page/worksDepartment/contracList/contract/gea
 import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
-import WorkProject from 'components/page/worksDepartment/contracList/contract/workContactDoc/workProject';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 
 // gear
@@ -26,10 +25,10 @@ import TextListEditor_v2, {
 
 // api
 import {
+  TupdateEngineeringContactDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
-  TupdateEngineeringContactDto,
-  TengineeringContactDto,
+  apiPostWorkSheet,
 } from 'js/api/api_engineering';
 
 import {
@@ -59,15 +58,15 @@ type Tprofile = {
   county: string;
   district: string;
   address: string;
-  projectPerson: string;
-  projectPersonNumber: string;
-  projectFaxNumber: string;
+  projectPrincipal: string;
+  constructionSitePrincipalContactNumber: string;
+  constructionSiteFaxNumber: string;
+  constructionSiteContactNumber: string;
   projectNumber: string;
-  engineeringNumber: string;
   contractor: string;
-  principal: string;
-  contactNumber: string;
-  faxNumber: string;
+  contractorPrincipal: string;
+  contractorContactNumber: string;
+  contractorFaxNumber: string;
 };
 
 // ============================================================================
@@ -82,6 +81,7 @@ export default function WorkContactDoc() {
 
   // ---------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
 
   const productArr = useMemo(() => {
     const list: { [key: string]: TquotationProductDto } = {};
@@ -111,7 +111,8 @@ export default function WorkContactDoc() {
   // ---------------------------------------------------------------------------
 
   /**data裡只會有一筆資料 */
-  const { data: engineeringContact, update: update_engineeringContact } = useGetEngineeringContact(contractId);
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
   useEffect(() => {
     (async () => {
@@ -129,7 +130,7 @@ export default function WorkContactDoc() {
         myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
       }
     })();
-  }, [contractId]);
+  }, [contractId, engineeringContactId]);
 
   // ---------------------------------------------------------------------------
 
@@ -212,15 +213,15 @@ export default function WorkContactDoc() {
       county,
       district,
       address,
-      projectPerson,
-      projectPersonNumber,
-      projectFaxNumber,
+      projectPrincipal,
+      constructionSitePrincipalContactNumber,
+      constructionSiteFaxNumber,
+      constructionSiteContactNumber,
       projectNumber,
-      engineeringNumber,
       contractor,
-      principal,
-      contactNumber,
-      faxNumber,
+      contractorPrincipal,
+      contractorContactNumber,
+      contractorFaxNumber,
     } = engineeringContact;
 
     if (annotations) {
@@ -234,15 +235,15 @@ export default function WorkContactDoc() {
       county,
       district,
       address,
-      projectPerson,
-      projectPersonNumber,
-      projectFaxNumber,
+      projectPrincipal,
+      constructionSitePrincipalContactNumber,
+      constructionSiteFaxNumber,
+      constructionSiteContactNumber,
       projectNumber,
-      engineeringNumber,
       contractor,
-      principal,
-      contactNumber,
-      faxNumber,
+      contractorPrincipal,
+      contractorContactNumber,
+      contractorFaxNumber,
     });
   };
 
@@ -324,68 +325,71 @@ export default function WorkContactDoc() {
     //
     /**工程負責人 */
     projectPerson: {
-      value: profile?.projectPerson ?? '',
+      value: profile?.projectPrincipal ?? '',
       onChange: (v) => {
-        profileChange('projectPerson', v);
+        profileChange('projectPrincipal', v);
       },
     },
     /**工程負責人聯絡電話 */
     projectPersonNumber: {
-      value: profile?.projectPersonNumber ?? '',
+      value: profile?.constructionSitePrincipalContactNumber ?? '',
       onChange: (v) => {
-        profileChange('projectPersonNumber', v);
+        profileChange('constructionSitePrincipalContactNumber', v);
       },
     },
     projectFaxNumber: {
-      value: profile?.projectFaxNumber ?? '',
-      // onChange: (v) => {
-      //   profileChange('projectFaxNumber', v);
-      // },
-      disabled: true,
+      value: profile?.constructionSiteFaxNumber ?? '',
+      onChange: (v) => {
+        profileChange('constructionSiteFaxNumber', v);
+      },
+      // disabled: true,
     },
     /**工地電話 */
     projectNumber: {
+      value: profile?.constructionSiteContactNumber ?? '',
+      onChange: (v) => {
+        profileChange('constructionSiteContactNumber', v);
+      },
+    },
+    //
+    //
+    //
+    /**工程編號 */
+    engineeringNumber: {
       value: profile?.projectNumber ?? '',
       onChange: (v) => {
         profileChange('projectNumber', v);
       },
-    },
-    /**工程編號 */
-    engineeringNumber: {
-      value: profile?.engineeringNumber ?? '',
-      // onChange: (v) => {
-      //   profileChange('engineeringNumber', v);
-      // },
-      disabled: true,
+      // disabled: true,
     },
     /**承包商 */
     contractor: {
       value: profile?.contractor ?? '',
-      // onChange: (v) => {
-      //   profileChange('contractor', v);
-      // },
-      disabled: true,
+      onChange: (v) => {
+        profileChange('contractor', v);
+      },
+      // disabled: true,
     },
     /**負責人 */
     principal: {
-      value: profile?.principal ?? '',
-      // onChange: (v) => {
-      //   profileChange('principal', v);
-      // },
-      disabled: true,
+      value: profile?.contractorPrincipal ?? '',
+      onChange: (v) => {
+        profileChange('contractorPrincipal', v);
+      },
+      // disabled: true,
     },
     /**公司電話 */
     contactNumber: {
-      value: profile?.contactNumber ?? '',
-      // onChange: (v) => {
-      //   profileChange('contactNumber', v);
-      // },
-      disabled: true,
+      value: profile?.contractorContactNumber ?? '',
+      onChange: (v) => {
+        profileChange('contractorContactNumber', v);
+      },
+      // disabled: true,
     },
     faxNumber: {
-      value: profile?.faxNumber ?? '',
+      value: profile?.contractorFaxNumber ?? '',
       onChange: (v) => {
-        profileChange('faxNumber', v);
+        profileChange('contractorFaxNumber', v);
       },
     },
   };
@@ -398,18 +402,8 @@ export default function WorkContactDoc() {
     }
 
     const body: TupdateEngineeringContactDto = {
-      // contractNumber: profile.contractNumber,
-      paymentStatus: profile.paymentStatus,
-      projectName: profile.projectName,
-      projectContent: profile.projectContent,
-      county: profile.county,
-      district: profile.district,
-      address: profile.address,
-      projectPerson: profile.projectPerson,
-      projectPersonNumber: profile.projectPersonNumber,
-      faxNumber: profile.faxNumber,
-      projectNumber: profile.projectNumber,
-      annotaion: annoArr,
+      ...profile,
+      annotations: annoArr,
     };
 
     try {
@@ -424,9 +418,29 @@ export default function WorkContactDoc() {
     }
   };
 
-  // ----------------------------------------------------------------------------
+  const reqCreateWorkSheet = async () => {
+    if (!contractId) {
+      return myAlert.info({ title: '無合約id', content: '請回到工務部合約列表再次選擇合約' });
+    }
 
-  const panelList_01: TpanelList = [{ type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }];
+    try {
+      setIsLoading(true);
+      await apiPostWorkSheet({ contractId });
+      myAlert.success({ title: '產生工作表成功' });
+    } catch (error) {
+      const err = error as Error;
+
+      myAlert.info({ title: '產生工作表失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ----------------------------------------------------------------------------
+  const panelList_01: TpanelList = [
+    contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
+    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+  ];
   const panelList_02: TpanelList = [
     { type: 'redButton', label: '上傳', onClick: reqPatch },
     {

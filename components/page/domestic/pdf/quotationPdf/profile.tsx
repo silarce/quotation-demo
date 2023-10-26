@@ -11,6 +11,8 @@ export type Tprofile = {
   fax: string;
   builtDate: string;
   projectAddress: string;
+  projectName: string;
+  validityPeriod: string;
 };
 
 export default function Profile({
@@ -22,10 +24,20 @@ export default function Profile({
   index: number;
   pageCount: number;
 }) {
-  const { quotationId, clientName, contactPerson, contactPhone, fax, builtDate, projectAddress } = profileData;
+  const {
+    quotationId,
+    clientName,
+    contactPerson,
+    contactPhone,
+    fax,
+    builtDate,
+    projectAddress,
+    validityPeriod,
+    projectName,
+  } = profileData;
 
   const [year, month, day] = builtDate.split('-');
-  const date = builtDate ? `${year}年${month}月${day}日` : '未定';
+  const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '未定';
 
   return (
     <div className={style.profile}>
@@ -38,7 +50,12 @@ export default function Profile({
             <span>{contactPerson}</span>
           </div>
           <div className={style.info}>
-            <span>客戶名稱</span>
+            <span className={style.flexSpan}>
+              <span>客</span>
+              <span>戶</span>
+              <span>名</span>
+              <span>稱</span>
+            </span>
             <span className={style.semi}>:</span>
             <span>{clientName}</span>
           </div>
@@ -69,7 +86,10 @@ export default function Profile({
           <div className={style.info}>
             <span>報價時效</span>
             <span className={style.semi}>:</span>
-            <span>{'十天內'}</span>
+            <span>
+              {validityPeriod}
+              {'天內'}
+            </span>
           </div>
           <div className={style.info}>
             <span>報價日期</span>
@@ -87,8 +107,23 @@ export default function Profile({
         </div>
       </div>
 
-      <div className={style.address}>
-        <span>工程名稱地點</span>
+      <div className={style.info2}>
+        <span className={style.flexSpan}>
+          <span>工</span>
+          <span>程</span>
+          <span>名</span>
+          <span>稱</span>
+        </span>
+        <span className={style.semi}>:</span>
+        <span>{projectName}</span>
+      </div>
+      <div className={style.info2}>
+        <span className={style.flexSpan}>
+          <span>工</span>
+          <span>程</span>
+          <span>地</span>
+          <span>點</span>
+        </span>
         <span className={style.semi}>:</span>
         <span>{projectAddress}</span>
       </div>
