@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { useRouter } from 'next/router';
 
 // layer
@@ -21,7 +21,9 @@ import WorkSheetProductOutline, {
 import WorkSheetProductDetail01, {
   Tcontrol_detail,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
-import WorkSheetOptional from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
+import WorkSheetOptional, {
+  Tcontrol_optional,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
 import WorkSheetProductDetail02, {
   Tcontrol_detail02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
@@ -61,64 +63,64 @@ type Tprofile = {
   faxNumber: string;
 };
 
-type TproductOutline = {
-  itemName: string;
-  doorType: string;
-  fullWidth: string;
-  height: string;
-  boxB: string;
-  quantity: string;
-  material: string;
-  isAntiTyphoon: boolean;
-};
+// type TproductOutline = {
+//   itemName: string;
+//   doorType: string;
+//   fullWidth: string;
+//   height: string;
+//   boxB: string;
+//   quantity: string;
+//   material: string;
+//   isAntiTyphoon: boolean;
+// };
 
-type Tdetail = {
-  reel: {
-    size: string;
-    hasConvex: string;
-  };
-  reelBox: {
-    material: string;
-    thickness: string;
-    surface: string;
-    front: string;
-    hasConvex: string;
-    type: string;
-  };
-  base: {
-    material: string;
-    angleMaterial: string;
-    baseMaterial: string;
-    type: string;
-    surface: string;
-  };
-  support: {
-    bearing: string;
-    chain: string;
-  };
-  //
-  doorPiece: {
-    material: string;
-    surface: string;
-  };
-  motor: {
-    horsepower: string;
-    manufacturer: string;
-    powerSupply: string;
-    voltage: string;
-    support: string;
-    chainType: string;
-    lockBox: string;
-  };
-  doorTrack: {
-    material: string;
-    thickness: string;
-    surface: string;
-    silencer: string;
-    doorTrackType: string;
-    doorTrackName: string;
-  };
-};
+// type Tdetail = {
+//   reel: {
+//     size: string;
+//     hasConvex: string;
+//   };
+//   reelBox: {
+//     material: string;
+//     thickness: string;
+//     surface: string;
+//     front: string;
+//     hasConvex: string;
+//     type: string;
+//   };
+//   base: {
+//     material: string;
+//     angleMaterial: string;
+//     baseMaterial: string;
+//     type: string;
+//     surface: string;
+//   };
+//   support: {
+//     bearing: string;
+//     chain: string;
+//   };
+//   //
+//   doorPiece: {
+//     material: string;
+//     surface: string;
+//   };
+//   motor: {
+//     horsepower: string;
+//     manufacturer: string;
+//     powerSupply: string;
+//     voltage: string;
+//     support: string;
+//     chainType: string;
+//     lockBox: string;
+//   };
+//   doorTrack: {
+//     material: string;
+//     thickness: string;
+//     surface: string;
+//     silencer: string;
+//     doorTrackType: string;
+//     doorTrackName: string;
+//   };
+// };
 
 // ====================================================================
 export default function WorkSheet() {
@@ -149,21 +151,21 @@ export default function WorkSheet() {
     })();
   }, []);
 
-  const productList = useMemo(() => {
-    const list: { [key: string]: TquotationProductDto } = {};
+  // const productList = useMemo(() => {
+  //   const list: { [key: string]: TquotationProductDto } = {};
 
-    if (!contract) {
-      return list;
-    }
+  //   if (!contract) {
+  //     return list;
+  //   }
 
-    contract.subContracts.forEach((item) => {
-      item.content.products.forEach((prod) => {
-        list[prod.rootProductId] = prod;
-      });
-    });
+  //   contract.subContracts.forEach((item) => {
+  //     item.content.products.forEach((prod) => {
+  //       list[prod.rootProductId] = prod;
+  //     });
+  //   });
 
-    return list;
-  }, [contract]);
+  //   return list;
+  // }, [contract]);
 
   // --------------------------------------------------------
   // --------------------------------------------------------
@@ -284,7 +286,7 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
-  const [others, setOthers] = useState<string[]>([]);
+  // const [others, setOthers] = useState<string[]>([]);
 
   // -------------------------------------------------------------------------
 
@@ -331,11 +333,23 @@ export default function WorkSheet() {
     //
   }, [engineeringContact]);
 
+  //
   useEffect(() => {
     if (disabled) {
       reset();
     }
   }, [disabled, itemTokenList]);
+  //
+
+  useEffect(() => {
+    if (!targetSheet) {
+      return;
+    }
+
+    if (targetSheet.accessoriesOptionArr.length === 0) {
+      targetSheet.getAccessoriesArr();
+    }
+  }, [targetSheet]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -865,6 +879,21 @@ export default function WorkSheet() {
   };
 
   // -------------------------------------------------------------------------
+
+  // Tcontrol_optional
+
+  const control_optional: Tcontrol_optional = {
+    value: targetSheet?.acceNameArr ?? [],
+    onChange: (arr: string[]) => {
+      if (targetSheet) {
+        targetSheet.acceNameArr = arr;
+      }
+    },
+  };
+
+  console.log(targetSheet?.acceNameArr);
+
+  // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
     {
       type: 'myButton',
@@ -946,11 +975,13 @@ export default function WorkSheet() {
 
             <hr />
             <WorkSheetOptional
-              value={others}
-              onChange={(arr) => {
-                setOthers(arr);
-              }}
-              optionArr={othersOptions}
+              // value={others}
+              // onChange={(arr) => {
+              //   setOthers(arr);
+              // }}
+              control={control_optional}
+              // optionArr={othersOptions}
+              optionArr={targetSheet?.accessoriesOptionArr_easy ?? []}
               disabled={disabled}
             />
             <hr />
@@ -966,20 +997,20 @@ export default function WorkSheet() {
 
 // ===========================================================================
 
-const othersOptions = [
-  { value: '門楣', label: '門楣' },
-  { value: '防颱底座鎖固', label: '防颱底座鎖固' },
-  { value: 'UL 熔金體', label: 'UL 熔金體' },
-  { value: '智慧型密碼開關', label: '智慧型密碼開關' },
-  { value: '遙控器(1:2)', label: '遙控器(1:2)' },
-  { value: '防颱活動中柱(滑軌)', label: '防颱活動中柱(滑軌)' },
-  { value: '颱風活動中柱(可拆式)', label: '颱風活動中柱(可拆式)' },
-  { value: '防爆裝置', label: '防爆裝置' },
-  { value: '手動關閉裝置', label: '手動關閉裝置' },
-  { value: 'UPS', label: 'UPS' },
-  { value: '煙感+中繼器', label: '煙感+中繼器' },
-  { value: '彈射門', label: '彈射門' },
-];
+// const othersOptions = [
+//   { value: '門楣', label: '門楣' },
+//   { value: '防颱底座鎖固', label: '防颱底座鎖固' },
+//   { value: 'UL 熔金體', label: 'UL 熔金體' },
+//   { value: '智慧型密碼開關', label: '智慧型密碼開關' },
+//   { value: '遙控器(1:2)', label: '遙控器(1:2)' },
+//   { value: '防颱活動中柱(滑軌)', label: '防颱活動中柱(滑軌)' },
+//   { value: '颱風活動中柱(可拆式)', label: '颱風活動中柱(可拆式)' },
+//   { value: '防爆裝置', label: '防爆裝置' },
+//   { value: '手動關閉裝置', label: '手動關閉裝置' },
+//   { value: 'UPS', label: 'UPS' },
+//   { value: '煙感+中繼器', label: '煙感+中繼器' },
+//   { value: '彈射門', label: '彈射門' },
+// ];
 
 // ============================================================================
 

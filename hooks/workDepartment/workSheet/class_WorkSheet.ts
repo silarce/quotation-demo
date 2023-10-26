@@ -5,6 +5,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
+import { apiGetProdAccessories, TdoorAccessoryDto } from 'js/api/api_product';
 
 // type
 import { TquotationProductDto, TquotationProductItemDto, TquotationProductComponentsDto } from 'js/api/dtoTypes';
@@ -36,49 +37,73 @@ class Class_workSheet {
     });
 
     this.comList = comList as { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
+
+    // 暫時先放進name，在getAccessoriesArr會改成放進id
+    this._acceIdArr = this._prod.accessories.map((item) => item.name);
   } //  constructor close
 
   // ---------------------------------------------------------------------
 
-  private _prod;
-  private forceUpdate;
-  private itemIdArr;
-  readonly oldProd;
+  private _prod: TquotationProductItemDto;
+  readonly oldProd: TquotationProductItemDto;
+  private forceUpdate: () => void;
+  private itemIdArr: string[];
   // ---------------------------------------------------------------------
 
-  private comList;
+  private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
+  private _acceIdArr: string[];
 
-  // ---------------------------------------------------------------------
-
-  // getWholeProduct() {
-  //   const req = async () => {
-  //     try {
-  //       const res = await apiGetQuotationProducts(this._prod.id);
-
-  //       if (res) {
-  //         this._prod = res;
-  //         this.forceUpdate();
-  //       }
-  //     } catch (error) {
-  //       const err = error as Error;
-  //       myAlert.err({ title: '取得產品資料失敗', content: err.message });
-  //     }
-  //   };
-
-  //   return req();
-  // }
+  private _accessoriesOptionArr: TdoorAccessoryDto[] = [];
+  private _accessoriesOptionList: { [key: string]: TdoorAccessoryDto } = {};
+  private _accessoriesOptionArr_easy: { value: string; label: string }[] = [];
 
   // ---------------------------------------------------------------------
 
-  // get rootProductId() {
-  //   return this._prod.rootProductId;
-  // }
+  async getAccessoriesArr() {
+    this._accessoriesOptionArr = [];
+    const res = await apiGetProdAccessories({ modelName: this.doorModelName });
+
+    if (res) {
+      this._accessoriesOptionArr = res;
+
+      const list: typeof this._accessoriesOptionList = {};
+      const arr: string[] = [];
+
+      this._accessoriesOptionArr.forEach((item) => {
+        list[item.id] = item;
+        this._accessoriesOptionArr_easy.push({ value: item.id, label: item.name });
+
+        const isHave = this._acceIdArr.some((name) => {
+          return name === item.name;
+        });
+
+        if (isHave) {
+          arr.push(item.id);
+        }
+      });
+
+      this._acceIdArr = arr;
+
+      this.forceUpdate();
+    }
+  }
+
+  // ---------------------------------------------------------------------
   get productId() {
     return this._prod.productId;
   }
 
-  //
-  //
+  get accessoriesOptionArr() {
+    return this._accessoriesOptionArr;
+  }
+  get accessoriesOptionArr_easy() {
+    return this._accessoriesOptionArr_easy;
+  }
+
+  // ---------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------
+
   get itemName() {
     return this._prod.itemName;
   }
@@ -487,6 +512,17 @@ class Class_workSheet {
   }
   set guideRail(str) {
     this._prod.guideRail = str;
+    this.forceUpdate();
+  }
+  // ----------------------------------------------------
+  // ----------------------------------------------------
+
+  get acceNameArr() {
+    return this._acceIdArr;
+  }
+
+  set acceNameArr(arr) {
+    this._acceIdArr = arr;
     this.forceUpdate();
   }
 
