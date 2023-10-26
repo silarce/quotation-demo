@@ -359,16 +359,17 @@ class Class_product {
       return '';
     }
 
-    return parseFloat(this._unitPrice).toLocaleString();
+    // return parseFloat(this._unitPrice).toLocaleString();
+    return String(this._unitPrice);
   }
   set unitPrice(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    // const numberRegex = /^(\d+(\.\d+)?|)$/;
 
-    if (!numberRegex.test(v)) {
-      return;
-    }
+    // if (!numberRegex.test(v)) {
+    //   return;
+    // }
 
     this._unitPrice = v;
     this._product.unitPrice = parseFloat(v || '0');
@@ -893,7 +894,9 @@ function prodCellConfigCre(): TprodCellConfig {
         inputSelProps: {
           wrapperStyle: { width: '120px' },
           inputProps: {
-            props: {},
+            props: {
+              type: 'number',
+            },
           },
         },
       },

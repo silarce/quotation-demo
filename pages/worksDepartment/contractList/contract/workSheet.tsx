@@ -15,6 +15,7 @@ import WorkSheetProfile, {
 import WorkSheetProdCard from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
 import WorkSheetProductOutline, {
   Tcontrol_productOutline,
+  ToldProductOutline,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
 import WorkSheetProductDetail01, {
   Tcontrol_detail,
@@ -25,19 +26,22 @@ import WorkSheetProductDetail02, {
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 
 // gear
-// import InputSel from 'components/global/gear/inputAndSel/inputSel';
-// import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
-// import { SingleValueWithIcon01 } from 'components/global/gear/select/singleValueWithIcon';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetEngineeringContact, useGetWorkSheet } from 'js/api/api_engineering';
+
+// hook
+import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
 
 // css
 import scss from './workSheet.module.scss';
 
 // image
 import imgIdk from 'public/image/fake/idk01.png';
+
+import type { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 // ====================================================================
 
@@ -120,15 +124,28 @@ export default function WorkSheet() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
+  const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
-
-  const [targetProd, setTargetProd] = useState<TquotationProductDto>();
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  // const engineeringContactId = contract?.engineeringContactId;
+  const { engineeringContactId, worksheetId } = contract ?? {};
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+  const { workSheet, update_workSheet } = useGetWorkSheet(worksheetId);
 
   useEffect(() => {
-    update_contract();
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   const productList = useMemo(() => {
@@ -146,7 +163,81 @@ export default function WorkSheet() {
 
     return list;
   }, [contract]);
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  const { itemTokenList, itemIdArrList } = useMemo(() => {
+    /**
+送給後端的item必須要有id，
 
+要將同一類的所有id，以arr的形式紀錄，就叫itemIdArr好了，然後送進class裡面
+未來要分堆的時候，就切割itemIdArr，送到另一堆的class就可以了
+
+送給後端時，依照itemIdArr的length產生item，並把id放進去
+
+送給後端時，只可以送有更改過的prod
+用useWorkSheet裡的changedList配合forceUpdate紀錄
+
+ */
+    if (!workSheet?.contractProductItems) {
+      return {};
+    }
+
+    const contractProductItems = workSheet.contractProductItems;
+
+    const itemTokenList: { [key: string]: TquotationProductItemDto } = {};
+    const itemIdArrList: { [key: string]: string[] } = {};
+
+    contractProductItems.forEach((item) => {
+      const productId = item.productId;
+      itemTokenList[productId] = item;
+
+      if (!itemIdArrList[productId]) {
+        itemIdArrList[productId] = [];
+      }
+
+      itemIdArrList[productId].push(item.id);
+    });
+
+    return {
+      itemTokenList,
+      itemIdArrList,
+    };
+
+    // console.log(workSheet);
+  }, [workSheet]);
+
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  // --------------------------------------------------------
+  useEffect(() => {
+    (async () => {
+      try {
+        const res01 = update_engineeringContact();
+        const res02 = update_workSheet();
+        await Promise.all([res01, res02]);
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+
+  const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
+
+  const { sheetList, reset } = useWorkSheet({ itemTokenList: itemTokenList ?? {} });
+
+  // console.log(productList);
+  // console.log(sheetList);
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
   const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
@@ -156,12 +247,12 @@ export default function WorkSheet() {
   };
 
   // ______________________________________________________________
-  const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
-  const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
+  // const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
+  // const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
 
-  const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
-    setProdcutOutline((state) => ({ ...state, [key]: value }));
-  };
+  // const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
+  //   setProdcutOutline((state) => ({ ...state, [key]: value }));
+  // };
 
   // ______________________________________________________________
 
@@ -188,83 +279,54 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   useEffect(() => {
-    if (!contract) {
+    if (!engineeringContact) {
       return;
     }
 
-    const { projectName: projectName_contract, county, district, address } = contract.content;
-
     const {
+      //
       projectName,
       projectContent,
-      /**工地電話 */
       projectNumber,
-      /**工地傳真 */
-      projectFaxNumber,
-      /**工程負責人 */
-      projectPerson,
-      /**工程負責人聯絡電話 */
-      projectPersonNumber,
-    } = creEmptyProfile();
+      projectPrincipal,
+      constructionSitePrincipalContactNumber,
+      constructionSiteFaxNumber,
+      constructionSiteContactNumber,
+      contractor,
+      contractorPrincipal,
+      contractorContactNumber,
+      contractorFaxNumber,
+
+      //
+      county,
+      district,
+      address,
+    } = engineeringContact;
 
     setProfile({
-      projectName: projectName || projectName_contract,
+      projectName: projectName,
       projectContent,
-      projectNumber,
-      projectFaxNumber,
-      projectPerson,
-      projectPersonNumber,
+      projectNumber: constructionSiteContactNumber,
+      projectFaxNumber: constructionSiteFaxNumber,
+      projectPerson: projectPrincipal,
+      projectPersonNumber: constructionSitePrincipalContactNumber,
       allAddress: `${county}${district}${address}`,
-      engineeringNumber: '999',
-      contractor: '999',
-      principal: '999',
-      contactNumber: '999',
-      faxNumber: '999',
+      engineeringNumber: projectNumber,
+      contractor: contractor,
+      principal: contractorPrincipal,
+      contactNumber: contractorContactNumber,
+      faxNumber: contractorFaxNumber,
     });
 
     //
-  }, [contract]);
+  }, [engineeringContact]);
 
-  // -------------------------------------------------------------------------
+  useEffect(() => {
+    if (disabled) {
+      reset();
+    }
+  }, [disabled, productList]);
 
-  // TODO 串接上api後，要放入取得的資料
-  // useEffect(() => {
-  //   setOldProduct({
-  //     itemName: sheet.itemName,
-  //     doorType: sheet.doorType,
-  //     fullWidth: sheet.fullWidth,
-  //     height: sheet.height,
-  //     boxB: sheet.boxB,
-  //     quantity: sheet.quantity,
-  //     material: sheet.material,
-  //     isAntiTyphoon: sheet.isAntiTyphoon,
-  //   });
-  // }, [sheet]);
-  // -------------------------------------------------------------------------
-  // const { control, handleSubmit, watch, setValue } = useForm({ defaultValues: fakeWorkSheet });
-
-  // const fakeWorkSheet_ori = useMemo(() => {
-  //   const copy = _.cloneDeep(watch());
-  //   const keyArr = ['itemName', 'doorType', 'length', 'height', 'thickness', 'quantity', 'material'] as const;
-
-  //   keyArr.forEach((key) => {
-  //     setValue(key, '');
-  //   });
-  //   setValue('typhoonProtection', true);
-
-  //   return copy;
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  // // console.log(watch())
-  // // console.log(watch("doorType"))
-
-  // const onSubmit: SubmitHandler<TfakeworkSheet> = (data) => {
-  //   // alert(JSON.stringify(data));
-  //   console.log(data);
-  // };
-
-  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {
@@ -344,53 +406,82 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
+  const oldProductOutline = {
+    itemName: targetSheet?.oldProd.itemName ?? '',
+    doorType: targetSheet?.oldProd.doorModelName ?? '',
+    fullWidth: String(targetSheet?.oldProd.fullWidth ?? ''),
+    height: String(targetSheet?.oldProd.height ?? ''),
+    boxB: String(targetSheet?.oldProd.boxB ?? ''),
+    quantity: targetSheet?.quantity ?? '',
+    material: targetSheet?.oldProd.materialName ?? '',
+    isAntiTyphoon: !!targetSheet?.oldProd.isAntiTyphoon,
+  };
+
+  // -------------------------------------------------------------------------
+
   const control_product: Tcontrol_productOutline = {
     itemName: {
-      value: productOutline.itemName,
+      value: targetSheet?.itemName ?? '',
       onChange: (v) => {
-        changeProduct('itemName', v);
+        if (targetSheet) {
+          targetSheet.itemName = v;
+        }
       },
     },
     doorType: {
-      value: productOutline.doorType,
+      value: targetSheet?.doorModelName ?? '',
       onChange: (v) => {
-        changeProduct('doorType', v);
+        if (targetSheet) {
+          targetSheet.doorModelName = v;
+        }
       },
     },
     fullWidth: {
-      value: productOutline.fullWidth,
+      value: targetSheet?.fullWidth ?? '',
       onChange: (v) => {
-        changeProduct('fullWidth', v);
+        if (targetSheet) {
+          targetSheet.fullWidth = v;
+        }
       },
     },
     height: {
-      value: productOutline.height,
+      value: targetSheet?.height ?? '',
       onChange: (v) => {
-        changeProduct('height', v);
+        if (targetSheet) {
+          targetSheet.height = v;
+        }
       },
     },
     boxB: {
-      value: productOutline.boxB,
+      value: targetSheet?.boxB ?? '',
       onChange: (v) => {
-        changeProduct('boxB', v);
+        if (targetSheet) {
+          targetSheet.boxB = v;
+        }
       },
     },
     quantity: {
-      value: productOutline.quantity,
-      onChange: (v) => {
-        changeProduct('quantity', v);
-      },
+      value: targetSheet?.quantity ?? '',
+      // onChange: (v) => {
+      //   if (targetSheet) {
+      //     targetSheet.quantity = v;
+      //   }
+      // },
     },
     material: {
-      value: productOutline.material,
+      value: targetSheet?.materialName ?? '',
       onChange: (v) => {
-        changeProduct('material', v);
+        if (targetSheet) {
+          targetSheet.materialName = v;
+        }
       },
     },
     isAntiTyphoon: {
-      value: productOutline.isAntiTyphoon,
+      value: !!targetSheet?.isAntiTyphoon,
       onChange: (v) => {
-        changeProduct('isAntiTyphoon', v);
+        if (targetSheet) {
+          targetSheet.isAntiTyphoon = v;
+        }
       },
     },
   };
@@ -686,7 +777,7 @@ export default function WorkSheet() {
   // -----------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} />
 
       <form>
@@ -695,15 +786,15 @@ export default function WorkSheet() {
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
-            {Object.keys(productList).map((key) => {
-              const prod = productList[key];
-              const { rootProductId, itemName, doorModelName, quantity } = prod;
+            {Object.keys(sheetList).map((key) => {
+              const sheet = sheetList[key];
+              const { itemName, doorModelName, quantity } = sheet;
 
               const onClick = () => {
-                setTargetProd(prod);
+                setTargetSheet(sheet);
               };
 
-              const isActive = rootProductId === targetProd?.rootProductId;
+              const isActive = key === targetSheet?.productId;
 
               const control = {
                 itemName,

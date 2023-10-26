@@ -65,6 +65,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [showPdf, setShowPdf] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
     populate: ['customer', 'products', 'additions', 'priceRecord'],
@@ -277,6 +279,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             isAppend={true}
             isAppending={isAppending}
             difference_prod={difference_prod}
+            control_vKeyArr={{
+              vKeyArr: verticalKeyArr,
+              onChange: setVerticalKeyArr,
+            }}
           />
           {/* 配件設定 */}
           <QuotationAdditions
@@ -319,6 +325,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setShowPdf(false);
         }}
         classLegacyContract={classLegacyContract}
+        verticalKeyArr={verticalKeyArr}
       />
     </SubLayer>
   );

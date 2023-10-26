@@ -49,6 +49,7 @@ export default function QuotationPdf({
 
   const {
     // customerName,
+    projectName,
     customer,
     contactPerson,
     contactNumber,
@@ -130,6 +131,7 @@ export default function QuotationPdf({
   const profilePram: Tprofile = (() => {
     const customerName = customer.name;
 
+    // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
     const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
@@ -138,8 +140,9 @@ export default function QuotationPdf({
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: dateString,
+      builtDate: dateString, // 報價日期
       projectAddress: county + district + address,
+      projectName: projectName,
       validityPeriod: validityPeriod,
     };
   })();
@@ -177,11 +180,12 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
+      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
         tradingLocation: deliveryLocation,
-        tradingDate: tradingDate,
+        tradingDate: tradingDate, // 交貨日期
         payWay,
       };
     })();
@@ -306,7 +310,7 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />

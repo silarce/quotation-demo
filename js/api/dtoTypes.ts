@@ -405,6 +405,11 @@ export type TlegacyContractProductDto = {
   batchNumber: string;
 };
 
+export type TlegacyContractProductItemDto = Omit<TlegacyContractProductDto, 'batch' | 'batchNumber' | 'quantity'> & {
+  productId: string;
+  product: TlegacyContractProductDto;
+};
+
 /**舊合約額外項目 */
 export type TlegacyContractAdditionDto = {
   id: string;
@@ -936,12 +941,35 @@ export type TquotationProductDto = {
 
   attachedToProductId?: string | null;
   attachedToProduct?: TquotationProductDto | null;
-  // api實際上還沒加上去
+
   rootProductId: string;
 
   // 前端用的，後端沒有
   // 只是為了方便才寫在這邊
   reduceQty?: number;
+};
+
+export type TquotationProductItemDto = Omit<
+  TquotationProductDto,
+  | 'order'
+  | 'items'
+  | 'distributionBoxPrice'
+  | 'distributionBoxUnitPrice'
+  | 'installationFeePrice'
+  | 'installationFeeDualPrice'
+  | 'installationFeeQuantity'
+  | 'installationFeeUnitPrice'
+  | 'installationFeeTotalPrice'
+  | 'attachedToProductId'
+  | 'attachedToProduct'
+  | 'rootProductId'
+  | 'reduceQty'
+  | 'quantity'
+> & {
+  components: TquotationProductComponentsDto[];
+  accessories: TquotationProductAccessoriesDto[];
+  product: TquotationProductDto;
+  productId: string;
 };
 
 type TquotationContentDto_foo = {
@@ -1208,29 +1236,6 @@ export type TcreateQuotationProductDto = {
   installationFeeTotalPrice: number;
 };
 
-// type TupdateQuotationContentDto = {
-//   quotationDate: string; // 報價日期
-//   validityPeriod: string; // 報價時效
-//   customerId: string;
-//   projectName: string; // 工程名稱
-//   county: string; // 縣市
-//   district: string; // 區
-//   address: string; // 剩餘地址
-//   contactPerson: string; //  聯絡人
-//   contactNumber: string; //  聯絡電話
-//   faxNumber: string; // 傳真號碼
-//   trackProgress: string; // 追蹤狀態
-//   projectProgress: string; //工地進度
-//   quantity: number; // 樘數
-//   editNotes: string; // 編輯備註
-//   status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
-//   /**備註 */
-//   annotations: string[] | null;
-//   /**報價範圍 */
-//   quotationRanges: string[] | null;
-//   managerId: string | null;
-// };
-
 export type TcreateQuotationContentDto = {
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
@@ -1293,6 +1298,7 @@ export type TquotationContractDto = {
   //
   subContracts: TquotationContractDto[];
   engineeringContactId: string | null;
+  worksheetId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
@@ -1758,6 +1764,7 @@ export type TengineeringContactDto = {
   createdAt: string;
   updatedAt: string;
   contractNumber: string;
+
   /**請款狀態 */
   paymentStatus: string;
   projectName: string;
@@ -1767,23 +1774,25 @@ export type TengineeringContactDto = {
   district: string;
   address: string;
   /**工程負責人 */
-  projectPerson: string;
+  projectPrincipal: string;
   /**工程負責人聯絡電話 */
-  projectPersonNumber: string;
-  projectFaxNumber: string;
+  constructionSitePrincipalContactNumber: string;
+  /**工地傳真 */
+  constructionSiteFaxNumber: string;
   /**工地電話 */
-  projectNumber: string;
+  constructionSiteContactNumber: string;
   /**工程編號 */
-  engineeringNumber: string;
+  projectNumber: string;
   /**承包商 */
   contractor: string;
-  /**負責人 */
-  principal: string;
-  /**公司電話 */
-  contactNumber: string;
-  faxNumber: string;
+  /**承包商負責人 */
+  contractorPrincipal: string;
+  /**承包商公司電話 */
+  contractorContactNumber: string;
+  contractorFaxNumber: string;
   /**備註列表 */
   annotations: string[] | null;
+  //
   contractId?: string | null;
   contract?: TquotationContractDto | null;
   quotationId?: string | null;
@@ -1795,6 +1804,7 @@ export type TupdateEngineeringContactDto = {
   contractNumber?: string;
   /**請款狀態 */
   paymentStatus?: string;
+  /**工程名稱 */
   projectName?: string;
   /**工程內容 */
   projectContent?: string;
@@ -1802,14 +1812,25 @@ export type TupdateEngineeringContactDto = {
   district?: string;
   address?: string;
   /**工程負責人 */
-  projectPerson?: string;
+  projectPrincipal?: string;
   /**工程負責人聯絡電話 */
-  projectPersonNumber?: string;
-  faxNumber?: string;
-  /**備註列表 */
-  annotaion?: string[] | null;
+  constructionSitePrincipalContactNumber?: string;
+  constructionSiteFaxNumber?: string;
   /**工地電話 */
-  projectNumber?: string;
+  constructionSiteContactNumber?: string;
+  /**工程編號 */
+  projectNumber: string;
+  /**承包商 */
+  contractor: string;
+  /**承包商負責人 */
+  contractorPrincipal: string;
+  /**承包商公司電話 */
+  contractorContactNumber: string;
+  /**承包商公司傳真 */
+  contractorFaxNumber: string;
+
+  /**備註列表 */
+  annotations?: string[] | null;
 };
 
 export type TcreateEngineeringContactDto = {
@@ -1838,7 +1859,7 @@ export type TdispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  engineeringNumber: string;
+  projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1880,7 +1901,7 @@ export type TcreateDispatchingDto = {
   // 工程詳細地址;
   address: string;
   // 工程編號;
-  engineeringNumber: string;
+  projectNumber: string;
   // 管制卡編號;
   badgeNumber: string;
   // 工務人員ID
@@ -1895,12 +1916,26 @@ export type TcreateDispatchingDto = {
   note: string | null;
 };
 
-export type TcreateElectronicSuppliesRecordDto = {
+export type TelectronicSuppliesRecordDto = {
+  id: string;
+  electronicSuppliesId: string; // 前端用不到
+  createdAt: string;
+  updatedAt: string;
   doorType: string;
   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
   category: string;
   quantity: string;
 };
+
+export type TcreateElectronicSuppliesRecordDto = {
+  id?: string; // 後端沒有，前端為了方便加上去的
+  doorType: string;
+  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+  category: string;
+  quantity: string;
+};
+
+export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
 
 export type TelectronicSuppliesDto = {
   id: string;
@@ -1916,7 +1951,7 @@ export type TelectronicSuppliesDto = {
   // 工程名稱
   projectName: string;
 
-  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+  electronicSuppliesRecords: TelectronicSuppliesRecordDto[];
   // others: string;
 
   // 備料人員Id
@@ -1951,9 +1986,14 @@ export type TcreateElectronicSuppliesDto = Omit<
   | 'materialHandler'
   | 'ingredientTechnician'
   | 'formCompleter'
->;
+  | 'electronicSuppliesRecords'
+> & {
+  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+};
 
-export type TupdateElectronicSuppliesDto = Partial<TcreateElectronicSuppliesDto>;
+export type TupdateElectronicSuppliesDto = Omit<Partial<TcreateElectronicSuppliesDto>, 'electronicSuppliesRecords'> & {
+  electronicSuppliesRecords: TupdateElectronicSuppliesRecordDto[];
+};
 
 export type TexchangeRecordDto = {
   id: string;
@@ -1965,7 +2005,13 @@ export type TexchangeRecordDto = {
   reason: string;
 };
 
-export type TcreateExchangeRecordDto = Omit<TexchangeRecordDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateExchangeRecordDto = {
+  id?: string;
+  goodsName: string;
+  goodsSpec: string;
+  goodsQuantity: number;
+  reason: string;
+};
 
 export type TexchangeDto = {
   id: string;
@@ -2003,6 +2049,23 @@ export type TcreateExchgangeDto = {
   factoryEmployeeId: string;
   supervisorId: string;
   formCompleterId: string;
+  contractId?: string | null;
+  legacyContractId?: string | null;
+};
+
+export type TworkSheetDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractProductItems: TquotationProductItemDto[];
+  legacyProductItems: TlegacyContractProductItemDto[];
+  contractId: string | null;
+  contract?: TquotationContentDto;
+  legacyContractId: string | null;
+  legacyContract?: TlegacyContractDto;
+};
+
+export type TcreateWorkSheetDto = {
   contractId?: string | null;
   legacyContractId?: string | null;
 };

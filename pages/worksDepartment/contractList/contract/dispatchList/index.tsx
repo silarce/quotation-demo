@@ -12,7 +12,7 @@ import Profile, { Tprofile01 } from 'components/page/worksDepartment/contracList
 import List from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
 
 // api
-import { Tparams, useGetEngineeringDispatchingList } from 'js/api/api_engineering';
+import { Tparams, useGetEngineeringContact, useGetEngineeringDispatchingList } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // helper
@@ -29,6 +29,9 @@ export default function DispatchList() {
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
   const params: Tparams = {
     filter: {
@@ -42,6 +45,12 @@ export default function DispatchList() {
     update();
     update_contract();
   }, []);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
+
+  console.log(engineeringContact);
 
   // ----------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>(creEmptyProfile());
@@ -57,39 +66,41 @@ export default function DispatchList() {
   };
 
   useEffect(() => {
-    if (contract) {
+    if (engineeringContact) {
       const dispatching = dispatchingArr?.[0];
 
       setProfile01(() => {
         const {
           projectName,
           // contactPerson,
-          contactNumber,
+          projectNumber,
+          contractor,
+          constructionSitePrincipalContactNumber,
           // quotationNumber,
 
           county,
           district,
           address,
-        } = contract.content;
+        } = engineeringContact;
 
         const allAddress = `${county}${district}${address}`;
 
         return {
           projectName: projectName,
-          contractor: dispatching?.contractor ?? '',
-          // 這是承包商的聯絡人，所以不應該帶入合約的聯絡人資料
+          contractor: contractor ?? '',
+          // 這是承包商的聯絡人
           contractorContactPerson: dispatching?.contractorContactPerson ?? '',
-          constructionSiteContactNumber: contactNumber,
+          constructionSiteContactNumber: constructionSitePrincipalContactNumber,
           allAddress,
           //
-          engineeringNumber: dispatching?.engineeringNumber ?? '',
+          projectNumber: projectNumber ?? '',
           badgeNumber: dispatching?.badgeNumber ?? '',
         };
       });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
+  }, [engineeringContact]);
 
   // ----------------------------------------------------
   // dispatchingArr
@@ -149,6 +160,6 @@ const creEmptyProfile = (): Tprofile01 => ({
   contractorContactPerson: '',
   constructionSiteContactNumber: '',
   allAddress: '',
-  engineeringNumber: '',
+  projectNumber: '',
   badgeNumber: '',
 });

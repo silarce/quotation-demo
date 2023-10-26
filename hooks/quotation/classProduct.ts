@@ -487,6 +487,12 @@ class Class_product {
       discount: this._prodData.discount,
       itemName: this._prodData.itemName,
       quoteType: this._prodData.quoteType,
+      //
+      material: this._prodData.material,
+      surface: this._prodData.surface,
+      doorTrack: this._prodData.doorTrack,
+      typhoonProtection: this._prodData.typhoonProtection,
+      notes: this._prodData.notes,
     };
 
     this._quantity = String(this._prodData.quantity);
@@ -511,6 +517,39 @@ class Class_product {
     // this.takeDefaultDynaValue();
     // this.findBDoptions();
   } // resetProd
+
+  clearProd_all() {
+    const empty = emptyProdOri();
+
+    const prod: Tprod = {
+      ...empty,
+      doorType: this.doorType,
+      quoteType: this._prodData.quoteType,
+      itemName: this._prodData.itemName,
+    };
+
+    this._prodData = prod;
+
+    this._quantity = String(this._prodData.quantity);
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
+    this._unitPrice = String(this._prodData.unitPrice);
+    this._totalPrice = String(this._prodData.totalPrice);
+
+    this.comList = undefined;
+    this.accessoriesList = {};
+    this._doorGeneralSpecs = undefined;
+    this._availableComponents = undefined;
+
+    this._prodData.boxB = '';
+    this._defaultBoxB = '';
+    this._prodData.thickness = '';
+
+    this.options_boxB = undefined;
+    this.options_boxD = undefined;
+
+    this.creSubComList();
+  }
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -1126,7 +1165,7 @@ class Class_product {
     };
   } // calcComAllPrice
 
-  private calcArea = () => {
+  private calcArea() {
     const h = Number(this._prodData.height || 0);
     const b = Number(this._prodData.boxB || 0);
     // const w = Number(this._prodData.WG || 0);
@@ -1139,7 +1178,7 @@ class Class_product {
       .toString();
 
     return area;
-  };
+  }
 
   /**所有acce執行calcPrice */
   calcChangeAccePrice() {
@@ -1149,11 +1188,11 @@ class Class_product {
   }
 
   /**計算才數 */
-  private calcVolume = () => {
+  private calcVolume() {
     return Decimal.mul(this.area || 0, 10.89)
       .toFixed(2)
       .toString();
-  };
+  }
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -1471,7 +1510,7 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
-    this.clearProd();
+    this.clearProd_all();
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -1725,10 +1764,21 @@ class Class_product {
       }
     }
 
+    const originallyIsZero = this._quantity === '0';
+
     this._prodData.quantity = Number(v);
     this._quantity = v;
 
     this.calcProdAllprice_timeout();
+
+    if (originallyIsZero) {
+      // 呼叫callAllReq後就會再自動算金額了
+      this.shouldCall_cgs = true;
+      this.shouldCall_pac = true;
+      this.shouldCall_pgpb = true;
+      this.callAllReq();
+    }
+
     this.reRender();
   }
 
@@ -2089,11 +2139,11 @@ class Class_product {
   }
 
   // 清空變更prod
-  clearAttach = () => {
+  clearAttach() {
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.reRender();
-  };
+  }
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------

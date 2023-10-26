@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -29,6 +30,7 @@ import {
   useGetEngineeringExchanges_id,
   apiPostEngineeringExchange,
   apiPatchEngineeringExchange,
+  useGetEngineeringContact,
 } from 'js/api/api_engineering';
 
 // -----------------------------------------------------------
@@ -48,6 +50,7 @@ type Tsignature = {
 };
 
 type Ttransfer = {
+  id?: string;
   goodsName: string;
   goodsSpec: string;
   goodsQuantity: number;
@@ -64,6 +67,10 @@ export default function Edit() {
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
   const { data: exchange, update: update_exchange } = useGetEngineeringExchanges_id(exchangeId);
 
   useEffect(() => {
@@ -87,6 +94,9 @@ export default function Edit() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, exchangeId]);
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Tprofile>(emptyProfileOri());
@@ -142,10 +152,10 @@ export default function Edit() {
   // ----------------------------------------------------
 
   useEffect(() => {
-    const { projectName: projectName_contract } = contract?.content ?? {};
+    const { projectName, projectNumber } = engineeringContact ?? {};
     const {
-      projectName,
-      projectNumber: engineeringNumber,
+      // projectName,
+      // projectNumber: engineeringNumber,
       requirementsDate,
       dispatchDate,
       //
@@ -157,8 +167,8 @@ export default function Edit() {
     } = exchange ?? {};
 
     setProfile({
-      projectNumber: engineeringNumber ?? '',
-      projectName: (projectName || projectName_contract) ?? '',
+      projectNumber: projectNumber ?? '',
+      projectName: projectName ?? '',
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
     });
@@ -171,9 +181,11 @@ export default function Edit() {
       formCompleter,
     });
 
-    setTransferArr(exchange?.exchangeRecords ?? []);
+    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
+    setTransferArr(recoreds);
+
     //
-  }, [contract, exchange, disabled]);
+  }, [engineeringContact, exchange, disabled]);
 
   // ----------------------------------------------------
 
@@ -181,11 +193,14 @@ export default function Edit() {
     projectNumber: {
       value: profile.projectNumber,
       onChange: (v: string) => changeProfile('projectNumber', v),
+      disabled: true,
+      showBaseline: 'invisible',
     },
     projectName: {
       value: profile.projectName,
       onChange: (v: string) => changeProfile('projectName', v),
       disabled: true,
+      showBaseline: 'invisible',
     },
     requirementsDate: {
       value: profile.requirementsDate,

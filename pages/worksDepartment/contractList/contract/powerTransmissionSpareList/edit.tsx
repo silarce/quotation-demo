@@ -29,6 +29,7 @@ import {
   // TelectronicSuppliesDto,
   TcreateElectronicSuppliesRecordDto,
   useGetElectronicSupplies_id,
+  useGetEngineeringContact,
 } from 'js/api/api_engineering';
 
 // css
@@ -83,11 +84,14 @@ type TemployeeList = {
 //   防颱中柱: { qty: string; itemName: string; category: string };
 // };
 type Tsheet = {
-  [key: string]: { itemName: string; category: string; quantity: string } | undefined;
-};
-
-type Tsheet_else = {
-  others: string;
+  [key: string]:
+    | {
+        id?: string;
+        itemName: string;
+        category: string;
+        quantity: string;
+      }
+    | undefined;
 };
 
 // =================================================================
@@ -98,11 +102,15 @@ export default function Edit() {
     electronicSuppliesId: string | undefined;
   };
 
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(!!electronicSuppliesId);
   const [isLoading, setIsLoading] = useState(false);
 
   // ----------------------------------------------------
   const { data: contract, update } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
   const { data: electronicSupplies, update: update_electronicSupplies } =
     useGetElectronicSupplies_id(electronicSuppliesId);
 
@@ -110,7 +118,10 @@ export default function Edit() {
     update();
     update_electronicSupplies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId]);
+  }, [contractId, electronicSuppliesId]);
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Tprofile>(cre_emptyProfile());
@@ -133,15 +144,15 @@ export default function Edit() {
     setProfile((state) => {
       return {
         ...state,
-        projectName: contract?.content.projectName ?? '',
+        projectName: engineeringContact?.projectName ?? '',
+        projectNumber: engineeringContact?.projectNumber ?? '',
       };
     });
-  }, [contract]);
+  }, [engineeringContact]);
 
   // ----------------------------------------------------
 
   const [sheet, setSheet] = useState<Tsheet>({});
-  // const [sheet_else, setSheet_else] = useState<Tsheet_else>({ others: '' });
 
   const changeSheet = ({
     //
@@ -157,6 +168,7 @@ export default function Edit() {
       return {
         ...state,
         [key]: {
+          id: state[key]?.id,
           itemName,
           category: key,
           quantity: quantity,
@@ -164,15 +176,6 @@ export default function Edit() {
       };
     });
   };
-
-  // const changeSheet_else = (key: keyof Tsheet_else, v: string) => {
-  //   setSheet_else((state) => {
-  //     return {
-  //       ...state,
-  //       [key]: v,
-  //     };
-  //   });
-  // };
 
   // ---------------------------------------------------------------------
 
@@ -187,7 +190,6 @@ export default function Edit() {
       formCompleter,
       electronicSuppliesRecords,
     } = electronicSupplies ?? {};
-    // const {} = contract ?? {};
     const projectName_contract = contract?.content.projectName ?? '';
 
     setProfile({
@@ -205,7 +207,19 @@ export default function Edit() {
 
     const sheet: Tsheet = {};
     electronicSuppliesRecords?.forEach((item) => {
+      if (item.itemName === '其他') {
+        sheet.other = {
+          id: item.id,
+          itemName: item.itemName,
+          category: item.category,
+          quantity: item.quantity,
+        };
+
+        return;
+      }
+
       sheet[item.category] = {
+        id: item.id,
         itemName: item.itemName,
         category: item.category,
         quantity: item.quantity,
@@ -213,11 +227,6 @@ export default function Edit() {
     });
 
     setSheet(sheet);
-
-    // setSheet_else({
-    //   // others: electronicSupplies?.others ?? '',
-    //   others: '',
-    // });
   }, [contract, electronicSupplies]);
 
   // ---------------------------------------------------------------------
@@ -287,7 +296,6 @@ export default function Edit() {
     '3HP馬達控制箱380v': {
       value: sheet['3HP馬達控制箱380v']?.quantity ?? '',
       onChange: (quantity, itemName) => {
-        console.log('foo');
         changeSheet({ key: '3HP馬達控制箱380v', quantity, itemName });
       },
     },
@@ -412,6 +420,7 @@ export default function Edit() {
           return {
             ...state,
             other: {
+              ...state.other,
               itemName: '其他',
               category: v,
               quantity: '0',
@@ -431,6 +440,8 @@ export default function Edit() {
       onChange: (v) => {
         changeProfile('projectNumber', v);
       },
+      disabled: true,
+      showBaseline: 'invisible',
     },
     projectName: {
       value: profile.projectName,
@@ -438,6 +449,7 @@ export default function Edit() {
         changeProfile('projectName', v);
       },
       disabled: true,
+      showBaseline: 'invisible',
     },
     requirementsDate: {
       value: profile.requirementsDate,
@@ -500,11 +512,15 @@ export default function Edit() {
     }
 
     const electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[] = [];
+
+    console.log(sheet);
+
     Object.values(sheet).forEach((item) => {
       if (item) {
         electronicSuppliesRecords.push({
           // TODO 目前寫死為SJ-302，需要確認doorType怎麼決定
           doorType: 'SJ-302',
+          id: item.id, // 如果是新的就會是undefined，patch時如果沒有id，後端就會新增一筆資料
           itemName: item.itemName as TcreateElectronicSuppliesRecordDto['itemName'],
           category: item.category,
           quantity: item.quantity,
@@ -536,9 +552,16 @@ export default function Edit() {
         const res = await apiPostElectronicSupplies(body);
 
         if (res) {
-          update_electronicSupplies();
+          router.push({
+            query: {
+              contractId,
+              electronicSuppliesId: res.id,
+            },
+          });
         }
       }
+
+      setDisabled(true);
     } catch (error) {
       const err = error as Error;
       console.log(err);
@@ -558,7 +581,6 @@ export default function Edit() {
     {
       type: 'myButton',
       label: '返回',
-      // onClick: () => router.back(),
       onClick: () => {
         router.push({
           pathname: '/worksDepartment/contractList/contract/powerTransmissionSpareList',
@@ -575,6 +597,21 @@ export default function Edit() {
     },
     {
       type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+      },
+    },
+  ];
+
+  const panelList03: TpanelList = [
+    {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => setDisabled(false),
+    },
+    {
+      type: 'myButton',
       label: '返回',
       onClick: () => {
         router.push({
@@ -585,7 +622,7 @@ export default function Edit() {
     },
   ];
 
-  const panelList = electronicSuppliesId ? panelList02 : panelList01;
+  const panelList = !electronicSuppliesId ? panelList01 : disabled ? panelList03 : panelList02;
 
   // ----------------------------------------------------
 
@@ -612,35 +649,3 @@ const cre_emptyProfile = () => ({
   requirementsDate: '',
   dispatchDate: '',
 });
-
-// const cre_emptySheet = (): Tsheet => ({
-//   智慧型: { quantity: '', itemName: '', category: '' },
-//   面板式: { quantity: '', itemName: '', category: '' },
-//   埋入式: { quantity: '', itemName: '', category: '' },
-//   外露式: { quantity: '', itemName: '', category: '' },
-//   電子式: { quantity: '', itemName: '', category: '' },
-//   防爆式: { quantity: '', itemName: '', category: '' },
-//   鎖號: { quantity: '', itemName: '', category: '' },
-//   特殊鎖號: { quantity: '', itemName: '', category: '' },
-//   三點式一般: { quantity: '', itemName: '', category: '' },
-//   三點式遮煙: { quantity: '', itemName: '', category: '' },
-//   '3HP馬達控制箱380v': { quantity: '', itemName: '', category: '' },
-//   '2HP馬達控制箱380v': { quantity: '', itemName: '', category: '' },
-//   '3HP馬達控制箱220v': { quantity: '', itemName: '', category: '' },
-//   '2HP馬達控制箱220v': { quantity: '', itemName: '', category: '' },
-//   彈射門控制箱: { quantity: '', itemName: '', category: '' },
-//   紅外線控制盤: { quantity: '', itemName: '', category: '' },
-//   煙感器: { quantity: '', itemName: '', category: '' },
-//   中繼器: { quantity: '', itemName: '', category: '' },
-//   門弓器: { quantity: '', itemName: '', category: '' },
-//   平推鎖: { quantity: '', itemName: '', category: '' },
-//   電磁扣: { quantity: '', itemName: '', category: '' },
-//   遙控器加障感器: { quantity: '', itemName: '', category: '' },
-//   遙控器: { quantity: '', itemName: '', category: '' },
-//   障感器: { quantity: '', itemName: '', category: '' },
-//   大門用主機: { quantity: '', itemName: '', category: '' },
-//   對照式: { quantity: '', itemName: '', category: '' },
-//   反射式: { quantity: '', itemName: '', category: '' },
-//   防颱鎖固: { quantity: '', itemName: '', category: '' },
-//   防颱中柱: { quantity: '', itemName: '', category: '' },
-// });

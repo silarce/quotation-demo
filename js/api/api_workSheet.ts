@@ -13,6 +13,8 @@ import {
   TcreateAnnotationDto,
   TcreateQuotationRangeDto,
   TquotationRangeDto,
+  TworkSheetDto,
+  TcreateWorkSheetDto,
 } from './dtoTypes';
 
 type TgetAnnotation = {
@@ -25,7 +27,15 @@ type TgetQuotataionRanges = {
   meta: TpageMetaDto;
 };
 
-export type { Tparams, TgetAnnotation, TgetQuotataionRanges, TcreateAnnotationDto, TcreateQuotationRangeDto };
+export type {
+  Tparams,
+  TgetAnnotation,
+  TgetQuotataionRanges,
+  TcreateAnnotationDto,
+  TcreateQuotationRangeDto,
+  TworkSheetDto,
+  TcreateWorkSheetDto,
+};
 
 // ==========================================================================
 // ==========================================================================
@@ -155,5 +165,3 @@ export const apiDeleteQuotationRanges = ({ id }: { id: string }) => {
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
-
-// =============================================================================

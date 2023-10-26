@@ -22,6 +22,8 @@ import type {
   TexchangeDto,
   TcreateExchgangeDto,
   TcreateElectronicSuppliesRecordDto,
+  TworkSheetDto,
+  TcreateWorkSheetDto,
 } from './dtoTypes';
 
 export type {
@@ -61,13 +63,20 @@ export const useGetEngineeringContact = (id: string | undefined | null) => {
       return;
     }
 
-    const newRes = await apiGetEngineeringContact(id);
+    try {
+      const newRes = await apiGetEngineeringContact(id);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得工程聯絡單失敗', content: err.message });
+
+      return;
     }
-
-    return newRes;
   };
 
   return {
@@ -419,7 +428,7 @@ export const apiPatchElectronicSupplies = async (id: string, body: TupdateElectr
   const api = `/engineering/electronic-supplies/${id}`;
 
   return axi
-    .patch<TelectronicSuppliesDto>(api, body)
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -526,6 +535,66 @@ export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchg
 
   return axi
     .patch<TexchangeDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// =============================================================================
+// 工作表
+
+export const apiGetWorkSheet = (id: string) => {
+  const api = `/engineering/worksheet/${id}`;
+
+  const params = {
+    populate: [
+      'contractProductItems.product',
+      'contractProductItems.components',
+      'contractProductItems.accessories',
+      //  'legacyProductItems'
+    ],
+  };
+
+  return axi
+    .get<TworkSheetDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetWorkSheet = (id: string | undefined | null) => {
+  const [res, setRes] = useState<TworkSheetDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const res = await apiGetWorkSheet(id);
+
+      if (res) {
+        setRes(res);
+      }
+
+      return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得工作表失敗', content: err.message });
+
+      return;
+    }
+  };
+
+  return {
+    workSheet: res,
+    update_workSheet: update,
+  };
+};
+
+export const apiPostWorkSheet = (body: TcreateWorkSheetDto) => {
+  const api = '/engineering/worksheet';
+
+  return axi
+    .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
