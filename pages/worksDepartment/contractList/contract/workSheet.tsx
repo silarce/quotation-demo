@@ -334,6 +334,10 @@ export default function WorkSheet() {
   useEffect(() => {
     if (disabled) {
       reset();
+
+      if (targetSheet) {
+        targetSheet.getInitData();
+      }
     }
   }, [disabled, itemTokenList]);
   //
