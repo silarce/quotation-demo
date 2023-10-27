@@ -67,7 +67,13 @@ import {
   filter_headBoxes,
 } from './componentFilters';
 
-import { calcProductArea, calcProductVolume, calcProductWG, calcProductFullWidth } from 'js/utils/product/calc';
+import {
+  calcProductArea,
+  calcProductVolume,
+  calcProductWG,
+  calcProductFullWidth,
+  findBDoptions,
+} from 'js/utils/product/calc';
 
 // =============================================================================
 // type
@@ -1324,26 +1330,29 @@ class Class_product {
 
   findBDoptions() {
     if (this._prodData.doorType) {
-      const BDList = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD;
-      const DBList = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB;
+      // const BDList = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD;
+      // const DBList = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB;
 
-      if (BDList) {
-        this.options_boxB = Object.keys(BDList).map((key) => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-      }
+      // if (BDList) {
+      //   this.options_boxB = Object.keys(BDList).map((key) => {
+      //     return {
+      //       value: key,
+      //       label: key,
+      //     };
+      //   });
+      // }
 
-      if (DBList) {
-        this.options_boxD = Object.keys(DBList).map((key) => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-      }
+      // if (DBList) {
+      //   this.options_boxD = Object.keys(DBList).map((key) => {
+      //     return {
+      //       value: key,
+      //       label: key,
+      //     };
+      //   });
+      // }
+      const { options_boxB, options_boxD } = findBDoptions(this._prodData.doorType);
+      this.options_boxB = options_boxB;
+      this.options_boxD = options_boxD;
     }
   }
 

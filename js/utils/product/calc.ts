@@ -1,5 +1,7 @@
 import Decimal from 'decimal.js';
 
+import { lookup_boxBAndBoxD } from 'config/product/lookup';
+
 /**計算主產品面積 */
 export const calcProductArea = ({
   height: h,
@@ -37,4 +39,35 @@ export const calcProductWG = ({ fullWidth, gapA, gapC }: { fullWidth: number; ga
 /**計算fullWidth 單位為mm*/
 export const calcProductFullWidth = ({ WG, gapA, gapC }: { WG: number; gapA: number; gapC: number }) => {
   return WG + gapA + gapC;
+};
+
+export const findBDoptions = (doorModelName: string) => {
+  const BDList = lookup_boxBAndBoxD[doorModelName]?.BtoD;
+  const DBList = lookup_boxBAndBoxD[doorModelName]?.DtoB;
+
+  let options_boxB: { value: string; label: string }[] | undefined = undefined;
+  let options_boxD: { value: string; label: string }[] | undefined = undefined;
+
+  if (BDList) {
+    options_boxB = Object.keys(BDList).map((key) => {
+      return {
+        value: key,
+        label: key,
+      };
+    });
+  }
+
+  if (DBList) {
+    options_boxD = Object.keys(DBList).map((key) => {
+      return {
+        value: key,
+        label: key,
+      };
+    });
+  }
+
+  return {
+    options_boxB,
+    options_boxD,
+  };
 };
