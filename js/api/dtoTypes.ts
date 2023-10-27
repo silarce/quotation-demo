@@ -2120,5 +2120,5 @@ export type TupdateWorkSheet = {
   worksheetId: string;
   others: null;
   components: TquotationProductComponentsDto[];
-  accessories: TquotationProductAccessoriesDto[];
+  accessories: TcreateQuotationProductAccessoriesDto[];
 };

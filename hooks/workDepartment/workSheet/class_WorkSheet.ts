@@ -704,6 +704,28 @@ class Class_workSheet {
   get bodyItemArr(): TupdateWorkSheet[] {
     const componentArr = Object.values(this.comList);
 
+    const accessories: TupdateWorkSheet['accessories'] = this._acceIdArr.map((id) => {
+      const acce = this._accessoriesOptionList[id];
+
+      const acceBody: TupdateWorkSheet['accessories'][number] = {
+        codeName: '', //代號
+        name: acce.name, //名稱
+        unit: acce.unit ?? '', // 單位
+        quantity: 0, // 數量
+        price: acce.price ?? 0, // 牌價
+        unitPrice: acce.price ?? 0, // 單價
+        totalPrice: 0, // 複價
+        dualPrice: 0, // 牌價複價
+        order: 0,
+        //
+        referenceSpec: acce.referenceSpec,
+        // originalPrice: number,
+        originalPrice: acce.price ?? 0,
+      };
+
+      return acceBody;
+    });
+
     return this.itemIdArr.map((id) => {
       const item: TupdateWorkSheet = {
         ...this._prod,
@@ -711,6 +733,7 @@ class Class_workSheet {
         guideRailThickness: this.guideRailThickness,
         headBoxThickness: this.headBoxThickness,
         components: componentArr,
+        accessories,
       };
 
       return item;
