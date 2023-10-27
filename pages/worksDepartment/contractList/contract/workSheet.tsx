@@ -34,6 +34,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { useGetEngineeringContact, useGetWorkSheet } from 'js/api/api_engineering';
+import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
@@ -76,65 +77,6 @@ type Tprofile = {
   faxNumber: string;
 };
 
-// type TproductOutline = {
-//   itemName: string;
-//   doorType: string;
-//   fullWidth: string;
-//   height: string;
-//   boxB: string;
-//   quantity: string;
-//   material: string;
-//   isAntiTyphoon: boolean;
-// };
-
-// type Tdetail = {
-//   reel: {
-//     size: string;
-//     hasConvex: string;
-//   };
-//   reelBox: {
-//     material: string;
-//     thickness: string;
-//     surface: string;
-//     front: string;
-//     hasConvex: string;
-//     type: string;
-//   };
-//   base: {
-//     material: string;
-//     angleMaterial: string;
-//     baseMaterial: string;
-//     type: string;
-//     surface: string;
-//   };
-//   support: {
-//     bearing: string;
-//     chain: string;
-//   };
-//   //
-//   doorPiece: {
-//     material: string;
-//     surface: string;
-//   };
-//   motor: {
-//     horsepower: string;
-//     manufacturer: string;
-//     powerSupply: string;
-//     voltage: string;
-//     support: string;
-//     chainType: string;
-//     lockBox: string;
-//   };
-//   doorTrack: {
-//     material: string;
-//     thickness: string;
-//     surface: string;
-//     silencer: string;
-//     doorTrackType: string;
-//     doorTrackName: string;
-//   };
-// };
-
 // ====================================================================
 export default function WorkSheet() {
   const router = useRouter();
@@ -150,6 +92,7 @@ export default function WorkSheet() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
   const { workSheet, update_workSheet } = useGetWorkSheet(worksheetId);
+  const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
 
   useEffect(() => {
     (async () => {
@@ -161,6 +104,8 @@ export default function WorkSheet() {
         myAlert.err({ title: '取得合約失敗', content: err.message });
         setIsLoading(false);
       }
+
+      update_doorModelArr();
     })();
   }, []);
 
@@ -235,6 +180,7 @@ export default function WorkSheet() {
   useEffect(() => {
     (async () => {
       try {
+        setIsLoading(true);
         const res01 = update_engineeringContact();
         const res02 = update_workSheet();
         await Promise.all([res01, res02]);
@@ -260,6 +206,63 @@ export default function WorkSheet() {
 
   // console.log(productList);
   // console.log(sheetList);
+
+  const doorModelOptionArr = useMemo(() => {
+    if (!doorModelList) {
+      return [];
+    }
+
+    return Object.values(doorModelList).map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+  }, [doorModelList]);
+
+  const { guideRailOptionArr_noHook, guideRailOptionArr_withHook, materialOptionArr } = useMemo(() => {
+    const empty = {
+      guideRailOptionArr_noHook: [],
+      guideRailOptionArr_withHook: [],
+      materialOptionArr: [],
+    };
+
+    if (!doorModelList || !targetSheet?.doorModelName) {
+      return empty;
+    }
+
+    const theDoorModel = doorModelList[targetSheet.doorModelName];
+
+    if (!theDoorModel) {
+      myAlert.warning({ title: '沒有匹配的門型', content: '資料庫中沒有該產品之門型資料' });
+
+      return empty;
+    }
+
+    const guideRailOptionArr_noHook: Toption[] = [];
+    const guideRailOptionArr_withHook: Toption[] = [];
+    const materialOptionArr: Toption[] = [];
+
+    const { guideRails, slatMaterials } = theDoorModel;
+
+    guideRails.forEach((item) => {
+      if (item.withHook) {
+        guideRailOptionArr_withHook.push({ value: item.imgSrc, label: item.imgSrc });
+      } else {
+        guideRailOptionArr_noHook.push({ value: item.imgSrc, label: item.imgSrc });
+      }
+    });
+
+    slatMaterials.forEach((item) => {
+      materialOptionArr.push({ value: item.name, label: item.name });
+    });
+
+    return {
+      guideRailOptionArr_noHook,
+      guideRailOptionArr_withHook,
+      materialOptionArr,
+    };
+  }, [doorModelList, targetSheet?.doorModelName]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -475,10 +478,7 @@ export default function WorkSheet() {
             targetSheet.doorModelName = v?.value ?? '';
           }
         },
-        options: [
-          { value: 'foo', label: 'foo' },
-          { value: 'bar', label: 'bat' },
-        ],
+        options: doorModelOptionArr,
       },
     },
     fullWidth: {
@@ -530,10 +530,7 @@ export default function WorkSheet() {
             targetSheet.materialName = v?.value ?? '';
           }
         },
-        options: [
-          { value: 'foo', label: 'foo' },
-          { value: 'bar', label: 'bat' },
-        ],
+        options: materialOptionArr,
       },
     },
     isAntiTyphoon: {
@@ -851,6 +848,8 @@ export default function WorkSheet() {
         },
         forbidden: true,
       },
+      //       guideRailOptionArr_noHook
+      // guideRailOptionArr_withHook
       doorTrackName: {
         value: targetSheet?.guideRail ?? '',
         onChange: (v) => {
