@@ -55,6 +55,7 @@ const useWorkSheet = ({
       });
     });
     setSheetList(list);
+    setChangedSheetList({});
 
     // const arr = Object.values(list);
     // for (const classSheet of arr) {

@@ -198,12 +198,14 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
-  const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
+  const [targetSheetKey, setTargetSheetKey] = useState<string>();
 
   const { sheetList, changedSheetList, reset } = useWorkSheet({
     itemTokenList: itemTokenList ?? {},
     itemIdArrList: itemIdArrList ?? {},
   });
+
+  const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey ?? 'undefined'];
 
   // console.log(productList);
   // console.log(sheetList);
@@ -283,36 +285,6 @@ export default function WorkSheet() {
     setProfile((state) => ({ ...state, [key]: value }));
   };
 
-  // ______________________________________________________________
-  // const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
-  // const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
-
-  // const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
-  //   setProdcutOutline((state) => ({ ...state, [key]: value }));
-  // };
-
-  // ______________________________________________________________
-
-  // const [detail, setDetail] = useState<Tdetail>(creEmptyDetail());
-
-  // function changeDetail<TpKey extends keyof Tdetail, TcKey extends keyof Tdetail[TpKey]>(
-  //   pKey: TpKey,
-  //   cKey: TcKey,
-  //   value: Tdetail[TpKey][TcKey]
-  // ) {
-  //   setDetail((state) => {
-  //     const copy = { ...state };
-
-  //     copy[pKey][cKey] = value;
-
-  //     return copy;
-  //   });
-  // }
-
-  // -------------------------------------------------------------------------
-
-  // const [others, setOthers] = useState<string[]>([]);
-
   // -------------------------------------------------------------------------
 
   useEffect(() => {
@@ -362,7 +334,6 @@ export default function WorkSheet() {
   useEffect(() => {
     if (disabled) {
       reset();
-      setTargetSheet(undefined);
     }
   }, [disabled, itemTokenList]);
   //
@@ -945,19 +916,13 @@ export default function WorkSheet() {
       await apiPatchWorkSheet(worksheetId, body);
       await update_workSheet();
       setDisabled(true);
-      // reset();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新工作單失敗', content: err.message });
     }
-
-    // changedSheetList
-    // TupdateWorkSheet
   };
 
   // -------------------------------------------------------------------------
-
-  // Tcontrol_optional
 
   const control_optional: Tcontrol_optional = {
     value: targetSheet?.acceNameArr ?? [],
@@ -1012,7 +977,7 @@ export default function WorkSheet() {
               const { itemName, doorModelName, quantity } = sheet;
 
               const onClick = () => {
-                setTargetSheet(sheet);
+                setTargetSheetKey(key);
               };
 
               const isActive = key === targetSheet?.productId;
@@ -1050,12 +1015,7 @@ export default function WorkSheet() {
 
             <hr />
             <WorkSheetOptional
-              // value={others}
-              // onChange={(arr) => {
-              //   setOthers(arr);
-              // }}
               control={control_optional}
-              // optionArr={othersOptions}
               optionArr={targetSheet?.accessoriesOptionArr_easy ?? []}
               disabled={disabled}
             />
