@@ -248,9 +248,17 @@ export default function WorkSheet() {
 
     guideRails.forEach((item) => {
       if (item.withHook) {
-        guideRailOptionArr_withHook.push({ value: item.imgSrc, label: item.imgSrc });
+        guideRailOptionArr_withHook.push({
+          value: item.imgSrc,
+          label: item.imgSrc,
+          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+        });
       } else {
-        guideRailOptionArr_noHook.push({ value: item.imgSrc, label: item.imgSrc });
+        guideRailOptionArr_noHook.push({
+          value: item.imgSrc,
+          label: item.imgSrc,
+          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+        });
       }
     });
 
@@ -853,8 +861,6 @@ export default function WorkSheet() {
         },
         forbidden: true,
       },
-      //       guideRailOptionArr_noHook
-      // guideRailOptionArr_withHook
       doorTrackName: {
         value: targetSheet?.guideRail ?? '',
         onChange: (v) => {
@@ -863,6 +869,7 @@ export default function WorkSheet() {
           }
         },
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
+        optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
       },
     },
   };
