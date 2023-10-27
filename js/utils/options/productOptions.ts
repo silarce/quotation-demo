@@ -171,6 +171,23 @@ export const optionsCreator_closingType = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_componentMaterial_01 = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
+    { value: 'SST#304', label: 'SST#304' },
+    { value: 'SST#316', label: 'SST#316' },
+    { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
+  ],
+});
+
+export const optionsCreator_componentMaterial_02 = createOptionsCreator({
+  optionsArr: [{ value: '黑鐵', label: '黑鐵' }],
+});
+
+export const optionsCreator_componentMaterial_03 = createOptionsCreator({
+  optionsArr: [{ value: '其他', label: '其他' }],
+});
+
 // !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarAngleIron有沒有不對
 export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
   optionsArr: [

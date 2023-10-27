@@ -16,6 +16,12 @@ import { TgenerateDoorProductBomDto_ComponentInfo } from 'js/api/api_product';
 import { TcomponentKey } from './useProduct';
 import { prodCellConfig } from './prodCellConfig';
 
+import {
+  optionsCreator_componentMaterial_01,
+  optionsCreator_componentMaterial_02,
+  optionsCreator_componentMaterial_03,
+} from 'js/utils/options/productOptions';
+
 // ===========================================================
 class Class_component {
   constructor({
@@ -1073,12 +1079,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     typeName: '底座',
     type: 'bottomBar',
     creDesc: creDesc_bottomBars,
-    options: [
-      { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: 'SST#304', label: 'SST#304' },
-      { value: 'SST#316', label: 'SST#316' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
-    ],
+    options: optionsCreator_componentMaterial_01(),
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
@@ -1086,12 +1087,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     typeName: '門軌',
     type: 'guideRail',
     creDesc: creDesc_guideRails,
-    options: [
-      { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: 'SST#304', label: 'SST#304' },
-      { value: 'SST#316', label: 'SST#316' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
-    ],
+    options: optionsCreator_componentMaterial_01(),
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
@@ -1099,14 +1095,14 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     typeName: '支板',
     type: 'sidePlate',
     creDesc: creDesc_sidePlates,
-    options: [{ value: '黑鐵', label: '黑鐵' }],
+    options: optionsCreator_componentMaterial_02(),
     hiddenKeyArr: ['surface', 'density'],
   },
   roller: {
     typeName: '捲軸',
     type: 'roller',
     creDesc: creDesc_rollers,
-    options: [{ value: '黑鐵', label: '黑鐵' }],
+    options: optionsCreator_componentMaterial_02(),
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
@@ -1114,7 +1110,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     typeName: '馬達機',
     type: 'motor',
     creDesc: creDesc_motors,
-    options: [{ value: '黑鐵', label: '黑鐵' }],
+    options: optionsCreator_componentMaterial_02(),
     hiddenKeyArr: ['surface', 'density'],
     unit: '組',
   },
@@ -1122,7 +1118,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     typeName: '馬達配件',
     type: 'motorAccessories',
     creDesc: creDesc_motorComponent,
-    options: [{ value: '其他', label: '其他' }],
+    options: optionsCreator_componentMaterial_03(),
     hiddenKeyArr: ['surface', 'density'],
     unit: '組',
   },
@@ -1130,12 +1126,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     typeName: '門箱',
     type: 'headBox',
     creDesc: creDesc_headBoxes,
-    options: [
-      { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-      { value: 'SST#304', label: 'SST#304' },
-      { value: 'SST#316', label: 'SST#316' },
-      { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
-    ],
+    options: optionsCreator_componentMaterial_01(),
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
   },
