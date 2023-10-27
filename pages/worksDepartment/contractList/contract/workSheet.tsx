@@ -458,60 +458,82 @@ export default function WorkSheet() {
 
   const control_product: Tcontrol_productOutline = {
     itemName: {
-      value: targetSheet?.itemName ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.itemName = v;
-        }
+      inputProps: {
+        value: targetSheet?.itemName ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.itemName = v;
+          }
+        },
       },
     },
     doorType: {
-      value: targetSheet?.doorModelName ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.doorModelName = v;
-        }
+      selectProps: {
+        value: targetSheet?.doorModelName ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.doorModelName = v?.value ?? '';
+          }
+        },
+        options: [
+          { value: 'foo', label: 'foo' },
+          { value: 'bar', label: 'bat' },
+        ],
       },
     },
     fullWidth: {
-      value: targetSheet?.fullWidth ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.fullWidth = v;
-        }
+      inputProps: {
+        value: targetSheet?.fullWidth ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.fullWidth = v;
+          }
+        },
       },
     },
     height: {
-      value: targetSheet?.height ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.height = v;
-        }
+      inputProps: {
+        value: targetSheet?.height ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.height = v;
+          }
+        },
       },
     },
     boxB: {
-      value: targetSheet?.boxB ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.boxB = v;
-        }
+      inputProps: {
+        value: targetSheet?.boxB ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.boxB = v;
+          }
+        },
       },
     },
     quantity: {
-      value: targetSheet?.quantity ?? '',
-      // onChange: (v) => {
-      //   if (targetSheet) {
-      //     targetSheet.quantity = v;
-      //   }
-      // },
+      inputProps: {
+        value: targetSheet?.quantity ?? '',
+        // onChange: (v) => {
+        //   if (targetSheet) {
+        //     targetSheet.quantity = v;
+        //   }
+        // },
+      },
       disabled: true,
     },
     material: {
-      value: targetSheet?.materialName ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.materialName = v;
-        }
+      selectProps: {
+        value: targetSheet?.materialName ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.materialName = v?.value ?? '';
+          }
+        },
+        options: [
+          { value: 'foo', label: 'foo' },
+          { value: 'bar', label: 'bat' },
+        ],
       },
     },
     isAntiTyphoon: {
