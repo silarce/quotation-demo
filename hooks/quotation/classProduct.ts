@@ -67,7 +67,7 @@ import {
   filter_headBoxes,
 } from './componentFilters';
 
-import { calcProductArea } from 'js/utils/product/calc';
+import { calcProductArea, calcProductVolume, calcProductWG, calcProductFullWidth } from 'js/utils/product/calc';
 
 // =============================================================================
 // type
@@ -611,7 +611,15 @@ class Class_product {
 
     // 計算出WG
 
-    this._prodData.WG = String((Number(this._prodData.fullWidth) * 1000 - res.gapA - res.gapC) / 1000);
+    // this._prodData.WG = String((Number(this._prodData.fullWidth) * 1000 - res.gapA - res.gapC) / 1000);
+
+    this._prodData.WG = String(
+      calcProductWG({
+        fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
+        gapA: res.gapA,
+        gapC: res.gapC,
+      }) / 1000
+    );
 
     //
     const defaultMotorIndex = res.defaultMotorIndex;
@@ -1201,9 +1209,10 @@ class Class_product {
 
   /**計算才數 */
   private calcVolume() {
-    return Decimal.mul(this.area || 0, 10.89)
-      .toFixed(2)
-      .toString();
+    return calcProductVolume(Number(this.area || 0));
+    // return Decimal.mul(this.area || 0, 10.89)
+    //   .toFixed(2)
+    //   .toString();
   }
 
   // ---------------------------------------------------------
@@ -2627,27 +2636,17 @@ const calcFullwidthWithWG = async ({
     const res = await apiGetProdCalcGeneralSpec(body);
     const { gapA, gapC } = res;
 
-    const fullWidth = gapA + gapC + body.WG;
+    // const fullWidth = gapA + gapC + body.WG;
+    const fullWidth = calcProductFullWidth({
+      gapA,
+      gapC,
+      WG: body.WG,
+    });
 
     return fullWidth;
   } catch (error) {
     return 0;
   }
-};
-
-const calcLW = ({ fullWidth, WG }: { fullWidth?: number; WG?: number }) => {
-  if (fullWidth) {
-    WG = WG ?? 0;
-  }
-
-  if (WG) {
-    fullWidth = fullWidth ?? 0;
-  }
-
-  return {
-    fullWidth,
-    WG,
-  };
 };
 
 // ===========================================================
