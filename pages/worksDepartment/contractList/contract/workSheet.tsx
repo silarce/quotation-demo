@@ -856,10 +856,10 @@ export default function WorkSheet() {
       捲門全高: '999',
     },
     size02: {
-      捲軸尺寸: '是指捲軸的數量嗎?',
+      捲軸尺寸: numToStr(targetSheet?.prodSpec?.diameter) + '"',
       軸徑: numToStr(targetSheet?.prodSpec?.diameter),
       軸承: targetSheet?.prodSpec?.bearingName ?? '',
-      總長: '是指捲軸的數量嗎?',
+      總長: numToStr(targetSheet?.prodSpec?.bearingHousingTotalLength),
       寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
     },
     rollBox: {
@@ -888,7 +888,7 @@ export default function WorkSheet() {
       },
     },
     chainCog: {
-      鏈齒輪番號: '999',
+      鏈齒輪番號: 'gearNumber',
       大鏈輪: '999',
       孔徑: '999',
     },
