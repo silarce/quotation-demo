@@ -9,11 +9,11 @@ export const calcProductArea = ({
 }: {
   height: number;
   boxb: number;
-  fullWidth: number;
-  WG: number;
+  fullWidth?: number;
+  WG?: number;
 }) => {
   const area = Decimal.add(h, b) // h+b
-    .mul(w || l)
+    .mul(l || w || 0)
     .toFixed(2)
     .toString();
 
