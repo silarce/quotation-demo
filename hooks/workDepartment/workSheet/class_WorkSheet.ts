@@ -31,6 +31,9 @@ import { lookup_boxBAndBoxD } from 'config/product/lookup';
 // utils
 import { calcProductArea, calcProductVolume, calcProductWG, findBDoptions } from 'js/utils/product/calc';
 
+// options
+import { Toption, optionsCreator_componentMaterial_01 } from 'js/utils/options/productOptions';
+
 // ======================================================================
 class Class_workSheet {
   constructor({
@@ -85,6 +88,8 @@ class Class_workSheet {
   private _prodSpec: TdoorGeneralSpecsDto | undefined = undefined;
   private _defaultBoxB = 0;
   // ---------------------------------------------------------------------
+  options_com = optionsCreator_componentMaterial_01();
+  options_com_valueArr = Object.values(this.options_com).map((item) => item.value);
   options_boxB: { value: string; label: string }[] = [];
   // ---------------------------------------------------------------------
 
@@ -169,6 +174,23 @@ class Class_workSheet {
   findBoxBoptions() {
     const { options_boxB } = findBDoptions(this._prod.doorModelName);
     this.options_boxB = options_boxB ?? [];
+  }
+
+  changeComMaterial() {
+    // this.options_com_valueArr
+
+    let material = this.options_com[1].value;
+
+    if (this.options_com_valueArr.includes(this._prod.materialName)) {
+      material = this._prod.materialName;
+    }
+
+    this.comList.guideRail.material = material;
+    this.comList.headBox.material = material;
+    this.comList.bottomBar.material = material;
+    this.comList.slat.material = material;
+
+    //
   }
 
   //
@@ -341,6 +363,7 @@ class Class_workSheet {
   }
   set materialName(str) {
     this._prod.materialName = str;
+    this.changeComMaterial();
     this.forceUpdate();
   }
 
@@ -717,9 +740,7 @@ class Class_workSheet {
         totalPrice: 0, // 複價
         dualPrice: 0, // 牌價複價
         order: 0,
-        //
         referenceSpec: acce.referenceSpec,
-        // originalPrice: number,
         originalPrice: acce.price ?? 0,
       };
 
