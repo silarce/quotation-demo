@@ -13,6 +13,7 @@ import {
   apiGetProdAccessories,
   apiGetProdCalcGeneralSpec,
   apiPostProdGenerateDoorProductBom,
+  apiGetProdCalcDetailSpec,
   // apiGetProdAvailableComponents,
 } from 'js/api/api_product';
 
@@ -86,6 +87,7 @@ class Class_workSheet {
   private _accessoriesOptionArr_easy: { value: string; label: string }[] = [];
 
   private _prodSpec: TdoorGeneralSpecsDto | undefined = undefined;
+  private _prodDetailSpec: { slatCount: number } | undefined = undefined;
   private _defaultBoxB = 0;
   // ---------------------------------------------------------------------
   options_com = optionsCreator_componentMaterial_01();
@@ -134,7 +136,29 @@ class Class_workSheet {
 
         return res;
       }
-    } catch (error) {}
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得產品規格失敗', content: err.message });
+    }
+  }
+
+  async getProdDetailSepc() {
+    try {
+      const res = await apiGetProdCalcDetailSpec({
+        modelName: this.doorModelName as TdoorModelInfoDto['name'],
+        height: this._prod.height,
+        B: this._prod.boxB,
+      });
+
+      if (res) {
+        this._prodDetailSpec = res;
+
+        return res;
+      }
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得產品細節規格失敗', content: err.message });
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -261,6 +285,10 @@ class Class_workSheet {
       this.getProdSpec();
     }
 
+    if (this._prodDetailSpec === undefined) {
+      this.getProdDetailSepc();
+    }
+
     this.forceUpdate({ isNoChange: true });
   }
 
@@ -278,6 +306,10 @@ class Class_workSheet {
 
   get prodSpec() {
     return this._prodSpec;
+  }
+
+  get prodDetailSpec() {
+    return this._prodDetailSpec;
   }
 
   // ---------------------------------------------------------------------

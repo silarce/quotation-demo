@@ -897,7 +897,7 @@ export default function WorkSheet() {
       門片材質: targetSheet?.com_slat_material ?? '',
       門片厚度: targetSheet?.thickness ?? '',
       門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
-      捲片支數: '999',
+      捲片支數: numToStr(targetSheet?.prodDetailSpec?.slatCount),
       防颱勾: '是否是指主產品的"防颱"?',
     },
     motor: {
