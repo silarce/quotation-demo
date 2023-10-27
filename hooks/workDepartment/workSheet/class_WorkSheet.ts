@@ -18,7 +18,12 @@ import {
 
 // type
 import { TforceUpdate_workSheet } from './useSheet';
-import { TquotationProductDto, TquotationProductItemDto, TquotationProductComponentsDto } from 'js/api/dtoTypes';
+import {
+  TquotationProductDto,
+  TupdateWorkSheet,
+  TquotationProductItemDto,
+  TquotationProductComponentsDto,
+} from 'js/api/dtoTypes';
 
 // config
 import { lookup_boxBAndBoxD } from 'config/product/lookup';
@@ -695,6 +700,22 @@ class Class_workSheet {
   }
 
   // --------------------------------------------------------------
+
+  get bodyItemArr(): TupdateWorkSheet[] {
+    const componentArr = Object.values(this.comList);
+
+    return this.itemIdArr.map((id) => {
+      const item: TupdateWorkSheet = {
+        ...this._prod,
+        id: id,
+        guideRailThickness: this.guideRailThickness,
+        headBoxThickness: this.headBoxThickness,
+        components: componentArr,
+      };
+
+      return item;
+    });
+  }
 
   //
 } // Class_workSheet close
