@@ -1,5 +1,15 @@
 // 工作表
 
+/*
+問題
+
+沒有對component為空陣列的情況做處理
+l與h無法輸入小數
+
+要呼叫api取得捲片支數
+
+*/
+
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 // import _ from 'lodash';
@@ -904,7 +914,8 @@ export default function WorkSheet() {
       },
     },
     chainCog: {
-      鏈齒輪番號: 'gearNumber',
+      // 鏈齒輪番號: 'gearNumber',
+      鏈齒輪番號: targetSheet?.prodSpec?.gearNumber ?? '',
       大鏈輪: '999',
       孔徑: '999',
     },

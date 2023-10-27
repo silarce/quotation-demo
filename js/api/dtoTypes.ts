@@ -1446,6 +1446,7 @@ export type TdoorGeneralSpecsDto = {
   gapA: number;
   gapC: number;
   motors: TdoorGeneralSpecsMotorDto[];
+  gearNumber: string;
   sprocketWheelModel: string;
   sprocketWheelTeethNumber: string;
   sprocketWheelChains: number;
