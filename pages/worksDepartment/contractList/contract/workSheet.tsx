@@ -61,6 +61,11 @@ import {
 // type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
 
+// ! 為了在無法從後端取得workSheet時的非常手段，使用本地workSheet資料
+// ! 做好之後要記得拿掉
+import staticWorkSheet from 'public/workSheet.json';
+// console.log(staticWorkSheet);
+
 // ====================================================================
 
 type Tprofile = {
@@ -99,7 +104,9 @@ export default function WorkSheet() {
     (async () => {
       try {
         setIsLoading(true);
-        await update_contract();
+        // ! 為了在無法從後端取得workSheet時的非常手段，使用本地workSheet資料
+        // ! 做好之後要記得把註解回復
+        // await update_contract();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '取得合約失敗', content: err.message });
@@ -141,11 +148,16 @@ export default function WorkSheet() {
 用useWorkSheet裡的changedList配合forceUpdate紀錄
 
  */
-    if (!workSheet?.contractProductItems) {
-      return {};
-    }
 
-    const contractProductItems = workSheet.contractProductItems;
+    // ! 為了在無法從後端取得workSheet時的非常手段，使用本地workSheet資料
+    // ! 做好之後要記得改回來
+    // if (!workSheet?.contractProductItems) {
+    //   return {};
+    // }
+    // const contractProductItems = workSheet.contractProductItems;
+
+    const contractProductItems = staticWorkSheet.contractProductItems;
+    // !!!
 
     const itemTokenList: { [key: string]: TquotationProductItemDto } = {};
     const itemIdArrList: { [key: string]: string[] } = {};
