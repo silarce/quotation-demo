@@ -24,6 +24,7 @@ import type {
   TcreateElectronicSuppliesRecordDto,
   TworkSheetDto,
   TcreateWorkSheetDto,
+  TupdateWorkSheet,
 } from './dtoTypes';
 
 export type {
@@ -40,6 +41,7 @@ export type {
   TexchangeDto,
   TcreateExchgangeDto,
   TcreateElectronicSuppliesRecordDto,
+  TupdateWorkSheet,
 } from './dtoTypes';
 
 // ========================================================================
@@ -595,6 +597,15 @@ export const apiPostWorkSheet = (body: TcreateWorkSheetDto) => {
 
   return axi
     .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet[]) => {
+  const api = `/engineering/worksheet/${id}/products`;
+
+  return axi
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
