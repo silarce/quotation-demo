@@ -52,6 +52,9 @@ import {
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // =============================================================================
+import { prodCellConfig } from './prodCellConfig';
+import { lookup_boxBAndBoxD } from 'config/product/lookup';
+
 // utils
 import {
   filter_slats,
@@ -64,8 +67,7 @@ import {
   filter_headBoxes,
 } from './componentFilters';
 
-import { prodCellConfig } from './prodCellConfig';
-import { lookup_boxBAndBoxD } from 'config/product/lookup';
+import { calcProductArea } from 'js/utils/product/calc';
 
 // =============================================================================
 // type
@@ -1175,10 +1177,17 @@ class Class_product {
     const w = 0;
     const l = Number(this._prodData.fullWidth || 0);
 
-    const area = Decimal.add(h, b) // h+b
-      .mul(w || l)
-      .toFixed(2)
-      .toString();
+    const area = calcProductArea({
+      height: h,
+      boxb: b,
+      fullWidth: l,
+      WG: w,
+    });
+
+    // const area = Decimal.add(h, b) // h+b
+    //   .mul(w || l)
+    //   .toFixed(2)
+    //   .toString();
 
     return area;
   }
