@@ -371,9 +371,7 @@ export default function WorkSheet() {
       return;
     }
 
-    if (targetSheet.accessoriesOptionArr.length === 0) {
-      targetSheet.getAccessoriesArr();
-    }
+    targetSheet.getInitData();
   }, [targetSheet]);
 
   // -------------------------------------------------------------------------
@@ -882,17 +880,17 @@ export default function WorkSheet() {
       fullWidth: targetSheet?.fullWidth ?? '',
       淨高: targetSheet?.height ?? '',
       WG: targetSheet?.WG ?? '',
-      gapA: '999',
-      gapC: '999',
+      gapA: numToStr(targetSheet?.prodSpec?.gapA),
+      gapC: numToStr(targetSheet?.prodSpec?.gapC),
       支板尺寸: targetSheet?.BD ?? '',
       捲門全高: '999',
     },
     size02: {
       捲軸尺寸: '是指捲軸的數量嗎?',
-      軸徑: '999',
-      軸承: '999',
+      軸徑: numToStr(targetSheet?.prodSpec?.diameter),
+      軸承: targetSheet?.prodSpec?.bearingName ?? '',
       總長: '是指捲軸的數量嗎?',
-      寸法: '999',
+      寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
     },
     rollBox: {
       角鐵數量: '999',
@@ -902,7 +900,7 @@ export default function WorkSheet() {
     doorPiece: {
       門片材質: targetSheet?.com_slat_material ?? '',
       門片厚度: targetSheet?.thickness ?? '',
-      門片長度: '999',
+      門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
       捲片支數: '999',
       防颱勾: '是否是指主產品的"防颱"?',
     },
@@ -913,7 +911,7 @@ export default function WorkSheet() {
     },
     doorTrack: {
       門軌材質: targetSheet?.com_guideRail_material ?? '',
-      門軌長度: '999',
+      門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
       門軌形式: {
         value: targetSheet?.guideRail ?? '',
         img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
@@ -1046,6 +1044,14 @@ export default function WorkSheet() {
 }
 
 // ===========================================================================
+
+const numToStr = (num: number | undefined) => {
+  if (num === undefined) {
+    return '';
+  }
+
+  return String(num);
+};
 
 const creCheckBarOptionArr = ({ optionArr }: { optionArr: Toption[] }) => {
   const arr = optionArr.map((item) => {

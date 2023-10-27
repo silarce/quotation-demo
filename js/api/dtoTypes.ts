@@ -1435,7 +1435,7 @@ export type TdoorGeneralSpecsMotorDto = {
 export type TdoorGeneralSpecsDto = {
   bearingHousingSize: number; // 軸承座寸法
   bearingHousingTotalLength: number; // 軸承座總長(=捲軸長度)
-  bearingInnerDiameter: string;
+  bearingInnerDiameter: string; // 軸承內徑
   bearingName: string; // 軸承
   defaultMotorIndex: number;
   density: number; // 密度

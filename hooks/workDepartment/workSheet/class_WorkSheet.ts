@@ -6,12 +6,14 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 import {
+  TdoorModelInfoDto,
   TgenerateDoorProductBomDto,
   TdoorAccessoryDto,
+  TdoorGeneralSpecsDto,
   apiGetProdAccessories,
   apiGetProdCalcGeneralSpec,
-  apiGetProdAvailableComponents,
   apiPostProdGenerateDoorProductBom,
+  // apiGetProdAvailableComponents,
 } from 'js/api/api_product';
 
 // type
@@ -64,6 +66,8 @@ class Class_workSheet {
   private _accessoriesOptionList: { [key: string]: TdoorAccessoryDto } = {};
   private _accessoriesOptionArr_easy: { value: string; label: string }[] = [];
 
+  private _prodSpec: TdoorGeneralSpecsDto | undefined = undefined;
+
   // ---------------------------------------------------------------------
 
   async getAccessoriesArr() {
@@ -95,6 +99,31 @@ class Class_workSheet {
     }
   }
 
+  async getProdSpec() {
+    try {
+      const res = await apiGetProdCalcGeneralSpec({
+        modelName: this.doorModelName as TdoorModelInfoDto['name'],
+        height: this._prod.height,
+        isAntiTyphoon: this.isAntiTyphoon,
+        fullWidth: this._prod.fullWidth,
+      });
+
+      if (res) {
+        this._prodSpec = res;
+      }
+    } catch (error) {}
+  }
+
+  getInitData() {
+    if (this.accessoriesOptionArr.length === 0) {
+      this.getAccessoriesArr();
+    }
+
+    if (this._prodSpec === undefined) {
+      this.getProdSpec();
+    }
+  }
+
   // ---------------------------------------------------------------------
   get productId() {
     return this._prod.productId;
@@ -105,6 +134,10 @@ class Class_workSheet {
   }
   get accessoriesOptionArr_easy() {
     return this._accessoriesOptionArr_easy;
+  }
+
+  get prodSpec() {
+    return this._prodSpec;
   }
 
   // ---------------------------------------------------------------------
