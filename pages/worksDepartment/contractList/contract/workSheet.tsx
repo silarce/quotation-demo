@@ -547,7 +547,9 @@ export default function WorkSheet() {
   };
 
   const onCalcClick = () => {
-    alert('test');
+    if (!disabled) {
+      targetSheet?.calcProd();
+    }
   };
 
   // -------------------------------------------------------------------------

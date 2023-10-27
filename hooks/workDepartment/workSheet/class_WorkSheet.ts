@@ -219,6 +219,8 @@ class Class_workSheet {
       label: '自動計算',
     });
 
+    this.forceUpdate();
+
     //
     //
   }
