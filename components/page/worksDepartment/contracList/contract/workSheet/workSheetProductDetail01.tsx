@@ -160,7 +160,7 @@ const Item = ({
             label: label_c,
             placeholder,
             className: className_inputSel,
-            options,
+            options: options_fake,
             checkBarPropsListCre,
           } = item;
 
@@ -178,6 +178,7 @@ const Item = ({
             forbidden,
             icon,
             checkBarOptionArr,
+            optionArr,
           } = control[pKey][cKey]!;
 
           let selectProps: TselectProps | undefined = undefined;
@@ -189,7 +190,7 @@ const Item = ({
               onChange: (v) => {
                 onChange(v?.value ?? '');
               },
-              options: options ?? [],
+              options: optionArr ?? options_fake ?? [],
               selClassNames: {
                 singleValue: (state) => {
                   return scss.selSingleValue;

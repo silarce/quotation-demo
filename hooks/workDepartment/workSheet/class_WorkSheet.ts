@@ -5,7 +5,14 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
-import { apiGetProdAccessories, TdoorAccessoryDto } from 'js/api/api_product';
+import {
+  TgenerateDoorProductBomDto,
+  TdoorAccessoryDto,
+  apiGetProdAccessories,
+  apiGetProdCalcGeneralSpec,
+  apiGetProdAvailableComponents,
+  apiPostProdGenerateDoorProductBom,
+} from 'js/api/api_product';
 
 // type
 import { TquotationProductDto, TquotationProductItemDto, TquotationProductComponentsDto } from 'js/api/dtoTypes';

@@ -55,6 +55,7 @@ import {
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
   optionsCreator_surface,
+  optionsCreator_componentMaterial_01,
 } from 'js/utils/options/productOptions';
 
 // type
@@ -220,11 +221,11 @@ export default function WorkSheet() {
     });
   }, [doorModelList]);
 
-  const { guideRailOptionArr_noHook, guideRailOptionArr_withHook, materialOptionArr } = useMemo(() => {
+  const { guideRailOptionArr_noHook, guideRailOptionArr_withHook, doorModelMaterialOptionArr } = useMemo(() => {
     const empty = {
       guideRailOptionArr_noHook: [],
       guideRailOptionArr_withHook: [],
-      materialOptionArr: [],
+      doorModelMaterialOptionArr: [],
     };
 
     if (!doorModelList || !targetSheet?.doorModelName) {
@@ -241,7 +242,7 @@ export default function WorkSheet() {
 
     const guideRailOptionArr_noHook: Toption[] = [];
     const guideRailOptionArr_withHook: Toption[] = [];
-    const materialOptionArr: Toption[] = [];
+    const doorModelMaterialOptionArr: Toption[] = [];
 
     const { guideRails, slatMaterials } = theDoorModel;
 
@@ -254,13 +255,13 @@ export default function WorkSheet() {
     });
 
     slatMaterials.forEach((item) => {
-      materialOptionArr.push({ value: item.name, label: item.name });
+      doorModelMaterialOptionArr.push({ value: item.name, label: item.name });
     });
 
     return {
       guideRailOptionArr_noHook,
       guideRailOptionArr_withHook,
-      materialOptionArr,
+      doorModelMaterialOptionArr,
     };
   }, [doorModelList, targetSheet?.doorModelName]);
 
@@ -530,7 +531,7 @@ export default function WorkSheet() {
             targetSheet.materialName = v?.value ?? '';
           }
         },
-        options: materialOptionArr,
+        options: doorModelMaterialOptionArr,
       },
     },
     isAntiTyphoon: {
@@ -581,6 +582,7 @@ export default function WorkSheet() {
             targetSheet.com_headBox_material = v;
           }
         },
+        optionArr: optionsCreator_componentMaterial_01(),
       },
       thickness: {
         value: targetSheet?.headBoxThickness ?? '',
@@ -637,6 +639,7 @@ export default function WorkSheet() {
             targetSheet.com_bottomBar_material = v;
           }
         },
+        optionArr: optionsCreator_componentMaterial_01(),
       },
       angleMaterial: {
         value: targetSheet?.bottomBarAngleIron ?? '',
@@ -708,6 +711,7 @@ export default function WorkSheet() {
             targetSheet.com_slat_material = v;
           }
         },
+        optionArr: doorModelMaterialOptionArr,
       },
       surface: {
         value: targetSheet?.com_slat_surface ?? '',
@@ -801,6 +805,7 @@ export default function WorkSheet() {
             targetSheet.com_guideRail_material = v;
           }
         },
+        optionArr: optionsCreator_componentMaterial_01(),
       },
       thickness: {
         value: targetSheet?.guideRailThickness ?? '',
