@@ -154,7 +154,15 @@ const Item = ({
       </p>
       <div className={scss.list}>
         {arr.map((item) => {
-          const { cKey: cKey, module, label: label_c, placeholder, className, options, checkBarPropsListCre } = item;
+          const {
+            cKey: cKey,
+            module,
+            label: label_c,
+            placeholder,
+            className: className_inputSel,
+            options,
+            checkBarPropsListCre,
+          } = item;
 
           if (!control[pKey][cKey]) {
             myAlert.err({ title: '開發者提示，Tcontrol的key與config不相符', content: `pKey:${pKey} cKey:${cKey}` });
@@ -223,6 +231,7 @@ const Item = ({
 
           if (module === 'checkBar') {
             // const checkBarPropsList = checkBarPropsListCre!();
+
             const checkBarPropsList = (() => {
               if (checkBarOptionArr) {
                 return createCheckBarPropsList(checkBarOptionArr);
@@ -235,19 +244,19 @@ const Item = ({
               checkBarPropsList[value].value = true;
             }
 
-            const objArr = Object.values(checkBarPropsList);
+            // const objArr = Object.values(checkBarPropsList);
 
-            if (objArr[objArr.length - 3]) {
-              objArr[objArr.length - 3].style = { width: '45px' };
-            }
+            // if (objArr[objArr.length - 3]) {
+            //   objArr[objArr.length - 3].style = { width: '45px' };
+            // }
 
-            if (objArr[objArr.length - 2]) {
-              objArr[objArr.length - 2].style = { width: '100px' };
-            }
+            // if (objArr[objArr.length - 2]) {
+            //   objArr[objArr.length - 2].style = { width: '100px' };
+            // }
 
-            if (objArr[objArr.length - 1]) {
-              objArr[objArr.length - 1].style = { width: '80px' };
-            }
+            // if (objArr[objArr.length - 1]) {
+            //   objArr[objArr.length - 1].style = { width: '80px' };
+            // }
 
             checkProps = {
               propsList: {
@@ -262,19 +271,9 @@ const Item = ({
                     theValue = key;
                   }
                 });
-                // console.log(value);
                 onChange(theValue);
-
-                // if (value === 'false') {
-                //   value = false;
-                // }
-
-                // if (value === 'true') {
-                //   value = true;
-                // }
-
-                // console.log(value);
               },
+              containerClassName: scss.checkBar,
             };
           }
 
@@ -285,7 +284,7 @@ const Item = ({
                 //
                 cKey === 'doorTrackName' && scss.inputSel_big,
                 forbidden && scss.forbidden,
-                className
+                className_inputSel
               )}
               label={label_c}
               selectProps={selectProps}
@@ -492,6 +491,7 @@ const configArr_left: Tconfig[] = [
         module: 'checkBar',
         label: '表面',
         placeholder: undefined,
+        // className: undefined,
         className: undefined,
         options: undefined,
         checkBarPropsListCre: checkBarPropsListCre_surface,

@@ -32,6 +32,7 @@ type TcheckProps = {
   checkStyle?: CSSProperties;
   isRadio?: boolean;
   toAside?: 'left';
+  containerClassName?: string;
 };
 
 type Tcheck = { [key: string]: boolean };
@@ -53,6 +54,7 @@ export default function CheckBar({
     checkStyle,
     isRadio,
     toAside: textAlign,
+    containerClassName,
   } = checkProps;
 
   const [checkList, setCheckList] = useState<Tcheck>({});
@@ -83,7 +85,14 @@ export default function CheckBar({
   }, [checkList]);
 
   return (
-    <div className={classNames(scss.checkBar, { [scss[`aside${textAlign}`]]: textAlign })}>
+    <div
+      className={classNames(
+        //
+        scss.checkBar,
+        containerClassName,
+        { [scss[`aside${textAlign}`]]: textAlign }
+      )}
+    >
       {keyArr.map((key) => {
         // const value = checkList[key];
         const { value, label, disabled: disabled_item, className, style } = propsList[key];

@@ -38,9 +38,15 @@
         }
       }
     }
+    .checkBar {
+      width: 100%;
+      flex-wrap: wrap;
+      > label {
+        flex: 20% 0 0;
+      }
+    }
   }
   .left {
-    // margin-left: 57px;
   }
   .right {
     .doorTrackName {
