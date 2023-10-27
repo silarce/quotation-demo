@@ -509,23 +509,19 @@ export default function WorkSheet() {
       },
     },
     boxB: {
-      inputProps: {
+      selectProps: {
         value: targetSheet?.boxB ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.boxB = v;
+            targetSheet.boxB = v?.value ?? '';
           }
         },
+        options: targetSheet?.options_boxB ?? [],
       },
     },
     quantity: {
       inputProps: {
         value: targetSheet?.quantity ?? '',
-        // onChange: (v) => {
-        //   if (targetSheet) {
-        //     targetSheet.quantity = v;
-        //   }
-        // },
       },
       disabled: true,
     },
