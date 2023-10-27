@@ -19,6 +19,13 @@ import {
 // type
 import { TquotationProductDto, TquotationProductItemDto, TquotationProductComponentsDto } from 'js/api/dtoTypes';
 
+// config
+import { lookup_boxBAndBoxD } from 'config/product/lookup';
+
+// utils
+import { calcProductArea, calcProductVolume, calcProductWG, findBDoptions } from 'js/utils/product/calc';
+
+// ======================================================================
 class Class_workSheet {
   constructor({
     forceUpdate,
@@ -49,6 +56,8 @@ class Class_workSheet {
 
     // 暫時先放進name，在getAccessoriesArr會改成放進id
     this._acceIdArr = this._prod.accessories.map((item) => item.name);
+
+    this.findBoxBoptions();
   } //  constructor close
 
   // ---------------------------------------------------------------------
@@ -67,7 +76,9 @@ class Class_workSheet {
   private _accessoriesOptionArr_easy: { value: string; label: string }[] = [];
 
   private _prodSpec: TdoorGeneralSpecsDto | undefined = undefined;
-
+  private _defaultBoxB = 0;
+  // ---------------------------------------------------------------------
+  options_boxB: { value: string; label: string }[] = [];
   // ---------------------------------------------------------------------
 
   async getAccessoriesArr() {
@@ -110,8 +121,106 @@ class Class_workSheet {
 
       if (res) {
         this._prodSpec = res;
+
+        return res;
       }
     } catch (error) {}
+  }
+
+  // ---------------------------------------------------------------------
+  calcArea() {
+    const area = calcProductArea({
+      height: this._prod.height,
+      boxb: this._prod.boxB,
+      fullWidth: this._prod.fullWidth,
+    });
+
+    this._prod.area = area;
+  }
+
+  private toSetDefaultBoxB() {
+    if (!this._prodSpec) {
+      return;
+    }
+
+    const motorArr = this._prodSpec.motors;
+    const hp = this.horsepower;
+    const vendor = this.motorVendor as '東元' | '大同' | '';
+    const defaultMotor = motorArr[this._prodSpec.defaultMotorIndex];
+    const defaultHP = defaultMotor.hp;
+    const box = defaultMotor.box;
+
+    if (hp !== defaultHP || !vendor || !box) {
+      return;
+    }
+
+    const boxB = box[vendor]?.boxB || box.default?.boxB;
+
+    if (boxB) {
+      this.boxB = String(boxB / 1000);
+    }
+  }
+
+  findBoxBoptions() {
+    const { options_boxB } = findBDoptions(this._prod.doorModelName);
+    this.options_boxB = options_boxB ?? [];
+  }
+
+  //
+  //
+  //
+
+  async calcProd() {
+    const prodSpec = await this.getProdSpec();
+
+    if (!prodSpec) {
+      return;
+    }
+
+    // 計算出WG
+    // this._prod.WG = (this._prod.fullWidth * 1000 - prodSpec.gapA - prodSpec.gapC) / 1000;
+    this._prod.WG =
+      calcProductWG({
+        fullWidth: this._prod.fullWidth * 1000,
+        gapA: prodSpec.gapA,
+        gapC: prodSpec.gapC,
+      }) / 1000;
+
+    const defaultMotorIndex = prodSpec.defaultMotorIndex;
+    const defaultMotor = prodSpec.motors[defaultMotorIndex];
+    const defaultMotorBox = defaultMotor.box;
+
+    // 設定馬力
+    this.horsepower = defaultMotor.hp;
+
+    // 設定boxB與thickness
+    // 後端說boxB只會在defaultMotorIndex指定的motors裡面
+    const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+    this._prod.thickness = prodSpec.thickness; // 門片厚度
+
+    // 設定馬達廠商
+    if (defaultMotorBox) {
+      if (defaultMotorBox.東元) {
+        this.motorVendor = '東元';
+        this.boxB_noCall = defaultMotorBox.東元.boxB;
+      } else if (defaultMotorBox.大同) {
+        this.motorVendor = '大同';
+        this.boxB_noCall = defaultMotorBox.大同.boxB;
+      } else if (defaultMotorBox.default) {
+        this.boxB_noCall = defaultMotorBox.default.boxB;
+      }
+    } else {
+      this.boxB_noCall = boxB ?? 0;
+    }
+
+    this.findBoxBoptions();
+    this.options_boxB?.unshift({
+      value: 'auto',
+      label: '自動計算',
+    });
+
+    //
+    //
   }
 
   getInitData() {
@@ -161,15 +270,16 @@ class Class_workSheet {
   }
 
   get fullWidth() {
-    return String(this._prod.fullWidth);
+    return String(this._prod.fullWidth / 1000);
   }
   set fullWidth(str) {
-    this._prod.fullWidth = Number(str);
+    this._prod.fullWidth = Number(str) * 1000;
+    this.calcArea();
     this.forceUpdate();
   }
 
   get WG() {
-    return String(this._prod.WG);
+    return String(this._prod.WG / 1000);
   }
 
   get BD() {
@@ -178,18 +288,35 @@ class Class_workSheet {
   }
 
   get height() {
-    return String(this._prod.height);
+    return String(this._prod.height / 1000);
   }
   set height(str) {
     this._prod.height = Number(str);
+    this.calcArea();
     this.forceUpdate();
   }
 
   get boxB() {
-    return String(this._prod.boxB);
+    return String(this._prod.boxB / 1000);
   }
   set boxB(str) {
-    this._prod.boxB = Number(str);
+    let num = Number(str) * 1000;
+
+    if (str === 'auto') {
+      num = this._defaultBoxB;
+    }
+
+    this._prod.boxB = num;
+    const boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[str]) ?? 0;
+    this._prod.boxD = boxD * 1000;
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  set boxB_noCall(num: number) {
+    this._prod.boxB = Number(num);
+    this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
+    this.calcArea();
     this.forceUpdate();
   }
 
@@ -439,6 +566,7 @@ class Class_workSheet {
   }
   set motorVendor(str) {
     this._prod.motorVendor = str;
+    this.toSetDefaultBoxB();
     this.forceUpdate();
   }
 
