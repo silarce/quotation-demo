@@ -65,6 +65,7 @@ import {
 } from './componentFilters';
 
 import { prodCellConfig } from './prodCellConfig';
+import { lookup_boxBAndBoxD } from 'config/product/lookup';
 
 // =============================================================================
 // type
@@ -1305,8 +1306,8 @@ class Class_product {
 
   findBDoptions() {
     if (this._prodData.doorType) {
-      const BDList = pairBD[this._prodData.doorType]?.BtoD;
-      const DBList = pairBD[this._prodData.doorType]?.DtoB;
+      const BDList = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD;
+      const DBList = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB;
 
       if (BDList) {
         this.options_boxB = Object.keys(BDList).map((key) => {
@@ -1626,7 +1627,7 @@ class Class_product {
 
     this._prodData.boxB = v;
 
-    this._prodData.boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -1638,7 +1639,7 @@ class Class_product {
   set boxB_noCall(v: string) {
     this._prodData.boxB = v;
 
-    this._prodData.boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
     this.reRender();
   }
@@ -1649,7 +1650,7 @@ class Class_product {
   }
   set boxD(v) {
     this._prodData.boxD = v;
-    this._prodData.boxB = pairBD[this._prodData.doorType]?.DtoB[v] ?? '';
+    this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -2514,39 +2515,39 @@ const creOptions_surface: () => Toption[] = () => [
 ];
 
 // 理論上不會有undefined，但現在情況混亂，先加上去吧
-type TpariBD = {
-  [key: string]:
-    | {
-        BtoD: {
-          [key: string]: string | undefined;
-        };
-        DtoB: {
-          [key: string]: string | undefined;
-        };
-      }
-    | undefined;
-};
-// 單位為m
-const pairBD: TpariBD = {
-  'SJ-302': {
-    BtoD: {
-      '0.35': '0.56',
-      '0.40': '0.60',
-      '0.45': '0.65',
-      '0.50': '0.75',
-      '0.55': '0.80',
-      '0.60': '0.90',
-    },
-    DtoB: {
-      '0.56': '0.35',
-      '0.60': '0.40',
-      '0.65': '0.45',
-      '0.75': '0.50',
-      '0.80': '0.55',
-      '0.90': '0.60',
-    },
-  },
-};
+// type TpariBD = {
+//   [key: string]:
+//     | {
+//         BtoD: {
+//           [key: string]: string | undefined;
+//         };
+//         DtoB: {
+//           [key: string]: string | undefined;
+//         };
+//       }
+//     | undefined;
+// };
+// // 單位為m
+// const pairBD: TpariBD = {
+//   'SJ-302': {
+//     BtoD: {
+//       '0.35': '0.56',
+//       '0.40': '0.60',
+//       '0.45': '0.65',
+//       '0.50': '0.75',
+//       '0.55': '0.80',
+//       '0.60': '0.90',
+//     },
+//     DtoB: {
+//       '0.56': '0.35',
+//       '0.60': '0.40',
+//       '0.65': '0.45',
+//       '0.75': '0.50',
+//       '0.80': '0.55',
+//       '0.90': '0.60',
+//     },
+//   },
+// };
 
 const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
   const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
