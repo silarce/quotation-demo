@@ -253,8 +253,6 @@ class Class_workSheet {
 
   // ---------------------------------------------------------------------
 
-  // ---------------------------------------------------------------------
-
   get itemName() {
     return this._prod.itemName;
   }
@@ -291,9 +289,10 @@ class Class_workSheet {
 
   get height() {
     return String(this._prod.height / 1000);
+    // return Decimal.div(this._prod.height, 1000).toString();
   }
   set height(str) {
-    this._prod.height = Number(str);
+    this._prod.height = Number(str) * 1000;
     this.calcArea();
     this.forceUpdate();
   }
