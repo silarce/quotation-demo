@@ -33,7 +33,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { useGetEngineeringContact, useGetWorkSheet } from 'js/api/api_engineering';
+import { TupdateWorkSheet, useGetEngineeringContact, useGetWorkSheet, apiPatchWorkSheet } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // hook
@@ -200,7 +200,7 @@ export default function WorkSheet() {
 
   const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
 
-  const { sheetList, reset } = useWorkSheet({
+  const { sheetList, changedSheetList, reset } = useWorkSheet({
     itemTokenList: itemTokenList ?? {},
     itemIdArrList: itemIdArrList ?? {},
   });
@@ -925,6 +925,14 @@ export default function WorkSheet() {
       底座開口: '999',
     },
   };
+
+  // -------------------------------------------------------------------------
+
+  const reqPatch = async () => {
+    // TupdateWorkSheet
+  };
+
+  console.log(changedSheetList);
 
   // -------------------------------------------------------------------------
 

@@ -17,6 +17,7 @@ import {
 } from 'js/api/api_product';
 
 // type
+import { TforceUpdate_workSheet } from './useSheet';
 import { TquotationProductDto, TquotationProductItemDto, TquotationProductComponentsDto } from 'js/api/dtoTypes';
 
 // config
@@ -36,7 +37,8 @@ class Class_workSheet {
     oldProd = _.cloneDeep(prod),
   }: {
     //
-    forceUpdate: () => void;
+    // forceUpdate: (props?: { isNoChange?: boolean }) => void;
+    forceUpdate: TforceUpdate_workSheet;
     prod: TquotationProductItemDto;
     itemIdArr: string[];
     oldProd?: TquotationProductItemDto;
@@ -64,7 +66,7 @@ class Class_workSheet {
 
   private _prod: TquotationProductItemDto;
   readonly oldProd: TquotationProductItemDto;
-  private forceUpdate: () => void;
+  private forceUpdate: TforceUpdate_workSheet;
   private itemIdArr: string[];
   // ---------------------------------------------------------------------
 
@@ -105,8 +107,6 @@ class Class_workSheet {
       });
 
       this._acceIdArr = arr;
-
-      this.forceUpdate();
     }
   }
 
@@ -233,6 +233,8 @@ class Class_workSheet {
     if (this._prodSpec === undefined) {
       this.getProdSpec();
     }
+
+    this.forceUpdate({ isNoChange: true });
   }
 
   // ---------------------------------------------------------------------
