@@ -4,11 +4,25 @@
 問題
 
 沒有對component為空陣列的情況做處理
-l與h無法輸入小數
 
-----
-l h boxB 門型 編輯後要呼叫的api還沒做
 
+--------------
+在報價單主產品
+呼叫get /products/door/available-components
+是為了取得材料配件資料，並顯出來
+顯示出來的欄位有代號、說明、材料、表面、烤漆、單位、數量、牌價、牌價複價、單價、複價
+這些欄位中，只有材料與表面會在工作表顯示出來
+而材料與表面的選項目前是固定的，
+所以應該是不需要呼叫 get /products/door/available-components
+況且component換掉就是整個主產品換掉，這應該不是工作表這邊要做的事
+component不變的話
+get /products/door/generate-door-product-bom 也不需要呼叫了
+
+看來需要呼叫並用來更新資料的只有
+get /products/door/calc-general-spec
+get /products/door/calc-detail-spec
+這兩個api的呼叫已經放進Class_workSheet.calcProd與Class_workSheet.getInitData了
+按下計算按鈕就會呼叫Class_workSheet.getInitData
 
 */
 

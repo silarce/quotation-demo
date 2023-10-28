@@ -225,8 +225,6 @@ class Class_workSheet {
   }
 
   changeComMaterial() {
-    // this.options_com_valueArr
-
     let material = this.options_com[1].value;
 
     if (this.options_com_valueArr.includes(this._prod.materialName)) {
@@ -237,8 +235,6 @@ class Class_workSheet {
     this.comList.headBox.material = material;
     this.comList.bottomBar.material = material;
     this.comList.slat.material = material;
-
-    //
   }
 
   //
@@ -294,8 +290,8 @@ class Class_workSheet {
       label: '自動計算',
     });
 
+    this.changeComMaterial();
     this.getProdDetailSepc();
-
     this.forceUpdate();
 
     //
@@ -421,7 +417,7 @@ class Class_workSheet {
   }
   set materialName(str) {
     this._prod.materialName = str;
-    this.changeComMaterial();
+    // this.changeComMaterial();
     this.forceUpdate();
   }
 
