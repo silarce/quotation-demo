@@ -249,13 +249,11 @@ class Class_workSheet {
     }
 
     // 計算出WG
-    // this._prod.WG = (this._prod.fullWidth * 1000 - prodSpec.gapA - prodSpec.gapC) / 1000;
-    this._prod.WG =
-      calcProductWG({
-        fullWidth: this._prod.fullWidth * 1000,
-        gapA: prodSpec.gapA,
-        gapC: prodSpec.gapC,
-      }) / 1000;
+    this._prod.WG = calcProductWG({
+      fullWidth: this._prod.fullWidth,
+      gapA: prodSpec.gapA,
+      gapC: prodSpec.gapC,
+    });
 
     const defaultMotorIndex = prodSpec.defaultMotorIndex;
     const defaultMotor = prodSpec.motors[defaultMotorIndex];
