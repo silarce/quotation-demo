@@ -3,9 +3,8 @@
 /*
 問題
 
-沒有對component為空陣列的情況做處理
-
 捲箱與門軌 的厚度選項現在仍是假資料
+有幾個下拉式選單選了之後會NaN
 
 --------------
 在報價單主產品
@@ -24,6 +23,21 @@ get /products/door/calc-general-spec
 get /products/door/calc-detail-spec
 這兩個api的呼叫已經放進Class_workSheet.calcProd與Class_workSheet.getInitData了
 按下計算按鈕就會呼叫Class_workSheet.getInitData
+
+如果工作表的是到現場實作後，修改主產品規格的紀錄
+那麼是不是厚度、馬力數的選項就不應該是從後端取得的資料
+而是應該包含所有可能的選項?
+在主產品
+options_horsepower
+options_motor
+options_phase
+options_voltage
+options_rollUpBoxThick
+options_doorTrackThick
+都是從_availableComponents拿的
+先主產品的作法吧，只是取得availableComponents後不把component換掉
+
+
 
 */
 

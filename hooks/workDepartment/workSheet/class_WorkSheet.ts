@@ -1,11 +1,14 @@
 import _ from 'lodash';
 import Decimal from 'decimal.js';
+import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 import {
+  TpacParams,
+  TdoorComponentListDto,
   TdoorModelInfoDto,
   TgenerateDoorProductBomDto,
   TdoorAccessoryDto,
@@ -14,6 +17,7 @@ import {
   apiGetProdCalcGeneralSpec,
   apiPostProdGenerateDoorProductBom,
   apiGetProdCalcDetailSpec,
+  apiGetProdAvailableComponents,
   // apiGetProdAvailableComponents,
 } from 'js/api/api_product';
 
@@ -109,12 +113,25 @@ class Class_workSheet {
 
   private _prodSpec: TdoorGeneralSpecsDto | undefined = undefined;
   private _prodDetailSpec: { slatCount: number } | undefined = undefined;
-  private _defaultBoxB = 0;
+
+  private _availableComponents: TdoorComponentListDto | undefined = undefined;
+
   // ---------------------------------------------------------------------
   options_com = optionsCreator_componentMaterial_01();
   options_com_valueArr = Object.values(this.options_com).map((item) => item.value);
   options_boxB: { value: string; label: string }[] = [];
+  // 下面這六個會經由執行retrieveOptions()來設定
+  options_horsepower: Toption[] | undefined = undefined;
+  options_motor: Toption[] | undefined = undefined;
+  options_phase: Toption[] | undefined = undefined;
+  options_voltage: Toption[] | undefined = undefined;
+  options_rollUpBoxThick: Toption[] | undefined = undefined;
+  options_doorTrackThick: Toption[] | undefined = undefined;
+  //
+  // options_boxB: Toption[] | undefined = undefined;
+  // options_boxD: Toption[] | undefined = undefined;
   // ---------------------------------------------------------------------
+  private _defaultBoxB = 0;
   private _fullWidth_str = '';
   private _height_str = '';
   // ---------------------------------------------------------------------
@@ -202,6 +219,40 @@ class Class_workSheet {
     }
   }
 
+  async getProdAvailableComponents() {
+    const rollerDiameter = this._prodSpec?.diameter;
+
+    // console.log(this.doorModelName);
+    console.log('rollerDiameter', rollerDiameter);
+    console.log(this._prodSpec?.weight);
+
+    if (!this.doorModelName || !this._prodSpec?.weight || !rollerDiameter) {
+      return false;
+    }
+
+    try {
+      const res = await apiGetProdAvailableComponents({
+        modelName: this.doorModelName as TpacParams['modelName'],
+        weight: this._prodSpec.weight,
+        isAntiTyphoon: this.isAntiTyphoon,
+        rollerDiameter: rollerDiameter,
+      });
+      this._availableComponents = res;
+
+      this.retrieveOptions();
+
+      return true;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string; status: number }>;
+
+      const { message, status } = err.response?.data ?? {};
+
+      myAlert.err({ title: '取得材料配件失敗', content: status + ' ' + message });
+
+      return false;
+    }
+  }
+
   // ---------------------------------------------------------------------
   calcArea() {
     const area = calcProductArea({
@@ -254,9 +305,114 @@ class Class_workSheet {
     this.comList.slat.material = material;
   }
 
-  //
-  //
-  //
+  // -------------------------
+
+  // 從_availableComponents撈出主產品下拉式選單的選項
+  private retrieveOptions() {
+    if (!this._availableComponents) {
+      return;
+    }
+
+    const { guideRails, motors, headBoxes } = this._availableComponents;
+
+    const horsePowerList: { [key: string]: Toption } = {};
+    const motorVendorList: { [key: string]: Toption } = {};
+    const phaseList: { [key: string]: Toption } = {};
+    const voltageList: { [key: string]: Toption } = {};
+    const headBoxThickList: { [key: string]: Toption } = {};
+    const railThickList: { [key: string]: Toption } = {};
+
+    motors.forEach((item) => {
+      const { horsePower, motorVendor, phase, voltage } = item;
+
+      if (horsePower) {
+        horsePowerList[horsePower] = {
+          value: horsePower,
+          label: horsePower,
+        };
+      }
+
+      if (motorVendor) {
+        motorVendorList[motorVendor] = {
+          value: motorVendor,
+          label: motorVendor,
+        };
+      }
+
+      if (phase) {
+        phaseList[phase] = {
+          value: String(phase),
+          // label: phase === 1 ? '單相' : phase === 3 ? '三相' : '未知資料',
+          label: phase === 1 ? '1' : phase === 3 ? '3' : '未知資料',
+        };
+      }
+
+      if (voltage) {
+        voltageList[voltage] = {
+          value: String(voltage),
+          label: voltage === 220 ? '220V' : voltage === 380 ? '380V' : '未知資料',
+        };
+      }
+    });
+
+    headBoxes.forEach((item) => {
+      const { thickness } = item;
+
+      if (thickness) {
+        headBoxThickList[thickness] = {
+          value: String(thickness),
+          label: String(thickness),
+        };
+      }
+    });
+
+    guideRails.forEach((item) => {
+      const { thickness } = item;
+
+      if (thickness) {
+        railThickList[thickness] = {
+          value: String(thickness),
+          label: String(thickness),
+        };
+      }
+    });
+
+    if (Object.keys(horsePowerList).length > 0) {
+      this.options_horsepower = Object.values(horsePowerList);
+    } else {
+      this.options_horsepower = undefined;
+    }
+
+    if (Object.keys(motorVendorList).length > 0) {
+      this.options_motor = Object.values(motorVendorList);
+    } else {
+      this.options_motor = undefined;
+    }
+
+    if (Object.keys(phaseList).length > 0) {
+      this.options_phase = Object.values(phaseList);
+    } else {
+      this.options_phase = undefined;
+    }
+
+    if (Object.keys(voltageList).length > 0) {
+      this.options_voltage = Object.values(voltageList);
+    } else {
+      this.options_voltage = undefined;
+    }
+
+    if (Object.keys(headBoxThickList).length > 0) {
+      this.options_rollUpBoxThick = Object.values(headBoxThickList);
+    } else {
+      this.options_rollUpBoxThick = undefined;
+    }
+
+    if (Object.keys(railThickList).length > 0) {
+      this.options_doorTrackThick = Object.values(railThickList);
+    }
+  } // retrieveOptions
+
+  // -------------------------
 
   async calcProd() {
     const prodSpec = await this.getProdSpec();
@@ -307,23 +463,28 @@ class Class_workSheet {
 
     this.changeComMaterial();
     this.getProdDetailSepc();
+    this.getProdAvailableComponents();
     this.forceUpdate();
 
     //
     //
   }
 
-  getInitData() {
+  async getInitData() {
     if (this.accessoriesOptionArr.length === 0) {
       this.getAccessoriesArr();
     }
 
-    if (this._prodSpec === undefined) {
-      this.getProdSpec();
-    }
-
     if (this._prodDetailSpec === undefined) {
       this.getProdDetailSepc();
+    }
+
+    if (this._prodSpec === undefined) {
+      await this.getProdSpec();
+    }
+
+    if (this._availableComponents === undefined) {
+      this.getProdAvailableComponents();
     }
 
     this.forceUpdate({ isNoChange: true });
