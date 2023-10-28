@@ -61,10 +61,27 @@ class Class_workSheet {
     this._height_str = String(this._prod.height / 1000);
 
     //
-    const comList: { [key: string]: TquotationProductComponentsDto } = {};
+    const comKeyArr: TquotationProductComponentsDto['type'][] = [
+      'slat',
+      'bottomBar',
+      'guideRail',
+      'sidePlate',
+      'roller',
+      'motor',
+      'motorAccessories',
+      'headBox',
+    ];
+    // const comList: { [key: string]: TquotationProductComponentsDto } = {};
+    const comList: { [key in TquotationProductComponentsDto['type']]?: TquotationProductComponentsDto } = {};
 
     this._prod.components.forEach((com) => {
       comList[com.type] = com;
+    });
+
+    comKeyArr.forEach((key) => {
+      if (!comList[key]) {
+        comList[key] = creEmptyCom(key);
+      }
     });
 
     this.comList = comList as { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -428,15 +445,6 @@ class Class_workSheet {
   }
 
   // -------------------------------------------------------
-
-  // | 'slat'
-  // | 'bottomBar'
-  // | 'guideRail'
-  // | 'sidePlate'
-  // | 'roller'
-  // | 'motor'
-  // | 'motorAccessories'
-  // | 'headBox';
 
   // 捲軸
 
@@ -817,3 +825,24 @@ class Class_workSheet {
 } // Class_workSheet close
 
 export { Class_workSheet as Class_workSheet };
+
+// ======================================================================
+
+const creEmptyCom = (type: TquotationProductComponentsDto['type']): TquotationProductComponentsDto => ({
+  id: '',
+  createdAt: '',
+  updatedAt: '',
+  type: type,
+  number: '',
+  componentId: '',
+  rawData: {},
+  bom: undefined,
+  material: '',
+  materialSurface: undefined,
+  isPainted: false,
+  price: 0,
+  quantity: '0',
+  order: 0,
+  desc: null,
+  density: null,
+});
