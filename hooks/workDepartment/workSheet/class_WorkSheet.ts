@@ -104,7 +104,16 @@ class Class_workSheet {
 
   async getAccessoriesArr() {
     this._accessoriesOptionArr = [];
-    const res = await apiGetProdAccessories({ modelName: this.doorModelName });
+
+    let res: TdoorAccessoryDto[] | undefined = undefined;
+
+    try {
+      res = await apiGetProdAccessories({ modelName: this.doorModelName });
+    } catch (error) {
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得選配列表失敗', content: statusCode + ' ' + message });
+    }
 
     if (res) {
       this._accessoriesOptionArr = res;
@@ -130,6 +139,12 @@ class Class_workSheet {
   }
 
   async getProdSpec() {
+    if (!this._prod.fullWidth) {
+      myAlert.info({ title: '全寬不可為0' });
+
+      return undefined;
+    }
+
     try {
       const res = await apiGetProdCalcGeneralSpec({
         modelName: this.doorModelName as TdoorModelInfoDto['name'],
@@ -144,8 +159,9 @@ class Class_workSheet {
         return res;
       }
     } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '取得產品規格失敗', content: err.message });
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得產品規格失敗', content: statusCode + ' ' + message });
     }
   }
 
@@ -163,8 +179,9 @@ class Class_workSheet {
         return res;
       }
     } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '取得產品細節規格失敗', content: err.message });
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得產品細節規格失敗', content: statusCode + ' ' + message });
     }
   }
 
@@ -277,6 +294,8 @@ class Class_workSheet {
       label: '自動計算',
     });
 
+    this.getProdDetailSepc();
+
     this.forceUpdate();
 
     //
@@ -352,7 +371,6 @@ class Class_workSheet {
   }
 
   get BD() {
-    // TODO item裡沒有boxD，已回報給後端
     return new Decimal(this._prod.boxB).mul(this._prod.boxD ?? 0).toString();
   }
 
