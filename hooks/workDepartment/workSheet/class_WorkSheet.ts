@@ -57,6 +57,10 @@ class Class_workSheet {
     this.oldProd = oldProd;
     this.itemIdArr = itemIdArr;
 
+    this._fullWidth_str = String(this._prod.fullWidth / 1000);
+    this._height_str = String(this._prod.height / 1000);
+
+    //
     const comList: { [key: string]: TquotationProductComponentsDto } = {};
 
     this._prod.components.forEach((com) => {
@@ -93,6 +97,9 @@ class Class_workSheet {
   options_com = optionsCreator_componentMaterial_01();
   options_com_valueArr = Object.values(this.options_com).map((item) => item.value);
   options_boxB: { value: string; label: string }[] = [];
+  // ---------------------------------------------------------------------
+  private _fullWidth_str = '';
+  private _height_str = '';
   // ---------------------------------------------------------------------
 
   async getAccessoriesArr() {
@@ -331,10 +338,11 @@ class Class_workSheet {
   }
 
   get fullWidth() {
-    return String(this._prod.fullWidth / 1000);
+    return this._fullWidth_str;
   }
   set fullWidth(str) {
-    this._prod.fullWidth = Number(str) * 1000;
+    this._fullWidth_str = str;
+    this._prod.fullWidth = Number(this._fullWidth_str) * 1000;
     this.calcArea();
     this.forceUpdate();
   }
@@ -349,11 +357,11 @@ class Class_workSheet {
   }
 
   get height() {
-    return String(this._prod.height / 1000);
-    // return Decimal.div(this._prod.height, 1000).toString();
+    return this._height_str;
   }
   set height(str) {
-    this._prod.height = Number(str) * 1000;
+    this._height_str = str;
+    this._prod.height = Number(this._height_str) * 1000;
     this.calcArea();
     this.forceUpdate();
   }

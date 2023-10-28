@@ -6,7 +6,9 @@
 沒有對component為空陣列的情況做處理
 l與h無法輸入小數
 
-要呼叫api取得捲片支數
+----
+l h boxB 門型 編輯後要呼叫的api還沒做
+
 
 */
 
@@ -494,6 +496,7 @@ export default function WorkSheet() {
             targetSheet.fullWidth = v;
           }
         },
+        inputType: 'number',
       },
     },
     height: {
@@ -504,6 +507,7 @@ export default function WorkSheet() {
             targetSheet.height = v;
           }
         },
+        inputType: 'number',
       },
     },
     boxB: {
