@@ -653,7 +653,7 @@ const configArr_right: Tconfig[] = [
       {
         cKey: 'powerSupply',
         module: 'select',
-        label: '電供',
+        label: '相數',
         placeholder: undefined,
         className: undefined,
         options: fakeOption_powerSupply,

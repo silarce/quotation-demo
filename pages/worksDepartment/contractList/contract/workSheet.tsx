@@ -35,7 +35,8 @@ options_voltage
 options_rollUpBoxThick
 options_doorTrackThick
 都是從_availableComponents拿的
-先主產品的作法吧，只是取得availableComponents後不把component換掉
+先用主產品的作法吧，只是取得availableComponents後不把component換掉
+只取得options
 
 
 
@@ -225,11 +226,6 @@ export default function WorkSheet() {
     // console.log(workSheet);
   }, [workSheet]);
 
-  // console.log('productList', productList);
-  // console.log('itemIdArrList', itemIdArrList);
-  // console.log('itemTokenList', itemTokenList);
-  // console.log('----------------------------------------------');
-
   // --------------------------------------------------------
   useEffect(() => {
     (async () => {
@@ -259,9 +255,6 @@ export default function WorkSheet() {
   });
 
   const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey ?? 'undefined'];
-
-  // console.log(productList);
-  // console.log(sheetList);
 
   const doorModelOptionArr = useMemo(() => {
     if (!doorModelList) {
@@ -626,6 +619,7 @@ export default function WorkSheet() {
             targetSheet.headBoxThickness = v;
           }
         },
+        optionArr: targetSheet?.options_rollUpBoxThick ?? [],
       },
       surface: {
         value: targetSheet?.com_headBox_surface ?? '',
@@ -653,6 +647,7 @@ export default function WorkSheet() {
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
+        forbidden: true,
       },
       type: {
         value: targetSheet?.com_headBox_type ?? '',
@@ -767,6 +762,7 @@ export default function WorkSheet() {
             targetSheet.horsepower = v;
           }
         },
+        optionArr: targetSheet?.options_horsepower ?? [],
       },
       manufacturer: {
         value: targetSheet?.motorVendor ?? '',
@@ -775,6 +771,7 @@ export default function WorkSheet() {
             targetSheet.motorVendor = v;
           }
         },
+        optionArr: targetSheet?.options_motor ?? [],
       },
       powerSupply: {
         value: targetSheet?.motorPhase ?? '',
@@ -783,6 +780,7 @@ export default function WorkSheet() {
             targetSheet.motorPhase = v;
           }
         },
+        optionArr: targetSheet?.options_phase ?? [],
       },
       voltage: {
         value: targetSheet?.motorVoltage ?? '',
@@ -791,6 +789,7 @@ export default function WorkSheet() {
             targetSheet.motorVoltage = v;
           }
         },
+        optionArr: targetSheet?.options_voltage ?? [],
       },
       support: {
         value: (() => {
@@ -849,6 +848,7 @@ export default function WorkSheet() {
             targetSheet.guideRailThickness = v;
           }
         },
+        optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
         value: targetSheet?.com_guideRail_surface ?? '',
@@ -1070,7 +1070,7 @@ export default function WorkSheet() {
             <WorkSheetProductDetail01
               control={control_detail}
               disabled={disabled}
-              supportTip={`馬達荷重(max:${999},min:${999}),馬力數:${99}Hp`}
+              supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
             <hr />
@@ -1183,55 +1183,3 @@ const creEmptyProfile = (): Tprofile => ({
 //     doorTrackName: '',
 //   },
 // });
-
-// console.log(
-//   JSON.parse(`{
-//   "contractProductItem":                {
-//             "id": "1fa79772-a846-46af-9ba2-0d67ada04585",
-//             "createdAt": "2023-10-26T02:05:55.107Z",
-//             "updatedAt": "2023-10-26T02:08:40.117Z",
-//             "createdBy": "4ab9a27a-1fcb-437a-9cdf-f239e768930e",
-//             "updatedBy": "4ab9a27a-1fcb-437a-9cdf-f239e768930e",
-//             "deletedBy": null,
-//             "itemNumber": "S-1121026-02undefined0101",
-//             "itemName": "測試update第1次",
-//             "discount": "100",
-//             "quoteType": "捲門",
-//             "doorModelName": "SJ-302",
-//             "fullWidth": 3000,
-//             "WG": 50000,
-//             "height": 55000,
-//             "boxB": 0,
-//             "area": "165.00",
-//             "volume": "",
-//             "materialName": "SST#304",
-//             "materialSurface": "HL",
-//             "guideRail": "SJ302_30.svg",
-//             "horsepower": "",
-//             "motorVendor": "",
-//             "motorVoltage": 0,
-//             "hasMotorSupportStand": false,
-//             "bottomBar": "",
-//             "motorLockBox": "外露",
-//             "guideRailThickness": "0",
-//             "rollerSpec": "無凸",
-//             "hasSilencingStrip": false,
-//             "isIntegratedHeadBox": false,
-//             "headBoxThickness": "0",
-//             "unitPrice": 302940,
-//             "totalPrice": 302940,
-//             "price": 302940,
-//             "dualPrice": 302940,
-//             "isAntiTyphoon": false,
-//             "bounceDoor": true,
-//             "closingType": "電動",
-//             "notes": "",
-//             "motorPhase": 1,
-//             "bottomBarAngleIron": "不鏽鋼#304 50*50*3T",
-//             "bottomBarPlate": "不鏽鋼#304 1.5T",
-//             "productId": "1f534566-4d0d-45e6-bbc7-4dfce1fda512",
-//             "worksheetId": "844fb786-1a65-4008-a40c-2bd4b5b6d64b",
-//             "others": null
-//         }
-// }`)
-// );
