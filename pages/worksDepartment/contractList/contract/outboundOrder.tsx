@@ -98,7 +98,10 @@ export default function OutboundOrder() {
 
   return (
     <SubLayer>
-      <PageHeader panelList={disabled ? panelList01 : panelList02} />
+      <PageHeader
+        panelList={disabled ? panelList01 : panelList02}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+      />
 
       <div>
         <div className={style.outboundOrder}>
