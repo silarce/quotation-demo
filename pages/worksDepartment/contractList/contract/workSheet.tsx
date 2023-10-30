@@ -1,5 +1,47 @@
 // 工作表
 
+/*
+問題
+
+捲箱與門軌 的厚度選項現在仍是假資料
+有幾個下拉式選單選了之後會NaN
+
+--------------
+在報價單主產品
+呼叫get /products/door/available-components
+是為了取得材料配件資料，並顯出來
+顯示出來的欄位有代號、說明、材料、表面、烤漆、單位、數量、牌價、牌價複價、單價、複價
+這些欄位中，只有材料與表面會在工作表顯示出來
+而材料與表面的選項目前是固定的，
+所以應該是不需要呼叫 get /products/door/available-components
+況且component換掉就是整個主產品換掉，這應該不是工作表這邊要做的事
+component不變的話
+get /products/door/generate-door-product-bom 也不需要呼叫了
+
+看來需要呼叫並用來更新資料的只有
+get /products/door/calc-general-spec
+get /products/door/calc-detail-spec
+這兩個api的呼叫已經放進Class_workSheet.calcProd與Class_workSheet.getInitData了
+按下計算按鈕就會呼叫Class_workSheet.getInitData
+
+如果工作表的是到現場實作後，修改主產品規格的紀錄
+那麼是不是厚度、馬力數的選項就不應該是從後端取得的資料
+而是應該包含所有可能的選項?
+在主產品
+options_horsepower
+options_motor
+options_phase
+options_voltage
+options_rollUpBoxThick
+options_doorTrackThick
+都是從_availableComponents拿的
+先用主產品的作法吧，只是取得availableComponents後不把component換掉
+只取得options
+
+
+
+*/
+
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 // import _ from 'lodash';
@@ -60,6 +102,9 @@ import {
 
 // type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+
+// import staticWorkSheet from 'public/workSheet.json';
+// console.log(staticWorkSheet);
 
 // ====================================================================
 
@@ -141,6 +186,7 @@ export default function WorkSheet() {
 用useWorkSheet裡的changedList配合forceUpdate紀錄
 
  */
+
     if (!workSheet?.contractProductItems) {
       return {};
     }
@@ -172,11 +218,6 @@ export default function WorkSheet() {
     // console.log(workSheet);
   }, [workSheet]);
 
-  // console.log('productList', productList);
-  // console.log('itemIdArrList', itemIdArrList);
-  // console.log('itemTokenList', itemTokenList);
-  // console.log('----------------------------------------------');
-
   // --------------------------------------------------------
   useEffect(() => {
     (async () => {
@@ -206,9 +247,6 @@ export default function WorkSheet() {
   });
 
   const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey ?? 'undefined'];
-
-  // console.log(productList);
-  // console.log(sheetList);
 
   const doorModelOptionArr = useMemo(() => {
     if (!doorModelList) {
@@ -334,6 +372,10 @@ export default function WorkSheet() {
   useEffect(() => {
     if (disabled) {
       reset();
+
+      if (targetSheet) {
+        targetSheet.getInitData();
+      }
     }
   }, [disabled, itemTokenList]);
   //
@@ -468,6 +510,7 @@ export default function WorkSheet() {
             targetSheet.fullWidth = v;
           }
         },
+        inputType: 'number',
       },
     },
     height: {
@@ -478,6 +521,7 @@ export default function WorkSheet() {
             targetSheet.height = v;
           }
         },
+        inputType: 'number',
       },
     },
     boxB: {
@@ -567,6 +611,7 @@ export default function WorkSheet() {
             targetSheet.headBoxThickness = v;
           }
         },
+        optionArr: targetSheet?.options_rollUpBoxThick ?? [],
       },
       surface: {
         value: targetSheet?.com_headBox_surface ?? '',
@@ -594,6 +639,7 @@ export default function WorkSheet() {
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
+        forbidden: true,
       },
       type: {
         value: targetSheet?.com_headBox_type ?? '',
@@ -708,6 +754,7 @@ export default function WorkSheet() {
             targetSheet.horsepower = v;
           }
         },
+        optionArr: targetSheet?.options_horsepower ?? [],
       },
       manufacturer: {
         value: targetSheet?.motorVendor ?? '',
@@ -716,6 +763,7 @@ export default function WorkSheet() {
             targetSheet.motorVendor = v;
           }
         },
+        optionArr: targetSheet?.options_motor ?? [],
       },
       powerSupply: {
         value: targetSheet?.motorPhase ?? '',
@@ -724,6 +772,7 @@ export default function WorkSheet() {
             targetSheet.motorPhase = v;
           }
         },
+        optionArr: targetSheet?.options_phase ?? [],
       },
       voltage: {
         value: targetSheet?.motorVoltage ?? '',
@@ -732,6 +781,7 @@ export default function WorkSheet() {
             targetSheet.motorVoltage = v;
           }
         },
+        optionArr: targetSheet?.options_voltage ?? [],
       },
       support: {
         value: (() => {
@@ -790,6 +840,7 @@ export default function WorkSheet() {
             targetSheet.guideRailThickness = v;
           }
         },
+        optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
         value: targetSheet?.com_guideRail_surface ?? '',
@@ -871,7 +922,7 @@ export default function WorkSheet() {
       門片材質: targetSheet?.com_slat_material ?? '',
       門片厚度: targetSheet?.thickness ?? '',
       門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
-      捲片支數: '999',
+      捲片支數: numToStr(targetSheet?.prodDetailSpec?.slatCount),
       防颱勾: '是否是指主產品的"防颱"?',
     },
     motor: {
@@ -888,7 +939,8 @@ export default function WorkSheet() {
       },
     },
     chainCog: {
-      鏈齒輪番號: 'gearNumber',
+      // 鏈齒輪番號: 'gearNumber',
+      鏈齒輪番號: targetSheet?.prodSpec?.gearNumber ?? '',
       大鏈輪: '999',
       孔徑: '999',
     },
@@ -1010,7 +1062,7 @@ export default function WorkSheet() {
             <WorkSheetProductDetail01
               control={control_detail}
               disabled={disabled}
-              supportTip={`馬達荷重(max:${999},min:${999}),馬力數:${99}Hp`}
+              supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
             <hr />
@@ -1123,55 +1175,3 @@ const creEmptyProfile = (): Tprofile => ({
 //     doorTrackName: '',
 //   },
 // });
-
-// console.log(
-//   JSON.parse(`{
-//   "contractProductItem":                {
-//             "id": "1fa79772-a846-46af-9ba2-0d67ada04585",
-//             "createdAt": "2023-10-26T02:05:55.107Z",
-//             "updatedAt": "2023-10-26T02:08:40.117Z",
-//             "createdBy": "4ab9a27a-1fcb-437a-9cdf-f239e768930e",
-//             "updatedBy": "4ab9a27a-1fcb-437a-9cdf-f239e768930e",
-//             "deletedBy": null,
-//             "itemNumber": "S-1121026-02undefined0101",
-//             "itemName": "測試update第1次",
-//             "discount": "100",
-//             "quoteType": "捲門",
-//             "doorModelName": "SJ-302",
-//             "fullWidth": 3000,
-//             "WG": 50000,
-//             "height": 55000,
-//             "boxB": 0,
-//             "area": "165.00",
-//             "volume": "",
-//             "materialName": "SST#304",
-//             "materialSurface": "HL",
-//             "guideRail": "SJ302_30.svg",
-//             "horsepower": "",
-//             "motorVendor": "",
-//             "motorVoltage": 0,
-//             "hasMotorSupportStand": false,
-//             "bottomBar": "",
-//             "motorLockBox": "外露",
-//             "guideRailThickness": "0",
-//             "rollerSpec": "無凸",
-//             "hasSilencingStrip": false,
-//             "isIntegratedHeadBox": false,
-//             "headBoxThickness": "0",
-//             "unitPrice": 302940,
-//             "totalPrice": 302940,
-//             "price": 302940,
-//             "dualPrice": 302940,
-//             "isAntiTyphoon": false,
-//             "bounceDoor": true,
-//             "closingType": "電動",
-//             "notes": "",
-//             "motorPhase": 1,
-//             "bottomBarAngleIron": "不鏽鋼#304 50*50*3T",
-//             "bottomBarPlate": "不鏽鋼#304 1.5T",
-//             "productId": "1f534566-4d0d-45e6-bbc7-4dfce1fda512",
-//             "worksheetId": "844fb786-1a65-4008-a40c-2bd4b5b6d64b",
-//             "others": null
-//         }
-// }`)
-// );

@@ -1446,6 +1446,7 @@ export type TdoorGeneralSpecsDto = {
   gapA: number;
   gapC: number;
   motors: TdoorGeneralSpecsMotorDto[];
+  gearNumber: string;
   sprocketWheelModel: string;
   sprocketWheelTeethNumber: string;
   sprocketWheelChains: number;
@@ -2120,5 +2121,5 @@ export type TupdateWorkSheet = {
   worksheetId: string;
   others: null;
   components: TquotationProductComponentsDto[];
-  accessories: TquotationProductAccessoriesDto[];
+  accessories: TcreateQuotationProductAccessoriesDto[];
 };

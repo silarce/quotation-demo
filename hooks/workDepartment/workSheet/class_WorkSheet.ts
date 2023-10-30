@@ -1,11 +1,14 @@
 import _ from 'lodash';
 import Decimal from 'decimal.js';
+import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 import {
+  TpacParams,
+  TdoorComponentListDto,
   TdoorModelInfoDto,
   TgenerateDoorProductBomDto,
   TdoorAccessoryDto,
@@ -13,6 +16,8 @@ import {
   apiGetProdAccessories,
   apiGetProdCalcGeneralSpec,
   apiPostProdGenerateDoorProductBom,
+  apiGetProdCalcDetailSpec,
+  apiGetProdAvailableComponents,
   // apiGetProdAvailableComponents,
 } from 'js/api/api_product';
 
@@ -30,6 +35,9 @@ import { lookup_boxBAndBoxD } from 'config/product/lookup';
 
 // utils
 import { calcProductArea, calcProductVolume, calcProductWG, findBDoptions } from 'js/utils/product/calc';
+
+// options
+import { Toption, optionsCreator_componentMaterial_01 } from 'js/utils/options/productOptions';
 
 // ======================================================================
 class Class_workSheet {
@@ -53,10 +61,31 @@ class Class_workSheet {
     this.oldProd = oldProd;
     this.itemIdArr = itemIdArr;
 
-    const comList: { [key: string]: TquotationProductComponentsDto } = {};
+    this._fullWidth_str = String(this._prod.fullWidth / 1000);
+    this._height_str = String(this._prod.height / 1000);
+
+    //
+    const comKeyArr: TquotationProductComponentsDto['type'][] = [
+      'slat',
+      'bottomBar',
+      'guideRail',
+      'sidePlate',
+      'roller',
+      'motor',
+      'motorAccessories',
+      'headBox',
+    ];
+    // const comList: { [key: string]: TquotationProductComponentsDto } = {};
+    const comList: { [key in TquotationProductComponentsDto['type']]?: TquotationProductComponentsDto } = {};
 
     this._prod.components.forEach((com) => {
       comList[com.type] = com;
+    });
+
+    comKeyArr.forEach((key) => {
+      if (!comList[key]) {
+        comList[key] = creEmptyCom(key);
+      }
     });
 
     this.comList = comList as { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -83,14 +112,42 @@ class Class_workSheet {
   private _accessoriesOptionArr_easy: { value: string; label: string }[] = [];
 
   private _prodSpec: TdoorGeneralSpecsDto | undefined = undefined;
-  private _defaultBoxB = 0;
+  private _prodDetailSpec: { slatCount: number } | undefined = undefined;
+
+  private _availableComponents: TdoorComponentListDto | undefined = undefined;
+
   // ---------------------------------------------------------------------
+  options_com = optionsCreator_componentMaterial_01();
+  options_com_valueArr = Object.values(this.options_com).map((item) => item.value);
   options_boxB: { value: string; label: string }[] = [];
+  // 下面這六個會經由執行retrieveOptions()來設定
+  options_horsepower: Toption[] | undefined = undefined;
+  options_motor: Toption[] | undefined = undefined;
+  options_phase: Toption[] | undefined = undefined;
+  options_voltage: Toption[] | undefined = undefined;
+  options_rollUpBoxThick: Toption[] | undefined = undefined;
+  options_doorTrackThick: Toption[] | undefined = undefined;
+  //
+  // options_boxB: Toption[] | undefined = undefined;
+  // options_boxD: Toption[] | undefined = undefined;
+  // ---------------------------------------------------------------------
+  private _defaultBoxB = 0;
+  private _fullWidth_str = '';
+  private _height_str = '';
   // ---------------------------------------------------------------------
 
   async getAccessoriesArr() {
     this._accessoriesOptionArr = [];
-    const res = await apiGetProdAccessories({ modelName: this.doorModelName });
+
+    let res: TdoorAccessoryDto[] | undefined = undefined;
+
+    try {
+      res = await apiGetProdAccessories({ modelName: this.doorModelName });
+    } catch (error) {
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得選配列表失敗', content: statusCode + ' ' + message });
+    }
 
     if (res) {
       this._accessoriesOptionArr = res;
@@ -116,6 +173,12 @@ class Class_workSheet {
   }
 
   async getProdSpec() {
+    if (!this._prod.fullWidth) {
+      myAlert.info({ title: '全寬不可為0' });
+
+      return undefined;
+    }
+
     try {
       const res = await apiGetProdCalcGeneralSpec({
         modelName: this.doorModelName as TdoorModelInfoDto['name'],
@@ -129,7 +192,65 @@ class Class_workSheet {
 
         return res;
       }
-    } catch (error) {}
+    } catch (error) {
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得產品規格失敗', content: statusCode + ' ' + message });
+    }
+  }
+
+  async getProdDetailSepc() {
+    try {
+      const res = await apiGetProdCalcDetailSpec({
+        modelName: this.doorModelName as TdoorModelInfoDto['name'],
+        height: this._prod.height,
+        B: this._prod.boxB,
+      });
+
+      if (res) {
+        this._prodDetailSpec = res;
+
+        return res;
+      }
+    } catch (error) {
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得產品細節規格失敗', content: statusCode + ' ' + message });
+    }
+  }
+
+  async getProdAvailableComponents() {
+    const rollerDiameter = this._prodSpec?.diameter;
+
+    // console.log(this.doorModelName);
+    console.log('rollerDiameter', rollerDiameter);
+    console.log(this._prodSpec?.weight);
+
+    if (!this.doorModelName || !this._prodSpec?.weight || !rollerDiameter) {
+      return false;
+    }
+
+    try {
+      const res = await apiGetProdAvailableComponents({
+        modelName: this.doorModelName as TpacParams['modelName'],
+        weight: this._prodSpec.weight,
+        isAntiTyphoon: this.isAntiTyphoon,
+        rollerDiameter: rollerDiameter,
+      });
+      this._availableComponents = res;
+
+      this.retrieveOptions();
+
+      return true;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string; status: number }>;
+
+      const { message, status } = err.response?.data ?? {};
+
+      myAlert.err({ title: '取得材料配件失敗', content: status + ' ' + message });
+
+      return false;
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -171,9 +292,127 @@ class Class_workSheet {
     this.options_boxB = options_boxB ?? [];
   }
 
-  //
-  //
-  //
+  changeComMaterial() {
+    let material = this.options_com[1].value;
+
+    if (this.options_com_valueArr.includes(this._prod.materialName)) {
+      material = this._prod.materialName;
+    }
+
+    this.comList.guideRail.material = material;
+    this.comList.headBox.material = material;
+    this.comList.bottomBar.material = material;
+    this.comList.slat.material = material;
+  }
+
+  // -------------------------
+
+  // 從_availableComponents撈出主產品下拉式選單的選項
+  private retrieveOptions() {
+    if (!this._availableComponents) {
+      return;
+    }
+
+    const { guideRails, motors, headBoxes } = this._availableComponents;
+
+    const horsePowerList: { [key: string]: Toption } = {};
+    const motorVendorList: { [key: string]: Toption } = {};
+    const phaseList: { [key: string]: Toption } = {};
+    const voltageList: { [key: string]: Toption } = {};
+    const headBoxThickList: { [key: string]: Toption } = {};
+    const railThickList: { [key: string]: Toption } = {};
+
+    motors.forEach((item) => {
+      const { horsePower, motorVendor, phase, voltage } = item;
+
+      if (horsePower) {
+        horsePowerList[horsePower] = {
+          value: horsePower,
+          label: horsePower,
+        };
+      }
+
+      if (motorVendor) {
+        motorVendorList[motorVendor] = {
+          value: motorVendor,
+          label: motorVendor,
+        };
+      }
+
+      if (phase) {
+        phaseList[phase] = {
+          value: String(phase),
+          // label: phase === 1 ? '單相' : phase === 3 ? '三相' : '未知資料',
+          label: phase === 1 ? '1' : phase === 3 ? '3' : '未知資料',
+        };
+      }
+
+      if (voltage) {
+        voltageList[voltage] = {
+          value: String(voltage),
+          label: voltage === 220 ? '220V' : voltage === 380 ? '380V' : '未知資料',
+        };
+      }
+    });
+
+    headBoxes.forEach((item) => {
+      const { thickness } = item;
+
+      if (thickness) {
+        headBoxThickList[thickness] = {
+          value: String(thickness),
+          label: String(thickness),
+        };
+      }
+    });
+
+    guideRails.forEach((item) => {
+      const { thickness } = item;
+
+      if (thickness) {
+        railThickList[thickness] = {
+          value: String(thickness),
+          label: String(thickness),
+        };
+      }
+    });
+
+    if (Object.keys(horsePowerList).length > 0) {
+      this.options_horsepower = Object.values(horsePowerList);
+    } else {
+      this.options_horsepower = undefined;
+    }
+
+    if (Object.keys(motorVendorList).length > 0) {
+      this.options_motor = Object.values(motorVendorList);
+    } else {
+      this.options_motor = undefined;
+    }
+
+    if (Object.keys(phaseList).length > 0) {
+      this.options_phase = Object.values(phaseList);
+    } else {
+      this.options_phase = undefined;
+    }
+
+    if (Object.keys(voltageList).length > 0) {
+      this.options_voltage = Object.values(voltageList);
+    } else {
+      this.options_voltage = undefined;
+    }
+
+    if (Object.keys(headBoxThickList).length > 0) {
+      this.options_rollUpBoxThick = Object.values(headBoxThickList);
+    } else {
+      this.options_rollUpBoxThick = undefined;
+    }
+
+    if (Object.keys(railThickList).length > 0) {
+      this.options_doorTrackThick = Object.values(railThickList);
+    }
+  } // retrieveOptions
+
+  // -------------------------
 
   async calcProd() {
     const prodSpec = await this.getProdSpec();
@@ -183,13 +422,11 @@ class Class_workSheet {
     }
 
     // 計算出WG
-    // this._prod.WG = (this._prod.fullWidth * 1000 - prodSpec.gapA - prodSpec.gapC) / 1000;
-    this._prod.WG =
-      calcProductWG({
-        fullWidth: this._prod.fullWidth * 1000,
-        gapA: prodSpec.gapA,
-        gapC: prodSpec.gapC,
-      }) / 1000;
+    this._prod.WG = calcProductWG({
+      fullWidth: this._prod.fullWidth,
+      gapA: prodSpec.gapA,
+      gapC: prodSpec.gapC,
+    });
 
     const defaultMotorIndex = prodSpec.defaultMotorIndex;
     const defaultMotor = prodSpec.motors[defaultMotorIndex];
@@ -224,19 +461,30 @@ class Class_workSheet {
       label: '自動計算',
     });
 
+    this.changeComMaterial();
+    this.getProdDetailSepc();
+    this.getProdAvailableComponents();
     this.forceUpdate();
 
     //
     //
   }
 
-  getInitData() {
+  async getInitData() {
     if (this.accessoriesOptionArr.length === 0) {
       this.getAccessoriesArr();
     }
 
+    if (this._prodDetailSpec === undefined) {
+      this.getProdDetailSepc();
+    }
+
     if (this._prodSpec === undefined) {
-      this.getProdSpec();
+      await this.getProdSpec();
+    }
+
+    if (this._availableComponents === undefined) {
+      this.getProdAvailableComponents();
     }
 
     this.forceUpdate({ isNoChange: true });
@@ -258,6 +506,10 @@ class Class_workSheet {
     return this._prodSpec;
   }
 
+  get prodDetailSpec() {
+    return this._prodDetailSpec;
+  }
+
   // ---------------------------------------------------------------------
 
   get itemName() {
@@ -277,10 +529,11 @@ class Class_workSheet {
   }
 
   get fullWidth() {
-    return String(this._prod.fullWidth / 1000);
+    return this._fullWidth_str;
   }
   set fullWidth(str) {
-    this._prod.fullWidth = Number(str) * 1000;
+    this._fullWidth_str = str;
+    this._prod.fullWidth = Number(this._fullWidth_str) * 1000;
     this.calcArea();
     this.forceUpdate();
   }
@@ -290,16 +543,15 @@ class Class_workSheet {
   }
 
   get BD() {
-    // TODO item裡沒有boxD，已回報給後端
     return new Decimal(this._prod.boxB).mul(this._prod.boxD ?? 0).toString();
   }
 
   get height() {
-    return String(this._prod.height / 1000);
-    // return Decimal.div(this._prod.height, 1000).toString();
+    return this._height_str;
   }
   set height(str) {
-    this._prod.height = Number(str) * 1000;
+    this._height_str = str;
+    this._prod.height = Number(this._height_str) * 1000;
     this.calcArea();
     this.forceUpdate();
   }
@@ -341,6 +593,7 @@ class Class_workSheet {
   }
   set materialName(str) {
     this._prod.materialName = str;
+    // this.changeComMaterial();
     this.forceUpdate();
   }
 
@@ -353,15 +606,6 @@ class Class_workSheet {
   }
 
   // -------------------------------------------------------
-
-  // | 'slat'
-  // | 'bottomBar'
-  // | 'guideRail'
-  // | 'sidePlate'
-  // | 'roller'
-  // | 'motor'
-  // | 'motorAccessories'
-  // | 'headBox';
 
   // 捲軸
 
@@ -704,6 +948,26 @@ class Class_workSheet {
   get bodyItemArr(): TupdateWorkSheet[] {
     const componentArr = Object.values(this.comList);
 
+    const accessories: TupdateWorkSheet['accessories'] = this._acceIdArr.map((id) => {
+      const acce = this._accessoriesOptionList[id];
+
+      const acceBody: TupdateWorkSheet['accessories'][number] = {
+        codeName: '', //代號
+        name: acce.name, //名稱
+        unit: acce.unit ?? '', // 單位
+        quantity: 0, // 數量
+        price: acce.price ?? 0, // 牌價
+        unitPrice: acce.price ?? 0, // 單價
+        totalPrice: 0, // 複價
+        dualPrice: 0, // 牌價複價
+        order: 0,
+        referenceSpec: acce.referenceSpec,
+        originalPrice: acce.price ?? 0,
+      };
+
+      return acceBody;
+    });
+
     return this.itemIdArr.map((id) => {
       const item: TupdateWorkSheet = {
         ...this._prod,
@@ -711,6 +975,7 @@ class Class_workSheet {
         guideRailThickness: this.guideRailThickness,
         headBoxThickness: this.headBoxThickness,
         components: componentArr,
+        accessories,
       };
 
       return item;
@@ -721,3 +986,24 @@ class Class_workSheet {
 } // Class_workSheet close
 
 export { Class_workSheet as Class_workSheet };
+
+// ======================================================================
+
+const creEmptyCom = (type: TquotationProductComponentsDto['type']): TquotationProductComponentsDto => ({
+  id: '',
+  createdAt: '',
+  updatedAt: '',
+  type: type,
+  number: '',
+  componentId: '',
+  rawData: {},
+  bom: undefined,
+  material: '',
+  materialSurface: undefined,
+  isPainted: false,
+  price: 0,
+  quantity: '0',
+  order: 0,
+  desc: null,
+  density: null,
+});
