@@ -168,6 +168,7 @@ class Class_workSheet {
         }
       });
 
+      this._accessoriesOptionList = list;
       this._acceIdArr = arr;
     }
   }
@@ -221,10 +222,6 @@ class Class_workSheet {
 
   async getProdAvailableComponents() {
     const rollerDiameter = this._prodSpec?.diameter;
-
-    // console.log(this.doorModelName);
-    console.log('rollerDiameter', rollerDiameter);
-    console.log(this._prodSpec?.weight);
 
     if (!this.doorModelName || !this._prodSpec?.weight || !rollerDiameter) {
       return false;
@@ -949,7 +946,7 @@ class Class_workSheet {
     const componentArr = Object.values(this.comList);
 
     const accessories: TupdateWorkSheet['accessories'] = this._acceIdArr.map((id) => {
-      const acce = this._accessoriesOptionList[id];
+      const acce = this._accessoriesOptionList[id] ?? {};
 
       const acceBody: TupdateWorkSheet['accessories'][number] = {
         codeName: '', //代號
