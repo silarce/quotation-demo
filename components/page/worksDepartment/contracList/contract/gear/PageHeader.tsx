@@ -47,7 +47,7 @@ export default function PageHeader({
     },
     {
       label: '出庫單',
-      disabled: true,
+      // disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
         query,
