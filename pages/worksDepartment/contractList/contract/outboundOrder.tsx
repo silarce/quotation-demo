@@ -116,7 +116,7 @@ export default function OutboundOrder() {
             </div>
           </div>
 
-          <OrderTable editable={!disabled} />
+          <OrderTable disabled={disabled} control={[]} />
 
           <div className={style.remark}>
             <div className={style.title}>
