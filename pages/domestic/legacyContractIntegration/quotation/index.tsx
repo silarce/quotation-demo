@@ -99,7 +99,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
-  console.log(verticalKeyArr);
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
@@ -364,8 +363,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   if (!classLegacyContract) {
     return null;
   }
-
-  // console.log(classLegacyContract.postBody);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
