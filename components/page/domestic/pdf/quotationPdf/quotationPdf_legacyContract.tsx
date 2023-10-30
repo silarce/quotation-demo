@@ -178,10 +178,16 @@ export default function QuotationPdf({
 
   const productArr: TtableProdList_series = (() => {
     // const classProdArr = classLegacyContract.prodArr;
+
     const prodList = classLegacyContract.prodList;
 
-    return verticalKeyArr.map((key) => {
+    let arr = verticalKeyArr.map((key) => {
       const prod = prodList[key];
+
+      if (!prod) {
+        return null;
+      }
+
       const lw = new Decimal(Number(prod?.width || 0) || Number(prod?.length || 0)).mul(100).toString();
       const h = new Decimal(Number(prod?.height || 0)).mul(100).toString();
       const b = new Decimal(Number(prod?.boxB || 0)).mul(100).toNumber();
@@ -208,6 +214,10 @@ export default function QuotationPdf({
         series: prod.itemName,
       };
     });
+
+    arr = arr.filter((item) => !!item);
+
+    return arr as TtableProdList_series;
   })();
 
   // ----------------------------------------------------------------------------
