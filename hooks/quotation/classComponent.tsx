@@ -871,8 +871,6 @@ const creDesc_slats = (classCom: Class_component) => {
   const { isAntiTyphoon, material, surface, thickness, name } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
 
-  console.log(thickness);
-
   // return `${desc_isAntiTyphoon} `;
   return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
 };

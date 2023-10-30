@@ -78,12 +78,12 @@ import {
 // =============================================================================
 // type
 import type {
-  TlegacyContractProductDto,
-  TcreateLegacyContractProductDto,
+  // TlegacyContractProductDto,
+  // TcreateLegacyContractProductDto,
   TdoorComponentListDto,
   TquotationProductAccessoriesDto,
   TgenerateDoorProductBomDto_DoorSpec,
-  TgenerateDoorProductBomDto_ComponentInfo,
+  // TgenerateDoorProductBomDto_ComponentInfo,
   TcreateQuotationProductAccessoriesDto,
   TcreateQuotationProductComponentDto,
   TquotationProductComponentsDto,
@@ -94,7 +94,7 @@ import type {
 
 import type { TreRender, TcomponentKey } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
-import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+// import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
 import type { TdoorModelInfoDto } from 'js/api/api_product';
 import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_product';
@@ -277,6 +277,7 @@ class Class_product {
 
   // 其他防抖
   timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
+  timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
 
   // ---------------------------------------------------------
 
@@ -1560,11 +1561,8 @@ class Class_product {
     this._prodData.fullWidth = v;
     // this._prodData.WG = '0';
     this.area = this.calcArea();
-
     this.clearProd();
-
     this.calcChangeAccePrice();
-
     this.shouldCall_cgs = true;
     this.callAllReq();
 
@@ -1597,7 +1595,6 @@ class Class_product {
   的pdfPartProps
    */
 
-    this._prodData.WG = v;
     // this._prodData.fullWidth = '0';
     // this.area = this.calcArea();
 
@@ -1607,8 +1604,11 @@ class Class_product {
 
     // this.shouldCall_cgs = true;
     // this.callAllReq();
+    this._prodData.WG = v;
 
     const callReq = async () => {
+      console.log('fooooooo');
+
       const fullWidth = await calcFullwidthWithWG({
         body: {
           modelName: this.doorType as TpcgsPrams['modelName'],
@@ -1619,10 +1619,22 @@ class Class_product {
       });
 
       this._prodData.fullWidth = String(fullWidth / 1000);
-      this.reRender();
+
+      this.area = this.calcArea();
+      this.clearProd();
+      this.calcChangeAccePrice();
+      this.shouldCall_cgs = true;
+      this.callAllReq();
     };
 
-    callReq();
+    if (this.timeoutId_calcFullWidth) {
+      clearTimeout(this.timeoutId_calcFullWidth);
+    }
+
+    this.timeoutId_calcFullWidth = setTimeout(async () => {
+      await callReq();
+      this.reRender();
+    }, 300);
 
     this.reRender();
   }
