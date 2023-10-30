@@ -552,7 +552,7 @@ export const apiGetWorkSheet = (id: string) => {
       'contractProductItems.product',
       'contractProductItems.components',
       'contractProductItems.accessories',
-      //  'legacyProductItems'
+      'contractProductItems.adjustedItem',
     ],
   };
 
