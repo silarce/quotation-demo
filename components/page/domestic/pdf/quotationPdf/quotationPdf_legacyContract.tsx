@@ -182,9 +182,9 @@ export default function QuotationPdf({
 
     return verticalKeyArr.map((key) => {
       const prod = prodList[key];
-      const lw = new Decimal(Number(prod.width || 0) || Number(prod.length || 0)).mul(100).toString();
-      const h = new Decimal(Number(prod.height || 0)).mul(100).toString();
-      const b = new Decimal(Number(prod.boxB || 0)).mul(100).toNumber();
+      const lw = new Decimal(Number(prod?.width || 0) || Number(prod?.length || 0)).mul(100).toString();
+      const h = new Decimal(Number(prod?.height || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod?.boxB || 0)).mul(100).toNumber();
 
       const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
