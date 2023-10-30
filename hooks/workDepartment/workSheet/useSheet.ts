@@ -41,6 +41,7 @@ const useWorkSheet = ({
     Object.keys(itemTokenList).forEach((key) => {
       const prod = itemTokenList[key];
       list[key] = new Class_workSheet({
+        identifyKey: key,
         forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
           forceUpdate();
 

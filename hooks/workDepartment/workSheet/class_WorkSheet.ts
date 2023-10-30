@@ -48,6 +48,7 @@ class Class_workSheet {
     // 未來若分堆需求，oldProd可能會要是未被修改的資料
     // 這樣可以取父prod的oldProd放進來，prod則是父prod的資料
     oldProd = _.cloneDeep(prod),
+    identifyKey,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -55,11 +56,13 @@ class Class_workSheet {
     prod: TquotationProductItemDto;
     itemIdArr: string[];
     oldProd?: TquotationProductItemDto;
+    identifyKey: string;
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
     this.oldProd = oldProd;
     this.itemIdArr = itemIdArr;
+    this.identifyKey = identifyKey;
 
     this._fullWidth_str = String(this._prod.fullWidth / 1000);
     this._height_str = String(this._prod.height / 1000);
@@ -102,6 +105,7 @@ class Class_workSheet {
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
   private itemIdArr: string[];
+  readonly identifyKey;
   // ---------------------------------------------------------------------
 
   private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -490,6 +494,9 @@ class Class_workSheet {
   // ---------------------------------------------------------------------
   get productId() {
     return this._prod.productId;
+  }
+  get adjustedItemId() {
+    return this._prod.adjustedItemId;
   }
 
   get accessoriesOptionArr() {

@@ -554,7 +554,8 @@ export const apiGetWorkSheet = (id: string) => {
       'contractProductItems.product',
       'contractProductItems.components',
       'contractProductItems.accessories',
-      'contractProductItems.adjustedItem',
+      'contractProductItems.adjustedItem.components',
+      'contractProductItems.adjustedItem.accessories',
     ],
   };
 

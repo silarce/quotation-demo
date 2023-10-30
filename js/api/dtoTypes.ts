@@ -994,6 +994,7 @@ export type TquotationProductItemDto = Omit<
   others: null;
   deliveryStatus?: TdeliveryStatusDto | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
+  adjustedItemId?: string | null;
 };
 
 type TquotationContentDto_foo = {

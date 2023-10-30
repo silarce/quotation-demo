@@ -116,9 +116,6 @@ import {
 // type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
 
-// import staticWorkSheet from 'public/workSheet.json';
-// console.log(staticWorkSheet);
-
 // ====================================================================
 
 type Tprofile = {
@@ -168,22 +165,6 @@ export default function WorkSheet() {
     })();
   }, []);
 
-  // const productList = useMemo(() => {
-  //   const list: { [key: string]: TquotationProductDto } = {};
-
-  //   if (!contract) {
-  //     return list;
-  //   }
-
-  //   contract.subContracts.forEach((item) => {
-  //     item.content.products.forEach((prod) => {
-  //       list[prod.rootProductId] = prod;
-  //     });
-  //   });
-
-  //   return list;
-  // }, [contract]);
-
   // --------------------------------------------------------
   // --------------------------------------------------------
   const { itemTokenList, itemIdArrList } = useMemo(() => {
@@ -210,25 +191,50 @@ export default function WorkSheet() {
     const itemIdArrList: { [key: string]: string[] } = {};
 
     contractProductItems.forEach((item) => {
-      const productId = item.productId;
+      const { productId, adjustedItem, adjustedItemId } = item;
 
-      if (!itemTokenList[productId]) {
-        itemTokenList[productId] = item;
+      let theItem: typeof item;
+      let theId: string;
+
+      if (adjustedItem && adjustedItemId) {
+        theItem = adjustedItem;
+        theId = adjustedItemId;
+      } else {
+        theItem = item;
+        theId = productId;
       }
 
-      if (!itemIdArrList[productId]) {
-        itemIdArrList[productId] = [];
+      itemTokenList[theId] = theItem;
+
+      //
+      if (!itemIdArrList[theId]) {
+        itemIdArrList[theId] = [];
       }
 
-      itemIdArrList[productId].push(item.id);
+      itemIdArrList[theId].push(item.id);
+
+      // //
+      // if (!itemTokenList[productId]) {
+      //   itemTokenList[productId] = item;
+      // }
+
+      // if (!itemTokenList[productId]) {
+      //   itemTokenList[productId] = item;
+      // }
+
+      // //
+      // if (!itemIdArrList[productId]) {
+      //   itemIdArrList[productId] = [];
+      // }
+
+      // itemIdArrList[productId].push(item.id);
+      // //
     });
 
     return {
       itemTokenList,
       itemIdArrList,
     };
-
-    // console.log(workSheet);
   }, [workSheet]);
 
   // --------------------------------------------------------
@@ -1045,7 +1051,8 @@ export default function WorkSheet() {
                 setTargetSheetKey(key);
               };
 
-              const isActive = key === targetSheet?.productId;
+              // const isActive = key === targetSheet?.productId;
+              const isActive = key === targetSheet?.identifyKey;
 
               const control = {
                 itemName,
