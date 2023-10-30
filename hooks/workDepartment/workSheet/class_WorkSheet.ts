@@ -25,7 +25,7 @@ import {
 import { TforceUpdate_workSheet } from './useSheet';
 import {
   TquotationProductDto,
-  TupdateWorkSheet,
+  TupdateWorkSheetItem,
   TquotationProductItemDto,
   TquotationProductComponentsDto,
 } from 'js/api/dtoTypes';
@@ -942,13 +942,13 @@ class Class_workSheet {
 
   // --------------------------------------------------------------
 
-  get bodyItemArr(): TupdateWorkSheet[] {
+  get bodyItemArr(): TupdateWorkSheetItem[] {
     const componentArr = Object.values(this.comList);
 
-    const accessories: TupdateWorkSheet['accessories'] = this._acceIdArr.map((id) => {
+    const accessories: TupdateWorkSheetItem['accessories'] = this._acceIdArr.map((id) => {
       const acce = this._accessoriesOptionList[id] ?? {};
 
-      const acceBody: TupdateWorkSheet['accessories'][number] = {
+      const acceBody: TupdateWorkSheetItem['accessories'][number] = {
         codeName: '', //代號
         name: acce.name, //名稱
         unit: acce.unit ?? '', // 單位
@@ -965,14 +965,63 @@ class Class_workSheet {
       return acceBody;
     });
 
+    // console.log(accessories);
+
+    // contractProductItems
     return this.itemIdArr.map((id) => {
-      const item: TupdateWorkSheet = {
-        ...this._prod,
+      const item: TupdateWorkSheetItem = {
+        // ...this._prod,
+        // id: id,
+        // guideRailThickness: this.guideRailThickness,
+        // headBoxThickness: this.headBoxThickness,
+        // components: componentArr,
+        // accessories,
+        // adjustedItem: undefined,
+        // adjustedItemId: undefined,
         id: id,
+        itemNumber: this._prod.itemNumber,
+        itemName: this._prod.itemName,
+        discount: this._prod.discount,
+        quoteType: this._prod.quoteType,
+        doorModelName: this._prod.doorModelName,
+        fullWidth: this._prod.fullWidth,
+        WG: this._prod.WG,
+        height: this._prod.height,
+        boxB: this._prod.boxB,
+        area: this._prod.area,
+        volume: this._prod.volume,
+        materialName: this._prod.materialName,
+        materialSurface: this._prod.materialSurface,
+        guideRail: this._prod.guideRail,
+        horsepower: this._prod.horsepower,
+        motorVendor: this._prod.motorVendor,
+        motorVoltage: this._prod.motorVoltage,
+        hasMotorSupportStand: this._prod.hasMotorSupportStand,
+        bottomBar: this._prod.bottomBar,
+        motorLockBox: this._prod.motorLockBox,
         guideRailThickness: this.guideRailThickness,
+        rollerSpec: this._prod.rollerSpec,
+        hasSilencingStrip: this._prod.hasSilencingStrip,
+        isIntegratedHeadBox: this._prod.isIntegratedHeadBox,
         headBoxThickness: this.headBoxThickness,
+        unitPrice: this._prod.unitPrice,
+        totalPrice: this._prod.totalPrice,
+        price: this._prod.price,
+        dualPrice: this._prod.dualPrice,
+        isAntiTyphoon: this._prod.isAntiTyphoon,
+        bounceDoor: this._prod.bounceDoor,
+        closingType: this._prod.closingType,
+        notes: this._prod.notes,
+        motorPhase: this._prod.motorPhase,
+        bottomBarAngleIron: this._prod.bottomBarAngleIron,
+        bottomBarPlate: this._prod.bottomBarPlate,
+        productId: this._prod.productId,
+        worksheetId: this._prod.worksheetId,
+        others: this._prod.others,
         components: componentArr,
-        accessories,
+        accessories: accessories,
+        adjustedItem: undefined,
+        adjustedItemId: undefined,
       };
 
       return item;

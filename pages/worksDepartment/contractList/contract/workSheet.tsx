@@ -38,6 +38,14 @@ options_doorTrackThick
 先用主產品的作法吧，只是取得availableComponents後不把component換掉
 只取得options
 
+-----------------------------
+
+工作表更新後
+被更新的item會產生adjustedItem這個property
+型別同item，內容是更新後的item
+
+
+
 
 
 */
@@ -75,7 +83,12 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { TupdateWorkSheet, useGetEngineeringContact, useGetWorkSheet, apiPatchWorkSheet } from 'js/api/api_engineering';
+import {
+  TupdateWorkSheetItem,
+  useGetEngineeringContact,
+  useGetWorkSheet,
+  apiPatchWorkSheet,
+} from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // hook
@@ -957,7 +970,7 @@ export default function WorkSheet() {
       return;
     }
 
-    let body: TupdateWorkSheet[] = [];
+    let body: TupdateWorkSheetItem[] = [];
 
     Object.values(changedSheetList).forEach((sheet) => {
       const bodyItemArr = sheet.bodyItemArr;
@@ -965,7 +978,7 @@ export default function WorkSheet() {
     });
 
     try {
-      await apiPatchWorkSheet(worksheetId, body);
+      await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
       await update_workSheet();
       setDisabled(true);
     } catch (error) {
