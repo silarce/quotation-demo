@@ -1,12 +1,7 @@
 // 工作表
 
 /*
-問題
 
-捲箱與門軌 的厚度選項現在仍是假資料
-有幾個下拉式選單選了之後會NaN
-
---------------
 在報價單主產品
 呼叫get /products/door/available-components
 是為了取得材料配件資料，並顯出來
@@ -43,10 +38,6 @@ options_doorTrackThick
 工作表更新後
 被更新的item會產生adjustedItem這個property
 型別同item，內容是更新後的item
-
-
-
-
 
 */
 
@@ -88,6 +79,7 @@ import {
   useGetEngineeringContact,
   useGetWorkSheet,
   apiPatchWorkSheet,
+  apiPostEngineeringDeliveryList,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
@@ -115,6 +107,7 @@ import {
 
 // type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+import { set } from 'lodash';
 
 // ====================================================================
 
@@ -993,6 +986,24 @@ export default function WorkSheet() {
     }
   };
 
+  /**產生出庫單 */
+  const reqPostDeliveryList = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPostEngineeringDeliveryList({ contractId });
+      myAlert.success({ title: '產生出庫單成功' });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '產生出庫單失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // -------------------------------------------------------------------------
 
   const control_optional: Tcontrol_optional = {
@@ -1006,6 +1017,11 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
+    {
+      type: 'myButton',
+      label: '產生出庫單',
+      onClick: reqPostDeliveryList,
+    },
     {
       type: 'myButton',
       label: '編輯',
