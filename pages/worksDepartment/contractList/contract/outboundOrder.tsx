@@ -19,8 +19,7 @@ import style from './contract.module.scss';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { TupdateWorkSheet, useGetEngineeringContact, useGetWorkSheet, apiPatchWorkSheet } from 'js/api/api_engineering';
-import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
+import { useGetEngineeringContact, useApiGetEngineeringDeliveryList } from 'js/api/api_engineering';
 
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -37,9 +36,11 @@ export default function OutboundOrder() {
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
   // const engineeringContactId = contract?.engineeringContactId;
-  const { engineeringContactId } = contract ?? {};
+  const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
+
+  const { deliveryList, update_deliveryList } = useApiGetEngineeringDeliveryList(engineeringDeliveryListId);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +60,7 @@ export default function OutboundOrder() {
       try {
         setIsLoading(true);
         await update_engineeringContact();
+        await update_deliveryList();
       } catch (error) {
       } finally {
         setIsLoading(false);

@@ -633,13 +633,17 @@ export const apiPostEngineeringDeliveryList = (body: {
 export const apiGetEngineeringDeliveryList = (id: string) => {
   const api = `engineering/delivery-list/${id}`;
 
+  const params = {
+    populate: ['contract.worksheet.contractProductItems.deliveryStatus'],
+  };
+
   return axi
-    .get<TengineeringDeliveryListDto>(api)
+    .get<TengineeringDeliveryListDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useApiGetEngineeringDeliveryList = (id: string | undefined) => {
+export const useApiGetEngineeringDeliveryList = (id: string | undefined | null) => {
   const [res, setRes] = useState<TengineeringDeliveryListDto>();
 
   const update = async () => {
@@ -664,8 +668,8 @@ export const useApiGetEngineeringDeliveryList = (id: string | undefined) => {
   };
 
   return {
-    data: res,
-    update,
+    deliveryList: res,
+    update_deliveryList: update,
   };
 };
 

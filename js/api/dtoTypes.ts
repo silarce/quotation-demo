@@ -1331,8 +1331,12 @@ export type TquotationContractDto = {
   version: number;
   //
   subContracts: TquotationContractDto[];
+  /**工程聯絡單ID */
   engineeringContactId: string | null;
+  /**工作表ID */
   worksheetId: string | null;
+  /**出庫單ID */
+  engineeringDeliveryListId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
