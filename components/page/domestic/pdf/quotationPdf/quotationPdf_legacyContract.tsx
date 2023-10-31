@@ -110,8 +110,8 @@ export default function QuotationPdf({
       projectName,
     } = classBasicInfo;
 
-    // const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+    const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+    // const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
     return {
       quotationId: contractNumber,
@@ -122,7 +122,7 @@ export default function QuotationPdf({
       builtDate: dateString,
       projectAddress: projectCity + projectDistrict + projectAddress,
       projectName,
-      validityPeriod: '--',
+      validityPeriod: '',
     };
   })();
   // -------------------------------
@@ -164,7 +164,8 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
         tradingLocation: deliveryLocation,
