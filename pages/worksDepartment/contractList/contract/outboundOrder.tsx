@@ -1,7 +1,7 @@
 // 出庫單
 // 出庫單
 // 出庫單
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -20,9 +20,21 @@ import style from './contract.module.scss';
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { useGetEngineeringContact, useApiGetEngineeringDeliveryList } from 'js/api/api_engineering';
+import { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+
+// =====================================================================
+
+type Tdelevery = {
+  itemName: string;
+  itemArr: TquotationProductItemDto[];
+};
+
+type myDeleveryList = {
+  [key: string]: Tdelevery;
+};
 
 // =====================================================================
 export default function OutboundOrder() {
@@ -69,6 +81,46 @@ export default function OutboundOrder() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
+
+  // --------------------------------------------------------------------------
+
+  const { myDeleveryList } = useMemo(() => {
+    if (!deliveryList?.contract.worksheet?.contractProductItems) {
+      return {};
+    }
+
+    const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
+
+    const myDeleveryList: myDeleveryList = {};
+
+    contractProductItems.forEach((item) => {
+      const { productId, adjustedItem, adjustedItemId } = item;
+
+      let theItem: typeof item;
+      let theId: string;
+
+      if (adjustedItem && adjustedItemId) {
+        theItem = adjustedItem;
+        theId = adjustedItemId;
+      } else {
+        theItem = item;
+        theId = productId;
+      }
+
+      if (!myDeleveryList?.[theId]) {
+        myDeleveryList[theId] = {
+          itemName: theItem.itemName,
+          itemArr: [],
+        };
+      }
+
+      myDeleveryList[theId].itemArr.push(theItem);
+    });
+
+    return {
+      myDeleveryList,
+    };
+  }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
