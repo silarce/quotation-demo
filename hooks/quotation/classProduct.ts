@@ -29,11 +29,12 @@ import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
-import { optionsCreator_surface } from 'js/utils/options/productOptions';
+import { optionsCreator_surface, optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
 const options_surface = optionsCreator_surface();
+const options_doorModel = optionsCreator_doorModel();
 
 // ===========================================================
 // child class
@@ -1377,10 +1378,20 @@ class Class_product {
   /**門型 options */
   get options_doorType() {
     return Object.values(this._doorModelList).map((item) => {
-      return {
-        value: item.name,
-        label: item.name,
-      };
+      const theIndex = options_doorModel.findIndex((model) => {
+        return item.name === model.value;
+      });
+
+      console.log(theIndex);
+
+      if (options_doorModel[theIndex]) {
+        return options_doorModel[theIndex];
+      } else {
+        return {
+          value: item.name,
+          label: item.name,
+        };
+      }
     });
   }
 

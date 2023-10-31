@@ -63,6 +63,10 @@ import Table_prod from 'components/page/domestic/quotation/quotation/product/tab
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -84,16 +88,11 @@ import {
   apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
+// hook
 import { useProductList } from 'hooks/quotation/useProduct';
-
-import Summary, {
-  TsummaryControl,
-  TpayInfoControl,
-} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-
 import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
