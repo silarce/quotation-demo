@@ -1069,7 +1069,7 @@ type TquotationContentDto_foo = {
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
-  updateAt: string;
+  updatedAt: string;
   quotationNumber: string;
   version: number;
 
