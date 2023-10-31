@@ -3,9 +3,6 @@ import { useState } from 'react';
 // css
 import style from './quotationPdf.module.scss';
 
-// api
-import { apiGetAssets } from 'js/api/api_product';
-
 export type TtableProdList = {
   category: string;
   size: string;
