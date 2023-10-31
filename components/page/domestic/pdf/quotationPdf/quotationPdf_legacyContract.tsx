@@ -110,7 +110,8 @@ export default function QuotationPdf({
       projectName,
     } = classBasicInfo;
 
-    const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
+    // const updatedAtStr = moment(updatedAt).subtract(1911, 'year').format('yy-MM-DD');
+    const updatedAtStr = '';
     // const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
     return {
@@ -119,7 +120,7 @@ export default function QuotationPdf({
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: dateString,
+      builtDate: updatedAtStr,
       projectAddress: projectCity + projectDistrict + projectAddress,
       projectName,
       validityPeriod: '',

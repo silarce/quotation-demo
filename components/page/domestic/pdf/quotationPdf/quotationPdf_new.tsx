@@ -47,6 +47,7 @@ export default function QuotationPdf({
 }) {
   const {
     // customerName,
+    updatedAt,
     quotationNumber,
     projectName,
     customer,
@@ -131,7 +132,7 @@ export default function QuotationPdf({
     const customerName = customer.name;
 
     // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = moment(updatedAt).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
       quotationId: quotationNumber,
