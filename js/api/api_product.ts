@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect, useMemo } from 'react';
 import { axi } from './_axiosCreator';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
 import type {
@@ -68,18 +68,40 @@ export const useApiGetProdDoorModels = () => {
   const [res, setRes] = useState<TdoorModelInfoDto[]>();
 
   const update = async () => {
-    const newRes = await apiGetProdDoorModels();
+    try {
+      const newRes = await apiGetProdDoorModels();
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得門型列表失敗', content: err.message });
+
+      return err;
+    }
+  };
+
+  const doorModelList = useMemo(() => {
+    if (!res) {
+      return undefined;
     }
 
-    return newRes;
-  };
+    const list: { [key: string]: TdoorModelInfoDto } = {};
+
+    res.forEach((item) => {
+      list[item.name] = item;
+    });
+
+    return list;
+  }, [res]);
 
   return {
     res,
     update,
+    doorModelList,
   };
 };
 

@@ -1044,7 +1044,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     const body: TcreateQuotationContentDto = {
-      quotationDate: data_watch.quotationDate ?? '',
+      // quotationDate: data_watch.quotationDate ?? '',
+      // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
+      quotationDate: new Date().toISOString(),
       validityPeriod: data_watch.validityPeriod ?? '',
       //
       customerId: data_watch.customer?.id ?? '',
@@ -1384,7 +1386,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <TextareaModal
         visible={showMemoModal}
         setVisible={setShowMemoModal}
-        title={'追加追減備註'}
+        title={'更新備註'}
         placeholder={'請輸入備註'}
         tip="最多25字"
         textLength={25}

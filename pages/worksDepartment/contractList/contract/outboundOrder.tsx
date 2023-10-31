@@ -1,27 +1,81 @@
 // 出庫單
 // 出庫單
 // 出庫單
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import OrderTable from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
+
+// gear
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import style from './contract.module.scss';
 
+// api
+import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { TupdateWorkSheet, useGetEngineeringContact, useGetWorkSheet, apiPatchWorkSheet } from 'js/api/api_engineering';
+import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
+
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// =====================================================================
 export default function OutboundOrder() {
-  const [editable, setEditable] = useState(false);
+  const router = useRouter();
+  const { contractId } = router.query as { contractId: string | undefined };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+
+  // --------------------------------------------------------------------------
+
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  // const engineeringContactId = contract?.engineeringContactId;
+  const { engineeringContactId } = contract ?? {};
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+        setIsLoading(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_engineeringContact();
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
+
+  // --------------------------------------------------------------------------
 
   const panelList01: TpanelList = [
     {
       type: 'myButton',
       label: '編輯',
       onClick: () => {
-        setEditable(true);
+        setDisabled(false);
       },
     },
   ];
@@ -37,29 +91,32 @@ export default function OutboundOrder() {
       type: 'myButton',
       label: '取消',
       onClick: () => {
-        setEditable(false);
+        setDisabled(true);
       },
     },
   ];
 
   return (
-    <div className={style.container}>
-      <PageHeader panelList={editable ? panelList02 : panelList01} />
+    <SubLayer>
+      <PageHeader
+        panelList={disabled ? panelList01 : panelList02}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+      />
 
-      <div className={style.mainContainer}>
+      <div>
         <div className={style.outboundOrder}>
           <div className={style.title}>
             <div>
               <span>工程編號</span>
-              <span>{'M-1101201'}</span>
+              <span>{engineeringContact?.projectNumber}</span>
             </div>
             <div>
               <span>工程名稱</span>
-              <span>{'台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程'}</span>
+              <span>{engineeringContact?.projectName}</span>
             </div>
           </div>
 
-          <OrderTable editable={editable} />
+          <OrderTable disabled={disabled} control={[]} />
 
           <div className={style.remark}>
             <div className={style.title}>
@@ -74,6 +131,6 @@ export default function OutboundOrder() {
           </div>
         </div>
       </div>
-    </div>
+    </SubLayer>
   );
 }

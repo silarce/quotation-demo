@@ -18,10 +18,6 @@ type TcontrolItem = {
   value: string;
   onChange: (v: string) => void;
   disabled?: boolean;
-  forbidden?: boolean;
-  icon?: string;
-  optionArr?: Toption[];
-  checkBarOptionArr?: { key: string; label: string }[];
 };
 
 type Tcontrol = {
@@ -154,15 +150,7 @@ const Item = ({
       </p>
       <div className={scss.list}>
         {arr.map((item) => {
-          const {
-            cKey: cKey,
-            module,
-            label: label_c,
-            placeholder,
-            className: className_inputSel,
-            options: options_fake,
-            checkBarPropsListCre,
-          } = item;
+          const { cKey: cKey, module, label: label_c, placeholder, className, options, checkBarPropsListCre } = item;
 
           if (!control[pKey][cKey]) {
             myAlert.err({ title: '開發者提示，Tcontrol的key與config不相符', content: `pKey:${pKey} cKey:${cKey}` });
@@ -170,27 +158,26 @@ const Item = ({
             return null;
           }
 
-          const {
-            //
-            value,
-            onChange,
-            disabled: disabled_control,
-            forbidden,
-            icon,
-            checkBarOptionArr,
-            optionArr,
-          } = control[pKey][cKey]!;
+          const { value, onChange, disabled: disabled_control } = control[pKey][cKey]!;
+
+          // if (cKey === 'hasConvex') {
+          //   console.log(cKey);
+          //   console.log(value);
+          //   console.log(onChange);
+          // }
 
           let selectProps: TselectProps | undefined = undefined;
           let checkProps: TcheckProps | undefined = undefined;
 
+          // console.log(label, label_c, value);
+
           if (module === 'select') {
             selectProps = {
-              value: value,
+              value: value as string,
               onChange: (v) => {
                 onChange(v?.value ?? '');
               },
-              options: optionArr ?? options_fake ?? [],
+              options: options ?? [],
               selClassNames: {
                 singleValue: (state) => {
                   return scss.selSingleValue;
@@ -203,12 +190,6 @@ const Item = ({
             };
 
             if (cKey === 'doorTrackName') {
-              selectProps.value = {
-                value: value,
-                label: value,
-                icon,
-              };
-
               selectProps = {
                 ...selectProps,
                 onChange: (v) => {
@@ -231,33 +212,38 @@ const Item = ({
           } //   if (module === "select")
 
           if (module === 'checkBar') {
-            // const checkBarPropsList = checkBarPropsListCre!();
-
-            const checkBarPropsList = (() => {
-              if (checkBarOptionArr) {
-                return createCheckBarPropsList(checkBarOptionArr);
-              } else {
-                return checkBarPropsListCre!();
-              }
-            })();
+            const checkBarPropsList = checkBarPropsListCre!();
 
             if (checkBarPropsList[value]) {
               checkBarPropsList[value].value = true;
             }
 
-            // const objArr = Object.values(checkBarPropsList);
-
-            // if (objArr[objArr.length - 3]) {
-            //   objArr[objArr.length - 3].style = { width: '45px' };
+            // if (pKey === 'reel' && cKey === 'hasConvex') {
+            //   console.log('control', checkBarPropsList);
+            //   console.log('control', value);
             // }
 
-            // if (objArr[objArr.length - 2]) {
-            //   objArr[objArr.length - 2].style = { width: '100px' };
+            // if (value === false && 'false' in checkBarPropsList) {
+            //   checkBarPropsList['false'].value = true;
             // }
 
-            // if (objArr[objArr.length - 1]) {
-            //   objArr[objArr.length - 1].style = { width: '80px' };
+            // if (value === true && 'true' in checkBarPropsList) {
+            //   checkBarPropsList['true'].value = true;
             // }
+
+            const objArr = Object.values(checkBarPropsList);
+
+            if (objArr[objArr.length - 3]) {
+              objArr[objArr.length - 3].style = { width: '45px' };
+            }
+
+            if (objArr[objArr.length - 2]) {
+              objArr[objArr.length - 2].style = { width: '100px' };
+            }
+
+            if (objArr[objArr.length - 1]) {
+              objArr[objArr.length - 1].style = { width: '80px' };
+            }
 
             checkProps = {
               propsList: {
@@ -272,27 +258,39 @@ const Item = ({
                     theValue = key;
                   }
                 });
+                // console.log(value);
                 onChange(theValue);
+
+                // if (value === 'false') {
+                //   value = false;
+                // }
+
+                // if (value === 'true') {
+                //   value = true;
+                // }
+
+                // console.log(value);
               },
-              containerClassName: scss.checkBar,
             };
           }
+
+          if (pKey === 'reel' && cKey === 'hasConvex') {
+            // console.log('control', checkBarPropsList);
+            // console.log('control', value);
+            console.log(checkProps);
+          }
+          // console.log(checkProps);
 
           return (
             <InputSel
               key={cKey}
-              className={classNames(
-                //
-                cKey === 'doorTrackName' && scss.inputSel_big,
-                forbidden && scss.forbidden,
-                className_inputSel
-              )}
+              className={classNames({ [scss.inputSel_big]: cKey === 'doorTrackName' }, className)}
               label={label_c}
               selectProps={selectProps}
               checkProps={checkProps}
               captionColor="main"
               captionWidth={captionWidth}
-              disabled={forbidden || disabled_control || disabled}
+              disabled={disabled_control || disabled}
               showBaseline="always"
             />
           );
@@ -369,24 +367,6 @@ const fakeOption_voltage: Toption[] = [
 ];
 
 // --------------------------------
-
-const createCheckBarPropsList = (arr: { key: string; label: string }[]): TcheckProps['propsList'] => {
-  const obj: TcheckProps['propsList'] = {};
-
-  arr.forEach((item) => {
-    obj[item.key] = {
-      value: false,
-      label: item.label,
-    };
-  });
-
-  return obj;
-};
-
-// const undefinedCheckBarPropsList = {
-//   _undefined: { value: false, label: 'undefined' },
-// };
-
 const checkBarPropsList_boolean = (): TcheckProps['propsList'] => ({
   no: { value: false, label: '無' },
   yes: { value: false, label: '有' },
@@ -492,7 +472,6 @@ const configArr_left: Tconfig[] = [
         module: 'checkBar',
         label: '表面',
         placeholder: undefined,
-        // className: undefined,
         className: undefined,
         options: undefined,
         checkBarPropsListCre: checkBarPropsListCre_surface,
@@ -653,7 +632,7 @@ const configArr_right: Tconfig[] = [
       {
         cKey: 'powerSupply',
         module: 'select',
-        label: '相數',
+        label: '電供',
         placeholder: undefined,
         className: undefined,
         options: fakeOption_powerSupply,

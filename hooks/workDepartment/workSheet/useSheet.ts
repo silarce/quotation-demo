@@ -14,12 +14,23 @@ import {
 
 type TsheetList = { [key: string]: Class_workSheet };
 
+type TforceUpdate_workSheet = (props?: { isNoChange?: boolean }) => void;
+
 // =====================================================================
-const useWorkSheet = ({ itemTokenList }: { itemTokenList: { [key: string]: TquotationProductItemDto } }) => {
+const useWorkSheet = ({
+  itemTokenList,
+  itemIdArrList,
+}: {
+  itemTokenList: { [key: string]: TquotationProductItemDto };
+  itemIdArrList: { [key: string]: string[] };
+}) => {
   // const [, updateState] = useState({});
   // const forceUpdate = useCallback(() => updateState({}), []);
   const [sheetList, setSheetList] = useState<TsheetList>({});
-  const forceUpdate = useCallback(() => setSheetList((state) => ({ ...state })), []);
+
+  const forceUpdate = useCallback(() => {
+    setSheetList((state) => ({ ...state }));
+  }, []);
 
   const [changedSheetList, setChangedSheetList] = useState<TsheetList>({});
 
@@ -30,15 +41,22 @@ const useWorkSheet = ({ itemTokenList }: { itemTokenList: { [key: string]: Tquot
     Object.keys(itemTokenList).forEach((key) => {
       const prod = itemTokenList[key];
       list[key] = new Class_workSheet({
-        forceUpdate: () => {
+        identifyKey: key,
+        forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
           forceUpdate();
+
+          if (isNoChange) {
+            return;
+          }
+
           setChangedSheetList((state) => ({ ...state, [key]: list[key] }));
         },
         prod,
-        itemIdArr: [],
+        itemIdArr: itemIdArrList[key],
       });
     });
     setSheetList(list);
+    setChangedSheetList({});
 
     // const arr = Object.values(list);
     // for (const classSheet of arr) {
@@ -51,7 +69,7 @@ const useWorkSheet = ({ itemTokenList }: { itemTokenList: { [key: string]: Tquot
 };
 
 export { useWorkSheet };
-export type { Class_workSheet };
+export type { Class_workSheet, TforceUpdate_workSheet };
 
 // ======================================================================
 /*
