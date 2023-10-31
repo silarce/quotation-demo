@@ -45,10 +45,9 @@ export default function QuotationPdf({
   noteArr: string[];
   qrArr: string[];
 }) {
-  const { quotationNumber } = basicInfo;
-
   const {
     // customerName,
+    quotationNumber,
     projectName,
     customer,
     contactPerson,
@@ -135,7 +134,7 @@ export default function QuotationPdf({
     const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
-      quotationId: contactPerson,
+      quotationId: quotationNumber,
       clientName: customerName,
       contactPerson: contactPerson,
       contactPhone: contactNumber,
