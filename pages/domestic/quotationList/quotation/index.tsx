@@ -1384,7 +1384,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <TextareaModal
         visible={showMemoModal}
         setVisible={setShowMemoModal}
-        title={'追加追減備註'}
+        title={'更新備註'}
         placeholder={'請輸入備註'}
         tip="最多25字"
         textLength={25}
