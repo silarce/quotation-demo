@@ -16,15 +16,15 @@ import Layer from 'components/Layer/Layer';
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
 import { useApiErpFeaturesMe } from 'js/api/api_erpFeature';
 
 // css
-import '../styles/globals.scss';
 import 'antd/dist/antd.css';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import '../styles/globals.scss';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
 
 // 全域moment語系轉換
