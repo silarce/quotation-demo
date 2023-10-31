@@ -25,9 +25,6 @@ export default function WorkSheetProdCard({
   return (
     <div className={classNames(scss.card, { [scss.active]: isActive })}>
       <div className={scss.left}>
-        {/* <span>D-SD1-1</span>
-        <span>SJ-302</span>
-        <span>數量 : 12樘</span> */}
         <span>{control.itemName}</span>
         <span>{control.doorType}</span>
         <span>數量 : {control.qty}樘</span>

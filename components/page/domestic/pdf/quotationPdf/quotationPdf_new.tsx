@@ -45,10 +45,10 @@ export default function QuotationPdf({
   noteArr: string[];
   qrArr: string[];
 }) {
-  const { quotationNumber } = basicInfo;
-
   const {
     // customerName,
+    quotationDate,
+    quotationNumber,
     projectName,
     customer,
     contactPerson,
@@ -132,10 +132,10 @@ export default function QuotationPdf({
     const customerName = customer.name;
 
     // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = moment(quotationDate).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
-      quotationId: contactPerson,
+      quotationId: quotationNumber,
       clientName: customerName,
       contactPerson: contactPerson,
       contactPhone: contactNumber,
@@ -198,7 +198,7 @@ export default function QuotationPdf({
       // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
       const lw = Number(prod.fullWidth || 0) * 100;
       const h = Number(prod.height) * 100;
-      const b = Number(prod.thickness) * 100;
+      const b = Number(prod.boxB) * 100;
 
       const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 

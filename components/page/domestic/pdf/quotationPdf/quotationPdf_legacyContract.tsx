@@ -110,8 +110,9 @@ export default function QuotationPdf({
       projectName,
     } = classBasicInfo;
 
-    // const dateString = moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+    // const updatedAtStr = moment(updatedAt).subtract(1911, 'year').format('yy-MM-DD');
+    const updatedAtStr = '';
+    // const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
     return {
       quotationId: contractNumber,
@@ -119,10 +120,10 @@ export default function QuotationPdf({
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: dateString,
+      builtDate: updatedAtStr,
       projectAddress: projectCity + projectDistrict + projectAddress,
       projectName,
-      validityPeriod: '--',
+      validityPeriod: '',
     };
   })();
   // -------------------------------
@@ -164,7 +165,8 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
         tradingLocation: deliveryLocation,
@@ -178,13 +180,19 @@ export default function QuotationPdf({
 
   const productArr: TtableProdList_series = (() => {
     // const classProdArr = classLegacyContract.prodArr;
+
     const prodList = classLegacyContract.prodList;
 
-    return verticalKeyArr.map((key) => {
+    let arr = verticalKeyArr.map((key) => {
       const prod = prodList[key];
-      const lw = new Decimal(Number(prod.width || 0) || Number(prod.length || 0)).mul(100).toString();
-      const h = new Decimal(Number(prod.height || 0)).mul(100).toString();
-      const b = new Decimal(Number(prod.boxB || 0)).mul(100).toNumber();
+
+      if (!prod) {
+        return null;
+      }
+
+      const lw = new Decimal(Number(prod?.width || 0) || Number(prod?.length || 0)).mul(100).toString();
+      const h = new Decimal(Number(prod?.height || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod?.boxB || 0)).mul(100).toNumber();
 
       const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
@@ -208,6 +216,10 @@ export default function QuotationPdf({
         series: prod.itemName,
       };
     });
+
+    arr = arr.filter((item) => !!item);
+
+    return arr as TtableProdList_series;
   })();
 
   // ----------------------------------------------------------------------------

@@ -1,4 +1,13 @@
-import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_doorModel,
+  optionsCreator_quoteType,
+  optionsCreator_bottomBar,
+  optionsCreator_motorLockBox,
+  optionsCreator_rollerSpec,
+  optionsCreator_closingType,
+  optionsCreator_bottomBarAngleIron,
+  optionsCreator_bottomBarPlate,
+} from 'js/utils/options/productOptions';
 
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 
@@ -342,11 +351,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          options: [
-            { value: 'none', label: '無' },
-            { value: '鋁障感型', label: '鋁障感型' },
-            { value: '止水型', label: '止水型' },
-          ],
+          options: optionsCreator_bottomBar(),
         },
       },
     },
@@ -357,10 +362,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          options: [
-            { value: '外露', label: '外露' },
-            { value: '防盜', label: '防盜' },
-          ],
+          options: optionsCreator_motorLockBox(),
         },
       },
     },
@@ -382,10 +384,7 @@ const prodCellConfig: TcellConfig = {
       wrapperStyle: { width: '90px' },
       selectProps: {
         props: {
-          options: [
-            { value: '無凸', label: '無凸' },
-            { value: '雙凸', label: '雙凸' },
-          ],
+          options: optionsCreator_rollerSpec(),
         },
       },
     },
@@ -430,10 +429,7 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // classProduct.ts 的emptyProdOri有用到options
-          options: [
-            { value: '電動', label: '電動' },
-            { value: '手動', label: '手動' },
-          ],
+          options: optionsCreator_closingType(),
         },
       },
     },
@@ -445,12 +441,7 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
-          options: [
-            { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
-            { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
-            { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T' },
-            { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T' },
-          ],
+          options: optionsCreator_bottomBarAngleIron(),
         },
       },
     },
@@ -462,12 +453,7 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
-          options: [
-            { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
-            { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
-            { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T' },
-            { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T' },
-          ],
+          options: optionsCreator_bottomBarPlate(),
         },
       },
     },

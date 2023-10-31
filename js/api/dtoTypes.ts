@@ -949,6 +949,25 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+export type TdeliveryStatusDto = {
+  // @ApiProperty({ description: '所屬產品' })
+  productItem: TquotationProductItemDto;
+  // @ApiProperty({ description: '備註' })
+  notes: string | null;
+  // @ApiProperty({ description: '安裝人員Id' })
+  installerEmployeeId: string | null;
+  // @ApiProperty({ description: '安裝人員' })
+  installerEmployee: TemployeeDto;
+  // @ApiProperty({ description: '安裝日期' })
+  installationDate: Date | null;
+  // @ApiProperty({ description: '工作表開立日期' })
+  workSheetInvoiceDate: Date | null;
+  // @ApiProperty({ description: '追加' })
+  append: string | null;
+  // @ApiProperty({ description: '完成追加' })
+  completeAppend: string | null;
+};
+
 export type TquotationProductItemDto = Omit<
   TquotationProductDto,
   | 'order'
@@ -970,6 +989,12 @@ export type TquotationProductItemDto = Omit<
   accessories: TquotationProductAccessoriesDto[];
   product: TquotationProductDto;
   productId: string;
+  itemNumber: string;
+  worksheetId: string;
+  others: null;
+  deliveryStatus?: TdeliveryStatusDto | null;
+  adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
+  adjustedItemId?: string | null;
 };
 
 type TquotationContentDto_foo = {
@@ -1044,7 +1069,7 @@ type TquotationContentDto_foo = {
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
-  updateAt: string;
+  updatedAt: string;
   quotationNumber: string;
   version: number;
 
@@ -1435,7 +1460,7 @@ export type TdoorGeneralSpecsMotorDto = {
 export type TdoorGeneralSpecsDto = {
   bearingHousingSize: number; // 軸承座寸法
   bearingHousingTotalLength: number; // 軸承座總長(=捲軸長度)
-  bearingInnerDiameter: string;
+  bearingInnerDiameter: string; // 軸承內徑
   bearingName: string; // 軸承
   defaultMotorIndex: number;
   density: number; // 密度
@@ -1443,6 +1468,7 @@ export type TdoorGeneralSpecsDto = {
   gapA: number;
   gapC: number;
   motors: TdoorGeneralSpecsMotorDto[];
+  gearNumber: string;
   sprocketWheelModel: string;
   sprocketWheelTeethNumber: string;
   sprocketWheelChains: number;
@@ -2068,4 +2094,114 @@ export type TworkSheetDto = {
 export type TcreateWorkSheetDto = {
   contractId?: string | null;
   legacyContractId?: string | null;
+};
+
+// export type TupdateWorkSheet = {
+//   id: string;
+//   // createdAt: string;
+//   // updatedAt: string;
+//   // createdBy: string;
+//   // updatedBy: string;
+//   // deletedBy: string;
+//   itemNumber: string;
+//   itemName: string;
+//   discount: string;
+//   quoteType: string;
+//   doorModelName: string;
+//   fullWidth: number;
+//   WG: number;
+//   height: number;
+//   boxB: number;
+//   area: string;
+//   volume: string;
+//   materialName: string;
+//   materialSurface: string;
+//   guideRail: string;
+//   horsepower: string;
+//   motorVendor: string;
+//   motorVoltage: number;
+//   hasMotorSupportStand: boolean;
+//   bottomBar: string;
+//   motorLockBox: string;
+//   guideRailThickness: string;
+//   rollerSpec: string;
+//   hasSilencingStrip: boolean;
+//   isIntegratedHeadBox: boolean;
+//   headBoxThickness: string;
+//   unitPrice: number;
+//   totalPrice: number;
+//   price: number;
+//   dualPrice: number;
+//   isAntiTyphoon: boolean;
+//   bounceDoor: boolean;
+//   closingType: string;
+//   notes: string;
+//   motorPhase: number;
+//   bottomBarAngleIron: string;
+//   bottomBarPlate: string;
+//   productId: string;
+//   worksheetId: string;
+//   others: null;
+//   components: TquotationProductComponentsDto[];
+//   accessories: TcreateQuotationProductAccessoriesDto[];
+//   adjustedItem: undefined;
+//   adjustedItemId: undefined;
+// };
+export type TupdateWorkSheetItem = {
+  id: string;
+  itemNumber: string;
+  itemName: string;
+  discount: string;
+  quoteType: string;
+  doorModelName: string;
+  fullWidth: number;
+  WG: number;
+  height: number;
+  boxB: number;
+  area: string;
+  volume: string;
+  materialName: string;
+  materialSurface: string;
+  guideRail: string;
+  horsepower: string;
+  motorVendor: string;
+  motorVoltage: number;
+  hasMotorSupportStand: boolean;
+  bottomBar: string;
+  motorLockBox: string;
+  guideRailThickness: string;
+  rollerSpec: string;
+  hasSilencingStrip: boolean;
+  isIntegratedHeadBox: boolean;
+  headBoxThickness: string;
+  unitPrice: number;
+  totalPrice: number;
+  price: number;
+  dualPrice: number;
+  isAntiTyphoon: boolean;
+  bounceDoor: boolean;
+  closingType: string;
+  notes: string;
+  motorPhase: number;
+  bottomBarAngleIron: string;
+  bottomBarPlate: string;
+  productId: string;
+  worksheetId: string;
+  others: null;
+  components: TquotationProductComponentsDto[];
+  accessories: TcreateQuotationProductAccessoriesDto[];
+  adjustedItem: undefined;
+  adjustedItemId: undefined;
+};
+
+export type TupdateWorkSheet = {
+  contractProductItems: TupdateWorkSheetItem[];
+};
+
+//
+export type ToutBoundOrder = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractProductItems?: TquotationProductItemDto[];
 };

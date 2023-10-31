@@ -2,6 +2,20 @@ import { Toption, addEmpty } from './options';
 
 export type { Toption };
 
+const createOptionsCreator = ({ optionsArr }: { optionsArr: Toption[] }) => {
+  const fuc = ({ haveEmpty }: { haveEmpty?: boolean } = {}): Toption[] => {
+    const arr = optionsArr;
+
+    if (haveEmpty) {
+      addEmpty(arr);
+    }
+
+    return arr;
+  };
+
+  return fuc;
+};
+
 // 類別
 export const optionsCreator_category = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
@@ -127,3 +141,89 @@ export const optionsCreator_quoteType = (props: { haveEmpty?: boolean } = {}): T
 
   return arr;
 };
+
+export const optionsCreator_bottomBar = createOptionsCreator({
+  optionsArr: [
+    { value: 'none', label: '無' },
+    { value: '鋁障感型', label: '鋁障感型' },
+    { value: '止水型', label: '止水型' },
+  ],
+});
+
+export const optionsCreator_motorLockBox = createOptionsCreator({
+  optionsArr: [
+    { value: '外露', label: '外露' },
+    { value: '防盜', label: '防盜' },
+  ],
+});
+
+export const optionsCreator_rollerSpec = createOptionsCreator({
+  optionsArr: [
+    { value: '無凸', label: '無凸' },
+    { value: '雙凸', label: '雙凸' },
+  ],
+});
+
+export const optionsCreator_closingType = createOptionsCreator({
+  optionsArr: [
+    { value: '電動', label: '電動' },
+    { value: '手動', label: '手動' },
+  ],
+});
+
+export const optionsCreator_componentMaterial_01 = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
+    { value: 'SST#304', label: 'SST#304' },
+    { value: 'SST#316', label: 'SST#316' },
+    { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
+  ],
+});
+
+export const optionsCreator_componentMaterial_02 = createOptionsCreator({
+  optionsArr: [{ value: '黑鐵', label: '黑鐵' }],
+});
+
+export const optionsCreator_componentMaterial_03 = createOptionsCreator({
+  optionsArr: [{ value: '其他', label: '其他' }],
+});
+
+// !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarAngleIron有沒有不對
+export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
+    { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
+    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T' },
+    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T' },
+  ],
+});
+
+// !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarPlate有沒有不對
+export const optionsCreator_bottomBarPlate = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
+    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T' },
+  ],
+});
+
+export const optionsCreator_surface = createOptionsCreator({
+  optionsArr: [
+    { value: '2B', label: '2B' },
+    { value: 'HL', label: 'HL' },
+    { value: 'BA', label: 'BA' },
+    { value: 'NO.4', label: 'NO.4' },
+  ],
+});
+
+// const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
+//   const { haveEmpty } = props;
+//   const arr = [{ value: 'foooo' as const, label: 'fooooo' }];
+
+//   if (haveEmpty) {
+//     addEmpty(arr);
+//   }
+
+//   return arr;
+// };

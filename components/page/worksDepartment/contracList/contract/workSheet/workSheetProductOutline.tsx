@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel, { TinputProps, TselectProps } from 'components/global/gear/inputAndSel/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './workSheetProductOutline.module.scss';
@@ -19,9 +19,16 @@ type ToldProductOutline = {
   isAntiTyphoon: boolean;
 };
 
+// type TcontrolItem = {
+//   value: string;
+//   onChange?: (value: string) => void;
+//   disabled?: boolean;
+// };
+
 type TcontrolItem = {
-  value: string;
-  onChange?: (value: string) => void;
+  inputProps?: TinputProps;
+  selectProps?: TselectProps;
+
   disabled?: boolean;
 };
 
@@ -78,6 +85,7 @@ export default function WorkSheetProductOutline({
               />
             );
           })}
+          {/*  */}
           <InputSel
             className={classNames(scss.inputSel)}
             label={'防颱'}
@@ -110,13 +118,16 @@ export default function WorkSheetProductOutline({
                 captionWidth={captionWidth}
                 disabled={disabled || control[key].disabled}
                 showBaseline="always"
-                inputProps={{
-                  value: control[key].value,
-                  onChange: (v) => {
-                    control[key].onChange?.(v);
-                  },
-                  inputType: inputType,
-                }}
+                inputProps={control[key].inputProps}
+                selectProps={control[key].selectProps}
+
+                // inputProps={{
+                //   value: control[key].value,
+                //   onChange: (v) => {
+                //     control[key].onChange?.(v);
+                //   },
+                //   inputType: inputType,
+                // }}
               />
             );
           })}

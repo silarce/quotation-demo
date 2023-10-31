@@ -4,12 +4,54 @@ import style from './outboundOrder.module.scss';
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
-// data
-import { dndCellConfigOutboundOrderOri, TdndCellConfigOutboundOrderKeys } from 'config/dndCellConfig';
-const dndCellConfigOutboundOrder = dndCellConfigOutboundOrderOri();
+// ================================================================================
 
-export default function OrderTable({ editable }: { editable: boolean }) {
-  const [orderList, setOrderList] = useState(fakeOrderData);
+type TstaticData = {
+  project: string;
+  L: string;
+  W: string;
+  B: string;
+  qty: string;
+  implementQty: string;
+  cai: string;
+  totalCai: string;
+  doorType: string;
+  material: string;
+  horsepower: string;
+  surface: string;
+};
+
+type TdeliveryStatusItem = {
+  value: string;
+  onChange: (str: string) => void;
+};
+
+type Tgroup = {
+  itemName: string;
+  rowArr: {
+    staticData: TstaticData;
+    deliveryStatus: {
+      remark01: TdeliveryStatusItem;
+      remark02: TdeliveryStatusItem;
+      remark03: TdeliveryStatusItem;
+      remark04: TdeliveryStatusItem;
+      appended: TdeliveryStatusItem;
+      orderCreatedDate: TdeliveryStatusItem;
+      finishAppended: TdeliveryStatusItem;
+      installer: TdeliveryStatusItem;
+      installDate: TdeliveryStatusItem;
+    };
+  }[];
+};
+
+type Tcontrol = Tgroup[];
+
+export type { Tcontrol as Tcontrol_orderTable };
+
+// ================================================================================
+export default function OrderTable({ disabled, control }: { disabled: boolean; control: Tcontrol }) {
+  // const [orderList, setOrderList] = useState(fakeOrderData);
+  const configList = creConfigList();
 
   return (
     <div className={style.orderTable}>
@@ -18,8 +60,8 @@ export default function OrderTable({ editable }: { editable: boolean }) {
         <div className={`${style.theadItem} ${style.indexCell}`} />
         {/*  */}
 
-        {orderKeyIndex01.map((key, index) => {
-          const { label, width, position } = dndCellConfigOutboundOrder[key];
+        {orderKeyArr_static.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
@@ -37,7 +79,7 @@ export default function OrderTable({ editable }: { editable: boolean }) {
         </div>
         {/*  */}
         {orderKeyIndex02.map((key, index) => {
-          const { label, width, position } = dndCellConfigOutboundOrder[key];
+          const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
@@ -52,12 +94,12 @@ export default function OrderTable({ editable }: { editable: boolean }) {
       </div>
 
       <div className={style.tableList}>
-        {orderList.map((item, groupIndex) => {
-          const { project, list } = item;
+        {control.map((item, groupIndex) => {
+          const { itemName, rowArr } = item;
 
           return (
             <div key={groupIndex}>
-              {list.map((row, rowIndex) => {
+              {rowArr.map((row, rowIndex) => {
                 const bgcSub = rowIndex !== 0 ? style.bgcSub : '';
 
                 return (
@@ -72,15 +114,16 @@ export default function OrderTable({ editable }: { editable: boolean }) {
                         <span></span>
                       </div>
                     )}
-                    {/*  */}
-                    {orderKeyIndex01.map((key, columnIndex) => {
-                      let { value } = row[key];
+
+                    {/* orderKeyIndex01 */}
+                    {orderKeyArr_static.map((key, columnIndex) => {
+                      let value = row.staticData[key];
 
                       if (rowIndex !== 0 && columnIndex === 0) {
                         value = '';
                       }
 
-                      const { width, position } = dndCellConfigOutboundOrder[key];
+                      const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
                       const textCenter = position === 'center' ? style.textCenter : '';
 
@@ -90,24 +133,26 @@ export default function OrderTable({ editable }: { editable: boolean }) {
                         </div>
                       );
                     })}
+
                     {/* 沒有柱子的灰色柱子 */}
                     <div className={`${style.pilar}`} />
-                    {/*  */}
+
+                    {/* orderKeyIndex02 */}
                     {orderKeyIndex02.map((key, columnIndex) => {
-                      let { value } = row[key];
+                      const { value, onChange } = row.deliveryStatus[key];
 
-                      if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
-                      }
+                      // if (rowIndex !== 0 && columnIndex === 0) {
+                      //   value = '';
+                      // }
 
-                      const { width, position } = dndCellConfigOutboundOrder[key];
+                      const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
                       const textCenter = position === 'center' ? style.textCenter : '';
 
-                      const onChange = (v: string) => {
-                        orderList[groupIndex].list[rowIndex][key].value = v;
-                        setOrderList([...orderList]);
-                      };
+                      // const onChange = (v: string) => {
+                      //   orderList[groupIndex].list[rowIndex][key].value = v;
+                      //   setOrderList([...orderList]);
+                      // };
 
                       return (
                         <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
@@ -118,7 +163,7 @@ export default function OrderTable({ editable }: { editable: boolean }) {
                               onChange,
                             }}
                             placeholder=""
-                            disabled={!editable}
+                            disabled={disabled}
                           />
                         </div>
                       );
@@ -137,7 +182,7 @@ export default function OrderTable({ editable }: { editable: boolean }) {
 }
 
 // =======================================================
-const orderKeyIndex01: TdndCellConfigOutboundOrderKeys[] = [
+const orderKeyArr_static: (keyof TstaticData)[] = [
   'project',
   'L',
   'W',
@@ -152,7 +197,7 @@ const orderKeyIndex01: TdndCellConfigOutboundOrderKeys[] = [
   'surface',
 ];
 
-const orderKeyIndex02: TdndCellConfigOutboundOrderKeys[] = [
+const orderKeyIndex02: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
   'remark01',
   'remark02',
   'remark03',
@@ -319,3 +364,220 @@ const fakeOrderData = [
     list: [fakeOrderDataItemOri()],
   },
 ];
+
+// =======================================================================
+
+type Tconfig = {
+  label: string;
+  width: string;
+  type: string;
+  position: string;
+};
+
+type TcellConfigList = {
+  [key: string]: Tconfig | undefined;
+};
+
+const creCellConfig_static = (): TcellConfigList => ({
+  discount: {
+    label: '折數',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
+  project: {
+    label: '項目',
+    width: '60px',
+    type: 'input',
+    position: '',
+  },
+  quoteType: {
+    label: '報價別',
+    width: '105px',
+    type: 'select',
+    position: '',
+  },
+  L: {
+    label: 'L',
+    width: '60px',
+    type: 'input',
+    position: 'center',
+  },
+  W: {
+    label: 'W',
+    width: '60px',
+    type: 'input',
+    position: 'center',
+  },
+  H: {
+    label: 'H',
+    width: '60px',
+    type: 'input',
+    position: 'center',
+  },
+  B: {
+    label: 'B',
+    width: '60px',
+    type: 'input',
+    position: 'center',
+  },
+  area: {
+    label: '面積',
+    width: '60px',
+    type: 'input',
+    position: '',
+  },
+  cai: {
+    label: '才數',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
+  totalCai: {
+    label: '總才數',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
+  doorType: {
+    label: '門型',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
+  material: {
+    label: '材料',
+    width: '120px',
+    type: 'select',
+    position: '',
+  },
+  surface: {
+    label: '表面',
+    width: '55px',
+    type: 'select',
+    position: '',
+  },
+  doorRail: {
+    label: '門軌',
+    width: '70px',
+    type: 'selectWithIcon',
+    position: '',
+  },
+  horsepower: {
+    label: '馬力',
+    width: '60px',
+    type: 'input',
+    position: '',
+  },
+  qty: {
+    label: '數量',
+    width: '43px',
+    type: 'input',
+    position: 'center',
+  },
+  unitPrice: {
+    label: '單價',
+    width: '84px',
+    type: 'input',
+    position: '',
+  },
+  subTotal: {
+    label: '複價',
+    width: '84px',
+    type: 'input',
+    position: '',
+  },
+  memo: {
+    label: '備註',
+    width: '90px',
+    type: 'select',
+    position: '',
+  },
+  ejectionDoor: {
+    label: '彈射門',
+    width: '60px',
+    type: 'checkbox',
+    position: '',
+  },
+  openType: {
+    label: '開門方式',
+    width: '82px',
+    type: 'select',
+    position: 'center',
+  },
+  thickness: {
+    label: '厚度',
+    width: '45px',
+    type: 'input',
+    position: '',
+  },
+});
+// =============================================================
+
+const creCellConfig_deliveryStatus = (): TcellConfigList => ({
+  remark01: {
+    label: '備註1',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  remark02: {
+    label: '備註2',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  remark03: {
+    label: '備註3',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  remark04: {
+    label: '備註4',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  appended: {
+    label: '追加',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  orderCreatedDate: {
+    label: '工作表開立日期',
+    width: '115px',
+    type: 'input',
+    position: '',
+  },
+  finishAppended: {
+    label: '完成追加',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
+  installer: {
+    label: '安裝人員',
+    width: '85px',
+    type: 'input',
+    position: '',
+  },
+  installDate: {
+    label: '安裝日期',
+    width: '85px',
+    type: 'input',
+    position: '',
+  },
+  implementQty: {
+    label: '實作數量',
+    width: '75px',
+    type: 'input',
+    position: 'center',
+  },
+});
+
+const creConfigList = (): TcellConfigList => ({
+  ...creCellConfig_static(),
+  ...creCellConfig_deliveryStatus(),
+});

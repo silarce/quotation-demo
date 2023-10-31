@@ -29,9 +29,11 @@ import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
+import { optionsCreator_surface } from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
+const options_surface = optionsCreator_surface();
 
 // ===========================================================
 // child class
@@ -50,6 +52,9 @@ import {
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // =============================================================================
+import { prodCellConfig } from './prodCellConfig';
+import { lookup_boxBAndBoxD } from 'config/product/lookup';
+
 // utils
 import {
   filter_slats,
@@ -62,17 +67,23 @@ import {
   filter_headBoxes,
 } from './componentFilters';
 
-import { prodCellConfig } from './prodCellConfig';
+import {
+  calcProductArea,
+  calcProductVolume,
+  calcProductWG,
+  calcProductFullWidth,
+  findBDoptions,
+} from 'js/utils/product/calc';
 
 // =============================================================================
 // type
 import type {
-  TlegacyContractProductDto,
-  TcreateLegacyContractProductDto,
+  // TlegacyContractProductDto,
+  // TcreateLegacyContractProductDto,
   TdoorComponentListDto,
   TquotationProductAccessoriesDto,
   TgenerateDoorProductBomDto_DoorSpec,
-  TgenerateDoorProductBomDto_ComponentInfo,
+  // TgenerateDoorProductBomDto_ComponentInfo,
   TcreateQuotationProductAccessoriesDto,
   TcreateQuotationProductComponentDto,
   TquotationProductComponentsDto,
@@ -83,7 +94,7 @@ import type {
 
 import type { TreRender, TcomponentKey } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
-import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+// import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
 import type { TdoorModelInfoDto } from 'js/api/api_product';
 import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_product';
@@ -266,6 +277,7 @@ class Class_product {
 
   // 其他防抖
   timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
+  timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
 
   // ---------------------------------------------------------
 
@@ -606,7 +618,15 @@ class Class_product {
 
     // 計算出WG
 
-    this._prodData.WG = String((Number(this._prodData.fullWidth) * 1000 - res.gapA - res.gapC) / 1000);
+    // this._prodData.WG = String((Number(this._prodData.fullWidth) * 1000 - res.gapA - res.gapC) / 1000);
+
+    this._prodData.WG = String(
+      calcProductWG({
+        fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
+        gapA: res.gapA,
+        gapC: res.gapC,
+      }) / 1000
+    );
 
     //
     const defaultMotorIndex = res.defaultMotorIndex;
@@ -1172,10 +1192,17 @@ class Class_product {
     const w = 0;
     const l = Number(this._prodData.fullWidth || 0);
 
-    const area = Decimal.add(h, b) // h+b
-      .mul(w || l)
-      .toFixed(2)
-      .toString();
+    const area = calcProductArea({
+      height: h,
+      boxb: b,
+      fullWidth: l,
+      WG: w,
+    });
+
+    // const area = Decimal.add(h, b) // h+b
+    //   .mul(w || l)
+    //   .toFixed(2)
+    //   .toString();
 
     return area;
   }
@@ -1189,9 +1216,10 @@ class Class_product {
 
   /**計算才數 */
   private calcVolume() {
-    return Decimal.mul(this.area || 0, 10.89)
-      .toFixed(2)
-      .toString();
+    return calcProductVolume(Number(this.area || 0));
+    // return Decimal.mul(this.area || 0, 10.89)
+    //   .toFixed(2)
+    //   .toString();
   }
 
   // ---------------------------------------------------------
@@ -1303,26 +1331,29 @@ class Class_product {
 
   findBDoptions() {
     if (this._prodData.doorType) {
-      const BDList = pairBD[this._prodData.doorType]?.BtoD;
-      const DBList = pairBD[this._prodData.doorType]?.DtoB;
+      // const BDList = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD;
+      // const DBList = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB;
 
-      if (BDList) {
-        this.options_boxB = Object.keys(BDList).map((key) => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-      }
+      // if (BDList) {
+      //   this.options_boxB = Object.keys(BDList).map((key) => {
+      //     return {
+      //       value: key,
+      //       label: key,
+      //     };
+      //   });
+      // }
 
-      if (DBList) {
-        this.options_boxD = Object.keys(DBList).map((key) => {
-          return {
-            value: key,
-            label: key,
-          };
-        });
-      }
+      // if (DBList) {
+      //   this.options_boxD = Object.keys(DBList).map((key) => {
+      //     return {
+      //       value: key,
+      //       label: key,
+      //     };
+      //   });
+      // }
+      const { options_boxB, options_boxD } = findBDoptions(this._prodData.doorType);
+      this.options_boxB = options_boxB;
+      this.options_boxD = options_boxD;
     }
   }
 
@@ -1412,12 +1443,13 @@ class Class_product {
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      return [
-        { value: '2B', label: '2B' },
-        { value: 'HL', label: 'HL' },
-        { value: 'BA', label: 'BA' },
-        { value: 'NO.4', label: 'NO.4' },
-      ];
+      // return [
+      //   { value: '2B', label: '2B' },
+      //   { value: 'HL', label: 'HL' },
+      //   { value: 'BA', label: 'BA' },
+      //   { value: 'NO.4', label: 'NO.4' },
+      // ];
+      return options_surface;
     }
 
     return undefined;
@@ -1529,11 +1561,8 @@ class Class_product {
     this._prodData.fullWidth = v;
     // this._prodData.WG = '0';
     this.area = this.calcArea();
-
     this.clearProd();
-
     this.calcChangeAccePrice();
-
     this.shouldCall_cgs = true;
     this.callAllReq();
 
@@ -1566,7 +1595,6 @@ class Class_product {
   的pdfPartProps
    */
 
-    this._prodData.WG = v;
     // this._prodData.fullWidth = '0';
     // this.area = this.calcArea();
 
@@ -1576,8 +1604,11 @@ class Class_product {
 
     // this.shouldCall_cgs = true;
     // this.callAllReq();
+    this._prodData.WG = v;
 
     const callReq = async () => {
+      console.log('fooooooo');
+
       const fullWidth = await calcFullwidthWithWG({
         body: {
           modelName: this.doorType as TpcgsPrams['modelName'],
@@ -1588,10 +1619,22 @@ class Class_product {
       });
 
       this._prodData.fullWidth = String(fullWidth / 1000);
-      this.reRender();
+
+      this.area = this.calcArea();
+      this.clearProd();
+      this.calcChangeAccePrice();
+      this.shouldCall_cgs = true;
+      this.callAllReq();
     };
 
-    callReq();
+    if (this.timeoutId_calcFullWidth) {
+      clearTimeout(this.timeoutId_calcFullWidth);
+    }
+
+    this.timeoutId_calcFullWidth = setTimeout(async () => {
+      await callReq();
+      this.reRender();
+    }, 300);
 
     this.reRender();
   }
@@ -1623,7 +1666,7 @@ class Class_product {
 
     this._prodData.boxB = v;
 
-    this._prodData.boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -1635,7 +1678,7 @@ class Class_product {
   set boxB_noCall(v: string) {
     this._prodData.boxB = v;
 
-    this._prodData.boxD = pairBD[this._prodData.doorType]?.BtoD[v] ?? '';
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
     this.reRender();
   }
@@ -1646,7 +1689,7 @@ class Class_product {
   }
   set boxD(v) {
     this._prodData.boxD = v;
-    this._prodData.boxB = pairBD[this._prodData.doorType]?.DtoB[v] ?? '';
+    this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -2511,39 +2554,39 @@ const creOptions_surface: () => Toption[] = () => [
 ];
 
 // 理論上不會有undefined，但現在情況混亂，先加上去吧
-type TpariBD = {
-  [key: string]:
-    | {
-        BtoD: {
-          [key: string]: string | undefined;
-        };
-        DtoB: {
-          [key: string]: string | undefined;
-        };
-      }
-    | undefined;
-};
-// 單位為m
-const pairBD: TpariBD = {
-  'SJ-302': {
-    BtoD: {
-      '0.35': '0.56',
-      '0.40': '0.60',
-      '0.45': '0.65',
-      '0.50': '0.75',
-      '0.55': '0.80',
-      '0.60': '0.90',
-    },
-    DtoB: {
-      '0.56': '0.35',
-      '0.60': '0.40',
-      '0.65': '0.45',
-      '0.75': '0.50',
-      '0.80': '0.55',
-      '0.90': '0.60',
-    },
-  },
-};
+// type TpariBD = {
+//   [key: string]:
+//     | {
+//         BtoD: {
+//           [key: string]: string | undefined;
+//         };
+//         DtoB: {
+//           [key: string]: string | undefined;
+//         };
+//       }
+//     | undefined;
+// };
+// // 單位為m
+// const pairBD: TpariBD = {
+//   'SJ-302': {
+//     BtoD: {
+//       '0.35': '0.56',
+//       '0.40': '0.60',
+//       '0.45': '0.65',
+//       '0.50': '0.75',
+//       '0.55': '0.80',
+//       '0.60': '0.90',
+//     },
+//     DtoB: {
+//       '0.56': '0.35',
+//       '0.60': '0.40',
+//       '0.65': '0.45',
+//       '0.75': '0.50',
+//       '0.80': '0.55',
+//       '0.90': '0.60',
+//     },
+//   },
+// };
 
 const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
   const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
@@ -2614,27 +2657,17 @@ const calcFullwidthWithWG = async ({
     const res = await apiGetProdCalcGeneralSpec(body);
     const { gapA, gapC } = res;
 
-    const fullWidth = gapA + gapC + body.WG;
+    // const fullWidth = gapA + gapC + body.WG;
+    const fullWidth = calcProductFullWidth({
+      gapA,
+      gapC,
+      WG: body.WG,
+    });
 
     return fullWidth;
   } catch (error) {
     return 0;
   }
-};
-
-const calcLW = ({ fullWidth, WG }: { fullWidth?: number; WG?: number }) => {
-  if (fullWidth) {
-    WG = WG ?? 0;
-  }
-
-  if (WG) {
-    fullWidth = fullWidth ?? 0;
-  }
-
-  return {
-    fullWidth,
-    WG,
-  };
 };
 
 // ===========================================================

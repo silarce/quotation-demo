@@ -118,7 +118,8 @@ $semiMaring: 0 8px;
       margin: auto 5px auto;
     }
     span {
-      white-space: nowrap;
+      // white-space: nowrap;
+      word-break: break-all;
       font-size: 16px;
       font-weight: 400;
     }

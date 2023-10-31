@@ -1,7 +1,58 @@
 // 工作表
 
+/*
+問題
+
+捲箱與門軌 的厚度選項現在仍是假資料
+有幾個下拉式選單選了之後會NaN
+
+--------------
+在報價單主產品
+呼叫get /products/door/available-components
+是為了取得材料配件資料，並顯出來
+顯示出來的欄位有代號、說明、材料、表面、烤漆、單位、數量、牌價、牌價複價、單價、複價
+這些欄位中，只有材料與表面會在工作表顯示出來
+而材料與表面的選項目前是固定的，
+所以應該是不需要呼叫 get /products/door/available-components
+況且component換掉就是整個主產品換掉，這應該不是工作表這邊要做的事
+component不變的話
+get /products/door/generate-door-product-bom 也不需要呼叫了
+
+看來需要呼叫並用來更新資料的只有
+get /products/door/calc-general-spec
+get /products/door/calc-detail-spec
+這兩個api的呼叫已經放進Class_workSheet.calcProd與Class_workSheet.getInitData了
+按下計算按鈕就會呼叫Class_workSheet.getInitData
+
+如果工作表的是到現場實作後，修改主產品規格的紀錄
+那麼是不是厚度、馬力數的選項就不應該是從後端取得的資料
+而是應該包含所有可能的選項?
+在主產品
+options_horsepower
+options_motor
+options_phase
+options_voltage
+options_rollUpBoxThick
+options_doorTrackThick
+都是從_availableComponents拿的
+先用主產品的作法吧，只是取得availableComponents後不把component換掉
+只取得options
+
+-----------------------------
+
+工作表更新後
+被更新的item會產生adjustedItem這個property
+型別同item，內容是更新後的item
+
+
+
+
+
+*/
+
 import { useState, useEffect, useMemo } from 'react';
-import _ from 'lodash';
+import classNames from 'classnames';
+// import _ from 'lodash';
 import { useRouter } from 'next/router';
 
 // layer
@@ -20,7 +71,9 @@ import WorkSheetProductOutline, {
 import WorkSheetProductDetail01, {
   Tcontrol_detail,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
-import WorkSheetOptional from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
+import WorkSheetOptional, {
+  Tcontrol_optional,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
 import WorkSheetProductDetail02, {
   Tcontrol_detail02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
@@ -30,7 +83,13 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { useGetEngineeringContact, useGetWorkSheet } from 'js/api/api_engineering';
+import {
+  TupdateWorkSheetItem,
+  useGetEngineeringContact,
+  useGetWorkSheet,
+  apiPatchWorkSheet,
+} from 'js/api/api_engineering';
+import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
@@ -41,6 +100,20 @@ import scss from './workSheet.module.scss';
 // image
 import imgIdk from 'public/image/fake/idk01.png';
 
+// options
+import {
+  Toption,
+  optionsCreator_bottomBar,
+  optionsCreator_motorLockBox,
+  optionsCreator_rollerSpec,
+  optionsCreator_closingType,
+  optionsCreator_bottomBarAngleIron,
+  optionsCreator_bottomBarPlate,
+  optionsCreator_surface,
+  optionsCreator_componentMaterial_01,
+} from 'js/utils/options/productOptions';
+
+// type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 // ====================================================================
@@ -60,65 +133,6 @@ type Tprofile = {
   faxNumber: string;
 };
 
-type TproductOutline = {
-  itemName: string;
-  doorType: string;
-  fullWidth: string;
-  height: string;
-  boxB: string;
-  quantity: string;
-  material: string;
-  isAntiTyphoon: boolean;
-};
-
-type Tdetail = {
-  reel: {
-    size: string;
-    hasConvex: string;
-  };
-  reelBox: {
-    material: string;
-    thickness: string;
-    surface: string;
-    front: string;
-    hasConvex: string;
-    type: string;
-  };
-  base: {
-    material: string;
-    angleMaterial: string;
-    baseMaterial: string;
-    type: string;
-    surface: string;
-  };
-  support: {
-    bearing: string;
-    chain: string;
-  };
-  //
-  doorPiece: {
-    material: string;
-    surface: string;
-  };
-  motor: {
-    horsepower: string;
-    manufacturer: string;
-    powerSupply: string;
-    voltage: string;
-    support: string;
-    chainType: string;
-    lockBox: string;
-  };
-  doorTrack: {
-    material: string;
-    thickness: string;
-    surface: string;
-    silencer: string;
-    doorTrackType: string;
-    doorTrackName: string;
-  };
-};
-
 // ====================================================================
 export default function WorkSheet() {
   const router = useRouter();
@@ -134,6 +148,7 @@ export default function WorkSheet() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
   const { workSheet, update_workSheet } = useGetWorkSheet(worksheetId);
+  const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
 
   useEffect(() => {
     (async () => {
@@ -145,24 +160,11 @@ export default function WorkSheet() {
         myAlert.err({ title: '取得合約失敗', content: err.message });
         setIsLoading(false);
       }
+
+      update_doorModelArr();
     })();
   }, []);
 
-  const productList = useMemo(() => {
-    const list: { [key: string]: TquotationProductDto } = {};
-
-    if (!contract) {
-      return list;
-    }
-
-    contract.subContracts.forEach((item) => {
-      item.content.products.forEach((prod) => {
-        list[prod.rootProductId] = prod;
-      });
-    });
-
-    return list;
-  }, [contract]);
   // --------------------------------------------------------
   // --------------------------------------------------------
   const { itemTokenList, itemIdArrList } = useMemo(() => {
@@ -178,6 +180,7 @@ export default function WorkSheet() {
 用useWorkSheet裡的changedList配合forceUpdate紀錄
 
  */
+
     if (!workSheet?.contractProductItems) {
       return {};
     }
@@ -188,31 +191,57 @@ export default function WorkSheet() {
     const itemIdArrList: { [key: string]: string[] } = {};
 
     contractProductItems.forEach((item) => {
-      const productId = item.productId;
-      itemTokenList[productId] = item;
+      const { productId, adjustedItem, adjustedItemId } = item;
 
-      if (!itemIdArrList[productId]) {
-        itemIdArrList[productId] = [];
+      let theItem: typeof item;
+      let theId: string;
+
+      if (adjustedItem && adjustedItemId) {
+        theItem = adjustedItem;
+        theId = adjustedItemId;
+      } else {
+        theItem = item;
+        theId = productId;
       }
 
-      itemIdArrList[productId].push(item.id);
+      itemTokenList[theId] = theItem;
+
+      //
+      if (!itemIdArrList[theId]) {
+        itemIdArrList[theId] = [];
+      }
+
+      itemIdArrList[theId].push(item.id);
+
+      // //
+      // if (!itemTokenList[productId]) {
+      //   itemTokenList[productId] = item;
+      // }
+
+      // if (!itemTokenList[productId]) {
+      //   itemTokenList[productId] = item;
+      // }
+
+      // //
+      // if (!itemIdArrList[productId]) {
+      //   itemIdArrList[productId] = [];
+      // }
+
+      // itemIdArrList[productId].push(item.id);
+      // //
     });
 
     return {
       itemTokenList,
       itemIdArrList,
     };
-
-    // console.log(workSheet);
   }, [workSheet]);
 
-  // --------------------------------------------------------
-  // --------------------------------------------------------
-  // --------------------------------------------------------
   // --------------------------------------------------------
   useEffect(() => {
     (async () => {
       try {
+        setIsLoading(true);
         const res01 = update_engineeringContact();
         const res02 = update_workSheet();
         await Promise.all([res01, res02]);
@@ -229,12 +258,79 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
-  const [targetSheet, setTargetSheet] = useState<Class_workSheet>();
+  const [targetSheetKey, setTargetSheetKey] = useState<string>();
 
-  const { sheetList, reset } = useWorkSheet({ itemTokenList: itemTokenList ?? {} });
+  const { sheetList, changedSheetList, reset } = useWorkSheet({
+    itemTokenList: itemTokenList ?? {},
+    itemIdArrList: itemIdArrList ?? {},
+  });
 
-  // console.log(productList);
-  // console.log(sheetList);
+  const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey ?? 'undefined'];
+
+  const doorModelOptionArr = useMemo(() => {
+    if (!doorModelList) {
+      return [];
+    }
+
+    return Object.values(doorModelList).map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+  }, [doorModelList]);
+
+  const { guideRailOptionArr_noHook, guideRailOptionArr_withHook, doorModelMaterialOptionArr } = useMemo(() => {
+    const empty = {
+      guideRailOptionArr_noHook: [],
+      guideRailOptionArr_withHook: [],
+      doorModelMaterialOptionArr: [],
+    };
+
+    if (!doorModelList || !targetSheet?.doorModelName) {
+      return empty;
+    }
+
+    const theDoorModel = doorModelList[targetSheet.doorModelName];
+
+    if (!theDoorModel) {
+      myAlert.warning({ title: '沒有匹配的門型', content: '資料庫中沒有該產品之門型資料' });
+
+      return empty;
+    }
+
+    const guideRailOptionArr_noHook: Toption[] = [];
+    const guideRailOptionArr_withHook: Toption[] = [];
+    const doorModelMaterialOptionArr: Toption[] = [];
+
+    const { guideRails, slatMaterials } = theDoorModel;
+
+    guideRails.forEach((item) => {
+      if (item.withHook) {
+        guideRailOptionArr_withHook.push({
+          value: item.imgSrc,
+          label: item.imgSrc,
+          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+        });
+      } else {
+        guideRailOptionArr_noHook.push({
+          value: item.imgSrc,
+          label: item.imgSrc,
+          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+        });
+      }
+    });
+
+    slatMaterials.forEach((item) => {
+      doorModelMaterialOptionArr.push({ value: item.name, label: item.name });
+    });
+
+    return {
+      guideRailOptionArr_noHook,
+      guideRailOptionArr_withHook,
+      doorModelMaterialOptionArr,
+    };
+  }, [doorModelList, targetSheet?.doorModelName]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -245,36 +341,6 @@ export default function WorkSheet() {
   const changeProfile = (key: keyof Tprofile, value: string) => {
     setProfile((state) => ({ ...state, [key]: value }));
   };
-
-  // ______________________________________________________________
-  // const [oldProductOutline, setOldProductOutline] = useState<TproductOutline>(creEmptyProductOutline());
-  // const [productOutline, setProdcutOutline] = useState<TproductOutline>(creEmptyProductOutline());
-
-  // const changeProduct = (key: keyof TproductOutline, value: string | boolean) => {
-  //   setProdcutOutline((state) => ({ ...state, [key]: value }));
-  // };
-
-  // ______________________________________________________________
-
-  const [detail, setDetail] = useState<Tdetail>(creEmptyDetail());
-
-  function changeDetail<TpKey extends keyof Tdetail, TcKey extends keyof Tdetail[TpKey]>(
-    pKey: TpKey,
-    cKey: TcKey,
-    value: Tdetail[TpKey][TcKey]
-  ) {
-    setDetail((state) => {
-      const copy = { ...state };
-
-      copy[pKey][cKey] = value;
-
-      return copy;
-    });
-  }
-
-  // -------------------------------------------------------------------------
-
-  const [others, setOthers] = useState<string[]>([]);
 
   // -------------------------------------------------------------------------
 
@@ -321,11 +387,25 @@ export default function WorkSheet() {
     //
   }, [engineeringContact]);
 
+  //
   useEffect(() => {
     if (disabled) {
       reset();
+
+      if (targetSheet) {
+        targetSheet.getInitData();
+      }
     }
-  }, [disabled, productList]);
+  }, [disabled, itemTokenList]);
+  //
+
+  useEffect(() => {
+    if (!targetSheet) {
+      return;
+    }
+
+    targetSheet.getInitData();
+  }, [targetSheet]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -421,59 +501,74 @@ export default function WorkSheet() {
 
   const control_product: Tcontrol_productOutline = {
     itemName: {
-      value: targetSheet?.itemName ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.itemName = v;
-        }
+      inputProps: {
+        value: targetSheet?.itemName ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.itemName = v;
+          }
+        },
       },
     },
     doorType: {
-      value: targetSheet?.doorModelName ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.doorModelName = v;
-        }
+      selectProps: {
+        value: targetSheet?.doorModelName ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.doorModelName = v?.value ?? '';
+          }
+        },
+        options: doorModelOptionArr,
       },
     },
     fullWidth: {
-      value: targetSheet?.fullWidth ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.fullWidth = v;
-        }
+      inputProps: {
+        value: targetSheet?.fullWidth ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.fullWidth = v;
+          }
+        },
+        inputType: 'number',
       },
     },
     height: {
-      value: targetSheet?.height ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.height = v;
-        }
+      inputProps: {
+        value: targetSheet?.height ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.height = v;
+          }
+        },
+        inputType: 'number',
       },
     },
     boxB: {
-      value: targetSheet?.boxB ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.boxB = v;
-        }
+      selectProps: {
+        value: targetSheet?.boxB ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.boxB = v?.value ?? '';
+          }
+        },
+        options: targetSheet?.options_boxB ?? [],
       },
     },
     quantity: {
-      value: targetSheet?.quantity ?? '',
-      // onChange: (v) => {
-      //   if (targetSheet) {
-      //     targetSheet.quantity = v;
-      //   }
-      // },
+      inputProps: {
+        value: targetSheet?.quantity ?? '',
+      },
+      disabled: true,
     },
     material: {
-      value: targetSheet?.materialName ?? '',
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.materialName = v;
-        }
+      selectProps: {
+        value: targetSheet?.materialName ?? '',
+        onChange: (v) => {
+          if (targetSheet) {
+            targetSheet.materialName = v?.value ?? '';
+          }
+        },
+        options: doorModelMaterialOptionArr,
       },
     },
     isAntiTyphoon: {
@@ -487,204 +582,332 @@ export default function WorkSheet() {
   };
 
   const onCalcClick = () => {
-    alert('test');
+    if (!disabled) {
+      targetSheet?.calcProd();
+    }
   };
 
   // -------------------------------------------------------------------------
 
   const control_detail: Tcontrol_detail = {
+    // 捲軸
     reel: {
       size: {
-        value: detail.reel.size,
+        value: targetSheet?.com_roller_size ?? '',
         onChange: (v) => {
-          changeDetail('reel', 'size', v);
+          if (targetSheet) {
+            targetSheet.com_roller_size = v;
+          }
         },
+        forbidden: true,
       },
       hasConvex: {
-        value: detail.reel.hasConvex,
+        value: targetSheet?.rollerSpec ?? '',
         onChange: (v) => {
-          changeDetail('reel', 'hasConvex', v);
+          if (targetSheet) {
+            targetSheet.rollerSpec = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
       },
     },
+    // ______________________________________________________________
+    // 捲箱
     reelBox: {
       material: {
-        value: detail.reelBox.material,
+        value: targetSheet?.com_headBox_material ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_material = v;
+          }
         },
+        optionArr: optionsCreator_componentMaterial_01(),
       },
       thickness: {
-        value: detail.reelBox.thickness,
+        value: targetSheet?.headBoxThickness ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'thickness', v);
+          if (targetSheet) {
+            targetSheet.headBoxThickness = v;
+          }
         },
+        optionArr: targetSheet?.options_rollUpBoxThick ?? [],
       },
       surface: {
-        value: detail.reelBox.surface,
+        value: targetSheet?.com_headBox_surface ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_surface = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
       front: {
-        value: detail.reelBox.front,
+        value: targetSheet?.com_headBox_front ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'front', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_front = v;
+          }
         },
+        forbidden: true,
       },
       hasConvex: {
-        value: detail.reelBox.hasConvex,
+        value: targetSheet?.com_headBox_spec ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'hasConvex', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_spec = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
+        forbidden: true,
       },
       type: {
-        value: detail.reelBox.type,
+        value: targetSheet?.com_headBox_type ?? '',
         onChange: (v) => {
-          changeDetail('reelBox', 'type', v);
+          if (targetSheet) {
+            targetSheet.com_headBox_type = v;
+          }
         },
+        forbidden: true,
       },
     },
+    // ______________________________________________________________
+    // 底座
     base: {
       material: {
-        value: detail.base.material,
+        value: targetSheet?.com_bottomBar_material ?? '',
         onChange: (v) => {
-          changeDetail('base', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_bottomBar_material = v;
+          }
         },
+        optionArr: optionsCreator_componentMaterial_01(),
       },
       angleMaterial: {
-        value: detail.base.angleMaterial,
+        value: targetSheet?.bottomBarAngleIron ?? '',
         onChange: (v) => {
-          changeDetail('base', 'angleMaterial', v);
+          if (targetSheet) {
+            targetSheet.bottomBarAngleIron = v;
+          }
         },
+        optionArr: optionsCreator_bottomBarAngleIron(),
       },
       baseMaterial: {
-        value: detail.base.baseMaterial,
+        value: targetSheet?.bottomBarPlate ?? '',
         onChange: (v) => {
-          changeDetail('base', 'baseMaterial', v);
+          if (targetSheet) {
+            targetSheet.bottomBarPlate = v;
+          }
         },
+        optionArr: optionsCreator_bottomBarPlate(),
       },
       type: {
-        value: detail.base.type,
+        value: targetSheet?.bottomBar ?? '',
         onChange: (v) => {
-          changeDetail('base', 'type', v);
+          if (targetSheet) {
+            targetSheet.bottomBar = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
       },
       surface: {
-        value: detail.base.surface,
+        value: targetSheet?.com_bottomBar_surface ?? '',
         onChange: (v) => {
-          changeDetail('base', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_bottomBar_surface = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
     },
+    // _________________________________________________
+    // 支板
     support: {
       bearing: {
-        value: detail.support.bearing,
+        value: targetSheet?.com_sidePlate_bearing ?? '',
         onChange: (v) => {
-          changeDetail('support', 'bearing', v);
+          if (targetSheet) {
+            targetSheet.com_sidePlate_bearing = v;
+          }
         },
+        forbidden: true,
       },
       chain: {
-        value: detail.support.chain,
+        value: targetSheet?.com_sidePlate_chain ?? '',
         onChange: (v) => {
-          changeDetail('support', 'chain', v);
+          if (targetSheet) {
+            targetSheet.com_sidePlate_chain = v;
+          }
         },
+        forbidden: true,
       },
     },
+    // _____________________________________________________
+    // 門片
+
     doorPiece: {
       material: {
-        value: detail.doorPiece.material,
+        value: targetSheet?.com_slat_material ?? '',
         onChange: (v) => {
-          changeDetail('doorPiece', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_slat_material = v;
+          }
         },
+        optionArr: doorModelMaterialOptionArr,
       },
       surface: {
-        value: detail.doorPiece.surface,
+        value: targetSheet?.com_slat_surface ?? '',
         onChange: (v) => {
-          changeDetail('doorPiece', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_slat_surface = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
     },
+    // _____________________________________________________________
     motor: {
       horsepower: {
-        value: detail.motor.horsepower,
+        value: targetSheet?.horsepower ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'horsepower', v);
+          if (targetSheet) {
+            targetSheet.horsepower = v;
+          }
         },
+        optionArr: targetSheet?.options_horsepower ?? [],
       },
       manufacturer: {
-        value: detail.motor.manufacturer,
+        value: targetSheet?.motorVendor ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'manufacturer', v);
+          if (targetSheet) {
+            targetSheet.motorVendor = v;
+          }
         },
+        optionArr: targetSheet?.options_motor ?? [],
       },
       powerSupply: {
-        value: detail.motor.powerSupply,
+        value: targetSheet?.motorPhase ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'powerSupply', v);
+          if (targetSheet) {
+            targetSheet.motorPhase = v;
+          }
         },
+        optionArr: targetSheet?.options_phase ?? [],
       },
       voltage: {
-        value: detail.motor.voltage,
+        value: targetSheet?.motorVoltage ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'voltage', v);
+          if (targetSheet) {
+            targetSheet.motorVoltage = v;
+          }
         },
+        optionArr: targetSheet?.options_voltage ?? [],
       },
       support: {
-        value: detail.motor.support,
+        value: (() => {
+          const spec = targetSheet?.hasMotorSupportStand;
+
+          if (!spec) {
+            return 'no';
+          } else {
+            return 'yes';
+          }
+        })(),
         onChange: (v) => {
-          changeDetail('motor', 'support', v);
+          if (targetSheet) {
+            if (v === 'no') {
+              targetSheet.hasMotorSupportStand = false;
+            } else if (v === 'yes') {
+              targetSheet.hasMotorSupportStand = true;
+            }
+          }
         },
       },
       chainType: {
-        value: detail.motor.chainType,
+        value: targetSheet?.com_motor_chainType ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'chainType', v);
+          if (targetSheet) {
+            targetSheet.com_motor_chainType = v;
+          }
         },
+        forbidden: true,
       },
       lockBox: {
-        value: detail.motor.lockBox,
+        value: targetSheet?.motorLockBox ?? '',
         onChange: (v) => {
-          changeDetail('motor', 'lockBox', v);
+          if (targetSheet) {
+            targetSheet.motorLockBox = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_motorLockBox() }),
       },
     },
+    // ________________________________________________________________
     doorTrack: {
       material: {
-        value: detail.doorTrack.material,
+        value: targetSheet?.com_guideRail_material ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'material', v);
+          if (targetSheet) {
+            targetSheet.com_guideRail_material = v;
+          }
         },
+        optionArr: optionsCreator_componentMaterial_01(),
       },
       thickness: {
-        value: detail.doorTrack.thickness,
+        value: targetSheet?.guideRailThickness ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'thickness', v);
+          if (targetSheet) {
+            targetSheet.guideRailThickness = v;
+          }
         },
+        optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
-        value: detail.doorTrack.surface,
+        value: targetSheet?.com_guideRail_surface ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'surface', v);
+          if (targetSheet) {
+            targetSheet.com_guideRail_surface = v;
+          }
         },
+        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
       silencer: {
-        value: detail.doorTrack.silencer,
+        value: (() => {
+          const spec = targetSheet?.hasSilencingStrip;
+
+          if (!spec) {
+            return 'no';
+          } else {
+            return 'yes';
+          }
+        })(),
         onChange: (v) => {
-          changeDetail('doorTrack', 'silencer', v);
+          if (targetSheet) {
+            if (v === 'no') {
+              targetSheet.hasSilencingStrip = false;
+            } else if (v === 'yes') {
+              targetSheet.hasSilencingStrip = true;
+            }
+          }
         },
       },
       doorTrackType: {
-        value: detail.doorTrack.doorTrackType,
+        value: targetSheet?.com_guideRail_type ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'doorTrackType', v);
+          if (targetSheet) {
+            targetSheet.com_guideRail_type = v;
+          }
         },
+        forbidden: true,
       },
       doorTrackName: {
-        value: detail.doorTrack.doorTrackName,
+        value: targetSheet?.guideRail ?? '',
         onChange: (v) => {
-          changeDetail('doorTrack', 'doorTrackName', v);
+          if (targetSheet) {
+            targetSheet.guideRail = v;
+          }
         },
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
+        optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
       },
     },
   };
@@ -693,60 +916,94 @@ export default function WorkSheet() {
 
   const control_detail02: Tcontrol_detail02 = {
     size01: {
-      doorType: '999',
-      fullWidth: '999',
-      淨高: '999',
-      WG: '999',
-      gapA: '999',
-      gapC: '999',
-      支板尺寸: '999',
+      doorType: targetSheet?.doorModelName ?? '',
+      fullWidth: targetSheet?.fullWidth ?? '',
+      淨高: targetSheet?.height ?? '',
+      WG: targetSheet?.WG ?? '',
+      gapA: numToStr(targetSheet?.prodSpec?.gapA),
+      gapC: numToStr(targetSheet?.prodSpec?.gapC),
+      支板尺寸: targetSheet?.BD ?? '',
       捲門全高: '999',
     },
     size02: {
-      捲軸尺寸: '999',
-      軸徑: '999',
-      軸承: '999',
-      總長: '999',
-      寸法: '999',
+      捲軸尺寸: numToStr(targetSheet?.prodSpec?.diameter) + '"',
+      軸徑: numToStr(targetSheet?.prodSpec?.diameter),
+      軸承: targetSheet?.prodSpec?.bearingName ?? '',
+      總長: numToStr(targetSheet?.prodSpec?.bearingHousingTotalLength),
+      寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
     },
     rollBox: {
       角鐵數量: '999',
       捲箱角鐵尺寸: '999',
-      捲箱資訊: '999',
+      捲箱資訊: '是指一體式捲箱嗎?',
     },
     doorPiece: {
-      門片材質: '999',
-      門片厚度: '999',
-      門片長度: '999',
-      捲片支數: '999',
-      防颱勾: '999',
+      門片材質: targetSheet?.com_slat_material ?? '',
+      門片厚度: targetSheet?.thickness ?? '',
+      門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
+      捲片支數: numToStr(targetSheet?.prodDetailSpec?.slatCount),
+      防颱勾: '是否是指主產品的"防颱"?',
     },
     motor: {
-      vendor: '999',
-      電供: '999',
-      馬力: '999',
+      vendor: targetSheet?.motorVendor ?? '',
+      電供: (targetSheet?.motorPhase ?? '') + '相',
+      馬力: targetSheet?.horsepower ?? '',
     },
     doorTrack: {
-      門軌材質: '999',
-      門軌長度: '999',
+      門軌材質: targetSheet?.com_guideRail_material ?? '',
+      門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
       門軌形式: {
-        value: '999',
-        img: '999',
+        value: targetSheet?.guideRail ?? '',
+        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
       },
     },
     chainCog: {
-      鏈齒輪番號: '999',
+      // 鏈齒輪番號: 'gearNumber',
+      鏈齒輪番號: targetSheet?.prodSpec?.gearNumber ?? '',
       大鏈輪: '999',
       孔徑: '999',
     },
     base: {
-      底座材質: '999',
+      底座材質: targetSheet?.com_bottomBar_material ?? '',
       底座開口: '999',
     },
   };
 
   // -------------------------------------------------------------------------
+
+  const reqPatch = async () => {
+    if (!worksheetId) {
+      return;
+    }
+
+    let body: TupdateWorkSheetItem[] = [];
+
+    Object.values(changedSheetList).forEach((sheet) => {
+      const bodyItemArr = sheet.bodyItemArr;
+      body = [...bodyItemArr];
+    });
+
+    try {
+      await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+      await update_workSheet();
+      setDisabled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新工作單失敗', content: err.message });
+    }
+  };
+
   // -------------------------------------------------------------------------
+
+  const control_optional: Tcontrol_optional = {
+    value: targetSheet?.acceNameArr ?? [],
+    onChange: (arr: string[]) => {
+      if (targetSheet) {
+        targetSheet.acceNameArr = arr;
+      }
+    },
+  };
+
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
     {
@@ -759,11 +1016,11 @@ export default function WorkSheet() {
   ];
 
   const panelList_notAllow: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: 'test',
-    //   onClick: () => {},
-    // },
+    {
+      type: 'redButton',
+      label: '更新',
+      onClick: reqPatch,
+    },
     {
       type: 'myButton',
       label: '取消',
@@ -778,7 +1035,7 @@ export default function WorkSheet() {
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} />
+      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <form>
         <WorkSheetProfile control={control_profile} disabled={true} />
@@ -791,10 +1048,11 @@ export default function WorkSheet() {
               const { itemName, doorModelName, quantity } = sheet;
 
               const onClick = () => {
-                setTargetSheet(sheet);
+                setTargetSheetKey(key);
               };
 
-              const isActive = key === targetSheet?.productId;
+              // const isActive = key === targetSheet?.productId;
+              const isActive = key === targetSheet?.identifyKey;
 
               const control = {
                 itemName,
@@ -811,7 +1069,8 @@ export default function WorkSheet() {
           </div>
 
           {/* right */}
-          <div className={scss.right}>
+          {/* targetSheet */}
+          <div className={classNames(scss.right, !targetSheet && 'hidden')}>
             <WorkSheetProductOutline
               control={control_product}
               oldProductOutline={oldProductOutline}
@@ -823,16 +1082,13 @@ export default function WorkSheet() {
             <WorkSheetProductDetail01
               control={control_detail}
               disabled={disabled}
-              supportTip={`馬達荷重(max:${999},min:${999}),馬力數:${99}Hp`}
+              supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
             <hr />
             <WorkSheetOptional
-              value={others}
-              onChange={(arr) => {
-                setOthers(arr);
-              }}
-              optionArr={othersOptions}
+              control={control_optional}
+              optionArr={targetSheet?.accessoriesOptionArr_easy ?? []}
               disabled={disabled}
             />
             <hr />
@@ -846,281 +1102,23 @@ export default function WorkSheet() {
   );
 }
 
-// ====================================================================
-
-// export type TfakeworkSheet = {
-//   // profile right
-//   /**工程編號 */
-//   projectNumber: string;
-//   /**承包商 */
-//   contractor: string;
-//   /**負責人 */
-//   principal: string;
-//   /**公司電話 */
-//   companyPhone: string;
-//   /**公司傳真 */
-//   companyFax: string;
-
-//   // profile left
-//   /**工程名稱 */
-//   projectName: string;
-//   /**工程內容 */
-//   projectDesc: string;
-//   /**工地電話 */
-//   constructionSiteNumber: string;
-//   /**工地傳真 */
-//   constructionSiteFax: string;
-//   /**工地位置縣市 */
-//   projectCity: string;
-//   /**工地位置地區 */
-//   projectDistrict: string;
-//   /**工地位置地址 */
-//   projectAddress: string;
-//   /**工程負責人 */
-//   projectPrincipal: string;
-//   /**工程負責人電話 */
-//   projectPrincipalPhone: string;
-
-//   // 合約產品項目
-//   /**項目 */
-//   itemName: string;
-//   /**門型 */
-//   doorType: string;
-//   /**全寬(L) */
-//   length: string;
-//   /**淨高(h) */
-//   height: string;
-//   /**捲箱高(B) */
-//   thickness: string;
-//   /**數量 */
-//   quantity: string;
-//   /**材質 */
-//   material: string;
-//   /**防颱 */
-//   typhoonProtection: boolean;
-
-//   // 產品細部規格
-//   // 卷軸
-//   reel: {
-//     /**尺寸 */
-//     size: string;
-//     /**有無凸 */
-//     hasConvex: boolean;
-//   };
-//   // 捲箱
-//   reelBox: {
-//     /**材質 */
-//     material: string;
-//     /**厚度 */
-//     thickness: string;
-//     /**表面 */
-//     surface: string;
-//     /**正面 */
-//     front: string;
-//     /**有無凸 */
-//     hasConvex: boolean;
-//     /**捲箱型式 */
-//     type: string;
-//   };
-//   // 底座
-//   base: {
-//     /**材質 */
-//     material: string;
-//     /**角鐵材質 */
-//     angleMaterial: string;
-//     /**底座板材質 */
-//     baseMaterial: string;
-//     /**型式 */
-//     type: string;
-//     /**表面 */
-//     surface: string;
-//   };
-//   // 支版
-//   support: {
-//     /**軸承 */
-//     bearing: string;
-//     /**鏈條 */
-//     chain: string;
-//   };
-//   // 門片
-//   doorPiece: {
-//     /**材質 */
-//     material: string;
-//     /**表面 */
-//     surface: string;
-//   };
-//   // 電動機
-//   motor: {
-//     /** 馬力數*/
-//     horsepower: string;
-//     /** 廠商*/
-//     manufacturer: string;
-//     /** 電供*/
-//     powerSupply: string;
-//     /** 電壓*/
-//     voltage: string;
-//     /** 支撐架*/
-//     support: boolean;
-//     /** 鏈條型式*/
-//     chainType: string;
-//     /** 鎖盒*/
-//     lockBox: string;
-//   };
-//   // 門軌
-//   doorTrack: {
-//     /** 材質*/
-//     material: string;
-//     /** 厚度*/
-//     thickness: string;
-//     /** 表面*/
-//     surface: string;
-//     /** 消音條*/
-//     silencer: boolean;
-//     /** 型式*/
-//     doorTrackType: string;
-//     /** 型式2*/
-//     doorTrackName: string;
-//   };
-// };
-
-// const fakeWorkSheet: TfakeworkSheet = {
-//   // profile的資料不應該編輯，之後要把profile的資料從抽出另外處理
-//   // profile right
-//   projectNumber: 'M-1101201',
-//   contractor: '創典科技A有限公司',
-//   principal: '李先生',
-//   companyPhone: '04-1234567',
-//   companyFax: '04-1234567',
-
-//   // profile left
-//   projectName: '台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程',
-//   projectDesc: '捲門＋大門工程',
-//   constructionSiteNumber: '04-1234567',
-//   constructionSiteFax: '04-1234567',
-//   projectCity: '台中市',
-//   projectDistrict: '梧棲區',
-//   projectAddress: '經二路27號',
-//   projectPrincipal: '王先生',
-//   projectPrincipalPhone: '0987654321',
-//   //
-//   // 合約產品項目
-//   /**項目 */
-//   itemName: 'D-SD1-1',
-//   /**門型 */
-//   doorType: 'SJ-302',
-//   /**全寬(L) */
-//   length: '5.25',
-//   /**淨高(h) */
-//   height: '4.87',
-//   /**捲箱高(B) */
-//   thickness: '5.50',
-//   /**數量 */
-//   quantity: '12',
-//   /**材質 */
-//   material: '不鏽鋼304#',
-//   /**防颱 */
-//   typhoonProtection: true,
-
-//   // 產品細部規格
-//   // 捲軸
-//   reel: {
-//     /**尺寸 */
-//     size: '5',
-//     /**有無凸 */
-//     hasConvex: true,
-//   },
-//   // 捲箱
-//   reelBox: {
-//     /**材質 */
-//     material: 'SST 304# (2B 霧面)',
-//     /**厚度 */
-//     thickness: '0.8',
-//     /**表面 */
-//     surface: '氟烤',
-//     /**正面 */
-//     front: '正乳白',
-//     /**有無凸 */
-//     hasConvex: true,
-//     /**捲箱型式 */
-//     type: '捲箱+機箱',
-//   },
-//   // 底座
-//   base: {
-//     /**材質 */
-//     material: 'SST 304# (2B 霧面)',
-//     /**角鐵材質 */
-//     angleMaterial: 'SST 304# (2B 霧面)',
-//     /**底座板材質 */
-//     baseMaterial: 'SST 304# (2B 霧面)',
-//     /**型式 */
-//     type: '止水型',
-//     /**表面 */
-//     surface: '氟烤',
-//   },
-//   // 支版
-//   support: {
-//     /**軸承 */
-//     bearing: '6208#',
-//     /**鏈條 */
-//     chain: '640#',
-//   },
-//   // 門片
-//   doorPiece: {
-//     /**材質 */
-//     material: 'SST 304# (2B 霧面)',
-//     /**表面 */
-//     surface: '氟烤',
-//   },
-//   // 電動機
-//   motor: {
-//     /** 馬力數*/
-//     horsepower: '1/2HP',
-//     /** 廠商*/
-//     manufacturer: '大同',
-//     /** 電供*/
-//     powerSupply: '單相',
-//     /** 電壓*/
-//     voltage: '220V',
-//     /** 支撐架*/
-//     support: true,
-//     /** 鏈條型式*/
-//     chainType: '雙排',
-//     /** 鎖盒*/
-//     lockBox: '防盜式',
-//   },
-//   // 門軌
-//   doorTrack: {
-//     /** 材質*/
-//     material: 'SST 304# (2B 霧面)',
-//     /** 厚度*/
-//     thickness: '1.5T',
-//     /** 表面*/
-//     surface: '氟烤',
-//     /** 消音條*/
-//     silencer: true,
-//     /** 型式*/
-//     doorTrackType: '彎',
-//     /** 型式2*/
-//     doorTrackName: 'sJ302_30',
-//   },
-// };
-
 // ===========================================================================
 
-const othersOptions = [
-  { value: '門楣', label: '門楣' },
-  { value: '防颱底座鎖固', label: '防颱底座鎖固' },
-  { value: 'UL 熔金體', label: 'UL 熔金體' },
-  { value: '智慧型密碼開關', label: '智慧型密碼開關' },
-  { value: '遙控器(1:2)', label: '遙控器(1:2)' },
-  { value: '防颱活動中柱(滑軌)', label: '防颱活動中柱(滑軌)' },
-  { value: '颱風活動中柱(可拆式)', label: '颱風活動中柱(可拆式)' },
-  { value: '防爆裝置', label: '防爆裝置' },
-  { value: '手動關閉裝置', label: '手動關閉裝置' },
-  { value: 'UPS', label: 'UPS' },
-  { value: '煙感+中繼器', label: '煙感+中繼器' },
-  { value: '彈射門', label: '彈射門' },
-];
+const numToStr = (num: number | undefined) => {
+  if (num === undefined) {
+    return '';
+  }
+
+  return String(num);
+};
+
+const creCheckBarOptionArr = ({ optionArr }: { optionArr: Toption[] }) => {
+  const arr = optionArr.map((item) => {
+    return { key: item.value, label: item.label };
+  });
+
+  return arr;
+};
 
 // ============================================================================
 
@@ -1137,63 +1135,4 @@ const creEmptyProfile = (): Tprofile => ({
   principal: '',
   contactNumber: '',
   faxNumber: '',
-});
-
-const creEmptyProductOutline = (): TproductOutline => ({
-  itemName: '',
-  doorType: '',
-  fullWidth: '',
-  height: '',
-  boxB: '',
-  quantity: '',
-  material: '',
-  isAntiTyphoon: false,
-});
-
-const creEmptyDetail = (): Tdetail => ({
-  reel: {
-    size: '',
-    hasConvex: '',
-  },
-  reelBox: {
-    material: '',
-    thickness: '456',
-    surface: '',
-    front: '',
-    hasConvex: '',
-    type: '',
-  },
-  base: {
-    material: '',
-    angleMaterial: '',
-    baseMaterial: '',
-    type: '',
-    surface: '',
-  },
-  support: {
-    bearing: '',
-    chain: '',
-  },
-  //
-  doorPiece: {
-    material: '',
-    surface: '',
-  },
-  motor: {
-    horsepower: '',
-    manufacturer: '',
-    powerSupply: '',
-    voltage: '',
-    support: '',
-    chainType: '',
-    lockBox: '',
-  },
-  doorTrack: {
-    material: '',
-    thickness: '',
-    surface: '',
-    silencer: '',
-    doorTrackType: '',
-    doorTrackName: '',
-  },
 });
