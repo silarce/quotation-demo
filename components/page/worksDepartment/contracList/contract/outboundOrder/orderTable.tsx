@@ -46,7 +46,7 @@ type Tgroup = {
 
 type Tcontrol = Tgroup[];
 
-export type { Tcontrol as Tcontrol_orderTable };
+export type { Tcontrol as Tcontrol_orderTable, Tgroup };
 
 // ================================================================================
 export default function OrderTable({ disabled, control }: { disabled: boolean; control: Tcontrol }) {
