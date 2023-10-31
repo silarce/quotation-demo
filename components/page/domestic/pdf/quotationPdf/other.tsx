@@ -51,7 +51,7 @@ export default function Other({
         <div className={style.date}>
           <h2>三、交貨日期 : </h2>
           <div>
-            <span>{tradingDate !== 'Invalid date' ? `民國${year}年${month}月${day}日` : ''}</span>
+            <span>{theTradingDate}</span>
           </div>
         </div>
 
