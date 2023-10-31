@@ -197,7 +197,7 @@ export default function QuotationPdf({
       // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
       const lw = Number(prod.fullWidth || 0) * 100;
       const h = Number(prod.height) * 100;
-      const b = Number(prod.thickness) * 100;
+      const b = Number(prod.boxB) * 100;
 
       const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
