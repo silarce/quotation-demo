@@ -634,7 +634,10 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
   const api = `engineering/delivery-list/${id}`;
 
   const params = {
-    populate: ['contract.worksheet.contractProductItems.deliveryStatus'],
+    populate: [
+      'contract.worksheet.contractProductItems.deliveryStatus',
+      'contract.worksheet.contractProductItems.adjustedItem',
+    ],
   };
 
   return axi

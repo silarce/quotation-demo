@@ -1309,6 +1309,7 @@ export type TcreateQuotationContentDto = {
   productsOrder?: string[] | null; // 已棄用
 };
 
+/**合約 */
 export type TquotationContractDto = {
   id: string;
   createdAt: string;
@@ -1333,6 +1334,8 @@ export type TquotationContractDto = {
   subContracts: TquotationContractDto[];
   /**工程聯絡單ID */
   engineeringContactId: string | null;
+  /**工作表 */
+  worksheet: TworkSheetDto;
   /**工作表ID */
   worksheetId: string | null;
   /**出庫單ID */
