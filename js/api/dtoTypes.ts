@@ -959,12 +959,21 @@ export type TdeliveryStatusDto = {
   // @ApiProperty({ description: '安裝人員' })
   installerEmployee: TemployeeDto;
   // @ApiProperty({ description: '安裝日期' })
-  installationDate: Date | null;
+  installationDate: string | null;
   // @ApiProperty({ description: '工作表開立日期' })
-  workSheetInvoiceDate: Date | null;
+  workSheetInvoiceDate: string | null;
   // @ApiProperty({ description: '追加' })
   append: string | null;
   // @ApiProperty({ description: '完成追加' })
+  completeAppend: string | null;
+};
+
+export type TupdateDeliveryStatus = {
+  id: string;
+  notes: string;
+  installerEmployeeId: string | null;
+  installationDate: string;
+  append: string | null;
   completeAppend: string | null;
 };
 
@@ -2198,10 +2207,14 @@ export type TupdateWorkSheet = {
   contractProductItems: TupdateWorkSheetItem[];
 };
 
-//
-export type ToutBoundOrder = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  contractProductItems?: TquotationProductItemDto[];
+// 出庫單
+
+export type TengineeringDeliveryListDto = {
+  note: string | null;
+  contract: TquotationContractDto;
+};
+
+export type TupdateEngineeringDeliveryList = {
+  note: string;
+  productsItemStatus: TupdateDeliveryStatus[];
 };
