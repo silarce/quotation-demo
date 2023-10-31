@@ -3,6 +3,8 @@ import { useState } from 'react';
 // css
 import style from './quotationPdf.module.scss';
 
+import { apiGetAssets } from 'js/api/api_product';
+
 export type TtableProdList = {
   category: string;
   size: string;
@@ -27,23 +29,23 @@ export default function Table({ productList }: { productList: TtableProdList }) 
       return;
     }
 
-    // try {
-    //   svgList[fileName] = 'isLoading';
+    try {
+      svgList[fileName] = 'isLoading';
 
-    //   const svg = await apiGetAssets(fileName);
+      const svg = await apiGetAssets(fileName);
 
-    //   if (svg) {
-    //     setSvgList((list) => ({
-    //       ...list,
-    //       [fileName]: svg,
-    //     }));
-    //   }
-    // } catch (error) {
-    //   setSvgList((list) => ({
-    //     ...list,
-    //     [fileName]: undefined,
-    //   }));
-    // }
+      if (svg) {
+        setSvgList((list) => ({
+          ...list,
+          [fileName]: svg,
+        }));
+      }
+    } catch (error) {
+      setSvgList((list) => ({
+        ...list,
+        [fileName]: undefined,
+      }));
+    }
   };
 
   return (
