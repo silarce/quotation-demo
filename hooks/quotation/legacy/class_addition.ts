@@ -375,7 +375,7 @@ const additionCellConfigCre = (): TadditionCellConfig => {
       itemName: {
         label: '項目',
         inputSelPorps: {
-          wrapperStyle: { width: '60px' },
+          wrapperStyle: { width: '120px' },
           inputProps: {
             props: {},
           },
