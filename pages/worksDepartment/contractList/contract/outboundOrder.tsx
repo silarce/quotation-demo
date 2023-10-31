@@ -9,7 +9,10 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import OrderTable from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
+import OrderTable, {
+  Tcontrol_orderTable,
+  Tgroup,
+} from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -124,6 +127,73 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
+  const control_orderTable: Tcontrol_orderTable =
+    Object.values(myDeleveryList ?? {}).map((delevery) => {
+      const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
+        return {
+          staticData: {
+            project: delevery.itemName,
+            L: String(item.fullWidth),
+            W: String(item.WG),
+            B: String(item.boxB),
+            qty: '999',
+            implementQty: '999',
+            cai: item.volume,
+            totalCai: '999',
+            doorType: item.doorModelName,
+            material: item.materialName,
+            horsepower: item.horsepower,
+            surface: item.materialSurface,
+          },
+          deliveryStatus: {
+            remark01: {
+              value: 'test',
+              onChange: () => {},
+            },
+            remark02: {
+              value: 'test',
+              onChange: () => {},
+            },
+            remark03: {
+              value: 'test',
+              onChange: () => {},
+            },
+            remark04: {
+              value: 'test',
+              onChange: () => {},
+            },
+            appended: {
+              value: 'test',
+              onChange: () => {},
+            },
+            orderCreatedDate: {
+              value: 'test',
+              onChange: () => {},
+            },
+            finishAppended: {
+              value: 'test',
+              onChange: () => {},
+            },
+            installer: {
+              value: 'test',
+              onChange: () => {},
+            },
+            installDate: {
+              value: 'test',
+              onChange: () => {},
+            },
+          },
+        };
+      });
+
+      return {
+        itemName: delevery.itemName,
+        rowArr,
+      };
+    }) ?? [];
+
+  // --------------------------------------------------------------------------
+
   const panelList01: TpanelList = [
     {
       type: 'myButton',
@@ -170,7 +240,7 @@ export default function OutboundOrder() {
             </div>
           </div>
 
-          <OrderTable disabled={disabled} control={[]} />
+          <OrderTable disabled={disabled} control={control_orderTable} />
 
           <div className={style.remark}>
             <div className={style.title}>
