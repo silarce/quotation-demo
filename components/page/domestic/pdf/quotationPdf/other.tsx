@@ -26,8 +26,9 @@ export default function Other({
     // eleConnectPayment,
   } = payInfo;
 
+  // 交貨日期
   const [year, month, day] = tradingDate.split('-');
-  console.log(tradingDate);
+  const theTradingDate = !tradingDate || tradingDate !== 'Invalid date' ? '' : `民國${year}年${month}月${day}日`;
 
   return (
     <div className={style.other}>

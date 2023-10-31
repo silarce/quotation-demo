@@ -37,7 +37,8 @@ export default function Profile({
   } = profileData;
 
   const [year, month, day] = builtDate.split('-');
-  const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '';
+  // const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '';
+  const date = !builtDate || builtDate === 'Invalid date' ? '' : `${year ?? ''}年${month ?? ''}月${day ?? ''}日`;
 
   return (
     <div className={style.profile}>
