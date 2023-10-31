@@ -37,7 +37,7 @@ export default function Profile({
   } = profileData;
 
   const [year, month, day] = builtDate.split('-');
-  const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '未定';
+  const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '';
 
   return (
     <div className={style.profile}>
@@ -91,8 +91,8 @@ export default function Profile({
             <span>報價時效</span>
             <span className={style.semi}>:</span>
             <span>
-              {validityPeriod}
-              {'天內'}
+              {validityPeriod ?? ''}
+              {!!validityPeriod && '天內'}
             </span>
           </div>
           <div className={style.info}>
