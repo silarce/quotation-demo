@@ -45,7 +45,11 @@ export default function Profile({
       <div className={style.grid}>
         <div className={style.customer}>
           <div className={style.info}>
-            <span>ATTN</span>
+            <span className={style.flexSpan}>
+              <span>聯</span>
+              <span>絡</span>
+              <span>人</span>
+            </span>
             <span className={style.semi}>:</span>
             <span>{contactPerson}</span>
           </div>
