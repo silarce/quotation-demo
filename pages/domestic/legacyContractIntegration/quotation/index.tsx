@@ -70,7 +70,6 @@ import {
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-import { fi } from 'date-fns/locale';
 
 // ========================================================================
 // ========================================================================

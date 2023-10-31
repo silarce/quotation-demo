@@ -104,13 +104,14 @@ class Class_product {
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  readonly options_doorModel = optionsCreator_doorModel();
 
   private _reduceQty = '0';
   // 因變更而新增的prod
   private _exchangeProdList: {
     [key in string]: Class_product;
   } = {};
-  // 等api新增，先用假資料 // TODO 這個已經完工了，假資料?
+
   private _batchNumber;
 
   //----------------------------------------------
@@ -159,6 +160,12 @@ class Class_product {
     } else {
       return this.options_doorTrack_normal;
     }
+  }
+
+  get options_doorModel_byQuoteType() {
+    return this.options_doorModel.filter((item) => {
+      return item.quoteType === this.quoteType;
+    });
   }
 
   get id() {
@@ -220,6 +227,7 @@ class Class_product {
   }
   set quoteType(v) {
     this._product.quoteType = v;
+    this._product.doorType = '';
     this._reRender();
   }
 

@@ -396,6 +396,10 @@ function DndRow({
               selectProps.easyValue = stateValue as string;
 
               if (selectProps.props) {
+                if (key === 'doorType') {
+                  selectProps.props!.options = prod.options_doorModel_byQuoteType;
+                }
+
                 selectProps.props.onChange = (option) => {
                   (prod[key] as string) = option?.value ?? '';
                 };
