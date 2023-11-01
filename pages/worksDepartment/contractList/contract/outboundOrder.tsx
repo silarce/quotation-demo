@@ -109,6 +109,10 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
+  const [note, setNote] = useState<string>('');
+
+  // --------------------------------------------------------------------------
+
   const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
 
   const change_deliveryStatusWillUpdate = (
@@ -442,7 +446,13 @@ export default function OutboundOrder() {
             </div>
 
             <div className={style.textarea}>
-              <textarea name="" id="" placeholder="請輸入備註"></textarea>
+              <textarea
+                value={note || deliveryList?.note || ''}
+                onChange={(e) => {
+                  setNote(e.target.value);
+                }}
+                placeholder="請輸入備註"
+              ></textarea>
             </div>
           </div>
         </div>
