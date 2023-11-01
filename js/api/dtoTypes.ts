@@ -975,7 +975,7 @@ export type TupdateDeliveryStatus = {
   id: string;
   notes: string;
   installerEmployeeId: string | null;
-  installationDate: string;
+  installationDate: string | null;
   append: string | null;
   completeAppend: string | null;
 };
@@ -2220,11 +2220,14 @@ export type TupdateWorkSheet = {
 // 出庫單
 
 export type TengineeringDeliveryListDto = {
-  note: string | null;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  notes: string;
   contract: TquotationContractDto;
 };
 
 export type TupdateEngineeringDeliveryList = {
-  note: string;
-  productsItemStatus: TupdateDeliveryStatus[];
+  notes: string;
+  productsItemStatus?: TupdateDeliveryStatus[];
 };

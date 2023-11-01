@@ -26,6 +26,7 @@ import style from './contract.module.scss';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import {
   TupdateEngineeringDeliveryList,
+  TupdateDeliveryStatus,
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
   apiPatchEngineeringDeliveryList,
@@ -109,7 +110,7 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  const [note, setNote] = useState<string>('');
+  const [notes, setNotes] = useState<string>();
 
   // --------------------------------------------------------------------------
 
@@ -218,6 +219,16 @@ export default function OutboundOrder() {
       myDeleveryList,
     };
   }, [deliveryList]);
+
+  useEffect(() => {
+    if (deliveryList) {
+      setNotes(deliveryList.notes);
+    }
+  }, [deliveryList]);
+
+  useEffect(() => {
+    setDeliveryStatusWillUpdate({});
+  }, [disabled]);
 
   // --------------------------------------------------------------------------
 
@@ -379,14 +390,45 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  // const reqUpdate = async () => {
+  const reqUpdate = async () => {
+    if (!engineeringDeliveryListId || !deliveryList || notes === undefined) {
+      return myAlert.warning({ title: '還未取得工作表' });
+    }
 
-  //   const body:TupdateEngineeringDeliveryList
+    const productsItemStatus: TupdateDeliveryStatus[] = Object.values(deliveryStatusWillUpdate).map((status) => {
+      const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
 
-  //   try {
-  //     const res = await apiPatchEngineeringDeliveryList();
-  //   } catch (error) {}
-  // };
+      return {
+        id: status.id,
+        notes: status.notes,
+        installerEmployeeId: status.installerEmployee?.id ?? null,
+        installationDate: theDate,
+        append: status.append,
+        completeAppend: status.completeAppend,
+      };
+    });
+
+    const body: TupdateEngineeringDeliveryList = {
+      notes: notes,
+      productsItemStatus,
+    };
+
+    try {
+      setIsLoading(true);
+      const res = await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, body);
+
+      if (res) {
+        myAlert.success({ title: '更新工作表成功' });
+        setDisabled(true);
+        await update_deliveryList();
+      }
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新工作表失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // --------------------------------------------------------------------------
 
@@ -402,10 +444,8 @@ export default function OutboundOrder() {
   const panelList02: TpanelList = [
     {
       type: 'redButton',
-      label: '儲存',
-      onClick: () => {
-        alert('儲存');
-      },
+      label: '更新',
+      onClick: reqUpdate,
     },
     {
       type: 'myButton',
@@ -417,7 +457,7 @@ export default function OutboundOrder() {
   ];
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader
         panelList={disabled ? panelList01 : panelList02}
         contractNumber={engineeringContact?.contractNumber ?? ''}
@@ -447,9 +487,9 @@ export default function OutboundOrder() {
 
             <div className={style.textarea}>
               <textarea
-                value={note || deliveryList?.note || ''}
+                value={notes || ''}
                 onChange={(e) => {
-                  setNote(e.target.value);
+                  setNotes(e.target.value);
                 }}
                 placeholder="請輸入備註"
               ></textarea>

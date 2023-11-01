@@ -28,6 +28,7 @@ import type {
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
   TupdateEngineeringDeliveryList,
+  TupdateDeliveryStatus,
 } from './dtoTypes';
 
 export type {
@@ -48,6 +49,7 @@ export type {
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
   TupdateEngineeringDeliveryList,
+  TupdateDeliveryStatus,
 } from './dtoTypes';
 
 // ========================================================================
@@ -678,7 +680,7 @@ export const useGetEngineeringDeliveryList = (id: string | undefined | null) => 
 
 /**更新出庫單 */
 export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryList) => {
-  const api = `/engineering/delivery-list/${id}/products`;
+  const api = `/engineering/delivery-list/${id}`;
 
   return axi
     .patch(api, body)
