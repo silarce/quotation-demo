@@ -84,6 +84,8 @@ $cellgap: 16px;
       > span {
         display: inline-block;
         font-size: 16px;
+        word-break: break-all;
+        white-space: pre-wrap;
       }
       .input03 {
         padding: 0;

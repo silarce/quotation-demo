@@ -158,10 +158,13 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
 
                       return (
-                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
+                        <div
+                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
                           <span>{value}</span>
                         </div>
                       );
@@ -182,15 +185,6 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       const { width, position, type } = configList[key] ?? {};
                       const theStyle = { width };
                       const textCenter = position === 'center' ? style.textCenter : '';
-
-                      // const theProps = (() => {
-                      //   if (type === 'input') {
-                      //     return {
-                      //       value,
-                      //       onChange,
-                      //     };
-                      //   }
-                      // })();
 
                       const theProps: Parameters<typeof InputSel>[0] = {};
 
@@ -297,7 +291,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
 type Tconfig = {
   label: string;
   width: string;
-  type: 'input' | 'select' | 'date' | 'employee';
+  type?: 'input' | 'select' | 'date' | 'employee';
   position: string;
 };
 
@@ -314,7 +308,7 @@ const creCellConfig_static = (): TcellConfigList => ({
   },
   project: {
     label: '項目',
-    width: '60px',
+    width: '80px',
     type: 'input',
     position: '',
   },
