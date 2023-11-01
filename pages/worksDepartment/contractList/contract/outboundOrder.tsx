@@ -3,6 +3,7 @@
 // 出庫單
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -187,10 +188,10 @@ export default function OutboundOrder() {
         },
       };
 
-      let totalCai_total = 0;
+      let totalCai_total = new Decimal(0);
 
       const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
-        totalCai_total += Number(item.volume);
+        totalCai_total = totalCai_total.add(item.volume || '0');
 
         return {
           staticData: {
@@ -248,7 +249,7 @@ export default function OutboundOrder() {
         };
       });
 
-      firstRow.staticData.totalCai = String(totalCai_total);
+      firstRow.staticData.totalCai = totalCai_total.toString();
       rowArr.unshift(firstRow);
 
       return {
