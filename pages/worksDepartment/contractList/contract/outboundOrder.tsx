@@ -403,7 +403,8 @@ export default function OutboundOrder() {
     }
 
     const productsItemStatus: TupdateDeliveryStatus[] = Object.values(deliveryStatusWillUpdate).map((status) => {
-      const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
+      // const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
+      const theDate = status.installationDate ? status.installationDate : null;
 
       return {
         id: status.id,
