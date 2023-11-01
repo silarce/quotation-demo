@@ -28,7 +28,7 @@ import { useGetEngineeringContact, useApiGetEngineeringDeliveryList } from 'js/a
 import { TquotationProductItemDto, TdeliveryStatusDto, TupdateDeliveryStatus, TemployeeDto } from 'js/api/dtoTypes';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { convertDate_reduce1911, convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -50,7 +50,7 @@ type TdeliveryStatusWillUpdate = {
     notes: string;
     // installerEmployeeId: string | null;
     installerEmployee?: TemployeeDto | null;
-    installationDate: string;
+    installationDate: string | null;
     append: string | null;
     completeAppend: string | null;
   };
@@ -106,6 +106,8 @@ export default function OutboundOrder() {
 
   const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
 
+  console.log(deliveryStatusWillUpdate);
+
   const change_deliveryStatusWillUpdate = (
     statusOri: TdeliveryStatusDto | undefined | null,
     key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
@@ -116,8 +118,10 @@ export default function OutboundOrder() {
     }
 
     const deliveryStatusId = statusOri.id;
-    const statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? { ...statusOri };
+    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+    statusCopy = { ...statusCopy };
     statusCopy[key] = v;
+
     setDeliveryStatusWillUpdate((state) => {
       return {
         ...state,
@@ -129,14 +133,36 @@ export default function OutboundOrder() {
   const change_deliveryStatusWillUpdate_employee = (
     statusOri: TdeliveryStatusDto | undefined | null,
     key: 'installerEmployee',
-    v: TemployeeDto
+    v: TemployeeDto | null
   ) => {
     if (!statusOri) {
       return;
     }
 
     const deliveryStatusId = statusOri.id;
-    const statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? { ...statusOri };
+    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+    statusCopy = { ...statusCopy };
+    statusCopy[key] = v;
+    setDeliveryStatusWillUpdate((state) => {
+      return {
+        ...state,
+        [deliveryStatusId]: statusCopy,
+      };
+    });
+  };
+
+  const change_deliveryStatusWillUpdate_date = (
+    statusOri: TdeliveryStatusDto | undefined | null,
+    key: 'installationDate',
+    v: string | null
+  ) => {
+    if (!statusOri) {
+      return;
+    }
+
+    const deliveryStatusId = statusOri.id;
+    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+    statusCopy = { ...statusCopy };
     statusCopy[key] = v;
     setDeliveryStatusWillUpdate((state) => {
       return {
@@ -239,7 +265,8 @@ export default function OutboundOrder() {
             hidden: true,
           },
           installer: {
-            value: '',
+            // value: '',
+            empolyee: null,
             hidden: true,
           },
           installDate: {
@@ -281,9 +308,6 @@ export default function OutboundOrder() {
             horsepower: item.horsepower,
             surface: item.materialSurface,
           },
-
-          // change_deliveryStatusWillUpdate_employee
-
           deliveryStatus: {
             remark01: {
               value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.notes ?? notes ?? '',
@@ -308,8 +332,10 @@ export default function OutboundOrder() {
               forbidden: true,
             },
             installDate: {
-              value: 'test',
-              onChange: () => {},
+              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.installationDate ?? installationDate ?? '',
+              onChange_date: (date) => {
+                change_deliveryStatusWillUpdate_date(item?.deliveryStatus, 'installationDate', date);
+              },
             },
             appended: {
               value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.append ?? append ?? '',
@@ -324,8 +350,12 @@ export default function OutboundOrder() {
               },
             },
             installer: {
-              value: 'test',
-              onChange: () => {},
+              // value: '', // 設定value的話就會蓋過employee.chName或employee.enName
+              empolyee:
+                deliveryStatusWillUpdate[deliveryStatusId ?? '']?.installerEmployee ?? installerEmployee ?? null,
+              onChange_employee: (emp) => {
+                change_deliveryStatusWillUpdate_employee(item?.deliveryStatus, 'installerEmployee', emp);
+              },
             },
           },
         };
@@ -406,3 +436,14 @@ export default function OutboundOrder() {
     </SubLayer>
   );
 }
+
+const createDeliveryStatusWillUpdate = (deliveryStatus: TdeliveryStatusDto): TdeliveryStatusWillUpdate[string] => {
+  return {
+    id: deliveryStatus.id,
+    notes: deliveryStatus.notes ?? '',
+    installerEmployee: deliveryStatus.installerEmployee ?? null,
+    installationDate: deliveryStatus.installationDate,
+    append: deliveryStatus.append,
+    completeAppend: deliveryStatus.completeAppend,
+  };
+};
