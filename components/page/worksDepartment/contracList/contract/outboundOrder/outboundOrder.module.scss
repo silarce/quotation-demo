@@ -90,6 +90,11 @@ $cellgap: 16px;
         &.hidden {
           visibility: hidden;
         }
+        .datepicker {
+          input {
+            color: theme("colors.text");
+          }
+        }
       }
     }
   }

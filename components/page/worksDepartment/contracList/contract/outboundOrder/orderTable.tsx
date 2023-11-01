@@ -207,6 +207,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                           onChange02: (m) => {
                             onChange_date?.(m?.toISOString() ?? null);
                           },
+                          datePickerClassName: style.datepicker,
                         };
                       }
 
