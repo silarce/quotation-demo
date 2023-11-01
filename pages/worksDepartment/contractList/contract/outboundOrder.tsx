@@ -205,6 +205,8 @@ export default function OutboundOrder() {
         theId = productId;
       }
 
+      theItem.deliveryStatus = item.deliveryStatus;
+
       if (!myDeleveryList?.[theId]) {
         myDeleveryList[theId] = {
           itemName: theItem.itemName,
