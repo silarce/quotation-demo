@@ -26,6 +26,7 @@ type TdeliveryStatusItem = {
   value: string;
   onChange?: (str: string) => void;
   hidden?: boolean;
+  forbidden?: boolean;
 };
 
 type Tgroup = {
@@ -34,9 +35,9 @@ type Tgroup = {
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
-      remark02: TdeliveryStatusItem;
-      remark03: TdeliveryStatusItem;
-      remark04: TdeliveryStatusItem;
+      // remark02: TdeliveryStatusItem;
+      // remark03: TdeliveryStatusItem;
+      // remark04: TdeliveryStatusItem;
       appended: TdeliveryStatusItem;
       orderCreatedDate: TdeliveryStatusItem;
       finishAppended: TdeliveryStatusItem;
@@ -141,7 +142,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                     {/* orderKeyIndex02 */}
                     {orderKeyIndex02.map((key, columnIndex) => {
-                      const { value, onChange, hidden } = row.deliveryStatus[key];
+                      const { value, onChange, hidden, forbidden } = row.deliveryStatus[key];
 
                       // if (rowIndex !== 0 && columnIndex === 0) {
                       //   value = '';
@@ -164,8 +165,9 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                               value,
                               onChange,
                             }}
+                            showBaseline={forbidden ? 'invisible' : 'auto'}
                             placeholder=""
-                            disabled={disabled}
+                            disabled={forbidden || disabled}
                           />
                         </div>
                       );
@@ -200,15 +202,16 @@ const orderKeyArr_static: (keyof TstaticData)[] = [
 ];
 
 const orderKeyIndex02: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
-  'remark01',
-  'remark02',
-  'remark03',
-  'remark04',
-  'appended',
   'orderCreatedDate',
+  'installDate',
+  //
+  'remark01',
+  // 'remark02',
+  // 'remark03',
+  // 'remark04',
+  'appended',
   'finishAppended',
   'installer',
-  'installDate',
 ];
 
 // =======================================================================

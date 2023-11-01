@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -24,7 +25,10 @@ import style from './contract.module.scss';
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { useGetEngineeringContact, useApiGetEngineeringDeliveryList } from 'js/api/api_engineering';
-import { TquotationProductItemDto } from 'js/api/dtoTypes';
+import { TquotationProductItemDto, TdeliveryStatusDto, TupdateDeliveryStatus, TemployeeDto } from 'js/api/dtoTypes';
+
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -38,6 +42,18 @@ type Tdelevery = {
 
 type myDeleveryList = {
   [key: string]: Tdelevery;
+};
+
+type TdeliveryStatusWillUpdate = {
+  [key in string]: {
+    id: string;
+    notes: string;
+    // installerEmployeeId: string | null;
+    installerEmployee?: TemployeeDto | null;
+    installationDate: string;
+    append: string | null;
+    completeAppend: string | null;
+  };
 };
 
 // =====================================================================
@@ -85,6 +101,50 @@ export default function OutboundOrder() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
+
+  // --------------------------------------------------------------------------
+
+  const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
+
+  const change_deliveryStatusWillUpdate = (
+    statusOri: TdeliveryStatusDto | undefined | null,
+    key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
+    v: string
+  ) => {
+    if (!statusOri) {
+      return;
+    }
+
+    const deliveryStatusId = statusOri.id;
+    const statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? { ...statusOri };
+    statusCopy[key] = v;
+    setDeliveryStatusWillUpdate((state) => {
+      return {
+        ...state,
+        [deliveryStatusId]: statusCopy,
+      };
+    });
+  };
+
+  const change_deliveryStatusWillUpdate_employee = (
+    statusOri: TdeliveryStatusDto | undefined | null,
+    key: 'installerEmployee',
+    v: TemployeeDto
+  ) => {
+    if (!statusOri) {
+      return;
+    }
+
+    const deliveryStatusId = statusOri.id;
+    const statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? { ...statusOri };
+    statusCopy[key] = v;
+    setDeliveryStatusWillUpdate((state) => {
+      return {
+        ...state,
+        [deliveryStatusId]: statusCopy,
+      };
+    });
+  };
 
   // --------------------------------------------------------------------------
 
@@ -141,7 +201,8 @@ export default function OutboundOrder() {
           B: String(firstItem.boxB),
           qty: String(delevery.itemArr.length),
           implementQty: '???',
-          cai: firstItem.volume,
+          // cai: firstItem.volume,
+          cai: '',
           totalCai: '0',
           doorType: firstItem.doorModelName,
           material: firstItem.materialName,
@@ -153,18 +214,18 @@ export default function OutboundOrder() {
             value: '',
             hidden: true,
           },
-          remark02: {
-            value: '',
-            hidden: true,
-          },
-          remark03: {
-            value: '',
-            hidden: true,
-          },
-          remark04: {
-            value: '',
-            hidden: true,
-          },
+          // remark02: {
+          //   value: '',
+          //   hidden: true,
+          // },
+          // remark03: {
+          //   value: '',
+          //   hidden: true,
+          // },
+          // remark04: {
+          //   value: '',
+          //   hidden: true,
+          // },
           appended: {
             value: '',
             hidden: true,
@@ -193,6 +254,18 @@ export default function OutboundOrder() {
       const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
         totalCai_total = totalCai_total.add(item.volume || '0');
 
+        const {
+          //
+          id: deliveryStatusId,
+          createdAt,
+          notes,
+          installerEmployeeId,
+          installerEmployee,
+          installationDate,
+          append,
+          completeAppend,
+        } = item.deliveryStatus ?? {};
+
         return {
           staticData: {
             project: delevery.itemName,
@@ -208,40 +281,49 @@ export default function OutboundOrder() {
             horsepower: item.horsepower,
             surface: item.materialSurface,
           },
+
+          // change_deliveryStatusWillUpdate_employee
+
           deliveryStatus: {
             remark01: {
-              value: 'test',
-              onChange: () => {},
+              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.notes ?? notes ?? '',
+              onChange: (str) => {
+                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
+              },
             },
-            remark02: {
-              value: 'test',
-              onChange: () => {},
+            // remark02: {
+            //   value: 'test',
+            //   onChange: () => {},
+            // },
+            // remark03: {
+            //   value: 'test',
+            //   onChange: () => {},
+            // },
+            // remark04: {
+            //   value: 'test',
+            //   onChange: () => {},
+            // },
+            orderCreatedDate: {
+              value: createdAt ? moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD') : '',
+              forbidden: true,
             },
-            remark03: {
-              value: 'test',
-              onChange: () => {},
-            },
-            remark04: {
+            installDate: {
               value: 'test',
               onChange: () => {},
             },
             appended: {
-              value: 'test',
-              onChange: () => {},
-            },
-            orderCreatedDate: {
-              value: 'test',
-              onChange: () => {},
+              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.append ?? append ?? '',
+              onChange: (str) => {
+                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'append', str);
+              },
             },
             finishAppended: {
-              value: 'test',
-              onChange: () => {},
+              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.completeAppend ?? completeAppend ?? '',
+              onChange: (str) => {
+                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'completeAppend', str);
+              },
             },
             installer: {
-              value: 'test',
-              onChange: () => {},
-            },
-            installDate: {
               value: 'test',
               onChange: () => {},
             },
