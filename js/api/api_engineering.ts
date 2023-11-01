@@ -646,7 +646,7 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useApiGetEngineeringDeliveryList = (id: string | undefined | null) => {
+export const useGetEngineeringDeliveryList = (id: string | undefined | null) => {
   const [res, setRes] = useState<TengineeringDeliveryListDto>();
 
   const update = async () => {
@@ -676,6 +676,7 @@ export const useApiGetEngineeringDeliveryList = (id: string | undefined | null) 
   };
 };
 
+/**更新出庫單 */
 export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryList) => {
   const api = `/engineering/delivery-list/${id}/products`;
 

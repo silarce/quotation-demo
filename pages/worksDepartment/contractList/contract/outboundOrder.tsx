@@ -24,14 +24,19 @@ import style from './contract.module.scss';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { useGetEngineeringContact, useApiGetEngineeringDeliveryList } from 'js/api/api_engineering';
-import { TquotationProductItemDto, TdeliveryStatusDto, TupdateDeliveryStatus, TemployeeDto } from 'js/api/dtoTypes';
+import {
+  TupdateEngineeringDeliveryList,
+  useGetEngineeringContact,
+  useGetEngineeringDeliveryList,
+  apiPatchEngineeringDeliveryList,
+} from 'js/api/api_engineering';
 
 // utils
 import { convertDate_reduce1911, convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -72,7 +77,7 @@ export default function OutboundOrder() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
 
-  const { deliveryList, update_deliveryList } = useApiGetEngineeringDeliveryList(engineeringDeliveryListId);
+  const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
 
   useEffect(() => {
     (async () => {
@@ -105,8 +110,6 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
-
-  console.log(deliveryStatusWillUpdate);
 
   const change_deliveryStatusWillUpdate = (
     statusOri: TdeliveryStatusDto | undefined | null,
@@ -369,6 +372,17 @@ export default function OutboundOrder() {
         rowArr,
       };
     }) ?? [];
+
+  // --------------------------------------------------------------------------
+
+  // const reqUpdate = async () => {
+
+  //   const body:TupdateEngineeringDeliveryList
+
+  //   try {
+  //     const res = await apiPatchEngineeringDeliveryList();
+  //   } catch (error) {}
+  // };
 
   // --------------------------------------------------------------------------
 
