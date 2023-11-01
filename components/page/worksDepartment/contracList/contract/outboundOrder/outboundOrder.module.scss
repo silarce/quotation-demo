@@ -87,6 +87,9 @@ $cellgap: 16px;
       }
       .input03 {
         padding: 0;
+        &.hidden {
+          visibility: hidden;
+        }
       }
     }
   }

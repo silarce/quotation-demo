@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import classNames from 'classnames';
+
 import style from './outboundOrder.module.scss';
 
 // global gear
@@ -23,7 +24,8 @@ type TstaticData = {
 
 type TdeliveryStatusItem = {
   value: string;
-  onChange: (str: string) => void;
+  onChange?: (str: string) => void;
+  hidden?: boolean;
 };
 
 type Tgroup = {
@@ -139,7 +141,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                     {/* orderKeyIndex02 */}
                     {orderKeyIndex02.map((key, columnIndex) => {
-                      const { value, onChange } = row.deliveryStatus[key];
+                      const { value, onChange, hidden } = row.deliveryStatus[key];
 
                       // if (rowIndex !== 0 && columnIndex === 0) {
                       //   value = '';
@@ -157,7 +159,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       return (
                         <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
                           <InputSel
-                            className={style.input03}
+                            className={classNames(style.input03, hidden && style.hidden)}
                             inputProps={{
                               value,
                               onChange,
@@ -207,162 +209,6 @@ const orderKeyIndex02: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
   'finishAppended',
   'installer',
   'installDate',
-];
-
-const fakeOrderDataItemOri = () => ({
-  project: {
-    value: 'SD2',
-  },
-  L: {
-    value: '516',
-  },
-  W: {
-    value: '230',
-  },
-  B: {
-    value: '45',
-  },
-  qty: {
-    value: '1',
-  },
-  implementQty: {
-    value: '1',
-  },
-  cai: {
-    value: '22181.49',
-  },
-  totalCai: {
-    value: '22181.49',
-  },
-  doorType: {
-    value: 'SJ-302',
-  },
-  material: {
-    value: '不鏽鋼304#',
-  },
-  horsepower: {
-    value: '1/3HP',
-  },
-  surface: {
-    value: '烤漆',
-  },
-
-  remark01: {
-    value: '',
-  },
-  remark02: {
-    value: '',
-  },
-  remark03: {
-    value: '',
-  },
-  remark04: {
-    value: '',
-  },
-  appended: {
-    value: '',
-  },
-  orderCreatedDate: {
-    value: '',
-  },
-  finishAppended: {
-    value: '',
-  },
-  installer: {
-    value: '',
-  },
-  installDate: {
-    value: '',
-  },
-});
-// const fakeOrderDataItem = {
-//   project: {
-//     value: "SD2"
-//   },
-//   L: {
-//     value: "516"
-//   },
-//   W: {
-//     value: "230"
-//   },
-//   B: {
-//     value: "45"
-//   },
-//   qty: {
-//     value: "1"
-//   },
-//   implementQty: {
-//     value: "1"
-//   },
-//   cai: {
-//     value: "22181.49"
-//   },
-//   totalCai: {
-//     value: "22181.49"
-//   },
-//   doorType: {
-//     value: "SJ-302"
-//   },
-//   material: {
-//     value: "不鏽鋼304#"
-//   },
-//   horsepower: {
-//     value: "1/3HP"
-//   },
-//   surface: {
-//     value: "烤漆"
-//   },
-
-//   remark01: {
-//     value: ""
-//   },
-//   remark02: {
-//     value: ""
-//   },
-//   remark03: {
-//     value: ""
-//   },
-//   remark04: {
-//     value: ""
-//   },
-//   appended: {
-//     value: ""
-//   },
-//   orderCreatedDate: {
-//     value: ""
-//   },
-//   finishAppended: {
-//     value: ""
-//   },
-//   installer: {
-//     value: ""
-//   },
-//   installDate: {
-//     value: ""
-//   },
-// }
-
-const fakeOrderData = [
-  {
-    project: 'SD2',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD3',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri(), fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD4',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD5',
-    list: [fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD5',
-    list: [fakeOrderDataItemOri()],
-  },
 ];
 
 // =======================================================================
