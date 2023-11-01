@@ -311,6 +311,9 @@ export default function OutboundOrder() {
           completeAppend,
         } = item.deliveryStatus ?? {};
 
+        const deliveryStatusWillUpdate_item: TdeliveryStatusWillUpdate[string] | undefined =
+          deliveryStatusWillUpdate[deliveryStatusId ?? ''];
+
         return {
           staticData: {
             project: delevery.itemName,
@@ -328,7 +331,7 @@ export default function OutboundOrder() {
           },
           deliveryStatus: {
             remark01: {
-              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.notes ?? notes ?? '',
+              value: (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || '',
               onChange: (str) => {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
               },
@@ -350,19 +353,22 @@ export default function OutboundOrder() {
               forbidden: true,
             },
             installDate: {
-              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.installationDate ?? installationDate ?? '',
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.installationDate : installationDate) ||
+                '',
               onChange_date: (date) => {
                 change_deliveryStatusWillUpdate_date(item?.deliveryStatus, 'installationDate', date);
               },
             },
             appended: {
-              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.append ?? append ?? '',
+              value: (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.append : append) || '',
               onChange: (str) => {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'append', str);
               },
             },
             finishAppended: {
-              value: deliveryStatusWillUpdate[deliveryStatusId ?? '']?.completeAppend ?? completeAppend ?? '',
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.completeAppend : completeAppend) || '',
               onChange: (str) => {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'completeAppend', str);
               },
@@ -370,7 +376,8 @@ export default function OutboundOrder() {
             installer: {
               // value: '', // 設定value的話就會蓋過employee.chName或employee.enName
               empolyee:
-                deliveryStatusWillUpdate[deliveryStatusId ?? '']?.installerEmployee ?? installerEmployee ?? null,
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.installerEmployee : installerEmployee) ||
+                null,
               onChange_employee: (emp) => {
                 change_deliveryStatusWillUpdate_employee(item?.deliveryStatus, 'installerEmployee', emp);
               },
