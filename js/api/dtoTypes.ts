@@ -950,14 +950,17 @@ export type TquotationProductDto = {
 };
 
 export type TdeliveryStatusDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
   // @ApiProperty({ description: '所屬產品' })
-  productItem: TquotationProductItemDto;
+  productItem?: TquotationProductItemDto;
   // @ApiProperty({ description: '備註' })
   notes: string | null;
   // @ApiProperty({ description: '安裝人員Id' })
   installerEmployeeId: string | null;
   // @ApiProperty({ description: '安裝人員' })
-  installerEmployee: TemployeeDto;
+  installerEmployee?: TemployeeDto | null;
   // @ApiProperty({ description: '安裝日期' })
   installationDate: string | null;
   // @ApiProperty({ description: '工作表開立日期' })
