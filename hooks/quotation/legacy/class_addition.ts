@@ -124,6 +124,7 @@ class Class_addition {
       key,
     });
 
+    this._countSubTotal();
     this._reRender();
   }
 
