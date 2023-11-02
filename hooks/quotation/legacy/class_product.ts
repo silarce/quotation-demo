@@ -28,6 +28,8 @@ class Class_product {
     //
     belongList,
     key,
+    //
+    addExtraExProd,
   }: {
     reRender: TreRender;
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto;
@@ -37,12 +39,16 @@ class Class_product {
     //
     belongList: { [key in string]: Class_product };
     key: string;
+    //
+    addExtraExProd: (body?: TcreateLegacyContractProductDto) => void;
   }) {
     this._reRender = reRender;
     this._product = legacyProduct;
 
     this._belongList = belongList;
     this._key = key;
+
+    this._addExtraExProd = addExtraExProd;
 
     // this._countTotalDiscount = countTotalDiscount;
     this._countSubTotal = countSubTotal;
@@ -92,6 +98,8 @@ class Class_product {
 
   private _belongList;
   private _key;
+
+  private _addExtraExProd;
 
   private _product;
   private _id;
@@ -143,6 +151,7 @@ class Class_product {
       countSubTotal: this._countSubTotal,
       belongList: this._belongList,
       key,
+      addExtraExProd: this._addExtraExProd,
     });
     this._countSubTotal();
   }
@@ -531,6 +540,7 @@ class Class_product {
       parentProd: this,
       belongList: this._belongList,
       key: this._key,
+      addExtraExProd: this._addExtraExProd,
     });
 
     this._countSubTotal();
@@ -542,17 +552,12 @@ class Class_product {
   }
 
   copySelfToExchange() {
-    const key = 'ex-' + nanoid();
+    // const key = 'ex-' + nanoid();
     const copy = this.postProd;
     copy.id = undefined;
 
-    this._exchangeProdList[key] = new Class_product({
-      reRender: this._reRender,
-      legacyProduct: this.postProd,
-      countSubTotal: this._countSubTotal,
-      belongList: this._belongList,
-      key,
-    });
+    this._addExtraExProd(copy);
+
     this._countSubTotal();
     this._reRender();
   }

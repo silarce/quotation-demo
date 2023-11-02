@@ -93,6 +93,7 @@ class Class_legacyContract {
         countSubTotal: this.countSubTotal,
         belongList: prodList,
         key,
+        addExtraExProd: this.addExtraExProd,
       });
     });
     //
@@ -347,6 +348,7 @@ class Class_legacyContract {
       countSubTotal: this.countSubTotal,
       belongList: this._prodList,
       key,
+      addExtraExProd: this.addExtraExProd,
     });
     this._prodList[key] = prod;
 
@@ -360,15 +362,16 @@ class Class_legacyContract {
     return this._extraExProdList;
   }
 
-  addExtraExProd = () => {
+  addExtraExProd = (body?: TcreateLegacyContractProductDto) => {
     const key = 'new-' + nanoid();
 
     const prod = new Class_product({
       reRender: this._reRender,
-      legacyProduct: emptyProdCre(),
+      legacyProduct: body ?? emptyProdCre(),
       countSubTotal: this.countSubTotal,
       belongList: this._extraExProdList,
       key,
+      addExtraExProd: this.addExtraExProd,
     });
 
     this._extraExProdList[key] = prod;
