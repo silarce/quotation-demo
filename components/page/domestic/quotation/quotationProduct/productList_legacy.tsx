@@ -249,6 +249,7 @@ const CopyDelBtnBox = ({
 const ResetChangeBtnBox = ({
   toSetTargetIndex,
   clearExchange,
+  copySelfToExchange,
   dndAttr,
   dndListener,
   indexNum,
@@ -256,6 +257,7 @@ const ResetChangeBtnBox = ({
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
+  copySelfToExchange: () => void;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNum: string | number;
@@ -265,6 +267,11 @@ const ResetChangeBtnBox = ({
     <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
       <Image className={scss.iconBtn} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
 
+      <IconCopy
+        className={classNames(scss.iconBtn, scss.littleBtn, !isAppending && scss.hidden)}
+        //
+        onClick={copySelfToExchange}
+      />
       <Image
         src={iconReset}
         alt="還原"
@@ -352,7 +359,8 @@ function DndRow({
           {isAppend && (
             <ResetChangeBtnBox
               toSetTargetIndex={toSetTargeProd}
-              clearExchange={prod.clearExchange}
+              clearExchange={() => prod.clearExchange()}
+              copySelfToExchange={() => prod.copySelfToExchange()}
               dndAttr={attributes}
               dndListener={listeners}
               indexNum={pIndex + 1}

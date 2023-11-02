@@ -522,14 +522,9 @@ class Class_product {
       copy.id = '';
     }
 
-    const exId = 'ex-' + nanoid();
+    const key = 'ex-' + nanoid();
 
-    const delSelf = () => {
-      delete this._exchangeProdList[exId];
-      // this._reRender();
-    };
-
-    this._exchangeProdList[exId] = new Class_product({
+    this._exchangeProdList[key] = new Class_product({
       reRender: this._reRender,
       legacyProduct: copy,
       countSubTotal: this._countSubTotal,
@@ -544,6 +539,22 @@ class Class_product {
 
     return true;
     //
+  }
+
+  copySelfToExchange() {
+    const key = 'ex-' + nanoid();
+    const copy = this.postProd;
+    copy.id = undefined;
+
+    this._exchangeProdList[key] = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: this.postProd,
+      countSubTotal: this._countSubTotal,
+      belongList: this._belongList,
+      key,
+    });
+    this._countSubTotal();
+    this._reRender();
   }
 
   // 清空變更prod
