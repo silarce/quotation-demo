@@ -130,7 +130,7 @@ class Class_legacyContract {
         reRender: reRender,
         addition: addi,
         countSubTotal: this.countSubTotal,
-        belongList: this._additionList,
+        belongList: additionList,
         key,
       });
     });
