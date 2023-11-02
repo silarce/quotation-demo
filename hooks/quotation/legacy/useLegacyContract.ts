@@ -726,6 +726,7 @@ class Class_legacyContract {
       additions: appendAddition,
       batchNumber: this.classBasicInfo.contractNumber,
       priceRecord,
+      notesRecord: this.classNotes.stringArr,
     };
   }
 

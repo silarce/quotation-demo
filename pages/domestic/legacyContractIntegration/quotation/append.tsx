@@ -41,8 +41,15 @@ import {
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
-// ========================================================================
-// ========================================================================
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+// 接著做追加追減的修改備註功能
+
 // ========================================================================
 
 export default function Quotation() {
@@ -181,6 +188,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     onClick: async () => {
       const appendBody = classLegacyContract.appendBody;
 
+      console.log(appendBody);
+
       if (!appendBody) {
         return;
       }
@@ -314,7 +323,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
             </span>
           </div>
           {/* 備註/報價範圍/付款資訊 */}
-          <QuotationTotal legacyContract={classLegacyContract} disabled={true} appendixParams={appendixParams} />
+          <QuotationTotal
+            legacyContract={classLegacyContract}
+            disabled={true}
+            appendixParams={appendixParams}
+            isAppend={true}
+          />
           {/* 簽名 */}
           <QuotationSinature signatureArr={signatureArr} disabled={true} />
         </div>
