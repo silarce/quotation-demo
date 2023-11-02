@@ -182,7 +182,7 @@ export default function QuotationExAddi({
 
                   const hasParent = addi.hasParent;
 
-                  const delSelf = hasParent ? undefined : addi.delSelf;
+                  const delSelf = hasParent ? undefined : () => addi.delSelf();
                   const isMoving = movingId === key;
 
                   return (
