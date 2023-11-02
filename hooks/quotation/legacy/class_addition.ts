@@ -18,14 +18,18 @@ class Class_addition {
     addition,
     countSubTotal,
     parentAddition,
-    delSelf,
+    belongList,
+    key,
   }: {
     reRender: TreRender;
     addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto;
     countSubTotal: () => void;
     parentAddition?: Class_addition;
-    delSelf: () => void;
+    belongList: { [key: string]: Class_addition };
+    key: string;
   }) {
+    this._reRender = reRender;
+
     this._id = (() => {
       if ('id' in addition) {
         return addition.id;
@@ -34,8 +38,11 @@ class Class_addition {
       return undefined;
     })();
 
-    this._reRender = reRender;
     this._addition = addition;
+
+    this._belongList = belongList;
+    this._key = key;
+
     this._countSubTotal = countSubTotal;
 
     this._quantity = addition.quantity ? addition.quantity.toString() : '';
@@ -53,17 +60,14 @@ class Class_addition {
     if (parentAddition) {
       this._parentAddition = parentAddition;
     }
-
-    this._delSelf = () => {
-      delSelf();
-      this._countSubTotal();
-      this._reRender();
-    };
   } // constructor
   // -------------------------------------------------
   private _id;
-  private _delSelf;
+  // private _delSelf;
   private _parentAddition: Class_addition | undefined = undefined;
+
+  private _belongList;
+  private _key;
 
   // 等api新增，先用假資料
   private _batchNumber;
@@ -95,15 +99,32 @@ class Class_addition {
   }
   set batchNumber(v) {}
 
-  get delSelf() {
-    return this._delSelf;
+  delSelf() {
+    delete this._belongList[this._key];
+    this._countSubTotal();
+    this._reRender();
   }
-  set delSelf(newDelSelf) {
-    this._delSelf = () => {
-      newDelSelf();
-      this._countSubTotal();
-      this._reRender();
+  copySelf() {
+    const key = 'new-' + nanoid();
+
+    const newAddiData: TcreateLegacyContractAdditionDto = {
+      itemName: this._addition.itemName,
+      content: this._addition.content,
+      quantity: this._addition.quantity,
+      unitPrice: this._addition.unitPrice,
+      totalPrice: this._addition.totalPrice,
+      notes: this._addition.notes,
     };
+
+    this._belongList[key] = new Class_addition({
+      reRender: this._reRender,
+      addition: newAddiData,
+      countSubTotal: this._countSubTotal,
+      belongList: this._belongList,
+      key,
+    });
+
+    this._reRender();
   }
 
   // ----------------------------------------------------
@@ -274,17 +295,14 @@ class Class_addition {
     copy.quantity = Number(v);
     copy.totalPrice = Decimal.mul(copy.unitPrice || 0, copy.quantity || 0).toNumber();
 
-    const delSelf = () => {
-      delete this._exAddiList[exId];
-      // this._reRender();
-    };
-
     this._exAddiList[exId] = new Class_addition({
       reRender: this._reRender,
       addition: copy,
       countSubTotal: this._countSubTotal,
       parentAddition: this,
-      delSelf,
+
+      belongList: this._exAddiList,
+      key: exId,
     });
 
     this._countSubTotal();

@@ -16,7 +16,7 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import { Class_legacyContract, Class_addition } from 'hooks/quotation/legacy/useLegacyContract';
 
 // icon
-import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
 import iconReset from 'public/image/icon/reset.svg';
 import iconChange from 'public/image/icon/change.svg';
@@ -154,6 +154,7 @@ export default function QuotationAdditions({
                 del={() => {
                   addi.delSelf();
                 }}
+                copy={() => addi.copySelf()}
                 indexNumber={pIndex + 1}
               />
             )}
@@ -215,7 +216,14 @@ export default function QuotationAdditions({
           <div className={scss.left}>
             {/* thead */}
             <div className={styleL.thead + ' ' + scss.thead}>
-              <div className={classNames(scss.btnBox, scss.headEmpty, isAppend && scss.resetChange)} />
+              <div
+                className={classNames(
+                  //
+                  scss.btnBox,
+                  scss.headEmpty,
+                  isAppend && scss.resetChange
+                )}
+              />
 
               {additionKeyindex.map((item, index) => {
                 const { label, inputSelPorps } = cellConfig[item];
@@ -353,12 +361,14 @@ export default function QuotationAdditions({
 const EditBtnBox = ({
   disabled,
   del,
+  copy,
   indexNumber,
   dndAttr,
   dndListener,
 }: {
   disabled?: boolean;
   del: () => void;
+  copy: () => void;
   indexNumber: number | string;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
@@ -366,6 +376,19 @@ const EditBtnBox = ({
   return (
     <div className={classNames(scss.btnBox, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+
+      <div className={scss.delBtn}>
+        <IconCopy
+          onClick={(e) => {
+            e.stopPropagation();
+
+            if (!disabled) {
+              copy();
+            }
+          }}
+        />
+      </div>
+
       <div className={scss.delBtn}>
         <IconDelete01
           onClick={(e) => {

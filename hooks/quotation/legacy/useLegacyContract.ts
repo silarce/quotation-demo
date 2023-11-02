@@ -129,15 +129,12 @@ class Class_legacyContract {
         key = 'new-' + nanoid();
       }
 
-      const delSelf = () => {
-        delete this._additionList[key];
-      };
-
       additionList[key] = new Class_addition({
         reRender: reRender,
         addition: addi,
         countSubTotal: this.countSubTotal,
-        delSelf: delSelf,
+        belongList: this._additionList,
+        key,
       });
     });
     //
@@ -511,15 +508,12 @@ class Class_legacyContract {
   addAddition = () => {
     const key = 'new-' + nanoid();
 
-    const delSelf = () => {
-      delete this._additionList[key];
-    };
-
     const addi = new Class_addition({
       reRender: this._reRender,
       addition: emptyAdditionCre(),
       countSubTotal: this.countSubTotal,
-      delSelf,
+      belongList: this._additionList,
+      key,
     });
 
     this._additionList[key] = addi;
@@ -535,15 +529,12 @@ class Class_legacyContract {
   addExtraExAddi = () => {
     const key = 'new-' + nanoid();
 
-    const delSelf = () => {
-      delete this._extraExAddiList[key];
-    };
-
     const addi = new Class_addition({
       reRender: this._reRender,
       addition: emptyAdditionCre(),
       countSubTotal: this.countSubTotal,
-      delSelf,
+      belongList: this._extraExAddiList,
+      key,
     });
 
     this._extraExAddiList[key] = addi;
