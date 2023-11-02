@@ -26,7 +26,9 @@ class Class_product {
     countSubTotal,
     parentProd,
     //
-    delSelf,
+    // delSelf,
+    belongList,
+    key,
   }: {
     reRender: TreRender;
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto;
@@ -34,10 +36,15 @@ class Class_product {
     countSubTotal: () => void;
     parentProd?: Class_product;
     //
-    delSelf: () => void;
+    // delSelf: () => void;
+    belongList: { [key in string]: Class_product };
+    key: string;
   }) {
     this._reRender = reRender;
     this._product = legacyProduct;
+
+    this._belongList = belongList;
+    this._key = key;
 
     // this._countTotalDiscount = countTotalDiscount;
     this._countSubTotal = countSubTotal;
@@ -77,19 +84,22 @@ class Class_product {
       this.parentProd = parentProd;
     }
 
-    this._delSelf = () => {
-      delSelf();
-      this._countSubTotal();
-      this._reRender();
-    };
+    // this._delSelf = () => {
+    //   delSelf();
+    //   this._countSubTotal();
+    //   this._reRender();
+    // };
   } // constructor
   //----------------------------------------------
 
   private parentProd: Class_product | undefined = undefined;
 
   private _reRender;
-  private _delSelf;
+  // private _delSelf;
   private _countSubTotal;
+
+  private _belongList;
+  private _key;
 
   private _product;
   private _id;
@@ -125,16 +135,35 @@ class Class_product {
     return !!this.parentProd;
   }
 
-  get delSelf() {
-    return this._delSelf;
+  delSelf() {
+    delete this._belongList[this._key];
+    this._countSubTotal();
+    this._reRender();
   }
-  set delSelf(newDelSelf) {
-    this._delSelf = () => {
-      newDelSelf();
-      this._countSubTotal();
-      this._reRender();
-    };
+
+  copySelf() {
+    const key = 'new-' + nanoid();
+    this.postProd;
+
+    this._belongList[key] = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: this.postProd,
+      countSubTotal: this._countSubTotal,
+      belongList: this._belongList,
+      key,
+    });
   }
+
+  // get delSelf() {
+  //   return this._delSelf;
+  // }
+  // set delSelf(newDelSelf) {
+  //   this._delSelf = () => {
+  //     newDelSelf();
+  //     this._countSubTotal();
+  //     this._reRender();
+  //   };
+  // }
 
   //----------------------------------------------
 
@@ -523,7 +552,8 @@ class Class_product {
       legacyProduct: copy,
       countSubTotal: this._countSubTotal,
       parentProd: this,
-      delSelf,
+      belongList: this._belongList,
+      key: this._key,
     });
 
     this._countSubTotal();

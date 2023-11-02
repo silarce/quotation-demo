@@ -87,15 +87,12 @@ class Class_legacyContract {
         key = 'new-' + nanoid();
       }
 
-      const delSelf = () => {
-        delete this._prodList[key];
-      };
-
       prodList[key] = new Class_product({
         reRender: reRender,
         legacyProduct: prodData,
         countSubTotal: this.countSubTotal,
-        delSelf,
+        belongList: prodList,
+        key,
       });
     });
     //
@@ -323,61 +320,38 @@ class Class_legacyContract {
     return Object.values(this._prodList);
   }
 
-  copyProd(id: string) {
-    const key = 'new-' + nanoid();
+  // copyProd(id: string) {
+  //   const key = 'new-' + nanoid();
 
-    const copy = _.cloneDeep(this._prodList[id]);
+  //   const copy = _.cloneDeep(this._prodList[id]);
 
-    copy.id = undefined;
+  //   copy.id = undefined;
 
-    copy.delSelf = () => {
-      delete this._prodList[key];
-    };
+  //   // copy.delSelf = () => {
+  //   //   delete this._prodList[key];
+  //   // };
 
-    this._prodList[key] = copy;
+  //   this._prodList[key] = copy;
 
-    this.countSubTotal();
+  //   this.countSubTotal();
 
-    this._reRender();
-  }
+  //   this._reRender();
+  // }
 
   addProd = () => {
     const key = 'new-' + nanoid();
-
-    const delSelf = () => {
-      delete this._prodList[key];
-    };
 
     const prod = new Class_product({
       reRender: this._reRender,
       legacyProduct: emptyProdCre(),
       countSubTotal: this.countSubTotal,
-      delSelf: delSelf,
+      belongList: this._prodList,
+      key,
     });
     this._prodList[key] = prod;
 
     this._reRender();
   };
-
-  get prodKitList_2() {
-    const kitList: TprodKit = {};
-
-    Object.keys(this._prodList).forEach((key) => {
-      const prod = this._prodList[key];
-
-      const copySelf = () => {
-        this.copyProd(key);
-      };
-
-      kitList[key] = {
-        key,
-        prod,
-        copySelf,
-      };
-    });
-
-    return kitList;
-  }
 
   // -----------------------
 
@@ -389,15 +363,12 @@ class Class_legacyContract {
   addExtraExProd = () => {
     const key = 'new-' + nanoid();
 
-    const delSelf = () => {
-      delete this._extraExProdList[key];
-    };
-
     const prod = new Class_product({
       reRender: this._reRender,
       legacyProduct: emptyProdCre(),
       countSubTotal: this.countSubTotal,
-      delSelf: delSelf,
+      belongList: this._extraExProdList,
+      key,
     });
 
     this._extraExProdList[key] = prod;
@@ -490,20 +461,20 @@ class Class_legacyContract {
     return Object.values(this._additionList);
   }
 
-  copyAddition = (id: string) => {
-    const key = 'new-' + nanoid();
+  // copyAddition = (id: string) => {
+  //   const key = 'new-' + nanoid();
 
-    const copy = _.cloneDeep(this._additionList[id]);
-    copy.id = undefined;
+  //   const copy = _.cloneDeep(this._additionList[id]);
+  //   copy.id = undefined;
 
-    copy.delSelf = () => {
-      delete this._additionList[key];
-    };
+  //   copy.delSelf = () => {
+  //     delete this._additionList[key];
+  //   };
 
-    this._additionList[key] = copy;
+  //   this._additionList[key] = copy;
 
-    this._reRender();
-  };
+  //   this._reRender();
+  // };
 
   addAddition = () => {
     const key = 'new-' + nanoid();

@@ -64,7 +64,7 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
   const [activeKey, setActiveKey] = useState<string>();
   // ---------------------------------------------------------------
-  const { prodCellConfig, prodList: prodList_2, prodKitList_2 } = classQuotation;
+  const { prodCellConfig, prodList } = classQuotation;
 
   const theadKeyArr: TtheadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
 
@@ -93,7 +93,7 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(prodList_2),
+    listKeyArr: Object.keys(prodList),
     resetTrigger: classQuotation,
   });
 
@@ -122,15 +122,11 @@ export default function ProductList_legacy({
       >
         <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
           {dndKeyArr.map((key, pIndex) => {
-            if (!prodKitList_2[key]) {
+            const prod = prodList[key];
+
+            if (!prod) {
               return null;
             }
-
-            const {
-              prod,
-              //  delSelf,
-              copySelf,
-            } = prodKitList_2[key];
 
             const isMoving = movingId === key;
 
@@ -160,14 +156,9 @@ export default function ProductList_legacy({
               <DndRow
                 key={key}
                 isActive={isActive}
-                // isActive={false}
                 pIndex={pIndex}
-                // del 跟 copy在這個情況好像不對
-                // 刪除或複製的對象會是?
-                delProd={() => {
-                  prod.delSelf();
-                }}
-                copyProd={copySelf}
+                delProd={() => prod.delSelf()}
+                copyProd={() => prod.copySelf()}
                 toSetTargeProd={toSetTargeProd}
                 prod={prod}
                 theadKeyArr={theadKeyArr}
