@@ -135,10 +135,11 @@ class Class_product {
 
   copySelf() {
     const key = 'new-' + nanoid();
-    console.log('foo');
+    const copy = this.postProd;
+    copy.id = undefined;
     this._belongList[key] = new Class_product({
       reRender: this._reRender,
-      legacyProduct: this.postProd,
+      legacyProduct: copy,
       countSubTotal: this._countSubTotal,
       belongList: this._belongList,
       key,
@@ -555,8 +556,7 @@ class Class_product {
 
   // -------------------------------------------------
   get postProd() {
-    // 那四個property要轉NUMBER
-    return {
+    const body = {
       ...this._product,
       id: this.id || undefined,
       closingType: this._product.closingType ?? '',
@@ -566,6 +566,10 @@ class Class_product {
       height: this.height || '0',
       thickness: this.thickness || '0',
     };
+
+    const copy = _.cloneDeep(body);
+
+    return copy;
   }
 
   get appendProd() {
