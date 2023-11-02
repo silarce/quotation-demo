@@ -303,12 +303,14 @@ export default function WorkSheet() {
         guideRailOptionArr_withHook.push({
           value: item.imgSrc,
           label: item.imgSrc,
+          opening: item.opening,
           icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
         });
       } else {
         guideRailOptionArr_noHook.push({
           value: item.imgSrc,
           label: item.imgSrc,
+          opening: item.opening,
           icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
         });
       }
@@ -893,12 +895,18 @@ export default function WorkSheet() {
         forbidden: true,
       },
       doorTrackName: {
-        value: targetSheet?.guideRail ?? '',
-        onChange: (v) => {
+        value: targetSheet?.guideRailName ?? '',
+        // onChange: (v) => {
+        //   if (targetSheet) {
+        //     targetSheet.guideRail = v;
+        //   }
+        // },
+        onChange_select: (option) => {
           if (targetSheet) {
-            targetSheet.guideRail = v;
+            targetSheet.guideRail = option;
           }
         },
+
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
         optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
       },
@@ -919,10 +927,10 @@ export default function WorkSheet() {
       捲門全高: '999',
     },
     size02: {
-      捲軸尺寸: numToStr(targetSheet?.prodSpec?.diameter) + '"',
-      軸徑: numToStr(targetSheet?.prodSpec?.diameter),
+      捲軸尺寸: targetSheet?.diameter ?? '',
+      軸徑: targetSheet?.bearingInnerDiameter ?? '',
       軸承: targetSheet?.prodSpec?.bearingName ?? '',
-      總長: numToStr(targetSheet?.prodSpec?.bearingHousingTotalLength),
+      總長: targetSheet?.bearingHousingTotalLength ?? '',
       寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
     },
     rollBox: {
@@ -934,7 +942,7 @@ export default function WorkSheet() {
       門片材質: targetSheet?.com_slat_material ?? '',
       門片厚度: targetSheet?.thickness ?? '',
       門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
-      捲片支數: numToStr(targetSheet?.prodDetailSpec?.slatCount),
+      捲片支數: targetSheet?.slatCount ?? '',
       防颱勾: '是否是指主產品的"防颱"?',
     },
     motor: {
@@ -946,19 +954,19 @@ export default function WorkSheet() {
       門軌材質: targetSheet?.com_guideRail_material ?? '',
       門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
       門軌形式: {
-        value: targetSheet?.guideRail ?? '',
+        value: targetSheet?.guideRailName ?? '',
         img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
       },
     },
     chainCog: {
       // 鏈齒輪番號: 'gearNumber',
-      鏈齒輪番號: targetSheet?.prodSpec?.gearNumber ?? '',
-      大鏈輪: '999',
-      孔徑: '999',
+      鏈齒輪番號: targetSheet?.sprocketWheelModel ?? '',
+      大鏈輪: targetSheet?.sprocketWheelTeethNumber ?? '',
+      孔徑: targetSheet?.bearingInnerDiameter ?? '',
     },
     base: {
       底座材質: targetSheet?.com_bottomBar_material ?? '',
-      底座開口: '999',
+      底座開口: targetSheet?.guideRailsOpening ?? '',
     },
   };
 

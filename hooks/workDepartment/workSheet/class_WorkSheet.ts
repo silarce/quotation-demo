@@ -194,6 +194,11 @@ class Class_workSheet {
 
       if (res) {
         this._prodSpec = res;
+        this._prod.sprocketWheelModel = res.sprocketWheelModel;
+        this._prod.sprocketWheelTeethNumber = res.sprocketWheelTeethNumber;
+        this._prod.bearingInnerDiameter = res.bearingInnerDiameter;
+        this._prod.diameter = String(res.diameter);
+        this._prod.bearingHousingTotalLength = String(res.bearingHousingTotalLength);
 
         return res;
       }
@@ -214,6 +219,7 @@ class Class_workSheet {
 
       if (res) {
         this._prodDetailSpec = res;
+        this._prod.slatCount = String(res.slatCount);
 
         return res;
       }
@@ -928,13 +934,45 @@ class Class_workSheet {
   }
 
   // 型式02
-  get guideRail() {
-    return this._prod.guideRail;
-  }
-  set guideRail(str) {
+  // get guideRail() {
+  //   return this._prod.guideRail;
+  // }
+  set guideRail(option: Toption | null) {
+    const str = option?.value ?? '';
+    const opening = option?.opening ?? '';
+
     this._prod.guideRail = str;
+    this._prod.guideRailsOpening = opening;
     this.forceUpdate();
   }
+
+  get guideRailName() {
+    return this._prod.guideRail;
+  }
+  // ----------------------------------------------------
+
+  get slatCount() {
+    return this._prod.slatCount;
+  }
+  get sprocketWheelModel() {
+    return this._prod.sprocketWheelModel;
+  }
+  get sprocketWheelTeethNumber() {
+    return this._prod.sprocketWheelTeethNumber;
+  }
+  get bearingInnerDiameter() {
+    return this._prod.bearingInnerDiameter;
+  }
+  get diameter() {
+    return this._prod.diameter;
+  }
+  get bearingHousingTotalLength() {
+    return this._prod.bearingHousingTotalLength;
+  }
+  get guideRailsOpening() {
+    return this._prod.guideRailsOpening;
+  }
+
   // ----------------------------------------------------
   // ----------------------------------------------------
 
