@@ -29,6 +29,8 @@ import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // icon
 import iconMove from 'public/image/icon/move.svg';
+import { IconCopy, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from './productList.module.scss';
 
@@ -102,7 +104,13 @@ export default function ExProductList_legacy({
         >
           <div className={scss.row}>
             {/*  */}
-            <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
+            <ControlBox
+              delSelf={delSelf}
+              copySelf={() => prod.copySelfToExchange()}
+              index={pIndex + 1}
+              dndAttr={attributes}
+              dndListener={listeners}
+            />
             {/*  */}
             {theadIndexArr.map((key) => {
               if (!prod) {
@@ -232,11 +240,13 @@ export default function ExProductList_legacy({
 
 const ControlBox = ({
   delSelf,
+  copySelf,
   index,
   dndAttr,
   dndListener,
 }: {
   delSelf?: () => void;
+  copySelf: () => void;
   index: number | string;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
@@ -244,9 +254,12 @@ const ControlBox = ({
   return (
     <div className={classNames(scss.buttonBox, scss.exchange, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
+      {/* <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
         刪除
-      </button>
+      </button> */}
+      <IconCopy className={classNames(scss.iconBtn, scss.littleBtn)} onClick={copySelf} />
+      <IconDelete01 className={classNames(scss.iconBtn, scss.littleBtn, !delSelf && scss.hidden)} onClick={delSelf} />
+
       <span>{index}</span>
     </div>
   );
