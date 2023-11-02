@@ -56,7 +56,8 @@ class Class_product {
     this._height = this._product.height ? this._product.height.toString() : '';
     this._boxB = this._product.boxB ? this._product.boxB.toString() : '';
     //
-    this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
+    // this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
+    this._quantity = this._product.quantity.toString();
     //
     this._unitPrice = this._product.unitPrice ? this._product.unitPrice.toString() : '';
     this._totalPrice = this._product.totalPrice ? this._product.totalPrice.toString() : '';
