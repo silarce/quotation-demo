@@ -26,7 +26,6 @@ class Class_product {
     countSubTotal,
     parentProd,
     //
-    // delSelf,
     belongList,
     key,
   }: {
@@ -36,7 +35,6 @@ class Class_product {
     countSubTotal: () => void;
     parentProd?: Class_product;
     //
-    // delSelf: () => void;
     belongList: { [key in string]: Class_product };
     key: string;
   }) {
@@ -83,12 +81,6 @@ class Class_product {
     if (parentProd) {
       this.parentProd = parentProd;
     }
-
-    // this._delSelf = () => {
-    //   delSelf();
-    //   this._countSubTotal();
-    //   this._reRender();
-    // };
   } // constructor
   //----------------------------------------------
 
@@ -153,17 +145,6 @@ class Class_product {
     });
     this._countSubTotal();
   }
-
-  // get delSelf() {
-  //   return this._delSelf;
-  // }
-  // set delSelf(newDelSelf) {
-  //   this._delSelf = () => {
-  //     newDelSelf();
-  //     this._countSubTotal();
-  //     this._reRender();
-  //   };
-  // }
 
   //----------------------------------------------
 

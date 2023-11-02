@@ -325,20 +325,22 @@ export default function QuotationAdditions({
         {/* container close */}
       </div>
       {/* difference_addi */}
-      <div className={classNames(scss.total)}>
-        <span>合計</span>
-        <span>
-          {(() => {
-            if (isAppending) {
-              return `- ${addiSubPriceTotal.toLocaleString()}`;
-            } else {
-              const mark = difference_addi >= 0 ? '+' : '';
+      {isAppend && (
+        <div className={classNames(scss.total)}>
+          <span>合計</span>
+          <span>
+            {(() => {
+              if (isAppending) {
+                return `- ${addiSubPriceTotal.toLocaleString()}`;
+              } else {
+                const mark = difference_addi >= 0 ? '+' : '';
 
-              return `${mark} ${difference_addi.toLocaleString()}`;
-            }
-          })()}
-        </span>
-      </div>
+                return `${mark} ${difference_addi.toLocaleString()}`;
+              }
+            })()}
+          </span>
+        </div>
+      )}
 
       {/*  */}
       <InputModal

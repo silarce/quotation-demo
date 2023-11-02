@@ -676,6 +676,7 @@ export type TmodifyLegacyContractDto = {
     salesTax: number; // 營業稅
     total: number; // 總計
   };
+  notesRecord: string[]; // 備註
 };
 
 // ==========================================================================
