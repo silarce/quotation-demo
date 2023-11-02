@@ -143,8 +143,7 @@ class Class_product {
 
   copySelf() {
     const key = 'new-' + nanoid();
-    this.postProd;
-
+    console.log('foo');
     this._belongList[key] = new Class_product({
       reRender: this._reRender,
       legacyProduct: this.postProd,
@@ -152,6 +151,7 @@ class Class_product {
       belongList: this._belongList,
       key,
     });
+    this._countSubTotal();
   }
 
   // get delSelf() {
