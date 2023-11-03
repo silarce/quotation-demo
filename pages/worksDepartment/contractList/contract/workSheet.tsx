@@ -54,7 +54,9 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import WorkSheetProfile, {
   Tcontrol_profile,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
-import WorkSheetProdCard from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
+import WorkSheetProdCard, {
+  Tcontrol_prodCard,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
 import WorkSheetProductOutline, {
   Tcontrol_productOutline,
   ToldProductOutline,
@@ -159,7 +161,7 @@ export default function WorkSheet() {
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList } = useMemo(() => {
+  const { itemTokenList, itemIdArrList, itemTokenList_new, itemIdArrList_new } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -206,49 +208,51 @@ export default function WorkSheet() {
       itemIdArrList[theId].push(item.id);
     });
 
-    // type TitemTokenList_new = {
-    //   [key: string]: {
-    //     originalItem: TquotationProductItemDto;
-    //     [key: string]: TquotationProductItemDto;
-    //   };
-    // };
+    type TitemTokenList_new = {
+      [key: string]: {
+        originalItem: TquotationProductItemDto;
+        [key: string]: TquotationProductItemDto;
+      };
+    };
 
-    // const itemTokenList_new: TitemTokenList_new = {};
-    // const itemIdArrList_new: { [key: string]: { [key: string]: string[] } } = {};
+    type TitemIdArrList_new = { [key: string]: { [key: string]: string[] } };
 
-    // contractProductItems.forEach((item) => {
-    //   const { productId, adjustedItem, adjustedItemId } = item;
+    const itemTokenList_new: TitemTokenList_new = {};
+    const itemIdArrList_new: TitemIdArrList_new = {};
 
-    //   let theItem: typeof item;
-    //   let theId: string;
+    contractProductItems.forEach((item) => {
+      const { productId, adjustedItem, adjustedItemId } = item;
 
-    //   if (adjustedItem && adjustedItemId) {
-    //     theItem = adjustedItem;
-    //     theId = adjustedItemId;
-    //   } else {
-    //     theItem = item;
-    //     theId = productId;
-    //   }
+      let theItem: typeof item;
+      let theId: string;
 
-    //   if (!itemTokenList_new[productId]) {
-    //     itemTokenList_new[productId] = {
-    //       originalItem: item,
-    //     };
-    //   }
+      if (adjustedItem && adjustedItemId) {
+        theItem = adjustedItem;
+        theId = adjustedItemId;
+      } else {
+        theItem = item;
+        theId = productId;
+      }
 
-    //   itemTokenList_new[productId][theId] = theItem;
+      if (!itemTokenList_new[productId]) {
+        itemTokenList_new[productId] = {
+          originalItem: item,
+        };
+      }
 
-    //   //
-    //   if (!itemIdArrList_new[productId]) {
-    //     itemIdArrList_new[productId] = {};
-    //   }
+      itemTokenList_new[productId][theId] = theItem;
 
-    //   if (!itemIdArrList_new[productId][theId]) {
-    //     itemIdArrList_new[productId][theId] = [];
-    //   }
+      //
+      if (!itemIdArrList_new[productId]) {
+        itemIdArrList_new[productId] = {};
+      }
 
-    //   itemIdArrList_new[productId][theId].push(item.id);
-    // });
+      if (!itemIdArrList_new[productId][theId]) {
+        itemIdArrList_new[productId][theId] = [];
+      }
+
+      itemIdArrList_new[productId][theId].push(item.id);
+    });
 
     // console.log(itemTokenList_new);
     // console.log(itemIdArrList_new);
@@ -258,6 +262,8 @@ export default function WorkSheet() {
     return {
       itemTokenList,
       itemIdArrList,
+      itemTokenList_new,
+      itemIdArrList_new,
     };
   }, [workSheet]);
 
@@ -281,15 +287,19 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
-
-  const [targetSheetKey, setTargetSheetKey] = useState<string>();
-
   const { sheetList, changedSheetList, reset } = useWorkSheet({
-    itemTokenList: itemTokenList ?? {},
-    itemIdArrList: itemIdArrList ?? {},
+    itemTokenList: itemTokenList_new ?? {},
+    itemIdArrList: itemIdArrList_new ?? {},
   });
 
-  const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey ?? 'undefined'];
+  // const [targetSheetKey, setTargetSheetKey] = useState<string>();
+  const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
+  const targetSheetKey_p = targetSheetKey?.[0];
+  const targetSheetKey_c = targetSheetKey?.[1];
+
+  const targetSheet: Class_workSheet | undefined =
+    targetSheetKey_p && targetSheetKey_c ? sheetList[targetSheetKey_p]?.[targetSheetKey_c] : undefined;
+  // const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey[0] ?? 'undefined'][];
 
   const doorModelOptionArr = useMemo(() => {
     if (!doorModelList) {
@@ -1008,12 +1018,12 @@ export default function WorkSheet() {
       return;
     }
 
-    let body: TupdateWorkSheetItem[] = [];
+    // let body: TupdateWorkSheetItem[] = [];
 
-    Object.values(changedSheetList).forEach((sheet) => {
-      const bodyItemArr = sheet.bodyItemArr;
-      body = [...bodyItemArr];
-    });
+    // Object.values(changedSheetList).forEach((sheet) => {
+    //   const bodyItemArr = sheet.bodyItemArr;
+    //   body = [...bodyItemArr];
+    // });
 
     // try {
     //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
@@ -1098,26 +1108,48 @@ export default function WorkSheet() {
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
-            {Object.keys(sheetList).map((key) => {
-              const sheet = sheetList[key];
-              const { itemName, doorModelName, quantity } = sheet;
+            {Object.keys(sheetList).map((pKey) => {
+              const list: Tcontrol_prodCard['list'] = [];
 
-              const onClick = () => {
-                setTargetSheetKey(key);
-              };
+              let qty = 0;
 
-              // const isActive = key === targetSheet?.productId;
-              const isActive = key === targetSheet?.identifyKey;
+              Object.keys(sheetList[pKey]).forEach((cKey) => {
+                const item = sheetList[pKey][cKey];
+                qty += Number(item.quantity);
+
+                const {
+                  itemName,
+                  // doorModelName,
+                  //  quantity
+                } = item;
+
+                let isActive = false;
+
+                if (targetSheetKey_p === pKey && targetSheetKey_c === cKey) {
+                  isActive = true;
+                }
+
+                list.push({
+                  itemName: itemName,
+                  onClick: () => {
+                    setTargetSheetKey([pKey, cKey]);
+                  },
+                  isActive,
+                });
+              });
+
+              const originalItem = itemTokenList_new?.[pKey].originalItem;
 
               const control = {
-                itemName,
-                doorType: doorModelName,
-                qty: String(quantity),
+                itemName: originalItem?.itemName ?? '',
+                doorType: originalItem?.doorModelName ?? '',
+                qty: String(qty),
+                list,
               };
 
               return (
-                <div key={key} onClick={onClick}>
-                  <WorkSheetProdCard control={control} isActive={isActive} img={imgIdk} />
+                <div key={pKey}>
+                  <WorkSheetProdCard control={control} isActive={false} img={imgIdk} />
                 </div>
               );
             })}

@@ -34,11 +34,12 @@
     .right {
     }
   }
-  .panel {
+  .list {
     margin-top: 10px;
-    > .btn {
-      background-color: white;
-      border: solid 1px black;
+    display: grid;
+    gap: 5px;
+    > .active {
+      background-color: #ffeeee;
     }
   }
 }

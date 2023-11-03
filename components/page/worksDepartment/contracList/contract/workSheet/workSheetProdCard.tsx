@@ -10,7 +10,14 @@ type Tcontrol = {
   itemName: string;
   doorType: string;
   qty: string;
+  list: {
+    itemName: string;
+    onClick: () => void;
+    isActive?: boolean;
+  }[];
 };
+
+export type { Tcontrol as Tcontrol_prodCard };
 
 // =================================================================
 export default function WorkSheetProdCard({
@@ -34,9 +41,26 @@ export default function WorkSheetProdCard({
           <Image src={img} alt="" />
         </div>
       </div>
-      {/* <div className={scss.panel}>
-        <button className={scss.btn}>分堆</button>
-      </div> */}
+      <div className={scss.list}>
+        {control.list.map((item, index) => {
+          const { itemName, onClick, isActive } = item;
+
+          return (
+            <div key={index} className={classNames(isActive && scss.active)} onClick={onClick}>
+              <span>{itemName}</span>
+            </div>
+          );
+        })}
+        {/* <div>
+          <span>123</span>
+        </div>
+        <div>
+          <span>123</span>
+        </div>
+        <div>
+          <span>123</span>
+        </div> */}
+      </div>
     </div>
   );
 }

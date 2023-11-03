@@ -12,7 +12,19 @@ import {
 
 // =====================================================================
 
-type TsheetList = { [key: string]: Class_workSheet };
+type TitemTokenList_new = {
+  [key: string]: {
+    originalItem: TquotationProductItemDto;
+    [key: string]: TquotationProductItemDto;
+  };
+};
+type TitemIdArrList_new = { [key: string]: { [key: string]: string[] } };
+
+type TsheetList = {
+  [key: string]: {
+    [key: string]: Class_workSheet;
+  };
+};
 
 type TforceUpdate_workSheet = (props?: { isNoChange?: boolean }) => void;
 
@@ -21,8 +33,8 @@ const useWorkSheet = ({
   itemTokenList,
   itemIdArrList,
 }: {
-  itemTokenList: { [key: string]: TquotationProductItemDto };
-  itemIdArrList: { [key: string]: string[] };
+  itemTokenList: TitemTokenList_new;
+  itemIdArrList: TitemIdArrList_new;
 }) => {
   // const [, updateState] = useState({});
   // const forceUpdate = useCallback(() => updateState({}), []);
@@ -38,23 +50,34 @@ const useWorkSheet = ({
 
   const reset = async () => {
     const list: TsheetList = {};
-    Object.keys(itemTokenList).forEach((key) => {
-      const prod = itemTokenList[key];
-      list[key] = new Class_workSheet({
-        identifyKey: key,
-        forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
-          forceUpdate();
 
-          if (isNoChange) {
-            return;
-          }
+    Object.keys(itemTokenList).forEach((pKey) => {
+      list[pKey] = {};
 
-          setChangedSheetList((state) => ({ ...state, [key]: list[key] }));
-        },
-        prod,
-        itemIdArr: itemIdArrList[key],
+      Object.keys(itemTokenList[pKey]).forEach((cKey) => {
+        if (cKey === 'originalItem') {
+          return;
+        }
+
+        const prod = itemTokenList[pKey][cKey];
+
+        list[pKey][cKey] = new Class_workSheet({
+          identifyKey: cKey,
+          forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
+            forceUpdate();
+
+            if (isNoChange) {
+              return;
+            }
+
+            setChangedSheetList((state) => ({ ...state, [cKey]: list[cKey] }));
+          },
+          prod,
+          itemIdArr: itemIdArrList[pKey][cKey],
+        });
       });
     });
+
     setSheetList(list);
     setChangedSheetList({});
 
@@ -63,6 +86,8 @@ const useWorkSheet = ({
     //   await classSheet.getWholeProduct();
     // }
   };
+
+  console.log(sheetList);
 
   // ------------------------------------------------------------
   return { sheetList, changedSheetList, reset };
@@ -97,3 +122,55 @@ export type { Class_workSheet, TforceUpdate_workSheet };
 取消編輯時要重置資料
 
 */
+// ======================================================================
+
+// const useWorkSheet = ({
+//   itemTokenList,
+//   itemIdArrList,
+// }: {
+//   itemTokenList: { [key: string]: TquotationProductItemDto };
+//   itemIdArrList: { [key: string]: string[] };
+// }) => {
+//   // const [, updateState] = useState({});
+//   // const forceUpdate = useCallback(() => updateState({}), []);
+//   const [sheetList, setSheetList] = useState<TsheetList>({});
+
+//   const forceUpdate = useCallback(() => {
+//     setSheetList((state) => ({ ...state }));
+//   }, []);
+
+//   const [changedSheetList, setChangedSheetList] = useState<TsheetList>({});
+
+//   // ------------------------------------------------------------
+
+//   const reset = async () => {
+//     const list: TsheetList = {};
+//     Object.keys(itemTokenList).forEach((key) => {
+//       const prod = itemTokenList[key];
+//       list[key] = new Class_workSheet({
+//         identifyKey: key,
+//         forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
+//           forceUpdate();
+
+//           if (isNoChange) {
+//             return;
+//           }
+
+//           setChangedSheetList((state) => ({ ...state, [key]: list[key] }));
+//         },
+//         prod,
+//         itemIdArr: itemIdArrList[key],
+//       });
+//     });
+//     setSheetList(list);
+//     setChangedSheetList({});
+
+//     // const arr = Object.values(list);
+//     // for (const classSheet of arr) {
+//     //   await classSheet.getWholeProduct();
+//     // }
+//   };
+
+//   // ------------------------------------------------------------
+//   return { sheetList, changedSheetList, reset };
+// };
