@@ -5,141 +5,52 @@ import React, { Fragment } from 'react';
 import style from './powerTransmissionSpareList.module.scss';
 
 // ==================================================================
-type Tcontroll = {
-  [key: string]:
-    | {
-        value: string;
-        onChange: (qty: string, c2Key: string) => void;
-      }
-    | undefined;
 
-  智慧型: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  面板式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  埋入式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  外露式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  電子式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  防爆式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  鎖號: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  特殊鎖號: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  三點式一般: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  三點式遮煙: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+type TcontrolItem = {
+  qty: string;
+  onQtyChange: (qty: string, c2Key: string) => void;
+};
+
+type Tcontroll = {
+  [key: string]: TcontrolItem;
+
+  智慧型: TcontrolItem;
+  面板式: TcontrolItem;
+  埋入式: TcontrolItem;
+  外露式: TcontrolItem;
+  電子式: TcontrolItem;
+  防爆式: TcontrolItem;
+  鎖號: TcontrolItem;
+  特殊鎖號: TcontrolItem;
+  三點式一般: TcontrolItem;
+  三點式遮煙: TcontrolItem;
   //
-  '3HP馬達控制箱380v': {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  '2HP馬達控制箱380v': {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  '3HP馬達控制箱220v': {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  '2HP馬達控制箱220v': {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  彈射門控制箱: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  紅外線控制盤: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  '3HP馬達控制箱380v': TcontrolItem;
+  '2HP馬達控制箱380v': TcontrolItem;
+  '3HP馬達控制箱220v': TcontrolItem;
+  '2HP馬達控制箱220v': TcontrolItem;
+  彈射門控制箱: TcontrolItem;
+  紅外線控制盤: TcontrolItem;
   //
-  煙感器: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  中繼器: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  煙感器: TcontrolItem;
+  中繼器: TcontrolItem;
   //
-  門弓器: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  平推鎖: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  電磁扣: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  門弓器: TcontrolItem;
+  平推鎖: TcontrolItem;
+  電磁扣: TcontrolItem;
   //
-  遙控器加障感器: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  遙控器: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  障感器: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  大門用主機: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  遙控器加障感器: TcontrolItem;
+  遙控器: TcontrolItem;
+  障感器: TcontrolItem;
+  大門用主機: TcontrolItem;
   //
-  對照式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  反射式: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  對照式: TcontrolItem;
+  反射式: TcontrolItem;
   //
-  防颱鎖固: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
-  防颱中柱: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  防颱鎖固: TcontrolItem;
+  防颱中柱: TcontrolItem;
   //
-  其他: {
-    value: string;
-    onChange: (qty: string, c2Key: string) => void;
-  };
+  其他: TcontrolItem;
 };
 
 export type { Tcontroll };
@@ -191,7 +102,7 @@ export default function Sheet({
                 const { label, rSpan, cSpan, type, defaultValue } = c3Config[c2Key].config[c3Key];
 
                 if (c2Key === '其他') {
-                  const { value, onChange } = controll[c2Key] ?? {};
+                  const { qty: value, onQtyChange: onChange } = controll[c2Key] ?? {};
 
                   return (
                     <Fragment key={c3Index}>
@@ -232,7 +143,7 @@ export default function Sheet({
                         </div>
                       </SubCell>
                       {subKeys!.map((key, subIndex) => {
-                        const { value, onChange } = controll[key] ?? {};
+                        const { qty: value, onQtyChange: onChange } = controll[key] ?? {};
 
                         return (
                           <C4 key={subIndex} editable={editable}>
@@ -261,7 +172,7 @@ export default function Sheet({
                   );
                 }
 
-                const { value, onChange } = controll[c3Key] ?? {};
+                const { qty: value, onQtyChange: onChange } = controll[c3Key] ?? {};
 
                 return (
                   <Fragment key={c3Index}>
