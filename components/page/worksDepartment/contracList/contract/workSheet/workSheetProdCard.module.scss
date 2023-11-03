@@ -1,10 +1,6 @@
 @use "styles/theme01" as *;
 
 .card {
-  display: grid;
-  grid-template-columns: auto 80px;
-  justify-content: space-between;
-  gap: 5px;
   width: 186px;
   padding: 10px;
   padding-bottom: 5px;
@@ -15,21 +11,34 @@
     background-color: #fee;
   }
 
-  .left {
+  .leftRight {
     display: grid;
+    grid-template-columns: auto 80px;
     justify-content: space-between;
-    gap: 12px;
-    > span {
-      font-size: 12px;
-      font-weight: 400;
-      color: black;
-      word-break: break-all;
-      &:nth-child(2) {
-        font-size: 18px;
-        font-weight: 700;
+    gap: 5px;
+    .left {
+      display: grid;
+      justify-content: space-between;
+      gap: 12px;
+      > span {
+        font-size: 12px;
+        font-weight: 400;
+        color: black;
+        word-break: break-all;
+        &:nth-child(2) {
+          font-size: 18px;
+          font-weight: 700;
+        }
       }
     }
+    .right {
+    }
   }
-  .right {
+  .panel {
+    margin-top: 10px;
+    > .btn {
+      background-color: white;
+      border: solid 1px black;
+    }
   }
 }

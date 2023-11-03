@@ -107,7 +107,6 @@ import {
 
 // type
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
-import { set } from 'lodash';
 
 // ====================================================================
 
@@ -205,24 +204,56 @@ export default function WorkSheet() {
       }
 
       itemIdArrList[theId].push(item.id);
-
-      // //
-      // if (!itemTokenList[productId]) {
-      //   itemTokenList[productId] = item;
-      // }
-
-      // if (!itemTokenList[productId]) {
-      //   itemTokenList[productId] = item;
-      // }
-
-      // //
-      // if (!itemIdArrList[productId]) {
-      //   itemIdArrList[productId] = [];
-      // }
-
-      // itemIdArrList[productId].push(item.id);
-      // //
     });
+
+    // type TitemTokenList_new = {
+    //   [key: string]: {
+    //     originalItem: TquotationProductItemDto;
+    //     [key: string]: TquotationProductItemDto;
+    //   };
+    // };
+
+    // const itemTokenList_new: TitemTokenList_new = {};
+    // const itemIdArrList_new: { [key: string]: { [key: string]: string[] } } = {};
+
+    // contractProductItems.forEach((item) => {
+    //   const { productId, adjustedItem, adjustedItemId } = item;
+
+    //   let theItem: typeof item;
+    //   let theId: string;
+
+    //   if (adjustedItem && adjustedItemId) {
+    //     theItem = adjustedItem;
+    //     theId = adjustedItemId;
+    //   } else {
+    //     theItem = item;
+    //     theId = productId;
+    //   }
+
+    //   if (!itemTokenList_new[productId]) {
+    //     itemTokenList_new[productId] = {
+    //       originalItem: item,
+    //     };
+    //   }
+
+    //   itemTokenList_new[productId][theId] = theItem;
+
+    //   //
+    //   if (!itemIdArrList_new[productId]) {
+    //     itemIdArrList_new[productId] = {};
+    //   }
+
+    //   if (!itemIdArrList_new[productId][theId]) {
+    //     itemIdArrList_new[productId][theId] = [];
+    //   }
+
+    //   itemIdArrList_new[productId][theId].push(item.id);
+    // });
+
+    // console.log(itemTokenList_new);
+    // console.log(itemIdArrList_new);
+
+    // console.log('itemIdArrList', itemIdArrList);
 
     return {
       itemTokenList,
@@ -984,14 +1015,14 @@ export default function WorkSheet() {
       body = [...bodyItemArr];
     });
 
-    try {
-      await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
-      await update_workSheet();
-      setDisabled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新工作單失敗', content: err.message });
-    }
+    // try {
+    //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+    //   await update_workSheet();
+    //   setDisabled(true);
+    // } catch (error) {
+    //   const err = error as Error;
+    //   myAlert.err({ title: '更新工作單失敗', content: err.message });
+    // }
   };
 
   /**產生出庫單 */
