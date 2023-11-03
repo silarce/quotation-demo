@@ -26,6 +26,10 @@ type TsheetList = {
   };
 };
 
+type TchangedSheetList = {
+  [key: string]: Class_workSheet;
+};
+
 type TforceUpdate_workSheet = (props?: { isNoChange?: boolean }) => void;
 
 // =====================================================================
@@ -44,7 +48,7 @@ const useWorkSheet = ({
     setSheetList((state) => ({ ...state }));
   }, []);
 
-  const [changedSheetList, setChangedSheetList] = useState<TsheetList>({});
+  const [changedSheetList, setChangedSheetList] = useState<TchangedSheetList>({});
 
   // ------------------------------------------------------------
 
@@ -70,7 +74,7 @@ const useWorkSheet = ({
               return;
             }
 
-            setChangedSheetList((state) => ({ ...state, [cKey]: list[cKey] }));
+            setChangedSheetList((state) => ({ ...state, [cKey]: list[pKey][cKey] }));
           },
           prod,
           itemIdArr: itemIdArrList[pKey][cKey],
@@ -80,14 +84,7 @@ const useWorkSheet = ({
 
     setSheetList(list);
     setChangedSheetList({});
-
-    // const arr = Object.values(list);
-    // for (const classSheet of arr) {
-    //   await classSheet.getWholeProduct();
-    // }
   };
-
-  console.log(sheetList);
 
   // ------------------------------------------------------------
   return { sheetList, changedSheetList, reset };

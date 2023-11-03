@@ -1018,12 +1018,12 @@ export default function WorkSheet() {
       return;
     }
 
-    // let body: TupdateWorkSheetItem[] = [];
+    let body: TupdateWorkSheetItem[] = [];
 
-    // Object.values(changedSheetList).forEach((sheet) => {
-    //   const bodyItemArr = sheet.bodyItemArr;
-    //   body = [...bodyItemArr];
-    // });
+    Object.values(changedSheetList).forEach((sheet) => {
+      const bodyItemArr = sheet.bodyItemArr;
+      body = [...body, ...bodyItemArr];
+    });
 
     // try {
     //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
