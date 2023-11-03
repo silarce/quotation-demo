@@ -7,12 +7,21 @@ import style from './powerTransmissionSpareList.module.scss';
 // ==================================================================
 
 type TcontrolItem = {
+  unit: string;
+  onUnitChange: (unit: string, c2Key: string) => void;
   qty: string;
   onQtyChange: (qty: string, c2Key: string) => void;
 };
 
+type TcontrolItem_other = {
+  qty: string;
+  onQtyChange: (qty: string, c2Key: string) => void;
+  unit?: undefined;
+  onUnitChange?: undefined;
+};
+
 type Tcontroll = {
-  [key: string]: TcontrolItem;
+  [key: string]: TcontrolItem | TcontrolItem_other;
 
   智慧型: TcontrolItem;
   面板式: TcontrolItem;
@@ -50,7 +59,7 @@ type Tcontroll = {
   防颱鎖固: TcontrolItem;
   防颱中柱: TcontrolItem;
   //
-  其他: TcontrolItem;
+  其他: TcontrolItem_other;
 };
 
 export type { Tcontroll };
@@ -143,7 +152,7 @@ export default function Sheet({
                         </div>
                       </SubCell>
                       {subKeys!.map((key, subIndex) => {
-                        const { qty: value, onQtyChange: onChange } = controll[key] ?? {};
+                        const { qty, onQtyChange, unit, onUnitChange } = controll[key] ?? {};
 
                         return (
                           <C4 key={subIndex} editable={editable}>
@@ -151,18 +160,18 @@ export default function Sheet({
                               type="text"
                               // defaultValue={isAdd ? '' : defaultValue}
                               disabled={!editable}
-                              // value={value ?? ''}
+                              value={unit ?? ''}
                               onChange={(e) => {
-                                // onChange?.(e.target.value, c2Key);
+                                onUnitChange?.(e.target.value, c2Key);
                               }}
                             />
                             <input
                               type="number"
                               // defaultValue={isAdd ? '' : defaultValue}
                               disabled={!editable}
-                              value={value ?? ''}
+                              value={qty ?? ''}
                               onChange={(e) => {
-                                onChange?.(e.target.value, c2Key);
+                                onQtyChange?.(e.target.value, c2Key);
                               }}
                             />
                           </C4>
@@ -172,7 +181,7 @@ export default function Sheet({
                   );
                 }
 
-                const { qty: value, onQtyChange: onChange } = controll[c3Key] ?? {};
+                const { qty, onQtyChange, unit, onUnitChange } = controll[c3Key] ?? {};
 
                 return (
                   <Fragment key={c3Index}>
@@ -184,18 +193,18 @@ export default function Sheet({
                         type="text"
                         // defaultValue={isAdd ? '' : defaultValue}
                         disabled={!editable}
-                        // value={value ?? ''}
+                        value={unit ?? ''}
                         onChange={(e) => {
-                          // onChange?.(e.target.value, c2Key);
+                          onUnitChange?.(e.target.value, c2Key);
                         }}
                       />
                       <input
                         type="number"
                         // defaultValue={isAdd ? '' : defaultValue}
                         disabled={!editable}
-                        value={value ?? ''}
+                        value={qty ?? ''}
                         onChange={(e) => {
-                          onChange?.(e.target.value, c2Key);
+                          onQtyChange?.(e.target.value, c2Key);
                         }}
                       />
                     </C4>
