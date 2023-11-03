@@ -73,6 +73,7 @@ import WorkSheetProductDetail02, {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
@@ -292,10 +293,11 @@ export default function WorkSheet() {
     itemIdArrList: itemIdArrList_new ?? {},
   });
 
-  // const [targetSheetKey, setTargetSheetKey] = useState<string>();
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
   const targetSheetKey_p = targetSheetKey?.[0];
   const targetSheetKey_c = targetSheetKey?.[1];
+
+  const [targetDivideItem, setTargetDivideItem] = useState<(qty: number) => void>();
 
   const targetSheet: Class_workSheet | undefined =
     targetSheetKey_p && targetSheetKey_c ? sheetList[targetSheetKey_p]?.[targetSheetKey_c] : undefined;
@@ -1025,14 +1027,14 @@ export default function WorkSheet() {
       body = [...body, ...bodyItemArr];
     });
 
-    // try {
-    //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
-    //   await update_workSheet();
-    //   setDisabled(true);
-    // } catch (error) {
-    //   const err = error as Error;
-    //   myAlert.err({ title: '更新工作單失敗', content: err.message });
-    // }
+    try {
+      await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+      await update_workSheet();
+      setDisabled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新工作單失敗', content: err.message });
+    }
   };
 
   /**產生出庫單 */
@@ -1102,7 +1104,11 @@ export default function WorkSheet() {
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
-      <form>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>
@@ -1121,6 +1127,7 @@ export default function WorkSheet() {
                   itemName,
                   // doorModelName,
                   //  quantity
+                  quantity,
                 } = item;
 
                 let isActive = false;
@@ -1131,10 +1138,19 @@ export default function WorkSheet() {
 
                 list.push({
                   itemName: itemName,
+                  qty: quantity,
                   onClick: () => {
                     setTargetSheetKey([pKey, cKey]);
                   },
                   isActive,
+                  onDivideClick: () => {
+                    setTargetDivideItem(() => {
+                      return (qty: number) => {
+                        item.divideItem(qty);
+                        setTargetDivideItem(undefined);
+                      };
+                    });
+                  },
                 });
               });
 
@@ -1149,7 +1165,7 @@ export default function WorkSheet() {
 
               return (
                 <div key={pKey}>
-                  <WorkSheetProdCard control={control} isActive={false} img={imgIdk} />
+                  <WorkSheetProdCard disabled={disabled} control={control} img={imgIdk} />
                 </div>
               );
             })}
@@ -1185,6 +1201,18 @@ export default function WorkSheet() {
         </div>
         {/* main */}
       </form>
+      <InputModal
+        visible={!!targetDivideItem}
+        title="分堆"
+        placeholder="請輸入數量"
+        onConfirm={(str) => {
+          targetDivideItem?.(Number(str));
+        }}
+        onCancel={() => setTargetDivideItem(undefined)}
+        inputAttr={{
+          type: 'number',
+        }}
+      />
     </SubLayer>
   );
 }

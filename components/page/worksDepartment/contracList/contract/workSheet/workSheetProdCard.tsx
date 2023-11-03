@@ -12,8 +12,10 @@ type Tcontrol = {
   qty: string;
   list: {
     itemName: string;
+    qty: string;
     onClick: () => void;
     isActive?: boolean;
+    onDivideClick: () => void;
   }[];
 };
 
@@ -23,14 +25,16 @@ export type { Tcontrol as Tcontrol_prodCard };
 export default function WorkSheetProdCard({
   control,
   img,
-  isActive,
+
+  disabled,
 }: {
   control: Tcontrol;
   img: StaticImageData;
-  isActive?: boolean;
+
+  disabled?: boolean;
 }) {
   return (
-    <div className={classNames(scss.card, { [scss.active]: isActive })}>
+    <div className={classNames(scss.card)}>
       <div className={scss.leftRight}>
         <div className={scss.left}>
           <span>{control.itemName}</span>
@@ -43,11 +47,15 @@ export default function WorkSheetProdCard({
       </div>
       <div className={scss.list}>
         {control.list.map((item, index) => {
-          const { itemName, onClick, isActive } = item;
+          const { itemName, qty, onClick, isActive, onDivideClick } = item;
 
           return (
             <div key={index} className={classNames(isActive && scss.active)} onClick={onClick}>
               <span>{itemName}</span>
+              <span>{qty}樘</span>
+              <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
+                分堆
+              </button>
             </div>
           );
         })}

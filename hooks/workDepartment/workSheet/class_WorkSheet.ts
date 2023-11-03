@@ -2,6 +2,7 @@ import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { AxiosError } from 'axios';
 
+// gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
@@ -47,22 +48,35 @@ class Class_workSheet {
     itemIdArr, // itemIdArr裝的是被這個class代表的item的id，
     // 未來若分堆需求，oldProd可能會要是未被修改的資料
     // 這樣可以取父prod的oldProd放進來，prod則是父prod的資料
-    oldProd = _.cloneDeep(prod),
-    identifyKey,
+    oldProd,
+    identifyKey_p,
+    identifyKey_c,
+    addSheet,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
     forceUpdate: TforceUpdate_workSheet;
-    prod: TquotationProductItemDto;
+    prod: TquotationProductItemDto | TupdateWorkSheetItem;
     itemIdArr: string[];
-    oldProd?: TquotationProductItemDto;
-    identifyKey: string;
+    oldProd: TquotationProductItemDto;
+    identifyKey_p: string;
+    identifyKey_c: string;
+    //
+    addSheet: (params: {
+      item: TquotationProductItemDto | TupdateWorkSheetItem;
+      oldItem: TquotationProductItemDto;
+      pKey: string;
+      cKey: string;
+      itemIdArr: string[];
+    }) => void;
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
     this.oldProd = oldProd;
     this.itemIdArr = itemIdArr;
-    this.identifyKey = identifyKey;
+    this.identifyKey_p = identifyKey_p;
+    this.identifyKey_c = identifyKey_c;
+    this._addSheet = addSheet;
 
     this._fullWidth_str = String(this._prod.fullWidth / 1000);
     this._height_str = String(this._prod.height / 1000);
@@ -101,11 +115,13 @@ class Class_workSheet {
 
   // ---------------------------------------------------------------------
 
-  private _prod: TquotationProductItemDto;
+  private _prod: TquotationProductItemDto | TupdateWorkSheetItem;
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
   private itemIdArr: string[];
-  readonly identifyKey;
+  readonly identifyKey_p;
+  readonly identifyKey_c;
+  private _addSheet;
   // ---------------------------------------------------------------------
 
   private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -987,6 +1003,31 @@ class Class_workSheet {
 
   // --------------------------------------------------------------
 
+  /**將這個items分堆 */
+  divideItem(qty: number) {
+    if (qty < 1) {
+      return myAlert.info({ title: '分堆數量不可小於1' });
+    }
+
+    if (qty >= Number(this.quantity)) {
+      return myAlert.info({ title: '分堆數量不可大於原本數量' });
+    }
+
+    const itemIdArr = this.itemIdArr.reverse().splice(0, qty);
+
+    this._addSheet({
+      item: this.bodyItemArr[0],
+      oldItem: this.oldProd,
+      pKey: this.identifyKey_p,
+      cKey: itemIdArr[0],
+      itemIdArr: itemIdArr,
+    });
+
+    this.forceUpdate({ isNoChange: true });
+  }
+
+  // --------------------------------------------------------------
+
   get bodyItemArr(): TupdateWorkSheetItem[] {
     const componentArr = Object.values(this.comList);
 
@@ -1009,8 +1050,6 @@ class Class_workSheet {
 
       return acceBody;
     });
-
-    // console.log(accessories);
 
     // contractProductItems
     return this.itemIdArr.map((id) => {
@@ -1067,6 +1106,17 @@ class Class_workSheet {
         accessories: accessories,
         adjustedItem: undefined,
         adjustedItemId: undefined,
+        //
+        slatCount: this._prod.slatCount,
+        sprocketWheelModel: this._prod.sprocketWheelModel,
+        sprocketWheelTeethNumber: this._prod.sprocketWheelTeethNumber,
+        bearingInnerDiameter: this._prod.bearingInnerDiameter,
+        diameter: this._prod.diameter,
+        bearingHousingTotalLength: this._prod.bearingHousingTotalLength,
+        guideRailsOpening: this._prod.guideRailsOpening,
+        //
+        thickness: this._prod.thickness,
+        boxD: this._prod.boxD,
       };
 
       return item;

@@ -8,6 +8,7 @@ import { Class_workSheet } from './class_WorkSheet';
 import {
   //  TquotationProductDto ,
   TquotationProductItemDto,
+  TupdateWorkSheetItem,
 } from 'js/api/dtoTypes';
 
 // =====================================================================
@@ -52,6 +53,45 @@ const useWorkSheet = ({
 
   // ------------------------------------------------------------
 
+  const addSheet = ({
+    //
+    item,
+    oldItem,
+    pKey,
+    cKey,
+    itemIdArr,
+  }: {
+    item: TquotationProductItemDto | TupdateWorkSheetItem;
+    oldItem: TquotationProductItemDto;
+    pKey: string;
+    cKey: string;
+    itemIdArr: string[];
+  }) => {
+    setSheetList((sheetList) => {
+      sheetList[pKey][cKey] = new Class_workSheet({
+        identifyKey_p: pKey,
+        identifyKey_c: cKey,
+        forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
+          forceUpdate();
+
+          if (isNoChange) {
+            return;
+          }
+
+          setChangedSheetList((state) => ({ ...state, [cKey]: sheetList[pKey][cKey] }));
+        },
+        prod: item,
+        oldProd: oldItem,
+        itemIdArr: itemIdArr,
+        addSheet,
+      });
+      // 分堆了，就要記錄在被改變清單中
+      setChangedSheetList((state) => ({ ...state, [cKey]: sheetList[pKey][cKey] }));
+
+      return { ...sheetList };
+    });
+  };
+
   const reset = async () => {
     const list: TsheetList = {};
 
@@ -66,7 +106,8 @@ const useWorkSheet = ({
         const prod = itemTokenList[pKey][cKey];
 
         list[pKey][cKey] = new Class_workSheet({
-          identifyKey: cKey,
+          identifyKey_p: pKey,
+          identifyKey_c: cKey,
           forceUpdate: ({ isNoChange }: { isNoChange?: boolean } = {}) => {
             forceUpdate();
 
@@ -77,7 +118,9 @@ const useWorkSheet = ({
             setChangedSheetList((state) => ({ ...state, [cKey]: list[pKey][cKey] }));
           },
           prod,
+          oldProd: prod,
           itemIdArr: itemIdArrList[pKey][cKey],
+          addSheet,
         });
       });
     });

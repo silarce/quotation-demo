@@ -38,8 +38,25 @@
     margin-top: 10px;
     display: grid;
     gap: 5px;
+    > div {
+      display: grid;
+      grid-template-columns: auto 30px 30px;
+      gap: 5px;
+      > span {
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      > button {
+        background-color: white;
+        height: fit-content;
+      }
+    }
     > .active {
       background-color: #ffeeee;
     }
   }
+}
+
+.hidden {
+  visibility: hidden;
 }
