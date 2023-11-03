@@ -166,7 +166,8 @@ export default function Sheet({
         <div>
           <span>種類</span>
         </div>
-        <div>
+        <div className={style.c4}>
+          <span>單位</span>
           <span>數量</span>
         </div>
       </div>
@@ -236,6 +237,15 @@ export default function Sheet({
                         return (
                           <C4 key={subIndex} editable={editable}>
                             <input
+                              type="text"
+                              // defaultValue={isAdd ? '' : defaultValue}
+                              disabled={!editable}
+                              // value={value ?? ''}
+                              onChange={(e) => {
+                                // onChange?.(e.target.value, c2Key);
+                              }}
+                            />
+                            <input
                               type="number"
                               // defaultValue={isAdd ? '' : defaultValue}
                               disabled={!editable}
@@ -259,6 +269,15 @@ export default function Sheet({
                       <span>{label}</span>
                     </C3>
                     <C4 editable={editable}>
+                      <input
+                        type="text"
+                        // defaultValue={isAdd ? '' : defaultValue}
+                        disabled={!editable}
+                        // value={value ?? ''}
+                        onChange={(e) => {
+                          // onChange?.(e.target.value, c2Key);
+                        }}
+                      />
                       <input
                         type="number"
                         // defaultValue={isAdd ? '' : defaultValue}
@@ -287,7 +306,7 @@ export default function Sheet({
 
 const Tbody = styled.div`
   display: grid;
-  grid-template-columns: 2fr 2fr 7fr 1fr;
+  grid-template-columns: 2fr 2fr 7fr 1.5fr;
 `;
 
 const CellInit = styled.div<{
@@ -323,7 +342,8 @@ const C3 = styled(CellInit)`
   }
 `;
 const C4 = styled(CellInit)<{ editable: boolean }>`
-  display: grid;
+  display: flex;
+  justify-content: space-evenly;
   border-right: none;
   > input {
     width: 50px;

@@ -1997,6 +1997,7 @@ export type TelectronicSuppliesRecordDto = {
   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
   category: string;
   quantity: string;
+  // unit: string | null;
 };
 
 export type TcreateElectronicSuppliesRecordDto = {
@@ -2005,6 +2006,7 @@ export type TcreateElectronicSuppliesRecordDto = {
   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
   category: string;
   quantity: string;
+  // unit: string | null;
 };
 
 export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };

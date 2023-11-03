@@ -513,8 +513,6 @@ export default function Edit() {
 
     const electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[] = [];
 
-    console.log(sheet);
-
     Object.values(sheet).forEach((item) => {
       if (item) {
         electronicSuppliesRecords.push({
