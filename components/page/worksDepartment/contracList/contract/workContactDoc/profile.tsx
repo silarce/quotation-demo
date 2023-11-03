@@ -163,7 +163,10 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
                       inputProps={{ ...contactPhone }}
                       {...inputStyle02}
                     />
-                    <IconRemoveCircle onClick={item.onDelClick} />
+                    <IconRemoveCircle
+                      onClick={item.onDelClick}
+                      className={classNames((contactPhone.disabled || disabled) && scss.hidden)}
+                    />
                   </div>
                 </Fragment>
               );

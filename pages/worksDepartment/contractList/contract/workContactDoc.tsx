@@ -198,12 +198,12 @@ export default function WorkContactDoc() {
   };
 
   // ---------------------------------------------------------------------------
-  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactPhone: string }[]>([]);
+  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactNumber: string }[]>([]);
 
   const onAddClick = () => {
     setContactArr((arr) => {
       const newArr = [...arr];
-      newArr.push({ contactPerson: '', contactPhone: '' });
+      newArr.push({ contactPerson: '', contactNumber: '' });
 
       return newArr;
     });
@@ -234,10 +234,15 @@ export default function WorkContactDoc() {
       contractorPrincipal,
       contractorContactNumber,
       contractorFaxNumber,
+      contactInfo,
     } = engineeringContact;
 
     if (annotations) {
       setAnnoArr(annotations);
+    }
+
+    if (contactInfo) {
+      setContactArr(contactInfo);
     }
 
     setProfile({
@@ -283,11 +288,11 @@ export default function WorkContactDoc() {
         },
       },
       contactPhone: {
-        value: item.contactPhone,
+        value: item.contactNumber,
         onChange: (v) => {
           setContactArr((arr) => {
             const newArr = [...arr];
-            newArr[index].contactPhone = v;
+            newArr[index].contactNumber = v;
 
             return newArr;
           });
@@ -454,6 +459,7 @@ export default function WorkContactDoc() {
     const body: TupdateEngineeringContactDto = {
       ...profile,
       annotations: annoArr,
+      contactInfo: contactArr,
     };
 
     try {

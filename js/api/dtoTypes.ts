@@ -1853,6 +1853,11 @@ export type TengineeringContactDto = {
   contractorFaxNumber: string;
   /**備註列表 */
   annotations: string[] | null;
+  /**聯絡人列表 */
+  contactInfo: {
+    contactPerson: string;
+    contactNumber: string;
+  }[];
   //
   contractId?: string | null;
   contract?: TquotationContractDto | null;
@@ -1892,6 +1897,12 @@ export type TupdateEngineeringContactDto = {
 
   /**備註列表 */
   annotations?: string[] | null;
+
+  /**聯絡人列表 */
+  contactInfo: {
+    contactPerson: string;
+    contactNumber: string;
+  }[];
 };
 
 export type TcreateEngineeringContactDto = {
