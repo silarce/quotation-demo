@@ -293,6 +293,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               onChange: setVerticalKeyArr,
             }}
           />
+
           {/* 配件設定 */}
           <QuotationAdditions
             legacyContract={classLegacyContract}

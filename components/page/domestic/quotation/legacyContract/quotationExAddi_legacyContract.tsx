@@ -36,7 +36,10 @@ import { CSS } from '@dnd-kit/utilities';
 import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // icon
+import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg';
+import iconReset from 'public/image/icon/reset.svg';
+import iconChange from 'public/image/icon/change.svg';
 
 // css
 import styleL from '../local.module.scss';
@@ -103,7 +106,13 @@ export default function QuotationExAddi({
           }}
         >
           {/*  */}
-          <ControlBox delSelf={delSelf} index={pIndex + 1} dndAttr={attributes} dndListener={listeners} />
+          <ControlBox
+            delSelf={delSelf}
+            copySelfToExAddiList={() => classAddi.copySelfToExAddiList()}
+            index={pIndex + 1}
+            dndAttr={attributes}
+            dndListener={listeners}
+          />
           {/*  */}
           {additionKeyArr.map((key, cIndex) => {
             const inputSelPorps = _.cloneDeep(cellConfig[key].inputSelPorps);
@@ -217,11 +226,13 @@ export default function QuotationExAddi({
 
 const ControlBox = ({
   delSelf,
+  copySelfToExAddiList,
   index,
   dndAttr,
   dndListener,
 }: {
   delSelf?: () => void;
+  copySelfToExAddiList: () => void;
   index: number | string;
 
   dndAttr: DraggableAttributes;
@@ -230,9 +241,16 @@ const ControlBox = ({
   return (
     <div className={classNames(scss.btnBox, scss.exchange, 'chameleon')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
+
+      {/* <button className={classNames(scss.btn, !delSelf && scss.hidden)} onClick={delSelf}>
         刪除
-      </button>
+      </button> */}
+      <IconCopy
+        className={classNames(scss.iconBtn, scss.littleBtn, !delSelf && scss.hidden)}
+        onClick={copySelfToExAddiList}
+      />
+      <IconDelete01 className={classNames(scss.iconBtn, scss.littleBtn, !delSelf && scss.hidden)} onClick={delSelf} />
+
       <span>{index}</span>
     </div>
   );

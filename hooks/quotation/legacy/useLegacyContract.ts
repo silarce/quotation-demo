@@ -133,6 +133,7 @@ class Class_legacyContract {
         countSubTotal: this.countSubTotal,
         belongList: additionList,
         key,
+        addExtraExAddi: this.addExtraExAddi,
       });
     });
     //
@@ -488,6 +489,7 @@ class Class_legacyContract {
       countSubTotal: this.countSubTotal,
       belongList: this._additionList,
       key,
+      addExtraExAddi: this.addExtraExAddi,
     });
 
     this._additionList[key] = addi;
@@ -500,15 +502,16 @@ class Class_legacyContract {
     return this._extraExAddiList;
   }
 
-  addExtraExAddi = () => {
+  addExtraExAddi = (body?: TcreateLegacyContractAdditionDto) => {
     const key = 'new-' + nanoid();
 
     const addi = new Class_addition({
       reRender: this._reRender,
-      addition: emptyAdditionCre(),
+      addition: body ?? emptyAdditionCre(),
       countSubTotal: this.countSubTotal,
       belongList: this._extraExAddiList,
       key,
+      addExtraExAddi: this.addExtraExAddi,
     });
 
     this._extraExAddiList[key] = addi;

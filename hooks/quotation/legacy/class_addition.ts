@@ -20,6 +20,7 @@ class Class_addition {
     parentAddition,
     belongList,
     key,
+    addExtraExAddi,
   }: {
     reRender: TreRender;
     addition: TlegacyContractAdditionDto | TcreateLegacyContractAdditionDto;
@@ -27,6 +28,7 @@ class Class_addition {
     parentAddition?: Class_addition;
     belongList: { [key: string]: Class_addition };
     key: string;
+    addExtraExAddi: (body?: TcreateLegacyContractAdditionDto) => void;
   }) {
     this._reRender = reRender;
 
@@ -42,6 +44,8 @@ class Class_addition {
 
     this._belongList = belongList;
     this._key = key;
+
+    this._addExtraExAddi = addExtraExAddi;
 
     this._countSubTotal = countSubTotal;
 
@@ -69,7 +73,8 @@ class Class_addition {
   private _belongList;
   private _key;
 
-  // 等api新增，先用假資料
+  private _addExtraExAddi;
+
   private _batchNumber;
 
   private _reRender;
@@ -122,6 +127,7 @@ class Class_addition {
       countSubTotal: this._countSubTotal,
       belongList: this._belongList,
       key,
+      addExtraExAddi: this._addExtraExAddi,
     });
 
     this._countSubTotal();
@@ -304,6 +310,7 @@ class Class_addition {
 
       belongList: this._exAddiList,
       key: exId,
+      addExtraExAddi: this._addExtraExAddi,
     });
 
     this._countSubTotal();
@@ -312,6 +319,16 @@ class Class_addition {
 
     return true;
   };
+
+  copySelfToExAddiList() {
+    const body = this.postAddition;
+    body.id = undefined;
+
+    this._addExtraExAddi(body);
+
+    this._countSubTotal();
+    this._reRender();
+  }
 
   // 清空變更項目
   clearExchange = () => {
@@ -324,8 +341,10 @@ class Class_addition {
   // -----------------------------------------------------------------
 
   get postAddition() {
+    const copy = _.cloneDeep(this._addition);
+
     return {
-      ...this._addition,
+      ...copy,
       id: this.id || undefined,
     };
   }

@@ -161,7 +161,8 @@ export default function QuotationAdditions({
             {isAppend && (
               <ResetChangeBtnBox
                 toSetTargetIndex={toSetTarget}
-                clearExchange={addi.clearExchange}
+                clearExchange={() => addi.clearExchange()}
+                copySelfToExAddiList={() => addi.copySelfToExAddiList()}
                 indexNumber={pIndex + 1}
                 dndAttr={attributes}
                 dndListener={listeners}
@@ -413,6 +414,7 @@ const EditBtnBox = ({
 const ResetChangeBtnBox = ({
   toSetTargetIndex,
   clearExchange,
+  copySelfToExAddiList,
   dndAttr,
   dndListener,
   indexNumber,
@@ -420,6 +422,7 @@ const ResetChangeBtnBox = ({
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
+  copySelfToExAddiList: () => void;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNumber: number | string;
@@ -428,6 +431,13 @@ const ResetChangeBtnBox = ({
   return (
     <div className={classNames(scss.btnBox, scss.resetChange, 'chameleon')}>
       <Image className={scss.iconBtn} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
+
+      <IconCopy
+        onClick={(e) => {
+          e.stopPropagation();
+          copySelfToExAddiList();
+        }}
+      />
 
       <Image
         src={iconReset}
@@ -442,12 +452,6 @@ const ResetChangeBtnBox = ({
         onClick={toSetTargetIndex}
       />
 
-      {/* <button className={classNames(scss.btn, !isAppending && scss.hidden)} onClick={clearExchange}>
-        還原
-      </button>
-      <button className={classNames(scss.btn, !isAppending && scss.hidden)} onClick={toSetTargetIndex}>
-        變更
-      </button> */}
       <span>{indexNumber}</span>
     </div>
   );
