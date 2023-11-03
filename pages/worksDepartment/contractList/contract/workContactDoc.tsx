@@ -198,6 +198,18 @@ export default function WorkContactDoc() {
   };
 
   // ---------------------------------------------------------------------------
+  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactPhone: string }[]>([]);
+
+  const onAddClick = () => {
+    setContactArr((arr) => {
+      const newArr = [...arr];
+      newArr.push({ contactPerson: '', contactPhone: '' });
+
+      return newArr;
+    });
+  };
+
+  // ---------------------------------------------------------------------------
 
   const reSet = () => {
     if (!engineeringContact) {
@@ -256,6 +268,42 @@ export default function WorkContactDoc() {
   }, [engineeringContact]);
 
   // ---------------------------------------------------------------------------
+
+  const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = contactArr.map((item, index) => {
+    return {
+      contactPerson: {
+        value: item.contactPerson,
+        onChange: (v) => {
+          setContactArr((arr) => {
+            const newArr = [...arr];
+            newArr[index].contactPerson = v;
+
+            return newArr;
+          });
+        },
+      },
+      contactPhone: {
+        value: item.contactPhone,
+        onChange: (v) => {
+          setContactArr((arr) => {
+            const newArr = [...arr];
+            newArr[index].contactPhone = v;
+
+            return newArr;
+          });
+        },
+      },
+      onDelClick: () => {
+        setContactArr((arr) => {
+          const newArr = [...arr];
+          newArr.splice(index, 1);
+
+          return newArr;
+        });
+      },
+    };
+  });
+
   const controll: Tcontroll_profile = {
     /**請款狀態 */
     paymentStatus: {
@@ -319,9 +367,6 @@ export default function WorkContactDoc() {
         },
       },
     },
-
-    //
-    //
     //
     /**工程負責人 */
     projectPerson: {
@@ -391,6 +436,11 @@ export default function WorkContactDoc() {
       onChange: (v) => {
         profileChange('contractorFaxNumber', v);
       },
+    },
+    //
+    contactPersons: {
+      onAddClick,
+      arr: contactPersonsArr,
     },
   };
 

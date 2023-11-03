@@ -1,3 +1,6 @@
+import { Fragment } from 'react';
+import classNames from 'classnames';
+
 // glogal gear
 import Status from 'components/global/gear/other/status';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -6,13 +9,22 @@ import AddressBar, {
   TinputSelProps_noProps,
 } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 
+// icon
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
-import style from './workContactDoc.module.scss';
+import scss from './workContactDoc.module.scss';
 
 type TcontrollItem = {
   value: string;
   onChange?: (v: string) => void;
   disabled?: boolean;
+};
+
+type TcontactItem = {
+  contactPerson: TcontrollItem;
+  contactPhone: TcontrollItem;
+  onDelClick: () => void;
 };
 
 type Tcontroll = {
@@ -43,6 +55,11 @@ type Tcontroll = {
   /**公司電話 */
   contactNumber: TcontrollItem;
   faxNumber: TcontrollItem;
+  //
+  contactPersons: {
+    onAddClick: () => void;
+    arr: TcontactItem[];
+  };
 };
 
 export type { Tcontroll };
@@ -66,13 +83,14 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
     principal,
     contactNumber,
     faxNumber,
+    contactPersons,
   } = controll;
 
   return (
-    <div className={style.profile}>
-      <div className={style.leftBlock}>
+    <div className={scss.profile}>
+      <div className={scss.leftBlock}>
         <Status text={`請款狀態:${paymentStatus.value}`} />
-        <div className={style.leftUpBlock}>
+        <div className={scss.leftUpBlock}>
           <InputSel
             disabled={projectName.disabled || disabled}
             label="工程名稱"
@@ -89,7 +107,7 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
 
         <hr />
 
-        <div className={style.leftDownBlock}>
+        <div className={scss.leftDownBlock}>
           <InputSel
             disabled={projectNumber.disabled || disabled}
             label="工程電話"
@@ -116,9 +134,45 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
           />
           <AddressBar addressProps={addressBarProps.addressProps} inputSelProps={addressBarProps.inputSelProps} />
         </div>
+
+        <div className={scss.leftBelowBlock}>
+          <div className={classNames(scss.caption, disabled && contactPersons.arr.length === 0 && scss.hidden)}>
+            <span>聯絡人</span>
+            <IconAddCircle onClick={contactPersons.onAddClick} className={classNames(disabled && scss.hidden)} />
+          </div>
+          <div className={scss.grid}>
+            {contactPersons.arr.map((item, index) => {
+              const { contactPerson, contactPhone } = item;
+
+              const indexStr = String(index + 1).padStart(2, '0');
+
+              return (
+                <Fragment key={index}>
+                  <InputSel
+                    disabled={contactPerson.disabled || disabled}
+                    label={`聯絡人${indexStr}`}
+                    placeholder="聯絡人"
+                    inputProps={{ ...contactPerson }}
+                    {...inputStyle01}
+                  />
+                  <div className={scss.wrapper}>
+                    <InputSel
+                      disabled={contactPhone.disabled || disabled}
+                      label={`聯絡人${indexStr}電話`}
+                      placeholder="聯絡人電話"
+                      inputProps={{ ...contactPhone }}
+                      {...inputStyle02}
+                    />
+                    <IconRemoveCircle onClick={item.onDelClick} />
+                  </div>
+                </Fragment>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      <div className={style.rightBlock}>
+      <div className={scss.rightBlock}>
         <InputSel
           disabled={engineeringNumber.disabled || disabled}
           label="工程編號"
@@ -160,14 +214,14 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
 const inputStyle01 = {
   captionWidth: '80px',
   gap: '24px',
-  captionClassName: style.inputCaption,
+  captionClassName: scss.inputCaption,
   captionColor: 'main' as const,
   showBaseline: 'auto' as const,
 };
 const inputStyle02 = {
-  captionWidth: '90px',
+  captionWidth: '110px',
   gap: '24px',
-  captionClassName: style.inputCaption,
+  captionClassName: scss.inputCaption,
   captionColor: 'main' as const,
   showBaseline: 'auto' as const,
 };
