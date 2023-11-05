@@ -16,7 +16,8 @@ import { optionsCre_doorTrack_normal } from 'js/utils/options/doorTrackOptions';
 
 type TcontrolItem = {
   value: string;
-  onChange: (v: string) => void;
+  onChange?: (v: string) => void;
+  onChange_select?: (option: Toption | null) => void;
   disabled?: boolean;
   forbidden?: boolean;
   icon?: string;
@@ -174,6 +175,7 @@ const Item = ({
             //
             value,
             onChange,
+            onChange_select,
             disabled: disabled_control,
             forbidden,
             icon,
@@ -188,7 +190,7 @@ const Item = ({
             selectProps = {
               value: value,
               onChange: (v) => {
-                onChange(v?.value ?? '');
+                onChange?.(v?.value ?? '');
               },
               options: optionArr ?? options_fake ?? [],
               selClassNames: {
@@ -212,7 +214,8 @@ const Item = ({
               selectProps = {
                 ...selectProps,
                 onChange: (v) => {
-                  onChange(v?.value ?? '');
+                  onChange?.(v?.value ?? '');
+                  onChange_select?.(v);
                 },
                 customComponents: {
                   Option: (props) =>
@@ -272,7 +275,7 @@ const Item = ({
                     theValue = key;
                   }
                 });
-                onChange(theValue);
+                onChange?.(theValue);
               },
               containerClassName: scss.checkBar,
             };

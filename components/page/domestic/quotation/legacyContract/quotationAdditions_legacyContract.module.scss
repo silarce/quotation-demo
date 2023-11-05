@@ -112,14 +112,16 @@
   flex-wrap: nowrap;
   align-items: flex-end;
   gap: 12px;
-  width: 95px;
+  // width: 95px;
+  width: 120px;
   padding-left: 20px;
   background-color: white;
 
   &.resetChange {
     // width: 160px;
     // width: 192px;
-    width: 140px;
+    // width: 140px;
+    width: 160px;
   }
   &.exchange {
     width: 160px;

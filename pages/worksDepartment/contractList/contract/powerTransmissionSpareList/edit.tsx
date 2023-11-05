@@ -90,6 +90,7 @@ type Tsheet = {
         itemName: string;
         category: string;
         quantity: string;
+        unit: string;
       }
     | undefined;
 };
@@ -154,7 +155,7 @@ export default function Edit() {
 
   const [sheet, setSheet] = useState<Tsheet>({});
 
-  const changeSheet = ({
+  const changeSheetQty = ({
     //
     key,
     itemName,
@@ -171,7 +172,32 @@ export default function Edit() {
           id: state[key]?.id,
           itemName,
           category: key,
-          quantity: quantity,
+          unit: state[key]?.unit ?? '',
+          quantity,
+        },
+      };
+    });
+  };
+
+  const changeSheetUnit = ({
+    //
+    key,
+    itemName,
+    unit,
+  }: {
+    key: string;
+    itemName: string;
+    unit: string;
+  }) => {
+    setSheet((state) => {
+      return {
+        ...state,
+        [key]: {
+          id: state[key]?.id,
+          itemName,
+          category: key,
+          unit,
+          quantity: state[key]?.quantity ?? '',
         },
       };
     });
@@ -212,7 +238,8 @@ export default function Edit() {
           id: item.id,
           itemName: item.itemName,
           category: item.category,
-          quantity: item.quantity,
+          quantity: String(item.quantity),
+          unit: item.unit ?? '',
         };
 
         return;
@@ -222,7 +249,8 @@ export default function Edit() {
         id: item.id,
         itemName: item.itemName,
         category: item.category,
-        quantity: item.quantity,
+        quantity: String(item.quantity),
+        unit: item.unit ?? '',
       };
     });
 
@@ -233,189 +261,305 @@ export default function Edit() {
 
   const controll_sheet: Tcontroll_sheet = {
     智慧型: {
-      value: sheet.智慧型?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '智慧型', quantity, itemName });
+      unit: sheet.智慧型?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '智慧型', unit, itemName });
+      },
+      qty: sheet.智慧型?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '智慧型', quantity, itemName });
       },
     },
     面板式: {
-      value: sheet.面板式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '面板式', quantity, itemName });
+      unit: sheet.面板式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '面板式', unit, itemName });
+      },
+      qty: sheet.面板式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '面板式', quantity, itemName });
       },
     },
     埋入式: {
-      value: sheet.埋入式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '埋入式', quantity, itemName });
+      unit: sheet.埋入式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '埋入式', unit, itemName });
+      },
+      qty: sheet.埋入式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '埋入式', quantity, itemName });
       },
     },
     外露式: {
-      value: sheet.外露式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '外露式', quantity, itemName });
+      unit: sheet.外露式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '外露式', unit, itemName });
+      },
+      qty: sheet.外露式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '外露式', quantity, itemName });
       },
     },
     電子式: {
-      value: sheet.電子式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '電子式', quantity, itemName });
+      unit: sheet.電子式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '電子式', unit, itemName });
+      },
+      qty: sheet.電子式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '電子式', quantity, itemName });
       },
     },
     防爆式: {
-      value: sheet.防爆式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '防爆式', quantity, itemName });
+      unit: sheet.防爆式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '防爆式', unit, itemName });
+      },
+      qty: sheet.防爆式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '防爆式', quantity, itemName });
       },
     },
     鎖號: {
-      value: sheet.鎖號?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '鎖號', quantity, itemName });
+      unit: sheet.鎖號?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '鎖號', unit, itemName });
+      },
+      qty: sheet.鎖號?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '鎖號', quantity, itemName });
       },
     },
     特殊鎖號: {
-      value: sheet.特殊鎖號?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '特殊鎖號', quantity, itemName });
+      unit: sheet.特殊鎖號?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '特殊鎖號', unit, itemName });
+      },
+      qty: sheet.特殊鎖號?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '特殊鎖號', quantity, itemName });
       },
     },
     三點式一般: {
-      value: sheet.三點式一般?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '三點式一般', quantity, itemName });
+      unit: sheet.三點式一般?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '三點式一般', unit, itemName });
+      },
+      qty: sheet.三點式一般?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '三點式一般', quantity, itemName });
       },
     },
     三點式遮煙: {
-      value: sheet.三點式遮煙?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '三點式遮煙', quantity, itemName });
+      unit: sheet.三點式遮煙?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '三點式遮煙', unit, itemName });
+      },
+      qty: sheet.三點式遮煙?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '三點式遮煙', quantity, itemName });
       },
     },
     //
     '3HP馬達控制箱380v': {
-      value: sheet['3HP馬達控制箱380v']?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '3HP馬達控制箱380v', quantity, itemName });
+      unit: sheet['3HP馬達控制箱380v']?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '3HP馬達控制箱380v', unit, itemName });
+      },
+      qty: sheet['3HP馬達控制箱380v']?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '3HP馬達控制箱380v', quantity, itemName });
       },
     },
     '2HP馬達控制箱380v': {
-      value: sheet['2HP馬達控制箱380v']?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '2HP馬達控制箱380v', quantity, itemName });
+      unit: sheet['2HP馬達控制箱380v']?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '2HP馬達控制箱380v', unit, itemName });
+      },
+      qty: sheet['2HP馬達控制箱380v']?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '2HP馬達控制箱380v', quantity, itemName });
       },
     },
     '3HP馬達控制箱220v': {
-      value: sheet['3HP馬達控制箱220v']?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '3HP馬達控制箱220v', quantity, itemName });
+      unit: sheet['3HP馬達控制箱220v']?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '3HP馬達控制箱220v', unit, itemName });
+      },
+      qty: sheet['3HP馬達控制箱220v']?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '3HP馬達控制箱220v', quantity, itemName });
       },
     },
     '2HP馬達控制箱220v': {
-      value: sheet['2HP馬達控制箱220v']?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '2HP馬達控制箱220v', quantity, itemName });
+      unit: sheet['2HP馬達控制箱220v']?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '2HP馬達控制箱220v', unit, itemName });
+      },
+      qty: sheet['2HP馬達控制箱220v']?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '2HP馬達控制箱220v', quantity, itemName });
       },
     },
     彈射門控制箱: {
-      value: sheet.彈射門控制箱?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '彈射門控制箱', quantity, itemName });
+      unit: sheet.彈射門控制箱?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '彈射門控制箱', unit, itemName });
+      },
+      qty: sheet.彈射門控制箱?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '彈射門控制箱', quantity, itemName });
       },
     },
     紅外線控制盤: {
-      value: sheet.紅外線控制盤?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '紅外線控制盤', quantity, itemName });
+      unit: sheet.紅外線控制盤?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '紅外線控制盤', unit, itemName });
+      },
+      qty: sheet.紅外線控制盤?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '紅外線控制盤', quantity, itemName });
       },
     },
     //
     煙感器: {
-      value: sheet.煙感器?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '煙感器', quantity, itemName });
+      unit: sheet.煙感器?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '煙感器', unit, itemName });
+      },
+      qty: sheet.煙感器?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '煙感器', quantity, itemName });
       },
     },
     中繼器: {
-      value: sheet.中繼器?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '中繼器', quantity, itemName });
+      unit: sheet.中繼器?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '中繼器', unit, itemName });
+      },
+      qty: sheet.中繼器?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '中繼器', quantity, itemName });
       },
     },
     //
     門弓器: {
-      value: sheet.門弓器?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '門弓器', quantity, itemName });
+      unit: sheet.門弓器?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '門弓器', unit, itemName });
+      },
+      qty: sheet.門弓器?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '門弓器', quantity, itemName });
       },
     },
     平推鎖: {
-      value: sheet.平推鎖?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '平推鎖', quantity, itemName });
+      unit: sheet.平推鎖?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '平推鎖', unit, itemName });
+      },
+      qty: sheet.平推鎖?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '平推鎖', quantity, itemName });
       },
     },
     電磁扣: {
-      value: sheet.電磁扣?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '電磁扣', quantity, itemName });
+      unit: sheet.電磁扣?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '電磁扣', unit, itemName });
+      },
+      qty: sheet.電磁扣?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '電磁扣', quantity, itemName });
       },
     },
     //
     遙控器加障感器: {
-      value: sheet.遙控器加障感器?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '遙控器加障感器', quantity, itemName });
+      unit: sheet.遙控器加障感器?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '遙控器加障感器', unit, itemName });
+      },
+      qty: sheet.遙控器加障感器?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '遙控器加障感器', quantity, itemName });
       },
     },
     遙控器: {
-      value: sheet.遙控器?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '遙控器', quantity, itemName });
+      unit: sheet.遙控器?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '遙控器', unit, itemName });
+      },
+      qty: sheet.遙控器?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '遙控器', quantity, itemName });
       },
     },
     障感器: {
-      value: sheet.障感器?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '障感器', quantity, itemName });
+      unit: sheet.障感器?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '障感器', unit, itemName });
+      },
+      qty: sheet.障感器?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '障感器', quantity, itemName });
       },
     },
     大門用主機: {
-      value: sheet.大門用主機?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '大門用主機', quantity, itemName });
+      unit: sheet.大門用主機?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '大門用主機', unit, itemName });
+      },
+      qty: sheet.大門用主機?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '大門用主機', quantity, itemName });
       },
     },
     //
     對照式: {
-      value: sheet.對照式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '對照式', quantity, itemName });
+      unit: sheet.對照式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '對照式', unit, itemName });
+      },
+      qty: sheet.對照式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '對照式', quantity, itemName });
       },
     },
     反射式: {
-      value: sheet.反射式?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '反射式', quantity, itemName });
+      unit: sheet.反射式?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '反射式', unit, itemName });
+      },
+      qty: sheet.反射式?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '反射式', quantity, itemName });
       },
     },
     //
     防颱鎖固: {
-      value: sheet.防颱鎖固?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '防颱鎖固', quantity, itemName });
+      unit: sheet.防颱鎖固?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '防颱鎖固', unit, itemName });
+      },
+      qty: sheet.防颱鎖固?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '防颱鎖固', quantity, itemName });
       },
     },
     防颱中柱: {
-      value: sheet.防颱中柱?.quantity ?? '',
-      onChange: (quantity, itemName) => {
-        changeSheet({ key: '防颱中柱', quantity, itemName });
+      unit: sheet.防颱中柱?.unit ?? '',
+      onUnitChange: (unit, itemName) => {
+        changeSheetUnit({ key: '防颱中柱', unit, itemName });
+      },
+      qty: sheet.防颱中柱?.quantity ?? '',
+      onQtyChange: (quantity, itemName) => {
+        changeSheetQty({ key: '防颱中柱', quantity, itemName });
       },
     },
     //
     其他: {
-      value: sheet.other?.category ?? '',
-      onChange: (v) => {
+      qty: sheet.other?.category ?? '',
+      onQtyChange: (v) => {
         setSheet((state) => {
           return {
             ...state,
@@ -423,6 +567,7 @@ export default function Edit() {
               ...state.other,
               itemName: '其他',
               category: v,
+              unit: state.other?.unit ?? '',
               quantity: '0',
             },
           };
@@ -513,8 +658,6 @@ export default function Edit() {
 
     const electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[] = [];
 
-    console.log(sheet);
-
     Object.values(sheet).forEach((item) => {
       if (item) {
         electronicSuppliesRecords.push({
@@ -523,7 +666,8 @@ export default function Edit() {
           id: item.id, // 如果是新的就會是undefined，patch時如果沒有id，後端就會新增一筆資料
           itemName: item.itemName as TcreateElectronicSuppliesRecordDto['itemName'],
           category: item.category,
-          quantity: item.quantity,
+          quantity: Number(item.quantity),
+          unit: item.unit,
         });
       }
     });

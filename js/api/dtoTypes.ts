@@ -676,6 +676,7 @@ export type TmodifyLegacyContractDto = {
     salesTax: number; // 營業稅
     total: number; // 總計
   };
+  notesRecord: string[]; // 備註
 };
 
 // ==========================================================================
@@ -950,21 +951,33 @@ export type TquotationProductDto = {
 };
 
 export type TdeliveryStatusDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
   // @ApiProperty({ description: '所屬產品' })
-  productItem: TquotationProductItemDto;
+  productItem?: TquotationProductItemDto;
   // @ApiProperty({ description: '備註' })
   notes: string | null;
   // @ApiProperty({ description: '安裝人員Id' })
   installerEmployeeId: string | null;
   // @ApiProperty({ description: '安裝人員' })
-  installerEmployee: TemployeeDto;
+  installerEmployee?: TemployeeDto | null;
   // @ApiProperty({ description: '安裝日期' })
-  installationDate: Date | null;
+  installationDate: string | null;
   // @ApiProperty({ description: '工作表開立日期' })
-  workSheetInvoiceDate: Date | null;
+  workSheetInvoiceDate: string | null;
   // @ApiProperty({ description: '追加' })
   append: string | null;
   // @ApiProperty({ description: '完成追加' })
+  completeAppend: string | null;
+};
+
+export type TupdateDeliveryStatus = {
+  id: string;
+  notes: string;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
   completeAppend: string | null;
 };
 
@@ -995,6 +1008,21 @@ export type TquotationProductItemDto = Omit<
   deliveryStatus?: TdeliveryStatusDto | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
   adjustedItemId?: string | null;
+  //
+  // 門片捲片支數
+  slatCount: string;
+  // 練齒輪番號
+  sprocketWheelModel: string;
+  // 練齒輪大鏈輪
+  sprocketWheelTeethNumber: string;
+  // 孔徑 軸徑
+  bearingInnerDiameter: string;
+  // 卷軸尺寸
+  diameter: string;
+  // 捲軸總長
+  bearingHousingTotalLength: string;
+  // 底座開口
+  guideRailsOpening: string;
 };
 
 type TquotationContentDto_foo = {
@@ -1300,6 +1328,7 @@ export type TcreateQuotationContentDto = {
   productsOrder?: string[] | null; // 已棄用
 };
 
+/**合約 */
 export type TquotationContractDto = {
   id: string;
   createdAt: string;
@@ -1322,8 +1351,14 @@ export type TquotationContractDto = {
   version: number;
   //
   subContracts: TquotationContractDto[];
+  /**工程聯絡單ID */
   engineeringContactId: string | null;
+  /**工作表 */
+  worksheet: TworkSheetDto;
+  /**工作表ID */
   worksheetId: string | null;
+  /**出庫單ID */
+  engineeringDeliveryListId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
@@ -1818,6 +1853,11 @@ export type TengineeringContactDto = {
   contractorFaxNumber: string;
   /**備註列表 */
   annotations: string[] | null;
+  /**聯絡人列表 */
+  contactInfo: {
+    contactPerson: string;
+    contactNumber: string;
+  }[];
   //
   contractId?: string | null;
   contract?: TquotationContractDto | null;
@@ -1857,6 +1897,12 @@ export type TupdateEngineeringContactDto = {
 
   /**備註列表 */
   annotations?: string[] | null;
+
+  /**聯絡人列表 */
+  contactInfo: {
+    contactPerson: string;
+    contactNumber: string;
+  }[];
 };
 
 export type TcreateEngineeringContactDto = {
@@ -1950,7 +1996,8 @@ export type TelectronicSuppliesRecordDto = {
   doorType: string;
   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
   category: string;
-  quantity: string;
+  quantity: number;
+  unit: string | null;
 };
 
 export type TcreateElectronicSuppliesRecordDto = {
@@ -1958,7 +2005,8 @@ export type TcreateElectronicSuppliesRecordDto = {
   doorType: string;
   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
   category: string;
-  quantity: string;
+  quantity: number;
+  unit: string | null;
 };
 
 export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
@@ -2192,16 +2240,42 @@ export type TupdateWorkSheetItem = {
   accessories: TcreateQuotationProductAccessoriesDto[];
   adjustedItem: undefined;
   adjustedItemId: undefined;
+  //
+  // 門片捲片支數
+  slatCount: string;
+  // 練齒輪番號
+  sprocketWheelModel: string;
+  // 練齒輪大鏈輪
+  sprocketWheelTeethNumber: string;
+  // 孔徑 軸徑
+  bearingInnerDiameter: string;
+  // 卷軸尺寸
+  diameter: string;
+  // 捲軸總長
+  bearingHousingTotalLength: string;
+  // 底座開口
+  guideRailsOpening: string;
+  //
+  //
+  thickness: string;
+  boxD: number;
 };
 
 export type TupdateWorkSheet = {
   contractProductItems: TupdateWorkSheetItem[];
 };
 
-//
-export type ToutBoundOrder = {
+// 出庫單
+
+export type TengineeringDeliveryListDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  contractProductItems?: TquotationProductItemDto[];
+  notes: string;
+  contract: TquotationContractDto;
+};
+
+export type TupdateEngineeringDeliveryList = {
+  notes: string;
+  productsItemStatus?: TupdateDeliveryStatus[];
 };

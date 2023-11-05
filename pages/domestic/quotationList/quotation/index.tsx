@@ -63,6 +63,10 @@ import Table_prod from 'components/page/domestic/quotation/quotation/product/tab
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -84,16 +88,11 @@ import {
   apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
+// hook
 import { useProductList } from 'hooks/quotation/useProduct';
-
-import Summary, {
-  TsummaryControl,
-  TpayInfoControl,
-} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-
 import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
@@ -375,7 +374,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } else {
       setAnnotation([]);
       setQr([]);
-      setPaymentMethod([]);
+      setPaymentMethod([
+        {
+          milestone: '訂製同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '交貨同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '按裝同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '接電同時付總金額',
+          totalPaymentRatio: '0',
+        },
+      ]);
 
       setSummary({
         discountRate: '100',
@@ -1530,9 +1546,9 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
-  const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
-  const taxStr = Number(tax.toFixed(0)).toLocaleString();
-  const totalStr = Number(total.toFixed(0)).toLocaleString();
+  const subTotalStr = subTotal.ceil().toNumber().toLocaleString();
+  const taxStr = tax.ceil().toNumber().toLocaleString();
+  const totalStr = total.ceil().toNumber().toLocaleString();
 
   return {
     subTotal: subTotalStr,

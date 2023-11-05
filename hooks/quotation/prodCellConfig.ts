@@ -46,7 +46,7 @@ const prodCellConfig: TcellConfig = {
   doorType: {
     label: '門型',
     inputSelProps: {
-      wrapperStyle: { width: '120px' },
+      wrapperStyle: { width: '300px' },
       selectProps: {
         props: {
           // options由api取得

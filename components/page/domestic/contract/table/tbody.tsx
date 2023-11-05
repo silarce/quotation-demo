@@ -176,6 +176,7 @@ function DndRow({
   // state: 'add' | 'div';
   //
 }) {
+  /** 有attachedToProductId 代表是追減 沒有代表是追加 */
   const state = item.attachedToProductId ? 'div' : item.attachedToProductId === null ? 'add' : undefined;
 
   return (

@@ -29,11 +29,12 @@ import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
-import { optionsCreator_surface } from 'js/utils/options/productOptions';
+import { optionsCreator_surface, optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
 const options_surface = optionsCreator_surface();
+const options_doorModel = optionsCreator_doorModel();
 
 // ===========================================================
 // child class
@@ -279,6 +280,8 @@ class Class_product {
   timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
   timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
 
+  // ---------------------------------------------------------
+  dontGetDefaultValue = false;
   // ---------------------------------------------------------
 
   comList: { [key in TcomponentKey]: Class_component } | undefined;
@@ -834,8 +837,19 @@ class Class_product {
     } finally {
       this.isLoading = false;
 
-      if (res1 || res2 || res3) {
+      //如果res1或res2改變了，就呼叫takeDefaultDynaValue
+      if (res1 || res2) {
         this.takeDefaultDynaValue();
+      } else if (res3) {
+        // 如果dontGetDefaultValue為true
+        // 代表其中一個會被takeDefaultDynaValue改變的值不應該被改變
+        // 所以不要呼叫takeDefaultDynaValue
+        // 例如rollUpBoxThick，現在也只有set rollUpBoxThick會使takeDefaultDynaValue=true
+        if (this.dontGetDefaultValue) {
+          this.dontGetDefaultValue = false;
+        } else {
+          this.takeDefaultDynaValue();
+        }
       }
     }
 
@@ -963,29 +977,16 @@ class Class_product {
       item.price = 0;
     });
 
-    // api沒有給門片的厚度，直接取主產品的厚度嗎?
+    // 主產品的厚度就是門片厚度
     dataList.slat.thickness = this.thickness;
 
     this.creComList({
       dataList,
     });
     this.material = this.material;
-    // this.creComList({
-    //   slat: slat || creEmptyCom(),
-    //   bottomBar: bottomBar || creEmptyCom(),
-    //   guideRail: guideRail || creEmptyCom(),
-    //   motor: motor || creEmptyCom(),
-    //   sidePlate: sidePlate || creEmptyCom(),
-    //   roller: roller || creEmptyCom(),
-    //   motorAccessories: motorAccessories || creEmptyCom(),
-    //   headBox: headBox || creEmptyCom(),
-    // });
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
-
-    // this.calcComAllPrice();
-    // this.calcProdAllprice();
 
     this.reRender();
 
@@ -1377,10 +1378,18 @@ class Class_product {
   /**門型 options */
   get options_doorType() {
     return Object.values(this._doorModelList).map((item) => {
-      return {
-        value: item.name,
-        label: item.name,
-      };
+      const theIndex = options_doorModel.findIndex((model) => {
+        return item.name === model.value;
+      });
+
+      if (options_doorModel[theIndex]) {
+        return options_doorModel[theIndex];
+      } else {
+        return {
+          value: item.name,
+          label: item.name,
+        };
+      }
     });
   }
 
@@ -1607,8 +1616,6 @@ class Class_product {
     this._prodData.WG = v;
 
     const callReq = async () => {
-      console.log('fooooooo');
-
       const fullWidth = await calcFullwidthWithWG({
         body: {
           modelName: this.doorType as TpcgsPrams['modelName'],
@@ -2032,6 +2039,7 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
+    this.dontGetDefaultValue = true;
     this.callRetrieveCreProdCom();
     this.reRender();
   }

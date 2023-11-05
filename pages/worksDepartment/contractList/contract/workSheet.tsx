@@ -1,12 +1,7 @@
 // 工作表
 
 /*
-問題
 
-捲箱與門軌 的厚度選項現在仍是假資料
-有幾個下拉式選單選了之後會NaN
-
---------------
 在報價單主產品
 呼叫get /products/door/available-components
 是為了取得材料配件資料，並顯出來
@@ -44,10 +39,6 @@ options_doorTrackThick
 被更新的item會產生adjustedItem這個property
 型別同item，內容是更新後的item
 
-
-
-
-
 */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -63,7 +54,9 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import WorkSheetProfile, {
   Tcontrol_profile,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
-import WorkSheetProdCard from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
+import WorkSheetProdCard, {
+  Tcontrol_prodCard,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
 import WorkSheetProductOutline, {
   Tcontrol_productOutline,
   ToldProductOutline,
@@ -80,6 +73,7 @@ import WorkSheetProductDetail02, {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
@@ -88,6 +82,7 @@ import {
   useGetEngineeringContact,
   useGetWorkSheet,
   apiPatchWorkSheet,
+  apiPostEngineeringDeliveryList,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
@@ -167,7 +162,7 @@ export default function WorkSheet() {
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList } = useMemo(() => {
+  const { itemTokenList, itemIdArrList, itemTokenList_new, itemIdArrList_new } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -212,28 +207,64 @@ export default function WorkSheet() {
       }
 
       itemIdArrList[theId].push(item.id);
-
-      // //
-      // if (!itemTokenList[productId]) {
-      //   itemTokenList[productId] = item;
-      // }
-
-      // if (!itemTokenList[productId]) {
-      //   itemTokenList[productId] = item;
-      // }
-
-      // //
-      // if (!itemIdArrList[productId]) {
-      //   itemIdArrList[productId] = [];
-      // }
-
-      // itemIdArrList[productId].push(item.id);
-      // //
     });
+
+    type TitemTokenList_new = {
+      [key: string]: {
+        originalItem: TquotationProductItemDto;
+        [key: string]: TquotationProductItemDto;
+      };
+    };
+
+    type TitemIdArrList_new = { [key: string]: { [key: string]: string[] } };
+
+    const itemTokenList_new: TitemTokenList_new = {};
+    const itemIdArrList_new: TitemIdArrList_new = {};
+
+    contractProductItems.forEach((item) => {
+      const { productId, adjustedItem, adjustedItemId } = item;
+
+      let theItem: typeof item;
+      let theId: string;
+
+      if (adjustedItem && adjustedItemId) {
+        theItem = adjustedItem;
+        theId = adjustedItemId;
+      } else {
+        theItem = item;
+        theId = productId;
+      }
+
+      if (!itemTokenList_new[productId]) {
+        itemTokenList_new[productId] = {
+          originalItem: item,
+        };
+      }
+
+      itemTokenList_new[productId][theId] = theItem;
+
+      //
+      if (!itemIdArrList_new[productId]) {
+        itemIdArrList_new[productId] = {};
+      }
+
+      if (!itemIdArrList_new[productId][theId]) {
+        itemIdArrList_new[productId][theId] = [];
+      }
+
+      itemIdArrList_new[productId][theId].push(item.id);
+    });
+
+    // console.log(itemTokenList_new);
+    // console.log(itemIdArrList_new);
+
+    // console.log('itemIdArrList', itemIdArrList);
 
     return {
       itemTokenList,
       itemIdArrList,
+      itemTokenList_new,
+      itemIdArrList_new,
     };
   }, [workSheet]);
 
@@ -257,15 +288,20 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
-
-  const [targetSheetKey, setTargetSheetKey] = useState<string>();
-
   const { sheetList, changedSheetList, reset } = useWorkSheet({
-    itemTokenList: itemTokenList ?? {},
-    itemIdArrList: itemIdArrList ?? {},
+    itemTokenList: itemTokenList_new ?? {},
+    itemIdArrList: itemIdArrList_new ?? {},
   });
 
-  const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey ?? 'undefined'];
+  const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
+  const targetSheetKey_p = targetSheetKey?.[0];
+  const targetSheetKey_c = targetSheetKey?.[1];
+
+  const [targetDivideItem, setTargetDivideItem] = useState<(qty: number) => void>();
+
+  const targetSheet: Class_workSheet | undefined =
+    targetSheetKey_p && targetSheetKey_c ? sheetList[targetSheetKey_p]?.[targetSheetKey_c] : undefined;
+  // const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey[0] ?? 'undefined'][];
 
   const doorModelOptionArr = useMemo(() => {
     if (!doorModelList) {
@@ -310,12 +346,14 @@ export default function WorkSheet() {
         guideRailOptionArr_withHook.push({
           value: item.imgSrc,
           label: item.imgSrc,
+          opening: item.opening,
           icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
         });
       } else {
         guideRailOptionArr_noHook.push({
           value: item.imgSrc,
           label: item.imgSrc,
+          opening: item.opening,
           icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
         });
       }
@@ -900,12 +938,18 @@ export default function WorkSheet() {
         forbidden: true,
       },
       doorTrackName: {
-        value: targetSheet?.guideRail ?? '',
-        onChange: (v) => {
+        value: targetSheet?.guideRailName ?? '',
+        // onChange: (v) => {
+        //   if (targetSheet) {
+        //     targetSheet.guideRail = v;
+        //   }
+        // },
+        onChange_select: (option) => {
           if (targetSheet) {
-            targetSheet.guideRail = v;
+            targetSheet.guideRail = option;
           }
         },
+
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
         optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
       },
@@ -926,10 +970,10 @@ export default function WorkSheet() {
       捲門全高: '999',
     },
     size02: {
-      捲軸尺寸: numToStr(targetSheet?.prodSpec?.diameter) + '"',
-      軸徑: numToStr(targetSheet?.prodSpec?.diameter),
+      捲軸尺寸: targetSheet?.diameter ?? '',
+      軸徑: targetSheet?.bearingInnerDiameter ?? '',
       軸承: targetSheet?.prodSpec?.bearingName ?? '',
-      總長: numToStr(targetSheet?.prodSpec?.bearingHousingTotalLength),
+      總長: targetSheet?.bearingHousingTotalLength ?? '',
       寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
     },
     rollBox: {
@@ -941,7 +985,7 @@ export default function WorkSheet() {
       門片材質: targetSheet?.com_slat_material ?? '',
       門片厚度: targetSheet?.thickness ?? '',
       門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
-      捲片支數: numToStr(targetSheet?.prodDetailSpec?.slatCount),
+      捲片支數: targetSheet?.slatCount ?? '',
       防颱勾: '是否是指主產品的"防颱"?',
     },
     motor: {
@@ -953,19 +997,19 @@ export default function WorkSheet() {
       門軌材質: targetSheet?.com_guideRail_material ?? '',
       門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
       門軌形式: {
-        value: targetSheet?.guideRail ?? '',
+        value: targetSheet?.guideRailName ?? '',
         img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
       },
     },
     chainCog: {
       // 鏈齒輪番號: 'gearNumber',
-      鏈齒輪番號: targetSheet?.prodSpec?.gearNumber ?? '',
-      大鏈輪: '999',
-      孔徑: '999',
+      鏈齒輪番號: targetSheet?.sprocketWheelModel ?? '',
+      大鏈輪: targetSheet?.sprocketWheelTeethNumber ?? '',
+      孔徑: targetSheet?.bearingInnerDiameter ?? '',
     },
     base: {
       底座材質: targetSheet?.com_bottomBar_material ?? '',
-      底座開口: '999',
+      底座開口: targetSheet?.guideRailsOpening ?? '',
     },
   };
 
@@ -980,7 +1024,7 @@ export default function WorkSheet() {
 
     Object.values(changedSheetList).forEach((sheet) => {
       const bodyItemArr = sheet.bodyItemArr;
-      body = [...bodyItemArr];
+      body = [...body, ...bodyItemArr];
     });
 
     try {
@@ -990,6 +1034,24 @@ export default function WorkSheet() {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新工作單失敗', content: err.message });
+    }
+  };
+
+  /**產生出庫單 */
+  const reqPostDeliveryList = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPostEngineeringDeliveryList({ contractId });
+      myAlert.success({ title: '產生出庫單成功' });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '產生出庫單失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1006,6 +1068,11 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
+    {
+      type: 'myButton',
+      label: '產生出庫單',
+      onClick: reqPostDeliveryList,
+    },
     {
       type: 'myButton',
       label: '編輯',
@@ -1037,32 +1104,68 @@ export default function WorkSheet() {
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
-      <form>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
-            {Object.keys(sheetList).map((key) => {
-              const sheet = sheetList[key];
-              const { itemName, doorModelName, quantity } = sheet;
+            {Object.keys(sheetList).map((pKey) => {
+              const list: Tcontrol_prodCard['list'] = [];
 
-              const onClick = () => {
-                setTargetSheetKey(key);
-              };
+              let qty = 0;
 
-              // const isActive = key === targetSheet?.productId;
-              const isActive = key === targetSheet?.identifyKey;
+              Object.keys(sheetList[pKey]).forEach((cKey) => {
+                const item = sheetList[pKey][cKey];
+                qty += Number(item.quantity);
+
+                const {
+                  itemName,
+                  // doorModelName,
+                  //  quantity
+                  quantity,
+                } = item;
+
+                let isActive = false;
+
+                if (targetSheetKey_p === pKey && targetSheetKey_c === cKey) {
+                  isActive = true;
+                }
+
+                list.push({
+                  itemName: itemName,
+                  qty: quantity,
+                  onClick: () => {
+                    setTargetSheetKey([pKey, cKey]);
+                  },
+                  isActive,
+                  onDivideClick: () => {
+                    setTargetDivideItem(() => {
+                      return (qty: number) => {
+                        item.divideItem(qty);
+                        setTargetDivideItem(undefined);
+                      };
+                    });
+                  },
+                });
+              });
+
+              const originalItem = itemTokenList_new?.[pKey].originalItem;
 
               const control = {
-                itemName,
-                doorType: doorModelName,
-                qty: String(quantity),
+                itemName: originalItem?.itemName ?? '',
+                doorType: originalItem?.doorModelName ?? '',
+                qty: String(qty),
+                list,
               };
 
               return (
-                <div key={key} onClick={onClick}>
-                  <WorkSheetProdCard control={control} isActive={isActive} img={imgIdk} />
+                <div key={pKey}>
+                  <WorkSheetProdCard disabled={disabled} control={control} img={imgIdk} />
                 </div>
               );
             })}
@@ -1098,6 +1201,18 @@ export default function WorkSheet() {
         </div>
         {/* main */}
       </form>
+      <InputModal
+        visible={!!targetDivideItem}
+        title="分堆"
+        placeholder="請輸入數量"
+        onConfirm={(str) => {
+          targetDivideItem?.(Number(str));
+        }}
+        onCancel={() => setTargetDivideItem(undefined)}
+        inputAttr={{
+          type: 'number',
+        }}
+      />
     </SubLayer>
   );
 }

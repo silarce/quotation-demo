@@ -70,7 +70,6 @@ import {
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-import { fi } from 'date-fns/locale';
 
 // ========================================================================
 // ========================================================================
@@ -88,14 +87,12 @@ export default function Quotation() {
 }
 
 // =====================================================================
-// =====================================================================
-// =====================================================================
 function TheQuotation({ router }: { router: NextRouter }) {
   /**合約id，若為undefined就逮代表為新增合約 */
   const contractId = router.query.contractId as string | undefined;
 
   // --------------------------------------------------------------------------
-  const [allowEdit, setAllowEdit] = useState(false);
+  const [disbaled, setDisabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
@@ -238,14 +235,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   useEffect(() => {
-    if (allowEdit) {
-      return;
+    if (disbaled) {
+      reset();
     }
 
-    reset();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowEdit, legacyContract]);
+  }, [disbaled, legacyContract]);
 
   // -----------------------------------------------------------------------
   const [showPdf, setShowPdf] = useState(false);
@@ -302,7 +297,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           }
 
           myAlert.success({ title: '上傳完成' });
-          setAllowEdit(false);
+          setDisabled(true);
         } catch {
           myAlert.err({ title: '上傳失敗' });
         } finally {
@@ -310,14 +305,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       },
     },
-    { type: 'myButton', label: '取消', onClick: () => setAllowEdit(false) },
+    { type: 'myButton', label: '取消', onClick: () => setDisabled(true) },
   ];
 
   const editBtn: TpanelList[number] = !latestBatch
     ? {
         type: 'myButton',
         label: '編輯',
-        onClick: () => setAllowEdit(true),
+        onClick: () => setDisabled(false),
       }
     : undefined;
 
@@ -370,7 +365,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader02 tagList={tagList} panelList={allowEdit ? panel_editable : panel_noEditable} />
+      <PageHeader02 tagList={tagList} panelList={!disbaled ? panel_editable : panel_noEditable} />
 
       <div>
         <div className={style.quotation}>
@@ -378,7 +373,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationProfile
             classLegacyContract={classLegacyContract}
             classBasicInfo={classLegacyContract.classBasicInfo}
-            disabled={!allowEdit}
+            disabled={disbaled}
           />
           {/*  */}
           <div className={style.switchBar}>
@@ -387,7 +382,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 主產品設定 */}
           <QuotationProduction
             legacyContract={classLegacyContract}
-            disabled={!allowEdit}
+            disabled={disbaled}
             isAppend={false}
             control_vKeyArr={{
               vKeyArr: verticalKeyArr,
@@ -395,11 +390,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
             }}
           />
           {/* 其他設定 */}
-          <QuotationAdditions legacyContract={classLegacyContract} disabled={!allowEdit} />
+          <QuotationAdditions legacyContract={classLegacyContract} disabled={disbaled} />
           {/* 備註/報價範圍/付款資訊 */}
-          <QuotationTotal legacyContract={classLegacyContract} disabled={!allowEdit} appendixParams={appendixParams} />
+          <QuotationTotal legacyContract={classLegacyContract} disabled={disbaled} appendixParams={appendixParams} />
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={!allowEdit} />
+          <QuotationSinature signatureArr={signatureArr} disabled={disbaled} />
         </div>
       </div>
       <QuotationPdf

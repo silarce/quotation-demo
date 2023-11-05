@@ -26,6 +26,9 @@ import type {
   TcreateWorkSheetDto,
   TupdateWorkSheetItem,
   TupdateWorkSheet,
+  TengineeringDeliveryListDto,
+  TupdateEngineeringDeliveryList,
+  TupdateDeliveryStatus,
 } from './dtoTypes';
 
 export type {
@@ -44,6 +47,9 @@ export type {
   TcreateElectronicSuppliesRecordDto,
   TupdateWorkSheetItem,
   TupdateWorkSheet,
+  TengineeringDeliveryListDto,
+  TupdateEngineeringDeliveryList,
+  TupdateDeliveryStatus,
 } from './dtoTypes';
 
 // ========================================================================
@@ -606,6 +612,75 @@ export const apiPostWorkSheet = (body: TcreateWorkSheetDto) => {
 
 export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet) => {
   const api = `/engineering/worksheet/${id}/products`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 出庫單
+export const apiPostEngineeringDeliveryList = (body: {
+  contractId?: string | null;
+  legacyContractId?: string | null;
+}) => {
+  const api = '/engineering/delivery-list';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiGetEngineeringDeliveryList = (id: string) => {
+  const api = `engineering/delivery-list/${id}`;
+
+  const params = {
+    populate: [
+      'contract.worksheet.contractProductItems.deliveryStatus.installerEmployee',
+      'contract.worksheet.contractProductItems.adjustedItem',
+    ],
+  };
+
+  return axi
+    .get<TengineeringDeliveryListDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetEngineeringDeliveryList = (id: string | undefined | null) => {
+  const [res, setRes] = useState<TengineeringDeliveryListDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const res = await apiGetEngineeringDeliveryList(id);
+
+      if (res) {
+        setRes(res);
+      }
+
+      return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得出庫單失敗', content: err.message });
+
+      return;
+    }
+  };
+
+  return {
+    deliveryList: res,
+    update_deliveryList: update,
+  };
+};
+
+/**更新出庫單 */
+export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryList) => {
+  const api = `/engineering/delivery-list/${id}`;
 
   return axi
     .patch(api, body)

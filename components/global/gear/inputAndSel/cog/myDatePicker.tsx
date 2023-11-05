@@ -1,4 +1,5 @@
 import { ChangeEvent, InputHTMLAttributes, CSSProperties, FocusEvent, Dispatch, SetStateAction } from 'react';
+import { CalendarOutlined } from '@ant-design/icons';
 
 import moment from 'moment';
 // antd
@@ -101,6 +102,7 @@ export default function MyDatePicker({
         onFocus={theOnFocus}
         onBlur={theOnBlur}
         inputReadOnly={true}
+        suffixIcon={disabled ? null : <CalendarOutlined />}
         {...{
           // 上面的showToday有型別錯誤，不知道為什麼
           showToday: false,
