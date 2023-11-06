@@ -365,9 +365,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: discount,
-        subTotal: String(subTotal),
-        salesTax: String(salesTax),
-        total: String(total),
+        subTotal: subTotal.toLocaleString(),
+        salesTax: salesTax.toLocaleString(),
+        total: total.toLocaleString(),
         deliveryLocation,
         deliveryDate,
       });
