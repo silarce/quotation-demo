@@ -584,16 +584,7 @@ class Class_product {
     }
 
     const body = (() => {
-      // let fullWidth: number | undefined;
-      // let WG: number | undefined;
-
       const fullWidth = Number(this.fullWidth || 0) * 1000;
-
-      // if (Number(this.fullWidth)) {
-      //   fullWidth = Number(this.fullWidth) * 1000;
-      // } else if (Number(this.WG)) {
-      //   WG = Number(this.WG) * 1000;
-      // }
 
       return {
         modelName: this.doorType as TpcgsPrams['modelName'],
@@ -2244,7 +2235,7 @@ class Class_product {
       id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
-      materialSurface: this.surface,
+      materialSurface: this.surface || null,
       guideRail: this.doorTrack,
       motorVendor: this.motor,
       guideRailThickness: Number(this.doorTrackThick),

@@ -165,7 +165,7 @@ const useProductList = ({
 
         doorType: prod.doorModelName,
         material: prod.materialName,
-        surface: prod.materialSurface,
+        surface: prod.materialSurface ?? '',
         close: prod.closingType,
         doorTrack: prod.guideRail,
         typhoonProtection: prod.isAntiTyphoon,
@@ -490,7 +490,7 @@ const useProductList = ({
 
           doorType: prod.doorModelName,
           material: prod.materialName,
-          surface: prod.materialSurface,
+          surface: prod.materialSurface ?? '',
           close: prod.closingType,
           doorTrack: prod.guideRail,
           typhoonProtection: prod.isAntiTyphoon,

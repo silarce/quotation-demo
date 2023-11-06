@@ -253,7 +253,7 @@ export default function OutboundOrder() {
           doorType: firstItem.doorModelName,
           material: firstItem.materialName,
           horsepower: firstItem.horsepower,
-          surface: firstItem.materialSurface,
+          surface: firstItem.materialSurface ?? '',
         },
         deliveryStatus: {
           remark01: {
@@ -329,7 +329,7 @@ export default function OutboundOrder() {
             doorType: item.doorModelName,
             material: item.materialName,
             horsepower: item.horsepower,
-            surface: item.materialSurface,
+            surface: item.materialSurface ?? '',
           },
           deliveryStatus: {
             remark01: {
