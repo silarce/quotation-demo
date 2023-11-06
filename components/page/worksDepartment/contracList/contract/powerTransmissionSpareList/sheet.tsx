@@ -65,15 +65,7 @@ type Tcontroll = {
 export type { Tcontroll };
 
 // ==================================================================
-export default function Sheet({
-  editable,
-  isAdd,
-  controll,
-}: {
-  editable: boolean;
-  isAdd?: boolean;
-  controll: Tcontroll;
-}) {
+export default function Sheet({ editable, controll }: { editable: boolean; controll: Tcontroll }) {
   return (
     <div className={style.sheet}>
       <div className={style.thead}>

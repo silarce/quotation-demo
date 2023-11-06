@@ -777,7 +777,7 @@ export default function Edit() {
       <div className={`${style.mainContainer}`}>
         <div className={style.powerTransmissionSpareList}>
           <Profile controll={control_profile} disabled={disabled} />
-          <Sheet editable={!disabled} isAdd={true} controll={controll_sheet} />
+          <Sheet editable={!disabled} controll={controll_sheet} />
           <Signature controll={contrll_signature} disabled={disabled} />
         </div>
       </div>
