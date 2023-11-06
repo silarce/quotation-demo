@@ -1142,7 +1142,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setDisabled(true);
     } catch (error) {
-      console.log(error);
+      const err = error as Error;
+      myAlert.err({ title: '更新報價單失敗', content: err.message });
     } finally {
       setIsLoading(false);
       showRootLoading(false);
