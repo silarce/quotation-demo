@@ -68,9 +68,9 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
         date: content.quotationDate,
         // describe: content.editNotes,
         describe: '',
-        discount: content.discount,
-        doorQty: String(content.quantity),
-        contractAmount: content.total.toLocaleString(),
+        // discount: content.discount,
+        // doorQty: String(content.quantity),
+        // contractAmount: content.total.toLocaleString(),
         onIconClick: () => {
           router.push({
             pathname: '/worksDepartment/contractList/contract/workContactDoc',
