@@ -1,0 +1,8 @@
+$pdfWidth: calc(595px * 2);
+$pdfHeight: calc(842px * 2);
+
+.standardPdf {
+  width: $pdfWidth;
+  height: $pdfHeight;
+  padding: 60px 40px;
+}

@@ -15,6 +15,7 @@ import Sheet, {
 import Signature, {
   Tcontroll as Tcontroll_Signature,
 } from 'components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/signature';
+import SheetPDF from 'components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/sheetPDF/sheetPDF';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -781,6 +782,7 @@ export default function Edit() {
           <Signature controll={contrll_signature} disabled={disabled} />
         </div>
       </div>
+      <SheetPDF />
     </SubLayer>
   );
 }
