@@ -162,7 +162,7 @@ export default function WorkSheet() {
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList, itemTokenList_new, itemIdArrList_new } = useMemo(() => {
+  const { itemTokenList, itemIdArrList } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -182,44 +182,17 @@ export default function WorkSheet() {
 
     const contractProductItems = workSheet.contractProductItems;
 
-    const itemTokenList: { [key: string]: TquotationProductItemDto } = {};
-    const itemIdArrList: { [key: string]: string[] } = {};
-
-    contractProductItems.forEach((item) => {
-      const { productId, adjustedItem, adjustedItemId } = item;
-
-      let theItem: typeof item;
-      let theId: string;
-
-      if (adjustedItem && adjustedItemId) {
-        theItem = adjustedItem;
-        theId = adjustedItemId;
-      } else {
-        theItem = item;
-        theId = productId;
-      }
-
-      itemTokenList[theId] = theItem;
-
-      //
-      if (!itemIdArrList[theId]) {
-        itemIdArrList[theId] = [];
-      }
-
-      itemIdArrList[theId].push(item.id);
-    });
-
-    type TitemTokenList_new = {
+    type TitemTokenList = {
       [key: string]: {
         originalItem: TquotationProductItemDto;
         [key: string]: TquotationProductItemDto;
       };
     };
 
-    type TitemIdArrList_new = { [key: string]: { [key: string]: string[] } };
+    type TitemIdArrList = { [key: string]: { [key: string]: string[] } };
 
-    const itemTokenList_new: TitemTokenList_new = {};
-    const itemIdArrList_new: TitemIdArrList_new = {};
+    const itemTokenList: TitemTokenList = {};
+    const itemIdArrList: TitemIdArrList = {};
 
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
@@ -235,36 +208,29 @@ export default function WorkSheet() {
         theId = productId;
       }
 
-      if (!itemTokenList_new[productId]) {
-        itemTokenList_new[productId] = {
+      if (!itemTokenList[productId]) {
+        itemTokenList[productId] = {
           originalItem: item,
         };
       }
 
-      itemTokenList_new[productId][theId] = theItem;
+      itemTokenList[productId][theId] = theItem;
 
       //
-      if (!itemIdArrList_new[productId]) {
-        itemIdArrList_new[productId] = {};
+      if (!itemIdArrList[productId]) {
+        itemIdArrList[productId] = {};
       }
 
-      if (!itemIdArrList_new[productId][theId]) {
-        itemIdArrList_new[productId][theId] = [];
+      if (!itemIdArrList[productId][theId]) {
+        itemIdArrList[productId][theId] = [];
       }
 
-      itemIdArrList_new[productId][theId].push(item.id);
+      itemIdArrList[productId][theId].push(item.id);
     });
 
-    // console.log(itemTokenList_new);
-    // console.log(itemIdArrList_new);
-
-    // console.log('itemIdArrList', itemIdArrList);
-
     return {
-      itemTokenList,
-      itemIdArrList,
-      itemTokenList_new,
-      itemIdArrList_new,
+      itemTokenList: itemTokenList,
+      itemIdArrList: itemIdArrList,
     };
   }, [workSheet]);
 
@@ -289,8 +255,8 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const { sheetList, changedSheetList, reset } = useWorkSheet({
-    itemTokenList: itemTokenList_new ?? {},
-    itemIdArrList: itemIdArrList_new ?? {},
+    itemTokenList: itemTokenList ?? {},
+    itemIdArrList: itemIdArrList ?? {},
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
@@ -1154,7 +1120,7 @@ export default function WorkSheet() {
                 });
               });
 
-              const originalItem = itemTokenList_new?.[pKey].originalItem;
+              const originalItem = itemTokenList?.[pKey].originalItem;
 
               const control = {
                 itemName: originalItem?.itemName ?? '',
