@@ -25,7 +25,9 @@ export default function Table({ productList }: { productList: TtableProdList }) 
   const [svgList, setSvgList] = useState<{ [key: string]: string | undefined }>({});
 
   const getSvg = async ({ fileName }: { fileName: string }) => {
-    if (!!svgList[fileName]) {
+    // console.log(fileName);
+
+    if (svgList[fileName]) {
       return;
     }
 
@@ -90,7 +92,9 @@ export default function Table({ productList }: { productList: TtableProdList }) 
                 const arr = value.split('/');
                 const fileName = arr[arr.length - 1];
 
-                getSvg({ fileName: fileName });
+                if (fileName) {
+                  getSvg({ fileName: fileName });
+                }
 
                 svgString = svgList[`${fileName}`] ?? '';
               }
