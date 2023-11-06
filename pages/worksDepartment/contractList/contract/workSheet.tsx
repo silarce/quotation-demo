@@ -1009,6 +1009,7 @@ export default function WorkSheet() {
 
     console.log(body);
     console.log(deleteIdArr);
+    myAlert.info({ title: 'api還未更新，此功能不可用' });
 
     // try {
     //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
