@@ -1023,6 +1023,7 @@ class Class_workSheet {
     }
 
     const theItem = this.bodyItemArr[0];
+    theItem.itemName = `${theItem.itemName}-new`;
 
     const itemIdArr = this.itemIdArr.reverse().splice(0, qty);
 
