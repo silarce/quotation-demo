@@ -996,19 +996,28 @@ export default function WorkSheet() {
 
     let body: TupdateWorkSheetItem[] = [];
 
+    let deleteIdArr: string[] = [];
+
     Object.values(changedSheetList).forEach((sheet) => {
-      const bodyItemArr = sheet.bodyItemArr;
-      body = [...body, ...bodyItemArr];
+      if (sheet.isOriginal) {
+        deleteIdArr = [...deleteIdArr, ...sheet.idArrShouldDelete];
+      } else {
+        const bodyItemArr = sheet.bodyItemArr;
+        body = [...body, ...bodyItemArr];
+      }
     });
 
-    try {
-      await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
-      await update_workSheet();
-      setDisabled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新工作單失敗', content: err.message });
-    }
+    console.log(body);
+    console.log(deleteIdArr);
+
+    // try {
+    //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+    //   await update_workSheet();
+    //   setDisabled(true);
+    // } catch (error) {
+    //   const err = error as Error;
+    //   myAlert.err({ title: '更新工作單失敗', content: err.message });
+    // }
   };
 
   /**產生出庫單 */

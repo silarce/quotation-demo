@@ -122,8 +122,6 @@ const useWorkSheet = ({
       sheetList[pKey][pKey].gatherBack(itemIdArr);
       delete sheetList[pKey][cKey];
 
-      console.log(sheetList);
-
       return { ...sheetList };
     });
   };

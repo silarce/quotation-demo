@@ -1069,7 +1069,17 @@ class Class_workSheet {
   gatherBack(itemIdArr: string[]) {
     this._itemIdArr = [...this._itemIdArr, ...itemIdArr];
 
-    this.forceUpdate({ isNoChange: true });
+    // this.forceUpdate({ isNoChange: true });
+    this.forceUpdate();
+  }
+
+  get idArrShouldDelete() {
+    this._originalIdArr;
+    this._itemIdArr;
+
+    const arr = _.difference(this._itemIdArr, this._originalIdArr ?? []);
+
+    return arr;
   }
 
   // --------------------------------------------------------------
