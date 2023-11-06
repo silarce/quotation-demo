@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 
 import Image, { StaticImageData } from 'next/image';
+import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 import scss from './workSheetProdCard.module.scss';
 
@@ -17,6 +18,7 @@ type Tcontrol = {
     onClick: () => void;
     isActive?: boolean;
     onDivideClick: () => void;
+    onDeleteClick: () => void;
   }[];
 };
 
@@ -61,6 +63,7 @@ export default function WorkSheetProdCard({
               <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
                 分堆
               </button>
+              <IconDelete01 className={classNames(disabled && scss.hidden)} />
             </div>
           );
         })}

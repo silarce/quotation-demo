@@ -1126,6 +1126,7 @@ export default function WorkSheet() {
                       };
                     });
                   },
+                  onDeleteClick: () => {},
                 });
               });
 
