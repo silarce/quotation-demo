@@ -7,21 +7,28 @@
   border: solid 1px $colorBorder01;
   background-color: $bgc01;
   border-bottom-color: transparent;
+
+  overflow: scroll;
+
   > button,
   > div,
   > a,
   .fakeA {
-    flex: auto;
-    position: relative;
+    // flex: auto;
     display: inline-flex;
+    flex: none;
+    position: relative;
+
     > span {
+      padding: 0 20px;
       font-weight: 400;
       font-size: 18px;
       margin: auto;
     }
     > .bottomBar {
       position: absolute;
-      bottom: -2px;
+      // bottom: -2px;
+      bottom: 0px;
       width: 100%;
       border-width: 0 0 2px 0;
       border-color: transparent;
