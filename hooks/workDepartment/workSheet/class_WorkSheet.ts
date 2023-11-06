@@ -52,6 +52,7 @@ class Class_workSheet {
     identifyKey_p,
     identifyKey_c,
     addSheet,
+    deleteSheet,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -69,6 +70,7 @@ class Class_workSheet {
       cKey: string;
       itemIdArr: string[];
     }) => void;
+    deleteSheet: () => void;
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
@@ -77,6 +79,7 @@ class Class_workSheet {
     this.identifyKey_p = identifyKey_p;
     this.identifyKey_c = identifyKey_c;
     this._addSheet = addSheet;
+    this._deleteSheet = deleteSheet;
 
     this._fullWidth_str = String(this._prod.fullWidth / 1000);
     this._height_str = String(this._prod.height / 1000);
@@ -122,6 +125,7 @@ class Class_workSheet {
   readonly identifyKey_p;
   readonly identifyKey_c;
   private _addSheet;
+  private _deleteSheet;
   // ---------------------------------------------------------------------
 
   private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -1014,19 +1018,25 @@ class Class_workSheet {
       return myAlert.info({ title: '分堆數量不可小於1' });
     }
 
-    if (qty >= Number(this.quantity)) {
-      return myAlert.info({ title: '分堆數量不可大於原本數量' });
+    if (qty > Number(this.quantity)) {
+      return myAlert.info({ title: '分堆數量大於原本數量' });
     }
+
+    const theItem = this.bodyItemArr[0];
 
     const itemIdArr = this.itemIdArr.reverse().splice(0, qty);
 
     this._addSheet({
-      item: this.bodyItemArr[0],
+      item: theItem,
       oldItem: this.oldProd,
       pKey: this.identifyKey_p,
       cKey: itemIdArr[0],
       itemIdArr: itemIdArr,
     });
+
+    if (this.itemIdArr.length <= 0 && !this.isOriginal) {
+      this._deleteSheet();
+    }
 
     this.forceUpdate({ isNoChange: true });
   }

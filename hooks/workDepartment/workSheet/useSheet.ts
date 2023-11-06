@@ -84,9 +84,25 @@ const useWorkSheet = ({
         oldProd: oldItem,
         itemIdArr: itemIdArr,
         addSheet,
+        deleteSheet: () => deleteSheet({ pKey, cKey }),
       });
       // 分堆了，就要記錄在被改變清單中
       setChangedSheetList((state) => ({ ...state, [cKey]: sheetList[pKey][cKey] }));
+
+      return { ...sheetList };
+    });
+  };
+
+  const deleteSheet = ({
+    //
+    pKey,
+    cKey,
+  }: {
+    pKey: string;
+    cKey: string;
+  }) => {
+    setSheetList((sheetList) => {
+      delete sheetList[pKey][cKey];
 
       return { ...sheetList };
     });
@@ -121,6 +137,7 @@ const useWorkSheet = ({
           oldProd: prod,
           itemIdArr: itemIdArrList[pKey][cKey],
           addSheet,
+          deleteSheet: () => deleteSheet({ pKey, cKey }),
         });
       });
     });

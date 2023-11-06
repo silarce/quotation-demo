@@ -211,7 +211,7 @@ export default function WorkSheet() {
       if (!itemTokenList[productId]) {
         itemTokenList[productId] = {
           originalItem: item,
-          [productId]: item,
+          [productId]: item, //itemTokenList[productId][productId] 為原始資料
         };
       }
 
@@ -220,7 +220,7 @@ export default function WorkSheet() {
       //
       if (!itemIdArrList[productId]) {
         itemIdArrList[productId] = {
-          [productId]: [],
+          [productId]: [], //itemIdArrList[productId][productId] 為原始資料代表的itemId陣列
         };
       }
 

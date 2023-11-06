@@ -49,7 +49,6 @@ export default function WorkSheetProdCard({
       <div className={scss.list}>
         {control.list.map((item, index) => {
           const { isOriginal, itemName, qty, onClick, isActive, onDivideClick } = item;
-          console.log(isOriginal);
 
           return (
             <div
