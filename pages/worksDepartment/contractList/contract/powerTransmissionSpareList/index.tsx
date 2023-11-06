@@ -13,8 +13,8 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // api
-import { useGetElectronicSupplies } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
 
 // helper
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
@@ -41,12 +41,21 @@ export default function PowerTransmissionSpareList() {
   };
 
   const { data: contract, update } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId ?? '';
+
   const { data: electronicSuppliesArr, update: updateElectronicSupplies } = useGetElectronicSupplies(customParams);
+
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
 
   useEffect(() => {
     update();
     updateElectronicSupplies();
   }, [contractId]);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
 
   // ----------------------------------------------------
 
@@ -55,8 +64,8 @@ export default function PowerTransmissionSpareList() {
       return {
         id: item.id,
         quotationNumber: contract?.content.quotationNumber ?? '',
-        projectNumber: item.projectNumber,
-        projectName: item.projectName,
+        projectNumber: engineeringContact?.projectNumber ?? '',
+        projectName: engineeringContact?.projectName ?? '',
         neededDate: moment(convertDate_reduce1911(item.requirementsDate)).format('yy-MM-DD') || '',
         applyDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD') || '',
       };
@@ -136,8 +145,6 @@ type TspareData = {
   applyDate: string;
 };
 
-type TindexKeys = keyof TspareData;
-
 const indexKeys = ['quotationNumber', 'projectNumber', 'projectName', 'neededDate', 'applyDate'] as const;
 
 const config = {
@@ -157,18 +164,3 @@ const config = {
     label: '填表日期',
   },
 } as const;
-
-// const fakeDataListOri = (): TspareData[] => {
-//   const dataOri = () => ({
-//     quotationNumber: '111001',
-//     projectNumber: 'M-1102112',
-//     projectName: '台中港加工處理區-宇隆科技廠房增建工程A',
-//     neededDate: '111-02-02',
-//     applyDate: '111-02-02',
-//   });
-//   const arr = new Array(30).fill(undefined).map((item, index, arr) => {
-//     return (arr[index] = dataOri());
-//   });
-
-//   return arr;
-// };
