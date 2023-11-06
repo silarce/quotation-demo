@@ -92,7 +92,6 @@ export default function EmployeeSelector({
       return;
     }
 
-    // setSelEmployeeArr([]);
     reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +109,12 @@ export default function EmployeeSelector({
       setSelEmployeeArr(defaultEmpArr);
     }
 
-    update_department();
+    (async () => {
+      try {
+        const res = await update_department();
+      } catch (error) {}
+    })();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
@@ -180,12 +184,13 @@ export default function EmployeeSelector({
   const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
     {
       selectProps: {
-        wrapperStyle: { width: '120px' },
+        wrapperStyle: { width: '160px' },
         props: {
           options: optionArr,
-          placeholder: '選擇部門',
+          // placeholder: '選擇部門',
+          placeholder: departmentData ? '選擇部門' : departmentData === null ? '無法取得部門' : '正在取得部門',
           menuPortalTarget: undefined,
-          isLoading: !departmentData,
+          isLoading: departmentData === null ? false : !departmentData,
         },
       },
     },
