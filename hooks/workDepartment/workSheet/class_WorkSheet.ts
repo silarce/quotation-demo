@@ -514,6 +514,11 @@ class Class_workSheet {
   }
 
   // ---------------------------------------------------------------------
+
+  get isOriginal() {
+    return this.identifyKey_p === this.identifyKey_c;
+  }
+
   get productId() {
     return this._prod.productId;
   }

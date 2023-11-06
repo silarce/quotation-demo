@@ -226,7 +226,16 @@ export default function WorkSheet() {
       }
 
       itemIdArrList[productId][theId].push(item.id);
+
+      // ____________________
+      if (!itemTokenList[productId][productId]) {
+        itemTokenList[productId][productId] = item;
+        itemIdArrList[productId][productId] = [];
+      }
     });
+
+    // console.log(itemTokenList);
+    // console.log(itemIdArrList);
 
     return {
       itemTokenList: itemTokenList,
@@ -1103,6 +1112,7 @@ export default function WorkSheet() {
                 }
 
                 list.push({
+                  isOriginal: item.isOriginal,
                   itemName: itemName,
                   qty: quantity,
                   onClick: () => {

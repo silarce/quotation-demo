@@ -54,6 +54,12 @@
     > .active {
       background-color: #ffeeee;
     }
+    > .original {
+      background-color: cornflowerblue;
+      >span{
+        color:white;
+      }
+    }
   }
 }
 

@@ -11,6 +11,7 @@ type Tcontrol = {
   doorType: string;
   qty: string;
   list: {
+    isOriginal: boolean;
     itemName: string;
     qty: string;
     onClick: () => void;
@@ -47,10 +48,15 @@ export default function WorkSheetProdCard({
       </div>
       <div className={scss.list}>
         {control.list.map((item, index) => {
-          const { itemName, qty, onClick, isActive, onDivideClick } = item;
+          const { isOriginal, itemName, qty, onClick, isActive, onDivideClick } = item;
+          console.log(isOriginal);
 
           return (
-            <div key={index} className={classNames(isActive && scss.active)} onClick={onClick}>
+            <div
+              key={index}
+              className={classNames(isOriginal && scss.original, isActive && scss.active)}
+              onClick={onClick}
+            >
               <span>{itemName}</span>
               <span>{qty}樘</span>
               <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
@@ -59,15 +65,6 @@ export default function WorkSheetProdCard({
             </div>
           );
         })}
-        {/* <div>
-          <span>123</span>
-        </div>
-        <div>
-          <span>123</span>
-        </div>
-        <div>
-          <span>123</span>
-        </div> */}
       </div>
     </div>
   );
