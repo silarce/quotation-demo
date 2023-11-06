@@ -301,6 +301,9 @@ export default function QuotationList() {
       onClick: () => {
         router.push({
           pathname: `/domestic/quotationList/quotation`,
+          query: {
+            status,
+          },
         });
       },
     },
