@@ -1228,13 +1228,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
     // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
-    const lw = Number(prod.fullWidth || 0) * 100;
-    const h = Number(prod.height || 0) * 100;
-    const b = Number(prod.boxB || 0) * 100;
+
+    const lw = new Decimal(prod.fullWidth || 0).mul(10).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
     const size = `${lw} X ${h} + ${b}`;
 
-    // const foo = prod.comList;
     const list = { ...prod.comList, ...prod.subComList };
     delete list['sidePlate'];
     delete list['motorAccessories'];
