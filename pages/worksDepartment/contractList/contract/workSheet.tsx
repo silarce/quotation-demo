@@ -1083,6 +1083,8 @@ export default function WorkSheet() {
   const panelList = disabled ? panelList_allow : panelList_notAllow;
   // -----------------------------------------------------------------
 
+  const forbidden = targetSheet?.isOriginal;
+
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
@@ -1163,13 +1165,13 @@ export default function WorkSheet() {
               control={control_product}
               oldProductOutline={oldProductOutline}
               onCalcClick={onCalcClick}
-              disabled={disabled}
+              disabled={forbidden || disabled}
             />
 
             <hr />
             <WorkSheetProductDetail01
               control={control_detail}
-              disabled={disabled}
+              disabled={forbidden || disabled}
               supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
@@ -1177,7 +1179,7 @@ export default function WorkSheet() {
             <WorkSheetOptional
               control={control_optional}
               optionArr={targetSheet?.accessoriesOptionArr_easy ?? []}
-              disabled={disabled}
+              disabled={forbidden || disabled}
             />
             <hr />
             <WorkSheetProductDetail02 control={control_detail02} />
