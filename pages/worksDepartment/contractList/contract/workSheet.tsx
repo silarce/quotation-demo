@@ -211,6 +211,7 @@ export default function WorkSheet() {
       if (!itemTokenList[productId]) {
         itemTokenList[productId] = {
           originalItem: item,
+          [productId]: item,
         };
       }
 
@@ -218,7 +219,9 @@ export default function WorkSheet() {
 
       //
       if (!itemIdArrList[productId]) {
-        itemIdArrList[productId] = {};
+        itemIdArrList[productId] = {
+          [productId]: [],
+        };
       }
 
       if (!itemIdArrList[productId][theId]) {
@@ -227,12 +230,8 @@ export default function WorkSheet() {
 
       itemIdArrList[productId][theId].push(item.id);
 
-      // ____________________
-      if (!itemTokenList[productId][productId]) {
-        itemTokenList[productId][productId] = item;
-        itemIdArrList[productId][productId] = [];
-      }
-    });
+      //
+    }); //  forEach close
 
     // console.log(itemTokenList);
     // console.log(itemIdArrList);
