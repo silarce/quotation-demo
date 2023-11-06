@@ -22,12 +22,10 @@ export type TtableProdList = {
 }[];
 
 export default function Table({ productList }: { productList: TtableProdList }) {
-  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined }>({});
+  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
 
   const getSvg = async ({ fileName }: { fileName: string }) => {
-    // console.log(fileName);
-
-    if (svgList[fileName]) {
+    if (svgList[fileName] !== null) {
       return;
     }
 
@@ -45,7 +43,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
     } catch (error) {
       setSvgList((list) => ({
         ...list,
-        [fileName]: undefined,
+        [fileName]: null,
       }));
     }
   };
