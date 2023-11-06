@@ -50,7 +50,7 @@ export default function WorkSheetProdCard({
       </div>
       <div className={scss.list}>
         {control.list.map((item, index) => {
-          const { isOriginal, itemName, qty, onClick, isActive, onDivideClick } = item;
+          const { isOriginal, itemName, qty, onClick, isActive, onDivideClick, onDeleteClick } = item;
 
           return (
             <div
@@ -63,7 +63,7 @@ export default function WorkSheetProdCard({
               <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
                 分堆
               </button>
-              <IconDelete01 className={classNames(disabled && scss.hidden)} />
+              <IconDelete01 className={classNames((disabled || isOriginal) && scss.hidden)} onClick={onDeleteClick} />
             </div>
           );
         })}

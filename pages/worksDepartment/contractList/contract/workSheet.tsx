@@ -1126,7 +1126,7 @@ export default function WorkSheet() {
                       };
                     });
                   },
-                  onDeleteClick: () => {},
+                  onDeleteClick: () => item.clearSheet(),
                 });
               });
 

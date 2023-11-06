@@ -53,6 +53,7 @@ class Class_workSheet {
     identifyKey_c,
     addSheet,
     deleteSheet,
+    clearSheet,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -71,15 +72,21 @@ class Class_workSheet {
       itemIdArr: string[];
     }) => void;
     deleteSheet: () => void;
+    clearSheet: () => void;
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
     this.oldProd = oldProd;
-    this.itemIdArr = itemIdArr;
+    this._itemIdArr = itemIdArr;
     this.identifyKey_p = identifyKey_p;
     this.identifyKey_c = identifyKey_c;
     this._addSheet = addSheet;
     this._deleteSheet = deleteSheet;
+    this._clearSheet = clearSheet;
+
+    if (this.identifyKey_p === this.identifyKey_c) {
+      this._originalIdArr = _.cloneDeep(this._itemIdArr);
+    }
 
     this._fullWidth_str = String(this._prod.fullWidth / 1000);
     this._height_str = String(this._prod.height / 1000);
@@ -121,11 +128,14 @@ class Class_workSheet {
   private _prod: TquotationProductItemDto | TupdateWorkSheetItem;
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
-  private itemIdArr: string[];
-  readonly identifyKey_p;
-  readonly identifyKey_c;
+  private _itemIdArr: string[];
+  readonly identifyKey_p: string;
+  readonly identifyKey_c: string;
   private _addSheet;
   private _deleteSheet;
+  private _clearSheet;
+
+  private _originalIdArr: string[] | undefined = undefined;
   // ---------------------------------------------------------------------
 
   private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -530,6 +540,10 @@ class Class_workSheet {
     return this._prod.adjustedItemId;
   }
 
+  get itemIdArr() {
+    return this._itemIdArr;
+  }
+
   get accessoriesOptionArr() {
     return this._accessoriesOptionArr;
   }
@@ -616,7 +630,7 @@ class Class_workSheet {
   }
 
   get quantity() {
-    return String(this.itemIdArr.length);
+    return String(this._itemIdArr.length);
   }
   // set quantity(str) {
   //   this._prod.quantity = Number(str);
@@ -1025,7 +1039,7 @@ class Class_workSheet {
     const theItem = this.bodyItemArr[0];
     theItem.itemName = `${theItem.itemName}-new`;
 
-    const itemIdArr = this.itemIdArr.reverse().splice(0, qty);
+    const itemIdArr = this._itemIdArr.reverse().splice(0, qty);
 
     this._addSheet({
       item: theItem,
@@ -1035,9 +1049,25 @@ class Class_workSheet {
       itemIdArr: itemIdArr,
     });
 
-    if (this.itemIdArr.length <= 0 && !this.isOriginal) {
+    if (this._itemIdArr.length <= 0 && !this.isOriginal) {
       this._deleteSheet();
     }
+
+    this.forceUpdate({ isNoChange: true });
+  }
+
+  clearSheet() {
+    if (this.isOriginal) {
+      alert('原始item不應該清除');
+    }
+
+    this._clearSheet();
+    this._itemIdArr = [];
+    this.forceUpdate({ isNoChange: true });
+  }
+
+  gatherBack(itemIdArr: string[]) {
+    this._itemIdArr = [...this._itemIdArr, ...itemIdArr];
 
     this.forceUpdate({ isNoChange: true });
   }
@@ -1068,7 +1098,7 @@ class Class_workSheet {
     });
 
     // contractProductItems
-    return this.itemIdArr.map((id) => {
+    return this._itemIdArr.map((id) => {
       const item: TupdateWorkSheetItem = {
         // ...this._prod,
         // id: id,

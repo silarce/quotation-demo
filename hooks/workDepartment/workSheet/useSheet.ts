@@ -85,6 +85,7 @@ const useWorkSheet = ({
         itemIdArr: itemIdArr,
         addSheet,
         deleteSheet: () => deleteSheet({ pKey, cKey }),
+        clearSheet: () => clearSheet({ pKey, cKey }),
       });
       // 分堆了，就要記錄在被改變清單中
       setChangedSheetList((state) => ({ ...state, [cKey]: sheetList[pKey][cKey] }));
@@ -107,6 +108,27 @@ const useWorkSheet = ({
       return { ...sheetList };
     });
   };
+
+  const clearSheet = ({
+    //
+    pKey,
+    cKey,
+  }: {
+    pKey: string;
+    cKey: string;
+  }) => {
+    setSheetList((sheetList) => {
+      const itemIdArr = sheetList[pKey][cKey].itemIdArr;
+      sheetList[pKey][pKey].gatherBack(itemIdArr);
+      delete sheetList[pKey][cKey];
+
+      console.log(sheetList);
+
+      return { ...sheetList };
+    });
+  };
+
+  // --------------------------------------------------------------------
 
   const reset = async () => {
     const list: TsheetList = {};
@@ -138,6 +160,7 @@ const useWorkSheet = ({
           itemIdArr: itemIdArrList[pKey][cKey],
           addSheet,
           deleteSheet: () => deleteSheet({ pKey, cKey }),
+          clearSheet: () => clearSheet({ pKey, cKey }),
         });
       });
     });
