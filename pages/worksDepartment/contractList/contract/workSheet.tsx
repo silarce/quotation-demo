@@ -1122,7 +1122,7 @@ export default function WorkSheet() {
             material: sheet.com_bottomBar_material,
             guideRailsOpening: sheet.guideRailsOpening,
           },
-          memo: 'foooooooooooooo',
+          memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
         };
         workSheetPDF_01_itemArr.push(control_item);
       });
@@ -1141,8 +1141,7 @@ export default function WorkSheet() {
       // 出貨日
       shippingDate: '999-999-99',
     },
-    // itemArr: workSheetPDF_01_itemArr,
-    itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    itemArr: workSheetPDF_01_itemArr,
   };
 
   // -------------------------------------------------------------------------

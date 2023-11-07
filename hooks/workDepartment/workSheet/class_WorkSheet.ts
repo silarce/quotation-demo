@@ -205,6 +205,8 @@ class Class_workSheet {
       this._accessoriesOptionList = list;
       this._acceIdArr = arr;
     }
+
+    this.forceUpdate({ isNoChange: true });
   }
 
   async getProdSpec() {
@@ -1022,6 +1024,16 @@ class Class_workSheet {
   set acceIdArr(arr) {
     this._acceIdArr = arr;
     this.forceUpdate();
+  }
+
+  get acceNameArr() {
+    if (!_.isNil(this._accessoriesOptionList)) {
+      return this._acceIdArr;
+    }
+
+    return this._acceIdArr.map((id) => {
+      return this._accessoriesOptionList[id]?.name ?? '';
+    });
   }
 
   // --------------------------------------------------------------
