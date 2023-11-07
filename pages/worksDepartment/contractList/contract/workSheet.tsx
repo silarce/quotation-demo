@@ -70,6 +70,9 @@ import WorkSheetOptional, {
 import WorkSheetProductDetail02, {
   Tcontrol_detail02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
+import WorkSheetPDF, {
+  Tcontrol_workSheetPDF_01,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -135,6 +138,8 @@ export default function WorkSheet() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
+
+  const [isShowPdf, setIsShowPdf] = useState(false);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -1051,7 +1056,98 @@ export default function WorkSheet() {
   };
 
   // -------------------------------------------------------------------------
+
+  const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
+
+  // 用if是為了節省效能
+  if (isShowPdf) {
+    Object.values(sheetList).forEach((subList) => {
+      Object.values(subList).forEach((sheet) => {
+        const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
+          itemName: sheet.itemName,
+          size: {
+            qty: sheet.quantity,
+            doorModelName: sheet.doorModelName,
+            fullWidth: sheet.fullWidth,
+            height: sheet.height,
+            WG: sheet.WG,
+            gapA: numToStr(sheet.prodSpec?.gapA),
+            gapC: numToStr(sheet.prodSpec?.gapC),
+            /**支版尺寸 boxB*boxD */
+            BD: sheet.BD,
+            /**捲門全高 */
+            fullHeight: '9999',
+          },
+          roller: {
+            diameter: sheet.diameter,
+            bearingInnerDiameter: sheet.bearingInnerDiameter,
+            bearingName: sheet.prodSpec?.bearingName ?? '',
+            bearingHousingTotalLength: sheet.bearingHousingTotalLength,
+            bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
+          },
+          headBox: {
+            angleIronQty: '999',
+            angleIronSize: '999',
+            info: '???',
+          },
+          doorPiece: {
+            material: sheet.com_slat_material,
+            thickness: sheet.thickness,
+            slatLength: numToStr(sheet.prodSpec?.slatLength),
+            slatCount: sheet.slatCount,
+            antyTyphoonHook: '???',
+          },
+          motor: {
+            vendor: sheet.motorVendor,
+            /**相數加電壓 */
+            phaseVoltage: sheet.motorPhase + sheet.motorVoltage,
+            horsepower: sheet.horsepower,
+          },
+          guideRail: {
+            彎直: '???',
+            material: sheet.com_guideRail_material,
+            guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
+            guideRailName: sheet.guideRailName,
+            icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`,
+          },
+          chainCog: {
+            sprocketWheelModel: sheet.sprocketWheelModel,
+            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber,
+            bearingInnerDiameter: sheet.bearingInnerDiameter,
+          },
+          base: {
+            material: sheet.com_bottomBar_material,
+            guideRailsOpening: sheet.guideRailsOpening,
+          },
+          memo: 'foooooooooooooo',
+        };
+        workSheetPDF_01_itemArr.push(control_item);
+      });
+    });
+  }
+
+  const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
+    info: {
+      contractNumber: profile.projectNumber,
+      projectName: profile.projectName,
+      projectAddress: profile.allAddress,
+      customerName: contract?.content.customer.name ?? '',
+      customerContactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
+      // 開單日
+      billingDate: '999-99-99',
+      // 出貨日
+      shippingDate: '999-999-99',
+    },
+    itemArr: workSheetPDF_01_itemArr,
+  };
+
+  // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出PDF',
+      onClick: () => setIsShowPdf(true),
+    },
     {
       type: 'myButton',
       label: '產生出庫單',
@@ -1201,6 +1297,7 @@ export default function WorkSheet() {
           type: 'number',
         }}
       />
+      <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
     </SubLayer>
   );
 }
