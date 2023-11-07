@@ -1108,7 +1108,6 @@ export default function WorkSheet() {
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
-            // icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`,
             icon: sheet?.guideRail
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`
               : undefined,
@@ -1135,7 +1134,8 @@ export default function WorkSheet() {
       projectName: profile.projectName,
       projectAddress: profile.allAddress,
       customerName: contract?.content.customer.name ?? '',
-      customerContactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
+      // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
+      contactPerson: '???',
       // 開單日
       billingDate: '999-99-99',
       // 出貨日

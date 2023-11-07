@@ -26,7 +26,7 @@ type Tcontrol = {
     projectName: string;
     projectAddress: string;
     customerName: string;
-    customerContactPerson: string;
+    contactPerson: string;
     // 開單日期
     billingDate: string;
     // 出貨日期
@@ -157,7 +157,7 @@ export default function WorkSheetPDF({
                   </tr>
                   <tr>
                     <td>工程名稱: {control.info.projectName}</td>
-                    <td>聯絡人: {control.info.customerContactPerson}</td>
+                    <td>聯絡人: {control.info.contactPerson}</td>
                     <td>出貨日期: {control.info.shippingDate}</td>
                   </tr>
                   <tr>
