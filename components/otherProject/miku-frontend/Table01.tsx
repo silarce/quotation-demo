@@ -79,7 +79,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
   } = control;
 
   return (
-    <div className="w-[450px]">
+    <div>
       <div className="border-l-4 border-r-4 border-black bg-gray-300">
         <C.TableHeader4 title={itemName} />
       </div>

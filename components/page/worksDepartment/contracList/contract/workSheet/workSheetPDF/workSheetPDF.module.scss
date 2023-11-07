@@ -7,6 +7,7 @@ $fontText: 25px;
   @extend .antdModalWrapper;
   :global(.ant-modal-body) {
     // background-color: gray;
+    // width: 420mm;
     padding: 0;
   }
 }
@@ -41,6 +42,7 @@ $fontText: 25px;
 
 .itemGrid {
   display: grid;
-  grid-template-columns: repeat(3, 450px);
+  grid-template-columns: repeat(3, 1fr);
   justify-content: space-between;
+  gap: 10px;
 }

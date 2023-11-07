@@ -1142,6 +1142,7 @@ export default function WorkSheet() {
       shippingDate: '999-999-99',
     },
     itemArr: workSheetPDF_01_itemArr,
+    // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
   };
 
   // -------------------------------------------------------------------------
