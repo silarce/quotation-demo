@@ -47,7 +47,7 @@ type Tcontrol = {
     material: string;
     guideRailLength: string;
     guideRailName: string;
-    icon: string;
+    icon: string | undefined;
   };
   chainCog: {
     sprocketWheelModel: string;

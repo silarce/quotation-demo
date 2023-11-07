@@ -1,11 +1,14 @@
 import React, { useRef, Fragment } from 'react';
 import classNames from 'classnames';
-
+import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 // component
 import Miku_frontend_table01, { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
+
+// gear
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // antd
 import Modal from 'antd/lib/modal/Modal';
@@ -46,18 +49,31 @@ export default function WorkSheetPDF({
 }) {
   // ---------------------------------------------------------------------
 
+  const itemArr = control.itemArr;
+
+  const chunkedList = _.chunk(itemArr, 3);
+
+  // ---------------------------------------------------------------------
+
   const refPdf = useRef<(HTMLDivElement | null)[]>([]);
 
   const dlPdf = async () => {
-    // if (!isVisable || !refPdf.current[0]) {
-    //   return;
-    // }
+    if (!isShow || !refPdf.current[0]) {
+      return;
+    }
 
-    // showRootLoading(true, '正在處理PDF');
+    showRootLoading(true, '正在處理PDF');
 
-    const doc = new jsPDF('p', 'px', 'a4');
+    // const doc = new jsPDF('l', 'px', 'a4');
+    const doc = new jsPDF({
+      orientation: 'l',
+      unit: 'px',
+      format: 'a3',
+      // userUnit: 300,
+      // compress: false,
+    });
+
     const pageWidth = doc.internal.pageSize.getWidth();
-
     const pageHeight = doc.internal.pageSize.getHeight();
 
     let isFirst = true;
@@ -69,7 +85,10 @@ export default function WorkSheetPDF({
       }
 
       const image = await html2canvas(
-        item
+        item,
+        {
+          // scale: 2,
+        }
         // ,{
         //   useCORS: true,
         //   allowTaint: true,
@@ -91,8 +110,8 @@ export default function WorkSheetPDF({
       doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
     }
 
-    doc.save(`${'foo'}.pdf`);
-    // showRootLoading(false);
+    doc.save(`工作表${control.info.contractNumber}.pdf`);
+    showRootLoading(false);
   };
 
   // ---------------------------------------------------------------------
@@ -111,42 +130,56 @@ export default function WorkSheetPDF({
       <div className={scss.panelBar}>
         <MyButton_v2 label="下載PDF" onClick={dlPdf} />
       </div>
-      <div
-        //
-        ref={(ele) => (refPdf.current[0] = ele)}
-        className={scss.container}
-      >
-        <div className="text-2xl text-center pt-5 mb-1">工作表</div>
 
-        <table className={classNames('w-full', scss.infoTable)}>
-          <tbody>
-            <tr>
-              <td>合約編號: {control.info.contractNumber}</td>
-              <td>客戶名稱: {control.info.customerName}</td>
-              <td>開單日期: {control.info.billingDate}</td>
-            </tr>
-            <tr>
-              <td>工程名稱: {control.info.projectName}</td>
-              <td>聯絡人: {control.info.customerContactPerson}</td>
-              <td>出貨日期: {control.info.shippingDate}</td>
-            </tr>
-            <tr>
-              <td colSpan={3}>{`工程地點: ${control.info.projectAddress}`}</td>
-            </tr>
-          </tbody>
-        </table>
-        <br />
+      {chunkedList.map((itemArr, index) => {
+        return (
+          <div key={index}>
+            {index !== 0 && <hr className=" border-black" />}
+            <div
+              //
 
-        <div>
-          {control.itemArr.map((control_item, index) => {
-            return (
-              <Fragment key={index}>
-                <Miku_frontend_table01 control={control_item} />
-              </Fragment>
-            );
-          })}
-        </div>
-      </div>
+              ref={(ele) => (refPdf.current[index] = ele)}
+              className={scss.container}
+            >
+              <div className="text-2xl text-center pt-5 mb-1 relative">
+                <span>工作表</span>
+                <span className="absolute right-0">
+                  {index + 1} / {chunkedList.length} 頁
+                </span>
+              </div>
+
+              <table className={classNames('w-full', scss.infoTable)}>
+                <tbody>
+                  <tr>
+                    <td>合約編號: {control.info.contractNumber}</td>
+                    <td>客戶名稱: {control.info.customerName}</td>
+                    <td>開單日期: {control.info.billingDate}</td>
+                  </tr>
+                  <tr>
+                    <td>工程名稱: {control.info.projectName}</td>
+                    <td>聯絡人: {control.info.customerContactPerson}</td>
+                    <td>出貨日期: {control.info.shippingDate}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3}>{`工程地點: ${control.info.projectAddress}`}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <br />
+
+              <div className={scss.itemGrid}>
+                {itemArr.map((control_item, index) => {
+                  return (
+                    <Fragment key={index}>
+                      <Miku_frontend_table01 control={control_item} />
+                    </Fragment>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </Modal>
   );
 }

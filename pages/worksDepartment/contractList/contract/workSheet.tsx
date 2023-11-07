@@ -1108,7 +1108,10 @@ export default function WorkSheet() {
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
-            icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`,
+            // icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`,
+            icon: sheet?.guideRail
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`
+              : undefined,
           },
           chainCog: {
             sprocketWheelModel: sheet.sprocketWheelModel,
@@ -1138,7 +1141,8 @@ export default function WorkSheet() {
       // 出貨日
       shippingDate: '999-999-99',
     },
-    itemArr: workSheetPDF_01_itemArr,
+    // itemArr: workSheetPDF_01_itemArr,
+    itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
   };
 
   // -------------------------------------------------------------------------

@@ -24,7 +24,7 @@ export const TableContentWithImage2 = ({ value, label, label2, image, height = 6
         {image && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`/SVG/${image}`}
+            src={image}
             // className="w-10 h-10"
             width={90}
             height={90}

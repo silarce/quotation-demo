@@ -38,3 +38,9 @@ $fontText: 25px;
     padding: 1px, 4px;
   }
 }
+
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 450px);
+  justify-content: space-between;
+}
