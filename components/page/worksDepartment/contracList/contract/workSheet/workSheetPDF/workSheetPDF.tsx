@@ -91,7 +91,7 @@ export default function WorkSheetPDF({
       const image = await html2canvas(
         item,
         {
-          // scale: 2,
+          scale: 5,
         }
         // ,{
         //   useCORS: true,
@@ -101,6 +101,39 @@ export default function WorkSheetPDF({
         const image = canvas.toDataURL('image/JPEG');
 
         return image;
+
+        const imageWidth = canvas.width;
+        const imageHeight = canvas.height;
+
+        // const onePageCanvas = document.createElement('canvas');
+        // onePageCanvas.setAttribute('width', imageWidth.toString());
+        // onePageCanvas.setAttribute('height', imageHeight.toString());
+
+        // const sX = 0;
+
+        // // const sY = (imageHeight / pages) * i;
+        // // const sY = undefined;
+        // const sY = 0;
+
+        // const sWidth = imageWidth;
+
+        // const sHeight = imageHeight;
+
+        // const dX = 0;
+
+        // const dY = 0;
+
+        // const dWidth = imageWidth;
+
+        // const dHeight = imageHeight;
+
+        // const ctx = onePageCanvas.getContext('2d');
+
+        // ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
+
+        // const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
+
+        // return canvasDataURL;
       });
 
       if (!isFirst) {
