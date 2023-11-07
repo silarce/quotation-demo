@@ -1015,11 +1015,11 @@ class Class_workSheet {
   // ----------------------------------------------------
   // ----------------------------------------------------
 
-  get acceNameArr() {
+  get acceIdArr() {
     return this._acceIdArr;
   }
 
-  set acceNameArr(arr) {
+  set acceIdArr(arr) {
     this._acceIdArr = arr;
     this.forceUpdate();
   }

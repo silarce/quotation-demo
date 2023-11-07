@@ -1047,10 +1047,10 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   const control_optional: Tcontrol_optional = {
-    value: targetSheet?.acceNameArr ?? [],
+    value: targetSheet?.acceIdArr ?? [],
     onChange: (arr: string[]) => {
       if (targetSheet) {
-        targetSheet.acceNameArr = arr;
+        targetSheet.acceIdArr = arr;
       }
     },
   };
