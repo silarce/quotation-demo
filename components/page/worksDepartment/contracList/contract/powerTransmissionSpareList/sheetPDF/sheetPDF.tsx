@@ -9,6 +9,7 @@ import Modal from 'antd/lib/modal/Modal';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 import scss from './sheetPDF.module.scss';
 
@@ -66,11 +67,11 @@ export default function SheetPDF({
   const refPdf = useRef<(HTMLDivElement | null)[]>([]);
 
   const dlPdf = async () => {
-    // if (!isVisable || !refPdf.current[0]) {
-    //   return;
-    // }
+    if (!isShow || !refPdf.current[0]) {
+      return;
+    }
 
-    // showRootLoading(true, '正在處理PDF');
+    showRootLoading(true, '正在處理PDF');
 
     const doc = new jsPDF('p', 'px', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -109,7 +110,7 @@ export default function SheetPDF({
     }
 
     doc.save(`${control_info.projectName}-${control_info.projectNumber}.pdf`);
-    // showRootLoading(false);
+    showRootLoading(false);
   };
 
   // ---------------------------------------------------------------------
