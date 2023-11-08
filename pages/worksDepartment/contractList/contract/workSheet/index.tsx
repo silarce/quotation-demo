@@ -1176,6 +1176,15 @@ export default function WorkSheet() {
   const panelList_allow: TpanelList = [
     {
       type: 'myButton',
+      label: '匯出工作表',
+      onClick: () =>
+        router.push({
+          pathname: '/worksDepartment/contractList/contract/workSheet/exportWorkSheet',
+          query: router.query,
+        }),
+    },
+    {
+      type: 'myButton',
       label: '匯出EXCEL',
       onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${profile.projectName}`),
     },
