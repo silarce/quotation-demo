@@ -42,6 +42,7 @@ import { TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/a
 // =====================================================================
 
 type Tdelevery = {
+  originalItem: TquotationProductItemDto;
   itemName: string;
   itemArr: TquotationProductItemDto[];
 };
@@ -84,7 +85,7 @@ export default function OutboundOrder() {
     (async () => {
       try {
         setIsLoading(true);
-        await update_contract();
+        // await update_contract();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '取得合約失敗', content: err.message });
@@ -97,8 +98,8 @@ export default function OutboundOrder() {
     (async () => {
       try {
         setIsLoading(true);
-        await update_engineeringContact();
-        await update_deliveryList();
+        // await update_engineeringContact();
+        // await update_deliveryList();
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -209,6 +210,7 @@ export default function OutboundOrder() {
 
       if (!myDeleveryList?.[theId]) {
         myDeleveryList[theId] = {
+          originalItem: item,
           itemName: theItem.itemName,
           itemArr: [],
         };
@@ -237,9 +239,25 @@ export default function OutboundOrder() {
   const control_orderTable: Tcontrol_orderTable =
     Object.values(myDeleveryList ?? {}).map((delevery) => {
       // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
+      const originalItem = delevery.originalItem;
       const firstItem = delevery.itemArr[0];
 
       const firstRow: Tgroup['rowArr'][0] = {
+        contractData: {
+          project: delevery.itemName,
+          L: String(originalItem.fullWidth),
+          W: String(originalItem.WG),
+          B: String(originalItem.boxB),
+          qty: String(delevery.itemArr.length),
+          implementQty: '???',
+          // cai: firstItem.volume,
+          cai: '',
+          totalCai: '0',
+          doorType: originalItem.doorModelName,
+          material: originalItem.materialName,
+          horsepower: originalItem.horsepower,
+          surface: originalItem.materialSurface ?? '',
+        },
         staticData: {
           project: delevery.itemName,
           L: String(firstItem.fullWidth),
@@ -317,6 +335,21 @@ export default function OutboundOrder() {
           deliveryStatusWillUpdate[deliveryStatusId ?? ''];
 
         return {
+          contractData: {
+            project: delevery.itemName,
+            L: String(originalItem.fullWidth),
+            W: String(originalItem.WG),
+            B: String(originalItem.boxB),
+            qty: String(delevery.itemArr.length),
+            implementQty: '???',
+            // cai: firstItem.volume,
+            cai: '',
+            totalCai: '0',
+            doorType: originalItem.doorModelName,
+            material: originalItem.materialName,
+            horsepower: originalItem.horsepower,
+            surface: originalItem.materialSurface ?? '',
+          },
           staticData: {
             project: delevery.itemName,
             L: String(item.fullWidth),

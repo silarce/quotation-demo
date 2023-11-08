@@ -13,6 +13,21 @@ import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // ================================================================================
 
+type TcontractData = {
+  project: string;
+  L: string;
+  W: string;
+  B: string;
+  qty: string;
+  implementQty: string;
+  cai: string;
+  totalCai: string;
+  doorType: string;
+  material: string;
+  horsepower: string;
+  surface: string;
+};
+
 type TstaticData = {
   project: string;
   L: string;
@@ -60,6 +75,7 @@ type TdeliveryStatusItem_employee = {
 type Tgroup = {
   itemName: string;
   rowArr: {
+    contractData: TcontractData;
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
@@ -92,6 +108,25 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
         {/*  */}
         <div className={`${style.theadItem} ${style.indexCell}`} />
         {/*  */}
+
+        {orderKeyArr_contract.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? style.textCenter : '';
+
+          return (
+            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+
+        {/* 灰色柱子 */}
+        <div className={` ${style.pilar}`}>
+          <div />
+        </div>
 
         {orderKeyArr_static.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
@@ -147,6 +182,30 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                         <span></span>
                       </div>
                     )}
+
+                    {orderKeyArr_contract.map((key, columnIndex) => {
+                      let value = row.contractData[key];
+
+                      if (rowIndex !== 0 && columnIndex === 0) {
+                        value = '';
+                      }
+
+                      const { width, position } = configList[key] ?? {};
+                      const theStyle = { width };
+
+                      return (
+                        <div
+                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
+                          <span>{value}</span>
+                        </div>
+                      );
+                    })}
+
+                    {/* 沒有柱子的灰色柱子 */}
+                    <div className={`${style.pilar}`} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
@@ -258,6 +317,22 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 }
 
 // =======================================================
+
+const orderKeyArr_contract: (keyof TcontractData)[] = [
+  'project',
+  'L',
+  'W',
+  'B',
+  'qty',
+  'implementQty',
+  'cai',
+  'totalCai',
+  'doorType',
+  'material',
+  'horsepower',
+  'surface',
+];
+
 const orderKeyArr_static: (keyof TstaticData)[] = [
   'project',
   'L',
