@@ -1,4 +1,5 @@
-import XLSX from 'xlsx';
+// import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 import 'xlsx-js-style';
 
 // import { AppContextProps } from './AppContext';
@@ -305,6 +306,8 @@ export function downloadExcel(
 ) {
   array = [];
 
+  console.log('in', control);
+
   const wb = XLSX.utils.book_new();
 
   for (let i = 0; i < control.itemArr.length; i++) {
@@ -379,5 +382,6 @@ export function downloadExcel(
     }
   }
 
-  XLSX.writeFile(wb, fileName);
+  // XLSX.writeFile(wb, fileName + '.xlsx');
+  XLSX.writeFile(wb, `${fileName}.xlsx`);
 }

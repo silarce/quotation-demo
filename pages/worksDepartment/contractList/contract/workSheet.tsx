@@ -96,6 +96,9 @@ import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
 
+// utils
+import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
+
 // css
 import scss from './workSheet.module.scss';
 
@@ -1062,10 +1065,9 @@ export default function WorkSheet() {
 
   // -------------------------------------------------------------------------
 
-  const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
+  const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
+    const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
 
-  // 用if是為了節省效能
-  if (isShowPdf || isShowPdf02) {
     Object.values(sheetList).forEach((subList) => {
       Object.values(subList).forEach((sheet) => {
         const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
@@ -1131,40 +1133,52 @@ export default function WorkSheet() {
         workSheetPDF_01_itemArr.push(control_item);
       });
     });
-  }
 
-  const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
-    info: {
-      contractNumber: profile.projectNumber,
-      projectName: profile.projectName,
-      projectAddress: profile.allAddress,
-      customerName: contract?.content.customer.name ?? '',
-      // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
-      contactPerson: '???',
-      // 開單日
-      billingDate: '???-??-??',
-      // 出貨日
-      shippingDate: '???-??-??',
-    },
-    itemArr: workSheetPDF_01_itemArr,
-    // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
-  };
+    const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
+      info: {
+        contractNumber: profile.projectNumber,
+        projectName: profile.projectName,
+        projectAddress: profile.allAddress,
+        customerName: contract?.content.customer.name ?? '',
+        // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
+        contactPerson: '???',
+        // 開單日
+        billingDate: '???-??-??',
+        // 出貨日
+        shippingDate: '???-??-??',
+      },
+      itemArr: workSheetPDF_01_itemArr,
+      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    };
 
-  let totalQty_PDF_02 = 0;
-  workSheetPDF_01_itemArr.forEach((item) => {
-    totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
-  });
-  const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
-    info: {
-      projectName: profile.projectName,
-      totalQty: String(totalQty_PDF_02),
-    },
-    itemArr: workSheetPDF_01_itemArr,
-    // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
-  };
+    let totalQty_PDF_02 = 0;
+    workSheetPDF_01_itemArr.forEach((item) => {
+      totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
+    });
+    const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
+      info: {
+        projectName: profile.projectName,
+        totalQty: String(totalQty_PDF_02),
+      },
+      itemArr: workSheetPDF_01_itemArr,
+      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    };
+
+    return {
+      control_workSheetPDF_01,
+      control_workSheetPDF_02,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheetList]);
 
   // -------------------------------------------------------------------------
+
   const panelList_allow: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出EXCEL',
+      onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${profile.projectName}`),
+    },
     {
       type: 'myButton',
       label: '匯出廠務部工作表',
