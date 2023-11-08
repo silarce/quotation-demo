@@ -1073,15 +1073,15 @@ export default function WorkSheet() {
           size: {
             qty: sheet.quantity,
             doorModelName: sheet.doorModelName,
-            fullWidth: sheet.fullWidth,
-            height: sheet.height,
-            WG: sheet.WG,
+            fullWidth: sheet.fullWidth_mm,
+            height: sheet.height_mm,
+            WG: sheet.WG_mm,
             gapA: numToStr(sheet.prodSpec?.gapA),
             gapC: numToStr(sheet.prodSpec?.gapC),
             /**支版尺寸 boxB*boxD */
             BD: sheet.BD,
             /**捲門全高 */
-            fullHeight: '9999',
+            fullHeight: '???',
           },
           roller: {
             diameter: sheet.diameter,
@@ -1091,8 +1091,8 @@ export default function WorkSheet() {
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
-            angleIronQty: '999',
-            angleIronSize: '999',
+            angleIronQty: '???',
+            angleIronSize: '???',
             info: '???',
           },
           doorPiece: {
@@ -1142,23 +1142,26 @@ export default function WorkSheet() {
       // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
       contactPerson: '???',
       // 開單日
-      billingDate: '999-99-99',
+      billingDate: '???-??-??',
       // 出貨日
-      shippingDate: '999-999-99',
+      shippingDate: '???-??-??',
     },
-    // itemArr: workSheetPDF_01_itemArr,
-    itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    itemArr: workSheetPDF_01_itemArr,
+    // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
   };
 
+  let totalQty_PDF_02 = 0;
+  workSheetPDF_01_itemArr.forEach((item) => {
+    totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
+  });
   const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
     info: {
       projectName: profile.projectName,
-      totalQty: '999',
+      totalQty: String(totalQty_PDF_02),
     },
-    itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    itemArr: workSheetPDF_01_itemArr,
+    // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
   };
-
-  console.log(control_workSheetPDF_02);
 
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
@@ -1169,7 +1172,7 @@ export default function WorkSheet() {
     },
     {
       type: 'myButton',
-      label: '匯出PDF',
+      label: '匯出工作表',
       onClick: () => setIsShowPdf(true),
     },
     {

@@ -589,8 +589,15 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  get fullWidth_mm() {
+    return String(this._prod.fullWidth);
+  }
+
   get WG() {
     return String(this._prod.WG / 1000);
+  }
+  get WG_mm() {
+    return String(this._prod.WG);
   }
 
   get BD() {
@@ -605,6 +612,10 @@ class Class_workSheet {
     this._prod.height = Number(this._height_str) * 1000;
     this.calcArea();
     this.forceUpdate();
+  }
+
+  get height_mm() {
+    return String(this._prod.height);
   }
 
   get boxB() {
