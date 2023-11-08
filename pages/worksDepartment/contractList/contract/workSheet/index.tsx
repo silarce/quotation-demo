@@ -90,6 +90,7 @@ import {
   useGetWorkSheet,
   apiPatchWorkSheet,
   apiPostEngineeringDeliveryList,
+  apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
@@ -215,6 +216,7 @@ export default function WorkSheet() {
 
       if (adjustedItem && adjustedItemId) {
         theItem = adjustedItem;
+        theItem.adjustedItemId = adjustedItemId;
         theId = adjustedItemId;
       } else {
         theItem = item;
@@ -245,9 +247,6 @@ export default function WorkSheet() {
 
       //
     }); //  forEach close
-
-    // console.log(itemTokenList);
-    // console.log(itemIdArrList);
 
     return {
       itemTokenList: itemTokenList,
@@ -1003,35 +1002,72 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   const reqPatch = async () => {
-    if (!worksheetId) {
+    if (!worksheetId || !workSheet?.contractProductItems) {
       return;
     }
 
+    let deleteIdList: { [key: string]: string[] } = {};
     let body: TupdateWorkSheetItem[] = [];
-
-    let deleteIdArr: string[] = [];
 
     Object.values(changedSheetList).forEach((sheet) => {
       if (sheet.isOriginal) {
-        deleteIdArr = [...deleteIdArr, ...sheet.idArrShouldDelete];
+        deleteIdList = { ...deleteIdList, ...sheet.idListShouldDelete };
+        // deleteIdArr = [...deleteIdArr, ...sheet.idListShouldDelete];
       } else {
         const bodyItemArr = sheet.bodyItemArr;
         body = [...body, ...bodyItemArr];
       }
     });
 
-    console.log(body);
-    console.log(deleteIdArr);
-    myAlert.info({ title: 'api還未更新，此功能不可用' });
+    for (const key in deleteIdList) {
+      const deleteIdArr = deleteIdList[key];
 
-    // try {
-    //   await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
-    //   await update_workSheet();
-    //   setDisabled(true);
-    // } catch (error) {
-    //   const err = error as Error;
-    //   myAlert.err({ title: '更新工作單失敗', content: err.message });
-    // }
+      try {
+        await apiDeleteWorkSheetItem(worksheetId, { contractProductItemsId: deleteIdArr });
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '清除工作表項目失敗', content: err.message });
+        setDisabled(true);
+      }
+    }
+
+    for (const key in changedSheetList) {
+      const sheet = changedSheetList[key];
+
+      if (sheet.isOriginal) {
+        return;
+      }
+
+      try {
+        // 送給後端的資料中如果accessories裡的name是空的，會壞掉
+        // 所以要呼叫getAccessoriesArr()確保accessories的name都有值
+        if (!changedSheetList[key].isAccessoriesReady) {
+          await changedSheetList[key].getAccessoriesArr();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得配件列表失敗，更新工作表失敗', content: err.message });
+        setDisabled(true);
+        break;
+      }
+
+      // 必須先執行確保accessories的name都有值的步驟才可以取body
+      const body = changedSheetList[key].bodyItemArr;
+
+      try {
+        await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '更新工作表失敗', content: err.message });
+        setDisabled(true);
+        break;
+      }
+    }
+
+    await update_workSheet();
+    setDisabled(true);
+
+    //
   };
 
   /**產生出庫單 */

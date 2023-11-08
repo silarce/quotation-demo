@@ -619,6 +619,21 @@ export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet) => {
     .catch((err) => Promise.reject(err));
 };
 
+export const apiDeleteWorkSheetItem = async (
+  workSheetId: string,
+  body: {
+    contractProductItemsId?: string[];
+    legacyContractProductItemsId?: string[];
+  }
+) => {
+  const api = `/engineering/worksheet/${workSheetId}/contractItems`;
+
+  return axi
+    .delete(api, { data: body })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
 // 出庫單
 export const apiPostEngineeringDeliveryList = (body: {
   contractId?: string | null;

@@ -119,7 +119,9 @@ const useWorkSheet = ({
   }) => {
     setSheetList((sheetList) => {
       const itemIdArr = sheetList[pKey][cKey].itemIdArr;
-      sheetList[pKey][pKey].gatherBack(itemIdArr);
+      const adjustedItemId = sheetList[pKey][cKey].adjustedItemId;
+
+      sheetList[pKey][pKey].gatherBack({ itemIdArr, adjustedItemId });
       delete sheetList[pKey][cKey];
 
       return { ...sheetList };

@@ -136,6 +136,9 @@ class Class_workSheet {
   private _clearSheet;
 
   private _originalIdArr: string[] | undefined = undefined;
+
+  private _deleteIdList: { [key: string]: string[] } = {};
+
   // ---------------------------------------------------------------------
 
   private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -559,6 +562,10 @@ class Class_workSheet {
 
   get prodDetailSpec() {
     return this._prodDetailSpec;
+  }
+
+  get adjustedId() {
+    return this._prod.adjustedItemId;
   }
 
   // ---------------------------------------------------------------------
@@ -1025,6 +1032,12 @@ class Class_workSheet {
     return this._prod.guideRailsOpening;
   }
 
+  get isAccessoriesReady() {
+    const arr = Object.keys(this._accessoriesOptionList);
+
+    return arr.length > 0;
+  }
+
   // ----------------------------------------------------
   // ----------------------------------------------------
 
@@ -1089,20 +1102,39 @@ class Class_workSheet {
     this.forceUpdate({ isNoChange: true });
   }
 
-  gatherBack(itemIdArr: string[]) {
+  gatherBack({ itemIdArr, adjustedItemId }: { itemIdArr: string[]; adjustedItemId?: string | null }) {
     this._itemIdArr = [...this._itemIdArr, ...itemIdArr];
 
-    // this.forceUpdate({ isNoChange: true });
+    if (adjustedItemId) {
+      if (!this._deleteIdList[adjustedItemId]) {
+        this._deleteIdList[adjustedItemId] = [];
+      }
+
+      this._deleteIdList[adjustedItemId] = [...this._deleteIdList[adjustedItemId], ...itemIdArr];
+    }
+
     this.forceUpdate();
   }
 
-  get idArrShouldDelete() {
+  get idListShouldDelete() {
     this._originalIdArr;
     this._itemIdArr;
 
     const arr = _.difference(this._itemIdArr, this._originalIdArr ?? []);
 
-    return arr;
+    Object.keys(this._deleteIdList).forEach((pKey) => {
+      const delIdArr = this._deleteIdList[pKey];
+
+      delIdArr.forEach((delId, index) => {
+        if (!arr.includes(delId)) {
+          // delete this._deleteIdList[pKey][cKey];
+          // delete this._deleteIdList[pKey][cKey];
+          this._deleteIdList[pKey].splice(index, 1);
+        }
+      });
+    });
+
+    return this._deleteIdList;
   }
 
   // --------------------------------------------------------------
