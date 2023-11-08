@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import Decimal from 'decimal.js';
 
 type Tcontrol_item = {
@@ -189,55 +190,11 @@ export default function Miku_frontend_table02({
             <td className="report border-b-2 border-black">馬達馬力</td>
           </tr>
           {itemArr.slice(index * 7, index * 7 + 7).map((item, cellIndex) => {
-            // const pageIndex = index * 7 + cellIndex;
-            // // predefined fields
-            // const _modelData = appCtx.specs[pageIndex].modelData;
-            // const _model = appCtx.specs[pageIndex].model;
-            // const _count = appCtx.specs[pageIndex].count;
-            // const _width = appCtx.specs[pageIndex].width;
-            // const _height = appCtx.specs[pageIndex].height;
-            // const _wg = appCtx.specs[pageIndex].wg;
-            // const _angleIronCount = appCtx.specs[pageIndex].angleIronCount;
-            // const _data = appCtx.specs[pageIndex].data;
-            // const _useHook = appCtx.specs[pageIndex].useHook!;
-            // const _motorIndex = appCtx.specs[pageIndex].motorIndex;
-            // const _motorUnitIndex = appCtx.specs[pageIndex].motorUnitIndex;
-            // const _doorTrackIndex = appCtx.specs[pageIndex].doorTrackIndex;
-            // const _baseMtlIndex = appCtx.specs[pageIndex].baseMtlIndex;
-            // const _doorMtlIndex = appCtx.specs[pageIndex].doorMtlIndex;
-            // const _doorTrackMtlIndex = appCtx.specs[pageIndex].doorTrackMtlIndex;
-            // const _doorTrackTypeIndex = appCtx.specs[pageIndex].doorTrackTypeIndex;
-            // const _doorSectionLength = appCtx.specs[pageIndex].doorSectionLength;
-            // const _useBakeDoorMt = appCtx.specs[pageIndex].useBakeDoorMt;
-            // const _useBakeDoorTrackMt = appCtx.specs[pageIndex].useBakeDoorTrackMt;
-            // const _useBakeBaseMt = appCtx.specs[pageIndex].useBakeBaseMt;
-            // const _useBakeRollBox = appCtx.specs[pageIndex].useBakeRollBox;
-            // const _power = appCtx.specs[pageIndex].powerIndex;
-            // const _preferredBDirectionIndex = appCtx.specs[pageIndex].preferredBDirectionIndex;
-            // const _rollBox = appCtx.specs[pageIndex].rollBoxIndexs;
-            // const _memo = appCtx.specs[pageIndex].memoIndexs;
-            // const _minA = appCtx.specs[pageIndex].minA;
-            // const _minB = appCtx.specs[pageIndex].minB;
-            // const _minC = appCtx.specs[pageIndex].minC;
-            // const _minD = appCtx.specs[pageIndex].minD;
-            // const _preferredA = appCtx.specs[pageIndex].preferredA;
-            // const _preferredB = appCtx.specs[pageIndex].preferredB;
-            // const _preferredC = appCtx.specs[pageIndex].preferredC;
-            // const _preferredD = appCtx.specs[pageIndex].preferredD;
-            // const _info = appCtx.specs[pageIndex].info;
-            // const _calculatedWidth = _width
-            //   ? Decimal.mul(Number(_width), 1000).toNumber()
-            //   : Decimal.mul(Number(_wg), 1000).plus(Number(_preferredA)).plus(Number(_preferredC)).toNumber();
-
-            // const specialSpec: Partial<SpecDataType> = SpecData[_model];
-
-            // const finalSpec = Object.assign({ ...commonSpec }, specialSpec) as SpecDataType;
-
             const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = item;
 
             if (cellIndex !== 6) {
               return (
-                <>
+                <Fragment key={cellIndex}>
                   <tr>
                     <td className="report border-b border-r border-gray-500">{itemName}</td>
                     <td
@@ -278,11 +235,11 @@ export default function Miku_frontend_table02({
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td className="report border-b border-gray-500">{motor.horsepower}</td>
                   </tr>
-                </>
+                </Fragment>
               );
             } else {
               return (
-                <>
+                <Fragment key={cellIndex}>
                   <tr>
                     <td className="report border-r border-gray-500">{itemName}</td>
                     <td
@@ -323,7 +280,7 @@ export default function Miku_frontend_table02({
                     <td className="report border-r border-gray-500">{'???'}</td>
                     <td className="report border-gray-500">{motor.horsepower}</td>
                   </tr>
-                </>
+                </Fragment>
               );
             }
           })}
@@ -416,56 +373,11 @@ export default function Miku_frontend_table02({
             <td className="report border-b-2 border-black">目數</td>
           </tr>
           {itemArr.slice(index * 7, index * 7 + 7).map((item, cellIndex) => {
-            // const pageIndex = index * 7 + cellIndex;
-
-            // // predefined fields
-            // const _modelData = appCtx.specs[pageIndex].modelData;
-            // const _model = appCtx.specs[pageIndex].model;
-            // const _count = appCtx.specs[pageIndex].count;
-            // const _width = appCtx.specs[pageIndex].width;
-            // const _height = appCtx.specs[pageIndex].height;
-            // const _wg = appCtx.specs[pageIndex].wg;
-            // const _angleIronCount = appCtx.specs[pageIndex].angleIronCount;
-            // const _data = appCtx.specs[pageIndex].data;
-            // const _useHook = appCtx.specs[pageIndex].useHook!;
-            // const _motorIndex = appCtx.specs[pageIndex].motorIndex;
-            // const _motorUnitIndex = appCtx.specs[pageIndex].motorUnitIndex;
-            // const _doorTrackIndex = appCtx.specs[pageIndex].doorTrackIndex;
-            // const _baseMtlIndex = appCtx.specs[pageIndex].baseMtlIndex;
-            // const _doorMtlIndex = appCtx.specs[pageIndex].doorMtlIndex;
-            // const _doorTrackMtlIndex = appCtx.specs[pageIndex].doorTrackMtlIndex;
-            // const _doorTrackTypeIndex = appCtx.specs[pageIndex].doorTrackTypeIndex;
-            // const _doorSectionLength = appCtx.specs[pageIndex].doorSectionLength;
-            // const _useBakeDoorMt = appCtx.specs[pageIndex].useBakeDoorMt;
-            // const _useBakeDoorTrackMt = appCtx.specs[pageIndex].useBakeDoorTrackMt;
-            // const _useBakeBaseMt = appCtx.specs[pageIndex].useBakeBaseMt;
-            // const _useBakeRollBox = appCtx.specs[pageIndex].useBakeRollBox;
-            // const _power = appCtx.specs[pageIndex].powerIndex;
-            // const _preferredBDirectionIndex = appCtx.specs[pageIndex].preferredBDirectionIndex;
-            // const _rollBox = appCtx.specs[pageIndex].rollBoxIndexs;
-            // const _memo = appCtx.specs[pageIndex].memoIndexs;
-            // const _minA = appCtx.specs[pageIndex].minA;
-            // const _minB = appCtx.specs[pageIndex].minB;
-            // const _minC = appCtx.specs[pageIndex].minC;
-            // const _minD = appCtx.specs[pageIndex].minD;
-            // const _preferredA = appCtx.specs[pageIndex].preferredA;
-            // const _preferredB = appCtx.specs[pageIndex].preferredB;
-            // const _preferredC = appCtx.specs[pageIndex].preferredC;
-            // const _preferredD = appCtx.specs[pageIndex].preferredD;
-            // const _info = appCtx.specs[pageIndex].info;
-            // const _calculatedWidth = _width
-            //   ? Decimal.mul(Number(_width), 1000).toNumber()
-            //   : Decimal.mul(Number(_wg), 1000).plus(Number(_preferredA)).plus(Number(_preferredC)).toNumber();
-
-            // const specialSpec: Partial<SpecDataType> = SpecData[_model];
-
-            // const finalSpec = Object.assign({ ...commonSpec }, specialSpec) as SpecDataType;
-
             const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = item;
 
             if (cellIndex !== 6) {
               return (
-                <>
+                <Fragment key={cellIndex}>
                   <tr>
                     <td className="report border-b border-r border-gray-500">{itemName}</td>
                     <td
@@ -509,11 +421,11 @@ export default function Miku_frontend_table02({
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td className="report border-b border-gray-500">{'???'}</td>
                   </tr>
-                </>
+                </Fragment>
               );
             } else {
               return (
-                <>
+                <Fragment key={cellIndex}>
                   <tr>
                     <td className="report border-r border-gray-500">{itemName}</td>
                     <td
@@ -554,7 +466,7 @@ export default function Miku_frontend_table02({
                     <td className="report border-r border-gray-500">{'???'}</td>
                     <td className="report border-gray-500">{'???'}</td>
                   </tr>
-                </>
+                </Fragment>
               );
             }
           })}
@@ -644,55 +556,11 @@ export default function Miku_frontend_table02({
           </tr>
 
           {itemArr.slice(index * 7, index * 7 + 7).map((item, cellIndex) => {
-            // const pageIndex = index * 7 + cellIndex;
-            // // predefined fields
-            // const _modelData = appCtx.specs[pageIndex].modelData;
-            // const _model = appCtx.specs[pageIndex].model;
-            // const _count = appCtx.specs[pageIndex].count;
-            // const _width = appCtx.specs[pageIndex].width;
-            // const _height = appCtx.specs[pageIndex].height;
-            // const _wg = appCtx.specs[pageIndex].wg;
-            // const _angleIronCount = appCtx.specs[pageIndex].angleIronCount;
-            // const _data = appCtx.specs[pageIndex].data;
-            // const _useHook = appCtx.specs[pageIndex].useHook!;
-            // const _motorIndex = appCtx.specs[pageIndex].motorIndex;
-            // const _motorUnitIndex = appCtx.specs[pageIndex].motorUnitIndex;
-            // const _doorTrackIndex = appCtx.specs[pageIndex].doorTrackIndex;
-            // const _baseMtlIndex = appCtx.specs[pageIndex].baseMtlIndex;
-            // const _doorMtlIndex = appCtx.specs[pageIndex].doorMtlIndex;
-            // const _doorTrackMtlIndex = appCtx.specs[pageIndex].doorTrackMtlIndex;
-            // const _doorTrackTypeIndex = appCtx.specs[pageIndex].doorTrackTypeIndex;
-            // const _doorSectionLength = appCtx.specs[pageIndex].doorSectionLength;
-            // const _useBakeDoorMt = appCtx.specs[pageIndex].useBakeDoorMt;
-            // const _useBakeDoorTrackMt = appCtx.specs[pageIndex].useBakeDoorTrackMt;
-            // const _useBakeBaseMt = appCtx.specs[pageIndex].useBakeBaseMt;
-            // const _useBakeRollBox = appCtx.specs[pageIndex].useBakeRollBox;
-            // const _power = appCtx.specs[pageIndex].powerIndex;
-            // const _preferredBDirectionIndex = appCtx.specs[pageIndex].preferredBDirectionIndex;
-            // const _rollBox = appCtx.specs[pageIndex].rollBoxIndexs;
-            // const _memo = appCtx.specs[pageIndex].memoIndexs;
-            // const _minA = appCtx.specs[pageIndex].minA;
-            // const _minB = appCtx.specs[pageIndex].minB;
-            // const _minC = appCtx.specs[pageIndex].minC;
-            // const _minD = appCtx.specs[pageIndex].minD;
-            // const _preferredA = appCtx.specs[pageIndex].preferredA;
-            // const _preferredB = appCtx.specs[pageIndex].preferredB;
-            // const _preferredC = appCtx.specs[pageIndex].preferredC;
-            // const _preferredD = appCtx.specs[pageIndex].preferredD;
-            // const _info = appCtx.specs[pageIndex].info;
-            // const _calculatedWidth = _width
-            //   ? Decimal.mul(Number(_width), 1000).toNumber()
-            //   : Decimal.mul(Number(_wg), 1000).plus(Number(_preferredA)).plus(Number(_preferredC)).toNumber();
-
-            // const specialSpec: Partial<SpecDataType> = SpecData[_model];
-
-            // const finalSpec = Object.assign({ ...commonSpec }, specialSpec) as SpecDataType;
-
             const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = item;
 
             if (cellIndex !== 6) {
               return (
-                <>
+                <Fragment key={cellIndex}>
                   <tr>
                     <td className="report border-b border-r border-gray-500">{itemName}</td>
                     <td
@@ -732,11 +600,11 @@ export default function Miku_frontend_table02({
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td className="report border-b border-gray-500">{base.guideRailsOpening}</td>
                   </tr>
-                </>
+                </Fragment>
               );
             } else {
               return (
-                <>
+                <Fragment key={cellIndex}>
                   <tr>
                     <td className="report border-r border-gray-500">{itemName}</td>
                     <td
@@ -776,7 +644,7 @@ export default function Miku_frontend_table02({
                     <td className="report border-r border-gray-500">{'???'}</td>
                     <td className="report border-gray-500">{base.guideRailsOpening}</td>
                   </tr>
-                </>
+                </Fragment>
               );
             }
           })}
