@@ -90,6 +90,7 @@ type Tcontrol_head = {
 };
 
 type Tcontrol_body = {
+  itemName: string;
   size: {
     qty: string;
     doorModelName: string;
@@ -186,13 +187,17 @@ function addHeader(control_head: Tcontrol_head) {
   array.push(['工程地點', control_head.projectAddress]);
 }
 
-function addBody(
-  //
-  control_body: Tcontrol_body,
-  index: number,
-  rowBegin: number,
-  init: boolean
-) {
+function addBody({
+  control_body,
+  index,
+  rowBegin,
+  init,
+}: {
+  control_body: Tcontrol_body;
+  index: number;
+  rowBegin: number;
+  init: boolean;
+}) {
   // predefined fields
   // const _modelData = appCtx.specs[index].modelData;
   // const _model = appCtx.specs[index].model;
@@ -271,15 +276,15 @@ function addBody(
     }
   }
 
-  const { size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = control_body;
+  const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = control_body;
 
-  array[rowBegin].push('foo', '', '', '');
-  array[rowBegin + 1].push('尺寸', '', '門片' + 'foo', '');
+  array[rowBegin].push(itemName, '', '', '');
+  array[rowBegin + 1].push('尺寸', '', '門片' + '', '');
   array[rowBegin + 2].push('數量', size.qty, '門片材質', doorPiece.material);
   array[rowBegin + 3].push('型號', size.doorModelName, '門片長度', doorPiece.slatLength);
   array[rowBegin + 4].push('全寬', `${size.fullWidth} mm`, xLabel, doorPiece.slatCount);
   array[rowBegin + 5].push('淨高', `${size.height} mm`, '防颱勾', doorPiece.antyTyphoonHook);
-  array[rowBegin + 6].push('重量換算', 'foo', 'foo');
+  array[rowBegin + 6].push('重量換算', '???', `電動機(${motor.vendor})`, '');
   array[rowBegin + 7].push('W+G', `${size.WG} mm`, '電供', motor.phaseVoltage);
   array[rowBegin + 8].push('機械縫 A', `${size.gapA} mm`, '馬力數', motor.horsepower);
   array[rowBegin + 9].push('機械縫 C', `${size.gapC} mm`, '門軌' + guideRail.guideRailName, '');
@@ -291,22 +296,16 @@ function addBody(
   array[rowBegin + 15].push('軸承', roller.bearingName, '', '');
   array[rowBegin + 16].push('總長', roller.bearingHousingTotalLength, '鏈齒輪', '');
   array[rowBegin + 17].push('寸法', roller.bearingHousingSize, '鏈齒輪番號', chainCog.sprocketWheelModel);
-  array[rowBegin + 18].push('捲箱' + 'foo', '', '齒數', 'foo');
+  array[rowBegin + 18].push('捲箱' + '', '', '齒數', '???');
   array[rowBegin + 19].push('捲箱角鐵數量', headBox.angleIronQty, '孔徑', chainCog.bearingInnerDiameter);
-  array[rowBegin + 20].push('捲箱角鐵尺寸', headBox.angleIronSize, '底座' + 'foo', '');
+  array[rowBegin + 20].push('捲箱角鐵尺寸', headBox.angleIronSize, '底座' + '', '');
   array[rowBegin + 21].push('捲箱資訊', headBox.info, '底座材質', base.material);
   array[rowBegin + 22].push('', '', '底座開口', base.guideRailsOpening);
   array[rowBegin + 23].push('備註', memo);
 }
 
-export function downloadExcel(
-  // appCtx: AppContextProps,
-  control: Tcontrol,
-  fileName: string
-) {
+export function downloadExcel(control: Tcontrol, fileName: string) {
   array = [];
-
-  console.log('in', control);
 
   const wb = XLSX.utils.book_new();
 
@@ -323,7 +322,12 @@ export function downloadExcel(
       addHeader(control.info);
     }
 
-    addBody(control.itemArr[i], i, rowsPerHeader * (page + 1) + rowsPerSection * section, isSectionHead);
+    addBody({
+      control_body: control.itemArr[i],
+      index: i,
+      rowBegin: rowsPerHeader * (page + 1) + rowsPerSection * section,
+      init: isSectionHead,
+    });
   }
 
   const ws = XLSX.utils.aoa_to_sheet(array);
