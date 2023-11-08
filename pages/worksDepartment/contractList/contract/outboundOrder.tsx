@@ -278,10 +278,10 @@ export default function OutboundOrder() {
             value: '',
             hidden: true,
           },
-          // remark02: {
-          //   value: '',
-          //   hidden: true,
-          // },
+          remark02: {
+            value: '',
+            hidden: true,
+          },
           // remark03: {
           //   value: '',
           //   hidden: true,
@@ -318,6 +318,11 @@ export default function OutboundOrder() {
 
       const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
         totalCai_total = totalCai_total.add(item.volume || '0');
+
+        const accessories = item.accessories;
+        const acceNameArr = accessories.map((acce) => {
+          return acce.name;
+        });
 
         const {
           //
@@ -371,10 +376,11 @@ export default function OutboundOrder() {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
               },
             },
-            // remark02: {
-            //   value: 'test',
-            //   onChange: () => {},
-            // },
+            remark02: {
+              value: acceNameArr.join('、'),
+              onChange: () => {},
+              forbidden: true,
+            },
             // remark03: {
             //   value: 'test',
             //   onChange: () => {},

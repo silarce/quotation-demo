@@ -79,7 +79,7 @@ type Tgroup = {
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
-      // remark02: TdeliveryStatusItem;
+      remark02: TdeliveryStatusItem;
       // remark03: TdeliveryStatusItem;
       // remark04: TdeliveryStatusItem;
       appended: TdeliveryStatusItem;
@@ -254,6 +254,13 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                         };
                       }
 
+                      if (type === 'teaxtarea') {
+                        theProps.textareaProps = {
+                          value: value ?? '',
+                          onChange,
+                        };
+                      }
+
                       if (type === 'date') {
                         theProps.datePickerProps = {
                           value,
@@ -353,7 +360,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
   'installDate',
   //
   'remark01',
-  // 'remark02',
+  'remark02',
   // 'remark03',
   // 'remark04',
   'appended',
@@ -366,7 +373,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
 type Tconfig = {
   label: string;
   width: string;
-  type?: 'input' | 'select' | 'date' | 'employee';
+  type?: 'input' | 'select' | 'date' | 'employee' | 'teaxtarea';
   position: string;
 };
 
@@ -518,9 +525,9 @@ const creCellConfig_deliveryStatus = (): TcellConfigList => ({
     position: '',
   },
   remark02: {
-    label: '備註2',
-    width: '65px',
-    type: 'input',
+    label: '選配',
+    width: '150px',
+    type: 'teaxtarea',
     position: '',
   },
   remark03: {
