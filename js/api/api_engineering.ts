@@ -110,7 +110,7 @@ export const apiPostEngineeringContact = async (body: TcreateEngineeringContactD
   const api = `/engineering/engineering-contact`;
 
   return axi
-    .post<TengineeringContactDto>(api, body)
+    .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -201,7 +201,7 @@ export const apiPostEngineeringDispatching = async (body: TcreateDispatchingDto)
   const api = '/engineering/dispatching';
 
   return axi
-    .post<TdispatchingDto>(api, body)
+    .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -211,7 +211,7 @@ export const apiPatchEngineeringDispatching = async (id: string, body: TcreateDi
   const api = `/engineering/dispatching/${id}`;
 
   return axi
-    .patch<TdispatchingDto>(api, body)
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -428,7 +428,7 @@ export const apiPostElectronicSupplies = async (body: TcreateElectronicSuppliesD
   const api = '/engineering/electronic-supplies';
 
   return axi
-    .post<TelectronicSuppliesDto>(api, body)
+    .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -535,7 +535,7 @@ export const apiPostEngineeringExchange = async (body: TcreateExchgangeDto) => {
   const api = `/engineering/exchange`;
 
   return axi
-    .post<TexchangeDto>(api, body)
+    .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -544,7 +544,7 @@ export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchg
   const api = `/engineering/exchange/${id}`;
 
   return axi
-    .patch<TexchangeDto>(api, body)
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
