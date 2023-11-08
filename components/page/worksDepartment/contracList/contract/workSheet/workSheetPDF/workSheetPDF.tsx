@@ -20,8 +20,6 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './workSheetPDF.module.scss';
 
-// import { downloadExcel } from '../downloadExcel';
-
 // =====================================================================
 
 type Tcontrol = {
@@ -101,39 +99,6 @@ export default function WorkSheetPDF({
         const image = canvas.toDataURL('image/JPEG');
 
         return image;
-
-        const imageWidth = canvas.width;
-        const imageHeight = canvas.height;
-
-        // const onePageCanvas = document.createElement('canvas');
-        // onePageCanvas.setAttribute('width', imageWidth.toString());
-        // onePageCanvas.setAttribute('height', imageHeight.toString());
-
-        // const sX = 0;
-
-        // // const sY = (imageHeight / pages) * i;
-        // // const sY = undefined;
-        // const sY = 0;
-
-        // const sWidth = imageWidth;
-
-        // const sHeight = imageHeight;
-
-        // const dX = 0;
-
-        // const dY = 0;
-
-        // const dWidth = imageWidth;
-
-        // const dHeight = imageHeight;
-
-        // const ctx = onePageCanvas.getContext('2d');
-
-        // ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
-
-        // const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
-
-        // return canvasDataURL;
       });
 
       if (!isFirst) {
@@ -155,68 +120,68 @@ export default function WorkSheetPDF({
 
   const pages = Math.ceil(control.itemArr.length / 3);
 
-  const exportPDF = () => {
-    const report = document.getElementById('report');
+  // const exportPDF = () => {
+  //   const report = document.getElementById('report');
 
-    const svgElements = document.body.querySelectorAll('svg');
-    svgElements.forEach(function (item) {
-      item.setAttribute('width', item.getBoundingClientRect().width.toString());
-      item.setAttribute('height', item.getBoundingClientRect().height.toString());
-      item.style.width = '';
-      item.style.height = '';
-    });
+  //   const svgElements = document.body.querySelectorAll('svg');
+  //   svgElements.forEach(function (item) {
+  //     item.setAttribute('width', item.getBoundingClientRect().width.toString());
+  //     item.setAttribute('height', item.getBoundingClientRect().height.toString());
+  //     item.style.width = '';
+  //     item.style.height = '';
+  //   });
 
-    html2canvas(report!, {
-      scale: 2,
-    }).then((canvas) => {
-      const pdf = new jsPDF('landscape', 'mm', 'a3');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imageWidth = canvas.width;
-      const imageHeight = canvas.height;
-      const w = report!.clientWidth;
-      const h = report!.clientHeight / pages;
+  //   html2canvas(report!, {
+  //     scale: 2,
+  //   }).then((canvas) => {
+  //     const pdf = new jsPDF('landscape', 'mm', 'a3');
+  //     const pageWidth = pdf.internal.pageSize.getWidth();
+  //     const pageHeight = pdf.internal.pageSize.getHeight();
+  //     const imageWidth = canvas.width;
+  //     const imageHeight = canvas.height;
+  //     const w = report!.clientWidth;
+  //     const h = report!.clientHeight / pages;
 
-      console.log(pageWidth, pageHeight, imageWidth, imageHeight, w, h);
+  //     console.log(pageWidth, pageHeight, imageWidth, imageHeight, w, h);
 
-      for (let i = 0; i < pages; i++) {
-        const onePageCanvas = document.createElement('canvas');
-        onePageCanvas.setAttribute('width', imageWidth.toString());
-        onePageCanvas.setAttribute('height', (imageHeight / pages).toString());
+  //     for (let i = 0; i < pages; i++) {
+  //       const onePageCanvas = document.createElement('canvas');
+  //       onePageCanvas.setAttribute('width', imageWidth.toString());
+  //       onePageCanvas.setAttribute('height', (imageHeight / pages).toString());
 
-        const sX = 0;
+  //       const sX = 0;
 
-        const sY = (imageHeight / pages) * i;
-        // const sY = 0;
+  //       const sY = (imageHeight / pages) * i;
+  //       // const sY = 0;
 
-        const sWidth = imageWidth;
+  //       const sWidth = imageWidth;
 
-        const sHeight = imageHeight / pages;
+  //       const sHeight = imageHeight / pages;
 
-        const dX = 0;
+  //       const dX = 0;
 
-        const dY = 0;
+  //       const dY = 0;
 
-        const dWidth = imageWidth;
+  //       const dWidth = imageWidth;
 
-        const dHeight = imageHeight / pages;
+  //       const dHeight = imageHeight / pages;
 
-        const ctx = onePageCanvas.getContext('2d');
-        ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
+  //       const ctx = onePageCanvas.getContext('2d');
+  //       ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
 
-        const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
+  //       const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
 
-        const ratio = pageWidth / imageWidth;
-        pdf.addImage(canvasDataURL, 'PNG', 0, 0, imageWidth * ratio, (imageHeight / pages) * ratio);
+  //       const ratio = pageWidth / imageWidth;
+  //       pdf.addImage(canvasDataURL, 'PNG', 0, 0, imageWidth * ratio, (imageHeight / pages) * ratio);
 
-        if (i !== pages - 1) {
-          pdf.addPage();
-        }
-      }
+  //       if (i !== pages - 1) {
+  //         pdf.addPage();
+  //       }
+  //     }
 
-      pdf.save(`${''} 工作表.pdf`);
-    });
-  };
+  //     pdf.save(`${''} 工作表.pdf`);
+  //   });
+  // };
 
   // ---------------------------------------------------------------------
   return (
@@ -234,23 +199,11 @@ export default function WorkSheetPDF({
     >
       <div className={scss.panelBar}>
         <MyButton_v2 label="下載PDF" onClick={dlPdf} />
-        {/* <MyButton_v2 label="下載PDF" onClick={() => download()} /> */}
-        {/* <MyButton_v2 label="下載PDF" onClick={() => exportPDF()} /> */}
-        {/* <MyButton_v2
-          label="下載EXCEL"
-          onClick={() => {
-            downloadExcel(control, 'foo');
-          }}
-        /> */}
       </div>
 
       {chunkedList.map((itemArr, index) => {
         return (
-          <div
-            key={index}
-            // id="report"
-            // style={{ width: '420mm' }}
-          >
+          <div key={index}>
             {index !== 0 && <hr className=" border-black" />}
 
             <div
@@ -259,9 +212,7 @@ export default function WorkSheetPDF({
               className={scss.container}
               id="report"
             >
-              <div
-              // style={{ width: '420mm', height: '594mm' }}
-              >
+              <div>
                 <div className="text-2xl text-center pt-5 mb-1 relative">
                   <span>工作表</span>
                   <span className="absolute right-0">
@@ -269,7 +220,7 @@ export default function WorkSheetPDF({
                   </span>
                 </div>
 
-                <table className={classNames('w-full', scss.infoTable)}>
+                <table className={classNames('w-full mb-1', scss.infoTable)}>
                   <tbody>
                     <tr>
                       <td>合約編號: {control.info.contractNumber}</td>
@@ -286,7 +237,6 @@ export default function WorkSheetPDF({
                     </tr>
                   </tbody>
                 </table>
-                <br />
 
                 <div className={scss.itemGrid}>
                   {itemArr.map((control_item, index) => {

@@ -23,13 +23,13 @@ $fontText: 25px;
 }
 
 .container {
-  @extend .standardPdf_horizontal;
+  @extend .standardPdf_horizontal_02;
   background-color: #fff;
   padding-top: 30px;
   padding-bottom: 30px;
-  // * {
-  //   font-size: $fontText;
-  // }
+  * {
+    font-weight: 500;
+  }
 }
 
 .infoTable {
@@ -44,5 +44,5 @@ $fontText: 25px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   justify-content: space-between;
-  gap: 10px;
+  gap: 4px;
 }
