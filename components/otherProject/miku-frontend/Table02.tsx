@@ -101,7 +101,7 @@ export default function Miku_frontend_table02({
   });
 
   return (
-    <div className="mx-5">
+    <div className="mx-5 text-black">
       <table className="w-full text-center border-4 border-black">
         <tbody>
           <tr>

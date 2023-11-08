@@ -29,3 +29,12 @@ $pdfHeight_horizontal: calc(595px * 2);
     color: black;
   }
 }
+
+.standardPdf_horizontal_02 {
+  width: $pdfWidth_horizontal;
+  height: $pdfHeight_horizontal;
+  padding: 60px 40px;
+  * {
+    color: black;
+  }
+}
