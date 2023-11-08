@@ -1,12 +1,108 @@
-export default function Miku_frontend_table02() {
+import Decimal from 'decimal.js';
+
+type Tcontrol_item = {
+  itemName: string;
+  size: {
+    qty: string;
+    doorModelName: string;
+    fullWidth: string;
+    height: string;
+    WG: string;
+    gapA: string;
+    gapC: string;
+    /**支版尺寸 boxB*boxD */
+    BD: string;
+    /**捲門全高 */
+    fullHeight: string;
+  };
+  roller: {
+    diameter: string;
+    bearingInnerDiameter: string;
+    bearingName: string;
+    bearingHousingTotalLength: string;
+    bearingHousingSize: string;
+  };
+  headBox: {
+    angleIronQty: string;
+    angleIronSize: string;
+    info: string;
+  };
+  doorPiece: {
+    material: string;
+    thickness: string;
+    slatLength: string;
+    slatCount: string;
+    antyTyphoonHook: string;
+  };
+  motor: {
+    vendor: string;
+    /**相數加電壓 */
+    phaseVoltage: string;
+    horsepower: string;
+  };
+  guideRail: {
+    彎直: string;
+    material: string;
+    guideRailLength: string;
+    guideRailName: string;
+    icon: string | undefined;
+  };
+  chainCog: {
+    sprocketWheelModel: string;
+    sprocketWheelTeethNumber: string;
+    bearingInnerDiameter: string;
+  };
+  base: {
+    material: string;
+    guideRailsOpening: string;
+  };
+  memo: string;
+};
+
+type Tcontro = {
+  info: {
+    projectName: string;
+    totalQty: string;
+  };
+  itemArr: Tcontrol_item[];
+};
+
+export default function Miku_frontend_table02({
+  //
+  // itemArr,
+  // info,
+  control,
+  index,
+}: {
+  // itemArr: Tcontrol_item[];
+  // info: {
+  //   projectName: string;
+  //   totalQty: string;
+  // };
+  control: Tcontro;
+  index: number;
+}) {
+  const { info, itemArr } = control;
+
+  const pages = Math.ceil(itemArr.length);
+
+  // let allCount = 0;
+  // itemArr.map((spec, cellIndex) => {
+  //   allCount += new Decimal(spec.count).toNumber();
+  // });
+  let allCount = 0;
+  itemArr.map((spec, cellIndex) => {
+    allCount += new Decimal(1).toNumber();
+  });
+
   return (
     <div className="mx-5">
       <table className="w-full text-center border-4" style={{ fontFamily: 'DFKai-sb' }}>
         <tbody>
           <tr>
             <td colSpan={14} className="report border-b-2 border-black">
-              <span>{`工程名稱: ${'foo'}`}</span>
-              <span className="ml-4">{`總樘數: ${'foo'}`}</span>
+              <span>{`工程名稱: ${info.projectName}`}</span>
+              <span className="ml-4">{`總樘數: ${info.totalQty}`}</span>
             </td>
           </tr>
           <tr className="font-bold">
@@ -88,7 +184,7 @@ export default function Miku_frontend_table02() {
             </td>
             <td className="report border-b-2 border-black">馬達馬力</td>
           </tr>
-          {['foo'].map((spec, cellIndex) => {
+          {itemArr.slice(index * 7, index * 7 + 7).map((item, cellIndex) => {
             // const pageIndex = index * 7 + cellIndex;
             // // predefined fields
             // const _modelData = appCtx.specs[pageIndex].modelData;
@@ -133,11 +229,13 @@ export default function Miku_frontend_table02() {
 
             // const finalSpec = Object.assign({ ...commonSpec }, specialSpec) as SpecDataType;
 
+            const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = item;
+
             if (cellIndex !== 6) {
               return (
                 <>
                   <tr>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{itemName}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -145,12 +243,12 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.qty}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{size.doorModelName}</td>
+                    <td className="report border-b border-r border-gray-500">{size.WG}</td>
+                    <td className="report border-b border-r border-gray-500">{size.gapA}</td>
+                    <td className="report border-b border-r border-gray-500">{size.gapC}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -158,11 +256,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.height}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{doorPiece.material}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    <td className="report border-b border-r border-gray-500">{doorPiece.slatLength}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -170,11 +268,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {doorPiece.slatCount}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{motor.vendor}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    <td className="report border-b border-gray-500">{motor.horsepower}</td>
                   </tr>
                 </>
               );
@@ -182,7 +280,7 @@ export default function Miku_frontend_table02() {
               return (
                 <>
                   <tr>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{itemName}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -190,12 +288,12 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.qty}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{size.doorModelName}</td>
+                    <td className="report border-r border-gray-500">{size.WG}</td>
+                    <td className="report border-r border-gray-500">{size.gapA}</td>
+                    <td className="report border-r border-gray-500">{size.gapC}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -203,11 +301,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.height}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{doorPiece.material}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-r border-gray-500">{doorPiece.slatLength}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -215,20 +313,20 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {doorPiece.slatCount}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{motor.vendor}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-gray-500">{motor.horsepower}</td>
                   </tr>
                 </>
               );
             }
           })}
 
-          {/* {Array(pages)
+          {Array(pages)
             .fill(null)
-            .map((item, pageIndex) => {})} */}
+            .map((item, pageIndex) => null)}
         </tbody>
       </table>
 
@@ -313,7 +411,7 @@ export default function Miku_frontend_table02() {
             </td>
             <td className="report border-b-2 border-black">目數</td>
           </tr>
-          {['foo'].map((spec, cellIndex) => {
+          {itemArr.slice(index * 7, index * 7 + 7).map((item, cellIndex) => {
             // const pageIndex = index * 7 + cellIndex;
 
             // // predefined fields
@@ -359,11 +457,13 @@ export default function Miku_frontend_table02() {
 
             // const finalSpec = Object.assign({ ...commonSpec }, specialSpec) as SpecDataType;
 
+            const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = item;
+
             if (cellIndex !== 6) {
               return (
                 <>
                   <tr>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{itemName}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -371,10 +471,12 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.qty}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    {/* 大支版 */}
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    {/* 小支版 */}
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -382,11 +484,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {guideRail.guideRailLength}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    <td className="report border-b border-r border-gray-500">{guideRail.material}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -394,11 +496,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {chainCog.sprocketWheelModel}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    <td className="report border-b border-r border-gray-500">{chainCog.bearingInnerDiameter}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td className="report border-b border-r border-gray-500"></td>
                     <td className="report border-b border-gray-500"></td>
                   </tr>
@@ -408,7 +510,7 @@ export default function Miku_frontend_table02() {
               return (
                 <>
                   <tr>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{itemName}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -416,10 +518,10 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.qty}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -427,11 +529,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {guideRail.guideRailLength}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-r border-gray-500">{guideRail.material}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -439,11 +541,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {chainCog.sprocketWheelModel}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-r border-gray-500">{chainCog.bearingInnerDiameter}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
                     <td className="report border-r border-gray-500"></td>
                     <td className="report border-gray-500"></td>
                   </tr>
@@ -452,9 +554,9 @@ export default function Miku_frontend_table02() {
             }
           })}
 
-          {/* {Array(pages)
+          {Array(pages)
             .fill(null)
-            .map((item, pageIndex) => {})} */}
+            .map((item, pageIndex) => null)}
         </tbody>
       </table>
 
@@ -536,7 +638,7 @@ export default function Miku_frontend_table02() {
             <td className="report border-b-2 border-black">角鐵開口</td>
           </tr>
 
-          {['foo'].map((spec, cellIndex) => {
+          {itemArr.slice(index * 7, index * 7 + 7).map((item, cellIndex) => {
             // const pageIndex = index * 7 + cellIndex;
             // // predefined fields
             // const _modelData = appCtx.specs[pageIndex].modelData;
@@ -581,11 +683,13 @@ export default function Miku_frontend_table02() {
 
             // const finalSpec = Object.assign({ ...commonSpec }, specialSpec) as SpecDataType;
 
+            const { itemName, size, roller, headBox, doorPiece, motor, guideRail, chainCog, base, memo } = item;
+
             if (cellIndex !== 6) {
               return (
                 <>
                   <tr>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{itemName}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -593,11 +697,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.qty}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{roller.diameter}</td>
+                    <td className="report border-b border-r border-gray-500">{roller.bearingName}</td>
+                    <td className="report border-b border-r border-gray-500">{roller.bearingHousingTotalLength}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -605,11 +709,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {roller.bearingHousingSize}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{headBox.angleIronSize}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -617,11 +721,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {headBox.angleIronQty}
                     </td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-b border-gray-500">{'foo'}</td>
+                    <td className="report border-b border-r border-gray-500">{base.material}</td>
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
+                    <td className="report border-b border-gray-500">{base.guideRailsOpening}</td>
                   </tr>
                 </>
               );
@@ -629,7 +733,7 @@ export default function Miku_frontend_table02() {
               return (
                 <>
                   <tr>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{itemName}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -637,11 +741,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {size.qty}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{roller.diameter}</td>
+                    <td className="report border-r border-gray-500">{roller.bearingName}</td>
+                    <td className="report border-r border-gray-500">{roller.bearingHousingTotalLength}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -649,11 +753,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {roller.bearingHousingSize}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{headBox.angleIronSize}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -661,11 +765,11 @@ export default function Miku_frontend_table02() {
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {'foo'}
+                      {headBox.angleIronQty}
                     </td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-r border-gray-500">{'foo'}</td>
-                    <td className="report border-gray-500">{'foo'}</td>
+                    <td className="report border-r border-gray-500">{base.material}</td>
+                    <td className="report border-r border-gray-500">{'???'}</td>
+                    <td className="report border-gray-500">{base.guideRailsOpening}</td>
                   </tr>
                 </>
               );

@@ -1141,8 +1141,8 @@ export default function WorkSheet() {
       // 出貨日
       shippingDate: '999-999-99',
     },
-    itemArr: workSheetPDF_01_itemArr,
-    // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    // itemArr: workSheetPDF_01_itemArr,
+    itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
   };
 
   // -------------------------------------------------------------------------
