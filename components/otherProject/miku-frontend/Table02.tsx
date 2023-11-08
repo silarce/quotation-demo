@@ -59,7 +59,7 @@ type Tcontrol_item = {
   memo: string;
 };
 
-type Tcontro = {
+type Tcontrol = {
   info: {
     projectName: string;
     totalQty: string;
@@ -67,6 +67,10 @@ type Tcontro = {
   itemArr: Tcontrol_item[];
 };
 
+// =====================================================================
+export type { Tcontrol as Tcontrol_table02 };
+
+// =====================================================================
 export default function Miku_frontend_table02({
   //
   // itemArr,
@@ -79,7 +83,7 @@ export default function Miku_frontend_table02({
   //   projectName: string;
   //   totalQty: string;
   // };
-  control: Tcontro;
+  control: Tcontrol;
   index: number;
 }) {
   const { info, itemArr } = control;
@@ -97,7 +101,7 @@ export default function Miku_frontend_table02({
 
   return (
     <div className="mx-5">
-      <table className="w-full text-center border-4" style={{ fontFamily: 'DFKai-sb' }}>
+      <table className="w-full text-center border-4 border-black">
         <tbody>
           <tr>
             <td colSpan={14} className="report border-b-2 border-black">
@@ -330,7 +334,7 @@ export default function Miku_frontend_table02({
         </tbody>
       </table>
 
-      <table className="w-full text-center mt-5 border-4" style={{ fontFamily: 'DFKai-sb' }}>
+      <table className="w-full text-center mt-5 border-4 border-black">
         <tbody>
           <tr className="font-bold">
             <td rowSpan={2} className="w-56 report border-b-2 border-r border-black">
@@ -473,10 +477,11 @@ export default function Miku_frontend_table02({
                     >
                       {size.qty}
                     </td>
+                    {/* 方向 */}
+                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     {/* 大支版 */}
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
                     {/* 小支版 */}
-                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -484,11 +489,11 @@ export default function Miku_frontend_table02({
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {guideRail.guideRailLength}
+                      {'???'}
                     </td>
+                    <td className="report border-b border-r border-gray-500">{guideRail.guideRailLength}</td>
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td className="report border-b border-r border-gray-500">{guideRail.material}</td>
-                    <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-b border-r-2 border-black"
                       style={{
@@ -496,13 +501,13 @@ export default function Miku_frontend_table02({
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {chainCog.sprocketWheelModel}
+                      {'???'}
                     </td>
+                    <td className="report border-b border-r border-gray-500">{chainCog.sprocketWheelModel}</td>
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
                     <td className="report border-b border-r border-gray-500">{chainCog.bearingInnerDiameter}</td>
                     <td className="report border-b border-r border-gray-500">{'???'}</td>
-                    <td className="report border-b border-r border-gray-500"></td>
-                    <td className="report border-b border-gray-500"></td>
+                    <td className="report border-b border-gray-500">{'???'}</td>
                   </tr>
                 </>
               );
@@ -529,11 +534,11 @@ export default function Miku_frontend_table02({
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {guideRail.guideRailLength}
+                      {'???'}
                     </td>
+                    <td className="report border-r border-gray-500">{guideRail.guideRailLength}</td>
                     <td className="report border-r border-gray-500">{'???'}</td>
                     <td className="report border-r border-gray-500">{guideRail.material}</td>
-                    <td className="report border-r border-gray-500">{'???'}</td>
                     <td
                       className="report border-r-2 border-black"
                       style={{
@@ -541,13 +546,13 @@ export default function Miku_frontend_table02({
                         borderLeftColor: 'rgb(107, 114, 128)',
                       }}
                     >
-                      {chainCog.sprocketWheelModel}
+                      {'???'}
                     </td>
+                    <td className="report border-r border-gray-500">{chainCog.sprocketWheelModel}</td>
                     <td className="report border-r border-gray-500">{'???'}</td>
                     <td className="report border-r border-gray-500">{chainCog.bearingInnerDiameter}</td>
                     <td className="report border-r border-gray-500">{'???'}</td>
-                    <td className="report border-r border-gray-500"></td>
-                    <td className="report border-gray-500"></td>
+                    <td className="report border-gray-500">{'???'}</td>
                   </tr>
                 </>
               );
@@ -560,7 +565,7 @@ export default function Miku_frontend_table02({
         </tbody>
       </table>
 
-      <table className="w-full text-center mt-5 border-4" style={{ fontFamily: 'DFKai-sb' }}>
+      <table className="w-full text-center mt-5 border-4 border-black">
         <tbody>
           <tr className="font-bold">
             <td rowSpan={2} className="w-56 report border-b-2 border-r border-black">
@@ -776,9 +781,9 @@ export default function Miku_frontend_table02({
             }
           })}
 
-          {/* {Array(pages)
+          {Array(pages)
             .fill(null)
-            .map((item, pageIndex) => {})} */}
+            .map((item, pageIndex) => null)}
         </tbody>
       </table>
     </div>

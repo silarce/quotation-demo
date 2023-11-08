@@ -74,6 +74,10 @@ import WorkSheetPDF, {
   Tcontrol_workSheetPDF_01,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
 
+import WorkSheetPDF_02, {
+  Tcontrol_workSheetPDF_02,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
+
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
@@ -140,6 +144,7 @@ export default function WorkSheet() {
   const [disabled, setDisabled] = useState(true);
 
   const [isShowPdf, setIsShowPdf] = useState(false);
+  const [isShowPdf02, setIsShowPdf02] = useState(false);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -1060,7 +1065,7 @@ export default function WorkSheet() {
   const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
 
   // 用if是為了節省效能
-  if (isShowPdf) {
+  if (isShowPdf || isShowPdf02) {
     Object.values(sheetList).forEach((subList) => {
       Object.values(subList).forEach((sheet) => {
         const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
@@ -1145,8 +1150,23 @@ export default function WorkSheet() {
     itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
   };
 
+  const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
+    info: {
+      projectName: profile.projectName,
+      totalQty: '999',
+    },
+    itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+  };
+
+  console.log(control_workSheetPDF_02);
+
   // -------------------------------------------------------------------------
   const panelList_allow: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出廠務部工作表',
+      onClick: () => setIsShowPdf02(true),
+    },
     {
       type: 'myButton',
       label: '匯出PDF',
@@ -1302,6 +1322,7 @@ export default function WorkSheet() {
         }}
       />
       <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
+      <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} />
     </SubLayer>
   );
 }
