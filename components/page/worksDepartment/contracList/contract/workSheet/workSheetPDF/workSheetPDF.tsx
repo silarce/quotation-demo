@@ -4,8 +4,6 @@ import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-import { download } from 'js/utils/downloadPdf.js';
-
 // component
 import Miku_frontend_table01, { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
 
@@ -71,8 +69,6 @@ export default function WorkSheetPDF({
       orientation: 'l',
       unit: 'px',
       format: 'a4',
-      // userUnit: 300,
-      // compress: false,
     });
 
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -117,73 +113,6 @@ export default function WorkSheetPDF({
   };
 
   // ---------------------------------------------------------------------
-
-  const pages = Math.ceil(control.itemArr.length / 3);
-
-  // const exportPDF = () => {
-  //   const report = document.getElementById('report');
-
-  //   const svgElements = document.body.querySelectorAll('svg');
-  //   svgElements.forEach(function (item) {
-  //     item.setAttribute('width', item.getBoundingClientRect().width.toString());
-  //     item.setAttribute('height', item.getBoundingClientRect().height.toString());
-  //     item.style.width = '';
-  //     item.style.height = '';
-  //   });
-
-  //   html2canvas(report!, {
-  //     scale: 2,
-  //   }).then((canvas) => {
-  //     const pdf = new jsPDF('landscape', 'mm', 'a3');
-  //     const pageWidth = pdf.internal.pageSize.getWidth();
-  //     const pageHeight = pdf.internal.pageSize.getHeight();
-  //     const imageWidth = canvas.width;
-  //     const imageHeight = canvas.height;
-  //     const w = report!.clientWidth;
-  //     const h = report!.clientHeight / pages;
-
-  //     console.log(pageWidth, pageHeight, imageWidth, imageHeight, w, h);
-
-  //     for (let i = 0; i < pages; i++) {
-  //       const onePageCanvas = document.createElement('canvas');
-  //       onePageCanvas.setAttribute('width', imageWidth.toString());
-  //       onePageCanvas.setAttribute('height', (imageHeight / pages).toString());
-
-  //       const sX = 0;
-
-  //       const sY = (imageHeight / pages) * i;
-  //       // const sY = 0;
-
-  //       const sWidth = imageWidth;
-
-  //       const sHeight = imageHeight / pages;
-
-  //       const dX = 0;
-
-  //       const dY = 0;
-
-  //       const dWidth = imageWidth;
-
-  //       const dHeight = imageHeight / pages;
-
-  //       const ctx = onePageCanvas.getContext('2d');
-  //       ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
-
-  //       const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
-
-  //       const ratio = pageWidth / imageWidth;
-  //       pdf.addImage(canvasDataURL, 'PNG', 0, 0, imageWidth * ratio, (imageHeight / pages) * ratio);
-
-  //       if (i !== pages - 1) {
-  //         pdf.addPage();
-  //       }
-  //     }
-
-  //     pdf.save(`${''} 工作表.pdf`);
-  //   });
-  // };
-
-  // ---------------------------------------------------------------------
   return (
     <Modal
       //
@@ -193,7 +122,6 @@ export default function WorkSheetPDF({
       centered={true}
       destroyOnClose={true}
       width={'auto'}
-      // width={'420mm'}
       wrapClassName={scss.antdModalWrapper}
       onCancel={onCancel}
     >
