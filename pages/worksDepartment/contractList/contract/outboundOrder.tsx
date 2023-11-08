@@ -85,7 +85,7 @@ export default function OutboundOrder() {
     (async () => {
       try {
         setIsLoading(true);
-        // await update_contract();
+        await update_contract();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '取得合約失敗', content: err.message });
@@ -98,8 +98,8 @@ export default function OutboundOrder() {
     (async () => {
       try {
         setIsLoading(true);
-        // await update_engineeringContact();
-        // await update_deliveryList();
+        await update_engineeringContact();
+        await update_deliveryList();
       } catch (error) {
       } finally {
         setIsLoading(false);
