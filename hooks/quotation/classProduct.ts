@@ -725,7 +725,8 @@ class Class_product {
       return false;
     }
 
-    const fullWidth = Number(this.fullWidth || 0) * 1000 + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
+    // const fullWidth = Number(this.fullWidth || 0) * 1000 + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
+    const fullWidth = Number(this.fullWidth || 0) * 1000;
 
     const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
       modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
