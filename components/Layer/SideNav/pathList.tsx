@@ -514,6 +514,38 @@ const sidePathList: TsidePathList = {
       ],
     };
   })(),
+
+  '/accounting': ((): TsidePathConfig => {
+    const path01 = '/accounting';
+
+    return {
+      path01,
+      list: [
+        {
+          label: '會計',
+          path: path01 + '/undefined',
+          erpFeature: devPass,
+        },
+        {
+          label: 'foo',
+          erpFeature: devPass,
+          list: [
+            {
+              label: 'foo',
+              path: path01 + '/undefined',
+              erpFeature: devPass,
+            },
+            {
+              label: 'foo',
+              path: path01 + '/undefined',
+              erpFeature: devPass,
+            },
+          ],
+        },
+      ],
+    };
+  })(),
+
   // =======================================
 };
 
@@ -588,6 +620,15 @@ const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: [worksDepartment],
   },
+  // {
+  //   icon: icon_project,
+  //   label: '會計部',
+  //   path01: sidePathList['/accounting'].path01,
+  //   href: {
+  //     pathname: sidePathList['/accounting'].path01 + '/contractList',
+  //   },
+  //   erpFeature: devPass,
+  // },
 ];
 
 export default sidePathList;
