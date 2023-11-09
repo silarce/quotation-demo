@@ -79,7 +79,7 @@ type Tgroup = {
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
-      remark02: TdeliveryStatusItem;
+      // remark02: TdeliveryStatusItem;
       // remark03: TdeliveryStatusItem;
       // remark04: TdeliveryStatusItem;
       appended: TdeliveryStatusItem;
@@ -361,7 +361,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
   'installDate',
   //
   'remark01',
-  'remark02',
+  // 'remark02',
   // 'remark03',
   // 'remark04',
   'appended',
@@ -526,7 +526,7 @@ const creCellConfig_deliveryStatus = (): TcellConfigList => ({
     position: '',
   },
   remark02: {
-    label: '選配',
+    label: '備註2',
     width: '150px',
     type: 'textarea',
     position: '',

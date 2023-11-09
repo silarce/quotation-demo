@@ -278,10 +278,10 @@ export default function OutboundOrder() {
             value: '',
             hidden: true,
           },
-          remark02: {
-            value: '',
-            hidden: true,
-          },
+          // remark02: {
+          //   value: '',
+          //   hidden: true,
+          // },
           // remark03: {
           //   value: '',
           //   hidden: true,
@@ -378,11 +378,11 @@ export default function OutboundOrder() {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
               },
             },
-            remark02: {
-              value: acceNameArr.join('、'),
-              onChange: () => {},
-              forbidden: true,
-            },
+            // remark02: {
+            //   value: "test",
+            //   onChange: () => {},
+            //   forbidden: true,
+            // },
             // remark03: {
             //   value: 'test',
             //   onChange: () => {},
