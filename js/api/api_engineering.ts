@@ -552,16 +552,39 @@ export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchg
 };
 
 // 調退貨單圖示
-export const apiGetEngineeringExchangeAttachment = async (id: string) => {
+export const apiGetEngineeringExchangeAttachments = async (id: string) => {
   const api = `/engineering/exchange/${id}/attachments`;
 
   return axi
-    .get<TfileDto>(api)
+    .get<TfileDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const apiPostEngineeringExchangeAttachment = async (id: string, body: FormData) => {
+export const useApiGetEngineeringExchangeAttachments = (id: string | undefined) => {
+  const [res, setRes] = useState<TfileDto[]>();
+
+  const update = async () => {
+    if (!id) {
+      return undefined;
+    }
+
+    const res = await apiGetEngineeringExchangeAttachments(id);
+
+    if (res) {
+      setRes(res);
+    }
+
+    return res;
+  };
+
+  return {
+    attachments: res,
+    updateAttachments: update,
+  };
+};
+
+export const apiPostEngineeringExchangeAttachments = async (id: string, body: FormData) => {
   const api = `/engineering/exchange/${id}/attachments`;
 
   return axi
@@ -570,7 +593,7 @@ export const apiPostEngineeringExchangeAttachment = async (id: string, body: For
     .catch((err) => Promise.reject(err));
 };
 
-export const apiDeleteEngineeringExchangeAttachment = async (id: string, fileId: string) => {
+export const apiDeleteEngineeringExchangeAttachments = async (id: string, fileId: string) => {
   const api = `/engineering/exchange/${id}/attachments/${fileId}`;
 
   return axi
