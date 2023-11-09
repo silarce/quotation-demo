@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 // typhoonProtection
 import icon_sj302_75_30t from 'public/image/doorTrack/typhoonProtection/SJ302_75_30t.svg';
 import icon_sJ302_90_30t from 'public/image/doorTrack/typhoonProtection/SJ302_90_30t.svg';
@@ -19,6 +21,15 @@ import { Toption } from 'js/utils/options/options';
 
 export type { Toption };
 
+type TdoorTrack_sorted = {
+  [key: string]:
+    | {
+        [key: string]: Toption;
+      }
+    | undefined;
+};
+
+// ==========================================================================
 const doorTrack_typhoonProtection = {
   sj302_75_30t: { value: 'sj302_75_30t', label: 'sj302_75_30t', icon: icon_sj302_75_30t.src },
   sJ302_90_30t: { value: 'sJ302_90_30t', label: 'sJ302_90_30t', icon: icon_sJ302_90_30t.src },
@@ -94,6 +105,21 @@ const doorTrack_normal = {
   },
 };
 
+const doorTrack_sorted: TdoorTrack_sorted = {
+  'SJ-312': {
+    sJ312_106_60t: {
+      value: 'sJ312_106_60t',
+      label: 'sJ312_106_60t',
+      icon: icon_sJ312_106_60t.src,
+    },
+    sJ312_150_90t: {
+      value: 'sJ312_150_90t',
+      label: 'sJ312_150_90t',
+      icon: icon_sJ312_150_90t.src,
+    },
+  },
+};
+
 const doorTrackLookup = {
   ...doorTrack_typhoonProtection,
   ...doorTrack_normal,
@@ -119,4 +145,21 @@ const optionsCre_doorTrack_normal = ({ emptyOption }: { emptyOption?: boolean } 
   return optionArr;
 };
 
-export { doorTrackLookup, optionsCre_doorTrack_typhoonProtection, optionsCre_doorTrack_normal };
+const getDoorTrackByDoorModel = ({ doorModelName }: { doorModelName: string }): Toption[] | undefined => {
+  const list = _.cloneDeep(doorTrack_sorted[doorModelName]);
+
+  if (list) {
+    const arr = Object.values(list);
+
+    return arr;
+  } else {
+    return undefined;
+  }
+};
+
+export {
+  doorTrackLookup,
+  optionsCre_doorTrack_typhoonProtection,
+  optionsCre_doorTrack_normal,
+  getDoorTrackByDoorModel,
+};
