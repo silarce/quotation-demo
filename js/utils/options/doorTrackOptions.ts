@@ -67,6 +67,31 @@ const doorTrack_normal = {
     label: 'sJ312_150_90t',
     icon: icon_sJ312_150_90t.src,
   },
+  '6kg': {
+    value: '6kg',
+    label: '6kg',
+    icon: '',
+  },
+  '△': {
+    value: '△',
+    label: '△',
+    icon: '',
+  },
+  扇形: {
+    value: '扇形',
+    label: '扇形',
+    icon: '',
+  },
+  單開: {
+    value: '單開',
+    label: '單開',
+    icon: '',
+  },
+  雙開: {
+    value: '雙開',
+    label: '雙開',
+    icon: '',
+  },
 };
 
 const doorTrackLookup = {
