@@ -35,7 +35,7 @@ import style from './quotation.module.scss';
 
 // api
 import { useGetContract_id_noItems, useQuotation_id_attachments, apiGetQuotationProducts } from 'js/api/api_quotation';
-import { apiPostEngineeringContact } from 'js/api/api_engineering';
+// import { apiPostEngineeringContact } from 'js/api/api_engineering';
 
 // component
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
@@ -54,7 +54,7 @@ import { useProductList } from 'hooks/quotation/useProduct';
 import type { TquotationContentDto } from 'js/api/api_quotation';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+// import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // =============================================================
 // =============================================================
@@ -402,32 +402,33 @@ version>1 是子合約
   ];
 
   const panel_quotation01: TpanelList = [
-    (() =>
-      version === '1' && !engineeringContactId
-        ? {
-            type: 'myButton',
-            label: '新增工程聯絡單',
-            onClick: async () => {
-              let isOk = true;
+    // 現在後端會在合約產生時自動產生工程聯絡單，因此把這個按鈕拿掉
+    // (() =>
+    //   version === '1' && !engineeringContactId
+    //     ? {
+    //         type: 'myButton',
+    //         label: '同步到工務部',
+    //         onClick: async () => {
+    //           let isOk = true;
 
-              try {
-                setIsLoading(true);
-                await apiPostEngineeringContact({ contractId: id });
-                myAlert.success({ title: '新增工程聯絡單成功' });
-              } catch (error) {
-                const err = error as Error;
-                isOk = false;
-                myAlert.err({ title: '新增工程聯絡單失敗', content: err.message });
-              } finally {
-                setIsLoading(false);
-              }
+    //           try {
+    //             setIsLoading(true);
+    //             await apiPostEngineeringContact({ contractId: id });
+    //             myAlert.success({ title: '新增工程聯絡單成功' });
+    //           } catch (error) {
+    //             const err = error as Error;
+    //             isOk = false;
+    //             myAlert.err({ title: '新增工程聯絡單失敗', content: err.message });
+    //           } finally {
+    //             setIsLoading(false);
+    //           }
 
-              if (isOk) {
-                update();
-              }
-            },
-          }
-        : null)(),
+    //           if (isOk) {
+    //             update();
+    //           }
+    //         },
+    //       }
+    //     : null)(),
     {
       type: 'myButton',
       label: '追加追減報價單',

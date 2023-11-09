@@ -63,6 +63,10 @@ import Table_prod from 'components/page/domestic/quotation/quotation/product/tab
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
 import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -84,16 +88,11 @@ import {
   apiDelQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
+// hook
 import { useProductList } from 'hooks/quotation/useProduct';
-
-import Summary, {
-  TsummaryControl,
-  TpayInfoControl,
-} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-
 import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
@@ -366,16 +365,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: discount,
-        subTotal: String(subTotal),
-        salesTax: String(salesTax),
-        total: String(total),
+        subTotal: subTotal.toLocaleString(),
+        salesTax: salesTax.toLocaleString(),
+        total: total.toLocaleString(),
         deliveryLocation,
         deliveryDate,
       });
     } else {
       setAnnotation([]);
       setQr([]);
-      setPaymentMethod([]);
+      setPaymentMethod([
+        {
+          milestone: '訂製同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '交貨同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '按裝同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '接電同時付總金額',
+          totalPaymentRatio: '0',
+        },
+      ]);
 
       setSummary({
         discountRate: '100',
@@ -1100,17 +1116,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       body.deliveryDate = null;
     }
 
-    let hasSurface = true;
-    body.products.forEach((item) => {
-      if (!item.materialSurface) {
-        hasSurface = false;
-      }
-    });
-
-    if (!hasSurface) {
-      return myAlert.warning({ title: '所有主產品必須選擇表面' });
-    }
-
     try {
       setIsLoading(true);
 
@@ -1137,7 +1142,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setDisabled(true);
     } catch (error) {
-      console.log(error);
+      const err = error as Error;
+      myAlert.err({ title: '更新報價單失敗', content: err.message });
     } finally {
       setIsLoading(false);
       showRootLoading(false);
@@ -1187,15 +1193,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    // 沒有用，後端設定成必須一個一個審
-    // const body = {
-    //   reviewSalesEmployeeId: '5e1c9259-1d31-4121-b160-3fdfdccb401e',
-    //   reviewSupervisorEmployeeId: '06dc8d70-485d-4ac9-aa31-5bf568c13d61',
-    //   reviewWorkDirectorEmployeeId: '3480f17e-07d8-42b1-ad52-cfb0de9c6049',
-    //   reviewManagerEmployeeId: '01f55698-49bb-4501-b432-1157a5109554',
-    //   reviewResult: isPass,
-    // };
-
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
@@ -1232,13 +1229,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
     // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
-    const lw = Number(prod.fullWidth || 0) * 100;
-    const h = Number(prod.height || 0) * 100;
-    const b = Number(prod.boxB || 0) * 100;
+
+    const lw = new Decimal(prod.fullWidth || 0).mul(10).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
     const size = `${lw} X ${h} + ${b}`;
 
-    // const foo = prod.comList;
     const list = { ...prod.comList, ...prod.subComList };
     delete list['sidePlate'];
     delete list['motorAccessories'];
@@ -1530,6 +1527,9 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
+  // const subTotalStr = subTotal.toFixed(0).toNumber().toLocaleString();
+  // const taxStr = tax.toFixed(0).toNumber().toLocaleString();
+  // const totalStr = total.toFixed(0).toNumber().toLocaleString();
   const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
   const taxStr = Number(tax.toFixed(0)).toLocaleString();
   const totalStr = Number(total.toFixed(0)).toLocaleString();

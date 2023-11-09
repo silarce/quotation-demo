@@ -165,7 +165,7 @@ const useProductList = ({
 
         doorType: prod.doorModelName,
         material: prod.materialName,
-        surface: prod.materialSurface,
+        surface: prod.materialSurface ?? '',
         close: prod.closingType,
         doorTrack: prod.guideRail,
         typhoonProtection: prod.isAntiTyphoon,
@@ -411,7 +411,7 @@ const useProductList = ({
       subTotal = subTotal.add(item.totalPrice);
     });
 
-    setSubTotal(subTotal.ceil().toString());
+    setSubTotal(subTotal.toFixed(0));
   };
 
   useEffect(() => {
@@ -490,7 +490,7 @@ const useProductList = ({
 
           doorType: prod.doorModelName,
           material: prod.materialName,
-          surface: prod.materialSurface,
+          surface: prod.materialSurface ?? '',
           close: prod.closingType,
           doorTrack: prod.guideRail,
           typhoonProtection: prod.isAntiTyphoon,

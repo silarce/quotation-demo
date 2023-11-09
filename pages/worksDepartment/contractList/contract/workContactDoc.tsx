@@ -198,6 +198,18 @@ export default function WorkContactDoc() {
   };
 
   // ---------------------------------------------------------------------------
+  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactNumber: string }[]>([]);
+
+  const onAddClick = () => {
+    setContactArr((arr) => {
+      const newArr = [...arr];
+      newArr.push({ contactPerson: '', contactNumber: '' });
+
+      return newArr;
+    });
+  };
+
+  // ---------------------------------------------------------------------------
 
   const reSet = () => {
     if (!engineeringContact) {
@@ -222,10 +234,15 @@ export default function WorkContactDoc() {
       contractorPrincipal,
       contractorContactNumber,
       contractorFaxNumber,
+      contactInfo,
     } = engineeringContact;
 
     if (annotations) {
       setAnnoArr(annotations);
+    }
+
+    if (contactInfo) {
+      setContactArr(contactInfo);
     }
 
     setProfile({
@@ -256,6 +273,42 @@ export default function WorkContactDoc() {
   }, [engineeringContact]);
 
   // ---------------------------------------------------------------------------
+
+  const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = contactArr.map((item, index) => {
+    return {
+      contactPerson: {
+        value: item.contactPerson,
+        onChange: (v) => {
+          setContactArr((arr) => {
+            const newArr = [...arr];
+            newArr[index].contactPerson = v;
+
+            return newArr;
+          });
+        },
+      },
+      contactPhone: {
+        value: item.contactNumber,
+        onChange: (v) => {
+          setContactArr((arr) => {
+            const newArr = [...arr];
+            newArr[index].contactNumber = v;
+
+            return newArr;
+          });
+        },
+      },
+      onDelClick: () => {
+        setContactArr((arr) => {
+          const newArr = [...arr];
+          newArr.splice(index, 1);
+
+          return newArr;
+        });
+      },
+    };
+  });
+
   const controll: Tcontroll_profile = {
     /**請款狀態 */
     paymentStatus: {
@@ -319,9 +372,6 @@ export default function WorkContactDoc() {
         },
       },
     },
-
-    //
-    //
     //
     /**工程負責人 */
     projectPerson: {
@@ -392,6 +442,11 @@ export default function WorkContactDoc() {
         profileChange('contractorFaxNumber', v);
       },
     },
+    //
+    contactPersons: {
+      onAddClick,
+      arr: contactPersonsArr,
+    },
   };
 
   // ----------------------------------------------------------------------------
@@ -404,6 +459,7 @@ export default function WorkContactDoc() {
     const body: TupdateEngineeringContactDto = {
       ...profile,
       annotations: annoArr,
+      contactInfo: contactArr,
     };
 
     try {

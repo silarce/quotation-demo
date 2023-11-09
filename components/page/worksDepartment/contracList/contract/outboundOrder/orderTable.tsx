@@ -1,10 +1,32 @@
 import { useState } from 'react';
+
+import classNames from 'classnames';
+
 import style from './outboundOrder.module.scss';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
+
+// type
+import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // ================================================================================
+
+type TcontractData = {
+  project: string;
+  L: string;
+  W: string;
+  B: string;
+  qty: string;
+  implementQty: string;
+  cai: string;
+  totalCai: string;
+  doorType: string;
+  material: string;
+  horsepower: string;
+  surface: string;
+};
 
 type TstaticData = {
   project: string;
@@ -23,42 +45,95 @@ type TstaticData = {
 
 type TdeliveryStatusItem = {
   value: string;
-  onChange: (str: string) => void;
+  empolyee?: undefined;
+  onChange?: (str: string) => void;
+  onChange_date?: undefined;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  forbidden?: boolean;
+};
+type TdeliveryStatusItem_date = {
+  value: string;
+  empolyee?: undefined;
+  onChange?: undefined;
+  onChange_date?: (date: string | null) => void;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  forbidden?: boolean;
+};
+
+type TdeliveryStatusItem_employee = {
+  value?: string | undefined;
+  empolyee: TemployeeDto | undefined | null;
+  onChange?: undefined;
+  onChange_date?: undefined;
+  onChange_employee?: (emp: TemployeeDto | null) => void;
+  hidden?: boolean;
+  forbidden?: boolean;
 };
 
 type Tgroup = {
   itemName: string;
   rowArr: {
+    contractData: TcontractData;
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
-      remark02: TdeliveryStatusItem;
-      remark03: TdeliveryStatusItem;
-      remark04: TdeliveryStatusItem;
+      // remark02: TdeliveryStatusItem;
+      // remark03: TdeliveryStatusItem;
+      // remark04: TdeliveryStatusItem;
       appended: TdeliveryStatusItem;
       orderCreatedDate: TdeliveryStatusItem;
       finishAppended: TdeliveryStatusItem;
-      installer: TdeliveryStatusItem;
-      installDate: TdeliveryStatusItem;
+      installer: TdeliveryStatusItem_employee;
+      installDate: TdeliveryStatusItem_date;
     };
   }[];
 };
 
 type Tcontrol = Tgroup[];
 
-export type { Tcontrol as Tcontrol_orderTable };
+export type { Tcontrol as Tcontrol_orderTable, Tgroup };
 
 // ================================================================================
 export default function OrderTable({ disabled, control }: { disabled: boolean; control: Tcontrol }) {
-  // const [orderList, setOrderList] = useState(fakeOrderData);
   const configList = creConfigList();
+
+  // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
+  const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_employee | undefined>();
 
   return (
     <div className={style.orderTable}>
       <div className={style.thead}>
         {/*  */}
-        <div className={`${style.theadItem} ${style.indexCell}`} />
+        {/* <div className={`${style.theadItem} ${style.indexCell}`} /> */}
         {/*  */}
+
+        {orderKeyArr_contract.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? style.textCenter : '';
+
+          if (index === 0) {
+            return (
+              <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+                <span></span>
+                <span>{label}</span>
+              </div>
+            );
+          }
+
+          return (
+            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+
+        {/* 灰色柱子 分隔線*/}
+        <div className={` ${style.pilar}`} />
 
         {orderKeyArr_static.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
@@ -73,12 +148,10 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
             </div>
           );
         })}
-        {/* 灰色柱子 */}
-        <div className={` ${style.pilar}`}>
-          <div />
-        </div>
+        {/* 灰色分隔線 */}
+        <div className={` ${style.pilar}`} />
         {/*  */}
-        {orderKeyIndex02.map((key, index) => {
+        {orderKey_editible.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
@@ -105,7 +178,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                 return (
                   <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
-                    {rowIndex === 0 ? (
+
+                    {/* {rowIndex === 0 ? (
                       <div className={`${style.column} ${style.indexCell}`}>
                         <span>{groupIndex + 1}</span>
                       </div>
@@ -113,7 +187,48 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       <div className={`${style.column} ${style.indexCell}`}>
                         <span></span>
                       </div>
-                    )}
+                    )} */}
+
+                    {orderKeyArr_contract.map((key, columnIndex) => {
+                      let value = row.contractData[key];
+
+                      if (rowIndex !== 0 && columnIndex === 0) {
+                        value = '';
+                      }
+
+                      const { width, position } = configList[key] ?? {};
+                      const theStyle = { width };
+
+                      if (columnIndex === 0) {
+                        const isHiddenIndex = rowIndex !== 0;
+
+                        return (
+                          <div
+                            className={classNames(style.column, position === 'center' && style.textCenter)}
+                            key={columnIndex}
+                            style={theStyle}
+                          >
+                            <span className={classNames('pr-[10px]', isHiddenIndex && style.hidden)}>
+                              {groupIndex + 1}
+                            </span>
+                            <span>{value}</span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div
+                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
+                          <span>{value}</span>
+                        </div>
+                      );
+                    })}
+
+                    {/* 灰色分隔線 */}
+                    <div className={` ${style.pilar}`} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
@@ -125,10 +240,13 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
 
                       return (
-                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
+                        <div
+                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
                           <span>{value}</span>
                         </div>
                       );
@@ -138,32 +256,70 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     <div className={`${style.pilar}`} />
 
                     {/* orderKeyIndex02 */}
-                    {orderKeyIndex02.map((key, columnIndex) => {
-                      const { value, onChange } = row.deliveryStatus[key];
+                    {orderKey_editible.map((key, columnIndex) => {
+                      const { value, empolyee, onChange_date, onChange, hidden, forbidden, onChange_employee } =
+                        row.deliveryStatus[key];
 
                       // if (rowIndex !== 0 && columnIndex === 0) {
                       //   value = '';
                       // }
 
-                      const { width, position } = configList[key] ?? {};
+                      const { width, position, type } = configList[key] ?? {};
                       const theStyle = { width };
                       const textCenter = position === 'center' ? style.textCenter : '';
 
-                      // const onChange = (v: string) => {
-                      //   orderList[groupIndex].list[rowIndex][key].value = v;
-                      //   setOrderList([...orderList]);
-                      // };
+                      const theProps: Parameters<typeof InputSel>[0] = {};
+
+                      if (type === 'input') {
+                        theProps.inputProps = {
+                          value: value ?? '',
+                          onChange,
+                        };
+                      }
+
+                      if (type === 'textarea') {
+                        theProps.textareaProps = {
+                          value: value ?? '',
+                          onChange,
+                          allowNewLineByUser: true,
+                        };
+                      }
+
+                      if (type === 'date') {
+                        theProps.datePickerProps = {
+                          value,
+                          onChange02: (m) => {
+                            onChange_date?.(m?.toISOString() ?? null);
+                          },
+                          datePickerClassName: style.datepicker,
+                        };
+                      }
+
+                      let onClick: (() => void) | undefined = undefined;
+
+                      if (type === 'employee' && key === 'installer') {
+                        theProps.inputProps = {
+                          value: value || empolyee?.chName || empolyee?.enName || '',
+                        };
+
+                        onClick = () => {
+                          !disabled && setTargetEmpControl(row.deliveryStatus[key]);
+                        };
+                      }
 
                       return (
-                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
+                        <div
+                          className={`${style.column} ${textCenter}`}
+                          key={columnIndex}
+                          style={theStyle}
+                          onClick={onClick}
+                        >
                           <InputSel
-                            className={style.input03}
-                            inputProps={{
-                              value,
-                              onChange,
-                            }}
+                            className={classNames(style.input03, hidden && style.hidden)}
+                            showBaseline={forbidden ? 'invisible' : 'auto'}
                             placeholder=""
-                            disabled={disabled}
+                            disabled={forbidden || disabled}
+                            {...theProps}
                           />
                         </div>
                       );
@@ -177,12 +333,23 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
           );
         })}
       </div>
+      <EmployeeSelector
+        showModal={!!targetEmpControl}
+        onConfirm={(arr) => {
+          targetEmpControl?.onChange_employee?.(arr[0] ?? null);
+        }}
+        onCancel={() => {
+          setTargetEmpControl(undefined);
+        }}
+        selLimit={1}
+      />
     </div>
   );
 }
 
 // =======================================================
-const orderKeyArr_static: (keyof TstaticData)[] = [
+
+const orderKeyArr_contract: (keyof TcontractData)[] = [
   'project',
   'L',
   'W',
@@ -197,172 +364,32 @@ const orderKeyArr_static: (keyof TstaticData)[] = [
   'surface',
 ];
 
-const orderKeyIndex02: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
-  'remark01',
-  'remark02',
-  'remark03',
-  'remark04',
-  'appended',
-  'orderCreatedDate',
-  'finishAppended',
-  'installer',
-  'installDate',
+const orderKeyArr_static: (keyof TstaticData)[] = [
+  // 'project',
+  'L',
+  'W',
+  'B',
+  'qty',
+  'implementQty',
+  'cai',
+  'totalCai',
+  'doorType',
+  'material',
+  'horsepower',
+  'surface',
 ];
 
-const fakeOrderDataItemOri = () => ({
-  project: {
-    value: 'SD2',
-  },
-  L: {
-    value: '516',
-  },
-  W: {
-    value: '230',
-  },
-  B: {
-    value: '45',
-  },
-  qty: {
-    value: '1',
-  },
-  implementQty: {
-    value: '1',
-  },
-  cai: {
-    value: '22181.49',
-  },
-  totalCai: {
-    value: '22181.49',
-  },
-  doorType: {
-    value: 'SJ-302',
-  },
-  material: {
-    value: '不鏽鋼304#',
-  },
-  horsepower: {
-    value: '1/3HP',
-  },
-  surface: {
-    value: '烤漆',
-  },
-
-  remark01: {
-    value: '',
-  },
-  remark02: {
-    value: '',
-  },
-  remark03: {
-    value: '',
-  },
-  remark04: {
-    value: '',
-  },
-  appended: {
-    value: '',
-  },
-  orderCreatedDate: {
-    value: '',
-  },
-  finishAppended: {
-    value: '',
-  },
-  installer: {
-    value: '',
-  },
-  installDate: {
-    value: '',
-  },
-});
-// const fakeOrderDataItem = {
-//   project: {
-//     value: "SD2"
-//   },
-//   L: {
-//     value: "516"
-//   },
-//   W: {
-//     value: "230"
-//   },
-//   B: {
-//     value: "45"
-//   },
-//   qty: {
-//     value: "1"
-//   },
-//   implementQty: {
-//     value: "1"
-//   },
-//   cai: {
-//     value: "22181.49"
-//   },
-//   totalCai: {
-//     value: "22181.49"
-//   },
-//   doorType: {
-//     value: "SJ-302"
-//   },
-//   material: {
-//     value: "不鏽鋼304#"
-//   },
-//   horsepower: {
-//     value: "1/3HP"
-//   },
-//   surface: {
-//     value: "烤漆"
-//   },
-
-//   remark01: {
-//     value: ""
-//   },
-//   remark02: {
-//     value: ""
-//   },
-//   remark03: {
-//     value: ""
-//   },
-//   remark04: {
-//     value: ""
-//   },
-//   appended: {
-//     value: ""
-//   },
-//   orderCreatedDate: {
-//     value: ""
-//   },
-//   finishAppended: {
-//     value: ""
-//   },
-//   installer: {
-//     value: ""
-//   },
-//   installDate: {
-//     value: ""
-//   },
-// }
-
-const fakeOrderData = [
-  {
-    project: 'SD2',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD3',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri(), fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD4',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD5',
-    list: [fakeOrderDataItemOri()],
-  },
-  {
-    project: 'SD5',
-    list: [fakeOrderDataItemOri()],
-  },
+const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
+  'orderCreatedDate',
+  'installDate',
+  //
+  'remark01',
+  // 'remark02',
+  // 'remark03',
+  // 'remark04',
+  'appended',
+  'finishAppended',
+  'installer',
 ];
 
 // =======================================================================
@@ -370,7 +397,7 @@ const fakeOrderData = [
 type Tconfig = {
   label: string;
   width: string;
-  type: string;
+  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea';
   position: string;
 };
 
@@ -387,7 +414,7 @@ const creCellConfig_static = (): TcellConfigList => ({
   },
   project: {
     label: '項目',
-    width: '60px',
+    width: '120px',
     type: 'input',
     position: '',
   },
@@ -457,12 +484,12 @@ const creCellConfig_static = (): TcellConfigList => ({
     type: 'select',
     position: '',
   },
-  doorRail: {
-    label: '門軌',
-    width: '70px',
-    type: 'selectWithIcon',
-    position: '',
-  },
+  // doorRail: {
+  //   label: '門軌',
+  //   width: '70px',
+  //   type: 'selectWithIcon',
+  //   position: '',
+  // },
   horsepower: {
     label: '馬力',
     width: '60px',
@@ -493,12 +520,12 @@ const creCellConfig_static = (): TcellConfigList => ({
     type: 'select',
     position: '',
   },
-  ejectionDoor: {
-    label: '彈射門',
-    width: '60px',
-    type: 'checkbox',
-    position: '',
-  },
+  // ejectionDoor: {
+  //   label: '彈射門',
+  //   width: '60px',
+  //   type: 'checkbox',
+  //   position: '',
+  // },
   openType: {
     label: '開門方式',
     width: '82px',
@@ -517,14 +544,14 @@ const creCellConfig_static = (): TcellConfigList => ({
 const creCellConfig_deliveryStatus = (): TcellConfigList => ({
   remark01: {
     label: '備註1',
-    width: '65px',
-    type: 'input',
+    width: '200px',
+    type: 'textarea',
     position: '',
   },
   remark02: {
     label: '備註2',
-    width: '65px',
-    type: 'input',
+    width: '150px',
+    type: 'textarea',
     position: '',
   },
   remark03: {
@@ -560,13 +587,13 @@ const creCellConfig_deliveryStatus = (): TcellConfigList => ({
   installer: {
     label: '安裝人員',
     width: '85px',
-    type: 'input',
+    type: 'employee',
     position: '',
   },
   installDate: {
     label: '安裝日期',
-    width: '85px',
-    type: 'input',
+    width: '120px',
+    type: 'date',
     position: '',
   },
   implementQty: {

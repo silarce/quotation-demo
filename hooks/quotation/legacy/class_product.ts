@@ -2,7 +2,11 @@ import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
 
-import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
+import {
+  optionsCre_doorTrack_normal,
+  optionsCre_doorTrack_typhoonProtection,
+  getDoorTrackByDoorModel,
+} from 'js/utils/options/doorTrackOptions';
 import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
@@ -26,7 +30,10 @@ class Class_product {
     countSubTotal,
     parentProd,
     //
-    delSelf,
+    belongList,
+    key,
+    //
+    addExtraExProd,
   }: {
     reRender: TreRender;
     legacyProduct: TlegacyContractProductDto | TcreateLegacyContractProductDto;
@@ -34,10 +41,18 @@ class Class_product {
     countSubTotal: () => void;
     parentProd?: Class_product;
     //
-    delSelf: () => void;
+    belongList: { [key in string]: Class_product };
+    key: string;
+    //
+    addExtraExProd: (body?: TcreateLegacyContractProductDto) => void;
   }) {
     this._reRender = reRender;
     this._product = legacyProduct;
+
+    this._belongList = belongList;
+    this._key = key;
+
+    this._addExtraExProd = addExtraExProd;
 
     // this._countTotalDiscount = countTotalDiscount;
     this._countSubTotal = countSubTotal;
@@ -56,7 +71,8 @@ class Class_product {
     this._height = this._product.height ? this._product.height.toString() : '';
     this._boxB = this._product.boxB ? this._product.boxB.toString() : '';
     //
-    this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
+    // this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
+    this._quantity = this._product.quantity.toString();
     //
     this._unitPrice = this._product.unitPrice ? this._product.unitPrice.toString() : '';
     this._totalPrice = this._product.totalPrice ? this._product.totalPrice.toString() : '';
@@ -75,20 +91,19 @@ class Class_product {
     if (parentProd) {
       this.parentProd = parentProd;
     }
-
-    this._delSelf = () => {
-      delSelf();
-      this._countSubTotal();
-      this._reRender();
-    };
   } // constructor
   //----------------------------------------------
 
   private parentProd: Class_product | undefined = undefined;
 
   private _reRender;
-  private _delSelf;
+  // private _delSelf;
   private _countSubTotal;
+
+  private _belongList;
+  private _key;
+
+  private _addExtraExProd;
 
   private _product;
   private _id;
@@ -104,13 +119,14 @@ class Class_product {
 
   readonly options_doorTrack_normal = options_doorTrack_normal;
   readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  readonly options_doorModel = optionsCreator_doorModel();
 
   private _reduceQty = '0';
   // 因變更而新增的prod
   private _exchangeProdList: {
     [key in string]: Class_product;
   } = {};
-  // 等api新增，先用假資料 // TODO 這個已經完工了，假資料?
+
   private _batchNumber;
 
   //----------------------------------------------
@@ -123,15 +139,25 @@ class Class_product {
     return !!this.parentProd;
   }
 
-  get delSelf() {
-    return this._delSelf;
+  delSelf() {
+    delete this._belongList[this._key];
+    this._countSubTotal();
+    this._reRender();
   }
-  set delSelf(newDelSelf) {
-    this._delSelf = () => {
-      newDelSelf();
-      this._countSubTotal();
-      this._reRender();
-    };
+
+  copySelf() {
+    const key = 'new-' + nanoid();
+    const copy = this.postProd;
+    copy.id = undefined;
+    this._belongList[key] = new Class_product({
+      reRender: this._reRender,
+      legacyProduct: copy,
+      countSubTotal: this._countSubTotal,
+      belongList: this._belongList,
+      key,
+      addExtraExProd: this._addExtraExProd,
+    });
+    this._countSubTotal();
   }
 
   //----------------------------------------------
@@ -154,11 +180,23 @@ class Class_product {
   };
 
   get options_doorTrack() {
+    const options_doorTrack_byDoorModel = getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
+
+    if (options_doorTrack_byDoorModel) {
+      return options_doorTrack_byDoorModel;
+    }
+
     if (this.typhoonProtection) {
       return this.options_doorTrack_typhoonProtection;
     } else {
       return this.options_doorTrack_normal;
     }
+  }
+
+  get options_doorModel_byQuoteType() {
+    return this.options_doorModel.filter((item) => {
+      return item.quoteType === this.quoteType;
+    });
   }
 
   get id() {
@@ -220,6 +258,7 @@ class Class_product {
   }
   set quoteType(v) {
     this._product.quoteType = v;
+    this._product.doorType = '';
     this._reRender();
   }
 
@@ -502,19 +541,16 @@ class Class_product {
       copy.id = '';
     }
 
-    const exId = 'ex-' + nanoid();
+    const key = 'ex-' + nanoid();
 
-    const delSelf = () => {
-      delete this._exchangeProdList[exId];
-      // this._reRender();
-    };
-
-    this._exchangeProdList[exId] = new Class_product({
+    this._exchangeProdList[key] = new Class_product({
       reRender: this._reRender,
       legacyProduct: copy,
       countSubTotal: this._countSubTotal,
       parentProd: this,
-      delSelf,
+      belongList: this._belongList,
+      key: this._key,
+      addExtraExProd: this._addExtraExProd,
     });
 
     this._countSubTotal();
@@ -523,6 +559,17 @@ class Class_product {
 
     return true;
     //
+  }
+
+  copySelfToExchange() {
+    // const key = 'ex-' + nanoid();
+    const copy = this.postProd;
+    copy.id = undefined;
+
+    this._addExtraExProd(copy);
+
+    this._countSubTotal();
+    this._reRender();
   }
 
   // 清空變更prod
@@ -535,8 +582,7 @@ class Class_product {
 
   // -------------------------------------------------
   get postProd() {
-    // 那四個property要轉NUMBER
-    return {
+    const body = {
       ...this._product,
       id: this.id || undefined,
       closingType: this._product.closingType ?? '',
@@ -546,6 +592,10 @@ class Class_product {
       height: this.height || '0',
       thickness: this.thickness || '0',
     };
+
+    const copy = _.cloneDeep(body);
+
+    return copy;
   }
 
   get appendProd() {
@@ -719,7 +769,7 @@ function prodCellConfigCre(): TprodCellConfig {
         id: 'doorType',
         label: '門型',
         inputSelProps: {
-          wrapperStyle: { width: '120px' },
+          wrapperStyle: { width: '320px' },
           selectProps: {
             props: {
               options: optionsCreator_doorModel(),

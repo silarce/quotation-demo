@@ -64,7 +64,7 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
   const [activeKey, setActiveKey] = useState<string>();
   // ---------------------------------------------------------------
-  const { prodCellConfig, prodList: prodList_2, prodKitList_2 } = classQuotation;
+  const { prodCellConfig, prodList } = classQuotation;
 
   const theadKeyArr: TtheadKeyArr = isAppend ? prodCellConfig.keyArr : classQuotation.editProdKeyArr;
 
@@ -93,7 +93,7 @@ export default function ProductList_legacy({
   // ---------------------------------------------------------------
 
   const { sensors, dndKeyArr, movingId, onDragEnd, onDragStart } = useVerticalDnd({
-    listKeyArr: Object.keys(prodList_2),
+    listKeyArr: Object.keys(prodList),
     resetTrigger: classQuotation,
   });
 
@@ -122,15 +122,11 @@ export default function ProductList_legacy({
       >
         <SortableContext items={dndKeyArr} strategy={verticalListSortingStrategy}>
           {dndKeyArr.map((key, pIndex) => {
-            if (!prodKitList_2[key]) {
+            const prod = prodList[key];
+
+            if (!prod) {
               return null;
             }
-
-            const {
-              prod,
-              //  delSelf,
-              copySelf,
-            } = prodKitList_2[key];
 
             const isMoving = movingId === key;
 
@@ -160,14 +156,9 @@ export default function ProductList_legacy({
               <DndRow
                 key={key}
                 isActive={isActive}
-                // isActive={false}
                 pIndex={pIndex}
-                // del 跟 copy在這個情況好像不對
-                // 刪除或複製的對象會是?
-                delProd={() => {
-                  prod.delSelf();
-                }}
-                copyProd={copySelf}
+                delProd={() => prod.delSelf()}
+                copyProd={() => prod.copySelf()}
                 toSetTargeProd={toSetTargeProd}
                 prod={prod}
                 theadKeyArr={theadKeyArr}
@@ -258,6 +249,7 @@ const CopyDelBtnBox = ({
 const ResetChangeBtnBox = ({
   toSetTargetIndex,
   clearExchange,
+  copySelfToExchange,
   dndAttr,
   dndListener,
   indexNum,
@@ -265,6 +257,7 @@ const ResetChangeBtnBox = ({
 }: {
   toSetTargetIndex: () => void;
   clearExchange: () => void;
+  copySelfToExchange: () => void;
   dndAttr: DraggableAttributes;
   dndListener: SyntheticListenerMap | undefined;
   indexNum: string | number;
@@ -274,6 +267,11 @@ const ResetChangeBtnBox = ({
     <div className={classNames(scss.buttonBox, scss.resetChange, 'chameleon')}>
       <Image className={scss.iconBtn} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
 
+      <IconCopy
+        className={classNames(scss.iconBtn, scss.littleBtn, !isAppending && scss.hidden)}
+        //
+        onClick={copySelfToExchange}
+      />
       <Image
         src={iconReset}
         alt="還原"
@@ -361,7 +359,8 @@ function DndRow({
           {isAppend && (
             <ResetChangeBtnBox
               toSetTargetIndex={toSetTargeProd}
-              clearExchange={prod.clearExchange}
+              clearExchange={() => prod.clearExchange()}
+              copySelfToExchange={() => prod.copySelfToExchange()}
               dndAttr={attributes}
               dndListener={listeners}
               indexNum={pIndex + 1}
@@ -389,13 +388,23 @@ function DndRow({
 
             //____
             if (selectProps) {
-              if (key === 'doorTrack') {
-                selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
-              }
+              // if (key === 'doorTrack') {
+              //   selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
+              // }
 
               selectProps.easyValue = stateValue as string;
 
               if (selectProps.props) {
+                if (key === 'doorTrack') {
+                  // selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
+                  // selectProps.props!.options = prod.options_doorTrack;
+                  selectProps.props!.options = prod.options_doorTrack;
+                }
+
+                if (key === 'doorType') {
+                  selectProps.props!.options = prod.options_doorModel_byQuoteType;
+                }
+
                 selectProps.props.onChange = (option) => {
                   (prod[key] as string) = option?.value ?? '';
                 };

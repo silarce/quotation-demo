@@ -16,9 +16,9 @@ type TtheadInfo = {
   contactName: string;
   contactNumber: string;
   agentName: string;
-  discount: string;
-  doorQty: string;
-  totalPrice: string;
+  // discount: string;
+  // doorQty: string;
+  // totalPrice: string;
   date: string;
   county: string;
   projectName: string;
@@ -44,9 +44,9 @@ export default function PanelHeader({
     contactName,
     contactNumber: contactPhone,
     agentName: undertaker,
-    discount,
-    doorQty,
-    totalPrice: budgetAmount,
+    // discount,
+    // doorQty,
+    // totalPrice: budgetAmount,
   } = contract;
   const { date, county: country, projectName } = contract;
 
@@ -58,9 +58,9 @@ export default function PanelHeader({
         <span>{contactName}</span>
         <span>{contactPhone}</span>
         <span>{undertaker}</span>
-        <span>{discount}</span>
+        {/* <span>{discount}</span>
         <span>{doorQty}</span>
-        <span>{budgetAmount}</span>
+        <span>{budgetAmount}</span> */}
         <div>
           <IconDetail onClick={openQuotation} />
         </div>

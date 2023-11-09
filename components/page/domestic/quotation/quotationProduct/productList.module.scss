@@ -73,8 +73,9 @@
   }
 
   &.resetChange {
-    width: 140px;
     // width: 206px;
+    // width: 140px;
+    width: 170px;
   }
   &.exchange {
     width: 140px;
@@ -89,17 +90,22 @@
     color: theme("colors.main");
     font-size: 16px;
     font-weight: 400;
-    &.hidden {
-      opacity: 0;
-      pointer-events: none;
-      user-select: none;
-    }
+    // &.hidden {
+    //   visibility: hidden;
+    //   pointer-events: none;
+    //   user-select: none;
+    // }
   }
   > .iconBtn {
     cursor: pointer;
     &.littleBtn {
       transform: translateY(-5px);
     }
+  }
+  > .hidden {
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
   }
 }
 

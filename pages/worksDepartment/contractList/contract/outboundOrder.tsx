@@ -1,15 +1,20 @@
 // 出庫單
 // 出庫單
 // 出庫單
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Decimal from 'decimal.js';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import OrderTable from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
+import OrderTable, {
+  Tcontrol_orderTable,
+  Tgroup,
+} from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -19,11 +24,44 @@ import style from './contract.module.scss';
 
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { TupdateWorkSheet, useGetEngineeringContact, useGetWorkSheet, apiPatchWorkSheet } from 'js/api/api_engineering';
-import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
+import {
+  TupdateEngineeringDeliveryList,
+  TupdateDeliveryStatus,
+  useGetEngineeringContact,
+  useGetEngineeringDeliveryList,
+  apiPatchEngineeringDeliveryList,
+} from 'js/api/api_engineering';
+
+// utils
+import { convertDate_reduce1911, convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/api/dtoTypes';
+
+// =====================================================================
+
+type Tdelevery = {
+  originalItem: TquotationProductItemDto;
+  itemName: string;
+  itemArr: TquotationProductItemDto[];
+};
+
+type myDeleveryList = {
+  [key: string]: Tdelevery;
+};
+
+type TdeliveryStatusWillUpdate = {
+  [key in string]: {
+    id: string;
+    notes: string;
+    // installerEmployeeId: string | null;
+    installerEmployee?: TemployeeDto | null;
+    installationDate: string | null;
+    append: string | null;
+    completeAppend: string | null;
+  };
+};
 
 // =====================================================================
 export default function OutboundOrder() {
@@ -37,9 +75,11 @@ export default function OutboundOrder() {
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
   // const engineeringContactId = contract?.engineeringContactId;
-  const { engineeringContactId } = contract ?? {};
+  const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
+
+  const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +99,7 @@ export default function OutboundOrder() {
       try {
         setIsLoading(true);
         await update_engineeringContact();
+        await update_deliveryList();
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -67,6 +108,378 @@ export default function OutboundOrder() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
+
+  // --------------------------------------------------------------------------
+
+  const [notes, setNotes] = useState<string>();
+
+  // --------------------------------------------------------------------------
+
+  const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
+
+  const change_deliveryStatusWillUpdate = (
+    statusOri: TdeliveryStatusDto | undefined | null,
+    key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
+    v: string
+  ) => {
+    if (!statusOri) {
+      return;
+    }
+
+    const deliveryStatusId = statusOri.id;
+    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+    statusCopy = { ...statusCopy };
+    statusCopy[key] = v;
+
+    setDeliveryStatusWillUpdate((state) => {
+      return {
+        ...state,
+        [deliveryStatusId]: statusCopy,
+      };
+    });
+  };
+
+  const change_deliveryStatusWillUpdate_employee = (
+    statusOri: TdeliveryStatusDto | undefined | null,
+    key: 'installerEmployee',
+    v: TemployeeDto | null
+  ) => {
+    if (!statusOri) {
+      return;
+    }
+
+    const deliveryStatusId = statusOri.id;
+    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+    statusCopy = { ...statusCopy };
+    statusCopy[key] = v;
+    setDeliveryStatusWillUpdate((state) => {
+      return {
+        ...state,
+        [deliveryStatusId]: statusCopy,
+      };
+    });
+  };
+
+  const change_deliveryStatusWillUpdate_date = (
+    statusOri: TdeliveryStatusDto | undefined | null,
+    key: 'installationDate',
+    v: string | null
+  ) => {
+    if (!statusOri) {
+      return;
+    }
+
+    const deliveryStatusId = statusOri.id;
+    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+    statusCopy = { ...statusCopy };
+    statusCopy[key] = v;
+    setDeliveryStatusWillUpdate((state) => {
+      return {
+        ...state,
+        [deliveryStatusId]: statusCopy,
+      };
+    });
+  };
+
+  // --------------------------------------------------------------------------
+
+  const { myDeleveryList } = useMemo(() => {
+    if (!deliveryList?.contract.worksheet?.contractProductItems) {
+      return {};
+    }
+
+    const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
+
+    const myDeleveryList: myDeleveryList = {};
+
+    contractProductItems.forEach((item) => {
+      const { productId, adjustedItem, adjustedItemId } = item;
+
+      let theItem: typeof item;
+      let theId: string;
+
+      if (adjustedItem && adjustedItemId) {
+        theItem = adjustedItem;
+        theId = adjustedItemId;
+      } else {
+        theItem = item;
+        theId = productId;
+      }
+
+      theItem.deliveryStatus = item.deliveryStatus;
+
+      if (!myDeleveryList?.[theId]) {
+        myDeleveryList[theId] = {
+          originalItem: item,
+          itemName: theItem.itemName,
+          itemArr: [],
+        };
+      }
+
+      myDeleveryList[theId].itemArr.push(theItem);
+    });
+
+    return {
+      myDeleveryList,
+    };
+  }, [deliveryList]);
+
+  useEffect(() => {
+    if (deliveryList) {
+      setNotes(deliveryList.notes);
+    }
+  }, [deliveryList]);
+
+  useEffect(() => {
+    setDeliveryStatusWillUpdate({});
+  }, [disabled]);
+
+  // --------------------------------------------------------------------------
+
+  const control_orderTable: Tcontrol_orderTable =
+    Object.values(myDeleveryList ?? {}).map((delevery) => {
+      // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
+      const originalItem = delevery.originalItem;
+      const firstItem = delevery.itemArr[0];
+
+      const firstRow: Tgroup['rowArr'][0] = {
+        contractData: {
+          project: delevery.itemName,
+          L: String(originalItem.fullWidth),
+          W: String(originalItem.WG),
+          B: String(originalItem.boxB),
+          qty: String(delevery.itemArr.length),
+          implementQty: '???',
+          // cai: firstItem.volume,
+          cai: '',
+          totalCai: '0',
+          doorType: originalItem.doorModelName,
+          material: originalItem.materialName,
+          horsepower: originalItem.horsepower,
+          surface: originalItem.materialSurface ?? '',
+        },
+        staticData: {
+          project: delevery.itemName,
+          L: String(firstItem.fullWidth),
+          W: String(firstItem.WG),
+          B: String(firstItem.boxB),
+          qty: String(delevery.itemArr.length),
+          implementQty: '???',
+          // cai: firstItem.volume,
+          cai: '',
+          totalCai: '0',
+          doorType: firstItem.doorModelName,
+          material: firstItem.materialName,
+          horsepower: firstItem.horsepower,
+          surface: firstItem.materialSurface ?? '',
+        },
+        deliveryStatus: {
+          remark01: {
+            value: '',
+            hidden: true,
+          },
+          // remark02: {
+          //   value: '',
+          //   hidden: true,
+          // },
+          // remark03: {
+          //   value: '',
+          //   hidden: true,
+          // },
+          // remark04: {
+          //   value: '',
+          //   hidden: true,
+          // },
+          appended: {
+            value: '',
+            hidden: true,
+          },
+          orderCreatedDate: {
+            value: '',
+            hidden: true,
+          },
+          finishAppended: {
+            value: '',
+            hidden: true,
+          },
+          installer: {
+            // value: '',
+            empolyee: null,
+            hidden: true,
+          },
+          installDate: {
+            value: '',
+            hidden: true,
+          },
+        },
+      };
+
+      let totalCai_total = new Decimal(0);
+
+      const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
+        totalCai_total = totalCai_total.add(item.volume || '0');
+
+        const accessories = item.accessories;
+        const acceNameArr =
+          accessories?.map((acce) => {
+            return acce.name;
+          }) ?? [];
+
+        const {
+          //
+          id: deliveryStatusId,
+          createdAt,
+          notes,
+          installerEmployeeId,
+          installerEmployee,
+          installationDate,
+          append,
+          completeAppend,
+        } = item.deliveryStatus ?? {};
+
+        const deliveryStatusWillUpdate_item: TdeliveryStatusWillUpdate[string] | undefined =
+          deliveryStatusWillUpdate[deliveryStatusId ?? ''];
+
+        return {
+          contractData: {
+            project: delevery.itemName,
+            L: String(originalItem.fullWidth),
+            W: String(originalItem.WG),
+            B: String(originalItem.boxB),
+            qty: String(delevery.itemArr.length),
+            implementQty: '???',
+            // cai: firstItem.volume,
+            cai: '',
+            totalCai: '0',
+            doorType: originalItem.doorModelName,
+            material: originalItem.materialName,
+            horsepower: originalItem.horsepower,
+            surface: originalItem.materialSurface ?? '',
+          },
+          staticData: {
+            project: delevery.itemName,
+            L: String(item.fullWidth),
+            W: String(item.WG),
+            B: String(item.boxB),
+            qty: '1',
+            implementQty: '???',
+            cai: item.volume,
+            totalCai: '',
+            doorType: item.doorModelName,
+            material: item.materialName,
+            horsepower: item.horsepower,
+            surface: item.materialSurface ?? '',
+          },
+          deliveryStatus: {
+            remark01: {
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || acceNameArr.join('\n'),
+              onChange: (str) => {
+                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
+              },
+            },
+            // remark02: {
+            //   value: "test",
+            //   onChange: () => {},
+            //   forbidden: true,
+            // },
+            // remark03: {
+            //   value: 'test',
+            //   onChange: () => {},
+            // },
+            // remark04: {
+            //   value: 'test',
+            //   onChange: () => {},
+            // },
+            orderCreatedDate: {
+              value: createdAt ? moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD') : '',
+              forbidden: true,
+            },
+            installDate: {
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.installationDate : installationDate) ||
+                '',
+              onChange_date: (date) => {
+                change_deliveryStatusWillUpdate_date(item?.deliveryStatus, 'installationDate', date);
+              },
+            },
+            appended: {
+              value: (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.append : append) || '',
+              onChange: (str) => {
+                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'append', str);
+              },
+            },
+            finishAppended: {
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.completeAppend : completeAppend) || '',
+              onChange: (str) => {
+                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'completeAppend', str);
+              },
+            },
+            installer: {
+              // value: '', // 設定value的話就會蓋過employee.chName或employee.enName
+              empolyee:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.installerEmployee : installerEmployee) ||
+                null,
+              onChange_employee: (emp) => {
+                change_deliveryStatusWillUpdate_employee(item?.deliveryStatus, 'installerEmployee', emp);
+              },
+            },
+          },
+        };
+      });
+
+      firstRow.staticData.totalCai = totalCai_total.toString();
+      rowArr.unshift(firstRow);
+
+      return {
+        itemName: delevery.itemName,
+        rowArr,
+      };
+    }) ?? [];
+
+  // --------------------------------------------------------------------------
+
+  const reqUpdate = async () => {
+    if (!engineeringDeliveryListId || !deliveryList || notes === undefined) {
+      return myAlert.warning({ title: '還未取得工作表' });
+    }
+
+    const productsItemStatus: TupdateDeliveryStatus[] = Object.values(deliveryStatusWillUpdate).map((status) => {
+      // const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
+      const theDate = status.installationDate ? status.installationDate : null;
+
+      return {
+        id: status.id,
+        notes: status.notes,
+        installerEmployeeId: status.installerEmployee?.id ?? null,
+        installationDate: theDate,
+        append: status.append,
+        completeAppend: status.completeAppend,
+      };
+    });
+
+    const body: TupdateEngineeringDeliveryList = {
+      notes: notes,
+      productsItemStatus,
+    };
+
+    try {
+      setIsLoading(true);
+      const res = await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, body);
+
+      if (res) {
+        myAlert.success({ title: '更新工作表成功' });
+        setDisabled(true);
+        await update_deliveryList();
+      }
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新工作表失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // --------------------------------------------------------------------------
 
@@ -82,10 +495,8 @@ export default function OutboundOrder() {
   const panelList02: TpanelList = [
     {
       type: 'redButton',
-      label: '儲存',
-      onClick: () => {
-        alert('儲存');
-      },
+      label: '更新',
+      onClick: reqUpdate,
     },
     {
       type: 'myButton',
@@ -97,7 +508,7 @@ export default function OutboundOrder() {
   ];
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader
         panelList={disabled ? panelList01 : panelList02}
         contractNumber={engineeringContact?.contractNumber ?? ''}
@@ -116,7 +527,7 @@ export default function OutboundOrder() {
             </div>
           </div>
 
-          <OrderTable disabled={disabled} control={[]} />
+          <OrderTable disabled={disabled} control={control_orderTable} />
 
           <div className={style.remark}>
             <div className={style.title}>
@@ -126,7 +537,13 @@ export default function OutboundOrder() {
             </div>
 
             <div className={style.textarea}>
-              <textarea name="" id="" placeholder="請輸入備註"></textarea>
+              <textarea
+                value={notes || ''}
+                onChange={(e) => {
+                  setNotes(e.target.value);
+                }}
+                placeholder="請輸入備註"
+              ></textarea>
             </div>
           </div>
         </div>
@@ -134,3 +551,14 @@ export default function OutboundOrder() {
     </SubLayer>
   );
 }
+
+const createDeliveryStatusWillUpdate = (deliveryStatus: TdeliveryStatusDto): TdeliveryStatusWillUpdate[string] => {
+  return {
+    id: deliveryStatus.id,
+    notes: deliveryStatus.notes ?? '',
+    installerEmployee: deliveryStatus.installerEmployee ?? null,
+    installationDate: deliveryStatus.installationDate,
+    append: deliveryStatus.append,
+    completeAppend: deliveryStatus.completeAppend,
+  };
+};

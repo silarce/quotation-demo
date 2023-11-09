@@ -253,35 +253,35 @@ export default function ContractReviewForm({
         </div>
         {/*  */}
         <div className={scss.list}>
-          <div>1</div>
+          <div className={scss.numIndex}>1</div>
           <div>
             <span>註明請款日</span>
             <InputSel
-              className={scss.datePicker}
-              datePickerProps={{
+              className={scss.date}
+              inputProps={{
                 props: {
-                  value: watchData.askForPaymentDate ? moment(watchData.askForPaymentDate) : null,
-                  onChange: (md) => {
-                    setValue('askForPaymentDate', md?.toISOString() ?? '');
+                  value: watchData.askForPaymentDate ?? '',
+                  onChange: (e) => {
+                    setValue('askForPaymentDate', e.target.value);
                   },
                 },
               }}
             />
             <span>，放款日</span>
             <InputSel
-              className={scss.datePicker}
-              datePickerProps={{
+              className={scss.date}
+              inputProps={{
                 props: {
-                  value: watchData.disbursementDate ? moment(watchData.disbursementDate) : null,
-                  onChange: (md) => {
-                    setValue('disbursementDate', md?.toISOString() ?? '');
+                  value: watchData.disbursementDate ?? '',
+                  onChange: (e) => {
+                    setValue('disbursementDate', e.target.value);
                   },
                 },
               }}
             />
           </div>
           {/*  */}
-          <div>2</div>
+          <div className={scss.numIndex}>2</div>
           <div className={scss.item2}>
             <div>
               <span>確定請款比例</span>
@@ -311,9 +311,6 @@ export default function ContractReviewForm({
                     }}
                     price={{
                       value: item.price,
-                      // onChange: (e) => {
-                      //   item.price = e.target.value;
-                      // },
                     }}
                     note={{
                       value: item.note,
@@ -327,24 +324,23 @@ export default function ContractReviewForm({
             </div>
           </div>
           {/*  */}
-          <div>3</div>
-          <div className="flex">
+          <div className={scss.numIndex}>3</div>
+          <div className={scss.paymentTenor}>
             <span>合理的放款票期</span>
-            {/* <InputBox className="flex-auto" inputAttr={{ ...register('paymentTenor') }} /> */}
             <InputSel
-              className={scss.datePicker}
-              datePickerProps={{
+              className={classNames()}
+              inputProps={{
                 props: {
-                  value: watchData.paymentTenor ? moment(watchData.paymentTenor) : null,
-                  onChange: (md) => {
-                    setValue('paymentTenor', md?.toISOString() ?? '');
+                  value: watchData.paymentTenor ?? '',
+                  onChange: (e) => {
+                    setValue('paymentTenor', e.target.value);
                   },
                 },
               }}
             />
           </div>
           {/*  */}
-          <div>4</div>
+          <div className={scss.numIndex}>4</div>
           <div>
             <RadioContainer
               label={'是否出具履約保證票'}
@@ -357,7 +353,7 @@ export default function ContractReviewForm({
             <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
           </div>
           {/*  */}
-          <div>5</div>
+          <div className={scss.numIndex}>5</div>
           <div>
             <RadioContainer
               label={'是否可請訂金款'}
@@ -369,7 +365,7 @@ export default function ContractReviewForm({
             />
           </div>
           {/*  */}
-          <div>6</div>
+          <div className={scss.numIndex}>6</div>
           <div className="flex">
             合理的保固期{' '}
             <InputBox
@@ -380,7 +376,7 @@ export default function ContractReviewForm({
             <InputBox className="flex-auto" inputAttr={{ ...register('note') }} />
           </div>
           {/*  */}
-          <div>7</div>
+          <div className={scss.numIndex}>7</div>
           <div>
             <RadioContainer
               label={'是否出具保固票或保固金'}
@@ -392,7 +388,7 @@ export default function ContractReviewForm({
             />
           </div>
           {/*  */}
-          <div>8</div>
+          <div className={scss.numIndex}>8</div>
           <div>
             <div>
               <RadioContainer
@@ -406,7 +402,7 @@ export default function ContractReviewForm({
             </div>
           </div>
           {/*  */}
-          <div>9</div>
+          <div className={scss.numIndex}>9</div>
           <div>
             <div>
               <RadioContainer
@@ -420,7 +416,7 @@ export default function ContractReviewForm({
             </div>
           </div>
           {/*  */}
-          <div>10</div>
+          <div className={scss.numIndex}>10</div>
           <div>
             <div>
               <RadioContainer
@@ -434,7 +430,7 @@ export default function ContractReviewForm({
             </div>
           </div>
           {/*  */}
-          <div>11</div>
+          <div className={scss.numIndex}>11</div>
           <div>
             <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
             <br />
@@ -552,10 +548,11 @@ const Row = ({
         <InputBox
           suffix="%"
           inputAttr={{
+            className: 'text-center',
             value: percent.value,
             onChange: percent.onChange,
             type: 'number',
-            placeholder: '請輸入比例',
+            placeholder: '比例',
           }}
         />
         <InputBox
