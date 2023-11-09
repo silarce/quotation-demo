@@ -837,6 +837,8 @@ class Class_product {
         // 代表其中一個會被takeDefaultDynaValue改變的值不應該被改變
         // 所以不要呼叫takeDefaultDynaValue
         // 例如rollUpBoxThick，現在也只有set rollUpBoxThick會使takeDefaultDynaValue=true
+        // 會使takeDefaultDynaValue=true的有 set rollUpBoxThick與set doorTrackThick
+
         if (this.dontGetDefaultValue) {
           this.dontGetDefaultValue = false;
         } else {
@@ -1996,6 +1998,7 @@ class Class_product {
   }
   set doorTrackThick(str) {
     this._prodData.doorTrackThick = str;
+    this.dontGetDefaultValue = true;
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -2460,7 +2463,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'motorSupport', // 馬達支撐架
     // 'bottomBar', // 底座類型
     // 'motorLockBox', // 馬達鎖盒
-    // 'doorTrackThick', // 門軌厚度
+    'doorTrackThick', // 門軌厚度
     // 'rollerSpec', // 捲軸規格
     'doorTrackSilencerStrip', // 門軌消音條
     // 'onePieceRollUpBox', // 一體式捲箱
