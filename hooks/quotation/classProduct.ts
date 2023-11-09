@@ -602,7 +602,11 @@ class Class_product {
 
     // let res: TdoorGeneralSpecsDto;
 
-    const res = await apiGetProdCalcGeneralSpec(body);
+    const res = await reqGetCalcGeneralSpec(body);
+
+    if (!res) {
+      return false;
+    }
 
     // try {
     //   res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
@@ -2686,20 +2690,20 @@ const calcFullwidthWithWG = async ({
 
 const reqGetCalcGeneralSpec = async ({
   //
-  doorType,
+  modelName,
   height,
   fullWidth,
   WG,
   isAntiTyphoon,
 }: {
-  doorType: string;
+  modelName: string;
   height: number;
   fullWidth?: number;
   WG?: number;
   isAntiTyphoon: boolean;
 }) => {
   const body = {
-    modelName: doorType as TpcgsPrams['modelName'],
+    modelName: modelName as TpcgsPrams['modelName'],
     height,
     isAntiTyphoon,
     fullWidth,
