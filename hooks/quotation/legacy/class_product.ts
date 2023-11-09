@@ -180,8 +180,10 @@ class Class_product {
   };
 
   get options_doorTrack() {
-    if (this._product.doorType === 'SJ-312') {
-      return getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
+    const options_doorTrack_byDoorModel = getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
+
+    if (options_doorTrack_byDoorModel) {
+      return options_doorTrack_byDoorModel;
     }
 
     if (this.typhoonProtection) {
