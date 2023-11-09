@@ -309,6 +309,7 @@ class Class_product {
     });
 
     this.comList = list as { [key in TcomponentKey]: Class_component };
+
     // this.calcComAllPrice({
     //   toCalcProdAllprice: false,
     // });
@@ -599,16 +600,18 @@ class Class_product {
       return false;
     }
 
-    let res: TdoorGeneralSpecsDto;
+    // let res: TdoorGeneralSpecsDto;
 
-    try {
-      res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+    const res = await apiGetProdCalcGeneralSpec(body);
 
-      return false;
-    }
+    // try {
+    //   res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+    // } catch (error) {
+    //   const err = error as AxiosError<{ message: string }>;
+    //   myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
+    //   return false;
+    // }
 
     // 計算出WG
 
@@ -763,8 +766,11 @@ class Class_product {
       const key = item.key;
       const { id, material, materialSurface, isPainted } = item.componentInfo;
 
-      if (!material || !id) {
+      if (!id || !material) {
         haveNull = true;
+        console.log(
+          '若沒呼叫apiPostProdGenerateDoorProductBom，導致材料配件的資料不齊全，可能是因為材料配件過濾器沒有濾出適合的材料配件'
+        );
       }
 
       generateBomObj_empty[key] = {
@@ -841,6 +847,10 @@ class Class_product {
 
         if (this.dontGetDefaultValue) {
           this.dontGetDefaultValue = false;
+          // this.shouldCall_cgs = false;
+          // this.shouldCall_pac = false;
+          // this.shouldCall_pgpb = false;
+          // this.retrieveCreProdCom();
         } else {
           this.takeDefaultDynaValue();
         }
@@ -898,7 +908,7 @@ class Class_product {
     const guideRail: Tcomponent | null = filter_guideRails({
       dataArr: availableComponents.guideRails,
       filterParams: {
-        // thickness: String(this.doorTrackThick),
+        thickness: String(this.doorTrackThick),
         isAntiTyphoon: this.typhoonProtection,
         hasSilencingStrip: this.doorTrackSilencerStrip,
       },
@@ -956,7 +966,8 @@ class Class_product {
 
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
     // TODO get /products/door/available-components取得的金額不是正確的金額
-    // 正確的金額之後會補在 post /products/door/generate-door-product-bom
+    // 正的金額之後會補在 post /products/door/generate-door-product-bom
+
     const dataList = {
       slat: slat || creEmptyCom(),
       roller: roller || creEmptyCom(),
@@ -2670,6 +2681,44 @@ const calcFullwidthWithWG = async ({
     return fullWidth;
   } catch (error) {
     return 0;
+  }
+};
+
+const reqGetCalcGeneralSpec = async ({
+  //
+  doorType,
+  height,
+  fullWidth,
+  WG,
+  isAntiTyphoon,
+}: {
+  doorType: string;
+  height: number;
+  fullWidth?: number;
+  WG?: number;
+  isAntiTyphoon: boolean;
+}) => {
+  const body = {
+    modelName: doorType as TpcgsPrams['modelName'],
+    height,
+    isAntiTyphoon,
+    fullWidth,
+    WG: WG,
+  };
+
+  if (!body.fullWidth && !body.WG) {
+    return false;
+  }
+
+  try {
+    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
+    return false;
   }
 };
 

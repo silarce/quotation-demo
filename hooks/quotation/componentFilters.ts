@@ -58,20 +58,21 @@ const filter_guideRails = ({
 }: {
   dataArr: TdoorComponentListDto['guideRails'];
   filterParams: {
-    // thickness: string; // 不用過濾
+    thickness: string; // 不用過濾
     isAntiTyphoon: boolean;
     /**消音條 */
     hasSilencingStrip: boolean; // 消音條
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    // if (data.thickness && data.thickness !== filterParams.thickness) {
-    // isPass = false;
-    // } else
-    if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+    if (Number(data.thickness) !== Number(filterParams.thickness)) {
+      return false;
+    } else if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
       return false;
     } else if (data.hasSilencingStrip !== filterParams.hasSilencingStrip) {
-      return false;
+      if (Number(data.thickness) !== 4.5) {
+        return false;
+      }
     }
 
     return true;
