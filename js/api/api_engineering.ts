@@ -653,7 +653,8 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
   const params = {
     populate: [
       'contract.worksheet.contractProductItems.deliveryStatus.installerEmployee',
-      'contract.worksheet.contractProductItems.adjustedItem',
+      'contract.worksheet.contractProductItems.adjustedItem.accessories',
+      'contract.worksheet.contractProductItems.accessories',
     ],
   };
 

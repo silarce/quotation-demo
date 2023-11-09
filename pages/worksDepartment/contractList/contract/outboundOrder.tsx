@@ -320,9 +320,10 @@ export default function OutboundOrder() {
         totalCai_total = totalCai_total.add(item.volume || '0');
 
         const accessories = item.accessories;
-        const acceNameArr = accessories.map((acce) => {
-          return acce.name;
-        });
+        const acceNameArr =
+          accessories?.map((acce) => {
+            return acce.name;
+          }) ?? [];
 
         const {
           //
