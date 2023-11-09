@@ -332,21 +332,21 @@ const sidePathList: TsidePathList = {
               path: path01 + '/quoteStatistics',
               erpFeature: [statisticsTable],
             },
-            {
-              label: '個人業績統計表',
-              path: path01 + '/personalPerformanceStatistics',
-              erpFeature: [statisticsTable],
-            },
+            // {
+            //   label: '個人業績統計表',
+            //   path: path01 + '/personalPerformanceStatistics',
+            //   erpFeature: [statisticsTable],
+            // },
             {
               label: '全區業績統計表',
               path: path01 + '/regionalPerformanceStatistics',
               erpFeature: [statisticsTable],
             },
-            {
-              label: '追加工程統計表',
-              path: path01 + '/additionalEngineeringStatistics',
-              erpFeature: [statisticsTable],
-            },
+            // {
+            //   label: '追加工程統計表',
+            //   path: path01 + '/additionalEngineeringStatistics',
+            //   erpFeature: [statisticsTable],
+            // },
             {
               label: '年度業績統計表',
               path: path01 + '/annualPerformanceStatistics',
