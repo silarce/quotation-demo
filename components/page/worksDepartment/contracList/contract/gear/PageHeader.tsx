@@ -91,6 +91,22 @@ export default function PageHeader({
         query,
       },
     },
+    {
+      label: '修繕報價',
+      disabled: true,
+      href: {
+        pathname: `${pathHead}/undefined`,
+        query,
+      },
+    },
+    {
+      label: '證明書/保固書',
+      disabled: true,
+      href: {
+        pathname: `${pathHead}/undefined`,
+        query,
+      },
+    },
   ];
 
   return (

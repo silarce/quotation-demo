@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 
 import Image, { StaticImageData } from 'next/image';
+import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 import scss from './workSheetProdCard.module.scss';
 
@@ -11,11 +12,13 @@ type Tcontrol = {
   doorType: string;
   qty: string;
   list: {
+    isOriginal: boolean;
     itemName: string;
     qty: string;
     onClick: () => void;
     isActive?: boolean;
     onDivideClick: () => void;
+    onDeleteClick: () => void;
   }[];
 };
 
@@ -47,27 +50,23 @@ export default function WorkSheetProdCard({
       </div>
       <div className={scss.list}>
         {control.list.map((item, index) => {
-          const { itemName, qty, onClick, isActive, onDivideClick } = item;
+          const { isOriginal, itemName, qty, onClick, isActive, onDivideClick, onDeleteClick } = item;
 
           return (
-            <div key={index} className={classNames(isActive && scss.active)} onClick={onClick}>
+            <div
+              key={index}
+              className={classNames(isOriginal && scss.original, isActive && scss.active)}
+              onClick={onClick}
+            >
               <span>{itemName}</span>
               <span>{qty}樘</span>
               <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
                 分堆
               </button>
+              <IconDelete01 className={classNames((disabled || isOriginal) && scss.hidden)} onClick={onDeleteClick} />
             </div>
           );
         })}
-        {/* <div>
-          <span>123</span>
-        </div>
-        <div>
-          <span>123</span>
-        </div>
-        <div>
-          <span>123</span>
-        </div> */}
       </div>
     </div>
   );

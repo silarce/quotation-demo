@@ -52,6 +52,8 @@ class Class_workSheet {
     identifyKey_p,
     identifyKey_c,
     addSheet,
+    deleteSheet,
+    clearSheet,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -69,14 +71,22 @@ class Class_workSheet {
       cKey: string;
       itemIdArr: string[];
     }) => void;
+    deleteSheet: () => void;
+    clearSheet: () => void;
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
     this.oldProd = oldProd;
-    this.itemIdArr = itemIdArr;
+    this._itemIdArr = itemIdArr;
     this.identifyKey_p = identifyKey_p;
     this.identifyKey_c = identifyKey_c;
     this._addSheet = addSheet;
+    this._deleteSheet = deleteSheet;
+    this._clearSheet = clearSheet;
+
+    if (this.identifyKey_p === this.identifyKey_c) {
+      this._originalIdArr = _.cloneDeep(this._itemIdArr);
+    }
 
     this._fullWidth_str = String(this._prod.fullWidth / 1000);
     this._height_str = String(this._prod.height / 1000);
@@ -118,10 +128,17 @@ class Class_workSheet {
   private _prod: TquotationProductItemDto | TupdateWorkSheetItem;
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
-  private itemIdArr: string[];
-  readonly identifyKey_p;
-  readonly identifyKey_c;
+  private _itemIdArr: string[];
+  readonly identifyKey_p: string;
+  readonly identifyKey_c: string;
   private _addSheet;
+  private _deleteSheet;
+  private _clearSheet;
+
+  private _originalIdArr: string[] | undefined = undefined;
+
+  private _deleteIdList: { [key: string]: string[] } = {};
+
   // ---------------------------------------------------------------------
 
   private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
@@ -191,6 +208,8 @@ class Class_workSheet {
       this._accessoriesOptionList = list;
       this._acceIdArr = arr;
     }
+
+    this.forceUpdate({ isNoChange: true });
   }
 
   async getProdSpec() {
@@ -514,11 +533,20 @@ class Class_workSheet {
   }
 
   // ---------------------------------------------------------------------
+
+  get isOriginal() {
+    return this.identifyKey_p === this.identifyKey_c;
+  }
+
   get productId() {
     return this._prod.productId;
   }
   get adjustedItemId() {
     return this._prod.adjustedItemId;
+  }
+
+  get itemIdArr() {
+    return this._itemIdArr;
   }
 
   get accessoriesOptionArr() {
@@ -534,6 +562,10 @@ class Class_workSheet {
 
   get prodDetailSpec() {
     return this._prodDetailSpec;
+  }
+
+  get adjustedId() {
+    return this._prod.adjustedItemId;
   }
 
   // ---------------------------------------------------------------------
@@ -564,8 +596,15 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  get fullWidth_mm() {
+    return String(this._prod.fullWidth);
+  }
+
   get WG() {
     return String(this._prod.WG / 1000);
+  }
+  get WG_mm() {
+    return String(this._prod.WG);
   }
 
   get BD() {
@@ -580,6 +619,10 @@ class Class_workSheet {
     this._prod.height = Number(this._height_str) * 1000;
     this.calcArea();
     this.forceUpdate();
+  }
+
+  get height_mm() {
+    return String(this._prod.height);
   }
 
   get boxB() {
@@ -607,7 +650,7 @@ class Class_workSheet {
   }
 
   get quantity() {
-    return String(this.itemIdArr.length);
+    return String(this._itemIdArr.length);
   }
   // set quantity(str) {
   //   this._prod.quantity = Number(str);
@@ -989,16 +1032,32 @@ class Class_workSheet {
     return this._prod.guideRailsOpening;
   }
 
+  get isAccessoriesReady() {
+    const arr = Object.keys(this._accessoriesOptionList);
+
+    return arr.length > 0;
+  }
+
   // ----------------------------------------------------
   // ----------------------------------------------------
 
-  get acceNameArr() {
+  get acceIdArr() {
     return this._acceIdArr;
   }
 
-  set acceNameArr(arr) {
+  set acceIdArr(arr) {
     this._acceIdArr = arr;
     this.forceUpdate();
+  }
+
+  get acceNameArr() {
+    if (!_.isNil(this._accessoriesOptionList)) {
+      return this._acceIdArr;
+    }
+
+    return this._acceIdArr.map((id) => {
+      return this._accessoriesOptionList[id]?.name ?? '';
+    });
   }
 
   // --------------------------------------------------------------
@@ -1009,21 +1068,73 @@ class Class_workSheet {
       return myAlert.info({ title: '分堆數量不可小於1' });
     }
 
-    if (qty >= Number(this.quantity)) {
-      return myAlert.info({ title: '分堆數量不可大於原本數量' });
+    if (qty > Number(this.quantity)) {
+      return myAlert.info({ title: '分堆數量大於原本數量' });
     }
 
-    const itemIdArr = this.itemIdArr.reverse().splice(0, qty);
+    const theItem = this.bodyItemArr[0];
+    theItem.itemName = `${theItem.itemName}-new`;
+
+    const itemIdArr = this._itemIdArr.reverse().splice(0, qty);
 
     this._addSheet({
-      item: this.bodyItemArr[0],
+      item: theItem,
       oldItem: this.oldProd,
       pKey: this.identifyKey_p,
       cKey: itemIdArr[0],
       itemIdArr: itemIdArr,
     });
 
+    if (this._itemIdArr.length <= 0 && !this.isOriginal) {
+      this._deleteSheet();
+    }
+
     this.forceUpdate({ isNoChange: true });
+  }
+
+  clearSheet() {
+    if (this.isOriginal) {
+      alert('原始item不應該清除');
+    }
+
+    this._clearSheet();
+    this._itemIdArr = [];
+    this.forceUpdate({ isNoChange: true });
+  }
+
+  gatherBack({ itemIdArr, adjustedItemId }: { itemIdArr: string[]; adjustedItemId?: string | null }) {
+    this._itemIdArr = [...this._itemIdArr, ...itemIdArr];
+
+    if (adjustedItemId) {
+      if (!this._deleteIdList[adjustedItemId]) {
+        this._deleteIdList[adjustedItemId] = [];
+      }
+
+      this._deleteIdList[adjustedItemId] = [...this._deleteIdList[adjustedItemId], ...itemIdArr];
+    }
+
+    this.forceUpdate();
+  }
+
+  get idListShouldDelete() {
+    this._originalIdArr;
+    this._itemIdArr;
+
+    const arr = _.difference(this._itemIdArr, this._originalIdArr ?? []);
+
+    Object.keys(this._deleteIdList).forEach((pKey) => {
+      const delIdArr = this._deleteIdList[pKey];
+
+      delIdArr.forEach((delId, index) => {
+        if (!arr.includes(delId)) {
+          // delete this._deleteIdList[pKey][cKey];
+          // delete this._deleteIdList[pKey][cKey];
+          this._deleteIdList[pKey].splice(index, 1);
+        }
+      });
+    });
+
+    return this._deleteIdList;
   }
 
   // --------------------------------------------------------------
@@ -1052,7 +1163,7 @@ class Class_workSheet {
     });
 
     // contractProductItems
-    return this.itemIdArr.map((id) => {
+    return this._itemIdArr.map((id) => {
       const item: TupdateWorkSheetItem = {
         // ...this._prod,
         // id: id,

@@ -388,13 +388,19 @@ function DndRow({
 
             //____
             if (selectProps) {
-              if (key === 'doorTrack') {
-                selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
-              }
+              // if (key === 'doorTrack') {
+              //   selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
+              // }
 
               selectProps.easyValue = stateValue as string;
 
               if (selectProps.props) {
+                if (key === 'doorTrack') {
+                  // selectProps.dynaOptionsKey = prod.typhoonProtection ? 'typhoonProtection' : 'normal';
+                  // selectProps.props!.options = prod.options_doorTrack;
+                  selectProps.props!.options = prod.options_doorTrack;
+                }
+
                 if (key === 'doorType') {
                   selectProps.props!.options = prod.options_doorModel_byQuoteType;
                 }

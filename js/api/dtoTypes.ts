@@ -866,7 +866,7 @@ export type TquotationProductDto = {
   // 材料
   materialName: string;
   // 表面
-  materialSurface: string;
+  materialSurface: string | null;
   // 門軌
   guideRail: string;
   // 馬力
@@ -1205,7 +1205,7 @@ export type TcreateQuotationProductDto = {
   // 材料
   materialName: string;
   // 表面
-  materialSurface: string;
+  materialSurface: string | null;
   // 門軌
   guideRail: string;
   // 馬力
@@ -2209,7 +2209,7 @@ export type TupdateWorkSheetItem = {
   area: string;
   volume: string;
   materialName: string;
-  materialSurface: string;
+  materialSurface: string | null;
   guideRail: string;
   horsepower: string;
   motorVendor: string;

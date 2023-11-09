@@ -42,6 +42,7 @@ import { TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/a
 // =====================================================================
 
 type Tdelevery = {
+  originalItem: TquotationProductItemDto;
   itemName: string;
   itemArr: TquotationProductItemDto[];
 };
@@ -209,6 +210,7 @@ export default function OutboundOrder() {
 
       if (!myDeleveryList?.[theId]) {
         myDeleveryList[theId] = {
+          originalItem: item,
           itemName: theItem.itemName,
           itemArr: [],
         };
@@ -237,9 +239,25 @@ export default function OutboundOrder() {
   const control_orderTable: Tcontrol_orderTable =
     Object.values(myDeleveryList ?? {}).map((delevery) => {
       // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
+      const originalItem = delevery.originalItem;
       const firstItem = delevery.itemArr[0];
 
       const firstRow: Tgroup['rowArr'][0] = {
+        contractData: {
+          project: delevery.itemName,
+          L: String(originalItem.fullWidth),
+          W: String(originalItem.WG),
+          B: String(originalItem.boxB),
+          qty: String(delevery.itemArr.length),
+          implementQty: '???',
+          // cai: firstItem.volume,
+          cai: '',
+          totalCai: '0',
+          doorType: originalItem.doorModelName,
+          material: originalItem.materialName,
+          horsepower: originalItem.horsepower,
+          surface: originalItem.materialSurface ?? '',
+        },
         staticData: {
           project: delevery.itemName,
           L: String(firstItem.fullWidth),
@@ -253,7 +271,7 @@ export default function OutboundOrder() {
           doorType: firstItem.doorModelName,
           material: firstItem.materialName,
           horsepower: firstItem.horsepower,
-          surface: firstItem.materialSurface,
+          surface: firstItem.materialSurface ?? '',
         },
         deliveryStatus: {
           remark01: {
@@ -301,6 +319,12 @@ export default function OutboundOrder() {
       const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
         totalCai_total = totalCai_total.add(item.volume || '0');
 
+        const accessories = item.accessories;
+        const acceNameArr =
+          accessories?.map((acce) => {
+            return acce.name;
+          }) ?? [];
+
         const {
           //
           id: deliveryStatusId,
@@ -317,6 +341,21 @@ export default function OutboundOrder() {
           deliveryStatusWillUpdate[deliveryStatusId ?? ''];
 
         return {
+          contractData: {
+            project: delevery.itemName,
+            L: String(originalItem.fullWidth),
+            W: String(originalItem.WG),
+            B: String(originalItem.boxB),
+            qty: String(delevery.itemArr.length),
+            implementQty: '???',
+            // cai: firstItem.volume,
+            cai: '',
+            totalCai: '0',
+            doorType: originalItem.doorModelName,
+            material: originalItem.materialName,
+            horsepower: originalItem.horsepower,
+            surface: originalItem.materialSurface ?? '',
+          },
           staticData: {
             project: delevery.itemName,
             L: String(item.fullWidth),
@@ -329,18 +368,20 @@ export default function OutboundOrder() {
             doorType: item.doorModelName,
             material: item.materialName,
             horsepower: item.horsepower,
-            surface: item.materialSurface,
+            surface: item.materialSurface ?? '',
           },
           deliveryStatus: {
             remark01: {
-              value: (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || '',
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || acceNameArr.join('\n'),
               onChange: (str) => {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
               },
             },
             // remark02: {
-            //   value: 'test',
+            //   value: "test",
             //   onChange: () => {},
+            //   forbidden: true,
             // },
             // remark03: {
             //   value: 'test',

@@ -16,9 +16,15 @@
 
 .container {
   padding: 30px 50px 50px 50px;
-  span: {
+  span,
+  input,
+  input::placeholder,
+  textarea {
     font-size: 16px;
     font-weight: 400;
+  }
+  input {
+    padding: 0 5px;
   }
 }
 
@@ -47,7 +53,11 @@
 .list {
   display: grid;
   grid-template-columns: 20px auto;
-  gap: 20px 6px;
+  gap: 16px 6px;
+  .numIndex {
+    height: fit-content;
+    transform: translateY(2px);
+  }
   .item2 {
     > div:nth-of-type(1) {
       display: grid;
@@ -75,7 +85,7 @@
     grid-template-columns: auto fit-content(100%);
     > div:nth-of-type(1) {
       display: grid;
-      grid-template-columns: auto 100px 100px 233px;
+      grid-template-columns: auto 60px 100px 233px;
       gap: 16px;
       margin-right: 6px;
     }
@@ -88,6 +98,13 @@
         cursor: pointer;
       }
     }
+  }
+}
+
+.paymentTenor {
+  display: flex;
+  > span {
+    flex: none;
   }
 }
 
@@ -160,7 +177,10 @@
   }
 }
 
-.datePicker {
+.date {
   display: inline-block;
-  width: 180px;
+  width: 92px;
+  input {
+    text-align: center;
+  }
 }

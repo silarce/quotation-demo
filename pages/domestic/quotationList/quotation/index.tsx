@@ -365,9 +365,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: discount,
-        subTotal: String(subTotal),
-        salesTax: String(salesTax),
-        total: String(total),
+        subTotal: subTotal.toLocaleString(),
+        salesTax: salesTax.toLocaleString(),
+        total: total.toLocaleString(),
         deliveryLocation,
         deliveryDate,
       });
@@ -1116,17 +1116,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       body.deliveryDate = null;
     }
 
-    let hasSurface = true;
-    body.products.forEach((item) => {
-      if (!item.materialSurface) {
-        hasSurface = false;
-      }
-    });
-
-    if (!hasSurface) {
-      return myAlert.warning({ title: '所有主產品必須選擇表面' });
-    }
-
     try {
       setIsLoading(true);
 
@@ -1153,7 +1142,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setDisabled(true);
     } catch (error) {
-      console.log(error);
+      const err = error as Error;
+      myAlert.err({ title: '更新報價單失敗', content: err.message });
     } finally {
       setIsLoading(false);
       showRootLoading(false);
@@ -1203,15 +1193,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    // 沒有用，後端設定成必須一個一個審
-    // const body = {
-    //   reviewSalesEmployeeId: '5e1c9259-1d31-4121-b160-3fdfdccb401e',
-    //   reviewSupervisorEmployeeId: '06dc8d70-485d-4ac9-aa31-5bf568c13d61',
-    //   reviewWorkDirectorEmployeeId: '3480f17e-07d8-42b1-ad52-cfb0de9c6049',
-    //   reviewManagerEmployeeId: '01f55698-49bb-4501-b432-1157a5109554',
-    //   reviewResult: isPass,
-    // };
-
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
@@ -1248,13 +1229,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
     // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
-    const lw = Number(prod.fullWidth || 0) * 100;
-    const h = Number(prod.height || 0) * 100;
-    const b = Number(prod.boxB || 0) * 100;
+
+    const lw = new Decimal(prod.fullWidth || 0).mul(10).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
     const size = `${lw} X ${h} + ${b}`;
 
-    // const foo = prod.comList;
     const list = { ...prod.comList, ...prod.subComList };
     delete list['sidePlate'];
     delete list['motorAccessories'];

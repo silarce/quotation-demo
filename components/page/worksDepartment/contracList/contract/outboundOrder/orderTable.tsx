@@ -13,6 +13,21 @@ import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // ================================================================================
 
+type TcontractData = {
+  project: string;
+  L: string;
+  W: string;
+  B: string;
+  qty: string;
+  implementQty: string;
+  cai: string;
+  totalCai: string;
+  doorType: string;
+  material: string;
+  horsepower: string;
+  surface: string;
+};
+
 type TstaticData = {
   project: string;
   L: string;
@@ -60,6 +75,7 @@ type TdeliveryStatusItem_employee = {
 type Tgroup = {
   itemName: string;
   rowArr: {
+    contractData: TcontractData;
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
@@ -90,8 +106,34 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
     <div className={style.orderTable}>
       <div className={style.thead}>
         {/*  */}
-        <div className={`${style.theadItem} ${style.indexCell}`} />
+        {/* <div className={`${style.theadItem} ${style.indexCell}`} /> */}
         {/*  */}
+
+        {orderKeyArr_contract.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? style.textCenter : '';
+
+          if (index === 0) {
+            return (
+              <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+                <span></span>
+                <span>{label}</span>
+              </div>
+            );
+          }
+
+          return (
+            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+
+        {/* 灰色柱子 分隔線*/}
+        <div className={` ${style.pilar}`} />
 
         {orderKeyArr_static.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
@@ -106,10 +148,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
             </div>
           );
         })}
-        {/* 灰色柱子 */}
-        <div className={` ${style.pilar}`}>
-          <div />
-        </div>
+        {/* 灰色分隔線 */}
+        <div className={` ${style.pilar}`} />
         {/*  */}
         {orderKey_editible.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
@@ -138,7 +178,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                 return (
                   <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
-                    {rowIndex === 0 ? (
+
+                    {/* {rowIndex === 0 ? (
                       <div className={`${style.column} ${style.indexCell}`}>
                         <span>{groupIndex + 1}</span>
                       </div>
@@ -146,7 +187,48 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       <div className={`${style.column} ${style.indexCell}`}>
                         <span></span>
                       </div>
-                    )}
+                    )} */}
+
+                    {orderKeyArr_contract.map((key, columnIndex) => {
+                      let value = row.contractData[key];
+
+                      if (rowIndex !== 0 && columnIndex === 0) {
+                        value = '';
+                      }
+
+                      const { width, position } = configList[key] ?? {};
+                      const theStyle = { width };
+
+                      if (columnIndex === 0) {
+                        const isHiddenIndex = rowIndex !== 0;
+
+                        return (
+                          <div
+                            className={classNames(style.column, position === 'center' && style.textCenter)}
+                            key={columnIndex}
+                            style={theStyle}
+                          >
+                            <span className={classNames('pr-[10px]', isHiddenIndex && style.hidden)}>
+                              {groupIndex + 1}
+                            </span>
+                            <span>{value}</span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div
+                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
+                          <span>{value}</span>
+                        </div>
+                      );
+                    })}
+
+                    {/* 灰色分隔線 */}
+                    <div className={` ${style.pilar}`} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
@@ -192,6 +274,14 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                         theProps.inputProps = {
                           value: value ?? '',
                           onChange,
+                        };
+                      }
+
+                      if (type === 'textarea') {
+                        theProps.textareaProps = {
+                          value: value ?? '',
+                          onChange,
+                          allowNewLineByUser: true,
                         };
                       }
 
@@ -258,8 +348,24 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 }
 
 // =======================================================
-const orderKeyArr_static: (keyof TstaticData)[] = [
+
+const orderKeyArr_contract: (keyof TcontractData)[] = [
   'project',
+  'L',
+  'W',
+  'B',
+  'qty',
+  'implementQty',
+  'cai',
+  'totalCai',
+  'doorType',
+  'material',
+  'horsepower',
+  'surface',
+];
+
+const orderKeyArr_static: (keyof TstaticData)[] = [
+  // 'project',
   'L',
   'W',
   'B',
@@ -291,7 +397,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
 type Tconfig = {
   label: string;
   width: string;
-  type?: 'input' | 'select' | 'date' | 'employee';
+  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea';
   position: string;
 };
 
@@ -308,7 +414,7 @@ const creCellConfig_static = (): TcellConfigList => ({
   },
   project: {
     label: '項目',
-    width: '80px',
+    width: '120px',
     type: 'input',
     position: '',
   },
@@ -438,14 +544,14 @@ const creCellConfig_static = (): TcellConfigList => ({
 const creCellConfig_deliveryStatus = (): TcellConfigList => ({
   remark01: {
     label: '備註1',
-    width: '65px',
-    type: 'input',
+    width: '200px',
+    type: 'textarea',
     position: '',
   },
   remark02: {
     label: '備註2',
-    width: '65px',
-    type: 'input',
+    width: '150px',
+    type: 'textarea',
     position: '',
   },
   remark03: {

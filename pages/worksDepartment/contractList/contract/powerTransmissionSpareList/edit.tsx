@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
-// component
+// component`
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import Profile, {
   Tcontroll as Tcontroll_profile,
@@ -15,6 +16,10 @@ import Sheet, {
 import Signature, {
   Tcontroll as Tcontroll_Signature,
 } from 'components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/signature';
+import SheetPDF, {
+  Tcontrol_sheetPDF,
+  Tcontrol_info_sheetPDF,
+} from 'components/page/worksDepartment/contracList/contract/powerTransmissionSpareList/sheetPDF/sheetPDF';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -31,6 +36,9 @@ import {
   useGetElectronicSupplies_id,
   useGetEngineeringContact,
 } from 'js/api/api_engineering';
+
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // css
 import style from './powerTransmissionSpareList.module.scss';
@@ -105,6 +113,7 @@ export default function Edit() {
 
   const [disabled, setDisabled] = useState(!!electronicSuppliesId);
   const [isLoading, setIsLoading] = useState(false);
+  const [isShowPdf, setIsShowPdf] = useState(false);
 
   // ----------------------------------------------------
   const { data: contract, update } = useGetContract_id_noItems(contractId);
@@ -320,6 +329,7 @@ export default function Edit() {
         changeSheetQty({ key: '防爆式', quantity, itemName });
       },
     },
+
     鎖號: {
       unit: sheet.鎖號?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -340,6 +350,7 @@ export default function Edit() {
         changeSheetQty({ key: '特殊鎖號', quantity, itemName });
       },
     },
+
     三點式一般: {
       unit: sheet.三點式一般?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -401,6 +412,7 @@ export default function Edit() {
         changeSheetQty({ key: '2HP馬達控制箱220v', quantity, itemName });
       },
     },
+
     彈射門控制箱: {
       unit: sheet.彈射門控制箱?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -421,7 +433,7 @@ export default function Edit() {
         changeSheetQty({ key: '紅外線控制盤', quantity, itemName });
       },
     },
-    //
+
     煙感器: {
       unit: sheet.煙感器?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -442,7 +454,7 @@ export default function Edit() {
         changeSheetQty({ key: '中繼器', quantity, itemName });
       },
     },
-    //
+
     門弓器: {
       unit: sheet.門弓器?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -473,7 +485,7 @@ export default function Edit() {
         changeSheetQty({ key: '電磁扣', quantity, itemName });
       },
     },
-    //
+
     遙控器加障感器: {
       unit: sheet.遙控器加障感器?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -514,7 +526,7 @@ export default function Edit() {
         changeSheetQty({ key: '大門用主機', quantity, itemName });
       },
     },
-    //
+
     對照式: {
       unit: sheet.對照式?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -535,7 +547,7 @@ export default function Edit() {
         changeSheetQty({ key: '反射式', quantity, itemName });
       },
     },
-    //
+
     防颱鎖固: {
       unit: sheet.防颱鎖固?.unit ?? '',
       onUnitChange: (unit, itemName) => {
@@ -641,6 +653,175 @@ export default function Edit() {
     },
   };
 
+  // ----------------------------------------------------
+  // ----------------------------------------------------
+
+  // Tcontrol_info_sheetPDF
+  const control_info_sheetPDF: Tcontrol_info_sheetPDF = {
+    projectNumber: profile.projectNumber,
+    projectName: profile.projectName,
+    // date: profile.dispatchDate,
+    date: moment(convertDate_reduce1911(profile.dispatchDate)).format('yy-MM-DD'),
+  };
+
+  // Tcontrol_sheetPDF
+  const control_sheetPdf: Tcontrol_sheetPDF = [
+    {
+      c1: {
+        value: '鎖盒',
+      },
+      c2: {
+        cArr: [
+          { value: '智慧型' },
+          { value: '面板式' },
+          { value: '埋入式' },
+          { value: '外露式' },
+          { value: '電子式' },
+          { value: '防爆式' },
+        ],
+      },
+      c3: {
+        cArr: [
+          { value: sheet.智慧型?.quantity ?? '' },
+          { value: sheet.面板式?.quantity ?? '' },
+          { value: sheet.埋入式?.quantity ?? '' },
+          { value: sheet.外露式?.quantity ?? '' },
+          { value: sheet.電子式?.quantity ?? '' },
+          { value: sheet.防爆式?.quantity ?? '' },
+        ],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '鎖匙',
+      },
+      c2: {
+        cArr: [{ value: '鎖號' }, { value: '特殊鎖號' }],
+      },
+      c3: {
+        cArr: [{ value: sheet.鎖號?.quantity ?? '' }, { value: sheet.特殊鎖號?.quantity ?? '' }],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '押扣',
+      },
+      c2: {
+        cArr: [{ value: '三點式一般' }, { value: '三點式遮煙' }],
+      },
+      c3: {
+        cArr: [{ value: sheet.三點式一般?.quantity ?? '' }, { value: sheet.三點式遮煙?.quantity ?? '' }],
+      },
+    },
+    //
+    //
+    {
+      c1: {
+        value: '控制箱/盤',
+      },
+      c2: {
+        masterC2: {
+          value: (
+            <div>
+              <p>捲門</p>
+              <p>／</p>
+              <p>水閘門</p>
+            </div>
+          ),
+        },
+        cArr: [
+          { value: '三點式一般' },
+          { value: '三點式遮煙' },
+          { value: '3HP馬達控制箱380v' },
+          { value: '2HP馬達控制箱380v' },
+          { value: '3HP馬達控制箱220v' },
+          { value: '2HP馬達控制箱220v' },
+        ],
+      },
+      c3: {
+        cArr: [
+          { value: sheet['三點式一般']?.quantity ?? '' },
+          { value: sheet['三點式遮煙']?.quantity ?? '' },
+          { value: sheet['3HP馬達控制箱380v']?.quantity ?? '' },
+          { value: sheet['2HP馬達控制箱380v']?.quantity ?? '' },
+          { value: sheet['3HP馬達控制箱220v']?.quantity ?? '' },
+          { value: sheet['2HP馬達控制箱220v']?.quantity ?? '' },
+        ],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '消防備品',
+      },
+      c2: {
+        cArr: [{ value: '煙感器' }, { value: '中繼器' }],
+      },
+      c3: {
+        cArr: [{ value: sheet.煙感器?.quantity ?? '' }, { value: sheet.中繼器?.quantity ?? '' }],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '板門配件',
+      },
+      c2: {
+        cArr: [{ value: '門弓器' }, { value: '平推鎖' }, { value: '電磁扣' }],
+      },
+      c3: {
+        cArr: [
+          { value: sheet.門弓器?.quantity ?? '' },
+          { value: sheet.平推鎖?.quantity ?? '' },
+          { value: sheet.電磁扣?.quantity ?? '' },
+        ],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '主機',
+      },
+      c2: {
+        cArr: [{ value: '遙控器加障感器' }, { value: '遙控器' }, { value: '障感器' }, { value: '大門用主機' }],
+      },
+      c3: {
+        cArr: [
+          { value: sheet.遙控器加障感器?.quantity ?? '' },
+          { value: sheet.遙控器?.quantity ?? '' },
+          { value: sheet.障感器?.quantity ?? '' },
+          { value: sheet.大門用主機?.quantity ?? '' },
+        ],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '防颱',
+      },
+      c2: {
+        cArr: [{ value: '防颱鎖固' }, { value: '防颱中柱' }],
+      },
+      c3: {
+        cArr: [{ value: sheet.防颱鎖固?.quantity ?? '' }, { value: sheet.防颱中柱?.quantity ?? '' }],
+      },
+    },
+    //
+    {
+      c1: {
+        value: '其他',
+      },
+      c2: {
+        bigC2: {
+          value: sheet.其他?.category ?? '',
+        },
+      },
+    },
+  ];
+
+  // ----------------------------------------------------
   // ----------------------------------------------------
 
   const reqPost = async () => {
@@ -751,6 +932,11 @@ export default function Edit() {
   const panelList03: TpanelList = [
     {
       type: 'myButton',
+      label: '匯出PDF',
+      onClick: () => setIsShowPdf(true),
+    },
+    {
+      type: 'myButton',
       label: '編輯',
       onClick: () => setDisabled(false),
     },
@@ -777,10 +963,17 @@ export default function Edit() {
       <div className={`${style.mainContainer}`}>
         <div className={style.powerTransmissionSpareList}>
           <Profile controll={control_profile} disabled={disabled} />
-          <Sheet editable={!disabled} isAdd={true} controll={controll_sheet} />
+          <Sheet editable={!disabled} controll={controll_sheet} />
           <Signature controll={contrll_signature} disabled={disabled} />
         </div>
       </div>
+      {/* isShowPdf */}
+      <SheetPDF
+        isShow={isShowPdf}
+        control={control_sheetPdf}
+        control_info={control_info_sheetPDF}
+        onCancel={() => setIsShowPdf(false)}
+      />
     </SubLayer>
   );
 }

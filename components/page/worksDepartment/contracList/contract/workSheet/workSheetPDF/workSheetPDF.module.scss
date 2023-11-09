@@ -1,0 +1,48 @@
+@use "styles/pdf" as *;
+
+$fontTitle: 40px;
+$fontText: 25px;
+
+.antdModalWrapper {
+  @extend .antdModalWrapper;
+  :global(.ant-modal-body) {
+    // background-color: gray;
+    // width: 420mm;
+    padding: 0;
+  }
+}
+
+.panelBar {
+  background-color: #ddd;
+  padding: 10px;
+  > button {
+    display: block;
+    margin: auto;
+    margin-right: 0;
+  }
+}
+
+.container {
+  @extend .standardPdf_horizontal_02;
+  background-color: #fff;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  * {
+    font-weight: 500;
+  }
+}
+
+.infoTable {
+  border: 2px solid black;
+  td:not(.report) {
+    border: 1px solid black;
+    padding: 1px, 4px;
+  }
+}
+
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-content: space-between;
+  gap: 4px;
+}

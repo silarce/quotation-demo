@@ -406,7 +406,7 @@ version>1 是子合約
       version === '1' && !engineeringContactId
         ? {
             type: 'myButton',
-            label: '新增工程聯絡單',
+            label: '同步到工務部',
             onClick: async () => {
               let isOk = true;
 

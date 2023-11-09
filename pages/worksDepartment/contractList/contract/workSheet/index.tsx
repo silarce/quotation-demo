@@ -70,6 +70,13 @@ import WorkSheetOptional, {
 import WorkSheetProductDetail02, {
   Tcontrol_detail02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
+import WorkSheetPDF, {
+  Tcontrol_workSheetPDF_01,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
+
+import WorkSheetPDF_02, {
+  Tcontrol_workSheetPDF_02,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -83,11 +90,15 @@ import {
   useGetWorkSheet,
   apiPatchWorkSheet,
   apiPostEngineeringDeliveryList,
+  apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
+
+// utils
+import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
 
 // css
 import scss from './workSheet.module.scss';
@@ -136,6 +147,9 @@ export default function WorkSheet() {
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
+  const [isShowPdf, setIsShowPdf] = useState(false);
+  const [isShowPdf02, setIsShowPdf02] = useState(false);
+
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
   // const engineeringContactId = contract?.engineeringContactId;
@@ -162,7 +176,7 @@ export default function WorkSheet() {
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList, itemTokenList_new, itemIdArrList_new } = useMemo(() => {
+  const { itemTokenList, itemIdArrList } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -182,44 +196,17 @@ export default function WorkSheet() {
 
     const contractProductItems = workSheet.contractProductItems;
 
-    const itemTokenList: { [key: string]: TquotationProductItemDto } = {};
-    const itemIdArrList: { [key: string]: string[] } = {};
-
-    contractProductItems.forEach((item) => {
-      const { productId, adjustedItem, adjustedItemId } = item;
-
-      let theItem: typeof item;
-      let theId: string;
-
-      if (adjustedItem && adjustedItemId) {
-        theItem = adjustedItem;
-        theId = adjustedItemId;
-      } else {
-        theItem = item;
-        theId = productId;
-      }
-
-      itemTokenList[theId] = theItem;
-
-      //
-      if (!itemIdArrList[theId]) {
-        itemIdArrList[theId] = [];
-      }
-
-      itemIdArrList[theId].push(item.id);
-    });
-
-    type TitemTokenList_new = {
+    type TitemTokenList = {
       [key: string]: {
         originalItem: TquotationProductItemDto;
         [key: string]: TquotationProductItemDto;
       };
     };
 
-    type TitemIdArrList_new = { [key: string]: { [key: string]: string[] } };
+    type TitemIdArrList = { [key: string]: { [key: string]: string[] } };
 
-    const itemTokenList_new: TitemTokenList_new = {};
-    const itemIdArrList_new: TitemIdArrList_new = {};
+    const itemTokenList: TitemTokenList = {};
+    const itemIdArrList: TitemIdArrList = {};
 
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
@@ -229,42 +216,41 @@ export default function WorkSheet() {
 
       if (adjustedItem && adjustedItemId) {
         theItem = adjustedItem;
+        theItem.adjustedItemId = adjustedItemId;
         theId = adjustedItemId;
       } else {
         theItem = item;
         theId = productId;
       }
 
-      if (!itemTokenList_new[productId]) {
-        itemTokenList_new[productId] = {
+      if (!itemTokenList[productId]) {
+        itemTokenList[productId] = {
           originalItem: item,
+          [productId]: item, //itemTokenList[productId][productId] 為原始資料
         };
       }
 
-      itemTokenList_new[productId][theId] = theItem;
+      itemTokenList[productId][theId] = theItem;
 
       //
-      if (!itemIdArrList_new[productId]) {
-        itemIdArrList_new[productId] = {};
+      if (!itemIdArrList[productId]) {
+        itemIdArrList[productId] = {
+          [productId]: [], //itemIdArrList[productId][productId] 為原始資料代表的itemId陣列
+        };
       }
 
-      if (!itemIdArrList_new[productId][theId]) {
-        itemIdArrList_new[productId][theId] = [];
+      if (!itemIdArrList[productId][theId]) {
+        itemIdArrList[productId][theId] = [];
       }
 
-      itemIdArrList_new[productId][theId].push(item.id);
-    });
+      itemIdArrList[productId][theId].push(item.id);
 
-    // console.log(itemTokenList_new);
-    // console.log(itemIdArrList_new);
-
-    // console.log('itemIdArrList', itemIdArrList);
+      //
+    }); //  forEach close
 
     return {
-      itemTokenList,
-      itemIdArrList,
-      itemTokenList_new,
-      itemIdArrList_new,
+      itemTokenList: itemTokenList,
+      itemIdArrList: itemIdArrList,
     };
   }, [workSheet]);
 
@@ -289,8 +275,8 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const { sheetList, changedSheetList, reset } = useWorkSheet({
-    itemTokenList: itemTokenList_new ?? {},
-    itemIdArrList: itemIdArrList_new ?? {},
+    itemTokenList: itemTokenList ?? {},
+    itemIdArrList: itemIdArrList ?? {},
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
@@ -1016,25 +1002,72 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   const reqPatch = async () => {
-    if (!worksheetId) {
+    if (!worksheetId || !workSheet?.contractProductItems) {
       return;
     }
 
+    let deleteIdList: { [key: string]: string[] } = {};
     let body: TupdateWorkSheetItem[] = [];
 
     Object.values(changedSheetList).forEach((sheet) => {
-      const bodyItemArr = sheet.bodyItemArr;
-      body = [...body, ...bodyItemArr];
+      if (sheet.isOriginal) {
+        deleteIdList = { ...deleteIdList, ...sheet.idListShouldDelete };
+        // deleteIdArr = [...deleteIdArr, ...sheet.idListShouldDelete];
+      } else {
+        const bodyItemArr = sheet.bodyItemArr;
+        body = [...body, ...bodyItemArr];
+      }
     });
 
-    try {
-      await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
-      await update_workSheet();
-      setDisabled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新工作單失敗', content: err.message });
+    for (const key in deleteIdList) {
+      const deleteIdArr = deleteIdList[key];
+
+      try {
+        await apiDeleteWorkSheetItem(worksheetId, { contractProductItemsId: deleteIdArr });
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '清除工作表項目失敗', content: err.message });
+        setDisabled(true);
+      }
     }
+
+    for (const key in changedSheetList) {
+      const sheet = changedSheetList[key];
+
+      if (sheet.isOriginal) {
+        return;
+      }
+
+      try {
+        // 送給後端的資料中如果accessories裡的name是空的，會壞掉
+        // 所以要呼叫getAccessoriesArr()確保accessories的name都有值
+        if (!changedSheetList[key].isAccessoriesReady) {
+          await changedSheetList[key].getAccessoriesArr();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得配件列表失敗，更新工作表失敗', content: err.message });
+        setDisabled(true);
+        break;
+      }
+
+      // 必須先執行確保accessories的name都有值的步驟才可以取body
+      const body = changedSheetList[key].bodyItemArr;
+
+      try {
+        await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '更新工作表失敗', content: err.message });
+        setDisabled(true);
+        break;
+      }
+    }
+
+    await update_workSheet();
+    setDisabled(true);
+
+    //
   };
 
   /**產生出庫單 */
@@ -1058,16 +1091,140 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   const control_optional: Tcontrol_optional = {
-    value: targetSheet?.acceNameArr ?? [],
+    value: targetSheet?.acceIdArr ?? [],
     onChange: (arr: string[]) => {
       if (targetSheet) {
-        targetSheet.acceNameArr = arr;
+        targetSheet.acceIdArr = arr;
       }
     },
   };
 
   // -------------------------------------------------------------------------
+
+  const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
+    const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
+
+    Object.values(sheetList).forEach((subList) => {
+      Object.values(subList).forEach((sheet) => {
+        const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
+          itemName: sheet.itemName,
+          size: {
+            qty: sheet.quantity,
+            doorModelName: sheet.doorModelName,
+            fullWidth: sheet.fullWidth_mm,
+            height: sheet.height_mm,
+            WG: sheet.WG_mm,
+            gapA: numToStr(sheet.prodSpec?.gapA),
+            gapC: numToStr(sheet.prodSpec?.gapC),
+            /**支版尺寸 boxB*boxD */
+            BD: sheet.BD,
+            /**捲門全高 */
+            fullHeight: '???',
+          },
+          roller: {
+            diameter: sheet.diameter,
+            bearingInnerDiameter: sheet.bearingInnerDiameter,
+            bearingName: sheet.prodSpec?.bearingName ?? '',
+            bearingHousingTotalLength: sheet.bearingHousingTotalLength,
+            bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
+          },
+          headBox: {
+            angleIronQty: '???',
+            angleIronSize: '???',
+            info: '???',
+          },
+          doorPiece: {
+            material: sheet.com_slat_material,
+            thickness: sheet.thickness,
+            slatLength: numToStr(sheet.prodSpec?.slatLength),
+            slatCount: sheet.slatCount,
+            antyTyphoonHook: '???',
+          },
+          motor: {
+            vendor: sheet.motorVendor,
+            /**相數加電壓 */
+            phaseVoltage: sheet.motorPhase + sheet.motorVoltage,
+            horsepower: sheet.horsepower,
+          },
+          guideRail: {
+            彎直: '???',
+            material: sheet.com_guideRail_material,
+            guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
+            guideRailName: sheet.guideRailName,
+            icon: sheet?.guideRail
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`
+              : undefined,
+          },
+          chainCog: {
+            sprocketWheelModel: sheet.sprocketWheelModel,
+            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber,
+            bearingInnerDiameter: sheet.bearingInnerDiameter,
+          },
+          base: {
+            material: sheet.com_bottomBar_material,
+            guideRailsOpening: sheet.guideRailsOpening,
+          },
+          memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
+        };
+        workSheetPDF_01_itemArr.push(control_item);
+      });
+    });
+
+    const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
+      info: {
+        contractNumber: profile.projectNumber,
+        projectName: profile.projectName,
+        projectAddress: profile.allAddress,
+        customerName: contract?.content.customer.name ?? '',
+        // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
+        contactPerson: '???',
+        // 開單日
+        billingDate: '???-??-??',
+        // 出貨日
+        shippingDate: '???-??-??',
+      },
+      itemArr: workSheetPDF_01_itemArr,
+      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    };
+
+    let totalQty_PDF_02 = 0;
+    workSheetPDF_01_itemArr.forEach((item) => {
+      totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
+    });
+    const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
+      info: {
+        projectName: profile.projectName,
+        totalQty: String(totalQty_PDF_02),
+      },
+      itemArr: workSheetPDF_01_itemArr,
+      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+    };
+
+    return {
+      control_workSheetPDF_01,
+      control_workSheetPDF_02,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheetList]);
+
+  // -------------------------------------------------------------------------
+
   const panelList_allow: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出EXCEL',
+      onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${profile.projectName}`),
+    },
+    {
+      type: 'myButton',
+      label: '匯出廠務部工作表',
+      onClick: () => setIsShowPdf02(true),
+    },
+    {
+      type: 'myButton',
+      label: '匯出工作表',
+      onClick: () => setIsShowPdf(true),
+    },
     {
       type: 'myButton',
       label: '產生出庫單',
@@ -1099,6 +1256,8 @@ export default function WorkSheet() {
 
   const panelList = disabled ? panelList_allow : panelList_notAllow;
   // -----------------------------------------------------------------
+
+  const forbidden = targetSheet?.isOriginal;
 
   return (
     <SubLayer isLoading_all={isLoading}>
@@ -1137,6 +1296,7 @@ export default function WorkSheet() {
                 }
 
                 list.push({
+                  isOriginal: item.isOriginal,
                   itemName: itemName,
                   qty: quantity,
                   onClick: () => {
@@ -1151,10 +1311,11 @@ export default function WorkSheet() {
                       };
                     });
                   },
+                  onDeleteClick: () => item.clearSheet(),
                 });
               });
 
-              const originalItem = itemTokenList_new?.[pKey].originalItem;
+              const originalItem = itemTokenList?.[pKey].originalItem;
 
               const control = {
                 itemName: originalItem?.itemName ?? '',
@@ -1178,13 +1339,13 @@ export default function WorkSheet() {
               control={control_product}
               oldProductOutline={oldProductOutline}
               onCalcClick={onCalcClick}
-              disabled={disabled}
+              disabled={forbidden || disabled}
             />
 
             <hr />
             <WorkSheetProductDetail01
               control={control_detail}
-              disabled={disabled}
+              disabled={forbidden || disabled}
               supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
@@ -1192,7 +1353,7 @@ export default function WorkSheet() {
             <WorkSheetOptional
               control={control_optional}
               optionArr={targetSheet?.accessoriesOptionArr_easy ?? []}
-              disabled={disabled}
+              disabled={forbidden || disabled}
             />
             <hr />
             <WorkSheetProductDetail02 control={control_detail02} />
@@ -1213,6 +1374,8 @@ export default function WorkSheet() {
           type: 'number',
         }}
       />
+      <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
+      <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} />
     </SubLayer>
   );
 }

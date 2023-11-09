@@ -84,6 +84,8 @@ const useWorkSheet = ({
         oldProd: oldItem,
         itemIdArr: itemIdArr,
         addSheet,
+        deleteSheet: () => deleteSheet({ pKey, cKey }),
+        clearSheet: () => clearSheet({ pKey, cKey }),
       });
       // 分堆了，就要記錄在被改變清單中
       setChangedSheetList((state) => ({ ...state, [cKey]: sheetList[pKey][cKey] }));
@@ -91,6 +93,42 @@ const useWorkSheet = ({
       return { ...sheetList };
     });
   };
+
+  const deleteSheet = ({
+    //
+    pKey,
+    cKey,
+  }: {
+    pKey: string;
+    cKey: string;
+  }) => {
+    setSheetList((sheetList) => {
+      delete sheetList[pKey][cKey];
+
+      return { ...sheetList };
+    });
+  };
+
+  const clearSheet = ({
+    //
+    pKey,
+    cKey,
+  }: {
+    pKey: string;
+    cKey: string;
+  }) => {
+    setSheetList((sheetList) => {
+      const itemIdArr = sheetList[pKey][cKey].itemIdArr;
+      const adjustedItemId = sheetList[pKey][cKey].adjustedItemId;
+
+      sheetList[pKey][pKey].gatherBack({ itemIdArr, adjustedItemId });
+      delete sheetList[pKey][cKey];
+
+      return { ...sheetList };
+    });
+  };
+
+  // --------------------------------------------------------------------
 
   const reset = async () => {
     const list: TsheetList = {};
@@ -121,6 +159,8 @@ const useWorkSheet = ({
           oldProd: prod,
           itemIdArr: itemIdArrList[pKey][cKey],
           addSheet,
+          deleteSheet: () => deleteSheet({ pKey, cKey }),
+          clearSheet: () => clearSheet({ pKey, cKey }),
         });
       });
     });

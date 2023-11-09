@@ -105,7 +105,6 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
                   // onChange={(e) => payment[key].onChange?.(e.target.value)}
                   disabled={disabled}
                 />
-                <span></span>
               </div>
             </div>
           );
