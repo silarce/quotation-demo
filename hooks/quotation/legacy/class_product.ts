@@ -2,7 +2,11 @@ import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
 
-import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
+import {
+  optionsCre_doorTrack_normal,
+  optionsCre_doorTrack_typhoonProtection,
+  getDoorTrackByDoorModel,
+} from 'js/utils/options/doorTrackOptions';
 import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
@@ -176,6 +180,10 @@ class Class_product {
   };
 
   get options_doorTrack() {
+    if (this._product.doorType === 'SJ-312') {
+      return getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
+    }
+
     if (this.typhoonProtection) {
       return this.options_doorTrack_typhoonProtection;
     } else {
