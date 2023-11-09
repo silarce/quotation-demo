@@ -1084,10 +1084,10 @@ class Class_product {
     const dualPrice = price.mul(quantity || 0).toNumber();
     const totalPrice = unitPrice.mul(quantity || 0).toNumber();
 
-    this.price = price.ceil().toString();
-    this.dualPrice = Math.ceil(dualPrice).toString();
-    this.unitPrice = unitPrice.ceil().toString();
-    this.totalPrice = Math.ceil(totalPrice).toString();
+    this.price = price.toFixed(0).toString();
+    this.dualPrice = dualPrice.toFixed(0).toString();
+    this.unitPrice = unitPrice.toFixed(0).toString();
+    this.totalPrice = totalPrice.toFixed(0).toString();
     this.callCalcSubTotal();
     this.reRender();
   }
@@ -1111,10 +1111,10 @@ class Class_product {
     });
 
     this.AcceAllPrice = {
-      price: d_price.ceil().toNumber(),
-      dualPrice: d_dualPrice.ceil().toNumber(),
-      unitPrice: d_unitPrice.ceil().toNumber(),
-      totalPrice: d_totalPrice.ceil().toNumber(),
+      price: Number(d_price.toFixed(0)),
+      dualPrice: Number(d_dualPrice.toFixed(0)),
+      unitPrice: Number(d_unitPrice.toFixed(0)),
+      totalPrice: Number(d_totalPrice.toFixed(0)),
     };
   } // calcAccessoriesAllprice
 
@@ -1142,10 +1142,10 @@ class Class_product {
     });
 
     this.comAllPrice = {
-      price: d_price.ceil().toNumber(),
-      dualPrice: d_dualPrice.ceil().toNumber(),
-      unitPrice: d_unitPrice.ceil().toNumber(),
-      totalPrice: d_totalPrice.ceil().toNumber(),
+      price: Number(d_price.toFixed(0)),
+      dualPrice: Number(d_dualPrice.toFixed(0)),
+      unitPrice: Number(d_unitPrice.toFixed(0)),
+      totalPrice: Number(d_totalPrice.toFixed(0)),
     };
   } // calcComAllPrice
 
@@ -1171,10 +1171,10 @@ class Class_product {
     });
 
     this.comAllPrice = {
-      price: d_price.ceil().toNumber(),
-      dualPrice: d_dualPrice.ceil().toNumber(),
-      unitPrice: d_unitPrice.ceil().toNumber(),
-      totalPrice: d_totalPrice.ceil().toNumber(),
+      price: Number(d_price.toFixed(0)),
+      dualPrice: Number(d_dualPrice.toFixed(0)),
+      unitPrice: Number(d_unitPrice.toFixed(0)),
+      totalPrice: Number(d_totalPrice.toFixed(0)),
     };
   } // calcComAllPrice
 

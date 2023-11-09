@@ -128,9 +128,9 @@ class Class_component {
     // 複價
     const totalPrice = new Decimal(unitPrice).mul(quantity);
 
-    this._dualPrice = dualPrice.ceil().toNumber();
-    this._unitPrice = unitPrice.ceil().toNumber();
-    this._totalPrice = totalPrice.ceil().toNumber();
+    this._dualPrice = Number(dualPrice.toFixed(0));
+    this._unitPrice = Number(unitPrice.toFixed(0));
+    this._totalPrice = Number(totalPrice.toFixed(0));
 
     if (calcProdTotal) {
       this._prod.calcProdAllprice_timeout();
