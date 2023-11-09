@@ -702,25 +702,42 @@ class Class_product {
       return false;
     }
 
-    try {
-      const res = await apiGetProdAvailableComponents({
-        modelName: this.doorType as TpacParams['modelName'],
-        weight: this.weight,
-        isAntiTyphoon: this.typhoonProtection,
-        rollerDiameter: rollerDiameter,
-      });
-      this._availableComponents = res;
+    const res = await reqGetProdAvailableComponents({
+      modelName: this.doorType as TpacParams['modelName'],
+      weight: this.weight,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: rollerDiameter,
+    });
 
+    if (res) {
+      this._availableComponents = res;
       this.retrieveOptions();
       this.callRetrieveCreProdCom();
 
       return true;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
-
+    } else {
       return false;
     }
+
+    // try {
+    //   const res = await apiGetProdAvailableComponents({
+    //     modelName: this.doorType as TpacParams['modelName'],
+    //     weight: this.weight,
+    //     isAntiTyphoon: this.typhoonProtection,
+    //     rollerDiameter: rollerDiameter,
+    //   });
+    //   this._availableComponents = res;
+
+    //   this.retrieveOptions();
+    //   this.callRetrieveCreProdCom();
+
+    //   return true;
+    // } catch (error) {
+    //   const err = error as AxiosError<{ message: string }>;
+    //   myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
+
+    //   return false;
+    // }
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
@@ -2721,6 +2738,24 @@ const reqGetCalcGeneralSpec = async ({
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
+    return false;
+  }
+};
+
+const reqGetProdAvailableComponents = async (body: {
+  modelName: TpacParams['modelName'];
+  weight: number;
+  isAntiTyphoon: boolean;
+  rollerDiameter: number;
+}) => {
+  try {
+    const res = await apiGetProdAvailableComponents(body);
+
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
 
     return false;
   }
