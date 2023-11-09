@@ -254,10 +254,11 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                         };
                       }
 
-                      if (type === 'teaxtarea') {
+                      if (type === 'textarea') {
                         theProps.textareaProps = {
                           value: value ?? '',
                           onChange,
+                          allowNewLineByUser: true,
                         };
                       }
 
@@ -373,7 +374,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
 type Tconfig = {
   label: string;
   width: string;
-  type?: 'input' | 'select' | 'date' | 'employee' | 'teaxtarea';
+  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea';
   position: string;
 };
 
@@ -520,14 +521,14 @@ const creCellConfig_static = (): TcellConfigList => ({
 const creCellConfig_deliveryStatus = (): TcellConfigList => ({
   remark01: {
     label: '備註1',
-    width: '65px',
-    type: 'input',
+    width: '200px',
+    type: 'textarea',
     position: '',
   },
   remark02: {
     label: '選配',
     width: '150px',
-    type: 'teaxtarea',
+    type: 'textarea',
     position: '',
   },
   remark03: {

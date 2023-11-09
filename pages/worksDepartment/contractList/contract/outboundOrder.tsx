@@ -372,7 +372,8 @@ export default function OutboundOrder() {
           },
           deliveryStatus: {
             remark01: {
-              value: (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || '',
+              value:
+                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || acceNameArr.join('\n'),
               onChange: (str) => {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
               },
