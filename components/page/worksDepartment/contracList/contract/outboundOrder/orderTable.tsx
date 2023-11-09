@@ -342,7 +342,7 @@ const orderKeyArr_contract: (keyof TcontractData)[] = [
 ];
 
 const orderKeyArr_static: (keyof TstaticData)[] = [
-  'project',
+  // 'project',
   'L',
   'W',
   'B',
@@ -391,7 +391,7 @@ const creCellConfig_static = (): TcellConfigList => ({
   },
   project: {
     label: '項目',
-    width: '80px',
+    width: '120px',
     type: 'input',
     position: '',
   },
