@@ -29,7 +29,7 @@ type Tquery = {
 };
 
 // ==================================================================
-const monthOptionArr = optionsCreator_month({ emptyOption: true });
+const monthOptionArr = optionsCreator_month();
 const yearOptionArr = optionsCreator_year();
 
 // ==================================================================
@@ -37,7 +37,7 @@ export default function RegionalPerformanceStatistics() {
   const router = useRouter();
   const { year, month } = router.query as Tquery;
 
-  const { data, update } = useQuotationAccounting_area({ year: Number(year), month: Number(month) });
+  const { data, update } = useQuotationAccounting_area({ year: Number(year) + 1911, month: Number(month) });
 
   useEffect(() => {
     if (!year || !month) {
@@ -46,7 +46,7 @@ export default function RegionalPerformanceStatistics() {
 
       router.push({
         query: {
-          year: yearNum,
+          year: yearNum - 1911,
           month: monthNum,
         },
       });
