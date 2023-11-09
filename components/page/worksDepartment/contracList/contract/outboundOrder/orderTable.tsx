@@ -123,10 +123,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
           );
         })}
 
-        {/* 灰色柱子 */}
-        <div className={` ${style.pilar}`}>
-          <div />
-        </div>
+        {/* 灰色柱子 分隔線*/}
+        <div className={` ${style.pilar}`} />
 
         {orderKeyArr_static.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
@@ -141,10 +139,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
             </div>
           );
         })}
-        {/* 灰色柱子 */}
-        <div className={` ${style.pilar}`}>
-          <div />
-        </div>
+        {/* 灰色分隔線 */}
+        <div className={` ${style.pilar}`} />
         {/*  */}
         {orderKey_editible.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
@@ -204,8 +200,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       );
                     })}
 
-                    {/* 沒有柱子的灰色柱子 */}
-                    <div className={`${style.pilar}`} />
+                    {/* 灰色分隔線 */}
+                    <div className={` ${style.pilar}`} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
