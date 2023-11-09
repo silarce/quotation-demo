@@ -897,6 +897,63 @@ class Class_product {
   }
 
   // ---------------------------------------------------------
+
+  // 在一開始取得下拉式選單的選項
+  async callApiAndGetOptions() {
+    if (this._availableComponents) {
+      return;
+    }
+
+    if (!this.doorType || !this.height || !this.fullWidth) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.reRender();
+
+    const res_spec = await reqGetCalcGeneralSpec({
+      modelName: this.doorType as TpcgsPrams['modelName'],
+      height: Number(this.height) * 1000,
+      isAntiTyphoon: this.typhoonProtection,
+      fullWidth: Number(this.fullWidth || 0) * 1000,
+      WG: undefined,
+    });
+
+    if (!res_spec) {
+      this.isLoading = false;
+      this.reRender();
+
+      return;
+    }
+
+    this._doorGeneralSpecs = res_spec;
+
+    // const rollerDiameter = res_spec?.diameter;
+    const rollerDiameter = this._doorGeneralSpecs?.diameter;
+
+    if (!this.doorType || !this.weight || !rollerDiameter) {
+      this.isLoading = false;
+      this.reRender();
+
+      return false;
+    }
+
+    const res_availableCom = await reqGetProdAvailableComponents({
+      modelName: this.doorType as TpacParams['modelName'],
+      weight: this.weight,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: rollerDiameter,
+    });
+
+    if (res_availableCom) {
+      this._availableComponents = res_availableCom;
+      this.retrieveOptions();
+      this.isLoading = false;
+      this.reRender();
+    }
+  }
+
+  // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------

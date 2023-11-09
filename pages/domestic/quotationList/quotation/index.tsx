@@ -326,6 +326,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
 
+  useEffect(() => {
+    if (targetProd) {
+      targetProd.callApiAndGetOptions();
+    }
+  }, [targetProd]);
+
   const [summary, setSummary] = useState<{
     discountRate: string;
     subTotal: string;
