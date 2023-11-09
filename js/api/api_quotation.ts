@@ -731,20 +731,20 @@ export const useQuotationAccounting_years = () => {
 };
 
 /**全區業績統計表 */
-export const apiQuotationAccounting_area = () => {
+export const apiQuotationAccounting_area = (params: { year: number; month: number }) => {
   const api = '/quotation/accounting/area';
 
   return axi
-    .get<TquotationAccouting_area[]>(api)
+    .get<TquotationAccouting_area[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useQuotationAccounting_area = () => {
+export const useQuotationAccounting_area = (params: { year: number; month: number }) => {
   const [res, setRes] = useState<TquotationAccouting_area[]>();
 
   const update = async () => {
-    const newRes = await apiQuotationAccounting_area();
+    const newRes = await apiQuotationAccounting_area(params);
 
     if (newRes) {
       setRes(newRes);
