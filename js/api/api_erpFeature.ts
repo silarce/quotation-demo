@@ -78,3 +78,22 @@ export const useApiErpFeaturesMe = () => {
 
   return { erpFeature: res, setErpFeature: setRes, updateErpFeature: update };
 };
+
+export const apiPostErpFeatures_id_employees = (id: string, body: { employeeIds: string[] }) => {
+  const api = `/erp-features/${id}/employees`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiDeleteErpFeatures_id_employees = (id: string, body: { employeeIds: string[] }) => {
+  const api = `/erp-features/${id}/employees`;
+
+  // { data: body }
+  return axi
+    .delete(api, { data: body })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};

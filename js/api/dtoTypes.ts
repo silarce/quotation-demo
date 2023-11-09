@@ -202,6 +202,7 @@ export type TerpFeatureDto = {
   updatedAt: string;
   name: string;
   departments: TdepartmentDto_jobs[];
+  employees: TemployeeDto[];
 };
 
 // export type TdailyReportItemDto = {

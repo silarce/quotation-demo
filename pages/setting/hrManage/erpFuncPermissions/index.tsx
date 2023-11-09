@@ -16,6 +16,7 @@ import { setRootLoading } from 'components/global/gear/loadingCover/rootLoadingC
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import TwoButtonModal from 'components/global/gear/modal/simpleModal/twoButtonModal';
 import MyButton from 'components/global/gear/button/myButton';
+import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // icon
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -26,6 +27,8 @@ import {
   useErpFeatures,
   apiPostErpFeatures_id_departments,
   apiDeleteErpFeatures_id_departments,
+  apiPostErpFeatures_id_employees,
+  apiDeleteErpFeatures_id_employees,
 } from 'js/api/api_erpFeature';
 import { TdepartmentDto, useDepartments } from 'js/api/api_department';
 
@@ -65,6 +68,59 @@ export default function ErpFuncPermissions() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // --------------------------------------------------------------------------
+  const [erpId_addEmp, setErpId_addEmp] = useState<string>();
+  const [employee_del, setEmployee_del] = useState<TemployeeDto>();
+
+  const reqAddEmpToErp = async (empArr: TemployeeDto[]) => {
+    if (isLoading) {
+      return;
+    }
+
+    if (!erpId_addEmp) {
+      return;
+    }
+
+    const body = {
+      employeeIds: empArr.map((item) => item.id),
+    };
+
+    try {
+      setRootLoading(true);
+      await apiPostErpFeatures_id_employees(erpId_addEmp, body);
+      setErpId_addEmp(undefined);
+    } catch {
+      myAlert.err({ title: '新增管理人員失敗' });
+    }
+
+    setRootLoading(false);
+    await updateList();
+  };
+
+  const cancelDelete_emp = () => {
+    setErpData_del(undefined);
+    setEmployee_del(undefined);
+  };
+
+  const confirmDelete_emp = async () => {
+    if (!erpData_del || !employee_del) {
+      return;
+    }
+
+    const body = { employeeIds: [employee_del.id] };
+
+    try {
+      setRootLoading(true);
+      await apiDeleteErpFeatures_id_employees(erpData_del.id, body);
+      cancelDelete_emp();
+    } catch {
+      myAlert.err({ title: '移除管理人員失敗' });
+    }
+
+    setRootLoading(false);
+    await updateList();
+  };
 
   // --------------------------------------------------------------------------
   // 新增部門
@@ -146,15 +202,30 @@ export default function ErpFuncPermissions() {
 
       <div className={scss.body}>
         {erpArr.map((erp) => {
-          const { departments: depArr, id: erpId, name } = erp;
+          const {
+            //
+            departments: depArr,
+            employees: empArr,
+            id: erpId,
+            name,
+          } = erp;
 
-          const removeData = (index: number) => {
+          const removeData_department = (index: number) => {
             if (isLoading) {
               return;
             }
 
             setErpData_del(erp);
             setDepartmentData_del(depArr[index]);
+          };
+
+          const removeData_employee = (emp: TemployeeDto) => {
+            if (isLoading) {
+              return;
+            }
+
+            setErpData_del(erp);
+            setEmployee_del(emp);
           };
 
           return (
@@ -172,11 +243,27 @@ export default function ErpFuncPermissions() {
                         <span>{depName}</span>
                       </div>
                       <div>
-                        <IconRemoveCircle className={scss.removeBtn} onClick={() => removeData(index)} />
+                        <IconRemoveCircle className={scss.removeBtn} onClick={() => removeData_department(index)} />
                       </div>
                     </CellWithBar>
                   );
                 })}
+
+                {empArr.map((emp, index) => {
+                  const { id: empId, chName } = emp;
+
+                  return (
+                    <CellWithBar key={empId} className={scss.row}>
+                      <div>
+                        <span>{chName}</span>
+                      </div>
+                      <div>
+                        <IconRemoveCircle className={scss.removeBtn} onClick={() => removeData_employee(emp)} />
+                      </div>
+                    </CellWithBar>
+                  );
+                })}
+
                 <div className={scss.row_btn}>
                   <CellWithBar>
                     <MyButton
@@ -187,7 +274,12 @@ export default function ErpFuncPermissions() {
                     />
                   </CellWithBar>
                   <CellWithBar>
-                    <MyButton className={scss.btn} label="新增管理人員" preImg="add" onClick={() => alert('test')} />
+                    <MyButton
+                      className={scss.btn}
+                      label="新增管理人員"
+                      preImg="add"
+                      onClick={() => setErpId_addEmp(erpId)}
+                    />
                   </CellWithBar>
                 </div>
               </div>
@@ -211,6 +303,19 @@ export default function ErpFuncPermissions() {
         text={`請確認是否從${erpData_del?.name}移除${departmentData_del?.name}`}
         onConfirm={confirmDelete}
         onCancel={() => cancelDelete()}
+      />
+
+      <TwoButtonModal
+        visible={!!erpData_del && !!employee_del}
+        text={`請確認是否從${erpData_del?.name}移除${employee_del?.chName}`}
+        onConfirm={confirmDelete_emp}
+        onCancel={() => cancelDelete_emp()}
+      />
+      <EmployeeSelector
+        showModal={!!erpId_addEmp}
+        onConfirm={reqAddEmpToErp}
+        onCancel={() => setErpId_addEmp(undefined)}
+        selLimit={1}
       />
     </SubLayer>
   );
