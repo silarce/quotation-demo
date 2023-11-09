@@ -599,16 +599,18 @@ class Class_product {
       return false;
     }
 
-    let res: TdoorGeneralSpecsDto;
+    // let res: TdoorGeneralSpecsDto;
 
-    try {
-      res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+    const res = await apiGetProdCalcGeneralSpec(body);
 
-      return false;
-    }
+    // try {
+    //   res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+    // } catch (error) {
+    //   const err = error as AxiosError<{ message: string }>;
+    //   myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
+    //   return false;
+    // }
 
     // 計算出WG
 
@@ -2670,6 +2672,44 @@ const calcFullwidthWithWG = async ({
     return fullWidth;
   } catch (error) {
     return 0;
+  }
+};
+
+const reqGetCalcGeneralSpec = async ({
+  //
+  doorType,
+  height,
+  fullWidth,
+  WG,
+  isAntiTyphoon,
+}: {
+  doorType: string;
+  height: number;
+  fullWidth?: number;
+  WG?: number;
+  isAntiTyphoon: boolean;
+}) => {
+  const body = {
+    modelName: doorType as TpcgsPrams['modelName'],
+    height,
+    isAntiTyphoon,
+    fullWidth,
+    WG: WG,
+  };
+
+  if (!body.fullWidth && !body.WG) {
+    return false;
+  }
+
+  try {
+    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
+    return false;
   }
 };
 
