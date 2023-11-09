@@ -768,6 +768,9 @@ class Class_product {
 
       if (!id || !material) {
         haveNull = true;
+        console.log(
+          '若沒呼叫apiPostProdGenerateDoorProductBom，導致材料配件的資料不齊全，可能是因為材料配件過濾器沒有濾出適合的材料配件'
+        );
       }
 
       generateBomObj_empty[key] = {
