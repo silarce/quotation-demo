@@ -57,7 +57,7 @@ export default function PageHeader({
       label: '應收帳款明細',
       disabled: true,
       href: {
-        pathname: `${pathHead}/accountsReceivableDetails`,
+        pathname: `${pathHead}/accountReceivable`,
         query,
       },
     },

@@ -29,6 +29,7 @@ import type {
   TengineeringDeliveryListDto,
   TupdateEngineeringDeliveryList,
   TupdateDeliveryStatus,
+  TfileDto,
 } from './dtoTypes';
 
 export type {
@@ -50,6 +51,7 @@ export type {
   TengineeringDeliveryListDto,
   TupdateEngineeringDeliveryList,
   TupdateDeliveryStatus,
+  TfileDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -545,6 +547,57 @@ export const apiPatchEngineeringExchange = async (id: string, body: TcreateExchg
 
   return axi
     .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 調退貨單圖示
+export const apiGetEngineeringExchangeAttachments = async (id: string) => {
+  const api = `/engineering/exchange/${id}/attachments`;
+
+  return axi
+    .get<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useApiGetEngineeringExchangeAttachments = (id: string | undefined) => {
+  const [res, setRes] = useState<TfileDto[]>();
+
+  const update = async () => {
+    if (!id) {
+      return undefined;
+    }
+
+    const res = await apiGetEngineeringExchangeAttachments(id);
+
+    if (res) {
+      setRes(res);
+    }
+
+    return res;
+  };
+
+  return {
+    attachments: res,
+    updateAttachments: update,
+  };
+};
+
+export const apiPostEngineeringExchangeAttachments = async (id: string, body: FormData) => {
+  const api = `/engineering/exchange/${id}/attachments`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiDeleteEngineeringExchangeAttachments = async (id: string, fileId: string) => {
+  const api = `/engineering/exchange/${id}/attachments/${fileId}`;
+
+  return axi
+    .delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

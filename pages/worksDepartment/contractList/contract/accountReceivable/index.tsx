@@ -1,17 +1,19 @@
 import React from 'react';
 
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+
 // component
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // css
-import style from './contract.module.scss';
 
-export default function AccountsReceivableDetails() {
+export default function AccountReceivable() {
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader />
-      <div className={style.mainContainer}>
-        <div className={style.workContactDoc}>
+      <div>
+        <div>
           <h1>應收帳款明細</h1>
           <h1>應收帳款明細</h1>
           <h1>應收帳款明細</h1>
@@ -19,6 +21,6 @@ export default function AccountsReceivableDetails() {
           <h1>應收帳款明細</h1>
         </div>
       </div>
-    </div>
+    </SubLayer>
   );
 }
