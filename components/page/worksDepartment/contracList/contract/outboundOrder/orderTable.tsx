@@ -106,7 +106,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
     <div className={style.orderTable}>
       <div className={style.thead}>
         {/*  */}
-        <div className={`${style.theadItem} ${style.indexCell}`} />
+        {/* <div className={`${style.theadItem} ${style.indexCell}`} /> */}
         {/*  */}
 
         {orderKeyArr_contract.map((key, index) => {
@@ -115,6 +115,15 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
             width,
           };
           const textCenter = position === 'center' ? style.textCenter : '';
+
+          if (index === 0) {
+            return (
+              <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+                <span></span>
+                <span>{label}</span>
+              </div>
+            );
+          }
 
           return (
             <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
@@ -169,7 +178,8 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                 return (
                   <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
-                    {rowIndex === 0 ? (
+
+                    {/* {rowIndex === 0 ? (
                       <div className={`${style.column} ${style.indexCell}`}>
                         <span>{groupIndex + 1}</span>
                       </div>
@@ -177,7 +187,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       <div className={`${style.column} ${style.indexCell}`}>
                         <span></span>
                       </div>
-                    )}
+                    )} */}
 
                     {orderKeyArr_contract.map((key, columnIndex) => {
                       let value = row.contractData[key];
@@ -188,6 +198,23 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
+
+                      if (columnIndex === 0) {
+                        const isHiddenIndex = rowIndex !== 0;
+
+                        return (
+                          <div
+                            className={classNames(style.column, position === 'center' && style.textCenter)}
+                            key={columnIndex}
+                            style={theStyle}
+                          >
+                            <span className={classNames('pr-[10px]', isHiddenIndex && style.hidden)}>
+                              {groupIndex + 1}
+                            </span>
+                            <span>{value}</span>
+                          </div>
+                        );
+                      }
 
                       return (
                         <div
