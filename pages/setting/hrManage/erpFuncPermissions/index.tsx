@@ -248,7 +248,13 @@ export default function ErpFuncPermissions() {
                     </CellWithBar>
                   );
                 })}
-
+                {empArr.length > 0 && (
+                  <>
+                    <hr />
+                    <hr />
+                    <hr />
+                  </>
+                )}
                 {empArr.map((emp, index) => {
                   const { id: empId, chName } = emp;
 

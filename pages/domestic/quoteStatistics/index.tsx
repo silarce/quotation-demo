@@ -35,7 +35,7 @@ export default function QuoteStatistics() {
   const { year, month, region } = router.query as Tquery;
 
   const { data, update } = useQuotationAccounting({
-    year: year ? Number(year) : undefined,
+    year: year ? Number(year) + 1911 : undefined,
     month: month ? Number(month) : undefined,
     area: region || 'all',
   });
