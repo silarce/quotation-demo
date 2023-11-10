@@ -1246,11 +1246,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const size = `${lw} X ${h} + ${b}`;
 
-    const list = { ...prod.comList, ...prod.subComList };
-    delete list['sidePlate'];
-    delete list['motorAccessories'];
+    const list_com = { ...prod.comList, ...prod.subComList };
+    delete list_com['sidePlate'];
+    delete list_com['motorAccessories'];
 
-    const componentArr = Object.values(list ?? {});
+    const list_acce = prod.accessoriesList;
+
+    const componentArr = Object.values(list_com ?? {});
 
     let totalPrice = 0;
 
@@ -1268,14 +1270,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
       };
     });
 
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      return {
+        partName: acce.name,
+        material: '',
+        unit: acce.unit,
+        qty: String(acce.quantity),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
+      };
+    });
+
     return {
       category: prod.itemName,
       material: prod.material,
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      part: part,
-      priceTotal: totalPrice.toLocaleString(),
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: prod.totalPrice,
     };
   });
 
