@@ -54,7 +54,8 @@ export const apiGetQuotation = async (params?: Tparams) => {
 
   params = {
     populate: [
-      'contents',
+      'contents.customer',
+      // 'contents',
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',

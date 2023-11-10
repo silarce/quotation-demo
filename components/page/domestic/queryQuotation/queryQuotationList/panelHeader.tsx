@@ -1,4 +1,5 @@
 import { MouseEvent } from 'react';
+import Link from 'next/link';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -8,32 +9,54 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import style from '../queryQuotationList.module.scss';
-// type
-import { TqueryQuotation } from 'pages/domestic/queryQuotation';
+
+// =======================================================================
+
+type Tcontrol_panelHeader = {
+  quotationNumber: string;
+  status: string;
+  quoteDate: string;
+  customerName: string;
+  contactPerson: string;
+  contactPhoneNumber: string;
+  href: Parameters<typeof Link>[0]['href'];
+};
+
+export type { Tcontrol_panelHeader };
+
+// =======================================================================
 
 export default function PanelHeader({
-  queryQuotation,
+  control,
   isActive,
   openQuotation,
 }: {
-  queryQuotation: TqueryQuotation;
+  control: Tcontrol_panelHeader;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
 }) {
-  const { queryQuotationId: id, contactPerson, phone, stepList } = queryQuotation;
-
-  const { step, date, clientName } = stepList[0];
+  const {
+    quotationNumber,
+    status,
+    quoteDate: updatedAt,
+    customerName,
+    contactPerson,
+    contactPhoneNumber,
+    href,
+  } = control;
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive}>
-      <span>{id}</span>
-      <span className={style.step}>{step}</span>
-      <span>{date}</span>
-      <span className={style.clientName}>{clientName}</span>
+      <span>{quotationNumber}</span>
+      <span className={style.step}>{status}</span>
+      <span>{updatedAt}</span>
+      <span className={style.clientName}>{customerName}</span>
       <span>{contactPerson}</span>
-      <span>{phone}</span>
+      <span>{contactPhoneNumber}</span>
       <div>
-        <IconDetail onClick={openQuotation} />
+        <Link href={href}>
+          <IconDetail onClick={openQuotation} />
+        </Link>
       </div>
     </CellWithBar>
   );
