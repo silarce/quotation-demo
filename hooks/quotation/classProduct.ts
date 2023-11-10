@@ -281,8 +281,6 @@ class Class_product {
   timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
 
   // ---------------------------------------------------------
-  dontGetDefaultValue = false;
-  // ---------------------------------------------------------
 
   comList: { [key in TcomponentKey]: Class_component } | undefined;
 
@@ -856,26 +854,33 @@ class Class_product {
     } finally {
       this.isLoading = false;
 
-      //如果res1或res2改變了，就呼叫takeDefaultDynaValue
+      //如果res1或res2呼叫了，就呼叫takeDefaultDynaValue
       if (res1 || res2) {
         this.takeDefaultDynaValue();
-      } else if (res3) {
-        // 如果dontGetDefaultValue為true
-        // 代表其中一個會被takeDefaultDynaValue改變的值不應該被改變
-        // 所以不要呼叫takeDefaultDynaValue
-        // 例如rollUpBoxThick，現在也只有set rollUpBoxThick會使takeDefaultDynaValue=true
-        // 會使takeDefaultDynaValue=true的有 set rollUpBoxThick與set doorTrackThick
-
-        if (this.dontGetDefaultValue) {
-          this.dontGetDefaultValue = false;
-          // this.shouldCall_cgs = false;
-          // this.shouldCall_pac = false;
-          // this.shouldCall_pgpb = false;
-          // this.retrieveCreProdCom();
-        } else {
-          this.takeDefaultDynaValue();
-        }
       }
+      // 呼叫reqProdGenerateDoorProductBom後取得的資料
+      // 只有comList(材料配件)會用到
+      // 那就根本不需要呼叫takeDefaultDynaValue
+      // 那麼dontGetDefaultValue這個變數也不再需要了
+      // 確定都沒問題後就把dontGetDefaultValue刪掉
+
+      // else if (res3) {
+      //   // 如果dontGetDefaultValue為true
+      //   // 代表其中一個會被takeDefaultDynaValue改變的值不應該被改變
+      //   // 所以不要呼叫takeDefaultDynaValue
+      //   // 例如rollUpBoxThick，現在也只有set rollUpBoxThick會使takeDefaultDynaValue=true
+      //   // 會使takeDefaultDynaValue=true的有 set rollUpBoxThick與set doorTrackThick
+
+      //   if (this.dontGetDefaultValue) {
+      //     this.dontGetDefaultValue = false;
+      //     // this.shouldCall_cgs = false;
+      //     // this.shouldCall_pac = false;
+      //     // this.shouldCall_pgpb = false;
+      //     // this.retrieveCreProdCom();
+      //   } else {
+      //     this.takeDefaultDynaValue();
+      //   }
+      // }
     }
 
     this.shouldCall_cgs = false;
@@ -2087,7 +2092,6 @@ class Class_product {
   }
   set doorTrackThick(str) {
     this._prodData.doorTrackThick = str;
-    this.dontGetDefaultValue = true;
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -2123,7 +2127,6 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
-    this.dontGetDefaultValue = true;
     this.callRetrieveCreProdCom();
     this.reRender();
   }

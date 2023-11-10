@@ -180,7 +180,6 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
       const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
