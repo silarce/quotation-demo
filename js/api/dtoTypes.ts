@@ -1026,7 +1026,7 @@ export type TquotationProductItemDto = Omit<
   guideRailsOpening: string;
 };
 
-type TquotationContentDto_foo = {
+type TquotationContentDto_copy = {
   id: string;
   createdAt: string;
   updateAt: string;
@@ -1095,6 +1095,7 @@ type TquotationContentDto_foo = {
 
   verifyForm: TquotationVerifyFormDto;
 };
+
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
@@ -1164,13 +1165,19 @@ export type TquotationContentDto = {
 
   verifyForm: TquotationVerifyFormDto;
 
-  contract?: TquotationContractDto;
+  // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
+  // ! 所以只設需要拿的東西
+  // contract?: TquotationContractDto;
+  contract?: {
+    id: string;
+  };
 
   // api文件上沒寫但應該會有的東西
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
   // rootContract?: TquotationContractDto;
+
   // 為了避免check壞掉，暫時先這樣
-  rootContract?: TquotationContentDto_foo;
+  rootContract?: TquotationContentDto_copy;
 };
 
 export type TquotationDto = {
