@@ -90,6 +90,8 @@ import {
   useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
   apiDelQuotation_id_attachments,
+  //
+  useGetQuotationContent_id,
 } from 'js/api/api_quotation';
 
 // hook
@@ -207,8 +209,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
-  const lastestContentId = quotationData?.latestContent.id;
-  const latestContent = quotationData?.latestContent;
+  const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
+
+  const latestContent = quotationData?.latestContent ?? quotationContentData;
+  const lastestContentId = latestContent?.id;
   const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
   const attachedToContract = quotationData?.attachedToContract;
@@ -327,9 +331,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reset: resetClass,
     //
   } = useProductList({
-    productArr: quotationData?.latestContent.products,
-    others: quotationData?.latestContent.others,
-    resetTrigger: quotationData,
+    // productArr: quotationData?.latestContent.products,
+    // others: quotationData?.latestContent.others,
+    productArr: latestContent?.products,
+    others: latestContent?.others,
+    resetTrigger: quotationData ?? quotationContentData,
     onDoorTypeChange: onDoorTypeChange,
   });
 
@@ -362,7 +368,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
-    if (quotationData) {
+    if (latestContent) {
       const {
         //
         discount,
@@ -374,7 +380,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         paymentMethods,
         annotations,
         quotationRanges,
-      } = quotationData.latestContent;
+      } = latestContent;
 
       setAnnotation(annotations ?? []);
       setQr(quotationRanges ?? []);
@@ -419,7 +425,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryDate: '',
       });
     }
-  }, [quotationData, disabled]);
+  }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
@@ -703,18 +709,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([update(), updateAttachments()]);
-      } catch (error) {}
+    if (contentId) {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([updateContent(), updateAttachments()]);
+        } catch (error) {}
 
-      setIsLoading(false);
-    })();
+        setIsLoading(false);
+      })();
+    } else {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([update(), updateAttachments()]);
+        } catch (error) {}
+
+        setIsLoading(false);
+      })();
+    }
   }, [quotationId]);
 
   useEffect(() => {
-    const latestContent = quotationData?.latestContent;
+    // 直接取外範疇的latestContent
+    // const latestContent = quotationData?.latestContent;
 
     let agentEmployee;
 
@@ -757,7 +775,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: latestContent?.trackProgress,
       projectProgress: latestContent?.projectProgress,
     });
-  }, [quotationData]);
+  }, [quotationData, quotationContentData]);
 
   const onProfileChange = (v: Partial<TreturnBody>) => {
     setValue('validityPeriod', v.validityPeriod ?? '');
@@ -934,7 +952,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: quotationId ? `報價編號 ${quotationData?.latestContent.quotationNumber || ''}` : '新報價單',
+      label: quotationId ? `報價編號 ${latestContent?.quotationNumber || ''}` : '新報價單',
       onClick: () => {},
     },
   ];
@@ -995,7 +1013,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '匯出材料/配件',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = quotationData?.latestContent.products;
+        const prodArr = latestContent.products;
         let isOk = true;
         prodArr?.forEach((prod) => {
           if (prod.quantity === 0) {
@@ -1313,7 +1331,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
-            profile={quotationData?.latestContent}
+            profile={latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
           />
@@ -1505,8 +1523,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <ContractReviewForm
         showModal={reviewFormShow}
         close={() => setReviewFormShow(false)}
-        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
-        contractName={quotationData?.latestContent.projectName ?? ''}
+        contractIdNumber={latestContent?.quotationNumber ?? ''}
+        contractName={latestContent?.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
         verifyForm={verifyForm}

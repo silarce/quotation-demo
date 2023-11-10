@@ -155,6 +155,57 @@ export const useGetQuotation_id = (id: string | undefined) => {
   };
 };
 
+const apiGetQuotationContent_Id = async (id: string) => {
+  const api = `/quotation/content/${id}`;
+
+  const params = {
+    populate: [
+      'customer',
+      'agentEmployee',
+      'supervisorEmployee',
+      'managerEmployee',
+      'reviewSalesEmployee',
+      'reviewWorkDirectorEmployee',
+      'reviewSupervisorEmployee',
+      'reviewManagerEmployee',
+
+      'products.items.accessories',
+      'products.items.components',
+      'products.items.rootProdductId',
+      'others',
+      'verifyForm',
+    ],
+  };
+
+  return axi
+    .get<TquotationContentDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetQuotationContent_id = (id: string | undefined) => {
+  const [res, setRes] = useState<TquotationContentDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetQuotationContent_Id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
 // ================================================================
 type TgetContracts = {
   data: TquotationContractDto[];
