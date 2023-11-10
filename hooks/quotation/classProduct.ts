@@ -602,7 +602,11 @@ class Class_product {
 
     // let res: TdoorGeneralSpecsDto;
 
-    const res = await apiGetProdCalcGeneralSpec(body);
+    const res = await reqGetCalcGeneralSpec(body);
+
+    if (!res) {
+      return false;
+    }
 
     // try {
     //   res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
@@ -698,25 +702,42 @@ class Class_product {
       return false;
     }
 
-    try {
-      const res = await apiGetProdAvailableComponents({
-        modelName: this.doorType as TpacParams['modelName'],
-        weight: this.weight,
-        isAntiTyphoon: this.typhoonProtection,
-        rollerDiameter: rollerDiameter,
-      });
-      this._availableComponents = res;
+    const res = await reqGetProdAvailableComponents({
+      modelName: this.doorType as TpacParams['modelName'],
+      weight: this.weight,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: rollerDiameter,
+    });
 
+    if (res) {
+      this._availableComponents = res;
       this.retrieveOptions();
       this.callRetrieveCreProdCom();
 
       return true;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
-
+    } else {
       return false;
     }
+
+    // try {
+    //   const res = await apiGetProdAvailableComponents({
+    //     modelName: this.doorType as TpacParams['modelName'],
+    //     weight: this.weight,
+    //     isAntiTyphoon: this.typhoonProtection,
+    //     rollerDiameter: rollerDiameter,
+    //   });
+    //   this._availableComponents = res;
+
+    //   this.retrieveOptions();
+    //   this.callRetrieveCreProdCom();
+
+    //   return true;
+    // } catch (error) {
+    //   const err = error as AxiosError<{ message: string }>;
+    //   myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
+
+    //   return false;
+    // }
   } //  req_getProdAvailableComponents
 
   // this.shouldCall_pgpb
@@ -873,6 +894,63 @@ class Class_product {
     this.callAllTimeoutId = setTimeout(() => {
       this.reqChain();
     }, 300);
+  }
+
+  // ---------------------------------------------------------
+
+  // 在一開始取得下拉式選單的選項
+  async callApiAndGetOptions() {
+    if (this._availableComponents) {
+      return;
+    }
+
+    if (!this.doorType || !this.height || !this.fullWidth) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.reRender();
+
+    const res_spec = await reqGetCalcGeneralSpec({
+      modelName: this.doorType as TpcgsPrams['modelName'],
+      height: Number(this.height) * 1000,
+      isAntiTyphoon: this.typhoonProtection,
+      fullWidth: Number(this.fullWidth || 0) * 1000,
+      WG: undefined,
+    });
+
+    if (!res_spec) {
+      this.isLoading = false;
+      this.reRender();
+
+      return;
+    }
+
+    this._doorGeneralSpecs = res_spec;
+
+    // const rollerDiameter = res_spec?.diameter;
+    const rollerDiameter = this._doorGeneralSpecs?.diameter;
+
+    if (!this.doorType || !this.weight || !rollerDiameter) {
+      this.isLoading = false;
+      this.reRender();
+
+      return false;
+    }
+
+    const res_availableCom = await reqGetProdAvailableComponents({
+      modelName: this.doorType as TpacParams['modelName'],
+      weight: this.weight,
+      isAntiTyphoon: this.typhoonProtection,
+      rollerDiameter: rollerDiameter,
+    });
+
+    if (res_availableCom) {
+      this._availableComponents = res_availableCom;
+      this.retrieveOptions();
+      this.isLoading = false;
+      this.reRender();
+    }
   }
 
   // ---------------------------------------------------------
@@ -2686,20 +2764,20 @@ const calcFullwidthWithWG = async ({
 
 const reqGetCalcGeneralSpec = async ({
   //
-  doorType,
+  modelName,
   height,
   fullWidth,
   WG,
   isAntiTyphoon,
 }: {
-  doorType: string;
+  modelName: string;
   height: number;
   fullWidth?: number;
   WG?: number;
   isAntiTyphoon: boolean;
 }) => {
   const body = {
-    modelName: doorType as TpcgsPrams['modelName'],
+    modelName: modelName as TpcgsPrams['modelName'],
     height,
     isAntiTyphoon,
     fullWidth,
@@ -2717,6 +2795,24 @@ const reqGetCalcGeneralSpec = async ({
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
+
+    return false;
+  }
+};
+
+const reqGetProdAvailableComponents = async (body: {
+  modelName: TpacParams['modelName'];
+  weight: number;
+  isAntiTyphoon: boolean;
+  rollerDiameter: number;
+}) => {
+  try {
+    const res = await apiGetProdAvailableComponents(body);
+
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
 
     return false;
   }
