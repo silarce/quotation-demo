@@ -118,9 +118,16 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
+  // const {
+  //   id: quotationId, //報價單id //若為新增報價單則為undefined
+  // } = router.query as { id: string | undefined };
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
-  } = router.query as { id: string | undefined };
+    contentId,
+  } = router.query as {
+    id: string | undefined;
+    contentId: string | undefined;
+  };
   const { userInfo, userGrade } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
@@ -1027,7 +1034,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return null;
       }
     })(),
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
