@@ -52,20 +52,10 @@ export default function QueryQuotationList({
           const { header, body } = item;
           const isActive = activeIndex === index;
 
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            // router.push(`/domestic/contract/quotation/${quotationId}`)
-            alert('test');
-          };
-
           // ===========================
 
           return (
-            <Panel
-              key={index}
-              className={style.panel}
-              header={<PanelHeader control={header} isActive={isActive} openQuotation={openQuotation} />}
-            >
+            <Panel key={index} className={style.panel} header={<PanelHeader control={header} isActive={isActive} />}>
               <PanelBody control={body} />
             </Panel>
           );

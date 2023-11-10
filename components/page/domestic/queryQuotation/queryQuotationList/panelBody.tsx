@@ -26,10 +26,6 @@ export default function PanelBody({
 }: {
   control: Tcontrol_panelBody[];
 }) {
-  const onClick = () => {
-    alert('目前無功能');
-  };
-
   return (
     <div className={style.panelBody}>
       {control.map((item, index) => {
@@ -45,7 +41,7 @@ export default function PanelBody({
             <span></span>
             <div>
               <Link href={href}>
-                <IconDetail onClick={onClick} />
+                <IconDetail />
               </Link>
             </div>
           </CellWithBar>

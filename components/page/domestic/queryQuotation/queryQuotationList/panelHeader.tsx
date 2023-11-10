@@ -1,4 +1,3 @@
-import { MouseEvent } from 'react';
 import Link from 'next/link';
 
 // global gear
@@ -26,15 +25,7 @@ export type { Tcontrol_panelHeader };
 
 // =======================================================================
 
-export default function PanelHeader({
-  control,
-  isActive,
-  openQuotation,
-}: {
-  control: Tcontrol_panelHeader;
-  isActive: boolean;
-  openQuotation: (e: MouseEvent) => void;
-}) {
+export default function PanelHeader({ control, isActive }: { control: Tcontrol_panelHeader; isActive: boolean }) {
   const {
     quotationNumber,
     status,
@@ -55,7 +46,12 @@ export default function PanelHeader({
       <span>{contactPhoneNumber}</span>
       <div>
         <Link href={href}>
-          <IconDetail onClick={openQuotation} />
+          {/* <IconDetail onClick={openQuotation} /> */}
+          <IconDetail
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          />
         </Link>
       </div>
     </CellWithBar>
