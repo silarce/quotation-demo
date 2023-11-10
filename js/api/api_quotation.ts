@@ -53,9 +53,10 @@ export const apiGetQuotation = async (params?: Tparams) => {
   const api = '/quotation';
 
   params = {
+    ...params,
     populate: [
-      'contents.customer',
-      // 'contents',
+      // 'contents.customer',
+      'contents',
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
@@ -66,8 +67,8 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.products.quantity',
       'latestContent.products.options',
       'attachedToContract',
+      'attachedToContractId',
     ],
-    ...params,
   };
 
   return axi

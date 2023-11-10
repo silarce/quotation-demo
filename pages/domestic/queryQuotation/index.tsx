@@ -31,6 +31,20 @@ export default function Budget() {
   // ----------------------------------------------------------------------
 
   const params = {
+    populate: [
+      'contents.customer',
+      // 'latestContent.customer',
+      'latestContent.agentEmployee',
+      'latestContent.reviewSalesEmployee',
+      'latestContent.reviewWorkDirectorEmployee',
+      'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewManagerEmployee',
+      'latestContent.managerReviewedAt',
+      'latestContent.products.quantity',
+      'latestContent.products.options',
+      'attachedToContract',
+      'attachedToContractId',
+    ],
     filter: {
       id: { $eq: quotationId },
     },
@@ -49,6 +63,8 @@ export default function Budget() {
       const { contents, latestContent, attachedToContractId, id } = quotation;
 
       const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+
+      const theLatestContent = sortedContent[sortedContent.length - 1];
 
       const href_head =
         latestContent.status === 'Contract'
@@ -71,7 +87,7 @@ export default function Budget() {
         quotationNumber: latestContent.quotationNumber,
         status: quotationStatusLookup[latestContent.status],
         quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
-        customerName: latestContent.customer?.name,
+        customerName: theLatestContent.customer?.name,
         contactPerson: latestContent.contactPerson,
         contactPhoneNumber: latestContent.contactNumber,
         href: href_head,
