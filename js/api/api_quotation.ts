@@ -102,7 +102,8 @@ export const apiGetQuotation_Id = async (id: string) => {
 
   const params = {
     populate: [
-      'contents',
+      // 'contents',
+      'contents.customer',
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',
