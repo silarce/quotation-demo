@@ -1013,7 +1013,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '匯出材料/配件',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = latestContent.products;
+        const prodArr = latestContent?.products;
         let isOk = true;
         prodArr?.forEach((prod) => {
           if (prod.quantity === 0) {
@@ -1029,32 +1029,46 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
 
-    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!isReviewer || null) && {
+    !contentId && isReviewer
+      ? {
+          type: 'myButton',
+          label: '審核',
+          onClick: () => setReviewModalShow(true),
+        }
+      : null,
+
+    !contentId && quotationId
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            openEmpSel('reviewSales');
+          },
+        }
+      : null,
+
+    !contentId && status === 'Contracting'
+      ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
+      : null,
+
+    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+
+    {
       type: 'myButton',
-      label: '審核',
-      onClick: () => setReviewModalShow(true),
-    },
-    // (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
-    (!!quotationId || null) && {
-      type: 'myButton',
-      label: '送審',
+      label: '返回',
       onClick: () => {
-        openEmpSel('reviewSales');
+        if (window.history.length === 1) {
+          router.push({
+            pathname: '/domestic/quotationList',
+            query: {
+              status: latestContent?.status,
+            },
+          });
+        } else {
+          router.back();
+        }
       },
     },
-    // status
-    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
-    (() => {
-      if (status === 'Contracting') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
-      } else {
-        return null;
-      }
-    })(),
-    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
-    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
   // --------------------------------------------------------------------------
@@ -1555,11 +1569,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   );
 }
 
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
