@@ -26,7 +26,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 export default function Budget() {
   const router = useRouter();
-  const { quotationId } = router.query as { quotationId: string };
+  const { quotationNumber: quotationNumber } = router.query as { quotationNumber: string };
 
   // ----------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ export default function Budget() {
       'attachedToContractId',
     ],
     filter: {
-      id: { $eq: quotationId },
+      quotationNumber: { $eq: quotationNumber },
     },
   };
 
@@ -55,7 +55,7 @@ export default function Budget() {
 
   useEffect(() => {
     update();
-  }, [quotationId]);
+  }, [quotationNumber]);
 
   // ----------------------------------------------------------------------
 
@@ -132,15 +132,15 @@ export default function Budget() {
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
-      value: quotationId,
+      value: quotationNumber,
       placeholder: '請輸入報價單編號',
     },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    const quotationId = vArr[0] as string;
+    const quotationNumber = vArr[0] as string;
     router.push({
-      query: { quotationId },
+      query: { quotationNumber },
     });
   };
 
