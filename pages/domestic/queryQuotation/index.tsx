@@ -42,6 +42,7 @@ export default function Budget() {
       'latestContent.managerReviewedAt',
       'latestContent.products.quantity',
       'latestContent.products.options',
+      'latestContent.contract',
       'attachedToContract',
       'attachedToContractId',
     ],
@@ -59,8 +60,8 @@ export default function Budget() {
   // ----------------------------------------------------------------------
 
   const panelArr: Tcontrol_queryQuotationList['panelArr'] =
-    quoatationArr?.map((quotation, index) => {
-      const { contents, latestContent, attachedToContractId, id } = quotation;
+    quoatationArr?.map((quotation) => {
+      const { contents, latestContent, id } = quotation;
 
       const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
 
@@ -71,7 +72,7 @@ export default function Budget() {
           ? {
               pathname: '/domestic/contract/quotation',
               query: {
-                id: attachedToContractId || undefined,
+                id: latestContent.contract?.id,
                 version: 1,
               },
             }

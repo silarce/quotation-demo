@@ -1164,6 +1164,8 @@ export type TquotationContentDto = {
 
   verifyForm: TquotationVerifyFormDto;
 
+  contract?: TquotationContractDto;
+
   // api文件上沒寫但應該會有的東西
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
   // rootContract?: TquotationContractDto;
