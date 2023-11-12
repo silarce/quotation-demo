@@ -31,9 +31,11 @@ export const budgetListContext = createContext<TbudgetListContext>(null!);
 export default function BudgetList({
   quotationArr,
   className,
+  viewRef_bottom,
 }: {
   quotationArr: TquotationDto[] | undefined;
   className?: string;
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
 }) {
   const router = useRouter();
 
@@ -78,6 +80,8 @@ export default function BudgetList({
             customerName: latestContent.customer?.name ?? '',
             agentEmployeeName: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
             totalPrice: latestContent.total,
+            // viewRef_bottom: viewRef_bottom,
+            viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,
           };
 
           const {
@@ -149,6 +153,7 @@ export default function BudgetList({
                   openQuotation={openQuotation}
                 >
                   <ReviewChain reviewStatuArr={reviewStatuArr} />
+                  <span></span>
                 </TbodyItem01>
               }
             >

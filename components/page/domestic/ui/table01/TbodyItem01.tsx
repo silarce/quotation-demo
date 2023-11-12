@@ -23,6 +23,7 @@ type TBodyItemContent = {
   totalPrice: number;
   customerName: string;
   agentEmployeeName: string;
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
 };
 
 export type { TBodyItemContent };
@@ -53,6 +54,7 @@ export default function TbodyItem01({
     totalPrice,
     customerName,
     agentEmployeeName,
+    viewRef_bottom,
   } = quotationContent;
 
   // const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
@@ -61,7 +63,7 @@ export default function TbodyItem01({
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive}>
-      <div className={scss.row01}>
+      <div className={scss.row01} ref={viewRef_bottom}>
         <span>{quotationNumber}</span>
         <span className={scss.clientName}>{customerName}</span>
         <span>{contactPerson}</span>
