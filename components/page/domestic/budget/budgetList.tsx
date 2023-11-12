@@ -2,6 +2,7 @@ import { useState, MouseEvent, createContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
+import _ from 'lodash';
 
 // components
 import Thead01 from '../ui/table01/Thead01';
@@ -129,15 +130,28 @@ export default function BudgetList({
             reviewStatuArr.pop();
           }
 
-          const recordArr = contents.map((item) => {
-            const { createdAt, editNotes, discount, quantity, total } = item;
+          const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+          sortedContent.shift();
+
+          const recordArr = sortedContent.map((content) => {
+            const { updatedAt, editNotes, discount, quantity, total } = content;
+
+            const href_body = {
+              pathname: '/domestic/quotationList/quotation',
+              query: {
+                id: id,
+                status: content.status,
+                contentId: content.id,
+              },
+            };
 
             return {
-              date: moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD'),
+              date: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
               editNotes,
               discount,
               doorQty: String(quantity),
               total: total.toLocaleString(),
+              href: href_body,
             };
           });
 
@@ -157,7 +171,6 @@ export default function BudgetList({
                 </TbodyItem01>
               }
             >
-              {/* 等api補資料再作 */}
               <PanelBody recordArr={recordArr} />
             </Panel>
           );
