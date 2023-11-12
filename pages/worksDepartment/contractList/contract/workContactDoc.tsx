@@ -539,6 +539,8 @@ export default function WorkContactDoc() {
             changeProdKeyArr={changeProdKeyArr}
             addProd={() => {}}
             setTargetProd={() => {}}
+            panelBox="easyBox"
+            emptyBlockWidth="80px"
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
