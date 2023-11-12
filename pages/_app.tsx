@@ -20,7 +20,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
-import { useApiErpFeaturesMe } from 'js/api/api_erpFeature';
+import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // css
 import 'antd/dist/antd.css';
@@ -44,6 +44,7 @@ type TappContext = {
   rwd1023: boolean;
   userInfo: TuserDto | undefined;
   userGrade: number;
+  erpFeature: TerpFeatureDto[] | undefined;
 };
 
 export const AppContext = createContext<TappContext>(null!);
@@ -112,6 +113,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     rwd1023,
     userInfo,
     userGrade,
+    erpFeature: userErpFeature,
   };
 
   // -----------------------------------------------------------------------
