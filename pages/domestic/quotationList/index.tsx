@@ -5,35 +5,34 @@ import _ from 'lodash';
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
+// components
+import BudgeList from 'components/page/domestic/budget/budgetList';
+
 // global gear
 import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import ContractSelector from 'components/global/gear/modal/contractSelector';
-
-// components
-import BudgeList from 'components/page/domestic/budget/budgetList';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './index.module.scss';
 
-import { AppContext } from 'pages/_app';
+// api
+import { useGetQuotation, useGetQuotation_infinite } from 'js/api/api_quotation';
 
 // option
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
 
+// other
+import { AppContext } from 'pages/_app';
+
+// ===========================================================
 const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 
-// ===========================================
-// ===========================================
-
-import { useGetQuotation } from 'js/api/api_quotation';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
-// ===========================================
-// ===========================================
+// ===========================================================
 
 export default function QuotationList() {
   const router = useRouter();
@@ -232,6 +231,20 @@ export default function QuotationList() {
       setIsLoading(false);
     })();
   }, [router.query]);
+
+  // const {
+  //   //
+  //   dataArr: quoatationArr,
+  //   viewRef_bottom,
+  //   isLoadingPage1,
+  //   // isLoading,
+  //   init,
+  //   reset,
+  // } = useGetQuotation_infinite({ customParams: params });
+
+  // useEffect(() => {
+  //   reset();
+  // }, [router.query]);
 
   // ----------------------------------------------------------
   // panelList

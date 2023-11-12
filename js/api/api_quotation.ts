@@ -6,6 +6,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
+import { createUseInfinite } from './useInfiniteTemplate';
 
 // type
 import type {
@@ -96,6 +97,12 @@ export const useGetQuotation = (customParams?: Tparams) => {
     update,
   };
 };
+
+export const useGetQuotation_infinite = createUseInfinite<TgetQuotation>({
+  //
+  apiClient: apiGetQuotation,
+  errTitle: '取得報價單失敗',
+});
 
 export const apiGetQuotation_Id = async (id: string) => {
   const api = `/quotation/${id}`;
