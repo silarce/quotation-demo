@@ -19,6 +19,7 @@ type Tcontrol_panelHeader = {
   contactPerson: string;
   contactPhoneNumber: string;
   href: Parameters<typeof Link>[0]['href'];
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
 };
 
 export type { Tcontrol_panelHeader };
@@ -34,11 +35,12 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
     contactPerson,
     contactPhoneNumber,
     href,
+    viewRef_bottom,
   } = control;
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive}>
-      <span>{quotationNumber}</span>
+      <span ref={viewRef_bottom}>{quotationNumber}</span>
       <span className={style.step}>{status}</span>
       <span>{updatedAt}</span>
       <span className={style.clientName}>{customerName}</span>

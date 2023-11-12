@@ -16,7 +16,7 @@ import QueryQuotationList, {
 } from 'components/page/domestic/queryQuotation/queryQuotationList';
 
 // api
-import { useGetQuotation } from 'js/api/api_quotation';
+import { useGetQuotation, useGetQuotation_infinite } from 'js/api/api_quotation';
 
 // utils
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -49,18 +49,33 @@ export default function Budget() {
     filter: {
       quotationNumber: { $eq: quotationNumber },
     },
+    pageSize: 20,
   };
 
-  const { data: quoatationArr, update } = useGetQuotation(params);
+  // const { data: quoatationArr, update } = useGetQuotation(params);
+
+  // useEffect(() => {
+  //   update();
+  // }, [quotationNumber]);
+
+  const {
+    //
+    dataArr: quoatationArr,
+    viewRef_bottom,
+    isLoadingPage1,
+    // isLoading,
+    init,
+    reset,
+  } = useGetQuotation_infinite({ customParams: params });
 
   useEffect(() => {
-    update();
+    reset();
   }, [quotationNumber]);
 
   // ----------------------------------------------------------------------
 
   const panelArr: Tcontrol_queryQuotationList['panelArr'] =
-    quoatationArr?.map((quotation) => {
+    quoatationArr?.map((quotation, index) => {
       const { contents, latestContent, id } = quotation;
 
       const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
@@ -92,6 +107,7 @@ export default function Budget() {
         contactPerson: latestContent.contactPerson,
         contactPhoneNumber: latestContent.contactNumber,
         href: href_head,
+        viewRef_bottom: quoatationArr.length - 10 === index ? viewRef_bottom : undefined,
       };
 
       const body = sortedContent.map((content, index) => {
@@ -155,7 +171,7 @@ export default function Budget() {
   // ===================================================
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoadingPage1}>
       {/* header panel */}
       <PageHeader02 tag="報價單列表" panelList={panelList} />
       {/*  */}
