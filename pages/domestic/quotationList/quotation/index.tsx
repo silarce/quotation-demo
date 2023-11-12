@@ -90,6 +90,8 @@ import {
   useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
   apiDelQuotation_id_attachments,
+  //
+  useGetQuotationContent_id,
 } from 'js/api/api_quotation';
 
 // hook
@@ -118,9 +120,16 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
+  // const {
+  //   id: quotationId, //報價單id //若為新增報價單則為undefined
+  // } = router.query as { id: string | undefined };
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
-  } = router.query as { id: string | undefined };
+    contentId,
+  } = router.query as {
+    id: string | undefined;
+    contentId: string | undefined;
+  };
   const { userInfo, userGrade } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
@@ -200,8 +209,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
-  const lastestContentId = quotationData?.latestContent.id;
-  const latestContent = quotationData?.latestContent;
+  const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
+
+  const latestContent = quotationData?.latestContent ?? quotationContentData;
+  const lastestContentId = latestContent?.id;
   const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
   const attachedToContract = quotationData?.attachedToContract;
@@ -320,9 +331,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reset: resetClass,
     //
   } = useProductList({
-    productArr: quotationData?.latestContent.products,
-    others: quotationData?.latestContent.others,
-    resetTrigger: quotationData,
+    // productArr: quotationData?.latestContent.products,
+    // others: quotationData?.latestContent.others,
+    productArr: latestContent?.products,
+    others: latestContent?.others,
+    resetTrigger: quotationData ?? quotationContentData,
     onDoorTypeChange: onDoorTypeChange,
   });
 
@@ -355,7 +368,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
-    if (quotationData) {
+    if (latestContent) {
       const {
         //
         discount,
@@ -367,7 +380,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         paymentMethods,
         annotations,
         quotationRanges,
-      } = quotationData.latestContent;
+      } = latestContent;
 
       setAnnotation(annotations ?? []);
       setQr(quotationRanges ?? []);
@@ -412,7 +425,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryDate: '',
       });
     }
-  }, [quotationData, disabled]);
+  }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
@@ -696,18 +709,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([update(), updateAttachments()]);
-      } catch (error) {}
+    if (contentId) {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([updateContent(), updateAttachments()]);
+        } catch (error) {}
 
-      setIsLoading(false);
-    })();
+        setIsLoading(false);
+      })();
+    } else {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([update(), updateAttachments()]);
+        } catch (error) {}
+
+        setIsLoading(false);
+      })();
+    }
   }, [quotationId]);
 
   useEffect(() => {
-    const latestContent = quotationData?.latestContent;
+    // 直接取外範疇的latestContent
+    // const latestContent = quotationData?.latestContent;
 
     let agentEmployee;
 
@@ -750,7 +775,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: latestContent?.trackProgress,
       projectProgress: latestContent?.projectProgress,
     });
-  }, [quotationData]);
+  }, [quotationData, quotationContentData]);
 
   const onProfileChange = (v: Partial<TreturnBody>) => {
     setValue('validityPeriod', v.validityPeriod ?? '');
@@ -927,7 +952,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: quotationId ? `報價編號 ${quotationData?.latestContent.quotationNumber || ''}` : '新報價單',
+      label: quotationId ? `報價編號 ${latestContent?.quotationNumber || ''}` : '新報價單',
       onClick: () => {},
     },
   ];
@@ -988,7 +1013,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '匯出材料/配件',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = quotationData?.latestContent.products;
+        const prodArr = latestContent?.products;
         let isOk = true;
         prodArr?.forEach((prod) => {
           if (prod.quantity === 0) {
@@ -1004,31 +1029,46 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
 
-    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!isReviewer || null) && {
+    !contentId && isReviewer
+      ? {
+          type: 'myButton',
+          label: '審核',
+          onClick: () => setReviewModalShow(true),
+        }
+      : null,
+
+    !contentId && quotationId
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            openEmpSel('reviewSales');
+          },
+        }
+      : null,
+
+    !contentId && status === 'Contracting'
+      ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
+      : null,
+
+    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+
+    {
       type: 'myButton',
-      label: '審核',
-      onClick: () => setReviewModalShow(true),
-    },
-    // (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
-    (!!quotationId || null) && {
-      type: 'myButton',
-      label: '送審',
+      label: '返回',
       onClick: () => {
-        openEmpSel('reviewSales');
+        if (window.history.length === 1) {
+          router.push({
+            pathname: '/domestic/quotationList',
+            query: {
+              status: latestContent?.status,
+            },
+          });
+        } else {
+          router.back();
+        }
       },
     },
-    // status
-    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
-    (() => {
-      if (status === 'Contracting') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
-      } else {
-        return null;
-      }
-    })(),
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
   // --------------------------------------------------------------------------
@@ -1246,11 +1286,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const size = `${lw} X ${h} + ${b}`;
 
-    const list = { ...prod.comList, ...prod.subComList };
-    delete list['sidePlate'];
-    delete list['motorAccessories'];
+    const list_com = { ...prod.comList, ...prod.subComList };
+    delete list_com['sidePlate'];
+    delete list_com['motorAccessories'];
 
-    const componentArr = Object.values(list ?? {});
+    const list_acce = prod.accessoriesList;
+
+    const componentArr = Object.values(list_com ?? {});
 
     let totalPrice = 0;
 
@@ -1268,14 +1310,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
       };
     });
 
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      return {
+        partName: acce.name,
+        material: '',
+        unit: acce.unit,
+        qty: String(acce.quantity),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
+      };
+    });
+
     return {
       category: prod.itemName,
       material: prod.material,
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      part: part,
-      priceTotal: totalPrice.toLocaleString(),
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: prod.totalPrice,
     };
   });
 
@@ -1290,7 +1345,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
-            profile={quotationData?.latestContent}
+            profile={latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
           />
@@ -1482,8 +1537,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <ContractReviewForm
         showModal={reviewFormShow}
         close={() => setReviewFormShow(false)}
-        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
-        contractName={quotationData?.latestContent.projectName ?? ''}
+        contractIdNumber={latestContent?.quotationNumber ?? ''}
+        contractName={latestContent?.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
         verifyForm={verifyForm}
@@ -1514,11 +1569,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   );
 }
 
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============

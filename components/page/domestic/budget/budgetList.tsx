@@ -75,7 +75,7 @@ export default function BudgetList({
 
           const quotationContent: TBodyItemContent = {
             ...latestContent,
-            customerName: latestContent.customer.name,
+            customerName: latestContent.customer?.name ?? '',
             agentEmployeeName: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
             totalPrice: latestContent.total,
           };

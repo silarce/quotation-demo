@@ -1026,7 +1026,7 @@ export type TquotationProductItemDto = Omit<
   guideRailsOpening: string;
 };
 
-type TquotationContentDto_foo = {
+type TquotationContentDto_copy = {
   id: string;
   createdAt: string;
   updateAt: string;
@@ -1044,7 +1044,7 @@ type TquotationContentDto_foo = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1095,6 +1095,7 @@ type TquotationContentDto_foo = {
 
   verifyForm: TquotationVerifyFormDto;
 };
+
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
@@ -1113,7 +1114,7 @@ export type TquotationContentDto = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1164,11 +1165,19 @@ export type TquotationContentDto = {
 
   verifyForm: TquotationVerifyFormDto;
 
+  // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
+  // ! 所以只設需要拿的東西
+  // contract?: TquotationContractDto;
+  contract?: {
+    id: string;
+  };
+
   // api文件上沒寫但應該會有的東西
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
   // rootContract?: TquotationContractDto;
+
   // 為了避免check壞掉，暫時先這樣
-  rootContract?: TquotationContentDto_foo;
+  rootContract?: TquotationContentDto_copy;
 };
 
 export type TquotationDto = {
@@ -1179,6 +1188,7 @@ export type TquotationDto = {
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
   attachedToContract?: TquotationContractDto;
+  attachedToContractId: string | null;
 };
 
 export type TcreateQuotationProductDto = {
@@ -1303,7 +1313,7 @@ export type TcreateQuotationContentDto = {
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID

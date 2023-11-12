@@ -407,7 +407,7 @@ version>1 是子合約
   const panel_quotation01: TpanelList = [
     // 現在後端會在合約產生時自動產生工程聯絡單，因此把這個按鈕拿掉
     (() =>
-      version === '1' && !engineeringContactId
+      version === '1' && engineeringContactId === null
         ? {
             type: 'myButton',
             label: '同步到工務部',
