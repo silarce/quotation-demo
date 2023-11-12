@@ -216,35 +216,35 @@ export default function QuotationList() {
     },
   };
 
-  const { data: quoatationArr, meta, update } = useGetQuotation(params);
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-
-      try {
-        await update();
-      } catch (error) {
-        myAlert.err({ title: '取得資料失敗' });
-      }
-
-      setIsLoading(false);
-    })();
-  }, [router.query]);
-
-  // const {
-  //   //
-  //   dataArr: quoatationArr,
-  //   viewRef_bottom,
-  //   isLoadingPage1,
-  //   // isLoading,
-  //   init,
-  //   reset,
-  // } = useGetQuotation_infinite({ customParams: params });
+  // const { data: quoatationArr, meta, update } = useGetQuotation(params);
 
   // useEffect(() => {
-  //   reset();
+  //   (async () => {
+  //     setIsLoading(true);
+
+  //     try {
+  //       await update();
+  //     } catch (error) {
+  //       myAlert.err({ title: '取得資料失敗' });
+  //     }
+
+  //     setIsLoading(false);
+  //   })();
   // }, [router.query]);
+
+  const {
+    //
+    dataArr: quoatationArr,
+    viewRef_bottom,
+    isLoadingPage1,
+    // isLoading,
+    init,
+    reset,
+  } = useGetQuotation_infinite({ customParams: params });
+
+  useEffect(() => {
+    reset();
+  }, [router.query]);
 
   // ----------------------------------------------------------
   // panelList
@@ -329,7 +329,7 @@ export default function QuotationList() {
       <PageHeader02 tag={statusLookup[status] ?? '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
-        <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} />
+        <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} viewRef_bottom={viewRef_bottom} />
       </div>
       <LoadingCover01 isLoading={isLoading} />
       <ContractSelector
