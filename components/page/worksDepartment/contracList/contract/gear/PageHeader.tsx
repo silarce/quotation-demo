@@ -1,9 +1,12 @@
-import React from 'react';
+import { useContext } from 'react';
+
 import { useRouter } from 'next/router';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
+
+import { AppContext } from 'pages/_app';
 
 export type { TpanelList };
 
@@ -16,17 +19,22 @@ export default function PageHeader({
   panelList?: TpanelList;
   contractNumber?: string;
 }) {
+  const { erpFeature } = useContext(AppContext);
   const router = useRouter();
-  const isReady = router.isReady;
+  const query = router.query as {
+    contractId: string | undefined;
+    version: string | undefined;
+  };
+  const { contractId, version } = query as {
+    contractId: string | undefined;
+    version: string | undefined;
+  };
 
-  if (!isReady) {
-    return null;
-  }
+  const isShowAccountReceivable = !!erpFeature?.find((item) => item.name === '應收帳款');
 
-  const { contractId, version } = router.query;
-  const query = router.query;
+  // -------------------------------------------------------------
 
-  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號 ${contractNumber}`;
+  const tag = (tagCallback && tagCallback(contractId ?? '')) || `合約編號 ${contractNumber}`;
 
   const pathHead = `/worksDepartment/contractList/contract`;
   const linkList = [
@@ -53,14 +61,16 @@ export default function PageHeader({
         query,
       },
     },
-    {
-      label: '應收帳款明細',
-      disabled: true,
-      href: {
-        pathname: `${pathHead}/accountReceivable`,
-        query,
-      },
-    },
+    isShowAccountReceivable
+      ? {
+          label: '應收帳款明細',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/accountReceivable`,
+            query,
+          },
+        }
+      : null,
     {
       label: '派工單列表',
       href: {
