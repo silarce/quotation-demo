@@ -12,23 +12,22 @@ import BudgeList from 'components/page/domestic/budget/budgetList';
 import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import ContractSelector from 'components/global/gear/modal/contractSelector';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './index.module.scss';
 
 // api
-import { useGetQuotation, useGetQuotation_infinite } from 'js/api/api_quotation';
+import { useGetQuotation_infinite } from 'js/api/api_quotation';
 
 // option
-import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
+import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
+// import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
 
 // other
 import { AppContext } from 'pages/_app';
 
 // ===========================================================
-const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
+// const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 
@@ -48,8 +47,6 @@ export default function QuotationList() {
 
   const [contractSelectShow, setContractSelectShow] = useState(false);
 
-  // ----------------------------------------------------
-  const [isLoading, setIsLoading] = useState(false);
   // ----------------------------------------------------
   //
   // agent 經辦
@@ -216,22 +213,6 @@ export default function QuotationList() {
     },
   };
 
-  // const { data: quoatationArr, meta, update } = useGetQuotation(params);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     setIsLoading(true);
-
-  //     try {
-  //       await update();
-  //     } catch (error) {
-  //       myAlert.err({ title: '取得資料失敗' });
-  //     }
-
-  //     setIsLoading(false);
-  //   })();
-  // }, [router.query]);
-
   const {
     //
     dataArr: quoatationArr,
@@ -325,13 +306,12 @@ export default function QuotationList() {
   // ----------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoadingPage1}>
       <PageHeader02 tag={statusLookup[status] ?? '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} viewRef_bottom={viewRef_bottom} />
       </div>
-      <LoadingCover01 isLoading={isLoading} />
       <ContractSelector
         showModal={contractSelectShow}
         onConfirm={(v) => {
