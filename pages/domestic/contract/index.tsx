@@ -11,19 +11,18 @@ import ContractList, { Tcontract } from 'components/page/domestic/contract/contr
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_doorModel, Toption } from 'js/utils/options/productOptions';
 
+// api
+import { useGetContract, useContract_infinite } from 'js/api/api_quotation';
+// css
+import style from './contract.module.scss';
+
+// ===========================================
+
 const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 
-// css
-import style from './contract.module.scss';
-
-//
-import { useGetContract } from 'js/api/api_quotation';
-
 // ===========================================
-// 合約列表單個項目展開裡的內容是追加追減項目
-// 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
@@ -36,11 +35,25 @@ export default function Contract() {
     },
   };
 
-  const { data, update } = useGetContract(params);
+  // const { data, update } = useGetContract(params);
+
+  // useEffect(() => {
+  //   update();
+  // }, []);
+
+  const {
+    //
+    dataArr,
+    viewRef_bottom,
+    isLoadingPage1,
+    // isLoading,
+    init,
+    reset,
+  } = useContract_infinite({ customParams: params });
 
   useEffect(() => {
-    update();
-  }, []);
+    reset();
+  }, [router.query]);
 
   // --------------------------------------------------
 
@@ -99,7 +112,7 @@ export default function Contract() {
   // ===================================================
 
   const contractList =
-    data?.map((item) => {
+    dataArr?.map((item, index) => {
       const content = item.content;
 
       return {
@@ -112,6 +125,7 @@ export default function Contract() {
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
         attn: content.agentEmployee.chName,
+        viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
       };
     }) ?? [];
 
