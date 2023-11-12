@@ -701,7 +701,7 @@ const comCellConfig: TcellConfig = {
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '65px' },
+      wrapperStyle: { width: '75px' },
       selectProps: {
         props: {
           // options 寫在class裡面
