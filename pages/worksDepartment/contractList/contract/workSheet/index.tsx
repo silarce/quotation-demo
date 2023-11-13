@@ -280,14 +280,17 @@ export default function WorkSheet() {
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
+
   const targetSheetKey_p = targetSheetKey?.[0];
   const targetSheetKey_c = targetSheetKey?.[1];
+  const firstSheetKey_p = Object.keys(sheetList ?? {})[0] ?? undefined;
 
   const [targetDivideItem, setTargetDivideItem] = useState<(qty: number) => void>();
 
   const targetSheet: Class_workSheet | undefined =
-    targetSheetKey_p && targetSheetKey_c ? sheetList[targetSheetKey_p]?.[targetSheetKey_c] : undefined;
-  // const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey[0] ?? 'undefined'][];
+    targetSheetKey_p && targetSheetKey_c
+      ? sheetList[targetSheetKey_p]?.[targetSheetKey_c]
+      : sheetList[firstSheetKey_p]?.[firstSheetKey_p];
 
   const doorModelOptionArr = useMemo(() => {
     if (!doorModelList) {
@@ -936,7 +939,7 @@ export default function WorkSheet() {
           }
         },
 
-        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
         optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
       },
     },
@@ -984,7 +987,7 @@ export default function WorkSheet() {
       門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
       門軌形式: {
         value: targetSheet?.guideRailName ?? '',
-        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
+        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
       },
     },
     chainCog: {
@@ -1151,8 +1154,8 @@ export default function WorkSheet() {
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
-            icon: sheet?.guideRail
-              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`
+            icon: sheet?.guideRailName
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
           },
           chainCog: {
