@@ -99,13 +99,11 @@ export default function QuotationPdf({
         continue;
       }
 
-      const image = await html2canvas(
-        item
-        // ,{
-        //   useCORS: true,
-        //   allowTaint: true,
-        // }
-      ).then((canvas) => {
+      const image = await html2canvas(item, {
+        scale: 3,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
         const image = canvas.toDataURL('image/JPEG');
 
         return image;

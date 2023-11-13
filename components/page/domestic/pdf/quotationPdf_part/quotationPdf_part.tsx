@@ -57,7 +57,9 @@ export default function QuotationPdf_part({
         continue;
       }
 
-      const image = await html2canvas(item).then((canvas) => {
+      const image = await html2canvas(item, {
+        scale: 3,
+      }).then((canvas) => {
         const image = canvas.toDataURL('image/JPEG');
 
         return image;
