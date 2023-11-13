@@ -1076,7 +1076,7 @@ class Class_workSheet {
   }
 
   get acceNameArr() {
-    if (!_.isNil(this._accessoriesOptionList)) {
+    if (Object.keys(this._accessoriesOptionList).length === 0) {
       return this._acceIdArr;
     }
 

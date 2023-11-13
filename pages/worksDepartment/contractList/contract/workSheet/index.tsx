@@ -1179,8 +1179,7 @@ export default function WorkSheet() {
         projectName: profile.projectName,
         projectAddress: profile.allAddress,
         customerName: contract?.content.customer.name ?? '',
-        // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
-        contactPerson: '???',
+        contactPerson: engineeringContact?.contactInfo[0].contactPerson ?? '',
         // 開單日
         billingDate: '???-??-??',
         // 出貨日
