@@ -899,7 +899,7 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  // 電供
+  // 電相
   get motorPhase() {
     return String(this._prod.motorPhase);
   }
@@ -944,6 +944,19 @@ class Class_workSheet {
   set motorLockBox(str) {
     this._prod.motorLockBox = str;
     this.forceUpdate();
+  }
+
+  // 電供
+  get motorPhaseVoltage() {
+    let phaseStr = '';
+
+    if (this._prod.motorPhase === 1) {
+      phaseStr = '單相';
+    } else if (this._prod.motorPhase === 3) {
+      phaseStr = '三相';
+    }
+
+    return `${phaseStr} ${this._prod.motorVoltage}V`;
   }
 
   // --------------------------------------------------------------

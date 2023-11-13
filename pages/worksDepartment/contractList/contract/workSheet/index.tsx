@@ -972,11 +972,11 @@ export default function WorkSheet() {
       門片厚度: targetSheet?.thickness ?? '',
       門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
       捲片支數: targetSheet?.slatCount ?? '',
-      防颱勾: '是否是指主產品的"防颱"?',
+      防颱勾: !targetSheet ? '' : targetSheet?.isAntiTyphoon ? '是' : '否',
     },
     motor: {
       vendor: targetSheet?.motorVendor ?? '',
-      電供: (targetSheet?.motorPhase ?? '') + '相',
+      電供: (targetSheet?.motorPhaseVoltage ?? '') + '相',
       馬力: targetSheet?.horsepower ?? '',
     },
     doorTrack: {
@@ -1138,12 +1138,12 @@ export default function WorkSheet() {
             thickness: sheet.thickness,
             slatLength: numToStr(sheet.prodSpec?.slatLength),
             slatCount: sheet.slatCount,
-            antyTyphoonHook: '???',
+            antyTyphoonHook: sheet.isAntiTyphoon ? '有' : '無',
           },
           motor: {
             vendor: sheet.motorVendor,
             /**相數加電壓 */
-            phaseVoltage: sheet.motorPhase + sheet.motorVoltage,
+            phaseVoltage: sheet.motorPhaseVoltage,
             horsepower: sheet.horsepower,
           },
           guideRail: {
