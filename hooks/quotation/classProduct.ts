@@ -743,7 +743,10 @@ class Class_product {
   async reqProdGenerateDoorProductBom() {
     const comList = this.comList;
 
-    if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
+    // if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
+    //   return false;
+    // }
+    if (!comList || !this._doorGeneralSpecs) {
       return false;
     }
 
@@ -763,7 +766,7 @@ class Class_product {
       isAntiTyphoon: this.typhoonProtection,
       rollerDiameter: this._doorGeneralSpecs.diameter,
       bearingType: this._doorGeneralSpecs.bearingName,
-      gearNumber: comList.motor?.gearNumber,
+      gearNumber: this._doorGeneralSpecs.gearNumber,
       chains: this._doorGeneralSpecs.sprocketWheelChains,
       fullWidth: fullWidth,
 
@@ -783,9 +786,15 @@ class Class_product {
       }
 
       const key = item.key;
-      const { id, material, materialSurface, isPainted } = item.componentInfo;
+      const {
+        // id,
+        material,
+        materialSurface,
+        isPainted,
+        componentId,
+      } = item.componentInfo;
 
-      if (!id || !material) {
+      if (!componentId || !material) {
         haveNull = true;
         console.log(
           '若沒呼叫apiPostProdGenerateDoorProductBom，導致材料配件的資料不齊全，可能是因為材料配件過濾器沒有濾出適合的材料配件'
@@ -793,7 +802,7 @@ class Class_product {
       }
 
       generateBomObj_empty[key] = {
-        id,
+        id: componentId,
         material,
         materialSurface: materialSurface || undefined,
         isPainted,
