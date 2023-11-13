@@ -1324,6 +1324,9 @@ export default function WorkSheet() {
                 itemName: originalItem?.itemName ?? '',
                 doorType: originalItem?.doorModelName ?? '',
                 qty: String(qty),
+                onClick: () => {
+                  setTargetSheetKey([pKey, pKey]);
+                },
                 list,
               };
 

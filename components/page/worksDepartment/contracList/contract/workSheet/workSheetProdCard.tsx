@@ -11,6 +11,7 @@ type Tcontrol = {
   itemName: string;
   doorType: string;
   qty: string;
+  onClick: () => void;
   list: {
     isOriginal: boolean;
     itemName: string;
@@ -37,7 +38,7 @@ export default function WorkSheetProdCard({
   disabled?: boolean;
 }) {
   return (
-    <div className={classNames(scss.card)}>
+    <div className={classNames(scss.card)} onClick={control.onClick}>
       <div className={scss.leftRight}>
         <div className={scss.left}>
           <span>{control.itemName}</span>
