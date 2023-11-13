@@ -950,9 +950,9 @@ export default function WorkSheet() {
   const control_detail02: Tcontrol_detail02 = {
     size01: {
       doorType: targetSheet?.doorModelName ?? '',
-      fullWidth: targetSheet?.fullWidth ?? '',
-      淨高: targetSheet?.height ?? '',
-      WG: targetSheet?.WG ?? '',
+      fullWidth: targetSheet?.fullWidth_mm ?? '',
+      淨高: targetSheet?.height_mm ?? '',
+      WG: targetSheet?.WG_mm ?? '',
       gapA: numToStr(targetSheet?.prodSpec?.gapA),
       gapC: numToStr(targetSheet?.prodSpec?.gapC),
       支板尺寸: `${targetSheet?.boxB_mm ?? ''}*${targetSheet?.boxD_mm ?? ''}`,
