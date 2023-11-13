@@ -399,7 +399,7 @@ export default function WorkSheet() {
     setProfile({
       projectName: projectName,
       projectContent,
-      projectNumber: constructionSiteContactNumber,
+      projectNumber: contract?.content.quotationNumber ?? '',
       projectFaxNumber: constructionSiteFaxNumber,
       projectPerson: projectPrincipal,
       projectPersonNumber: constructionSitePrincipalContactNumber,
