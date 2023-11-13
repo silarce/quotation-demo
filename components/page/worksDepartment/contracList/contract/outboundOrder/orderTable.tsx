@@ -264,10 +264,6 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                       const { value, empolyee, onChange_date, onChange, hidden, forbidden, onChange_employee } =
                         row.deliveryStatus[key];
 
-                      // if (rowIndex !== 0 && columnIndex === 0) {
-                      //   value = '';
-                      // }
-
                       const { width, position, type } = configList[key] ?? {};
                       const theStyle = { width };
                       const textCenter = position === 'center' ? style.textCenter : '';
