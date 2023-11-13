@@ -1022,6 +1022,8 @@ export default function WorkSheet() {
       }
     });
 
+    setIsLoading(true);
+
     for (const key in deleteIdList) {
       const deleteIdArr = deleteIdList[key];
 
@@ -1068,8 +1070,8 @@ export default function WorkSheet() {
     }
 
     await update_workSheet();
+    setIsLoading(false);
     setDisabled(true);
-
     //
   };
 
