@@ -706,6 +706,10 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  get fullHeight() {
+    return String(this._prod.height + this._prod.boxB);
+  }
+
   // --------------------------------------------------------------
 
   // 捲箱
