@@ -1002,6 +1002,7 @@ class Class_product {
       filterParams: {
         horsePower: this.horsepower,
         // gearNumber: this., // DuST說先略過
+        gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
         motorVendor: this.motor,
         phase: Number(this.phase),
         voltage: Number(this.voltage),
@@ -1014,7 +1015,8 @@ class Class_product {
       dataArr: availableComponents.sidePlates,
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
-        gearNumber: motor?.gearNumber ?? '', // 從上面的motor取得
+        // gearNumber: motor?.gearNumber ?? '', // 從上面的motor取得
+        gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined',
         isIntegrated: this.onePieceRollUpBox,
         motorVendor: this.motor,
         weight: this.weight,

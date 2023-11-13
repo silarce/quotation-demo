@@ -88,7 +88,7 @@ const filter_sidePlates = ({
   dataArr: TdoorComponentListDto['sidePlates'];
   filterParams: {
     bearingType: string; // 軸承
-    gearNumber: string; // 鍊齒輪番號
+    gearNumber: string | undefined; // 鍊齒輪番號
     /**一體式捲箱 */
     isIntegrated: boolean; // 一體式捲箱
     motorVendor: string; // 馬達廠商
@@ -144,6 +144,7 @@ const filter_motors = ({
   filterParams: {
     horsePower: string; // 馬力數
     // gearNumber: string; // 鍊齒輪番號 // DuST說先略過
+    gearNumber: string; // 鍊齒輪番號 // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
     motorVendor: string; // 馬達廠商
     phase: number; // 相數
     /**電壓(V) */
@@ -167,11 +168,9 @@ const filter_motors = ({
 
     if (d_horsePower !== horsePoswer) {
       return false;
-    }
-    // else if (data.gearNumber !== filterParams.gearNumber) {
-    //   isPass = false;
-    // }
-    else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+    } else if (data.gearNumber !== filterParams.gearNumber) {
+      return false;
+    } else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
       return false;
     } else if (data.phase !== null && data.phase !== filterParams.phase) {
       return false;
