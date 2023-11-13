@@ -104,6 +104,10 @@ export default function QuotationPdf_part({
       sheet.getRow(rowCount + 3).font = { bold: true, size: 18 };
 
       const { part } = item;
+      const slatIndex = part.findIndex((item) => {
+        return item.partName === '捲門片';
+      });
+      part[slatIndex].unit = 'M2';
 
       const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }));
       const profileRows = infoKeyIndex.map((key) => item[key]);
@@ -118,9 +122,13 @@ export default function QuotationPdf_part({
       });
 
       const partColumns = keyIndex.map((key) => ({ name: config[key].label }));
+
+      console.log(part);
+
       const partRows = part.map((item) => {
         return keyIndex.map((key) => item[key]);
       });
+
       sheet.addTable({
         name: 'part',
         ref: `A${rowCount + 3}`,
@@ -252,11 +260,6 @@ type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string;
-    style: {
-      width: string;
-      textAlign?: 'left' | 'center' | 'right';
-      flex?: string;
-    };
   };
 };
 
@@ -265,43 +268,21 @@ const keyIndex: TkeyIndex[] = ['partName', 'desc', 'unit', 'qty', 'price', 'tota
 const config: Tconfig = {
   partName: {
     label: '名稱',
-    style: {
-      width: '300px',
-    },
   },
   desc: {
     label: '說明',
-    style: {
-      width: 'auto',
-      flex: '1',
-    },
   },
   unit: {
     label: '單位',
-    style: {
-      width: '80px',
-    },
   },
   qty: {
     label: '數量',
-    style: {
-      width: '100px',
-      textAlign: 'right',
-    },
   },
   price: {
     label: '單價',
-    style: {
-      width: '120px',
-      textAlign: 'right',
-    },
   },
   totalPrice: {
     label: '金額',
-    style: {
-      width: '150px',
-      textAlign: 'right',
-    },
   },
 };
 
