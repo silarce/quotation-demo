@@ -2,7 +2,9 @@
 
 .container {
   display: grid;
-  grid-template-columns: auto min-content auto fit-content(100%);
+  // grid-template-columns: auto min-content auto fit-content(100%);
+  grid-template-columns: 600px fit-content(100%);
+  justify-content: center;
   .left,
   .right {
     margin-bottom: 35px;
