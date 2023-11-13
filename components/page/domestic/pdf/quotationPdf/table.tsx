@@ -24,8 +24,6 @@ export type TtableProdList = {
 export default function Table({ productList }: { productList: TtableProdList }) {
   const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
 
-  console.log(svgList);
-
   const getSvg = async ({ fileName }: { fileName: string }) => {
     if (svgList[fileName] === null) {
       return;
