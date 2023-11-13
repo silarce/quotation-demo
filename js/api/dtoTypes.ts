@@ -2292,21 +2292,38 @@ export type TupdateWorkSheetItem = {
   // 門片捲片支數
   slatCount: string;
   // 練齒輪番號
-  sprocketWheelModel: string;
+  // sprocketWheelModel: string;
   // 練齒輪大鏈輪
-  sprocketWheelTeethNumber: string;
+  // sprocketWheelTeethNumber: string;
   // 孔徑 軸徑
-  bearingInnerDiameter: string;
+  // bearingInnerDiameter: string;
   // 卷軸尺寸
-  diameter: string;
+  // diameter: string;
   // 捲軸總長
-  bearingHousingTotalLength: string;
+  // bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
   //
   //
-  thickness: string;
+  // thickness: string;
   boxD: number;
+
+  bearingHousingSize?: number | null; //軸承座寸法
+  bearingHousingTotalLength?: string | null; //捲軸 - 總長
+  bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingName?: string | null; //軸承
+  diameter?: string | null; //捲軸 - 尺寸
+  gapA?: string | null; //
+  gapC?: string | null; //
+  gearNumber?: string | null; //
+  sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains?: string | null; //
+  weight?: string | null; //
+  slatLength?: number | null; //門片長度
+  guideRailLength?: number | null; //門軌長度
+  headBoxLength?: number | null; //捲箱長度
+  thickness: string; // 門片厚度
 };
 
 export type TupdateWorkSheet = {

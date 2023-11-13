@@ -120,6 +120,32 @@ class Class_workSheet {
     // 暫時先放進name，在getAccessoriesArr會改成放進id
     this._acceIdArr = this._prod.accessories.map((item) => item.name);
 
+    this._prodSpec = {
+      bearingHousingSize: this._prod.bearingHousingSize ?? 0,
+      bearingHousingTotalLength: Number(this._prod.bearingHousingTotalLength) ?? 0,
+      bearingInnerDiameter: this._prod.bearingInnerDiameter ?? '',
+      bearingName: this._prod.bearingName ?? '',
+      defaultMotorIndex: -1,
+      density: 0,
+      diameter: Number(this._prod.diameter) ?? 0,
+      gapA: Number(this._prod.gapA) ?? 0,
+      gapC: Number(this._prod.gapC) ?? 0,
+      motors: [],
+      gearNumber: this._prod.gearNumber ?? '',
+      sprocketWheelModel: this._prod.sprocketWheelModel ?? '',
+      sprocketWheelTeethNumber: this._prod.sprocketWheelTeethNumber ?? '',
+      sprocketWheelChains: Number(this._prod.sprocketWheelChains) ?? 0,
+      weight: Number(this._prod.weight) ?? 0,
+      slatLength: Number(this._prod.slatLength) ?? 0,
+      guideRailLength: Number(this._prod.guideRailLength) ?? 0,
+      headBoxLength: Number(this._prod.headBoxLength) ?? 0,
+      thickness: this._prod.thickness,
+    };
+
+    this._prodDetailSpec = {
+      slatCount: Number(this._prod.slatCount ?? 0),
+    };
+
     this.findBoxBoptions();
   } //  constructor close
 
@@ -517,13 +543,13 @@ class Class_workSheet {
       this.getAccessoriesArr();
     }
 
-    if (this._prodDetailSpec === undefined) {
-      this.getProdDetailSepc();
-    }
+    // if (this._prodDetailSpec === undefined) {
+    //   this.getProdDetailSepc();
+    // }
 
-    if (this._prodSpec === undefined) {
-      await this.getProdSpec();
-    }
+    // if (this._prodSpec === undefined) {
+    //   await this.getProdSpec();
+    // }
 
     if (this._availableComponents === undefined) {
       this.getProdAvailableComponents();
@@ -1253,6 +1279,23 @@ class Class_workSheet {
         //
         thickness: this._prod.thickness,
         boxD: this._prod.boxD,
+        //
+        bearingHousingSize: Number(this._prodSpec?.bearingHousingSize ?? 0),
+        // bearingHousingTotalLength: String(this._prodSpec?.bearingHousingTotalLength ?? '0'),
+        // bearingInnerDiameter: String(this._prodSpec?.bearingInnerDiameter ?? '0'),
+        bearingName: this._prodSpec?.bearingName ?? '',
+        // diameter: this._prodSpec?.diameter ?? '',
+        gapA: String(this._prodSpec?.gapA ?? 0),
+        gapC: String(this._prodSpec?.gapC ?? 0),
+        gearNumber: this._prodSpec?.gearNumber ?? '',
+        // sprocketWheelModel: this._prodSpec?.sprocketWheelModel ?? '',
+        // sprocketWheelTeethNumber: this._prodSpec?.sprocketWheelTeethNumber ?? '',
+        sprocketWheelChains: String(this._prodSpec?.sprocketWheelChains ?? '0'),
+        weight: String(this._prodSpec?.weight ?? '0'),
+        slatLength: Number(this._prodSpec?.slatLength ?? 0),
+        guideRailLength: Number(this._prodSpec?.guideRailLength ?? 0),
+        headBoxLength: Number(this._prodSpec?.headBoxLength ?? 0),
+        // thickness: String(this._prodSpec?.thickness ?? '0'),
       };
 
       return item;

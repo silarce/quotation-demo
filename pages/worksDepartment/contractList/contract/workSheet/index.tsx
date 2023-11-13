@@ -1127,10 +1127,10 @@ export default function WorkSheet() {
             fullHeight: sheet.fullHeight,
           },
           roller: {
-            diameter: sheet.diameter,
-            bearingInnerDiameter: sheet.bearingInnerDiameter,
+            diameter: sheet.diameter ?? '',
+            bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
             bearingName: sheet.prodSpec?.bearingName ?? '',
-            bearingHousingTotalLength: sheet.bearingHousingTotalLength,
+            bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
@@ -1161,9 +1161,9 @@ export default function WorkSheet() {
               : undefined,
           },
           chainCog: {
-            sprocketWheelModel: sheet.sprocketWheelModel,
-            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber,
-            bearingInnerDiameter: sheet.bearingInnerDiameter,
+            sprocketWheelModel: sheet.sprocketWheelModel ?? '',
+            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
+            bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
           },
           base: {
             material: sheet.com_bottomBar_material,
