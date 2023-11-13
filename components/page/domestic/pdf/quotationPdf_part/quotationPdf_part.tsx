@@ -269,13 +269,6 @@ const config: Tconfig = {
       width: '300px',
     },
   },
-  // material: {
-  //   label: '材質',
-  //   style: {
-  //     width: 'auto',
-  //     flex: '1',
-  //   },
-  // },
   desc: {
     label: '說明',
     style: {
@@ -283,13 +276,6 @@ const config: Tconfig = {
       flex: '1',
     },
   },
-  // surface: {
-  //   label: "表面",
-  //   style: {
-  //     width: "auto",
-  //     flex: "1"
-  //   },
-  // },
   unit: {
     label: '單位',
     style: {

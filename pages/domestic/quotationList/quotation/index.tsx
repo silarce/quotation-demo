@@ -1304,9 +1304,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         material: com.material,
         unit: com.unit,
         qty: Number(com.quantity).toFixed(2),
-        price: Number(com.price || 0).toLocaleString(),
         desc: com.desc ?? '',
-        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+        // price: Number(com.price || 0).toLocaleString(),
+        // totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+        price: Number(999999 || 0).toLocaleString(),
+        totalPrice: Number(999999 || 0).toLocaleString(),
       };
     });
 

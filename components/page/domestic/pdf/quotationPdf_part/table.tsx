@@ -9,11 +9,10 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
           <span>項次:</span>
         </div>
         {keyIndex.map((key, index) => {
-          const { label, style } = config[key];
-          const { width, flex } = style;
+          const { label, style, headStyle } = config[key];
 
           return (
-            <div key={index} style={{ width, flex }}>
+            <div key={index} style={{ ...style, ...headStyle }}>
               <span>{label}</span>
             </div>
           );
@@ -75,6 +74,7 @@ type Tconfig = {
       textAlign?: 'left' | 'center' | 'right';
       flex?: string;
     };
+    headStyle?: React.CSSProperties;
   };
 };
 
@@ -84,16 +84,9 @@ const config: Tconfig = {
   partName: {
     label: '名稱',
     style: {
-      width: '160px',
+      width: '220px',
     },
   },
-  // material: {
-  //   label: '材質',
-  //   style: {
-  //     width: 'auto',
-  //     flex: '1',
-  //   },
-  // },
   desc: {
     label: '說明',
     style: {
@@ -104,7 +97,8 @@ const config: Tconfig = {
   unit: {
     label: '單位',
     style: {
-      width: '80px',
+      width: '60px',
+      textAlign: 'center',
     },
   },
   qty: {
@@ -113,19 +107,28 @@ const config: Tconfig = {
       width: '80px',
       textAlign: 'right',
     },
+    headStyle: {
+      textAlign: 'left',
+    },
   },
   price: {
     label: '單價',
     style: {
-      width: '120px',
+      width: '100px',
       textAlign: 'right',
+    },
+    headStyle: {
+      textAlign: 'left',
     },
   },
   totalPrice: {
     label: '金額',
     style: {
-      width: '150px',
+      width: '100px',
       textAlign: 'right',
+    },
+    headStyle: {
+      textAlign: 'left',
     },
   },
 };
