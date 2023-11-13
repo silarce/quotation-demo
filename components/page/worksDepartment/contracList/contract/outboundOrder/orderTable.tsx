@@ -125,6 +125,11 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
             );
           }
 
+          // return (
+          //   <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+          //     <span>{label}</span>
+          //   </div>
+          // );
           return (
             <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
@@ -179,16 +184,6 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                   <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
 
-                    {/* {rowIndex === 0 ? (
-                      <div className={`${style.column} ${style.indexCell}`}>
-                        <span>{groupIndex + 1}</span>
-                      </div>
-                    ) : (
-                      <div className={`${style.column} ${style.indexCell}`}>
-                        <span></span>
-                      </div>
-                    )} */}
-
                     {orderKeyArr_contract.map((key, columnIndex) => {
                       let value = row.contractData[key];
 
@@ -204,7 +199,11 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                         return (
                           <div
-                            className={classNames(style.column, position === 'center' && style.textCenter)}
+                            className={classNames(
+                              //
+                              style.column,
+                              position === 'center' && style.textCenter
+                            )}
                             key={columnIndex}
                             style={theStyle}
                           >
@@ -218,7 +217,12 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       return (
                         <div
-                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          className={classNames(
+                            //
+                            style.column,
+                            position === 'center' && style.textCenter,
+                            rowIndex !== 0 && style.hidden
+                          )}
                           key={columnIndex}
                           style={theStyle}
                         >
@@ -228,7 +232,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     })}
 
                     {/* 灰色分隔線 */}
-                    <div className={` ${style.pilar}`} />
+                    <div className={classNames(style.pilar, rowIndex !== 0 && style.hidden)} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
@@ -259,10 +263,6 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     {orderKey_editible.map((key, columnIndex) => {
                       const { value, empolyee, onChange_date, onChange, hidden, forbidden, onChange_employee } =
                         row.deliveryStatus[key];
-
-                      // if (rowIndex !== 0 && columnIndex === 0) {
-                      //   value = '';
-                      // }
 
                       const { width, position, type } = configList[key] ?? {};
                       const theStyle = { width };

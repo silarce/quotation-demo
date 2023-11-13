@@ -64,7 +64,8 @@ export default function WorkSheetProductOutline({
 }) {
   return (
     <div className={scss.container}>
-      <div className={scss.left}>
+      {/* left */}
+      {/* <div className={scss.left}>
         <p>合約產品項目：</p>
         <div className={scss.list}>
           {configArr.map((item) => {
@@ -85,7 +86,7 @@ export default function WorkSheetProductOutline({
               />
             );
           })}
-          {/*  */}
+
           <InputSel
             className={classNames(scss.inputSel)}
             label={'防颱'}
@@ -100,9 +101,9 @@ export default function WorkSheetProductOutline({
             showBaseline="always"
           />
         </div>
-      </div>{' '}
-      {/* left */}
-      <hr />
+      </div> */}
+      {/*  */}
+      {/* <hr /> */}
       <div className={scss.right}>
         <p>調整過後項目：</p>
         <div className={scss.list}>
@@ -159,8 +160,8 @@ export default function WorkSheetProductOutline({
             showBaseline="always"
           />
         </div>
-      </div>{' '}
-      {/* right */}
+      </div>
+      {/*  */}
       <div className={scss.btn}>
         <MyButton_v2 label="計算" preImg="upload" onClick={onCalcClick} />
       </div>

@@ -2,6 +2,7 @@ import { useState, MouseEvent, createContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
+import _ from 'lodash';
 
 // components
 import Thead01 from '../ui/table01/Thead01';
@@ -31,9 +32,11 @@ export const budgetListContext = createContext<TbudgetListContext>(null!);
 export default function BudgetList({
   quotationArr,
   className,
+  viewRef_bottom,
 }: {
   quotationArr: TquotationDto[] | undefined;
   className?: string;
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
 }) {
   const router = useRouter();
 
@@ -78,6 +81,8 @@ export default function BudgetList({
             customerName: latestContent.customer?.name ?? '',
             agentEmployeeName: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
             totalPrice: latestContent.total,
+            // viewRef_bottom: viewRef_bottom,
+            viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,
           };
 
           const {
@@ -125,15 +130,28 @@ export default function BudgetList({
             reviewStatuArr.pop();
           }
 
-          const recordArr = contents.map((item) => {
-            const { createdAt, editNotes, discount, quantity, total } = item;
+          const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+          sortedContent.shift();
+
+          const recordArr = sortedContent.map((content) => {
+            const { updatedAt, editNotes, discount, quantity, total } = content;
+
+            const href_body = {
+              pathname: '/domestic/quotationList/quotation',
+              query: {
+                id: id,
+                status: content.status,
+                contentId: content.id,
+              },
+            };
 
             return {
-              date: moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD'),
+              date: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
               editNotes,
               discount,
               doorQty: String(quantity),
               total: total.toLocaleString(),
+              href: href_body,
             };
           });
 
@@ -149,10 +167,10 @@ export default function BudgetList({
                   openQuotation={openQuotation}
                 >
                   <ReviewChain reviewStatuArr={reviewStatuArr} />
+                  <span></span>
                 </TbodyItem01>
               }
             >
-              {/* 等api補資料再作 */}
               <PanelBody recordArr={recordArr} />
             </Panel>
           );

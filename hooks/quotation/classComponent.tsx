@@ -151,8 +151,9 @@ class Class_component {
   }
 
   get componentInfo() {
-    const info: TgenerateDoorProductBomDto_ComponentInfo = {
+    const info = {
       id: this._com.id ?? '',
+      componentId: this._com.componentId ?? '',
       material: this._com.material ?? '', // 注意，api不接受空字串
       materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
       isPainted: !!this._com.isPainted,

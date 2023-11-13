@@ -649,6 +649,14 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  get boxB_mm() {
+    return String(this._prod.boxB);
+  }
+
+  get boxD_mm() {
+    return String(this._prod.boxD);
+  }
+
   get quantity() {
     return String(this._itemIdArr.length);
   }
@@ -696,6 +704,10 @@ class Class_workSheet {
   set rollerSpec(str) {
     this._prod.rollerSpec = str;
     this.forceUpdate();
+  }
+
+  get fullHeight() {
+    return String(this._prod.height + this._prod.boxB);
   }
 
   // --------------------------------------------------------------
@@ -891,7 +903,7 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  // 電供
+  // 電相
   get motorPhase() {
     return String(this._prod.motorPhase);
   }
@@ -936,6 +948,19 @@ class Class_workSheet {
   set motorLockBox(str) {
     this._prod.motorLockBox = str;
     this.forceUpdate();
+  }
+
+  // 電供
+  get motorPhaseVoltage() {
+    let phaseStr = '';
+
+    if (this._prod.motorPhase === 1) {
+      phaseStr = '單相';
+    } else if (this._prod.motorPhase === 3) {
+      phaseStr = '三相';
+    }
+
+    return `${phaseStr} ${this._prod.motorVoltage}V`;
   }
 
   // --------------------------------------------------------------
@@ -1051,7 +1076,7 @@ class Class_workSheet {
   }
 
   get acceNameArr() {
-    if (!_.isNil(this._accessoriesOptionList)) {
+    if (Object.keys(this._accessoriesOptionList).length === 0) {
       return this._acceIdArr;
     }
 

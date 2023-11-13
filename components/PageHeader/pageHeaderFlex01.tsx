@@ -26,7 +26,7 @@ export default function PageHeaderFlex01({
   linkList = [],
 }: {
   tagList?: Ttag[]; // 左邊的多個標籤，帶click事件
-  linkList?: Tlink[]; // 左邊的標籤，不過是Link
+  linkList?: (Tlink | null)[]; // 左邊的標籤，不過是Link
 }) {
   const [active, setActive] = useState(0);
 
@@ -80,8 +80,12 @@ export default function PageHeaderFlex01({
 
     return (
       <>
-        {linkList.map((config, index) => {
-          const { label, href, disabled } = config;
+        {linkList.map((props, index) => {
+          if (!props) {
+            return null;
+          }
+
+          const { label, href, disabled } = props;
           let hrefPathname: string;
 
           if (typeof href === 'string') {

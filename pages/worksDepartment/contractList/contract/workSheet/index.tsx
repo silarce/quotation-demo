@@ -43,7 +43,7 @@ options_doorTrackThick
 
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-// import _ from 'lodash';
+import _ from 'lodash';
 import { useRouter } from 'next/router';
 
 // layer
@@ -275,19 +275,22 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const { sheetList, changedSheetList, reset } = useWorkSheet({
-    itemTokenList: itemTokenList ?? {},
-    itemIdArrList: itemIdArrList ?? {},
+    itemTokenList: _.cloneDeep(itemTokenList) ?? {},
+    itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
+
   const targetSheetKey_p = targetSheetKey?.[0];
   const targetSheetKey_c = targetSheetKey?.[1];
+  const firstSheetKey_p = Object.keys(sheetList ?? {})[0] ?? undefined;
 
   const [targetDivideItem, setTargetDivideItem] = useState<(qty: number) => void>();
 
   const targetSheet: Class_workSheet | undefined =
-    targetSheetKey_p && targetSheetKey_c ? sheetList[targetSheetKey_p]?.[targetSheetKey_c] : undefined;
-  // const targetSheet: Class_workSheet | undefined = sheetList[targetSheetKey[0] ?? 'undefined'][];
+    targetSheetKey_p && targetSheetKey_c
+      ? sheetList[targetSheetKey_p]?.[targetSheetKey_c]
+      : sheetList[firstSheetKey_p]?.[firstSheetKey_p];
 
   const doorModelOptionArr = useMemo(() => {
     if (!doorModelList) {
@@ -396,7 +399,7 @@ export default function WorkSheet() {
     setProfile({
       projectName: projectName,
       projectContent,
-      projectNumber: constructionSiteContactNumber,
+      projectNumber: contract?.content.quotationNumber ?? '',
       projectFaxNumber: constructionSiteFaxNumber,
       projectPerson: projectPrincipal,
       projectPersonNumber: constructionSitePrincipalContactNumber,
@@ -936,7 +939,7 @@ export default function WorkSheet() {
           }
         },
 
-        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
         optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
       },
     },
@@ -952,8 +955,8 @@ export default function WorkSheet() {
       WG: targetSheet?.WG ?? '',
       gapA: numToStr(targetSheet?.prodSpec?.gapA),
       gapC: numToStr(targetSheet?.prodSpec?.gapC),
-      支板尺寸: targetSheet?.BD ?? '',
-      捲門全高: '999',
+      支板尺寸: `${targetSheet?.boxB_mm ?? ''}*${targetSheet?.boxD_mm ?? ''}`,
+      捲門全高: targetSheet?.fullHeight ?? '',
     },
     size02: {
       捲軸尺寸: targetSheet?.diameter ?? '',
@@ -972,11 +975,11 @@ export default function WorkSheet() {
       門片厚度: targetSheet?.thickness ?? '',
       門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
       捲片支數: targetSheet?.slatCount ?? '',
-      防颱勾: '是否是指主產品的"防颱"?',
+      防颱勾: !targetSheet ? '' : targetSheet?.isAntiTyphoon ? '是' : '否',
     },
     motor: {
       vendor: targetSheet?.motorVendor ?? '',
-      電供: (targetSheet?.motorPhase ?? '') + '相',
+      電供: (targetSheet?.motorPhaseVoltage ?? '') + '相',
       馬力: targetSheet?.horsepower ?? '',
     },
     doorTrack: {
@@ -984,7 +987,7 @@ export default function WorkSheet() {
       門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
       門軌形式: {
         value: targetSheet?.guideRailName ?? '',
-        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRail}`,
+        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
       },
     },
     chainCog: {
@@ -1018,6 +1021,8 @@ export default function WorkSheet() {
         body = [...body, ...bodyItemArr];
       }
     });
+
+    setIsLoading(true);
 
     for (const key in deleteIdList) {
       const deleteIdArr = deleteIdList[key];
@@ -1065,8 +1070,8 @@ export default function WorkSheet() {
     }
 
     await update_workSheet();
+    setIsLoading(false);
     setDisabled(true);
-
     //
   };
 
@@ -1117,9 +1122,9 @@ export default function WorkSheet() {
             gapA: numToStr(sheet.prodSpec?.gapA),
             gapC: numToStr(sheet.prodSpec?.gapC),
             /**支版尺寸 boxB*boxD */
-            BD: sheet.BD,
+            BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             /**捲門全高 */
-            fullHeight: '???',
+            fullHeight: sheet.fullHeight,
           },
           roller: {
             diameter: sheet.diameter,
@@ -1138,12 +1143,12 @@ export default function WorkSheet() {
             thickness: sheet.thickness,
             slatLength: numToStr(sheet.prodSpec?.slatLength),
             slatCount: sheet.slatCount,
-            antyTyphoonHook: '???',
+            antyTyphoonHook: sheet.isAntiTyphoon ? '有' : '無',
           },
           motor: {
             vendor: sheet.motorVendor,
             /**相數加電壓 */
-            phaseVoltage: sheet.motorPhase + sheet.motorVoltage,
+            phaseVoltage: sheet.motorPhaseVoltage,
             horsepower: sheet.horsepower,
           },
           guideRail: {
@@ -1151,8 +1156,8 @@ export default function WorkSheet() {
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
-            icon: sheet?.guideRail
-              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRail}`
+            icon: sheet?.guideRailName
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
           },
           chainCog: {
@@ -1176,8 +1181,7 @@ export default function WorkSheet() {
         projectName: profile.projectName,
         projectAddress: profile.allAddress,
         customerName: contract?.content.customer.name ?? '',
-        // contactPerson: contract?.content.customer.contacts?.[0]?.name ?? '',
-        contactPerson: '???',
+        contactPerson: engineeringContact?.contactInfo[0].contactPerson ?? '',
         // 開單日
         billingDate: '???-??-??',
         // 出貨日
@@ -1299,7 +1303,8 @@ export default function WorkSheet() {
                   isOriginal: item.isOriginal,
                   itemName: itemName,
                   qty: quantity,
-                  onClick: () => {
+                  onClick: (e) => {
+                    e.stopPropagation();
                     setTargetSheetKey([pKey, cKey]);
                   },
                   isActive,
@@ -1317,10 +1322,13 @@ export default function WorkSheet() {
 
               const originalItem = itemTokenList?.[pKey].originalItem;
 
-              const control = {
+              const control: Tcontrol_prodCard = {
                 itemName: originalItem?.itemName ?? '',
                 doorType: originalItem?.doorModelName ?? '',
                 qty: String(qty),
+                onClick: (e) => {
+                  setTargetSheetKey([pKey, pKey]);
+                },
                 list,
               };
 
