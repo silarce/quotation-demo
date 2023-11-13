@@ -979,7 +979,7 @@ export default function WorkSheet() {
     },
     motor: {
       vendor: targetSheet?.motorVendor ?? '',
-      電供: (targetSheet?.motorPhaseVoltage ?? '') + '相',
+      電供: targetSheet?.motorPhaseVoltage ?? '',
       馬力: targetSheet?.horsepower ?? '',
     },
     doorTrack: {
