@@ -649,6 +649,14 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  get boxB_mm() {
+    return String(this._prod.boxB);
+  }
+
+  get boxD_mm() {
+    return String(this._prod.boxD);
+  }
+
   get quantity() {
     return String(this._itemIdArr.length);
   }

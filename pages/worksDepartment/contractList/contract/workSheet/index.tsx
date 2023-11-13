@@ -952,7 +952,7 @@ export default function WorkSheet() {
       WG: targetSheet?.WG ?? '',
       gapA: numToStr(targetSheet?.prodSpec?.gapA),
       gapC: numToStr(targetSheet?.prodSpec?.gapC),
-      支板尺寸: targetSheet?.BD ?? '',
+      支板尺寸: `${targetSheet?.boxB_mm ?? ''}*${targetSheet?.boxD_mm ?? ''}`,
       捲門全高: '999',
     },
     size02: {
@@ -1117,7 +1117,7 @@ export default function WorkSheet() {
             gapA: numToStr(sheet.prodSpec?.gapA),
             gapC: numToStr(sheet.prodSpec?.gapC),
             /**支版尺寸 boxB*boxD */
-            BD: sheet.BD,
+            BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             /**捲門全高 */
             fullHeight: '???',
           },
