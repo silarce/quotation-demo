@@ -11,12 +11,12 @@ type Tcontrol = {
   itemName: string;
   doorType: string;
   qty: string;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   list: {
     isOriginal: boolean;
     itemName: string;
     qty: string;
-    onClick: () => void;
+    onClick: (e: React.MouseEvent) => void;
     isActive?: boolean;
     onDivideClick: () => void;
     onDeleteClick: () => void;
