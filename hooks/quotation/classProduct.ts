@@ -28,11 +28,8 @@ import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { optionsCre_doorTrack_normal, optionsCre_doorTrack_typhoonProtection } from 'js/utils/options/doorTrackOptions';
 import { optionsCreator_surface, optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
-const options_doorTrack_normal = optionsCre_doorTrack_normal();
-const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
 const options_surface = optionsCreator_surface();
 const options_doorModel = optionsCreator_doorModel();
 
@@ -47,6 +44,7 @@ import {
   apiGetProdCalcGeneralSpec,
   apiGetProdAvailableComponents,
   apiPostProdGenerateDoorProductBom,
+  apiGetProdCalcDetailSpec,
   TgenerateDoorProductBomDto,
 } from 'js/api/api_product';
 
@@ -178,7 +176,28 @@ class Class_product {
       this.reduceQty = String(this._prodData.reduceQty);
     }
     // ___________________________________________________________
-    // = constructor close ===========================================================
+
+    this._doorGeneralSpecs = {
+      bearingHousingSize: this._prodData.bearingHousingSize ?? 0,
+      bearingHousingTotalLength: Number(this._prodData.bearingHousingTotalLength) ?? 0,
+      bearingInnerDiameter: this._prodData.bearingInnerDiameter ?? '',
+      bearingName: this._prodData.bearingName ?? '',
+      defaultMotorIndex: -1,
+      density: 0,
+      diameter: Number(this._prodData.diameter) ?? 0,
+      gapA: Number(this._prodData.gapA) ?? 0,
+      gapC: Number(this._prodData.gapC) ?? 0,
+      motors: [],
+      gearNumber: this._prodData.gearNumber ?? '',
+      sprocketWheelModel: this._prodData.sprocketWheelModel ?? '',
+      sprocketWheelTeethNumber: this._prodData.sprocketWheelTeethNumber ?? '',
+      sprocketWheelChains: Number(this._prodData.sprocketWheelChains) ?? 0,
+      weight: Number(this._prodData.weight) ?? 0,
+      slatLength: Number(this._prodData.slatLength) ?? 0,
+      guideRailLength: Number(this._prodData.guideRailLength) ?? 0,
+      headBoxLength: Number(this._prodData.headBoxLength) ?? 0,
+      thickness: this._prodData.thickness,
+    };
   } // = constructor close ===========================================================
 
   private reRender;
@@ -201,6 +220,8 @@ class Class_product {
   // 門型資料
   private _doorModelList;
   _doorGeneralSpecs: TdoorGeneralSpecsDto | undefined;
+  private _detailSpecs: { slatCount: number } | undefined;
+
   private _availableComponents: TdoorComponentListDto | undefined;
 
   private _defaultBoxB = '';
@@ -213,8 +234,8 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
 
-  readonly options_doorTrack_normal = options_doorTrack_normal;
-  readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+  // readonly options_doorTrack_normal = options_doorTrack_normal;
+  // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -519,6 +540,7 @@ class Class_product {
 
     this.comList = undefined;
     this._doorGeneralSpecs = undefined;
+    this._detailSpecs = undefined;
     this._availableComponents = undefined;
 
     this._prodData.boxB = '';
@@ -553,6 +575,7 @@ class Class_product {
     this.comList = undefined;
     this.accessoriesList = {};
     this._doorGeneralSpecs = undefined;
+    this._detailSpecs = undefined;
     this._availableComponents = undefined;
 
     this._prodData.boxB = '';
@@ -838,6 +861,18 @@ class Class_product {
       myAlert.err({ title: '取得bom資料失敗', content: err.response?.data.message });
     }
   } // reqProdGenerateDoorProductBom
+
+  /**取得細部規格(取得slatCount) */
+  async reqGetDetailSpec() {
+    const res = await reqGetProdCalcDetailSpec({
+      modelName: this.doorType as TpcgsPrams['modelName'],
+      height: Number(this.height_mm),
+      B: Number(this.boxB_mm),
+    });
+
+    this._detailSpecs = res || undefined;
+    this._prodData.slatCount = String(this._detailSpecs?.slatCount ?? 0);
+  }
 
   async reqChain() {
     let res1: boolean | undefined;
@@ -1532,6 +1567,7 @@ class Class_product {
         // 在後端那邊會多出一個 / 符號，暫時先把這邊的/拿掉處理
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
         // icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+        guideRailsOpening: item.opening,
       };
 
       if (withHook === null || withHook === this.typhoonProtection) {
@@ -1760,6 +1796,9 @@ class Class_product {
 
     this.reRender();
   }
+  get height_mm() {
+    return String(Number(this._prodData.height) * 1000);
+  }
 
   /**B(m) */
   get boxB() {
@@ -1787,6 +1826,10 @@ class Class_product {
     this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
     this.area = this.calcArea();
     this.reRender();
+  }
+
+  get boxB_mm() {
+    return String(Number(this._prodData.boxB) * 1000);
   }
 
   /**D(m) */
@@ -1888,6 +1931,10 @@ class Class_product {
   }
   set doorTrack(v) {
     this._prodData.doorTrack = v;
+    const theGuideRail = this.options_doorTrack?.find((item) => {
+      return item?.value === v;
+    });
+    this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
     this.reRender();
   }
 
@@ -2387,6 +2434,22 @@ class Class_product {
       installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
 
       bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
+
+      bearingHousingSize: this._doorGeneralSpecs?.bearingHousingSize ?? 0,
+      bearingHousingTotalLength: String(this._doorGeneralSpecs?.bearingHousingTotalLength ?? 0),
+      bearingInnerDiameter: this._doorGeneralSpecs?.bearingInnerDiameter ?? '',
+      bearingName: this._doorGeneralSpecs?.bearingName ?? '',
+      diameter: String(this._doorGeneralSpecs?.diameter ?? 0),
+      gapA: String(this._doorGeneralSpecs?.gapA ?? 0),
+      gapC: String(this._doorGeneralSpecs?.gapC ?? 0),
+      gearNumber: this._doorGeneralSpecs?.gearNumber ?? '',
+      sprocketWheelModel: this._doorGeneralSpecs?.sprocketWheelModel ?? '',
+      sprocketWheelTeethNumber: this._doorGeneralSpecs?.sprocketWheelTeethNumber ?? '',
+      sprocketWheelChains: String(this._doorGeneralSpecs?.sprocketWheelChains ?? 0),
+      weight: String(this._doorGeneralSpecs?.weight ?? 0),
+      slatLength: this._doorGeneralSpecs?.slatLength ?? 0,
+      guideRailLength: this._doorGeneralSpecs?.guideRailLength ?? 0,
+      headBoxLength: this._doorGeneralSpecs?.headBoxLength ?? 0,
     };
 
     if ('items' in body) {
@@ -2419,6 +2482,22 @@ class Class_product {
       installationFeeQuantity: Number(this.subComList.installationFee.quantity),
       installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
       installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
+
+      bearingHousingSize: this._doorGeneralSpecs?.bearingHousingSize ?? 0,
+      bearingHousingTotalLength: String(this._doorGeneralSpecs?.bearingHousingTotalLength ?? 0),
+      bearingInnerDiameter: this._doorGeneralSpecs?.bearingInnerDiameter ?? '',
+      bearingName: this._doorGeneralSpecs?.bearingName ?? '',
+      diameter: String(this._doorGeneralSpecs?.diameter ?? 0),
+      gapA: String(this._doorGeneralSpecs?.gapA ?? 0),
+      gapC: String(this._doorGeneralSpecs?.gapC ?? 0),
+      gearNumber: this._doorGeneralSpecs?.gearNumber ?? '',
+      sprocketWheelModel: this._doorGeneralSpecs?.sprocketWheelModel ?? '',
+      sprocketWheelTeethNumber: this._doorGeneralSpecs?.sprocketWheelTeethNumber ?? '',
+      sprocketWheelChains: String(this._doorGeneralSpecs?.sprocketWheelChains ?? 0),
+      weight: String(this._doorGeneralSpecs?.weight ?? 0),
+      slatLength: this._doorGeneralSpecs?.slatLength ?? 0,
+      guideRailLength: this._doorGeneralSpecs?.guideRailLength ?? 0,
+      headBoxLength: this._doorGeneralSpecs?.headBoxLength ?? 0,
     };
 
     return body;
@@ -2523,8 +2602,27 @@ type Tprod = {
   // 安裝費複價;
   installationFeeTotalPrice: number;
 
+  slatCount: string | null; //門片 - 捲片支數
+  sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains: string | null; //
+  bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  diameter: string | null; //捲軸 - 尺寸
+  bearingHousingTotalLength: string | null; //捲軸 - 總長
+  guideRailsOpening: string | null; //底座 - 開口
+  slatLength: number | null; //門片長度
+  guideRailLength: number | null; //門軌長度
+  headBoxLength: number | null; //捲箱長度
+  bearingHousingSize: number | null; //軸承座寸法
+  bearingName: string | null; //軸承
+  gapA: string | null; //
+  gapC: string | null; //
+  gearNumber: string | null; //
+  weight: string | null; //
+
   //
   reduceQty?: number;
+  //
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
@@ -2640,6 +2738,24 @@ const emptyProdOri = (): Tprod => {
     installationFeeUnitPrice: 1800,
     // 安裝費 複價;
     installationFeeTotalPrice: 1800,
+
+    slatCount: '',
+    sprocketWheelModel: '',
+    sprocketWheelTeethNumber: '',
+    sprocketWheelChains: '',
+    bearingInnerDiameter: '',
+    diameter: '',
+    bearingHousingTotalLength: '',
+    guideRailsOpening: '',
+    slatLength: 0,
+    guideRailLength: 0,
+    headBoxLength: 0,
+    bearingHousingSize: 0,
+    bearingName: '',
+    gapA: '',
+    gapC: '',
+    gearNumber: '',
+    weight: '',
   };
 };
 
@@ -2827,6 +2943,26 @@ const reqGetProdAvailableComponents = async (body: {
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
+
+    return false;
+  }
+};
+
+const reqGetProdCalcDetailSpec = async (body: { modelName: TdoorModelInfoDto['name']; height: number; B: number }) => {
+  try {
+    const theBody = {
+      ...body,
+      modelName: body.modelName as TdoorModelInfoDto['name'],
+    };
+
+    const res = await apiGetProdCalcDetailSpec(theBody);
+
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    myAlert.err({ title: '取得細部規格失敗', content: err.response?.data.message });
 
     return false;
   }

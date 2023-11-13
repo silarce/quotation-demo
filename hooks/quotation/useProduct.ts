@@ -174,6 +174,24 @@ const useProductList = ({
         onePieceRollUpBox: prod.isIntegratedHeadBox,
         thickness: String(prod.thickness ?? ''),
         bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
+
+        slatCount: prod.slatCount ?? '',
+        sprocketWheelModel: prod.sprocketWheelModel ?? '',
+        sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber ?? '',
+        sprocketWheelChains: prod.sprocketWheelChains ?? '',
+        bearingInnerDiameter: prod.bearingInnerDiameter ?? '',
+        diameter: prod.diameter ?? '',
+        bearingHousingTotalLength: prod.bearingHousingTotalLength ?? '',
+        guideRailsOpening: prod.guideRailsOpening ?? '',
+        slatLength: prod.slatLength ?? 0,
+        guideRailLength: prod.guideRailLength ?? 0,
+        headBoxLength: prod.headBoxLength ?? 0,
+        bearingHousingSize: prod.bearingHousingSize ?? 0,
+        bearingName: prod.bearingName ?? '',
+        gapA: prod.gapA ?? '',
+        gapC: prod.gapC ?? '',
+        gearNumber: prod.gearNumber ?? '',
+        weight: prod.weight ?? '',
       };
 
       list[key] = new Class_product({
@@ -499,6 +517,24 @@ const useProductList = ({
           onePieceRollUpBox: prod.isIntegratedHeadBox,
           thickness: String(prod.thickness ?? ''),
           bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
+
+          slatCount: prod.slatCount ?? '',
+          sprocketWheelModel: prod.sprocketWheelModel ?? '',
+          sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber ?? '',
+          sprocketWheelChains: prod.sprocketWheelChains ?? '',
+          bearingInnerDiameter: prod.bearingInnerDiameter ?? '',
+          diameter: prod.diameter ?? '',
+          bearingHousingTotalLength: prod.bearingHousingTotalLength ?? '',
+          guideRailsOpening: prod.guideRailsOpening ?? '',
+          slatLength: prod.slatLength ?? 0,
+          guideRailLength: prod.guideRailLength ?? 0,
+          headBoxLength: prod.headBoxLength ?? 0,
+          bearingHousingSize: prod.bearingHousingSize ?? 0,
+          bearingName: prod.bearingName ?? '',
+          gapA: prod.gapA ?? '',
+          gapC: prod.gapC ?? '',
+          gearNumber: prod.gearNumber ?? '',
+          weight: prod.weight ?? '',
         };
 
         list[key] = new Class_product({

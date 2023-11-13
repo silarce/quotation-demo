@@ -59,10 +59,6 @@ import style from './quotation.module.scss';
 import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
-
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -1077,6 +1073,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
+
+    setIsLoading(true);
+
+    for (const prod of Object.values(productList)) {
+      try {
+        await prod.reqGetDetailSpec();
+      } catch (error) {
+        setIsLoading(false);
+      }
+    }
 
     // 總樘數
     let prodQty = 0;
