@@ -1302,7 +1302,8 @@ export default function WorkSheet() {
                   isOriginal: item.isOriginal,
                   itemName: itemName,
                   qty: quantity,
-                  onClick: () => {
+                  onClick: (e) => {
+                    e.stopPropagation();
                     setTargetSheetKey([pKey, cKey]);
                   },
                   isActive,
@@ -1320,11 +1321,11 @@ export default function WorkSheet() {
 
               const originalItem = itemTokenList?.[pKey].originalItem;
 
-              const control = {
+              const control: Tcontrol_prodCard = {
                 itemName: originalItem?.itemName ?? '',
                 doorType: originalItem?.doorModelName ?? '',
                 qty: String(qty),
-                onClick: () => {
+                onClick: (e) => {
                   setTargetSheetKey([pKey, pKey]);
                 },
                 list,
