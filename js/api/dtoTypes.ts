@@ -924,8 +924,6 @@ export type TquotationProductDto = {
   }[];
 
   quantity: number;
-  // 門片厚度
-  thickness: string;
   // 配電箱牌價;
   distributionBoxPrice: number;
   // 配電箱單價;
@@ -946,6 +944,27 @@ export type TquotationProductDto = {
 
   rootProductId: string;
 
+  guideRailsOpening?: string | null; //底座 - 開口
+  slatCount: string | null; //門片 - 捲片支數
+
+  bearingHousingSize?: number | null; //軸承座寸法
+  bearingHousingTotalLength?: string | null; //捲軸 - 總長
+  bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingName?: string | null; //軸承
+  diameter?: string | null; //捲軸 - 尺寸
+  gapA?: string | null; //
+  gapC?: string | null; //
+  gearNumber?: string | null; //
+  sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains?: string | null; //
+  weight?: string | null; //
+  slatLength?: number | null; //門片長度
+  guideRailLength?: number | null; //門軌長度
+  headBoxLength?: number | null; //捲箱長度
+  thickness: string; // 門片厚度
+
+  //
   // 前端用的，後端沒有
   // 只是為了方便才寫在這邊
   reduceQty?: number;
@@ -1298,6 +1317,24 @@ export type TcreateQuotationProductDto = {
   installationFeeUnitPrice: number;
   // 安裝費 複價;
   installationFeeTotalPrice: number;
+
+  slatCount: string | null; //門片 - 捲片支數
+  sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains: string | null; //
+  bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  diameter: string | null; //捲軸 - 尺寸
+  bearingHousingTotalLength: string | null; //捲軸 - 總長
+  guideRailsOpening: string | null; //底座 - 開口
+  slatLength: number | null; //門片長度
+  guideRailLength: number | null; //門軌長度
+  headBoxLength: number | null; //捲箱長度
+  bearingHousingSize: number | null; //軸承座寸法
+  bearingName: string | null; //軸承
+  gapA: string | null; //
+  gapC: string | null; //
+  gearNumber: string | null; //
+  weight: string | null; //
 };
 
 export type TcreateQuotationContentDto = {
@@ -1518,11 +1555,11 @@ export type TdoorGeneralSpecsDto = {
   sprocketWheelModel: string;
   sprocketWheelTeethNumber: string;
   sprocketWheelChains: number;
-  thickness: string;
   weight: number;
   slatLength: number; // 門片長度
   guideRailLength: number; // 門軌長度
   headBoxLength: number; //  捲箱長度
+  thickness: string; // 門片厚度
 };
 
 export type TdoorSlatDto = {
