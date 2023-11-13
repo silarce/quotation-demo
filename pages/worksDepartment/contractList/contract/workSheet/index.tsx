@@ -43,7 +43,7 @@ options_doorTrackThick
 
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-// import _ from 'lodash';
+import _ from 'lodash';
 import { useRouter } from 'next/router';
 
 // layer
@@ -275,8 +275,8 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   const { sheetList, changedSheetList, reset } = useWorkSheet({
-    itemTokenList: itemTokenList ?? {},
-    itemIdArrList: itemIdArrList ?? {},
+    itemTokenList: _.cloneDeep(itemTokenList) ?? {},
+    itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
