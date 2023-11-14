@@ -321,6 +321,7 @@ export default function AttachContract() {
         })[];
       })();
 
+      // 追加跟變更
       const attachProdArr = Object.values(attachProdList).map((prod) => {
         return prod.body;
       });

@@ -2352,7 +2352,8 @@ class Class_product {
     await this.getComAndAcce();
 
     const copy = _.cloneDeep(this.body_Tprod);
-    copy.id = undefined;
+    // copy.id = undefined;
+    copy.id = this.id;
     copy.quantity = Number(v);
     copy.dualPrice = new Decimal(copy.quantity).mul(copy.price).toNumber();
     copy.totalPrice = new Decimal(copy.quantity).mul(copy.unitPrice).toNumber();
@@ -2431,7 +2432,9 @@ class Class_product {
   get body() {
     const copy = _.cloneDeep(this._prodData);
 
-    const body: TcreateQuotationProductDto & { id: string | undefined } = {
+    const body: TcreateQuotationProductDto & {
+      id: string | undefined;
+    } = {
       ...copy,
       id: copy.id,
       doorModelName: this.doorType,
@@ -2559,11 +2562,20 @@ class Class_product {
   }
 
   get body_attachDiv() {
-    const body = this.body;
+    // const body = this.body;
     const divQty = Number(this.reduceQty) + this.exchangeQty;
-    body.quantity = body.quantity - divQty;
-    body.dualPrice = new Decimal(body.quantity).mul(body.price).toNumber();
-    body.totalPrice = new Decimal(body.quantity).mul(body.unitPrice).toNumber();
+    const theBody = this.body;
+    const body = {
+      ...this.body,
+      quantity: theBody.quantity - divQty,
+      dualPrice: new Decimal(theBody.quantity).mul(theBody.price).toNumber(),
+      totalPrice: new Decimal(theBody.quantity).mul(theBody.unitPrice).toNumber(),
+      attachedToProductId: this.id,
+    };
+    // body.quantity = body.quantity - divQty;
+    // body.dualPrice = new Decimal(body.quantity).mul(body.price).toNumber();
+    // body.totalPrice = new Decimal(body.quantity).mul(body.unitPrice).toNumber();
+    // body.attachedToProductId = this.id;
 
     return body;
   }
