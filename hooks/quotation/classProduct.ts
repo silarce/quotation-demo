@@ -817,6 +817,8 @@ class Class_product {
         componentId,
       } = item.componentInfo;
 
+      console.log('componentId', componentId);
+
       if (!componentId || !material) {
         haveNull = true;
         console.log(
@@ -1096,6 +1098,22 @@ class Class_product {
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
     // TODO get /products/door/available-components取得的金額不是正確的金額
     // 正的金額之後會補在 post /products/door/generate-door-product-bom
+
+    // console.log('slat', slat);
+    // console.log('roller', roller);
+    // console.log('headBox', headBox);
+    // console.log('bottomBar', bottomBar);
+    // console.log('guideRail', guideRail);
+    // console.log('motor', motor);
+    // console.log('motorAccessories', motorAccessories);
+    // console.log('sidePlate', sidePlate);
+
+    [slat, roller, headBox, bottomBar, guideRail, motor, motorAccessories, sidePlate].forEach((item) => {
+      if (item) {
+        item.componentId = item.id;
+        item.id = '';
+      }
+    });
 
     const dataList = {
       slat: slat || creEmptyCom(),
