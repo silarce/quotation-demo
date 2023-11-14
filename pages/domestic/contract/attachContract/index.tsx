@@ -69,7 +69,7 @@ export default function AttachContract() {
 
     let subContracts = data.subContracts;
 
-    subContracts = _.sortBy(subContracts, 'createdAt');
+    subContracts = _.sortBy(subContracts, 'version');
 
     const list: { [key: string]: TquotationProductDto } = {};
 
