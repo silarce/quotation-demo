@@ -268,7 +268,7 @@ export default function OutboundOrder() {
   }, [disabled]);
 
   // console.log('contractProdList', contractProdList);
-  console.log('myDeleveryList', myDeleveryList);
+  // console.log('myDeleveryList', myDeleveryList);
   // console.log('---------------------------------------');
 
   // --------------------------------------------------------------------------
