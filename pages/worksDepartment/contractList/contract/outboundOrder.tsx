@@ -228,34 +228,28 @@ export default function OutboundOrder() {
       const { productId, adjustedItem, adjustedItemId } = item;
 
       let theItem: typeof item;
-      let theId: string;
+      // 現在只以productId分類，theId用不到了
+      // let theId: string;
 
       if (adjustedItem && adjustedItemId) {
         theItem = adjustedItem;
-        theId = adjustedItemId;
+        // theId = adjustedItemId;
       } else {
         theItem = item;
-        theId = productId;
+        // theId = productId;
       }
 
       theItem.deliveryStatus = item.deliveryStatus;
 
-      // if (!myDeleveryList?.[theId]) {
-      //   myDeleveryList[theId] = {
-      //     originalItem: item,
-      //     itemName: theItem.itemName,
-      //     itemArr: [],
-      //   };
-      // }
       if (!myDeleveryList?.[productId]) {
-        myDeleveryList[theId] = {
+        myDeleveryList[productId] = {
           originalItem: item,
           itemName: theItem.itemName,
           itemArr: [],
         };
       }
 
-      myDeleveryList[theId].itemArr.push(theItem);
+      myDeleveryList[productId].itemArr.push(theItem);
     });
 
     return {
@@ -274,7 +268,7 @@ export default function OutboundOrder() {
   }, [disabled]);
 
   // console.log('contractProdList', contractProdList);
-  // console.log('myDeleveryList', myDeleveryList);
+  console.log('myDeleveryList', myDeleveryList);
   // console.log('---------------------------------------');
 
   // --------------------------------------------------------------------------
