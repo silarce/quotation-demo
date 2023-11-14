@@ -67,7 +67,10 @@ export default function AttachContract() {
 
     const content_copy = _.cloneDeep(data.content);
 
-    const subContracts = data.subContracts;
+    let subContracts = data.subContracts;
+
+    subContracts = _.sortBy(subContracts, 'createdAt');
+
     const list: { [key: string]: TquotationProductDto } = {};
 
     let subTotal = 0;
