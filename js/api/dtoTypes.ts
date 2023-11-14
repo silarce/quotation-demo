@@ -1902,10 +1902,12 @@ export type TengineeringContactDto = {
   /**備註列表 */
   annotations: string[] | null;
   /**聯絡人列表 */
-  contactInfo: {
-    contactPerson: string;
-    contactNumber: string;
-  }[];
+  contactInfo:
+    | {
+        contactPerson: string;
+        contactNumber: string;
+      }[]
+    | null;
   //
   contractId?: string | null;
   contract?: TquotationContractDto | null;

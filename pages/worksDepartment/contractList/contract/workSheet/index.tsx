@@ -1,7 +1,6 @@
 // 工作表
 
 /*
-
 在報價單主產品
 呼叫get /products/door/available-components
 是為了取得材料配件資料，並顯出來
@@ -38,7 +37,6 @@ options_doorTrackThick
 工作表更新後
 被更新的item會產生adjustedItem這個property
 型別同item，內容是更新後的item
-
 */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -186,9 +184,7 @@ export default function WorkSheet() {
 送給後端時，依照itemIdArr的length產生item，並把id放進去
 
 送給後端時，只可以送有更改過的prod
-用useWorkSheet裡的changedList配合forceUpdate紀錄
-
- */
+用useWorkSheet裡的changedList配合forceUpdate紀錄 */
 
     if (!workSheet?.contractProductItems) {
       return {};
@@ -1181,7 +1177,7 @@ export default function WorkSheet() {
         projectName: profile.projectName,
         projectAddress: profile.allAddress,
         customerName: contract?.content.customer.name ?? '',
-        contactPerson: engineeringContact?.contactInfo[0].contactPerson ?? '',
+        contactPerson: engineeringContact?.contactInfo?.[0].contactPerson ?? '',
         // 開單日
         billingDate: '???-??-??',
         // 出貨日
