@@ -769,6 +769,7 @@ class Class_product {
     // if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
     //   return false;
     // }
+
     if (!comList || !this._doorGeneralSpecs) {
       return false;
     }
@@ -818,6 +819,7 @@ class Class_product {
       } = item.componentInfo;
 
       if (!componentId || !material) {
+        console.log('reqProdGenerateDoorProductBom中斷，componentId或material為空');
         haveNull = true;
       }
 
@@ -1014,13 +1016,13 @@ class Class_product {
 
     const availableComponents = this._availableComponents;
 
-    const slat: Tcomponent | null = filter_slats({
+    let slat: Tcomponent | null = filter_slats({
       //
       dataArr: availableComponents.slats,
       filterParams: { isAntiTyphoon: this.typhoonProtection },
     });
 
-    const bottomBar: Tcomponent | null = filter_bottomBars({
+    let bottomBar: Tcomponent | null = filter_bottomBars({
       dataArr: availableComponents.bottomBars,
       filterParams: {
         isAntiTyphoon: this.typhoonProtection,
@@ -1029,7 +1031,7 @@ class Class_product {
       },
     });
 
-    const guideRail: Tcomponent | null = filter_guideRails({
+    let guideRail: Tcomponent | null = filter_guideRails({
       dataArr: availableComponents.guideRails,
       filterParams: {
         thickness: String(this.doorTrackThick),
@@ -1038,7 +1040,7 @@ class Class_product {
       },
     });
 
-    const motor: Tcomponent | null = filter_motors({
+    let motor: Tcomponent | null = filter_motors({
       dataArr: availableComponents.motors,
       filterParams: {
         horsePower: this.horsepower,
@@ -1052,7 +1054,7 @@ class Class_product {
       },
     });
 
-    const sidePlate: Tcomponent | null = filter_sidePlates({
+    let sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
@@ -1064,14 +1066,14 @@ class Class_product {
       },
     });
 
-    const roller: Tcomponent | null = filter_rollers({
+    let roller: Tcomponent | null = filter_rollers({
       dataArr: availableComponents.rollers,
       filterParams: {
         diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
       },
     });
 
-    const motorAccessories: Tcomponent | null = filter_motorAccessories({
+    let motorAccessories: Tcomponent | null = filter_motorAccessories({
       dataArr: availableComponents.motorAccessories,
       filterParams: {
         /**鍊條排數 */
@@ -1081,7 +1083,7 @@ class Class_product {
       },
     });
 
-    const headBox: Tcomponent | null = filter_headBoxes({
+    let headBox: Tcomponent | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
         thickness: this.rollUpBoxThick, // 捲箱厚度
@@ -1093,6 +1095,15 @@ class Class_product {
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
     // TODO get /products/door/available-components取得的金額不是正確的金額
     // 正的金額之後會補在 post /products/door/generate-door-product-bom
+
+    slat = _.cloneDeep(slat);
+    roller = _.cloneDeep(roller);
+    headBox = _.cloneDeep(headBox);
+    bottomBar = _.cloneDeep(bottomBar);
+    guideRail = _.cloneDeep(guideRail);
+    motor = _.cloneDeep(motor);
+    motorAccessories = _.cloneDeep(motorAccessories);
+    sidePlate = _.cloneDeep(sidePlate);
 
     [slat, roller, headBox, bottomBar, guideRail, motor, motorAccessories, sidePlate].forEach((item) => {
       if (item) {
