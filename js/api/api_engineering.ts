@@ -688,17 +688,19 @@ export const apiDeleteWorkSheetItem = async (
 };
 
 // 出庫單
-export const apiPostEngineeringDeliveryList = (body: {
-  contractId?: string | null;
-  legacyContractId?: string | null;
-}) => {
-  const api = '/engineering/delivery-list';
 
-  return axi
-    .post(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
+// 產生出庫單，後端已移除這個api
+// export const apiPostEngineeringDeliveryList = (body: {
+//   contractId?: string | null;
+//   legacyContractId?: string | null;
+// }) => {
+//   const api = '/engineering/delivery-list';
+
+//   return axi
+//     .post(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
 
 export const apiGetEngineeringDeliveryList = (id: string) => {
   const api = `engineering/delivery-list/${id}`;

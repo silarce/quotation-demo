@@ -87,7 +87,6 @@ import {
   useGetEngineeringContact,
   useGetWorkSheet,
   apiPatchWorkSheet,
-  apiPostEngineeringDeliveryList,
   apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
@@ -1071,24 +1070,6 @@ export default function WorkSheet() {
     //
   };
 
-  /**產生出庫單 */
-  const reqPostDeliveryList = async () => {
-    if (!contractId) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await apiPostEngineeringDeliveryList({ contractId });
-      myAlert.success({ title: '產生出庫單成功' });
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '產生出庫單失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // -------------------------------------------------------------------------
 
   const control_optional: Tcontrol_optional = {
@@ -1224,11 +1205,6 @@ export default function WorkSheet() {
       type: 'myButton',
       label: '匯出工作表',
       onClick: () => setIsShowPdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '產生出庫單',
-      onClick: reqPostDeliveryList,
     },
     {
       type: 'myButton',
