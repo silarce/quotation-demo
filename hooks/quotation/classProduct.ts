@@ -817,13 +817,8 @@ class Class_product {
         componentId,
       } = item.componentInfo;
 
-      console.log('componentId', componentId);
-
       if (!componentId || !material) {
         haveNull = true;
-        console.log(
-          '若沒呼叫apiPostProdGenerateDoorProductBom，導致材料配件的資料不齊全，可能是因為材料配件過濾器沒有濾出適合的材料配件'
-        );
       }
 
       generateBomObj_empty[key] = {
@@ -1099,21 +1094,44 @@ class Class_product {
     // TODO get /products/door/available-components取得的金額不是正確的金額
     // 正的金額之後會補在 post /products/door/generate-door-product-bom
 
-    // console.log('slat', slat);
-    // console.log('roller', roller);
-    // console.log('headBox', headBox);
-    // console.log('bottomBar', bottomBar);
-    // console.log('guideRail', guideRail);
-    // console.log('motor', motor);
-    // console.log('motorAccessories', motorAccessories);
-    // console.log('sidePlate', sidePlate);
-
     [slat, roller, headBox, bottomBar, guideRail, motor, motorAccessories, sidePlate].forEach((item) => {
       if (item) {
         item.componentId = item.id;
         item.id = '';
       }
     });
+
+    if (!slat) {
+      myAlert.info({ title: '沒有符合規格的捲門片' });
+    }
+
+    if (!roller) {
+      myAlert.info({ title: '沒有符合規格的捲軸' });
+    }
+
+    if (!headBox) {
+      myAlert.info({ title: '沒有符合規格的門箱' });
+    }
+
+    if (!bottomBar) {
+      myAlert.info({ title: '沒有符合規格的底座' });
+    }
+
+    if (!guideRail) {
+      myAlert.info({ title: '沒有符合規格的門軌' });
+    }
+
+    if (!motor) {
+      myAlert.info({ title: '沒有符合規格的馬達' });
+    }
+
+    if (!motorAccessories) {
+      myAlert.info({ title: '沒有符合規格的馬達配件' });
+    }
+
+    if (!sidePlate) {
+      myAlert.info({ title: '沒有符合規格的側板' });
+    }
 
     const dataList = {
       slat: slat || creEmptyCom(),
