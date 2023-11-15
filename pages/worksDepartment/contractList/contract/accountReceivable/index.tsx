@@ -12,6 +12,7 @@ import Profile, {
 import Table_requestPayment, {
   Tcontrol_table_requestPayment,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
+import InvoiceGivingRecord from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceGivingRecord';
 
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -204,12 +205,15 @@ export default function AccountReceivable() {
         <div className={scss.checkBar01}>
           <InputSel showBaseline="invisible" checkBoxProps={control_checkBar01} />
         </div>
-
+        {/* 請款表格 */}
         <Table_requestPayment disabled={disabled} control={control_table_requestPayment} />
 
         <div className={scss.checkBar02}>
           <InputSel showBaseline="invisible" checkBoxProps={control_checkBar02} />
         </div>
+
+        {/* 發票給予紀錄 */}
+        <InvoiceGivingRecord />
       </div>
     </SubLayer>
   );
