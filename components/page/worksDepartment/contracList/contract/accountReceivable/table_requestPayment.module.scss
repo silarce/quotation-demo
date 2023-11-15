@@ -39,6 +39,9 @@
       background-color: theme("colors.bgc01");
       border-right: solid 1px transparent;
       margin-bottom: 3px;
+      span {
+        color: theme("colors.main");
+      }
     }
     &:nth-last-of-type(1) {
       border-bottom: none;
