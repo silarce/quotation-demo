@@ -393,6 +393,7 @@ export default function InputSel({
         <CheckBar
           wrapperClassName={classNames(checkBoxProps.wrapperClassName)}
           wrapperStyle={checkBoxProps.wrapperStyle}
+          onClick={checkBoxProps.onClick}
           fontClassName={fontClassName}
           disabled={disabled}
           isRadio={checkBoxProps.isRadio}
