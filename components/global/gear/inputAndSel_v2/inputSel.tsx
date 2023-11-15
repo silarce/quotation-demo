@@ -40,6 +40,7 @@ export type {
 
 type TinputSelProps = {
   disabled?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
   //
   inputProps?: TinputProps;
   selectProps?: TselectProps;
@@ -83,6 +84,8 @@ type TinputSelProps = {
 
 export default function InputSel({
   disabled,
+  //
+  onClick,
   //
   inputProps,
   selectProps,
@@ -163,6 +166,8 @@ export default function InputSel({
         if (inputSelBarProps || checkBoxProps) {
           e.preventDefault();
         }
+
+        onClick?.(e);
       }}
     >
       {caption && (
