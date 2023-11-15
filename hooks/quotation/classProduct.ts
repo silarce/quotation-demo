@@ -882,11 +882,21 @@ class Class_product {
       this.isLoading = true;
       this.reRender();
 
+      // 預期_availableComponents會更新，在_availableComponents更新前
+      // 不應該呼叫會用到_availableComponents或this.comList的方法
+      // 因此在這邊設為undefined，避免呼叫相關方法
+      // 在下面呼叫this.req_getProdAvailableComponents而更新_availableComponents後
+      // 會使用_availableComponents的方法應該就會被呼叫了(包括建立comList的方法)
+      if (this.shouldCall_pac) {
+        this._availableComponents = undefined;
+        this.comList = undefined;
+      }
+
       if (this.shouldCall_cgs) {
         res1 = await this.req_calcGeneralSpec();
       }
 
-      if (this.shouldCall_cgs) {
+      if (this.shouldCall_pac) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
