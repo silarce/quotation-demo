@@ -104,6 +104,22 @@
   }
 }
 
+.panelCell {
+  display: flex;
+  align-items: center;
+  svg {
+    height: 20px;
+    width: fit-content;
+  }
+}
+
+.iconRemoveCircle {
+  stroke: theme("colors.main");
+  &:hover {
+    stroke: red;
+  }
+}
+
 .hidden {
   visibility: hidden;
 }

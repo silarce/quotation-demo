@@ -37,6 +37,7 @@ type Trow = {
 };
 
 type Tcontrol = {
+  caption: string;
   topRightBtnProps?: {
     label: string;
     onClick: () => void;
@@ -64,7 +65,7 @@ export default function AccountReceivable_dynaTable({
   control: Tcontrol;
   disabled?: boolean;
 }) {
-  const { rowArr, tableBottomBtnProps, bottomBarProps, topRightBtnProps } = control;
+  const { caption, rowArr, tableBottomBtnProps, bottomBarProps, topRightBtnProps } = control;
 
   const firstRow = rowArr[0];
   const firstRowCellArr = Object.values(firstRow.list);
@@ -73,7 +74,7 @@ export default function AccountReceivable_dynaTable({
     <div className={scss.container}>
       <div className={scss.wrapper}>
         <div className={scss.top}>
-          <span>發票給予紀錄</span>
+          <span>{caption}</span>
           {topRightBtnProps && <MyButton_v2 label={topRightBtnProps.label} onClick={topRightBtnProps.onClick} />}
         </div>
         {/* table */}
@@ -160,7 +161,7 @@ export default function AccountReceivable_dynaTable({
 
 const PanelCell_01 = ({ isHidden, onDeleteClick }: { isHidden?: boolean; onDeleteClick?: () => void }) => {
   return (
-    <div className={classNames(isHidden && scss.hidden)}>
+    <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
       <div>
         <IconDelete01 onClick={onDeleteClick} />
       </div>
@@ -170,9 +171,9 @@ const PanelCell_01 = ({ isHidden, onDeleteClick }: { isHidden?: boolean; onDelet
 
 const PanelCell_02 = ({ isHidden, onDeleteClick }: { isHidden?: boolean; onDeleteClick?: () => void }) => {
   return (
-    <div className={classNames(isHidden && scss.hidden)}>
+    <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
       <div>
-        <IconRemoveCircle onClick={onDeleteClick} />
+        <IconRemoveCircle className={scss.iconRemoveCircle} onClick={onDeleteClick} />
       </div>
     </div>
   );
