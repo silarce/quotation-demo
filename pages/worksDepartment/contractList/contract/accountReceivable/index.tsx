@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -249,14 +250,18 @@ export default function AccountReceivable() {
       list: {
         date: {
           label: '日期',
-          cellStyle: { width: '100px' },
-          inputProps: {
+          cellStyle: { width: '120px' },
+          datePickerProps: {
             props: {
-              value: item.date,
-              onChange: (e) => {
-                const arr = [...invoiceArr];
-                arr[index].date = e.target.value;
-                setInvoiceArr(arr);
+              value: item.date ? moment(item.date) : null,
+              onChange: (date) => {
+                setInvoiceArr((arr) => {
+                  const newArr = [...arr];
+                  const theDate = date?.toISOString() ?? '';
+                  newArr[index].date = theDate;
+
+                  return newArr;
+                });
               },
             },
           },
@@ -477,10 +482,15 @@ export default function AccountReceivable() {
         list: {
           date: {
             label: '日期',
-            cellStyle: { width: '100px' },
-            inputProps: {
+            cellStyle: { width: '120px' },
+            // inputProps: {
+            //   props: {
+            //     value: '',
+            //   },
+            // },
+            datePickerProps: {
               props: {
-                value: '111-11-11',
+                value: undefined,
               },
             },
           },
