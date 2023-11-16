@@ -12,7 +12,9 @@ import Profile, {
 import Table_requestPayment, {
   Tcontrol_table_requestPayment,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
-import InvoiceGivingRecord from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceGivingRecord';
+import AccountReceivable_dynaTable, {
+  Tcontrol_dynaTable,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
 
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -167,6 +169,164 @@ export default function AccountReceivable() {
   };
 
   // --------------------------------------------------------------------------
+
+  const control_invoiceGivingRecord: Tcontrol_dynaTable = {
+    caption: '發票給予紀錄',
+    topRightBtnProps: {
+      label: `更改發票前兩碼:${'CD'}`,
+      onClick: () => {
+        alert('test');
+      },
+    },
+    tableBottomBtnProps: {
+      label: '新增發票',
+      onClick: () => {
+        alert('test');
+      },
+    },
+    bottomBarProps: {
+      label: '合計',
+      value: '123,123',
+    },
+
+    rowArr: [
+      {
+        panelCell_01: {
+          onDeleteClick: () => {
+            alert('test');
+          },
+        },
+        list: {
+          date: {
+            label: '日期',
+            cellStyle: { width: '100px' },
+            inputProps: {
+              props: {
+                value: '111-11-11',
+              },
+            },
+          },
+          invoiceNumber: {
+            label: '發票號碼',
+            cellStyle: { width: '300px' },
+            twoInputProps: {
+              one: {
+                props: {
+                  value: '12345678',
+                },
+              },
+              two: {
+                props: {
+                  value: '999',
+                },
+              },
+            },
+          },
+          price: {
+            label: '金額',
+            cellStyle: { width: '290px' },
+            inputProps: {
+              props: {
+                value: 'aaa',
+              },
+            },
+          },
+          remark: {
+            label: '備註',
+            cellStyle: { width: '300px' },
+            inputProps: {
+              props: {
+                value: 'aaa',
+              },
+            },
+          },
+        }, // list close
+      },
+    ],
+  };
+
+  // --------------------------------------------------------------------------
+  const control_paymentRecord: Tcontrol_dynaTable = {
+    caption: '收款紀錄',
+    topRightBtnProps: {
+      label: '新增收款紀錄',
+      onClick: () => {
+        alert('test');
+      },
+    },
+    bottomBarProps: {
+      label: '合計',
+      value: '123,123',
+    },
+
+    rowArr: [
+      {
+        panelCell_02: {
+          onDeleteClick: () => {
+            alert('test');
+          },
+        },
+        list: {
+          date: {
+            label: '日期',
+            cellStyle: { width: '100px' },
+            inputProps: {
+              props: {
+                value: '111-11-11',
+              },
+            },
+          },
+          account: {
+            label: '帳號',
+            cellStyle: { width: '189px' },
+            inputProps: {
+              props: {
+                value: 'XXXXXX',
+              },
+            },
+          },
+          chequeNumber: {
+            label: '票據號碼',
+            cellStyle: { width: '189px' },
+            inputProps: {
+              props: {
+                value: 'XXXXXX',
+              },
+            },
+          },
+          chequeDate: {
+            label: '票據日期',
+            cellStyle: { width: '100px' },
+            inputProps: {
+              props: {
+                value: '111-11-11',
+              },
+            },
+          },
+          price: {
+            label: '金額',
+            cellStyle: { width: '170px' },
+            inputProps: {
+              props: {
+                value: '999,999',
+              },
+            },
+          },
+          incomingSubpoenaSerialNumber: {
+            label: '收入傳票序號',
+            cellStyle: { width: '187px' },
+            inputProps: {
+              props: {
+                value: '1110304001',
+              },
+            },
+          },
+        }, // list close
+      },
+    ],
+  };
+
+  // --------------------------------------------------------------------------
   const panelList_01: TpanelList = [
     //
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
@@ -213,7 +373,9 @@ export default function AccountReceivable() {
         </div>
 
         {/* 發票給予紀錄 */}
-        <InvoiceGivingRecord />
+        <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
+        {/* 收款紀錄*/}
+        <AccountReceivable_dynaTable control={control_paymentRecord} disabled={disabled} />
       </div>
     </SubLayer>
   );
