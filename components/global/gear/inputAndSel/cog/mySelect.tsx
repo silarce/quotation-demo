@@ -35,6 +35,7 @@ export type TselectProps = {
   selectRef?: React.RefObject<HTMLDivElement>;
   openMenuOnFocus?: boolean;
   isSearchable?: boolean;
+  menuPortalTarget?: 'undefined';
   /**
    *  元件可以收一個參數，型別設定可以參考 mySelect.tsx裡的DropdownIndicator
    * parameter的型別要從'react-select'引入
@@ -90,6 +91,7 @@ export default function MySelect<
     arrowType,
     fontSize,
     isSearchable,
+    menuPortalTarget,
   } = selectProps;
 
   // 客製化元件
@@ -130,7 +132,8 @@ export default function MySelect<
           ...customComponents,
         }}
         unstyled={true}
-        menuPortalTarget={document.getElementById('__next')}
+        menuPortalTarget={menuPortalTarget !== 'undefined' ? document.getElementById('__next') : undefined}
+        // menuPortalTarget={document.getElementById('__next')}
         onFocus={onFocus}
         onBlur={onBlur}
         menuPosition={'fixed'}
@@ -138,6 +141,7 @@ export default function MySelect<
         isSearchable={isSearchable ?? false}
         openMenuOnFocus={openMenuOnFocus}
         // ---------這樣比較好找-----------------------------------------------
+        // styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         // ---------這樣比較好找-----------------------------------------------
         classNames={{
