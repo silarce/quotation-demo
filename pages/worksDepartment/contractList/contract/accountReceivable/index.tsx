@@ -51,6 +51,8 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // --------------------------------------------------------------------------
+
   const [checkBar01, setCheckBar01] = useState<string[]>([]);
   const [checkBar02, setCheckBar02] = useState<string[]>([]);
 
@@ -256,6 +258,9 @@ export default function AccountReceivable() {
       {
         panelCell_01: {
           onDeleteClick: () => {
+            alert('test');
+          },
+          onChainClick: () => {
             alert('test');
           },
         },

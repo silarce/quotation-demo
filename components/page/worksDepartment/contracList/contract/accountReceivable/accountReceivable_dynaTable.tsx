@@ -9,7 +9,7 @@ import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inp
 import scss from './accountReceivable_dynaTable.module.scss';
 
 // icon
-import { IconDelete01, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDelete01, IconRemoveCircle, IconChain } from 'public/image/icon/svgComponent/svgIcons';
 import iconAdd from 'public/image/icon/add.svg';
 
 // ==========================================================================
@@ -22,6 +22,7 @@ type TtwoInputProps = {
 type Trow = {
   panelCell_01?: {
     onDeleteClick: () => void;
+    onChainClick: () => void;
   };
   panelCell_02?: {
     onDeleteClick: () => void;
@@ -103,7 +104,9 @@ export default function AccountReceivable_dynaTable({
 
               return (
                 <CellWithBar key={index} className={classNames(scss.row)}>
-                  {panelCell_01 && <PanelCell_01 onDeleteClick={panelCell_01.onDeleteClick} />}
+                  {panelCell_01 && (
+                    <PanelCell_01 onDeleteClick={panelCell_01.onDeleteClick} onChainClick={panelCell_01.onChainClick} />
+                  )}
                   {panelCell_02 && <PanelCell_02 onDeleteClick={panelCell_02.onDeleteClick} />}
                   {arr.map((cell, index) => {
                     const { cellStyle, inputProps, twoInputProps } = cell;
@@ -159,9 +162,20 @@ export default function AccountReceivable_dynaTable({
 
 // ==========================================================================
 
-const PanelCell_01 = ({ isHidden, onDeleteClick }: { isHidden?: boolean; onDeleteClick?: () => void }) => {
+const PanelCell_01 = ({
+  isHidden,
+  onDeleteClick,
+  onChainClick,
+}: {
+  isHidden?: boolean;
+  onDeleteClick?: () => void;
+  onChainClick?: () => void;
+}) => {
   return (
     <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
+      <div>
+        <IconChain onClick={onChainClick} />
+      </div>
       <div>
         <IconDelete01 onClick={onDeleteClick} />
       </div>

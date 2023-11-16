@@ -106,10 +106,11 @@
 
 .panelCell {
   display: flex;
+  gap: 16px;
   align-items: center;
   svg {
     height: 20px;
-    width: fit-content;
+    width: 20px;
   }
 }
 
