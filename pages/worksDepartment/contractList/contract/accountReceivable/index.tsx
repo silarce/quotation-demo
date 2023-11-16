@@ -51,6 +51,10 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
+
+  // --------------------------------------------------------------------------
+
   const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
 
   useEffect(() => {
@@ -436,7 +440,7 @@ export default function AccountReceivable() {
     topRightBtnProps: {
       label: '新增收款紀錄',
       onClick: () => {
-        alert('test');
+        setShowRecordModal(true);
       },
     },
     bottomBarProps: {
@@ -678,9 +682,13 @@ export default function AccountReceivable() {
       <PaymentRecordSelector
         label="請選擇收款紀錄"
         tip="可複選"
-        showModal={true}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        showModal={showRecordModal}
+        onConfirm={(v) => {
+          console.log(v);
+        }}
+        onCancel={() => {
+          setShowRecordModal(false);
+        }}
       />
     </SubLayer>
   );
