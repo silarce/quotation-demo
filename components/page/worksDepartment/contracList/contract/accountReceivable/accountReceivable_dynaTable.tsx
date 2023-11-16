@@ -4,7 +4,7 @@ import Image from 'next/image';
 // gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputProps, TdatePickerProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './accountReceivable_dynaTable.module.scss';
 
@@ -33,6 +33,7 @@ type Trow = {
       cellStyle: React.CSSProperties;
       inputProps?: TinputProps;
       twoInputProps?: TtwoInputProps;
+      datePickerProps?: TdatePickerProps;
     };
   };
 };
@@ -126,7 +127,7 @@ export default function AccountReceivable_dynaTable({
                   )}
                   {panelCell_02 && <PanelCell_02 onDeleteClick={panelCell_02.onDeleteClick} />}
                   {arr.map((cell, index) => {
-                    const { cellStyle, inputProps, twoInputProps } = cell;
+                    const { cellStyle, inputProps, datePickerProps, twoInputProps } = cell;
 
                     if (twoInputProps) {
                       const { one, two } = twoInputProps;
@@ -141,7 +142,13 @@ export default function AccountReceivable_dynaTable({
 
                     return (
                       <div key={index} style={cellStyle}>
-                        <InputSel disabled={disabled} showBaseline="auto" inputProps={inputProps} />
+                        <InputSel
+                          //
+                          disabled={disabled}
+                          showBaseline="auto"
+                          inputProps={inputProps}
+                          datePickerProps={datePickerProps}
+                        />
                       </div>
                     );
                   })}
