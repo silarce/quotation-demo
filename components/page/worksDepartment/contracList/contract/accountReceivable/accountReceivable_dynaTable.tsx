@@ -37,14 +37,32 @@ type Trow = {
   };
 };
 
+type TheadRow = {
+  panelCell_01?: {
+    onDeleteClick?: () => void;
+    onChainClick?: () => void;
+  };
+  panelCell_02?: {
+    onDeleteClick?: () => void;
+  };
+  list: {
+    [key: string]: {
+      label: string;
+      cellStyle: React.CSSProperties;
+    };
+  };
+};
+
 type Tcontrol = {
   caption: string;
+  headRow: TheadRow;
+  rowArr: Trow[];
+
   topRightBtnProps?: {
     label: string;
     onClick: () => void;
   };
 
-  rowArr: Trow[];
   tableBottomBtnProps?: {
     label: string;
     onClick: () => void;
@@ -66,10 +84,9 @@ export default function AccountReceivable_dynaTable({
   control: Tcontrol;
   disabled?: boolean;
 }) {
-  const { caption, rowArr, tableBottomBtnProps, bottomBarProps, topRightBtnProps } = control;
+  const { caption, headRow, rowArr, tableBottomBtnProps, bottomBarProps, topRightBtnProps } = control;
 
-  const firstRow = rowArr[0];
-  const firstRowCellArr = Object.values(firstRow.list);
+  const headRowCellArr = Object.values(headRow.list);
 
   return (
     <div className={scss.container}>
@@ -81,9 +98,9 @@ export default function AccountReceivable_dynaTable({
         {/* table */}
         <div className={scss.table}>
           <div className={classNames(scss.thead, scss.row)}>
-            {firstRow.panelCell_01 && <PanelCell_01 isHidden={true} />}
-            {firstRow.panelCell_02 && <PanelCell_02 isHidden={true} />}
-            {firstRowCellArr.map((cell, index) => {
+            {headRow.panelCell_01 && <PanelCell_01 isHidden={true} />}
+            {headRow.panelCell_02 && <PanelCell_02 isHidden={true} />}
+            {headRowCellArr.map((cell, index) => {
               const { label, cellStyle } = cell;
 
               return (
