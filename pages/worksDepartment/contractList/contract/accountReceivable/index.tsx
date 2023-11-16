@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
 // layer
@@ -25,9 +25,29 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // css
 import scss from './index.module.scss';
+// ========================================================================
+
+type TrequestPayment = {
+  caption: string;
+  paymentRatio: string;
+  loanPeriod: string;
+  remark: string;
+};
+
+// ========================================================================
 
 export default function AccountReceivable() {
   const [disabled, setDisabled] = useState(true);
+
+  // --------------------------------------------------------------------------
+
+  const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
+
+  useEffect(() => {
+    if (disabled) {
+      setRequestPaymentArr(fakeRequestPayment);
+    }
+  }, [disabled]);
 
   // --------------------------------------------------------------------------
 
@@ -120,27 +140,61 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // const control_table_requestPayment: Tcontrol_table_requestPayment = {
+  //   columnArr: [
+  //     {
+  //       caption: 'foo',
+  //       paymentRatio: { value: 'foo' },
+  //       loanPeriod: { value: 'foo' },
+  //       remark: { value: 'foo' },
+  //     },
+  //     {
+  //       caption: 'foo',
+  //       paymentRatio: { value: 'foo' },
+  //       loanPeriod: { value: 'foo' },
+  //       remark: { value: 'foo' },
+  //     },
+  //     {
+  //       caption: 'foo',
+  //       paymentRatio: { value: 'foo' },
+  //       loanPeriod: { value: 'foo' },
+  //       remark: { value: 'foo' },
+  //     },
+  //   ],
+  // };
   const control_table_requestPayment: Tcontrol_table_requestPayment = {
-    columnArr: [
-      {
-        caption: 'foo',
-        paymentRatio: { value: 'foo' },
-        loanPeriod: { value: 'foo' },
-        remark: { value: 'foo' },
-      },
-      {
-        caption: 'foo',
-        paymentRatio: { value: 'foo' },
-        loanPeriod: { value: 'foo' },
-        remark: { value: 'foo' },
-      },
-      {
-        caption: 'foo',
-        paymentRatio: { value: 'foo' },
-        loanPeriod: { value: 'foo' },
-        remark: { value: 'foo' },
-      },
-    ],
+    columnArr: requestPaymentArr.map((item, index) => {
+      return {
+        caption: item.caption,
+        paymentRatio: {
+          value: item.paymentRatio,
+          onChange: (str) => {
+            setRequestPaymentArr((arr) => {
+              const newArr = [...requestPaymentArr];
+              arr[index].paymentRatio = str;
+
+              return newArr;
+            });
+          },
+        },
+        loanPeriod: {
+          value: item.loanPeriod,
+          onChange: (str) => {
+            const arr = [...requestPaymentArr];
+            arr[index].loanPeriod = str;
+            setRequestPaymentArr(arr);
+          },
+        },
+        remark: {
+          value: item.remark,
+          onChange: (str) => {
+            const arr = [...requestPaymentArr];
+            arr[index].remark = str;
+            setRequestPaymentArr(arr);
+          },
+        },
+      };
+    }),
   };
 
   // --------------------------------------------------------------------------
@@ -470,3 +524,24 @@ export default function AccountReceivable() {
 }
 
 // ========================================================================
+
+const fakeRequestPayment = [
+  {
+    caption: '訂約',
+    paymentRatio: 'foo',
+    loanPeriod: 'foo',
+    remark: 'foo',
+  },
+  {
+    caption: '送審',
+    paymentRatio: 'foo',
+    loanPeriod: 'foo',
+    remark: 'foo',
+  },
+  {
+    caption: '丈量',
+    paymentRatio: 'foo',
+    loanPeriod: 'foo',
+    remark: 'foo',
+  },
+];
