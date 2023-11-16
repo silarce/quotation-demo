@@ -21,6 +21,7 @@ import DeductionDetails, {
 
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // css
 import scss from './index.module.scss';
@@ -32,6 +33,11 @@ export default function AccountReceivable() {
 
   const [checkBar01, setCheckBar01] = useState<string[]>([]);
   const [checkBar02, setCheckBar02] = useState<string[]>([]);
+
+  // --------------------------------------------------------------------------
+
+  const [isShowInvoicePrefixModal, setIsShowInvoicePrefixModal] = useState<boolean>(false);
+  const [invoicePrefix, setInvoicePrefix] = useState<string>('');
 
   // --------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {
@@ -176,9 +182,9 @@ export default function AccountReceivable() {
   const control_invoiceGivingRecord: Tcontrol_dynaTable = {
     caption: '發票給予紀錄',
     topRightBtnProps: {
-      label: `更改發票前兩碼:${'CD'}`,
+      label: `更改發票前綴:${invoicePrefix}`,
       onClick: () => {
-        alert('test');
+        setIsShowInvoicePrefixModal(true);
       },
     },
     tableBottomBtnProps: {
@@ -449,6 +455,16 @@ export default function AccountReceivable() {
         {/* 扣款明細 */}
         <DeductionDetails control={control_deductionDetails} disabled={disabled} />
       </div>
+      {/*  */}
+      <InputModal
+        title="當月預設發票前綴"
+        visible={isShowInvoicePrefixModal}
+        onConfirm={(value) => {
+          setInvoicePrefix(value);
+          setIsShowInvoicePrefixModal(false);
+        }}
+        onCancel={() => setIsShowInvoicePrefixModal(false)}
+      />
     </SubLayer>
   );
 }
