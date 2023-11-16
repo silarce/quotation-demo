@@ -31,6 +31,8 @@ export default function SelectorShell({
   tip,
   //
   searcbBarProps,
+  //
+  otherLeft,
 }: {
   children: ReactNode;
   label?: string;
@@ -44,6 +46,8 @@ export default function SelectorShell({
   noSearch?: boolean;
   //
   searcbBarProps?: TsearcbBarProps;
+  //
+  otherLeft?: JSX.Element;
 }) {
   // ======================================================
 
@@ -64,6 +68,7 @@ export default function SelectorShell({
             <div className={scss.filler} />
             <div className={scss.label}>{label}</div>
             <div className={scss.tip}>{tip}</div>
+            {otherLeft}
           </div>
           {searcbBarProps && <SearchBar {...searcbBarProps} />}
         </div>
