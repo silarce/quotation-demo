@@ -23,6 +23,7 @@ import DeductionDetails, {
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
 
 // css
 import scss from './index.module.scss';
@@ -673,6 +674,13 @@ export default function AccountReceivable() {
           setIsShowInvoicePrefixModal(false);
         }}
         onCancel={() => setIsShowInvoicePrefixModal(false)}
+      />
+      <PaymentRecordSelector
+        label="請選擇收款紀錄"
+        tip="可複選"
+        showModal={true}
+        onConfirm={() => {}}
+        onCancel={() => {}}
       />
     </SubLayer>
   );
