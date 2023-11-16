@@ -15,6 +15,9 @@ import Table_requestPayment, {
 import AccountReceivable_dynaTable, {
   Tcontrol_dynaTable,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
+import DeductionDetails, {
+  Tcontrol_deductionDetails,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetails';
 
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -327,6 +330,73 @@ export default function AccountReceivable() {
   };
 
   // --------------------------------------------------------------------------
+
+  const control_deductionDetails: Tcontrol_deductionDetails = {
+    sideColumn: {
+      caption: '項目',
+      subTotal: '合計',
+      tax: '營業稅5%',
+      total: '總計',
+      arr: [
+        {
+          value: '第一期',
+        },
+        {
+          value: '第二期',
+        },
+        {
+          value: '第三期',
+        },
+        {
+          value: '第四期',
+        },
+      ],
+    },
+    columnArr: [
+      {
+        caption: '工作證',
+        subTotal: '999999',
+        tax: '999999',
+        total: '999999',
+        arr: [
+          {
+            value: '999',
+          },
+          {
+            value: '999',
+          },
+          {
+            value: '999',
+          },
+          {
+            value: '999',
+          },
+        ],
+      },
+      {
+        caption: '安衛費',
+        subTotal: '999999',
+        tax: '999999',
+        total: '999999',
+        arr: [
+          {
+            value: '999',
+          },
+          {
+            value: '999',
+          },
+          {
+            value: '999',
+          },
+          {
+            value: '999',
+          },
+        ],
+      },
+    ],
+  };
+
+  // --------------------------------------------------------------------------
   const panelList_01: TpanelList = [
     //
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
@@ -376,6 +446,8 @@ export default function AccountReceivable() {
         <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
         {/* 收款紀錄*/}
         <AccountReceivable_dynaTable control={control_paymentRecord} disabled={disabled} />
+        {/* 扣款明細 */}
+        <DeductionDetails control={control_deductionDetails} disabled={disabled} />
       </div>
     </SubLayer>
   );
