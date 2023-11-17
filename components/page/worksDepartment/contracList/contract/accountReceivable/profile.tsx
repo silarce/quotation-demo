@@ -1,7 +1,4 @@
-import classNames from 'classnames';
-
 // gear
-
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './profile.module.scss';
@@ -35,8 +32,6 @@ export type { Tcontrol as Tcontrol_profile };
 
 // ========================================================================
 
-// ========================================================================
-
 export default function Profile({
   //
   control,
@@ -66,6 +61,7 @@ export default function Profile({
                   inputProps={{
                     props: {
                       value: control[key].value,
+                      placeholder: '',
                       onChange: (e) => {
                         control[key].onChange?.(e.target.value);
                       },
@@ -84,6 +80,7 @@ export default function Profile({
               inputProps: {
                 props: {
                   value: control[key].value,
+                  placeholder: '',
                   onChange: (e) => {
                     control[key].onChange?.(e.target.value);
                   },
@@ -96,6 +93,7 @@ export default function Profile({
                 textareaProps: {
                   props: {
                     value: control[key].value,
+                    placeholder: '',
                     onChange: (e) => {
                       control[key].onChange?.(e.target.value);
                     },
@@ -138,6 +136,7 @@ export default function Profile({
                   inputProps={{
                     props: {
                       value: control[key].value,
+                      placeholder: '',
                       onChange: (e) => {
                         control[key].onChange?.(e.target.value);
                       },
