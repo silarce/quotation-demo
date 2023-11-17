@@ -17,6 +17,7 @@ type TcontrolItem = {
 
 type TcontrolColumn = {
   caption: string;
+  onChange?: (str: string) => void;
   arr: TcontrolItem[];
   subTotal: string;
   tax: string;
@@ -78,12 +79,23 @@ const Column = ({
   disabled?: boolean;
   inputType?: 'number';
 }) => {
-  const { caption, arr, subTotal, tax, total, onDeleteClick } = controlColumn;
+  const { caption, arr, subTotal, tax, total, onDeleteClick, onChange } = controlColumn;
 
   return (
     <div className={scss.column}>
       <div className={scss.headCell}>
-        <span>{caption}</span>
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          inputProps={{
+            props: {
+              value: caption,
+              onChange: (e) => {
+                onChange?.(e.target.value);
+              },
+            },
+          }}
+        />
         {onDeleteClick && !disabled && <IconRemoveCircle onClick={onDeleteClick} />}
       </div>
       {/*  */}

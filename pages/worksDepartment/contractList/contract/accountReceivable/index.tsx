@@ -73,7 +73,10 @@ type Tdeduction = {
 
 type TdeductionList = {
   [key: string]: {
-    [key: string]: Tdeduction;
+    itemName: string;
+    list: {
+      [key: string]: Tdeduction;
+    };
   };
 };
 
@@ -155,8 +158,7 @@ export default function AccountReceivable() {
 
   // deductionDetails
 
-  const [deductionList, setDeductionList] = useState<TdeductionList>();
-  const [deductionItemNameArr, setDeductionItemNameArr] = useState<string[]>([]);
+  const [deductionList, setDeductionList] = useState<TdeductionList>({});
 
   const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: Tdeduction }>({});
 
@@ -175,7 +177,6 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     setDeductionList(sortedDeductionList);
-    setDeductionItemNameArr(itemNameArr);
   }, [sortedDeductionList]);
 
   // --------------------------------------------------------------------------
@@ -675,11 +676,13 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const control_deductionDetails = useMemo(() => {
-    const columnArr = deductionItemNameArr.map((itemName, itemNameIndex) => {
+    const columnArr = Object.keys(deductionList).map((pKey, itemNameIndex) => {
       let subTotal = 0;
+      const itemName = deductionList[pKey]?.itemName;
+      const theList = deductionList[pKey]?.list;
 
       const arr = periodArr.map((period) => {
-        const deduction = deductionList?.[itemName]?.[period];
+        const deduction = deductionList?.[pKey]?.list?.[period];
 
         const detailedAmount = deduction?.detailedAmount ?? '';
 
@@ -691,21 +694,24 @@ export default function AccountReceivable() {
             setDeductionList((obj) => {
               const newObj = { ...obj };
 
-              if (!newObj[itemName]) {
-                newObj[itemName] = {};
+              if (!newObj[pKey]) {
+                newObj[pKey] = {
+                  itemName: itemName,
+                  list: {},
+                };
               }
 
-              if (!newObj[itemName]?.[period]) {
-                newObj[itemName][period] = {
+              if (!newObj[pKey].list[period]) {
+                newObj[pKey].list[period] = {
                   key: nanoid(),
-                  itemName,
+                  itemName: itemName,
                   period: Number(period),
                   detailedAmount: '',
                 };
               }
 
-              newObj[itemName][period].detailedAmount = str;
-              recordChangedDeduction(newObj[itemName][period]);
+              newObj[pKey].list[period].detailedAmount = str;
+              recordChangedDeduction(newObj[pKey].list[period]);
 
               return newObj;
             });
@@ -714,25 +720,71 @@ export default function AccountReceivable() {
 
         return controlItem;
       });
+      // const arr = periodArr.map((period) => {
+      //   const deduction = deductionList?.[itemName]?.[period];
+
+      //   const detailedAmount = deduction?.detailedAmount ?? '';
+
+      //   subTotal = subTotal + Number(detailedAmount || '0');
+
+      //   const controlItem: Tcontrol_deductionDetails['columnArr'][number]['arr'][number] = {
+      //     value: detailedAmount,
+      //     onChange: (str) => {
+      //       setDeductionList((obj) => {
+      //         const newObj = { ...obj };
+
+      //         if (!newObj[itemName]) {
+      //           newObj[itemName] = {};
+      //         }
+
+      //         if (!newObj[itemName]?.[period]) {
+      //           newObj[itemName][period] = {
+      //             key: nanoid(),
+      //             itemName,
+      //             period: Number(period),
+      //             detailedAmount: '',
+      //           };
+      //         }
+
+      //         newObj[itemName][period].detailedAmount = str;
+      //         recordChangedDeduction(newObj[itemName][period]);
+
+      //         return newObj;
+      //       });
+      //     },
+      //   };
+
+      //   return controlItem;
+      // });
 
       const tax = new Decimal(subTotal).mul(0.05).toNumber();
 
       const column: Tcontrol_deductionDetails['columnArr'][number] = {
         caption: itemName,
         onChange: (str) => {
-          // setDeductionItemNameArr((arr) => {
-          //   arr[itemNameIndex] = str;
-          // });
+          setDeductionList((obj) => {
+            const newObj = { ...obj };
+
+            const theItem = newObj[pKey];
+            theItem.itemName = str;
+            Object.keys(theItem.list).forEach((key) => {
+              theItem.list[key].itemName = str;
+            });
+
+            newObj[pKey] = theItem;
+
+            return newObj;
+          });
         },
         subTotal: subTotal.toLocaleString(),
         tax: tax.toLocaleString(),
         total: (subTotal + tax).toLocaleString(),
         onDeleteClick: () => {
-          setDeductionItemNameArr((arr) => {
-            const newArr = [...arr];
-            newArr.splice(itemNameIndex, 1);
+          setDeductionList((obj) => {
+            const newObj = { ...obj };
+            delete newObj[pKey];
 
-            return newArr;
+            return newObj;
           });
         },
         arr,
@@ -743,8 +795,14 @@ export default function AccountReceivable() {
 
     const control_deductionDetails: Tcontrol_deductionDetails = {
       onTopBtnClick: () => {
-        setDeductionItemNameArr((arr) => {
-          return [...arr, 'new'];
+        setDeductionList((obj) => {
+          return {
+            ...obj,
+            [nanoid()]: {
+              itemName: 'new',
+              list: {},
+            },
+          };
         });
       },
       sideColumn: {
@@ -762,7 +820,7 @@ export default function AccountReceivable() {
     };
 
     return control_deductionDetails;
-  }, [deductionList, deductionItemNameArr]);
+  }, [deductionList]);
 
   // --------------------------------------------------------------------------
   const panelList_01: TpanelList = [
@@ -955,10 +1013,13 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
     }
 
     if (!list[itemName]) {
-      list[itemName] = {};
+      list[itemName] = {
+        itemName,
+        list: {},
+      };
     }
 
-    list[itemName][`${period}`] = {
+    list[itemName].list[`${period}`] = {
       id: id,
       key: id,
       itemName,
