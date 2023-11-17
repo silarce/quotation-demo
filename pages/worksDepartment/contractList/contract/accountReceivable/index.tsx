@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -24,9 +25,21 @@ import DeductionDetails, {
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+// api
+import {
+  TupdateEngineeringContactDto,
+  useGetEngineeringContact,
+  apiPatchEngineeringContact,
+  apiPostWorkSheet,
+} from 'js/api/api_engineering';
+
+import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // css
 import scss from './index.module.scss';
+
 // ========================================================================
 
 type TrequestPayment = {
@@ -47,11 +60,44 @@ type Tinvoice = {
 // ========================================================================
 
 export default function AccountReceivable() {
+  const router = useRouter();
+  const { contractId } = router.query as { contractId: string | undefined };
+
   const [disabled, setDisabled] = useState(true);
 
   // --------------------------------------------------------------------------
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
+
+  // --------------------------------------------------------------------------
+
+  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const engineeringContactId = contract?.engineeringContactId;
+
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
+  useEffect(() => {
+    (async () => {
+      if (contract) {
+        return;
+      }
+
+      try {
+        await update_contract();
+      } catch (error) {
+        myAlert.err({ title: '取得合約資料失敗' });
+      }
+    })();
+
+    (async () => {
+      try {
+        await update_engineeringContact();
+      } catch (error) {
+        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
+      }
+    })();
+  }, [contractId, engineeringContactId]);
 
   // --------------------------------------------------------------------------
 
@@ -86,44 +132,44 @@ export default function AccountReceivable() {
   const control_profile: Tcontrol_profile = {
     // left
     projectName: {
-      value: 'fooo',
+      value: engineeringContact?.projectName ?? '',
     },
     contractor: {
-      value: 'fooo',
+      value: engineeringContact?.contractor ?? '', // 承包商
     },
     companyName: {
-      value: 'fooo',
+      value: '未串接 承包商與承包商名稱是同一個資料嗎?', // 承包商名稱
     },
     contactPerson: {
-      value: 'fooo',
+      value: '未串接 承包商聯絡人', // 承包商聯絡人
     },
     businessIdNumber: {
-      value: 'fooo',
+      value: '未串接 承包商統編', // 承包商統編
     },
     companyAddress: {
-      value: 'fooo',
+      value: '未串接 承包商地址', // 承包商地址
     },
     companyPhoneNumber: {
-      value: 'fooo',
+      value: engineeringContact?.contractorContactNumber ?? '', // 承包商電話
     },
     projectAddress: {
-      value: 'fooo',
+      value: `${engineeringContact?.county}${engineeringContact?.district}${engineeringContact?.address}`,
     },
     projectPhoneNumber: {
-      value: 'fooo',
+      value: engineeringContact?.constructionSiteContactNumber ?? '', // 工地電話
     },
     // right
     warrantyPeriod: {
-      value: 'fooo',
+      value: '未串接',
     },
     projectNumber: {
-      value: 'fooo',
+      value: engineeringContact?.projectNumber ?? '',
     },
     valuationDate: {
-      value: 'fooo',
+      value: contract?.content.verifyForm?.askForPaymentDate ?? '',
     },
     paymentDate: {
-      value: 'fooo',
+      value: contract?.content.verifyForm?.disbursementDate ?? '',
     },
   };
 
