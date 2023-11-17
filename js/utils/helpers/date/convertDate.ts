@@ -37,3 +37,11 @@ export const convertDate_add1911 = (ISOString: string) => {
 
   return dateTime.toISOString();
 };
+
+export const getTaiwanDateStr = (ISOString: string | undefined | null) => {
+  if (!ISOString) {
+    return '';
+  }
+
+  return moment(convertDate_reduce1911(ISOString)).format('yy-MM-DD');
+};
