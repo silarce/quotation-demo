@@ -2346,3 +2346,22 @@ export type TupdateEngineeringDeliveryList = {
   notes: string;
   productsItemStatus?: TupdateDeliveryStatus[];
 };
+
+// =========================================================================
+
+// accountant
+
+export type TaccountantDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  paymentType: '匯款' | '票據' | '現金'; // 收款類型
+  accountingNumber: string; // 編號/存入帳號
+  price: number; // 金額
+  notes: string | null; // 備註
+  noteMaturityDate: string | null; // 票據到期日
+};
+
+export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {
+  noteMaturityDate?: string | null;
+};
