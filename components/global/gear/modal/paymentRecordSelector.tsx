@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
 // global gear
@@ -6,7 +6,7 @@ import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
-import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
+import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 
 // css
 import scss from './paymentRecordSelector.module.scss';
@@ -16,15 +16,13 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 
 // api
 import { Tparams, useEmployee_infinite } from 'js/api/api_employee';
-import { useDepartments } from 'js/api/api_department';
 
 // option
-import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
+import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
-const regionOptionArr = optionsCreator_region({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
 
-import { AppContext } from 'pages/_app';
+// import { AppContext } from 'pages/_app';
 
 // ==========================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
@@ -70,7 +68,7 @@ export default function PaymentRecordSelector({
   isCancelOnConfirm?: boolean;
   exceptEmpCheck?: (emp: TemployeeDto) => boolean;
 }) {
-  const { rwd1023 } = useContext(AppContext);
+  // const { rwd1023 } = useContext(AppContext);
 
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
@@ -100,7 +98,7 @@ export default function PaymentRecordSelector({
           }
         },
       },
-      placeholder: '年',
+      placeholder: '類型',
       boxStyle: { width: '100px' },
     },
     {
