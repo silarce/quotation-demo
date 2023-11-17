@@ -485,75 +485,16 @@ export default function AccountReceivable() {
       },
     },
     rowArr: control_invoiceGivingRecord_rowArr,
-
-    // rowArr: [
-    //   {
-    //     panelCell_01: {
-    //       onDeleteClick: () => {
-    //         alert('test');
-    //       },
-    //       onChainClick: () => {
-    //         alert('test');
-    //       },
-    //     },
-    //     list: {
-    //       date: {
-    //         label: '日期',
-    //         cellStyle: { width: '100px' },
-    //         inputProps: {
-    //           props: {
-    //             value: '111-11-11',
-    //           },
-    //         },
-    //       },
-    //       invoiceNumber: {
-    //         label: '發票號碼',
-    //         cellStyle: { width: '300px' },
-    //         twoInputProps: {
-    //           one: {
-    //             props: {
-    //               value: '12345678',
-    //             },
-    //           },
-    //           two: {
-    //             props: {
-    //               value: '999',
-    //             },
-    //           },
-    //         },
-    //       },
-    //       price: {
-    //         label: '金額',
-    //         cellStyle: { width: '290px' },
-    //         inputProps: {
-    //           props: {
-    //             value: 'aaa',
-    //           },
-    //         },
-    //       },
-    //       remark: {
-    //         label: '備註',
-    //         cellStyle: { width: '300px' },
-    //         inputProps: {
-    //           props: {
-    //             value: 'aaa',
-    //           },
-    //         },
-    //       },
-    //     }, // list close
-    //   },
-    // ],
   };
 
   // --------------------------------------------------------------------------
 
-  // accountantArr
-
-  const control_paymentRecord = useMemo(() => {
+  // 收款紀錄 不應該叫paymentRecord的
+  const control_accountant = useMemo(() => {
     //
     let priceTotal = 0;
 
-    const control_paymentRecord_rowArr: Tcontrol_dynaTable['rowArr'] = accountantArr.map((item, index) => {
+    const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = accountantArr.map((item, index) => {
       priceTotal = priceTotal + item.price;
 
       const control: Tcontrol_dynaTable['rowArr'][number] = {
@@ -628,7 +569,7 @@ export default function AccountReceivable() {
       return control;
     });
 
-    const control_paymentRecord: Tcontrol_dynaTable = {
+    const control_accountant: Tcontrol_dynaTable = {
       caption: '收款紀錄',
       topRightBtnProps: {
         label: '新增收款紀錄',
@@ -670,10 +611,10 @@ export default function AccountReceivable() {
           //
         },
       },
-      rowArr: control_paymentRecord_rowArr,
+      rowArr: control_accountant_rowArr,
     };
 
-    return control_paymentRecord;
+    return control_accountant;
   }, [accountantArr]);
 
   // --------------------------------------------------------------------------
@@ -848,7 +789,7 @@ export default function AccountReceivable() {
         {/* 發票給予紀錄 */}
         <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
         {/* 收款紀錄*/}
-        <AccountReceivable_dynaTable control={control_paymentRecord} disabled={disabled} />
+        <AccountReceivable_dynaTable control={control_accountant} disabled={disabled} />
         {/* 扣款明細 */}
         <DeductionDetails control={control_deductionDetails} disabled={disabled} />
       </div>
@@ -973,6 +914,7 @@ const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
   },
 ];
 
+/**用來把從後端取得的扣款明細變成這裡可以用的樣子 */
 const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
   let periodQty = 0;
   const itemNameArr: string[] = [];
@@ -1016,77 +958,3 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
     sortedDeductionList: list,
   };
 };
-
-// const control_deductionDetails = useMemo(() => {
-//   const control_deductionDetails: Tcontrol_deductionDetails = {
-//     onTopBtnClick: () => {
-//       alert('test');
-//       // setDeductionItemNameArr
-//     },
-//     sideColumn: {
-//       caption: '項目',
-//       subTotal: '合計',
-//       tax: '營業稅5%',
-//       total: '總計',
-//       arr: [
-//         {
-//           value: '第一期',
-//         },
-//         {
-//           value: '第二期',
-//         },
-//         {
-//           value: '第三期',
-//         },
-//         {
-//           value: '第四期',
-//         },
-//       ],
-//     },
-//     columnArr: [
-//       {
-//         caption: '工作證',
-//         subTotal: '999999',
-//         tax: '999999',
-//         total: '999999',
-//         onDeleteClick: () => {},
-//         arr: [
-//           {
-//             value: '999',
-//           },
-//           {
-//             value: '999',
-//           },
-//           {
-//             value: '999',
-//           },
-//           {
-//             value: '999',
-//           },
-//         ],
-//       },
-//       {
-//         caption: '安衛費',
-//         subTotal: '999999',
-//         tax: '999999',
-//         total: '999999',
-//         arr: [
-//           {
-//             value: '999',
-//           },
-//           {
-//             value: '999',
-//           },
-//           {
-//             value: '999',
-//           },
-//           {
-//             value: '999',
-//           },
-//         ],
-//       },
-//     ],
-//   };
-
-//   return control_deductionDetails;
-// }, [deductionList]);
