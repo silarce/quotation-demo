@@ -767,12 +767,7 @@ export default function AccountReceivable() {
 
   return (
     <SubLayer>
-      <PageHeader
-        //
-        panelList={panelList}
-        // contractNumber={engineeringContact?.contractNumber ?? ''}
-        contractNumber={'foo'}
-      />
+      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
       <div className={scss.main}>
         <Profile control={control_profile} />
 
