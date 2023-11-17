@@ -58,6 +58,23 @@
       border-bottom: none;
     }
   }
+
+  .headCell {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke: theme("colors.main");
+      &:hover {
+        stroke: red;
+      }
+    }
+  }
+
   .totalCell {
     input {
       color: theme("colors.main");

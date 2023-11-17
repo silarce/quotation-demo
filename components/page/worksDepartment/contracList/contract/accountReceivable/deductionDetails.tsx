@@ -2,6 +2,10 @@ import classNames from 'classnames';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
+// icon
+import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 import scss from './deductionDetails.module.scss';
 
@@ -17,24 +21,29 @@ type TcontrolColumn = {
   subTotal: string;
   tax: string;
   total: string;
+  onDeleteClick?: () => void;
 };
 
 type Tcontrol = {
   sideColumn: TcontrolColumn;
   columnArr: TcontrolColumn[];
+  onTopBtnClick: () => void;
 };
 
 export type { Tcontrol as Tcontrol_deductionDetails };
 
 // ============================================================================
 export default function DeductionDetails({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
-  const { sideColumn, columnArr } = control;
+  const { sideColumn, columnArr, onTopBtnClick } = control;
 
   return (
     <div className={scss.container}>
       <div className={scss.wrapper}>
         <div className={scss.top}>
           <span>扣款明細</span>
+          <div>
+            <MyButton_v2 label="新增項目" px="px22" onClick={onTopBtnClick} />
+          </div>
         </div>
         <div className={scss.table}>
           {/*  */}
@@ -69,12 +78,13 @@ const Column = ({
   disabled?: boolean;
   inputType?: 'number';
 }) => {
-  const { caption, arr, subTotal, tax, total } = controlColumn;
+  const { caption, arr, subTotal, tax, total, onDeleteClick } = controlColumn;
 
   return (
     <div className={scss.column}>
-      <div>
+      <div className={scss.headCell}>
         <span>{caption}</span>
+        {onDeleteClick && <IconRemoveCircle onClick={onDeleteClick} />}
       </div>
       {/*  */}
       {arr.map((item, index) => {
