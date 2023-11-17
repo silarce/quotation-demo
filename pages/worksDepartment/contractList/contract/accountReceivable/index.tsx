@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -34,8 +34,11 @@ import {
   apiPatchEngineeringContact,
   apiPostWorkSheet,
 } from 'js/api/api_engineering';
-
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { TaccountantDto } from 'js/api/api_accountant';
+
+// utils
+import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
@@ -101,6 +104,8 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // --------------------------------------------------------------------------
+
   const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
 
   useEffect(() => {
@@ -120,6 +125,16 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const [accountantArr, setAccountantArr] = useState<TaccountantDto[]>([]);
+
+  const addAccountant = (newArr: TaccountantDto[]) => {
+    setAccountantArr((arr) => {
+      return [...arr, ...newArr];
+    });
+  };
+
+  // --------------------------------------------------------------------------
+
   const [checkBar01, setCheckBar01] = useState<string[]>([]);
   const [checkBar02, setCheckBar02] = useState<string[]>([]);
 
@@ -128,6 +143,7 @@ export default function AccountReceivable() {
   const [isShowInvoicePrefixModal, setIsShowInvoicePrefixModal] = useState<boolean>(false);
   const [invoicePrefix, setInvoicePrefix] = useState<string>('');
 
+  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {
     // left
@@ -481,67 +497,34 @@ export default function AccountReceivable() {
   };
 
   // --------------------------------------------------------------------------
-  const control_paymentRecord: Tcontrol_dynaTable = {
-    caption: '收款紀錄',
-    topRightBtnProps: {
-      label: '新增收款紀錄',
-      onClick: () => {
-        setShowRecordModal(true);
-      },
-    },
-    bottomBarProps: {
-      label: '合計',
-      value: '123,123',
-    },
-    headRow: {
-      panelCell_02: {},
-      list: {
-        date: {
-          label: '日期',
-          cellStyle: { width: '120px' },
-        },
-        account: {
-          label: '帳號',
-          cellStyle: { width: '189px' },
-        },
-        chequeNumber: {
-          label: '票據號碼',
-          cellStyle: { width: '189px' },
-        },
-        chequeDate: {
-          label: '票據日期',
-          cellStyle: { width: '100px' },
-        },
-        price: {
-          label: '金額',
-          cellStyle: { width: '170px' },
-        },
-        incomingSubpoenaSerialNumber: {
-          label: '收入傳票序號',
-          cellStyle: { width: '187px' },
-        },
-        //
-      },
-    },
-    rowArr: [
-      {
+
+  // accountantArr
+
+  const control_paymentRecord = useMemo(() => {
+    //
+    let priceTotal = 0;
+
+    const control_paymentRecord_rowArr: Tcontrol_dynaTable['rowArr'] = accountantArr.map((item, index) => {
+      priceTotal = priceTotal + item.price;
+
+      const control: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_02: {
           onDeleteClick: () => {
-            alert('test');
+            setAccountantArr((arr) => {
+              const newArr = [...arr];
+              newArr.splice(index, 1);
+
+              return newArr;
+            });
           },
         },
         list: {
           date: {
             label: '日期',
             cellStyle: { width: '120px' },
-            // inputProps: {
-            //   props: {
-            //     value: '',
-            //   },
-            // },
-            datePickerProps: {
+            inputProps: {
               props: {
-                value: undefined,
+                value: 'no property',
               },
             },
           },
@@ -550,7 +533,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: 'XXXXXX',
+                value: item.accountingNumber,
               },
             },
           },
@@ -559,7 +542,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: 'XXXXXX',
+                value: 'no property',
               },
             },
           },
@@ -568,7 +551,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '100px' },
             inputProps: {
               props: {
-                value: '111-11-11',
+                value: getTaiwanDateStr(item.noteMaturityDate) ?? '',
               },
             },
           },
@@ -577,7 +560,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '170px' },
             inputProps: {
               props: {
-                value: '999,999',
+                value: item.price,
               },
             },
           },
@@ -586,14 +569,63 @@ export default function AccountReceivable() {
             cellStyle: { width: '187px' },
             inputProps: {
               props: {
-                value: '1110304001',
+                value: 'no property',
               },
             },
           },
-        }, // list close
+        },
+      };
+
+      return control;
+    });
+
+    const control_paymentRecord: Tcontrol_dynaTable = {
+      caption: '收款紀錄',
+      topRightBtnProps: {
+        label: '新增收款紀錄',
+        onClick: () => {
+          setShowRecordModal(true);
+        },
       },
-    ],
-  };
+      bottomBarProps: {
+        label: '合計',
+        value: priceTotal.toLocaleString(),
+      },
+      headRow: {
+        panelCell_02: {},
+        list: {
+          date: {
+            label: '日期',
+            cellStyle: { width: '120px' },
+          },
+          account: {
+            label: '帳號',
+            cellStyle: { width: '189px' },
+          },
+          chequeNumber: {
+            label: '票據號碼',
+            cellStyle: { width: '189px' },
+          },
+          chequeDate: {
+            label: '票據日期',
+            cellStyle: { width: '100px' },
+          },
+          price: {
+            label: '金額',
+            cellStyle: { width: '170px' },
+          },
+          incomingSubpoenaSerialNumber: {
+            label: '收入傳票序號',
+            cellStyle: { width: '187px' },
+          },
+          //
+        },
+      },
+      rowArr: control_paymentRecord_rowArr,
+    };
+
+    return control_paymentRecord;
+  }, [accountantArr]);
 
   // --------------------------------------------------------------------------
 
@@ -729,12 +761,11 @@ export default function AccountReceivable() {
         label="請選擇收款紀錄"
         tip="可複選"
         showModal={showRecordModal}
-        onConfirm={(v) => {
-          console.log(v);
-        }}
+        onConfirm={addAccountant}
         onCancel={() => {
           setShowRecordModal(false);
         }}
+        exceptAccountantArr={accountantArr}
       />
     </SubLayer>
   );
