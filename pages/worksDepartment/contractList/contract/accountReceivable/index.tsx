@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
 import Decimal from 'decimal.js';
+import { nanoid } from 'nanoid';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -64,6 +65,7 @@ type Tinvoice = {
 
 type Tdeduction = {
   id?: string;
+  key: string;
   itemName: string;
   period: number;
   detailedAmount: string;
@@ -155,6 +157,17 @@ export default function AccountReceivable() {
 
   const [deductionList, setDeductionList] = useState<TdeductionList>();
   const [deductionItemNameArr, setDeductionItemNameArr] = useState<string[]>([]);
+
+  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: Tdeduction }>({});
+
+  const recordChangedDeduction = (data: Tdeduction) => {
+    setChangedDeduction((list) => {
+      return {
+        ...list,
+        [data.key]: data,
+      };
+    });
+  };
 
   const { periodQty, periodArr, itemNameArr, sortedDeductionList } = useMemo(() => {
     return createDeductionList(fakeAccountsReceivableDeduction);
@@ -666,7 +679,7 @@ export default function AccountReceivable() {
       let subTotal = 0;
 
       const arr = periodArr.map((period) => {
-        const deduction = deductionList?.[itemName][period];
+        const deduction = deductionList?.[itemName]?.[period];
 
         const detailedAmount = deduction?.detailedAmount ?? '';
 
@@ -678,8 +691,13 @@ export default function AccountReceivable() {
             setDeductionList((obj) => {
               const newObj = { ...obj };
 
-              if (!newObj[itemName][period]) {
+              if (!newObj[itemName]) {
+                newObj[itemName] = {};
+              }
+
+              if (!newObj[itemName]?.[period]) {
                 newObj[itemName][period] = {
+                  key: nanoid(),
                   itemName,
                   period: Number(period),
                   detailedAmount: '',
@@ -687,6 +705,7 @@ export default function AccountReceivable() {
               }
 
               newObj[itemName][period].detailedAmount = str;
+              recordChangedDeduction(newObj[itemName][period]);
 
               return newObj;
             });
@@ -700,6 +719,11 @@ export default function AccountReceivable() {
 
       const column: Tcontrol_deductionDetails['columnArr'][number] = {
         caption: itemName,
+        onChange: (str) => {
+          // setDeductionItemNameArr((arr) => {
+          //   arr[itemNameIndex] = str;
+          // });
+        },
         subTotal: subTotal.toLocaleString(),
         tax: tax.toLocaleString(),
         total: (subTotal + tax).toLocaleString(),
@@ -719,8 +743,9 @@ export default function AccountReceivable() {
 
     const control_deductionDetails: Tcontrol_deductionDetails = {
       onTopBtnClick: () => {
-        alert('test');
-        // setDeductionItemNameArr
+        setDeductionItemNameArr((arr) => {
+          return [...arr, 'new'];
+        });
       },
       sideColumn: {
         caption: '項目',
@@ -802,6 +827,7 @@ export default function AccountReceivable() {
         }}
         onCancel={() => setIsShowInvoicePrefixModal(false)}
       />
+
       <PaymentRecordSelector
         label="請選擇收款紀錄"
         tip="可複選"
@@ -934,6 +960,7 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
 
     list[itemName][`${period}`] = {
       id: id,
+      key: id,
       itemName,
       period,
       detailedAmount: String(item.detailedAmount),
