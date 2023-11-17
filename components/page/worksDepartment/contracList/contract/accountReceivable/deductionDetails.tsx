@@ -84,7 +84,7 @@ const Column = ({
     <div className={scss.column}>
       <div className={scss.headCell}>
         <span>{caption}</span>
-        {onDeleteClick && <IconRemoveCircle onClick={onDeleteClick} />}
+        {onDeleteClick && !disabled && <IconRemoveCircle onClick={onDeleteClick} />}
       </div>
       {/*  */}
       {arr.map((item, index) => {
