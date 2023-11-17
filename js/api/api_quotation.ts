@@ -478,6 +478,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'content.products.items.accessories',
       // 'content.products.items.components',
       'content.others',
+      'content.verifyForm',
 
       // 'rootContract.content.customer',
       // 'rootContract.content.agentEmployee',
