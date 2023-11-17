@@ -65,7 +65,7 @@ export default function AccessorySelector({
   const [selAcceArr, setSelAcceArr] = useState<TdoorAccessoryDto[]>([]);
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
-
+  console.log(searchValue);
   //
 
   useEffect(() => {
@@ -134,27 +134,16 @@ export default function AccessorySelector({
     setSearchValue(v);
   };
 
-  // const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
-  //   {
-  //     selectProps: {
-  //       wrapperStyle: { width: '120px' },
-  //       props: {
-  //         options: optionArr,
-  //         placeholder: '選擇部門',
-  //         menuPortalTarget: undefined,
-  //         isLoading: !departmentData,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     inputProps: {
-  //       wrapperStyle: { width: '160px' },
-  //       props: {
-  //         placeholder: '搜尋關鍵字',
-  //       },
-  //     },
-  //   },
-  // ];
+  const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
+    {
+      inputProps: {
+        wrapperStyle: { width: '160px' },
+        props: {
+          placeholder: '搜尋關鍵字',
+        },
+      },
+    },
+  ];
 
   // ==================================================
 
@@ -169,10 +158,10 @@ export default function AccessorySelector({
       width={'950px'}
       className={classNames(scss.container)}
       tip={tip}
-      // searcbBarProps={{
-      //   inputSelPropsArr: inputSelPropsArr,
-      //   onClick: onSearch,
-      // }}
+      searcbBarProps={{
+        inputSelPropsArr: inputSelPropsArr,
+        onClick: onSearch,
+      }}
     >
       <LoadingCoverWrapper01 isLoading={false}>
         <div className={classNames(scss.listContainer)}>
@@ -193,6 +182,7 @@ export default function AccessorySelector({
             exceptAcceArr={exceptAcceArr}
             onClick={onClick}
             exceptAcceCheck={exceptEmpCheck}
+            filterKeyWord={searchValue[0]}
           />
           {/*  */}
         </div>
@@ -210,6 +200,7 @@ const RowArr = ({
   exceptAcceArr,
   onClick,
   exceptAcceCheck,
+  filterKeyWord,
 }: {
   acceArr: TdoorAccessoryDto[];
   selAcceArr: TdoorAccessoryDto[];
@@ -218,6 +209,7 @@ const RowArr = ({
   exceptAcceArr?: { id: string }[];
   viewRef_bottom?: (node?: Element | null | undefined) => void;
   exceptAcceCheck: ((emp: TdoorAccessoryDto) => boolean) | undefined;
+  filterKeyWord?: string;
 }) => {
   return (
     <>
@@ -231,6 +223,31 @@ const RowArr = ({
 
         //   return undefined;
         // })();
+
+        let isPass = true;
+
+        if (filterKeyWord) {
+          let pass = false;
+
+          // name.includes(filterKeyWord) ? (isPass = true) : (isPass = false);
+          if (name.includes(filterKeyWord)) {
+            pass = true;
+          }
+
+          if (doorModelName === filterKeyWord) {
+            pass = true;
+          }
+
+          if (String(price) === filterKeyWord) {
+            pass = true;
+          }
+
+          isPass = pass;
+        }
+
+        if (!isPass) {
+          return null;
+        }
 
         const isActive = selAcceArr.some((selAcce) => selAcce.id === acce.id);
         let isExcept = exceptAcceArr?.some((exceptAcce) => exceptAcce.id === acce.id);
