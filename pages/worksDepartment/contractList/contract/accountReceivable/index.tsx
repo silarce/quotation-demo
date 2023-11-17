@@ -403,7 +403,7 @@ export default function AccountReceivable() {
       list: {
         date: {
           label: '日期',
-          cellStyle: { width: '100px' },
+          cellStyle: { width: '120px' },
         },
         invoiceNumber: {
           label: '發票號碼',
@@ -498,7 +498,7 @@ export default function AccountReceivable() {
       list: {
         date: {
           label: '日期',
-          cellStyle: { width: '100px' },
+          cellStyle: { width: '120px' },
         },
         account: {
           label: '帳號',
