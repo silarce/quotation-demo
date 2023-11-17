@@ -159,14 +159,16 @@ export default function AccountReceivable() {
   // deductionDetails
 
   const [deductionList, setDeductionList] = useState<TdeductionList>({});
+  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
 
-  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: Tdeduction }>({});
-
-  const recordChangedDeduction = (data: Tdeduction) => {
-    setChangedDeduction((list) => {
+  const recordChangedDeduction = (data: Tdeduction, pKey: string) => {
+    setChangedDeduction((state) => {
       return {
-        ...list,
-        [data.key]: data,
+        ...state,
+        [pKey]: {
+          ...state[pKey],
+          [data.key]: data,
+        },
       };
     });
   };
@@ -711,7 +713,7 @@ export default function AccountReceivable() {
               }
 
               newObj[pKey].list[period].detailedAmount = str;
-              recordChangedDeduction(newObj[pKey].list[period]);
+              recordChangedDeduction(newObj[pKey].list[period], pKey);
 
               return newObj;
             });
@@ -720,42 +722,6 @@ export default function AccountReceivable() {
 
         return controlItem;
       });
-      // const arr = periodArr.map((period) => {
-      //   const deduction = deductionList?.[itemName]?.[period];
-
-      //   const detailedAmount = deduction?.detailedAmount ?? '';
-
-      //   subTotal = subTotal + Number(detailedAmount || '0');
-
-      //   const controlItem: Tcontrol_deductionDetails['columnArr'][number]['arr'][number] = {
-      //     value: detailedAmount,
-      //     onChange: (str) => {
-      //       setDeductionList((obj) => {
-      //         const newObj = { ...obj };
-
-      //         if (!newObj[itemName]) {
-      //           newObj[itemName] = {};
-      //         }
-
-      //         if (!newObj[itemName]?.[period]) {
-      //           newObj[itemName][period] = {
-      //             key: nanoid(),
-      //             itemName,
-      //             period: Number(period),
-      //             detailedAmount: '',
-      //           };
-      //         }
-
-      //         newObj[itemName][period].detailedAmount = str;
-      //         recordChangedDeduction(newObj[itemName][period]);
-
-      //         return newObj;
-      //       });
-      //     },
-      //   };
-
-      //   return controlItem;
-      // });
 
       const tax = new Decimal(subTotal).mul(0.05).toNumber();
 
@@ -781,6 +747,12 @@ export default function AccountReceivable() {
         total: (subTotal + tax).toLocaleString(),
         onDeleteClick: () => {
           setDeductionList((obj) => {
+            const newObj = { ...obj };
+            delete newObj[pKey];
+
+            return newObj;
+          });
+          setChangedDeduction((obj) => {
             const newObj = { ...obj };
             delete newObj[pKey];
 
