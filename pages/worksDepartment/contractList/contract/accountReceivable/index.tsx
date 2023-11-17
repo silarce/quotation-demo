@@ -36,6 +36,7 @@ import {
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
+import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // utils
 import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -125,6 +126,7 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // 收款明細
   const [accountantArr, setAccountantArr] = useState<TaccountantDto[]>([]);
 
   const addAccountant = (newArr: TaccountantDto[]) => {
@@ -132,6 +134,10 @@ export default function AccountReceivable() {
       return [...arr, ...newArr];
     });
   };
+
+  // --------------------------------------------------------------------------
+
+  // deductionDetails
 
   // --------------------------------------------------------------------------
 
@@ -818,3 +824,104 @@ const fakeInvoiceArr: Tinvoice[] = [
     remark: 'bbbbb',
   },
 ];
+
+const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
+  {
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '工作證',
+    period: 1,
+    detailedAmount: 999,
+    accountsReceivableId: '',
+  },
+  {
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '工作證',
+    period: 2,
+    detailedAmount: 111,
+    accountsReceivableId: '',
+  },
+  {
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '工作證',
+    period: 3,
+    detailedAmount: 333,
+    accountsReceivableId: '',
+  },
+  {
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '安衛費',
+    period: 1,
+    detailedAmount: 11,
+    accountsReceivableId: '',
+  },
+  {
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '安衛費',
+    period: 3,
+    detailedAmount: 322,
+    accountsReceivableId: '',
+  },
+];
+
+type Tdeduction = {
+  id?: string;
+  itemName: string;
+  period: number;
+  detailedAmount: string;
+};
+
+type TdeductionList = {
+  [key: string]: {
+    [key: `${number}`]: Tdeduction;
+  };
+};
+
+const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
+  let periodQty = 0;
+  const itemNameArr: string[] = [];
+  const list: TdeductionList = {};
+
+  data.forEach((item) => {
+    const { id, itemName, period } = item;
+
+    if (!itemNameArr.includes(itemName)) {
+      itemNameArr.push(itemName);
+    }
+
+    if (period > periodQty) {
+      periodQty = period;
+    }
+
+    if (!list[itemName]) {
+      list[itemName] = {};
+    }
+
+    list[itemName][`${period}`] = {
+      id: id,
+      itemName,
+      period,
+      detailedAmount: String(item.detailedAmount),
+    };
+
+    //
+  });
+
+  const periodArr = Array.from({ length: periodQty }, (_, i) => String(i + 1));
+
+  return {
+    periodQty,
+    periodArr,
+    itemNameArr,
+    list,
+  };
+};

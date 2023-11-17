@@ -2365,3 +2365,14 @@ export type TaccountantDto = {
 export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {
   noteMaturityDate?: string | null;
 };
+
+export type TaccountsReceivableDeductionDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  itemName: string; // 項目
+  period: number; // 期數
+  detailedAmount: number; // 明細金額
+  accountsReceivableId: string; // 所屬應收帳款Id
+  // accountsReceivable: ; // 所屬應收帳款
+};
