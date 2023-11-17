@@ -71,6 +71,16 @@ export default function PageHeader({
           },
         }
       : null,
+    isShowAccountReceivable
+      ? {
+          label: '合約',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/contractTable`,
+            query,
+          },
+        }
+      : null,
     {
       label: '派工單列表',
       href: {
