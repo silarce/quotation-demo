@@ -18,6 +18,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
   padding: 16px 22px 20px 22px;
   > span {
     color: theme("colors.main");

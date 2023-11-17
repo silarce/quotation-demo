@@ -156,10 +156,11 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  // deductionDetails
+  // deductionDetails 扣款明細
 
   const [deductionList, setDeductionList] = useState<TdeductionList>({});
   const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
+  const [deductionIdWillDeleteArr, setDeductionIdWillDeleteArr] = useState<string[]>([]);
 
   const recordChangedDeduction = (data: Tdeduction, pKey: string) => {
     setChangedDeduction((state) => {
@@ -748,6 +749,10 @@ export default function AccountReceivable() {
         onDeleteClick: () => {
           setDeductionList((obj) => {
             const newObj = { ...obj };
+            const list = newObj[pKey].list;
+            const idArr = Object.values(list).map((item) => item.id);
+            const theIdArr = idArr.filter((id) => id) as string[];
+            setDeductionIdWillDeleteArr((arr) => [...arr, ...theIdArr]);
             delete newObj[pKey];
 
             return newObj;
