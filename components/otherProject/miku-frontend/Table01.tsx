@@ -48,6 +48,7 @@ type Tcontrol = {
     guideRailLength: string;
     guideRailName: string;
     icon: string | undefined;
+    dangerSvg?: string;
   };
   chainCog: {
     sprocketWheelModel: string;
@@ -133,6 +134,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
               label2={guideRail.彎直}
               value={guideRail.guideRailName}
               image={guideRail.icon}
+              dangerSvg={guideRail.dangerSvg}
             />
 
             <C.TableHeader2 title="鏈齒輪" />

@@ -1184,6 +1184,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         await uploadAttachment(res.latestContent.id);
 
+        router.push({
+          query: {
+            ...router.query,
+            status: data_watch.status,
+          },
+        });
+
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
@@ -1192,6 +1199,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         router.push({
           query: {
             id: res.id,
+            // status: data_watch.status,
           },
         });
       }

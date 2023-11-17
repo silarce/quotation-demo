@@ -67,7 +67,10 @@ export default function AttachContract() {
 
     const content_copy = _.cloneDeep(data.content);
 
-    const subContracts = data.subContracts;
+    let subContracts = data.subContracts;
+
+    subContracts = _.sortBy(subContracts, 'version');
+
     const list: { [key: string]: TquotationProductDto } = {};
 
     let subTotal = 0;
@@ -321,6 +324,7 @@ export default function AttachContract() {
         })[];
       })();
 
+      // 追加跟變更
       const attachProdArr = Object.values(attachProdList).map((prod) => {
         return prod.body;
       });
@@ -335,18 +339,6 @@ export default function AttachContract() {
         salesTax: salesTax_calced,
         total: total_calced,
       };
-
-      let hasSurface = true;
-
-      body.products?.forEach((item) => {
-        if (!item.materialSurface) {
-          hasSurface = false;
-        }
-      });
-
-      if (!hasSurface) {
-        return myAlert.warning({ title: '所有主產品必須選擇表面' });
-      }
 
       try {
         await apiQuotationModify(contractId, body);

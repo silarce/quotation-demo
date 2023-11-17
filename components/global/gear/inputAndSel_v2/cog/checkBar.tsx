@@ -20,6 +20,7 @@ export type TcheckBoxInfo = {
 export type TcheckboxProps = {
   wrapperClassName?: string;
   wrapperStyle?: React.CSSProperties;
+  onClick?: (e: React.MouseEvent) => void;
   fontClassName?: string;
   onChange?: (v: string[]) => void;
   isRadio?: boolean;
@@ -33,6 +34,7 @@ export type TcheckboxProps = {
 export default function CheckBar({
   wrapperClassName,
   wrapperStyle,
+  onClick,
   fontClassName,
   isRadio,
   onChange,
@@ -51,6 +53,7 @@ export default function CheckBar({
     arr.map((item) => {
       item.value && keyArr.push(item.key);
     });
+
     onChange?.(keyArr);
   };
 
@@ -82,6 +85,7 @@ export default function CheckBar({
             //但不知道為什麼在Checkbox的onClick呼叫e.stopPropagation()沒有效果
             key={key}
             onClick={(e) => {
+              onClick?.(e);
               e.stopPropagation();
             }}
           >

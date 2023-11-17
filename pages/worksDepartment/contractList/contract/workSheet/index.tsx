@@ -1,7 +1,6 @@
 // 工作表
 
 /*
-
 在報價單主產品
 呼叫get /products/door/available-components
 是為了取得材料配件資料，並顯出來
@@ -38,7 +37,6 @@ options_doorTrackThick
 工作表更新後
 被更新的item會產生adjustedItem這個property
 型別同item，內容是更新後的item
-
 */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -89,7 +87,6 @@ import {
   useGetEngineeringContact,
   useGetWorkSheet,
   apiPatchWorkSheet,
-  apiPostEngineeringDeliveryList,
   apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
@@ -186,9 +183,7 @@ export default function WorkSheet() {
 送給後端時，依照itemIdArr的length產生item，並把id放進去
 
 送給後端時，只可以送有更改過的prod
-用useWorkSheet裡的changedList配合forceUpdate紀錄
-
- */
+用useWorkSheet裡的changedList配合forceUpdate紀錄 */
 
     if (!workSheet?.contractProductItems) {
       return {};
@@ -950,9 +945,9 @@ export default function WorkSheet() {
   const control_detail02: Tcontrol_detail02 = {
     size01: {
       doorType: targetSheet?.doorModelName ?? '',
-      fullWidth: targetSheet?.fullWidth ?? '',
-      淨高: targetSheet?.height ?? '',
-      WG: targetSheet?.WG ?? '',
+      fullWidth: targetSheet?.fullWidth_mm ?? '',
+      淨高: targetSheet?.height_mm ?? '',
+      WG: targetSheet?.WG_mm ?? '',
       gapA: numToStr(targetSheet?.prodSpec?.gapA),
       gapC: numToStr(targetSheet?.prodSpec?.gapC),
       支板尺寸: `${targetSheet?.boxB_mm ?? ''}*${targetSheet?.boxD_mm ?? ''}`,
@@ -979,7 +974,7 @@ export default function WorkSheet() {
     },
     motor: {
       vendor: targetSheet?.motorVendor ?? '',
-      電供: (targetSheet?.motorPhaseVoltage ?? '') + '相',
+      電供: targetSheet?.motorPhaseVoltage ?? '',
       馬力: targetSheet?.horsepower ?? '',
     },
     doorTrack: {
@@ -1075,24 +1070,6 @@ export default function WorkSheet() {
     //
   };
 
-  /**產生出庫單 */
-  const reqPostDeliveryList = async () => {
-    if (!contractId) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await apiPostEngineeringDeliveryList({ contractId });
-      myAlert.success({ title: '產生出庫單成功' });
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '產生出庫單失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // -------------------------------------------------------------------------
 
   const control_optional: Tcontrol_optional = {
@@ -1127,10 +1104,10 @@ export default function WorkSheet() {
             fullHeight: sheet.fullHeight,
           },
           roller: {
-            diameter: sheet.diameter,
-            bearingInnerDiameter: sheet.bearingInnerDiameter,
+            diameter: sheet.diameter ?? '',
+            bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
             bearingName: sheet.prodSpec?.bearingName ?? '',
-            bearingHousingTotalLength: sheet.bearingHousingTotalLength,
+            bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
@@ -1161,9 +1138,9 @@ export default function WorkSheet() {
               : undefined,
           },
           chainCog: {
-            sprocketWheelModel: sheet.sprocketWheelModel,
-            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber,
-            bearingInnerDiameter: sheet.bearingInnerDiameter,
+            sprocketWheelModel: sheet.sprocketWheelModel ?? '',
+            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
+            bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
           },
           base: {
             material: sheet.com_bottomBar_material,
@@ -1181,7 +1158,7 @@ export default function WorkSheet() {
         projectName: profile.projectName,
         projectAddress: profile.allAddress,
         customerName: contract?.content.customer.name ?? '',
-        contactPerson: engineeringContact?.contactInfo[0].contactPerson ?? '',
+        contactPerson: engineeringContact?.contactInfo?.[0].contactPerson ?? '',
         // 開單日
         billingDate: '???-??-??',
         // 出貨日
@@ -1228,11 +1205,6 @@ export default function WorkSheet() {
       type: 'myButton',
       label: '匯出工作表',
       onClick: () => setIsShowPdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '產生出庫單',
-      onClick: reqPostDeliveryList,
     },
     {
       type: 'myButton',

@@ -769,6 +769,7 @@ class Class_product {
     // if (!comList || !this._doorGeneralSpecs || !comList.motor.gearNumber) {
     //   return false;
     // }
+
     if (!comList || !this._doorGeneralSpecs) {
       return false;
     }
@@ -818,10 +819,8 @@ class Class_product {
       } = item.componentInfo;
 
       if (!componentId || !material) {
+        console.log('reqProdGenerateDoorProductBom中斷，componentId或material為空');
         haveNull = true;
-        console.log(
-          '若沒呼叫apiPostProdGenerateDoorProductBom，導致材料配件的資料不齊全，可能是因為材料配件過濾器沒有濾出適合的材料配件'
-        );
       }
 
       generateBomObj_empty[key] = {
@@ -883,11 +882,21 @@ class Class_product {
       this.isLoading = true;
       this.reRender();
 
+      // 預期_availableComponents會更新，在_availableComponents更新前
+      // 不應該呼叫會用到_availableComponents或this.comList的方法
+      // 因此在這邊設為undefined，避免呼叫相關方法
+      // 在下面呼叫this.req_getProdAvailableComponents而更新_availableComponents後
+      // 會使用_availableComponents的方法應該就會被呼叫了(包括建立comList的方法)
+      if (this.shouldCall_pac) {
+        this._availableComponents = undefined;
+        this.comList = undefined;
+      }
+
       if (this.shouldCall_cgs) {
         res1 = await this.req_calcGeneralSpec();
       }
 
-      if (this.shouldCall_cgs) {
+      if (this.shouldCall_pac) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
@@ -1017,13 +1026,13 @@ class Class_product {
 
     const availableComponents = this._availableComponents;
 
-    const slat: Tcomponent | null = filter_slats({
+    let slat: Tcomponent | null = filter_slats({
       //
       dataArr: availableComponents.slats,
       filterParams: { isAntiTyphoon: this.typhoonProtection },
     });
 
-    const bottomBar: Tcomponent | null = filter_bottomBars({
+    let bottomBar: Tcomponent | null = filter_bottomBars({
       dataArr: availableComponents.bottomBars,
       filterParams: {
         isAntiTyphoon: this.typhoonProtection,
@@ -1032,7 +1041,7 @@ class Class_product {
       },
     });
 
-    const guideRail: Tcomponent | null = filter_guideRails({
+    let guideRail: Tcomponent | null = filter_guideRails({
       dataArr: availableComponents.guideRails,
       filterParams: {
         thickness: String(this.doorTrackThick),
@@ -1041,7 +1050,7 @@ class Class_product {
       },
     });
 
-    const motor: Tcomponent | null = filter_motors({
+    let motor: Tcomponent | null = filter_motors({
       dataArr: availableComponents.motors,
       filterParams: {
         horsePower: this.horsepower,
@@ -1055,7 +1064,7 @@ class Class_product {
       },
     });
 
-    const sidePlate: Tcomponent | null = filter_sidePlates({
+    let sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
@@ -1067,14 +1076,14 @@ class Class_product {
       },
     });
 
-    const roller: Tcomponent | null = filter_rollers({
+    let roller: Tcomponent | null = filter_rollers({
       dataArr: availableComponents.rollers,
       filterParams: {
         diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
       },
     });
 
-    const motorAccessories: Tcomponent | null = filter_motorAccessories({
+    let motorAccessories: Tcomponent | null = filter_motorAccessories({
       dataArr: availableComponents.motorAccessories,
       filterParams: {
         /**鍊條排數 */
@@ -1084,7 +1093,7 @@ class Class_product {
       },
     });
 
-    const headBox: Tcomponent | null = filter_headBoxes({
+    let headBox: Tcomponent | null = filter_headBoxes({
       dataArr: availableComponents.headBoxes,
       filterParams: {
         thickness: this.rollUpBoxThick, // 捲箱厚度
@@ -1096,6 +1105,54 @@ class Class_product {
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
     // TODO get /products/door/available-components取得的金額不是正確的金額
     // 正的金額之後會補在 post /products/door/generate-door-product-bom
+
+    slat = _.cloneDeep(slat);
+    roller = _.cloneDeep(roller);
+    headBox = _.cloneDeep(headBox);
+    bottomBar = _.cloneDeep(bottomBar);
+    guideRail = _.cloneDeep(guideRail);
+    motor = _.cloneDeep(motor);
+    motorAccessories = _.cloneDeep(motorAccessories);
+    sidePlate = _.cloneDeep(sidePlate);
+
+    [slat, roller, headBox, bottomBar, guideRail, motor, motorAccessories, sidePlate].forEach((item) => {
+      if (item) {
+        item.componentId = item.id;
+        item.id = '';
+      }
+    });
+
+    if (!slat) {
+      myAlert.info({ title: '沒有符合規格的捲門片' });
+    }
+
+    if (!roller) {
+      myAlert.info({ title: '沒有符合規格的捲軸' });
+    }
+
+    if (!headBox) {
+      myAlert.info({ title: '沒有符合規格的門箱' });
+    }
+
+    if (!bottomBar) {
+      myAlert.info({ title: '沒有符合規格的底座' });
+    }
+
+    if (!guideRail) {
+      myAlert.info({ title: '沒有符合規格的門軌' });
+    }
+
+    if (!motor) {
+      myAlert.info({ title: '沒有符合規格的馬達' });
+    }
+
+    if (!motorAccessories) {
+      myAlert.info({ title: '沒有符合規格的馬達配件' });
+    }
+
+    if (!sidePlate) {
+      myAlert.info({ title: '沒有符合規格的側板' });
+    }
 
     const dataList = {
       slat: slat || creEmptyCom(),
@@ -2305,7 +2362,8 @@ class Class_product {
     await this.getComAndAcce();
 
     const copy = _.cloneDeep(this.body_Tprod);
-    copy.id = undefined;
+    // copy.id = undefined;
+    copy.id = this.id;
     copy.quantity = Number(v);
     copy.dualPrice = new Decimal(copy.quantity).mul(copy.price).toNumber();
     copy.totalPrice = new Decimal(copy.quantity).mul(copy.unitPrice).toNumber();
@@ -2384,7 +2442,9 @@ class Class_product {
   get body() {
     const copy = _.cloneDeep(this._prodData);
 
-    const body: TcreateQuotationProductDto & { id: string | undefined } = {
+    const body: TcreateQuotationProductDto & {
+      id: string | undefined;
+    } = {
       ...copy,
       id: copy.id,
       doorModelName: this.doorType,
@@ -2512,11 +2572,20 @@ class Class_product {
   }
 
   get body_attachDiv() {
-    const body = this.body;
+    // const body = this.body;
     const divQty = Number(this.reduceQty) + this.exchangeQty;
-    body.quantity = body.quantity - divQty;
-    body.dualPrice = new Decimal(body.quantity).mul(body.price).toNumber();
-    body.totalPrice = new Decimal(body.quantity).mul(body.unitPrice).toNumber();
+    const theBody = this.body;
+    const body = {
+      ...this.body,
+      quantity: theBody.quantity - divQty,
+      dualPrice: new Decimal(theBody.quantity).mul(theBody.price).toNumber(),
+      totalPrice: new Decimal(theBody.quantity).mul(theBody.unitPrice).toNumber(),
+      attachedToProductId: this.id,
+    };
+    // body.quantity = body.quantity - divQty;
+    // body.dualPrice = new Decimal(body.quantity).mul(body.price).toNumber();
+    // body.totalPrice = new Decimal(body.quantity).mul(body.unitPrice).toNumber();
+    // body.attachedToProductId = this.id;
 
     return body;
   }

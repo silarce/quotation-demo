@@ -390,7 +390,7 @@ export default function Edit() {
         <div>
           <Profile controll={controll_profile} disabled={disabled} />
           <EditTransfer controll={controll_transfer} disabled={disabled} />
-          <IconEdit exchangeId={exchangeId} />
+          {/* <IconEdit exchangeId={exchangeId} /> */}
           <Signature controll={controll_signature} disabled={disabled} />
         </div>
       </div>

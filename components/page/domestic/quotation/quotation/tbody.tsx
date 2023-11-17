@@ -525,6 +525,7 @@ function DndRow({
 
             if (checkBoxProps?.propsArr[0]) {
               checkBoxProps.propsArr[0].value = !!stateValue as boolean;
+              checkBoxProps.onClick = onRowClick;
 
               checkBoxProps.onChange = (arr) => {
                 (item[key] as boolean) = !!arr[0];

@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import moment from 'moment';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -109,6 +110,37 @@ export default function OutboundOrder() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
+  const contractProdList = useMemo(() => {
+    if (!contract) {
+      return undefined;
+    }
+
+    let subContracts = contract.subContracts;
+
+    subContracts = _.sortBy(subContracts, 'version');
+    // console.log('subContracts', subContracts);
+
+    const list: { [key: string]: TquotationProductDto } = {};
+
+    subContracts.forEach((contract) => {
+      const prodArr = contract.content.products;
+      prodArr.forEach((prod) => {
+        list[prod.rootProductId] = prod;
+      });
+    });
+
+    Object.keys(list).forEach((key) => {
+      const item = list[key];
+
+      if (key !== item.id) {
+        list[item.id] = item;
+        delete list[key];
+      }
+    });
+
+    return list;
+  }, [contract]);
+
   // --------------------------------------------------------------------------
 
   const [notes, setNotes] = useState<string>();
@@ -196,27 +228,28 @@ export default function OutboundOrder() {
       const { productId, adjustedItem, adjustedItemId } = item;
 
       let theItem: typeof item;
-      let theId: string;
+      // 現在只以productId分類，theId用不到了
+      // let theId: string;
 
       if (adjustedItem && adjustedItemId) {
         theItem = adjustedItem;
-        theId = adjustedItemId;
+        // theId = adjustedItemId;
       } else {
         theItem = item;
-        theId = productId;
+        // theId = productId;
       }
 
       theItem.deliveryStatus = item.deliveryStatus;
 
-      if (!myDeleveryList?.[theId]) {
-        myDeleveryList[theId] = {
+      if (!myDeleveryList?.[productId]) {
+        myDeleveryList[productId] = {
           originalItem: item,
           itemName: theItem.itemName,
           itemArr: [],
         };
       }
 
-      myDeleveryList[theId].itemArr.push(theItem);
+      myDeleveryList[productId].itemArr.push(theItem);
     });
 
     return {
@@ -234,29 +267,50 @@ export default function OutboundOrder() {
     setDeliveryStatusWillUpdate({});
   }, [disabled]);
 
+  // console.log('contractProdList', contractProdList);
+  // console.log('myDeleveryList', myDeleveryList);
+  // console.log('---------------------------------------');
+
   // --------------------------------------------------------------------------
 
   const control_orderTable: Tcontrol_orderTable =
-    Object.values(myDeleveryList ?? {}).map((delevery) => {
+    // Object.values(myDeleveryList ?? {}).map((delevery) => {
+    Object.keys(myDeleveryList ?? {}).map((key) => {
+      const delevery = myDeleveryList![key];
+
+      const theOriginalContractContent = contractProdList![key];
+
+      // const originalItem = delevery.originalItem;
       // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
-      const originalItem = delevery.originalItem;
       const firstItem = delevery.itemArr[0];
 
       const firstRow: Tgroup['rowArr'][0] = {
         contractData: {
           project: delevery.itemName,
-          L: String(originalItem.fullWidth),
-          W: String(originalItem.WG),
-          B: String(originalItem.boxB),
+          L: String(theOriginalContractContent.fullWidth),
+          W: String(theOriginalContractContent.WG),
+          B: String(theOriginalContractContent.boxB),
           qty: String(delevery.itemArr.length),
           implementQty: '???',
-          // cai: firstItem.volume,
-          cai: '',
-          totalCai: '0',
-          doorType: originalItem.doorModelName,
-          material: originalItem.materialName,
-          horsepower: originalItem.horsepower,
-          surface: originalItem.materialSurface ?? '',
+          cai: theOriginalContractContent.volume ?? '',
+          totalCai: '???',
+          doorType: theOriginalContractContent.doorModelName,
+          material: theOriginalContractContent.materialName,
+          horsepower: theOriginalContractContent.horsepower,
+          surface: theOriginalContractContent.materialSurface ?? '',
+          // project: delevery.itemName,
+          // L: String(originalItem.fullWidth),
+          // W: String(originalItem.WG),
+          // B: String(originalItem.boxB),
+          // qty: String(delevery.itemArr.length),
+          // implementQty: '???',
+          // // cai: firstItem.volume,
+          // cai: '',
+          // totalCai: '0',
+          // doorType: originalItem.doorModelName,
+          // material: originalItem.materialName,
+          // horsepower: originalItem.horsepower,
+          // surface: originalItem.materialSurface ?? '',
         },
         staticData: {
           project: delevery.itemName,
@@ -342,19 +396,19 @@ export default function OutboundOrder() {
 
         return {
           contractData: {
-            project: delevery.itemName,
-            L: String(originalItem.fullWidth),
-            W: String(originalItem.WG),
-            B: String(originalItem.boxB),
-            qty: String(delevery.itemArr.length),
-            implementQty: '???',
-            // cai: firstItem.volume,
+            // 這裡的東西不需要顯示，所以空字串就好了
+            project: '',
+            L: '',
+            W: '',
+            B: '',
+            qty: '',
+            implementQty: '',
             cai: '',
-            totalCai: '0',
-            doorType: originalItem.doorModelName,
-            material: originalItem.materialName,
-            horsepower: originalItem.horsepower,
-            surface: originalItem.materialSurface ?? '',
+            totalCai: '',
+            doorType: '',
+            material: '',
+            horsepower: '',
+            surface: '',
           },
           staticData: {
             project: delevery.itemName,

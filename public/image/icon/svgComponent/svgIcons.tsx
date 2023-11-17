@@ -251,6 +251,33 @@ export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
+function IconChain(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props);
+
+  return (
+    <svg
+      {...{ ...props, className }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="7"
+      viewBox="0 0 20 7"
+      fill="none"
+    >
+      <path
+        d="M9 2V2C9 1.17157 8.32843 0.5 7.5 0.5H3C1.89543 0.5 1 1.39543 1 2.5V4.5C1 5.60457 1.89543 6.5 3 6.5H7.5C8.32843 6.5 9 5.82843 9 5V5"
+        stroke="#14256A"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11 2V2C11 1.17157 11.6716 0.5 12.5 0.5H17C18.1046 0.5 19 1.39543 19 2.5V4.5C19 5.60457 18.1046 6.5 17 6.5H12.5C11.6716 6.5 11 5.82843 11 5V5"
+        stroke="#14256A"
+        strokeLinecap="round"
+      />
+      <path d="M6 3.5H14" stroke="#14256A" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export {
   IconDelete01, //垃圾桶icon
   IconEdit,
@@ -260,4 +287,5 @@ export {
   IconAddCircle,
   IconRemoveCircle,
   IconRemove02,
+  IconChain,
 };
