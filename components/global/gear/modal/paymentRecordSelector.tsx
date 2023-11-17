@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -15,7 +16,15 @@ import scss from './paymentRecordSelector.module.scss';
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 // api
-import { Tparams, useEmployee_infinite } from 'js/api/api_employee';
+import {
+  Tparams,
+  TaccountantDto,
+  //
+  useGetAccountant,
+} from 'js/api/api_accountant';
+
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // option
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
@@ -27,16 +36,7 @@ const yearOptionArr = optionsCreator_year();
 // ==========================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
-type Trow = {
-  id: string;
-  date: string;
-  recordNumber: string;
-  expiryDate: string;
-  price: string;
-  remark: string;
-};
-
-export type { Trow };
+export type { TaccountantDto };
 
 // ==========================================================================
 export default function PaymentRecordSelector({
@@ -55,7 +55,7 @@ export default function PaymentRecordSelector({
   exceptEmpCheck,
 }: {
   showModal: boolean;
-  onConfirm: (v: Trow[]) => void;
+  onConfirm: (v: TaccountantDto[]) => void;
   onCancel: () => void;
   label?: string;
   tip?: React.ReactNode;
@@ -70,31 +70,59 @@ export default function PaymentRecordSelector({
 }) {
   // const { rwd1023 } = useContext(AppContext);
 
+  const [paymentType, setPaymentType] = useState<string | undefined>();
+  const [year, setYear] = useState<string | undefined>(undefined);
+  const [month, setMonth] = useState<string | undefined>(undefined);
+  // ------------------------------------------------------------------
+
+  const params: Tparams = {
+    filter: {
+      paymentType: { $eq: paymentType || undefined },
+    },
+  };
+
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useGetAccountant({ customParams: params });
+
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
 
-  const [recordType, setRecordType] = useState<string | undefined>();
-  const [year, setYear] = useState<string | undefined>(undefined);
-  const [month, setMonth] = useState<string | undefined>(undefined);
+  const paymentOptions: (
+    | {
+        value: TaccountantDto['paymentType'];
+        label: TaccountantDto['paymentType'];
+      }
+    | {
+        value: '';
+        label: '不拘';
+      }
+  )[] = [
+    {
+      value: '',
+      label: '不拘',
+    },
+    {
+      value: '匯款',
+      label: '匯款',
+    },
+    {
+      value: '票據',
+      label: '票據',
+    },
+    {
+      value: '現金',
+      label: '現金',
+    },
+  ];
 
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
-        value: recordType,
-        options: [
-          {
-            value: '票據',
-            label: '票據',
-          },
-          {
-            value: '現金',
-            label: '現金',
-          },
-        ],
+        value: paymentType,
+        options: paymentOptions,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            setRecordType(option.value);
+            setPaymentType(option.value);
           }
         },
       },
@@ -133,7 +161,7 @@ export default function PaymentRecordSelector({
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
   // 被選的資料
-  const [selDataArr, setSelDataArr] = useState<Trow[]>([]);
+  const [selDataArr, setSelDataArr] = useState<TaccountantDto[]>([]);
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
 
@@ -146,10 +174,10 @@ export default function PaymentRecordSelector({
       return;
     }
 
-    // reset();
+    reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal]);
+  }, [searchValue, paymentType, year, month, showModal]);
 
   useEffect(() => {
     if (!showModal) {
@@ -164,7 +192,7 @@ export default function PaymentRecordSelector({
 
   // ==================================================
 
-  const onClick = (newData: Trow) => {
+  const onClick = (newData: TaccountantDto) => {
     const newArr = [...selDataArr];
 
     if (selLimit === 1) {
@@ -238,7 +266,7 @@ export default function PaymentRecordSelector({
       }}
       otherLeft={otherLeft}
     >
-      <LoadingCoverWrapper01 isLoading={false}>
+      <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={scss.listContainer}>
           <div className={classNames(scss.thead, scss.row)}>
             <div>
@@ -259,28 +287,34 @@ export default function PaymentRecordSelector({
           </div>
           {/*  */}
 
-          {fakeRecordArr.map((item, index) => {
-            const { id, date, recordNumber, expiryDate, price, remark } = item;
+          {dataArr?.map((item, index) => {
+            const { paymentType, accountingNumber, price, notes, noteMaturityDate } = item;
+
+            const theNoteMaturityDate = !noteMaturityDate
+              ? ''
+              : moment(convertDate_reduce1911(noteMaturityDate)).format('yy-MM-DD');
 
             const isActive = selDataArr.some((selData) => selData.id === item.id);
 
+            const ref = index === dataArr.length - 3 ? viewRef_bottom : undefined;
+
             return (
               <CellWithBar key={index} isActive={isActive}>
-                <div className={classNames(scss.row)} onClick={() => onClick(item)}>
+                <div className={classNames(scss.row)} onClick={() => onClick(item)} ref={ref}>
                   <div>
-                    <span>{date}</span>
+                    <span>{'999-99-99'}</span>
                   </div>
                   <div>
-                    <span>{recordNumber}</span>
+                    <span>{accountingNumber}</span>
                   </div>
                   <div>
-                    <span>{expiryDate}</span>
+                    <span>{theNoteMaturityDate}</span>
                   </div>
                   <div>
                     <span>{price}</span>
                   </div>
                   <div>
-                    <span>{remark}</span>
+                    <span>{notes}</span>
                   </div>
                 </div>
               </CellWithBar>
@@ -293,56 +327,56 @@ export default function PaymentRecordSelector({
 }
 // =========================================================
 
-const fakeRecordArr: Trow[] = [
-  {
-    id: '1',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '2',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '3',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '4',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '5',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '6',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-];
+// const fakeRecordArr: Trow[] = [
+//   {
+//     id: '1',
+//     date: '111-11-11',
+//     accountingNumber: '1234567890',
+//     expiryDate: '111-11-11',
+//     price: '9,999,999',
+//     remark: '備註備註',
+//   },
+//   {
+//     id: '2',
+//     date: '111-11-11',
+//     accountingNumber: '1234567890',
+//     expiryDate: '111-11-11',
+//     price: '9,999,999',
+//     remark: '備註備註',
+//   },
+//   {
+//     id: '3',
+//     date: '111-11-11',
+//     accountingNumber: '1234567890',
+//     expiryDate: '111-11-11',
+//     price: '9,999,999',
+//     remark: '備註備註',
+//   },
+//   {
+//     id: '4',
+//     date: '111-11-11',
+//     accountingNumber: '1234567890',
+//     expiryDate: '111-11-11',
+//     price: '9,999,999',
+//     remark: '備註備註',
+//   },
+//   {
+//     id: '5',
+//     date: '111-11-11',
+//     accountingNumber: '1234567890',
+//     expiryDate: '111-11-11',
+//     price: '9,999,999',
+//     remark: '備註備註',
+//   },
+//   {
+//     id: '6',
+//     date: '111-11-11',
+//     accountingNumber: '1234567890',
+//     expiryDate: '111-11-11',
+//     price: '9,999,999',
+//     remark: '備註備註',
+//   },
+// ];
 
 // =========================================================
 
