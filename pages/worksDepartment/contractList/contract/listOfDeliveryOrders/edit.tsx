@@ -11,7 +11,9 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import EditTransfer, {
   Tcontroll as Tcontroll_transfer,
 } from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/editTransfer';
-import IconEdit from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/iconEdit';
+import IconEdit, {
+  UploadFile,
+} from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/iconEdit';
 import Signature, {
   Tcontroll as Tcontroll_signature,
   TemployeeDto,
@@ -31,6 +33,12 @@ import {
   apiPostEngineeringExchange,
   apiPatchEngineeringExchange,
   useGetEngineeringContact,
+} from 'js/api/api_engineering';
+
+import {
+  apiPostEngineeringExchangeAttachments,
+  apiDeleteEngineeringExchangeAttachments,
+  TfileDto,
 } from 'js/api/api_engineering';
 
 // -----------------------------------------------------------
@@ -148,6 +156,14 @@ export default function Edit() {
       return newTransferList;
     });
   };
+
+  // ----------------------------------------------------
+
+  const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
+  const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
+
+  console.log(newImgArr);
+  console.log(delImgIdArr);
 
   // ----------------------------------------------------
 
@@ -299,11 +315,26 @@ export default function Edit() {
     try {
       setIsLoading(true);
 
+      const resId: string | undefined = undefined;
+
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
+
+        await updateAttachments({
+          exchangeId,
+          newImgArr,
+          delImgIdArr,
+        });
+
         update_exchange();
       } else {
         const res = await apiPostEngineeringExchange(body);
+        await updateAttachments({
+          exchangeId: res.id as string,
+          newImgArr,
+          delImgIdArr,
+        });
+
         router.push({
           query: { ...router.query, exchangeId: res.id },
         });
@@ -390,7 +421,17 @@ export default function Edit() {
         <div>
           <Profile controll={controll_profile} disabled={disabled} />
           <EditTransfer controll={controll_transfer} disabled={disabled} />
-          {/* <IconEdit exchangeId={exchangeId} /> */}
+          <IconEdit
+            //
+            disabled={disabled}
+            exchangeId={exchangeId}
+            onAdd={(arr) => {
+              setNewImgArr(arr);
+            }}
+            onDel={(arr) => {
+              setDelImgIdArr(arr);
+            }}
+          />
           <Signature controll={controll_signature} disabled={disabled} />
         </div>
       </div>
@@ -421,3 +462,29 @@ const emptyTransferOri = (): Ttransfer => ({
   goodsQuantity: 1,
   reason: '',
 });
+
+const updateAttachments = async ({
+  //
+  exchangeId,
+  newImgArr,
+  delImgIdArr,
+}: {
+  exchangeId: string;
+  newImgArr?: UploadFile[];
+  delImgIdArr?: string[];
+}) => {
+  if (delImgIdArr) {
+    for (const id of delImgIdArr) {
+      await apiDeleteEngineeringExchangeAttachments(exchangeId, id);
+    }
+  }
+
+  if (newImgArr) {
+    for (const uploadFile of newImgArr) {
+      const file = uploadFile.originFileObj as File;
+      const formData = new FormData();
+      formData.append('file', file);
+      await apiPostEngineeringExchangeAttachments(exchangeId, formData);
+    }
+  }
+};
