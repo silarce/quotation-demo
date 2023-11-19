@@ -42,7 +42,10 @@ export default function PageHeader({
       label: '工程聯絡單',
       href: {
         pathname: `${pathHead}/workContactDoc`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -50,7 +53,10 @@ export default function PageHeader({
       // disabled: true,
       href: {
         pathname: `${pathHead}/workSheet`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -58,7 +64,10 @@ export default function PageHeader({
       // disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     isShowAccountReceivable
@@ -67,7 +76,10 @@ export default function PageHeader({
           disabled: !isShowAccountReceivable,
           href: {
             pathname: `${pathHead}/accountReceivable`,
-            query,
+            query: {
+              contractId,
+              version,
+            },
           },
         }
       : null,
@@ -77,7 +89,10 @@ export default function PageHeader({
           disabled: !isShowAccountReceivable,
           href: {
             pathname: `${pathHead}/contractTable`,
-            query,
+            query: {
+              contractId,
+              version,
+            },
           },
         }
       : null,
@@ -85,14 +100,20 @@ export default function PageHeader({
       label: '派工單列表',
       href: {
         pathname: `${pathHead}/dispatchList`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
       label: '送電備品列表',
       href: {
         pathname: `${pathHead}/powerTransmissionSpareList`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -100,7 +121,10 @@ export default function PageHeader({
       // disabled: true,
       href: {
         pathname: `${pathHead}/listOfDeliveryOrders`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -108,7 +132,10 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/memorandum`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -116,7 +143,10 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/undefined`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -124,7 +154,10 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/undefined`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
   ];
