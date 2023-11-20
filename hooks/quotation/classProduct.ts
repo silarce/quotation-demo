@@ -1868,7 +1868,9 @@ class Class_product {
 
     this._prodData.boxB = v;
 
-    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
+    const fixedV = Number(v).toFixed(2);
+
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[fixedV] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -1880,7 +1882,9 @@ class Class_product {
   set boxB_noCall(v: string) {
     this._prodData.boxB = v;
 
-    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
+    const fixedV = Number(v).toFixed(2);
+
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[fixedV] ?? '';
     this.area = this.calcArea();
     this.reRender();
   }
