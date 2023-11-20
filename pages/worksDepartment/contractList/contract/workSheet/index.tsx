@@ -956,7 +956,7 @@ export default function WorkSheet() {
       捲門全高: targetSheet?.fullHeight ?? '',
     },
     size02: {
-      捲軸尺寸: targetSheet?.diameter ?? '',
+      捲軸尺寸: targetSheet?.diameter ? `${targetSheet.diameter}"` : '',
       軸徑: targetSheet?.bearingInnerDiameter ?? '',
       軸承: targetSheet?.prodSpec?.bearingName ?? '',
       總長: targetSheet?.bearingHousingTotalLength ?? '',
@@ -964,8 +964,8 @@ export default function WorkSheet() {
     },
     rollBox: {
       角鐵數量: '999',
-      捲箱角鐵尺寸: '999',
-      捲箱資訊: '是指一體式捲箱嗎?',
+      捲箱角鐵尺寸: targetSheet?.angleIronSize ?? '',
+      捲箱資訊: targetSheet?.headBoxForm_str ?? '',
     },
     doorPiece: {
       門片材質: targetSheet?.com_slat_material ?? '',
