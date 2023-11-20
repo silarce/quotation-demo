@@ -15,18 +15,8 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import {
-  TupdateEngineeringContactDto,
-  useGetEngineeringContact,
-  apiPatchEngineeringContact,
-  apiPostWorkSheet,
-} from 'js/api/api_engineering';
+import { useGetEngineeringContact } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { TaccountantDto } from 'js/api/api_accountant';
-import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
-
-// utils
-import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
@@ -87,6 +77,8 @@ export default function ContracTable() {
               <Center dataArr={[undefined, undefined, undefined, undefined]} />
               <Right />
             </div>
+
+            {/* row */}
             <div className={scss.row}>
               <Left
                 data={{
@@ -108,6 +100,24 @@ export default function ContracTable() {
               />
             </div>
 
+            <div className={classNames(scss.row, scss.totalRow)}>
+              <Left_total
+                data={{
+                  contractSubTotal: 'foo',
+                  tax: 'foo',
+                  contractTotal: 'foo',
+                }}
+              />
+              <Center_total dataArr={[barrrrrrr, barrrrrrr, barrrrrrr, barrrrrrr]} />
+              <Right_total02
+                data={{
+                  cumulativeTotal: 'foo',
+                  tax: 'foo',
+                  doneTotal: 'foo',
+                }}
+              />
+            </div>
+
             {/*  */}
           </div>
         </div>
@@ -116,6 +126,7 @@ export default function ContracTable() {
   );
 }
 
+// ========================================================================
 const Left = ({
   data = {
     projectNumber: '追加追減',
@@ -221,9 +232,101 @@ const Center = ({
   );
 };
 
+const Left_total = ({
+  data,
+}: {
+  data: {
+    contractSubTotal: string;
+    tax: string;
+    contractTotal: string;
+  };
+}) => {
+  return (
+    <>
+      <div className={'w-[115px]'}></div>
+      <div className={'w-[80px]'}></div>
+      <div className={'w-[110px]'}></div>
+      <div className={'w-[50px]'}></div>
+      <div className={classNames('w-[90px]', scss.totalGrid, scss.labelGrid)}>
+        <span>合約合計</span>
+        <span>營業稅5%</span>
+        <span>合約總計</span>
+      </div>
+      <div className={classNames('w-[90px]', scss.totalGrid)}>
+        <span>{data.contractSubTotal}</span>
+        <span>{data.tax}</span>
+        <span>{data.contractTotal}</span>
+      </div>
+    </>
+  );
+};
+
+const Center_total = ({
+  dataArr,
+}: {
+  dataArr: {
+    doneSubTotal: string;
+    tax: string;
+    periodTotal: string;
+  }[];
+}) => {
+  return (
+    <>
+      {dataArr.map((data, index) => {
+        return (
+          <Fragment key={index}>
+            <div className={classNames('w-[92px] justify-center', scss.totalGrid, scss.labelGrid)}>
+              <span>實作合計</span>
+              <span>營業稅5%</span>
+              <span>本期合計</span>
+            </div>
+            <div className={classNames('w-[120px] justify-center', scss.totalGrid)}>
+              <span>{data.doneSubTotal}</span>
+              <span>{data.tax}</span>
+              <span>{data.periodTotal}</span>
+            </div>
+          </Fragment>
+        );
+      })}
+    </>
+  );
+};
+
+const Right_total02 = ({
+  data,
+}: {
+  data: {
+    cumulativeTotal: string;
+    tax: string;
+    doneTotal: string;
+  };
+}) => {
+  return (
+    <>
+      <div className={classNames('w-[80px] justify-center', scss.totalGrid, scss.labelGrid)}>
+        <span>累計合計</span>
+        <span>營業稅5%</span>
+        <span>實作總計</span>
+      </div>
+      <div className={classNames('w-[110px] justify-center', scss.totalGrid)}>
+        <span>{data.cumulativeTotal}</span>
+        <span>{data.tax}</span>
+        <span>{data.doneTotal}</span>
+      </div>
+      <div className={classNames('w-[86px]', scss.rightCell)}></div>
+    </>
+  );
+};
+
 // ========================================================================
 
 const foooooooo = {
   quantity: 'foo',
   price: 'foo',
+};
+
+const barrrrrrr = {
+  doneSubTotal: 'foo',
+  tax: 'foo',
+  periodTotal: 'foo',
 };
