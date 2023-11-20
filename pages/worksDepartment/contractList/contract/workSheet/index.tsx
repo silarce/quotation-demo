@@ -43,6 +43,7 @@ import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
+import Decimal from 'decimal.js';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
@@ -1311,10 +1312,18 @@ export default function WorkSheet() {
 
               const originalItem = itemTokenList?.[pKey].originalItem;
 
+              let width = originalItem?.fullWidth ?? 0;
+              width = new Decimal(width).div(1000).toNumber();
+
+              let height = originalItem?.height ?? 0;
+              height = new Decimal(height).div(1000).toNumber();
+
               const control: Tcontrol_prodCard = {
                 itemName: originalItem?.itemName ?? '',
                 doorType: originalItem?.doorModelName ?? '',
                 qty: String(qty),
+                width: String(width),
+                height: String(height),
                 onClick: (e) => {
                   setTargetSheetKey([pKey, pKey]);
                 },
@@ -1323,7 +1332,7 @@ export default function WorkSheet() {
 
               return (
                 <div key={pKey}>
-                  <WorkSheetProdCard disabled={disabled} control={control} img={imgIdk} />
+                  <WorkSheetProdCard disabled={disabled} control={control} />
                 </div>
               );
             })}
