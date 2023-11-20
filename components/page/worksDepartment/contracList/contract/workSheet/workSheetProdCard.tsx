@@ -1,6 +1,9 @@
 import classNames from 'classnames';
 
-import Image, { StaticImageData } from 'next/image';
+// gear
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+
+// icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 import scss from './workSheetProdCard.module.scss';
@@ -58,18 +61,16 @@ export default function WorkSheetProdCard({ control, disabled }: { control: Tcon
           const { isOriginal, itemName, qty, onClick, isActive, onDivideClick, onDeleteClick } = item;
 
           return (
-            <div
-              key={index}
-              className={classNames(isOriginal && scss.original, isActive && scss.active)}
-              onClick={onClick}
-            >
-              <span>{itemName}</span>
-              <span>{qty}樘</span>
-              <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
-                分堆
-              </button>
-              <IconDelete01 className={classNames((disabled || isOriginal) && scss.hidden)} onClick={onDeleteClick} />
-            </div>
+            <CellWithBar key={index} isActive={isActive}>
+              <div className={classNames(scss.row)} onClick={onClick}>
+                <span>{itemName}</span>
+                <span>{qty}樘</span>
+                <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
+                  分堆
+                </button>
+                <IconDelete01 className={classNames((disabled || isOriginal) && scss.hidden)} onClick={onDeleteClick} />
+              </div>
+            </CellWithBar>
           );
         })}
       </div>

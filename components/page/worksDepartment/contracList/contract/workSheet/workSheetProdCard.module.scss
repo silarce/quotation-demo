@@ -81,34 +81,38 @@
     }
   }
   .list {
+    // display: grid;
+    // gap: 10px;
+    padding: 5px 0;
     margin-top: 10px;
-    display: grid;
-    gap: 10px;
-    > div {
+    background-color: white;
+    border-top: solid 1px theme("colors.border");
+    .row {
       display: grid;
-      grid-template-columns: auto 30px 30px 20px;
-      gap: 5px;
+      grid-template-columns: auto 30px fit-content(100%) 20px;
+      gap: 10px;
+      padding: 5px;
       > span {
         white-space: pre-wrap;
         word-break: break-all;
       }
       > button {
-        background-color: white;
         height: fit-content;
+        padding: 2px 3px;
+        border: solid 1px theme("colors.main");
+        font-size: 12px;
       }
     }
-    > .active {
-      background-color: #ffeeee;
-    }
-    > .original {
-      background-color: cornflowerblue;
-      > span {
-        color: white;
-      }
-      > svg {
-        color: white;
-      }
-    }
+
+    // > .original {
+    //   background-color: cornflowerblue;
+    //   > span {
+    //     color: white;
+    //   }
+    //   > svg {
+    //     color: white;
+    //   }
+    // }
   }
 }
 
