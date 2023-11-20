@@ -6,7 +6,8 @@ import 'xlsx-js-style';
 
 import Decimal from 'decimal.js';
 
-// const foo = 'foo';
+// import { Tcontrol_table01 } from './Table01';
+import { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
 
 const MaterialOptions = [
   { title: '不鏽鋼304#', value: '0' },
@@ -89,64 +90,65 @@ type Tcontrol_head = {
   shippingDate: string;
 };
 
-type Tcontrol_body = {
-  itemName: string;
-  size: {
-    qty: string;
-    doorModelName: string;
-    fullWidth: string;
-    height: string;
-    WG: string;
-    gapA: string;
-    gapC: string;
-    /**支版尺寸 boxB*boxD */
-    BD: string;
-    /**捲門全高 */
-    fullHeight: string;
-  };
-  roller: {
-    diameter: string;
-    bearingInnerDiameter: string;
-    bearingName: string;
-    bearingHousingTotalLength: string;
-    bearingHousingSize: string;
-  };
-  headBox: {
-    angleIronQty: string;
-    angleIronSize: string;
-    info: string;
-  };
-  doorPiece: {
-    material: string;
-    thickness: string;
-    slatLength: string;
-    slatCount: string;
-    antyTyphoonHook: string;
-  };
-  motor: {
-    vendor: string;
-    /**相數加電壓 */
-    phaseVoltage: string;
-    horsepower: string;
-  };
-  guideRail: {
-    彎直: string;
-    material: string;
-    guideRailLength: string;
-    guideRailName: string;
-    icon: string | undefined;
-  };
-  chainCog: {
-    sprocketWheelModel: string;
-    sprocketWheelTeethNumber: string;
-    bearingInnerDiameter: string;
-  };
-  base: {
-    material: string;
-    guideRailsOpening: string;
-  };
-  memo: string;
-};
+// type Tcontrol_body = {
+//   itemName: string;
+//   size: {
+//     qty: string;
+//     doorModelName: string;
+//     fullWidth: string;
+//     height: string;
+//     WG: string;
+//     gapA: string;
+//     gapC: string;
+//     /**支版尺寸 boxB*boxD */
+//     BD: string;
+//     /**捲門全高 */
+//     fullHeight: string;
+//   };
+//   roller: {
+//     diameter: string;
+//     bearingInnerDiameter: string;
+//     bearingName: string;
+//     bearingHousingTotalLength: string;
+//     bearingHousingSize: string;
+//   };
+//   headBox: {
+//     angleIronQty: string;
+//     angleIronSize: string;
+//     // info: string;
+//     form: string;
+//   };
+//   doorPiece: {
+//     material: string;
+//     thickness: string;
+//     slatLength: string;
+//     slatCount: string;
+//     antyTyphoonHook: string;
+//   };
+//   motor: {
+//     vendor: string;
+//     /**相數加電壓 */
+//     phaseVoltage: string;
+//     horsepower: string;
+//   };
+//   guideRail: {
+//     form: string;
+//     material: string;
+//     guideRailLength: string;
+//     guideRailName: string;
+//     icon: string | undefined;
+//   };
+//   chainCog: {
+//     sprocketWheelModel: string;
+//     sprocketWheelTeethNumber: string;
+//     bearingInnerDiameter: string;
+//   };
+//   base: {
+//     material: string;
+//     guideRailsOpening: string;
+//   };
+//   memo: string;
+// };
 
 type Tcontrol = {
   info: {
@@ -160,7 +162,7 @@ type Tcontrol = {
     // 出貨日期
     shippingDate: string;
   };
-  itemArr: Tcontrol_body[];
+  itemArr: Tcontrol_table01[];
 };
 
 // ====================================================================================================
@@ -193,7 +195,7 @@ function addBody({
   rowBegin,
   init,
 }: {
-  control_body: Tcontrol_body;
+  control_body: Tcontrol_table01;
   index: number;
   rowBegin: number;
   init: boolean;
@@ -284,22 +286,22 @@ function addBody({
   array[rowBegin + 3].push('型號', size.doorModelName, '門片長度', doorPiece.slatLength);
   array[rowBegin + 4].push('全寬', `${size.fullWidth} mm`, xLabel, doorPiece.slatCount);
   array[rowBegin + 5].push('淨高', `${size.height} mm`, '防颱勾', doorPiece.antyTyphoonHook);
-  array[rowBegin + 6].push('重量換算', '???', `電動機(${motor.vendor})`, '');
+  array[rowBegin + 6].push('重量換算', size.weightConversion, `電動機(${motor.vendor})`, '');
   array[rowBegin + 7].push('W+G', `${size.WG} mm`, '電供', motor.phaseVoltage);
   array[rowBegin + 8].push('機械縫 A', `${size.gapA} mm`, '馬力數', motor.horsepower);
   array[rowBegin + 9].push('機械縫 C', `${size.gapC} mm`, '門軌' + guideRail.guideRailName, '');
   array[rowBegin + 10].push('門片厚度', `${doorPiece.thickness} mm`, '門軌材質', guideRail.material);
   array[rowBegin + 11].push('支板尺寸 B*D', size.BD, '門軌長度', guideRail.guideRailLength);
-  array[rowBegin + 12].push('捲門全高 H', `${size.fullHeight} mm`, '門軌形式' + guideRail.彎直, '');
+  array[rowBegin + 12].push('捲門全高 H', `${size.fullHeight} mm`, '門軌形式' + guideRail.form, '');
   array[rowBegin + 13].push('捲軸', '', '', '');
   array[rowBegin + 14].push('捲軸尺寸', roller.diameter, '', '');
   array[rowBegin + 15].push('軸承', roller.bearingName, '', '');
   array[rowBegin + 16].push('總長', roller.bearingHousingTotalLength, '鏈齒輪', '');
   array[rowBegin + 17].push('寸法', roller.bearingHousingSize, '鏈齒輪番號', chainCog.sprocketWheelModel);
-  array[rowBegin + 18].push('捲箱' + '', '', '齒數', '???');
+  array[rowBegin + 18].push('捲箱' + '', '', '齒數', chainCog.teethQuantity);
   array[rowBegin + 19].push('捲箱角鐵數量', headBox.angleIronQty, '孔徑', chainCog.bearingInnerDiameter);
   array[rowBegin + 20].push('捲箱角鐵尺寸', headBox.angleIronSize, '底座' + '', '');
-  array[rowBegin + 21].push('捲箱資訊', headBox.info, '底座材質', base.material);
+  array[rowBegin + 21].push('捲箱資訊', headBox.form, '底座材質', base.material);
   array[rowBegin + 22].push('', '', '底座開口', base.guideRailsOpening);
   array[rowBegin + 23].push('備註', memo);
 }

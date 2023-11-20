@@ -767,6 +767,23 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  // 角鐵尺寸
+  get angleIronSize() {
+    if (!this._prod.gapA) {
+      return '';
+    }
+
+    if (!this._prod.gapC) {
+      return '';
+    }
+
+    if (!this.WG_mm) {
+      return '';
+    }
+
+    return String(Number(this.WG_mm) + Number(this._prod.gapA) + Number(this._prod.gapC) - 10);
+  }
+
   // TODO 正面
   private _com_headBox_front = '無';
   get com_headBox_front() {
@@ -798,6 +815,19 @@ class Class_workSheet {
   set com_headBox_type(str) {
     this._com_headBox_type = str;
     this.forceUpdate();
+  }
+
+  get isIntegratedHeadBox() {
+    return this._prod.isIntegratedHeadBox;
+  }
+
+  set isIntegratedHeadBox(bool) {
+    this._prod.isIntegratedHeadBox = bool;
+    this.forceUpdate();
+  }
+
+  get headBoxForm() {
+    return this._prod.isIntegratedHeadBox ? '方形捲箱' : '捲箱 + 機箱';
   }
 
   // --------------------------------------------------------------
@@ -1032,14 +1062,15 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  // bendStraight
   // TODO 型式
-  private _com_guideRail_type = '';
-  get com_guideRail_type() {
+  private _com_guideRail_bendStraight = '直';
+  get com_guideRail_bendStraight() {
     // return this.comList.guideRail.type;
-    return this._com_guideRail_type;
+    return this._com_guideRail_bendStraight;
   }
-  set com_guideRail_type(str) {
-    this._com_guideRail_type = str;
+  set com_guideRail_bendStraight(str) {
+    this._com_guideRail_bendStraight = str;
     this.forceUpdate();
   }
 

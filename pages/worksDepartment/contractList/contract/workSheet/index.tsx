@@ -913,10 +913,10 @@ export default function WorkSheet() {
         },
       },
       doorTrackType: {
-        value: targetSheet?.com_guideRail_type ?? '',
+        value: targetSheet?.com_guideRail_bendStraight ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_guideRail_type = v;
+            targetSheet.com_guideRail_bendStraight = v;
           }
         },
         forbidden: true,
@@ -1102,21 +1102,24 @@ export default function WorkSheet() {
             BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             /**捲門全高 */
             fullHeight: sheet.fullHeight,
+            weightConversion: '', // 未知 // 重量換算
           },
           roller: {
-            diameter: sheet.diameter ?? '',
+            diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
             bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
             bearingName: sheet.prodSpec?.bearingName ?? '',
             bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
-            angleIronQty: '???',
-            angleIronSize: '???',
-            info: '???',
+            angleIronQty: '', // 未知
+            angleIronSize: sheet.angleIronSize,
+            form: sheet.headBoxForm,
+            surface: '',
           },
           doorPiece: {
             material: sheet.com_slat_material,
+            surface: sheet.com_slat_surface ?? '',
             thickness: sheet.thickness,
             slatLength: numToStr(sheet.prodSpec?.slatLength),
             slatCount: sheet.slatCount,
@@ -1127,24 +1130,36 @@ export default function WorkSheet() {
             /**相數加電壓 */
             phaseVoltage: sheet.motorPhaseVoltage,
             horsepower: sheet.horsepower,
+            direction: '', // 未知
           },
           guideRail: {
-            彎直: '???',
+            form: sheet.isAntiTyphoon ? '防颱' : '一般', // 未知
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
             icon: sheet?.guideRailName
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
+            antiTyphoonHook: '-50', // 未知
+            bendStraight: sheet.com_guideRail_bendStraight, // 未知
           },
           chainCog: {
             sprocketWheelModel: sheet.sprocketWheelModel ?? '',
             sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
             bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
+            teethQuantity: '', // 未知
+            centerDistance: '', // 未知
+            eyesQuantity: '', // 未知
           },
           base: {
             material: sheet.com_bottomBar_material,
             guideRailsOpening: sheet.guideRailsOpening,
+            surface: '', // 未知
+          },
+          sidePlate: {
+            direction: '', // 未知
+            bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
+            smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
           },
           memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
         };
@@ -1160,9 +1175,9 @@ export default function WorkSheet() {
         customerName: contract?.content.customer.name ?? '',
         contactPerson: engineeringContact?.contactInfo?.[0].contactPerson ?? '',
         // 開單日
-        billingDate: '???-??-??',
+        billingDate: '', // 未知
         // 出貨日
-        shippingDate: '???-??-??',
+        shippingDate: '', // 未知
       },
       itemArr: workSheetPDF_01_itemArr,
       // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
@@ -1394,3 +1409,30 @@ const creEmptyProfile = (): Tprofile => ({
   contactNumber: '',
   faxNumber: '',
 });
+
+// ============================================================================
+
+/**
+ *
+ * 一體式捲箱 true === 方形捲箱
+ * false ==="捲箱 + 機箱"
+ *
+ * 方向 數量加方向 2右 6左 8左   這樣
+ * 捲箱的角鐵尺寸為 WG + gapA + gapC - 10
+ *
+ * 門軌的防颱先全部放-50
+ * 捲箱角鐵數量由使用者輸入
+ *
+ *
+ * 電動機與支版的方向是一樣的
+ * 所以記錄在product就好了
+ *
+ *
+ *
+ 根據PDF缺的欄位而需要新增的property
+ 方向 角鐵數量 彎直
+
+ 另外開單日期與出貨日期還不知道要帶入什麼值
+ *
+ *
+ */
