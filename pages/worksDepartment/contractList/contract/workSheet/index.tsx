@@ -615,13 +615,9 @@ export default function WorkSheet() {
     // 捲軸
     reel: {
       size: {
-        value: targetSheet?.com_roller_size ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_roller_size = v;
-          }
-        },
-        forbidden: true,
+        // value: targetSheet?.com_roller_size ?? '',
+        value: targetSheet?.diameter ? `${targetSheet.diameter}"` : '',
+        disabled: true,
       },
       hasConvex: {
         value: targetSheet?.rollerSpec ?? '',
@@ -682,14 +678,25 @@ export default function WorkSheet() {
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
         forbidden: true,
       },
+      // type: {
+      //   value: targetSheet?.com_headBox_type ?? '',
+      //   onChange: (v) => {
+      //     if (targetSheet) {
+      //       targetSheet.com_headBox_type = v;
+      //     }
+      //   },
+      //   // forbidden: true,
+      // },
       type: {
-        value: targetSheet?.com_headBox_type ?? '',
+        value: String(targetSheet?.headBoxForm),
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_headBox_type = v;
+            const bool = v === 'true' ? true : false;
+
+            targetSheet.headBoxForm = bool;
           }
         },
-        forbidden: true,
+        // forbidden: true,
       },
     },
     // ______________________________________________________________
@@ -745,13 +752,8 @@ export default function WorkSheet() {
     // 支板
     support: {
       bearing: {
-        value: targetSheet?.com_sidePlate_bearing ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_sidePlate_bearing = v;
-          }
-        },
-        forbidden: true,
+        value: targetSheet?.prodSpec?.bearingName ?? '',
+        disabled: true,
       },
       chain: {
         value: targetSheet?.com_sidePlate_chain ?? '',
@@ -1114,7 +1116,7 @@ export default function WorkSheet() {
           headBox: {
             angleIronQty: '', // 未知
             angleIronSize: sheet.angleIronSize,
-            form: sheet.headBoxForm,
+            form: sheet.headBoxForm_str,
             surface: '',
           },
           doorPiece: {
@@ -1429,10 +1431,11 @@ const creEmptyProfile = (): Tprofile => ({
  *
  *
  *
- 根據PDF缺的欄位而需要新增的property
- 方向 角鐵數量 彎直
+根據PDF缺的欄位而需要新增的property
+方向 角鐵數量 彎直
 
- 另外開單日期與出貨日期還不知道要帶入什麼值
- *
- *
+另外開單日期與出貨日期還不知道要帶入什麼值
+ 
+馬達荷重怎麼算
+ 
  */

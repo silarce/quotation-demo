@@ -713,14 +713,19 @@ class Class_workSheet {
   // 捲軸
 
   // TODO 尺寸
-  private _com_roller_size = '999';
-  get com_roller_size() {
-    // return this.comList.roller.size;
-    return this._com_roller_size;
-  }
-  set com_roller_size(str) {
-    this._com_roller_size = str;
-    this.forceUpdate();
+  // private _com_roller_size = '999';
+  // get com_roller_size() {
+  //   // return this.comList.roller.size;
+  //   return this._com_roller_size;
+  // }
+  // set com_roller_size(str) {
+  //   this._com_roller_size = str;
+  //   this.forceUpdate();
+  // }
+
+  get diameter() {
+    // return this._prod.diameter;
+    return String(this._prodSpec?.diameter) ?? '';
   }
 
   // private _com_roller_spec = false;
@@ -826,8 +831,17 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  get headBoxForm() {
+  get headBoxForm_str() {
     return this._prod.isIntegratedHeadBox ? '方形捲箱' : '捲箱 + 機箱';
+  }
+
+  get headBoxForm() {
+    return this._prod.isIntegratedHeadBox;
+  }
+
+  set headBoxForm(bool) {
+    this._prod.isIntegratedHeadBox = bool;
+    this.forceUpdate();
   }
 
   // --------------------------------------------------------------
@@ -886,17 +900,6 @@ class Class_workSheet {
   // 支版
   get sidePlateTip() {
     return '馬達荷重(max:500,min:600),馬力數:2Hp';
-  }
-
-  // TODO 軸承
-  private _com_sidePlate_bearing = '9999#';
-  get com_sidePlate_bearing() {
-    // return this.comList.sidePlate.bearing;
-    return this._com_sidePlate_bearing;
-  }
-  set com_sidePlate_bearing(str) {
-    this._com_sidePlate_bearing = str;
-    this.forceUpdate();
   }
 
   // TODO 鍊條
@@ -1064,7 +1067,7 @@ class Class_workSheet {
 
   // bendStraight
   // TODO 型式
-  private _com_guideRail_bendStraight = '直';
+  private _com_guideRail_bendStraight = '';
   get com_guideRail_bendStraight() {
     // return this.comList.guideRail.type;
     return this._com_guideRail_bendStraight;
@@ -1104,9 +1107,10 @@ class Class_workSheet {
   get bearingInnerDiameter() {
     return this._prod.bearingInnerDiameter;
   }
-  get diameter() {
-    return this._prod.diameter;
-  }
+  // get diameter() {
+  //   // return this._prod.diameter;
+  //   return String(this._prodSpec?.diameter) ?? '';
+  // }
   get bearingHousingTotalLength() {
     return this._prod.bearingHousingTotalLength;
   }

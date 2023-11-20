@@ -521,10 +521,14 @@ const configArr_left: Tconfig[] = [
       {
         cKey: 'type',
         module: 'select',
-        label: '捲相型式',
+        label: '捲箱型式',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_reelBoxType,
+        // options: fakeOption_reelBoxType,
+        options: [
+          { value: 'false', label: '捲箱 + 機箱' },
+          { value: 'true', label: '方形捲箱' },
+        ],
         checkBarPropsListCre: undefined,
       },
     ],
