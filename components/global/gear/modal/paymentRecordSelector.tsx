@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -11,11 +12,16 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 // css
 import scss from './paymentRecordSelector.module.scss';
 
-// type
-import { TemployeeDto } from 'js/api/dtoTypes';
-
 // api
-import { Tparams, useEmployee_infinite } from 'js/api/api_employee';
+import {
+  Tparams,
+  TaccountantDto,
+  //
+  useGetAccountant,
+} from 'js/api/api_accountant';
+
+// utils
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // option
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
@@ -27,16 +33,7 @@ const yearOptionArr = optionsCreator_year();
 // ==========================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
-type Trow = {
-  id: string;
-  date: string;
-  recordNumber: string;
-  expiryDate: string;
-  price: string;
-  remark: string;
-};
-
-export type { Trow };
+export type { TaccountantDto };
 
 // ==========================================================================
 export default function PaymentRecordSelector({
@@ -49,13 +46,13 @@ export default function PaymentRecordSelector({
   customParams,
   customFilter,
   customPopulate,
-  defaultEmpArr,
-  exceptEmpArr,
+  defaultAccountantArr,
+  exceptAccountantArr,
   isCancelOnConfirm = true,
-  exceptEmpCheck,
+  exceptAccountantCheck,
 }: {
   showModal: boolean;
-  onConfirm: (v: Trow[]) => void;
+  onConfirm: (v: TaccountantDto[]) => void;
   onCancel: () => void;
   label?: string;
   tip?: React.ReactNode;
@@ -63,38 +60,67 @@ export default function PaymentRecordSelector({
   customParams?: Tparams;
   customFilter?: Tparams['filter'];
   customPopulate?: Tparams['populate'];
-  defaultEmpArr?: TemployeeDto[];
-  exceptEmpArr?: { id: string }[];
+  defaultAccountantArr?: TaccountantDto[];
+  exceptAccountantArr?: { id: string }[];
   isCancelOnConfirm?: boolean;
-  exceptEmpCheck?: (emp: TemployeeDto) => boolean;
+  // exceptAccountantCheck?: (data: TaccountantDto) => boolean;
+  exceptAccountantCheck?: (data: TaccountantDto) => boolean;
 }) {
   // const { rwd1023 } = useContext(AppContext);
 
+  const [paymentType, setPaymentType] = useState<string | undefined>();
+  const [year, setYear] = useState<string | undefined>(undefined);
+  const [month, setMonth] = useState<string | undefined>(undefined);
+  // ------------------------------------------------------------------
+
+  const params: Tparams = {
+    filter: {
+      paymentType: { $eq: paymentType || undefined },
+    },
+  };
+
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useGetAccountant({ customParams: params });
+
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
 
-  const [recordType, setRecordType] = useState<string | undefined>();
-  const [year, setYear] = useState<string | undefined>(undefined);
-  const [month, setMonth] = useState<string | undefined>(undefined);
+  const paymentOptions: (
+    | {
+        value: TaccountantDto['paymentType'];
+        label: TaccountantDto['paymentType'];
+      }
+    | {
+        value: '';
+        label: '不拘';
+      }
+  )[] = [
+    {
+      value: '',
+      label: '不拘',
+    },
+    {
+      value: '匯款',
+      label: '匯款',
+    },
+    {
+      value: '票據',
+      label: '票據',
+    },
+    {
+      value: '現金',
+      label: '現金',
+    },
+  ];
 
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
-        value: recordType,
-        options: [
-          {
-            value: '票據',
-            label: '票據',
-          },
-          {
-            value: '現金',
-            label: '現金',
-          },
-        ],
+        value: paymentType,
+        options: paymentOptions,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            setRecordType(option.value);
+            setPaymentType(option.value);
           }
         },
       },
@@ -133,7 +159,7 @@ export default function PaymentRecordSelector({
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------
   // 被選的資料
-  const [selDataArr, setSelDataArr] = useState<Trow[]>([]);
+  const [selDataArr, setSelDataArr] = useState<TaccountantDto[]>([]);
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
 
@@ -146,10 +172,10 @@ export default function PaymentRecordSelector({
       return;
     }
 
-    // reset();
+    reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, showModal]);
+  }, [searchValue, paymentType, year, month, showModal]);
 
   useEffect(() => {
     if (!showModal) {
@@ -164,7 +190,7 @@ export default function PaymentRecordSelector({
 
   // ==================================================
 
-  const onClick = (newData: Trow) => {
+  const onClick = (newData: TaccountantDto) => {
     const newArr = [...selDataArr];
 
     if (selLimit === 1) {
@@ -238,7 +264,7 @@ export default function PaymentRecordSelector({
       }}
       otherLeft={otherLeft}
     >
-      <LoadingCoverWrapper01 isLoading={false}>
+      <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
         <div className={scss.listContainer}>
           <div className={classNames(scss.thead, scss.row)}>
             <div>
@@ -259,33 +285,24 @@ export default function PaymentRecordSelector({
           </div>
           {/*  */}
 
-          {fakeRecordArr.map((item, index) => {
-            const { id, date, recordNumber, expiryDate, price, remark } = item;
+          <RowArr
+            dataArr={selDataArr}
+            selDataArr={selDataArr}
+            onClick={onClick}
+            // exceptDataArr={exceptAccountantArr}
+            // exceptDataCheck={exceptAccountantCheck}
+          />
 
-            const isActive = selDataArr.some((selData) => selData.id === item.id);
+          {selDataArr.length !== 0 && <div className={scss.divider} />}
 
-            return (
-              <CellWithBar key={index} isActive={isActive}>
-                <div className={classNames(scss.row)} onClick={() => onClick(item)}>
-                  <div>
-                    <span>{date}</span>
-                  </div>
-                  <div>
-                    <span>{recordNumber}</span>
-                  </div>
-                  <div>
-                    <span>{expiryDate}</span>
-                  </div>
-                  <div>
-                    <span>{price}</span>
-                  </div>
-                  <div>
-                    <span>{remark}</span>
-                  </div>
-                </div>
-              </CellWithBar>
-            );
-          })}
+          <RowArr
+            dataArr={dataArr}
+            selDataArr={selDataArr}
+            onClick={onClick}
+            viewRef_bottom={viewRef_bottom}
+            exceptDataArr={exceptAccountantArr}
+            exceptDataCheck={exceptAccountantCheck}
+          />
         </div>
       </LoadingCoverWrapper01>
     </SelectorShell>
@@ -293,115 +310,73 @@ export default function PaymentRecordSelector({
 }
 // =========================================================
 
-const fakeRecordArr: Trow[] = [
-  {
-    id: '1',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '2',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '3',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '4',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '5',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-  {
-    id: '6',
-    date: '111-11-11',
-    recordNumber: '1234567890',
-    expiryDate: '111-11-11',
-    price: '9,999,999',
-    remark: '備註備註',
-  },
-];
-
 // =========================================================
 
-// const RowArr = ({
-//   empArr,
-//   selEmployeeArr,
-//   // skipArr,
-//   viewRef_bottom,
-//   exceptEmpArr,
-//   onClick,
-//   exceptEmpCheck,
-// }: {
-//   empArr: TemployeeDto[];
-//   selEmployeeArr: TemployeeDto[];
-//   // skipArr?: TemployeeDto[];
-//   onClick: (v: TemployeeDto) => void;
-//   exceptEmpArr?: { id: string }[];
-//   viewRef_bottom?: (node?: Element | null | undefined) => void;
-//   exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
-// }) => {
-//   return (
-//     <>
-//       {empArr.map((emp, index, arr) => {
-//         const { idNumber, chName, jobs } = emp;
-//         const { name, grade, department } = jobs?.[0] ?? {};
+const RowArr = ({
+  dataArr: dataArr,
+  selDataArr,
+  // skipArr,
+  viewRef_bottom,
+  exceptDataArr,
+  onClick,
+  exceptDataCheck,
+}: {
+  dataArr: TaccountantDto[];
+  selDataArr: TaccountantDto[];
+  // skipArr?: TemployeeDto[];
+  onClick: (v: TaccountantDto) => void;
+  exceptDataArr?: { id: string }[];
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
+  exceptDataCheck?: ((data: TaccountantDto) => boolean) | undefined;
+}) => {
+  return (
+    <>
+      {dataArr.map((data, index, arr) => {
+        const { paymentType, accountingNumber, price, notes, noteMaturityDate } = data;
 
-//         const theViewRef = (() => {
-//           if (arr.length - 11 === index) {
-//             return viewRef_bottom;
-//           }
+        const theNoteMaturityDate = !noteMaturityDate
+          ? ''
+          : moment(convertDate_reduce1911(noteMaturityDate)).format('yy-MM-DD');
 
-//           return undefined;
-//         })();
+        const ref = index === dataArr.length - 3 ? viewRef_bottom : undefined;
 
-//         const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
-//         let isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+        const isActive = selDataArr.some((selData) => selData.id === data.id);
 
-//         if (!isExcept && exceptEmpCheck) {
-//           isExcept = exceptEmpCheck(emp);
-//         }
-//         // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
+        let isExcept = exceptDataArr?.some((exceptEmp) => exceptEmp.id === data.id);
 
-//         const theOnClick = isExcept ? undefined : () => onClick(emp);
+        if (!isExcept && exceptDataCheck) {
+          isExcept = exceptDataCheck(data);
+        }
+        // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
 
-//         // if (isSkinp) {
-//         //   return <div key={index} className="skip" ref={theViewRef}></div>;
-//         // }
+        const theOnClick = isExcept ? undefined : () => onClick(data);
 
-//         return (
-//           <CellWithBar key={index} isActive={isActive}>
-//             <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={theViewRef}>
-//               <span className={scss.idNumber}>{idNumber}</span>
-//               <span>{chName}</span>
-//               <span>{name ? `${department?.name} / ${name}` : ''}</span>
-//               <span>{grade && `Level ${grade}`}</span>
-//             </div>
-//           </CellWithBar>
-//         );
-//       })}
-//     </>
-//   );
-// };
+        // if (isSkinp) {
+        //   return <div key={index} className="skip" ref={theViewRef}></div>;
+        // }
+
+        return (
+          <CellWithBar key={index} isActive={isActive}>
+            <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={ref}>
+              <div>
+                <span>{'999-99-99'}</span>
+              </div>
+              <div>
+                <span>{accountingNumber}</span>
+              </div>
+              <div>
+                <span>{theNoteMaturityDate}</span>
+              </div>
+              <div>
+                <span>{price}</span>
+              </div>
+              <div>
+                <span>{notes}</span>
+              </div>
+            </div>
+          </CellWithBar>
+        );
+      })}
+    </>
+  );
+};

@@ -45,6 +45,9 @@ export function createUseInfinite<TapiReq extends Treq>({
     const [isLoading, setIsloading] = useState(false);
     const [viewRef_top, inView_top] = useInView();
     const [viewRef_bottom, inView_bottom] = useInView();
+
+    const [isReqFail, setIsReqFail] = useState(false);
+
     // ----------------------------------------------------------------
     const [dataList, setDataList] = useState<{ [key: `${number}`]: TapiReq['data'] }>({});
 
@@ -91,6 +94,7 @@ export function createUseInfinite<TapiReq extends Treq>({
         myAlert.err({ title: errTitle, content: errContent ?? err.message });
 
         console.log(error);
+        setIsReqFail(true);
 
         return null;
       } finally {
@@ -100,7 +104,7 @@ export function createUseInfinite<TapiReq extends Treq>({
     };
 
     const nextPage = () => {
-      if (hasNextPage === false || !page) {
+      if (hasNextPage === false || !page || isReqFail) {
         return;
       }
 
@@ -113,6 +117,7 @@ export function createUseInfinite<TapiReq extends Treq>({
       setPage(undefined);
       setHasNextPage(undefined);
       setResetCount(0);
+      setIsReqFail(false);
     };
 
     const reset = () => {

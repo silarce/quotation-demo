@@ -537,7 +537,7 @@ export const apiPostEngineeringExchange = async (body: TcreateExchgangeDto) => {
   const api = `/engineering/exchange`;
 
   return axi
-    .post(api, body)
+    .post<TexchangeDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

@@ -17,7 +17,7 @@ type TmyBtn = {
   label?: string;
   img?: string;
   preImg?: keyof typeof preImgList;
-  px?: 'px22' | 'px44' | 'px2227';
+  px?: 'px22' | 'px32' | 'px44' | 'px2227';
   theme?: 'danger' | 'transparent' | undefined;
   // https://4x.ant.design/components/button-cn/#
   onClick?: MouseEventHandler<HTMLElement> | undefined;

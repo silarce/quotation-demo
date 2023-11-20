@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
+import Decimal from 'decimal.js';
+import { nanoid } from 'nanoid';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -34,8 +36,12 @@ import {
   apiPatchEngineeringContact,
   apiPostWorkSheet,
 } from 'js/api/api_engineering';
-
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { TaccountantDto } from 'js/api/api_accountant';
+import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
+
+// utils
+import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
@@ -55,6 +61,23 @@ type Tinvoice = {
   invoiceNumber: string;
   price: string;
   remark: string;
+};
+
+type Tdeduction = {
+  id?: string;
+  key: string;
+  itemName: string;
+  period: number;
+  detailedAmount: string;
+};
+
+type TdeductionList = {
+  [key: string]: {
+    itemName: string;
+    list: {
+      [key: string]: Tdeduction;
+    };
+  };
 };
 
 // ========================================================================
@@ -101,6 +124,8 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // --------------------------------------------------------------------------
+
   const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
 
   useEffect(() => {
@@ -120,6 +145,45 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // 收款明細
+  const [accountantArr, setAccountantArr] = useState<TaccountantDto[]>([]);
+
+  const addAccountant = (newArr: TaccountantDto[]) => {
+    setAccountantArr((arr) => {
+      return [...arr, ...newArr];
+    });
+  };
+
+  // --------------------------------------------------------------------------
+
+  // deductionDetails 扣款明細
+
+  const [deductionList, setDeductionList] = useState<TdeductionList>({});
+  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
+  const [deductionIdWillDeleteArr, setDeductionIdWillDeleteArr] = useState<string[]>([]);
+
+  const recordChangedDeduction = (data: Tdeduction, pKey: string) => {
+    setChangedDeduction((state) => {
+      return {
+        ...state,
+        [pKey]: {
+          ...state[pKey],
+          [data.key]: data,
+        },
+      };
+    });
+  };
+
+  const { periodQty, periodArr, itemNameArr, sortedDeductionList } = useMemo(() => {
+    return createDeductionList(fakeAccountsReceivableDeduction);
+  }, [fakeAccountsReceivableDeduction]);
+
+  useEffect(() => {
+    setDeductionList(sortedDeductionList);
+  }, [sortedDeductionList]);
+
+  // --------------------------------------------------------------------------
+
   const [checkBar01, setCheckBar01] = useState<string[]>([]);
   const [checkBar02, setCheckBar02] = useState<string[]>([]);
 
@@ -128,6 +192,7 @@ export default function AccountReceivable() {
   const [isShowInvoicePrefixModal, setIsShowInvoicePrefixModal] = useState<boolean>(false);
   const [invoicePrefix, setInvoicePrefix] = useState<string>('');
 
+  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   const control_profile: Tcontrol_profile = {
     // left
@@ -403,7 +468,7 @@ export default function AccountReceivable() {
       list: {
         date: {
           label: '日期',
-          cellStyle: { width: '100px' },
+          cellStyle: { width: '120px' },
         },
         invoiceNumber: {
           label: '發票號碼',
@@ -420,128 +485,36 @@ export default function AccountReceivable() {
       },
     },
     rowArr: control_invoiceGivingRecord_rowArr,
-
-    // rowArr: [
-    //   {
-    //     panelCell_01: {
-    //       onDeleteClick: () => {
-    //         alert('test');
-    //       },
-    //       onChainClick: () => {
-    //         alert('test');
-    //       },
-    //     },
-    //     list: {
-    //       date: {
-    //         label: '日期',
-    //         cellStyle: { width: '100px' },
-    //         inputProps: {
-    //           props: {
-    //             value: '111-11-11',
-    //           },
-    //         },
-    //       },
-    //       invoiceNumber: {
-    //         label: '發票號碼',
-    //         cellStyle: { width: '300px' },
-    //         twoInputProps: {
-    //           one: {
-    //             props: {
-    //               value: '12345678',
-    //             },
-    //           },
-    //           two: {
-    //             props: {
-    //               value: '999',
-    //             },
-    //           },
-    //         },
-    //       },
-    //       price: {
-    //         label: '金額',
-    //         cellStyle: { width: '290px' },
-    //         inputProps: {
-    //           props: {
-    //             value: 'aaa',
-    //           },
-    //         },
-    //       },
-    //       remark: {
-    //         label: '備註',
-    //         cellStyle: { width: '300px' },
-    //         inputProps: {
-    //           props: {
-    //             value: 'aaa',
-    //           },
-    //         },
-    //       },
-    //     }, // list close
-    //   },
-    // ],
   };
 
   // --------------------------------------------------------------------------
-  const control_paymentRecord: Tcontrol_dynaTable = {
-    caption: '收款紀錄',
-    topRightBtnProps: {
-      label: '新增收款紀錄',
-      onClick: () => {
-        setShowRecordModal(true);
-      },
-    },
-    bottomBarProps: {
-      label: '合計',
-      value: '123,123',
-    },
-    headRow: {
-      panelCell_02: {},
-      list: {
-        date: {
-          label: '日期',
-          cellStyle: { width: '100px' },
-        },
-        account: {
-          label: '帳號',
-          cellStyle: { width: '189px' },
-        },
-        chequeNumber: {
-          label: '票據號碼',
-          cellStyle: { width: '189px' },
-        },
-        chequeDate: {
-          label: '票據日期',
-          cellStyle: { width: '100px' },
-        },
-        price: {
-          label: '金額',
-          cellStyle: { width: '170px' },
-        },
-        incomingSubpoenaSerialNumber: {
-          label: '收入傳票序號',
-          cellStyle: { width: '187px' },
-        },
-        //
-      },
-    },
-    rowArr: [
-      {
+
+  // 收款紀錄 不應該叫paymentRecord的
+  const control_accountant = useMemo(() => {
+    //
+    let priceTotal = 0;
+
+    const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = accountantArr.map((item, index) => {
+      priceTotal = priceTotal + item.price;
+
+      const control: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_02: {
           onDeleteClick: () => {
-            alert('test');
+            setAccountantArr((arr) => {
+              const newArr = [...arr];
+              newArr.splice(index, 1);
+
+              return newArr;
+            });
           },
         },
         list: {
           date: {
             label: '日期',
             cellStyle: { width: '120px' },
-            // inputProps: {
-            //   props: {
-            //     value: '',
-            //   },
-            // },
-            datePickerProps: {
+            inputProps: {
               props: {
-                value: undefined,
+                value: 'no property',
               },
             },
           },
@@ -550,7 +523,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: 'XXXXXX',
+                value: item.accountingNumber,
               },
             },
           },
@@ -559,7 +532,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: 'XXXXXX',
+                value: 'no property',
               },
             },
           },
@@ -568,7 +541,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '100px' },
             inputProps: {
               props: {
-                value: '111-11-11',
+                value: getTaiwanDateStr(item.noteMaturityDate) ?? '',
               },
             },
           },
@@ -577,7 +550,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '170px' },
             inputProps: {
               props: {
-                value: '999,999',
+                value: item.price,
               },
             },
           },
@@ -586,81 +559,186 @@ export default function AccountReceivable() {
             cellStyle: { width: '187px' },
             inputProps: {
               props: {
-                value: '1110304001',
+                value: 'no property',
               },
             },
           },
-        }, // list close
+        },
+      };
+
+      return control;
+    });
+
+    const control_accountant: Tcontrol_dynaTable = {
+      caption: '收款紀錄',
+      topRightBtnProps: {
+        label: '新增收款紀錄',
+        onClick: () => {
+          setShowRecordModal(true);
+        },
       },
-    ],
-  };
+      bottomBarProps: {
+        label: '合計',
+        value: priceTotal.toLocaleString(),
+      },
+      headRow: {
+        panelCell_02: {},
+        list: {
+          date: {
+            label: '日期',
+            cellStyle: { width: '120px' },
+          },
+          account: {
+            label: '帳號',
+            cellStyle: { width: '189px' },
+          },
+          chequeNumber: {
+            label: '票據號碼',
+            cellStyle: { width: '189px' },
+          },
+          chequeDate: {
+            label: '票據日期',
+            cellStyle: { width: '100px' },
+          },
+          price: {
+            label: '金額',
+            cellStyle: { width: '170px' },
+          },
+          incomingSubpoenaSerialNumber: {
+            label: '收入傳票序號',
+            cellStyle: { width: '187px' },
+          },
+          //
+        },
+      },
+      rowArr: control_accountant_rowArr,
+    };
+
+    return control_accountant;
+  }, [accountantArr]);
 
   // --------------------------------------------------------------------------
 
-  const control_deductionDetails: Tcontrol_deductionDetails = {
-    sideColumn: {
-      caption: '項目',
-      subTotal: '合計',
-      tax: '營業稅5%',
-      total: '總計',
-      arr: [
-        {
-          value: '第一期',
-        },
-        {
-          value: '第二期',
-        },
-        {
-          value: '第三期',
-        },
-        {
-          value: '第四期',
-        },
-      ],
-    },
-    columnArr: [
-      {
-        caption: '工作證',
-        subTotal: '999999',
-        tax: '999999',
-        total: '999999',
-        arr: [
-          {
-            value: '999',
+  const control_deductionDetails = useMemo(() => {
+    const columnArr = Object.keys(deductionList).map((pKey, itemNameIndex) => {
+      let subTotal = 0;
+      const itemName = deductionList[pKey]?.itemName;
+      const theList = deductionList[pKey]?.list;
+
+      const arr = periodArr.map((period) => {
+        const deduction = deductionList?.[pKey]?.list?.[period];
+
+        const detailedAmount = deduction?.detailedAmount ?? '';
+
+        subTotal = subTotal + Number(detailedAmount || '0');
+
+        const controlItem: Tcontrol_deductionDetails['columnArr'][number]['arr'][number] = {
+          value: detailedAmount,
+          onChange: (str) => {
+            setDeductionList((obj) => {
+              const newObj = { ...obj };
+
+              if (!newObj[pKey]) {
+                newObj[pKey] = {
+                  itemName: itemName,
+                  list: {},
+                };
+              }
+
+              if (!newObj[pKey].list[period]) {
+                newObj[pKey].list[period] = {
+                  key: nanoid(),
+                  itemName: itemName,
+                  period: Number(period),
+                  detailedAmount: '',
+                };
+              }
+
+              newObj[pKey].list[period].detailedAmount = str;
+              recordChangedDeduction(newObj[pKey].list[period], pKey);
+
+              return newObj;
+            });
           },
-          {
-            value: '999',
-          },
-          {
-            value: '999',
-          },
-          {
-            value: '999',
-          },
-        ],
+        };
+
+        return controlItem;
+      });
+
+      const tax = new Decimal(subTotal).mul(0.05).toNumber();
+
+      const column: Tcontrol_deductionDetails['columnArr'][number] = {
+        caption: itemName,
+        onChange: (str) => {
+          setDeductionList((obj) => {
+            const newObj = { ...obj };
+
+            const theItem = newObj[pKey];
+            theItem.itemName = str;
+            Object.keys(theItem.list).forEach((key) => {
+              theItem.list[key].itemName = str;
+            });
+
+            newObj[pKey] = theItem;
+
+            return newObj;
+          });
+        },
+        subTotal: subTotal.toLocaleString(),
+        tax: tax.toLocaleString(),
+        total: (subTotal + tax).toLocaleString(),
+        onDeleteClick: () => {
+          setDeductionList((obj) => {
+            const newObj = { ...obj };
+            const list = newObj[pKey].list;
+            const idArr = Object.values(list).map((item) => item.id);
+            const theIdArr = idArr.filter((id) => id) as string[];
+            setDeductionIdWillDeleteArr((arr) => [...arr, ...theIdArr]);
+            delete newObj[pKey];
+
+            return newObj;
+          });
+          setChangedDeduction((obj) => {
+            const newObj = { ...obj };
+            delete newObj[pKey];
+
+            return newObj;
+          });
+        },
+        arr,
+      };
+
+      return column;
+    });
+
+    const control_deductionDetails: Tcontrol_deductionDetails = {
+      onTopBtnClick: () => {
+        setDeductionList((obj) => {
+          return {
+            ...obj,
+            [nanoid()]: {
+              itemName: 'new',
+              list: {},
+            },
+          };
+        });
       },
-      {
-        caption: '安衛費',
-        subTotal: '999999',
-        tax: '999999',
-        total: '999999',
-        arr: [
-          {
-            value: '999',
-          },
-          {
-            value: '999',
-          },
-          {
-            value: '999',
-          },
-          {
-            value: '999',
-          },
-        ],
+      sideColumn: {
+        caption: '項目',
+        subTotal: '合計',
+        tax: '營業稅5%',
+        total: '總計',
+        arr: periodArr.map((item) => {
+          return {
+            value: `第${item}期`,
+          };
+        }),
       },
-    ],
-  };
+      columnArr: columnArr,
+    };
+
+    return control_deductionDetails;
+  }, [deductionList]);
 
   // --------------------------------------------------------------------------
   const panelList_01: TpanelList = [
@@ -689,12 +767,7 @@ export default function AccountReceivable() {
 
   return (
     <SubLayer>
-      <PageHeader
-        //
-        panelList={panelList}
-        // contractNumber={engineeringContact?.contractNumber ?? ''}
-        contractNumber={'foo'}
-      />
+      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
       <div className={scss.main}>
         <Profile control={control_profile} />
 
@@ -711,7 +784,7 @@ export default function AccountReceivable() {
         {/* 發票給予紀錄 */}
         <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
         {/* 收款紀錄*/}
-        <AccountReceivable_dynaTable control={control_paymentRecord} disabled={disabled} />
+        <AccountReceivable_dynaTable control={control_accountant} disabled={disabled} />
         {/* 扣款明細 */}
         <DeductionDetails control={control_deductionDetails} disabled={disabled} />
       </div>
@@ -725,16 +798,16 @@ export default function AccountReceivable() {
         }}
         onCancel={() => setIsShowInvoicePrefixModal(false)}
       />
+
       <PaymentRecordSelector
         label="請選擇收款紀錄"
         tip="可複選"
         showModal={showRecordModal}
-        onConfirm={(v) => {
-          console.log(v);
-        }}
+        onConfirm={addAccountant}
         onCancel={() => {
           setShowRecordModal(false);
         }}
+        exceptAccountantArr={accountantArr}
       />
     </SubLayer>
   );
@@ -787,3 +860,96 @@ const fakeInvoiceArr: Tinvoice[] = [
     remark: 'bbbbb',
   },
 ];
+
+const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
+  {
+    id: 'u1',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '工作證',
+    period: 1,
+    detailedAmount: 999,
+    accountsReceivableId: '',
+  },
+  {
+    id: 'u2',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '工作證',
+    period: 2,
+    detailedAmount: 111,
+    accountsReceivableId: '',
+  },
+  {
+    id: 'u3',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '工作證',
+    period: 3,
+    detailedAmount: 333,
+    accountsReceivableId: '',
+  },
+  {
+    id: 'u4',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '安衛費',
+    period: 1,
+    detailedAmount: 11,
+    accountsReceivableId: '',
+  },
+  {
+    id: 'u5',
+    createdAt: '',
+    updatedAt: '',
+    itemName: '安衛費',
+    period: 3,
+    detailedAmount: 322,
+    accountsReceivableId: '',
+  },
+];
+
+/**用來把從後端取得的扣款明細變成這裡可以用的樣子 */
+const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
+  let periodQty = 0;
+  const itemNameArr: string[] = [];
+  const list: TdeductionList = {};
+
+  data.forEach((item) => {
+    const { id, itemName, period } = item;
+
+    if (!itemNameArr.includes(itemName)) {
+      itemNameArr.push(itemName);
+    }
+
+    if (period > periodQty) {
+      periodQty = period;
+    }
+
+    if (!list[itemName]) {
+      list[itemName] = {
+        itemName,
+        list: {},
+      };
+    }
+
+    list[itemName].list[`${period}`] = {
+      id: id,
+      key: id,
+      itemName,
+      period,
+      detailedAmount: String(item.detailedAmount),
+    };
+
+    //
+  });
+
+  const periodArr = Array.from({ length: periodQty }, (_, i) => String(i + 1));
+
+  return {
+    periodQty,
+    periodArr,
+    itemNameArr,
+    sortedDeductionList: list,
+  };
+};

@@ -51,6 +51,10 @@
         display: none;
       }
     }
+    &.except {
+      background-color: #ddd;
+      cursor: auto;
+    }
   }
 }
 
