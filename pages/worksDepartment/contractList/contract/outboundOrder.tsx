@@ -118,7 +118,6 @@ export default function OutboundOrder() {
     let subContracts = contract.subContracts;
 
     subContracts = _.sortBy(subContracts, 'version');
-    // console.log('subContracts', subContracts);
 
     const list: { [key: string]: TquotationProductDto } = {};
 
@@ -154,8 +153,6 @@ export default function OutboundOrder() {
     key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
     v: string
   ) => {
-    console.log(statusOri);
-
     if (!statusOri) {
       return;
     }
@@ -217,10 +214,12 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  const { myDeleveryList } = useMemo(() => {
+  const { myDeleveryList, worksheet } = useMemo(() => {
     if (!deliveryList?.contract.worksheet?.contractProductItems) {
       return {};
     }
+
+    const worksheet = deliveryList.contract.worksheet;
 
     const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
 
@@ -256,6 +255,7 @@ export default function OutboundOrder() {
 
     return {
       myDeleveryList,
+      worksheet,
     };
   }, [deliveryList]);
 
@@ -269,20 +269,14 @@ export default function OutboundOrder() {
     setDeliveryStatusWillUpdate({});
   }, [disabled]);
 
-  // console.log('contractProdList', contractProdList);
-  // console.log('myDeleveryList', myDeleveryList);
-  // console.log('---------------------------------------');
-
   // --------------------------------------------------------------------------
 
   const control_orderTable: Tcontrol_orderTable =
-    // Object.values(myDeleveryList ?? {}).map((delevery) => {
     Object.keys(myDeleveryList ?? {}).map((key) => {
       const delevery = myDeleveryList![key];
 
       const theOriginalContractContent = contractProdList![key];
 
-      // const originalItem = delevery.originalItem;
       // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
       const firstItem = delevery.itemArr[0];
 
@@ -411,14 +405,11 @@ export default function OutboundOrder() {
           },
           deliveryStatus: {
             remark01: {
-              value:
-                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.notes : notes) || acceNameArr.join('\n'),
-              onChange: (str) => {
-                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
-              },
+              value: acceNameArr.join('\n'),
+              forbidden: true,
             },
             orderCreatedDate: {
-              value: createdAt ? moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD') : '',
+              value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
               forbidden: true,
             },
             installDate: {
