@@ -272,7 +272,9 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   const control_orderTable: Tcontrol_orderTable =
-    Object.keys(myDeleveryList ?? {}).map((key) => {
+    Object.keys(myDeleveryList ?? {}).map((key, index, arr) => {
+      const arrLength = arr.length;
+
       const delevery = myDeleveryList![key];
 
       const theOriginalContractContent = contractProdList![key];
@@ -289,7 +291,7 @@ export default function OutboundOrder() {
           qty: String(delevery.itemArr.length),
           implementQty: '???',
           cai: theOriginalContractContent.volume ?? '',
-          totalCai: '???',
+          totalCai: new Decimal(theOriginalContractContent.volume).mul(arrLength).toString(),
           doorType: theOriginalContractContent.doorModelName,
           material: theOriginalContractContent.materialName,
           horsepower: theOriginalContractContent.horsepower,
