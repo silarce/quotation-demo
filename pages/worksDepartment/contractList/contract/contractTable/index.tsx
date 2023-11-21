@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -21,6 +22,45 @@ import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quot
 // css
 import scss from './index.module.scss';
 
+// ========================================================================
+
+type TcenterItem = {
+  quantity: string;
+  price: string;
+};
+type Tcontrol_left = {
+  projectNumber: string;
+  itemName: string;
+  size: string;
+  quantity: string;
+  unitPrice: string;
+  totalPrice: string;
+};
+type Tcontrol_center = TcenterItem[];
+type Tcontrol_right = {
+  exchangedQuantity: string;
+  exchangedPrice: string;
+  notes: string;
+};
+
+type Tcontrol_leftTotal = {
+  contractSubTotal: string;
+  tax: string;
+  contractTotal: string;
+};
+type TcenterTotalItem = {
+  doneSubTotal: string;
+  tax: string;
+  periodTotal: string;
+};
+type TcenterTotal = TcenterTotalItem[];
+type TrightTotal = {
+  cumulativeTotal: string;
+  tax: string;
+  doneTotal: string;
+};
+
+// ========================================================================
 export default function ContracTable() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
@@ -53,6 +93,24 @@ export default function ContracTable() {
       }
     })();
   }, [contractId, engineeringContactId]);
+
+  // -------------------------------------------------------------
+
+  const foo = useMemo(() => {
+    if (!contract) {
+      return {};
+    }
+
+    const subContractArr = _.sortBy(contract.subContracts, 'version');
+    console.log(subContractArr);
+
+    /**
+     *  subContractArr.length-1 === 有多少次變更
+     *
+     */
+
+    return {};
+  }, [contract]);
 
   // -------------------------------------------------------------
   return (
@@ -137,14 +195,7 @@ const Left = ({
     totalPrice: '合約金額',
   },
 }: {
-  data?: {
-    projectNumber?: string;
-    itemName?: string;
-    size?: string;
-    quantity?: string;
-    unitPrice?: string;
-    totalPrice?: string;
-  };
+  data?: Tcontrol_left;
 }) => {
   return (
     <>
@@ -177,11 +228,7 @@ const Right = ({
     notes: '備註',
   },
 }: {
-  data?: {
-    exchangedQuantity: string;
-    exchangedPrice: string;
-    notes: string;
-  };
+  data?: Tcontrol_right;
 }) => {
   return (
     <>
@@ -198,17 +245,7 @@ const Right = ({
   );
 };
 
-const Center = ({
-  dataArr,
-}: {
-  dataArr: (
-    | {
-        quantity: string;
-        price: string;
-      }
-    | undefined
-  )[];
-}) => {
+const Center = ({ dataArr }: { dataArr: (TcenterItem | undefined)[] }) => {
   return (
     <>
       {dataArr.map((data, index) => {
@@ -232,15 +269,7 @@ const Center = ({
   );
 };
 
-const Left_total = ({
-  data,
-}: {
-  data: {
-    contractSubTotal: string;
-    tax: string;
-    contractTotal: string;
-  };
-}) => {
+const Left_total = ({ data }: { data: Tcontrol_leftTotal }) => {
   return (
     <>
       <div className={'w-[115px]'}></div>
@@ -261,15 +290,7 @@ const Left_total = ({
   );
 };
 
-const Center_total = ({
-  dataArr,
-}: {
-  dataArr: {
-    doneSubTotal: string;
-    tax: string;
-    periodTotal: string;
-  }[];
-}) => {
+const Center_total = ({ dataArr }: { dataArr: TcenterTotal }) => {
   return (
     <>
       {dataArr.map((data, index) => {
@@ -292,15 +313,7 @@ const Center_total = ({
   );
 };
 
-const Right_total02 = ({
-  data,
-}: {
-  data: {
-    cumulativeTotal: string;
-    tax: string;
-    doneTotal: string;
-  };
-}) => {
+const Right_total02 = ({ data }: { data: TrightTotal }) => {
   return (
     <>
       <div className={classNames('w-[80px] justify-center', scss.totalGrid, scss.labelGrid)}>
