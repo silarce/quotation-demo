@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // gear
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
@@ -59,11 +60,14 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
             <InputSel
               className={style.input02}
               inputProps={{
-                value,
+                props: {
+                  value,
+                  placeholder,
+                },
               }}
-              placeholder={placeholder}
               disabled={disabled}
               showBaseline="auto"
+              showAddIcon={true}
             />
           </div>
         );
