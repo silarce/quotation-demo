@@ -125,14 +125,6 @@ export default function WorkSheetProductOutline({
                 inputProps={control[key].inputProps}
                 selectProps={control[key].selectProps}
                 datePickerProps={control[key].datePickerProps}
-
-                // inputProps={{
-                //   value: control[key].value,
-                //   onChange: (v) => {
-                //     control[key].onChange?.(v);
-                //   },
-                //   inputType: inputType,
-                // }}
               />
             );
           })}

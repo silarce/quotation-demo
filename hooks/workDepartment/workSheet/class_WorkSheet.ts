@@ -708,6 +708,21 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
+  get billingDay() {
+    return this._prod.billingDay;
+  }
+  set billingDay(str) {
+    this._prod.billingDay = str;
+    this.forceUpdate();
+  }
+  get shipDay() {
+    return this._prod.shipDay;
+  }
+  set shipDay(str) {
+    this._prod.shipDay = str;
+    this.forceUpdate();
+  }
+
   // -------------------------------------------------------
 
   // 捲軸
@@ -789,39 +804,25 @@ class Class_workSheet {
     return String(Number(this.WG_mm) + Number(this._prod.gapA) + Number(this._prod.gapC) - 10);
   }
 
-  // TODO 正面
-  private _com_headBox_front = '無';
-  get com_headBox_front() {
-    // return this.comList.headBox.front;
-    return this._com_headBox_front;
+  //  正面
+  get headBoxFront() {
+    return this._prod.headBoxFront;
   }
-  set com_headBox_front(str) {
-    this._com_headBox_front = str;
+  set headBoxFront(str) {
+    this._prod.headBoxFront = str;
     this.forceUpdate();
   }
 
-  // TODO 有無凸
-  private _com_headBox_spec = '無';
-  get com_headBox_spec() {
-    // return this.comList.headBox.spec;
-    return this._com_headBox_spec;
+  // 有無凸
+  get headBoxProtruding() {
+    return this._prod.headBoxProtruding;
   }
-  set com_headBox_spec(str) {
-    this._com_headBox_spec = str;
+  set headBoxProtruding(str) {
+    this._prod.headBoxProtruding = str;
     this.forceUpdate();
   }
 
-  // TODO 捲箱型式 在主產品是boolean
-  private _com_headBox_type = '捲箱999';
-  get com_headBox_type() {
-    // return this.comList.headBox.type;
-    return this._com_headBox_type;
-  }
-  set com_headBox_type(str) {
-    this._com_headBox_type = str;
-    this.forceUpdate();
-  }
-
+  //  捲箱型式
   get isIntegratedHeadBox() {
     return this._prod.isIntegratedHeadBox;
   }
@@ -841,6 +842,14 @@ class Class_workSheet {
 
   set headBoxForm(bool) {
     this._prod.isIntegratedHeadBox = bool;
+    this.forceUpdate();
+  }
+
+  get headBoxAngleIronQuantity() {
+    return String(this._prod.headBoxAngleIronQuantity);
+  }
+  set headBoxAngleIronQuantity(str) {
+    this._prod.headBoxAngleIronQuantity = Number(str);
     this.forceUpdate();
   }
 
@@ -902,14 +911,21 @@ class Class_workSheet {
     return '馬達荷重(max:500,min:600),馬力數:2Hp';
   }
 
-  // TODO 鍊條
-  private _com_sidePlate_chain = '999#';
-  get com_sidePlate_chain() {
-    // return this.comList.sidePlate.chain;
-    return this._com_sidePlate_chain;
+  //  鍊條
+  // get sprocketWheelChains() {
+  //   if (this._prodSpec?.sprocketWheelChains) {
+  //     return String(this._prodSpec?.sprocketWheelChains);
+  //   } else {
+  //     return '';
+  //   }
+  // }
+
+  // 方向
+  get sidePlateDirection() {
+    return this._prod.sidePlateDirection;
   }
-  set com_sidePlate_chain(str) {
-    this._com_sidePlate_chain = str;
+  set sidePlateDirection(str) {
+    this._prod.sidePlateDirection = str;
     this.forceUpdate();
   }
 
@@ -989,14 +1005,12 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  // TODO 鍊條型式
-  private _com_motor_chainType = '';
-  get com_motor_chainType() {
-    // return this.comList.motor.chain;
-    return this._com_motor_chainType;
+  //  鍊條型式
+  get electricMotorChainType() {
+    return this._prod.electricMotorChainType;
   }
-  set com_motor_chainType(str) {
-    this._com_motor_chainType = str;
+  set electricMotorChainType(str) {
+    this._prod.electricMotorChainType = str;
     this.forceUpdate();
   }
 
@@ -1020,6 +1034,15 @@ class Class_workSheet {
     }
 
     return `${phaseStr} ${this._prod.motorVoltage}V`;
+  }
+
+  // 方向
+  get electricMotorDirection() {
+    return this._prod.electricMotorDirection;
+  }
+  set electricMotorDirection(str) {
+    this._prod.electricMotorDirection = str;
+    this.forceUpdate();
   }
 
   // --------------------------------------------------------------
@@ -1065,15 +1088,12 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  // bendStraight
-  // TODO 型式
-  private _com_guideRail_bendStraight = '';
-  get com_guideRail_bendStraight() {
-    // return this.comList.guideRail.type;
-    return this._com_guideRail_bendStraight;
+  //  型式 彎直
+  get guideRailType() {
+    return this._prod.guideRailType;
   }
-  set com_guideRail_bendStraight(str) {
-    this._com_guideRail_bendStraight = str;
+  set guideRailType(str) {
+    this._prod.guideRailType = str;
     this.forceUpdate();
   }
 
@@ -1106,6 +1126,10 @@ class Class_workSheet {
   }
   get bearingInnerDiameter() {
     return this._prod.bearingInnerDiameter;
+  }
+
+  get sprocketWheelChains() {
+    return this._prod.sprocketWheelChains;
   }
   // get diameter() {
   //   // return this._prod.diameter;
@@ -1149,7 +1173,7 @@ class Class_workSheet {
   // --------------------------------------------------------------
 
   /**將這個items分堆 */
-  divideItem(qty: number) {
+  divideItem(qty: number, suffixes = '') {
     if (qty < 1) {
       return myAlert.info({ title: '分堆數量不可小於1' });
     }
@@ -1159,7 +1183,8 @@ class Class_workSheet {
     }
 
     const theItem = this.bodyItemArr[0];
-    theItem.itemName = `${theItem.itemName}-new`;
+
+    theItem.itemName = `${theItem.itemName}${suffixes}`;
 
     const itemIdArr = this._itemIdArr.reverse().splice(0, qty);
 
@@ -1331,6 +1356,17 @@ class Class_workSheet {
         guideRailLength: Number(this._prodSpec?.guideRailLength ?? 0),
         headBoxLength: Number(this._prodSpec?.headBoxLength ?? 0),
         // thickness: String(this._prodSpec?.thickness ?? '0'),
+
+        billingDay: this._prod.billingDay,
+        shipDay: this._prod.shipDay,
+        headBoxFront: this._prod.headBoxFront,
+        headBoxProtruding: this._prod.headBoxProtruding,
+        headBoxAngleIronQuantity: this._prod.headBoxAngleIronQuantity,
+        sidePlateChain: this._prod.sidePlateChain,
+        sidePlateDirection: this._prod.sidePlateDirection,
+        electricMotorChainType: this._prod.electricMotorChainType,
+        electricMotorDirection: this._prod.electricMotorDirection,
+        guideRailType: this._prod.guideRailType,
       };
 
       return item;

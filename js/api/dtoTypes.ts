@@ -1043,6 +1043,27 @@ export type TquotationProductItemDto = Omit<
   bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
+  //
+  //  '開單日'
+  billingDay: string | null;
+  //  '出貨日'
+  shipDay: string | null;
+  //  '捲箱 - 正面'
+  headBoxFront: string | null;
+  //  '捲箱 - 有無凸'
+  headBoxProtruding: string | null;
+  //  '捲箱 - 角鐵數量'
+  headBoxAngleIronQuantity: number | null;
+  //  '支板 - 鏈條'
+  sidePlateChain: string | null;
+  //  '支板 - 方向'
+  sidePlateDirection: string | null;
+  //  '電動機 - 鍊條形式'
+  electricMotorChainType: string | null;
+  //  '電動機 - 方向'
+  electricMotorDirection: string | null;
+  //  '門軌 - 型式'
+  guideRailType: string | null;
 };
 
 type TquotationContentDto_copy = {
@@ -2326,6 +2347,27 @@ export type TupdateWorkSheetItem = {
   guideRailLength?: number | null; //門軌長度
   headBoxLength?: number | null; //捲箱長度
   thickness: string; // 門片厚度
+
+  //  '開單日'
+  billingDay: string | null;
+  //  '出貨日'
+  shipDay: string | null;
+  //  '捲箱 - 正面'
+  headBoxFront: string | null;
+  //  '捲箱 - 有無凸'
+  headBoxProtruding: string | null;
+  //  '捲箱 - 角鐵數量'
+  headBoxAngleIronQuantity: number | null;
+  //  '支板 - 鏈條'
+  sidePlateChain: string | null;
+  //  '支板 - 方向'
+  sidePlateDirection: string | null;
+  //  '電動機 - 鍊條形式'
+  electricMotorChainType: string | null;
+  //  '電動機 - 方向'
+  electricMotorDirection: string | null;
+  //  '門軌 - 型式'
+  guideRailType: string | null;
 };
 
 export type TupdateWorkSheet = {

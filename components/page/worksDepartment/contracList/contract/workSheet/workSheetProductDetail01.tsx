@@ -23,6 +23,8 @@ type TcontrolItem = {
   icon?: string;
   optionArr?: Toption[];
   checkBarOptionArr?: { key: string; label: string }[];
+  inputType?: 'number';
+  placeholder?: string;
 };
 
 type Tcontrol = {
@@ -184,6 +186,8 @@ const Item = ({
             icon,
             checkBarOptionArr,
             optionArr,
+            inputType,
+            placeholder: customPlaceholder,
           } = control[pKey][cKey]!;
 
           let selectProps: TselectProps | undefined = undefined;
@@ -276,6 +280,7 @@ const Item = ({
                 onChange?.(v);
               },
               className: scss.inputClass,
+              inputType: inputType,
             };
           }
 
@@ -296,6 +301,7 @@ const Item = ({
               captionWidth={captionWidth}
               disabled={forbidden || disabled_control || disabled}
               showBaseline="always"
+              placeholder={customPlaceholder || placeholder}
             />
           );
         })}

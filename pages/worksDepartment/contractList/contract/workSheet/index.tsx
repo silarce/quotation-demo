@@ -101,9 +101,6 @@ import { downloadExcel } from 'components/page/worksDepartment/contracList/contr
 // css
 import scss from './workSheet.module.scss';
 
-// image
-import imgIdk from 'public/image/fake/idk01.png';
-
 // options
 import {
   Toption,
@@ -605,15 +602,31 @@ export default function WorkSheet() {
     // 開單日
     billingDate: {
       datePickerProps: {
-        // value: '',
-        // onChange02: (m) => {},
+        value: targetSheet?.billingDay ?? '',
+        onChange02: (m) => {
+          if (targetSheet) {
+            if (m) {
+              targetSheet.billingDay = m.toISOString();
+            } else {
+              targetSheet.billingDay = '';
+            }
+          }
+        },
       },
     },
     // 出貨日
     shippingDate: {
       datePickerProps: {
-        // value: '',
-        // onChange02: (m) => {},
+        value: targetSheet?.shipDay ?? '',
+        onChange02: (m) => {
+          if (targetSheet) {
+            if (m) {
+              targetSheet.shipDay = m.toISOString();
+            } else {
+              targetSheet.shipDay = '';
+            }
+          }
+        },
       },
     },
   };
@@ -674,40 +687,44 @@ export default function WorkSheet() {
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
+      //
       front: {
-        value: targetSheet?.com_headBox_front ?? '',
+        value: targetSheet?.headBoxFront ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_headBox_front = v;
+            targetSheet.headBoxFront = v;
           }
         },
-        forbidden: true,
       },
+      //
       hasConvex: {
-        value: targetSheet?.com_headBox_spec ?? '',
+        value: targetSheet?.headBoxProtruding ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_headBox_spec = v;
+            targetSheet.headBoxProtruding = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
-        forbidden: true,
       },
+      //
       type: {
         value: String(targetSheet?.headBoxForm),
         onChange: (v) => {
           if (targetSheet) {
             const bool = v === 'true' ? true : false;
-
             targetSheet.headBoxForm = bool;
           }
         },
       },
       // 角鐵數量
       angleIronQuantity: {
-        value: '999',
-        onChange: () => {},
-        forbidden: true,
+        value: targetSheet?.headBoxAngleIronQuantity ?? '',
+        onChange: (str) => {
+          if (targetSheet) {
+            targetSheet.headBoxAngleIronQuantity = str;
+          }
+        },
+        inputType: 'number',
       },
     },
     // ______________________________________________________________
@@ -767,19 +784,17 @@ export default function WorkSheet() {
         disabled: true,
       },
       chain: {
-        value: targetSheet?.com_sidePlate_chain ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_sidePlate_chain = v;
-          }
-        },
-        forbidden: true,
+        value: targetSheet?.sprocketWheelModel ?? '',
+        disabled: true,
       },
       // 方向
       direction: {
-        value: '',
-        onChange: () => {},
-        forbidden: true,
+        value: targetSheet?.sidePlateDirection ?? '',
+        onChange: (str) => {
+          if (targetSheet) {
+            targetSheet.sidePlateDirection = str;
+          }
+        },
       },
     },
     // _____________________________________________________
@@ -864,13 +879,12 @@ export default function WorkSheet() {
         },
       },
       chainType: {
-        value: targetSheet?.com_motor_chainType ?? '',
+        value: targetSheet?.electricMotorChainType ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_motor_chainType = v;
+            targetSheet.electricMotorChainType = v;
           }
         },
-        forbidden: true,
       },
       lockBox: {
         value: targetSheet?.motorLockBox ?? '',
@@ -883,9 +897,12 @@ export default function WorkSheet() {
       },
       // 方向
       direction: {
-        value: '',
-        onChange: () => {},
-        forbidden: true,
+        value: targetSheet?.electricMotorDirection ?? '',
+        onChange: (str) => {
+          if (targetSheet) {
+            targetSheet.electricMotorDirection = str;
+          }
+        },
       },
     },
     // ________________________________________________________________
@@ -938,13 +955,12 @@ export default function WorkSheet() {
         },
       },
       doorTrackType: {
-        value: targetSheet?.com_guideRail_bendStraight ?? '',
+        value: targetSheet?.guideRailType ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_guideRail_bendStraight = v;
+            targetSheet.guideRailType = v;
           }
         },
-        forbidden: true,
       },
       doorTrackName: {
         value: targetSheet?.guideRailName ?? '',
@@ -1158,7 +1174,7 @@ export default function WorkSheet() {
             direction: '', // 未知
           },
           guideRail: {
-            form: sheet.isAntiTyphoon ? '防颱' : '一般', // 未知
+            form: sheet.isAntiTyphoon ? '防颱' : '一般',
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
@@ -1166,7 +1182,7 @@ export default function WorkSheet() {
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
             antiTyphoonHook: '-50', // 未知
-            bendStraight: sheet.com_guideRail_bendStraight, // 未知
+            bendStraight: sheet.guideRailType ?? '',
           },
           chainCog: {
             sprocketWheelModel: sheet.sprocketWheelModel ?? '',
@@ -1311,6 +1327,8 @@ export default function WorkSheet() {
                   isActive = true;
                 }
 
+                const length = Object.keys(sheetList[pKey]).length;
+
                 list.push({
                   isOriginal: item.isOriginal,
                   itemName: itemName,
@@ -1323,7 +1341,7 @@ export default function WorkSheet() {
                   onDivideClick: () => {
                     setTargetDivideItem(() => {
                       return (qty: number) => {
-                        item.divideItem(qty);
+                        item.divideItem(qty, `-${String(length + 1)}`);
                         setTargetDivideItem(undefined);
                       };
                     });
