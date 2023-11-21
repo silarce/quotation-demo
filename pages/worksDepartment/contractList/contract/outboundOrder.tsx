@@ -154,6 +154,8 @@ export default function OutboundOrder() {
     key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
     v: string
   ) => {
+    console.log(statusOri);
+
     if (!statusOri) {
       return;
     }
@@ -298,19 +300,6 @@ export default function OutboundOrder() {
           material: theOriginalContractContent.materialName,
           horsepower: theOriginalContractContent.horsepower,
           surface: theOriginalContractContent.materialSurface ?? '',
-          // project: delevery.itemName,
-          // L: String(originalItem.fullWidth),
-          // W: String(originalItem.WG),
-          // B: String(originalItem.boxB),
-          // qty: String(delevery.itemArr.length),
-          // implementQty: '???',
-          // // cai: firstItem.volume,
-          // cai: '',
-          // totalCai: '0',
-          // doorType: originalItem.doorModelName,
-          // material: originalItem.materialName,
-          // horsepower: originalItem.horsepower,
-          // surface: originalItem.materialSurface ?? '',
         },
         staticData: {
           project: delevery.itemName,
@@ -332,18 +321,7 @@ export default function OutboundOrder() {
             value: '',
             hidden: true,
           },
-          // remark02: {
-          //   value: '',
-          //   hidden: true,
-          // },
-          // remark03: {
-          //   value: '',
-          //   hidden: true,
-          // },
-          // remark04: {
-          //   value: '',
-          //   hidden: true,
-          // },
+
           appended: {
             value: '',
             hidden: true,
@@ -365,6 +343,13 @@ export default function OutboundOrder() {
             value: '',
             hidden: true,
           },
+        },
+        subGroup: {
+          btnPanelArr: [],
+          installDateArr: [],
+          installerArr: [],
+          itemNameArr: [],
+          notesArr: [],
         },
       };
 
@@ -432,19 +417,6 @@ export default function OutboundOrder() {
                 change_deliveryStatusWillUpdate(item?.deliveryStatus, 'notes', str);
               },
             },
-            // remark02: {
-            //   value: "test",
-            //   onChange: () => {},
-            //   forbidden: true,
-            // },
-            // remark03: {
-            //   value: 'test',
-            //   onChange: () => {},
-            // },
-            // remark04: {
-            //   value: 'test',
-            //   onChange: () => {},
-            // },
             orderCreatedDate: {
               value: createdAt ? moment(convertDate_reduce1911(createdAt)).format('yy-MM-DD') : '',
               forbidden: true,
@@ -479,6 +451,78 @@ export default function OutboundOrder() {
                 change_deliveryStatusWillUpdate_employee(item?.deliveryStatus, 'installerEmployee', emp);
               },
             },
+          },
+          subGroup: {
+            btnPanelArr: [
+              {
+                onEditClick: () => {},
+                onDeleteClick: () => {},
+              },
+              {
+                onEditClick: () => {},
+                onDeleteClick: () => {},
+              },
+              {
+                onEditClick: () => {},
+                onDeleteClick: () => {},
+              },
+            ],
+            installDateArr: [
+              {
+                value: '',
+                onChange_date: () => {},
+              },
+              {
+                value: '',
+                onChange_date: () => {},
+              },
+              {
+                value: '',
+                onChange_date: () => {},
+              },
+            ],
+            installerArr: [
+              {
+                empolyee: null,
+                onChange_employee: () => {},
+              },
+              {
+                empolyee: null,
+                onChange_employee: () => {},
+              },
+              {
+                empolyee: null,
+                onChange_employee: () => {},
+              },
+            ],
+            itemNameArr: [
+              {
+                value: '',
+                onChange: () => {},
+              },
+              {
+                value: '',
+                onChange: () => {},
+              },
+              {
+                value: '',
+                onChange: () => {},
+              },
+            ],
+            notesArr: [
+              {
+                value: '',
+                onChange: () => {},
+              },
+              {
+                value: '',
+                onChange: () => {},
+              },
+              {
+                value: '',
+                onChange: () => {},
+              },
+            ],
           },
         };
       });

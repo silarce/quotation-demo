@@ -1,12 +1,16 @@
 import { useState } from 'react';
-
 import classNames from 'classnames';
+import moment from 'moment';
 
 import style from './outboundOrder.module.scss';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
+
+// icon
+import { IconAddCircle, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 
 // type
 import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
@@ -51,6 +55,8 @@ type TdeliveryStatusItem = {
   onChange_employee?: undefined;
   hidden?: boolean;
   forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
 };
 type TdeliveryStatusItem_date = {
   value: string;
@@ -60,6 +66,8 @@ type TdeliveryStatusItem_date = {
   onChange_employee?: undefined;
   hidden?: boolean;
   forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
 };
 
 type TdeliveryStatusItem_employee = {
@@ -70,6 +78,20 @@ type TdeliveryStatusItem_employee = {
   onChange_employee?: (emp: TemployeeDto | null) => void;
   hidden?: boolean;
   forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+};
+
+type TdeliveryStatusItem_btnPanel = {
+  value?: undefined;
+  empolyee?: undefined;
+  onChange?: undefined;
+  onChange_date?: undefined;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  forbidden?: boolean;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
 };
 
 type Tgroup = {
@@ -79,14 +101,19 @@ type Tgroup = {
     staticData: TstaticData;
     deliveryStatus: {
       remark01: TdeliveryStatusItem;
-      // remark02: TdeliveryStatusItem;
-      // remark03: TdeliveryStatusItem;
-      // remark04: TdeliveryStatusItem;
+
       appended: TdeliveryStatusItem;
       orderCreatedDate: TdeliveryStatusItem;
       finishAppended: TdeliveryStatusItem;
       installer: TdeliveryStatusItem_employee;
       installDate: TdeliveryStatusItem_date;
+    };
+    subGroup: {
+      btnPanelArr: TdeliveryStatusItem_btnPanel[];
+      installDateArr: TdeliveryStatusItem_date[];
+      installerArr: TdeliveryStatusItem_employee[];
+      itemNameArr: TdeliveryStatusItem[];
+      notesArr: TdeliveryStatusItem[];
     };
   }[];
 };
@@ -169,6 +196,21 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
             </div>
           );
         })}
+        {/*  */}
+        {orderKey_subGroup.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? style.textCenter : '';
+
+          return (
+            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+        {/*  */}
       </div>
 
       <div className={style.tableList}>
@@ -272,26 +314,38 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       if (type === 'input') {
                         theProps.inputProps = {
-                          value: value ?? '',
-                          onChange,
+                          props: {
+                            value: value ?? '',
+                            onChange: (e) => {
+                              onChange?.(e.target.value);
+                            },
+                            placeholder: '',
+                          },
                         };
                       }
 
                       if (type === 'textarea') {
                         theProps.textareaProps = {
-                          value: value ?? '',
-                          onChange,
                           allowNewLineByUser: true,
+                          wrapperClassName: style.foo,
+                          props: {
+                            value: value ?? '',
+                            onChange: (e) => onChange?.(e.target.value),
+                            placeholder: '',
+                          },
                         };
                       }
 
                       if (type === 'date') {
                         theProps.datePickerProps = {
-                          value,
-                          onChange02: (m) => {
-                            onChange_date?.(m?.toISOString() ?? null);
+                          props: {
+                            value: value ? moment(value) : null,
+                            onChange: (m) => {
+                              onChange_date?.(m?.toISOString() ?? null);
+                            },
+                            placeholder: '',
                           },
-                          datePickerClassName: style.datepicker,
+                          wrapperClassName: style.datepicker,
                         };
                       }
 
@@ -299,7 +353,10 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       if (type === 'employee' && key === 'installer') {
                         theProps.inputProps = {
-                          value: value || empolyee?.chName || empolyee?.enName || '',
+                          props: {
+                            value: value || empolyee?.chName || empolyee?.enName || '',
+                            placeholder: '',
+                          },
                         };
 
                         onClick = () => {
@@ -317,13 +374,100 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                           <InputSel
                             className={classNames(style.input03, hidden && style.hidden)}
                             showBaseline={forbidden ? 'invisible' : 'auto'}
-                            placeholder=""
+                            // placeholder=""
                             disabled={forbidden || disabled}
                             {...theProps}
                           />
                         </div>
                       );
                     })}
+                    {/*  */}
+
+                    {orderKey_subGroup.map((key, index) => {
+                      const group = row.subGroup[key];
+
+                      const { width, position, type } = configList[key] ?? {};
+                      const theStyle = { width };
+                      const textCenter = position === 'center' ? style.textCenter : '';
+
+                      const theProps: Parameters<typeof InputSel>[0] = {};
+
+                      // Object.values(subGroup).map(() => {
+                      //   return null;
+                      // });
+
+                      return (
+                        <div
+                          //
+                          key={key}
+                          className={classNames(style.column, textCenter, style.subGroup)}
+                          style={theStyle}
+                        >
+                          {group.map((item, index) => {
+                            const {
+                              value,
+                              empolyee,
+                              onChange_date,
+                              onChange_employee,
+
+                              onEditClick,
+                              onDeleteClick,
+                            } = item;
+
+                            if (key === 'btnPanelArr') {
+                              return (
+                                <div key={index} className={style.btnPanel}>
+                                  <IconAddCircle />
+                                  <IconEdit />
+                                </div>
+                              );
+                            }
+
+                            //
+                            if (onChange_employee) {
+                              theProps.inputProps = {
+                                props: {
+                                  value: value || empolyee?.chName || empolyee?.enName || '',
+                                  placeholder: '',
+                                },
+                              };
+
+                              const onClick = () => {
+                                !disabled && setTargetEmpControl(item);
+                              };
+
+                              return (
+                                <div key={index} onClick={onClick}>
+                                  <InputSel
+                                    className={classNames(style.input03)}
+                                    showBaseline={'auto'}
+                                    // placeholder=""
+                                    disabled={disabled}
+                                    {...theProps}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            //
+                            if (onChange_date) {
+                              return (
+                                <div key={index}>
+                                  <InputSel datePickerProps={{}} />
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div key={index}>
+                                <InputSel inputProps={{}} />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+
                     {/*  */}
                     {rowIndex !== 0 && <div className={style.ribbon}></div>}
                   </div> // row
@@ -381,15 +525,23 @@ const orderKeyArr_static: (keyof TstaticData)[] = [
 
 const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
   'orderCreatedDate',
-  'installDate',
+  // 'installDate',
   //
   'remark01',
   // 'remark02',
   // 'remark03',
   // 'remark04',
-  'appended',
-  'finishAppended',
-  'installer',
+  // 'appended',
+  // 'finishAppended',
+  // 'installer',
+];
+
+const orderKey_subGroup: (keyof Tgroup['rowArr'][number]['subGroup'])[] = [
+  'btnPanelArr',
+  'installDateArr',
+  'installerArr',
+  'itemNameArr',
+  'notesArr',
 ];
 
 // =======================================================================
@@ -397,7 +549,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
 type Tconfig = {
   label: string;
   width: string;
-  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea';
+  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea' | 'other';
   position: string;
 };
 
@@ -604,7 +756,43 @@ const creCellConfig_deliveryStatus = (): TcellConfigList => ({
   },
 });
 
+const creCellConfig_subGroup = (): TcellConfigList => ({
+  btnPanelArr: {
+    label: '',
+    width: '54px',
+    type: 'other',
+    position: '',
+  },
+  installDateArr: {
+    label: '安裝日期',
+    width: '150px',
+    type: 'date',
+    position: '',
+  },
+  installerArr: {
+    label: '安裝人員',
+    width: '85px',
+    type: 'input',
+    position: '',
+  },
+  itemNameArr: {
+    label: '項目',
+    width: '100px',
+    type: 'input',
+    position: '',
+  },
+  notesArr: {
+    label: '備註',
+    width: '150px',
+    type: 'input',
+    position: '',
+  },
+});
+
+// =============================================================
+
 const creConfigList = (): TcellConfigList => ({
   ...creCellConfig_static(),
   ...creCellConfig_deliveryStatus(),
+  ...creCellConfig_subGroup(),
 });

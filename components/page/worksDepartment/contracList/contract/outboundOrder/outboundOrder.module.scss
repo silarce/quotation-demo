@@ -52,13 +52,15 @@ $cellgap: 16px;
 
   .tableList {
     max-height: 410px;
+    // max-height: 810px;
     width: fit-content;
     .row {
+      // border: solid 1px black;
       position: relative;
       display: inline-flex;
+      align-items: flex-start;
       width: fit-content;
       white-space: nowrap;
-      align-items: center;
       padding: 11px;
       padding-left: 22px;
       padding-right: 33px;
@@ -121,7 +123,20 @@ $cellgap: 16px;
           }
         }
       }
-    }
+
+      &.subGroup {
+        display: grid;
+        gap: 20px;
+        .btnPanel {
+          display: flex;
+          gap: 22px;
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    } // column
   }
 
   .indexCell {
@@ -140,7 +155,6 @@ $cellgap: 16px;
     padding: 2px 0px;
     margin-left: 10px;
     margin-right: 6px;
-
     &::after {
       content: "";
       position: absolute;
@@ -148,7 +162,6 @@ $cellgap: 16px;
       left: 0;
       transform: translate(-50%, -50%);
       width: 1px;
-      // height: 31px;
       height: 31px;
       background-color: $colorBorder01;
     }
@@ -158,3 +171,5 @@ $cellgap: 16px;
 .hidden {
   visibility: hidden;
 }
+
+// 日期 人員 項目 備註
