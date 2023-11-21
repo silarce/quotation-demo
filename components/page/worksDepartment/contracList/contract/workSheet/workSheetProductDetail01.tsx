@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // gear
-import InputSel, { TselectProps, TcheckProps } from 'components/global/gear/inputAndSel/inputSel';
+import InputSel, { TselectProps, TcheckProps, TinputProps } from 'components/global/gear/inputAndSel/inputSel';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { OptionWithIcon01 } from 'components/global/gear/select/optionWithIcon';
@@ -39,6 +39,7 @@ type Tcontrol = {
     front: TcontrolItem;
     hasConvex: TcontrolItem;
     type: TcontrolItem;
+    angleIronQuantity: TcontrolItem;
   };
   base: {
     [key: string]: TcontrolItem | undefined;
@@ -52,6 +53,7 @@ type Tcontrol = {
     [key: string]: TcontrolItem | undefined;
     bearing: TcontrolItem;
     chain: TcontrolItem;
+    direction: TcontrolItem;
   };
   //
   doorPiece: {
@@ -68,6 +70,7 @@ type Tcontrol = {
     support: TcontrolItem;
     chainType: TcontrolItem;
     lockBox: TcontrolItem;
+    direction: TcontrolItem;
   };
   doorTrack: {
     [key: string]: TcontrolItem | undefined;
@@ -92,7 +95,7 @@ export default function WorkSheetProductDetail01({
   disabled,
 }: {
   control: Tcontrol;
-  supportTip: string;
+  supportTip?: string;
   disabled: boolean;
 }) {
   return (
@@ -185,6 +188,7 @@ const Item = ({
 
           let selectProps: TselectProps | undefined = undefined;
           let checkProps: TcheckProps | undefined = undefined;
+          let inputProps: TinputProps | undefined = undefined;
 
           if (module === 'select') {
             selectProps = {
@@ -231,11 +235,9 @@ const Item = ({
                 },
               };
             }
-          } //   if (module === "select")
+          }
 
           if (module === 'checkBar') {
-            // const checkBarPropsList = checkBarPropsListCre!();
-
             const checkBarPropsList = (() => {
               if (checkBarOptionArr) {
                 return createCheckBarPropsList(checkBarOptionArr);
@@ -247,20 +249,6 @@ const Item = ({
             if (checkBarPropsList[value]) {
               checkBarPropsList[value].value = true;
             }
-
-            // const objArr = Object.values(checkBarPropsList);
-
-            // if (objArr[objArr.length - 3]) {
-            //   objArr[objArr.length - 3].style = { width: '45px' };
-            // }
-
-            // if (objArr[objArr.length - 2]) {
-            //   objArr[objArr.length - 2].style = { width: '100px' };
-            // }
-
-            // if (objArr[objArr.length - 1]) {
-            //   objArr[objArr.length - 1].style = { width: '80px' };
-            // }
 
             checkProps = {
               propsList: {
@@ -281,6 +269,16 @@ const Item = ({
             };
           }
 
+          if (module === 'input') {
+            inputProps = {
+              value: value,
+              onChange: (v) => {
+                onChange?.(v);
+              },
+              className: scss.inputClass,
+            };
+          }
+
           return (
             <InputSel
               key={cKey}
@@ -293,6 +291,7 @@ const Item = ({
               label={label_c}
               selectProps={selectProps}
               checkProps={checkProps}
+              inputProps={inputProps}
               captionColor="main"
               captionWidth={captionWidth}
               disabled={forbidden || disabled_control || disabled}
@@ -426,6 +425,10 @@ const checkBarPropsListCre_doorTrackType = (): TcheckProps['propsList'] => ({
   直: { value: false, label: '直' },
   彎: { value: false, label: '彎' },
 });
+const checkBarPropsListCre_direction = (): TcheckProps['propsList'] => ({
+  左: { value: false, label: '左' },
+  右: { value: false, label: '右' },
+});
 
 type Tconfig = {
   // readonly pKey: string;
@@ -434,7 +437,7 @@ type Tconfig = {
   readonly arr: {
     readonly cKey: string;
     // readonly cKey: keyof Tcontroll[keyof Tcontroll];
-    readonly module: 'select' | 'checkBar';
+    readonly module: 'input' | 'select' | 'checkBar';
     readonly label: string;
     readonly placeholder: string | undefined;
     readonly className: string | undefined;
@@ -531,6 +534,15 @@ const configArr_left: Tconfig[] = [
         ],
         checkBarPropsListCre: undefined,
       },
+      {
+        cKey: 'angleIronQuantity',
+        module: 'input',
+        label: '角鐵數量',
+        placeholder: undefined,
+        className: undefined,
+        options: undefined,
+        checkBarPropsListCre: undefined,
+      },
     ],
   },
   {
@@ -605,6 +617,15 @@ const configArr_left: Tconfig[] = [
         className: undefined,
         options: fakeOption_chain,
         checkBarPropsListCre: undefined,
+      },
+      {
+        cKey: 'direction',
+        module: 'checkBar',
+        label: '方向',
+        placeholder: undefined,
+        className: undefined,
+        options: undefined,
+        checkBarPropsListCre: checkBarPropsListCre_direction,
       },
     ],
   },
@@ -701,6 +722,15 @@ const configArr_right: Tconfig[] = [
         className: undefined,
         options: undefined,
         checkBarPropsListCre: checkBarPropsListCre_lockBox,
+      },
+      {
+        cKey: 'direction',
+        module: 'checkBar',
+        label: '方向',
+        placeholder: undefined,
+        className: undefined,
+        options: undefined,
+        checkBarPropsListCre: checkBarPropsListCre_direction,
       },
     ],
   },

@@ -602,6 +602,20 @@ export default function WorkSheet() {
         }
       },
     },
+    // 開單日
+    billingDate: {
+      datePickerProps: {
+        // value: '',
+        // onChange02: (m) => {},
+      },
+    },
+    // 出貨日
+    shippingDate: {
+      datePickerProps: {
+        // value: '',
+        // onChange02: (m) => {},
+      },
+    },
   };
 
   const onCalcClick = () => {
@@ -679,15 +693,6 @@ export default function WorkSheet() {
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
         forbidden: true,
       },
-      // type: {
-      //   value: targetSheet?.com_headBox_type ?? '',
-      //   onChange: (v) => {
-      //     if (targetSheet) {
-      //       targetSheet.com_headBox_type = v;
-      //     }
-      //   },
-      //   // forbidden: true,
-      // },
       type: {
         value: String(targetSheet?.headBoxForm),
         onChange: (v) => {
@@ -697,7 +702,12 @@ export default function WorkSheet() {
             targetSheet.headBoxForm = bool;
           }
         },
-        // forbidden: true,
+      },
+      // 角鐵數量
+      angleIronQuantity: {
+        value: '999',
+        onChange: () => {},
+        forbidden: true,
       },
     },
     // ______________________________________________________________
@@ -763,6 +773,12 @@ export default function WorkSheet() {
             targetSheet.com_sidePlate_chain = v;
           }
         },
+        forbidden: true,
+      },
+      // 方向
+      direction: {
+        value: '',
+        onChange: () => {},
         forbidden: true,
       },
     },
@@ -864,6 +880,12 @@ export default function WorkSheet() {
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_motorLockBox() }),
+      },
+      // 方向
+      direction: {
+        value: '',
+        onChange: () => {},
+        forbidden: true,
       },
     },
     // ________________________________________________________________
@@ -1352,7 +1374,7 @@ export default function WorkSheet() {
             <WorkSheetProductDetail01
               control={control_detail}
               disabled={forbidden || disabled}
-              supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
+              // supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
             <hr />
@@ -1442,6 +1464,30 @@ const creEmptyProfile = (): Tprofile => ({
  *
 根據PDF缺的欄位而需要新增的property
 方向 角鐵數量 彎直
+另外要新增的欄位
+
+開單日 date string
+出貨日 date string
+
+捲箱
+正面 string
+有無凸 string
+角鐵數量 number
+
+支版
+鍊條 string 應該是不可編輯的欄位
+方向 string
+
+電動機
+鍊條型式 string
+方向 string
+
+門軌
+型式 string
+
+
+
+
 
 另外開單日期與出貨日期還不知道要帶入什麼值
  

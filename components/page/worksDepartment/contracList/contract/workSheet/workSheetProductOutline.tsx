@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // gear
-import InputSel, { TinputProps, TselectProps } from 'components/global/gear/inputAndSel/inputSel';
+import InputSel, { TinputProps, TselectProps, TdatePickerProps } from 'components/global/gear/inputAndSel/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './workSheetProductOutline.module.scss';
@@ -28,6 +28,7 @@ type ToldProductOutline = {
 type TcontrolItem = {
   inputProps?: TinputProps;
   selectProps?: TselectProps;
+  datePickerProps?: TdatePickerProps;
 
   disabled?: boolean;
 };
@@ -45,6 +46,8 @@ type Tcontrol = {
     onChange?: (value: boolean) => void;
     disabled?: boolean;
   };
+  billingDate: TcontrolItem;
+  shippingDate: TcontrolItem;
 };
 
 export type { Tcontrol as Tcontrol_productOutline, ToldProductOutline };
@@ -121,6 +124,7 @@ export default function WorkSheetProductOutline({
                 showBaseline="always"
                 inputProps={control[key].inputProps}
                 selectProps={control[key].selectProps}
+                datePickerProps={control[key].datePickerProps}
 
                 // inputProps={{
                 //   value: control[key].value,
@@ -227,6 +231,20 @@ const configArr = [
   {
     key: 'material',
     label: '材質',
+    placeholder: undefined,
+    className: undefined,
+    inputType: undefined,
+  },
+  {
+    key: 'billingDate',
+    label: '開單日',
+    placeholder: undefined,
+    className: undefined,
+    inputType: undefined,
+  },
+  {
+    key: 'shippingDate',
+    label: '出貨日',
     placeholder: undefined,
     className: undefined,
     inputType: undefined,
