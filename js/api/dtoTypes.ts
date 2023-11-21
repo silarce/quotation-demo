@@ -1043,11 +1043,6 @@ export type TquotationProductItemDto = Omit<
   bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
-  //
-  //  '開單日'
-  billingDay: string | null;
-  //  '出貨日'
-  shipDay: string | null;
   //  '捲箱 - 正面'
   headBoxFront: string | null;
   //  '捲箱 - 有無凸'
@@ -2352,10 +2347,6 @@ export type TupdateWorkSheetItem = {
   headBoxLength?: number | null; //捲箱長度
   thickness: string; // 門片厚度
 
-  //  '開單日'
-  billingDay: string | null;
-  //  '出貨日'
-  shipDay: string | null;
   //  '捲箱 - 正面'
   headBoxFront: string | null;
   //  '捲箱 - 有無凸'

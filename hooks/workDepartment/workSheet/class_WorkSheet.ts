@@ -708,21 +708,6 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  get billingDay() {
-    return this._prod.billingDay;
-  }
-  set billingDay(str) {
-    this._prod.billingDay = str;
-    this.forceUpdate();
-  }
-  get shipDay() {
-    return this._prod.shipDay;
-  }
-  set shipDay(str) {
-    this._prod.shipDay = str;
-    this.forceUpdate();
-  }
-
   // -------------------------------------------------------
 
   // 捲軸
@@ -1344,8 +1329,6 @@ class Class_workSheet {
         headBoxLength: Number(this._prodSpec?.headBoxLength ?? 0),
         // thickness: String(this._prodSpec?.thickness ?? '0'),
 
-        billingDay: this._prod.billingDay,
-        shipDay: this._prod.shipDay,
         headBoxFront: this._prod.headBoxFront,
         headBoxProtruding: this._prod.headBoxProtruding,
         headBoxAngleIronQuantity: this._prod.headBoxAngleIronQuantity,

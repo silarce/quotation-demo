@@ -44,6 +44,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import moment from 'moment';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
@@ -97,6 +98,7 @@ import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/us
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './workSheet.module.scss';
@@ -597,36 +599,6 @@ export default function WorkSheet() {
         if (targetSheet) {
           targetSheet.isAntiTyphoon = v;
         }
-      },
-    },
-    // 開單日
-    billingDate: {
-      datePickerProps: {
-        value: targetSheet?.billingDay ?? '',
-        onChange02: (m) => {
-          if (targetSheet) {
-            if (m) {
-              targetSheet.billingDay = m.toISOString();
-            } else {
-              targetSheet.billingDay = '';
-            }
-          }
-        },
-      },
-    },
-    // 出貨日
-    shippingDate: {
-      datePickerProps: {
-        value: targetSheet?.shipDay ?? '',
-        onChange02: (m) => {
-          if (targetSheet) {
-            if (m) {
-              targetSheet.shipDay = m.toISOString();
-            } else {
-              targetSheet.shipDay = '';
-            }
-          }
-        },
       },
     },
   };
@@ -1216,7 +1188,7 @@ export default function WorkSheet() {
         customerName: contract?.content.customer.name ?? '',
         contactPerson: engineeringContact?.contactInfo?.[0].contactPerson ?? '',
         // 開單日
-        billingDate: '', // 未知
+        billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
         // 出貨日
         shippingDate: '', // 未知
       },

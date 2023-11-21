@@ -29,7 +29,6 @@ type TcontrolItem = {
   inputProps?: TinputProps;
   selectProps?: TselectProps;
   datePickerProps?: TdatePickerProps;
-
   disabled?: boolean;
 };
 
@@ -46,8 +45,6 @@ type Tcontrol = {
     onChange?: (value: boolean) => void;
     disabled?: boolean;
   };
-  billingDate: TcontrolItem;
-  shippingDate: TcontrolItem;
 };
 
 export type { Tcontrol as Tcontrol_productOutline, ToldProductOutline };
@@ -223,20 +220,6 @@ const configArr = [
   {
     key: 'material',
     label: '材質',
-    placeholder: undefined,
-    className: undefined,
-    inputType: undefined,
-  },
-  {
-    key: 'billingDate',
-    label: '開單日',
-    placeholder: undefined,
-    className: undefined,
-    inputType: undefined,
-  },
-  {
-    key: 'shippingDate',
-    label: '出貨日',
     placeholder: undefined,
     className: undefined,
     inputType: undefined,
