@@ -1341,7 +1341,7 @@ export default function WorkSheet() {
                   onDivideClick: () => {
                     setTargetDivideItem(() => {
                       return (qty: number) => {
-                        item.divideItem(qty, `-${String(length + 1)}`);
+                        item.divideItem(qty, `-${String(length)}`);
                         setTargetDivideItem(undefined);
                       };
                     });
