@@ -1064,6 +1064,10 @@ export type TquotationProductItemDto = Omit<
   electricMotorDirection: string | null;
   //  '門軌 - 型式'
   guideRailType: string | null;
+  // 底座 - 表面
+  bottomBarSurface: string | null;
+  // 門軌 - 表面
+  guideRailSurface: string | null;
 };
 
 type TquotationContentDto_copy = {
@@ -2368,6 +2372,10 @@ export type TupdateWorkSheetItem = {
   electricMotorDirection: string | null;
   //  '門軌 - 型式'
   guideRailType: string | null;
+  // 底座 - 表面
+  bottomBarSurface: string | null;
+  // 門軌 - 表面
+  guideRailSurface: string | null;
 };
 
 export type TupdateWorkSheet = {

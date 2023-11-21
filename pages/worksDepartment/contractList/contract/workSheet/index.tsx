@@ -767,10 +767,10 @@ export default function WorkSheet() {
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
       },
       surface: {
-        value: targetSheet?.com_bottomBar_surface ?? '',
+        value: targetSheet?.bottomBarSurface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_bottomBar_surface = v;
+            targetSheet.bottomBarSurface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -926,10 +926,10 @@ export default function WorkSheet() {
         optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
-        value: targetSheet?.com_guideRail_surface ?? '',
+        value: targetSheet?.guideRailSurface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_guideRail_surface = v;
+            targetSheet.guideRailSurface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),

@@ -727,17 +727,7 @@ class Class_workSheet {
 
   // 捲軸
 
-  // TODO 尺寸
-  // private _com_roller_size = '999';
-  // get com_roller_size() {
-  //   // return this.comList.roller.size;
-  //   return this._com_roller_size;
-  // }
-  // set com_roller_size(str) {
-  //   this._com_roller_size = str;
-  //   this.forceUpdate();
-  // }
-
+  // 尺寸
   get diameter() {
     // return this._prod.diameter;
     return String(this._prodSpec?.diameter) ?? '';
@@ -893,14 +883,13 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  // TODO 表面
-  private _com_bottomBar_surface = '無';
-  get com_bottomBar_surface() {
-    // return this.comList.bottomBar.surface;
-    return this._com_bottomBar_surface;
+  // 表面
+  get bottomBarSurface() {
+    return this._prod.bottomBarSurface;
   }
-  set com_bottomBar_surface(str) {
-    this._com_bottomBar_surface = str;
+
+  set bottomBarSurface(str) {
+    this._prod.bottomBarSurface = str;
     this.forceUpdate();
   }
 
@@ -1068,14 +1057,12 @@ class Class_workSheet {
     this.forceUpdate();
   }
 
-  // TODO 表面
-  private _com_guideRail_surface = '無';
-  get com_guideRail_surface() {
-    // return this.comList.guideRail.surface;
-    return this._com_guideRail_surface;
+  // 表面
+  get guideRailSurface() {
+    return this._prod.guideRailSurface;
   }
-  set com_guideRail_surface(str) {
-    this._com_guideRail_surface = str;
+  set guideRailSurface(str) {
+    this._prod.guideRailSurface = str;
     this.forceUpdate();
   }
 
@@ -1367,6 +1354,8 @@ class Class_workSheet {
         electricMotorChainType: this._prod.electricMotorChainType,
         electricMotorDirection: this._prod.electricMotorDirection,
         guideRailType: this._prod.guideRailType,
+        bottomBarSurface: this._prod.bottomBarSurface,
+        guideRailSurface: this._prod.guideRailSurface,
       };
 
       return item;
