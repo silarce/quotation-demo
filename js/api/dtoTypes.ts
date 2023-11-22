@@ -1016,6 +1016,26 @@ export type TdeliveryStatusDto = {
   productPayment: TaccountsReceivableProductPaymentDto;
 };
 
+export type TcreateEngineeringDeliveryStatusDto = {
+  notes: string;
+  shippingDate: string | null;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
+  completeAppend: string | null;
+  productItemId: string;
+};
+
+export type TupdateEngineeringDeliveryStatusDto = {
+  notes: string;
+  shippingDate: string | null;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
+  completeAppend: string | null;
+  productItemId: string;
+};
+
 export type TupdateDeliveryStatus = {
   id: string;
   notes: string;

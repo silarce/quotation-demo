@@ -28,8 +28,9 @@ import type {
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
   TupdateEngineeringDeliveryList,
-  TupdateDeliveryStatus,
   TfileDto,
+  TupdateEngineeringDeliveryStatusDto,
+  TcreateEngineeringDeliveryStatusDto,
 } from './dtoTypes';
 
 export type {
@@ -52,6 +53,8 @@ export type {
   TupdateEngineeringDeliveryList,
   TupdateDeliveryStatus,
   TfileDto,
+  TupdateEngineeringDeliveryStatusDto,
+  TcreateEngineeringDeliveryStatusDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -755,6 +758,51 @@ export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEnginee
 
   return axi
     .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 新增指定 DeliveryStatus
+export const apiPostDeliveryStatus = ({
+  //
+  id,
+  body,
+}: {
+  id: string;
+  body: TcreateEngineeringDeliveryStatusDto;
+}) => {
+  const api = `/engineering/delivery-list/${id}/delivery-status/`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 更新指定 DeliveryStatus
+export const apiPatchDeliveryStatus = ({
+  id,
+  statusId,
+  body,
+}: {
+  id: string;
+  statusId: string;
+  body: TupdateEngineeringDeliveryStatusDto;
+}) => {
+  const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 刪除指定 DeliveryStatus
+export const apiDeleteDeliveryStatus = ({ id, statusId }: { id: string; statusId: string }) => {
+  const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
+
+  return axi
+    .patch(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
