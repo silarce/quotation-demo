@@ -1,14 +1,12 @@
-import { useState, useEffect, useMemo, Fragment } from 'react';
+import { useEffect, useMemo, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
 import Decimal from 'decimal.js';
-import { nanoid } from 'nanoid';
 import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
 
@@ -17,7 +15,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useGetEngineeringContact } from 'js/api/api_engineering';
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
 
 // css
 import scss from './index.module.scss';
@@ -55,6 +53,7 @@ type TcenterTotalItem = {
   periodTotal: string;
 };
 type TcenterTotal = TcenterTotalItem[];
+
 type TrightTotal = {
   cumulativeTotal: string;
   tax: string;
@@ -101,6 +100,9 @@ export default function ContracTable() {
     control_list: control,
     control_arr,
     attachTimes,
+    control_leftTotal,
+    control_rightTotal,
+    control_centerTotal,
   } = useMemo(() => {
     if (!contract) {
       return {};
@@ -129,17 +131,8 @@ export default function ContracTable() {
 
     const subContractArr = _.sortBy(contract.subContracts, 'version');
 
-    // subContractArr.pop();
-    // subContractArr.pop();
-
-    console.log(subContractArr);
-
     const attachTimes = subContractArr.length - 1; //  有多少次變更
 
-    // const emptyCenterArr: TcenterItem[] = new Array(attachTimes).fill({
-    //   quantity: 0,
-    //   price: 0,
-    // });
     const createEmptyCenterArr = (): TcenterItem[] => {
       return new Array(attachTimes).fill({
         quantity: 0,
@@ -232,29 +225,18 @@ export default function ContracTable() {
               return;
             }
 
-            // centerQuantity = quantity - centerItem.quantity;
-            // centerPrice = totalPrice - centerItem.price;
-
             // 差值
             centerQuantity = quantity - item.left.remainQty;
             // product裡的數量是最後剩下的數量
             item.left.remainQty = quantity;
-
             centerPrice = centerQuantity * unitPrice;
-            // centerQuantity = quantity;
-            // centerPrice = totalPrice;
           });
 
           // 如果到最後都沒有找到
           if (centerQuantity === 0 && centerPrice === 0) {
-            // if (rootProductId === '8953bf11-50f4-47da-8871-1558139c456b') {
-            //   console.log('quantity', quantity);
-            //   console.log('item.left.quantity', item.left.quantity);
-            // }
-
             centerQuantity = quantity - item.left.remainQty;
             item.left.remainQty = quantity;
-            // centerPrice = totalPrice - item.left.totalPrice;
+
             centerPrice = centerQuantity * unitPrice;
           }
 
@@ -269,16 +251,66 @@ export default function ContracTable() {
             notes: '',
           };
         } // else
-
-        //
-        //
-        //
       }); //  prodcutArr.forEach
     }); // subContractArr.forEach
 
+    //
+    //----------
+
+    //----------
+
+    let leftSubTotal = 0;
+    const centerTotalArr: number[] = new Array(attachTimes).fill(0);
+    let rightTotal = 0;
+
+    Object.values(list).forEach((item) => {
+      const { left, centerArr, right } = item;
+
+      leftSubTotal = leftSubTotal + left.totalPrice;
+      rightTotal = rightTotal + right.exchangedPrice;
+
+      centerArr.forEach((centerItem, index) => {
+        centerTotalArr[index] = centerTotalArr[index] + centerItem.price;
+      });
+    });
+
+    const leftTax = new Decimal(leftSubTotal).mul(0.05).toFixed(2);
+    const control_leftTotal: Tcontrol_leftTotal = {
+      contractSubTotal: leftSubTotal.toLocaleString(),
+      tax: Number(leftTax).toLocaleString(),
+      contractTotal: Number(new Decimal(leftSubTotal).add(leftTax).toFixed(2)).toLocaleString(),
+    };
+
+    const rightTax = new Decimal(rightTotal).mul(0.05).toFixed(2);
+    const control_rightTotal: TrightTotal = {
+      cumulativeTotal: rightTotal.toLocaleString(),
+      tax: Number(rightTax).toLocaleString(),
+      doneTotal: Number(new Decimal(rightTotal).add(rightTax).toFixed(2)).toLocaleString(),
+    };
+
+    const control_centerTotal: TcenterTotal = centerTotalArr.map((centerTotal) => {
+      const tax = new Decimal(centerTotal).mul(0.05).toFixed(2);
+
+      return {
+        doneSubTotal: centerTotal.toLocaleString(),
+        tax: Number(tax).toLocaleString(),
+        periodTotal: Number(new Decimal(centerTotal).add(tax).toFixed(2)).toLocaleString(),
+      };
+    });
+
+    //----------
+
     const control_arr = Object.values(list) ?? [];
 
-    return { control_list: list, control_arr, attachTimes };
+    return {
+      control_list: list,
+      control_arr,
+      attachTimes,
+
+      control_leftTotal,
+      control_rightTotal,
+      control_centerTotal,
+    };
   }, [contract]);
 
   // -------------------------------------------------------------
@@ -316,44 +348,10 @@ export default function ContracTable() {
               );
             })}
 
-            {/* row */}
-            {/* <div className={scss.row}>
-              <Left
-                data={{
-                  projectNumber: 'foooo',
-                  itemName: 'foooo',
-                  size: 'foooo',
-                  quantity: 999,
-                  unitPrice: 999,
-                  totalPrice: 999,
-                }}
-              />
-              <Center dataArr={[foooooooo, foooooooo, foooooooo, foooooooo]} />
-              <Right
-                data={{
-                  exchangedQuantity: 999,
-                  exchangedPrice: 999,
-                  notes: 'foo',
-                }}
-              />
-            </div> */}
-
             <div className={classNames(scss.row, scss.totalRow)}>
-              <Left_total
-                data={{
-                  contractSubTotal: 'foo',
-                  tax: 'foo',
-                  contractTotal: 'foo',
-                }}
-              />
-              <Center_total dataArr={[barrrrrrr, barrrrrrr, barrrrrrr, barrrrrrr]} />
-              <Right_total02
-                data={{
-                  cumulativeTotal: 'foo',
-                  tax: 'foo',
-                  doneTotal: 'foo',
-                }}
-              />
+              <Left_total data={control_leftTotal} />
+              <Center_total dataArr={control_centerTotal} />
+              <Right_total02 data={control_rightTotal} />
             </div>
 
             {/*  */}
@@ -462,7 +460,7 @@ const Center = ({
   );
 };
 
-const Left_total = ({ data }: { data: Tcontrol_leftTotal }) => {
+const Left_total = ({ data }: { data: Tcontrol_leftTotal | undefined }) => {
   return (
     <>
       <div className={'w-[115px]'}></div>
@@ -475,18 +473,18 @@ const Left_total = ({ data }: { data: Tcontrol_leftTotal }) => {
         <span>合約總計</span>
       </div>
       <div className={classNames('w-[90px]', scss.totalGrid)}>
-        <span>{data.contractSubTotal}</span>
-        <span>{data.tax}</span>
-        <span>{data.contractTotal}</span>
+        <span>{data?.contractSubTotal}</span>
+        <span>{data?.tax}</span>
+        <span>{data?.contractTotal}</span>
       </div>
     </>
   );
 };
 
-const Center_total = ({ dataArr }: { dataArr: TcenterTotal }) => {
+const Center_total = ({ dataArr }: { dataArr: TcenterTotal | undefined }) => {
   return (
     <>
-      {dataArr.map((data, index) => {
+      {dataArr?.map((data, index) => {
         return (
           <Fragment key={index}>
             <div className={classNames('w-[92px] justify-center', scss.totalGrid, scss.labelGrid)}>
@@ -506,7 +504,7 @@ const Center_total = ({ dataArr }: { dataArr: TcenterTotal }) => {
   );
 };
 
-const Right_total02 = ({ data }: { data: TrightTotal }) => {
+const Right_total02 = ({ data }: { data: TrightTotal | undefined }) => {
   return (
     <>
       <div className={classNames('w-[80px] justify-center', scss.totalGrid, scss.labelGrid)}>
@@ -515,24 +513,11 @@ const Right_total02 = ({ data }: { data: TrightTotal }) => {
         <span>實作總計</span>
       </div>
       <div className={classNames('w-[110px] justify-center', scss.totalGrid)}>
-        <span>{data.cumulativeTotal}</span>
-        <span>{data.tax}</span>
-        <span>{data.doneTotal}</span>
+        <span>{data?.cumulativeTotal}</span>
+        <span>{data?.tax}</span>
+        <span>{data?.doneTotal}</span>
       </div>
       <div className={classNames('w-[86px]', scss.rightCell)}></div>
     </>
   );
-};
-
-// ========================================================================
-
-const foooooooo = {
-  quantity: 999,
-  price: 999,
-};
-
-const barrrrrrr = {
-  doneSubTotal: 'foo',
-  tax: 'foo',
-  periodTotal: 'foo',
 };
