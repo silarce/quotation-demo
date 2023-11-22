@@ -2579,11 +2579,14 @@ class Class_product {
     // const body = this.body;
     const divQty = Number(this.reduceQty) + this.exchangeQty;
     const theBody = this.body;
+
+    const quantity = theBody.quantity - divQty;
+
     const body = {
       ...this.body,
-      quantity: theBody.quantity - divQty,
-      dualPrice: new Decimal(theBody.quantity).mul(theBody.price).toNumber(),
-      totalPrice: new Decimal(theBody.quantity).mul(theBody.unitPrice).toNumber(),
+      quantity: quantity,
+      dualPrice: new Decimal(quantity).mul(theBody.price).toNumber(),
+      totalPrice: new Decimal(quantity).mul(theBody.unitPrice).toNumber(),
       attachedToProductId: this.id,
     };
     // body.quantity = body.quantity - divQty;

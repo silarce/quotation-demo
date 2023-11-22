@@ -324,6 +324,8 @@ export default function AttachContract() {
         })[];
       })();
 
+      console.log(divProdArr);
+
       // 追加跟變更
       const attachProdArr = Object.values(attachProdList).map((prod) => {
         return prod.body;
@@ -340,10 +342,10 @@ export default function AttachContract() {
         total: total_calced,
       };
 
-      try {
-        await apiQuotationModify(contractId, body);
-        router.back();
-      } catch (error) {}
+      // try {
+      //   await apiQuotationModify(contractId, body);
+      //   router.back();
+      // } catch (error) {}
       //
     } catch (error) {
       myAlert.err({ title: '上傳失敗' });
