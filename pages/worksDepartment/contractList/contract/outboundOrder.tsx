@@ -146,71 +146,71 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
+  // const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
 
-  const change_deliveryStatusWillUpdate = (
-    statusOri: TdeliveryStatusDto | undefined | null,
-    key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
-    v: string
-  ) => {
-    if (!statusOri) {
-      return;
-    }
+  // const change_deliveryStatusWillUpdate = (
+  //   statusOri: TdeliveryStatusDto | undefined | null,
+  //   key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
+  //   v: string
+  // ) => {
+  //   if (!statusOri) {
+  //     return;
+  //   }
 
-    const deliveryStatusId = statusOri.id;
-    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
-    statusCopy = { ...statusCopy };
-    statusCopy[key] = v;
+  //   const deliveryStatusId = statusOri.id;
+  //   let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+  //   statusCopy = { ...statusCopy };
+  //   statusCopy[key] = v;
 
-    setDeliveryStatusWillUpdate((state) => {
-      return {
-        ...state,
-        [deliveryStatusId]: statusCopy,
-      };
-    });
-  };
+  //   setDeliveryStatusWillUpdate((state) => {
+  //     return {
+  //       ...state,
+  //       [deliveryStatusId]: statusCopy,
+  //     };
+  //   });
+  // };
 
-  const change_deliveryStatusWillUpdate_employee = (
-    statusOri: TdeliveryStatusDto | undefined | null,
-    key: 'installerEmployee',
-    v: TemployeeDto | null
-  ) => {
-    if (!statusOri) {
-      return;
-    }
+  // const change_deliveryStatusWillUpdate_employee = (
+  //   statusOri: TdeliveryStatusDto | undefined | null,
+  //   key: 'installerEmployee',
+  //   v: TemployeeDto | null
+  // ) => {
+  //   if (!statusOri) {
+  //     return;
+  //   }
 
-    const deliveryStatusId = statusOri.id;
-    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
-    statusCopy = { ...statusCopy };
-    statusCopy[key] = v;
-    setDeliveryStatusWillUpdate((state) => {
-      return {
-        ...state,
-        [deliveryStatusId]: statusCopy,
-      };
-    });
-  };
+  //   const deliveryStatusId = statusOri.id;
+  //   let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+  //   statusCopy = { ...statusCopy };
+  //   statusCopy[key] = v;
+  //   setDeliveryStatusWillUpdate((state) => {
+  //     return {
+  //       ...state,
+  //       [deliveryStatusId]: statusCopy,
+  //     };
+  //   });
+  // };
 
-  const change_deliveryStatusWillUpdate_date = (
-    statusOri: TdeliveryStatusDto | undefined | null,
-    key: 'installationDate',
-    v: string | null
-  ) => {
-    if (!statusOri) {
-      return;
-    }
+  // const change_deliveryStatusWillUpdate_date = (
+  //   statusOri: TdeliveryStatusDto | undefined | null,
+  //   key: 'installationDate',
+  //   v: string | null
+  // ) => {
+  //   if (!statusOri) {
+  //     return;
+  //   }
 
-    const deliveryStatusId = statusOri.id;
-    let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
-    statusCopy = { ...statusCopy };
-    statusCopy[key] = v;
-    setDeliveryStatusWillUpdate((state) => {
-      return {
-        ...state,
-        [deliveryStatusId]: statusCopy,
-      };
-    });
-  };
+  //   const deliveryStatusId = statusOri.id;
+  //   let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
+  //   statusCopy = { ...statusCopy };
+  //   statusCopy[key] = v;
+  //   setDeliveryStatusWillUpdate((state) => {
+  //     return {
+  //       ...state,
+  //       [deliveryStatusId]: statusCopy,
+  //     };
+  //   });
+  // };
 
   // --------------------------------------------------------------------------
 
@@ -265,9 +265,9 @@ export default function OutboundOrder() {
     }
   }, [deliveryList]);
 
-  useEffect(() => {
-    setDeliveryStatusWillUpdate({});
-  }, [disabled]);
+  // useEffect(() => {
+  //   setDeliveryStatusWillUpdate({});
+  // }, [disabled]);
 
   // --------------------------------------------------------------------------
 
@@ -312,13 +312,8 @@ export default function OutboundOrder() {
           horsepower: firstItem.horsepower,
           surface: firstItem.materialSurface ?? '',
         },
-        deliveryStatus: {
+        staticData2: {
           remark01: {
-            value: '',
-            hidden: true,
-          },
-
-          appended: {
             value: '',
             hidden: true,
           },
@@ -326,26 +321,15 @@ export default function OutboundOrder() {
             value: '',
             hidden: true,
           },
-          finishAppended: {
-            value: '',
-            hidden: true,
-          },
-          installer: {
-            // value: '',
-            empolyee: null,
-            hidden: true,
-          },
-          installDate: {
-            value: '',
-            hidden: true,
-          },
         },
-        subGroup: {
-          btnPanelArr: [],
-          installDateArr: [],
-          installerArr: [],
-          itemNameArr: [],
-          notesArr: [],
+        deliveryStatus: {
+          groupList: {
+            btnPanelArr: [],
+            installDateArr: [],
+            installerArr: [],
+            itemNameArr: [],
+            notesArr: [],
+          },
         },
       };
 
@@ -360,20 +344,17 @@ export default function OutboundOrder() {
             return acce.name;
           }) ?? [];
 
-        const {
-          //
-          id: deliveryStatusId,
-          createdAt,
-          notes,
-          installerEmployeeId,
-          installerEmployee,
-          installationDate,
-          append,
-          completeAppend,
-        } = item.deliveryStatus ?? {};
-
-        const deliveryStatusWillUpdate_item: TdeliveryStatusWillUpdate[string] | undefined =
-          deliveryStatusWillUpdate[deliveryStatusId ?? ''];
+        // const {
+        //   //
+        //   id: deliveryStatusId,
+        //   createdAt,
+        //   notes,
+        //   installerEmployeeId,
+        //   installerEmployee,
+        //   installationDate,
+        //   append,
+        //   completeAppend,
+        // } = item.deliveryStatus ?? {};
 
         return {
           contractData: {
@@ -405,7 +386,7 @@ export default function OutboundOrder() {
             horsepower: item.horsepower,
             surface: item.materialSurface ?? '',
           },
-          deliveryStatus: {
+          staticData2: {
             remark01: {
               value: acceNameArr.join('\n'),
               forbidden: true,
@@ -414,108 +395,86 @@ export default function OutboundOrder() {
               value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
               forbidden: true,
             },
-            installDate: {
-              value:
-                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.installationDate : installationDate) ||
-                '',
-              onChange_date: (date) => {
-                change_deliveryStatusWillUpdate_date(item?.deliveryStatus, 'installationDate', date);
-              },
-            },
-            appended: {
-              value: (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.append : append) || '',
-              onChange: (str) => {
-                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'append', str);
-              },
-            },
-            finishAppended: {
-              value:
-                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.completeAppend : completeAppend) || '',
-              onChange: (str) => {
-                change_deliveryStatusWillUpdate(item?.deliveryStatus, 'completeAppend', str);
-              },
-            },
-            installer: {
-              // value: '', // 設定value的話就會蓋過employee.chName或employee.enName
-              empolyee:
-                (deliveryStatusWillUpdate_item ? deliveryStatusWillUpdate_item.installerEmployee : installerEmployee) ||
-                null,
-              onChange_employee: (emp) => {
-                change_deliveryStatusWillUpdate_employee(item?.deliveryStatus, 'installerEmployee', emp);
-              },
-            },
           },
-          subGroup: {
-            btnPanelArr: [
-              {
-                onEditClick: () => {},
-                onDeleteClick: () => {},
-              },
-              {
-                onEditClick: () => {},
-                onDeleteClick: () => {},
-              },
-              {
-                onEditClick: () => {},
-                onDeleteClick: () => {},
-              },
-            ],
-            installDateArr: [
-              {
-                value: '',
-                onChange_date: () => {},
-              },
-              {
-                value: '',
-                onChange_date: () => {},
-              },
-              {
-                value: '',
-                onChange_date: () => {},
-              },
-            ],
-            installerArr: [
-              {
-                empolyee: null,
-                onChange_employee: () => {},
-              },
-              {
-                empolyee: null,
-                onChange_employee: () => {},
-              },
-              {
-                empolyee: null,
-                onChange_employee: () => {},
-              },
-            ],
-            itemNameArr: [
-              {
-                value: '',
-                onChange: () => {},
-              },
-              {
-                value: '',
-                onChange: () => {},
-              },
-              {
-                value: '',
-                onChange: () => {},
-              },
-            ],
-            notesArr: [
-              {
-                value: '',
-                onChange: () => {},
-              },
-              {
-                value: '',
-                onChange: () => {},
-              },
-              {
-                value: '',
-                onChange: () => {},
-              },
-            ],
+          deliveryStatus: {
+            groupList: {
+              btnPanelArr: [
+                {
+                  onEditClick: () => {},
+                  onDeleteClick: () => {},
+                  onAddClick: () => {},
+                  onConfirmClick: () => {},
+                },
+                {
+                  onEditClick: () => {},
+                  onDeleteClick: () => {},
+                  onAddClick: () => {},
+                  onConfirmClick: () => {},
+                },
+                {
+                  onEditClick: () => {},
+                  onDeleteClick: () => {},
+                  onAddClick: () => {},
+                  onConfirmClick: () => {},
+                },
+              ],
+              installDateArr: [
+                {
+                  value: '',
+                  onChange_date: () => {},
+                },
+                {
+                  value: '',
+                  onChange_date: () => {},
+                },
+                {
+                  value: '',
+                  onChange_date: () => {},
+                },
+              ],
+              installerArr: [
+                {
+                  empolyee: null,
+                  onChange_employee: () => {},
+                },
+                {
+                  empolyee: null,
+                  onChange_employee: () => {},
+                },
+                {
+                  empolyee: null,
+                  onChange_employee: () => {},
+                },
+              ],
+              itemNameArr: [
+                {
+                  value: '',
+                  onChange: () => {},
+                },
+                {
+                  value: '',
+                  onChange: () => {},
+                },
+                {
+                  value: '',
+                  onChange: () => {},
+                },
+              ],
+              notesArr: [
+                {
+                  value: '',
+                  onChange: () => {},
+                },
+                {
+                  value: '',
+                  onChange: () => {},
+                },
+                {
+                  value: '',
+                  onChange: () => {},
+                },
+              ],
+            },
           },
         };
       });
@@ -531,77 +490,77 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  const reqUpdate = async () => {
-    if (!engineeringDeliveryListId || !deliveryList || notes === undefined) {
-      return myAlert.warning({ title: '還未取得工作表' });
-    }
+  // const reqUpdate = async () => {
+  //   if (!engineeringDeliveryListId || !deliveryList || notes === undefined) {
+  //     return myAlert.warning({ title: '還未取得工作表' });
+  //   }
 
-    const productsItemStatus: TupdateDeliveryStatus[] = Object.values(deliveryStatusWillUpdate).map((status) => {
-      // const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
-      const theDate = status.installationDate ? status.installationDate : null;
+  //   const productsItemStatus: TupdateDeliveryStatus[] = Object.values(deliveryStatusWillUpdate).map((status) => {
+  //     // const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
+  //     const theDate = status.installationDate ? status.installationDate : null;
 
-      return {
-        id: status.id,
-        notes: status.notes,
-        installerEmployeeId: status.installerEmployee?.id ?? null,
-        installationDate: theDate,
-        append: status.append,
-        completeAppend: status.completeAppend,
-      };
-    });
+  //     return {
+  //       id: status.id,
+  //       notes: status.notes,
+  //       installerEmployeeId: status.installerEmployee?.id ?? null,
+  //       installationDate: theDate,
+  //       append: status.append,
+  //       completeAppend: status.completeAppend,
+  //     };
+  //   });
 
-    const body: TupdateEngineeringDeliveryList = {
-      notes: notes,
-      productsItemStatus,
-    };
+  //   const body: TupdateEngineeringDeliveryList = {
+  //     notes: notes,
+  //     productsItemStatus,
+  //   };
 
-    try {
-      setIsLoading(true);
-      const res = await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, body);
+  //   try {
+  //     setIsLoading(true);
+  //     const res = await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, body);
 
-      if (res) {
-        myAlert.success({ title: '更新工作表成功' });
-        setDisabled(true);
-        await update_deliveryList();
-      }
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新工作表失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (res) {
+  //       myAlert.success({ title: '更新工作表成功' });
+  //       setDisabled(true);
+  //       await update_deliveryList();
+  //     }
+  //   } catch (error) {
+  //     const err = error as Error;
+  //     myAlert.err({ title: '更新工作表失敗', content: err.message });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // --------------------------------------------------------------------------
 
-  const panelList01: TpanelList = [
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: () => {
-        setDisabled(false);
-      },
-    },
-  ];
-  const panelList02: TpanelList = [
-    {
-      type: 'redButton',
-      label: '更新',
-      onClick: reqUpdate,
-    },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => {
-        setDisabled(true);
-      },
-    },
-  ];
+  // const panelList01: TpanelList = [
+  //   {
+  //     type: 'myButton',
+  //     label: '編輯',
+  //     onClick: () => {
+  //       setDisabled(false);
+  //     },
+  //   },
+  // ];
+  // const panelList02: TpanelList = [
+  //   {
+  //     type: 'redButton',
+  //     label: '更新',
+  //     onClick: reqUpdate,
+  //   },
+  //   {
+  //     type: 'myButton',
+  //     label: '取消',
+  //     onClick: () => {
+  //       setDisabled(true);
+  //     },
+  //   },
+  // ];
 
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        panelList={disabled ? panelList01 : panelList02}
+        // panelList={disabled ? panelList01 : panelList02}
         contractNumber={engineeringContact?.contractNumber ?? ''}
       />
 
@@ -618,7 +577,7 @@ export default function OutboundOrder() {
             </div>
           </div>
 
-          <OrderTable disabled={disabled} control={control_orderTable} />
+          <OrderTable control={control_orderTable} />
 
           <div className={style.remark}>
             <div className={style.title}>

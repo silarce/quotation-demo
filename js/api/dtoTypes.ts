@@ -1025,7 +1025,7 @@ export type TquotationProductItemDto = Omit<
   itemNumber: string;
   worksheetId: string;
   others: null;
-  deliveryStatus?: TdeliveryStatusDto | null;
+  deliveryStatus?: TdeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
   adjustedItemId?: string | null;
   //

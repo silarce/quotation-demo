@@ -127,8 +127,13 @@ $cellgap: 16px;
       &.subGroup {
         display: grid;
         gap: 20px;
+
+        > div {
+          height: 27px;
+        }
         .btnPanel {
           display: flex;
+          align-items: center;
           gap: 22px;
           svg {
             width: 16px;
@@ -171,5 +176,3 @@ $cellgap: 16px;
 .hidden {
   visibility: hidden;
 }
-
-// 日期 人員 項目 備註

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import style from './outboundOrder.module.scss';
+import scss from './outboundOrder.module.scss';
 
 // global gear
 // import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -10,7 +10,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 
 // icon
-import { IconAddCircle, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
+import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 
 // type
 import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
@@ -57,6 +57,8 @@ type TdeliveryStatusItem = {
   forbidden?: boolean;
   onEditClick?: undefined;
   onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
 };
 type TdeliveryStatusItem_date = {
   value: string;
@@ -68,6 +70,8 @@ type TdeliveryStatusItem_date = {
   forbidden?: boolean;
   onEditClick?: undefined;
   onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
 };
 
 type TdeliveryStatusItem_employee = {
@@ -80,6 +84,8 @@ type TdeliveryStatusItem_employee = {
   forbidden?: boolean;
   onEditClick?: undefined;
   onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
 };
 
 type TdeliveryStatusItem_btnPanel = {
@@ -90,8 +96,10 @@ type TdeliveryStatusItem_btnPanel = {
   onChange_employee?: undefined;
   hidden?: boolean;
   forbidden?: boolean;
-  onEditClick?: () => void;
-  onDeleteClick?: () => void;
+  onEditClick: () => void;
+  onDeleteClick: () => void;
+  onAddClick: () => void;
+  onConfirmClick: () => void;
 };
 
 type Tgroup = {
@@ -99,21 +107,20 @@ type Tgroup = {
   rowArr: {
     contractData: TcontractData;
     staticData: TstaticData;
-    deliveryStatus: {
+    staticData2: {
       remark01: TdeliveryStatusItem;
-
-      appended: TdeliveryStatusItem;
       orderCreatedDate: TdeliveryStatusItem;
-      finishAppended: TdeliveryStatusItem;
-      installer: TdeliveryStatusItem_employee;
-      installDate: TdeliveryStatusItem_date;
     };
-    subGroup: {
-      btnPanelArr: TdeliveryStatusItem_btnPanel[];
-      installDateArr: TdeliveryStatusItem_date[];
-      installerArr: TdeliveryStatusItem_employee[];
-      itemNameArr: TdeliveryStatusItem[];
-      notesArr: TdeliveryStatusItem[];
+
+    deliveryStatus: {
+      disabled?: boolean;
+      groupList: {
+        btnPanelArr: TdeliveryStatusItem_btnPanel[];
+        installDateArr: TdeliveryStatusItem_date[];
+        installerArr: TdeliveryStatusItem_employee[];
+        itemNameArr: TdeliveryStatusItem[];
+        notesArr: TdeliveryStatusItem[];
+      };
     };
   }[];
 };
@@ -123,15 +130,15 @@ type Tcontrol = Tgroup[];
 export type { Tcontrol as Tcontrol_orderTable, Tgroup };
 
 // ================================================================================
-export default function OrderTable({ disabled, control }: { disabled: boolean; control: Tcontrol }) {
+export default function OrderTable({ control }: { control: Tcontrol }) {
   const configList = creConfigList();
 
   // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
   const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_employee | undefined>();
 
   return (
-    <div className={style.orderTable}>
-      <div className={style.thead}>
+    <div className={scss.orderTable}>
+      <div className={scss.thead}>
         {/*  */}
         {/* <div className={`${style.theadItem} ${style.indexCell}`} /> */}
         {/*  */}
@@ -141,11 +148,11 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           if (index === 0) {
             return (
-              <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
                 <span></span>
                 <span>{label}</span>
               </div>
@@ -158,54 +165,54 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
           //   </div>
           // );
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
 
         {/* 灰色柱子 分隔線*/}
-        <div className={` ${style.pilar}`} />
+        <div className={` ${scss.pilar}`} />
 
         {orderKeyArr_static.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
         {/* 灰色分隔線 */}
-        <div className={` ${style.pilar}`} />
+        <div className={` ${scss.pilar}`} />
         {/*  */}
-        {orderKey_editible.map((key, index) => {
+        {orderKey_staticData2.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
         {/*  */}
-        {orderKey_subGroup.map((key, index) => {
+        {orderKey_deliveryStatus.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
@@ -213,17 +220,17 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
         {/*  */}
       </div>
 
-      <div className={style.tableList}>
+      <div className={scss.tableList}>
         {control.map((item, groupIndex) => {
           const { itemName, rowArr } = item;
 
           return (
             <div key={groupIndex}>
               {rowArr.map((row, rowIndex) => {
-                const bgcSub = rowIndex !== 0 ? style.bgcSub : '';
+                const bgcSub = rowIndex !== 0 ? scss.bgcSub : '';
 
                 return (
-                  <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
+                  <div className={`${scss.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
 
                     {orderKeyArr_contract.map((key, columnIndex) => {
@@ -243,13 +250,13 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                           <div
                             className={classNames(
                               //
-                              style.column,
-                              position === 'center' && style.textCenter
+                              scss.column,
+                              position === 'center' && scss.textCenter
                             )}
                             key={columnIndex}
                             style={theStyle}
                           >
-                            <span className={classNames('pr-[10px]', isHiddenIndex && style.hidden)}>
+                            <span className={classNames('pr-[10px]', isHiddenIndex && scss.hidden)}>
                               {groupIndex + 1}
                             </span>
                             <span>{value}</span>
@@ -261,9 +268,9 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                         <div
                           className={classNames(
                             //
-                            style.column,
-                            position === 'center' && style.textCenter,
-                            rowIndex !== 0 && style.hidden
+                            scss.column,
+                            position === 'center' && scss.textCenter,
+                            rowIndex !== 0 && scss.hidden
                           )}
                           key={columnIndex}
                           style={theStyle}
@@ -274,7 +281,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     })}
 
                     {/* 灰色分隔線 */}
-                    <div className={classNames(style.pilar, rowIndex !== 0 && style.hidden)} />
+                    <div className={classNames(scss.pilar, rowIndex !== 0 && scss.hidden)} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
@@ -289,7 +296,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
 
                       return (
                         <div
-                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          className={classNames(scss.column, position === 'center' && scss.textCenter)}
                           key={columnIndex}
                           style={theStyle}
                         >
@@ -299,108 +306,50 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     })}
 
                     {/* 沒有柱子的灰色柱子 */}
-                    <div className={`${style.pilar}`} />
+                    <div className={`${scss.pilar}`} />
 
                     {/* orderKeyIndex02 */}
-                    {orderKey_editible.map((key, columnIndex) => {
-                      const { value, empolyee, onChange_date, onChange, hidden, forbidden, onChange_employee } =
-                        row.deliveryStatus[key];
+                    {orderKey_staticData2.map((key, columnIndex) => {
+                      const { value } = row.staticData2[key];
 
-                      const { width, position, type } = configList[key] ?? {};
+                      const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
-
-                      const theProps: Parameters<typeof InputSel>[0] = {};
-
-                      if (type === 'input') {
-                        theProps.inputProps = {
-                          props: {
-                            value: value ?? '',
-                            onChange: (e) => {
-                              onChange?.(e.target.value);
-                            },
-                            placeholder: '',
-                          },
-                        };
-                      }
-
-                      if (type === 'textarea') {
-                        theProps.textareaProps = {
-                          allowNewLineByUser: true,
-                          wrapperClassName: style.foo,
-                          props: {
-                            value: value ?? '',
-                            onChange: (e) => onChange?.(e.target.value),
-                            placeholder: '',
-                          },
-                        };
-                      }
-
-                      if (type === 'date') {
-                        theProps.datePickerProps = {
-                          props: {
-                            value: value ? moment(value) : null,
-                            onChange: (m) => {
-                              onChange_date?.(m?.toISOString() ?? null);
-                            },
-                            placeholder: '',
-                          },
-                          wrapperClassName: style.datepicker,
-                        };
-                      }
-
-                      let onClick: (() => void) | undefined = undefined;
-
-                      if (type === 'employee' && key === 'installer') {
-                        theProps.inputProps = {
-                          props: {
-                            value: value || empolyee?.chName || empolyee?.enName || '',
-                            placeholder: '',
-                          },
-                        };
-
-                        onClick = () => {
-                          !disabled && setTargetEmpControl(row.deliveryStatus[key]);
-                        };
-                      }
+                      const textCenter = position === 'center' ? scss.textCenter : '';
 
                       return (
-                        <div
-                          className={`${style.column} ${textCenter}`}
-                          key={columnIndex}
-                          style={theStyle}
-                          onClick={onClick}
-                        >
+                        <div className={`${scss.column} ${textCenter}`} key={columnIndex} style={theStyle}>
                           <InputSel
-                            className={classNames(style.input03, hidden && style.hidden)}
-                            showBaseline={forbidden ? 'invisible' : 'auto'}
-                            // placeholder=""
-                            disabled={forbidden || disabled}
-                            {...theProps}
+                            className={classNames(scss.input03)}
+                            showBaseline={'invisible'}
+                            disabled={true}
+                            inputProps={{
+                              props: {
+                                value,
+                                placeholder: '',
+                              },
+                            }}
                           />
                         </div>
                       );
                     })}
                     {/*  */}
 
-                    {orderKey_subGroup.map((key, index) => {
-                      const group = row.subGroup[key];
+                    {orderKey_deliveryStatus.map((key, index) => {
+                      const { disabled, groupList } = row.deliveryStatus;
+
+                      const group = groupList[key];
 
                       const { width, position, type } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
+                      const textCenter = position === 'center' ? scss.textCenter : '';
 
                       const theProps: Parameters<typeof InputSel>[0] = {};
-
-                      // Object.values(subGroup).map(() => {
-                      //   return null;
-                      // });
 
                       return (
                         <div
                           //
                           key={key}
-                          className={classNames(style.column, textCenter, style.subGroup)}
+                          className={classNames(scss.column, textCenter, scss.subGroup)}
                           style={theStyle}
                         >
                           {group.map((item, index) => {
@@ -410,15 +359,24 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                               onChange_date,
                               onChange_employee,
 
+                              onAddClick,
                               onEditClick,
                               onDeleteClick,
+                              onConfirmClick,
                             } = item;
 
                             if (key === 'btnPanelArr') {
+                              const isFirst = index === 0;
+
                               return (
-                                <div key={index} className={style.btnPanel}>
-                                  <IconAddCircle />
-                                  <IconEdit />
+                                <div key={index} className={classNames(scss.btnPanel)}>
+                                  <IconAddCircle className={classNames(!isFirst && scss.hidden)} onClick={onAddClick} />
+                                  {disabled ? (
+                                    <IconEdit onClick={onEditClick} />
+                                  ) : (
+                                    <IconCheck02 onClick={onConfirmClick} />
+                                  )}
+                                  <IconDelete01 onClick={onDeleteClick} />
                                 </div>
                               );
                             }
@@ -439,7 +397,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                               return (
                                 <div key={index} onClick={onClick}>
                                   <InputSel
-                                    className={classNames(style.input03)}
+                                    className={classNames(scss.input03)}
                                     showBaseline={'auto'}
                                     // placeholder=""
                                     disabled={disabled}
@@ -453,14 +411,14 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                             if (onChange_date) {
                               return (
                                 <div key={index}>
-                                  <InputSel datePickerProps={{}} />
+                                  <InputSel datePickerProps={{}} disabled={disabled} showBaseline={'auto'} />
                                 </div>
                               );
                             }
 
                             return (
                               <div key={index}>
-                                <InputSel inputProps={{}} />
+                                <InputSel inputProps={{}} disabled={disabled} showBaseline={'auto'} />
                               </div>
                             );
                           })}
@@ -469,7 +427,7 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     })}
 
                     {/*  */}
-                    {rowIndex !== 0 && <div className={style.ribbon}></div>}
+                    {rowIndex !== 0 && <div className={scss.ribbon}></div>}
                   </div> // row
                 ); // return
               })}
@@ -523,20 +481,13 @@ const orderKeyArr_static: (keyof TstaticData)[] = [
   'surface',
 ];
 
-const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
-  'orderCreatedDate',
-  // 'installDate',
+const orderKey_staticData2: (keyof Tgroup['rowArr'][number]['staticData2'])[] = [
   //
+  'orderCreatedDate',
   'remark01',
-  // 'remark02',
-  // 'remark03',
-  // 'remark04',
-  // 'appended',
-  // 'finishAppended',
-  // 'installer',
 ];
 
-const orderKey_subGroup: (keyof Tgroup['rowArr'][number]['subGroup'])[] = [
+const orderKey_deliveryStatus: (keyof Tgroup['rowArr'][number]['deliveryStatus']['groupList'])[] = [
   'btnPanelArr',
   'installDateArr',
   'installerArr',
@@ -693,7 +644,7 @@ const creCellConfig_static = (): TcellConfigList => ({
 });
 // =============================================================
 
-const creCellConfig_deliveryStatus = (): TcellConfigList => ({
+const creCellConfig_staticData2 = (): TcellConfigList => ({
   remark01: {
     label: '備註1',
     width: '200px',
@@ -759,7 +710,7 @@ const creCellConfig_deliveryStatus = (): TcellConfigList => ({
 const creCellConfig_subGroup = (): TcellConfigList => ({
   btnPanelArr: {
     label: '',
-    width: '54px',
+    width: '92px',
     type: 'other',
     position: '',
   },
@@ -793,6 +744,6 @@ const creCellConfig_subGroup = (): TcellConfigList => ({
 
 const creConfigList = (): TcellConfigList => ({
   ...creCellConfig_static(),
-  ...creCellConfig_deliveryStatus(),
+  ...creCellConfig_staticData2(),
   ...creCellConfig_subGroup(),
 });
