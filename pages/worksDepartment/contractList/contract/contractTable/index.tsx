@@ -97,7 +97,8 @@ export default function ContracTable() {
   // -------------------------------------------------------------
 
   const {
-    control_list: control,
+    //
+    control_list,
     control_arr,
     attachTimes,
     control_leftTotal,
@@ -324,34 +325,35 @@ export default function ContracTable() {
       <div className={scss.main}>
         <div className={scss.tableContainer}>
           <div className={scss.tablewrapper}>
-            <div className={scss.top}>
-              {/*  */}
+            {/* <div className={scss.top}>
               <div>
                 <span>本期請款金額：{'foooo'}</span>
               </div>
-            </div>
+            </div> */}
             {/*  */}
-            <div className={classNames(scss.row, scss.thead)}>
-              <Left isThead={true} />
-              <Center isThead={true} dataArr={new Array(attachTimes).fill(undefined)} />
-              <Right isThead={true} />
-            </div>
-            {control_arr?.map((item, index) => {
-              const { left, centerArr, right } = item;
+            <div className={scss.table}>
+              <div className={classNames(scss.row, scss.thead)}>
+                <Left isThead={true} />
+                <Center isThead={true} dataArr={new Array(attachTimes).fill(undefined)} />
+                <Right isThead={true} />
+              </div>
+              {control_arr?.map((item, index) => {
+                const { left, centerArr, right } = item;
 
-              return (
-                <div className={scss.row} key={index}>
-                  <Left data={left} />
-                  <Center dataArr={centerArr} />
-                  <Right data={right} />
-                </div>
-              );
-            })}
+                return (
+                  <div className={scss.row} key={index}>
+                    <Left data={left} />
+                    <Center dataArr={centerArr} />
+                    <Right data={right} />
+                  </div>
+                );
+              })}
 
-            <div className={classNames(scss.row, scss.totalRow)}>
-              <Left_total data={control_leftTotal} />
-              <Center_total dataArr={control_centerTotal} />
-              <Right_total02 data={control_rightTotal} />
+              <div className={classNames(scss.row, scss.totalRow)}>
+                <Left_total data={control_leftTotal} />
+                <Center_total dataArr={control_centerTotal} />
+                <Right_total02 data={control_rightTotal} />
+              </div>
             </div>
 
             {/*  */}

@@ -1,7 +1,7 @@
 .main {
   padding: 0 17px;
-  padding-top: 60px;
-  padding-bottom: 50px;
+  // padding-top: 60px;
+  // padding-bottom: 50px;
 }
 
 .tableContainer {
@@ -30,6 +30,13 @@
   }
 }
 
+.table {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: auto;
+}
+
 .row {
   display: flex;
   flex-wrap: nowrap;
@@ -42,6 +49,10 @@
 
   &.totalRow {
     border-top: solid 1px theme("colors.border");
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    background-color: #fff;
   }
 
   &.thead {
