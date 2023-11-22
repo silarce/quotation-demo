@@ -25,21 +25,22 @@ import scss from './index.module.scss';
 // ========================================================================
 
 type TcenterItem = {
-  quantity: string;
-  price: string;
+  quantity: number;
+  price: number;
 };
 type Tcontrol_left = {
   projectNumber: string;
   itemName: string;
   size: string;
-  quantity: string;
-  unitPrice: string;
-  totalPrice: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
 };
 type Tcontrol_center = TcenterItem[];
+
 type Tcontrol_right = {
-  exchangedQuantity: string;
-  exchangedPrice: string;
+  exchangedQuantity: number;
+  exchangedPrice: number;
   notes: string;
 };
 
@@ -96,21 +97,188 @@ export default function ContracTable() {
 
   // -------------------------------------------------------------
 
-  const foo = useMemo(() => {
+  const {
+    control_list: control,
+    control_arr,
+    attachTimes,
+  } = useMemo(() => {
     if (!contract) {
       return {};
     }
 
+    type Tlist = {
+      [key: string /* rootProductId */]: {
+        left: /* 建立時 */ {
+          projectNumber: string;
+          itemName: string;
+          size: string;
+          quantity: number;
+          unitPrice: number;
+          totalPrice: number;
+        };
+        centerArr: /* 追加追減 減少或增加 */ { quantity: number; price: number }[];
+        right: /*這個產品最後的狀態 */ {
+          exchangedQuantity: number;
+          exchangedPrice: number;
+          notes: string;
+        };
+        //
+      };
+    };
+
     const subContractArr = _.sortBy(contract.subContracts, 'version');
+
+    subContractArr.pop();
+    subContractArr.pop();
+
     console.log(subContractArr);
 
-    /**
-     *  subContractArr.length-1 === 有多少次變更
-     *
-     */
+    const attachTimes = subContractArr.length - 1; //  有多少次變更
 
-    return {};
+    // const emptyCenterArr: TcenterItem[] = new Array(attachTimes).fill({
+    //   quantity: 0,
+    //   price: 0,
+    // });
+    const createEmptyCenterArr = (): TcenterItem[] => {
+      return new Array(attachTimes).fill({
+        quantity: 0,
+        price: 0,
+      });
+    };
+
+    const createdEmptyListItem = (): Tlist[string] => ({
+      left: {
+        projectNumber: '',
+        itemName: '',
+        size: '',
+        quantity: 0,
+        unitPrice: 0,
+        totalPrice: 0,
+      },
+      centerArr: createEmptyCenterArr(),
+      right: {
+        exchangedQuantity: 0,
+        exchangedPrice: 0,
+        notes: '',
+      },
+    });
+
+    const list: Tlist = {};
+
+    subContractArr.forEach((subContract, subContractIndex) => {
+      const prodcutArr = subContract.content.products;
+
+      const { quotationNumber } = subContract.content;
+
+      prodcutArr.forEach((prod) => {
+        const {
+          rootProductId,
+          //
+          itemName,
+          fullWidth,
+          height,
+          boxB,
+          quantity,
+          unitPrice,
+          totalPrice,
+        } = prod;
+
+        const fullWidth_cm = new Decimal(fullWidth || 0).div(10).toString();
+        const height_cm = new Decimal(height || 0).div(10).toString();
+        const boxB_cm = new Decimal(boxB || 0).div(10).toString();
+
+        // if (rootProductId === '3359a3d5-33c2-4dad-86f0-07298020fb50') {
+        //   console.log(quantity);
+        // }
+
+        if (!list[rootProductId]) {
+          list[rootProductId] = createdEmptyListItem();
+          const newItem = list[rootProductId];
+          newItem.left = {
+            projectNumber: subContractIndex === 0 ? '' : quotationNumber,
+            itemName: itemName,
+            size: `${fullWidth_cm}*${height_cm}+${boxB_cm}`,
+            quantity,
+            unitPrice,
+            totalPrice,
+          };
+          newItem.right = {
+            exchangedQuantity: quantity,
+            exchangedPrice: totalPrice,
+            notes: '',
+          };
+        } else {
+          const item = list[rootProductId];
+          const centerArrReverse = item.centerArr.toReversed();
+
+          // console.log(centerArrReverse);
+          // console.log(centerArrReverse);
+
+          // if (rootProductId === '3359a3d5-33c2-4dad-86f0-07298020fb50') {
+          //   console.log(quantity);
+          // }
+
+          let centerQuantity = 0;
+          let centerPrice = 0;
+
+          centerArrReverse.forEach((centerItem, index) => {
+            // console.log(centerItem);
+            // console.log('----------------------------------------------');
+
+            // 如果已經找到了
+            if (centerQuantity !== 0 || centerPrice !== 0) {
+              return;
+            }
+
+            // 如果是空的
+            if (centerItem.price === 0 && centerItem.quantity === 0) {
+              return;
+            }
+
+            if (rootProductId === '3359a3d5-33c2-4dad-86f0-07298020fb50') {
+              // console.log('quantity', quantity);
+              // console.log('totalPrice', totalPrice);
+              // console.log('centerQuantity', centerQuantity);
+              // console.log('centerPrice', centerPrice);
+              // console.log('fooo', quantity - centerItem.quantity);
+            }
+
+            centerQuantity = quantity - centerItem.quantity;
+            centerPrice = totalPrice - centerItem.price;
+
+            //
+          });
+
+          // 如果到最後都沒有找到
+          if (centerQuantity === 0 && centerPrice === 0) {
+            centerQuantity = quantity - item.left.quantity;
+            centerPrice = totalPrice - item.left.totalPrice;
+          }
+
+          item.centerArr[subContractIndex - 1] = {
+            quantity: centerQuantity,
+            price: centerPrice,
+          };
+
+          item.right = {
+            exchangedQuantity: quantity,
+            exchangedPrice: totalPrice,
+            notes: '',
+          };
+        } // else
+
+        //
+        //
+        //
+      }); //  prodcutArr.forEach
+    }); // subContractArr.forEach
+
+    const control_arr = Object.values(list) ?? [];
+
+    return { control_list: list, control_arr, attachTimes };
   }, [contract]);
+
+  // console.log(control);
 
   // -------------------------------------------------------------
   return (
@@ -131,32 +299,44 @@ export default function ContracTable() {
             </div>
             {/*  */}
             <div className={classNames(scss.row, scss.thead)}>
-              <Left />
-              <Center dataArr={[undefined, undefined, undefined, undefined]} />
-              <Right />
+              <Left isThead={true} />
+              {/* <Center isThead={true} dataArr={[undefined, undefined, undefined, undefined]} /> */}
+              <Center isThead={true} dataArr={new Array(attachTimes).fill(undefined)} />
+              <Right isThead={true} />
             </div>
+            {control_arr?.map((item, index) => {
+              const { left, centerArr, right } = item;
+
+              return (
+                <div className={scss.row} key={index}>
+                  <Left data={left} />
+                  <Center dataArr={centerArr} />
+                  <Right data={right} />
+                </div>
+              );
+            })}
 
             {/* row */}
-            <div className={scss.row}>
+            {/* <div className={scss.row}>
               <Left
                 data={{
                   projectNumber: 'foooo',
                   itemName: 'foooo',
                   size: 'foooo',
-                  quantity: 'foooo',
-                  unitPrice: 'foooo',
-                  totalPrice: 'foooo',
+                  quantity: 999,
+                  unitPrice: 999,
+                  totalPrice: 999,
                 }}
               />
               <Center dataArr={[foooooooo, foooooooo, foooooooo, foooooooo]} />
               <Right
                 data={{
-                  exchangedQuantity: 'foo',
-                  exchangedPrice: 'foo',
+                  exchangedQuantity: 999,
+                  exchangedPrice: 999,
                   notes: 'foo',
                 }}
               />
-            </div>
+            </div> */}
 
             <div className={classNames(scss.row, scss.totalRow)}>
               <Left_total
@@ -186,71 +366,84 @@ export default function ContracTable() {
 
 // ========================================================================
 const Left = ({
-  data = {
-    projectNumber: '追加追減',
-    itemName: '項目',
-    size: '尺寸 (cm)',
-    quantity: '數量',
-    unitPrice: '合約單價',
-    totalPrice: '合約金額',
-  },
+  //
+  isThead,
+  data,
 }: {
+  isThead?: boolean;
   data?: Tcontrol_left;
 }) => {
+  const projectNumber = isThead ? '追加追減' : data?.projectNumber;
+  const itemName = isThead ? '項目' : data?.itemName;
+  const size = isThead ? '尺寸 (cm)' : data?.size;
+  const quantity = isThead ? '數量' : data?.quantity;
+  const unitPrice = isThead ? '合約單價' : data?.unitPrice;
+  const totalPrice = isThead ? '合約金額' : data?.totalPrice;
+
   return (
     <>
       <div className={'w-[115px]'}>
-        <span>{data.projectNumber}</span>
+        <span>{projectNumber}</span>
       </div>
       <div className={'w-[80px]'}>
-        <span>{data.itemName}</span>
+        <span>{itemName}</span>
       </div>
       <div className={'w-[110px]'}>
-        <span>{data.size}</span>
+        <span>{size}</span>
       </div>
       <div className={'w-[50px]'}>
-        <span>{data.quantity}</span>
+        <span>{quantity}</span>
       </div>
       <div className={'w-[90px]'}>
-        <span>{data.unitPrice}</span>
+        <span>{unitPrice}</span>
       </div>
       <div className={'w-[90px]'}>
-        <span>{data.totalPrice}</span>
+        <span>{totalPrice}</span>
       </div>
     </>
   );
 };
 
 const Right = ({
-  data = {
-    exchangedQuantity: '變更後數量',
-    exchangedPrice: '變更後金額',
-    notes: '備註',
-  },
+  //
+  isThead,
+  data,
 }: {
+  isThead?: boolean;
   data?: Tcontrol_right;
 }) => {
+  const exchangedQuantity = isThead ? '變更後數量' : data?.exchangedQuantity;
+  const exchangedPrice = isThead ? '變更後金額' : data?.exchangedPrice;
+  const notes = isThead ? '備註' : data?.notes;
+
   return (
     <>
       <div className={classNames('w-[80px]', scss.rightCell)}>
-        <span>{data.exchangedQuantity}</span>
+        <span>{exchangedQuantity}</span>
       </div>
       <div className={classNames('w-[110px]', scss.rightCell)}>
-        <span>{data.exchangedPrice}</span>
+        <span>{exchangedPrice}</span>
       </div>
       <div className={classNames('w-[86px]', scss.rightCell)}>
-        <span>{data.notes}</span>
+        <span>{notes}</span>
       </div>
     </>
   );
 };
 
-const Center = ({ dataArr }: { dataArr: (TcenterItem | undefined)[] }) => {
+const Center = ({
+  //
+  isThead,
+  dataArr,
+}: {
+  isThead?: boolean;
+  dataArr: (TcenterItem | undefined)[];
+}) => {
   return (
     <>
       {dataArr.map((data, index) => {
-        const quantity = data?.quantity ?? `數量(變更${index + 1})`;
-        const price = data?.price ?? `金額(變更${index + 1})`;
+        const quantity = isThead ? `數量(變更${index + 1})` : data?.quantity;
+        const price = isThead ? `金額(變更${index + 1})` : data?.price;
 
         const isOdd = index % 2 === 0;
 
@@ -334,8 +527,8 @@ const Right_total02 = ({ data }: { data: TrightTotal }) => {
 // ========================================================================
 
 const foooooooo = {
-  quantity: 'foo',
-  price: 'foo',
+  quantity: 999,
+  price: 999,
 };
 
 const barrrrrrr = {
