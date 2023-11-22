@@ -31,6 +31,7 @@ import {
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
   apiPatchEngineeringDeliveryList,
+  TcreateEngineeringDeliveryStatusDto,
 } from 'js/api/api_engineering';
 
 // utils
@@ -143,6 +144,13 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   const [notes, setNotes] = useState<string>();
+
+  // --------------------------------------------------------------------------
+
+  // const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TcreateEngineeringDeliveryStatusDto>();
+  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<{
+    [key: string /*id */]: TcreateEngineeringDeliveryStatusDto & { id: string };
+  }>();
 
   // --------------------------------------------------------------------------
 
