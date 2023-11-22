@@ -970,26 +970,50 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+export type TaccountsReceivableProductPaymentDto = {
+  //  '期數'
+  period: number;
+  //  '請款比例(完成數量)'
+  paymentRatio: string | null;
+  //  '發票id'
+  invoiceId: string | null;
+  //  '發票' 要用的時候在跟Gina要型別吧
+  // invoice: AccountsReceivableInvoiceDto;
+  //  '關聯產品itemId'
+  productItemId: string | null;
+  //  '關聯產品itemId'
+  productItem: TquotationProductItemDto;
+  //  '完成項目'
+  // completeItemStatus: EngineeringDeliveryStatusDto[];
+  completeItemStatus: TdeliveryStatusDto[];
+};
+
 export type TdeliveryStatusDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // @ApiProperty({ description: '所屬產品' })
+  productItemId?: string;
+  //  '所屬產品'
   productItem?: TquotationProductItemDto;
-  // @ApiProperty({ description: '備註' })
+  //  '備註'
   notes: string | null;
-  // @ApiProperty({ description: '安裝人員Id' })
+  itemName: string | null;
+  //  '安裝人員Id'
   installerEmployeeId: string | null;
-  // @ApiProperty({ description: '安裝人員' })
+  //  '安裝人員'
   installerEmployee?: TemployeeDto | null;
-  // @ApiProperty({ description: '安裝日期' })
+  //  '安裝日期'
   installationDate: string | null;
-  // @ApiProperty({ description: '工作表開立日期' })
+  //  '工作表開立日期'
   workSheetInvoiceDate: string | null;
-  // @ApiProperty({ description: '追加' })
+  //  '追加'
   append: string | null;
-  // @ApiProperty({ description: '完成追加' })
+  //  '完成追加'
   completeAppend: string | null;
+  //
+  completePayment: boolean | null;
+  productPaymentId: boolean | null;
+  productPayment: TaccountsReceivableProductPaymentDto;
 };
 
 export type TupdateDeliveryStatus = {

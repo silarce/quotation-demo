@@ -70,7 +70,7 @@ export default function OutboundOrder() {
   const { contractId } = router.query as { contractId: string | undefined };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [disabled, setDisabled] = useState(true);
+  // const [disabled, setDisabled] = useState(true);
 
   // --------------------------------------------------------------------------
 
