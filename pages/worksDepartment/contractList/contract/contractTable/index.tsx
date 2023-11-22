@@ -214,7 +214,9 @@ export default function ContracTable() {
         } else {
           const item = list[rootProductId];
 
-          const centerArrReverse = _.cloneDeep(item.centerArr).toReversed();
+          // npm run check時會報型別錯誤
+          // const centerArrReverse = _.cloneDeep(item.centerArr).toReversed();
+          const centerArrReverse = _.cloneDeep(item.centerArr).reverse();
 
           let centerQuantity = 0;
           let centerPrice = 0;
