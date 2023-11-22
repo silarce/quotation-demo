@@ -115,6 +115,7 @@ export default function ContracTable() {
           quantity: number;
           unitPrice: number;
           totalPrice: number;
+          remainQty: number;
         };
         centerArr: /* 追加追減 減少或增加 */ { quantity: number; price: number }[];
         right: /*這個產品最後的狀態 */ {
@@ -128,8 +129,8 @@ export default function ContracTable() {
 
     const subContractArr = _.sortBy(contract.subContracts, 'version');
 
-    subContractArr.pop();
-    subContractArr.pop();
+    // subContractArr.pop();
+    // subContractArr.pop();
 
     console.log(subContractArr);
 
@@ -154,6 +155,7 @@ export default function ContracTable() {
         quantity: 0,
         unitPrice: 0,
         totalPrice: 0,
+        remainQty: 0,
       },
       centerArr: createEmptyCenterArr(),
       right: {
@@ -187,10 +189,6 @@ export default function ContracTable() {
         const height_cm = new Decimal(height || 0).div(10).toString();
         const boxB_cm = new Decimal(boxB || 0).div(10).toString();
 
-        // if (rootProductId === '3359a3d5-33c2-4dad-86f0-07298020fb50') {
-        //   console.log(quantity);
-        // }
-
         if (!list[rootProductId]) {
           list[rootProductId] = createdEmptyListItem();
           const newItem = list[rootProductId];
@@ -201,30 +199,29 @@ export default function ContracTable() {
             quantity,
             unitPrice,
             totalPrice,
+            remainQty: quantity,
           };
           newItem.right = {
             exchangedQuantity: quantity,
             exchangedPrice: totalPrice,
             notes: '',
           };
+
+          if (subContractIndex !== 0) {
+            newItem.centerArr[subContractIndex - 1] = {
+              quantity: quantity,
+              price: totalPrice,
+            };
+          }
         } else {
           const item = list[rootProductId];
-          const centerArrReverse = item.centerArr.toReversed();
 
-          // console.log(centerArrReverse);
-          // console.log(centerArrReverse);
-
-          // if (rootProductId === '3359a3d5-33c2-4dad-86f0-07298020fb50') {
-          //   console.log(quantity);
-          // }
+          const centerArrReverse = _.cloneDeep(item.centerArr).toReversed();
 
           let centerQuantity = 0;
           let centerPrice = 0;
 
           centerArrReverse.forEach((centerItem, index) => {
-            // console.log(centerItem);
-            // console.log('----------------------------------------------');
-
             // 如果已經找到了
             if (centerQuantity !== 0 || centerPrice !== 0) {
               return;
@@ -235,24 +232,30 @@ export default function ContracTable() {
               return;
             }
 
-            if (rootProductId === '3359a3d5-33c2-4dad-86f0-07298020fb50') {
-              // console.log('quantity', quantity);
-              // console.log('totalPrice', totalPrice);
-              // console.log('centerQuantity', centerQuantity);
-              // console.log('centerPrice', centerPrice);
-              // console.log('fooo', quantity - centerItem.quantity);
-            }
+            // centerQuantity = quantity - centerItem.quantity;
+            // centerPrice = totalPrice - centerItem.price;
 
-            centerQuantity = quantity - centerItem.quantity;
-            centerPrice = totalPrice - centerItem.price;
+            // 差值
+            centerQuantity = quantity - item.left.remainQty;
+            // product裡的數量是最後剩下的數量
+            item.left.remainQty = quantity;
 
-            //
+            centerPrice = centerQuantity * unitPrice;
+            // centerQuantity = quantity;
+            // centerPrice = totalPrice;
           });
 
           // 如果到最後都沒有找到
           if (centerQuantity === 0 && centerPrice === 0) {
-            centerQuantity = quantity - item.left.quantity;
-            centerPrice = totalPrice - item.left.totalPrice;
+            // if (rootProductId === '8953bf11-50f4-47da-8871-1558139c456b') {
+            //   console.log('quantity', quantity);
+            //   console.log('item.left.quantity', item.left.quantity);
+            // }
+
+            centerQuantity = quantity - item.left.remainQty;
+            item.left.remainQty = quantity;
+            // centerPrice = totalPrice - item.left.totalPrice;
+            centerPrice = centerQuantity * unitPrice;
           }
 
           item.centerArr[subContractIndex - 1] = {
@@ -278,8 +281,6 @@ export default function ContracTable() {
     return { control_list: list, control_arr, attachTimes };
   }, [contract]);
 
-  // console.log(control);
-
   // -------------------------------------------------------------
   return (
     <SubLayer>
@@ -294,13 +295,12 @@ export default function ContracTable() {
             <div className={scss.top}>
               {/*  */}
               <div>
-                <span>本期請款金額：{'63,160'}</span>
+                <span>本期請款金額：{'foooo'}</span>
               </div>
             </div>
             {/*  */}
             <div className={classNames(scss.row, scss.thead)}>
               <Left isThead={true} />
-              {/* <Center isThead={true} dataArr={[undefined, undefined, undefined, undefined]} /> */}
               <Center isThead={true} dataArr={new Array(attachTimes).fill(undefined)} />
               <Right isThead={true} />
             </div>
@@ -377,8 +377,8 @@ const Left = ({
   const itemName = isThead ? '項目' : data?.itemName;
   const size = isThead ? '尺寸 (cm)' : data?.size;
   const quantity = isThead ? '數量' : data?.quantity;
-  const unitPrice = isThead ? '合約單價' : data?.unitPrice;
-  const totalPrice = isThead ? '合約金額' : data?.totalPrice;
+  const unitPrice = isThead ? '合約單價' : data?.unitPrice.toLocaleString();
+  const totalPrice = isThead ? '合約金額' : data?.totalPrice.toLocaleString();
 
   return (
     <>
@@ -413,7 +413,7 @@ const Right = ({
   data?: Tcontrol_right;
 }) => {
   const exchangedQuantity = isThead ? '變更後數量' : data?.exchangedQuantity;
-  const exchangedPrice = isThead ? '變更後金額' : data?.exchangedPrice;
+  const exchangedPrice = isThead ? '變更後金額' : data?.exchangedPrice.toLocaleString();
   const notes = isThead ? '備註' : data?.notes;
 
   return (
@@ -443,7 +443,7 @@ const Center = ({
     <>
       {dataArr.map((data, index) => {
         const quantity = isThead ? `數量(變更${index + 1})` : data?.quantity;
-        const price = isThead ? `金額(變更${index + 1})` : data?.price;
+        const price = isThead ? `金額(變更${index + 1})` : data?.price.toLocaleString();
 
         const isOdd = index % 2 === 0;
 
