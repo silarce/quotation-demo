@@ -162,7 +162,8 @@ export default function ContracTable() {
     const list: Tlist = {};
 
     subContractArr.forEach((subContract, subContractIndex) => {
-      const prodcutArr = subContract.content.products;
+      // const prodcutArr = subContract.content.products;
+      const prodcutArr = _.sortBy(subContract.content.products, 'createdAt').reverse();
 
       const { quotationNumber } = subContract.content;
 
@@ -202,6 +203,9 @@ export default function ContracTable() {
           };
 
           if (subContractIndex !== 0) {
+            newItem.left.totalPrice = 0;
+            newItem.left.quantity = 0;
+
             newItem.centerArr[subContractIndex - 1] = {
               quantity: quantity,
               price: totalPrice,

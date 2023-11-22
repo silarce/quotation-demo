@@ -48,6 +48,7 @@
   }
 
   &.totalRow {
+    width: fit-content;
     border-top: solid 1px theme("colors.border");
     position: sticky;
     bottom: 0;
