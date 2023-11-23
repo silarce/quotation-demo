@@ -201,7 +201,7 @@ export default function ContractReviewForm({
     body.paymentRatio.forEach((item) => {
       const { level, paymentRatio, price, note } = item;
 
-      if (!level || !paymentRatio || !price || !note) {
+      if (!level || !paymentRatio || !price) {
         isPaymentOk = false;
       }
     });
