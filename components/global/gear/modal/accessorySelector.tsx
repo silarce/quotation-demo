@@ -65,7 +65,7 @@ export default function AccessorySelector({
   const [selAcceArr, setSelAcceArr] = useState<TdoorAccessoryDto[]>([]);
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
-  console.log(searchValue);
+
   //
 
   useEffect(() => {

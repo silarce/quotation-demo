@@ -27,9 +27,11 @@ import type {
   TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
-  TupdateEngineeringDeliveryList,
-  TupdateDeliveryStatus,
   TfileDto,
+  TupdateEngineeringDeliveryStatusDto,
+  TcreateEngineeringDeliveryStatusDto,
+  TdeliveryStatusDto,
+  TupdateEngineeringDeliveryListDto,
 } from './dtoTypes';
 
 export type {
@@ -49,9 +51,12 @@ export type {
   TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
-  TupdateEngineeringDeliveryList,
   TupdateDeliveryStatus,
   TfileDto,
+  TupdateEngineeringDeliveryStatusDto,
+  TcreateEngineeringDeliveryStatusDto,
+  TdeliveryStatusDto,
+  TupdateEngineeringDeliveryListDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -750,11 +755,56 @@ export const useGetEngineeringDeliveryList = (id: string | undefined | null) => 
 };
 
 /**更新出庫單 */
-export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryList) => {
+export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryListDto) => {
   const api = `/engineering/delivery-list/${id}`;
 
   return axi
     .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 新增指定 DeliveryStatus
+export const apiPostDeliveryStatus = ({
+  //
+  id,
+  body,
+}: {
+  id: string; // 出庫單ID
+  body: TcreateEngineeringDeliveryStatusDto;
+}) => {
+  const api = `/engineering/delivery-list/${id}/delivery-status`;
+
+  return axi
+    .post<TdeliveryStatusDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 更新指定 DeliveryStatus
+export const apiPatchDeliveryStatus = ({
+  id,
+  statusId,
+  body,
+}: {
+  id: string;
+  statusId: string;
+  body: TupdateEngineeringDeliveryStatusDto;
+}) => {
+  const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
+
+  return axi
+    .patch<TdeliveryStatusDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 刪除指定 DeliveryStatus
+export const apiDeleteDeliveryStatus = ({ id, statusId }: { id: string; statusId: string }) => {
+  const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
+
+  return axi
+    .delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

@@ -970,26 +970,73 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+export type TaccountsReceivableProductPaymentDto = {
+  //  '期數'
+  period: number;
+  //  '請款比例(完成數量)'
+  paymentRatio: string | null;
+  //  '發票id'
+  invoiceId: string | null;
+  //  '發票' 要用的時候在跟Gina要型別吧
+  // invoice: AccountsReceivableInvoiceDto;
+  //  '關聯產品itemId'
+  productItemId: string | null;
+  //  '關聯產品itemId'
+  productItem: TquotationProductItemDto;
+  //  '完成項目'
+  // completeItemStatus: EngineeringDeliveryStatusDto[];
+  completeItemStatus: TdeliveryStatusDto[];
+};
+
 export type TdeliveryStatusDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // @ApiProperty({ description: '所屬產品' })
+  productItemId: string;
+  //  '所屬產品'
   productItem?: TquotationProductItemDto;
-  // @ApiProperty({ description: '備註' })
+  //  '備註'
   notes: string | null;
-  // @ApiProperty({ description: '安裝人員Id' })
+  itemName: string | null;
+  shippingDate: string | null;
+  //  '安裝人員Id'
   installerEmployeeId: string | null;
-  // @ApiProperty({ description: '安裝人員' })
+  //  '安裝人員'
   installerEmployee?: TemployeeDto | null;
-  // @ApiProperty({ description: '安裝日期' })
+  //  '安裝日期'
   installationDate: string | null;
-  // @ApiProperty({ description: '工作表開立日期' })
+  //  '工作表開立日期'
   workSheetInvoiceDate: string | null;
-  // @ApiProperty({ description: '追加' })
+  //  '追加'
   append: string | null;
-  // @ApiProperty({ description: '完成追加' })
+  //  '完成追加'
   completeAppend: string | null;
+  //
+  completePayment: boolean | null;
+  productPaymentId: boolean | null;
+  productPayment: TaccountsReceivableProductPaymentDto;
+};
+
+export type TcreateEngineeringDeliveryStatusDto = {
+  notes: string | null;
+  itemName: string | null;
+  shippingDate: string | null;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
+  completeAppend: string | null;
+  productItemId: string;
+};
+
+export type TupdateEngineeringDeliveryStatusDto = {
+  notes: string | null;
+  itemName: string | null;
+  shippingDate: string | null;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
+  completeAppend: string | null;
+  productItemId: string;
 };
 
 export type TupdateDeliveryStatus = {
@@ -1025,7 +1072,7 @@ export type TquotationProductItemDto = Omit<
   itemNumber: string;
   worksheetId: string;
   others: null;
-  deliveryStatus?: TdeliveryStatusDto | null;
+  deliveryStatus?: TdeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
   adjustedItemId?: string | null;
   //
@@ -1043,6 +1090,26 @@ export type TquotationProductItemDto = Omit<
   bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
+  //  '捲箱 - 正面'
+  headBoxFront: string | null;
+  //  '捲箱 - 有無凸'
+  headBoxProtruding: string | null;
+  //  '捲箱 - 角鐵數量'
+  headBoxAngleIronQuantity: number | null;
+  //  '支板 - 鏈條'
+  sidePlateChain: string | null;
+  //  '支板 - 方向'
+  sidePlateDirection: string | null;
+  //  '電動機 - 鍊條形式'
+  electricMotorChainType: string | null;
+  //  '電動機 - 方向'
+  electricMotorDirection: string | null;
+  //  '門軌 - 型式'
+  guideRailType: string | null;
+  // 底座 - 表面
+  bottomBarSurface: string | null;
+  // 門軌 - 表面
+  guideRailSurface: string | null;
 };
 
 type TquotationContentDto_copy = {
@@ -2326,6 +2393,27 @@ export type TupdateWorkSheetItem = {
   guideRailLength?: number | null; //門軌長度
   headBoxLength?: number | null; //捲箱長度
   thickness: string; // 門片厚度
+
+  //  '捲箱 - 正面'
+  headBoxFront: string | null;
+  //  '捲箱 - 有無凸'
+  headBoxProtruding: string | null;
+  //  '捲箱 - 角鐵數量'
+  headBoxAngleIronQuantity: number | null;
+  //  '支板 - 鏈條'
+  sidePlateChain: string | null;
+  //  '支板 - 方向'
+  sidePlateDirection: string | null;
+  //  '電動機 - 鍊條形式'
+  electricMotorChainType: string | null;
+  //  '電動機 - 方向'
+  electricMotorDirection: string | null;
+  //  '門軌 - 型式'
+  guideRailType: string | null;
+  // 底座 - 表面
+  bottomBarSurface: string | null;
+  // 門軌 - 表面
+  guideRailSurface: string | null;
 };
 
 export type TupdateWorkSheet = {
@@ -2342,9 +2430,13 @@ export type TengineeringDeliveryListDto = {
   contract: TquotationContractDto;
 };
 
-export type TupdateEngineeringDeliveryList = {
+// export type TupdateEngineeringDeliveryList = {
+//   notes: string;
+//   productsItemStatus?: TupdateDeliveryStatus[];
+// };
+
+export type TupdateEngineeringDeliveryListDto = {
   notes: string;
-  productsItemStatus?: TupdateDeliveryStatus[];
 };
 
 // =========================================================================

@@ -344,7 +344,6 @@ export default function AttachContract() {
         await apiQuotationModify(contractId, body);
         router.back();
       } catch (error) {}
-      //
     } catch (error) {
       myAlert.err({ title: '上傳失敗' });
     } finally {

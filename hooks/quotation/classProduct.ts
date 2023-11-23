@@ -1868,7 +1868,9 @@ class Class_product {
 
     this._prodData.boxB = v;
 
-    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
+    const fixedV = Number(v).toFixed(2);
+
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[fixedV] ?? '';
     this.area = this.calcArea();
 
     this.shouldCall_pgpb = true;
@@ -1880,7 +1882,9 @@ class Class_product {
   set boxB_noCall(v: string) {
     this._prodData.boxB = v;
 
-    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[v] ?? '';
+    const fixedV = Number(v).toFixed(2);
+
+    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[fixedV] ?? '';
     this.area = this.calcArea();
     this.reRender();
   }
@@ -2575,11 +2579,14 @@ class Class_product {
     // const body = this.body;
     const divQty = Number(this.reduceQty) + this.exchangeQty;
     const theBody = this.body;
+
+    const quantity = theBody.quantity - divQty;
+
     const body = {
       ...this.body,
-      quantity: theBody.quantity - divQty,
-      dualPrice: new Decimal(theBody.quantity).mul(theBody.price).toNumber(),
-      totalPrice: new Decimal(theBody.quantity).mul(theBody.unitPrice).toNumber(),
+      quantity: quantity,
+      dualPrice: new Decimal(quantity).mul(theBody.price).toNumber(),
+      totalPrice: new Decimal(quantity).mul(theBody.unitPrice).toNumber(),
       attachedToProductId: this.id,
     };
     // body.quantity = body.quantity - divQty;

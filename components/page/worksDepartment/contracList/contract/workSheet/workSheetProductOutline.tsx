@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // gear
-import InputSel, { TinputProps, TselectProps } from 'components/global/gear/inputAndSel/inputSel';
+import InputSel, { TinputProps, TselectProps, TdatePickerProps } from 'components/global/gear/inputAndSel/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './workSheetProductOutline.module.scss';
@@ -28,7 +28,7 @@ type ToldProductOutline = {
 type TcontrolItem = {
   inputProps?: TinputProps;
   selectProps?: TselectProps;
-
+  datePickerProps?: TdatePickerProps;
   disabled?: boolean;
 };
 
@@ -121,14 +121,7 @@ export default function WorkSheetProductOutline({
                 showBaseline="always"
                 inputProps={control[key].inputProps}
                 selectProps={control[key].selectProps}
-
-                // inputProps={{
-                //   value: control[key].value,
-                //   onChange: (v) => {
-                //     control[key].onChange?.(v);
-                //   },
-                //   inputType: inputType,
-                // }}
+                datePickerProps={control[key].datePickerProps}
               />
             );
           })}

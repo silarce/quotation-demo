@@ -17,6 +17,9 @@ import MustTip_simple from '../other/mustTip_simple';
 import { creOptionWithIcon } from './selectCustom/creOptionWithIcon';
 import { creSingleValueWithIcon } from './selectCustom/creSingleValueWithIcon';
 
+// icon
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from './inputSel.module.scss';
 
@@ -78,6 +81,8 @@ type TinputSelProps = {
   // suffix?: string;
   suffix?: React.ReactNode;
   suffixClassName?: string;
+  //
+  showAddIcon?: boolean;
 };
 
 // =============================================================================
@@ -121,6 +126,8 @@ export default function InputSel({
   //
   suffix,
   suffixClassName,
+  //
+  showAddIcon,
 }: TinputSelProps) {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -423,6 +430,8 @@ export default function InputSel({
       {showBaseline !== 'invisible' && (
         <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
       )}
+
+      {showAddIcon && <IconAddCircle className={scss.addIcon} />}
     </label>
   );
 }

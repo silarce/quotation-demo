@@ -43,6 +43,8 @@ import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
+import Decimal from 'decimal.js';
+import moment from 'moment';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
@@ -96,12 +98,10 @@ import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/us
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './workSheet.module.scss';
-
-// image
-import imgIdk from 'public/image/fake/idk01.png';
 
 // options
 import {
@@ -615,13 +615,9 @@ export default function WorkSheet() {
     // 捲軸
     reel: {
       size: {
-        value: targetSheet?.com_roller_size ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_roller_size = v;
-          }
-        },
-        forbidden: true,
+        // value: targetSheet?.com_roller_size ?? '',
+        value: targetSheet?.diameter ? `${targetSheet.diameter}"` : '',
+        disabled: true,
       },
       hasConvex: {
         value: targetSheet?.rollerSpec ?? '',
@@ -663,33 +659,44 @@ export default function WorkSheet() {
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
       },
+      //
       front: {
-        value: targetSheet?.com_headBox_front ?? '',
+        value: targetSheet?.headBoxFront ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_headBox_front = v;
+            targetSheet.headBoxFront = v;
           }
         },
-        forbidden: true,
       },
+      //
       hasConvex: {
-        value: targetSheet?.com_headBox_spec ?? '',
+        value: targetSheet?.headBoxProtruding ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_headBox_spec = v;
+            targetSheet.headBoxProtruding = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
-        forbidden: true,
       },
+      //
       type: {
-        value: targetSheet?.com_headBox_type ?? '',
+        value: String(targetSheet?.headBoxForm),
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_headBox_type = v;
+            const bool = v === 'true' ? true : false;
+            targetSheet.headBoxForm = bool;
           }
         },
-        forbidden: true,
+      },
+      // 角鐵數量
+      angleIronQuantity: {
+        value: targetSheet?.headBoxAngleIronQuantity ?? '',
+        onChange: (str) => {
+          if (targetSheet) {
+            targetSheet.headBoxAngleIronQuantity = str;
+          }
+        },
+        inputType: 'number',
       },
     },
     // ______________________________________________________________
@@ -732,10 +739,10 @@ export default function WorkSheet() {
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
       },
       surface: {
-        value: targetSheet?.com_bottomBar_surface ?? '',
+        value: targetSheet?.bottomBarSurface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_bottomBar_surface = v;
+            targetSheet.bottomBarSurface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -745,22 +752,21 @@ export default function WorkSheet() {
     // 支板
     support: {
       bearing: {
-        value: targetSheet?.com_sidePlate_bearing ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_sidePlate_bearing = v;
-          }
-        },
-        forbidden: true,
+        value: targetSheet?.prodSpec?.bearingName ?? '',
+        disabled: true,
       },
       chain: {
-        value: targetSheet?.com_sidePlate_chain ?? '',
-        onChange: (v) => {
+        value: targetSheet?.sprocketWheelModel ?? '',
+        disabled: true,
+      },
+      // 方向
+      direction: {
+        value: targetSheet?.sidePlateDirection ?? '',
+        onChange: (str) => {
           if (targetSheet) {
-            targetSheet.com_sidePlate_chain = v;
+            targetSheet.sidePlateDirection = str;
           }
         },
-        forbidden: true,
       },
     },
     // _____________________________________________________
@@ -845,13 +851,12 @@ export default function WorkSheet() {
         },
       },
       chainType: {
-        value: targetSheet?.com_motor_chainType ?? '',
+        value: targetSheet?.electricMotorChainType ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_motor_chainType = v;
+            targetSheet.electricMotorChainType = v;
           }
         },
-        forbidden: true,
       },
       lockBox: {
         value: targetSheet?.motorLockBox ?? '',
@@ -861,6 +866,15 @@ export default function WorkSheet() {
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_motorLockBox() }),
+      },
+      // 方向
+      direction: {
+        value: targetSheet?.electricMotorDirection ?? '',
+        onChange: (str) => {
+          if (targetSheet) {
+            targetSheet.electricMotorDirection = str;
+          }
+        },
       },
     },
     // ________________________________________________________________
@@ -884,10 +898,10 @@ export default function WorkSheet() {
         optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
-        value: targetSheet?.com_guideRail_surface ?? '',
+        value: targetSheet?.guideRailSurface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_guideRail_surface = v;
+            targetSheet.guideRailSurface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -913,13 +927,12 @@ export default function WorkSheet() {
         },
       },
       doorTrackType: {
-        value: targetSheet?.com_guideRail_type ?? '',
+        value: targetSheet?.guideRailType ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.com_guideRail_type = v;
+            targetSheet.guideRailType = v;
           }
         },
-        forbidden: true,
       },
       doorTrackName: {
         value: targetSheet?.guideRailName ?? '',
@@ -954,7 +967,7 @@ export default function WorkSheet() {
       捲門全高: targetSheet?.fullHeight ?? '',
     },
     size02: {
-      捲軸尺寸: targetSheet?.diameter ?? '',
+      捲軸尺寸: targetSheet?.diameter ? `${targetSheet.diameter}"` : '',
       軸徑: targetSheet?.bearingInnerDiameter ?? '',
       軸承: targetSheet?.prodSpec?.bearingName ?? '',
       總長: targetSheet?.bearingHousingTotalLength ?? '',
@@ -962,8 +975,8 @@ export default function WorkSheet() {
     },
     rollBox: {
       角鐵數量: '999',
-      捲箱角鐵尺寸: '999',
-      捲箱資訊: '是指一體式捲箱嗎?',
+      捲箱角鐵尺寸: targetSheet?.angleIronSize ?? '',
+      捲箱資訊: targetSheet?.headBoxForm_str ?? '',
     },
     doorPiece: {
       門片材質: targetSheet?.com_slat_material ?? '',
@@ -1102,21 +1115,24 @@ export default function WorkSheet() {
             BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             /**捲門全高 */
             fullHeight: sheet.fullHeight,
+            weightConversion: '', // 未知 // 重量換算
           },
           roller: {
-            diameter: sheet.diameter ?? '',
+            diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
             bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
             bearingName: sheet.prodSpec?.bearingName ?? '',
             bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
-            angleIronQty: '???',
-            angleIronSize: '???',
-            info: '???',
+            angleIronQty: '', // 未知
+            angleIronSize: sheet.angleIronSize,
+            form: sheet.headBoxForm_str,
+            surface: '',
           },
           doorPiece: {
             material: sheet.com_slat_material,
+            surface: sheet.com_slat_surface ?? '',
             thickness: sheet.thickness,
             slatLength: numToStr(sheet.prodSpec?.slatLength),
             slatCount: sheet.slatCount,
@@ -1127,24 +1143,36 @@ export default function WorkSheet() {
             /**相數加電壓 */
             phaseVoltage: sheet.motorPhaseVoltage,
             horsepower: sheet.horsepower,
+            direction: '', // 未知
           },
           guideRail: {
-            彎直: '???',
+            form: sheet.isAntiTyphoon ? '防颱' : '一般',
             material: sheet.com_guideRail_material,
             guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
             guideRailName: sheet.guideRailName,
             icon: sheet?.guideRailName
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
+            antiTyphoonHook: '-50', // 未知
+            bendStraight: sheet.guideRailType ?? '',
           },
           chainCog: {
             sprocketWheelModel: sheet.sprocketWheelModel ?? '',
             sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
             bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
+            teethQuantity: '', // 未知
+            centerDistance: '', // 未知
+            eyesQuantity: '', // 未知
           },
           base: {
             material: sheet.com_bottomBar_material,
             guideRailsOpening: sheet.guideRailsOpening,
+            surface: '', // 未知
+          },
+          sidePlate: {
+            direction: '', // 未知
+            bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
+            smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
           },
           memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
         };
@@ -1160,9 +1188,9 @@ export default function WorkSheet() {
         customerName: contract?.content.customer.name ?? '',
         contactPerson: engineeringContact?.contactInfo?.[0].contactPerson ?? '',
         // 開單日
-        billingDate: '???-??-??',
+        billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
         // 出貨日
-        shippingDate: '???-??-??',
+        shippingDate: '', // 未知
       },
       itemArr: workSheetPDF_01_itemArr,
       // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
@@ -1271,6 +1299,8 @@ export default function WorkSheet() {
                   isActive = true;
                 }
 
+                const length = Object.keys(sheetList[pKey]).length;
+
                 list.push({
                   isOriginal: item.isOriginal,
                   itemName: itemName,
@@ -1283,7 +1313,7 @@ export default function WorkSheet() {
                   onDivideClick: () => {
                     setTargetDivideItem(() => {
                       return (qty: number) => {
-                        item.divideItem(qty);
+                        item.divideItem(qty, `-${String(length)}`);
                         setTargetDivideItem(undefined);
                       };
                     });
@@ -1294,10 +1324,18 @@ export default function WorkSheet() {
 
               const originalItem = itemTokenList?.[pKey].originalItem;
 
+              let width = originalItem?.fullWidth ?? 0;
+              width = new Decimal(width).div(1000).toNumber();
+
+              let height = originalItem?.height ?? 0;
+              height = new Decimal(height).div(1000).toNumber();
+
               const control: Tcontrol_prodCard = {
                 itemName: originalItem?.itemName ?? '',
                 doorType: originalItem?.doorModelName ?? '',
                 qty: String(qty),
+                width: String(width),
+                height: String(height),
                 onClick: (e) => {
                   setTargetSheetKey([pKey, pKey]);
                 },
@@ -1306,7 +1344,7 @@ export default function WorkSheet() {
 
               return (
                 <div key={pKey}>
-                  <WorkSheetProdCard disabled={disabled} control={control} img={imgIdk} />
+                  <WorkSheetProdCard disabled={disabled} control={control} />
                 </div>
               );
             })}
@@ -1326,7 +1364,7 @@ export default function WorkSheet() {
             <WorkSheetProductDetail01
               control={control_detail}
               disabled={forbidden || disabled}
-              supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
+              // supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
             />
 
             <hr />
@@ -1394,3 +1432,55 @@ const creEmptyProfile = (): Tprofile => ({
   contactNumber: '',
   faxNumber: '',
 });
+
+// ============================================================================
+
+/**
+ *
+ * 一體式捲箱 true === 方形捲箱
+ * false ==="捲箱 + 機箱"
+ *
+ * 方向 數量加方向 2右 6左 8左   這樣
+ * 捲箱的角鐵尺寸為 WG + gapA + gapC - 10
+ *
+ * 門軌的防颱先全部放-50
+ * 捲箱角鐵數量由使用者輸入
+ *
+ *
+ * 電動機與支版的方向是一樣的
+ * 所以記錄在product就好了
+ *
+ *
+ *
+根據PDF缺的欄位而需要新增的property
+方向 角鐵數量 彎直
+另外要新增的欄位
+
+開單日 date string
+出貨日 date string
+
+捲箱
+正面 string
+有無凸 string
+角鐵數量 number
+
+支版
+鍊條 string 應該是不可編輯的欄位
+方向 string
+
+電動機
+鍊條型式 string
+方向 string
+
+門軌
+型式 string
+
+
+
+
+
+另外開單日期與出貨日期還不知道要帶入什麼值
+ 
+馬達荷重怎麼算
+ 
+ */

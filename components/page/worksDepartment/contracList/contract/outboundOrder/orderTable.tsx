@@ -1,12 +1,16 @@
 import { useState } from 'react';
-
 import classNames from 'classnames';
+import moment from 'moment';
 
-import style from './outboundOrder.module.scss';
+import scss from './outboundOrder.module.scss';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
+
+// icon
+import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 
 // type
 import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
@@ -50,7 +54,13 @@ type TdeliveryStatusItem = {
   onChange_date?: undefined;
   onChange_employee?: undefined;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
+  onCancelClick?: undefined;
 };
 type TdeliveryStatusItem_date = {
   value: string;
@@ -59,7 +69,13 @@ type TdeliveryStatusItem_date = {
   onChange_date?: (date: string | null) => void;
   onChange_employee?: undefined;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
+  onCancelClick?: undefined;
 };
 
 type TdeliveryStatusItem_employee = {
@@ -69,7 +85,29 @@ type TdeliveryStatusItem_employee = {
   onChange_date?: undefined;
   onChange_employee?: (emp: TemployeeDto | null) => void;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
+  onCancelClick?: undefined;
+};
+
+type TdeliveryStatusItem_btnPanel = {
+  value?: undefined;
+  empolyee?: undefined;
+  onChange?: undefined;
+  onChange_date?: undefined;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  disabled?: boolean;
+  forbidden?: boolean;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
+  onAddClick: () => void;
+  onConfirmClick: () => void;
+  onCancelClick: () => void;
 };
 
 type Tgroup = {
@@ -77,16 +115,20 @@ type Tgroup = {
   rowArr: {
     contractData: TcontractData;
     staticData: TstaticData;
-    deliveryStatus: {
+    staticData2: {
       remark01: TdeliveryStatusItem;
-      // remark02: TdeliveryStatusItem;
-      // remark03: TdeliveryStatusItem;
-      // remark04: TdeliveryStatusItem;
-      appended: TdeliveryStatusItem;
       orderCreatedDate: TdeliveryStatusItem;
-      finishAppended: TdeliveryStatusItem;
-      installer: TdeliveryStatusItem_employee;
-      installDate: TdeliveryStatusItem_date;
+    };
+
+    deliveryStatus: {
+      // disabled?: boolean;
+      groupList: {
+        btnPanelArr: TdeliveryStatusItem_btnPanel[];
+        installDateArr: TdeliveryStatusItem_date[];
+        installerArr: TdeliveryStatusItem_employee[];
+        itemNameArr: TdeliveryStatusItem[];
+        notesArr: TdeliveryStatusItem[];
+      };
     };
   }[];
 };
@@ -96,15 +138,15 @@ type Tcontrol = Tgroup[];
 export type { Tcontrol as Tcontrol_orderTable, Tgroup };
 
 // ================================================================================
-export default function OrderTable({ disabled, control }: { disabled: boolean; control: Tcontrol }) {
+export default function OrderTable({ control }: { control: Tcontrol }) {
   const configList = creConfigList();
 
   // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
   const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_employee | undefined>();
 
   return (
-    <div className={style.orderTable}>
-      <div className={style.thead}>
+    <div className={scss.orderTable}>
+      <div className={scss.thead}>
         {/*  */}
         {/* <div className={`${style.theadItem} ${style.indexCell}`} /> */}
         {/*  */}
@@ -114,11 +156,11 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           if (index === 0) {
             return (
-              <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
                 <span></span>
                 <span>{label}</span>
               </div>
@@ -131,64 +173,79 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
           //   </div>
           // );
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
 
         {/* 灰色柱子 分隔線*/}
-        <div className={` ${style.pilar}`} />
+        <div className={` ${scss.pilar}`} />
 
         {orderKeyArr_static.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
         {/* 灰色分隔線 */}
-        <div className={` ${style.pilar}`} />
+        <div className={` ${scss.pilar}`} />
         {/*  */}
-        {orderKey_editible.map((key, index) => {
+        {orderKey_staticData2.map((key, index) => {
           const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
+        {/*  */}
+        {orderKey_deliveryStatus.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? scss.textCenter : '';
+
+          return (
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+        {/*  */}
       </div>
 
-      <div className={style.tableList}>
+      <div className={scss.tableList}>
         {control.map((item, groupIndex) => {
           const { itemName, rowArr } = item;
 
           return (
             <div key={groupIndex}>
               {rowArr.map((row, rowIndex) => {
-                const bgcSub = rowIndex !== 0 ? style.bgcSub : '';
+                const bgcSub = rowIndex !== 0 ? scss.bgcSub : '';
 
                 return (
-                  <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
+                  <div className={`${scss.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
 
                     {orderKeyArr_contract.map((key, columnIndex) => {
-                      let value = row.contractData[key];
+                      const value = row.contractData[key];
 
                       if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
+                        // value = '';
                       }
 
                       const { width, position } = configList[key] ?? {};
@@ -201,13 +258,13 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                           <div
                             className={classNames(
                               //
-                              style.column,
-                              position === 'center' && style.textCenter
+                              scss.column,
+                              position === 'center' && scss.textCenter
                             )}
                             key={columnIndex}
                             style={theStyle}
                           >
-                            <span className={classNames('pr-[10px]', isHiddenIndex && style.hidden)}>
+                            <span className={classNames('pr-[10px]', isHiddenIndex && scss.hidden)}>
                               {groupIndex + 1}
                             </span>
                             <span>{value}</span>
@@ -219,9 +276,9 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                         <div
                           className={classNames(
                             //
-                            style.column,
-                            position === 'center' && style.textCenter,
-                            rowIndex !== 0 && style.hidden
+                            scss.column,
+                            position === 'center' && scss.textCenter,
+                            rowIndex !== 0 && scss.hidden
                           )}
                           key={columnIndex}
                           style={theStyle}
@@ -232,22 +289,22 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     })}
 
                     {/* 灰色分隔線 */}
-                    <div className={classNames(style.pilar, rowIndex !== 0 && style.hidden)} />
+                    <div className={classNames(scss.pilar, rowIndex !== 0 && scss.hidden)} />
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
-                      let value = row.staticData[key];
+                      const value = row.staticData[key];
 
-                      if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
-                      }
+                      // if (rowIndex !== 0 && columnIndex === 0) {
+                      //   value = '';
+                      // }
 
                       const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
 
                       return (
                         <div
-                          className={classNames(style.column, position === 'center' && style.textCenter)}
+                          className={classNames(scss.column, position === 'center' && scss.textCenter)}
                           key={columnIndex}
                           style={theStyle}
                         >
@@ -257,75 +314,163 @@ export default function OrderTable({ disabled, control }: { disabled: boolean; c
                     })}
 
                     {/* 沒有柱子的灰色柱子 */}
-                    <div className={`${style.pilar}`} />
+                    <div className={`${scss.pilar}`} />
 
                     {/* orderKeyIndex02 */}
-                    {orderKey_editible.map((key, columnIndex) => {
-                      const { value, empolyee, onChange_date, onChange, hidden, forbidden, onChange_employee } =
-                        row.deliveryStatus[key];
+                    {orderKey_staticData2.map((key, columnIndex) => {
+                      const { value } = row.staticData2[key];
 
-                      const { width, position, type } = configList[key] ?? {};
+                      const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
-
-                      const theProps: Parameters<typeof InputSel>[0] = {};
-
-                      if (type === 'input') {
-                        theProps.inputProps = {
-                          value: value ?? '',
-                          onChange,
-                        };
-                      }
-
-                      if (type === 'textarea') {
-                        theProps.textareaProps = {
-                          value: value ?? '',
-                          onChange,
-                          allowNewLineByUser: true,
-                        };
-                      }
-
-                      if (type === 'date') {
-                        theProps.datePickerProps = {
-                          value,
-                          onChange02: (m) => {
-                            onChange_date?.(m?.toISOString() ?? null);
-                          },
-                          datePickerClassName: style.datepicker,
-                        };
-                      }
-
-                      let onClick: (() => void) | undefined = undefined;
-
-                      if (type === 'employee' && key === 'installer') {
-                        theProps.inputProps = {
-                          value: value || empolyee?.chName || empolyee?.enName || '',
-                        };
-
-                        onClick = () => {
-                          !disabled && setTargetEmpControl(row.deliveryStatus[key]);
-                        };
-                      }
+                      const textCenter = position === 'center' ? scss.textCenter : '';
 
                       return (
-                        <div
-                          className={`${style.column} ${textCenter}`}
-                          key={columnIndex}
-                          style={theStyle}
-                          onClick={onClick}
-                        >
+                        <div className={`${scss.column} ${textCenter}`} key={columnIndex} style={theStyle}>
                           <InputSel
-                            className={classNames(style.input03, hidden && style.hidden)}
-                            showBaseline={forbidden ? 'invisible' : 'auto'}
-                            placeholder=""
-                            disabled={forbidden || disabled}
-                            {...theProps}
+                            className={classNames(scss.input03)}
+                            showBaseline={'invisible'}
+                            disabled={true}
+                            inputProps={{
+                              props: {
+                                value,
+                                placeholder: '',
+                              },
+                            }}
                           />
                         </div>
                       );
                     })}
                     {/*  */}
-                    {rowIndex !== 0 && <div className={style.ribbon}></div>}
+
+                    {orderKey_deliveryStatus.map((key, index) => {
+                      const { groupList } = row.deliveryStatus;
+
+                      const group = groupList[key];
+
+                      const { width, position, type } = configList[key] ?? {};
+                      const theStyle = { width };
+                      const textCenter = position === 'center' ? scss.textCenter : '';
+
+                      const theProps: Parameters<typeof InputSel>[0] = {};
+
+                      return (
+                        <div
+                          //
+                          key={key}
+                          className={classNames(scss.column, textCenter, scss.subGroup)}
+                          style={theStyle}
+                        >
+                          {group.map((item, index) => {
+                            const {
+                              disabled,
+                              value,
+                              empolyee,
+                              onChange,
+                              onChange_date,
+                              onChange_employee,
+                              onAddClick,
+                              onEditClick,
+                              onDeleteClick,
+                              onConfirmClick,
+                              onCancelClick,
+                            } = item;
+
+                            if (key === 'btnPanelArr') {
+                              const isFirst = index === 0;
+
+                              return (
+                                <div key={index} className={classNames(scss.btnPanel)}>
+                                  <IconAddCircle className={classNames(!isFirst && scss.hidden)} onClick={onAddClick} />
+                                  {disabled ? (
+                                    //
+                                    <IconEdit
+                                      onClick={onEditClick}
+                                      className={classNames(!onEditClick && scss.hidden)}
+                                    />
+                                  ) : (
+                                    <IconEdit onClick={onCancelClick} className={scss.svgActive} />
+                                  )}
+                                  {disabled ? (
+                                    <IconDelete01
+                                      onClick={onDeleteClick}
+                                      className={classNames(!onDeleteClick && scss.hidden)}
+                                    />
+                                  ) : (
+                                    <IconCheck02 onClick={onConfirmClick} />
+                                  )}
+                                </div>
+                              );
+                            }
+
+                            //
+                            if (onChange_employee) {
+                              theProps.inputProps = {
+                                props: {
+                                  value: value || empolyee?.chName || empolyee?.enName || '',
+                                  placeholder: '',
+                                },
+                              };
+
+                              const onClick = () => {
+                                !disabled && setTargetEmpControl(item);
+                              };
+
+                              return (
+                                <div key={index} onClick={onClick}>
+                                  <InputSel
+                                    className={classNames(scss.input03)}
+                                    showBaseline={'auto'}
+                                    // placeholder=""
+                                    disabled={disabled}
+                                    {...theProps}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            //
+                            if (onChange_date) {
+                              return (
+                                <div key={index}>
+                                  <InputSel
+                                    datePickerProps={{
+                                      props: {
+                                        value: value ? moment(value) : null,
+                                        onChange: (date) => {
+                                          onChange_date(date?.toISOString() ?? '');
+                                        },
+                                      },
+                                    }}
+                                    disabled={disabled}
+                                    showBaseline={'auto'}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div key={index}>
+                                <InputSel
+                                  inputProps={{
+                                    props: {
+                                      value,
+                                      onChange: (e) => {
+                                        onChange?.(e.target.value);
+                                      },
+                                    },
+                                  }}
+                                  disabled={disabled}
+                                  showBaseline={'auto'}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+
+                    {/*  */}
+                    {rowIndex !== 0 && <div className={scss.ribbon}></div>}
                   </div> // row
                 ); // return
               })}
@@ -355,7 +500,7 @@ const orderKeyArr_contract: (keyof TcontractData)[] = [
   'W',
   'B',
   'qty',
-  'implementQty',
+  // 'implementQty',
   'cai',
   'totalCai',
   'doorType',
@@ -370,7 +515,7 @@ const orderKeyArr_static: (keyof TstaticData)[] = [
   'W',
   'B',
   'qty',
-  'implementQty',
+  // 'implementQty',
   'cai',
   'totalCai',
   'doorType',
@@ -379,17 +524,18 @@ const orderKeyArr_static: (keyof TstaticData)[] = [
   'surface',
 ];
 
-const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = [
-  'orderCreatedDate',
-  'installDate',
+const orderKey_staticData2: (keyof Tgroup['rowArr'][number]['staticData2'])[] = [
   //
+  'orderCreatedDate',
   'remark01',
-  // 'remark02',
-  // 'remark03',
-  // 'remark04',
-  'appended',
-  'finishAppended',
-  'installer',
+];
+
+const orderKey_deliveryStatus: (keyof Tgroup['rowArr'][number]['deliveryStatus']['groupList'])[] = [
+  'btnPanelArr',
+  'installDateArr',
+  'installerArr',
+  'itemNameArr',
+  'notesArr',
 ];
 
 // =======================================================================
@@ -397,7 +543,7 @@ const orderKey_editible: (keyof Tgroup['rowArr'][number]['deliveryStatus'])[] = 
 type Tconfig = {
   label: string;
   width: string;
-  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea';
+  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea' | 'other';
   position: string;
 };
 
@@ -541,7 +687,7 @@ const creCellConfig_static = (): TcellConfigList => ({
 });
 // =============================================================
 
-const creCellConfig_deliveryStatus = (): TcellConfigList => ({
+const creCellConfig_staticData2 = (): TcellConfigList => ({
   remark01: {
     label: '備註1',
     width: '200px',
@@ -604,7 +750,43 @@ const creCellConfig_deliveryStatus = (): TcellConfigList => ({
   },
 });
 
+const creCellConfig_subGroup = (): TcellConfigList => ({
+  btnPanelArr: {
+    label: '',
+    width: '92px',
+    type: 'other',
+    position: '',
+  },
+  installDateArr: {
+    label: '安裝日期',
+    width: '150px',
+    type: 'date',
+    position: '',
+  },
+  installerArr: {
+    label: '安裝人員',
+    width: '85px',
+    type: 'input',
+    position: '',
+  },
+  itemNameArr: {
+    label: '項目',
+    width: '100px',
+    type: 'input',
+    position: '',
+  },
+  notesArr: {
+    label: '備註',
+    width: '150px',
+    type: 'input',
+    position: '',
+  },
+});
+
+// =============================================================
+
 const creConfigList = (): TcellConfigList => ({
   ...creCellConfig_static(),
-  ...creCellConfig_deliveryStatus(),
+  ...creCellConfig_staticData2(),
+  ...creCellConfig_subGroup(),
 });
