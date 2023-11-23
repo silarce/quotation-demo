@@ -41,6 +41,17 @@ type TpanelCell0_03 = {
 type TpanelCell0_04 = {
   onChainBreakClick?: () => void;
 };
+type TpanelCell0_05 = {
+  onChainClick?: () => void;
+  onRemoveClick?: () => void;
+};
+type TpanelCell0_06 = {
+  onBreakChainClick?: () => void;
+  onRemoveClick?: () => void;
+};
+type TpanelCell0_07 = {
+  onBreakChainClick?: () => void;
+};
 
 type TtwoInputProps = {
   one: TinputProps;
@@ -52,6 +63,9 @@ type Trow = {
   panelCell_02?: TpanelCell0_02;
   panelCell_03?: TpanelCell0_03;
   panelCell_04?: TpanelCell0_04;
+  panelCell_05?: TpanelCell0_05;
+  panelCell_06?: TpanelCell0_06;
+  panelCell_07?: TpanelCell0_07;
   list: {
     [key: string]: {
       label: string;
@@ -72,6 +86,9 @@ type TheadRow = {
   panelCell_02?: TpanelCell0_02;
   panelCell_03?: TpanelCell0_03;
   panelCell_04?: TpanelCell0_04;
+  panelCell_05?: TpanelCell0_05;
+  panelCell_06?: TpanelCell0_06;
+  panelCell_07?: TpanelCell0_07;
   list: {
     [key: string]: {
       label: string;
@@ -287,6 +304,72 @@ const PanelCell_04 = ({
   );
 };
 
+const PanelCell_05 = ({
+  //
+  isHidden,
+  control,
+}: {
+  isHidden?: boolean;
+  control?: TpanelCell0_05;
+}) => {
+  const { onRemoveClick, onChainClick } = control ?? {};
+
+  return (
+    <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
+      <div>
+        <IconChain onClick={onChainClick} />
+      </div>
+      <div>
+        <IconRemoveCircle className={scss.iconRemoveCircle} onClick={onRemoveClick} />
+      </div>
+    </div>
+  );
+};
+
+const PanelCell_06 = ({
+  //
+  isHidden,
+  control,
+}: {
+  isHidden?: boolean;
+  control?: TpanelCell0_06;
+}) => {
+  const { onRemoveClick, onBreakChainClick } = control ?? {};
+
+  return (
+    <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
+      <div>
+        <IconBreakChain onClick={onBreakChainClick} />
+      </div>
+      <div>
+        <IconRemoveCircle className={scss.iconRemoveCircle} onClick={onRemoveClick} />
+      </div>
+    </div>
+  );
+};
+
+const PanelCell_07 = ({
+  //
+  isHidden,
+  control,
+}: {
+  isHidden?: boolean;
+  control?: TpanelCell0_07;
+}) => {
+  const { onBreakChainClick } = control ?? {};
+
+  return (
+    <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
+      <div className={scss.hidden}>
+        <IconBreakChain />
+      </div>
+      <div>
+        <IconBreakChain onClick={onBreakChainClick} />
+      </div>
+    </div>
+  );
+};
+
 // ================
 const Row = ({
   //
@@ -296,7 +379,17 @@ const Row = ({
   row: Trow;
   disabled?: boolean;
 }) => {
-  const { panelCell_01, panelCell_02, panelCell_03, panelCell_04, list } = row;
+  const {
+    //
+    list,
+    panelCell_01,
+    panelCell_02,
+    panelCell_03,
+    panelCell_04,
+    panelCell_05,
+    panelCell_06,
+    panelCell_07,
+  } = row;
 
   const arr = Object.values(list);
 
@@ -308,6 +401,9 @@ const Row = ({
       {panelCell_02 && <PanelCell_02 onDeleteClick={panelCell_02.onDeleteClick} />}
       {panelCell_03 && <PanelCell_03 control={panelCell_03} />}
       {panelCell_04 && <PanelCell_04 control={panelCell_04} />}
+      {panelCell_05 && <PanelCell_05 control={panelCell_05} />}
+      {panelCell_06 && <PanelCell_06 control={panelCell_06} />}
+      {panelCell_07 && <PanelCell_07 control={panelCell_07} />}
       {arr.map((cell, index) => {
         const { cellStyle, inputProps, datePickerProps, twoInputProps } = cell;
 
@@ -352,6 +448,9 @@ const Thead = ({
       {headRow.panelCell_02 && <PanelCell_02 isHidden={true} />}
       {headRow.panelCell_03 && <PanelCell_03 isHidden={true} />}
       {headRow.panelCell_04 && <PanelCell_04 isHidden={true} />}
+      {headRow.panelCell_05 && <PanelCell_05 isHidden={true} />}
+      {headRow.panelCell_06 && <PanelCell_06 isHidden={true} />}
+      {headRow.panelCell_07 && <PanelCell_07 isHidden={true} />}
       {headRowCellArr.map((cell, index) => {
         const { label, cellStyle } = cell;
 

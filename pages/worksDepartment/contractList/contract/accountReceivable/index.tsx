@@ -347,39 +347,13 @@ export default function AccountReceivable() {
   };
 
   // --------------------------------------------------------------------------
-
+  // 控制 發票給予紀錄
   const control_invoiceGivingRecord = useMemo(() => {
     const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
       const subTable = {
         subHeadRow: {
           panelCell_04: {},
-          list: {
-            date: {
-              label: '日期',
-              cellStyle: { width: '120px' },
-            },
-            account: {
-              label: '帳號',
-              cellStyle: { width: '189px' },
-            },
-            chequeNumber: {
-              label: '票據號碼',
-              cellStyle: { width: '189px' },
-            },
-            chequeDate: {
-              label: '票據日期',
-              cellStyle: { width: '100px' },
-            },
-            price: {
-              label: '金額',
-              cellStyle: { width: '170px' },
-            },
-            incomingSubpoenaSerialNumber: {
-              label: '收入傳票序號',
-              cellStyle: { width: '187px' },
-            },
-            //
-          },
+          list: headRow_list_收款紀錄,
         }, // subHeadRow close
         subRowArr: [
           {
@@ -525,6 +499,15 @@ export default function AccountReceivable() {
               },
             },
           },
+          period: {
+            label: '對應期數',
+            cellStyle: { width: '64px' },
+            inputProps: {
+              props: {
+                value: 'no property',
+              },
+            },
+          },
         }, // list close
         subTable: subTable,
       }; // return close
@@ -555,24 +538,7 @@ export default function AccountReceivable() {
       },
       headRow: {
         panelCell_03: {},
-        list: {
-          date: {
-            label: '日期',
-            cellStyle: { width: '120px' },
-          },
-          invoiceNumber: {
-            label: '發票號碼',
-            cellStyle: { width: '300px' },
-          },
-          price: {
-            label: '金額',
-            cellStyle: { width: '290px' },
-          },
-          remark: {
-            label: '備註',
-            cellStyle: { width: '300px' },
-          },
-        },
+        list: headRow_list_發票給予紀錄,
       },
       rowArr: control_invoiceGivingRecord_rowArr,
     };
@@ -590,16 +556,80 @@ export default function AccountReceivable() {
     const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = accountantArr.map((item, index) => {
       priceTotal = priceTotal + item.price;
 
-      const control: Tcontrol_dynaTable['rowArr'][number] = {
-        panelCell_02: {
-          onDeleteClick: () => {
-            setAccountantArr((arr) => {
-              const newArr = [...arr];
-              newArr.splice(index, 1);
-
-              return newArr;
-            });
+      //
+      const subTable = {
+        subHeadRow: {
+          panelCell_05: {},
+          list: headRow_list_發票給予紀錄,
+        },
+        subRowArr: [
+          {
+            date: {
+              label: '日期',
+              cellStyle: { width: '120px' },
+              datePickerProps: {
+                props: {
+                  value: undefined,
+                  onChange: () => {},
+                },
+              },
+            },
+            invoiceNumber: {
+              label: '發票號碼',
+              cellStyle: { width: '300px' },
+              twoInputProps: {
+                one: {
+                  props: {
+                    value: undefined,
+                    onChange: () => {},
+                  },
+                },
+                two: {
+                  props: {
+                    value: undefined,
+                    onChange: () => {},
+                  },
+                },
+              },
+            },
+            price: {
+              label: '金額',
+              cellStyle: { width: '290px' },
+              inputProps: {
+                props: {
+                  value: undefined,
+                  onChange: () => {},
+                },
+              },
+            },
+            remark: {
+              label: '備註',
+              cellStyle: { width: '300px' },
+              inputProps: {
+                props: {
+                  value: undefined,
+                  onChange: () => {},
+                },
+              },
+            },
+            period: {
+              label: '對應期數',
+              cellStyle: { width: '64px' },
+              inputProps: {
+                props: {
+                  value: 'no property',
+                },
+              },
+            },
           },
+        ],
+      };
+      //
+
+      const control: Tcontrol_dynaTable['rowArr'][number] = {
+        panelCell_05: {
+          onChainClick: () => {},
+          onRemoveClick: () => {},
         },
         list: {
           date: {
@@ -675,7 +705,7 @@ export default function AccountReceivable() {
         value: priceTotal.toLocaleString(),
       },
       headRow: {
-        panelCell_02: {},
+        panelCell_05: {},
         list: {
           date: {
             label: '日期',
@@ -1053,4 +1083,54 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
     itemNameArr,
     sortedDeductionList: list,
   };
+};
+
+const headRow_list_收款紀錄 = {
+  date: {
+    label: '日期',
+    cellStyle: { width: '120px' },
+  },
+  account: {
+    label: '帳號',
+    cellStyle: { width: '189px' },
+  },
+  chequeNumber: {
+    label: '票據號碼',
+    cellStyle: { width: '189px' },
+  },
+  chequeDate: {
+    label: '票據日期',
+    cellStyle: { width: '100px' },
+  },
+  price: {
+    label: '金額',
+    cellStyle: { width: '170px' },
+  },
+  incomingSubpoenaSerialNumber: {
+    label: '收入傳票序號',
+    cellStyle: { width: '187px' },
+  },
+};
+
+const headRow_list_發票給予紀錄 = {
+  date: {
+    label: '日期',
+    cellStyle: { width: '120px' },
+  },
+  invoiceNumber: {
+    label: '發票號碼',
+    cellStyle: { width: '300px' },
+  },
+  price: {
+    label: '金額',
+    cellStyle: { width: '290px' },
+  },
+  remark: {
+    label: '備註',
+    cellStyle: { width: '300px' },
+  },
+  period: {
+    label: '對應期數',
+    cellStyle: { width: '64px' },
+  },
 };
