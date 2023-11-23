@@ -802,7 +802,7 @@ export const apiDeleteDeliveryStatus = ({ id, statusId }: { id: string; statusId
   const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
 
   return axi
-    .patch(api)
+    .delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

@@ -28,10 +28,14 @@ import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quot
 import {
   TupdateEngineeringDeliveryList,
   TupdateDeliveryStatus,
+  TupdateEngineeringDeliveryStatusDto,
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
   apiPatchEngineeringDeliveryList,
   TcreateEngineeringDeliveryStatusDto,
+  apiPostDeliveryStatus,
+  apiPatchDeliveryStatus,
+  apiDeleteDeliveryStatus,
 } from 'js/api/api_engineering';
 
 // utils
@@ -65,11 +69,25 @@ type TmyDeleveryList = {
 //   };
 // };
 
+// type TdeliveryStatusInEdit = {
+//   [key: string /*prodKey */]: {
+//     [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+//       id?: string;
+//       installerEmployee?: TemployeeDto | null;
+//     };
+//   };
+// };
 type TdeliveryStatusInEdit = {
   [key: string /*prodKey */]: {
-    [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
-      id?: string;
-      installerEmployee?: TemployeeDto | null;
+    [key: string /*itemId */]: {
+      [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+        id?: string;
+        installerEmployee?: TemployeeDto | null;
+      };
+      // new: TcreateEngineeringDeliveryStatusDto & {
+      //   id?: '';
+      //   installerEmployee?: TemployeeDto | null;
+      // };
     };
   };
 };
@@ -336,6 +354,70 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
+  const reqPost = async (productItemId: string) => {
+    if (!engineeringDeliveryListId) {
+      return;
+    }
+
+    try {
+      const res = await apiPostDeliveryStatus({
+        id: engineeringDeliveryListId,
+        body: {
+          notes: null,
+          itemName: null,
+          shippingDate: null,
+          installerEmployeeId: null,
+          installationDate: null,
+          append: null,
+          completeAppend: null,
+          productItemId,
+        },
+      });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增失敗', content: err.message });
+    }
+
+    //
+  };
+
+  const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
+    if (!engineeringDeliveryListId) {
+      return;
+    }
+
+    try {
+      const res = await apiPatchDeliveryStatus({
+        id: engineeringDeliveryListId,
+        statusId,
+        body,
+      });
+
+      // return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新失敗', content: err.message });
+    }
+  };
+
+  const reqDelete = async (statusId: string) => {
+    if (!engineeringDeliveryListId) {
+      return;
+    }
+
+    try {
+      const res = await apiDeleteDeliveryStatus({
+        id: engineeringDeliveryListId,
+        statusId,
+      });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '刪除失敗', content: err.message });
+    }
+  };
+
+  // --------------------------------------------------------------------------
+
   const control_orderTable: Tcontrol_orderTable =
     Object.keys(myDeleveryList ?? {}).map((prodKey, index, arr) => {
       const arrLength = arr.length;
@@ -401,7 +483,7 @@ export default function OutboundOrder() {
       let totalCai_total = new Decimal(0);
 
       const rowArr: Tgroup['rowArr'] = prod.itemArr.map((item) => {
-        // const itemId = item.id;
+        const itemId = item.id;
 
         totalCai_total = totalCai_total.add(item.volume || '0');
 
@@ -421,7 +503,7 @@ export default function OutboundOrder() {
 
         deliveryStatusArr?.forEach((status, index) => {
           const statusId = status.id;
-          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[statusId];
+          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[itemId][statusId];
           const disabled = !deleveryStatus;
 
           const edit = ({
@@ -430,8 +512,7 @@ export default function OutboundOrder() {
             value,
             employee,
           }: {
-            key: keyof TdeliveryStatusInEdit[string][string];
-            // key: keyof TcreateEngineeringDeliveryStatusDto;
+            key: keyof TdeliveryStatusInEdit[string][string][string];
             value?: string;
             employee?: TemployeeDto | null;
           }) => {
@@ -439,22 +520,18 @@ export default function OutboundOrder() {
               return;
             }
 
-            const theValue = key === 'installerEmployee' ? employee : value;
-
             setDeleveryStatusInEdit((state) => {
               if (!state) {
                 return state;
               }
 
-              const copy = {
-                ...state,
-                [prodKey]: {
-                  [statusId]: {
-                    ...state[prodKey][statusId],
-                    [key]: theValue,
-                  },
-                },
-              };
+              const copy = { ...state };
+
+              if (key === 'installerEmployee') {
+                copy[prodKey][itemId][statusId]['installerEmployee'] = employee;
+              } else {
+                copy[prodKey][itemId][statusId][key] = value ?? '';
+              }
 
               return copy;
               //
@@ -467,18 +544,35 @@ export default function OutboundOrder() {
             onEditClick: () => {
               setDeleveryStatusInEdit({
                 [prodKey]: {
-                  [statusId]: status,
+                  [itemId]: {
+                    [statusId]: _.cloneDeep(status),
+                  },
                 },
               });
             },
             onDeleteClick: () => {
-              alert('test');
+              reqDelete(statusId);
             },
             onAddClick: () => {
-              alert('test');
+              reqPost(itemId);
+
+              // setDeleveryStatusInEdit({
+              //   [prodKey]: {
+              //     [itemId]: {
+              //       ['add']: emptyDeliveryStatus(itemId),
+              //     },
+              //   },
+              // });
             },
             onConfirmClick: () => {
-              alert('test');
+              if (!deleveryStatus) {
+                return;
+              }
+
+              reqPatch({
+                statusId,
+                body: deleveryStatus,
+              });
             },
           });
 
@@ -516,8 +610,6 @@ export default function OutboundOrder() {
             disabled,
             value: deleveryStatus?.itemName ?? status.itemName ?? '',
             onChange: (v) => {
-              console.log('foo');
-
               if (!deleveryStatus) {
                 return;
               }
@@ -722,3 +814,23 @@ export default function OutboundOrder() {
 }
 
 // =====================================================================
+
+const emptyDeliveryStatus = (
+  productItemId: string
+): TcreateEngineeringDeliveryStatusDto & {
+  id?: string;
+  installerEmployee?: TemployeeDto | null;
+} => ({
+  id: 'new',
+  productItemId,
+
+  notes: null,
+  itemName: null,
+  shippingDate: null,
+  installerEmployeeId: null,
+  installationDate: null,
+  append: null,
+  completeAppend: null,
+
+  installerEmployee: null,
+});
