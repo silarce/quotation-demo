@@ -60,6 +60,7 @@ type TdeliveryStatusItem = {
   onDeleteClick?: undefined;
   onAddClick?: undefined;
   onConfirmClick?: undefined;
+  onCancelClick?: undefined;
 };
 type TdeliveryStatusItem_date = {
   value: string;
@@ -74,6 +75,7 @@ type TdeliveryStatusItem_date = {
   onDeleteClick?: undefined;
   onAddClick?: undefined;
   onConfirmClick?: undefined;
+  onCancelClick?: undefined;
 };
 
 type TdeliveryStatusItem_employee = {
@@ -89,6 +91,7 @@ type TdeliveryStatusItem_employee = {
   onDeleteClick?: undefined;
   onAddClick?: undefined;
   onConfirmClick?: undefined;
+  onCancelClick?: undefined;
 };
 
 type TdeliveryStatusItem_btnPanel = {
@@ -100,10 +103,11 @@ type TdeliveryStatusItem_btnPanel = {
   hidden?: boolean;
   disabled?: boolean;
   forbidden?: boolean;
-  onEditClick: () => void;
-  onDeleteClick: () => void;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
   onAddClick: () => void;
   onConfirmClick: () => void;
+  onCancelClick: () => void;
 };
 
 type Tgroup = {
@@ -368,6 +372,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                               onEditClick,
                               onDeleteClick,
                               onConfirmClick,
+                              onCancelClick,
                             } = item;
 
                             if (key === 'btnPanelArr') {
@@ -377,11 +382,22 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                                 <div key={index} className={classNames(scss.btnPanel)}>
                                   <IconAddCircle className={classNames(!isFirst && scss.hidden)} onClick={onAddClick} />
                                   {disabled ? (
-                                    <IconEdit onClick={onEditClick} />
+                                    //
+                                    <IconEdit
+                                      onClick={onEditClick}
+                                      className={classNames(!onEditClick && scss.hidden)}
+                                    />
+                                  ) : (
+                                    <IconEdit onClick={onCancelClick} className={scss.svgActive} />
+                                  )}
+                                  {disabled ? (
+                                    <IconDelete01
+                                      onClick={onDeleteClick}
+                                      className={classNames(!onDeleteClick && scss.hidden)}
+                                    />
                                   ) : (
                                     <IconCheck02 onClick={onConfirmClick} />
                                   )}
-                                  <IconDelete01 onClick={onDeleteClick} />
                                 </div>
                               );
                             }

@@ -1,6 +1,9 @@
 // 出庫單
 // 出庫單
 // 出庫單
+
+// setMyDeleveryList
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
@@ -26,12 +29,12 @@ import style from './contract.module.scss';
 // api
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import {
-  TupdateEngineeringDeliveryList,
-  TupdateDeliveryStatus,
+  // TupdateEngineeringDeliveryList,
+  // TupdateDeliveryStatus,
   TupdateEngineeringDeliveryStatusDto,
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
-  apiPatchEngineeringDeliveryList,
+  // apiPatchEngineeringDeliveryList,
   TcreateEngineeringDeliveryStatusDto,
   apiPostDeliveryStatus,
   apiPatchDeliveryStatus,
@@ -39,10 +42,10 @@ import {
 } from 'js/api/api_engineering';
 
 // utils
-import { convertDate_reduce1911, convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
+import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
-import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+// import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/api/dtoTypes';
 
 // =====================================================================
@@ -57,26 +60,6 @@ type TmyDeleveryList = {
   [key: string]: Tdelevery;
 };
 
-// type TdeliveryStatusWillUpdate = {
-//   [key in string]: {
-//     id: string;
-//     notes: string;
-//     // installerEmployeeId: string | null;
-//     installerEmployee?: TemployeeDto | null;
-//     installationDate: string | null;
-//     append: string | null;
-//     completeAppend: string | null;
-//   };
-// };
-
-// type TdeliveryStatusInEdit = {
-//   [key: string /*prodKey */]: {
-//     [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
-//       id?: string;
-//       installerEmployee?: TemployeeDto | null;
-//     };
-//   };
-// };
 type TdeliveryStatusInEdit = {
   [key: string /*prodKey */]: {
     [key: string /*itemId */]: {
@@ -84,10 +67,6 @@ type TdeliveryStatusInEdit = {
         id?: string;
         installerEmployee?: TemployeeDto | null;
       };
-      // new: TcreateEngineeringDeliveryStatusDto & {
-      //   id?: '';
-      //   installerEmployee?: TemployeeDto | null;
-      // };
     };
   };
 };
@@ -99,6 +78,7 @@ export default function OutboundOrder() {
 
   const [isLoading, setIsLoading] = useState(false);
   // const [disabled, setDisabled] = useState(true);
+  const [isReqing, setIsReqing] = useState(false);
 
   // --------------------------------------------------------------------------
 
@@ -174,131 +154,15 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  // const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TcreateEngineeringDeliveryStatusDto>();
   const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
 
-  console.log(deleveryStatusInEdit);
-
-  const [deleveryStatus, setDeleveryStatus] = useState<TdeliveryStatusDto>();
-
   // --------------------------------------------------------------------------
-
-  // const [deliveryStatusWillUpdate, setDeliveryStatusWillUpdate] = useState<TdeliveryStatusWillUpdate>({});
-
-  // const change_deliveryStatusWillUpdate = (
-  //   statusOri: TdeliveryStatusDto | undefined | null,
-  //   key: Exclude<keyof TdeliveryStatusWillUpdate[string], 'installerEmployee'>,
-  //   v: string
-  // ) => {
-  //   if (!statusOri) {
-  //     return;
-  //   }
-
-  //   const deliveryStatusId = statusOri.id;
-  //   let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
-  //   statusCopy = { ...statusCopy };
-  //   statusCopy[key] = v;
-
-  //   setDeliveryStatusWillUpdate((state) => {
-  //     return {
-  //       ...state,
-  //       [deliveryStatusId]: statusCopy,
-  //     };
-  //   });
-  // };
-
-  // const change_deliveryStatusWillUpdate_employee = (
-  //   statusOri: TdeliveryStatusDto | undefined | null,
-  //   key: 'installerEmployee',
-  //   v: TemployeeDto | null
-  // ) => {
-  //   if (!statusOri) {
-  //     return;
-  //   }
-
-  //   const deliveryStatusId = statusOri.id;
-  //   let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
-  //   statusCopy = { ...statusCopy };
-  //   statusCopy[key] = v;
-  //   setDeliveryStatusWillUpdate((state) => {
-  //     return {
-  //       ...state,
-  //       [deliveryStatusId]: statusCopy,
-  //     };
-  //   });
-  // };
-
-  // const change_deliveryStatusWillUpdate_date = (
-  //   statusOri: TdeliveryStatusDto | undefined | null,
-  //   key: 'installationDate',
-  //   v: string | null
-  // ) => {
-  //   if (!statusOri) {
-  //     return;
-  //   }
-
-  //   const deliveryStatusId = statusOri.id;
-  //   let statusCopy = deliveryStatusWillUpdate[deliveryStatusId] ?? createDeliveryStatusWillUpdate(statusOri);
-  //   statusCopy = { ...statusCopy };
-  //   statusCopy[key] = v;
-  //   setDeliveryStatusWillUpdate((state) => {
-  //     return {
-  //       ...state,
-  //       [deliveryStatusId]: statusCopy,
-  //     };
-  //   });
-  // };
-
-  // --------------------------------------------------------------------------
-
-  // const { myDeleveryList, worksheet } = useMemo(() => {
-  //   if (!deliveryList?.contract.worksheet?.contractProductItems) {
-  //     return {};
-  //   }
-
-  //   const worksheet = deliveryList.contract.worksheet;
-
-  //   const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
-
-  //   const myDeleveryList: myDeleveryList = {};
-
-  //   contractProductItems.forEach((item) => {
-  //     const { productId, adjustedItem, adjustedItemId } = item;
-
-  //     let theItem: typeof item;
-  //     // 現在只以productId分類，theId用不到了
-  //     // let theId: string;
-
-  //     if (adjustedItem && adjustedItemId) {
-  //       theItem = adjustedItem;
-  //       // theId = adjustedItemId;
-  //     } else {
-  //       theItem = item;
-  //       // theId = productId;
-  //     }
-
-  //     theItem.deliveryStatus = item.deliveryStatus;
-
-  //     if (!myDeleveryList?.[productId]) {
-  //       myDeleveryList[productId] = {
-  //         originalItem: item,
-  //         itemName: theItem.itemName,
-  //         itemArr: [],
-  //       };
-  //     }
-
-  //     myDeleveryList[productId].itemArr.push(theItem);
-  //   });
-
-  //   return {
-  //     myDeleveryList,
-  //     worksheet,
-  //   };
-  // }, [deliveryList]);
 
   const worksheet = deliveryList?.contract.worksheet;
 
   const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
+
+  console.log(myDeleveryList);
 
   useEffect(() => {
     if (!deliveryList?.contract.worksheet?.contractProductItems) {
@@ -344,19 +208,13 @@ export default function OutboundOrder() {
 
   useEffect(() => {
     setNotes(deliveryList?.notes);
-
-    // const deleveryStatusList =
   }, [deliveryList]);
-
-  // useEffect(() => {
-  //   setDeliveryStatusWillUpdate({});
-  // }, [disabled]);
 
   // --------------------------------------------------------------------------
 
   const reqPost = async (productItemId: string) => {
-    if (!engineeringDeliveryListId) {
-      return;
+    if (!engineeringDeliveryListId || isReqing) {
+      return undefined;
     }
 
     try {
@@ -373,16 +231,24 @@ export default function OutboundOrder() {
           productItemId,
         },
       });
+
+      console.log(res);
+
+      if (res) {
+        return res;
+      }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增失敗', content: err.message });
+
+      return undefined;
     }
 
     //
   };
 
   const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
-    if (!engineeringDeliveryListId) {
+    if (!engineeringDeliveryListId || isReqing) {
       return;
     }
 
@@ -393,7 +259,7 @@ export default function OutboundOrder() {
         body,
       });
 
-      // return res;
+      return res;
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新失敗', content: err.message });
@@ -401,7 +267,7 @@ export default function OutboundOrder() {
   };
 
   const reqDelete = async (statusId: string) => {
-    if (!engineeringDeliveryListId) {
+    if (!engineeringDeliveryListId || isReqing) {
       return;
     }
 
@@ -410,6 +276,8 @@ export default function OutboundOrder() {
         id: engineeringDeliveryListId,
         statusId,
       });
+
+      return true;
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '刪除失敗', content: err.message });
@@ -482,7 +350,7 @@ export default function OutboundOrder() {
 
       let totalCai_total = new Decimal(0);
 
-      const rowArr: Tgroup['rowArr'] = prod.itemArr.map((item) => {
+      const rowArr: Tgroup['rowArr'] = prod.itemArr.map((item, itemIndex) => {
         const itemId = item.id;
 
         totalCai_total = totalCai_total.add(item.volume || '0');
@@ -501,9 +369,9 @@ export default function OutboundOrder() {
 
         const deliveryStatusArr = item.deliveryStatus;
 
-        deliveryStatusArr?.forEach((status, index) => {
+        deliveryStatusArr?.forEach((status, statusIndex) => {
           const statusId = status.id;
-          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[itemId][statusId];
+          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[itemId]?.[statusId];
           const disabled = !deleveryStatus;
 
           const edit = ({
@@ -550,29 +418,73 @@ export default function OutboundOrder() {
                 },
               });
             },
-            onDeleteClick: () => {
-              reqDelete(statusId);
+            onCancelClick: () => {
+              setDeleveryStatusInEdit(undefined);
             },
-            onAddClick: () => {
-              reqPost(itemId);
+            onDeleteClick: async () => {
+              const res = await reqDelete(statusId);
 
-              // setDeleveryStatusInEdit({
-              //   [prodKey]: {
-              //     [itemId]: {
-              //       ['add']: emptyDeliveryStatus(itemId),
-              //     },
-              //   },
-              // });
+              if (res) {
+                setMyDeleveryList((state) => {
+                  const copy = { ...state };
+                  const theIndex = copy[prodKey].itemArr[itemIndex].deliveryStatus?.findIndex((item) => {
+                    return item.id === statusId;
+                  });
+
+                  if (theIndex) {
+                    copy[prodKey].itemArr[itemIndex].deliveryStatus?.splice(theIndex, 1);
+                  }
+
+                  return copy;
+                });
+              }
             },
-            onConfirmClick: () => {
+            onAddClick: async () => {
+              const res = await reqPost(itemId);
+
+              if (res) {
+                setMyDeleveryList((state) => {
+                  const copy = { ...state };
+                  copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
+
+                  return copy;
+                });
+              }
+            },
+            onConfirmClick: async () => {
               if (!deleveryStatus) {
                 return;
               }
 
-              reqPatch({
+              const body = {
+                ...deleveryStatus,
+                installerEmployeeId: deleveryStatus.installerEmployee?.id ?? null,
+              };
+
+              const res = await reqPatch({
                 statusId,
-                body: deleveryStatus,
+                body,
               });
+
+              if (res) {
+                setDeleveryStatusInEdit(undefined);
+
+                setMyDeleveryList((state) => {
+                  const copy = { ...state };
+
+                  const theIndex = copy[prodKey].itemArr[itemIndex].deliveryStatus?.findIndex((item) => {
+                    return item.id === statusId;
+                  });
+
+                  if (theIndex !== undefined && theIndex > -1) {
+                    if (copy[prodKey].itemArr[itemIndex].deliveryStatus) {
+                      copy[prodKey].itemArr[itemIndex].deliveryStatus![theIndex] = res;
+                    }
+                  }
+
+                  return copy;
+                });
+              }
             },
           });
 
@@ -638,6 +550,26 @@ export default function OutboundOrder() {
           //
         });
 
+        if (btnPanelArr.length === 0) {
+          btnPanelArr.push({
+            disabled: true,
+            onConfirmClick: () => {},
+            onCancelClick: () => {},
+            onAddClick: async () => {
+              const res = await reqPost(itemId);
+
+              if (res) {
+                setMyDeleveryList((state) => {
+                  const copy = { ...state };
+                  copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
+
+                  return copy;
+                });
+              }
+            },
+          });
+        }
+
         return {
           contractData: {
             // 這裡的東西不需要顯示，所以空字串就好了
@@ -698,49 +630,6 @@ export default function OutboundOrder() {
         rowArr,
       };
     }) ?? [];
-
-  // --------------------------------------------------------------------------
-
-  // const reqUpdate = async () => {
-  //   if (!engineeringDeliveryListId || !deliveryList || notes === undefined) {
-  //     return myAlert.warning({ title: '還未取得工作表' });
-  //   }
-
-  //   const productsItemStatus: TupdateDeliveryStatus[] = Object.values(deliveryStatusWillUpdate).map((status) => {
-  //     // const theDate = status.installationDate ? convertDate_add1911(status.installationDate) : null;
-  //     const theDate = status.installationDate ? status.installationDate : null;
-
-  //     return {
-  //       id: status.id,
-  //       notes: status.notes,
-  //       installerEmployeeId: status.installerEmployee?.id ?? null,
-  //       installationDate: theDate,
-  //       append: status.append,
-  //       completeAppend: status.completeAppend,
-  //     };
-  //   });
-
-  //   const body: TupdateEngineeringDeliveryList = {
-  //     notes: notes,
-  //     productsItemStatus,
-  //   };
-
-  //   try {
-  //     setIsLoading(true);
-  //     const res = await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, body);
-
-  //     if (res) {
-  //       myAlert.success({ title: '更新工作表成功' });
-  //       setDisabled(true);
-  //       await update_deliveryList();
-  //     }
-  //   } catch (error) {
-  //     const err = error as Error;
-  //     myAlert.err({ title: '更新工作表失敗', content: err.message });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   // --------------------------------------------------------------------------
 
@@ -812,25 +701,3 @@ export default function OutboundOrder() {
     </SubLayer>
   );
 }
-
-// =====================================================================
-
-const emptyDeliveryStatus = (
-  productItemId: string
-): TcreateEngineeringDeliveryStatusDto & {
-  id?: string;
-  installerEmployee?: TemployeeDto | null;
-} => ({
-  id: 'new',
-  productItemId,
-
-  notes: null,
-  itemName: null,
-  shippingDate: null,
-  installerEmployeeId: null,
-  installationDate: null,
-  append: null,
-  completeAppend: null,
-
-  installerEmployee: null,
-});

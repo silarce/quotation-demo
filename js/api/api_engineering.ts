@@ -31,6 +31,7 @@ import type {
   TfileDto,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
+  TdeliveryStatusDto,
 } from './dtoTypes';
 
 export type {
@@ -55,6 +56,7 @@ export type {
   TfileDto,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
+  TdeliveryStatusDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -771,10 +773,10 @@ export const apiPostDeliveryStatus = ({
   id: string; // 出庫單ID
   body: TcreateEngineeringDeliveryStatusDto;
 }) => {
-  const api = `/engineering/delivery-list/${id}/delivery-status/`;
+  const api = `/engineering/delivery-list/${id}/delivery-status`;
 
   return axi
-    .post(api, body)
+    .post<TdeliveryStatusDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -792,7 +794,7 @@ export const apiPatchDeliveryStatus = ({
   const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
 
   return axi
-    .patch(api, body)
+    .patch<TdeliveryStatusDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
