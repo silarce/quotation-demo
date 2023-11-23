@@ -27,11 +27,11 @@ import type {
   TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
-  TupdateEngineeringDeliveryList,
   TfileDto,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
   TdeliveryStatusDto,
+  TupdateEngineeringDeliveryListDto,
 } from './dtoTypes';
 
 export type {
@@ -51,12 +51,12 @@ export type {
   TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
-  TupdateEngineeringDeliveryList,
   TupdateDeliveryStatus,
   TfileDto,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
   TdeliveryStatusDto,
+  TupdateEngineeringDeliveryListDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -755,7 +755,7 @@ export const useGetEngineeringDeliveryList = (id: string | undefined | null) => 
 };
 
 /**更新出庫單 */
-export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryList) => {
+export const apiPatchEngineeringDeliveryList = (id: string, body: TupdateEngineeringDeliveryListDto) => {
   const api = `/engineering/delivery-list/${id}`;
 
   return axi

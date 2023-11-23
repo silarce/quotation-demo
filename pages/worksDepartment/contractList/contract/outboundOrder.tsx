@@ -8,7 +8,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import moment from 'moment';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -22,6 +22,7 @@ import OrderTable, {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // css
 import style from './contract.module.scss';
@@ -34,7 +35,7 @@ import {
   TupdateEngineeringDeliveryStatusDto,
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
-  // apiPatchEngineeringDeliveryList,
+  apiPatchEngineeringDeliveryList,
   TcreateEngineeringDeliveryStatusDto,
   apiPostDeliveryStatus,
   apiPatchDeliveryStatus,
@@ -151,6 +152,11 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   const [notes, setNotes] = useState<string>();
+  const [notesDiasbled, setNotesDiasbled] = useState(true);
+
+  useEffect(() => {
+    setNotes(deliveryList?.notes);
+  }, [deliveryList, notesDiasbled]);
 
   // --------------------------------------------------------------------------
 
@@ -161,8 +167,6 @@ export default function OutboundOrder() {
   const worksheet = deliveryList?.contract.worksheet;
 
   const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
-
-  console.log(myDeleveryList);
 
   useEffect(() => {
     if (!deliveryList?.contract.worksheet?.contractProductItems) {
@@ -205,10 +209,6 @@ export default function OutboundOrder() {
   }, [deliveryList]);
 
   // console.log(myDeleveryList);
-
-  useEffect(() => {
-    setNotes(deliveryList?.notes);
-  }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
@@ -633,6 +633,26 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
+  const reqPatchNotes = async () => {
+    if (!engineeringDeliveryListId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
+      await update_deliveryList();
+      setNotesDiasbled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新備註失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------------------
+
   // const panelList01: TpanelList = [
   //   {
   //     type: 'myButton',
@@ -683,6 +703,23 @@ export default function OutboundOrder() {
             <div className={style.title}>
               <div>
                 <span>備註</span>
+                <div className={style.btnBar}>
+                  {notesDiasbled && (
+                    <div>
+                      <MyButton_v2 label="編輯" onClick={() => setNotesDiasbled(false)} />
+                    </div>
+                  )}
+                  {!notesDiasbled && (
+                    <>
+                      <div>
+                        <MyButton_v2 label="確認" onClick={reqPatchNotes} />
+                      </div>
+                      <div>
+                        <MyButton_v2 label="取消" onClick={() => setNotesDiasbled(true)} />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -690,9 +727,12 @@ export default function OutboundOrder() {
               <textarea
                 value={notes || ''}
                 onChange={(e) => {
-                  setNotes(e.target.value);
+                  if (!notesDiasbled) {
+                    setNotes(e.target.value);
+                  }
                 }}
                 placeholder="請輸入備註"
+                disabled={notesDiasbled}
               ></textarea>
             </div>
           </div>

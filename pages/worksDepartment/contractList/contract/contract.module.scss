@@ -9,6 +9,15 @@
 
   .remark {
     margin-top: 40px;
+    .title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      button {
+        width: fit-content;
+      }
+    }
+
     .textarea {
       height: 175px;
       border: solid 1px $colorBorder01;
@@ -21,9 +30,6 @@
         font-size: 18px;
       }
     }
-    .title {
-      margin-bottom: 15px;
-    }
   }
 
   .title {
@@ -32,6 +38,7 @@
     > div {
       display: grid;
       grid-template-columns: 75px auto;
+      align-items: center;
       gap: 20px;
       > span {
         font-weight: 400;
@@ -40,6 +47,10 @@
           color: $colorMain;
         }
       }
+    }
+    .btnBar {
+      display: flex;
+      gap: 20px;
     }
   }
 }

@@ -2430,9 +2430,13 @@ export type TengineeringDeliveryListDto = {
   contract: TquotationContractDto;
 };
 
-export type TupdateEngineeringDeliveryList = {
+// export type TupdateEngineeringDeliveryList = {
+//   notes: string;
+//   productsItemStatus?: TupdateDeliveryStatus[];
+// };
+
+export type TupdateEngineeringDeliveryListDto = {
   notes: string;
-  productsItemStatus?: TupdateDeliveryStatus[];
 };
 
 // =========================================================================
