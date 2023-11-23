@@ -49,19 +49,28 @@ type Tdelevery = {
   itemArr: TquotationProductItemDto[];
 };
 
-type myDeleveryList = {
+type TmyDeleveryList = {
   [key: string]: Tdelevery;
 };
 
-type TdeliveryStatusWillUpdate = {
-  [key in string]: {
-    id: string;
-    notes: string;
-    // installerEmployeeId: string | null;
-    installerEmployee?: TemployeeDto | null;
-    installationDate: string | null;
-    append: string | null;
-    completeAppend: string | null;
+// type TdeliveryStatusWillUpdate = {
+//   [key in string]: {
+//     id: string;
+//     notes: string;
+//     // installerEmployeeId: string | null;
+//     installerEmployee?: TemployeeDto | null;
+//     installationDate: string | null;
+//     append: string | null;
+//     completeAppend: string | null;
+//   };
+// };
+
+type TdeliveryStatusInEdit = {
+  [key: string /*prodKey */]: {
+    [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+      id?: string;
+      installerEmployee?: TemployeeDto | null;
+    };
   };
 };
 
@@ -148,9 +157,11 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   // const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TcreateEngineeringDeliveryStatusDto>();
-  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<{
-    [key: string /*id */]: TcreateEngineeringDeliveryStatusDto & { id: string };
-  }>();
+  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
+
+  console.log(deleveryStatusInEdit);
+
+  const [deleveryStatus, setDeleveryStatus] = useState<TdeliveryStatusDto>();
 
   // --------------------------------------------------------------------------
 
@@ -222,16 +233,63 @@ export default function OutboundOrder() {
 
   // --------------------------------------------------------------------------
 
-  const { myDeleveryList, worksheet } = useMemo(() => {
-    if (!deliveryList?.contract.worksheet?.contractProductItems) {
-      return {};
-    }
+  // const { myDeleveryList, worksheet } = useMemo(() => {
+  //   if (!deliveryList?.contract.worksheet?.contractProductItems) {
+  //     return {};
+  //   }
 
-    const worksheet = deliveryList.contract.worksheet;
+  //   const worksheet = deliveryList.contract.worksheet;
+
+  //   const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
+
+  //   const myDeleveryList: myDeleveryList = {};
+
+  //   contractProductItems.forEach((item) => {
+  //     const { productId, adjustedItem, adjustedItemId } = item;
+
+  //     let theItem: typeof item;
+  //     // 現在只以productId分類，theId用不到了
+  //     // let theId: string;
+
+  //     if (adjustedItem && adjustedItemId) {
+  //       theItem = adjustedItem;
+  //       // theId = adjustedItemId;
+  //     } else {
+  //       theItem = item;
+  //       // theId = productId;
+  //     }
+
+  //     theItem.deliveryStatus = item.deliveryStatus;
+
+  //     if (!myDeleveryList?.[productId]) {
+  //       myDeleveryList[productId] = {
+  //         originalItem: item,
+  //         itemName: theItem.itemName,
+  //         itemArr: [],
+  //       };
+  //     }
+
+  //     myDeleveryList[productId].itemArr.push(theItem);
+  //   });
+
+  //   return {
+  //     myDeleveryList,
+  //     worksheet,
+  //   };
+  // }, [deliveryList]);
+
+  const worksheet = deliveryList?.contract.worksheet;
+
+  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
+
+  useEffect(() => {
+    if (!deliveryList?.contract.worksheet?.contractProductItems) {
+      return;
+    }
 
     const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
 
-    const myDeleveryList: myDeleveryList = {};
+    const myDeleveryList: TmyDeleveryList = {};
 
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
@@ -261,16 +319,15 @@ export default function OutboundOrder() {
       myDeleveryList[productId].itemArr.push(theItem);
     });
 
-    return {
-      myDeleveryList,
-      worksheet,
-    };
+    setMyDeleveryList(myDeleveryList);
   }, [deliveryList]);
 
+  // console.log(myDeleveryList);
+
   useEffect(() => {
-    if (deliveryList) {
-      setNotes(deliveryList.notes);
-    }
+    setNotes(deliveryList?.notes);
+
+    // const deleveryStatusList =
   }, [deliveryList]);
 
   // useEffect(() => {
@@ -280,23 +337,23 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   const control_orderTable: Tcontrol_orderTable =
-    Object.keys(myDeleveryList ?? {}).map((key, index, arr) => {
+    Object.keys(myDeleveryList ?? {}).map((prodKey, index, arr) => {
       const arrLength = arr.length;
 
-      const delevery = myDeleveryList![key];
+      const prod = myDeleveryList![prodKey];
 
-      const theOriginalContractContent = contractProdList![key];
+      const theOriginalContractContent = contractProdList![prodKey];
 
       // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
-      const firstItem = delevery.itemArr[0];
+      const firstItem = prod.itemArr[0];
 
       const firstRow: Tgroup['rowArr'][0] = {
         contractData: {
-          project: delevery.itemName,
+          project: prod.itemName,
           L: String(theOriginalContractContent.fullWidth),
           W: String(theOriginalContractContent.WG),
           B: String(theOriginalContractContent.boxB),
-          qty: String(delevery.itemArr.length),
+          qty: String(prod.itemArr.length),
           implementQty: '???',
           cai: theOriginalContractContent.volume ?? '',
           totalCai: new Decimal(theOriginalContractContent.volume).mul(arrLength).toString(),
@@ -306,11 +363,11 @@ export default function OutboundOrder() {
           surface: theOriginalContractContent.materialSurface ?? '',
         },
         staticData: {
-          project: delevery.itemName,
+          project: prod.itemName,
           L: String(firstItem.fullWidth),
           W: String(firstItem.WG),
           B: String(firstItem.boxB),
-          qty: String(delevery.itemArr.length),
+          qty: String(prod.itemArr.length),
           implementQty: '???',
           // cai: firstItem.volume,
           cai: '',
@@ -343,7 +400,9 @@ export default function OutboundOrder() {
 
       let totalCai_total = new Decimal(0);
 
-      const rowArr: Tgroup['rowArr'] = delevery.itemArr.map((item) => {
+      const rowArr: Tgroup['rowArr'] = prod.itemArr.map((item) => {
+        // const itemId = item.id;
+
         totalCai_total = totalCai_total.add(item.volume || '0');
 
         const accessories = item.accessories;
@@ -352,17 +411,140 @@ export default function OutboundOrder() {
             return acce.name;
           }) ?? [];
 
-        // const {
-        //   //
-        //   id: deliveryStatusId,
-        //   createdAt,
-        //   notes,
-        //   installerEmployeeId,
-        //   installerEmployee,
-        //   installationDate,
-        //   append,
-        //   completeAppend,
-        // } = item.deliveryStatus ?? {};
+        const btnPanelArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['btnPanelArr'] = [];
+        const installDateArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['installDateArr'] = [];
+        const installerArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['installerArr'] = [];
+        const itemNameArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['itemNameArr'] = [];
+        const notesArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['notesArr'] = [];
+
+        const deliveryStatusArr = item.deliveryStatus;
+
+        deliveryStatusArr?.forEach((status, index) => {
+          const statusId = status.id;
+          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[statusId];
+          const disabled = !deleveryStatus;
+
+          const edit = ({
+            //
+            key,
+            value,
+            employee,
+          }: {
+            key: keyof TdeliveryStatusInEdit[string][string];
+            // key: keyof TcreateEngineeringDeliveryStatusDto;
+            value?: string;
+            employee?: TemployeeDto | null;
+          }) => {
+            if (!deleveryStatus) {
+              return;
+            }
+
+            const theValue = key === 'installerEmployee' ? employee : value;
+
+            setDeleveryStatusInEdit((state) => {
+              if (!state) {
+                return state;
+              }
+
+              const copy = {
+                ...state,
+                [prodKey]: {
+                  [statusId]: {
+                    ...state[prodKey][statusId],
+                    [key]: theValue,
+                  },
+                },
+              };
+
+              return copy;
+              //
+            });
+          };
+
+          //
+          btnPanelArr.push({
+            disabled,
+            onEditClick: () => {
+              setDeleveryStatusInEdit({
+                [prodKey]: {
+                  [statusId]: status,
+                },
+              });
+            },
+            onDeleteClick: () => {
+              alert('test');
+            },
+            onAddClick: () => {
+              alert('test');
+            },
+            onConfirmClick: () => {
+              alert('test');
+            },
+          });
+
+          installDateArr.push({
+            disabled,
+            value: deleveryStatus?.installationDate ?? status.installationDate ?? '',
+            onChange_date: (v) => {
+              if (!deleveryStatus) {
+                return;
+              }
+
+              edit({
+                key: 'installationDate',
+                value: v ?? '',
+              });
+            },
+          });
+
+          installerArr.push({
+            disabled,
+            empolyee: deleveryStatus?.installerEmployee ?? (status.installerEmployee || null),
+            onChange_employee: (employee) => {
+              if (!deleveryStatus) {
+                return;
+              }
+
+              edit({
+                key: 'installerEmployee',
+                employee,
+              });
+            },
+          });
+
+          itemNameArr.push({
+            disabled,
+            value: deleveryStatus?.itemName ?? status.itemName ?? '',
+            onChange: (v) => {
+              console.log('foo');
+
+              if (!deleveryStatus) {
+                return;
+              }
+
+              edit({
+                key: 'itemName',
+                value: v ?? '',
+              });
+            },
+          });
+
+          notesArr.push({
+            disabled,
+            value: deleveryStatus?.notes ?? status.notes ?? '',
+            onChange: (v) => {
+              if (!deleveryStatus) {
+                return;
+              }
+
+              edit({
+                key: 'notes',
+                value: v ?? '',
+              });
+            },
+          });
+          //
+        });
 
         return {
           contractData: {
@@ -381,7 +563,7 @@ export default function OutboundOrder() {
             surface: '',
           },
           staticData: {
-            project: delevery.itemName,
+            project: prod.itemName,
             L: String(item.fullWidth),
             W: String(item.WG),
             B: String(item.boxB),
@@ -406,82 +588,11 @@ export default function OutboundOrder() {
           },
           deliveryStatus: {
             groupList: {
-              btnPanelArr: [
-                {
-                  onEditClick: () => {},
-                  onDeleteClick: () => {},
-                  onAddClick: () => {},
-                  onConfirmClick: () => {},
-                },
-                {
-                  onEditClick: () => {},
-                  onDeleteClick: () => {},
-                  onAddClick: () => {},
-                  onConfirmClick: () => {},
-                },
-                {
-                  onEditClick: () => {},
-                  onDeleteClick: () => {},
-                  onAddClick: () => {},
-                  onConfirmClick: () => {},
-                },
-              ],
-              installDateArr: [
-                {
-                  value: '',
-                  onChange_date: () => {},
-                },
-                {
-                  value: '',
-                  onChange_date: () => {},
-                },
-                {
-                  value: '',
-                  onChange_date: () => {},
-                },
-              ],
-              installerArr: [
-                {
-                  empolyee: null,
-                  onChange_employee: () => {},
-                },
-                {
-                  empolyee: null,
-                  onChange_employee: () => {},
-                },
-                {
-                  empolyee: null,
-                  onChange_employee: () => {},
-                },
-              ],
-              itemNameArr: [
-                {
-                  value: '',
-                  onChange: () => {},
-                },
-                {
-                  value: '',
-                  onChange: () => {},
-                },
-                {
-                  value: '',
-                  onChange: () => {},
-                },
-              ],
-              notesArr: [
-                {
-                  value: '',
-                  onChange: () => {},
-                },
-                {
-                  value: '',
-                  onChange: () => {},
-                },
-                {
-                  value: '',
-                  onChange: () => {},
-                },
-              ],
+              btnPanelArr,
+              installDateArr,
+              installerArr,
+              itemNameArr,
+              notesArr,
             },
           },
         };
@@ -491,7 +602,7 @@ export default function OutboundOrder() {
       rowArr.unshift(firstRow);
 
       return {
-        itemName: delevery.itemName,
+        itemName: prod.itemName,
         rowArr,
       };
     }) ?? [];
@@ -610,13 +721,4 @@ export default function OutboundOrder() {
   );
 }
 
-const createDeliveryStatusWillUpdate = (deliveryStatus: TdeliveryStatusDto): TdeliveryStatusWillUpdate[string] => {
-  return {
-    id: deliveryStatus.id,
-    notes: deliveryStatus.notes ?? '',
-    installerEmployee: deliveryStatus.installerEmployee ?? null,
-    installationDate: deliveryStatus.installationDate,
-    append: deliveryStatus.append,
-    completeAppend: deliveryStatus.completeAppend,
-  };
-};
+// =====================================================================

@@ -54,6 +54,7 @@ type TdeliveryStatusItem = {
   onChange_date?: undefined;
   onChange_employee?: undefined;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
   onEditClick?: undefined;
   onDeleteClick?: undefined;
@@ -67,6 +68,7 @@ type TdeliveryStatusItem_date = {
   onChange_date?: (date: string | null) => void;
   onChange_employee?: undefined;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
   onEditClick?: undefined;
   onDeleteClick?: undefined;
@@ -81,6 +83,7 @@ type TdeliveryStatusItem_employee = {
   onChange_date?: undefined;
   onChange_employee?: (emp: TemployeeDto | null) => void;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
   onEditClick?: undefined;
   onDeleteClick?: undefined;
@@ -95,6 +98,7 @@ type TdeliveryStatusItem_btnPanel = {
   onChange_date?: undefined;
   onChange_employee?: undefined;
   hidden?: boolean;
+  disabled?: boolean;
   forbidden?: boolean;
   onEditClick: () => void;
   onDeleteClick: () => void;
@@ -113,7 +117,7 @@ type Tgroup = {
     };
 
     deliveryStatus: {
-      disabled?: boolean;
+      // disabled?: boolean;
       groupList: {
         btnPanelArr: TdeliveryStatusItem_btnPanel[];
         installDateArr: TdeliveryStatusItem_date[];
@@ -335,7 +339,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                     {/*  */}
 
                     {orderKey_deliveryStatus.map((key, index) => {
-                      const { disabled, groupList } = row.deliveryStatus;
+                      const { groupList } = row.deliveryStatus;
 
                       const group = groupList[key];
 
@@ -354,11 +358,12 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                         >
                           {group.map((item, index) => {
                             const {
+                              disabled,
                               value,
                               empolyee,
+                              onChange,
                               onChange_date,
                               onChange_employee,
-
                               onAddClick,
                               onEditClick,
                               onDeleteClick,
@@ -411,14 +416,36 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                             if (onChange_date) {
                               return (
                                 <div key={index}>
-                                  <InputSel datePickerProps={{}} disabled={disabled} showBaseline={'auto'} />
+                                  <InputSel
+                                    datePickerProps={{
+                                      props: {
+                                        value: value ? moment(value) : null,
+                                        onChange: (date) => {
+                                          onChange_date(date?.toISOString() ?? '');
+                                        },
+                                      },
+                                    }}
+                                    disabled={disabled}
+                                    showBaseline={'auto'}
+                                  />
                                 </div>
                               );
                             }
 
                             return (
                               <div key={index}>
-                                <InputSel inputProps={{}} disabled={disabled} showBaseline={'auto'} />
+                                <InputSel
+                                  inputProps={{
+                                    props: {
+                                      value,
+                                      onChange: (e) => {
+                                        onChange?.(e.target.value);
+                                      },
+                                    },
+                                  }}
+                                  disabled={disabled}
+                                  showBaseline={'auto'}
+                                />
                               </div>
                             );
                           })}

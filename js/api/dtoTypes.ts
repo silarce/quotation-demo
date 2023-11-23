@@ -992,12 +992,13 @@ export type TdeliveryStatusDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  productItemId?: string;
+  productItemId: string;
   //  '所屬產品'
   productItem?: TquotationProductItemDto;
   //  '備註'
   notes: string | null;
   itemName: string | null;
+  shippingDate: string | null;
   //  '安裝人員Id'
   installerEmployeeId: string | null;
   //  '安裝人員'
@@ -1017,7 +1018,8 @@ export type TdeliveryStatusDto = {
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
-  notes: string;
+  notes: string | null;
+  itemName: string | null;
   shippingDate: string | null;
   installerEmployeeId: string | null;
   installationDate: string | null;
@@ -1027,7 +1029,8 @@ export type TcreateEngineeringDeliveryStatusDto = {
 };
 
 export type TupdateEngineeringDeliveryStatusDto = {
-  notes: string;
+  notes: string | null;
+  itemName: string | null;
   shippingDate: string | null;
   installerEmployeeId: string | null;
   installationDate: string | null;

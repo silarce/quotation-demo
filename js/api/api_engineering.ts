@@ -768,7 +768,7 @@ export const apiPostDeliveryStatus = ({
   id,
   body,
 }: {
-  id: string;
+  id: string; // 出庫單ID
   body: TcreateEngineeringDeliveryStatusDto;
 }) => {
   const api = `/engineering/delivery-list/${id}/delivery-status/`;
