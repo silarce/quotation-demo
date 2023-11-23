@@ -27,6 +27,12 @@
   :global(.ant-collapse-content-box) {
     padding: 0;
   }
+  // input[disabled] {
+  //   pointer-events: none !important;
+  //   cursor: pointer !important;
+  //   background-color: pink;
+  //   // pointer-events: all !important;
+  // }
 }
 
 .top {
@@ -49,6 +55,9 @@
   > * {
     flex: none;
   }
+  &.sub {
+    background-color: theme("colors.bgc01");
+  }
 }
 
 .row {
@@ -59,6 +68,12 @@
   padding-bottom: 11px;
   padding-left: 16px;
   padding-right: 16px;
+
+  input:disabled {
+    pointer-events: none !important;
+    // cursor: pointer !important; // 鼠標事件無效 設這個沒有用
+  }
+
   > div {
     flex: none;
   }
@@ -124,6 +139,17 @@
   svg {
     height: 20px;
     width: 20px;
+  }
+  .abandon {
+    width: 32px;
+    span {
+      color: theme("colors.main");
+      font-size: 16px;
+    }
+    > svg {
+      display: block;
+      margin: auto;
+    }
   }
 }
 

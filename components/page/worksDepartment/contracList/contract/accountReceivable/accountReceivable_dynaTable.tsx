@@ -13,10 +13,34 @@ import InputSel, { TinputProps, TdatePickerProps } from 'components/global/gear/
 import scss from './accountReceivable_dynaTable.module.scss';
 
 // icon
-import { IconDelete01, IconRemoveCircle, IconChain } from 'public/image/icon/svgComponent/svgIcons';
+import {
+  //
+  IconDelete01,
+  IconRemoveCircle,
+  IconChain,
+  IconBreakChain,
+  IconEdit,
+  IconTearing,
+} from 'public/image/icon/svgComponent/svgIcons';
 import iconAdd from 'public/image/icon/add.svg';
 
 // ==========================================================================
+
+type TpanelCell0_01 = {
+  onDeleteClick?: () => void;
+  onChainClick?: () => void;
+};
+type TpanelCell0_02 = {
+  onDeleteClick?: () => void;
+};
+type TpanelCell0_03 = {
+  onChainBreakClick?: () => void;
+  onEditClick?: () => void;
+  onAbandonClick?: () => void;
+};
+type TpanelCell0_04 = {
+  onChainBreakClick?: () => void;
+};
 
 type TtwoInputProps = {
   one: TinputProps;
@@ -24,13 +48,10 @@ type TtwoInputProps = {
 };
 
 type Trow = {
-  panelCell_01?: {
-    onDeleteClick: () => void;
-    onChainClick: () => void;
-  };
-  panelCell_02?: {
-    onDeleteClick: () => void;
-  };
+  panelCell_01?: TpanelCell0_01;
+  panelCell_02?: TpanelCell0_02;
+  panelCell_03?: TpanelCell0_03;
+  panelCell_04?: TpanelCell0_04;
   list: {
     [key: string]: {
       label: string;
@@ -38,19 +59,19 @@ type Trow = {
       inputProps?: TinputProps;
       twoInputProps?: TtwoInputProps;
       datePickerProps?: TdatePickerProps;
-      subRow?: Trow[];
     };
+  };
+  subTable?: {
+    subHeadRow: TheadRow;
+    subRowArr: Trow[];
   };
 };
 
 type TheadRow = {
-  panelCell_01?: {
-    onDeleteClick?: () => void;
-    onChainClick?: () => void;
-  };
-  panelCell_02?: {
-    onDeleteClick?: () => void;
-  };
+  panelCell_01?: TpanelCell0_01;
+  panelCell_02?: TpanelCell0_02;
+  panelCell_03?: TpanelCell0_03;
+  panelCell_04?: TpanelCell0_04;
   list: {
     [key: string]: {
       label: string;
@@ -93,9 +114,15 @@ export default function AccountReceivable_dynaTable({
   control: Tcontrol;
   disabled?: boolean;
 }) {
-  const { caption, headRow, rowArr, tableBottomBtnProps, bottomBarProps, topRightBtnProps } = control;
-
-  const headRowCellArr = Object.values(headRow.list);
+  const {
+    //
+    caption,
+    headRow,
+    rowArr,
+    tableBottomBtnProps,
+    bottomBarProps,
+    topRightBtnProps,
+  } = control;
 
   return (
     <div className={scss.container}>
@@ -107,7 +134,7 @@ export default function AccountReceivable_dynaTable({
         {/* table */}
 
         <div className={scss.table}>
-          <Thead headRow={headRow} headRowCellArr={headRowCellArr} />
+          <Thead headRow={headRow} headRowCellArr={Object.values(headRow.list)} />
 
           {/* tbody */}
           <div className={scss.tbody}>
@@ -117,13 +144,25 @@ export default function AccountReceivable_dynaTable({
               expandIcon={() => <></>}
             >
               {rowArr.map((row, index) => {
+                const { subHeadRow, subRowArr } = row.subTable ?? {};
+
                 return (
                   <Panel
                     //
                     key={index}
-                    header={<Table_parent row={row} />}
+                    header={<Row row={row} disabled={disabled} />}
                   >
-                    fooo
+                    {subHeadRow && subRowArr && (
+                      <div className={classNames(scss.table, scss.sub)}>
+                        <Thead headRow={subHeadRow} headRowCellArr={Object.values(subHeadRow.list)} />
+
+                        <div className={scss.tbody}>
+                          {subRowArr.map((row, index) => {
+                            return <Row key={index} row={row} disabled={disabled} />;
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </Panel>
                 );
               })}
@@ -191,7 +230,65 @@ const PanelCell_02 = ({ isHidden, onDeleteClick }: { isHidden?: boolean; onDelet
   );
 };
 
-const Table_parent = ({
+const PanelCell_03 = ({
+  //
+  isHidden,
+  control,
+}: {
+  isHidden?: boolean;
+  control?: {
+    onChainBreakClick?: () => void;
+    onEditClick?: () => void;
+    onAbandonClick?: () => void;
+  };
+}) => {
+  const { onChainBreakClick, onEditClick, onAbandonClick } = control ?? {};
+
+  return (
+    <div className={classNames(scss.panelCell)}>
+      <div>
+        <IconBreakChain onClick={onChainBreakClick} className={classNames(isHidden && scss.hidden)} />
+      </div>
+      <div>
+        <IconEdit onClick={onEditClick} className={classNames(isHidden && scss.hidden)} />
+      </div>
+      <div className={classNames(scss.abandon)}>
+        {isHidden && <span>作廢</span>}
+        {!isHidden && <IconTearing onClick={onAbandonClick} className={classNames(scss.iconRemoveCircle)} />}
+      </div>
+    </div>
+  );
+};
+
+const PanelCell_04 = ({
+  //
+  isHidden,
+  control,
+}: {
+  isHidden?: boolean;
+  control?: {
+    onChainBreakClick?: () => void;
+  };
+}) => {
+  const { onChainBreakClick } = control ?? {};
+
+  return (
+    <div className={classNames(scss.panelCell, isHidden && scss.hidden)}>
+      <div>
+        <IconBreakChain className={classNames(scss.hidden)} />
+      </div>
+      <div>
+        <IconEdit className={classNames(scss.hidden)} />
+      </div>
+      <div className={classNames(scss.abandon)}>
+        <IconBreakChain onClick={onChainBreakClick} className={classNames(scss.iconRemoveCircle)} />
+      </div>
+    </div>
+  );
+};
+
+// ================
+const Row = ({
   //
   row,
   disabled,
@@ -199,7 +296,7 @@ const Table_parent = ({
   row: Trow;
   disabled?: boolean;
 }) => {
-  const { panelCell_01, panelCell_02, list } = row;
+  const { panelCell_01, panelCell_02, panelCell_03, panelCell_04, list } = row;
 
   const arr = Object.values(list);
 
@@ -209,6 +306,8 @@ const Table_parent = ({
         <PanelCell_01 onDeleteClick={panelCell_01.onDeleteClick} onChainClick={panelCell_01.onChainClick} />
       )}
       {panelCell_02 && <PanelCell_02 onDeleteClick={panelCell_02.onDeleteClick} />}
+      {panelCell_03 && <PanelCell_03 control={panelCell_03} />}
+      {panelCell_04 && <PanelCell_04 control={panelCell_04} />}
       {arr.map((cell, index) => {
         const { cellStyle, inputProps, datePickerProps, twoInputProps } = cell;
 
@@ -251,6 +350,8 @@ const Thead = ({
     <div className={classNames(scss.thead, scss.row)}>
       {headRow.panelCell_01 && <PanelCell_01 isHidden={true} />}
       {headRow.panelCell_02 && <PanelCell_02 isHidden={true} />}
+      {headRow.panelCell_03 && <PanelCell_03 isHidden={true} />}
+      {headRow.panelCell_04 && <PanelCell_04 isHidden={true} />}
       {headRowCellArr.map((cell, index) => {
         const { label, cellStyle } = cell;
 
