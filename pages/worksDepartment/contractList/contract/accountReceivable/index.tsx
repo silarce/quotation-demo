@@ -557,67 +557,73 @@ export default function AccountReceivable() {
       priceTotal = priceTotal + item.price;
 
       //
-      const subTable = {
+      const subTable: Tcontrol_dynaTable['rowArr'][number]['subTable'] = {
         subHeadRow: {
           panelCell_05: {},
           list: headRow_list_發票給予紀錄,
         },
         subRowArr: [
           {
-            date: {
-              label: '日期',
-              cellStyle: { width: '120px' },
-              datePickerProps: {
-                props: {
-                  value: undefined,
-                  onChange: () => {},
-                },
-              },
+            panelCell_05: {
+              onChainClick: () => {},
+              onRemoveClick: () => {},
             },
-            invoiceNumber: {
-              label: '發票號碼',
-              cellStyle: { width: '300px' },
-              twoInputProps: {
-                one: {
-                  props: {
-                    value: undefined,
-                    onChange: () => {},
-                  },
-                },
-                two: {
+            list: {
+              date: {
+                label: '日期',
+                cellStyle: { width: '120px' },
+                datePickerProps: {
                   props: {
                     value: undefined,
                     onChange: () => {},
                   },
                 },
               },
-            },
-            price: {
-              label: '金額',
-              cellStyle: { width: '290px' },
-              inputProps: {
-                props: {
-                  value: undefined,
-                  onChange: () => {},
+              invoiceNumber: {
+                label: '發票號碼',
+                cellStyle: { width: '300px' },
+                twoInputProps: {
+                  one: {
+                    props: {
+                      value: undefined,
+                      onChange: () => {},
+                    },
+                  },
+                  two: {
+                    props: {
+                      value: undefined,
+                      onChange: () => {},
+                    },
+                  },
                 },
               },
-            },
-            remark: {
-              label: '備註',
-              cellStyle: { width: '300px' },
-              inputProps: {
-                props: {
-                  value: undefined,
-                  onChange: () => {},
+              price: {
+                label: '金額',
+                cellStyle: { width: '290px' },
+                inputProps: {
+                  props: {
+                    value: undefined,
+                    onChange: () => {},
+                  },
                 },
               },
-            },
-            period: {
-              label: '對應期數',
-              cellStyle: { width: '64px' },
-              inputProps: {
-                props: {
-                  value: 'no property',
+              remark: {
+                label: '備註',
+                cellStyle: { width: '300px' },
+                inputProps: {
+                  props: {
+                    value: undefined,
+                    onChange: () => {},
+                  },
+                },
+              },
+              period: {
+                label: '對應期數',
+                cellStyle: { width: '64px' },
+                inputProps: {
+                  props: {
+                    value: 'no property',
+                  },
                 },
               },
             },
@@ -687,6 +693,7 @@ export default function AccountReceivable() {
             },
           },
         },
+        subTable,
       };
 
       return control;
