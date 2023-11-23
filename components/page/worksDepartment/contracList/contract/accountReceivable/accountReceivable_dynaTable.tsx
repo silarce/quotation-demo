@@ -38,6 +38,7 @@ type Trow = {
       inputProps?: TinputProps;
       twoInputProps?: TtwoInputProps;
       datePickerProps?: TdatePickerProps;
+      subRow?: Trow[];
     };
   };
 };
@@ -105,22 +106,9 @@ export default function AccountReceivable_dynaTable({
         </div>
         {/* table */}
 
-        {/* <Table_parent headRow={headRow} headRowCellArr={headRowCellArr} rowArr={rowArr} disabled={disabled} /> */}
-
         <div className={scss.table}>
-          <div className={classNames(scss.thead, scss.row)}>
-            {headRow.panelCell_01 && <PanelCell_01 isHidden={true} />}
-            {headRow.panelCell_02 && <PanelCell_02 isHidden={true} />}
-            {headRowCellArr.map((cell, index) => {
-              const { label, cellStyle } = cell;
+          <Thead headRow={headRow} headRowCellArr={headRowCellArr} />
 
-              return (
-                <div key={index} style={cellStyle}>
-                  <span>{label}</span>
-                </div>
-              );
-            })}
-          </div>
           {/* tbody */}
           <div className={scss.tbody}>
             <Collapse
@@ -248,6 +236,31 @@ const Table_parent = ({
         );
       })}
     </CellWithBar>
+  );
+};
+
+const Thead = ({
+  //
+  headRow,
+  headRowCellArr,
+}: {
+  headRow: TheadRow;
+  headRowCellArr: TheadRow['list'][string][];
+}) => {
+  return (
+    <div className={classNames(scss.thead, scss.row)}>
+      {headRow.panelCell_01 && <PanelCell_01 isHidden={true} />}
+      {headRow.panelCell_02 && <PanelCell_02 isHidden={true} />}
+      {headRowCellArr.map((cell, index) => {
+        const { label, cellStyle } = cell;
+
+        return (
+          <div key={index} style={cellStyle}>
+            <span>{label}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 
