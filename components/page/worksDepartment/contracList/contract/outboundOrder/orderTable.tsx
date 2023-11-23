@@ -242,10 +242,10 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                     {/*  */}
 
                     {orderKeyArr_contract.map((key, columnIndex) => {
-                      let value = row.contractData[key];
+                      const value = row.contractData[key];
 
                       if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
+                        // value = '';
                       }
 
                       const { width, position } = configList[key] ?? {};
@@ -293,11 +293,11 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 
                     {/* orderKeyIndex01 */}
                     {orderKeyArr_static.map((key, columnIndex) => {
-                      let value = row.staticData[key];
+                      const value = row.staticData[key];
 
-                      if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
-                      }
+                      // if (rowIndex !== 0 && columnIndex === 0) {
+                      //   value = '';
+                      // }
 
                       const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
