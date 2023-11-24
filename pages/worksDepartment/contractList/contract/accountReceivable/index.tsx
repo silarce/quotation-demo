@@ -28,6 +28,7 @@ import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import TwoButtonModal_free from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
 
 // api
 import {
@@ -45,6 +46,7 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // ========================================================================
 
@@ -91,6 +93,7 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
+  const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -915,8 +918,9 @@ export default function AccountReceivable() {
       </div>
       {/*  */}
       <InputModal
-        title="當月預設發票前綴"
+        title="當月發票預設前兩碼"
         visible={isShowInvoicePrefixModal}
+        // visible={true}
         onConfirm={(value) => {
           setInvoicePrefix(value);
           setIsShowInvoicePrefixModal(false);
@@ -934,6 +938,28 @@ export default function AccountReceivable() {
         }}
         exceptAccountantArr={accountantArr}
       />
+
+      <TwoButtonModal_free
+        //
+        title={`"請選擇移除 第${3}期 方式"`}
+        visible={showPeriodModal}
+        onConfirm={() => {}}
+        onCancel={() => {
+          setShowPeriodModal(false);
+        }}
+        modalProps={{
+          width: 453,
+        }}
+      >
+        <div className={scss.cleanPeriodBar}>
+          <div className={scss.left}>
+            <span>往前遞補</span>
+          </div>
+          <div className={scss.right}>
+            <span>留空</span>
+          </div>
+        </div>
+      </TwoButtonModal_free>
     </SubLayer>
   );
 }
