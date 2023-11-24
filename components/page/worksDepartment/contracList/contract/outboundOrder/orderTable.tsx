@@ -326,7 +326,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 
                       return (
                         <div className={`${scss.column} ${textCenter}`} key={columnIndex} style={theStyle}>
-                          <InputSel
+                          {/* <InputSel
                             className={classNames(scss.input03)}
                             showBaseline={'invisible'}
                             disabled={true}
@@ -336,7 +336,8 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                                 placeholder: '',
                               },
                             }}
-                          />
+                          /> */}
+                          <span>{value}</span>
                         </div>
                       );
                     })}

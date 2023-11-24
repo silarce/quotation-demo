@@ -17,7 +17,7 @@ export default function MyButton({
   px,
 }: {
   label?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   img?: string;
   preImg?: keyof typeof preImgList;

@@ -28,6 +28,7 @@ import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
 
 // api
 import {
@@ -35,6 +36,7 @@ import {
   useGetEngineeringContact,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
+  useGetFinalProduct,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -45,15 +47,16 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
+import { update } from 'lodash';
 
 // ========================================================================
 
-type TrequestPayment = {
-  caption: string;
-  paymentRatio: string;
-  loanPeriod: string;
-  remark: string;
-};
+// type TrequestPayment = {
+//   caption: string;
+//   paymentRatio: string;
+//   loanPeriod: string;
+//   remark: string;
+// };
 
 type Tinvoice = {
   date: string;
@@ -91,6 +94,9 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
+  const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
+  const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
+  const [showPercentModal, setShowPercentModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -124,15 +130,33 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
+  useEffect(() => {
+    (async () => {
+      const res = await update_finalProduct();
+    })();
+  }, [contractId]);
+
   // --------------------------------------------------------------------------
 
-  const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
-
-  useEffect(() => {
-    if (disabled) {
-      setRequestPaymentArr(fakeRequestPayment);
+  const { lastestVerifyForm } = useMemo(() => {
+    if (!contract) {
+      return {};
     }
-  }, [disabled]);
+
+    const { subContracts } = contract;
+    const lastestSubContract = subContracts[subContracts.length - 1];
+    const lastestVerifyForm = lastestSubContract.content.verifyForm;
+
+    return { lastestVerifyForm };
+  }, [
+    contract,
+    // engineeringContact,
+  ]);
+
+  // --------------------------------------------------------------------------
+
+  // const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
 
   // --------------------------------------------------------------------------
 
@@ -189,6 +213,7 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // 更改發票前綴的modal
   const [isShowInvoicePrefixModal, setIsShowInvoicePrefixModal] = useState<boolean>(false);
   const [invoicePrefix, setInvoicePrefix] = useState<string>('');
 
@@ -275,41 +300,26 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const control_table_requestPayment: Tcontrol_table_requestPayment = {
-    columnArr: requestPaymentArr.map((item, index) => {
-      return {
-        caption: item.caption,
-        // 請款比例
-        paymentRatio: {
-          value: item.paymentRatio,
-          onChange: (str) => {
-            setRequestPaymentArr((arr) => {
-              const newArr = [...requestPaymentArr];
-              arr[index].paymentRatio = str;
-
-              return newArr;
-            });
+    columnArr:
+      lastestVerifyForm?.paymentRatio.map((item, index) => {
+        return {
+          caption: item.level,
+          // 請款比例
+          paymentRatio: {
+            // value: item.paymentRatio,
+            value: new Decimal(item.paymentRatio || 0).mul(100).toString() + '%',
           },
-        },
-        // 放款票期
-        loanPeriod: {
-          value: item.loanPeriod,
-          onChange: (str) => {
-            const arr = [...requestPaymentArr];
-            arr[index].loanPeriod = str;
-            setRequestPaymentArr(arr);
+          // 放款票期
+          loanPeriod: {
+            // 合約審核表 TquotationVerifyFormDto.paymentRatioDto 沒有票期 還是說全部都放 paymentTenor?
+            value: 'no property',
           },
-        },
-        // 備註
-        remark: {
-          value: item.remark,
-          onChange: (str) => {
-            const arr = [...requestPaymentArr];
-            arr[index].remark = str;
-            setRequestPaymentArr(arr);
+          // 備註
+          remark: {
+            value: item.note,
           },
-        },
-      };
-    }),
+        };
+      }) ?? [],
   };
 
   // --------------------------------------------------------------------------
@@ -353,7 +363,7 @@ export default function AccountReceivable() {
       const subTable = {
         subHeadRow: {
           panelCell_04: {},
-          list: headRow_list_收款紀錄,
+          list: createdHeadRowList_收款紀錄(),
         }, // subHeadRow close
         subRowArr: [
           {
@@ -501,7 +511,7 @@ export default function AccountReceivable() {
           },
           period: {
             label: '對應期數',
-            cellStyle: { width: '64px' },
+            cellStyle: { width: '75px' },
             inputProps: {
               props: {
                 value: 'no property',
@@ -515,30 +525,37 @@ export default function AccountReceivable() {
 
     const control_invoiceGivingRecord: Tcontrol_dynaTable = {
       caption: '發票給予紀錄',
-      topRightBtnProps: {
-        label: `更改發票前綴:${invoicePrefix}`,
-        onClick: () => {
-          setIsShowInvoicePrefixModal(true);
-        },
+      onSearchClick: (str) => {
+        alert(str);
       },
-      tableBottomBtnProps: {
-        label: '新增發票',
-        onClick: () => {
-          setInvoiceArr((arr) => {
-            const empty = creEmptyInvoice();
-            empty.invoiceNumberPrefix = invoicePrefix;
+      // tableBottomBtnProps: {
+      //   label: '新增發票',
+      //   onClick: () => {
+      //     setInvoiceArr((arr) => {
+      //       const empty = creEmptyInvoice();
+      //       empty.invoiceNumberPrefix = invoicePrefix;
 
-            return [...arr, empty];
-          });
-        },
-      },
+      //       return [...arr, empty];
+      //     });
+      //   },
+      // },
       bottomBarProps: {
         label: '合計',
         value: '123,123',
       },
       headRow: {
         panelCell_03: {},
-        list: headRow_list_發票給予紀錄,
+        list: createHeadRowList_發票給予紀錄({
+          onDateClick: () => {
+            alert('test');
+          },
+          onPriceClick: () => {
+            alert('test');
+          },
+          onPeriodClick: () => {
+            alert('test');
+          },
+        }),
       },
       rowArr: control_invoiceGivingRecord_rowArr,
     };
@@ -560,7 +577,7 @@ export default function AccountReceivable() {
       const subTable: Tcontrol_dynaTable['rowArr'][number]['subTable'] = {
         subHeadRow: {
           panelCell_05: {},
-          list: headRow_list_發票給予紀錄,
+          list: createHeadRowList_發票給予紀錄(),
         },
         subRowArr: [
           {
@@ -619,7 +636,7 @@ export default function AccountReceivable() {
               },
               period: {
                 label: '對應期數',
-                cellStyle: { width: '64px' },
+                cellStyle: { width: '75px' },
                 inputProps: {
                   props: {
                     value: 'no property',
@@ -632,7 +649,7 @@ export default function AccountReceivable() {
       };
       //
 
-      const control: Tcontrol_dynaTable['rowArr'][number] = {
+      const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_05: {
           onChainClick: () => {},
           onRemoveClick: () => {},
@@ -696,12 +713,15 @@ export default function AccountReceivable() {
         subTable,
       };
 
-      return control;
-    });
+      return control_accountant_rowArr;
+    }); // control_accountant_rowArr
 
     const control_accountant: Tcontrol_dynaTable = {
       caption: '收款紀錄',
-      topRightBtnProps: {
+      onSearchClick: (str) => {
+        alert(str);
+      },
+      tableBottomBtnProps: {
         label: '新增收款紀錄',
         onClick: () => {
           setShowRecordModal(true);
@@ -713,33 +733,17 @@ export default function AccountReceivable() {
       },
       headRow: {
         panelCell_05: {},
-        list: {
-          date: {
-            label: '日期',
-            cellStyle: { width: '120px' },
+        list: createdHeadRowList_收款紀錄({
+          onDateClick: () => {
+            alert('test');
           },
-          account: {
-            label: '帳號',
-            cellStyle: { width: '189px' },
+          onChequeDateClick: () => {
+            alert('test');
           },
-          chequeNumber: {
-            label: '票據號碼',
-            cellStyle: { width: '189px' },
+          onIncomingSubpoenaSerialNumberClick: () => {
+            alert('test');
           },
-          chequeDate: {
-            label: '票據日期',
-            cellStyle: { width: '100px' },
-          },
-          price: {
-            label: '金額',
-            cellStyle: { width: '170px' },
-          },
-          incomingSubpoenaSerialNumber: {
-            label: '收入傳票序號',
-            cellStyle: { width: '187px' },
-          },
-          //
-        },
+        }),
       },
       rowArr: control_accountant_rowArr,
     };
@@ -920,13 +924,24 @@ export default function AccountReceivable() {
       </div>
       {/*  */}
       <InputModal
-        title="當月預設發票前綴"
+        title="當月發票預設前兩碼"
         visible={isShowInvoicePrefixModal}
+        // visible={true}
         onConfirm={(value) => {
           setInvoicePrefix(value);
           setIsShowInvoicePrefixModal(false);
         }}
         onCancel={() => setIsShowInvoicePrefixModal(false)}
+      />
+
+      <InputModal
+        //
+        title="請輸入百分比"
+        visible={showPercentModal}
+        onConfirm={(value) => {}}
+        onCancel={() => {
+          setShowPercentModal(false);
+        }}
       />
 
       <PaymentRecordSelector
@@ -939,6 +954,68 @@ export default function AccountReceivable() {
         }}
         exceptAccountantArr={accountantArr}
       />
+
+      <TwoButtonModal_free
+        //
+        title={`"請選擇移除 第${3}期 方式"`}
+        visible={showPeriodModal}
+        onConfirm={() => {}}
+        onCancel={() => {
+          setShowPeriodModal(false);
+        }}
+        modalProps={{
+          width: 453,
+        }}
+      >
+        <div className={scss.cleanPeriodBar}>
+          <div className={scss.left}>
+            <span>往前遞補</span>
+          </div>
+          <div className={scss.right}>
+            <span>留空</span>
+          </div>
+        </div>
+      </TwoButtonModal_free>
+
+      <TwoButtonModal_free
+        //
+        title="請輸入新增發票"
+        visible={showAddInvoiceModal}
+        onCancel={() => setShowAddInvoiceModal(false)}
+        modalProps={{
+          width: 400,
+          footer: null,
+        }}
+      >
+        <form
+          className={classNames()}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const target = e.target as HTMLFormElement;
+            const t0 = target[0] as HTMLInputElement;
+            const t1 = target[1] as HTMLInputElement;
+            console.log(t0.value);
+            console.log(t1.value);
+          }}
+        >
+          <div className={scss.addInvoiceModal}>
+            <label>
+              <InputSel caption="發票日期" datePickerProps={{}} showBaseline="invisible" />
+            </label>
+            <label>
+              <InputSel caption="發票號碼" inputProps={{}} showBaseline="invisible" />
+            </label>
+          </div>
+
+          <TwoBtnFooter
+            onConfirm={() => {}}
+            onCancel={(e) => {
+              e.preventDefault();
+              setShowAddInvoiceModal(false);
+            }}
+          />
+        </form>
+      </TwoButtonModal_free>
     </SubLayer>
   );
 }
@@ -953,34 +1030,34 @@ export default function AccountReceivable() {
 // ========================================================================
 // ========================================================================
 
-const fakeRequestPayment: TrequestPayment[] = [
-  {
-    caption: '訂約',
-    paymentRatio: 'foo',
-    loanPeriod: 'foo',
-    remark: 'foo',
-  },
-  {
-    caption: '送審',
-    paymentRatio: 'foo',
-    loanPeriod: 'foo',
-    remark: 'foo',
-  },
-  {
-    caption: '丈量',
-    paymentRatio: 'foo',
-    loanPeriod: 'foo',
-    remark: 'foo',
-  },
-];
+// const fakeRequestPayment: TrequestPayment[] = [
+//   {
+//     caption: '訂約',
+//     paymentRatio: 'foo',
+//     loanPeriod: 'foo',
+//     remark: 'foo',
+//   },
+//   {
+//     caption: '送審',
+//     paymentRatio: 'foo',
+//     loanPeriod: 'foo',
+//     remark: 'foo',
+//   },
+//   {
+//     caption: '丈量',
+//     paymentRatio: 'foo',
+//     loanPeriod: 'foo',
+//     remark: 'foo',
+//   },
+// ];
 
-const creEmptyInvoice = (): Tinvoice => ({
-  date: '',
-  invoiceNumberPrefix: '',
-  invoiceNumber: '',
-  price: '',
-  remark: '',
-});
+// const creEmptyInvoice = (): Tinvoice => ({
+//   date: '',
+//   invoiceNumberPrefix: '',
+//   invoiceNumber: '',
+//   price: '',
+//   remark: '',
+// });
 
 const fakeInvoiceArr: Tinvoice[] = [
   {
@@ -1092,10 +1169,15 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
   };
 };
 
-const headRow_list_收款紀錄 = {
+const createdHeadRowList_收款紀錄 = (props?: {
+  onDateClick?: () => void;
+  onChequeDateClick?: () => void;
+  onIncomingSubpoenaSerialNumberClick?: () => void;
+}) => ({
   date: {
     label: '日期',
     cellStyle: { width: '120px' },
+    onClick: props?.onDateClick,
   },
   account: {
     label: '帳號',
@@ -1108,6 +1190,7 @@ const headRow_list_收款紀錄 = {
   chequeDate: {
     label: '票據日期',
     cellStyle: { width: '100px' },
+    onClick: props?.onChequeDateClick,
   },
   price: {
     label: '金額',
@@ -1116,13 +1199,19 @@ const headRow_list_收款紀錄 = {
   incomingSubpoenaSerialNumber: {
     label: '收入傳票序號',
     cellStyle: { width: '187px' },
+    onClick: props?.onIncomingSubpoenaSerialNumberClick,
   },
-};
+});
 
-const headRow_list_發票給予紀錄 = {
+const createHeadRowList_發票給予紀錄 = (props?: {
+  onDateClick: () => void;
+  onPriceClick: () => void;
+  onPeriodClick: () => void;
+}) => ({
   date: {
     label: '日期',
     cellStyle: { width: '120px' },
+    onClick: props?.onDateClick,
   },
   invoiceNumber: {
     label: '發票號碼',
@@ -1131,6 +1220,7 @@ const headRow_list_發票給予紀錄 = {
   price: {
     label: '金額',
     cellStyle: { width: '290px' },
+    onClick: props?.onPriceClick,
   },
   remark: {
     label: '備註',
@@ -1138,6 +1228,7 @@ const headRow_list_發票給予紀錄 = {
   },
   period: {
     label: '對應期數',
-    cellStyle: { width: '64px' },
+    cellStyle: { width: '75px' },
+    onClick: props?.onPeriodClick,
   },
-};
+});

@@ -431,7 +431,7 @@ export default function OutboundOrder() {
                     return item.id === statusId;
                   });
 
-                  if (theIndex) {
+                  if (theIndex !== undefined && theIndex > -1) {
                     copy[prodKey].itemArr[itemIndex].deliveryStatus?.splice(theIndex, 1);
                   }
 

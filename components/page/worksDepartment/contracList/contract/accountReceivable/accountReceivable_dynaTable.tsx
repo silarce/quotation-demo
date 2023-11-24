@@ -21,8 +21,11 @@ import {
   IconBreakChain,
   IconEdit,
   IconTearing,
+  IconSearch,
 } from 'public/image/icon/svgComponent/svgIcons';
+
 import iconAdd from 'public/image/icon/add.svg';
+import iconUpDown from 'public/image/icon/upDown.svg';
 
 // ==========================================================================
 
@@ -92,6 +95,7 @@ type TheadRow = {
   list: {
     [key: string]: {
       label: string;
+      onClick?: () => void;
       cellStyle: React.CSSProperties;
     };
   };
@@ -102,10 +106,7 @@ type Tcontrol = {
   headRow: TheadRow;
   rowArr: Trow[];
 
-  topRightBtnProps?: {
-    label: string;
-    onClick: () => void;
-  };
+  onSearchClick?: (str: string) => void;
 
   tableBottomBtnProps?: {
     label: string;
@@ -138,7 +139,7 @@ export default function AccountReceivable_dynaTable({
     rowArr,
     tableBottomBtnProps,
     bottomBarProps,
-    topRightBtnProps,
+    onSearchClick,
   } = control;
 
   return (
@@ -146,7 +147,23 @@ export default function AccountReceivable_dynaTable({
       <div className={scss.wrapper}>
         <div className={scss.top}>
           <span>{caption}</span>
-          {topRightBtnProps && <MyButton_v2 label={topRightBtnProps.label} onClick={topRightBtnProps.onClick} />}
+
+          {onSearchClick && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const target = e.target as HTMLFormElement;
+                const inputElement = target[0] as HTMLInputElement;
+                onSearchClick(inputElement.value);
+              }}
+              className={scss.searchBar}
+            >
+              <input type="text" />
+              <button>
+                <IconSearch />
+              </button>
+            </form>
+          )}
         </div>
         {/* table */}
 
@@ -452,11 +469,18 @@ const Thead = ({
       {headRow.panelCell_06 && <PanelCell_06 isHidden={true} />}
       {headRow.panelCell_07 && <PanelCell_07 isHidden={true} />}
       {headRowCellArr.map((cell, index) => {
-        const { label, cellStyle } = cell;
+        const { label, cellStyle, onClick } = cell;
 
         return (
-          <div key={index} style={cellStyle}>
+          <div
+            //
+            key={index}
+            style={cellStyle}
+            className={classNames(scss.theadCell, onClick && 'cursor-pointer')}
+            onClick={onClick}
+          >
             <span>{label}</span>
+            {onClick && <Image src={iconUpDown} alt="" />}
           </div>
         );
       })}

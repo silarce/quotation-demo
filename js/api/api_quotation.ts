@@ -6,7 +6,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
-import { createUseInfinite } from './useInfiniteTemplate';
+import { createUseInfinite } from './createUseInfinite';
 
 // type
 import type {
@@ -495,6 +495,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'attachedContract',
       'subContracts.content.products.rootProdductId',
       'subContracts.content.customer',
+      'subContracts.content.verifyForm',
 
       'products',
     ],

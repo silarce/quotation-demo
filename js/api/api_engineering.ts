@@ -7,6 +7,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi } from './_axiosCreator';
 
+import { createUseInfinite } from './createUseInfinite';
+
 // type
 import type {
   Tparams,
@@ -32,6 +34,16 @@ import type {
   TcreateEngineeringDeliveryStatusDto,
   TdeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
+  TaccountsReceivableInvoiceDto,
+  TaccountReceivableDto,
+  TupdateAccountReceivableDto,
+  TcreateAccountReceivableInvoiceDto,
+  TupdateAccountReceivableInvoiceDto,
+  TaccountantDto,
+  TaccountsReceivableDeductionDto,
+  TcreateAccountReceivableDeductionDto,
+  TupdateAccountReceivableDeductionDto,
+  TfinalProduct,
 } from './dtoTypes';
 
 export type {
@@ -57,6 +69,16 @@ export type {
   TcreateEngineeringDeliveryStatusDto,
   TdeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
+  TaccountsReceivableInvoiceDto,
+  TaccountReceivableDto,
+  TupdateAccountReceivableDto,
+  TcreateAccountReceivableInvoiceDto,
+  TupdateAccountReceivableInvoiceDto,
+  TaccountantDto,
+  TaccountsReceivableDeductionDto,
+  TcreateAccountReceivableDeductionDto,
+  TupdateAccountReceivableDeductionDto,
+  TfinalProduct,
 } from './dtoTypes';
 
 // ========================================================================
@@ -144,6 +166,7 @@ export const useGetEngineeringDispatchingList = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetDispatchingList>();
 
   const params = {
+    pageSize: 9999,
     populate: ['workerEmployee'],
     ...customParams,
   };
@@ -245,6 +268,7 @@ export const useGetElectronicSupplies = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetElectronicSupplies>();
 
   const params = {
+    pageSize: 9999,
     populate: [
       'contractId',
       //  'contract',
@@ -473,6 +497,7 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetEngineeringExchanges>();
 
   const params = {
+    pageSize: 9999,
     populate: [
       'contractId',
       'contract.content',
@@ -715,6 +740,7 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
       'contract.worksheet.contractProductItems.deliveryStatus.installerEmployee',
       'contract.worksheet.contractProductItems.adjustedItem.accessories',
       'contract.worksheet.contractProductItems.accessories',
+      'contract.worksheet.contractProductItems.rootproductId',
     ],
   };
 
@@ -807,4 +833,324 @@ export const apiDeleteDeliveryStatus = ({ id, statusId }: { id: string; statusId
     .delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// =============================================================================
+// 應收帳款明細
+
+type TgetAccountReceivableDto = {
+  data: TaccountReceivableDto[];
+  meta: TpageMetaDto;
+};
+
+/**取得所有應收帳款明細 */
+const apiGetAccountReceivable = async (params?: Tparams) => {
+  const api = '/engineering/account-receivable';
+
+  return axi
+    .get<TgetAccountReceivableDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivable = createUseInfinite<TgetAccountReceivableDto>({
+  apiClient: apiGetAccountReceivable,
+  errTitle: '取得應收帳款明細列表失敗',
+});
+
+const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
+  const api = `/engineering/account-receivable/${id}`;
+
+  return axi
+    .get<TaccountReceivableDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) => {
+  const [res, setRes] = useState<TaccountReceivableDto>();
+
+  const update = async (dynaParams: Tparams) => {
+    const params = {
+      ...customeParams,
+      ...dynaParams,
+    };
+
+    const newRes = await apiGetAccountReceivable_id(id, params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+/**更新 應收帳款明細 account-receivable */
+export const apiPatchAccountReceivable = async (id: string, body: TupdateAccountReceivableDto) => {
+  const api = `/engineering/account-receivable/${id}`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+//
+
+type TgetAccountReceivableIncoices = {
+  data: TaccountsReceivableInvoiceDto[];
+  meta: TpageMetaDto;
+};
+
+/**以 應收帳款id取得 所有 應收帳款發票 account-receivable */
+export const apiGetAccountReceivableIncoices = async (id: string, params?: Tparams) => {
+  const api = `/engineering/account-receivable/${id}/invoices`;
+
+  return axi
+    .get<TgetAccountReceivableIncoices>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivableIncoices = (id: string, customParams?: Tparams) => {
+  const [res, setRes] = useState<TgetAccountReceivableIncoices>();
+
+  const params = {
+    // populate: [],
+    pageSize: 9999,
+    ...customParams,
+  };
+
+  const update = async () => {
+    const newRes = await apiGetAccountReceivableIncoices(id, params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
+};
+
+/**新增 應收帳款發票 account-receivable-invoice */
+export const apiPostAccountReceivableIncoice = async (id: string, body: TcreateAccountReceivableInvoiceDto) => {
+  const api = `/engineering/account-receivable/${id}/invoice`;
+
+  return axi
+    .post<TaccountsReceivableInvoiceDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**作廢 應收帳款 發票 account-receivable-invoice */
+export const apiPatchAccountReceivableVoidInvoice = async (id: string) => {
+  const api = `/engineering/account-receivable/void-invoice/${id}`;
+
+  return axi
+    .patch<TaccountsReceivableInvoiceDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**更新 應收帳款發票 account-receivable-invoice */
+export const apiPatchAccountReceivableInvoice = async (id: string, body: TupdateAccountReceivableInvoiceDto) => {
+  const api = `/engineering/account-receivable/invoice/${id}`;
+
+  return axi
+    .patch<TaccountsReceivableInvoiceDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+type TgetAccountant = {
+  data: TaccountantDto[];
+  meta: TpageMetaDto;
+};
+
+/**取得 所有 應收帳款 收款紀錄 account-receivable-accountant */
+const apiGetAccountReceivableAccountants = async (id: string, params?: Tparams) => {
+  const api = `/engineering/account-receivable/${id}/accountants`;
+
+  return axi
+    .get<TgetAccountant>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivableAccountants = (id: string, customParams?: Tparams) => {
+  const [res, setRes] = useState<TgetAccountant>();
+
+  const params = {
+    // populate: [],
+    pageSize: 9999,
+    ...customParams,
+  };
+
+  const update = async () => {
+    const newRes = await apiGetAccountReceivableAccountants(id, params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
+};
+
+/**新增 應收帳款 收款紀錄 account-receivable-accountant */
+export const apiPostAccountReceivableAccountant = async (
+  id: string,
+  body: {
+    accountantId: string[]; // 收款明細Id
+  }
+) => {
+  const api = `/engineering/account-receivable/${id}/accountants`;
+
+  return axi
+    .post<TaccountantDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**刪除 應收帳款 收款紀錄關聯 account-receivable-accountant */
+export const apiDeleteAccountReceivableAccountant = async (id: string, accountantId: string) => {
+  const api = `/engineering/account-receivable/${id}/accountant/${accountantId}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**更新 收款紀錄與發票關聯 account-receivable-accountant */
+export const apiPatchAccountReceivableAccountant = async (id: string, accountantId: string, body: string[]) => {
+  const api = `/engineering/account-receivable/${id}/accountant/${accountantId}`;
+
+  return axi
+    .patch(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+type TgetAccountReceivableDeductions = {
+  data: TaccountsReceivableDeductionDto[];
+  meta: TpageMetaDto;
+};
+
+/**取得 所有 應收帳款 扣款明細 account-receivable-deduction */
+const apiGetAccountReceivableDeductions = async (id: string, params?: Tparams) => {
+  const api = `/engineering/account-receivable/${id}/deductions`;
+
+  return axi
+    .get<TgetAccountReceivableDeductions>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**取得 所有 應收帳款 扣款明細 account-receivable-deduction */
+export const useGetAccountReceivableDeductions = (id: string, customParams?: Tparams) => {
+  const [res, setRes] = useState<TgetAccountReceivableDeductions>();
+
+  const params = {
+    // populate: [],
+    pageSize: 9999,
+    ...customParams,
+  };
+
+  const update = async () => {
+    const newRes = await apiGetAccountReceivableDeductions(id, params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+  };
+};
+
+/**新增 應收帳款 扣款明細 account-receivable-deduction */
+export const apiPostAccountReceivableDeduction = async (id: string, body: TcreateAccountReceivableDeductionDto[]) => {
+  const api = `/engineering/account-receivable/${id}/deduction`;
+
+  return axi
+    .post<TaccountsReceivableDeductionDto[]>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**批量更新 應收帳款 扣款明細 account-receivable-deduction */
+export const apiPatchAccountReceivableDeduction = async (id: string, body: TupdateAccountReceivableDeductionDto[]) => {
+  const api = `/engineering/account-receivable/${id}/deduction`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**刪除 應收帳款 扣款明細 account-receivable-deduction */
+export const apiDeleteAccountReceivableDeduction = async (body: string[]) => {
+  const api = `/engineering/account-receivable/deduction`;
+
+  return axi
+    .delete(api, { data: body })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**取得 源合約最終狀態產品 和 追加產品(請款單) */
+export const apiGetFinalProduct = async (contractId: string) => {
+  const api = `/engineering/account-receivable/finalProduct/${contractId}`;
+
+  return axi
+    .get<TfinalProduct>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetFinalProduct = (contractId: string | undefined) => {
+  const [res, setRes] = useState<TfinalProduct>();
+
+  const update = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    const newRes = await apiGetFinalProduct(contractId);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
 };

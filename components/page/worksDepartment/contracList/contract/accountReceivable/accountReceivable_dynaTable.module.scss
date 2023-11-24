@@ -44,6 +44,21 @@
     color: theme("colors.main");
     font-size: 18px;
   }
+  .searchBar {
+    display: flex;
+    gap: 5px;
+    width: 188px;
+    border-bottom: solid 1px black;
+    padding-left: 8px;
+    padding-right: 5px;
+    input {
+      width: 100%;
+      font-size: 16px;
+    }
+    svg {
+      cursor: pointer;
+    }
+  }
 }
 
 .table {
@@ -87,6 +102,10 @@
     span {
       color: theme("colors.main");
       font-size: 16px;
+    }
+    > .theadCell {
+      display: flex;
+      gap: 4px;
     }
   }
 }
