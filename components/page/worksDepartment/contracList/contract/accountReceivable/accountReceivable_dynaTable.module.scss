@@ -88,6 +88,10 @@
       color: theme("colors.main");
       font-size: 16px;
     }
+    > .theadCell {
+      display: flex;
+      gap: 4px;
+    }
   }
 }
 

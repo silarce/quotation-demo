@@ -353,7 +353,7 @@ export default function AccountReceivable() {
       const subTable = {
         subHeadRow: {
           panelCell_04: {},
-          list: headRow_list_收款紀錄,
+          list: createdHeadRowList_收款紀錄(),
         }, // subHeadRow close
         subRowArr: [
           {
@@ -501,7 +501,7 @@ export default function AccountReceivable() {
           },
           period: {
             label: '對應期數',
-            cellStyle: { width: '64px' },
+            cellStyle: { width: '75px' },
             inputProps: {
               props: {
                 value: 'no property',
@@ -538,7 +538,17 @@ export default function AccountReceivable() {
       },
       headRow: {
         panelCell_03: {},
-        list: headRow_list_發票給予紀錄,
+        list: createHeadRowList_發票給予紀錄({
+          onDateClick: () => {
+            alert('test');
+          },
+          onPriceClick: () => {
+            alert('test');
+          },
+          onPeriodClick: () => {
+            alert('test');
+          },
+        }),
       },
       rowArr: control_invoiceGivingRecord_rowArr,
     };
@@ -560,7 +570,7 @@ export default function AccountReceivable() {
       const subTable: Tcontrol_dynaTable['rowArr'][number]['subTable'] = {
         subHeadRow: {
           panelCell_05: {},
-          list: headRow_list_發票給予紀錄,
+          list: createHeadRowList_發票給予紀錄(),
         },
         subRowArr: [
           {
@@ -619,7 +629,7 @@ export default function AccountReceivable() {
               },
               period: {
                 label: '對應期數',
-                cellStyle: { width: '64px' },
+                cellStyle: { width: '75px' },
                 inputProps: {
                   props: {
                     value: 'no property',
@@ -713,33 +723,17 @@ export default function AccountReceivable() {
       },
       headRow: {
         panelCell_05: {},
-        list: {
-          date: {
-            label: '日期',
-            cellStyle: { width: '120px' },
+        list: createdHeadRowList_收款紀錄({
+          onDateClick: () => {
+            alert('test');
           },
-          account: {
-            label: '帳號',
-            cellStyle: { width: '189px' },
+          onChequeDateClick: () => {
+            alert('test');
           },
-          chequeNumber: {
-            label: '票據號碼',
-            cellStyle: { width: '189px' },
+          onIncomingSubpoenaSerialNumberClick: () => {
+            alert('test');
           },
-          chequeDate: {
-            label: '票據日期',
-            cellStyle: { width: '100px' },
-          },
-          price: {
-            label: '金額',
-            cellStyle: { width: '170px' },
-          },
-          incomingSubpoenaSerialNumber: {
-            label: '收入傳票序號',
-            cellStyle: { width: '187px' },
-          },
-          //
-        },
+        }),
       },
       rowArr: control_accountant_rowArr,
     };
@@ -1092,10 +1086,15 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
   };
 };
 
-const headRow_list_收款紀錄 = {
+const createdHeadRowList_收款紀錄 = (props?: {
+  onDateClick?: () => void;
+  onChequeDateClick?: () => void;
+  onIncomingSubpoenaSerialNumberClick?: () => void;
+}) => ({
   date: {
     label: '日期',
     cellStyle: { width: '120px' },
+    onClick: props?.onDateClick,
   },
   account: {
     label: '帳號',
@@ -1108,6 +1107,7 @@ const headRow_list_收款紀錄 = {
   chequeDate: {
     label: '票據日期',
     cellStyle: { width: '100px' },
+    onClick: props?.onChequeDateClick,
   },
   price: {
     label: '金額',
@@ -1116,13 +1116,19 @@ const headRow_list_收款紀錄 = {
   incomingSubpoenaSerialNumber: {
     label: '收入傳票序號',
     cellStyle: { width: '187px' },
+    onClick: props?.onIncomingSubpoenaSerialNumberClick,
   },
-};
+});
 
-const headRow_list_發票給予紀錄 = {
+const createHeadRowList_發票給予紀錄 = (props?: {
+  onDateClick: () => void;
+  onPriceClick: () => void;
+  onPeriodClick: () => void;
+}) => ({
   date: {
     label: '日期',
     cellStyle: { width: '120px' },
+    onClick: props?.onDateClick,
   },
   invoiceNumber: {
     label: '發票號碼',
@@ -1131,6 +1137,7 @@ const headRow_list_發票給予紀錄 = {
   price: {
     label: '金額',
     cellStyle: { width: '290px' },
+    onClick: props?.onPriceClick,
   },
   remark: {
     label: '備註',
@@ -1138,6 +1145,7 @@ const headRow_list_發票給予紀錄 = {
   },
   period: {
     label: '對應期數',
-    cellStyle: { width: '64px' },
+    cellStyle: { width: '75px' },
+    onClick: props?.onPeriodClick,
   },
-};
+});

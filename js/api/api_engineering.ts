@@ -715,6 +715,7 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
       'contract.worksheet.contractProductItems.deliveryStatus.installerEmployee',
       'contract.worksheet.contractProductItems.adjustedItem.accessories',
       'contract.worksheet.contractProductItems.accessories',
+      'contract.worksheet.contractProductItems.rootproductId',
     ],
   };
 

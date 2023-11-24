@@ -22,7 +22,9 @@ import {
   IconEdit,
   IconTearing,
 } from 'public/image/icon/svgComponent/svgIcons';
+
 import iconAdd from 'public/image/icon/add.svg';
+import iconUpDown from 'public/image/icon/upDown.svg';
 
 // ==========================================================================
 
@@ -92,6 +94,7 @@ type TheadRow = {
   list: {
     [key: string]: {
       label: string;
+      onClick?: () => void;
       cellStyle: React.CSSProperties;
     };
   };
@@ -452,11 +455,18 @@ const Thead = ({
       {headRow.panelCell_06 && <PanelCell_06 isHidden={true} />}
       {headRow.panelCell_07 && <PanelCell_07 isHidden={true} />}
       {headRowCellArr.map((cell, index) => {
-        const { label, cellStyle } = cell;
+        const { label, cellStyle, onClick } = cell;
 
         return (
-          <div key={index} style={cellStyle}>
+          <div
+            //
+            key={index}
+            style={cellStyle}
+            className={classNames(scss.theadCell, onClick && 'cursor-pointer')}
+            onClick={onClick}
+          >
             <span>{label}</span>
+            {onClick && <Image src={iconUpDown} alt="" />}
           </div>
         );
       })}
