@@ -6,7 +6,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
-import { createUseInfinite } from './useInfiniteTemplate';
+import { createUseInfinite } from './createUseInfinite';
 
 // type
 import type {

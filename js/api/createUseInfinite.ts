@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
 
-import { axi } from './_axiosCreator';
-
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -11,10 +9,6 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { Tparams, TpageMetaDto } from './dtoTypes';
 
 export type { Tparams };
-
-// type Tfoo = ReturnType<typeof apiGetEmployee> extends Promise<infer U> ? U : never;
-
-// (params?: Tparams) => Promise<TgetEmployee>
 
 type Treq = {
   data: any[];
