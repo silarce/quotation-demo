@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 // global gear
 import TwoBtnFooter from '../footer/twoBtnFooter';
 // antd
@@ -36,6 +38,7 @@ export default function TwoButtonModal_free({
       centered={true}
       width={400}
       onCancel={onCancel}
+      destroyOnClose={true}
       footer={
         <TwoBtnFooter
           {...{
@@ -48,7 +51,7 @@ export default function TwoButtonModal_free({
       }
       {...modalProps}
     >
-      {title && <p className={scss.title}>{title}</p>}
+      {title && <p className={classNames(scss.title, scss.plus, scss.plus2)}>{title}</p>}
 
       {children}
     </Modal>
