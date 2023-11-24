@@ -1469,11 +1469,14 @@ export type TquotationContractDto = {
   /**工程聯絡單ID */
   engineeringContactId: string | null;
   /**工作表 */
-  worksheet: TworkSheetDto;
+  worksheet?: TworkSheetDto; // populate
   /**工作表ID */
   worksheetId: string | null;
   /**出庫單ID */
   engineeringDeliveryListId: string | null;
+  /**應收帳款明細 */
+  accountReceivable?: TaccountReceivableDto; // populate
+  accountReceivableId: string;
 };
 
 export type TcreateModifyQuotationDto = {
