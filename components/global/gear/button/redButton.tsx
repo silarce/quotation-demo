@@ -7,7 +7,7 @@ export default function RedButton({
   img,
 }: {
   label: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   img?: string;
 }) {
