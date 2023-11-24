@@ -44,6 +44,7 @@ import type {
   TcreateAccountReceivableDeductionDto,
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
+  TcreateAccountReceivableDto,
 } from './dtoTypes';
 
 export type {
@@ -79,6 +80,7 @@ export type {
   TcreateAccountReceivableDeductionDto,
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
+  TcreateAccountReceivableDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -858,6 +860,7 @@ export const useGetAccountReceivable = createUseInfinite<TgetAccountReceivableDt
   errTitle: '取得應收帳款明細列表失敗',
 });
 
+/**取得應收帳款明細 by id */
 const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
   const api = `/engineering/account-receivable/${id}`;
 
@@ -867,6 +870,7 @@ const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
+/**取得應收帳款明細 by id */
 export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) => {
   const [res, setRes] = useState<TaccountReceivableDto>();
 
@@ -889,6 +893,16 @@ export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) =
     data: res,
     update,
   };
+};
+
+/**新增 應收帳款明細 account-receivable */
+export const apiPostAccountReceivable = async (body: TcreateAccountReceivableDto) => {
+  const api = `/engineering/account-receivable`;
+
+  return axi
+    .post<TaccountReceivableDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
 };
 
 /**更新 應收帳款明細 account-receivable */

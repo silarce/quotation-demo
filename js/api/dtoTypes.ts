@@ -2465,8 +2465,37 @@ export type TaccountReceivableDto = {
   paymentRatio: TpaymentRatioDto[];
   contract: TquotationContractDto;
   legacyContract: TlegacyContractDto;
-  accountReceivableDeduction: TaccountsReceivableDeductionDto | null;
+  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   accountant: TaccountantDto | null;
+};
+
+export type TcreateAccountReceivableDto = {
+  // 估價日期
+  valuationDate: string | null;
+  // 付清日期
+  payOffDay: string | null;
+  // 履約保證票
+  performanceBond: boolean;
+  // 訂金款保證票
+  depositGuaranteeTicket: boolean;
+  // 保固票
+  warrantyTicket: boolean;
+  // 異常燈號(工作表已開立，合約尚未簽回)
+  hasNoContract: boolean;
+  // 提醒燈號(已出具證明，尚未收足款項)
+  hasUncollectedAmounts: boolean;
+  // 已出貨，因故尚未安裝
+  hasNotInstall: boolean;
+  // 收款明細
+  accountantId: string[] | null;
+  // 扣款明細
+  accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
+  // 發票紀錄
+  invoices: TcreateAccountReceivableInvoiceDto[] | null;
+  // 所屬合約Id;
+  contractId: string | null;
+  // 所屬合約Id;
+  legacyContractId: string | null;
 };
 
 export type TupdateAccountReceivableDto = Pick<
