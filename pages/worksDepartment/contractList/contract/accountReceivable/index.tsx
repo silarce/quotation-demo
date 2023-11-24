@@ -33,10 +33,12 @@ import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/
 // api
 import {
   TupdateEngineeringContactDto,
+  TaccountReceivableDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
   useGetFinalProduct,
+  useGetAccountReceivable_id,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -47,7 +49,6 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
-import { update } from 'lodash';
 
 // ========================================================================
 
@@ -130,7 +131,16 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const [accountReceivable, setAccountReceivable] = useState<TaccountReceivableDto>();
+
+  // console.log(accountReceivable);
+
+  // --------------------------------------------------------------------------
+
   const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
+
+  // const {} = useGetAccountReceivable_id();
+
   useEffect(() => {
     (async () => {
       const res = await update_finalProduct();
@@ -139,7 +149,15 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  const { lastestVerifyForm } = useMemo(() => {
+  useEffect(() => {
+    const accountReceivable = contract?.accountReceivable;
+    console.log(contract);
+    setAccountReceivable(accountReceivable);
+  }, [contract]);
+
+  const {
+    lastestVerifyForm, // 請款比例表用的
+  } = useMemo(() => {
     if (!contract) {
       return {};
     }
@@ -208,9 +226,6 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  const [checkBar01, setCheckBar01] = useState<string[]>([]);
-  const [checkBar02, setCheckBar02] = useState<string[]>([]);
-
   // --------------------------------------------------------------------------
 
   // 更改發票前綴的modal
@@ -256,42 +271,83 @@ export default function AccountReceivable() {
       value: engineeringContact?.projectNumber ?? '',
     },
     valuationDate: {
-      value: contract?.content.verifyForm?.askForPaymentDate ?? '',
+      value: accountReceivable?.valuationDate ?? '',
+      onChange_date: (str) => {
+        setAccountReceivable((state) => {
+          if (!state) {
+            return state;
+          }
+
+          return {
+            ...state,
+            valuationDate: str,
+          };
+        });
+      },
     },
     paymentDate: {
-      value: contract?.content.verifyForm?.disbursementDate ?? '',
+      value: accountReceivable?.payOffDay ?? '',
+      onChange_date: (str) => {
+        setAccountReceivable((state) => {
+          if (!state) {
+            return state;
+          }
+
+          return {
+            ...state,
+            payOffDay: str,
+          };
+        });
+      },
     },
   };
 
   // --------------------------------------------------------------------------
 
+  // console.log(accountReceivable);
+
   const control_checkBar01: TcheckboxProps = {
     onChange: (arr) => {
-      setCheckBar01(arr);
+      const performanceBond = arr.includes('performanceBond');
+      const depositGuaranteeTicket = arr.includes('depositGuaranteeTicket');
+      const warrantyTicket = arr.includes('warrantyTicket');
+
+      setAccountReceivable((state) => {
+        if (!state) {
+          return state;
+        }
+
+        const copy = { ...state };
+        copy.performanceBond = performanceBond;
+        copy.depositGuaranteeTicket = depositGuaranteeTicket;
+        copy.warrantyTicket = warrantyTicket;
+
+        return copy;
+      });
     },
     propsArr: [
       {
-        key: 'performanceCheque',
+        key: 'performanceBond',
         label: '履約保證票',
-        value: checkBar01.includes('performanceCheque'),
+        value: accountReceivable?.performanceBond,
         props: {
-          className: classNames(checkBar01.includes('performanceCheque') && scss.checkActive),
+          className: classNames(accountReceivable?.performanceBond && scss.checkActive),
         },
       },
       {
-        key: 'depositGuaranteeCheque',
+        key: 'depositGuaranteeTicket',
         label: '訂金款保證票',
-        value: checkBar01.includes('depositGuaranteeCheque'),
+        value: accountReceivable?.depositGuaranteeTicket,
         props: {
-          className: classNames(checkBar01.includes('depositGuaranteeCheque') && scss.checkActive),
+          className: classNames(accountReceivable?.depositGuaranteeTicket && scss.checkActive),
         },
       },
       {
-        key: 'warrantyCheque',
+        key: 'warrantyTicket',
         label: '保固票',
-        value: checkBar01.includes('warrantyCheque'),
+        value: accountReceivable?.warrantyTicket,
         props: {
-          className: classNames(checkBar01.includes('warrantyCheque') && scss.checkActive),
+          className: classNames(accountReceivable?.warrantyTicket && scss.checkActive),
         },
       },
     ],
@@ -316,7 +372,7 @@ export default function AccountReceivable() {
           },
           // 備註
           remark: {
-            value: item.note,
+            value: item.note ?? '',
           },
         };
       }) ?? [],
@@ -326,31 +382,46 @@ export default function AccountReceivable() {
 
   const control_checkBar02: TcheckboxProps = {
     onChange: (arr) => {
-      setCheckBar02(arr);
+      const hasNoContract = arr.includes('hasNoContract');
+      const hasUncollectedAmounts = arr.includes('hasUncollectedAmounts');
+      const hasNotInstall = arr.includes('hasNotInstall');
+
+      setAccountReceivable((state) => {
+        if (!state) {
+          return state;
+        }
+
+        const copy = { ...state };
+        copy.hasNoContract = hasNoContract;
+        copy.hasUncollectedAmounts = hasUncollectedAmounts;
+        copy.hasNotInstall = hasNotInstall;
+
+        return copy;
+      });
     },
     propsArr: [
       {
-        key: 'abnormal',
+        key: 'hasNoContract',
         label: '異常燈號：工作表已開立，合約尚未簽回',
-        value: checkBar02.includes('abnormal'),
+        value: accountReceivable?.hasNoContract,
         props: {
-          className: classNames(checkBar02.includes('abnormal') && scss.checkActive),
+          className: classNames(accountReceivable?.hasNoContract && scss.checkActive),
         },
       },
       {
-        key: 'remind',
+        key: 'hasUncollectedAmounts',
         label: '提醒燈號：已出具說明，尚未收足款項 ',
-        value: checkBar02.includes('remind'),
+        value: accountReceivable?.hasUncollectedAmounts,
         props: {
-          className: classNames(checkBar02.includes('remind') && scss.checkActive),
+          className: classNames(accountReceivable?.hasUncollectedAmounts && scss.checkActive),
         },
       },
       {
-        key: 'notInstalled',
+        key: 'hasNotInstall',
         label: '已出貨因故尚未安裝',
-        value: checkBar02.includes('notInstalled'),
+        value: accountReceivable?.hasNotInstall,
         props: {
-          className: classNames(checkBar02.includes('notInstalled') && scss.checkActive),
+          className: classNames(accountReceivable?.hasNotInstall && scss.checkActive),
         },
       },
     ],

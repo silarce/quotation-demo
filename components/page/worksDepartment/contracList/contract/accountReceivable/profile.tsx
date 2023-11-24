@@ -1,5 +1,6 @@
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import moment from 'moment';
 
 import scss from './profile.module.scss';
 
@@ -8,6 +9,7 @@ import scss from './profile.module.scss';
 type TcontrolItem = {
   value: string;
   onChange?: (str: string) => void;
+  onChange_date?: (str: string) => void;
 };
 
 type Tcontrol = {
@@ -125,23 +127,41 @@ export default function Profile({
           {rightKeys.map((key, index) => {
             const { label } = config[key];
 
+            const { value, onChange, onChange_date } = control[key];
+
             return (
               <div key={index} className={scss.span1}>
                 <InputSel
                   wrapperStyle={{ gap }}
                   caption={label}
                   captionClassName={scss.caption}
-                  disabled={control[key].onChange ? disabled : true}
+                  disabled={onChange || onChange_date ? disabled : true}
                   showBaseline="auto"
-                  inputProps={{
-                    props: {
-                      value: control[key].value,
-                      placeholder: '',
-                      onChange: (e) => {
-                        control[key].onChange?.(e.target.value);
-                      },
-                    },
-                  }}
+                  inputProps={
+                    onChange
+                      ? {
+                          props: {
+                            value: value,
+                            placeholder: '',
+                            onChange: (e) => {
+                              onChange?.(e.target.value);
+                            },
+                          },
+                        }
+                      : undefined
+                  }
+                  datePickerProps={
+                    onChange_date
+                      ? {
+                          props: {
+                            value: value ? moment(value) : null,
+                            onChange: (date) => {
+                              onChange_date(date ? date.toISOString() : '');
+                            },
+                          },
+                        }
+                      : undefined
+                  }
                 />
               </div>
             );
