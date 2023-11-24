@@ -36,6 +36,7 @@ import {
   useGetEngineeringContact,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
+  useGetFinalProduct,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -46,15 +47,16 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
+import { update } from 'lodash';
 
 // ========================================================================
 
-type TrequestPayment = {
-  caption: string;
-  paymentRatio: string;
-  loanPeriod: string;
-  remark: string;
-};
+// type TrequestPayment = {
+//   caption: string;
+//   paymentRatio: string;
+//   loanPeriod: string;
+//   remark: string;
+// };
 
 type Tinvoice = {
   date: string;
@@ -128,15 +130,33 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
+  useEffect(() => {
+    (async () => {
+      const res = await update_finalProduct();
+    })();
+  }, [contractId]);
+
   // --------------------------------------------------------------------------
 
-  const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
-
-  useEffect(() => {
-    if (disabled) {
-      setRequestPaymentArr(fakeRequestPayment);
+  const { lastestVerifyForm } = useMemo(() => {
+    if (!contract) {
+      return {};
     }
-  }, [disabled]);
+
+    const { subContracts } = contract;
+    const lastestSubContract = subContracts[subContracts.length - 1];
+    const lastestVerifyForm = lastestSubContract.content.verifyForm;
+
+    return { lastestVerifyForm };
+  }, [
+    contract,
+    // engineeringContact,
+  ]);
+
+  // --------------------------------------------------------------------------
+
+  // const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
 
   // --------------------------------------------------------------------------
 
@@ -280,41 +300,26 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const control_table_requestPayment: Tcontrol_table_requestPayment = {
-    columnArr: requestPaymentArr.map((item, index) => {
-      return {
-        caption: item.caption,
-        // 請款比例
-        paymentRatio: {
-          value: item.paymentRatio,
-          onChange: (str) => {
-            setRequestPaymentArr((arr) => {
-              const newArr = [...requestPaymentArr];
-              arr[index].paymentRatio = str;
-
-              return newArr;
-            });
+    columnArr:
+      lastestVerifyForm?.paymentRatio.map((item, index) => {
+        return {
+          caption: item.level,
+          // 請款比例
+          paymentRatio: {
+            // value: item.paymentRatio,
+            value: new Decimal(item.paymentRatio || 0).mul(100).toString() + '%',
           },
-        },
-        // 放款票期
-        loanPeriod: {
-          value: item.loanPeriod,
-          onChange: (str) => {
-            const arr = [...requestPaymentArr];
-            arr[index].loanPeriod = str;
-            setRequestPaymentArr(arr);
+          // 放款票期
+          loanPeriod: {
+            // 合約審核表 TquotationVerifyFormDto.paymentRatioDto 沒有票期 還是說全部都放 paymentTenor?
+            value: 'no property',
           },
-        },
-        // 備註
-        remark: {
-          value: item.remark,
-          onChange: (str) => {
-            const arr = [...requestPaymentArr];
-            arr[index].remark = str;
-            setRequestPaymentArr(arr);
+          // 備註
+          remark: {
+            value: item.note,
           },
-        },
-      };
-    }),
+        };
+      }) ?? [],
   };
 
   // --------------------------------------------------------------------------
@@ -1025,34 +1030,34 @@ export default function AccountReceivable() {
 // ========================================================================
 // ========================================================================
 
-const fakeRequestPayment: TrequestPayment[] = [
-  {
-    caption: '訂約',
-    paymentRatio: 'foo',
-    loanPeriod: 'foo',
-    remark: 'foo',
-  },
-  {
-    caption: '送審',
-    paymentRatio: 'foo',
-    loanPeriod: 'foo',
-    remark: 'foo',
-  },
-  {
-    caption: '丈量',
-    paymentRatio: 'foo',
-    loanPeriod: 'foo',
-    remark: 'foo',
-  },
-];
+// const fakeRequestPayment: TrequestPayment[] = [
+//   {
+//     caption: '訂約',
+//     paymentRatio: 'foo',
+//     loanPeriod: 'foo',
+//     remark: 'foo',
+//   },
+//   {
+//     caption: '送審',
+//     paymentRatio: 'foo',
+//     loanPeriod: 'foo',
+//     remark: 'foo',
+//   },
+//   {
+//     caption: '丈量',
+//     paymentRatio: 'foo',
+//     loanPeriod: 'foo',
+//     remark: 'foo',
+//   },
+// ];
 
-const creEmptyInvoice = (): Tinvoice => ({
-  date: '',
-  invoiceNumberPrefix: '',
-  invoiceNumber: '',
-  price: '',
-  remark: '',
-});
+// const creEmptyInvoice = (): Tinvoice => ({
+//   date: '',
+//   invoiceNumberPrefix: '',
+//   invoiceNumber: '',
+//   price: '',
+//   remark: '',
+// });
 
 const fakeInvoiceArr: Tinvoice[] = [
   {

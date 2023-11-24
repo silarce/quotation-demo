@@ -495,6 +495,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'attachedContract',
       'subContracts.content.products.rootProdductId',
       'subContracts.content.customer',
+      'subContracts.content.verifyForm',
 
       'products',
     ],
