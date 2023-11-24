@@ -11,8 +11,8 @@ export default function TwoBtnFooter({
   confirmText,
   cancelText,
 }: {
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
   confirmText?: string;
   cancelText?: string;
 }) {

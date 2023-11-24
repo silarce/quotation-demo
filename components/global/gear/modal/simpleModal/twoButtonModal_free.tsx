@@ -19,8 +19,8 @@ export default function TwoButtonModal_free({
   visible: boolean;
   title?: string;
   children: React.ReactNode;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
   confirmText?: string;
   cancelText?: string;
   modalProps?: ModalProps;
@@ -54,3 +54,5 @@ export default function TwoButtonModal_free({
     </Modal>
   );
 }
+
+export { TwoBtnFooter };

@@ -7,7 +7,7 @@ export default function RedButton({
   img,
 }: {
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
   img?: string;
 }) {
