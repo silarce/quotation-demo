@@ -86,6 +86,12 @@ type TdeductionList = {
 
 // ========================================================================
 
+// 接著做 串接 apiPatchAccountReceivable
+// 接著做 串接 apiPatchAccountReceivable
+// 接著做 串接 apiPatchAccountReceivable
+// 接著做 串接 apiPatchAccountReceivable
+// 接著做 串接 apiPatchAccountReceivable
+
 export default function AccountReceivable() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
