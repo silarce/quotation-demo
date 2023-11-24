@@ -28,7 +28,7 @@ import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import TwoButtonModal_free from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
+import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
 
 // api
 import {
@@ -46,7 +46,6 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
-import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // ========================================================================
 
@@ -94,6 +93,7 @@ export default function AccountReceivable() {
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
   const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
+  const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -959,6 +959,46 @@ export default function AccountReceivable() {
             <span>留空</span>
           </div>
         </div>
+      </TwoButtonModal_free>
+
+      <TwoButtonModal_free
+        //
+        title="請輸入新增發票"
+        visible={showAddInvoiceModal}
+        onCancel={() => setShowAddInvoiceModal(false)}
+        modalProps={{
+          width: 400,
+          footer: null,
+        }}
+      >
+        <form
+          className={classNames()}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const target = e.target as HTMLFormElement;
+            const t0 = target[0] as HTMLInputElement;
+            const t1 = target[1] as HTMLInputElement;
+            console.log(t0.value);
+            console.log(t1.value);
+          }}
+        >
+          <div className={scss.addInvoiceModal}>
+            <label>
+              <InputSel caption="發票日期" datePickerProps={{}} showBaseline="invisible" />
+            </label>
+            <label>
+              <InputSel caption="發票號碼" inputProps={{}} showBaseline="invisible" />
+            </label>
+          </div>
+
+          <TwoBtnFooter
+            onConfirm={() => {}}
+            onCancel={(e) => {
+              e.preventDefault();
+              setShowAddInvoiceModal(false);
+            }}
+          />
+        </form>
       </TwoButtonModal_free>
     </SubLayer>
   );

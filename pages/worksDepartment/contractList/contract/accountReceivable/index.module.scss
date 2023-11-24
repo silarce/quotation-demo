@@ -54,3 +54,20 @@
     }
   }
 }
+
+.addInvoiceModal {
+  display: grid;
+  gap: 17px;
+  margin-top: 42px;
+  margin-bottom: 48px;
+  input {
+    border-bottom: solid 1px black;
+    text-align: center;
+  }
+  :global(.ant-picker-input) {
+    border-bottom: solid 1px black;
+    input {
+      border: none;
+    }
+  }
+}
