@@ -2439,6 +2439,51 @@ export type TupdateEngineeringDeliveryListDto = {
   notes: string;
 };
 
+// 應收帳款明細
+
+export type TaccountReceivableDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 估價日期
+  valuationDate: string | null;
+  // 付清日期
+  payOffDay: string | null;
+  // 履約保證票
+  performanceBond: boolean;
+  // 訂金款保證票
+  depositGuaranteeTicket: boolean;
+  // 保固票
+  warrantyTicket: boolean;
+  // 異常燈號(工作表已開立，合約尚未簽回)
+  hasNoContract: boolean;
+  // 提醒燈號(已出具證明，尚未收足款項)
+  hasUncollectedAmounts: boolean;
+  // 已出貨，因故尚未安裝
+  hasNotInstall: boolean;
+  // 請款比例
+  paymentRatio: TpaymentRatioDto[];
+  contract: TquotationContractDto;
+  legacyContract: TlegacyContractDto;
+  accountReceivableDeduction: TaccountsReceivableDeductionDto | null;
+  accountant: TaccountantDto | null;
+};
+
+// 發票
+export type TaccountsReceivableInvoiceDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  /** 發票日期 */
+  invoiceDate: string;
+  /** 發票號碼 */
+  invoiceNumber: string;
+  price: number;
+  /** 所屬應收帳款ID */
+  accountsReceivableId: string | null;
+  accountsReceivable?: TaccountReceivableDto | null;
+};
+
 // =========================================================================
 
 // accountant
@@ -2451,6 +2496,7 @@ export type TaccountantDto = {
   accountingNumber: string; // 編號/存入帳號
   price: number; // 金額
   notes: string | null; // 備註
+  billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
 };
 
@@ -2466,5 +2512,5 @@ export type TaccountsReceivableDeductionDto = {
   period: number; // 期數
   detailedAmount: number; // 明細金額
   accountsReceivableId: string; // 所屬應收帳款Id
-  // accountsReceivable: ; // 所屬應收帳款
+  accountsReceivable?: TaccountReceivableDto | null; // 所屬應收帳款
 };
