@@ -149,6 +149,8 @@ export default function OutboundOrder() {
     return list;
   }, [contract]);
 
+  // console.log(contractProdList);
+
   // --------------------------------------------------------------------------
 
   const [notes, setNotes] = useState<string>();
@@ -231,8 +233,6 @@ export default function OutboundOrder() {
           productItemId,
         },
       });
-
-      console.log(res);
 
       if (res) {
         return res;
@@ -574,6 +574,7 @@ export default function OutboundOrder() {
           contractData: {
             // 這裡的東西不需要顯示，所以空字串就好了
             project: '',
+            // project: prod.itemName,
             L: '',
             W: '',
             B: '',
@@ -587,7 +588,9 @@ export default function OutboundOrder() {
             surface: '',
           },
           staticData: {
-            project: prod.itemName,
+            // 現在orderTable的orderKeyArr_static沒有project，所以不會顯示這個欄位
+            // 但應該是顯示了會比較清楚
+            project: item.itemName,
             L: String(item.fullWidth),
             W: String(item.WG),
             B: String(item.boxB),
