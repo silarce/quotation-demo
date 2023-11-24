@@ -1854,7 +1854,7 @@ export type TpaymentRatioDto = {
   // 金額
   price: string;
   // 備註
-  note: string;
+  note: string | null;
 };
 
 export type TquotationVerifyFormDto = {

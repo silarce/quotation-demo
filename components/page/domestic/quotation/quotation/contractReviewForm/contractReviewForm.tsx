@@ -128,7 +128,7 @@ export default function ContractReviewForm({
         title: item.level,
         percent: item.paymentRatio,
         price: item.price,
-        note: item.note,
+        note: item.note ?? '',
       };
     });
 
