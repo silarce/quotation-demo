@@ -21,6 +21,7 @@ import {
   IconBreakChain,
   IconEdit,
   IconTearing,
+  IconSearch,
 } from 'public/image/icon/svgComponent/svgIcons';
 
 import iconAdd from 'public/image/icon/add.svg';
@@ -105,10 +106,7 @@ type Tcontrol = {
   headRow: TheadRow;
   rowArr: Trow[];
 
-  topRightBtnProps?: {
-    label: string;
-    onClick: () => void;
-  };
+  onSearchClick?: (str: string) => void;
 
   tableBottomBtnProps?: {
     label: string;
@@ -141,7 +139,7 @@ export default function AccountReceivable_dynaTable({
     rowArr,
     tableBottomBtnProps,
     bottomBarProps,
-    topRightBtnProps,
+    onSearchClick,
   } = control;
 
   return (
@@ -149,7 +147,23 @@ export default function AccountReceivable_dynaTable({
       <div className={scss.wrapper}>
         <div className={scss.top}>
           <span>{caption}</span>
-          {topRightBtnProps && <MyButton_v2 label={topRightBtnProps.label} onClick={topRightBtnProps.onClick} />}
+
+          {onSearchClick && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const target = e.target as HTMLFormElement;
+                const inputElement = target[0] as HTMLInputElement;
+                onSearchClick(inputElement.value);
+              }}
+              className={scss.searchBar}
+            >
+              <input type="text" />
+              <button>
+                <IconSearch />
+              </button>
+            </form>
+          )}
         </div>
         {/* table */}
 

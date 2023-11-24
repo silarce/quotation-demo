@@ -189,6 +189,7 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // 更改發票前綴的modal
   const [isShowInvoicePrefixModal, setIsShowInvoicePrefixModal] = useState<boolean>(false);
   const [invoicePrefix, setInvoicePrefix] = useState<string>('');
 
@@ -515,23 +516,20 @@ export default function AccountReceivable() {
 
     const control_invoiceGivingRecord: Tcontrol_dynaTable = {
       caption: '發票給予紀錄',
-      topRightBtnProps: {
-        label: `更改發票前綴:${invoicePrefix}`,
-        onClick: () => {
-          setIsShowInvoicePrefixModal(true);
-        },
+      onSearchClick: (str) => {
+        alert(str);
       },
-      tableBottomBtnProps: {
-        label: '新增發票',
-        onClick: () => {
-          setInvoiceArr((arr) => {
-            const empty = creEmptyInvoice();
-            empty.invoiceNumberPrefix = invoicePrefix;
+      // tableBottomBtnProps: {
+      //   label: '新增發票',
+      //   onClick: () => {
+      //     setInvoiceArr((arr) => {
+      //       const empty = creEmptyInvoice();
+      //       empty.invoiceNumberPrefix = invoicePrefix;
 
-            return [...arr, empty];
-          });
-        },
-      },
+      //       return [...arr, empty];
+      //     });
+      //   },
+      // },
       bottomBarProps: {
         label: '合計',
         value: '123,123',
@@ -642,7 +640,7 @@ export default function AccountReceivable() {
       };
       //
 
-      const control: Tcontrol_dynaTable['rowArr'][number] = {
+      const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_05: {
           onChainClick: () => {},
           onRemoveClick: () => {},
@@ -706,12 +704,15 @@ export default function AccountReceivable() {
         subTable,
       };
 
-      return control;
-    });
+      return control_accountant_rowArr;
+    }); // control_accountant_rowArr
 
     const control_accountant: Tcontrol_dynaTable = {
       caption: '收款紀錄',
-      topRightBtnProps: {
+      onSearchClick: (str) => {
+        alert(str);
+      },
+      tableBottomBtnProps: {
         label: '新增收款紀錄',
         onClick: () => {
           setShowRecordModal(true);
