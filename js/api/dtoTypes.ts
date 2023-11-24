@@ -2469,6 +2469,18 @@ export type TaccountReceivableDto = {
   accountant: TaccountantDto | null;
 };
 
+export type TupdateAccountReceivableDto = Pick<
+  TaccountReceivableDto,
+  | 'valuationDate'
+  | 'payOffDay'
+  | 'performanceBond'
+  | 'depositGuaranteeTicket'
+  | 'warrantyTicket'
+  | 'hasNoContract'
+  | 'hasUncollectedAmounts'
+  | 'hasNotInstall'
+>;
+
 // 發票
 export type TaccountsReceivableInvoiceDto = {
   id: string;
@@ -2479,14 +2491,24 @@ export type TaccountsReceivableInvoiceDto = {
   /** 發票號碼 */
   invoiceNumber: string;
   price: number;
+  note: string | null;
   /** 所屬應收帳款ID */
   accountsReceivableId: string | null;
   accountsReceivable?: TaccountReceivableDto | null;
 };
 
-// =========================================================================
+export type TcreateAccountReceivableInvoiceDto = Pick<
+  TaccountsReceivableInvoiceDto,
+  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
+>;
 
-// accountant
+export type TupdateAccountReceivableInvoiceDto = Pick<
+  TaccountsReceivableInvoiceDto,
+  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
+> & {
+  // 關聯的收款紀錄Id
+  accountants: string[];
+};
 
 export type TaccountantDto = {
   id: string;
@@ -2504,6 +2526,7 @@ export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'up
   noteMaturityDate?: string | null;
 };
 
+/**扣款明細 */
 export type TaccountsReceivableDeductionDto = {
   id: string;
   createdAt: string;
@@ -2513,4 +2536,20 @@ export type TaccountsReceivableDeductionDto = {
   detailedAmount: number; // 明細金額
   accountsReceivableId: string; // 所屬應收帳款Id
   accountsReceivable?: TaccountReceivableDto | null; // 所屬應收帳款
+};
+
+export type TcreateAccountReceivableDeductionDto = Pick<
+  TaccountsReceivableDeductionDto,
+  'itemName' | 'period' | 'detailedAmount'
+>;
+
+export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
+  id?: string; // 不提供時將此筆視為新增資料
+};
+
+export type TfinalProduct = {
+  //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
+  finalRootContractProduct: TquotationProductDto[];
+  //追加合約產品包含item deliveryStatus productPayment
+  finalAppendContractProducts: TquotationProductDto[];
 };
