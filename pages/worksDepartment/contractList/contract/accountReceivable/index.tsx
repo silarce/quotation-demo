@@ -94,6 +94,7 @@ export default function AccountReceivable() {
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
   const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
   const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
+  const [showPercentModal, setShowPercentModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -926,6 +927,16 @@ export default function AccountReceivable() {
           setIsShowInvoicePrefixModal(false);
         }}
         onCancel={() => setIsShowInvoicePrefixModal(false)}
+      />
+
+      <InputModal
+        //
+        title="請輸入百分比"
+        visible={showPercentModal}
+        onConfirm={(value) => {}}
+        onCancel={() => {
+          setShowPercentModal(false);
+        }}
       />
 
       <PaymentRecordSelector
