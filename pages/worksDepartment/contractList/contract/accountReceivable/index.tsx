@@ -22,6 +22,7 @@ import AccountReceivable_dynaTable, {
 import DeductionDetails, {
   Tcontrol_deductionDetails,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetails';
+import Table_request from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_request';
 
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -1071,6 +1072,9 @@ export default function AccountReceivable() {
           <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar02} />
         </div>
 
+        {/* 請款單表格 */}
+        <Table_request contractId={contractId} accountReceivableId={accountReceivableId} />
+
         {/* 發票給予紀錄 */}
         <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
         {/* 收款紀錄*/}
@@ -1133,7 +1137,7 @@ export default function AccountReceivable() {
         </div>
       </TwoButtonModal_free>
 
-      <TwoButtonModal_free
+      {/* <TwoButtonModal_free
         //
         title="請輸入新增發票"
         visible={showAddInvoiceModal}
@@ -1171,7 +1175,7 @@ export default function AccountReceivable() {
             }}
           />
         </form>
-      </TwoButtonModal_free>
+      </TwoButtonModal_free> */}
     </SubLayer>
   );
 }

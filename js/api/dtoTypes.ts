@@ -970,6 +970,7 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+/**應收帳款明細 主產品請款比例 */
 export type TaccountsReceivableProductPaymentDto = {
   //  '期數'
   period: number;

@@ -959,8 +959,11 @@ export const useGetAccountReceivableIncoices = (id: string, customParams?: Tpara
 };
 
 /**新增 應收帳款發票 account-receivable-invoice */
-export const apiPostAccountReceivableIncoice = async (id: string, body: TcreateAccountReceivableInvoiceDto) => {
-  const api = `/engineering/account-receivable/${id}/invoice`;
+export const apiPostAccountReceivableIncoice = async (
+  accountReceivableId: string,
+  body: TcreateAccountReceivableInvoiceDto
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/invoice`;
 
   return axi
     .post<TaccountsReceivableInvoiceDto>(api, body)
