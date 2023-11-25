@@ -10,6 +10,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import {
   TcreateAccountReceivableInvoiceDto,
+  TaccountsReceivableInvoiceDto,
   TupdateEngineeringContactDto,
   TupdateAccountReceivableDto,
   TaccountReceivableDto,
@@ -35,9 +36,13 @@ import scss from './table_request.module.scss';
 export default function Table_request({
   contractId,
   accountReceivableId,
+  invoiceArr,
+  onInvoiceAdd,
 }: {
   contractId: string | undefined;
   accountReceivableId: string | undefined;
+  invoiceArr: TaccountsReceivableInvoiceDto[] | undefined;
+  onInvoiceAdd?: (invoice: TaccountsReceivableInvoiceDto) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -66,8 +71,9 @@ export default function Table_request({
 
     try {
       setIsLoading(true);
-      await apiPostAccountReceivableIncoice(accountReceivableId, body);
+      const res = await apiPostAccountReceivableIncoice(accountReceivableId, body);
       setShowAddInvoiceModal(false);
+      onInvoiceAdd?.(res);
     } catch (error) {
       const err = error as Error;
       myAlert.err({

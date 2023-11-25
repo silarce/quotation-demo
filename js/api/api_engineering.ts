@@ -923,8 +923,8 @@ type TgetAccountReceivableIncoices = {
 };
 
 /**以 應收帳款id取得 所有 應收帳款發票 account-receivable */
-export const apiGetAccountReceivableIncoices = async (id: string, params?: Tparams) => {
-  const api = `/engineering/account-receivable/${id}/invoices`;
+export const apiGetAccountReceivableIncoices = async (accountReceivableId: string, params?: Tparams) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/invoices`;
 
   return axi
     .get<TgetAccountReceivableIncoices>(api, { params })
@@ -932,17 +932,24 @@ export const apiGetAccountReceivableIncoices = async (id: string, params?: Tpara
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetAccountReceivableIncoices = (id: string, customParams?: Tparams) => {
+/**以 應收帳款id取得 所有 應收帳款發票 account-receivable */
+export const useGetAccountReceivableIncoices = (accountReceivableId: string | undefined, customParams?: Tparams) => {
   const [res, setRes] = useState<TgetAccountReceivableIncoices>();
 
-  const params = {
+  const params: Tparams = {
     // populate: [],
     pageSize: 9999,
+    sort: 'createdAt',
+    order: 'DESC',
     ...customParams,
   };
 
   const update = async () => {
-    const newRes = await apiGetAccountReceivableIncoices(id, params);
+    if (!accountReceivableId) {
+      return;
+    }
+
+    const newRes = await apiGetAccountReceivableIncoices(accountReceivableId, params);
 
     if (newRes) {
       setRes(newRes);

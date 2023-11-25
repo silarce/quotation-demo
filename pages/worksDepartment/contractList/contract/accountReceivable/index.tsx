@@ -45,6 +45,8 @@ import {
   useGetAccountReceivableAccountants,
   apiPostAccountReceivableAccountant,
   apiDeleteAccountReceivableAccountant,
+  useGetAccountReceivableIncoices,
+  TaccountsReceivableInvoiceDto,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -151,9 +153,13 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  // _use收款紀錄
   const { data: data_accountantArr, update: update_accountantArr } =
     useGetAccountReceivableAccountants(accountReceivableId);
 
+  // _use發票給予紀錄
+  const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(accountReceivableId);
+  console.log('data_invoiceArr', data_invoiceArr);
   // --------------------------------------------------------------------------
 
   // 應收帳款明細
@@ -183,6 +189,7 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     update_accountantArr();
+    update_invoiceArr();
   }, [accountReceivableId]);
 
   const {
@@ -208,12 +215,19 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  const [invoiceArr, setInvoiceArr] = useState<Tinvoice[]>([]);
+  // const [invoiceArr, setInvoiceArr] = useState<Tinvoice[]>([]);
+  // useEffect(() => {
+  //   if (disabled) {
+  //     setInvoiceArr(fakeInvoiceArr);
+  //   }
+  // }, [disabled]);
+
+  const [invoiceArr, setInvoiceArr] = useState<TaccountsReceivableInvoiceDto[]>([]);
   useEffect(() => {
     if (disabled) {
-      setInvoiceArr(fakeInvoiceArr);
+      setInvoiceArr(data_invoiceArr ?? []);
     }
-  }, [disabled]);
+  }, [data_invoiceArr, disabled]);
 
   // --------------------------------------------------------------------------
 
@@ -487,6 +501,7 @@ export default function AccountReceivable() {
   };
 
   // --------------------------------------------------------------------------
+  // data_invoiceArr
   // 控制 發票給予紀錄
   const control_invoiceGivingRecord = useMemo(() => {
     const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
@@ -572,12 +587,12 @@ export default function AccountReceivable() {
             cellStyle: { width: '120px' },
             datePickerProps: {
               props: {
-                value: item.date ? moment(item.date) : null,
+                value: item.invoiceDate ? moment(item.invoiceDate) : null,
                 onChange: (date) => {
                   setInvoiceArr((arr) => {
                     const newArr = [...arr];
                     const theDate = date?.toISOString() ?? '';
-                    newArr[index].date = theDate;
+                    newArr[index].invoiceDate = theDate;
 
                     return newArr;
                   });
@@ -588,25 +603,41 @@ export default function AccountReceivable() {
           invoiceNumber: {
             label: '發票號碼',
             cellStyle: { width: '300px' },
-            twoInputProps: {
-              one: {
-                props: {
-                  value: item.invoiceNumberPrefix,
-                  onChange: (e) => {
-                    const arr = [...invoiceArr];
-                    arr[index].invoiceNumberPrefix = e.target.value;
-                    setInvoiceArr(arr);
-                  },
-                },
-              },
-              two: {
-                props: {
-                  value: item.invoiceNumber,
-                  onChange: (e) => {
-                    const arr = [...invoiceArr];
-                    arr[index].invoiceNumber = e.target.value;
-                    setInvoiceArr(arr);
-                  },
+            // twoInputProps: {
+            //   one: {
+            //     props: {
+            //       // value: item.invoiceNumberPrefix,
+            //       // onChange: (e) => {
+            //       //   const arr = [...invoiceArr];
+            //       //   arr[index].invoiceNumberPrefix = e.target.value;
+            //       //   setInvoiceArr(arr);
+            //       // },
+            //       value: '',
+            //       onChange: (e) => {
+            //         // const arr = [...invoiceArr];
+            //         // arr[index].invoiceNumberPrefix = e.target.value;
+            //         // setInvoiceArr(arr);
+            //       },
+            //     },
+            //   },
+            //   two: {
+            //     props: {
+            //       value: item.invoiceNumber ?? '',
+            //       onChange: (e) => {
+            //         const arr = [...invoiceArr];
+            //         arr[index].invoiceNumber = e.target.value;
+            //         setInvoiceArr(arr);
+            //       },
+            //     },
+            //   },
+            // },
+            inputProps: {
+              props: {
+                value: item.invoiceNumber ?? '',
+                onChange: (e) => {
+                  const arr = [...invoiceArr];
+                  arr[index].invoiceNumber = e.target.value;
+                  setInvoiceArr(arr);
                 },
               },
             },
@@ -616,10 +647,11 @@ export default function AccountReceivable() {
             cellStyle: { width: '290px' },
             inputProps: {
               props: {
-                value: item.price,
+                type: 'number',
+                value: String(item.price) ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
-                  arr[index].price = e.target.value;
+                  arr[index].price = Number(e.target.value);
                   setInvoiceArr(arr);
                 },
               },
@@ -630,10 +662,10 @@ export default function AccountReceivable() {
             cellStyle: { width: '300px' },
             inputProps: {
               props: {
-                value: item.remark,
+                value: item.note ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
-                  arr[index].remark = e.target.value;
+                  arr[index].note = e.target.value;
                   setInvoiceArr(arr);
                 },
               },
@@ -1073,7 +1105,12 @@ export default function AccountReceivable() {
         </div>
 
         {/* 請款單表格 */}
-        <Table_request contractId={contractId} accountReceivableId={accountReceivableId} />
+        <Table_request
+          contractId={contractId}
+          accountReceivableId={accountReceivableId}
+          invoiceArr={data_invoiceArr}
+          onInvoiceAdd={update_invoiceArr}
+        />
 
         {/* 發票給予紀錄 */}
         <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
@@ -1189,52 +1226,6 @@ export default function AccountReceivable() {
 // ========================================================================
 // ========================================================================
 // ========================================================================
-
-// const fakeRequestPayment: TrequestPayment[] = [
-//   {
-//     caption: '訂約',
-//     paymentRatio: 'foo',
-//     loanPeriod: 'foo',
-//     remark: 'foo',
-//   },
-//   {
-//     caption: '送審',
-//     paymentRatio: 'foo',
-//     loanPeriod: 'foo',
-//     remark: 'foo',
-//   },
-//   {
-//     caption: '丈量',
-//     paymentRatio: 'foo',
-//     loanPeriod: 'foo',
-//     remark: 'foo',
-//   },
-// ];
-
-// const creEmptyInvoice = (): Tinvoice => ({
-//   date: '',
-//   invoiceNumberPrefix: '',
-//   invoiceNumber: '',
-//   price: '',
-//   remark: '',
-// });
-
-const fakeInvoiceArr: Tinvoice[] = [
-  {
-    date: '',
-    invoiceNumberPrefix: '55555',
-    invoiceNumber: '123',
-    price: '999',
-    remark: 'aaaaaa',
-  },
-  {
-    date: '',
-    invoiceNumberPrefix: '55555',
-    invoiceNumber: '123',
-    price: '999',
-    remark: 'bbbbb',
-  },
-];
 
 const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
   {
