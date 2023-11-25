@@ -1,3 +1,7 @@
+/**
+ * 常用變數 accountReceivableId
+ */
+
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
@@ -30,6 +34,7 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
+import InvoiceSelector from 'components/global/gear/modal/invoiceSelector';
 
 // api
 import {
@@ -1178,6 +1183,16 @@ export default function AccountReceivable() {
         exceptAccountantArr={data_accountantArr}
       />
 
+      <InvoiceSelector
+        accountReceivableId={accountReceivableId}
+        label="請選擇發票"
+        tip="可複選"
+        showModal={true}
+        onConfirm={() => {}}
+        onCancel={() => {}}
+        exceptInvoiceArr={[]}
+      />
+
       <TwoButtonModal_free
         //
         title={`"請選擇移除 第${3}期 方式"`}
@@ -1200,6 +1215,7 @@ export default function AccountReceivable() {
         </div>
       </TwoButtonModal_free>
 
+      {/* 編輯發票 */}
       <TwoButtonModal_free
         //
         title="編輯發票"
